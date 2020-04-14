@@ -27,11 +27,11 @@
     <SamplesExample>
       <Table :data="typography">
         <template v-slot:header-row>
-          <HeaderCell size="4">Name</HeaderCell>
+          <HeaderCell size="4">Mixin</HeaderCell>
           <HeaderCell size="12">Example</HeaderCell>
         </template>
         <template v-slot:row="{ row }">
-          <Cell size="4" column-header="Name">
+          <Cell size="4" column-header="Mixin">
             {{ row.name }}
           </Cell>
 
@@ -72,75 +72,75 @@ export default {
       typography: [
         {
           class: 'tui-typographySamples__heading-large',
-          name: 'tui-font-heading-large',
+          name: '@include tui-font-heading-large();',
         },
         {
           class: 'tui-typographySamples__heading-medium',
-          name: 'tui-font-heading-medium',
+          name: '@include tui-font-heading-medium();',
         },
         {
           class: 'tui-typographySamples__heading-small',
-          name: 'tui-font-heading-small',
+          name: '@include tui-font-heading-small();',
         },
         {
           class: 'tui-typographySamples__heading-smallRegular',
-          name: 'tui-font-heading-small-regular',
+          name: '@include tui-font-heading-small-regular();',
         },
         {
           class: 'tui-typographySamples__heading-xSmall',
-          name: 'tui-font-heading-x-small',
+          name: '@include tui-font-heading-x-small();',
         },
         {
           class: 'tui-typographySamples__heading-label',
-          name: 'tui-font-heading-label',
+          name: '@include tui-font-heading-label();',
         },
         {
           class: 'tui-typographySamples__heading-labelSmall',
-          name: 'tui-font-heading-label-small',
+          name: '@include tui-font-heading-label-small();',
         },
         {
           class: 'tui-typographySamples__body',
-          name: 'tui-font-body',
+          name: '@include tui-font-body();',
         },
         {
           class: 'tui-typographySamples__body-small',
-          name: 'tui-font-body-small',
+          name: '@include tui-font-body-small();',
         },
         {
           class: 'tui-typographySamples__body-xSmall',
-          name: 'tui-font-body-x-small',
+          name: '@include tui-font-body-x-small();',
         },
         {
           class: 'tui-typographySamples__body-xxSmall',
-          name: 'tui-font-body-xx-small',
+          name: '@include tui-font-body-xx-small();',
         },
         {
           class: 'tui-typographySamples__body-disabled',
-          name: 'tui-font-body-disabled',
+          name: '@include tui-font-body-disabled();',
         },
         {
           class: 'tui-typographySamples__body-placeholder',
-          name: 'tui-font-body-placeholder',
+          name: '@include tui-font-body-placeholder();',
         },
         {
           class: 'tui-typographySamples__body-heavy',
-          name: 'tui-font-heavy',
+          name: '@include tui-font-heavy();',
         },
         {
           class: 'tui-typographySamples__body-hint',
-          name: 'tui-font-hint',
+          name: '@include tui-font-hint();',
         },
         {
           class: 'tui-typographySamples__link-large',
-          name: 'tui-font-link-large',
+          name: '@include tui-font-link-large();',
         },
         {
           class: 'tui-typographySamples__link',
-          name: 'tui-font-link',
+          name: '@include tui-font-link();',
         },
         {
           class: 'tui-typographySamples__link-small',
-          name: 'tui-font-link-small',
+          name: '@include tui-font-link-small();',
         },
       ],
       codeTemplate: `<div class="tui-example__text">Hello</div>`,

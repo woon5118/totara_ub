@@ -25,14 +25,14 @@
     Available colour variables
 
     <SamplesExample>
-      <Table :data="typography">
+      <Table :data="colours">
         <template v-slot:header-row>
-          <HeaderCell size="7">Name</HeaderCell>
+          <HeaderCell size="7">Variables</HeaderCell>
           <HeaderCell size="4">Example</HeaderCell>
           <HeaderCell size="5">Note</HeaderCell>
         </template>
         <template v-slot:row="{ row }">
-          <Cell size="7" column-header="Name">
+          <Cell size="7" column-header="Variables">
             {{ row.name }}
           </Cell>
 
@@ -72,19 +72,19 @@ export default {
 
   data() {
     return {
-      typography: [
+      colours: [
         {
           class: 'tui-colourSamplesBox--primary',
-          name: 'var(--tui-color-primary)',
+          name: 'var(--tui-color-primary);',
           note: 'No contrast dependency (No text on top)',
         },
         {
           class: 'tui-colourSamplesBox--secondary',
-          name: 'var(--tui-color-secondary)',
+          name: 'var(--tui-color-secondary);',
         },
         {
           class: 'tui-colourSamplesBox--tertiary',
-          name: 'var(--tui-color-tertiary)',
+          name: 'var(--tui-color-tertiary);',
         },
         {
           class: '',
@@ -92,27 +92,27 @@ export default {
         },
         {
           class: 'tui-colourSamplesBox--state',
-          name: 'var(--tui-color-state)',
+          name: 'var(--tui-color-state);',
         },
         {
           class: 'tui-colourSamplesBox--stateHover',
-          name: 'var(--tui-color-state-hover)',
+          name: 'var(--tui-color-state-hover);',
         },
         {
           class: 'tui-colourSamplesBox--stateFocus',
-          name: 'var(--tui-color-state-focus)',
+          name: 'var(--tui-color-state-focus);',
         },
         {
           class: 'tui-colourSamplesBox--stateActive',
-          name: 'var(--tui-color-state-active)',
+          name: 'var(--tui-color-state-active);',
         },
         {
           class: 'tui-colourSamplesBox--stateHighlight',
-          name: 'var(--tui-color-state-highlight)',
+          name: 'var(--tui-color-state-highlight);',
         },
         {
           class: 'tui-colourSamplesBox--stateDisabled',
-          name: 'var(--tui-color-state-disabled)',
+          name: 'var(--tui-color-state-disabled);',
         },
         {
           class: '',
