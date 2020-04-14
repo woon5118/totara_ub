@@ -19,6 +19,8 @@
  *
  * @package totara
  * @subpackage reportbuilder
+ *
+ * @deprecated since Totara 13
  */
 
 // lang strings for report builder 'competency evidence' source

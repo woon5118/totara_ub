@@ -432,4 +432,292 @@ class totara_reportbuilder_upgradelib_testcase extends advanced_testcase {
         $graph = $DB->get_record('report_builder_graph', array('id' => $this->rbgraph->id));
         $this->assertEquals($expected, $graph->settings);
     }
+
+    /**
+     * Test migration of competency_evidence report to competency_status report
+     * We create the test report will all columns and filter and with a saved report containing values for all columns
+     */
+    public function test_migrate_competency_evidence_to_competency_status_perform() {
+        global $DB;
+
+        $report = new stdclass();
+        $report->fullname = 'Test Evidence Report';
+        $report->shortname = 'tster';
+        $report->source = 'competency_evidence';
+        $report->hidden = 0;
+        $report->accessmode = 0;
+        $report->contentmode = 0;
+        $report->description = '';
+        $report->recordsperpage = 40;
+        $report->embedded = 0;
+        $report->id = $DB->insert_record('report_builder', $report);
+        $this->report = $report;
+
+        $orig_columns = [
+            [
+                'type' => 'competency_evidence',
+                'value' => 'proficiency',
+                'updated_to' => [
+                    'type' => 'competency_status',
+                    'value' => 'scale_value_name',
+                ],
+            ],
+            [
+                'type' => 'competency_evidence',
+                'value' => 'proficiencyid',
+                'filter' => [
+                    'operator' => 1,
+                    'value' => 1,
+                ],
+                'updated_to' => [
+                    'type' => 'competency_status',
+                    'value' => 'scale_value_id',
+                ],
+            ],
+            [
+                'type' => 'competency_evidence',
+                'value' => 'timemodified',
+                'filter' => [
+                    'before' => time(),
+                ],
+                'updated_to' => [
+                    'type' => 'competency',
+                    'value' => 'time_created',
+                ],
+            ],
+            [
+                'type' => 'competency_evidence',
+                'value' => 'proficientdate',
+                'filter' => [
+                    'before' => time(),
+                ],
+                'deleted' => true,
+            ],
+            [
+                'type' => 'competency_evidence',
+                'value' => 'organisationid',
+                'filter' => [
+                    'operator' => 1,
+                    'value' => 1,
+                ],
+                'deleted' => true,
+            ],
+            [
+                'type' => 'competency_evidence',
+                'value' => 'organisationid2',
+                'filter' => [
+                    'value' => 1,
+                ],
+                'deleted' => true,
+            ],
+            [
+                'type' => 'competency_evidence',
+                'value' => 'organisationpath',
+                'filter' => [
+                    'operator' => 1,
+                    'value' => 1,
+                ],
+                'deleted' => true,
+            ],
+            [
+                'type' => 'competency_evidence',
+                'value' => 'organisation',
+                'deleted' => true,
+            ],
+            [
+                'type' => 'competency_evidence',
+                'value' => 'positionid',
+                'filter' => [
+                    'operator' => 1,
+                    'value' => 1,
+                ],
+                'deleted' => true,
+            ],
+            [
+                'type' => 'competency_evidence',
+                'value' => 'positionid2',
+                'filter' => [
+                    'value' => 1,
+                ],
+                'deleted' => true,
+            ],
+            [
+                'type' => 'competency_evidence',
+                'value' => 'positionpath',
+                'deleted' => true,
+            ],
+            [
+                'type' => 'competency_evidence',
+                'value' => 'position',
+                'deleted' => true,
+            ],
+            [
+                'type' => 'competency_evidence',
+                'value' => 'assessor',
+                'filter' => [
+                    'operator' => 0,
+                    'value' => 'Assessor',
+                ],
+                'deleted' => true,
+            ],
+            [
+                'type' => 'competency_evidence',
+                'value' => 'assessorname',
+                'filter' => [
+                    'operator' => 0,
+                    'value' => 'AssessorName',
+                ],
+                'deleted' => true,
+            ],
+            [
+                'type' => 'competency',
+                'value' => 'fullname',
+                'filter' => [
+                    'operator' => 0,
+                    'value' => 'CompFull',
+                ],
+            ],
+            [
+                'type' => 'competency',
+                'value' => 'shortname',
+                'filter' => [
+                    'operator' => 0,
+                    'value' => 'CompShort',
+                ],
+                'deleted' => true,
+            ],
+            [
+                'type' => 'competency',
+                'value' => 'idnumber',
+                'filter' => [
+                    'operator' => 0,
+                    'value' => 'CompID',
+                ],
+            ],
+            [
+                'type' => 'competency',
+                'value' => 'competencylink',
+                'deleted' => true,
+            ],
+            [
+                'type' => 'competency',
+                'value' => 'id',
+            ],
+            [
+                'type' => 'competency',
+                'value' => 'id2',
+                'filter' => [
+                    'value' => 1,
+                ],
+                'deleted' => true,
+            ],
+            [
+                'type' => 'competency',
+                'value' => 'path',
+                'filter' => [
+                    'operator' => 1,
+                    'value' => 1,
+                ],
+                'deleted' => true,
+            ],
+            [
+                'type' => 'competency',
+                'value' => 'statushistorylink',
+                'deleted' => true,
+            ],
+        ];
+
+        // Columns, Filters and Search cols
+        $orig_saved = [];
+
+        foreach ($orig_columns as $idx => $data) {
+            $rbcolumn = new stdClass();
+            $rbcolumn->reportid = $report->id;
+            $rbcolumn->type = $data['type'];
+            $rbcolumn->value = $data['value'];
+            $rbcolumn->sortorder = $idx;
+            $rbcolumn->hidden = 0;
+            $rbcolumn->customheading = 0;
+            $rbcolumn->id = $DB->insert_record('report_builder_columns', $rbcolumn);
+
+            if (isset($data['filter'])) {
+                $rbfilter = new stdClass();
+                $rbfilter->reportid = $report->id;
+                $rbfilter->type = $data['type'];
+                $rbfilter->value = $data['value'];
+                $rbfilter->filtername = "{$data['value']} Filter";
+                $rbfilter->advanced = 0;
+                $rbfilter->sortorder = $idx;
+                $rbfilter->id = $DB->insert_record('report_builder_filters', $rbfilter);
+
+                $save_key = "{$data['type']}-{$data['value']}";
+                $orig_saved[$save_key] = $data['filter'];
+
+                $search_col = new stdClass();
+                $search_col->reportid = $report->id;
+                $search_col->type = $data['type'];
+                $search_col->value = $data['value'];
+                $search_col->id = $DB->insert_record('report_builder_search_cols', $search_col);
+            }
+        }
+
+        // Saved Search
+        $rbsaved = new stdClass();
+        $rbsaved->reportid = $report->id;
+        $rbsaved->userid = $this->user->id;
+        $rbsaved->name = 'Saved Search';
+        $rbsaved->search = serialize($orig_saved);
+        $rbsaved->ispublic = 1;
+        $rbsaved->id = $DB->insert_record('report_builder_saved', $rbsaved);
+
+        // Verify saved report
+        $this->assertSame(count($orig_columns), $DB->count_records('report_builder_columns', ['reportid' => $report->id]));
+
+        $orig_filters = array_filter($orig_columns, function ($column) {
+            return isset($column['filter']);
+        });
+        $this->assertSame(count($orig_filters), $DB->count_records('report_builder_filters', ['reportid' => $report->id]));
+        $this->assertSame(count($orig_filters), $DB->count_records('report_builder_search_cols', ['reportid' => $report->id]));
+
+        $saved_row = $DB->get_record('report_builder_saved', ['reportid' => $report->id]);
+        $this->assertEquals(serialize($orig_saved), $saved_row->search);
+
+
+        // Now for the migration
+        reportbuilder_migrate_competency_evidence_to_competency_status_perform();
+
+        $new_columns = array_filter($orig_columns, function ($column) {
+            return empty($column['deleted']);
+        });
+        $new_columns = array_map(function ($column) {
+            if (isset($column['updated_to'])) {
+                return  $column['updated_to'] + (isset($column['filter']) ? ['filter' => $column['filter']] : []);
+            } else {
+                return $column;
+            }
+        }, $new_columns);
+
+        $new_filters = array_filter($new_columns, function ($column) {
+            return isset($column['filter']);
+        });
+
+        $new_saved = [];
+        foreach ($new_filters as $column) {
+            $key = "{$column['type']}-{$column['value']}";
+            $new_saved[$key] = $column['filter'];
+        }
+
+        $actual_columns = $DB->get_records('report_builder_columns', ['reportid' => $report->id]);
+        $actual_filters = $DB->get_records('report_builder_filters', ['reportid' => $report->id]);
+        $actual_search_cols = $DB->get_records('report_builder_search_cols', ['reportid' => $report->id]);
+        $actual_saved = $DB->get_record('report_builder_saved', ['reportid' => $report->id]);
+        $actual_report = $DB->get_record('report_builder', ['id' => $report->id]);
+
+        $this->assertSame(count($new_columns), count($actual_columns));
+        $this->assertSame(count($new_filters), count($actual_filters));
+        $this->assertSame(count($new_filters), count($actual_search_cols));
+        $this->assertSame('competency_status', $actual_report->source);
+
+        $this->assertEqualsCanonicalizing($new_saved, unserialize($actual_saved->search));
+    }
 }

@@ -731,5 +731,14 @@ function xmldb_totara_reportbuilder_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020040700, 'totara', 'reportbuilder');
     }
 
+    // TODO: This version change is on perform. If reportbuilder version is bumped in t13 or t14 before perform is released,
+    //       bump the version to ensure the perform version is later
+    if ($oldversion < 2020041400) {
+        reportbuilder_migrate_competency_evidence_to_competency_status_perform();
+
+        // Reportbuilder savepoint reached.
+        upgrade_plugin_savepoint(true, 2020041400, 'totara', 'reportbuilder');
+    }
+
     return true;
 }

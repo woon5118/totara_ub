@@ -143,7 +143,7 @@ class rb_source_comp_status_history extends rb_base_source {
             new rb_column_option(
                 'history',
                 'proficientdate',
-                get_string('proficientdate', 'rb_source_competency_evidence'),
+                get_string('proficientdate', 'rb_source_comp_status_history'),
                 'base.time_proficient',
                 array('displayfunc' => 'nice_date', 'dbdatatype' => 'timestamp')
             ),
@@ -176,7 +176,7 @@ class rb_source_comp_status_history extends rb_base_source {
             new rb_filter_option(
                 'history',
                 'proficientdate',
-                get_string('proficientdate', 'rb_source_competency_evidence'),
+                get_string('proficientdate', 'rb_source_comp_status_history'),
                 'date',
                 array()
             ),

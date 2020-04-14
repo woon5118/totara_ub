@@ -21,14 +21,29 @@
  * @author Simon Coggins <simon.coggins@totaralms.com>
  * @package totara
  * @subpackage reportbuilder
+ *
+ * @deprecated since Totara 13
  */
 
 use totara_core\advanced_feature;
 
 defined('MOODLE_INTERNAL') || die();
 
+// Report source rb_source_competency_evidence has been deprecated. Please use rb_source_competency_status.
+// No debugging notice to keep this source testable until it is removed
+
 class rb_source_competency_evidence extends rb_base_source {
     use \totara_job\rb\source\report_trait;
+
+    /** @var bool true if source is selectable for new reports */
+    public $selectable = false;
+
+    /** @var bool true if reports with this source can be scheduled */
+    public $scheduleable = false;
+
+    /** @var bool true if reports with this source are compatible with report caching */
+    public $cacheable = false;
+
 
     public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
         if ($groupid instanceof rb_global_restriction_set) {
@@ -66,7 +81,8 @@ class rb_source_competency_evidence extends rb_base_source {
     }
 
     public static function is_source_ignored() {
-        return !advanced_feature::is_enabled('competencies');
+        // Source is deprecated
+        return true;
     }
 
     //

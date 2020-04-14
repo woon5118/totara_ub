@@ -6,6 +6,7 @@ Feature: Test use of images in competencies and competency custom fields
   @javascript
   Scenario: Images in competency and custom competency fields and descriptions
     Given I am on a totara site
+    And Perform is disabled
     And the following "users" exist:
       | username | firstname | lastname | email                        |
       | learner1 | Learner   | One      | learner1@example.com         |
@@ -20,7 +21,7 @@ Feature: Test use of images in competencies and competency custom fields
       | Test Comp Framework | tstcompfw   |
     And the following "standard_report" exist in "totara_reportbuilder" plugin:
       | fullname                       | shortname                             | source              |
-      | Test Competency Status         | report_test_competency_status         | competency_evidence |
+      | Test Competency Status         | report_test_competency_status         | competency_status   |
       | Test Competency Status History | report_test_competency_status_history | comp_status_history |
     And I log in as "admin"
 
@@ -108,7 +109,7 @@ Feature: Test use of images in competencies and competency custom fields
     And I should see image with alt text "logo2 in competency description"
     And I should see image with alt text "logo3 on customfield text area"
 
-    When I follow "Back to Competency page"
+    When I click on "Back to Competency page" "link"
     And I should see image with alt text "logo2 in competency description"
     And I should see image with alt text "logo3 on customfield text area"
 
@@ -164,16 +165,10 @@ Feature: Test use of images in competencies and competency custom fields
     And I press "Add"
     And I press "Save changes"
     And I follow "View This Report"
-    # TODO: images no longer shown on the report
-    # Then I should see image with alt text "logo3 on customfield text area"
+    Then I should see image with alt text "logo3 on customfield text area"
 
-    When I follow "My competency 1"
-    Then I should see the "logo2 in competency description" image in the "#id_description_editoreditable" "css_element"
-    And I should see the "logo3 on customfield text area" image in the "#id_customfield_CTA1_editoreditable" "css_element"
-    And I should see image with alt text "logo2 in competency description"
-    And I should see image with alt text "logo3 on customfield text area"
-
-    When I navigate to "Manage user reports" node in "Site administration > Reports"
+    When I am on homepage
+    And I navigate to "Manage user reports" node in "Site administration > Reports"
     And I follow "Test Competency Status History"
     Then I should see "Edit Report 'Test Competency Status History'"
 

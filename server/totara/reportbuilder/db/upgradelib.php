@@ -191,15 +191,17 @@ function totara_reportbuilder_migrate_saved_searches($source, $oldtype, $oldvalu
             if ($type == $oldtype && $value == $oldvalue) {
                 $update = true;
 
-                $newkey = "{$newtype}-{$newvalue}";
-                $search[$newkey] = $info;
+                if (!empty($newtype) && !empty($newvalue)) {
+                    $newkey = "{$newtype}-{$newvalue}";
+                    $search[$newkey] = $info;
+                }
                 unset($search[$oldkey]);
             }
         }
 
         if ($update) {
             // Re encode and update the database.
-            $todb = new \stdClass;
+            $todb = new \stdClass();
             $todb->id = $saved->id;
             $todb->search = serialize($search);
             $DB->update_record('report_builder_saved', $todb);
@@ -437,4 +439,120 @@ function totara_reportbuilder_migrate_svggraph_settings() {
         $record->settings = json_encode($newsettings, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         $DB->update_record('report_builder_graph', $record);
     }
+}
+
+/**
+ * Migrate all reports using the competency_evidence source to use the comp_status_history source
+ */
+function reportbuilder_migrate_competency_evidence_to_competency_status_perform() {
+    global $CFG, $DB;
+
+    require_once ($CFG->dirroot . '/totara/reportbuilder/lib.php');
+
+    $report_ids = $DB->get_fieldset_sql("SELECT id FROM {report_builder} WHERE source = :oldsource",
+        ['oldsource' => 'competency_evidence']
+    );
+
+    if (empty($report_ids)) {
+        return;
+    }
+
+    [$id_sql, $id_params] = $DB->get_in_or_equal($report_ids, SQL_PARAMS_NAMED);
+
+    // Columns and saved searches
+    $update_sql =
+        "SET type = :new_type,
+                value = :new_value
+            WHERE reportid {$id_sql}
+              AND type = :old_type
+              AND value = :old_value";
+
+    $delete_wh =
+        "WHERE reportid {$id_sql}
+                 AND type = :old_type
+                 AND value ";
+
+    $to_update = [
+        [
+            'old_type' => 'competency_evidence',
+            'old_value' => 'proficiency',
+            'new_type' => 'competency_status',
+            'new_value' => 'scale_value_name',
+        ],
+        [
+            'old_type' => 'competency_evidence',
+            'old_value' => 'proficiencyid',
+            'new_type' => 'competency_status',
+            'new_value' => 'scale_value_id',
+        ],
+        [
+            'old_type' => 'competency_evidence',
+            'old_value' => 'timemodified',
+            'new_type' => 'competency',
+            'new_value' => 'time_created',
+        ],
+    ];
+
+    $to_delete = [
+        'competency_evidence' => [
+            'proficientdate',
+            'organisationid',
+            'organisationid2',
+            'organisationpath',
+            'organisation',
+            'positionid',
+            'positionid2',
+            'positionpath',
+            'position',
+            'assessor',
+            'assessorname',
+        ],
+        'competency' => [
+            'competencylink',
+            'id2',
+            'statushistorylink',
+            'shortname',
+            'path',
+        ],
+    ];
+
+    foreach ($to_update as $update_params) {
+        $params = array_merge($id_params, $update_params);
+
+        foreach (['report_builder_columns', 'report_builder_filters', 'report_builder_search_cols'] as $table) {
+            $DB->execute("UPDATE {{$table}} " . $update_sql, $params);
+        }
+
+        totara_reportbuilder_migrate_saved_searches('competency_evidence',
+            $update_params['old_type'], $update_params['old_value'], $update_params['new_type'], $update_params['new_value']);
+    }
+
+    foreach ($to_delete as $type => $values) {
+        [$values_sql, $values_params] = $DB->get_in_or_equal($values, SQL_PARAMS_NAMED);
+        $params = array_merge($id_params, ['old_type' => $type], $values_params);
+
+        foreach (['report_builder_columns', 'report_builder_filters', 'report_builder_search_cols'] as $table) {
+            $DB->execute("DELETE FROM {{$table}} " . $delete_wh . $values_sql, $params);
+        }
+
+        foreach ($values as $value) {
+            totara_reportbuilder_migrate_saved_searches('competency_evidence',
+                $type, $value, null, null);
+        }
+    }
+
+    // No numeric columns - no graphs
+
+    // Purge all caches
+    foreach ($report_ids as $id) {
+        reportbuilder_purge_cache($id);
+    }
+
+    // Source
+    $DB->execute(
+        "UPDATE {report_builder} 
+                 SET source = :new_source 
+               WHERE id {$id_sql}",
+        array_merge($id_params, ['new_source' => 'competency_status'])
+    );
 }

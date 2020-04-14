@@ -63,7 +63,7 @@ if ($showhidden && !has_capability('totara/hierarchy:updatecompetencyframeworks'
 }
 
 // Setup page
-admin_externalpage_setup('competencymanage', '', array(), '/totara/hierarchy/prefix/competency/evidence/add.php');
+admin_externalpage_setup('competencymanage');
 
 ///
 /// Display page

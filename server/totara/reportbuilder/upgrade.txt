@@ -40,6 +40,7 @@ information provided here is intended especially for developers.
   * REPORT_BUILDER_PDF_FONT_SIZE_DATA
   * REPORT_BUILDER_PDF_FONT_SIZE_RECORD
   * REPORT_BUILDER_PDF_FONT_SIZE_TITLE
+* Deprecated report source rb_source_competency_evidence. Please use rb_source_competency_status
 
 === 12.0 ===
 

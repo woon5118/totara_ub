@@ -37,6 +37,7 @@ $string['comptimemodifiedcolumn'] = 'User\'s Status Time Modified';
 $string['comptimemodifiedheading'] = 'Time modified';
 $string['compusermodifiedcolumn'] = 'User\'s Status Modifed By User';
 $string['compusermodifiedheading'] = 'Modifed by';
+$string['proficientdate'] = 'Date Proficiency Achieved';
 $string['scalevaluedatecolumn'] = 'Time when user achieved the value';
 $string['scalevaluedateheading'] = 'Time Achieved';
 $string['scalevaluedateheading'] = 'Time Achieved';
