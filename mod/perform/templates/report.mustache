@@ -31,6 +31,8 @@
     * none
 
     Context variables required for this template:
+    * backto: HTML
+    * heading: HTML
     * debughtml: HTML, if debug is active contains debug information
     * restrictions: HTML, restrictions part of the report
     * description: HTML, report description
@@ -43,6 +45,8 @@
 
     Example context (json):
     {
+        "backto": "",
+        "heading": "",
         "debughtml": "",
         "restrictions": "",
         "description": "",
@@ -55,6 +59,8 @@
     }
 }}
 <div class="tw-participation__report">
+    {{{backto}}}
+    {{{heading}}}
     {{{debughtml}}}
     {{{restrictions}}}
     {{{description}}}

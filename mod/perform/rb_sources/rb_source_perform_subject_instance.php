@@ -112,11 +112,29 @@ class rb_source_perform_subject_instance extends rb_base_source {
                 ]
             ),
             new rb_column_option(
+                'participant_instance',
+                'count',
+                get_string('participant_count', 'rb_source_perform_subject_instance'),
+                "(SELECT COUNT('x')
+                FROM {perform_participant_instance} ppi
+                {$global_restriction_join_su}
+                WHERE ppi.subject_instance_id = base.id)",
+                [
+                    'dbdatatype' => 'integer',
+                    'displayfunc' => 'participant_count',
+                    'iscompound' => true,
+                    'issubquery' => true,
+                    'extrafields' => [
+                        'subject_instance_id' => "base.id"
+                    ]
+                ]
+            ),
+            new rb_column_option(
                 'subject_instance',
-                'status',
+                'subject_status',
                 get_string('subject_instance_status', 'mod_perform'),
                 // TODO: delete it
-                '\'In progress\'', // 'base.status',
+                '\'In progress\'', // "base.status",
                 [
                     'dbdatatype' => 'char',
                     'displayfunc' => 'format_string'
@@ -127,15 +145,28 @@ class rb_source_perform_subject_instance extends rb_base_source {
                 'instance_count',
                 get_string('instance_count', 'rb_source_perform_subject_instance'),
                 // TODO: delete it
-                '\'0\'', // 'base.instance_count',
+                '\'0\'', // "base.instance_count",
                 [
                     'dbdatatype' => 'integer',
                     'displayfunc' => 'integer'
                 ]
             ),
-            // new rb_column_option(
+            new rb_column_option(
+                'track',
+                'description',
+                get_string('track_description', 'mod_perform'),
+                'track.description',
+                [
+                    'joins' => ['track', 'track_user_assignment'],
+                    'dbdatatype' => 'text',
+                    'outputformat' => 'text',
+                    'displayfunc' => 'format_string'
+                ]
+            )
+
+        // new rb_column_option(
             //     'subject_instance',
-            //     'date_completion',
+            //     'subject_date_completion',
             //     get_string('date_completion', 'rb_source_perform_subject_instance'),
             //     'base.???',
             //     [
@@ -145,7 +176,7 @@ class rb_source_perform_subject_instance extends rb_base_source {
             // ),
         ];
 
-        $this->add_fields_to_columns($columnoptions, 'base', $global_restriction_join_su);
+        $this->add_fields_to_columns($columnoptions);
         $this->add_core_user_columns($columnoptions);
         //$this->add_totara_job_columns($columnoptions);
 
@@ -165,18 +196,38 @@ class rb_source_perform_subject_instance extends rb_base_source {
                 get_string('date_created', 'rb_source_perform_subject_instance'),
                 'date'
             ),
-            // new rb_filter_option(
-            //     'subject_instance',
-            //     'status',
-            // get_string('status', 'rb_source_perform_subject_instance'),
-            // 'text ???'
-            // ),
-            // new rb_filter_option(
-            //     'subject_instance',
-            //     'date_completion',
-            // get_string('date_completion', 'rb_source_perform_subject_instance'),
-            // 'date'
-            // ),
+            new rb_filter_option(
+                'user',
+                'namelink',
+                get_string('subject_name', 'rb_source_perform_subject_instance'),
+                'text'
+            ),
+            new rb_filter_option(
+                'subject_instance',
+                "subject_status",
+                get_string('subject_instance_status', 'mod_perform'),
+                'select',
+                [
+                    'selectchoices' => [
+                        '1' => 'In progress'
+                    ],
+                    'simplemode' => true,
+                ]
+            ),
+            new rb_filter_option(
+                'track',
+                'description',
+                get_string('track_description', 'mod_perform'),
+                'text'
+            ),
+
+        // $filteroptions[] = new rb_filter_option(
+        //     'subject_instance',
+        //     'subject_date_completion',
+        // get_string('date_completion', 'rb_source_perform_subject_instance'),
+        // 'date'
+        // );
+
         ];
 
         $this->add_fields_to_filters($filteroptions);
@@ -196,7 +247,7 @@ class rb_source_perform_subject_instance extends rb_base_source {
     }
 
     /**
-     * Define the default filter for this report.
+     * Define the default filters for this report.
      *
      * @return array
      */
@@ -233,7 +284,7 @@ class rb_source_perform_subject_instance extends rb_base_source {
             ],
             [
                 'type' => 'subject_instance',
-                'value' => 'status',
+                'value' => 'subject_status',
                 'heading' => get_string('subject_instance_status', 'mod_perform')
             ],
             [
@@ -248,7 +299,7 @@ class rb_source_perform_subject_instance extends rb_base_source {
             // ],
             // [
             //     'type' => 'subject_instance',
-            //     'value' => 'date_completion',
+            //     'value' => 'subject_date_completion',
             //     'heading' => get_string('date_completion', 'rb_source_perform_subject_instance')
             // ],
             // [
@@ -271,10 +322,6 @@ class rb_source_perform_subject_instance extends rb_base_source {
                 'value' => 'namelink',
             ],
             [
-                'type' => 'perform',
-                'value' => 'name',
-            ],
-            [
                 'type' => 'track',
                 'value' => 'description',
             ],
@@ -288,11 +335,11 @@ class rb_source_perform_subject_instance extends rb_base_source {
             // ],
             // [
             //     'type' => 'subject_instance',
-            //     'value' => 'status'
+            //     'value' => 'subject_status'
             // ],
             // [
             //     'type' => 'subject_instance',
-            //     'value' => 'date_completion'
+            //     'value' => 'subject_date_completion'
             // ],
         ];
     }

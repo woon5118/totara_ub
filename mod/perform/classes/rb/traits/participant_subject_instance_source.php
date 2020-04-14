@@ -77,9 +77,8 @@ trait participant_subject_instance_source {
      *
      * @param array $columnoptions
      * @param string $join
-     * @param string $global_restriction_join_su
      */
-    protected function add_fields_to_columns(array &$columnoptions, string $join = 'base', string $global_restriction_join_su) {
+    protected function add_fields_to_columns(array &$columnoptions, string $join = 'base') {
         $columnoptions[] = new rb_column_option(
             'perform',
             'name',
@@ -92,37 +91,7 @@ trait participant_subject_instance_source {
                 'displayfunc' => 'format_string'
             ]
         );
-        $columnoptions[] = new rb_column_option(
-            'track',
-            'description',
-            get_string('track_description', 'mod_perform'),
-            'track.description',
-            [
-                'joins' => ['track', 'track_user_assignment'],
-                'dbdatatype' => 'text',
-                'outputformat' => 'text',
-                'displayfunc' => 'format_string'
-            ]
-        );
-        $columnoptions[] = new rb_column_option(
-            'participant_instance',
-            'count',
-            get_string('participant_count', 'rb_source_perform_subject_instance'),
-            "(SELECT COUNT('x')
-                FROM {perform_participant_instance} ppi
-                {$global_restriction_join_su}
-                WHERE ppi.subject_instance_id = {$join}.id)",
-            [
-                'joins' => $join,
-                'dbdatatype' => 'integer',
-                'displayfunc' => 'participant_count',
-                'iscompound' => true,
-                'issubquery' => true,
-                'extrafields' => [
-                    'subject_instance_id' => "{$join}.id"
-                ]
-            ]
-        );
+        // TODO: Activity type
         // $columnoptions[] = new rb_column_option(
         //     'perform',
         //     'type',
@@ -143,24 +112,14 @@ trait participant_subject_instance_source {
      * @param array $filteroptions
      */
     protected function add_fields_to_filters(array &$filteroptions) {
-        $filteroptions[] = new rb_filter_option(
-            'user',
-            'namelink',
-            get_string('subject_name', 'rb_source_perform_subject_instance'),
-            'text'
-        );
+        // Performance activity name
         $filteroptions[] = new rb_filter_option(
             'perform',
             'name',
             get_string('activity_name', 'mod_perform'),
             'text'
         );
-        $filteroptions[] = new rb_filter_option(
-            'track',
-            'description',
-            get_string('track_description', 'mod_perform'),
-            'text'
-        );
+        // TODO: Activity type
         // $filteroptions[] = new rb_filter_option(
         //     'perform',
         //     'type',

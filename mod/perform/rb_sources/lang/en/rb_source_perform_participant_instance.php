@@ -21,19 +21,19 @@
  * @package: mod_perform
  */
 
-$string['sourcelabel'] = 'Performance Subject Instance (Perform)';
-$string['sourcesummary'] = 'Learners progress on their assigned competencies.';
-$string['sourcetitle'] = 'Performance Subject Instance (Perform)';
+$string['sourcelabel'] = 'Participant Instance (Perform)';
+$string['sourcesummary'] = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.';
+$string['sourcetitle'] = 'Participant Instance (Perform)';
 
-$string['date_completion'] = 'Date of subject instance completion';
-$string['date_created'] = 'Date subject instance created';
-$string['instance_count'] = 'Instance count';
-$string['participant_count'] = 'Participant count';
-$string['perform_type'] = 'Performance type';
-$string['subject_name'] = 'Subject\'s full name';
+$string['activity_subject'] = 'Subject of the activity';
+$string['date_created'] = 'Date instance created';
+$string['participant_name'] = 'Participant\'s full name';
+$string['participant_status'] = 'Status of participant instance';
+$string['relationship_id'] = 'Relationship ID';
+$string['relationship_in_activity'] = 'Relationship in activity';
 
 $string['type_participant_instance'] = 'Participant instance';
-$string['type_perform'] = 'Perform';
-$string['type_perform_type'] = 'Perform type';
+$string['type_perform'] = 'Performance';
+$string['type_perform_relationship'] = 'Performance relatioship';
 $string['type_subject_instance'] = 'Subject instance';
 $string['type_track'] = 'Track';

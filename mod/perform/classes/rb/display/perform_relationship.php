@@ -24,10 +24,8 @@
 namespace mod_perform\rb\display;
 
 use totara_reportbuilder\rb\display\base;
-use moodle_url;
-use html_writer;
 
-class participant_count extends base {
+class perform_relationship extends base {
 
     /**
      * Handles the display
@@ -39,21 +37,11 @@ class participant_count extends base {
      * @param \reportbuilder $report
      * @return string
      */
-    public static function display($count, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
-        if ($count == 0) {
-            return '0';
+    public static function display($class, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
+        if (!$class) {
+            return '';
         }
-
-        if ($format !== 'html') {
-            return $count;
-        }
-
-        $extrafields = self::get_extrafields_row($row, $column);
-        $url = new moodle_url(
-            '/mod/perform/reporting/participation/participants.php',
-            ['subject_instance_id' => $extrafields->subject_instance_id]
-        );
-        return html_writer::link($url, $count);
+        return $class::get_name();
     }
 
     /**
