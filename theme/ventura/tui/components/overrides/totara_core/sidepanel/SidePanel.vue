@@ -25,7 +25,6 @@
   position: relative;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
   height: 100%;
   overflow: hidden;
 
@@ -42,6 +41,16 @@
       position: relative;
       top: auto;
     }
+  }
+
+  // inner content alignment
+  &--rtl,
+  .dir-rtl .tui-sidePanel--ltr & {
+    justify-content: flex-end;
+  }
+  &--ltr,
+  .dir-rtl .tui-sidePanel--rtl & {
+    justify-content: flex-start;
   }
 
   /**
@@ -140,7 +149,8 @@
 
     .tui-sidePanel--closed & {
       max-width: 1px;
-      padding: 0;
+      padding-right: 0;
+      padding-left: 0;
     }
   }
 

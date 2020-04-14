@@ -36,7 +36,7 @@
       'tui-sidePanel--rtl': direction === 'rtl',
     }"
     :style="{
-      maxHeight: maxHeight + 'px',
+      maxHeight: limitHeight ? maxHeight + 'px' : 'initial',
     }"
   >
     <div
