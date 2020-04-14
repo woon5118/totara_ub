@@ -55,21 +55,6 @@ class pathway_competency_services_testcase extends advanced_testcase {
         return $data;
     }
 
-    public function test_totara_competency_link_default_preset() {
-        $data = $this->setup_data();
-
-        $res = \external_api::call_external_function(
-            'totara_competency_link_default_preset',
-            ['competency_id' => $data->comp->id]
-        );
-
-        $result = $res['data'] ?? null;
-        $error = $res['error'] ?? null;
-
-        $this->assertEquals(false, $error);
-        $this->assertEquals(1, $result);
-    }
-
     public function test_totara_competency_get_courses() {
         $data = $this->setup_data();
 

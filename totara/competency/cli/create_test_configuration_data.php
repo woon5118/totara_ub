@@ -97,8 +97,6 @@ $scale = create_scale($num_scalevalues);
 $competencies = create_fw_competencies($num_fw, $num_comp, $scale);
 //Linked courses
 link_courses_to_competencies($num_linked, $competencies, $courses);
-//Default preset criteria
-link_default_preset_to_competencies($competencies);
 
 
 function create_scale($num_scalevalues) {
@@ -203,16 +201,5 @@ function link_courses_to_competencies($num_linked, $competencies, $courses) {
         }
 
         linked_courses::set_linked_courses($comp->id, $courses_to_link);
-    }
-}
-
-function link_default_preset_to_competencies($competencies) {
-    printf("\nLinking the default preset to competencies:\n");
-
-    foreach ($competencies as $comp) {
-        printf("\t%s\n", $comp->fullname);
-
-        $config = new achievement_configuration($comp);
-        $config->link_default_preset();
     }
 }

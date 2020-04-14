@@ -271,31 +271,6 @@ class external extends \external_api {
         return null;
     }
 
-    /**
-     * link_default_preset
-     */
-    public static function link_default_preset_parameters() {
-        return new \external_function_parameters(
-            [
-                'competency_id' => new \external_value(PARAM_INT, 'Id of the competency'),
-            ]
-        );
-    }
-
-    public static function link_default_preset(int $competency_id): string {
-        advanced_feature::require('competency_assignment');
-
-        $config = new achievement_configuration(new competency($competency_id));
-        $config->link_default_preset();
-
-        return 1;
-    }
-
-    public static function link_default_preset_returns() {
-        return new \external_value(PARAM_INT, 'Return status');
-    }
-
-
     /** delete_pathways */
     public static function delete_pathways_parameters() {
         return new \external_function_parameters(

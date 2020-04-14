@@ -217,37 +217,6 @@ class totara_competency_achievement_configuration_testcase extends advanced_test
     }
 
 
-    public function test_link_default_preset() {
-        global $DB;
-
-        $data = $this->setup_data();
-        $competency = $data->comp;
-        /** @var achievement_configuration $config */
-        $config = $data->config;
-
-        /** @var totara_competency_generator $competency_generator */
-        $def_pathways = achievement_criteria::get_default_pathways($competency->scale, $competency->id);
-
-        $pathways = $config->get_active_pathways();
-
-        // Validate that it has no pathways
-        $this->assertEquals(0, count($pathways));
-
-        // No link the default pathways
-        $config->link_default_preset();
-
-        // Retrieve the competency from the db and validate that the pathways have been linked
-        $competency_id = $competency->id;
-        $competency = new competency($competency_id);
-        $config = new achievement_configuration($competency);
-        $pathways = $config->get_active_pathways();
-
-        $this->assertEquals(count($def_pathways), count($pathways));
-
-        // Should also be logged
-        $this->assertSame(1, $DB->count_records('totara_competency_configuration_change'));
-    }
-
     /**
      * Test user_can_become_proficient through single value pathways
      */

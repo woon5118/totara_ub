@@ -123,21 +123,6 @@ class behat_totara_competency extends behat_base {
     }
 
     /**
-     * Create the default achievement paths for a competency.
-     *
-     * @Given /^the default achievement paths exist for the "(?P<competency_string>(?:[^"]|\\")*)" competency$/
-     * @param string $competency
-     */
-    public function the_default_achievement_paths_exist_for_the_competency($competency) {
-        global $DB;
-        \behat_hooks::set_step_readonly(true); // Backend action.
-
-        $competency_id = $DB->get_field(competency::TABLE, 'id', ['idnumber' => $competency]);
-        $config = new achievement_configuration(new competency($competency_id));
-        $config->link_default_preset();
-    }
-
-    /**
      * Archive all assignments for a given competency.
      *
      * @Given /^all assignments for the "(?P<competency_string>(?:[^"]|\\")*)" competency are archived$/

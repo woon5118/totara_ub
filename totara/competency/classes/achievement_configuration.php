@@ -172,46 +172,6 @@ class achievement_configuration {
     }
 
     /**
-     * Link and save pathways defined in the default preset to this competency if it has no existing pathways
-     *
-     * @param int|null $action_time Time when this action was initiated.
-     * @return $this
-     */
-    public function link_default_preset(?int $action_time = null): achievement_configuration {
-        global $DB;
-
-        if (!empty($this->get_pathways)) {
-            return $this;
-        }
-
-        // No need to save history - no previous configuration
-
-        $transaction = $DB->start_delegated_transaction();
-
-        $pathway_ids = [];
-        $pathways = achievement_criteria::get_default_pathways($this->get_competency()->scale, $this->get_competency()->id);
-        foreach ($pathways as $pw) {
-            $pw->set_competency($this->competency);
-            $pw->save();
-            $pathway_ids[] = $pw->get_id();
-        }
-
-        if (!empty($pathway_ids)) {
-            // TODO: Should we maybe not log this if no action_time is provided to cater for the case
-            //       when this is called for new competencies??
-            configuration_change::add_competency_entry(
-                $this->competency->id,
-                configuration_change::CHANGED_CRITERIA,
-                $action_time
-            );
-        }
-
-        $transaction->allow_commit();
-
-        return $this;
-    }
-
-    /**
      * Save an aggregation type
      *
      * @param int|null $action_time Time when this action was initiated.

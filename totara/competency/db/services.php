@@ -69,15 +69,6 @@ $functions = [
         'ajax'          => true
     ],
 
-    'totara_competency_link_default_preset' => [
-        'classname' => \totara_competency\external::class,
-        'methodname'    => 'link_default_preset',
-        'description'   => 'Link the default list of pathways to the competency',
-        'type'          => 'post',
-        'loginrequired' => true,
-        'ajax'          => true
-    ],
-
     'totara_competency_delete_pathways' => [
         'classname' => \totara_competency\external::class,
         'methodname'    => 'delete_pathways',

@@ -274,7 +274,6 @@ $string['is_proficient_value'] = 'This value is proficient.';
 $string['latest_achievement'] = 'Latest achievement';
 $string['legacy_assignment_rating_description'] = 'These include learning plans, course completion, or proficiency in child competencies, in previous versions of the system.';
 $string['legacy_assignment_rating_discontinued'] = 'This rating was determined through methods which have been discontinued.';
-$string['linkdefaultpreset'] = 'Link default preset';
 $string['linkedcourses'] = 'Linked courses';
 $string['linkedcourses_mustsavechange'] = 'Changes must be saved before they will be applied';
 $string['linkedcoursessaved'] = 'Linked courses have been saved';
