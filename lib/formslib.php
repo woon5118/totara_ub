@@ -2364,6 +2364,7 @@ require(["core/event", "jquery"], function(Event, $) {
             }
             foreach ($element as $elem) {
                 if (key_exists('id', $elem->_attributes)) {
+                    $checkoxjs = ($elem instanceof MoodleQuickForm_advcheckbox) ? '  && ((element.checked != undefined) && (element.checked == false))' : '';
                     $js .= '
     function validate_' . $this->_formName . '_' . $escapedElementName . '(element, escapedName) {
       if (undefined == element) {
@@ -2375,7 +2376,7 @@ require(["core/event", "jquery"], function(Event, $) {
       var _qfGroups = {};
       var _qfMsg = \'\';
       var frm = element.parentNode;
-      if ((undefined != element.name) && (frm != undefined)) {
+      if ((undefined != element.name) && (frm != undefined)' . $checkoxjs . ') {
           while (frm && frm.nodeName.toUpperCase() != "FORM") {
             frm = frm.parentNode;
           }
