@@ -432,6 +432,7 @@ function (templates, ajax, modalFactory, modalEvents, notification, str) {
                 key,
                 pathType = 'criteria_group',
                 target = svWgt.querySelector('[data-cc-scalevalue-pw-list]'),
+                numPathways = parseInt(target.getAttribute('data-cc-scalevalue-pw-list')),
                 templatename = 'totara_competency/partial_pathway',
                 pw,
                 criterionType = criterionOptionNode.getAttribute('data-scalevalue-criterion-type'),
@@ -455,7 +456,8 @@ function (templates, ajax, modalFactory, modalEvents, notification, str) {
                 'pathway_templatename': 'pathway_criteria_group/pathway_criteria_group_edit',
                 'criteria_type_level': pathType,
                 'criteria_types': this.criteriaTypes,
-                'criteria': [criterion]
+                'criteria': [criterion],
+                'showor': numPathways > 0,
             };
 
             this.pathways[key] = pw;
@@ -463,6 +465,7 @@ function (templates, ajax, modalFactory, modalEvents, notification, str) {
 
             // Display the pathway in the correct div
             templates.renderAppend(templatename, pw, target).then(function () {
+                target.setAttribute('data-cc-scalevalue-pw-list', numPathways + 1);
                 that.hideCriteriaTypeSelectors();
                 that.calculateSortorderFromDisplay();
                 that.dirty = true;
@@ -651,8 +654,7 @@ function (templates, ajax, modalFactory, modalEvents, notification, str) {
          * to indicate that final removal will only happen when changes are applied
          */
         removePathway: function (pwKey) {
-            var pwTarget = this.widget.querySelector('[data-pw-key="' + pwKey + '"]'),
-                pwOrTarget = this.widget.querySelector('[data-pw-or="' + pwKey + '"]');
+            var pwTarget = this.widget.querySelector('[data-pw-key="' + pwKey + '"]');
 
             if (this.pathways[pwKey]) {
                 this.dirty = true;

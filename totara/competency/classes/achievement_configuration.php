@@ -331,7 +331,7 @@ class achievement_configuration {
      * @return array
      */
     public function export_pathway_groups(): array {
-        $pathways = $this->get_active_pathways();
+        $pathways = array_values($this->get_active_pathways());
         $pathways = array_map(function (pathway $pathway) {
             return $pathway->export_edit_detail();
         }, $pathways);
@@ -356,12 +356,19 @@ class achievement_configuration {
                 return $pathway['scalevalue'] === $scale_value->id;
             });
 
+            array_walk($sv_pathways, function (&$pathway, $idx) {
+                if ($idx > 0) {
+                    $pathway['showor'] = true;
+                }
+            });
+
             return [
                 'id' => $scale_value->id,
                 'name' => format_string($scale_value->name),
                 'proficient' => $scale_value->proficient,
                 'sortorder' => $scale_value->sortorder,
-                'pathways' => array_values($sv_pathways),
+                'pathways' => $sv_pathways,
+                'num_pathways' => count($sv_pathways),
                 'criteria_type_level' => 'scalevalue',
             ];
         }, $scale_values);
@@ -383,7 +390,7 @@ class achievement_configuration {
                 'id' => 'low-sortorder',
                 'name' => get_string('anyscalevalue', 'totara_competency'),
                 'hidden' => false,
-                'pathways' => array_values($low_multivalue_pathways),
+                'pathways' => $low_multivalue_pathways,
             ],
             [
                 'id' => 'singlevalue',
@@ -395,7 +402,7 @@ class achievement_configuration {
                 'id' => 'high-sortorder',
                 'name' => get_string('anyscalevalue', 'totara_competency'),
                 'hidden' => false,
-                'pathways' => array_values($high_multivalue_pathways),
+                'pathways' => $high_multivalue_pathways,
             ],
         ];
 
