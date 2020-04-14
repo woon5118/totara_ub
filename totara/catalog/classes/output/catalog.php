@@ -135,7 +135,7 @@ class catalog extends template {
         $data->defaulthomepage = false;
         $data->defaulthomepage_url = '';
         $userhomepagepref = get_user_preferences('user_home_page_preference', -1);
-        if (!empty(get_config('core', 'allowdefaultpageselection')) &&
+        if (!empty(get_config('core', 'allowdefaultpageselection')) && !isguestuser() &&
             (get_home_page() != HOMEPAGE_TOTARA_GRID_CATALOG || $userhomepagepref != HOMEPAGE_TOTARA_GRID_CATALOG))
         {
             $data->defaulthomepage = true;
