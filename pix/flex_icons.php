@@ -2189,6 +2189,20 @@ $icons = array(
                     'classes' => 'fa-warning',
                 ),
         ),
+    'tags' =>
+        array (
+            'data' =>
+                array (
+                    'classes' => 'fa-tags'
+                )
+        ),
+    'tag' =>
+        array (
+            'data' =>
+                array (
+                    'classes' => 'fa-tag'
+                )
+        ),
 );
 
 /*
