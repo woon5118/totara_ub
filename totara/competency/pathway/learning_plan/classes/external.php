@@ -24,6 +24,7 @@
 
 namespace pathway_learning_plan;
 
+use context_system;
 use totara_competency\achievement_configuration;
 use totara_competency\entities\competency;
 use totara_competency\entities\configuration_change;
@@ -43,6 +44,7 @@ class external extends \external_api {
 
     public static function create(int $competency_id, int $sortorder, string $action_time) {
         advanced_feature::require('competency_assignment');
+        require_capability('totara/hierarchy:updatecompetency', context_system::instance());
 
         $competency = new competency($competency_id);
         $config = new achievement_configuration($competency);
@@ -82,6 +84,7 @@ class external extends \external_api {
 
     public static function update(int $id, int $sortorder, string $action_time) {
         advanced_feature::require('competency_assignment');
+        require_capability('totara/hierarchy:updatecompetency', context_system::instance());
 
         $pathway = learning_plan::fetch($id);
         $config = new achievement_configuration($pathway->get_competency());

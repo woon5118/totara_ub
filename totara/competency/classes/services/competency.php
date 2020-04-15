@@ -101,6 +101,7 @@ class competency extends external_api {
      */
     public static function index(array $filters = [], int $page = 0, string $order_by = '', string $order_dir = '') {
         advanced_feature::require('competency_assignment');
+        require_capability('totara/hierarchy:viewcompetency', context_system::instance());
 
         require_capability('totara/competency:view_assignments', context_system::instance());
 
@@ -169,6 +170,7 @@ class competency extends external_api {
      */
     public static function show(int $id, array $options) {
         advanced_feature::require('competency_assignment');
+        require_capability('totara/hierarchy:viewcompetency', context_system::instance());
 
         require_capability('totara/competency:view_assignments', context_system::instance());
 
@@ -246,5 +248,4 @@ class competency extends external_api {
 
         return $response;
     }
-
 }

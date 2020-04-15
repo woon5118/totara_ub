@@ -24,12 +24,12 @@
 
 namespace pathway_manual;
 
+use context_system;
 use pathway_manual\models\roles\role;
 use pathway_manual\models\roles\role_factory;
 use totara_competency\achievement_configuration;
 use totara_competency\entities\competency;
 use totara_competency\entities\configuration_change;
-use totara_competency\scale_provider;
 use totara_core\advanced_feature;
 
 class external extends \external_api {
@@ -70,6 +70,7 @@ class external extends \external_api {
      */
     public static function get_roles(array $filters, int $page, string $order, string $direction) {
         advanced_feature::require('competency_assignment');
+        require_capability('totara/hierarchy:viewcompetency', context_system::instance());
 
         $roles = role_factory::create_all();
 
@@ -153,6 +154,7 @@ class external extends \external_api {
 
     public static function create(int $competency_id, int $sortorder, array $roles, string $action_time) {
         advanced_feature::require('competency_assignment');
+        require_capability('totara/hierarchy:updatecompetency', context_system::instance());
 
         $competency = new competency($competency_id);
         $config = new achievement_configuration($competency);
@@ -198,6 +200,7 @@ class external extends \external_api {
 
     public static function update(int $id, int $sortorder, array $roles, string $action_time) {
         advanced_feature::require('competency_assignment');
+        require_capability('totara/hierarchy:updatecompetency', context_system::instance());
 
         $pathway = manual::fetch($id);
         $config = new achievement_configuration($pathway->get_competency());

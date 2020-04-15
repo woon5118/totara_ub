@@ -26,11 +26,11 @@ namespace pathway_criteria_group;
 
 defined('MOODLE_INTERNAL') || die;
 
+use context_system;
 use totara_competency\achievement_configuration;
 use totara_competency\entities\competency;
 use totara_competency\entities\configuration_change;
 use totara_competency\entities\scale_value;
-use totara_competency\plugin_types;
 use totara_core\advanced_feature;
 use totara_criteria\criterion_factory;
 
@@ -78,6 +78,7 @@ class external extends \external_api {
     // TODO: Make this part of the graphQL configuration mutators
     public static function create(int $competency_id, int $sortorder, int $scalevalue, array $criteria, int $action_time) {
         advanced_feature::require('competency_assignment');
+        require_capability('totara/hierarchy:updatecompetency', context_system::instance());
 
         // If there are no criteria linked to this pathway, don't create
         if (empty($criteria)) {
@@ -183,6 +184,7 @@ class external extends \external_api {
 
     public static function update(int $id, int $sortorder, int $scalevalue, array $criteria, int $action_time) {
         advanced_feature::require('competency_assignment');
+        require_capability('totara/hierarchy:updatecompetency', context_system::instance());
 
         $pathway = criteria_group::fetch($id);
 
@@ -257,6 +259,8 @@ class external extends \external_api {
 
     public static function get_criteria_types() {
         advanced_feature::require('competency_assignment');
+        require_capability('totara/hierarchy:viewcompetency', context_system::instance());
+
         return criteria_group::export_criteria_types();
     }
 

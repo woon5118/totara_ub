@@ -21,7 +21,6 @@
  */
 
 use pathway_manual\external;
-use pathway_manual\manual;
 use pathway_manual\models\roles\appraiser;
 use pathway_manual\models\roles\manager;
 use pathway_manual\models\roles\self_role;
@@ -35,6 +34,7 @@ require_once($CFG->dirroot . '/lib/externallib.php');
 class pathway_manual_services_testcase extends advanced_testcase {
 
     public function test_get_roles_no_filter() {
+        $this->setAdminUser();
 
         $return = external::get_roles([], 1, '', 'asc');
         $result = external::clean_returnvalue(external::get_roles_returns(), $return);
@@ -68,6 +68,8 @@ class pathway_manual_services_testcase extends advanced_testcase {
     }
 
     public function test_get_roles_ids_filter() {
+        $this->setAdminUser();
+
         $ids = [appraiser::get_display_order(), self_role::get_display_order()];
         $return = external::get_roles(['ids' => $ids], 1, '', 'asc');
         $result = external::clean_returnvalue(external::get_roles_returns(), $return);
@@ -97,6 +99,7 @@ class pathway_manual_services_testcase extends advanced_testcase {
     }
 
     public function test_get_roles_name_filter() {
+        $this->setAdminUser();
 
         $return = external::get_roles(['name' => 'manage'], 1, '', 'asc');
         $result = external::clean_returnvalue(external::get_roles_returns(), $return);
@@ -119,6 +122,4 @@ class pathway_manual_services_testcase extends advanced_testcase {
 
         $this->assertEquals($expected, $result);
     }
-
-    // TODO: Test pw filter
 }

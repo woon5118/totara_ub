@@ -23,6 +23,7 @@
 
 namespace totara_competency\webapi\resolver\query;
 
+use context_system;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
 use totara_competency\models\assignment as assignment_model;
@@ -43,9 +44,16 @@ class assignment implements query_resolver {
     public static function resolve(array $args, execution_context $ec) {
         advanced_feature::require('competency_assignment');
 
-        require_login();
+        self::authorize();
 
         return assignment_model::load_by_id($args['assignment_id']);
     }
 
+    /**
+     * Checks whether the user is authenticated.
+     */
+    private static function authorize(): void {
+        require_login(null, false, null, false, true);
+        require_capability('totara/competency:view_assignments', context_system::instance());
+    }
 }

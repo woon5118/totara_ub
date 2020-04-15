@@ -38,6 +38,8 @@ class pathway_criteria_group_external_testcase extends \advanced_testcase {
     private function setup_data() {
         global $DB;
 
+        $this->setAdminUser();
+
         $data = new class() {
             public $competencies = [];
             public $courses = [];

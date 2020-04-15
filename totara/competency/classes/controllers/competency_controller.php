@@ -25,6 +25,7 @@
 namespace totara_competency\controllers;
 
 use context;
+use context_system;
 use hierarchy_competency\event\competency_viewed;
 use moodle_url;
 use pathway_criteria_group\criteria_group;
@@ -91,6 +92,7 @@ class competency_controller extends admin_controller {
 
     public function action_summary() {
         $this->setup();
+        require_capability('totara/hierarchy:viewcompetency', context_system::instance());
 
         $url = new moodle_url('/totara/competency/competency_summary.php', ['id' => $this->competency->id]);
         $title = get_string('competencytitle', 'totara_hierarchy', (object) [
@@ -118,6 +120,7 @@ class competency_controller extends admin_controller {
         require_once($CFG->dirroot . '/totara/hierarchy/renderer.php');
 
         $this->setup();
+        require_capability('totara/hierarchy:updatecompetency', context_system::instance());
 
         $section = $this->get_param('s', PARAM_ALPHA, null, true);
         $notify = $this->get_param('notify', PARAM_INT, 0, false);
@@ -159,7 +162,6 @@ class competency_controller extends admin_controller {
      * @return bool
      */
     private function validate_user_access($permissions): bool {
-        // TODO: Add criteria management capabitilies
         return !empty($permissions) && !empty($permissions['canview']) && !empty($permissions['canmanage']);
     }
 

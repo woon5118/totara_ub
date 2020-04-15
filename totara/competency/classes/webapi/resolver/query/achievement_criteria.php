@@ -23,11 +23,11 @@
 
 namespace totara_competency\webapi\resolver\query;
 
+use context_system;
 use core\webapi\execution_context;
 use totara_competency\achievement_configuration;
 use totara_competency\entities\competency;
 use totara_core\advanced_feature;
-use totara_core\feature_not_available_exception;
 
 /**
  * Query to return all achievement criteria related information for a competency
@@ -43,13 +43,21 @@ class achievement_criteria implements \core\webapi\query_resolver {
     public static function resolve(array $args, execution_context $ec) {
         advanced_feature::require('competency_assignment');
 
-        // TODO: More capability checks
-        // TL-21305 will find a better, encapsulated solution for require_login calls.
-        require_login(null, false,null, false, true);
+        self::authorize();
 
         /** @var competency $competency */
         $competency = new competency($args['competency_id']);
         return new achievement_configuration($competency);
     }
 
+    /**
+     * Checks whether the user is authenticated.
+     */
+    private static function authorize(): void {
+        // TODO: More capability checks
+        // TL-21305 will find a better, encapsulated solution for require_login calls.
+        require_login(null, false, null, false, true);
+
+        require_capability('totara/hierarchy:viewcompetency', context_system::instance());
+    }
 }
