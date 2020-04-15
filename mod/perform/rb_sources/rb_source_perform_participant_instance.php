@@ -43,7 +43,6 @@ class rb_source_perform_participant_instance extends rb_base_source {
      * @param rb_global_restriction_set|null $globalrestrictionset
      */
     public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
-        global $DB;
         if ($groupid instanceof rb_global_restriction_set) {
             throw new coding_exception('Wrong parameter orders detected during report source instantiation.');
         }
@@ -53,13 +52,7 @@ class rb_source_perform_participant_instance extends rb_base_source {
         // Apply global user restrictions.
         $this->add_global_report_restriction_join('base', 'user_id');
 
-        $sql = "SELECT tcrr.class_name, tcrr.relationship_id
-                  FROM {totara_core_relationship_resolver} tcrr
-                 WHERE tcrr.relationship_id IN (
-                        SELECT DISTINCT pr2.core_relationship_id
-                          FROM {perform_relationship} pr2
-                        )";
-        $this->resolvers = $DB->get_records_sql($sql);
+        $this->resolvers = self::get_resolvers();
 
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_perform_participant_instance');
         $this->sourcesummary = get_string('sourcesummary', 'rb_source_perform_participant_instance');
@@ -219,6 +212,7 @@ class rb_source_perform_participant_instance extends rb_base_source {
                 [
                     'joins' => ['totara_relationship_resolver', 'perform_relationship'],
                     'dbdatatype' => 'integer',
+                    'displayfunc' => 'integer',
                     'outputformat' => 'integer',
                     'hidden' => 1,
                     'noexport' => true
@@ -425,7 +419,7 @@ class rb_source_perform_participant_instance extends rb_base_source {
      * @return array
      */
     public static function get_default_filters() {
-        return [
+        $default_filters = [
             [
                 'type' => 'user',
                 'value' => 'namelink',
@@ -435,14 +429,22 @@ class rb_source_perform_participant_instance extends rb_base_source {
                 'value' => 'created_at',
             ],
             [
-                'type' => 'perform_relationship',
-                'value' => 'core_relationship_id',
-            ],
-            [
                 'type' => 'subject_instance',
                 'value' => 'activity_subject',
             ]
         ];
+        if (self::get_resolvers()) {
+            $default_filters[] = [
+                'type' => 'perform_relationship',
+                'value' => 'core_relationship_id',
+            ];
+        } else {
+            $default_filters[] = [
+                'type' => 'perform_relationship',
+                'value' => 'class_name',
+            ];
+        }
+        return $default_filters;
     }
 
     /**
@@ -472,6 +474,23 @@ class rb_source_perform_participant_instance extends rb_base_source {
             )
         ];
         return $paramoptions;
+    }
+
+    /**
+     * Get relationship resolvers.
+     *
+     * @return array
+     * @throws dml_exception
+     */
+    private static function get_resolvers() {
+        global $DB;
+        $sql = "SELECT tcrr.class_name, tcrr.relationship_id
+                  FROM {totara_core_relationship_resolver} tcrr
+                 WHERE tcrr.relationship_id IN (
+                        SELECT DISTINCT pr2.core_relationship_id
+                          FROM {perform_relationship} pr2
+                        )";
+        return $DB->get_records_sql($sql);
     }
 
     /**
