@@ -82,6 +82,16 @@ class core_orm_cursor_testcase extends basic_testcase {
         ]);
     }
 
+    public function test_invalid_column_keys() {
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('Expecting an array with column names as keys');
+        $cursor = new cursor();
+        $cursor->set_columns([
+            0, 'foo',
+            'col1' => 'bar'
+        ]);
+    }
+
     public function test_valid_cursor() {
         $expected_cursor = [
             'limit' => cursor_paginator::DEFAULT_ITEMS_PER_PAGE,

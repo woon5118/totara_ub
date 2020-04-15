@@ -329,7 +329,93 @@ class core_orm_cursor_paginator_testcase extends orm_query_builder_base {
     }
 
     public function test_using_three_sized_cursor() {
-        $this->markTestIncomplete('WIP');
+        $records = collection::new($this->create_sample_records());
+
+        // The following order is expected:
+        // - Peter
+        // - John
+        // - Jane
+        // - Basil
+        // - Roxanne
+
+        $query = builder::table($this->table_name)
+            ->order_by('type')
+            ->order_by('is_deleted', 'desc')
+            ->order_by('name');
+
+        $cursor = cursor::create()
+            ->set_limit(2);
+
+        // Let's start at the beginning, when we do not have a cursor yet
+        $paginator = new cursor_paginator($query, $cursor, true);
+
+        // This should give us the first two records
+        $this->assertEquals([
+            'Peter',
+            'John',
+        ], $paginator->get_items()->pluck('name'));
+
+        // Let's create the cursor we expect to come next, which is generated from the last record
+        $record = $records->find('name', 'John');
+        $expected_next_cursor = cursor::create()
+            ->set_limit(2)
+            ->set_columns([
+                'type' => $record['type'],
+                'is_deleted' => (string)$record['is_deleted'],
+                'name' => $record['name'],
+            ]);
+
+        $this->assertEquals(2, count($paginator->get_items()));
+        $this->assertEquals($cursor, $paginator->get_current_cursor());
+        $this->assertEquals(5, $paginator->get_total());
+        $this->assertEquals($expected_next_cursor, $paginator->get_next_cursor());
+
+        $query = builder::table($this->table_name)
+            ->order_by('type')
+            ->order_by('is_deleted', 'desc')
+            ->order_by('name');
+
+        $cursor = $paginator->get_next_cursor();
+
+        $paginator = new cursor_paginator($query, $cursor, true);
+
+        // Let's create the cursor we expect to come next, which is generated from the last record
+        $record = $records->find('name', 'Basil');
+        $expected_next_cursor = cursor::create()
+            ->set_limit(2)
+            ->set_columns([
+                'type' => $record['type'],
+                'is_deleted' => (string)$record['is_deleted'],
+                'name' => $record['name'],
+            ]);
+
+        $this->assertEquals([
+            'Jane',
+            'Basil'
+        ], $paginator->get_items()->pluck('name'));
+
+        $this->assertEquals(2, count($paginator->get_items()));
+        $this->assertEquals($cursor, $paginator->get_current_cursor());
+        $this->assertEquals(5, $paginator->get_total());
+        $this->assertEquals($expected_next_cursor, $paginator->get_next_cursor());
+
+        // Use the next cursor
+
+        $query = builder::table($this->table_name)
+            ->order_by('type')
+            ->order_by('is_deleted', 'desc')
+            ->order_by('name');
+
+        $cursor = $paginator->get_next_cursor();
+
+        $paginator = new cursor_paginator($query, $cursor, true);
+
+        // Just one left
+        $this->assertEquals(['Roxanne'], $paginator->get_items()->pluck('name'));
+        $this->assertEquals(1, count($paginator->get_items()));
+        $this->assertEquals($cursor, $paginator->get_current_cursor());
+        $this->assertEquals(5, $paginator->get_total());
+        $this->assertNull($paginator->get_next_cursor());
     }
 
     public function test_last_page_works() {

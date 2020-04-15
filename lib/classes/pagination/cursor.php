@@ -66,9 +66,9 @@ class cursor extends base_cursor {
      */
     public function set_columns(?array $columns) {
         if (is_array($columns)) {
-            foreach ($columns as $column) {
-                if (!is_string($column)) {
-                    throw new coding_exception('Expecting an array of column names');
+            foreach (array_keys($columns) as $key) {
+                if (!is_string($key)) {
+                    throw new coding_exception('Expecting an array with column names as keys');
                 }
             }
         }
