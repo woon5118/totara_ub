@@ -37,6 +37,7 @@ class register_form extends moodleform {
             'demo' => get_string('sitetypedemo', 'totara_core'),
             'development' => get_string('sitetypedevelopment', 'totara_core'),
             'qa' => get_string('sitetypeqa', 'totara_core'),
+            'trial' => get_string('sitetypetrial', 'totara_core'),
             'production' => get_string('sitetypeproduction', 'totara_core'),
         );
         $mform->addElement('select', 'sitetype', get_string('sitetype', 'totara_core'), $choices);
@@ -108,7 +109,7 @@ class register_form extends moodleform {
                 $errors['registrationcode'] = get_string('registrationcodeinvalid', 'totara_core');
             }
         }
-        if ($sitetype === 'production' and $registrationcode === '') {
+        if (($sitetype === 'production' || $sitetype === 'trial')and $registrationcode === '') {
             $errors['registrationcode'] = get_string('required');
         }
 

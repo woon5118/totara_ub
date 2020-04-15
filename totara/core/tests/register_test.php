@@ -66,6 +66,9 @@ class totara_core_register_testcase extends advanced_testcase {
         $CFG->sitetype = 'development';
         $this->assertFalse(is_registration_required());
 
+        $CFG->sitetype = 'trial';
+        $this->assertTrue(is_registration_required());
+
         $CFG->sitetype = 'production';
         $this->assertTrue(is_registration_required());
 

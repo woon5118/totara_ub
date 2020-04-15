@@ -67,8 +67,8 @@ function is_registration_required() {
     if (empty($CFG->sitetype)) {
         return true;
     }
-    // Production mode requires valid registration code.
-    if ($CFG->sitetype === 'production') {
+    // Production mode and Trial require valid registration code.
+    if ($CFG->sitetype === 'production' || $CFG->sitetype === 'trial') {
         if (empty($CFG->registrationcode)) {
             return true;
         }

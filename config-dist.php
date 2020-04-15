@@ -1070,7 +1070,7 @@ $CFG->directorypermissions = 02777;
 // Please note that the registration code is unique for each site and cannot be shared,
 // it can be obtained from your Totara Partner.
 //
-// $CFG->sitetype = 'production'; // Options are 'production', 'qa', 'demo' or 'development'.
+// $CFG->sitetype = 'production'; // Options are 'production', 'trial', 'qa', 'demo' or 'development'.
 // $CFG->registrationcode = 'xxxxxxxxxxxxxxxx'; // Unique alphanumeric code, 16 characters.
 //
 //=========================================================================

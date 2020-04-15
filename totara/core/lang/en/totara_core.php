@@ -601,6 +601,7 @@ $string['sitetypedemo'] = 'Demo';
 $string['sitetypedevelopment'] = 'Development';
 $string['sitetypeproduction'] = 'Production';
 $string['sitetypeqa'] = 'QA / Staging';
+$string['sitetypetrial'] = 'Trial';
 $string['staffmanager'] = 'Staff Manager';
 $string['startdate'] = 'Start Date';
 $string['started'] = 'Started';
