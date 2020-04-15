@@ -444,22 +444,21 @@ abstract class pathway {
     }
 
     /**
-     * Return a human readable string of the pathway status
+     * Return a string representation of the pathway status
      *
      * @return string
      */
     public function get_status_name(): string {
         $string_keys = [
-            static::PATHWAY_STATUS_ACTIVE => 'pathwaystatusactive',
-            static::PATHWAY_STATUS_ARCHIVED => 'pathwaystatusarchived',
+            static::PATHWAY_STATUS_ACTIVE => 'ACTIVE',
+            static::PATHWAY_STATUS_ARCHIVED => 'ARCHIVED',
         ];
 
         if (!isset($string_keys[$this->status])) {
-            debugging("Missing translation string for pathway status {$this->status}", DEBUG_DEVELOPER);
-            return 'pathwaystatusunknown';
+            throw new coding_exception('Missing string representation for pathway classification');
         }
 
-        return strtoupper(get_string($string_keys[$this->status], 'totara_competency'));
+        return $string_keys[$this->status];
     }
 
     /**
@@ -511,8 +510,6 @@ abstract class pathway {
         return $this->validated;
     }
 
-
-
     /**
      * Get pathway classification (Single or Multi value)
      *
@@ -529,16 +526,15 @@ abstract class pathway {
      */
     public function get_classification_name(): string {
         $string_keys = [
-            static::PATHWAY_MULTI_VALUE => 'pathwaymultivalue',
-            static::PATHWAY_SINGLE_VALUE => 'pathwaysinglevalue',
+            static::PATHWAY_MULTI_VALUE => 'MULTIVALUE',
+            static::PATHWAY_SINGLE_VALUE => 'SINGLEVALUE',
         ];
 
         if (!isset($string_keys[static::CLASSIFICATION])) {
-            debugging("Missing translation string for pathway classification name ".static::CLASSIFICATION, DEBUG_DEVELOPER);
-            return 'pathwayunknownclassification';
+            throw new coding_exception('Missing string representation for pathway classification');
         }
 
-        return strtoupper(get_string($string_keys[static::CLASSIFICATION], 'totara_competency'));
+        return $string_keys[static::CLASSIFICATION];
     }
 
     /**

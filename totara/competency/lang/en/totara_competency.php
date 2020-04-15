@@ -307,10 +307,6 @@ $string['overallratingcalc'] = 'Overall rating calculation';
 $string['overview'] = 'Overview';
 
 $string['pathtype'] = 'Path type';
-$string['pathwaymultivalue'] = 'Multivalue';
-$string['pathwaysinglevalue'] = 'Singlevalue';
-$string['pathwaystatusactive'] = 'Active';
-$string['pathwaystatusarchived'] = 'Archived';
 $string['proficiency_level'] = 'Proficiency level';
 $string['proficiency_not_achieved'] = 'Proficiency not achieved';
 $string['proficiency_status'] = 'Proficiency status';
