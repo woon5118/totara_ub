@@ -352,9 +352,9 @@ class achievement_configuration {
             ->all();
 
         $scale_values = array_map(function ($scale_value) use ($singlevalue_pathways) {
-            $sv_pathways = array_filter($singlevalue_pathways, function ($pathway) use ($scale_value) {
+            $sv_pathways = array_values(array_filter($singlevalue_pathways, function ($pathway) use ($scale_value) {
                 return $pathway['scalevalue'] === $scale_value->id;
-            });
+            }));
 
             array_walk($sv_pathways, function (&$pathway, $idx) {
                 if ($idx > 0) {

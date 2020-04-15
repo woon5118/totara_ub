@@ -309,6 +309,8 @@ function (templates, ajax, modalFactory, modalEvents, notification, str) {
                     that.nPaths = 0;
 
                     templates.renderReplace(templatename, {'criteria_types': that.criteriaTypes, 'pathway_groups': pwGroups}, target).then(function() {
+                        that.singlevalShown = that.hasSingleValuePaths();
+                        that.showHideNoPaths();
                         resolve();
                     }).catch(function(e) {
                         e.fileName = that.filename;
@@ -689,32 +691,29 @@ function (templates, ajax, modalFactory, modalEvents, notification, str) {
                 } else {
                     // Remove it totally
                     if (this.pathways[pwKey].scalevalue) {
-                        // TODO: fix
-                        // var scalevalue = this.pathways[pwKey].scalevalue,
-                        //     idx = this.scalevalues[scalevalue].pathways.indexOf(pwKey);
-                        //
-                        // if (idx >= 0) {
-                        //     this.scalevalues[scalevalue].pathways.splice(idx, 1);
-                        // }
+                        // For single value pathways, we also need to remove the OR where applicable.
+                        var svNode = this.widget.querySelector('[data-scalevalue-id="' + this.pathways[pwKey].scalevalue + '"]'),
+                            pwOrNode = this.widget.querySelector('[data-pw-or="' + pwKey + '"]'),
+                            pwListNode = svNode.querySelector('[data-cc-scalevalue-pw-list]'),
+                            numPathways = parseInt(pwListNode.getAttribute('data-cc-scalevalue-pw-list'));
 
-                        // if (pwOrTarget) {
-                        //     pwOrTarget.remove();
-                        // } else if (this.scalevalues[scalevalue].pathways.length > 0) {
-                        //     // If we removed the top pathway for the scalevalue and there are more pathways,
-                        //     // we need now to remove the new top OR
-                        //     var svWgt = this.widget.querySelector('[data-scalevalue-id="' + scalevalue + '"]');
-                        //
-                        //     if (svWgt) {
-                        //         pwOrTarget = svWgt.querySelector('[data-pw-or]');
-                        //         if (pwOrTarget) {
-                        //             pwOrTarget.remove();
-                        //         }
-                        //     }
-                        // }
+                        if (pwOrNode) {
+                            pwOrNode.remove();
+                        } else {
+                            // Top pathway. We need to find the first OR and remove it if it exists
+                            var pwOrNodes = svNode.querySelectorAll('[data-pw-or]');
+                            if (pwOrNodes.length > 0) {
+                                pwOrNodes[0].remove();
+                            }
+                        }
+
+                        numPathways -= 1;
+                        pwListNode.setAttribute('data-cc-scalevalue-pw-list', numPathways);
                     }
 
                     delete this.pathways[pwKey];
                     this.nPaths -= 1;
+                    this.singlevalShown = this.hasSingleValuePaths();
                     this.showHideNoPaths();
 
                     if (pwTarget) {
@@ -981,6 +980,24 @@ function (templates, ajax, modalFactory, modalEvents, notification, str) {
                 }
             }
         },
+
+        /**
+         * Determine whether we have any single value paths
+         * @return {bool}
+         */
+        hasSingleValuePaths: function() {
+            var hasPaths = false,
+                pwKey;
+
+            for (pwKey in this.pathways) {
+                if (this.pathways[pwKey].scalevalue) {
+                    hasPaths = true;
+                    break;
+                }
+            }
+
+            return hasPaths;
+        }
 
     };
 
