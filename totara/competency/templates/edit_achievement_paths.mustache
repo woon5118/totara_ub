@@ -1,0 +1,119 @@
+{{!
+   This file is part of Totara LMS
+
+   Copyright (C) 2018 onwards Totara Learning Solutions LTD
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See  the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+   @author Riana Rossouw <riana.rossouw@totaralearning.com>
+   @package totara_competency
+}}
+{{!
+
+    @template totara_competency/achievement_paths
+
+    This is the template for editing achievement_paths
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * data-comp-id
+    * data-scale-id
+    * data-action
+
+    Context variables required for this template:
+    * competency_id
+    * scale_id
+    * achievement_paths
+
+    Other context variables for following partials:
+    * totara_competency/overall_aggregation
+
+    Strings:
+    * achievementpaths, totara_competency
+    * addachievementpath, totara_competency
+    * linkdefaultpreset, totara_competency
+    * addachievementpath, totara_competency
+}}
+
+<div data-tw-compAchievementPaths=""
+     data-core-autoinitialise="true"
+     data-core-autoinitialise-amd="totara_competency/achievement_paths"
+     data-tw-compAchievementPaths-comp-id="{{competency_id}}"
+     data-tw-compAchievementPaths-comp-scale-id="{{scale_id}}"
+     data-tw-compAchievementPaths-comp-singleuse="{{singleuse}}"
+     data-tw-loader-target="">
+
+    <div class="cc_inline cc_title">
+        <span class="legend">
+            <strong>{{#str}}achievementpaths, totara_competency{{/str}}</strong>
+        </span>
+    </div>
+    <div class="cc_inline cc_actions">
+        <div>
+            <select name="tw_compAchievementPaths_add_pathway_select"
+                  data-tw-compAchievementPaths-add-pathway=""
+                  data-tw-compAchievementPaths-on-ordering="disable">
+                <option value="0" selected="selected">{{#str}}addachievementpath, totara_competency{{/str}}</option>
+                {{#multivalue_types}}
+                    <option value="{{type}}">{{name}}</option>
+                {{/multivalue_types}}
+                <option value="singlevalue" disabled="disabled">{{#str}}singlevaluepaths, totara_competency{{/str}}</option>
+            </select>
+        </div>
+
+        <div>
+            <button type="submit"
+                    name="tw_compAchievementPaths_link_to_default_button"
+                    data-tw-compAchievementPaths-link-defaultpreset=""
+                    data-tw-compAchievementPaths-on-ordering="disable">
+                <span class="pw_item__btn_small_icon">
+                    {{#flex_icon}}undo{{/flex_icon}}
+                    {{#str}}linkdefaultpreset, totara_competency{{/str}}
+                </span>
+            </button>
+        </div>
+    </div>
+
+    {{> totara_competency/partial_aggregation}}
+
+    <div class="pw_none cc_hidden">
+        {{#str}}nopaths, totara_competency{{/str}}
+    </div>
+
+    {{! Placehoder for multi-value pathways with a sortorder < single-value pathways}}
+    <div data-tw-compAchievementPaths-noscale-top=""></div>
+
+    {{! Placehoder for single-value pathways}}
+    <div data-tw-compAchievementPaths-scale=""></div>
+
+    {{! Placehoder for multi-value pathways with a sortorder > single-value pathways}}
+    <div data-tw-compAchievementPaths-noscale-bottom></div>
+
+    <div class="cc_group_buttons clearfix">
+        <input type="submit"
+               class="cc_button"
+               name="tw_compAchievementPaths_apply_changes_button"
+               value="{{#str}}applychanges, totara_competency{{/str}}"
+               data-tw-compAchievementPaths-applyChange=""
+               data-tw-compAchievementPaths-on-ordering="disable">
+        <input type="submit"
+               class="cc_button"
+               name="tw_compAchievementPaths_cancel_changes_button"
+               value="{{#str}}cancel, totara_competency{{/str}}"
+               data-tw-compAchievementPaths-cancelChanges=""
+               data-tw-compAchievementPaths-cancel-href="{{backurl}}">
+    </div>
+</div>
