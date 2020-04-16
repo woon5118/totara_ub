@@ -67,8 +67,9 @@
             >
               <Select
                 :id="id"
-                v-model="currentSelected"
+                :value="currentSelected"
                 :options="selectOptions"
+                @input="selectTabId"
               />
             </FormRow>
           </Form>
@@ -193,6 +194,11 @@ export default {
         return;
       }
       this.$_setSelectedTab(tab);
+    },
+
+    selectTabId(id) {
+      this.currentSelected = id;
+      this.$emit('input', id);
     },
 
     handleTabKeydown(e) {
