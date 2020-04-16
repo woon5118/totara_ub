@@ -27,6 +27,7 @@ use core\webapi\execution_context;
 use core\webapi\query_resolver;
 
 use mod_perform\models\activity\track as track_model;
+use totara_core\advanced_feature;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -38,6 +39,8 @@ class track implements query_resolver {
      * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
+        advanced_feature::require('performance_activities');
+
         $track_id = (int)$args['track_id'] ?? 0;
         if (!$track_id) {
             throw new \invalid_parameter_exception('invalid track id');

@@ -23,8 +23,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-use totara_job\rb\source\report_trait;
 use mod_perform\rb\traits\participant_subject_instance_source;
+use totara_core\advanced_feature;
+use totara_job\rb\source\report_trait;
 
 /**
  * Performance participant instance report.
@@ -474,6 +475,15 @@ class rb_source_perform_participant_instance extends rb_base_source {
             )
         ];
         return $paramoptions;
+    }
+
+    /**
+     * Disable participant reports if the performance activities feature is disabled.
+     *
+     * @return bool
+     */
+    public static function is_source_ignored() {
+        return advanced_feature::is_disabled('performance_activities');
     }
 
     /**

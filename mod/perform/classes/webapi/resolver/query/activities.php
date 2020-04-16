@@ -28,10 +28,12 @@ use core\webapi\execution_context;
 use core\webapi\query_resolver;
 use mod_perform\data_providers\activity;
 use mod_perform\util;
+use totara_core\advanced_feature;
 
 class activities implements query_resolver {
 
     public static function resolve(array $args, execution_context $ec) {
+        advanced_feature::require('performance_activities');
         require_login(null, false, null, false, true);
 
         $context = self::get_context();

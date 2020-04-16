@@ -28,10 +28,12 @@ use core\webapi\execution_context;
 use core\webapi\query_resolver;
 use mod_perform\models\activity\subject_instance;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
+use totara_core\advanced_feature;
 
 class participant_section implements query_resolver {
 
     public static function resolve(array $args, execution_context $ec) {
+        advanced_feature::require('performance_activities');
         require_login(null, false, null, false, true);
 
         /** @var subject_instance_entity $subject_instance_entity */

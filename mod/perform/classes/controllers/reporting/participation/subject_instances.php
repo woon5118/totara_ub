@@ -26,6 +26,7 @@ namespace mod_perform\controllers\reporting\participation;
 use context;
 use mod_perform\controllers\perform_controller;
 use mod_perform\models\activity\activity;
+use mod_perform\models\activity\subject_instance;
 use moodle_exception;
 use totara_mvc\has_report;
 use totara_mvc\report_view;
@@ -36,27 +37,18 @@ class subject_instances extends perform_controller {
 
     private $activity;
 
-    public function __construct() {
-        $activity_id = $this->get_param('activity_id', PARAM_INT, null, true);
-        try {
-            $this->activity = activity::load_by_id($activity_id);
-        } catch (\Exception $e) {
-            throw new moodle_exception('error_activity_id_wrong', 'mod_perform', '', null, $e);
-        }
-        parent::__construct();
-    }
-
     public function setup_context(): context {
-        return $this->activity->get_context();
+        return $this->get_activity()->get_context();
     }
 
     public function action() {
         parent::action();
-        $activity_id = $this->get_param('activity_id', PARAM_INT, null, true);
-        $report = $this->load_embedded_report('perform_subject_instance', ['activity_id' => $activity_id]);
+
+        $report = $this->load_embedded_report('perform_subject_instance', ['activity_id' => $this->get_activity()->id]);
+
         return (new report_view('mod_perform/report', $report))
-            ->set_title($this->activity->name)
-            ->set_url(static::get_url(['activity_id' => $activity_id]))
+            ->set_title($this->get_activity()->name)
+            ->set_url(static::get_url(['activity_id' => $this->get_activity()->id]))
             ->set_backto(
                 new \moodle_url('/mod/perform/manage/activity/index.php'),
                 get_string('perform:back_to_all_activities', 'mod_perform')
@@ -66,4 +58,19 @@ class subject_instances extends perform_controller {
     public static function get_base_url(): string {
         return '/mod/perform/reporting/participation/index.php';
     }
+
+    private function get_activity(): activity {
+        if (!isset($this->activity)) {
+            $activity_id = $this->get_param('activity_id', PARAM_INT, null, true);
+
+            try {
+                $this->activity = activity::load_by_id($activity_id);
+            } catch (\Exception $e) {
+                throw new moodle_exception('error_activity_id_wrong', 'mod_perform', '', null, $e);
+            }
+        }
+
+        return $this->activity;
+    }
+
 }

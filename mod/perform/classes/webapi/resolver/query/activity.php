@@ -26,6 +26,7 @@ namespace mod_perform\webapi\resolver\query;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
 use mod_perform\models\activity\activity as activity_model;
+use totara_core\advanced_feature;
 
 class activity implements query_resolver {
 
@@ -37,6 +38,7 @@ class activity implements query_resolver {
      * @return activity_model
      */
     public static function resolve(array $args, execution_context $ec) {
+        advanced_feature::require('performance_activities');
         require_login(null, false, null, false, true);
 
         // This may be opened up later, but for now user needs manage capability.

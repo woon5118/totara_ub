@@ -28,6 +28,7 @@ use core\webapi\execution_context;
 use core\webapi\query_resolver;
 use mod_perform\data_providers\activity\element_plugin as element_plugin_data_provider;
 use mod_perform\models\activity\element_plugin as element_plugin_model;
+use totara_core\advanced_feature;
 
 class element_plugins implements query_resolver {
 
@@ -37,6 +38,7 @@ class element_plugins implements query_resolver {
      * @return collection|element_plugin_model[]
      */
     public static function resolve(array $args, execution_context $ec) {
+        advanced_feature::require('performance_activities');
         require_login(null, false, null, false, true);
 
         return (new element_plugin_data_provider())->fetch()->get();

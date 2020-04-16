@@ -28,6 +28,7 @@ use core\webapi\execution_context;
 use core\webapi\mutation_resolver;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\activity as activity_model;
+use totara_core\advanced_feature;
 
 class update_activity_general_info implements mutation_resolver {
 
@@ -40,6 +41,7 @@ class update_activity_general_info implements mutation_resolver {
      * @see activity
      */
     public static function resolve(array $args, execution_context $ec) {
+        advanced_feature::require('performance_activities');
         require_login(null, false, null, false, true);
 
         $activity = activity_model::load_by_id($args['activity_id']);

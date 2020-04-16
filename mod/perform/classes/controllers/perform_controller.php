@@ -25,6 +25,7 @@ namespace mod_perform\controllers;
 
 use moodle_url;
 use navigation_node_collection;
+use totara_core\advanced_feature;
 use totara_mvc\controller;
 
 /**
@@ -33,6 +34,11 @@ use totara_mvc\controller;
  * @package mod_perform\controllers
  */
 abstract class perform_controller extends controller {
+
+    public function init_page_object() {
+        advanced_feature::require('performance_activities');
+        parent::init_page_object();
+    }
 
     public function action() {
         // Remove course-related settings blocks.

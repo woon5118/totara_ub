@@ -152,6 +152,11 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
         new lang_string('configenablegoals', 'totara_hierarchy'),
         advanced_feature::ENABLED));
 
+    $optionalsubsystems->add(new totara_core_admin_setting_feature('enableperformance_activities',
+        new lang_string('enable_performance_activities', 'mod_perform'),
+        new lang_string('enable_performance_activities_description', 'mod_perform'),
+        advanced_feature::ENABLED));
+
     $optionalsubsystems->add(new totara_core_admin_setting_feature('enablecompetencies',
         new lang_string('enablecompetencies', 'totara_hierarchy'),
         new lang_string('enablecompetencies_desc', 'totara_hierarchy'),

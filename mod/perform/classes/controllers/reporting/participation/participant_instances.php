@@ -37,32 +37,29 @@ class participant_instances extends perform_controller {
 
     private $subject_instance;
 
-    public function __construct() {
-        $subject_instance_id = $this->get_param('subject_instance_id', PARAM_INT, null, true);
-        try {
-            $this->subject_instance = subject_instance::load_by_id($subject_instance_id);
-        } catch (\Exception $e) {
-            throw new moodle_exception('error_subject_instance_id_wrong', 'mod_perform', '', null, $e);
-        }
-        parent::__construct();
-    }
-
     public function setup_context(): context {
-        return $this->subject_instance->get_context();
+        return $this->get_subject_instance()->get_context();
     }
 
     public function action() {
         parent::action();
-        $subject_instance_id = $this->get_param('subject_instance_id', PARAM_INT, null, true);
-        $report = $this->load_embedded_report('perform_participant_instance', ['subject_instance_id' => $subject_instance_id]);
-        $a = ['activity_name' => $this->subject_instance->get_activity()->name, 'fullname' => $this->subject_instance->subject_user->fullname];
+
+        $report = $this->load_embedded_report('perform_participant_instance', [
+            'subject_instance_id' => $this->get_subject_instance()->id,
+        ]);
+
+        $page_title = get_string('participant_instances_title', 'mod_perform', [
+            'activity_name' => $this->get_subject_instance()->get_activity()->name,
+            'fullname' => $this->subject_instance->subject_user->fullname
+        ]);
+
         return (new report_view('mod_perform/report', $report))
-            ->set_title(get_string('participant_instances_title', 'mod_perform', (object)$a))
-            ->set_url(static::get_url(['subject_instance_id' => $subject_instance_id]))
+            ->set_title($page_title)
+            ->set_url(static::get_url(['subject_instance_id' => $this->get_subject_instance()->id]))
             ->set_backto(
-                new \moodle_url(
+                new moodle_url(
                     '/mod/perform/reporting/participation/index.php',
-                    ['activity_id' => $this->subject_instance->get_activity()->id]
+                    ['activity_id' => $this->get_subject_instance()->get_activity()->id]
                 ),
                 get_string('back_to_activity', 'mod_perform')
             );
@@ -71,4 +68,19 @@ class participant_instances extends perform_controller {
     public static function get_base_url(): string {
         return '/mod/perform/reporting/participation/participants.php';
     }
+
+    private function get_subject_instance(): subject_instance {
+        if (!isset($this->subject_instance)) {
+            $subject_instance_id = $this->get_param('subject_instance_id', PARAM_INT, null, true);
+
+            try {
+                $this->subject_instance = subject_instance::load_by_id($subject_instance_id);
+            } catch (\Exception $e) {
+                throw new moodle_exception('error_subject_instance_id_wrong', 'mod_perform', '', null, $e);
+            }
+        }
+
+        return $this->subject_instance;
+    }
+
 }

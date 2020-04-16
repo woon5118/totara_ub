@@ -29,6 +29,7 @@ use core\webapi\execution_context;
 use core\webapi\query_resolver;
 use mod_perform\data_providers\activity\subject_instance as subject_instance_data_provider;
 use mod_perform\models\activity\subject_instance as subject_instance_model;
+use totara_core\advanced_feature;
 
 class subject_instances implements query_resolver {
 
@@ -40,6 +41,7 @@ class subject_instances implements query_resolver {
      * @return collection|mixed|subject_instance_model[]
      */
     public static function resolve(array $args, execution_context $ec) {
+        advanced_feature::require('performance_activities');
         require_login(null, false, null, false, true);
 
         $participant_id = user::logged_in()->id;

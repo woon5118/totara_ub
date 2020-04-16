@@ -29,6 +29,7 @@ use core\webapi\execution_context;
 use core\webapi\mutation_resolver;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\section;
+use totara_core\advanced_feature;
 
 class create_activity implements mutation_resolver {
 
@@ -37,6 +38,7 @@ class create_activity implements mutation_resolver {
      */
     public static function resolve(array $args, execution_context $ec) {
         global $DB;
+        advanced_feature::require('performance_activities');
         require_login(null, false, null, false, true);
 
         if (!activity::can_create()) {

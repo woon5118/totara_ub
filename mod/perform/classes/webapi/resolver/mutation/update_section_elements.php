@@ -29,6 +29,7 @@ use mod_perform\models\activity\activity;
 use mod_perform\models\activity\element;
 use mod_perform\models\activity\section;
 use mod_perform\models\activity\section_element;
+use totara_core\advanced_feature;
 
 class update_section_elements implements mutation_resolver {
 
@@ -37,8 +38,8 @@ class update_section_elements implements mutation_resolver {
      */
     public static function resolve(array $args, execution_context $ec) {
         global $DB;
-
-        require_login();
+        advanced_feature::require('performance_activities');
+        require_login(null, false, null, false, true);
 
         $section_form_data = $args['input'];
 

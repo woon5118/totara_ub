@@ -24,6 +24,7 @@
 use core_user\output\myprofile\node;
 use core_user\output\myprofile\tree;
 use mod_perform\controllers\activity\user_activities;
+use totara_core\advanced_feature;
 
 /**
  * Required in order to prevent failures in tests.
@@ -53,6 +54,10 @@ function perform_delete_instance($id) {
 function mod_perform_myprofile_navigation(tree $tree, $user, $is_current_user) {
     // You can only view your own performance activities for now.
     if (!$is_current_user) {
+        return false;
+    }
+
+    if (advanced_feature::is_disabled('performance_activities')) {
         return false;
     }
 

@@ -26,6 +26,7 @@ namespace mod_perform\controllers\activity;
 use mod_perform\controllers\perform_controller;
 use mod_perform\models\activity\activity as activity_model;
 use mod_perform\util;
+use totara_core\advanced_feature;
 use totara_mvc\tui_view;
 
 class manage_activities extends perform_controller {
@@ -46,6 +47,7 @@ class manage_activities extends perform_controller {
     public function process(string $action = '') {
         require_once($this->config->libdir . '/adminlib.php');
         admin_externalpage_setup('mod_perform_manage_activities');
+
         parent::process($action);
     }
 

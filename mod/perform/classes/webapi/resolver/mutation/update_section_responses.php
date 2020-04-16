@@ -31,6 +31,7 @@ use core\webapi\mutation_resolver;
 use mod_perform\data_providers\activity\responses_for_participant_section;
 use mod_perform\models\activity\element_response;
 use mod_perform\models\activity\participant_section;
+use totara_core\advanced_feature;
 
 class update_section_responses implements mutation_resolver {
 
@@ -40,7 +41,8 @@ class update_section_responses implements mutation_resolver {
      * @return participant_section
      */
     public static function resolve(array $args, execution_context $ec): participant_section {
-        require_login();
+        advanced_feature::require('performance_activities');
+        require_login(null, false, null, false, true);
 
         $input = $args['input'];
 

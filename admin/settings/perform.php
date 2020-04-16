@@ -31,10 +31,15 @@ defined('MOODLE_INTERNAL') || die();
 //      see TL-24292 for more details
 
 $is_perform_installed = (core_component::get_component_directory('mod_perform') !== null);
+$is_perform_enabled = totara_core\advanced_feature::is_enabled('performance_activities');
 
 // Make sure for now that this does not fall over if the plugin would not exist
-if ($is_perform_installed) {
-    $ADMIN->add('root', new admin_category('performactivities', new lang_string('performactivities', 'admin')));
+if ($is_perform_installed && $is_perform_enabled) {
+    $ADMIN->add(
+        'root',
+        new admin_category('performactivities', new lang_string('performactivities', 'admin')),
+        'appraisals'
+    );
 
     \mod_perform\settings::init_public_settings($ADMIN);
 }

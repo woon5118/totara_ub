@@ -27,6 +27,7 @@ use core\orm\query\exceptions\record_not_found_exception;
 use core\webapi\execution_context;
 use core\webapi\mutation_resolver;
 use mod_perform\models\activity\section;
+use totara_core\advanced_feature;
 
 class update_section_relationships implements mutation_resolver {
 
@@ -36,7 +37,8 @@ class update_section_relationships implements mutation_resolver {
      * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
-        require_login();
+        advanced_feature::require('performance_activities');
+        require_login(null, false, null, false, true);
 
         $args = $args['input'];
 

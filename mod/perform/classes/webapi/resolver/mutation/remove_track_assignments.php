@@ -32,6 +32,7 @@ use mod_perform\models\activity\track;
 use mod_perform\models\activity\track_assignment_type;
 
 use mod_perform\user_groups\grouping;
+use totara_core\advanced_feature;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -43,6 +44,8 @@ class remove_track_assignments implements mutation_resolver {
      * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
+        advanced_feature::require('performance_activities');
+
         $assignments = $args['assignments'] ?? null;
         if (!$assignments) {
             throw new \invalid_parameter_exception("no assignments given'");
