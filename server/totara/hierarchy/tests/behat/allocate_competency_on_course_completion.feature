@@ -3,7 +3,7 @@ Feature: Verify completion of a course triggers assigning a competency.
 
   Background:
     Given I am on a totara site
-    And Perform is disabled
+    And I disable the "competency_assignment" advanced feature
     And the following "users" exist:
       | username | firstname  | lastname  | email                |
       | learner1 | Bob1       | Learner1  | learner1@example.com |

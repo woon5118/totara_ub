@@ -6,7 +6,7 @@ Feature: Test competencies achieved is updated
 
   Background:
     Given I am on a totara site
-    And Perform is disabled
+    And I disable the "competency_assignment" advanced feature
     And the following "users" exist:
       | username | firstname | lastname | email                        | role         | context |
       | bilbo    | Bilbo     | Baggins  | bilbo.baggins@example.com    |              |         |

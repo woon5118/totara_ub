@@ -3,7 +3,7 @@ Feature: Test competencies are updated when linked courses are deleted
 
   Scenario: Delete course linked to a single competency
     Given I am on a totara site
-    And Perform is disabled
+    And I disable the "competency_assignment" advanced feature
     And the following "competency" frameworks exist:
       | fullname             | idnumber | description                |
       | Competency Framework | CFrame   | Framework for Competencies |

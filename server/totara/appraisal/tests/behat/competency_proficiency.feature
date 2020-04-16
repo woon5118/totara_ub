@@ -1,9 +1,9 @@
-@totara @totara_appraisal @totara_core_menu
+@totara @perform @totara_appraisal @totara_core_menu
 Feature: Appraisal question: Competencies from Learning Plan - test that changing proficiency is working
 
   Background:
     Given I am on a totara site
-    And Perform is disabled
+    And I disable the "competency_assignment" advanced feature
     And the following "competency" frameworks exist:
       | fullname               | idnumber | description           |
       | Competency Framework 1 | CF1      | Framework description |

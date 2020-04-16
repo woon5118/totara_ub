@@ -4,7 +4,7 @@ Feature: Verify competencies completion status is updated when the associated co
   Background:
     Given the "mylearning" user profile block exists
     And I am on a totara site
-    And Perform is disabled
+    And I disable the "competency_assignment" advanced feature
     And the following "users" exist:
       | username | firstname  | lastname  | email                |
       | learner1 | Bob1       | Learner1  | learner1@example.com |

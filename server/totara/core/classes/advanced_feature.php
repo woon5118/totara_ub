@@ -136,6 +136,7 @@ class advanced_feature {
             'goals',
             'learningplans',
             'myteam',
+            'performance_activities',
             'positions',
             'programs',
             'recordoflearning',
