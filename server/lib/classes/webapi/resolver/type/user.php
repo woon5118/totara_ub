@@ -59,21 +59,20 @@ class user implements \core\webapi\type_resolver {
             throw new \coding_exception(__METHOD__ . ' must be given a user record from the database', gettype($user));
         }
 
-        // Giving us more spaces for checking the custom compute fields.
-        $custom_computed_fields = ['card_display'];
-
-        if (!user_field_resolver::is_valid_field($field) && !in_array($field, $custom_computed_fields)) {
-            throw new \coding_exception("Unknown user field");
+        // TODO remove this temp hack
+        if ($ec->has_relevant_context() && self::is_perform_container($ec->get_relevant_context())) {
+            $controller = null;
+        } else {
+            $controller = self::get_user_access_controller($user, $ec);
         }
 
-        $course_id = null;
-
-        if ($ec->has_relevant_context()) {
-            $context = $ec->get_relevant_context();
-            $context_course = $context->get_course_context(false);
-
-            if ($context_course && SITEID != $context_course->instanceid) {
-                $course_id = $context_course->instanceid;
+        if ($controller !== null && !$controller->can_view_field($field)) {
+            $requiredfields = ['id', 'fullname'];
+            if (in_array($field, $requiredfields)) {
+                // You got here because you did not check permissions because using this type, and now you can't
+                // view this users information. The fields are required in GraphQL, but because we're kind you're
+                // getting a coding_exception rather than a cryptic GraphQL exception.
+                throw new \coding_exception('You did not check you can view a user before resolving them.', $user->id);
             }
         }
 

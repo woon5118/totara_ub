@@ -1,4 +1,14 @@
 <?php
+
+use core_container\hook\module_supported_in_container;
+use mod_perform\watcher\activity;
+use mod_perform\hook\subject_instances_created;
+use mod_perform\watcher\participant_instances;
+use mod_perform\watcher\participant_sections;
+use mod_perform\hook\participant_instances_created;
+use core_user\hook\allow_view_profile_field;
+use mod_perform\watcher\user;
+
 /**
  * This file is part of Totara Learn
  *
@@ -23,15 +33,19 @@
 
 $watchers = [
     [
-        'hookname' => '\core_container\hook\module_supported_in_container',
-        'callback' => ['\mod_perform\watcher\activity', 'filter_module'],
+        'hookname' => module_supported_in_container::class,
+        'callback' => [activity::class, 'filter_module'],
     ],
     [
-        'hookname' => '\mod_perform\hook\subject_instances_created',
-        'callback' => ['\mod_perform\watcher\participant_instances', 'create_participants'],
+        'hookname' => subject_instances_created::class,
+        'callback' => [participant_instances::class, 'create_participants'],
     ],
     [
-        'hookname' => '\mod_perform\hook\participant_instances_created',
-        'callback' => ['\mod_perform\watcher\participant_sections', 'create_participant_sections'],
+        'hookname' => participant_instances_created::class,
+        'callback' => [participant_sections::class, 'create_participant_sections'],
+    ],
+    [
+        'hookname' => allow_view_profile_field::class,
+        'callback' => [user::class, 'allow_view_profile_field'],
     ],
 ];

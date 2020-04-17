@@ -45,6 +45,8 @@ use core\orm\entity\relations\has_many;
  * @property-read collection|participant_section[] $participant_sections
  * @property-read user $participant_user
  *
+ * @method static participant_instance_repository repository
+ *
  * @package mod_perform\entities
  */
 class participant_instance extends entity {

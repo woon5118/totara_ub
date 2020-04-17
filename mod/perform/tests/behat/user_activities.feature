@@ -10,7 +10,7 @@ Feature: Viewing and responding to perform activities
     And the following "subject instances" exist in "mod_perform" plugin:
       | activity_name                 | subject_username | subject_is_participating | other_participant_username |
       | John is participating subject | john             | true                     | david                      |
-      | David is subject              | david            | false                    | admin                      |
+      | David is subject              | david            | false                    | john                      |
       | John is not participating     | harry            | true                     | david                      |
 
   Scenario: Can view and respond to activities I'm a participant in that are about me
@@ -46,7 +46,7 @@ Feature: Viewing and responding to perform activities
       | John is participating subject | Complete      | In progress               |
 
   Scenario: Can view and and respond to activities I'm a participant in but are not about me
-    Given I log in as "admin"
+    Given I log in as "john"
     When I navigate to the outstanding perform activities list page
     And I click on "Activities about others" "link"
     Then I should see the tui datatable contains:
