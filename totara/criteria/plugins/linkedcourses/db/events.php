@@ -35,6 +35,7 @@ use totara_completionimport\event\bulk_course_completionimport;
 use criteria_linkedcourses\observer\linked_courses as linked_courses_observer;
 use criteria_linkedcourses\observer\course as course_observer;
 use totara_competency\event\linked_courses_updated;
+use totara_core\event\course_completion_reset;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -50,6 +51,10 @@ $observers = [
     [
         'eventname' => course_completion_edited::class,
         'callback' => course_observer::class.'::course_completion_changed',
+    ],
+    [
+        'eventname' => course_completion_reset::class,
+        'callback' => course_observer::class.'::course_completion_reset',
     ],
     [
         'eventname' => bulk_course_completionimport::class,

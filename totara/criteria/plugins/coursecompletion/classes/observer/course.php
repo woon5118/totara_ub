@@ -33,6 +33,7 @@ use core\event\course_restored;
 use core\event\course_updated;
 use totara_completioneditor\event\course_completion_edited;
 use totara_completionimport\event\bulk_course_completionimport;
+use totara_core\event\course_completion_reset;
 use totara_criteria\course_item_helper;
 
 class course {
@@ -48,6 +49,15 @@ class course {
         }
 
         course_item_helper::course_completions_updated([$event->relateduserid => [$event->courseid]], 'coursecompletion');
+    }
+
+    /**
+     * Course completion of all users have been reset for the course
+     *
+     * @param course_completion_reset $event
+     */
+    public static function course_completion_reset(course_completion_reset $event) {
+        course_item_helper::course_completions_reset($event->objectid, 'coursecompletion');
     }
 
     /**

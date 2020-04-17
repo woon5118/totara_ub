@@ -24,6 +24,7 @@ Feature: Verify replacement of sql_fullname
     And I log in as "admin"
     And I set the following administration settings values:
       | assessorroleid | Staff Manager (staffmanager) |
+    And I am on homepage
     And I navigate to "Manage templates" node in "Site administration > Learning Plans"
     And I click on "Learning Plan" "link" in the ".dp-templates" "css_element"
     And I switch to "Workflow" tab

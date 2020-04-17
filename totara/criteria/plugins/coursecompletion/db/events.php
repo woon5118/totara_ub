@@ -27,6 +27,7 @@ use core\event\course_completed;
 use core\event\course_deleted;
 use core\event\course_restored;
 use core\event\course_updated;
+use totara_core\event\course_completion_reset;
 use criteria_coursecompletion\observer\course as course_observer;
 use criteria_coursecompletion\observer\totara_core as core_observer;
 use totara_completioneditor\event\course_completion_edited;
@@ -42,6 +43,10 @@ $observers = [
     [
         'eventname' => course_completion_edited::class,
         'callback' => course_observer::class.'::course_completion_changed',
+    ],
+    [
+        'eventname' => course_completion_reset::class,
+        'callback' => course_observer::class.'::course_completion_reset',
     ],
     [
         'eventname' => bulk_course_completionimport::class,

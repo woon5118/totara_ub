@@ -23,8 +23,11 @@
 
 use totara_competency\linked_courses;
 use totara_completionimport\event\bulk_course_completionimport;
+use totara_core\event\course_completion_reset;
+use totara_criteria\entities\criteria_item as item_entity;
+use totara_criteria\entities\criteria_item_record as item_record_entity;
+use totara_criteria\entities\criterion as criterion_entity;
 use totara_criteria\hook\criteria_achievement_changed;
-use totara_criteria\hook\criteria_validity_changed;
 
 class criteria_linkedcourses_course_observer_testcase extends advanced_testcase {
 
@@ -42,7 +45,7 @@ class criteria_linkedcourses_course_observer_testcase extends advanced_testcase 
         $data = new class() {
             /** @var competency_entity $competency */
             public $competency;
-            /** @var criterion[] $criterion */
+            /** @var criterion_entity[] $criterion */
             public $criteria = [];
             /** @var array int[] $criteria_ids */
             public $criteria_ids = [];
@@ -173,6 +176,43 @@ class criteria_linkedcourses_course_observer_testcase extends advanced_testcase 
         $hook_sink->close();
     }
 
+    public function test_course_completion_reset() {
+        $data = $this->setup_data(2);
+
+        linked_courses::set_linked_courses($data->competency->id, [
+            ['id' => $data->courses[1]->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY],
+            ['id' => $data->courses[2]->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY],
+            ['id' => $data->courses[3]->id, 'linktype' => linked_courses::LINKTYPE_MANDATORY],
+        ]);
+
+        // Create item_records
+        $this->create_item_records($data->courses[1]->id, $data->users[1]->id, 1);
+        $this->create_item_records($data->courses[2]->id, $data->users[1]->id, 0);
+        $this->create_item_records($data->courses[2]->id, $data->users[2]->id, 1);
+
+
+        /** @var phpunit_hook_sink $hook_sink */
+        $hook_sink = $this->redirectHooks();
+
+        course_completion_reset::create_from_course($data->courses[1])->trigger();
+        $this->verify_achievement_changed_hook($hook_sink, [
+            $data->users[1]->id => [$data->criteria[1]->get_id(), $data->criteria[2]->get_id()],
+        ]);
+        $hook_sink->clear();
+
+        course_completion_reset::create_from_course($data->courses[2])->trigger();
+        $this->verify_achievement_changed_hook($hook_sink, [
+            $data->users[1]->id => [$data->criteria[1]->get_id(), $data->criteria[2]->get_id()],
+            $data->users[2]->id => [$data->criteria[1]->get_id(), $data->criteria[2]->get_id()],
+        ]);
+        $hook_sink->clear();
+
+        course_completion_reset::create_from_course($data->courses[3])->trigger();
+        $this->assertSame(0, $hook_sink->count());
+
+        $hook_sink->close();
+    }
+
 
     /**
      * @param phpunit_hook_sink $sink
@@ -190,17 +230,28 @@ class criteria_linkedcourses_course_observer_testcase extends advanced_testcase 
     }
 
     /**
-     * @param phpunit_hook_sink $sink
-     * @param array $expected_criteria_ids
+     * @param int $course_id
+     * @param int $user_id
+     * @param int $criterion_met
      */
-    private function verify_validity_changed_hook(phpunit_hook_sink $sink, array $expected_criteria_ids) {
-        $hooks = $sink->get_hooks();
-        $this->assertEquals(1, count($hooks));
-        /** @var criteria_validity_changed $hook */
-        $hook = reset($hooks);
-        $this->assertEquals(criteria_validity_changed::class, get_class($hook));
+    private function create_item_records(int $course_id, int $user_id, int $criterion_met = 0) {
+        /** @var criterion_item $items */
+        $items = item_entity::repository()
+            ->as('item')
+            ->join([criterion_entity::TABLE, 'criterion'], 'item.criterion_id', 'criterion.id')
+            ->where('criterion.plugin_type', 'linkedcourses')
+            ->where('item.item_type', 'course')
+            ->where('item.item_id', $course_id)
+            ->get();
 
-        $this->assertEqualsCanonicalizing($expected_criteria_ids, $hook->get_criteria_ids());
-        $sink->clear();
+        foreach ($items as $item) {
+            $record = new item_record_entity();
+            $record->user_id = $user_id;
+            $record->criterion_item_id = $item->id;
+            $record->criterion_met = $criterion_met;
+            $record->timeevaluated = time();
+            $record->save();
+        }
     }
+
 }

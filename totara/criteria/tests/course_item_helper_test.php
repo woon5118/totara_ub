@@ -22,6 +22,8 @@
  */
 
 use totara_criteria\course_item_helper;
+use totara_criteria\entities\criteria_item;
+use totara_criteria\entities\criteria_item_record;
 use totara_criteria\entities\criterion as criterion_entity;
 use totara_competency\entities\course as course_entity;
 use totara_criteria\hook\criteria_achievement_changed;
@@ -449,6 +451,98 @@ class course_item_helper_testcase extends advanced_testcase {
         $hook_sink->close();
     }
 
+    public function test_course_completions_reset() {
+        $data = $this->setup_data();
+        $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
+        $criterion1 = $criteria_generator->create_coursecompletion(['courseids' => [$data->courses[1]->id]]);
+        $criterion2 = $criteria_generator->create_coursecompletion(['courseids' => [$data->courses[2]->id]]);
+
+        /** @var phpunit_hook_sink $hook_sink */
+        $hook_sink = $this->redirectHooks();
+
+        // No records
+        course_item_helper::course_completions_reset($data->courses[1]->id);
+        $this->assertSame(0, $hook_sink->count());
+
+        // Records for another course
+        // User1 completed course2
+        $criterion2_itemid = criteria_item::repository()
+            ->select('id')
+            ->where('criterion_id', $criterion2->get_id())
+            ->one();
+
+        $this->create_item_record($criterion2_itemid->id, $data->users[1]->id, 1);
+
+        course_item_helper::course_completions_reset($data->courses[1]->id);
+        $this->assertSame(0, $hook_sink->count());
+
+        // With one record
+        course_item_helper::course_completions_reset($data->courses[2]->id);
+        $this->verify_achievement_changed_hook($hook_sink, [$data->users[1]->id => [$criterion2->get_id()]]);
+        $hook_sink->close();
+    }
+
+    public function test_course_completions_reset_multiple() {
+        $data = $this->setup_data();
+        $criteria_generator = $this->getDataGenerator()->get_plugin_generator('totara_criteria');
+        $criterion1 = $criteria_generator->create_coursecompletion(['courseids' => [$data->courses[1]->id]]);
+        $criterion2 = $criteria_generator->create_coursecompletion(['courseids' => [$data->courses[2]->id]]);
+        $criterion3 = $criteria_generator->create_coursecompletion(['courseids' => [$data->courses[3]->id]]);
+        $criterion34 = $criteria_generator->create_coursecompletion(['courseids' => [$data->courses[3]->id, $data->courses[4]->id]]);
+
+        // User1 completed course1 and course2
+        // User2 completed course3
+        // User3 completes course4
+        // User4 completes course3 and course4
+        $criterion_items = criteria_item::repository()
+            ->get();
+        foreach ($criterion_items as $item) {
+            if ($item->item_id == $data->courses[1]->id || $item->item_id == $data->courses[2]->id) {
+                $this->create_item_record($item->id, $data->users[1]->id, 1);
+            }
+
+            if ($item->item_id == $data->courses[3]->id) {
+                $this->create_item_record($item->id, $data->users[2]->id, 1);
+                $this->create_item_record($item->id, $data->users[4]->id, 1);
+            }
+
+            if ($item->item_id == $data->courses[4]->id) {
+                $this->create_item_record($item->id, $data->users[3]->id, 1);
+                $this->create_item_record($item->id, $data->users[4]->id, 1);
+            }
+        }
+
+        /** @var phpunit_hook_sink $hook_sink */
+        $hook_sink = $this->redirectHooks();
+
+        course_item_helper::course_completions_reset($data->courses[2]->id);
+        $this->verify_achievement_changed_hook($hook_sink,
+            [
+                $data->users[1]->id => [$criterion2->get_id()],
+            ]
+        );
+        $hook_sink->clear();
+
+        course_item_helper::course_completions_reset($data->courses[3]->id);
+        $this->verify_achievement_changed_hook($hook_sink,
+            [
+                $data->users[2]->id => [$criterion3->get_id(), $criterion34->get_id()],
+                $data->users[4]->id => [$criterion3->get_id(), $criterion34->get_id()],
+            ]
+        );
+        $hook_sink->clear();
+
+        course_item_helper::course_completions_reset($data->courses[4]->id);
+        $this->verify_achievement_changed_hook($hook_sink,
+            [
+                $data->users[3]->id => [$criterion34->get_id()],
+                $data->users[4]->id => [$criterion34->get_id()],
+            ]
+        );
+
+        $hook_sink->close();
+    }
+
 
     /**
      * @param phpunit_hook_sink $sink
@@ -478,5 +572,19 @@ class course_item_helper_testcase extends advanced_testcase {
 
         $this->assertEqualsCanonicalizing($expected_criteria_ids, $hook->get_criteria_ids());
         $sink->clear();
+    }
+
+    /**
+     * @param int $item_id
+     * @param int $user_id
+     * @param int $criterion_met
+     */
+    private function create_item_record(int $item_id, int $user_id, int $criterion_met = 0) {
+        $record = new criteria_item_record();
+        $record->criterion_item_id = $item_id;
+        $record->user_id = $user_id;
+        $record->criterion_met = $criterion_met;
+        $record->timeevaluated = time();
+        $record->save();
     }
 }

@@ -28,6 +28,7 @@ use core\orm\collection;
 use core\orm\entity\repository;
 use core\orm\query\builder;
 use totara_criteria\entities\criteria_item as criteria_item_entity;
+use totara_criteria\entities\criteria_item_record as criteria_item_record_entity;
 use totara_criteria\entities\criterion as criterion_entity;
 use totara_criteria\hook\criteria_achievement_changed;
 use totara_criteria\hook\criteria_validity_changed;
@@ -69,6 +70,38 @@ class course_item_helper {
 
             if (!empty($ids)) {
                 $user_criteria_ids[$user_id] = array_unique($ids);
+            }
+        }
+
+        if (!empty($user_criteria_ids)) {
+            $hook = new criteria_achievement_changed($user_criteria_ids);
+            $hook->execute();
+        }
+    }
+
+    /**
+     * All course completion records of the ccourse were reset
+     *
+     * @param int $course_id
+     * @param string|null $plugin_type Used for criteria filtering if provided
+     */
+    public static function course_completions_reset(int $course_id, ?string $plugin_type = null) {
+
+        // We find all criteria that refer to this course as well as all users for whom we already have an item_record
+        // We then generate a criteria_achievement_changed event for affected users and criteria
+
+        $item_records = self::get_criteria_item_records_from_course($course_id, $plugin_type);
+        if (!$item_records->count()) {
+            return;
+        }
+
+        // Build the list of criterion_ids per user
+        $user_criteria_ids = [];
+        foreach ($item_records as $item_record) {
+            if (!isset($user_criteria_ids[$item_record->user_id])) {
+                $user_criteria_ids[$item_record->user_id] = [$item_record->item->criterion_id];
+            } else if (!in_array($item_record->item->criterion_id, $user_criteria_ids[$item_record->user_id])) {
+                $user_criteria_ids[$item_record->user_id][] = $item_record->item->criterion_id;
             }
         }
 
@@ -276,5 +309,26 @@ class course_item_helper {
             })
             ->get();
     }
+
+    /**
+     * Find all criteria item records for completion of this course
+     *
+     * @param int $course_id
+     * @param string|null $plugin_type
+     * @return collection
+     */
+    private static function get_criteria_item_records_from_course(int $course_id, ?string $plugin_type = null): collection {
+        return criteria_item_record_entity::repository()
+            ->as('cir')
+            ->join([criteria_item_entity::TABLE, 'item'], 'cir.criterion_item_id', 'item.id')
+            ->when(!is_null($plugin_type), function (repository $repository) use ($plugin_type) {
+                $repository->join([criterion_entity::TABLE, 'criterion'], 'item.criterion_id', 'criterion.id');
+                $repository->where('criterion.plugin_type', $plugin_type);
+            })
+            ->where('item.item_type', 'course')
+            ->where('item.item_id', $course_id)
+            ->get();
+    }
+
 
 }
