@@ -15,17 +15,25 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Nathan Lewis <nathan.lewis@totaralearning.com>
- * @package performelement_short_text
+ * @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
+ * @package performelement_multi_choice
  */
 
-$string['error_question_required'] = 'Question is required';
-$string['error_question_length_exceed'] = 'Question text exceeds the maximum length';
-$string['pluginname'] = 'Short text element';
-$string['name'] = 'Short text';
-$string['short_text_answer_placeholder'] = 'Short text answer field';
-$string['short_text_response_no_response_submitted'] = 'No response submitted';
-$string['short_text_your_response'] = 'Your response';
-$string['short_text_title'] = 'Question text';
+namespace performelement_multi_choice;
+
+use mod_perform\models\response\element_validation_error;
+
+class option_required_error extends element_validation_error {
+
+    public const OPTION_REQUIRED = 'OPTION_REQUIRED';
+
+    public function __construct() {
+        $error_code = self::OPTION_REQUIRED;
+        $error_message = get_string('error_answer_required', 'performelement_multi_choice');
+
+        parent::__construct($error_code, $error_message);
+    }
+
+}

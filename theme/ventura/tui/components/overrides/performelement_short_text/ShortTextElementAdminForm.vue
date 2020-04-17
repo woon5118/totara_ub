@@ -16,33 +16,18 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-  @author Simon Chester <simon.chester@totaralearning.com>
   @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
   @package performelement_short_text
 -->
-<template>
-  <ElementAdminDisplay
-    :type="type"
-    :name="name"
-    :error="error"
-    @edit="$emit('edit')"
-    @remove="$emit('remove')"
-  />
-</template>
 
-<script>
-import ElementAdminDisplay from 'mod_perform/components/element/ElementAdminDisplay';
-
-export default {
-  components: {
-    ElementAdminDisplay,
-  },
-
-  props: {
-    name: String,
-    type: Object,
-    data: Object,
-    error: String,
-  },
-};
-</script>
+<style lang="scss">
+.tui-elementEditShortText {
+  &__action-buttons {
+    display: flex;
+    align-items: end;
+    justify-content: flex-end;
+    width: 100%;
+    margin-bottom: 0;
+  }
+}
+</style>

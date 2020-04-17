@@ -33,12 +33,19 @@ class behat_mod_perform extends behat_base {
     public const PERFORM_ELEMENT_LOCATOR = '.tui-participantContent__sectionItem';
     public const PERFORM_ELEMENT_QUESTION_TEXT_LOCATOR = '.tui-collapsible__header-text';
     public const SHORT_TEXT_RESPONSE_LOCATOR = 'textarea';
+    public const MULTI_CHOICE_RESPONSE_LOCATOR = 'radio';
     public const PERFORM_ELEMENT_OTHER_RESPONSE_CONTAINER_LOCATOR = '.tui-otherParticipantResponses';
     public const PERFORM_ELEMENT_OTHER_RESPONSE_RELATION_LOCATOR = '.tui-otherParticipantResponses__relation .tui-formLabel';
     public const SHORT_TEXT_ANSWER_LOCATOR = '.tui-shortTextElementParticipantResponse__answer';
+    public const MULTI_CHOICE_ANSWER_LOCATOR = '.tui-elementEditMultiChoiceParticipantResponse__answer';
     public const PERFORM_ACTIVITY_YOUR_RELATIONSHIP_LOCATOR = '.tui-participantContent__user-relationshipValue';
     public const PERFORM_SHOW_OTHERS_RESPONSES_INPUT_LOCATOR = '.tui-participantContent__sectionHeading-switch input';
     public const PERFORM_SHOW_OTHERS_RESPONSES_LABEL_LOCATOR = '.tui-participantContent__sectionHeading-switch label';
+
+    public const TUI_USER_ANSWER_ERROR_LOCATOR = '.tui-formFieldError';
+    public const USER_QUESTION_TEXT_LOCATOR = '.tui-collapsible__header-text';
+    public const TUI_TAB_ELEMENT = '.tui-tabs__tabs';
+
 
     /**
      * Navigate to the specified page and wait for JS.
@@ -269,6 +276,20 @@ class behat_mod_perform extends behat_base {
         $response->setValue($new_answer);
     }
 
+    /**
+     * @When /^I navigate to manage perform activity content page$/
+     */
+    public function i_navigate_to_manage_perform_activity_content_page(): void {
+        $behat_general = behat_context_helper::get('behat_general');
+        $behat_general->i_click_on_in_the(
+            "Content",
+            "link",
+            self::TUI_TAB_ELEMENT,
+            "css_element"
+        );
+        $behat_general->i_click_on("Edit content","button");
+    }
+
     private function find_question_response(string $element_type, string $question_text) {
         $question = $this->find_question_from_text($question_text);
 
@@ -280,6 +301,7 @@ class behat_mod_perform extends behat_base {
     private function find_question_other_responses_by_element(string $element_type, NodeElement $other_responses) {
         $map = [
             'short text' => self::SHORT_TEXT_ANSWER_LOCATOR,
+            "multi choice" => self::MULTI_CHOICE_ANSWER_LOCATOR
         ];
 
         $locator =  $map[$element_type] ?? null;
@@ -293,6 +315,7 @@ class behat_mod_perform extends behat_base {
     private function get_response_element_response_locator(string $element_type): string {
         $map = [
             'short text' => self::SHORT_TEXT_RESPONSE_LOCATOR,
+            "multi choice" => self::MULTI_CHOICE_RESPONSE_LOCATOR
         ];
 
         $locator =  $map[$element_type] ?? null;

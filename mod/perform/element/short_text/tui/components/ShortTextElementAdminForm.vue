@@ -21,66 +21,68 @@
   @package performelement_short_text
 -->
 <template>
-  <ElementEdit :type="type" :error="error">
+  <ElementAdminForm :type="type" :error="error">
     <template v-slot:content>
-      <Uniform :initial-values="initialValues" @submit="handleSubmit">
-        <FormRow :label="$str('short_text_title', 'performelement_short_text')">
-          <FormText
-            name="name"
-            :validations="v => [v.required(), v.maxLength(1024)]"
-          />
-        </FormRow>
-        <FormRow
-          :label="
-            $str('short_text_answer_placeholder', 'performelement_short_text')
-          "
-          :hidden="true"
+      <div class="tui-elementEditShortText">
+        <Uniform
+          v-slot="{ getSubmitting }"
+          :initial-values="initialValues"
+          :vertical="true"
+          input-width="full"
+          @submit="handleSubmit"
         >
-          <Textarea
-            :disabled="true"
-            :placeholder="
+          <FormRow
+            :label="$str('short_text_title', 'performelement_short_text')"
+          >
+            <FormText
+              name="name"
+              :validations="v => [v.required(), v.maxLength(1024)]"
+            />
+          </FormRow>
+          <FormRow
+            :label="
               $str('short_text_answer_placeholder', 'performelement_short_text')
             "
-          />
-        </FormRow>
-        <FormRow>
-          <ButtonGroup>
-            <Button
-              :styleclass="{ primary: 'true' }"
-              :text="
-                $str('short_text_button_done', 'performelement_short_text')
+            :hidden="true"
+          >
+            <Textarea
+              :disabled="true"
+              :placeholder="
+                $str(
+                  'short_text_answer_placeholder',
+                  'performelement_short_text'
+                )
               "
-              type="submit"
             />
-            <Button
-              :text="
-                $str('short_text_button_cancel', 'performelement_short_text')
-              "
-              @click="cancel"
-            />
-          </ButtonGroup>
-        </FormRow>
-      </Uniform>
+          </FormRow>
+          <FormRow>
+            <div class="tui-elementEditShortText__action-buttons">
+              <FormActionButtons
+                :submitting="getSubmitting()"
+                @cancel="cancel"
+              />
+            </div>
+          </FormRow>
+        </Uniform>
+      </div>
     </template>
-  </ElementEdit>
+  </ElementAdminForm>
 </template>
 
 <script>
 import { Uniform, FormRow, FormText } from 'totara_core/components/uniform';
 import Textarea from 'totara_core/components/form/Textarea';
-import ElementEdit from 'mod_perform/components/element/ElementEdit';
-import ButtonGroup from 'totara_core/components/buttons/ButtonGroup';
-import Button from 'totara_core/components/buttons/Button';
+import ElementAdminForm from 'mod_perform/components/element/ElementAdminForm';
+import FormActionButtons from 'mod_perform/components/element/admin_form/ActionButtons';
 
 export default {
   components: {
-    ElementEdit,
+    ElementAdminForm,
     Uniform,
     FormRow,
     FormText,
     Textarea,
-    ButtonGroup,
-    Button,
+    FormActionButtons,
   },
 
   props: {
@@ -89,7 +91,6 @@ export default {
     data: Object,
     error: String,
   },
-
   computed: {
     initialValues() {
       return {
@@ -118,9 +119,7 @@ export default {
         "error_question_required",
         "error_question_length_exceed",
         "short_text_title",
-        "short_text_answer_placeholder",
-        "short_text_button_done",
-        "short_text_button_cancel"
+        "short_text_answer_placeholder"
     ]
   }
 </lang-strings>

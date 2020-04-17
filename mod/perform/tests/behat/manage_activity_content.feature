@@ -14,19 +14,19 @@ Feature: Adding, Updating, Removing activity elements.
     And I click on "Add Element Activity" "link"
     And I click on "Content" "link" in the ".tui-tabs__tabs" "css_element"
     And I click on "Edit content" "button"
-    Then I click on "Add Element" "button"
+    Then I click on "Add element" "button"
     And I click on "Questions" "button"
     And I click on "Short text" "link"
     And I set the following fields to these values:
       |name        | Question 1 |
     And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"
-    Then I click on "Add Element" "button"
+    Then I click on "Add element" "button"
     And I click on "Questions" "button"
     And I click on "Short text" "link"
     And I set the following fields to these values:
       |name        | Question 2 |
     And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"
-    Then I click on "Add Element" "button"
+    Then I click on "Add element" "button"
     And I click on "Questions" "button"
     And I click on "Short text" "link"
     And I set the following fields to these values:

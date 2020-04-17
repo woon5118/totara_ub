@@ -67,6 +67,7 @@
                       <component
                         :is="componentFor()"
                         :data="JSON.parse(response.response_data)"
+                        :element-data="sectionElement.element.data"
                         :name="sectionElement.element.name"
                         :type="sectionElement.element.type"
                       />

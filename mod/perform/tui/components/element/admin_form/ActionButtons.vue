@@ -16,33 +16,49 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-  @author Simon Chester <simon.chester@totaralearning.com>
   @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
-  @package performelement_short_text
+  @package mod_perform
 -->
 <template>
-  <ElementAdminDisplay
-    :type="type"
-    :name="name"
-    :error="error"
-    @edit="$emit('edit')"
-    @remove="$emit('remove')"
-  />
+  <div class="tui-elementAdminFormActionButtons">
+    <ButtonGroup>
+      <Button
+        :styleclass="{ primary: true, small: true }"
+        :text="$str('button_done', 'mod_perform')"
+        :disabled="submitting"
+        class="tui-elementAdminFormActionButtons__done"
+        type="submit"
+        @click="$emit('submit', $event)"
+      />
+      <Button
+        :text="$str('button_cancel', 'mod_perform')"
+        :styleclass="{ small: true }"
+        class="tui-elementAdminFormActionButtons__cancel"
+        @click="$emit('cancel')"
+      />
+    </ButtonGroup>
+  </div>
 </template>
 
 <script>
-import ElementAdminDisplay from 'mod_perform/components/element/ElementAdminDisplay';
+import ButtonGroup from 'totara_core/components/buttons/ButtonGroup';
+import Button from 'totara_core/components/buttons/Button';
 
 export default {
   components: {
-    ElementAdminDisplay,
+    ButtonGroup,
+    Button,
   },
-
   props: {
-    name: String,
-    type: Object,
-    data: Object,
-    error: String,
+    submitting: Boolean,
   },
 };
 </script>
+<lang-strings>
+  {
+    "mod_perform": [
+      "button_done",
+      "button_cancel"
+    ]
+  }
+</lang-strings>

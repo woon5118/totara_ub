@@ -8,8 +8,12 @@
 
   &__inner {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
+    &-header {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+    }
   }
 }
 </style>

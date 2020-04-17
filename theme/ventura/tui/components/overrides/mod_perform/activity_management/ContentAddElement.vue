@@ -1,8 +1,11 @@
 <style lang="scss">
-.tui-performEditSectionContentModal__addElement_wrapper {
+.tui-performEditSectionContentAddElement {
   display: inline-flex;
   & > * + * {
     margin-left: var(--tui-gap-1);
+  }
+  &__menu {
+    width: 250px;
   }
 }
 </style>

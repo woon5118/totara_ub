@@ -17,15 +17,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Nathan Lewis <nathan.lewis@totaralearning.com>
- * @package performelement_short_text
+ * @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
+ * @package performelement_multi_choice
  */
 
+$string['answer_text'] = 'Answer text';
+$string['error_answer_required'] = 'Answer is required';
 $string['error_question_required'] = 'Question is required';
-$string['error_question_length_exceed'] = 'Question text exceeds the maximum length';
-$string['pluginname'] = 'Short text element';
-$string['name'] = 'Short text';
-$string['short_text_answer_placeholder'] = 'Short text answer field';
-$string['short_text_response_no_response_submitted'] = 'No response submitted';
-$string['short_text_your_response'] = 'Your response';
-$string['short_text_title'] = 'Question text';
+$string['name'] = 'Multiple choice: Single-select';
+$string['no_response_submitted'] = 'No response submitted';
+$string['option_required_error'] = 'Option field cannot be left blank';
+$string['pluginname'] = 'Multiple choice single select element';
+$string['question_title'] = 'Question text';
+$string['single_select_options'] = 'Single-select options';
+$string['your_response'] = 'Your response';

@@ -173,6 +173,7 @@ export default {
                 name: item.element.title,
                 identifier: item.element.identifier,
                 data: JSON.parse(item.element.data),
+                responseData: null,
               },
               sort_order: item.sort_order,
               response_data: item.response_data,
@@ -238,7 +239,7 @@ export default {
       // assign values from submission to the section elements
       this.sectionElements.forEach(sectionElement => {
         const result = values.sectionElements[sectionElement.id];
-        sectionElement.element.data = result;
+        sectionElement.element.responseData = result;
       });
 
       this.isSaving = true;
@@ -280,7 +281,7 @@ export default {
       const update = this.sectionElements.map(item => {
         return {
           section_element_id: item.id,
-          response_data: JSON.stringify(item.element.data),
+          response_data: JSON.stringify(item.element.responseData),
         };
       });
 

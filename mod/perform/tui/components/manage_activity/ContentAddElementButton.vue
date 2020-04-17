@@ -20,16 +20,20 @@
   @package mod_perform
 -->
 <template>
-  <div class="tui-performEditSectionContentModal__addElement_wrapper">
+  <div class="tui-performEditSectionContentAddElement">
     <ButtonIcon
       v-show="!isElementsVisible"
       :aria-label="'Add'"
       :text="$str('section_add_element', 'mod_perform')"
+      :styleclass="{ small: true }"
       @click.prevent="showElements"
     >
       <AddIcon size="200" />
     </ButtonIcon>
-    <div v-show="isElementsVisible">
+    <div
+      v-show="isElementsVisible"
+      class="tui-performEditSectionContentAddElement__menu"
+    >
       <Dropdown>
         <template v-slot:trigger="{ toggle, isOpen }">
           <ButtonIcon
@@ -37,6 +41,7 @@
             :aria-label="'Add'"
             :text="$str('section_element_questions', 'mod_perform')"
             :caret="true"
+            :styleclass="{ small: true }"
             @click.prevent="toggle"
           />
         </template>

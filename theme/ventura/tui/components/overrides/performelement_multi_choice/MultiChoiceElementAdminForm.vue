@@ -17,20 +17,19 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
   @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
-  @package mod_perform
+  @package performelement_multi_choice
 -->
-<template>
-  <div class="tui-elementResponse">
-    <div v-if="error">{{ error }}</div>
-    <slot name="content" />
-  </div>
-</template>
-
-<script>
-export default {
-  props: {
-    type: Object,
-    error: String,
-  },
-};
-</script>
+<style lang="scss">
+.tui-elementEditMultiChoice {
+  &__action-buttons {
+    display: flex;
+    align-items: end;
+    justify-content: flex-end;
+    width: 100%;
+    margin-bottom: 0;
+  }
+  &__option {
+    max-width: 200px;
+  }
+}
+</style>

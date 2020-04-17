@@ -17,41 +17,46 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
   @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
-  @package performelement_short_text
+  @package performelement_multi_choice
 -->
 <template>
   <ElementParticipantForm :name="name">
     <template v-slot:content>
-      <div>
-        <FormScope :path="path" :process="process">
-          <FormRow
-            :label="
-              $str('short_text_your_response', 'performelement_short_text')
-            "
+      <FormScope :path="path">
+        <FormRow :label="$str('your_response', 'performelement_multi_choice')">
+          <FormRadioGroup
+            :validations="v => [v.required()]"
+            name="answer_option"
           >
-            <FormTextarea
-              name="answer_text"
-              :validations="v => [v.required(), v.maxLength(1024)]"
-            />
-          </FormRow>
-        </FormScope>
-      </div>
+            <Radio
+              v-for="item in data.options"
+              :key="item.name"
+              :value="item.name"
+              :name="item.name"
+              :validations="v => [v.required()]"
+              >{{ item.value }}</Radio
+            >
+          </FormRadioGroup>
+        </FormRow>
+      </FormScope>
     </template>
   </ElementParticipantForm>
 </template>
 
 <script>
 import FormScope from 'totara_core/components/reform/FormScope';
-import { FormRow } from 'totara_core/components/uniform';
-import FormTextarea from 'totara_core/components/uniform/FormTextarea';
 import ElementParticipantForm from 'mod_perform/components/element/ElementParticipantForm';
+import { FormRow } from 'totara_core/components/uniform';
+import Radio from 'totara_core/components/form/Radio';
+import FormRadioGroup from 'totara_core/components/uniform/FormRadioGroup';
 
 export default {
   components: {
     FormScope,
     FormRow,
-    FormTextarea,
     ElementParticipantForm,
+    Radio,
+    FormRadioGroup,
   },
 
   props: {
@@ -61,18 +66,12 @@ export default {
     data: Object,
     error: String,
   },
-  methods: {
-    process(values) {
-      values.answer_text = values.answer_text.trim();
-      return values;
-    },
-  },
 };
 </script>
 <lang-strings>
   {
-  "performelement_short_text": [
-    "short_text_your_response"
-  ]
+    "performelement_multi_choice": [
+      "your_response"
+    ]
   }
 </lang-strings>

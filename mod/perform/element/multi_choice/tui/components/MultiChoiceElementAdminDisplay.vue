@@ -16,9 +16,8 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-  @author Simon Chester <simon.chester@totaralearning.com>
   @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
-  @package performelement_short_text
+  @package performelement_multi_choice
 -->
 <template>
   <ElementAdminDisplay
@@ -27,15 +26,31 @@
     :error="error"
     @edit="$emit('edit')"
     @remove="$emit('remove')"
-  />
+  >
+    <template v-slot:content>
+      <RadioGroup :disabled="true">
+        <Radio
+          v-for="item in data.options"
+          :key="item.name"
+          :name="item.name"
+          value="item.value"
+          >{{ item.value }}</Radio
+        >
+      </RadioGroup>
+    </template>
+  </ElementAdminDisplay>
 </template>
 
 <script>
 import ElementAdminDisplay from 'mod_perform/components/element/ElementAdminDisplay';
+import Radio from 'totara_core/components/form/Radio';
+import RadioGroup from 'totara_core/components/form/RadioGroup';
 
 export default {
   components: {
     ElementAdminDisplay,
+    Radio,
+    RadioGroup,
   },
 
   props: {
