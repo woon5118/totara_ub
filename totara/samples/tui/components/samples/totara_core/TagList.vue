@@ -33,13 +33,13 @@
     >
       <template v-if="withAvatar" v-slot:tag="{ tag }">
         <div class="tui-customTag">
-          <Avatar :src="tag.url" :alt="tag.alt" size="xsmall" />
+          <Avatar :src="tag.url" alt="" size="xsmall" />
           <span>{{ tag.text }}</span>
         </div>
       </template>
       <template v-slot:item="{ index, item }">
         <div>
-          <Avatar :src="item.url" :alt="item.alt" size="medium" />
+          <Avatar :src="item.url" alt="" size="medium" />
           <p>{{ item.name }}</p>
         </div>
       </template>
@@ -86,73 +86,61 @@ export default {
       {
         id: 1,
         url: 'https://i.imgur.com/SnSRJUH.jpg',
-        alt: 'itemAlt1',
         name: 'Mike',
       },
       {
         id: 2,
         url: 'https://i.imgur.com/14WAio1.jpg',
-        alt: 'itemAlt2',
         name: 'John',
       },
       {
         id: 3,
         url: 'https://i.imgur.com/SnSRJUH.jpg',
-        alt: 'itemAlt3',
         name: 'Eric',
       },
       {
         id: 4,
         url: 'https://i.imgur.com/14WAio1.jpg',
-        alt: 'itemAlt4',
         name: 'George',
       },
       {
         id: 5,
         url: 'https://i.imgur.com/SnSRJUH.jpg',
-        alt: 'itemAlt1',
         name: 'Mike',
       },
       {
         id: 6,
         url: 'https://i.imgur.com/14WAio1.jpg',
-        alt: 'itemAlt2',
         name: 'John',
       },
       {
         id: 7,
         url: 'https://i.imgur.com/SnSRJUH.jpg',
-        alt: 'itemAlt3',
         name: 'Eric',
       },
       {
         id: 8,
         url: 'https://i.imgur.com/14WAio1.jpg',
-        alt: 'itemAlt4',
         name: 'George',
       },
       {
         id: 9,
         url: 'https://i.imgur.com/SnSRJUH.jpg',
-        alt: 'itemAlt1',
         name: 'Mike',
       },
       {
         id: 10,
         url: 'https://i.imgur.com/14WAio1.jpg',
-        alt: 'itemAlt2',
         name: 'John',
       },
       {
         id: 11,
         url: 'https://i.imgur.com/SnSRJUH.jpg',
-        alt: 'itemAlt3',
         name: 'Eric',
       },
       {
         id: 12,
         url: 'https://i.imgur.com/14WAio1.jpg',
-        alt: 'itemAlt4',
         name: 'George',
       },
     ];

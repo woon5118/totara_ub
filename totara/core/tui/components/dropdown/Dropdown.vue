@@ -38,6 +38,7 @@
         class="tui-dropdown__menu"
         :aria-hidden="!isOpen"
         :aria-labelledby="$id('trigger')"
+        aria-orientation="vertical"
         :role="role"
       >
         <div

@@ -21,7 +21,7 @@
 -->
 
 <template>
-  <Dropdown :close-on-click="false" :separator="separator" aria-label="TagList">
+  <Dropdown :close-on-click="false" :separator="separator">
     <template v-slot:trigger="{ toggle, isOpen }">
       <div class="tui-tagList" @click="handleClick(toggle, isOpen)">
         <div class="tui-tagList__tags">
@@ -29,6 +29,11 @@
             <div
               class="tui-tagList__tagItems"
               :class="{ 'tui-tagList__tagItems--open': isOpen }"
+              aria-live="polite"
+              role="status"
+              aria-atomic="false"
+              :aria-label="$str('tags_selected', 'totara_core')"
+              aria-relevant="additions"
             >
               <template v-for="(tag, index) in tags">
                 <slot
@@ -50,7 +55,9 @@
                           primary: true,
                           small: true,
                         }"
-                        aria-label="removeTag"
+                        :aria-label="
+                          $str('tag_remove', 'totara_core') + ' ' + tag.text
+                        "
                         @click.stop.prevent="handleRemove(tag, index)"
                       >
                         <Close size="100" />
@@ -66,6 +73,7 @@
                   v-model="itemName"
                   :styleclass="{ transparent: true }"
                   :disabled="disabled"
+                  :aria-label="$str('tag_list', 'totara_core')"
                 />
               </div>
             </div>
@@ -78,7 +86,13 @@
         </div>
         <ButtonIcon
           ref="expandArrow"
-          :aria-label="$str(isOpen ? 'collapse' : 'expand', 'moodle')"
+          :aria-expanded="isOpen.toString()"
+          :aria-label="
+            $str(isOpen ? 'collapse' : 'expand', 'moodle') +
+              ' ' +
+              $str('tag_list', 'totara_core')
+          "
+          aria-haspopup="menu"
           :disabled="disabled"
           :styleclass="{ transparent: true }"
           @click.stop.prevent="expandList(toggle, isOpen)"
@@ -157,7 +171,6 @@ export default {
       this.$emit('remove', tag, index);
     },
     dropdownItemClicked(item, index) {
-      this.$refs['expandArrow'].$el.focus();
       this.$emit('select', item, index);
     },
     triggerTooltip() {
@@ -205,7 +218,10 @@ export default {
     "collapse"
   ],
   "totara_core": [
-    "n_more"
+    "n_more",
+    "tag_list",
+    "tag_remove",
+    "tags_selected"
   ]
 }
 </lang-strings>
