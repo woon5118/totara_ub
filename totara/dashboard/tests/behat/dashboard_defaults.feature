@@ -107,7 +107,7 @@ Feature: Test Dashboard defaults
   Scenario: Set Home as default user page
     Given I log in as "admin"
     And I set the following administration settings values:
-      | defaulthomepage | Site |
+      | defaulthomepage | Front page |
     And I log out
 
     When I log in as "student1"
