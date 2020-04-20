@@ -83,31 +83,31 @@ class criteria_childcompetency_watchers_testcase extends advanced_testcase {
         $sink = $this->redirectHooks();
 
         // Parent with criteria
-        $test_hook = new competency_achievement_updated_bulk($competencies['Comp A']->id);
-        $test_hook->add_user_id($user1->id, 1);
-        $test_hook->add_user_id($user2->id, 0);
+        $test_hook = new competency_achievement_updated_bulk($competencies['Comp A']);
+        $test_hook->add_user_id($user1->id, ['is_proficient' => 1]);
+        $test_hook->add_user_id($user2->id, ['is_proficient' => 0]);
         achievement::updated_bulk($test_hook);
         $this->assertSame(0, $sink->count());
 
         // Parent without criteria
-        $test_hook = new competency_achievement_updated_bulk($competencies['Comp B']->id);
-        $test_hook->add_user_id($user1->id, 1);
-        $test_hook->add_user_id($user2->id, 0);
+        $test_hook = new competency_achievement_updated_bulk($competencies['Comp B']);
+        $test_hook->add_user_id($user1->id, ['is_proficient' => 1]);
+        $test_hook->add_user_id($user2->id, ['is_proficient' => 0]);
         achievement::updated_bulk($test_hook);
         $this->assertSame(0, $sink->count());
 
         // Child competency of parent with criteria
-        $test_hook = new competency_achievement_updated_bulk($competencies['Comp A-1']->id);
-        $test_hook->add_user_id($user1->id, 1);
-        $test_hook->add_user_id($user2->id, 0);
+        $test_hook = new competency_achievement_updated_bulk($competencies['Comp A-1']);
+        $test_hook->add_user_id($user1->id, ['is_proficient' => 1]);
+        $test_hook->add_user_id($user2->id, ['is_proficient' => 0]);
         achievement::updated_bulk($test_hook);
         $this->verify_hook($sink, [$user1->id => [$criterion->get_id()], $user2->id => [$criterion->get_id()]]);
         $sink->clear();
 
         // Child competency of parent without criteria
-        $test_hook = new competency_achievement_updated_bulk($competencies['Comp B-1']->id);
-        $test_hook->add_user_id($user1->id, 1);
-        $test_hook->add_user_id($user2->id, 0);
+        $test_hook = new competency_achievement_updated_bulk($competencies['Comp B-1']);
+        $test_hook->add_user_id($user1->id, ['is_proficient' => 1]);
+        $test_hook->add_user_id($user2->id, ['is_proficient' => 0]);
         achievement::updated_bulk($test_hook);
         $this->assertSame(0, $sink->count());
 

@@ -21,8 +21,10 @@
  * @package criteria_childcompetency
  */
 
+use totara_competency\hook\competency_achievement_updated_bulk;
 use totara_competency\hook\competency_configuration_changed;
 use totara_competency\watcher\configuration as configuration_watcher;
+use totara_competency\watcher\notify_users_of_proficiency_change;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -30,5 +32,9 @@ $watchers = [
     [
         'hookname' => competency_configuration_changed::class,
         'callback' => configuration_watcher::class.'::configuration_changed',
+    ],
+    [
+        'hookname' => competency_achievement_updated_bulk::class,
+        'callback' => [notify_users_of_proficiency_change::class, 'send_notification'],
     ],
 ];

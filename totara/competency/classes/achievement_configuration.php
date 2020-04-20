@@ -31,6 +31,7 @@ use totara_competency\entities\competency;
 use totara_competency\entities\configuration_change;
 use totara_competency\entities\configuration_history;
 use totara_competency\entities\scale_aggregation;
+use context_system;
 
 /**
  * Class containing all relvant configuration information for a specific competency
@@ -364,7 +365,7 @@ class achievement_configuration {
 
             return [
                 'id' => $scale_value->id,
-                'name' => format_string($scale_value->name),
+                'name' => format_string($scale_value->name, true, ['context' => context_system::instance()]),
                 'proficient' => $scale_value->proficient,
                 'sortorder' => $scale_value->sortorder,
                 'pathways' => array_values($sv_pathways),

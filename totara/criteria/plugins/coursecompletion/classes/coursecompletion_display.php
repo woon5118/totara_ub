@@ -24,6 +24,7 @@
 namespace criteria_coursecompletion;
 
 use totara_criteria\criterion_display;
+use context_course;
 
 /**
  * Display class for coursecompletion criteria
@@ -64,7 +65,13 @@ class coursecompletion_display extends criterion_display {
             $item_detail = [];
             $course = $DB->get_record('course', ['id' => $course_id]);
             if ($course) {
-                $item_detail['description'] = format_string(get_course_display_name_for_list($course));
+                $item_detail['description'] = format_string(
+                    get_course_display_name_for_list($course),
+                    true,
+                    [
+                        'context' => context_course::instance($course->id)
+                    ]
+                );
 
                 if (!$course->enablecompletion) {
                     $item_detail['error'] = get_string('error_no_course_completion', 'criteria_coursecompletion');

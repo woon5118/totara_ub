@@ -27,6 +27,7 @@ use criteria_coursecompletion\validators\coursecompletion_validator;
 use totara_criteria\criterion;
 use totara_criteria\evaluators\course_item_evaluator;
 use totara_criteria\validators\course_item_validator;
+use context_course;
 
 /**
  * Class containing information of course completion criteria instances
@@ -133,7 +134,7 @@ class coursecompletion extends criterion {
 
             $course = $DB->get_record('course', ['id' => $course_id]);
             if ($course) {
-                $item_detail['text'] = format_string(get_course_display_name_for_list($course));
+                $item_detail['text'] = format_string(get_course_display_name_for_list($course), true, ['context' => context_course::instance($course_id)]);
                 $item_detail['error'] = $course->enablecompletion
                     ? ''
                     : get_string('error_no_course_completion', 'criteria_coursecompletion');

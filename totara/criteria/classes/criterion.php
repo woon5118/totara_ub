@@ -676,7 +676,7 @@ abstract class criterion {
         $criterion = $exists ? new criterion_entity($this->get_id()) : new criterion_entity();
         $criterion->plugin_type = $this->get_plugin_type();
 
-        if (!empty($this->get_idnumber()) && totara_idnumber_exists(criterion_entity::TABLE, $this->get_idnumber())) {
+        if (!empty($this->get_idnumber()) && totara_idnumber_exists(criterion_entity::TABLE, $this->get_idnumber(), $this->id)) {
             throw new coding_exception("ID number '{$this->get_idnumber()}' already exists in " . criterion_entity::TABLE);
         }
         $criterion->idnumber = $this->get_idnumber();

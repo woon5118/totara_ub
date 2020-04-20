@@ -262,6 +262,7 @@ $string['linkedcourses_mustsavechange'] = 'Changes must be saved before they wil
 $string['loading'] = 'Loading...';
 $string['mandatory'] = 'Mandatory';
 $string['messageprovider:expand_task_finished'] = 'Sync assigned users finished';
+$string['messageprovider:no_longer_proficient'] = 'No longer proficient';
 $string['more_information'] = 'More information';
 $string['my_competency_profile'] = '{$a} Competency profile';
 $string['n_competencies_selected'] = 'You have selected {$a} competencies to assign.';
@@ -274,6 +275,9 @@ $string['no_courses_linked_yet'] = 'No courses linked yet';
 $string['no_current_assignments_other'] = 'This user has no current assignments';
 $string['no_current_assignments_self'] = 'You have no current assignments';
 $string['no_description'] = 'No description';
+$string['no_longer_proficient_notification_html_body'] = 'There has been a change on the competency "{$a->competency_name}" and you are no longer considered proficient in it. This could be because of a change to your overall achievement level (currently "{$a->current_rating}"), or to settings on the competency itself. For more information, view the <a href="{$a->link_to_competency_activity_log}">competency\'s activity log</a>.';
+$string['no_longer_proficient_notification_subject'] = 'You are no longer proficient in the competency {$a}';
+$string['no_longer_proficient_notification_text_body'] = 'There has been a change on the competency "{$a->competency_name}" and you are no longer considered proficient in it. This could be because of a change to your overall achievement level (currently "{$a->current_rating}"), or to settings on the competency itself. For more information, view the competency\'s activity log: {$a->link_to_competency_activity_log}';
 $string['no_paths'] = 'No achievement paths added';
 $string['no_such_user_error_message'] = 'The requested user does not exist.';
 $string['no_user_groups'] = 'No assignments';

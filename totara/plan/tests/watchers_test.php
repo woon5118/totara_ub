@@ -126,9 +126,9 @@ class totara_plan_watchers_testcase extends advanced_testcase {
         $this->assertEquals(3, $DB->count_records('totara_competency_achievement'));
 
         // Now for the tests
-        $hook = new competency_achievement_updated_bulk($competencies[1]->id);
+        $hook = new competency_achievement_updated_bulk($competencies[1]);
         foreach ($users as $user) {
-            $hook->add_user_id($user->id, 0);
+            $hook->add_user_id($user->id, ['is_proficient' => 0]);
         }
         competency::achievement_updated_bulk($hook);
 
@@ -150,9 +150,9 @@ class totara_plan_watchers_testcase extends advanced_testcase {
             ],
         ]);
 
-        $hook = new competency_achievement_updated_bulk($competencies[2]->id);
+        $hook = new competency_achievement_updated_bulk($competencies[2]);
         foreach ($users as $user) {
-            $hook->add_user_id($user->id, 0);
+            $hook->add_user_id($user->id, ['is_proficient' => 0]);
         }
         competency::achievement_updated_bulk($hook);
 

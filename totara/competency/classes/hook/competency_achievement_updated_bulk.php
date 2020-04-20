@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
  * Copyright (C) 2019 onwards Totara Learning Solutions LTD
@@ -23,6 +23,7 @@
 
 namespace totara_competency\hook;
 
+use totara_competency\entities\competency;
 use totara_core\hook\base;
 
 class competency_achievement_updated_bulk extends base {
@@ -33,27 +34,61 @@ class competency_achievement_updated_bulk extends base {
     protected $user_ids = [];
 
     /**
-     * @var int
+     * @var array
      */
-    protected $competency_id;
+    protected $competency_data;
 
-    public function __construct(int $competency_id) {
-        $this->competency_id = $competency_id;
+    public function __construct(competency $competency_data) {
+        $this->competency_data = [
+            'id' => $competency_data->id,
+            'fullname' => $competency_data->fullname,
+        ];
     }
 
-    public function add_user_id(int $user_id, int $proficient) {
-        $this->user_ids[$user_id] = $proficient;
+    /**
+     * Add proficiency data for the user id.
+     *
+     * @param int $user_id
+     * @param array $proficiency_data
+     * @return void
+     */
+    public function add_user_id(int $user_id, array $proficiency_data): void {
+        $this->user_ids[$user_id] = $proficiency_data;
     }
 
+    /**
+     * Get competency id.
+     *
+     * @return int
+     */
     public function get_competency_id(): int {
-        return $this->competency_id;
+        return $this->competency_data['id'];
     }
 
+    /**
+     * Get competency.
+     *
+     * @return array
+     */
+    public function get_competency_data(): array {
+        return $this->competency_data;
+    }
+
+    /**
+     * Get user ids affected.
+     *
+     * @return array
+     */
     public function get_user_ids(): array {
         return array_keys($this->user_ids);
     }
 
-    public function get_user_ids_proficient(): array {
+    /**
+     * Get proficiency change data of users.
+     *
+     * @return array where keys are user_ids and value is an array of proficiency data.
+     */
+    public function get_user_ids_proficiency_data(): array {
         return $this->user_ids;
     }
 

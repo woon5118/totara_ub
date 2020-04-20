@@ -29,6 +29,7 @@ use totara_criteria\criterion;
 use totara_criteria\evaluators\competency_item_evaluator;
 use totara_criteria\validators\competency_item_validator;
 use Exception;
+use context_system;
 
 /**
  * Class containing information of other competencies criteria instances
@@ -133,7 +134,7 @@ class othercompetency extends criterion {
             try {
                 $competency = new competency_entity($competency_id);
                 $config = new achievement_configuration($competency);
-                $item_detail['text'] = format_string($competency->fullname);
+                $item_detail['text'] = format_string($competency->fullname, true, ['context' => context_system::instance()]);
                 $item_detail['error'] = $config->user_can_become_proficient()
                     ? ''
                     : get_string('error_competency_cannot_proficient', 'criteria_othercompetency');

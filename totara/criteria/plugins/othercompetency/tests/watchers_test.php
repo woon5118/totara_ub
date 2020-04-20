@@ -137,24 +137,24 @@ class criteria_othercompetency_watchers_testcase extends advanced_testcase {
         $sink = $this->redirectHooks();
 
         // Competency not used as an othercompetency item
-        $test_hook = new competency_achievement_updated_bulk($competencies['Comp A']->id);
-        $test_hook->add_user_id($user1->id, 1);
-        $test_hook->add_user_id($user2->id, 0);
+        $test_hook = new competency_achievement_updated_bulk($competencies['Comp A']);
+        $test_hook->add_user_id($user1->id, ['is_proficient' => 1]);
+        $test_hook->add_user_id($user2->id, ['is_proficient' => 0]);
         achievement::updated_bulk($test_hook);
         $this->assertSame(0, $sink->count());
 
         // Competency used in 1 othercompetency criterion
-        $test_hook = new competency_achievement_updated_bulk($competencies['Other B']->id);
-        $test_hook->add_user_id($user1->id, 1);
-        $test_hook->add_user_id($user2->id, 0);
+        $test_hook = new competency_achievement_updated_bulk($competencies['Other B']);
+        $test_hook->add_user_id($user1->id, ['is_proficient' => 1]);
+        $test_hook->add_user_id($user2->id, ['is_proficient' => 0]);
         achievement::updated_bulk($test_hook);
         $this->verify_hook($sink, [$user1->id => [$criterion1->get_id()], $user2->id => [$criterion1->get_id()]]);
         $sink->clear();
 
         // Competency used in 2 othercompetency criteria
-        $test_hook = new competency_achievement_updated_bulk($competencies['Other C']->id);
-        $test_hook->add_user_id($user1->id, 1);
-        $test_hook->add_user_id($user2->id, 0);
+        $test_hook = new competency_achievement_updated_bulk($competencies['Other C']);
+        $test_hook->add_user_id($user1->id, ['is_proficient' => 1]);
+        $test_hook->add_user_id($user2->id, ['is_proficient' => 0]);
         achievement::updated_bulk($test_hook);
         $this->verify_hook($sink, [
             $user1->id => [$criterion1->get_id(), $criterion2->get_id()],
@@ -163,8 +163,8 @@ class criteria_othercompetency_watchers_testcase extends advanced_testcase {
         $sink->clear();
 
         // Competency used in 2 othercompetency criteria but with a single user only
-        $test_hook = new competency_achievement_updated_bulk($competencies['Other C']->id);
-        $test_hook->add_user_id($user1->id, 1);
+        $test_hook = new competency_achievement_updated_bulk($competencies['Other C']);
+        $test_hook->add_user_id($user1->id, ['is_proficient' => 1]);
         achievement::updated_bulk($test_hook);
         $this->verify_hook($sink, [
             $user1->id => [$criterion1->get_id(), $criterion2->get_id()],
