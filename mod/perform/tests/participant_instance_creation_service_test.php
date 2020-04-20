@@ -55,6 +55,12 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
     private $activity_relationships;
 
     /**
+     * Array of participant job assignments [manager and appraiser].
+     * @var array
+     */
+    private $participant_job_assignments;
+
+    /**
      * Test participant_instances watcher processes on subject_instance_creation hook call.
      *
      * @return void
@@ -92,11 +98,86 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
      * @return void
      */
     private function assert_participant_instances_created(collection $track_user_assignments): void {
-        $created_participants = participant_instance::repository()->get()->count();
+        $created_participants = participant_instance::repository()->get();
         $expected_participants_created = $track_user_assignments->count()
             * count($this->activity_relationships)
             * $this->users_per_relationship;
-        $this->assertEquals($expected_participants_created, $created_participants);
+        $this->assertEquals($expected_participants_created, $created_participants->count());
+
+        $this->assert_each_participant_created_with_correct_data($created_participants);
+    }
+
+    /**
+     * Asserts each participant instance is created with the right data.
+     *
+     * @param collection $created_participants
+     * @return void
+     */
+    private function assert_each_participant_created_with_correct_data(collection $created_participants): void {
+        $relationship_ids = [
+            'manager' => null,
+            'appraiser' => null,
+        ];
+        $subject_instances = subject_instance::repository()->get()->pluck('id');
+        $managers_and_appraisers_list = $this->group_participant_job_assignments();
+        $subject_instances_counter = [];
+
+        foreach ($created_participants as $created_participant) {
+            $this->assertArrayHasKey(
+                $created_participant->participant_id,
+                $managers_and_appraisers_list,
+                'Unknown participant stored.'
+            );
+            $managers_and_appraisers_list[$created_participant->participant_id]['count']++;
+
+            $this->assertContains(
+                $created_participant->subject_instance_id,
+                $subject_instances,
+                'unknown subject instance id stored'
+            );
+            if (!isset($subject_instances_counter[$created_participant->subject_instance_id])) {
+                $subject_instances_counter[$created_participant->subject_instance_id] = 0;
+            }
+            $subject_instances_counter[$created_participant->subject_instance_id]++;
+
+            $participant_relationship = $managers_and_appraisers_list[$created_participant->participant_id]['relationship'];
+            if (is_null($relationship_ids[$participant_relationship])) {
+                $relationship_ids[$participant_relationship] = $created_participant->activity_relationship_id;
+            }
+            $this->assertEquals($relationship_ids[$participant_relationship], $created_participant->activity_relationship_id);
+        }
+
+        $expected_participant_count = count($subject_instances);
+        foreach ($managers_and_appraisers_list as $actual_participant) {
+            $this->assertEquals($expected_participant_count, $actual_participant['count']);
+        }
+
+        $expected_subject_instance_count = count($this->activity_relationships) * $this->users_per_relationship;
+        foreach ($subject_instances_counter as $subject_instance_count) {
+            $this->assertEquals($expected_subject_instance_count, $subject_instance_count);
+        }
+    }
+
+    /**
+     * Group participant instance job assignments
+     *
+     * @return array
+     */
+    private function group_participant_job_assignments(): array {
+        $expected_participants = [];
+
+        foreach ($this->participant_job_assignments as $participant_job_assignment) {
+            $expected_participants[$participant_job_assignment['manager']->get_data()->userid] = [
+                'relationship' => 'manager',
+                'count' => 0,
+            ];
+            $expected_participants[$participant_job_assignment['appraiser']] = [
+                'relationship' => 'appraiser',
+                'count' => 0,
+            ];
+        }
+
+        return $expected_participants;
     }
 
     /**
@@ -166,7 +247,7 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
      */
     protected function setup_config_values(): void {
         $this->setAdminUser();
-        $this->users_per_relationship = 5;
+        $this->users_per_relationship = 2;
         $this->activity_relationships = [
             appraiser::class,
             manager::class,
@@ -195,7 +276,7 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
         }
 
         $tracks = $generator->create_activity_tracks($activity_tree->activity);
-        $activity_tree->track = $generator->create_track_assignments($tracks->first(), 0, 0, 0, 20);
+        $activity_tree->track = $generator->create_track_assignments($tracks->first(), 0, 0, 0, 3);
         $activity_tree->assignments = track_assignment::repository()
             ->where('user_group_type', grouping::USER)
             ->get();
@@ -210,26 +291,26 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
      * @return void
      */
     private function setup_job_assignments(stdClass $activity_tree): void {
-        $job_assignment_data = [];
+        $participant_job_assignments = [];
+        $data_generator = $this->getDataGenerator();
 
         for ($i = 0; $i < $this->users_per_relationship; $i++) {
-            $manager = $this->getDataGenerator()->create_user();
-            $job_assignment_data[] = [
-                'manager_ja_id' => job_assignment::create_default($manager->id)->id,
-                'appraiser_id' => $this->getDataGenerator()->create_user()->id,
+            $participant_job_assignments[] = [
+                'manager' => job_assignment::create_default($data_generator->create_user()->id),
+                'appraiser' => $data_generator->create_user()->id,
             ];
         }
+        $this->participant_job_assignments = $participant_job_assignments;
 
+        $activity_user_job_assignments = [];
         foreach ($activity_tree->assignments as $assignment) {
-            $job_assignments = [];
-
-            foreach ($job_assignment_data as $key => $job_assignment_datum) {
-                $job_assignments[] = job_assignment::create(
+            foreach ($participant_job_assignments as $key => $job_assignments) {
+                $activity_user_job_assignments[] = job_assignment::create(
                     [
                         'userid' => $assignment->user_group_id,
                         'idnumber' => $assignment->id . $key,
-                        'managerjaid' => $job_assignment_datum['manager_ja_id'],
-                        'appraiserid' => $job_assignment_datum['appraiser_id'],
+                        'managerjaid' => $job_assignments['manager']->id,
+                        'appraiserid' => $job_assignments['appraiser'],
                     ]
                 );
             }
@@ -243,5 +324,6 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
     protected function tearDown() {
         $this->users_per_relationship = null;
         $this->activity_relationships = null;
+        $this->participant_job_assignments = null;
     }
 }

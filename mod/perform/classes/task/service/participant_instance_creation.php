@@ -188,15 +188,15 @@ class participant_instance_creation {
      * @return array
      */
     private function build_participant_instance_data($activity_relationship_id, $subject_instance): array {
-        $dto = [];
-        $participant_data = new stdClass();
-        $participant_data->activity_relationship_id = $activity_relationship_id;
-        $participant_data->subject_instance_id = $subject_instance->id;
-        $participant_data->status = not_started::get_code();
-        $participant_data->created_at = time();
-        $dto['participant_data'] = $participant_data;
-        $dto['activity_id'] = $subject_instance->activity_id;
-        return $dto;
+        return [
+            'participant_data' => [
+                'activity_relationship_id' => $activity_relationship_id,
+                'subject_instance_id' => $subject_instance->id,
+                'status' => not_started::get_code(),
+                'created_at' => time(),
+            ],
+            'activity_id' => $subject_instance->activity_id,
+        ];
     }
 
     /**
@@ -211,7 +211,7 @@ class participant_instance_creation {
         array $participant_user_id_list
     ): void {
         foreach ($participant_user_id_list as $participant_user_id) {
-            $data['participant_data']->participant_id = $participant_user_id;
+            $data['participant_data']['participant_id'] = $participant_user_id;
             $this->participation_creation_list[] = $data;
 
             if (count($this->participation_creation_list) === $this->buffer_count) {
@@ -237,7 +237,7 @@ class participant_instance_creation {
             $section_data['activity_id'] = $participant_instance['activity_id'];
             $section_data['id'] = $db->insert_record(
                 participant_instance_entity::TABLE,
-                $participant_instance['participant_data']
+                (object) $participant_instance['participant_data']
             );
             $created_participants_dtos->append(
                 participant_instance_dto::create_from_data($section_data)
