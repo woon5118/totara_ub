@@ -19,6 +19,7 @@ Feature: Viewing other responses
     And I click on "John is participating subject" "link"
     Then I should see "John is participating subject" in the ".tui-performUserActivity h2" "css_element"
     And I should see "Part one"
+    And I should see that show others responses is toggled "off"
     And I should see perform activity relationship to user "Self"
     And I should see perform "short text" question "Question one" is unanswered
     And I should see perform "short text" question "Question two" is unanswered
@@ -26,11 +27,14 @@ Feature: Viewing other responses
     And I answer "short text" question "Question one" with "John Answer one"
     And I answer "short text" question "Question two" with "John Answer two"
 
-    And I click on "Submit" "button"
-    Then I should see "Activity responses saved" in the tui "success" notification toast
+    When I click on "Submit" "button"
+    Then I should see "Performance activities"
+    And I should see "Activity responses saved" in the tui "success" notification toast
+    And the "Your activities" tui tab should be active
 
-    And I click show others responses
-    And I should see "Manager response"
+    When I click on "John is participating subject" "link"
+    Then I should see that show others responses is toggled "on"
+    Then I should see "Manager response"
     And I should see "No response submitted"
 
   Scenario: Manager can respond to other activities and I can view manager responses
@@ -38,18 +42,24 @@ Feature: Viewing other responses
     When I navigate to the outstanding perform activities list page
     And I click on "Activities about others" "link"
     Then I should see "John is participating subject" in the ".tui-performUserActivities" "css_element"
-    And I click on "John is participating subject" "link"
-    And I should see perform activity relationship to user "Manager"
+
+    When I click on "John is participating subject" "link"
+    Then I should see perform activity relationship to user "Manager"
     And I answer "short text" question "Question one" with "Manager Answer one"
     And I answer "short text" question "Question two" with "Manager Answer two"
     And I click on "Submit" "button"
-    Then I should see "Activity responses saved" in the tui "success" notification toast
-    And I click on "Close" "button"
-    And I log out
 
-    When I log in as "john"
-    When I navigate to the outstanding perform activities list page
+    Then I should see "Performance activities"
+    And I should see "Activity responses saved" in the tui "success" notification toast
+    And the "Activities about others" tui tab should be active
+
+    When I click on "Close" "button"
+    And I log out
+    And I log in as "john"
+    And I navigate to the outstanding perform activities list page
     And I click on "John is participating subject" "link"
-    And I click show others responses
-    And I should see perform "short text" question "Question one" is answered by "Manager" with "Manager Answer one"
+    Then I should see that show others responses is toggled "off"
+
+    When I click show others responses
+    Then I should see perform "short text" question "Question one" is answered by "Manager" with "Manager Answer one"
     And I should see perform "short text" question "Question two" is answered by "Manager" with "Manager Answer two"

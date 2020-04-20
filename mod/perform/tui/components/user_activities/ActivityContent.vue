@@ -88,7 +88,7 @@
 
       <ButtonGroup class="tui-participantContent__buttons">
         <ButtonSubmit :submitting="getSubmitting()" />
-        <ButtonCancel @click="cancel" />
+        <ButtonCancel @click="goBackToListCancel" />
       </ButtonGroup>
     </Uniform>
   </div>
@@ -143,6 +143,7 @@ export default {
       },
       sectionElements: [],
       showOtherResponse: false,
+      completionSaveSuccess: false,
     };
   },
 
@@ -199,25 +200,20 @@ export default {
     },
   },
 
+  computed: {
+    /**
+     * Determine if we should return the the about others tab on cancel or completion.
+     */
+    shouldReturnToAboutOthersTab() {
+      if (!this.subjectInstance) {
+        return false;
+      }
+
+      return !this.subjectInstance.is_self;
+    },
+  },
+
   methods: {
-    /**
-     * cancel saving
-     */
-    cancel() {
-      this.backToUserActivities();
-    },
-
-    /**
-     * Show a generic success toast.
-     */
-    showSuccessNotification() {
-      notify({
-        duration: 10000,
-        message: this.$str('toast_success_save_response', 'mod_perform'),
-        type: 'success',
-      });
-    },
-
     /**
      * Show a generic saving error toast.
      */
@@ -227,15 +223,6 @@ export default {
         message: this.$str('toast_error_save_response', 'mod_perform'),
         type: 'error',
       });
-    },
-
-    /**
-     * Back to user activities
-     */
-    backToUserActivities() {
-      // TODO add url here
-      // window.location.href =
-      window.history.back();
     },
 
     /**
@@ -272,7 +259,7 @@ export default {
 
         //show validation if no errors
         if (!this.errors) {
-          this.showSuccessNotification();
+          this.goBackToListCompletionSuccess();
         }
         this.isSaving = false;
       } catch (e) {
@@ -309,16 +296,63 @@ export default {
       });
       return resultData;
     },
+
+    goBackToListCompletionSuccess() {
+      // Post requests require a real url (activity/index.php no activity/).
+      const url = this.$url('/mod/perform/activity/index.php');
+
+      this.redirectWithPost(url, {
+        show_about_others_tab: this.shouldReturnToAboutOthersTab,
+        completion_save_success: true,
+      });
+    },
+
+    goBackToListCancel() {
+      // Post requests require a real url (activity/index.php no activity/).
+      const url = this.$url('/mod/perform/activity/index.php');
+
+      this.redirectWithPost(url, {
+        show_about_others_tab: this.shouldReturnToAboutOthersTab,
+        completion_save_success: false,
+      });
+    },
+
+    /**
+     * There is no real way to do a post request redirect in js
+     * This just creates a hidden form and submits it.
+     *
+     * @param {String} url
+     * @param {Object} params
+     */
+    redirectWithPost(url, params) {
+      const hiddenForm = document.createElement('form');
+      hiddenForm.style.display = 'hidden';
+      hiddenForm.action = url;
+      hiddenForm.method = 'post';
+
+      // Note this only supports boolean params.
+      Object.entries(params).forEach(entry => {
+        const input = document.createElement('input');
+        input.type = 'checkbox';
+        input.name = entry[0];
+        input.checked = Boolean(entry[1]);
+        hiddenForm.appendChild(input);
+      });
+
+      document.body.appendChild(hiddenForm);
+
+      hiddenForm.submit();
+    },
   },
 };
 </script>
 <lang-strings>
   {
-  "mod_perform": [
-  "user_activities_other_response_show",
-  "user_activities_your_relationship_to_user",
-  "toast_success_save_response",
-  "toast_error_save_response"
-  ]
+    "mod_perform": [
+      "user_activities_other_response_show",
+      "user_activities_your_relationship_to_user",
+      "toast_success_save_response",
+      "toast_error_save_response"
+    ]
   }
 </lang-strings>

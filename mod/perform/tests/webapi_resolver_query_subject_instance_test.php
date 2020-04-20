@@ -58,6 +58,7 @@ class mod_perform_webapi_resolver_query_subject_instance_testcase extends mod_pe
                 'profileimageurlsmall' => $profile_image_small_url,
             ],
             'relationship_to_subject' => 'Self',
+            'is_self' => true,
         ];
 
         self::assertEquals($expected, $actual);

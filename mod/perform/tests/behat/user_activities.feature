@@ -23,6 +23,7 @@ Feature: Viewing and responding to perform activities
     When I click on "John is participating subject" "link"
     Then I should see "John is participating subject" in the ".tui-performUserActivity h2" "css_element"
     And I should see "Part one"
+    And I should see that show others responses is toggled "off"
     And I should see perform "short text" question "Question one" is unanswered
     And I should see perform "short text" question "Question two" is unanswered
 
@@ -37,11 +38,11 @@ Feature: Viewing and responding to perform activities
 
     When I answer "short text" question "Question two" with "1024" characters
     And I click on "Submit" "button"
-    Then I should see "Activity responses saved" in the tui "success" notification toast
-    And I should see "Question two" has no validation errors
 
-    When I navigate to the outstanding perform activities list page
-    Then I should see the tui datatable contains:
+    Then I should see "Performance activities"
+    And the "Your activities" tui tab should be active
+    And I should see "Activity responses saved" in the tui "success" notification toast
+    And I should see the tui datatable contains:
       | Activity title                | Your progress | Overall activity progress |
       | John is participating subject | Complete      | In progress               |
 
@@ -56,20 +57,20 @@ Feature: Viewing and responding to perform activities
     When I click on "David is subject" "link"
     Then I should see "David is subject" in the ".tui-performUserActivity h2" "css_element"
     And I should see "Part one"
+    And I should see that show others responses is toggled "off"
     And I should see perform "short text" question "Question one" is unanswered
     And I should see perform "short text" question "Question two" is unanswered
 
     When I answer "short text" question "Question one" with "My first answer"
     And I answer "short text" question "Question two" with "My second answer"
-    And I click on "Submit" "button"
-
-    Then I should see "Activity responses saved" in the tui "success" notification toast
-    And I should see "Question one" has no validation errors
+    Then I should see "Question one" has no validation errors
     And I should see "Question two" has no validation errors
 
-    When I navigate to the outstanding perform activities list page
-    And I click on "Activities about others" "link"
-    Then I should see the tui datatable contains:
+    When I click on "Submit" "button"
+    Then I should see "Performance activities"
+    And I should see "Activity responses saved" in the tui "success" notification toast
+    And the "Activities about others" tui tab should be active
+    And I should see the tui datatable contains:
       | Activity title   | User      | Your progress | Overall activity progress |
       | David is subject | David Two | Complete      | In progress               |
 

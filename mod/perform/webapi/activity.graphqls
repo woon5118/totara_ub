@@ -90,6 +90,7 @@ type mod_perform_subject_instance {
   activity: mod_perform_activity!
   status: mod_perform_subject_instance_status!
   relationship_to_subject: String!
+  is_self: Boolean!
   subject_user: core_user!
   participant_instances: [mod_perform_participant_instance!]!
 }

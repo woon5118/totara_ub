@@ -37,6 +37,8 @@ class behat_mod_perform extends behat_base {
     public const PERFORM_ELEMENT_OTHER_RESPONSE_RELATION_LOCATOR = '.tui-otherParticipantResponses__relation .tui-formLabel';
     public const SHORT_TEXT_ANSWER_LOCATOR = '.tui-shortTextElementParticipantResponse__answer';
     public const PERFORM_ACTIVITY_YOUR_RELATIONSHIP_LOCATOR = '.tui-participantContent__user-relationshipValue';
+    public const PERFORM_SHOW_OTHERS_RESPONSES_INPUT_LOCATOR = '.tui-participantContent__sectionHeading-switch input';
+    public const PERFORM_SHOW_OTHERS_RESPONSES_LABEL_LOCATOR = '.tui-participantContent__sectionHeading-switch label';
 
     /**
      * Navigate to the specified page and wait for JS.
@@ -109,18 +111,16 @@ class behat_mod_perform extends behat_base {
 
     /**
      * @Given /^I should see perform activity relationship to user "([^"]*)"$/
-     * @param $element_type
-     * @param $question_text
-     * @param $expected_relation
-     * @param $expected_answer_text
+     * @param string $expected_relation
      * @throws ExpectationException
      */
-    public function i_should_see_perform_activity_relationship_to_user(string $expected_relation) {
+    public function i_should_see_perform_activity_relationship_to_user(string $expected_relation): void {
         $your_relationship_element = $this->find('css', self::PERFORM_ACTIVITY_YOUR_RELATIONSHIP_LOCATOR);
 
-        if ($expected_relation == trim($your_relationship_element->getText())) {
+        if ($expected_relation === trim($your_relationship_element->getText())) {
             return;
         }
+
         throw new ExpectationException(
             "Could not find expected relationship to user {$expected_relation}",
             $this->getSession()
@@ -132,7 +132,22 @@ class behat_mod_perform extends behat_base {
      * @readonly
      */
     public function i_click_show_others_responses(): void {
-        $this->find('css', '.tui-participantContent__sectionHeading-switch label')->click();
+        $this->find('css', self::PERFORM_SHOW_OTHERS_RESPONSES_LABEL_LOCATOR)->click();
+    }
+
+    /**
+     * @Then /^I should see that show others responses is toggled "([(on)|(off)]*)"$/
+     * @param string|bool $expected_state
+     * @throws ExpectationException
+     */
+    public function i_should_see_that_show_others_responses_is(string $expected_state): void {
+        $expected_state = $expected_state === 'on';
+
+        $checked = $this->find('css', self::PERFORM_SHOW_OTHERS_RESPONSES_INPUT_LOCATOR)->isChecked();
+
+        if ($checked !== $expected_state) {
+            throw new ExpectationException('Others responses toggle was not on', $this->getSession());
+        }
     }
 
     /**
@@ -253,8 +268,6 @@ class behat_mod_perform extends behat_base {
         $new_answer = random_string($character_count);
         $response->setValue($new_answer);
     }
-
-
 
     private function find_question_response(string $element_type, string $question_text) {
         $question = $this->find_question_from_text($question_text);

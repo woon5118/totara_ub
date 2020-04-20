@@ -86,12 +86,9 @@ import Loader from 'totara_core/components/loader/Loader';
 import Table from 'totara_core/components/datatable/Table';
 
 import SubjectInstancesQuery from 'mod_perform/graphql/subject_instances.graphql';
-import { notify } from 'totara_core/notifications';
 
 const ABOUT_SELF = 'self';
 const ABOUT_OTHERS = 'others';
-
-const TOAST_DURATION = 10 * 1000; // in microseconds.
 
 export default {
   components: {
@@ -117,6 +114,14 @@ export default {
       subjectInstances: [],
     };
   },
+  computed: {
+    aboutFilter() {
+      return [this.about.toUpperCase()];
+    },
+    showSubjectName() {
+      return this.about === ABOUT_OTHERS;
+    },
+  },
   apollo: {
     subjectInstances: {
       query: SubjectInstancesQuery,
@@ -129,14 +134,6 @@ export default {
         };
       },
       update: data => data['mod_perform_subject_instances'],
-    },
-  },
-  computed: {
-    aboutFilter() {
-      return [this.about.toUpperCase()];
-    },
-    showSubjectName() {
-      return this.about === ABOUT_OTHERS;
     },
   },
   methods: {
@@ -167,27 +164,6 @@ export default {
         default:
           return '';
       }
-    },
-    /**
-     * Show a generic success toast.
-     */
-    showSuccessNotification() {
-      notify({
-        duration: TOAST_DURATION,
-        message: this.$str('toast_success_save_response', 'mod_perform'),
-        type: 'success',
-      });
-    },
-
-    /**
-     * Show a generic saving error toast.
-     */
-    showErrorNotification() {
-      notify({
-        duration: TOAST_DURATION,
-        message: this.$str('toast_error_save_response', 'mod_perform'),
-        type: 'error',
-      });
     },
   },
 };

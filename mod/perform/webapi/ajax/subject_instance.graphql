@@ -6,6 +6,7 @@ query mod_perform_subject_instance($subject_instance_id: core_id!) {
       name
     }
     relationship_to_subject
+    is_self
     subject_user {
       fullname
       profileimageurlsmall

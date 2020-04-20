@@ -50,6 +50,8 @@ class user_activities extends perform_controller {
 
         $props = [
             'view-activity-url' => (string) view_user_activity::get_url(),
+            'show-about-others-tab' => (bool) $this->get_param('show_about_others_tab', PARAM_BOOL, false),
+            'completion-save-success' => (bool) $this->get_param('completion_save_success', PARAM_BOOL, false),
         ];
 
         return tui_view::create('mod_perform/pages/UserActivities', $props)
@@ -57,8 +59,11 @@ class user_activities extends perform_controller {
             ->set_url(self::get_url());
     }
 
+    /**
+     * @return string
+     */
     public static function get_base_url(): string {
-        return '/mod/perform/activity';
+        return '/mod/perform/activity/';
     }
 
 }

@@ -24,7 +24,7 @@
   <div class="tui-performUserActivities">
     <h2>{{ $str('user_activities_page_title', 'mod_perform') }}</h2>
 
-    <Tabs transparent-tabs>
+    <Tabs transparent-tabs :selected="initialTab">
       <Tab
         :id="$id('your-activities-tab')"
         :name="$str('user_activities_your_activities_title', 'mod_perform')"
@@ -47,6 +47,9 @@
 import Tab from 'totara_core/components/tabs/Tab';
 import Tabs from 'totara_core/components/tabs/Tabs';
 import UserActivityList from 'mod_perform/components/user_activities/UserActivityList';
+import { notify } from 'totara_core/notifications';
+
+const TOAST_DURATION = 10 * 1000; // in microseconds.
 
 export default {
   components: {
@@ -59,12 +62,46 @@ export default {
       required: true,
       type: String,
     },
+    showAboutOthersTab: {
+      required: true,
+      type: Boolean,
+    },
+    completionSaveSuccess: {
+      required: true,
+      type: Boolean,
+    },
+  },
+  computed: {
+    initialTab() {
+      return this.showAboutOthersTab
+        ? this.$id('activities-about-others-tab')
+        : this.$id('your-activities-tab');
+    },
+  },
+  mounted() {
+    // Show the save notification if we have been redirected back here after saving.
+    if (this.completionSaveSuccess) {
+      this.showSuccessNotification();
+    }
+  },
+  methods: {
+    /**
+     * Show a generic success toast.
+     */
+    showSuccessNotification() {
+      notify({
+        duration: TOAST_DURATION,
+        message: this.$str('toast_success_save_response', 'mod_perform'),
+        type: 'success',
+      });
+    },
   },
 };
 </script>
 <lang-strings>
   {
     "mod_perform": [
+      "toast_success_save_response",
       "user_activities_activities_about_others_title",
       "user_activities_page_title",
       "user_activities_your_activities_title"

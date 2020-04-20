@@ -54,6 +54,7 @@ class subject_instance extends model {
         'status',
         'participant_instances',
         'relationship_to_subject',
+        'is_self',
     ];
 
     /** @var subject_instance_entity */
@@ -107,6 +108,14 @@ class subject_instance extends model {
      */
     public function get_relationship_to_subject(): string {
         return $this->relationship_to_subject;
+    }
+
+    /**
+     * Is this subject instance the logged in user.
+     * @return bool
+     */
+    public function get_is_self(): bool {
+        return (int) $this->entity->subject_user_id === (int) user::logged_in()->id;
     }
 
     /**
