@@ -28,6 +28,7 @@ use container_perform\perform as perform_container;
 use core\webapi\execution_context;
 use core\webapi\mutation_resolver;
 use mod_perform\models\activity\activity;
+use mod_perform\models\activity\activity_type;
 use mod_perform\models\activity\section;
 use totara_core\advanced_feature;
 
@@ -49,13 +50,15 @@ class create_activity implements mutation_resolver {
             throw new create_exception(get_string('error_activity_name_missing', 'mod_perform'));
         }
 
+        $type = activity_type::load_by_name('appraisal');
+
         $courseinfo = new \stdClass();
         $courseinfo->fullname = $args['name'];
         $courseinfo->description = $args['description'] ?? null;
         $courseinfo->category = perform_container::get_default_category_id();
 
         /** @var activity $activity */
-        $activity =  $DB->transaction(function () use ($courseinfo, $args) {
+        $activity =  $DB->transaction(function () use ($courseinfo, $args, $type) {
             $container = perform_container::create($courseinfo);
 
             // Create a performance activity inside the new performance container.
@@ -64,7 +67,7 @@ class create_activity implements mutation_resolver {
             $status = $args['status'] ?? activity::STATUS_ACTIVE;
 
             /** @var perform_container $container */
-            $activity = activity::create($container, $name, $description, $status);
+            $activity = activity::create($container, $name, $description, $status, $type);
 
             // Create the first section for the entity.
             section::create($activity);

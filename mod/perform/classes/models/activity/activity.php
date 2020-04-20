@@ -61,6 +61,7 @@ class activity extends model {
     ];
 
     protected $model_accessor_whitelist = [
+        'type',
         'sections',
         'relationships',
     ];
@@ -139,6 +140,7 @@ class activity extends model {
      * @param string            $name
      * @param string|null       $description
      * @param int               $status
+     * @param activity_type     $type
      *
      * @return static
      */
@@ -146,7 +148,8 @@ class activity extends model {
         perform_container $container,
         string $name,
         string $description = null,
-        int $status = self::STATUS_ACTIVE
+        int $status = self::STATUS_ACTIVE,
+        activity_type $type
     ): self {
         global $DB;
 
@@ -166,6 +169,7 @@ class activity extends model {
         $entity->name = $name;
         $entity->description = $description;
         $entity->status = $status;
+        $entity->type_id = $type->id;
 
         return $DB->transaction(function () use ($entity, $modinfo, $container) {
             global $CFG, $USER;
@@ -283,4 +287,12 @@ class activity extends model {
         return has_capability('mod/perform:view_participation_reporting', $this->get_context());
     }
 
+    /**
+     * Returns the activity type.
+     *
+     * @return activity_type the type.
+     */
+    public function get_type(): activity_type {
+        return activity_type::load_by_entity($this->entity->type);
+    }
 }

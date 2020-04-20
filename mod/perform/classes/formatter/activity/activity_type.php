@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
@@ -17,31 +17,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
+ * @author Murali Nair <murali.nair@totaralearning.com>
  * @package mod_perform
  */
 
 namespace mod_perform\formatter\activity;
 
 use core\orm\formatter\entity_model_formatter;
-use core\webapi\formatter\field\date_field_formatter;
 use core\webapi\formatter\field\string_field_formatter;
 
-/**
- * Class activity
- *
- * @package mod_perform\formatter\activity
- */
-class activity extends entity_model_formatter {
+defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Maps the activity_type model class into a GraphQL mod_perform_activity_type.
+ */
+class activity_type extends entity_model_formatter {
+    /**
+     * {@inheritdoc}
+     */
     protected function get_map(): array {
         return [
             'id' => null,
             'name' => string_field_formatter::class,
-            'type' => null,
-            'description' => string_field_formatter::class,
-            'updated_at' => date_field_formatter::class,
-            'sections' => null,
+            'display_name' => string_field_formatter::class,
         ];
     }
 }

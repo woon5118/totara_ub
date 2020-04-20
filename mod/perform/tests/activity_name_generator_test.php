@@ -21,7 +21,12 @@
  * @package mod_perform
  */
 
-class mod_perform_activity_name_generator_testcase extends basic_testcase {
+/**
+ * @coversDefaultClass mod_perform_activity_name_generator
+ *
+ * @group perform
+ */
+class mod_perform_activity_name_generator_testcase extends advanced_testcase {
 
     public static function setUpBeforeClass() {
         global $CFG;
@@ -33,9 +38,10 @@ class mod_perform_activity_name_generator_testcase extends basic_testcase {
     public function test_generate_name() {
         $name_generator = new mod_perform_activity_name_generator();
 
-        $name = $name_generator->generate();
+        [$name, $type] = $name_generator->generate();
         $this->assertIsString($name);
         $this->assertGreaterThan(0, strlen($name));
+        $this->assertContains($type, $name_generator->type);
     }
 
     public function test_generate_names() {
@@ -44,9 +50,10 @@ class mod_perform_activity_name_generator_testcase extends basic_testcase {
         $names = $name_generator->generate_multiple(5);
         $this->assertIsArray($names);
         $this->assertCount(5, $names);
-        foreach ($names as $name) {
+        foreach ($names as [$name, $type]) {
             $this->assertIsString($name);
             $this->assertGreaterThan(0, strlen($name));
+            $this->assertContains($type, $name_generator->type);
         }
     }
 

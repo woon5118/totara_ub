@@ -124,6 +124,7 @@ class mod_perform_generator_testcase extends advanced_testcase {
         $expected_activity = $activities->first();
         $actual_activity_entity = $activities_in_db->first();
         $this->assertEquals($expected_activity->id, $actual_activity_entity->id);
+        $this->assertEquals($expected_activity->type->id, $actual_activity_entity->type_id);
 
         // Assert that there is the expected amount of assignments in the database
         $assignments_in_db = track_assignment_entity::repository()->get();
@@ -185,6 +186,7 @@ class mod_perform_generator_testcase extends advanced_testcase {
         $expected_activity = $activities->first();
         $actual_activity_entity = $activities_in_db->first();
         $this->assertEquals($expected_activity->id, $actual_activity_entity->id);
+        $this->assertEquals($expected_activity->type->id, $actual_activity_entity->type_id);
 
         // Assert that there is the expected amount of assignments in the database
         $assignments_in_db = track_assignment_entity::repository()->get();
@@ -214,6 +216,7 @@ class mod_perform_generator_testcase extends advanced_testcase {
         $expected_activity = $activities->first();
         $actual_activity_entity = $activities_in_db->first();
         $this->assertEquals($expected_activity->id, $actual_activity_entity->id);
+        $this->assertEquals($expected_activity->type->id, $actual_activity_entity->type_id);
 
         // Assert that there is the expected amount of assignments in the database
         $assignments_in_db = track_assignment_entity::repository()->get();

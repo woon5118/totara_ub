@@ -1,9 +1,19 @@
 """
-This is generic performance activity type
+Performance activity type
+"""
+type mod_perform_activity_type {
+  id: core_id
+  name: String!
+  display_name(format: core_format = PLAIN): String!
+}
+
+"""
+This is generic performance activity
 """
 type mod_perform_activity {
   id: core_id
   name(format: core_format = PLAIN): String!
+  type: mod_perform_activity_type!
   description(format: core_format = PLAIN): String
   updated_at(format: core_date_format = TIMESTAMP): core_date
   can_view_participation_reporting: Boolean! # Whether the current user can view the participation tracking for the activity

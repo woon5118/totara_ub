@@ -26,5 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 function xmldb_perform_install() {
     // Ensure required performance activity roles exist.
     mod_perform\util::create_performance_roles();
-}
 
+    // Create activity types.
+    mod_perform\util::create_activity_types();
+}

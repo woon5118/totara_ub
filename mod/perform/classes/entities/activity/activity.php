@@ -27,6 +27,7 @@ use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\entity\relations\has_many;
 use core\orm\entity\relations\has_many_through;
+use core\orm\entity\relations\has_one;
 use totara_core\entities\relationship;
 
 /**
@@ -34,6 +35,7 @@ use totara_core\entities\relationship;
  *
  * Properties:
  * @property-read int $id ID
+ * @property int $type_id activity type
  * @property int $course ID of parent course
  * @property string $description
  * @property string $name Activity name
@@ -45,6 +47,7 @@ use totara_core\entities\relationship;
  * @property-read collection|section[] $sections
  * @property-read collection|activity_relationship[] $activity_relationships
  * @property-read collection|relationship[] $relationships
+ * @property-read activity_type $type
  *
  * @method static activity_repository repository()
  *
@@ -91,4 +94,12 @@ class activity extends entity {
         );
     }
 
+    /**
+     * Activity type.
+     *
+     * @return has_one the relationship.
+     */
+    public function type(): has_one {
+        return $this->has_one(activity_type::class, 'id', 'type_id');
+    }
 }

@@ -35,14 +35,16 @@ class mod_perform_activity_name_generator {
     ];
 
     public $type = [
-        'check-in', 'appraisal', 'evaluation', 'appraisal', 'review', 'assessment', 'self-assessment', 'survey', 'feedback'
+        'check-in', 'appraisal', 'feedback'
     ];
 
-    public function generate(): string {
+    public function generate(): array {
         $period = $this->period[array_rand($this->period)];
         $middle = $this->middle[array_rand($this->middle)];
         $type = $this->type[array_rand($this->type)];
-        return sprintf('%s %s %s', $period, $middle, $type);
+
+        $name = sprintf('%s %s %s', $period, $middle, $type);
+        return [$name, $type];
     }
 
     public function generate_multiple(int $amount): array {
@@ -52,5 +54,4 @@ class mod_perform_activity_name_generator {
         }
         return $names;
     }
-
 }

@@ -830,5 +830,45 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020040800, 'perform');
     }
 
+    if ($oldversion < 2020042000) {
+        // Create activity type table.
+        $table = new xmldb_table('perform_type');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('is_system', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, 1);
+        $table->add_field('created_at', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Populate canned activity types.
+        mod_perform\util::create_activity_types();
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020042000, 'perform');
+    }
+
+    if ($oldversion < 2020042001) {
+        // Create new activity_type column for activity table.
+        $types = $DB->get_records('perform_type', null, 'id', 'id', 0, 1);
+        $default_type = reset($types)->id;
+
+        $table = new xmldb_table('perform');
+        $field = new xmldb_field('type_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, $default_type, 'id');
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+
+            $type_key = new xmldb_key('type_id', XMLDB_KEY_FOREIGN, ['type_id'], 'perform_type', ['id'], 'restrict');
+            $dbman->add_key($table, $type_key);
+        }
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020042001, 'perform');
+    }
+
     return true;
 }

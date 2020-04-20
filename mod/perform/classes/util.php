@@ -24,6 +24,7 @@
 namespace mod_perform;
 
 use container_perform\perform as perform_container;
+use mod_perform\entities\activity\activity_type;
 
 class util {
 
@@ -95,5 +96,24 @@ class util {
      */
     public static function get_default_category_id(): int {
         return perform_container::get_default_category_id();
+    }
+
+    /**
+     * Creates a set of activity types.
+     */
+    public static function create_activity_types(): void {
+        $predefined_types = [
+            'appraisal',
+            'check-in',
+            'feedback'
+        ];
+
+        foreach ($predefined_types as $type) {
+            $entity = new activity_type();
+            $entity->name = $type;
+            $entity->is_system = true;
+
+            $entity->save();
+        }
     }
 }

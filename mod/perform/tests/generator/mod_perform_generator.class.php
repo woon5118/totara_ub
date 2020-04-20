@@ -34,6 +34,7 @@ use mod_perform\models\activity\track;
 use mod_perform\entities\activity\track_user_assignment;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
 use mod_perform\models\activity\activity;
+use mod_perform\models\activity\activity_type;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\models\activity\section;
 use mod_perform\models\activity\element;
@@ -86,8 +87,14 @@ class mod_perform_generator extends component_generator_base {
             $description = $data['description'] ?? "test description";
             $status = $data['activity_status'] ?? activity::STATUS_ACTIVE;
 
+            $type = $data['activity_type'] ?? 'appraisal';
+            $type_model = activity_type::load_by_name($type);
+            if (!$type_model) {
+                throw new coding_exception("Unknown activity type: '$type'");
+            }
+
             /** @var perform_container $container */
-            $activity = activity::create($container, $name, $description, $status);
+            $activity = activity::create($container, $name, $description, $status, $type_model);
 
             if (isset($data['create_section']) && $data['create_section']) {
                 section::create($activity);
@@ -110,10 +117,16 @@ class mod_perform_generator extends component_generator_base {
         $description = $data['description'] ?? "test description";
         $status = $data['status'] ?? activity::STATUS_ACTIVE;
 
+        $type = $data['activity_type'] ?? 'appraisal';
+        $type_model = activity_type::load_by_name($type);
+        if (!$type_model) {
+            throw new coding_exception("Unknown activity type: '$type'");
+        }
+
         $container = perform_container::from_id($data['course']);
 
         /** @var perform_container $container */
-        activity::create($container, $name, $description, $status);
+        activity::create($container, $name, $description, $status, $type_model);
 
         $modules = $container->get_section(0)->get_all_modules();
         $module = reset($modules);
@@ -341,8 +354,10 @@ class mod_perform_generator extends component_generator_base {
 
         $activities = [];
         for ($i = 0; $i < $configuration->get_number_of_activities(); $i++) {
+            [$name, $type] = $activity_name_generator->generate();
             $data = [
-                'activity_name' => $activity_name_generator->generate()
+                'activity_name' => $name,
+                'activity_type' => $type
             ];
 
             $activity = $this->create_activity_in_container($data);
@@ -404,7 +419,9 @@ class mod_perform_generator extends component_generator_base {
         if ($activity_id) {
             $activity = activity::load_by_id($activity_id);
         } else {
-            $activity = $this->find_or_make_perform_activity($data['activity_name'] ?? null);
+            $name = $data['activity_name'] ?? null;
+            $type = $data['activity_type'] ?? 'appraisal';
+            $activity = $this->find_or_make_perform_activity($name, $type);
         }
 
         $subject_id = $data['subject_user_id'] ?? null;
@@ -499,16 +516,25 @@ class mod_perform_generator extends component_generator_base {
         return $subject_instance;
     }
 
-    private function find_or_make_perform_activity($name): activity {
+    private function find_or_make_perform_activity($name, $type): activity {
         if (!$name) {
-            return $this->create_activity_in_container();
+            return $this->create_activity_in_container(
+                [
+                    'activity_type' => $type
+                ]
+            );
         }
 
         /** @var activity_entity $activity_entity */
         $activity_entity = activity_entity::repository()->where('name', $name)->order_by('id')->first();
 
         if ($activity_entity === null) {
-            return $this->create_activity_in_container(['activity_name' => $name]);
+            return $this->create_activity_in_container(
+                [
+                    'activity_name' => $name,
+                    'activity_type' => $type
+                ]
+            );
         }
 
         return activity::load_by_entity($activity_entity);

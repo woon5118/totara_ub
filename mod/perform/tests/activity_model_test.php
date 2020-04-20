@@ -22,6 +22,7 @@
  */
 
 use mod_perform\models\activity\activity;
+use mod_perform\models\activity\activity_type;
 use mod_perform\entities\activity\activity as activity_entity;
 
 /**
@@ -64,10 +65,12 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
         $original_data->name = 'Existing activity name';
         $original_data->description = 'Existing activity description';
 
-        $activity = $this->create_activity($original_data);
+        $activity_type = 'check-in';
+        $activity = $this->create_activity($original_data, $activity_type);
 
         $this->assertEquals($activity->name, $original_data->name);
         $this->assertEquals($activity->description, $original_data->description);
+        $this->assertEquals($activity->type->name, $activity_type);
 
         $activity->update_general_info('New name for existing activity', 'New description');
 
@@ -86,10 +89,12 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
         $original_data->name = 'Existing activity name';
         $original_data->description = 'Existing activity description';
 
-        $activity = $this->create_activity($original_data);
+        $activity_type = 'feedback';
+        $activity = $this->create_activity($original_data, $activity_type);
 
         $this->assertEquals($activity->name, $original_data->name);
         $this->assertEquals($activity->description, $original_data->description);
+        $this->assertEquals($activity->type->name, $activity_type);
 
         $activity->update_general_info('New name for existing activity', null);
 
@@ -162,10 +167,12 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
      * Create just the activity entity without any container.
      *
      * @param activity_entity $entity
+     * @param string $type activity type
      * @return activity
      * @throws coding_exception
      */
-    private function create_activity(activity_entity $entity): activity {
+    private function create_activity(activity_entity $entity, string $type='appraisal'): activity {
+        $entity->type_id = activity_type::load_by_name($type)->id;
         $entity->status = activity::STATUS_ACTIVE;
 
         /** @var activity_entity $entity */
