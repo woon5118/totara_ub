@@ -27,17 +27,16 @@ global $CFG;
 
 require_once($CFG->dirroot . '/totara/job/lib.php');
 
-use \totara_job\job_assignment;
-use \totara_job\webapi\resolver\query;
+use totara_job\job_assignment;
+use totara_job\webapi\resolver\query;
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
  * Tests the totara job my assignments query resolver
  */
 class totara_job_webapi_resolver_query_my_assignments_testcase extends advanced_testcase {
 
-    private function get_execution_context(string $type = 'dev', ?string $operation = null) {
-        return \core\webapi\execution_context::create($type, $operation);
-    }
+    use webapi_phpunit_helper;
 
     private function create_job_assignment($data): job_assignment {
         $data = (array)$data;
@@ -53,22 +52,19 @@ class totara_job_webapi_resolver_query_my_assignments_testcase extends advanced_
     }
 
     public function test_resolve_nologgedin() {
-        try {
-            query\my_assignments::resolve([], $this->get_execution_context());
-            self::fail('Expected a moodle_exception: cannot view job assignments');
-        } catch (\moodle_exception $ex) {
-            self::assertSame('Course or activity not accessible. (You are not logged in)', $ex->getMessage());
-        }
+        $this->expectException(moodle_exception::class);
+        $this->expectExceptionMessage('Course or activity not accessible. (You are not logged in)');
+
+        $this->resolve_graphql_query('totara_job_my_assignments', []);
     }
 
     public function test_resolve_guestuser() {
         $this->setGuestUser();
-        try {
-            query\my_assignments::resolve([], $this->get_execution_context());
-            self::fail('Expected a moodle_exception: cannot view job assignments');
-        } catch (\moodle_exception $ex) {
-            self::assertSame('Sorry, but you do not currently have permissions to do that (view job assignments)', $ex->getMessage());
-        }
+
+        $this->expectException(moodle_exception::class);
+        $this->expectExceptionMessage('Sorry, but you do not currently have permissions to do that (view job assignments)');
+
+        $this->resolve_graphql_query('totara_job_my_assignments', []);
     }
 
     public function test_resolve_normaluser() {
@@ -78,20 +74,23 @@ class totara_job_webapi_resolver_query_my_assignments_testcase extends advanced_
         $this->setUser($user);
 
         $job1 =  $this->create_job_assignment(['userid' => $user->id]);
-        $result = query\my_assignments::resolve([], $this->get_execution_context());
+        $result = $this->resolve_graphql_query('totara_job_my_assignments', []);
         self::assertEquals([$job1->sortorder => $job1], $result);
 
-        $job2 =  $this->create_job_assignment(['userid' => $user->id, 'idnumber' => 'job_2']);
-        $result = query\my_assignments::resolve([], $this->get_execution_context());
+        $job2 = $this->create_job_assignment(['userid' => $user->id, 'idnumber' => 'job_2']);
+        $result = $this->resolve_graphql_query('totara_job_my_assignments', []);
         self::assertEquals([$job1->sortorder => $job1, $job2->sortorder => $job2], $result);
 
         // Test job assignment belonging to deleted user.
         delete_user($DB->get_record('user', ['id' => $user->id]));
         try {
-            query\my_assignments::resolve([], $this->get_execution_context());
+            $this->resolve_graphql_query('totara_job_my_assignments', []);
             self::fail('Expected a moodle_exception: cannot view job assignments');
         } catch (\moodle_exception $ex) {
-            self::assertContains('Sorry, but you do not currently have permissions to do that (view job assignments)', $ex->getMessage());
+            self::assertContains(
+                'Sorry, but you do not currently have permissions to do that (view job assignments)',
+                $ex->getMessage()
+            );
         }
     }
 
@@ -105,12 +104,11 @@ class totara_job_webapi_resolver_query_my_assignments_testcase extends advanced_
         $manager = $this->getDataGenerator()->create_user();
         $managerja = $this->create_job_assignment(['userid' => $manager->id, 'idnumber' => 'j1']);
         $job1 =  $this->create_job_assignment(['userid' => $user->id, 'idnumber' => 'j1']);
-        $job2 =  $this->create_job_assignment(['userid' => $user->id, 'idnumber' => 'j2', 'managerjaid' => $managerja->id, 'appraiserid' => $appraiser->id]);
-
-        $result = \totara_webapi\graphql::execute_operation(
-            \core\webapi\execution_context::create('ajax', 'totara_job_my_assignments'),
-            []
+        $job2 =  $this->create_job_assignment(
+            ['userid' => $user->id, 'idnumber' => 'j2', 'managerjaid' => $managerja->id, 'appraiserid' => $appraiser->id]
         );
+
+        $result = $this->execute_graphql_operation('totara_job_my_assignments', []);
         self::assertSame(
             [
                 'data' => [

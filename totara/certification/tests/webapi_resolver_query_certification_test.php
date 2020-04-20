@@ -23,16 +23,14 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-use \totara_certification\webapi\resolver\query;
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
  * Tests the totara job assignment query resolver
  */
 class totara_certification_webapi_resolver_query_certification_testcase extends advanced_testcase {
 
-    private function get_execution_context(string $type = 'dev', ?string $operation = null) {
-        return \core\webapi\execution_context::create($type, $operation);
-    }
+    use webapi_phpunit_helper;
 
     /**
      * Create some certifications and assign some users for testing.
@@ -75,13 +73,10 @@ class totara_certification_webapi_resolver_query_certification_testcase extends 
     public function test_resolve_no_login() {
         list($users, $certifications) = $this->create_faux_certifications();
 
-        try {
-            query\certification::resolve(['certificationid' => $certifications[0]->id], $this->get_execution_context());
-            $this->fail('Expected a moodle_exception: cannot view certification');
-        } catch (\moodle_exception $ex) {
-            // Note: I know this is a certification, but this is the require_login generic error.
-            $this->assertSame('Course or activity not accessible. (You are not logged in)', $ex->getMessage());
-        }
+        $this->expectException(moodle_exception::class);
+        $this->expectExceptionMessage('Course or activity not accessible. (You are not logged in)');
+
+        $this->resolve_graphql_query('totara_certification_certification', ['certificationid' => $certifications[0]->id]);
     }
 
     /**
@@ -92,14 +87,14 @@ class totara_certification_webapi_resolver_query_certification_testcase extends 
         $this->setGuestUser();
 
         // Guests can view certifications (shouldn't have completion data though so...)
-        $result = query\certification::resolve(['certificationid' => $certifications[0]->id], $this->get_execution_context());
+        $result = $this->resolve_graphql_query('totara_certification_certification', ['certificationid' => $certifications[0]->id]);
         $this->assertEquals($certifications[0]->id, $result->id);
         $this->assertEquals($certifications[0]->fullname, $result->fullname);
         $this->assertEquals($certifications[0]->shortname, $result->shortname);
 
         // Guests should not be able to see hidden certifications however.
         try {
-            $result = query\certification::resolve(['certificationid' => $certifications[2]->id], $this->get_execution_context());
+            $result = $this->resolve_graphql_query('totara_certification_certification', ['certificationid' => $certifications[2]->id]);
             $this->fail('Expected a moodle_exception: cannot view certification');
         } catch (\moodle_exception $ex) {
             // Note: I know this is a certification, but this is the require_login generic error.
@@ -115,13 +110,21 @@ class totara_certification_webapi_resolver_query_certification_testcase extends 
         $this->setAdminUser();
 
         // Admins should be able to see certifications, again without completion data.
-        $result = query\certification::resolve(['certificationid' => $certifications[0]->id], $this->get_execution_context());
+        $result = $this->resolve_graphql_query('totara_certification_certification', ['certificationid' => $certifications[0]->id]);
         $this->assertEquals($certifications[0]->id, $result->id);
         $this->assertEquals($certifications[0]->fullname, $result->fullname);
         $this->assertEquals($certifications[0]->shortname, $result->shortname);
+    }
+
+    /**
+     * Test the results of the query when the current user is the site administrator.
+     */
+    public function test_resolve_admin_user_hidden_certificate() {
+        list($users, $certifications) = $this->create_faux_certifications();
+        $this->setAdminUser();
 
         // They should also be able to see hidden certifications.
-        $result = query\certification::resolve(['certificationid' => $certifications[2]->id], $this->get_execution_context());
+        $result = $this->resolve_graphql_query('totara_certification_certification', ['certificationid' => $certifications[2]->id]);
         $this->assertEquals($certifications[2]->id, $result->id);
         $this->assertEquals($certifications[2]->fullname, $result->fullname);
         $this->assertEquals($certifications[2]->shortname, $result->shortname);
@@ -137,16 +140,16 @@ class totara_certification_webapi_resolver_query_certification_testcase extends 
         $this->setUser($users[0]);
 
         // User should be able to see certification 1, with full assignment/completion data.
-        $result = query\certification::resolve(['certificationid' => $certifications[0]->id], $this->get_execution_context());
+        $result = $this->resolve_graphql_query('totara_certification_certification', ['certificationid' => $certifications[0]->id]);
         $this->assertEquals($certifications[0]->id, $result->id);
 
         // User should be able to see certification 2, with out any assignment/completion data.
-        $result = query\certification::resolve(['certificationid' => $certifications[0]->id], $this->get_execution_context());
-        $this->assertEquals($certifications[0]->id, $result->id);
+        $result = $this->resolve_graphql_query('totara_certification_certification', ['certificationid' => $certifications[1]->id]);
+        $this->assertEquals($certifications[1]->id, $result->id);
 
         // User should not be able to see certification 3, its hidden.
         try {
-            $result = query\certification::resolve(['certificationid' => $certifications[2]->id], $this->get_execution_context());
+            $result = $this->resolve_graphql_query('totara_certification_certification', ['certificationid' => $certifications[2]->id]);
             $this->fail('Expected a moodle_exception: cannot view certification');
         } catch (\moodle_exception $ex) {
             // Note: I know this is a certification, but this is the require_login generic error.
@@ -163,10 +166,7 @@ class totara_certification_webapi_resolver_query_certification_testcase extends 
         list($users, $certifications) = $this->create_faux_certifications();
 
         $this->setUser($users[0]);
-        $result = \totara_webapi\graphql::execute_operation(
-            \core\webapi\execution_context::create('ajax', 'totara_certification_certification'),
-            ['certificationid' => $certifications[0]->id]
-        );
+        $result = $this->execute_graphql_operation('totara_certification_certification', ['certificationid' => $certifications[0]->id]);
         $data = $result->toArray()['data'];
 
         $coursesets = $certifications[0]->get_content()->get_course_sets();

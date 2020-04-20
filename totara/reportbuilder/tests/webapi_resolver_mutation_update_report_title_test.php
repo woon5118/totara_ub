@@ -23,18 +23,20 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-global $CFG;
-
-use \totara_reportbuilder\webapi\resolver\mutation;
-require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
  * Tests the totara update report title mutation
  */
 class totara_reportbuilder_webapi_resolver_mutation_update_report_title_testcase extends advanced_testcase {
 
-    private function get_execution_context(string $type = 'dev', ?string $operation = null) {
-        return \core\webapi\execution_context::create($type, $operation);
+    use webapi_phpunit_helper;
+
+    public static function setUpBeforeClass() {
+        parent::setUpBeforeClass();
+
+        global $CFG;
+        require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
     }
 
     /**
@@ -57,24 +59,27 @@ class totara_reportbuilder_webapi_resolver_mutation_update_report_title_testcase
     public function test_resolve_nologgedin() {
         $r1 = $this->create_report('user', 'Test Report 1');
 
-        try {
-            mutation\update_report_title::resolve(['reportid' => $r1, 'title' => 'Test Report 2'], $this->get_execution_context());
-            self::fail('Expected a moodle_exception: No permission to edit reports');
-        } catch (\moodle_exception $ex) {
-            self::assertSame('Course or activity not accessible. (You are not logged in)', $ex->getMessage());
-        }
+        $this->expectException(moodle_exception::class);
+        $this->expectExceptionMessage('Course or activity not accessible. (You are not logged in)');
+
+        $this->resolve_grapqhl_mutation(
+            'totara_reportbuilder_update_report_title',
+            ['reportid' => $r1, 'title' => 'Test Report 2']
+        );
     }
 
     public function test_resolve_guestuser() {
         $this->setGuestUser();
 
         $r1 = $this->create_report('user', 'Test Report 1');
-        try {
-            mutation\update_report_title::resolve(['reportid' => $r1, 'title' => 'Test Report 2'], $this->get_execution_context());
-            self::fail('Expected a moodle_exception: No permission to edit reports');
-        } catch (\coding_exception $ex) {
-            self::assertContains('No permission to edit reports', $ex->getMessage());
-        }
+
+        $this->expectException(moodle_exception::class);
+        $this->expectExceptionMessage('No permission to edit reports');
+
+        $this->resolve_grapqhl_mutation(
+            'totara_reportbuilder_update_report_title',
+            ['reportid' => $r1, 'title' => 'Test Report 2']
+        );
     }
 
     public function test_resolve_normaluser() {
@@ -83,12 +88,13 @@ class totara_reportbuilder_webapi_resolver_mutation_update_report_title_testcase
 
         $r1 = $this->create_report('user', 'Test Report 1');
 
-        try {
-            mutation\update_report_title::resolve(['reportid' => $r1, 'title' => 'Test Report 2'], $this->get_execution_context());
-            self::fail('Expected a moodle_exception: No permission to edit reports');
-        } catch (\coding_exception $ex) {
-            self::assertContains('No permission to edit reports', $ex->getMessage());
-        }
+        $this->expectException(moodle_exception::class);
+        $this->expectExceptionMessage('No permission to edit reports');
+
+        $this->resolve_grapqhl_mutation(
+            'totara_reportbuilder_update_report_title',
+            ['reportid' => $r1, 'title' => 'Test Report 2']
+        );
     }
 
     public function test_resolve_adminuser() {
@@ -100,7 +106,10 @@ class totara_reportbuilder_webapi_resolver_mutation_update_report_title_testcase
         $r2 = $this->create_report('user', 'Test Report 2');
 
         // Check the returned result is the same
-        $result = mutation\update_report_title::resolve(['reportid' => $r1, 'title' => 'Test Report 3'], $this->get_execution_context());
+        $result = $this->resolve_grapqhl_mutation(
+            'totara_reportbuilder_update_report_title',
+            ['reportid' => $r1, 'title' => 'Test Report 3']
+        );
         self::assertEquals('Test Report 3', $result);
 
         // Check the DB is updated
@@ -112,12 +121,13 @@ class totara_reportbuilder_webapi_resolver_mutation_update_report_title_testcase
         self::assertEquals('Test Report 2', $item->fullname);
 
         // Modifying a non-existent record
-        try {
-            mutation\update_report_title::resolve(['reportid' => 100, 'title' => 'Test Report 6'], $this->get_execution_context());
-            $this->fail('Exception expected.');
-        } catch (\moodle_exception $ex) {
-            self::assertContains('Attempted to edit a non-existent report', $ex->getMessage());
-        }
+        $this->expectException(moodle_exception::class);
+        $this->expectExceptionMessage('Attempted to edit a non-existent report');
+
+        $this->resolve_grapqhl_mutation(
+            'totara_reportbuilder_update_report_title',
+            ['reportid' => 100, 'title' => 'Test Report 6']
+        );
     }
 
     /**
@@ -134,8 +144,8 @@ class totara_reportbuilder_webapi_resolver_mutation_update_report_title_testcase
         $map = function ($obj) {
             return (array)$obj;
         };
-        $result = \totara_webapi\graphql::execute_operation(
-            \core\webapi\execution_context::create('ajax', 'totara_reportbuilder_update_report_title'),
+        $result = $this->execute_graphql_operation(
+            'totara_reportbuilder_update_report_title',
             ['reportid' => $r1, 'title' => 'Test Report 3']
         );
 

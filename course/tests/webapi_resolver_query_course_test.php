@@ -23,16 +23,14 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-use \core\webapi\resolver\query;
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
  * Tests the totara current learning query resolver
  */
 class totara_core_webapi_resolver_query_course_testcase extends advanced_testcase {
 
-    private function get_execution_context(string $type = 'dev', ?string $operation = null) {
-        return \core\webapi\execution_context::create($type, $operation);
-    }
+    use webapi_phpunit_helper;
 
     /**
      * Create some courses and assign some users for testing.
@@ -61,12 +59,11 @@ class totara_core_webapi_resolver_query_course_testcase extends advanced_testcas
      */
     public function test_resolve_no_login() {
         list($users, $courses) = $this->create_faux_courses();
-        try {
-            query\course::resolve(['courseid' => $courses[0]->id], $this->get_execution_context());
-            $this->fail('Expected a moodle_exception: cannot view current learnings');
-        } catch (\moodle_exception $ex) {
-            $this->assertSame('Course or activity not accessible. (You are not logged in)', $ex->getMessage());
-        }
+
+        $this->expectException(require_login_exception::class);
+        $this->expectExceptionMessage('Course or activity not accessible. (You are not logged in)');
+
+        $this->resolve_graphql_query('core_course', ['courseid' => $courses[0]->id]);
     }
 
     /**
@@ -76,19 +73,11 @@ class totara_core_webapi_resolver_query_course_testcase extends advanced_testcas
         list($users, $courses) = $this->create_faux_courses();
         $this->setGuestUser();
 
-        // Guests can view courses (shouldn't have completion data though so...)
-        $result = query\course::resolve(['courseid' => $courses[0]->id], $this->get_execution_context());
-        $this->assertEquals($courses[0]->id, $result->id);
-        $this->assertEquals($courses[0]->fullname, $result->fullname);
-        $this->assertEquals($courses[0]->shortname, $result->shortname);
+        $this->expectException(require_login_exception::class);
+        $this->expectExceptionMessage('Course or activity not accessible. (Not enrolled)');
 
-        // Guests should not be able to see hidden courses however.
-        try {
-            $result = query\course::resolve(['courseid' => $courses[2]->id], $this->get_execution_context());
-            $this->fail('Expected a moodle_exception: cannot view course');
-        } catch (\moodle_exception $ex) {
-            $this->assertSame('Coding error detected, it must be fixed by a programmer: Current user can not access this course.', $ex->getMessage());
-        }
+        // By default guests cannot view courses, only when the guest enrol plugin is enabled
+        $this->resolve_graphql_query('core_course', ['courseid' => $courses[0]->id]);
     }
 
     /**
@@ -99,13 +88,21 @@ class totara_core_webapi_resolver_query_course_testcase extends advanced_testcas
         $this->setAdminUser();
 
         // Admins should be able to see courses, again without completion data.
-        $result = query\course::resolve(['courseid' => $courses[0]->id], $this->get_execution_context());
+        $result = $this->resolve_graphql_query('core_course', ['courseid' => $courses[0]->id]);
         $this->assertEquals($courses[0]->id, $result->id);
         $this->assertEquals($courses[0]->fullname, $result->fullname);
         $this->assertEquals($courses[0]->shortname, $result->shortname);
+    }
 
-        // They should also be able to see hidden courses.
-        $result = query\course::resolve(['courseid' => $courses[2]->id], $this->get_execution_context());
+    /**
+     * Test the results of the query when the current user is the site administrator.
+     */
+    public function test_resolve_admin_user_with_hidden_course() {
+        list($users, $courses) = $this->create_faux_courses();
+        $this->setAdminUser();
+
+        // Admins should also be able to see hidden courses.
+        $result = $this->resolve_graphql_query('core_course', ['courseid' => $courses[2]->id]);
         $this->assertEquals($courses[2]->id, $result->id);
         $this->assertEquals($courses[2]->fullname, $result->fullname);
         $this->assertEquals($courses[2]->shortname, $result->shortname);
@@ -122,7 +119,7 @@ class totara_core_webapi_resolver_query_course_testcase extends advanced_testcas
 
         // User 0 should be able to see the assigned course[0].
         try {
-            $item = query\course::resolve(['courseid' => $courses[0]->id], $this->get_execution_context());
+            $item = $this->resolve_graphql_query('core_course', ['courseid' => $courses[0]->id]);
 
             // Do some checks on the item to make sure it's what we are expecting.
             $this->assertEquals($courses[0]->id, $item->id);
@@ -133,25 +130,20 @@ class totara_core_webapi_resolver_query_course_testcase extends advanced_testcas
             $this->fail($ex->getMessage());
         }
 
-        // User 0 should be able to see the unassigned course[1].
+        // User 0 should not be able to see the unassigned course[1].
         try {
-            $item = query\course::resolve(['courseid' => $courses[1]->id], $this->get_execution_context());
-
-            // Do some checks on the item to make sure it's what we are expecting.
-            $this->assertEquals($courses[1]->id, $item->id);
-            $this->assertEquals($courses[1]->fullname, $item->fullname);
-            $this->assertEquals($courses[1]->shortname, $item->shortname);
-            $this->assertEquals($courses[1]->summary, $item->summary);
-        } catch (\moodle_exception $ex) {
-            $this->fail($ex->getMessage());
+            $item = $this->resolve_graphql_query('core_course', ['courseid' => $courses[1]->id]);
+            $this->fail('User should not see course due to missing enrolment');
+        } catch (require_login_exception $ex) {
+            $this->assertStringContainsString('Course or activity not accessible. (Not enrolled)', $ex->getMessage());
         }
 
         // User 0 should not be able to see the hidden course[2].
         try {
-            $items = query\course::resolve(['courseid' => $courses[2]->id], $this->get_execution_context());
+            $items = $this->resolve_graphql_query('core_course', ['courseid' => $courses[2]->id]);
             $this->fail('Expected a moodle_exception: cannot view course');
         } catch (\moodle_exception $ex) {
-            $this->assertSame('Coding error detected, it must be fixed by a programmer: Current user can not access this course.', $ex->getMessage());
+            $this->assertStringContainsString('Course or activity not accessible. (Course is hidden)', $ex->getMessage());
         }
     }
 
@@ -162,10 +154,7 @@ class totara_core_webapi_resolver_query_course_testcase extends advanced_testcas
         list($users, $courses) = $this->create_faux_courses();
 
         $this->setUser($users[0]);
-        $result = \totara_webapi\graphql::execute_operation(
-            \core\webapi\execution_context::create('ajax', 'core_course_course'),
-            ['courseid' => $courses[0]->id]
-        );
+        $result = $this->execute_graphql_operation('core_course_course', ['courseid' => $courses[0]->id]);
         $data = $result->toArray()['data'];
 
         $category = coursecat::get($courses[0]->category);

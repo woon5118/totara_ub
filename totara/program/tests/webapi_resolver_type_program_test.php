@@ -23,29 +23,23 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-use \totara_core\webapi\resolver\type;
 use core\format;
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
  * Tests the totara core program type resolver.
  */
 class totara_program_webapi_resolver_type_program_testcase extends advanced_testcase {
-    private function resolve($field, $program, array $args = []) {
-        return \totara_program\webapi\resolver\type\program::resolve(
-            $field,
-            $program,
-            $args,
-            $this->get_execution_context()
-        );
-    }
 
-    private function get_execution_context(string $type = 'dev', ?string $operation = null) {
-        return \core\webapi\execution_context::create($type, $operation);
+    use webapi_phpunit_helper;
+
+    private function resolve($field, $program, array $args = []) {
+        return $this->resolve_graphql_type('totara_program_program', $field, $program, $args);
     }
 
     /**
      * Create some users and various learning items.
-     * @return []
+     * @return array
      */
     private function create_faux_programs() {
         $prog_gen = $this->getDataGenerator()->get_plugin_generator('totara_program');

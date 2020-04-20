@@ -23,17 +23,14 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-use \totara_core\user_learning\item_helper;
-use \totara_core\webapi\resolver\query;
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
  * Tests the totara current learning query resolver
  */
 class totara_core_webapi_resolver_query_my_current_learning_testcase extends advanced_testcase {
 
-    private function get_execution_context(string $type = 'dev', ?string $operation = null) {
-        return \core\webapi\execution_context::create($type, $operation);
-    }
+    use webapi_phpunit_helper;
 
     /**
      * Create some users for testing.
@@ -157,12 +154,10 @@ class totara_core_webapi_resolver_query_my_current_learning_testcase extends adv
      * Test the results of the query when the current user is not logged in.
      */
     public function test_resolve_no_login() {
-        try {
-            query\my_current_learning::resolve([], $this->get_execution_context());
-            $this->fail('Expected a moodle_exception: cannot view current learnings');
-        } catch (\moodle_exception $ex) {
-            $this->assertSame('Course or activity not accessible. (You are not logged in)', $ex->getMessage());
-        }
+        $this->expectException(moodle_exception::class);
+        $this->expectExceptionMessage('Course or activity not accessible. (You are not logged in)');
+
+        $this->resolve_graphql_query('totara_core_my_current_learning', []);
     }
 
     /**
@@ -170,12 +165,9 @@ class totara_core_webapi_resolver_query_my_current_learning_testcase extends adv
      */
     public function test_resolve_guest_user() {
         $this->setGuestUser();
-        try {
-            $results = query\my_current_learning::resolve([], $this->get_execution_context());
-            $this->assertEmpty($results); // Guests shouldn't have any items.
-        } catch (\moodle_exception $ex) {
-            $this->fail($ex->getMessage());
-        }
+
+        $results = $this->resolve_graphql_query('totara_core_my_current_learning', []);
+        $this->assertEmpty($results); // Guests shouldn't have any items.
     }
 
     /**
@@ -183,12 +175,9 @@ class totara_core_webapi_resolver_query_my_current_learning_testcase extends adv
      */
     public function test_resolve_admin_user() {
         $this->setAdminUser();
-        try {
-            $results = query\my_current_learning::resolve([], $this->get_execution_context());
-            $this->assertEmpty($results);
-        } catch (\moodle_exception $ex) {
-            $this->fail($ex->getMessage());
-        }
+
+        $results = $this->resolve_graphql_query('totara_core_my_current_learning', []);
+        $this->assertEmpty($results);
     }
 
     /**
@@ -199,12 +188,8 @@ class totara_core_webapi_resolver_query_my_current_learning_testcase extends adv
         $user = array_pop($users);
         $this->setUser($user);
 
-        try {
-            $items = query\my_current_learning::resolve([], $this->get_execution_context());
-            $this->assertEmpty($items);
-        } catch (\moodle_exception $ex) {
-            $this->fail($ex->getMessage());
-        }
+        $items = $this->resolve_graphql_query('totara_core_my_current_learning', []);
+        $this->assertEmpty($items);
     }
 
     /**
@@ -216,39 +201,27 @@ class totara_core_webapi_resolver_query_my_current_learning_testcase extends adv
 
         // Check that user 0 has one learning item as expected.
         $this->setUser($users[0]);
-        try {
-            $items = query\my_current_learning::resolve([], $this->get_execution_context());
-            $this->assertCount(1, $items);
+        $items = $this->resolve_graphql_query('totara_core_my_current_learning', []);
+        $this->assertCount(1, $items);
 
-            // Do some checks on the item to make sure it's what we are expecting.
-            $item = array_pop($items);
-            $this->assertInstanceOf('\totara_core\user_learning\item', $item);
-            $this->assertEquals('core_course', $item->get_component());
-            $this->assertEquals($courses[0]->id, $item->id);
-            $this->assertEquals($courses[0]->fullname, $item->fullname);
-            $this->assertEquals($courses[0]->shortname, $item->shortname);
-            $this->assertEquals($courses[0]->summary, $item->description);
-        } catch (\moodle_exception $ex) {
-            $this->fail($ex->getMessage());
-        }
+        // Do some checks on the item to make sure it's what we are expecting.
+        $item = array_pop($items);
+        $this->assertInstanceOf('\totara_core\user_learning\item', $item);
+        $this->assertEquals('core_course', $item->get_component());
+        $this->assertEquals($courses[0]->id, $item->id);
+        $this->assertEquals($courses[0]->fullname, $item->fullname);
+        $this->assertEquals($courses[0]->shortname, $item->shortname);
+        $this->assertEquals($courses[0]->summary, $item->description);
 
         // Check that user 1 has two learning items as expected.
         $this->setUser($users[1]);
-        try {
-            $items = query\my_current_learning::resolve([], $this->get_execution_context());
-            $this->assertCount(2, $items);
-        } catch (\moodle_exception $ex) {
-            $this->fail($ex->getMessage());
-        }
+        $items = $this->resolve_graphql_query('totara_core_my_current_learning', []);
+        $this->assertCount(2, $items);
 
         // Check that user 2 has three learning items as expected.
         $this->setUser($users[2]);
-        try {
-            $items = query\my_current_learning::resolve([], $this->get_execution_context());
-            $this->assertCount(0, $items);
-        } catch (\moodle_exception $ex) {
-            $this->fail($ex->getMessage());
-        }
+        $items = $this->resolve_graphql_query('totara_core_my_current_learning', []);
+        $this->assertCount(0, $items);
     }
 
     /**
@@ -260,39 +233,27 @@ class totara_core_webapi_resolver_query_my_current_learning_testcase extends adv
 
         // Check that user 0 has one learning item as expected.
         $this->setUser($users[0]);
-        try {
-            $items = query\my_current_learning::resolve([], $this->get_execution_context());
-            $this->assertCount(1, $items);
+        $items = $this->resolve_graphql_query('totara_core_my_current_learning', []);
+        $this->assertCount(1, $items);
 
-            // Do some checks on the item to make sure it's what we are expecting.
-            $item = array_pop($items);
-            $this->assertInstanceOf('\totara_core\user_learning\item', $item);
-            $this->assertEquals('totara_program', $item->get_component());
-            $this->assertEquals($programs[0]->id, $item->id);
-            $this->assertEquals($programs[0]->fullname, $item->fullname);
-            $this->assertEquals($programs[0]->shortname, $item->shortname);
-            $this->assertEquals($programs[0]->summary, $item->description);
-        } catch (\moodle_exception $ex) {
-            $this->fail($ex->getMessage());
-        }
+        // Do some checks on the item to make sure it's what we are expecting.
+        $item = array_pop($items);
+        $this->assertInstanceOf('\totara_core\user_learning\item', $item);
+        $this->assertEquals('totara_program', $item->get_component());
+        $this->assertEquals($programs[0]->id, $item->id);
+        $this->assertEquals($programs[0]->fullname, $item->fullname);
+        $this->assertEquals($programs[0]->shortname, $item->shortname);
+        $this->assertEquals($programs[0]->summary, $item->description);
 
         // Check that user 1 has two learning items as expected.
         $this->setUser($users[1]);
-        try {
-            $items = query\my_current_learning::resolve([], $this->get_execution_context());
-            $this->assertCount(2, $items);
-        } catch (\moodle_exception $ex) {
-            $this->fail($ex->getMessage());
-        }
+        $items = $this->resolve_graphql_query('totara_core_my_current_learning', []);
+        $this->assertCount(2, $items);
 
         // Check that user 2 has three learning items as expected.
         $this->setUser($users[2]);
-        try {
-            $items = query\my_current_learning::resolve([], $this->get_execution_context());
-            $this->assertCount(0, $items);
-        } catch (\moodle_exception $ex) {
-            $this->fail($ex->getMessage());
-        }
+        $items = $this->resolve_graphql_query('totara_core_my_current_learning', []);
+        $this->assertCount(0, $items);
     }
 
     /**
@@ -304,39 +265,27 @@ class totara_core_webapi_resolver_query_my_current_learning_testcase extends adv
 
         // Check that user 0 has one learning item as expected.
         $this->setUser($users[0]);
-        try {
-            $items = query\my_current_learning::resolve([], $this->get_execution_context());
-            $this->assertCount(1, $items);
+        $items = $this->resolve_graphql_query('totara_core_my_current_learning', []);
+        $this->assertCount(1, $items);
 
-            // Do some checks on the item to make sure it's what we are expecting.
-            $item = array_pop($items);
-            $this->assertInstanceOf('\totara_core\user_learning\item', $item);
-            $this->assertEquals('totara_certification', $item->get_component());
-            $this->assertEquals($certifications[0]->id, $item->id);
-            $this->assertEquals($certifications[0]->fullname, $item->fullname);
-            $this->assertEquals($certifications[0]->shortname, $item->shortname);
-            $this->assertEquals($certifications[0]->summary, $item->description);
-        } catch (\moodle_exception $ex) {
-            $this->fail($ex->getMessage());
-        }
+        // Do some checks on the item to make sure it's what we are expecting.
+        $item = array_pop($items);
+        $this->assertInstanceOf('\totara_core\user_learning\item', $item);
+        $this->assertEquals('totara_certification', $item->get_component());
+        $this->assertEquals($certifications[0]->id, $item->id);
+        $this->assertEquals($certifications[0]->fullname, $item->fullname);
+        $this->assertEquals($certifications[0]->shortname, $item->shortname);
+        $this->assertEquals($certifications[0]->summary, $item->description);
 
         // Check that user 1 has two learning items as expected.
         $this->setUser($users[1]);
-        try {
-            $items = query\my_current_learning::resolve([], $this->get_execution_context());
-            $this->assertCount(2, $items);
-        } catch (\moodle_exception $ex) {
-            $this->fail($ex->getMessage());
-        }
+        $items = $this->resolve_graphql_query('totara_core_my_current_learning', []);
+        $this->assertCount(2, $items);
 
         // Check that user 2 has three learning items as expected.
         $this->setUser($users[2]);
-        try {
-            $items = query\my_current_learning::resolve([], $this->get_execution_context());
-            $this->assertCount(0, $items);
-        } catch (\moodle_exception $ex) {
-            $this->fail($ex->getMessage());
-        }
+        $items = $this->resolve_graphql_query('totara_core_my_current_learning', []);
+        $this->assertCount(0, $items);
     }
 
     /**
@@ -348,35 +297,23 @@ class totara_core_webapi_resolver_query_my_current_learning_testcase extends adv
 
         // Check that user 0 has one learning item as expected.
         $this->setUser($users[0]);
-        try {
-            $items = query\my_current_learning::resolve([], $this->get_execution_context());
-            $this->assertCount(3, $items);
+        $items = $this->resolve_graphql_query('totara_core_my_current_learning', []);
+        $this->assertCount(3, $items);
 
-            // Just a quick check that they're all learning items.
-            foreach ($items as $item) {
-                $this->assertInstanceOf('\totara_core\user_learning\item', $item);
-            }
-        } catch (\moodle_exception $ex) {
-            $this->fail($ex->getMessage());
+        // Just a quick check that they're all learning items.
+        foreach ($items as $item) {
+            $this->assertInstanceOf('\totara_core\user_learning\item', $item);
         }
 
         // Check that user 1 has two learning items as expected.
         $this->setUser($users[1]);
-        try {
-            $items = query\my_current_learning::resolve([], $this->get_execution_context());
-            $this->assertCount(6, $items);
-        } catch (\moodle_exception $ex) {
-            $this->fail($ex->getMessage());
-        }
+        $items = $this->resolve_graphql_query('totara_core_my_current_learning', []);
+        $this->assertCount(6, $items);
 
         // Check that user 2 has three learning items as expected.
         $this->setUser($users[2]);
-        try {
-            $items = query\my_current_learning::resolve([], $this->get_execution_context());
-            $this->assertCount(0, $items);
-        } catch (\moodle_exception $ex) {
-            $this->fail($ex->getMessage());
-        }
+        $items = $this->resolve_graphql_query('totara_core_my_current_learning', []);
+        $this->assertCount(0, $items);
     }
 
     /**
@@ -387,9 +324,7 @@ class totara_core_webapi_resolver_query_my_current_learning_testcase extends adv
         $items = $this->create_faux_learning_items($users);
 
         $this->setUser($users[0]);
-        $result = \totara_webapi\graphql::execute_operation(
-            \core\webapi\execution_context::create('ajax', 'totara_core_my_current_learning'), []
-        );
+        $result = $this->execute_graphql_operation('totara_core_my_current_learning', []);
         $data = $result->toArray()['data'];
         $this->assertCount(3, $data['totara_core_my_current_learning']);
 

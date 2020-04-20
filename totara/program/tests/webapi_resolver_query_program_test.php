@@ -23,16 +23,14 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-use \totara_program\webapi\resolver\query;
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
  * Tests the totara job assignment query resolver
  */
 class totara_program_webapi_resolver_query_program_testcase extends advanced_testcase {
 
-    private function get_execution_context(string $type = 'dev', ?string $operation = null) {
-        return \core\webapi\execution_context::create($type, $operation);
-    }
+    use webapi_phpunit_helper;
 
     /**
      *
@@ -71,13 +69,10 @@ class totara_program_webapi_resolver_query_program_testcase extends advanced_tes
     public function test_resolve_no_login() {
         list($users, $programs) = $this->create_faux_programs();
 
-        try {
-            query\program::resolve(['programid' => $programs[0]->id], $this->get_execution_context());
-            $this->fail('Expected a moodle_exception: cannot view program');
-        } catch (\moodle_exception $ex) {
-            // Note: I know this is a program, but this is the require_login generic error.
-            $this->assertSame('Course or activity not accessible. (You are not logged in)', $ex->getMessage());
-        }
+        $this->expectException(moodle_exception::class);
+        $this->expectExceptionMessage('Course or activity not accessible. (You are not logged in)');
+
+        $this->resolve_graphql_query('totara_program_program', ['programid' => $programs[0]->id]);
     }
 
     /**
@@ -88,19 +83,16 @@ class totara_program_webapi_resolver_query_program_testcase extends advanced_tes
         $this->setGuestUser();
 
         // Guests can view programs (shouldn't have completion data though so...)
-        $result = query\program::resolve(['programid' => $programs[0]->id], $this->get_execution_context());
+        $result = $this->resolve_graphql_query('totara_program_program', ['programid' => $programs[0]->id]);
         $this->assertEquals($programs[0]->id, $result->id);
         $this->assertEquals($programs[0]->fullname, $result->fullname);
         $this->assertEquals($programs[0]->shortname, $result->shortname);
 
         // Guests should not be able to see hidden programs however.
-        try {
-            $result = query\program::resolve(['programid' => $programs[2]->id], $this->get_execution_context());
-            $this->fail('Expected a moodle_exception: cannot view program');
-        } catch (\moodle_exception $ex) {
-            // Note: I know this is a program, but this is the require_login generic error.
-            $this->assertSame('Coding error detected, it must be fixed by a programmer: Current user can not access this program.', $ex->getMessage());
-        }
+        $this->expectException(moodle_exception::class);
+        $this->expectExceptionMessage('Current user can not access this program.');
+
+        $this->resolve_graphql_query('totara_program_program', ['programid' => $programs[2]->id]);
     }
 
     /**
@@ -111,13 +103,13 @@ class totara_program_webapi_resolver_query_program_testcase extends advanced_tes
         $this->setAdminUser();
 
         // Admins should be able to see programs, again without completion data.
-        $result = query\program::resolve(['programid' => $programs[0]->id], $this->get_execution_context());
+        $result = $this->resolve_graphql_query('totara_program_program', ['programid' => $programs[0]->id]);
         $this->assertEquals($programs[0]->id, $result->id);
         $this->assertEquals($programs[0]->fullname, $result->fullname);
         $this->assertEquals($programs[0]->shortname, $result->shortname);
 
         // They should also be able to see hidden programs.
-        $result = query\program::resolve(['programid' => $programs[2]->id], $this->get_execution_context());
+        $result = $this->resolve_graphql_query('totara_program_program', ['programid' => $programs[2]->id]);
         $this->assertEquals($programs[2]->id, $result->id);
         $this->assertEquals($programs[2]->fullname, $result->fullname);
         $this->assertEquals($programs[2]->shortname, $result->shortname);
@@ -133,21 +125,18 @@ class totara_program_webapi_resolver_query_program_testcase extends advanced_tes
         $this->setUser($users[0]);
 
         // User should be able to see program 1, with full assignment/completion data.
-        $result = query\program::resolve(['programid' => $programs[0]->id], $this->get_execution_context());
+        $result = $this->resolve_graphql_query('totara_program_program', ['programid' => $programs[0]->id]);
         $this->assertEquals($programs[0]->id, $result->id);
 
         // User should be able to see program 2, with out any assignment/completion data.
-        $result = query\program::resolve(['programid' => $programs[0]->id], $this->get_execution_context());
-        $this->assertEquals($programs[0]->id, $result->id);
+        $result = $this->resolve_graphql_query('totara_program_program', ['programid' => $programs[1]->id]);
+        $this->assertEquals($programs[1]->id, $result->id);
 
         // User should not be able to see program 3, its hidden.
-        try {
-            $result = query\program::resolve(['programid' => $programs[2]->id], $this->get_execution_context());
-            $this->fail('Expected a moodle_exception: cannot view program');
-        } catch (\moodle_exception $ex) {
-            // Note: I know this is a program, but this is the require_login generic error.
-            $this->assertSame('Coding error detected, it must be fixed by a programmer: Current user can not access this program.', $ex->getMessage());
-        }
+        $this->expectException(moodle_exception::class);
+        $this->expectExceptionMessage('Current user can not access this program.');
+
+        $this->resolve_graphql_query('totara_program_program', ['programid' => $programs[2]->id]);
     }
 
     /**
@@ -157,10 +146,7 @@ class totara_program_webapi_resolver_query_program_testcase extends advanced_tes
         list($users, $programs) = $this->create_faux_programs();
 
         $this->setUser($users[0]);
-        $result = \totara_webapi\graphql::execute_operation(
-            \core\webapi\execution_context::create('ajax', 'totara_program_program'),
-            ['programid' => $programs[0]->id]
-        );
+        $result = $this->execute_graphql_operation('totara_program_program', ['programid' => $programs[0]->id]);
         $data = $result->toArray()['data'];
 
         $coursesets = $programs[0]->get_content()->get_course_sets();

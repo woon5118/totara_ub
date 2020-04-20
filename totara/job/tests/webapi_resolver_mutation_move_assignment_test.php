@@ -27,17 +27,16 @@ global $CFG;
 
 require_once($CFG->dirroot . '/totara/job/lib.php');
 
-use \totara_job\job_assignment;
-use \totara_job\webapi\resolver\mutation;
+use totara_job\job_assignment;
+use totara_job\webapi\resolver\mutation;
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
  * Tests the totara job move assignments mutation
  */
 class totara_job_webapi_resolver_mutation_move_assignments_testcase extends advanced_testcase {
 
-    private function get_execution_context(string $type = 'dev', ?string $operation = null) {
-        return \core\webapi\execution_context::create($type, $operation);
-    }
+    use webapi_phpunit_helper;
 
     private function create_job_assignment($data) {
         $data = (array)$data;
@@ -55,12 +54,14 @@ class totara_job_webapi_resolver_mutation_move_assignments_testcase extends adva
     public function test_resolve_nologgedin() {
         $job1 = $this->create_job_assignment([]);
         $job2 = $this->create_job_assignment(['userid' => $job1->userid, 'idnumber' => 'j2']);
-        try {
-            mutation\move_assignment::resolve(['userid' => $job1->userid, 'assignmentid' => $job2->id, 'newposition' => 0], $this->get_execution_context());
-            self::fail('Expected a moodle_exception: cannot view job assignments');
-        } catch (\moodle_exception $ex) {
-            self::assertSame('Course or activity not accessible. (You are not logged in)', $ex->getMessage());
-        }
+
+        $this->expectException(moodle_exception::class);
+        $this->expectExceptionMessage('Course or activity not accessible. (You are not logged in)');
+
+        $this->resolve_grapqhl_mutation(
+            'totara_job_move_assignment',
+            ['userid' => $job1->userid, 'assignmentid' => $job2->id, 'newposition' => 0]
+        );
     }
 
     public function test_resolve_guestuser() {
@@ -68,12 +69,14 @@ class totara_job_webapi_resolver_mutation_move_assignments_testcase extends adva
 
         $job1 = $this->create_job_assignment([]);
         $job2 = $this->create_job_assignment(['userid' => $job1->userid, 'idnumber' => 'j2']);
-        try {
-            mutation\move_assignment::resolve(['userid' => $job1->userid, 'assignmentid' => $job2->id, 'newposition' => 0], $this->get_execution_context());
-            self::fail('Expected a moodle_exception: cannot view job assignments');
-        } catch (\coding_exception $ex) {
-            self::assertContains('No permission to sort job assignments', $ex->getMessage());
-        }
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('No permission to sort job assignments');
+
+        $this->resolve_grapqhl_mutation(
+            'totara_job_move_assignment',
+            ['userid' => $job1->userid, 'assignmentid' => $job2->id, 'newposition' => 0]
+        );
     }
 
     public function test_resolve_normaluser() {
@@ -82,12 +85,14 @@ class totara_job_webapi_resolver_mutation_move_assignments_testcase extends adva
 
         $job1 = $this->create_job_assignment([]);
         $job2 = $this->create_job_assignment(['userid' => $job1->userid, 'idnumber' => 'j2']);
-        try {
-            mutation\move_assignment::resolve(['userid' => $job1->userid, 'assignmentid' => $job2->id, 'newposition' => 0], $this->get_execution_context());
-            self::fail('Expected a moodle_exception: cannot view job assignments');
-        } catch (\coding_exception $ex) {
-            self::assertContains('No permission to sort job assignments', $ex->getMessage());
-        }
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('No permission to sort job assignments');
+
+        $this->resolve_grapqhl_mutation(
+            'totara_job_move_assignment',
+            ['userid' => $job1->userid, 'assignmentid' => $job2->id, 'newposition' => 0]
+        );
     }
 
     public function test_resolve_adminuser() {
@@ -101,18 +106,30 @@ class totara_job_webapi_resolver_mutation_move_assignments_testcase extends adva
         // Confirm initial support
         self::assertEquals([$job1->id, $job2->id], array_keys($DB->get_records('job_assignment', ['userid' => $job1->userid], 'sortorder ASC', 'id')));
         // Sort: new order
-        mutation\move_assignment::resolve(['userid' => $job1->userid, 'assignmentid' => $job2->id, 'newposition' => 0], $this->get_execution_context());
+        $this->resolve_grapqhl_mutation(
+            'totara_job_move_assignment',
+            ['userid' => $job1->userid, 'assignmentid' => $job2->id, 'newposition' => 0]
+        );
         self::assertEquals([$job2->id, $job1->id], array_keys($DB->get_records('job_assignment', ['userid' => $job1->userid], 'sortorder ASC', 'id')));
         // Sort: old order.
-        mutation\move_assignment::resolve(['userid' => $job1->userid, 'assignmentid' => $job2->id, 'newposition' => 1], $this->get_execution_context());
+        $this->resolve_grapqhl_mutation(
+            'totara_job_move_assignment',
+            ['userid' => $job1->userid, 'assignmentid' => $job2->id, 'newposition' => 1]
+        );
         self::assertEquals([$job1->id, $job2->id], array_keys($DB->get_records('job_assignment', ['userid' => $job1->userid], 'sortorder ASC', 'id')));
         // Sort: no change.
-        mutation\move_assignment::resolve(['userid' => $job1->userid, 'assignmentid' => $job1->id, 'newposition' => 0], $this->get_execution_context());
+        $this->resolve_grapqhl_mutation(
+            'totara_job_move_assignment',
+            ['userid' => $job1->userid, 'assignmentid' => $job1->id, 'newposition' => 0]
+        );
         self::assertEquals([$job1->id, $job2->id], array_keys($DB->get_records('job_assignment', ['userid' => $job1->userid], 'sortorder ASC', 'id')));
 
         // No user id
         try {
-            mutation\move_assignment::resolve(['assignmentid' => $job1->id, 'newposition' => 1], $this->get_execution_context());
+            $this->resolve_grapqhl_mutation(
+                'totara_job_move_assignment',
+                ['assignmentid' => $job1->id, 'newposition' => 1]
+            );
             $this->fail('Exception expected.');
         } catch (\moodle_exception $ex) {
             self::assertContains('A required parameter (userid) was missing (assignmentid,newposition)', $ex->getMessage());
@@ -120,7 +137,10 @@ class totara_job_webapi_resolver_mutation_move_assignments_testcase extends adva
 
         // Incorrect Job ids
         try {
-            mutation\move_assignment::resolve(['userid' => $job1->userid, 'assignmentid' => 16, 'newposition' => 1], $this->get_execution_context());
+            $this->resolve_grapqhl_mutation(
+                'totara_job_move_assignment',
+                ['userid' => $job1->userid, 'assignmentid' => 16, 'newposition' => 1]
+            );
             $this->fail('Exception expected.');
         } catch (\coding_exception $ex) {
             self::assertContains('Invalid job.', $ex->getMessage());
@@ -128,7 +148,10 @@ class totara_job_webapi_resolver_mutation_move_assignments_testcase extends adva
 
         // Position to low
         try {
-            mutation\move_assignment::resolve(['userid' => $job1->userid, 'assignmentid'  => $job1->id, 'newposition' => -1], $this->get_execution_context());
+            $this->resolve_grapqhl_mutation(
+                'totara_job_move_assignment',
+                ['userid' => $job1->userid, 'assignmentid' => $job1->id, 'newposition' => -1]
+            );
             $this->fail('Exception expected.');
         } catch (\coding_exception $ex) {
             self::assertContains('Invalid job position.', $ex->getMessage());
@@ -136,7 +159,10 @@ class totara_job_webapi_resolver_mutation_move_assignments_testcase extends adva
 
         // Position to high
         try {
-            mutation\move_assignment::resolve(['userid' => $job1->userid, 'assignmentid'  => $job1->id, 'newposition' => 100], $this->get_execution_context());
+            $this->resolve_grapqhl_mutation(
+                'totara_job_move_assignment',
+                ['userid' => $job1->userid, 'assignmentid' => $job1->id, 'newposition' => 100]
+            );
             $this->fail('Exception expected.');
         } catch (\coding_exception $ex) {
             self::assertContains('Invalid job position.', $ex->getMessage());
@@ -145,7 +171,10 @@ class totara_job_webapi_resolver_mutation_move_assignments_testcase extends adva
         // Test job assignment belonging to deleted user.
         delete_user($DB->get_record('user', ['id' => $job1->userid]));
         try {
-            mutation\move_assignment::resolve(['userid' => $job1->userid, 'assignmentid' => $job1->id, 'newposition' => 0], $this->get_execution_context());
+            $this->resolve_grapqhl_mutation(
+                'totara_job_move_assignment',
+                ['userid' => $job1->userid, 'assignmentid' => $job1->id, 'newposition' => 0]
+            );
             self::fail('Expected a moodle_exception: cannot view job assignments');
         } catch (\dml_exception $ex) {
             self::assertContains('Can not find data record in database', $ex->getMessage());
@@ -168,8 +197,8 @@ class totara_job_webapi_resolver_mutation_move_assignments_testcase extends adva
         $map = function ($obj) {
             return (array)$obj;
         };
-        $result = \totara_webapi\graphql::execute_operation(
-            \core\webapi\execution_context::create('ajax', 'totara_job_move_assignment'),
+        $result = $this->execute_graphql_operation(
+            'totara_job_move_assignment',
             ['userid' => $user->id, 'assignmentid' => $job3->id, 'newposition' => 0]
         );
         self::assertSame(
@@ -178,8 +207,8 @@ class totara_job_webapi_resolver_mutation_move_assignments_testcase extends adva
         );
         self::assertEquals([$job3->id, $job1->id, $job2->id], array_keys($DB->get_records('job_assignment', ['userid' => $job1->userid], 'sortorder ASC', 'id')));
 
-        $result = \totara_webapi\graphql::execute_operation(
-            \core\webapi\execution_context::create('ajax', 'totara_job_move_assignment'),
+        $result = $this->execute_graphql_operation(
+            'totara_job_move_assignment',
             ['userid' => $user->id, 'assignmentid' => $job2->id, 'newposition' => 0]
         );
         self::assertSame(
@@ -188,8 +217,8 @@ class totara_job_webapi_resolver_mutation_move_assignments_testcase extends adva
         );
         self::assertEquals([$job2->id, $job3->id, $job1->id], array_keys($DB->get_records('job_assignment', ['userid' => $job1->userid], 'sortorder ASC', 'id')));
 
-        $result = \totara_webapi\graphql::execute_operation(
-            \core\webapi\execution_context::create('ajax', 'totara_job_move_assignment'),
+        $result = $this->execute_graphql_operation(
+            'totara_job_move_assignment',
             ['userid' => $user->id, 'assignmentid' => $job2->id, 'newposition' => 2]
         );
         self::assertSame(

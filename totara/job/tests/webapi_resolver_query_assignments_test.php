@@ -29,18 +29,17 @@ require_once($CFG->dirroot . '/totara/job/lib.php');
 
 use core\webapi\execution_context;
 use GraphQL\Error\Debug;
-use \totara_job\job_assignment;
-use \totara_job\webapi\resolver\query;
+use totara_job\job_assignment;
+use totara_job\webapi\resolver\query;
 use totara_webapi\graphql;
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
  * Tests the totara job assignments query resolver
  */
 class totara_job_webapi_resolver_query_assignments_testcase extends advanced_testcase {
 
-    private function get_execution_context(string $type = 'dev', ?string $operation = null) {
-        return execution_context::create($type, $operation);
-    }
+    use webapi_phpunit_helper;
 
     private function create_job_assignment($data) {
         $data = (array)$data;
@@ -56,24 +55,22 @@ class totara_job_webapi_resolver_query_assignments_testcase extends advanced_tes
     }
 
     public function test_resolve_nologgedin() {
-        $job =  $this->create_job_assignment([]);
-        try {
-            query\assignments::resolve(['userid' => $job->userid], $this->get_execution_context());
-            self::fail('Expected a moodle_exception: cannot view job assignments');
-        } catch (\moodle_exception $ex) {
-            self::assertSame('Course or activity not accessible. (You are not logged in)', $ex->getMessage());
-        }
+        $job = $this->create_job_assignment([]);
+
+        $this->expectException(moodle_exception::class);
+        $this->expectExceptionMessage('Course or activity not accessible. (You are not logged in)');
+
+        $this->resolve_graphql_query('totara_job_assignments', ['userid' => $job->userid]);
     }
 
     public function test_resolve_guestuser() {
         $this->setGuestUser();
-        $job =  $this->create_job_assignment([]);
-        try {
-            query\assignments::resolve(['userid' => $job->userid], $this->get_execution_context());
-            self::fail('Expected a moodle_exception: cannot view job assignments');
-        } catch (\moodle_exception $ex) {
-            self::assertSame('Sorry, but you do not currently have permissions to do that (view job assignments)', $ex->getMessage());
-        }
+        $job = $this->create_job_assignment([]);
+
+        $this->expectException(moodle_exception::class);
+        $this->expectExceptionMessage('Sorry, but you do not currently have permissions to do that (view job assignments)');
+
+        $this->resolve_graphql_query('totara_job_assignments', ['userid' => $job->userid]);
     }
 
     public function test_resolve_adminuser() {
@@ -82,16 +79,16 @@ class totara_job_webapi_resolver_query_assignments_testcase extends advanced_tes
         $this->setAdminUser();
 
         $job1 =  $this->create_job_assignment([]);
-        $result = query\assignments::resolve(['userid' => $job1->userid, 'idnumber' => 'job_1'], $this->get_execution_context());
+        $result = $this->resolve_graphql_query('totara_job_assignments', ['userid' => $job1->userid, 'idnumber' => 'job_1']);
         self::assertEquals([$job1->sortorder => $job1], $result);
 
         $job2 =  $this->create_job_assignment(['userid' => $job1->userid, 'idnumber' => 'job_2']);
-        $result = query\assignments::resolve(['userid' => $job1->userid], $this->get_execution_context());
+        $result = $this->resolve_graphql_query('totara_job_assignments', ['userid' => $job1->userid]);
         self::assertEquals([$job1->sortorder => $job1, $job2->sortorder => $job2], $result);
 
         // Test no user provided.
         try {
-            query\assignments::resolve([], $this->get_execution_context());
+            $this->resolve_graphql_query('totara_job_assignments', []);
             self::fail('Expected a moodle_exception: no user argument provided');
         } catch (\moodle_exception $ex) {
             self::assertContains('A required parameter (userid) was missing', $ex->getMessage());
@@ -99,13 +96,13 @@ class totara_job_webapi_resolver_query_assignments_testcase extends advanced_tes
 
         // Test invalid user id.
         try {
-            query\assignments::resolve(['userid' => 0], $this->get_execution_context());
+            $this->resolve_graphql_query('totara_job_assignments', ['userid' => 0]);
             self::fail('Expected a moodle_exception: cannot view job assignments');
         } catch (\dml_exception $ex) {
             self::assertContains('Can not find data record in database.', $ex->getMessage());
         }
         try {
-            query\assignments::resolve(['userid' => '-2'], $this->get_execution_context());
+            $this->resolve_graphql_query('totara_job_assignments', ['userid' => '-2']);
             self::fail('Expected a moodle_exception: cannot view job assignments');
         } catch (\dml_exception $ex) {
             self::assertContains('Can not find data record in database.', $ex->getMessage());
@@ -114,7 +111,7 @@ class totara_job_webapi_resolver_query_assignments_testcase extends advanced_tes
         // Test job assignment belonging to deleted user.
         delete_user($DB->get_record('user', ['id' => $job1->userid]));
         try {
-            query\assignments::resolve(['userid' => $job1->userid], $this->get_execution_context());
+            $this->resolve_graphql_query('totara_job_assignments', ['userid' => $job1->userid]);
             self::fail('Expected a moodle_exception: cannot view job assignments');
         } catch (\dml_exception $ex) {
             self::assertContains('Can not find data record in database.', $ex->getMessage());
@@ -168,7 +165,7 @@ class totara_job_webapi_resolver_query_assignments_testcase extends advanced_tes
         self::assertSame(
             $expected,
             array_map(
-                function($obj) {
+                function ($obj) {
                     return (array)$obj;
                 },
                 $result->toArray(Debug::INCLUDE_DEBUG_MESSAGE)
@@ -183,7 +180,7 @@ class totara_job_webapi_resolver_query_assignments_testcase extends advanced_tes
         self::assertSame(
             $expected,
             array_map(
-                function($obj) {
+                function ($obj) {
                     return (array)$obj;
                 },
                 $result->toArray(Debug::INCLUDE_DEBUG_MESSAGE)
@@ -191,10 +188,7 @@ class totara_job_webapi_resolver_query_assignments_testcase extends advanced_tes
         );
 
         // Invalid userid
-        $result = graphql::execute_operation(
-            execution_context::create('ajax', 'totara_job_assignments'),
-            ['userid' => 'apples']
-        );
+        $result = $this->execute_graphql_operation('totara_job_assignments', ['userid' => 'apples']);
 
         $this->assertEquals(
             'Variable "$userid" got invalid value "apples"; Expected type core_id; Invalid parameter value detected',
@@ -202,10 +196,7 @@ class totara_job_webapi_resolver_query_assignments_testcase extends advanced_tes
         );
 
         // Missing userid
-        $result = graphql::execute_operation(
-            execution_context::create('ajax', 'totara_job_assignments'),
-            []
-        );
+        $result = $this->execute_graphql_operation('totara_job_assignments', []);
 
         $this->assertEquals(
             'Variable "$userid" of required type "core_id!" was not provided.',

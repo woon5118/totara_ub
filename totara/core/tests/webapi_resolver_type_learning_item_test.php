@@ -23,26 +23,19 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-use \totara_core\user_learning\item as learning_item;
-use \totara_core\user_learning\item_helper;
-use \totara_core\webapi\resolver\type;
 use core\format;
+use totara_core\user_learning\item_helper;
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
  * Tests the totara core learning item type resolver.
  */
 class totara_core_webapi_resolver_type_learning_item_testcase extends advanced_testcase {
-    private function resolve($field, $learning_item, array $args = []) {
-        return \totara_core\webapi\resolver\type\learning_item::resolve(
-            $field,
-            $learning_item,
-            $args,
-            $this->get_execution_context()
-        );
-    }
 
-    private function get_execution_context(string $type = 'dev', ?string $operation = null) {
-        return \core\webapi\execution_context::create($type, $operation);
+    use webapi_phpunit_helper;
+
+    private function resolve($field, $learning_item, array $args = []) {
+        return $this->resolve_graphql_type('totara_core_learning_item', $field, $learning_item, $args);
     }
 
     /**

@@ -27,24 +27,18 @@ global $CFG;
 
 require_once($CFG->dirroot . '/totara/job/lib.php');
 
-use \totara_job\job_assignment;
+use totara_job\job_assignment;
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
  * Tests the totara job assignment type resolver
  */
 class totara_job_webapi_resolver_type_assignment_testcase extends advanced_testcase {
 
-    private function resolve($field, $job, array $args = []) {
-        return \totara_job\webapi\resolver\type\assignment::resolve(
-            $field,
-            $job,
-            $args,
-            $this->get_execution_context()
-        );
-    }
+    use webapi_phpunit_helper;
 
-    private function get_execution_context(string $type = 'dev', ?string $operation = null) {
-        return \core\webapi\execution_context::create($type, $operation);
+    private function resolve($field, $job, array $args = []) {
+        return $this->resolve_graphql_type('totara_job_assignment', $field, $job, $args);
     }
 
     private static function create_fake_job_assignment($data) {

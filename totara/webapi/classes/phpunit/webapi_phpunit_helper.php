@@ -39,6 +39,7 @@ trait webapi_phpunit_helper {
      * @param string $operation_name name of the operation, not to confuse with the query name
      * @param array $variables
      * @param string $type optional, defaults to AJAX
+     * @return ExecutionResult
      */
     protected function execute_graphql_operation(
         string $operation_name,
@@ -101,6 +102,35 @@ trait webapi_phpunit_helper {
 
         $resolver = new default_resolver();
         return $resolver(null, $variables, $execution_context, $resolve_info_mock);
+    }
+
+    /**
+     * Resolve a type using default resolver to not add too much overhead by using the whole schema
+     *
+     * @param string $type_name
+     * @param string $field_name
+     * @param $source
+     * @param array $variables
+     * @return mixed|null
+     */
+    protected function resolve_graphql_type(string $type_name, string $field_name, $source, array $variables = []) {
+        $object_type_mock = $this->getMockBuilder(ObjectType::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $object_type_mock->name = $type_name;
+
+        $resolve_info_mock = $this->getMockBuilder(ResolveInfo::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $resolve_info_mock->parentType = $object_type_mock;
+        $resolve_info_mock->fieldName = $field_name;
+
+        $execution_context = execution_context::create(graphql::TYPE_AJAX, null);
+
+        $resolver = new default_resolver();
+        return $resolver($source, $variables, $execution_context, $resolve_info_mock);
     }
 
 }

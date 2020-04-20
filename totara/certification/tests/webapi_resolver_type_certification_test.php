@@ -27,24 +27,18 @@ global $CFG;
 
 require_once($CFG->dirroot . '/totara/job/lib.php');
 
-use \totara_core\webapi\resolver\type;
 use core\format;
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
  * Tests the totara core certification type resolver.
  */
 class totara_certification_webapi_resolver_type_certification_testcase extends advanced_testcase {
-    private function resolve($field, $certification, array $args = []) {
-        return \totara_certification\webapi\resolver\type\certification::resolve(
-            $field,
-            $certification,
-            $args,
-            $this->get_execution_context()
-        );
-    }
 
-    private function get_execution_context(string $type = 'dev', ?string $operation = null) {
-        return \core\webapi\execution_context::create($type, $operation);
+    use webapi_phpunit_helper;
+
+    private function resolve($field, $certification, array $args = []) {
+        return $this->resolve_graphql_type('totara_certification_certification', $field, $certification, $args);
     }
 
     /**

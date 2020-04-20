@@ -27,58 +27,46 @@ global $CFG;
 
 require_once($CFG->dirroot . '/totara/job/lib.php');
 
-use \totara_job\job_assignment;
-use \totara_job\webapi\resolver\mutation;
+use totara_job\job_assignment;
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
  * Tests the totara job create assignment mutation
  */
 class totara_job_webapi_resolver_mutation_create_assignment_testcase extends advanced_testcase {
 
-    private function get_execution_context(string $type = 'dev', ?string $operation = null) {
-        return \core\webapi\execution_context::create($type, $operation);
-    }
+    use webapi_phpunit_helper;
 
     public function test_resolve_nologgedin() {
-        $this->resetAfterTest();
         $user = $this->getDataGenerator()->create_user();
 
-        try {
-            mutation\create_assignment::resolve(['userid' => $user->id, 'idnumber' => 'j1'], $this->get_execution_context());
-            self::fail('Expected a moodle_exception: cannot view job assignments');
-        } catch (\moodle_exception $ex) {
-            self::assertSame('Course or activity not accessible. (You are not logged in)', $ex->getMessage());
-        }
+        $this->expectException(moodle_exception::class);
+        $this->expectExceptionMessage('Course or activity not accessible. (You are not logged in)');
+
+        $this->resolve_grapqhl_mutation('totara_job_create_assignment', ['userid' => $user->id, 'idnumber' => 'j1']);
     }
 
     public function test_resolve_guestuser() {
-        $this->resetAfterTest();
         $this->setGuestUser();
         $user = $this->getDataGenerator()->create_user();
 
-        try {
-            mutation\create_assignment::resolve(['userid' => $user->id, 'idnumber' => 'j1'], $this->get_execution_context());
-            self::fail('Expected a moodle_exception: cannot view job assignments');
-        } catch (\coding_exception $ex) {
-            self::assertContains('No permission to create job assignments.', $ex->getMessage());
-        }
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('No permission to create job assignments.');
+
+        $this->resolve_grapqhl_mutation('totara_job_create_assignment', ['userid' => $user->id, 'idnumber' => 'j1']);
     }
 
     public function test_resolve_normaluser() {
-        $this->resetAfterTest();
         $user = $this->getDataGenerator()->create_user();
         $this->setUser($user);
 
-        try {
-            mutation\create_assignment::resolve(['userid' => $user->id, 'idnumber' => 'j1'], $this->get_execution_context());
-            self::fail('Expected a moodle_exception: cannot view job assignments');
-        } catch (\coding_exception $ex) {
-            self::assertContains('No permission to create job assignments.', $ex->getMessage());
-        }
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('No permission to create job assignments.');
+
+        $this->resolve_grapqhl_mutation('totara_job_create_assignment', ['userid' => $user->id, 'idnumber' => 'j1']);
     }
 
     public function test_resolve_adminuser() {
-        $this->resetAfterTest();
         $this->setAdminUser();
         $user = $this->getDataGenerator()->create_user();
         $manager = $this->getDataGenerator()->create_user();
@@ -97,7 +85,8 @@ class totara_job_webapi_resolver_mutation_create_assignment_testcase extends adv
         self::assertCount(0, job_assignment::get_all($user->id));
 
         // Create a basic job.
-        $jaid = mutation\create_assignment::resolve(['userid' => $user->id, 'idnumber' => 'j1'], $this->get_execution_context());
+        $jaid = $this->resolve_grapqhl_mutation('totara_job_create_assignment', ['userid' => $user->id, 'idnumber' => 'j1']);
+
         self::assertIsNumeric($jaid);
         self::assertCount(1, job_assignment::get_all($user->id));
         $job = job_assignment::get_with_id($jaid);
@@ -106,22 +95,25 @@ class totara_job_webapi_resolver_mutation_create_assignment_testcase extends adv
         self::assertSame($job->idnumber, 'j1');
 
         $now = time();
-        $managerjaid = mutation\create_assignment::resolve(['userid' => $manager->id, 'idnumber' => 'jm1'], $this->get_execution_context());
+        $managerjaid = $this->resolve_grapqhl_mutation('totara_job_create_assignment', ['userid' => $manager->id, 'idnumber' => 'jm1']);
 
         // Create a job with lots of detail.
-        $ja2id = mutation\create_assignment::resolve([
-            'userid' => $user->id,
-            'idnumber' => 'j2',
-            'fullname' => 'Test & test',
-            'shortname' => 'Te&Te',
-            'description' => '<p>This is a <strong>complex</strong> test</p>',
-            'positionid' => $position1->id,
-            'organisationid' => $organisation1->id,
-            'startdate' => $now - 86400,
-            'enddate' => $now + 86400,
-            'managerjaid' => $managerjaid,
-            'appraiserid' => $appraiser->id
-        ], $this->get_execution_context());
+        $ja2id = $this->resolve_grapqhl_mutation(
+            'totara_job_create_assignment',
+            [
+                'userid' => $user->id,
+                'idnumber' => 'j2',
+                'fullname' => 'Test & test',
+                'shortname' => 'Te&Te',
+                'description' => '<p>This is a <strong>complex</strong> test</p>',
+                'positionid' => $position1->id,
+                'organisationid' => $organisation1->id,
+                'startdate' => $now - 86400,
+                'enddate' => $now + 86400,
+                'managerjaid' => $managerjaid,
+                'appraiserid' => $appraiser->id
+            ]
+        );
         self::assertIsNumeric($ja2id);
         self::assertCount(2, job_assignment::get_all($user->id));
         $job2 = job_assignment::get_with_id($ja2id);
@@ -140,7 +132,7 @@ class totara_job_webapi_resolver_mutation_create_assignment_testcase extends adv
 
         // No userid.
         try {
-            mutation\create_assignment::resolve(['idnumber' => 'j1'], $this->get_execution_context());
+            $this->resolve_grapqhl_mutation('totara_job_create_assignment', ['idnumber' => 'j1']);
             $this->fail('Exception expected.');
         } catch (\moodle_exception $ex) {
             self::assertContains('A required parameter (userid) was missing (idnumber)', $ex->getMessage());
@@ -148,7 +140,7 @@ class totara_job_webapi_resolver_mutation_create_assignment_testcase extends adv
 
         // Duplicate id number.
         try {
-            mutation\create_assignment::resolve(['userid' => $job->userid, 'idnumber' => $job->idnumber], $this->get_execution_context());
+            $this->resolve_grapqhl_mutation('totara_job_create_assignment', ['userid' => $job->userid, 'idnumber' => $job->idnumber]);
             $this->fail('Exception expected.');
         } catch (\moodle_exception $ex) {
             self::assertContains('Tried to create job assignment idnumber which is not unique for this user', $ex->getMessage());
@@ -175,12 +167,12 @@ class totara_job_webapi_resolver_mutation_create_assignment_testcase extends adv
         $posframework = $generator->create_pos_frame([]);
         $position = $generator->create_pos(['frameworkid' => $posframework->id, 'typeid' => $generator->create_pos_type([])]);
 
-        $map = function($obj) {
+        $map = function ($obj) {
             return (array)$obj;
         };
 
-        $result = \totara_webapi\graphql::execute_operation(
-            \core\webapi\execution_context::create('ajax', 'totara_job_create_assignment'),
+        $result = $this->execute_graphql_operation(
+            'totara_job_create_assignment',
             [
                 'userid' => $user->id,
                 'idnumber' => 'j1'
@@ -205,8 +197,8 @@ class totara_job_webapi_resolver_mutation_create_assignment_testcase extends adv
         self::assertSame('0', $job->totarasync);
 
         $now = time();
-        $result = \totara_webapi\graphql::execute_operation(
-            \core\webapi\execution_context::create('ajax', 'totara_job_create_assignment'),
+        $result = $this->execute_graphql_operation(
+            'totara_job_create_assignment',
             [
                 'userid' => $user->id,
                 'idnumber' => 'j2',

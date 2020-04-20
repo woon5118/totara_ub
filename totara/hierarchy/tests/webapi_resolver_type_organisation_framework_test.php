@@ -21,6 +21,8 @@
  * @package totara_hierarchy
  */
 
+use totara_webapi\phpunit\webapi_phpunit_helper;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -28,13 +30,10 @@ defined('MOODLE_INTERNAL') || die();
  */
 class totara_hierarchy_webapi_resolver_type_organisation_framework_testcase extends advanced_testcase {
 
+    use webapi_phpunit_helper;
+
     private function resolve($field, $pos, array $args = []) {
-        return \totara_hierarchy\webapi\resolver\type\organisation_framework::resolve(
-            $field,
-            (object)$pos,
-            $args,
-            $this->get_execution_context()
-        );
+        return $this->resolve_graphql_type('totara_hierarchy_organisation_framework', $field, (object) $pos, $args);
     }
 
     private function get_execution_context(string $type = 'dev', ?string $operation = null) {
