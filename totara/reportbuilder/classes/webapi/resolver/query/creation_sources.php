@@ -24,15 +24,19 @@
 namespace totara_reportbuilder\webapi\resolver\query;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_login;
+use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 use totara_reportbuilder\report_helper;
 use totara_reportbuilder\template_helper;
+use totara_reportbuilder\webapi\resolver\helper;
 
 /**
  * Query to return all available report builder templates and sources for report creation.
  */
-class creation_sources implements \core\webapi\query_resolver {
+class creation_sources implements query_resolver, has_middleware {
 
-    use \totara_reportbuilder\webapi\resolver\helper;
+    use helper;
 
     /**
      * Returns all available report builder templates and sources with filtering supplied by the args..
@@ -42,9 +46,6 @@ class creation_sources implements \core\webapi\query_resolver {
      * @return
      */
     public static function resolve(array $args, execution_context $ec) {
-        // TL-21305 will find a better, encapsulated solution for require_login calls.
-        require_login(null, false, null, false, true);
-
         if (!self::user_can_edit_report()) {
             throw new \coding_exception('No permission to edit reports.');
         }
@@ -124,4 +125,11 @@ class creation_sources implements \core\webapi\query_resolver {
 
         return $data;
     }
+
+    public static function get_middleware(): array {
+        return [
+            require_login::class
+        ];
+    }
+
 }

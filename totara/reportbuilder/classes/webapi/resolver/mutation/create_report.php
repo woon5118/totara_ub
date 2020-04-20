@@ -24,13 +24,18 @@
 namespace totara_reportbuilder\webapi\resolver\mutation;
 
 use \core\webapi\execution_context;
+use core\webapi\middleware\require_login;
+use core\webapi\mutation_resolver;
+use core\webapi\resolver\has_middleware;
+use totara_reportbuilder\report_helper;
+use totara_reportbuilder\webapi\resolver\helper;
 
 /**
  * Mutation to create a report
  */
-class create_report implements \core\webapi\mutation_resolver {
+class create_report implements mutation_resolver, has_middleware {
 
-    use \totara_reportbuilder\webapi\resolver\helper;
+    use helper;
 
     /**
      * Create report
@@ -40,9 +45,6 @@ class create_report implements \core\webapi\mutation_resolver {
      * @return bool
      */
     public static function resolve(array $args, execution_context $ec) {
-        // TL-21305 will find a better, encapsulated solution for require_login calls.
-        require_login(null, false, null, false, true);
-
         if (!self::user_can_create_reports()) {
             throw new \coding_exception('No permission to create reports.');
         }
@@ -55,9 +57,16 @@ class create_report implements \core\webapi\mutation_resolver {
         global $CFG;
         require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
 
-        $reportid = \totara_reportbuilder\report_helper::create($source);
+        $reportid = report_helper::create($source);
 
         return $reportid;
     }
+
+    public static function get_middleware(): array {
+        return [
+            require_login::class
+        ];
+    }
+
 }
 

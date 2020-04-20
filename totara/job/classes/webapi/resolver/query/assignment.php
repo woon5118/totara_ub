@@ -24,35 +24,37 @@
 namespace totara_job\webapi\resolver\query;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_login;
+use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
+use totara_job\job_assignment;
+use totara_job\webapi\resolver\helper;
 
 /**
  * Query to return a single job assignment.
  */
-class assignment implements \core\webapi\query_resolver {
+class assignment implements query_resolver, has_middleware {
 
-    use \totara_job\webapi\resolver\helper;
+    use helper;
 
     /**
      * Returns an assignment, given its ID.
      *
      * @param array $args
      * @param execution_context $ec
-     * @return \totara_job\job_assignment
+     * @return job_assignment
      */
     public static function resolve(array $args, execution_context $ec) {
         global $CFG, $DB;
 
         require_once($CFG->dirroot . '/totara/job/lib.php');
 
-        // TL-21305 will find a better, encapsulated solution for require_login calls.
-        require_login(null, false,null, false, true);
-
         // Basic sanity check, GraphQL does this for us, but other can call resolve.
         if (!isset($args['assignmentid'])) {
             throw new \coding_exception('A required parameter (assignmentid) was missing');
         }
 
-        $job = \totara_job\job_assignment::get_with_id($args['assignmentid']);
+        $job = job_assignment::get_with_id($args['assignmentid']);
         $user = $DB->get_record('user', ['id' => $job->userid, 'deleted' => 0], '*', MUST_EXIST);
 
         require_once($CFG->dirroot . '/totara/job/lib.php');
@@ -61,6 +63,12 @@ class assignment implements \core\webapi\query_resolver {
         }
 
         return $job;
+    }
+
+    public static function get_middleware(): array {
+        return [
+            require_login::class
+        ];
     }
 
 }

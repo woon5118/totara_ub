@@ -23,14 +23,18 @@
 
 namespace totara_reportbuilder\webapi\resolver\mutation;
 
-use \core\webapi\execution_context;
+use core\webapi\execution_context;
+use core\webapi\middleware\require_login;
+use core\webapi\mutation_resolver;
+use core\webapi\resolver\has_middleware;
+use totara_reportbuilder\webapi\resolver\helper;
 
 /**
  * Mutation to update a report title
  */
-class update_report_title implements \core\webapi\mutation_resolver {
+class update_report_title implements mutation_resolver, has_middleware {
 
-    use \totara_reportbuilder\webapi\resolver\helper;
+    use helper;
 
     /**
      * Updates a report title.
@@ -42,9 +46,6 @@ class update_report_title implements \core\webapi\mutation_resolver {
     public static function resolve(array $args, execution_context $ec) {
         global $DB, $CFG;
         require_once($CFG->dirroot . '/totara/reportbuilder/lib.php');
-
-        // TL-21305 will find a better, encapsulated solution for require_login calls.
-        require_login(null, false, null, false, true);
 
         $formatted = format_string($args['title'], true);
         if (!$formatted) {
@@ -63,5 +64,12 @@ class update_report_title implements \core\webapi\mutation_resolver {
 
         return $formatted;
     }
+
+    public static function get_middleware(): array {
+        return [
+            require_login::class
+        ];
+    }
+
 }
 

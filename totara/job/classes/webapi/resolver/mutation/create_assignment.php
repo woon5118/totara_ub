@@ -24,15 +24,19 @@
 namespace totara_job\webapi\resolver\mutation;
 
 use \core\webapi\execution_context;
+use core\webapi\middleware\require_login;
+use core\webapi\mutation_resolver;
+use core\webapi\resolver\has_middleware;
 use totara_core\advanced_feature;
 use \totara_job\job_assignment;
+use totara_job\webapi\resolver\helper;
 
 /**
  * Mutation to create a job assignment.
  */
-class create_assignment implements \core\webapi\mutation_resolver {
+class create_assignment implements mutation_resolver, has_middleware {
 
-    use \totara_job\webapi\resolver\helper;
+    use helper;
 
     /**
      * Creates an assignment and returns the new assignment id.
@@ -45,9 +49,6 @@ class create_assignment implements \core\webapi\mutation_resolver {
         global $CFG;
 
         require_once($CFG->dirroot . '/totara/job/lib.php');
-
-        // TL-21305 will find a better, encapsulated solution for require_login calls.
-        require_login(null, false, null, false, true);
 
         $user = self::get_user_from_args($args, 'userid', false);
         // They have to be able to view and edit the job assignments in order to create.
@@ -76,4 +77,11 @@ class create_assignment implements \core\webapi\mutation_resolver {
         $job = job_assignment::create($jobassignment);
         return $job->id;
     }
+
+    public static function get_middleware(): array {
+        return [
+            require_login::class
+        ];
+    }
+
 }

@@ -25,7 +25,9 @@
 namespace totara_core\webapi\resolver\query;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 use totara_core\user_learning\item_base;
 use totara_core\user_learning\item_helper as learning_item_helper;
 use totara_plan\user_learning\item as plan_item;
@@ -33,7 +35,7 @@ use totara_plan\user_learning\item as plan_item;
 /**
  * Query to return my programs.
  */
-class my_current_learning implements query_resolver {
+class my_current_learning implements query_resolver, has_middleware {
 
     /**
      * Returns the user's current learning items.
@@ -44,9 +46,6 @@ class my_current_learning implements query_resolver {
      */
     public static function resolve(array $args, execution_context $ec) {
         global $USER;
-
-        // TL-21305 will find a better, encapsulated solution for require_login calls.
-        require_login(null, false, null, false, true);
 
         $items = learning_item_helper::get_users_current_learning_items($USER->id);
 
@@ -65,4 +64,11 @@ class my_current_learning implements query_resolver {
 
         return $learning_items;
     }
+
+    public static function get_middleware(): array {
+        return [
+            require_login::class
+        ];
+    }
+
 }

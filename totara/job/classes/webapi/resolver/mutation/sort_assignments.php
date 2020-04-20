@@ -24,14 +24,18 @@
 namespace totara_job\webapi\resolver\mutation;
 
 use \core\webapi\execution_context;
+use core\webapi\middleware\require_login;
+use core\webapi\mutation_resolver;
+use core\webapi\resolver\has_middleware;
 use \totara_job\job_assignment;
+use totara_job\webapi\resolver\helper;
 
 /**
  * Mutation to sort job assignments
  */
-class sort_assignments implements \core\webapi\mutation_resolver {
+class sort_assignments implements mutation_resolver, has_middleware {
 
-    use \totara_job\webapi\resolver\helper;
+    use helper;
 
     /**
      * Sorts job assignments
@@ -44,9 +48,6 @@ class sort_assignments implements \core\webapi\mutation_resolver {
         global $CFG;
 
         require_once($CFG->dirroot . '/totara/job/lib.php');
-
-        // TL-21305 will find a better, encapsulated solution for require_login calls.
-        require_login(null, false, null, false, true);
 
         $user = self::get_user_from_args($args, 'userid', false);
         if (!\totara_job_can_edit_job_assignments($user->id) || !\totara_job_can_view_job_assignments($user)) {
@@ -68,5 +69,12 @@ class sort_assignments implements \core\webapi\mutation_resolver {
 
         return true;
     }
+
+    public static function get_middleware(): array {
+        return [
+            require_login::class
+        ];
+    }
+
 }
 

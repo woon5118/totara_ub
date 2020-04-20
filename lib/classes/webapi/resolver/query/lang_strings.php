@@ -24,8 +24,10 @@
 namespace core\webapi\resolver\query;
 
 use core\webapi\execution_context;
+use core\webapi\query_resolver;
 
-final class lang_strings implements \core\webapi\query_resolver {
+final class lang_strings implements query_resolver {
+
     public static function resolve(array $args, execution_context $ec) {
         $lang = $args['lang'];
         $sm = get_string_manager();
@@ -42,4 +44,5 @@ final class lang_strings implements \core\webapi\query_resolver {
 
         return $result;
     }
+
 }

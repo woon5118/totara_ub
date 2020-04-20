@@ -25,14 +25,15 @@
 namespace core\webapi\resolver\query;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_login;
+use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 
-final class categories_by_parent_category implements \core\webapi\query_resolver {
+final class categories_by_parent_category implements query_resolver, has_middleware {
+
     public static function resolve(array $args, execution_context $ec) {
         global $CFG;
         require_once($CFG->dirroot . '/lib/coursecatlib.php');
-
-        // TL-21305 will find a better, encapsulated solution for require_login calls.
-        require_login(null, false, null, false, true);
 
         if (!empty($args['sort'])) {
             $sortstr = mb_strtolower($args['sort']);
@@ -50,4 +51,11 @@ final class categories_by_parent_category implements \core\webapi\query_resolver
         // Note: This seems to handle the visibility of the child categories.
         return $category->get_children($options);
     }
+
+    public static function get_middleware(): array {
+        return [
+            require_login::class
+        ];
+    }
+
 }

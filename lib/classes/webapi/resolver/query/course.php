@@ -25,24 +25,27 @@
 namespace core\webapi\resolver\query;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_login_course;
+use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 
+final class course implements query_resolver, has_middleware {
 
-final class course implements \core\webapi\query_resolver {
     public static function resolve(array $args, execution_context $ec) {
-        global $CFG, $USER;
+        global $CFG;
         require_once($CFG->dirroot . '/course/lib.php');
 
-        // TL-21305 will find a better, encapsulated solution for require_login calls.
-        require_login(null, false, null, false, true);
-
+        // Course visibility and access is already covered in the course_require_login middleware
         $course = get_course($args['courseid']);
-
-        if (!totara_course_is_viewable($course, $USER->id)) {
-            throw new \coding_exception('Current user can not access this course.');
-        }
-
         $course->image = course_get_image($course);
 
         return (object)$course;
     }
+
+    public static function get_middleware(): array {
+        return [
+            new require_login_course('courseid')
+        ];
+    }
+
 }

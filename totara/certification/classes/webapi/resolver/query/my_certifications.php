@@ -25,12 +25,15 @@
 namespace totara_certification\webapi\resolver\query;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_login;
+use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 use totara_core\advanced_feature;
 
 /**
  * Query to return my programs.
  */
-class my_certifications implements \core\webapi\query_resolver {
+class my_certifications implements query_resolver, has_middleware {
 
     /**
      * Returns the user's programs.
@@ -41,9 +44,6 @@ class my_certifications implements \core\webapi\query_resolver {
     public static function resolve(array $args, execution_context $ec) {
         global $CFG, $USER;
         require_once($CFG->dirroot . '/totara/program/lib.php');
-
-        // TL-21305 will find a better, encapsulated solution for require_login calls.
-        require_login(null, false, null, false, true);
 
         if (advanced_feature::is_disabled('certifications')) {
             throw new \coding_exception('Certifications have been disabled.');
@@ -58,4 +58,11 @@ class my_certifications implements \core\webapi\query_resolver {
 
         return $certifications;
     }
+
+    public static function get_middleware(): array {
+        return [
+            require_login::class
+        ];
+    }
+
 }

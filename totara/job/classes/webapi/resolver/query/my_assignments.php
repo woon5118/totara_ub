@@ -24,32 +24,39 @@
 namespace totara_job\webapi\resolver\query;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_login;
+use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
+use totara_job\job_assignment;
 
 /**
  * Query to return all of the job assignments belonging to the current user.
  */
-class my_assignments implements \core\webapi\query_resolver {
+class my_assignments implements query_resolver, has_middleware {
 
     /**
      * Returns all of a users job assignments
      *
      * @param array $args
      * @param execution_context $ec
-     * @return \totara_job\job_assignment[]
+     * @return job_assignment[]
      */
     public static function resolve(array $args, execution_context $ec) {
         global $CFG, $USER;
 
         require_once($CFG->dirroot . '/totara/job/lib.php');
 
-        // TL-21305 will find a better, encapsulated solution for require_login calls.
-        require_login(null, false,null, false, true);
-
         if (!totara_job_can_view_job_assignments($USER)) {
             throw new \moodle_exception('nopermissions', '', '', 'view job assignments');
         }
 
-        return \totara_job\job_assignment::get_all($USER->id);
+        return job_assignment::get_all($USER->id);
+    }
+
+    public static function get_middleware(): array {
+        return [
+            require_login::class
+        ];
     }
 
 }

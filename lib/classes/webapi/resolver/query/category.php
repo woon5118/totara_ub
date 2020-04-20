@@ -25,19 +25,27 @@
 namespace core\webapi\resolver\query;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_login;
+use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 use coursecat;
 
-final class category implements \core\webapi\query_resolver {
+final class category implements query_resolver, has_middleware {
+
     public static function resolve(array $args, execution_context $ec) {
         global $CFG;
         require_once($CFG->dirroot . '/lib/coursecatlib.php');
-
-        // TL-21305 will find a better, encapsulated solution for require_login calls.
-        require_login(null, false, null, false, true);
 
         // Note: This takes care of visibility checks as long as the 3rd parameter is false.
         $category = coursecat::get($args['categoryid'], MUST_EXIST, false);
 
         return (object)$category;
     }
+
+    public static function get_middleware(): array {
+        return [
+            require_login::class
+        ];
+    }
+
 }

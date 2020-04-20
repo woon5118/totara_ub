@@ -25,13 +25,14 @@
 namespace core\webapi\resolver\query;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_login;
+use core\webapi\query_resolver;
+use core\webapi\resolver\has_middleware;
 
-final class courses_by_parent_category implements \core\webapi\query_resolver {
+final class courses_by_parent_category implements query_resolver, has_middleware {
+
     public static function resolve(array $args, execution_context $ec) {
         global $CFG, $DB;
-
-        // TL-21305 will find a better, encapsulated solution for require_login calls.
-        require_login(null, false, null, false, true);
 
         require_once($CFG->dirroot . '/course/lib.php');
         if (!empty($args['sort'])) {
@@ -60,4 +61,11 @@ final class courses_by_parent_category implements \core\webapi\query_resolver {
             return $courses;
         }
     }
+
+    public static function get_middleware(): array {
+        return [
+            require_login::class
+        ];
+    }
+
 }

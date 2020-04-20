@@ -24,8 +24,10 @@
 namespace core\webapi\resolver\query;
 
 use core\webapi\execution_context;
+use core\webapi\query_resolver;
 
-final class template implements \core\webapi\query_resolver {
+final class template implements query_resolver {
+
     public static function resolve(array $args, execution_context $ec) {
         $component = $args['component'];
         $name = $args['name'];
@@ -39,4 +41,5 @@ final class template implements \core\webapi\query_resolver {
             throw new \coding_exception('Template does not exist');
         }
     }
+
 }
