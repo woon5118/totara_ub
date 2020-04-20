@@ -33,7 +33,7 @@
 
     <transition :name="'tui-dropdown__animation-' + animation">
       <div
-        v-show="!disabled && isOpen"
+        v-show="!disabled && isOpen && this.$scopedSlots.default"
         ref="dropdownMenu"
         class="tui-dropdown__menu"
         :aria-hidden="!isOpen"
