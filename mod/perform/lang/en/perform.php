@@ -37,10 +37,10 @@ $string['edit_content'] = 'Edit content';
 $string['embedded_perform_participant_instance'] = 'Performance Participant Instance (Perform)';
 $string['embedded_perform_subject_instance'] = 'Performance Subject Instance (Perform)';
 $string['enable_performance_activities'] = 'Enable Performance Activities';
-$string['enable_performance_activities_description'] = 'This option will let you: enable (show) or disable the performance activities feature on this site.
+$string['enable_performance_activities_description'] = 'This option lets you enable or disable the performance activities feature on this site.
 
-* If Show is selected, all features related to performance activities will be visible and accessible.
-* If Disable is selected, no performance activities features will be visible or accessible.';
+* If \'Enable\' is selected, all functionality related to performance activities will be visible and accessible to users.
+* If \'Disable\' is selected, no performance activities functionality will be visible or accessible.';
 $string['error_activity_id_wrong'] = 'Wrong activity id';
 $string['error:activity_name_missing'] = 'You are not allowed to create an activity with an empty name';
 $string['error:create_permission_missing'] = 'Create Permission Missing';
