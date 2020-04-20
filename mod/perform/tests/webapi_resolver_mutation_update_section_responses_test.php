@@ -30,6 +30,8 @@ use mod_perform\entities\activity\participant_section as participant_section_ent
 use mod_perform\entities\activity\section_element;
 use mod_perform\event\participant_section_progress_updated;
 use mod_perform\entities\activity\element_response as element_response_entity;
+use mod_perform\models\activity\activity;
+use mod_perform\models\response\participant_section;
 use mod_perform\state\participant_section\complete;
 use mod_perform\state\participant_section\not_started;
 use mod_perform\webapi\resolver\mutation\update_section_responses;
@@ -95,20 +97,21 @@ class mod_perform_webapi_resolver_mutation_update_section_responses_testscase ex
         $sink = $this->redirectEvents();
 
         // Initial save of responses.
-        $initial_save_result = update_section_responses::resolve($args, $this->get_execution_context());
+        /** @var participant_section $initial_save_result */
+        $initial_save_result = update_section_responses::resolve($args, $this->get_execution_context())['participant_section'];
 
-        self::assertEquals(complete::get_code(), $initial_save_result->progress);
-        self::assertCount(2, $initial_save_result->get_element_responses());
+        self::assertEquals('COMPLETE', $initial_save_result->get_progress_status());
+        self::assertCount(2, $initial_save_result->get_section_element_responses());
 
         self::assertEquals(
             $encoded_response1,
-            $initial_save_result->get_element_responses()->first()->response_data,
+            $initial_save_result->get_section_element_responses()->first()->response_data,
             'Expected result response to match update'
         );
 
         self::assertEquals(
             $encoded_response2,
-            $initial_save_result->get_element_responses()->last()->response_data,
+            $initial_save_result->get_section_element_responses()->last()->response_data,
             'Expected result response to match update'
         );
 
@@ -158,12 +161,12 @@ class mod_perform_webapi_resolver_mutation_update_section_responses_testscase ex
         $update_save_result = graphql::execute_operation(
             $this->get_execution_context('ajax', 'mod_perform_update_section_responses'),
             $args
-        )->toArray(true)['data']['mod_perform_update_section_responses'];
+        )->toArray(true)['data']['mod_perform_update_section_responses']['participant_section'];
 
         self::assertEquals('Part one', $update_save_result['section']['title']);
 
         // Everything is always returned, despite only patching one question.
-        self::assertCount(2, $update_save_result['element_responses']);
+        self::assertCount(2, $update_save_result['section_element_responses']);
 
         $participant_section->refresh();
         self::assertEquals(
@@ -241,7 +244,7 @@ class mod_perform_webapi_resolver_mutation_update_section_responses_testscase ex
         $result = graphql::execute_operation(
             $this->get_execution_context('ajax', 'mod_perform_update_section_responses'),
             $args
-        )->toArray(true)['data']['mod_perform_update_section_responses'];
+        )->toArray(true)['data']['mod_perform_update_section_responses']['participant_section'];
 
         self::assertEquals(
             not_started::get_code(),
@@ -249,12 +252,12 @@ class mod_perform_webapi_resolver_mutation_update_section_responses_testscase ex
             'Section should not have been completed'
         );
 
-        self::assertCount(0, $result['element_responses'][0]['validation_errors']);
+        self::assertCount(0, $result['section_element_responses'][0]['validation_errors']);
 
         self::assertEquals([
             'error_code' => answer_length_exceeded_error::LENGTH_EXCEEDED,
             'error_message' => 'Question text exceeds the maximum length',
-        ], $result['element_responses'][1]['validation_errors'][0]);
+        ], $result['section_element_responses'][1]['validation_errors'][0]);
     }
 
     public function test_can_not_update_another_persons_responses(): void {
@@ -364,8 +367,18 @@ class mod_perform_webapi_resolver_mutation_update_section_responses_testscase ex
             ->where('participant_id', $other_participant->id)
             ->one();
 
-        /** @var participant_section_entity $other_participants_section */
-        $other_participants_section =  $other_participant_instance->participant_sections()->one();
+        $activity = new activity($subject_instance->activity());
+        $section2 = $generator->create_section($activity, ['title' => 'Part one']);
+
+        $element = $generator->create_element(['title' => 'Section two question one']);
+        $generator->create_section_element($section2, $element);
+
+        $other_participants_section = $generator->create_participant_section(
+            $activity,
+            $other_participant_instance,
+            false,
+            $section2
+        );
 
         /** @var collection|section_element[] $section_elements */
         $other_participant_section_elements = $other_participants_section->section_elements()->get();

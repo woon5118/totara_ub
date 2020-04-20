@@ -1,0 +1,73 @@
+"""
+A participant section
+"""
+type mod_perform_participant_section {
+  id: core_id!
+  section: mod_perform_section!
+  participant_instance: mod_perform_participant_instance!
+  section_element_responses: [mod_perform_section_element_response!]!
+  progress_status: mod_perform_participant_section_progress_status!
+}
+
+"""
+A section element containing responses relating to a specific participant
+"""
+type mod_perform_section_element_response {
+  section_element_id: core_id!
+  participant_instance: mod_perform_participant_instance
+  element: mod_perform_element!
+  sort_order: Int!
+  other_responder_groups: [mod_perform_responder_group!]!
+  visible_to: [mod_perform_participant_instance!]!
+  response_data: String # JSON encoded answer, format is specific to the element type
+  validation_errors: [mod_perform_validation_error!]!
+}
+
+"""
+A relationship and set of participants that have responded to a particular section element in relation to a participant
+"""
+type mod_perform_responder_group {
+  relationship_name: String! # The name of the "other responder" group, the relationship name (manager/apraiser)
+  responses: [mod_perform_section_element_response!]! # This can be empty if nonone satisfied the relationship to the subject
+}
+
+"""
+Update a section's responses
+"""
+input mod_perform_update_section_responses_input {
+  participant_section_id: core_id!
+  update: [mod_perform_update_element_response_input!]!
+}
+
+"""
+Update the response for a question
+"""
+input mod_perform_update_element_response_input {
+  section_element_id: core_id!
+  response_data: String! # JSON encoded answer, format is specific to the element type
+}
+
+extend type Mutation {
+  """
+  Update the responses in a section
+  """
+  mod_perform_update_section_responses(
+    input: mod_perform_update_section_responses_input!
+  ): mod_perform_response_update_section_result
+}
+
+"""
+Return type for mod_perform_update_section_responses mutation
+"""
+type mod_perform_response_update_section_result {
+  participant_section: mod_perform_participant_section!
+}
+
+"""
+A list of possible progress status states that a user participant section can be in
+"""
+enum mod_perform_participant_section_progress_status {
+  COMPLETE
+  INCOMPLETE
+  NOT_STARTED
+}

@@ -49,6 +49,7 @@ use mod_perform\util;
 use totara_core\entities\relationship_resolver;
 use totara_core\relationship\relationship;
 use totara_core\relationship\resolvers\subject;
+use totara_job\relationship\resolvers\manager;
 
 /**
  * Perform generator
@@ -450,13 +451,6 @@ class mod_perform_generator extends component_generator_base {
                 ->first();
         }
 
-        $subject_is_participating = $data['subject_is_participating'] ?? false;
-
-        // String conversion for behat
-        if (is_string($subject_is_participating) && $subject_is_participating !== 'true') {
-            $subject_is_participating = false;
-        }
-
         $track = track::create($activity, "track for {$activity->name}");
 
         $user_assignment = new track_user_assignment();
@@ -504,12 +498,32 @@ class mod_perform_generator extends component_generator_base {
         }
 
         if ($include_questions) {
+            $section1 = $this->create_section($activity, ['title' => 'Part one']);
+
+            $element = $this->create_element(['title' => 'Question one']);
+            $this->create_section_element($section1, $element);
+
+            $element2 = $this->create_element(['title' => 'Question two']);
+            $this->create_section_element($section1, $element2, 2);
+
             foreach ([$subjects_participant_instance, $other_participant_instance] as $participant_instance) {
                 if ($participant_instance === null) {
                     continue;
                 }
 
-                $this->create_participant_section($activity, $participant_instance);
+                $this->create_participant_section($activity, $participant_instance, false, $section1);
+            }
+
+            if ($subject_is_participating) {
+                $subject_relationship = $this->create_section_relationship($section1, ['class_name' => subject::class]);
+                $subjects_participant_instance->activity_relationship_id = $subject_relationship->activity_relationship_id;
+                $subjects_participant_instance->save();
+            }
+
+            if ($other_participant) {
+                $manager_relationship = $this->create_section_relationship($section1, ['class_name' => manager::class]);
+                $other_participant_instance->activity_relationship_id = $manager_relationship->activity_relationship_id;
+                $other_participant_instance->save();
             }
         }
 
@@ -540,5 +554,23 @@ class mod_perform_generator extends component_generator_base {
         return activity::load_by_entity($activity_entity);
     }
 
+    public function create_participant_instance_and_section(
+        activity $activity,
+        stdClass $participant_user,
+        int $subject_instance_id,
+        section $section,
+        int $activity_relationship_id
+    ): participant_section {
+        $participant_instance = new participant_instance_entity();
+        $participant_instance->activity_relationship_id = $activity_relationship_id;
+        $participant_instance->participant_id = $participant_user->id;
+        $participant_instance->subject_instance_id = $subject_instance_id;
+        $participant_instance->progress = not_started::get_code();
+        $participant_instance->save();
+
+        $participant_section = $this->create_participant_section($activity, $participant_instance, false, $section);
+
+        return $participant_section;
+    }
 
 }

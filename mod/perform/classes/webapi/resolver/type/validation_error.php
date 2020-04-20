@@ -26,8 +26,8 @@ namespace mod_perform\webapi\resolver\type;
 use core\format;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
-use mod_perform\formatter\activity\validation_error as validation_error_formatter;
-use mod_perform\models\activity\element_validation_error;
+use mod_perform\formatter\response\validation_error as validation_error_formatter;
+use mod_perform\models\response\element_validation_error;
 
 class validation_error implements type_resolver {
 

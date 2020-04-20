@@ -23,6 +23,7 @@
 
 namespace mod_perform\entities\activity;
 
+use core\entities\user;
 use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\entity\relations\belongs_to;
@@ -42,6 +43,7 @@ use core\orm\entity\relations\has_many;
  * @property-read activity_relationship $activity_relationship
  * @property-read subject_instance $subject_instance
  * @property-read collection|participant_section[] $participant_sections
+ * @property-read user $participant_user
  *
  * @package mod_perform\entities
  */
@@ -74,6 +76,15 @@ class participant_instance extends entity {
      */
     public function participant_sections(): has_many {
         return $this->has_many(participant_section::class, 'participant_instance_id');
+    }
+
+    /**
+     * Get the user this participant instance belongs to.
+     *
+     * @return belongs_to
+     */
+    public function participant_user(): belongs_to {
+        return $this->belongs_to(user::class, 'participant_id');
     }
 
 }

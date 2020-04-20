@@ -21,21 +21,18 @@
  * @package mod_perform
  */
 
-namespace mod_perform\models\activity;
+namespace mod_perform\models\response;
 
+use coding_exception;
 use context_module;
 use core\collection;
 use core\orm\entity\model;
 use core\orm\query\builder;
-use mod_perform\entities\activity\participant_instance as participant_instance_entity;
-use mod_perform\entities\activity\participant_instance;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
-use mod_perform\entities\activity\section as section_entity;
-use mod_perform\entities\activity\subject_instance as subject_instance_entity;
-use mod_perform\state\participant_section\complete;
+use mod_perform\models\activity\participant_instance;
+use mod_perform\models\activity\section;
 use mod_perform\state\state;
 use mod_perform\state\state_aware;
-use mod_perform\state\state_helper;
 
 /**
  * Class participant_section
@@ -46,14 +43,26 @@ use mod_perform\state\state_helper;
  * @property-read int $progress
  * @property-read int $created_at
  * @property-read int $updated_at
- * @property-read participant_instance_entity $participant_instance
+ * @property-read string $progress_status
+ * @property-read participant_instance $participant_instance
  * @property-read section $section
+ * @property-read section_element_response[] $section_element_responses
  *
  * @package mod_perform\models\activity
  */
 class participant_section extends model {
 
     use state_aware;
+
+    /**
+     * @var participant_section_entity
+     */
+    protected $entity;
+
+    /**
+     * @var collection|section_element_response[]
+     */
+    protected $element_responses;
 
     protected $entity_attribute_whitelist = [
         'id',
@@ -67,18 +76,25 @@ class participant_section extends model {
 
     protected $model_accessor_whitelist = [
         'section',
-        'element_responses',
+        'section_element_responses',
+        'progress_status',
+        'participant_instance',
+        'section_element_responses',
+        'progress_status',
+        'participant_instance',
     ];
 
     /**
-     * @var participant_section_entity
+     * participant_section constructor.
+     *
+     * @param participant_section_entity $entity
+     * @param collection $element_responses
+     * @throws coding_exception
      */
-    protected $entity;
-
-    /**
-     * @var collection|element_response[]
-     */
-    protected $element_responses;
+    public function __construct(participant_section_entity $entity, collection $element_responses = null) {
+        parent::__construct($entity);
+        $this->element_responses = $element_responses ?? new collection();
+    }
 
     /**
      * @inheritDoc
@@ -91,20 +107,16 @@ class participant_section extends model {
         return section::load_by_entity($this->entity->section);
     }
 
-    public function get_participant_instance(): participant_instance_entity {
-        return $this->entity->participant_instance;
+    public function get_participant_instance(): participant_instance {
+        return participant_instance::load_by_entity($this->entity->participant_instance);
     }
 
     public function get_context(): context_module {
-        /** @var subject_instance_entity $subject_instance_entity */
-        $subject_instance_entity = $this->get_participant_instance()->subject_instance()->one();
-        $subject_instance = new subject_instance($subject_instance_entity);
-
-        return $subject_instance->get_context();
+        return $this->get_participant_instance()->get_subject_instance()->get_context();
     }
 
     /**
-     * @param collection|element_response[] $element_responses
+     * @param collection|section_element_response[] $element_responses
      * @return self
      */
     public function set_element_responses(collection $element_responses): self {
@@ -113,10 +125,49 @@ class participant_section extends model {
     }
 
     /**
-     * @return collection|element_response[]
+     * @return collection|section_element_response[]
      */
-    public function get_element_responses(): collection {
+    public function get_section_element_responses(): collection {
         return $this->element_responses;
+    }
+
+    /**
+     * Update the response data held in memory on this instance.
+     *
+     * @param array $update_request_payload
+     * @return $this
+     * @throws coding_exception
+     */
+    public function set_responses_data_from_request(array $update_request_payload): self {
+        foreach ($update_request_payload as $update) {
+            $section_element_id = $update['section_element_id'];
+            $updated_response_data = $update['response_data'];
+
+            /** @var section_element_response $existing_element_response */
+            $existing_element_response = $this->find_element_response($section_element_id);
+
+            if ($existing_element_response === null) {
+                throw new coding_exception(sprintf('Section element not found for id %d', $section_element_id));
+            }
+
+            $existing_element_response->set_response_data($updated_response_data);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Find an element response based on section element id.
+     *
+     * @param int $section_element_id
+     * @return mixed|null
+     */
+    public function find_element_response(int $section_element_id): ?section_element_response {
+        return $this->element_responses->find(
+            function (section_element_response $element_response) use ($section_element_id) {
+                return (int) $element_response->section_element_id === $section_element_id;
+            }
+        );
     }
 
     /**
@@ -126,8 +177,8 @@ class participant_section extends model {
      * Validation errors are accessible on each element response.
      *
      * @return bool true if no validation rules failed and the section was completed, false if any validation rules failed.
-     * @see get_element_responses
-     * @see element_response::get_validation_errors
+     * @see get_section_element_responses
+     * @see section_element_response::get_validation_errors
      * @see set_element_responses
      */
     public function complete(): bool {
@@ -162,4 +213,14 @@ class participant_section extends model {
         $this->entity->progress = $state::get_code();
         $this->entity->update();
     }
+
+    /**
+     * Get internal name of current progress state.
+     *
+     * @return string
+     */
+    public function get_progress_status(): string {
+        return $this->get_state()->get_name();
+    }
+
 }

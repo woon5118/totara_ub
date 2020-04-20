@@ -20,89 +20,153 @@
   @package mod_perform
 -->
 <template>
-  <Uniform
-    v-slot="{ getSubmitting }"
-    :initial-values="initialValues"
-    @submit="submit"
-  >
-    <h3>
-      {{ section.title }}
-    </h3>
-    <component
-      :is="componentFor(sectionElement)"
-      v-for="sectionElement in sectionElements"
-      :key="sectionElement.id"
-      :path="['sectionElements', sectionElement.id]"
-      :data="sectionElement.element.data"
-      :name="sectionElement.element.name"
-      :type="sectionElement.element.type"
-      :error="errors && errors[sectionElement.clientId]"
-    />
-    <ButtonGroup>
-      <ButtonSubmit :submitting="getSubmitting()" />
-      <ButtonCancel @click="cancel" />
-    </ButtonGroup>
-  </Uniform>
+  <div class="tui-participantContent">
+    <Uniform
+      v-if="initialValues"
+      v-slot="{ getSubmitting }"
+      :initial-values="initialValues"
+      @submit="submit"
+    >
+      <div class="tui-participantContent__user">
+        <div class="tui-participantContent__user-info">
+          <ParticipantUserHeader
+            :user-name="subjectInstance.subject_user.fullname"
+            :profile-picture="subjectInstance.subject_user.profileimageurlsmall"
+            size="small"
+          />
+        </div>
+        <div class="tui-participantContent__user-relationship">
+          {{ $str('user_activities_your_relationship_to_user', 'mod_perform') }}
+          <h4 class="tui-participantContent__user-relationshipValue">
+            {{ subjectInstance.relationship_to_subject }}
+          </h4>
+        </div>
+      </div>
+
+      <h2 class="tui-participantContent__header">
+        {{ subjectInstance.activity.name }}
+      </h2>
+
+      <div class="tui-participantContent__section">
+        <div class="tui-participantContent__sectionHeading">
+          <h3 class="tui-participantContent__sectionHeading-title">
+            {{ section.title }}
+          </h3>
+
+          <Checkbox
+            v-show="hasOtherResponse"
+            v-model="showOtherResponse"
+            class="tui-participantContent__sectionHeading-switch"
+          >
+            {{ $str('user_activities_other_response_show', 'mod_perform') }}
+          </Checkbox>
+        </div>
+
+        <Collapsible
+          v-for="sectionElement in sectionElements"
+          :key="sectionElement.id"
+          :label="sectionElement.element.name"
+          :initial-state="true"
+          class="tui-participantContent__sectionItem"
+        >
+          <div class="tui-participantContent__sectionItem-content">
+            <component
+              :is="sectionElement.component"
+              :path="['sectionElements', sectionElement.id]"
+              :data="sectionElement.element.data"
+              :name="sectionElement.element.name"
+              :type="sectionElement.element.type"
+              :error="errors && errors[sectionElement.clientId]"
+            />
+            <OtherParticipantResponses
+              v-show="showOtherResponse"
+              :section-element="sectionElement"
+            />
+          </div>
+        </Collapsible>
+      </div>
+
+      <ButtonGroup class="tui-participantContent__buttons">
+        <ButtonSubmit :submitting="getSubmitting()" />
+        <ButtonCancel @click="cancel" />
+      </ButtonGroup>
+    </Uniform>
+  </div>
 </template>
 
 <script>
+// Util
 import { uniqueId } from 'totara_core/util';
 import { notify } from 'totara_core/notifications';
-import { Uniform } from 'totara_core/components/uniform';
+// Components
 import ButtonCancel from 'totara_core/components/buttons/Cancel';
 import ButtonGroup from 'totara_core/components/buttons/ButtonGroup';
 import ButtonSubmit from 'totara_core/components/buttons/Submit';
-import sectionResponses from 'mod_perform/graphql/participant_section';
-import updateSectionResponsesMutation from 'mod_perform/graphql/update_section_responses';
-
-const TOAST_DURATION = 10 * 1000; // in microseconds.
+import Checkbox from 'totara_core/components/form/Checkbox';
+import Collapsible from 'totara_core/components/collapsible/Collapsible';
+import OtherParticipantResponses from 'mod_perform/components/user_activities/participant/OtherParticipantResponses';
+import ParticipantUserHeader from 'mod_perform/components/user_activities/participant/ParticipantUserHeader';
+import { Uniform } from 'totara_core/components/uniform';
+// graphQL
+import SectionResponsesQuery from 'mod_perform/graphql/participant_section';
+import UpdateSectionResponsesMutation from 'mod_perform/graphql/update_section_responses';
 
 export default {
   components: {
     ButtonCancel,
     ButtonGroup,
     ButtonSubmit,
+    Checkbox,
+    Collapsible,
+    OtherParticipantResponses,
+    ParticipantUserHeader,
     Uniform,
   },
 
   props: {
-    subjectInstanceId: {
-      type: Number,
+    subjectInstance: {
       required: true,
+      type: Object,
     },
   },
 
   data() {
     return {
-      initialValues: { sectionElements: {} },
+      errors: null,
+      hasOtherResponse: false,
+      initialValues: null,
+      isSaving: false,
+      participantSectionId: null,
       section: {
         title: '',
         section_elements: [],
       },
       sectionElements: [],
-      errors: null,
-      isSaving: false,
-      participantSectionId: null,
+      showOtherResponse: false,
     };
   },
 
   apollo: {
     section: {
-      query: sectionResponses,
+      query: SectionResponsesQuery,
       variables() {
         return {
-          subject_instance_id: this.subjectInstanceId,
+          subject_instance_id: this.subjectInstance.id,
         };
       },
       update: data => data.mod_perform_participant_section.section,
-      fetchPolicy: 'network-only',
       result({ data }) {
         this.participantSectionId = data.mod_perform_participant_section.id;
-        this.sectionElements = data.mod_perform_participant_section.section.section_elements.map(
+        this.initialValues = {};
+        this.initialValues.sectionElements = {};
+        this.sectionElements = data.mod_perform_participant_section.section_element_responses.map(
           item => {
             return {
-              id: item.id,
+              id: item.section_element_id,
               clientId: uniqueId(),
+              component: tui.asyncComponent(
+                item.element.element_plugin.participant_form_component
+              ),
               element: {
                 type: item.element.element_plugin,
                 name: item.element.title,
@@ -110,23 +174,32 @@ export default {
                 data: JSON.parse(item.element.data),
               },
               sort_order: item.sort_order,
+              response_data: item.response_data,
+              other_responder_groups: item.other_responder_groups,
             };
           }
         );
-        this.initialValues.sectionElements = this.sectionElements;
+
+        data.mod_perform_participant_section.section_element_responses.forEach(
+          item => {
+            this.initialValues.sectionElements[
+              item.section_element_id
+            ] = JSON.parse(item.response_data);
+            if (item.other_responder_groups.length > 0) {
+              this.hasOtherResponse = true;
+            }
+            item.other_responder_groups.forEach(group => {
+              if (group.responses.length > 0 && item.response_data) {
+                this.showOtherResponse = true;
+              }
+            });
+          }
+        );
       },
     },
   },
 
   methods: {
-    /**
-     * if the element is editing shows the Form component else shows element display component
-     */
-    componentFor(sectionElement) {
-      const { type } = sectionElement.element;
-      return tui.asyncComponent(type.participant_form_component);
-    },
-
     /**
      * cancel saving
      */
@@ -139,7 +212,7 @@ export default {
      */
     showSuccessNotification() {
       notify({
-        duration: TOAST_DURATION,
+        duration: 10000,
         message: this.$str('toast_success_save_response', 'mod_perform'),
         type: 'success',
       });
@@ -150,7 +223,7 @@ export default {
      */
     showErrorNotification() {
       notify({
-        duration: TOAST_DURATION,
+        duration: 10000,
         message: this.$str('toast_error_save_response', 'mod_perform'),
         type: 'error',
       });
@@ -160,11 +233,15 @@ export default {
      * Back to user activities
      */
     backToUserActivities() {
+      // TODO add url here
+      // window.location.href =
       window.history.back();
     },
 
     /**
      * Save user responses and show notifications
+     *
+     * @param {Object} values
      */
     async submit(values) {
       if (this.errors) {
@@ -182,8 +259,7 @@ export default {
         const sectionResponsesResult = await this.save();
         const element_responses =
           sectionResponsesResult.mod_perform_update_section_responses
-            .element_responses;
-
+            .participant_section.section_element_responses;
         //assign errors to individual elements
         this.errors = element_responses
           .filter(item => item.validation_errors)
@@ -210,31 +286,27 @@ export default {
     /**
      * Extract section elements into new. update , delete and move
      * and call the GQL mutation to save section elements
-     * @returns {Promise<any>}
+     *
+     * @returns {Object}
      */
     async save() {
-      let variables,
-        update = [];
-
-      this.sectionElements.forEach(function(item) {
-        update.push({
+      const update = this.sectionElements.map(item => {
+        return {
           section_element_id: item.id,
           response_data: JSON.stringify(item.element.data),
-        });
+        };
       });
-      variables = {
-        input: {
-          participant_section_id: this.participantSectionId,
-          update: update,
-        },
-      };
 
       const { data: resultData } = await this.$apollo.mutate({
-        mutation: updateSectionResponsesMutation,
-        variables: variables,
+        mutation: UpdateSectionResponsesMutation,
+        variables: {
+          input: {
+            participant_section_id: this.participantSectionId,
+            update: update,
+          },
+        },
         refetchAll: false,
       });
-
       return resultData;
     },
   },
@@ -243,8 +315,10 @@ export default {
 <lang-strings>
   {
   "mod_perform": [
-    "toast_success_save_response",
-    "toast_error_save_response"
+  "user_activities_other_response_show",
+  "user_activities_your_relationship_to_user",
+  "toast_success_save_response",
+  "toast_error_save_response"
   ]
   }
 </lang-strings>

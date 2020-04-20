@@ -27,11 +27,13 @@ use core\collection;
 use core\entities\user;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
+use mod_perform\entities\activity\section_element;
 use mod_perform\models\activity\activity;
 use mod_perform\entities\activity\activity as activity_entity;
-use mod_perform\models\activity\element_response;
-use mod_perform\models\activity\element_validation_error;
-use mod_perform\models\activity\participant_section;
+use mod_perform\models\activity\element_plugin;
+use mod_perform\models\response\section_element_response;
+use mod_perform\models\response\element_validation_error;
+use mod_perform\models\response\participant_section;
 use mod_perform\state\invalid_state_switch_exception;
 use mod_perform\state\participant_section\complete;
 use mod_perform\state\participant_section\incomplete;
@@ -47,11 +49,11 @@ class mod_perform_participant_section_model_testcase extends advanced_testcase {
 
     public function state_transitions_data_provider(): array {
         return [
-            [not_started::class, incomplete::class, true],
-            [not_started::class, complete::class, true],
-            [incomplete::class, complete::class, true],
-            [not_started::class, not_started::class, false],
-            [complete::class, incomplete::class, false],
+            'Not started to incomplete' => [not_started::class, incomplete::class, true],
+            'Not started to complete' => [not_started::class, complete::class, true],
+            'Incomplete to complete' => [incomplete::class, complete::class, true],
+            'Not started to not started' => [not_started::class, not_started::class, false],
+            'Complete to incomplete' => [complete::class, incomplete::class, false],
         ];
     }
 
@@ -165,9 +167,9 @@ class mod_perform_participant_section_model_testcase extends advanced_testcase {
 
     /**
      * @dataProvider invalid_responses_provider
-     * @param element_response ...$element_responses
+     * @param section_element_response ...$element_responses
      */
-    public function test_complete_with_validation_errors(element_response ...$element_responses): void {
+    public function test_complete_with_validation_errors(section_element_response ...$element_responses): void {
         $participant_section = participant_section::load_by_entity($this->create_participant_section());
 
         self::assertEquals(
@@ -210,6 +212,89 @@ class mod_perform_participant_section_model_testcase extends advanced_testcase {
         ];
     }
 
+    public function test_set_response_data_from_request(): void {
+        $participant_section = $this->create_section_element_with_empty_responses();
+
+        $request_payload = [
+            ['section_element_id' => 1, 'response_data' => 'answer 1'],
+            ['section_element_id' => 2, 'response_data' => 'answer 2'],
+        ];
+
+        static::assertCount(2, $participant_section->get_section_element_responses());
+        static::assertNull($participant_section->find_element_response(1)->response_data);
+        static::assertNull($participant_section->find_element_response(2)->response_data);
+
+        $participant_section->set_responses_data_from_request($request_payload);
+
+        static::assertCount(2, $participant_section->get_section_element_responses());
+        static::assertEquals('answer 1', $participant_section->find_element_response(1)->response_data);
+        static::assertEquals('answer 2', $participant_section->find_element_response(2)->response_data);
+    }
+
+    public function test_set_response_data_from_request_partial_update(): void {
+        $participant_section = $this->create_section_element_with_empty_responses();
+
+        $request_payload = [
+            ['section_element_id' => 2, 'response_data' => 'answer 2'],
+        ];
+
+        static::assertCount(2, $participant_section->get_section_element_responses());
+        static::assertNull($participant_section->find_element_response(1)->response_data);
+        static::assertNull($participant_section->find_element_response(2)->response_data);
+
+        $participant_section->set_responses_data_from_request($request_payload);
+
+        static::assertCount(2, $participant_section->get_section_element_responses());
+        static::assertNull($participant_section->find_element_response(1)->response_data);
+        static::assertEquals('answer 2', $participant_section->find_element_response(2)->response_data);
+    }
+
+    public function test_cant_set_response_data_from_request_on_non_existent_section_element(): void {
+        $participant_section = $this->create_section_element_with_empty_responses();
+
+        $request_payload = [
+            ['section_element_id' => 3, 'response_data' => 'answer 1'],
+        ];
+
+        static::assertCount(2, $participant_section->get_section_element_responses());
+        static::assertNull($participant_section->find_element_response(1)->response_data);
+        static::assertNull($participant_section->find_element_response(2)->response_data);
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('Section element not found for id 3');
+
+        $participant_section->set_responses_data_from_request($request_payload);
+    }
+
+    private function create_section_element_with_empty_responses(): participant_section {
+        $participant_section_entity = $this->create_participant_section();
+
+        $participant_instance_entity = $participant_section_entity->participant_instance;
+
+        $section_element1 = new section_element(['id' => 1]);
+        $section_element2 = new section_element(['id' => 2]);
+
+        $response1 = new section_element_response(
+            $participant_instance_entity,
+            $section_element1,
+            null,
+            null,
+            element_plugin::load_by_plugin('short_text')
+        );
+
+        $response2 = new section_element_response(
+            $participant_instance_entity,
+            $section_element2,
+            null,
+            null,
+            element_plugin::load_by_plugin('short_text')
+        );
+
+        $responses = new collection([$response1, $response2]);
+
+        return new participant_section($participant_section_entity, $responses);
+    }
+
     /**
      * @param stdClass|null $subject_user
      * @param stdClass|null $other_participant
@@ -239,14 +324,14 @@ class mod_perform_participant_section_model_testcase extends advanced_testcase {
             ->one();
     }
 
-    private function create_valid_element_response(): element_response {
-        return new class extends element_response {
+    private function create_valid_element_response(): section_element_response {
+        return new class extends section_element_response {
             public $was_saved = false;
 
             public function __construct() {
             }
 
-            public function save(): element_response {
+            public function save(): section_element_response {
                 $this->was_saved = true;
                 return $this;
             }
@@ -258,14 +343,14 @@ class mod_perform_participant_section_model_testcase extends advanced_testcase {
         };
     }
 
-    private function create_element_response_with_validation_errors(): element_response {
-        return new class extends element_response {
+    private function create_element_response_with_validation_errors(): section_element_response {
+        return new class extends section_element_response {
             public $was_saved = false;
 
             public function __construct() {
             }
 
-            public function save(): element_response {
+            public function save(): section_element_response {
                 $this->was_saved = true;
                 return $this;
             }

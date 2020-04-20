@@ -52,13 +52,7 @@ class activity implements type_resolver {
         }
 
         $format = $args['format'] ?? format::FORMAT_HTML;
-
-        // The "subject_instance" type is not compatible with relevant context.
-        // As well as this type ("activity") it also has "user" as a child type.
-        // "User" is not compatible with a relevant execution context being set to a perform container.
-        $context = $ec->has_relevant_context() ? $ec->get_relevant_context() : $activity->get_context();
-
-        $formatter = new activity_formatter($activity, $context);
+        $formatter = new activity_formatter($activity, $ec->get_relevant_context());
 
         return $formatter->format($field, $format);
     }

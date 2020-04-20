@@ -30,14 +30,16 @@ use core\webapi\query_resolver;
 use mod_perform\data_providers\activity\subject_instance as subject_instance_data_provider;
 use mod_perform\models\activity\subject_instance as subject_instance_model;
 use totara_core\advanced_feature;
+use mod_perform\util;
 
 class subject_instances implements query_resolver {
 
     /**
      * Get the subject instances that the logged in user is participating in.
      *
-     * @param array $args
+     * @param array             $args
      * @param execution_context $ec
+     *
      * @return collection|mixed|subject_instance_model[]
      */
     public static function resolve(array $args, execution_context $ec) {
@@ -48,6 +50,8 @@ class subject_instances implements query_resolver {
 
         $filters = $args['filters'] ?? [];
         $about_filter = $filters['about'] ?? [];
+
+        $ec->set_relevant_context(util::get_default_context());
 
         return (new subject_instance_data_provider($participant_id))
             ->set_about_filter($about_filter)

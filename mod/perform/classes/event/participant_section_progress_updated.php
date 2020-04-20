@@ -26,7 +26,7 @@ namespace mod_perform\event;
 defined('MOODLE_INTERNAL') || die();
 
 use core\event\base;
-use mod_perform\models\activity\participant_section;
+use mod_perform\models\response\participant_section;
 
 class participant_section_progress_updated extends base {
 

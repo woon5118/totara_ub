@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Matthias Bonk <matthias.bonk@totaralearning.com>
+ * @author Jaron Steenson <jaron.steenson@totaralearning.com>
  * @package mod_perform
  */
 
@@ -45,7 +45,8 @@ class participant_instance implements type_resolver {
         }
 
         $format = $args['format'] ?? format::FORMAT_HTML;
-        $formatter = new participant_instance_formatter($participant_instance, $participant_instance->get_context());
+        $formatter = new participant_instance_formatter($participant_instance, $ec->get_relevant_context());
+
         return $formatter->format($field, $format);
     }
 }

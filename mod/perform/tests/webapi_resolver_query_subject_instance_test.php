@@ -42,6 +42,11 @@ class mod_perform_webapi_resolver_query_subject_instance_testcase extends mod_pe
 
         $actual = $result['data']['mod_perform_subject_instance'];
 
+        $profile_image_small_url = (new \user_picture(
+            self::$about_user_and_participating->subject_user->to_the_origins(),
+            0
+        ))->get_url($GLOBALS['PAGE'])->out(false);
+
         $expected = [
             'id' => self::$about_user_and_participating->id,
             'status' => self::$about_user_and_participating->get_status(),
@@ -49,8 +54,10 @@ class mod_perform_webapi_resolver_query_subject_instance_testcase extends mod_pe
                 'name' => self::$about_user_and_participating->get_activity()->name
             ],
             'subject_user' => [
-                'fullname' => self::$about_user_and_participating->subject_user->fullname
-            ]
+                'fullname' => self::$about_user_and_participating->subject_user->fullname,
+                'profileimageurlsmall' => $profile_image_small_url,
+            ],
+            'relationship_to_subject' => 'Self',
         ];
 
         self::assertEquals($expected, $actual);

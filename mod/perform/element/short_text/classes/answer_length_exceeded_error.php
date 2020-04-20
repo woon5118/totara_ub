@@ -23,7 +23,7 @@
 
 namespace performelement_short_text;
 
-use mod_perform\models\activity\element_validation_error;
+use mod_perform\models\response\element_validation_error;
 
 class answer_length_exceeded_error extends element_validation_error {
 

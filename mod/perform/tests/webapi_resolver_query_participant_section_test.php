@@ -33,21 +33,10 @@ use totara_webapi\graphql;
 
 class mod_perform_webapi_resolver_query_participant_section_testcase extends advanced_testcase {
 
-    /**
-     * Helper to get execution context
-     *
-     * @param string $type
-     * @param string|null $operation
-     * @return execution_context
-     */
-    private function get_execution_context(string $type = 'dev', ?string $operation = null): execution_context {
-        return execution_context::create($type, $operation);
-    }
-
     public function test_get_participant_section(): void {
-        $this->setAdminUser();
+        self::setAdminUser();
 
-        $data_generator = $this->getDataGenerator();
+        $data_generator = self::getDataGenerator();
         /** @var mod_perform_generator $perform_generator */
         $perform_generator = $data_generator->get_plugin_generator('mod_perform');
 
@@ -59,13 +48,13 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
         $element = $perform_generator->create_element();
         $section_element = $perform_generator->create_section_element($section, $element);
 
-        /** @var participant_section_entity[] $participant_sections_entities */
-        $participant_sections_entities = participant_section_entity::repository()->get();
+        /** @var participant_section_entity[] $participant_sections */
+        $participant_sections = participant_section_entity::repository()->order_by('id', 'desc')->get();
 
-        foreach ($participant_sections_entities as $participant_section_entity) {
-            $subject_instance = $participant_section_entity->participant_instance->subject_instance;
+        foreach ($participant_sections as $participant_section) {
+            $subject_instance = $participant_section->participant_instance->subject_instance;
 
-            $this->setUser($subject_instance->subject_user_id);
+            self::setUser($subject_instance->subject_user_id);
 
             $args = ['subject_instance_id' => $subject_instance->id];
 
@@ -74,16 +63,53 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
                 $args
             )->toArray(true)['data']['mod_perform_participant_section'];
 
-            $this->assertEquals($participant_section_entity->id, $result['id']);
-            $this->assertSame($participant_section_entity->section->title, $result['section']['title']);
+            $this->assertEquals($participant_section->id, $result['id']);
+            $this->assertSame($participant_section->section->title, $result['section']['title']);
+            $this->assertSame('NOT_STARTED', $result['progress_status']);
 
-            $result_section_elements = $result['section']['section_elements'];
+            $section_element_responses = $result['section_element_responses'];
 
-            $this->assertCount(1, $result_section_elements, 'Expected one section element');
-            $this->assertEquals($section_element->id, $result_section_elements[0]['id']);
-            $this->assertEquals($section_element->sort_order, $result_section_elements[0]['sort_order']);
-            $this->assertSame($section_element->element->title, $result_section_elements[0]['element']['title']);
+            $this->assertCount(1, $section_element_responses, 'Expected one section element');
+            $this->assertEquals(
+                $this->create_section_element_response($section_element->id),
+                $section_element_responses[0]
+            );
         }
+    }
+
+    private function create_section_element_response(int $section_element_id): array {
+        return [
+            'section_element_id' => $section_element_id,
+            'element' =>
+                [
+                    'element_plugin' =>
+                        [
+                            'participant_form_component' =>
+                                'performelement_short_text/components/ShortTextElementParticipantForm',
+                            'participant_response_component' =>
+                                'performelement_short_text/components/ShortTextElementParticipantResponse',
+                        ],
+                    'title' => 'test element title',
+                    'data' => null,
+                ],
+            'sort_order' => 1,
+            'response_data' => null,
+            'validation_errors' => [],
+            'other_responder_groups' => [],
+            'visible_to' => [],
+        ];
+    }
+
+
+    /**
+     * Helper to get execution context
+     *
+     * @param string $type
+     * @param string|null $operation
+     * @return execution_context
+     */
+    private function get_execution_context(string $type = 'dev', ?string $operation = null): execution_context {
+        return execution_context::create($type, $operation);
     }
 
 }

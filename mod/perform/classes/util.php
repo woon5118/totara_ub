@@ -26,6 +26,9 @@ namespace mod_perform;
 use container_perform\perform as perform_container;
 use mod_perform\entities\activity\activity_type;
 
+use context;
+use context_coursecat;
+
 class util {
 
     /**
@@ -115,5 +118,13 @@ class util {
 
             $entity->save();
         }
+    }
+
+    /**
+     * @return context
+     */
+    public static function get_default_context(): context {
+        $category_id = self::get_default_category_id();
+        return context_coursecat::instance($category_id);
     }
 }

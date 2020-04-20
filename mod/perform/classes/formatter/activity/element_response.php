@@ -34,7 +34,6 @@ class element_response extends entity_model_formatter {
 
     protected function get_map(): array {
         return [
-            'section_element' => null,
             'response_data' => null,
             'validation_errors' => null,
         ];

@@ -49,7 +49,7 @@ class subject_instance implements type_resolver {
 
         $format = $args['format'] ?? format::FORMAT_HTML;
 
-        $formatter = new subject_instance_formatter($subject_instance, $subject_instance->get_context());
+        $formatter = new subject_instance_formatter($subject_instance, $ec->get_relevant_context());
 
         return $formatter->format($field, $format);
     }

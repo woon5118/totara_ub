@@ -21,10 +21,15 @@
  * @package mod_perform
  */
 
+use core\entities\user;
 use mod_perform\data_providers\activity\subject_instance;
 use mod_perform\entities\activity\filters\subject_instances_about;
 use mod_perform\entities\activity\participant_instance;
+use mod_perform\models\activity\activity;
 use mod_perform\models\activity\subject_instance as subject_instance_model;
+use totara_core\relationship\resolvers\subject;
+use totara_job\relationship\resolvers\appraiser;
+use totara_job\relationship\resolvers\manager;
 
 require_once(__DIR__ . '/subject_instance_testcase.php');
 
@@ -111,6 +116,147 @@ class mod_perform_data_provider_subject_instances_testcase extends mod_perform_s
         self::assert_same_subject_instance(
             self::$about_user_and_participating, $returned_subject_instances->last()
         ); // 538001
+    }
+
+    /**
+     * @dataProvider relationship_to_user_data_provider
+     */
+    public function test_relationships_to_user_population(string $fetching_as): void {
+        self::setAdminUser();
+
+        /** @var mod_perform_generator $generator */
+        $generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
+
+        $subject_user = user::logged_in();
+        $subject_user_id = $subject_user->id;
+
+        $subject_instance = $generator->create_subject_instance([
+            'subject_is_participating' => true,
+            'subject_user_id' => $subject_user_id,
+            'other_participant_id' => null,
+            'include_questions' => false,
+        ]);
+
+        $activity = new activity($subject_instance->activity());
+
+        $section = $generator->create_section($activity, ['title' => 'Part one']);
+
+        $manager_section_relationship = $generator->create_section_relationship($section, ['class_name' => manager::class]);
+        $appraiser_section_relationship = $generator->create_section_relationship($section, ['class_name' => appraiser::class]);
+        $subject_section_relationship = $generator->create_section_relationship($section, ['class_name' => subject::class]);
+
+        $element = $generator->create_element(['title' => 'Question one']);
+        $generator->create_section_element($section, $element);
+
+        $manager_user = self::getDataGenerator()->create_user();
+        $appraiser_user = self::getDataGenerator()->create_user();
+
+        $generator->create_participant_instance_and_section(
+            $activity,
+            $manager_user,
+            $subject_instance->id,
+            $section,
+            $manager_section_relationship->activity_relationship_id
+        );
+
+        $generator->create_participant_instance_and_section(
+            $activity,
+            $appraiser_user,
+            $subject_instance->id,
+            $section,
+            $appraiser_section_relationship->activity_relationship_id
+        );
+
+        $subject_section = $generator->create_participant_instance_and_section(
+            $activity,
+            $subject_user->to_the_origins(),
+            $subject_instance->id,
+            $section,
+            $subject_section_relationship->activity_relationship_id
+        );
+
+        $user_id_map = [
+            'Self' => $subject_user_id,
+            'Manager' => $manager_user->id,
+            'Appraiser' => $appraiser_user->id,
+        ];
+
+        $data_provider = new subject_instance($user_id_map[$fetching_as]);
+        $subject_instances = $data_provider->fetch()->get();
+
+        self::assertCount(1, $subject_instances);
+
+        self::assertEquals($fetching_as, $subject_instances->first()->get_relationship_to_subject());
+    }
+
+
+    public function relationship_to_user_data_provider(): array {
+        return [
+            'fetching as subject/self' => ['Self'],
+            'fetching as manager' => ['Manager'],
+            'fetching as appraiser' => ['Appraiser'],
+        ];
+    }
+
+    public function test_relationships_to_user_population_same_user_is_manager_and_appraiser(): void {
+        self::setAdminUser();
+
+        /** @var mod_perform_generator $generator */
+        $generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
+
+        $subject_user = user::logged_in();
+        $subject_user_id = $subject_user->id;
+
+        $subject_instance = $generator->create_subject_instance([
+            'subject_is_participating' => true,
+            'subject_user_id' => $subject_user_id,
+            'other_participant_id' => null,
+            'include_questions' => false,
+        ]);
+
+        $activity = new activity($subject_instance->activity());
+
+        $section = $generator->create_section($activity, ['title' => 'Part one']);
+
+        $manager_section_relationship = $generator->create_section_relationship($section, ['class_name' => manager::class]);
+        $appraiser_section_relationship = $generator->create_section_relationship($section, ['class_name' => appraiser::class]);
+        $subject_section_relationship = $generator->create_section_relationship($section, ['class_name' => subject::class]);
+
+        $element = $generator->create_element(['title' => 'Question one']);
+        $generator->create_section_element($section, $element);
+
+        $manager_appraiser_user = self::getDataGenerator()->create_user();
+
+        $generator->create_participant_instance_and_section(
+            $activity,
+            $manager_appraiser_user,
+            $subject_instance->id,
+            $section,
+            $manager_section_relationship->activity_relationship_id
+        );
+
+        $generator->create_participant_instance_and_section(
+            $activity,
+            $manager_appraiser_user,
+            $subject_instance->id,
+            $section,
+            $appraiser_section_relationship->activity_relationship_id
+        );
+
+        $generator->create_participant_instance_and_section(
+            $activity,
+            $subject_user->to_the_origins(),
+            $subject_instance->id,
+            $section,
+            $subject_section_relationship->activity_relationship_id
+        );
+
+        $data_provider = new subject_instance($manager_appraiser_user->id);
+        $subject_instances = $data_provider->fetch()->get();
+
+        self::assertCount(1, $subject_instances);
+
+        self::assertEquals('Appraiser', $subject_instances->first()->get_relationship_to_subject());
     }
 
     /**

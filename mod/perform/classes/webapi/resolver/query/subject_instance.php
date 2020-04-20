@@ -23,12 +23,13 @@
 
 namespace mod_perform\webapi\resolver\query;
 
+use totara_core\advanced_feature;
 use core\entities\user;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
 use mod_perform\data_providers\activity\subject_instance as subject_instance_data_provider;
 use mod_perform\models\activity\subject_instance as subject_instance_model;
-use totara_core\advanced_feature;
+use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 
 class subject_instance implements query_resolver {
 
@@ -45,9 +46,19 @@ class subject_instance implements query_resolver {
 
         $subject_instance_id = $args['subject_instance_id'];
 
+        /** @var subject_instance_entity $subject_instance_entity */
+        $subject_instance_entity = subject_instance_entity::repository()->find($subject_instance_id);
+
+        if ($subject_instance_entity === null) {
+            return null;
+        }
+
+        $ec->set_relevant_context(subject_instance_model::load_by_entity($subject_instance_entity)->get_context());
+
         /** @var user $target_participant */
         $participant_id = User::logged_in()->id;
 
+        /** @var subject_instance_model $subject_instance */
         return (new subject_instance_data_provider($participant_id))
             ->set_subject_instance_id_filter($subject_instance_id)
             ->fetch()

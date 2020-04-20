@@ -2,20 +2,44 @@ mutation mod_perform_update_section_responses(
   $input: mod_perform_update_section_responses_input!
 ) {
   mod_perform_update_section_responses(input: $input) {
-    id
-    section {
+    participant_section {
       id
-      title
-    }
-    element_responses {
-      section_element {
-        id
-        sort_order
+      progress_status
+      section {
+        title
       }
-      response_data
-      validation_errors {
-        error_code
-        error_message
+      section_element_responses {
+        section_element_id
+        element {
+          element_plugin {
+            participant_form_component
+          }
+          title
+          data
+        }
+        sort_order
+        response_data
+        validation_errors {
+          error_code
+          error_message
+        }
+        other_responder_groups {
+          relationship_name
+          responses {
+            participant_instance {
+              participant {
+                fullname
+                profileimageurlsmall
+              }
+            }
+            response_data
+          }
+        }
+        visible_to {
+          participant {
+            fullname
+          }
+        }
       }
     }
   }

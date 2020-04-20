@@ -26,8 +26,9 @@ namespace mod_perform\webapi\resolver\query;
 use core\entities\user;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
-use mod_perform\models\activity\subject_instance;
-use mod_perform\entities\activity\subject_instance as subject_instance_entity;
+use mod_perform\data_providers\response\participant_section_with_responses;
+use mod_perform\entities\activity\participant_section as participant_section_entity;
+use mod_perform\models\activity\subject_instance as subject_instance_model;
 use totara_core\advanced_feature;
 
 class participant_section implements query_resolver {
@@ -36,21 +37,22 @@ class participant_section implements query_resolver {
         advanced_feature::require('performance_activities');
         require_login(null, false, null, false, true);
 
-        /** @var subject_instance_entity $subject_instance_entity */
-        $subject_instance_entity = subject_instance_entity::repository()->find($args['subject_instance_id']);
+        $subject_instance_id = $args['subject_instance_id'];
+        $participant_id = user::logged_in()->id;
 
-        if ($subject_instance_entity === null) {
+        $participant_section_entity = participant_section_entity::repository()->fetch_default(
+            $subject_instance_id,
+            $participant_id
+        );
+
+        if ($participant_section_entity === null) {
             return null;
         }
 
-        $subject_instance = subject_instance::load_by_entity($subject_instance_entity);
+        $ec->set_relevant_context(subject_instance_model::load_by_id($subject_instance_id)->get_context());
 
-        $participant_id = user::logged_in()->id;
+        $data_provider = new participant_section_with_responses($participant_id, $participant_section_entity->id);
 
-        $participant_section = $subject_instance->get_participant_section_for_participant($participant_id);
-
-        $ec->set_relevant_context($participant_section->get_section()->get_activity()->get_context());
-
-        return $participant_section;
+        return $data_provider->fetch()->get();
     }
 }

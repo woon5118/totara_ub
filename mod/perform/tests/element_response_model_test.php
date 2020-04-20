@@ -28,13 +28,13 @@ use mod_perform\entities\activity\element_response as element_response_entity;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\entities\activity\section_element as section_element_entity;
 use mod_perform\models\activity\element_plugin;
-use mod_perform\models\activity\element_response;
-use mod_perform\models\activity\element_validation_error;
+use mod_perform\models\response\section_element_response;
+use mod_perform\models\response\element_validation_error;
 
 /**
  * @group perform
  */
-class mod_perform_response_mdodel_testcase extends advanced_testcase {
+class mod_perform_response_model_testcase extends advanced_testcase {
 
     /**
      * @dataProvider constructor_only_allows_responses_entities_related_to_others_provider
@@ -56,7 +56,7 @@ class mod_perform_response_mdodel_testcase extends advanced_testcase {
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage($expected_message);
 
-        new element_response($participant_instance_entity, $section_element_entity, $element_response_entity);
+        new section_element_response($participant_instance_entity, $section_element_entity, $element_response_entity);
     }
 
     public function constructor_only_allows_responses_entities_related_to_others_provider(): array {
@@ -83,12 +83,13 @@ class mod_perform_response_mdodel_testcase extends advanced_testcase {
     /**
      * @throws coding_exception
      */
-    public function test_completing_supports_elements_that_have_not_been_responded_to(): void {
+    public function test_saving_supports_elements_that_have_not_been_responded_to(): void {
         $participant_instance = new participant_instance_entity(['id' => 100]);
         $section_element = new section_element_entity(['id' => 200]);
 
-        $element_response = new element_response($participant_instance,
+        $element_response = new section_element_response($participant_instance,
             $section_element,
+            null,
             null,
             $this->create_element_plugin_stub()
         );
@@ -110,8 +111,9 @@ class mod_perform_response_mdodel_testcase extends advanced_testcase {
         $participant_instance = new participant_instance_entity(['id' => 100]);
         $section_element = new section_element_entity(['id' => 200]);
 
-        $element_response = new element_response($participant_instance,
+        $element_response = new section_element_response($participant_instance,
             $section_element,
+            null,
             null,
             $this->create_element_plugin_stub()
         );
@@ -131,8 +133,9 @@ class mod_perform_response_mdodel_testcase extends advanced_testcase {
         $participant_instance = new participant_instance_entity(['id' => 100]);
         $section_element = new section_element_entity(['id' => 200]);
 
-        $element_response = new element_response($participant_instance,
+        $element_response = new section_element_response($participant_instance,
             $section_element,
+            null,
             null,
             $this->create_element_plugin_with_validation_errors()
         );
@@ -167,7 +170,7 @@ class mod_perform_response_mdodel_testcase extends advanced_testcase {
             public function __construct() {
             }
 
-            public function validate_response(): collection {
+            public function validate_response(?string $encoded_response_data): collection {
                 $error = new element_validation_error(1, 'There was a problem.');
                 $error2 = new element_validation_error(2, 'There was another problem.');
 

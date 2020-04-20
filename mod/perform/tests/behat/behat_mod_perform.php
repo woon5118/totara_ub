@@ -29,8 +29,14 @@ use mod_perform\controllers\activity\view_user_activity;
 
 class behat_mod_perform extends behat_base {
 
-    public const TUI_USER_ANSWER_ERROR_LOCATOR = '.tui-formFieldError';
-    public const USER_QUESTION_TEXT_LOCATOR = '.tui-collapsible__header-text';
+    public const PERFORM_ELEMENT_VALIDATION_ERROR_LOCATOR = '.tui-formFieldError';
+    public const PERFORM_ELEMENT_LOCATOR = '.tui-participantContent__sectionItem';
+    public const PERFORM_ELEMENT_QUESTION_TEXT_LOCATOR = '.tui-collapsible__header-text';
+    public const SHORT_TEXT_RESPONSE_LOCATOR = 'textarea';
+    public const PERFORM_ELEMENT_OTHER_RESPONSE_LOCATOR = '.tui-otherParticipantResponse';
+    public const PERFORM_ELEMENT_OTHER_RESPONSE_RELATION_LOCATOR = '.tui-otherParticipantResponse__relation .tui-formLabel';
+    public const SHORT_TEXT_ANSWER_LOCATOR = '.tui-shortTextElementParticipantResponse__answer';
+    public const PERFORM_ACTIVITY_YOUR_RELATIONSHIP_LOCATOR = '.tui-participantContent__user-relationshipValue';
 
     /**
      * Navigate to the specified page and wait for JS.
@@ -102,6 +108,80 @@ class behat_mod_perform extends behat_base {
     }
 
     /**
+     * @Given /^I should see perform activity relationship to user "([^"]*)"$/
+     * @param $element_type
+     * @param $question_text
+     * @param $expected_relation
+     * @param $expected_answer_text
+     * @throws ExpectationException
+     */
+    public function i_should_see_perform_activity_relationship_to_user(string $expected_relation) {
+        $your_relationship_element = $this->find('css', self::PERFORM_ACTIVITY_YOUR_RELATIONSHIP_LOCATOR);
+
+        if ($expected_relation == trim($your_relationship_element->getText())) {
+            return;
+        }
+        throw new ExpectationException(
+            "Could not find expected relationship to user {$expected_relation}",
+            $this->getSession()
+        );
+    }
+
+    /**
+     * @Then /^I click show others responses$/
+     * @readonly
+     */
+    public function i_click_show_others_responses(): void {
+
+        $this->find('css', '.tui-participantContent__sectionHeading-switch label')->click();
+    }
+
+    /**
+     * @Given /^I should see perform "([^"]*)" question "([^"]*)" is answered by "([^"]*)" with "([^"]*)"$/
+     * @param $element_type
+     * @param $question_text
+     * @param $expected_relation
+     * @param $expected_answer_text
+     * @throws ExpectationException
+     */
+    public function i_should_see_perform_question_is_answered_by_with(
+        string $element_type,
+        string $question_text,
+        string $expected_relation,
+        string $expected_answer_text
+    ): void {
+        $has_relation = false;
+        $has_answer = false;
+        $question = $this->find_question_from_text($question_text);
+        $other_response_element = $question->find('css', self::PERFORM_ELEMENT_OTHER_RESPONSE_LOCATOR);
+
+        $relations = $other_response_element->findAll('css', self::PERFORM_ELEMENT_OTHER_RESPONSE_RELATION_LOCATOR);
+        foreach ($relations as $relation) {
+            if ((strpos(trim($relation->getText()), $expected_relation) === false)) {
+                continue;
+            }
+            $has_relation = true;
+        }
+
+        $other_responses = $this->find_question_other_responses_by_element($element_type, $other_response_element);
+        foreach ($other_responses as $other_response) {
+            if ($expected_answer_text !== trim($other_response->getText())) {
+                continue;
+            }
+            $has_answer = true;
+        }
+
+        if ($has_relation && $has_answer) {
+            return;
+        }
+
+        throw new ExpectationException(
+            "Could not find expected other response by {$expected_relation} with {$expected_answer_text}",
+            $this->getSession()
+        );
+    }
+
+    /**
      * @Then /^I should see "([^"]*)" has the validation error "([^"]*)"$/
      * @param string $question_text
      * @param string $expected_validation_error
@@ -113,7 +193,7 @@ class behat_mod_perform extends behat_base {
     ): void {
         $question = $this->find_question_from_text($question_text);
 
-        $validation_errors = $question->findAll('css', self::TUI_USER_ANSWER_ERROR_LOCATOR);
+        $validation_errors = $question->findAll('css', self::PERFORM_ELEMENT_VALIDATION_ERROR_LOCATOR);
 
         foreach ($validation_errors as $error) {
             if ($expected_validation_error === trim($error->getText())) {
@@ -132,7 +212,7 @@ class behat_mod_perform extends behat_base {
     public function i_should_see_perform_question_has_no_validation_errors(string $question_text): void {
         $question = $this->find_question_from_text($question_text);
 
-        $validation_errors = $question->findAll('css', self::TUI_USER_ANSWER_ERROR_LOCATOR);
+        $validation_errors = $question->findAll('css', self::PERFORM_ELEMENT_VALIDATION_ERROR_LOCATOR);
 
         if (count($validation_errors) > 0) {
             throw new ExpectationException(
@@ -185,9 +265,22 @@ class behat_mod_perform extends behat_base {
         return $question->find('css', $response_locator);
     }
 
+    private function find_question_other_responses_by_element(string $element_type, NodeElement $other_responses) {
+        $map = [
+            'short text' => self::SHORT_TEXT_ANSWER_LOCATOR,
+        ];
+
+        $locator =  $map[$element_type] ?? null;
+        if ($locator === null) {
+            throw new ExpectationException("Invalid perform element type {$element_type}", $this->getSession());
+        }
+
+        return $other_responses->findAll('css', $locator);
+    }
+
     private function get_response_element_response_locator(string $element_type): string {
         $map = [
-            'short text' => 'textarea'
+            'short text' => self::SHORT_TEXT_RESPONSE_LOCATOR,
         ];
 
         $locator =  $map[$element_type] ?? null;
@@ -201,10 +294,10 @@ class behat_mod_perform extends behat_base {
 
     private function find_question_from_text(string $question_text): NodeElement {
         /** @var NodeElement[] $questions */
-        $questions = $this->find_all('css', '.tui-elementResponse');
+        $questions = $this->find_all('css', self::PERFORM_ELEMENT_LOCATOR);
 
         foreach ($questions as $question) {
-            $found_question = $question->find('css', self::USER_QUESTION_TEXT_LOCATOR);
+            $found_question = $question->find('css', self::PERFORM_ELEMENT_QUESTION_TEXT_LOCATOR);
 
             if ($found_question === null) {
                 continue;
@@ -215,7 +308,7 @@ class behat_mod_perform extends behat_base {
             }
         }
 
-        throw new ExpectationException("Question not found with text ${$question_text}", $this->getSession());
+        throw new ExpectationException("Question not found with text {$question_text}", $this->getSession());
     }
 
 }

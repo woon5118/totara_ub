@@ -49,6 +49,7 @@ class section implements type_resolver {
 
         $format = $args['format'] ?? format::FORMAT_HTML;
         $formatter = new section_formatter($section, $ec->get_relevant_context());
+
         return $formatter->format($field, $format);
     }
 }

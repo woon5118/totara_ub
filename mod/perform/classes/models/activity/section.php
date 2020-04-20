@@ -55,6 +55,7 @@ class section extends model {
         'title',
         'section_elements',
         'section_relationships',
+        'participant_sections',
     ];
 
     /**

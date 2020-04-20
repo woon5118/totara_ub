@@ -24,6 +24,7 @@
 namespace mod_perform\formatter\activity;
 
 use core\orm\formatter\entity_model_formatter;
+use mod_perform\models\activity\participant_instance as participant_instance_model;
 
 /**
  * Class participant_instance
@@ -32,9 +33,15 @@ use core\orm\formatter\entity_model_formatter;
  */
 class participant_instance extends entity_model_formatter {
 
+    /**
+     * @var participant_instance_model
+     */
+    protected $object;
+
     protected function get_map(): array {
         return [
             'id' => null,
+            'participant' => null,
             'progress_status' => null,
         ];
     }

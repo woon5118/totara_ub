@@ -17,26 +17,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Nathan Lewis <nathan.lewis@totaralearning.com>
+ * @author Jaron Steenson <jaron.steenson@totaralearning.com>
  * @package mod_perform
  */
 
-namespace mod_perform\formatter\activity;
+namespace mod_perform\formatter\response;
 
-use core\webapi\formatter\field\string_field_formatter;
-use core\webapi\formatter\formatter;
+use core\orm\formatter\entity_model_formatter;
 
 /**
- * Class participant_section
+ * Class section_element
  *
- * @package mod_perform\formatter\activity
+ * @package mod_perform\formatter\response
+ * @property \mod_perform\models\response\section_element_response object
  */
-class validation_error extends formatter {
+class section_element_response extends entity_model_formatter {
 
     protected function get_map(): array {
         return [
-            'error_code' => null,
-            'error_message' => string_field_formatter::class,
+            'section_element_id' => null,
+            'element' => null,
+            'sort_order' => null,
+            'response_data' => null,
+            'participant_instance' => null,
+            'other_responder_groups' => null,
+            'visible_to' => null,
+            'validation_errors' => null,
         ];
     }
 }

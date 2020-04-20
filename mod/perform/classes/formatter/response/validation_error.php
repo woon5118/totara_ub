@@ -17,38 +17,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Jaron Steenson <jaron.steenson@totaralearning.com>
+ * @author Nathan Lewis <nathan.lewis@totaralearning.com>
  * @package mod_perform
  */
 
-namespace mod_perform\models\activity;
+namespace mod_perform\formatter\response;
+
+use core\webapi\formatter\field\string_field_formatter;
+use core\webapi\formatter\formatter;
 
 /**
- * Class element_plugin_validation_error
+ * Class participant_section
  *
- * @package mod_perform\models\activity
+ * @package mod_perform\formatter\activity
  */
-class element_validation_error {
+class validation_error extends formatter {
 
-    /**
-     * @var string
-     */
-    public $error_code;
-
-    /**
-     * @var string
-     */
-    public $error_message;
-
-    /**
-     * Element plugin constructor
-     *
-     * @param string $error_code
-     * @param string $error_message
-     */
-    public function __construct(string $error_code, string $error_message) {
-        $this->error_code = $error_code;
-        $this->error_message = $error_message;
+    protected function get_map(): array {
+        return [
+            'error_code' => null,
+            'error_message' => string_field_formatter::class,
+        ];
     }
-
 }

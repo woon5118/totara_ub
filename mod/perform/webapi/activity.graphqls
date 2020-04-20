@@ -29,6 +29,7 @@ type mod_perform_element_plugin {
   admin_form_component: String!
   admin_display_component: String!
   participant_form_component: String!
+  participant_response_component: String!
 }
 
 """
@@ -64,15 +65,6 @@ type mod_perform_section {
 }
 
 """
-A participant section
-"""
-type mod_perform_participant_section {
-  id: core_id!
-  section: mod_perform_section!
-  element_responses: [mod_perform_element_response!]!
-}
-
-"""
 An element used in a section
 """
 type mod_perform_section_element {
@@ -80,15 +72,6 @@ type mod_perform_section_element {
   section: mod_perform_section!
   element: mod_perform_element!
   sort_order: Int!
-}
-
-"""
-A response to a question (section element)
-"""
-type mod_perform_element_response {
-  section_element: mod_perform_section_element!
-  response_data: String! # JSON encoded answer, format is specific to the element type
-  validation_errors: [mod_perform_validation_error!]!
 }
 
 """
@@ -106,6 +89,7 @@ type mod_perform_subject_instance {
   id: core_id!
   activity: mod_perform_activity!
   status: mod_perform_subject_instance_status!
+  relationship_to_subject: String!
   subject_user: core_user!
   participant_instances: [mod_perform_participant_instance!]!
 }
@@ -115,6 +99,8 @@ Details about a participant_instance
 """
 type mod_perform_participant_instance {
   id: core_id!
+  participant_sections: [mod_perform_participant_section!]!
+  participant: core_user!
   progress_status: mod_perform_participant_instance_status!
 }
 
@@ -221,14 +207,6 @@ input mod_perform_update_element_input {
 }
 
 """
-Update the response for a question
-"""
-input mod_perform_update_element_response_input {
-  section_element_id: core_id!
-  response_data: String! # JSON encoded answer, format is specific to the element type
-}
-
-"""
 Delete an existing section element
 """
 input mod_perform_delete_section_element_input {
@@ -253,14 +231,6 @@ input mod_perform_update_section_elements_input {
   update: [mod_perform_update_element_input!]
   delete: [mod_perform_delete_section_element_input!]
   move: [mod_perform_move_section_element_input!]
-}
-
-"""
-Update a section's responses
-"""
-input mod_perform_update_section_responses_input {
-  participant_section_id: core_id!
-  update: [mod_perform_update_element_response_input!]!
 }
 
 """
@@ -307,13 +277,6 @@ extend type Mutation {
   mod_perform_update_section_elements(
     input: mod_perform_update_section_elements_input!
   ): mod_perform_section_result!
-
-  """
-  Update the responses in a section
-  """
-  mod_perform_update_section_responses(
-    input: mod_perform_update_section_responses_input!
-  ): mod_perform_participant_section
 }
 
 """

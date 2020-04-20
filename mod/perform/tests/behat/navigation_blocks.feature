@@ -44,7 +44,8 @@ Feature: Make sure the correct navigation breadcrumbs and blocks are shown.
     # Single activity page
     When I click on "Activities about others" "link"
     And I click on "activity_one" "link"
-    Then I should see "activity_one (User One)"
+    Then I should see "activity_one"
+    And I should see perform activity relationship to user "Manager"
     And I should not see "Performance activity administration" in the "#settingsnav" "css_element"
     And I should not see "Course administration" in the "#settingsnav" "css_element"
     And I should not see "Courses" in the ".breadcrumb-container" "css_element"

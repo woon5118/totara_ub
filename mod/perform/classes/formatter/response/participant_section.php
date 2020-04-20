@@ -21,7 +21,7 @@
  * @package mod_perform
  */
 
-namespace mod_perform\formatter\activity;
+namespace mod_perform\formatter\response;
 
 use core\orm\formatter\entity_model_formatter;
 
@@ -29,6 +29,7 @@ use core\orm\formatter\entity_model_formatter;
  * Class participant_section
  *
  * @package mod_perform\formatter\activity
+ * @property \mod_perform\models\response\participant_section object
  */
 class participant_section extends entity_model_formatter {
 
@@ -37,6 +38,9 @@ class participant_section extends entity_model_formatter {
             'id' => null,
             'section' => null,
             'element_responses' => null,
+            'section_element_responses' => null,
+            'progress_status' => null,
+            'participant_instance' => null,
         ];
     }
 }

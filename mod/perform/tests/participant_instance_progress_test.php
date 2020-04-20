@@ -25,7 +25,7 @@ use core\collection;
 use core\entities\user;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\models\activity\participant_instance;
-use mod_perform\models\activity\participant_section;
+use mod_perform\models\response\participant_section;
 use mod_perform\state\participant_instance\complete as complete_instance;
 use mod_perform\state\participant_instance\condition\all_sections_complete;
 use mod_perform\state\participant_instance\condition\at_least_one_section_started;
@@ -43,7 +43,7 @@ require_once(__DIR__ . '/generator/activity_generator_configuration.php');
  */
 class mod_perform_participant_instance_progress_testcase extends advanced_testcase {
 
-    public function condition_all_sections_data_provider() {
+    public function condition_all_sections_data_provider(): array {
         $n = not_started_section::get_code();
         $i = incomplete_section::get_code();
         $c = complete_section::get_code();

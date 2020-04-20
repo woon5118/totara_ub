@@ -5,8 +5,10 @@ query mod_perform_subject_instance($subject_instance_id: core_id!) {
     activity {
       name
     }
+    relationship_to_subject
     subject_user {
       fullname
+      profileimageurlsmall
     }
   }
 }

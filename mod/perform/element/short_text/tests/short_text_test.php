@@ -37,14 +37,14 @@ class mod_perform_element_short_text_testcase extends advanced_testcase {
      * @param array|null $response_data
      * @throws coding_exception
      */
-    public function test_set_response_data_invalid_format(array $response_data): void {
+    public function test_validate_response_invalid_format(array $response_data): void {
         /** @var short_text $short_text */
         $short_text = element_plugin::load_by_plugin('short_text');
 
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage('Invalid response data format, expected "answer_text" field');
 
-        $short_text->set_response_data($response_data);
+        $short_text->validate_response(json_encode($response_data));
     }
 
     public function invalid_response_data_format_provider(): array {
@@ -64,7 +64,7 @@ class mod_perform_element_short_text_testcase extends advanced_testcase {
         /** @var short_text $short_text */
         $short_text = element_plugin::load_by_plugin('short_text');
 
-        $errors = $short_text->set_response_data(['answer_text' => $answer_text])->validate_response();
+        $errors = $short_text->validate_response(json_encode(['answer_text' => $answer_text]));
 
         self::assertEquals($expected_errors, $errors);
     }

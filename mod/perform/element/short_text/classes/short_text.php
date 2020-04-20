@@ -32,39 +32,42 @@ class short_text extends element_plugin {
 
     public const MAX_ANSWER_LENGTH = 1024;
 
-    protected $answer_text;
-
     /**
      * @inheritDoc
      */
-    public function set_response_data(?array $response_data): element_plugin {
+    public function validate_response(?string $encoded_response_data): collection {
+        $answer_text = $this->decode_answer_text($encoded_response_data);
+
+        $errors = new collection();
+
+        if ((string) $answer_text === '') {
+            $errors->append(new answer_required_error());
+        }
+
+        if (core_text::strlen($answer_text) > self::MAX_ANSWER_LENGTH) {
+            $errors->append(new answer_length_exceeded_error());
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Pull the answer text string out of the encoded json data.
+     * @param string|null $encoded_response_data
+     * @return string
+     */
+    protected function decode_answer_text(?string $encoded_response_data): ?string {
+        $response_data = json_decode($encoded_response_data, true);
+
         if ($response_data === null) {
-            return $this;
+            return null;
         }
 
         if (!is_array($response_data) || !array_key_exists('answer_text', $response_data)) {
             throw new coding_exception('Invalid response data format, expected "answer_text" field');
         }
 
-        $this->answer_text = $response_data['answer_text'];
-
-        return $this;
+        return $response_data['answer_text'];
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function validate_response(): collection {
-        $errors = new collection();
-
-        if ((string) $this->answer_text === '') {
-            $errors->append(new answer_required_error());
-        }
-
-        if (core_text::strlen($this->answer_text) > self::MAX_ANSWER_LENGTH) {
-            $errors->append(new answer_length_exceeded_error());
-        }
-
-        return $errors;
-    }
 }

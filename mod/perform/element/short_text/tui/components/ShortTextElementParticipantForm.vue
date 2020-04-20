@@ -23,20 +23,18 @@
   <ElementUserForm>
     <template v-slot:content>
       <div>
-        <Collapsible :label="name" :initial-state="true">
-          <Scope :path="path" :process="process">
-            <FormRow
-              :label="
-                $str('short_text_your_response', 'performelement_short_text')
-              "
-            >
-              <FormTextarea
-                name="answer_text"
-                :validations="v => [v.required(), v.maxLength(1024)]"
-              />
-            </FormRow>
-          </Scope>
-        </Collapsible>
+        <Scope :path="path" :process="process">
+          <FormRow
+            :label="
+              $str('short_text_your_response', 'performelement_short_text')
+            "
+          >
+            <FormTextarea
+              name="answer_text"
+              :validations="v => [v.required(), v.maxLength(1024)]"
+            />
+          </FormRow>
+        </Scope>
       </div>
     </template>
   </ElementUserForm>
@@ -46,13 +44,11 @@
 import Scope from 'totara_core/components/reform/Scope';
 import { FormRow } from 'totara_core/components/uniform';
 import FormTextarea from 'totara_core/components/uniform/FormTextarea';
-import Collapsible from 'totara_core/components/collapsible/Collapsible';
 import ElementUserForm from 'mod_perform/components/element/ElementUserForm';
 
 export default {
   components: {
     Scope,
-    Collapsible,
     FormRow,
     FormTextarea,
     ElementUserForm,

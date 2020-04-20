@@ -32,13 +32,10 @@
         "
         type="error"
       />
-      <h2 v-if="activityFound">
-        {{ subjectInstance.activity.name }} ({{
-          subjectInstance.subject_user.fullname
-        }})
-
-        <ActivityContent :subject-instance-id="subjectInstanceId" />
-      </h2>
+      <ActivityContent
+        v-if="activityFound"
+        :subject-instance="subjectInstance"
+      />
     </Loader>
   </div>
 </template>
@@ -66,6 +63,7 @@ export default {
     return {
       hasLoaded: false,
       userActivity: null,
+      subjectInstance: null,
     };
   },
   apollo: {

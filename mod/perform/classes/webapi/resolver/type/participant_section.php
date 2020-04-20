@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
@@ -26,8 +26,8 @@ namespace mod_perform\webapi\resolver\type;
 use core\format;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
-use mod_perform\formatter\activity\participant_section as participant_section_formatter;
-use mod_perform\models\activity\participant_section as participant_section_model;
+use mod_perform\formatter\response\participant_section as participant_section_formatter;
+use mod_perform\models\response\participant_section as participant_section_model;
 
 class participant_section implements type_resolver {
 
@@ -46,6 +46,7 @@ class participant_section implements type_resolver {
 
         $format = $args['format'] ?? format::FORMAT_HTML;
         $formatter = new participant_section_formatter($participant_section, $ec->get_relevant_context());
+
         return $formatter->format($field, $format);
     }
 }

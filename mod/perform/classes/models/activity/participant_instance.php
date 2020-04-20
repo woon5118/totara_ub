@@ -24,9 +24,9 @@
 namespace mod_perform\models\activity;
 
 use context_module;
+use core\entities\user;
 use core\orm\entity\model;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
-use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 use mod_perform\state\state;
 use mod_perform\state\state_aware;
 
@@ -37,25 +37,30 @@ use mod_perform\state\state_aware;
  *
  * @property-read int $progress
  * @property-read int $participant_id
+ * @property-read subject_instance $subject_instance
+ * @property-read int $subject_instance_id
  */
 class participant_instance extends model {
 
     use state_aware;
 
-    protected $entity_attribute_whitelist = [
-        'progress',
-        'participant_id',
-        'participant_sections'
-    ];
-
-    protected $model_accessor_whitelist = [
-        'progress_status'
-    ];
-
     /**
      * @var participant_instance_entity
      */
     protected $entity;
+
+    protected $entity_attribute_whitelist = [
+        'progress',
+        'participant_id',
+        'participant_sections',
+        'subject_instance_id',
+    ];
+
+    protected $model_accessor_whitelist = [
+        'progress_status',
+        'subject_instance',
+        'participant',
+    ];
 
     public static function get_entity_class(): string {
         return participant_instance_entity::class;
@@ -70,18 +75,30 @@ class participant_instance extends model {
         $this->entity->update();
     }
 
-    public function get_context(): context_module {
-        /** @var subject_instance_entity $subject_instance_entity */
-        $subject_instance_entity = $this->entity->subject_instance;
-        $subject_instance = new subject_instance($subject_instance_entity);
+    public function get_subject_instance(): subject_instance {
+        return subject_instance::load_by_entity($this->entity->subject_instance);
+    }
 
-        return $subject_instance->get_context();
+    /**
+     * Get the participant entity, for now always an internal user.
+     */
+    public function get_participant(): user {
+        return $this->entity->participant_user;
+    }
+
+    /**
+     * Get the context object for the overarching abstract perform activity (perform in the database).
+     *
+     * @return context_module
+     */
+    public function get_context(): context_module {
+        return $this->get_subject_instance()->get_context();
     }
 
     /**
      * Update progress status according to section progress.
      */
-    public function update_progress_status() {
+    public function update_progress_status(): void {
         $this->get_state()->update_progress();
     }
 

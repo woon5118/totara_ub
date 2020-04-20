@@ -37,6 +37,8 @@ use core\orm\entity\relations\has_many_through;
  * @property int $created_at
  * @property int $updated_at
  *
+ * @method static participant_section_repository repository()
+ *
  * @property-read section $section
  * @property-read participant_instance $participant_instance
  * @property-read collection|section_element[] $section_elements

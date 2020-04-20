@@ -23,6 +23,7 @@
 
 namespace mod_perform\data_providers\activity;
 
+use coding_exception;
 use core\orm\collection;
 use core\orm\entity\repository;
 use core\orm\query\builder;
@@ -31,33 +32,38 @@ use mod_perform\entities\activity\participant_instance;
 use mod_perform\models\activity\subject_instance as subject_instance_model;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 use mod_perform\entities\activity\filters\subject_instances_about;
+use totara_core\relationship\relationship;
 
+/**
+ * Class subject_instance
+ *
+ * @package mod_perform\data_providers\activity
+ */
 class subject_instance {
 
-    /**
-     * @var int
-     */
+    /** @var int */
     protected $participant_id;
 
-    /**
-     * @var collection
-     */
+    /** @var collection */
     protected $items;
 
     /** @var array */
     private $filters = [];
 
+    /** @var collection */
+    protected $participant_instance_entities;
+
     /**
      * subject_instance constructor.
      *
-     * @param int $participant_id The id of the user we would like to get activities that they are participating in
+     * @param int $participant_id The id of the user we would like to get activities that they are participating in.
      */
     public function __construct(int $participant_id) {
         $this->participant_id = $participant_id;
     }
 
     /**
-     * Set filter for who the activities are about (who is the subject)
+     * Set filter for who the activities are about (who is the subject).
      *
      * @param array $about
      * @return $this
@@ -77,7 +83,7 @@ class subject_instance {
     }
 
     /**
-     * Fetch subject instances that from the database
+     * Fetch subject instances that from the database.
      *
      * @return $this
      */
@@ -100,7 +106,9 @@ class subject_instance {
             ->with([
                 // Only get the participant_instance for the given participant.
                 'participant_instances' => function (repository $repository) {
-                    $repository->where('participant_id', $this->participant_id);
+                    $repository->where('participant_id', $this->participant_id)
+                        // Required for "your progress" and "relationship to subject".
+                        ->with('activity_relationship.relationship.resolvers');
                 }
             ])
             ->where_exists($this->get_target_participant_exists())
@@ -111,9 +119,62 @@ class subject_instance {
 
         $repo->set_filters($this->filters);
 
-        $this->items = $repo->get()->map_to(subject_instance_model::class);
+        $subject_instance_entities = $repo->get();
+
+        $this->items = $subject_instance_entities->map(
+            function (subject_instance_entity $subject_instance_entity) {
+                $relationship_to_subject = $this->determine_relationship_to_subject($subject_instance_entity);
+
+                return new subject_instance_model($subject_instance_entity, $relationship_to_subject);
+            }
+        );
 
         return $this;
+    }
+
+    /**
+     * @param subject_instance_entity $subject_instance
+     * @return string
+     * @throws coding_exception
+     */
+    protected function determine_relationship_to_subject(subject_instance_entity $subject_instance): string {
+        // Short circuit if the user (participant_id) is the subject, this is about them (self).
+        // A common case where this could happen is when viewing the "Your activities" list.
+        if ((int) $subject_instance->subject_user_id === (int) $this->participant_id) {
+            return get_string('relation_to_subject_self', 'mod_perform');
+        }
+
+        // It's possible for one user two have two separate participant instance records for the same
+        // subject instance. For example the case where one user is both the subject's manager and appraiser.
+        /** @var participant_instance[] $participant_instance */
+        $participant_instances = $subject_instance->participant_instances->filter('participant_id', $this->participant_id);
+
+        // Conversely it should not be possible for there to be no participant instance records for the
+        // user ($participant_id).
+        if ($participant_instances->count() === 0) {
+            throw new coding_exception(sprintf(
+                'No participant_instance records found for subject_instance with id %d', $subject_instance->id
+            ));
+        }
+
+        $relationship_names = $participant_instances->map(
+            function (participant_instance $instance_for_subject) {
+                $relationship_entity = $instance_for_subject->activity_relationship->relationship;
+
+                if ($relationship_entity === null) {
+                    throw new coding_exception(sprintf(
+                        'perform_relationship not found for participant_instance with id %d', $instance_for_subject->id
+                    ));
+                }
+
+                return (new relationship($relationship_entity))->get_name();
+            }
+        );
+
+        // TODO: Return all relationships, probably with the participant_instance.id),
+        // TODO: so that a particular participant instance can be selected to respond as in the ui.
+        // Last() seems to more often line up with the participant instance the user will responds to as by default.
+        return $relationship_names->last();
     }
 
     /**

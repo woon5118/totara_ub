@@ -24,6 +24,7 @@
 namespace mod_perform\models\activity;
 
 use core\collection;
+use mod_perform\models\response\element_validation_error;
 
 /**
  * Class element_plugin
@@ -100,6 +101,14 @@ abstract class element_plugin {
     }
 
     /**
+     * This method return element's user form vue component name
+     * @return string
+     */
+    public function get_participant_response_component(): string {
+        return $this->get_component_path('ParticipantResponse');
+    }
+
+    /**
      * Calculate the full path to a tui component related to this element plugin.
      *
      * @param string $suffix
@@ -114,49 +123,16 @@ abstract class element_plugin {
             $suffix;
     }
 
-
     /**
-     * Hook method to set the decoded response data as properties on this object
-     * ready for validation.
+     * Hook method to validate the response data.
+     * This method is responsible for decoding the raw response data and validating it.
      *
-     * @param array $response_data
-     * @return static
-     */
-    public function set_response_data(?array $response_data): self {
-        return $this;
-    }
-
-    /**
-     * Set the response data from an encoded format.
-     *
-     * @param string|null $encoded_response_data
-     * @return $this
-     */
-    public function set_encoded_response_data(?string $encoded_response_data): self {
-        $decoded_response_data = $this->decode_response_data($encoded_response_data);
-
-        return $this->set_response_data($decoded_response_data);
-    }
-
-
-    /**
-     * Decodes the response data string.
-     *
-     * @param string|null $encoded_response_data
-     * @return array|null
-     */
-    protected function decode_response_data(?string $encoded_response_data): ?array {
-        return json_decode($encoded_response_data, true);
-    }
-
-    /**
-     * Hook method to validate the decoded response data.
-     * Should return a collection of element_validation_errors
+     * Should return a collection of element_validation_errors (or an empty collection when there are no errors).
      *
      * @see element_validation_error
      * @return collection|element_validation_error[]
      */
-    public function validate_response(): collection {
+    public function validate_response(?string $encoded_response_data): collection {
         return new collection();
     }
 

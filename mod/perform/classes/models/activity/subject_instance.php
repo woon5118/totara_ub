@@ -24,13 +24,10 @@
 
 namespace mod_perform\models\activity;
 
-use coding_exception;
 use context_module;
 use core\collection;
 use core\entities\user;
 use core\orm\entity\model;
-use mod_perform\entities\activity\participant_instance as participant_instance_entity;
-use mod_perform\entities\activity\participant_section as participant_section_entity;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 
 /**
@@ -56,13 +53,18 @@ class subject_instance extends model {
         'activity',
         'status',
         'participant_instances',
+        'relationship_to_subject',
     ];
 
     /** @var subject_instance_entity */
     protected $entity;
 
-    public function __construct(subject_instance_entity $subject_instance) {
+    /** @var string */
+    protected $relationship_to_subject;
+
+    public function __construct(subject_instance_entity $subject_instance, string $relationship_to_subject = null) {
         parent::__construct($subject_instance);
+        $this->relationship_to_subject = $relationship_to_subject;
     }
 
     /**
@@ -100,26 +102,11 @@ class subject_instance extends model {
     }
 
     /**
-     * @param int $participant_id
-     * @return participant_section
+     * The relationship name for the relationship between the logged in user and subject.
+     * @return string
      */
-    public function get_participant_section_for_participant(int $participant_id): participant_section {
-        /** @var participant_instance_entity $participant_instance_entity */
-        $participant_instance_entity = participant_instance_entity::repository()
-            ->with('participant_sections')
-            ->where('subject_instance_id', $this->id)
-            ->where('participant_id', $participant_id)
-            ->order_by('id')
-            ->first();
-
-        /** @var participant_section_entity $first_participant_section */
-        $first_participant_section = $participant_instance_entity->participant_sections->first();
-
-        if (!$first_participant_section) {
-            throw new coding_exception('No participant section found for this subject instance and given participant');
-        }
-
-        return participant_section::load_by_entity($first_participant_section);
+    public function get_relationship_to_subject(): string {
+        return $this->relationship_to_subject;
     }
 
     /**
