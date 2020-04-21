@@ -23,6 +23,8 @@
 
 namespace mod_perform\rb\traits;
 
+use mod_perform\entities\activity\activity_type as activity_type_entity;
+use mod_perform\models\activity\activity_type as activity_type_model;
 use rb_column_option;
 use rb_filter_option;
 use rb_join;
@@ -62,14 +64,14 @@ trait participant_subject_instance_source {
             REPORT_BUILDER_RELATION_ONE_TO_ONE,
             'track'
         );
-        // $joinlist[] = new rb_join(
-        //     'perform_type',
-        //     'INNER',
-        //     "{perform_type}",
-        //     "perform_type.id = perform.type_id",
-        //     REPORT_BUILDER_RELATION_ONE_TO_ONE,
-        //     'perform'
-        // );
+        $joinlist[] = new rb_join(
+            'perform_type',
+            'INNER',
+            "{perform_type}",
+            "perform_type.id = perform.type_id",
+            REPORT_BUILDER_RELATION_ONE_TO_MANY,
+            'perform'
+        );
     }
 
     /**
@@ -91,19 +93,22 @@ trait participant_subject_instance_source {
                 'displayfunc' => 'format_string'
             ]
         );
-        // TODO: Activity type
-        // $columnoptions[] = new rb_column_option(
-        //     'perform',
-        //     'type',
-        //     get_string('activity_type', 'mod_perform'),
-        //     'perform_type.name',
-        //     [
-        //         'joins' => ['perform_type', 'perform', 'track', 'track_user_assignment'],
-        //         'dbdatatype' => 'text',
-        //         'outputformat' => 'text',
-        //         'displayfunc' => 'format_string'
-        //     ]
-        // );
+        $columnoptions[] = new rb_column_option(
+            'perform',
+            'type',
+            get_string('activity_type', 'mod_perform'),
+            'perform_type.id',
+            [
+                'joins' => ['perform_type', 'perform', 'track', 'track_user_assignment'],
+                'dbdatatype' => 'text',
+                'outputformat' => 'text',
+                'displayfunc' => 'activity_type_name',
+                'extrafields' => [
+                    'name' => 'perform_type.name',
+                    'is_system' => 'perform_type.is_system',
+                ],
+            ]
+        );
     }
 
     /**
@@ -119,12 +124,32 @@ trait participant_subject_instance_source {
             get_string('activity_name', 'mod_perform'),
             'text'
         );
-        // TODO: Activity type
-        // $filteroptions[] = new rb_filter_option(
-        //     'perform',
-        //     'type',
-        //      get_string('perform_type', 'mod_perform'),
-        //      'text'
-        //  );
+        $filteroptions[] = new rb_filter_option(
+            'perform',
+            'type',
+            get_string('activity_type', 'mod_perform'),
+            'select',
+            ['selectchoices' => $this->get_activity_type_options()]
+        );
     }
+
+    /**
+     * Get an array of activity type options to use for filtering.
+     *
+     * @return string[] of [ID => Display Name]
+     */
+    private function get_activity_type_options(): array {
+        return activity_type_entity::repository()
+            ->select(['id', 'name', 'is_system'])
+            ->get()
+            ->map_to(activity_type_model::class)
+            ->map(static function (activity_type_model $activity_type) {
+                return $activity_type->display_name;
+            })
+            ->sort(static function (string $a, string $b) {
+                return $a <=> $b;
+            })
+            ->all(true);
+    }
+
 }

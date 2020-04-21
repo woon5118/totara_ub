@@ -274,6 +274,11 @@ class rb_source_perform_subject_instance extends rb_base_source {
                 'heading' => get_string('activity_name', 'mod_perform')
             ],
             [
+                'type' => 'perform',
+                'value' => 'type',
+                'heading' => get_string('activity_type', 'mod_perform')
+            ],
+            [
                 'type' => 'track',
                 'value' => 'description',
                 'heading' => get_string('track_description', 'mod_perform')
@@ -293,11 +298,6 @@ class rb_source_perform_subject_instance extends rb_base_source {
                 'value' => 'count',
                 'heading' => get_string('participant_count', 'rb_source_perform_subject_instance')
             ],
-            // [
-            //     'type' => 'perform',
-            //     'value' => 'type',
-            //     'heading' => get_string('activity_type', 'mod_perform')
-            // ],
             // [
             //     'type' => 'subject_instance',
             //     'value' => 'subject_date_completion',
@@ -330,10 +330,10 @@ class rb_source_perform_subject_instance extends rb_base_source {
                 'type' => 'subject_instance',
                 'value' => 'created_at',
             ],
-            // [
-            //     'type' => 'perform',
-            //     'value' => 'type'
-            // ],
+            [
+                'type' => 'perform',
+                'value' => 'type'
+            ],
             // [
             //     'type' => 'subject_instance',
             //     'value' => 'subject_status'

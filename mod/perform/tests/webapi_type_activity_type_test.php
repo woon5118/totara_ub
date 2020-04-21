@@ -71,7 +71,7 @@ class mod_perform_webapi_type_activity_type_testcase extends advanced_testcase {
         $testcases = [
             'id' => ['id', null, $type->id],
             'name' => ['name', null, $type->name],
-            'display_name' => ['display_name', null, $type->name]
+            'display_name' => ['display_name', null, $type->display_name]
         ];
 
         foreach ($testcases as $id => $testcase) {

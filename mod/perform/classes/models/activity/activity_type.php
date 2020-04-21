@@ -30,6 +30,14 @@ use mod_perform\entities\activity\activity_type as activity_type_entity;
 
 /**
  * Represents a single performance activity type.
+ *
+ * @property-read int $id
+ * @property-read string $name
+ * @property-read string $display_name
+ * @property-read bool $is_system
+ * @property-read collection|activity[] $activities
+ *
+ * @package mod_perform\models\activity
  */
 class activity_type extends model {
     /**
@@ -118,8 +126,10 @@ class activity_type extends model {
      * @return string the display name.
      */
     public function get_display_name(): string {
-        // TODO in TL-24738 this needs to be reworked to return a formatted
-        // string depending on whether this is a system type or not.
-        return $this->entity->name;
+        if ($this->entity->is_system) {
+            return get_string('system_activity_type:' . $this->entity->name, 'mod_perform');
+        }
+
+        return format_string($this->entity->name);
     }
 }

@@ -373,14 +373,12 @@ class rb_source_perform_participant_instance extends rb_base_source {
                 'value' => 'name',
                 'heading' => get_string('activity_name', 'mod_perform'),
             ],
-
-            // TODO: Activity type
-            // [
-            //     'type' => 'perform',
-            //     'value' => 'type',
-            //     'heading' => 'Activity type',
-            // ],
-
+            // Activity type
+            [
+                'type' => 'perform',
+                'value' => 'type',
+                'heading' => get_string('activity_type', 'mod_perform'),
+            ],
             // Date instance created
             [
                 'type' => 'participant_instance',

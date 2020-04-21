@@ -54,6 +54,9 @@
             $str('view_name', 'mod_perform')
           }}</HeaderCell>
           <HeaderCell size="2">{{
+            $str('view_type', 'mod_perform')
+          }}</HeaderCell>
+          <HeaderCell size="2">{{
             $str('view_status', 'mod_perform')
           }}</HeaderCell>
           <HeaderCell size="1" />
@@ -61,6 +64,9 @@
         <template v-slot:row="{ row }">
           <Cell size="9" :column-header="$str('view_name', 'mod_perform')">
             <a :href="getEditActivityUrl(row.id)">{{ row.name }}</a>
+          </Cell>
+          <Cell size="2" :column-header="$str('view_type', 'mod_perform')">
+            {{ row.type.display_name }}
           </Cell>
           <Cell size="2" :column-header="$str('view_status', 'mod_perform')">
             {{ $str('view_status_active', 'mod_perform') }}
@@ -198,15 +204,16 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
+      "add_activity",
       "get_started",
       "participation_reporting",
-      "add_activity",
       "perform:manage_activity",
+      "toast_error_create_activity",
       "view_actions",
       "view_name",
       "view_status",
       "view_status_active",
-      "toast_error_create_activity"
+      "view_type"
     ]
   }
 </lang-strings>

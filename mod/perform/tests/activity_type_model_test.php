@@ -24,6 +24,7 @@
 
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\activity_type;
+use mod_perform\entities\activity\activity_type as activity_type_entity;
 
 /**
  * @coversDefaultClass activity_type.
@@ -99,4 +100,26 @@ class mod_perform_activity_type_model_testcase extends advanced_testcase {
             $this->assertEmpty($wrong_types, 'wrong activity types retrieved');
         }
     }
+
+    /**
+     * @covers mod_perform\models\activity\activity_type::get_display_name
+     */
+    public function test_get_display_name(): void {
+        $system_types = activity_type_entity::repository()
+            ->where('is_system', 1)
+            ->get();
+
+        $this->assertNotEmpty($system_types);
+        foreach ($system_types as $system_type) {
+            $this->assertEquals(
+                get_string('system_activity_type:' . $system_type->name, 'mod_perform'),
+                activity_type::load_by_entity($system_type)->display_name
+            );
+        }
+
+        $xss_string = 'Regular <script>alert(\'Bad!\')</script>Type!';
+        $regular_type = activity_type::create($xss_string);
+        $this->assertEquals(format_string($xss_string), $regular_type->display_name);
+    }
+
 }
