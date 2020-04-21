@@ -20,8 +20,7 @@
  * @package pathway_criteria_group
  */
 
-define(['core/str', 'core/notification', 'core/templates'],
-function (str, notification, templates) {
+define(['core/str', 'core/notification', 'core/templates'], function(str, notification, templates) {
 
     /**
      * Class constructor for the PwCriteriaGroup.
@@ -78,11 +77,11 @@ function (str, notification, templates) {
          * Add event listeners for PwCriteriaGroups
          *
          */
-        events: function () {
+        events: function() {
             var that = this,
                 action;
 
-            this.widget.addEventListener('click', function (e) {
+            this.widget.addEventListener('click', function(e) {
                 if (!e.target) {
                     return false;
                 }
@@ -93,17 +92,17 @@ function (str, notification, templates) {
                     if (action === 'addcriterion') {
                         that.showCriteriaTypeOptions();
                     }
-                } else if (e.target.closest('[data-criteria_group-criterion-type]')) {
-                    var selectedOption = e.target.closest('[data-criteria_group-criterion-type]');
+                } else if (e.target.closest('[data-tw-editScaleValuePaths-dropDown-level="criteria_group"]')) {
+                    var selectedOption = e.target.closest('[data-tw-editScaleValuePaths-dropDown-level="criteria_group"]');
 
                     that.hideCriteriaTypeSelectors();
                     that.addCriterion(that.pwKey, selectedOption);
-                } else if (e.target.closest('[data-criterion-action]')) {
-                    var wgt = e.target.closest('[data-criterion-action]'),
-                        keyWgt = wgt.closest('[data-tw-criterion-key]'),
+                } else if (e.target.closest('[data-tw-editScaleValuePaths-criterion-action]')) {
+                    var wgt = e.target.closest('[data-tw-editScaleValuePaths-criterion-action]'),
+                        keyWgt = wgt.closest('[data-tw-editScaleValuePaths-criterion-key]'),
                         criterionKey;
 
-                    action = wgt.getAttribute('data-criterion-action');
+                    action = wgt.getAttribute('data-tw-editScaleValuePaths-criterion-action');
                     if (!keyWgt) {
                         // Something went wrong - we can't determine which criterion to perform the action on
                         notification.exception({
@@ -111,11 +110,11 @@ function (str, notification, templates) {
                             message: "Can't determine target of the " + action + " criterion action",
                             name: 'No criterion action target'
                         });
-                        return;
+                        return false;
                     }
 
                     that.hideCriteriaTypeSelectors();
-                    criterionKey = keyWgt.getAttribute('data-tw-criterion-key');
+                    criterionKey = keyWgt.getAttribute('data-tw-editScaleValuePaths-criterion-key');
 
                     if (action === 'toggle-detail') {
                         that.toggleCriterionDetail(criterionKey);
@@ -131,13 +130,13 @@ function (str, notification, templates) {
         },
 
         // Listen for propagated events
-        bubbledEventsListener: function () {
+        bubbledEventsListener: function() {
             var that = this,
                 criteriaEvents = 'totara_criteria/criterion:',
                 criterionKey,
                 criterion;
 
-            this.widget.addEventListener(criteriaEvents + 'update', function (e) {
+            this.widget.addEventListener(criteriaEvents + 'update', function(e) {
                 criterionKey = e.detail.key;
                 criterion = e.detail.criterion;
 
@@ -179,7 +178,7 @@ function (str, notification, templates) {
                 that.showHideNoCriteria();
             });
 
-            this.widget.addEventListener(criteriaEvents + 'dirty', function (e) {
+            this.widget.addEventListener(criteriaEvents + 'dirty', function(e) {
                 criterionKey = e.detail.key;
 
                 if (that.criteria[criterionKey]) {
@@ -197,46 +196,49 @@ function (str, notification, templates) {
          *
          * @param {node} parent
          */
-        setParent: function (parent) {
+        setParent: function(parent) {
             this.widget = parent;
         },
 
         /**
          * Initialise the data and display it
          */
-        initData: function () {
-            var pwWgt = this.widget.closest('[data-pw-key]'),
-                svWgt = this.widget.closest('[data-pw-scalevalue]'),
+        initData: function() {
+            var that = this,
+                pwWgt = this.widget.closest('[data-tw-editAchievementPaths-pathway-key]'),
+                svWgt = this.widget.closest('[data-tw-editScaleValuePaths-value]'),
                 pwKey = 0,
                 pwId = 0;
 
             if (pwWgt) {
-                pwKey = pwWgt.getAttribute('data-pw-key') ? pwWgt.getAttribute('data-pw-key') : 0;
-                pwId = pwWgt.getAttribute('data-pw-id') ? pwWgt.getAttribute('data-pw-id') : 0;
+                pwKey = pwWgt.getAttribute('data-tw-editAchievementPaths-pathway-key') ? pwWgt.getAttribute('data-tw-editAchievementPaths-pathway-key') : 0;
+                pwId = pwWgt.getAttribute('data-tw-editAchievementPaths-pathway-id') ? pwWgt.getAttribute('data-tw-editAchievementPaths-pathway-id') : 0;
             }
 
             // Obtain the pathway detail from the dom
 
             this.pwKey = pwKey;
             if (svWgt) {
-                this.pathway.scalevalue = svWgt.getAttribute('data-pw-scalevalue') ? svWgt.getAttribute('data-pw-scalevalue') : 1;
+                this.pathway.scalevalue = svWgt.getAttribute('data-tw-editScaleValuePaths-value') ? svWgt.getAttribute('data-tw-editScaleValuePaths-value') : 1;
             }
 
             if (pwId === 0) {
-                // New pw - we also need the competency_id and scalevalue
-                delete this.pathway.id;
+                delete that.pathway.id;
 
-                var compIdNode = document.querySelector('[data-comp-id]');
+                // New pw - we need the competency id
+                // Get the competency ID from higher up in the DOM
+                var competencyIdNode = document.querySelector('[data-tw-editAchievementPaths-competency]'),
+                    competencyId = 1;
 
-                if (compIdNode) {
-                    this.pathway.competency_id = compIdNode.getAttribute('data-comp-id')
-                        ? compIdNode.getAttribute('data-comp-id')
-                        : 1;
+                if (competencyIdNode) {
+                    competencyId = competencyIdNode.getAttribute('data-tw-editAchievementPaths-competency');
                 }
 
-                this.widget.setAttribute('data-pw-save-endpoint', this.endpoints.create);
+                this.pathway.competency_id = competencyId;
+                this.widget.setAttribute('data-tw-editAchievementPaths-save-endPoint', this.endpoints.create);
+
             } else {
-                this.widget.setAttribute('data-pw-save-endpoint', this.endpoints.update);
+                this.widget.setAttribute('data-tw-editAchievementPaths-save-endPoint', this.endpoints.update);
                 this.pathway.id = pwId;
             }
 
@@ -248,7 +250,7 @@ function (str, notification, templates) {
          *
          * @return {string} Next key
          */
-        getNextCriterionKey: function () {
+        getNextCriterionKey: function() {
             this.lastCriterionKey++;
             return this.pwKey + '_new_criterion_' + this.lastCriterionKey;
         },
@@ -258,7 +260,7 @@ function (str, notification, templates) {
          * Pack the pathway criteria data to ensure that it will be serialize as expected
          * when sent to the save api endpoint
          */
-        packCriteria: function () {
+        packCriteria: function() {
             this.pathway.criteria = [];
 
             for (var criterionKey in this.criteria) {
@@ -271,7 +273,7 @@ function (str, notification, templates) {
         /**
          * Show or hide the 'No Criteria' message
          */
-        showHideNoCriteria: function () {
+        showHideNoCriteria: function() {
             var nCriteria = this.pathway.criteria.length,
                 nDeletedCriteria = 0;
 
@@ -280,95 +282,69 @@ function (str, notification, templates) {
             }
 
             if ((nCriteria + nDeletedCriteria) == 0) {
-                this.widget.querySelector('.critgrp_criteria_none').classList.remove('cc_hidden');
+                this.widget.querySelector('[data-tw-editScaleValuePaths-criterion-empty]').classList.remove('tw-editAchievementPaths--hidden');
             } else {
-                this.widget.querySelector('.critgrp_criteria_none').classList.add('cc_hidden');
+                this.widget.querySelector('[data-tw-editScaleValuePaths-criterion-empty]').classList.add('tw-editAchievementPaths--hidden');
             }
-
-            return false;
         },
 
         /**
          * Hide the bottom actions
          */
-        hideBottomActions: function () {
-            var wgt = this.widget.closest('[data-pw-key]').querySelector('.critgrp_bottom_action');
-            wgt.classList.add('cc_hidden');
-
-            return false;
+        hideBottomActions: function() {
+            var wgt = this.widget.closest('[data-tw-editAchievementPaths-pathway-key]').querySelector('[data-tw-editScaleValuePaths-group-add]');
+            wgt.classList.add('tw-editAchievementPaths--hidden');
         },
 
         /**
          * Show the bottom actions
          */
-        showBottomActions: function () {
-            var wgt = this.widget.closest('[data-pw-key]').querySelector('.critgrp_bottom_action');
-            wgt.classList.remove('cc_hidden');
-
-            return false;
-        },
-
-        /**
-         * Return an empty pathway for the key
-         *
-         * @param {int} compId
-         * @param {int} scalevalue
-         * @return {Object}
-         */
-        createEmptyPw: function (compId, scalevalue) {
-            return {
-                competency_id: compId,
-                scalevalue: scalevalue,
-                criteria: [],
-            };
+        showBottomActions: function() {
+            var wgt = this.widget.closest('[data-tw-editAchievementPaths-pathway-key]').querySelector('[data-tw-editScaleValuePaths-group-add]');
+            wgt.classList.remove('tw-editAchievementPaths--hidden');
         },
 
         /**
          * Hide all criteria type selectors
          */
-        hideCriteriaTypeSelectors: function () {
+        hideCriteriaTypeSelectors: function() {
             // We also want to close the options lists in parent templates
-            var criteriaTypeNodes = document.querySelectorAll('[data-criteria-type-toggle]');
+            var criteriaTypeNodes = document.querySelectorAll('[data-tw-editScaleValuePaths-dropDown]');
 
             for (var a = 0; a < criteriaTypeNodes.length; a++) {
-                criteriaTypeNodes[a].classList.add('cc_hidden');
+                criteriaTypeNodes[a].classList.add('tw-editAchievementPaths--hidden');
             }
-
-            return false;
         },
 
         /**
          * Show the criteria type dropdown for the specific scalevalue
          */
-        showCriteriaTypeOptions: function () {
-            var toOpen = this.widget.querySelector('[data-criteria-type-toggle="criteria_group"]'),
-                expanded = toOpen ? !toOpen.classList.contains('cc_hidden') : false;
+        showCriteriaTypeOptions: function() {
+            var toOpen = this.widget.querySelector('[data-tw-editScaleValuePaths-dropDown="criteria_group"]'),
+                expanded = toOpen ? !toOpen.classList.contains('tw-editAchievementPaths--hidden') : false;
 
             this.hideCriteriaTypeSelectors();
 
             // Now show the correct list
             if (toOpen && !expanded) {
-                toOpen.classList.remove('cc_hidden');
+                toOpen.classList.remove('tw-editAchievementPaths--hidden');
             }
-
-            return false;
         },
 
         /**
          * Add a new criterion
          *
          * @param {string} pwKey Key of pathway to add the new criterion to
-         * @param {string} criterionType Type of criterion to add
-         * @param {string} criterionTemplate Template to display the new criterion
+         * @param {string} criterionOptionNode Criterion option node
          */
-        addCriterion: function (pwKey, criterionOptionNode) {
+        addCriterion: function(pwKey, criterionOptionNode) {
             var that = this,
-                target = this.widget.querySelector('.critgrp_criteria'),
-                templatename = 'pathway_criteria_group/partial_group_criteria',
-                criterionType = criterionOptionNode.getAttribute('data-criteria_group-criterion-type'),
-                criterionTitle = criterionOptionNode.getAttribute('data-criteria_group-criterion-title'),
-                criterionTemplatename = criterionOptionNode.getAttribute('data-criteria_group-criterion-templatename'),
-                criterionSingleuse = criterionOptionNode.getAttribute('data-criteria_group-criterion-singleuse'),
+                target = this.widget.querySelector('[data-tw-editScaleValuePaths-group-criteria]'),
+                templateName = 'pathway_criteria_group/scalevalue_group_criteria',
+                criterionType = criterionOptionNode.getAttribute('data-tw-editScaleValuePaths-dropDown-item-type'),
+                criterionTitle = criterionOptionNode.getAttribute('data-tw-editScaleValuePaths-dropDown-item-title'),
+                criterionTemplateName = criterionOptionNode.getAttribute('data-tw-editScaleValuePaths-dropDown-item-template'),
+                criterionSingleuse = criterionOptionNode.getAttribute('data-tw-editScaleValuePaths-dropDown-item-singleUse'),
                 criterionKey;
 
             criterionKey = that.getNextCriterionKey();
@@ -377,13 +353,12 @@ function (str, notification, templates) {
                 'key': criterionKey,
                 'type': criterionType,
                 'title': criterionTitle,
-                'criterion_templatename': criterionTemplatename,
+                'criterion_templatename': criterionTemplateName,
                 'singleuse': !!+criterionSingleuse,
             };
 
             // TODO: For now singleuse is used to determine whether there are detail - may need to expand later
             this.criteria[criterionKey].expandable = !this.criteria[criterionKey].singleuse;
-
             if (this.criteriaLength > 0) {
                 this.criteria[criterionKey].showand = true;
             }
@@ -391,19 +366,14 @@ function (str, notification, templates) {
             this.criteriaLength += 1;
 
             // Display the criterion
-            templates.renderAppend(templatename,  {criteria: this.criteria[criterionKey]}, target).then(
-                function () {
-                    templates.runTemplateJS('');
-                    that.triggerEvent('dirty', {});
-                },
-                function (e) {
-                    e.fileName = that.filename;
-                    e.name = 'Error displaying ' + criterionType;
-                    notification.exception(e);
-                }
-            );
-
-            return false;
+            templates.renderAppend(templateName, {criteria: this.criteria[criterionKey]}, target).then(function() {
+                templates.runTemplateJS('');
+                that.triggerEvent('dirty', {});
+            }).catch(function(e) {
+                e.fileName = that.filename;
+                e.name = 'Error displaying ' + criterionType;
+                notification.exception(e);
+            });
         },
 
         /**
@@ -411,30 +381,20 @@ function (str, notification, templates) {
          *
          * @param {bool} allowSingleUse
          */
-        toggleSingleUse: function (allowSingleUse) {
-            var singleUseActiveNodes = this.widget.querySelectorAll('[data-criteria-type-singleuse-active]'),
-                singleUseDisabledNodes = this.widget.querySelectorAll('[data-criteria-type-singleuse-disabled]');
+        toggleSingleUse: function(allowSingleUse) {
+            var singleUseNodes = this.widget.querySelectorAll('[data-tw-editScaleValuePaths-dropDown-singleUse]');
 
-            // Only need to test 1
-            if (singleUseActiveNodes.length > 0) {
+            if (singleUseNodes.length > 0) {
                 if (allowSingleUse) {
-                    for (var k = 0; k < singleUseActiveNodes.length; k++) {
-                        singleUseActiveNodes[k].classList.remove('cc_hidden');
-                    }
-                    for (var k = 0; k < singleUseDisabledNodes.length; k++) {
-                        singleUseDisabledNodes[k].classList.add('cc_hidden');
+                    for (var a = 0; a < singleUseNodes.length; a++) {
+                        singleUseNodes[a].removeAttribute('disabled');
                     }
                 } else {
-                    for (var k = 0; k < singleUseActiveNodes.length; k++) {
-                        singleUseActiveNodes[k].classList.add('cc_hidden');
-                    }
-                    for (var k = 0; k < singleUseDisabledNodes.length; k++) {
-                        singleUseDisabledNodes[k].classList.remove('cc_hidden');
+                    for (var b = 0; b < singleUseNodes.length; b++) {
+                        singleUseNodes[b].setAttribute('disabled', '');
                     }
                 }
             }
-
-            return false;
         },
 
         /**
@@ -442,30 +402,28 @@ function (str, notification, templates) {
          *
          * @param {bool} allowSingleUse
          */
-        toggleAllSingleUse: function (allowSingleUse) {
-            var criteriaTypeNodes = document.querySelectorAll('[data-criteria-type-toggle="criteria_group"]'),
-                singleUseActiveNodes,
-                singleUseDisabledNodes,
+        toggleAllSingleUse: function(allowSingleUse) {
+            var criteriaDropDownNodes = document.querySelectorAll('[data-tw-editScaleValuePaths-dropDown="criteria_group"]'),
+                singleUseNodes,
                 pwWgt,
                 criteria,
                 pwAllow;
 
-            for (var a = 0; a < criteriaTypeNodes.length; a++) {
+            for (var a = 0; a < criteriaDropDownNodes.length; a++) {
                 pwAllow = allowSingleUse;
-                singleUseActiveNodes = criteriaTypeNodes[a].querySelectorAll('[data-criteria-type-singleuse-active]');
-                singleUseDisabledNodes = criteriaTypeNodes[a].querySelectorAll('[data-criteria-type-singleuse-disabled]');
+                singleUseNodes = criteriaDropDownNodes[a].querySelectorAll('[data-tw-editScaleValuePaths-dropDown-singleUse]');
 
                 // Only need to test 1
-                if (singleUseActiveNodes.length == 0) {
+                if (singleUseNodes.length == 0) {
                     continue;
                 }
 
                 if (allowSingleUse) {
                     // Before we allow single use in a group,
                     // ensure there are no active criteria in that group (using title)
-                    pwWgt = criteriaTypeNodes[a].closest('[data-pw-key]');
+                    pwWgt = criteriaDropDownNodes[a].closest('[data-tw-editAchievementPaths-pathway-key]');
                     if (pwWgt) {
-                        criteria = pwWgt.querySelectorAll('[data-criterion-active]');
+                        criteria = pwWgt.querySelectorAll('[data-tw-editScaleValuePaths-criterion-active]');
                         if (criteria.length > 0) {
                             pwAllow = false;
                         }
@@ -473,23 +431,15 @@ function (str, notification, templates) {
                 }
 
                 if (pwAllow) {
-                    for (var k = 0; k < singleUseActiveNodes.length; k++) {
-                        singleUseActiveNodes[k].classList.remove('cc_hidden');
-                    }
-                    for (var k = 0; k < singleUseDisabledNodes.length; k++) {
-                        singleUseDisabledNodes[k].classList.add('cc_hidden');
+                    for (var b = 0; b < singleUseNodes.length; b++) {
+                        singleUseNodes[b].removeAttribute('disabled');
                     }
                 } else {
-                    for (var k = 0; k < singleUseActiveNodes.length; k++) {
-                        singleUseActiveNodes[k].classList.add('cc_hidden');
-                    }
-                    for (var k = 0; k < singleUseDisabledNodes.length; k++) {
-                        singleUseDisabledNodes[k].classList.remove('cc_hidden');
+                    for (var c = 0; c < singleUseNodes.length; c++) {
+                        singleUseNodes[c].setAttribute('disabled', '');
                     }
                 }
             }
-
-            return false;
         },
 
         /**
@@ -497,28 +447,26 @@ function (str, notification, templates) {
          *
          * @param  {String} criterionKey Key of criterion whose detail display should be toggled
          */
-        toggleCriterionDetail: function (criterionKey) {
-            var criterionTarget = this.widget.querySelector('[data-tw-criterion-key="' + criterionKey + '"]'),
-                expandTarget = this.widget.querySelector('[data-criterion-detail="' + criterionKey + '"]'),
-                isExpanded = criterionTarget.hasAttribute('data-criterion-detail-expanded')
-                    ? criterionTarget.getAttribute('data-criterion-detail-expanded')
+        toggleCriterionDetail: function(criterionKey) {
+            var criterionTarget = this.widget.querySelector('[data-tw-editScaleValuePaths-criterion-key="' + criterionKey + '"]'),
+                expandTarget = this.widget.querySelector('[data-tw-editScaleValuePaths-criterion-detail="' + criterionKey + '"]'),
+                isExpanded = criterionTarget.hasAttribute('data-tw-editScaleValuePaths-criterion-detail-expanded')
+                    ? criterionTarget.getAttribute('data-tw-editScaleValuePaths-criterion-detail-expanded')
                     : 0,
-                expandedIcon = criterionTarget.querySelector('[data-criterion-detail-icon="expanded"]'),
-                collapsedIcon = criterionTarget.querySelector('[data-criterion-detail-icon="collapsed"]');
+                expandedIcon = criterionTarget.querySelector('[data-tw-editScaleValuePaths-criterion-detail-icon="expanded"]'),
+                collapsedIcon = criterionTarget.querySelector('[data-tw-editScaleValuePaths-criterion-detail-icon="collapsed"]');
 
             if (isExpanded == 1) {
-                expandTarget.classList.add('cc_hidden');
-                expandedIcon.classList.add('cc_hidden');
-                collapsedIcon.classList.remove('cc_hidden');
-                criterionTarget.removeAttribute('data-criterion-detail-expanded');
+                expandTarget.classList.add('tw-editAchievementPaths--hidden');
+                expandedIcon.classList.add('tw-editAchievementPaths--hidden');
+                collapsedIcon.classList.remove('tw-editAchievementPaths--hidden');
+                criterionTarget.removeAttribute('data-tw-editScaleValuePaths-criterion-detail-expanded');
             } else {
-                expandTarget.classList.remove('cc_hidden');
-                expandedIcon.classList.remove('cc_hidden');
-                collapsedIcon.classList.add('cc_hidden');
-                criterionTarget.setAttribute('data-criterion-detail-expanded', "1");
+                expandTarget.classList.remove('tw-editAchievementPaths--hidden');
+                expandedIcon.classList.remove('tw-editAchievementPaths--hidden');
+                collapsedIcon.classList.add('tw-editAchievementPaths--hidden');
+                criterionTarget.setAttribute('data-tw-editScaleValuePaths-criterion-detail-expanded', "1");
             }
-
-            return false;
         },
 
         /**
@@ -528,13 +476,13 @@ function (str, notification, templates) {
          *
          * @param  {String} criterionKey Key of criterion to remove
          */
-        removeCriterion: function (criterionKey) {
-            var criterionTarget = this.widget.querySelector('[data-tw-criterion-key="' + criterionKey + '"]'),
-                criterionAndTarget = this.widget.querySelector('[data-pw-and="' + criterionKey + '"]'),
-                activeNode = criterionTarget.querySelector('[data-criterion-active]'),
-                deletedNode = criterionTarget.querySelector('[data-criterion-deleted]'),
-                removeIconWgt = criterionTarget.querySelector('[data-criterion-action="remove"]'),
-                undoIconWgt = criterionTarget.querySelector('[data-criterion-action="undo"]'),
+        removeCriterion: function(criterionKey) {
+            var criterionTarget = this.widget.querySelector('[data-tw-editScaleValuePaths-criterion-key="' + criterionKey + '"]'),
+                criterionAndTarget = this.widget.querySelector('[data-tw-editAchievementPaths-and-key="' + criterionKey + '"]'),
+                activeNode = criterionTarget.querySelector('[data-tw-editScaleValuePaths-criterion-active]'),
+                deletedNode = criterionTarget.querySelector('[data-tw-editScaleValuePaths-criterion-deleted]'),
+                removeIconWgt = criterionTarget.querySelector('[data-tw-editScaleValuePaths-criterion-action="remove"]'),
+                undoIconWgt = criterionTarget.querySelector('[data-tw-editScaleValuePaths-criterion-action="undo"]'),
                 copyObj = {};
 
             if (this.criteria[criterionKey]) {
@@ -562,19 +510,19 @@ function (str, notification, templates) {
                     this.packCriteria();
 
                     if (activeNode) {
-                        activeNode.classList.add('cc_hidden');
+                        activeNode.classList.add('tw-editAchievementPaths--hidden');
                     }
 
                     if (deletedNode) {
-                        deletedNode.classList.remove('cc_hidden');
+                        deletedNode.classList.remove('tw-editAchievementPaths--hidden');
                     }
 
                     // Show undo action
                     if (removeIconWgt) {
-                        removeIconWgt.classList.add('cc_hidden');
+                        removeIconWgt.classList.add('tw-editAchievementPaths--hidden');
                     }
                     if (undoIconWgt) {
-                        undoIconWgt.classList.remove('cc_hidden');
+                        undoIconWgt.classList.remove('tw-editAchievementPaths--hidden');
                     }
 
                     this.triggerEvent('update', {pathway: this.pathway});
@@ -591,7 +539,7 @@ function (str, notification, templates) {
                         // If we removed the top criterion and there are more criteria,
                         // we need now to remove the new top criterion's AND
                         if (this.pathway.criteria.length > 1) {
-                            criterionAndTarget = this.widget.querySelector('[data-pw-and]');
+                            criterionAndTarget = this.widget.querySelector('[data-tw-editAchievementPaths-and-key]');
                             if (criterionAndTarget) {
                                 criterionAndTarget.remove();
                             }
@@ -612,8 +560,6 @@ function (str, notification, templates) {
 
                 this.criteriaLength -= 1;
             }
-
-            return false;
         },
 
         /**
@@ -621,33 +567,32 @@ function (str, notification, templates) {
          *
          * @param  {String} criterionKey Key of criterion to remove
          */
-        undoCriterionRemoval: function (criterionKey) {
+        undoCriterionRemoval: function(criterionKey) {
             if (!this.markedForDeletionCriteria[criterionKey]) {
                 return;
             }
 
-            var criterionTarget = this.widget.querySelector('[data-tw-criterion-key="' + criterionKey + '"]'),
-                criterionAndTarget = this.widget.querySelector('[data-pw-and="' + criterionKey + '"]'),
-                activeNode = criterionTarget.querySelector('[data-criterion-active]'),
-                deletedNode = criterionTarget.querySelector('[data-criterion-deleted]'),
-                removeIconWgt = criterionTarget.querySelector('[data-criterion-action="remove"]'),
-                undoIconWgt = criterionTarget.querySelector('[data-criterion-action="undo"]'),
+            var criterionTarget = this.widget.querySelector('[data-tw-editScaleValuePaths-criterion-key="' + criterionKey + '"]'),
+                activeNode = criterionTarget.querySelector('[data-tw-editScaleValuePaths-criterion-active]'),
+                deletedNode = criterionTarget.querySelector('[data-tw-editScaleValuePaths-criterion-deleted]'),
+                removeIconWgt = criterionTarget.querySelector('[data-tw-editScaleValuePaths-criterion-action="remove"]'),
+                undoIconWgt = criterionTarget.querySelector('[data-tw-editScaleValuePaths-criterion-action="undo"]'),
                 copyObj = {};
 
             // Handle the case where an existing single-use has been removed, another one added
             // and then the user tries to undo removal of the original criterion
             if (this.markedForDeletionCriteria[criterionKey].singleuse) {
-                var singleUseWgt = document.querySelector('[data-singleuse]'),
-                    hasSingleUse = '0';
+                var singleUseNode = document.querySelector('[data-tw-editAchievementPaths-singleUse]'),
+                    hasSingleUse = false;
 
-                if (singleUseWgt) {
-                    hasSingleUse = singleUseWgt.getAttribute('data-singleuse');
+                if (singleUseNode) {
+                    hasSingleUse = singleUseNode.getAttribute('data-tw-editAchievementPaths-singleUse');
                 }
 
                 if (hasSingleUse == '1') {
                     notification.clearNotifications();
 
-                    str.get_string('error_cant_undo_single_use', 'pathway_criteria_group').done(function (message) {
+                    str.get_string('error_cant_undo_single_use', 'pathway_criteria_group').done(function(message) {
                         notification.addNotification({
                             message: message,
                             type: 'error'
@@ -656,8 +601,6 @@ function (str, notification, templates) {
                         // Scroll to top to make sure that the notification is visible
                         window.scrollTo(0, 0);
                     }).fail(notification.exception);
-
-                    return;
                 }
             }
 
@@ -677,19 +620,19 @@ function (str, notification, templates) {
             }
 
             if (activeNode) {
-                activeNode.classList.remove('cc_hidden');
+                activeNode.classList.remove('tw-editAchievementPaths--hidden');
             }
 
             if (deletedNode) {
-                deletedNode.classList.add('cc_hidden');
+                deletedNode.classList.add('tw-editAchievementPaths--hidden');
             }
 
             // Hide undo action
             if (removeIconWgt) {
-                removeIconWgt.classList.remove('cc_hidden');
+                removeIconWgt.classList.remove('tw-editAchievementPaths--hidden');
             }
             if (undoIconWgt) {
-                undoIconWgt.classList.add('cc_hidden');
+                undoIconWgt.classList.add('tw-editAchievementPaths--hidden');
             }
 
             this.triggerEvent('update', {pathway: this.pathway});
@@ -697,7 +640,6 @@ function (str, notification, templates) {
 
             this.criteriaLength += 1;
 
-            return false;
         },
 
         /**
@@ -706,7 +648,7 @@ function (str, notification, templates) {
          * @param {string} eventName
          * @param {object} data
          */
-        triggerEvent: function (eventName, data) {
+        triggerEvent: function(eventName, data) {
             data.key = this.pwKey;
 
             var propagateEvent = new CustomEvent('totara_competency/pathway:' + eventName, {
@@ -725,8 +667,8 @@ function (str, notification, templates) {
      * @param {node} parent
      * @returns {Object} promise
      */
-    var init = function (parent) {
-        return new Promise(function (resolve) {
+    var init = function(parent) {
+        return new Promise(function(resolve) {
             var wgt = new PwCriteriaGroup();
             wgt.setParent(parent);
             wgt.events();

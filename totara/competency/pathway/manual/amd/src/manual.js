@@ -21,7 +21,7 @@
  */
 
 define(['core/templates', 'core/notification', 'core/ajax', 'totara_competency/modal_list'],
-function (templates, notification, ajax, ModalList) {
+function(templates, notification, ajax, ModalList) {
 
     /**
      * Class constructor for PwManual.
@@ -54,7 +54,7 @@ function (templates, notification, ajax, ModalList) {
 
         this.rolesPicker = null;
         this.fullRoles = []; // Contains the full role data indexed by the id to assist with deletion of pathway.roles
-        this.roleIds = []; // Co`ntains the ids of the selected roles
+        this.roleIds = []; // Contains the ids of the selected roles
 
         this.endpoints = {
             create: 'pathway_manual_create',
@@ -71,10 +71,10 @@ function (templates, notification, ajax, ModalList) {
          * Add event listeners for PwManual
          *
          */
-        events: function () {
+        events: function() {
             var that = this;
 
-            this.widget.addEventListener('click', function (e) {
+            this.widget.addEventListener('click', function(e) {
                 if (!e.target) {
                     return;
                 }
@@ -102,42 +102,44 @@ function (templates, notification, ajax, ModalList) {
          *
          * @param {node} parent
          */
-        setParent: function (parent) {
+        setParent: function(parent) {
             this.widget = parent;
         },
 
         /**
          * Initialise the data
          */
-        initData: function () {
+        initData: function() {
             var that = this,
-                pwWgt = this.widget.closest('[data-pw-key]'),
+                pwWgt = this.widget.closest('[data-tw-editAchievementPaths-pathway-key]'),
                 pwKey = 0,
                 pwId = 0;
 
             if (pwWgt) {
-                pwKey = pwWgt.getAttribute('data-pw-key') ? pwWgt.getAttribute('data-pw-key') : 0;
-                pwId = pwWgt.getAttribute('data-pw-id') ? pwWgt.getAttribute('data-pw-id') : 0;
+                pwKey = pwWgt.getAttribute('data-tw-editAchievementPaths-pathway-key') ? pwWgt.getAttribute('data-tw-editAchievementPaths-pathway-key') : 0;
+                pwId = pwWgt.getAttribute('data-tw-editAchievementPaths-pathway-id') ? pwWgt.getAttribute('data-tw-editAchievementPaths-pathway-id') : 0;
             }
 
             this.pwKey = pwKey;
 
             if (pwId === 0) {
-                // New pw - we need the competency_id. Outer should have provided the key
-                var compIdWgt = document.querySelector('[data-comp-id]'),
-                    compId = 1;
-
-                if (compIdWgt) {
-                    compId = compIdWgt.getAttribute('data-comp-id') ? compIdWgt.getAttribute('data-comp-id') : 1;
-                }
-
-                this.pathway.competency_id = compId;
                 delete that.pathway.id;
 
-                this.widget.setAttribute('data-pw-save-endpoint', this.endpoints.create);
+                // New pw - we need the competency id
+                // Get the competency ID from higher up in the DOM
+                var competencyIdNode = document.querySelector('[data-tw-editAchievementPaths-competency]'),
+                    competencyId = 1;
+
+                if (competencyIdNode) {
+                    competencyId = competencyIdNode.getAttribute('data-tw-editAchievementPaths-competency');
+                }
+
+                this.pathway.competencyId = competencyId;
+                this.widget.setAttribute('data-tw-editAchievementPaths-save-endPoint', this.endpoints.create);
+
             } else {
                 this.pathway.id = pwId;
-                this.widget.setAttribute('data-pw-save-endpoint', this.endpoints.update);
+                this.widget.setAttribute('data-tw-editAchievementPaths-save-endPoint', this.endpoints.update);
 
                 this.getRoles();
             }
@@ -145,9 +147,9 @@ function (templates, notification, ajax, ModalList) {
             this.showHideNoRaters();
 
             // Init the picker
-            this.initRolesPicker().then(function () {
+            this.initRolesPicker().then(function() {
                 that.triggerEvent('update', {pathway: that.pathway});
-            }).catch(function (e) {
+            }).catch(function(e) {
                 notification.exception({
                     fileName: that.filename,
                     message: e[0] + ' modal: ' + e[1],
@@ -159,7 +161,7 @@ function (templates, notification, ajax, ModalList) {
         /**
          * Retrieve the roles from the dom
          */
-        getRoles: function () {
+        getRoles: function() {
             var roleNodes = this.widget.querySelectorAll('.pw_item'),
                 role;
 
@@ -178,10 +180,10 @@ function (templates, notification, ajax, ModalList) {
          *
          * @return {Promise}
          */
-        initRolesPicker: function () {
+        initRolesPicker: function() {
             var that = this;
 
-            return new Promise(function (resolve) {
+            return new Promise(function(resolve) {
                 var pickerData = {
                     key: 'pwManualRolesPicker_' + that.pwKey,
                     title: [{
@@ -200,15 +202,15 @@ function (templates, notification, ajax, ModalList) {
                         },
                         service: that.endpoints.allroles,
                     },
-                    onSaved: function (picker, items, itemData) {
+                    onSaved: function(picker, items, itemData) {
                         that.updateRoles(itemData);
                     },
                 };
 
-                ModalList.adder(pickerData).then(function (modal) {
+                ModalList.adder(pickerData).then(function(modal) {
                     that.rolesPicker = modal;
                     resolve(modal);
-                }).catch(function (e) {
+                }).catch(function(e) {
                     notification.exception({
                         fileName: that.filename,
                         message: e[0] + ' modal: ' + e[1],
@@ -222,13 +224,13 @@ function (templates, notification, ajax, ModalList) {
          * Open the picker to add raters
          *
          */
-        pickRaters: function () {
+        pickRaters: function() {
             var that = this;
 
             if (!this.rolesPicker) {
-                this.initRolesPicker().then(function (modal) {
+                this.initRolesPicker().then(function(modal) {
                     modal.show(that.roleIds);
-                }).catch(function (e) {
+                }).catch(function(e) {
                     notification.exception({
                         fileName: that.filename,
                         message: e[0] + ' modal: ' + e[1],
@@ -241,11 +243,11 @@ function (templates, notification, ajax, ModalList) {
         },
 
         /**
-         * @param []
+         * @param {Array} roles
          */
-        updateRoles: function (roles) {
+        updateRoles: function(roles) {
             var that = this,
-                target = this.widget.querySelector('.pw_roles'),
+                target = this.widget.querySelector('[data-pw-roles]'),
                 promiseArr = [];
 
             for (var a = 0; a < roles.length; a++) {
@@ -264,10 +266,10 @@ function (templates, notification, ajax, ModalList) {
             that.showHideNoRaters();
 
             if (promiseArr.length > 0) {
-                Promise.all(promiseArr).then(function () {
+                Promise.all(promiseArr).then(function() {
                     that.triggerEvent('update', {pathway: that.pathway});
                     that.triggerEvent('dirty', {});
-                }).catch(function (e) {
+                }).catch(function(e) {
                     e.fileName = that.filename;
                     e.name = 'Error showing updated roles';
                     notification.exception(e);
@@ -278,7 +280,7 @@ function (templates, notification, ajax, ModalList) {
         /**
          * @param {int} id
          */
-        removeRole: function (id) {
+        removeRole: function(id) {
             id = parseInt(id);
 
             var idIndex = this.roleIds.indexOf(id),
@@ -313,12 +315,12 @@ function (templates, notification, ajax, ModalList) {
         /**
          * Show or hide the No Raters warning depending on the number of raters
          */
-        showHideNoRaters: function () {
-            var target = this.widget.querySelector('.pw_manual_error_noraters');
+        showHideNoRaters: function() {
+            var target = this.widget.querySelector('[data-pw-manual-error-no-raters]');
             if (this.roleIds.length == 0) {
-                target.classList.remove('cc_hidden');
+                target.classList.remove('tw-editAchievementPaths--hidden');
             } else {
-                target.classList.add('cc_hidden');
+                target.classList.add('tw-editAchievementPaths--hidden');
             }
         },
 
@@ -328,7 +330,7 @@ function (templates, notification, ajax, ModalList) {
          * @param {string} eventName
          * @param {object} data
          */
-        triggerEvent: function (eventName, data) {
+        triggerEvent: function(eventName, data) {
             data.key = this.pwKey;
 
             var propagateEvent = new CustomEvent('totara_competency/pathway:' + eventName, {
@@ -346,8 +348,8 @@ function (templates, notification, ajax, ModalList) {
      * @param {node} parent
      * @returns {Object} promise
      */
-    var init = function (parent) {
-        return new Promise(function (resolve) {
+    var init = function(parent) {
+        return new Promise(function(resolve) {
             var wgt = new PwManual();
             wgt.setParent(parent);
             wgt.events();

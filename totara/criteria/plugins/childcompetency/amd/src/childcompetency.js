@@ -35,6 +35,8 @@ function(ajax, notification, Loader) {
         }
 
         this.widget = ''; // Parent widget
+        this.competencyKey = 'competency_id'; // Metadata key for competency id
+        this.criterionKey = ''; // Unique key to use in bubbled event
         this.loader = null; // Loading overlay manager
 
         /**
@@ -52,17 +54,6 @@ function(ajax, notification, Loader) {
             singleuse: false,
             expandable: true
         };
-
-        this.criterionKey = '';  // Unique key to use in bubbled event
-        this.competencyKey = 'competency_id'; // Metadata key for competency id
-
-        this.endpoints = {};
-
-        this.domClasses = {
-            hidden: 'tw-criterion-hidden',
-        };
-
-        this.fileName = 'childcompetency.js';
     }
 
     CriterionChildCompetency.prototype = {
@@ -122,28 +113,28 @@ function(ajax, notification, Loader) {
          */
         getDetail: function() {
             var that = this,
-                criterionNode = this.widget.closest('[data-tw-criterion-key]'),
+                criterionNode = this.widget.closest('[data-tw-editScaleValuePaths-criterion-key]'),
                 aggregationNode = criterionNode.querySelector('[data-tw-criterionChildCompetency-aggregation]'),
-                compIdWgt = document.querySelector('[data-comp-id]'),
-                compId = 1;
+                competencyIdNode = document.querySelector('[data-tw-editAchievementPaths-competency]');
 
 
             return new Promise(function(resolve) {
                 if (criterionNode) {
-                    that.criterionKey = criterionNode.hasAttribute('data-tw-criterion-key')
-                        ? criterionNode.getAttribute('data-tw-criterion-key')
+                    that.criterionKey = criterionNode.hasAttribute('data-tw-editScaleValuePaths-criterion-key')
+                        ? criterionNode.getAttribute('data-tw-editScaleValuePaths-criterion-key')
                         : 0;
-                    that.criterion.id = criterionNode.hasAttribute('data-tw-criterion-id')
-                        ? criterionNode.getAttribute('data-tw-criterion-id')
+                    that.criterion.id = criterionNode.hasAttribute('data-tw-editScaleValuePaths-criterion-id')
+                        ? criterionNode.getAttribute('data-tw-editScaleValuePaths-criterion-id')
                         : 0;
                 }
 
-                if (compIdWgt) {
-                    compId = compIdWgt.getAttribute('data-comp-id') ? compIdWgt.getAttribute('data-comp-id') : 1;
+                if (competencyIdNode) {
+                    var competencyId = competencyIdNode.getAttribute('data-tw-editAchievementPaths-competency')
+                        ? competencyIdNode.getAttribute('data-tw-editAchievementPaths-competency') : 1;
 
                     that.criterion.metadata = [{
                         metakey: that.competencyKey,
-                        metavalue: compId
+                        metavalue: competencyId
                     }];
                 }
 
@@ -164,55 +155,6 @@ function(ajax, notification, Loader) {
         },
 
         /**
-         * Create an empty childcompetency criterion
-         * @return {Promise}
-         */
-        oldCreateEmptyCriterion: function() {
-            // TODO: Fix when converting to vue - for now depending on the fact that the comp-id is on the document
-            var that = this,
-                compIdWgt = document.querySelector('[data-comp-id]'),
-                compId = 1;
-
-            if (compIdWgt) {
-                compId = compIdWgt.getAttribute('data-comp-id') ? compIdWgt.getAttribute('data-comp-id') : 1;
-            }
-
-            return new Promise(function(resolve) {
-                resolve({
-                    results: {
-                        id: 0,
-                        metadata: [{
-                            metakey: that.competencyKey,
-                            metavalue: compId
-                        }],
-                        aggregation:{
-                            method: 1,
-                            reqitems: 1
-                        }
-                    }
-                });
-            });
-        },
-
-        /**
-         * Show or hide the configuration error warning
-         */
-        oldShowHideConfigurationError: function(theError) {
-            var target = this.widget.querySelector('[data-tw-criterionChildCompetency-error]');
-            if (!target) {
-                return;
-            }
-
-            if (theError) {
-                // Show the warning
-                target.classList.remove(this.domClasses.hidden);
-            } else {
-                target.classList.add(this.domClasses.hidden);
-            }
-        },
-
-
-        /**
          * Set the aggregation method
          *
          * @param {int} method New aggregation method
@@ -230,7 +172,7 @@ function(ajax, notification, Loader) {
             }
 
             if (countInput) {
-                // To avoid hardcoding that method 1 == all, etc, we use the fact that the reqItems input
+                // To avoid hard coding that method 1 == all, etc, we use the fact that the reqItems input
                 // is in the same div as the 'any' radio button to determine whether to disable or enable
                 // the count input
                 countInput.disabled = testCountInput ? false : true;
@@ -290,6 +232,8 @@ function(ajax, notification, Loader) {
             wgt.getDetail().then(function() {
                 wgt.loader.hide();
                 M.util.js_complete('criterionChildCompetency');
+            }).catch(function() {
+                // Failed
             });
         });
     };

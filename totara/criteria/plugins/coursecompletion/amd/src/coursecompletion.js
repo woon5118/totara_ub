@@ -65,7 +65,7 @@ function(templates, notification, ajax, ModalList, Loader) {
         };
 
         this.domClasses = {
-            hidden: 'tw-criterion-hidden',
+            hidden: 'tw-editAchievementPaths--hidden',
         };
 
         this.filename = 'coursecompletion.js';
@@ -149,20 +149,22 @@ function(templates, notification, ajax, ModalList, Loader) {
 
         /**
          * Retrieve the criterion detail
-         * @param {node}
+         *
+         * @param {node} wgt
+         * @return {Promise}
          */
         getDetail: function(wgt) {
             var that = this,
-                criterionNode = wgt.closest('[data-tw-criterion-key]'),
+                criterionNode = wgt.closest('[data-tw-editScaleValuePaths-criterion-key]'),
                 aggregationNode = criterionNode.querySelector('[data-tw-criterionCourseCompletion-aggregation]');
 
             return new Promise(function(resolve) {
                 if (criterionNode) {
-                    that.criterionKey = criterionNode.hasAttribute('data-tw-criterion-key')
-                        ? criterionNode.getAttribute('data-tw-criterion-key')
+                    that.criterionKey = criterionNode.hasAttribute('data-tw-editScaleValuePaths-criterion-key')
+                        ? criterionNode.getAttribute('data-tw-editScaleValuePaths-criterion-key')
                         : '';
-                    that.criterion.id = criterionNode.hasAttribute('data-tw-criterion-id')
-                        ? criterionNode.getAttribute('data-tw-criterion-id')
+                    that.criterion.id = criterionNode.hasAttribute('data-tw-editScaleValuePaths-criterion-id')
+                        ? criterionNode.getAttribute('data-tw-editScaleValuePaths-criterion-id')
                         : 0;
                 }
 
@@ -184,6 +186,8 @@ function(templates, notification, ajax, ModalList, Loader) {
                 Promise.all([that.initCourseAdder()]).then(function() {
                     that.triggerEvent('update', {criterion: that.criterion});
                     resolve();
+                }).catch(function() {
+                    // Failed
                 });
             });
         },
@@ -229,8 +233,7 @@ function(templates, notification, ajax, ModalList, Loader) {
         /**
          * Retrieve course detail from the dom
          *
-         * @param {node}
-         * @return {Promise}
+         * @param {node} wgt
          */
         setCourses: function(wgt) {
             var courseNodes = wgt.querySelectorAll('[data-tw-course-item-value]'),
@@ -357,7 +360,7 @@ function(templates, notification, ajax, ModalList, Loader) {
         /**
          * Update the displayed courses
          *
-         * @param  {[Object]} items Selected courses
+         * @param  {[Object]} courses Selected courses
          */
         updateCourses: function(courses) {
             var that = this,
@@ -472,6 +475,8 @@ function(templates, notification, ajax, ModalList, Loader) {
             wgt.getDetail(parent).then(function() {
                 wgt.loader.hide();
                 M.util.js_complete('criterionCourseCompletion');
+            }).catch(function() {
+                // Failed
             });
         });
     };

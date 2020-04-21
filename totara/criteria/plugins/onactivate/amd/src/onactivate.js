@@ -35,6 +35,8 @@ function(Loader) {
         }
 
         this.widget = ''; // Parent widget
+        this.competencyKey = 'competency_id'; // Metadata key for competency id
+        this.criterionKey = '';
         this.loader = null; // Loading overlay manager
 
         /**
@@ -49,9 +51,6 @@ function(Loader) {
             singleuse: true,
             expandable: false
         };
-
-        this.criterionKey = '';
-        this.competencyKey = 'competency_id'; // Metadata key for competency id
     }
 
     CriterionOnActivate.prototype = {
@@ -72,28 +71,27 @@ function(Loader) {
          */
         getDetail: function() {
             var that = this,
-                criterionNode = this.widget.closest('[data-tw-criterion-key]'),
-                compIdNode = document.querySelector('[data-comp-id]'),
-                compId = 1;
+                criterionNode = this.widget.closest('[data-tw-editScaleValuePaths-criterion-key]'),
+                competencyIdNode = document.querySelector('[data-tw-editAchievementPaths-competency]');
 
 
             return new Promise(function(resolve) {
                 if (criterionNode) {
-                    that.criterionKey = criterionNode.hasAttribute('data-tw-criterion-key')
-                        ? criterionNode.getAttribute('data-tw-criterion-key')
+                    that.criterionKey = criterionNode.hasAttribute('data-tw-editScaleValuePaths-criterion-key')
+                        ? criterionNode.getAttribute('data-tw-editScaleValuePaths-criterion-key')
                         : 0;
-                    that.criterion.id = criterionNode.hasAttribute('data-tw-criterion-id')
-                        ? criterionNode.getAttribute('data-tw-criterion-id')
+                    that.criterion.id = criterionNode.hasAttribute('data-tw-editScaleValuePaths-criterion-id')
+                        ? criterionNode.getAttribute('data-tw-editScaleValuePaths-criterion-id')
                         : 0;
                 }
 
-                if (compIdNode) {
-                    compId = compIdNode.getAttribute('data-comp-id')
-                        ? compIdNode.getAttribute('data-comp-id')
-                        : 1;
+                if (competencyIdNode) {
+                    var competencyId = competencyIdNode.getAttribute('data-tw-editAchievementPaths-competency')
+                        ? competencyIdNode.getAttribute('data-tw-editAchievementPaths-competency') : 1;
+
                     that.criterion.metadata = [{
                         metakey: that.competencyKey,
-                        metavalue: compId
+                        metavalue: competencyId
                     }];
                 }
 
@@ -140,6 +138,8 @@ function(Loader) {
             wgt.getDetail().then(function() {
                 wgt.loader.hide();
                 M.util.js_complete('criterionCourseCompletion');
+            }).catch(function() {
+                // Failed
             });
         });
     };
