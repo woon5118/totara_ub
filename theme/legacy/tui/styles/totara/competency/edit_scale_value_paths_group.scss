@@ -1,7 +1,7 @@
 //
 // This file is part of Totara Learn
 //
-// Copyright (C) 2019 onwards Totara Learning Solutions LTD
+// Copyright (C) 2020 onwards Totara Learning Solutions LTD
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,39 +16,37 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
-// @copyright 2019 onwards Totara Learning Solutions LTD
+// @copyright 2020 onwards Totara Learning Solutions LTD
 // @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-// @author    Riana Rossouw <riana.rossouw@totaralearning.com>
-// @package   theme_roots
+// @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
+// @package   theme_legacy
 
-.tw-criterion-hidden {
-  display: none;
+.tw-editScaleValuePathsGroup {
+  margin-top: var(--tui-gap-2);
+  padding: var(--tui-gap-2);
+  border: var(--tui-border-width-thin) solid var(--tui-color-neutral-5);
+  border-radius: var(--tui-border-radius-normal);
 }
 
-.tw-criterion-warning {
-  color: var(--tui-color-prompt-warning);
+.tw-editScaleValuePathGroup {
+  &__scaleHeader {
+    &-add {
+      margin-top: var(--tui-gap-2);
+    }
+  }
 }
 
-.tw-criterion-label {
-  display: inline-block;
-  min-width: 15em;
-  font-weight: bold;
-  margin-bottom: 0.5em;
-  vertical-align: top;
-}
+.tw-editScaleValuePathGroupCriterion {
+  display: flex;
+  margin-left: 6em;
+  margin-top: var(--tui-gap-4);
 
-.tw-criterion-value {
-  min-width: 15em;
-  display: inline-block;
-  vertical-align: top;
-}
+  &--deleted {
+    color: var(--tui-color-neutral-6);
+    text-decoration: line-through;
+  }
 
-.tw-criterion-smalltitle {
-  font-size: 1.1em;
-  font-weight: bold;
-  margin-bottom: 0.5em;
-}
-
-.tw-criterion-inline {
-  display: inline-block;
+  &__actions {
+    margin-left: auto;
+  }
 }

@@ -23,34 +23,30 @@
 
         @template totara_competency/competency_edit
 
-        This is the outer template for editing a competency
+        This is the outer template for editing a competency,
+        provides tabs for editing the different sections (General, linked courses, achievement paths)
 
         Classes required for JS:
         * none
 
         Data attributes required for JS:
-        * data-comp-id
+        * none
 
         Context variables required for this template:
-        * competency_id
-        * heading
-        * tabs
+        * heading: String for page heading
+        * tabs: Markup for different edit sections
         * detail
-        **  templatename
-
-        Other context variables for following partials:
+        * detail -> templatename: Name of template to be called
 
 }}
 
-<div data-comp-edit="1">
-    <a href="{{backurl}}">&laquo; {{#str}}competencybacktocompetencypage, totara_hierarchy{{/str}}</a>
+<div class="tw-editCompetency">
+    <a href="{{backurl}}">{{#str}}competency_back_to_competency_page, totara_hierarchy{{/str}}</a>
 
-    <h2>{{heading}}</h2>
+    <h2 class="tw-editCompetency__title">{{heading}}</h2>
 
     {{{tabs}}}
 
-    {{#detail}}
-        {{> &&templatename}}
-    {{/detail}}
+    {{#detail}}{{> &&templatename}}{{/detail}}
 </div>
 

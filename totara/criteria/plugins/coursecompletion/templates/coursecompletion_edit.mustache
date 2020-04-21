@@ -51,67 +51,80 @@
 }}
 
 <div data-tw-criterionCourseCompletion=""
-     data-core-autoinitialise="true"
-     data-core-autoinitialise-amd="criteria_coursecompletion/coursecompletion"
-     data-tw-loader-target="">
-    <div data-tw-criterionCourseCompletion-detail="">
-        <div class="tw-criterion-label">
-            <span>{{#str}}courses, criteria_coursecompletion{{/str}}</span>
-        </div>
-        <div class="tw-criterion-value">
-            <div data-tw-criterionCourseCompletion-courses="">
-                {{#items}}
-                    {{> totara_criteria/partial_item}}
-                {{/items}}
-            </div>
+data-core-autoinitialise="true"
+data-core-autoinitialise-amd="criteria_coursecompletion/coursecompletion"
+data-tw-loader-target="">
+
+    <div class="tw-editAchievementPaths__criterionForm" data-tw-criterionCourseCompletion-detail="">
+        <h5 class="tw-editAchievementPaths__criterionForm-title">
+            {{#str}}courses, criteria_coursecompletion{{/str}}
+        </h5>
+
+        <div>
+            <ul class="tw-editAchievementPaths__criterionForm-list" data-tw-criterionCourseCompletion-courses="">
+                {{#items}}{{> totara_criteria/partial_item}}{{/items}}
+            </ul>
 
             <div>
-                <a href="#" data-tw-criterionCourseCompletion-addCourses="">
-                    <span class="tw-criterion-smalltitle">
-                        {{#str}}add_courses, criteria_coursecompletion{{/str}}
-                    </span>
-                </a>
-                <span class="tw-criterion-warning tw-criterion-hidden" data-tw-criterionCourseCompletion-error="notenoughcourses">
+                <div class="tw-editAchievementPaths__criterionForm-warning tw-editAchievementPaths--hidden" data-tw-criterionCourseCompletion-error="notenoughcourses">
                     {{#flex_icon}}notification-warning{{/flex_icon}}
                     {{#str}}error_not_enough_courses, criteria_coursecompletion{{/str}}
-                </span>
+                </div>
+
+                <button type="button" class="tw-editAchievementPaths__transparentBtn" aria-label="" data-tw-criterionCourseCompletion-addCourses="">
+                    {{#str}}add_courses, criteria_coursecompletion{{/str}}
+                </button>
             </div>
         </div>
     </div>
 
-    <div data-tw-criterionCourseCompletion-aggregation="{{#aggregation}}{{method}}{{/aggregation}}{{^aggregation}}1{{/aggregation}}"
-         data-tw-criterionCourseCompletion-aggregation-reqitems="{{#aggregation}}{{reqitems}}{{/aggregation}}{{^aggregation}}1{{/aggregation}}">
-        <div class="tw-criterion-label">
-            <span>{{#str}}aggregation, totara_criteria{{/str}}</span>
-        </div>
-        <div class="tw-criterion-value">
+    <form class="tw-editAchievementPaths__criterionForm" 
+    data-tw-criterionCourseCompletion-aggregation="{{#aggregation}}{{method}}{{/aggregation}}{{^aggregation}}1{{/aggregation}}"
+    data-tw-criterionCourseCompletion-aggregation-reqitems="{{#aggregation}}{{reqitems}}{{/aggregation}}{{^aggregation}}1{{/aggregation}}">
+
+        <h5 class="tw-editAchievementPaths__criterionForm-title">
+            {{#str}}aggregation, totara_criteria{{/str}}
+        </h5>
+
+        <div class="tw-editAchievementPaths__criterionForm-items">
             <div data-tw-criterionCourseCompletion-aggregationMethod="1">
                 <input type="radio"
-                       id="tw_criterionCourseCompletion_agg_all__{{key}}"
-                       name="tw_criterionCourseCompletion_agg__{{key}}"
-                       value="1"
-                       data-tw-criterionCourseCompletion-aggregationMethod-changed="all"/>
-                <label for="tw_criterionCourseCompletion_agg_all__{{key}}"><span>{{#str}}complete_all, totara_criteria {{/str}}</span></label><span class="tf_loading" style="display: none;">{{#pix}} i/loading, core, loading, totara_core{{/pix}}</span>
+                id="tw_criterionCourseCompletion_agg_all__{{key}}"
+                name="tw_criterionCourseCompletion_agg__{{key}}"
+                value="1"
+                data-tw-criterionCourseCompletion-aggregationMethod-changed="all"/>
+
+                <label for="tw_criterionCourseCompletion_agg_all__{{key}}">
+                    <span>{{#str}}complete_all, totara_criteria {{/str}}</span>
+                </label>
+                <span class="tf_loading" style="display: none;">
+                    {{#pix}} i/loading, core, loading, totara_core{{/pix}}
+                </span>
             </div>
 
-            <div data-tw-criterionCourseCompletion-aggregationMethod="2">
-                <div class="tw-criterion-inline">
+            <div class="tw-editAchievementPaths__criterionForm-item" data-tw-criterionCourseCompletion-aggregationMethod="2">
+                <div>
                     <input type="radio"
-                           id="tw_criterionCourseCompletion_agg_any__{{key}}"
-                           name="tw_criterionCourseCompletion_agg__{{key}}"
-                           value="2"
-                           data-tw-criterionCourseCompletion-aggregationMethod-changed="any"/>
-                    <label for="tw_criterionCourseCompletion_agg_any__{{key}}"><span>{{#str}}complete_any, totara_criteria {{/str}}</span></label><span class="tf_loading" style="display: none;">{{#pix}} i/loading, core, loading, totara_core{{/pix}}</span>
+                    id="tw_criterionCourseCompletion_agg_any__{{key}}"
+                    name="tw_criterionCourseCompletion_agg__{{key}}"
+                    value="2"
+                    data-tw-criterionCourseCompletion-aggregationMethod-changed="any"/>
+                    <label for="tw_criterionCourseCompletion_agg_any__{{key}}">
+                        <span>{{#str}}complete_any, totara_criteria {{/str}}</span>
+                    </label>
+                    <span class="tf_loading" style="display: none;">
+                        {{#pix}} i/loading, core, loading, totara_core{{/pix}}
+                    </span>
                 </div>
 
-                <div class="tw-criterion-inline" data-tw-criterionCourseCompletion-aggregationCount="">
+                <div data-tw-criterionCourseCompletion-aggregationCount="">
                     <input type="number"
-                           name="tw_criterionCourseCompletion_agg_count__{{key}}"
-                           value="1" min="0"
-                           data-tw-criterionCourseCompletion-aggregationCount-changed=""
-                           disabled="disabled"/>
+                    name="tw_criterionCourseCompletion_agg_count__{{key}}"
+                    value="1" min="0"
+                    data-tw-criterionCourseCompletion-aggregationCount-changed=""
+                    disabled="disabled"/>
                 </div>
             </div>
         </div>
-    </div>
+    </form>
 </div>

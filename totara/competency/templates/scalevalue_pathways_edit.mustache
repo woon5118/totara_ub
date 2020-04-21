@@ -28,8 +28,8 @@
         * none
 
         Data attributes required for JS:
-        * data-scalevalue-id
-        * data-scalevalue-action
+        * data-tw-editScaleValuePaths-scale-id
+        * 
 
         Context variables required for this template:
         * scalevalues
@@ -37,67 +37,50 @@
         **  name
         **  pathways
         **  proficient
-
-        Other context variables for following partials:
-
-        Strings:
-        * single_value_paths, totara_competency
-        * single_value_proficient_mark_help, totara_competency
 }}
 
-<div class="scalevalue_pathways cc_solid_border" data-cc-orderable="scalevalues">
-    <div class="scalevalue_pathways_title">
-        <div class="cc_detail_label cc_hidden"
-             data-cc-on-ordering="show">
-            <span class="cc_label cc_allupper">{{#str}}single_value_paths, totara_competency{{/str}}</span>
+<div class="tw-editScaleValuePaths" data-tw-editAchievementPaths-draggable="" data-tw-editAchievementPaths-order-key="scalevalues" draggable="false">
+
+    <div class="tw-editScaleValuePaths__header">
+        <h4 class="tw-editScaleValuePaths__header-title tw-editAchievementPaths--hidden" data-tw-editAchievementPaths-on-ordering="show">
+            {{#str}}single_value_paths, totara_competency{{/str}}
+        </h4>
+
+        <div class="tw-editScaleValuePaths__header-legend" data-tw-editAchievementPaths-on-ordering="hide">
+            {{#str}}single_value_proficient_mark_help, totara_competency{{/str}}
+            {{#flex_icon}}check-circle-o-success{{/flex_icon}}
         </div>
 
-        <div class="cc_helptext cc_inline_element"
-             data-cc-on-ordering="hide">
-            <span class="legend">
-                {{#str}}single_value_proficient_mark_help, totara_competency{{/str}}
-                {{#flex_icon}}check-circle-o-success{{/flex_icon}}
-            </span>
-        </div>
-
-        <div class="cc_actions cc_inline_element cc_hidden"
-             data-cc-on-ordering="show">
-            <span class="pw_item__btn_small_icon">
-                {{#flex_icon}}arrows{{/flex_icon}}
-            </span>
+        <div class="tw-editScaleValuePaths__header-drag tw-editAchievementPaths--hidden" data-tw-editAchievementPaths-on-ordering="show">
+            {{#flex_icon}}arrows{{/flex_icon}}
         </div>
     </div>
 
-    <div class="scalevalue_pathways_scalevalues"
-         data-cc-on-ordering="hide">
+    <div class="tw-editScaleValuePaths__scales" data-tw-editAchievementPaths-on-ordering="hide">
         {{#scale_values}}
-            <div class="scalevalue_pathways_scale"
-                 data-scalevalue-id="{{id}}">
+        <div class="tw-editScaleValuePaths__scales-scale" data-tw-editScaleValuePaths-scale-id="{{id}}" data-tw-editScaleValuePaths-pathway-list="{{num_pathways}}">
 
-                <div class="scalevalue_pathways_scale_title {{^pathways}}empty_paths{{/pathways}}">
-                    <div class="cc_inline_element">
-                        {{#proficient}}
-                            <span class="btn_normal_icon">{{#flex_icon}}check-circle-o-success{{/flex_icon}}</span>
-                        {{/proficient}}
-                        <span class="cc_allupper">{{name}}</span>
-                    </div>
-                    <div class="cc_actions cc_inline_element">
-                        <a href="#"
-                           data-scalevalue-action="add-pw">
-                            <span class="btn_large_icon">
-                                {{#flex_icon}}plus-square-o{{/flex_icon}}
+            <div class="tw-editScaleValuePaths__scaleHeader {{^pathways}}tw-editScaleValuePaths__scaleHeader-empty{{/pathways}}">
+                <h4 class="tw-editScaleValuePaths__scaleHeader-title">
+                    {{#proficient}}{{#flex_icon}}check-circle-o-success{{/flex_icon}}{{/proficient}}
+                    {{name}}
+                </h4>
+                
+                <div class="tw-editScaleValuePaths__scaleHeader-add">
+                    <button class="tw-editScaleValuePaths__addButton" aria-label="Add" type="button" data-tw-editScaleValuePaths-add="">
+                        <span>
+                            <span aria-hidden="true" class="">
+                                {{#flex_icon}}plus{{/flex_icon}}
                             </span>
-                        </a>
-                        {{> totara_competency/partial_criteria_type_select}}
-                    </div>
-                </div>
+                        </span>
+                    </button>
 
-                <div data-cc-scalevalue-pw-list="{{num_pathways}}">
-                    {{#pathways}}
-                        {{> totara_competency/partial_pathway}}
-                    {{/pathways}}
+                    {{> totara_competency/scalevalue_add_criteria_select}}
                 </div>
             </div>
+
+            {{#pathways}}{{> totara_competency/partial_pathway}}{{/pathways}}
+        </div>
         {{/scale_values}}
     </div>
 </div>

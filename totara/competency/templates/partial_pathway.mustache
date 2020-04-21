@@ -42,38 +42,42 @@
 </div>
 {{/showor}}
 
-<div class="{{^scalevalue}}cc_solid_border{{/scalevalue}} {{#scalevalue}}pw_border{{/scalevalue}}"
-     data-pw-type="{{type}}"
-     data-pw-key="{{key}}"
-     data-pw-sortorder="{{sortorder}}"
-     {{#id}}data-pw-id="{{.}}"{{/id}}
-     {{^scalevalue}}data-cc-orderable="{{key}}"{{/scalevalue}}>
+{{#scalevalue}}{{> totara_competency/scalevalue_partial_pathway}}{{/scalevalue}}
 
-    <div data-pathway-detail="{{key}}" class="{{^scalevalue}}cc_inline_element{{/scalevalue}} {{#deleted}}cc_deleted{{/deleted}}">
-      {{> &&pathway_templatename}}
-    </div>
+{{^scalevalue}}
+<div class="tw-editAchievementPaths__group-item"
+     data-tw-editAchievementPaths-pathway-key="{{key}}"
+     data-tw-editAchievementPaths-pathway-sortOrder="{{sortorder}}"
+     {{#id}}data-tw-editAchievementPaths-pathway-id="{{.}}"{{/id}}
+     data-tw-editAchievementPaths-draggable=""
+     data-tw-editAchievementPaths-order-key="scalevalues"
+     draggable="false">
 
-    {{^scalevalue}}
-        <div class="cc_actions cc_inline_element" data-cc-on-ordering="hide">
-            <a href="#" {{#deleted}}class="cc_hidden"{{/deleted}}
-               data-pw-action="remove">
-                <span class="pw_item__btn_small_icon">
+    {{> &&pathway_templatename}}
+
+    <div class="tw-editAchievementPaths__group-actions" data-tw-editAchievementPaths-on-ordering="hide">
+        <button type="button" class="tw-editAchievementPaths__group-actionsButton {{#deleted}}tw-editAchievementPaths--hidden{{/deleted}}" 
+        aria-label="" data-tw-editAchievementPaths-pathway-action="remove">
+            <span>
+                <span aria-hidden="true" class="">
                     {{#flex_icon}}trash{{/flex_icon}}
                 </span>
-            </a>
+            </span>
+        </button>
 
-            <a href="#" {{^canundo}}class="cc_hidden"{{/canundo}}
-               data-pw-action="undo">
-                <span class="pw_item__btn_small_icon">
+        <button type="button" class="tw-editAchievementPaths__group-actionsButton {{^canundo}}tw-editAchievementPaths--hidden{{/canundo}}" 
+        aria-label="" data-tw-editAchievementPaths-pathway-action="undo">
+            <span>
+                <span aria-hidden="true" class="">
                     {{#flex_icon}}undo{{/flex_icon}}
                 </span>
-            </a>
-        </div>
-
-        <div class="cc_actions cc_inline_element cc_hidden" data-cc-on-ordering="show">
-            <span class="pw_item__btn_small_icon">
-                {{#flex_icon}}arrows{{/flex_icon}}
             </span>
-        </div>
-    {{/scalevalue}}
+        </button>
+    </div>
+
+    <div class="tw-editAchievementPaths__group-actions tw-editAchievementPaths--hidden" data-tw-editAchievementPaths-on-ordering="show">
+        {{#flex_icon}}arrows{{/flex_icon}}
+    </div>
 </div>
+{{/scalevalue}}
+

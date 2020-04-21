@@ -41,26 +41,25 @@
         }
 }}
 
-<div class="pw_criteria_group"
+<div class="tw-editScaleValuePathGroup"
      data-core-autoinitialise="true"
      data-core-autoinitialise-amd="pathway_criteria_group/criteria_group"
-     data-pw-save-endpoint="pathway_criteria_group_update"
-     data-pw-save-req-sortorder="1"
-     data-pw-scalevalue="{{scalevalue}}">
+     data-tw-editAchievementPaths-save-endPoint="pathway_criteria_group_update"
+     data-tw-editAchievementPaths-save-req-sortOrder="1"
+     data-tw-editScaleValuePaths-value="{{scalevalue}}">
 
-    <div class="critgrp_criteria">
-        {{> pathway_criteria_group/partial_group_criteria}}
+    <div class="tw-editScaleValuePathGroup__criteria" data-tw-editScaleValuePaths-group-criteria="">
+        {{> pathway_criteria_group/scalevalue_group_criteria}}
     </div>
 
-    <div class="critgrp_bottom_action cc_divider_icon">
-        <a href="#"
-           data-cg-action="addcriterion"
-           data-cc-on-ordering="hide">
-            <span class="btn_large_icon">
-                {{#flex_icon}}plus-square-o{{/flex_icon}}
+    <div class="tw-editScaleValuePathGroup__scaleHeader-add" data-tw-editScaleValuePaths-group-add="">
+        <button class="tw-editScaleValuePaths__addButton" aria-label="" type="button" data-cg-action="addcriterion" data-tw-editAchievementPaths-on-ordering="hide">
+            <span>
+                <span aria-hidden="true" class="">
+                    {{#flex_icon}}plus{{/flex_icon}}
+                </span>
             </span>
-        </a>
-
-        {{> totara_competency/partial_criteria_type_select}}
+        </button>
+        {{> totara_competency/scalevalue_add_criteria_select}}
     </div>
 </div>

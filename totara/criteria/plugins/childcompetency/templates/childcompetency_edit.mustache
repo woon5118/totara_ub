@@ -16,6 +16,7 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
    @author Riana Rossouw <riana.rossouw@totaralearning.com>
    @package criteria_childcompetency
 }}
@@ -45,50 +46,63 @@
 }}
 
 <div data-tw-criterionChildCompetency=""
-     data-core-autoinitialise="true"
-     data-core-autoinitialise-amd="criteria_childcompetency/childcompetency"
-     data-tw-loader-target="">
+data-core-autoinitialise="true"
+data-core-autoinitialise-amd="criteria_childcompetency/childcompetency"
+data-tw-loader-target="">
 
-    <div class="tw-criterion-hidden" data-tw-criterionChildCompetency-error="">
-      <span class="tw-criterion-warning">
-          {{#flex_icon}}notification-warning{{/flex_icon}}
-          {{#str}}error_not_enough_children, criteria_childcompetency{{/str}}
-      </span>
+    <div class="tw-editAchievementPaths--hidden" data-tw-criterionChildCompetency-error="">
+        <span class="tw-editAchievementPaths__criterionForm-warning">
+            {{#flex_icon}}notification-warning{{/flex_icon}}
+            {{#str}}error_not_enough_children, criteria_childcompetency{{/str}}
+        </span>
     </div>
 
-    <div data-tw-criterionChildCompetency-aggregation="{{#aggregation}}{{method}}{{/aggregation}}{{^aggregation}}1{{/aggregation}}"
-         data-tw-criterionChildCompetency-aggregation-reqitems="{{#aggregation}}{{reqitems}}{{/aggregation}}{{^aggregation}}1{{/aggregation}}">
-        <div class="tw-criterion-label">
-            <span>{{#str}}aggregation, totara_criteria{{/str}}</span>
-        </div>
-        <div class="tw-criterion-value">
+    <form class="tw-editAchievementPaths__criterionForm"
+    data-tw-criterionChildCompetency-aggregation="{{#aggregation}}{{method}}{{/aggregation}}{{^aggregation}}1{{/aggregation}}"
+    data-tw-criterionChildCompetency-aggregation-reqitems="{{#aggregation}}{{reqitems}}{{/aggregation}}{{^aggregation}}1{{/aggregation}}">
+        
+        <h5 class="tw-editAchievementPaths__criterionForm-title">
+            {{#str}}aggregation, totara_criteria{{/str}}
+        </h5>
+
+        <div class="tw-editAchievementPaths__criterionForm-items">
             <div data-tw-criterionChildCompetency-aggregationMethod="1">
                 <input type="radio"
-                       id="tw_criterionChildCompetency_agg_all__{{key}}"
-                       name="tw_criterionChildCompetency_agg__{{key}}"
-                       value="1"
-                       data-tw-criterionChildCompetency-aggregationMethod-changed="all"/>
-                <label for="tw_criterionChildCompetency_agg_all__{{key}}"><span>{{#str}}complete_all, totara_criteria {{/str}}</span></label><span class="tf_loading" style="display: none;">{{#pix}} i/loading, core, loading, totara_core{{/pix}}</span>
+                id="tw_criterionChildCompetency_agg_all__{{key}}"
+                name="tw_criterionChildCompetency_agg__{{key}}"
+                value="1"
+                data-tw-criterionChildCompetency-aggregationMethod-changed="all"/>
+                
+                <label class="tw-editAchievementPaths__criterionForm-label" for="tw_criterionChildCompetency_agg_all__{{key}}">
+                    {{#str}}complete_all, totara_criteria {{/str}}
+                </label>
+                <span class="tf_loading" style="display: none;">
+                    {{#pix}} i/loading, core, loading, totara_core{{/pix}}
+                </span>
             </div>
 
-            <div data-tw-criterionChildCompetency-aggregationMethod="2">
-                <div class="tw-criterion-inline">
-                    <input type="radio"
-                           id="tw_criterionChildCompetency_agg_any__{{key}}"
-                           name="tw_criterionChildCompetency_agg__{{key}}"
-                           value="2"
-                           data-tw-criterionChildCompetency-aggregationMethod-changed="any"/>
-                    <label for="tw_criterionChildCompetency_agg_any__{{key}}"><span>{{#str}}complete_any, totara_criteria {{/str}}</span></label><span class="tf_loading" style="display: none;">{{#pix}} i/loading, core, loading, totara_core{{/pix}}</span>
-                </div>
+            <div class="tw-editAchievementPaths__criterionForm-item" data-tw-criterionChildCompetency-aggregationMethod="2">
+                <input type="radio"
+                id="tw_criterionChildCompetency_agg_any__{{key}}"
+                name="tw_criterionChildCompetency_agg__{{key}}"
+                value="2"
+                data-tw-criterionChildCompetency-aggregationMethod-changed="any"/>
+                
+                <label class="tw-editAchievementPaths__criterionForm-label" for="tw_criterionChildCompetency_agg_any__{{key}}">
+                    {{#str}}complete_any, totara_criteria{{/str}}
+                </label>
+                <span class="tf_loading" style="display: none;">
+                    {{#pix}} i/loading, core, loading, totara_core{{/pix}}
+                </span>
 
-                <div class="tw-criterion-inline" data-tw-criterionChildCompetency-aggregationCount="">
+                <div data-tw-criterionChildCompetency-aggregationCount="">
                     <input type="number"
-                           name="tw_criterionChildCompetency_agg_count__{{key}}"
-                           value="1" min="0"
-                           data-tw-criterionChildCompetency-aggregationCount-changed=""
-                           disabled="disabled"/>
+                    name="tw_criterionChildCompetency_agg_count__{{key}}"
+                    value="1" min="0"
+                    data-tw-criterionChildCompetency-aggregationCount-changed=""
+                    disabled="disabled"/>
                 </div>
             </div>
         </div>
-    </div>
+    </form>
 </div>

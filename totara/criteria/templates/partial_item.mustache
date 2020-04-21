@@ -43,18 +43,21 @@
     * none
 
 }}
-<div data-tw-{{type}}-item-value="{{value}}">
+{{! data-tw-criterionothercompetency-competencies }}
+<li data-tw-{{type}}-item-value="{{value}}">
     {{text}}
     {{#error}}
-      <span class="cc_warning">
+      <span class="tw-editAchievementPaths__criterionForm-warning">
         {{#flex_icon}}notification-warning{{/flex_icon}}
         {{error}}
       </span>
     {{/error}}
 
-    <a href="#">
-        <span class="tw_criterion_item__btn_small_icon" data-tw-{{type}}-item-remove="">
-            {{#flex_icon}}trash{{/flex_icon}}
+    <button type="button" class="tw-editAchievementPaths__group-actionsButton"  aria-label="" data-tw-{{type}}-item-remove="">
+        <span>
+            <span aria-hidden="true" class="">
+                {{#flex_icon}}trash{{/flex_icon}}
+            </span>
         </span>
-    </a>
-</div>
+    </button>
+</li>

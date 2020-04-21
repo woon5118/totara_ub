@@ -1,0 +1,284 @@
+//
+// This file is part of Totara Learn
+//
+// Copyright (C) 2020 onwards Totara Learning Solutions LTD
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+// @copyright 2020 onwards Totara Learning Solutions LTD
+// @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+// @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
+// @package   theme_legacy
+
+.tw-editAchievementPaths {
+  &__aggregation {
+    display: flex;
+    margin-top: var(--tui-gap-4);
+
+    & > * {
+      margin-right: var(--tui-gap-8);
+    }
+  }
+
+  &__transparentBtn {
+    @include tui-font-heading-label-small();
+    color: var(--tui-color-state);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    white-space: normal;
+    text-align: left;
+    padding: 0;
+
+    .flex-icon {
+      position: relative;
+      top: -1px;
+    }
+
+    &:active,
+    &:focus,
+    &:hover:active,
+    &:hover {
+      color: var(--tui-color-state-hover);
+      text-decoration: none;
+      background: transparent;
+      border: none;
+      box-shadow: none;
+    }
+  }
+
+  &__buttons {
+    margin-top: var(--tui-gap-6);
+
+    &-submit.tw-editAchievementPaths__buttons-submit {
+      @include bs-btn-primary();
+    }
+
+    &-cancel {
+      @include bs-btn-default();
+    }
+  }
+
+  &__btnGroup {
+    @include bs-btn-group();
+
+    .tw-editAchievementPaths__btn {
+      @extend .btn;
+      @include bs-btn-default();
+      color: var(--tui-btn-toggle-text-color);
+      background: var(--tui-btn-toggle-bg-color);
+      border-color: var(--tui-btn-toggle-border-color);
+
+      &:hover,
+      &:focus {
+        color: var(--tui-btn-toggle-text-color-focus);
+        background: var(--tui-btn-toggle-bg-color-focus);
+        border-color: var(--tui-btn-toggle-border-color-focus);
+      }
+
+      &-active {
+        color: var(--tui-btn-toggle-text-color-selected);
+        background: var(--tui-btn-toggle-bg-color-selected);
+        border-color: var(--tui-btn-toggle-border-color-selected);
+        cursor: default;
+
+        &:active:hover,
+        &:hover,
+        &:focus {
+          color: var(--tui-btn-toggle-text-color-selected);
+          background: var(--tui-btn-toggle-bg-color-selected);
+          border-color: var(--tui-btn-toggle-border-color-selected);
+          box-shadow: none;
+        }
+      }
+    }
+  }
+
+  &__activeDropZone {
+    .tw-editAchievementPaths__group & {
+      border: var(--tui-border-width-thin) dashed var(--tui-color-neutral-6);
+    }
+
+    > * {
+      pointer-events: none;
+    }
+
+    &-over {
+      background: var(--tui-color-state-highlight);
+    }
+  }
+
+  &__empty {
+    @include tui-font-hint();
+    border-top: 1px solid var(--tui-color-neutral-5);
+    border-bottom: 1px solid var(--tui-color-neutral-5);
+    margin-top: var(--tui-gap-4);
+    padding: var(--tui-gap-4) 0;
+  }
+
+  &__groups {
+    & > * {
+      margin-top: var(--tui-gap-4);
+    }
+
+    &-item {
+      border: 1px solid red;
+    }
+  }
+
+  &__group {
+    & > * + * {
+      margin-top: var(--tui-gap-4);
+    }
+
+    &-actions {
+      margin-left: auto;
+
+      &Button {
+        color: var(--tui-color-state);
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        white-space: normal;
+        text-align: left;
+        padding: 0 var(--tui-gap-1);
+
+        &:active,
+        &:focus,
+        &:hover:active,
+        &:hover {
+          color: var(--tui-color-state-hover);
+          text-decoration: none;
+          background: transparent;
+          border: none;
+          box-shadow: none;
+        }
+
+        .flex-icon {
+          position: relative;
+          top: -2px;
+        }
+      }
+    }
+
+    &-item {
+      display: flex;
+      padding: var(--tui-gap-4);
+      border: var(--tui-border-width-thin) solid var(--tui-color-neutral-5);
+      border-radius: var(--tui-border-radius-normal);
+      box-shadow: var(--tui-shadow-2);
+
+      &Details {
+        display: flex;
+        flex-grow: 1;
+      }
+    }
+
+    &-title {
+      width: 15%;
+      margin: 0;
+      @include tui-font-heading-x-small();
+    }
+  }
+
+  &__heading {
+    display: flex;
+
+    &-title {
+      @include tui-font-heading-small();
+      margin: auto 0;
+    }
+
+    &-addPath {
+      margin-left: auto;
+    }
+  }
+
+  &--hidden {
+    display: none;
+  }
+
+  &__andSeparator {
+    position: relative;
+    margin: var(--tui-gap-4) var(--tui-gap-6) 0;
+
+    &-label {
+      position: relative;
+      background: var(--tui-color-neutral-1);
+      margin-left: var(--tui-gap-10);
+      padding: 0 var(--tui-gap-4);
+      text-transform: uppercase;
+      color: var(--tui-color-neutral-5);
+    }
+
+    &-line {
+      position: absolute;
+      width: 100%;
+      top: 50%;
+      border-top: var(--tui-border-width-thin) solid var(--tui-color-neutral-5);
+    }
+  }
+
+  &--deleted {
+    color: var(--tui-color-neutral-5);
+    text-decoration: line-through;
+
+    label,
+    input {
+      pointer-events: none;
+    }
+  }
+
+  &__criterionForm {
+    display: flex;
+    margin: var(--tui-gap-3) var(--tui-gap-6) 0;
+
+    &-title {
+      width: 12rem;
+      margin: var(--tui-gap-1) var(--tui-gap-4) 0 0;
+      @include tui-font-heading-label-small();
+    }
+
+    &-items {
+      & > * + * {
+        margin-top: var(--tui-gap-1);
+      }
+    }
+
+    &-item {
+      & > * {
+        display: inline-block;
+      }
+    }
+
+    &-label {
+      @include tui-font-body-small();
+      font-weight: normal;
+    }
+
+    &-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+
+      & > * {
+        margin-top: var(--tui-gap-1);
+      }
+    }
+
+    &-warning {
+      color: var(--tui-color-prompt-warning);
+    }
+  }
+}

@@ -36,35 +36,37 @@
 
 }}
 
-<div class="critgrp_criteria_none {{#criteria}}cc_hidden{{/criteria}}">
+<div class="tw-editScaleValuePathGroupCriterion__empty {{#criteria}}tw-editAchievementPaths--hidden{{/criteria}}" data-tw-editScaleValuePaths-criterion-empty="">
     {{#str}}no_criteria, pathway_criteria_group{{/str}}
 </div>
 
 {{#criteria}}
-    <div class="criterion"
-         data-tw-criterion-type="{{type}}"
-         data-tw-criterion-key="{{key}}"
-         {{#id}}data-tw-criterion-id="{{.}}"{{/id}}>
+{{#showand}}{{> totara_competency/divider_and}}{{/showand}}
 
-        <div data-criterion-detail class="cc_inline_element">
-            {{> pathway_criteria_group/partial_criterion_detail}}
-        </div>
+<div class="tw-editScaleValuePathGroupCriterion" data-tw-editScaleValuePaths-criterion-key="{{key}}" {{#id}}data-tw-editScaleValuePaths-criterion-id="{{.}}"{{/id}}>
 
-        <div class="cc_actions cc_inline_element"
-             data-cc-on-ordering="hide">
-            <a href="#" data-criterion-action="remove"
-               {{#deleted}}class="cc_hidden"{{/deleted}}>
-                <span class="pw_item__btn_small_icon">
+    <div class="tw-editScaleValuePathGroupCriterion__detail" data-tw-editScaleValuePaths-criterion-detail="">
+        {{> pathway_criteria_group/partial_criterion_detail}}
+    </div>
+
+    <div class="tw-editScaleValuePathGroupCriterion__actions" data-tw-editAchievementPaths-on-ordering="hide">
+        <button type="button" class="tw-editAchievementPaths__group-actionsButton {{#deleted}}tw-editAchievementPaths--hidden{{/deleted}}" 
+        aria-label="" data-tw-editScaleValuePaths-criterion-action="remove">
+            <span>
+                <span aria-hidden="true" class="">
                     {{#flex_icon}}trash{{/flex_icon}}
                 </span>
-            </a>
+            </span>
+        </button>
 
-            <a href="#" data-criterion-action="undo"
-               {{^canundo}} class="cc_hidden" {{/canundo}}>
-                <span class="pw_item__btn_small_icon">
+        <button type="button" class="tw-editAchievementPaths__group-actionsButton {{^canundo}}tw-editAchievementPaths--hidden{{/canundo}}" 
+        aria-label="" data-tw-editScaleValuePaths-criterion-action="undo">
+            <span>
+                <span aria-hidden="true" class="">
                     {{#flex_icon}}undo{{/flex_icon}}
                 </span>
-            </a>
-        </div>
+            </span>
+        </button>
     </div>
+</div>
 {{/criteria}}

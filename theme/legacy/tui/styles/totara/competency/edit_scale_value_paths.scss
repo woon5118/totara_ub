@@ -1,0 +1,138 @@
+//
+// This file is part of Totara Learn
+//
+// Copyright (C) 2020 onwards Totara Learning Solutions LTD
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+// @copyright 2020 onwards Totara Learning Solutions LTD
+// @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+// @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
+// @package   theme_legacy
+
+.tw-editScaleValuePaths {
+  box-shadow: var(--tui-shadow-2);
+  padding: var(--tui-gap-4);
+  border: var(--tui-border-width-thin) solid var(--tui-color-neutral-5);
+  border-radius: var(--tui-border-radius-normal);
+
+  &__header {
+    display: flex;
+
+    &-drag {
+      margin-left: auto;
+
+      .flex-icon {
+        position: relative;
+        top: -1px;
+      }
+    }
+
+    &-legend {
+      @include tui-font-body-xx-small();
+    }
+
+    &-title {
+      margin: 0;
+      @include tui-font-heading-x-small();
+    }
+  }
+
+  &__scales {
+    margin-top: var(--tui-gap-4);
+
+    & > * + * {
+      margin-top: var(--tui-gap-4);
+    }
+  }
+
+  &__scaleHeader {
+    display: flex;
+
+    &-add {
+      position: relative;
+      margin-left: auto;
+    }
+
+    &-empty {
+      color: var(--tui-color-neutral-5);
+    }
+
+    &-title {
+      display: flex;
+      align-items: center;
+      margin: 0;
+      @include tui-font-heading-label();
+
+      .flex-icon {
+        position: relative;
+        top: 1px;
+        margin-right: var(--tui-gap-1);
+      }
+    }
+  }
+
+  &__addButton {
+    @include tui-font-body-x-small();
+    padding: 5px 6px;
+  }
+
+  &__addButtonList {
+    position: absolute;
+    width: 250px;
+    background: var(--tui-color-neutral-1);
+    border: var(--tui-border-width-thin) solid var(--tui-color-neutral-5);
+    box-shadow: var(--tui-shadow-2);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    text-align: left;
+    z-index: 2;
+
+    .tw-editScaleValuePaths__scaleHeader-add & {
+      right: 0;
+    }
+
+    &-button {
+      color: var(--tui-color-state);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      white-space: normal;
+      text-align: left;
+
+      &[disabled] {
+        background: transparent;
+        &:active,
+        &:focus,
+        &:hover:active,
+        &:hover {
+          color: var(--tui-btn-text-color-disabled);
+          background: transparent;
+        }
+      }
+
+      &:active,
+      &:focus,
+      &:hover:active,
+      &:hover {
+        color: var(--tui-color-state-hover);
+        text-decoration: none;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+      }
+    }
+  }
+}

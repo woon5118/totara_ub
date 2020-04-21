@@ -50,67 +50,79 @@
 }}
 
 <div data-tw-criterionOtherCompetency=""
-     data-core-autoinitialise="true"
-     data-core-autoinitialise-amd="criteria_othercompetency/othercompetency"
-     data-tw-loader-target="">
-    <div data-tw-criterionOtherCompetency-detail="">
-        <div class="tw-criterion-label">
-            <span>{{#str}}competencies, criteria_othercompetency{{/str}}</span>
-        </div>
-        <div class="tw-criterion-value">
-            <div data-tw-criterionOtherCompetency-competencies="">
-                {{#items}}
-                    {{> totara_criteria/partial_item}}
-                {{/items}}
-            </div>
+data-core-autoinitialise="true"
+data-core-autoinitialise-amd="criteria_othercompetency/othercompetency"
+data-tw-loader-target="">
+
+    <div class="tw-editAchievementPaths__criterionForm" data-tw-criterionOtherCompetency-detail="">
+        <h5 class="tw-editAchievementPaths__criterionForm-title">
+            {{#str}}competencies, criteria_othercompetency{{/str}}
+        </h5>
+
+        <div>
+            <ul class="tw-editAchievementPaths__criterionForm-list" data-tw-criterionOtherCompetency-competencies="">
+                {{#items}}{{> totara_criteria/partial_item}}{{/items}}
+            </ul>
 
             <div>
-                <a href="#" data-tw-criterionOtherCompetency-addCompetencies="">
-                    <span class="tw-criterion-smalltitle">
-                        {{#str}}add_competencies, criteria_othercompetency{{/str}}
-                    </span>
-                </a>
-                <span class="tw-criterion-warning tw-criterion-hidden" data-tw-criterionOtherCompetency-error="notenoughothercompetency">
+                <div class="tw-editAchievementPaths__criterionForm-warning tw-editAchievementPaths--hidden" data-tw-criterionOtherCompetency-error="notenoughothercompetency">
                     {{#flex_icon}}notification-warning{{/flex_icon}}
                     {{#str}}error_not_enough_other_competency, criteria_othercompetency{{/str}}
-                </span>
+                </div>
+
+                <button type="button" class="tw-editAchievementPaths__transparentBtn" aria-label="" data-tw-criterionOtherCompetency-addCompetencies="">
+                    {{#str}}add_competencies, criteria_othercompetency{{/str}}
+                </button>
             </div>
         </div>
     </div>
 
-    <div data-tw-criterionOtherCompetency-aggregation="{{#aggregation}}{{method}}{{/aggregation}}{{^aggregation}}1{{/aggregation}}"
-         data-tw-criterionOtherCompetency-aggregation-reqitems="{{#aggregation}}{{reqitems}}{{/aggregation}}{{^aggregation}}1{{/aggregation}}">
-        <div class="tw-criterion-label">
-            <span>{{#str}}aggregation, totara_criteria{{/str}}</span>
-        </div>
-        <div class="tw-criterion-value">
+    <form class="tw-editAchievementPaths__criterionForm"
+    data-tw-criterionOtherCompetency-aggregation="{{#aggregation}}{{method}}{{/aggregation}}{{^aggregation}}1{{/aggregation}}"
+    data-tw-criterionOtherCompetency-aggregation-reqitems="{{#aggregation}}{{reqitems}}{{/aggregation}}{{^aggregation}}1{{/aggregation}}">
+        
+        <h5 class="tw-editAchievementPaths__criterionForm-title">
+            {{#str}}aggregation, totara_criteria{{/str}}
+        </h5>
+
+        <div class="tw-editAchievementPaths__criterionForm-items">
             <div data-tw-criterionOtherCompetency-aggregationMethod="1">
                 <input type="radio"
-                       id="tw_criterionOtherCompetency_agg_all__{{key}}"
-                       name="tw_criterionOtherCompetency_agg__{{key}}"
-                       value="1"
-                       data-tw-criterionOtherCompetency-aggregationMethod-changed="all"/>
-                <label for="tw_criterionOtherCompetency_agg_all__{{key}}"><span>{{#str}}complete_all, totara_criteria {{/str}}</span></label><span class="tf_loading" style="display: none;">{{#pix}} i/loading, core, loading, totara_core{{/pix}}</span>
+                id="tw_criterionOtherCompetency_agg_all__{{key}}"
+                name="tw_criterionOtherCompetency_agg__{{key}}"
+                value="1"
+                data-tw-criterionOtherCompetency-aggregationMethod-changed="all"/>
+                
+                <label for="tw_criterionOtherCompetency_agg_all__{{key}}">
+                    {{#str}}complete_all, totara_criteria{{/str}}
+                </label>
+                <span class="tf_loading" style="display: none;">
+                    {{#pix}} i/loading, core, loading, totara_core{{/pix}}
+                </span>
             </div>
 
-            <div data-tw-criterionOtherCompetency-aggregationMethod="2">
-                <div class="tw-criterion-inline">
-                    <input type="radio"
-                           id="tw_criterionOtherCompetency_agg_any__{{key}}"
-                           name="tw_criterionOtherCompetency_agg__{{key}}"
-                           value="2"
-                           data-tw-criterionOtherCompetency-aggregationMethod-changed="any"/>
-                    <label for="tw_criterionOtherCompetency_agg_any__{{key}}"><span>{{#str}}complete_any, totara_criteria {{/str}}</span></label><span class="tf_loading" style="display: none;">{{#pix}} i/loading, core, loading, totara_core{{/pix}}</span>
-                </div>
+            <div class="tw-editAchievementPaths__criterionForm-item" data-tw-criterionOtherCompetency-aggregationMethod="2">
+                <input type="radio"
+                id="tw_criterionOtherCompetency_agg_any__{{key}}"
+                name="tw_criterionOtherCompetency_agg__{{key}}"
+                value="2"
+                data-tw-criterionOtherCompetency-aggregationMethod-changed="any"/>
 
-                <div class="tw-criterion-inline" data-tw-criterionOtherCompetency-aggregationCount="">
+                <label class="tw-editAchievementPaths__criterionForm-label" for="tw_criterionOtherCompetency_agg_any__{{key}}">
+                    {{#str}}complete_any, totara_criteria{{/str}}
+                </label>
+                <span class="tf_loading" style="display: none;">
+                    {{#pix}} i/loading, core, loading, totara_core{{/pix}}
+                </span>      
+
+                <div data-tw-criterionOtherCompetency-aggregationCount="">
                     <input type="number"
-                           name="tw_criterionOtherCompetency_agg_count__{{key}}"
-                           value="1" min="0"
-                           data-tw-criterionOtherCompetency-aggregationCount-changed=""
-                           disabled="disabled"/>
+                    name="tw_criterionOtherCompetency_agg_count__{{key}}"
+                    value="1" min="0"
+                    data-tw-criterionOtherCompetency-aggregationCount-changed=""
+                    disabled="disabled"/>
                 </div>
             </div>
         </div>
-    </div>
+    </form>
 </div>

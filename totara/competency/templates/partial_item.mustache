@@ -37,14 +37,19 @@
         Strings:
 
 }}
-<div class="pw_item"
-    {{#id}}data-pw-item-id="{{id}}"{{/id}}
-    data-pw-item-value="{{value}}"
-    data-pw-on-delete="mark">
+<li class="pw_item"
+{{#id}}data-pw-item-id="{{id}}"{{/id}}
+data-pw-item-value="{{value}}"
+data-pw-on-delete="mark">
     {{text}}
-    <a href="#" data-cc-on-ordering="hide" data-pw-on-delete="hide">
-        <span class="pw_item__btn_small_icon" data-pw-item-remove="removeitem">
-            {{#flex_icon}}trash{{/flex_icon}}
+    <button type="button" class="tw-editAchievementPaths__group-actionsButton"  aria-label="" 
+    data-tw-editAchievementPaths-on-ordering="hide" 
+    data-pw-on-delete="hide"
+    data-pw-item-remove="removeitem">
+        <span>
+            <span aria-hidden="true" class="">
+                {{#flex_icon}}trash{{/flex_icon}}
+            </span>
         </span>
-    </a>
-</div>
+    </button>
+</li>

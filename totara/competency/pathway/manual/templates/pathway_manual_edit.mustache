@@ -41,34 +41,30 @@
         }
 }}
 
-<div class="pw_manual"
-     data-core-autoinitialise="true"
-     data-core-autoinitialise-amd="pathway_manual/manual"
-     data-pw-save-endpoint="pathway_manual_update"
-     data-pw-save-req-sortorder="1">
+<div class="tw-editAchievementPaths__group-itemDetails"
+data-core-autoinitialise="true"
+data-core-autoinitialise-amd="pathway_manual/manual"
+data-tw-editAchievementPaths-save-endPoint="pathway_manual_update"
+data-tw-editAchievementPaths-save-req-sortOrder="1">
 
-    <div class="pw_manual_detail">
-        <div class="cc_detail_label" data-pw-on-delete="mark">
-            <span class="cc_label cc_allupper">{{title}}</span>
-        </div>
-        <div class="cc_detail_value">
-            <div class="pw_roles">
-                {{#roles}}
-                    {{> totara_competency/partial_item}}
-                {{/roles}}
+    <h4 class="tw-editAchievementPaths__group-title" data-pw-on-delete="mark">
+        {{title}}
+    </h4>
+    <div>
+        <ul class="tw-editAchievementPaths__criterionForm-list" data-pw-roles="">
+            {{#roles}}{{> totara_competency/partial_item}}{{/roles}}
+        </ul>
+
+        <div class="pw_manual_raters" data-pw-on-delete="hide">
+
+            <div class="tw-editAchievementPaths__criterionForm-warning {{^noraters}}tw-editAchievementPaths--hidden{{/noraters}}" data-pw-manual-error-no-raters="">
+                {{#flex_icon}}notification-warning{{/flex_icon}}
+                {{#str}}error_no_raters, pathway_manual{{/str}}
             </div>
 
-            <div class="pw_manual_raters" data-pw-on-delete="hide">
-                <a href="#" data-pw-manual-action="addraters" data-cc-on-ordering="hide">
-                    <span class="pw_item__btn_small_icon">
-                        {{#str}}add_raters, pathway_manual{{/str}}
-                    </span>
-                </a>
-                <span class="pw_manual_error_noraters cc_warning {{^noraters}}cc_hidden{{/noraters}}">
-                    {{#flex_icon}}notification-warning{{/flex_icon}}
-                    {{#str}}error_no_raters, pathway_manual{{/str}}
-                </span>
-            </div>
+            <button type="button" class="tw-editAchievementPaths__transparentBtn" data-pw-manual-action="addraters" data-tw-editAchievementPaths-on-ordering="hide">
+                {{#str}}add_raters, pathway_manual{{/str}}
+            </button>
         </div>
     </div>
 </div>

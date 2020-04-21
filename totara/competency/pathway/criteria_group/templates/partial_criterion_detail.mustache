@@ -36,60 +36,54 @@
 
 }}
 
-{{#showand}}
-    {{> totara_competency/divider_and}}
-{{/showand}}
 
-    <div class="criterion_title cc_deleted cc_hidden" data-criterion-deleted><span>{{title}}</span></div>
+<div class="tw-editScaleValuePathGroupCriterion__item tw-editScaleValuePathGroupCriterion--deleted tw-editAchievementPaths--hidden" 
+data-tw-editScaleValuePaths-criterion-deleted="">
+    {{title}}
+</div>
 
 {{#expandable}}
-    <div data-criterion-active data-cc-on-ordering="hide">
-        <div class="criterion_title"
-             data-criterion-action="toggle-detail"
-             {{#expanded}}data-criterion-detail-expanded="1"{{/expanded}}>
+<div class="tw-editScaleValuePathGroupCriterion__item" data-tw-editScaleValuePaths-criterion-active="" data-tw-editAchievementPaths-on-ordering="hide">
+    <div class="criterion_title" 
+    data-tw-editScaleValuePaths-criterion-action="toggle-detail" 
+    {{#expanded}}data-tw-editScaleValuePaths-criterion-detail-expanded="1"{{/expanded}}>
 
-            <a href="#">
-                <span data-criterion-detail-icon="expanded" {{^expanded}}class="cc_hidden"{{/expanded}}>
+        <button type="button" class="tw-editAchievementPaths__transparentBtn" aria-label="">
+            <span>
+                <span aria-hidden="true" {{^expanded}}class="tw-editAchievementPaths--hidden"{{/expanded}} data-tw-editScaleValuePaths-criterion-detail-icon="expanded">
                     {{#flex_icon}}expanded{{/flex_icon}}
                 </span>
-                <span data-criterion-detail-icon="collapsed" {{#expanded}}class="cc_hidden"{{/expanded}}>
+                <span aria-hidden="true" {{#expanded}}class="tw-editAchievementPaths--hidden"{{/expanded}} data-tw-editScaleValuePaths-criterion-detail-icon="collapsed">
                     {{#flex_icon}}collapsed{{/flex_icon}}
                 </span>
                 {{title}}
-                {{#error}}
-                    <span class="cc_warning">
-                      {{#flex_icon}}notification-warning{{/flex_icon}}
-                      {{error}}
-                    </span>
-                {{/error}}
-            </a>
-        </div>
-
-        <div data-criterion-detail="{{key}}" {{^expanded}}class="cc_hidden"{{/expanded}}>
-            {{#criterion_templatename}}
-            {{> &&criterion_templatename}}
-            {{/criterion_templatename}}
-        </div>
+            </span>
+        </button>
     </div>
 
-    <div class="criterion_title cc_hidden"
-         data-cc-on-ordering="show">
-
-        <span data-criterion-detail-icon="collapsed" {{#expanded}}class="cc_hidden"{{/expanded}}>
-            {{#flex_icon}}collapsed{{/flex_icon}}
-        </span>
-        {{title}}
+    <div data-tw-editScaleValuePaths-criterion-detail="{{key}}" {{^expanded}}class="tw-editAchievementPaths--hidden"{{/expanded}}>
+        {{#criterion_templatename}}{{> &&criterion_templatename}}{{/criterion_templatename}}
     </div>
+</div>
+
+<div class="tw-editScaleValuePathGroupCriterion__item tw-editAchievementPaths--hidden" data-tw-editAchievementPaths-on-ordering="show">
+    <span data-tw-editScaleValuePaths-criterion-detail-icon="collapsed" {{#expanded}}class="tw-editAchievementPaths--hidden"{{/expanded}}>
+        {{#flex_icon}}collapsed{{/flex_icon}}
+    </span>
+    {{title}}
+</div>
 {{/expandable}}
 
 {{^expandable}}
-    <div data-criterion-active>
-        <div class="criterion_title {{#deleted}}cc_deleted{{/deleted}}"><span>{{title}}</span></div>
-
-        {{#criterion_templatename}}
-            <div data-criterion-detail="{{key}}" class="cc_hidden">
-                {{> &&criterion_templatename}}
-            {{/criterion_templatename}}
-        </div>
+<div class="tw-editScaleValuePathGroupCriterion__item" data-tw-editScaleValuePaths-criterion-active>
+    <div class="{{#deleted}}tw-editScaleValuePathGroupCriterion--deleted{{/deleted}}">
+        {{title}}
     </div>
+
+    {{#criterion_templatename}}
+    <div data-tw-editScaleValuePaths-criterion-detail="{{key}}" class="tw-editAchievementPaths--hidden">
+        {{> &&criterion_templatename}}
+    </div>
+    {{/criterion_templatename}}
+</div>
 {{/expandable}}

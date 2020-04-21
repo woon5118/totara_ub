@@ -204,7 +204,7 @@ if ($prefix === 'competency' && !empty($item->id)) {
     echo $OUTPUT->container($OUTPUT->action_link(
         new moodle_url('/totara/hierarchy/item/view.php',
             ['prefix' => $prefix, 'id' => $item->id, 'page' => $page]),
-        '&laquo; ' . get_string('competencybacktocompetencypage', 'totara_hierarchy')),
+        get_string('competency_back_to_competency_page', 'totara_hierarchy')),
         'back-link'
     );
 }
