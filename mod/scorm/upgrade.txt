@@ -1,6 +1,10 @@
 This files describes API changes in the mod_scorm code,
 information provided here is intended especially for developers.
 
+== 12.17 ==
+
+* mod_scorm/rb_source_scorm::rb_filter_scorm_attempt_list() function has been deprecated, please use the number type filter instead.
+
 == 12 ==
 
 * New capabilities 'mod/scorm:view' and 'mod/scorm:launch' were added.

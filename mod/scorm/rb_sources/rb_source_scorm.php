@@ -466,7 +466,7 @@ class rb_source_scorm extends rb_base_source {
     //
 
     /**
-     * @deprecated Since 13.0
+     * @deprecated since Totara 12.17
      */
     function rb_filter_scorm_attempt_list() {
         global $DB;
