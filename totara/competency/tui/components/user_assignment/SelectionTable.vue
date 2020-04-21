@@ -37,7 +37,7 @@
       <template v-slot:header-row>
         <HeaderCell size="16">{{
           $str('header_competency', 'totara_competency')
-          }}</HeaderCell>
+        }}</HeaderCell>
         <HeaderCell size="16">{{
           $str('header_assignment_status', 'totara_competency')
         }}</HeaderCell>
@@ -91,21 +91,21 @@
 </template>
 
 <script>
-  import Cell from 'totara_core/components/datatable/Cell';
-  import HeaderCell from 'totara_core/components/datatable/HeaderCell';
-  import SelectTable from 'totara_core/components/datatable/SelectTable';
+import Cell from 'totara_core/components/datatable/Cell';
+import HeaderCell from 'totara_core/components/datatable/HeaderCell';
+import SelectTable from 'totara_core/components/datatable/SelectTable';
 
-  export default {
-    components: {
-      Cell,
-      HeaderCell,
-      SelectTable,
+export default {
+  components: {
+    Cell,
+    HeaderCell,
+    SelectTable,
+  },
+  props: {
+    value: {
+      type: Array,
+      required: true,
     },
-    props: {
-      value: {
-        type: Array,
-        required: true,
-      },
     competencies: {
       type: Array,
       required: true,

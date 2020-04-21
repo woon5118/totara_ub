@@ -90,22 +90,22 @@
 </template>
 
 <script>
-  import Table from 'totara_core/components/datatable/Table';
-  import HeaderCell from 'totara_core/components/datatable/HeaderCell';
-  import Cell from 'totara_core/components/datatable/Cell';
-  import MyRatingCell from 'totara_competency/components/profile/MyRatingCell';
+import Table from 'totara_core/components/datatable/Table';
+import HeaderCell from 'totara_core/components/datatable/HeaderCell';
+import Cell from 'totara_core/components/datatable/Cell';
+import MyRatingCell from 'totara_competency/components/profile/MyRatingCell';
 
-  export default {
-    components: {
-      Table,
-      HeaderCell,
-      Cell,
-      MyRatingCell,
-    },
+export default {
+  components: {
+    Table,
+    HeaderCell,
+    Cell,
+    MyRatingCell,
+  },
 
-    props: {
-      competencies: {
-        required: true,
+  props: {
+    competencies: {
+      required: true,
       type: Array,
     },
     baseUrl: {
