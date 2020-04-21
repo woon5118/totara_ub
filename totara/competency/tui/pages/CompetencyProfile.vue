@@ -63,6 +63,7 @@
         <CurrentProgress
           :data="currentProgressData"
           :latest-achievement="data.latest_achievement"
+          :is-current-user="isMine"
         />
         <Responsive
           v-slot="{ currentBoundaryName }"
@@ -226,7 +227,11 @@ export default {
       },
       update: data => data.totara_competency_profile_progress,
       result({ data: { totara_competency_profile_progress: data } }) {
-        if (!this.currentProgressData.length) {
+        // show current progress only when there is active assignment
+        if (
+          this.selectedFilters.status == ACTIVE_ASSIGNMENT &&
+          !this.currentProgressData.length
+        ) {
           this.currentProgressData = data.items.slice(0);
         }
 

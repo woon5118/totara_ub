@@ -25,11 +25,24 @@
   <div class="tui-competencyProfileCurrentProgress">
     <Grid :stack-at="900">
       <GridItem :units="10">
-        <ul class="tui-competencyProfileCurrentProgress__progress">
+        <ul
+          v-if="data.length"
+          class="tui-competencyProfileCurrentProgress__progress"
+        >
           <li v-for="(item, key) in data" :key="key">
             <AssignmentProgress :progress="item" />
           </li>
         </ul>
+        <div v-else>
+          {{
+            $str(
+              isCurrentUser
+                ? 'no_current_assignments_self'
+                : 'no_current_assignments_other',
+              'totara_competency'
+            )
+          }}
+        </div>
       </GridItem>
       <GridItem :units="2">
         <div class="tui-competencyProfileCurrentProgress__userDetails">
@@ -75,6 +88,10 @@ export default {
       required: true,
       validator: prop => typeof prop === 'string' || prop === null, // String or null
     },
+    isCurrentUser: {
+      type: Boolean,
+      required: true,
+    },
   },
 };
 </script>
@@ -86,6 +103,8 @@ export default {
   ],
   "totara_competency": [
     "assign_competencies",
+    "no_current_assignments_other",
+    "no_current_assignments_self",
     "self_assign_competencies",
     "latest_achievement"
   ]

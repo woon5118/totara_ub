@@ -243,4 +243,22 @@ class behat_totara_competency extends behat_base {
         return str_replace($url, 'index.php', '');
     }
 
+    /**
+     * Archive all assignments for a given assignment type.
+     * @Given /^all assignments for the "([^"]*)" assignment type are archived$/
+     * @param string $assignmentType
+     * @throws Exception
+     */
+    public function allAssignmentsForTheAssignmentTypeAreArchived($assignmentType) {
+        \behat_hooks::set_step_readonly(true); // Backend action.
+
+        $assignments = assignment::repository()
+            ->filter_by_active()
+            ->where('user_group_type', $assignmentType)
+            ->get_lazy();
+        foreach ($assignments as $assignment) {
+            assignment_model::load_by_entity($assignment)->archive();
+        }
+    }
+
 }

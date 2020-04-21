@@ -281,3 +281,11 @@ Feature: Competency profile landing page - an overview of their progress towards
       | comp15cohort4 | user1        | user1      | self | competent   |
     And I run the scheduled task "totara_competency\task\competency_aggregation_queue"
     Then I should see "015_Cohort_NotProficient" in the ".tui-competencyProfileCurrentProgress__latestAchievement" "css_element"
+
+  Scenario: View message shows if no active assignments
+    Given all assignments for the "position" assignment type are archived
+    And all assignments for the "organisation" assignment type are archived
+    And all assignments for the "cohort" assignment type are archived
+    And all assignments for the "user" assignment type are archived
+    When I reload the page
+    Then I should see "This user has no current assignments" in the ".tui-competencyProfileCurrentProgress li:nth-child(1)" "css_element"
