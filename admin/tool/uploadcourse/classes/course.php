@@ -795,7 +795,7 @@ class tool_uploadcourse_course {
                 $rc->execute_plan();
                 $this->status('courserestored', new lang_string('courserestored', 'tool_uploadcourse'));
             } else {
-                $this->error('errorwhilerestoringcourse', new lang_string('errorwhilerestoringthecourse', 'tool_uploadcourse'));
+                $this->error('errorwhilerestoringcourse', new lang_string('errorwhilerestoringcourse', 'tool_uploadcourse'));
             }
             $rc->destroy();
         }
