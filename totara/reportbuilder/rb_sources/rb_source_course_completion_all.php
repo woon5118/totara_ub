@@ -211,6 +211,12 @@ class rb_source_course_completion_all extends rb_base_source {
         // Add the manager/position/organisation content options.
         $this->add_basic_user_content_options($contentoptions);
 
+        $contentoptions[] = new rb_content_option(
+            'date',
+            get_string('completiondate', 'rb_source_course_completion'),
+            'base.timecompleted'
+        );
+
         return $contentoptions;
     }
 
