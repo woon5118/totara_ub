@@ -95,7 +95,7 @@ class mod_perform_generator extends component_generator_base {
             }
 
             /** @var perform_container $container */
-            $activity = activity::create($container, $name, $description, $status, $type_model);
+            $activity = activity::create($container, $name, $type_model, $description, $status);
 
             if (isset($data['create_section']) && $data['create_section']) {
                 section::create($activity);
@@ -127,7 +127,7 @@ class mod_perform_generator extends component_generator_base {
         $container = perform_container::from_id($data['course']);
 
         /** @var perform_container $container */
-        activity::create($container, $name, $description, $status, $type_model);
+        activity::create($container, $name, $type_model, $description, $status);
 
         $modules = $container->get_section(0)->get_all_modules();
         $module = reset($modules);

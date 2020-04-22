@@ -138,18 +138,18 @@ class activity extends model {
      *
      * @param perform_container $container
      * @param string            $name
+     * @param activity_type     $type
      * @param string|null       $description
      * @param int               $status
-     * @param activity_type     $type
      *
      * @return static
      */
     public static function create(
         perform_container $container,
         string $name,
+        activity_type $type,
         string $description = null,
-        int $status = self::STATUS_ACTIVE,
-        activity_type $type
+        int $status = self::STATUS_ACTIVE
     ): self {
         global $DB;
 

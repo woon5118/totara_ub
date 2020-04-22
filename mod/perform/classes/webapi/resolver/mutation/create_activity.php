@@ -67,7 +67,7 @@ class create_activity implements mutation_resolver {
             $status = $args['status'] ?? activity::STATUS_ACTIVE;
 
             /** @var perform_container $container */
-            $activity = activity::create($container, $name, $description, $status, $type);
+            $activity = activity::create($container, $name, $type, $description, $status);
 
             // Create the first section for the entity.
             section::create($activity);
