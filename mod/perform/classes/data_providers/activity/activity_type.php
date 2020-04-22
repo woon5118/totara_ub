@@ -26,6 +26,7 @@ namespace mod_perform\data_providers\activity;
 use core\collection;
 
 use mod_perform\entities\activity\activity_type as activity_type_entity;
+use mod_perform\models\activity\activity_type as activity_type_model;
 
 /**
  * Handles sets of performance activity types.
@@ -57,7 +58,7 @@ class activity_type {
     public function fetch(): activity_type {
         $this->items = activity_type_entity::repository()
             ->get()
-            ->map_to(activity_type::class);
+            ->map_to(activity_type_model::class);
 
         return $this;
     }

@@ -25,8 +25,9 @@
  * @group perform
  */
 
+use container_perform\create_exception;
+use mod_perform\models\activity\activity_type;
 use mod_perform\webapi\resolver\mutation\create_activity;
-use mod_perform\models\activity\activity as activity;
 use core\webapi\execution_context;
 
 class mod_perform_webapi_resolver_mutation_create_activity_testcase extends advanced_testcase {
@@ -37,15 +38,21 @@ class mod_perform_webapi_resolver_mutation_create_activity_testcase extends adva
 
     public function test_create_activity(): void {
         $this->setAdminUser();
+        $expected_type = activity_type::load_by_name('check-in');
         $args = [
             'name' => "Mid year performance review",
             'description' => "Test Description",
+            'type' => $expected_type->name
         ];
 
         /** @type activity $result */
         ['activity' => $result] = create_activity::resolve($args, $this->get_execution_context());
         $this->assertSame('Mid year performance review', $result->name);
         $this->assertSame('Test Description', $result->description);
+
+        $actual_type = $result->type;
+        $this->assertEquals($expected_type->name, $actual_type->name, "wrong type");
+        $this->assertEquals($expected_type->display_name, $actual_type->display_name, "wrong display name");
     }
 
     public function test_create_activity_for_non_admin_user(): void {
@@ -54,9 +61,10 @@ class mod_perform_webapi_resolver_mutation_create_activity_testcase extends adva
         $args = [
             'name' => 'Mid year performance review',
             'description' => 'Test Description',
+            'type' => 'appraisal'
         ];
 
-        $this->expectException(\container_perform\create_exception::class);
+        $this->expectException(create_exception::class);
         $this->expectExceptionMessage('You do not have the permission to create a performance activity');
         create_activity::resolve($args, $this->get_execution_context());
     }
@@ -66,8 +74,9 @@ class mod_perform_webapi_resolver_mutation_create_activity_testcase extends adva
         $args = [
             'name' => '',
             'description' => 'Test Description',
+            'type' => 'appraisal'
         ];
-        $this->expectException(\container_perform\create_exception::class);
+        $this->expectException(create_exception::class);
         $this->expectExceptionMessage('You are not allowed to create an activity with an empty name');
         create_activity::resolve($args, $this->get_execution_context());
     }
@@ -77,6 +86,7 @@ class mod_perform_webapi_resolver_mutation_create_activity_testcase extends adva
         $args = [
             'name' => 'Mid year performance review',
             'description' => "",
+            'type' => 'appraisal'
         ];
 
         ['activity' => $result] = create_activity::resolve($args, $this->get_execution_context());
@@ -86,10 +96,37 @@ class mod_perform_webapi_resolver_mutation_create_activity_testcase extends adva
         $args = [
             'name' => 'Mid year performance review',
             'description' => null,
+            'type' => 'appraisal'
         ];
 
         ['activity' => $result] = create_activity::resolve($args, $this->get_execution_context());
         $this->assertSame('Mid year performance review', $result->name);
         $this->assertNull($result->description);
+    }
+
+    /*
+    TODO: To be enabled in TL-24739
+    public function test_create_activity_with_empty_type(): void {
+        $this->setAdminUser();
+        $args = [
+            'name' => 'Mid year performance review'
+        ];
+
+        $this->expectException(create_exception::class);
+        $this->expectExceptionMessageRegExp("/type/");
+        create_activity::resolve($args, $this->get_execution_context());
+    }
+    */
+
+    public function test_create_activity_with_invalid_type(): void {
+        $this->setAdminUser();
+        $args = [
+            'name' => 'Mid year performance review',
+            'type' => "12334"
+        ];
+
+        $this->expectException(create_exception::class);
+        $this->expectExceptionMessageRegExp("/type id/");
+        create_activity::resolve($args, $this->get_execution_context());
     }
 }

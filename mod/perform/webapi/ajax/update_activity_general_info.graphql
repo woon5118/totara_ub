@@ -15,6 +15,9 @@ mutation mod_perform_update_activity_general_info(
       description
       edit_description: description(format: RAW)
       description
+      type {
+        display_name
+      }
     }
   }
 }

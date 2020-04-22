@@ -48,6 +48,10 @@ class mod_perform_activity_type_model_testcase extends advanced_testcase {
             $this->assertNotNull($type, "activity type not installed: '$name'");
             $this->assertEquals($name, $type->name, 'wrong name');
             $this->assertTrue($type->is_system, 'wrong system value');
+            $this->assertEquals(
+                $type->display_name,
+                get_string("system_activity_type:$name", 'mod_perform')
+            );
         }
     }
 
@@ -63,6 +67,7 @@ class mod_perform_activity_type_model_testcase extends advanced_testcase {
         $retrieved = activity_type::load_by_id($type->id);
         $this->assertEquals($name, $retrieved->name, 'wrong name');
         $this->assertFalse($type->is_system, 'wrong wrong system value');
+        $this->assertEquals($type->display_name, format_string($name));
     }
 
     /**

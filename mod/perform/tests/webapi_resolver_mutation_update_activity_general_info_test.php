@@ -18,12 +18,15 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Jaron Steenson <jaron.steenson@totaralearning.com>
+ * @author Murali Nair <murali.nair@totaralearning.com>
  * @package mod_perform
  */
 
 use core\webapi\execution_context;
 use mod_perform\webapi\resolver\mutation\update_activity_general_info;
 use mod_perform\models\activity\activity;
+
+use totara_webapi\graphql;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -52,15 +55,19 @@ class mod_perform_webapi_resolver_mutation_update_activity_general_info_testcase
         self::setAdminUser();
 
         $activity = $this->create_activity();
+        $expected_type = $activity->type;
         $args = $this->to_args_payload($activity);
 
         ['activity' => $activity] = update_activity_general_info::resolve($args, $this->get_execution_context());
-
 
         // Return values should be updated
         self::assertEquals($activity->id, $args['activity_id']);
         self::assertEquals($activity->name, $args['name']);
         self::assertEquals($activity->description, $args['description']);
+
+        $actual_type = $activity->type;
+        $this->assertEquals($expected_type->name, $actual_type->name, "wrong type name");
+        $this->assertEquals($expected_type->display_name, $actual_type->display_name, "wrong type display");
     }
 
     public function test_activity_must_belong_to_user(): void {
@@ -84,8 +91,23 @@ class mod_perform_webapi_resolver_mutation_update_activity_general_info_testcase
         update_activity_general_info::resolve($args, $this->get_execution_context());
     }
 
-    private function get_execution_context(string $type = 'dev', ?string $operation = null): execution_context {
-        return execution_context::create($type, $operation);
+    public function test_successful_ajax_call(): void {
+        self::setAdminUser();
+
+        $activity = $this->create_activity();
+        $args = $this->to_args_payload($activity);
+        $context = $this->get_execution_context();
+
+        $result = $this->exec_graphql($context, $args)['activity'];
+        $this->assertEquals($activity->id, $result['id']);
+        $this->assertEquals($activity->name, $result['name']);
+
+        $type = $result['type'];
+        $this->assertEquals($activity->type->display_name, $type['display_name']);
+    }
+
+    private function get_execution_context(): execution_context {
+        return execution_context::create('ajax', 'mod_perform_update_activity_general_info');
     }
 
     private function create_activity(): activity {
@@ -102,4 +124,23 @@ class mod_perform_webapi_resolver_mutation_update_activity_general_info_testcase
         ];
     }
 
+    private function exec_graphql(execution_context $context, array $args=[]) {
+        $result = graphql::execute_operation($context, $args)->toArray(true);
+
+        $op = $context->get_operationname();
+        $errors = $result['errors'] ?? null;
+        if ($errors) {
+            $error = $errors[0];
+            $msg = $error['debugMessage'] ?? $error['message'];
+
+            return sprintf(
+                "invocation of %s://%s failed: %s",
+                $context->get_type(),
+                $op,
+                $msg
+            );
+        }
+
+        return $result['data'][$op];
+    }
 }

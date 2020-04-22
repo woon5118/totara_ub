@@ -46,6 +46,11 @@ class mod_perform_webapi_resolver_query_activity_testcase extends mod_perform_re
 
         $this->assertEquals($id, $returned_activity->id);
         $this->assertEquals($created_activity->name, $returned_activity->name);
+
+        $expected_type = $created_activity->type;
+        $actual_type = $returned_activity->type;
+        $this->assertEquals($expected_type->name, $actual_type->name, "wrong type name");
+        $this->assertEquals($expected_type->display_name, $actual_type->display_name, "wrong type display");
     }
 
     public function test_activity_must_belong_to_user(): void {
@@ -104,6 +109,15 @@ class mod_perform_webapi_resolver_query_activity_testcase extends mod_perform_re
         $this->assertEquals($data->activity1->id, $result['id']);
         $this->assertEquals('Activity 1', $result['name']);
         $this->assertEquals('test description', $result['description']);
+
+        $expected_type = $data->activity1->type;
+        $actual_type = $result['type'];
+        $this->assertEquals(
+            $expected_type->display_name,
+            $actual_type['display_name'],
+            "wrong type display"
+        );
+
         $section1 = array_filter($result['sections'], function ($section) use ($data) {
             return (int)$section['id'] === $data->activity1_section1->id;
         });

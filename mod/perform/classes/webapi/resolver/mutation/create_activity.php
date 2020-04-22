@@ -51,7 +51,16 @@ class create_activity implements mutation_resolver {
             throw new create_exception(get_string('error_activity_name_missing', 'mod_perform'));
         }
 
-        $type = activity_type::load_by_name('appraisal');
+        // TBD: the model will be loaded by id in TL-24739. For now just use a default and load in by name
+        $type = $args['type'] ?? 'appraisal';
+        if (!$type) {
+            throw new create_exception(get_string('error_activity_type_missing', 'mod_perform'));
+        }
+        $type_model = activity_type::load_by_name($type);
+        //$type_model = activity_type::load_by_id($type);
+        if (!$type_model) {
+            throw new create_exception(get_string('error_activity_type_unknown', 'mod_perform'));
+        }
 
         $courseinfo = new \stdClass();
         $courseinfo->fullname = $args['name'];
@@ -59,7 +68,7 @@ class create_activity implements mutation_resolver {
         $courseinfo->category = perform_container::get_default_category_id();
 
         /** @var activity $activity */
-        $activity =  $DB->transaction(function () use ($courseinfo, $args, $type) {
+        $activity =  $DB->transaction(function () use ($courseinfo, $args, $type_model) {
             $container = perform_container::create($courseinfo);
 
             // Create a performance activity inside the new performance container.
@@ -70,7 +79,7 @@ class create_activity implements mutation_resolver {
             $status = $args['status'] ?? active::get_code();
 
             /** @var perform_container $container */
-            $activity = activity::create($container, $name, $type, $description, $status);
+            $activity = activity::create($container, $name, $type_model, $description, $status);
 
             // Create the first section for the entity.
             section::create($activity);
