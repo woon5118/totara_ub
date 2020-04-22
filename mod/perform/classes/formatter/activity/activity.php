@@ -26,6 +26,7 @@ namespace mod_perform\formatter\activity;
 use core\orm\formatter\entity_model_formatter;
 use core\webapi\formatter\field\date_field_formatter;
 use core\webapi\formatter\field\string_field_formatter;
+use mod_perform\models\activity\activity as activity_model;
 
 /**
  * Class activity
@@ -42,6 +43,10 @@ class activity extends entity_model_formatter {
             'description' => string_field_formatter::class,
             'updated_at' => date_field_formatter::class,
             'sections' => null,
+            'status' => null,
+            'status_name' => null,
+            'can_potentially_activate' => null,
+            'can_activate' => null,
         ];
     }
 }

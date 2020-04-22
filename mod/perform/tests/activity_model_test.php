@@ -24,6 +24,7 @@
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\activity_type;
 use mod_perform\entities\activity\activity as activity_entity;
+use mod_perform\state\activity\active;
 
 /**
  * @group perform
@@ -171,9 +172,9 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
      * @return activity
      * @throws coding_exception
      */
-    private function create_activity(activity_entity $entity, string $type='appraisal'): activity {
+    private function create_activity(activity_entity $entity, string $type = 'appraisal'): activity {
         $entity->type_id = activity_type::load_by_name($type)->id;
-        $entity->status = activity::STATUS_ACTIVE;
+        $entity->status = active::get_code();
 
         /** @var activity_entity $entity */
         /** @noinspection CallableParameterUseCaseInTypeContextInspection */

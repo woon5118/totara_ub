@@ -24,6 +24,8 @@
 
 namespace mod_perform\state;
 
+use mod_perform\state\activity\active;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -100,12 +102,27 @@ abstract class state {
      * @throws invalid_state_switch_exception If not possible to switch
      */
     final public function transition_to(string $target_state_class): state {
-        foreach ($this->get_transitions() as $transition) {
-            if ($transition->get_to() instanceof $target_state_class && $transition->is_possible()) {
-                return $transition->get_to();
-            }
+        $transition = $this->get_transition_to($target_state_class);
+        if ($transition && $transition->is_possible()) {
+            return $transition->get_to();
         }
         throw new invalid_state_switch_exception(get_class($this), $target_state_class);
+    }
+
+    /**
+     * Returns the given transition if the state defined it. If the state does not contain
+     * the transition it returns null
+     *
+     * @param string $state_class
+     * @return transition|null
+     */
+    final public function get_transition_to(string $state_class): ?transition {
+        foreach ($this->get_transitions() as $transition) {
+            if ($transition->get_to() instanceof $state_class) {
+                return $transition;
+            }
+        }
+        return null;
     }
 
     /**

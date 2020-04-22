@@ -30,6 +30,7 @@ use core\webapi\mutation_resolver;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\activity_type;
 use mod_perform\models\activity\section;
+use mod_perform\state\activity\active;
 use totara_core\advanced_feature;
 
 class create_activity implements mutation_resolver {
@@ -64,7 +65,7 @@ class create_activity implements mutation_resolver {
             // Create a performance activity inside the new performance container.
             $name = $args['name'];
             $description = $args['description'] ?? null;
-            $status = $args['status'] ?? activity::STATUS_ACTIVE;
+            $status = $args['status'] ?? active::get_code();
 
             /** @var perform_container $container */
             $activity = activity::create($container, $name, $type, $description, $status);

@@ -31,6 +31,7 @@ use mod_perform\hook\subject_instances_created;
 use mod_perform\models\activity\activity as activity_model;
 use mod_perform\models\activity\track;
 use mod_perform\models\activity\track_status;
+use mod_perform\state\activity\draft;
 use mod_perform\task\service\subject_instance_creation;
 use mod_perform\task\service\subject_instance_dto;
 use mod_perform\user_groups\grouping;
@@ -131,7 +132,7 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
 
         /** @var activity_entity $activity */
         $activity = activity_entity::repository()->find($data->activity1->get_id());
-        $activity->status = activity_model::STATUS_INACTIVE;
+        $activity->status = draft::get_code();
         $activity->save();
 
         // There should be three user assignments now

@@ -17,7 +17,11 @@ type mod_perform_activity {
   description(format: core_format = PLAIN): String
   updated_at(format: core_date_format = TIMESTAMP): core_date
   can_view_participation_reporting: Boolean! # Whether the current user can view the participation tracking for the activity
+  can_potentially_activate: Boolean! # Whether this activity could be activated due to capability checks and current status, without checking further conditions
+  can_activate: Boolean! # Whether this activity can be activated, only if it satisfies all conditions
   sections: [mod_perform_section!]!
+  status: Int!
+  status_name: mod_perform_activity_status!
 }
 
 """
@@ -109,8 +113,8 @@ type mod_perform_participant_instance {
 A list of possible states that a performance activity can be in
 """
 enum mod_perform_activity_status {
+  DRAFT
   ACTIVE
-  INACTIVE
 }
 
 """
@@ -235,6 +239,20 @@ input mod_perform_update_section_elements_input {
 }
 
 """
+Input type for activating an activity
+"""
+input mod_perform_activate_activity_input {
+  activity_id: core_id!
+}
+
+"""
+Mutation return type including an activity
+"""
+type mod_perform_activate_activity_result {
+  activity: mod_perform_activity!
+}
+
+"""
 Mutation return type including an activity
 """
 type mod_perform_activity_result {
@@ -278,6 +296,13 @@ extend type Mutation {
   mod_perform_update_section_elements(
     input: mod_perform_update_section_elements_input!
   ): mod_perform_section_result!
+
+  """
+  Activate an activity
+  """
+  mod_perform_activate_activity(
+    input: mod_perform_activate_activity_input!
+  ): mod_perform_activate_activity_result!
 }
 
 """

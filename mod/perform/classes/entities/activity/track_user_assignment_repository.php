@@ -26,6 +26,7 @@ namespace mod_perform\entities\activity;
 use core\orm\entity\repository;
 use mod_perform\models\activity\activity as activity_model;
 use mod_perform\models\activity\track_status;
+use mod_perform\state\activity\active;
 
 /**
  * Repository for track user assignment entities
@@ -77,7 +78,7 @@ final class track_user_assignment_repository extends repository {
             $this->join([track::TABLE, 'fbat'], 'track_id', 'id')
                 ->join([activity::TABLE, 'fbaa'], 'fbat.activity_id', 'id')
                 ->where('fbat.status', track_status::ACTIVE)
-                ->where('fbaa.status', activity_model::STATUS_ACTIVE);
+                ->where('fbaa.status', active::get_code());
         }
 
         return $this;

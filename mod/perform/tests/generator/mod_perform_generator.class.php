@@ -41,6 +41,7 @@ use mod_perform\models\activity\element;
 use mod_perform\models\activity\section_element;
 use mod_perform\models\activity\section_relationship as section_relationship_model;
 use mod_perform\models\activity\track_assignment_type;
+use mod_perform\state\activity\active;
 use mod_perform\state\participant_instance\not_started as instance_not_started;
 use mod_perform\state\participant_section\not_started;
 use mod_perform\task\service\subject_instance_creation;
@@ -86,7 +87,7 @@ class mod_perform_generator extends component_generator_base {
             // Create a performance activity inside the new performance container.
             $name = $data['activity_name'] ?? "test performance activity";
             $description = $data['description'] ?? "test description";
-            $status = $data['activity_status'] ?? activity::STATUS_ACTIVE;
+            $status = $data['activity_status'] ?? active::get_code();
 
             $type = $data['activity_type'] ?? 'appraisal';
             $type_model = activity_type::load_by_name($type);
@@ -116,7 +117,7 @@ class mod_perform_generator extends component_generator_base {
     public function create_instance($data = []): module {
         $name = $data['name'] ?? "test performance activity";
         $description = $data['description'] ?? "test description";
-        $status = $data['status'] ?? activity::STATUS_ACTIVE;
+        $status = $data['status'] ?? active::get_code();
 
         $type = $data['activity_type'] ?? 'appraisal';
         $type_model = activity_type::load_by_name($type);

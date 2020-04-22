@@ -28,6 +28,10 @@ use container_perform\perform as perform_container;
 use core\orm\collection;
 use core\orm\entity\model;
 use mod_perform\entities\activity\activity as activity_entity;
+use mod_perform\state\activity\active;
+use mod_perform\state\activity\draft;
+use mod_perform\state\state;
+use mod_perform\state\state_aware;
 use mod_perform\util;
 use totara_core\relationship\relationship;
 
@@ -50,6 +54,8 @@ use totara_core\relationship\relationship;
  */
 class activity extends model {
 
+    use state_aware;
+
     protected $entity_attribute_whitelist = [
         'id',
         'course',
@@ -64,10 +70,9 @@ class activity extends model {
         'type',
         'sections',
         'relationships',
+        'can_potentially_activate',
+        'status_name'
     ];
-
-    public const STATUS_ACTIVE = 1;
-    public const STATUS_INACTIVE = 2;
 
     public const NAME_MAX_LENGTH = 255;
 
@@ -149,9 +154,13 @@ class activity extends model {
         string $name,
         activity_type $type,
         string $description = null,
-        int $status = self::STATUS_ACTIVE
+        int $status = null
     ): self {
         global $DB;
+
+        if ($status && $status !== draft::get_code() && $status != active::get_code()) {
+            throw new \coding_exception('Invalid activity status given');
+        }
 
         $modinfo = new \stdClass();
         $modinfo->modulename = 'perform';
@@ -168,7 +177,9 @@ class activity extends model {
         $entity->course = $container->id;
         $entity->name = $name;
         $entity->description = $description;
-        $entity->status = $status;
+        // TODO TL-24773 leaving this as active for now as we do not have the interface
+        //      to activate for now. Once this is there we need to change the default to draft
+        $entity->status = $status ?? active::get_code();
         $entity->type_id = $type->id;
 
         return $DB->transaction(function () use ($entity, $modinfo, $container) {
@@ -189,6 +200,16 @@ class activity extends model {
 
             return $activity;
         });
+    }
+
+    /**
+     * Forces the model to reload its data from the repository.
+     *
+     * @return activity
+     */
+    public function refresh(): self {
+        $this->entity->refresh();
+        return $this;
     }
 
     /**
@@ -295,4 +316,94 @@ class activity extends model {
     public function get_type(): activity_type {
         return activity_type::load_by_entity($this->entity->type);
     }
+    /**
+     * Returns whether this activity is still in draft state
+     *
+     * @return bool
+     */
+    public function is_draft(): bool {
+        return $this->get_state()::get_code() === draft::get_code();
+    }
+
+    /**
+     * Returns whether this activity is in active state
+     *
+     * @return bool
+     */
+    public function is_active(): bool {
+        return $this->get_state()::get_code() === active::get_code();
+    }
+
+    /**
+     * Can this activity be potentially activated, meaning that the user has
+     * the correct capability and it is in the right state.
+     * This does not check the conditions to make the change.
+     *
+     * @param int|null $user_id defaults to current user
+     * @return bool
+     */
+    public function can_potentially_activate(int $user_id = null): bool {
+        return $this->can_manage($user_id) && $this->get_state()->can_potentially_activate();
+    }
+
+    /**
+     * Getter method for @see can_potentially_activate
+     * @return bool
+     */
+    public function get_can_potentially_activate(): bool {
+        return $this->can_potentially_activate();
+    }
+
+    /**
+     * Can this activity be activated. This checks the capability,
+     * the status and the conditions to activate an activity.
+     *
+     * @return bool
+     */
+    public function can_activate(): bool {
+        return $this->can_potentially_activate() && $this->get_state()->can_activate();
+    }
+
+    /**
+     * Getter method for @see can_activate
+     * @return bool
+     */
+    public function get_can_activate(): bool {
+        return $this->can_activate();
+    }
+
+    /**
+     * Activate this activity if possible
+     *
+     * @return $this
+     */
+    public function activate(): self {
+        $this->get_state()->activate();
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function get_current_state_code(): int {
+        return $this->entity->status;
+    }
+
+    /**
+     * Get name representation of current status
+     *
+     * @return string
+     */
+    public function get_status_name(): string {
+        return $this->get_state()->get_name();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function update_state_code(state $state): void {
+        $this->entity->status = $state::get_code();
+        $this->entity->update();
+    }
+
 }

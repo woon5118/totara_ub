@@ -33,6 +33,7 @@ use mod_perform\expand_task;
 use mod_perform\models\activity\activity as activity_model;
 use mod_perform\models\activity\track_assignment_type;
 use mod_perform\models\activity\track_status;
+use mod_perform\state\activity\draft;
 use mod_perform\user_groups\grouping;
 
 defined('MOODLE_INTERNAL') || die();
@@ -249,7 +250,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
 
         /** @var activity $activity_entity */
         $activity_entity = activity::repository()->find($activity->get_id());
-        $activity_entity->status = activity_model::STATUS_INACTIVE;
+        $activity_entity->status = draft::get_code();
         $activity_entity->save();
 
         $track1_id = $test_data->track1->id;
