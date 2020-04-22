@@ -33,8 +33,8 @@ class behat_mod_perform extends behat_base {
     public const PERFORM_ELEMENT_LOCATOR = '.tui-participantContent__sectionItem';
     public const PERFORM_ELEMENT_QUESTION_TEXT_LOCATOR = '.tui-collapsible__header-text';
     public const SHORT_TEXT_RESPONSE_LOCATOR = 'textarea';
-    public const PERFORM_ELEMENT_OTHER_RESPONSE_LOCATOR = '.tui-otherParticipantResponse';
-    public const PERFORM_ELEMENT_OTHER_RESPONSE_RELATION_LOCATOR = '.tui-otherParticipantResponse__relation .tui-formLabel';
+    public const PERFORM_ELEMENT_OTHER_RESPONSE_CONTAINER_LOCATOR = '.tui-otherParticipantResponses';
+    public const PERFORM_ELEMENT_OTHER_RESPONSE_RELATION_LOCATOR = '.tui-otherParticipantResponses__relation .tui-formLabel';
     public const SHORT_TEXT_ANSWER_LOCATOR = '.tui-shortTextElementParticipantResponse__answer';
     public const PERFORM_ACTIVITY_YOUR_RELATIONSHIP_LOCATOR = '.tui-participantContent__user-relationshipValue';
 
@@ -132,7 +132,6 @@ class behat_mod_perform extends behat_base {
      * @readonly
      */
     public function i_click_show_others_responses(): void {
-
         $this->find('css', '.tui-participantContent__sectionHeading-switch label')->click();
     }
 
@@ -153,7 +152,7 @@ class behat_mod_perform extends behat_base {
         $has_relation = false;
         $has_answer = false;
         $question = $this->find_question_from_text($question_text);
-        $other_response_element = $question->find('css', self::PERFORM_ELEMENT_OTHER_RESPONSE_LOCATOR);
+        $other_response_element = $question->find('css', self::PERFORM_ELEMENT_OTHER_RESPONSE_CONTAINER_LOCATOR);
 
         $relations = $other_response_element->findAll('css', self::PERFORM_ELEMENT_OTHER_RESPONSE_RELATION_LOCATOR);
         foreach ($relations as $relation) {
