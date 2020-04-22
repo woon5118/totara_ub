@@ -89,6 +89,42 @@ class totara_webapi_default_resolver_test extends advanced_testcase {
         $this->resolve_graphql_query('totara_webapi_test_middleware_query_resolver_with_broken_middleware');
     }
 
+    public function test_query_resolver_with_middleware_group() {
+        global $CFG;
+        require_once $CFG->dirroot.'/totara/webapi/tests/fixtures/resolver/query/test_middleware_query_resolver_with_group.php';
+
+        $result = $this->resolve_graphql_query('totara_webapi_test_middleware_query_resolver_with_group', ['arg1' => 'value1']);
+
+        $this->assertArrayHasKey('success', $result);
+        $this->assertEquals(true, $result['success']);
+        $this->assertArrayHasKey('args', $result);
+        $this->assertEqualsCanonicalizing([
+            'arg1' => 'newvalue1',
+            'arg2' => 'value2'
+        ], $result['args']);
+
+        $this->assertArrayHasKey('result1', $result);
+        $this->assertArrayHasKey('result2', $result);
+    }
+
+    public function test_query_resolver_with_nested_middleware_group() {
+        global $CFG;
+        require_once $CFG->dirroot.'/totara/webapi/tests/fixtures/resolver/query/test_middleware_query_resolver_with_nested_group.php';
+
+        $result = $this->resolve_graphql_query('totara_webapi_test_middleware_query_resolver_with_nested_group', ['arg1' => 'value1']);
+
+        $this->assertArrayHasKey('success', $result);
+        $this->assertEquals(true, $result['success']);
+        $this->assertArrayHasKey('args', $result);
+        $this->assertEqualsCanonicalizing([
+            'arg1' => 'newvalue1',
+            'arg2' => 'value2'
+        ], $result['args']);
+
+        $this->assertArrayHasKey('result1', $result);
+        $this->assertArrayHasKey('result2', $result);
+    }
+
     public function test_mutation_resolver_with_middleware() {
         global $CFG;
         require_once $CFG->dirroot.'/totara/webapi/tests/fixtures/resolver/mutation/test_middleware_mutation_resolver.php';

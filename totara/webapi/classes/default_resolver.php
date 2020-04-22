@@ -24,8 +24,10 @@
 
 namespace totara_webapi;
 
+use Closure;
 use core\webapi\execution_context;
 use core\webapi\middleware;
+use core\webapi\middleware_group;
 use core\webapi\mutation_resolver;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
@@ -176,26 +178,53 @@ class default_resolver {
                     return new result($result);
                 };
 
-                foreach ($middleware as $current_middleware) {
-                    // Middleware can be instances of class names both would work
-                    if (!is_subclass_of($current_middleware, middleware::class)) {
-                        throw new \coding_exception('Expecting an array of middleware instances only');
-                    }
-
-                    $middleware_chain = function (payload $payload) use ($middleware_chain, $current_middleware) {
-                        // This is just the class name, so let's instantiate it
-                        if (is_string($current_middleware)) {
-                            $current_middleware = new $current_middleware();
-                        }
-                        return $current_middleware->handle($payload, $middleware_chain);
-                    };
-                }
+                $middleware_chain = $this->create_chain_recursively($middleware, $middleware_chain);
 
                 return $middleware_chain($payload)->get_data();
             }
         }
 
         return $classname::resolve($variables, $ec);
+    }
+
+    /**
+     * Create a middleware chain recursively
+     *
+     * @param $middleware
+     * @param Closure $middleware_chain
+     * @return Closure
+     */
+    private function create_chain_recursively($middleware, Closure $middleware_chain): Closure {
+        foreach ($middleware as $current_middleware) {
+            // This middleware could be a middleware group, in this case get all middleware
+            // from it and add them to the chain as well
+            if (is_subclass_of($current_middleware, middleware_group::class)) {
+                // This is just the class name, so let's instantiate it
+                if (is_string($current_middleware)) {
+                    $current_middleware = new $current_middleware();
+                }
+
+                /** @var middleware_group $current_middleware */
+                $middleware_group_items = array_values(array_reverse($current_middleware->get_middleware()));
+                $middleware_chain = $this->create_chain_recursively($middleware_group_items, $middleware_chain);
+                continue;
+            }
+
+            // Middleware can be instances or class names, both would work
+            if (!is_subclass_of($current_middleware, middleware::class)) {
+                throw new \coding_exception('Expecting an array of middleware instances only');
+            }
+
+            $middleware_chain = function (payload $payload) use ($middleware_chain, $current_middleware) {
+                // This is just the class name, so let's instantiate it
+                if (is_string($current_middleware)) {
+                    $current_middleware = new $current_middleware();
+                }
+                return $current_middleware->handle($payload, $middleware_chain);
+            };
+        }
+
+        return $middleware_chain;
     }
 
 }
