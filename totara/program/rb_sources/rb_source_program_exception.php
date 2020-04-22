@@ -244,7 +244,6 @@ class rb_source_program_exception extends rb_base_source {
             \totara_program\exception\manager::EXCEPTIONTYPE_ALREADY_ASSIGNED        => get_string('exceptiontypealreadyassigned', 'totara_program'),
             \totara_program\exception\manager::EXCEPTIONTYPE_COMPLETION_TIME_UNKNOWN => get_string('completiontimeunknown', 'totara_program'),
             \totara_program\exception\manager::EXCEPTIONTYPE_UNKNOWN                 => get_string('unknown', 'totara_program'),
-            \totara_program\exception\manager::EXCEPTIONTYPE_DUPLICATE_COURSE        => get_string('exceptiontypeduplicatecourse', 'totara_program'),
         ];
 
         return $options;
