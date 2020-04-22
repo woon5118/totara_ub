@@ -1698,18 +1698,21 @@ function prog_get_courses_associated_with_programs($courses = null) {
  * @return bool false if file not found, does not return if found - just send the file
  */
 function totara_program_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, $options=array()) {
-    global $USER;
+    global $USER, $CFG;
 
     $programid = $context->instanceid;
     $component = 'totara_program';
     $itemid = $args[0];
     $filename = $args[1];
 
-    if (!isloggedin()) {
+    // Only grid catalogue images can be bypassed.
+    $loginrequired = $filearea !== 'images' || empty($CFG->publishgridcatalogimage);
+
+    if ($loginrequired && !isloggedin()) {
         send_file_not_found();
     }
 
-    if (!has_capability("totara/program:viewprogram", $context)) {
+    if ($loginrequired && !has_capability("totara/program:viewprogram", $context)) {
         send_file_not_found();
     }
 
@@ -1722,12 +1725,12 @@ function totara_program_pluginfile($course, $cm, $context, $filearea, $args, $fo
         $filearea != 'overviewfiles' &&
         $filearea != 'images')
     {
-        if (!$program->user_is_assigned($USER->id)) {
+        if ($loginrequired && !$program->user_is_assigned($USER->id)) {
             send_file_not_found();
         }
     }
 
-    if (!$program->is_viewable($USER)) {
+    if ($loginrequired && !$program->is_viewable($USER)) {
         send_file_not_found();
     }
 

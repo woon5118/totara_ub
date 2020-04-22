@@ -4514,7 +4514,7 @@ function file_pluginfile($relativepath, $forcedownload, $preview = null) {
 
         // Totara: default image for course backgrounds in grid catalogue.
         if ($filearea === 'defaultimage') {
-            if ($CFG->forcelogin) {
+            if ($CFG->forcelogin && empty($CFG->publishgridcatalogimage)) {
                 require_login();
             }
             if ($context->contextlevel != CONTEXT_SYSTEM) {
@@ -4539,11 +4539,17 @@ function file_pluginfile($relativepath, $forcedownload, $preview = null) {
             $file = reset($files);
 
             \core\session\manager::write_close(); // Unlock session during file serving.
-            send_stored_file($file, $lifetime, 0, $forcedownload, ['preview' => $preview, 'filename' => $filename]);
+            $options = ['preview' => $preview, 'filename' => $filename];
+            if (!empty($CFG->publishgridcatalogimage)) {
+                // Grid catalog images should be cache-able by both browsers and proxies according
+                // to $CFG->publishgridcatalogimage.
+                $options['cacheability'] = 'public';
+            }
+            send_stored_file($file, $lifetime, 0, $forcedownload, $options);
         }
         // Totara: one image per course for background in grid catalogue.
         if ($filearea === 'images') {
-            if ($CFG->forcelogin) {
+            if ($CFG->forcelogin && empty($CFG->publishgridcatalogimage)) {
                 require_login();
             }
             if ($context->contextlevel != CONTEXT_COURSE) {
@@ -4567,7 +4573,13 @@ function file_pluginfile($relativepath, $forcedownload, $preview = null) {
             $file = reset($files);
 
             \core\session\manager::write_close(); // Unlock session during file serving.
-            send_stored_file($file, $lifetime, 0, $forcedownload, array('preview' => $preview));
+            $options = array('preview' => $preview);
+            if (!empty($CFG->publishgridcatalogimage)) {
+                // Grid catalog images should be cache-able by both browsers and proxies according
+                // to $CFG->publishgridcatalogimage.
+                $options['cacheability'] = 'public';
+            }
+            send_stored_file($file, $lifetime, 0, $forcedownload, $options);
         }
 
         if ($context->contextlevel != CONTEXT_COURSE) {

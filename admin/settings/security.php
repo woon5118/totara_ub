@@ -22,6 +22,7 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
     $temp->add(new admin_setting_configcheckbox('forceloginforprofileimage', new lang_string('forceloginforprofileimage', 'admin'), new lang_string('forceloginforprofileimage_help', 'admin'), 1)); // Totara: enabled by default for privacy reasons.
     $temp->add(new admin_setting_configcheckbox('preventmultiplelogins', new lang_string('preventmultiplelogins', 'admin'), new lang_string('preventmultiplelogins_help', 'admin'), 0));
     $temp->add(new admin_setting_configcheckbox('opentogoogle', new lang_string('opentogoogle', 'admin'), new lang_string('configopentogoogle', 'admin'), 0));
+    $temp->add(new admin_setting_configcheckbox('publishgridcatalogimage', new lang_string('publishgridcatalogimage', 'admin'), new lang_string('publishgridcatalogimage_help', 'admin'), 0)); // Totara: disabled by default for privacy reasons.
     $temp->add(new admin_setting_pickroles('profileroles',
         new lang_string('profileroles','admin'),
         new lang_string('configprofileroles', 'admin'),
