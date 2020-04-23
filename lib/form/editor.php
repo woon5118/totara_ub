@@ -439,23 +439,6 @@ class MoodleQuickForm_editor extends HTML_QuickForm_element implements templatab
             if ($maxfiles != 0 ) {
                 $str .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => $elname.'[itemid]',
                         'value' => $draftitemid));
-
-                // used by non js editor only
-                $editorurl = new moodle_url("$CFG->wwwroot/repository/draftfiles_manager.php", array(
-                    'action'=>'browse',
-                    'env'=>'editor',
-                    'itemid'=>$draftitemid,
-                    'subdirs'=>$subdirs,
-                    'maxbytes'=>$maxbytes,
-                    'areamaxbytes' => $areamaxbytes,
-                    'maxfiles'=>$maxfiles,
-                    'ctx_id'=>$ctx->id,
-                    'course'=>$PAGE->course->id,
-                    'sesskey'=>sesskey(),
-                    ));
-                $str .= '<noscript>';
-                $str .= "<div><object type='text/html' data='$editorurl' height='160' width='600' style='border:1px solid #000'></object></div>";
-                $str .= '</noscript>';
             }
         }
 

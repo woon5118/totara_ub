@@ -469,19 +469,12 @@ class form_filemanager implements renderable {
         $this->options->filepicker = $filepicker_options;
     }
 
+    /*
+     * @deprecated Since Totara 13
+     */
     public function get_nonjsurl() {
         global $PAGE;
-        return new moodle_url('/repository/draftfiles_manager.php', array(
-            'env'=>'filemanager',
-            'action'=>'browse',
-            'itemid'=>$this->options->itemid,
-            'subdirs'=>$this->options->subdirs,
-            'maxbytes'=>$this->options->maxbytes,
-            'areamaxbytes' => $this->options->areamaxbytes,
-            'maxfiles'=>$this->options->maxfiles,
-            'ctx_id'=>$PAGE->context->id, // TODO ?
-            'course'=>$PAGE->course->id, // TODO ?
-            'sesskey'=>sesskey(),
-            ));
+
+        return new moodle_url('');
     }
 }
