@@ -27,6 +27,7 @@ use mod_perform\models\activity\activity as activity;
 use mod_perform\state\activity\active;
 use mod_perform\state\activity\draft;
 use mod_perform\webapi\resolver\mutation\activate_activity;
+use totara_job\relationship\resolvers\manager;
 use totara_webapi\graphql;
 
 class mod_perform_webapi_resolver_mutation_activate_activity_testcase extends advanced_testcase {
@@ -38,24 +39,37 @@ class mod_perform_webapi_resolver_mutation_activate_activity_testcase extends ad
     public function test_activate_draft_activity(): void {
         $this->setAdminUser();
 
-        $activity = $this->create_activity(draft::get_code());
+        $activity = $this->create_valid_activity();
 
         $args = ['input' => ['activity_id' => $activity->id]];
 
-        /** @type activity $result */
+        /** @var activity $result */
         ['activity' => $result] = activate_activity::resolve($args, $this->get_execution_context());
         $this->assertEquals($activity->id, $result->id);
         $this->assertEquals(active::get_code(), $result->status);
     }
 
-    public function test_activate_active_activity(): void {
+    public function test_activate_draft_activity_which_does_not_satisfy_conditions(): void {
         $this->setAdminUser();
 
-        $activity = $this->create_activity(active::get_code());
+        $activity = $this->create_activity();
 
         $args = ['input' => ['activity_id' => $activity->id]];
 
-        /** @type activity $result */
+        $this->expectException(moodle_exception::class);
+        $this->expectExceptionMessage('Cannot activate this activity due to invalid state or conditions are not satisfied.');
+
+        activate_activity::resolve($args, $this->get_execution_context());
+    }
+
+    public function test_activate_active_activity(): void {
+        $this->setAdminUser();
+
+        $activity = $this->create_valid_activity(active::get_code());
+
+        $args = ['input' => ['activity_id' => $activity->id]];
+
+        /** @var activity $result */
         ['activity' => $result] = activate_activity::resolve($args, $this->get_execution_context());
         $this->assertEquals($activity->id, $result->id);
         $this->assertEquals(active::get_code(), $result->status);
@@ -67,7 +81,7 @@ class mod_perform_webapi_resolver_mutation_activate_activity_testcase extends ad
 
         $this->setUser($user1);
 
-        $activity = $this->create_activity(active::get_code());
+        $activity = $this->create_valid_activity();
 
         $this->setUser($user2);
 
@@ -96,7 +110,7 @@ class mod_perform_webapi_resolver_mutation_activate_activity_testcase extends ad
     public function test_execute_query_successful_on_draft_activity() {
         $this->setAdminUser();
 
-        $activity = $this->create_activity(draft::get_code());
+        $activity = $this->create_valid_activity();
 
         $args = ['activity_id' => $activity->id];
 
@@ -121,7 +135,7 @@ class mod_perform_webapi_resolver_mutation_activate_activity_testcase extends ad
     public function test_execute_query_successful_on_active_activity() {
         $this->setAdminUser();
 
-        $activity = $this->create_activity(active::get_code());
+        $activity = $this->create_valid_activity(active::get_code());
 
         $args = ['activity_id' => $activity->id];
 
@@ -141,19 +155,46 @@ class mod_perform_webapi_resolver_mutation_activate_activity_testcase extends ad
     }
 
     /**
-     * @param int $status a status constant coming from the activity state classes
+     * Create a basic activity without any sections or questions in it
+     *
+     * @param int|null $status defaults to draft
      * @return activity
      */
-    private function create_activity(int $status): activity {
-        // TODO With TL-24784 we need to add at least one valid question and one valid assignment to make this test pass
-
-        $data = [
-            'activity_status' => $status
-        ];
-
+    protected function create_activity(int $status = null): activity {
+        $data_generator = $this->getDataGenerator();
         /** @var mod_perform_generator $perform_generator */
-        $perform_generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
-        return $perform_generator->create_activity_in_container($data);
+        $perform_generator = $data_generator->get_plugin_generator('mod_perform');
+
+        return $perform_generator->create_activity_in_container([
+            'activity_name' => 'User1 One',
+            'activity_status' => $status ?? draft::get_code()
+        ]);
+    }
+
+    /**
+     * Creates an activity with one section, one question and one relationship
+     *
+     * @param int|null $status defaults to draft
+     * @return activity
+     */
+    protected function create_valid_activity(int $status = null): activity {
+        $data_generator = $this->getDataGenerator();
+        /** @var mod_perform_generator $perform_generator */
+        $perform_generator = $data_generator->get_plugin_generator('mod_perform');
+
+        $activity = $this->create_activity($status);
+
+        $section = $perform_generator->create_section($activity, ['title' => 'Test section 1']);
+
+        $perform_generator->create_section_relationship(
+            $section,
+            ['class_name' => manager::class]
+        );
+
+        $element = $perform_generator->create_element(['title' => 'Question one']);
+        $perform_generator->create_section_element($section, $element);
+
+        return $activity;
     }
 
 }

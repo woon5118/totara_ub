@@ -21,43 +21,32 @@
  * @package mod_perform
  */
 
-namespace mod_perform\state\activity;
+namespace mod_perform\state\activity\condition;
 
-use mod_perform\state\activity\condition\at_least_one_section_with_question_and_relationship;
-use mod_perform\state\transition;
+use mod_perform\models\activity\activity;
+use mod_perform\state\condition;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * This class represents the "draft" state status of an activity.
- *
- * @package mod_perform
+ * The activity has at least one section with at least one valid question and one relationship
  */
-class draft extends activity_state {
+class at_least_one_section_with_question_and_relationship extends condition {
 
-    /**
-     * @inheritDoc
-     */
-    public static function get_name(): string {
-        return 'DRAFT';
-    }
+    public function pass(): bool {
+        /** @var activity $activity */
+        $activity = $this->object;
 
-    /**
-     * @inheritDoc
-     */
-    public static function get_code(): int {
-        return 0;
-    }
+        $sections = $activity->get_sections();
 
-    /**
-     * @inheritDoc
-     */
-    public function get_transitions(): array {
-        return [
-            // A draft activity can be activated.
-            transition::to(new active($this->object))->with_conditions([
-                at_least_one_section_with_question_and_relationship::class
-            ]),
-        ];
+        // Check whether the activity has at least one section element
+        // and one relationship for a section
+        foreach ($sections as $section) {
+            $relationships = $section->get_section_relationships();
+            $section_elements = $section->get_section_elements();
+            return !empty($relationships) && !empty($section_elements);
+        }
+
+        return false;
     }
 }

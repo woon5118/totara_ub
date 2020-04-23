@@ -205,10 +205,19 @@ class activity extends model {
     /**
      * Forces the model to reload its data from the repository.
      *
+     * @param bool $with_relationships defaults to false, use with care as it triggers additional queries
      * @return activity
      */
-    public function refresh(): self {
+    public function refresh(bool $with_relationships = false): self {
         $this->entity->refresh();
+        if ($with_relationships) {
+            if ($this->entity->relation_loaded('relationships')) {
+                $this->entity->load_relation('relationships');
+            }
+            if ($this->entity->relation_loaded('sections')) {
+                $this->entity->load_relation('sections');
+            }
+        }
         return $this;
     }
 
@@ -288,7 +297,7 @@ class activity extends model {
      * @return collection|section[]
      */
     public function get_sections(): collection {
-        return $this->entity->sections->transform_to(section::class);
+        return $this->entity->sections->map_to(section::class);
     }
 
     /**
@@ -297,7 +306,7 @@ class activity extends model {
      * @return collection|relationship[]
      */
     public function get_relationships(): collection {
-        return $this->entity->relationships->transform_to(relationship::class);
+        return $this->entity->relationships->map_to(relationship::class);
     }
 
     /**

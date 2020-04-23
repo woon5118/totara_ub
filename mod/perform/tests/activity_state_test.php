@@ -22,9 +22,11 @@
  */
 
 use mod_perform\event\activity_activated;
+use mod_perform\models\activity\activity;
 use mod_perform\state\activity\active;
 use mod_perform\state\activity\draft;
 use mod_perform\state\state_helper;
+use totara_job\relationship\resolvers\manager;
 
 /**
  * @group perform
@@ -32,24 +34,15 @@ use mod_perform\state\state_helper;
 class mod_perform_activity_state_testcase extends advanced_testcase {
 
     public function test_activate() {
-        $data_generator = $this->getDataGenerator();
-        /** @var mod_perform_generator $perform_generator */
-        $perform_generator = $data_generator->get_plugin_generator('mod_perform');
-
-        $user = $data_generator->create_user();
+        $user = $this->getDataGenerator()->create_user();
 
         $this->setUser($user);
 
-        $activity = $perform_generator->create_activity_in_container([
-            'activity_name' => 'User1 One',
-            'activity_status' => draft::get_code()
-        ]);
+        $activity = $this->create_valid_activity();
 
         $this->assertEquals(draft::get_code(), $activity->status);
         $this->assertTrue($activity->is_draft());
         $this->assertFalse($activity->is_active());
-
-        // TODO With TL-24784 we need to add at least one valid question and one valid assignment to make this test pass
 
         $activity->activate();
 
@@ -70,20 +63,11 @@ class mod_perform_activity_state_testcase extends advanced_testcase {
     }
 
     public function test_activate_event_is_triggered() {
-        $data_generator = $this->getDataGenerator();
-        /** @var mod_perform_generator $perform_generator */
-        $perform_generator = $data_generator->get_plugin_generator('mod_perform');
-
-        $user = $data_generator->create_user();
+        $user = $this->getDataGenerator()->create_user();
 
         $this->setUser($user);
 
-        $activity = $perform_generator->create_activity_in_container([
-            'activity_name' => 'User1 One',
-            'activity_status' => draft::get_code()
-        ]);
-
-        // TODO With TL-24784 we need to add at least one valid question and one valid assignment to make this test pass
+        $activity = $this->create_valid_activity();
 
         $sink = $this->redirectEvents();
 
@@ -108,22 +92,13 @@ class mod_perform_activity_state_testcase extends advanced_testcase {
     }
 
     public function test_can_activate(): void {
-        $data_generator = $this->getDataGenerator();
-        /** @var mod_perform_generator $perform_generator */
-        $perform_generator = $data_generator->get_plugin_generator('mod_perform');
-
-        $user1 = $data_generator->create_user();
-        $user2 = $data_generator->create_user();
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
 
         $this->setUser($user1);
 
-        // TODO With TL-24784 we need to add at least one valid question and one valid assignment to make this test pass
-        //      and we need to test whether an activity can be activated if not all conditions are fulfilled
-
-        $draft_activity = $perform_generator->create_activity_in_container([
-            'activity_name' => 'User1 One',
-            'activity_status' => draft::get_code()
-        ]);
+        // A draft activity which fulfills all conditions can be activated
+        $draft_activity = $this->create_valid_activity();
 
         $this->assertTrue($draft_activity->can_potentially_activate());
         $this->assertTrue($draft_activity->can_activate());
@@ -132,15 +107,12 @@ class mod_perform_activity_state_testcase extends advanced_testcase {
 
         // The user can't activate it because he does not have the capability
         $this->assertFalse($draft_activity->can_potentially_activate());
-        // And all conditions are fulfilled
         $this->assertFalse($draft_activity->can_activate());
 
         $this->setUser($user1);
 
-        $active_activity = $perform_generator->create_activity_in_container([
-            'activity_name' => 'User1 One',
-            'activity_status' => active::get_code()
-        ]);
+        // An activate activity cannot be activated anymore
+        $active_activity = $this->create_valid_activity(active::get_code());
 
         $this->assertFalse($active_activity->can_potentially_activate());
         $this->assertFalse($active_activity->can_activate());
@@ -153,5 +125,94 @@ class mod_perform_activity_state_testcase extends advanced_testcase {
         ], state_helper::get_all_display_names('activity'));
     }
 
+
+    public function test_can_activate_with_unsatisfied_conditions() {
+        $user = $this->getDataGenerator()->create_user();
+
+        $this->setUser($user);
+
+        // Now lets create an activity which does not satisfy the conditions
+        // (at least one section with at least on question and one relationship)
+        $invalid_draft_activity = $this->create_activity();
+
+        // The user has the capability and the activity is in draft, so potentially can be activated
+        $this->assertTrue($invalid_draft_activity->can_potentially_activate());
+        // But not really as the conditions are not satisfied
+        $this->assertFalse($invalid_draft_activity->can_activate());
+
+        // Having a section won't change anything
+        $perform_generator = $this->generator();
+        $section = $perform_generator->create_section($invalid_draft_activity, ['title' => 'Test section 1']);
+
+        $invalid_draft_activity->refresh(true);
+
+        $this->assertTrue($invalid_draft_activity->can_potentially_activate());
+        $this->assertFalse($invalid_draft_activity->can_activate());
+
+        // Same with a section relationship
+        $perform_generator->create_section_relationship(
+            $section,
+            ['class_name' => manager::class]
+        );
+
+        $invalid_draft_activity->refresh(true);
+
+        $this->assertTrue($invalid_draft_activity->can_potentially_activate());
+        $this->assertFalse($invalid_draft_activity->can_activate());
+
+        // Finally, with a section element we have all the pieces together
+        $element = $perform_generator->create_element(['title' => 'Question one']);
+        $perform_generator->create_section_element($section, $element);
+
+        $invalid_draft_activity->refresh(true);
+
+        $this->assertTrue($invalid_draft_activity->can_potentially_activate());
+        $this->assertTrue($invalid_draft_activity->can_activate());
+    }
+
+    /**
+     * Create a basic activity without any sections or questions in it
+     *
+     * @param int|null $status defaults to draft
+     * @return activity
+     */
+    protected function create_activity(int $status = null): activity {
+        $perform_generator = $this->generator();
+
+        return $perform_generator->create_activity_in_container([
+            'activity_name' => 'User1 One',
+            'activity_status' => $status ?? draft::get_code()
+        ]);
+    }
+
+    /**
+     * Creates an activity with one section, one question and one relationship
+     *
+     * @param int|null $status defaults to draft
+     * @return activity
+     */
+    protected function create_valid_activity(int $status = null): activity {
+        $perform_generator = $this->generator();
+
+        $activity = $this->create_activity($status);
+
+        $section = $perform_generator->create_section($activity, ['title' => 'Test section 1']);
+
+        $perform_generator->create_section_relationship(
+            $section,
+            ['class_name' => manager::class]
+        );
+
+        $element = $perform_generator->create_element(['title' => 'Question one']);
+        $perform_generator->create_section_element($section, $element);
+
+        return $activity;
+    }
+
+    protected function generator(): mod_perform_generator {
+        $data_generator = $this->getDataGenerator();
+        /** @var mod_perform_generator $perform_generator */
+        return $data_generator->get_plugin_generator('mod_perform');
+    }
 
 }
