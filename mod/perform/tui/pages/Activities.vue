@@ -73,7 +73,7 @@
             {{ row.type.display_name }}
           </Cell>
           <Cell size="2" :column-header="$str('view_status', 'mod_perform')">
-            {{ row.state.display_name }}
+            {{ row.state_details.display_name }}
           </Cell>
           <Cell size="1" :column-header="$str('view_actions', 'mod_perform')">
             <ActivityActions :activity="row" @refetch="refetchActivities" />

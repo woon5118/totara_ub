@@ -61,6 +61,13 @@ abstract class state {
     abstract public static function get_name(): string;
 
     /**
+     * Get internal state type.
+     *
+     * @return string
+     */
+    abstract public static function get_type(): string;
+
+    /**
      * Get translated state name.
      *
      * @return string

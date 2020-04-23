@@ -45,6 +45,7 @@ use totara_core\relationship\relationship;
  * @property-read int $subject_instance_id
  * @property-read collection|participant_section_entity[] $participant_sections
  * @property-read string $progress_status internal name of current progress state
+ * @property-read string $availability_status internal name of current availability state
  * @property-read string $relationship_name internal name of the participant instance's activity relationship
  */
 class participant_instance extends model {
@@ -59,6 +60,7 @@ class participant_instance extends model {
     protected $entity_attribute_whitelist = [
         'id',
         'progress',
+        'availability',
         'participant_id',
         'participant_sections',
         'subject_instance_id',
@@ -66,6 +68,7 @@ class participant_instance extends model {
 
     protected $model_accessor_whitelist = [
         'progress_status',
+        'availability_status',
         'subject_instance',
         'participant',
         'relationship_name'
@@ -75,12 +78,12 @@ class participant_instance extends model {
         return participant_instance_entity::class;
     }
 
-    public function get_current_state_code(): int {
-        return $this->progress;
+    public function get_current_state_code(string $state_type): int {
+        return $this->{$state_type};
     }
 
     protected function update_state_code(state $state): void {
-        $this->entity->progress = $state::get_code();
+        $this->entity->{$state::get_type()} = $state::get_code();
         $this->entity->update();
     }
 
@@ -109,7 +112,7 @@ class participant_instance extends model {
      */
     public function update_progress_status() {
         /** @var participant_instance_progress $state */
-        $state = $this->get_state();
+        $state = $this->get_state(participant_instance_progress::get_type());
         $state->update_progress();
     }
 
@@ -119,7 +122,7 @@ class participant_instance extends model {
      * @return string
      */
     public function get_progress_status(): string {
-        return $this->get_state()->get_name();
+        return $this->get_state(participant_instance_progress::get_type())->get_name();
     }
 
     /**

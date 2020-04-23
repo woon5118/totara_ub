@@ -42,6 +42,7 @@ use mod_perform\user_groups\grouping;
 use mod_perform\util;
 use mod_perform\webapi\resolver\type\activity_state;
 use totara_core\relationship\relationship;
+use mod_perform\state\activity\activity_state as activity_status;
 
 /**
  * Class activity
@@ -84,7 +85,7 @@ class activity extends model {
         'tracks',
         'can_activate',
         'can_potentially_activate',
-        'state'
+        'state_details'
     ];
 
     public const NAME_MAX_LENGTH = 255;
@@ -362,7 +363,7 @@ class activity extends model {
      * @return bool
      */
     public function is_draft(): bool {
-        return $this->get_state()::get_code() === draft::get_code();
+        return $this->get_state(activity_status::get_type())::get_code() === draft::get_code();
     }
 
     /**
@@ -371,7 +372,7 @@ class activity extends model {
      * @return bool
      */
     public function is_active(): bool {
-        return $this->get_state()::get_code() === active::get_code();
+        return $this->get_state(activity_status::get_type())::get_code() === active::get_code();
     }
 
     /**
@@ -383,7 +384,7 @@ class activity extends model {
      * @return bool
      */
     public function can_potentially_activate(int $user_id = null): bool {
-        return $this->can_manage($user_id) && $this->get_state()->can_potentially_activate();
+        return $this->can_manage($user_id) && $this->get_state(activity_status::get_type())->can_potentially_activate();
     }
 
     /**
@@ -394,6 +395,10 @@ class activity extends model {
         return $this->can_potentially_activate();
     }
 
+    public function get_state_details() {
+        return $this->get_state(activity_status::get_type());
+    }
+
     /**
      * Can this activity be activated. This checks the capability,
      * the status and the conditions to activate an activity.
@@ -401,7 +406,7 @@ class activity extends model {
      * @return bool
      */
     public function can_activate(): bool {
-        return $this->can_potentially_activate() && $this->get_state()->can_activate();
+        return $this->can_potentially_activate() && $this->get_state(activity_status::get_type())->can_activate();
     }
 
     /**
@@ -418,7 +423,7 @@ class activity extends model {
      * @return $this
      */
     public function activate(): self {
-        $this->get_state()->activate();
+        $this->get_state(activity_status::get_type())->activate();
         return $this;
     }
 
@@ -468,15 +473,15 @@ class activity extends model {
     /**
      * @inheritDoc
      */
-    public function get_current_state_code(): int {
-        return $this->entity->status;
+    public function get_current_state_code(string $state_type): int {
+        return $this->entity->{$state_type};
     }
 
     /**
      * @inheritDoc
      */
     protected function update_state_code(state $state): void {
-        $this->entity->status = $state::get_code();
+        $this->entity->{$state::get_type()} = $state::get_code();
         $this->entity->update();
     }
 

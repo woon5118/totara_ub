@@ -24,6 +24,7 @@
 namespace mod_perform\rb\display;
 
 use mod_perform\state\state_helper;
+use mod_perform\state\subject_instance\subject_instance_progress;
 use totara_reportbuilder\rb\display\base;
 
 class subject_progress extends base {
@@ -39,7 +40,7 @@ class subject_progress extends base {
      * @return string
      */
     public static function display($code, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
-        return state_helper::from_code($code, 'subject_instance')::get_display_name();
+        return state_helper::from_code($code, 'subject_instance', subject_instance_progress::get_type())::get_display_name();
     }
 
     /**

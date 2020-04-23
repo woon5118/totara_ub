@@ -36,6 +36,7 @@ use core\orm\entity\relations\has_one_through;
  * @property int $subject_user_id
  * @property int $track_user_assignment_id
  * @property int $progress
+ * @property int $availability
  * @property int $created_at
  * @property int $updated_at
  *

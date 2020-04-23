@@ -126,7 +126,7 @@ class mod_perform_webapi_resolver_mutation_activate_activity_testcase extends ad
         $activity_result = $result['activity'];
         $this->assertEquals($activity->id, $activity_result['id']);
         $this->assertEquals($activity->name, $activity_result['name']);
-        $this->assertEquals(active::get_code(), $activity_result['state']['code']);
+        $this->assertEquals(active::get_code(), $activity_result['state_details']['code']);
     }
 
     /**
@@ -151,7 +151,7 @@ class mod_perform_webapi_resolver_mutation_activate_activity_testcase extends ad
         $activity_result = $result['activity'];
         $this->assertEquals($activity->id, $activity_result['id']);
         $this->assertEquals($activity->name, $activity_result['name']);
-        $this->assertEquals(active::get_code(), $activity_result['state']['code']);
+        $this->assertEquals(active::get_code(), $activity_result['state_details']['code']);
     }
 
     /**

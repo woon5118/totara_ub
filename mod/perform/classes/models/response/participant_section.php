@@ -213,7 +213,7 @@ class participant_section extends model {
             }
 
             /** @var participant_section_progress $state */
-            $state = $this->get_state();
+            $state = $this->get_state(participant_section_progress::get_type());
             $state->complete();
         });
 
@@ -225,16 +225,16 @@ class participant_section extends model {
      */
     public function on_participant_access() {
         /** @var participant_section_progress $state */
-        $state = $this->get_state();
+        $state = $this->get_state(participant_section_progress::get_type());
         $state->on_participant_access();
     }
 
-    public function get_current_state_code(): int {
-        return $this->progress;
+    public function get_current_state_code(string $state_type): int {
+        return $this->{$state_type};
     }
 
     protected function update_state_code(state $state): void {
-        $this->entity->progress = $state::get_code();
+        $this->entity->{$state::get_type()} = $state::get_code();
         $this->entity->update();
     }
 
@@ -244,7 +244,7 @@ class participant_section extends model {
      * @return string
      */
     public function get_progress_status(): string {
-        return $this->get_state()->get_name();
+        return $this->get_state(participant_section_progress::get_type())->get_name();
     }
 
 }

@@ -36,9 +36,11 @@ trait state_aware {
     /**
      * Get the code of the model's currently stored state.
      *
+     * @param string $status_type
+     *
      * @return int
      */
-    abstract public function get_current_state_code(): int;
+    abstract public function get_current_state_code(string $status_type): int;
 
     /**
      * Make the model update its currently stored state.
@@ -51,11 +53,16 @@ trait state_aware {
     /**
      * Get the current state.
      *
+     * @param string $state_type
      * @return state
      * @throws \coding_exception
      */
-    public function get_state(): state {
-        $state_class = state_helper::from_code($this->get_current_state_code(), $this->get_object_type());
+    public function get_state(string $state_type): state {
+        $state_class = state_helper::from_code(
+            $this->get_current_state_code($state_type),
+            $this->get_object_type(),
+            $state_type
+        );
         return new $state_class($this);
     }
 
@@ -74,13 +81,14 @@ trait state_aware {
      * This method must be used for any state changes.
      *
      * @param string $target_state class name
+     * @param string $state_type State type
      * @return self
      */
     public function switch_state(string $target_state): self {
-        $old_state = $this->get_state();
+        $old_state = $this->get_state(call_user_func([$target_state, 'get_type']));
         $new_state = $old_state->transition_to($target_state);
 
-        if ($new_state::get_code() !== $old_state::get_code()) {
+        if ($this->can_switch_between_states($old_state, $new_state)) {
             builder::get_db()->transaction(function () use ($new_state) {
                 $this->update_state_code($new_state);
                 if ($new_state instanceof state_event) {
@@ -91,5 +99,17 @@ trait state_aware {
         }
 
         return $this;
+    }
+
+    /**
+     * Checks state codes & types to ensure switch between states is valid.
+     *
+     * @param state $old_state
+     * @param state $new_state
+     * @return bool
+     */
+    private function can_switch_between_states(state $old_state, state $new_state): bool {
+        return $new_state::get_code() !== $old_state::get_code()
+            && $new_state::get_type() === $old_state::get_type();
     }
 }

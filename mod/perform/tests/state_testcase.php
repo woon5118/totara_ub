@@ -40,9 +40,29 @@ abstract class state_testcase extends advanced_testcase {
 
     private function assert_no_duplicates(string $method_name) {
         $all_states = state_helper::get_all(static::get_object_type());
-        $unique_results = array_unique(array_map(function (string $state_class) use ($method_name) {
-            return call_user_func([$state_class, $method_name]);
-        }, $all_states));
-        $this->assertCount(count($all_states), $unique_results);
+        $unique_results = $this->group_state_classes_by_type($all_states, $method_name);
+
+        $count = 0;
+        foreach ($unique_results as $states_per_type) {
+            $count = $count + count($states_per_type);
+        }
+        $this->assertEquals(count($all_states), $count);
+    }
+
+    private function group_state_classes_by_type(array $all_states, string $method_name): array {
+        $result = [];
+        foreach ($all_states as $state_class) {
+            $state_type = call_user_func([$state_class, 'get_type']);
+            if (!array_key_exists($state_type, $result)) {
+                $result[$state_type] = [];
+            }
+
+            $value = call_user_func([$state_class, $method_name]);
+            if (!in_array($value, $result[$state_type], true)) {
+                $result[$state_type][] = $value;
+            }
+        }
+
+        return $result;
     }
 }

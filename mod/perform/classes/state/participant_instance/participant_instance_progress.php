@@ -39,6 +39,13 @@ abstract class participant_instance_progress extends state {
      */
     abstract public function update_progress(): void;
 
+    /**
+     * @inheritDoc
+     */
+    public static function get_type(): string {
+        return 'progress';
+    }
+
     public static function get_display_name(): string {
         return get_string('participant_instance_status_' . strtolower(static::get_name()), 'mod_perform');
     }

@@ -28,6 +28,13 @@ use mod_perform\state\state;
 abstract class activity_state extends state {
 
     /**
+     * @inheritDoc
+     */
+    public static function get_type(): string {
+        return 'status';
+    }
+
+    /**
      * Can this activity be potentially activated, checking if the transition
      * to active is possible
      *

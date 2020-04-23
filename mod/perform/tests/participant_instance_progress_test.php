@@ -36,6 +36,7 @@ use mod_perform\state\participant_section\complete as complete_section;
 use mod_perform\state\participant_section\in_progress as in_progress_section;
 use mod_perform\state\participant_section\not_started as not_started_section;
 use mod_perform\state\state_helper;
+use mod_perform\state\participant_instance\participant_instance_progress;
 
 require_once(__DIR__ . '/generator/activity_generator_configuration.php');
 require_once(__DIR__ . '/state_testcase.php');
@@ -74,7 +75,7 @@ class mod_perform_participant_instance_progress_testcase extends state_testcase 
             ->setMethods(['__get'])
             ->disableOriginalConstructor()
             ->getMock();
-        
+
         $mock->expects($this->exactly(2))
             ->method('__get')
             ->with('participant_sections')
@@ -211,7 +212,7 @@ class mod_perform_participant_instance_progress_testcase extends state_testcase 
             20 => 'Complete',
             10 => 'In progress',
             0 => 'Not started',
-        ], state_helper::get_all_display_names('participant_instance'));
+        ], state_helper::get_all_display_names('participant_instance', participant_instance_progress::get_type()));
     }
 
     /**

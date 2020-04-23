@@ -101,7 +101,7 @@ class subject_instance extends model {
      * @return string
      */
     public function get_progress_status(): string {
-        return $this->get_state()->get_name();
+        return $this->get_state(subject_instance_progress::get_type())->get_name();
     }
 
     /**
@@ -111,16 +111,16 @@ class subject_instance extends model {
      */
     public function update_progress_status() {
         /** @var subject_instance_progress $state */
-        $state = $this->get_state();
+        $state = $this->get_state(subject_instance_progress::get_type());
         $state->update_progress();
     }
 
-    public function get_current_state_code(): int {
-        return $this->progress;
+    public function get_current_state_code(string $state_type): int {
+        return $this->{$state_type};
     }
 
     protected function update_state_code(state $state): void {
-        $this->entity->progress = $state::get_code();
+        $this->entity->{$state::get_type()} = $state::get_code();
         $this->entity->update();
     }
 

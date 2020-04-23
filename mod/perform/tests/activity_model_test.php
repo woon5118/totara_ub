@@ -26,6 +26,7 @@ use mod_perform\models\activity\activity_type;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\state\activity\active;
 use mod_perform\state\activity\draft;
+use mod_perform\state\activity\activity_state;
 
 /**
  * @group perform
@@ -178,7 +179,7 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
         ]);
 
         $this->assertEquals(draft::get_code(), $draft_activity->status);
-        $state = $draft_activity->get_state();
+        $state = $draft_activity->get_state(activity_state::get_type());
         $this->assertEquals('DRAFT', $state->get_name());
         $this->assertEquals('Draft', $state->get_display_name());
 
@@ -188,7 +189,7 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
         ]);
 
         $this->assertEquals(active::get_code(), $active_activity->status);
-        $state = $active_activity->get_state();
+        $state = $active_activity->get_state(activity_state::get_type());
         $this->assertEquals('ACTIVE', $state->get_name());
         $this->assertEquals('Active', $state->get_display_name());
     }

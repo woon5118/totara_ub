@@ -25,6 +25,7 @@ use mod_perform\event\activity_activated;
 use mod_perform\models\activity\activity;
 use mod_perform\state\activity\active;
 use mod_perform\state\activity\draft;
+use mod_perform\state\activity\activity_state;
 use mod_perform\state\state_helper;
 use totara_job\relationship\resolvers\manager;
 
@@ -119,10 +120,16 @@ class mod_perform_activity_state_testcase extends advanced_testcase {
     }
 
     public function test_get_all_translated() {
-        $this->assertEqualsCanonicalizing([
-            1 => 'Active',
-            0 => 'Draft',
-        ], state_helper::get_all_display_names('activity'));
+        $this->assertEqualsCanonicalizing(
+            [
+                1 => 'Active',
+                0 => 'Draft',
+            ],
+            state_helper::get_all_display_names(
+                'activity',
+                activity_state::get_type()
+            )
+        );
     }
 
 

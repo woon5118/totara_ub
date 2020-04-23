@@ -35,6 +35,7 @@ use mod_perform\models\activity\participant_instance as participant_instance_ent
  * @property int $section_id ID of activity section
  * @property int $participant_instance_id ID of participant instance
  * @property int $progress
+ * @property int $availability
  * @property int $created_at
  * @property int $updated_at
  *

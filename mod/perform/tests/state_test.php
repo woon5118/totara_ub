@@ -80,6 +80,10 @@ class test_condition_not_passing extends condition {
 }
 
 class test_state extends base_state {
+    public static function get_type(): string {
+        return 'test';
+    }
+
     public function get_transitions(): array {
         return [
             transition::to(new test_state_2($this->object))->with_conditions([
@@ -106,6 +110,10 @@ class test_state extends base_state {
 }
 
 class test_state_2 extends base_state {
+    public static function get_type(): string {
+        return 'test';
+    }
+
     public function get_transitions(): array {
         return [];
     }
@@ -124,6 +132,10 @@ class test_state_2 extends base_state {
 }
 
 class test_state_3 extends base_state {
+    public static function get_type(): string {
+        return 'test';
+    }
+
     public function get_transitions(): array {
         return [];
     }

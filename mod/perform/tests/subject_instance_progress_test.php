@@ -44,6 +44,7 @@ use mod_perform\state\subject_instance\in_progress;
 use mod_perform\state\subject_instance\not_started;
 use totara_core\relationship\resolvers\subject;
 use totara_job\relationship\resolvers\appraiser;
+use mod_perform\state\subject_instance\subject_instance_progress;
 
 require_once(__DIR__ . '/generator/activity_generator_configuration.php');
 require_once(__DIR__ . '/state_testcase.php');
@@ -250,7 +251,7 @@ class mod_perform_subject_instance_progress_testcase extends state_testcase {
             20 => 'Complete',
             10 => 'In progress',
             0 => 'Not started',
-        ], state_helper::get_all_display_names('subject_instance'));
+        ], state_helper::get_all_display_names('subject_instance', subject_instance_progress::get_type()));
     }
 
     /**

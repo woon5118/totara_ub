@@ -44,6 +44,13 @@ abstract class participant_section_progress extends state {
      */
     abstract public function on_participant_access(): void;
 
+    /**
+     * @inheritDoc
+     */
+    public static function get_type(): string {
+        return 'progress';
+    }
+
     public static function get_display_name(): string {
         return get_string('participant_section_status_' . strtolower(static::get_name()), 'mod_perform');
     }
