@@ -67,7 +67,7 @@
         <span
           :class="{
             'tui-competencyDetailActivityLog__description-rating':
-              row.proficient_status,
+              row.proficient_status != null,
             'tui-competencyDetailActivityLog__description-system':
               row.assignment && row.assignment.type === 'system',
             'tui-competencyDetailActivityLog__description-tracking':
@@ -85,7 +85,10 @@
         size="3"
         :column-header="$str('proficiency_status', 'totara_competency')"
       >
-        <ProficientStatus :proficient-status="row.proficient_status" />
+        <ProficientStatus
+          v-if="row.proficient_status != null"
+          :proficient-status="row.proficient_status"
+        />
       </Cell>
 
       <!-- Assignment column -->
