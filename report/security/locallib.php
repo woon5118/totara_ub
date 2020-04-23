@@ -75,6 +75,7 @@ function report_security_get_issue_list() {
         'report_security_check_preventexecpath',
         'report_security_check_disableconsistentcleaning',
         'report_security_check_devgraphql',
+        'report_security_check_oauth2verify',
     );
 
     $result = array_flip($result);
@@ -1423,6 +1424,58 @@ function report_security_check_devgraphql($detailed = false) {
     } else {
         $result->status = REPORT_SECURITY_OK;
         $result->info   = get_string('check_devgraphql_ok', 'report_security');
+    }
+
+    return $result;
+}
+
+/**
+ * Check that:
+ *       i) Configured OAuth2 issuers will verify email address;
+ *      ii) Totara users not permitted to share an email address.
+ *
+ * It is possible for a user to compromise another user account when shared email addresses are
+ * permitted either in Totara, or by a third party OAuth 2 issuer (e.g. see MDL-66598).
+ *
+ * @param bool $detailed Return detailed info.
+ * @return object Result data.
+ */
+function report_security_check_oauth2verify($detailed = false) {
+    global $CFG, $DB;
+
+    $result = new stdClass();
+    $result->issue = 'report_security_check_oauth2verify';
+    $result->name = get_string('check_oauth2verify_name', 'report_security');
+    $result->info = null;
+    $result->details = null;
+    $result->status = null;
+    $result->link = null;
+
+    $badconf = $DB->count_records('oauth2_issuer', ['enabled' => 1, 'requireconfirmation' => 0]);
+    if (empty($CFG->allowaccountssameemail)) {
+        if ($badconf == 0) {
+            // Shared emails not permitted in Totara and all oauth2 issuers verify email (or none configured yet).
+            $result->status = REPORT_SECURITY_OK;
+            $result->info = get_string('check_oauth2verify_info_ok', 'report_security');
+        } else {
+            // Shared emails not permitted in Totara and at least one oauth2 issuer does not verify email.
+            $result->status = REPORT_SECURITY_WARNING;
+            $result->info = get_string('check_oauth2verify_info_oauth2', 'report_security');
+        }
+    } else {
+        if ($badconf == 0) {
+            // Shared emails permitted in Totara and all oauth2 issuers verify email (or none configured yet).
+            $result->status = REPORT_SECURITY_WARNING;
+            $result->info = get_string('check_oauth2verify_info_totara', 'report_security');
+        } else {
+            // Shared emails permitted in Totara and at least one oauth2 issuer does not verify email.
+            $result->status = REPORT_SECURITY_CRITICAL;
+            $result->info = get_string('check_oauth2verify_info_totara_oauth2', 'report_security');
+        }
+    }
+
+    if ($detailed) {
+        $result->details = get_string('check_oauth2verify_detailed', 'report_security');
     }
 
     return $result;
