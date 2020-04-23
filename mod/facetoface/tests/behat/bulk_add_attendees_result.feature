@@ -22,50 +22,6 @@ Feature: Add seminar attendees in bulk and see results
     And I am on "Course 1" course homepage
 
   @_file_upload
-  Scenario: Conflict result when choosing Add users via file upload option
-    Given I follow "View all events"
-    And I follow "Add event"
-    And I press "Save changes"
-
-    And I click on the seminar event action "Attendees" in row "#1"
-    And I set the field "Attendee actions" to "Add users via file upload"
-    And I upload "mod/facetoface/tests/fixtures/f2f_attendees.csv" file to "CSV text file" filemanager
-    And I press "Continue"
-    When I press "Confirm"
-    Then I should see "Uploaded via csv file" in the "John1 Smith1" "table_row"
-    And I should see "Also uploaded via csv file" in the "John2 Smith2" "table_row"
-    And I set the field "Attendee actions" to "Add users via file upload"
-    And I upload "mod/facetoface/tests/fixtures/f2f_attendees.csv" file to "CSV text file" filemanager
-    And I press "Continue"
-    Then I should see "2 problem(s) encountered during import."
-    When I click on "View results" "link"
-    Then the following should exist in the "generaltable" table:
-      | Name          | Result                                                   |
-      | John1 Smith1  | This user is already signed-up for this seminar activity |
-      | John2 Smith2  | This user is already signed-up for this seminar activity |
-
-  Scenario: Conflict result when choosing Add users via list of IDs option
-    Given I follow "View all events"
-    And I follow "Add event"
-    And I press "Save changes"
-
-    And I click on the seminar event action "Attendees" in row "#1"
-    And I set the field "Attendee actions" to "Add users via list of IDs"
-    And I set the field "idfield" to "ID number"
-    And I set the field "csvinput" to "I3"
-    And I press "Continue"
-    And I press "Confirm"
-    When I set the field "Attendee actions" to "Add users via list of IDs"
-    And I set the field "idfield" to "ID number"
-    And I set the field "csvinput" to "I3"
-    And I press "Continue"
-    Then I should see "1 problem(s) encountered during import."
-    When I click on "View results" "link"
-    Then the following should exist in the "generaltable" table:
-      | Name          | Result                                                   |
-      | John3 Smith3  | This user is already signed-up for this seminar activity |
-
-  @_file_upload
   Scenario: Success result when choosing Add users via file upload option
     Given I follow "View all events"
     And I follow "Add event"

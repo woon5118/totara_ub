@@ -124,3 +124,6 @@ placeholder:icq,mod_facetoface
 placeholder:msn,mod_facetoface
 placeholder:yahoo,mod_facetoface
 placeholder:aim,mod_facetoface
+error:idnumbernotfound,mod_facetoface
+error:emailnotfound,mod_facetoface
+error:usernamenotfound,mod_facetoface

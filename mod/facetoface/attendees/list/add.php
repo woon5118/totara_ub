@@ -92,33 +92,14 @@ if ($frm = data_submitted()) {
         if (empty($userstoadd)) {
             $notification = get_string('pleaseselectusers', 'mod_facetoface');
         } else {
-            $users = $DB->get_records_list('user', 'id', $userstoadd);
-            $errors  = array();
-            foreach ($users as $user) {
-                $signup = signup::create($user->id, $seminarevent);
-                $signup->set_ignoreconflicts($ignoreconflicts);
-                if (!signup_helper::can_signup($signup)) {
-                    $signuperrors = signup_helper::get_failures($signup);
-                    // The only error we can ignore - is that user is not enroled. That's because user will be enrolled
-                    // during signup later.
-                    if (!isset($signuperrors['user_is_enrolable'])) {
-                        $errors[] = ['idnumber' => $user->idnumber, 'name' => fullname($user), 'result' => current($signuperrors)];
-                    }
-                }
-            }
-            if (!empty($errors)) {
-                $errorcount = count($errors);
-                $notification = get_string('xerrorsencounteredduringimport', 'facetoface', $errorcount);
-                $notification .= ' '. html_writer::link('#', get_string('viewresults', 'facetoface'), array('id' => 'viewbulkresults', 'class' => 'viewbulkresults'));
-                $list->set_validaton_results($errors);
-            } else {
-                // Redirect to confirmation.
-                redirect(new moodle_url('/mod/facetoface/attendees/list/addconfirm.php',
-                    array('s' => $s,
-                        'listid' => $listid,
-                        'ignoreconflicts' => $ignoreconflicts)));
-                return;
-            }
+            // signup_helper::can_signup() will happen in step two.
+            // Redirect to confirmation.
+            redirect(new moodle_url('/mod/facetoface/attendees/list/addconfirm.php', [
+                's' => $s,
+                'listid' => $listid,
+                'ignoreconflicts' => $ignoreconflicts
+            ]));
+            return;
         }
     } else if ($clearsearch) {
         $searchtext = '';

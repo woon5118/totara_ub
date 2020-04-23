@@ -56,6 +56,7 @@ class attendees_add_confirm extends \moodleform {
 
         if ($this->_customdata['isapprovalrequired']) {
             $mform->addElement('header', 'bookingoptions', get_string('bookingoptions', 'facetoface'));
+            $mform->setExpanded('bookingoptions', true);
             $mform->addElement('advcheckbox', 'ignoreapproval', '', get_string('ignoreapprovalwhenaddingattendees', 'facetoface'));
 
             // Disabling suppress notification if approval required and not ignored.

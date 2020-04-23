@@ -142,10 +142,11 @@ Feature: Add - Remove seminar attendees
     And I set the field "potential users" to "Sam2 Student2, student2@example.com"
     And I press "Add"
     And I press "Continue"
+    And I press "Confirm"
     Then I should see "1 problem(s) encountered during import."
     When I click on "View results" "link"
     Then I should see "This seminar requires manager approval. Users without a manager cannot join the seminar." in the "Sam2 Student2" "table_row"
-    And I press "Close"
+    And I press "Cancel"
 
   Scenario: Add users by username via textarea
     Given I log in as "admin"
@@ -286,11 +287,15 @@ Feature: Add - Remove seminar attendees
     And I set the field "potential users" to "Sam1 Student1, student1@example.com"
     And I press exact "add"
     And I press "Continue"
+    And I press "Confirm"
     Then I should see "1 problem(s) encountered during import."
     When I click on "View results" "link"
     Then I should see "Sam1 Student1"
     And I should see "The signup user has conflicting signups"
-    When I press exact "Close"
+    When I press "Cancel"
+    And I set the field "Attendee actions" to "Add users"
+    And I set the field "potential users" to "Sam1 Student1, student1@example.com"
+    And I press exact "add"
     And I set the following fields to these values:
       | Allow scheduling conflicts | 1 |
     And I press "Continue"

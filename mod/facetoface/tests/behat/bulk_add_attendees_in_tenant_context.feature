@@ -38,8 +38,8 @@ Feature: Add seminar attendees in tenant context via bulk options
     And the following "seminar sessions" exist in "mod_facetoface" plugin:
       | eventdetails | start                   | finish                  |
       | event 1      | now +2 days             | now +2 days +60 minutes |
-      | event 2      | now +2 days             | now +2 days +60 minutes |
-      | event 3      | now +2 days             | now +2 days +60 minutes |
+      | event 2      | now +3 days             | now +3 days +60 minutes |
+      | event 3      | now +4 days             | now +4 days +60 minutes |
 
   Scenario: Check only tenant participants can be added as attendees via CSV in tenants context seminars
     Given I log in as "admin"
@@ -50,7 +50,7 @@ Feature: Add seminar attendees in tenant context via bulk options
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees_in_tenant_context.csv" file to "CSV text file" filemanager
     And I set the field "delimiter" to "Automatic"
     When I press "Continue"
-    When I press "Confirm"
+    And I press "Confirm"
     Then I should see "Student One"
     And I should see "Student Two"
     And I should see "Student Three"
@@ -64,6 +64,7 @@ Feature: Add seminar attendees in tenant context via bulk options
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees_in_tenant_context.csv" file to "CSV text file" filemanager
     And I set the field "delimiter" to "Automatic"
     When I press "Continue"
+    And I press "Confirm"
     Then I should see "3 problem(s) encountered during import"
     When I click on "View results" "link"
     Then I should see "The user is not a tenant participant" in the "Student Three" "table_row"
@@ -77,6 +78,7 @@ Feature: Add seminar attendees in tenant context via bulk options
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees_in_tenant_context.csv" file to "CSV text file" filemanager
     And I set the field "delimiter" to "Automatic"
     When I press "Continue"
+    And I press "Confirm"
     Then I should see "3 problem(s) encountered during import"
     When I click on "View results" "link"
     Then I should see "The user is not a tenant participant" in the "Student One" "table_row"
@@ -93,6 +95,7 @@ Feature: Add seminar attendees in tenant context via bulk options
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees_in_tenant_context.csv" file to "CSV text file" filemanager
     And I set the field "delimiter" to "Automatic"
     When I press "Continue"
+    And I press "Confirm"
     Then I should see "2 problem(s) encountered during import"
     When I click on "View results" "link"
     Then I should see "Tenant isolation enabled. Members cannot attend events outside their tenant domain" in the "Student One" "table_row"
@@ -105,6 +108,7 @@ Feature: Add seminar attendees in tenant context via bulk options
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees_in_tenant_context.csv" file to "CSV text file" filemanager
     And I set the field "delimiter" to "Automatic"
     When I press "Continue"
+    And I press "Confirm"
     Then I should see "3 problem(s) encountered during import"
     When I click on "View results" "link"
     Then I should see "The user is not a tenant participant" in the "Student Three" "table_row"
@@ -118,6 +122,7 @@ Feature: Add seminar attendees in tenant context via bulk options
     And I upload "mod/facetoface/tests/fixtures/f2f_attendees_in_tenant_context.csv" file to "CSV text file" filemanager
     And I set the field "delimiter" to "Automatic"
     When I press "Continue"
+    And I press "Confirm"
     Then I should see "3 problem(s) encountered during import"
     When I click on "View results" "link"
     Then I should see "The user is not a tenant participant" in the "Student One" "table_row"
@@ -147,6 +152,7 @@ Feature: Add seminar attendees in tenant context via bulk options
     And I set the field "idfield" to "Username"
     And I set the field "csvinput" to "student1,student2,student3,student4,student6"
     And I press "Continue"
+    And I press "Confirm"
     Then I should see "3 problem(s) encountered during import"
     When I click on "View results" "link"
     Then I should see "The user is not a tenant participant" in the "Student Three" "table_row"
@@ -160,6 +166,7 @@ Feature: Add seminar attendees in tenant context via bulk options
     And I set the field "idfield" to "Username"
     And I set the field "csvinput" to "student1,student2,student3,student4,student6"
     And I press "Continue"
+    And I press "Confirm"
     Then I should see "3 problem(s) encountered during import"
     When I click on "View results" "link"
     Then I should see "The user is not a tenant participant" in the "Student One" "table_row"
@@ -175,7 +182,8 @@ Feature: Add seminar attendees in tenant context via bulk options
     And I set the field "Attendee actions" to "Add users via list of IDs"
     And I set the field "idfield" to "Username"
     And I set the field "csvinput" to "student1,student2,student3,student4,student6"
-    And I press "Continue"
+    When I press "Continue"
+    And I press "Confirm"
     Then I should see "2 problem(s) encountered during import"
     When I click on "View results" "link"
     Then I should see "Tenant isolation enabled. Members cannot attend events outside their tenant domain" in the "Student One" "table_row"
@@ -187,7 +195,8 @@ Feature: Add seminar attendees in tenant context via bulk options
     And I set the field "Attendee actions" to "Add users via list of IDs"
     And I set the field "idfield" to "Username"
     And I set the field "csvinput" to "student1,student2,student3,student4,student6"
-    And I press "Continue"
+    When I press "Continue"
+    And I press "Confirm"
     Then I should see "3 problem(s) encountered during import"
     When I click on "View results" "link"
     Then I should see "The user is not a tenant participant" in the "Student Three" "table_row"
@@ -200,7 +209,8 @@ Feature: Add seminar attendees in tenant context via bulk options
     And I set the field "Attendee actions" to "Add users via list of IDs"
     And I set the field "idfield" to "Username"
     And I set the field "csvinput" to "student1,student2,student3,student4,student6"
-    And I press "Continue"
+    When I press "Continue"
+    And I press "Confirm"
     Then I should see "3 problem(s) encountered during import"
     When I click on "View results" "link"
     Then I should see "The user is not a tenant participant" in the "Student One" "table_row"

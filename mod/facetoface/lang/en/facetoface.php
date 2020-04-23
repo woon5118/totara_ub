@@ -554,6 +554,9 @@ $string['enablemincapacitynotification'] = 'Notify about minimum bookings';
 $string['enablemincapacitynotification_help'] = 'If the minimum bookings have not been reached by the cut-off point, then the appropriate users will be notified. Users to be notified is determined by the role assignments and the configuration setting under *Site administration > Seminars > General Settings > Notification*.';
 $string['encoding'] = 'CSV file encoding';
 $string['enrolled'] = 'enrolled';
+$string['error_idnumber_not_found'] = 'No user was found with the following user ID number: {$a}';
+$string['error_email_not_found'] = 'No user was found with the following email: {$a}';
+$string['error_username_not_found'] = 'No user was found with the following username: {$a}';
 $string['error:alreadysignedup'] = 'Already signed up';
 $string['error:addalreadysignedupattendee'] = 'This user is already signed-up for this seminar activity.';
 $string['error:addalreadysignedupattendeeaddself'] = 'You are already signed-up for this seminar activity.';
@@ -627,7 +630,6 @@ $string['error:cutofftooclose'] = 'The cut-off time for minimum bookings is too 
 $string['error:cutofftoolate'] = 'The cut-off for minimum bookings is after the events earliest start date, it must be before to have any effect.';
 $string['error:datesunavailablestuff'] = 'The new dates you have selected are unavailable due to a scheduling conflict with the following resources:<br/>{$a}Please choose different dates or change the selected room/facilitators/assets.';
 $string['error:delimiternotfound'] = 'Supported CSV file delimiter is not found.';
-$string['error:emailnotfound'] = 'No users were found with the following emails: {$a}';
 $string['error:emptylocation'] = 'Location was empty.';
 $string['error:emptyvenue'] = 'Venue was empty.';
 $string['error:enrolmentfailed'] = 'Could not enrol {$a} into the course.';
@@ -641,7 +643,6 @@ $string['error:facilitatornotselected'] = 'Facilitator is not selected';
 $string['error:facilitatortypewrong'] = 'Facilitator type is wrong, please select \'External\'';
 $string['error:fieldidincorrect'] = 'Field ID is incorrect: {$a}';
 $string['error:f2ffailedupdatestatus'] = 'Seminar failed to update the user\'s status';
-$string['error:idnumbernotfound'] = 'No users were added because no users match the following user ID numbers: {$a}. Please remove invalid numbers and try again';
 $string['error:incorrectassetid'] = 'Asset ID was incorrect';
 $string['error:incorrectcourseid'] = 'Course ID was incorrect';
 $string['error:incorrectcoursemodule'] = 'Course module is incorrect';
@@ -713,7 +714,6 @@ $string['error:userbookedsessionconflictmultiday'] = '{$a->fullname} is already 
 $string['error:userbookedsessionconflictmultidayselfsignup'] = 'You are already booked to attend {$a->session} at {$a->datetimestart} to {$a->datetimefinish}.';
 $string['error:userdeleted'] = 'Can not add deleted user {$a} to the seminar.';
 $string['error:userimportuseridnotanint'] = 'Cannot add user with user id {$a} because it is not an integer';
-$string['error:usernamenotfound'] = 'No users were found with the following usernames: {$a}';
 $string['error:usernotfound'] = '(not found)';
 $string['error:usersuspended'] = 'Can not add suspended user {$a} to the seminar.';
 $string['error:xinvalidjaidnumber'] = 'Job assignment with idnumber {$a->idnumber} not found for user {$a->user}';
@@ -2900,8 +2900,13 @@ Capacity: {$a->booked} / {$a->capacity} (minimum: {$a->mincapacity})
 $string['declareinterestonlyiffull'] = 'Show "Declare Interest" link only if all events are closed';
 $string['declareinterestonlyiffull_help'] = 'Only show the declare interest option if there are no events with spaces or waiting lists.';
 
-// Deprecated since Totara 13.0
+/**
+ * @deprecated since Totara 13.0
+ */
 $string['placeholder:icq'] = '[icq]';
 $string['placeholder:msn'] = '[msn]';
 $string['placeholder:yahoo'] = '[yahoo]';
 $string['placeholder:aim'] = '[aim]';
+$string['error:idnumbernotfound'] = 'No users were added because no users match the following user ID numbers: {$a}. Please remove invalid numbers and try again';
+$string['error:emailnotfound'] = 'No users were found with the following emails: {$a}';
+$string['error:usernamenotfound'] = 'No users were found with the following usernames: {$a}';

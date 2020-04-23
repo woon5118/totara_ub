@@ -101,11 +101,12 @@ Feature: Seminar event cancellation rebooking
     And I set the field "potential users" to "Learner One, learner1@example.com,Learner Two, learner2@example.com"
     And I press "Add"
     And I press "Continue"
+    And I press "Confirm"
 
     When I follow "View results"
     Then I should see "Learner sign-up limit for this seminar was reached" in the "Learner One" "table_row"
     And I should see "Learner sign-up limit for this seminar was reached" in the "Learner Two" "table_row"
-    And I press "Close"
+    And I press "Cancel"
 
     Given I log out
     And I log in as "admin"
