@@ -37,6 +37,7 @@
             'tui-tabs__tab--active': tab.active,
             'tui-tabs__tab--disabled': tab.disabled,
             'tui-tabs__tab--transparent': transparentTabs,
+            'tui-tabs__tab--small': smallTabs,
             'tui-tabs__tab--hidden': overflowing && !measuring,
           }"
           role="presentation"
@@ -124,6 +125,9 @@ export default {
       validator: x => ['horizontal', 'vertical'].includes(x),
     },
     transparentTabs: {
+      type: Boolean,
+    },
+    smallTabs: {
       type: Boolean,
     },
   },

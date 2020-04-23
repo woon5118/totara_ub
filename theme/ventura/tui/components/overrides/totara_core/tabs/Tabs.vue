@@ -32,6 +32,10 @@
   --tui-tab-highlight-height: var(--tui-gap-1);
   // Add extra spacing for drop shadow to be displayed
   --tui-tab-shadow-offset: var(--tui-gap-3);
+  // Tab small version inner horizontal padding
+  --tui-tab-small-h-padding: var(--tui-gap-4);
+  // Tab small version inner vertical padding
+  --tui-tab-small-v-padding: var(--tui-gap-3);
 }
 
 .tui-tabs {
@@ -95,14 +99,15 @@
   }
 
   a&__link {
-    @include tui-font-link();
+    @include tui-font-link-large();
     display: flex;
     padding: var(--tui-tab-v-padding) var(--tui-tab-h-padding);
     color: var(--tui-tabs-text-color);
     text-decoration: none;
-    background: var(--tui-tabs-bg-color);
+
     border: var(--tui-tab-border-width) solid;
-    border-color: var(--tui-tabs-border-color);
+    border-color: transparent;
+
     pointer-events: auto;
 
     &:hover {
@@ -141,34 +146,10 @@
     }
   }
 
-  &__tab:last-child &__link {
-    #{$mod-horizontal} & {
-      margin-right: 0;
-    }
-
-    #{$mod-vertical} & {
-      margin-bottom: 0;
-    }
-  }
-
   &__tab--disabled a&__link {
     color: var(--tui-tabs-text-color-disabled);
-    background: var(--tui-tabs-bg-color-disabled);
-    border-color: var(--tui-tabs-border-color-disabled);
     cursor: default;
     pointer-events: none;
-  }
-
-  // since tab edges overlap, make sure a disabled tab has a non disabled left
-  // edge if it follows a non disabled tab
-  &__tab:not(&__tab--disabled) + &__tab--disabled a&__link {
-    #{$mod-horizontal} & {
-      border-left-color: var(--tui-tabs-border-color);
-    }
-
-    #{$mod-vertical} & {
-      border-top-color: var(--tui-tabs-border-color);
-    }
   }
 
   &__tab--active a&__link {
@@ -182,7 +163,7 @@
       padding-bottom: calc(
         var(--tui-tab-v-padding) + var(--tui-tab-border-width)
       );
-      border-color: var(--tui-tabs-border-color-selected);
+      border-color: var(--tui-tabs-border-color);
       box-shadow: var(--tui-shadow-3);
     }
 
@@ -194,7 +175,7 @@
       padding-left: calc(
         var(--tui-tab-h-padding) - var(--tui-tab-border-width)
       );
-      border-bottom-color: var(--tui-tabs-border-color-selected);
+      border-color: var(--tui-tabs-border-color);
       box-shadow: var(--tui-shadow-2);
     }
 
@@ -232,6 +213,42 @@
   $mod-horizontal: #{&}--horizontal;
   $block: #{&};
 
+  // Small tab
+  &__tab--small {
+    #{$mod-horizontal} & {
+      #{$block}__link {
+        @include tui-font-body-small;
+        padding: var(--tui-tab-small-v-padding) var(--tui-tab-small-h-padding);
+      }
+    }
+  }
+
+  // Active small tab
+  &__tab--active&__tab--small {
+    #{$mod-horizontal} & {
+      #{$block}__link {
+        padding-top: calc(
+          var(--tui-tab-small-v-padding) - var(--tui-tab-border-width)
+        );
+        padding-bottom: calc(
+          var(--tui-tab-small-v-padding) + var(--tui-tab-border-width)
+        );
+        color: var(--tui-tabs-text-color-selected);
+      }
+    }
+  }
+
+  // Disabled small tab
+  &__tab--disabled&__tab--small {
+    #{$mod-horizontal} & {
+      #{$block}__link {
+        color: var(--tui-tabs-text-color-disabled);
+        cursor: default;
+        pointer-events: none;
+      }
+    }
+  }
+
   // Normal transparent tab
   &__tab--transparent {
     #{$mod-horizontal} & {
@@ -261,6 +278,7 @@
       #{$block}__link {
         font-weight: bold;
         background: transparent;
+        border: none;
         box-shadow: none;
 
         // Overwrite to position at bottom & matching text width

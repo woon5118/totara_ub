@@ -30,7 +30,7 @@
         <Button text="Add tab" @click="addTab" />
         <Button text="Remove tab" @click="removeTab" />
       </p>
-      <Tabs>
+      <Tabs :small-tabs="smallTabs">
         <Tab
           v-for="tab in tabs"
           :id="tab.id"
@@ -52,6 +52,12 @@
           <Radio :value="3">3</Radio>
           <Radio :value="4">4</Radio>
           <Radio :value="5">5</Radio>
+        </RadioGroup>
+      </FormRow>
+      <FormRow label="Small tabs">
+        <RadioGroup v-model="smallTabs" :horizontal="true">
+          <Radio :value="false">Normal</Radio>
+          <Radio :value="true">Small</Radio>
         </RadioGroup>
       </FormRow>
     </SamplesPropCtl>
@@ -99,6 +105,7 @@ export default {
       ],
       selectedId: 1,
       disabledId: 0,
+      smallTabs: false,
       codeTemplate: `<Tabs>
   <Tab
     v-for="tab in tabs"
