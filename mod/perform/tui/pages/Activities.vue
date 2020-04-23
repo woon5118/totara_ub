@@ -47,6 +47,15 @@
       </Modal>
     </ModalPresenter>
 
+    <ConfirmationModal
+      :open="activateModalOpen"
+      :title="$str('modal_activate_title', 'mod_perform')"
+      @confirm="activateActivity(activateModalActivityId)"
+      @cancel="closeActivateModal"
+    >
+      <span v-html="$str('modal_activate_message', 'mod_perform')" />
+    </ConfirmationModal>
+
     <loader :loading="$apollo.loading">
       <Table v-if="!$apollo.loading" :data="activities">
         <template v-slot:header-row>
@@ -72,17 +81,41 @@
             {{ row.state.display_name }}
           </Cell>
           <Cell size="1" :column-header="$str('view_actions', 'mod_perform')">
-            <a
-              v-if="row.can_view_participation_reporting"
-              :href="getParticipationReportingUrl(row.id)"
-              :title="$str('participation_reporting', 'mod_perform')"
-            >
-              <ParticipationReportingIcon
-                :alt="$str('participation_reporting', 'mod_perform')"
+            <div class="tui-performActivities__actionIcons">
+              <a
+                v-if="row.can_view_participation_reporting"
+                :href="getParticipationReportingUrl(row.id)"
                 :title="$str('participation_reporting', 'mod_perform')"
-                size="200"
-              />
-            </a>
+              >
+                <ParticipationReportingIcon
+                  :alt="$str('participation_reporting', 'mod_perform')"
+                  :title="$str('participation_reporting', 'mod_perform')"
+                  size="200"
+                />
+              </a>
+              <Dropdown position="bottom-right">
+                <template v-slot:trigger="{ toggle }">
+                  <a href="#" @click.prevent="toggle">
+                    <ActivityActionsIcon
+                      :alt="$str('activity_action_options', 'mod_perform')"
+                      :title="$str('activity_action_options', 'mod_perform')"
+                      size="200"
+                    />
+                  </a>
+                </template>
+                <DropdownItem
+                  v-if="row.can_potentially_activate"
+                  :disabled="!row.can_activate"
+                  :title="getActivateOptionTitle(row)"
+                  @click="showActivateModal(row.id)"
+                >
+                  {{ $str('activity_action_activate', 'mod_perform') }}
+                </DropdownItem>
+                <DropdownItem>{{
+                  $str('activity_action_delete', 'mod_perform')
+                }}</DropdownItem>
+              </Dropdown>
+            </div>
           </Cell>
         </template>
       </Table>
@@ -93,7 +126,10 @@
 <script>
 import Button from 'totara_core/components/buttons/Button';
 import Cell from 'totara_core/components/datatable/Cell';
+import Dropdown from 'totara_core/components/dropdown/Dropdown';
+import DropdownItem from 'totara_core/components/dropdown/DropdownItem';
 import ParticipationReportingIcon from 'mod_perform/components/icons/ParticipationReporting';
+import ActivityActionsIcon from 'mod_perform/components/icons/ActivityActions';
 import GeneralInfoForm from 'mod_perform/components/manage_activity/GeneralInfoForm';
 import HeaderCell from 'totara_core/components/datatable/HeaderCell';
 import Loader from 'totara_core/components/loader/Loader';
@@ -103,11 +139,16 @@ import ModalPresenter from 'totara_core/components/modal/ModalPresenter';
 import Table from 'totara_core/components/datatable/Table';
 import performActivitiesQuery from 'mod_perform/graphql/activities.graphql';
 import { notify } from 'totara_core/notifications';
+import ConfirmationModal from 'totara_core/components/modal/ConfirmationModal';
 
 const TOAST_DURATION = 10 * 1000; // in microseconds.
 
 export default {
   components: {
+    ConfirmationModal,
+    DropdownItem,
+    Dropdown,
+    ActivityActionsIcon,
     Button,
     Cell,
     HeaderCell,
@@ -133,6 +174,8 @@ export default {
     return {
       activities: [],
       modalOpen: false,
+      activateModalOpen: false,
+      activateModalActivityId: null,
     };
   },
   methods: {
@@ -189,6 +232,36 @@ export default {
         params
       );
     },
+
+    showActivateModal(activityId) {
+      this.activateModalOpen = true;
+      this.activateModalActivityId = activityId;
+    },
+
+    closeActivateModal() {
+      this.activateModalOpen = false;
+      this.activateModalActivityId = null;
+    },
+
+    /**
+     * For certain cases, get a title text for the 'Activate" dropdown option.
+     *
+     */
+    getActivateOptionTitle(row) {
+      if (row.can_potentially_activate && !row.can_activate) {
+        return this.$str('activity_draft_not_ready', 'mod_perform');
+      }
+      return '';
+    },
+
+    /**
+     * Activate an activity
+     *
+     * @param activityId
+     */
+    activateActivity(activityId) {
+      console.log(activityId);
+    },
   },
   apollo: {
     activities: {
@@ -204,8 +277,14 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
+      "activity_action_activate",
+      "activity_action_delete",
+      "activity_action_options",
+      "activity_draft_not_ready",
       "add_activity",
       "get_started",
+      "modal_activate_message",
+      "modal_activate_title",
       "participation_reporting",
       "perform:manage_activity",
       "toast_error_create_activity",

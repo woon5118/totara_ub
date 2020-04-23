@@ -23,7 +23,11 @@
 
 $string['pluginname'] = 'Performance activity';
 
+$string['activity_action_activate'] = 'Activate';
+$string['activity_action_delete'] = 'Delete';
+$string['activity_action_options'] = 'Actions';
 $string['activity_content_tab_heading'] = 'Content';
+$string['activity_draft_not_ready'] = 'Draft is not yet ready for activation';
 $string['activity_name'] = 'Performance activity name';
 $string['activity_participants_add'] = 'Add participants';
 $string['activity_participants_heading'] = 'Participants';
@@ -73,6 +77,12 @@ $string['manage_activities_tabs_general'] = 'General';
 $string['manage_activity_page_title'] = 'Manage performance activity';
 $string['manage_edit_draft_heading'] = 'Edit draft: “{$a}”';
 $string['menu_title_activity_management'] = 'Activity Management';
+$string['modal_activate_title'] = 'Confirm activity activation';
+$string['modal_activate_message'] = '<p>Activation will make this activity live. Subjects will be assigned, and instances '
+    . 'generated for them according to the schedule set on the activity. Once activated, changes can still be made '
+    . 'to assignments, but content cannot be edited.</p>'
+    . '<p>{$a->assignable_user_count} users will be assigned on activation.</p>'
+    . '<p>Are you sure you would like to activate this activity?</p>';
 $string['modulename'] = 'Performance activity';
 $string['modulenameplural'] = 'Performance activities';
 $string['participant_instance_status_complete'] = 'Complete';
