@@ -5,7 +5,10 @@ mutation mod_perform_activate_activity(
     activity {
       id
       name
-      status_name
+      state {
+        code
+        display_name
+      }
     }
   }
 }

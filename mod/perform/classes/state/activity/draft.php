@@ -53,6 +53,13 @@ class draft extends activity_state {
     /**
      * @inheritDoc
      */
+    public static function get_display_name(): string {
+        return get_string('activity_status_draft', 'mod_perform');
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function get_transitions(): array {
         return [
             // A draft activity can be activated.

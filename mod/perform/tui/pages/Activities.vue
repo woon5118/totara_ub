@@ -69,7 +69,7 @@
             {{ row.type.display_name }}
           </Cell>
           <Cell size="2" :column-header="$str('view_status', 'mod_perform')">
-            {{ $str('view_status_active', 'mod_perform') }}
+            {{ row.state.display_name }}
           </Cell>
           <Cell size="1" :column-header="$str('view_actions', 'mod_perform')">
             <a
@@ -212,7 +212,6 @@ export default {
       "view_actions",
       "view_name",
       "view_status",
-      "view_status_active",
       "view_type"
     ]
   }

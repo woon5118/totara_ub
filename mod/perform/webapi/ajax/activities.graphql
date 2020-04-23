@@ -7,5 +7,8 @@ query mod_perform_activities {
     }
     updated_at
     can_view_participation_reporting
+    state {
+      display_name
+    }
   }
 }

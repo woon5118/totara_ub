@@ -8,6 +8,15 @@ type mod_perform_activity_type {
 }
 
 """
+Represents the state an activity is in
+"""
+type mod_perform_activity_state {
+  code: Int!
+  name: mod_perform_activity_state_enums!
+  display_name: String!
+}
+
+"""
 This is generic performance activity
 """
 type mod_perform_activity {
@@ -20,8 +29,7 @@ type mod_perform_activity {
   can_potentially_activate: Boolean! # Whether this activity could be activated due to capability checks and current status, without checking further conditions
   can_activate: Boolean! # Whether this activity can be activated, only if it satisfies all conditions
   sections: [mod_perform_section!]!
-  status: Int!
-  status_name: mod_perform_activity_status!
+  state: mod_perform_activity_state!
 }
 
 """
@@ -113,7 +121,7 @@ type mod_perform_participant_instance {
 """
 A list of possible states that a performance activity can be in
 """
-enum mod_perform_activity_status {
+enum mod_perform_activity_state_enums {
   DRAFT
   ACTIVE
 }
@@ -278,7 +286,7 @@ extend type Mutation {
   mod_perform_create_activity(
     name: param_text!
     description: param_text
-    status: mod_perform_activity_status
+    status: mod_perform_activity_state_enums
   ): mod_perform_activity_result!
 
   mod_perform_update_activity_general_info(

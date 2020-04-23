@@ -54,6 +54,13 @@ class active extends activity_state implements state_event {
     /**
      * @inheritDoc
      */
+    public static function get_display_name(): string {
+        return get_string('activity_status_active', 'mod_perform');
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function get_transitions(): array {
         return [];
     }

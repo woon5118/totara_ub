@@ -141,5 +141,4 @@ $string['user_group_assignment_usercount'] = 'Users';
 $string['view_actions'] = 'Actions';
 $string['view_name'] = 'Name';
 $string['view_status'] = 'Status';
-$string['view_status_active'] = 'Active';
 $string['view_type'] = 'Type';

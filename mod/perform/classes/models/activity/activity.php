@@ -33,6 +33,7 @@ use mod_perform\state\activity\draft;
 use mod_perform\state\state;
 use mod_perform\state\state_aware;
 use mod_perform\util;
+use mod_perform\webapi\resolver\type\activity_state;
 use totara_core\relationship\relationship;
 
 /**
@@ -45,6 +46,8 @@ use totara_core\relationship\relationship;
  * @property-read string $name
  * @property-read string $description
  * @property-read int $status
+ * @property-read activity_state $state
+ * @property-read int $type
  * @property-read int $created_at
  * @property-read int $updated_at
  * @property-read collection|section[] $sections
@@ -72,8 +75,9 @@ class activity extends model {
         'sections',
         'relationships',
         'tracks',
+        'can_activate',
         'can_potentially_activate',
-        'status_name'
+        'state'
     ];
 
     public const NAME_MAX_LENGTH = 255;
@@ -411,15 +415,6 @@ class activity extends model {
      */
     public function get_current_state_code(): int {
         return $this->entity->status;
-    }
-
-    /**
-     * Get name representation of current status
-     *
-     * @return string
-     */
-    public function get_status_name(): string {
-        return $this->get_state()->get_name();
     }
 
     /**

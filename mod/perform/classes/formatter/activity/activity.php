@@ -44,9 +44,9 @@ class activity extends entity_model_formatter {
             'updated_at' => date_field_formatter::class,
             'sections' => null,
             'status' => null,
-            'status_name' => null,
-            'can_potentially_activate' => null,
+            'state' => null,
             'can_activate' => null,
+            'can_potentially_activate' => null,
         ];
     }
 }

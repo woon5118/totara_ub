@@ -65,6 +65,8 @@ class create_activity implements mutation_resolver {
             // Create a performance activity inside the new performance container.
             $name = $args['name'];
             $description = $args['description'] ?? null;
+            // TODO TL-24773 leaving this as active for now as we do not have the interface
+            //      to activate for now. Once this is there we need to change the default to draft
             $status = $args['status'] ?? active::get_code();
 
             /** @var perform_container $container */

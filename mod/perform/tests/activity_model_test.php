@@ -25,6 +25,7 @@ use mod_perform\models\activity\activity;
 use mod_perform\models\activity\activity_type;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\state\activity\active;
+use mod_perform\state\activity\draft;
 
 /**
  * @group perform
@@ -162,6 +163,34 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
 
         $new_entity->exists_now = false;
         $activity->update_general_info('name', 'description');
+    }
+
+    public function test_status() {
+        $this->setAdminUser();
+
+        $data_generator = $this->getDataGenerator();
+        /** @var mod_perform_generator $perform_generator */
+        $perform_generator = $data_generator->get_plugin_generator('mod_perform');
+
+        $draft_activity = $perform_generator->create_activity_in_container([
+            'activity_name' => 'User1 One',
+            'activity_status' => draft::get_code()
+        ]);
+
+        $this->assertEquals(draft::get_code(), $draft_activity->status);
+        $state = $draft_activity->get_state();
+        $this->assertEquals('DRAFT', $state->get_name());
+        $this->assertEquals('Draft', $state->get_display_name());
+
+        $active_activity = $perform_generator->create_activity_in_container([
+            'activity_name' => 'User1 One',
+            'activity_status' => active::get_code()
+        ]);
+
+        $this->assertEquals(active::get_code(), $active_activity->status);
+        $state = $active_activity->get_state();
+        $this->assertEquals('ACTIVE', $state->get_name());
+        $this->assertEquals('Active', $state->get_display_name());
     }
 
     /**
