@@ -66,4 +66,4 @@ Feature: Test the basic functionality of the Totara report graph block
      | Max width                    | 800px                      |
     And I press "Save changes"
     Then I should see "My user report graph block"
-    And I should see "Report" in the "My user report graph block" "block"
+    And I should see "View full report" in the "My user report graph block" "block"

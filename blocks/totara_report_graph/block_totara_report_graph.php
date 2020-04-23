@@ -148,7 +148,8 @@ class block_totara_report_graph extends block_base {
             if (!empty($this->rawreport->savedid)) {
                 $url->param('sid', $this->rawreport->savedid);
             }
-            $this->content->footer = '<a href="'.$url.'">'.get_string('report', 'totara_reportbuilder').'</a>';
+            $attrs = ['aria-label' => get_string('viewfullreportlabel', 'block_totara_report_graph')];
+            $this->content->footer = html_writer::link($url, get_string('viewfullreport', 'block_totara_report_graph'), $attrs);
         }
 
         $chart = \totara_reportbuilder\local\graph\base::create_graph(reportbuilder::create($this->rawreport->id));
