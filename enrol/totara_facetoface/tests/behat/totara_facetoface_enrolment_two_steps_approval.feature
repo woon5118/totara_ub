@@ -53,7 +53,7 @@ Feature: Users can enrol on courses when two steps approval is on
     And I click on "Micky Mau" from the search results in the "Select activity level approvers" totara dialogue
     And I click on "Save" "button" in the "Select activity level approvers" "totaradialogue"
     And I press "Save and display"
-    And I follow "Add a new event"
+    And I follow "Add event"
     And I set the following fields to these values:
       | capacity           | 10   |
     And I press "Save changes"
@@ -62,10 +62,9 @@ Feature: Users can enrol on courses when two steps approval is on
   Scenario: Student gets approved and enrolled through both steps of the 2 stage approval
     Given I log in as "jimmy"
     And I am on "Course1" course homepage
-    And I should see "Request approval"
-    And I follow "Request approval"
-    And I should see "Manager and Administrative approval"
+    And I press "Go to event"
     And I press "Request approval"
+    And I should see "Your request was sent to your manager for approval."
     And I run all adhoc tasks
     And I log out
 
@@ -104,7 +103,7 @@ Feature: Users can enrol on courses when two steps approval is on
 
     When I am on "Course1" course homepage
     And I follow "View all events"
-    Then I should see "Booked" in the "More info" "table_row"
+    Then I should see "Booked" in the "Upcoming" "table_row"
     And I log out
 
     When I log in as "admin"
