@@ -31,7 +31,6 @@
         :value="activity.edit_name"
         :placeholder="label"
         @input="updateActivity({ edit_name: $event })"
-        @submit="trySave"
       />
     </FormRow>
 
@@ -47,12 +46,27 @@
       />
     </FormRow>
 
+    <FormRow
+      v-slot="{ id, label }"
+      :label="$str('general_info_label_activity_type', 'mod_perform')"
+    >
+      <SelectFilter
+        v-if="isNew"
+        v-model="activityTypeSelection"
+        :label="$str('general_info_label_activity_type', 'mod_perform')"
+        :options="activityTypes"
+        :show-label="false"
+        :stacked="false"
+      />
+      <span v-else>{{ activityTypeName }}</span>
+    </FormRow>
+
     <FormRow :style="actionButtonStyling">
       <ButtonGroup>
         <Button
           :styleclass="{ primary: true }"
           :text="submitButtonText"
-          :disabled="isSaving || hasNoTitle"
+          :disabled="isSaving || hasNoTitle || hasNoType"
           type="submit"
           @click.prevent="trySave"
         />
@@ -67,9 +81,13 @@ import ButtonGroup from 'totara_core/components/buttons/ButtonGroup';
 import Form from 'totara_core/components/form/Form';
 import FormRow from 'totara_core/components/form/FormRow';
 import InputText from 'totara_core/components/form/InputText';
+import SelectFilter from 'totara_core/components/filters/SelectFilter';
 import Textarea from 'totara_core/components/form/Textarea';
 import UpdateGeneralInfoMutation from 'mod_perform/graphql/update_activity_general_info.graphql';
 import CreateActivityMutation from 'mod_perform/graphql/create_activity.graphql';
+
+//GraphQL
+import ActivityTypesQuery from 'mod_perform/graphql/activity_types';
 
 export default {
   components: {
@@ -78,6 +96,7 @@ export default {
     Form,
     FormRow,
     InputText,
+    SelectFilter,
     Textarea,
   },
   props: {
@@ -104,10 +123,23 @@ export default {
     },
   },
   data() {
+    const activity = Object.assign({}, this.value);
+    const typeId = activity && activity.id ? activity.type.id : 0;
+    const typeName =
+      activity && activity.id ? activity.type.display_name : 'unknown';
+
     return {
+      activityTypes: [
+        {
+          id: 0,
+          label: this.$str('general_info_select_activity_type', 'mod_perform'),
+        },
+      ],
+      activityTypeSelection: typeId,
+      activityTypeName: typeName,
       isSaving: false,
       mutationError: null,
-      activity: Object.assign({}, this.value),
+      activity: activity,
     };
   },
   computed: {
@@ -136,6 +168,15 @@ export default {
      */
     hasNoTitle() {
       return !this.activity.edit_name || this.activity.edit_name.length === 0;
+    },
+
+    /**
+     * Is the activity type unselected.
+     *
+     * @returns {boolean}
+     */
+    hasNoType() {
+      return this.activityTypeSelection === 0;
     },
 
     /**
@@ -169,6 +210,9 @@ export default {
      */
     async trySave() {
       this.isSaving = true;
+      this.activityTypeName = this.activityTypes[
+        this.activityTypeSelection
+      ].label;
 
       try {
         const savedActivity = await this.save();
@@ -209,6 +253,7 @@ export default {
         variables = {
           name: this.activity.edit_name,
           description: this.activity.edit_description,
+          type: this.activityTypeSelection,
         };
       }
 
@@ -221,6 +266,29 @@ export default {
       return resultData[mutationName].activity;
     },
   },
+
+  apollo: {
+    activityTypes: {
+      query: ActivityTypesQuery,
+      variables() {
+        return [];
+      },
+      update({ mod_perform_activity_types: types }) {
+        const options = types
+          .map(type => {
+            return { id: type.id, label: type.display_name };
+          })
+          .sort((a, b) => a.label.localeCompare(b.label));
+
+        options.unshift({
+          id: 0,
+          label: this.$str('general_info_select_activity_type', 'mod_perform'),
+        });
+
+        return options;
+      },
+    },
+  },
 };
 </script>
 
@@ -229,6 +297,8 @@ export default {
     "mod_perform": [
       "general_info_label_activity_description",
       "general_info_label_activity_title",
+      "general_info_label_activity_type",
+      "general_info_select_activity_type",
       "save_changes"
     ]
   }

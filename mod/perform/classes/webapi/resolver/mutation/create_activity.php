@@ -51,13 +51,11 @@ class create_activity implements mutation_resolver {
             throw new create_exception(get_string('error_activity_name_missing', 'mod_perform'));
         }
 
-        // TBD: the model will be loaded by id in TL-24739. For now just use a default and load in by name
-        $type = $args['type'] ?? 'appraisal';
+        $type = $args['type'] ?? null;
         if (!$type) {
             throw new create_exception(get_string('error_activity_type_missing', 'mod_perform'));
         }
-        $type_model = activity_type::load_by_name($type);
-        //$type_model = activity_type::load_by_id($type);
+        $type_model = activity_type::load_by_id($type);
         if (!$type_model) {
             throw new create_exception(get_string('error_activity_type_unknown', 'mod_perform'));
         }

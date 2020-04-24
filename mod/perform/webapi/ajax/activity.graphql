@@ -3,6 +3,7 @@ query mod_perform_activity($activity_id: core_id!) {
     id
     name
     type {
+      id
       display_name
     }
     edit_name: name(format: RAW)

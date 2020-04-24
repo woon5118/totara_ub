@@ -40,7 +40,7 @@ class activity_type {
     /**
      * Returns the activity types.
      *
-     * @return collection the list of activity types.
+     * @return collection|activity_type_model[] the list of activity types.
      */
     public function get(): collection {
         if (is_null($this->items)) {
@@ -51,12 +51,13 @@ class activity_type {
     }
 
     /**
-     * Fetches activity types from the database.
+     * Fetches activity types from the database and sorts it by id.
      *
      * @return activity_type this object.
      */
     public function fetch(): activity_type {
         $this->items = activity_type_entity::repository()
+            ->order_by('id')
             ->get()
             ->map_to(activity_type_model::class);
 

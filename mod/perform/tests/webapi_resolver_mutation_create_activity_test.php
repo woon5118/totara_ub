@@ -42,7 +42,7 @@ class mod_perform_webapi_resolver_mutation_create_activity_testcase extends adva
         $args = [
             'name' => "Mid year performance review",
             'description' => "Test Description",
-            'type' => $expected_type->name
+            'type' => $expected_type->id
         ];
 
         /** @type activity $result */
@@ -61,7 +61,7 @@ class mod_perform_webapi_resolver_mutation_create_activity_testcase extends adva
         $args = [
             'name' => 'Mid year performance review',
             'description' => 'Test Description',
-            'type' => 'appraisal'
+            'type' => activity_type::load_by_name('appraisal')->id
         ];
 
         $this->expectException(create_exception::class);
@@ -74,7 +74,7 @@ class mod_perform_webapi_resolver_mutation_create_activity_testcase extends adva
         $args = [
             'name' => '',
             'description' => 'Test Description',
-            'type' => 'appraisal'
+            'type' => activity_type::load_by_name('feedback')->id
         ];
         $this->expectException(create_exception::class);
         $this->expectExceptionMessage('You are not allowed to create an activity with an empty name');
@@ -83,10 +83,11 @@ class mod_perform_webapi_resolver_mutation_create_activity_testcase extends adva
 
     public function test_create_activity_with_empty_description(): void {
         $this->setAdminUser();
+        $type_id = activity_type::load_by_name('feedback')->id;
         $args = [
             'name' => 'Mid year performance review',
             'description' => "",
-            'type' => 'appraisal'
+            'type' => $type_id
         ];
 
         ['activity' => $result] = create_activity::resolve($args, $this->get_execution_context());
@@ -96,7 +97,7 @@ class mod_perform_webapi_resolver_mutation_create_activity_testcase extends adva
         $args = [
             'name' => 'Mid year performance review',
             'description' => null,
-            'type' => 'appraisal'
+            'type' => $type_id
         ];
 
         ['activity' => $result] = create_activity::resolve($args, $this->get_execution_context());
@@ -104,8 +105,6 @@ class mod_perform_webapi_resolver_mutation_create_activity_testcase extends adva
         $this->assertNull($result->description);
     }
 
-    /*
-    TODO: To be enabled in TL-24739
     public function test_create_activity_with_empty_type(): void {
         $this->setAdminUser();
         $args = [
@@ -116,13 +115,12 @@ class mod_perform_webapi_resolver_mutation_create_activity_testcase extends adva
         $this->expectExceptionMessageRegExp("/type/");
         create_activity::resolve($args, $this->get_execution_context());
     }
-    */
 
     public function test_create_activity_with_invalid_type(): void {
         $this->setAdminUser();
         $args = [
             'name' => 'Mid year performance review',
-            'type' => "12334"
+            'type' => 12334
         ];
 
         $this->expectException(create_exception::class);

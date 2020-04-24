@@ -884,5 +884,18 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020042200, 'perform');
     }
 
+    if ($oldversion < 2020042900) {
+        // Drop name index on perform_type if it exists.
+        $table = new xmldb_table('perform_type');
+        $index = new xmldb_index('perform_type_name', XMLDB_INDEX_UNIQUE, ['name']);
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020042900, 'perform');
+    }
+
+
     return true;
 }

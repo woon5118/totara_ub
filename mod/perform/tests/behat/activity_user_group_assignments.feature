@@ -30,8 +30,8 @@ Feature: Assign user groups to perform activities
     Given I log in as "admin"
     And I navigate to the manage perform activities page
     Then I should see the tui datatable contains:
-      | Name             | Status |
-      | My Test Activity | Active |
+      | Name             | Type     | Status |
+      | My Test Activity | Feedback | Active |
 
     When I click on "My Test Activity" "link"
     And I click on "Assignments" "link"

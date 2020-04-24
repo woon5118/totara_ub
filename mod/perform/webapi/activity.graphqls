@@ -1,13 +1,4 @@
 """
-Performance activity type
-"""
-type mod_perform_activity_type {
-  id: core_id
-  name: String!
-  display_name(format: core_format = PLAIN): String!
-}
-
-"""
 Represents the state an activity is in
 """
 type mod_perform_activity_state {
@@ -287,6 +278,7 @@ extend type Mutation {
     name: param_text!
     description: param_text
     status: mod_perform_activity_state_enums
+    type: core_id!
   ): mod_perform_activity_result!
 
   mod_perform_update_activity_general_info(

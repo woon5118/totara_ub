@@ -90,13 +90,8 @@ class core_webapi_query_activity_types_testcase extends advanced_testcase {
 
         return activity_type_entity::repository()
             ->get()
-            ->reduce(
-                function (array $map, activity_type_entity $entity): array {
-                    $map[$entity->id] = activity_type_model::load_by_entity($entity);
-                    return $map;
-                },
-                []
-            );
+            ->map_to(activity_type_model::class)
+            ->all(true);
     }
 
     /**
