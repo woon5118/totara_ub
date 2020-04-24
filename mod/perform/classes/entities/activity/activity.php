@@ -47,6 +47,7 @@ use totara_core\entities\relationship;
  * @property-read collection|section[] $sections
  * @property-read collection|activity_relationship[] $activity_relationships
  * @property-read collection|relationship[] $relationships
+ * @property-read collection|track[] $tracks
  * @property-read activity_type $type
  *
  * @method static activity_repository repository()
@@ -76,6 +77,15 @@ class activity extends entity {
      */
     public function activity_relationships(): has_many {
         return $this->has_many(activity_relationship::class, 'activity_id');
+    }
+
+    /**
+     * Tracks for this activity.
+     *
+     * @return has_many
+     */
+    public function tracks(): has_many {
+        return $this->has_many(track::class, 'activity_id');
     }
 
     /**

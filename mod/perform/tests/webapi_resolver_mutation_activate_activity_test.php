@@ -194,6 +194,8 @@ class mod_perform_webapi_resolver_mutation_activate_activity_testcase extends ad
         $element = $perform_generator->create_element(['title' => 'Question one']);
         $perform_generator->create_section_element($section, $element);
 
+        $perform_generator->create_single_activity_track_and_assignment($activity);
+
         return $activity;
     }
 

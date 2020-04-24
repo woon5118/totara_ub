@@ -24,27 +24,25 @@
 namespace mod_perform\state\activity\condition;
 
 use mod_perform\models\activity\activity;
+use mod_perform\models\activity\track_assignment;
 use mod_perform\state\condition;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * The activity has at least one section with at least one valid question and one relationship
+ * The activity has at least one track with one assignment
  */
-class at_least_one_section_with_question_and_relationship extends condition {
+class at_least_one_track_with_one_assignment extends condition {
 
     public function pass(): bool {
         /** @var activity $activity */
         $activity = $this->object;
 
-        $sections = $activity->get_sections();
+        $tracks = $activity->get_tracks();
 
-        // Check whether the activity has at least one section element
-        // and one relationship for a section
-        foreach ($sections as $section) {
-            $relationships = $section->get_section_relationships();
-            $section_elements = $section->get_section_elements();
-            if (!empty($relationships) && !empty($section_elements)) {
+        // Check whether the activity has at least one track with one assignment
+        foreach ($tracks as $track) {
+            if ($track->has_assignments()) {
                 return true;
             }
         }

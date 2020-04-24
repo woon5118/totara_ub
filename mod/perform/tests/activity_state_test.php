@@ -160,9 +160,17 @@ class mod_perform_activity_state_testcase extends advanced_testcase {
         $this->assertTrue($invalid_draft_activity->can_potentially_activate());
         $this->assertFalse($invalid_draft_activity->can_activate());
 
-        // Finally, with a section element we have all the pieces together
+        // Same with a section element
         $element = $perform_generator->create_element(['title' => 'Question one']);
         $perform_generator->create_section_element($section, $element);
+
+        $invalid_draft_activity->refresh(true);
+
+        $this->assertTrue($invalid_draft_activity->can_potentially_activate());
+        $this->assertFalse($invalid_draft_activity->can_activate());
+
+        // Finally, with a track and assignment we have everything in place
+        $perform_generator->create_single_activity_track_and_assignment($invalid_draft_activity);
 
         $invalid_draft_activity->refresh(true);
 
@@ -205,6 +213,8 @@ class mod_perform_activity_state_testcase extends advanced_testcase {
 
         $element = $perform_generator->create_element(['title' => 'Question one']);
         $perform_generator->create_section_element($section, $element);
+
+        $perform_generator->create_single_activity_track_and_assignment($activity);
 
         return $activity;
     }

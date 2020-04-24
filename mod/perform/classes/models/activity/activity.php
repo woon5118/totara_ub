@@ -49,6 +49,7 @@ use totara_core\relationship\relationship;
  * @property-read int $updated_at
  * @property-read collection|section[] $sections
  * @property-read collection|relationship[] $relationships
+ * @property-read collection|track[] $tracks
  *
  * @package mod_perform\models\activity
  */
@@ -70,6 +71,7 @@ class activity extends model {
         'type',
         'sections',
         'relationships',
+        'tracks',
         'can_potentially_activate',
         'status_name'
     ];
@@ -217,6 +219,9 @@ class activity extends model {
             if ($this->entity->relation_loaded('sections')) {
                 $this->entity->load_relation('sections');
             }
+            if ($this->entity->relation_loaded('tracks')) {
+                $this->entity->load_relation('tracks');
+            }
         }
         return $this;
     }
@@ -325,6 +330,16 @@ class activity extends model {
     public function get_type(): activity_type {
         return activity_type::load_by_entity($this->entity->type);
     }
+
+    /**
+     * Get the tracks of this activity.
+     *
+     * @return collection|track[]
+     */
+    public function get_tracks(): collection {
+        return $this->entity->tracks->map_to(track::class);
+    }
+
     /**
      * Returns whether this activity is still in draft state
      *

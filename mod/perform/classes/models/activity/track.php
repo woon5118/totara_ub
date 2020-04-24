@@ -149,6 +149,15 @@ class track extends model {
     }
 
     /**
+     * Returns whether this track has assignments
+     *
+     * @return bool
+     */
+    public function has_assignments(): bool {
+        return $this->entity->assignments()->exists();
+    }
+
+    /**
      * Adds a user group assignment to this track if it doesn't already exist.
      *
      * NB: no check is done to see if this incoming group id really corresponds
