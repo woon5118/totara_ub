@@ -1024,7 +1024,11 @@ function import_course($importname, $importtime) {
                 $gradeitem = ($cache[$course->courseid] = $cache[$course->courseid] ?? $gradeitem = grade_item::fetch_course_item($course->courseid));
                 if ($gradeitem !== false) {
                     // Convert point to percentage.
-                    $grade_percent = ((grade_floatval($grade_point) - $gradeitem->grademin) * 100) / ($gradeitem->grademax - $gradeitem->grademin);
+                    if ($gradeitem->grademax != $gradeitem->grademin) {
+                        $grade_percent = ((grade_floatval($grade_point) - $gradeitem->grademin) * 100) / ($gradeitem->grademax - $gradeitem->grademin);
+                    } else {
+                        // Cannot scale a grade if grademax is equal to grademin.
+                    }
                 } else {
                     // Nothing is doable for a non-existent course.
                 }
