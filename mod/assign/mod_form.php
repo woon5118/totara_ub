@@ -217,7 +217,23 @@ class mod_assign_mod_form extends moodleform_mod {
      * @param array $files
      */
     public function validation($data, $files) {
+        global $DB;
+
         $errors = parent::validation($data, $files);
+
+        // Totara: Check that grade to pass is set if it is required for completion.
+        if (empty($data['gradepass']) || $data['gradepass'] <= 0) {
+            if (!empty($data['completionunlocked'])) {
+                if ($data['completion'] == COMPLETION_TRACKING_AUTOMATIC && !empty($data['completionpass'])) {
+                    $errors['gradepass'] = get_string('gradepassrequiredforcompletion', 'mod_assign');
+                }
+            } else if ($data['instance']) {
+                $completionpass = $DB->get_field('assign', 'completionpass', ['id' => $data['instance']], MUST_EXIST);
+                if ($completionpass) {
+                    $errors['gradepass'] = get_string('gradepassrequiredforcompletion', 'mod_assign');
+                }
+            }
+        }
 
         if ($data['allowsubmissionsfromdate'] && $data['duedate']) {
             if ($data['allowsubmissionsfromdate'] > $data['duedate']) {
@@ -236,6 +252,20 @@ class mod_assign_mod_form extends moodleform_mod {
         }
         if ($data['blindmarking'] && $data['attemptreopenmethod'] == ASSIGN_ATTEMPT_REOPEN_METHOD_UNTILPASS) {
             $errors['attemptreopenmethod'] = get_string('reopenuntilpassincompatiblewithblindmarking', 'assign');
+        }
+
+        // Totara: Verify 'grade to pass' completion setting.
+        if (array_key_exists('completion', $data) && $data['completion'] == COMPLETION_TRACKING_AUTOMATIC) {
+            $completionpass = isset($data['completionpass']) ? $data['completionpass'] : !empty($this->current->completionpass);
+
+            // Show an error if require passing grade was selected and the grade to pass was set to 0.
+            if ($completionpass && (empty($data['gradepass']) || grade_floatval($data['gradepass']) == 0)) {
+                if (isset($data['completionpass'])) {
+                    $errors['completionpass'] = get_string('gradetopassnotset', 'mod_assign');
+                } else {
+                    $errors['gradepass'] = get_string('gradetopassmustbeset', 'mod_assign');
+                }
+            }
         }
 
         // If you wan to use 'Student must receive a grade to complete this activity' then you need to enable either
@@ -291,6 +321,11 @@ class mod_assign_mod_form extends moodleform_mod {
                                 0, array('subdirs' => 0));
         $defaultvalues['introattachments'] = $draftitemid;
 
+        // Totara: Completion settings check.
+        if (empty($defaultvalues['completionusegrade'])) {
+            $defaultvalues['completionpass'] = 0; // Forced unchecked.
+        }
+
         $assignment->plugin_data_preprocessing($defaultvalues);
     }
 
@@ -301,9 +336,18 @@ class mod_assign_mod_form extends moodleform_mod {
      */
     public function add_completion_rules() {
         $mform =& $this->_form;
+        $items = array();
 
         $mform->addElement('checkbox', 'completionsubmit', '', get_string('completionsubmit', 'assign'));
-        return array('completionsubmit');
+        $items[] = 'completionsubmit';
+
+        // Totara: Add require passing grade
+        $mform->addElement('checkbox', 'completionpass', get_string('completionpass', 'mod_assign'), get_string('completionpass', 'mod_assign'));
+        $mform->disabledIf('completionpass', 'completionusegrade', 'notchecked');
+        $mform->addHelpButton('completionpass', 'completionpass', 'mod_assign');
+        $items[] = 'completionpass';
+
+        return $items;
     }
 
     /**
@@ -313,7 +357,8 @@ class mod_assign_mod_form extends moodleform_mod {
      * @return bool
      */
     public function completion_rule_enabled($data) {
-        return !empty($data['completionsubmit']);
+        // Totara: Add require passing grade
+        return !empty($data['completionsubmit']) || !empty($data['completionpass']);
     }
 
 }

@@ -1458,20 +1458,46 @@ function assign_get_completion_state($course, $cm, $userid, $type) {
     global $CFG, $DB;
     require_once($CFG->dirroot . '/mod/assign/locallib.php');
 
+    if (empty($userid)) {
+        return false;
+    }
+
+    $result = $type;
+
     $assign = new assign(null, $cm, $course);
+    $instance = $assign->get_instance();
 
     // If completion option is enabled, evaluate it and return true/false.
-    if ($assign->get_instance()->completionsubmit) {
-        if ($assign->get_instance()->teamsubmission) {
+    if ($instance->completionsubmit) {
+        if ($instance->teamsubmission) {
             $submission = $assign->get_group_submission($userid, 0, false);
         } else {
             $submission = $assign->get_user_submission($userid, false);
         }
-        return $submission && $submission->status == ASSIGN_SUBMISSION_STATUS_SUBMITTED;
-    } else {
-        // Completion option is not enabled so just return $type.
-        return $type;
+        $newstate = $submission && $submission->status == ASSIGN_SUBMISSION_STATUS_SUBMITTED;
+        $result = completion_info::aggregate_completion_states($type, $result, $newstate);
     }
+
+    // Totara: Check for passing grade.
+    if ($instance->completionpass) {
+        require_once($CFG->libdir . '/gradelib.php');
+        $item = grade_item::fetch([
+            'courseid' => $course->id,
+            'itemtype' => 'mod',
+            'itemmodule' => 'assign',
+            'iteminstance' => $cm->instance,
+            'outcomeid' => null
+        ]);
+        if ($item) {
+            $grades = grade_grade::fetch_users_grades($item, [$userid], false);
+            if (!empty($grades[$userid])) {
+                $newstate = $grades[$userid]->is_passed($item);
+                $result = completion_info::aggregate_completion_states($type, $result, $newstate);
+            }
+        }
+    }
+
+    return $result;
 }
 
 /**

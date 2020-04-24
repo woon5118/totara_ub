@@ -24,6 +24,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->dirroot.'/mod/assign/feedbackplugin.php');
+
 /**
  * Library class for comment feedback plugin extending feedback plugin base class.
  *

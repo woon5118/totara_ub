@@ -88,7 +88,9 @@ class backup_assign_activity_structure_step extends backup_activity_structure_st
                                                   'maxattempts',
                                                   'markingworkflow',
                                                   'markingallocation',
-                                                  'preventsubmissionnotingroup'));
+                                                  'preventsubmissionnotingroup',
+                                                   // Totara: Add require passing grade
+                                                  'completionpass'));
 
         $userflags = new backup_nested_element('userflags');
 
