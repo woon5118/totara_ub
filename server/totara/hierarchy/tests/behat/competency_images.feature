@@ -6,7 +6,7 @@ Feature: Test use of images in competencies and competency custom fields
   @javascript
   Scenario: Images in competency and custom competency fields and descriptions
     Given I am on a totara site
-    And Perform is disabled
+    And I disable the "competency_assignment" advanced feature
     And the following "users" exist:
       | username | firstname | lastname | email                        |
       | learner1 | Learner   | One      | learner1@example.com         |

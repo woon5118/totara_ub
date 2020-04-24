@@ -3,6 +3,7 @@ Feature: See that competency proficiency can be updated in Record of Learning: C
 
   Background:
     Given I am on a totara site
+    And I disable the "competency_assignment" advanced feature
     And the following "competency" frameworks exist:
       | fullname               | idnumber | description           |
       | Competency Framework 1 | CF1      | Framework description |

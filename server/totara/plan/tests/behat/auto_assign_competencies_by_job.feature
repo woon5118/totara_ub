@@ -3,6 +3,7 @@ Feature: Verify competencies are automatically added to plan according to job as
 
   Background:
     Given I am on a totara site
+    And I disable the "competency_assignment" advanced feature
     And the following "users" exist:
       | username | firstname | lastname | email                |
       | learner1 | Bob1      | Learner1 | learner1@example.com |
@@ -62,10 +63,10 @@ Feature: Verify competencies are automatically added to plan according to job as
 
     # Add Competency 1 to Position 1.
     When I press "Add Competency"
-    Then I should see "Locate competency" in the "Assign competencies" "totaradialogue"
+    Then I should see "Locate competency" in the "Link competencies" "totaradialogue"
 
     When I follow "Competency 1"
-    And I click on "Save" "button" in the "Assign competencies" "totaradialogue"
+    And I click on "Save" "button" in the "Link competencies" "totaradialogue"
     Then I should see "Remove" in the "Competency 1" "table_row"
 
     # Add Competency 2 to Position 2.
@@ -74,10 +75,10 @@ Feature: Verify competencies are automatically added to plan according to job as
     Then I should see "Position Framework 1 - Position 2"
 
     When I press "Add Competency"
-    Then I should see "Locate competency" in the "Assign competencies" "totaradialogue"
+    Then I should see "Locate competency" in the "Link competencies" "totaradialogue"
 
     When I follow "Competency 2"
-    And I click on "Save" "button" in the "Assign competencies" "totaradialogue"
+    And I click on "Save" "button" in the "Link competencies" "totaradialogue"
     Then I should see "Remove" in the "Competency 2" "table_row"
 
     # Add Competency 3 to Position 3.
@@ -86,10 +87,10 @@ Feature: Verify competencies are automatically added to plan according to job as
     Then I should see "Position Framework 1 - Position 3"
 
     When I press "Add Competency"
-    Then I should see "Locate competency" in the "Assign competencies" "totaradialogue"
+    Then I should see "Locate competency" in the "Link competencies" "totaradialogue"
 
     When I follow "Competency 3"
-    And I click on "Save" "button" in the "Assign competencies" "totaradialogue"
+    And I click on "Save" "button" in the "Link competencies" "totaradialogue"
     Then I should see "Remove" in the "Competency 3" "table_row"
 
     When I navigate to "Manage organisations" node in "Site administration > Organisations"
@@ -99,10 +100,10 @@ Feature: Verify competencies are automatically added to plan according to job as
     Then I should see "Organisation Framework 1 - Organisation 2"
 
     When I press "Add Competency"
-    Then I should see "Locate competency" in the "Assign competencies" "totaradialogue"
+    Then I should see "Locate competency" in the "Link competencies" "totaradialogue"
 
     When I follow "Competency 2"
-    And I click on "Save" "button" in the "Assign competencies" "totaradialogue"
+    And I click on "Save" "button" in the "Link competencies" "totaradialogue"
     Then I should see "Remove" in the "Competency 2" "table_row"
 
     # Add Competency 3 to Organisation 3.
@@ -111,10 +112,10 @@ Feature: Verify competencies are automatically added to plan according to job as
     Then I should see "Organisation Framework 1 - Organisation 3"
 
     When I press "Add Competency"
-    Then I should see "Locate competency" in the "Assign competencies" "totaradialogue"
+    Then I should see "Locate competency" in the "Link competencies" "totaradialogue"
 
     When I follow "Competency 3"
-    And I click on "Save" "button" in the "Assign competencies" "totaradialogue"
+    And I click on "Save" "button" in the "Link competencies" "totaradialogue"
     Then I should see "Remove" in the "Competency 3" "table_row"
 
     # Make sure competencies are automatically assigned when a learning plan is created.

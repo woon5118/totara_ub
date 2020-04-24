@@ -49,6 +49,7 @@ Feature: Test viewing criteria fulfilment for a user on their competency details
     And I navigate to the competency profile details page for the "Comp1" competency
 
     # Course completion (aka flexible courses) criteria (Course 1 & 2)
+    And I wait for pending js
     Then I should see "Complete courses" in the ".tui-criteriaCourseAchievement" "css_element"
     And I should see "1 / 2" in the ".tui-criteriaCourseAchievement .tui-progressCircle__circle" "css_element"
 
@@ -74,6 +75,7 @@ Feature: Test viewing criteria fulfilment for a user on their competency details
     Then I should see "Competency profile"
 
     # Linked courses criteria (Course 3)
+    And I wait for pending js
     When I toggle the "Work towards level Just Barely Competent" tui collapsible
     Then I should see "Complete courses" in the ".tui-competencyAchievementsScale > div:last-child .tui-criteriaCourseAchievement" "css_element"
     And I should see "1 / 1" in the ".tui-competencyAchievementsScale > div:last-child .tui-criteriaCourseAchievement .tui-progressCircle__circle" "css_element"

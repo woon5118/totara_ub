@@ -42,7 +42,7 @@ Feature: Test if linking competency with position or organization is disabled wh
 
   Scenario: Competency assignment for organization/position hierarchy is visible with perform disabled
     Given I log in as "admin"
-    And Perform is disabled
+    And I disable the "competency_assignment" advanced feature
     When I navigate to "Manage organisations" node in "Site administration > Organisations"
     And I click on "Org frame" "link"
     When I click on "Organisation One" "link"
