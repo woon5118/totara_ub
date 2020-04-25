@@ -124,7 +124,22 @@ if ($options['unset'] || $options['set'] !== null) {
         cli_error('The configuration variable is hard-set in the config.php, unable to change.', 4);
     }
 
+    $oldvalue = get_config($options['component'], $options['name']);
     set_config($options['name'], $options['set'], $options['component']);
+    $newvalue = get_config($options['component'], $options['name']);
+
+    // Totara: log values so that support may find out if they did something wrong with settings.
+    if ($oldvalue !== $newvalue) {
+        // 'False' value from get_config means no value.
+        if ($oldvalue === false) {
+            $oldvalue = null;
+        }
+        if ($newvalue === false) {
+            $newvalue = null;
+        }
+        add_to_config_log($options['name'], $oldvalue, $newvalue, $options['component']);
+    }
+
     exit(0);
 }
 
