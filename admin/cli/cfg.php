@@ -27,6 +27,8 @@
  */
 
 define('CLI_SCRIPT', true);
+// Totara: ignore upgrade checks here in case upgrade needs to be 'unstuck'.
+define('NO_UPGRADE_CHECK', true);
 
 require(__DIR__.'/../../config.php');
 require_once($CFG->libdir.'/clilib.php');
