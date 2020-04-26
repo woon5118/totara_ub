@@ -3,6 +3,7 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* Added \core\hook\admin_setting_changed that can be used for notification of admin setting changes.
 * Capability 'moodle/role:switchroles' and all related functionality is deprecated and will be removed in Totara 14
 * MNET functionality is deprecated and will be removed in Totara 14
 * Following columns were removed from the "user" database table: icq, yahoo, aim, msn

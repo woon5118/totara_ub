@@ -2031,8 +2031,9 @@ abstract class admin_setting {
      * @return bool true if changed, false if not.
      */
     public function post_write_settings($original) {
+        $newsetting = $this->get_setting();
         // Comparison must work for arrays too.
-        if (serialize($original) === serialize($this->get_setting())) {
+        if (serialize($original) === serialize($newsetting)) {
             return false;
         }
 
@@ -2041,6 +2042,11 @@ abstract class admin_setting {
         if (!empty($callbackfunction) and is_callable($callbackfunction)) {
             call_user_func($callbackfunction, $this->get_full_name());
         }
+
+        // Totara: add more flexible hook callbacks.
+        $hook = new \core\hook\admin_setting_changed($this->name, $original, $newsetting);
+        $hook->execute();
+
         return true;
     }
 
