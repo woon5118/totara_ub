@@ -1056,5 +1056,13 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020032100, 'totara', 'core');
     }
 
+    if ($oldversion < 2020042902) {
+        // Delete log records that may contain sensitive admin setting values.
+        $DB->delete_records('logstore_standard_log', ['eventname' => '\core\event\admin_settings_changed']);
+
+        // Main savepoint reached.
+        upgrade_plugin_savepoint(true, 2020042902, 'totara', 'core');
+    }
+
     return true;
 }
