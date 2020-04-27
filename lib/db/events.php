@@ -125,10 +125,6 @@ $observers = array(
         'callback'  => 'core_course\totara_catalog\course::object_update_observer'
     ),
     array(
-        'eventname' => '\core\event\admin_settings_changed',
-        'callback'  => 'core_tag\totara_catalog\tags_observer::changed'
-    ),
-    array(
         'eventname' => '\core\event\tag_area_updated',
         'callback'  => 'core_tag\totara_catalog\tags_observer::tag_area_updated'
     ),

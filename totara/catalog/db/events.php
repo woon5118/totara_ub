@@ -28,10 +28,6 @@ if (!defined('MOODLE_INTERNAL')) {
 
 $observers = array(
     array(
-        'eventname' => '\core\event\admin_settings_changed',
-        'callback'  => 'totara_catalog\observer\settings_observer::changed',
-    ),
-    array(
         'eventname' => '\core\event\course_deleted',
         'callback' => '\totara_catalog\observer\course_search_metadata_observer::remove_search_metadata'
     ),

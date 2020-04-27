@@ -125,10 +125,6 @@ $observers = array(
         'callback'  => 'totara_program\totara_catalog\program::object_update_observer',
     ),
     array(
-        'eventname' => '\core\event\admin_settings_changed',
-        'callback'  => 'totara_program\totara_catalog\program\observer\settings_observer::changed',
-    ),
-    array(
         'eventname' => '\totara_customfield\event\customfield_created',
         'callback'  => 'totara_program\totara_catalog\program\observer\customfield_changed::update_default_data'
     ),

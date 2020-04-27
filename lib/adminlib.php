@@ -8196,7 +8196,6 @@ function admin_write_settings($formdata) {
     $enforcedsettings = \totara_flavour\helper::get_enforced_settings();
 
     $count = 0;
-    $olddata = array();
     foreach ($settings as $fullname=>$setting) {
         $plugin = is_null($setting->plugin) ? 'moodle' : $setting->plugin;
         if (isset($enforcedsettings[$plugin][$setting->name])) {
@@ -8205,7 +8204,6 @@ function admin_write_settings($formdata) {
         }
         /** @var $setting admin_setting */
         $original = $setting->get_setting();
-        $olddata[$fullname] = $original;
         $error = $setting->write_setting($data[$fullname]);
         if ($error !== '') {
             $adminroot->errors[$fullname] = new stdClass();
@@ -8234,17 +8232,7 @@ function admin_write_settings($formdata) {
     // now reload all settings - some of them might depend on the changed
     admin_get_root(true);
 
-    //trigger admin settings changed events
-    $event = core\event\admin_settings_changed::create(
-        [
-            'context' => \context_system::instance(),
-            'other' =>
-             [
-                 'olddata' => $olddata
-             ]
-        ]
-    );
-    $event->trigger();
+    // Totara: \core\event\admin_settings_changed was replaced by \core\hook\admin_setting_changed
 
     return $count;
 }

@@ -3,6 +3,8 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* \core\event\admin_settings_changed was replaced by \core\hook\admin_setting_changed for security reasons,
+  code needs to be updated to use new hook instead of previous event.
 * Added \core\hook\admin_setting_changed that can be used for notification of admin setting changes.
 * Capability 'moodle/role:switchroles' and all related functionality is deprecated and will be removed in Totara 14
 * MNET functionality is deprecated and will be removed in Totara 14

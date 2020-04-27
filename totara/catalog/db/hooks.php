@@ -46,5 +46,9 @@ $watchers = [
     [
         'hookname' => '\totara_core\hook\fts_repopulation',
         'callback' => '\totara_catalog\watcher\fts_watcher::rebuild_catalog'
-    ]
+    ],
+    [
+        'hookname' => '\core\hook\admin_setting_changed',
+        'callback' => '\totara_catalog\watcher\admin_settings_watcher::changed'
+    ],
 ];

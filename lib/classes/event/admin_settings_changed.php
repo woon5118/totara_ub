@@ -27,6 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Admin settings changed event class.
+ * @deprecated since Totara 12.18
  */
 class admin_settings_changed extends base {
 
@@ -36,6 +37,7 @@ class admin_settings_changed extends base {
      * @return void
      */
     protected function init() {
+        debugging('admin_settings_changed event was replaced by admin_setting_changed hook', DEBUG_DEVELOPER);
         $this->data['crud'] = 'u';
         $this->data['edulevel'] = self::LEVEL_OTHER;
     }

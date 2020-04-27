@@ -26,7 +26,6 @@ namespace core_tag\totara_catalog;
 
 defined('MOODLE_INTERNAL') || die();
 
-use core\event\admin_settings_changed;
 use core\event\tag_area_updated;
 use core\task\manager as task_manager;
 use totara_catalog\task\refresh_catalog_adhoc;
@@ -35,39 +34,6 @@ use totara_certification\totara_catalog\certification as certification_provider;
 use totara_program\totara_catalog\program as program_provider;
 
 class tags_observer {
-
-    /**
-     * Refresh all catalog records when the tags feature is enabled or disabled.
-     *
-     * @param admin_settings_changed $event
-     */
-    public static function changed(admin_settings_changed $event): void {
-
-        if (static::is_tags_setting_changed($event->get_data())) {
-            $adhoctask = new refresh_catalog_adhoc();
-            $adhoctask->set_component('totara_catalog');
-            task_manager::queue_adhoc_task($adhoctask);
-        }
-    }
-
-    /**
-     * Check if the tags setting has changed. This event observes all admin settings changes, so we're looking for
-     * just this one that is relevant.
-     *
-     * @param array $data
-     * @return bool
-     */
-    private static function is_tags_setting_changed(array $data): bool {
-        global $CFG;
-
-        if (isset($data['other']['olddata']['s__usetags']) &&
-            (int)$data['other']['olddata']['s__usetags'] != (int)$CFG->usetags) {
-            return true;
-        }
-
-        return false;
-    }
-
     /**
      * Refresh catalog provider records when the tags area is enabled or disabled.
      *
