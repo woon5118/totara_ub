@@ -1976,6 +1976,22 @@ abstract class admin_setting {
     }
 
     /**
+     * Is this setting hardcoded in config.php?
+     *
+     * @since Totara 13.0
+     *
+     * @return bool
+     */
+    public function is_forced(): bool {
+        global $CFG;
+        if (empty($this->plugin)) {
+            return array_key_exists($this->name, $CFG->config_php_settings);
+        } else {
+            return (isset($CFG->forced_plugin_settings[$this->plugin]) && array_key_exists($this->name, $CFG->forced_plugin_settings[$this->plugin]));
+        }
+    }
+
+    /**
      * Returns current value of this setting
      * @return mixed array or string depending on instance, NULL means not set yet
      */
@@ -2680,14 +2696,20 @@ class admin_setting_configpasswordunmask extends admin_setting_configtext {
      */
     public function output_html($data, $query='') {
         global $OUTPUT;
+        $data = strval($data);
         $context = (object) [
             'id' => $this->get_id(),
             'name' => $this->get_full_name(),
             'size' => $this->size,
             'value' => $data,
             'forceltr' => $this->get_force_ltr(),
+            'hasvalue' => (strlen($data) > 0),
         ];
-        $element = $OUTPUT->render_from_template('core_admin/setting_configpasswordunmask', $context);
+        if ($this->is_forced()) {
+            $element = $OUTPUT->render_from_template('core_admin/setting_configpasswordunmask_forced', $context);
+        } else {
+            $element = $OUTPUT->render_from_template('core_admin/setting_configpasswordunmask', $context);
+        }
         return format_admin_setting($this, $this->visiblename, $element, $this->description, true, '', null, $query);
     }
 
@@ -8431,21 +8453,11 @@ function format_admin_setting($setting, $title='', $form='', $description='', $l
 
     $context->warning = $warning;
     $context->override = '';
-    if (empty($setting->plugin)) {
-        if (array_key_exists($setting->name, $CFG->config_php_settings)) {
-            if (empty($CFG->cloudconfigoverride)) {
-                $context->override = get_string('configoverride', 'admin');
-            } else {
-                $context->override = get_string('cloudconfigoverride', 'totara_core');
-            }
-        }
-    } else {
-        if (array_key_exists($setting->plugin, $CFG->forced_plugin_settings) and array_key_exists($setting->name, $CFG->forced_plugin_settings[$setting->plugin])) {
-            if (empty($CFG->cloudconfigoverride)) {
-                $context->override = get_string('configoverride', 'admin');
-            } else {
-                $context->override = get_string('cloudconfigoverride', 'totara_core');
-            }
+    if ($setting->is_forced()) {
+        if (empty($CFG->cloudconfigoverride)) {
+            $context->override = get_string('configoverride', 'admin');
+        } else {
+            $context->override = get_string('cloudconfigoverride', 'totara_core');
         }
     }
 
