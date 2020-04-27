@@ -32,6 +32,7 @@ define('NO_UPGRADE_CHECK', true);
 
 require(__DIR__.'/../../config.php');
 require_once($CFG->libdir.'/clilib.php');
+require_once($CFG->libdir.'/adminlib.php');
 
 $usage = "Displays the current value of the given site setting. Allows to set it to the given value, too.
 
@@ -139,7 +140,21 @@ if ($options['unset'] || $options['set'] !== null) {
         if ($newvalue === false) {
             $newvalue = null;
         }
-        add_to_config_log($options['name'], $oldvalue, $newvalue, $options['component']);
+        // We need to find out is settings is a password and obscure it if necessary the same
+        // way as in \admin_setting_configpasswordunmask::add_to_config_log().
+        cron_setup_user(null); // Switch to admin to load full admin tree.
+        $settingname = (empty($options['component']) ? $options['name'] : $options['component'] . '/' . $options['name']);
+        $setting = cli_cfg_find_setting($settingname, admin_get_root());
+        cron_setup_user('reset'); // Switch back to no user to get 0 as author of setting change.
+        if ($setting) {
+            // This is not a nice hack, unfortunately the method is protected in stable branches.
+            $class = new ReflectionClass(get_class($setting));
+            $method = $class->getMethod('add_to_config_log');
+            $method->setAccessible(true);
+            $method->invokeArgs($setting, [$options['name'], $oldvalue, $newvalue, $options['component']]);
+        } else {
+            add_to_config_log($options['name'], $oldvalue, $newvalue, $options['component']);
+        }
     }
 
     exit(0);
@@ -187,4 +202,34 @@ if ($options['name'] === null) {
     }
 
     exit(0);
+}
+
+/**
+ * @internal
+ *
+ * @param string $name
+ * @param admin_category $cat
+ * @return admin_setting|null
+ */
+function cli_cfg_find_setting(string $name, admin_category $cat) {
+    // Do not check access control here.
+    foreach ($cat->get_children(false) as $node) {
+        if ($node instanceof admin_settingpage) {
+            foreach ($node->settings as $setting) {
+                /** @var admin_setting $setting */
+                if ($setting->name === $name) {
+                    return $setting;
+                }
+            }
+            continue;
+        }
+        if ($node instanceof admin_category) {
+            $found = cli_cfg_find_setting($name, $node);
+            if ($found) {
+                return $found;
+            }
+            continue;
+        }
+    }
+    return null;
 }
