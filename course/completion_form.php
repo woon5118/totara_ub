@@ -167,17 +167,6 @@ class course_completion_form extends moodleform {
             $selectbox = array();
             $selected = array();
             foreach ($courses as $c) {
-                // Internally coursecat::make_categories_list check viewhiddencategories for us. So, if the category is not
-                // in the list, is because the category is not visible and the user doesn't have the capability to view it.
-                if (!isset($list[$c->category])) {
-                    continue;
-                }
-
-                // Check visibility of the course.
-                if (!totara_course_is_viewable($c->id)) {
-                    continue;
-                }
-
                 $selectbox[$c->id] = $list[$c->category] . ' / ' . format_string($c->fullname, true,
                     array('context' => context_course::instance($c->id)));
 
