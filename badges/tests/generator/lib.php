@@ -47,7 +47,7 @@ class core_badges_generator extends component_generator_base {
         $record->usercreated = $userid;
         $record->usermodified = $userid;
         $record->issuername = "Test issuer";
-        $record->issuerurl = "http://badgeissuer.example.com";
+        $record->issuerurl = (new moodle_url('/'))->out(false);
         $record->issuercontact = "issuer@example.com";
         $record->expiredate = null;
         $record->expireperiod = null;
@@ -73,6 +73,10 @@ class core_badges_generator extends component_generator_base {
         }
 
         $badgeid = $DB->insert_record('badge', $record, true);
+
+        // Set the default Issuer (because OBv2 needs them).
+        set_config('badges_defaultissuername', $record->issuername);
+        set_config('badges_defaultissuercontact', $record->issuercontact);
 
         if (empty($record->courseid)) {
             $context = \context_system::instance();
@@ -109,7 +113,7 @@ class core_badges_generator extends component_generator_base {
         $backpackid = $DB->insert_record('badge_backpack', [
             'userid' => $user->id,
             'email' => $user->email,
-            'backpackurl' => 'https://backpack.openbadges.org',
+            'backpackurl' => 'https://api.badgr.io/v2',
             'backpackuid' => $user->id,
             'password' => 'T0t@rA!'
         ]);

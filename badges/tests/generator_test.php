@@ -97,7 +97,6 @@ class core_badges_generator_testcase extends advanced_testcase {
             'usercreated' => $admin->id,
             'usermodified' => $user->id,
             'issuername' => 'Example issuer',
-            'issuerurl' => 'https://badgeissuer.example.com',
             'issuercontact' => 'user@example.com',
             'expiredate' => time() + 86400,
             'expireperiod' => '86400',

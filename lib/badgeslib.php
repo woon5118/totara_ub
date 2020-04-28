@@ -105,7 +105,7 @@ define('BADGRIO_BACKPACKWEBURL', 'https://badgr.io');
 define('BADGE_BACKPACKURL', 'https://backpack.openbadges.org');
 
 /*
- * @deprecated since 3.9 (MDL-66357).
+ * @deprecated since Totara 13.
  */
 define('BADGE_BACKPACKAPIURL', 'https://backpack.openbadges.org');
 define('BADGE_BACKPACKWEBURL', 'https://backpack.openbadges.org');

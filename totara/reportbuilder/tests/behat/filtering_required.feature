@@ -134,8 +134,6 @@ Feature: Filter option for filtering required
     And I set the following fields to these values:
       | Name          | Test Badge 1           |
       | Description   | Test badge description |
-      | issuername    | Test Badge Site        |
-      | issuercontact | testuser@example.com   |
     And I upload "badges/tests/behat/badge.png" file to "Image" filemanager
     And I press "Create badge"
     And I set the field "Add badge criteria" to "Manual issue by role"
@@ -153,8 +151,6 @@ Feature: Filter option for filtering required
     And I set the following fields to these values:
       | Name          | Test Badge 2           |
       | Description   | Test badge description |
-      | issuername    | Test Badge Site        |
-      | issuercontact | testuser@example.com   |
     And I upload "badges/tests/behat/badge.png" file to "Image" filemanager
     And I press "Create badge"
     And I set the field "Add badge criteria" to "Manual issue by role"

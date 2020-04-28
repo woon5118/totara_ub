@@ -22,7 +22,6 @@ Feature: Verify badge issue based on cohort / audience completion criterion.
     And I set the following fields to these values:
       | Name        | Audience Badge             |
       | Description | Audience Badge description |
-      | issuername  | Mr Test                    |
     And I upload "badges/tests/behat/badge.png" file to "Image" filemanager
     And I press "Create badge"
     Then I should see "To start adding criteria, please select one of the options from the drop-down menu."

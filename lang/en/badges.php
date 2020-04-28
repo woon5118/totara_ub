@@ -278,7 +278,7 @@ $string['editsettings'] = 'Edit settings';
 $string['enablebadges'] = 'Enable badges';
 $string['endorsement'] = 'Endorsement';
 $string['error:backpackdatainvalid'] = 'The data return from the backpack was invalid.';
-$string['error:backpackemailnotfound'] = 'The email \'{$a}\' is not associated with a backpack. You need to <a href="http://backpack.openbadges.org">create a backpack</a> for that account or sign in with another email address.';
+$string['error:backpackemailnotfound'] = 'The email \'{$a}\' is not associated with a backpack. You need to create a backpack for that account or sign in with another email address.';
 $string['error:backpacknotavailable'] = 'Your site is not accessible from the Internet, so any badges issued from this site cannot be verified by external backpack services.';
 $string['error:backpackloginfailed'] = 'You could not be connected to an external backpack for the following reason: {$a}';
 $string['error:backpackproblem'] = 'There was a problem connecting to your backpack service provider. Please try again later.';
@@ -529,7 +529,7 @@ $string['year'] = 'Year(s)';
 // Deprecated since Totara 13.
 $string['error:invalidbadgeurl'] = 'Invalid issuer URL format. The URL should have a prefix http:// or https://.';
 $string['backpackbadges'] = 'You have {$a->totalbadges} badge(s) displayed from {$a->totalcollections} collection(s). <a href="mybackpack.php">Change backpack settings</a>.';
-$string['error:nogroups'] = '<p>There are no public collections of badges available in your backpack. </p> <p>Only public collections are shown. <a href="https://backpack.openbadges.org">Visit your backpack</a> to create some public collections.</p>';
+$string['error:nogroups'] = '<p>There are no public collections of badges available in your backpack. </p> <p>Only public collections are shown. Visit your backpack to create some public collections.</p>';
 $string['localbadges'] = 'My badges from {$a} web site';
 $string['nobackpackbadges'] = 'There are no badges in the collections you have selected. <a href="mybackpack.php">Add more collections</a>.';
 $string['nobackpackcollections'] = 'No badge collections have been selected. <a href="mybackpack.php">Add collections</a>.';

@@ -76,7 +76,6 @@ Feature: Verify badge issue based on program completion criterion.
     And I set the following fields to these values:
       | Name        | Program Badge             |
       | Description | Program badge description |
-      | issuername  | Mr Tester                 |
     And I upload "badges/tests/behat/badge.png" file to "Image" filemanager
     And I press "Create badge"
     Then I should see "Criteria for this badge have not been set up yet."

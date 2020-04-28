@@ -1064,5 +1064,40 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020042902, 'totara', 'core');
     }
 
+    if ($oldversion < 2020050100) {
+        // Remove deprecated Mozilla OpenBadges backpack.
+        $url = 'https://backpack.openbadges.org';
+        $bp = $DB->get_record('badge_external_backpack', ['backpackapiurl' => $url]);
+        if ($bp) {
+            // Remove connections for users to this backpack.
+            $sql = "SELECT DISTINCT bb.id
+                      FROM {badge_backpack} bb
+                 LEFT JOIN {badge_external} be ON be. backpackid = bb.externalbackpackid
+                     WHERE bb.externalbackpackid = :backpackid";
+            $params = ['backpackid' => $bp->id];
+            $externalbackpacks = $DB->get_fieldset_sql($sql, $params);
+            if ($externalbackpacks) {
+                list($sql, $params) = $DB->get_in_or_equal($externalbackpacks);
+
+                // Delete user external collections references to this backpack.
+                $DB->execute("DELETE FROM {badge_external} WHERE backpackid " . $sql, $params);
+            }
+            $DB->delete_records('badge_backpack', ['externalbackpackid' => $bp->id]);
+
+            // Delete deprecated backpack entry.
+            $DB->delete_records('badge_external_backpack', ['backpackapiurl' => $url]);
+        }
+
+        // Set active external backpack to Badgr.io.
+        $url = 'https://api.badgr.io/v2';
+        if ($bp = $DB->get_record('badge_external_backpack', ['backpackapiurl' => $url])) {
+            set_config('badges_site_backpack', $bp->id);
+        } else {
+            unset_config('badges_site_backpack');
+        }
+
+        upgrade_plugin_savepoint(true, 2020050100, 'totara', 'core');
+    }
+
     return true;
 }
