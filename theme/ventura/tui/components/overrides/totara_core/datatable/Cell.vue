@@ -22,6 +22,11 @@
 
 <style lang="scss">
 .tui-dataTableCell {
+  /* ensure excessively long words don't push out cell width */
+  min-width: 0;
+  /* ensure excessively long words don't overflow */
+  word-wrap: break-word;
+
   &__label {
     display: inline-block;
     margin-top: var(--tui-gap-2);
@@ -36,10 +41,6 @@
     flex-basis: 0;
     flex-direction: column;
     flex-grow: 1;
-    /* ensure excessively long words don't push out cell width */
-    min-width: 0;
-    /* ensure excessively long words don't overflow */
-    word-wrap: break-word;
 
     &__label {
       display: none;
