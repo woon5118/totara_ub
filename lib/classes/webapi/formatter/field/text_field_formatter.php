@@ -94,10 +94,10 @@ class text_field_formatter extends base {
      * not to be confused with the output format passed to the constructor
      * FORMAT_MOODLE, FORMAT_HTML, FORMAT_PLAIN, etc. see format_text for available options
      *
-     * @param string $format
+     * @param int|null $format
      * @return $this
      */
-    public function set_text_format(string $format) {
+    public function set_text_format(?int $format) {
         $this->options['text_format'] = $format;
         return $this;
     }

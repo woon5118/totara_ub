@@ -482,7 +482,12 @@ class totara_core_webapi_resolver_type_learning_item_testcase extends advanced_t
 
         foreach ($formats as $format) {
             $value = $this->resolve('description', $item, ['format' => $format]);
-            $this->assertEquals('first course', $value);
+            if ($format == format::FORMAT_PLAIN) {
+                $this->assertEquals('first course', $value);
+            }
+            if ($format == format::FORMAT_HTML) {
+                $this->assertEquals('<div class="text_to_html">first course</div>', $value);
+            }
             $this->assertTrue(is_string($value));
         }
 

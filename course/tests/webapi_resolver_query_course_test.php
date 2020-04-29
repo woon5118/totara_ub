@@ -175,7 +175,8 @@ class totara_core_webapi_resolver_query_course_testcase extends advanced_testcas
                 'idnumber' => "{$courses[0]->idnumber}",
                 'fullname' => "{$courses[0]->fullname}",
                 'shortname' => "{$courses[0]->shortname}",
-                'summary' => "{$courses[0]->summary}",
+                // summaryformat is FORMAT_MOODLE, means text_to_html
+                'summary' => '<div class="text_to_html">'.$courses[0]->summary.'</div>',
                 'summaryformat' => (int) $courses[0]->summaryformat,
                 'category' => [
                     'id' => $category->id,

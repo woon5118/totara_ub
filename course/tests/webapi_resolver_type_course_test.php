@@ -260,7 +260,12 @@ class totara_core_webapi_resolver_type_course_testcase extends advanced_testcase
 
         foreach ($formats as $format) {
             $value = $this->resolve('summary', $courses[0], ['format' => $format]);
-            $this->assertEquals($courses[0]->summary, $value);
+            if ($format == format::FORMAT_PLAIN) {
+                $this->assertEquals($courses[0]->summary, $value);
+            }
+            if ($format == format::FORMAT_HTML) {
+                $this->assertEquals('<div class="text_to_html">'.$courses[0]->summary.'</div>', $value);
+            }
             $this->assertTrue(is_string($value));
         }
 

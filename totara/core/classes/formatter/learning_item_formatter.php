@@ -77,7 +77,16 @@ class learning_item_formatter extends formatter {
      * @return
      */
     private function item_inherited_field_formatter($field, $value, $format) {
-        $item = (object)['id' => $this->object->id, $field => $value];
+        $item = (object)[
+            'id' => $this->object->id,
+            $field => $value
+        ];
+
+        // For summary we need extra information
+        if ($field == 'summary') {
+            $item->summaryformat = $this->object->description_format;
+        }
+
         switch ($this->object->get_type()) {
             case 'course':
                 $itemformatter = new course_formatter($item, $this->context);

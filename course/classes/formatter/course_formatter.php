@@ -43,6 +43,7 @@ class course_formatter extends formatter {
                 $itemid = $this->object->id;
 
                 return $formatter
+                    ->set_text_format($this->object->summaryformat)
                     ->set_pluginfile_url_options($this->context, $component, $filearea, $itemid)
                     ->format($value);
             },
