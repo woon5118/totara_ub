@@ -30,7 +30,7 @@ function xmldb_mod_forum_premigrate() {
 
     $version = premigrate_get_plugin_version('mod', 'forum');
 
-    if ($version > 2019111800) {
+    if ($version > 2019111801) {
         throw new coding_exception("Invalid plugin (mod_forum) version ($version) for pre-migration");
     }
 

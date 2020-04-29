@@ -1,9 +1,9 @@
 <?php
 
 $versions = array (
-  'tag' => 'v3.6.8',
-  'version' => 2018120308.0,
-  'release' => '3.6.8 (Build: 20200113)',
+  'tag' => 'v3.6.9',
+  'version' => 2018120309.0,
+  'release' => '3.6.9 (Build: 20200309)',
   'plugins' => 
   array (
     'antivirus_clamav' => 
