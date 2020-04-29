@@ -83,7 +83,7 @@ class MoodleExcelWorkbook {
 
         $this->filename = $filename;
 
-        if (strtolower($type) === 'Xls') {
+        if (strtolower($type) === 'xls') {
             debugging('Xls is no longer supported, using Xlsx instead', DEBUG_DEVELOPER);
             $this->type = 'Xlsx';
         } else {
