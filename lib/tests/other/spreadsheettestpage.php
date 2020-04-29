@@ -40,27 +40,23 @@ if (!in_array($type, array('xslx', 'ods'))) {
 }
 
 if (!$type) {
-    $PAGE->set_title('Moodle spreadsheet export test');
-    $PAGE->set_heading('Moodle spreadsheet export test');
+    $PAGE->set_title('Totara spreadsheet export test');
+    $PAGE->set_heading('Totara spreadsheet export test');
 
     echo $OUTPUT->header();
     echo $OUTPUT->box_start();
 
     $notes = '
-Tested with:
+Supported software:
 
-* MS Excel Viewer 2003 (with Compatibility Pack), 2010
-* LibreOffice 6.0
-* NeoOffice 3.3
-* Apple Numbers \'09 (2.3) and Preview
+* MS Excel 2010 and later
+* LibreOffice 6
+* Apple Numbers 10
 * Google Drive spreadsheet import
-* IBM Lotus Symphony 3.0.1
-* Gnumeric 1.11
-* Calligra Suite 2.4, 2.5
 
-Known problems:
+Known issues:
 
-* Excel 2007 can not be opened in Calligra Suite
+* formulas in ODS may not work in Google
 ';
 
     echo markdown_to_html($notes);
@@ -72,21 +68,21 @@ Known problems:
 }
 
 if ($type === 'xslx') {
-    $workbook = new MoodleExcelWorkbook('moodletest.xlsx', 'Xslx');
+    $workbook = new MoodleExcelWorkbook('totaratest.xlsx', 'Xslx');
 } else if ($type === 'ods') {
-    $workbook = new MoodleODSWorkbook('moodletest.ods');
+    $workbook = new MoodleODSWorkbook('totaratest.ods');
 }
 
 $worksheet = array();
 
-$worksheet = $workbook->add_worksheet('Supported');
+$worksheet = $workbook->add_worksheet('Spreadsheet test');
 
 $worksheet->hide_screen_gridlines();
 
-$worksheet->write_string(0, 0, 'Moodle worksheet export test',
+$worksheet->write_string(0, 0, 'Totara worksheet export test',
     $workbook->add_format(array('color' => 'red', 'size' => 20, 'bold' => 1, 'italic' => 1)));
 $worksheet->set_row(0, 25);
-$worksheet->write(1, 0, 'Moodle release: '.$CFG->release, $workbook->add_format(array('size' => 8, 'italic' => 1)));
+$worksheet->write(1, 0, 'Totara release: ' . $CFG->totara_release, $workbook->add_format(array('size' => 8, 'italic' => 1)));
 
 $worksheet->set_column(0, 0, 20);
 $worksheet->set_column(1, 1, 30);
@@ -114,16 +110,19 @@ $worksheet->write(7, 0, 'Float');
 $worksheet->write_number(7, 1, 3.14159);
 
 $worksheet->write(8, 0, 'URL');
-$worksheet->write_url(8, 1, 'http://moodle.org');
+$worksheet->write_url(8, 1, 'https://www.totaralearning.com');
 
 $worksheet->write(9, 0, 'Date (now)');
 $worksheet->write_date(9, 1, time());
 
 $worksheet->write(10, 0, 'Formula');
-$worksheet->write(10, 1, '=1+2');
+$worksheet->write_formula(10, 1, '=1+2');
 
-$worksheet->write(11, 0, 'Blank');
-$worksheet->write_blank(11, 1, $workbook->add_format(array('bg_color' => 'silver')));
+$worksheet->write(11, 0, 'Formula as string');
+$worksheet->write(11, 1, '=1+2');
+
+$worksheet->write(12, 0, 'Blank');
+$worksheet->write_blank(12, 1, $workbook->add_format(array('bg_color' => 'silver')));
 
 
 $worksheet->write(14, 0, 'Text formats', $miniheading);
@@ -170,7 +169,7 @@ $worksheet->write_string(35, 0, '2: 0.00');
 $worksheet->write_number(35, 1, 1003.14159, array('num_format' => 2));
 $worksheet->write_string(36, 0, '3: #,##0');
 $worksheet->write_number(36, 1, 1003.14159, array('num_format' => 3));
-$worksheet->write_string(37, 0, '3: #,##0.00');
+$worksheet->write_string(37, 0, '4: #,##0.00');
 $worksheet->write_number(37, 1, 1003.14159, array('num_format' => 4));
 $worksheet->write_string(38, 0, '11: 0.00E+00');
 $worksheet->write_number(38, 1, 3.14159, array('num_format' => 11));
@@ -178,12 +177,20 @@ $worksheet->write_string(39, 0, '12: # ?/?');
 $worksheet->write_number(39, 1, 3.14, array('num_format' => 12));
 $worksheet->write_string(40, 0, '13: # ??/??');
 $worksheet->write_number(40, 1, 3.14, array('num_format' => 13));
-$worksheet->write_string(41, 0, '15: d-mmm-yy');
-$worksheet->write_date(41, 1, time(), array('num_format' => 15));
-$worksheet->write_string(42, 0, '22: m/d/yyyy h:mm');
-$worksheet->write_date(42, 1, time(), array('num_format' => 22));
-$worksheet->write_string(43, 0, '24: h:mm');
-$worksheet->write_date(43, 1, time(), array('num_format' => 24));
+$worksheet->write_string(41, 0, '14: m/d/yyyy');
+$worksheet->write_date(41, 1, time(), array('num_format' => 14));
+$worksheet->write_string(42, 0, '15: d-mmm-yy');
+$worksheet->write_date(42, 1, time(), array('num_format' => 15));
+$worksheet->write_string(43, 0, '16: d-mmm');
+$worksheet->write_date(43, 1, time(), array('num_format' => 16));
+$worksheet->write_string(44, 0, '17: mmm-yy');
+$worksheet->write_date(44, 1, time(), array('num_format' => 17));
+$worksheet->write_string(45, 0, '22: m/d/yyyy h:mm');
+$worksheet->write_date(45, 1, time(), array('num_format' => 22));
+$worksheet->write_string(46, 0, '24: h:mm');
+$worksheet->write_date(46, 1, time(), array('num_format' => 24));
+$worksheet->write_string(47, 0, '47: @');
+$worksheet->write_date(47, 1, time(), array('num_format' => 49));
 
 
 $worksheet->write(2, 3, 'Borders', $miniheading);
@@ -214,17 +221,17 @@ $worksheet->write(30, 3, 'Horizontal merging of cells',
     $workbook->add_format(array('pattern' => 1, 'bg_color' => 'silver')));
 $worksheet->set_column(4, 4, 5);
 
-$worksheet->set_row(44, null, null, true);
-$worksheet->write(44, 0, 'Hidden row', array('bg_color' => 'yellow'));
+$worksheet->set_row(50, null, null, true);
+$worksheet->write(50, 0, 'Hidden row', array('bg_color' => 'yellow'));
 
 $worksheet->set_column(5, 5, null, null, true);
 $worksheet->write(0, 5, 'Hidden column', array('bg_color' => 'yellow'));
 
 
-$worksheet->write(45, 0, 'Outline row 1');
-$worksheet->set_row(45, null, null, false, 1);
-$worksheet->write(46, 0, 'Outline row 2');
-$worksheet->set_row(46, null, null, false, 2);
+$worksheet->write(51, 0, 'Outline row 1');
+$worksheet->set_row(51, null, null, false, 1);
+$worksheet->write(52, 0, 'Outline row 2');
+$worksheet->set_row(52, null, null, false, 2);
 
 $worksheet->write(0, 6, 'Outline column 1');
 $worksheet->set_column(6, 6, 20, null, false, 1);
