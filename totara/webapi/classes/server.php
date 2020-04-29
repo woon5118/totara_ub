@@ -115,7 +115,10 @@ class server {
             }
 
             // This is here to make sure there's a session initiated
-            if (!NO_MOODLE_COOKIES && !confirm_sesskey($_SERVER['HTTP_X_TOTARA_SESSKEY'])) {
+            if ($this->type !== graphql::TYPE_DEV
+                && !NO_MOODLE_COOKIES
+                && !confirm_sesskey($_SERVER['HTTP_X_TOTARA_SESSKEY'] ?? null)
+            ) {
                 throw new webapi_request_exception('Invalid sesskey, page reload required');
             }
 
