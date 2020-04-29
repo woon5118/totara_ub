@@ -50,7 +50,7 @@ use \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
  * @package moodlecore
  */
 class MoodleExcelWorkbook {
-    /** @var PhpSpreadsheet */
+    /** @var Spreadsheet */
     protected $objspreadsheet;
 
     /** @var string */
@@ -331,23 +331,23 @@ class MoodleExcelWorksheet {
         // Analyse what are we trying to send.
         if (preg_match("/^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/", $token)) {
             // Match number
-            return $this->write_number($row, $col, $token, $format);
-        } elseif (preg_match("/^[fh]tt?p:\/\//", $token)) {
+            $this->write_number($row, $col, $token, $format);
+        } else if (preg_match("/^[fh]tt?p:\/\//", $token)) {
             // Match http or ftp URL
-            return $this->write_url($row, $col, $token, '', $format);
-        } elseif (preg_match("/^mailto:/", $token)) {
+            $this->write_url($row, $col, $token, $format);
+        } else if (preg_match("/^mailto:/", $token)) {
             // Match mailto:
-            return $this->write_url($row, $col, $token, '', $format);
-        } elseif (preg_match("/^(?:in|ex)ternal:/", $token)) {
+            $this->write_url($row, $col, $token, $format);
+        } else if (preg_match("/^(?:in|ex)ternal:/", $token)) {
             // Match internal or external sheet link
-            return $this->write_url($row, $col, $token, '', $format);
+            $this->write_url($row, $col, $token, $format);
             // Formula processing was intentionally removed in TL-10268.
-        } elseif ($token == '') {
+        } else if ($token == '') {
             // Match blank
-            return $this->write_blank($row, $col, $format);
+            $this->write_blank($row, $col, $format);
         } else {
             // Default: match string
-            return $this->write_string($row, $col, $token, $format);
+            $this->write_string($row, $col, $token, $format);
         }
     }
 

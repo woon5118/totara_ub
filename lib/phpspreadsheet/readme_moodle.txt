@@ -1,4 +1,4 @@
-Description of PhpSpreadsheet 1.7.0 import into Moodle
+Description of PhpSpreadsheet 1.12.0 import into Moodle
 
 Last release package can be found in https://github.com/PHPOffice/PhpSpreadsheet/releases
 
@@ -26,14 +26,14 @@ CHANGES:
   - .scrutinizer.yml
   - .travis.yml
 
- * Add the Moodle hack in vendor/phpoffice/phpspreadsheet/src/PhpSpreadsheet/Shared/File/sys_get_temp_dir() because we
- can not guarantee sys_get_temp_dir() works everywhere:
-
-     // Moodle hack!
+ * Add the next Moodle hack at the beginning of the function sysGetTempDir()
+   located in vendor/phpoffice/phpspreadsheet/src/PhpSpreadsheet/Shared/File.php
+    // Moodle hack!
      if (function_exists('make_temp_directory')) {
          $temp = make_temp_directory('phpspreadsheet');
          return realpath(dirname($temp));
      }
+  We need this hack because we can not guarantee sysGetTempDir() works everywhere.
 
  * Shared/OLE has been removed because OLE is not DFSG compliant and is not being used in core code.
    Remove the files/folders:
@@ -49,6 +49,6 @@ CHANGES:
    - PhpSpreadsheet/Writer/Xls.php
    - PhpSpreadsheet/Writer/Xls/*
 
-
-COMMENTS:
- * lib/excellib.class.php has been updated so that only xslx spreadsheets will be produced.
+ * Remove the next files in vendor/markbaker/ related to external testing that we don't need matrix/:
+  - infection.json.dist (PHP mutation testing framework configuration file)
+  - phpstan.neon (PHP static analyzer configuration file)

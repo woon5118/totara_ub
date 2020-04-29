@@ -180,9 +180,10 @@ $worksheet->write_string(40, 0, '13: # ??/??');
 $worksheet->write_number(40, 1, 3.14, array('num_format' => 13));
 $worksheet->write_string(41, 0, '15: d-mmm-yy');
 $worksheet->write_date(41, 1, time(), array('num_format' => 15));
-$worksheet->write_string(42, 0, '22: m/d/yy h:mm');
+$worksheet->write_string(42, 0, '22: m/d/yyyy h:mm');
 $worksheet->write_date(42, 1, time(), array('num_format' => 22));
-
+$worksheet->write_string(43, 0, '24: h:mm');
+$worksheet->write_date(43, 1, time(), array('num_format' => 24));
 
 
 $worksheet->write(2, 3, 'Borders', $miniheading);
