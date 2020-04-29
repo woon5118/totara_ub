@@ -21,7 +21,7 @@
 -->
 
 <style lang="scss">
-.tui-performActivities {
+.tui-performActivityActions {
   &__actionIcons {
     display: flex;
   }
