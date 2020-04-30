@@ -251,7 +251,7 @@ function xmldb_totara_hierarchy_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019052700, 'totara', 'hierarchy');
     }
 
-    if ($oldversion < 2019090300) {
+    if ($oldversion < 2020011701) {
         // comp_assign_availability
         $table = new xmldb_table('comp_assign_availability');
 
@@ -267,10 +267,10 @@ function xmldb_totara_hierarchy_upgrade($oldversion) {
         }
 
         // Competency savepoint reached.
-        upgrade_plugin_savepoint(true, 2019090300, 'totara', 'hierarchy');
+        upgrade_plugin_savepoint(true, 2020011701, 'totara', 'hierarchy');
     }
 
-    if ($oldversion < 2019101600) {
+    if ($oldversion < 2020011702) {
 
         // Changing nullability of field aggregationmethod on table comp to null.
         $table = new xmldb_table('comp');
@@ -280,7 +280,7 @@ function xmldb_totara_hierarchy_upgrade($oldversion) {
         $dbman->change_field_notnull($table, $field);
 
         // Hierarchy savepoint reached.
-        upgrade_plugin_savepoint(true, 2019101600, 'totara', 'hierarchy');
+        upgrade_plugin_savepoint(true, 2020011702, 'totara', 'hierarchy');
     }
 
 
