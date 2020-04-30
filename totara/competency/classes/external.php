@@ -24,11 +24,11 @@
 
 namespace totara_competency;
 
+use context_system;
 use core\format;
 use totara_competency\entities\competency;
 use totara_competency\entities\competency_framework;
 use totara_competency\entities\course;
-use totara_competency\entities\scale;
 use totara_core\advanced_feature;
 use core\webapi\formatter\field\string_field_formatter;
 
@@ -49,6 +49,7 @@ class external extends \external_api {
 
     public static function get_pathways(int $competency_id) {
         advanced_feature::require('competency_assignment');
+        require_capability('totara/hierarchy:viewcompetency', context_system::instance());
 
         $config = new achievement_configuration(new competency($competency_id));
         return $config->export_pathway_groups();
@@ -64,6 +65,7 @@ class external extends \external_api {
 
     public static function get_categories() {
         advanced_feature::require('competencies');
+        require_capability('totara/hierarchy:viewcompetency', context_system::instance());
 
         global $DB;
 
@@ -112,6 +114,7 @@ class external extends \external_api {
      */
     public static function get_courses(array $filters, int $page, string $order, string $direction) {
         advanced_feature::require('competencies');
+        require_capability('totara/hierarchy:viewcompetency', context_system::instance());
 
         global $CFG;
         require_once($CFG->dirroot . '/totara/coursecatalog/lib.php');
@@ -202,11 +205,10 @@ class external extends \external_api {
      */
     public static function get_linked_courses(int $competency_id) {
         advanced_feature::require('competencies');
+        require_capability('totara/hierarchy:viewcompetency', context_system::instance());
 
         global $CFG;
         require_once($CFG->dirroot . '/totara/plan/lib.php');
-
-        // Todo: permission checks. Can see competency.
 
         $linked_courses_records = linked_courses::get_linked_courses($competency_id);
 
@@ -262,8 +264,9 @@ class external extends \external_api {
      */
     public static function set_linked_courses(int $competency_id, $courses) {
         advanced_feature::require('competencies');
+        require_capability('totara/hierarchy:updatecompetency', context_system::instance());
 
-        // Todo: permission checks on courses being visible. Also on being able to administer competency.
+        // Todo: permission checks on courses being visible.
         linked_courses::set_linked_courses($competency_id, $courses);
     }
 
@@ -289,6 +292,7 @@ class external extends \external_api {
 
     public static function delete_pathways(string $competency_id, array $pathways, int $action_time) {
         advanced_feature::require('competency_assignment');
+        require_capability('totara/hierarchy:updatecompetency', context_system::instance());
 
         $config = new achievement_configuration(new competency($competency_id));
         return $config->delete_pathways($pathways, $action_time);
@@ -314,6 +318,7 @@ class external extends \external_api {
 
     public static function set_overall_aggregation(int $competency_id, string $type, int $action_time): string {
         advanced_feature::require('competency_assignment');
+        require_capability('totara/hierarchy:updatecompetency', context_system::instance());
 
         $config = new achievement_configuration(new competency($competency_id));
         $old_type = $config->get_aggregation_type();
@@ -332,6 +337,7 @@ class external extends \external_api {
 
     public static function get_frameworks() {
         advanced_feature::require('competencies');
+        require_capability('totara/hierarchy:viewcompetency', context_system::instance());
 
         $items = competency_framework::repository()
             ->select(['id', 'fullname'])
