@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
+ * @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
  * @package core
  */
 
@@ -25,12 +26,31 @@ namespace core\entities;
 
 use core\orm\query\builder;
 
-/**
- * @property string $expand_table
- * @property string $expand_query_column
- * @property string $expand_select_column
- */
 trait expand {
+
+    /**
+     * Get all records for the given ids which could be only one entry or multiple ones depending on the source or target.
+     * For example: For users it could be all members of a cohort/position/organisation or it could be an individual user.
+     *
+     * @param int[] $ids
+     * @return array
+     */
+    public static function expand_multiple(array $ids): array {
+        if (empty($ids)) {
+            throw new \coding_exception('To be able to expand at least one id must be specified');
+        }
+
+        if (empty(static::EXPAND_TABLE) || empty(static::EXPAND_QUERY_COLUMN) || empty(static::EXPAND_SELECT_COLUMN)) {
+            throw new \coding_exception('Please define the EXPAND_TABLE, EXPAND_QUERY_COLUMN and EXPAND_SELECT_COLUMN constants');
+        }
+
+        return builder::table(static::EXPAND_TABLE)
+            ->select(static::EXPAND_SELECT_COLUMN)
+            ->where_in(static::EXPAND_QUERY_COLUMN, $ids)
+            ->group_by(static::EXPAND_SELECT_COLUMN)
+            ->get()
+            ->pluck(static::EXPAND_SELECT_COLUMN);
+    }
 
     /**
      * Get all records for the given id which could be only one entry or multiple ones depending on the source or target.
@@ -39,21 +59,7 @@ trait expand {
      * @return array
      */
     public function expand(): array {
-        if (empty($this->id)) {
-            throw new \coding_exception('To be able to expand an id has to be set');
-        }
-
-        if (empty($this->expand_table) || empty($this->expand_query_column) || empty($this->expand_select_column)) {
-            throw new \coding_exception('Please define expand_table, expand_query_column and expand_select_column');
-        }
-
-        $expanded = builder::table($this->expand_table)
-            ->select($this->expand_select_column)
-            ->where($this->expand_query_column, $this->id)
-            ->group_by($this->expand_select_column)
-            ->get();
-
-        return $expanded->pluck($this->expand_select_column);
+        return self::expand_multiple([$this->id]);
     }
 
 }

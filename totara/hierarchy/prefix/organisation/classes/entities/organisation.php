@@ -29,6 +29,7 @@ use core\entities\expandable;
 use hierarchy_position\entities\position;
 use hierarchy_position\entities\position_framework;
 use totara_hierarchy\entities\hierarchy_item;
+use totara_job\entities\job_assignment;
 
 /**
  * @property string $shortname Short name
@@ -59,9 +60,9 @@ class organisation extends hierarchy_item implements expandable {
 
     use expand;
 
-    protected $expand_table = 'job_assignment';
-    protected $expand_select_column = 'userid';
-    protected $expand_query_column = 'organisationid';
+    protected const EXPAND_TABLE = job_assignment::TABLE;
+    protected const EXPAND_SELECT_COLUMN = 'userid';
+    protected const EXPAND_QUERY_COLUMN = 'organisationid';
 
     public const TABLE = 'org';
 }

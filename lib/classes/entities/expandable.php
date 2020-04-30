@@ -30,4 +30,10 @@ interface expandable {
      */
     public function expand(): array;
 
+    /**
+     * @param int[] $ids
+     * @return array
+     */
+    public static function expand_multiple(array $ids): array;
+
 }

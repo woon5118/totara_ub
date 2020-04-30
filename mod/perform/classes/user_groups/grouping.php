@@ -25,7 +25,7 @@ namespace mod_perform\user_groups;
 
 use core\entities\cohort;
 use core\entities\user;
-
+use core\orm\entity\entity;
 use hierarchy_organisation\entities\organisation;
 use hierarchy_position\entities\position;
 
@@ -279,4 +279,37 @@ final class grouping {
 
         return $this->name;
     }
+
+    /**
+     * Get entity class by user group type
+     *
+     * @param string $type
+     * @return string|entity
+     */
+    public static function get_entity_class_by_user_group_type(string $type): string {
+        switch ($type) {
+            case self::USER:
+                $class_name = user::class;
+                break;
+            case self::COHORT:
+                $class_name = cohort::class;
+                break;
+            case self::POS:
+                $class_name = position::class;
+                break;
+            case self::ORG:
+                $class_name = organisation::class;
+                break;
+            default:
+                $class_name = null;
+                break;
+        }
+
+        if (!class_exists($class_name)) {
+            throw new \coding_exception('Invalid entity found!');
+        }
+
+        return $class_name;
+    }
+
 }

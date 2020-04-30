@@ -24,6 +24,7 @@
 
 use container_perform\perform as perform_container;
 use core\collection;
+use core\entities\cohort;
 use core\entities\user;
 use core_container\module\module;
 use mod_perform\entities\activity\participant_section;
@@ -52,6 +53,8 @@ use totara_core\relationship\relationship;
 use totara_core\relationship\resolvers\subject;
 use totara_job\job_assignment;
 use totara_job\relationship\resolvers\manager;
+use hierarchy_position\entities\position;
+use hierarchy_organisation\entities\organisation;
 
 /**
  * Perform generator
@@ -605,6 +608,89 @@ class mod_perform_generator extends component_generator_base {
         $participant_section = $this->create_participant_section($activity, $participant_instance, false, $section);
 
         return $participant_section;
+    }
+
+    /**
+     * Create a cohort and add the specified users to it.
+     *
+     * @param array $user_ids
+     * @param array|object $record
+     * @return cohort
+     */
+    public function create_cohort_with_users(array $user_ids, $record = []): cohort {
+        global $CFG;
+        require_once($CFG->dirroot.'/cohort/lib.php');
+
+        $cohort = $this->datagenerator->create_cohort($record);
+
+        foreach ($user_ids as $user_id) {
+            cohort_add_member($cohort->id, $user_id);
+        }
+
+        return new cohort($cohort);
+    }
+
+    /**
+     * Create an organisation and add the specified users to it.
+     *
+     * @param array $user_ids
+     * @param array|object $record
+     * @return organisation
+     */
+    public function create_organisation_with_users(array $user_ids, $record = []): organisation {
+        /** @var totara_hierarchy_generator $generator */
+        $generator = $this->datagenerator->get_plugin_generator('totara_hierarchy');
+
+        $record = (array) $record;
+        if (!isset($record['frameworkid'])) {
+            $record['frameworkid'] = $generator->create_org_frame([])->id;
+        }
+
+        $organisation = $generator->create_org($record);
+
+        $ja_idnumber = $this->get_last_job_assignment_idnumber();
+        foreach ($user_ids as $user_id) {
+            job_assignment::create(['userid' => $user_id, 'organisationid' => $organisation->id, 'idnumber' => ++$ja_idnumber]);
+        }
+
+        return new organisation($organisation);
+    }
+
+    /**
+     * Create a position and add the specified users to it.
+     *
+     * @param array $user_ids
+     * @param array|object $record
+     * @return position
+     */
+    public function create_position_with_users(array $user_ids, $record = []): position {
+        /** @var totara_hierarchy_generator $generator */
+        $generator = $this->datagenerator->get_plugin_generator('totara_hierarchy');
+
+        $record = (array) $record;
+        if (!isset($record['frameworkid'])) {
+            $record['frameworkid'] = $generator->create_pos_frame([])->id;
+        }
+
+        $position = $generator->create_pos($record);
+
+        $ja_idnumber = $this->get_last_job_assignment_idnumber();
+        foreach ($user_ids as $user_id) {
+            job_assignment::create(['userid' => $user_id, 'positionid' => $position->id, 'idnumber' => ++$ja_idnumber]);
+        }
+
+        return new position($position);
+    }
+
+    private function get_last_job_assignment_idnumber(): int {
+        $last_record = \totara_job\entities\job_assignment::repository()
+            ->order_by('id', 'desc')
+            ->select('id')
+            ->first();
+        if ($last_record) {
+            return $last_record->id;
+        }
+        return 0;
     }
 
 }

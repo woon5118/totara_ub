@@ -78,11 +78,7 @@ $string['manage_activity_page_title'] = 'Manage performance activity';
 $string['manage_edit_draft_heading'] = 'Edit draft: “{$a}”';
 $string['menu_title_activity_management'] = 'Activity Management';
 $string['modal_activate_title'] = 'Confirm activity activation';
-$string['modal_activate_message'] = '<p>Activation will make this activity live. Subjects will be assigned, and instances '
-    . 'generated for them according to the schedule set on the activity. Once activated, changes can still be made '
-    . 'to assignments, but content cannot be edited.</p>'
-    . '<p>{$a->assignable_user_count} users will be assigned on activation.</p>'
-    . '<p>Are you sure you would like to activate this activity?</p>';
+$string['modal_activate_message'] = '<p>Activation will make this activity live. Subjects will be assigned, and instances generated for them according to the schedule set on the activity. Once activated, changes can still be made to assignments, but content cannot be edited.</p><p><strong>{$a}</strong> users will be assigned on activation.</p><p>Are you sure you would like to activate this activity?</p>';
 $string['modulename'] = 'Performance activity';
 $string['modulenameplural'] = 'Performance activities';
 $string['participant_instance_status_complete'] = 'Complete';
@@ -115,6 +111,7 @@ $string['system_activity_type:feedback'] = 'Feedback';
 $string['toast_error_create_activity'] = 'An error occurred while saving, and the activity could not be created.';
 $string['toast_error_generic_update'] = 'An error occurred, and your latest changes have not been saved.';
 $string['toast_error_save_response'] = 'An error occurred while saving, and the activity responses could not be updated.';
+$string['toast_success_activity_activated'] = '"{$a}" was successfully activated.';
 $string['toast_success_activity_update'] = 'Activity saved.';
 $string['toast_success_save_response'] = 'Activity responses saved.';
 $string['track_description'] = 'Track description';

@@ -152,6 +152,11 @@ extend type Query {
   mod_perform_activity(activity_id: core_id!): mod_perform_activity
 
   """
+  The number of users that will be assigned to an activity upon activation
+  """
+  mod_perform_activity_users_to_assign_count(activity_id: core_id!): Int
+
+  """
   A list of all element types that can be used to create elements
   """
   mod_perform_element_plugins: [mod_perform_element_plugin!]!

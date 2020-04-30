@@ -23,14 +23,10 @@
 
 namespace mod_perform;
 
-use core\entities\cohort;
 use core\entities\expandable;
-use core\entities\user;
 use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\query\builder;
-use hierarchy_organisation\entities\organisation;
-use hierarchy_position\entities\position;
 use mod_perform\entities\activity\track_assignment;
 use mod_perform\entities\activity\track_assignment_repository;
 use mod_perform\entities\activity\track_user_assignment;
@@ -215,7 +211,7 @@ class expand_task {
      */
     private function expand_entity(string $type, int $target_id): array {
         /** @var entity $class_name */
-        $class_name = self::get_entity_class_by_user_group_type($type);
+        $class_name = grouping::get_entity_class_by_user_group_type($type);
         if (is_subclass_of($class_name, expandable::class)) {
             if (!is_subclass_of($class_name, entity::class)) {
                 throw new \coding_exception('Currently only entities can be expanded');
@@ -449,38 +445,6 @@ class expand_task {
                 $event->trigger();
             }
         }
-    }
-
-    /**
-     * Get entity class bu user group type
-     *
-     * @param string $type
-     * @return string
-     */
-    private static function get_entity_class_by_user_group_type(string $type): string {
-        switch ($type) {
-            case grouping::USER:
-                $class_name = user::class;
-                break;
-            case grouping::COHORT:
-                $class_name = cohort::class;
-                break;
-            case grouping::POS:
-                $class_name = position::class;
-                break;
-            case grouping::ORG:
-                $class_name = organisation::class;
-                break;
-            default:
-                $class_name = null;
-                break;
-        }
-
-        if (!class_exists($class_name)) {
-            throw new \coding_exception('Invalid entity found!');
-        }
-
-        return $class_name;
     }
 
     /**

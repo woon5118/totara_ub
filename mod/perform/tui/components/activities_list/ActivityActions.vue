@@ -61,20 +61,36 @@
     <ConfirmationModal
       :open="activateModalOpen"
       :title="$str('modal_activate_title', 'mod_perform')"
+      :confirm-button-text="$str('activity_action_activate', 'mod_perform')"
       @confirm="activateActivity"
       @cancel="closeActivateModal"
     >
-      <span v-html="$str('modal_activate_message', 'mod_perform')" />
+      <Loader :loading="$apollo.queries.activityUsersToAssignCount.loading">
+        <span
+          v-html="
+            $str(
+              'modal_activate_message',
+              'mod_perform',
+              activityUsersToAssignCount
+            )
+          "
+        />
+      </Loader>
     </ConfirmationModal>
   </div>
 </template>
 
 <script>
+import ActivateActivityMutation from 'mod_perform/graphql/activate_activity.graphql';
 import ActivityActionsIcon from 'mod_perform/components/icons/ActivityActions';
+import ActivityUsersToAssignCountQuery from 'mod_perform/graphql/activity_users_to_assign_count.graphql';
 import ConfirmationModal from 'totara_core/components/modal/ConfirmationModal';
 import Dropdown from 'totara_core/components/dropdown/Dropdown';
 import DropdownItem from 'totara_core/components/dropdown/DropdownItem';
+import Loader from 'totara_core/components/loader/Loader';
 import ParticipationReportingIcon from 'mod_perform/components/icons/ParticipationReporting';
+import { notify } from 'totara_core/notifications';
+import { NOTIFICATION_DURATION } from 'mod_perform/constants';
 
 export default {
   components: {
@@ -82,6 +98,7 @@ export default {
     ConfirmationModal,
     Dropdown,
     DropdownItem,
+    Loader,
     ParticipationReportingIcon,
   },
 
@@ -95,6 +112,7 @@ export default {
   data() {
     return {
       activateModalOpen: false,
+      activityUsersToAssignCount: 0,
     };
   },
 
@@ -143,7 +161,56 @@ export default {
      * Activate an activity
      */
     activateActivity() {
-      console.log(this.activity.id);
+      this.closeActivateModal();
+      this.$apollo
+        .mutate({
+          mutation: ActivateActivityMutation,
+          variables: {
+            input: {
+              activity_id: this.activity.id,
+            },
+          },
+        })
+        .then(() => {
+          notify({
+            duration: NOTIFICATION_DURATION,
+            message: this.$str(
+              'toast_success_activity_activated',
+              'mod_perform',
+              this.activity.name
+            ),
+            type: 'success',
+          });
+        })
+        .catch(() => {
+          notify({
+            duration: NOTIFICATION_DURATION,
+            message: this.$str(
+              'toast_error_generic_update',
+              'mod_perform',
+              this.activity.name
+            ),
+            type: 'error',
+          });
+        })
+        .finally(() => {
+          this.$emit('refetch');
+        });
+    },
+  },
+
+  apollo: {
+    activityUsersToAssignCount: {
+      query: ActivityUsersToAssignCountQuery,
+      variables() {
+        return {
+          activity_id: this.activity.id,
+        };
+      },
+      update: data => data.mod_perform_activity_users_to_assign_count,
+      skip() {
+        return !this.activateModalOpen;
+      },
     },
   },
 };
@@ -158,7 +225,9 @@ export default {
       "activity_draft_not_ready",
       "modal_activate_message",
       "modal_activate_title",
-      "participation_reporting"
+      "participation_reporting",
+      "toast_error_generic_update",
+      "toast_success_activity_activated"
     ]
   }
 </lang-strings>

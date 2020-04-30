@@ -51,8 +51,8 @@ class activity {
      * @return $this
      */
     protected function fetch_activities() {
-
-        $repo = activity_entity::repository();
+        $repo = activity_entity::repository()
+            ->order_by('id');
         $entities = $repo->get();
         $this->items = [];
 

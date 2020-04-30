@@ -72,7 +72,7 @@
             {{ row.state.display_name }}
           </Cell>
           <Cell size="1" :column-header="$str('view_actions', 'mod_perform')">
-            <ActivityActions :activity="row" />
+            <ActivityActions :activity="row" @refetch="refetchActivities" />
           </Cell>
         </template>
       </Table>
@@ -163,6 +163,13 @@ export default {
      */
     getEditActivityUrl(activityId) {
       return this.$url(this.editUrl, { activity_id: activityId });
+    },
+
+    /**
+     * Reload the activities list.
+     */
+    refetchActivities() {
+      this.$apollo.queries.activities.refetch();
     },
   },
   apollo: {

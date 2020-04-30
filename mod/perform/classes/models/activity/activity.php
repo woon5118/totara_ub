@@ -25,13 +25,18 @@
 namespace mod_perform\models\activity;
 
 use container_perform\perform as perform_container;
+use core\entities\expandable;
+use core\entities\user;
 use core\orm\collection;
 use core\orm\entity\model;
 use mod_perform\entities\activity\activity as activity_entity;
+use mod_perform\entities\activity\track as track_entity;
+use mod_perform\entities\activity\track_assignment;
 use mod_perform\state\activity\active;
 use mod_perform\state\activity\draft;
 use mod_perform\state\state;
 use mod_perform\state\state_aware;
+use mod_perform\user_groups\grouping;
 use mod_perform\util;
 use mod_perform\webapi\resolver\type\activity_state;
 use totara_core\relationship\relationship;
@@ -183,9 +188,7 @@ class activity extends model {
         $entity->course = $container->id;
         $entity->name = $name;
         $entity->description = $description;
-        // TODO TL-24773 leaving this as active for now as we do not have the interface
-        //      to activate for now. Once this is there we need to change the default to draft
-        $entity->status = $status ?? active::get_code();
+        $entity->status = $status ?? draft::get_code();
         $entity->type_id = $type->id;
 
         return $DB->transaction(function () use ($entity, $modinfo, $container) {
@@ -408,6 +411,49 @@ class activity extends model {
     public function activate(): self {
         $this->get_state()->activate();
         return $this;
+    }
+
+    /**
+     * Get the number of users that will be assigned to this activity upon activation.
+     *
+     * @return int
+     * @throws \coding_exception if the activity has already been activated
+     */
+    public function get_users_to_assign_count(): int {
+        if (!$this->get_state()->can_activate()) {
+            throw new \coding_exception("Activity {$this->id} can't be activated");
+        }
+
+        // Get all the assignments for this activity.
+        /** @var track_assignment $track_assignments */
+        $track_assignments = track_assignment::repository()
+            ->select(['id', 'user_group_type', 'user_group_id'])
+            ->join([track_entity::TABLE, 'track'], 'track_id', 'id')
+            ->where('track.activity_id', $this->id)
+            ->get();
+
+        // Separate the user group types in order to query the users associated with the group.
+        $user_groups = [];
+        foreach ($track_assignments as $assignment) {
+            $user_group_entity = grouping::get_entity_class_by_user_group_type($assignment->user_group_type);
+            $user_groups[$user_group_entity][] = $assignment->user_group_id;
+        }
+
+        // Build the total user count by counting the expanded user group records.
+        // User group id for users is just a user id, so it can't be expanded.
+        $user_ids = [];
+        if (isset($user_groups[user::class])) {
+            $user_ids = [$user_groups[user::class]];
+            unset($user_groups[user::class]);
+        }
+        // Expand each user group for the total user count.
+        foreach ($user_groups as $user_group_type => $user_group_ids) {
+            /** @var expandable $user_group_type */
+            $user_ids[] = $user_group_type::expand_multiple($user_group_ids);
+        }
+        $user_ids = array_unique(array_merge(...$user_ids));
+
+        return count($user_ids);
     }
 
     /**

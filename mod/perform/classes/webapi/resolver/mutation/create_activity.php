@@ -30,7 +30,7 @@ use core\webapi\mutation_resolver;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\activity_type;
 use mod_perform\models\activity\section;
-use mod_perform\state\activity\active;
+use mod_perform\state\activity\draft;
 use totara_core\advanced_feature;
 
 class create_activity implements mutation_resolver {
@@ -72,9 +72,7 @@ class create_activity implements mutation_resolver {
             // Create a performance activity inside the new performance container.
             $name = $args['name'];
             $description = $args['description'] ?? null;
-            // TODO TL-24773 leaving this as active for now as we do not have the interface
-            //      to activate for now. Once this is there we need to change the default to draft
-            $status = $args['status'] ?? active::get_code();
+            $status = $args['status'] ?? draft::get_code();
 
             /** @var perform_container $container */
             $activity = activity::create($container, $name, $type_model, $description, $status);
