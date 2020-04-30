@@ -27,6 +27,7 @@ use mod_perform\rb\traits\participant_subject_instance_source;
 use mod_perform\state\state_helper;
 use totara_core\advanced_feature;
 use totara_job\rb\source\report_trait;
+use mod_perform\state\subject_instance\subject_instance_progress;
 
 /**
  * Performance subject instance report.
@@ -209,7 +210,7 @@ class rb_source_perform_subject_instance extends rb_base_source {
                 get_string('subject_instance_status', 'mod_perform'),
                 'select',
                 [
-                    'selectchoices' => state_helper::get_all_display_names('subject_instance'),
+                    'selectchoices' => state_helper::get_all_display_names('subject_instance', subject_instance_progress::get_type()),
                     'simplemode' => true,
                 ]
             ),

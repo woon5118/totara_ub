@@ -27,7 +27,7 @@ use mod_perform\rb\traits\participant_subject_instance_source;
 use mod_perform\state\state_helper;
 use totara_core\advanced_feature;
 use totara_job\rb\source\report_trait;
-
+use mod_perform\state\participant_instance\participant_instance_progress;
 /**
  * Performance participant instance report.
  *
@@ -284,7 +284,7 @@ class rb_source_perform_participant_instance extends rb_base_source {
                 get_string('participant_status', 'rb_source_perform_participant_instance'),
                 'select',
                 [
-                    'selectchoices' => state_helper::get_all_display_names('participant_instance'),
+                    'selectchoices' => state_helper::get_all_display_names('participant_instance', participant_instance_progress::get_type()),
                     'simplemode' => true
                 ]
             ),

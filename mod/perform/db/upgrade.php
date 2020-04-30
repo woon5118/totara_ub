@@ -896,8 +896,27 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020042900, 'perform');
     }
 
-    if ($oldversion < 2020043000) {
+    if ($oldversion < 2020042901) {
+        // Define field availability to be added.
+        $field = new xmldb_field('availability', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0');
+        $tables = [
+            'perform_subject_instance',
+            'perform_participant_instance',
+            'perform_participant_section',
+        ];
 
+        foreach ($tables as $table) {
+            $table_to_update = new xmldb_table($table);
+            if (!$dbman->field_exists($table_to_update, $field)) {
+                $dbman->add_field($table_to_update, $field);
+            }
+        }
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020042901, 'perform');
+    }
+
+    if ($oldversion < 2020043000) {
         // Define field schedule_type to be added to perform_track.
         $table = new xmldb_table('perform_track');
         $field = new xmldb_field('schedule_type', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, 0, 'status');
@@ -910,5 +929,6 @@ function xmldb_perform_upgrade($oldversion) {
         // Perform savepoint reached.
         upgrade_mod_savepoint(true, 2020043000, 'perform');
     }
+
     return true;
 }
