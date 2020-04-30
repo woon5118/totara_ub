@@ -123,33 +123,58 @@ if ($options['unset'] || $options['set'] !== null) {
     }
 
     // Check that the variable is not hard-set in the main config.php already.
-    if (array_key_exists($options['name'], $CFG->config_php_settings)) {
-        cli_error('The configuration variable is hard-set in the config.php, unable to change.', 4);
+    if (empty($options['component'])) {
+        if (array_key_exists($options['name'], $CFG->config_php_settings)) {
+            cli_error('The configuration variable is hard-set in the config.php, unable to change.', 4);
+        }
+    } else {
+        if (isset($CFG->forced_plugin_settings[$options['component']]) && array_key_exists($options['name'], $CFG->forced_plugin_settings[$options['component']])) {
+            cli_error('The configuration variable is hard-set in the config.php, unable to change.', 4);
+        }
     }
 
+    // Make sure we are not overwriting flavour settings.
+    $enforcedsettings = totara_flavour\helper::get_enforced_settings();
+    $flavourplugin = empty($options['component']) ? 'moodle' : $options['component'];
+    if (isset($enforcedsettings[$flavourplugin][$options['name']])) {
+        cli_error('The configuration variable is enforced by current Flavour, unable to change.', 4);
+    }
+
+    // Switch to admin user to load full admin tree.
+    cron_setup_user(null);
+    $settingname = (empty($options['component']) ? $options['name'] : $options['component'] . '/' . $options['name']);
+    $setting = cli_cfg_find_setting($settingname, admin_get_root());
+    if ($setting) {
+        $original = $setting->get_setting();
+    } else {
+        $original = null;
+    }
+
+    // Change the config value in database and caches.
     $oldvalue = get_config($options['component'], $options['name']);
     set_config($options['name'], $options['set'], $options['component']);
     $newvalue = get_config($options['component'], $options['name']);
 
-    // Totara: log values so that support may find out if they did something wrong with settings.
+    // Switch back to no user to get 0 as author of setting change in configlog table.
+    cron_setup_user('reset');
+
     if ($oldvalue !== $newvalue) {
-        // 'False' value from get_config means no value.
+        // Log values so that support may find out if they did something wrong with settings.
         if ($oldvalue === false) {
             $oldvalue = null;
         }
         if ($newvalue === false) {
             $newvalue = null;
         }
-        // We need to find out is settings is a password and obscure it if necessary the same
-        // way as in \admin_setting_configpasswordunmask::add_to_config_log().
-        cron_setup_user(null); // Switch to admin to load full admin tree.
-        $settingname = (empty($options['component']) ? $options['name'] : $options['component'] . '/' . $options['name']);
-        $setting = cli_cfg_find_setting($settingname, admin_get_root());
-        cron_setup_user('reset'); // Switch back to no user to get 0 as author of setting change.
         if ($setting) {
             $setting->add_to_config_log($options['name'], $oldvalue, $newvalue);
         } else {
             add_to_config_log($options['name'], $oldvalue, $newvalue, $options['component']);
+        }
+
+        // Trigger update callbacks and hook.
+        if ($setting) {
+            $setting->post_write_settings($original);
         }
     }
 
