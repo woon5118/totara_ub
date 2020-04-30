@@ -48,8 +48,7 @@ import Tab from 'totara_core/components/tabs/Tab';
 import Tabs from 'totara_core/components/tabs/Tabs';
 import UserActivityList from 'mod_perform/components/user_activities/UserActivityList';
 import { notify } from 'totara_core/notifications';
-
-const TOAST_DURATION = 10 * 1000; // in microseconds.
+import { NOTIFICATION_DURATION } from 'mod_perform/constants';
 
 export default {
   components: {
@@ -90,7 +89,7 @@ export default {
      */
     showSuccessNotification() {
       notify({
-        duration: TOAST_DURATION,
+        duration: NOTIFICATION_DURATION,
         message: this.$str('toast_success_save_response', 'mod_perform'),
         type: 'success',
       });

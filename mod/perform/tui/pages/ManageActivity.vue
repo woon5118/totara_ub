@@ -70,8 +70,7 @@ import Tab from 'totara_core/components/tabs/Tab';
 import Tabs from 'totara_core/components/tabs/Tabs';
 import activityQuery from 'mod_perform/graphql/activity.graphql';
 import { notify } from 'totara_core/notifications';
-
-const TOAST_DURATION = 10 * 1000; // in microseconds.
+import { NOTIFICATION_DURATION } from 'mod_perform/constants';
 
 export default {
   components: {
@@ -144,7 +143,7 @@ export default {
      */
     showMutationSuccessNotification() {
       notify({
-        duration: TOAST_DURATION,
+        duration: NOTIFICATION_DURATION,
         message: this.$str('toast_success_activity_update', 'mod_perform'),
         type: 'success',
       });
@@ -155,7 +154,7 @@ export default {
      */
     showMutationErrorNotification() {
       notify({
-        duration: TOAST_DURATION,
+        duration: NOTIFICATION_DURATION,
         message: this.$str('toast_error_generic_update', 'mod_perform'),
         type: 'error',
       });

@@ -93,8 +93,7 @@ import ModalPresenter from 'totara_core/components/modal/ModalPresenter';
 import performActivitiesQuery from 'mod_perform/graphql/activities.graphql';
 import Table from 'totara_core/components/datatable/Table';
 import { notify } from 'totara_core/notifications';
-
-const TOAST_DURATION = 10 * 1000; // in microseconds.
+import { NOTIFICATION_DURATION } from 'mod_perform/constants';
 
 export default {
   components: {
@@ -132,7 +131,7 @@ export default {
      */
     creationError() {
       notify({
-        duration: TOAST_DURATION,
+        duration: NOTIFICATION_DURATION,
         message: this.$str('toast_error_create_activity', 'mod_perform'),
         type: 'error',
       });
