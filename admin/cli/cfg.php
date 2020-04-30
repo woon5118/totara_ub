@@ -147,11 +147,7 @@ if ($options['unset'] || $options['set'] !== null) {
         $setting = cli_cfg_find_setting($settingname, admin_get_root());
         cron_setup_user('reset'); // Switch back to no user to get 0 as author of setting change.
         if ($setting) {
-            // This is not a nice hack, unfortunately the method is protected in stable branches.
-            $class = new ReflectionClass(get_class($setting));
-            $method = $class->getMethod('add_to_config_log');
-            $method->setAccessible(true);
-            $method->invokeArgs($setting, [$options['name'], $oldvalue, $newvalue, $options['component']]);
+            $setting->add_to_config_log($options['name'], $oldvalue, $newvalue);
         } else {
             add_to_config_log($options['name'], $oldvalue, $newvalue, $options['component']);
         }

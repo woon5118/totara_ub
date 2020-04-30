@@ -1964,11 +1964,14 @@ abstract class admin_setting {
 
     /**
      * Log config changes if necessary.
+     *
+     * NOTE: this method used to be protected in Totara 12 and earlier
+     *
      * @param string $name
      * @param string $oldvalue
      * @param string $value
      */
-    protected function add_to_config_log($name, $oldvalue, $value) {
+    public function add_to_config_log($name, $oldvalue, $value) {
         add_to_config_log($name, $oldvalue, $value, $this->plugin);
     }
 
@@ -2658,7 +2661,7 @@ class admin_setting_configpasswordunmask extends admin_setting_configtext {
      * @param string $oldvalue
      * @param string $value
      */
-    protected function add_to_config_log($name, $oldvalue, $value) {
+    public function add_to_config_log($name, $oldvalue, $value) {
         if ($value !== '') {
             $value = '********';
         }
