@@ -175,4 +175,42 @@ class tool_totara_sync_comp_csv_check_sanity_testcase extends totara_sync_csv_te
         $this->assertEquals('Competency 1', current($records)->fullname);
     }
 
+    public function test_comp_csv_field_mappings_for_types() {
+        global $DB;
+
+        // Setup type and customfields
+        $hierarchygenerator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
+        $typeid = $hierarchygenerator->create_comp_type(['idnumber' => 'T1', 'fullname' => 'Type 1']);
+
+        $text_customfield_data = [
+            'hierarchy'    => 'competency',
+            'typeidnumber' => 'T1',
+            'shortname'    => 'cf1',
+            'value'        => '',
+        ];
+        $hierarchygenerator->create_hierarchy_type_text($text_customfield_data);
+
+        $this->assertCount(0, $DB->get_records('comp'));
+
+        // Set the element config.
+        $this->set_element_config($this->config);
+
+        $additional_fields = [
+            'import_shortname'                       => '1',
+            'import_typeidnumber'                    => '1',
+            'import_customfield_' . $typeid . '_cf1' => '1',
+
+            'fieldmapping_shortname'    => 'sname',
+            'fieldmapping_idnumber'     => 'id',
+            'fieldmapping_typeidnumber' => 'typeid',
+        ];
+        $config = array_merge($this->configcsv, $this->importfields(), $additional_fields);
+        $this->set_source_config($config);
+        $this->add_csv('competencies_field_mapping_2.csv', 'comp');
+        $this->sync();
+
+        $records = $DB->get_records('comp');
+        $this->assertCount(1, $records);
+        $this->assertEquals('Competency 1', current($records)->fullname);
+    }
 }

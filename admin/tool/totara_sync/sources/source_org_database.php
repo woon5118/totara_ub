@@ -91,15 +91,22 @@ class totara_sync_source_org_database extends totara_sync_source_org {
             }
         }
 
+        $dbfields = [];
+
         // Finally, perform externaldb to totara db field mapping
         foreach ($fields as $i => $f) {
             if (in_array($f, array_keys($fieldmappings))) {
-                $fields[$i] = $fieldmappings[$f];
+                $dbfields[$i] = $fieldmappings[$f];
             }
         }
 
         // Custom fields are made unique as it is permitted to have one column for customfields
         // with the same shortname for example (possible if each field has a different type).
+        $dbfields = array_merge(
+            $dbfields,
+            $this->get_unique_mapped_customfields()
+        );
+
         $fields = array_merge(
             $fields,
             $this->get_unique_mapped_customfields()
@@ -115,7 +122,7 @@ class totara_sync_source_org_database extends totara_sync_source_org {
 
         // Check that all fields exists in database.
         $missingcolumns = array();
-        foreach ($fields as $f) {
+        foreach ($dbfields as $f) {
             try {
                 $database_connection->get_field_sql("SELECT $f from $db_table", array(), IGNORE_MULTIPLE);
             } catch (Exception $e) {
@@ -137,7 +144,7 @@ class totara_sync_source_org_database extends totara_sync_source_org {
         $datarows = array();  // holds rows of data
         $rowcount = 0;
 
-        $columns = implode(', ', $fields);
+        $columns = implode(', ', $dbfields);
         $fetch_sql = 'SELECT ' . $columns . ' FROM ' . $db_table;
         $data = $database_connection->get_recordset_sql($fetch_sql);
 
@@ -148,11 +155,7 @@ class totara_sync_source_org_database extends totara_sync_source_org {
 
             foreach ($this->fields as $field) {
                 if (!empty($this->config->{'import_'.$field})) {
-                    if (!empty($this->config->{'fieldmapping_'.$field})) {
-                        $dbrow[$field] = $extdbrow[$this->config->{'fieldmapping_'.$field}];
-                    } else {
-                        $dbrow[$field] = $extdbrow[$field];
-                    }
+                    $dbrow[$field] = $extdbrow[$field];
                 }
             }
 
@@ -174,6 +177,7 @@ class totara_sync_source_org_database extends totara_sync_source_org {
                     $dbrow['timemodified'] = $parsed_date;
                 }
             }
+
             // Custom fields are special - needs to be json-encoded
             if (!empty($this->hierarchy_customfields)) {
                 $dbrow['customfields'] = $this->get_customfield_json($extdbrow);
