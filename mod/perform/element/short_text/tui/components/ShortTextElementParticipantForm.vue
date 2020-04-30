@@ -23,7 +23,7 @@
   <ElementUserForm>
     <template v-slot:content>
       <div>
-        <Scope :path="path" :process="process">
+        <FormScope :path="path" :process="process">
           <FormRow
             :label="
               $str('short_text_your_response', 'performelement_short_text')
@@ -34,21 +34,21 @@
               :validations="v => [v.required(), v.maxLength(1024)]"
             />
           </FormRow>
-        </Scope>
+        </FormScope>
       </div>
     </template>
   </ElementUserForm>
 </template>
 
 <script>
-import Scope from 'totara_core/components/reform/Scope';
+import FormScope from 'totara_core/components/reform/FormScope';
 import { FormRow } from 'totara_core/components/uniform';
 import FormTextarea from 'totara_core/components/uniform/FormTextarea';
 import ElementUserForm from 'mod_perform/components/element/ElementUserForm';
 
 export default {
   components: {
-    Scope,
+    FormScope,
     FormRow,
     FormTextarea,
     ElementUserForm,
