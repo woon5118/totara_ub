@@ -37,23 +37,22 @@ $blockid = required_param('blockid', PARAM_INT);
 $blockcontext = context_block::instance($blockid, MUST_EXIST);
 list($context, $course, $cm) = get_context_info_array($blockcontext->id);
 
-if (empty($course)) {
-    $PAGE->set_context(context_system::instance());
-}
+$PAGE->set_context($blockcontext);
+$PAGE->set_pagelayout('noblocks');
+
 if ($CFG->forcelogin) {
     require_login($course, false, $cm, false, true);
 } else {
     require_course_login($course, false, $cm, false, true);
 }
 
-require_capability('moodle/block:view', $blockcontext);
-
 // Send the correct headers.
 send_headers('text/html; charset=utf-8', false);
 
 $block = $DB->get_record('block_instances', array('id' => $blockid, 'blockname' => 'totara_report_table'), '*', MUST_EXIST);
 
-if (empty($block->configdata)) {
+$totara_report_table = block_instance('totara_report_table', $block);
+if (empty($block->configdata) || !$totara_report_table || !$totara_report_table->user_can_view()) {
     die;
 }
 
@@ -72,9 +71,6 @@ $uniqueid = 'block_totara_report_table_' . $blockid;
 reportbuilder::overrideuniqueid($uniqueid);
 $config = (new rb_config())->set_global_restriction_set($globalrestrictionset);
 $report = reportbuilder::create($id, $config, true);
-
-$PAGE->set_context($blockcontext);
-$PAGE->set_pagelayout('noblocks');
 
 \totara_reportbuilder\event\report_viewed::create_from_report($report)->trigger();
 

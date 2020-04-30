@@ -40,6 +40,11 @@ require_once($CFG->dirroot.'/totara/cohort/lib.php');
 function block_totara_featured_links_pluginfile($course, $birecord_or_cm, context $context, $filearea, $args, $forcedownload, array $options= []) {
     global $DB, $CFG, $USER;
 
+    $totara_featured_links = block_instance('totara_featured_links', $birecord_or_cm);
+    if (!$totara_featured_links || !$totara_featured_links->user_can_view()) {
+        send_file_not_found();
+    }
+
     if ($context->contextlevel != CONTEXT_BLOCK) {
         send_file_not_found();
     }

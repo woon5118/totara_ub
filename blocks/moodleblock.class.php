@@ -591,6 +591,38 @@ class block_base {
     }
 
     /**
+     * Can the user view the block instance
+     *
+     * @return bool True if user can view
+     */
+    public function user_can_view() : bool {
+        global $CFG, $USER, $PAGE;
+
+        if (!has_capability('moodle/block:view', $this->context)) {
+            return false;
+        }
+
+        if ($this->context->id !== $PAGE->context->id) {
+            debugging('The block should only be used in the context it was created.', DEBUG_DEVELOPER);
+            return false;
+        }
+
+        // If the block is added to a totara dashboard, ensure the user has access to the dashboard.
+        if (preg_match("/totara-dashboard-(\d+)/", $this->instance->pagetypepattern, $matches) &&
+            !has_capability('totara/dashboard:manage', context_system::instance())) {
+            require_once($CFG->dirroot . '/totara/dashboard/lib.php');
+            foreach (totara_dashboard::get_user_dashboards($USER->id) as $dashboard) {
+                if ($dashboard->id === $matches[1]) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Allows the block class to have a say in the user's ability to edit (i.e., configure) blocks of this type.
      * The framework has first say in whether this will be allowed (e.g., no editing allowed unless in edit mode)
      * but if the framework does allow it, the block can still decide to refuse.

@@ -4055,7 +4055,7 @@ class curl_cache {
  * @todo MDL-31088 file serving improments
  */
 function file_pluginfile($relativepath, $forcedownload, $preview = null, $theme = null) {
-    global $DB, $CFG, $USER;
+    global $DB, $CFG, $USER, $PAGE;
     // relative path must start with '/'
     if (!$relativepath) {
         print_error('invalidargorconf');
@@ -4910,6 +4910,8 @@ function file_pluginfile($relativepath, $forcedownload, $preview = null, $theme 
             send_file_not_found();
         }
         require_once("$CFG->dirroot/blocks/$blockname/lib.php");
+
+        $PAGE->set_context($context);
 
         if ($context->contextlevel == CONTEXT_BLOCK) {
             $birecord = $DB->get_record('block_instances', array('id'=>$context->instanceid), '*',MUST_EXIST);
