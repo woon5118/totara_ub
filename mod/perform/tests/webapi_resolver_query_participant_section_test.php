@@ -52,11 +52,9 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
         $participant_sections = participant_section_entity::repository()->order_by('id', 'desc')->get();
 
         foreach ($participant_sections as $participant_section) {
-            $subject_instance = $participant_section->participant_instance->subject_instance;
+            self::setUser($participant_section->participant_instance->participant_user->id);
 
-            self::setUser($subject_instance->subject_user_id);
-
-            $args = ['subject_instance_id' => $subject_instance->id];
+            $args = ['participant_instance_id' => $participant_section->participant_instance->id];
 
             $result = graphql::execute_operation(
                 $this->get_execution_context('ajax', 'mod_perform_participant_section'),
@@ -69,7 +67,12 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
 
             $section_element_responses = $result['section_element_responses'];
 
-            $this->assertCount(1, $section_element_responses, 'Expected one section element');
+            $this->assertCount(
+                1,
+                $section_element_responses,
+                'Expected one section element'
+            );
+
             $this->assertEquals(
                 $this->create_section_element_response($section_element->id),
                 $section_element_responses[0]

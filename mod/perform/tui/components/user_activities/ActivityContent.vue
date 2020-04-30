@@ -30,21 +30,21 @@
       <div class="tui-participantContent__user">
         <div class="tui-participantContent__user-info">
           <ParticipantUserHeader
-            :user-name="subjectInstance.subject_user.fullname"
-            :profile-picture="subjectInstance.subject_user.profileimageurlsmall"
+            :user-name="subjectUser.fullname"
+            :profile-picture="subjectUser.profileimageurlsmall"
             size="small"
           />
         </div>
         <div class="tui-participantContent__user-relationship">
           {{ $str('user_activities_your_relationship_to_user', 'mod_perform') }}
           <h4 class="tui-participantContent__user-relationshipValue">
-            {{ subjectInstance.relationship_to_subject }}
+            {{ relationshipToUser }}
           </h4>
         </div>
       </div>
 
       <h2 class="tui-participantContent__header">
-        {{ subjectInstance.activity.name }}
+        {{ activity.name }}
       </h2>
 
       <div class="tui-participantContent__section">
@@ -124,9 +124,43 @@ export default {
   },
 
   props: {
-    subjectInstance: {
+    /**
+     * The id of the logged in user.
+     */
+    currentUserId: {
+      required: true,
+      type: Number,
+    },
+
+    /**
+     * The abstract perform activity this is an instance of.
+     */
+    activity: {
       required: true,
       type: Object,
+    },
+
+    /**
+     * The user this activity is about.
+     */
+    subjectUser: {
+      required: true,
+      type: Object,
+      validator(value) {
+        return ['id', 'profileimageurlsmall', 'fullname'].every(
+          Object.prototype.hasOwnProperty.bind(value)
+        );
+      },
+    },
+
+    /**
+     * The participant instances that are available to answer as, under most circumstances there will only be one,
+     * however if the logged in user was for example both the manager and appraiser for the subject they would
+     * have the option to answer as either.
+     */
+    participantInstances: {
+      required: true,
+      type: Array,
     },
   },
 
@@ -144,6 +178,7 @@ export default {
       sectionElements: [],
       showOtherResponse: false,
       completionSaveSuccess: false,
+      answeringAs: this.participantInstances[0],
     };
   },
 
@@ -152,7 +187,7 @@ export default {
       query: SectionResponsesQuery,
       variables() {
         return {
-          subject_instance_id: this.subjectInstance.id,
+          participant_instance_id: this.answeringAs.id,
         };
       },
       update: data => data.mod_perform_participant_section.section,
@@ -202,15 +237,19 @@ export default {
   },
 
   computed: {
-    /**
-     * Determine if we should return the the about others tab on cancel or completion.
-     */
-    shouldReturnToAboutOthersTab() {
-      if (!this.subjectInstance) {
-        return false;
+    relationshipToUser() {
+      if (this.currentUserIsSubject) {
+        return this.$str('relation_to_subject_self', 'mod_perform');
       }
 
-      return !this.subjectInstance.is_self;
+      return this.answeringAs.relationship_name;
+    },
+
+    /**
+     * Is the logged in user the subject of this activity.
+     */
+    currentUserIsSubject() {
+      return Number(this.currentUserId) === Number(this.subjectUser.id);
     },
   },
 
@@ -303,7 +342,7 @@ export default {
       const url = this.$url('/mod/perform/activity/index.php');
 
       this.redirectWithPost(url, {
-        show_about_others_tab: this.shouldReturnToAboutOthersTab,
+        show_about_others_tab: !this.currentUserIsSubject,
         completion_save_success: true,
       });
     },
@@ -313,7 +352,7 @@ export default {
       const url = this.$url('/mod/perform/activity/index.php');
 
       this.redirectWithPost(url, {
-        show_about_others_tab: this.shouldReturnToAboutOthersTab,
+        show_about_others_tab: !this.currentUserIsSubject,
         completion_save_success: false,
       });
     },
@@ -350,10 +389,11 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
-      "user_activities_other_response_show",
-      "user_activities_your_relationship_to_user",
+      "relation_to_subject_self",
+      "toast_error_save_response",
       "toast_success_save_response",
-      "toast_error_save_response"
+      "user_activities_other_response_show",
+      "user_activities_your_relationship_to_user"
     ]
   }
 </lang-strings>

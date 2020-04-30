@@ -34,7 +34,10 @@
       />
       <ActivityContent
         v-if="activityFound"
-        :subject-instance="subjectInstance"
+        :current-user-id="currentUserId"
+        :activity="subjectInstance.activity"
+        :subject-user="subjectInstance.subject_user"
+        :participant-instances="subjectInstance.participant_instances"
       />
     </Loader>
   </div>
@@ -53,6 +56,13 @@ export default {
     ActivityContent,
   },
   props: {
+    /**
+     * The id of the logged in user.
+     */
+    currentUserId: {
+      required: true,
+      type: Number,
+    },
     subjectInstanceId: {
       required: true,
       type: Number,

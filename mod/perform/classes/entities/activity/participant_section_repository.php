@@ -32,21 +32,20 @@ use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 class participant_section_repository extends repository {
 
     /**
-     * Get the first participant section for a given subject instance and participant.
+     * Get the first participant section for a given participant instance.
      *
-     * @param int $subject_instance_id
+     * @param int $participant_instance_id
      * @param int $participant_id
      * @return participant_section
      * @throws coding_exception
      */
-    public function fetch_default(int $subject_instance_id, int $participant_id): participant_section_entity {
+    public function fetch_default(int $participant_instance_id, int $participant_id): participant_section_entity {
         /** @var participant_section_entity $first_participant_section */
         $first_participant_section = participant_section_entity::repository()
             ->as('ps')
             ->join([participant_instance_entity::TABLE, 'pi'], 'ps.participant_instance_id', 'pi.id')
-            ->join([subject_instance_entity::TABLE, 'si'], 'pi.subject_instance_id', 'si.id')
             ->where('pi.participant_id', $participant_id)
-            ->where('si.id', $subject_instance_id)
+            ->where('pi.id', $participant_instance_id)
             ->order_by('ps.id', 'desc')
             ->first();
 

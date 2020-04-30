@@ -28,7 +28,7 @@ use core\webapi\execution_context;
 use core\webapi\query_resolver;
 use mod_perform\data_providers\response\participant_section_with_responses;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
-use mod_perform\models\activity\subject_instance as subject_instance_model;
+use mod_perform\models\activity\participant_instance as participant_instance_model;
 use mod_perform\models\response\participant_section as participant_section_model;
 use totara_core\advanced_feature;
 
@@ -38,11 +38,11 @@ class participant_section implements query_resolver {
         advanced_feature::require('performance_activities');
         require_login(null, false, null, false, true);
 
-        $subject_instance_id = $args['subject_instance_id'];
+        $participant_instance_id = $args['participant_instance_id'];
         $participant_id = user::logged_in()->id;
 
         $participant_section_entity = participant_section_entity::repository()->fetch_default(
-            $subject_instance_id,
+            $participant_instance_id,
             $participant_id
         );
 
@@ -50,7 +50,7 @@ class participant_section implements query_resolver {
             return null;
         }
 
-        $ec->set_relevant_context(subject_instance_model::load_by_id($subject_instance_id)->get_context());
+        $ec->set_relevant_context(participant_instance_model::load_by_id($participant_instance_id)->get_context());
 
         $data_provider = new participant_section_with_responses($participant_id, $participant_section_entity->id);
 

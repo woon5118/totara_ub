@@ -5,11 +5,15 @@ query mod_perform_subject_instance($subject_instance_id: core_id!) {
     activity {
       name
     }
-    relationship_to_subject
-    is_self
     subject_user {
+      id
       fullname
       profileimageurlsmall
+    }
+    participant_instances {
+      id
+      progress_status
+      relationship_name
     }
   }
 }

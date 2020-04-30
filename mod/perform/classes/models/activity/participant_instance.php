@@ -57,6 +57,7 @@ class participant_instance extends model {
     protected $entity;
 
     protected $entity_attribute_whitelist = [
+        'id',
         'progress',
         'participant_id',
         'participant_sections',
@@ -130,4 +131,5 @@ class participant_instance extends model {
         $relationship_entity = $this->entity->activity_relationship->relationship;
         return (new relationship($relationship_entity))->get_name();
     }
+
 }

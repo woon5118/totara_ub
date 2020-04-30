@@ -1,5 +1,7 @@
-query mod_perform_participant_section($subject_instance_id: core_id!) {
-  mod_perform_participant_section(subject_instance_id: $subject_instance_id) {
+query mod_perform_participant_section($participant_instance_id: core_id!) {
+  mod_perform_participant_section(
+    participant_instance_id: $participant_instance_id
+  ) {
     id
     progress_status
     section {

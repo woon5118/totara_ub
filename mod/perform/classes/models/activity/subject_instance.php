@@ -60,20 +60,14 @@ class subject_instance extends model {
     protected $model_accessor_whitelist = [
         'activity',
         'participant_instances',
-        'relationship_to_subject',
-        'is_self',
         'progress_status',
     ];
 
     /** @var subject_instance_entity */
     protected $entity;
 
-    /** @var string */
-    protected $relationship_to_subject;
-
-    public function __construct(subject_instance_entity $subject_instance, string $relationship_to_subject = null) {
+    public function __construct(subject_instance_entity $subject_instance) {
         parent::__construct($subject_instance);
-        $this->relationship_to_subject = $relationship_to_subject;
     }
 
     /**
@@ -128,22 +122,6 @@ class subject_instance extends model {
     protected function update_state_code(state $state): void {
         $this->entity->progress = $state::get_code();
         $this->entity->update();
-    }
-
-    /**
-     * The relationship name for the relationship between the logged in user and subject.
-     * @return string
-     */
-    public function get_relationship_to_subject(): string {
-        return $this->relationship_to_subject;
-    }
-
-    /**
-     * Is this subject instance the logged in user.
-     * @return bool
-     */
-    public function get_is_self(): bool {
-        return (int) $this->entity->subject_user_id === (int) user::logged_in()->id;
     }
 
     /**

@@ -21,6 +21,8 @@
  * @package mod_perform
  */
 
+use mod_perform\models\activity\participant_instance;
+use mod_perform\state\participant_instance\not_started;
 use totara_webapi\graphql;
 
 require_once(__DIR__ . '/subject_instance_testcase.php');
@@ -47,6 +49,9 @@ class mod_perform_webapi_resolver_query_subject_instance_testcase extends mod_pe
             0
         ))->get_url($GLOBALS['PAGE'])->out(false);
 
+        /** @var participant_instance $participant_instance */
+        $participant_instance = self::$about_user_and_participating->participant_instances->first();
+
         $expected = [
             'id' => self::$about_user_and_participating->id,
             'progress_status' => self::$about_user_and_participating->get_progress_status(),
@@ -57,8 +62,13 @@ class mod_perform_webapi_resolver_query_subject_instance_testcase extends mod_pe
                 'fullname' => self::$about_user_and_participating->subject_user->fullname,
                 'profileimageurlsmall' => $profile_image_small_url,
             ],
-            'relationship_to_subject' => 'Self',
-            'is_self' => true,
+            'participant_instances' => [
+                [
+                    'id' => $participant_instance->get_id(),
+                    'progress_status' => not_started::get_name(),
+                    'relationship_name' => 'Subject',
+                ]
+            ]
         ];
 
         self::assertEquals($expected, $actual);

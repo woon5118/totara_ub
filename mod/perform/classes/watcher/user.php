@@ -49,6 +49,7 @@ class user {
 
     private static function is_allowed_profile_field(string $field): bool {
         static $allowed_profile_fields = [
+            'id',
             'fullname',
             'profileimageurlsmall',
         ];

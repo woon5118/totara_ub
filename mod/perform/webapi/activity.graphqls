@@ -92,9 +92,8 @@ type mod_perform_subject_instance {
   id: core_id!
   activity: mod_perform_activity!
   progress_status: mod_perform_subject_instance_status!
-  relationship_to_subject: String!
-  is_self: Boolean!
   subject_user: core_user!
+  # Note: these participant_instances are only ones which link to the logged in user.
   participant_instances: [mod_perform_participant_instance!]!
 }
 
@@ -192,7 +191,7 @@ extend type Query {
   A section of elements for a user to respond to
   """
   mod_perform_participant_section(
-    subject_instance_id: core_id!
+    participant_instance_id: core_id!
   ): mod_perform_participant_section
 }
 
