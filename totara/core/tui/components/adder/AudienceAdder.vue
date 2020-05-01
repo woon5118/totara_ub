@@ -152,10 +152,12 @@ export default {
       default: () => [],
     },
     open: Boolean,
+    customQuery: Object,
   },
 
   data() {
     return {
+      audiences: null,
       audienceSelectedItems: [],
       filters: {
         search: '',
@@ -165,13 +167,31 @@ export default {
     };
   },
 
-  apollo: {
+  watch: {
+    /**
+     * On opening of adder, unblock query
+     *
+     */
+    open() {
+      if (this.open) {
+        this.filters.search = '';
+        this.skipQueries = false;
+      } else {
+        this.skipQueries = true;
+      }
+    },
+  },
+
+  /**
+   * Apollo queries have been registered here to provide support for custom queries
+   */
+  created() {
     /**
      * All audiences query
      *
      */
-    audiences: {
-      query: cohorts,
+    this.$apollo.addSmartQuery('audiences', {
+      query: this.customQuery ? this.customQuery : cohorts,
       skip() {
         return this.skipQueries;
       },
@@ -188,14 +208,14 @@ export default {
         this.nextPage = audiences.next_cursor ? audiences.next_cursor : false;
         return audiences;
       },
-    },
+    });
 
     /**
      * Selected audiences query
      *
      */
-    selectedAudiences: {
-      query: cohorts,
+    this.$apollo.addSmartQuery('selectedAudiences', {
+      query: this.customQuery ? this.customQuery : cohorts,
       skip() {
         return this.skipQueries;
       },
@@ -212,22 +232,7 @@ export default {
         this.audienceSelectedItems = selectedAudiences.items;
         return selectedAudiences;
       },
-    },
-  },
-
-  watch: {
-    /**
-     * On opening of adder, unblock query
-     *
-     */
-    open() {
-      if (this.open) {
-        this.filters.search = '';
-        this.skipQueries = false;
-      } else {
-        this.skipQueries = true;
-      }
-    },
+    });
   },
 
   methods: {

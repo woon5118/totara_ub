@@ -41,6 +41,7 @@ describe('AudienceAdder', () => {
           return 'tempString';
         },
         $apollo: {
+          addSmartQuery: function() {},
           loading: false,
         },
         audiences: function() {

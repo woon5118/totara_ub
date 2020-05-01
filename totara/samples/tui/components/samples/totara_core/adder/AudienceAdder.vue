@@ -29,6 +29,7 @@
 
       <AudienceAdder
         :open="showAdder"
+        :custom-query="query"
         :existing-items="addedIds"
         @added="adderUpdate"
         @cancel="adderCancelled"
@@ -54,6 +55,9 @@ import Button from 'totara_core/components/buttons/Button';
 import SamplesCode from 'totara_samples/components/sample_parts/misc/SamplesCode';
 import SamplesExample from 'totara_samples/components/sample_parts/misc/SamplesExample';
 
+// Queries
+import cohorts from 'core/graphql/cohorts';
+
 export default {
   components: {
     AudienceAdder,
@@ -67,6 +71,7 @@ export default {
       addedAudiences: [],
       addedIds: [],
       showAdder: false,
+      query: cohorts,
       codeTemplate: `<Button :text="$str('add_audiences', 'totara_core')" @click="adderOpen" />
 
 <AudienceAdder
