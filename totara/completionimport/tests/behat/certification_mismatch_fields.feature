@@ -49,11 +49,9 @@ Feature: Verify the case insensitive shortnames for certification completion imp
     And I click on "Show more" "link" in the ".totara_completionimport__uploadcertification_form" "css_element"
     And I set the field "Upload certification Case insensitive shortnames" to "1"
     And I click on "Save" "button" in the ".totara_completionimport__uploadcertification_form" "css_element"
-    Then I should see "CSV import completed"
-    And I should see "0 Records with data errors - these were ignored"
-    And I should see "5 Records created as evidence"
-    And I should see "7 Records successfully imported as certifications"
-    And I should see "12 Records in total"
+    Then I should see "Certification completion file successfully imported"
+    And I should see "12 Records imported pending processing"
+    And I run all adhoc tasks
 
     When I follow "Certification import report"
     And "1" row "Imported as evidence?" column of "completionimport_certification" table should contain "No"
@@ -106,11 +104,9 @@ Feature: Verify the case insensitive shortnames for certification completion imp
     And I upload "totara/completionimport/tests/behat/fixtures/certification_mismatch_fields_1.csv" file to "Certification CSV file to upload" filemanager
     And I set the field "Upload certification Default evidence type" to "0"
     And I click on "Save" "button" in the ".totara_completionimport__uploadcertification_form" "css_element"
-    Then I should see "CSV import completed"
-    And I should see "9 Records with data errors - these were ignored"
-    And I should see "2 Records created as evidence"
-    And I should see "1 Records successfully imported as certifications"
-    And I should see "12 Records in total"
+    Then I should see "Certification completion file successfully imported"
+    And I should see "12 Records imported pending processing"
+    And I run all adhoc tasks
 
     When I follow "Certification import report"
     And "1" row "Imported as evidence?" column of "completionimport_certification" table should contain "No"

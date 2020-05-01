@@ -83,9 +83,9 @@ Feature: Verify certification completion data with custom fields can be successf
     And I upload "totara/completionimport/tests/behat/fixtures/certification_evidence_custom_fields_1.csv" file to "Certification CSV file to upload" filemanager
     And I set the field "Upload certification Default evidence type" to "0"
     And I click on "Save" "button" in the ".totara_completionimport__uploadcertification_form" "css_element"
-    Then I should see "CSV import completed"
-    And I should see "1 Records created as evidence"
-    And I should see "1 Records in total"
+    Then I should see "Certification completion file successfully imported"
+    And I should see "1 Records imported pending processing"
+    And I run all adhoc tasks
 
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
@@ -125,9 +125,9 @@ Feature: Verify certification completion data with custom fields can be successf
     And I upload "totara/completionimport/tests/behat/fixtures/certification_evidence_custom_fields_1.csv" file to "Certification CSV file to upload" filemanager
     And I set the field "Upload certification Default evidence type" to "0"
     And I click on "Save" "button" in the ".totara_completionimport__uploadcertification_form" "css_element"
-    Then I should see "CSV import completed"
-    And I should see "1 Records created as evidence"
-    And I should see "1 Records in total"
+    Then I should see "Certification completion file successfully imported"
+    And I should see "1 Records imported pending processing"
+    And I run all adhoc tasks
 
     When I follow "Certification import report"
     Then I should see "1 Jan 2015" in the "learner1" "table_row"
@@ -144,9 +144,8 @@ Feature: Verify certification completion data with custom fields can be successf
     And I upload "totara/completionimport/tests/behat/fixtures/certification_evidence_custom_fields_2.csv" file to "Certification CSV file to upload" filemanager
     And I set the field "Upload certification Default evidence type" to "0"
     And I click on "Save" "button" in the ".totara_completionimport__uploadcertification_form" "css_element"
-    Then I should see "CSV import completed"
-    And I should see "1 Records created as evidence"
-    And I should see "1 Records in total"
+    And I should see "1 Records imported pending processing"
+    And I run all adhoc tasks
 
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"

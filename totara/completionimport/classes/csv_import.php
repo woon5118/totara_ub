@@ -209,4 +209,56 @@ class csv_import {
 
         return $rowobject;
     }
+
+    /**
+     * Import content with only basic santiy check of CSV
+     *
+     * @param $content
+     * @param $importname
+     * @param $importtime
+     */
+    public static function basic_import($content, $importname, $importtime): array{
+        global $CFG, $DB;
+        require_once($CFG->libdir . '/csvlib.class.php');
+
+        // Increase memory limit.
+        raise_memory_limit(MEMORY_EXTRA);
+
+        // Stop time outs, this might take a while.
+        \core_php_time_limit::raise(0);
+
+        // Get any evidence custom fields.
+        $customfields = get_evidence_customfields();
+        $pluginname = 'totara_completionimport_' . $importname;
+        $tablename = get_tablename($importname);
+
+        // The names of delimiter and separator have been swapped in these Totara params. We'll start using
+        // names that match up with the class/function APIs at this point.
+        $csvenclosure = get_default_config($pluginname, 'csvdelimiter', TCI_CSV_DELIMITER);
+        $csvdelimiter = get_default_config($pluginname, 'csvseparator', TCI_CSV_SEPARATOR);
+        $csvencoding = get_default_config($pluginname, 'csvencoding', TCI_CSV_ENCODING);
+        $csvdateformat = get_default_config($pluginname, 'csvdateformat', TCI_CSV_DATE_FORMAT);
+
+        $importid = \csv_import_reader::get_new_iid('completionimport');
+        $csvimport = new \csv_import_reader($importid, 'completionimport');
+        $csvimport->load_csv_content($content, $csvencoding, $csvdelimiter, null, $csvenclosure);
+
+        $allcolumns = $csvimport->get_columns();
+        $columnerrors = self::validate_columns($allcolumns, $importname);
+        if ($columnerrors) {
+            return $columnerrors;
+        }
+
+        $csvimport->init();
+        $import = array();
+        // For backwards compatibility, rowcount is number 1 for columns and then data rows begin below that at row 2.
+        $rownumber = 2;
+        while ($item = $csvimport->next()) {
+            $import[] = self::new_row_object($item, $rownumber, $allcolumns, $importtime, $csvdateformat, $customfields);
+            $rownumber++;
+        }
+        $DB->insert_records_via_batch($tablename, $import);
+
+        return [];
+    }
 }

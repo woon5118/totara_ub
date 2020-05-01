@@ -144,17 +144,54 @@ if (!empty($importname)) {
         exit;
     }
 
-    // Importtime is used to filter the import table for this run.
     $importtime = time();
-    $errors = \totara_completionimport\csv_import::import($content, $importname, $importtime);
-    if (empty($errors)) {
-        echo $OUTPUT->notification(get_string('csvimportdone', 'totara_completionimport'), 'notifysuccess');
-    } else {
-        echo $OUTPUT->notification(get_string('importerror_' . $importname, 'totara_completionimport'), 'notifyproblem');
-        echo html_writer::alist($errors);
+    if ($importname === 'course') {
+        // Importtime is used to filter the import table for this run.
+        $errors = \totara_completionimport\csv_import::import($content, $importname, $importtime);
+        if (empty($errors)) {
+            echo $OUTPUT->notification(get_string('csvimportdone', 'totara_completionimport'), 'notifysuccess');
+        } else {
+            echo $OUTPUT->notification(get_string('importerror_' . $importname, 'totara_completionimport'), 'notifyproblem');
+        }
+    } else if ($importname === 'certification') {
+        // Run basic sanity check
+        //$errors = \totara_completionimport\csv_import::sanity_check_csv($content, $importname);
+
+        // Do initial import (sanity check and import data into import table)
+        $errors = \totara_completionimport\csv_import::basic_import($content, $importname, $importtime);
+
+        if (empty($errors)) {
+
+            // Run adhoc task to process imported data
+            $adhoctask = new \totara_completionimport\task\import_certification_completions_task();
+            $adhoctask->set_custom_data(['importname' => $importname, 'importtime' => $importtime]);
+
+            \core\task\manager::queue_adhoc_task($adhoctask);
+
+            echo $OUTPUT->notification(get_string('certificationcsvdone', 'totara_completionimport'), 'notifysuccess');
+        } else {
+            echo $OUTPUT->notification(get_string('importerror_' . $importname, 'totara_completionimport'), 'notifyproblem');
+        }
     }
 
-    display_report_link($importname, $importtime);
+    $data = get_import_results_data($importname, $importtime);
+
+    $viewurl = new moodle_url('/totara/completionimport/viewreport.php',
+                ['importname' => $importname, 'timecreated' => $importtime, 'importuserid' => $USER->id, 'clearfilters' => 1]);
+
+    $data->reportlink = [
+        'text' => format_string(get_string('report_' . $importname, 'totara_completionimport')),
+        'link' => $viewurl
+    ];
+
+    // Add errors to data for rendering
+    $data->errors = $errors;
+
+    $import_results_output = \totara_completionimport\output\import_results::create_from_import($data, $importname);
+    $results_template_data = $import_results_output->get_template_data();
+
+    echo $OUTPUT->render_from_template('totara_completionimport/completionimport_import_results', $results_template_data);
+
     echo $OUTPUT->footer();
     exit;
 }

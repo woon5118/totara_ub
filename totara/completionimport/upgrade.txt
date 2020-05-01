@@ -3,6 +3,7 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* Deprecated function display_report_link, please use display class (\totara_completionimport\output\import_results) and template instead.
 * Changed the Upload Completion Records page:
   * The header text of each form has been moved to the upload_form class.
   * The description texts have been moved to the upload_form class.

@@ -17,8 +17,9 @@ Feature: Certification history can be imported as long as records are considered
     And I set the field "Upload certification Default evidence type" to "0"
     And I set the field "Upload certification Import action" to "Save to history"
     And I click on "Save" "button" in the ".totara_completionimport__uploadcertification_form" "css_element"
-    Then I should see "CSV import completed"
-    And I should see "2 Records successfully imported as certifications"
+    Then I should see "Certification completion file successfully imported"
+    And I should see "2 Records imported pending processing"
+    And I run all adhoc tasks
 
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Learner One"
@@ -89,7 +90,8 @@ Feature: Certification history can be imported as long as records are considered
     And I set the field "Upload certification Default evidence type" to "0"
     And I set the field "Upload certification Import action" to "Save to history"
     And I click on "Save" "button" in the ".totara_completionimport__uploadcertification_form" "css_element"
-    Then I should see "CSV import completed"
+    Then I should see "Certification completion file successfully imported"
+    And I run all adhoc tasks
 
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Learner One"

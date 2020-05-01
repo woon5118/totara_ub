@@ -1757,6 +1757,8 @@ function get_dateformats() {
 /**
  * Displays import results and a link to view the import errors
  *
+ * @deprecated Since Totara 12.19
+ *
  * @global object $OUTPUT
  * @global object $DB
  * @global object $USER
@@ -1765,6 +1767,8 @@ function get_dateformats() {
  */
 function display_report_link($importname, $importtime) {
     global $OUTPUT, $DB, $USER;
+
+    debugging('display_report_link has been deprecated use output class (\totara_completionimport\output\import_results) and template instead.', DEBUG_DEVELOPER);
 
     $tablename = get_tablename($importname);
 
@@ -1791,7 +1795,34 @@ function display_report_link($importname, $importtime) {
     } else {
         echo html_writer::tag('p', get_string('importnone', 'totara_completionimport'));
     }
+}
 
+function get_import_results_data(string $importname, string $importtime): \stdClass {
+    global $DB, $USER;
+
+    $tablename = get_tablename($importname);
+
+    $sql = "SELECT COUNT(*) AS totalrows,
+            COALESCE(SUM(importerror), 0) AS totalerrors,
+            COALESCE(SUM(importevidence), 0) AS totalevidence
+            FROM {{$tablename}}
+            WHERE timecreated = :timecreated
+            AND importuserid = :userid";
+    $totals = $DB->get_record_sql($sql, ['timecreated' => $importtime, 'userid' => $USER->id]);
+
+    $data = new \stdClass();
+
+    if ($totals->totalrows) {
+        $data->importtype = $importname;
+        $data->totalrows = $totals->totalrows;
+
+        $data->errorcount = $totals->totalerrors;
+        $data->evidencecount = $totals->totalevidence;
+
+        $data->successfulcount = $data->totalrows - $data->errorcount - $data->evidencecount;
+    }
+
+    return $data;
 }
 
 /**

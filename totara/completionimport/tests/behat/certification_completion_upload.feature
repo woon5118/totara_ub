@@ -18,10 +18,9 @@ Feature: Verify certification completion data can be successfully uploaded.
     And I set the field "Upload certification Default evidence type" to "0"
     And I set the field "Upload certification Import action" to "Certify uncertified users"
     And I click on "Save" "button" in the ".totara_completionimport__uploadcertification_form" "css_element"
-    Then I should see "CSV import completed"
-    And I should see "1 Records successfully imported as certifications"
-    And I should see "1 Records created as evidence"
-    And I should see "2 Records in total"
+    Then I should see "Certification completion file successfully imported"
+    And I should see "2 Records imported pending processing"
+    And I run all adhoc tasks
 
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
@@ -61,10 +60,9 @@ Feature: Verify certification completion data can be successfully uploaded.
     And I set the field "Upload certification Evidence field for the description" to "CUSTOM - Description"
     And I set the field "Upload certification Import action" to "Certify uncertified users"
     And I click on "Save" "button" in the ".totara_completionimport__uploadcertification_form" "css_element"
-    Then I should see "CSV import completed"
-    And I should see "1 Records successfully imported as certifications"
-    And I should see "1 Records created as evidence"
-    And I should see "2 Records in total"
+    Then I should see "Certification completion file successfully imported"
+    And I should see "2 Records imported pending processing"
+    And I run all adhoc tasks
 
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
@@ -89,10 +87,9 @@ Feature: Verify certification completion data can be successfully uploaded.
     And I set the field "Upload certification Evidence field for the description" to "Select an evidence description field"
     And I set the field "Upload certification Import action" to "Certify uncertified users"
     And I click on "Save" "button" in the ".totara_completionimport__uploadcertification_form" "css_element"
-    Then I should see "CSV import completed"
-    And I should see "1 Records successfully imported as certifications"
-    And I should see "1 Records created as evidence"
-    And I should see "2 Records in total"
+    Then I should see "Certification completion file successfully imported"
+    And I should see "2 Records imported pending processing"
+    And I run all adhoc tasks
 
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
@@ -113,11 +110,9 @@ Feature: Verify certification completion data can be successfully uploaded.
     And I set the field "Upload certification Default evidence type" to "-1"
     And I set the field "Upload certification Import action" to "Certify uncertified users"
     And I click on "Save" "button" in the ".totara_completionimport__uploadcertification_form" "css_element"
-    Then I should see "CSV import completed"
-    And I should see "1 Records with data errors - these were ignored"
-    And I should see "1 Records successfully imported as certifications"
-    And I should see "0 Records created as evidence"
-    And I should see "2 Records in total"
+    Then I should see "Certification completion file successfully imported"
+    And I should see "2 Records imported pending processing"
+    And I run all adhoc tasks
 
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"

@@ -280,6 +280,14 @@ class rb_source_completionimport_certification extends rb_base_source {
                 array('displayfunc' => 'plaintext')
         );
 
+        $columnoptions[] = new rb_column_option(
+                'base',
+                'processed',
+                get_string('columnbaseprocessed', 'rb_source_completionimport_certification'),
+                'base.processed',
+                ['displayfunc' => 'yes_or_no']
+        );
+
         return $columnoptions;
     }
 
@@ -371,6 +379,16 @@ class rb_source_completionimport_certification extends rb_base_source {
                 'text'
         );
 
+        $filteroptions[] = new rb_filter_option(
+                'base',
+                'processed',
+                get_string('columnbaseprocessed', 'rb_source_completionimport_certification'),
+                'select',
+                [
+                    'selectfunc' => 'yesno_list'
+                ]
+        );
+
         return $filteroptions;
     }
 
@@ -438,6 +456,10 @@ class rb_source_completionimport_certification extends rb_base_source {
                 'type' => 'base',
                 'value' => 'completiondate',
             ),
+            array(
+                'type' => 'base',
+                'value' => 'processed',
+            )
         );
         return $defaultcolumns;
     }
@@ -483,6 +505,11 @@ class rb_source_completionimport_certification extends rb_base_source {
                 'type' => 'base',
                 'value' => 'completiondate',
                 'advanced' => 1,
+            ),
+            array(
+                'type' => 'base',
+                'value' => 'processed',
+                'advanced' => 0
             ),
         );
         return $defaultfilters;
