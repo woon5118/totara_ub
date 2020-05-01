@@ -62,8 +62,15 @@ class participant_section_creation {
                 $activity_ids = array_unique($participant_instances->pluck('activity_id'));
                 $section_ids = $this->get_section_ids_for_activities($activity_ids);
 
-                foreach ($section_ids as $section_id) {
-                    $this->aggregate_participants_for_section($section_id, $participant_instances);
+                foreach ($participant_instances as $participant_instance) {
+                    foreach ($section_ids[$participant_instance->activity_id] as $section_id) {
+                        $data = new stdClass();
+                        $data->section_id = $section_id;
+                        $data->status = not_started::get_code();
+                        $data->created_at = time();
+                        $data->participant_instance_id = $participant_instance->id;
+                        $this->aggregate_participant_section($data);
+                    }
                 }
                 $this->save_participant_sections();
             }
@@ -78,29 +85,20 @@ class participant_section_creation {
      * @return array
      */
     private function get_section_ids_for_activities(array $activity_ids): array {
-        return section::repository()
+        $activity_sections = section::repository()
             ->where_in('activity_id', $activity_ids)
-            ->select('id')
-            ->get()
-            ->pluck('id');
-    }
+            ->select(['id', 'activity_id'])
+            ->get();
+        $result = [];
 
-    /**
-     * Aggregates participants for a section.
-     *
-     * @param int $section_id
-     * @param collection $participant_instance_list
-     * @return void
-     */
-    private function aggregate_participants_for_section(int $section_id, collection $participant_instance_list): void {
-        foreach ($participant_instance_list as $participant_instance) {
-            $data = new stdClass();
-            $data->section_id = $section_id;
-            $data->status = not_started::get_code();
-            $data->created_at = time();
-            $data->participant_instance_id = $participant_instance->id;
-            $this->aggregate_participant_section($data);
+        foreach ($activity_sections as $activity_section) {
+            if (!isset($result[$activity_section->activity_id])) {
+                $result[$activity_section->activity_id] = [];
+            }
+            $result[$activity_section->activity_id][] = $activity_section->id;
         }
+
+        return $result;
     }
 
     /**

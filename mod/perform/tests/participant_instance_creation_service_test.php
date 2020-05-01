@@ -55,10 +55,11 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
     private $activity_relationships;
 
     /**
-     * Array of participant job assignments [manager and appraiser].
+     * Data of Activities used.
+     *
      * @var array
      */
-    private $participant_job_assignments;
+    private $activity_trees;
 
     /**
      * Test participant_instances watcher processes on subject_instance_creation hook call.
@@ -114,25 +115,24 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
      * @return void
      */
     private function assert_each_participant_created_with_correct_data(collection $created_participants): void {
-        $relationship_ids = [
-            'manager' => null,
-            'appraiser' => null,
-        ];
-        $subject_instances = subject_instance::repository()->get()->pluck('id');
+        $relationship_ids = [];
+        $subject_instances = subject_instance::repository()->get();
+        $subject_instance_ids = $subject_instances->pluck('id');
         $managers_and_appraisers_list = $this->group_participant_job_assignments();
         $subject_instances_counter = [];
 
         foreach ($created_participants as $created_participant) {
+            $activity_id = $subject_instances->find('id', $created_participant->subject_instance_id)->activity()->id;
             $this->assertArrayHasKey(
                 $created_participant->participant_id,
-                $managers_and_appraisers_list,
+                $managers_and_appraisers_list[$activity_id],
                 'Unknown participant stored.'
             );
-            $managers_and_appraisers_list[$created_participant->participant_id]['count']++;
+            $managers_and_appraisers_list[$activity_id][$created_participant->participant_id]['count']++;
 
             $this->assertContains(
                 $created_participant->subject_instance_id,
-                $subject_instances,
+                $subject_instance_ids,
                 'unknown subject instance id stored'
             );
             if (!isset($subject_instances_counter[$created_participant->subject_instance_id])) {
@@ -140,16 +140,24 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
             }
             $subject_instances_counter[$created_participant->subject_instance_id]++;
 
-            $participant_relationship = $managers_and_appraisers_list[$created_participant->participant_id]['relationship'];
-            if (is_null($relationship_ids[$participant_relationship])) {
-                $relationship_ids[$participant_relationship] = $created_participant->activity_relationship_id;
+            $participant_relationship = $managers_and_appraisers_list[$activity_id][$created_participant->participant_id]['relationship'];
+            if (!isset($relationship_ids[$activity_id])) {
+                $relationship_ids[$activity_id] = [
+                    'manager' => null,
+                    'appraiser' => null,
+                ];
             }
-            $this->assertEquals($relationship_ids[$participant_relationship], $created_participant->activity_relationship_id);
+            if (is_null($relationship_ids[$activity_id][$participant_relationship])) {
+                $relationship_ids[$activity_id][$participant_relationship] = $created_participant->activity_relationship_id;
+            }
+            $this->assertEquals($relationship_ids[$activity_id][$participant_relationship], $created_participant->activity_relationship_id);
         }
 
-        $expected_participant_count = count($subject_instances);
-        foreach ($managers_and_appraisers_list as $actual_participant) {
-            $this->assertEquals($expected_participant_count, $actual_participant['count']);
+        $expected_participant_count = count($subject_instance_ids) / $this->users_per_relationship;
+        foreach ($managers_and_appraisers_list as $activity_participants) {
+            foreach ($activity_participants as $actual_participant) {
+                $this->assertEquals($expected_participant_count, $actual_participant['count']);
+            }
         }
 
         $expected_subject_instance_count = count($this->activity_relationships) * $this->users_per_relationship;
@@ -166,15 +174,17 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
     private function group_participant_job_assignments(): array {
         $expected_participants = [];
 
-        foreach ($this->participant_job_assignments as $participant_job_assignment) {
-            $expected_participants[$participant_job_assignment['manager']->get_data()->userid] = [
-                'relationship' => 'manager',
-                'count' => 0,
-            ];
-            $expected_participants[$participant_job_assignment['appraiser']] = [
-                'relationship' => 'appraiser',
-                'count' => 0,
-            ];
+        foreach ($this->activity_trees as $activity_id => $activity_tree) {
+            foreach ($activity_tree->participant_job_assignments as $participant_job_assignment) {
+                $expected_participants[$activity_id][$participant_job_assignment['manager']->get_data()->userid] = [
+                    'relationship' => 'manager',
+                    'count' => 0,
+                ];
+                $expected_participants[$activity_id][$participant_job_assignment['appraiser']] = [
+                    'relationship' => 'appraiser',
+                    'count' => 0,
+                ];
+            }
         }
 
         return $expected_participants;
@@ -236,8 +246,13 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
      */
     protected function setUp() {
         $this->setup_config_values();
-        $activity_tree = $this->setup_activity();
-        $this->setup_job_assignments($activity_tree);
+        $this->activity_trees = [];
+        $activity_count = 2;
+        for ($i = 0; $i < $activity_count; $i++) {
+            $activity_tree = $this->setup_activity($i);
+            $activity_tree->identifier = $i;
+            $this->activity_trees[$activity_tree->activity->id] = $this->setup_job_assignments($activity_tree);
+        }
     }
 
     /**
@@ -257,16 +272,17 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
     /**
      * Setup Activity details.
      *
+     * @param int $identifier For number of activities to create.
      * @return stdClass
      */
-    protected function setup_activity(): stdClass {
+    protected function setup_activity(int $identifier): stdClass {
         /** @var mod_perform_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
         $activity_tree = new stdClass();
         $activity_tree->activity = $generator->create_activity_in_container();
 
         //create sections and add relationships to activity:
-        $activity_tree->section = $generator->create_section($activity_tree->activity, ['title' => 'Test section 1']);
+        $activity_tree->section = $generator->create_section($activity_tree->activity, ['title' => 'Test section for activity ' . $identifier]);
 
         foreach ($this->activity_relationships as $relationship_class) {
             $generator->create_section_relationship(
@@ -277,20 +293,17 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
 
         $tracks = $generator->create_activity_tracks($activity_tree->activity);
         $activity_tree->track = $generator->create_track_assignments($tracks->first(), 0, 0, 0, 3);
-        $activity_tree->assignments = track_assignment::repository()
-            ->where('user_group_type', grouping::USER)
-            ->get();
 
         return $activity_tree;
     }
 
     /**
-     * Setups job assignments for the test cases.
+     * Setups job assignments and updates details in activity_tree for the test cases.
      *
      * @param stdClass $activity_tree
-     * @return void
+     * @return stdClass
      */
-    private function setup_job_assignments(stdClass $activity_tree): void {
+    private function setup_job_assignments(stdClass $activity_tree): stdClass {
         $participant_job_assignments = [];
         $data_generator = $this->getDataGenerator();
 
@@ -300,15 +313,15 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
                 'appraiser' => $data_generator->create_user()->id,
             ];
         }
-        $this->participant_job_assignments = $participant_job_assignments;
+        $activity_tree->participant_job_assignments = $participant_job_assignments;
 
         $activity_user_job_assignments = [];
-        foreach ($activity_tree->assignments as $assignment) {
+        foreach ($activity_tree->track->assignments as $assignment) {
             foreach ($participant_job_assignments as $key => $job_assignments) {
                 $activity_user_job_assignments[] = job_assignment::create(
                     [
                         'userid' => $assignment->user_group_id,
-                        'idnumber' => $assignment->id . $key,
+                        'idnumber' => $assignment->id . $key . $activity_tree->identifier,
                         'managerjaid' => $job_assignments['manager']->id,
                         'appraiserid' => $job_assignments['appraiser'],
                     ]
@@ -316,6 +329,8 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
             }
         }
         (new expand_task())->expand_all();
+
+        return $activity_tree;
     }
 
     /**
@@ -324,6 +339,6 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
     protected function tearDown() {
         $this->users_per_relationship = null;
         $this->activity_relationships = null;
-        $this->participant_job_assignments = null;
+        $this->activity_trees = null;
     }
 }

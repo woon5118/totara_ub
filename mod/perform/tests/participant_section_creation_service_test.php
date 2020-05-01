@@ -49,10 +49,10 @@ use totara_job\relationship\resolvers\manager;
 class mod_perform_participant_section_creation_service_testcase extends advanced_testcase {
 
     /**
-     * Data of Activity used.
-     * @var stdClass
+     * Data of Activities used.
+     * @var array
      */
-    private $activity_tree;
+    private $activity_trees;
 
     /**
      * Test participant_sections are created when the subject instance service generates subject instances.
@@ -85,14 +85,27 @@ class mod_perform_participant_section_creation_service_testcase extends advanced
      * @return void
      */
     private function assert_participant_sections_created_count(): void {
-        $created_participants = participant_instance::repository()->count();
-        $activity_sections = section::repository()->count();
-        $created_participant_sections = participant_section::repository()->count();
-        $expected_participant_sections_created = $created_participants * $activity_sections;
+        $participant_instance_ids = participant_instance::repository()->get()->pluck('id');
+        $created_participant_sections = participant_section::repository()->get();
+        $sections = section::repository()->get();
+        $activity_sections = [];
+        foreach ($sections as $section) {
+            if (!isset($activity_sections[$section->activity_id])) {
+                $activity_sections[$section->activity_id] = [];
+            }
+            $activity_sections[$section->activity_id][] = $section->id;
+        }
 
-        $this->assertEquals($expected_participant_sections_created, $created_participant_sections);
+        foreach ($created_participant_sections as $participant_section) {
+            $this->assertContains(
+                $participant_section->participant_instance_id,
+                $participant_instance_ids
+            );
+            $activity_id = $sections->find('id', $participant_section->section_id)->activity_id;
+            $sections_created_for_participant = $created_participant_sections->filter('participant_instance_id', $participant_section->participant_instance_id)->pluck('section_id');
+            $this->assertEqualsCanonicalizing($sections_created_for_participant, $activity_sections[$activity_id]);
+        }
     }
-
 
     /**
      * Tests participants are created successfully.
@@ -100,14 +113,27 @@ class mod_perform_participant_section_creation_service_testcase extends advanced
      * @return void
      */
     public function test_create_participant_sections(): void {
-        $participant_instance_dto_collection = $this->setup_participant_instances($this->activity_tree);
-        $participant_instance_service = new participant_section_creation();
-        $participant_instance_service->generate_sections($participant_instance_dto_collection);
+        $participant_section_service = new participant_section_creation();
+        $participant_instance_dto_collection = $this->setup_participant_instances();
+        $participant_section_service->generate_sections($participant_instance_dto_collection);
 
-        $activity_sections = section::repository()->count();
-        $created_participant_sections = participant_section::repository()->count();
-        $expected_participant_sections_created = $participant_instance_dto_collection->count() * $activity_sections;
-        $this->assertEquals($expected_participant_sections_created, $created_participant_sections);
+        $sections = section::repository()->get();
+        $created_participant_sections = participant_section::repository()->get();
+        $expected_participant_sections_created = 0;
+
+        foreach ($participant_instance_dto_collection as $participant_instance_dto) {
+            $this->assertContains(
+                $participant_instance_dto->id,
+                $created_participant_sections->pluck('participant_instance_id')
+            );
+            $activity_sections = $sections->filter('activity_id', $participant_instance_dto->activity_id);
+            $this->assertEqualsCanonicalizing(
+                $activity_sections->pluck('id'),
+                $created_participant_sections->filter('participant_instance_id', $participant_instance_dto->id)->pluck('section_id')
+            );
+            $expected_participant_sections_created = $expected_participant_sections_created + $activity_sections->count();
+        }
+        $this->assertEquals($expected_participant_sections_created, $created_participant_sections->count());
     }
 
     /**
@@ -116,9 +142,8 @@ class mod_perform_participant_section_creation_service_testcase extends advanced
      * @param stdClass $activity_tree
      * @return collection
      */
-    private function setup_participant_instances(stdClass $activity_tree): collection {
+    private function setup_participant_instances(): collection {
         $user_assignments = $this->get_track_user_assignments();
-
         $subject_instances = new collection();
         $participant_instance_dto_list = new collection();
 
@@ -132,31 +157,33 @@ class mod_perform_participant_section_creation_service_testcase extends advanced
 
         //create participant instances.
         /** @var section_relationship $section_relationship*/
-        foreach ($activity_tree->section_relationships as $section_relationship) {
-            /** @var relationship $relationship*/
-            $relationship = $section_relationship->get_relationship();
+        foreach ($this->activity_trees as $activity_tree) {
+            foreach ($activity_tree->section_relationships as $section_relationship) {
+                /** @var relationship $relationship*/
+                $relationship = $section_relationship->get_relationship();
 
-            foreach ($subject_instances as $subject_instance) {
-                $participants = $relationship->get_users(
-                    [
-                        'user_id' => $subject_instance->subject_user_id,
-                    ]
-                );
-
-                foreach ($participants as $participant) {
-                    $participant_instance = new participant_instance();
-                    $participant_instance->subject_instance_id = $subject_instance->id;
-                    $participant_instance->participant_id = $participant;
-                    $participant_instance->activity_relationship_id = $relationship->get_id();
-                    $participant_instance->progress = not_started::get_code();
-                    $participant_instance->save();
-                    $participant_instance_dto = participant_instance_dto::create_from_data(
+                foreach ($subject_instances as $subject_instance) {
+                    $participants = $relationship->get_users(
                         [
-                            'activity_id' => $activity_tree->activity->id,
-                            'id' => $participant_instance->id,
+                            'user_id' => $subject_instance->subject_user_id,
                         ]
                     );
-                    $participant_instance_dto_list->append($participant_instance_dto);
+
+                    foreach ($participants as $participant) {
+                        $participant_instance = new participant_instance();
+                        $participant_instance->subject_instance_id = $subject_instance->id;
+                        $participant_instance->participant_id = $participant;
+                        $participant_instance->activity_relationship_id = $relationship->get_id();
+                        $participant_instance->progress = not_started::get_code();
+                        $participant_instance->save();
+                        $participant_instance_dto = participant_instance_dto::create_from_data(
+                            [
+                                'activity_id' => $activity_tree->activity->id,
+                                'id' => $participant_instance->id,
+                            ]
+                        );
+                        $participant_instance_dto_list->append($participant_instance_dto);
+                    }
                 }
             }
         }
@@ -169,18 +196,24 @@ class mod_perform_participant_section_creation_service_testcase extends advanced
      */
     protected function setUp() {
         $this->setAdminUser();
-        $activity_tree = $this->setup_activity();
+        $this->activity_trees = [];
 
-        $this->setup_job_assignments();
-        $this->activity_tree = $activity_tree;
+        $activity_count = 4;
+        for ($i = 0; $i < $activity_count; $i++) {
+            $activity_tree = $this->setup_activity($i);
+            $activity_tree->identifier = $i;
+            $this->setup_job_assignments($activity_tree);
+            $this->activity_trees[] = $activity_tree;
+        }
     }
 
     /**
      * Setup activity details.
      *
+     * @param int $identifier For number of activities to create.
      * @return stdClass
      */
-    private function setup_activity(): stdClass {
+    private function setup_activity(int $identifier): stdClass {
         /** @var mod_perform_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
 
@@ -188,7 +221,7 @@ class mod_perform_participant_section_creation_service_testcase extends advanced
         $activity_tree->activity = $generator->create_activity_in_container();
 
         //create sections and add relationships to activity:
-        $activity_tree->section = $generator->create_section($activity_tree->activity, ['title' => 'Test section 1']);
+        $activity_tree->section = $generator->create_section($activity_tree->activity, ['title' => 'Test activity section '. $identifier]);
         $activity_tree->section_relationships = [];
         $activity_tree->section_relationships[] = $generator->create_section_relationship(
             $activity_tree->section,
@@ -201,8 +234,8 @@ class mod_perform_participant_section_creation_service_testcase extends advanced
 
         /** @var track $track */
         $tracks = $generator->create_activity_tracks($activity_tree->activity);
-        $activity_tree->track = $tracks->first();
-        $activity_tree->track = $generator->create_track_assignments($activity_tree->track, 0, 0, 0, 20);
+        $activity_tree->track = $generator->create_track_assignments($tracks->first(), 0, 0, 0, 4);
+        $activity_tree->assignments = $activity_tree->track->assignments;
 
         return $activity_tree;
     }
@@ -210,10 +243,11 @@ class mod_perform_participant_section_creation_service_testcase extends advanced
     /**
      * Sets up job assignments and returns stats of job assignments created.
      *
+     * @param stdClass $activity_tree
      * @return void
      */
-    private function setup_job_assignments(): void {
-        $users_per_relationship = 5;
+    private function setup_job_assignments($activity_tree): void {
+        $users_per_relationship = 2;
         $job_assignment_data = [];
 
         for ($i = 0; $i < $users_per_relationship; $i++) {
@@ -226,16 +260,12 @@ class mod_perform_participant_section_creation_service_testcase extends advanced
             ];
         }
 
-        $track_assignments = track_assignment::repository()
-            ->where('user_group_type', grouping::USER)
-            ->get();
-
-        foreach ($track_assignments as $assignment) {
+        foreach ($activity_tree->track->assignments as $assignment) {
             foreach ($job_assignment_data as $key => $job_assignment_datum) {
                 job_assignment::create(
                     [
                         'userid' => $assignment->user_group_id,
-                        'idnumber' => $assignment->id . $key,
+                        'idnumber' => $assignment->id . $key . $activity_tree->identifier,
                         'managerjaid' => $job_assignment_datum['manager_ja_id'],
                         'appraiserid' => $job_assignment_datum['appraiser_id'],
                     ]
@@ -282,6 +312,6 @@ class mod_perform_participant_section_creation_service_testcase extends advanced
      * Cleans class properties.
      */
     protected function tearDown() {
-        $this->activity_tree = null;
+        $this->activity_trees = null;
     }
 }
