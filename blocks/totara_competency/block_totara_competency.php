@@ -22,6 +22,7 @@
  */
 
 use pathway_manual\models\roles;
+use totara_core\advanced_feature;
 
 final class block_totara_competency extends block_base {
 
@@ -57,6 +58,10 @@ final class block_totara_competency extends block_base {
      * @return stdClass
      */
     public function get_content() {
+        if (!isloggedin() || isguestuser() || advanced_feature::is_disabled('competency_assignment')) {
+            return null;
+        }
+
         return $this->content = (object) [
             'text' => $this->render(),
         ];
