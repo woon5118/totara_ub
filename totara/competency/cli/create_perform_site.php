@@ -3336,79 +3336,6 @@ Feel free to browse, list of users is below, their password is 12345.
 
     run_tasks();
 
-    // Then we need to create achievement records
-    // TODO: Remove manual achievement records once achievement data is properly generated via pathways
-    $achievements = [
-        // Janitor
-        [get_user('gm', $data), get_assignment('pos', 'pp', 'janitor', 'priest', $data), 3],
-        [get_user('gm', $data), get_assignment('pos', 'pp', 'janitor', 'teeth-whitening', $data), 2],
-        [get_user('gm', $data), get_assignment('pos', 'pp', 'janitor', 'hoarder', $data), 3],
-
-        // Stargazer
-        // JM
-        [get_user('jm', $data), get_assignment('pos', 'pp', 'stargazer', 'doer', $data), 1],
-        [get_user('jm', $data), get_assignment('pos', 'pp', 'stargazer', 'hoarder', $data), 1],
-        [get_user('jm', $data), get_assignment('pos', 'pp', 'stargazer', 'administrative-nurse', $data), 1],
-        [get_user('jm', $data), get_assignment('pos', 'pp', 'stargazer', 'it', $data), 1],
-        [get_user('jm', $data), get_assignment('pos', 'pp', 'stargazer', 'storm-trooper', $data), 1],
-        [get_user('jm', $data), get_assignment('pos', 'pp', 'stargazer', 'integrity', $data), 1],
-
-        //SS
-        [get_user('ss', $data), get_assignment('pos', 'pp', 'stargazer', 'doer', $data), 2],
-        [get_user('ss', $data), get_assignment('pos', 'pp', 'stargazer', 'administrative-nurse', $data), 3],
-        [get_user('ss', $data), get_assignment('pos', 'pp', 'stargazer', 'storm-trooper', $data), 1],
-        [get_user('ss', $data), get_assignment('pos', 'pp', 'stargazer', 'integrity', $data), 3],
-
-        //UT
-        [get_user('ut', $data), get_assignment('pos', 'pp', 'stargazer', 'hoarder', $data), 2],
-        [get_user('ut', $data), get_assignment('pos', 'pp', 'stargazer', 'it', $data), 3],
-        [get_user('ut', $data), get_assignment('pos', 'pp', 'stargazer', 'storm-trooper', $data), 3],
-        [get_user('ut', $data), get_assignment('pos', 'pp', 'stargazer', 'integrity', $data), 3],
-
-        //TR
-        [get_user('tr', $data), get_assignment('pos', 'pp', 'stargazer', 'hoarder', $data), 1],
-        [get_user('tr', $data), get_assignment('pos', 'pp', 'stargazer', 'it', $data), 3],
-        [get_user('tr', $data), get_assignment('pos', 'pp', 'stargazer', 'storm-trooper', $data), 1],
-        [get_user('tr', $data), get_assignment('pos', 'pp', 'stargazer', 'integrity', $data), 2],
-
-        //Theologist
-
-        //JM
-        [get_user('jm', $data), get_assignment('pos', 'pp', 'theologist', 'literate', $data), 1],
-        [get_user('jm', $data), get_assignment('pos', 'pp', 'theologist', 'cc', $data), 1],
-        [get_user('jm', $data), get_assignment('pos', 'pp', 'theologist', 'consultant', $data), 1],
-        [get_user('jm', $data), get_assignment('pos', 'pp', 'theologist', 'drive', $data), 1],
-
-        //DT
-        [get_user('dt', $data), get_assignment('pos', 'pp', 'theologist', 'cc', $data), 2],
-        [get_user('dt', $data), get_assignment('pos', 'pp', 'theologist', 'consultant', $data), 4],
-        [get_user('dt', $data), get_assignment('pos', 'pp', 'theologist', 'drive', $data), 2],
-
-        //SS
-        [get_user('ss', $data), get_assignment('pos', 'pp', 'theologist', 'literate', $data), 1],
-        [get_user('ss', $data), get_assignment('pos', 'pp', 'theologist', 'cc', $data), 3],
-        [get_user('ss', $data), get_assignment('pos', 'pp', 'theologist', 'consultant', $data), 2],
-
-        //TR
-        [get_user('tr', $data), get_assignment('pos', 'pp', 'theologist', 'literate', $data), 1],
-        [get_user('tr', $data), get_assignment('pos', 'pp', 'theologist', 'drive', $data), 1],
-
-        //SJ
-        [get_user('sj', $data), get_assignment('pos', 'pp', 'theologist', 'literate', $data), 2],
-        [get_user('sj', $data), get_assignment('pos', 'pp', 'theologist', 'cc', $data), 2],
-        [get_user('sj', $data), get_assignment('pos', 'pp', 'theologist', 'drive', $data), 3],
-
-        //UT
-        [get_user('ut', $data), get_assignment('pos', 'pp', 'theologist', 'literate', $data), 1],
-        [get_user('ut', $data), get_assignment('pos', 'pp', 'theologist', 'cc', $data), 2],
-        [get_user('ut', $data), get_assignment('pos', 'pp', 'theologist', 'consultant', $data), 4],
-        [get_user('ut', $data), get_assignment('pos', 'pp', 'theologist', 'drive', $data), 2],
-    ];
-
-    foreach ($achievements as $achievement) {
-        create_achievement_record(...$achievement);
-    }
-
     set_theme_to_ventura();
 
     create_info_block($data);
@@ -4270,7 +4197,6 @@ function evidence_generator() {
 function run_tasks() {
     (new expand_task(db()))->expand_all();
     (new totara_competency\task\competency_aggregation_all())->execute();
-    (new totara_competency\task\competency_aggregation_queue())->execute();
 }
 
 function mark_competencies_self_assignable($frameworks, $data) {
