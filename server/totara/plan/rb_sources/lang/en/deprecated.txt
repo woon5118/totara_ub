@@ -18,3 +18,5 @@ timemodified,rb_source_dp_evidence
 type_evidence,rb_source_dp_evidence
 viewevidence,rb_source_dp_evidence
 viewevidencelink,rb_source_dp_evidence
+competencyproficiencyandapproval,rb_source_dp_competency
+competencyproficiency,rb_source_dp_competency

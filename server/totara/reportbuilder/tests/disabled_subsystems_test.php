@@ -43,6 +43,8 @@ class totara_reportbuilder_disabled_subsystems_testcase extends advanced_testcas
         parent::setup();
         $this->setAdminUser();
 
+        // For 'Record of Learning: Competencies' only
+        advanced_feature::disable('competency_assignment');
         // Generate the embedded reports.
         reportbuilder::generate_embedded_reports();
 

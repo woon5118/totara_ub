@@ -18,97 +18,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Simon Coggins <simon.coggins@totaralms.com>
- * @package totara
- * @subpackage reportbuilder
+ * @package totara_reportbuilder
  */
 
 use totara_core\advanced_feature;
 
+global $CFG;
+require_once($CFG->dirroot . '/totara/plan/rb_sources/rb_source_dp_competency.php');
+
 class rb_plan_competencies_embedded extends rb_base_embedded {
 
-    public $url, $source, $fullname, $filters, $columns;
-    public $contentmode, $contentsettings, $embeddedparams;
-    public $hidden, $accessmode, $accesssettings, $shortname;
-    public $defaultsortcolumn, $defaultsortorder;
-
     public function __construct($data) {
-        $userid = array_key_exists('userid', $data) ? $data['userid'] : null;
-        $compid = array_key_exists('competency', $data) ? $data['competencyid'] : null;
-        $rolstatus = array_key_exists('rolstatus', $data) ? $data['rolstatus'] : null;
-
         $this->url = '/totara/plan/record/competencies.php';
         $this->source = 'dp_competency';
         $this->defaultsortcolumn = 'competency_fullname';
         $this->shortname = 'plan_competencies';
         $this->fullname = get_string('recordoflearningcompetencies', 'totara_plan');
-        $this->columns = array(
-            array(
-                'type' => 'plan',
-                'value' => 'planlink',
-                'heading' => get_string('plan', 'totara_plan'),
-            ),
-            array(
-                'type' => 'plan',
-                'value' => 'status',
-                'heading' => get_string('planstatus', 'totara_plan'),
-            ),
-            array(
-                'type' => 'competency',
-                'value' => 'fullname',
-                'heading' => get_string('competency', 'totara_hierarchy'),
-            ),
-            array(
-                'type' => 'competency',
-                'value' => 'priority',
-                'heading' => get_string('priority', 'rb_source_dp_competency'),
-            ),
-            array(
-                'type' => 'competency',
-                'value' => 'duedate',
-                'heading' => get_string('duedate', 'rb_source_dp_competency'),
-            ),
-            array(
-                'type' => 'competency',
-                'value' => 'proficiencyandapproval',
-                'heading' => get_string('status', 'rb_source_dp_competency'),
-            ),
-        );
-
-        $this->filters = array(
-            array(
-                'type' => 'competency',
-                'value' => 'fullname',
-                'advanced' => 0,
-            ),
-            array(
-                'type' => 'competency',
-                'value' => 'priority',
-                'advanced' => 1,
-            ),
-            array(
-                'type' => 'competency',
-                'value' => 'duedate',
-                'advanced' => 1,
-            ),
-            array(
-                'type' => 'plan',
-                'value' => 'name',
-                'advanced' => 1,
-            ),
-        );
+        $this->columns = rb_source_dp_competency::get_default_columns();
+        $this->filters = rb_source_dp_competency::get_default_filters();
 
         // no restrictions
         $this->contentmode = REPORT_BUILDER_CONTENT_MODE_NONE;
 
         $this->embeddedparams = array();
-        if (isset($userid)) {
-            $this->embeddedparams['userid'] = $userid;
+        if (isset($data['userid'])) {
+            $this->embeddedparams['userid'] = $data['userid'];
         }
-        if (isset($rolstatus)) {
-            $this->embeddedparams['rolstatus'] = $rolstatus;
+        if (isset($data['rolstatus'])) {
+            $this->embeddedparams['rolstatus'] = $data['rolstatus'];
         }
-        if (isset($compid)) {
-            $this->embeddedparams['competencyid'] = $compid;
+        if (isset($data['competencyid'])) {
+            $this->embeddedparams['competencyid'] = $data['competencyid'];
         }
 
         parent::__construct();
@@ -130,10 +70,12 @@ class rb_plan_competencies_embedded extends rb_base_embedded {
             $subjectid = $USER->id;
         }
         // Users can only view their own and their staff's pages or if they are an admin.
-        return ($reportfor == $subjectid ||
+        return (
+            $reportfor == $subjectid ||
             \totara_job\job_assignment::is_managing($reportfor, $subjectid) ||
-                has_capability('totara/plan:accessanyplan', context_system::instance(), $reportfor) ||
-                has_capability('totara/core:viewrecordoflearning', context_user::instance($subjectid), $reportfor));
+            has_capability('totara/plan:accessanyplan', context_system::instance(), $reportfor) ||
+            has_capability('totara/core:viewrecordoflearning', context_user::instance($subjectid), $reportfor)
+        );
     }
 
     /**
@@ -142,6 +84,10 @@ class rb_plan_competencies_embedded extends rb_base_embedded {
      * @return boolean If the report should be ignored of not.
      */
     public static function is_report_ignored() {
-        return !advanced_feature::is_enabled('recordoflearning');
+        return (
+            !advanced_feature::is_enabled('recordoflearning') or
+            !advanced_feature::is_enabled('competencies') ||
+            advanced_feature::is_enabled('competency_assignment')
+        );
     }
 }

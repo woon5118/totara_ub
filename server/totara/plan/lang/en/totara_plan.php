@@ -562,6 +562,7 @@ $string['na'] = 'N/A';
 $string['name'] = 'Name';
 $string['namelink'] = 'Name (link)';
 $string['newtemplate'] = 'New Template';
+$string['no_value_achieved'] = 'No value achieved';
 $string['nochanges'] = 'There are no changes';
 $string['noclassfileforcomponent'] = 'Class file \'{$a->classfile}\' could not be found for component \'{$a->component}\'';
 $string['noclassfileforrole'] = 'Class file \'{$a->classfile}\' could not be found for role of \'{$a->role}\'';

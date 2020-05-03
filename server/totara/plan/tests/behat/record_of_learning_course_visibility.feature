@@ -145,6 +145,7 @@ Feature: Verify standard and audience-based visibility in record of learning cou
     And I should see "Course 6"
     And I should see "Course 7"
     And I should see "Course 8"
+    And I am on homepage
     And I log out
 
     When I log in as "learner1"
@@ -194,6 +195,7 @@ Feature: Verify standard and audience-based visibility in record of learning cou
     And I should not see "Course 4"
     And I should not see "Course 5"
     And I should not see "Course 6"
+    And I am on homepage
     And I log out
 
     When I log in as "learner1"
@@ -275,6 +277,7 @@ Feature: Verify standard and audience-based visibility in record of learning cou
     And I should not see "Course 5"
     And I should not see "Course 6"
     And I should not see "Course 7"
+    And I am on homepage
     And I log out
 
     When I log in as "learner1"
@@ -350,6 +353,7 @@ Feature: Verify standard and audience-based visibility in record of learning cou
     And I should see "Course 6"
     And I should see "Course 7"
     And I should see "Course 8"
+    And I am on homepage
     And I log out
 
     When I log in as "learner1"
@@ -426,6 +430,7 @@ Feature: Verify standard and audience-based visibility in record of learning cou
     And I should not see "Course 4"
     And I should not see "Course 5"
     And I should not see "Course 7"
+    And I am on homepage
     And I log out
 
     When I log in as "learner1"
@@ -520,6 +525,7 @@ Feature: Verify standard and audience-based visibility in record of learning cou
     And I should not see "Course 4"
     And I should not see "Course 5"
     And I should not see "Course 7"
+    And I am on homepage
     And I log out
 
     When I log in as "learner1"

@@ -89,10 +89,7 @@ Feature: Learner creates learning plan with competencies.
     # Make sure the ajax competency update request works
     When I am on "Team" page
     And I click on "Records" "link" in the "Bob1 Learner1" "table_row"
-    And the field "competencyevidencestatus1" matches value "Not competent"
-    And I set the field "competencyevidencestatus1" to "Competent"
-    And I reload the page
-    Then the field "competencyevidencestatus1" matches value "Competent"
+    And I should see "Not competent" in the "Competency 1" "table_row"
     And I log out
 
     # Test Record of Learning: Competencies report with Global report restriction.
@@ -106,6 +103,7 @@ Feature: Learner creates learning plan with competencies.
     And I set the following administration settings values:
       | Enable report restrictions | 1 |
 
+    And I click on "Dashboard" in the totara menu
     And I navigate to "Global report restrictions" node in "Site administration > Reports"
     And I press "New restriction"
     And I set the following fields to these values:
@@ -158,8 +156,8 @@ Feature: Learner creates learning plan with competencies.
     And I follow "Competency 2"
     And I set the field "menu" to "Competency Framework 2"
     And I follow "Competency 3"
-    And I click on "Save" "button" in the "Assign competencies" "totaradialogue"
-    Then the following should exist in the "list-assignedcompetencies" table:
+    And I click on "Save" "button" in the "Link competencies" "totaradialogue"
+    Then the following should exist in the "list-linkedcompetencies" table:
       | Type         | Name         |
       | Unclassified | Competency 1 |
       | Unclassified | Competency 2 |

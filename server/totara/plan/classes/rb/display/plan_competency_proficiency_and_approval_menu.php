@@ -31,6 +31,8 @@ use totara_reportbuilder\rb\display\base;
  *
  * @author Simon Player <simon.player@totaralearning.com>
  * @package totara_plan
+ *
+ * @deprecated since Totara 13.0
  */
 class plan_competency_proficiency_and_approval_menu extends base {
 
@@ -47,6 +49,8 @@ class plan_competency_proficiency_and_approval_menu extends base {
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
         global $CFG, $DB;
 
+        debugging('plan_competency_proficiency_and_approval_menu class has been deprecated, please use format_string() instead.', DEBUG_DEVELOPER);
+
         // Needed for approval constants.
         require_once($CFG->dirroot . '/totara/plan/lib.php');
 
@@ -59,65 +63,16 @@ class plan_competency_proficiency_and_approval_menu extends base {
 
         $content = array();
         $approved = isset($extrafields->approved) ? $extrafields->approved : null;
-        $compframeworkid = isset($extrafields->compframeworkid) ? $extrafields->compframeworkid : null;
         $planid = isset($extrafields->planid) ? $extrafields->planid : null;
-        $compevscalevalueid = isset($extrafields->compevscalevalueid) ? $extrafields->compevscalevalueid : null;
-        $plancompid = isset($extrafields->plancompid) ? $extrafields->plancompid : null;
-        $competencyid = isset($extrafields->competencyid) ? $extrafields->competencyid : null;
 
         if (!$planid) {
             return $value;
         } else {
-            if (array_key_exists($planid, $report->src->dp_plans)) {
-                $plan = $report->src->dp_plans[$planid];
-            } else {
+            if (!array_key_exists($planid, $report->src->dp_plans)) {
                 $plan = new \development_plan($planid);
                 $report->src->dp_plans[$planid] = $plan;
             }
-
-            $competencycomponent = $plan->get_component('competency');
-            if ($competencycomponent->can_update_competency_evidence($extrafields)) {
-
-                // Get the info we need about the framework
-                if (array_key_exists( $compframeworkid, $report->src->compscales)) {
-                    $compscale = $report->src->compscales[$compframeworkid];
-                } else {
-                    $sql = "SELECT
-                                cs.defaultid as defaultid, cs.id as scaleid
-                            FROM {comp} c
-                            JOIN {comp_scale_assignments} csa
-                                ON c.frameworkid = csa.frameworkid
-                            JOIN {comp_scale} cs
-                                ON csa.scaleid = cs.id
-                            WHERE c.id= ?";
-                    $scaledetails = $DB->get_record_sql($sql, array($competencyid));
-                    $formatscale = $DB->get_records_menu('comp_scale_values', array('scaleid' => $scaledetails->scaleid), 'sortorder');
-
-                    $compscale = array();
-                    foreach ($formatscale as $key => $scale) {
-                        $compscale[$key] = format_string($scale);
-                    }
-                    $report->src->compscales[$compframeworkid] = $compscale;
-                }
-
-                $label = \html_writer::label(get_string('statusof', 'totara_plan', $extrafields->compfullname), 'menucompetencyevidencestatus' . $plancompid, '', array('class' => 'sr-only'));
-                $action = "var response; ".
-                    "response = \$.get(".
-                    "'{$CFG->wwwroot}/totara/plan/components/competency/update-competency-setting.php".
-                    "?sesskey=" . sesskey() .
-                    "&competencyid={$competencyid}" .
-                    "&planid={$planid}".
-                    "&prof=' + $(this).val()".
-                    "); ";
-                $attributes = array('onchange' => $action);
-                $content[] = $label . \html_writer::select($compscale,
-                        'competencyevidencestatus'.$plancompid,
-                        $compevscalevalueid,
-                        array(($compevscalevalueid ? '' : 0) => ($compevscalevalueid ? '' : get_string('notset', 'totara_hierarchy'))),
-                        $attributes);
-            } else if ($value) {
-                $content[] = $value;
-            }
+            $content[] = $value;
         }
 
         // Highlight if the item has not yet been approved.

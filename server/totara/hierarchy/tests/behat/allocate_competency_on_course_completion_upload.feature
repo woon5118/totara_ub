@@ -150,8 +150,8 @@ Scale 1
       | Course 2      | 0%       |
     When I switch to "Competencies" tab
     Then the following should exist in the "plan_competencies" table:
-      | Plan                 | Status   |
-      | Bob's Learning Plan  | Scale 1  |
+      | Plan                 | Overall achievement level   |
+      | Bob's Learning Plan  | Scale 1                     |
     And I log out
 
   Scenario: Verify that competency status is updated after some course completion with completion date set to today
@@ -180,8 +180,8 @@ Scale 1
       | Course 2      | 100%     |
     When I switch to "Competencies" tab
     Then the following should exist in the "plan_competencies" table:
-      | Plan                 | Status   |
-      | Bob's Learning Plan  | Scale 3  |
+      | Plan                 | Overall achievement level   |
+      | Bob's Learning Plan  | Scale 3                     |
     And I log out
 
   Scenario: Verify that competency status is updated after some course completion with completion date set to last month
@@ -191,6 +191,7 @@ Scale 1
       | user     | course | timecompleted  |
       | learner1 | C1     | today          |
     Then I run the scheduled task "\totara_competency\task\competency_aggregation_queue"
+    And I wait for the next second
 
     # Upload course completion for other courses with last month's date
     When the following courses are completed:
@@ -210,8 +211,8 @@ Scale 1
       | Course 2      | 100%     |
     When I switch to "Competencies" tab
     Then the following should exist in the "plan_competencies" table:
-      | Plan                 | Status   |
-      | Bob's Learning Plan  | Scale 3  |
+      | Plan                 | Overall achievement level   |
+      | Bob's Learning Plan  | Scale 3                     |
     And I log out
 
   Scenario: Verify that competency status is updated when competency criteria is changed
@@ -234,8 +235,8 @@ Scale 1
       | Course 2      | 0%       |
     When I switch to "Competencies" tab
     Then the following should exist in the "plan_competencies" table:
-      | Plan                 | Status   |
-      | Bob's Learning Plan  | Scale 1  |
+      | Plan                 | Overall achievement level   |
+      | Bob's Learning Plan  | Scale 1                     |
     And I log out
 
     When I log in as "admin"
@@ -258,6 +259,6 @@ Scale 1
       | Course 2      | 0%       |
     When I switch to "Competencies" tab
     Then the following should exist in the "plan_competencies" table:
-      | Plan                 | Status   |
-      | Bob's Learning Plan  | Scale 3  |
+      | Plan                 | Overall achievement level   |
+      | Bob's Learning Plan  | Scale 3                     |
     And I log out

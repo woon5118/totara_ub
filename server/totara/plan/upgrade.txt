@@ -32,6 +32,7 @@ information provided here is intended especially for developers.
     * totara_plan\event\evidence_type_created, please use totara_evidence\event\evidence_type_created instead.
     * totara_plan\event\evidence_type_deleted, please use totara_evidence\event\evidence_type_deleted instead.
     * totara_plan\event\evidence_type_updated, please use totara_evidence\event\evidence_type_updated instead.
+    * totara_plan\rb\display\plan_competency_proficiency_and_approval_menu, please use format_string() instead.
     * totara_plan\rb\display\plan_evidence_action_links, please use totara_evidence\rb\display\evidence_item_actions instead.
     * totara_plan\rb\display\plan_evidence_in_use, please use totara_reportbuilder\rb\display\yes_or_no instead.
     * totara_plan\rb\display\plan_evidence_name_link, please use totara_evidence\rb\display\evidence_item_name instead.

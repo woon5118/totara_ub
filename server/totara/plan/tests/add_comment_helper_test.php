@@ -31,8 +31,7 @@ use totara_plan\add_comment_helper;
  * Unit test for assuring that the logic
  * operation is working properly
  */
-class add_comment_helper_test extends advanced_testcase
-{
+class totara_plan_add_comment_helper_testcase extends advanced_testcase {
     /**
      * Method of creating the user with the custom last access value
      *

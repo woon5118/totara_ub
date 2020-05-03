@@ -18,8 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Valerii Kuznetsov <valerii.kuznetsov@totaralms.com>
- * @package totara
- * @subpackage reportbuilder
+ * @package totara_reportbuilder
  *
  * Unit/functional tests to check Record of Learning: Competencies reports caching
  */
@@ -62,15 +61,12 @@ class totara_reportbuilder_rb_plan_competencies_embedded_cache_testcase extends 
                         array('id' => 21, 'reportid' => 10, 'type' => 'plan', 'value' => 'name',
                               'sortorder' => 4, 'advanced' => 1));
 
-    protected $comp_framework_data = array('id' => 1, 'shortname' => '', 'idnumber' => '', 'description' => '',
-        'sortorder' => 1, 'visible' => 1, 'hidecustomfields' => 0, 'timecreated' => 1354063605,
-        'timemodified' => 1354063605, 'usermodified' => 2, 'fullname' => 'Test');
-
     // Work data
     public static $ind = 0;
     protected $user1 = null;
     protected $user2 = null;
     protected $user3 = null;
+    protected $user4 = null;
     protected $plan1 = null;
     protected $plan2 = null;
     protected $competency1 = null;
@@ -82,10 +78,10 @@ class totara_reportbuilder_rb_plan_competencies_embedded_cache_testcase extends 
         $this->report_builder_data = null;
         $this->report_builder_columns_data = null;
         $this->report_builder_filters_data = null;
-        $this->comp_framework_data = null;
         $this->user1 = null;
         $this->user2 = null;
         $this->user3 = null;
+        $this->user4 = null;
         $this->plan1 = null;
         $this->plan2 = null;
         $this->competency1 = null;
@@ -113,21 +109,31 @@ class totara_reportbuilder_rb_plan_competencies_embedded_cache_testcase extends 
         // Create report record in database
         $this->loadDataSet($this->createArrayDataSet(array('report_builder' => array($this->report_builder_data),
                                                            'report_builder_columns' => $this->report_builder_columns_data,
-                                                           'report_builder_filters' => $this->report_builder_filters_data,
-                                                           'comp_framework' => array($this->comp_framework_data))));
-        $this->user1 = $this->getDataGenerator()->create_user();
-        $this->user2 = $this->getDataGenerator()->create_user();
-        $this->user3 = $this->getDataGenerator()->create_user();
-        $this->user4 = $this->getDataGenerator()->create_user();
-        $this->plan1 = $this->getDataGenerator()->create_plan($this->user1->id);
-        $this->plan2 = $this->getDataGenerator()->create_plan($this->user2->id);
-        $this->plan3 = $this->getDataGenerator()->create_plan($this->user2->id);
-        $this->competency1 = $this->create_competency();
-        $this->competency2 = $this->create_competency();
-        $this->competency3 = $this->create_competency();
-        $this->assign_competency($this->plan1->id, $this->competency1->id);
-        $this->assign_competency($this->plan2->id, $this->competency2->id);
-        $this->assign_competency($this->plan2->id, $this->competency3->id);
+                                                           'report_builder_filters' => $this->report_builder_filters_data)));
+
+        /** @var totara_hierarchy_generator $hierarchygenerator */
+        $hierarchygenerator = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');
+        $competencyframework = $hierarchygenerator->create_framework('competency');
+        $this->competency1 = $hierarchygenerator->create_hierarchy($competencyframework->id, 'competency');
+        $this->competency2 = $hierarchygenerator->create_hierarchy($competencyframework->id, 'competency');
+        $this->competency3 = $hierarchygenerator->create_hierarchy($competencyframework->id, 'competency');
+
+        /** @var totara_plan_generator $plangenerator */
+        $plan_generator = $this->getDataGenerator()->get_plugin_generator('totara_plan');
+        /** @var totara_job_generator $plangenerator */
+        $user_generator = $this->getDataGenerator()->get_plugin_generator('totara_job');
+        [$this->user1, $ja1] = $user_generator->create_user_and_job([], null, null);
+        [$this->user2, $ja2] = $user_generator->create_user_and_job([], null, null);
+        [$this->user3, $ja3] = $user_generator->create_user_and_job([], null, null);
+        [$this->user4, $ja4] = $user_generator->create_user_and_job([], null, null);
+        $this->plan1 = $plan_generator->create_learning_plan(['userid' => $this->user1->id]);
+        $this->plan2 = $plan_generator->create_learning_plan(['userid' => $this->user2->id]);
+        $plan3 = $plan_generator->create_learning_plan(['userid' => $this->user2->id]);
+        $sink = $this->redirectMessages();
+        $plan_generator->add_learning_plan_competency($this->plan1->id, $this->competency1->id);
+        $plan_generator->add_learning_plan_competency($this->plan2->id, $this->competency2->id);
+        $plan_generator->add_learning_plan_competency($this->plan2->id, $this->competency3->id);
+        $sink->close();
 
         $syscontext = context_system::instance();
 
@@ -156,25 +162,21 @@ class totara_reportbuilder_rb_plan_competencies_embedded_cache_testcase extends 
      * @dataProvider provider_use_cache
      */
     public function test_plan_competencies($usecache) {
-        $this->resetAfterTest();
         if ($usecache) {
             $this->enable_caching($this->report_builder_data['id']);
         }
         $planidalias = reportbuilder_get_extrafield_alias('plan', 'planlink', 'plan_id');
-        $competencyidalias = reportbuilder_get_extrafield_alias('competency', 'proficiencyandapproval', 'competencyid');
         $result = $this->get_report_result($this->report_builder_data['shortname'],
                             array('userid' => $this->user1->id), $usecache);
         $this->assertCount(1, $result);
         $r = array_shift($result);
         $this->assertEquals($this->plan1->id, $r->$planidalias);
-        $this->assertEquals($this->competency1->id, $r->$competencyidalias);
 
         $result = $this->get_report_result($this->report_builder_data['shortname'],
                             array('userid' => $this->user2->id), $usecache);
         $this->assertCount(2, $result);
         $was = array('');
         foreach($result as $r) {
-            $this->assertContains($r->$competencyidalias, array($this->competency2->id, $this->competency3->id));
             $this->assertEquals($this->plan2->id, $r->$planidalias);
             $this->assertNotContains($r->competency_fullname, $was);
             $was[] = $r->competency_fullname;
@@ -189,6 +191,8 @@ class totara_reportbuilder_rb_plan_competencies_embedded_cache_testcase extends 
      * Create mock competency for plan
      *
      * @param stdClass|array $record
+     *
+     * @deprecated since Totara 13, please use totara_plan_generator.
      */
     public function create_competency($record = array()) {
         self::$ind++;
@@ -217,6 +221,8 @@ class totara_reportbuilder_rb_plan_competencies_embedded_cache_testcase extends 
      * Assign a competency to a plan
      * @param int $planid
      * @param int $competencyid
+     *
+     * @deprecated since Totara 13, please use totara_plan_generator.
      */
     public function assign_competency($planid, $competencyid) {
         $plan = new development_plan($planid);
@@ -225,7 +231,6 @@ class totara_reportbuilder_rb_plan_competencies_embedded_cache_testcase extends 
     }
 
     public function test_is_capable() {
-        $this->resetAfterTest();
 
         // Set up report and embedded object for is_capable checks.
         $shortname = $this->report_builder_data['shortname'];
