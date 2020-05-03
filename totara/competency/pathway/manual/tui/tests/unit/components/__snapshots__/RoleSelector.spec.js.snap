@@ -25,6 +25,7 @@ exports[`components/RoleSelector.vue Checks snapshot - has multiple roles: multi
    
   <confirmationmodal-stub
     closebutton="true"
+    confirmbuttontext="$str('ok', 'moodle')"
     size="normal"
     title="$str('modal_confirm_update_role_title', 'pathway_manual')"
   >
@@ -60,6 +61,7 @@ exports[`components/RoleSelector.vue Checks snapshot - has single role: singleRo
    
   <confirmationmodal-stub
     closebutton="true"
+    confirmbuttontext="$str('ok', 'moodle')"
     size="normal"
     title="$str('modal_confirm_update_role_title', 'pathway_manual')"
   >
@@ -87,6 +89,7 @@ exports[`components/RoleSelector.vue Checks snapshot - has specified role: speci
    
   <confirmationmodal-stub
     closebutton="true"
+    confirmbuttontext="$str('ok', 'moodle')"
     size="normal"
     title="$str('modal_confirm_update_role_title', 'pathway_manual')"
   >
