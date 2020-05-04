@@ -143,15 +143,17 @@ trait report_trait {
 
         // Only get the tags in the collection for this item type.
         $tags = \core_tag\report_builder_tag_loader::get_tags($component, $itemtype);
+        $tag_objects = \core_tag_tag::get_bulk(array_keys($tags));
 
-        // Create a yes/no filter for every official tag
-        foreach ($tags as $tag) {
+        $tagoptions = array();
+        foreach ($tag_objects as $tag) {
             $tagid = $tag->id;
-            $name = $tag->name;
-            $ajoin = "{$itemtype}_tag_{$tagid}";
+            $name = $tag->get_display_name();
+
+            // Create a yes/no filter for every official tag
             $filteroptions[] = new \rb_filter_option(
                 $prefix . 'tags',
-                $ajoin,
+                "{$itemtype}_tag_{$tagid}",
                 get_string('taggedx', 'totara_reportbuilder', $name),
                 'select',
                 array(
@@ -159,14 +161,11 @@ trait report_trait {
                     'simplemode' => true,
                 )
             );
+
+            $tagoptions[$tagid] = $name;
         }
 
         // Build filter list from tag list.
-        $tagoptions = array();
-        foreach ($tags as $tag) {
-            $tagoptions[$tag->id] = $tag->name;
-        }
-
         $filteroptions[] = new \rb_filter_option(
             $prefix . 'tags',
             'tagid',

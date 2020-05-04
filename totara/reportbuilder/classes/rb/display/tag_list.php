@@ -46,7 +46,7 @@ class tag_list extends base {
 
         $result = [];
         foreach ($tags as $tag) {
-            $result[] = $tag->name;
+            $result[] = $tag->get_display_name();
         }
         return implode(', ', $result);
     }
