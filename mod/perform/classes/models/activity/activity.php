@@ -418,6 +418,14 @@ class activity extends model {
     }
 
     /**
+     * Get settings on activity to close availability of participant & subject instance.
+     * @return bool
+     */
+    public function close_on_completion(): bool {
+        return true;
+    }
+
+    /**
      * Activate this activity if possible
      *
      * @return $this

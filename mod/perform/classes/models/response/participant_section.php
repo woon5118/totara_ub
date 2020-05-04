@@ -31,6 +31,7 @@ use core\orm\query\builder;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
 use mod_perform\models\activity\participant_instance;
 use mod_perform\models\activity\section;
+use mod_perform\state\participant_section\participant_section_availability;
 use mod_perform\state\participant_section\participant_section_progress;
 use mod_perform\state\state;
 use mod_perform\state\state_aware;
@@ -71,6 +72,7 @@ class participant_section extends model {
         'section_id',
         'participant_instance_id',
         'progress',
+        'availability',
         'created_at',
         'updated_at',
         'participant_instance',
@@ -81,9 +83,7 @@ class participant_section extends model {
         'section_element_responses',
         'progress_status',
         'participant_instance',
-        'section_element_responses',
-        'progress_status',
-        'participant_instance',
+        'availability_status',
         'answerable_participant_instances',
     ];
 
@@ -245,6 +245,15 @@ class participant_section extends model {
      */
     public function get_progress_status(): string {
         return $this->get_state(participant_section_progress::get_type())->get_name();
+    }
+
+    /**
+     * Get internal name of current availability state.
+     *
+     * @return string
+     */
+    public function get_availability_status(): string {
+        return $this->get_state(participant_section_availability::get_type())->get_name();
     }
 
 }

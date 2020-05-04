@@ -47,8 +47,11 @@ class participant_section_availability_closed extends base {
      */
     public static function create_from_participant_section(participant_section $participant_section): self {
         $data = [
-            'id' => $participant_section->get_id(),
-            'participant_instance_id' => $participant_section->participant_instance->id,
+            'objectid' => $participant_section->get_id(),
+            'other' => [
+                'participant_instance_id' => $participant_section->get_participant_instance()->get_id(),
+            ],
+            'context' => $participant_section->get_context(),
         ];
 
         return static::create($data);
