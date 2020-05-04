@@ -29,6 +29,7 @@ Feature: Apply audience membership rules using before and after criteria for cus
       | Start year | 2016      |
       | End year   | 2016      |
     And I press "Save changes"
+    And I confirm new default admin settings
     And I log out
 
   Scenario: Set various timezones for user that setup before and after criteria and confirm that they stored correctly
