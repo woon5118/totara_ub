@@ -1,8 +1,8 @@
 <?php
 /*
- * This file is part of Totara LMS
+ * This file is part of Totara Learn
  *
- * Copyright (C) 2010 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2019 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,16 +17,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Brendan Cox <brendan.cox@totaralearning.com>
- * @author Riana Rossouw <riana.rossouw@totaralearning.com>
- * @package totara_criteria
+ * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
+ * @package pathway_learning_plan
  */
+
+use core\hook\admin_setting_changed;
+use pathway_learning_plan\watcher\totara_core;
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2020050400;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2016120505;       // Requires this Moodle version.
-$plugin->component = 'criteria_linkedcourses'; // To check on upgrade, that module sits in correct place
-$plugin->tuidependencies = [
-    'totara_criteria'
+$watchers = [
+    [
+        'hookname' => admin_setting_changed::class,
+        'callback' => totara_core::class.'::admin_settings_changed',
+    ],
 ];

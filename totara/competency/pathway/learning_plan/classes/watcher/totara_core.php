@@ -21,25 +21,23 @@
  * @package pathway_learning_plan
  */
 
-namespace pathway_learning_plan\observer;
+namespace pathway_learning_plan\watcher;
 
-use core\event\admin_settings_changed;
+use core\hook\admin_setting_changed;
 use core\orm\query\builder;
 use totara_competency\entities\pathway as pathway_entity;
 use totara_competency\hook\competency_validity_changed;
 use totara_competency\pathway;
 use totara_core\advanced_feature;
 
-
 class totara_core {
 
-    public static function admin_settings_changed(admin_settings_changed $event) {
-        $data = $event->get_data();
-        if (!isset($data['other']['olddata']['s__enablelearningplans'])) {
+    public static function admin_settings_changed(admin_setting_changed $hook) {
+        if ($hook->name !== 'enablelearningplans') {
             return;
         }
 
-        if (advanced_feature::check('learningplans', (int)$data['other']['olddata']['s__enablelearningplans'])) {
+        if (advanced_feature::check('learningplans', (int)$hook->oldvalue)) {
             return;
         }
 

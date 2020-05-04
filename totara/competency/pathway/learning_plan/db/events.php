@@ -21,8 +21,6 @@
  * @package pathway_learning_plan
  */
 
-use core\event\admin_settings_changed;
-use pathway_learning_plan\observer\totara_core;
 use pathway_learning_plan\observer\totara_plan;
 use totara_plan\event\competency_value_set;
 
@@ -32,9 +30,5 @@ $observers = [
     [
         'eventname' => competency_value_set::class,
         'callback' => totara_plan::class.'::competency_value_set',
-    ],
-    [
-        'eventname' => admin_settings_changed::class,
-        'callback' => totara_core::class.'::admin_settings_changed',
     ],
 ];

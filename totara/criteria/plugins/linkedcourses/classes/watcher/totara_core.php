@@ -21,26 +21,25 @@
  * @package criteria_linkedcourses
  */
 
-namespace criteria_linkedcourses\observer;
+namespace criteria_linkedcourses\watcher;
 
-use core\event\admin_settings_changed;
+use core\hook\admin_setting_changed;
 use totara_criteria\course_item_helper;
-
 
 class totara_core {
 
-    public static function admin_settings_changed(admin_settings_changed $event) {
+    public static function admin_settings_changed(admin_setting_changed $hook) {
         global $CFG;
 
         $cfgsetting = "enablecompletion";
 
-        $data = $event->get_data();
-        if (!isset($data['other']['olddata']["s__{$cfgsetting}"])) {
+        // Wrong hook
+        if ($hook->name !== $cfgsetting) {
             return;
         }
 
-        $old_value = (int)$data['other']['olddata']["s__{$cfgsetting}"];
-        if (isset($CFG->$cfgsetting) && $CFG->$cfgsetting == $old_value) {
+        // Nothing changed
+        if ($hook->oldvalue == $hook->newvalue) {
             return;
         }
 

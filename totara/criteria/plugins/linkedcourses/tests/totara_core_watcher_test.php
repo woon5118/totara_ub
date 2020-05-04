@@ -23,19 +23,16 @@
 
 
 use core\event\admin_settings_changed;
+use core\hook\admin_setting_changed;
 use totara_competency\linked_courses;
+use totara_core\advanced_feature;
 use totara_criteria\entities\criterion as criterion_entity;
 use totara_criteria\hook\criteria_validity_changed;
 
 
-class criteria_linkedcourses_totara_core_observer_testcase extends advanced_testcase {
+class criteria_linkedcourses_totara_core_watcher_testcase extends advanced_testcase {
 
     public function test_admin_settings_changed() {
-        global $CFG;
-
-        /** @var phpunit_hook_sink $hook_sink */
-        $hook_sink = $this->redirectHooks();
-
         set_config('enablecompletion', 1);
 
         for ($course_idx = 1; $course_idx <= 3; $course_idx++) {
@@ -71,22 +68,9 @@ class criteria_linkedcourses_totara_core_observer_testcase extends advanced_test
             ->count();
         $this->assertSame(2, $on_disk);
 
-        $hook_sink->clear();
-
         // First disable something else
-        $event = admin_settings_changed::create(
-            [
-                'context' => context_system::instance(),
-                'other' =>
-                 [
-                     'olddata' => ['whatever' => 0]
-                 ]
-            ]
-        );
+        (new admin_setting_changed('whatever', advanced_feature::DISABLED, advanced_feature::ENABLED))->execute();
 
-        $event->trigger();
-
-        $this->assertSame(0, $hook_sink->count());
         $on_disk = criterion_entity::repository()
             ->where('valid', 1)
             ->count();
@@ -95,28 +79,7 @@ class criteria_linkedcourses_totara_core_observer_testcase extends advanced_test
         // Now disable completion
         // We need to disable the setting as well as generate the event to simulate what actually happens
         set_config('enablecompletion', 0);
-        $event = admin_settings_changed::create(
-            [
-                'context' => context_system::instance(),
-                'other' =>
-                 [
-                     'olddata' => ['s__enablecompletion' => 1]
-                 ]
-            ]
-        );
-
-        $hook_sink->clear();
-        $event->trigger();
-
-        $hooks = $hook_sink->get_hooks();
-        $this->assertSame(1, count($hooks));
-
-        /** @var criteria_validity_changed $triggered_hook */
-        $triggered_hook = reset($hooks);
-        $this->assertTrue($triggered_hook instanceof criteria_validity_changed);
-        $this->assertEqualsCanonicalizing([$criteria['A']->get_id(), $criteria['B']->get_id()],
-            $triggered_hook->get_criteria_ids()
-        );
+        (new admin_setting_changed('enablecompletion', advanced_feature::ENABLED, advanced_feature::DISABLED))->execute();
 
         $on_disk = criterion_entity::repository()
             ->where('valid', 1)
@@ -131,28 +94,7 @@ class criteria_linkedcourses_totara_core_observer_testcase extends advanced_test
 
         // And enable it again
         set_config('enablecompletion', 1);
-        $event = admin_settings_changed::create(
-            [
-                'context' => context_system::instance(),
-                'other' =>
-                 [
-                     'olddata' => ['s__enablecompletion' => 0]
-                 ]
-            ]
-        );
-
-        $hook_sink->clear();
-        $event->trigger();
-
-        $hooks = $hook_sink->get_hooks();
-        $this->assertSame(1, count($hooks));
-
-        /** @var criteria_validity_changed $triggered_hook */
-        $triggered_hook = reset($hooks);
-        $this->assertTrue($triggered_hook instanceof criteria_validity_changed);
-        $this->assertEqualsCanonicalizing([$criteria['A']->get_id(), $criteria['B']->get_id()],
-            $triggered_hook->get_criteria_ids()
-        );
+        (new admin_setting_changed('enablecompletion', advanced_feature::DISABLED, advanced_feature::ENABLED))->execute();
 
         $on_disk = criterion_entity::repository()
             ->where('valid', 1)
@@ -166,20 +108,17 @@ class criteria_linkedcourses_totara_core_observer_testcase extends advanced_test
 
 
         // Check nothing happens if the setting is set to the same value
-        $event = admin_settings_changed::create(
-            [
-                'context' => context_system::instance(),
-                'other' =>
-                 [
-                     'olddata' => ['s__enablelearningplans' => 1]
-                 ]
-            ]
-        );
+        (new admin_setting_changed('enablecompletion', advanced_feature::DISABLED, advanced_feature::ENABLED))->execute();
 
-        $hook_sink->clear();
-        $event->trigger();
-        $this->assertSame(0, $hook_sink->count());
-        $hook_sink->close();
+        $on_disk = criterion_entity::repository()
+            ->where('valid', 1)
+            ->count();
+        $this->assertSame(2, $on_disk);
+
+        $on_disk = criterion_entity::repository()
+            ->where('valid', 0)
+            ->count();
+        $this->assertSame(0, $on_disk);
     }
 
 }

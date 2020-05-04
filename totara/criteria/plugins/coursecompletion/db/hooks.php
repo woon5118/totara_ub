@@ -17,34 +17,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Riana Rossouw <riana.rossouw@totaralearning.com>
+ * @author Riana Rossow <riana.rossow@totaralearning.com>
+ * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
  * @package criteria_coursecompletion
  */
 
-namespace criteria_coursecompletion\observer;
+use core\hook\admin_setting_changed;
+use criteria_coursecompletion\watcher\totara_core as core_watcher;
 
-use core\event\admin_settings_changed;
-use totara_criteria\course_item_helper;
+defined('MOODLE_INTERNAL') || die();
 
+$watchers = [
+    [
+        'hookname' => admin_setting_changed::class,
+        'callback' => core_watcher::class.'::admin_settings_changed',
+    ],
 
-class totara_core {
-
-    public static function admin_settings_changed(admin_settings_changed $event) {
-        global $CFG;
-
-        $cfgsetting = "enablecompletion";
-
-        $data = $event->get_data();
-        if (!isset($data['other']['olddata']["s__{$cfgsetting}"])) {
-            return;
-        }
-
-        $old_value = (int)$data['other']['olddata']["s__{$cfgsetting}"];
-        if (isset($CFG->$cfgsetting) && $CFG->$cfgsetting == $old_value) {
-            return;
-        }
-
-        course_item_helper::global_setting_changed('coursecompletion');
-    }
-
-}
+];

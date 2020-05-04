@@ -26,15 +26,13 @@
  * This lists event observers.
  */
 
-use core\event\admin_settings_changed;
 use core\event\course_completed;
 use core\event\course_updated;
-use criteria_linkedcourses\observer\totara_core as core_observer;
+use criteria_linkedcourses\observer\course as course_observer;
+use criteria_linkedcourses\observer\linked_courses as linked_courses_observer;
+use totara_competency\event\linked_courses_updated;
 use totara_completioneditor\event\course_completion_edited;
 use totara_completionimport\event\bulk_course_completionimport;
-use criteria_linkedcourses\observer\linked_courses as linked_courses_observer;
-use criteria_linkedcourses\observer\course as course_observer;
-use totara_competency\event\linked_courses_updated;
 use totara_core\event\course_completion_reset;
 
 defined('MOODLE_INTERNAL') || die();
@@ -67,9 +65,4 @@ $observers = [
         'eventname' => course_updated::class,
         'callback' => course_observer::class.'::course_updated',
     ],
-    [
-        'eventname' => admin_settings_changed::class,
-        'callback' => core_observer::class.'::admin_settings_changed',
-    ],
-
 ];
