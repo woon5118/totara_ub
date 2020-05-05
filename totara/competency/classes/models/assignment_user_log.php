@@ -123,10 +123,13 @@ class assignment_user_log {
      * Log the given action for given user
      *
      * @param int|array $user_id one or multiple user_ids
+     * @param bool $tracking_continues
      */
-    public function log_archive($user_id) {
+    public function log_archive($user_id, bool $tracking_continues = false) {
         $this->log($user_id, competency_assignment_user_log::ACTION_UNASSIGNED_ARCHIVED);
-        $this->log_tracking_end($user_id);
+        if (!$tracking_continues) {
+            $this->log_tracking_end($user_id);
+        }
     }
 
     /**

@@ -23,6 +23,8 @@
 
 namespace totara_competency\event;
 
+use totara_competency\entities\competency_assignment_user;
+
 defined('MOODLE_INTERNAL') || die();
 
 class assignment_user_archived extends assignment_user {
@@ -53,4 +55,43 @@ class assignment_user_archived extends assignment_user {
     public function get_description() {
         return 'Users assignment got archived to a competency';
     }
+
+    /**
+     * Create instance of event with tracking data
+     *
+     * @param competency_assignment_user $assignment_user
+     * @param string $assignment_type
+     * @param bool $tracking_continues
+     * @return self
+     */
+    public static function create_from_assignment_user_with_tracking(
+        competency_assignment_user $assignment_user,
+        ?string $assignment_type = null,
+        bool $tracking_continues = false
+    ) {
+        $assignment_user = (object) $assignment_user->get_attributes_raw();
+
+        $data = [
+            'objectid' => $assignment_user->assignment_id,
+            'relateduserid' => $assignment_user->user_id,
+            'other' => [
+                'assignment_id' => $assignment_user->assignment_id,
+                'competency_id' => $assignment_user->competency_id,
+                'type' => $assignment_type ?? null,
+                'tracking_continues' => $tracking_continues,
+            ],
+            'context' => \context_system::instance()
+        ];
+        return static::create($data);
+    }
+
+    /**
+     * Return related tracking information
+     *
+     * @return bool
+     */
+    public function get_tracking_continues(): bool {
+        return $this->data['other']['tracking_continues'] ?? false;
+    }
+
 }

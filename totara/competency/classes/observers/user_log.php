@@ -58,7 +58,8 @@ class user_log {
             switch (get_class($event)) {
                 case assignment_user_archived::class:
                     // Log this action
-                    $log->log_archive($user_id);
+                    $tracking_continues = $event->get_tracking_continues();
+                    $log->log_archive($user_id, $tracking_continues);
                     break;
                 case assignment_user_assigned::class:
                 case assignment_user_assigned_bulk::class:

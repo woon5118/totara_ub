@@ -36,7 +36,6 @@ use hierarchy_position\event\position_deleted;
 use totara_cohort\event\members_updated;
 use totara_competency\event\assignment_activated;
 use totara_competency\event\assignment_archived;
-use totara_competency\event\assignment_created;
 use totara_competency\event\assignment_deleted;
 use totara_competency\event\assignment_user_archived;
 use totara_competency\event\assignment_user_assigned;

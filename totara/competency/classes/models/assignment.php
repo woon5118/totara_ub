@@ -98,12 +98,15 @@ class assignment {
 
         /** @var competency_assignment_user $assignment_user */
         foreach ($assigned_users as $assignment_user) {
-            $events[] = assignment_user_archived::create_from_assignment_user($assignment_user);
-
             // if tracking should be continued create new system
             // assignments for each user before archiving them
             // We only ever create new tracking assignments for users in group assignments
-            if ($continue_tracking && $this->entity->user_group_type !== user_groups::USER) {
+            $tracking_continues = $continue_tracking && $this->entity->user_group_type !== user_groups::USER;
+
+            $events[] = assignment_user_archived::create_from_assignment_user_with_tracking($assignment_user,
+                null, $tracking_continues
+            );
+            if ($tracking_continues) {
                 $system_assignments[] = $assignment_user;
             }
         }
@@ -120,14 +123,14 @@ class assignment {
             ->where('assignment_id', $this->entity->id)
             ->delete();
 
+        foreach ($events as $event) {
+            $event->trigger();
+        }
+
         // Create system assignments for continuous tracking
         foreach ($system_assignments as $assignment_user) {
             (new assignment_user($assignment_user->user_id))
                 ->create_system_assignment($assignment_user->competency_id);
-        }
-
-        foreach ($events as $event) {
-            $event->trigger();
         }
     }
 
@@ -549,13 +552,13 @@ class assignment {
             case 'can_archive':
                 return $this->can_archive(user::logged_in()->id);
 
-                // We fall back to the default if it's not there intentionally
             case 'assigned_at':
                 if ($this->entity->relation_loaded('assignment_user')) {
                     // The relation might be loaded, but the related model does not always exist,
                     // for example there is no assignment user for archived assignments...
                     return $this->entity->assignment_user->created_at ?? null;
                 }
+                // We fall back to the default if it's not there intentionally
             default:
                 if (isset($this->entity->{$field})) {
                     return $this->entity->$field;
