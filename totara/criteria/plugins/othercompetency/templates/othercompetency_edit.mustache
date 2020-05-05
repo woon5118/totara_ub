@@ -66,11 +66,11 @@ data-tw-loader-target="">
 
             <div>
                 <div class="tw-editAchievementPaths__criterionForm-warning tw-editAchievementPaths--hidden" data-tw-criterionOtherCompetency-error="notenoughothercompetency">
-                    {{#flex_icon}}notification-warning{{/flex_icon}}
+                    {{#flex_icon}}notification-warning, error, criteria_othercompetency{{/flex_icon}}
                     {{#str}}error_not_enough_other_competency, criteria_othercompetency{{/str}}
                 </div>
 
-                <button type="button" class="tw-editAchievementPaths__transparentBtn" aria-label="" data-tw-criterionOtherCompetency-addCompetencies="">
+                <button type="button" class="tw-editAchievementPaths__transparentBtn" data-tw-criterionOtherCompetency-addCompetencies="">
                     {{#str}}add_competencies, criteria_othercompetency{{/str}}
                 </button>
             </div>
@@ -81,11 +81,11 @@ data-tw-loader-target="">
     data-tw-criterionOtherCompetency-aggregation="{{#aggregation}}{{method}}{{/aggregation}}{{^aggregation}}1{{/aggregation}}"
     data-tw-criterionOtherCompetency-aggregation-reqitems="{{#aggregation}}{{reqitems}}{{/aggregation}}{{^aggregation}}1{{/aggregation}}">
         
-        <h5 class="tw-editAchievementPaths__criterionForm-title">
+        <h5 class="tw-editAchievementPaths__criterionForm-title" id="tw_criterionOtherCompetency-radioGroup-label-{{key}}">
             {{#str}}aggregation, totara_criteria{{/str}}
         </h5>
 
-        <div class="tw-editAchievementPaths__criterionForm-items">
+        <div role="radiogroup" aria-labelledby="tw_criterionOtherCompetency-radioGroup-label-{{key}}" aria-describedby="criterion_title--{{key}}" class="tw-editAchievementPaths__criterionForm-items">
             <div data-tw-criterionOtherCompetency-aggregationMethod="1">
                 <input type="radio"
                 id="tw_criterionOtherCompetency_agg_all__{{key}}"

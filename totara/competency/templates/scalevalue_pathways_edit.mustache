@@ -48,7 +48,7 @@
 
         <div class="tw-editScaleValuePaths__header-legend" data-tw-editAchievementPaths-on-ordering="hide">
             {{#str}}single_value_proficient_mark_help, totara_competency{{/str}}
-            {{#flex_icon}}check-circle-o-success{{/flex_icon}}
+            {{#flex_icon}}check-circle-o-success, single_value_proficient_mark, totara_competency{{/flex_icon}}
         </div>
 
         <div class="tw-editScaleValuePaths__header-drag tw-editAchievementPaths--hidden" data-tw-editAchievementPaths-on-ordering="show">
@@ -62,12 +62,12 @@
 
             <div class="tw-editScaleValuePaths__scaleHeader {{^pathways}}tw-editScaleValuePaths__scaleHeader-empty{{/pathways}}">
                 <h4 class="tw-editScaleValuePaths__scaleHeader-title">
-                    {{#proficient}}{{#flex_icon}}check-circle-o-success{{/flex_icon}}{{/proficient}}
+                    {{#proficient}}{{#flex_icon}}check-circle-o-success, single_value_proficient_mark, totara_competency{{/flex_icon}}{{/proficient}}
                     {{name}}
                 </h4>
                 
                 <div class="tw-editScaleValuePaths__scaleHeader-add">
-                    <button class="tw-editScaleValuePaths__addButton" aria-label="Add" type="button" data-tw-editScaleValuePaths-add="">
+                    <button aria-expanded="false" class="tw-editScaleValuePaths__addButton" aria-label="Add" type="button" data-tw-editScaleValuePaths-add="">
                         <span>
                             <span aria-hidden="true" class="">
                                 {{#flex_icon}}plus{{/flex_icon}}

@@ -35,6 +35,7 @@ $string['competency_framework_count_plural'] = '{$a->name}: {$a->count} competen
 $string['competency_framework_count_singular'] = '{$a->name}: {$a->count} competency';
 $string['date'] = 'Date';
 $string['edit_rating'] = 'Edit rating';
+$string['error'] = 'Error';
 $string['error_no_raters'] = 'No raters selected';
 $string['error_user_lacks_role_for_any'] = 'There are no users that you are allowed to rate';
 $string['error_user_lacks_role_for_user'] = 'You do not have the {$a->role} role for {$a->user}';

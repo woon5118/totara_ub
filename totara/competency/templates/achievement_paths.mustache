@@ -63,12 +63,12 @@
     data-core-autoinitialise-amd="totara_competency/achievement_paths">
 
     <div class="tw-editAchievementPaths__heading">
-        <div class="tw-editAchievementPaths__heading-title">
+        <h3 class="tw-editAchievementPaths__heading-title">
             {{#str}}achievement_paths, totara_competency{{/str}}
-        </div>
+        </h3>
 
         <div class="tw-editAchievementPaths__heading-addPath">
-            <select data-tw-editAchievementPaths-add-pathway="" data-tw-editAchievementPaths-on-ordering="disable">
+            <select aria-label="{{#str}}competency_achievement_add_achievement_path, totara_hierarchy{{/str}}" data-tw-editAchievementPaths-add-pathway="" data-tw-editAchievementPaths-on-ordering="disable">
                 <option value="0" selected="selected">
                     {{#str}}add_achievement_path, totara_competency{{/str}}
                 </option>
@@ -76,6 +76,7 @@
                 <option value="{{type}}" data-tw-editAchievementPaths-path-template="{{templatename}}">{{name}}</option>
                 {{/pathway_types}}
             </select>
+            <span id="add-pathway-sr-only" class="sr-only" aria-live="assertive" role="alert" data-aria-live-extra-text="{{#str}}competency_achievement_add_achievement_path_sr_only, totara_hierarchy{{/str}}"></span>
         </div>
     </div>
 
@@ -96,9 +97,9 @@
 
         <div class="tw-editAchievementPaths__aggregation-actions tw-editAchievementPaths__btnGroup tw-editAchievementPaths--hidden" 
         data-tw-editAchievementPaths-aggregation-actions="">
-            <button class="tw-editAchievementPaths__btn tw-editAchievementPaths__btn-active" data-tw-editAchievementPaths-aggregation-action="edit">
+            <button aria-label="{{#str}}competency_criteria_priority_edit, totara_hierarchy{{/str}}" class="tw-editAchievementPaths__btn tw-editAchievementPaths__btn-active" data-tw-editAchievementPaths-aggregation-action="edit">
                 {{#flex_icon}}edit{{/flex_icon}}
-            </button><button class="tw-editAchievementPaths__btn" data-tw-editAchievementPaths-aggregation-action="move">
+            </button><button aria-label="{{#str}}competency_criteria_priority_move, totara_hierarchy{{/str}}" class="tw-editAchievementPaths__btn" data-tw-editAchievementPaths-aggregation-action="move">
                 {{#flex_icon}}arrows{{/flex_icon}}
             </button>
         </div>

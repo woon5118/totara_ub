@@ -26,6 +26,7 @@ $string['pluginname'] = 'Course completion: Flexible courses';
 $string['achievement_via'] = 'Course completion';
 $string['add_courses'] = "Add courses";
 $string['courses'] = 'Courses';
+$string['error'] = 'Error';
 $string['error_no_course'] = 'Course no longer exists';
 $string['error_no_course_completion'] = 'Completion tracking is disabled';
 $string['error_not_enough_courses'] = 'Not enough courses with completion tracking enabled';

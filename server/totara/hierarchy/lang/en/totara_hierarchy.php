@@ -188,6 +188,11 @@ $string['competencyassigndeletecheck'] = 'Are you sure you would like to remove 
 $string['competencybacktoallframeworks'] = 'Back to all competency frameworks';
 $string['competency_back_to_competency_page'] = '« Back to Competency page';
 $string['competencycreatetype'] = 'The competency type "{$a}" has been created';
+$string['competency_criteria_remove'] = 'Remove criteria';
+$string['competency_criteria_remove_undo'] = 'Undo remove criteria';
+$string['competency_criteria_remove_item'] = 'Remove "{$a}"';
+$string['competency_criteria_priority_edit'] = 'Edit prioritised achievement paths';
+$string['competency_criteria_priority_move'] = 'Move prioritised achievement paths';
 $string['competencycustomfields'] = 'Custom fields';
 $string['competencydeletedframework'] = 'The competency framework "{$a}" and its data have been completely deleted.';
 $string['competencydeletedtype'] = 'The competency type "{$a}" has been completely deleted.';
@@ -273,6 +278,11 @@ Select the **Parent competency** from the dropdown menu. Select **Top** if you w
 If you change the parent competency of an item it will move to sit below its new parent, and all of its children will move with it.
 
 Note that to set up parent/child relationships you need to have at least one other item in the framework. Otherwise the option will not appear.';
+$string['competency_achievement_add_achievement_path'] = 'Add achievement path';
+$string['competency_achievement_add_achievement_path_sr_only'] = 'added';
+$string['competency_achievement_pathway_add'] = 'Add pathway';
+$string['competency_achievement_pathway_remove'] = 'Remove pathway';
+$string['competency_achievement_pathway_undo'] = 'Undo remove pathway';
 $string['competencyplural'] = 'Competencies';
 $string['competencyreturntoframework'] = 'Return to competency framework';
 $string['competencyscale'] = 'Competency scale';

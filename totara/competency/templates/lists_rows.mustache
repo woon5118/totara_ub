@@ -69,9 +69,9 @@
 
 {{! List heading }}
 {{#rows.0}}{{#row_header}}
-<div class="tw-list__row tw-list__row_header" role="row">
+<div class="tw-list__row tw-list__row_header">
     {{#select_enabled}}
-    <div class="tw-list__cell tw-list__cell_select" role="columnheader">
+    <div class="tw-list__cell tw-list__cell_select">
         <label class="tw-list__cell_select_label" title="{{#str}}selectallpageitems, totara_core{{/str}}">
             <input type="checkbox" aria-label="{{#str}}selectallpageitems, totara_core{{/str}}" name="tw-list__selectAll"
             class="tw-list__cell_select_checkbox" data-tw-list-selectAll="">{{!
@@ -81,36 +81,35 @@
     {{/select_enabled}}
 
     {{#columns}}
-    <div class="tw-list__cell{{#width}} tw-list__cell--{{width}}{{/width}}" role="columnheader">
+    <div class="tw-list__cell{{#width}} tw-list__cell--{{width}}{{/width}}">
         {{value}}
     </div>
     {{/columns}}
 
     {{#has_actions}}
-    <div class="tw-list__cell tw-list__cell_action tw-list__cell--sm" role="columnheader"></div>
+    <div class="tw-list__cell tw-list__cell_action tw-list__cell--sm"></div>
     {{/has_actions}}
 
     {{#hierarchyEnabled}}
-    <div class="tw-list__cell tw-list__cell_hierarchy" role="columnheader"></div>
+    <div class="tw-list__cell tw-list__cell_hierarchy"></div>
     {{/hierarchyEnabled}}
 </div>
 {{/row_header}}{{/rows.0}}
 
 {{! List rows) }}
 {{#rows}}
-<div class="tw-list__row {{#active}}tw-list__row_active{{/active}} {{#disabled}}tw-list__row_disabled{{/disabled}}" role="row"
-{{#select_enabled}}aria-selected="{{#active}}true{{/active}}{{^active}}false{{/active}}"{{/select_enabled}}
+<div class="tw-list__row {{#active}}tw-list__row_active{{/active}} {{#disabled}}tw-list__row_disabled{{/disabled}}" {{#select_enabled}}aria-selected="{{#active}}true{{/active}}{{^active}}false{{/active}}"{{/select_enabled}}
 data-tw-list-row="{{id}}" data-tw-list-extraData="{{extra_data}}">
     {{#select_enabled}}
-    <div class="tw-list__cell tw-list__cell_select" role="cell">
+    <div class="tw-list__cell tw-list__cell_select">
         <label class="tw-list__cell_select_label {{#disabled}}tw-list__cell_select_label_disabled{{/disabled}}">
-            <input type="checkbox" class="tw-list__cell_select_checkbox" aria-label="{{#str}}select, core{{/str}}" name="tw-list__select_{{id}}"
+            <input type="checkbox" class="tw-list__cell_select_checkbox" aria-label="{{#str}}select, core{{/str}} {{#columns}}{{value}}{{/columns}}" name="tw-list__select_{{id}}"
             data-tw-list-rowSelect="" {{#active}}checked="checked"{{/active}} {{#disabled}}disabled="disabled"{{/disabled}}>
         </label>
     </div>
     {{/select_enabled}}
     {{#columns}}
-    <div class="tw-list__cell{{#width}} tw-list__cell--{{width}}{{/width}}" role="cell">
+    <div class="tw-list__cell{{#width}} tw-list__cell--{{width}}{{/width}}">
         {{#expandable}}{{#expand_trigger}}{{!
       }}<a href="#" class="tw-list__row_trigger" data-tw-list-expandTrigger="">{{!
       }}{{/expand_trigger}}{{/expandable}}
@@ -124,7 +123,7 @@ data-tw-list-row="{{id}}" data-tw-list-extraData="{{extra_data}}">
     {{/columns}}
 
     {{#has_actions}}
-        <div class="tw-list__cell tw-list__cell_action tw-list__cell--sm" role="cell">
+        <div class="tw-list__cell tw-list__cell_action tw-list__cell--sm">
             {{#actions.0}}{{#actions}}{{!
           }}<a href="#" class="tw-list__cell_action_btn {{#disabled}}tw-list__cell_action_btn_disabled{{/disabled}}
             {{#hidden}}tw-list__cell_action_btn_hidden{{/hidden}}" data-tw-list-actionTrigger="{{event_key}}">
@@ -135,7 +134,7 @@ data-tw-list-row="{{id}}" data-tw-list-extraData="{{extra_data}}">
     {{/has_actions}}
 
     {{#hierarchyEnabled}}
-    <div class="tw-list__cell tw-list__cell_hierarchy" role="cell">
+    <div class="tw-list__cell tw-list__cell_hierarchy">
         {{#has_children}}
         <a href="#" class="tw-list__cell_hierarchy_btn" data-tw-list-hierarchyTrigger="">
             {{#flex_icon}}subitems, viewchildren, totara_core{{/flex_icon}}

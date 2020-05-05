@@ -61,11 +61,11 @@ data-tw-loader-target="">
     data-tw-criterionChildCompetency-aggregation="{{#aggregation}}{{method}}{{/aggregation}}{{^aggregation}}1{{/aggregation}}"
     data-tw-criterionChildCompetency-aggregation-reqitems="{{#aggregation}}{{reqitems}}{{/aggregation}}{{^aggregation}}1{{/aggregation}}">
         
-        <h5 class="tw-editAchievementPaths__criterionForm-title">
+        <h5 class="tw-editAchievementPaths__criterionForm-title" id="tw_criterionChildCompetency-radioGroup-label-{{key}}">
             {{#str}}aggregation, totara_criteria{{/str}}
         </h5>
 
-        <div class="tw-editAchievementPaths__criterionForm-items">
+        <div role="radiogroup" aria-labelledby="tw_criterionChildCompetency-radioGroup-label-{{key}}" aria-describedby="criterion_title--{{key}}" class="tw-editAchievementPaths__criterionForm-items">
             <div data-tw-criterionChildCompetency-aggregationMethod="1">
                 <input type="radio"
                 id="tw_criterionChildCompetency_agg_all__{{key}}"

@@ -61,11 +61,11 @@ data-tw-loader-target="">
     data-tw-criterionLinkedCourses-aggregation="{{#aggregation}}{{method}}{{/aggregation}}{{^aggregation}}1{{/aggregation}}"
     data-tw-criterionLinkedCourses-aggregation-reqitems="{{#aggregation}}{{reqitems}}{{/aggregation}}{{^aggregation}}1{{/aggregation}}">
 
-        <h5 class="tw-editAchievementPaths__criterionForm-title">
+        <h5 class="tw-editAchievementPaths__criterionForm-title" id="tw_criterionLinkedCourses-radioGroup-label-{{key}}">
             {{#str}}aggregation, totara_criteria{{/str}}
         </h5>
 
-        <div class="tw-editAchievementPaths__criterionForm-items">
+        <div role="radiogroup" aria-labelledby="tw_criterionLinkedCourses-radioGroup-label-{{key}}" aria-describedby="criterion_title--{{key}}" class="tw-editAchievementPaths__criterionForm-items">
             <div data-tw-criterionLinkedCourses-aggregationMethod="1">
                 <input type="radio"
                 id="tw_criterionLinkedCourses_agg_all__{{key}}"

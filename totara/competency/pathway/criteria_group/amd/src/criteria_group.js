@@ -100,6 +100,7 @@ define(['core/str', 'core/notification', 'core/templates'], function(str, notifi
                 } else if (e.target.closest('[data-tw-editScaleValuePaths-criterion-action]')) {
                     var wgt = e.target.closest('[data-tw-editScaleValuePaths-criterion-action]'),
                         keyWgt = wgt.closest('[data-tw-editScaleValuePaths-criterion-key]'),
+                        buttonWgt = keyWgt.querySelector('button'),
                         criterionKey;
 
                     action = wgt.getAttribute('data-tw-editScaleValuePaths-criterion-action');
@@ -118,6 +119,10 @@ define(['core/str', 'core/notification', 'core/templates'], function(str, notifi
 
                     if (action === 'toggle-detail') {
                         that.toggleCriterionDetail(criterionKey);
+
+                        var ariaExpandedValue = buttonWgt.getAttribute('aria-expanded');
+                        var toggledAriaExpandedValue = ariaExpandedValue === 'true' ? 'false' : 'true';
+                        buttonWgt.setAttribute('aria-expanded', toggledAriaExpandedValue);
                     } else if (action === 'remove') {
                         that.removeCriterion(criterionKey);
                     } else if (action === 'undo') {
@@ -314,6 +319,13 @@ define(['core/str', 'core/notification', 'core/templates'], function(str, notifi
             for (var a = 0; a < criteriaTypeNodes.length; a++) {
                 criteriaTypeNodes[a].classList.add('tw-editAchievementPaths--hidden');
             }
+
+            // We also want to set the associated buttons to aria-expanded="false"
+            var criteriaTypeNodesButtons =  document.querySelectorAll('[data-cg-action="addcriterion"]');
+
+            for (var a = 0; a < criteriaTypeNodesButtons.length; a++) {
+                criteriaTypeNodesButtons[a].setAttribute('aria-expanded', false);
+            }
         },
 
         /**
@@ -321,13 +333,19 @@ define(['core/str', 'core/notification', 'core/templates'], function(str, notifi
          */
         showCriteriaTypeOptions: function() {
             var toOpen = this.widget.querySelector('[data-tw-editScaleValuePaths-dropDown="criteria_group"]'),
-                expanded = toOpen ? !toOpen.classList.contains('tw-editAchievementPaths--hidden') : false;
+                expanded = toOpen ? !toOpen.classList.contains('tw-editAchievementPaths--hidden') : false,
+                dropDownButton = toOpen.previousElementSibling;
 
             this.hideCriteriaTypeSelectors();
 
             // Now show the correct list
             if (toOpen && !expanded) {
                 toOpen.classList.remove('tw-editAchievementPaths--hidden');
+
+                // And set the button to aria state
+                if(dropDownButton) {
+                    dropDownButton.setAttribute('aria-expanded', 'true');
+                }
             }
         },
 

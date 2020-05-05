@@ -327,6 +327,7 @@ $string['settings_unassignment_header'] = 'Automatic user unassignment behaviour
 $string['settings_unassignment_text'] = 'Configuration for determining the consequences of a user being unassigned from a competency due to them losing membership of an assigned audience, being removed from an assigned position or organisation, or their assigned audience, position or organisation being deleted.';
 $string['show_help_for_x'] = 'Show help for {$a}';
 $string['single_value_paths'] = 'Criteria-based paths';
+$string['single_value_proficient_mark'] = 'Proficient';
 $string['single_value_proficient_mark_help'] = 'Proficient values marked with';
 $string['sort'] = 'Sort by';
 $string['sort_alphabetical'] = 'Alphabetical';

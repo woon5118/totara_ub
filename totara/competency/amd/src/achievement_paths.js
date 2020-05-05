@@ -138,6 +138,10 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                     if (selectedOption.value != '0') {
                         that.addPath(selectedOption);
                         addPathwayNode.value = '0';
+                        var addPathwaySrOnly = document.querySelector(
+                          '#add-pathway-sr-only'
+                        );
+                        addPathwaySrOnly.innerText = selectedOption.innerText + ' ' + addPathwaySrOnly.dataset.ariaLiveExtraText;
                     }
                 } else if (e.target.closest('[data-tw-editAchievementPaths-aggregation-change]')) {
                     that.setOverallAggregation();
@@ -468,13 +472,20 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
         },
 
         /**
-         * Hide all criteria type selectors
+         * Hide all criteria type selectors and set their associated buttons to the correct aria state
          */
         hideCriteriaTypeSelectors: function() {
             var criteriaDropDowns = this.widget.querySelectorAll('[data-tw-editScaleValuePaths-dropDown]');
 
             for (var a = 0; a < criteriaDropDowns.length; a++) {
                 criteriaDropDowns[a].classList.add('tw-editAchievementPaths--hidden');
+
+            }
+
+            var criteriaDropDownsButtons = document.querySelectorAll('[data-tw-editscalevaluepaths-add]');
+
+            for (var a = 0; a < criteriaDropDownsButtons.length; a++) {
+                criteriaDropDownsButtons[a].setAttribute('aria-expanded', 'false');
             }
         },
 
@@ -485,7 +496,8 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
          */
         showCriteriaTypeDropDown: function(scaleValueNode) {
             var openDropDown = scaleValueNode.querySelector('[data-tw-editScaleValuePaths-dropDown="scalevalue"]'),
-                alreadyExpanded = !openDropDown.classList.contains('tw-editAchievementPaths--hidden');
+                alreadyExpanded = !openDropDown.classList.contains('tw-editAchievementPaths--hidden'),
+                dropDownButton = scaleValueNode.querySelector('[data-tw-editscalevaluepaths-add]');
 
             // Hide existing open lists
             this.hideCriteriaTypeSelectors();
@@ -493,6 +505,11 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
             // Now show the correct list
             if (openDropDown && !alreadyExpanded) {
                 openDropDown.classList.remove('tw-editAchievementPaths--hidden');
+
+                // And set the button to aria state
+                if(dropDownButton) {
+                    dropDownButton.setAttribute('aria-expanded', 'true');
+                }
             }
         },
 

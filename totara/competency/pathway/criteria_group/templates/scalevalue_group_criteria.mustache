@@ -51,7 +51,7 @@
 
     <div class="tw-editScaleValuePathGroupCriterion__actions" data-tw-editAchievementPaths-on-ordering="hide">
         <button type="button" class="tw-editAchievementPaths__group-actionsButton {{#deleted}}tw-editAchievementPaths--hidden{{/deleted}}" 
-        aria-label="" data-tw-editScaleValuePaths-criterion-action="remove">
+        aria-label="{{#str}}competency_criteria_remove, totara_hierarchy{{/str}}" data-tw-editScaleValuePaths-criterion-action="remove">
             <span>
                 <span aria-hidden="true" class="">
                     {{#flex_icon}}trash{{/flex_icon}}
@@ -60,7 +60,7 @@
         </button>
 
         <button type="button" class="tw-editAchievementPaths__group-actionsButton {{^canundo}}tw-editAchievementPaths--hidden{{/canundo}}" 
-        aria-label="" data-tw-editScaleValuePaths-criterion-action="undo">
+        aria-label="{{#str}}competency_criteria_remove_undo, totara_hierarchy{{/str}}" data-tw-editScaleValuePaths-criterion-action="undo">
             <span>
                 <span aria-hidden="true" class="">
                     {{#flex_icon}}undo{{/flex_icon}}

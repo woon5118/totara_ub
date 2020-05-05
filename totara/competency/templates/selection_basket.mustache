@@ -65,24 +65,24 @@
     </div>
 
     <div class="tw-selectionBasket__clear">
-        <a href="#" class="tw-selectionBasket__btn tw-selectionBasket__btn_small
+        <button class="clear-selectionBasket__btn tw-selectionBasket__btn_small
         {{^count}}tw-selectionBasket__btn_disabled{{/count}}" data-tw-selectionBasket-action="clear"
         data-tw-selectionBasket-countReq="">
             <span class="tw-selectionBasket__btn_small_icon">
                 {{#flex_icon}}trash{{/flex_icon}}
             </span>
             {{selectionClearLabel}}{{^selectionClearLabel}}{{#str}}clearselection, totara_core{{/str}}{{/selectionClearLabel}}
-        </a>
+        </button>
     </div>
 
     <div class="tw-selectionBasket__actions">
         {{#hasToggleSelection}}
-        <a href="#" class="tw-selectionBasket__showSelection" data-tw-selectionBasket-action="show">
+        <button class="tw-selectionBasket__transparentBtn tw-selectionBasket__showSelection" data-tw-selectionBasket-action="show">
             {{selectionShowLabel}}{{^selectionShowLabel}}{{#str}}viewselected, totara_core{{/str}}{{/selectionShowLabel}}
-        </a>
-        <a href="#" class="tw-selectionBasket__hideSelection" data-tw-selectionBasket-action="hide">
+        </button>
+        <button class="tw-selectionBasket__transparentBtn tw-selectionBasket__hideSelection" data-tw-selectionBasket-action="hide">
             {{selectionHideLabel}}{{^selectionHideLabel}}{{#str}}gobacktoall, totara_core{{/str}}{{/selectionHideLabel}}
-        </a>
+        </button>
         {{/hasToggleSelection}}
 
         {{#actionBtn}}
@@ -95,20 +95,20 @@
 
         {{#hasActionBtnList}}
         <div class="tw-selectionBasket__actions_group" data-tw-selectionBasket-group="">
-            <a href="#" class="tw-selectionBasket__btn tw-selectionBasket__btn_small tw-selectionBasket__btn_prim
+            <button class="tw-selectionBasket__transparentBtn tw-selectionBasket__btn tw-selectionBasket__btn_small tw-selectionBasket__btn_prim
             {{^count}}tw-selectionBasket__btn_disabled{{/count}}" data-tw-selectionBasket-group-trigger=""
             data-tw-selectionBasket-countReq="">
                 {{actionBtnListLabel}}{{^actionBtnListLabel}}{{#str}}actions, core{{/str}}{{/actionBtnListLabel}}
                 <span class="tw-selectionBasket__btn_small_icon">
                     {{#flex_icon}}expandable, expand, core{{/flex_icon}}
                 </span>
-            </a>
+            </button>
             <ul class="tw-selectionBasket__actions_group_list">
                 {{#actionBtnList}}
                 <li>
-                    <a href="#" class="tw-selectionBasket__actions_group_link" data-tw-selectionBasket-customAction="{{action}}">
+                    <button class="tw-selectionBasket__transparentBtn tw-selectionBasket__actions_group_link" data-tw-selectionBasket-customAction="{{action}}">
                         {{label}}
-                    </a>
+                    </button>
                 </li>
                 {{/actionBtnList}}
             </ul>

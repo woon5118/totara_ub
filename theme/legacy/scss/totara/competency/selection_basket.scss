@@ -114,6 +114,33 @@
     }
   }
 
+  &__transparentBtn {
+    @include tui-font-heading-label-small();
+    color: var(--tui-color-state);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    white-space: normal;
+    text-align: left;
+    padding: 0;
+
+    .flex-icon {
+      position: relative;
+      top: -1px;
+    }
+
+    &:active,
+    &:focus,
+    &:hover:active,
+    &:hover {
+      color: var(--tui-color-state-hover);
+      text-decoration: none;
+      background: transparent;
+      border: none;
+      box-shadow: none;
+    }
+  }
+
   &__clear {
     display: none;
   }

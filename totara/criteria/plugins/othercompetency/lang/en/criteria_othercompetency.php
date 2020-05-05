@@ -28,6 +28,7 @@ $string['add_competencies'] = "Add competencies";
 $string['all_frameworks'] = 'All frameworks';
 $string['competencies'] = 'Competencies';
 $string['competency'] = 'competency';
+$string['error'] = 'Error';
 $string['error_competency_cannot_proficient'] = 'Competency can not become proficient';
 $string['error_no_competency'] = 'Competency no longer exists';
 $string['error_not_enough_other_competency'] = 'No competencies added yet.';

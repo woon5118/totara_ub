@@ -48,7 +48,7 @@ data-tw-editScaleValuePaths-criterion-deleted="">
     data-tw-editScaleValuePaths-criterion-action="toggle-detail" 
     {{#expanded}}data-tw-editScaleValuePaths-criterion-detail-expanded="1"{{/expanded}}>
 
-        <button type="button" class="tw-editAchievementPaths__transparentBtn" aria-label="">
+        <button type="button" aria-expanded="false" class="tw-editAchievementPaths__transparentBtn">
             <span>
                 <span aria-hidden="true" {{^expanded}}class="tw-editAchievementPaths--hidden"{{/expanded}} data-tw-editScaleValuePaths-criterion-detail-icon="expanded">
                     {{#flex_icon}}expanded{{/flex_icon}}
@@ -56,7 +56,7 @@ data-tw-editScaleValuePaths-criterion-deleted="">
                 <span aria-hidden="true" {{#expanded}}class="tw-editAchievementPaths--hidden"{{/expanded}} data-tw-editScaleValuePaths-criterion-detail-icon="collapsed">
                     {{#flex_icon}}collapsed{{/flex_icon}}
                 </span>
-                {{title}}
+                <span id="criterion_title--{{key}}">{{title}}</span>
             </span>
         </button>
     </div>
