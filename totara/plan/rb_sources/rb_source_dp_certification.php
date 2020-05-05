@@ -684,21 +684,21 @@ class rb_source_dp_certification extends rb_base_source {
         );
 
         $requiredcolumns[] = new rb_column(
-            'base',
+            'visibility',
             'available',
             '',
             "base.available"
         );
 
         $requiredcolumns[] = new rb_column(
-            'base',
+            'visibility',
             'availablefrom',
             '',
             "base.availablefrom"
         );
 
         $requiredcolumns[] = new rb_column(
-            'base',
+            'visibility',
             'availableuntil',
             '',
             "base.availableuntil"

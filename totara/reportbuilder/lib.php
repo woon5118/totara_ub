@@ -5888,19 +5888,19 @@ class reportbuilder {
         }
 
         if ($type == 'program' || $type == 'certification') {
-            if (empty($this->requiredcolumns[$table . '-available']) ||
-                $this->requiredcolumns[$table . '-available']->field != $table . '.available') {
-                throw new moodle_exception("Report is missing required column {$table} available or field is incorrect");
+            if (empty($this->requiredcolumns[ 'visibility-available']) ||
+                $this->requiredcolumns['visibility-available']->field != $table . '.available') {
+                throw new moodle_exception('Report is missing required column visibility available or field is incorrect');
             }
 
-            if (empty($this->requiredcolumns[$table . '-availablefrom']) ||
-                $this->requiredcolumns[$table . '-availablefrom']->field != $table . '.availablefrom') {
-                throw new moodle_exception("Report is missing required column {$table} availablefrom or field is incorrect");
+            if (empty($this->requiredcolumns['visibility-availablefrom']) ||
+                $this->requiredcolumns['visibility-availablefrom']->field != $table . '.availablefrom') {
+                throw new moodle_exception('Report is missing required column visibility availablefrom or field is incorrect');
             }
 
-            if (empty($this->requiredcolumns[$table . '-availableuntil']) ||
-                $this->requiredcolumns[$table . '-availableuntil']->field != $table . '.availableuntil') {
-                throw new moodle_exception("Report is missing required column {$table} availableuntil or field is incorrect");
+            if (empty($this->requiredcolumns['visibility-availableuntil']) ||
+                $this->requiredcolumns['visibility-availableuntil']->field != $table . '.availableuntil') {
+                throw new moodle_exception('Report is missing required column visibility availableuntil or field is incorrect');
             }
         }
 

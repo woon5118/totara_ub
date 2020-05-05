@@ -444,7 +444,7 @@ class rb_source_dp_program_recurring extends rb_base_source {
         );
 
         $requiredcolumns[] = new rb_column(
-            'prog',
+            'visibility',
             'available',
             '',
             "prog.available",
@@ -452,7 +452,7 @@ class rb_source_dp_program_recurring extends rb_base_source {
         );
 
         $requiredcolumns[] = new rb_column(
-            'prog',
+            'visibility',
             'availablefrom',
             '',
             "prog.availablefrom",
@@ -460,7 +460,7 @@ class rb_source_dp_program_recurring extends rb_base_source {
         );
 
         $requiredcolumns[] = new rb_column(
-            'prog',
+            'visibility',
             'availableuntil',
             '',
             "prog.availableuntil",

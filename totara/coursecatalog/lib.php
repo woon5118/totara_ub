@@ -299,8 +299,13 @@ function totara_visibility_where($userid = null, $fieldbaseid = 'course.id', $fi
              $showhidden = false) {
     global $CFG, $USER;
 
+    $separator = ($iscached) ? '_' : '.'; // When the report is cached its fields come in type_value form.
+    $quoted_separator = preg_quote($separator, '#');
+    $regex = "#^([^{$quoted_separator}]+){$quoted_separator}.*\$#";
+    $alias = preg_replace($regex, '$1', $fieldbaseid);
+
     if (!empty($CFG->disable_visibility_maps)) {
-        return legacy_totara_visibility_where($userid, $fieldbaseid, $fieldvisible, $fieldaudvis, $tablealias, $type, $iscached, $showhidden);
+        return legacy_totara_visibility_where($userid, $fieldbaseid, $fieldvisible, $fieldaudvis, $alias, $type, $iscached, $showhidden);
     }
 
     if ($userid === null) {
@@ -317,12 +322,7 @@ function totara_visibility_where($userid = null, $fieldbaseid = 'course.id', $fi
     }
 
     $audiencebased = !empty($CFG->audiencevisibility);
-    $separator = ($iscached) ? '_' : '.'; // When the report is caches its fields comes in type_value form.
     $systemcontext = context_system::instance();
-
-    $quoted_separator = preg_quote($separator, '#');
-    $regex = "#^([^{$quoted_separator}]+){$quoted_separator}.*\$#";
-    $alias = preg_replace($regex, '$1', $fieldbaseid);
 
     switch ($type) {
         case 'course':
