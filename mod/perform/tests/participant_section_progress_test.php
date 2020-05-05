@@ -85,7 +85,7 @@ class mod_perform_participant_section_progress_testcase extends state_testcase {
         $entity->progress = $initial_state_class::get_code();
         $entity->update();
         $participant_section = participant_section::load_by_entity($entity);
-        $this->assertInstanceOf($initial_state_class, $participant_section->get_state(participant_section_progress::get_type()));
+        $this->assertInstanceOf($initial_state_class, $participant_section->get_progress_state());
 
         $this->setUser($subject_user);
         $sink = $this->redirectEvents();
@@ -99,7 +99,7 @@ class mod_perform_participant_section_progress_testcase extends state_testcase {
 
         $db_progress = participant_section_entity::repository()->find($participant_section->get_id())->progress;
         $this->assertEquals($target_state_class::get_code(), $db_progress);
-        $this->assertInstanceOf($target_state_class, $participant_section->get_state(participant_section_progress::get_type()));
+        $this->assertInstanceOf($target_state_class, $participant_section->get_progress_state());
 
         // Check that event has been triggered.
         $this->assert_section_updated_event($sink, $participant_section, $subject_user->id);

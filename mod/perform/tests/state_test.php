@@ -65,6 +65,21 @@ class mod_perform_state_testcase extends advanced_testcase {
         $this->expectException(invalid_state_switch_exception::class);
         $state->transition_to(test_state_3::class);
     }
+
+    /**
+     * Tests state can't change to state of different type.
+     *
+     * @return void
+     */
+    public function test_cant_switch_to_state_of_different_type(): void {
+
+        $test_object = new stdClass();
+        $state = new test_state($test_object);
+        $this->assertFalse($state->can_switch(test_state_4::class));
+
+        $this->expectException(invalid_state_switch_exception::class);
+        $state->transition_to(test_state_4::class);
+    }
 }
 
 class test_condition_passing extends condition {
@@ -81,7 +96,7 @@ class test_condition_not_passing extends condition {
 
 class test_state extends base_state {
     public static function get_type(): string {
-        return 'test';
+        return 'test_type_1';
     }
 
     public function get_transitions(): array {
@@ -111,7 +126,7 @@ class test_state extends base_state {
 
 class test_state_2 extends base_state {
     public static function get_type(): string {
-        return 'test';
+        return 'test_type_1';
     }
 
     public function get_transitions(): array {
@@ -133,7 +148,7 @@ class test_state_2 extends base_state {
 
 class test_state_3 extends base_state {
     public static function get_type(): string {
-        return 'test';
+        return 'test_type_1';
     }
 
     public function get_transitions(): array {
@@ -150,5 +165,27 @@ class test_state_3 extends base_state {
 
     public static function get_display_name(): string {
         return 'test state 3';
+    }
+}
+
+class test_state_4 extends base_state {
+    public static function get_type(): string {
+        return 'test_type_2';
+    }
+
+    public function get_transitions(): array {
+        return [];
+    }
+
+    public static function get_code(): int {
+        return 300;
+    }
+
+    public static function get_name(): string {
+        return 'TEST_STATE_4';
+    }
+
+    public static function get_display_name(): string {
+        return 'test state 4';
     }
 }

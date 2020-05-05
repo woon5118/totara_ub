@@ -40,6 +40,7 @@ use totara_core\entities\relationship;
  * @property string $description
  * @property string $name Activity name
  * @property int $status
+ * @property bool $close_on_completion
  * @property int $created_at
  * @property int $updated_at
  *
@@ -60,6 +61,16 @@ class activity extends entity {
     public const CREATED_TIMESTAMP = 'created_at';
     public const UPDATED_TIMESTAMP = 'updated_at';
     public const SET_UPDATED_WHEN_CREATED = true;
+
+
+    /**
+     * Cast close_on_completion to bool type.
+     *
+     * @return bool
+     */
+    protected function get_close_on_completion_attribute(): bool {
+        return (bool) $this->get_attributes_raw()['close_on_completion'];
+    }
 
     /**
      * Relationship with section entities.

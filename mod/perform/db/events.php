@@ -48,7 +48,7 @@ $observers = [
     ],
     [
         'eventname' => participant_section_progress_updated::class,
-        'callback' => [participant_section_availability::class, 'maybe_close_availability'],
+        'callback' => [participant_section_availability::class, 'close_completed_section_availability'],
     ],
     [
         'eventname' => participant_section_progress_updated::class,

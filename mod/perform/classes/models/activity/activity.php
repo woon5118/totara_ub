@@ -56,6 +56,7 @@ use mod_perform\state\activity\activity_state as activity_status;
  * @property-read int $status
  * @property-read activity_state $state
  * @property-read int $type
+ * @property-read bool $close_on_completion
  * @property-read int $created_at
  * @property-read int $updated_at
  * @property-read collection|section[] $sections
@@ -74,6 +75,7 @@ class activity extends model {
         'name',
         'description',
         'status',
+        'close_on_completion',
         'created_at',
         'updated_at',
     ];
@@ -199,6 +201,7 @@ class activity extends model {
         $entity->description = $description;
         $entity->status = $status ?? draft::get_code();
         $entity->type_id = $type->id;
+        $entity->close_on_completion = false;
 
         return $DB->transaction(function () use ($entity, $modinfo, $container) {
             global $CFG, $USER;
@@ -363,7 +366,7 @@ class activity extends model {
      * @return bool
      */
     public function is_draft(): bool {
-        return $this->get_state(activity_status::get_type())::get_code() === draft::get_code();
+        return $this->get_status_state()::get_code() === draft::get_code();
     }
 
     /**
@@ -372,7 +375,7 @@ class activity extends model {
      * @return bool
      */
     public function is_active(): bool {
-        return $this->get_state(activity_status::get_type())::get_code() === active::get_code();
+        return $this->get_status_state()::get_code() === active::get_code();
     }
 
     /**
@@ -384,7 +387,7 @@ class activity extends model {
      * @return bool
      */
     public function can_potentially_activate(int $user_id = null): bool {
-        return $this->can_manage($user_id) && $this->get_state(activity_status::get_type())->can_potentially_activate();
+        return $this->can_manage($user_id) && $this->get_status_state()->can_potentially_activate();
     }
 
     /**
@@ -396,7 +399,7 @@ class activity extends model {
     }
 
     public function get_state_details() {
-        return $this->get_state(activity_status::get_type());
+        return $this->get_status_state();
     }
 
     /**
@@ -406,7 +409,7 @@ class activity extends model {
      * @return bool
      */
     public function can_activate(): bool {
-        return $this->can_potentially_activate() && $this->get_state(activity_status::get_type())->can_activate();
+        return $this->can_potentially_activate() && $this->get_status_state()->can_activate();
     }
 
     /**
@@ -418,11 +421,14 @@ class activity extends model {
     }
 
     /**
-     * Get settings on activity to close availability of participant & subject instance.
-     * @return bool
+     * Update settings on activity to close availability of participant & subject instance.
+     *
+     * @param bool $close_on_completion
+     * @return void
      */
-    public function close_on_completion(): bool {
-        return true;
+    public function set_close_on_completion(bool $close_on_completion): void {
+        $this->entity->close_on_completion = $close_on_completion;
+        $this->entity->update();
     }
 
     /**
@@ -431,7 +437,7 @@ class activity extends model {
      * @return $this
      */
     public function activate(): self {
-        $this->get_state(activity_status::get_type())->activate();
+        $this->get_status_state()->activate();
         return $this;
     }
 
@@ -442,7 +448,7 @@ class activity extends model {
      * @throws \coding_exception if the activity has already been activated
      */
     public function get_users_to_assign_count(): int {
-        if (!$this->get_state()->can_activate()) {
+        if (!$this->get_status_state()->can_activate()) {
             throw new \coding_exception("Activity {$this->id} can't be activated");
         }
 
@@ -511,6 +517,15 @@ class activity extends model {
      */
     public function delete(): void {
         (new activity_deletion($this))->delete();
+    }
+
+    /**
+     * Get status state class.
+     *
+     * @return state
+     */
+    public function get_status_state(): state {
+        return $this->get_state(activity_status::get_type());
     }
 
 }

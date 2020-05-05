@@ -19,6 +19,7 @@ type mod_perform_activity {
   can_view_participation_reporting: Boolean! # Whether the current user can view the participation tracking for the activity
   can_potentially_activate: Boolean! # Whether this activity could be activated due to capability checks and current status, without checking further conditions
   can_activate: Boolean! # Whether this activity can be activated, only if it satisfies all conditions
+  close_on_completion: Boolean! # Whether instances & sections should be closed on completion
   sections: [mod_perform_section!]!
   state_details: mod_perform_activity_state!
 }
@@ -144,6 +145,14 @@ Input type for deleting an activity
 """
 input mod_perform_delete_activity_input {
   activity_id: core_id!
+}
+
+"""
+Input for activity workflow settings change.
+"""
+input update_activity_workflow_input {
+  activity_id: core_id!
+  close_on_completion: Boolean!
 }
 
 extend type Query {
@@ -297,6 +306,13 @@ extend type Mutation {
     name: param_text!
     description: param_text
   ): mod_perform_activity_result!
+
+  """
+  Update an activity's workflow settings.
+  """
+  mod_perform_update_activity_workflow(
+    input: update_activity_workflow_input!
+  ): mod_perform_activity!
 
   mod_perform_update_section_relationships(
     input: update_section_relationships_input!

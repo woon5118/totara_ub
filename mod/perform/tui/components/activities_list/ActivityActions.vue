@@ -187,7 +187,7 @@ export default {
      * @return {boolean}
      */
     activityIsDraft() {
-      return this.activity.state.name === 'DRAFT';
+      return this.activity.state_details.name === 'DRAFT';
     },
   },
 

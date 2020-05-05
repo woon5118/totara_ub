@@ -35,18 +35,16 @@ defined('MOODLE_INTERNAL') || die();
 abstract class participant_section_availability extends state {
 
     /**
-     * Switch availability status.
+     * Close availability.
+     *
+     * @return void
      */
-    abstract public function switch_state(): void;
+    abstract public function close(): void;
 
     /**
      * @inheritDoc
      */
     public static function get_type(): string {
         return 'availability';
-    }
-
-    public static function get_display_name(): string {
-        return get_string('participant_section_status_' . strtolower(static::get_name()), 'mod_perform');
     }
 }

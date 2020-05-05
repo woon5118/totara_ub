@@ -34,14 +34,30 @@ defined('MOODLE_INTERNAL') || die();
  */
 class open extends subject_instance_availability {
 
+    /**
+     * @inheritDoc
+     */
     public static function get_name(): string {
         return 'OPEN';
     }
 
+    /**
+     * @inheritDoc
+     */
+    public static function get_display_name(): string {
+        return get_string('subject_instance_availability_open', 'mod_perform');
+    }
+
+    /**
+     * @inheritDoc
+     */
     public static function get_code(): int {
         return 0;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function get_transitions(): array {
         return [
             // The subject instance in closed state.
@@ -49,7 +65,10 @@ class open extends subject_instance_availability {
         ];
     }
 
-    public function switch_state(): void {
+    /**
+     * @inheritDoc
+     */
+    public function close(): void {
         $this->object->switch_state(closed::class);
     }
 }

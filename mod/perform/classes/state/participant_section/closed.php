@@ -38,25 +38,44 @@ defined('MOODLE_INTERNAL') || die();
  */
 class closed extends participant_section_availability implements state_event {
 
+    /**
+     * @inheritDoc
+     */
     public static function get_name(): string {
         return 'CLOSED';
     }
 
+    /**
+     * @inheritDoc
+     */
+    public static function get_display_name(): string {
+        return get_string('participant_section_availability_closed', 'mod_perform');
+    }
+
+    /**
+     * @inheritDoc
+     */
     public static function get_code(): int {
         return 10;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function get_transitions(): array {
-        return [
-            // The participant section in open state.
-            transition::to(new open($this->object)),
-        ];
+        return [];
     }
 
-    public function switch_state(): void {
-        $this->object->switch_state(open::class);
+    /**
+     * @inheritDoc
+     */
+    public function close(): void {
+        return;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function get_event(): base {
         /**
          * @var participant_section $participant_section

@@ -179,7 +179,7 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
         ]);
 
         $this->assertEquals(draft::get_code(), $draft_activity->status);
-        $state = $draft_activity->get_state(activity_state::get_type());
+        $state = $draft_activity->get_status_state();
         $this->assertEquals('DRAFT', $state->get_name());
         $this->assertEquals('Draft', $state->get_display_name());
 
@@ -189,7 +189,7 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
         ]);
 
         $this->assertEquals(active::get_code(), $active_activity->status);
-        $state = $active_activity->get_state(activity_state::get_type());
+        $state = $active_activity->get_status_state();
         $this->assertEquals('ACTIVE', $state->get_name());
         $this->assertEquals('Active', $state->get_display_name());
     }

@@ -34,14 +34,15 @@ defined('MOODLE_INTERNAL') || die();
  */
 abstract class participant_instance_availability extends state {
 
-    public static function get_display_name(): string {
-        return get_string('participant_instance_status_' . strtolower(static::get_name()), 'mod_perform');
-    }
-
     /**
      * @inheritDoc
      */
     public static function get_type(): string {
         return 'availability';
     }
+
+    /**
+     * Switch availability status.
+     */
+    abstract public function close(): void;
 }

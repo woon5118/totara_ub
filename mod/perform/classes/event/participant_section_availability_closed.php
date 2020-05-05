@@ -28,6 +28,11 @@ defined('MOODLE_INTERNAL') || die();
 use core\event\base;
 use mod_perform\models\response\participant_section;
 
+/**
+ * Class participant_section_availability_closed event is triggered when a participant_section is closed.
+ *
+ * @package mod_perform\event
+ */
 class participant_section_availability_closed extends base {
 
     /**
@@ -48,6 +53,7 @@ class participant_section_availability_closed extends base {
     public static function create_from_participant_section(participant_section $participant_section): self {
         $data = [
             'objectid' => $participant_section->get_id(),
+            'relateduserid' => $participant_section->get_participant_instance()->participant_id,
             'other' => [
                 'participant_instance_id' => $participant_section->get_participant_instance()->get_id(),
             ],
@@ -55,5 +61,26 @@ class participant_section_availability_closed extends base {
         ];
 
         return static::create($data);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_name() {
+        return get_string('event_participant_section_availability_closed_name', 'mod_perform');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function get_description() {
+        return get_string(
+            'event_participant_section_availability_closed_description',
+            'mod_perform',
+            [
+                'id' => $this->objectid,
+                'user_id' => $this->relateduserid,
+            ]
+        );
     }
 }

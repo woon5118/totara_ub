@@ -930,5 +930,19 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020043000, 'perform');
     }
 
+    if ($oldversion < 2020050500) {
+        // Define field close_on_completion to be added to perform.
+        $table = new xmldb_table('perform');
+        $field = new xmldb_field('close_on_completion', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'status', [0, 1]);
+
+        // Conditionally launch add field close_on_completion.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020050500, 'perform');
+    }
+
     return true;
 }

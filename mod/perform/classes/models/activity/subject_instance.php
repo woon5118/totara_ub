@@ -101,7 +101,7 @@ class subject_instance extends model {
      * @return string
      */
     public function get_progress_status(): string {
-        return $this->get_state(subject_instance_progress::get_type())->get_name();
+        return $this->get_progress_state()->get_name();
     }
 
     /**
@@ -111,7 +111,7 @@ class subject_instance extends model {
      */
     public function update_progress_status() {
         /** @var subject_instance_progress $state */
-        $state = $this->get_state(subject_instance_progress::get_type());
+        $state = $this->get_progress_state();
         $state->update_progress();
     }
 
@@ -129,5 +129,14 @@ class subject_instance extends model {
      */
     public function get_participant_instances(): collection {
         return $this->entity->participant_instances->map_to(participant_instance::class);
+    }
+
+    /**
+     * Get progress state class.
+     *
+     * @return state
+     */
+    private function get_progress_state(): state {
+        return $this->get_state(subject_instance_progress::get_type());
     }
 }

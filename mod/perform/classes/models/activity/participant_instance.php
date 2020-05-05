@@ -112,8 +112,7 @@ class participant_instance extends model {
      */
     public function update_progress_status() {
         /** @var participant_instance_progress $state */
-        $state = $this->get_state(participant_instance_progress::get_type());
-        $state->update_progress();
+        $this->get_progress_state()->update_progress();
     }
 
     /**
@@ -122,7 +121,7 @@ class participant_instance extends model {
      * @return string
      */
     public function get_progress_status(): string {
-        return $this->get_state(participant_instance_progress::get_type())->get_name();
+        return $this->get_progress_state()->get_name();
     }
 
     /**
@@ -133,6 +132,15 @@ class participant_instance extends model {
     public function get_relationship_name(): string {
         $relationship_entity = $this->entity->activity_relationship->relationship;
         return (new relationship($relationship_entity))->get_name();
+    }
+
+    /**
+     * Get progress state class.
+     *
+     * @return state
+     */
+    private function get_progress_state(): state {
+        return $this->get_state(participant_instance_progress::get_type());
     }
 
 }

@@ -17,11 +17,13 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
   @author Jaron Steenson <jaron.steenson@totaralearning.com>
-  @package totara_perform
+  @package mod_perform
 -->
 
 <template>
   <div>
+    <WorkflowOptions :activity="value" />
+
     <h3>{{ $str('activity_content_tab_heading', 'mod_perform') }}</h3>
 
     <ActivitySection
@@ -38,10 +40,12 @@
 <script>
 import ActivitySection from 'mod_perform/components/manage_activity/content/ActivitySection';
 import UpdateGeneralInfoMutation from 'mod_perform/graphql/update_activity_general_info.graphql';
+import WorkflowOptions from 'mod_perform/components/manage_activity/WorkflowOptions';
 
 export default {
   components: {
     ActivitySection: ActivitySection,
+    WorkflowOptions,
   },
   props: {
     value: {

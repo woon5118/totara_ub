@@ -213,7 +213,7 @@ class participant_section extends model {
             }
 
             /** @var participant_section_progress $state */
-            $state = $this->get_state(participant_section_progress::get_type());
+            $state = $this->get_progress_state();
             $state->complete();
         });
 
@@ -225,7 +225,7 @@ class participant_section extends model {
      */
     public function on_participant_access() {
         /** @var participant_section_progress $state */
-        $state = $this->get_state(participant_section_progress::get_type());
+        $state = $this->get_progress_state();
         $state->on_participant_access();
     }
 
@@ -244,7 +244,7 @@ class participant_section extends model {
      * @return string
      */
     public function get_progress_status(): string {
-        return $this->get_state(participant_section_progress::get_type())->get_name();
+        return $this->get_progress_state()->get_name();
     }
 
     /**
@@ -253,7 +253,25 @@ class participant_section extends model {
      * @return string
      */
     public function get_availability_status(): string {
-        return $this->get_state(participant_section_availability::get_type())->get_name();
+        return $this->get_availability_state()->get_name();
+    }
+
+    /**
+     * Get progress state class.
+     *
+     * @return state
+     */
+    public function get_progress_state(): state {
+        return $this->get_state(participant_section_progress::get_type());
+    }
+
+    /**
+     * Get availability state class.
+     *
+     * @return state
+     */
+    public function get_availability_state(): state {
+        return $this->get_state(participant_section_availability::get_type());
     }
 
 }

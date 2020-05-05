@@ -28,27 +28,32 @@ use mod_perform\event\participant_section_progress_updated;
 use mod_perform\models\response\participant_section;
 use mod_perform\state\participant_section\closed;
 use mod_perform\state\participant_section\complete;
-use mod_perform\state\participant_section\participant_section_progress;
+use mod_perform\state\participant_section\participant_section_availability as availability_state;
 
 class participant_section_availability {
 
     /**
-     * When progress status of a participant section is updated
+     * When progress status of a participant section is updated to complete,
+     * the availability of participant section is closed is close on completion is enabled.
      *
      * @param base|participant_section_progress_updated $event
      */
-    public static function maybe_close_availability(base $event) {
-        /** @var participant_section $participant_section */
+    public static function close_completed_section_availability(base $event) {
         $participant_section = participant_section::load_by_id($event->objectid);
-        $progress_state = $participant_section->get_state(participant_section_progress::get_type());
 
-        if (!$progress_state instanceof complete) {
-            return;
+        if (self::can_switch($participant_section)) {
+            $participant_section->get_availability_state()->close();
         }
-        $activity = $participant_section->get_section()->get_activity();
+    }
 
-        if ($activity->close_on_completion()) {
-            $participant_section->switch_state(closed::class);
-        }
+    /**
+     * Conditions to allow closing the availability.
+     *
+     * @param participant_section $participant_section
+     * @return bool
+     */
+    private static function can_switch(participant_section $participant_section): bool {
+        return $participant_section->get_progress_state() instanceof complete
+            && $participant_section->get_section()->get_activity()->close_on_completion;
     }
 }

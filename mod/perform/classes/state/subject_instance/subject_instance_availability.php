@@ -35,17 +35,14 @@ defined('MOODLE_INTERNAL') || die();
 abstract class subject_instance_availability extends state {
 
     /**
-     * Switch availability status.
+     * Close availability status.
      */
-    abstract public function switch_state(): void;
+    abstract public function close(): void;
 
     /**
      * @inheritDoc
      */
     public static function get_type(): string {
         return 'availability';
-    }
-    public static function get_display_name(): string {
-        return get_string('subject_instance_status_' . strtolower(static::get_name()), 'mod_perform');
     }
 }
