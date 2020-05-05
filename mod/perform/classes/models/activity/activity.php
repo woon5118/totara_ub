@@ -30,6 +30,8 @@ use core\entities\user;
 use core\orm\collection;
 use core\orm\entity\model;
 use mod_perform\entities\activity\activity as activity_entity;
+use mod_perform\event\activity_deleted;
+use mod_perform\models\activity\helpers\activity_deletion;
 use mod_perform\entities\activity\track as track_entity;
 use mod_perform\entities\activity\track_assignment;
 use mod_perform\state\activity\active;
@@ -96,10 +98,16 @@ class activity extends model {
         return activity_entity::class;
     }
 
+    /**
+     * Gets a model object based on the mod perform container (course) id.
+     *
+     * @param int $container_id
+     * @return static
+     */
     public static function load_by_container_id(int $container_id): self {
         $entity = activity_entity::repository()
             ->where('course', $container_id)
-            ->get()->first();
+            ->one(true);
 
         return self::load_by_entity($entity);
     }
@@ -107,7 +115,7 @@ class activity extends model {
     /**
      * Checks whether the logged in (or given) user has the capability to create the activity.
      *
-     * @param int|null                $userid
+     * @param int|null $userid
      * @param \context_coursecat|null $context
      *
      * @return bool
@@ -278,6 +286,7 @@ class activity extends model {
 
     /**
      * TODO use/write a library or make this generic, or at least move this to it's own class.
+     *
      * @param activity_entity $entity
      * @return string[]
      */
@@ -323,6 +332,7 @@ class activity extends model {
 
     /**
      * Checks whether the current user can view the participation reporting
+     *
      * @return bool
      */
     public function can_view_participation_reporting(): bool {
@@ -469,6 +479,26 @@ class activity extends model {
     protected function update_state_code(state $state): void {
         $this->entity->status = $state::get_code();
         $this->entity->update();
+    }
+
+    /**
+     * Checks whether the current user can delete this perform activity.
+     *
+     * @return bool
+     */
+    public function can_delete(): bool {
+        return has_capability('mod/perform:manage_activity', $this->get_context());
+    }
+
+    /**
+     * Delete the activity and the associated child models.
+     * Will only delete elements that are not used by any other perform activities.
+     *
+     * An activity_deleted event will be triggered on successful deletions.
+     * @see activity_deleted
+     */
+    public function delete(): void {
+        (new activity_deletion($this))->delete();
     }
 
 }

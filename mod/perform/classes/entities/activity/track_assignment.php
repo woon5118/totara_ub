@@ -24,6 +24,7 @@
 
 namespace mod_perform\entities\activity;
 
+use core\collection;
 use core\orm\entity\entity;
 use core\orm\entity\relations\belongs_to;
 use core\orm\entity\relations\has_many_through;

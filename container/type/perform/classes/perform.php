@@ -24,6 +24,8 @@
 namespace container_perform;
 
 use core_container\{category, container};
+use core\orm\query\builder;
+use mod_perform\models\activity\activity;
 
 /**
  * Container for performance activities
@@ -36,6 +38,18 @@ class perform extends container {
      * @const string Default category name string.
      */
     const DEFAULT_CATEGORY_NAME = 'performance-activities';
+
+
+    /**
+     * @param activity $activity
+     * @return static
+     */
+    public static function from_activity(activity $activity): self {
+        /** @var static $perform_container */
+        $perform_container = static::from_id($activity->course);
+
+        return $perform_container;
+    }
 
     /**
      * @inheritDoc
@@ -168,4 +182,20 @@ class perform extends container {
 
         return $data;
     }
+
+    /**
+     * Delete all course/container records and the related perform activity and it's children.
+     *
+     * @see
+     */
+    public function delete(): void {
+        builder::get_db()->transaction(function () {
+            // Delete the mod perform specific records first because the context
+            // record is required to create the activity deleted event.
+            activity::load_by_container_id($this->get_id())->delete();
+
+            delete_course($this->get_id(), false);
+        });
+    }
+
 }

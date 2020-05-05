@@ -140,6 +140,13 @@ input update_section_relationships_input {
   relationship_ids: [Int]!
 }
 
+"""
+Input type for deleting an activity
+"""
+input mod_perform_delete_activity_input {
+  activity_id: core_id!
+}
+
 extend type Query {
   """
   A list of all performance activities that the current user can administer
@@ -309,6 +316,13 @@ extend type Mutation {
   mod_perform_activate_activity(
     input: mod_perform_activate_activity_input!
   ): mod_perform_activate_activity_result!
+
+  """
+  Delete an activity
+  """
+  mod_perform_delete_activity(
+    input: mod_perform_delete_activity_input!
+  ): Boolean!
 }
 
 """
