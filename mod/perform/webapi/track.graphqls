@@ -9,6 +9,8 @@ type mod_perform_track {
   description(format: core_format = HTML): String!
   status: Int!
   schedule_type: Int!
+  schedule_fixed_from: Int
+  schedule_fixed_to: Int
   assignments: [mod_perform_track_assignment!]!
 }
 
@@ -40,6 +42,7 @@ Input parameters required for open-ended track schedule period using fixed dates
 """
 input mod_perform_track_schedule_open_fixed_input {
   track_id: core_id!
+  from: param_integer!
 }
 
 """
@@ -47,6 +50,8 @@ Input parameters required for closed track schedule period using fixed dates
 """
 input mod_perform_track_schedule_closed_fixed_input {
   track_id: core_id!
+  from: param_integer!
+  to: param_integer!
 }
 
 """
@@ -68,6 +73,7 @@ Return type for mod_perform_update_track_schedule_xxx mutations
 """
 type mod_perform_update_track_schedule_result {
   track: mod_perform_track!
+  validation_errors: [mod_perform_validation_error!]!
 }
 
 extend type Mutation {

@@ -42,6 +42,10 @@ class track extends entity_model_formatter {
             'description' => string_field_formatter::class,
             'status' => null,
             'schedule_type' => null,
+            'schedule_fixed_from' => null,
+            'schedule_fixed_to' => null,
+            'created_at' => null,
+            'updated_at' => null,
             'assignments' => null
         ];
     }

@@ -931,6 +931,7 @@ function xmldb_perform_upgrade($oldversion) {
     }
 
     if ($oldversion < 2020050500) {
+
         // Define field close_on_completion to be added to perform.
         $table = new xmldb_table('perform');
         $field = new xmldb_field('close_on_completion', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'status', [0, 1]);
@@ -942,6 +943,27 @@ function xmldb_perform_upgrade($oldversion) {
 
         // Perform savepoint reached.
         upgrade_mod_savepoint(true, 2020050500, 'perform');
+    }
+
+    if ($oldversion < 2020051100) {
+        // Define field schedule_fixed_from to be added to perform_track.
+        $table = new xmldb_table('perform_track');
+
+        $field = new xmldb_field('schedule_fixed_from', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'schedule_type');
+
+        // Conditionally launch add field schedule_fixed_from.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('schedule_fixed_to', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'schedule_fixed_from');
+
+        // Conditionally launch add field schedule_fixed_to.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020051100, 'perform');
     }
 
     return true;

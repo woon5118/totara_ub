@@ -23,17 +23,19 @@
  */
 
 require_once(__DIR__ . '/generator/activity_generator_configuration.php');
+require_once(__DIR__ . '/webapi_resolver_mutation_update_track_schedule.php');
 
-use core\webapi\execution_context;
 use mod_perform\entities\activity\track as track_entity;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\track;
 use totara_webapi\phpunit\webapi_phpunit_helper;
+use totara_webapi\graphql;
 
 /**
  * @group perform
  */
-class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_fixed_testcase extends advanced_testcase {
+class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_fixed_testcase
+    extends mod_perform_webapi_resolver_mutation_update_track_schedule_testcase {
 
     use webapi_phpunit_helper;
 
@@ -52,6 +54,8 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_fixed_te
         $args = [
             'track_schedule' => [
                 'track_id' => $track1->id,
+                'from' => 123,
+                'to' => 234,
             ],
         ];
 
@@ -67,66 +71,69 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_fixed_te
     public function test_correct_track_is_updated(): void {
         global $DB;
 
-        self::setAdminUser();
-
-        $configuration = mod_perform_activity_generator_configuration::new();
-        $configuration->set_number_of_activities(2);
-        $configuration->set_number_of_tracks_per_activity(2);
-
-        /** @var mod_perform_generator $perform_generator */
-        $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
-        $activities = $perform_generator->create_full_activities($configuration);
-
-        // Before we test, set them all to open fixed, so we can see the effect of changing to closed fixed.
-        $DB->set_field('perform_track', 'schedule_type', track_entity::SCHEDULE_TYPE_OPEN_FIXED);
-
-        /** @var activity $activity1 */
-        $activity1 = $activities->first();
-        /** @var track $track1 */
-        $track1 = $activity1->get_tracks()->first();
-
         $args = [
             'track_schedule' => [
-                'track_id' => $track1->id,
+                'track_id' => $this->track1_id,
+                'from' => 123,
+                'to' => 234,
             ],
         ];
 
         $before_tracks = $DB->get_records('perform_track', [], 'id');
         self::assertCount(4, $before_tracks);
-        unset($before_tracks[$track1->id]->updated_at);
+        unset($before_tracks[$this->track1_id]->updated_at);
 
-        $updated_track = $this->resolve_graphql_mutation(
+        $result = $this->resolve_graphql_mutation(
             'mod_perform_update_track_schedule_closed_fixed',
             $args
-        )['track'];
+        );
+        $result_track = $result['track'];
+        $result_errors = $result['validation_errors'];
 
         // Verify the resulting graphql data.
-        self::assertEquals($track1->id, $updated_track->id);
-        self::assertEquals(track_entity::SCHEDULE_TYPE_CLOSED_FIXED, $updated_track->schedule_type);
+        self::assertEmpty($result_errors);
+        self::assertEquals($this->track1_id, $result_track->id);
+        self::assertEquals(track_entity::SCHEDULE_TYPE_CLOSED_FIXED, $result_track->schedule_type);
 
         // Manually make the changes that we expect to make.
-        $affected_track = $before_tracks[$track1->id];
+        $affected_track = $before_tracks[$this->track1_id];
         $affected_track->schedule_type = track_entity::SCHEDULE_TYPE_CLOSED_FIXED;
+        $affected_track->schedule_fixed_from = 123;
+        $affected_track->schedule_fixed_to = 234;
 
         $after_tracks = $DB->get_records('perform_track', [], 'id');
-        unset($after_tracks[$track1->id]->updated_at);
-
+        unset($after_tracks[$this->track1_id]->updated_at);
         self::assertEquals($after_tracks, $before_tracks);
     }
 
     public function test_with_validation_errors(): void {
-        // None currently, but we will have when additional fields are added.
-    }
+        global $DB;
 
-    /**
-     * Helper to get execution context
-     *
-     * @param string $type
-     * @param string|null $operation
-     * @return execution_context
-     */
-    private function get_execution_context(string $type = 'dev', ?string $operation = null): execution_context {
-        return execution_context::create($type, $operation);
+        $before_tracks = $DB->get_records('perform_track', [], 'id');
+
+        // To must be after or equal to from.
+        $args = [
+            'track_schedule' => [
+                'track_id' => $this->track1_id,
+                'from' => 234,
+                'to' => 123,
+            ],
+        ];
+
+        $result = graphql::execute_operation(
+            $this->get_execution_context('ajax', 'mod_perform_update_track_schedule_closed_fixed'),
+            $args
+        )->toArray(true)['data']['mod_perform_update_track_schedule_closed_fixed'];
+        $result_track = $result['track'];
+        $result_errors = $result['validation_errors'];
+
+        // Verify resulting graphql data.
+        self::assertNotEmpty($result_errors);
+        self::assertEquals('schedule_fixed_closed_order_validation', $result_errors[0]['error_code']);
+        self::assertEquals(-1, $result_track['schedule_type']);
+
+        $after_tracks = $DB->get_records('perform_track', [], 'id');
+        self::assertEquals($after_tracks, $before_tracks);
     }
 
 }

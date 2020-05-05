@@ -23,26 +23,40 @@
 
 namespace mod_perform\models\activity;
 
-use core\collection;
+use core\orm\collection;
 use core\orm\entity\model;
 use mod_perform\entities\activity\track as track_entity;
+use mod_perform\exception\schedule_validation_exception;
 use mod_perform\user_groups\grouping;
 
 /**
  * Represents a single performance activity track.
  *
- * @property-read collection|track_assignment[] assignments
+ * @property-read int $id
+ * @property-read int $activity_id
+ * @property-read string $description
+ * @property-read int $status
+ * @property-read int $schedule_type
+ * @property-read int $schedule_fixed_from
+ * @property-read int $schedule_fixed_to
+ * @property-read int $created_at
+ * @property-read int $updated_at
+ *
+ * @property-read activity $activity
+ * @property-read collection|track_assignment[] $assignments
  */
 class track extends model {
-    /**
-     * {@inheritdoc}
-     */
+
     protected $entity_attribute_whitelist = [
         'id',
         'activity_id',
         'description',
         'status',
         'schedule_type',
+        'schedule_fixed_from',
+        'schedule_fixed_to',
+        'created_at',
+        'updated_at',
     ];
 
     protected $model_accessor_whitelist = [
@@ -248,12 +262,19 @@ class track extends model {
     /**
      * Set the schedule to be closed with fixed dates
      *
-     * TODO add two fixed date params
+     * @param int $from
+     * @param int $to
      */
-    public function update_schedule_closed_fixed(): void {
+    public function update_schedule_closed_fixed(int $from, int $to): void {
         $entity = $this->entity;
 
+        if ($to < $from) {
+            throw new schedule_validation_exception('schedule_fixed_closed_order_validation', 'mod_perform');
+        }
+
         $entity->schedule_type = track_entity::SCHEDULE_TYPE_CLOSED_FIXED;
+        $entity->schedule_fixed_from = $from;
+        $entity->schedule_fixed_to = $to;
 
         $entity->update();
     }
@@ -261,12 +282,14 @@ class track extends model {
     /**
      * Set the schedule to be open ended with fixed dates
      *
-     * TODO add one fixed date param
+     * @param int $from
      */
-    public function update_schedule_open_fixed(): void {
+    public function update_schedule_open_fixed(int $from): void {
         $entity = $this->entity;
 
         $entity->schedule_type = track_entity::SCHEDULE_TYPE_OPEN_FIXED;
+        $entity->schedule_fixed_from = $from;
+        $entity->schedule_fixed_to = null;
 
         $entity->update();
     }

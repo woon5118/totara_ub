@@ -1,7 +1,7 @@
 <!--
   This file is part of Totara Learn
 
-  Copyright (C) 2019 onwards Totara Learning Solutions LTD
+  Copyright (C) 2020 onwards Totara Learning Solutions LTD
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -16,19 +16,34 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-  @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
-  @package theme_ventura
+  @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
+  @package mod_perform
 -->
 
-<style lang="scss">
-.tui-PerformScheduleDateRangeClosedFixed {
-  &__input-container {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-  }
-  &__input-container-label {
-    margin-right: var(--tui-gap-3);
-  }
-}
-</style>
+<script>
+import FlexIcon from 'totara_core/components/icons/FlexIcon';
+
+export default {
+  functional: true,
+
+  components: {
+    FlexIcon,
+  },
+
+  props: {
+    alt: String,
+    customClass: [String, Object, Array],
+    styleClass: Object,
+    size: [String, Number],
+    title: String,
+  },
+
+  render(h, { props }) {
+    return h(FlexIcon, {
+      props: Object.assign({}, props, {
+        icon: 'user',
+      }),
+    });
+  },
+};
+</script>

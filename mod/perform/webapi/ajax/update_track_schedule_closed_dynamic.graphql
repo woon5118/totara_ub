@@ -9,6 +9,8 @@ mutation mod_perform_update_track_schedule_closed_dynamic(
       description
       status
       schedule_type
+      schedule_fixed_from
+      schedule_fixed_to
       assignments {
         type
         group {

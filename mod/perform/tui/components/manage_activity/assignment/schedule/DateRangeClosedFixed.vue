@@ -20,22 +20,44 @@
   @package mod_perform
 -->
 <template>
-  <div class="tui-PerformScheduleDataRangeClosedFixed">
-    <FormScope :path="path">
+  <div class="tui-PerformScheduleDateRangeClosedFixed">
+    <FormScope :path="path" :validate="dateRangeValidator">
       <FormRow
         :label="
           $str('schedule_activity_instance_creation_period', 'mod_perform')
         "
       >
         <Grid>
-          <GridItem :units="1">{{
-            $str('schedule_date_range_from', 'mod_perform')
-          }}</GridItem>
-          <GridItem :units="5"><FormText name="closedFrom"/></GridItem>
-          <GridItem :units="1">{{
-            $str('schedule_date_range_to', 'mod_perform')
-          }}</GridItem>
-          <GridItem :units="5"><FormText name="closedTo"/></GridItem>
+          <GridItem :units="6">
+            <div
+              class="tui-PerformScheduleDateRangeClosedFixed__input-container"
+            >
+              <div
+                class="tui-PerformScheduleDateRangeClosedFixed__input-container-label"
+              >
+                {{ $str('schedule_date_range_from', 'mod_perform') }}
+              </div>
+              <FormText
+                name="from"
+                :validations="v => [v.required(), dateValidator()]"
+              />
+            </div>
+          </GridItem>
+          <GridItem :units="6">
+            <div
+              class="tui-PerformScheduleDateRangeClosedFixed__input-container"
+            >
+              <div
+                class="tui-PerformScheduleDateRangeClosedFixed__input-container-label"
+              >
+                {{ $str('schedule_date_range_to', 'mod_perform') }}
+              </div>
+              <FormText
+                name="to"
+                :validations="v => [v.required(), dateValidator()]"
+              />
+            </div>
+          </GridItem>
         </Grid>
       </FormRow>
     </FormScope>
@@ -59,6 +81,26 @@ export default {
     path: [String, Array],
     error: String,
   },
+  methods: {
+    dateValidator() {
+      return {
+        validate: val => !isNaN(Date.parse(val)),
+        message: () => this.$str('schedule_error_date_required', 'mod_perform'),
+      };
+    },
+    dateRangeValidator(values) {
+      const errors = {};
+      const fromDate = new Date(values.from).getTime();
+      const toDate = new Date(values.to).getTime();
+      if (fromDate > toDate) {
+        errors.to = this.$str('schedule_error_date_range', 'mod_perform');
+      }
+      return errors;
+    },
+    getUnixTime(dataString) {
+      return new Date(dataString).getTime() / 1000;
+    },
+  },
 };
 </script>
 <lang-strings>
@@ -66,7 +108,9 @@ export default {
   "mod_perform" : [
     "schedule_activity_instance_creation_period",
     "schedule_date_range_from",
-    "schedule_date_range_to"
+    "schedule_date_range_to",
+    "schedule_error_date_required",
+    "schedule_error_date_range"
   ]
   }
 </lang-strings>

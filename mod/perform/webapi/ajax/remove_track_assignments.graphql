@@ -6,6 +6,8 @@ mutation mod_perform_remove_track_assignments(
     description
     status
     schedule_type
+    schedule_fixed_from
+    schedule_fixed_to
     assignments {
       type
       group {

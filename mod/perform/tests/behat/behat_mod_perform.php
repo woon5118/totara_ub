@@ -45,6 +45,7 @@ class behat_mod_perform extends behat_base {
     public const TUI_USER_ANSWER_ERROR_LOCATOR = '.tui-formFieldError';
     public const USER_QUESTION_TEXT_LOCATOR = '.tui-collapsible__header-text';
     public const TUI_TAB_ELEMENT = '.tui-tabs__tabs';
+    public const SCHEDULE_SAVE_LOCATOR ='.tui_performAssignmentSchedule__action-submit';
 
 
     /**
@@ -288,6 +289,13 @@ class behat_mod_perform extends behat_base {
             "css_element"
         );
         $behat_general->i_click_on("Edit content","button");
+    }
+
+    /**
+     * @When /^I save the activity schedule$/
+     */
+    public function i_save_the_activity_schedule(): void {
+        $this->find('css', self::SCHEDULE_SAVE_LOCATOR)->click();
     }
 
     private function find_question_response(string $element_type, string $question_text) {

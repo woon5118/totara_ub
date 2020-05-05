@@ -25,7 +25,9 @@ namespace mod_perform\webapi\resolver\mutation;
 
 use core\webapi\execution_context;
 use core\webapi\mutation_resolver;
+use mod_perform\exception\schedule_validation_exception;
 use mod_perform\models\activity\track;
+use mod_perform\models\response\element_validation_error;
 use totara_core\advanced_feature;
 
 class update_track_schedule_open_fixed implements mutation_resolver {
@@ -40,8 +42,9 @@ class update_track_schedule_open_fixed implements mutation_resolver {
         require_login(null, false, null, false, true);
 
         $track_schedule = $args['track_schedule'];
-
         $track_id = $track_schedule['track_id'];
+        $from = $track_schedule['from'];
+
         $track = track::load_by_id($track_id);
 
         $activity = $track->get_activity();
@@ -56,11 +59,20 @@ class update_track_schedule_open_fixed implements mutation_resolver {
             );
         }
 
-        $track->update_schedule_open_fixed();
+        $errors = [];
+        try {
+            $track->update_schedule_open_fixed($from);
+        } catch (schedule_validation_exception $e) {
+            $errors[] = new element_validation_error(
+                $e->errorcode,
+                $e->getMessage()
+            );
+        }
 
         $ec->set_relevant_context($context);
         return [
             'track' => $track,
+            'validation_errors' => $errors,
         ];
     }
 

@@ -22,6 +22,14 @@
 
 <style lang="scss">
 .tui_performAssignmentSchedule {
+  &__controls-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+  }
+  &__controls {
+    margin-right: var(--tui-gap-5);
+  }
   &__toggle-button {
     min-height: 50px;
   }

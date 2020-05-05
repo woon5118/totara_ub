@@ -16,24 +16,19 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-  @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
-  @package mod_perform
+  @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
+  @package theme_ventura
 -->
 
 <style lang="scss">
-.tui-PerformScheduleDataRangeOpenFixed {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  justify-content: space-around;
-  width: 100%;
+.tui-PerformScheduleDateRangeOpenFixed {
   &__input-container {
     display: flex;
     flex-direction: row;
-    width: 50%;
+    flex-wrap: nowrap;
   }
-  &__input-label {
-    margin-right: var(--tui-gap-5);
+  &__input-container-label {
+    margin-right: var(--tui-gap-3);
   }
 }
 </style>

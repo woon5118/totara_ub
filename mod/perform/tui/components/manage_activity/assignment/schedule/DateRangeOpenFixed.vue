@@ -20,7 +20,7 @@
   @package mod_perform
 -->
 <template>
-  <div class="tui-PerformScheduleDataRangeOpenFixed">
+  <div class="tui-PerformScheduleDateRangeOpenFixed">
     <FormScope :path="path">
       <FormRow
         :label="
@@ -28,10 +28,19 @@
         "
       >
         <Grid>
-          <GridItem :units="2">{{
-            $str('schedule_date_range_from', 'mod_perform')
-          }}</GridItem>
-          <GridItem :units="4"><FormText name="openFrom"/></GridItem>
+          <GridItem :units="6">
+            <div class="tui-PerformScheduleDateRangeOpenFixed__input-container">
+              <div
+                class="tui-PerformScheduleDateRangeOpenFixed__input-container-label"
+              >
+                {{ $str('schedule_date_range_from', 'mod_perform') }}
+              </div>
+              <FormText
+                name="from"
+                :validations="v => [v.required(), dateValidator()]"
+              />
+            </div>
+          </GridItem>
           <GridItem :units="5">{{
             $str('schedule_date_range_onwards', 'mod_perform')
           }}</GridItem>
@@ -58,6 +67,14 @@ export default {
     path: [String, Array],
     error: String,
   },
+  methods: {
+    dateValidator() {
+      return {
+        validate: val => !isNaN(Date.parse(val)),
+        message: () => this.$str('schedule_error_date_required', 'mod_perform'),
+      };
+    },
+  },
 };
 </script>
 <lang-strings>
@@ -65,7 +82,8 @@ export default {
   "mod_perform" : [
     "schedule_activity_instance_creation_period",
     "schedule_date_range_from",
-    "schedule_date_range_onwards"
+    "schedule_date_range_onwards",
+    "schedule_error_date_required"
   ]
   }
 </lang-strings>

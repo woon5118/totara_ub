@@ -37,6 +37,8 @@ use core\orm\entity\relations\has_many_through;
  * @property string $description track description
  * @property int $status track status
  * @property int $schedule_type one of the constants SCHEDULE_TYPE_XXX
+ * @property int $schedule_fixed_from when schedule type is FIXED, contains the start date of assignment
+ * @property int $schedule_fixed_to when schedule type is CLOSED_FIXED, contains the end date of assignment
  * @property int $created_at record creation time
  * @property int $updated_at record modification time
  * @property-read collection|subject_instance[] $subject_instances

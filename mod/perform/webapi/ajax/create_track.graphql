@@ -4,6 +4,8 @@ mutation mod_perform_create_track($details: mod_perform_create_track_input!) {
     description
     status
     schedule_type
+    schedule_fixed_from
+    schedule_fixed_to
     assignments {
       type
       group {

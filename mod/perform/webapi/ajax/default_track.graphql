@@ -4,6 +4,8 @@ query mod_perform_default_track($activity_id: param_integer!) {
     description
     status
     schedule_type
+    schedule_fixed_from
+    schedule_fixed_to
     assignments {
       type
       group {

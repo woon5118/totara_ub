@@ -22,64 +22,72 @@
 <template>
   <div class="tui_performAssignmentSchedule">
     <h4>{{ $str('schedule_creation_range_and_date_type', 'mod_perform') }}</h4>
-    <div class="tui_performAssignmentSchedule__controls">
-      <ToggleSet v-model="scheduleOpenClosed">
-        <ToggleButtonIcon
-          value="closed"
-          :label="$str('schedule_type_closed', 'mod_perform')"
-          text="Limited"
-          class="tui_performAssignmentSchedule__toggle-button"
-        >
-          <div class="tui_performAssignmentSchedule__toggle-button-content">
-            <CalendarIcon />
-            <CalendarIcon />
-            <div class="tui_performAssignmentSchedule__button-label">
-              {{ $str('schedule_type_closed', 'mod_perform') }}
+    <div
+      v-if="initialValues"
+      class="tui_performAssignmentSchedule__controls-container"
+    >
+      <div class="tui_performAssignmentSchedule__controls">
+        <ToggleSet v-model="scheduleOpenClosed">
+          <ToggleButtonIcon
+            value="closed"
+            :label="$str('schedule_type_closed', 'mod_perform')"
+            class="tui_performAssignmentSchedule__toggle-button"
+          >
+            <div class="tui_performAssignmentSchedule__toggle-button-content">
+              <CalendarIcon />
+              <CalendarIcon />
+              <div class="tui_performAssignmentSchedule__button-label">
+                {{ $str('schedule_type_closed', 'mod_perform') }}
+              </div>
             </div>
-          </div>
-        </ToggleButtonIcon>
-        <ToggleButtonIcon
-          value="open"
-          :label="$str('schedule_type_open', 'mod_perform')"
-          text="Open-ended"
-          class="tui_performAssignmentSchedule__toggle-button"
-        >
-          <div class="tui_performAssignmentSchedule__toggle-button-content">
-            <CalendarIcon />
-            <CalendarIcon />
-            <CalendarIcon />
-            <div class="tui_performAssignmentSchedule__button-label">
-              {{ $str('schedule_type_open', 'mod_perform') }}
+          </ToggleButtonIcon>
+          <ToggleButtonIcon
+            value="open"
+            :label="$str('schedule_type_open', 'mod_perform')"
+            class="tui_performAssignmentSchedule__toggle-button"
+          >
+            <div class="tui_performAssignmentSchedule__toggle-button-content">
+              <CalendarIcon />
+              <CalendarIcon />
+              <CalendarIcon />
+              <div class="tui_performAssignmentSchedule__button-label">
+                {{ $str('schedule_type_open', 'mod_perform') }}
+              </div>
             </div>
-          </div>
-        </ToggleButtonIcon>
-      </ToggleSet>
-      <ToggleSet v-model="scheduleFixedDynamic">
-        <ToggleButtonIcon
-          value="fixed"
-          :label="$str('schedule_type_fixed', 'mod_perform')"
-          class="tui_performAssignmentSchedule__toggle-button"
-        >
-          <div class="tui_performAssignmentSchedule__toggle-button-content">
-            <div class="tui_performAssignmentSchedule__button-label">
-              {{ $str('schedule_type_fixed', 'mod_perform') }}
+          </ToggleButtonIcon>
+        </ToggleSet>
+      </div>
+      <div class="tui_performAssignmentSchedule__controls">
+        <ToggleSet v-model="scheduleFixedDynamic">
+          <ToggleButtonIcon
+            value="fixed"
+            :label="$str('schedule_type_fixed', 'mod_perform')"
+            class="tui_performAssignmentSchedule__toggle-button"
+          >
+            <div class="tui_performAssignmentSchedule__toggle-button-content">
+              <CalendarIcon :size="300" />
+              <div class="tui_performAssignmentSchedule__button-label">
+                {{ $str('schedule_type_fixed', 'mod_perform') }}
+              </div>
             </div>
-          </div>
-        </ToggleButtonIcon>
-        <ToggleButtonIcon
-          value="dynamic"
-          :label="$str('schedule_type_dynamic', 'mod_perform')"
-          class="tui_performAssignmentSchedule__toggle-button"
-        >
-          <div class="tui_performAssignmentSchedule__toggle-button-content">
-            <div class="tui_performAssignmentSchedule__button-label">
-              {{ $str('schedule_type_dynamic', 'mod_perform') }}
+          </ToggleButtonIcon>
+          <ToggleButtonIcon
+            value="dynamic"
+            :label="$str('schedule_type_dynamic', 'mod_perform')"
+            class="tui_performAssignmentSchedule__toggle-button"
+          >
+            <div class="tui_performAssignmentSchedule__toggle-button-content">
+              <UserIcon :size="300" />
+              <div class="tui_performAssignmentSchedule__button-label">
+                {{ $str('schedule_type_dynamic', 'mod_perform') }}
+              </div>
             </div>
-          </div>
-        </ToggleButtonIcon>
-      </ToggleSet>
+          </ToggleButtonIcon>
+        </ToggleSet>
+      </div>
     </div>
     <Uniform
+      v-slot="{ reset }"
       :initial-values="initialValues"
       input-width="full"
       @submit="trySave"
@@ -94,12 +102,13 @@
             :styleclass="{ primary: 'true' }"
             :text="$str('save_changes', 'mod_perform')"
             type="submit"
+            class="tui_performAssignmentSchedule__action-submit"
             :disabled="isSaving"
           />
           <Button
             :text="$str('cancel', 'moodle')"
             :disabled="isSaving"
-            @click="cancel"
+            @click="reset"
           />
         </ButtonGroup>
       </div>
@@ -112,6 +121,7 @@ import { notify } from 'totara_core/notifications';
 import ToggleSet from 'totara_core/components/buttons/ToggleSet';
 import ToggleButtonIcon from 'totara_core/components/buttons/ToggleButtonIcon';
 import CalendarIcon from 'mod_perform/components/manage_activity/assignment/schedule/icon/Calendar';
+import UserIcon from 'mod_perform/components/manage_activity/assignment/schedule/icon/User';
 import ButtonGroup from 'totara_core/components/buttons/ButtonGroup';
 import Button from 'totara_core/components/buttons/Button';
 import DateRangeClosedFixed from 'mod_perform/components/manage_activity/assignment/schedule/DateRangeClosedFixed';
@@ -135,6 +145,7 @@ export default {
     ToggleSet,
     ToggleButtonIcon,
     CalendarIcon,
+    UserIcon,
     Uniform,
     ButtonGroup,
     Button,
@@ -150,21 +161,26 @@ export default {
   data() {
     let scheduleOpenClosed = null;
     let scheduleFixedDynamic = null;
-    let initialValues = {};
+    let initialValues = null;
+    const fromDate = this.getFormattedTime(this.track.schedule_fixed_from);
+    const toDate = this.getFormattedTime(this.track.schedule_fixed_to);
     switch (this.track.schedule_type) {
       case SCHEDULE_TYPE_OPEN_FIXED_VALUE:
         scheduleOpenClosed = SCHEDULE_TYPE_OPEN;
         scheduleFixedDynamic = SCHEDULE_TYPE_FIXED;
         initialValues = {
-          closedFrom: '',
-          closedTo: '',
+          open: { from: fromDate },
+          closed: { from: fromDate },
         };
         break;
       case SCHEDULE_TYPE_CLOSED_FIXED_VALUE:
         scheduleOpenClosed = SCHEDULE_TYPE_CLOSED;
         scheduleFixedDynamic = SCHEDULE_TYPE_FIXED;
         initialValues = {
-          openFrom: '',
+          open: {
+            from: fromDate,
+          },
+          closed: { from: fromDate, to: toDate },
         };
         break;
       case SCHEDULE_TYPE_OPEN_DYNAMIC_VALUE:
@@ -203,13 +219,6 @@ export default {
     },
 
     /**
-     * Canceling the form
-     */
-    cancel() {
-      console.log('canceling');
-    },
-
-    /**
      * Show a generic saving error toast.
      */
     showErrorNotification() {
@@ -237,11 +246,35 @@ export default {
      *
      * @returns {Promise<void>}
      */
-    async trySave() {
+    async trySave(values) {
       this.isSaving = true;
 
       try {
-        await this.save();
+        const resultData = await this.save(values);
+        let fromDate = null;
+        let toDate = null;
+        console.log(resultData);
+        if (this.scheduleFixedDynamic == SCHEDULE_TYPE_FIXED) {
+          if (this.scheduleOpenClosed == SCHEDULE_TYPE_CLOSED) {
+            const track =
+              resultData.mod_perform_update_track_schedule_closed_fixed.track;
+            fromDate = this.getFormattedTime(track.schedule_fixed_from);
+            toDate = this.getFormattedTime(track.schedule_fixed_to);
+          } else {
+            // Open.
+            const track =
+              resultData.mod_perform_update_track_schedule_open_fixed.track;
+            fromDate = this.getFormattedTime(track.schedule_fixed_from);
+            toDate = this.getFormattedTime(track.schedule_fixed_to);
+          }
+        }
+        this.initialValues = {
+          closed: {
+            from: fromDate,
+            to: toDate,
+          },
+          open: { from: fromDate },
+        };
         this.showSuccessNotification();
       } catch (e) {
         this.showErrorNotification();
@@ -256,26 +289,30 @@ export default {
      * Calling the mutation
      * @returns {Promise<any>}
      */
-    async save() {
+    async save(values) {
       let mutation = null;
+      let track_schedule = { track_id: this.track.id };
       if (this.scheduleFixedDynamic == SCHEDULE_TYPE_FIXED) {
         if (this.scheduleOpenClosed == SCHEDULE_TYPE_CLOSED) {
           mutation = UpdateTrackScheduleClosedFixedMutation;
+          track_schedule.from = this.getUnixTime(values.closed.from);
+          track_schedule.to = this.getUnixTime(values.closed.to);
         } else {
           // Open.
           mutation = UpdateTrackScheduleOpenFixedMutation;
+          track_schedule.from = this.getUnixTime(values.open.from);
         }
       } else {
         // Dynamic.
         if (this.scheduleOpenClosed == SCHEDULE_TYPE_CLOSED) {
           mutation = UpdateTrackScheduleClosedDynamicMutation;
+          // TODO in TL-24472
         } else {
           // Open.
           mutation = UpdateTrackScheduleOpenDynamicMutation;
+          // TODO in TL-24472
         }
       }
-
-      const track_schedule = { track_id: this.track.id };
 
       const { data: resultData } = await this.$apollo.mutate({
         mutation: mutation,
@@ -284,6 +321,14 @@ export default {
         },
       });
       return resultData;
+    },
+    getFormattedTime(timestamp) {
+      if (timestamp) {
+        return new Date(timestamp * 1000).toLocaleDateString('en-US');
+      }
+    },
+    getUnixTime(dataString) {
+      return new Date(dataString).getTime() / 1000;
     },
   },
 };
