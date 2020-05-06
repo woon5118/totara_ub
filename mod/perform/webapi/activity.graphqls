@@ -93,7 +93,6 @@ type mod_perform_subject_instance {
   activity: mod_perform_activity!
   progress_status: mod_perform_subject_instance_status!
   subject_user: core_user!
-  # Note: these participant_instances are only ones which link to the logged in user.
   participant_instances: [mod_perform_participant_instance!]!
 }
 
@@ -102,6 +101,7 @@ Details about a participant_instance
 """
 type mod_perform_participant_instance {
   id: core_id!
+  participant_id: core_id!
   participant_sections: [mod_perform_participant_section!]!
   participant: core_user!
   progress_status: mod_perform_participant_instance_status!

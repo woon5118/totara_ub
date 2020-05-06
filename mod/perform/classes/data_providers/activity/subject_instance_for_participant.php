@@ -37,7 +37,7 @@ use mod_perform\entities\activity\filters\subject_instances_about;
  *
  * @package mod_perform\data_providers\activity
  */
-class subject_instance {
+class subject_instance_for_participant {
 
     /** @var int */
     protected $participant_id;
@@ -47,9 +47,6 @@ class subject_instance {
 
     /** @var array */
     private $filters = [];
-
-    /** @var collection */
-    protected $participant_instance_entities;
 
     /**
      * subject_instance constructor.
@@ -101,13 +98,12 @@ class subject_instance {
             ->as('si')
             ->with('subject_user')
             ->with('track.activity')
+            ->with('participant_instances')
             ->where_exists($this->get_target_participant_exists())
             // Newest subject instances at the top of the list
             ->order_by('si.created_at', 'desc')
             // Order by id as well is so that tests wont fail if two rows are inserted within the same second
             ->order_by('si.id', 'desc');
-
-        if ($this->f)
 
         $repo->set_filters($this->filters);
 

@@ -564,50 +564,9 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
 
         $subject_user = user::logged_in();
         $subject_user_id = $subject_user->id;
-
-        $subject_instance = $generator->create_subject_instance([
-            'subject_is_participating' => true,
-            'subject_user_id' => $subject_user_id,
-            'other_participant_id' => null,
-            'include_questions' => false,
-        ]);
-
-        $activity = new activity($subject_instance->activity());
-
-        $section = $generator->create_section($activity, ['title' => 'Part one']);
-
-        $manager_section_relationship = $generator->create_section_relationship($section, ['class_name' => manager::class]);
-        $appraiser_section_relationship = $generator->create_section_relationship($section, ['class_name' => appraiser::class]);
-        $subject_section_relationship = $generator->create_section_relationship($section, ['class_name' => subject::class]);
-
-        $element = $generator->create_element(['title' => 'Question one']);
-        $generator->create_section_element($section, $element);
-
         $manager_appraiser_user = self::getDataGenerator()->create_user();
 
-        $generator->create_participant_instance_and_section(
-            $activity,
-            $manager_appraiser_user,
-            $subject_instance->id,
-            $section,
-            $manager_section_relationship->activity_relationship_id
-        );
-
-        $generator->create_participant_instance_and_section(
-            $activity,
-            $manager_appraiser_user,
-            $subject_instance->id,
-            $section,
-            $appraiser_section_relationship->activity_relationship_id
-        );
-
-        $subject_section = $generator->create_participant_instance_and_section(
-            $activity,
-            $subject_user->to_the_origins(),
-            $subject_instance->id,
-            $section,
-            $subject_section_relationship->activity_relationship_id
-        );
+        [$subject_section] = $generator->create_section_with_combined_manager_appraiser($subject_user, $manager_appraiser_user);
 
         $data_provider = new participant_section_with_responses($subject_user_id, $subject_section->id);
         $fetched_participant_section = $data_provider->fetch()->get();

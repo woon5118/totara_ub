@@ -46,7 +46,7 @@ require_once(__DIR__ . '/state_testcase.php');
 /**
  * @group perform
  */
-class mod_perform_participant_section_model_testcase extends state_testcase {
+class mod_perform_participant_section_progress_testcase extends state_testcase {
 
     protected static function get_object_type(): string {
         return 'participant_section';

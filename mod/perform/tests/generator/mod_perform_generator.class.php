@@ -52,6 +52,7 @@ use totara_core\entities\relationship_resolver;
 use totara_core\relationship\relationship;
 use totara_core\relationship\resolvers\subject;
 use totara_job\job_assignment;
+use totara_job\relationship\resolvers\appraiser;
 use totara_job\relationship\resolvers\manager;
 use hierarchy_position\entities\position;
 use hierarchy_organisation\entities\organisation;
@@ -67,8 +68,8 @@ class mod_perform_generator extends component_generator_base {
     private $cache;
 
     public function __construct(testing_data_generator $datagenerator) {
-        require_once __DIR__.'/activity_name_generator.php';
-        require_once __DIR__.'/activity_generator_configuration.php';
+        require_once __DIR__ . '/activity_name_generator.php';
+        require_once __DIR__ . '/activity_generator_configuration.php';
         parent::__construct($datagenerator);
     }
 
@@ -141,7 +142,7 @@ class mod_perform_generator extends component_generator_base {
     }
 
     public function create_section(activity $activity, $data = []): section {
-        $title =  $data['title'] ?? "test Section";
+        $title = $data['title'] ?? "test Section";
         return section::create($activity, $title);
     }
 
@@ -159,7 +160,7 @@ class mod_perform_generator extends component_generator_base {
             $section = $this->create_section($activity, ['title' => 'Part one']);
         }
 
-        $participant_section =  new participant_section_entity();
+        $participant_section = new participant_section_entity();
         $participant_section->section_id = $section->id;
         $participant_section->participant_instance_id = $participant_instance->id;
         $participant_section->progress = not_started::get_code();
@@ -220,7 +221,7 @@ class mod_perform_generator extends component_generator_base {
      *
      * @return collection $tracks the generated tracks.
      */
-    public function create_activity_tracks(activity $activity, int $track_count=1): collection {
+    public function create_activity_tracks(activity $activity, int $track_count = 1): collection {
         return collection::new(range(0, $track_count - 1))
             ->map_to(
                 function (int $i) use ($activity): track {
@@ -254,10 +255,10 @@ class mod_perform_generator extends component_generator_base {
      */
     public function create_track_assignments(
         track $track,
-        int $cohort_count=1,
-        int $org_count=1,
-        int $pos_count=1,
-        int $user_count=1
+        int $cohort_count = 1,
+        int $org_count = 1,
+        int $pos_count = 1,
+        int $user_count = 1
     ): track {
         $pos = [];
         $hierarchies = $this->datagenerator->get_plugin_generator('totara_hierarchy');
@@ -402,7 +403,6 @@ class mod_perform_generator extends component_generator_base {
                             'managerjaid' => job_assignment::create_default($manager->id)->id,
                         ]);
                     }
-
                 }
             }
 
@@ -479,7 +479,7 @@ class mod_perform_generator extends component_generator_base {
         $track = track::create($activity, "track for {$activity->name}");
 
         $user_assignment = new track_user_assignment();
-        $user_assignment->track_id =  $track->id;
+        $user_assignment->track_id = $track->id;
         $user_assignment->subject_user_id = $subject->id;
         $user_assignment->deleted = false;
         $user_assignment->save();
@@ -591,9 +591,17 @@ class mod_perform_generator extends component_generator_base {
         return activity::load_by_entity($activity_entity);
     }
 
+    /**
+     * @param activity $activity
+     * @param stdClass|user $participant_user
+     * @param int $subject_instance_id
+     * @param section $section
+     * @param int $activity_relationship_id
+     * @return participant_section_entity
+     */
     public function create_participant_instance_and_section(
         activity $activity,
-        stdClass $participant_user,
+        $participant_user,
         int $subject_instance_id,
         section $section,
         int $activity_relationship_id
@@ -691,6 +699,60 @@ class mod_perform_generator extends component_generator_base {
             return $last_record->id;
         }
         return 0;
+    }
+
+    /**
+     * Creates a subject instance/participant instances with a one section that has a combined manager-appraiser.
+     * Combined manager-appraiser means a manager and appraiser linked to the same single end user.
+     *
+     * @param stdClass|user $subject_user
+     * @param stdClass|user $manager_appraiser_user
+     * @return participant_section[] [$subject_section, $manager_section, $appraiser_section]
+     */
+    public function create_section_with_combined_manager_appraiser($subject_user, $manager_appraiser_user): array {
+        $subject_instance = $this->create_subject_instance([
+            'subject_is_participating' => true,
+            'subject_user_id' => $subject_user->id,
+            'other_participant_id' => null,
+            'include_questions' => false,
+        ]);
+
+        $activity = new activity($subject_instance->activity());
+
+        $section = $this->create_section($activity, ['title' => 'Part one']);
+
+        $manager_section_relationship = $this->create_section_relationship($section, ['class_name' => manager::class]);
+        $appraiser_section_relationship = $this->create_section_relationship($section, ['class_name' => appraiser::class]);
+        $subject_section_relationship = $this->create_section_relationship($section, ['class_name' => subject::class]);
+
+        $element = $this->create_element(['title' => 'Question one']);
+        $this->create_section_element($section, $element);
+
+        $manager_section = $this->create_participant_instance_and_section(
+            $activity,
+            $manager_appraiser_user,
+            $subject_instance->id,
+            $section,
+            $manager_section_relationship->activity_relationship_id
+        );
+
+        $appraiser_section = $this->create_participant_instance_and_section(
+            $activity,
+            $manager_appraiser_user,
+            $subject_instance->id,
+            $section,
+            $appraiser_section_relationship->activity_relationship_id
+        );
+
+        $subject_section = $this->create_participant_instance_and_section(
+            $activity,
+            $subject_user,
+            $subject_instance->id,
+            $section,
+            $subject_section_relationship->activity_relationship_id
+        );
+
+        return [$subject_section, $manager_section, $appraiser_section];
     }
 
 }

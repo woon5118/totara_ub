@@ -27,7 +27,7 @@ use core\entities\user;
 use core\orm\collection;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
-use mod_perform\data_providers\activity\subject_instance as subject_instance_data_provider;
+use mod_perform\data_providers\activity\subject_instance_for_participant as subject_instance_data_provider;
 use mod_perform\models\activity\subject_instance as subject_instance_model;
 use totara_core\advanced_feature;
 use mod_perform\util;

@@ -141,6 +141,15 @@ export default {
     },
 
     /**
+     * A participant instance id, to look the section up with.
+     * This will change when we introduce multiple sections.
+     */
+    participantInstanceId: {
+      required: true,
+      type: Number,
+    },
+
+    /**
      * The user this activity is about.
      */
     subjectUser: {
@@ -151,16 +160,6 @@ export default {
           Object.prototype.hasOwnProperty.bind(value)
         );
       },
-    },
-
-    /**
-     * The participant instances that are available to answer as, under most circumstances there will only be one,
-     * however if the logged in user was for example both the manager and appraiser for the subject they would
-     * have the option to answer as either.
-     */
-    participantInstances: {
-      required: true,
-      type: Array,
     },
   },
 
@@ -178,7 +177,8 @@ export default {
       sectionElements: [],
       showOtherResponse: false,
       completionSaveSuccess: false,
-      answeringAs: this.participantInstances[0],
+      answeringAsParticipantId: this.participantInstanceId,
+      answerableParticipantInstances: null,
     };
   },
 
@@ -187,12 +187,14 @@ export default {
       query: SectionResponsesQuery,
       variables() {
         return {
-          participant_instance_id: this.answeringAs.id,
+          participant_instance_id: this.answeringAsParticipantId,
         };
       },
       update: data => data.mod_perform_participant_section.section,
       result({ data }) {
         this.participantSectionId = data.mod_perform_participant_section.id;
+        this.answerableParticipantInstances =
+          data.mod_perform_participant_section.answerable_participant_instances;
         this.initialValues = {};
         this.initialValues.sectionElements = {};
         this.sectionElements = data.mod_perform_participant_section.section_element_responses.map(
@@ -250,6 +252,21 @@ export default {
      */
     currentUserIsSubject() {
       return Number(this.currentUserId) === Number(this.subjectUser.id);
+    },
+
+    /*
+     * Get the participant instance we are currently answering as.
+     */
+    answeringAs: {
+      get() {
+        if (this.answerableParticipantInstances === null) {
+          return {};
+        }
+
+        return this.answerableParticipantInstances.find(
+          pi => Number(pi.id) === Number(this.answeringAsParticipantId)
+        );
+      },
     },
   },
 

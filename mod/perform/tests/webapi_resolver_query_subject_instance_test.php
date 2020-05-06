@@ -49,8 +49,19 @@ class mod_perform_webapi_resolver_query_subject_instance_testcase extends mod_pe
             0
         ))->get_url($GLOBALS['PAGE'])->out(false);
 
-        /** @var participant_instance $participant_instance */
-        $participant_instance = self::$about_user_and_participating->participant_instances->first();
+        /** @var participant_instance $subject_participant_instance */
+        $subject_participant_instance = self::$about_user_and_participating->participant_instances->find(
+            function (participant_instance $pi) {
+                return (int) $pi->participant_id === (int) self::$about_user_and_participating->subject_user->id;
+            }
+        );
+
+        /** @var participant_instance $manager_participant_instance */
+        $manager_participant_instance = self::$about_user_and_participating->participant_instances->find(
+            function (participant_instance $pi) {
+                return (int) $pi->participant_id !== (int) self::$about_user_and_participating->subject_user->id;
+            }
+        );
 
         $expected = [
             'id' => self::$about_user_and_participating->id,
@@ -59,15 +70,23 @@ class mod_perform_webapi_resolver_query_subject_instance_testcase extends mod_pe
                 'name' => self::$about_user_and_participating->get_activity()->name
             ],
             'subject_user' => [
+                'id' => self::$about_user_and_participating->subject_user->id,
                 'fullname' => self::$about_user_and_participating->subject_user->fullname,
                 'profileimageurlsmall' => $profile_image_small_url,
             ],
             'participant_instances' => [
                 [
-                    'id' => $participant_instance->get_id(),
+                    'id' => $subject_participant_instance->get_id(),
                     'progress_status' => not_started::get_name(),
                     'relationship_name' => 'Subject',
-                ]
+                    'participant_id' => $subject_participant_instance->participant_id,
+                ],
+                [
+                    'id' => $manager_participant_instance->get_id(),
+                    'progress_status' => not_started::get_name(),
+                    'relationship_name' => 'Manager',
+                    'participant_id' => $manager_participant_instance->participant_id,
+                ],
             ]
         ];
 

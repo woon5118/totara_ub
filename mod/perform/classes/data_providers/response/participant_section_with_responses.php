@@ -79,7 +79,7 @@ class participant_section_with_responses {
 
         // The participant section either doesn't exist or does not belong to the supplied participant id.
         // The front end or calling code will handle these cases the same way,
-        // the recourse does not exist as far as the user is concerned.
+        // the participant section does not exist as far as the user is concerned.
         if ($this->participant_section_entity === null) {
             return $this;
         }

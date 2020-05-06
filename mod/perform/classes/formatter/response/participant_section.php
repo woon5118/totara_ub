@@ -41,6 +41,7 @@ class participant_section extends entity_model_formatter {
             'section_element_responses' => null,
             'progress_status' => null,
             'participant_instance' => null,
+            'answerable_participant_instances' => null,
         ];
     }
 }

@@ -23,7 +23,7 @@ Feature: Create and update activity general info fields
     Then I should see the tui datatable contains:
       | Name                | Type     | Status |
       | My Test Activity #1 | Check-in | Active |
-      | My Test Activity #2 | Feedback | Active |
+      | My Test Activity #2 | Feedback | Draft |
 
   Scenario: Edit the general info fields for an existing activity
     Given I log in as "admin"

@@ -58,7 +58,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
 
         $expected = [
             [
-                'id' => (int)$subject_instance->id,
+                'id' => (int) $subject_instance->id,
                 'progress_status' => $subject_instance->get_progress_status(),
                 'activity' => [
                     'name' => $activity->name
@@ -70,6 +70,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                     [
                         'progress_status' => 'NOT_STARTED',
                         'relationship_name' => 'Subject',
+                        'participant_id' => $participant_instance->participant_id,
                     ]
                 ],
             ]

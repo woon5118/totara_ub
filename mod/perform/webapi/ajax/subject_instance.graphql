@@ -12,6 +12,7 @@ query mod_perform_subject_instance($subject_instance_id: core_id!) {
     }
     participant_instances {
       id
+      participant_id
       progress_status
       relationship_name
     }

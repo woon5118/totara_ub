@@ -75,11 +75,7 @@
             $str('user_activities_status_header_participation', 'mod_perform')
           "
         >
-          {{
-            calculateStatusTextFromInstances(
-              subjectInstance.participant_instances
-            )
-          }}
+          {{ getYourProgressText(subjectInstance.participant_instances) }}
         </Cell>
         <Cell
           size="2"
@@ -112,6 +108,13 @@ export default {
     Table,
   },
   props: {
+    /**
+     * The id of the logged in user.
+     */
+    currentUserId: {
+      required: true,
+      type: Number,
+    },
     about: {
       type: String,
       validator(val) {
@@ -179,13 +182,23 @@ export default {
           return '';
       }
     },
-    // We have to take into account that there can be several participant instances per row (e.g. when the user is both
-    // appraiser and manager for the subject). So we get an overall status depending on the combination of individual
-    // statuses.
-    calculateStatusTextFromInstances(participantInstances) {
+
+    /**
+     * Get the current users progress on a particular subject instance.
+     *
+     * We have to take into account that there can be several participant instances per row (e.g. when the user is both
+     * appraiser and manager for the subject). So we get an overall status depending on the combination of individual
+     * statuses.
+     *
+     * @param {Object[]} participantInstances - The participant instances from the subject instance we are getting the progress text for
+     * @returns {string}
+     */
+    getYourProgressText(participantInstances) {
       let allComplete = true;
       let allNotStarted = true;
-      participantInstances.forEach(function(participant_instance) {
+      this.filterToCurrentUser(participantInstances).forEach(function(
+        participant_instance
+      ) {
         switch (participant_instance.progress_status) {
           case 'NOT_STARTED':
             allComplete = false;
@@ -205,11 +218,31 @@ export default {
         : 'IN_PROGRESS';
       return this.getStatusText(calcStatus);
     },
+
+    /**
+     * Relationship names for the logged in user for a set of participant instances.
+     *
+     * @param {Object[]} participantInstances - The participant instances from the subject instance we are getting the relationship text for
+     * @returns {string}
+     */
     getRelationshipText(participantInstances) {
-      let relationships = participantInstances.map(
+      let relationships = this.filterToCurrentUser(participantInstances).map(
         instance => instance.relationship_name
       );
+
       return relationships.join(', ');
+    },
+
+    /**
+     * Filter participant instances to only ones that belong to the logged in user.
+     *
+     * @param {Object[]} participantInstances
+     * @return {Object[]}
+     */
+    filterToCurrentUser(participantInstances) {
+      return participantInstances.filter(
+        pi => Number(this.currentUserId) === Number(pi.participant_id)
+      );
     },
   },
 };

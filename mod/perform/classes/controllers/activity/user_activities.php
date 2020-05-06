@@ -25,6 +25,7 @@ namespace mod_perform\controllers\activity;
 
 use context;
 use context_coursecat;
+use core\entities\user;
 use mod_perform\controllers\perform_controller;
 use mod_perform\util;
 use totara_mvc\tui_view;
@@ -49,6 +50,7 @@ class user_activities extends perform_controller {
         parent::action();
 
         $props = [
+            'current-user-id' => user::logged_in()->id,
             'view-activity-url' => (string) view_user_activity::get_url(),
             'show-about-others-tab' => (bool) $this->get_param('show_about_others_tab', PARAM_BOOL, false),
             'completion-save-success' => (bool) $this->get_param('completion_save_success', PARAM_BOOL, false),

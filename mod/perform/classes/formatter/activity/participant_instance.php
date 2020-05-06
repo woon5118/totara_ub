@@ -44,6 +44,7 @@ class participant_instance extends entity_model_formatter {
             'participant' => null,
             'progress_status' => null,
             'relationship_name' => null,
+            'participant_id' => null,
         ];
     }
 }

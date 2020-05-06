@@ -26,9 +26,11 @@
  */
 
 use core\webapi\execution_context;
+use mod_perform\entities\activity\subject_instance;
 use mod_perform\models\activity\section;
 use mod_perform\models\activity\activity;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
+use mod_perform\webapi\resolver\query\participant_section;
 use totara_webapi\graphql;
 
 class mod_perform_webapi_resolver_query_participant_section_testcase extends advanced_testcase {
@@ -64,6 +66,10 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
             $this->assertEquals($participant_section->id, $result['id']);
             $this->assertSame($participant_section->section->title, $result['section']['title']);
             $this->assertSame('IN_PROGRESS', $result['progress_status']);
+
+
+            $this->assertCount(1, $result['answerable_participant_instances']);
+            $this->assertSame('Subject', $result['answerable_participant_instances'][0]['relationship_name']);
 
             $section_element_responses = $result['section_element_responses'];
 

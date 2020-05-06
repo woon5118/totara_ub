@@ -5,6 +5,7 @@ type mod_perform_participant_section {
   id: core_id!
   section: mod_perform_section!
   participant_instance: mod_perform_participant_instance!
+  answerable_participant_instances: [mod_perform_participant_instance!]! # All participant instances the linked user (particiapnt_instance) can asnwer as
   section_element_responses: [mod_perform_section_element_response!]!
   progress_status: mod_perform_participant_section_progress_status!
 }

@@ -27,6 +27,7 @@ use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\entity\relations\belongs_to;
 use core\orm\entity\relations\has_many_through;
+use mod_perform\models\activity\participant_instance as participant_instance_entity;
 
 /**
  * Participant section entity
@@ -82,6 +83,26 @@ class participant_section extends entity {
             'id',
             'section_id'
         );
+    }
+
+    /**
+     * Get all participant instances (same end user, different relationship),
+     * that this section can be answered by the linked participant instance.
+     *
+     * @return collection|participant_instance_entity
+     */
+    public function get_answerable_participant_instances(): collection {
+        $subject_instance_id = $this->participant_instance->subject_instance_id;
+        $participant_id = $this->participant_instance->participant_id;
+        $section_id = $this->section_id;
+
+        return $this->participant_instance::repository()
+            ->as('pi')
+            ->where('pi.subject_instance_id', $subject_instance_id) // For performance so we can hit the subject_instance_id index.
+            ->where('pi.participant_id', $participant_id) // Same end user.
+            ->join([self::TABLE, 'ps'], 'ps.participant_instance_id', 'pi.id')
+            ->where('ps.section_id', $section_id) // Same section.
+            ->get(true);
     }
 
 }

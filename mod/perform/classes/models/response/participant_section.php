@@ -48,6 +48,7 @@ use mod_perform\state\state_aware;
  * @property-read participant_instance $participant_instance
  * @property-read section $section
  * @property-read section_element_response[] $section_element_responses
+ * @property-read participant_instance[] answerable_participant_instances
  *
  * @package mod_perform\models\activity
  */
@@ -83,6 +84,7 @@ class participant_section extends model {
         'section_element_responses',
         'progress_status',
         'participant_instance',
+        'answerable_participant_instances',
     ];
 
     /**
@@ -110,6 +112,16 @@ class participant_section extends model {
 
     public function get_participant_instance(): participant_instance {
         return participant_instance::load_by_entity($this->entity->participant_instance);
+    }
+
+    /**
+     * Get all participant instances (same end user, different relationship),
+     * that this section can be answered by the linked participant instance.
+     *
+     * @return collection|participant_instance
+     */
+    public function get_answerable_participant_instances(): collection {
+        return $this->entity->get_answerable_participant_instances()->map_to(participant_instance::class);
     }
 
     public function get_context(): context_module {

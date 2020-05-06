@@ -36,8 +36,8 @@
         v-if="activityFound"
         :current-user-id="currentUserId"
         :activity="subjectInstance.activity"
+        :participant-instance-id="firstParticipantInstanceIdForUser"
         :subject-user="subjectInstance.subject_user"
-        :participant-instances="subjectInstance.participant_instances"
       />
     </Loader>
   </div>
@@ -102,6 +102,20 @@ export default {
     },
     activityFound() {
       return !this.$apollo.loading && this.subjectInstance !== null;
+    },
+
+    /**
+     * Get the first participant instance belonging to the logged in user.
+     * This will need to change when we introduce multiple selections.
+     *
+     * @return {Number}
+     */
+    firstParticipantInstanceIdForUser() {
+      const firstId = this.subjectInstance.participant_instances.filter(
+        pi => Number(this.currentUserId) === Number(pi.participant_id)
+      )[0].id;
+
+      return Number(firstId);
     },
   },
 };
