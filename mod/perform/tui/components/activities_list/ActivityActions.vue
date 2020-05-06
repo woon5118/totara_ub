@@ -325,7 +325,7 @@ export default {
       },
       update: data => data.mod_perform_activity_users_to_assign_count,
       skip() {
-        return !this.activateModalOpen;
+        return !this.activateModalOpen || this.activating;
       },
     },
   },

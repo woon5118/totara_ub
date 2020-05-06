@@ -420,6 +420,26 @@ class behat_totara_data_generators extends behat_base {
                 'datagenerator' => 'activity_in_container',
                 'required' => array('activity_name')
             ),
+            'activity sections' => array(
+                'datagenerator' => 'activity_section',
+                'required' => array('activity_name', 'section_name')
+            ),
+            'activity tracks' => array(
+                'datagenerator' => 'activity_track',
+                'required' => array('activity_name', 'track_description')
+            ),
+            'section relationships' => array(
+                'datagenerator' => 'section_relationship_from_name',
+                'required' => array('section_name', 'relationship')
+            ),
+            'section elements' => array(
+                'datagenerator' => 'section_element_from_name',
+                'required' => array('section_name', 'element_name')
+            ),
+            'track assignments' => array(
+                'datagenerator' => 'track_assignment',
+                'required' => array('track_description', 'assignment_type', 'assignment_name')
+            ),
         ),
         'mod_quiz' => array(
             'responses' => array(

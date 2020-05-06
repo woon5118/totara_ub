@@ -28,6 +28,8 @@ use core\entities\cohort;
 use core\entities\user;
 use core_container\module\module;
 use mod_perform\entities\activity\participant_section;
+use mod_perform\entities\activity\section as section_entity;
+use mod_perform\entities\activity\track as track_entity;
 use mod_perform\expand_task;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
@@ -52,6 +54,7 @@ use mod_perform\user_groups\grouping;
 use mod_perform\util;
 use totara_core\entities\relationship_resolver;
 use totara_core\relationship\relationship;
+use totara_core\relationship\relationship_provider;
 use totara_core\relationship\resolvers\subject;
 use totara_job\job_assignment;
 use totara_job\relationship\resolvers\appraiser;
@@ -164,9 +167,44 @@ class mod_perform_generator extends component_generator_base {
         return $module;
     }
 
+    /**
+     * Wrapper for behat
+     *
+     * @param array $data
+     */
+    public function create_activity_section(array $data): void {
+        $this->create_section($this->get_activity_from_name($data['activity_name']), ['title' => $data['section_name']]);
+    }
+
     public function create_section(activity $activity, $data = []): section {
         $title = $data['title'] ?? "test Section";
         return section::create($activity, $title);
+    }
+
+    /**
+     * @param string $activity_name
+     * @return activity
+     */
+    private function get_activity_from_name(string $activity_name): activity {
+        /** @var activity_entity $activity */
+        $activity = activity_entity::repository()
+            ->where('name', $activity_name)
+            ->one(true);
+        return activity::load_by_entity($activity);
+    }
+
+    /**
+     * Wrapper for behat
+     *
+     * @param array $data
+     */
+    public function create_section_element_from_name(array $data): void {
+        $section = $this->get_section_from_title($data['section_name']);
+        $element = $this->create_element([
+            'plugin_name' => $data['element_name'],
+            'context' => $section->get_activity()->get_context()
+        ]);
+        $this->create_section_element($section, $element);
     }
 
     public function create_section_element(section $section, element $element, $sort_order = 1): section_element {
@@ -208,6 +246,38 @@ class mod_perform_generator extends component_generator_base {
             $data['identifier'] ?? 0,
             $data['data'] ?? null
         );
+    }
+
+    /**
+     * Wrapper for Behat
+     *
+     * @param array $data required: 'section_name' (should be unique) and 'relationship'
+     */
+    public function create_section_relationship_from_name(array $data): void {
+        $relationship_name = strtolower($data['relationship']);
+        $relationships = relationship_provider::get_all_relationships();
+        foreach ($relationships as $relationship) {
+            if (strtolower($relationship->get_name()) === $relationship_name) {
+                $this->create_section_relationship(
+                    $this->get_section_from_title($data['section_name']),
+                    ['class_name' => $relationship->get_resolvers()[0]]
+                );
+                return;
+            }
+        }
+        throw new coding_exception("Could not find relationship '{$relationship_name}'");
+    }
+
+    /**
+     * @param string $section_name
+     * @return section
+     */
+    private function get_section_from_title(string $section_name): section {
+        /** @var section_entity $section */
+        $section = section_entity::repository()
+            ->where('title', $section_name)
+            ->one(true);
+        return section::load_by_entity($section);
     }
 
     public function create_section_relationship(section $section, array $data): section_relationship_model {
@@ -779,4 +849,37 @@ class mod_perform_generator extends component_generator_base {
         return [$subject_section, $manager_section, $appraiser_section];
     }
 
+    /**
+     * Wrapper for behat
+     *
+     * @param array $data
+     */
+    public function create_activity_track(array $data): void {
+        $activity = $this->get_activity_from_name($data['activity_name']);
+        track::create($activity, $data['track_description']);
+    }
+
+    /**
+     * Wrapper for behat
+     *
+     * @param array $data
+     */
+    public function create_track_assignment(array $data): void {
+        global $DB;
+        $type = $data['assignment_type'];
+        /** @var track $track */
+        $track = track_entity::repository()
+            ->where('description', $data['track_description'])
+            ->one(true);
+
+        $cohort_ids = [];
+        switch ($type) {
+            case 'cohort':
+                $cohort_ids[] = $DB->get_field('cohort', 'id', ['name' => $data['assignment_name']], MUST_EXIST);
+                break;
+            default:
+                throw new coding_exception("creating track assignment not yet implemented for {$type}");
+        }
+        $this->create_track_assignments_with_existing_groups(track::load_by_entity($track), $cohort_ids);
+    }
 }
