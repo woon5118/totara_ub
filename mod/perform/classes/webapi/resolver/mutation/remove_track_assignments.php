@@ -23,8 +23,6 @@
 
 namespace mod_perform\webapi\resolver\mutation;
 
-use core\collection;
-
 use core\webapi\execution_context;
 use core\webapi\mutation_resolver;
 

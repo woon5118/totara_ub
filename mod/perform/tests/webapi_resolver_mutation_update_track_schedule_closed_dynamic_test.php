@@ -33,7 +33,7 @@ use totara_webapi\phpunit\webapi_phpunit_helper;
 /**
  * @group perform
  */
-class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_fixed_testcase extends advanced_testcase {
+class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_testcase extends advanced_testcase {
 
     use webapi_phpunit_helper;
 
@@ -61,7 +61,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_fixed_te
         $this->expectException(required_capability_exception::class);
         $this->expectExceptionMessage('Manage performance activities');
 
-        $this->resolve_graphql_mutation('mod_perform_update_track_schedule_closed_fixed', $args);
+        $this->resolve_graphql_mutation('mod_perform_update_track_schedule_closed_dynamic', $args);
     }
 
     public function test_correct_track_is_updated(): void {
@@ -78,7 +78,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_fixed_te
         $activities = $perform_generator->create_full_activities($configuration);
 
         // Before we test, set them all to open fixed, so we can see the effect of changing to closed fixed.
-        $DB->set_field('perform_track', 'schedule_type', track_entity::SCHEDULE_TYPE_OPEN_FIXED);
+        $DB->set_field('perform_track', 'schedule_type', track_entity::SCHEDULE_TYPE_OPEN_DYNAMIC);
 
         /** @var activity $activity1 */
         $activity1 = $activities->first();
@@ -96,17 +96,17 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_fixed_te
         unset($before_tracks[$track1->id]->updated_at);
 
         $updated_track = $this->resolve_graphql_mutation(
-            'mod_perform_update_track_schedule_closed_fixed',
+            'mod_perform_update_track_schedule_closed_dynamic',
             $args
         )['track'];
 
         // Verify the resulting graphql data.
         self::assertEquals($track1->id, $updated_track->id);
-        self::assertEquals(track_entity::SCHEDULE_TYPE_CLOSED_FIXED, $updated_track->schedule_type);
+        self::assertEquals(track_entity::SCHEDULE_TYPE_CLOSED_DYNAMIC, $updated_track->schedule_type);
 
         // Manually make the changes that we expect to make.
         $affected_track = $before_tracks[$track1->id];
-        $affected_track->schedule_type = track_entity::SCHEDULE_TYPE_CLOSED_FIXED;
+        $affected_track->schedule_type = track_entity::SCHEDULE_TYPE_CLOSED_DYNAMIC;
 
         $after_tracks = $DB->get_records('perform_track', [], 'id');
         unset($after_tracks[$track1->id]->updated_at);

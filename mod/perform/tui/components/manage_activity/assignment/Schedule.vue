@@ -26,7 +26,7 @@
       <ToggleSet v-model="scheduleOpenClosed">
         <ToggleButtonIcon
           value="closed"
-          label="left label"
+          :label="$str('schedule_type_closed', 'mod_perform')"
           text="Limited"
           class="tui_performAssignmentSchedule__toggle-button"
         >
@@ -40,7 +40,7 @@
         </ToggleButtonIcon>
         <ToggleButtonIcon
           value="open"
-          label="right label"
+          :label="$str('schedule_type_open', 'mod_perform')"
           text="Open-ended"
           class="tui_performAssignmentSchedule__toggle-button"
         >
@@ -50,6 +50,30 @@
             <CalendarIcon />
             <div class="tui_performAssignmentSchedule__button-label">
               {{ $str('schedule_type_open', 'mod_perform') }}
+            </div>
+          </div>
+        </ToggleButtonIcon>
+      </ToggleSet>
+      <ToggleSet v-model="scheduleFixedDynamic">
+        <ToggleButtonIcon
+          value="fixed"
+          :label="$str('schedule_type_fixed', 'mod_perform')"
+          class="tui_performAssignmentSchedule__toggle-button"
+        >
+          <div class="tui_performAssignmentSchedule__toggle-button-content">
+            <div class="tui_performAssignmentSchedule__button-label">
+              {{ $str('schedule_type_fixed', 'mod_perform') }}
+            </div>
+          </div>
+        </ToggleButtonIcon>
+        <ToggleButtonIcon
+          value="dynamic"
+          :label="$str('schedule_type_dynamic', 'mod_perform')"
+          class="tui_performAssignmentSchedule__toggle-button"
+        >
+          <div class="tui_performAssignmentSchedule__toggle-button-content">
+            <div class="tui_performAssignmentSchedule__button-label">
+              {{ $str('schedule_type_dynamic', 'mod_perform') }}
             </div>
           </div>
         </ToggleButtonIcon>
@@ -94,11 +118,17 @@ import DateRangeClosedFixed from 'mod_perform/components/manage_activity/assignm
 import DateRangeOpenFixed from 'mod_perform/components/manage_activity/assignment/schedule/DateRangeOpenFixed';
 import UpdateTrackScheduleClosedFixedMutation from 'mod_perform/graphql/update_track_schedule_closed_fixed';
 import UpdateTrackScheduleOpenFixedMutation from 'mod_perform/graphql/update_track_schedule_open_fixed';
+import UpdateTrackScheduleClosedDynamicMutation from 'mod_perform/graphql/update_track_schedule_closed_dynamic';
+import UpdateTrackScheduleOpenDynamicMutation from 'mod_perform/graphql/update_track_schedule_open_dynamic';
 
 const SCHEDULE_TYPE_OPEN = 'open';
 const SCHEDULE_TYPE_CLOSED = 'closed';
-const SCHEDULE_TYPE_OPEN_VALUE = 0;
-const SCHEDULE_TYPE_CLOSED_VALUE = 1;
+const SCHEDULE_TYPE_FIXED = 'fixed';
+const SCHEDULE_TYPE_DYNAMIC = 'dynamic';
+const SCHEDULE_TYPE_OPEN_FIXED_VALUE = 0;
+const SCHEDULE_TYPE_CLOSED_FIXED_VALUE = 1;
+const SCHEDULE_TYPE_OPEN_DYNAMIC_VALUE = 2;
+const SCHEDULE_TYPE_CLOSED_DYNAMIC_VALUE = 3;
 
 export default {
   components: {
@@ -119,24 +149,42 @@ export default {
   },
   data() {
     let scheduleOpenClosed = null;
+    let scheduleFixedDynamic = null;
     let initialValues = {};
     switch (this.track.schedule_type) {
-      case SCHEDULE_TYPE_OPEN_VALUE:
+      case SCHEDULE_TYPE_OPEN_FIXED_VALUE:
         scheduleOpenClosed = SCHEDULE_TYPE_OPEN;
+        scheduleFixedDynamic = SCHEDULE_TYPE_FIXED;
         initialValues = {
           closedFrom: '',
           closedTo: '',
         };
         break;
-      case SCHEDULE_TYPE_CLOSED_VALUE:
+      case SCHEDULE_TYPE_CLOSED_FIXED_VALUE:
         scheduleOpenClosed = SCHEDULE_TYPE_CLOSED;
+        scheduleFixedDynamic = SCHEDULE_TYPE_FIXED;
         initialValues = {
           openFrom: '',
+        };
+        break;
+      case SCHEDULE_TYPE_OPEN_DYNAMIC_VALUE:
+        scheduleOpenClosed = SCHEDULE_TYPE_OPEN;
+        scheduleFixedDynamic = SCHEDULE_TYPE_DYNAMIC;
+        initialValues = {
+          // TODO in dynamic form patch
+        };
+        break;
+      case SCHEDULE_TYPE_CLOSED_DYNAMIC_VALUE:
+        scheduleOpenClosed = SCHEDULE_TYPE_CLOSED;
+        scheduleFixedDynamic = SCHEDULE_TYPE_DYNAMIC;
+        initialValues = {
+          // TODO in dynamic form patch
         };
         break;
     }
     return {
       scheduleOpenClosed: scheduleOpenClosed,
+      scheduleFixedDynamic: scheduleFixedDynamic,
       initialValues: initialValues,
       isSaving: false,
     };
@@ -146,6 +194,7 @@ export default {
      * Get current form component
      */
     getFormComponent() {
+      // TODO in dynamic form patch
       if (this.scheduleOpenClosed == SCHEDULE_TYPE_CLOSED) {
         return 'DateRangeClosedFixed';
       }
@@ -208,10 +257,24 @@ export default {
      * @returns {Promise<any>}
      */
     async save() {
-      const mutation =
-        this.scheduleOpenClosed == SCHEDULE_TYPE_CLOSED
-          ? UpdateTrackScheduleClosedFixedMutation
-          : UpdateTrackScheduleOpenFixedMutation;
+      let mutation = null;
+      if (this.scheduleFixedDynamic == SCHEDULE_TYPE_FIXED) {
+        if (this.scheduleOpenClosed == SCHEDULE_TYPE_CLOSED) {
+          mutation = UpdateTrackScheduleClosedFixedMutation;
+        } else {
+          // Open.
+          mutation = UpdateTrackScheduleOpenFixedMutation;
+        }
+      } else {
+        // Dynamic.
+        if (this.scheduleOpenClosed == SCHEDULE_TYPE_CLOSED) {
+          mutation = UpdateTrackScheduleClosedDynamicMutation;
+        } else {
+          // Open.
+          mutation = UpdateTrackScheduleOpenDynamicMutation;
+        }
+      }
+
       const track_schedule = { track_id: this.track.id };
 
       const { data: resultData } = await this.$apollo.mutate({
@@ -230,6 +293,8 @@ export default {
   "mod_perform" : [
     "save_changes",
     "schedule_type_closed",
+    "schedule_type_fixed",
+    "schedule_type_dynamic",
     "schedule_type_open",
     "schedule_creation_range_and_date_type",
     "toast_success_save_schedule",

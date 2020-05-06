@@ -28,12 +28,41 @@ use core\webapi\execution_context;
 use mod_perform\entities\activity\track as track_entity;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\track;
-use totara_webapi\graphql;
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
  * @group perform
  */
 class mod_perform_webapi_resolver_mutation_update_track_schedule_open_fixed_testcase extends advanced_testcase {
+
+    use webapi_phpunit_helper;
+
+    public function test_user_cannot_update_without_permission(): void {
+        self::setAdminUser();
+
+        /** @var mod_perform_generator $perform_generator */
+        $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        $activities = $perform_generator->create_full_activities();
+
+        /** @var activity $activity1 */
+        $activity1 = $activities->first();
+        /** @var track $track1 */
+        $track1 = $activity1->get_tracks()->first();
+
+        $args = [
+            'track_schedule' => [
+                'track_id' => $track1->id,
+            ],
+        ];
+
+        $user = self::getDataGenerator()->create_user();
+        self::setUser($user);
+
+        $this->expectException(required_capability_exception::class);
+        $this->expectExceptionMessage('Manage performance activities');
+
+        $this->resolve_graphql_mutation('mod_perform_update_track_schedule_open_fixed', $args);
+    }
 
     public function test_correct_track_is_updated(): void {
         global $DB;
@@ -66,14 +95,14 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_fixed_test
         self::assertCount(4, $before_tracks);
         unset($before_tracks[$track1->id]->updated_at);
 
-        $update_result = graphql::execute_operation(
-            $this->get_execution_context('ajax', 'mod_perform_update_track_schedule_open_fixed'),
+        $updated_track = $this->resolve_graphql_mutation(
+            'mod_perform_update_track_schedule_open_fixed',
             $args
-        )->toArray(true)['data']['mod_perform_update_track_schedule_open_fixed']['track'];
+        )['track'];
 
         // Verify the resulting graphql data.
-        self::assertEquals($track1->id, $update_result['id']);
-        self::assertEquals(track_entity::SCHEDULE_TYPE_OPEN_FIXED, $update_result['schedule_type']);
+        self::assertEquals($track1->id, $updated_track->id);
+        self::assertEquals(track_entity::SCHEDULE_TYPE_OPEN_FIXED, $updated_track->schedule_type);
 
         // Manually make the changes that we expect to make.
         $affected_track = $before_tracks[$track1->id];

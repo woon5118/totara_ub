@@ -23,11 +23,8 @@
 
 namespace mod_perform\webapi\resolver\mutation;
 
-use coding_exception;
-use core\entities\user;
 use core\webapi\execution_context;
 use core\webapi\mutation_resolver;
-use mod_perform\data_providers\response\participant_section_with_responses;
 use mod_perform\models\activity\track;
 use totara_core\advanced_feature;
 
@@ -40,17 +37,28 @@ class update_track_schedule_open_fixed implements mutation_resolver {
      */
     public static function resolve(array $args, execution_context $ec) {
         advanced_feature::require('performance_activities');
-        require_login();
+        require_login(null, false, null, false, true);
 
         $track_schedule = $args['track_schedule'];
 
         $track_id = $track_schedule['track_id'];
         $track = track::load_by_id($track_id);
-        unset($track_schedule['track_id']);
+
+        $activity = $track->get_activity();
+        $context = $activity->get_context();
+
+        if (!$activity->can_manage()) {
+            throw new \required_capability_exception(
+                $context,
+                'mod/perform:manage_activity',
+                'nopermission',
+                ''
+            );
+        }
 
         $track->update_schedule_open_fixed();
 
-        $ec->set_relevant_context($track->get_activity()->get_context());
+        $ec->set_relevant_context($context);
         return [
             'track' => $track,
         ];

@@ -28,7 +28,7 @@ use core\webapi\mutation_resolver;
 use mod_perform\models\activity\track;
 use totara_core\advanced_feature;
 
-class update_track_schedule_closed_fixed implements mutation_resolver {
+class update_track_schedule_closed_dynamic implements mutation_resolver {
 
     /**
      * @param array $args
@@ -56,7 +56,7 @@ class update_track_schedule_closed_fixed implements mutation_resolver {
             );
         }
 
-        $track->update_schedule_closed_fixed();
+        $track->update_schedule_closed_dynamic();
 
         $ec->set_relevant_context($context);
         return [

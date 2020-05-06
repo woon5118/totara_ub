@@ -35,11 +35,31 @@ input mod_perform_create_track_input {
   description: param_text
 }
 
+"""
+Input parameters required for open-ended track schedule period using fixed dates
+"""
+input mod_perform_track_schedule_open_fixed_input {
+  track_id: core_id!
+}
+
+"""
+Input parameters required for closed track schedule period using fixed dates
+"""
 input mod_perform_track_schedule_closed_fixed_input {
   track_id: core_id!
 }
 
-input mod_perform_track_schedule_open_fixed_input {
+"""
+Input parameters required for open-ended track schedule period using dynamic dates
+"""
+input mod_perform_track_schedule_open_dynamic_input {
+  track_id: core_id!
+}
+
+"""
+Input parameters required for closed track schedule period using dynamic dates
+"""
+input mod_perform_track_schedule_closed_dynamic_input {
   track_id: core_id!
 }
 
@@ -51,23 +71,60 @@ type mod_perform_update_track_schedule_result {
 }
 
 extend type Mutation {
+  """
+  Add a new track to a given activity
+  """
   mod_perform_create_track(
     details: mod_perform_create_track_input!
   ): mod_perform_track!
 
+  """
+  Add track assignments to a given track
+  """
   mod_perform_add_track_assignments(
     assignments: mod_perform_track_assignments_input!
   ): mod_perform_track!
 
+  """
+  Remove track assignments
+  """
   mod_perform_remove_track_assignments(
     assignments: mod_perform_track_assignments_input!
   ): mod_perform_track!
 
+  """
+  Use one of the four following mutations when you want to set the schedule for a track
+
+  The mutation you should call depends on whether the assignment schedule period is open-ended or
+  closed (has an end date), and whether the dates are specified using fixed dates or are dynamically
+  calculated (relative to some property of the subject)
+
+  Each schedule type has different input requirements
+
+  Mutation to use when you want to set the schedule to be closed (has a start and end) and uses fixed dates
+  """
   mod_perform_update_track_schedule_closed_fixed(
     track_schedule: mod_perform_track_schedule_closed_fixed_input!
   ): mod_perform_update_track_schedule_result!
 
+  """
+  Mutation to use when you want to set the schedule to be open (start but no end) and uses fixed dates
+  """
   mod_perform_update_track_schedule_open_fixed(
     track_schedule: mod_perform_track_schedule_open_fixed_input!
+  ): mod_perform_update_track_schedule_result!
+
+  """
+  Mutation to use when you want to set the schedule to be close (has a start and end) and uses dynamic dates
+  """
+  mod_perform_update_track_schedule_closed_dynamic(
+    track_schedule: mod_perform_track_schedule_closed_dynamic_input!
+  ): mod_perform_update_track_schedule_result!
+
+  """
+  Mutation to use when you want to set the schedule to be open (start but no end) and uses dynamic dates
+  """
+  mod_perform_update_track_schedule_open_dynamic(
+    track_schedule: mod_perform_track_schedule_open_dynamic_input!
   ): mod_perform_update_track_schedule_result!
 }

@@ -270,4 +270,30 @@ class track extends model {
 
         $entity->update();
     }
+
+    /**
+     * Set the schedule to be closed with dynamic dates
+     *
+     * TODO some params
+     */
+    public function update_schedule_closed_dynamic(): void {
+        $entity = $this->entity;
+
+        $entity->schedule_type = track_entity::SCHEDULE_TYPE_CLOSED_DYNAMIC;
+
+        $entity->update();
+    }
+
+    /**
+     * Set the schedule to be open ended with dynamic dates
+     *
+     * TODO some params
+     */
+    public function update_schedule_open_dynamic(): void {
+        $entity = $this->entity;
+
+        $entity->schedule_type = track_entity::SCHEDULE_TYPE_OPEN_DYNAMIC;
+
+        $entity->update();
+    }
 }
