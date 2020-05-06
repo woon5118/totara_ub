@@ -48,7 +48,7 @@ class create_activity implements mutation_resolver {
             throw new create_exception(get_string('error_create_permission_missing', 'mod_perform'));
         }
 
-        if (empty($args['name'])) {
+        if (empty($args['name']) || ctype_space($args['name'])) {
             throw new create_exception(get_string('error_activity_name_missing', 'mod_perform'));
         }
 

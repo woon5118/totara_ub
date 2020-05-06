@@ -33,6 +33,14 @@ Feature: Create and update activity general info fields
       | My Test Activity #1 | Check-in | Active |
       | My Test Activity #2 | Feedback | Draft  |
 
+  Scenario: Activity can not be saved if title only contains whitespace
+    Given I log in as "admin"
+    And I navigate to the manage perform activities page
+    And I click on "Add activity" "button"
+    And I set the field "Activity title" to "  "
+    And I set the field "Activity type" to "Feedback"
+    Then the "Get started" "button" should be disabled
+
   Scenario: Edit the general info fields for an existing activity
     Given I log in as "admin"
     And I navigate to the manage perform activities page
@@ -54,3 +62,16 @@ Feature: Create and update activity general info fields
     Then I should see the tui datatable contains:
       | Name                | Type     | Status |
       | My Test Activity #3 | Check-in | Active |
+
+  Scenario: Edit the general info fields can not be saved if title field only contains whitespace
+    Given I log in as "admin"
+    And I navigate to the manage perform activities page
+
+    When I click on "My Test Activity #1" "link"
+    Then the following fields match these values:
+      | Activity title | My Test Activity #1             |
+      | Description    | My Test Activity #1 description |
+
+    When I set the field "Activity title" to "  "
+    Then the "Save changes" "button" should be disabled
+

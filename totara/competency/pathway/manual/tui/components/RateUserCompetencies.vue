@@ -188,7 +188,7 @@ export default {
      * @returns {String}
      */
     submitRatingsModalMessage() {
-      let ratingSummary = 'modal:submit_ratings_summary';
+      let ratingSummary = 'modal_submit_ratings_summary';
       ratingSummary +=
         this.selectedRatings.length === 1 ? '_singular' : '_plural';
       ratingSummary += this.role === ROLE_SELF ? '_self' : '_other';

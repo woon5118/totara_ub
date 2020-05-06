@@ -81,6 +81,18 @@ class mod_perform_webapi_resolver_mutation_create_activity_testcase extends adva
         create_activity::resolve($args, $this->get_execution_context());
     }
 
+    public function test_create_activity_with_name_only_contains_whitespace(): void {
+        $this->setAdminUser();
+        $args = [
+            'name' => '  ',
+            'description' => 'Test Description',
+            'type' => activity_type::load_by_name('feedback')->id
+        ];
+        $this->expectException(create_exception::class);
+        $this->expectExceptionMessage('You are not allowed to create an activity with an empty name');
+        create_activity::resolve($args, $this->get_execution_context());
+    }
+
     public function test_create_activity_with_empty_description(): void {
         $this->setAdminUser();
         $type_id = activity_type::load_by_name('feedback')->id;

@@ -167,7 +167,9 @@ export default {
      * @returns {boolean}
      */
     hasNoTitle() {
-      return !this.activity.edit_name || this.activity.edit_name.length === 0;
+      return (
+        !this.activity.edit_name || this.activity.edit_name.trim().length === 0
+      );
     },
 
     /**

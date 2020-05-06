@@ -292,7 +292,7 @@ class activity extends model {
     protected static function get_validation_problems(activity_entity $entity): array {
         $problems = [];
 
-        if (empty($entity->name)) {
+        if (empty($entity->name) || ctype_space($entity->name)) {
             $problems[] = 'Name is required';
         }
 

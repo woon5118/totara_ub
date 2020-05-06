@@ -193,6 +193,24 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
         $this->assertEquals('Active', $state->get_display_name());
     }
 
+    public function test_update_general_info_not_accepts_title_only_with_spaces(): void {
+        $original_data = new activity_entity();
+        $original_data->name = 'Existing activity name';
+        $original_data->description = 'Existing activity description';
+
+        $activity_type = 'feedback';
+        $activity = $this->create_activity($original_data, $activity_type);
+
+        $this->assertEquals($activity->name, $original_data->name);
+        $this->assertEquals($activity->description, $original_data->description);
+        $this->assertEquals($activity->type->name, $activity_type);
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('The following errors need to be fixed: "Name is required"');
+        /** @var activity $activity */
+        $activity->update_general_info('   ', null);
+    }
+
     /**
      * Create just the activity entity without any container.
      *
