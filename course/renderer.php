@@ -469,16 +469,24 @@ class core_course_renderer extends plugin_renderer_base {
             // Totara: If grade is hidden, do not show pass/fail, only complete.
             if ($completiondata->completionstate == COMPLETION_COMPLETE_PASS || $completiondata->completionstate == COMPLETION_COMPLETE_FAIL) {
                 require_once($CFG->dirroot . "/lib/grade/grade_item.php");
-                $grade_item = grade_item::fetch(array('courseid' => $course->id, 'itemmodule' => $mod->modname, 'iteminstance' => $mod->instance));
-                if ($grade_item->is_hidden()) {
+                $grade_items = grade_object::fetch_all_helper('grade_items', 'grade_item',
+                    array('courseid' => $course->id, 'itemmodule' => $mod->modname, 'iteminstance' => $mod->instance));
+                $is_hidden = false;
+                foreach ($grade_items as $grade_item) {
+                    if ($grade_item->is_hidden()) {
+                        $is_hidden = true;
+                        break;
+                    }
+                }
+                if ($is_hidden) {
                     $completionicon = 'auto-y';
                 } else {
                     require_once($CFG->dirroot . "/lib/grade/grade_grade.php");
-                    $grades = grade_grade::fetch_users_grades($grade_item, array($USER->id));
-                    if (!empty($grades[$USER->id])) {
-                        $grade_grade = $grades[$USER->id];
-                        if ($grade_grade->is_hidden()) {
+                    foreach ($grade_items as $grade_item) {
+                        $grades = grade_grade::fetch_users_grades($grade_item, array($USER->id));
+                        if (!empty($grades[$USER->id]) && $grades[$USER->id]->is_hidden()) {
                             $completionicon = 'auto-y';
+                            break;
                         }
                     }
                 }
