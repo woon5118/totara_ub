@@ -194,16 +194,15 @@ class totara_job_webapi_resolver_mutation_move_assignments_testcase extends adva
         $job2 =  $this->create_job_assignment(['userid' => $user->id, 'idnumber' => 'j2']);
         $job3 =  $this->create_job_assignment(['userid' => $user->id, 'idnumber' => 'j3']);
 
-        $map = function ($obj) {
-            return (array)$obj;
-        };
         $result = $this->execute_graphql_operation(
             'totara_job_move_assignment',
             ['userid' => $user->id, 'assignmentid' => $job3->id, 'newposition' => 0]
         );
+        $result = $result->toArray(true);
+        self::assertArrayHasKey('data', $result);
         self::assertSame(
-            ['data' => ['totara_job_move_assignment' => true]],
-            array_map($map, $result->toArray(true))
+            ['totara_job_move_assignment' => true],
+            $result['data']
         );
         self::assertEquals([$job3->id, $job1->id, $job2->id], array_keys($DB->get_records('job_assignment', ['userid' => $job1->userid], 'sortorder ASC', 'id')));
 
@@ -211,9 +210,11 @@ class totara_job_webapi_resolver_mutation_move_assignments_testcase extends adva
             'totara_job_move_assignment',
             ['userid' => $user->id, 'assignmentid' => $job2->id, 'newposition' => 0]
         );
+        $result = $result->toArray(true);
+        self::assertArrayHasKey('data', $result);
         self::assertSame(
-            ['data' => ['totara_job_move_assignment' => true]],
-            array_map($map, $result->toArray(true))
+            ['totara_job_move_assignment' => true],
+            $result['data']
         );
         self::assertEquals([$job2->id, $job3->id, $job1->id], array_keys($DB->get_records('job_assignment', ['userid' => $job1->userid], 'sortorder ASC', 'id')));
 
@@ -221,9 +222,11 @@ class totara_job_webapi_resolver_mutation_move_assignments_testcase extends adva
             'totara_job_move_assignment',
             ['userid' => $user->id, 'assignmentid' => $job2->id, 'newposition' => 2]
         );
+        $result = $result->toArray(true);
+        self::assertArrayHasKey('data', $result);
         self::assertSame(
-            ['data' => ['totara_job_move_assignment' => true]],
-            array_map($map, $result->toArray(true))
+            ['totara_job_move_assignment' => true],
+            $result['data']
         );
         self::assertEquals([$job3->id, $job1->id, $job2->id], array_keys($DB->get_records('job_assignment', ['userid' => $job1->userid], 'sortorder ASC', 'id')));
     }

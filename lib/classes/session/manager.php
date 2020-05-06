@@ -135,8 +135,7 @@ class manager {
 
         $info = array();
         $info['size'] = $size;
-        $info['html'] = "<span class=\"sessionsize\">Session ($handler): $size</span> ";
-        $info['txt'] = "Session ($handler): $size ";
+        $info['handler'] = $handler;
 
         return $info;
     }

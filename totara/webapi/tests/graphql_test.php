@@ -70,18 +70,51 @@ class totara_webapi_graphql_testcase extends advanced_testcase {
         );
         $this->assertInstanceOf('GraphQL\Executor\ExecutionResult', $result);
         $result = $result->toArray(true);
+        $this->assertArrayHasKey('data', $result);
         $this->assertSame([
-            'data' => [
-                'lang_strings' => [
-                    [
-                        'lang' => 'en',
-                        'identifier' => 'edit',
-                        'component' => 'core',
-                        'string' => 'Edit'
-                    ]
+            'lang_strings' => [
+                [
+                    'lang' => 'en',
+                    'identifier' => 'edit',
+                    'component' => 'core',
+                    'string' => 'Edit'
                 ]
             ]
-        ], $result);
+        ], $result['data']);
+    }
+
+    public function test_execute_operation_with_performance_metrics() {
+        // Any operation will do here.
+        $result = graphql::execute_operation(
+            execution_context::create('ajax', 'core_lang_strings_nosession'),
+            [
+                'lang' => 'en',
+                'ids' => [
+                    'edit,core'
+                ]
+            ]
+        );
+        $this->assertInstanceOf('GraphQL\Executor\ExecutionResult', $result);
+        $result = $result->toArray(true);
+        $this->assertArrayNotHasKey('extensions', $result);
+
+        // Activate performance config
+        set_config('perfdebug', 15);
+
+        // Any operation will do here.
+        $result = graphql::execute_operation(
+            execution_context::create('ajax', 'core_lang_strings_nosession'),
+            [
+                'lang' => 'en',
+                'ids' => [
+                    'edit,core'
+                ]
+            ]
+        );
+        $this->assertInstanceOf('GraphQL\Executor\ExecutionResult', $result);
+        $result = $result->toArray(true);
+        $this->assertArrayHasKey('extensions', $result);
+        $this->assertArrayHasKey('performance_data', $result['extensions']);
     }
 
     public function test_execute_operation_with_error_result() {

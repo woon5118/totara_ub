@@ -141,17 +141,16 @@ class totara_reportbuilder_webapi_resolver_mutation_update_report_title_testcase
         $r1 =  $this->create_report('user' , 'Test Report 1');
         $r2 =  $this->create_report('user' , 'Test Report 2');
 
-        $map = function ($obj) {
-            return (array)$obj;
-        };
         $result = $this->execute_graphql_operation(
             'totara_reportbuilder_update_report_title',
             ['reportid' => $r1, 'title' => 'Test Report 3']
         );
 
+        $result = $result->toArray(true);
+        self::assertArrayHasKey('data', $result);
         self::assertSame(
-            ['data' => ['totara_reportbuilder_update_report_title' => 'Test Report 3']],
-            array_map($map, $result->toArray(true))
+            ['totara_reportbuilder_update_report_title' => 'Test Report 3'],
+            $result['data']
         );
 
         $item = $DB->get_record('report_builder', ['id' => $r1]);

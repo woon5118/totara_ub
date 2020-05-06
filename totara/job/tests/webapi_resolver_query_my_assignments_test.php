@@ -109,39 +109,34 @@ class totara_job_webapi_resolver_query_my_assignments_testcase extends advanced_
         );
 
         $result = $this->execute_graphql_operation('totara_job_my_assignments', []);
+        $result = $result->toArray(true);
+        self::assertArrayHasKey('data', $result);
         self::assertSame(
             [
-                'data' => [
-                    'totara_job_my_assignments' => [
-                        [
-                            'id' => $job1->id,
-                            'fullname' => 'Unnamed job assignment (ID: j1)',
-                            'idnumber' => 'j1',
-                            'managerja' => null,
-                            'appraiser' => null,
+                'totara_job_my_assignments' => [
+                    [
+                        'id' => $job1->id,
+                        'fullname' => 'Unnamed job assignment (ID: j1)',
+                        'idnumber' => 'j1',
+                        'managerja' => null,
+                        'appraiser' => null,
+                    ],
+                    [
+                        'id' => $job2->id,
+                        'fullname' => 'Unnamed job assignment (ID: j2)',
+                        'idnumber' => 'j2',
+                        'managerja' => [
+                            'user' => [
+                                'fullname' => fullname($manager)
+                            ]
                         ],
-                        [
-                            'id' => $job2->id,
-                            'fullname' => 'Unnamed job assignment (ID: j2)',
-                            'idnumber' => 'j2',
-                            'managerja' => [
-                                'user' => [
-                                    'fullname' => fullname($manager)
-                                ]
-                            ],
-                            'appraiser' => [
-                                'fullname' => fullname($appraiser)
-                            ],
+                        'appraiser' => [
+                            'fullname' => fullname($appraiser)
                         ],
-                    ]
+                    ],
                 ]
             ],
-            array_map(
-                function ($obj) {
-                    return (array)$obj;
-                },
-                $result->toArray()
-            )
+            $result['data']
         );
     }
 }

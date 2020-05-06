@@ -167,10 +167,6 @@ class totara_job_webapi_resolver_mutation_create_assignment_testcase extends adv
         $posframework = $generator->create_pos_frame([]);
         $position = $generator->create_pos(['frameworkid' => $posframework->id, 'typeid' => $generator->create_pos_type([])]);
 
-        $map = function ($obj) {
-            return (array)$obj;
-        };
-
         $result = $this->execute_graphql_operation(
             'totara_job_create_assignment',
             [
@@ -179,9 +175,11 @@ class totara_job_webapi_resolver_mutation_create_assignment_testcase extends adv
             ]
         );
         $job = $DB->get_record('job_assignment', ['userid' => $user->id, 'idnumber' => 'j1'], '*', IGNORE_MISSING);
+        $result = $result->toArray(true);
+        self::assertArrayHasKey('data', $result);
         self::assertSame(
-            ['data' => ['totara_job_create_assignment' => $job->id]],
-            array_map($map, $result->toArray(true))
+            ['totara_job_create_assignment' => $job->id],
+            $result['data']
         );
         self::assertSame(null, $job->fullname);
         self::assertSame(null, $job->shortname);
@@ -214,9 +212,11 @@ class totara_job_webapi_resolver_mutation_create_assignment_testcase extends adv
             ]
         );
         $job = $DB->get_record('job_assignment', ['userid' => $user->id, 'idnumber' => 'j2'], '*', IGNORE_MISSING);
+        $result = $result->toArray(true);
+        self::assertArrayHasKey('data', $result);
         self::assertSame(
-            ['data' => ['totara_job_create_assignment' => $job->id]],
-            array_map($map, $result->toArray(true))
+            ['totara_job_create_assignment' => $job->id],
+            $result['data']
         );
         self::assertSame('Test fullname', $job->fullname);
         self::assertSame('Test shortname', $job->shortname);

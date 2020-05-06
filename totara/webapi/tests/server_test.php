@@ -113,6 +113,43 @@ class totara_webapi_server_test extends advanced_testcase {
             $this->assertEquals('ok',  $data['status']);
             $this->assertArrayHasKey('timestamp',  $data);
             $this->assertGreaterThan(0,  $data['timestamp']);
+
+            $this->assertArrayNotHasKey('extensions', $result);
+        }
+    }
+
+    public function test_batched_queries_with_performance_metrics() {
+        // Activate performance config
+        set_config('perfdebug', 15);
+
+        $server = new server(execution_context::create(graphql::TYPE_AJAX));
+
+        $request_params = [
+            [
+                'operationName' => 'totara_webapi_status_nosession',
+                'variables' => []
+            ],
+            [
+                'operationName' => 'totara_webapi_status_nosession',
+                'variables' => []
+            ],
+            [
+                'operationName' => 'totara_webapi_status_nosession',
+                'variables' => []
+            ],
+        ];
+        $request = new request(graphql::TYPE_AJAX, $request_params);
+
+        $results = $server->handle_request($request);
+        $this->assertIsArray($results);
+        $this->assertContainsOnlyInstancesOf(ExecutionResult::class, $results);
+        $this->assertCount(3, $results);
+
+        foreach ($results as $result) {
+            $result = $result->toArray(Debug::INCLUDE_DEBUG_MESSAGE | Debug::INCLUDE_TRACE);
+            $this->assertArrayHasKey('data', $result);
+            $this->assertArrayHasKey('extensions', $result);
+            $this->assertArrayHasKey('performance_data', $result['extensions']);
         }
     }
 

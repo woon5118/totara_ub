@@ -24,6 +24,7 @@
 namespace totara_webapi;
 
 use coding_exception;
+use core\perf_stats\collector;
 use core\webapi\execution_context;
 use Exception;
 use GraphQL\Error\Debug;
@@ -32,6 +33,7 @@ use GraphQL\Executor\ExecutionResult;
 use GraphQL\Server\OperationParams;
 use GraphQL\Server\StandardServer;
 use GraphQL\Type\Schema;
+use stdClass;
 use Throwable;
 use totara_webapi\local\util;
 
@@ -109,6 +111,8 @@ class server {
      * @return ExecutionResult|ExecutionResult[]
      */
     public function handle_request(request $request = null) {
+        global $CFG;
+
         try {
             if (!$request) {
                 $request = new request($this->type);
@@ -143,6 +147,8 @@ class server {
             $result = new ExecutionResult(null, [$e]);
             $result->setErrorsHandler([util::class, 'graphql_error_handler']);
         }
+
+        $this->add_performance_data_to_result($result);
         
         return $result;
     }
@@ -205,6 +211,37 @@ class server {
         $params['webapi_type'] = $this->type;
         $params = fix_utf8($params);
         return OperationParams::create($params);
+    }
+
+    /**
+     * If site is configured to capture performance metrics append it in the results.
+     * This also works for batched queries.
+     *
+     * @param ExecutionResult|ExecutionResult[] $results
+     */
+    protected function add_performance_data_to_result($results) {
+        global $CFG;
+
+        if ((defined('MDL_PERF') && MDL_PERF === true)
+            || (!empty($CFG->perfdebug) && $CFG->perfdebug > 7)
+        ) {
+            // We only want to query the performance metrics once per request
+            // so do it once and pass it on if we have multiple results
+            $collector = new collector();
+            $performance_data = $collector->all();
+
+            // If this is a batched queries we will have multiple results
+            // so go through them and add the performance metrics for them
+            if (is_array($results)) {
+                foreach ($results as $result) {
+                    if ($result instanceof ExecutionResult) {
+                        $result->extensions['performance_data'] = $performance_data;
+                    }
+                }
+            } else if ($results instanceof ExecutionResult) {
+                $results->extensions['performance_data'] = $performance_data;
+            }
+        }
     }
 
     /**

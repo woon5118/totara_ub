@@ -193,16 +193,15 @@ class totara_job_webapi_resolver_mutation_sort_assignments_testcase extends adva
         $job2 =  $this->create_job_assignment(['userid' => $user->id, 'idnumber' => 'j2']);
         $job3 =  $this->create_job_assignment(['userid' => $user->id, 'idnumber' => 'j3']);
 
-        $map = function($obj) {
-            return (array)$obj;
-        };
         $result = $this->execute_graphql_operation(
             'totara_job_sort_assignments',
             ['userid' => $user->id, 'assignmentids' => [$job3->id, $job2->id, $job1->id]]
         );
+        $result = $result->toArray(true);
+        self::assertArrayHasKey('data', $result);
         self::assertSame(
-            ['data' => ['totara_job_sort_assignments' => true]],
-            array_map($map, $result->toArray(true))
+            ['totara_job_sort_assignments' => true],
+            $result['data']
         );
         self::assertEquals([$job3->id, $job2->id, $job1->id], array_keys($DB->get_records('job_assignment', ['userid' => $job1->userid], 'sortorder ASC', 'id')));
 
@@ -210,9 +209,11 @@ class totara_job_webapi_resolver_mutation_sort_assignments_testcase extends adva
             'totara_job_sort_assignments',
             ['userid' => $user->id, 'assignmentids' => [$job2->id, $job3->id, $job1->id]]
         );
+        $result = $result->toArray(true);
+        self::assertArrayHasKey('data', $result);
         self::assertSame(
-            ['data' => ['totara_job_sort_assignments' => true]],
-            array_map($map, $result->toArray(true))
+            ['totara_job_sort_assignments' => true],
+            $result['data']
         );
         self::assertEquals([$job2->id, $job3->id, $job1->id], array_keys($DB->get_records('job_assignment', ['userid' => $job1->userid], 'sortorder ASC', 'id')));
     }

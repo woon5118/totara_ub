@@ -28,6 +28,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use core\perf_stats\collector;
 use totara_core\advanced_feature;
 
 defined('MOODLE_INTERNAL') || die();
@@ -9645,120 +9646,98 @@ function array_is_nested($array) {
 function get_performance_info() {
     global $CFG, $PERF, $DB, $PAGE;
 
-    $info = array();
-    $info['txt']  = me() . ' '; // Holds log-friendly representation.
+    $collector = new collector();
+    $data = $collector->all();
+    // All data we need is in core right now
+    $data = $data->core;
 
+    $info = array();
+    // Holds log-friendly representation.
+    $info['txt'] = me() . ' ';
+
+    // Holds userfriendly HTML representation.
     $info['html'] = '';
     if (!empty($CFG->themedesignermode)) {
         // Attempt to avoid devs debugging peformance issues, when its caused by css building and so on.
         $info['html'] .= '<p><strong>Warning: Theme designer mode is enabled.</strong></p>';
     }
-    $info['html'] .= '<ul class="list-unstyled m-l-1 row">';         // Holds userfriendly HTML representation.
+    $info['html'] .= '<ul class="list-unstyled m-l-1 row">';
 
-    $info['realtime'] = microtime_diff($PERF->starttime, microtime());
+    // Time to load
+    $info['html'] .= '<li class="timeused col-sm-4">'.$data->realtime.' secs</li> ';
+    $info['txt'] .= 'time: '.$data->realtime.'s ';
 
-    $info['html'] .= '<li class="timeused col-sm-4">'.$info['realtime'].' secs</li> ';
-    $info['txt'] .= 'time: '.$info['realtime'].'s ';
+    // Memory total usage
+    $info['html'] .= '<li class="memoryused col-sm-4">RAM: '.display_size($data->memory->total).'</li> ';
+    $info['txt']  .= 'memory_total: '.$data->memory->total.'B (' . display_size($data->memory->total).') memory_growth: '.
+        $data->memory->growth.'B ('.display_size($data->memory->growth).') ';
 
-    if (function_exists('memory_get_usage')) {
-        $info['memory_total'] = memory_get_usage();
-        $info['memory_growth'] = memory_get_usage() - $PERF->startmemory;
-        $info['html'] .= '<li class="memoryused col-sm-4">RAM: '.display_size($info['memory_total']).'</li> ';
-        $info['txt']  .= 'memory_total: '.$info['memory_total'].'B (' . display_size($info['memory_total']).') memory_growth: '.
-            $info['memory_growth'].'B ('.display_size($info['memory_growth']).') ';
-    }
-
-    if (function_exists('memory_get_peak_usage')) {
-        $info['memory_peak'] = memory_get_peak_usage();
-        $info['html'] .= '<li class="memoryused col-sm-4">RAM peak: '.display_size($info['memory_peak']).'</li> ';
-        $info['txt']  .= 'memory_peak: '.$info['memory_peak'].'B (' . display_size($info['memory_peak']).') ';
-    }
+    // Memory peak usage
+    $info['html'] .= '<li class="memoryused col-sm-4">RAM peak: '.display_size($data->memory->peak).'</li> ';
+    $info['txt']  .= 'memory_peak: '.$data->memory->peak.'B (' . display_size($data->memory->peak).') ';
 
     $info['html'] .= '</ul><ul class="list-unstyled m-l-1 row">';
-    $inc = get_included_files();
-    $info['includecount'] = count($inc);
-    $info['html'] .= '<li class="included col-sm-4">Included '.$info['includecount'].' files</li> ';
-    $info['txt']  .= 'includecount: '.$info['includecount'].' ';
+
+    // Included files count
+    $info['html'] .= '<li class="included col-sm-4">Included '.$data->includecount.' files</li> ';
+    $info['txt']  .= 'includecount: '.$data->includecount.' ';
 
     if (!empty($CFG->early_install_lang) or empty($PAGE)) {
         // We can not track more performance before installation or before PAGE init, sorry.
         return $info;
     }
 
-    $filtermanager = filter_manager::instance();
-    if (method_exists($filtermanager, 'get_performance_summary')) {
-        list($filterinfo, $nicenames) = $filtermanager->get_performance_summary();
-        $info = array_merge($filterinfo, $info);
-        foreach ($filterinfo as $key => $value) {
-            $info['html'] .= "<li class='$key col-sm-4'>$nicenames[$key]: $value </li> ";
+    // Filter performance summary
+    if (!empty($data->filters)) {
+        foreach ($data->filters->data as $key => $value) {
+            $info['html'] .= "<li class='$key col-sm-4'>{$data->filters->names[$key]}: {$value} </li> ";
             $info['txt'] .= "$key: $value ";
         }
     }
 
-    $stringmanager = get_string_manager();
-    if (method_exists($stringmanager, 'get_performance_summary')) {
-        list($filterinfo, $nicenames) = $stringmanager->get_performance_summary();
-        $info = array_merge($filterinfo, $info);
-        foreach ($filterinfo as $key => $value) {
-            $info['html'] .= "<li class='$key col-sm-4'>$nicenames[$key]: $value </li> ";
+    // String Manager performance summary
+    if (!empty($data->strings)) {
+        foreach ($data->strings->data as $key => $value) {
+            $info['html'] .= "<li class='$key col-sm-4'>{$data->strings->names[$key]}: {$value} </li> ";
             $info['txt'] .= "$key: $value ";
         }
     }
 
-    if (!empty($PERF->logwrites)) {
-        $info['logwrites'] = $PERF->logwrites;
-        $info['html'] .= '<li class="logwrites col-sm-4">Log DB writes '.$info['logwrites'].'</li> ';
-        $info['txt'] .= 'logwrites: '.$info['logwrites'].' ';
+    // Log writes
+    if ($data->logwrites !== null) {
+        $info['html'] .= '<li class="logwrites col-sm-4">Log DB writes '.$data->logwrites.'</li> ';
+        $info['txt'] .= 'logwrites: '.$data->logwrites.' ';
     }
 
-    $info['dbqueries'] = $DB->perf_get_reads().'/'.($DB->perf_get_writes() - $PERF->logwrites);
-    $info['html'] .= '<li class="dbqueries col-sm-4">DB reads/writes: '.$info['dbqueries'].'</li> ';
-    $info['txt'] .= 'db reads/writes: '.$info['dbqueries'].' ';
+    // DB Queries and time
+    $queries = $data->db->reads.'/'.$data->db->writes;
+    $info['html'] .= '<li class="dbqueries col-sm-4">DB reads/writes: '.$queries.'</li> ';
+    $info['txt'] .= 'db reads/writes: '.$queries.' ';
 
-    $info['dbtime'] = round($DB->perf_get_queries_time(), 5);
-    $info['html'] .= '<li class="dbtime col-sm-4">DB queries time: '.$info['dbtime'].' secs</li> ';
-    $info['txt'] .= 'db queries time: ' . $info['dbtime'] . 's ';
+    $info['html'] .= '<li class="dbtime col-sm-4">DB queries time: '.$data->db->time.' secs</li> ';
+    $info['txt'] .= 'db queries time: ' . $data->db->time . 's ';
 
-    if (function_exists('posix_times')) {
-        $ptimes = posix_times();
-        if (is_array($ptimes)) {
-            foreach ($ptimes as $key => $val) {
-                $info[$key] = $ptimes[$key] -  $PERF->startposixtimes[$key];
-            }
-            $info['html'] .= "<li class=\"posixtimes col-sm-4\">ticks: $info[ticks] user: $info[utime]";
-            $info['html'] .= "sys: $info[stime] cuser: $info[cutime] csys: $info[cstime]</li> ";
-            $info['txt'] .= "ticks: $info[ticks] user: $info[utime] sys: $info[stime] cuser: $info[cutime] csys: $info[cstime] ";
-        }
+    if ($data->posix_times !== null) {
+        $info['html'] .= "<li class=\"posixtimes col-sm-4\">ticks: ".$data->posix_times->ticks." user: ".$data->posix_times->utime." ";
+        $info['html'] .= "sys: ".$data->posix_times->stime." cuser: ".$data->posix_times->cutime." csys: ".$data->posix_times->cstime."</li> ";
+        $info['txt'] .= "ticks: ".$data->posix_times->ticks." user: ".$data->posix_times->utime." sys: ".$data->posix_times->stime." cuser: ".$data->posix_times->cutime." csys: ".$data->posix_times->cstime." ";
     }
 
-    // Grab the load average for the last minute.
-    // /proc will only work under some linux configurations
-    // while uptime is there under MacOSX/Darwin and other unices.
-    if (is_readable('/proc/loadavg') && $loadavg = @file('/proc/loadavg')) {
-        list($serverload) = explode(' ', $loadavg[0]);
-        unset($loadavg);
-    } else if ( function_exists('is_executable') && is_executable('/usr/bin/uptime') && $loadavg = `/usr/bin/uptime` ) {
-        if (preg_match('/load averages?: (\d+[\.,:]\d+)/', $loadavg, $matches)) {
-            $serverload = $matches[1];
-        } else {
-            trigger_error('Could not parse uptime output!');
-        }
-    }
-    if (!empty($serverload)) {
-        $info['serverload'] = $serverload;
-        $info['html'] .= '<li class="serverload col-sm-4">Load average: '.$info['serverload'].'</li> ';
-        $info['txt'] .= "serverload: {$info['serverload']} ";
+    // Server load
+    if ($data->server_load !== null) {
+        $info['html'] .= '<li class="serverload col-sm-4">Load average: '.$data->server_load.'</li> ';
+        $info['txt'] .= "serverload: {$data->server_load} ";
     }
 
     // Display size of session if session started.
-    if ($si = \core\session\manager::get_performance_info()) {
-        $info['sessionsize'] = $si['size'];
-        $info['html'] .= "<li class=\"serverload col-sm-4\">" . $si['html'] . "</li>";
-        $info['txt'] .= $si['txt'];
+    if ($data->session !== null) {
+        $info['html'] .= "<li class=\"serverload col-sm-4\"><span class=\"sessionsize\">Session ({$data->session->handler}): {$data->session->size}</span></li>";
+        $info['txt'] .= "Session ({$data->session->handler}): {$data->session->size} ";
     }
 
     $info['html'] .= '</ul>';
-    if ($stats = cache_helper::get_stats()) {
+    if (!empty($data->cache)) {
+        $stats = $data->cache;
         $html = '<ul class="cachesused list-unstyled m-l-1 row">';
         $html .= '<li class="cache-stats-heading font-weight-bold">Caches used (hits/misses/sets)</li>';
         $html .= '</ul><ul class="cachesused list-unstyled m-l-1">';
@@ -9811,11 +9790,9 @@ function get_performance_info() {
         }
         $html .= '</ul> ';
         $html .= "<div class='cache-total-stats row'>Total: $hits / $misses / $sets</div>";
-        $info['cachesused'] = "$hits / $misses / $sets";
         $info['html'] .= $html;
         $info['txt'] .= $text.'. ';
     } else {
-        $info['cachesused'] = '0 / 0 / 0';
         $info['html'] .= '<div class="cachesused">Caches used (hits/misses/sets): 0/0/0</div>';
         $info['txt'] .= 'Caches used (hits/misses/sets): 0/0/0 ';
     }

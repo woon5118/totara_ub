@@ -138,28 +138,30 @@ class totara_job_webapi_resolver_mutation_delete_assignment_testcase extends adv
         $job2 =  $this->create_job_assignment(['userid' => $user->id, 'idnumber' => 'j2']);
         $job3 =  $this->create_job_assignment(['userid' => $user->id, 'idnumber' => 'j3']);
 
-        $map = function ($obj) {
-            return (array)$obj;
-        };
-
         $result = $this->execute_graphql_operation('totara_job_delete_assignment', ['userid' => $user->id, 'assignmentid' => $job3->id]);
+        $result = $result->toArray(true);
+        self::assertArrayHasKey('data', $result);
         self::assertSame(
-            ['data' => ['totara_job_delete_assignment' => true]],
-            array_map($map, $result->toArray(true))
+            ['totara_job_delete_assignment' => true],
+            $result['data']
         );
         self::assertEquals([$job1->id, $job2->id], array_keys($DB->get_records('job_assignment', ['userid' => $job1->userid], 'sortorder ASC', 'id')));
 
         $result = $this->execute_graphql_operation('totara_job_delete_assignment', ['userid' => $user->id, 'assignmentid' => $job2->id]);
+        $result = $result->toArray(true);
+        self::assertArrayHasKey('data', $result);
         self::assertSame(
-            ['data' => ['totara_job_delete_assignment' => true]],
-            array_map($map, $result->toArray(true))
+            ['totara_job_delete_assignment' => true],
+            $result['data']
         );
         self::assertEquals([$job1->id], array_keys($DB->get_records('job_assignment', ['userid' => $job1->userid], 'sortorder ASC', 'id')));
 
         $result = $this->execute_graphql_operation('totara_job_delete_assignment', ['userid' => $user->id, 'assignmentid' => $job1->id]);
+        $result = $result->toArray(true);
+        self::assertArrayHasKey('data', $result);
         self::assertSame(
-            ['data' => ['totara_job_delete_assignment' => true]],
-            array_map($map, $result->toArray(true))
+            ['totara_job_delete_assignment' => true],
+            $result['data']
         );
         self::assertEquals([], array_keys($DB->get_records('job_assignment', ['userid' => $job1->userid], 'sortorder ASC', 'id')));
     }

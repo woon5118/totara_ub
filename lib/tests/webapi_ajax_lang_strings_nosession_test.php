@@ -25,46 +25,77 @@ use \totara_webapi\graphql;
 use core\webapi\execution_context;
 
 class core_webapi_ajax_lang_strings_nosession_testcase extends advanced_testcase {
+
     public function test_execute() {
         $this->setUser(null);
 
-        $result = graphql::execute_operation(execution_context::create('ajax', 'core_lang_strings_nosession'), ['lang' => 'en', 'ids' => ['edit,core']]);
+        $result = graphql::execute_operation(
+            execution_context::create('ajax', 'core_lang_strings_nosession'),
+            ['lang' => 'en', 'ids' => ['edit,core']]
+        );
         $result = $result->toArray(true);
-        $expected = ['data' => ['lang_strings' => [
-            ['lang' => 'en', 'identifier' => 'edit', 'component' => 'core', 'string' => 'Edit'],
-        ]]];
-        $this->assertSame($expected, $result);
+        $expected = [
+            'lang_strings' => [
+                ['lang' => 'en', 'identifier' => 'edit', 'component' => 'core', 'string' => 'Edit'],
+            ]
+        ];
+        $this->assertArrayHasKey('data', $result);
+        $this->assertSame($expected, $result['data']);
 
-        $result = graphql::execute_operation(execution_context::create('ajax', 'core_lang_strings_nosession'), ['lang' => 'en', 'ids' => [' edit , core ', 'delete , moodle']]);
+        $result = graphql::execute_operation(
+            execution_context::create('ajax', 'core_lang_strings_nosession'),
+            ['lang' => 'en', 'ids' => [' edit , core ', 'delete , moodle']]
+        );
         $result = $result->toArray(true);
-        $expected = ['data' => ['lang_strings' => [
-            ['lang' => 'en', 'identifier' => 'edit', 'component' => 'core', 'string' => 'Edit'],
-            ['lang' => 'en', 'identifier' => 'delete', 'component' => 'moodle', 'string' => 'Delete'],
-        ]]];
-        $this->assertSame($expected, $result);
-
-        $result = graphql::execute_operation(execution_context::create('ajax', 'core_lang_strings_nosession'), ['lang' => 'xx', 'ids' => ['edit,core']]);
+        $expected = [
+            'lang_strings' => [
+                ['lang' => 'en', 'identifier' => 'edit', 'component' => 'core', 'string' => 'Edit'],
+                ['lang' => 'en', 'identifier' => 'delete', 'component' => 'moodle', 'string' => 'Delete'],
+            ]
+        ];
+        $this->assertArrayHasKey('data', $result);
+        $this->assertSame($expected, $result['data']);
+        $result = graphql::execute_operation(
+            execution_context::create('ajax', 'core_lang_strings_nosession'),
+            ['lang' => 'xx', 'ids' => ['edit,core']]
+        );
         $result = $result->toArray(true);
         $this->assertArrayNotHasKey('data', $result);
-        $this->assertSame('Variable "$lang" got invalid value "xx"; Expected type param_lang; Invalid parameter value detected', $result['errors'][0]['debugMessage']);
+        $this->assertSame(
+            'Variable "$lang" got invalid value "xx"; Expected type param_lang; Invalid parameter value detected',
+            $result['errors'][0]['debugMessage']
+        );
 
         $this->assertDebuggingNotCalled();
-        $result = graphql::execute_operation(execution_context::create('ajax', 'core_lang_strings_nosession'), ['lang' => 'en', 'ids' => ['xxedit,core']]);
+        $result = graphql::execute_operation(
+            execution_context::create('ajax', 'core_lang_strings_nosession'),
+            ['lang' => 'en', 'ids' => ['xxedit,core']]
+        );
         $result = $result->toArray(true);
-        $expected = ['data' => ['lang_strings' => [
-            ['lang' => 'en', 'identifier' => 'xxedit', 'component' => 'core', 'string' => '[[xxedit]]'],
-        ]]];
-        $this->assertSame($expected, $result);
+        $expected = [
+            'lang_strings' => [
+                ['lang' => 'en', 'identifier' => 'xxedit', 'component' => 'core', 'string' => '[[xxedit]]'],
+            ]
+        ];
+        $this->assertArrayHasKey('data', $result);
+        $this->assertSame($expected, $result['data']);
         $this->assertDebuggingCalled();
 
-        $result = graphql::execute_operation(execution_context::create('ajax', 'core_lang_strings_nosession'), ['lang' => '', 'ids' => ['edit,core']]);
+        $result = graphql::execute_operation(
+            execution_context::create('ajax', 'core_lang_strings_nosession'),
+            ['lang' => '', 'ids' => ['edit,core']]
+        );
         $result = $result->toArray(true);
         $this->assertArrayNotHasKey('data', $result);
         $this->assertSame('Cannot return null for non-nullable field core_lang_string.lang.', $result['errors'][0]['debugMessage']);
 
-        $result = graphql::execute_operation(execution_context::create('ajax', 'core_lang_strings_nosession'), ['ids' => ['edit,core']]);
+        $result = graphql::execute_operation(
+            execution_context::create('ajax', 'core_lang_strings_nosession'),
+            ['ids' => ['edit,core']]
+        );
         $result = $result->toArray(true);
         $this->assertArrayNotHasKey('data', $result);
         $this->assertSame('Variable "$lang" of required type "param_lang!" was not provided.', $result['errors'][0]['message']);
     }
+
 }

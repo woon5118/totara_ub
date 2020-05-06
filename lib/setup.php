@@ -274,19 +274,21 @@ if (!defined('PHPUNIT_TEST')) {
 }
 
 // Performance tests needs to always display performance info, even in redirections.
-if (!defined('MDL_PERF_TEST')) {
-    define('MDL_PERF_TEST', false);
+if (defined('MDL_PERF_TEST')) {
+    if (MDL_PERF_TEST) {
+        // We force the ones we need.
+        if (!defined('MDL_PERF')) {
+            define('MDL_PERF', true);
+        }
+        if (!defined('MDL_PERFDB')) {
+            define('MDL_PERFDB', true);
+        }
+        if (!defined('MDL_PERFTOFOOT')) {
+            define('MDL_PERFTOFOOT', true);
+        }
+    }
 } else {
-    // We force the ones we need.
-    if (!defined('MDL_PERF')) {
-        define('MDL_PERF', true);
-    }
-    if (!defined('MDL_PERFDB')) {
-        define('MDL_PERFDB', true);
-    }
-    if (!defined('MDL_PERFTOFOOT')) {
-        define('MDL_PERFTOFOOT', true);
-    }
+    define('MDL_PERF_TEST', false);
 }
 
 // When set to true MUC (Moodle caching) will be disabled as much as possible.

@@ -137,55 +137,41 @@ class totara_job_webapi_resolver_query_assignments_testcase extends advanced_tes
             ['userid' => $user->id]
         );
         $expected = [
-            'data' => [
-                'totara_job_assignments' => [
-                    [
-                        'id' => $job1->id,
-                        'fullname' => 'Unnamed job assignment (ID: j1)',
-                        'idnumber' => 'j1',
-                        'managerja' => null,
-                        'appraiser' => null,
+            'totara_job_assignments' => [
+                [
+                    'id' => $job1->id,
+                    'fullname' => 'Unnamed job assignment (ID: j1)',
+                    'idnumber' => 'j1',
+                    'managerja' => null,
+                    'appraiser' => null,
+                ],
+                [
+                    'id' => $job2->id,
+                    'fullname' => 'Unnamed job assignment (ID: j2)',
+                    'idnumber' => 'j2',
+                    'managerja' => [
+                        'user' => [
+                            'fullname' => fullname($manager)
+                        ]
                     ],
-                    [
-                        'id' => $job2->id,
-                        'fullname' => 'Unnamed job assignment (ID: j2)',
-                        'idnumber' => 'j2',
-                        'managerja' => [
-                            'user' => [
-                                'fullname' => fullname($manager)
-                            ]
-                        ],
-                        'appraiser' => [
-                            'fullname' => fullname($appraiser)
-                        ],
+                    'appraiser' => [
+                        'fullname' => fullname($appraiser)
                     ],
-                ]
+                ],
             ]
         ];
-        self::assertSame(
-            $expected,
-            array_map(
-                function ($obj) {
-                    return (array)$obj;
-                },
-                $result->toArray(Debug::INCLUDE_DEBUG_MESSAGE)
-            )
-        );
+        $result = $result->toArray(true);
+        $this->assertArrayHasKey('data', $result);
+        $this->assertSame($expected, $result['data']);
 
         $this->setUser($user);
         $result = graphql::execute_operation(
             execution_context::create('ajax', 'totara_job_assignments'),
             ['userid' => $user->id]
         );
-        self::assertSame(
-            $expected,
-            array_map(
-                function ($obj) {
-                    return (array)$obj;
-                },
-                $result->toArray(Debug::INCLUDE_DEBUG_MESSAGE)
-            )
-        );
+        $result = $result->toArray(true);
+        $this->assertArrayHasKey('data', $result);
+        $this->assertSame($expected, $result['data']);
 
         // Invalid userid
         $result = $this->execute_graphql_operation('totara_job_assignments', ['userid' => 'apples']);
