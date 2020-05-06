@@ -59,7 +59,7 @@ import Button from 'totara_core/components/buttons/Button';
 import ButtonCancel from 'totara_core/components/buttons/Cancel';
 import ButtonGroup from 'totara_core/components/buttons/ButtonGroup';
 import ButtonSubmit from 'totara_core/components/buttons/Submit';
-import ContentAddElementButton from 'mod_perform/components/manage_activity/ContentAddElementButton';
+import ContentAddElementButton from 'mod_perform/components/manage_activity/content/ContentAddElementButton';
 import Modal from 'totara_core/components/modal/Modal';
 import ModalContent from 'totara_core/components/modal/ModalContent';
 import sectionDetailQuery from 'mod_perform/graphql/section_admin';

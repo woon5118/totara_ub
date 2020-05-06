@@ -101,11 +101,11 @@ import Button from 'totara_core/components/buttons/Button';
 import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
 import Card from 'totara_core/components/card/Card';
 import DeleteIcon from 'totara_core/components/icons/common/Delete';
-import EditSectionContentModal from 'mod_perform/components/manage_activity/EditSectionContentModal';
+import EditSectionContentModal from 'mod_perform/components/manage_activity/content/EditSectionContentModal';
 import Grid from 'totara_core/components/grid/Grid';
 import GridItem from 'totara_core/components/grid/GridItem';
 import ModalPresenter from 'totara_core/components/modal/ModalPresenter';
-import ParticipantsPopover from 'mod_perform/components/manage_activity/ParticipantsPopover';
+import ParticipantsPopover from 'mod_perform/components/manage_activity/content/ParticipantsPopover';
 import UpdateSectionRelationshipsMutation from 'mod_perform/graphql/update_section_relationships.graphql';
 
 export default {

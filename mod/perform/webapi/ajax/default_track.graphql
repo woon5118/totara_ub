@@ -3,6 +3,7 @@ query mod_perform_default_track($activity_id: param_integer!) {
     id
     description
     status
+    schedule_type
     assignments {
       type
       group {

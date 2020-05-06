@@ -103,6 +103,10 @@ class mod_perform_generator extends component_generator_base {
             /** @var perform_container $container */
             $activity = activity::create($container, $name, $type_model, $description, $status);
 
+            if (isset($data['create_track']) && $data['create_track']) {
+                track::create($activity);
+            }
+
             if (isset($data['create_section']) && $data['create_section']) {
                 section::create($activity);
             }
@@ -374,7 +378,7 @@ class mod_perform_generator extends component_generator_base {
                     $this->create_section_relationship($section, ['class_name' => $relationship_class]);
                 }
             }
-            $this->create_activity_tracks($activity);
+            $this->create_activity_tracks($activity, $configuration->get_number_of_tracks_per_activity());
             $activities[] = $activity;
         }
 
@@ -406,8 +410,9 @@ class mod_perform_generator extends component_generator_base {
                 }
             }
 
-            $track = track::load_by_activity($activity)->first();
-            $this->create_track_assignments_with_existing_groups($track, $cohorts);
+            foreach (track::load_by_activity($activity) as $track) {
+                $this->create_track_assignments_with_existing_groups($track, $cohorts);
+            }
         }
 
         // Expand assignments to user assignments

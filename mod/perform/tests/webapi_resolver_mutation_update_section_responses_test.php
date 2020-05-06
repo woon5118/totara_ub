@@ -42,7 +42,7 @@ use totara_webapi\graphql;
 /**
  * @group perform
  */
-class mod_perform_webapi_resolver_mutation_update_section_responses_testscase extends advanced_testcase {
+class mod_perform_webapi_resolver_mutation_update_section_responses_testcase extends advanced_testcase {
 
     public function test_successful_create_and_update(): void {
         self::setAdminUser();

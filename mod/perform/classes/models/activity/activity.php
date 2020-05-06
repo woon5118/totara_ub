@@ -213,7 +213,6 @@ class activity extends model {
             }
 
             $activity = self::load_by_entity($entity);
-            track::create($activity);
 
             return $activity;
         });

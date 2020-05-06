@@ -30,6 +30,7 @@ use core\webapi\mutation_resolver;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\activity_type;
 use mod_perform\models\activity\section;
+use mod_perform\models\activity\track;
 use mod_perform\state\activity\draft;
 use totara_core\advanced_feature;
 
@@ -77,10 +78,13 @@ class create_activity implements mutation_resolver {
             /** @var perform_container $container */
             $activity = activity::create($container, $name, $type_model, $description, $status);
 
+            // Create the first track for the entity.
+            track::create($activity);
+
             // Create the first section for the entity.
             section::create($activity);
 
-            return $activity;
+            return $activity->refresh();
         });
 
         $ec->set_relevant_context($activity->get_context());

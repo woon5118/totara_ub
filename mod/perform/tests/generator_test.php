@@ -26,6 +26,7 @@ use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\entities\activity\section_relationship;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
+use mod_perform\entities\activity\track as track_entity;
 use mod_perform\entities\activity\track_assignment as track_assignment_entity;
 use mod_perform\entities\activity\track_user_assignment as track_user_assignment_entity;
 use mod_perform\models\activity\track_status;
@@ -91,6 +92,7 @@ class mod_perform_generator_testcase extends advanced_testcase {
                 $this->assertEquals($track_id, $assignment->track_id, 'transient assignment');
                 $this->assertEquals(track_assignment_type::ADMIN, $assignment->type, 'wrong type');
 
+                /** @var grouping $group */
                 $group = $assignment->group;
                 $this->assertGreaterThan(0, $group->get_id(), 'no group id');
 
@@ -132,6 +134,10 @@ class mod_perform_generator_testcase extends advanced_testcase {
         $this->assertEquals($expected_activity->id, $actual_activity_entity->id);
         $this->assertEquals($expected_activity->type->id, $actual_activity_entity->type_id);
 
+        // Assert that there is the expected amount of tracks in the database
+        $tracks_in_db = track_entity::repository()->get();
+        $this->assertCount(1, $tracks_in_db);
+
         // Assert that there is the expected amount of assignments in the database
         $assignments_in_db = track_assignment_entity::repository()->get();
         $this->assertCount(1, $assignments_in_db);
@@ -158,8 +164,10 @@ class mod_perform_generator_testcase extends advanced_testcase {
 
         $configuration = mod_perform_activity_generator_configuration::new()
             ->set_number_of_activities(3)
+            ->set_number_of_tracks_per_activity(2)
             ->set_cohort_assignments_per_activity(4)
-            ->set_number_of_users_per_user_group_type(6)
+            ->set_number_of_users_per_user_group_type(5)
+            ->enable_appraiser_for_each_subject_user()
             ->set_relationships_per_section([subject::class, manager::class, appraiser::class]);
 
         $activities = $generator->create_full_activities($configuration);
@@ -172,23 +180,32 @@ class mod_perform_generator_testcase extends advanced_testcase {
         $actual_activity_ids = $activities_in_db->pluck('id');
         $this->assertEqualsCanonicalizing($expected_activity_ids, $actual_activity_ids);
 
+        // Assert that there is the expected amount of tracks in the database
+        $tracks_in_db = track_entity::repository()->get();
+        $this->assertCount(6, $tracks_in_db);
+
         // Assert that there is the expected amount of assignments in the database
+        // = 3 activities * 2 tracks * 4 cohorts.
         $assignments_in_db = track_assignment_entity::repository()->get();
-        $this->assertCount(12, $assignments_in_db);
+        $this->assertCount(24, $assignments_in_db);
 
         // Assert that there is the expected amount of user assignments in the database
+        // = 3 activities * 2 tracks * 4 cohorts * 5 users per group.
         $user_assignments_in_db = track_user_assignment_entity::repository()->get();
-        $this->assertCount(72, $user_assignments_in_db);
+        $this->assertCount(120, $user_assignments_in_db);
 
         // Assert that there is the expected amount of subject instances in the database
+        // = same as user assignments
         $subject_instances_in_db = subject_instance_entity::repository()->get();
-        $this->assertCount(72, $subject_instances_in_db);
+        $this->assertCount(120, $subject_instances_in_db);
 
         // Assert that there is the expected amount of participant instances in the database
+        // = 144 subject instances * 2 participants (subject + appraiser)
         $participant_instances_in_db = participant_instance_entity::repository()->get();
-        $this->assertCount(72, $participant_instances_in_db);
+        $this->assertCount(240, $participant_instances_in_db);
 
         // Assert that there is the expected amount of section relationships in the database
+        // = 3 activities * 3 roles
         $section_relationships_in_db = section_relationship::repository()->get();
         $this->assertCount(9, $section_relationships_in_db);
     }

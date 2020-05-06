@@ -12,8 +12,8 @@ Feature: Assign user groups to perform activities
       | learner3  | Learner   | Three    | three@example.com     |
       | learner4  | Learner   | Four     | four@example.com      |
     Given the following "activities" exist in "mod_perform" plugin:
-      | activity_name    | description      | activity_type |
-      | My Test Activity | My Test Activity | feedback      |
+      | activity_name    | description      | activity_type | create_track |
+      | My Test Activity | My Test Activity | feedback      | true         |
     And the following "cohorts" exist:
       | name        | idnumber    | description            | contextlevel | reference | cohorttype |
       | Seal Team 6 | Seal Team 6 | US Seal Team 6         | System       | 0         | 1          |

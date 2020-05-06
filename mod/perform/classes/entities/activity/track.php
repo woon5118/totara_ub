@@ -36,6 +36,7 @@ use core\orm\entity\relations\has_many_through;
  * @property int $activity_id parent activity record id
  * @property string $description track description
  * @property int $status track status
+ * @property int $schedule_type one of the constants SCHEDULE_TYPE_XXX
  * @property int $created_at record creation time
  * @property int $updated_at record modification time
  * @property-read collection|subject_instance[] $subject_instances
@@ -49,6 +50,11 @@ class track extends entity {
 
     public const STATUS_ACTIVE = 1;
     public const STATUS_PAUSED = 0;
+
+    public const SCHEDULE_TYPE_OPEN_FIXED = 0;
+    public const SCHEDULE_TYPE_CLOSED_FIXED = 1;
+    public const SCHEDULE_TYPE_OPEN_DYNAMIC = 2;
+    public const SCHEDULE_TYPE_CLOSED_DYNAMIC = 3;
 
     /**
      * Establishes the relationship with activity entities.

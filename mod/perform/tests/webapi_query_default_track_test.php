@@ -137,8 +137,9 @@ class mod_perform_webapi_query_default_track_testcase extends advanced_testcase 
     private function setup_env(): array {
         $this->setAdminUser();
 
+        /** @var mod_perform_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
-        $activity = $generator->create_activity_in_container();
+        $activity = $generator->create_activity_in_container(['create_track' => true]);
         $default_track = track::load_by_activity($activity)->first();
 
         $groups_by_id = $generator

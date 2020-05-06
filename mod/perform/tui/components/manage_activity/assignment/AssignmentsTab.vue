@@ -96,24 +96,9 @@
         </template>
       </template>
     </Table>
-
-    <div>
-      <h3>
-        {{
-          $str('user_group_assignment_unique_user_count_title', 'mod_perform')
-        }}
-      </h3>
-
-      <div class="tui-performManageActivityAssignmentsForm__summary">
-        <span class="tui-performManageActivityAssignmentsForm__summary-count">
-          <span>0</span>
-        </span>
-        <a href="#TBC">{{
-          $str('user_group_assignment_unique_user_count_link', 'mod_perform')
-        }}</a>
-      </div>
+    <div class="tui-performManageActivityAssignmentsForm__summary">
+      <Schedule v-if="track" :track="track" />
     </div>
-
     <AudienceAdder
       :open="isAdderOpen"
       :existing-items="addedIds"
@@ -147,6 +132,7 @@ import Grid from 'totara_core/components/grid/Grid';
 import GridItem from 'totara_core/components/grid/GridItem';
 import HeaderCell from 'totara_core/components/datatable/HeaderCell';
 import Table from 'totara_core/components/datatable/Table';
+import Schedule from 'mod_perform/components/manage_activity/assignment/Schedule';
 
 //GraphQL
 import TrackQuery from 'mod_perform/graphql/default_track';
@@ -167,6 +153,7 @@ export default {
     GridItem,
     HeaderCell,
     Table,
+    Schedule,
   },
 
   props: {

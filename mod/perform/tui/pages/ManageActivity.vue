@@ -59,10 +59,10 @@
 </template>
 
 <script>
-import AssignmentsForm from 'mod_perform/components/manage_activity/AssignmentsForm';
-import ContentForm from 'mod_perform/components/manage_activity/ContentForm';
+import AssignmentsTab from 'mod_perform/components/manage_activity/assignment/AssignmentsTab';
+import ContentTab from 'mod_perform/components/manage_activity/content/ContentTab';
 import FlexIcon from 'totara_core/components/icons/FlexIcon';
-import GeneralInfoForm from 'mod_perform/components/manage_activity/GeneralInfoForm';
+import GeneralInfoTab from 'mod_perform/components/manage_activity/GeneralInfoTab';
 import Grid from 'totara_core/components/grid/Grid';
 import GridItem from 'totara_core/components/grid/GridItem';
 import Loader from 'totara_core/components/loader/Loader';
@@ -74,13 +74,13 @@ import { NOTIFICATION_DURATION } from 'mod_perform/constants';
 
 export default {
   components: {
-    AssignmentsForm,
-    ContentForm,
+    AssignmentsTab,
+    ContentTab,
     FlexIcon,
     Tab,
     Tabs,
     Loader,
-    GeneralInfoForm,
+    GeneralInfoTab,
     Grid,
     GridItem,
   },
@@ -99,15 +99,15 @@ export default {
       activity: null,
       tabs: [
         {
-          component: 'GeneralInfoForm',
+          component: 'GeneralInfoTab',
           name: this.$str('manage_activities_tabs_general', 'mod_perform'),
         },
         {
-          component: 'ContentForm',
+          component: 'ContentTab',
           name: this.$str('manage_activities_tabs_content', 'mod_perform'),
         },
         {
-          component: 'AssignmentsForm',
+          component: 'AssignmentsTab',
           name: this.$str('manage_activities_tabs_assignment', 'mod_perform'),
         },
       ],

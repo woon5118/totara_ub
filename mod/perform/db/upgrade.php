@@ -896,6 +896,19 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020042900, 'perform');
     }
 
+    if ($oldversion < 2020043000) {
 
+        // Define field schedule_type to be added to perform_track.
+        $table = new xmldb_table('perform_track');
+        $field = new xmldb_field('schedule_type', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, 0, 'status');
+
+        // Conditionally launch add field schedule_type.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020043000, 'perform');
+    }
     return true;
 }

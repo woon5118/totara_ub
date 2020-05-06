@@ -8,18 +8,8 @@ type mod_perform_track {
   id: core_id!
   description(format: core_format = HTML): String!
   status: Int!
+  schedule_type: Int!
   assignments: [mod_perform_track_assignment!]!
-}
-
-input mod_perform_track_assignments_input {
-  track_id: core_id!
-  type: Int!
-  groups: [mod_perform_user_grouping_input!]!
-}
-
-input mod_perform_create_track_input {
-  activity_id: param_integer!
-  description: param_text
 }
 
 extend type Query {
@@ -34,6 +24,32 @@ extend type Query {
   mod_perform_default_track(activity_id: param_integer!): mod_perform_track!
 }
 
+input mod_perform_track_assignments_input {
+  track_id: core_id!
+  type: Int!
+  groups: [mod_perform_user_grouping_input!]!
+}
+
+input mod_perform_create_track_input {
+  activity_id: param_integer!
+  description: param_text
+}
+
+input mod_perform_track_schedule_closed_fixed_input {
+  track_id: core_id!
+}
+
+input mod_perform_track_schedule_open_fixed_input {
+  track_id: core_id!
+}
+
+"""
+Return type for mod_perform_update_track_schedule_xxx mutations
+"""
+type mod_perform_update_track_schedule_result {
+  track: mod_perform_track!
+}
+
 extend type Mutation {
   mod_perform_create_track(
     details: mod_perform_create_track_input!
@@ -46,4 +62,12 @@ extend type Mutation {
   mod_perform_remove_track_assignments(
     assignments: mod_perform_track_assignments_input!
   ): mod_perform_track!
+
+  mod_perform_update_track_schedule_closed_fixed(
+    track_schedule: mod_perform_track_schedule_closed_fixed_input!
+  ): mod_perform_update_track_schedule_result!
+
+  mod_perform_update_track_schedule_open_fixed(
+    track_schedule: mod_perform_track_schedule_open_fixed_input!
+  ): mod_perform_update_track_schedule_result!
 }

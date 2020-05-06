@@ -43,7 +43,7 @@ class activity_type extends model {
     /**
      * {@inheritdoc}
      */
-    protected $accessible_attributes = [
+    protected $entity_attribute_whitelist = [
         'id',
         'name',
         'is_system'

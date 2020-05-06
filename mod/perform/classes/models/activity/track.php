@@ -37,13 +37,23 @@ class track extends model {
     /**
      * {@inheritdoc}
      */
-    protected $accessible_attributes = [
+    protected $entity_attribute_whitelist = [
         'id',
-        'activity',
         'activity_id',
         'description',
-        'status'
+        'status',
+        'schedule_type',
     ];
+
+    protected $model_accessor_whitelist = [
+        'activity',
+        'assignments',
+    ];
+
+    /**
+     * @var track_entity
+     */
+    protected $entity;
 
     /**
      * {@inheritdoc}
@@ -69,6 +79,7 @@ class track extends model {
         $entity->activity_id = $parent->get_id();
         $entity->description = $description;
         $entity->status = track_status::ACTIVE;
+        $entity->schedule_type = track_entity::SCHEDULE_TYPE_OPEN_FIXED;
         $entity->save();
 
         return new track($entity);
@@ -93,18 +104,21 @@ class track extends model {
     }
 
     /**
-     * {@inheritdoc}
+     * Get the activity model that this track belongs to
+     *
+     * @return activity
      */
-    public function __get($name) {
-        if ($name === 'assignments') {
-            return $this->entity->assignments->map_to(track_assignment::class);
-        }
+    public function get_activity(): activity {
+        return activity::load_by_entity($this->entity->activity);
+    }
 
-        if ($name === 'activity') {
-            return activity::load_by_entity($this->entity->activity);
-        }
-
-        return parent::__get($name);
+    /**
+     * Get all assignment models that belong to this track
+     *
+     * @return collection|track_assignment[]
+     */
+    public function get_assignments(): collection {
+        return $this->entity->assignments->map_to(track_assignment::class);
     }
 
     /**
@@ -229,5 +243,31 @@ class track extends model {
         if (!$parent->can_manage()) {
             throw new \moodle_exception('nopermissions', '', '', $op);
         }
+    }
+
+    /**
+     * Set the schedule to be closed with fixed dates
+     *
+     * TODO add two fixed date params
+     */
+    public function update_schedule_closed_fixed(): void {
+        $entity = $this->entity;
+
+        $entity->schedule_type = track_entity::SCHEDULE_TYPE_CLOSED_FIXED;
+
+        $entity->update();
+    }
+
+    /**
+     * Set the schedule to be open ended with fixed dates
+     *
+     * TODO add one fixed date param
+     */
+    public function update_schedule_open_fixed(): void {
+        $entity = $this->entity;
+
+        $entity->schedule_type = track_entity::SCHEDULE_TYPE_OPEN_FIXED;
+
+        $entity->update();
     }
 }

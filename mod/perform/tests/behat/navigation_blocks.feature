@@ -3,8 +3,8 @@ Feature: Make sure the correct navigation breadcrumbs and blocks are shown.
 
   Scenario: Admin management pages show correct navigation options
     Given the following "activities" exist in "mod_perform" plugin:
-      | activity_name |
-      | activity_one  |
+      | activity_name | create_track |
+      | activity_one  | true         |
     And I log in as "admin"
 
     # Manage performance activities page

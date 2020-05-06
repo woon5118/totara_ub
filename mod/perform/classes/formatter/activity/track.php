@@ -23,7 +23,7 @@
 
 namespace mod_perform\formatter\activity;
 
-use core\webapi\formatter\formatter;
+use core\orm\formatter\entity_model_formatter;
 use core\webapi\formatter\field\string_field_formatter;
 
 defined('MOODLE_INTERNAL') || die();
@@ -31,7 +31,8 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Maps the track model class into the GraphQL mod_perform_track type.
  */
-class track extends formatter {
+class track extends entity_model_formatter {
+
     /**
      * {@inheritdoc}
      */
@@ -40,36 +41,9 @@ class track extends formatter {
             'id' => null,
             'description' => string_field_formatter::class,
             'status' => null,
+            'schedule_type' => null,
             'assignments' => null
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function get_field(string $field) {
-        switch ($field) {
-            case 'id':
-            case 'description':
-            case 'status':
-                return $this->object->$field;
-
-            case 'assignments':
-                return $this->object->$field->all();
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function has_field(string $field): bool {
-        $recognized = [
-            'id',
-            'description',
-            'status',
-            'assignments'
-        ];
-
-        return in_array($field, $recognized);
-    }
 }

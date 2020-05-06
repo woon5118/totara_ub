@@ -38,6 +38,13 @@ class mod_perform_activity_generator_configuration {
     private $number_of_activities = 1;
 
     /**
+     * The number of tracks per activity that should be created
+     *
+     * @var int
+     */
+    private $number_of_tracks_per_activity = 1;
+
+    /**
      * The number of sections per activity that should be created
      *
      * @var int
@@ -107,6 +114,23 @@ class mod_perform_activity_generator_configuration {
      */
     public function set_number_of_activities(int $number): self {
         $this->number_of_activities = $number;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function get_number_of_tracks_per_activity(): int {
+        return $this->number_of_tracks_per_activity;
+    }
+
+    /**
+     * @param int $number
+     * @return $this
+     */
+    public function set_number_of_tracks_per_activity(int $number): self {
+        $this->number_of_tracks_per_activity = $number;
 
         return $this;
     }

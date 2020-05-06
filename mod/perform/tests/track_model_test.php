@@ -40,9 +40,9 @@ class mod_perform_track_model_testcase extends advanced_testcase {
     public function test_create_tracks(): void {
         $this->setAdminUser();
 
-        $activity = $this->getDataGenerator()
-            ->get_plugin_generator('mod_perform')
-            ->create_activity_in_container();
+        /** @var mod_perform_generator $perform_generator */
+        $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        $activity = $perform_generator->create_activity_in_container(['create_track' => true]);
 
         // There is already a "default" track, created when the activity is
         // created.
@@ -116,9 +116,9 @@ class mod_perform_track_model_testcase extends advanced_testcase {
         $active = track_status::ACTIVE;
         $paused = track_status::PAUSED;
 
-        $activity = $this->getDataGenerator()
-            ->get_plugin_generator('mod_perform')
-            ->create_activity_in_container();
+        /** @var mod_perform_generator $perform_generator */
+        $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        $activity = $perform_generator->create_activity_in_container();
         $track = track::create($activity);
 
         // State active; invoke activate - ignored.

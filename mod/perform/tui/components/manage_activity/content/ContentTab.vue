@@ -36,8 +36,8 @@
 </template>
 
 <script>
-import ActivitySection from 'mod_perform/components/manage_activity/ActivitySection';
-import UpdateGeneralInfoMutation from '../../../webapi/ajax/update_activity_general_info.graphql';
+import ActivitySection from 'mod_perform/components/manage_activity/content/ActivitySection';
+import UpdateGeneralInfoMutation from 'mod_perform/graphql/update_activity_general_info.graphql';
 
 export default {
   components: {

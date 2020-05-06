@@ -238,7 +238,7 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
         /** @var mod_perform_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
 
-        $data->activity1 = $generator->create_activity_in_container();
+        $data->activity1 = $generator->create_activity_in_container(['create_track' => true]);
         /** @var track $track1 */
         $data->track1 = track::load_by_activity($data->activity1)->first();
 

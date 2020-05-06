@@ -38,7 +38,7 @@ class track_assignment extends model {
     /**
      * {@inheritdoc}
      */
-    protected $accessible_attributes = [
+    protected $entity_attribute_whitelist = [
         'id',
         'track_id',
         'type',

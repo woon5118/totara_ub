@@ -3,8 +3,8 @@ Feature: Adding, Updating, Removing activity elements.
 
   Background:
     Given the following "activities" exist in "mod_perform" plugin:
-      | activity_name        | create_section |
-      | Add Element Activity | true           |
+      | activity_name        | create_section | create_track |
+      | Add Element Activity | true           | true         |
 
   Scenario: Save multiple elements to activity content.
     Given I log in as "admin"

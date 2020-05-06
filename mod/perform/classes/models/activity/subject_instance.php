@@ -51,7 +51,7 @@ class subject_instance extends model {
 
     use state_aware;
 
-    protected $accessible_attributes = [
+    protected $entity_attribute_whitelist = [
         'id',
         'subject_user',
         'progress'

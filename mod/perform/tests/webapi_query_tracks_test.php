@@ -141,8 +141,10 @@ class mod_perform_webapi_query_tracks_testcase extends advanced_testcase {
      */
     private function setup_env(int $no_of_tracks=10): array {
         $this->setAdminUser();
+
+        /** @var mod_perform_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
-        $activity = $generator->create_activity_in_container();
+        $activity = $generator->create_activity_in_container(['create_track' => true]);
 
         $tracks_by_id = $generator
             ->create_activity_tracks($activity, $no_of_tracks)
@@ -175,7 +177,8 @@ class mod_perform_webapi_query_tracks_testcase extends advanced_testcase {
             'id' => $resolve('id'),
             'description' => $resolve('description'),
             'status' => $resolve('status'),
-            'assignments' => $resolve('assignments')
+            'assignments' => $resolve('assignments'),
+            'schedule_type' => $resolve('schedule_type'),
         ];
     }
 

@@ -3,8 +3,8 @@ Feature: Manage performance activity multiple choice elements
 
   Background:
     Given the following "activities" exist in "mod_perform" plugin:
-      | activity_name        | create_section |
-      | Activity one         | true           |
+      | activity_name        | create_section | create_track |
+      | Activity one         | true           | true         |
 
   Scenario: Save multiple choice elements to activity content
     Given I log in as "admin"
