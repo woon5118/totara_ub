@@ -1928,7 +1928,8 @@ function facetoface_notification_loop_session_placeholders($msg, $session, $room
                     $values = [];
                     foreach ($attachments[$attachment_collection] as $attachment) {
                         $url = new moodle_url("/mod/facetoface/reports/{$attachment_collection}.php", ["{$attachment_type}id" => $attachment->get_id()]);
-                        $partial = $attachment->get_name();
+                        //Totara: resource title is linked
+                        $partial = html_writer::link($url, $attachment->get_name(), ['title' => get_string("{$attachment_type}details", 'mod_facetoface')]);
                         if ($attachment_type == 'room') {
                             $cfs_for_partial = array();
                             foreach (['building', 'location'] as $cfkey) {
@@ -1940,7 +1941,6 @@ function facetoface_notification_loop_session_placeholders($msg, $session, $room
                                 $partial .= "\n<br> " . implode("\n<br> ", $cfs_for_partial);
                             }
                         }
-                        $partial .= "\n<br> " . html_writer::link($url, $url, ['title' => get_string("{$attachment_type}details", 'mod_facetoface')]);
                         $values[] = $partial;
                     }
                     if (count($values) > 1) {

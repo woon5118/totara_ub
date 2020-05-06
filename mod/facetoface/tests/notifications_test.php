@@ -1340,10 +1340,10 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
 
         $expectedmsg = "The details for each session:\n";
         $expectedmsg .= "\nRoom: ";
-        $expectedmsg .= "Room One\n Catalyst House\n 150 Willis Street\n {$roomurls[1]}\n";
+        $expectedmsg .= "Room One\n Catalyst House\n 150 Willis Street\n";
         $expectedmsg .= "\nRooms:\n";
-        $expectedmsg .= "Room Three\n 186 Willis Street\n {$roomurls[3]}\n";
-        $expectedmsg .= "Room Two\n South Campus\n {$roomurls[2]}\n";
+        $expectedmsg .= "Room Three\n 186 Willis Street\n";
+        $expectedmsg .= "Room Two\n South Campus\n";
         $expectedmsg .= "\nThose are all the details.";
 
         $this->assertEquals($expectedmsg, $replacedmsg);
@@ -1403,10 +1403,10 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
 
         $expectedmsg = "The details for each session:\n";
         $expectedmsg .= "\nAsset: ";
-        $expectedmsg .= "Asset One\n {$asseturls[1]}\n";
+        $expectedmsg .= "Asset One\n";
         $expectedmsg .= "\nAssets:\n";
-        $expectedmsg .= "Asset Three\n {$asseturls[3]}\n";
-        $expectedmsg .= "Asset Two\n {$asseturls[2]}\n";
+        $expectedmsg .= "Asset Three\n";
+        $expectedmsg .= "Asset Two\n";
         $expectedmsg .= "\nThose are all the details.";
 
         $this->assertEquals($expectedmsg, $replacedmsg);
@@ -1466,10 +1466,10 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
 
         $expectedmsg = "The details for each session:\n";
         $expectedmsg .= "\nFacilitator: ";
-        $expectedmsg .= "Facilitator One\n {$facilitatorurls[1]}\n";
+        $expectedmsg .= "Facilitator One\n";
         $expectedmsg .= "\nFacilitators:\n";
-        $expectedmsg .= "Facilitator Three\n {$facilitatorurls[3]}\n";
-        $expectedmsg .= "Facilitator Two\n {$facilitatorurls[2]}\n";
+        $expectedmsg .= "Facilitator Three\n";
+        $expectedmsg .= "Facilitator Two\n";
         $expectedmsg .= "\nThose are all the details.";
 
         $this->assertEquals($expectedmsg, $replacedmsg);
