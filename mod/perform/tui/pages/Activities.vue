@@ -48,7 +48,11 @@
     </ModalPresenter>
 
     <loader :loading="$apollo.loading">
-      <Table v-if="!$apollo.loading" :data="activities">
+      <Table
+        v-if="!$apollo.loading"
+        :data="activities"
+        class="tui-performManageActivityList__table"
+      >
         <template v-slot:header-row>
           <HeaderCell size="9">{{
             $str('view_name', 'mod_perform')

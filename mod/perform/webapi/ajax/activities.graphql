@@ -11,6 +11,7 @@ query mod_perform_activities {
     can_activate
     state {
       display_name
+      name
     }
   }
 }

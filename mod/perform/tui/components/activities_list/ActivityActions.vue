@@ -53,15 +53,16 @@
       >
         {{ $str('activity_action_activate', 'mod_perform') }}
       </DropdownItem>
-      <DropdownItem>{{
-        $str('activity_action_delete', 'mod_perform')
-      }}</DropdownItem>
+      <DropdownItem @click="showDeleteModal">
+        {{ $str('activity_action_delete', 'mod_perform') }}
+      </DropdownItem>
     </Dropdown>
 
     <ConfirmationModal
       :open="activateModalOpen"
       :title="$str('modal_activate_title', 'mod_perform')"
       :confirm-button-text="$str('activity_action_activate', 'mod_perform')"
+      :loading="activating"
       @confirm="activateActivity"
       @cancel="closeActivateModal"
     >
@@ -77,11 +78,34 @@
         />
       </Loader>
     </ConfirmationModal>
+
+    <ConfirmationModal
+      :open="deleteModalOpen"
+      :title="deleteConfirmationTitle"
+      :confirm-button-text="$str('delete')"
+      :loading="deleting"
+      @confirm="deleteActivity"
+      @cancel="closeDeleteModal"
+    >
+      <template v-if="activityIsDraft">
+        <p>{{ $str('modal_delete_draft_message', 'mod_perform') }}</p>
+      </template>
+      <template v-else>
+        <p>{{ $str('modal_delete_message', 'mod_perform') }}</p>
+        <p>
+          <strong>{{
+            $str('modal_delete_message_data_recovery_warning', 'mod_perform')
+          }}</strong>
+        </p>
+      </template>
+      <p>{{ $str('modal_delete_confirmation_line', 'mod_perform') }}</p>
+    </ConfirmationModal>
   </div>
 </template>
 
 <script>
 import ActivateActivityMutation from 'mod_perform/graphql/activate_activity.graphql';
+import ActivateDeleteMutation from 'mod_perform/graphql/delete_activity.graphql';
 import ActivityActionsIcon from 'mod_perform/components/icons/ActivityActions';
 import ActivityUsersToAssignCountQuery from 'mod_perform/graphql/activity_users_to_assign_count.graphql';
 import ConfirmationModal from 'totara_core/components/modal/ConfirmationModal';
@@ -113,6 +137,9 @@ export default {
     return {
       activateModalOpen: false,
       activityUsersToAssignCount: 0,
+      deleteModalOpen: false,
+      activating: false,
+      deleting: false,
     };
   },
 
@@ -140,28 +167,52 @@ export default {
       }
       return this.$str('activity_action_activate', 'mod_perform');
     },
+
+    /**
+     * Activity state dependant delete confirmation title.
+     *
+     * @return {string}
+     */
+    deleteConfirmationTitle() {
+      if (this.activityIsDraft) {
+        return this.$str('modal_delete_draft_title', 'mod_perform');
+      }
+
+      return this.$str('modal_delete_title', 'mod_perform');
+    },
+
+    /**
+     * Is the activity in draft state.
+     *
+     * @return {boolean}
+     */
+    activityIsDraft() {
+      return this.activity.state.name === 'DRAFT';
+    },
   },
 
   methods: {
     /**
-     * Display the modal for confirming the activation of the activity
+     * Display the modal for confirming the activation of the activity.
      */
     showActivateModal() {
       this.activateModalOpen = true;
     },
 
     /**
-     * Close the modal for confirming the activation of the activity
+     * Close the modal for confirming the activation of the activity.
      */
     closeActivateModal() {
       this.activateModalOpen = false;
+      this.activating = false;
     },
 
     /**
      * Activate an activity
      */
     activateActivity() {
-      this.closeActivateModal();
+      this.activating = true;
+
       this.$apollo
         .mutate({
           mutation: ActivateActivityMutation,
@@ -183,19 +234,84 @@ export default {
           });
         })
         .catch(() => {
-          notify({
-            duration: NOTIFICATION_DURATION,
-            message: this.$str(
-              'toast_error_generic_update',
-              'mod_perform',
-              this.activity.name
-            ),
-            type: 'error',
-          });
+          this.showErrorNotification();
         })
         .finally(() => {
           this.$emit('refetch');
+          this.closeActivateModal();
         });
+    },
+
+    /**
+     * Display the modal for confirming the deletion of the activity.
+     */
+    showDeleteModal() {
+      this.deleteModalOpen = true;
+    },
+
+    /**
+     * Close the modal for confirming the deletion of the activity.
+     */
+    closeDeleteModal() {
+      this.deleteModalOpen = false;
+      this.deleting = false;
+    },
+
+    /**
+     * Deletes the activity.
+     */
+    async deleteActivity() {
+      this.deleting = true;
+
+      try {
+        await this.$apollo.mutate({
+          mutation: ActivateDeleteMutation,
+          variables: {
+            input: {
+              activity_id: this.activity.id,
+            },
+          },
+        });
+
+        this.showDeleteSuccessNotification();
+      } catch (e) {
+        this.showErrorNotification();
+      }
+
+      this.$emit('refetch');
+      this.closeDeleteModal();
+    },
+
+    showDeleteSuccessNotification() {
+      let message = this.$str('toast_success_activity_deleted', 'mod_perform');
+
+      if (this.activityIsDraft) {
+        message = this.$str(
+          'toast_success_draft_activity_deleted',
+          'mod_perform'
+        );
+      }
+
+      notify({
+        duration: NOTIFICATION_DURATION,
+        message,
+        type: 'success',
+      });
+    },
+
+    /**
+     * Show generic save/update error toast.
+     */
+    showErrorNotification() {
+      notify({
+        duration: NOTIFICATION_DURATION,
+        message: this.$str(
+          'toast_error_generic_update',
+          'mod_perform',
+          this.activity.name
+        ),
+        type: 'error',
+      });
     },
   },
 
@@ -225,9 +341,21 @@ export default {
       "activity_draft_not_ready",
       "modal_activate_message",
       "modal_activate_title",
+      "modal_delete_confirmation_line",
+      "modal_delete_draft_message",
+      "modal_delete_draft_title",
+      "modal_delete_message",
+      "modal_delete_message_data_recovery_warning",
+      "modal_delete_title",
+      "participation_reporting",
       "participation_reporting",
       "toast_error_generic_update",
-      "toast_success_activity_activated"
+      "toast_success_activity_activated",
+      "toast_success_activity_deleted",
+      "toast_success_draft_activity_deleted"
+    ],
+    "moodle": [
+      "delete"
     ]
   }
 </lang-strings>
