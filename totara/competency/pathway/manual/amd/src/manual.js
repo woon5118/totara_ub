@@ -134,7 +134,7 @@ function(templates, notification, ajax, ModalList) {
                     competencyId = competencyIdNode.getAttribute('data-tw-editAchievementPaths-competency');
                 }
 
-                this.pathway.competencyId = competencyId;
+                this.pathway.competency_id = competencyId;
                 this.widget.setAttribute('data-tw-editAchievementPaths-save-endPoint', this.endpoints.create);
 
             } else {

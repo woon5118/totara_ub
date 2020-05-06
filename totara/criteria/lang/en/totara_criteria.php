@@ -59,6 +59,7 @@ $string['no_courses'] = 'There are no courses available to view';
 $string['not_available'] = 'Not available';
 $string['not_complete'] = 'Not complete';
 $string['progress'] = 'Progress';
+$string['remove_item'] = 'Remove item';
 $string['required_only'] = '{$a} required only';
 $string['self_assign_competency'] = 'Self assign competency';
 $string['type'] = 'Type';

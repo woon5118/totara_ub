@@ -23,5 +23,8 @@
 
 $string['pluginname'] = 'Criteria fulfillment';
 
-$string['no_criteria'] = 'No criteria added';
+$string['criteria_add'] = 'Add criteria';
+$string['criteria_remove'] = 'Remove criteria';
+$string['criteria_remove_undo'] = 'Undo remove criteria';
 $string['error_cant_undo_single_use'] = 'This criterion type can only be used once per competency. To be able to restore this criterion item, first remove the other item where it is in use.';
+$string['no_criteria'] = 'No criteria added';

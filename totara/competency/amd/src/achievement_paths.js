@@ -1064,24 +1064,11 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
          * @return {bool}
          */
         hasSingleValuePaths: function() {
-            var hasPaths = false,
-                pwKey;
-
-            for (pwKey in this.pathways) {
-                if (this.pathways[pwKey].scalevalue) {
-                    hasPaths = true;
-                    break;
-                }
+            if (this.widget.querySelectorAll('.tw-editScaleValuePathsGroup').length) {
+                return true;
             }
 
-            // Check the Dom
-            if (!hasPaths) {
-                if (this.widget.querySelectorAll('[data-tw-editAchievementPaths-pathway-key]').length) {
-                    hasPaths = true;
-                }
-            }
-
-            return hasPaths;
+            return false;
         }
 
     };

@@ -86,7 +86,7 @@ define([], function() {
                     competencyId = competencyIdNode.getAttribute('data-tw-editAchievementPaths-competency');
                 }
 
-                that.pathway.competencyId = competencyId;
+                that.pathway.competency_id = competencyId;
                 target.setAttribute('data-tw-editAchievementPaths-save-endPoint', that.endpoints.create);
 
             } else {
