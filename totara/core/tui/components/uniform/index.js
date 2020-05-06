@@ -29,6 +29,7 @@ export { default as FormRow } from 'totara_core/components/form/FormRow';
 export { default as FormRowFieldset } from 'totara_core/components/form/FormRowFieldset';
 
 // inputs
+export { default as FormDateSelector } from 'totara_core/components/uniform/FormDateSelector';
 export { default as FormEmail } from 'totara_core/components/uniform/FormEmail';
 export { default as FormNumber } from 'totara_core/components/uniform/FormNumber';
 export { default as FormPassword } from 'totara_core/components/uniform/FormPassword';

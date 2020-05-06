@@ -78,7 +78,7 @@
     }
 
     .tui-formField {
-      flex-grow: 0;
+      width: auto;
     }
   }
 }

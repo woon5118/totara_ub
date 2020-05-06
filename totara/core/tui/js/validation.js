@@ -21,6 +21,8 @@
  */
 
 import { langString } from './i18n';
+import { isExists } from 'date-fns';
+import { isIsoAfter, isIsoBefore, getValuesFromIso } from 'totara_core/date';
 
 // match browser email validation regex.
 const EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
@@ -36,6 +38,50 @@ export const v = {
       return !isEmpty;
     },
     message: () => langString('required', 'moodle'),
+  }),
+
+  date: () => ({
+    validate: val => {
+      const date = getValuesFromIso(val.iso);
+      return isExists(date.year, date.month, date.day);
+    },
+    message: () => langString('not_a_valid_date', 'totara_form'),
+  }),
+
+  /**
+   * Check date is not greater than max limit
+   *
+   * @param {isoDate} limit
+   * @param {isoDate} customErrorString
+   */
+  dateMaxLimit: (limit, customErrorString) => ({
+    validate: val => {
+      return isIsoBefore(val.iso, limit);
+    },
+    message: () => {
+      if (customErrorString) {
+        return customErrorString;
+      }
+      return langString('date_after_limit', 'totara_form', limit);
+    },
+  }),
+
+  /**
+   * Check date is greater than min limit
+   *
+   * @param {isoDate} limit
+   * @param {isoDate} customErrorString
+   */
+  dateMinLimit: (limit, customErrorString) => ({
+    validate: val => {
+      return isIsoAfter(val.iso, limit);
+    },
+    message: () => {
+      if (customErrorString) {
+        return customErrorString;
+      }
+      return langString('date_before_limit', 'totara_form', limit);
+    },
   }),
 
   email: () => ({

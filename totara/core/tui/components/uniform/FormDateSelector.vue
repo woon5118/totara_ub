@@ -16,13 +16,13 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-  @author Simon Chester <simon.chester@totaralearning.com>
-  @package theme_ventura
+  @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
+  @package totara_core
 -->
 
-<style lang="scss">
-.tui-formField {
-  width: 100%;
-  min-width: 0;
-}
-</style>
+<script>
+import { createUniformInputWrapper } from './util';
+import DateSelector from 'totara_core/components/form/DateSelector';
+
+export default createUniformInputWrapper(DateSelector);
+</script>

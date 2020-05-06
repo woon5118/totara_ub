@@ -23,12 +23,15 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['date_after_limit'] = 'Date cannot be after limit ({$a})';
+$string['date_before_limit'] = 'Date cannot be before limit ({$a})';
 $string['datetimevalidationerror'] = 'Invalid date or time';
 $string['done'] = 'Done';
 $string['durationvalidationerror'] = 'Invalid duration format';
 $string['emailvalidationerror'] = 'Invalid email address format';
 $string['mytimezone'] = '{$a} (my timezone)';
 $string['nonemptyvalidationerror'] = 'Value is required';
+$string['not_a_valid_date'] = 'Not a valid date';
 $string['now'] = 'Now';
 $string['pluginname'] = 'Totara forms';
 $string['submissionerror'] = 'Form could not be submitted, validation failed';

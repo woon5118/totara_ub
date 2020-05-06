@@ -16,13 +16,43 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-  @author Simon Chester <simon.chester@totaralearning.com>
+  @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
   @package theme_ventura
 -->
 
 <style lang="scss">
-.tui-formField {
-  width: 100%;
-  min-width: 0;
+.tui-dateSelector {
+  display: flex;
+  flex-wrap: wrap;
+
+  &__date {
+    display: flex;
+    margin: 0 var(--tui-gap-4) var(--tui-gap-2) 0;
+
+    & > * {
+      display: flex;
+    }
+
+    & > * + * {
+      margin-left: var(--tui-gap-2);
+    }
+
+    &-day {
+      width: 5rem;
+    }
+
+    &-month {
+      width: 12rem;
+    }
+
+    &-year {
+      width: 7rem;
+    }
+  }
+
+  &__time {
+    display: flex;
+    width: calc((var(--tui-gap-2) * 2) + 24rem);
+  }
 }
 </style>
