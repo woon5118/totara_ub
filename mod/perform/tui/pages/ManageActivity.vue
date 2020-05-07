@@ -37,10 +37,10 @@
         </GridItem>
       </Grid>
 
-      <Tabs v-if="activity">
+      <Tabs v-if="activity" :selected="initialTabId">
         <Tab
-          v-for="({ component, name }, index) in tabs"
-          :id="index"
+          v-for="({ component, name, id }, index) in tabs"
+          :id="id"
           :key="index"
           :name="name"
           :always-render="true"
@@ -95,18 +95,26 @@ export default {
     },
   },
   data() {
+    const generalInfoTabId = this.$id('genral-info-tab');
+    const contentTabId = this.$id('content-tab');
+    const assignmentTabId = this.$id('assignments-tab');
+
     return {
       activity: null,
+      initialTabId: contentTabId,
       tabs: [
         {
+          id: generalInfoTabId,
           component: 'GeneralInfoTab',
           name: this.$str('manage_activities_tabs_general', 'mod_perform'),
         },
         {
+          id: contentTabId,
           component: 'ContentTab',
           name: this.$str('manage_activities_tabs_content', 'mod_perform'),
         },
         {
+          id: assignmentTabId,
           component: 'AssignmentsTab',
           name: this.$str('manage_activities_tabs_assignment', 'mod_perform'),
         },

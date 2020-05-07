@@ -19,17 +19,28 @@ Feature: Create and update activity general info fields
       | Activity type  | Feedback                        |
 
     When I click on "Get started" "button"
-    And I navigate to the manage perform activities page
+    Then the "Content" tui tab should be active
+
+    When I click on "General" "link"
+    Then the following fields match these values:
+      | Activity title | My Test Activity #2             |
+      | Description    | My Test Activity #2 description |
+    And "//span[contains(., 'Feedback')]" "xpath_element" should exist
+
+    When I navigate to the manage perform activities page
     Then I should see the tui datatable contains:
       | Name                | Type     | Status |
       | My Test Activity #1 | Check-in | Active |
-      | My Test Activity #2 | Feedback | Draft |
+      | My Test Activity #2 | Feedback | Draft  |
 
   Scenario: Edit the general info fields for an existing activity
     Given I log in as "admin"
     And I navigate to the manage perform activities page
 
     When I click on "My Test Activity #1" "link"
+    Then the "Content" tui tab should be active
+
+    When I click on "General" "link"
     Then the following fields match these values:
       | Activity title | My Test Activity #1             |
       | Description    | My Test Activity #1 description |
