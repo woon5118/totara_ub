@@ -213,7 +213,8 @@ class appraisal_answer_form extends moodleform {
                 }
             }
 
-            if (($rights & appraisal::ACCESS_CANANSWER) != appraisal::ACCESS_CANANSWER && !$isviewonlyquestion) {
+            // The question is either a viewonly question or the role doesn't have permissions to answer it.
+            if (($rights & appraisal::ACCESS_CANANSWER) != appraisal::ACCESS_CANANSWER || $isviewonlyquestion) {
                 $elem->cananswer = false;
             }
 
