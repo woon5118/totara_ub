@@ -17,23 +17,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Matthias Bonk <matthias.bonk@totaralearning.com>
+ * @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
  * @package mod_perform
  */
 
 namespace mod_perform\event;
 
-defined('MOODLE_INTERNAL') || die();
-
 use core\event\base;
+use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 use mod_perform\models\activity\subject_instance;
 
-/**
- * Class subject_instance_progress_updated
+/**_
+ * Class subject_instance_availability_closed event is triggered when a participant instance is closed.
  *
- * This event is fired when the progress status of a subject instance changes.
+ * @package mod_perform\event
  */
-class subject_instance_progress_updated extends base {
+class subject_instance_availability_closed extends base {
 
     /**
      * Initialise required event data properties.
@@ -41,23 +40,39 @@ class subject_instance_progress_updated extends base {
     protected function init() {
         $this->data['crud'] = 'u';
         $this->data['edulevel'] = self::LEVEL_OTHER;
-        $this->data['objecttable'] = 'perform_subject_instance';
+        $this->data['objecttable'] = subject_instance_entity::TABLE;
     }
 
     /**
-     * Create event by subject instance.
+     * Create instance of event.
      *
      * @param subject_instance $subject_instance
      * @return self|base
      */
     public static function create_from_subject_instance(subject_instance $subject_instance): self {
         $data = [
-            'objectid' => $subject_instance->get_id(),
-            'relateduserid' => $subject_instance->subject_user->id,
+            'objectid' => $subject_instance->id,
+            'relateduserid' => $subject_instance->subject_user_id,
             'other' => [],
             'context' => $subject_instance->get_context(),
         ];
 
         return static::create($data);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_name() {
+        return get_string('event_subject_instance_availability_closed', 'mod_perform');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function get_description() {
+        return 'The availability of the subject instance with id ' . $this->objectid
+            . ' for the user with id ' . $this->relateduserid . ' has been closed';
+    }
+
 }

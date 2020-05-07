@@ -29,6 +29,7 @@ use core\entities\user;
 use core\orm\entity\model;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
+use mod_perform\state\participant_instance\participant_instance_availability;
 use mod_perform\state\participant_instance\participant_instance_progress;
 use mod_perform\state\state;
 use mod_perform\state\state_aware;
@@ -39,13 +40,15 @@ use totara_core\relationship\relationship;
  *
  * @package mod_perform\models\activity
  *
+ * @property-read int $id
  * @property-read int $progress
  * @property-read int $participant_id
  * @property-read subject_instance $subject_instance
  * @property-read int $subject_instance_id
  * @property-read collection|participant_section_entity[] $participant_sections
  * @property-read string $progress_status internal name of current progress state
- * @property-read string $availability_status internal name of current availability state
+ * @property-read participant_instance_progress|state $progress_state Current progress state
+ * @property-read participant_instance_availability|state $availability_state Current availability state
  * @property-read string $relationship_name internal name of the participant instance's activity relationship
  */
 class participant_instance extends model {
@@ -68,7 +71,8 @@ class participant_instance extends model {
 
     protected $model_accessor_whitelist = [
         'progress_status',
-        'availability_status',
+        'progress_state',
+        'availability_state',
         'subject_instance',
         'participant',
         'relationship_name'
@@ -139,8 +143,17 @@ class participant_instance extends model {
      *
      * @return state
      */
-    private function get_progress_state(): state {
+    public function get_progress_state(): state {
         return $this->get_state(participant_instance_progress::get_type());
+    }
+
+    /**
+     * Get the current availability state.
+     *
+     * @return participant_instance_availability|state
+     */
+    public function get_availability_state(): state {
+        return $this->get_state(participant_instance_availability::get_type());
     }
 
 }

@@ -27,27 +27,30 @@ use core\collection;
 use core\entities\cohort;
 use core\entities\user;
 use core_container\module\module;
-use mod_perform\entities\activity\participant_section;
-use mod_perform\entities\activity\section as section_entity;
-use mod_perform\entities\activity\track as track_entity;
-use mod_perform\expand_task;
+use hierarchy_organisation\entities\organisation;
+use hierarchy_position\entities\position;
+use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
-use mod_perform\entities\activity\subject_instance as subject_instance_entity;
-use mod_perform\models\activity\track;
-use mod_perform\entities\activity\track_user_assignment;
+use mod_perform\entities\activity\participant_section;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
+use mod_perform\entities\activity\section as section_entity;
+use mod_perform\entities\activity\subject_instance as subject_instance_entity;
+use mod_perform\entities\activity\track as track_entity;
+use mod_perform\entities\activity\track_user_assignment;
+use mod_perform\expand_task;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\activity_type;
-use mod_perform\entities\activity\activity as activity_entity;
-use mod_perform\models\activity\section;
 use mod_perform\models\activity\element;
+use mod_perform\models\activity\section;
 use mod_perform\models\activity\section_element;
 use mod_perform\models\activity\section_relationship as section_relationship_model;
+use mod_perform\models\activity\track;
 use mod_perform\models\activity\track_assignment_type;
 use mod_perform\state\activity\active;
 use mod_perform\state\activity\activity_state;
 use mod_perform\state\activity\draft;
 use mod_perform\state\participant_instance\not_started as instance_not_started;
+use mod_perform\state\participant_instance\open;
 use mod_perform\state\participant_section\not_started;
 use mod_perform\task\service\subject_instance_creation;
 use mod_perform\user_groups\grouping;
@@ -59,8 +62,6 @@ use totara_core\relationship\resolvers\subject;
 use totara_job\job_assignment;
 use totara_job\relationship\resolvers\appraiser;
 use totara_job\relationship\resolvers\manager;
-use hierarchy_position\entities\position;
-use hierarchy_organisation\entities\organisation;
 
 /**
  * Perform generator
@@ -686,6 +687,30 @@ class mod_perform_generator extends component_generator_base {
     }
 
     /**
+     * Create a single participant instance for a user.
+     *
+     * @param user|object $participant_user
+     * @param int $subject_instance_id
+     * @param int $activity_relationship_id
+     * @return participant_instance_entity
+     */
+    public function create_participant_instance(
+        $participant_user,
+        int $subject_instance_id,
+        int $activity_relationship_id
+    ): participant_instance_entity {
+        $participant_instance = new participant_instance_entity();
+        $participant_instance->activity_relationship_id = $activity_relationship_id;
+        $participant_instance->participant_id = $participant_user->id;
+        $participant_instance->subject_instance_id = $subject_instance_id;
+        $participant_instance->progress = not_started::get_code();
+        $participant_instance->availability = open::get_code();
+        return $participant_instance->save();
+    }
+
+    /**
+     * Create a participant instance and section for a user.
+     *
      * @param activity $activity
      * @param stdClass|user $participant_user
      * @param int $subject_instance_id
@@ -700,16 +725,11 @@ class mod_perform_generator extends component_generator_base {
         section $section,
         int $activity_relationship_id
     ): participant_section {
-        $participant_instance = new participant_instance_entity();
-        $participant_instance->activity_relationship_id = $activity_relationship_id;
-        $participant_instance->participant_id = $participant_user->id;
-        $participant_instance->subject_instance_id = $subject_instance_id;
-        $participant_instance->progress = not_started::get_code();
-        $participant_instance->save();
+        $participant_instance = $this->create_participant_instance(
+            $participant_user, $subject_instance_id, $activity_relationship_id
+        );
 
-        $participant_section = $this->create_participant_section($activity, $participant_instance, false, $section);
-
-        return $participant_section;
+        return $this->create_participant_section($activity, $participant_instance, false, $section);
     }
 
     /**

@@ -23,6 +23,7 @@
 
 namespace mod_perform\state\subject_instance;
 
+use mod_perform\state\subject_instance\condition\close_on_completion_enabled;
 use mod_perform\state\transition;
 
 defined('MOODLE_INTERNAL') || die();

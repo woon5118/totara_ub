@@ -31,6 +31,7 @@ use core\orm\entity\model;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 use mod_perform\state\state;
 use mod_perform\state\state_aware;
+use mod_perform\state\subject_instance\subject_instance_availability;
 use mod_perform\state\subject_instance\subject_instance_progress;
 
 /**
@@ -40,10 +41,14 @@ use mod_perform\state\subject_instance\subject_instance_progress;
  *
  * @property-read int $id
  * @property-read user $subject_user The user that this activity is about
+ * @property-read int $subject_user_id The user id for the user this instance is about
  * @property-read int $progress The progress status code
+ * @property-read int $availability The availability status code
  * @property-read activity $activity The top level perform activity this is an instance of
  * @property-read collection|participant_instance[] $participant_instances models created from participant_instance entities
  * @property-read string $progress_status internal name of current progress state
+ * @property-read subject_instance_progress|state $progress_state Current progress state
+ * @property-read subject_instance_availability|state $availability_state Current availability state
  *
  * @package mod_perform\models\activity
  */
@@ -54,13 +59,17 @@ class subject_instance extends model {
     protected $entity_attribute_whitelist = [
         'id',
         'subject_user',
-        'progress'
+        'subject_user_id',
+        'progress',
+        'availability',
     ];
 
     protected $model_accessor_whitelist = [
         'activity',
         'participant_instances',
         'progress_status',
+        'progress_state',
+        'availability_state',
     ];
 
     /** @var subject_instance_entity */
@@ -136,7 +145,17 @@ class subject_instance extends model {
      *
      * @return state
      */
-    private function get_progress_state(): state {
+    public function get_progress_state(): state {
         return $this->get_state(subject_instance_progress::get_type());
     }
+
+    /**
+     * Get the current availability state.
+     *
+     * @return subject_instance_availability|state
+     */
+    public function get_availability_state(): state {
+        return $this->get_state(subject_instance_availability::get_type());
+    }
+
 }

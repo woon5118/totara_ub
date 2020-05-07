@@ -17,19 +17,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Matthias Bonk <matthias.bonk@totaralearning.com>
+ * @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
  * @package mod_perform
  */
 
 namespace mod_perform\event;
 
-defined('MOODLE_INTERNAL') || die();
-
 use core\event\base;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\models\activity\participant_instance;
 
-class participant_instance_progress_updated extends base {
+/**
+ * Class participant_instance_availability_closed event is triggered when a participant instance is closed.
+ *
+ * @package mod_perform\event
+ */
+class participant_instance_availability_closed extends base {
 
     /**
      * Initialise required event data properties.
@@ -41,19 +44,38 @@ class participant_instance_progress_updated extends base {
     }
 
     /**
-     * Create event by participant instance.
+     * Create instance of event.
      *
      * @param participant_instance $participant_instance
      * @return self|base
      */
     public static function create_from_participant_instance(participant_instance $participant_instance): self {
+        $subject_instance = $participant_instance->subject_instance;
         $data = [
-            'objectid' => $participant_instance->get_id(),
+            'objectid' => $participant_instance->id,
             'relateduserid' => $participant_instance->participant_id,
-            'other' => [],
-            'context' => $participant_instance->get_context(),
+            'other' => [
+                'subject_instance_id' => $subject_instance->id,
+            ],
+            'context' => $subject_instance->get_context(),
         ];
 
         return static::create($data);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_name() {
+        return get_string('event_participant_instance_availability_closed', 'mod_perform');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function get_description() {
+        return 'The availability of the participant instance with id ' . $this->objectid
+            . ' for the user with id ' . $this->relateduserid . ' has been closed';
+    }
+
 }
