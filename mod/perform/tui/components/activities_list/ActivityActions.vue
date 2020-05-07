@@ -35,7 +35,7 @@
       />
     </a>
 
-    <Dropdown position="bottom-right">
+    <Dropdown v-if="activity.can_manage" position="bottom-right">
       <template v-slot:trigger="{ toggle }">
         <a href="#" @click.prevent="toggle">
           <ActivityActionsIcon

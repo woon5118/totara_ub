@@ -50,6 +50,9 @@ class activity implements type_resolver {
         if ($field == 'can_view_participation_reporting') {
             return $activity->can_view_participation_reporting();
         }
+        if ($field == 'can_manage') {
+            return $activity->can_manage();
+        }
 
         $format = $args['format'] ?? format::FORMAT_HTML;
         $formatter = new activity_formatter($activity, $ec->get_relevant_context());

@@ -59,7 +59,7 @@ class activity {
         foreach ($entities as $entity) {
             /** @var activity_model $item */
             $item = activity_model::load_by_entity($entity);
-            if ($item->can_manage()) {
+            if ($item->can_manage() || $item->can_view_participation_reporting()) {
                 $this->items[] = $item;
             }
         }

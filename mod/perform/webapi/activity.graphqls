@@ -18,7 +18,8 @@ type mod_perform_activity {
   updated_at(format: core_date_format = TIMESTAMP): core_date
   can_view_participation_reporting: Boolean! # Whether the current user can view the participation tracking for the activity
   can_potentially_activate: Boolean! # Whether this activity could be activated due to capability checks and current status, without checking further conditions
-  can_activate: Boolean! # Whether this activity can be activated, only if it satisfies all conditions
+  can_activate: Boolean! # Whether the current user can activate this activity, only if it satisfies all conditions
+  can_manage: Boolean! # Whether the current user can manage this activity
   close_on_completion: Boolean! # Whether instances & sections should be closed on completion
   sections: [mod_perform_section!]!
   state_details: mod_perform_activity_state!

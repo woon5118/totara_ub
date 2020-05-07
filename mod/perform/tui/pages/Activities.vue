@@ -67,7 +67,10 @@
         </template>
         <template v-slot:row="{ row }">
           <Cell size="9" :column-header="$str('view_name', 'mod_perform')">
-            <a :href="getEditActivityUrl(row.id)">{{ row.name }}</a>
+            <a v-if="row.can_manage" :href="getEditActivityUrl(row.id)">{{
+              row.name
+            }}</a>
+            <div v-else>{{ row.name }}</div>
           </Cell>
           <Cell size="2" :column-header="$str('view_type', 'mod_perform')">
             {{ row.type.display_name }}
