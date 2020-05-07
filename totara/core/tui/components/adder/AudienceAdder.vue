@@ -33,13 +33,13 @@
     @selected-tab-active="updateSelectedItems($event)"
   >
     <template v-slot:browse-filters>
-      <FilterBar :title="'Filter cities'">
+      <FilterBar :title="$str('filter_audiences', 'totara_core')">
         <template v-slot:filters-left="{ stacked }">
           <SearchFilter
             v-model="filters.search"
-            label="Filter items by search"
+            :label="$str('filter_audiences_search_label', 'totara_core')"
             :show-label="false"
-            :placeholder="'Search'"
+            :placeholder="$str('search', 'totara_core')"
             :stacked="stacked"
           />
         </template>
@@ -315,7 +315,10 @@ export default {
 <lang-strings>
 {
   "totara_core": [
-    "select_audiences"
+    "filter_audiences",
+    "filter_audiences_search_label",
+    "select_audiences",
+    "search"
   ],
   "totara_cohort": [
     "cohortname",
