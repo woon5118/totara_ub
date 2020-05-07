@@ -21,30 +21,29 @@
  * @package core
  */
 
-namespace core\perf_stats;
+namespace core\performance_statistics;
 
-use core\session\manager;
 use stdClass;
 
-class session extends provider {
+/**
+ * Returns memory usage, includes growth and peak as well
+ *
+ * @package core\perf_stats
+ */
+class memory extends provider {
 
     /**
      * @inheritDoc
      */
     public function get_data() {
-        global $CFG, $PAGE;
-        if (!empty($CFG->early_install_lang) or empty($PAGE)) {
-            return null;
-        }
+        global $PERF;
 
-        // Display size of session if session started.
-        if ($session_info = manager::get_performance_info()) {
-            $data = new stdClass();
-            $data->size = $session_info['size'];
-            $data->handler = $session_info['handler'];
-        }
+        $data = new stdClass();
+        $data->total = memory_get_usage();
+        $data->growth = (memory_get_usage() - $PERF->startmemory);
+        $data->peak = memory_get_peak_usage();
 
-        return $data ?? null;
+        return $data;
     }
 
 }

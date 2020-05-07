@@ -21,7 +21,7 @@
  * @package core
  */
 
-namespace core\perf_stats;
+namespace core\performance_statistics;
 
 use ReflectionClass;
 

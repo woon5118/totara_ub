@@ -21,15 +21,31 @@
  * @package core
  */
 
-namespace core\perf_stats;
+namespace core\performance_statistics;
 
-class includecount extends provider {
+use filter_manager;
+use stdClass;
+
+/**
+ * Returns information about how many filters where applied
+ *
+ * @package core\perf_stats
+ */
+class filters extends provider {
 
     /**
      * @inheritDoc
      */
     public function get_data() {
-        return count(get_included_files());
+        $filtermanager = filter_manager::instance();
+        if (method_exists($filtermanager, 'get_performance_summary')) {
+            [$filterinfo, $nicenames] = $filtermanager->get_performance_summary();
+            $data = new stdClass();
+            $data->data = $filterinfo;
+            $data->names = $nicenames;
+        }
+
+        return $data ?? null;
     }
 
 }

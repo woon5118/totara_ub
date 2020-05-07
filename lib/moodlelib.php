@@ -28,7 +28,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use core\perf_stats\collector;
+use core\performance_statistics\collector;
 use totara_core\advanced_feature;
 
 defined('MOODLE_INTERNAL') || die();

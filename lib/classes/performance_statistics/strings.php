@@ -21,16 +21,33 @@
  * @package core
  */
 
-namespace core\perf_stats;
+namespace core\performance_statistics;
 
-class realtime extends provider {
+use core\session\manager;
+use stdClass;
+
+class strings extends provider {
 
     /**
      * @inheritDoc
      */
     public function get_data() {
-        global $PERF;
-        return microtime_diff($PERF->starttime, microtime());
+        global $CFG;
+        // The string manager is not fully initialised
+        if (!empty($CFG->early_install_lang)) {
+            return null;
+        }
+
+        // String Manager performance summary
+        $string_manager = get_string_manager();
+        if (method_exists($string_manager, 'get_performance_summary')) {
+            [$filterinfo, $nice_names] = $string_manager->get_performance_summary();
+            $data = new stdClass();
+            $data->data = $filterinfo;
+            $data->names = $nice_names;
+        }
+
+        return $data ?? null;
     }
 
 }

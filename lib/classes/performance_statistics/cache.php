@@ -21,32 +21,23 @@
  * @package core
  */
 
-namespace core\perf_stats;
+namespace core\performance_statistics;
 
-use core\session\manager;
-use stdClass;
+use cache_helper;
 
-class strings extends provider {
+/**
+ * Detailed stats about cache usage, returns list of cachestores,
+ * it's number of cached entries and how many hits and misses it has
+ *
+ * @package core\perf_stats
+ */
+class cache extends provider {
 
     /**
      * @inheritDoc
      */
     public function get_data() {
-        global $CFG, $PAGE;
-        if (!empty($CFG->early_install_lang) or empty($PAGE)) {
-            return null;
-        }
-
-        // String Manager performance summary
-        $string_manager = get_string_manager();
-        if (method_exists($string_manager, 'get_performance_summary')) {
-            [$filterinfo, $nice_names] = $string_manager->get_performance_summary();
-            $data = new stdClass();
-            $data->data = $filterinfo;
-            $data->names = $nice_names;
-        }
-
-        return $data ?? null;
+        return cache_helper::get_stats() ?? null;
     }
 
 }

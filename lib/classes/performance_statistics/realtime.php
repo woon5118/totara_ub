@@ -21,20 +21,22 @@
  * @package core
  */
 
-namespace core\perf_stats;
+namespace core\performance_statistics;
 
-class logwrites extends provider {
+/**
+ * Returns the duration of this script run from the time the performance
+ * tracking started till now.
+ *
+ * @package core\perf_stats
+ */
+class realtime extends provider {
 
     /**
      * @inheritDoc
      */
     public function get_data() {
-        global $CFG, $PAGE;
-        if (!empty($CFG->early_install_lang) or empty($PAGE)) {
-            return null;
-        }
-
-        return count(get_included_files());
+        global $PERF;
+        return microtime_diff($PERF->starttime, microtime());
     }
 
 }

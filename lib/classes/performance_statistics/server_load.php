@@ -21,22 +21,28 @@
  * @package core
  */
 
-namespace core\perf_stats;
+namespace core\performance_statistics;
 
-use stdClass;
-
-class memory extends provider {
+class server_load extends provider {
 
     /**
      * @inheritDoc
      */
     public function get_data() {
-        global $PERF;
-
-        $data = new stdClass();
-        $data->total = memory_get_usage();
-        $data->growth = (memory_get_usage() - $PERF->startmemory);
-        $data->peak = memory_get_peak_usage();
+        $data = null;
+        // Grab the load average for the last minute.
+        // /proc will only work under some linux configurations
+        // while uptime is there under MacOSX/Darwin and other unices.
+        if (is_readable('/proc/loadavg') && $loadavg = @file('/proc/loadavg')) {
+            list($data) = explode(' ', $loadavg[0]);
+            unset($loadavg);
+        } else if (function_exists('is_executable') && is_executable('/usr/bin/uptime') && $loadavg = `/usr/bin/uptime`) {
+            if (preg_match('/load averages?: (\d+[\.,:]\d+)/', $loadavg, $matches)) {
+                $data = $matches[1];
+            } else {
+                trigger_error('Could not parse uptime output!');
+            }
+        }
 
         return $data;
     }

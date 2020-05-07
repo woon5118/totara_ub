@@ -21,7 +21,7 @@
  * @package core
  */
 
-namespace core\perf_stats;
+namespace core\performance_statistics;
 
 use core_component;
 use stdClass;
@@ -40,7 +40,7 @@ class collector {
 
     public function __construct() {
         /** @var provider[] $providers */
-        $providers = core_component::get_namespace_classes('perf_stats', provider::class);
+        $providers = core_component::get_namespace_classes('performance_statistics', provider::class);
         foreach ($providers as $provider) {
             $this->providers[] = new $provider();
         }

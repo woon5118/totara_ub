@@ -21,29 +21,25 @@
  * @package core
  */
 
-namespace core\perf_stats;
+namespace core\performance_statistics;
 
+use core\session\manager;
 use stdClass;
 
-class db extends provider {
+class session extends provider {
 
     /**
      * @inheritDoc
      */
     public function get_data() {
-        global $CFG, $PAGE;
-        if (!empty($CFG->early_install_lang) or empty($PAGE)) {
-            return null;
+        // Display size of session if session started.
+        if ($session_info = manager::get_performance_info()) {
+            $data = new stdClass();
+            $data->size = $session_info['size'];
+            $data->handler = $session_info['handler'];
         }
 
-        global $DB, $PERF;
-
-        $data = new stdClass();
-        $data->reads = $DB->perf_get_reads();
-        $data->writes = ($DB->perf_get_writes() - $PERF->logwrites);
-        $data->time = round($DB->perf_get_queries_time(), 5);
-
-        return $data;
+        return $data ?? null;
     }
 
 }

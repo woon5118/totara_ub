@@ -21,22 +21,30 @@
  * @package core
  */
 
-namespace core\perf_stats;
+namespace core\performance_statistics;
 
-use cache_helper;
+use stdClass;
 
-class cache extends provider {
+/**
+ * Returns information about how many database reads and writes happened
+ * and how much total time database queries took.
+ *
+ * @package core\perf_stats
+ */
+class db extends provider {
 
     /**
      * @inheritDoc
      */
     public function get_data() {
-        global $CFG, $PAGE;
-        if (!empty($CFG->early_install_lang) or empty($PAGE)) {
-            return null;
-        }
+        global $DB, $PERF;
 
-        return cache_helper::get_stats() ?? null;
+        $data = new stdClass();
+        $data->reads = $DB->perf_get_reads();
+        $data->writes = ($DB->perf_get_writes() - $PERF->logwrites);
+        $data->time = round($DB->perf_get_queries_time(), 5);
+
+        return $data;
     }
 
 }

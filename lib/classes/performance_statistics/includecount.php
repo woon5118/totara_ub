@@ -21,36 +21,20 @@
  * @package core
  */
 
-namespace core\perf_stats;
+namespace core\performance_statistics;
 
-use stdClass;
-
-class posix_times extends provider {
+/**
+ * Returns number of included files
+ *
+ * @package core\perf_stats
+ */
+class includecount extends provider {
 
     /**
      * @inheritDoc
      */
     public function get_data() {
-        global $PERF, $CFG, $PAGE;
-        if (!empty($CFG->early_install_lang) or empty($PAGE)) {
-            return null;
-        }
-
-        if (!function_exists('posix_times')) {
-            return null;
-        }
-
-        $ptimes = posix_times();
-        
-        $data = new stdClass();
-
-        if (is_array($ptimes)) {
-            foreach ($ptimes as $key => $val) {
-                $data->$key = $ptimes[$key] - $PERF->startposixtimes[$key];
-            }
-        }
-
-        return $data;
+        return count(get_included_files());
     }
 
 }

@@ -24,7 +24,7 @@
 namespace totara_webapi;
 
 use coding_exception;
-use core\perf_stats\collector;
+use core\performance_statistics\collector;
 use core\webapi\execution_context;
 use Exception;
 use GraphQL\Error\Debug;
@@ -148,7 +148,11 @@ class server {
             $result->setErrorsHandler([util::class, 'graphql_error_handler']);
         }
 
-        $this->add_performance_data_to_result($result);
+        if ((defined('MDL_PERF') && MDL_PERF === true)
+            || (!empty($CFG->perfdebug) && $CFG->perfdebug > 7)
+        ) {
+            $this->add_performance_data_to_result($result);
+        }
         
         return $result;
     }
@@ -219,28 +223,22 @@ class server {
      *
      * @param ExecutionResult|ExecutionResult[] $results
      */
-    protected function add_performance_data_to_result($results) {
-        global $CFG;
+    private function add_performance_data_to_result($results) {
+        // We only want to query the performance metrics once per request
+        // so do it once and pass it on if we have multiple results
+        $collector = new collector();
+        $performance_data = $collector->all();
 
-        if ((defined('MDL_PERF') && MDL_PERF === true)
-            || (!empty($CFG->perfdebug) && $CFG->perfdebug > 7)
-        ) {
-            // We only want to query the performance metrics once per request
-            // so do it once and pass it on if we have multiple results
-            $collector = new collector();
-            $performance_data = $collector->all();
-
-            // If this is a batched queries we will have multiple results
-            // so go through them and add the performance metrics for them
-            if (is_array($results)) {
-                foreach ($results as $result) {
-                    if ($result instanceof ExecutionResult) {
-                        $result->extensions['performance_data'] = $performance_data;
-                    }
+        // If this is a batched queries we will have multiple results
+        // so go through them and add the performance metrics for them
+        if (is_array($results)) {
+            foreach ($results as $result) {
+                if ($result instanceof ExecutionResult) {
+                    $result->extensions['performance_data'] = $performance_data;
                 }
-            } else if ($results instanceof ExecutionResult) {
-                $results->extensions['performance_data'] = $performance_data;
             }
+        } else if ($results instanceof ExecutionResult) {
+            $results->extensions['performance_data'] = $performance_data;
         }
     }
 

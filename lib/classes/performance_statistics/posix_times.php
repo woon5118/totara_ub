@@ -21,31 +21,34 @@
  * @package core
  */
 
-namespace core\perf_stats;
+namespace core\performance_statistics;
 
-class server_load extends provider {
+use stdClass;
+
+/**
+ * Returns posix times information about the current process CPU usage
+ *
+ * @package core\perf_stats
+ */
+class posix_times extends provider {
 
     /**
      * @inheritDoc
      */
     public function get_data() {
-        global $PERF, $CFG, $PAGE;
-        if (!empty($CFG->early_install_lang) or empty($PAGE)) {
+        global $PERF;
+
+        if (!function_exists('posix_times')) {
             return null;
         }
 
-        $data = null;
-        // Grab the load average for the last minute.
-        // /proc will only work under some linux configurations
-        // while uptime is there under MacOSX/Darwin and other unices.
-        if (is_readable('/proc/loadavg') && $loadavg = @file('/proc/loadavg')) {
-            list($data) = explode(' ', $loadavg[0]);
-            unset($loadavg);
-        } else if (function_exists('is_executable') && is_executable('/usr/bin/uptime') && $loadavg = `/usr/bin/uptime`) {
-            if (preg_match('/load averages?: (\d+[\.,:]\d+)/', $loadavg, $matches)) {
-                $data = $matches[1];
-            } else {
-                trigger_error('Could not parse uptime output!');
+        $ptimes = posix_times();
+        
+        $data = new stdClass();
+
+        if (is_array($ptimes)) {
+            foreach ($ptimes as $key => $val) {
+                $data->$key = $ptimes[$key] - $PERF->startposixtimes[$key];
             }
         }
 

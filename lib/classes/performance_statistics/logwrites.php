@@ -21,30 +21,21 @@
  * @package core
  */
 
-namespace core\perf_stats;
+namespace core\performance_statistics;
 
-use filter_manager;
-use stdClass;
-
-class filters extends provider {
+/**
+ * Number of writes to the logs
+ *
+ * @package core\perf_stats
+ */
+class logwrites extends provider {
 
     /**
      * @inheritDoc
      */
     public function get_data() {
-        global $CFG, $PAGE;
-        if (!empty($CFG->early_install_lang) or empty($PAGE)) {
-            return null;
-        }
-        $filtermanager = filter_manager::instance();
-        if (method_exists($filtermanager, 'get_performance_summary')) {
-            [$filterinfo, $nicenames] = $filtermanager->get_performance_summary();
-            $data = new stdClass();
-            $data->data = $filterinfo;
-            $data->names = $nicenames;
-        }
-
-        return $data ?? null;
+        global $PERF;
+        return isset($PERF->logwrites) ? $PERF->logwrites : null;
     }
 
 }
