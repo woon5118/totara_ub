@@ -25,13 +25,11 @@ use core\collection;
 use \mod_perform\entities\activity\activity_relationship;
 use mod_perform\entities\activity\participant_instance;
 use mod_perform\entities\activity\subject_instance;
-use mod_perform\entities\activity\track_assignment;
 use mod_perform\entities\activity\track_user_assignment;
 use mod_perform\expand_task;
 use mod_perform\task\service\participant_instance_creation;
 use mod_perform\task\service\subject_instance_creation;
 use mod_perform\task\service\subject_instance_dto;
-use mod_perform\user_groups\grouping;
 use totara_job\job_assignment;
 use totara_job\relationship\resolvers\appraiser;
 use totara_job\relationship\resolvers\manager;
@@ -140,7 +138,8 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
             }
             $subject_instances_counter[$created_participant->subject_instance_id]++;
 
-            $participant_relationship = $managers_and_appraisers_list[$activity_id][$created_participant->participant_id]['relationship'];
+            $participant_relationship =
+                $managers_and_appraisers_list[$activity_id][$created_participant->participant_id]['relationship'];
             if (!isset($relationship_ids[$activity_id])) {
                 $relationship_ids[$activity_id] = [
                     'manager' => null,
@@ -150,7 +149,10 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
             if (is_null($relationship_ids[$activity_id][$participant_relationship])) {
                 $relationship_ids[$activity_id][$participant_relationship] = $created_participant->activity_relationship_id;
             }
-            $this->assertEquals($relationship_ids[$activity_id][$participant_relationship], $created_participant->activity_relationship_id);
+            $this->assertEquals(
+                $relationship_ids[$activity_id][$participant_relationship],
+                $created_participant->activity_relationship_id
+            );
         }
 
         $expected_participant_count = count($subject_instance_ids) / $this->users_per_relationship;
@@ -282,7 +284,10 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
         $activity_tree->activity = $generator->create_activity_in_container();
 
         //create sections and add relationships to activity:
-        $activity_tree->section = $generator->create_section($activity_tree->activity, ['title' => 'Test section for activity ' . $identifier]);
+        $activity_tree->section = $generator->create_section(
+            $activity_tree->activity,
+            ['title' => 'Test section for activity ' . $identifier]
+        );
 
         foreach ($this->activity_relationships as $relationship_class) {
             $generator->create_section_relationship(

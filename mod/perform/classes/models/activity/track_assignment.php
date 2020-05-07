@@ -42,6 +42,11 @@ class track_assignment extends model {
         'id',
         'track_id',
         'type',
+        'user_group_type',
+        'user_group_id',
+        'created_by',
+        'created_at',
+        'updated_at',
         'expand'
     ];
 
