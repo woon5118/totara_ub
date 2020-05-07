@@ -22,8 +22,9 @@
 
 <template>
   <Popover :triggers="['click']">
-    <template v-slot:trigger>
+    <template v-slot:trigger="{ isOpen }">
       <ButtonIcon
+        :aria-expanded="isOpen.toString()"
         :aria-label="ariaLabel"
         :disabled="disabled"
         class="tui-InfoIconButton"
