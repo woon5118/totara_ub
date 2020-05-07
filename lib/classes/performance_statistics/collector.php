@@ -29,7 +29,7 @@ use stdClass;
 /**
  * Class which collects performance stats data from throughout the application.
  *
- * @package core\perf_stats
+ * @package core\performance_statistics
  */
 class collector {
 

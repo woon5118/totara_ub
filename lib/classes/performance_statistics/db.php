@@ -29,7 +29,7 @@ use stdClass;
  * Returns information about how many database reads and writes happened
  * and how much total time database queries took.
  *
- * @package core\perf_stats
+ * @package core\performance_statistics
  */
 class db extends provider {
 

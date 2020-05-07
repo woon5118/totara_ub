@@ -28,7 +28,7 @@ use stdClass;
 /**
  * Returns posix times information about the current process CPU usage
  *
- * @package core\perf_stats
+ * @package core\performance_statistics
  */
 class posix_times extends provider {
 

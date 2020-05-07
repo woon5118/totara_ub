@@ -29,7 +29,7 @@ use cache_helper;
  * Detailed stats about cache usage, returns list of cachestores,
  * it's number of cached entries and how many hits and misses it has
  *
- * @package core\perf_stats
+ * @package core\performance_statistics
  */
 class cache extends provider {
 

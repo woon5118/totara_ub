@@ -28,7 +28,7 @@ use stdClass;
 /**
  * Returns memory usage, includes growth and peak as well
  *
- * @package core\perf_stats
+ * @package core\performance_statistics
  */
 class memory extends provider {
 

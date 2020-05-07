@@ -26,7 +26,7 @@ namespace core\performance_statistics;
 /**
  * Returns number of included files
  *
- * @package core\perf_stats
+ * @package core\performance_statistics
  */
 class includecount extends provider {
 

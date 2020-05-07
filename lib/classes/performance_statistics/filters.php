@@ -29,7 +29,7 @@ use stdClass;
 /**
  * Returns information about how many filters where applied
  *
- * @package core\perf_stats
+ * @package core\performance_statistics
  */
 class filters extends provider {
 

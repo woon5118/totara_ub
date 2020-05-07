@@ -27,7 +27,7 @@ namespace core\performance_statistics;
  * Returns the duration of this script run from the time the performance
  * tracking started till now.
  *
- * @package core\perf_stats
+ * @package core\performance_statistics
  */
 class realtime extends provider {
 

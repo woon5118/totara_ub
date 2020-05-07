@@ -26,7 +26,7 @@ namespace core\performance_statistics;
 /**
  * Number of writes to the logs
  *
- * @package core\perf_stats
+ * @package core\performance_statistics
  */
 class logwrites extends provider {
 
