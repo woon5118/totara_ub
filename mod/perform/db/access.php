@@ -29,6 +29,7 @@ $capabilities = [
         'captype' => 'read',
         'contextlevel' => CONTEXT_COURSECAT,
         'archetypes' => [
+            'manager' => CAP_ALLOW,
             'performanceactivitycreator' => CAP_ALLOW,
         ]
     ],
