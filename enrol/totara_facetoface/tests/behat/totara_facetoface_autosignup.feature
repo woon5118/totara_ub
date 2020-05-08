@@ -195,8 +195,7 @@ Feature: Users can enrol on courses that have autosignup enabled and get signed 
     Then I should see "Required"
 
     When I click on "Terms and conditions" "link"
-    Then I should see "By checking the box you confirm that permission to sign up to this seminar activity has been granted by your manager."
-    And I should see "Falsely claiming that approval has been granted can result in non-admittance and disciplinary action."
+    Then I should see "Check the box to confirm your eligibility to sign up to this seminar."
     When I click on "Close" "button"
     And I click on "authorisation" "checkbox"
     And I click on "Sign-up" "link_or_button"

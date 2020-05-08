@@ -1278,9 +1278,7 @@ $string['selfapprovalsoughtbrief'] = 'I accept the terms and conditions.';
 $string['selfapprovalsoughtdesc'] = 'By checking this box, I confirm that I have read and agreed to the {$a} (opens a new window).';
 $string['selfapprovaltandc'] = 'Self Approval Terms and Conditions';
 $string['selfapprovaltandc_help'] = 'Where an activity has approval required and an event has self approval enabled these are the terms and conditions that will be displayed when a user signs up.';
-$string['selfapprovaltandccontents'] = 'By checking the box you confirm that permission to sign up to this seminar activity has been granted by your manager.
-
-Falsely claiming that approval has been granted can result in non-admittance and disciplinary action.
+$string['selfapprovaltandccontents'] = 'Check the box to confirm your eligibility to sign up to this seminar.
 ';
 $string['selfbooked'] = 'Self booked';
 $string['seminarid'] = 'Seminar ID';
@@ -1432,9 +1430,7 @@ $string['setting:managerselect_caption'] = 'Users Select Manager';
 $string['setting:managerselect_format'] = 'Recommended when manager assignment data is not available. When enabled and an activity requires approval by Manager, the event sign-up page will force users to search for and select a user to approve their request to attend an event each time they sign-up. The selected user will receive a notification about the request and instructions on how to approve or decline it.';
 $string['setting:termsandconditions_caption'] = 'Terms and conditions';
 $string['setting:termsandconditions_format'] = 'Text entered in this setting will be the default for the \'Learner accepts terms and conditions\' setting but can be edited for each activity.';
-$string['setting:termsandconditions_default'] = 'By checking the box you confirm that permission to sign up to this seminar activity has been granted by your manager.
-
-Falsely claiming that approval has been granted can result in non-admittance and disciplinary action.
+$string['setting:termsandconditions_default'] = 'Check the box to confirm your eligibility to sign up to this seminar.
 ';
 $string['setting:adminapprovers_caption'] = 'Site level administrative approvers';
 $string['setting:adminapprovers_format'] = 'Selected users \'site level administrative approvers\' are automatically added to all seminar activities and can not be removed from within any given activity (note: other administrative approvers can be added to each seminar activity)';
