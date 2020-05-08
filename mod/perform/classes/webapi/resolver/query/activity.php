@@ -25,39 +25,40 @@ namespace mod_perform\webapi\resolver\query;
 
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\resolver\has_middleware;
+
+use mod_perform\webapi\middleware\require_activity;
 use mod_perform\models\activity\activity as activity_model;
-use totara_core\advanced_feature;
 
-class activity implements query_resolver {
-
+class activity implements query_resolver, has_middleware {
     /**
-     * Get a specific perform activity by id.
-     *
-     * @param array $args
-     * @param execution_context $ec
-     * @return activity_model
+     * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
-        advanced_feature::require('performance_activities');
-        require_login(null, false, null, false, true);
-
         // This may be opened up later, but for now user needs manage capability.
         /** @var activity_model $activity */
         $activity = activity_model::load_by_id($args['activity_id']);
 
-        $activity_context = $activity->get_context();
-
         if (!$activity->can_manage()) {
             throw new \required_capability_exception(
-                $activity_context,
+                $activity->get_context(),
                 'mod/perform:manage_activity',
                 'nopermission',
                 ''
             );
         }
 
-        $ec->set_relevant_context($activity_context);
-
         return $activity;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_advanced_feature('performance_activities'),
+            require_activity::by_activity_id('activity_id', true)
+        ];
     }
 }

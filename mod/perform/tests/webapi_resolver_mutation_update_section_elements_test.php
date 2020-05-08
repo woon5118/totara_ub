@@ -21,18 +21,20 @@
  * @package mod_perform
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-use core\webapi\execution_context;
 use mod_perform\models\activity\section;
 use mod_perform\webapi\resolver\mutation\update_section_elements;
-use totara_webapi\graphql;
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
+ * @coversDefaultClass update_section_elements.
+ *
  * @group perform
  * Tests the mutation to add, update and delete section elements
  */
 class mod_perform_webapi_resolver_mutation_update_section_elements_testcase extends advanced_testcase {
+    private const MUTATION = 'mod_perform_update_section_elements';
+
+    use webapi_phpunit_helper;
 
     public function test_create_new_section_elements(): void {
         global $DB;
@@ -65,7 +67,8 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
             ]
         ];
 
-        $result = update_section_elements::resolve($args, execution_context::create('dev'));
+        $context = $this->create_webapi_context(self::MUTATION);
+        $result = update_section_elements::resolve($args, $context);
 
         // Check that the changes were made.
         $section_element_records = $DB->get_records('perform_section_element', ['section_id' => $section->id]);
@@ -136,7 +139,8 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
             ]
         ];
 
-        $result = update_section_elements::resolve($args, execution_context::create('dev'));
+        $context = $this->create_webapi_context(self::MUTATION);
+        $result = update_section_elements::resolve($args, $context);
 
         // Check that the changes were made.
         $section_element_records = $DB->get_records('perform_section_element', ['section_id' => $section->id]);
@@ -208,7 +212,8 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
         ];
         // Section sort order 1 => element 2 (title 2), section sort order 2 => element 1 (title 1).
 
-        update_section_elements::resolve($args, execution_context::create('dev'));
+        $context = $this->create_webapi_context(self::MUTATION);
+        $result = update_section_elements::resolve($args, $context);
 
         $args = [
             'input' => [
@@ -229,7 +234,7 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
         ];
         // Section sort order 1 => element 2 (title 4), section sort order 2 => element 1 (title 3).
 
-        $result = update_section_elements::resolve($args, execution_context::create('dev'));
+        $result = update_section_elements::resolve($args, $context);
 
         // Check that the changes were made.
         $section_element_records = $DB->get_records('perform_section_element', ['section_id' => $section->id]);
@@ -306,7 +311,8 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
             ]
         ];
 
-        update_section_elements::resolve($args, execution_context::create('dev'));
+        $context = $this->create_webapi_context(self::MUTATION);
+        $result = update_section_elements::resolve($args, $context);
 
         $section_elements = $section->get_section_elements();
 
@@ -332,7 +338,7 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
             ]
         ];
 
-        $result = update_section_elements::resolve($args, execution_context::create('dev'));
+        $result = update_section_elements::resolve($args, $context);
 
         // Check that the changes were made.
         $section_element_records = $DB->get_records('perform_section_element', ['section_id' => $section->id]);
@@ -397,7 +403,8 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
             ]
         ];
 
-        update_section_elements::resolve($args, execution_context::create('dev'));
+        $context = $this->create_webapi_context(self::MUTATION);
+        $result = update_section_elements::resolve($args, $context);
 
         $section_elements = $section->get_section_elements();
 
@@ -431,7 +438,7 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
             ]
         ];
 
-        $result = update_section_elements::resolve($args, execution_context::create('dev'));
+        $result = update_section_elements::resolve($args, $context);
 
         // Check that the changes were made.
         $section_element_records = $DB->get_records('perform_section_element', ['section_id' => $section->id]);
@@ -521,7 +528,8 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
             ]
         ];
 
-        update_section_elements::resolve($args, execution_context::create('dev'));
+        $context = $this->create_webapi_context(self::MUTATION);
+        $result = update_section_elements::resolve($args, $context);
 
         $section_elements = $section->get_section_elements();
 
@@ -573,10 +581,11 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
             ]
         ];
 
-        $result = graphql::execute_operation(
-            execution_context::create('ajax', 'mod_perform_update_section_elements'),
-            $args
-        );
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_successful($result);
+
+        $result_data = $this->get_webapi_operation_data($result);
+        $this->assertNotEmpty($result_data, "no result");
 
         // Check that the changes were made.
         $section_element_records = $DB->get_records('perform_section_element', ['section_id' => $section->id]);
@@ -620,7 +629,6 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
         $this->assertEquals(4, $section_elements[4]->sort_order);
 
         // Check that the result is correct (good enough).
-        $result_data = $result->data['mod_perform_update_section_elements'];
         $this->assertEquals($section->id, $result_data['section']['id']);
         $this->assertCount(4, $result_data['section']['section_elements']);
     }

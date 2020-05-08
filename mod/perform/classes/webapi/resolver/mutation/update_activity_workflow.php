@@ -25,23 +25,19 @@ namespace mod_perform\webapi\resolver\mutation;
 
 use core\webapi\execution_context;
 use core\webapi\mutation_resolver;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\resolver\has_middleware;
 use mod_perform\models\activity\activity;
-use totara_core\advanced_feature;
+use mod_perform\webapi\middleware\require_activity;
 use required_capability_exception;
 
-class update_activity_workflow implements mutation_resolver {
-
+class update_activity_workflow implements mutation_resolver, has_middleware {
     /**
      * Updates the workflow options for an activity.
      *
-     * @param array $args
-     * @param execution_context $ec
-     * @return activity
+     * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
-        advanced_feature::require('performance_activities');
-        require_login(null, false, null, false, true);
-
         $input = $args['input'];
         $activity = activity::load_by_id($input['activity_id']);
 
@@ -56,9 +52,16 @@ class update_activity_workflow implements mutation_resolver {
 
         $activity->set_close_on_completion($input['close_on_completion']);
 
-        $ec->set_relevant_context($activity->get_context());
-
         return $activity;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_advanced_feature('performance_activities'),
+            require_activity::by_activity_id('input.activity_id', true)
+        ];
+    }
 }

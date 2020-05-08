@@ -25,21 +25,19 @@ namespace mod_perform\webapi\resolver\mutation;
 
 use core\webapi\execution_context;
 use core\webapi\mutation_resolver;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\resolver\has_middleware;
+use mod_perform\webapi\middleware\require_activity;
 use mod_perform\models\activity\activity;
 use moodle_exception;
-use totara_core\advanced_feature;
 
-class activate_activity implements mutation_resolver {
-
+class activate_activity implements mutation_resolver, has_middleware {
     /**
      * This activates the activity
      *
      * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
-        advanced_feature::require('performance_activities');
-        require_login(null, false, null, false, true);
-
         $args = $args['input'];
 
         try {
@@ -49,8 +47,6 @@ class activate_activity implements mutation_resolver {
                 throw new moodle_exception('invalid_activity', 'mod_perform');
             }
         }
-
-        $ec->set_relevant_context($activity->get_context());
 
         // If activity is already active just return
         if ($activity->is_active()) {
@@ -64,5 +60,15 @@ class activate_activity implements mutation_resolver {
         $activity->activate();
 
         return ['activity' => $activity];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_advanced_feature('performance_activities'),
+            require_activity::by_activity_id('input.activity_id', true)
+        ];
     }
 }

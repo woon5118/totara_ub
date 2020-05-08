@@ -26,19 +26,23 @@ namespace mod_perform\webapi\resolver\query;
 use core\entities\user;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
+use core\webapi\resolver\has_middleware;
 use mod_perform\data_providers\response\participant_section_with_responses;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
 use mod_perform\models\activity\participant_instance as participant_instance_model;
 use mod_perform\models\response\participant_section as participant_section_model;
-use totara_core\advanced_feature;
 
-class participant_section implements query_resolver {
-
+class participant_section implements query_resolver, has_middleware {
+    /**
+     * {@inheritdoc}
+     */
     public static function resolve(array $args, execution_context $ec) {
-        advanced_feature::require('performance_activities');
-        require_login(null, false, null, false, true);
-
-        $participant_instance_id = $args['participant_instance_id'];
+        $participant_instance_id = $args['participant_instance_id'] ?? 0;
+        if (!$participant_instance_id) {
+            throw new \invalid_parameter_exception('invalid participant instance id');
+        }
         $participant_id = user::logged_in()->id;
 
         $participant_section_entity = participant_section_entity::repository()->fetch_default(
@@ -60,5 +64,15 @@ class participant_section implements query_resolver {
         participant_section_model::load_by_entity($participant_section_entity)->on_participant_access();
 
         return $data_provider->fetch()->get();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_advanced_feature('performance_activities'),
+            new require_login()
+        ];
     }
 }

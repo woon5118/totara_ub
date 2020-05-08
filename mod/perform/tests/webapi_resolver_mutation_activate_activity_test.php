@@ -21,60 +21,47 @@
  * @package mod_perform
  */
 
-use core\webapi\execution_context;
 use mod_perform\models\activity\activity as activity;
 use mod_perform\state\activity\active;
 use mod_perform\state\activity\draft;
 use mod_perform\webapi\resolver\mutation\activate_activity;
 use totara_job\relationship\resolvers\manager;
-use totara_webapi\graphql;
+use totara_core\advanced_feature;
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
- * Class mod_perform_webapi_resolver_mutation_activate_activity_testcase
+ * @coversDefaultClass activate_activity.
  *
  * @group perform
  */
 class mod_perform_webapi_resolver_mutation_activate_activity_testcase extends advanced_testcase {
+    private const MUTATION = 'mod_perform_activate_activity';
 
-    private function get_execution_context(string $type = graphql::TYPE_AJAX, ?string $operation = null): execution_context {
-        return execution_context::create($type, $operation);
-    }
+    use webapi_phpunit_helper;
 
     public function test_activate_draft_activity(): void {
-        $this->setAdminUser();
-
-        $activity = $this->create_valid_activity();
-
-        $args = ['input' => ['activity_id' => $activity->id]];
+        [$activity, $args, $context] = $this->create_valid_activity();
 
         /** @var activity $result */
-        ['activity' => $result] = activate_activity::resolve($args, $this->get_execution_context());
+        ['activity' => $result] = activate_activity::resolve($args, $context);
         $this->assertEquals($activity->id, $result->id);
         $this->assertEquals(active::get_code(), $result->status);
     }
 
     public function test_activate_draft_activity_which_does_not_satisfy_conditions(): void {
-        $this->setAdminUser();
-
-        $activity = $this->create_activity();
-
-        $args = ['input' => ['activity_id' => $activity->id]];
+        [, $args, $context] = $this->create_activity();
 
         $this->expectException(moodle_exception::class);
         $this->expectExceptionMessage('Cannot activate this activity due to invalid state or conditions are not satisfied.');
 
-        activate_activity::resolve($args, $this->get_execution_context());
+        activate_activity::resolve($args, $context);
     }
 
     public function test_activate_active_activity(): void {
-        $this->setAdminUser();
-
-        $activity = $this->create_valid_activity(active::get_code());
-
-        $args = ['input' => ['activity_id' => $activity->id]];
+        [$activity, $args, $context] = $this->create_valid_activity(active::get_code());
 
         /** @var activity $result */
-        ['activity' => $result] = activate_activity::resolve($args, $this->get_execution_context());
+        ['activity' => $result] = activate_activity::resolve($args, $context);
         $this->assertEquals($activity->id, $result->id);
         $this->assertEquals(active::get_code(), $result->status);
     }
@@ -83,51 +70,46 @@ class mod_perform_webapi_resolver_mutation_activate_activity_testcase extends ad
         $user1 = $this->getDataGenerator()->create_user();
         $user2 = $this->getDataGenerator()->create_user();
 
-        $this->setUser($user1);
-
-        $activity = $this->create_valid_activity();
+        [, $args, $context] = $this->create_valid_activity(null, $user1);
 
         $this->setUser($user2);
 
         $this->expectException(moodle_exception::class);
         $this->expectExceptionMessage('Invalid activity');
-
-        $args = ['input' => ['activity_id' => $activity->id]];
-
-        activate_activity::resolve($args, $this->get_execution_context());
+        activate_activity::resolve($args, $context);
     }
 
     public function test_activate_nonexisting_activity(): void {
-        $this->setAdminUser();
+        $root_key = 'input';
+        $activity_id_key = 'activity_id';
+        $args = [
+            $root_key => [
+                $activity_id_key => 999
+            ]
+        ];
+
+        $context = $this->create_webapi_context(self::MUTATION);
 
         $this->expectException(moodle_exception::class);
         $this->expectExceptionMessage('Invalid activity');
 
-        $args = ['input' => ['activity_id' => 999]];
-
-        activate_activity::resolve($args, $this->get_execution_context());
+        activate_activity::resolve($args, $context);
     }
 
     /**
      * Test the mutation through the GraphQL stack.
      */
     public function test_execute_query_successful_on_draft_activity() {
-        $this->setAdminUser();
+        [$activity, $args, ] = $this->create_valid_activity();
 
-        $activity = $this->create_valid_activity();
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_successful($result);
 
-        $args = ['activity_id' => $activity->id];
+        $result = $this->get_webapi_operation_data($result);
+        $this->assertNotEmpty($result, 'result empty');
 
-        $result = graphql::execute_operation(
-            $this->get_execution_context(graphql::TYPE_AJAX, 'mod_perform_activate_activity'),
-            ['input' => $args]
-        );
-
-        $this->assertEquals([], $result->errors);
-        $this->assertArrayHasKey('mod_perform_activate_activity', $result->data);
-        $result = $result->data['mod_perform_activate_activity'];
-        $this->assertArrayHasKey('activity', $result);
-        $activity_result = $result['activity'];
+        $activity_result = $result['activity'] ?? null;
+        $this->assertNotEmpty($activity_result, 'result empty');
         $this->assertEquals($activity->id, $activity_result['id']);
         $this->assertEquals($activity->name, $activity_result['name']);
         $this->assertEquals(active::get_code(), $activity_result['state_details']['code']);
@@ -137,56 +119,85 @@ class mod_perform_webapi_resolver_mutation_activate_activity_testcase extends ad
      * Test the mutation through the GraphQL stack.
      */
     public function test_execute_query_successful_on_active_activity() {
-        $this->setAdminUser();
+        [$activity, $args, ] = $this->create_valid_activity();
 
-        $activity = $this->create_valid_activity(active::get_code());
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_successful($result);
 
-        $args = ['activity_id' => $activity->id];
+        $result = $this->get_webapi_operation_data($result);
+        $this->assertNotEmpty($result, 'result empty');
 
-        $result = graphql::execute_operation(
-            $this->get_execution_context(graphql::TYPE_AJAX, 'mod_perform_activate_activity'),
-            ['input' => $args]
-        );
-
-        $this->assertEquals([], $result->errors);
-        $this->assertArrayHasKey('mod_perform_activate_activity', $result->data);
-        $result = $result->data['mod_perform_activate_activity'];
-        $this->assertArrayHasKey('activity', $result);
-        $activity_result = $result['activity'];
+        $activity_result = $result['activity'] ?? null;
+        $this->assertNotEmpty($activity_result, 'result empty');
         $this->assertEquals($activity->id, $activity_result['id']);
         $this->assertEquals($activity->name, $activity_result['name']);
         $this->assertEquals(active::get_code(), $activity_result['state_details']['code']);
     }
 
     /**
+     * @covers ::resolve
+     */
+    public function test_failed_ajax_call(): void {
+        [, $args, ] = $this->create_valid_activity();
+
+        $feature = 'performance_activities';
+        advanced_feature::disable($feature);
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_failed($result, $feature);
+        advanced_feature::enable($feature);
+
+        self::setGuestUser();
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_failed($result, 'accessible');
+    }
+
+    /**
      * Create a basic activity without any sections or questions in it
      *
      * @param int|null $status defaults to draft
-     * @return activity
+     * @param stdClass $as_user user that creates the activity.
+     * @return array [activity, graphql args, graphql context] tuple.
      */
-    protected function create_activity(int $status = null): activity {
+    protected function create_activity(int $status = null, ?stdClass $as_user = null): array {
+        if ($as_user) {
+            self::setUser($as_user);
+        } else {
+            self::setAdminUser();
+        }
+
         $data_generator = $this->getDataGenerator();
         /** @var mod_perform_generator $perform_generator */
         $perform_generator = $data_generator->get_plugin_generator('mod_perform');
 
-        return $perform_generator->create_activity_in_container([
+        $activity = $perform_generator->create_activity_in_container([
             'activity_name' => 'User1 One',
             'activity_status' => $status ?? draft::get_code()
         ]);
+
+        $args = [
+            'input' => [
+                'activity_id' => $activity->id
+            ]
+        ];
+
+        $context = $this->create_webapi_context(self::MUTATION);
+        $context->set_relevant_context($activity->get_context());
+
+        return [$activity, $args, $context];
     }
 
     /**
      * Creates an activity with one section, one question and one relationship
      *
      * @param int|null $status defaults to draft
-     * @return activity
+     * @return array [activity, graphql args, graphql context] tuple.
      */
-    protected function create_valid_activity(int $status = null): activity {
+    protected function create_valid_activity(int $status = null): array {
         $data_generator = $this->getDataGenerator();
         /** @var mod_perform_generator $perform_generator */
         $perform_generator = $data_generator->get_plugin_generator('mod_perform');
 
-        $activity = $this->create_activity($status);
+        [$activity, $args, $context] = $this->create_activity($status);
 
         $section = $perform_generator->create_section($activity, ['title' => 'Test section 1']);
 
@@ -200,7 +211,6 @@ class mod_perform_webapi_resolver_mutation_activate_activity_testcase extends ad
 
         $perform_generator->create_single_activity_track_and_assignment($activity);
 
-        return $activity;
+        return [$activity, $args, $context];
     }
-
 }

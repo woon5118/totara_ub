@@ -21,11 +21,11 @@
  * @package mod_perform
  */
 
-use core\webapi\execution_context;
 use mod_perform\entities\activity\filters\subject_instances_about;
 use mod_perform\entities\activity\participant_instance;
 use mod_perform\models\activity\subject_instance;
-use totara_webapi\graphql;
+use totara_core\advanced_feature;
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 require_once(__DIR__ . '/subject_instance_testcase.php');
 
@@ -33,6 +33,9 @@ require_once(__DIR__ . '/subject_instance_testcase.php');
  * @group perform
  */
 class mod_perform_webapi_resolver_query_subject_instances_testcase extends advanced_testcase {
+    private const QUERY = 'mod_perform_subject_instances';
+
+    use webapi_phpunit_helper;
 
     public function test_query_successful(): void {
         $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
@@ -49,13 +52,10 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
             ]
         ];
 
-        $result = graphql::execute_operation(
-            execution_context::create('ajax', 'mod_perform_subject_instances'),
-            $args
-        )->toArray(true);
+        $result = $this->parsed_graphql_operation(self::QUERY, $args);
+        $this->assert_webapi_operation_successful($result);
 
-        $actual = $result['data']['mod_perform_subject_instances'];
-
+        $actual = $this->get_webapi_operation_data($result);
         $expected = [
             [
                 'id' => (int) $subject_instance->id,
@@ -80,26 +80,29 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
     }
 
     public function test_query_invalid_filter(): void {
+        $this->setAdminUser();
+
         $args = [
             'filters' => [
                 'not_real_filter' => 1,
             ],
         ];
 
-        $errors = graphql::execute_operation(
-            execution_context::create('ajax', 'mod_perform_subject_instances'),
-            $args
-        )->errors;
-
-        self::assertCount(1, $errors);
-
         $expected_error_message = 'Variable "$filters" got invalid value {"not_real_filter":1}; ';
         $expected_error_message .= 'Field "not_real_filter" is not defined by type mod_perform_subject_instance_filters.';
-
-        self::assertEquals(
-            $expected_error_message,
-            $errors[0]->message
-        );
+        $result = $this->parsed_graphql_operation(self::QUERY, $args);
+        $this->assert_webapi_operation_failed($result, $expected_error_message);
     }
 
+    public function test_failed_ajax_query(): void {
+        $feature = 'performance_activities';
+        advanced_feature::disable($feature);
+        $result = $this->parsed_graphql_operation(self::QUERY, []);
+        $this->assert_webapi_operation_failed($result, $feature);
+        advanced_feature::enable($feature);
+
+        $this->setUser();
+        $result = $this->parsed_graphql_operation(self::QUERY, []);
+        $this->assert_webapi_operation_failed($result, 'not logged in');
+    }
 }

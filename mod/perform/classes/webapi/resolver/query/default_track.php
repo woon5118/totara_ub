@@ -25,12 +25,13 @@ namespace mod_perform\webapi\resolver\query;
 
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\resolver\has_middleware;
+
+use mod_perform\webapi\middleware\require_activity;
 
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\track;
-use totara_core\advanced_feature;
-
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Handles the "mod_perform_default_track" GraphQL query.
@@ -39,20 +40,16 @@ defined('MOODLE_INTERNAL') || die();
  * replaced by mod_perform_track when multiple tracks per activity is implemented
  * in the front end.
  */
-class default_track implements query_resolver {
+class default_track implements query_resolver, has_middleware {
     /**
      * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
-        advanced_feature::require('performance_activities');
-
-        $activity_id = (int)$args['activity_id'] ?? 0;
+        $activity_id = (int)$args['activity_id'];
+        $activity = activity::load_by_id($activity_id);
         if (!$activity_id) {
             throw new \invalid_parameter_exception('invalid activity id');
         }
-
-        $activity = activity::load_by_id($activity_id);
-        self::setup_env($activity, $ec);
 
         $default_track = track::load_by_activity($activity)->first();
         if (!$default_track) {
@@ -63,16 +60,12 @@ class default_track implements query_resolver {
     }
 
     /**
-     * Checks whether the user is authenticated and sets the correct context
-     * for the graphql execution.
-     *
-     * @param activity $activity parent activity.
-     * @param execution_context $ec graphql execution context to update.
+     * {@inheritdoc}
      */
-    private static function setup_env(activity $activity, execution_context $ec): void {
-        [$course, $cm] = get_course_and_cm_from_instance($activity->get_id(), 'perform');
-        \require_login($course, false, $cm, false, true);
-
-        $ec->set_relevant_context($activity->get_context());
+    public static function get_middleware(): array {
+        return [
+            new require_advanced_feature('performance_activities'),
+            require_activity::by_activity_id('activity_id', true)
+        ];
     }
 }

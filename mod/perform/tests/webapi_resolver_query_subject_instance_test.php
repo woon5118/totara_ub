@@ -23,26 +23,29 @@
 
 use mod_perform\models\activity\participant_instance;
 use mod_perform\state\participant_instance\not_started;
-use totara_webapi\graphql;
+use totara_core\advanced_feature;
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 require_once(__DIR__ . '/subject_instance_testcase.php');
 
 /**
+ * @coversDefaultClass participant_section
+ *
  * @group perform
  */
 class mod_perform_webapi_resolver_query_subject_instance_testcase extends mod_perform_subject_instance_testcase {
+    private const QUERY = 'mod_perform_subject_instance';
+
+    use webapi_phpunit_helper;
 
     public function test_query_successful(): void {
         $args = [
             'subject_instance_id' => self::$about_user_and_participating->get_id()
         ];
 
-        $result = graphql::execute_operation(
-            $this->get_execution_context('ajax', 'mod_perform_subject_instance'),
-            $args
-        )->toArray(true);
-
-        $actual = $result['data']['mod_perform_subject_instance'];
+        $result = $this->parsed_graphql_operation(self::QUERY, $args);
+        $this->assert_webapi_operation_successful($result);
+        $actual = $this->get_webapi_operation_data($result);
 
         $profile_image_small_url = (new \user_picture(
             self::$about_user_and_participating->subject_user->to_the_origins(),
@@ -95,22 +98,25 @@ class mod_perform_webapi_resolver_query_subject_instance_testcase extends mod_pe
         self::assertEquals($expected, $actual);
     }
 
-    public function test_query_missing_id(): void {
+    public function test_failed_ajax_query(): void {
         $args = [
-            'subject_instance_id' => null
+            'subject_instance_id' => self::$about_user_and_participating->get_id()
         ];
 
-        $errors = graphql::execute_operation(
-            $this->get_execution_context('ajax', 'mod_perform_subject_instance'),
-            $args
-        )->errors;
+        $feature = 'performance_activities';
+        advanced_feature::disable($feature);
+        $result = $this->parsed_graphql_operation(self::QUERY, $args);
+        $this->assert_webapi_operation_failed($result, $feature);
+        advanced_feature::enable($feature);
 
-        self::assertCount(1, $errors);
+        $result = $this->parsed_graphql_operation(self::QUERY, []);
+        $this->assert_webapi_operation_failed($result, 'subject_instance_id');
 
-        self::assertEquals(
-            'Variable "$subject_instance_id" got invalid value null; Expected non-nullable type core_id! not to be null.',
-            $errors[0]->message
-        );
+        $result = $this->parsed_graphql_operation(self::QUERY, ['subject_instance_id' => 0]);
+        $this->assert_webapi_operation_failed($result, 'subject instance id');
+
+        $this->setUser();
+        $result = $this->parsed_graphql_operation(self::QUERY, $args);
+        $this->assert_webapi_operation_failed($result, 'not logged in');
     }
-
 }

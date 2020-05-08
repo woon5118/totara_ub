@@ -23,36 +23,34 @@
 
 namespace mod_perform\webapi\resolver\mutation;
 
-
 use core\webapi\execution_context;
 use core\webapi\mutation_resolver;
-use mod_perform\models\activity\activity;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\resolver\has_middleware;
 use mod_perform\models\activity\activity as activity_model;
-use totara_core\advanced_feature;
+use mod_perform\webapi\middleware\require_activity;
 
-class update_activity_general_info implements mutation_resolver {
-
+class update_activity_general_info implements mutation_resolver, has_middleware {
     /**
-     * Updates the general info (name and description) of an existing a perform activity.
-     *
-     * @param array $args
-     * @param execution_context $ec
-     * @return array response envelop holding an activity model
-     * @see activity
+     * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
-        advanced_feature::require('performance_activities');
-        require_login(null, false, null, false, true);
-
         $activity = activity_model::load_by_id($args['activity_id']);
 
         require_capability('mod/perform:manage_activity', $activity->get_context());
 
         $activity->update_general_info($args['name'], $args['description'] ?? null);
 
-        $ec->set_relevant_context($activity->get_context());
-
         return ['activity' => $activity];
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_advanced_feature('performance_activities'),
+            require_activity::by_activity_id('activity_id', true)
+        ];
+    }
 }

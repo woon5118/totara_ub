@@ -22,12 +22,10 @@
  * @category test
  */
 
-require_once(__DIR__ . '/generator/activity_generator_configuration.php');
-
-use core\webapi\execution_context;
 use mod_perform\entities\activity\track as track_entity;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\track;
+use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 require_once(__DIR__ . '/generator/activity_generator_configuration.php');
@@ -39,6 +37,8 @@ require_once(__DIR__ . '/webapi_resolver_mutation_update_track_schedule.php');
 class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_testcase
     extends mod_perform_webapi_resolver_mutation_update_track_schedule_testcase {
 
+    private const MUTATION = 'mod_perform_update_track_schedule';
+
     use webapi_phpunit_helper;
 
     public function test_user_cannot_update_without_permission(): void {
@@ -47,6 +47,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_
         /** @var mod_perform_generator $perform_generator */
         $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
         $activities = $perform_generator->create_full_activities();
+
 
         /** @var activity $activity1 */
         $activity1 = $activities->first();
@@ -63,11 +64,8 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_
 
         $user = self::getDataGenerator()->create_user();
         self::setUser($user);
-
-        $this->expectException(required_capability_exception::class);
-        $this->expectExceptionMessage('Manage performance activities');
-
-        $this->resolve_graphql_mutation('mod_perform_update_track_schedule', $args);
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_failed($result, 'accessible');
     }
 
     public function test_correct_track_is_updated(): void {
@@ -108,22 +106,22 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_
         self::assertCount(8, $before_tracks);
         unset($before_tracks[$track1->id]->updated_at);
 
-        $result = $this->resolve_graphql_mutation(
-            'mod_perform_update_track_schedule',
-            $args
-        );
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_successful($result);
+
+        $result = $this->get_webapi_operation_data($result);
         $result_track = $result['track'];
 
         // Verify the resulting graphql data.
-        self::assertEquals($track1->id, $result_track->id);
-        self::assertFalse($result_track->schedule_is_open);
-        self::assertFalse($result_track->schedule_is_fixed);
-        self::assertNull($result_track->schedule_fixed_from);
-        self::assertNull($result_track->schedule_fixed_to);
-        self::assertEquals(555, $result_track->schedule_dynamic_count_from);
-        self::assertEquals(444, $result_track->schedule_dynamic_count_to);
-        self::assertEquals(track_entity::SCHEDULE_DYNAMIC_UNIT_YEAR, $result_track->schedule_dynamic_unit);
-        self::assertEquals(track_entity::SCHEDULE_DYNAMIC_DIRECTION_BEFORE, $result_track->schedule_dynamic_direction);
+        self::assertEquals($track1->id, $result_track['id']);
+        self::assertFalse($result_track['schedule_is_open']);
+        self::assertFalse($result_track['schedule_is_fixed']);
+        self::assertNull($result_track['schedule_fixed_from']);
+        self::assertNull($result_track['schedule_fixed_to']);
+        self::assertEquals(555, $result_track['schedule_dynamic_count_from']);
+        self::assertEquals(444, $result_track['schedule_dynamic_count_to']);
+        self::assertEquals('YEAR', $result_track['schedule_dynamic_unit']);
+        self::assertEquals('BEFORE', $result_track['schedule_dynamic_direction']);
 
         // Manually make the changes that we expect to make.
         $affected_track = $before_tracks[$track1->id];
@@ -156,13 +154,44 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_
             ],
         ];
 
-        $this->expectException(coding_exception::class);
-        $this->expectExceptionMessage('"count_from" must not be after "count_to" when dynamic schedule direction is "AFTER"');
-
-        $this->resolve_graphql_mutation(
-            'mod_perform_update_track_schedule',
-            $args
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_failed(
+            $result,
+            '"count_from" must not be after "count_to" when dynamic schedule direction is "AFTER"'
         );
     }
 
+    public function test_failed_ajax_query(): void {
+        self::setAdminUser();
+
+        $args = [
+            'track_schedule' => [
+                'track_id' => $this->track1_id,
+                'is_open' => false,
+                'is_fixed' => false,
+                'dynamic_count_from' => 555,
+                'dynamic_count_to' => 444,
+                'dynamic_unit' => 'YEAR',
+                'dynamic_direction' => 'BEFORE'
+            ],
+        ];
+
+        $feature = 'performance_activities';
+        advanced_feature::disable($feature);
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_failed($result, $feature);
+        advanced_feature::enable($feature);
+
+        $result = $this->parsed_graphql_operation(self::MUTATION, []);
+        $this->assert_webapi_operation_failed($result, 'track_schedule');
+
+        $args['track_schedule']['track_id'] = 0;
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_failed($result, 'track id');
+
+        $track_id = 1293;
+        $args['track_schedule']['track_id'] = $track_id;
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_failed($result, "$track_id");
+    }
 }

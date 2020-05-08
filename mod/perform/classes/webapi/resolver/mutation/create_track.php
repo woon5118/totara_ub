@@ -25,26 +25,25 @@ namespace mod_perform\webapi\resolver\mutation;
 
 use core\webapi\execution_context;
 use core\webapi\mutation_resolver;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\resolver\has_middleware;
+
+use mod_perform\webapi\middleware\require_activity;
 
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\track;
-use totara_core\advanced_feature;
-
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Handles the "mod_perform_create_track" GraphQL mutation.
  */
-class create_track implements mutation_resolver {
+class create_track implements mutation_resolver, has_middleware {
     /**
      * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
-        advanced_feature::require('performance_activities');
-
         $details = $args['details'] ?? null;
         if (!$details) {
-            throw new \invalid_parameter_exception('new track details not given');
+            throw new \invalid_parameter_exception('activity details not given');
         }
 
         $activity_id = (int)$details['activity_id'] ?? 0;
@@ -53,24 +52,18 @@ class create_track implements mutation_resolver {
         }
 
         $activity = activity::load_by_id($activity_id);
-        self::setup_env($activity, $ec);
-
         $description = $details['description'] ?? '';
 
         return track::create($activity, $description);
     }
 
     /**
-     * Checks whether the user is authenticated and sets the correct context
-     * for the graphql execution.
-     *
-     * @param activity $activity parent activity.
-     * @param execution_context $ec graphql execution context to update.
+     * {@inheritdoc}
      */
-    private static function setup_env(activity $activity, execution_context $ec): void {
-        [$course, $cm] = get_course_and_cm_from_instance($activity->get_id(), 'perform');
-        \require_login($course, false, $cm, false, true);
-
-        $ec->set_relevant_context($activity->get_context());
+    public static function get_middleware(): array {
+        return [
+            new require_advanced_feature('performance_activities'),
+            require_activity::by_activity_id('details.activity_id', true)
+        ];
     }
 }

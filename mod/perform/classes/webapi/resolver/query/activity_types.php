@@ -23,21 +23,19 @@
 
 namespace mod_perform\webapi\resolver\query;
 
-use \context_coursecat;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
+use core\webapi\resolver\has_middleware;
 
 use mod_perform\data_providers\activity\activity_type;
 use mod_perform\util;
 
-use totara_core\advanced_feature;
-
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Handles the "mod_perform_activity_types" GraphQL query.
  */
-class activity_types implements query_resolver {
+class activity_types implements query_resolver, has_middleware {
     /**
      * {@inheritdoc}
      */
@@ -49,19 +47,25 @@ class activity_types implements query_resolver {
     }
 
     /**
-     * Checks whether the user is authenticated and sets the correct context
-     * for the graphql execution.
+     * Checks whether the user's authorization and sets the correct context for
+     * the graphql execution.
      *
      * @param execution_context $ec graphql execution context to update.
      */
     private static function authorize(execution_context $ec): void {
-        advanced_feature::require('performance_activities');
-        require_login(null, false, null, false, true);
-
-        $category_id = util::get_default_category_id();
-        $context = context_coursecat::instance($category_id);
-        require_capability('mod/perform:view_manage_activities', $context);
-
+        $context = util::get_default_context();
         $ec->set_relevant_context($context);
+
+        require_capability('mod/perform:view_manage_activities', $context);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_advanced_feature('performance_activities'),
+            new require_login()
+        ];
     }
 }

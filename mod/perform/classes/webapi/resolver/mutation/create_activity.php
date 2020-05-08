@@ -27,28 +27,27 @@ use container_perform\create_exception;
 use container_perform\perform as perform_container;
 use core\webapi\execution_context;
 use core\webapi\mutation_resolver;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
+use core\webapi\resolver\has_middleware;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\activity_type;
 use mod_perform\models\activity\section;
 use mod_perform\models\activity\track;
 use mod_perform\state\activity\draft;
-use totara_core\advanced_feature;
 
-class create_activity implements mutation_resolver {
-
+class create_activity implements mutation_resolver, has_middleware {
     /**
      * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
         global $DB;
-        advanced_feature::require('performance_activities');
-        require_login(null, false, null, false, true);
 
         if (!activity::can_create()) {
             throw new create_exception(get_string('error_create_permission_missing', 'mod_perform'));
         }
 
-        if (empty($args['name']) || ctype_space($args['name'])) {
+        if (empty($args['name'])) {
             throw new create_exception(get_string('error_activity_name_missing', 'mod_perform'));
         }
 
@@ -90,5 +89,15 @@ class create_activity implements mutation_resolver {
         $ec->set_relevant_context($activity->get_context());
 
         return ['activity' => $activity];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_advanced_feature('performance_activities'),
+            new require_login()
+        ];
     }
 }

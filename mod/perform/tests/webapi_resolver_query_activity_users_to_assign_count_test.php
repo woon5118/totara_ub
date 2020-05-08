@@ -21,36 +21,74 @@
  * @package mod_perform
  */
 
-/**
- * @group perform
- */
-
-use core\webapi\execution_context;
 use mod_perform\state\activity\draft;
 use mod_perform\webapi\resolver\query\activity_users_to_assign_count;
 use totara_core\relationship\resolvers\subject;
+use totara_core\advanced_feature;
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
  * @group perform
  * @covers \mod_perform\webapi\resolver\query\activity_users_to_assign_count
  */
 class mod_perform_webapi_resolver_query_activity_users_to_assign_count_testcase extends advanced_testcase {
+    private const QUERY = 'mod_perform_activity_users_to_assign_count';
+
+    use webapi_phpunit_helper;
 
     /**
      * We don't need to thoroughly test permissions as the query simply extends the query activity.
      */
     public function test_query_permissions(): void {
+        [$args, $context] = $this->create_test_data();
+
         $this->expectException(moodle_exception::class);
         self::setGuestUser();
-
-        /** @var mod_perform_generator|component_generator_base $generator */
-        $generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
-        $activity = $generator->create_activity_in_container();
-
-        activity_users_to_assign_count::resolve(['activity_id' => $activity->id], $this->get_execution_context());
+        activity_users_to_assign_count::resolve($args, $context);
     }
 
     public function test_query_successful() {
+        [$args, $context] = $this->create_test_data();
+
+        $result = activity_users_to_assign_count::resolve($args, $context);
+        $this->assertEquals(1, $result);
+    }
+
+    public function test_successful_ajax_call(): void {
+        [$args, ] = $this->create_test_data();
+
+        $result = $this->parsed_graphql_operation(self::QUERY, $args);
+        $this->assert_webapi_operation_successful($result);
+
+        $result = $this->get_webapi_operation_data($result);
+        $this->assertEquals(1, $result);
+    }
+
+    public function test_failed_ajax_query(): void {
+        [$args, ] = $this->create_test_data();
+
+        $feature = 'performance_activities';
+        advanced_feature::disable($feature);
+        $result = $this->parsed_graphql_operation(self::QUERY, $args);
+        $this->assert_webapi_operation_failed($result, $feature);
+        advanced_feature::enable($feature);
+
+        $result = $this->parsed_graphql_operation(self::QUERY, []);
+        $this->assert_webapi_operation_failed($result, 'activity_id');
+
+        $result = $this->parsed_graphql_operation(self::QUERY, ['activity_id' => 0]);
+        $this->assert_webapi_operation_failed($result, 'activity id');
+
+        $id = 1293;
+        $result = $this->parsed_graphql_operation(self::QUERY, ['activity_id' => $id]);
+        $this->assert_webapi_operation_failed($result, "$id");
+
+        self::setGuestUser();
+        $result = $this->parsed_graphql_operation(self::QUERY, $args);
+        $this->assert_webapi_operation_failed($result, 'not accessible');
+    }
+
+    private function create_test_data(): array {
         self::setAdminUser();
 
         /** @var mod_perform_generator|component_generator_base $generator */
@@ -69,19 +107,11 @@ class mod_perform_webapi_resolver_query_activity_users_to_assign_count_testcase 
         $user = self::getDataGenerator()->create_user();
         $generator->create_track_assignments_with_existing_groups($track, [], [], [], [$user->id]);
 
-        $result = activity_users_to_assign_count::resolve(['activity_id' => $activity->id], $this->get_execution_context());
-        $this->assertEquals(1, $result);
-    }
+        $context = $this->create_webapi_context(self::QUERY);
+        $context->set_relevant_context($activity->get_context());
 
-    /**
-     * Helper to get execution context
-     *
-     * @param string $type
-     * @param string|null $operation
-     * @return execution_context
-     */
-    private function get_execution_context(string $type = 'dev', ?string $operation = null): execution_context {
-        return execution_context::create($type, $operation);
-    }
+        $args = ['activity_id' => $activity->id];
 
+        return [$args, $context];
+    }
 }

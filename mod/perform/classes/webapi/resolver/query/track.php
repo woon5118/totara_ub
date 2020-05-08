@@ -25,46 +25,36 @@ namespace mod_perform\webapi\resolver\query;
 
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\resolver\has_middleware;
+
+use mod_perform\webapi\middleware\require_activity;
 
 use mod_perform\models\activity\track as track_model;
-use totara_core\advanced_feature;
-
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Handles the "mod_perform_track" GraphQL query.
  */
-class track implements query_resolver {
+class track implements query_resolver, has_middleware {
     /**
      * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
-        advanced_feature::require('performance_activities');
-
-        $track_id = (int)$args['track_id'] ?? 0;
+        $track_id = (int)$args['track_id'];
         if (!$track_id) {
             throw new \invalid_parameter_exception('invalid track id');
         }
 
-        $track = track_model::load_by_id($track_id);
-        self::setup_env($track, $ec);
-
-        return $track;
+        return track_model::load_by_id($track_id);
     }
 
     /**
-     * Checks whether the user is authenticated and sets the correct context
-     * for the graphql execution.
-     *
-     * @param track_model $track target track.
-     * @param execution_context $ec graphql execution context to update.
+     * {@inheritdoc}
      */
-    private static function setup_env(track_model $track, execution_context $ec): void {
-        $activity = $track->activity;
-
-        [$course, $cm] = get_course_and_cm_from_instance($activity->get_id(), 'perform');
-        \require_login($course, false, $cm, false, true);
-
-        $ec->set_relevant_context($activity->get_context());
+    public static function get_middleware(): array {
+        return [
+            new require_advanced_feature('performance_activities'),
+            require_activity::by_track_id('track_id', true)
+        ];
     }
 }

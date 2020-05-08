@@ -24,21 +24,22 @@
 namespace mod_perform\webapi\resolver\mutation;
 
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
 use core\webapi\mutation_resolver;
+use core\webapi\resolver\has_middleware;
 use mod_perform\models\activity\element;
 use mod_perform\models\activity\section;
 use mod_perform\models\activity\section_element;
-use totara_core\advanced_feature;
+use mod_perform\webapi\middleware\require_activity;
 
-class update_section_elements implements mutation_resolver {
-
+class update_section_elements implements mutation_resolver, has_middleware {
     /**
-     * @return section
+     * This updates the list of relationships for a specified section.
+     *
+     * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
         global $DB;
-        advanced_feature::require('performance_activities');
-        require_login(null, false, null, false, true);
 
         $section_form_data = $args['input'];
 
@@ -94,10 +95,18 @@ class update_section_elements implements mutation_resolver {
             }
         });
 
-        $ec->set_relevant_context($section->get_activity()->get_context());
-
         return [
             'section' => section::load_by_id($section->id)
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_advanced_feature('performance_activities'),
+            require_activity::by_section_id('input.section_id', true)
         ];
     }
 }

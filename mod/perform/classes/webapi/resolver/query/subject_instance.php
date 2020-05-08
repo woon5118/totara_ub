@@ -23,28 +23,25 @@
 
 namespace mod_perform\webapi\resolver\query;
 
-use totara_core\advanced_feature;
 use core\entities\user;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
+use core\webapi\resolver\has_middleware;
 use mod_perform\data_providers\activity\subject_instance_for_participant as subject_instance_data_provider;
 use mod_perform\models\activity\subject_instance as subject_instance_model;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 
-class subject_instance implements query_resolver {
-
+class subject_instance implements query_resolver, has_middleware {
     /**
-     * Get the subject instances that the logged in user is participating in.
-     *
-     * @param array $args
-     * @param execution_context $ec
-     * @return mixed|subject_instance_model|null
+     * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
-        advanced_feature::require('performance_activities');
-        require_login(null, false, null, false, true);
-
-        $subject_instance_id = $args['subject_instance_id'];
+        $subject_instance_id = $args['subject_instance_id'] ?? 0;
+        if (!$subject_instance_id) {
+            throw new \invalid_parameter_exception('invalid subject instance id');
+        }
 
         /** @var subject_instance_entity $subject_instance_entity */
         $subject_instance_entity = subject_instance_entity::repository()->find($subject_instance_id);
@@ -66,4 +63,13 @@ class subject_instance implements query_resolver {
             ->first();
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_advanced_feature('performance_activities'),
+            new require_login()
+        ];
+    }
 }

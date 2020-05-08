@@ -25,16 +25,20 @@ namespace mod_perform\webapi\resolver\query;
 
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\resolver\has_middleware;
 use mod_perform\models\activity\section as section_model;
-use totara_core\advanced_feature;
+use mod_perform\webapi\middleware\require_activity;
 
-class section_admin implements query_resolver {
-
+class section_admin implements query_resolver, has_middleware {
+    /**
+     * {@inheritdoc}
+     */
     public static function resolve(array $args, execution_context $ec) {
-        advanced_feature::require('performance_activities');
-        require_login(null, false, null, false, true);
-
-        $section_id = $args['section_id'];
+        $section_id = (int)$args['section_id'] ?? 0;
+        if (!$section_id) {
+            throw new \invalid_parameter_exception('invalid section id');
+        }
 
         /** @var section_model $section */
         $section = section_model::load_by_id($section_id);
@@ -55,5 +59,15 @@ class section_admin implements query_resolver {
         $ec->set_relevant_context($activity_context);
 
         return $section;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_advanced_feature('performance_activities'),
+            require_activity::by_section_id('section_id', true)
+        ];
     }
 }

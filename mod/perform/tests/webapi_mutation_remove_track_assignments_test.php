@@ -22,17 +22,15 @@
  * @category test
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-use core\webapi\execution_context;
-
 use mod_perform\models\activity\track;
 use mod_perform\models\activity\track_assignment;
 use mod_perform\models\activity\track_assignment_type;
 
 use mod_perform\webapi\resolver\mutation\remove_track_assignments;
 
-use totara_webapi\graphql;
+use totara_core\advanced_feature;
+
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
  * @coversDefaultClass remove_track_assignments.
@@ -40,23 +38,20 @@ use totara_webapi\graphql;
  * @group perform
  */
 class mod_perform_webapi_mutation_remove_track_assignments_testcase extends advanced_testcase {
+    private const MUTATION = 'mod_perform_remove_track_assignments';
+
+    use webapi_phpunit_helper;
+
     /**
      * @covers ::resolve
      */
     public function test_remove_track_assignments(): void {
-        [$track, $groups] = $this->setup_env();
+        $assignment_type = track_assignment_type::ADMIN;
+        [$track, $args, $context] = $this->setup_env(['type' => $assignment_type]);
+
         $assignments = $track->assignments;
         $this->assertNotEmpty($assignments->all(), 'track has no assignments');
 
-        $args = [
-            'assignments' => [
-                'track_id' => $track->id,
-                'type' => track_assignment_type::ADMIN,
-                'groups' => $groups
-            ]
-        ];
-
-        $context = $this->get_webapi_context();
         $updated_track = remove_track_assignments::resolve($args, $context);
         $this->assertNotNull($updated_track, 'track assignment failed');
         $this->assertInstanceOf(track::class, $updated_track, 'wrong return type');
@@ -69,20 +64,16 @@ class mod_perform_webapi_mutation_remove_track_assignments_testcase extends adva
      * @covers ::resolve
      */
     public function test_successful_ajax_call(): void {
-        [$track, $groups] = $this->setup_env();
+        $assignment_type = track_assignment_type::ADMIN;
+        [$track, $args, ] = $this->setup_env(['type' => $assignment_type]);
+
         $assignments = $track->assignments;
         $this->assertNotEmpty($assignments->all(), 'track has no assignments');
 
-        $args = [
-            'assignments' => [
-                'track_id' => $track->id,
-                'type' => track_assignment_type::ADMIN,
-                'groups' => $groups
-            ]
-        ];
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_successful($result);
 
-        $context = $this->get_webapi_context();
-        $updated_track = $this->exec_graphql($context, $args);
+        $updated_track = $this->get_webapi_operation_data($result);
         $this->assertNotNull($updated_track, 'track creation failed');
         $this->assertEquals($track->id, $updated_track['id'], 'wrong track returned');
         $this->assertEquals($track->status, $updated_track['status'], 'wrong track status');
@@ -93,62 +84,43 @@ class mod_perform_webapi_mutation_remove_track_assignments_testcase extends adva
      * @covers ::resolve
      */
     public function test_failed_ajax_call(): void {
-        [$track, $groups] = $this->setup_env();
+        [$track, $args, ] = $this->setup_env(['type' => track_assignment_type::ADMIN]);
 
-        // Invalid user.
-        self::setGuestUser();
+        $feature = 'performance_activities';
+        advanced_feature::disable($feature);
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_failed($result, $feature);
+        advanced_feature::enable($feature);
 
-        $args = [
-            'assignments' => [
-                'track_id' => $track->id,
-                'type' => track_assignment_type::ADMIN,
-                'groups' => $groups
-            ]
-        ];
+        $result = $this->parsed_graphql_operation(self::MUTATION, []);
+        $this->assert_webapi_operation_failed($result, 'input');
 
-        $context = $this->get_webapi_context();
-        $actual = $this->exec_graphql($context, $args);
-        $this->assertIsString($actual, 'wrong type');
-        $this->assertStringContainsString('not accessible', $actual, 'wrong error');
+        $args['assignments']['track_id'] = 0;
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_failed($result, 'track id');
 
-        // No input.
-        $actual = $this->exec_graphql($context, []);
-        $this->assertIsString($actual, 'wrong type');
-        $this->assertStringContainsString('assignments', $actual, 'wrong error');
-
-        // Input with track id set to 0.
-        $args = [
-            'assignments' => [
-                'track_id' => 0,
-                'type' => track_assignment_type::ADMIN,
-                'groups' => $groups
-            ]
-        ];
-        $actual = $this->exec_graphql($context, $args);
-        $this->assertIsString($actual, 'wrong type');
-        $this->assertStringContainsString('track id', $actual, 'wrong error');
-
-        // Input with unknown track id.
         $track_id = 1293;
-        $args = [
-            'assignments' => [
-                'track_id' => $track_id,
-                'type' => track_assignment_type::ADMIN,
-                'groups' => $groups
-            ]
-        ];
-        $actual = $this->exec_graphql($context, $args);
-        $this->assertIsString($actual, 'wrong type');
-        $this->assertStringContainsString("$track_id", $actual, 'wrong error');
+        $args['assignments']['track_id'] = $track_id;
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_failed($result, "$track_id");
+
+        self::setGuestUser();
+        $args['assignments']['track_id'] = $track->id;
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_failed($result, 'accessible');
     }
 
     /**
      * Generates test data.
      *
-     * @return array a (generated track, groupings) tuple.
+     * @param array $track_details details other than the track id and groups to
+     *        add to the generated graphql arguments.
+     *
+     * @return array [generated track, graphql arguments, graphql context] tuple.
      */
-    private function setup_env(): array {
+    private function setup_env(array $track_details = []): array {
         $this->setAdminUser();
+
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
         $activity = $generator->create_activity_in_container();
 
@@ -168,44 +140,14 @@ class mod_perform_webapi_mutation_remove_track_assignments_testcase extends adva
             []
         );
 
-        return [$updated_track, $groups];
-    }
+        $track_details['track_id'] = $track->id;
+        $track_details['groups'] = $groups;
 
-    /**
-     * Executes the test query via AJAX.
-     *
-     * @param execution_context $context graphql execution context.
-     * @param array $args ajax arguments if any.
-     *
-     * @return array|string either the retrieved items or the error string for
-     *         failures.
-     */
-    private function exec_graphql(execution_context $context, array $args=[]) {
-        $result = graphql::execute_operation($context, $args)->toArray(true);
+        $args = ['assignments' => $track_details];
 
-        $op = $context->get_operationname();
-        $errors = $result['errors'] ?? null;
-        if ($errors) {
-            $error = $errors[0];
-            $msg = $error['debugMessage'] ?? $error['message'];
+        $context = $this->create_webapi_context(self::MUTATION);
+        $context->set_relevant_context($activity->get_context());
 
-            return sprintf(
-                "invocation of %s://%s failed: %s",
-                $context->get_type(),
-                $op,
-                $msg
-            );
-        }
-
-        return $result['data'][$op];
-    }
-
-    /**
-     * Creates an graphql execution context.
-     *
-     * @return execution_context the context.
-     */
-    private function get_webapi_context(): execution_context {
-        return execution_context::create('ajax', 'mod_perform_remove_track_assignments');
+        return [$updated_track, $args, $context];
     }
 }

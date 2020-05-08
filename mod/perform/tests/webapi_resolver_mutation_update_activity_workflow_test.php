@@ -21,14 +21,14 @@
  * @package mod_perform
  */
 
-use core\orm\query\exceptions\record_not_found_exception;
-use mod_perform\models\activity\activity;
+use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
  * @group perform
  */
 class mod_perform_webapi_resolver_mutation_update_activity_workflow_testcase extends advanced_testcase {
+    private const MUTATION = 'mod_perform_update_activity_workflow';
 
     use webapi_phpunit_helper;
 
@@ -38,20 +38,11 @@ class mod_perform_webapi_resolver_mutation_update_activity_workflow_testcase ext
      * @return void
      */
     public function test_permissions(): void {
-        self::setAdminUser();
-        $activity = $this->create_activity();
-        self::setGuestUser();
+        [, $args] = $this->create_activity();
 
-        $this->expectException(required_capability_exception::class);
-        $this->resolve_graphql_mutation(
-            'mod_perform_update_activity_workflow',
-            [
-                'input' => [
-                    'activity_id' => $activity->id,
-                    'close_on_completion' => true,
-                ]
-            ]
-        );
+        self::setGuestUser();
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_failed($result, 'accessible');
     }
 
     /**
@@ -60,14 +51,11 @@ class mod_perform_webapi_resolver_mutation_update_activity_workflow_testcase ext
      * @return void
      */
     public function test_invalid_activity(): void {
-        self::setGuestUser();
-        $this->expectException(record_not_found_exception::class);
-        $this->resolve_graphql_mutation('mod_perform_update_activity_workflow', [
-            'input' => [
-                'activity_id' => 0,
-                'close_on_completion' => true,
-            ],
-        ]);
+        [, $args] = $this->create_activity();
+        $args['input']['activity_id'] = 0;
+
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_failed($result, 'activity id');
     }
 
     /**
@@ -76,56 +64,73 @@ class mod_perform_webapi_resolver_mutation_update_activity_workflow_testcase ext
      * @return void
      */
     public function test_change_close_on_completion(): void {
-        self::setAdminUser();
-        $activity = $this->create_activity();
+        [$activity, $args] = $this->create_activity();
         $this->assertEquals(false, $activity->close_on_completion);
 
-        $result = $this->execute_graphql_operation(
-            'mod_perform_update_activity_workflow',
-            [
-                'input' => [
-                    'activity_id' => $activity->id,
-                    'close_on_completion' => false,
-                ]
-            ]
-        );
-        $activity->refresh();
-        $this->assertEquals($result->data['mod_perform_update_activity_workflow']['close_on_completion'], $activity->close_on_completion);
+        $args['input']['close_on_completion'] = false;
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_successful($result);
 
-        $result = $this->execute_graphql_operation(
-            'mod_perform_update_activity_workflow',
-            [
-                'input' => [
-                    'activity_id' => $activity->id,
-                    'close_on_completion' => false,
-                ]
-            ]
-        );
+        $result = $this->get_webapi_operation_data($result);
         $activity->refresh();
-        $this->assertEquals($result->data['mod_perform_update_activity_workflow']['close_on_completion'], $activity->close_on_completion);
+        $this->assertEquals($result['close_on_completion'], $activity->close_on_completion);
 
-        $result = $this->execute_graphql_operation(
-            'mod_perform_update_activity_workflow',
-            [
-                'input' => [
-                    'activity_id' => $activity->id,
-                    'close_on_completion' => false,
-                ]
-            ]
-        );
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_successful($result);
+
+        $result = $this->get_webapi_operation_data($result);
         $activity->refresh();
-        $this->assertEquals($result->data['mod_perform_update_activity_workflow']['close_on_completion'], $activity->close_on_completion);
+        $this->assertEquals($result['close_on_completion'], $activity->close_on_completion);
+
+        $args['input']['close_on_completion'] = true;
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_successful($result);
+
+        $result = $this->get_webapi_operation_data($result);
+        $activity->refresh();
+        $this->assertEquals($result['close_on_completion'], $activity->close_on_completion);
+    }
+
+    public function test_failed_ajax_query(): void {
+        [, $args] = $this->create_activity();
+
+        $feature = 'performance_activities';
+        advanced_feature::disable($feature);
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_failed($result, $feature);
+        advanced_feature::enable($feature);
+
+        $result = $this->parsed_graphql_operation(self::MUTATION, []);
+        $this->assert_webapi_operation_failed($result, 'input');
+
+        $activity_id = 999;
+        $args['input']['activity_id'] = $activity_id;
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_failed($result, "$activity_id");
     }
 
     /**
      * Create sample activity.
      *
-     * @return activity
+     * @param bool $close_on_completion the close on completion value to put into
+     *        the returned graphql arguments.
+     *
+     * @return array an (activity, graphql args) tuple.
      */
-    private function create_activity(): activity {
+    private function create_activity(bool $close_on_completion = true): array {
+        self::setAdminUser();
+
         /** @var mod_perform_generator|component_generator_base $generator */
         $generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
+        $activity = $generator->create_activity_in_container();
 
-        return $generator->create_activity_in_container();
+        $args = [
+            'input' => [
+                'activity_id' => $activity->id,
+                'close_on_completion' => $close_on_completion
+            ]
+        ];
+
+        return [$activity, $args];
     }
 }

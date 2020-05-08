@@ -22,8 +22,6 @@
  * @category test
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 use core\webapi\execution_context;
 
 use mod_perform\models\activity\track as track_model;
@@ -34,7 +32,9 @@ use mod_perform\webapi\resolver\query\track;
 use mod_perform\webapi\resolver\type\track_assignment;
 use mod_perform\webapi\resolver\type\user_grouping;
 
-use totara_webapi\graphql;
+use totara_core\advanced_feature;
+
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
  * @coversDefaultClass track.
@@ -42,15 +42,17 @@ use totara_webapi\graphql;
  * @group perform
  */
 class mod_perform_webapi_query_track_testcase extends advanced_testcase {
+    private const QUERY = 'mod_perform_track';
+
+    use webapi_phpunit_helper;
+
     /**
      * @covers ::resolve
      */
     public function test_find(): void {
-        [$track_id, $groups_by_id] = $this->setup_env();
-
-        $context = $this->get_webapi_context();
-        $args = ['track_id' => $track_id];
+        [$track_id, $groups_by_id, $args, $context] = $this->setup_env();
         $track = track::resolve($args, $context);
+
         $this->assertEquals($track_id, $track->id, 'wrong track id');
         $this->assertEquals(track_status::ACTIVE, $track->status, 'wrong track status');
 
@@ -77,11 +79,12 @@ class mod_perform_webapi_query_track_testcase extends advanced_testcase {
      * @covers ::resolve
      */
     public function test_successful_ajax_call(): void {
-        [$track_id, $groups_by_id] = $this->setup_env();
+        [$track_id, $groups_by_id, $args, $context] = $this->setup_env();
 
-        $context = $this->get_webapi_context();
-        $args = ['track_id' => $track_id];
-        $track = $this->exec_graphql($context, $args);
+        $result = $this->parsed_graphql_operation(self::QUERY, $args);
+        $this->assert_webapi_operation_successful($result);
+
+        $track = $this->get_webapi_operation_data($result);
         $this->assertEquals($track_id, $track['id'], 'wrong track id');
         $this->assertEquals(track_status::ACTIVE, $track['status'], 'wrong track status');
 
@@ -100,40 +103,36 @@ class mod_perform_webapi_query_track_testcase extends advanced_testcase {
 
     /**
      * @covers ::resolve
-    */
+     */
     public function test_failed_ajax_query(): void {
-        [$track_id, ] = $this->setup_env();
+        [, , $args, ] = $this->setup_env();
 
-        // Invalid user.
+        $feature = 'performance_activities';
+        advanced_feature::disable($feature);
+        $result = $this->parsed_graphql_operation(self::QUERY, $args);
+        $this->assert_webapi_operation_failed($result, $feature);
+        advanced_feature::enable($feature);
+
+        $result = $this->parsed_graphql_operation(self::QUERY, []);
+        $this->assert_webapi_operation_failed($result, 'track_id');
+
+        $result = $this->parsed_graphql_operation(self::QUERY, ['track_id' => 0]);
+        $this->assert_webapi_operation_failed($result, 'track id');
+
+        $id = 1293;
+        $result = $this->parsed_graphql_operation(self::QUERY, ['track_id' => $id]);
+        $this->assert_webapi_operation_failed($result, "$id");
+
         self::setGuestUser();
-        $context = $this->get_webapi_context();
-        $actual = $this->exec_graphql($context, ['track_id' => $track_id]);
-        $this->assertIsString($actual, 'wrong type');
-        $this->assertStringContainsString('not accessible', $actual, 'wrong error');
-
-        // No input.
-        $actual = $this->exec_graphql($context, []);
-        $this->assertIsString($actual, 'wrong type');
-        $this->assertStringContainsString('track_id', $actual, 'wrong error');
-
-        // Input with track id set to 0.
-        $args = ['track_id' => 0];
-        $actual = $this->exec_graphql($context, $args);
-        $this->assertIsString($actual, 'wrong type');
-        $this->assertStringContainsString('track id', $actual, 'wrong error');
-
-        // Input with unknown track id.
-        $track_id = 1293;
-        $args = ['track_id' => $track_id];
-        $actual = $this->exec_graphql($context, $args);
-        $this->assertIsString($actual, 'wrong type');
-        $this->assertStringContainsString("$track_id", $actual, 'wrong error');
+        $result = $this->parsed_graphql_operation(self::QUERY, $args);
+        $this->assert_webapi_operation_failed($result, 'accessible');
     }
 
     /**
      * Generates test data.
      *
-     * @return array (track, the generated assignments by group id] tuple.
+     * @return array (track, the generated assignments by group id, graphql query
+     *         arguments, graphql execution context) tuple.
      */
     private function setup_env(): array {
         $this->setAdminUser();
@@ -153,7 +152,13 @@ class mod_perform_webapi_query_track_testcase extends advanced_testcase {
                 []
             );
 
-        return [$track->id, $groups_by_id];
+        $track_id = $track->id;
+        $args = ['track_id' => $track_id];
+
+        $context = $this->create_webapi_context(self::QUERY);
+        $context->set_relevant_context($track->activity->get_context());
+
+        return [$track_id, $groups_by_id, $args, $context];
     }
 
     /**
@@ -187,43 +192,5 @@ class mod_perform_webapi_query_track_testcase extends advanced_testcase {
                 'name' => $grouping_resolve('name')
             ]
         ];
-    }
-
-    /**
-     * Executes the test query via AJAX.
-     *
-     * @param execution_context $context graphql execution context.
-     * @param array $args ajax arguments if any.
-     *
-     * @return array|string either the retrieved items or the error string for
-     *         failures.
-     */
-    private function exec_graphql(execution_context $context, array $args=[]) {
-        $result = graphql::execute_operation($context, $args)->toArray(true);
-
-        $op = $context->get_operationname();
-        $errors = $result['errors'] ?? null;
-        if ($errors) {
-            $error = $errors[0];
-            $msg = $error['debugMessage'] ?? $error['message'];
-
-            return sprintf(
-                "invocation of %s://%s failed: %s",
-                $context->get_type(),
-                $op,
-                $msg
-            );
-        }
-
-        return $result['data'][$op];
-    }
-
-    /**
-     * Creates an graphql execution context.
-     *
-     * @return execution_context the context.
-     */
-    private function get_webapi_context(): execution_context {
-        return execution_context::create('ajax', 'mod_perform_track');
     }
 }

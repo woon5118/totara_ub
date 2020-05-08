@@ -25,25 +25,24 @@ namespace mod_perform\webapi\resolver\mutation;
 
 use core\webapi\execution_context;
 use core\webapi\mutation_resolver;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\resolver\has_middleware;
 
 use mod_perform\models\activity\track;
 use mod_perform\models\activity\track_assignment_type;
 
-use mod_perform\user_groups\grouping;
-use totara_core\advanced_feature;
+use mod_perform\webapi\middleware\require_activity;
 
-defined('MOODLE_INTERNAL') || die();
+use mod_perform\user_groups\grouping;
 
 /**
  * Handles the "mod_perform_remove_track_assignments" GraphQL mutation.
  */
-class remove_track_assignments implements mutation_resolver {
+class remove_track_assignments implements mutation_resolver, has_middleware {
     /**
      * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
-        advanced_feature::require('performance_activities');
-
         $assignments = $args['assignments'] ?? null;
         if (!$assignments) {
             throw new \invalid_parameter_exception("no assignments given'");
@@ -53,9 +52,7 @@ class remove_track_assignments implements mutation_resolver {
         if (!$track_id) {
             throw new \invalid_parameter_exception('invalid track id');
         }
-
         $track = track::load_by_id($track_id);
-        self::setup_env($track, $ec);
 
         $assignment_type = $assignments['type'] ?? track_assignment_type::ADMIN;
         $groups = $assignments['groups'] ?? [];
@@ -76,18 +73,12 @@ class remove_track_assignments implements mutation_resolver {
     }
 
     /**
-     * Checks whether the user is authenticated and sets the correct context
-     * for the graphql execution.
-     *
-     * @param track $track target track.
-     * @param execution_context $ec graphql execution context to update.
+     * {@inheritdoc}
      */
-    private static function setup_env(track $track, execution_context $ec): void {
-        $activity = $track->activity;
-
-        [$course, $cm] = get_course_and_cm_from_instance($activity->get_id(), 'perform');
-        \require_login($course, false, $cm, false, true);
-
-        $ec->set_relevant_context($activity->get_context());
+    public static function get_middleware(): array {
+        return [
+            new require_advanced_feature('performance_activities'),
+            require_activity::by_track_id('assignments.track_id', true)
+        ];
     }
 }

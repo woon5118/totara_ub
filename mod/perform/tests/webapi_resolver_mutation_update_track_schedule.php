@@ -24,9 +24,6 @@
 
 require_once(__DIR__ . '/generator/activity_generator_configuration.php');
 
-use core\webapi\execution_context;
-use totara_webapi\graphql;
-use mod_perform\entities\activity\track as track_entity;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\track;
 
@@ -69,16 +66,4 @@ abstract class mod_perform_webapi_resolver_mutation_update_track_schedule_testca
 
         parent::tearDown();
     }
-
-    /**
-     * Helper to get execution context
-     *
-     * @param string $type
-     * @param string|null $operation
-     * @return execution_context
-     */
-    protected function get_execution_context(string $type = 'dev', ?string $operation = null): execution_context {
-        return execution_context::create($type, $operation);
-    }
-
 }

@@ -20,42 +20,32 @@
  * @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
  * @package mod_perform
  */
-
-/**
- * @group perform
- */
+use core\collection;
 use core\webapi\execution_context;
 use mod_perform\webapi\resolver\query\activities;
-use totara_webapi\graphql;
+use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
+/**
+ * @coversDefaultClass activities.
+ *
+ * @group perform
+ */
 class mod_perform_webapi_resolver_query_activities_testcase extends advanced_testcase {
+    private const QUERY = 'mod_perform_activities';
 
     use webapi_phpunit_helper;
 
-    /**
-     * Helper to get execution context
-     *
-     * @param string $type
-     * @param string|null $operation
-     * @return execution_context
-     */
-    private function get_execution_context(string $type = 'dev', ?string $operation = null) {
-        return execution_context::create($type, $operation);
-    }
-
     public function test_get_activities() {
-        $this->setAdminUser();
-        $this->create_test_data();
+        $names = ['Mid year performance', 'End year performance'];
+        $context = $this->create_test_data($names);
 
         /** @var mod_perform\models\activity\activity[] $activities */
-        $activities = activities::resolve([], $this->get_execution_context());
+        $activities = collection::new(activities::resolve([], $context))
+            ->pluck('name');
 
-        $this->assertCount(2, $activities);
-        $this->assertEqualsCanonicalizing(
-            ['Mid year performance', 'End year performance'],
-            [$activities[0]->name, $activities[1]->name]
-        );
+        $this->assertCount(count($names), $activities);
+        $this->assertEqualsCanonicalizing($names, $activities);
     }
 
     public function test_user_needs_view_manage_activities_capability() {
@@ -63,24 +53,20 @@ class mod_perform_webapi_resolver_query_activities_testcase extends advanced_tes
 
         $user1 = $this->getDataGenerator()->create_user();
         $this->setUser($user1);
-        // $this->create_test_data();
 
         $user_role = $DB->get_record('role', ['shortname' => 'user']);
         assign_capability('mod/perform:view_manage_activities', CAP_ALLOW, $user_role->id, SYSCONTEXTID, true);
 
         /** @var mod_perform\models\activity\activity[] $activities */
-        $activities = activities::resolve([], $this->get_execution_context());
+        $context = $this->create_webapi_context(self::QUERY);
+        $activities = activities::resolve([], $context);
 
         // There are not activities but also no exceptions
         $this->assertEmpty($activities);
 
         unassign_capability('mod/perform:view_manage_activities', $user_role->id, SYSCONTEXTID);
-
-        $this->expectException(required_capability_exception::class);
-        $this->expectExceptionMessage('(Access the performance activities management interface)');
-
-        /** @var mod_perform\models\activity\activity[] $activities */
-        $this->resolve_graphql_query('mod_perform_activities');
+        $result = $this->parsed_graphql_operation(self::QUERY, []);
+        $this->assert_webapi_operation_failed($result, '(Access the performance activities management interface)');
     }
 
     public function test_users_can_view_reports_or_manage_other_users_activities() {
@@ -89,15 +75,17 @@ class mod_perform_webapi_resolver_query_activities_testcase extends advanced_tes
         $user1 = $this->getDataGenerator()->create_user();
         $user2 = $this->getDataGenerator()->create_user();
         $this->setUser($user1);
-        $this->create_test_data();
+
+        $names = ['Mid year performance', 'End year performance'];
+        $this->create_test_data($names);
 
         $user_role = $DB->get_record('role', ['shortname' => 'user']);
         assign_capability('mod/perform:view_manage_activities', CAP_ALLOW, $user_role->id, SYSCONTEXTID, true);
 
         /** @var mod_perform\models\activity\activity[] $activities */
-        $activities = $this->resolve_graphql_query('mod_perform_activities');
+        $activities = $this->resolve_graphql_query(self::QUERY);
 
-        $this->assertCount(2, $activities);
+        $this->assertCount(count($names), $activities);
         // Users who created activities can always manage and view reporting
         foreach ($activities as $activity) {
             $this->assertTrue($activity->can_manage());
@@ -106,13 +94,13 @@ class mod_perform_webapi_resolver_query_activities_testcase extends advanced_tes
 
         $this->setUser($user2);
 
-        $activities = $this->resolve_graphql_query('mod_perform_activities');
+        $activities = $this->resolve_graphql_query(self::QUERY);
         $this->assertEmpty($activities);
 
         // Let the other user manage only
         assign_capability('mod/perform:manage_activity', CAP_ALLOW, $user_role->id, SYSCONTEXTID, true);
 
-        $activities = $this->resolve_graphql_query('mod_perform_activities');
+        $activities = $this->resolve_graphql_query(self::QUERY);
 
         foreach ($activities as $activity) {
             $this->assertTrue($activity->can_manage());
@@ -122,7 +110,7 @@ class mod_perform_webapi_resolver_query_activities_testcase extends advanced_tes
         // Let the user also see view the reports
         assign_capability('mod/perform:view_participation_reporting', CAP_ALLOW, $user_role->id, SYSCONTEXTID, true);
 
-        $activities = $this->resolve_graphql_query('mod_perform_activities');
+        $activities = $this->resolve_graphql_query(self::QUERY);
 
         foreach ($activities as $activity) {
             $this->assertTrue($activity->can_manage());
@@ -139,9 +127,8 @@ class mod_perform_webapi_resolver_query_activities_testcase extends advanced_tes
     }
 
     public function test_get_empty_activities() {
-        $this->setAdminUser();
-
-        $activities = activities::resolve([], $this->get_execution_context());
+        $context = $this->create_test_data([]);
+        $activities = activities::resolve([], $context);
 
         $this->assertCount(0, $activities);
     }
@@ -150,26 +137,40 @@ class mod_perform_webapi_resolver_query_activities_testcase extends advanced_tes
      * @expectedException moodle_exception
      */
     public function test_get_activities_non_admin() {
+        $context = $this->create_test_data([]);
         $this->setGuestUser();
 
-        activities::resolve([], $this->get_execution_context());
+        activities::resolve([], $context);
     }
 
     public function test_ajax_query() {
-        $this->setAdminUser();
-        $this->create_test_data();
-        $result = graphql::execute_operation(
-            execution_context::create('ajax', 'mod_perform_activities'),
-            []
-        );
-        $this->assertCount(2, $result->data['mod_perform_activities']);
+        $names = ['Mid year performance', 'End year performance'];
+        $this->create_test_data($names);
+
+        $result = $this->parsed_graphql_operation(self::QUERY, []);
+        $this->assert_webapi_operation_successful($result);
+
+        $activities = $this->get_webapi_operation_data($result);
+        $this->assertCount(count($names), $activities, 'wrong count');
     }
 
-    private function create_test_data() {
+    public function test_failed_ajax_query(): void {
+        $feature = 'performance_activities';
+        advanced_feature::disable($feature);
+        $result = $this->parsed_graphql_operation(self::QUERY, []);
+        $this->assert_webapi_operation_failed($result, $feature);
+        advanced_feature::enable($feature);
+    }
+
+    private function create_test_data(array $activity_names): execution_context {
+        $this->setAdminUser();
+
         /** @var mod_perform_generator $perform_generator */
         $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        foreach ($activity_names as $name) {
+            $perform_generator->create_activity_in_container(['activity_name' => $name]);
+        }
 
-        $perform_generator->create_activity_in_container(['activity_name' => 'Mid year performance']);
-        $perform_generator->create_activity_in_container(['activity_name' => 'End year performance']);
+        return $this->create_webapi_context(self::QUERY);
     }
 }

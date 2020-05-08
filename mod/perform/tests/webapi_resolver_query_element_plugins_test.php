@@ -21,29 +21,25 @@
  * @package mod_perform
  */
 
+use mod_perform\webapi\resolver\query\element_plugins;
+use totara_core\advanced_feature;
+use totara_webapi\phpunit\webapi_phpunit_helper;
+
 /**
+ * @coversDefaultClass element_plugins.
+ *
  * @group perform
  */
-use core\webapi\execution_context;
-use mod_perform\webapi\resolver\query\element_plugins;
-
 class mod_perform_webapi_resolver_query_element_plugins_testcase extends advanced_testcase {
+    private const QUERY = 'mod_perform_element_plugins';
 
-    /**
-     * Helper to get execution context
-     *
-     * @param string $type
-     * @param string|null $operation
-     * @return execution_context
-     */
-    private function get_execution_context(string $type = 'dev', ?string $operation = null) {
-        return execution_context::create($type, $operation);
-    }
+    use webapi_phpunit_helper;
 
     public function test_get_element_plugins() {
         $this->setAdminUser();
+        $context = $this->create_webapi_context(self::QUERY);
 
-        $element_plugins = element_plugins::resolve([], $this->get_execution_context());
+        $element_plugins = element_plugins::resolve([], $context);
         foreach ($element_plugins as $element_plugin) {
             $this->assertInstanceOf('mod_perform\models\activity\element_plugin', $element_plugin);
             $this->assertNotEmpty($element_plugin->get_plugin_name());
@@ -52,5 +48,36 @@ class mod_perform_webapi_resolver_query_element_plugins_testcase extends advance
             $this->assertNotEmpty($element_plugin->get_admin_display_component());
             $this->assertNotEmpty($element_plugin->get_participant_form_component());
         }
+    }
+
+    public function test_successful_ajax_call(): void {
+        $this->setAdminUser();
+
+        $result = $this->parsed_graphql_operation(self::QUERY, []);
+        $this->assert_webapi_operation_successful($result);
+
+        $element_plugins = $this->get_webapi_operation_data($result);
+        $this->assertNotEmpty($element_plugins, "no element plugins");
+
+        foreach ($element_plugins as $element_plugin) {
+            $this->assertNotEmpty($element_plugin['plugin_name']);
+            $this->assertNotEmpty($element_plugin['name']);
+            $this->assertNotEmpty($element_plugin['admin_form_component']);
+            $this->assertNotEmpty($element_plugin['admin_display_component']);
+            $this->assertNotEmpty($element_plugin['participant_form_component']);
+        }
+    }
+
+    public function test_failed_ajax_query(): void {
+        $this->setAdminUser();
+        $feature = 'performance_activities';
+        advanced_feature::disable($feature);
+        $result = $this->parsed_graphql_operation(self::QUERY, []);
+        $this->assert_webapi_operation_failed($result, $feature);
+        advanced_feature::enable($feature);
+
+        $this->setUser();
+        $result = $this->parsed_graphql_operation(self::QUERY, []);
+        $this->assert_webapi_operation_failed($result, 'not logged in');
     }
 }

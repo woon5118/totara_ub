@@ -26,21 +26,17 @@ namespace mod_perform\webapi\resolver\mutation;
 use coding_exception;
 use core\entities\user;
 use core\webapi\execution_context;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\middleware\require_login;
 use core\webapi\mutation_resolver;
+use core\webapi\resolver\has_middleware;
 use mod_perform\data_providers\response\participant_section_with_responses;
-use totara_core\advanced_feature;
 
-class update_section_responses implements mutation_resolver {
-
+class update_section_responses implements mutation_resolver, has_middleware {
     /**
-     * @param array $args
-     * @param execution_context $ec
-     * @return array
+     * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
-        advanced_feature::require('performance_activities');
-        require_login();
-
         $input = $args['input'];
 
         $participant_id = user::logged_in()->id;
@@ -64,4 +60,13 @@ class update_section_responses implements mutation_resolver {
         ];
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_advanced_feature('performance_activities'),
+            new require_login()
+        ];
+    }
 }

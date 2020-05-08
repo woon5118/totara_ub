@@ -21,32 +21,26 @@
  * @package mod_perform
  */
 
-use core\webapi\execution_context;
-use mod_perform\models\activity\activity;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\webapi\resolver\mutation\delete_activity;
-use totara_webapi\graphql;
+use totara_core\advanced_feature;
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
- * Class mod_perform_webapi_resolver_mutation_delete_activity_testcase
+ * @coversDefaultClass delete_activity
  *
  * @group perform
  */
 class mod_perform_webapi_resolver_mutation_delete_activity_testcase extends advanced_testcase {
+    private const MUTATION = 'mod_perform_delete_activity';
 
-    private function get_execution_context(string $type = graphql::TYPE_AJAX, ?string $operation = null): execution_context {
-        return execution_context::create($type, $operation);
-    }
+    use webapi_phpunit_helper;
 
     public function test_activate_delete_activity(): void {
-        self::setAdminUser();
-
-        $activity = $this->create_activity();
+        [$activity, $args, $context] = $this->create_activity();
         self::assertTrue($this->container_course_exists($activity->course));
 
-        $args = ['input' => ['activity_id' => $activity->id]];
-        $result = delete_activity::resolve($args, $this->get_execution_context());
-
+        $result = delete_activity::resolve($args, $context);
         $this->assertTrue($result);
         self::assertNull(activity_entity::repository()->find($activity->id));
         self::assertFalse($this->container_course_exists($activity->course));
@@ -56,60 +50,58 @@ class mod_perform_webapi_resolver_mutation_delete_activity_testcase extends adva
         $user1 = self::getDataGenerator()->create_user();
         $user2 = self::getDataGenerator()->create_user();
 
-        self::setUser($user1);
-
-        $activity = $this->create_activity();
+        [$activity, $args, $context] = $this->create_activity($user1);
         self::assertTrue($this->container_course_exists($activity->course));
 
         self::setUser($user2);
 
         $this->expectException(moodle_exception::class);
         $this->expectExceptionMessage('Invalid activity');
-
-        $args = ['input' => ['activity_id' => $activity->id]];
-
-        delete_activity::resolve($args, $this->get_execution_context());
-    }
-
-    public function test_delete_nonexisting_activity(): void {
-        self::setAdminUser();
-
-        $this->expectException(moodle_exception::class);
-        $this->expectExceptionMessage('Invalid activity');
-
-        $args = ['input' => ['activity_id' => 999]];
-
-        delete_activity::resolve($args, $this->get_execution_context());
+        delete_activity::resolve($args, $context);
     }
 
     /**
      * Test the mutation through the GraphQL stack.
      */
     public function test_execute_query_successful(): void {
-        self::setAdminUser();
-
-        $activity = $this->create_activity();
+        [$activity, $args, ] = $this->create_activity();
         self::assertTrue($this->container_course_exists($activity->course));
 
-        $args = ['activity_id' => $activity->id];
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_successful($result);
 
-        $result = graphql::execute_operation(
-            $this->get_execution_context(graphql::TYPE_AJAX, 'mod_perform_delete_activity'),
-            ['input' => $args]
-        );
+        $result = $this->get_webapi_operation_data($result);
+        $this->assertTrue($result);
 
-        $this->assertTrue($result->data['mod_perform_delete_activity']);
         self::assertNull(activity_entity::repository()->find($activity->id));
         self::assertFalse($this->container_course_exists($activity->course));
     }
 
-    /**
-     * @return activity
-     */
-    private function create_activity(): activity {
-        /** @var mod_perform_generator $perform_generator */
-        $perform_generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
-        return $perform_generator->create_activity_in_container();
+    public function test_failed_ajax_query(): void {
+        [$activity, $args, ] = $this->create_activity();
+
+        $feature = 'performance_activities';
+        advanced_feature::disable($feature);
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_failed($result, $feature);
+        advanced_feature::enable($feature);
+
+        $result = $this->parsed_graphql_operation(self::MUTATION, []);
+        $this->assert_webapi_operation_failed($result, 'input');
+
+        $args['input']['activity_id'] = 0;
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_failed($result, 'activity id');
+
+        $activity_id = 999;
+        $args['input']['activity_id'] = $activity_id;
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_failed($result, "$activity_id");
+
+        self::setGuestUser();
+        $args['input']['activity_id'] = $activity->id;
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_failed($result, 'not accessible');
     }
 
     private function container_course_exists(int $course_id): bool {
@@ -117,4 +109,26 @@ class mod_perform_webapi_resolver_mutation_delete_activity_testcase extends adva
         return $DB->record_exists('course', ['id' => $course_id]);
     }
 
+    private function create_activity(?stdClass $as_user = null): array {
+        if ($as_user) {
+            self::setUser($as_user);
+        } else {
+            self::setAdminUser();
+        }
+
+        /** @var mod_perform_generator $perform_generator */
+        $perform_generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
+        $activity = $perform_generator->create_activity_in_container();
+
+        $args = [
+            'input' => [
+                'activity_id' => $activity->id
+            ]
+        ];
+
+        $context = $this->create_webapi_context(self::MUTATION);
+        $context->set_relevant_context($activity->get_context());
+
+        return [$activity, $args, $context];
+    }
 }

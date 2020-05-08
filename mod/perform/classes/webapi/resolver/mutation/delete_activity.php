@@ -25,34 +25,31 @@ namespace mod_perform\webapi\resolver\mutation;
 
 use core\webapi\execution_context;
 use core\webapi\mutation_resolver;
+use core\webapi\middleware\require_advanced_feature;
+use core\webapi\resolver\has_middleware;
+use mod_perform\webapi\middleware\require_activity;
 use mod_perform\models\activity\activity;
-use mod_perform\entities\activity\activity as activity_entity;
 use moodle_exception;
-use totara_core\advanced_feature;
 use container_perform\perform as perform_container;
 
-class delete_activity implements mutation_resolver {
-
+class delete_activity implements mutation_resolver, has_middleware {
     /**
      * This hard deletes the activity, instances, assignments, responses and elements (if not used by other activities).
      *
      * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
-        advanced_feature::require('performance_activities');
-        require_login(null, false, null, false, true);
-
-        $args = $args['input'];
-
-        /** @var activity_entity $activity_entity */
-        $activity_entity = activity_entity::repository()->find($args['activity_id']);
-
-        if ($activity_entity === null) {
-            throw new moodle_exception('invalid_activity', 'mod_perform');
+        $details = $args['input'] ?? null;
+        if (!$details) {
+            throw new \invalid_parameter_exception('activity details not given');
         }
 
-        $activity = activity::load_by_entity($activity_entity);
+        $activity_id = (int)$details['activity_id'] ?? 0;
+        if (!$activity_id) {
+            throw new \invalid_parameter_exception('unknown activity id');
+        }
 
+        $activity = activity::load_by_id($activity_id);
         if (!$activity->can_delete()) {
             throw new moodle_exception('invalid_activity', 'mod_perform');
         }
@@ -60,5 +57,15 @@ class delete_activity implements mutation_resolver {
         perform_container::from_activity($activity)->delete();
 
         return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function get_middleware(): array {
+        return [
+            new require_advanced_feature('performance_activities'),
+            require_activity::by_activity_id('input.activity_id', true)
+        ];
     }
 }

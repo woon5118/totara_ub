@@ -30,13 +30,7 @@ use totara_core\relationship\resolvers\subject;
 use totara_job\relationship\resolvers\appraiser;
 use totara_job\relationship\resolvers\manager;
 
-/**
- * Class mod_perform_relationship_testcase
- *
- * @group perform
- */
 abstract class mod_perform_relationship_testcase extends advanced_testcase {
-
     /**
      * @var component_generator_base|mod_perform_generator
      */
@@ -55,7 +49,13 @@ abstract class mod_perform_relationship_testcase extends advanced_testcase {
     /**
      * @return object
      */
-    protected function create_test_data() {
+    protected function create_test_data(?stdClass $as_user = null) {
+        if ($as_user) {
+            self::setUser($as_user);
+        } else {
+            self::setAdminUser();
+        }
+
         $perform_generator = $this->perform_generator();
 
         $data = new stdClass();

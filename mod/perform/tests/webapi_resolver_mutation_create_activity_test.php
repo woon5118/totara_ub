@@ -21,20 +21,21 @@
  * @package mod_perform
  */
 
-/**
- * @group perform
- */
-
 use container_perform\create_exception;
 use mod_perform\models\activity\activity_type;
 use mod_perform\webapi\resolver\mutation\create_activity;
-use core\webapi\execution_context;
+use totara_core\advanced_feature;
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
+/**
+ * @coversDefaultClass create_activity.
+ *
+ * @group perform
+ */
 class mod_perform_webapi_resolver_mutation_create_activity_testcase extends advanced_testcase {
+    private const MUTATION = 'mod_perform_create_activity';
 
-    private function get_execution_context(string $type = 'dev', ?string $operation = null): execution_context {
-        return execution_context::create($type, $operation);
-    }
+    use webapi_phpunit_helper;
 
     public function test_create_activity(): void {
         $this->setAdminUser();
@@ -44,9 +45,10 @@ class mod_perform_webapi_resolver_mutation_create_activity_testcase extends adva
             'description' => "Test Description",
             'type' => $expected_type->id
         ];
+        $context = $this->create_webapi_context(self::MUTATION);
 
         /** @type activity $result */
-        ['activity' => $result] = create_activity::resolve($args, $this->get_execution_context());
+        ['activity' => $result] = create_activity::resolve($args, $context);
         $this->assertSame('Mid year performance review', $result->name);
         $this->assertSame('Test Description', $result->description);
 
@@ -63,10 +65,11 @@ class mod_perform_webapi_resolver_mutation_create_activity_testcase extends adva
             'description' => 'Test Description',
             'type' => activity_type::load_by_name('appraisal')->id
         ];
+        $context = $this->create_webapi_context(self::MUTATION);
 
         $this->expectException(create_exception::class);
         $this->expectExceptionMessage('You do not have the permission to create a performance activity');
-        create_activity::resolve($args, $this->get_execution_context());
+        create_activity::resolve($args, $context);
     }
 
     public function test_create_activity_with_empty_name(): void {
@@ -76,21 +79,11 @@ class mod_perform_webapi_resolver_mutation_create_activity_testcase extends adva
             'description' => 'Test Description',
             'type' => activity_type::load_by_name('feedback')->id
         ];
-        $this->expectException(create_exception::class);
-        $this->expectExceptionMessage('You are not allowed to create an activity with an empty name');
-        create_activity::resolve($args, $this->get_execution_context());
-    }
+        $context = $this->create_webapi_context(self::MUTATION);
 
-    public function test_create_activity_with_name_only_contains_whitespace(): void {
-        $this->setAdminUser();
-        $args = [
-            'name' => '  ',
-            'description' => 'Test Description',
-            'type' => activity_type::load_by_name('feedback')->id
-        ];
         $this->expectException(create_exception::class);
         $this->expectExceptionMessage('You are not allowed to create an activity with an empty name');
-        create_activity::resolve($args, $this->get_execution_context());
+        create_activity::resolve($args, $context);
     }
 
     public function test_create_activity_with_empty_description(): void {
@@ -101,8 +94,9 @@ class mod_perform_webapi_resolver_mutation_create_activity_testcase extends adva
             'description' => "",
             'type' => $type_id
         ];
+        $context = $this->create_webapi_context(self::MUTATION);
 
-        ['activity' => $result] = create_activity::resolve($args, $this->get_execution_context());
+        ['activity' => $result] = create_activity::resolve($args, $context);
         $this->assertSame('Mid year performance review', $result->name);
         $this->assertSame('', $result->description);
 
@@ -112,7 +106,7 @@ class mod_perform_webapi_resolver_mutation_create_activity_testcase extends adva
             'type' => $type_id
         ];
 
-        ['activity' => $result] = create_activity::resolve($args, $this->get_execution_context());
+        ['activity' => $result] = create_activity::resolve($args, $context);
         $this->assertSame('Mid year performance review', $result->name);
         $this->assertNull($result->description);
     }
@@ -122,10 +116,11 @@ class mod_perform_webapi_resolver_mutation_create_activity_testcase extends adva
         $args = [
             'name' => 'Mid year performance review'
         ];
+        $context = $this->create_webapi_context(self::MUTATION);
 
         $this->expectException(create_exception::class);
         $this->expectExceptionMessageRegExp("/type/");
-        create_activity::resolve($args, $this->get_execution_context());
+        create_activity::resolve($args, $context);
     }
 
     public function test_create_activity_with_invalid_type(): void {
@@ -134,9 +129,60 @@ class mod_perform_webapi_resolver_mutation_create_activity_testcase extends adva
             'name' => 'Mid year performance review',
             'type' => 12334
         ];
+        $context = $this->create_webapi_context(self::MUTATION);
 
         $this->expectException(create_exception::class);
         $this->expectExceptionMessageRegExp("/type id/");
-        create_activity::resolve($args, $this->get_execution_context());
+        create_activity::resolve($args, $context);
+    }
+
+    /**
+     * @covers ::resolve
+     */
+    public function test_successful_ajax_call(): void {
+        $this->setAdminUser();
+
+        $expected_type = activity_type::load_by_name('check-in');
+        $args = [
+            'name' => "Mid year performance review",
+            'description' => "Test Description",
+            'type' => $expected_type->id
+        ];
+
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_successful($result);
+
+        $result = $this->get_webapi_operation_data($result);
+        $this->assertNotEmpty($result, 'activity creation failed');
+
+        $activity = $result['activity'];
+        $this->assertSame($args['name'], $activity['name']);
+        $this->assertSame($args['description'], $activity['description']);
+
+        $actual_type = $activity['type'];
+        $this->assertEquals($expected_type->display_name, $actual_type['display_name'], "wrong type");
+    }
+
+    /**
+     * @covers ::resolve
+     */
+    public function test_failed_ajax_call(): void {
+        $this->setAdminUser();
+
+        $args = [
+            'name' => "Mid year performance review",
+            'description' => "Test Description",
+            'type' => activity_type::load_by_name('check-in')->id
+        ];
+
+        $feature = 'performance_activities';
+        advanced_feature::disable($feature);
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_failed($result, $feature);
+        advanced_feature::enable($feature);
+
+        self::setGuestUser();
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_failed($result, 'permission');
     }
 }

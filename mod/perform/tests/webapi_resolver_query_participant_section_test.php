@@ -21,48 +21,37 @@
  * @package mod_perform
  */
 
-/**
- * @group perform
- */
-
-use core\webapi\execution_context;
-use mod_perform\entities\activity\subject_instance;
 use mod_perform\models\activity\section;
 use mod_perform\models\activity\activity;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
 use mod_perform\webapi\resolver\query\participant_section;
-use totara_webapi\graphql;
 
+use totara_core\advanced_feature;
+
+use totara_webapi\phpunit\webapi_phpunit_helper;
+
+/**
+ * @coversDefaultClass participant_section
+ *
+ * @group perform
+ */
 class mod_perform_webapi_resolver_query_participant_section_testcase extends advanced_testcase {
+    private const QUERY = 'mod_perform_participant_section';
+
+    use webapi_phpunit_helper;
 
     public function test_get_participant_section(): void {
-        self::setAdminUser();
-
-        $data_generator = self::getDataGenerator();
-        /** @var mod_perform_generator $perform_generator */
-        $perform_generator = $data_generator->get_plugin_generator('mod_perform');
-
-        /** @var activity $activity */
-        $activity = $perform_generator->create_full_activities()->first();
-        /** @var section $section */
-        $section = $activity->sections->first();
-
-        $element = $perform_generator->create_element();
-        $section_element = $perform_generator->create_section_element($section, $element);
-
-        /** @var participant_section_entity[] $participant_sections */
-        $participant_sections = participant_section_entity::repository()->order_by('id', 'desc')->get();
+        [$participant_sections, $section_element] = $this->create_test_data();
 
         foreach ($participant_sections as $participant_section) {
             self::setUser($participant_section->participant_instance->participant_user->id);
 
             $args = ['participant_instance_id' => $participant_section->participant_instance->id];
 
-            $result = graphql::execute_operation(
-                $this->get_execution_context('ajax', 'mod_perform_participant_section'),
-                $args
-            )->toArray(true)['data']['mod_perform_participant_section'];
+            $result = $this->parsed_graphql_operation(self::QUERY, $args);
+            $this->assert_webapi_operation_successful($result);
 
+            $result = $this->get_webapi_operation_data($result);
             $this->assertEquals($participant_section->id, $result['id']);
             $this->assertSame($participant_section->section->title, $result['section']['title']);
             $this->assertSame('IN_PROGRESS', $result['progress_status']);
@@ -84,6 +73,53 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
                 $section_element_responses[0]
             );
         }
+    }
+
+    public function test_failed_ajax_query(): void {
+        [$participants, ] = $this->create_test_data();
+        $participant_instance = $participants->first()->participant_instance;
+        $args = ['participant_instance_id' => $participant_instance->id];
+
+        $feature = 'performance_activities';
+        advanced_feature::disable($feature);
+        $result = $this->parsed_graphql_operation(self::QUERY, $args);
+        $this->assert_webapi_operation_failed($result, $feature);
+        advanced_feature::enable($feature);
+
+        $result = $this->parsed_graphql_operation(self::QUERY, []);
+        $this->assert_webapi_operation_failed($result, 'participant_instance_id');
+
+        $result = $this->parsed_graphql_operation(self::QUERY, ['participant_instance_id' => 0]);
+        $this->assert_webapi_operation_failed($result, 'participant instance id');
+
+        $result = $this->parsed_graphql_operation(self::QUERY, ['participant_instance_id' => 1293]);
+        $this->assert_webapi_operation_failed($result, "No participant section");
+
+        $this->setUser();
+        $result = $this->parsed_graphql_operation(self::QUERY, $args);
+        $this->assert_webapi_operation_failed($result, 'not logged in');
+    }
+
+    private function create_test_data(): array {
+        self::setAdminUser();
+
+        $data_generator = self::getDataGenerator();
+        /** @var mod_perform_generator $perform_generator */
+        $perform_generator = $data_generator->get_plugin_generator('mod_perform');
+
+        /** @var activity $activity */
+        $activity = $perform_generator->create_full_activities()->first();
+        /** @var section $section */
+        $section = $activity->sections->first();
+
+        $element = $perform_generator->create_element();
+        $section_element = $perform_generator->create_section_element($section, $element);
+
+        $participant_section = participant_section_entity::repository()
+            ->order_by('id', 'desc')
+            ->get();
+
+        return [$participant_section, $section_element];
     }
 
     private function create_section_element_response(int $section_element_id): array {
@@ -108,17 +144,4 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
             'visible_to' => [],
         ];
     }
-
-
-    /**
-     * Helper to get execution context
-     *
-     * @param string $type
-     * @param string|null $operation
-     * @return execution_context
-     */
-    private function get_execution_context(string $type = 'dev', ?string $operation = null): execution_context {
-        return execution_context::create($type, $operation);
-    }
-
 }

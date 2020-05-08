@@ -21,26 +21,26 @@
  * @package mod_perform
  */
 
-/**
- * @group perform
- */
-
-use core\webapi\execution_context;
 use mod_perform\entities\activity\section as section_entity;
 use mod_perform\models\activity\section;
 use mod_perform\webapi\resolver\mutation\update_section_relationships;
 use totara_core\relationship\resolvers\subject;
 use totara_job\relationship\resolvers\appraiser;
 use totara_job\relationship\resolvers\manager;
-use totara_webapi\graphql;
+use totara_core\advanced_feature;
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 require_once(__DIR__.'/relationship_testcase.php');
 
+/**
+ * @coversDefaultClass update_section_relationships.
+ *
+ * @group perform
+ */
 class mod_perform_webapi_resolver_mutation_update_section_relationships_testcase extends mod_perform_relationship_testcase {
+    private const MUTATION = 'mod_perform_update_section_relationships';
 
-    private function get_execution_context() {
-        return execution_context::create('ajax', 'mod_perform_update_section_relationships');
-    }
+    use webapi_phpunit_helper;
 
     public function test_update_invalid_section_id() {
         $this->setAdminUser();
@@ -52,11 +52,8 @@ class mod_perform_webapi_resolver_mutation_update_section_relationships_testcase
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage('Specified section id does not exist');
 
-        $args = [
-            'section_id' => $non_existent_section_id,
-            'relationship_ids' => [$relationship_id],
-        ];
-        update_section_relationships::resolve(['input' => $args], $this->get_execution_context());
+        [$args, $context] = $this->create_args($non_existent_section_id, [$relationship_id]);
+        update_section_relationships::resolve($args, $context);
     }
 
     public function test_update_missing_capability() {
@@ -73,11 +70,8 @@ class mod_perform_webapi_resolver_mutation_update_section_relationships_testcase
         $this->expectException(required_capability_exception::class);
         $this->expectExceptionMessage('you do not currently have permissions to do that (Manage performance activities)');
 
-        $args = [
-            'section_id' => $section1->id,
-            'relationship_ids' => [$relationship_id],
-        ];
-        update_section_relationships::resolve(['input' => $args], $this->get_execution_context());
+        [$args, $context] = $this->create_args($section1->id, [$relationship_id]);
+        update_section_relationships::resolve($args, $context);
     }
 
     public function test_update_successful() {
@@ -95,11 +89,9 @@ class mod_perform_webapi_resolver_mutation_update_section_relationships_testcase
         $this->assert_section_relationships($section2, []);
 
         // Add three relationships to section1.
-        $args = [
-            'section_id' => $section1->id,
-            'relationship_ids' => [$subject_id, $manager_id, $appraiser_id],
-        ];
-        $result = update_section_relationships::resolve(['input' => $args], $this->get_execution_context());
+        [$args, $context] = $this->create_args($section1->id, [$subject_id, $manager_id, $appraiser_id]);
+        $result = update_section_relationships::resolve($args, $context);
+
         /** @var section $returned_section */
         $returned_section = $result['section'];
         $this->assertEquals($section1->id, $returned_section->id);
@@ -109,11 +101,9 @@ class mod_perform_webapi_resolver_mutation_update_section_relationships_testcase
         $this->assert_activity_relationships($activity2, []);
 
         // Remove all relationships.
-        $args = [
-            'section_id' => $section1->id,
-            'relationship_ids' => [],
-        ];
-        update_section_relationships::resolve(['input' => $args], $this->get_execution_context());
+        [$args, $context] = $this->create_args($section1->id, []);
+        update_section_relationships::resolve($args, $context);
+
         $this->assert_section_relationships($section1, []);
         $this->assert_section_relationships($section2, []);
         $this->assert_activity_relationships($activity1, []);
@@ -124,22 +114,47 @@ class mod_perform_webapi_resolver_mutation_update_section_relationships_testcase
      * Test the mutation through the GraphQL stack.
      */
     public function test_ajax_query_successful() {
-        $this->setAdminUser();
         $data = $this->create_test_data();
         // Section without relationships.
         $section_id = $data->activity2_section2->id;
         $appraiser_id = $this->perform_generator()->get_relationship(appraiser::class)->id;
 
+        [$args, ] = $this->create_args($section_id, [$appraiser_id]);
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_successful($result);
+
+        $result = $this->get_webapi_operation_data($result);
+        $this->assertNotEmpty($result, "no result");
+        $this->assertEquals($section_id, $result['section']['id']);
+    }
+
+    public function test_failed_ajax_query(): void {
+        $data = $this->create_test_data();
+        $section_id = $data->activity2_section2->id;
+        $appraiser_id = $this->perform_generator()->get_relationship(appraiser::class)->id;
+        [$args, ] = $this->create_args($section_id, [$appraiser_id]);
+
+        $feature = 'performance_activities';
+        advanced_feature::disable($feature);
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_failed($result, $feature);
+        advanced_feature::enable($feature);
+
+        $this->setUser();
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_failed($result, 'not logged in');
+    }
+
+    private function create_args(int $section_id, array $relationship_ids): array {
         $args = [
-            'section_id' => $section_id,
-            'relationship_ids' => [$appraiser_id],
+            'input' => [
+                'section_id' => $section_id,
+                'relationship_ids' => $relationship_ids
+            ]
         ];
 
-        $result = graphql::execute_operation(
-            $this->get_execution_context(),
-            ['input' => $args]
-        );
-        $this->assertEquals([], $result->errors);
-        $this->assertEquals($section_id, $result->data['mod_perform_update_section_relationships']['section']['id']);
+        $context = $this->create_webapi_context(self::MUTATION);
+
+        return [$args, $context];
     }
 }

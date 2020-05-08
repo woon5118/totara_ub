@@ -25,9 +25,9 @@
 require_once(__DIR__ . '/generator/activity_generator_configuration.php');
 require_once(__DIR__ . '/webapi_resolver_mutation_update_track_schedule.php');
 
-use mod_perform\entities\activity\track as track_entity;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\track;
+use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
@@ -35,6 +35,8 @@ use totara_webapi\phpunit\webapi_phpunit_helper;
  */
 class mod_perform_webapi_resolver_mutation_update_track_schedule_open_fixed_testcase
     extends mod_perform_webapi_resolver_mutation_update_track_schedule_testcase {
+
+    private const MUTATION = 'mod_perform_update_track_schedule';
 
     use webapi_phpunit_helper;
 
@@ -61,11 +63,8 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_fixed_test
 
         $user = self::getDataGenerator()->create_user();
         self::setUser($user);
-
-        $this->expectException(required_capability_exception::class);
-        $this->expectExceptionMessage('Manage performance activities');
-
-        $this->resolve_graphql_mutation('mod_perform_update_track_schedule', $args);
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_failed($result, 'accessible');
     }
 
     public function test_correct_track_is_updated(): void {
@@ -84,22 +83,22 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_fixed_test
         self::assertCount(4, $before_tracks);
         unset($before_tracks[$this->track1_id]->updated_at);
 
-        $result = $this->resolve_graphql_mutation(
-            'mod_perform_update_track_schedule',
-            $args
-        );
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_successful($result);
+
+        $result = $this->get_webapi_operation_data($result);
         $result_track = $result['track'];
 
         // Verify the resulting graphql data.
-        self::assertEquals($this->track1_id, $result_track->id);
-        self::assertTrue($result_track->schedule_is_open);
-        self::assertTrue($result_track->schedule_is_fixed);
-        self::assertEquals(222, $result_track->schedule_fixed_from);
-        self::assertNull($result_track->schedule_fixed_to);
-        self::assertNull($result_track->schedule_dynamic_count_from);
-        self::assertNull($result_track->schedule_dynamic_count_to);
-        self::assertNull($result_track->schedule_dynamic_unit);
-        self::assertNull($result_track->schedule_dynamic_direction);
+        self::assertEquals($this->track1_id, $result_track['id']);
+        self::assertTrue($result_track['schedule_is_open']);
+        self::assertTrue($result_track['schedule_is_fixed']);
+        self::assertEquals(222, $result_track['schedule_fixed_from']);
+        self::assertNull($result_track['schedule_fixed_to']);
+        self::assertNull($result_track['schedule_dynamic_count_from']);
+        self::assertNull($result_track['schedule_dynamic_count_to']);
+        self::assertNull($result_track['schedule_dynamic_unit']);
+        self::assertNull($result_track['schedule_dynamic_direction']);
 
         // Manually make the changes that we expect to make.
         $affected_track = $before_tracks[$this->track1_id];
@@ -117,8 +116,36 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_fixed_test
         self::assertEquals($after_tracks, $before_tracks);
     }
 
+    public function test_failed_ajax_call(): void {
+        $args = [
+            'track_schedule' => [
+                'track_id' => $this->track1_id,
+                'is_open' => true,
+                'is_fixed' => true,
+                'fixed_from' => 222,
+            ],
+        ];
+
+        $feature = 'performance_activities';
+        advanced_feature::disable($feature);
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_failed($result, $feature);
+        advanced_feature::enable($feature);
+
+        $result = $this->parsed_graphql_operation(self::MUTATION, []);
+        $this->assert_webapi_operation_failed($result, 'track_schedule');
+
+        $args['track_schedule']['track_id'] = 0;
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_failed($result, 'track id');
+
+        $track_id = 1293;
+        $args['track_schedule']['track_id'] = $track_id;
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_failed($result, "$track_id");
+    }
+
     public function test_with_validation_errors(): void {
         // None currently, but we will have when additional fields are added.
     }
-
 }

@@ -22,8 +22,6 @@
  * @category test
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 use core\webapi\execution_context;
 
 use mod_perform\entities\activity\activity_type as activity_type_entity;
@@ -31,21 +29,27 @@ use mod_perform\models\activity\activity_type as activity_type_model;
 use mod_perform\webapi\resolver\query\activity_types;
 use mod_perform\webapi\resolver\type\activity_type;
 
-use totara_webapi\graphql;
+use totara_core\advanced_feature;
+
+use totara_webapi\phpunit\webapi_phpunit_helper;
+
 
 /**
  * @coversDefaultClass activity_types.
  *
  * @group perform
  */
-class core_webapi_query_activity_types_testcase extends advanced_testcase {
+class mod_perform_webapi_query_activity_types_testcase extends advanced_testcase {
+    private const QUERY = 'mod_perform_activity_types';
+
+    use webapi_phpunit_helper;
+
     /**
      * @covers ::resolve
      */
     public function test_find(): void {
-        $expected_types = $this->setup_env();
+        [$expected_types, $context] = $this->setup_env();
 
-        $context = $this->get_webapi_context();
         $actual_types = activity_types::resolve([], $context)
             ->all();
 
@@ -57,10 +61,12 @@ class core_webapi_query_activity_types_testcase extends advanced_testcase {
      * @covers ::resolve
      */
     public function test_successful_ajax_call(): void {
-        $expected_types = $this->setup_env();
+        [$expected_types, $context] = $this->setup_env();
 
-        $context = $this->get_webapi_context();
-        $actual_types = $this->exec_graphql($context, []);
+        $result = $this->parsed_graphql_operation(self::QUERY, []);
+        $this->assert_webapi_operation_successful($result);
+
+        $actual_types = $this->get_webapi_operation_data($result);
         $this->assertCount(count($expected_types), $actual_types, 'wrong count');
 
         foreach ($actual_types as $type) {
@@ -74,12 +80,28 @@ class core_webapi_query_activity_types_testcase extends advanced_testcase {
     }
 
     /**
+     * @covers ::resolve
+     */
+    public function test_failed_ajax_query(): void {
+        $feature = 'performance_activities';
+        advanced_feature::disable($feature);
+        $result = $this->parsed_graphql_operation(self::QUERY, []);
+        $this->assert_webapi_operation_failed($result, $feature);
+        advanced_feature::enable($feature);
+
+        self::setGuestUser();
+        $result = $this->parsed_graphql_operation(self::QUERY, []);
+        $this->assert_webapi_operation_failed($result, 'permission');
+    }
+
+    /**
      * Generates test data.
      *
      * @param int $no_of_custom no of custom activity types to create.
      *
-     * @return activity_type_model[] the available activity types. Includes the
-     *         system (predefined types) as well as the custom ones.
+     * @return array (activity types, graphql execution context) tuple. Note the
+     *         types include the system (predefined types) as well as the custom
+     *         ones.
      */
     private function setup_env(int $no_of_custom = 2): array {
         self::setAdminUser();
@@ -88,48 +110,14 @@ class core_webapi_query_activity_types_testcase extends advanced_testcase {
             activity_type_model::create("my custom type #$i");
         }
 
-        return activity_type_entity::repository()
+        $types = activity_type_entity::repository()
             ->get()
             ->map_to(activity_type_model::class)
             ->all(true);
-    }
 
-    /**
-     * Creates an graphql execution context.
-     *
-     * @return execution_context the context.
-     */
-    private function get_webapi_context(): execution_context {
-        return execution_context::create('ajax', 'mod_perform_activity_types');
-    }
+        $context = $this->create_webapi_context(self::QUERY);
 
-    /**
-     * Executes the test query via AJAX.
-     *
-     * @param execution_context $context graphql execution context.
-     * @param array $args ajax arguments if any.
-     *
-     * @return array|string either the retrieved items or the error string for
-     *         failures.
-     */
-    private function exec_graphql(execution_context $context, array $args=[]) {
-        $result = graphql::execute_operation($context, $args)->toArray(true);
-
-        $op = $context->get_operationname();
-        $errors = $result['errors'] ?? null;
-        if ($errors) {
-            $error = $errors[0];
-            $msg = $error['debugMessage'] ?? $error['message'];
-
-            return sprintf(
-                "invocation of %s://%s failed: %s",
-                $context->get_type(),
-                $op,
-                $msg
-            );
-        }
-
-        return $result['data'][$op];
+        return [$types, $context];
     }
 
     /**

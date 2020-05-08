@@ -21,28 +21,35 @@
  * @package mod_perform
  */
 
-/**
- * @group perform
- */
-
-use core\webapi\execution_context;
-use mod_perform\models\activity\activity;
-use mod_perform\webapi\resolver\query\activity as activity_resolver;
+use mod_perform\webapi\resolver\query\activity;
 use totara_core\relationship\resolvers\subject;
 use totara_job\relationship\resolvers\appraiser;
 use totara_job\relationship\resolvers\manager;
-use totara_webapi\graphql;
+
+use totara_core\advanced_feature;
+
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 require_once(__DIR__.'/relationship_testcase.php');
 
+/**
+ * @coversDefaultClass activity.
+ *
+ * @group perform
+ */
 class mod_perform_webapi_resolver_query_activity_testcase extends mod_perform_relationship_testcase {
+    private const QUERY = 'mod_perform_activity';
+
+    use webapi_phpunit_helper;
 
     public function test_get_activity(): void {
-        self::setAdminUser();
-        $created_activity = $this->create_activity();
+        $created_activity = $this->create_test_data()->activity1;
         $id = $created_activity->id;
+        $args = ['activity_id' => $id];
 
-        $returned_activity = activity_resolver::resolve(['activity_id' => $id], $this->get_execution_context());
+        $context = $this->create_webapi_context(self::QUERY);
+        $context->set_relevant_context($created_activity->get_context());
+        $returned_activity = activity::resolve($args, $context);
 
         $this->assertEquals($id, $returned_activity->id);
         $this->assertEquals($created_activity->name, $returned_activity->name);
@@ -59,54 +66,52 @@ class mod_perform_webapi_resolver_query_activity_testcase extends mod_perform_re
         $user1 = $data_generator->create_user();
         $user2 = $data_generator->create_user();
 
-        self::setUser($user1);
-        $created_activity = $this->create_activity();
+        $created_activity = $this->create_test_data($user1)->activity2;
         $id = $created_activity->id;
+        $args = ['activity_id' => $id];
+
+        $context = $this->create_webapi_context(self::QUERY);
+        $context->set_relevant_context($created_activity->get_context());
 
         // Returns the activity for the user that created it
-        $returned_activity = activity_resolver::resolve(['activity_id' => $id], $this->get_execution_context());
+        $returned_activity = activity::resolve($args, $context);
         $this->assertEquals($id, $returned_activity->id);
         $this->assertEquals($created_activity->name, $returned_activity->name);
 
         self::setUser($user2);
         $this->expectException(moodle_exception::class);
-        activity_resolver::resolve(['activity_id' => $id], $this->get_execution_context());
+        activity::resolve($args, $context);
     }
 
     public function test_get_activity_non_admin(): void {
+        $created_activity = $this->create_test_data()->activity3;
+        $args = ['activity_id' => $created_activity->id];
+
+        $context = $this->create_webapi_context(self::QUERY);
+        $context->set_relevant_context($created_activity->get_context());
+
         $this->expectException(moodle_exception::class);
         self::setGuestUser();
-
-        $created_activity = $this->create_activity();
-        $id = $created_activity->id;
-
-        activity_resolver::resolve(['activity_id' => $id], $this->get_execution_context());
+        activity::resolve($args, $context);
     }
 
     /**
      * Test the query through the GraphQL stack.
      */
     public function test_ajax_query_successful() {
-        self::setAdminUser();
         $data = $this->create_test_data();
         $appraiser_id = $this->perform_generator()->get_relationship(appraiser::class);
         $manager_id = $this->perform_generator()->get_relationship(manager::class);
         $subject_id = $this->perform_generator()->get_relationship(subject::class);
 
         $id = $data->activity1->id;
-        $args = [
-            'activity_id' => $id,
-        ];
+        $args = ['activity_id' => $id];
 
-        $result = graphql::execute_operation(
-            $this->get_execution_context('ajax', 'mod_perform_activity'),
-            $args
-        );
-        $this->assertEquals([], $result->errors);
+        $result = $this->parsed_graphql_operation(self::QUERY, $args);
+        $this->assert_webapi_operation_successful($result);
 
-        // Assert result structure.
-        $result = $result->data['mod_perform_activity'];
-        $this->assertEquals($data->activity1->id, $result['id']);
+        $result = $this->get_webapi_operation_data($result);
+        $this->assertEquals($id, $result['id']);
         $this->assertEquals('Activity 1', $result['name']);
         $this->assertEquals('test description', $result['description']);
 
@@ -167,21 +172,27 @@ class mod_perform_webapi_resolver_query_activity_testcase extends mod_perform_re
         $this->assertEquals($section2_expected_relationships, reset($section2_result['section_relationships']));
     }
 
-    private function create_activity(): activity {
-        /** @var mod_perform_generator $perform_generator */
-        $perform_generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
-
-        return $perform_generator->create_activity_in_container(['activity_name' => 'Mid year performance']);
-    }
-
     /**
-     * Helper to get execution context
-     *
-     * @param string $type
-     * @param string|null $operation
-     * @return execution_context
+     * @covers ::resolve
      */
-    private function get_execution_context(string $type = 'dev', ?string $operation = null): execution_context {
-        return execution_context::create($type, $operation);
+    public function test_failed_ajax_query(): void {
+        $activity = $this->create_test_data()->activity1;
+        $args = ['activity_id' => $activity->id];
+
+        $feature = 'performance_activities';
+        advanced_feature::disable($feature);
+        $result = $this->parsed_graphql_operation(self::QUERY, $args);
+        $this->assert_webapi_operation_failed($result, $feature);
+        advanced_feature::enable($feature);
+
+        $result = $this->parsed_graphql_operation(self::QUERY, []);
+        $this->assert_webapi_operation_failed($result, 'activity_id');
+
+        $result = $this->parsed_graphql_operation(self::QUERY, ['activity_id' => 0]);
+        $this->assert_webapi_operation_failed($result, 'activity id');
+
+        $id = 1293;
+        $result = $this->parsed_graphql_operation(self::QUERY, ['activity_id' => $id]);
+        $this->assert_webapi_operation_failed($result, "$id");
     }
 }

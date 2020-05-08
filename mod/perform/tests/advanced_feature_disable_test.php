@@ -21,21 +21,32 @@
  * @package mod_perform
  */
 
-/**
- * @group perform
- */
-
 use core\webapi\execution_context;
 use core\webapi\mutation_resolver;
 use core\webapi\query_resolver;
 use totara_core\advanced_feature;
 use totara_core\feature_not_available_exception;
 
+use totara_webapi\phpunit\webapi_phpunit_helper;
+
+/**
+ * @group perform
+ */
 class mod_perform_advanced_feature_disable_testcase extends advanced_testcase {
+    use webapi_phpunit_helper;
 
     protected function setUp() {
         parent::setUp();
         advanced_feature::disable('performance_activities');
+    }
+
+    private function get_webapi_mutation_provider(): array {
+        $result = [];
+        $mutations = core_component::get_namespace_classes('webapi\\resolver\\mutation', mutation_resolver::class, 'mod_perform');
+        foreach ($mutations as $mutation) {
+            $result[] = [$mutation];
+        }
+        return $result;
     }
 
     public function test_webapi_mutators_throw_error_if_feature_is_disabled() {
@@ -45,7 +56,8 @@ class mod_perform_advanced_feature_disable_testcase extends advanced_testcase {
 
         foreach ($mutators as $mutator) {
             try {
-                $mutator::resolve([], $this->get_execution_context());
+                $operation = str_replace('\\webapi\\resolver\\mutation\\', '_', $mutator);
+                $this->resolve_graphql_mutation($operation);
                 $this->fail('Mutator ' . $mutator . ' must call advanced_feature::require(\'performance_activities\')');
             } catch (feature_not_available_exception $exception) {
                 continue;
@@ -62,7 +74,8 @@ class mod_perform_advanced_feature_disable_testcase extends advanced_testcase {
 
         foreach ($queries as $query) {
             try {
-                $query::resolve([], $this->get_execution_context());
+                $operation = str_replace('\\webapi\\resolver\\query\\', '_', $query);
+                $this->resolve_graphql_query($operation);
                 $this->fail('Query' . $query . ' must call advanced_feature::require(\'performance_activities\')');
             } catch (\totara_core\feature_not_available_exception $exception) {
                 continue;

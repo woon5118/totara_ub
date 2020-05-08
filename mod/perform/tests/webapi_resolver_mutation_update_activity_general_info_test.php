@@ -22,25 +22,23 @@
  * @package mod_perform
  */
 
-use core\webapi\execution_context;
 use mod_perform\webapi\resolver\mutation\update_activity_general_info;
-use mod_perform\models\activity\activity;
 
-use totara_webapi\graphql;
+use totara_core\advanced_feature;
 
-defined('MOODLE_INTERNAL') || die();
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
  * @group perform
  * Tests the mutation to create assignments for self or other
  */
 class mod_perform_webapi_resolver_mutation_update_activity_general_info_testcase extends advanced_testcase {
+    private const MUTATION = 'mod_perform_update_activity_general_info';
+
+    use webapi_phpunit_helper;
 
     public function test_user_cannot_update_without_permission(): void {
-        self::setAdminUser();
-
-        $activity = $this->create_activity();
-        $args = $this->to_args_payload($activity);
+        [, $args, $context] = $this->create_activity();
 
         $user = self::getDataGenerator()->create_user();
         self::setUser($user);
@@ -48,17 +46,14 @@ class mod_perform_webapi_resolver_mutation_update_activity_general_info_testcase
         $this->expectException(required_capability_exception::class);
         $this->expectExceptionMessage('Manage performance activities');
 
-        update_activity_general_info::resolve($args, $this->get_execution_context());
+        update_activity_general_info::resolve($args, $context);
     }
 
     public function test_update_success(): void {
-        self::setAdminUser();
-
-        $activity = $this->create_activity();
+        [$activity, $args, $context] = $this->create_activity();
         $expected_type = $activity->type;
-        $args = $this->to_args_payload($activity);
 
-        ['activity' => $activity] = update_activity_general_info::resolve($args, $this->get_execution_context());
+        ['activity' => $activity] = update_activity_general_info::resolve($args, $context);
 
         // Return values should be updated
         self::assertEquals($activity->id, $args['activity_id']);
@@ -76,29 +71,29 @@ class mod_perform_webapi_resolver_mutation_update_activity_general_info_testcase
         $user1 = $data_generator->create_user();
         $user2 = $data_generator->create_user();
 
-        self::setUser($user1);
-        $created_activity = $this->create_activity();
-        $args = $this->to_args_payload($created_activity);
+        [$created_activity, $args, $context] = $this->create_activity($user1);
 
         /** @type activity $returned_activity */
-        ['activity' => $returned_activity] = update_activity_general_info::resolve($args, $this->get_execution_context());
+        ['activity' => $returned_activity] = update_activity_general_info::resolve($args, $context);
 
         $this->assertEquals($created_activity->id, $returned_activity->id);
         $this->assertEquals($created_activity->name, $returned_activity->name);
 
         self::setUser($user2);
         $this->expectException(moodle_exception::class);
-        update_activity_general_info::resolve($args, $this->get_execution_context());
+        update_activity_general_info::resolve($args, $context);
     }
 
     public function test_successful_ajax_call(): void {
-        self::setAdminUser();
+        [$activity, $args, ] = $this->create_activity();
 
-        $activity = $this->create_activity();
-        $args = $this->to_args_payload($activity);
-        $context = $this->get_execution_context();
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_successful($result);
 
-        $result = $this->exec_graphql($context, $args)['activity'];
+        $result = $this->get_webapi_operation_data($result);
+        $this->assertNotNull($result, 'null result');
+
+        $result = $result['activity'];
         $this->assertEquals($activity->id, $result['id']);
         $this->assertEquals($activity->name, $result['name']);
 
@@ -106,41 +101,39 @@ class mod_perform_webapi_resolver_mutation_update_activity_general_info_testcase
         $this->assertEquals($activity->type->display_name, $type['display_name']);
     }
 
-    private function get_execution_context(): execution_context {
-        return execution_context::create('ajax', 'mod_perform_update_activity_general_info');
+    public function test_failed_ajax_query(): void {
+        [, $args, ] = $this->create_activity();
+
+        $feature = 'performance_activities';
+        advanced_feature::disable($feature);
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_failed($result, $feature);
+        advanced_feature::enable($feature);
+
+        $result = $this->parsed_graphql_operation(self::MUTATION, []);
+        $this->assert_webapi_operation_failed($result, 'activity_id');
     }
 
-    private function create_activity(): activity {
+    private function create_activity(?stdClass $as_user = null): array {
+        if ($as_user) {
+            self::setUser($as_user);
+        } else {
+            self::setAdminUser();
+        }
+
         /** @var mod_perform_generator $perform_generator */
         $perform_generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
-        return $perform_generator->create_activity_in_container();
-    }
+        $activity = $perform_generator->create_activity_in_container();
 
-    private function to_args_payload(activity $activity): array {
-        return [
+        $args = [
             'activity_id' => $activity->id,
             'name' => $activity->name,
             'description' => $activity->description,
         ];
-    }
 
-    private function exec_graphql(execution_context $context, array $args=[]) {
-        $result = graphql::execute_operation($context, $args)->toArray(true);
+        $context = $this->create_webapi_context(self::MUTATION);
+        $context->set_relevant_context($activity->get_context());
 
-        $op = $context->get_operationname();
-        $errors = $result['errors'] ?? null;
-        if ($errors) {
-            $error = $errors[0];
-            $msg = $error['debugMessage'] ?? $error['message'];
-
-            return sprintf(
-                "invocation of %s://%s failed: %s",
-                $context->get_type(),
-                $op,
-                $msg
-            );
-        }
-
-        return $result['data'][$op];
+        return [$activity, $args, $context];
     }
 }

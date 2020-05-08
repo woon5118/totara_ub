@@ -22,17 +22,14 @@
  * @category test
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-use core\webapi\execution_context;
-
-use mod_perform\models\activity\activity;
 use mod_perform\models\activity\track;
 use mod_perform\models\activity\track_status;
 
 use mod_perform\webapi\resolver\mutation\create_track;
 
-use totara_webapi\graphql;
+use totara_core\advanced_feature;
+
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
  * @coversDefaultClass create_track.
@@ -40,151 +37,104 @@ use totara_webapi\graphql;
  * @group perform
  */
 class mod_perform_webapi_mutation_create_track_testcase extends advanced_testcase {
+    private const MUTATION = 'mod_perform_create_track';
+
+    use webapi_phpunit_helper;
+
     /**
      * @covers ::resolve
      */
     public function test_create_track(): void {
-        $activity = $this->setup_env();
-        $activity_id = $activity->get_id();
-
-        // Note: a default track is created upon activity creation.
-        $tracks = track::load_by_activity($activity);
-        $this->assertEquals(1, $tracks->count(), 'wrong existing track count');
-
         $desc = 'my activity track description';
-        $args = [
-            'details' => [
-                'activity_id' => $activity_id,
-                'description' => $desc
-            ]
-        ];
-        $context = $this->get_webapi_context();
+        [$activity, $args, $context] = $this->setup_env(['description' => $desc]);
+
+        $tracks = track::load_by_activity($activity);
+        $this->assertEquals(0, $tracks->count(), 'wrong existing track count');
 
         $track = create_track::resolve($args, $context);
         $this->assertNotNull($track, 'track creation failed');
-        $this->assertEquals($activity_id, $track->activity_id, 'wrong track parent');
+        $this->assertEquals($activity->id, $track->activity_id, 'wrong track parent');
         $this->assertEquals($desc, $track->description, 'wrong track parent');
         $this->assertEquals(track_status::ACTIVE, $track->status, 'wrong track status');
         $this->assertEmpty($track->assignments->all(), 'wrong track assignments');
 
         $tracks = track::load_by_activity($activity);
-        $this->assertEquals(2, $tracks->count(), 'track does not exist for activity');
+        $this->assertEquals(1, $tracks->count(), 'track does not exist for activity');
     }
 
     /**
      * @covers ::resolve
      */
     public function test_successful_ajax_call(): void {
-        $activity = $this->setup_env();
-        $activity_id = $activity->get_id();
+        [$activity, $args, ] = $this->setup_env();
 
-        // Note: a default track is created upon activity creation.
         $tracks = track::load_by_activity($activity);
-        $this->assertEquals(1, $tracks->count(), 'wrong existing track count');
+        $this->assertEquals(0, $tracks->count(), 'wrong existing track count');
 
-        $args = [
-            'details' => ['activity_id' => $activity_id]
-        ];
-        $context = $this->get_webapi_context();
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_successful($result);
 
-        $track = $this->exec_graphql($context, $args);
+        $track = $this->get_webapi_operation_data($result);
         $this->assertNotEmpty($track, 'track creation failed');
         $this->assertEmpty($track['description'], 'wrong track parent');
         $this->assertEquals(track_status::ACTIVE, $track['status'], 'wrong track status');
         $this->assertEmpty($track['assignments'], 'wrong track assignments');
 
         $tracks = track::load_by_activity($activity);
-        $this->assertEquals(2, $tracks->count(), 'track does not exist for activity');
+        $this->assertEquals(1, $tracks->count(), 'track does not exist for activity');
     }
 
     /**
      * @covers ::resolve
      */
     public function test_failed_ajax_call(): void {
-        $activity = $this->setup_env();
+        [$activity, $args, ] = $this->setup_env();
 
-        // Invalid user.
-        self::setGuestUser();
-        $args = [
-            'details' => ['activity_id' => $activity->get_id()]
-        ];
-        $context = $this->get_webapi_context();
+        $feature = 'performance_activities';
+        advanced_feature::disable($feature);
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_failed($result, $feature);
+        advanced_feature::enable($feature);
 
-        $actual = $this->exec_graphql($context, $args);
-        $this->assertIsString($actual, 'wrong type');
-        $this->assertStringContainsString('not accessible', $actual, 'wrong error');
+        $result = $this->parsed_graphql_operation(self::MUTATION, []);
+        $this->assert_webapi_operation_failed($result, 'details');
 
-        // No input.
-        $actual = $this->exec_graphql($context, []);
-        $this->assertIsString($actual, 'wrong type');
-        $this->assertStringContainsString('details', $actual, 'wrong error');
+        $args['details']['activity_id'] = 0;
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_failed($result, 'activity id');
 
-        // Input with activity id set to 0.
-        $args = [
-            'details' => ['activity_id' => 0]
-        ];
-        $actual = $this->exec_graphql($context, $args);
-        $this->assertIsString($actual, 'wrong type');
-        $this->assertStringContainsString('activity id', $actual, 'wrong error');
-
-        // Input with unknown activity id.
         $activity_id = 1293;
-        $args = [
-            'details' => ['activity_id' => $activity_id]
-        ];
-        $actual = $this->exec_graphql($context, $args);
-        $this->assertIsString($actual, 'wrong type');
-        $this->assertStringContainsString("$activity_id", $actual, 'wrong error');
+        $args['details']['activity_id'] = $activity_id;
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_failed($result, "$activity_id");
+
+        self::setGuestUser();
+        $args['details']['activity_id'] = $activity->id;
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_failed($result, 'accessible');
     }
 
     /**
      * Generates test data.
      *
-     * @return int the created activity.
+     * @param array $activity_details details other than the activity id to add
+     *        to the generated graphql arguments.
+     *
+     * @return array an (activity, graphql arguments, graphql context) tuple.
      */
-    private function setup_env(): activity {
+    private function setup_env(array $activity_details = []): array {
         $this->setAdminUser();
 
         /** @var mod_perform_generator $perform_generator */
         $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
-        return $perform_generator->create_activity_in_container(['create_track' => true]);
-    }
+        $activity = $perform_generator->create_activity_in_container();
 
-    /**
-     * Executes the test query via AJAX.
-     *
-     * @param execution_context $context graphql execution context.
-     * @param array $args ajax arguments if any.
-     *
-     * @return array|string either the retrieved items or the error string for
-     *         failures.
-     */
-    private function exec_graphql(execution_context $context, array $args=[]) {
-        $result = graphql::execute_operation($context, $args)->toArray(true);
+        $activity_details['activity_id'] = $activity->id;
+        $args = ['details' => $activity_details];
 
-        $op = $context->get_operationname();
-        $errors = $result['errors'] ?? null;
-        if ($errors) {
-            $error = $errors[0];
-            $msg = $error['debugMessage'] ?? $error['message'];
+        $context = $this->create_webapi_context(self::MUTATION);
+        $context->set_relevant_context($activity->get_context());
 
-            return sprintf(
-                "invocation of %s://%s failed: %s",
-                $context->get_type(),
-                $op,
-                $msg
-            );
-        }
-
-        return $result['data'][$op];
-    }
-
-    /**
-     * Creates an graphql execution context.
-     *
-     * @return execution_context the context.
-     */
-    private function get_webapi_context(): execution_context {
-        return execution_context::create('ajax', 'mod_perform_create_track');
+        return [$activity, $args, $context];
     }
 }
