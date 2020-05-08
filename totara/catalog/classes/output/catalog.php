@@ -46,6 +46,7 @@ class catalog extends template {
      * @param bool $showdebugging Include debug output
      * @param array $filterparams
      * @param string|null $request Something to identify the request
+     * @param bool $enableactiveitem Controls whether there is a pop-up when an item is clicked (optional)
      * @return catalog
      */
     public static function create(
@@ -56,12 +57,14 @@ class catalog extends template {
         bool $resultsonly,
         bool $showdebugging,
         array $filterparams,
-        string $request = null
+        string $request = null,
+        bool $enableactiveitem = true
     ) {
         global $USER, $PAGE;
         $config = config::instance();
 
         $data = new \stdClass();
+        $data->enableactiveitem = $enableactiveitem;
 
         // Process filter params.
         $filterhandler = filter_handler::instance();

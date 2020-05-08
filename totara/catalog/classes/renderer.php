@@ -22,6 +22,7 @@
  */
 
 use totara_catalog\local\config_form_helper;
+use totara_catalog\local\config;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -39,8 +40,16 @@ class totara_catalog_renderer extends plugin_renderer_base {
         $activated = [];
         $inactive = [];
 
+        $config = config::instance();
+        $enabledetails = $config->get_value('details_content_enabled');
+
         if (has_capability('totara/catalog:configurecatalog', context_system::instance())) {
             foreach (config_form_helper::create()->get_form_keys() as $tab) {
+                // Hide the details tab when the details pop-up is disabled.
+                if (($tab == 'details') && ($tab != $currenttab) && (!$enabledetails)) {
+                    continue;
+                }
+
                 $row[] = new tabobject(
                     $tab,
                     $CFG->wwwroot . '/totara/catalog/config.php?tab=' . $tab,

@@ -57,6 +57,7 @@ class config {
         'featured_learning_enabled' => '0',
         'featured_learning_source' => '',
         'featured_learning_value' => '',
+        'details_content_enabled' => '0',
         'hero_data_type' => 'none',
         'image_enabled' => '1',
         'item_description_enabled' => '0',

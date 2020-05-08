@@ -39,6 +39,11 @@ defined('MOODLE_INTERNAL') || die();
  * @group totara_catalog
  */
 class totara_catalog_output_item_testcase extends advanced_testcase {
+    private $redirecturls = [];
+
+    public function tearDown() {
+        $this->redirecturls = null;
+    }
 
     /**
      * Example item data.
@@ -46,14 +51,35 @@ class totara_catalog_output_item_testcase extends advanced_testcase {
      * Test data that will be passed to item output class. It's designed so that it can be reused for all
      * provider types (course,program,certification).
      *
-     * @param string $provider
+     * @param string $providertype
      * @return array
      */
-    private function get_example_item_data(string $provider): array {
+    private function get_example_item_data(string $providertype): array {
+        $generator = $this->getDataGenerator();
+        $provider = provider_handler::instance()->get_provider($providertype);
+        switch ($providertype) {
+            case 'course':
+                $item = $generator->create_course();
+                break;
+            case 'program':
+                $pgen = $generator->get_plugin_generator('totara_program');
+                $item = $pgen->create_program();
+                break;
+            case 'certification':
+                $pgen = $generator->get_plugin_generator('totara_program');
+                // Note: this is the program->id not certification->id,
+                // but the page it links to is is /program/view.php so it works as expected.
+                $item = $pgen->create_certification();
+                break;
+            default:
+                $this->fail('unrecognised provider string: ' . $providertype);
+        }
+        $this->redirecturls[$providertype] = $provider->get_details_link($item->id)->button->url;
+
         return [
             'id' => 123,
-            'objectid' => 234,
-            'objecttype' => $provider,
+            'objectid' => $item->id,
+            'objecttype' => $providertype,
             'data' => [
                 formatter::TYPE_PLACEHOLDER_TITLE => [
                     'fullname' => 'Test item 1',
@@ -337,6 +363,9 @@ class totara_catalog_output_item_testcase extends advanced_testcase {
         foreach ($expected_removed as $remove_key) {
             unset($expected[$remove_key]);
         }
+
+        // Inject the redirecturl into the expected item.
+        $expected['redirecturl'] = $this->redirecturls[$provider];
 
         // item_wide and item_narrow share the create() method, so only test one.
         $actual = item_wide::create((object)$item_data)->get_template_data();

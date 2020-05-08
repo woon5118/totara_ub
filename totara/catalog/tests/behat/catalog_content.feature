@@ -28,9 +28,15 @@ Feature: Course catalog item and details content
     And the following "certifications" exist in "totara_program" plugin:
       | fullname | shortname | category |
       | cert1    | cert1     | 0        |
+    And I log in as "admin"
+    And I click on "Find Learning" in the totara menu
+    And I follow "Configure catalogue"
+    And I follow "General"
+    And I set the following Totara form fields to these values:
+      | Details content | 1 |
+    And I click on "Save" "button"
 
   Scenario: User viewing course catalog item and content
-    When I log in as "admin"
     And I navigate to "Courses > Configure catalogue" in site administration
     And I follow "Templates"
     And I set the following Totara form fields to these values:
@@ -105,7 +111,8 @@ Feature: Course catalog item and details content
     Then I should see "0%"
 
   Scenario: User without enrolment should still get a link to course page
-    When I log in as "notenrold"
+    When I log out
+    And I log in as "notenrold"
     And I click on "Find Learning" in the totara menu
     And I click on "course1" "text"
     Then I should see "You are not enrolled in this course"

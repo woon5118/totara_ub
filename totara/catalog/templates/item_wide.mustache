@@ -31,6 +31,7 @@
     * data-tw-catalogItem: Target for checking ellipsis requirements
     * data-tw-catalogDetails: Target for rendered full details & loading overlay
     * data-tw-grid-item-toggle: Toggle for displaying details view
+    * data-redirect-url: Target for redirect when the details pop-up is disabled
 
     Context variables required for this template:
     * active: Bool, grid item is active
@@ -62,11 +63,13 @@
     * text_placeholders -> value: string, text
     * text_placeholders_enabled: bool, has text placeholders
     * title: string, title for item
+    * redirecturl: text, url to redirect to on click if details pop-up is disabled
 
     Example context (json):
     {
         "itemid": 1,
         "title": "v12",
+        "redirecturl": "http:\/\/localhost\/course\/view.php?id=2",
         "featured": 0,
         "image_enabled": true,
         "image": {
@@ -103,8 +106,11 @@
         }]
     }
 }}
-<div class="tw-catalogItemWide" tabindex="0"
-    data-tw-grid-item-toggle="">
+<div class="tw-catalogItemWide"
+    tabindex="0"
+    data-redirect-url={{redirecturl}}
+    data-tw-grid-item-toggle=""
+    >
 
     <div class="tw-catalogItemWide__content_left">
         {{#image_enabled}}

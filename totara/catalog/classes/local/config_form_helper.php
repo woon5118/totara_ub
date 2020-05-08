@@ -55,6 +55,7 @@ class config_form_helper {
         'featured_learning_enabled',
         'featured_learning_source',
         'featured_learning_value',
+        'details_content_enabled',
 
         'image_enabled',
         'hero_data_type',

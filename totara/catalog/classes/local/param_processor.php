@@ -61,6 +61,9 @@ class param_processor {
             }
         }
 
+        $config = config::instance();
+        $enabledetails = $config->get_value('details_content_enabled') ?? "1";
+
         return catalog::create(
             optional_param('itemstyle', 'narrow', PARAM_ALPHA),
             0,
@@ -68,7 +71,9 @@ class param_processor {
             optional_param('orderbykey', '', PARAM_ALPHA),
             0,
             optional_param('debug', false, PARAM_BOOL),
-            $filterparams
+            $filterparams,
+            null,
+            $enabledetails
         );
     }
 }

@@ -42,6 +42,18 @@ class config_general_controller extends base_config_form_controller {
         return 'general';
     }
 
+    public function process_data(): array {
+        $oldsetting = get_config('totara_catalog', 'details_content_enabled');
+        $result = parent::process_data();
+        $newsetting = get_config('totara_catalog', 'details_content_enabled');
+
+        if ($oldsetting !== $newsetting) {
+            $result['redirect'] = new \moodle_url('/totara/catalog/config.php', ['tab' => 'general']);
+        }
+
+        return $result;
+    }
+
     public function get_current_data_and_params(): array {
         list($currentdata, $params) = parent::get_current_data_and_params();
 
@@ -49,6 +61,7 @@ class config_general_controller extends base_config_form_controller {
         $featured_learning_enabled = optional_param('featured_learning_enabled', null, PARAM_ALPHANUM);
         $featured_learning_source = optional_param('featured_learning_source', null, PARAM_ALPHANUMEXT);
         $featured_learning_value = optional_param('featured_learning_value', null, PARAM_ALPHANUMEXT);
+        $details_content_enabled = optional_param('details_content_enabled', null, PARAM_ALPHANUM);
         $learning_types_in_catalog = optional_param('learning_types_in_catalog', null, PARAM_ALPHANUMEXT);
 
         if (!is_null($browse_by)) {
@@ -62,6 +75,9 @@ class config_general_controller extends base_config_form_controller {
         }
         if (!is_null($featured_learning_value)) {
             $currentdata['featured_learning_value'] = $featured_learning_value;
+        }
+        if (!is_null($details_content_enabled)) {
+            $currentdata['details_content_enabled'] = $details_content_enabled;
         }
         if (!is_null($learning_types_in_catalog)) {
             $currentdata['learning_types_in_catalog'] = $learning_types_in_catalog;

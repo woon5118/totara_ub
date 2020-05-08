@@ -60,7 +60,7 @@ class totara_catalog_provider_handler_testcase extends config_base_testcase {
     public function test_get_active_providers() {
         // Default (all enabled).
         $activeproviders = provider_handler::instance()->get_active_providers();
-        $this->assertCount(3, $activeproviders);
+        $this->assertGreaterThanOrEqual(3, count($activeproviders));
         $this->assertInstanceOf(totara_program\totara_catalog\program::class, $activeproviders['program']);
         $this->assertInstanceOf(core_course\totara_catalog\course::class, $activeproviders['course']);
 
@@ -92,7 +92,7 @@ class totara_catalog_provider_handler_testcase extends config_base_testcase {
 
         config::instance()->update(['learning_types_in_catalog' => 'not_an_array']);
         $activeproviders = provider_handler::instance()->get_active_providers();
-        $this->assertCount(3, $activeproviders);
+        $this->assertGreaterThanOrEqual(3, count($activeproviders));
         $this->assertInstanceOf(totara_program\totara_catalog\program::class, $activeproviders['program']);
         $this->assertInstanceOf(core_course\totara_catalog\course::class, $activeproviders['course']);
     }
@@ -118,7 +118,8 @@ class totara_catalog_provider_handler_testcase extends config_base_testcase {
     public function test_get_all_provider_classes() {
         // test all providers
         config::instance()->update(['learning_types_in_catalog' => ['course', 'program']]);
-        $this->assertCount(3, $this->provider_handler->get_all_provider_classes());
+        $allproviders = $this->provider_handler->get_all_provider_classes();
+        $this->assertGreaterThanOrEqual(3, count($allproviders));
 
         // check active providers
         $this->provider_handler->reset_cache();

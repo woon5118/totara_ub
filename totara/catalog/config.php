@@ -53,6 +53,35 @@ if ($form->is_cancelled()) {
     redirect(new moodle_url('/totara/catalog/config.php', ['tab' => $tab]));
 }
 
+$warningmsg = '';
+$successmsg = '';
+if (!$form->is_reloaded()) {
+    if ($data = $form_controller->get_submission_data()) {
+        $process_result = $form_controller->process_data();
+
+        // Note: redirect should contain a valid moodle url.
+        if (isset($process_result['redirect'])) {
+            $message = '';
+            $message_type = '';
+
+            // We want to output one of these after redirecting.
+            if (isset($process_result['warning_msg'])) {
+                $message = $process_result['warning_msg'];
+                $messagetype = \core\output\notification::NOTIFY_WARNING;
+            } else if (isset($process_result['success_msg'])) {
+                $message = $process_result['success_msg'];
+                $messagetype = \core\output\notification::NOTIFY_SUCCESS;
+            }
+
+            redirect($process_result['redirect'], $message, null, $messagetype);
+        } else {
+            // We want to output them directly to the page.
+            $warningmsg = isset($process_result['warning_msg']) ? $process_result['warning_msg'] : '';
+            $successmsg = isset($process_result['success_msg']) ? $process_result['success_msg'] : '';
+        }
+    }
+}
+
 /** @var totara_catalog_renderer $output */
 $output = $PAGE->get_renderer('totara_catalog');
 echo $output->header();
@@ -62,18 +91,14 @@ echo $output->config_tabs($tab);
 
 echo '<div class="totara_catalog_admin_config_form">';
 
-if (!$form->is_reloaded()) {
-    if ($data = $form_controller->get_submission_data()) {
-        $process_result = $form_controller->process_data();
-
-        if (isset($process_result['success_msg'])) {
-            echo $output->notification($process_result['success_msg'], 'notifysuccess');
-        }
-        if (isset($process_result['warning_msg'])) {
-            echo $output->notification($process_result['warning_msg'], 'warning');
-        }
-    }
+if (!empty($successmsg)) {
+    echo $output->notification($successmsg, 'notifysuccess');
 }
+
+if (!empty($warningmsg)) {
+    echo $output->notification($warningmsg, 'warning');
+}
+
 echo $form->render();
 
 echo '</div>';

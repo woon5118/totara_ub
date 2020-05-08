@@ -74,5 +74,11 @@ function xmldb_totara_catalog_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019061801, 'totara', 'catalog');
     }
 
+    if ($oldversion < 2020051300) {
+        set_config('details_content_enabled', '"1"', 'totara_catalog');
+
+        upgrade_plugin_savepoint(true, 2020051300, 'totara', 'catalog');
+    }
+
     return true;
 }

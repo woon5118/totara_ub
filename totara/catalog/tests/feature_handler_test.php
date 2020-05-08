@@ -46,7 +46,7 @@ class totara_catalog_feature_handler_testcase extends advanced_testcase {
         $this->resetAfterTest();
 
         $features = feature_handler::instance()->get_all_features();
-        $this->assertCount(4, $features);
+        $this->assertGreaterThanOrEqual(4, count($features));
         $keys = [];
         foreach ($features as $feature) {
             $this->assertInstanceOf(feature::class, $feature);
@@ -57,15 +57,10 @@ class totara_catalog_feature_handler_testcase extends advanced_testcase {
         $tagcollectionid = \core_tag_area::get_collection('totara_program', 'prog');
 
         // Make sure the expected default features are there.
-        $this->assertEquals(
-            [
-                'course_format_ftrd',
-                'tag_' . $tagcollectionid,
-                'course_type_ftrd',
-                'cat_cgry_ftrd',
-            ],
-            $keys
-        );
+        $expected = ['course_format_ftrd', 'tag_' . $tagcollectionid, 'course_type_ftrd', 'cat_cgry_ftrd'];
+        foreach ($expected as $value) {
+            $this->assertContains($value, $keys);
+        }
 
         // Make sure features are returned for active providers only.
         config::instance()->update(['learning_types_in_catalog' => ['program', 'certification']]);

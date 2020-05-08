@@ -144,6 +144,13 @@ class config_general extends base_config_form {
             $featured_learning_source_select->set_frozen(true);
         }
 
+        // Details content (popup)
+        $details_content_checkbox = new titled_checkbox(
+            'details_content_enabled',
+            get_string('details_content', 'totara_catalog')
+        );
+        $section->add($details_content_checkbox);
+
         $this->add_action_buttons();
     }
 

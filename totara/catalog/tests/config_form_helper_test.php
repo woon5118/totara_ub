@@ -111,11 +111,24 @@ class totara_catalog_config_form_helper_testcase extends config_base_testcase {
             'rich_text__course' => 'test_placeholder',
             'rich_text__program' => '',
             'rich_text__certification' => 'test',
+            'details_content_enabled' => '1',
         ];
     }
 
     public function test_get_config_for_form_default() {
-        $this->assertEquals($this->get_expected_form_defaults(), config_form_helper::create()->get_config_for_form());
+        $actual = config_form_helper::create()->get_config_for_form();
+        $expected = $this->get_expected_form_defaults();
+
+        foreach ($expected as $key => $value) {
+            // Handle sub-arrays
+            if (is_array($value)) {
+                foreach ($value as $subkey => $subvalue) {
+                    $this->assertContains($subvalue, $actual[$key]);
+                }
+            } else {
+                $this->assertEquals($value, $actual[$key]);
+            }
+        }
     }
 
     public function test_get_config_for_form_non_default() {
@@ -184,7 +197,7 @@ class totara_catalog_config_form_helper_testcase extends config_base_testcase {
         $fh->update_from_form_data($new_values);
         $this->assertEquals(array_merge($default_form_config, $new_values), $fh->get_config_for_form());
     }
-    
+
     public function test_bad_form_data_handling() {
         // Config keys for dynamic provider list fields (additional texts).
         // As long as these keys are well formed, only the order in which they are sent matters and
@@ -213,7 +226,9 @@ class totara_catalog_config_form_helper_testcase extends config_base_testcase {
         $fh = config_form_helper::create();
         $fh->update_from_form_data($new_values);
 
-        $expected = [
+        $expected = array_merge(
+            $this->get_expected_form_defaults(),
+            [
             'item_additional_text__testprovider__0' => 'test_placeholder1',
             'item_additional_text__testprovider__1' => 'test_placeholder3',
             'item_additional_text__testprovider__2' => 'test_placeholder4',
@@ -226,7 +241,19 @@ class totara_catalog_config_form_helper_testcase extends config_base_testcase {
             'item_additional_text__certification__1' => 'text4',
             'item_additional_text__program__0' => 'text5',
             'item_additional_text__program__1' => 'text6',
-        ];
-        $this->assertEquals(array_merge($this->get_expected_form_defaults(), $expected), $fh->get_config_for_form());
+            ]
+        );
+
+        $actual = $fh->get_config_for_form();
+        foreach ($expected as $key => $value) {
+            // Handle sub-arrays
+            if (is_array($value)) {
+                foreach ($value as $subkey => $subvalue) {
+                    $this->assertContains($subvalue, $actual[$key]);
+                }
+            } else {
+                $this->assertEquals($value, $actual[$key]);
+            }
+        }
     }
 }

@@ -400,4 +400,15 @@ abstract class provider {
 
         return $this->dataholders[$formattertype];
     }
+
+
+    /**
+     * Set up the cache of records used for visibility.
+     * Since the visibility is checked individually for each item it can be better
+     * to cache the results of a single database query and get the info out of that
+     * instead of running 50+ different database queries.
+     */
+    public function prime_provider_cache(): void {
+        return;
+    }
 }

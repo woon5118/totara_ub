@@ -54,6 +54,7 @@ abstract class config_base_testcase extends advanced_testcase {
             'progress_bar_enabled' => '0',
             'rich_text_content_enabled' => '1',
             'view_options' => 'tile_and_list',
+            'details_content_enabled' => '0',
         ];
     }
 
@@ -101,6 +102,7 @@ abstract class config_base_testcase extends advanced_testcase {
             'progress_bar_enabled' => '1',
             'rich_text_content_enabled' => '0',
             'view_options' => 'tile_only',
+            'details_content_enabled' => '1',
 
             // Generated defaults.
             'item_additional_icons' => ['course' => ['test_placeholder'], 'program' => ['test'], 'certification' => ['abc', 'def']],
@@ -175,6 +177,7 @@ abstract class config_base_testcase extends advanced_testcase {
             'rich_text__program' => '',
             'rich_text__certification' => '',
             'view_options' => 'tile_and_list',
+            'details_content_enabled' => '0'
         ];
     }
 }

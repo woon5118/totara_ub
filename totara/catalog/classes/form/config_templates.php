@@ -28,6 +28,7 @@ use totara_form\form\element\radios;
 use totara_form\form\element\select;
 use totara_form\form\element\static_html;
 use totara_form\form\group\section;
+use totara_catalog\local\config;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -106,49 +107,51 @@ class config_templates extends base_config_form {
         // Progress bar
         $section->add(new titled_checkbox('progress_bar_enabled', get_string('progress_bar', 'totara_catalog')));
 
-        // Section: Detail content placeholders
-        $section = $this->model->add(new section('details_content', get_string('details_content_placeholders', 'totara_catalog')));
-        $section->set_collapsible(false);
-        $section->add(
-            new static_html(
-                'details_content_placeholders_subheading',
-                '',
-                get_string('details_content_placeholders_subheading', 'totara_catalog')
-            )
-        );
+        if (config::instance()->get_value('details_content_enabled')) {
+            // Section: Detail content placeholders
+            $section = $this->model->add(new section('details_content', get_string('details_content_placeholders', 'totara_catalog')));
+            $section->set_collapsible(false);
+            $section->add(
+                new static_html(
+                    'details_content_placeholders_subheading',
+                    '',
+                    get_string('details_content_placeholders_subheading', 'totara_catalog')
+                )
+            );
 
-        // Title
-        $section->add(new titled_checkbox('details_title_enabled', get_string('details_title', 'totara_catalog')));
+            // Title
+            $section->add(new titled_checkbox('details_title_enabled', get_string('details_title', 'totara_catalog')));
 
-        // Rich text content
-        $rich_text_content_checkbox = new titled_checkbox(
-            'rich_text_content_enabled',
-            get_string('rich_text_content', 'totara_catalog')
-        );
-        $rich_text_content_checkbox->add_help_button('rich_text_content', 'totara_catalog');
-        $section->add($rich_text_content_checkbox);
+            // Rich text content
+            $rich_text_content_checkbox = new titled_checkbox(
+                'rich_text_content_enabled',
+                get_string('rich_text_content', 'totara_catalog')
+            );
+            $rich_text_content_checkbox->add_help_button('rich_text_content', 'totara_catalog');
+            $section->add($rich_text_content_checkbox);
 
-        // Description
-        $description_checkbox = new titled_checkbox('details_description_enabled', get_string('description', 'totara_catalog'));
-        $description_checkbox->add_help_button('description_detail', 'totara_catalog');
-        $section->add($description_checkbox);
+            // Description
+            $description_checkbox = new titled_checkbox('details_description_enabled', get_string('description', 'totara_catalog'));
+            $description_checkbox->add_help_button('description_detail', 'totara_catalog');
+            $section->add($description_checkbox);
 
-        // Additional text placeholders
-        $additional_text_placeholders_select = new select(
-            'details_additional_text_count',
-            get_string('additional_text_placeholders', 'totara_catalog'),
-            range(0, 5)
-        );
-        $section->add($additional_text_placeholders_select);
-        $additional_text_placeholders_select->add_help_button('additional_text_placeholders_detail', 'totara_catalog');
+            // Additional text placeholders
+            $additional_text_placeholders_select = new select(
+                'details_additional_text_count',
+                get_string('additional_text_placeholders', 'totara_catalog'),
+                range(0, 5)
+            );
+            $section->add($additional_text_placeholders_select);
+            $additional_text_placeholders_select->add_help_button('additional_text_placeholders_detail', 'totara_catalog');
 
-        // Additional icon placeholders
-        $icon_placeholders_checkbox = new titled_checkbox(
-            'details_additional_icons_enabled',
-            get_string('icon_placeholders', 'totara_catalog')
-        );
-        $section->add($icon_placeholders_checkbox);
-        $icon_placeholders_checkbox->add_help_button('icon_placeholders_detail', 'totara_catalog');
+            // Additional icon placeholders
+            $icon_placeholders_checkbox = new titled_checkbox(
+                'details_additional_icons_enabled',
+                get_string('icon_placeholders', 'totara_catalog')
+            );
+            $section->add($icon_placeholders_checkbox);
+            $icon_placeholders_checkbox->add_help_button('icon_placeholders_detail', 'totara_catalog');
+        }
 
         $this->add_action_buttons();
     }

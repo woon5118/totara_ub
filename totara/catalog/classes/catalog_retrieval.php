@@ -200,6 +200,11 @@ class catalog_retrieval {
         $skipped = 0;
 
         $providerhandler = provider_handler::instance();
+        $providers = $providerhandler->get_active_providers();
+
+        foreach ($providers as $provider) {
+            $provider->prime_provider_cache(); // Fetch appropriate visibility records in bulk.
+        }
 
         while (!$endofrecords && count($objects) < $pagesize) {
             // Get some records.

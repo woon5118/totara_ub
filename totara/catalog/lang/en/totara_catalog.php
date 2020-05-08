@@ -66,6 +66,7 @@ $string['description_detail_help'] = 'This setting allows a short paragraph of t
 $string['delete'] = 'Delete';
 $string['delete_filter'] = 'Delete filter';
 $string['details'] = 'Details';
+$string['details_content'] = 'Details content';
 $string['details_content_placeholders'] = 'Detail content placeholders';
 $string['details_content_placeholders_subheading'] = 'This section of the form allows you to define the content placeholders for each catalogue item’s ‘Details’ window (the details window appears below an item when it is clicked on). Note that actual content to display is specified in the following ‘Details’ tab.';
 $string['details_title'] = 'Title';

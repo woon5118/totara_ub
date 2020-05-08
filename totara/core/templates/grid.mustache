@@ -31,6 +31,7 @@
     Data attributes required for JS:
     * data-core-autoinitialise: State of this JS auto initilise
     * data-core-autoinitialise-amd: AMD to be linked to template
+    * data-core-enableactiveitem: Boolean used to enable/disable details popups (optional: default enabled)
     * data-tw-grid: Selector for grid
     * data-tw-grid-item: Selector for grid item
 
@@ -47,6 +48,7 @@
 <section class="tw-grid"
     role="list"
     data-tw-grid=""
+    data-core-enableactiveitem="{{enableactiveitem}}"
     data-core-autoinitialise="true"
     data-core-autoinitialise-amd="totara_core/grid">
 

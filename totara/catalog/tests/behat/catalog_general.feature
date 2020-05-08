@@ -42,6 +42,39 @@ Feature: Test file for catalog
     And I set the field "Parent category" to "1"
     And I click on "Save changes" "button"
 
+  Scenario: User clicks catalog item with details disabled
+    Given I am on homepage
+    And I click on "Find Learning" in the totara menu
+    And I follow "Configure catalogue"
+    And I follow "General"
+    And I set the following Totara form fields to these values:
+      | Details content | 1 |
+    And I click on "Save" "button"
+    And I click on "Find Learning" in the totara menu
+    And I click on "Hello Kim Sa Rang" "text"
+    Then I should see "You are not enrolled in this course"
+    When I click on "Bilbo Baggin's Secret Agents" "text"
+    Then I should see "You are not enrolled in this program"
+    When I click on "cert1" "text"
+    Then I should see "You are not enrolled in this certification"
+    When I follow "Configure catalogue"
+    And I follow "General"
+    And I set the following Totara form fields to these values:
+      | Details content | 0 |
+    And I click on "Save" "button"
+    And I click on "Find Learning" in the totara menu
+    And I click on "Hello Kim Sa Rang" "text"
+    Then I should not see "You are not enrolled in this course"
+    And I should see "Topic 1"
+    When I click on "Find Learning" in the totara menu
+    And I click on "Bilbo Baggin's Secret Agents" "text"
+    Then I should not see "You are not enrolled in this program"
+    And I should see "No course content."
+    When I click on "Find Learning" in the totara menu
+    And I click on "cert1" "text"
+    Then I should not see "You are not enrolled in this certification"
+    And I should see "No course content."
+
   # Full text search
   Scenario: User performs full text search within find learning home page
     Given I am on homepage

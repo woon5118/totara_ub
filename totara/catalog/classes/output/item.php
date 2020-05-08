@@ -148,7 +148,6 @@ abstract class item extends template {
         $config = config::instance();
 
         $data = new \stdClass();
-
         $data->itemid = $object->id;
         $data->featured = !empty($object->featured);
 
@@ -161,6 +160,10 @@ abstract class item extends template {
             $titledataholderkey = $firsttitledataholder->key;
         }
         $data->title = $object->data[formatter::TYPE_PLACEHOLDER_TITLE][$titledataholderkey] ?? '';
+
+        // Provide the URL to redirect to if details popup is disabled.
+        $detailslink = $provider->get_details_link($object->objectid);
+        $data->redirecturl = $detailslink->button->url;
 
         $data->image_enabled = (bool)$config->get_value('image_enabled');
         if ($data->image_enabled) {

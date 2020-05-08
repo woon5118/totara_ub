@@ -128,11 +128,19 @@ abstract class output_test_base extends advanced_testcase {
         foreach ($expected as $k => $v) {
             $this->assertArrayHasKey($k, $actual);
             if (!in_array($k, $skip_deep_inspection)) {
-                $this->assertEquals(
-                    $v,
-                    $actual[$k],
-                    "Expected for {$k}: " . var_export($v, true) . " Actual: " . var_export($actual[$k], true)
-                );
+                // Handle sub-levels individually.
+                if (is_object($v)) {
+                    $v = (array) $v;
+                    foreach ($v as $sk => $sv) {
+                        $this->assertEquals($sv, $actual[$k]->$sk);
+                    }
+                } else {
+                    $this->assertEquals(
+                        $v,
+                        $actual[$k],
+                        "Expected for {$k}: " . var_export($v, true) . " Actual: " . var_export($actual[$k], true)
+                    );
+                }
             }
         }
     }

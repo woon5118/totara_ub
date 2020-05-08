@@ -48,6 +48,11 @@ class totara_catalog_output_catalog_testcase extends output_test_base {
     protected function setUp() {
         global $PAGE;
         $PAGE->set_context(context_system::instance());
+
+        // Set up a basic test user.
+        $generator = $this->getDataGenerator();
+        $user = $generator->create_user(['firstname' => 'Barry', 'lastname' => 'Gimbo']);
+        $this->setUser($user);
     }
 
     /**
@@ -318,7 +323,8 @@ class totara_catalog_output_catalog_testcase extends output_test_base {
         $this->assertEquals('Configure catalogue', $manage_buttons->buttons[0]->label);
 
         $this->assertTrue($manage_buttons->has_create_dropdown);
-        $this->assertCount(3, $manage_buttons->create_buttons);
+        $this->assertGreaterThanOrEqual(3, count($manage_buttons->create_buttons));
+
         $labels = [];
         foreach ($manage_buttons->create_buttons as $button) {
             $labels[] = $button->label;

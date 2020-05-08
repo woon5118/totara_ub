@@ -59,18 +59,19 @@ class totara_catalog_feature_factory_testcase extends advanced_testcase {
      */
     public function test_get_features() {
         $provider_classes = \core_component::get_namespace_classes('totara_catalog', 'totara_catalog\provider');
-        $this->assertCount(3, $provider_classes);
+        $this->assertGreaterThanOrEqual(3, count($provider_classes));
         $expected_factory_counts = [
             'core_course\totara_catalog\course' => 4,
             'totara_certification\totara_catalog\certification' => 2,
             'totara_program\totara_catalog\program' => 2,
         ];
-        foreach ($provider_classes as $provider_class) {
+
+        foreach ($expected_factory_counts as $provider_class => $count) {
             $namespace = substr($provider_class, strpos($provider_class, 'totara_catalog')) . '\\feature_factory';
             $feature_factories = \core_component::get_namespace_classes($namespace, 'totara_catalog\feature_factory');
-            $this->assertCount($expected_factory_counts[$provider_class], $feature_factories);
+            $this->assertCount($count, $feature_factories);
+
             foreach ($feature_factories as $feature_factory) {
-                /** @var feature_factory $factory */
                 $factory = new $feature_factory();
                 $features = $factory->get_features();
                 if (in_array($feature_factory, $this->get_customfield_feature_factories())) {

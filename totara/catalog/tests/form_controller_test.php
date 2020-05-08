@@ -73,7 +73,17 @@ class totara_catalog_form_controller_testcase extends config_base_testcase {
     public function test_get_current_data_defaults($form_key) {
         $form_controller = base_config_form_controller::create_from_key($form_key);
         list($currentdata, $params) = $form_controller->get_current_data_and_params();
-        $this->assertEquals($this->get_expected_default_currentdata($form_key), $currentdata);
+        $expected = $this->get_expected_default_currentdata($form_key);
+        foreach ($expected as $key => $value) {
+            // Handle sub-arrays
+            if (is_array($value)) {
+                foreach ($value as $subkey => $subvalue) {
+                    $this->assertContains($subvalue, $currentdata[$key]);
+                }
+            } else {
+                $this->assertEquals($value, $currentdata[$key]);
+            }
+        }
     }
 
     public function unknown_values_removed_provider() {

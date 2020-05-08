@@ -74,8 +74,15 @@ define([], function() {
                         return;
                     }
 
-                    // Set tile active
-                    that.setActive(tile);
+                    // If active tiles are enabled set the active tile, otherwise attempt to redirect
+                    if (this.getAttribute('data-core-enableactiveitem') == '0') {
+                        var redirecturl = tile.childNodes[1].getAttribute('data-redirect-url');
+                        if (redirecturl.length > 1) {
+                            window.location.href = tile.childNodes[1].getAttribute('data-redirect-url');
+                        }
+                    } else {
+                        that.setActive(tile);
+                    }
                 }
             });
         },

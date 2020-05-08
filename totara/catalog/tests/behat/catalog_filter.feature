@@ -27,6 +27,12 @@ Feature: Course catalog filters and featured learning
     And I set the field "Add another..." to "colour"
     And I set the field "Add another..." to "checkbox"
     And I click on "Save" "button"
+    And I click on "Find Learning" in the totara menu
+    And I follow "Configure catalogue"
+    And I follow "General"
+    And I set the following Totara form fields to these values:
+      | Details content | 1 |
+    And I click on "Save" "button"
 
     # Editing the custom field for program
     And I click on "Find Learning" in the totara menu

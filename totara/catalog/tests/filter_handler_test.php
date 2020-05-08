@@ -116,7 +116,7 @@ class totara_catalog_filter_handler_testcase extends advanced_testcase {
 
         // browse region filters
         $filters = $this->filter_handler->get_region_filters(filter::REGION_BROWSE);
-        $this->assertCount(6, $filters);
+        $this->assertGreaterThanOrEqual(6, count($filters));
 
         $keys = [
             'course_acttyp_browse',
@@ -132,7 +132,7 @@ class totara_catalog_filter_handler_testcase extends advanced_testcase {
 
         // panel region filters
         $filters = $this->filter_handler->get_region_filters(filter::REGION_PANEL);
-        $this->assertCount(6, $filters);
+        $this->assertGreaterThanOrEqual(6, count($filters));
 
         $keys = [
             'course_acttyp_panel',
