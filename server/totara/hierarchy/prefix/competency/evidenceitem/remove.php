@@ -20,11 +20,9 @@
  * @author Simon Coggins <simon.coggins@totaralms.com>
  * @package totara
  * @subpackage totara_hierarchy
- *
- * @deprecated since Totara 13
  */
 
-debugging('totara/hierarchy/prefix/competency/evidenceitem/remove.php has been deprecated, please remove all includes.', DEBUG_DEVELOPER);
+use totara_competency\linked_courses;
 
 require_once(__DIR__ . '/../../../../../config.php');
 require_once($CFG->libdir.'/adminlib.php');
@@ -119,9 +117,18 @@ if (!confirm_sesskey()) {
     print_error('confirmsesskeybad', 'error');
 }
 
-$item->delete($competency);
+// Although calling the linked_courses::remove_linked_course method here will re-read the item,
+// it is done to ensure all the correct events are triggered for competency aggregation
+if ($item->itemtype === 'coursecompletion') {
+    linked_courses::remove_linked_course($item->id);
+} else {
+    $item->delete($competency);
+}
 
-$message = get_string('removed'.$hierarchy->prefix.'evidenceitem', 'totara_hierarchy', format_string($compname .' ('. $item->get_type().')'));
+$message = get_string('removed'.$hierarchy->prefix.'evidenceitem',
+    'totara_hierarchy',
+    format_string($compname .' ('. $item->get_type().')')
+);
 
 \core\notification::success($message);
 redirect($return);

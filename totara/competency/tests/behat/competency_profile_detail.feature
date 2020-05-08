@@ -77,6 +77,7 @@ Feature: Competency profile detail page - an overview of their progress (or lack
     When I log in as "appraiser"
     And I am on profile page for user "user"
     And I click on "Competency profile" "link" in the ".userprofile" "css_element"
+    And I wait for pending js
     And I change the competency profile to list view
     And I click on "Typing slow" "link"
 

@@ -21,8 +21,6 @@
  * @author Aaron Barnes <aaron.barnes@totaralms.com>
  * @package totara
  * @subpackage totara_hierarchy
- *
- * @deprecated since Totara 13
  */
 
 require_once("{$CFG->dirroot}/completion/data_object.php");

@@ -20,12 +20,9 @@
  * @author Simon Coggins <simon.coggins@totaralms.com>
  * @package totara
  * @subpackage totara_hierarchy
- *
- * @deprecated since Totara 13
  */
 
-debugging('totara/hierarchy/prefix/competency/evidenceitem/add.php has been deprecated, please remove all includes.', DEBUG_DEVELOPER);
-
+use totara_competency\linked_courses;
 use totara_core\advanced_feature;
 
 require_once(__DIR__ . '/../../../../../config.php');
@@ -71,9 +68,6 @@ $sitecontext = context_system::instance();
 require_capability('totara/hierarchy:updatecompetency', $sitecontext);
 $can_edit = has_capability('totara/hierarchy:updatecompetency', $sitecontext);
 
-// Load competency
-$competency = $DB->get_record('comp', array('id' => $id));
-
 // Check type is available
 $avail_types = array('coursecompletion', 'coursegrade', 'activitycompletion');
 
@@ -81,34 +75,55 @@ if (!in_array($type, $avail_types)) {
     die('type unavailable');
 }
 
-///
-/// Delete removed courses (if specified)
-///
-if ($deleteexisting && !empty($idlist)) {
+// Load competency
+$competency = $DB->get_record('comp', array('id' => $id));
 
-    $assigned = $DB->get_records('comp_criteria', array('competencyid' => $id));
-    $assigned = !empty($assigned) ? $assigned : array();
+if ($type === 'coursecompletion') {
+    // Check if Competencies are enabled.
+    if (advanced_feature::is_enabled('competency_assignment')) {
+        debugging('This page has been deprecated in Totara Perform. Please use totara/competency/competency_edit.php');
+    }
 
-    foreach ($assigned as $ritem) {
-        if (!in_array($ritem->iteminstance, $idlist)) {
-            $data = new stdClass();
-            $data->id = $ritem->id;
-            $data->itemtype = $ritem->itemtype;
-            $evidence = competency_evidence_type::factory((array)$data);
-            $evidence->iteminstance = $ritem->iteminstance;
-            $evidence->delete($competency);
+    // The default linktype is Optional in Learn-only
+    $idlist = array_map(function ($course_id) {
+        return ['id' => $course_id, 'linktype' => linked_courses::LINKTYPE_OPTIONAL];
+    }, $idlist);
+
+    if ($deleteexisting) {
+        linked_courses::set_linked_courses($id, $idlist);
+    } else {
+        linked_courses::add_linked_courses($id, $idlist);
+    }
+} else {
+    ///
+    /// Delete removed courses (if specified)
+    ///
+    if ($deleteexisting && !empty($idlist)) {
+
+        $assigned = $DB->get_records('comp_criteria', array('competencyid' => $id));
+        $assigned = !empty($assigned) ? $assigned : array();
+
+        foreach ($assigned as $ritem) {
+            if (!in_array($ritem->iteminstance, $idlist)) {
+                $data = new stdClass();
+                $data->id = $ritem->id;
+                $data->itemtype = $ritem->itemtype;
+                $evidence = competency_evidence_type::factory((array)$data);
+                $evidence->iteminstance = $ritem->iteminstance;
+                $evidence->delete($competency);
+            }
         }
     }
-}
 
-// HTML to return for JS version
-foreach ($idlist as $instance) {
-    $data = new stdClass();
-    $data->itemtype = $type;
-    $evidence = competency_evidence_type::factory((array)$data);
-    $evidence->iteminstance = $instance;
+    // HTML to return for JS version
+    foreach ($idlist as $instance) {
+        $data = new stdClass();
+        $data->itemtype = $type;
+        $evidence = competency_evidence_type::factory((array)$data);
+        $evidence->iteminstance = $instance;
 
-    $newevidenceid = $evidence->add($competency);
+        $newevidenceid = $evidence->add($competency);
+    }
 }
 
 $editingon = 1;

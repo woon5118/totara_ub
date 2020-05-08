@@ -143,8 +143,13 @@ class competency_controller extends admin_controller {
             'tabs' => \totara_hierarchy_renderer::get_competency_tabs($this->competency->id, "edit$section"),
             'detail' => $this->$exportmethod($config),
             'singleuse' => (int)$config->has_singleuse_criteria(),
-            'backurl' => new \moodle_url('/totara/competency/competency_summary.php', ['id' => $this->competency->id]),
         ];
+
+        if (advanced_feature::is_enabled('competency_assignment')) {
+            $data['backurl'] = new \moodle_url('/totara/competency/competency_summary.php', ['id' => $this->competency->id]);
+        } else {
+            $data['backurl'] = new \moodle_url('/totara/hierarchy/item/view.php', ['id' => $this->competency->id, 'prefix' => 'competency']);
+        }
 
         if ($notify) {
             $data['success'] = true;

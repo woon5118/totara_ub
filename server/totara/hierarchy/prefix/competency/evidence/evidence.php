@@ -22,10 +22,11 @@
  * @package totara
  * @subpackage totara_hierarchy
  *
- * @deprecated since Totara 13
+ * @deprecated since Totara 13.0
  */
 
-debugging('totara/hierarchy/prefix/competency/evidence/competency_evidence has been deprecated, please remove all includes.', DEBUG_DEVELOPER);
+use core\orm\query\order;
+use totara_competency\entities\competency_achievement;
 
 require_once("{$CFG->dirroot}/completion/data_object.php");
 
@@ -65,7 +66,7 @@ class competency_evidence extends data_object {
     public $reaggregate;
 
     final public function __construct($params = null, $fetch = true) {
-        debugging('\competency_evidence has been deprecated, please use totara_competency/linked_courses.', DEBUG_DEVELOPER);
+        debugging('\competency_evidence has been deprecated, please use \totara_competency\entities\competency_achievement.', DEBUG_DEVELOPER);
     }
 
     /**
@@ -73,20 +74,30 @@ class competency_evidence extends data_object {
      *
      * @param array $params associative arrays varname => value
      * @return object data_object instance or false if none found.
+     *
+     * @deprecated since Totara 13.0
      */
     public static function fetch($params) {
-        return self::fetch_helper('comp_record', __CLASS__, $params);
+        debugging('\competency_evidence::fetch has been deprecated, please use \totara_competency\entities\competency_achievement .',
+            DEBUG_DEVELOPER
+        );
+
+        return false;
     }
 
     /**
      * Trigger a reaggregation of this evidence item
      *
      * @return  void
+     *
+     * @deprecated since Totara 13.0
      */
     public function trigger_reaggregation() {
-        $this->reaggregate = time();
+        debugging('\competency_evidence\trigger_reaggregation has been deprecated. Re-aggregation is now triggered automatically',
+            DEBUG_DEVELOPER
+        );
 
-        return $this->_save();
+        return false;
     }
 
     /**
@@ -94,16 +105,15 @@ class competency_evidence extends data_object {
      *
      * @param   $proficiency    int
      * @return  void
+     *
+     * @deprecated since Totara 13.0
      */
     public function update_proficiency($proficiency) {
-        $this->proficiency = $proficiency;
+        debugging('\competency_evidence\update_proficiency has been deprecated. Please use \dp_competency_component\set_value',
+            DEBUG_DEVELOPER
+        );
 
-        // Save new proficiency value
-        $this->_save();
-
-        // Trigger reaggregation of parent records as
-        // obviously their child evidence items have changed
-        $this->_trigger_parent_reaggregation();
+        return false;
     }
 
     /**

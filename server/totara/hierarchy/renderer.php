@@ -44,7 +44,9 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
      * @return string HTML to output.
      */
     public function competency_view_evidence($item, $evidence=null, $can_edit=false) {
-        debugging('This method has been deprecated since Totara 13. Please use totara/competency/classes/controllers/competency_controller for display and management of linked courses');
+        if (advanced_feature::is_enabled('competency_assignment')) {
+            debugging('This method has been deprecated in Totara Perform. Please use totara/competency/classes/controllers/competency_controller for display and management of linked courses');
+        }
 
         global $CFG, $PAGE;
         require_once($CFG->dirroot . '/totara/plan/lib.php');
@@ -57,6 +59,10 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
         // Set up table header.
         $table->head = array();
         $table->head[] = get_string('name');
+        if (!empty($CFG->competencyuseresourcelevelevidence)) {
+            $table->head[] = get_string('type', 'totara_hierarchy');
+            $table->head[] = get_string('activity');
+        }
         if ($can_edit) {
             $table->head[] = get_string('linktype', 'totara_plan');
             $table->head[] = get_string('options', 'totara_hierarchy');
@@ -72,8 +78,11 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
                 $oddeven = ++$oddeven % 2;
                 $eitem = competency_evidence_type::factory((array)$eitem);
                 $cells[] = new html_table_cell($eitem->get_name());
+                if (!empty($CFG->competencyuseresourcelevelevidence)) {
+                    $cells[] = new html_table_cell($eitem->get_type());
+                    $cells[] = new html_table_cell($eitem->get_activity_type());
+                }
                 if ($can_edit) {
-
                     $content = html_writer::select(
                         array( //$options
                             PLAN_LINKTYPE_MANDATORY => get_string('mandatory','totara_hierarchy'),
@@ -90,7 +99,7 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
                     $cells[] = $cell;
                     $str_remove = get_string('remove');
                     $link = $this->output->action_link(
-                        new moodle_url('/totara/hierarchy/prefix/competency/course/remove.php', array('id' => $eitem->id)),
+                        new moodle_url('/totara/hierarchy/prefix/competency/evidenceitem/remove.php', array('id' => $eitem->id)),
                         $this->output->pix_icon('t/delete', $str_remove, null, array('class' => 'iconsmall')),
                         null,
                         array('title' => $str_remove)
@@ -122,7 +131,14 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
         if ($can_edit) {
             $templatedata->canedit = true;
 
-            $templatedata->evidencestring = get_string('assigncoursecompletions', 'totara_hierarchy');
+            $action = new moodle_url('/totara/hierarchy/prefix/competency/evidenceitem/edit.php', array('id' => $item->id));
+            $templatedata->formaction = $action->out();
+
+            if (!empty($CFG->competencyuseresourcelevelevidence)) {
+                $templatedata->evidencestring = get_string('assignnewevidenceitem', 'totara_hierarchy');
+            } else {
+                $templatedata->evidencestring = get_string('assigncoursecompletions', 'totara_hierarchy');
+            }
 
             $templatedata->id = $item->id;
             $templatedata->returnurl = qualified_me();
@@ -143,7 +159,9 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
      * @return string HTML to output.
      */
     public function competency_view_related($item, $can_edit=false, $related=null) {
-        debugging('This method has been deprecated since Totara 13. The functionality is no longer supported');
+        if (advanced_feature::is_enabled('competency_assignment')) {
+            debugging('This method has been deprecated in Totara Perform. The functionality is no longer supported');
+        }
 
         $templatedata = new stdClass();
 
@@ -192,7 +210,6 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
                 $row->attributes['class'] = 'r'.$oddeven;
                 $table->data[] = $row;
             }
-
         } else {
             // # cols varies
             $cols = $can_edit ? 4 : 3;
@@ -250,14 +267,14 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
 
         $andchildstr = get_string('andchildren', 'totara_hierarchy');
         foreach ($assignments as $assignment) {
-
             $assigntype = goal::grp_type_to_assignment($assignment->grouptype);
 
             // Check permissions.
             if ($can_edit) {
                 // Add a delete action button.
                 $params = array('goalid' => $item->id, 'assigntype' => $assigntype,
-                        'modid' => $assignment->sourceid, 'view' => true);
+                    'modid' => $assignment->sourceid, 'view' => true
+                );
                 $url = new moodle_url('/totara/hierarchy/prefix/goal/assign/remove.php', $params);
                 $delete = $this->output->action_icon(
                     $url,
@@ -312,13 +329,13 @@ class totara_hierarchy_renderer extends plugin_renderer_base {
         if ($displaytitle == 'linkedcompetencies') {
             $columns = array('type', 'name');
             $headers = array(
-            get_string('type', 'totara_hierarchy'),
-            get_string('name', 'totara_hierarchy')
+                get_string('type', 'totara_hierarchy'),
+                get_string('name', 'totara_hierarchy')
             );
         } else if ($displaytitle == 'assignedcompetencytemplates') {
             $columns = array('name');
             $headers = array(
-            get_string('name', 'totara_hierarchy'),
+                get_string('name', 'totara_hierarchy'),
             );
         }
         $displayprefix = 'competency';

@@ -20,11 +20,7 @@
  * @author Aaron Wells <aaronw@catalyst.net.nz>
  * @package totara
  * @subpackage hierarchy
- *
- * @deprecated since Totara 13
  */
-
-debugging('totara/hierarchy/prefix/competency/evidence/lib.php has been deprecated, please remove all includes.', DEBUG_DEVELOPER);
 
 require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/evidence/evidence.php');
 require_once($CFG->dirroot.'/blocks/totara_stats/locallib.php');
@@ -45,9 +41,11 @@ require_once($CFG->dirroot.'/blocks/totara_stats/locallib.php');
  * @deprecated since Totara 13
  */
 function hierarchy_add_competency_evidence($competencyid, $userid, $prof, $component, $details, $reaggregate = true, $notify = true) {
-    global $DB;
+    debugging('hierarchy_add_competency_evidence has been deprecated. Please use \dp_competency_component\set_value',
+        DEBUG_DEVELOPER
+    );
 
-    debugging('hierarchy_add_competency_evidence() has been deprecated since Totara 13. See the new Totara Competency API.');
+    global $DB;
 
     $todb = new competency_evidence(
         array(
@@ -131,8 +129,6 @@ function hierarchy_add_competency_evidence($competencyid, $userid, $prof, $compo
  */
 function hierarchy_delete_competency_evidence($courseid) {
     global $DB;
-
-    debugging('hierarchy_delete_competency_evidence() has been deprecated since Totara 13. See the new Totara Competency API.');
 
     if (empty($courseid)) {
         return false;

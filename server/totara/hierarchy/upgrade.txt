@@ -31,11 +31,11 @@ information provided here is intended especially for developers.
 * The following mustache templates have been deprecated:
   * totara/hierarchy/templates/competency_view_evidence.mustache
   * totara/hierarchy/templates/competency_view_related.mustache
-* totara_hierarchy_renderer::competency_view_evidence has been deprecated. See the new Totara Competency API.
-  Display and management of courses linked to a competency is now handled by the totara/competency/classes/controllers/competency_controller
+* totara_hierarchy_renderer::competency_view_evidence has been deprecated in Perform only.
+  The display and management of courses linked to a competency is now handled by the totara/competency/classes/controllers/competency_controller
   controller and totara/competency/classes/linked_courses class.
-  Information is passes to totara/competency/templates/competency_edit_linkedcourses.mustache.
-* totara_hierarchy_renderer::competency_view_related has been deprecated. The functionality is no longer supported. See the new Totara Competency API.
+  Information is passed to totara/competency/templates/competency_edit_linkedcourses.mustache.
+* totara_hierarchy_renderer::competency_view_related has been deprecated. The functionality is no longer supported.
 * hierarchy_can_add_competency_evidence has been moved to from totara/hierarchy/prefix/competency/evidence/lib.php to totara/hierarchy/lib.php.
 * competencyuseresourcelevelevidence global setting has been deprecated.
 

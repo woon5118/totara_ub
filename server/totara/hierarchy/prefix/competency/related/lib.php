@@ -21,8 +21,6 @@
  * @author Simon Coggins <simon.coggins@totaralms.com>
  * @package totara
  * @subpackage totara_hierarchy
- *
- * @deprecated since Totara 13
  */
 /**
  * competency/evidenceitem/lib.php
@@ -34,8 +32,6 @@
  *
  */
 
-debugging('totara/hierarchy/prefix/competency/related/lib.php has been deprecated, please remove all includes.', DEBUG_DEVELOPER);
-
 /**
  * Retrieve an array of all the competencies related to the present one
  *
@@ -46,8 +42,6 @@ debugging('totara/hierarchy/prefix/competency/related/lib.php has been deprecate
  */
 function comp_relation_get_relations($compid) {
     global $DB;
-
-    debugging('comp_relation_get_relations() has been deprecated since Totara 13. See the new Totara Competency API.');
 
     $returnrecs = array();
     $reclist = $DB->get_records_sql("SELECT id, id1, id2 FROM {comp_relations} WHERE id1 = ? OR id2 = ?", array($compid, $compid));

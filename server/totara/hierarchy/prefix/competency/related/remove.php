@@ -20,11 +20,7 @@
  * @author Simon Coggins <simon.coggins@totaralms.com>
  * @package totara
  * @subpackage totara_hierarchy
- *
- * @deprecated since Totara 13
  */
-
-debugging('totara/hierarchy/prefix/competency/related/remove.php has been deprecated, please remove all includes.', DEBUG_DEVELOPER);
 
 require_once(__DIR__ . '/../../../../../config.php');
 require_once($CFG->libdir.'/adminlib.php');

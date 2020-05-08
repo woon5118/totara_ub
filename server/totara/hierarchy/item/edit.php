@@ -23,6 +23,7 @@
  */
 
 use hierarchy_competency\event\competency_updated;
+use totara_core\advanced_feature;
 use totara_hierarchy\event\hierarchy_created;
 use totara_hierarchy\event\hierarchy_updated;
 
@@ -176,7 +177,7 @@ if ($itemform->is_cancelled()) {
     }
 
     \core\notification::add(get_string($notificationtext . $prefix, 'totara_hierarchy', format_string($itemnew->fullname)), $notificationtype);
-    if ($prefix === 'competency') {
+    if ($prefix === 'competency' && advanced_feature::is_enabled('competency_assignment')) {
         $notificationurl = new moodle_url('/totara/hierarchy/item/edit.php',
             ['prefix' => $prefix, 'frameworkid' => $frameworkid, 'id' => $itemnew->id]);
     }
@@ -215,7 +216,7 @@ if ($item->id == 0) {
     echo $OUTPUT->heading(get_string('edit'.$prefix, 'totara_hierarchy', format_string($item->fullname)));
 }
 
-if ($prefix === 'competency') {
+if ($prefix === 'competency' && advanced_feature::is_enabled('competency_assignment')) {
     require_once ($CFG->dirroot . '/totara/hierarchy/renderer.php');
 
     echo $OUTPUT->render(totara_hierarchy_renderer::get_competency_tabs($item->id, 'editgeneral'));

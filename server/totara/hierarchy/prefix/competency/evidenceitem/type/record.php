@@ -21,11 +21,7 @@
  * @author Aaron Barnes <aaron.barnes@totaralms.com>
  * @package totara
  * @subpackage totara_hierarchy
- *
- * @deprecated since Totara 13
  */
-
-debugging('totara/hierarchy/prefix/competency/evidenceitem/type/record.php has been deprecated, please remove all includes.', DEBUG_DEVELOPER);
 
 require_once("{$CFG->dirroot}/completion/data_object.php");
 
@@ -47,12 +43,6 @@ class comp_criteria_record extends data_object {
     public $required_fields = array(
         'id', 'userid', 'competencyid', 'itemid', 'status', 'proficiencymeasured', 'timecreated', 'timemodified'
     );
-
-    public function __construct($params = null, $fetch = true) {
-        debugging('\comp_criteria_record has been deprecated since Totara 13. See the new Totara Competency API.', DEBUG_DEVELOPER);
-
-        parent::__construct($params, $fetch);
-    }
 
     /**
      * Add this evidence to a competency

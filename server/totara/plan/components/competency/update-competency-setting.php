@@ -21,13 +21,19 @@
  * @author Aaron Barnes <aaron.barnes@totaralms.com>
  * @package totara
  * @subpackage plan
+ *
+ * @deprecated since Totara 13.0
  */
+
+use totara_plan\event\component_updated;
 
 header("Content-Type:text/plain");
 require_once(__DIR__ . '/../../../../config.php');
 require_once($CFG->dirroot.'/totara/hierarchy/prefix/position/lib.php');
 require_once($CFG->dirroot.'/totara/hierarchy/prefix/competency/evidence/lib.php');
 require_once($CFG->dirroot.'/totara/plan/development_plan.class.php');
+
+debugging(__FILE__ . ' has been deprecated. Please remove all references.', DEBUG_DEVELOPER);
 
 // Check if Learning plans are enabled.
 check_learningplan_enabled();
@@ -72,31 +78,26 @@ if ($jobassignment) {
 $details->assessorname = fullname($USER);
 $details->assessorid = $USER->id;
 
-// TODO This script here is used for triggering ajax requests from the 'rb_source_dp_competency' report source,
-//      We need to decide if we still support that. If yes, this call here needs to be changed (see TL-19974)
-$result = hierarchy_add_competency_evidence($competencyid, $userid, $prof, $component, $details);
+$component = new dp_competency_component($plan);
+$component->set_value($competencyid, $userid, $prof, $details);
 
-if ($result) {
-    // Log it.
-    $competencyname = $DB->get_field('comp', 'fullname', array('id' => $competencyid));
-    $data = array(
-        'objectid' => $plan->id,
-        'context' => \context_system::instance(),
-        'relateduserid' => $plan->userid,
-        'other' => array(
-            'name' => $plan->name,
-            'component' => 'competencyproficiency',
-            'componentid' => $competencyid,
-            'componentname' => $competencyname,
-            'proficiencyvalue' => $prof,
-        ),
-    );
-    \totara_plan\event\component_updated::create($data)->trigger();
+// Trigger event
+$competencyname = $DB->get_field('comp', 'fullname', array('id' => $competencyid));
+$data = array(
+    'objectid' => $plan->id,
+    'context' => \context_system::instance(),
+    'relateduserid' => $plan->userid,
+    'other' => array(
+        'name' => $plan->name,
+        'component' => 'competencyproficiency',
+        'componentid' => $competencyid,
+        'componentname' => $competencyname,
+        'proficiencyvalue' => $prof,
+    ),
+);
+component_updated::create($data)->trigger();
 
-    // Check if any plans this competency belongs to are complete.
-    dp_plan_item_updated($userid, 'competency', $competencyid);
+// Check if any plans this competency belongs to are complete.
+dp_plan_item_updated($userid, 'competency', $competencyid);
 
-    echo "OK";
-} else {
-    echo "FAIL";
-}
+echo "OK";

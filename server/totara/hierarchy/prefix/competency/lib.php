@@ -516,10 +516,11 @@ class competency extends hierarchy {
         $data = parent::get_item_data($item, $cols);
 
         $prefix = get_string($this->prefix, 'totara_hierarchy');
+        $aggregationmethod = $item->aggregationmethod ?? self::AGGREGATION_METHOD_ALL;
         // Add aggregation method
         $data[] = array(
             'title' => get_string('aggregationmethodview', 'totara_hierarchy', $prefix),
-            'value' => get_string('aggregationmethod'.$item->aggregationmethod, 'totara_hierarchy')
+            'value' => get_string('aggregationmethod'.$aggregationmethod, 'totara_hierarchy')
         );
 
         return $data;

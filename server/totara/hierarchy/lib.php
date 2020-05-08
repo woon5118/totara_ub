@@ -4017,6 +4017,7 @@ function totara_hierarchy_parse_competency_assignment_availability($assignavaila
  *                      string name and the second element is the lang string file
  */
 function hierarchy_can_add_competency_evidence($plan, $component, $userid, $competencyid) {
+
     global $DB;
 
     $systemcontext = context_system::instance();

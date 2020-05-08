@@ -21,11 +21,7 @@
  * @author Aaron Barnes <aaron.barnes@totaralms.com>
  * @package totara
  * @subpackage totara_hierarchy
- *
- * @deprecated since Totara 13
  */
-
-debugging('totara/hierarchy/prefix/competency/evidenceitem/type/activitycompletion.php has been deprecated, please remove all includes.', DEBUG_DEVELOPER);
 
 /**
  * Activity completion competency evidence type
@@ -43,12 +39,6 @@ class competency_evidence_type_activitycompletion extends competency_evidence_ty
      * @var object
      */
     private $_module;
-
-    public function __construct($params = null, $fetch = true) {
-        debugging('The activitycompletion activity type has been deprecated since Totara 13. See the new Totara Competency API.');
-
-        parent::__construct($params, $fetch);
-    }
 
     /**
      * Add this evidence to a competency

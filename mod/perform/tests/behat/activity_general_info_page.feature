@@ -68,6 +68,8 @@ Feature: Create and update activity general info fields
     And I navigate to the manage perform activities page
 
     When I click on "My Test Activity #1" "link"
+    And I click on "General" "link"
+
     Then the following fields match these values:
       | Activity title | My Test Activity #1             |
       | Description    | My Test Activity #1 description |

@@ -30,6 +30,7 @@ require_once($CFG->dirroot.'/totara/customfield/fieldlib.php');
 require_once($CFG->libdir.'/filelib.php');
 
 use totara_competency\criteria_renderer;
+use totara_core\advanced_feature;
 
 // Get data.
 $prefix      = required_param('prefix', PARAM_ALPHA);
@@ -44,12 +45,9 @@ $shortprefix = hierarchy::get_short_prefix($prefix);
 
 hierarchy::check_enable_hierarchy($prefix);
 
-if ($prefix === 'competency') {
-    $section = optional_param('s', '', PARAM_ALPHA);
-    if (empty($section)) {
-        $newurl = new moodle_url('/totara/competency/competency_summary.php', ['id' => $id]);
-        redirect($newurl);
-    }
+if ($prefix === 'competency' && advanced_feature::is_enabled('competency_assignment')) {
+    $newurl = new moodle_url('/totara/competency/competency_summary.php', ['id' => $id]);
+    redirect($newurl);
 }
 
 $hierarchy = hierarchy::load_hierarchy($prefix);
@@ -83,7 +81,8 @@ if ($canmanage) {
     $PAGE->set_pagelayout('admin');
     if ($canviewframeworks) {
         $PAGE->navbar->add(get_string("{$prefix}frameworks", 'totara_hierarchy'),
-                new moodle_url("../index.php", array('prefix' => $prefix)));
+            new moodle_url("../index.php", array('prefix' => $prefix))
+        );
     } else {
         $PAGE->navbar->add(get_string("{$prefix}frameworks", 'totara_hierarchy'));
     }
@@ -93,7 +92,7 @@ if ($canmanage) {
 
 // Run any hierarchy prefix specific code.
 $compfw = optional_param('framework', 0, PARAM_INT);
-$setupitem = new stdClass;
+$setupitem = new stdClass();
 $setupitem->id = $item->id;
 $setupitem->frameworkid = $compfw;
 
@@ -121,15 +120,13 @@ $str_edit = get_string('edit');
 
 if ($canupdateitems) {
     $heading .= ' ' . $OUTPUT->action_icon(new moodle_url("edit.php",
-            array('prefix' => $prefix, 'frameworkid' => $framework->id, 'id' => $item->id)),
-            new pix_icon('t/edit', $str_edit, 'moodle', array('class' => 'iconsmall')));
+        array('prefix' => $prefix, 'frameworkid' => $framework->id, 'id' => $item->id)),
+        new pix_icon('t/edit', $str_edit, 'moodle', array('class' => 'iconsmall'))
+    );
 }
 
 echo $OUTPUT->heading($heading);
 $renderer = $PAGE->get_renderer('totara_hierarchy');
-if ($prefix === 'competency') {
-    echo $OUTPUT->render(totara_hierarchy_renderer::get_competency_tabs($id, $section));
-}
 
 $data = $hierarchy->get_item_data($item);
 $cfdata = $hierarchy->get_custom_fields($item->id);
@@ -152,7 +149,6 @@ if ($cfdata) {
 echo html_writer::start_tag('dl', array('class' => 'dl-horizontal'));
 
 foreach ($data as $ditem) {
-
     // Check if empty.
     if (!strlen($ditem['value'])) {
         continue;
@@ -174,8 +170,11 @@ echo html_writer::end_tag('dl');
 $hierarchy->display_extra_view_info($item, $frameworkid);
 
 if ($canmanageframeworks) {
-    $options = array('prefix' => $prefix,'frameworkid' => $framework->id);
-    $button = $OUTPUT->single_button(new moodle_url('../index.php', $options), get_string($prefix.'returntoframework', 'totara_hierarchy'), 'get');
+    $options = array('prefix' => $prefix, 'frameworkid' => $framework->id);
+    $button = $OUTPUT->single_button(new moodle_url('../index.php', $options),
+        get_string($prefix.'returntoframework', 'totara_hierarchy'),
+        'get'
+    );
 
     echo html_writer::tag('div', $button, array('class' => 'buttons'));
 }

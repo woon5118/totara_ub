@@ -20,11 +20,7 @@
  * @author Simon Coggins <simon.coggins@totaralms.com>
  * @package totara
  * @subpackage totara_hierarchy
- *
- * @deprecated since Totara 13
  */
-
-debugging('totara/hierarchy/prefix/competency/evidenceitem/edit.php has been deprecated, please remove all includes.', DEBUG_DEVELOPER);
 
 use totara_core\advanced_feature;
 
@@ -47,6 +43,11 @@ $category = optional_param('category', 0, PARAM_INT);
 if (advanced_feature::is_disabled('competencies')) {
     echo html_writer::tag('div', get_string('competenciesdisabled', 'totara_hierarchy'), array('class' => 'notifyproblem'));
     die();
+}
+
+// Check if Competencies are enabled.
+if (advanced_feature::is_enabled('competency_assignment')) {
+    debugging('This page has been deprecated in Totara Perform. Please use totara/competency/competency_edit.php');
 }
 
 // Check perms

@@ -51,16 +51,17 @@ Feature: Test competencies achieved is updated
     And I click on "Gandalf the Grey" "link"
     And I click on "OK" "button" in the ".totara-dialog[aria-describedby=manager]" "css_element"
     And I click on "Add job assignment" "button"
+
     And I navigate to "Manage competencies" node in "Site administration > Competencies"
     And I click on "Reclaim the Lonely Mountain" "link"
     And I click on "Kill the Smaug" "link"
-    And I click on ".tui-competencyOverviewLinkedCourses__header_edit" "css_element"
-    And I press "Add linked courses"
-    And I click on "Select" "checkbox"
-    And I click on "Save changes" "button" in the ".modal-container" "css_element"
-    And I click on "Save changes" "button"
-    And I click on "Back to Competency page" "link"
+    And I click on "Assign course completions" "button"
+    And I click on "Miscellaneous" "link"
+    And I click on "An Unexpected Journey" "link"
+    And I click on "Save" "button" in the ".totara-dialog[aria-describedby=evidence]" "css_element"
+    And I wait for pending js
     Then I should see "An Unexpected Journey"
+    And I press "Return to competency framework"
 
     When I log out
     And I log in as "bilbo"
