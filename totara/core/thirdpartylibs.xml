@@ -97,4 +97,11 @@
         <version>2.0.3</version>
         <licenseversion></licenseversion>
     </library>
+    <library>
+        <location>tui/build</location>
+        <name>date-fns</name>
+        <license>MIT</license>
+        <version>2.13.0</version>
+        <licenseversion></licenseversion>
+    </library>
 </libraries>

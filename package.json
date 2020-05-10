@@ -28,6 +28,7 @@
         "apollo-link-http": "^1.5.16",
         "chart.js": "^2.8.0",
         "chartjs-plugin-doughnutlabel": "^2.0.3",
+        "date-fns": "^2.13.0",
         "graphql": "^14.4.2",
         "graphql-tag": "^2.10.1",
         "resize-observer-polyfill": "^1.5.1",
