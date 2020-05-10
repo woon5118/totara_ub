@@ -43,6 +43,7 @@ Feature: View activity logs
     And the following "assignments" exist in "totara_competency" plugin:
       | competency | user_group_type | user_group   | type  |
       | comp2      | user            | user1        | self  |
+    And I wait for the next second
     And I run the scheduled task "totara_competency\task\expand_assignments_task"
 
   Scenario: View activity logs in the competency profile
@@ -64,9 +65,9 @@ Feature: View activity logs
     #Check it shows all the items in activity log
     And I should see the tui datatable in the ".tui-competencyDetailActivityLog" "css_element" contains:
       | Description                                                         | Proficiency status | Assignment        |
+      | Assigned: Self-assigned                                             |                    | Self-assigned     |
       | Rating: Super Competent                                             |  Proficient        | Directly assigned |
       | Criteria met: Course completion. Achieved 'Super Competent' rating. |                    | Directly assigned |
-      | Assigned: Self-assigned                                             |                    | Self-assigned     |
       | COMPETENCY ACTIVE: ACHIEVEMENT TRACKING STARTED                     |                    |                   |
       | Assigned: Admin User (Admin)                                        |                    | Directly assigned |
 
