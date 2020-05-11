@@ -43,7 +43,7 @@ class mod_perform_webapi_resolver_mutation_update_activity_workflow_testcase ext
         self::setGuestUser();
 
         $this->expectException(required_capability_exception::class);
-        $this->resolve_grapqhl_mutation(
+        $this->resolve_graphql_mutation(
             'mod_perform_update_activity_workflow',
             [
                 'input' => [
@@ -62,7 +62,7 @@ class mod_perform_webapi_resolver_mutation_update_activity_workflow_testcase ext
     public function test_invalid_activity(): void {
         self::setGuestUser();
         $this->expectException(record_not_found_exception::class);
-        $this->resolve_grapqhl_mutation('mod_perform_update_activity_workflow', [
+        $this->resolve_graphql_mutation('mod_perform_update_activity_workflow', [
             'input' => [
                 'activity_id' => 0,
                 'close_on_completion' => true,
