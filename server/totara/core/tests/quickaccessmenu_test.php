@@ -1086,8 +1086,9 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
     public function test_helper_remove_group() {
         global $DB;
 
-        // Testing with competency assignment explicitly switched off
+        // Testing with competency assignment and perform activities explicitly switched off
         advanced_feature::disable('competency_assignment');
+        advanced_feature::disable('performance_activities');
 
         $this->resetAfterTest();
 
