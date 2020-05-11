@@ -53,7 +53,10 @@ class participant_instances extends perform_controller {
             'fullname' => $this->subject_instance->subject_user->fullname
         ]);
 
-        return (new report_view('mod_perform/report', $report))
+        $sid = $this->get_param('sid', PARAM_INT, 0);
+        $debug = $this->get_param('debug', PARAM_INT, 0);
+
+        return (new report_view('mod_perform/report', $report, $sid, $debug))
             ->set_title($page_title)
             ->set_url(static::get_url(['subject_instance_id' => $this->get_subject_instance()->id]))
             ->set_backto(

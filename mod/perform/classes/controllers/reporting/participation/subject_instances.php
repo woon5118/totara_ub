@@ -46,7 +46,10 @@ class subject_instances extends perform_controller {
 
         $report = $this->load_embedded_report('perform_subject_instance', ['activity_id' => $this->get_activity()->id]);
 
-        return (new report_view('mod_perform/report', $report))
+        $sid = $this->get_param('sid', PARAM_INT, 0);
+        $debug = $this->get_param('debug', PARAM_INT, 0);
+
+        return (new report_view('mod_perform/report', $report, $sid, $debug))
             ->set_title($this->get_activity()->name)
             ->set_url(static::get_url(['activity_id' => $this->get_activity()->id]))
             ->set_backto(
