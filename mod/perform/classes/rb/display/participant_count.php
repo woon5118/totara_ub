@@ -40,12 +40,14 @@ class participant_count extends base {
      * @return string
      */
     public static function display($count, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
-        if ($count == 0) {
-            return '0';
+        if ((int)$count == 1) {
+            $text = get_string('instance_one', 'mod_perform');
+        } else {
+            $text = get_string('instances', 'mod_perform', $count);
         }
 
-        if ($format !== 'html') {
-            return $count;
+        if ($count == 0 || $format !== 'html') {
+            return $text;
         }
 
         $extrafields = self::get_extrafields_row($row, $column);
@@ -53,7 +55,7 @@ class participant_count extends base {
             '/mod/perform/reporting/participation/participants.php',
             ['subject_instance_id' => $extrafields->subject_instance_id]
         );
-        return html_writer::link($url, $count);
+        return html_writer::link($url, $text);
     }
 
     /**
