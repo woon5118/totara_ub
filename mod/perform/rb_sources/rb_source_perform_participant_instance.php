@@ -97,14 +97,6 @@ class rb_source_perform_participant_instance extends rb_base_source {
                 "subject_instance.id = base.subject_instance_id",
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
             ),
-            // new rb_join(
-            //     'subject_instance_user',
-            //     'INNER',
-            //     "{perform_subject_instance}",
-            //     "subject_instance_user.subject_user_id = auser.id",
-            //     REPORT_BUILDER_RELATION_ONE_TO_ONE,
-            //     ['subject_instance_user', 'auser']
-            // ),
             new rb_join(
                 'perform_relationship',
                 'LEFT',
@@ -112,23 +104,6 @@ class rb_source_perform_participant_instance extends rb_base_source {
                 "perform_relationship.id = base.activity_relationship_id",
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
             ),
-            // new rb_join(
-            //     'totara_relationship',
-            //     'INNER',
-            //     'relationship',
-            //     "{totara_core_relationship}",
-            //     "totara_relationship.id = perform_relationship.relationship_id",
-            //     REPORT_BUILDER_RELATION_ONE_TO_ONE,
-            //     'perform_relationship'
-            // ),
-            // new rb_join(
-            //     'totara_relationship_resolver',
-            //     'INNER',
-            //     "{totara_core_relationship_resolver}",
-            //     'totara_relationship_resolver.relationship_id = totara_relationship.id',
-            //     REPORT_BUILDER_RELATION_ONE_TO_ONE,
-            //     ['totara_relationship', 'perform_relationship']
-            // ),
             new rb_join(
                 'totara_relationship_resolver',
                 'LEFT',
@@ -137,13 +112,11 @@ class rb_source_perform_participant_instance extends rb_base_source {
                 REPORT_BUILDER_RELATION_ONE_TO_ONE,
                 ['perform_relationship']
             ),
-
         );
 
         $this->add_to_joinlist($joinlist, 'subject_instance');
         $this->add_core_user_tables($joinlist, 'base', 'participant_id');
         $this->add_core_user_tables($joinlist, 'subject_instance', 'subject_user_id', 'subject_user');
-        //        $this->add_totara_job_tables($joinlist, 'subject_instance', 'subject_user_id');
 
         return $joinlist;
     }
@@ -199,7 +172,6 @@ class rb_source_perform_participant_instance extends rb_base_source {
                 get_string('relationship_in_activity', 'rb_source_perform_participant_instance'),
                 'totara_relationship_resolver.class_name',
                 [
-                    //'joins' => ['totara_relationship_resolver', 'totara_relationship', 'perform_relationship'],
                     'joins' => ['totara_relationship_resolver', 'perform_relationship'],
                     'dbdatatype' => 'char',
                     'outputformat' => 'text',
@@ -220,38 +192,12 @@ class rb_source_perform_participant_instance extends rb_base_source {
                     'noexport' => true
                 ]
             )
-
-            // new rb_column_option(
-            //     'perform',
-            //     'type_name',
-            //     get_string('activity_type', 'mod_perform'),
-            //     'perform_type.name',
-            //     [
-            //         'joins' => ['perform_type', 'perform', 'track', 'track_user_assignment'],
-            //         'dbdatatype' => 'text',
-            //         'outputformat' => 'text',
-            //         'displayfunc' => 'format_string'
-            //     ]
-            // ),
-            // new rb_column_option(
-            //     'participant_instance',
-            //     'participant_date_completion',
-            //     get_string('date_completion', 'rb_source_perform_subject_instance'),
-            //     'base.???',
-            //     [
-            //         'dbdatatype' => 'timestamp',
-            //         'displayfunc' => 'nice_date'
-            //     ]
-            // ),
         ];
 
         $this->add_fields_to_columns($columnoptions, 'subject_instance');
         $this->add_core_user_columns($columnoptions);
-
         // ATTENTION: Remove Subject of the activity rb_column_option first
         // $this->add_core_user_columns($columnoptions, 'subject_user', 'activity_subject');
-
-        // $this->add_totara_job_columns($columnoptions);
 
         return $columnoptions;
     }
@@ -399,12 +345,6 @@ class rb_source_perform_participant_instance extends rb_base_source {
                 'value' => 'participant_progress',
                 'heading' => get_string('participant_status', 'rb_source_perform_participant_instance'),
             ],
-            // TODO: Date participant instance completed
-            // [
-            //     'type' => 'participant_instance',
-            //     'value' => 'completed_at',
-            //     'heading' => 'Date participant instance completed',
-            // ],
         ];
     }
 

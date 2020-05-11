@@ -90,7 +90,6 @@ class rb_source_perform_subject_instance extends rb_base_source {
         $joinlist = [];
         $this->add_to_joinlist($joinlist);
         $this->add_core_user_tables($joinlist, 'base', 'subject_user_id');
-        //$this->add_totara_job_tables($joinlist, 'base', 'job_assignment_id');
 
         return $joinlist;
     }
@@ -142,45 +141,23 @@ class rb_source_perform_subject_instance extends rb_base_source {
                     'displayfunc' => 'subject_progress'
                 ]
             ),
-            new rb_column_option(
-                'subject_instance',
-                'instance_count',
-                get_string('instance_count', 'rb_source_perform_subject_instance'),
-                // TODO: delete it
-                '\'0\'', // "base.instance_count",
-                [
-                    'dbdatatype' => 'integer',
-                    'displayfunc' => 'integer'
-                ]
-            ),
-            new rb_column_option(
-                'track',
-                'description',
-                get_string('track_description', 'mod_perform'),
-                'track.description',
-                [
-                    'joins' => ['track', 'track_user_assignment'],
-                    'dbdatatype' => 'text',
-                    'outputformat' => 'text',
-                    'displayfunc' => 'format_string'
-                ]
-            )
-
-        // new rb_column_option(
-            //     'subject_instance',
-            //     'subject_date_completion',
-            //     get_string('date_completion', 'rb_source_perform_subject_instance'),
-            //     'base.???',
+            // TODO: uncomment when its available
+            // new rb_column_option(
+            //     'track',
+            //     'description',
+            //     get_string('track_description', 'mod_perform'),
+            //     'track.description',
             //     [
-            //         'dbdatatype' => 'timestamp',
-            //         'displayfunc' => 'nice_date'
+            //         'joins' => ['track', 'track_user_assignment'],
+            //         'dbdatatype' => 'text',
+            //         'outputformat' => 'text',
+            //         'displayfunc' => 'format_string'
             //     ]
-            // ),
+            // )
         ];
 
         $this->add_fields_to_columns($columnoptions);
         $this->add_core_user_columns($columnoptions);
-        //$this->add_totara_job_columns($columnoptions);
 
         return $columnoptions;
     }
@@ -214,25 +191,17 @@ class rb_source_perform_subject_instance extends rb_base_source {
                     'simplemode' => true,
                 ]
             ),
-            new rb_filter_option(
-                'track',
-                'description',
-                get_string('track_description', 'mod_perform'),
-                'text'
-            ),
-
-        // $filteroptions[] = new rb_filter_option(
-        //     'subject_instance',
-        //     'subject_date_completion',
-        // get_string('date_completion', 'rb_source_perform_subject_instance'),
-        // 'date'
-        // );
-
+            // TODO: uncomment when its available
+            // new rb_filter_option(
+            //     'track',
+            //     'description',
+            //     get_string('track_description', 'mod_perform'),
+            //     'text'
+            // ),
         ];
 
         $this->add_fields_to_filters($filteroptions);
         $this->add_core_user_filters($filteroptions);
-        //$this->add_totara_job_filters($filteroptions, 'base', 'job_assignment_id');
 
         return $filteroptions;
     }
@@ -278,11 +247,6 @@ class rb_source_perform_subject_instance extends rb_base_source {
                 'heading' => get_string('activity_type', 'mod_perform')
             ],
             [
-                'type' => 'track',
-                'value' => 'description',
-                'heading' => get_string('track_description', 'mod_perform')
-            ],
-            [
                 'type' => 'subject_instance',
                 'value' => 'created_at',
                 'heading' => get_string('date_created', 'rb_source_perform_subject_instance')
@@ -297,16 +261,6 @@ class rb_source_perform_subject_instance extends rb_base_source {
                 'value' => 'count',
                 'heading' => get_string('participant_count', 'rb_source_perform_subject_instance')
             ],
-            // [
-            //     'type' => 'subject_instance',
-            //     'value' => 'subject_date_completion',
-            //     'heading' => get_string('date_completion', 'rb_source_perform_subject_instance')
-            // ],
-            // [
-            //     'type' => 'subject_instance',
-            //     'value' => 'instance_count',
-            //     'heading' => get_string('instance_count', 'rb_source_perform_subject_instance')
-            // ]
         ];
     }
 
@@ -321,10 +275,11 @@ class rb_source_perform_subject_instance extends rb_base_source {
                 'type' => 'user',
                 'value' => 'namelink',
             ],
-            [
-                'type' => 'track',
-                'value' => 'description',
-            ],
+            // TODO: uncomment when its available
+            // [
+            //     'type' => 'track',
+            //     'value' => 'description',
+            // ],
             [
                 'type' => 'subject_instance',
                 'value' => 'created_at',
@@ -333,14 +288,6 @@ class rb_source_perform_subject_instance extends rb_base_source {
                 'type' => 'perform',
                 'value' => 'type'
             ],
-            // [
-            //     'type' => 'subject_instance',
-            //     'value' => 'subject_status'
-            // ],
-            // [
-            //     'type' => 'subject_instance',
-            //     'value' => 'subject_date_completion'
-            // ],
         ];
     }
 
