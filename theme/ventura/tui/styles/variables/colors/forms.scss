@@ -142,3 +142,13 @@
 --tui-btn-toolbar-bg-color-selected: var(--tui-color-state-active);
 --tui-btn-toolbar-text-color: var(--tui-color-state);
 --tui-btn-toolbar-text-color-selected: var(--tui-color-neutral-1);
+
+// Toggle btn
+--tui-form-toggle-dot-color: var(--tui-color-neutral-1);
+--tui-form-toggle-off-bg-color: var(--tui-color-neutral-4);
+--tui-form-toggle-off-bg-color-hover-focus: var(--tui-color-neutral-5);
+--tui-form-toggle-on-bg-color: var(--tui-color-state);
+--tui-form-toggle-on-bg-color-hover-focus: var(--tui-color-state-hover);
+--tui-form-toggle-on-border-color: var(--tui-color-state);
+--tui-form-toggle-on-border-color-hover-focus: var(--tui-color-state-hover);
+--tui-form-toggle-border-color: var(--tui-color-neutral-6);

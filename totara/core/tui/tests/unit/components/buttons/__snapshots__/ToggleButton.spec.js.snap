@@ -1,0 +1,16 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ToggleButton.vue Checks snapshot 1`] = `
+<button
+  class="tui-toggleBtn"
+  type="button"
+>
+  
+  toggle button text
+  
+  <span
+    aria-hidden="true"
+    class="tui-toggleBtn__ui"
+  />
+</button>
+`;
