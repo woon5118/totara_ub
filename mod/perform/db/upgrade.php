@@ -966,5 +966,18 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020051100, 'perform');
     }
 
+    if ($oldversion < 2020051300) {
+
+        // Changing precision of field name on table perform to (1024).
+        $table = new xmldb_table('perform');
+        $field = new xmldb_field('name', XMLDB_TYPE_CHAR, '1024', null, XMLDB_NOTNULL, null, null, 'course');
+
+        // Launch change of precision for field name.
+        $dbman->change_field_precision($table, $field);
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020051300, 'perform');
+    }
+
     return true;
 }

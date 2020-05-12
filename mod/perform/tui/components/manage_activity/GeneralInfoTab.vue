@@ -30,6 +30,7 @@
         :id="id"
         :value="activity.edit_name"
         :placeholder="label"
+        :maxlength="ACTIVITY_NAME_MAX_LENGTH"
         @input="updateActivity({ edit_name: $event })"
       />
     </FormRow>
@@ -89,6 +90,9 @@ import CreateActivityMutation from 'mod_perform/graphql/create_activity.graphql'
 //GraphQL
 import ActivityTypesQuery from 'mod_perform/graphql/activity_types';
 
+// This should correspond to mod_perform\models\activity\activity::NAME_MAX_LENGTH in the back end.
+const ACTIVITY_NAME_MAX_LENGTH = 1024;
+
 export default {
   components: {
     Button,
@@ -144,7 +148,7 @@ export default {
   },
   computed: {
     /**
-     * Has the activity been not yet been saved to the back-end.
+     * Has the activity not yet been saved to the back-end.
      *
      * @returns {boolean}
      */
@@ -191,6 +195,9 @@ export default {
 
       return null;
     },
+  },
+  created() {
+    this.ACTIVITY_NAME_MAX_LENGTH = ACTIVITY_NAME_MAX_LENGTH;
   },
   methods: {
     /**

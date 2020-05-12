@@ -90,7 +90,7 @@ class activity extends model {
         'state_details'
     ];
 
-    public const NAME_MAX_LENGTH = 255;
+    public const NAME_MAX_LENGTH = 1024;
 
     /**
      * @var activity_entity
@@ -301,7 +301,7 @@ class activity extends model {
         }
 
         if (\core_text::strlen($entity->name) > self::NAME_MAX_LENGTH) {
-            $problems[] = 'Name must be less than ' . self::NAME_MAX_LENGTH . ' characters';
+            $problems[] = 'Name cannot be more than ' . self::NAME_MAX_LENGTH . ' characters';
         }
 
         return $problems;

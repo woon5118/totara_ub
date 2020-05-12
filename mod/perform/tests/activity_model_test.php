@@ -138,7 +138,7 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
             ],
             'Name too long' => [
                 random_string(activity::NAME_MAX_LENGTH + 1),
-                'Name must be less than 255 characters',
+                'Name cannot be more than 1024 characters',
             ],
         ];
     }
