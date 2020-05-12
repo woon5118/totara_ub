@@ -96,7 +96,6 @@ function(Loader) {
                 }
 
                 that.triggerEvent('update', {criterion: that.criterion});
-                that.triggerEvent('singleuse', {criterion: that.criterion});
                 resolve();
             });
         },

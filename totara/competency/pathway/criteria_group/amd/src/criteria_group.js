@@ -155,8 +155,8 @@ define(['core/str', 'core/notification', 'core/templates'], function(str, notifi
                             'id': criterion.id ? criterion.id : 0,
                             'type': criterion.type ? criterion.type : '',
                             'title': criterion.title ? criterion.title : '',
-                            'singleuse': criterion.singleuse ? criterion.singleuse : false,
-                            'expandable': criterion.expandable ? criterion.expandable : false
+                            'singleuse': criterion.singleuse || false,
+                            'expandable': criterion.expandable || false
                         };
 
                         // If previous marked for deletion, remove from that list
@@ -168,8 +168,10 @@ define(['core/str', 'core/notification', 'core/templates'], function(str, notifi
                     }
 
                     if (criterion.singleuse) {
-                        that.triggerEvent('singleuse', {used: true});
+                        that.hideAddCriteriaDropdown();
+                        that.triggerEvent('singleUseCriterion', {used: true, scalevalue: that.pathway.scalevalue});
                     }
+
                     // Remove attributes not needed for APIs
                     delete criterion.singleuse;
                     delete criterion.expandable;
@@ -179,8 +181,6 @@ define(['core/str', 'core/notification', 'core/templates'], function(str, notifi
                 // Propagate up to achievementPaths
                 that.packCriteria();
                 that.triggerEvent('update', {pathway: that.pathway});
-
-                that.showHideNoCriteria();
             });
 
             this.widget.addEventListener(criteriaEvents + 'dirty', function(e) {
@@ -247,6 +247,9 @@ define(['core/str', 'core/notification', 'core/templates'], function(str, notifi
                 this.pathway.id = pwId;
             }
 
+            // We can't add singleuse criteria with any other criteria
+            this.toggleSingleUse(false);
+
             this.triggerEvent('update', {pathway: this.pathway});
         },
 
@@ -272,24 +275,6 @@ define(['core/str', 'core/notification', 'core/templates'], function(str, notifi
                 if (this.criteria[criterionKey].detail) {
                     this.pathway.criteria.push(this.criteria[criterionKey].detail);
                 }
-            }
-        },
-
-        /**
-         * Show or hide the 'No Criteria' message
-         */
-        showHideNoCriteria: function() {
-            var nCriteria = this.pathway.criteria.length,
-                nDeletedCriteria = 0;
-
-            if (Object.keys(this.markedForDeletionCriteria).length) {
-                nDeletedCriteria = 1;
-            }
-
-            if ((nCriteria + nDeletedCriteria) == 0) {
-                this.widget.querySelector('[data-tw-editScaleValuePaths-criterion-empty]').classList.remove('tw-editAchievementPaths--hidden');
-            } else {
-                this.widget.querySelector('[data-tw-editScaleValuePaths-criterion-empty]').classList.add('tw-editAchievementPaths--hidden');
             }
         },
 
@@ -362,7 +347,7 @@ define(['core/str', 'core/notification', 'core/templates'], function(str, notifi
                 criterionType = criterionOptionNode.getAttribute('data-tw-editScaleValuePaths-dropDown-item-type'),
                 criterionTitle = criterionOptionNode.getAttribute('data-tw-editScaleValuePaths-dropDown-item-title'),
                 criterionTemplateName = criterionOptionNode.getAttribute('data-tw-editScaleValuePaths-dropDown-item-template'),
-                criterionSingleuse = criterionOptionNode.getAttribute('data-tw-editScaleValuePaths-dropDown-item-singleUse'),
+                criterionSingleUse = criterionOptionNode.getAttribute('data-tw-editScaleValuePaths-dropDown-item-singleUse'),
                 criterionKey;
 
             criterionKey = that.getNextCriterionKey();
@@ -372,7 +357,7 @@ define(['core/str', 'core/notification', 'core/templates'], function(str, notifi
                 'type': criterionType,
                 'title': criterionTitle,
                 'criterion_templatename': criterionTemplateName,
-                'singleuse': !!+criterionSingleuse,
+                'singleuse': !!+criterionSingleUse,
             };
 
             // TODO: For now singleuse is used to determine whether there are detail - may need to expand later
@@ -400,63 +385,29 @@ define(['core/str', 'core/notification', 'core/templates'], function(str, notifi
          * @param {bool} allowSingleUse
          */
         toggleSingleUse: function(allowSingleUse) {
-            var singleUseNodes = this.widget.querySelectorAll('[data-tw-editScaleValuePaths-dropDown-singleUse]');
+            var singleUseOptions = this.widget.querySelectorAll('[data-tw-editScaleValuePaths-dropDown-item-singleUse="1"]');
 
-            if (singleUseNodes.length > 0) {
+            if (singleUseOptions.length > 0) {
                 if (allowSingleUse) {
-                    for (var a = 0; a < singleUseNodes.length; a++) {
-                        singleUseNodes[a].removeAttribute('disabled');
+                    for (var a = 0; a < singleUseOptions.length; a++) {
+                        singleUseOptions[a].removeAttribute('disabled');
                     }
                 } else {
-                    for (var b = 0; b < singleUseNodes.length; b++) {
-                        singleUseNodes[b].setAttribute('disabled', '');
+                    for (var b = 0; b < singleUseOptions.length; b++) {
+                        singleUseOptions[b].setAttribute('disabled', '');
                     }
                 }
             }
         },
 
         /**
-         * Toggle disabling / enabling of singleUse criterion types in ALL groups
-         *
-         * @param {bool} allowSingleUse
+         * Hide criteria dropdown
          */
-        toggleAllSingleUse: function(allowSingleUse) {
-            var criteriaDropDownNodes = document.querySelectorAll('[data-tw-editScaleValuePaths-dropDown="criteria_group"]'),
-                singleUseNodes,
-                pwWgt,
-                criteria,
-                pwAllow;
+        hideAddCriteriaDropdown: function() {
+            var addButton = this.widget.querySelector('.tw-editScaleValuePaths__addButton');
 
-            for (var a = 0; a < criteriaDropDownNodes.length; a++) {
-                pwAllow = allowSingleUse;
-                singleUseNodes = criteriaDropDownNodes[a].querySelectorAll('[data-tw-editScaleValuePaths-dropDown-singleUse]');
-
-                // Only need to test 1
-                if (singleUseNodes.length == 0) {
-                    continue;
-                }
-
-                if (allowSingleUse) {
-                    // Before we allow single use in a group,
-                    // ensure there are no active criteria in that group (using title)
-                    pwWgt = criteriaDropDownNodes[a].closest('[data-tw-editAchievementPaths-pathway-key]');
-                    if (pwWgt) {
-                        criteria = pwWgt.querySelectorAll('[data-tw-editScaleValuePaths-criterion-active]');
-                        if (criteria.length > 0) {
-                            pwAllow = false;
-                        }
-                    }
-                }
-
-                if (pwAllow) {
-                    for (var b = 0; b < singleUseNodes.length; b++) {
-                        singleUseNodes[b].removeAttribute('disabled');
-                    }
-                } else {
-                    for (var c = 0; c < singleUseNodes.length; c++) {
-                        singleUseNodes[c].setAttribute('disabled', '');
-                    }
-                }
+            if (addButton) {
+                addButton.classList.add('tw-editAchievementPaths--hidden');
             }
         },
 
@@ -507,8 +458,7 @@ define(['core/str', 'core/notification', 'core/templates'], function(str, notifi
                 // If it is a single use criterion, bubble event up to indicate that we
                 // are no longer using a single-use criterion
                 if (this.criteria[criterionKey].singleuse) {
-                    this.toggleAllSingleUse(true);
-                    this.triggerEvent('singleuse', {used: false});
+                    this.triggerEvent('singleUseCriterion', {used: false, scalevalue: this.pathway.scalevalue});
                     this.showBottomActions();
                 }
 
@@ -600,14 +550,9 @@ define(['core/str', 'core/notification', 'core/templates'], function(str, notifi
             // Handle the case where an existing single-use has been removed, another one added
             // and then the user tries to undo removal of the original criterion
             if (this.markedForDeletionCriteria[criterionKey].singleuse) {
-                var singleUseNode = document.querySelector('[data-tw-editAchievementPaths-singleUse]'),
-                    hasSingleUse = false;
+                var hasSingleUse = this.hasSingleUseCriteria();
 
-                if (singleUseNode) {
-                    hasSingleUse = singleUseNode.getAttribute('data-tw-editAchievementPaths-singleUse');
-                }
-
-                if (hasSingleUse == '1') {
+                if (hasSingleUse) {
                     notification.clearNotifications();
 
                     str.get_string('error_cant_undo_single_use', 'pathway_criteria_group').done(function(message) {
@@ -619,6 +564,8 @@ define(['core/str', 'core/notification', 'core/templates'], function(str, notifi
                         // Scroll to top to make sure that the notification is visible
                         window.scrollTo(0, 0);
                     }).fail(notification.exception);
+
+                    return false;
                 }
             }
 
@@ -630,8 +577,7 @@ define(['core/str', 'core/notification', 'core/templates'], function(str, notifi
             // If it is a single use criterion, bubble event up to indicate that we
             // are using a single-use criterion
             if (this.criteria[criterionKey].singleuse) {
-                this.triggerEvent('singleuse', {used: true});
-                this.toggleAllSingleUse(false);
+                this.triggerEvent('singleUseCriterion', {used: true, scalevalue: this.pathway.scalevalue});
             } else {
                 // Just this pw is affected
                 this.toggleSingleUse(false);
@@ -659,6 +605,23 @@ define(['core/str', 'core/notification', 'core/templates'], function(str, notifi
             this.criteriaLength += 1;
 
         },
+
+        /**
+         * Determine whether we have any single use criteria
+         *
+         * @return {bool}
+         */
+        hasSingleUseCriteria: function() {
+            var singleUseNode = document.querySelector('[data-tw-editAchievementPaths-criteria-singleUse]'),
+                hasSingleUse = 0;
+
+            if (singleUseNode) {
+                hasSingleUse = singleUseNode.getAttribute('data-tw-editAchievementPaths-criteria-singleUse');
+            }
+
+            return !!+hasSingleUse;
+        },
+
 
         /**
          * Trigger event

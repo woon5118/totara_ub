@@ -423,7 +423,7 @@ class criteria_group extends pathway {
             return [
                 'type' => $criterion->get_plugin_type(),
                 'title' => $criterion->get_title(),
-                'singleuse' => $criterion->is_singleuse(),
+                'singleuse' => (int)$criterion->is_singleuse(),
                 'criterion_templatename' => $criterion->get_edit_template(),
             ];
         }, $types);

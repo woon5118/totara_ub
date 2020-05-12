@@ -269,7 +269,7 @@ class external extends \external_api {
             new \external_single_structure([
                 'type' => new \external_value(PARAM_TEXT, 'Criterion type'),
                 'title' => new \external_value(PARAM_TEXT, 'Criterion title'),
-                'singleuse' => new \external_value(PARAM_BOOL, 'Indication whether this is a single-use criterion type'),
+                'singleuse' => new \external_value(PARAM_INT, 'Indication whether this is a single-use criterion type'),
                 'criterion_templatename' => new \external_value(PARAM_TEXT, 'Template to use to display and manage instances of this criterion'),
             ])
         );

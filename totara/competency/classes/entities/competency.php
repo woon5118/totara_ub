@@ -29,6 +29,7 @@ use core\orm\entity\relations\has_many;
 use core\orm\entity\relations\has_one;
 use core\orm\entity\relations\has_one_through;
 use core\orm\query\builder;
+use totara_competency\achievement_configuration;
 use totara_competency\user_groups;
 use totara_hierarchy\entities\hierarchy_item;
 
@@ -161,10 +162,11 @@ class competency extends hierarchy_item {
     /**
      * Retrieve scale_aggregation
      *
-     * @return string Scale aggregation type
+     * @return string|null Scale aggregation type
      */
-    public function get_scale_aggregation_type_attribute(): string {
-        return $this->scale_aggregation->type;
+    public function get_scale_aggregation_type_attribute(): ?string {
+        $scale_aggregation = $this->scale_aggregation;
+        return $scale_aggregation ? $scale_aggregation->type : null;
     }
 
     /**

@@ -207,6 +207,7 @@ $string['enablecompetency_assignment'] = 'Enable Competency Assignment';
 $string['enablecompetency_assignment_desc'] = 'This option will let you: Enable(show)/Disable Competency Assignment feature on this site.';
 $string['enabled'] = 'Enabled';
 $string['error_archive_user_assignment'] = "You do not have the capability to archive this assignment.";
+$string['error_cant_undo_single_use'] = 'This pathway can only be used once per competency. To be able to restore this pathway, first remove the one added after removing this one.';
 $string['error_competencies_out_of_sync'] = 'An error occurred with your selection. {$a} competencies were removed from your selection due to no longer being available for assignment.';
 $string['error_create_assignments'] = 'An error occurred during assignment creation, due to modifications to the competencies or user groups after you selected them. Your selection has been updated to reflect these changes – please verify before proceeding.';
 $string['error_filter_assignment_not_supported'] = 'Filtering by "{$a}" is currently not supported';

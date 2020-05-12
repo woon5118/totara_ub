@@ -231,14 +231,15 @@ class competency_controller extends admin_controller {
                 'name' => get_string('single_value_paths', 'totara_competency'),
                 'templatename' => 'totara_competency/scalevalue_pathways_edit',
                 'classification' => pathway::PATHWAY_SINGLE_VALUE,
+                'singleuse' => false,
             ];
 
         $results = [
             'templatename' => 'totara_competency/achievement_paths',
-            'overall_aggregation' => $this->competency->scale_aggregation->type ?? 'highest',
             'aggregation_types' => $this->get_overall_aggregation_types(),
             'pathway_types' => $pathway_types,
             'criteria_types' => criteria_group::export_criteria_types(),
+            'has_pathways' => count($config->get_active_pathways()) > 0,
             'pathway_groups' => $config->export_pathway_groups(),
         ];
 
@@ -257,6 +258,7 @@ class competency_controller extends admin_controller {
                 'name' => $pw->get_title(),
                 'templatename' => $pw->get_edit_template(),
                 'classification' => $pw->get_classification(),
+                'singleuse' => $pw->is_singleuse(),
             ];
         }, $types);
 
@@ -269,7 +271,7 @@ class competency_controller extends admin_controller {
      * @return array
      */
     private function get_overall_aggregation_types(): array {
-        $competency_agg_type = $this->competency->scale_aggregation->type ?? 'highest';
+        $competency_agg_type = $this->competency->scale_aggregation_type ?? achievement_configuration::DEFAULT_AGGREGATION;
         $agg_methods = achievement_criteria::get_available_overall_aggregation_methods();
 
         return array_map(function (overall_aggregation $method) use ($competency_agg_type) {

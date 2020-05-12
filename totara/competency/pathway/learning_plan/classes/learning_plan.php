@@ -77,6 +77,15 @@ class learning_plan extends pathway {
         return advanced_feature::is_enabled('learningplans');
     }
 
+    /**
+     * Is this a single-use pathway
+     *
+     * @return bool
+     */
+    public function is_singleuse(): bool {
+        return true;
+    }
+
 
     /**
      * Get the current value from the learning plan and aggregate the pathway with it

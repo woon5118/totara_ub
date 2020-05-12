@@ -36,14 +36,11 @@
 
 }}
 
-<div class="tw-editScaleValuePathGroupCriterion__empty {{#criteria}}tw-editAchievementPaths--hidden{{/criteria}}" data-tw-editScaleValuePaths-criterion-empty="">
-    {{#str}}no_criteria, pathway_criteria_group{{/str}}
-</div>
-
 {{#criteria}}
 {{#showand}}{{> totara_competency/divider_and}}{{/showand}}
 
-<div class="tw-editScaleValuePathGroupCriterion" data-tw-editScaleValuePaths-criterion-key="{{key}}" {{#id}}data-tw-editScaleValuePaths-criterion-id="{{.}}"{{/id}}>
+<div class="tw-editScaleValuePathGroupCriterion" data-tw-editScaleValuePaths-criterion-key="{{key}}"
+{{#id}}data-tw-editScaleValuePaths-criterion-id="{{.}}"{{/id}}>
 
     <div class="tw-editScaleValuePathGroupCriterion__detail" data-tw-editScaleValuePaths-criterion-detail="">
         {{> pathway_criteria_group/partial_criterion_detail}}

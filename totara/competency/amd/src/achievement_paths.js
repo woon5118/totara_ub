@@ -146,6 +146,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                 } else if (e.target.closest('[data-tw-editAchievementPaths-aggregation-change]')) {
                     that.setOverallAggregation();
                     that.dirty = true;
+                    that.enableApplyChanges();
                 }
             });
 
@@ -259,6 +260,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                 }
 
                 that.dirty = true;
+                that.enableApplyChanges();
             });
 
             this.widget.addEventListener(pwEvents + 'update', function(e) {
@@ -266,9 +268,10 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                     pw = e.detail.pathway;
 
                 if (!that.pathways[key]) {
-                    that.pathways[key] = {'id': pw.id ? pw.id : 0, 'type': pw.type ? pw.type : ''};
+                    that.pathways[key] = {'id': pw.id || 0, 'type': pw.type || ''};
                     if (pw.scalevalue) {
                         that.singlevalShown = true;
+                        that.toggleSingleUseCriteriaTypes(false, pw.scalevalue);
                     }
                     that.nPaths += 1;
                     that.showHideNoPaths();
@@ -278,6 +281,14 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                 if (pw.type) {
                     delete pw.type;
                 }
+
+                that.pathways[key].singleuse = pw.singleuse || 0;
+                if (that.pathways[key].singleuse) {
+                    // At the moment we have only 1 single use pathway type (learning plan). Need to enhance if there are more
+                    that.toggleSingleUsePathwayTypes(false);
+                }
+                delete pw.singleuse;
+
                 that.pathways[key].detail = pw;
             });
 
@@ -287,11 +298,17 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                 that.removePathway(pwKey);
             });
 
-            this.widget.addEventListener(pwEvents + 'singleuse', function(e) {
-                var isUsed = e.detail.used;
+            this.widget.addEventListener(pwEvents + 'singleUseCriterion', function(e) {
+                var isUsed = e.detail.used,
+                    scaleValueId = e.detail.scalevalue;
 
-                that.widget.setAttribute('data-tw-editAchievementPaths-singleUse', isUsed ? '1' : '0');
-                that.toggleSingleUseCriteriaTypes(!isUsed);
+                that.widget.setAttribute('data-tw-editAchievementPaths-criteria-singleUse', isUsed ? '1' : '0');
+                that.toggleAllSingleUseCriteriaTypes(!isUsed);
+                if (isUsed) {
+                    that.hideAddScaleValuePaths(scaleValueId);
+                } else {
+                    that.showAddScaleValuePaths(scaleValueId);
+                }
             });
 
         },
@@ -343,7 +360,6 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
 
             this.getCriteriaTypes().then(function() {
                 that.setOverallAggregation();
-                that.showHideNoPaths();
             }).catch(function(e) {
                 e.fileName = that.filename;
                 e.name = 'Error retrieving criteria types';
@@ -463,6 +479,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                 that.calculateSortOrderFromDisplay();
                 that.dirty = true;
                 that.showHideNoPaths();
+                that.enableApplyChanges();
                 templates.runTemplateJS('');
             }).catch(function(e) {
                 e.fileName = that.filename;
@@ -533,7 +550,8 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                 pw,
                 criterionType = criterionOptionNode.getAttribute('data-tw-editScaleValuePaths-dropDown-item-type'),
                 criterionKey,
-                criterion;
+                criterion,
+                scaleValueId = svWgt.getAttribute('data-tw-editScaleValuePaths-scale-id');
 
             key = this.getNextKey();
             criterionKey = key + '_criterion_1';
@@ -547,7 +565,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
             pw = {
                 'key': key,
                 'type': pathType,
-                'scalevalue': svWgt.getAttribute('data-tw-editScaleValuePaths-scale-id'),
+                'scalevalue': scaleValueId,
                 'sortorder': 0,
                 'pathway_templatename': 'pathway_criteria_group/pathway_criteria_group_edit',
                 'criteria_type_level': pathType,
@@ -563,8 +581,10 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
             templates.renderAppend(templatename, pw, target).then(function() {
                 target.setAttribute('data-tw-editScaleValuePaths-pathway-list', numPathways + 1);
                 that.hideCriteriaTypeSelectors();
+                that.toggleSingleUseCriteriaTypes(false, scaleValueId);
                 that.calculateSortOrderFromDisplay();
                 that.dirty = true;
+                that.enableApplyChanges();
                 templates.runTemplateJS('');
             }).catch(function(e) {
                 e.fileName = that.filename;
@@ -594,6 +614,10 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
             if (!this.dirty) {
                 return;
             }
+
+            // Resetting dirty early to avoid doubble submissions
+            this.dirty = false;
+            this.disableApplyChanges();
 
             // Generate a key to group all changes together for logging
             // Must convert to seconds to be compatible with PHP timestamps
@@ -656,8 +680,6 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
 
             if (promiseArr.length > 0) {
                 Promise.all(promiseArr).then(function() {
-                    that.dirty = false;
-
                     // TODO: For now simply reloading all pathways. Try to find a way to update ids for keys
                     that.updatePage().then(function() {
                         that.showNotification('success', 'apply_success', 'totara_competency', {});
@@ -667,6 +689,10 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                         notification.exception(e);
                     });
                 }).catch(function(e) {
+                    // If an error occurred while applying - reset dirty flag to allow retry
+                    that.dirty = true;
+                    that.enableApplyChanges();
+
                     e.fileName = that.filename;
                     e.name = 'Error applying changes';
                     notification.exception(e);
@@ -739,7 +765,8 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                     } else if (this.markedForDeletionPathways[pwKey]) {
                         this.markedForDeletionPathways[pwKey].dirty = true;
                     }
-                    this.dirty = true;
+                    // If re-calculating the sortorder is the only change, no user changes so not setting overall dirty flag
+                    // When a user makes changes, that change will result in the overall dirty flag being set
                 }
 
                 pw.sortorder = ++lastOrder;
@@ -771,6 +798,11 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
 
             if (this.pathways[pwKey]) {
                 this.dirty = true;
+                this.enableApplyChanges();
+
+                if (this.pathways[pwKey].singleuse) {
+                    this.toggleSingleUsePathwayTypes(true);
+                }
 
                 if (this.pathways[pwKey].id && this.pathways[pwKey].id != 0) {
                     // Exists on db - show indication that path will be deleted when changes are applied
@@ -820,6 +852,13 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
 
                         numPathways -= 1;
                         pwListNode.setAttribute('data-tw-editScaleValuePaths-pathway-list', numPathways);
+
+                        if (numPathways == 0) {
+                            var hasSingleUseCriteria = this.hasSingleUseCriteria();
+                            if (!hasSingleUseCriteria) {
+                                this.toggleSingleUseCriteriaTypes(true, this.pathways[pwKey].scalevalue);
+                            }
+                        }
                     }
 
                     delete this.pathways[pwKey];
@@ -830,8 +869,6 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                     if (pwTarget) {
                         pwTarget.remove();
                     }
-
-                    this.dirty = true;
                 }
             }
         },
@@ -847,6 +884,29 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
 
             if (!this.markedForDeletionPathways[pwKey]) {
                 return;
+            }
+
+            // Handle the case where an existing single-use pathway has been removed, another one added
+            // and then the user tries to undo removal of the original pathway
+            if (this.markedForDeletionPathways[pwKey].singleuse) {
+                var singleUsePathways = this.widget.querySelectorAll('[data-tw-editAchievementPaths-singleUse-pathway="1"]');
+                if (singleUsePathways.length > 1) {
+                    notification.clearNotifications();
+
+                    str.get_string('error_cant_undo_single_use', 'totara_competency').done(function(message) {
+                        notification.addNotification({
+                            message: message,
+                            type: 'error'
+                        });
+
+                        // Scroll to top to make sure that the notification is visible
+                        window.scrollTo(0, 0);
+                    }).fail(notification.exception);
+
+                    return false;
+                } else {
+                    this.toggleSingleUsePathwayTypes(false);
+                }
             }
 
             copyObj[pwKey] = this.markedForDeletionPathways[pwKey];
@@ -879,8 +939,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
          */
         getCriteriaTypes: function() {
             var that = this,
-                hasSingleUse = this.widget.hasAttribute('data-tw-editAchievementPaths-singleUse')
-                    ? this.widget.getAttribute('data-tw-editAchievementPaths-singleUse') : '0';
+                hasSingleUseCriteria = this.hasSingleUseCriteria();
 
             return new Promise(function(resolve, reject) {
                 if (that.criteriaTypes && that.criteriaTypes.length > 0) {
@@ -896,7 +955,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
 
                         that.criteriaTypes = [];
                         for (var a = 0; a < criteriaTypes.length; a++) {
-                            criteriaTypes[a].disabled = criteriaTypes[a].singleuse && hasSingleUse == '1';
+                            criteriaTypes[a].disabled = !!+criteriaTypes[a].singleuse && hasSingleUseCriteria;
                             that.criteriaTypes.push(criteriaTypes[a]);
                         }
 
@@ -912,55 +971,137 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
         },
 
         /**
+         * Toggle availability of single use pathway types
+         *
+         * @param {bool} allowSingleUse
+         */
+        toggleSingleUsePathwayTypes: function(allowSingleUse) {
+            var pathwayTypeDropDownNode = this.widget.querySelector('[data-tw-editAchievementPaths-add-pathway]'),
+                singleUseOptions;
+
+            if (pathwayTypeDropDownNode) {
+                singleUseOptions = pathwayTypeDropDownNode.querySelectorAll('[data-tw-editachievementpaths-path-singleUse="1"]');
+            }
+
+            if (singleUseOptions) {
+                if (allowSingleUse) {
+                    for (var b = 0; b < singleUseOptions.length; b++) {
+                        singleUseOptions[b].removeAttribute('disabled');
+                    }
+
+                } else {
+                    for (var c = 0; c < singleUseOptions.length; c++) {
+                        singleUseOptions[c].setAttribute('disabled', '');
+                    }
+                }
+            }
+        },
+
+
+        /**
          * Toggle availability of single use criteria types on the scalevalue level
          *
          * @param {bool} allowSingleUse
          */
-        toggleSingleUseCriteriaTypes: function(allowSingleUse) {
+        toggleAllSingleUseCriteriaTypes: function(allowSingleUse) {
             var criteriaDropDownNodes = this.widget.querySelectorAll('[data-tw-editScaleValuePaths-dropDown="scalevalue"]'),
                 scaleValueNode,
                 scaleValueId,
-                singleUseNodes;
+                singleUseOptions;
 
             // Update all criteria type drop downs on the top level only
             for (var a = 0; a < criteriaDropDownNodes.length; a++) {
                 scaleValueNode = criteriaDropDownNodes[a].closest('[data-tw-editScaleValuePaths-scale-id]');
                 scaleValueId = null;
-                singleUseNodes = criteriaDropDownNodes[a].querySelectorAll('[data-tw-editScaleValuePaths-dropDown-singleUse]');
+                singleUseOptions = criteriaDropDownNodes[a].querySelectorAll('[data-tw-editScaleValuePaths-dropDown-item-singleUse="1"]');
 
                 if (scaleValueNode) {
                     scaleValueId = scaleValueNode.getAttribute('data-tw-editScaleValuePaths-scale-id');
                 }
 
-                if (!scaleValueId || !singleUseNodes.length) {
+                if (!scaleValueId || !singleUseOptions.length) {
                     continue;
                 }
 
-                // You can't add single use criteria if there is already a pathway resulting
-                // in the scalevalue
-                // var svAllow = allowSingleUse;
-                // TODO: Fix
-                // var pwKeys;
-                // if (svAllow) {
-                //     pwKeys = this.scalevalues[scalevalue].pathways;
-                //     for (k = 0; k < pwKeys.length; k++) {
-                //         if (this.pathways[pwKeys[k]]) {
-                //             // Not deleted
-                //             svAllow = false;
-                //             break;
-                //         }
-                //     }
-                // }
-
                 if (allowSingleUse) {
-                    for (var b = 0; b < singleUseNodes.length; b++) {
-                        singleUseNodes[b].removeAttribute('disabled');
+                    for (var b = 0; b < singleUseOptions.length; b++) {
+                        singleUseOptions[b].removeAttribute('disabled');
                     }
                 } else {
-                    for (var c = 0; c < singleUseNodes.length; c++) {
-                        singleUseNodes[c].setAttribute('disabled', '');
+                    for (var c = 0; c < singleUseOptions.length; c++) {
+                        singleUseOptions[c].setAttribute('disabled', '');
                     }
                 }
+            }
+        },
+
+        /**
+         * Toggle availability of single use criteria types on a specific scalevalue level
+         *
+         * @param {bool} allowSingleUse
+         * @param int} scalevalueId
+         */
+        toggleSingleUseCriteriaTypes: function(allowSingleUse, scalevalueId) {
+            var scaleValueNode = this.widget.querySelector('[data-tw-editScaleValuePaths-scale-id="' + scalevalueId + '"]'),
+                criteriaDropDownNode,
+                singleUseOptions;
+
+            if (scaleValueNode) {
+                criteriaDropDownNode = scaleValueNode.querySelector('[data-tw-editScaleValuePaths-dropDown="scalevalue"]');
+            }
+
+            if (!criteriaDropDownNode) {
+                return;
+            }
+
+            singleUseOptions = criteriaDropDownNode.querySelectorAll('[data-tw-editScaleValuePaths-dropDown-item-singleUse="1"]');
+            if (singleUseOptions) {
+                if (allowSingleUse) {
+                    for (var b = 0; b < singleUseOptions.length; b++) {
+                        singleUseOptions[b].removeAttribute('disabled');
+                    }
+
+                } else {
+                    for (var c = 0; c < singleUseOptions.length; c++) {
+                        singleUseOptions[c].setAttribute('disabled', '');
+                    }
+                }
+            }
+        },
+
+        /**
+         * Hide Add paths button for a specific scalevalue
+         *
+         * @param {int} scaleValueId
+         */
+        hideAddScaleValuePaths: function(scaleValueId) {
+            var scaleValueNode = this.widget.querySelector('[data-tw-editScaleValuePaths-scale-id="' + scaleValueId + '"]'),
+                addButton;
+
+            if (scaleValueNode) {
+                addButton = scaleValueNode.querySelector('[data-tw-editScaleValuePaths-add]');
+            }
+
+            if (addButton) {
+                addButton.classList.add('tw-editAchievementPaths--hidden');
+            }
+        },
+
+        /**
+         * Show Add paths button for a specific scalevalue
+         *
+         * @param {int} scaleValueId
+         */
+        showAddScaleValuePaths: function(scaleValueId) {
+            var scaleValueNode = this.widget.querySelector('[data-tw-editScaleValuePaths-scale-id="' + scaleValueId + '"]'),
+                addButton;
+
+            if (scaleValueNode) {
+                addButton = scaleValueNode.querySelector('[data-tw-editScaleValuePaths-add]');
+            }
+
+            if (addButton) {
+                addButton.classList.remove('tw-editAchievementPaths--hidden');
             }
         },
 
@@ -1069,6 +1210,36 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
             }
 
             return false;
+        },
+
+        /**
+         * Determine whether we have any single use criteria
+         *
+         * @return {bool}
+         */
+        hasSingleUseCriteria: function() {
+            var hasSingleUse = this.widget.getAttribute('[data-tw-editAchievementPaths-criteria-singleUse]') || 0;
+            return !!+hasSingleUse;
+        },
+
+        /**
+         * Enable the Apply changes button
+         */
+        enableApplyChanges: function() {
+            var applyChangesButton = this.widget.querySelector('[data-tw-editAchievementPaths-action="apply"]');
+            if (applyChangesButton) {
+                applyChangesButton.removeAttribute('disabled');
+            }
+        },
+
+        /**
+         * Disable the Apply changes button
+         */
+        disableApplyChanges: function() {
+            var applyChangesButton = this.widget.querySelector('[data-tw-editAchievementPaths-action="apply"]');
+            if (applyChangesButton) {
+                applyChangesButton.setAttribute('disabled', '');
+            }
         }
 
     };

@@ -50,7 +50,7 @@ data-core-autoinitialise="true"
 data-core-autoinitialise-amd="criteria_linkedcourses/linkedcourses"
 data-tw-loader-target="">
 
-    <div class="tw-editAchievementPaths--hidden" data-tw-criterionLinkedCourses-error="">
+    <div {{^error}}class="tw-editAchievementPaths--hidden"{{/error}} data-tw-criterionLinkedCourses-error="">
         <span class="tw-editAchievementPaths__criterionForm-warning">
             {{#flex_icon}}notification-warning{{/flex_icon}}
             {{#str}}error_not_enough_courses, criteria_linkedcourses{{/str}}

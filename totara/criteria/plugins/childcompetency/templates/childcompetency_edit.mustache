@@ -50,7 +50,7 @@ data-core-autoinitialise="true"
 data-core-autoinitialise-amd="criteria_childcompetency/childcompetency"
 data-tw-loader-target="">
 
-    <div class="tw-editAchievementPaths--hidden" data-tw-criterionChildCompetency-error="">
+    <div {{^error}}class="tw-editAchievementPaths--hidden"{{/error}} data-tw-criterionChildCompetency-error="">
         <span class="tw-editAchievementPaths__criterionForm-warning">
             {{#flex_icon}}notification-warning{{/flex_icon}}
             {{#str}}error_not_enough_children, criteria_childcompetency{{/str}}
@@ -60,7 +60,7 @@ data-tw-loader-target="">
     <form class="tw-editAchievementPaths__criterionForm"
     data-tw-criterionChildCompetency-aggregation="{{#aggregation}}{{method}}{{/aggregation}}{{^aggregation}}1{{/aggregation}}"
     data-tw-criterionChildCompetency-aggregation-reqitems="{{#aggregation}}{{reqitems}}{{/aggregation}}{{^aggregation}}1{{/aggregation}}">
-        
+
         <h5 class="tw-editAchievementPaths__criterionForm-title" id="tw_criterionChildCompetency-radioGroup-label-{{key}}">
             {{#str}}aggregation, totara_criteria{{/str}}
         </h5>
@@ -72,7 +72,7 @@ data-tw-loader-target="">
                 name="tw_criterionChildCompetency_agg__{{key}}"
                 value="1"
                 data-tw-criterionChildCompetency-aggregationMethod-changed="all"/>
-                
+
                 <label class="tw-editAchievementPaths__criterionForm-label" for="tw_criterionChildCompetency_agg_all__{{key}}">
                     {{#str}}complete_all, totara_criteria {{/str}}
                 </label>
@@ -87,7 +87,7 @@ data-tw-loader-target="">
                 name="tw_criterionChildCompetency_agg__{{key}}"
                 value="2"
                 data-tw-criterionChildCompetency-aggregationMethod-changed="any"/>
-                
+
                 <label class="tw-editAchievementPaths__criterionForm-label" for="tw_criterionChildCompetency_agg_any__{{key}}">
                     {{#str}}complete_any, totara_criteria{{/str}}
                 </label>

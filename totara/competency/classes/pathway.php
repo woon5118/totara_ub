@@ -634,6 +634,16 @@ abstract class pathway {
         return (bool)$scale_value->proficient;
     }
 
+    /**
+     * Is this a single-use pathway
+     * Plugins should overwrite if required
+     *
+     * @return bool
+     */
+    public function is_singleuse(): bool {
+        return false;
+    }
+
 
     /*******************************************************************************************************
      * Data exporting
@@ -688,6 +698,7 @@ abstract class pathway {
             'classification' => $this->get_classification(),
             'pathway_templatename' => $this->get_edit_template(),
             'criteria_type_level' => $this->get_path_type(),
+            'singleuse' => $this->is_singleuse(),
         ];
 
         if (!$this->is_valid()) {

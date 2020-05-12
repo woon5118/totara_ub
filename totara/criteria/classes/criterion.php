@@ -1058,7 +1058,9 @@ abstract class criterion {
 
         if ($this->has_items()) {
             $results['items'] = $this->export_edit_items();
-        } else if (!$this->is_valid()) {
+        }
+
+        if (!$this->is_valid()) {
             $results['error'] = $this->export_configuration_error_description();
         }
 
