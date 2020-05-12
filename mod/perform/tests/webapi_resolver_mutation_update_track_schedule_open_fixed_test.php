@@ -53,7 +53,9 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_fixed_test
         $args = [
             'track_schedule' => [
                 'track_id' => $track1->id,
-                'from' => 123,
+                'is_open' => true,
+                'is_fixed' => true,
+                'fixed_from' => 123,
             ],
         ];
 
@@ -63,7 +65,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_fixed_test
         $this->expectException(required_capability_exception::class);
         $this->expectExceptionMessage('Manage performance activities');
 
-        $this->resolve_graphql_mutation('mod_perform_update_track_schedule_open_fixed', $args);
+        $this->resolve_graphql_mutation('mod_perform_update_track_schedule', $args);
     }
 
     public function test_correct_track_is_updated(): void {
@@ -72,7 +74,9 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_fixed_test
         $args = [
             'track_schedule' => [
                 'track_id' => $this->track1_id,
-                'from' => 123,
+                'is_open' => true,
+                'is_fixed' => true,
+                'fixed_from' => 123,
             ],
         ];
 
@@ -81,7 +85,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_fixed_test
         unset($before_tracks[$this->track1_id]->updated_at);
 
         $result = $this->resolve_graphql_mutation(
-            'mod_perform_update_track_schedule_open_fixed',
+            'mod_perform_update_track_schedule',
             $args
         );
         $result_track = $result['track'];
@@ -90,11 +94,13 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_fixed_test
         // Verify the resulting graphql data.
         self::assertEmpty($result_errors);
         self::assertEquals($this->track1_id, $result_track->id);
-        self::assertEquals(track_entity::SCHEDULE_TYPE_OPEN_FIXED, $result_track->schedule_type);
+        self::assertTrue($result_track->schedule_is_open);
+        self::assertTrue($result_track->schedule_is_fixed);
 
         // Manually make the changes that we expect to make.
         $affected_track = $before_tracks[$this->track1_id];
-        $affected_track->schedule_type = track_entity::SCHEDULE_TYPE_OPEN_FIXED;
+        $affected_track->schedule_is_open = 1;
+        $affected_track->schedule_is_fixed = 1;
         $affected_track->schedule_fixed_from = 123;
         $affected_track->schedule_fixed_to = null;
 

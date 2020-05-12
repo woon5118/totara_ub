@@ -25,6 +25,7 @@ namespace mod_perform\formatter\activity;
 
 use core\orm\formatter\entity_model_formatter;
 use core\webapi\formatter\field\string_field_formatter;
+use mod_perform\entities\activity\track as track_entity;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -41,7 +42,8 @@ class track extends entity_model_formatter {
             'id' => null,
             'description' => string_field_formatter::class,
             'status' => null,
-            'schedule_type' => null,
+            'schedule_is_open' => null,
+            'schedule_is_fixed' => null,
             'schedule_fixed_from' => null,
             'schedule_fixed_to' => null,
             'created_at' => null,

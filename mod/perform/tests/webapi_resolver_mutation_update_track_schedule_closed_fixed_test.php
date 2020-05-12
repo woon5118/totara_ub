@@ -54,8 +54,10 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_fixed_te
         $args = [
             'track_schedule' => [
                 'track_id' => $track1->id,
-                'from' => 123,
-                'to' => 234,
+                'is_open' => false,
+                'is_fixed' => true,
+                'fixed_from' => 123,
+                'fixed_to' => 234,
             ],
         ];
 
@@ -65,7 +67,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_fixed_te
         $this->expectException(required_capability_exception::class);
         $this->expectExceptionMessage('Manage performance activities');
 
-        $this->resolve_graphql_mutation('mod_perform_update_track_schedule_closed_fixed', $args);
+        $this->resolve_graphql_mutation('mod_perform_update_track_schedule', $args);
     }
 
     public function test_correct_track_is_updated(): void {
@@ -74,8 +76,10 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_fixed_te
         $args = [
             'track_schedule' => [
                 'track_id' => $this->track1_id,
-                'from' => 123,
-                'to' => 234,
+                'is_open' => false,
+                'is_fixed' => true,
+                'fixed_from' => 123,
+                'fixed_to' => 234,
             ],
         ];
 
@@ -84,7 +88,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_fixed_te
         unset($before_tracks[$this->track1_id]->updated_at);
 
         $result = $this->resolve_graphql_mutation(
-            'mod_perform_update_track_schedule_closed_fixed',
+            'mod_perform_update_track_schedule',
             $args
         );
         $result_track = $result['track'];
@@ -93,11 +97,13 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_fixed_te
         // Verify the resulting graphql data.
         self::assertEmpty($result_errors);
         self::assertEquals($this->track1_id, $result_track->id);
-        self::assertEquals(track_entity::SCHEDULE_TYPE_CLOSED_FIXED, $result_track->schedule_type);
+        self::assertFalse($result_track->schedule_is_open);
+        self::assertTrue($result_track->schedule_is_fixed);
 
         // Manually make the changes that we expect to make.
         $affected_track = $before_tracks[$this->track1_id];
-        $affected_track->schedule_type = track_entity::SCHEDULE_TYPE_CLOSED_FIXED;
+        $affected_track->schedule_is_open = 0;
+        $affected_track->schedule_is_fixed = 1;
         $affected_track->schedule_fixed_from = 123;
         $affected_track->schedule_fixed_to = 234;
 
@@ -115,22 +121,25 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_fixed_te
         $args = [
             'track_schedule' => [
                 'track_id' => $this->track1_id,
-                'from' => 234,
-                'to' => 123,
+                'is_open' => false,
+                'is_fixed' => true,
+                'fixed_from' => 234,
+                'fixed_to' => 123,
             ],
         ];
 
-        $result = graphql::execute_operation(
-            $this->get_execution_context('ajax', 'mod_perform_update_track_schedule_closed_fixed'),
+        $result = $this->resolve_graphql_mutation(
+            'mod_perform_update_track_schedule',
             $args
-        )->toArray(true)['data']['mod_perform_update_track_schedule_closed_fixed'];
+        );
         $result_track = $result['track'];
         $result_errors = $result['validation_errors'];
 
         // Verify resulting graphql data.
         self::assertNotEmpty($result_errors);
-        self::assertEquals('schedule_fixed_closed_order_validation', $result_errors[0]['error_code']);
-        self::assertEquals(-1, $result_track['schedule_type']);
+        self::assertEquals('schedule_fixed_closed_order_validation', $result_errors[0]->error_code);
+        self::assertEquals(-1, $result_track->schedule_is_open);
+        self::assertEquals(-1, $result_track->schedule_is_fixed);
 
         $after_tracks = $DB->get_records('perform_track', [], 'id');
         self::assertEquals($after_tracks, $before_tracks);

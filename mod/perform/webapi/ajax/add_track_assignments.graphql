@@ -5,7 +5,8 @@ mutation mod_perform_add_track_assignments(
     id
     description
     status
-    schedule_type
+    schedule_is_open
+    schedule_is_fixed
     schedule_fixed_from
     schedule_fixed_to
     assignments {

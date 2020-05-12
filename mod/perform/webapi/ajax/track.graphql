@@ -3,7 +3,8 @@ query mod_perform_track($track_id: param_integer!) {
     id
     description
     status
-    schedule_type
+    schedule_is_open
+    schedule_is_fixed
     schedule_fixed_from
     schedule_fixed_to
     assignments {

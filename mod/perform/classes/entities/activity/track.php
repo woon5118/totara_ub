@@ -36,7 +36,8 @@ use core\orm\entity\relations\has_many_through;
  * @property int $activity_id parent activity record id
  * @property string $description track description
  * @property int $status track status
- * @property int $schedule_type one of the constants SCHEDULE_TYPE_XXX
+ * @property bool $schedule_is_open
+ * @property bool $schedule_is_fixed
  * @property int $schedule_fixed_from when schedule type is FIXED, contains the start date of assignment
  * @property int $schedule_fixed_to when schedule type is CLOSED_FIXED, contains the end date of assignment
  * @property int $created_at record creation time
@@ -52,11 +53,6 @@ class track extends entity {
 
     public const STATUS_ACTIVE = 1;
     public const STATUS_PAUSED = 0;
-
-    public const SCHEDULE_TYPE_OPEN_FIXED = 0;
-    public const SCHEDULE_TYPE_CLOSED_FIXED = 1;
-    public const SCHEDULE_TYPE_OPEN_DYNAMIC = 2;
-    public const SCHEDULE_TYPE_CLOSED_DYNAMIC = 3;
 
     /**
      * Establishes the relationship with activity entities.

@@ -946,9 +946,9 @@ function xmldb_perform_upgrade($oldversion) {
     }
 
     if ($oldversion < 2020051100) {
-        // Define field schedule_fixed_from to be added to perform_track.
         $table = new xmldb_table('perform_track');
 
+        // Define field schedule_fixed_from to be added to perform_track.
         $field = new xmldb_field('schedule_fixed_from', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'schedule_type');
 
         // Conditionally launch add field schedule_fixed_from.
@@ -956,12 +956,14 @@ function xmldb_perform_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
+        // Define field schedule_fixed_to to be added to perform_track.
         $field = new xmldb_field('schedule_fixed_to', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'schedule_fixed_from');
 
         // Conditionally launch add field schedule_fixed_to.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
+
         // Perform savepoint reached.
         upgrade_mod_savepoint(true, 2020051100, 'perform');
     }
@@ -974,6 +976,37 @@ function xmldb_perform_upgrade($oldversion) {
 
         // Launch change of precision for field name.
         $dbman->change_field_precision($table, $field);
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020051300, 'perform');
+    }
+
+    if ($oldversion < 2020051300) {
+        $table = new xmldb_table('perform_track');
+
+        // Define field schedule_is_open to be added to perform_track.
+        $field = new xmldb_field('schedule_is_open', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, 1, 'status');
+
+        // Conditionally launch add field schedule_is_open.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field schedule_is_fixed to be added to perform_track.
+        $field = new xmldb_field('schedule_is_fixed', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, 1, 'schedule_is_open');
+
+        // Conditionally launch add field schedule_is_fixed.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field schedule_type to be dropped from perform_track.
+        $field = new xmldb_field('schedule_type');
+
+        // Conditionally launch drop field schedule_type.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
 
         // Perform savepoint reached.
         upgrade_mod_savepoint(true, 2020051300, 'perform');

@@ -178,7 +178,8 @@ class mod_perform_webapi_query_tracks_testcase extends advanced_testcase {
             'description' => $resolve('description'),
             'status' => $resolve('status'),
             'assignments' => $resolve('assignments'),
-            'schedule_type' => $resolve('schedule_type'),
+            'schedule_is_open' => $resolve('schedule_is_open'),
+            'schedule_is_fixed' => $resolve('schedule_is_fixed'),
             'schedule_fixed_from' => $resolve('schedule_fixed_from'),
             'schedule_fixed_to' => $resolve('schedule_fixed_to'),
         ];

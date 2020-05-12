@@ -52,6 +52,8 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_dynamic_te
         $args = [
             'track_schedule' => [
                 'track_id' => $track1->id,
+                'is_open' => true,
+                'is_fixed' => false,
             ],
         ];
 
@@ -61,7 +63,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_dynamic_te
         $this->expectException(required_capability_exception::class);
         $this->expectExceptionMessage('Manage performance activities');
 
-        $this->resolve_graphql_mutation('mod_perform_update_track_schedule_open_dynamic', $args);
+        $this->resolve_graphql_mutation('mod_perform_update_track_schedule', $args);
     }
 
     public function test_correct_track_is_updated(): void {
@@ -78,7 +80,8 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_dynamic_te
         $activities = $perform_generator->create_full_activities($configuration);
 
         // Before we test, set them all to closed fixed, so we can see the effect of changing to open fixed.
-        $DB->set_field('perform_track', 'schedule_type', track_entity::SCHEDULE_TYPE_CLOSED_DYNAMIC);
+        $DB->set_field('perform_track', 'schedule_is_open', false);
+        $DB->set_field('perform_track', 'schedule_is_fixed', true);
 
         /** @var activity $activity1 */
         $activity1 = $activities->first();
@@ -88,6 +91,8 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_dynamic_te
         $args = [
             'track_schedule' => [
                 'track_id' => $track1->id,
+                'is_open' => true,
+                'is_fixed' => false,
             ],
         ];
 
@@ -96,17 +101,19 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_dynamic_te
         unset($before_tracks[$track1->id]->updated_at);
 
         $updated_track = $this->resolve_graphql_mutation(
-            'mod_perform_update_track_schedule_open_dynamic',
+            'mod_perform_update_track_schedule',
             $args
         )['track'];
 
         // Verify the resulting graphql data.
         self::assertEquals($track1->id, $updated_track->id);
-        self::assertEquals(track_entity::SCHEDULE_TYPE_OPEN_DYNAMIC, $updated_track->schedule_type);
+        self::assertTrue($updated_track->schedule_is_open);
+        self::assertFalse($updated_track->schedule_is_fixed);
 
         // Manually make the changes that we expect to make.
         $affected_track = $before_tracks[$track1->id];
-        $affected_track->schedule_type = track_entity::SCHEDULE_TYPE_OPEN_DYNAMIC;
+        $affected_track->schedule_is_open = 1;
+        $affected_track->schedule_is_fixed = 0;
 
         $after_tracks = $DB->get_records('perform_track', [], 'id');
         unset($after_tracks[$track1->id]->updated_at);

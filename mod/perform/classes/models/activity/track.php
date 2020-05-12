@@ -36,7 +36,8 @@ use mod_perform\user_groups\grouping;
  * @property-read int $activity_id
  * @property-read string $description
  * @property-read int $status
- * @property-read int $schedule_type
+ * @property-read bool $schedule_is_open
+ * @property-read bool $schedule_is_fixed
  * @property-read int $schedule_fixed_from
  * @property-read int $schedule_fixed_to
  * @property-read int $created_at
@@ -52,7 +53,8 @@ class track extends model {
         'activity_id',
         'description',
         'status',
-        'schedule_type',
+        'schedule_is_open',
+        'schedule_is_fixed',
         'schedule_fixed_from',
         'schedule_fixed_to',
         'created_at',
@@ -93,7 +95,7 @@ class track extends model {
         $entity->activity_id = $parent->get_id();
         $entity->description = $description;
         $entity->status = track_status::ACTIVE;
-        $entity->schedule_type = track_entity::SCHEDULE_TYPE_OPEN_FIXED;
+        $entity->schedule_is_open = true;
         $entity->save();
 
         return new track($entity);
@@ -272,7 +274,8 @@ class track extends model {
             throw new schedule_validation_exception('schedule_fixed_closed_order_validation', 'mod_perform');
         }
 
-        $entity->schedule_type = track_entity::SCHEDULE_TYPE_CLOSED_FIXED;
+        $entity->schedule_is_open = false;
+        $entity->schedule_is_fixed = true;
         $entity->schedule_fixed_from = $from;
         $entity->schedule_fixed_to = $to;
 
@@ -287,7 +290,8 @@ class track extends model {
     public function update_schedule_open_fixed(int $from): void {
         $entity = $this->entity;
 
-        $entity->schedule_type = track_entity::SCHEDULE_TYPE_OPEN_FIXED;
+        $entity->schedule_is_open = true;
+        $entity->schedule_is_fixed = true;
         $entity->schedule_fixed_from = $from;
         $entity->schedule_fixed_to = null;
 
@@ -302,7 +306,8 @@ class track extends model {
     public function update_schedule_closed_dynamic(): void {
         $entity = $this->entity;
 
-        $entity->schedule_type = track_entity::SCHEDULE_TYPE_CLOSED_DYNAMIC;
+        $entity->schedule_is_open = false;
+        $entity->schedule_is_fixed = false;
 
         $entity->update();
     }
@@ -315,7 +320,8 @@ class track extends model {
     public function update_schedule_open_dynamic(): void {
         $entity = $this->entity;
 
-        $entity->schedule_type = track_entity::SCHEDULE_TYPE_OPEN_DYNAMIC;
+        $entity->schedule_is_open = true;
+        $entity->schedule_is_fixed = false;
 
         $entity->update();
     }

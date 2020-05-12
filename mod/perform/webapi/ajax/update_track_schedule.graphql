@@ -1,14 +1,13 @@
-mutation mod_perform_update_track_schedule_closed_fixed(
-  $track_schedule: mod_perform_track_schedule_closed_fixed_input!
+mutation mod_perform_update_track_schedule(
+  $track_schedule: mod_perform_track_schedule_input!
 ) {
-  mod_perform_update_track_schedule_closed_fixed(
-    track_schedule: $track_schedule
-  ) {
+  mod_perform_update_track_schedule(track_schedule: $track_schedule) {
     track {
       id
       description
       status
-      schedule_type
+      schedule_is_open
+      schedule_is_fixed
       schedule_fixed_from
       schedule_fixed_to
       assignments {
