@@ -89,3 +89,114 @@ function totara_plan_upgrade_remove_evidence_tables() {
         }
     }
 }
+
+/** Covert any programs assigned to plans as actual program assignments using the new plan assignment type.
+ *
+ * Also ensure program messages will not be inadvertently sent due to this.
+ *
+ * The new plan assignment type was introduced via TL-24703
+ */
+function totara_plan_upgrade_do_program_assignments() {
+    global $DB;
+
+    $prog_messages = [];
+    $prog_coursesets = [];
+    $now = time();
+
+    $sql = "SELECT DISTINCT(p.id), p.userid
+              FROM {dp_plan} p
+              JOIN {dp_plan_program_assign} ppa on ppa.planid = p.id";
+    $records = $DB->get_records_sql($sql);
+
+    foreach ($records as $record) {
+        // Do the assignment(s), can be multiple programs for the user.
+        \totara_program\assignment\plan::update_plan_assignments($record->userid, $record->id);
+
+        // Get all that have just been assigned.
+        $assignments = \totara_program\assignment\plan::get_user_assignments($record->userid, $record->id);
+
+        // Ensure program messages are not going to be inadvertently sent due to the new assignment.
+        foreach ($assignments as $assignmentid => $programid) {
+            // Did the user already have an assignment to this program?
+            $sql = "SELECT 1
+                      FROM {prog_user_assignment} pua
+                      JOIN {prog_assignment} pa ON pa.id = pua.assignmentid
+                     WHERE pua.userid = :userid
+                       AND pua.programid = :programid
+                       AND pa.assignmenttype != :assignmenttype";
+            $params = [
+                'userid' => $record->userid,
+                'programid' => $programid,
+                'assignmenttype' => ASSIGNTYPE_PLAN,
+            ];
+            $alreadyassigned = $DB->record_exists_sql($sql, $params);
+            if ($alreadyassigned) {
+                // User already had an assignment.
+                continue;
+            }
+
+            $insertrecords = [];
+
+            // Loop through all messages set for the program.
+            if (!isset($prog_messages[$programid])) {
+                $prog_messages[$programid] = $DB->get_records('prog_message', ['programid' => $programid]);
+            }
+            foreach ($prog_messages[$programid] as $prog_message) {
+                $todb = [
+                    'messageid' => $prog_message->id,
+                    'userid' => $record->userid,
+                    'coursesetid' => 0
+                ];
+
+                if ($DB->record_exists('prog_messagelog', $todb)) {
+                    // Message has already been sent.
+                    continue;
+                }
+
+                switch ($prog_message->messagetype) {
+                    case MESSAGETYPE_ENROLMENT:
+                    case MESSAGETYPE_PROGRAM_COMPLETED:
+                        // Ensure the enrolment and completed message do not get sent.
+                        $todb['timeissued'] = $now;
+                        $insertrecords[] = $todb;
+                        break;
+                    case MESSAGETYPE_COURSESET_DUE:
+                    case MESSAGETYPE_COURSESET_OVERDUE:
+                    case MESSAGETYPE_COURSESET_COMPLETED:
+                        // Get the programs coursesets.
+                        if (!isset($prog_coursesets[$programid])) {
+                            $prog_coursesets[$programid] = $DB->get_records('prog_courseset', ['programid' => $programid], 'id ASC', 'id');
+                        }
+                        // Ensure the courseset related messages do not get sent.
+                        foreach ($prog_coursesets[$programid] as $courseset) {
+                            $todb['coursesetid'] = $courseset->id;
+                            unset($todb['timeissued']);
+                            if (!$DB->record_exists('prog_messagelog', $todb)) {
+                                $todb['timeissued'] = $now;
+                                $insertrecords[] = $todb;
+                            }
+                        }
+                        break;
+                    case MESSAGETYPE_PROGRAM_DUE:
+                        $timedue = $DB->get_field('prog_completion', 'timedue', ['programid' => $programid, 'userid' => $record->userid]);
+                        if ($timedue && $timedue > 0 && (($timedue - $prog_message->triggertime) < $now)) {
+                            $todb['timeissued'] = $now;
+                            $insertrecords[] = $todb;
+                        }
+                        break;
+                    case MESSAGETYPE_PROGRAM_OVERDUE:
+                        $timedue = $DB->get_field('prog_completion', 'timedue', ['programid' => $programid, 'userid' => $record->userid]);
+                        if ($timedue && $timedue > 0 && (($timedue + $prog_message->triggertime) < $now)) {
+                            $todb['timeissued'] = $now;
+                            $insertrecords[] = $todb;
+                        }
+                        break;
+                }
+            }
+            if ($insertrecords) {
+                $DB->insert_records('prog_messagelog', $insertrecords);
+            }
+        }
+    }
+    return true;
+}

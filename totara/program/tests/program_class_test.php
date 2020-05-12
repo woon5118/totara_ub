@@ -442,8 +442,10 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
 
         // Set the status to approved.
         $plan->set_status(DP_PLAN_STATUS_APPROVED);
+        \totara_program\assignment\plan::update_plan_assignments($user->id, $plan->id);
 
-        $expected = '<p>This user is assigned for the following reasons:</p><ul><li>Assigned via learning plan.</li></ul>';
+        $description = "Assigned via learning plan, (" . $plan->name . ").";
+        $expected = '<p>This user is assigned for the following reasons:</p><ul><li class="assignmentcriteria"><span class="criteria">' . $description . '</span></li></ul>';
         $returnedreason = $program1->display_completion_record_reason($user);
         $this->assertEquals($expected, $returnedreason);
     }
@@ -1346,8 +1348,6 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
         plan_activate_plan($plan);
 
         $program->update_learner_assignments(true);
-
-        $this->assertTrue($program->assigned_through_plan($planuser->id));
 
         // Is now assigned through a plan.
         $this->assertTrue($program->user_is_assigned($planuser->id));

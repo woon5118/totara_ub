@@ -86,7 +86,7 @@ final class external extends \external_api {
         require_once($CFG->dirroot . '/totara/program/program.class.php');
 
         // Check manage program capability
-        if (!helper::can_update($programid)) {
+        if (!helper::can_update($programid, $typeid)) {
             throw new \moodle_exception('error:cannotupdateassignment', 'totara_program');
         }
 
@@ -161,6 +161,16 @@ final class external extends \external_api {
         $context = \context_program::instance($programid);
         self::validate_context($context);
 
+        // Exclude categorys that don't have a UI.
+        $catwithoutui = helper::get_types_with_ui(true);
+        if ($catwithoutui) {
+            list($catwithoutuiin, $catwithoutuiparams) = $DB->get_in_or_equal(array_flip($catwithoutui), SQL_PARAMS_NAMED, 'param', false);
+            $catwithoutuisql = "assignmenttype $catwithoutuiin";
+        } else {
+            $catwithoutuisql = '1=1';
+            $catwithoutuiparams = [];
+        }
+
         // Get all assignments that match category and programid
         if (!empty($categories)) {
             list($catin, $catparams) = $DB->get_in_or_equal($categories, SQL_PARAMS_NAMED);
@@ -185,8 +195,8 @@ final class external extends \external_api {
 
         $sql = "SELECT * FROM {prog_assignment}
                 WHERE programid = :programid
-                AND $catsql AND $recentsql";
-        $params = array_merge(['programid' => $programid], $catparams, $recentparams);
+                AND $catwithoutuisql AND $catsql AND $recentsql";
+        $params = array_merge(['programid' => $programid], $catwithoutuiparams, $catparams, $recentparams);
 
         $records = $DB->get_records_sql($sql, $params);
 
@@ -257,7 +267,7 @@ final class external extends \external_api {
         // Create instance of the assignment
         $assignment = base::create_from_id($assignmentid);
 
-        if (!helper::can_update($assignment->get_programid())) {
+        if (!helper::can_update($assignment->get_programid(), $assignment->get_type())) {
             throw new \moodle_exception('error:cannotupdateassignment', 'totara_program');
         }
 
@@ -312,7 +322,7 @@ final class external extends \external_api {
         }
 
         // Check user permissions
-        if (!helper::can_update($assignment->get_programid())) {
+        if (!helper::can_update($assignment->get_programid(), $assignment->get_type())) {
             throw new \moodle_exception('error:cannotupdateassignment', 'totara_program');
         }
 
@@ -375,7 +385,7 @@ final class external extends \external_api {
             throw new \moodle_exception('error:cannotupdateduedate', 'totara_program');
         }
 
-        if (!helper::can_update($assignment->get_programid())) {
+        if (!helper::can_update($assignment->get_programid(), $assignment->get_type())) {
             throw new \moodle_exception('error:cannotupdateassignment', 'totara_program');
         }
 
@@ -421,7 +431,7 @@ final class external extends \external_api {
 
         $assignment = base::create_from_id($assignmentid);
 
-        if (!helper::can_update($assignment->get_programid())) {
+        if (!helper::can_update($assignment->get_programid(), $assignment->get_type())) {
             throw new \moodle_exception('error:cannotupdateassignment', 'totara_program');
         }
 

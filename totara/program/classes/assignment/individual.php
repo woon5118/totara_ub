@@ -199,7 +199,7 @@ class individual extends base {
     public function get_actual_duedate() {
         global $CFG;
 
-        if (!helper::can_update($this->programid)) {
+        if (!helper::can_update($this->programid, $this->get_type())) {
             return false;
         }
 

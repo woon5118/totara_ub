@@ -2101,60 +2101,30 @@ function prog_update_available_enrolments(enrol_totara_program_plugin $program_p
             // Check to see if the user should still be able to access the course.
             $userid = $enrolment->userid;
 
-            $sql = "SELECT ppa.programid
-                      FROM {dp_plan_program_assign} ppa
-                      JOIN {prog} p ON p.id = ppa.programid AND p.available = :progisavailable1
-                      JOIN {dp_plan} pln ON pln.id = ppa.planid
-                      JOIN {prog_courseset} pcs ON ppa.programid = pcs.programid
-                      JOIN {prog_courseset_course} pcsc ON pcs.id = pcsc.coursesetid AND pcsc.courseid = :courseid1
-                     WHERE ppa.approved >= :ppaapproved1
-                       AND pln.userid = :userid1
-                       AND pln.status >= :plnstatusapproved1
-                     UNION
-                    SELECT ppa.programid
-                      FROM {dp_plan_program_assign} ppa
-                      JOIN {prog} p ON p.id = ppa.programid AND p.available = :progisavailable2
-                      JOIN {dp_plan} pln ON pln.id = ppa.planid
-                      JOIN {prog_courseset} pcs ON ppa.programid = pcs.programid
-                      JOIN {comp_criteria} cc ON cc.competencyid = pcs.competencyid AND cc.iteminstance = :courseid2
-                     WHERE ppa.approved >= :ppaapproved2
-                       AND pln.userid = :userid2
-                       AND pln.status >= :plnstatusapproved2
-                     UNION
-                    SELECT pua.programid
+           $sql = " SELECT pua.programid
                       FROM {prog_user_assignment} pua
-                      JOIN {prog} p ON p.id = pua.programid AND p.available = :progisavailable3
+                      JOIN {prog} p ON p.id = pua.programid AND p.available = :progisavailable1
                       JOIN {prog_completion} pc ON pua.programid = pc.programid AND pua.userid = pc.userid
                       JOIN {prog_courseset} pcs ON pua.programid = pcs.programid
-                      JOIN {prog_courseset_course} pcsc ON pcs.id = pcsc.coursesetid AND pcsc.courseid = :courseid3
-                     WHERE pua.userid = :userid3
+                      JOIN {prog_courseset_course} pcsc ON pcs.id = pcsc.coursesetid AND pcsc.courseid = :courseid1
+                     WHERE pua.userid = :userid1
                        AND pc.coursesetid = 0
                      UNION
                     SELECT pua.programid
                       FROM {prog_user_assignment} pua
-                      JOIN {prog} p ON p.id = pua.programid AND p.available = :progisavailable4
+                      JOIN {prog} p ON p.id = pua.programid AND p.available = :progisavailable2
                       JOIN {prog_completion} pc ON pua.programid = pc.programid AND pua.userid = pc.userid
                       JOIN {prog_courseset} pcs ON pua.programid = pcs.programid
-                      JOIN {comp_criteria} cc ON cc.competencyid = pcs.competencyid AND cc.iteminstance = :courseid4
-                     WHERE pua.userid = :userid4
+                      JOIN {comp_criteria} cc ON cc.competencyid = pcs.competencyid AND cc.iteminstance = :courseid2
+                     WHERE pua.userid = :userid2
                        AND pc.coursesetid = 0";
             $params = array(
                 'progisavailable1' => AVAILABILITY_TO_STUDENTS,
-                'courseid1'  => $courseid,
-                'ppaapproved1'  => DP_APPROVAL_APPROVED,
-                'userid1'  => $userid,
-                'plnstatusapproved1' => DP_PLAN_STATUS_APPROVED,
+                'courseid1' => $courseid,
+                'userid1' => $userid,
                 'progisavailable2' => AVAILABILITY_TO_STUDENTS,
-                'courseid2'  => $courseid,
-                'ppaapproved2'  => DP_APPROVAL_APPROVED,
-                'userid2'  => $userid,
-                'plnstatusapproved2' => DP_PLAN_STATUS_APPROVED,
-                'progisavailable3' => AVAILABILITY_TO_STUDENTS,
-                'courseid3' => $courseid,
-                'userid3' => $userid,
-                'progisavailable4' => AVAILABILITY_TO_STUDENTS,
-                'courseid4' => $courseid,
-                'userid4' => $userid,
+                'courseid2' => $courseid,
+                'userid2' => $userid,
             );
             $result = $DB->get_records_sql($sql, $params);
             if (empty($result)) {
@@ -3487,13 +3457,8 @@ function prog_load_all_completions($userid) {
 function prog_conditionally_delete_completion($programid, $userid) {
     $program = new program($programid);
 
-    // Check that the program is not still assigned to the program.
+    // Check that the user is not still assigned to the program.
     if ($program->assigned_to_users_required_learning($userid)) {
-        return;
-    }
-
-    // Check that the program is not still assigned to a Learning Plan.
-    if ($program->assigned_to_users_non_required_learning($userid)) {
         return;
     }
 

@@ -33,7 +33,8 @@ $USER_ASSIGNMENT_CLASSNAMES = array(
     ASSIGNTYPE_POSITION     => 'prog_position_assignment',
     ASSIGNTYPE_COHORT       => 'prog_cohort_assignment',
     ASSIGNTYPE_MANAGERJA    => 'prog_manager_assignment',
-    ASSIGNTYPE_INDIVIDUAL   => 'prog_individual_assignment'
+    ASSIGNTYPE_INDIVIDUAL   => 'prog_individual_assignment',
+    ASSIGNTYPE_PLAN         => 'prog_plan_assignment'
 );
 
 abstract class prog_user_assignment {
@@ -192,6 +193,31 @@ class prog_individual_assignment extends prog_user_assignment {
         $out .= get_string('assignedasindividual', 'totara_program');
         $out .= html_writer::end_tag('span');
         $out .= html_writer::end_tag('li');
+        return $out;
+    }
+}
+
+class prog_plan_assignment extends prog_user_assignment {
+
+    /**
+     * Returns the assignment criteria as a string
+     *
+     * @return string
+     */
+    public function display_criteria() : string {
+        global $DB;
+
+        // get plan name.
+        $a = new stdClass();
+        $a->planname = format_string($DB->get_field('dp_plan', 'name', ['id' => $this->assignment->assignmenttypeid]));
+
+        $out = '';
+        $out .= html_writer::start_tag('li', array('class' => 'assignmentcriteria'));
+        $out .= html_writer::start_tag('span', array('class' => 'criteria'));
+        $out .= get_string('assignedvialearningplan', 'totara_program', $a);
+        $out .= html_writer::end_tag('span');
+        $out .= html_writer::end_tag('li');
+
         return $out;
     }
 }

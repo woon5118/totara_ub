@@ -60,6 +60,26 @@ class base {
     }
 
     /**
+     * Should the assignment type be used via the user interface?
+     *
+     * @return bool
+     */
+    public static function show_in_ui() :bool {
+        return true;
+    }
+
+    /**
+     * Can the assignment be updated?
+     *
+     * @param int $programid
+     * @return bool
+     */
+    public static function can_be_updated(int $programid) : bool {
+        $program_context = \context_program::instance($programid);
+        return has_capability('totara/program:configureassignments', $program_context);
+    }
+
+    /**
      * Load program object for this assignment
      */
     private function ensure_program_loaded() {
@@ -174,6 +194,15 @@ class base {
     }
 
     /**
+     * Get the instanceid
+     *
+     * @return int
+     */
+    public function get_instanceid() : int {
+        return $this->instanceid;
+    }
+
+    /**
      * Set include children value
      *
      * @param bool
@@ -231,7 +260,7 @@ class base {
 
         require_once($CFG->dirroot . '/totara/program/program_assignments.class.php');
 
-        $canupdate = helper::can_update($this->programid);
+        $canupdate = helper::can_update($this->programid, $this->get_type());
 
         $completiondate = new \stdClass();
 
@@ -287,7 +316,7 @@ class base {
      * Get actual duedate null by default
      */
     public function get_actual_duedate() {
-        if (!helper::can_update($this->programid)) {
+        if (!helper::can_update($this->programid, $this->get_type())) {
             return get_string('noduedate', 'totara_program');
         }
         return null;
@@ -318,7 +347,7 @@ class base {
     public function save(): bool {
         global $DB;
 
-        $canupdate = helper::can_update($this->programid);
+        $canupdate = helper::can_update($this->programid, $this->typeid);
         if (!$canupdate) {
             return false;
         }
@@ -374,7 +403,7 @@ class base {
     public function remove(): bool {
         global $DB;
 
-        $canupdate = helper::can_update($this->programid);
+        $canupdate = helper::can_update($this->programid, $this->get_type());
         if (!$canupdate) {
             return false;
         }
@@ -428,7 +457,7 @@ class base {
     public function set_duedate(int $duedate, int $completionevent = 0, int $completioninstance = 0) {
         global $DB, $CFG;
 
-        $canupdate = helper::can_update($this->programid);
+        $canupdate = helper::can_update($this->programid, $this->get_type());
         if (!$canupdate) {
             return false;
         }
@@ -449,6 +478,7 @@ class base {
 
         $assignment = new \stdClass();
         $assignment->id = $this->id;
+        $assignment->programid = $this->programid;
         $assignment->assignmenttypeid = $this->instanceid;
         $assignment->completionevent = $this->completionevent;
         $assignment->completiontime = $this->completiontime;
@@ -705,6 +735,7 @@ class base {
         // Create a dummy assignment object to use in this function.
         $progassignment = new \stdClass();
         $progassignment->id = $this->id;
+        $progassignment->programid = $this->programid;
         $progassignment->assignmenttypeid = $this->instanceid;
         $progassignment->completionevent = $this->completionevent;
         $progassignment->completiontime = $this->completiontime;

@@ -92,7 +92,7 @@ if (!empty($CFG->enablelegacyprogramassignments)) {
 }
 
 // Define the categorys to appear on the page
-$categories = prog_assignment_category::get_categories();
+$categories = prog_assignment_category::get_categories(true);
 
 if ($data = data_submitted()) {
 

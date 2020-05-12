@@ -52,8 +52,14 @@ if (!$plan->can_view()) {
 }
 
 // Check the item is in this plan
-if (!$DB->record_exists('dp_plan_program_assign', array('planid' => $plan->id, 'id' => $progassid))) {
+$programid = $DB->get_field('dp_plan_program_assign', 'programid', array('planid' => $plan->id, 'id' => $progassid));
+if (!$programid) {
     print_error('error:itemnotinplan', 'totara_plan');
+}
+
+// Ensure the program is viewable.
+if (!totara_program_is_viewable($programid)) {
+    print_error('error:inaccessible', 'totara_program');
 }
 
 $systemcontext = context_system::instance();
@@ -69,28 +75,25 @@ local_js(array(
 ));
 
 // Get extension dialog content
-if ($programid = $DB->get_field('dp_plan_program_assign', 'programid', array('id' => $progassid))) {
+$PAGE->requires->strings_for_js(array('pleaseentervaliddate', 'pleaseentervalidreason', 'extensionrequest', 'cancel', 'ok'), 'totara_program');
+$PAGE->requires->strings_for_js(array('datepickerlongyeardisplayformat', 'datepickerlongyearplaceholder', 'datepickerlongyearregexjs'), 'totara_core');
 
-    $PAGE->requires->strings_for_js(array('pleaseentervaliddate', 'pleaseentervalidreason', 'extensionrequest', 'cancel', 'ok'), 'totara_program');
-    $PAGE->requires->strings_for_js(array('datepickerlongyeardisplayformat', 'datepickerlongyearplaceholder', 'datepickerlongyearregexjs'), 'totara_core');
+$args = array(
+    'args' => json_encode((object)[
+        'id' => $programid,
+        'userid' => $USER->id,
+        'user_fullname' => fullname($USER),
+        'notify_html_fail' => trim($OUTPUT->notification(get_string("extensionrequestnotsent", "totara_program"), null)),
+        'notify_html' => trim($OUTPUT->notification(get_string("extensionrequestsent", "totara_program"), "notifysuccess"))
+    ]
+));
 
-    $args = array(
-        'args' => json_encode((object)[
-            'id' => $programid,
-            'userid' => $USER->id,
-            'user_fullname' => fullname($USER),
-            'notify_html_fail' => trim($OUTPUT->notification(get_string("extensionrequestnotsent", "totara_program"), null)),
-            'notify_html' => trim($OUTPUT->notification(get_string("extensionrequestsent", "totara_program"), "notifysuccess"))
-        ]
-    ));
-
-    $jsmodule = array(
-        'name' => 'totara_programview',
-        'fullpath' => '/totara/program/view/program_view.js',
-        'requires' => array('json', 'totara_core')
-    );
-    $PAGE->requires->js_init_call('M.totara_programview.init', $args, false, $jsmodule);
-}
+$jsmodule = array(
+    'name' => 'totara_programview',
+    'fullpath' => '/totara/program/view/program_view.js',
+    'requires' => array('json', 'totara_core')
+);
+$PAGE->requires->js_init_call('M.totara_programview.init', $args, false, $jsmodule);
 
 $componentname = 'program';
 $component = $plan->get_component($componentname);

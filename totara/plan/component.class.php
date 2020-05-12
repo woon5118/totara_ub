@@ -1504,12 +1504,10 @@ abstract class dp_base_component {
     function display_duedate($itemid, $duedate, $componentname) {
         $baddates = explode(',',optional_param('badduedates', null, PARAM_TEXT));
 
-        $cansetduedate = $this->plan->can_manage() && !$this->plan->is_complete()
-                            && ($this->get_setting('setduedate') == DP_PERMISSION_ALLOW);
         $out = '';
 
         // only show a form if they have permission to change due dates
-        if ($cansetduedate) {
+        if ($this->can_set_due_date($itemid)) {
             $class = in_array($itemid, $baddates) ? 'dp-plan-component-input-error' : '';
             $out .= $this->display_duedate_as_form($duedate, "duedate_{$this->component}[{$itemid}]", $class, $itemid, $componentname);
         } else {
@@ -1518,6 +1516,17 @@ abstract class dp_base_component {
 
         return $out;
 
+    }
+
+    /**
+     * Can the due date be set?
+     *
+     * @param int $itemid The dp_plan_program_assign table row id
+     * @return bool
+     */
+    public function can_set_due_date($itemid) {
+        return $this->plan->can_manage() && !$this->plan->is_complete()
+            && ($this->get_setting('setduedate') == DP_PERMISSION_ALLOW);
     }
 
 

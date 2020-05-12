@@ -107,5 +107,12 @@ function xmldb_totara_plan_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020062600, 'totara', 'plan');
     }
 
+    if ($oldversion < 2020062900) {
+        // Covert any programs assigned to plans as actual program assignments using the new plan assignment type.
+        totara_plan_upgrade_do_program_assignments();
+
+        upgrade_plugin_savepoint(true, 2020062900, 'totara', 'plan');
+    }
+
     return true;
 }

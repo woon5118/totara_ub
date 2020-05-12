@@ -23,6 +23,22 @@
 
 class totara_program_assignment_cohorts_test extends advanced_testcase {
 
+    public function test_show_in_ui() {
+        $assignment = "\\totara_program\assignment\cohort";
+        self::assertTrue($assignment::show_in_ui());
+    }
+
+    public function test_can_be_updated() {
+        $assignment = "\\totara_program\assignment\cohort";
+        $generator = $this->getDataGenerator();
+        $programgenerator = $generator->get_plugin_generator('totara_program');
+        $program1 = $programgenerator->create_program();
+        self::setAdminUser();
+        self::assertTrue($assignment::can_be_updated($program1->id));
+
+        self::setUser($generator->create_user());
+        self::assertFalse($assignment::can_be_updated($program1->id));
+    }
 
     public function test_get_user_count() {
         global $DB;

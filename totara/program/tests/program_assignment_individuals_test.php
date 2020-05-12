@@ -44,6 +44,22 @@ class totara_program_assignment_individuals_test extends advanced_testcase {
         $this->users[1] = $this->generator->create_user();
     }
 
+    public function test_show_in_ui() {
+        $this->create_individual_data();
+        $assignment = \totara_program\assignment\base::create_from_instance_id($this->programs[1]->id, ASSIGNTYPE_INDIVIDUAL, $this->users[1]->id);
+        self::assertTrue($assignment::show_in_ui());
+    }
+
+    public function test_can_be_updated() {
+        self::setAdminUser();
+        $this->create_individual_data();
+        $assignment = \totara_program\assignment\base::create_from_instance_id($this->programs[1]->id, ASSIGNTYPE_INDIVIDUAL, $this->users[1]->id);
+        self::assertTrue($assignment::can_be_updated($this->programs[1]->id));
+
+        self::setUser($this->users[1]);
+        self::assertFalse($assignment::can_be_updated($this->programs[1]->id));
+    }
+
     public function test_create_from_instance_id() {
         global $DB, $CFG;
 

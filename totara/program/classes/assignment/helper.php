@@ -37,9 +37,17 @@ final class helper {
     public static function get_assignments(int $programid): array {
         global $DB;
 
-        $assignments = [];
+        $types_without_ui = self::get_types_with_ui(true);
+        if ($types_without_ui) {
+            list($excludeuisql, $excludeuiparams) = $DB->get_in_or_equal(array_flip($types_without_ui), SQL_PARAMS_NAMED, 'param', false);
+            $sql = "programid = :programid AND assignmenttype {$excludeuisql}";
+            $params = array_merge($excludeuiparams, ['programid' => $programid]);
+            $assignment_records = $DB->get_records_select('prog_assignment', $sql, $params, '', 'id,assignmenttype');
+        } else {
+            $assignment_records = $DB->get_records('prog_assignment', ['programid' => $programid], '', 'id,assignmenttype');
+        }
 
-        $assignment_records = $DB->get_records('prog_assignment', ['programid' => $programid], '', 'id,assignmenttype');
+        $assignments = [];
 
         if (count($assignment_records) > self::MAX_RESULTS) {
             // Too many assignments
@@ -78,10 +86,27 @@ final class helper {
             3 => 'cohort',
             // 4 is unused
             5 => 'individual',
-            6 => 'manager'
+            6 => 'manager',
+            7 => 'plan'
         ];
 
         return $assignmenttypes;
+    }
+
+    /**
+     * Get the type name
+     *
+     * @param int $typeid
+     * @return string
+     */
+    public static function get_type_name(int $typeid) : string {
+        $types = self::get_types();
+
+        if (!isset($types[$typeid])) {
+            throw new \coding_exception('Assignment type not found');
+        }
+
+        return $types[$typeid];
     }
 
     /**
@@ -92,11 +117,33 @@ final class helper {
      * @return string
      */
     public static function get_type_string(int $typeid): string {
-        $types = self::get_types();
+        return get_string(self::get_type_name($typeid), 'totara_program');
+    }
 
-        $identifier = $types[$typeid];
+    /**
+     * Get all assignment types that have a user interface
+     *
+     * @param bool $without Return types without a user interface
+     * @return array
+     */
+    public static function get_types_with_ui(bool $without = false) : array {
+        static $types_with_ui = null;
 
-        return get_string($identifier, 'totara_program');
+        if (is_null($types_with_ui) || PHPUNIT_TEST) {
+            $types_with_ui = [];
+            foreach (self::get_types() as $typeid => $name) {
+                $class = "\\totara_program\assignment\\" . $name;
+                if ($class::show_in_ui()) {
+                    $types_with_ui[$typeid] = $name;
+                }
+            }
+        }
+
+        if ($without) {
+            return array_diff(self::get_types(), $types_with_ui);
+        }
+
+        return $types_with_ui;
     }
 
     /**
@@ -136,19 +183,16 @@ final class helper {
      * program assignments
      *
      * @param int $programid
+     * @param int $typeid The assignment type id
      *
      * @return bool
      */
-    public static function can_update(int $programid): bool {
+    public static function can_update(int $programid, int $typeid): bool {
         global $CFG;
 
-        $program_context = \context_program::instance($programid);
-
-        $canupdate = has_capability('totara/program:configureassignments', $program_context);
-
-        // Performance: If we dont have the capability then dont do the more
-        // intensive permission check
-        if (!$canupdate) {
+        // Check permission on the assignment type.
+        $class = "\\totara_program\assignment\\" . self::get_type_name($typeid);
+        if (!$class::can_be_updated($programid)) {
             return false;
         }
 
@@ -161,6 +205,6 @@ final class helper {
             return false;
         }
 
-        return $canupdate;
+        return true;
     }
 }

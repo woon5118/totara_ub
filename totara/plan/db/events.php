@@ -34,4 +34,32 @@ $observers = array(
         'eventname' => '\core\event\course_deleted',
         'callback'  => 'totara_plan_observer::course_deleted',
     ),
+    array(
+        'eventname' => '\totara_plan\event\approval_approved',
+        'callback'  => 'totara_program_observer::learning_plan_approved',
+    ),
+    array(
+        'eventname' => '\totara_plan\event\approval_declined',
+        'callback'  => 'totara_program_observer::learning_plan_declined',
+    ),
+    array(
+        'eventname' => '\totara_plan\event\component_created',
+        'callback'  => 'totara_program_observer::learning_plan_component_created',
+    ),
+    array(
+        'eventname' => '\totara_plan\event\component_deleted',
+        'callback'  => 'totara_program_observer::learning_plan_component_deleted',
+    ),
+    array(
+        'eventname' => '\totara_plan\event\plan_completed',
+        'callback'  => 'totara_program_observer::learning_plan_completed',
+    ),
+    array(
+        'eventname' => '\totara_plan\event\plan_reactivated',
+        'callback'  => 'totara_program_observer::learning_plan_reactivated',
+    ),
+    array(
+        'eventname' => '\totara_plan\event\plan_deleted',
+        'callback'  => 'totara_program_observer::learning_plan_deleted',
+    ),
 );

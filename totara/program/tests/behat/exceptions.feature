@@ -122,9 +122,9 @@ Feature: Generation of program assignment exceptions
     Then I should see "You have been enrolled in course Course 1 via required learning program Program Exception Tests"
 
   @javascript
-  Scenario: Already assigned exceptions are generated and overridden
+  Scenario: Exceptions are not generated when assigned via learning plan
     Given the "mylearning" user profile block exists
-    And I log in as "admin"
+    When I log in as "admin"
     And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "fn_001 ln_001" "link"
     And I click on "Learning Plans" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
@@ -148,50 +148,26 @@ Feature: Generation of program assignment exceptions
     And I click on "fn_001 ln_001 (user001@example.com)" "link" in the "add-assignment-dialog-5" "totaradialogue"
     And I click on "fn_002 ln_002 (user002@example.com)" "link" in the "add-assignment-dialog-5" "totaradialogue"
     And I click on "Ok" "button" in the "add-assignment-dialog-5" "totaradialogue"
-    Then I should see "2 learner(s) assigned: 1 active, 1 exception(s)"
+    Then I should see "2 learner(s) assigned: 2 active, 0 exception(s)"
     And I wait "1" seconds
     And I run the scheduled task "\totara_program\task\send_messages_task"
 
     When I log out
     And I log in as "user001"
-    And I should not see "You have been enrolled on program Program Exception Tests"
-    Then I should not see "Required Learning" in the totara menu
+    And I should see "You have been enrolled on program Program Exception Tests"
+    Then I should see "Required Learning" in the totara menu
 
     When I click on "Record of Learning" in the totara menu
-    Then I should not see "Program Exception Tests"
+    Then I should see "Program Exception Tests"
 
     When I log out
     And I log in as "user002"
     And I should see "You have been enrolled on program Program Exception Tests"
     And I click on "Required Learning" in the totara menu
     Then I should see "Program Exception Tests" in the "#program-content" "css_element"
+    And I log out
 
-    When I log out
-    And I log in as "admin"
-    And I navigate to "Manage programs" node in "Site administration > Programs"
-    And I click on "Miscellaneous" "link"
-    And I click on "Program Exception Tests" "link"
-    And I click on "Edit program details" "button"
-    And I click on "Exception Report (1)" "link"
-    Then I should see "fn_001 ln_001"
-    And I should see "Already assigned to program" in the "fn_001 ln_001" "table_row"
-
-    When I set the field "selectiontype" to "Already assigned to program"
-    And I set the field "selectionaction" to "Assign"
-    And I click on "Proceed with this action" "button"
-    And I click on "OK" "button"
-    Then I should see "No exceptions"
-    And I should see "2 learner(s) assigned: 2 active, 0 exception(s)"
-
-    When I click on "Assignments" "link"
-    And I set the field "Add a new" to "Individuals"
-    And I click on "fn_003 ln_003 (user003@example.com)" "link" in the "add-assignment-dialog-5" "totaradialogue"
-    And I click on "Ok" "button" in the "add-assignment-dialog-5" "totaradialogue"
-    Then I should see "3 learner(s) assigned: 3 active, 0 exception(s)"
-    And I wait "1" seconds
-    And I run the scheduled task "\totara_program\task\send_messages_task"
-
-    When I log out
+    When I run the scheduled task "\totara_program\task\send_messages_task"
     And I log in as "user001"
     And I should see "You have been enrolled on program Program Exception Tests"
     And I click on "Required Learning" in the totara menu

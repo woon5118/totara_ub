@@ -39,11 +39,16 @@ final class assignments extends \core\output\template {
      * @return assignments assignments template object
      */
     public static function create_from_assignments(array $assignments, int $programid, bool $toomany): assignments {
-        global $OUTPUT;
-
         $data = [];
 
-        $canupdate = helper::can_update($programid);
+        // Can update?
+        $canupdate = false;
+        foreach (helper::get_types_with_ui() as $typeid => $typename) {
+            if (helper::can_update($programid, $typeid)) {
+                $canupdate = true;
+                break;
+            }
+        }
 
         // Add assignment search
         $serachprogramassignments = get_string('searchprogramassignments', 'totara_program');
@@ -52,9 +57,9 @@ final class assignments extends \core\output\template {
         $data['assignment_search_template_data'] = $assignmentsearch->get_template_data();
 
         // Assignment types
-        $types = helper::get_types();
+        $types = helper::get_types_with_ui();
         foreach ($types as $id => $name) {
-            $types[$id] = get_string($name, 'totara_program');
+            $types[$id] = helper::get_type_string($id);
         }
 
         $recentfilter = select_multi::create('recent', '', 'somethign', [1 => get_string('recentlyadded', 'totara_program')]);

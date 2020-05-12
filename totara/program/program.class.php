@@ -1238,11 +1238,13 @@ class program {
      * Determines if the program is assigned to the speficied user's non-required
      * learning (i.e. part of a learning plan)
      *
+     * @deprecated Deprecated since Torara 13.0
      * @global object $CFG
      * @param int $userid
      * @return bool True if the program is assigned to a learning plan, false if not
      */
     public function assigned_to_users_non_required_learning($userid) {
+        debugging('program::assigned_to_users_non_required_learning() method is deprecated since Torara 13.0.', DEBUG_DEVELOPER);
         global $DB, $CFG;
         require_once($CFG->dirroot . '/totara/plan/lib.php');
 
@@ -2119,11 +2121,6 @@ class program {
         exception_manager::delete_exceptions_by_assignment($assignment->id, $userid);
         $now = time();
 
-        if ($this->assigned_to_users_non_required_learning($userid)) {
-            $this->exceptionsmanager->raise_exception(exception_manager::EXCEPTIONTYPE_ALREADY_ASSIGNED, $userid, $assignment->id, $now);
-            return true;
-        }
-
         if ($this->duplicate_course($userid)) {
             $this->exceptionsmanager->raise_exception(exception_manager::EXCEPTIONTYPE_DUPLICATE_COURSE, $userid, $assignment->id, $now);
             return true;
@@ -2187,10 +2184,12 @@ class program {
      * Checks to see if a program is assigned to a user
      * through a plan and approved
      *
+     * @deprecated Deprecated since Torara 13.0
      * @param int $userid
      * @return bool Returns true if program is assigned to user
      */
     public function assigned_through_plan($userid) {
+        debugging('program::assigned_through_plan() method is deprecated since Torara 13.0.', DEBUG_DEVELOPER);
         global $DB, $CFG;
 
         require_once($CFG->dirroot . '/totara/plan/lib.php');
@@ -2278,12 +2277,6 @@ class program {
         $userassigned = \totara_program\utils::user_is_assigned($this->id, $user->id);
         if ($userassigned) {
             $reasonlist .= $this->display_required_assignment_reason($user->id, false);
-        }
-
-        // The display_required_assignment_reason method doesn't currently show a message if
-        // the user is assigned via a plan as that is not considered required learning.
-        if ($this->assigned_through_plan($user->id)) {
-            $reasonlist .= html_writer::tag('li', get_string('assignedvialearningplan', 'totara_program'));
         }
 
         if (!empty($reasonlist)) {

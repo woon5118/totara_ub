@@ -36,8 +36,6 @@ class totara_plan_component_program_testcase extends reportcache_advanced_testca
     public function test_dp_program_component_unassign_item() {
         global $DB;
 
-        $this->resetAfterTest();
-
         $generator = $this->getDataGenerator();
         /* @var totara_plan_generator $plangenerator */
         $plangenerator = $generator->get_plugin_generator('totara_plan');
@@ -58,42 +56,47 @@ class totara_plan_component_program_testcase extends reportcache_advanced_testca
         // remove the program2 completion but should leave the program1 completion.
 
         // User1, first learning plan, both programs.
-        $planrecord = $plangenerator->create_learning_plan(array('userid' => $user1->id));
-        $plan = new development_plan($planrecord->id);
+        $planrecord1 = $plangenerator->create_learning_plan(array('userid' => $user1->id));
+        $plan = new development_plan($planrecord1->id);
+        $plan1 = $plan;
         $plan->set_status(DP_PLAN_STATUS_APPROVED);
+        \totara_program\assignment\plan::update_plan_assignments($user1->id, $plan1->id);
         // Reload to get change in status.
-        $plan = new development_plan($planrecord->id);
+        $plan = new development_plan($planrecord1->id);
         /* @var dp_program_component $component_program */
         $user1lp1componentprogram = $plan->get_component('program');
         $user1lp1program1 = $user1lp1componentprogram->assign_new_item($prog1->id, false);
         $user1lp1program2 = $user1lp1componentprogram->assign_new_item($prog2->id, false);
 
         // User1, second learning plan, just program1.
-        $planrecord = $plangenerator->create_learning_plan(array('userid' => $user1->id));
-        $plan = new development_plan($planrecord->id);
+        $planrecord2 = $plangenerator->create_learning_plan(array('userid' => $user1->id));
+        $plan = new development_plan($planrecord2->id);
         $plan->set_status(DP_PLAN_STATUS_APPROVED);
+        \totara_program\assignment\plan::update_plan_assignments($user1->id, $plan1->id);
         // Reload to get change in status.
-        $plan = new development_plan($planrecord->id);
+        $plan = new development_plan($planrecord2->id);
         /* @var dp_program_component $component_program */
         $componentprogram = $plan->get_component('program');
         $componentprogram->assign_new_item($prog1->id, false);
 
         // User2, first learning plan, just program1.
-        $planrecord = $plangenerator->create_learning_plan(array('userid' => $user2->id));
-        $plan = new development_plan($planrecord->id);
+        $planrecord3 = $plangenerator->create_learning_plan(array('userid' => $user2->id));
+        $plan = new development_plan($planrecord3->id);
         $plan->set_status(DP_PLAN_STATUS_APPROVED);
+        \totara_program\assignment\plan::update_plan_assignments($user2->id, $plan1->id);
         // Reload to get change in status.
-        $plan = new development_plan($planrecord->id);
+        $plan = new development_plan($planrecord3->id);
         /* @var dp_program_component $component_program */
         $componentprogram = $plan->get_component('program');
         $componentprogram->assign_new_item($prog1->id, false);
 
         // User2, first learning plan, just program2.
-        $planrecord = $plangenerator->create_learning_plan(array('userid' => $user2->id));
-        $plan = new development_plan($planrecord->id);
+        $planrecord4 = $plangenerator->create_learning_plan(array('userid' => $user2->id));
+        $plan = new development_plan($planrecord4->id);
         $plan->set_status(DP_PLAN_STATUS_APPROVED);
+        \totara_program\assignment\plan::update_plan_assignments($user2->id, $plan1->id);
         // Reload to get change in status.
-        $plan = new development_plan($planrecord->id);
+        $plan = new development_plan($planrecord4->id);
         /* @var dp_program_component $component_program */
         $componentprogram = $plan->get_component('program');
         $componentprogram->assign_new_item($prog2->id, false);
@@ -104,6 +107,7 @@ class totara_plan_component_program_testcase extends reportcache_advanced_testca
         // Remove both programs from user1's first learning plan.
         $user1lp1componentprogram->unassign_item($user1lp1program1);
         $user1lp1componentprogram->unassign_item($user1lp1program2);
+        \totara_program\assignment\plan::update_plan_assignments($user1->id, $planrecord1->id);
 
         // Manually make the same change to the expected data.
         foreach ($expectedprogcompletions as $key => $progcompletion) {

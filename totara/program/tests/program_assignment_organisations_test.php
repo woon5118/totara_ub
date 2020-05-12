@@ -75,6 +75,22 @@ class totara_program_assignment_organisations_test extends advanced_testcase {
         $user5ja1 = \totara_job\job_assignment::create_default($this->users[5]->id, array('organisationid' => $this->organisations[3]->id));
     }
 
+    public function test_show_in_ui() {
+        $this->create_organisation_data();
+        $assignment = \totara_program\assignment\base::create_from_instance_id($this->programs[1]->id, ASSIGNTYPE_ORGANISATION, $this->organisations[1]->id);
+        self::assertTrue($assignment::show_in_ui());
+    }
+
+    public function test_can_be_updated() {
+        self::setAdminUser();
+        $this->create_organisation_data();
+        $assignment = \totara_program\assignment\base::create_from_instance_id($this->programs[1]->id, ASSIGNTYPE_ORGANISATION, $this->organisations[1]->id);
+        self::assertTrue($assignment::can_be_updated($this->programs[1]->id));
+
+        self::setUser($this->users[1]);
+        self::assertFalse($assignment::can_be_updated($this->programs[1]->id));
+    }
+
     public function test_create_from_id() {
         global $DB;
 

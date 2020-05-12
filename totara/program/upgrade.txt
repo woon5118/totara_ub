@@ -30,6 +30,10 @@ information provided here is intended especially for developers.
   * duplicate_course_exception, please use \totara_program\exception\duplicate_course instead.
   * completion_time_unknown_exception, please use \totara_program\exception\completion_time_unknown instead.
   * unknown_exception, please use \totara_program\exception\unknown instead.
+* program::assigned_through_plan() method has been deprecated.
+* program::assigned_to_users_non_required_learning() method has been deprecated.
+* \totara_program\assignment\helper::can_update() added second argument $typeid.
+* prog_assignment_category::get_categories() added first argument $excludeui.
 
 === 12.8 ===
 

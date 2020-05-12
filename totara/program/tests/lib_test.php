@@ -840,11 +840,15 @@ class totara_program_lib_testcase extends reportcache_advanced_testcase {
 
         // 3) User5 and user6 are not assigned but their enrolment is not suspended.
         $DB->delete_records('dp_plan_program_assign', array('planid' => $plan[$user5->id]->id));
+        \totara_program\assignment\plan::update_plan_assignments($user5->id, $plan[$user5->id]->id);
         $DB->delete_records('dp_plan_program_assign', array('planid' => $plan[$user6->id]->id));
+        \totara_program\assignment\plan::update_plan_assignments($user6->id, $plan[$user6->id]->id);
 
         // 4) User7 and user8 are not assigned and their enrolment is suspended.
         $DB->delete_records('dp_plan_program_assign', array('planid' => $plan[$user7->id]->id));
+        \totara_program\assignment\plan::update_plan_assignments($user7->id, $plan[$user7->id]->id);
         $DB->delete_records('dp_plan_program_assign', array('planid' => $plan[$user8->id]->id));
+        \totara_program\assignment\plan::update_plan_assignments($user8->id, $plan[$user8->id]->id);
         $DB->set_field('user_enrolments', 'status', ENROL_USER_SUSPENDED, array('userid' => $user7->id));
         $DB->set_field('user_enrolments', 'status', ENROL_USER_SUSPENDED, array('userid' => $user8->id));
 

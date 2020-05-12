@@ -911,4 +911,20 @@ class dp_program_component extends dp_base_component {
         // TODO
         return true;
     }
+
+    /**
+     * Can the due date be set?
+     *
+     * @param int $itemid The dp_plan_program_assign table row id
+     * @return bool
+     */
+    public function can_set_due_date($itemid) {
+        global $DB;
+
+        $programid = $DB->get_field('dp_plan_program_assign', 'programid', ['id' => $itemid]);
+
+        return $this->plan->can_manage() && !$this->plan->is_complete()
+            && ($this->get_setting('setduedate') == DP_PERMISSION_ALLOW)
+            && !prog_is_complete($programid, $this->plan->userid);
+    }
 }

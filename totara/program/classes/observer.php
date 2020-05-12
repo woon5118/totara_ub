@@ -705,4 +705,107 @@ class totara_program_observer {
             $assignment->remove();
         }
     }
+
+    /**
+     * Learning plan approval approved, if it contains a program(s), assign the user to the program(s).
+     *
+     * @param \totara_plan\event\approval_approved $event
+     * @return boolean True if successful
+     */
+    public static function learning_plan_approved(\totara_plan\event\approval_approved $event) {
+        $userid = $event->relateduserid;
+        $planid = $event->objectid;
+        \totara_program\assignment\plan::update_plan_assignments($userid, $planid);
+
+        return true;
+    }
+
+    /**
+     * Learning plan approval declined, if it contains a program(s), unassign the user to the program(s).
+     *
+     * @param \totara_plan\event\approval_declined $event
+     * @return boolean True if successful
+     */
+    public static function learning_plan_declined(\totara_plan\event\approval_declined $event) {
+        $userid = $event->relateduserid;
+        $planid = $event->objectid;
+        \totara_program\assignment\plan::update_plan_assignments($userid, $planid);
+
+        return true;
+    }
+
+    /**
+     * Learning plan program component created, update program assignments.
+     *
+     * @param \totara_plan\event\component_created $event
+     * @return boolean True if successful
+     */
+    public static function learning_plan_component_created(\totara_plan\event\component_created $event) {
+        if ($event->other['component'] == 'program') {
+            $userid = $event->relateduserid;
+            $planid = $event->objectid;
+            \totara_program\assignment\plan::update_plan_assignments($userid, $planid);
+        }
+
+        return true;
+    }
+
+    /**
+     * Learning plan program component deleted, update program assignments.
+     *
+     * @param \totara_plan\event\component_deleted $event
+     * @return boolean True if successful
+     */
+    public static function learning_plan_component_deleted(\totara_plan\event\component_deleted $event) {
+        if ($event->other['component'] == 'program') {
+            $userid = $event->relateduserid;
+            $planid = $event->objectid;
+            \totara_program\assignment\plan::update_plan_assignments($userid, $planid);
+        }
+
+        return true;
+    }
+
+    /**
+     * Learning plan completed, if it contains a program, unassign the user from the program.
+     *
+     * @param \totara_plan\event\plan_completed $event
+     * @return boolean True if successful
+     */
+    public static function learning_plan_completed(\totara_plan\event\plan_completed $event) {
+        $userid = $event->relateduserid;
+        $planid = $event->objectid;
+        \totara_program\assignment\plan::update_plan_assignments($userid, $planid);
+
+        return true;
+    }
+
+    /**
+     * Learning plan reactivated, if it contains a program, assign the user from the program.
+     *
+     * @param \totara_plan\event\plan_reactivated $event
+     * @return boolean True if successful
+     */
+    public static function learning_plan_reactivated(\totara_plan\event\plan_reactivated $event) {
+        $userid = $event->relateduserid;
+        $planid = $event->objectid;
+        \totara_program\assignment\plan::update_plan_assignments($userid, $planid);
+
+        return true;
+    }
+
+    /**
+     * Learning plan deleted, if it contains a program, unassign the user from the program.
+     *
+     * @param \totara_plan\event\plan_deleted $event
+     * @return boolean True if successful
+     */
+    public static function learning_plan_deleted(\totara_plan\event\plan_deleted $event) {
+        $userid = $event->relateduserid;
+        $planid = $event->objectid;
+        \totara_program\assignment\plan::update_plan_assignments($userid, $planid);
+
+        return true;
+    }
+
 }

@@ -33,6 +33,7 @@ define('ASSIGNTYPE_POSITION', 2);
 define('ASSIGNTYPE_COHORT', 3);
 define('ASSIGNTYPE_INDIVIDUAL', 5);
 define('ASSIGNTYPE_MANAGERJA', 6);
+define('ASSIGNTYPE_PLAN', 7);
 
 global $ASSIGNMENT_CATEGORY_CLASSNAMES;
 
@@ -41,7 +42,8 @@ $ASSIGNMENT_CATEGORY_CLASSNAMES = array(
     ASSIGNTYPE_POSITION     => 'positions_category',
     ASSIGNTYPE_COHORT       => 'cohorts_category',
     ASSIGNTYPE_MANAGERJA    => 'managers_category',
-    ASSIGNTYPE_INDIVIDUAL   => 'individuals_category'
+    ASSIGNTYPE_INDIVIDUAL   => 'individuals_category',
+    ASSIGNTYPE_PLAN         => 'plans_category'
 );
 
 define('COMPLETION_TIME_NOT_SET', -1);
@@ -132,7 +134,7 @@ class prog_assignments {
 
     /**
      * @param int $assignmenttype One of ASSIGNTYPE_*
-     * @return organisations_category|positions_category|cohorts_category|managers_category|individuals_category
+     * @return organisations_category|positions_category|cohorts_category|managers_category|individuals_category|plans_category
      * @throws Exception
      */
     public static function factory($assignmenttype) {
@@ -254,6 +256,7 @@ class prog_assignments {
             ASSIGNTYPE_COHORT => $emptyarray,
             ASSIGNTYPE_MANAGERJA => $emptyarray,
             ASSIGNTYPE_INDIVIDUAL => $emptyarray,
+            ASSIGNTYPE_PLAN => $emptyarray,
         );
 
         $out = '';
@@ -346,6 +349,9 @@ class prog_assignments {
         $table->head = array('', get_string('added', 'totara_program'), get_string('removed', 'totara_program'));
         $table->data = array();
         foreach ($ASSIGNMENT_CATEGORY_CLASSNAMES as $classname) {
+            if (!$classname::show_in_ui()) {
+                continue;
+            }
             $category = new $classname();
             $spanadded = html_writer::tag('span', '0', array('class' => 'added_'.$category->id));
             $spanremoved = html_writer::tag('span', '0', array('class' => 'removed_'.$category->id));
@@ -807,19 +813,38 @@ abstract class prog_assignment_category {
         }
     }
 
-    static function get_categories() {
+    /**
+     * Get assignment categories
+     *
+     * @param bool $excludeui If true only assignment types that should be shown in the user interface are returned
+     * @return array
+     */
+    public static function get_categories($excludeui = false) : array {
         $tempcategories = array(
             new organisations_category(),
             new positions_category(),
             new cohorts_category(),
             new managers_category(),
             new individuals_category(),
+            new plans_category(),
         );
         $categories = array();
         foreach ($tempcategories as $category) {
+            if ($excludeui && !$category->show_in_ui()) {
+                continue;
+            }
             $categories[$category->id] = $category;
         }
         return $categories;
+    }
+
+    /**
+     * Should the assignment type be used via the user interface?
+     *
+     * @return bool
+     */
+    public static function show_in_ui() :bool {
+        return true;
     }
 }
 
@@ -1764,6 +1789,112 @@ class individuals_category extends prog_assignment_category {
         $title = addslashes_js(get_string('addindividualstoprogram', 'totara_program'));
         $url = 'find_individual.php?programid='.$programid;
         return "M.totara_programassignment.add_category({$this->id}, 'individuals', '{$url}', '{$title}');";
+    }
+}
+
+class plans_category extends prog_assignment_category {
+
+    public function __construct() {
+        $this->id = ASSIGNTYPE_PLAN;
+        $this->name = get_string('plan', 'totara_program');
+    }
+
+    /**
+     * Should the assignment type be used via the user interface?
+     *
+     * @return bool
+     */
+    public static function show_in_ui() : bool {
+        return false;
+    }
+
+    /**
+     * Builds table for displaying within assignment category.
+     * Not required for plans as this assignment type intentionally has no UI.
+     */
+    public function build_table($programidorinstance) { }
+
+    /**
+     * Create row to be added to this assignment category's table.
+     * Not required for plans as this assignment type intentionally has no UI.
+     */
+    public function build_row($item, $canupdate = true) { }
+
+    /**
+     * Get count of affected users
+     *
+     * @param $item
+     * @return array|int
+     */
+    public function user_affected_count($item) {
+        return $this->get_affected_users($item, 0, true);
+    }
+
+    /**
+     * Get affected users
+     *
+     * For plans this is only ever one user or none
+     *
+     * @param object $item
+     * @param int $userid
+     * @param bool $count
+     * @return array|int
+     */
+    public function get_affected_users($item, $userid = 0, $count = false) {
+        global $DB;
+
+        $select = $count ? 'COUNT(u.id)' : 'u.id';
+
+        $sql = "SELECT $select
+                  FROM {dp_plan} p
+                  JOIN {dp_plan_program_assign} ppa on ppa.planid = p.id
+                  JOIN {user} u ON u.id = p.userid
+                 WHERE p.id = :assignmenttypeid
+                   AND ppa.programid = :programid
+                   AND p.status = :status_approved
+                   AND p.status != :status_complete
+                   AND ppa.approved = :approved
+                   AND u.deleted = 0";
+
+        $params = [
+            'programid' => $item->programid,
+            'assignmenttypeid' => $item->assignmenttypeid,
+            'status_approved' => DP_PLAN_STATUS_APPROVED,
+            'status_complete' => DP_PLAN_STATUS_COMPLETE,
+            'approved' => DP_APPROVAL_APPROVED,
+        ];
+
+        if ($count) {
+            return $DB->count_records_sql($sql, $params);
+        } else {
+            return $DB->get_records_sql($sql, $params);
+        }
+    }
+
+    public function get_affected_users_by_assignment($assignment, $userid = 0) {
+        return $this->get_affected_users($assignment, $userid);
+    }
+
+    /**
+     * Unused by the plans category, so just return zero
+     */
+    public function get_includechildren($data, $object) {
+        return 0;
+    }
+
+    /**
+     * Unused by the plans category, so just return empty string
+     */
+    public function get_js($programid) {
+        return '';
+    }
+
+    protected function _add_assignment_hook($object) {
+        return true;
+    }
+
+    protected function _delete_assignment_hook($object) {
+        return true;
     }
 }
 
