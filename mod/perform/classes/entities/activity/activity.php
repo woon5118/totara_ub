@@ -62,7 +62,6 @@ class activity extends entity {
     public const UPDATED_TIMESTAMP = 'updated_at';
     public const SET_UPDATED_WHEN_CREATED = true;
 
-
     /**
      * Cast close_on_completion to bool type.
      *

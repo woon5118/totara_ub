@@ -52,6 +52,11 @@ abstract class mod_perform_webapi_resolver_mutation_update_track_schedule_testca
         $DB->set_field('perform_track', 'schedule_is_fixed', -1);
         $DB->set_field('perform_track', 'schedule_fixed_from', -1);
         $DB->set_field('perform_track', 'schedule_fixed_to', -1);
+        $DB->set_field('perform_track', 'schedule_dynamic_count_from', -1);
+        $DB->set_field('perform_track', 'schedule_dynamic_count_to', -1);
+        $DB->set_field('perform_track', 'schedule_dynamic_unit', -1);
+        $DB->set_field('perform_track', 'schedule_dynamic_direction', -1);
+        $DB->set_field('perform_track', 'due_date_is_enabled', -1);
 
         /** @var activity $activity1 */
         $activity1 = $activities->first();

@@ -10,6 +10,7 @@ A list of possible units which can be used for relative dynamic date schedules
 enum mod_perform_track_dynamic_unit_enums {
   DAY
   MONTH
+  WEEK
   YEAR
 }
 
@@ -33,6 +34,7 @@ type mod_perform_track {
   schedule_dynamic_count_to: Int
   schedule_dynamic_unit: mod_perform_track_dynamic_unit_enums
   schedule_dynamic_direction: mod_perform_track_dynamic_direction_enums
+  due_date_is_enabled: Boolean!
   assignments: [mod_perform_track_assignment!]!
 }
 
@@ -64,14 +66,15 @@ Input parameters required for open-ended track schedule period using fixed dates
 """
 input mod_perform_track_schedule_input {
   track_id: core_id!
-  is_open: param_boolean!
-  is_fixed: param_boolean!
-  fixed_from: param_integer
-  fixed_to: param_integer
-  dynamic_count_from: param_integer
-  dynamic_count_to: param_integer
-  dynamic_unit: mod_perform_track_dynamic_unit_enums
-  dynamic_direction: mod_perform_track_dynamic_direction_enums
+  schedule_is_open: param_boolean!
+  schedule_is_fixed: param_boolean!
+  schedule_fixed_from: param_integer
+  schedule_fixed_to: param_integer
+  schedule_dynamic_count_from: param_integer
+  schedule_dynamic_count_to: param_integer
+  schedule_dynamic_unit: mod_perform_track_dynamic_unit_enums
+  schedule_dynamic_direction: mod_perform_track_dynamic_direction_enums
+  due_date_is_enabled: param_boolean!
 }
 
 """

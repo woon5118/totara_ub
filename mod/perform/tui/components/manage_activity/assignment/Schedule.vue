@@ -26,12 +26,11 @@
     <ScheduleToggles
       :fixed-dynamic.sync="scheduleFixedDynamic"
       :open-limited.sync="scheduleOpenLimited"
+      :due-date.sync="scheduleDueDate"
     />
-
     <h4 class="tui_performAssignmentSchedule__range-type-heading">
       {{ scheduleRangeHeading }}
     </h4>
-
     <Uniform
       v-slot="{ getSubmitting, reset }"
       :initial-values="initialValues"
@@ -92,6 +91,8 @@ import FixedScheduleSettings from './schedule/FixedScheduleSettings';
 import DynamicScheduleSettings from './schedule/DynamicScheduleSettings';
 import {
   NOTIFICATION_DURATION,
+  DUE_DATE_IS_ENABLED,
+  DUE_DATE_IS_DISABLED,
   SCHEDULE_IS_DYNAMIC,
   SCHEDULE_IS_FIXED,
   SCHEDULE_IS_LIMITED,
@@ -164,19 +165,28 @@ export default {
       scheduleFixedDynamic = SCHEDULE_IS_FIXED;
     }
 
+    let scheduleDueDate = DUE_DATE_IS_DISABLED;
+    if (
+      this.track.due_date_is_enabled === null ||
+      this.track.due_date_is_enabled
+    ) {
+      scheduleDueDate = DUE_DATE_IS_ENABLED;
+    }
+
     return {
+      DUE_DATE_IS_ENABLED,
+      DUE_DATE_IS_DISABLED,
       SCHEDULE_IS_OPEN,
       SCHEDULE_IS_LIMITED,
       SCHEDULE_IS_FIXED,
       SCHEDULE_IS_DYNAMIC,
-
       FIXED_SCHEDULE_SCOPE,
       DYNAMIC_SCHEDULE_SCOPE,
-
       initialValues,
       scheduleOpenLimited,
       scheduleFixedDynamic,
       isSaving: false,
+      scheduleDueDate,
     };
   },
   computed: {
@@ -224,6 +234,9 @@ export default {
     },
     scheduleIsDynamic() {
       return this.scheduleFixedDynamic === SCHEDULE_IS_DYNAMIC;
+    },
+    dueDateIsEnabled() {
+      return this.scheduleDueDate === DUE_DATE_IS_ENABLED;
     },
   },
   methods: {
@@ -281,32 +294,39 @@ export default {
         track_id: this.track.id,
 
         // Toggle values.
-        is_open: this.scheduleIsOpen,
-        is_fixed: this.scheduleIsFixed,
-
+        schedule_is_open: this.scheduleIsOpen,
+        schedule_is_fixed: this.scheduleIsFixed,
+        due_date_is_enabled: this.dueDateIsEnabled,
         // Fixed schedule values.
-        fixed_from: this.getUnixTime(
+        schedule_fixed_from: this.getUnixTime(
           formValues[FIXED_SCHEDULE_SCOPE].fixed_from
         ),
-        fixed_to: this.getUnixTime(formValues[FIXED_SCHEDULE_SCOPE].fixed_to),
+        schedule_fixed_to: this.getUnixTime(
+          formValues[FIXED_SCHEDULE_SCOPE].fixed_to
+        ),
 
         // Dynamic schedule values.
-        dynamic_count_from: Number(
+        schedule_dynamic_count_from: Number(
           formValues[DYNAMIC_SCHEDULE_SCOPE].dynamic_count_from
         ), // Gql does not handle "-1" and an int type.
-        dynamic_count_to: Number(
+        schedule_dynamic_count_to: Number(
           formValues[DYNAMIC_SCHEDULE_SCOPE].dynamic_count_to
         ), // Gql does not handle "-1" and an int type.
-        dynamic_unit: formValues[DYNAMIC_SCHEDULE_SCOPE].dynamic_unit,
-        dynamic_direction: formValues[DYNAMIC_SCHEDULE_SCOPE].dynamic_direction,
+        schedule_dynamic_unit: formValues[DYNAMIC_SCHEDULE_SCOPE].dynamic_unit,
+        schedule_dynamic_direction:
+          formValues[DYNAMIC_SCHEDULE_SCOPE].dynamic_direction,
       };
 
       // Fields common to all permutations of settings.
-      const relevantFields = ['track_id', 'is_open', 'is_fixed'];
+      const relevantFields = [
+        'track_id',
+        'schedule_is_open',
+        'schedule_is_fixed',
+        'due_date_is_enabled',
+      ];
 
       // Add fields specific to the current toggle permutation.
       relevantFields.push(...this.getScheduleTypeSpecificGqlFields());
-
       const track_schedule = pick(gqlValues, relevantFields);
 
       return { track_schedule };
@@ -315,17 +335,21 @@ export default {
     getScheduleTypeSpecificGqlFields() {
       switch (true) {
         case this.scheduleIsOpenFixed:
-          return ['fixed_from'];
+          return ['schedule_fixed_from'];
         case this.scheduleIsLimitedFixed:
-          return ['fixed_from', 'fixed_to'];
+          return ['schedule_fixed_from', 'schedule_fixed_to'];
         case this.scheduleIsOpenDynamic:
-          return ['dynamic_count_from', 'dynamic_unit', 'dynamic_direction'];
+          return [
+            'schedule_dynamic_count_from',
+            'schedule_dynamic_unit',
+            'schedule_dynamic_direction',
+          ];
         case this.scheduleIsLimitedDynamic:
           return [
-            'dynamic_count_from',
-            'dynamic_count_to',
-            'dynamic_unit',
-            'dynamic_direction',
+            'schedule_dynamic_count_from',
+            'schedule_dynamic_count_to',
+            'schedule_dynamic_unit',
+            'schedule_dynamic_direction',
           ];
       }
 
@@ -378,6 +402,9 @@ export default {
   {
     "mod_perform": [
       "activity_instance_creation_heading",
+      "due_date",
+      "due_date_is_disabled",
+      "due_date_is_enabled",
       "save_changes",
       "schedule_range_date_preamble",
       "schedule_range_heading_limited_dynamic",

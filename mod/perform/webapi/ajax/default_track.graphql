@@ -11,6 +11,7 @@ query mod_perform_default_track($activity_id: param_integer!) {
     schedule_dynamic_count_to
     schedule_dynamic_unit
     schedule_dynamic_direction
+    due_date_is_enabled
     assignments {
       type
       group {

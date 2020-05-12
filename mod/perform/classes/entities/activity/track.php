@@ -44,6 +44,7 @@ use core\orm\entity\relations\has_many_through;
  * @property int $schedule_dynamic_count_to number of units
  * @property int $schedule_dynamic_unit one of SCHEDULE_DYNAMIC_UNIT_XXX or null
  * @property int $schedule_dynamic_direction one of SCHEDULE_DYNAMIC_DIRECTION_XXX or null
+ * @property bool $due_date_is_enabled
  * @property int $created_at record creation time
  * @property int $updated_at record modification time
  * @property-read collection|subject_instance[] $subject_instances
@@ -98,4 +99,32 @@ class track extends entity {
             'track_user_assignment_id'
         );
     }
+
+    /**
+     * Cast schedule_is_fixed to bool type.
+     *
+     * @return bool
+     */
+    protected function get_schedule_is_fixed_attribute(): bool {
+        return (bool) $this->get_attributes_raw()['schedule_is_fixed'];
+    }
+
+    /**
+     * Cast schedule_is_open to bool type.
+     *
+     * @return bool
+     */
+    protected function get_schedule_is_open_attribute(): bool {
+        return (bool) $this->get_attributes_raw()['schedule_is_open'];
+    }
+
+    /**
+     * Cast due_date_is_enabled to bool type.
+     *
+     * @return bool
+     */
+    protected function get_due_date_is_enabled_attribute(): bool {
+        return (bool) $this->get_attributes_raw()['due_date_is_enabled'];
+    }
+
 }

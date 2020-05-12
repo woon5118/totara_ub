@@ -22,21 +22,21 @@
  * @category test
  */
 
-require_once(__DIR__ . '/generator/activity_generator_configuration.php');
-require_once(__DIR__ . '/webapi_resolver_mutation_update_track_schedule.php');
-
 use mod_perform\entities\activity\track as track_entity;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\track;
 use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
+require_once(__DIR__ . '/generator/activity_generator_configuration.php');
+require_once(__DIR__ . '/webapi_resolver_mutation_update_track_schedule.php');
+
 /**
  * @group perform
  */
 class mod_perform_webapi_resolver_mutation_update_track_schedule_open_dynamic_testcasee
     extends mod_perform_webapi_resolver_mutation_update_track_schedule_testcase {
-    private const MUTATION = 'mod_perform_update_track_schedule';
+    protected const MUTATION = 'mod_perform_update_track_schedule';
 
     use webapi_phpunit_helper;
 
@@ -55,8 +55,12 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_dynamic_te
         $args = [
             'track_schedule' => [
                 'track_id' => $track1->id,
-                'is_open' => true,
-                'is_fixed' => false,
+                'schedule_is_open' => true,
+                'schedule_is_fixed' => false,
+                'schedule_dynamic_count_from' => 555,
+                'schedule_dynamic_unit' => 'YEAR',
+                'schedule_dynamic_direction' => 'BEFORE',
+                'due_date_is_enabled' => false,
             ],
         ];
 
@@ -79,10 +83,6 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_dynamic_te
         $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
         $activities = $perform_generator->create_full_activities($configuration);
 
-        // Before we test, set them all to closed fixed, so we can see the effect of changing to open fixed.
-        $DB->set_field('perform_track', 'schedule_is_open', false);
-        $DB->set_field('perform_track', 'schedule_is_fixed', true);
-
         /** @var activity $activity1 */
         $activity1 = $activities->first();
         /** @var track $track1 */
@@ -91,11 +91,12 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_dynamic_te
         $args = [
             'track_schedule' => [
                 'track_id' => $track1->id,
-                'is_open' => true,
-                'is_fixed' => false,
-                'dynamic_count_from' => 555,
-                'dynamic_unit' => 'YEAR',
-                'dynamic_direction' => 'BEFORE',
+                'schedule_is_open' => true,
+                'schedule_is_fixed' => false,
+                'schedule_dynamic_count_from' => 555,
+                'schedule_dynamic_unit' => 'YEAR',
+                'schedule_dynamic_direction' => 'BEFORE',
+                'due_date_is_enabled' => false,
             ],
         ];
 
@@ -130,6 +131,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_dynamic_te
         $affected_track->schedule_dynamic_count_to = null;
         $affected_track->schedule_dynamic_unit = track_entity::SCHEDULE_DYNAMIC_UNIT_YEAR;
         $affected_track->schedule_dynamic_direction = track_entity::SCHEDULE_DYNAMIC_DIRECTION_BEFORE;
+        $affected_track->due_date_is_enabled = 0;
 
         $after_tracks = $DB->get_records('perform_track', [], 'id');
         unset($after_tracks[$track1->id]->updated_at);
@@ -141,11 +143,12 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_dynamic_te
         $args = [
             'track_schedule' => [
                 'track_id' => $this->track1_id,
-                'is_open' => true,
-                'is_fixed' => false,
-                'dynamic_unit' => 'YEAR',
-                'dynamic_direction' => 'AFTER',
-                'dynamic_count_from' => -234,
+                'schedule_is_open' => true,
+                'schedule_is_fixed' => false,
+                'schedule_dynamic_unit' => 'YEAR',
+                'schedule_dynamic_direction' => 'AFTER',
+                'schedule_dynamic_count_from' => -234,
+                'due_date_is_enabled' => false,
             ],
         ];
 
@@ -173,11 +176,12 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_dynamic_te
         $args = [
             'track_schedule' => [
                 'track_id' => $track1->id,
-                'is_open' => true,
-                'is_fixed' => false,
-                'dynamic_count_from' => 555,
-                'dynamic_unit' => 'YEAR',
-                'dynamic_direction' => 'BEFORE',
+                'schedule_is_open' => true,
+                'schedule_is_fixed' => false,
+                'schedule_dynamic_count_from' => 555,
+                'schedule_dynamic_unit' => 'YEAR',
+                'schedule_dynamic_direction' => 'BEFORE',
+                'due_date_is_enabled' => false,
             ],
         ];
 

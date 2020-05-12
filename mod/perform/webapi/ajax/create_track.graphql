@@ -11,6 +11,7 @@ mutation mod_perform_create_track($details: mod_perform_create_track_input!) {
     schedule_dynamic_count_to
     schedule_dynamic_unit
     schedule_dynamic_direction
+    due_date_is_enabled
     assignments {
       type
       group {

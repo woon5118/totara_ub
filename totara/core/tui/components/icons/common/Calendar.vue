@@ -17,7 +17,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
   @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
-  @package mod_perform
+  @package totara_core
 -->
 
 <script>
@@ -41,7 +41,7 @@ export default {
   render(h, { props }) {
     return h(FlexIcon, {
       props: Object.assign({}, props, {
-        icon: 'user',
+        icon: 'calendar',
       }),
     });
   },

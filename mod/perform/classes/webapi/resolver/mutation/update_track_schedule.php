@@ -57,35 +57,61 @@ class update_track_schedule implements mutation_resolver, has_middleware {
             throw new coding_exception(implode(', ', $errors));
         }
 
-        if ($track_schedule['is_fixed']) {
-            if ($track_schedule['is_open']) {
+        // Fixed and dynamic schedules.
+        if ($track_schedule['schedule_is_fixed']) {
+            if ($track_schedule['schedule_is_open']) {
                 $track->update_schedule_open_fixed(
-                    $track_schedule['fixed_from']
+                    $track_schedule['schedule_fixed_from']
                 );
             } else { // Closed.
                 $track->update_schedule_closed_fixed(
-                    $track_schedule['fixed_from'],
-                    $track_schedule['fixed_to']
+                    $track_schedule['schedule_fixed_from'],
+                    $track_schedule['schedule_fixed_to']
                 );
             }
         } else { // Dynamic.
             $dynamic_units = array_flip(track::get_dynamic_schedule_units());
             $dynamic_directions = array_flip(track::get_dynamic_schedule_directions());
-            if ($track_schedule['is_open']) {
+            if ($track_schedule['schedule_is_open']) {
                 $track->update_schedule_open_dynamic(
-                    $track_schedule['dynamic_count_from'],
-                    $dynamic_units[$track_schedule['dynamic_unit']],
-                    $dynamic_directions[$track_schedule['dynamic_direction']]
+                    $track_schedule['schedule_dynamic_count_from'],
+                    $dynamic_units[$track_schedule['schedule_dynamic_unit']],
+                    $dynamic_directions[$track_schedule['schedule_dynamic_direction']]
                 );
             } else { // Closed.
                 $track->update_schedule_closed_dynamic(
-                    $track_schedule['dynamic_count_from'],
-                    $track_schedule['dynamic_count_to'],
-                    $dynamic_units[$track_schedule['dynamic_unit']],
-                    $dynamic_directions[$track_schedule['dynamic_direction']]
+                    $track_schedule['schedule_dynamic_count_from'],
+                    $track_schedule['schedule_dynamic_count_to'],
+                    $dynamic_units[$track_schedule['schedule_dynamic_unit']],
+                    $dynamic_directions[$track_schedule['schedule_dynamic_direction']]
                 );
             }
         }
+            
+        // Due date (has a small dependency on is_open and is_fixed).
+        if ($track_schedule['due_date_is_enabled']) {
+            if (false && $track_schedule['schedule_is_open'] && $track_schedule['schedule_is_fixed']) { // TODO in next patch.
+                if (false && $track_schedule['due_date_is_fixed']) { // TODO in next patch.
+                    $track->update_due_date_fixed(
+                        // TODO $track_schedule['due_date_fixed']
+                    );
+                } else { // Relative.
+                    $track->update_due_date_relative(
+                        // TODO $track_schedule['due_date_relative_count']
+                        // TODO $track_schedule['due_date_relative_unit']
+                    );
+                }
+            } else {
+                $track->update_due_date_relative(
+                    // TODO $track_schedule['due_date_relative_count']
+                    // TODO $track_schedule['due_date_relative_unit']
+                );
+            }
+        } else { // Disabled.
+            $track->update_due_date_disabled();
+        }
+
+        $ec->set_relevant_context($context);
 
         return [
             'track' => $track,
@@ -104,41 +130,46 @@ class update_track_schedule implements mutation_resolver, has_middleware {
         $errors = [];
 
         $all_fields = [
-            'fixed_from',
-            'fixed_to',
-            'dynamic_count_from',
-            'dynamic_count_to',
-            'dynamic_unit',
-            'dynamic_direction',
+            'schedule_fixed_from',
+            'schedule_fixed_to',
+            'schedule_dynamic_count_from',
+            'schedule_dynamic_count_to',
+            'schedule_dynamic_unit',
+            'schedule_dynamic_direction',
+            // TODO due date fields in next patch
         ];
 
-        if ($schedule['is_fixed']) {
-            if ($schedule['is_open']) {
+        // Fixed and dynamic schedules.
+        if ($schedule['schedule_is_fixed']) {
+            if ($schedule['schedule_is_open']) {
                 $required_fields = [
-                    'fixed_from',
+                    'schedule_fixed_from',
                 ];
             } else { // Closed.
                 $required_fields = [
-                    'fixed_from',
-                    'fixed_to',
+                    'schedule_fixed_from',
+                    'schedule_fixed_to',
                 ];
             }
         } else { // Dynamic.
-            if ($schedule['is_open']) {
+            if ($schedule['schedule_is_open']) {
                 $required_fields = [
-                    'dynamic_count_from',
-                    'dynamic_unit',
-                    'dynamic_direction',
+                    'schedule_dynamic_count_from',
+                    'schedule_dynamic_unit',
+                    'schedule_dynamic_direction',
                 ];
             } else { // Closed.
                 $required_fields = [
-                    'dynamic_count_from',
-                    'dynamic_count_to',
-                    'dynamic_unit',
-                    'dynamic_direction',
+                    'schedule_dynamic_count_from',
+                    'schedule_dynamic_count_to',
+                    'schedule_dynamic_unit',
+                    'schedule_dynamic_direction',
                 ];
             }
         }
+
+        // Due date (has a small dependency on is_open and is_fixed).
+        // TODO due date fields in next patch
 
         foreach ($required_fields as $required_field) {
             if (!isset($schedule[$required_field])) {
@@ -153,17 +184,17 @@ class update_track_schedule implements mutation_resolver, has_middleware {
             }
         }
 
-        if (isset($schedule['dynamic_unit'])) {
+        if (isset($schedule['schedule_dynamic_unit'])) {
             $dynamic_units = array_flip(track::get_dynamic_schedule_units());
-            if (!isset($dynamic_units[$schedule['dynamic_unit']])) {
-                $errors[] = 'Invalid dynamic unit specified: ' . $schedule['dynamic_unit'];
+            if (!isset($dynamic_units[$schedule['schedule_dynamic_unit']])) {
+                $errors[] = 'Invalid dynamic unit specified: ' . $schedule['schedule_dynamic_unit'];
             }
         }
 
-        if (isset($schedule['dynamic_direction'])) {
+        if (isset($schedule['schedule_dynamic_direction'])) {
             $dynamic_directions = array_flip(track::get_dynamic_schedule_directions());
-            if (!isset($dynamic_directions[$schedule['dynamic_direction']])) {
-                $errors[] = 'Invalid dynamic direction specified: ' . $schedule['dynamic_direction'];
+            if (!isset($dynamic_directions[$schedule['schedule_dynamic_direction']])) {
+                $errors[] = 'Invalid dynamic direction specified: ' . $schedule['schedule_dynamic_direction'];
             }
         }
 

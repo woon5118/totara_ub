@@ -22,6 +22,7 @@
  * @category test
  */
 
+
 require_once(__DIR__ . '/generator/activity_generator_configuration.php');
 require_once(__DIR__ . '/webapi_resolver_mutation_update_track_schedule.php');
 
@@ -55,9 +56,10 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_fixed_test
         $args = [
             'track_schedule' => [
                 'track_id' => $track1->id,
-                'is_open' => true,
-                'is_fixed' => true,
-                'fixed_from' => 222,
+                'schedule_is_open' => true,
+                'schedule_is_fixed' => true,
+                'schedule_fixed_from' => 222,
+                'due_date_is_enabled' => false,
             ],
         ];
 
@@ -73,9 +75,10 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_fixed_test
         $args = [
             'track_schedule' => [
                 'track_id' => $this->track1_id,
-                'is_open' => true,
-                'is_fixed' => true,
-                'fixed_from' => 222,
+                'schedule_is_open' => true,
+                'schedule_is_fixed' => true,
+                'schedule_fixed_from' => 222,
+                'due_date_is_enabled' => false,
             ],
         ];
 
@@ -110,6 +113,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_fixed_test
         $affected_track->schedule_dynamic_count_to = null;
         $affected_track->schedule_dynamic_unit = null;
         $affected_track->schedule_dynamic_direction = null;
+        $affected_track->due_date_is_enabled = 0;
 
         $after_tracks = $DB->get_records('perform_track', [], 'id');
         unset($after_tracks[$this->track1_id]->updated_at);
@@ -120,9 +124,10 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_fixed_test
         $args = [
             'track_schedule' => [
                 'track_id' => $this->track1_id,
-                'is_open' => true,
-                'is_fixed' => true,
-                'fixed_from' => 222,
+                'schedule_is_open' => true,
+                'schedule_is_fixed' => true,
+                'schedule_fixed_from' => 222,
+                'due_date_is_enabled' => false,
             ],
         ];
 

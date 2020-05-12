@@ -41,7 +41,7 @@ export default {
   render(h, { props }) {
     return h(FlexIcon, {
       props: Object.assign({}, props, {
-        icon: 'calendar',
+        icon: 'notification',
       }),
     });
   },

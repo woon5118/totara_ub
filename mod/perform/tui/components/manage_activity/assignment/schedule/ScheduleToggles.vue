@@ -105,17 +105,60 @@
         </div>
       </div>
     </div>
+    <div class="tui_performAssignmentSchedule__toggle-setting-group">
+      <h4>
+        {{ $str('due_date', 'mod_perform') }}
+      </h4>
+      <div class="tui_performAssignmentScheduleToggles__toggle-group">
+        <div class="tui_performAssignmentScheduleToggles__toggle-set">
+          <ToggleSet :value="dueDate" @input="$emit('update:dueDate', $event)">
+            <ToggleButtonIcon
+              :label="$str('due_date_is_enabled', 'mod_perform')"
+              class="tui_performAssignmentScheduleToggles__toggle-button"
+              :value="DUE_DATE_IS_ENABLED"
+            >
+              <div
+                class="tui_performAssignmentScheduleToggles__toggle-button-content"
+              >
+                <EndDateEnabled :size="300" />
+                <div class="tui_performAssignmentScheduleToggles__button-label">
+                  {{ $str('due_date_is_enabled', 'mod_perform') }}
+                </div>
+              </div>
+            </ToggleButtonIcon>
+            <ToggleButtonIcon
+              :label="$str('due_date_is_disabled', 'mod_perform')"
+              class="tui_performAssignmentScheduleToggles__toggle-button"
+              :value="DUE_DATE_IS_DISABLED"
+            >
+              <div
+                class="tui_performAssignmentScheduleToggles__toggle-button-content"
+              >
+                <EndDateDisabled :size="300" />
+                <div class="tui_performAssignmentScheduleToggles__button-label">
+                  {{ $str('due_date_is_disabled', 'mod_perform') }}
+                </div>
+              </div>
+            </ToggleButtonIcon>
+          </ToggleSet>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 <script>
-import CalendarIcon from 'mod_perform/components/manage_activity/assignment/schedule/icon/Calendar';
+import CalendarIcon from 'totara_core/components/icons/common/Calendar';
 import ToggleButtonIcon from 'totara_core/components/buttons/ToggleButtonIcon';
 import ToggleSet from 'totara_core/components/buttons/ToggleSet';
+import EndDateEnabled from 'mod_perform/components/icons/EndDateEnabled';
+import EndDateDisabled from 'mod_perform/components/icons/EndDateDisabled';
 import {
   SCHEDULE_IS_OPEN,
   SCHEDULE_IS_LIMITED,
   SCHEDULE_IS_FIXED,
   SCHEDULE_IS_DYNAMIC,
+  DUE_DATE_IS_ENABLED,
+  DUE_DATE_IS_DISABLED,
 } from 'mod_perform/constants';
 
 export default {
@@ -123,6 +166,8 @@ export default {
     CalendarIcon,
     ToggleButtonIcon,
     ToggleSet,
+    EndDateEnabled,
+    EndDateDisabled,
   },
   props: {
     fixedDynamic: {
@@ -135,6 +180,12 @@ export default {
       type: String,
       validator: val => [SCHEDULE_IS_OPEN, SCHEDULE_IS_LIMITED].includes(val),
     },
+    dueDate: {
+      required: true,
+      type: String,
+      validator: val =>
+        [DUE_DATE_IS_ENABLED, DUE_DATE_IS_DISABLED].includes(val),
+    },
   },
   data() {
     return {
@@ -142,6 +193,8 @@ export default {
       SCHEDULE_IS_LIMITED,
       SCHEDULE_IS_FIXED,
       SCHEDULE_IS_DYNAMIC,
+      DUE_DATE_IS_ENABLED,
+      DUE_DATE_IS_DISABLED,
     };
   },
 };

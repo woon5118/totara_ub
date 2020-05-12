@@ -45,6 +45,7 @@ use moodle_exception;
  * @property-read int $schedule_dynamic_count_to
  * @property-read int $schedule_dynamic_unit
  * @property-read int $schedule_dynamic_direction
+ * @property-read bool $due_date_is_enabled
  * @property-read int $created_at
  * @property-read int $updated_at
  *
@@ -66,6 +67,7 @@ class track extends model {
         'schedule_dynamic_count_to',
         'schedule_dynamic_unit',
         'schedule_dynamic_direction',
+        'due_date_is_enabled',
         'created_at',
         'updated_at',
     ];
@@ -105,6 +107,14 @@ class track extends model {
         $entity->description = $description;
         $entity->status = track_status::ACTIVE;
         $entity->schedule_is_open = true;
+        $entity->schedule_is_fixed = true;
+        $entity->schedule_fixed_from = time();
+        $entity->schedule_fixed_to = null;
+        $entity->schedule_dynamic_count_from = null;
+        $entity->schedule_dynamic_count_to = null;
+        $entity->schedule_dynamic_unit = null;
+        $entity->schedule_dynamic_direction = null;
+        $entity->due_date_is_enabled = false;
         $entity->save();
 
         return new track($entity);
@@ -376,6 +386,54 @@ class track extends model {
         ];
 
         $this->update_schedule_properties($properties_to_update);
+    }
+
+    /**
+     * Disable the due date
+     *
+     * Clears all due date related fields.
+     */
+    public function update_due_date_disabled(): void {
+        $entity = $this->entity;
+
+        $entity->due_date_is_enabled = false;
+        // TODO set fixed and relative due date fields set to null
+
+        $this->entity->update();
+    }
+
+    /**
+     * Update the due date to fixed (and enabled)
+     *
+     * TODO add fixed due date param
+     */
+    public function update_due_date_fixed(): void {
+        $entity = $this->entity;
+
+        if ($entity->schedule_is_open || !$entity->schedule_is_fixed) {
+            throw new coding_exception('Cannot set due date to relative except when schedule is not open and fixed');
+        }
+
+        $entity->due_date_is_enabled = true;
+        // TODO set fixed due date field
+        // TODO set relative due date fields to null
+
+        $this->entity->update();
+    }
+
+    /**
+     * Update the due date to relative (and enabled)
+     *
+     * TODO add relative due date params
+     */
+    public function update_due_date_relative(): void {
+        $entity = $this->entity;
+
+        $entity->due_date_is_enabled = true;
+        // TODO set relative due date fields
+        // TODO set fixed due date fields to null
+
+        $this->entity->update();
     }
 
     private function update_schedule_properties(array $properties): void {

@@ -68,6 +68,7 @@ class track extends entity_model_formatter {
                 }
                 return $map[$value];
             },
+            'due_date_is_enabled' => null,
             'created_at' => null,
             'updated_at' => null,
             'assignments' => null

@@ -22,13 +22,13 @@
  * @category test
  */
 
-require_once(__DIR__ . '/generator/activity_generator_configuration.php');
-require_once(__DIR__ . '/webapi_resolver_mutation_update_track_schedule.php');
-
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\track;
 use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
+
+require_once(__DIR__ . '/generator/activity_generator_configuration.php');
+require_once(__DIR__ . '/webapi_resolver_mutation_update_track_schedule.php');
 
 /**
  * @group perform
@@ -55,10 +55,11 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_fixed_te
         $args = [
             'track_schedule' => [
                 'track_id' => $track1->id,
-                'is_open' => false,
-                'is_fixed' => true,
-                'fixed_from' => 123,
-                'fixed_to' => 234,
+                'schedule_is_open' => false,
+                'schedule_is_fixed' => true,
+                'schedule_fixed_from' => 123,
+                'schedule_fixed_to' => 234,
+                'due_date_is_enabled' => false,
             ],
         ];
 
@@ -74,10 +75,11 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_fixed_te
         $args = [
             'track_schedule' => [
                 'track_id' => $this->track1_id,
-                'is_open' => false,
-                'is_fixed' => true,
-                'fixed_from' => 222,
-                'fixed_to' => 333,
+                'schedule_is_open' => false,
+                'schedule_is_fixed' => true,
+                'schedule_fixed_from' => 222,
+                'schedule_fixed_to' => 333,
+                'due_date_is_enabled' => false,
             ],
         ];
 
@@ -112,6 +114,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_fixed_te
         $affected_track->schedule_dynamic_count_to = null;
         $affected_track->schedule_dynamic_unit = null;
         $affected_track->schedule_dynamic_direction = null;
+        $affected_track->due_date_is_enabled = 0;
 
         $after_tracks = $DB->get_records('perform_track', [], 'id');
         unset($after_tracks[$this->track1_id]->updated_at);
@@ -123,10 +126,11 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_fixed_te
         $args = [
             'track_schedule' => [
                 'track_id' => $this->track1_id,
-                'is_open' => false,
-                'is_fixed' => true,
-                'fixed_from' => 234,
-                'fixed_to' => 123,
+                'schedule_is_open' => false,
+                'schedule_is_fixed' => true,
+                'schedule_fixed_from' => 234,
+                'schedule_fixed_to' => 123,
+                'due_date_is_enabled' => false,
             ],
         ];
 
@@ -141,10 +145,11 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_fixed_te
         $args = [
             'track_schedule' => [
                 'track_id' => $this->track1_id,
-                'is_open' => false,
-                'is_fixed' => true,
-                'fixed_from' => 123,
-                'fixed_to' => 234,
+                'schedule_is_open' => false,
+                'schedule_is_fixed' => true,
+                'schedule_fixed_from' => 123,
+                'schedule_fixed_to' => 234,
+                'due_date_is_enabled' => false,
             ],
         ];
 

@@ -29,4 +29,9 @@ $icons = [
             'classes' => 'fa-ellipsis-h',
         ],
     ],
+    'mod_perform|notification-slash' => [
+        'data' => [
+            'classes' => 'fa-bell-slash',
+        ],
+    ],
 ];

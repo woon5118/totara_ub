@@ -1035,7 +1035,6 @@ function xmldb_perform_upgrade($oldversion) {
         // Perform savepoint reached.
         upgrade_mod_savepoint(true, 2020051800, 'perform');
     }
-
     if ($oldversion < 2020052000) {
         // Define field schedule_dynamic_count_from to be added to perform_track.
         $table = new xmldb_table('perform_track');
@@ -1066,9 +1065,22 @@ function xmldb_perform_upgrade($oldversion) {
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
+        upgrade_mod_savepoint(true, 2020052000, 'perform');
+    }
+    if ($oldversion < 2020052001) {
+        $table = new xmldb_table('perform_track');
+
+        // Define field due_date_is_enabled to be added to perform_track.
+        $field = new xmldb_field('due_date_is_enabled', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, 0, 'schedule_dynamic_direction');
+
+        // Conditionally launch add field due_date_is_enabled.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
 
         // Perform savepoint reached.
-        upgrade_mod_savepoint(true, 2020052000, 'perform');
+        upgrade_mod_savepoint(true, 2020052001, 'perform');
+
     }
 
     return true;
