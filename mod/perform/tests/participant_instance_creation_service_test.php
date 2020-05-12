@@ -36,6 +36,8 @@ use totara_job\relationship\resolvers\manager;
 
 /**
  * Class participant_instance_creation_service_test
+ *
+ * @group perform
  */
 class mod_perform_participant_instance_creation_service_testcase extends advanced_testcase {
 

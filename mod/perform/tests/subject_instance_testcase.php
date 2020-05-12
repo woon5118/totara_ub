@@ -25,6 +25,11 @@ use core\webapi\execution_context;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 use mod_perform\models\activity\subject_instance;
 
+/**
+ * Class mod_perform_subject_instance_testcase
+ *
+ * @group perform
+ */
 abstract class mod_perform_subject_instance_testcase extends advanced_testcase {
 
     /** @var stdClass */

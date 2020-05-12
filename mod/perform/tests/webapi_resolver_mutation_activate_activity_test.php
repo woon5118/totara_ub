@@ -19,7 +19,6 @@
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
  * @package mod_perform
- * @group perform
  */
 
 use core\webapi\execution_context;
@@ -30,6 +29,11 @@ use mod_perform\webapi\resolver\mutation\activate_activity;
 use totara_job\relationship\resolvers\manager;
 use totara_webapi\graphql;
 
+/**
+ * Class mod_perform_webapi_resolver_mutation_activate_activity_testcase
+ *
+ * @group perform
+ */
 class mod_perform_webapi_resolver_mutation_activate_activity_testcase extends advanced_testcase {
 
     private function get_execution_context(string $type = graphql::TYPE_AJAX, ?string $operation = null): execution_context {

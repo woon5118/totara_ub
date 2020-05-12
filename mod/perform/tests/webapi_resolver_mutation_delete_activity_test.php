@@ -19,7 +19,6 @@
  *
  * @author Jaron Steenson <jaron.steenson@totaralearning.com>
  * @package mod_perform
- * @group perform
  */
 
 use core\webapi\execution_context;
@@ -28,6 +27,11 @@ use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\webapi\resolver\mutation\delete_activity;
 use totara_webapi\graphql;
 
+/**
+ * Class mod_perform_webapi_resolver_mutation_delete_activity_testcase
+ *
+ * @group perform
+ */
 class mod_perform_webapi_resolver_mutation_delete_activity_testcase extends advanced_testcase {
 
     private function get_execution_context(string $type = graphql::TYPE_AJAX, ?string $operation = null): execution_context {

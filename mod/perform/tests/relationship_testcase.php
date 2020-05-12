@@ -30,6 +30,11 @@ use totara_core\relationship\resolvers\subject;
 use totara_job\relationship\resolvers\appraiser;
 use totara_job\relationship\resolvers\manager;
 
+/**
+ * Class mod_perform_relationship_testcase
+ *
+ * @group perform
+ */
 abstract class mod_perform_relationship_testcase extends advanced_testcase {
 
     /**
