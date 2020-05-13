@@ -113,6 +113,8 @@ $string['perform:view_manage_activities'] = 'Access the performance activities m
 $string['perform:view_participation_reporting'] = 'Access the participation reporting interface';
 $string['pluginadministration'] = 'Performance activity administration';
 $string['relation_to_subject_self'] = 'Self';
+$string['report_activity_warning_message'] = 'This report page can only show details for a single activity at a time - to select which activity\'s report to view, go to <a href="{$a->url}">Manage performance activities</a>, and click on the relevant activity\'s reporting icon.';
+$string['report_participant_warning_message'] = 'This report page can only show details for a single subject instance at a time - to select which subject instance\'s report to view, go to <a href="{$a->url}">Manage performance activities</a>, click on the reporting icon of the activity to which the subject instance belongs. From the report\'s list of subject instances, navigate to the relevant one\'s participant instance report by clicking on its participant count.';
 $string['save_changes'] = 'Save changes';
 $string['section_add_element'] = 'Add element';
 $string['schedule_activity_instance_creation_period'] = 'Activity instance creation period';

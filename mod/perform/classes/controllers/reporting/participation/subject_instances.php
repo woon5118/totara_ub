@@ -24,38 +24,58 @@
 namespace mod_perform\controllers\reporting\participation;
 
 use context;
+use context_system;
+use core\notification;
 use mod_perform\controllers\perform_controller;
 use mod_perform\models\activity\activity;
-use mod_perform\models\activity\subject_instance;
 use moodle_exception;
+use moodle_url;
 use totara_mvc\has_report;
 use totara_mvc\report_view;
+use totara_mvc\view;
 
 class subject_instances extends perform_controller {
 
     use has_report;
 
-    private $activity;
+    /**
+     * mod_perform\models\activity\activity instance
+     * @var activity $activity
+     */
+    private $activity = null;
 
     public function setup_context(): context {
-        return $this->get_activity()->get_context();
+        if ($this->get_param('activity_id', PARAM_INT)) {
+            return $this->get_activity()->get_context();
+        } else {
+            return context_system::instance();
+        }
     }
 
     public function action() {
         parent::action();
 
-        $report = $this->load_embedded_report('perform_subject_instance', ['activity_id' => $this->get_activity()->id]);
+        if ($this->get_param('activity_id', PARAM_INT)) {
+            $report = $this->load_embedded_report('perform_subject_instance', ['activity_id' => $this->get_activity()->id]);
 
-        $sid = $this->get_param('sid', PARAM_INT, 0);
-        $debug = $this->get_param('debug', PARAM_INT, 0);
+            $sid = $this->get_param('sid', PARAM_INT, 0);
+            $debug = $this->get_param('debug', PARAM_INT, 0);
 
-        return (new report_view('mod_perform/report', $report, $sid, $debug))
-            ->set_title($this->get_activity()->name)
-            ->set_url(static::get_url(['activity_id' => $this->get_activity()->id]))
-            ->set_backto(
-                new \moodle_url('/mod/perform/manage/activity/index.php'),
-                get_string('back_to_all_activities', 'mod_perform')
-            );
+            return (new report_view('mod_perform/report', $report, $sid, $debug))
+                ->set_title($this->get_activity()->name)
+                ->set_url(static::get_url(['activity_id' => $this->get_activity()->id]))
+                ->set_backto(
+                    new moodle_url('/mod/perform/manage/activity/index.php'),
+                    get_string('back_to_all_activities', 'mod_perform')
+                );
+        } else {
+            $url = new moodle_url('/mod/perform/manage/activity/index.php');
+            return (new view('mod_perform/no_report', [
+                'content' => notification::warning(
+                    get_string('report_activity_warning_message', 'mod_perform', (object)['url' => $url->out(true)])
+                )
+            ]));
+        }
     }
 
     public static function get_base_url(): string {
@@ -64,16 +84,13 @@ class subject_instances extends perform_controller {
 
     private function get_activity(): activity {
         if (!isset($this->activity)) {
-            $activity_id = $this->get_param('activity_id', PARAM_INT, null, true);
-
             try {
+                $activity_id = $this->get_param('activity_id', PARAM_INT, null, true);
                 $this->activity = activity::load_by_id($activity_id);
             } catch (\Exception $e) {
                 throw new moodle_exception('error_activity_id_wrong', 'mod_perform', '', null, $e);
             }
         }
-
         return $this->activity;
     }
-
 }
