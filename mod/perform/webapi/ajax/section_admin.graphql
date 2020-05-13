@@ -13,6 +13,7 @@ query mod_perform_section_admin($section_id: core_id!) {
           participant_form_component
         }
         title
+        raw_title: title(format: RAW)
         identifier
         data
       }

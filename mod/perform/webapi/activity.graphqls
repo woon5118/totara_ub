@@ -43,7 +43,7 @@ An element in the element library
 type mod_perform_element {
   id: core_id!
   element_plugin: mod_perform_element_plugin!
-  title: String!
+  title(format: core_format = PLAIN): String!
   identifier: String
   data: String
 }

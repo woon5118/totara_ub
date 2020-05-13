@@ -23,7 +23,7 @@
 <template>
   <ElementAdminDisplay
     :type="type"
-    :name="name"
+    :title="title"
     :error="error"
     @edit="$emit('edit')"
     @remove="$emit('remove')"
@@ -39,7 +39,7 @@ export default {
   },
 
   props: {
-    name: String,
+    title: String,
     type: Object,
     data: Object,
     error: String,

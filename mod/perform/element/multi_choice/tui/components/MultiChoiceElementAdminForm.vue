@@ -35,7 +35,7 @@
             :label="$str('question_title', 'performelement_multi_choice')"
           >
             <FormText
-              name="name"
+              name="rawTitle"
               :validations="v => [v.required(), v.maxLength(1024)]"
             />
           </FormRow>
@@ -118,13 +118,18 @@ export default {
 
   props: {
     type: Object,
-    name: String,
+    title: String,
+    rawTitle: String,
     data: Object,
     error: String,
   },
 
   data() {
-    const initialValues = { name: this.name, answers: [] };
+    const initialValues = {
+      title: this.title,
+      rawTitle: this.rawTitle,
+      answers: [],
+    };
     if (Object.keys(this.data).length == 0) {
       initialValues.answers = ['', ''];
     } else {
@@ -151,7 +156,7 @@ export default {
         optionList.push({ name: OPTION_PREFIX + index, value: item });
       });
       this.$emit('update', {
-        name: values.name,
+        title: values.rawTitle,
         data: { options: optionList },
       });
     },

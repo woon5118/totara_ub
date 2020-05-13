@@ -47,7 +47,7 @@ class element implements type_resolver {
             throw new \coding_exception('Expected element model');
         }
 
-        $format = $args['format'] ?? format::FORMAT_HTML;
+        $format = $args['format'] ?? format::FORMAT_PLAIN;
         $context = $ec->has_relevant_context() ? $ec->get_relevant_context() : \context_system::instance();
         $formatter = new element_formatter($element, $context);
         return $formatter->format($field, $format);

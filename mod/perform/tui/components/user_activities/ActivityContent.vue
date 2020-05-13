@@ -65,7 +65,7 @@
         <Collapsible
           v-for="sectionElement in sectionElements"
           :key="sectionElement.id"
-          :label="sectionElement.element.name"
+          :label="sectionElement.element.title"
           :initial-state="true"
           class="tui-participantContent__sectionItem"
         >
@@ -74,7 +74,7 @@
               :is="sectionElement.component"
               :path="['sectionElements', sectionElement.id]"
               :data="sectionElement.element.data"
-              :name="sectionElement.element.name"
+              :title="sectionElement.element.title"
               :type="sectionElement.element.type"
               :error="errors && errors[sectionElement.clientId]"
             />
@@ -207,7 +207,7 @@ export default {
               ),
               element: {
                 type: item.element.element_plugin,
-                name: item.element.title,
+                title: item.element.title,
                 identifier: item.element.identifier,
                 data: JSON.parse(item.element.data),
                 responseData: null,

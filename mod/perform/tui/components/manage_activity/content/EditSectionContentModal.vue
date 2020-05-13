@@ -35,7 +35,8 @@
           ref="sectionElements"
           :key="sectionElement.clientId"
           :data="sectionElement.element.data"
-          :name="sectionElement.element.name"
+          :title="sectionElement.element.title"
+          :raw-title="sectionElement.element.raw_title"
           :type="sectionElement.element.type"
           :error="errors[sectionElement.clientId]"
           @update="update(sectionElement, $event)"
@@ -114,7 +115,8 @@ export default {
               element: {
                 id: item.element.id,
                 type: item.element.element_plugin,
-                name: item.element.title,
+                title: item.element.title,
+                raw_title: item.element.raw_title,
                 identifier: item.element.identifier,
                 data: JSON.parse(item.element.data),
               },
@@ -137,7 +139,8 @@ export default {
         element: {
           id: null,
           type: plugin,
-          name: '',
+          title: '',
+          raw_title: '',
           identifier: null,
           data: {},
         },
@@ -152,8 +155,9 @@ export default {
     /**
      * update existing elements and shows display view of the element
      */
-    update(sectionElement, { name, data }) {
-      sectionElement.element.name = name;
+    update(sectionElement, { title, data }) {
+      sectionElement.element.title = title;
+      sectionElement.element.raw_title = title;
       sectionElement.element.data = data;
       delete sectionElement.creating;
       this.display(sectionElement);
@@ -255,14 +259,14 @@ export default {
         if (!item.element.id) {
           createNew.push({
             plugin_name: item.element.type.plugin_name,
-            title: item.element.name,
+            title: item.element.raw_title,
             data: JSON.stringify(item.element.data),
             sort_order: sortOrder,
           });
         } else {
           update.push({
             element_id: item.element.id,
-            title: item.element.name,
+            title: item.element.raw_title,
             data: JSON.stringify(item.element.data),
           });
           move.push({

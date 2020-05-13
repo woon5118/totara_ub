@@ -25,7 +25,7 @@
     <div v-if="error">{{ error }}</div>
     <div class="tui-elementEditDisplay__inner">
       <div class="tui-elementEditDisplay__inner-header">
-        <div class="tui-elementEditDisplay__title">{{ name }}</div>
+        <div class="tui-elementEditDisplay__title">{{ title }}</div>
         <div class="tui-elementEditDisplay__action">
           <ButtonIcon
             :aria-label="$str('section_delete_element', 'mod_perform')"
@@ -53,7 +53,7 @@ export default {
   },
 
   props: {
-    name: String,
+    title: String,
     type: Object,
     error: String,
   },

@@ -35,7 +35,7 @@
             :label="$str('short_text_title', 'performelement_short_text')"
           >
             <FormText
-              name="name"
+              name="rawTitle"
               :validations="v => [v.required(), v.maxLength(1024)]"
             />
           </FormRow>
@@ -87,14 +87,16 @@ export default {
 
   props: {
     type: Object,
-    name: String,
+    title: String,
+    rawTitle: String,
     data: Object,
     error: String,
   },
   computed: {
     initialValues() {
       return {
-        name: this.name,
+        title: this.title,
+        rawTitle: this.rawTitle,
       };
     },
   },
@@ -102,7 +104,7 @@ export default {
   methods: {
     handleSubmit(values) {
       this.$emit('update', {
-        name: values.name,
+        title: values.rawTitle,
         data: {},
       });
     },
