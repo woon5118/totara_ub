@@ -54,20 +54,30 @@
       />
     </template>
     <template v-slot:trigger>
-      <slot name="rating-trigger" />
+      <ButtonIcon
+        :styleclass="{ small: true }"
+        :aria-label="$str('activity_participants_add', 'mod_perform')"
+        :disabled="hasAddedAllParticipants"
+      >
+        <AddIcon size="100" />
+      </ButtonIcon>
     </template>
   </Popover>
 </template>
 <script>
+import AddIcon from 'totara_core/components/icons/common/Add';
 import Button from 'totara_core/components/buttons/Button';
+import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
 import Checkbox from 'totara_core/components/form/Checkbox';
 import Popover from 'totara_core/components/popover/Popover';
 import RelationshipsQuery from 'totara_core/graphql/relationships.graphql';
 
 export default {
   components: {
-    Checkbox,
+    AddIcon,
     Button,
+    ButtonIcon,
+    Checkbox,
     Popover,
   },
 
@@ -83,6 +93,14 @@ export default {
       availableParticipants: [],
       checkedParticipants: [],
     };
+  },
+
+  computed: {
+    hasAddedAllParticipants() {
+      return (
+        this.availableParticipants.length === this.activeParticipants.length
+      );
+    },
   },
 
   methods: {

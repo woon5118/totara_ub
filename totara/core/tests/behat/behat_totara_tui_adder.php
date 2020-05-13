@@ -408,7 +408,7 @@ class behat_totara_tui_adder extends behat_base {
     }
 
     /**
-     * Convenience method to throw an ExpectionException on an fail
+     * Convenience method to fail from an ExpectationException.
      *
      * @param string $error error message.
      */

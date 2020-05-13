@@ -1112,6 +1112,75 @@ class behat_general extends behat_base {
     }
 
     /**
+     * Checks, that element of specified type inside a container is disabled.
+     *
+     * @Then /^the "([^"]*)" "([^"]*)" should be disabled in the "([^"]*)" "([^"]*)"$/
+     * @param string $element Element we look in
+     * @param $selector_type
+     * @param $container_element
+     * @param $container_selector_type
+     */
+    public function the_element_should_be_disabled_in_the(
+        $element,
+        $selector_type,
+        $container_element,
+        $container_selector_type
+    ): void {
+        \behat_hooks::set_step_readonly(true);
+
+        $node = $this->find_the_element_in_the($element, $selector_type, $container_element, $container_selector_type);
+
+        if (!$node->hasAttribute('disabled')) {
+            throw new ExpectationException('The element "' . $element . '" is not disabled', $this->getSession());
+        }
+    }
+
+    /**
+     * Checks, that element of specified type inside a container is disabled.
+     *
+     * @Then /^the "([^"]*)" "([^"]*)" should be enabled in the "([^"]*)" "([^"]*)"$/
+     * @param string $element Element we look in
+     * @param $selector_type
+     * @param $container_element
+     * @param $container_selector_type
+     */
+    public function the_element_should_be_enabled_in_the(
+        $element,
+        $selector_type,
+        $container_element,
+        $container_selector_type
+    ): void {
+        \behat_hooks::set_step_readonly(true);
+
+        $node = $this->find_the_element_in_the($element, $selector_type, $container_element, $container_selector_type);
+
+        if ($node->hasAttribute('disabled')) {
+            throw new ExpectationException('The element "' . $element . '" is not enabled', $this->getSession());
+        }
+    }
+
+    private function find_the_element_in_the(
+        string $element,
+        string $selector_type,
+        string $container_element,
+        string $container_selector_type
+    ) {
+        // Transforming from steps definitions selector/locator format to Mink format and getting the NodeElement.
+        $container_node = $this->get_selected_node($container_selector_type, $container_element);
+
+        if ($container_node === null) {
+            throw new ExpectationException(
+                'The element "' . $container_element . '" container element could not be found',
+                $this->getSession()
+            );
+        }
+
+        [$selector, $locator] = $this->transform_selector($selector_type, $element);
+
+        return $container_node->find($selector, $locator);
+    }
+
+    /**
      * Checks, that element of specified type is enabled.
      *
      * @Then /^the "(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>[^"]*)" should be enabled$/

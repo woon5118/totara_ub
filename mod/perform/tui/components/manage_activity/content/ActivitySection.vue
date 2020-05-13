@@ -58,30 +58,23 @@
         <ParticipantsPopover
           :active-participants="displayedParticipants"
           @update-participants="updateDisplayedParticipants"
-        >
-          <template v-slot:rating-trigger>
-            <ButtonIcon
-              :styleclass="{ small: true }"
-              :aria-label="$str('activity_participants_add', 'mod_perform')"
-            >
-              <AddIcon size="100" />
-            </ButtonIcon>
-          </template>
-        </ParticipantsPopover>
+        />
 
         <br />
-        <Button
-          :styleclass="{ primary: true }"
-          :text="$str('activity_section_save_changes', 'mod_perform')"
-          :disabled="isSaving || !hasChanges"
-          @click="trySave"
-        />
-        <Button
-          :styleclass="{ primary: false }"
-          :text="$str('cancel')"
-          :disabled="isSaving || !hasChanges"
-          @click="resetSectionChanges"
-        />
+        <ButtonGroup>
+          <Button
+            :styleclass="{ primary: true }"
+            :text="$str('activity_section_save_changes', 'mod_perform')"
+            :disabled="isSaving || !hasChanges"
+            @click="trySave"
+          />
+          <Button
+            :styleclass="{ primary: false }"
+            :text="$str('cancel')"
+            :disabled="isSaving || !hasChanges"
+            @click="resetSectionChanges"
+          />
+        </ButtonGroup>
       </GridItem>
     </Grid>
 
@@ -96,8 +89,8 @@
 </template>
 
 <script>
-import AddIcon from 'totara_core/components/icons/common/Add';
 import Button from 'totara_core/components/buttons/Button';
+import ButtonGroup from 'totara_core/components/buttons/ButtonGroup';
 import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
 import Card from 'totara_core/components/card/Card';
 import DeleteIcon from 'totara_core/components/icons/common/Delete';
@@ -110,9 +103,9 @@ import UpdateSectionRelationshipsMutation from 'mod_perform/graphql/update_secti
 
 export default {
   components: {
-    AddIcon,
     Button,
     ButtonIcon,
+    ButtonGroup,
     Card,
     DeleteIcon,
     EditSectionContentModal,

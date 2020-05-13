@@ -41,12 +41,15 @@ class behat_mod_perform extends behat_base {
     public const PERFORM_ACTIVITY_YOUR_RELATIONSHIP_LOCATOR = '.tui-participantContent__user-relationshipValue';
     public const PERFORM_SHOW_OTHERS_RESPONSES_INPUT_LOCATOR = '.tui-participantContent__sectionHeading-switch input';
     public const PERFORM_SHOW_OTHERS_RESPONSES_LABEL_LOCATOR = '.tui-participantContent__sectionHeading-switch label';
+    public const MANAGE_CONTENT_PARTICIPANT_ROW_LOCATOR = '.mod-perform-activitySection__participant-row';
+    public const MANAGE_CONTENT_ADD_PARTICIPANTS_BUTTON_LABEL = ".mod-perform-activitySection [aria-label='Add participants']";
 
     public const TUI_USER_ANSWER_ERROR_LOCATOR = '.tui-formFieldError';
     public const USER_QUESTION_TEXT_LOCATOR = '.tui-collapsible__header-text';
     public const TUI_TAB_ELEMENT = '.tui-tabs__tabs';
     public const SCHEDULE_SAVE_LOCATOR ='.tui_performAssignmentSchedule__action-submit';
 
+    public const TUI_TRASH_ICON_BUTTON = "button[aria-label='Delete']";
 
     /**
      * Navigate to the specified page and wait for JS.
@@ -309,7 +312,7 @@ class behat_mod_perform extends behat_base {
     private function find_question_other_responses_by_element(string $element_type, NodeElement $other_responses) {
         $map = [
             'short text' => self::SHORT_TEXT_ANSWER_LOCATOR,
-            "multi choice" => self::MULTI_CHOICE_ANSWER_LOCATOR
+            'multi choice' => self::MULTI_CHOICE_ANSWER_LOCATOR
         ];
 
         $locator =  $map[$element_type] ?? null;
@@ -323,7 +326,7 @@ class behat_mod_perform extends behat_base {
     private function get_response_element_response_locator(string $element_type): string {
         $map = [
             'short text' => self::SHORT_TEXT_RESPONSE_LOCATOR,
-            "multi choice" => self::MULTI_CHOICE_RESPONSE_LOCATOR
+            'multi choice' => self::MULTI_CHOICE_RESPONSE_LOCATOR
         ];
 
         $locator =  $map[$element_type] ?? null;
@@ -352,6 +355,88 @@ class behat_mod_perform extends behat_base {
         }
 
         throw new ExpectationException("Question not found with text {$question_text}", $this->getSession());
+    }
+
+    /**
+     * @Then /^I should see no perform activity participants$/
+     */
+    public function i_should_see_no_participants(): void {
+        $this->ensure_element_does_not_exist(
+            self::MANAGE_CONTENT_PARTICIPANT_ROW_LOCATOR,
+            'css_element'
+        );
+    }
+
+    /**
+     * @Then /^I should see "([^"]*)" as the perform activity participants$/
+     */
+    public function i_should_see_as_the_participants($expected_participant_list): void {
+        $expected_participants = explode(',', $expected_participant_list);
+
+        /** @var NodeElement[] $rows */
+        $rows = $this->find_all('css', self::MANAGE_CONTENT_PARTICIPANT_ROW_LOCATOR);
+
+        foreach ($expected_participants as $index => $expected_participant) {
+            if (trim($rows[$index]->getText()) !== trim($expected_participant)) {
+                $this->fail("{$expected_participant} was not found in the {$index} position");
+            }
+        }
+    }
+
+    /**
+     * @When /^I click the add perform activity participant button$/
+     */
+    public function i_click_the_add_participant_button(): void {
+        $this->find(
+            'css',
+            self::MANAGE_CONTENT_ADD_PARTICIPANTS_BUTTON_LABEL
+        )->click();
+    }
+
+    /**
+     * @When /^I should see the add perform activity participant button is disabled$/
+     */
+    public function i_should_see_the_add_participant_button_is_disabled(): void {
+        $this->execute('behat_general::the_element_should_be_disabled',
+            [self::MANAGE_CONTENT_ADD_PARTICIPANTS_BUTTON_LABEL, 'css_element']
+        );
+    }
+
+    /**
+     * @When /^I should see the add perform activity participant button$/
+     */
+    public function i_should_see_the_add_participant_button(): void {
+        $this->ensure_element_exists(
+            self::MANAGE_CONTENT_ADD_PARTICIPANTS_BUTTON_LABEL,
+            'css_element'
+        );
+    }
+
+    /**
+     * @When /^I remove "([^"]*)" as a perform activity participant$/
+     * @param string $participant_to_remove
+     */
+    public function i_remove_as_a_participant(string $participant_to_remove): void {
+        /** @var NodeElement[] $rows */
+        $rows = $this->find_all('css', self::MANAGE_CONTENT_PARTICIPANT_ROW_LOCATOR);
+
+        foreach ($rows as $participant_row) {
+            if (trim($participant_row->getText()) === $participant_to_remove) {
+                $participant_row->find('css', self::TUI_TRASH_ICON_BUTTON)->click();
+                return;
+            }
+        }
+
+        $this->fail("{$participant_to_remove} participant not found");
+    }
+
+    /**
+     * Convenience method to fail from an ExpectationException.
+     *
+     * @param string $error error message.
+     */
+    private function fail(string $error): void {
+        throw new ExpectationException($error, $this->getSession());
     }
 
 }
