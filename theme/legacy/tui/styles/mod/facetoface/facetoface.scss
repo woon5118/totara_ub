@@ -530,13 +530,11 @@ select.menuf2f-select {
     }
 
     &__action {
-      // Override Bootstrap.
-      &__buttons.btn-group {
+      &__buttons {
         display: flex;
         justify-content: center;
       }
-      // Override Bootstrap.
-      &__buttons.btn-group &__dropdown.dropdown-toggle {
+      &__buttons &__dropdown.dropdown-toggle {
         padding: var(--tui-gap-1) var(--tui-gap-2);
       }
       &__icons {
@@ -547,6 +545,7 @@ select.menuf2f-select {
         margin-top: var(--tui-gap-1);
       }
       &__dropdown {
+        margin-left: var(--tui-gap-1);
         > .flex-icon {
           font-size: 111%;
           // This hackery disables font hinting and grid fitting to get a better rendering result of the "..." button.
