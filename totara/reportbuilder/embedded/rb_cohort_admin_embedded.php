@@ -121,6 +121,16 @@ class rb_cohort_admin_embedded extends rb_base_embedded {
     }
 
     /**
+     * Can searches be saved?
+     *
+     * @return bool
+     */
+    public static function is_search_saving_allowed(): bool {
+        // The audience management UI is using report parameters that are not compatible with saved searches.
+        return false;
+    }
+
+    /**
      * Check if the user is capable of accessing this report.
      * We use $reportfor instead of $USER->id and $report->get_param_value() instead of getting report params
      * some other way so that the embedded report will be compatible with the scheduler (in the future).
