@@ -236,6 +236,25 @@ select.menuf2f-select {
   }
 }
 
+@mixin force-link-style() {
+  &,
+  &:active,
+  &:focus,
+  &:hover,
+  &:active:focus,
+  &:active:hover {
+      background: transparent none;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      cursor: pointer;
+      font: inherit;
+      margin: 0;
+      outline: none;
+      padding: 0;
+  }
+}
+
 .mod_facetoface {
   // +++ Action bars +++ //
   &__action {
@@ -765,7 +784,23 @@ select.menuf2f-select {
     }
   }
 
-    // +++ Event page +++ //
+  @mixin sidebar-panel-close() {
+    height: 0;
+    min-height: 0;
+    padding: 0;
+    transform: scaleY(0);
+    visibility: hidden;
+  }
+
+  @mixin sidebar-panel-open() {
+    height: auto;
+    min-height: 200px; // DES-89
+    padding: var(--tui-gap-6);
+    transform: none;
+    visibility: visible;
+  }
+
+  // +++ Event page +++ //
   &__eventinfo {
     display: flex;
     margin-bottom: var(--tui-gap-2);
@@ -863,22 +898,6 @@ select.menuf2f-select {
           }
         }
       }
-    }
-
-    @mixin sidebar-panel-close() {
-      height: 0;
-      min-height: 0;
-      padding: 0;
-      transform: scaleY(0);
-      visibility: hidden;
-    }
-
-    @mixin sidebar-panel-open() {
-      height: auto;
-      min-height: 200px; // DES-89
-      padding: var(--tui-gap-6);
-      transform: none;
-      visibility: visible;
     }
 
     &__sidebars {
@@ -985,46 +1004,63 @@ select.menuf2f-select {
       }
 
       &__cancellation {
-        @include with-heading;
+        @include with-heading();
       }
 
       &__cancellation-confirm {
-        @include sidebar-panel-close;
+        @include sidebar-panel-close();
       }
 
       &__signup-failure {
-        @include with-heading;
+        @include with-heading();
 
         background: var(--tui-color-neutral-2);
         color: var(--tui-color-neutral-1);
       }
 
       &__cancellation-cancellation {  // NOTE: this is not a typo.
-        cursor: pointer;
-        font-size: var(--tui-gap-10);
-        line-height: 1;
-        padding: 0;
-        position: absolute;
-        top: 0;
-        right: var(--tui-gap-2);
+        @include force-link-style();
+        color: var(--tui-color-state);
+
+        &:active,
+        &:focus,
+        &:hover,
+        &:active:focus,
+        &:active:hover {
+          color: var(--tui-color-state-focus);
+        }
+
+        &,
+        &:active,
+        &:focus,
+        &:hover,
+        &:active:focus,
+        &:active:hover {
+          font-size: var(--tui-font-size-20);
+          line-height: 1;
+          position: absolute;
+          top: var(--tui-font-size-10);
+          right: var(--tui-gap-2);
+        }
+      }
+    }
+
+    &__card {
+      &__toggle {
+        @include force-link-color();
+        @include force-link-style();
       }
     }
 
     &__cancellation {
       display: none;
 
-      &__link {
-        @include force-link-color;
-        cursor: pointer;
-        font: inherit;
-      }
-
       &:checked {
         & ~ .mod_facetoface__eventinfo__sidebar__cancellation {
-          @include sidebar-panel-close;
+          @include sidebar-panel-close();
         }
         & ~ .mod_facetoface__eventinfo__sidebar__cancellation-confirm {
-          @include sidebar-panel-open;
+          @include sidebar-panel-open();
         }
       }
     }
@@ -1065,13 +1101,14 @@ select.menuf2f-select {
 
         &__label {
           @include force-link-color();
+          @include force-link-style();
 
           display: block;
           flex: 1;
-          font: inherit;
-          margin-bottom: 0;
-          padding: var(--tui-gap-2) 0;
-
+          &__hidden,
+          &__shown {
+            padding: var(--tui-gap-2) 0;
+          }
           &__hidden {
             display: block;
           }
