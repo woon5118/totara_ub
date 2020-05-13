@@ -31,17 +31,17 @@ use mod_perform\task\service\participant_section_creation;
 use core\collection;
 use mod_perform\entities\activity\participant_instance;
 use mod_perform\entities\activity\subject_instance;
-use mod_perform\entities\activity\track_assignment;
 use mod_perform\entities\activity\track_user_assignment;
 use mod_perform\expand_task;
 use mod_perform\models\activity\track;
 use mod_perform\task\service\subject_instance_creation;
 use mod_perform\task\service\subject_instance_dto;
-use mod_perform\user_groups\grouping;
 use totara_core\relationship\relationship;
+use totara_core\relationship\resolvers\subject;
 use totara_job\job_assignment;
 use totara_job\relationship\resolvers\appraiser;
 use totara_job\relationship\resolvers\manager;
+use mod_perform\models\activity\activity;
 
 /**
  * Class participant_section_creation_service_test
@@ -57,11 +57,51 @@ class mod_perform_participant_section_creation_service_testcase extends advanced
     private $activity_trees;
 
     /**
+     * Tests the correct participant is assigned to the right section based on the section relationship
+     * when an activity has multiple sections.
+     *
+     * @return void
+     */
+    public function test_correct_participant_assigned_to_correct_section(): void {
+        // Creates activity with 2 sections: 1 section has Subject relationship.
+        // other section has manager & appraiser as relationship.
+        $activity_tree = $this->setup_activity_with_multiple_sections();
+        $subject_instance_service = new subject_instance_creation();
+        $subject_instance_service->generate_instances();
+        $subject_instance = subject_instance::repository()->get()->first();
+        $participant_sections = participant_section::repository()->get();
+        $participant_instances = participant_instance::repository()->get();
+
+        $subject_user_participant_section = $participant_sections->filter('section_id', $activity_tree->subject_user_section->id);
+        // Asserts the 1 user(subject) is assigned to the subject_user section.
+        $this->assertCount(1, $subject_user_participant_section);
+        $subject_user_participant_instance = $participant_instances->find(
+            'id',
+            $subject_user_participant_section->first()->participant_instance_id
+        );
+        // Asserts the participant_id of the subject_user section is same as subject user id.
+        $this->assertEquals($subject_instance->subject_user_id, $subject_user_participant_instance->participant_id);
+
+        $manager_appraiser_user_participant_section = $participant_sections->filter(
+            'section_id',
+            $activity_tree->manager_appraiser_user_section->id
+        );
+        // Asserts the 2 participant sections are created for the manager_appraiser section.
+        $this->assertCount(2, $manager_appraiser_user_participant_section);
+        // Assert the subject_user participant is not assigned to the manager_appraiser section.
+        $this->assertNotContains(
+            $subject_user_participant_instance->id,
+            $manager_appraiser_user_participant_section->pluck('participant_instance_id')
+        );
+    }
+
+    /**
      * Test participant_sections are created when the subject instance service generates subject instances.
      *
      * @return void
      */
     public function test_participant_sections_are_created_from_subject_instance_creation(): void {
+        $this->setup_multiple_activities();
         $subject_instance_service = new subject_instance_creation();
         $subject_instance_service->generate_instances();
 
@@ -74,6 +114,7 @@ class mod_perform_participant_section_creation_service_testcase extends advanced
      * @return void
      */
     public function test_participant_sections_are_created_from_participant_instance_creation(): void {
+        $this->setup_multiple_activities();
         $subject_instance_collection = $this->create_subject_instances();
         $participant_instance_service = new participant_instance_creation();
         $participant_instance_service->generate_instances($subject_instance_collection);
@@ -104,7 +145,10 @@ class mod_perform_participant_section_creation_service_testcase extends advanced
                 $participant_instance_ids
             );
             $activity_id = $sections->find('id', $participant_section->section_id)->activity_id;
-            $sections_created_for_participant = $created_participant_sections->filter('participant_instance_id', $participant_section->participant_instance_id)->pluck('section_id');
+            $sections_created_for_participant = $created_participant_sections->filter(
+                'participant_instance_id',
+                $participant_section->participant_instance_id
+            )->pluck('section_id');
             $this->assertEqualsCanonicalizing($sections_created_for_participant, $activity_sections[$activity_id]);
         }
     }
@@ -115,6 +159,7 @@ class mod_perform_participant_section_creation_service_testcase extends advanced
      * @return void
      */
     public function test_create_participant_sections(): void {
+        $this->setup_multiple_activities();
         $participant_section_service = new participant_section_creation();
         $participant_instance_dto_collection = $this->setup_participant_instances();
         $participant_section_service->generate_sections($participant_instance_dto_collection);
@@ -175,12 +220,13 @@ class mod_perform_participant_section_creation_service_testcase extends advanced
                         $participant_instance = new participant_instance();
                         $participant_instance->subject_instance_id = $subject_instance->id;
                         $participant_instance->participant_id = $participant;
-                        $participant_instance->activity_relationship_id = $relationship->get_id();
+                        $participant_instance->activity_relationship_id = $section_relationship->activity_relationship_id;
                         $participant_instance->progress = not_started::get_code();
                         $participant_instance->save();
                         $participant_instance_dto = participant_instance_dto::create_from_data(
                             [
                                 'activity_id' => $activity_tree->activity->id,
+                                'activity_relationship_id' => $participant_instance->activity_relationship_id,
                                 'id' => $participant_instance->id,
                             ]
                         );
@@ -199,14 +245,79 @@ class mod_perform_participant_section_creation_service_testcase extends advanced
     protected function setUp() {
         $this->setAdminUser();
         $this->activity_trees = [];
+    }
 
+    /**
+     * Setup activity with multiple sections.
+     *
+     * @return stdClass
+     */
+    private function setup_activity_with_multiple_sections(): stdClass {
+        /** @var mod_perform_generator $generator */
+        $generator = $this->get_perform_generator();
+
+        $activity_tree = new stdClass();
+        $activity_tree->identifier = 0;
+        $activity_tree->activity = $generator->create_activity_in_container();
+        $activity_tree->track = $this->create_activity_track($activity_tree->activity, 1);
+
+        //create sections and add relationships to activity:
+        $activity_tree->section_relationships = [];
+        $activity_tree->subject_user_section = $generator->create_section(
+            $activity_tree->activity,
+            ['title' => 'Test activity section 1']
+        );
+        $activity_tree->section_relationships[] = $generator->create_section_relationship(
+            $activity_tree->subject_user_section,
+            ['class_name' => subject::class]
+        );
+
+        $activity_tree->manager_appraiser_user_section = $generator->create_section(
+            $activity_tree->activity,
+            ['title' => 'Test activity section 2']
+        );
+        $activity_tree->section_relationships[] = $generator->create_section_relationship(
+            $activity_tree->manager_appraiser_user_section,
+            ['class_name' => appraiser::class]
+        );
+        $activity_tree->section_relationships[] = $generator->create_section_relationship(
+            $activity_tree->manager_appraiser_user_section,
+            ['class_name' => manager::class]
+        );
+
+        $this->setup_job_assignments($activity_tree, 1);
+        return $activity_tree;
+    }
+
+    /**
+     * Setup multiple activities.
+     *
+     * @return void
+     */
+    private function setup_multiple_activities(): void {
         $activity_count = 4;
+        $users_per_relationship = 2;
         for ($i = 0; $i < $activity_count; $i++) {
             $activity_tree = $this->setup_activity($i);
             $activity_tree->identifier = $i;
-            $this->setup_job_assignments($activity_tree);
+            $this->setup_job_assignments($activity_tree, $users_per_relationship);
             $this->activity_trees[] = $activity_tree;
         }
+    }
+
+    /**
+     * Creates an activity track with the specified number of users.
+     *
+     * @param activity $activity
+     * @param int $user_count
+     * @return track
+     */
+    private function create_activity_track(activity $activity, int $user_count = 4): track {
+        $generator = $this->get_perform_generator();
+        /** @var track $track */
+        $tracks = $generator->create_activity_tracks($activity);
+
+        return $generator->create_track_assignments($tracks->first(), 0, 0, 0, $user_count);
     }
 
     /**
@@ -216,14 +327,19 @@ class mod_perform_participant_section_creation_service_testcase extends advanced
      * @return stdClass
      */
     private function setup_activity(int $identifier): stdClass {
-        /** @var mod_perform_generator $generator */
-        $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        $generator = $this->get_perform_generator();
 
         $activity_tree = new stdClass();
         $activity_tree->activity = $generator->create_activity_in_container();
+        $activity_tree->track = $this->create_activity_track($activity_tree->activity, 4);
 
         //create sections and add relationships to activity:
-        $activity_tree->section = $generator->create_section($activity_tree->activity, ['title' => 'Test activity section '. $identifier]);
+        $activity_tree->section = $generator->create_section(
+            $activity_tree->activity,
+            [
+                'title' => 'Test activity section '. $identifier,
+            ]
+        );
         $activity_tree->section_relationships = [];
         $activity_tree->section_relationships[] = $generator->create_section_relationship(
             $activity_tree->section,
@@ -234,11 +350,6 @@ class mod_perform_participant_section_creation_service_testcase extends advanced
             ['class_name' => manager::class]
         );
 
-        /** @var track $track */
-        $tracks = $generator->create_activity_tracks($activity_tree->activity);
-        $activity_tree->track = $generator->create_track_assignments($tracks->first(), 0, 0, 0, 4);
-        $activity_tree->assignments = $activity_tree->track->assignments;
-
         return $activity_tree;
     }
 
@@ -246,10 +357,10 @@ class mod_perform_participant_section_creation_service_testcase extends advanced
      * Sets up job assignments and returns stats of job assignments created.
      *
      * @param stdClass $activity_tree
+     * @param int $users_per_relationship Number of users to each relationship should have.
      * @return void
      */
-    private function setup_job_assignments($activity_tree): void {
-        $users_per_relationship = 2;
+    private function setup_job_assignments($activity_tree, int $users_per_relationship): void {
         $job_assignment_data = [];
 
         for ($i = 0; $i < $users_per_relationship; $i++) {
@@ -315,5 +426,14 @@ class mod_perform_participant_section_creation_service_testcase extends advanced
      */
     protected function tearDown() {
         $this->activity_trees = null;
+    }
+
+    /**
+     * Get mod_perform data generator.
+     *
+     * @return mod_perform_generator
+     */
+    private function get_perform_generator(): mod_perform_generator {
+        return $this->getDataGenerator()->get_plugin_generator('mod_perform');
     }
 }

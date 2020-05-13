@@ -235,6 +235,7 @@ class participant_instance_creation {
         foreach ($this->participation_creation_list as $participant_instance) {
             $section_data = [];
             $section_data['activity_id'] = $participant_instance['activity_id'];
+            $section_data['activity_relationship_id'] = $participant_instance['participant_data']['activity_relationship_id'];
             $section_data['id'] = $db->insert_record(
                 participant_instance_entity::TABLE,
                 (object) $participant_instance['participant_data']

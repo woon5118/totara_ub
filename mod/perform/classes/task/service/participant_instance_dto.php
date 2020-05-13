@@ -42,6 +42,9 @@ class participant_instance_dto {
     /** @var int */
     protected $activity_id;
 
+    /** @var int */
+    protected $activity_relationship_id;
+
     /**
      * Create a new dto from a given entity.
      *
@@ -52,6 +55,7 @@ class participant_instance_dto {
         $instance = new self();
         $instance->id = $data['id'];
         $instance->activity_id = $data['activity_id'];
+        $instance->activity_relationship_id = $data['activity_relationship_id'];
 
         return $instance;
     }
@@ -72,6 +76,15 @@ class participant_instance_dto {
      */
     public function get_activity_id(): int {
         return $this->activity_id;
+    }
+
+    /**
+     * Get activity relationship id.
+     *
+     * @return int
+     */
+    public function get_activity_relationship_id(): int {
+        return $this->activity_relationship_id;
     }
 
     final public function __get($name) {
