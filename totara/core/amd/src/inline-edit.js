@@ -77,13 +77,23 @@ define(['core/str'], function(str) {
      */
     InlineEditController.prototype.events = function() {
         var self = this;
-
-        this.controller.addEventListener('click', function(e) {
+        function startEdit(e) {
             e.preventDefault();
             e.stopPropagation();
 
             self.edit();
             self.hideError();
+        }
+
+        this.controller.addEventListener('mouseup', function(e) {
+            startEdit(e);
+            return false;
+        });
+
+        this.controller.addEventListener('keyup', function(e) {
+            if (e.key === "Enter") {
+                startEdit(e);
+            }
             return false;
         });
 
@@ -213,6 +223,7 @@ define(['core/str'], function(str) {
         this.tooltip.style.display = 'none';
 
         this.controller.style.display = '';
+        this.controller.focus();
         this.editing = false;
     };
 
@@ -234,6 +245,7 @@ define(['core/str'], function(str) {
         this.tooltip.style.display = 'none';
 
         this.controller.style.display = '';
+        this.controller.focus();
         this.editing = false;
     };
 
