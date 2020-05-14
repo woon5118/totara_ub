@@ -3,8 +3,8 @@ Feature: Manage performance activity multiple choice elements
 
   Background:
     Given the following "activities" exist in "mod_perform" plugin:
-      | activity_name        | create_section | create_track |
-      | Activity one         | true           | true         |
+      | activity_name | create_section | create_track |
+      | Activity one  | true           | true         |
 
   Scenario: Save multiple choice elements to activity content
     Given I log in as "admin"
@@ -15,21 +15,21 @@ Feature: Manage performance activity multiple choice elements
     And I navigate to manage perform activity content page
     And I click multi choice question element
     And I set the following fields to these values:
-      |name        | Question 1 |
-      |answers[0]  | Option one |
-      |answers[1]  | Option two |
+      | rawTitle   | Question 1 |
+      | answers[0] | Option one |
+      | answers[1] | Option two |
     And I save multi choice question element data
     And I click multi choice question element
     And I set the following fields to these values:
-      |name        | Question 2 |
-      |answers[0]  | Option three |
-      |answers[1]  | Option four |
+      | rawTitle   | Question 2 |
+      | answers[0] | Option three |
+      | answers[1] | Option four |
     And I save multi choice question element data
     And I click multi choice question element
     And I set the following fields to these values:
-      |name        | Question 3 |
-      |answers[0]  | Option five |
-      |answers[1]  | Option six |
+      | rawTitle   | Question 3 |
+      | answers[0] | Option five |
+      | answers[1] | Option six |
     And I save multi choice question element data
     And I click on "Submit" "button"
     When I navigate to manage perform activity content page
@@ -45,9 +45,9 @@ Feature: Manage performance activity multiple choice elements
     And I navigate to manage perform activity content page
     And I click multi choice question element
     And I set the following fields to these values:
-      |name        | Question 1 |
-      |answers[0]  | Option one |
-      |answers[1]  | Option two |
+      | rawTitle   | Question 1 |
+      | answers[0] | Option one |
+      | answers[1] | Option two |
     And I click multi choice question add new option
     And I set the following fields to these values:
       |answers[2]        | Option three |
@@ -64,12 +64,12 @@ Feature: Manage performance activity multiple choice elements
     And I navigate to manage perform activity content page
     And I click multi choice question element
     And I set the following fields to these values:
-      |name        | Question 1 |
-      |answers[0]  | Option one |
-      |answers[1]  | Option two |
+      | rawTitle   | Question 1 |
+      | answers[0] | Option one |
+      | answers[1] | Option two |
     And I click multi choice question add new option
     And I set the following fields to these values:
-      |answers[2]        | Option three |
+      | answers[2] | Option three |
     And I delete multi choice question option
     And I save multi choice question element data
     And I click on "Submit" "button"
@@ -84,7 +84,7 @@ Feature: Manage performance activity multiple choice elements
     And I navigate to manage perform activity content page
     And I click multi choice question element
     And I set the following fields to these values:
-      |name        | Question 1 |
+      | rawTitle | Question 1 |
     And I save multi choice question element data
     And I should see "Required"
 
