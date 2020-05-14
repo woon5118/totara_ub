@@ -11,9 +11,9 @@ Feature: User courses and programs when added to a plan appear correctly in the 
       | user     | fullname       | manager  |
       | learner1 | jobassignment1 | manager2 |
     And the following "courses" exist:
-      | fullname | shortname   |
-      | Course 1 | course1     |
-      | Course 2 | course2     |
+      | fullname | shortname   | enablecompletion |
+      | Course 1 | course1     | 1                |
+      | Course 2 | course2     | 1                |
     And the following "programs" exist in "totara_program" plugin:
       | fullname  | shortname  |
       | Program 1 | program1   |
@@ -29,6 +29,9 @@ Feature: User courses and programs when added to a plan appear correctly in the 
     And the following "plans" exist in "totara_plan" plugin:
       | user     | name                   |
       | learner1 | learner1 Learning Plan |
+    And I log in as "admin"
+    And I set self completion for "Course 1" in the "Miscellaneous" category
+    And I log out
 
   @javascript
   Scenario: Programs appear in the current learning block when they have been added to a plan.
@@ -69,3 +72,12 @@ Feature: User courses and programs when added to a plan appear correctly in the 
     Then I should see "Program 1" in the "Current Learning" "block"
     When I toggle "Program 1" in the current learning block
     Then I should see "Course 1" in "Program 1" within the current learning block
+
+    # Complete the program, it should no longer appear in the block.
+    When I follow "Course 1"
+    And I click on "Complete course" "link"
+    And I click on "Yes" "button"
+    Then I should see "You have already completed this course"
+    When I run the scheduled task "\totara_program\task\completions_task"
+    And I click on "Dashboard" in the totara menu
+    Then I should not see "Program 1" in the "Current Learning" "block"

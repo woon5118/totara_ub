@@ -103,7 +103,10 @@ class item extends item_base implements item_has_progress, item_has_dueinfo {
 
         $program = new \program($itemid);
 
-        if ($program->get_completion_data($userorid)) {
+        $completion = $program->get_completion_data($userorid);
+
+        // Ensure completion data is set but the user is not complete.
+        if ($completion && empty($completion->timecompleted)) {
             $data = new \stdClass();
             $data->id = $program->id;
             $data->fullname = $program->fullname;
