@@ -185,4 +185,29 @@ class rating {
         return true;
     }
 
+    /**
+     * Do the two specified users share a relation via a manual rating?
+     *
+     * Will return true if the viewing user share a manual rating with the target user,
+     * or if the the target user is the subject of a manual rating that the viewing user has made.
+     *
+     * @param int $viewing_user_id The user requesting to view the target user
+     * @param int $target_user_id The target user
+     * @return bool
+     */
+    public static function users_share_rating(int $viewing_user_id, int $target_user_id): bool {
+        return rating_entity::repository()
+            ->where(static function (builder $builder) use ($viewing_user_id, $target_user_id) {
+                return $builder
+                    ->where('user_id', $viewing_user_id)
+                    ->where('assigned_by', $target_user_id);
+            })
+            ->or_where(static function (builder $builder) use ($viewing_user_id, $target_user_id) {
+                return $builder
+                    ->where('user_id', $target_user_id)
+                    ->where('assigned_by', $viewing_user_id);
+            })
+            ->exists();
+    }
+
 }

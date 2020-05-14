@@ -121,7 +121,6 @@ Feel free to browse, list of users is below, their password is 12345.
             'lastname' => 'Malkovich',
             'caps' => [
                 'totara/competency:view_own_profile',
-                'moodle/site:viewfullnames', // TODO: Temporary so can see other manual raters, remove this in TL-22484
             ],
             'description' => multilang('Has all available assignments (no archived) and has completed every course.'),
         ],
@@ -130,7 +129,6 @@ Feel free to browse, list of users is below, their password is 12345.
             'lastname' => 'Seagal',
             'caps' => [
                 'totara/competency:view_own_profile',
-                'moodle/site:viewfullnames', // TODO: Temporary so can see other manual raters, remove this in TL-22484
             ],
             'description' => multilang('Has all available assignments, some archived.'),
         ],
@@ -139,7 +137,6 @@ Feel free to browse, list of users is below, their password is 12345.
             'lastname' => 'Trejo',
             'caps' => [
                 'totara/competency:view_own_profile',
-                'moodle/site:viewfullnames', // TODO: Temporary so can see other manual raters, remove this in TL-22484
             ],
             'description' => multilang('Has one current and one archived assignment.'),
         ],
@@ -148,7 +145,6 @@ Feel free to browse, list of users is below, their password is 12345.
             'lastname' => 'Travolta',
             'caps' => [
                 'totara/competency:view_own_profile',
-                'moodle/site:viewfullnames', // TODO: Temporary so can see other manual raters, remove this in TL-22484
             ],
             'description' => multilang('Has 7 assignments'),
         ],
