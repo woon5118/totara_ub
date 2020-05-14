@@ -163,6 +163,59 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
         $this->assertEquals(0, subject_instance::repository()->count());
     }
 
+    public function period_data_provider() {
+        $yesterday = time() - 86400;
+        $tomorrow = time() + 86400;
+        return [
+            [null, null, true],
+            [$yesterday, $tomorrow, true],
+            [$yesterday, null, true],
+            [null, $tomorrow, true],
+            [$tomorrow, null, false],
+            [null, $yesterday, false],
+        ];
+    }
+
+    /**
+     * @dataProvider period_data_provider
+     * @param int|null $track_assignment_start
+     * @param int|null $track_assignment_end
+     * @param bool $should_subject_instance_be_created
+     */
+    public function test_instances_are_only_created_for_correct_periods(
+        ?int $track_assignment_start,
+        ?int $track_assignment_end,
+        bool $should_subject_instance_be_created
+    ) {
+        $data = $this->create_data();
+
+        /** @var track_user_assignment $user_assignment */
+        $user_assignment = track_user_assignment::repository()
+            ->order_by('id')
+            ->first();
+
+        $user_assignment->period_start_date = $track_assignment_start;
+        $user_assignment->period_end_date = $track_assignment_end;
+        $user_assignment->save();
+
+        // There should be three user assignments initially.
+        $user_assignments = track_user_assignment::repository()->get();
+        $this->assertCount(3, $user_assignments);
+        $this->assertEquals(0, subject_instance::repository()->count());
+
+        $this->generate_instances();
+
+        $expected_instance_count = $should_subject_instance_be_created ? 3 : 2;
+        $this->assertEquals($expected_instance_count, subject_instance::repository()->count());
+
+        $this->assertEquals(
+            $should_subject_instance_be_created,
+            subject_instance::repository()
+            ->where('subject_user_id', $user_assignment->subject_user_id)
+            ->exists()
+        );
+    }
+
     public function test_hook_is_executed_properly() {
         $data = $this->create_data();
 
@@ -206,7 +259,7 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
     }
 
     /**
-     * This calls the creation service and returns the hooks sink if $no_hooks is set to false.
+     * This calls the creation service and returns the hooks sink if $no_hooks is set to true.
      *
      * Passing false for $no_hooks enables testing the service in connection with any watchers for hooks
      *

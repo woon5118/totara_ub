@@ -27,6 +27,7 @@ use core\entities\expandable;
 use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\query\builder;
+use mod_perform\entities\activity\track;
 use mod_perform\entities\activity\track_assignment;
 use mod_perform\entities\activity\track_assignment_repository;
 use mod_perform\entities\activity\track_user_assignment;
@@ -268,6 +269,37 @@ class expand_task {
     }
 
     /**
+     * Calculate track_user_assignment period start date for a given user.
+     *
+     * @param track $track
+     * @param int $user_id
+     * @return int|null
+     */
+    private function calculate_user_assignment_start_date(track $track, int $user_id): ?int {
+        if (in_array($track->schedule_type, [
+            track::SCHEDULE_TYPE_OPEN_FIXED,
+            track::SCHEDULE_TYPE_CLOSED_FIXED,
+        ])) {
+            return $track->schedule_fixed_from;
+        }
+        return null;
+    }
+
+    /**
+     * Calculate track_user_assignment period end date for a given user.
+     *
+     * @param track $track
+     * @param int $user_id
+     * @return int|null
+     */
+    private function calculate_user_assignment_end_date(track $track, int $user_id): ?int {
+        if ((int)$track->schedule_type === track::SCHEDULE_TYPE_CLOSED_FIXED) {
+            return $track->schedule_fixed_to;
+        }
+        return null;
+    }
+
+    /**
      * Add to assign buffer, also flushes the buffer if max amount per buffer is reached
      *
      * @param track_assignment $assignment
@@ -277,6 +309,8 @@ class expand_task {
         $this->assign_buffer[] = [
             'track_id' => $assignment->track_id,
             'subject_user_id' => $user_id,
+            'period_start_date' => $this->calculate_user_assignment_start_date($assignment->track, $user_id),
+            'period_end_date' => $this->calculate_user_assignment_end_date($assignment->track, $user_id),
             'created_at' => time(),
             'deleted' => false
         ];

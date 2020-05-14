@@ -33,8 +33,9 @@ use mod_perform\hook\subject_instances_created;
  * are assigned to a track.
  *
  * Currently, it creates new instance for every assignment which does not have a
- * subject instance yet. In the future it will do that only if the start date for the assignment
- * is reached and, if the track is configured that way, if repeating subject instance should be created.
+ * subject instance yet and meets time interval restrictions.
+ * In the future it will also create repeating subject instances, if the track is
+ * configured that way.
  */
 class subject_instance_creation {
 
@@ -57,19 +58,19 @@ class subject_instance_creation {
     }
 
     /**
-     * Get all user assignments which do not yet have a subject instance.
+     * Get all user assignments which do not yet have a subject instance and which have matching
+     * period settings.
      *
      * @return collection
      */
     private function get_active_user_assignments(): collection {
-        // TDDO With story I2SPA02 in iteration 2 this needs to be extended:
-        //      We would need to check only those assignments where track_user_assignment.period_start_date >= NOW().
-        //      Also later we need to take the repeating schedule into account and the status of the subject instance.
+        // TODO Later we need to take the repeating schedule into account and the status of the subject instance.
         //      Currently, we just create new subject instances if there are no existing ones.
         return track_user_assignment::repository()
             ->filter_by_no_subject_instances()
             ->filter_by_active()
             ->filter_by_active_track_and_activity()
+            ->filter_by_time_interval()
             ->with('track')
             ->get();
     }

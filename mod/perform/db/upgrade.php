@@ -979,5 +979,29 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020051300, 'perform');
     }
 
+    if ($oldversion < 2020051400) {
+
+        // Define field period_start_date to be added to perform_track_user_assignment.
+        $table = new xmldb_table('perform_track_user_assignment');
+        $field = new xmldb_field('period_start_date', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'subject_user_id');
+
+        // Conditionally launch add field period_start_date.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field period_end_date to be added to perform_track_user_assignment.
+        $table = new xmldb_table('perform_track_user_assignment');
+        $field = new xmldb_field('period_end_date', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'period_start_date');
+
+        // Conditionally launch add field period_end_date.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020051400, 'perform');
+    }
+
     return true;
 }

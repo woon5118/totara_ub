@@ -24,6 +24,7 @@
 namespace mod_perform\entities\activity;
 
 use core\orm\entity\repository;
+use core\orm\query\builder;
 use mod_perform\models\activity\activity as activity_model;
 use mod_perform\models\activity\track_status;
 use mod_perform\state\activity\active;
@@ -50,6 +51,24 @@ final class track_user_assignment_repository extends repository {
      */
     public function filter_by_active(): self {
         $this->where('deleted', false);
+
+        return $this;
+    }
+
+    /**
+     * Filter for records where the period restriction matches the current time.
+     *
+     * @return $this
+     */
+    public function filter_by_time_interval(): self {
+        $now = time();
+        $this->where(function (builder $builder) use ($now) {
+            $builder->where_null('period_start_date')
+                ->or_where('period_start_date', '<=', $now);
+        })->where(function (builder $builder) use ($now) {
+            $builder->where_null('period_end_date')
+                ->or_where('period_end_date', '>', $now);
+        });
 
         return $this;
     }

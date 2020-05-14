@@ -285,6 +285,48 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $this->assert_track_has_no_user_assignments($track1_id, $test_data->user2->id, false);
     }
 
+    public function test_assignment_period_dates_are_populated() {
+        $test_data = $this->prepare_assignments();
+
+        $track1_id = $test_data->track1->id;
+
+        /** @var track_entity $track */
+        $track = track_entity::repository()->find($track1_id);
+        $start_time = time() - 1000;
+        $end_time = time() + 1000;
+        $track->schedule_type = track_entity::SCHEDULE_TYPE_CLOSED_FIXED;
+        $track->schedule_fixed_from = $start_time;
+        $track->schedule_fixed_to = $end_time;
+        $track->save();
+
+        $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user1->id);
+
+        (new expand_task())->expand_all();
+
+        /** @var track_user_assignment $track_user_assignment */
+        $track_user_assignment = track_user_assignment::repository()
+            ->where('track_id', $track1_id)
+            ->where('subject_user_id', $test_data->user1->id)
+            ->one();
+        $this->assertEquals($start_time, $track_user_assignment->period_start_date);
+        $this->assertEquals($end_time, $track_user_assignment->period_end_date);
+
+        // Change to open_fixed and expand for a new user.
+        $track->schedule_type = track_entity::SCHEDULE_TYPE_OPEN_FIXED;
+        $track->save();
+
+        $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user2->id);
+
+        (new expand_task())->expand_all();
+        /** @var track_user_assignment $track_user_assignment */
+        $track_user_assignment = track_user_assignment::repository()
+            ->where('track_id', $track1_id)
+            ->where('subject_user_id', $test_data->user2->id)
+            ->one();
+        $this->assertEquals($start_time, $track_user_assignment->period_start_date);
+        $this->assertEquals(null, $track_user_assignment->period_end_date);
+    }
+
     /**
      * Assert that the track does have any assignments, optionally can check individual user
      *
@@ -314,7 +356,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
     }
 
     /**
-     * Does the track and (optional) user combination has any assignments?
+     * Does the track and (optional) user combination have any assignments?
      *
      * @param int $track_id
      * @param int|null $user_id

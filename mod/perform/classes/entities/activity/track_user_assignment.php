@@ -35,6 +35,8 @@ use core\orm\entity\relations\has_many_through;
  * @property-read int $id record id
  * @property int $track_id parent track record id
  * @property int $subject_user_id user this assignment is about
+ * @property int $period_start_date start date of this assignment
+ * @property int $period_end_date end date of this assignment
  * @property bool $deleted is this record deleted?
  * @property int $created_at record creation time
  * @property int $updated_at record modification time
