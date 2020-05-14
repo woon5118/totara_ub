@@ -36,6 +36,8 @@ class totara_core_requirejs_testcase extends advanced_testcase {
         $this->assertFileExists("{$CFG->dirroot}/lib/amd/src/first.js"); // Must exist for BC with Moodle.
         $this->assertFileNotExists("{$CFG->dirroot}/lib/amd/src/bundle.js"); // Must not exist because it would collide with bundle name.
 
+        $hook_sink = self::redirectHooks();
+
         $config = \core_requirejs::get_config_data(-1);
         $this->assertSame('https://www.example.com/moodle/lib/requirejs.php/-1/', $config['baseUrl']);
         $this->assertRegExp('|^https://www\.example\.com/moodle/lib/javascript\.php/-1/lib/jquery/jquery-.*\.min$|', $config['paths']['jquery']);
@@ -49,6 +51,10 @@ class totara_core_requirejs_testcase extends advanced_testcase {
             $this->assertNotContains('-lazy', $amd);
         }
 
+        self::assertSame(1, $hook_sink->count());
+        self::assertSame('core\hook\requirejs_config_generated', get_class($hook_sink->get_hooks()[0]));
+        $hook_sink->clear();
+
         $config = \core_requirejs::get_config_data(55);
         $this->assertSame('https://www.example.com/moodle/lib/requirejs.php/55/', $config['baseUrl']);
         $this->assertRegExp('|^https://www\.example\.com/moodle/lib/javascript\.php/55/lib/jquery/jquery-.*\.min$|', $config['paths']['jquery']);
@@ -61,6 +67,10 @@ class totara_core_requirejs_testcase extends advanced_testcase {
             $this->assertRegExp('/^[a-z0-9_]+\/[a-z0-9_-]+$/', $amd, 'Invalid AMD module name: ' . $amd);
             $this->assertNotContains('-lazy', $amd);
         }
+
+        self::assertSame(1, $hook_sink->count());
+        self::assertSame('core\hook\requirejs_config_generated', get_class($hook_sink->get_hooks()[0]));
+        $hook_sink->close();
     }
 
     public function test_get_config_file_content() {

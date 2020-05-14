@@ -122,6 +122,8 @@ information provided here is intended especially for developers.
 * file_storage::get_file_preview() has been deprecated, please use \core\image\preview_helper::get_file_preview() instead.
 * function file_pluginfile($relativepath, $forcedownload, $preview = null, $theme = null) has new parameter $theme to help on resizing image base on theme. If null is given, then default theme will be used.
 * Added new function crop_resize_image_from_image which can be used to resize the image from original image content.
+* Added \core\hook\requirejs_config_generated that can be used to manipulate RequireJS config after it has
+  been generated. Allowing plugins to introduce shims and other common constructs if required.
 
 === 12.0 ===
 
