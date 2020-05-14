@@ -191,6 +191,8 @@ class core_requirejs {
             $config['bundles']['core/bundle'][] = $modulename;
         }
 
+        (new \core\hook\requirejs_config_generated($config))->execute();
+
         return $config;
     }
 
