@@ -21,59 +21,68 @@
 -->
 
 <template>
-  <Form class="tui-performManageActivityGeneralInfo">
-    <FormRow
-      v-slot="{ id, label }"
-      :label="$str('general_info_label_activity_title', 'mod_perform')"
+  <div class="tui-performManageActivityGeneralInfo">
+    <h3
+      v-if="!disableAfterSave"
+      class="tui-performManageActivityGeneralInfo__heading"
     >
-      <InputText
-        :id="id"
-        :value="activity.edit_name"
-        :placeholder="label"
-        :maxlength="ACTIVITY_NAME_MAX_LENGTH"
-        @input="updateActivity({ edit_name: $event })"
-      />
-    </FormRow>
+      {{ $str('activity_general_tab_heading', 'mod_perform') }}
+    </h3>
 
-    <FormRow
-      v-slot="{ id, label }"
-      :label="$str('general_info_label_activity_description', 'mod_perform')"
-    >
-      <Textarea
-        :id="id"
-        :value="activity.edit_description"
-        :placeholder="label"
-        @input="updateActivity({ edit_description: $event })"
-      />
-    </FormRow>
-
-    <FormRow
-      v-slot="{ id, label }"
-      :label="$str('general_info_label_activity_type', 'mod_perform')"
-    >
-      <SelectFilter
-        v-if="isNew"
-        v-model="activityTypeSelection"
-        :label="$str('general_info_label_activity_type', 'mod_perform')"
-        :options="activityTypes"
-        :show-label="false"
-        :stacked="false"
-      />
-      <span v-else>{{ activityTypeName }}</span>
-    </FormRow>
-
-    <FormRow :style="actionButtonStyling">
-      <ButtonGroup>
-        <Button
-          :styleclass="{ primary: true }"
-          :text="submitButtonText"
-          :disabled="isSaving || hasNoTitle || hasNoType"
-          type="submit"
-          @click.prevent="trySave"
+    <Form class="tui-performManageActivityGeneralInfoForm">
+      <FormRow
+        v-slot="{ id, label }"
+        :label="$str('general_info_label_activity_title', 'mod_perform')"
+      >
+        <InputText
+          :id="id"
+          :value="activity.edit_name"
+          :placeholder="label"
+          :maxlength="ACTIVITY_NAME_MAX_LENGTH"
+          @input="updateActivity({ edit_name: $event })"
         />
-      </ButtonGroup>
-    </FormRow>
-  </Form>
+      </FormRow>
+
+      <FormRow
+        v-slot="{ id, label }"
+        :label="$str('general_info_label_activity_description', 'mod_perform')"
+      >
+        <Textarea
+          :id="id"
+          :value="activity.edit_description"
+          :placeholder="label"
+          @input="updateActivity({ edit_description: $event })"
+        />
+      </FormRow>
+
+      <FormRow
+        v-slot="{ id, label }"
+        :label="$str('general_info_label_activity_type', 'mod_perform')"
+      >
+        <SelectFilter
+          v-if="disableAfterSave"
+          v-model="activityTypeSelection"
+          :label="$str('general_info_label_activity_type', 'mod_perform')"
+          :options="activityTypes"
+          :show-label="false"
+          :stacked="false"
+        />
+        <span v-else>{{ activityTypeName }}</span>
+      </FormRow>
+
+      <FormRow :style="actionButtonStyling">
+        <ButtonGroup>
+          <Button
+            :styleclass="{ primary: true }"
+            :text="submitButtonText"
+            :disabled="isSaving || hasNoTitle || hasNoType"
+            type="submit"
+            @click.prevent="trySave"
+          />
+        </ButtonGroup>
+      </FormRow>
+    </Form>
+  </div>
 </template>
 
 <script>
@@ -154,15 +163,6 @@ export default {
      */
     exists() {
       return Boolean(this.activity.id);
-    },
-
-    /**
-     * Has the activity been saved to the back-end.
-     *
-     * @returns {boolean}
-     */
-    isNew() {
-      return !this.activity.id;
     },
 
     /**
@@ -304,6 +304,7 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
+      "activity_general_tab_heading",
       "general_info_label_activity_description",
       "general_info_label_activity_title",
       "general_info_label_activity_type",

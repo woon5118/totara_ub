@@ -28,6 +28,7 @@ $string['activity_action_delete'] = 'Delete';
 $string['activity_action_options'] = 'Actions';
 $string['activity_content_tab_heading'] = 'Content';
 $string['activity_draft_not_ready'] = 'Draft is not yet ready for activation';
+$string['activity_general_tab_heading'] = 'General';
 $string['activity_name'] = 'Performance activity name';
 $string['activity_participants_add'] = 'Add participants';
 $string['activity_participants_heading'] = 'Participants';
