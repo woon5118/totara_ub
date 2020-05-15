@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/totara/customfield/definelib.php');
 class customfield_define_multiselect extends customfield_define_base {
-    const MAX_CHOICES = 64;
+    const MAX_CHOICES = 128;
 
     public function define_form_specific(&$form) {
         $title =  get_string('multiselectoptions', 'totara_customfield');
