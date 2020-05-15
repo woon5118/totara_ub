@@ -121,6 +121,7 @@ export default {
     title: String,
     rawTitle: String,
     data: Object,
+    rawData: Object,
     error: String,
   },
 
@@ -130,10 +131,10 @@ export default {
       rawTitle: this.rawTitle,
       answers: [],
     };
-    if (Object.keys(this.data).length == 0) {
+    if (Object.keys(this.rawData).length == 0) {
       initialValues.answers = ['', ''];
     } else {
-      this.data.options.forEach(item => {
+      this.rawData.options.forEach(item => {
         initialValues.answers.push(item.value);
       });
     }

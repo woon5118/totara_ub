@@ -45,7 +45,7 @@ type mod_perform_element {
   element_plugin: mod_perform_element_plugin!
   title(format: core_format = PLAIN): String!
   identifier: String
-  data: String
+  data(format: core_format = PLAIN): String
 }
 
 """
@@ -211,7 +211,7 @@ Create a new element and add it to a section
 input mod_perform_create_new_element_input {
   plugin_name: param_text!
   title: param_text!
-  data: param_text
+  data: String
   sort_order: param_integer!
 }
 
@@ -229,7 +229,7 @@ Update an existing element
 input mod_perform_update_element_input {
   element_id: core_id!
   title: param_text!
-  data: param_text!
+  data: String! # We cannot use param_text here as it would do some cleaning
 }
 
 """
@@ -342,7 +342,7 @@ extend type Mutation {
 }
 
 """
-Competency profile assignment filters
+Competency subject instance filters
 """
 input mod_perform_subject_instance_filters {
   about: [mod_perform_subject_instance_about_filter]

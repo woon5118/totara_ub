@@ -1,5 +1,5 @@
 @totara @perform @mod_perform @javascript @vuejs
-Feature: Elements (questions) support multi-lang filters in titles
+Feature: Multiple choice element supports multi-lang filters in titles and options
 
   Background:
     Given I am on a totara site
@@ -13,18 +13,18 @@ Feature: Elements (questions) support multi-lang filters in titles
     # Enabling multi-language filters for headings and content.
     And the multi-language content filter is enabled
 
-  Scenario: Set multi-lang text as question titles and make sure it's displayed correctly
+  Scenario: Set multi-lang text as question title and for options of the multiple choice element type and make sure it's displayed correctly
     Given I navigate to the manage perform activities page
     And I click on "John is participating subject" "link"
 
     # Adding a new item
-    And I click on "Content" "link" in the ".tui-tabs__tabs" "css_element"
-    And I click on "Edit content" "button"
-    And I click on "Add element" "button"
-    And I click on "Questions" "button"
-    And I click on "Short text" "link"
-    And I set the following fields to these values:
-      | rawTitle | <span lang="en" class="multilang">it's an English question</span><span lang="de" class="multilang">deutsche Frage</span> |
+    And I navigate to manage perform activity content page
+    And I click multi choice question element
+    Then "rawTitle" "field" should be visible
+    When I set the following fields to these values:
+      | rawTitle   | <span lang="en" class="multilang">it's an English question</span><span lang="de" class="multilang">deutsche Frage</span> |
+      | answers[0] | <span lang="en" class="multilang">it's the first option</span><span lang="de" class="multilang">erste Option</span>      |
+      | answers[1] | <span lang="en" class="multilang">it's the second option</span><span lang="de" class="multilang">zweite Option</span>    |
     And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"
     # Currently a changed text won't be filtered until saved
     Then I should see "<span lang=\"en\" class=\"multilang\">it's an English question</span><span lang=\"de\" class=\"multilang\">deutsche Frage</span>"
@@ -33,18 +33,31 @@ Feature: Elements (questions) support multi-lang filters in titles
     Then "rawTitle" "field" should not be visible
     And I should see "it's an English question"
     And I should not see "deutsche Frage"
+    And I should see "it's the first option"
+    And I should not see "erste Option"
+    And I should see "it's the second option"
+    And I should not see "zweite Option"
     When I click on "it's an English question" "button"
     Then "rawTitle" "field" should be visible
     And the following fields match these values:
-      | rawTitle | <span lang="en" class="multilang">it's an English question</span><span lang="de" class="multilang">deutsche Frage</span> |
+      | rawTitle   | <span lang="en" class="multilang">it's an English question</span><span lang="de" class="multilang">deutsche Frage</span> |
+      | answers[0] | <span lang="en" class="multilang">it's the first option</span><span lang="de" class="multilang">erste Option</span>                 |
+      | answers[1] | <span lang="en" class="multilang">it's the second option</span><span lang="de" class="multilang">zweite Option</span>               |
     When I set the following fields to these values:
-      | rawTitle | <span lang="en" class="multilang">changed & updated</span><span lang="de" class="multilang">geaendert & gespeichert</span> |
+      | rawTitle   | <span lang="en" class="multilang">changed & updated</span><span lang="de" class="multilang">geaendert & gespeichert</span>               |
+      | answers[0] | <span lang="en" class="multilang">it's the first changed option</span><span lang="de" class="multilang">erste geaenderte Option</span>   |
+      | answers[1] | <span lang="en" class="multilang">it's the second changed option</span><span lang="de" class="multilang">zweite geaenderte Option</span> |
     And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"
     # Currently a changed text won't be filtered until saved
     Then I should see "<span lang=\"en\" class=\"multilang\">changed & updated</span><span lang=\"de\" class=\"multilang\">geaendert & gespeichert</span>"
     When I click on "Submit" "button"
     And I click on "Edit content" "button"
     Then I should see "changed & updated"
+    And I should not see "geaendert & gespeichert"
+    And I should see "it's the first changed option"
+    And I should not see "erste geaenderte Option"
+    And I should see "it's the second changed option"
+    And I should not see "zweite geaenderte Option"
     When I click on "Submit" "button"
     # Going back to edit mode and saving without changes should not change anything
     And I click on "Edit content" "button"
@@ -52,6 +65,11 @@ Feature: Elements (questions) support multi-lang filters in titles
     And I close the tui notification toast
     And I click on "Edit content" "button"
     Then I should see "changed & updated"
+    And I should not see "geaendert & gespeichert"
+    And I should see "it's the first changed option"
+    And I should not see "erste geaenderte Option"
+    And I should see "it's the second changed option"
+    And I should not see "zweite geaenderte Option"
     And I should not see "geaendert & gespeichert"
     And I close the tui notification toast
     When I click on "Cancel" "button" in the ".tui-performEditSectionContentModal__form .tui-formBtnGroup" "css_element"
@@ -65,3 +83,9 @@ Feature: Elements (questions) support multi-lang filters in titles
     Then I should see "John is participating subject" in the ".tui-performUserActivity h2" "css_element"
     And I should see "Part one"
     And I should see "changed & updated"
+    And I should not see "geaendert & gespeichert"
+    And I should see "it's the first changed option"
+    And I should not see "erste geaenderte Option"
+    And I should see "it's the second changed option"
+    And I should not see "zweite geaenderte Option"
+    And I should not see "geaendert & gespeichert"

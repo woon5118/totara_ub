@@ -30,6 +30,8 @@ use core\webapi\formatter\field\string_field_formatter;
  * Class element
  *
  * @package mod_perform\formatter\activity
+ *
+ * @property \mod_perform\models\activity\element $object
  */
 class element extends entity_model_formatter {
 
@@ -39,7 +41,7 @@ class element extends entity_model_formatter {
             'element_plugin' => null,
             'title' => string_field_formatter::class,
             'identifier' => null,
-            'data' => null,
+            'data' => element_data_field_formatter::for_model($this->object)
         ];
     }
 }

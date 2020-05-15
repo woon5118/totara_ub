@@ -35,6 +35,7 @@
           ref="sectionElements"
           :key="sectionElement.clientId"
           :data="sectionElement.element.data"
+          :raw-data="sectionElement.element.raw_data"
           :title="sectionElement.element.title"
           :raw-title="sectionElement.element.raw_title"
           :type="sectionElement.element.type"
@@ -119,6 +120,7 @@ export default {
                 raw_title: item.element.raw_title,
                 identifier: item.element.identifier,
                 data: JSON.parse(item.element.data),
+                raw_data: JSON.parse(item.element.raw_data),
               },
               sort_order: item.sort_order,
             };
@@ -143,6 +145,7 @@ export default {
           raw_title: '',
           identifier: null,
           data: {},
+          raw_data: {},
         },
         sort_order: this.sectionElements.length + 1,
         creating: true,
@@ -159,6 +162,7 @@ export default {
       sectionElement.element.title = title;
       sectionElement.element.raw_title = title;
       sectionElement.element.data = data;
+      sectionElement.element.raw_data = data;
       delete sectionElement.creating;
       this.display(sectionElement);
     },
@@ -260,14 +264,14 @@ export default {
           createNew.push({
             plugin_name: item.element.type.plugin_name,
             title: item.element.raw_title,
-            data: JSON.stringify(item.element.data),
+            data: JSON.stringify(item.element.raw_data),
             sort_order: sortOrder,
           });
         } else {
           update.push({
             element_id: item.element.id,
             title: item.element.raw_title,
-            data: JSON.stringify(item.element.data),
+            data: JSON.stringify(item.element.raw_data),
           });
           move.push({
             section_element_id: item.id,
