@@ -106,6 +106,7 @@ export default {
               close_on_completion: this.close_on_completion,
             },
           },
+          refetchAll: false, // Prevents 4 additional queries from executing unnecessarily
         })
         .then(() => {
           notify({
