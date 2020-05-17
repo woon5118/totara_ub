@@ -191,7 +191,14 @@ class core_requirejs {
             $config['bundles']['core/bundle'][] = $modulename;
         }
 
-        (new \core\hook\requirejs_config_generated($config))->execute();
+        // Check if the hook can be found, don't assume it can as it is possible to otherwise generate
+        // config with an abort after config in which file autoloading isn't running.
+        if (class_exists('core\hook\requirejs_config_generated')) {
+            (new \core\hook\requirejs_config_generated($config))->execute();
+        } else {
+            // We should never get here, debugging to help us detect it.
+            debugging('Unable to fire requirejs_config_generated hook.', DEBUG_DEVELOPER);
+        }
 
         return $config;
     }

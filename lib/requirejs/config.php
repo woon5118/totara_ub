@@ -42,32 +42,42 @@ if (!$slashargument) {
     $rev = min_clean_param($rev, 'INT');
 }
 
+$cache = ($rev > 0 and $rev < (time() + 60 * 60));
+$candidate = $CFG->localcachedir . '/requirejsconfig/' . $rev;
+
 // Use the caching only for meaningful revision numbers to prevent future cache poisoning.
-if ($rev > 0 and $rev < (time() + 60 * 60)) {
+if ($cache && file_exists($candidate)) {
     $etag = sha1($rev);
-    $candidate = $CFG->localcachedir . '/requirejsconfig/' . $rev;
-
-    if (file_exists($candidate)) {
-        if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) || !empty($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
-            // We do not actually need to verify the etag value because content
-            // of this file never change because we increment the rev parameter.
-            js_send_unmodified(filemtime($candidate), $etag);
-            exit(0);
-        }
-        js_send_cached($candidate, $etag, 'config.js');
+    if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) || !empty($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
+        // We do not actually need to verify the etag value because content
+        // of this file never change because we increment the rev parameter.
+        js_send_unmodified(filemtime($candidate), $etag);
         exit(0);
     }
-
-    $content = \core_requirejs::get_config_file_content($rev);
-    js_write_cache_file_content($candidate, $content);
-
-    // Verify nothing failed in cache file creation.
-    clearstatcache();
-    if (file_exists($candidate)) {
-        js_send_cached($candidate, $etag, 'config.js');
-        exit(0);
-    }
+    js_send_cached($candidate, $etag, 'config.js');
+    exit(0);
 }
 
-$content = \core_requirejs::get_config_file_content(-1);
-js_send_uncached($content, 'config.js');
+// Ok, now we need to start normal moodle script, we need to load all libs and $DB
+define('ABORT_AFTER_CONFIG_CANCEL', true);
+define('NO_MOODLE_COOKIES', true); // Session not used here
+define('NO_UPGRADE_CHECK', true);  // Ignore upgrade check
+
+require("$CFG->dirroot/lib/setup.php");
+
+$content = \core_requirejs::get_config_file_content($rev);
+
+if (!$cache) {
+    js_send_uncached($content, 'config.js');
+    exit(0);
+}
+
+js_write_cache_file_content($candidate, $content);
+
+// Verify nothing failed in cache file creation.
+clearstatcache();
+if (file_exists($candidate)) {
+    $etag = sha1($rev);
+    js_send_cached($candidate, $etag, 'config.js');
+    exit(0);
+}
