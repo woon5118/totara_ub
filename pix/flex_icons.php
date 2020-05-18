@@ -2203,6 +2203,13 @@ $icons = array(
                     'classes' => 'fa-tag'
                 )
         ),
+    'reply' =>
+        array (
+            'data' =>
+                array (
+                    'classes' => 'fa-reply'
+                )
+        )
 );
 
 /*
