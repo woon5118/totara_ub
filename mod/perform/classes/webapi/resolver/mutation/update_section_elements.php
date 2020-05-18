@@ -70,7 +70,8 @@ class update_section_elements implements mutation_resolver, has_middleware {
                         $create_new_form_data['plugin_name'],
                         $create_new_form_data['title'],
                         $create_new_form_data['identifier'] ?? 0,
-                        $create_new_form_data['data'] ?? null
+                        $create_new_form_data['data'] ?? null,
+                        $create_new_form_data['is_required'] ?? null
                     );
                     $sort_orders[$create_new_form_data['sort_order']] = $section->add_element($element);
                 }
@@ -91,7 +92,11 @@ class update_section_elements implements mutation_resolver, has_middleware {
             // Update existing elements.
             foreach ($section_form_data['update'] ?? [] as $update_form_data) {
                 $element = element::load_by_id($update_form_data['element_id']);
-                $element->update_details($update_form_data['title'], $update_form_data['data']);
+                $element->update_details(
+                    $update_form_data['title'],
+                    $update_form_data['data'],
+                    $update_form_data['is_required'] ?? null
+                );
             }
         });
 

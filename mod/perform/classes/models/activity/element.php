@@ -37,6 +37,7 @@ use mod_perform\entities\activity\element as element_entity;
  * @property-read string $title a user-defined title to identify and describe this element
  * @property-read int $identifier used to match elements that share the same identifier
  * @property-read string $data specific configuration data for this type of element
+ * @property-read bool $is_required used to check response required or optional
  * @property-read \context $context
  * @property-read element_plugin $element_plugin
  *
@@ -51,6 +52,7 @@ class element extends model {
         'title',
         'identifier',
         'data',
+        'is_required'
     ];
 
     protected $model_accessor_whitelist = [
@@ -76,6 +78,7 @@ class element extends model {
      * @param string $title
      * @param int $identifier
      * @param string $data
+     * @param bool $is_required
      *
      * @return static
      */
@@ -84,7 +87,8 @@ class element extends model {
         string $plugin_name,
         string $title,
         int $identifier = 0,
-        string $data = null
+        string $data = null,
+        bool $is_required = null
     ): self {
         $entity = new element_entity();
         $entity->context_id = $context->id;
@@ -92,6 +96,7 @@ class element extends model {
         $entity->title = $title;
         $entity->identifier = $identifier ;
         $entity->data = $data;
+        $entity->is_required  = $is_required;
         $entity->save();
 
         /** @var self $model */
@@ -133,11 +138,13 @@ class element extends model {
      * Update the standard properties that define this element
      *
      * @param string $title
-     * @param $data
+     * @param string $data
+     * @param bool $is_required
      */
-    public function update_details(string $title, string $data = null) {
+    public function update_details(string $title, string $data = null, bool $is_required = null) {
         $this->entity->title = $title;
         $this->entity->data = $data;
+        $this->entity->is_required = $is_required;
         $this->entity->save();
     }
 

@@ -22,6 +22,11 @@ query mod_perform_activity($activity_id: core_id!) {
           name
         }
       }
+      section_elements_summary {
+        required_question_count
+        optional_question_count
+        other_element_count
+      }
     }
   }
 }

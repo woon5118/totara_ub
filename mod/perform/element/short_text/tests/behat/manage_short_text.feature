@@ -1,0 +1,39 @@
+@totara @perform @mod_perform @javascript @vuejs
+Feature: Manage performance activity short text elements
+
+  Background:
+    Given the following "activities" exist in "mod_perform" plugin:
+      | activity_name        | create_section | create_track |
+      | Add Element Activity | true           | true         |
+
+  Scenario: Save required and optional short text elements
+    Given I log in as "admin"
+    And I navigate to the manage perform activities page
+
+    # Add multiple elements
+    When I click on "Add Element Activity" "link"
+    And I click on "Content" "link" in the ".tui-tabs__tabs" "css_element"
+    And I click on "Edit content" "button"
+    And I click on "Add element" "button"
+    And I click on "Questions" "button"
+    And I click on "Short text" "link"
+    When I set the following fields to these values:
+      | rawTitle | Question 1 |
+    And I click on the "responseRequired" tui checkbox
+    And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"
+    Then I should see "Required"
+    And I click on "Add element" "button"
+    And I click on "Questions" "button"
+    And I click on "Short text" "link"
+    When I set the following fields to these values:
+      | rawTitle | Question 2 |
+    And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"
+    Then I should see "Optional"
+    And I click on "Submit" "button"
+    And I close the tui notification toast
+    Then I should see the tui datatable contains:
+      | Required questions     | Optional questions | Other content elements |
+      | 1                      | 1                  | 0                      |
+    When I click on "Edit content" "button"
+    Then I should see "Optional"
+    And I should see "Required"

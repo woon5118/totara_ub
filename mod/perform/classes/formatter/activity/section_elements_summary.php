@@ -17,32 +17,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Nathan Lewis <nathan.lewis@totaralearning.com>
+ * @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
  * @package mod_perform
  */
-
 namespace mod_perform\formatter\activity;
 
-use core\orm\formatter\entity_model_formatter;
-use core\webapi\formatter\field\string_field_formatter;
+use core\webapi\formatter\formatter;
 
-/**
- * Class element
- *
- * @package mod_perform\formatter\activity
- *
- * @property \mod_perform\models\activity\element $object
- */
-class element extends entity_model_formatter {
+ class section_elements_summary extends formatter {
 
-    protected function get_map(): array {
-        return [
-            'id' => null,
-            'element_plugin' => null,
-            'title' => string_field_formatter::class,
-            'identifier' => null,
-            'data' => element_data_field_formatter::for_model($this->object),
-            'is_required' => null,
-        ];
-    }
+     protected function get_map(): array {
+         return [
+             'required_question_count' => null,
+             'optional_question_count' => null,
+             'other_element_count' => null
+         ];
+     }
 }

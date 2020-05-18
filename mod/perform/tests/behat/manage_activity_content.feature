@@ -72,8 +72,12 @@ Feature: Adding, Updating, Removing activity elements.
     And I should see "Test 3"
 
     # Delete multiple elements.
-    When I click on "Delete" "button" in the ".tui-performEditSectionContentModal__form > div:nth-of-type(1)" "css_element"
-    And I click on "Delete" "button" in the ".tui-performEditSectionContentModal__form > div:nth-of-type(1)" "css_element"
+    When I click on "Test 2" "button"
+    And I click on "Actions" "link"
+    And I click on "Delete" "link"
+    And I click on "Test 1" "button"
+    And I click on "Actions" "link"
+    And I click on "Delete" "link"
     And I click on "Submit" "button"
     And I click on "Edit content" "button"
     Then I should see "Test 3"

@@ -1106,6 +1106,18 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020052001, 'perform');
 
     }
+    if ($oldversion < 2020052200) {
+        // Define field is_required to be added to perform_element.
+        $table = new xmldb_table('perform_element');
+
+        $field = new xmldb_field('is_required', XMLDB_TYPE_INTEGER, '1', null, null, null, null);
+
+        // Conditionally launch add field is_required.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_mod_savepoint(true, 2020052200, 'perform');
+    }
 
     return true;
 }

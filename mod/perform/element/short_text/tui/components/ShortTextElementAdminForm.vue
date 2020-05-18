@@ -21,7 +21,7 @@
   @package performelement_short_text
 -->
 <template>
-  <ElementAdminForm :type="type" :error="error">
+  <ElementAdminForm :type="type" :error="error" @remove="$emit('remove')">
     <template v-slot:content>
       <div class="tui-elementEditShortText">
         <Uniform
@@ -56,6 +56,11 @@
             />
           </FormRow>
           <FormRow>
+            <Checkbox v-model="responseRequired" name="responseRequired">
+              {{ $str('section_element_response_required', 'mod_perform') }}
+            </Checkbox>
+          </FormRow>
+          <FormRow>
             <div class="tui-elementEditShortText__action-buttons">
               <FormActionButtons
                 :submitting="getSubmitting()"
@@ -75,6 +80,7 @@ import Textarea from 'totara_core/components/form/Textarea';
 import ElementAdminForm from 'mod_perform/components/element/ElementAdminForm';
 import FormActionButtons from 'mod_perform/components/element/admin_form/ActionButtons';
 import AdminFormMixin from 'mod_perform/components/element/admin_form/AdminFormMixin';
+import Checkbox from 'totara_core/components/form/Checkbox';
 
 export default {
   components: {
@@ -84,6 +90,7 @@ export default {
     FormText,
     Textarea,
     FormActionButtons,
+    Checkbox,
   },
   mixins: [AdminFormMixin],
   props: {
@@ -91,21 +98,29 @@ export default {
     title: String,
     rawTitle: String,
     data: Object,
+    isRequired: {
+      type: Boolean,
+      default: false,
+    },
     error: String,
   },
-  computed: {
-    initialValues() {
-      return {
-        title: this.title,
-        rawTitle: this.rawTitle,
-      };
-    },
+  data() {
+    const initialValues = {
+      title: this.title,
+      rawTitle: this.rawTitle,
+      responseRequired: this.isRequired,
+    };
+    return {
+      initialValues: initialValues,
+      responseRequired: this.isRequired,
+    };
   },
   methods: {
     handleSubmit(values) {
       this.$emit('update', {
         title: values.rawTitle,
         data: {},
+        is_required: this.responseRequired,
       });
     },
 
@@ -122,6 +137,9 @@ export default {
         "error_question_length_exceed",
         "short_text_title",
         "short_text_answer_placeholder"
+    ],
+    "mod_perform": [
+        "section_element_response_required"
     ]
   }
 </lang-strings>

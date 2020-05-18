@@ -23,18 +23,6 @@
 
 <template>
   <Card class="mod-perform-activitySection">
-    <Grid>
-      <GridItem grows :units="1" />
-      <GridItem grows :units="1">
-        <div class="mod-perform-activitySection__action-buttons">
-          <Button
-            :text="$str('edit_content', 'mod_perform')"
-            :styleclass="{ small: true }"
-            @click="modelOpen = true"
-          />
-        </div>
-      </GridItem>
-    </Grid>
     <Grid :stack-at="1200">
       <GridItem :units="6">
         <h3 class="mod-perform-activitySection__participant-heading">
@@ -69,12 +57,56 @@
         </ButtonGroup>
       </GridItem>
     </Grid>
-
+    <Grid>
+      <GridItem grows :units="10">
+        <Table
+          :data="elementsSummary"
+          :border-bottom-hidden="true"
+          :border-top-hidden="true"
+        >
+          <template v-slot:header-row>
+            <HeaderCell size="4">{{
+              $str('section_element_summary_required_questions', 'mod_perform')
+            }}</HeaderCell>
+            <HeaderCell size="4">{{
+              $str('section_element_summary_optional_questions', 'mod_perform')
+            }}</HeaderCell>
+            <HeaderCell size="4">{{
+              $str(
+                'section_element_summary_other_content_elements',
+                'mod_perform'
+              )
+            }}</HeaderCell>
+          </template>
+          <template v-slot:row="{ row }">
+            <Cell size="4">
+              {{ row.required_question_count }}
+            </Cell>
+            <Cell size="4">
+              {{ row.optional_question_count }}
+            </Cell>
+            <Cell size="4">
+              {{ row.other_element_count }}
+            </Cell>
+          </template>
+        </Table>
+      </GridItem>
+      <GridItem grows :units="1">
+        <div class="mod-perform-activitySection__action-buttons">
+          <Button
+            :text="$str('edit_content_elements', 'mod_perform')"
+            :styleclass="{ small: true }"
+            @click="modelOpen = true"
+          />
+        </div>
+      </GridItem>
+    </Grid>
     <ModalPresenter :open="modelOpen" @request-close="modalRequestClose">
       <EditSectionContentModal
         :section-id="section.id"
         @mutation-success="showMutationSuccessNotification"
         @mutation-error="showMutationErrorNotification"
+        @update-summary="updateSummary"
       />
     </ModalPresenter>
   </Card>
@@ -91,6 +123,9 @@ import ModalPresenter from 'totara_core/components/modal/ModalPresenter';
 import ParticipantsPopover from 'mod_perform/components/manage_activity/content/ParticipantsPopover';
 import SectionRelationship from 'mod_perform/components/manage_activity/content/SectionRelationship';
 import UpdateSectionRelationshipsMutation from 'mod_perform/graphql/update_section_relationships.graphql';
+import Table from 'totara_core/components/datatable/Table';
+import Cell from 'totara_core/components/datatable/Cell';
+import HeaderCell from 'totara_core/components/datatable/HeaderCell';
 
 export default {
   components: {
@@ -103,6 +138,9 @@ export default {
     ModalPresenter,
     ParticipantsPopover,
     SectionRelationship,
+    Table,
+    Cell,
+    HeaderCell,
   },
   props: {
     section: {
@@ -116,6 +154,7 @@ export default {
       savedSection: this.section,
       displayedParticipants: this.getParticipantsFromSection(this.section),
       isSaving: false,
+      elementsSummary: [this.section.section_elements_summary],
     };
   },
   computed: {
@@ -202,6 +241,10 @@ export default {
       this.$emit('mutation-error');
     },
 
+    updateSummary(data) {
+      this.elementsSummary = [data];
+    },
+
     async trySave() {
       this.isSaving = true;
 
@@ -241,7 +284,13 @@ export default {
     "mod_perform": [
       "activity_participants_heading",
       "activity_section_save_changes",
-      "edit_content"
+      "edit_content_elements",
+      "activity_participants_add",
+      "activity_participants_heading",
+      "activity_section_save_changes",
+      "section_element_summary_required_questions",
+      "section_element_summary_optional_questions",
+      "section_element_summary_other_content_elements"
     ],
     "moodle": [
       "cancel"

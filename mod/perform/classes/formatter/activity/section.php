@@ -40,6 +40,7 @@ class section extends entity_model_formatter {
             'activity' => null,
             'section_elements' => null,
             'section_relationships' => null,
+            'section_elements_summary' => null,
         ];
     }
 }

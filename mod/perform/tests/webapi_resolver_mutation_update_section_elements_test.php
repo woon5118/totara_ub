@@ -55,12 +55,14 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
                         'plugin_name' => 'short_text',
                         'title' => 'Test title 1',
                         'data' => 'aaa',
+                        'is_required' => true,
                         'sort_order' => 2,
                     ],
                     [
                         'plugin_name' => 'short_text',
                         'title' => 'Test title 2',
                         'data' => 'bbb',
+                        'is_required' => true,
                         'sort_order' => 1,
                     ],
                 ],
@@ -82,10 +84,12 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
         $element1 = $DB->get_record('perform_element', ['id' => $section_elements[1]->element_id]);
         $this->assertEquals('Test title 2', $element1->title);
         $this->assertEquals('bbb', $element1->data);
+        $this->assertEquals(1, $element1->is_required);
 
         $element2 = $DB->get_record('perform_element', ['id' => $section_elements[2]->element_id]);
         $this->assertEquals('Test title 1', $element2->title);
         $this->assertEquals('aaa', $element2->data);
+        $this->assertEquals(1, $element2->is_required);
 
         $this->assertEquals($section->id, $section_elements[1]->section_id);
         $this->assertEquals($element1->id, $section_elements[1]->element_id);
@@ -510,18 +514,21 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
                         'plugin_name' => 'short_text',
                         'title' => 'Test title 1',
                         'data' => 'aaa',
+                        'is_required' => true,
                         'sort_order' => 1,
                     ],
                     [
                         'plugin_name' => 'short_text',
                         'title' => 'Test title 2',
                         'data' => 'bbb',
+                        'is_required' => true,
                         'sort_order' => 2,
                     ],
                     [
                         'plugin_name' => 'short_text',
                         'title' => 'Test title 3',
                         'data' => 'ccc',
+                        'is_required' => true,
                         'sort_order' => 3,
                     ],
                 ],
@@ -536,6 +543,7 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
         $element4 = $perform_generator->create_element([
             'title' => 'Test title 5',
             'data' => 'eee',
+            'is_required' => true,
             'identifier' => 555,
         ]);
 
@@ -547,6 +555,7 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
                         'plugin_name' => 'short_text',
                         'title' => 'Test title 4',
                         'data' => 'ddd',
+                        'is_required' => true,
                         'sort_order' => 1,
                     ],
                 ],
@@ -560,6 +569,7 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
                     [
                         'element_id' => $element4->id,
                         'title' => 'Test title 6',
+                        'is_required' => true,
                         'data' => 'fff',
                     ],
                 ],

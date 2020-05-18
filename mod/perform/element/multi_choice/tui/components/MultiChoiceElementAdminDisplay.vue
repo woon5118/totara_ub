@@ -24,6 +24,7 @@
     :type="type"
     :title="title"
     :error="error"
+    :is-required="isRequired"
     @edit="$emit('edit')"
     @remove="$emit('remove')"
   >
@@ -57,6 +58,7 @@ export default {
     title: String,
     type: Object,
     data: Object,
+    isRequired: Boolean,
     error: String,
   },
 };

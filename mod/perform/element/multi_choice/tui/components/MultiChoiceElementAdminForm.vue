@@ -20,7 +20,7 @@
   @package performelement_multi_choice
 -->
 <template>
-  <ElementAdminForm :type="type" :error="error">
+  <ElementAdminForm :type="type" :error="error" @remove="$emit('remove')">
     <template v-slot:content>
       <div class="tui-elementEditMultiChoice">
         <Uniform
@@ -78,6 +78,11 @@
             </FieldArray>
           </FormRow>
           <FormRow>
+            <Checkbox v-model="responseRequired" name="responseRequired">
+              {{ $str('section_element_response_required', 'mod_perform') }}
+            </Checkbox>
+          </FormRow>
+          <FormRow>
             <div class="tui-elementEditMultiChoice__action-buttons">
               <FormActionButtons
                 :submitting="getSubmitting()"
@@ -100,6 +105,7 @@ import AdminFormMixin from 'mod_perform/components/element/admin_form/AdminFormM
 import Repeater from 'totara_core/components/form/Repeater';
 import AddIcon from 'totara_core/components/icons/common/Add';
 import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
+import Checkbox from 'totara_core/components/form/Checkbox';
 
 const MIN_OPTIONS = 2;
 const OPTION_PREFIX = 'option_';
@@ -115,12 +121,17 @@ export default {
     FieldArray,
     AddIcon,
     ButtonIcon,
+    Checkbox,
   },
   mixins: [AdminFormMixin],
   props: {
     type: Object,
     title: String,
     rawTitle: String,
+    isRequired: {
+      type: Boolean,
+      default: false,
+    },
     data: Object,
     rawData: Object,
     error: String,
@@ -129,6 +140,7 @@ export default {
     const initialValues = {
       title: this.title,
       rawTitle: this.rawTitle,
+      responseRequired: this.isRequired,
       answers: [],
     };
     if (Object.keys(this.rawData).length == 0) {
@@ -142,6 +154,7 @@ export default {
     return {
       initialValues: initialValues,
       minRows: MIN_OPTIONS,
+      responseRequired: this.isRequired,
     };
   },
   methods: {
@@ -158,6 +171,7 @@ export default {
       this.$emit('update', {
         title: values.rawTitle,
         data: { options: optionList },
+        is_required: this.responseRequired,
       });
     },
 
@@ -177,6 +191,9 @@ export default {
         "question_title",
         "answer_text",
         "single_select_options"
+    ],
+    "mod_perform": [
+        "section_element_response_required"
     ],
     "moodle": [
       "add",

@@ -46,6 +46,7 @@ type mod_perform_element {
   title(format: core_format = PLAIN): String!
   identifier: String
   data(format: core_format = PLAIN): String
+  is_required: Boolean
 }
 
 """
@@ -67,6 +68,15 @@ type mod_perform_section {
   activity: mod_perform_activity!
   section_elements: [mod_perform_section_element!]!
   section_relationships: [mod_perform_section_relationship!]!
+  section_elements_summary: mod_perform_section_elements_summary
+}
+"""
+An element statistics in a section
+"""
+type mod_perform_section_elements_summary {
+  required_question_count: Int!
+  optional_question_count: Int!
+  other_element_count: Int!
 }
 
 """
@@ -220,6 +230,7 @@ Create a new element and add it to a section
 input mod_perform_create_new_element_input {
   plugin_name: param_text!
   title: param_text!
+  is_required: param_boolean
   data: String
   sort_order: param_integer!
 }
@@ -238,6 +249,7 @@ Update an existing element
 input mod_perform_update_element_input {
   element_id: core_id!
   title: param_text!
+  is_required: param_boolean
   data: String! # We cannot use param_text here as it would do some cleaning
 }
 

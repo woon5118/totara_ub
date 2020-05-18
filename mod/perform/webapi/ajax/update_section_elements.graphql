@@ -16,8 +16,14 @@ mutation mod_perform_update_section_elements(
           title
           identifier
           data
+          is_required
         }
         sort_order
+      }
+      section_elements_summary {
+        required_question_count
+        optional_question_count
+        other_element_count
       }
     }
   }

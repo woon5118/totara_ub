@@ -38,6 +38,7 @@
           :raw-data="sectionElement.element.raw_data"
           :title="sectionElement.element.title"
           :raw-title="sectionElement.element.raw_title"
+          :is-required="sectionElement.element.is_required"
           :type="sectionElement.element.type"
           :error="errors[sectionElement.clientId]"
           @update="update(sectionElement, $event)"
@@ -121,6 +122,7 @@ export default {
                 identifier: item.element.identifier,
                 data: JSON.parse(item.element.data),
                 raw_data: JSON.parse(item.element.raw_data),
+                is_required: item.element.is_required,
               },
               sort_order: item.sort_order,
             };
@@ -158,11 +160,12 @@ export default {
     /**
      * update existing elements and shows display view of the element
      */
-    update(sectionElement, { title, data }) {
+    update(sectionElement, { title, data, is_required }) {
       sectionElement.element.title = title;
       sectionElement.element.raw_title = title;
       sectionElement.element.data = data;
       sectionElement.element.raw_data = data;
+      sectionElement.element.is_required = is_required;
       delete sectionElement.creating;
       this.display(sectionElement);
     },
@@ -233,10 +236,15 @@ export default {
       this.isSaving = true;
 
       try {
-        await this.save();
+        const result = await this.save();
         this.$emit('mutation-success');
         this.isSaving = false;
         this.$emit('request-close');
+        this.$emit(
+          'update-summary',
+          result.mod_perform_update_section_elements.section
+            .section_elements_summary
+        );
       } catch (e) {
         this.$emit('mutation-error', e);
         // If something goes wrong during create, allow the user to try again.
@@ -264,6 +272,7 @@ export default {
           createNew.push({
             plugin_name: item.element.type.plugin_name,
             title: item.element.raw_title,
+            is_required: item.element.is_required,
             data: JSON.stringify(item.element.raw_data),
             sort_order: sortOrder,
           });
@@ -271,6 +280,7 @@ export default {
           update.push({
             element_id: item.element.id,
             title: item.element.raw_title,
+            is_required: item.element.is_required,
             data: JSON.stringify(item.element.raw_data),
           });
           move.push({

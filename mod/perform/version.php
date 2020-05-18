@@ -22,8 +22,7 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
-
-$plugin->version  = 2020052001;       // The current module version (Date: YYYYMMDDXX).
+$plugin->version  = 2020052200;       // The current module version (Date: YYYYMMDDXX).
 $plugin->requires = 2016120505;       // Requires this Moodle version.
 $plugin->component = 'mod_perform'; // To check on upgrade, that module sits in correct place
 $plugin->dependencies = ['container_perform' => 2020012400];

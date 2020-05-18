@@ -88,3 +88,36 @@ Feature: Manage performance activity multiple choice elements
     And I save multi choice question element data
     And I should see "Required"
 
+  Scenario: Save required and optional multiple choice elements
+    Given I log in as "admin"
+    And I navigate to the manage perform activities page
+    And I click on "Activity one" "link"
+    Then I should see the tui datatable contains:
+      | Required questions     | Optional questions | Other content elements |
+      | 0                      | 0                  | 0                      |
+    # Add multiple elements
+    And I navigate to manage perform activity content page
+    And I click multi choice question element
+    When I set the following fields to these values:
+      | rawTitle   | Question 1 |
+      | answers[0] | Option one |
+      | answers[1] | Option two |
+    And I click on the "responseRequired" tui checkbox
+    And I save multi choice question element data
+    Then I should see "Required"
+    And I click multi choice question element
+    When I set the following fields to these values:
+      | rawTitle   | Question 2 |
+      | answers[0] | Option one |
+      | answers[1] | Option two |
+    And I save multi choice question element data
+    Then I should see "Optional"
+    And I click on "Submit" "button"
+    When I close the tui notification toast
+    Then I should see the tui datatable contains:
+      | Required questions     | Optional questions | Other content elements |
+      | 1                      | 1                  | 0                      |
+    When I navigate to manage perform activity content page
+    Then I should see "Optional"
+    And I should see "Required"
+

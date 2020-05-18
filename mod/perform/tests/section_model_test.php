@@ -23,6 +23,7 @@
  */
 
 use mod_perform\entities\activity\section as section_entity;
+use mod_perform\models\activity\section_element;
 use mod_perform\models\activity\section;
 use totara_core\relationship\resolvers\subject;
 use totara_job\relationship\resolvers\appraiser;
@@ -155,5 +156,51 @@ class mod_perform_section_model_testcase extends mod_perform_relationship_testca
         $this->assert_section_relationships($section2, []);
         $this->assert_activity_relationships($activity1, []);
         $this->assert_activity_relationships($activity2, []);
+    }
+
+    public function test_get_section_element_stats() {
+        self::setAdminUser();
+        $perform_generator = $this->perform_generator();
+        $activity = $perform_generator->create_activity_in_container();
+        $section1 = $perform_generator->create_section($activity);
+        $section2 = $perform_generator->create_section($activity);
+
+        $element1 = $perform_generator->create_element(['title'=>'element one', 'is_required'=>true]);
+        $element2 = $perform_generator->create_element(['title'=>'element two', 'is_required'=>true]);
+        $element3 = $perform_generator->create_element(['title'=>'element three']);
+
+        section_element::create($section1, $element1, 1);
+        section_element::create($section1, $element2, 2);
+        section_element::create($section1, $element3, 3);
+
+        //check element counts after create
+        $result= $section1->get_section_elements_summary();
+        $expected = (object)[
+            'required_question_count' => 2,
+            'optional_question_count' => 1,
+            'other_element_count' => 0
+        ];
+        $this->assertEquals($expected, $result);
+
+        //check element counts after update
+        $perform_generator->update_element($element1, ['is_required'=>false]);
+        $perform_generator->update_element($element2, ['is_required'=>false]);
+
+        $result= $section1->get_section_elements_summary();
+        $expected = (object)[
+            'required_question_count' => 0,
+            'optional_question_count' => 3,
+            'other_element_count' => 0
+        ];
+        $this->assertEquals($expected, $result);
+
+        //check other section element counts
+        $result= $section2->get_section_elements_summary();
+        $expected = (object)[
+            'required_question_count' => 0,
+            'optional_question_count' => 0,
+            'other_element_count' => 0
+        ];
+        $this->assertEquals($expected, $result);
     }
 }

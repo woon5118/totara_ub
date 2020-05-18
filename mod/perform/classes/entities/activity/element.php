@@ -35,6 +35,7 @@ use core\orm\entity\entity;
  * @property string $title a user-defined title to identify and describe this element
  * @property int $identifier used to match elements that share the same identifier
  * @property string $data configuration data specific to this type of element
+ * @property bool $is_required used to check response required or optional
  *
  * @method static element_repository repository()
  *
@@ -42,4 +43,18 @@ use core\orm\entity\entity;
  */
 class element extends entity {
     public const TABLE = 'perform_element';
+
+    /**
+     * Cast is_required to bool type.
+     *
+     * @return bool
+     */
+    protected function get_is_required_attribute(): ?bool {
+        $value = $this->get_attributes_raw()['is_required'];
+        if (is_null($value)) {
+            return null;
+        } else {
+            return (bool) $this->get_attributes_raw()['is_required'];
+        }
+    }
 }

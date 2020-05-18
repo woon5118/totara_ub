@@ -26,13 +26,16 @@
     <div class="tui-elementEditDisplay__inner">
       <div class="tui-elementEditDisplay__inner-header">
         <div class="tui-elementEditDisplay__title">{{ title }}</div>
-        <div class="tui-elementEditDisplay__action">
-          <ButtonIcon
-            :aria-label="$str('section_delete_element', 'mod_perform')"
-            @click="remove"
-          >
-            <DeleteIcon size="200" />
-          </ButtonIcon>
+        <div class="tui-elementEditDisplay__info">
+          <Lozenge
+            v-show="isRequired"
+            :text="$str('section_element_tag_required', 'mod_perform')"
+          />
+          <Lozenge
+            v-show="!isRequired"
+            :text="$str('section_element_tag_optional', 'mod_perform')"
+            type="warning"
+          />
         </div>
       </div>
       <div class="tui-elementEditDisplay__inner-content">
@@ -43,21 +46,19 @@
 </template>
 
 <script>
-import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
-import DeleteIcon from 'totara_core/components/icons/common/Delete';
+import Lozenge from 'totara_core/components/lozenge/Lozenge';
 
 export default {
   components: {
-    ButtonIcon,
-    DeleteIcon,
+    Lozenge,
   },
 
   props: {
     title: String,
+    isRequired: Boolean,
     type: Object,
     error: String,
   },
-
   methods: {
     edit() {
       this.$emit('edit');
@@ -71,7 +72,8 @@ export default {
 <lang-strings>
   {
   "mod_perform": [
-    "section_delete_element"
+    "section_element_tag_required",
+    "section_element_tag_optional"
   ]
   }
 </lang-strings>

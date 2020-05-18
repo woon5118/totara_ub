@@ -17,6 +17,7 @@ query mod_perform_section_admin($section_id: core_id!) {
         identifier
         data
         raw_data: data(format: RAW)
+        is_required
       }
       sort_order
     }

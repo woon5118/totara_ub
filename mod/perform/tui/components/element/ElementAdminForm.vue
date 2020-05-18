@@ -21,14 +21,39 @@
   @package mod_perform
 -->
 <template>
-  <div class="tui-elementEdit">
+  <div class="tui-elementAdminForm">
     <div v-if="error">{{ error }}</div>
+    <div class="tui-elementAdminForm__action">
+      <Dropdown position="bottom-right">
+        <template v-slot:trigger="{ toggle, isOpen }">
+          <a href="#" @click.prevent="toggle">
+            <ActivityActionsIcon
+              :alt="$str('activity_action_options', 'mod_perform')"
+              :title="$str('activity_action_options', 'mod_perform')"
+              size="200"
+            />
+          </a>
+        </template>
+        <DropdownItem @click="remove">{{
+          $str('section_delete_element', 'mod_perform')
+        }}</DropdownItem>
+      </Dropdown>
+    </div>
     <slot name="content" />
   </div>
 </template>
 
 <script>
+import Dropdown from 'totara_core/components/dropdown/Dropdown';
+import DropdownItem from 'totara_core/components/dropdown/DropdownItem';
+import ActivityActionsIcon from 'mod_perform/components/icons/ActivityActions';
 export default {
+  components: {
+    Dropdown,
+    DropdownItem,
+    ActivityActionsIcon,
+  },
+
   props: {
     type: Object,
     error: String,
@@ -38,6 +63,17 @@ export default {
     edit() {
       this.$emit('edit');
     },
+    remove() {
+      this.$emit('remove');
+    },
   },
 };
 </script>
+<lang-strings>
+  {
+  "mod_perform": [
+    "activity_action_options",
+    "section_delete_element"
+  ]
+  }
+</lang-strings>

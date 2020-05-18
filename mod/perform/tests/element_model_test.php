@@ -32,7 +32,14 @@ class mod_perform_element_model_testcase extends advanced_testcase {
     public function test_create() {
         $default_context = context_coursecat::instance(perform::get_default_category_id());
 
-        $element = element::create($default_context, 'short_text', 'test element 1 title', 123);
+        $element = element::create(
+            $default_context,
+            'short_text',
+            'test element 1 title',
+            123,
+            null,
+            true
+        );
 
         // Reload, just to make sure that we're getting it out of the DB.
         /** @var element $actual_element */
@@ -40,6 +47,7 @@ class mod_perform_element_model_testcase extends advanced_testcase {
 
         $this->assertSame('short_text', $element_model->plugin_name);
         $this->assertSame('test element 1 title', $element_model->title);
+        $this->assertTrue($element_model->is_required);
     }
 
 }

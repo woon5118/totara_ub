@@ -239,13 +239,32 @@ class mod_perform_generator extends component_generator_base {
         return $participant_section;
     }
 
+    /**
+     * @param array $data
+     *
+     * @return element
+     */
     public function create_element(array $data = []): element {
         return element::create(
             $data['context'] ?? context_coursecat::instance(perform_container::get_default_category_id()),
             $data['plugin_name'] ?? 'short_text',
             $data['title'] ?? 'test element title',
             $data['identifier'] ?? 0,
-            $data['data'] ?? null
+            $data['data'] ?? null,
+            $data['is_required'] ?? false
+        );
+    }
+
+    /**
+     * Update existing element
+     * @param element $element
+     * @param array   $data
+     */
+    public function update_element(element $element, array $data = []): void {
+        $element->update_details(
+            $data['title'] ?? $element->title,
+            $data['data'] ?? $element->data,
+            $data['is_required'] ?? $element->is_required
         );
     }
 
