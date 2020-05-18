@@ -78,6 +78,15 @@ class rb_perform_subject_instance_embedded extends rb_base_embedded {
     }
 
     /**
+     * Can searches be saved?
+     *
+     * @return bool
+     */
+    public static function is_search_saving_allowed(): bool {
+        return false;
+    }
+
+    /**
      * Check if the user is capable of accessing this report.
      *
      * @param int $reportfor userid of the user that this report is being generated for
