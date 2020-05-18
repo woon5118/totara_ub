@@ -12,7 +12,7 @@ Feature: Catalog metadata search
 
   Scenario: Create a course with search terms and search for the term
     Given I click on "Find Learning" in the totara menu
-    And I click on "div.tw-catalogManageBtns__btn" "css_element"
+    And I click on "Create" "button"
     And I click on "Course" "link" in the "li.tw-catalogManageBtns__group_options_item" "css_element"
     And I follow "Expand all"
     And I set the following fields to these values:

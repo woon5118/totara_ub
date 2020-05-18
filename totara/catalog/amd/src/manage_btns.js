@@ -48,10 +48,16 @@ define([], function() {
                 if (!e.target) {
                     return;
                 }
+                var button = e.target.closest('#tw-catalogMagageBtns_button');
 
-                if (e.target.closest('[data-tw-catalogManageBtnsGroup]')) {
+                if (button) {
                     if (!e.target.closest('.tw-catalogManageBtns__group_options')) {
                         e.preventDefault();
+                    }
+                    if (button.getAttribute('aria-expanded') === "true") {
+                        button.setAttribute('aria-expanded', "false");
+                    } else {
+                        button.setAttribute('aria-expanded', "true");
                     }
                     var list = e.target.closest('[data-tw-catalogManageBtnsGroup]');
                     list.classList.toggle('tw-catalog__activePopover');

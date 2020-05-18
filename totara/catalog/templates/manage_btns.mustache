@@ -60,11 +60,20 @@
 
     {{#has_create_dropdown}}
     <div class="tw-catalogManageBtns__group" data-tw-catalogManageBtnsGroup="">
-        <div class="tw-catalogManageBtns__btn">
+        <button
+            id="tw-catalogMagageBtns_button"
+            class="tw-catalogManageBtns__btn"
+            aria-expanded="false"
+            aria-controls="tw-catalogMagageBtns_menu"
+        >
             {{#str}}create, core{{/str}}
             {{#flex_icon}}expandable, expand, core{{/flex_icon}}
-        </div>
-        <ul class="tw-catalogManageBtns__group_options">
+        </button>
+        <ul
+            id="tw-catalogMagageBtns_menu"
+            class="tw-catalogManageBtns__group_options"
+            aria-labelledby="tw-catalogMagageBtns_button"
+        >
             {{#create_buttons}}
             <li class="tw-catalogManageBtns__group_options_item">
                 <a href="{{{url}}}" class="tw-catalogManageBtns__group_options_item_link">
