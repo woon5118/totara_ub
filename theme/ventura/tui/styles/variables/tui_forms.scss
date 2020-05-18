@@ -36,11 +36,8 @@
   // Border size of input elements
   --tui-form-input-border-size: 0.1rem;
   // Vertical padding of single line form elements,
-  // the calculation splits the remaining available space to meet the target height
-  --tui-form-input-v-padding: calc(
-    (
-        var(--tui-form-input-height) - var(--tui-form-input-font-size) -
-          (var(--tui-form-input-border-size) * 2)
-      ) / 2
-  );
+  // the calculation splits the remaining available space to meet the target height.
+  // Must be on a single line otherwise it breaks (for some reason!) so must be ignored by prettier.
+  /* prettier-ignore */
+  --tui-form-input-v-padding: calc((var(--tui-form-input-height) - var(--tui-form-input-font-size) - (var(--tui-form-input-border-size) * 2)) / 2);
 }
