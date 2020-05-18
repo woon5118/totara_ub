@@ -203,6 +203,7 @@ $string['directly_assigned'] = 'Directly assigned';
 $string['disabled'] = 'Disabled';
 $string['done'] = 'Done';
 $string['edit_competency'] = 'Edit competency: {$a}';
+$string['edit_competency_title'] = '{$a->header} ({$a->tab})';
 $string['enablecompetency_assignment'] = 'Enable Competency Assignment';
 $string['enablecompetency_assignment_desc'] = 'This option will let you: Enable(show)/Disable Competency Assignment feature on this site.';
 $string['enabled'] = 'Enabled';

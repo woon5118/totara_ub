@@ -43,7 +43,7 @@
   }
 
   &__title {
-    @include tui-font-heading-medium();
+    @include tui-font-heading-small();
     margin: auto 0;
   }
 

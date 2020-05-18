@@ -131,6 +131,9 @@ class competency_controller extends admin_controller {
         }
 
         $heading = get_string('edit_competency', 'totara_competency', format_string($this->competency->display_name));
+        $tab = get_string('competencytab' . $section, 'totara_hierarchy');
+        $title = get_string('edit_competency_title', 'totara_competency', ['header' => $heading, 'tab' => $tab]);
+
         $this->page->navbar->add($heading);
 
         $this->competency = new competency($this->competency->id);
@@ -155,10 +158,10 @@ class competency_controller extends admin_controller {
             $data['success'] = true;
         }
 
-        return new \totara_mvc\view(
+        return (new \totara_mvc\view(
             'totara_competency/competency_edit',
             $data
-        );
+        ))->set_title($title);
     }
 
     /**

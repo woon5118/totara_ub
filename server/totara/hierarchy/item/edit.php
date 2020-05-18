@@ -192,7 +192,11 @@ if ($item->id) {
             new moodle_url('/totara/hierarchy/item/view.php', array('prefix' => $prefix, 'id' => $item->id)));
         $PAGE->navbar->add(get_string('edit'.$prefix, 'totara_hierarchy'));
     } else {
-        $PAGE->navbar->add(format_string($item->fullname));
+        $tab = get_string('competencytabgeneral', 'totara_hierarchy');
+        $header = get_string('edit' . $prefix, 'totara_hierarchy', format_string($item->fullname));
+        $title = get_string('edit_competency_title', 'totara_hierarchy', ['header' => $header, 'tab' => $tab]);
+        $PAGE->navbar->add($header);
+        $PAGE->set_title($title);
     }
 } else {
     $PAGE->navbar->add(get_string('addnew'.$prefix, 'totara_hierarchy'));
@@ -213,7 +217,8 @@ if ($prefix === 'competency' && !empty($item->id)) {
 if ($item->id == 0) {
     echo $OUTPUT->heading(get_string('addnew'.$prefix, 'totara_hierarchy'));
 } else {
-    echo $OUTPUT->heading(get_string('edit'.$prefix, 'totara_hierarchy', format_string($item->fullname)));
+    $page_title = get_string('edit'.$prefix, 'totara_hierarchy', format_string($item->fullname));
+    echo html_writer::div($page_title, 'competency-edit-general-title');
 }
 
 if ($prefix === 'competency' && advanced_feature::is_enabled('competency_assignment')) {
@@ -221,7 +226,7 @@ if ($prefix === 'competency' && advanced_feature::is_enabled('competency_assignm
 
     echo $OUTPUT->render(totara_hierarchy_renderer::get_competency_tabs($item->id, 'editgeneral'));
 
-    echo html_writer::tag('h3', get_string('general'), ['class' => 'tw-editGeneral__title']);
+    echo html_writer::tag('h3', get_string('general'), ['class' => 'competency-edit-general-small-title']);
 }
 
 /// Finally display THE form

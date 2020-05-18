@@ -66,6 +66,16 @@ table.hierarchy-index .depth10 {
   display: inline;
 }
 
+.competency-edit-general-title {
+  @include tui-font-heading-medium();
+  margin: auto 0;
+}
+
+.competency-edit-general-small-title {
+  @include tui-font-heading-small();
+  margin: auto 0;
+}
+
 #hierarchy-bulk-actions-form .action {
   text-align: center;
   margin-top: $padding-large-vertical * 4;
