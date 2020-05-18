@@ -28,6 +28,7 @@ use core\orm\entity\model;
 use core\orm\query\builder;
 use mod_perform\entities\activity\activity_relationship;
 use mod_perform\entities\activity\section as section_entity;
+use coding_exception;
 
 /**
  * Class section
@@ -150,22 +151,37 @@ class section extends model {
     /**
      * Update section relationships by a list of class names.
      *
-     * @param int[] $relationship_ids
+     * @param array[] $relationships_updates
+     *
      * @return section
      */
-    public function update_relationships(array $relationship_ids): self {
+    public function update_relationships(array $relationships_updates): self {
         // Figure out which relationships to remove and which to add.
-        $current_relationship_ids = $this->get_activity_relationships()->pluck('core_relationship_id');
 
-        builder::get_db()->transaction(function () use ($current_relationship_ids, $relationship_ids) {
-            foreach ($relationship_ids as $relationship_id) {
-                if (!in_array($relationship_id, $current_relationship_ids)) {
-                    section_relationship::create($this->get_id(), $relationship_id);
+        builder::get_db()->transaction(function () use ($relationships_updates) {
+            $existing_section_relationships = $this->get_section_relationships();
+            foreach ($relationships_updates as $relationship_update) {
+                $core_relationship_id = $relationship_update['id'];
+
+                /** @var section_relationship $section_relationship */
+                $section_relationship = $existing_section_relationships->find(
+                    function($section_relationship) use ($core_relationship_id) {
+                        return $section_relationship->relationship->id === $core_relationship_id;
+                    }
+                );
+
+                if ($section_relationship) {
+                    unset($relationship_update['id']);
                 }
+                $section_relationship
+                    ? $section_relationship->update_can_view($relationship_update['can_view'])
+                    : section_relationship::create($this->get_id(), $relationship_update['id'], $relationship_update['can_view']);
             }
-            foreach ($current_relationship_ids as $relationship_id) {
-                if (!in_array($relationship_id, $relationship_ids)) {
-                    section_relationship::delete_with_properties($this->get_id(), $relationship_id);
+
+            $relationship_ids = array_column($relationships_updates, 'id');
+            foreach ($existing_section_relationships as $section_relationship) {
+                if (!in_array($section_relationship->relationship->id, $relationship_ids, true)) {
+                    section_relationship::delete_with_properties($this->get_id(), $section_relationship->relationship->id);
                 }
             }
         });
@@ -192,13 +208,13 @@ class section extends model {
         $sort_orders = array_unique(array_column($section_elements, 'sort_order'));
 
         if (count($sort_orders) != count($section_elements)) {
-            throw new \coding_exception('Section element sort orders are not unique!');
+            throw new coding_exception('Section element sort orders are not unique!');
         }
 
         sort($sort_orders);
 
         if (reset($sort_orders) != 1 or end($sort_orders) != count($sort_orders)) {
-            throw new \coding_exception('Section element sort orders are not consecutive starting at 1!');
+            throw new coding_exception('Section element sort orders are not consecutive starting at 1!');
         }
     }
 
@@ -238,7 +254,7 @@ class section extends model {
         $DB->transaction(function () use ($remove_section_elements) {
             foreach ($remove_section_elements as $section_element) {
                 if ($section_element->section_id != $this->id) {
-                    throw new \coding_exception('Cannot delete a section element that does not belong to this section');
+                    throw new coding_exception('Cannot delete a section element that does not belong to this section');
                 }
                 $section_element->delete();
             }
@@ -275,7 +291,7 @@ class section extends model {
         $DB->transaction(function () use ($move_section_elements) {
             foreach ($move_section_elements as $sort_order => $section_element) {
                 if ($section_element->section_id != $this->id) {
-                    throw new \coding_exception('Cannot move a section element that does not belong to this section');
+                    throw new coding_exception('Cannot move a section element that does not belong to this section');
                 }
                 $section_element->update_sort_order($sort_order);
             }

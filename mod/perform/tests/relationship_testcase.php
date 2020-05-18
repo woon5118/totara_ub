@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
@@ -23,6 +23,7 @@
 
 use mod_perform\entities\activity\activity_relationship;
 use mod_perform\entities\activity\section_relationship;
+use mod_perform\models\activity\section_relationship as section_relationship_model;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\section;
 use totara_core\entities\relationship_resolver;
@@ -144,4 +145,26 @@ abstract class mod_perform_relationship_testcase extends advanced_testcase {
         $this->assertEqualsCanonicalizing($expected_class_names, $actual_class_names);
     }
 
+
+    /**
+     * Asserts the right can_view status is saved for each relationship in a section.
+     *
+     * @param section $section
+     * @param array $relationships
+     * @return void
+     */
+    protected function assert_can_view_status(section $section, array $relationships): void {
+        $section1_relationships = $section->get_section_relationships();
+
+        foreach ($relationships as $relationship) {
+            $created_relationship = $section1_relationships->find(
+                function($section_relationship) use ($relationship) {
+                    return $relationship['id'] === $section_relationship->relationship->id;
+                }
+            );
+            $this->assertInstanceOf(section_relationship_model::class, $created_relationship);
+            $expected_can_view = $relationship['can_view'] ?? false;
+            $this->assertEquals($expected_can_view, (bool) $created_relationship->can_view);
+        }
+    }
 }

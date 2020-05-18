@@ -17,7 +17,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
   @author Matthias Bonk <matthias.bonk@totaralearning.com>
-  @package pathway_manual
+  @package mod_perform
 -->
 
 <template>
@@ -116,7 +116,7 @@ export default {
 
     isActiveParticipant(participant) {
       return this.activeParticipants
-        .map(participant => participant.id)
+        .map(participant => participant.relationship.id)
         .includes(participant.id);
     },
 
@@ -144,7 +144,8 @@ export default {
   {
     "mod_perform": [
       "activity_participants_select_done",
-      "activity_participants_select_heading"
+      "activity_participants_select_heading",
+      "activity_participants_add"
     ],
     "moodle": [
       "cancel"

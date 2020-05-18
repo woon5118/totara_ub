@@ -31,6 +31,7 @@ $string['activity_draft_not_ready'] = 'Draft is not yet ready for activation';
 $string['activity_general_tab_heading'] = 'General';
 $string['activity_instance_creation_heading'] = 'Activity instance creation';
 $string['activity_name'] = 'Performance activity name';
+$string['activity_participant_view_other_responses'] = 'Can view others\' responses';
 $string['activity_participants_add'] = 'Add participants';
 $string['activity_participants_heading'] = 'Participants';
 $string['activity_participants_select_done'] = 'Done';

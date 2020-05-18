@@ -27,6 +27,7 @@ use core\orm\entity\model;
 use mod_perform\entities\activity\activity_relationship as activity_relationship_entity;
 use mod_perform\entities\activity\section_relationship as section_relationship_entity;
 use totara_core\relationship\relationship;
+use invalid_state_exception;
 
 /**
  * Class section_relationship
@@ -75,17 +76,18 @@ class section_relationship extends model {
      *
      * @param int $section_id
      * @param int $relationship_id
+     * @param bool $can_view
      * @return static
      */
-    public static function create(int $section_id, int $relationship_id): self {
+    public static function create(int $section_id, int $relationship_id, bool $can_view = false): self {
         global $DB;
 
-        $relationship = relationship::load_by_id($relationship_id);
         $section = section::load_by_id($section_id);
         $activity = activity::load_by_id($section->activity_id);
         require_capability('mod/perform:manage_activity', $activity->get_context());
 
-        return $DB->transaction(function () use ($section_id, $relationship, $activity) {
+        return $DB->transaction(function () use ($section_id, $activity, $relationship_id, $can_view) {
+            $relationship = relationship::load_by_id($relationship_id);
             $relationship_entity = activity_relationship_entity::repository()
                 ->where('activity_id', $activity->get_id())
                 ->where('core_relationship_id', $relationship->id)
@@ -108,13 +110,28 @@ class section_relationship extends model {
                 $section_relationship_entity = new section_relationship_entity();
                 $section_relationship_entity->section_id = $section_id;
                 $section_relationship_entity->activity_relationship_id = $relationship_entity->id;
-                // Can view/answer always set to true for now.
-                $section_relationship_entity->can_view = 1;
+                $section_relationship_entity->can_view = $can_view;
+                // Can answer always set to true for now.
                 $section_relationship_entity->can_answer = 1;
                 $section_relationship_entity->save();
             }
             return self::load_by_entity($section_relationship_entity);
         });
+    }
+
+    /**
+     * Update a section relationship's can_view
+     *
+     * @param bool $can_view
+     * @return void
+     */
+    public function update_can_view(bool $can_view): void {
+        $activity = activity::load_by_id($this->section->activity_id);
+        require_capability('mod/perform:manage_activity', $activity->get_context());
+        $entity = $this->entity;
+        $entity->set_attribute('can_view', $can_view);
+
+        $entity->save();
     }
 
     /**
@@ -150,7 +167,7 @@ class section_relationship extends model {
             ->first();
         if (!$section_relationship_entity) {
             // This should never happen.
-            throw new \invalid_state_exception(
+            throw new invalid_state_exception(
                 "Record found in perform_relationship without corresponding section_relationship record. "
                 . "section_id {$section_id}, activity_relationship_id {$activity_relationship_entity->id}"
             );

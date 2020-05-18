@@ -23,6 +23,7 @@
 
 use mod_perform\entities\activity\section as section_entity;
 use mod_perform\models\activity\section;
+use mod_perform\models\activity\section_relationship;
 use mod_perform\webapi\resolver\mutation\update_section_relationships;
 use totara_core\relationship\resolvers\subject;
 use totara_job\relationship\resolvers\appraiser;
@@ -52,7 +53,15 @@ class mod_perform_webapi_resolver_mutation_update_section_relationships_testcase
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage('Specified section id does not exist');
 
-        [$args, $context] = $this->create_args($non_existent_section_id, [$relationship_id]);
+        [$args, $context] = $this->create_args(
+            $non_existent_section_id,
+            [
+                [
+                    'id' => $relationship_id,
+                    'can_view' => true,
+                ]
+            ]
+        );
         update_section_relationships::resolve($args, $context);
     }
 
@@ -70,7 +79,15 @@ class mod_perform_webapi_resolver_mutation_update_section_relationships_testcase
         $this->expectException(required_capability_exception::class);
         $this->expectExceptionMessage('you do not currently have permissions to do that (Manage performance activities)');
 
-        [$args, $context] = $this->create_args($section1->id, [$relationship_id]);
+        [$args, $context] = $this->create_args(
+            $section1->id,
+            [
+                [
+                    'id' => $relationship_id,
+                    'can_view' => true,
+                ],
+            ]
+        );
         update_section_relationships::resolve($args, $context);
     }
 
@@ -82,6 +99,7 @@ class mod_perform_webapi_resolver_mutation_update_section_relationships_testcase
         $appraiser_id = $perform_generator->get_relationship(appraiser::class)->id;
         $activity1 = $perform_generator->create_activity_in_container(['activity_name' => 'Activity 1']);
         $activity2 = $perform_generator->create_activity_in_container(['activity_name' => 'Activity 2']);
+
         /** @var section $section1 */
         $section1 = $perform_generator->create_section($activity1);
         $section2 = $perform_generator->create_section($activity1);
@@ -89,13 +107,30 @@ class mod_perform_webapi_resolver_mutation_update_section_relationships_testcase
         $this->assert_section_relationships($section2, []);
 
         // Add three relationships to section1.
-        [$args, $context] = $this->create_args($section1->id, [$subject_id, $manager_id, $appraiser_id]);
+        [$args, $context] = $this->create_args(
+            $section1->id,
+            [
+                [
+                    'id' => $subject_id,
+                    'can_view' => false,
+                ],
+                [
+                    'id' => $manager_id,
+                    'can_view' => true,
+                ],
+                [
+                    'id' => $appraiser_id,
+                    'can_view' => false,
+                ],
+            ]
+        );
         $result = update_section_relationships::resolve($args, $context);
 
         /** @var section $returned_section */
         $returned_section = $result['section'];
         $this->assertEquals($section1->id, $returned_section->id);
         $this->assert_section_relationships($section1, [subject::class, manager::class, appraiser::class]);
+        $this->assert_can_view_status($section1, $args['input']['relationships']);
         $this->assert_section_relationships($section2, []);
         $this->assert_activity_relationships($activity1, [subject::class, manager::class, appraiser::class]);
         $this->assert_activity_relationships($activity2, []);
@@ -103,7 +138,6 @@ class mod_perform_webapi_resolver_mutation_update_section_relationships_testcase
         // Remove all relationships.
         [$args, $context] = $this->create_args($section1->id, []);
         update_section_relationships::resolve($args, $context);
-
         $this->assert_section_relationships($section1, []);
         $this->assert_section_relationships($section2, []);
         $this->assert_activity_relationships($activity1, []);
@@ -119,7 +153,15 @@ class mod_perform_webapi_resolver_mutation_update_section_relationships_testcase
         $section_id = $data->activity2_section2->id;
         $appraiser_id = $this->perform_generator()->get_relationship(appraiser::class)->id;
 
-        [$args, ] = $this->create_args($section_id, [$appraiser_id]);
+        [$args, ] = $this->create_args(
+            $section_id,
+            [
+                [
+                    'id' => $appraiser_id,
+                    'can_view' => false,
+                ],
+            ]
+        );
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
         $this->assert_webapi_operation_successful($result);
 
@@ -132,7 +174,15 @@ class mod_perform_webapi_resolver_mutation_update_section_relationships_testcase
         $data = $this->create_test_data();
         $section_id = $data->activity2_section2->id;
         $appraiser_id = $this->perform_generator()->get_relationship(appraiser::class)->id;
-        [$args, ] = $this->create_args($section_id, [$appraiser_id]);
+        [$args, ] = $this->create_args(
+            $section_id,
+            [
+                [
+                    'id' => $appraiser_id,
+                    'can_view' => true,
+                ]
+            ]
+        );
 
         $feature = 'performance_activities';
         advanced_feature::disable($feature);
@@ -145,11 +195,11 @@ class mod_perform_webapi_resolver_mutation_update_section_relationships_testcase
         $this->assert_webapi_operation_failed($result, 'not logged in');
     }
 
-    private function create_args(int $section_id, array $relationship_ids): array {
+    private function create_args(int $section_id, array $relationships): array {
         $args = [
             'input' => [
                 'section_id' => $section_id,
-                'relationship_ids' => $relationship_ids
+                'relationships' => $relationships
             ]
         ];
 

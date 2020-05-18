@@ -283,7 +283,11 @@ class mod_perform_generator extends component_generator_base {
 
     public function create_section_relationship(section $section, array $data): section_relationship_model {
         $relationship = $this->get_relationship($data['class_name']);
-        return section_relationship_model::create($section->get_id(), $relationship->id);
+        return section_relationship_model::create(
+            $section->get_id(),
+            $relationship->id,
+            true
+        );
     }
 
     public function get_relationship(string $class_name): relationship {

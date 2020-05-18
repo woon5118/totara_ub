@@ -84,7 +84,22 @@ class mod_perform_section_model_testcase extends mod_perform_relationship_testca
         $subject_id = $perform_generator->get_relationship(subject::class)->id;
 
         // Add three relationships to section1.
-        $returned_section = $section1->update_relationships([$appraiser_id, $manager_id, $subject_id]);
+        $returned_section = $section1->update_relationships(
+            [
+                [
+                    'id' => $appraiser_id,
+                    'can_view' => true,
+                ],
+                [
+                    'id' => $manager_id,
+                    'can_view' => true,
+                ],
+                [
+                    'id' => $subject_id,
+                    'can_view' => true,
+                ],
+            ]
+        );
         $this->assertEquals($section1, $returned_section);
         $this->assert_section_relationships($section1, [appraiser::class, manager::class, subject::class]);
         $this->assert_section_relationships($section2, []);
@@ -92,14 +107,36 @@ class mod_perform_section_model_testcase extends mod_perform_relationship_testca
         $this->assert_activity_relationships($activity2, []);
 
         // Remove one relationship.
-        $section1->update_relationships([$appraiser_id, $manager_id]);
+        $section1->update_relationships(
+            [
+                [
+                    'id' => $appraiser_id,
+                    'can_view' => true,
+                ],
+                [
+                    'id' => $manager_id,
+                    'can_view' => true,
+                ]
+            ]
+        );
         $this->assert_section_relationships($section1, [appraiser::class, manager::class]);
         $this->assert_section_relationships($section2, []);
         $this->assert_activity_relationships($activity1, [appraiser::class, manager::class]);
         $this->assert_activity_relationships($activity2, []);
 
         // Add to section2.
-        $section2->update_relationships([$manager_id, $subject_id]);
+        $section2->update_relationships(
+            [
+                [
+                    'id' => $manager_id,
+                    'can_view' => true,
+                ],
+                [
+                    'id' => $subject_id,
+                    'can_view' => true,
+                ]
+            ]
+        );
         $this->assert_section_relationships($section1, [appraiser::class, manager::class]);
         $this->assert_section_relationships($section2, [manager::class, subject::class]);
         $this->assert_activity_relationships($activity1, [appraiser::class, manager::class, subject::class]);

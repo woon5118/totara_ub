@@ -35,26 +35,18 @@
         </div>
       </GridItem>
     </Grid>
-    <Grid :stack-at="768">
-      <GridItem :units="5">
+    <Grid :stack-at="1200">
+      <GridItem :units="6">
         <h3 class="mod-perform-activitySection__participant-heading">
           {{ $str('activity_participants_heading', 'mod_perform') }}
         </h3>
-        <div
+        <SectionRelationship
           v-for="participant in displayedParticipantsSorted"
-          :key="participant.id"
-          class="mod-perform-activitySection__participant-row"
-        >
-          {{ participant.name }}
-          <ButtonIcon
-            :styleclass="{ small: true, transparent: true }"
-            :aria-label="$str('delete')"
-            @click="removeDisplayedParticipant(participant)"
-          >
-            <DeleteIcon />
-          </ButtonIcon>
-        </div>
-
+          :key="participant.relationship.id"
+          :participant="participant"
+          @participant-removed="removeDisplayedParticipant"
+          @can-view-changed="updateParticipantData"
+        />
         <ParticipantsPopover
           :active-participants="displayedParticipants"
           @update-participants="updateDisplayedParticipants"
@@ -91,28 +83,26 @@
 <script>
 import Button from 'totara_core/components/buttons/Button';
 import ButtonGroup from 'totara_core/components/buttons/ButtonGroup';
-import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
 import Card from 'totara_core/components/card/Card';
-import DeleteIcon from 'totara_core/components/icons/common/Delete';
 import EditSectionContentModal from 'mod_perform/components/manage_activity/content/EditSectionContentModal';
 import Grid from 'totara_core/components/grid/Grid';
 import GridItem from 'totara_core/components/grid/GridItem';
 import ModalPresenter from 'totara_core/components/modal/ModalPresenter';
 import ParticipantsPopover from 'mod_perform/components/manage_activity/content/ParticipantsPopover';
+import SectionRelationship from 'mod_perform/components/manage_activity/content/SectionRelationship';
 import UpdateSectionRelationshipsMutation from 'mod_perform/graphql/update_section_relationships.graphql';
 
 export default {
   components: {
     Button,
-    ButtonIcon,
     ButtonGroup,
     Card,
-    DeleteIcon,
     EditSectionContentModal,
     Grid,
     GridItem,
     ModalPresenter,
     ParticipantsPopover,
+    SectionRelationship,
   },
   props: {
     section: {
@@ -137,26 +127,37 @@ export default {
     hasChanges: function() {
       return !(
         this.displayedParticipants.length === this.savedParticipants.length &&
-        this.displayedParticipantIds.every(value =>
-          this.savedParticipants
-            .map(participant => participant.id)
-            .includes(value)
-        )
+        this.displayedParticipants.every(value => {
+          return this.savedParticipants.find(participant => {
+            return (
+              participant.relationship.id === value.relationship.id &&
+              participant.can_view === value.can_view
+            );
+          });
+        })
       );
     },
-    displayedParticipantIds() {
-      return this.displayedParticipants.map(participant => participant.id);
-    },
     displayedParticipantsSorted() {
-      return this.displayedParticipants.slice().sort((a, b) => a.id - b.id);
+      return this.displayedParticipants
+        .slice()
+        .sort((a, b) => a.relationship.id - b.relationship.id);
     },
   },
   methods: {
     getParticipantsFromSection(section) {
       if (section.section_relationships) {
-        return section.section_relationships.map(value => value.relationship);
+        return section.section_relationships;
       }
       return [];
+    },
+
+    getSectionRelationships() {
+      return this.displayedParticipants.map(participant => {
+        return {
+          id: participant.relationship.id,
+          can_view: participant.can_view,
+        };
+      });
     },
     updateSection(update) {
       const newValue = Object.assign({}, this.section, update);
@@ -167,12 +168,24 @@ export default {
     },
     updateDisplayedParticipants(checkedParticipants) {
       this.displayedParticipants = this.displayedParticipants.concat(
-        checkedParticipants
+        checkedParticipants.map(participant => {
+          return {
+            can_view: false,
+            relationship: participant,
+          };
+        })
       );
+    },
+    updateParticipantData(participant) {
+      this.displayedParticipants = this.displayedParticipants.map(value => {
+        return value.relationship.id === participant.relationship.id
+          ? participant
+          : value;
+      });
     },
     removeDisplayedParticipant(participant) {
       this.displayedParticipants = this.displayedParticipants.filter(
-        value => value.id !== participant.id
+        value => value.relationship.id !== participant.relationship.id
       );
     },
     resetSectionChanges() {
@@ -209,7 +222,7 @@ export default {
         variables: {
           input: {
             section_id: this.section.id,
-            relationship_ids: this.displayedParticipantIds,
+            relationships: this.getSectionRelationships(),
           },
         },
         refetchAll: false, // Don't refetch all the data again
@@ -226,13 +239,12 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
-      "edit_content",
-      "activity_participants_add",
       "activity_participants_heading",
-      "activity_section_save_changes"
+      "activity_section_save_changes",
+      "edit_content"
     ],
     "moodle": [
-      "delete"
+      "cancel"
     ]
   }
 </lang-strings>

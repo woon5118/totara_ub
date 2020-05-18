@@ -46,7 +46,11 @@ class mod_perform_section_relationship_model_testcase extends mod_perform_relati
 
         $this->expectException(record_not_found_exception::class);
 
-        section_relationship::create($section1->get_id(), -1);
+        section_relationship::create(
+            $section1->get_id(),
+            -1,
+            true
+        );
     }
 
     public function test_create_invalid_section_id() {
@@ -57,7 +61,11 @@ class mod_perform_section_relationship_model_testcase extends mod_perform_relati
         }
         $this->expectException(record_not_found_exception::class);
 
-        section_relationship::create($non_existent_section_id, $this->perform_generator()->get_relationship(subject::class)->id);
+        section_relationship::create(
+            $non_existent_section_id,
+            $this->perform_generator()->get_relationship(subject::class)->id,
+            true
+        );
     }
 
     public function test_create_missing_capability() {
@@ -73,7 +81,11 @@ class mod_perform_section_relationship_model_testcase extends mod_perform_relati
         $this->expectException(required_capability_exception::class);
         $this->expectExceptionMessage('you do not currently have permissions to do that (Manage performance activities)');
 
-        section_relationship::create($section1->get_id(), $subject_id);
+        section_relationship::create(
+            $section1->get_id(),
+            $subject_id,
+            true
+        );
     }
 
     public function test_create_successful() {
@@ -90,7 +102,11 @@ class mod_perform_section_relationship_model_testcase extends mod_perform_relati
         $this->assert_section_relationships($section1, []);
         $this->assert_section_relationships($section2, []);
 
-        $section_relationship = section_relationship::create($section1->get_id(), $subject_id);
+        $section_relationship = section_relationship::create(
+            $section1->get_id(),
+            $subject_id,
+            true
+        );
         $this->assertInstanceOf(section_relationship::class, $section_relationship);
         $this->assertEquals($section1->get_id(), $section_relationship->section_id);
         $this->assert_activity_relationships($activity1, [subject::class]);
@@ -99,21 +115,33 @@ class mod_perform_section_relationship_model_testcase extends mod_perform_relati
         $this->assert_section_relationships($section2, []);
 
         // Try to create the same - nothing should change.
-        section_relationship::create($section1->get_id(), $subject_id);
+        section_relationship::create(
+            $section1->get_id(),
+            $subject_id,
+            true
+        );
         $this->assert_activity_relationships($activity1, [subject::class]);
         $this->assert_activity_relationships($activity2, []);
         $this->assert_section_relationships($section1, [subject::class]);
         $this->assert_section_relationships($section2, []);
 
         // Add another one to the same section.
-        section_relationship::create($section1->get_id(), $manager_id);
+        section_relationship::create(
+            $section1->get_id(),
+            $manager_id,
+            true
+        );
         $this->assert_activity_relationships($activity1, [subject::class, manager::class]);
         $this->assert_activity_relationships($activity2, []);
         $this->assert_section_relationships($section1, [subject::class, manager::class]);
         $this->assert_section_relationships($section2, []);
 
         // Add another one to the other section.
-        section_relationship::create($section2->get_id(), $appraiser_id);
+        section_relationship::create(
+            $section2->get_id(),
+            $appraiser_id,
+            true
+        );
         $this->assert_activity_relationships($activity1, [subject::class, manager::class, appraiser::class]);
         $this->assert_activity_relationships($activity2, []);
         $this->assert_section_relationships($section1, [subject::class, manager::class]);

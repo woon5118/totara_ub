@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
@@ -29,6 +29,8 @@ use core\webapi\middleware\require_advanced_feature;
 use core\webapi\mutation_resolver;
 use core\webapi\resolver\has_middleware;
 use mod_perform\models\activity\section;
+use totara_core\advanced_feature;
+use coding_exception;
 use mod_perform\webapi\middleware\require_activity;
 
 class update_section_relationships implements mutation_resolver, has_middleware {
@@ -43,13 +45,13 @@ class update_section_relationships implements mutation_resolver, has_middleware 
         try {
             $section = section::load_by_id($args['section_id']);
         } catch (record_not_found_exception $e) {
-            throw new \coding_exception('Specified section id does not exist');
+            throw new coding_exception('Specified section id does not exist');
         }
 
         $activity_context = $section->get_activity()->get_context();
         require_capability('mod/perform:manage_activity', $activity_context);
 
-        return ['section' => $section->update_relationships($args['relationship_ids'])];
+        return ['section' => $section->update_relationships($args['relationships'])];
     }
 
     /**

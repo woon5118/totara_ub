@@ -138,7 +138,16 @@ enum mod_perform_participant_instance_status {
 
 input update_section_relationships_input {
   section_id: core_id!
-  relationship_ids: [Int]!
+  relationships: [section_relationship!]!
+}
+
+"""
+Section relationship object
+used to update section relationships.
+"""
+input section_relationship {
+  id: core_id!
+  can_view: Boolean = false
 }
 
 """
