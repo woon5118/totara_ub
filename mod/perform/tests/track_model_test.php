@@ -25,7 +25,9 @@
 use core\collection;
 
 use mod_perform\models\activity\track;
+use mod_perform\entities\activity\track as track_entity;
 use mod_perform\models\activity\track_status;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @coversDefaultClass track.
@@ -141,5 +143,65 @@ class mod_perform_track_model_testcase extends advanced_testcase {
         $to_status = $track->activate()->status;
         $this->assertEquals($paused, $from_status, 'wrong status');
         $this->assertEquals($active, $to_status, 'wrong status');
+    }
+
+    /**
+     * @dataProvider invalid_open_dynamic_schedule_from_to_permutations_provider
+     * @param int $count_from
+     * @param int $unit
+     * @param int $direction
+     * @param string $expected_exception_message
+     * @throws coding_exception
+     */
+    public function test_invalid_open_dynamic_schedule_from_to_permutations(
+        int $count_from,
+        int $unit,
+        int $direction,
+        string $expected_exception_message
+    ): void {
+        $track = track::load_by_entity($this->mock_existing_entity(track_entity::class));
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage($expected_exception_message);
+
+        $track->update_schedule_closed_dynamic(
+            $count_from,
+            $unit,
+            track_entity::SCHEDULE_DYNAMIC_UNIT_DAY,
+            $direction
+        );
+    }
+
+    /**
+     * Mock an entity that will be flagged as "existing".
+     *
+     * Useful for when you don't actually need to hit the database, but something requires an
+     * "existing" entity, such as testing a model method that doesn't directly need the database.
+     *
+     * @param string $class
+     * @return \core\orm\entity\entity|MockObject
+     */
+    protected function mock_existing_entity(string $class): \core\orm\entity\entity {
+        $mock = $this->getMockBuilder($class)->getMock();
+        $mock->method('exists')->willReturn(true);
+
+        return $mock;
+    }
+
+    public function invalid_open_dynamic_schedule_from_to_permutations_provider(): array {
+        return [
+            [
+                100,
+                0,
+                track_entity::SCHEDULE_DYNAMIC_DIRECTION_AFTER,
+                '"count_from" must not be after "count_to" when dynamic schedule direction is "AFTER"'
+            ],
+            [
+                0,
+                100,
+                track_entity::SCHEDULE_DYNAMIC_DIRECTION_BEFORE,
+                'count_from" must not be before "count_to" when dynamic schedule direction is "BEFORE"'
+            ],
+        ];
     }
 }

@@ -7,6 +7,10 @@ mutation mod_perform_create_track($details: mod_perform_create_track_input!) {
     schedule_is_fixed
     schedule_fixed_from
     schedule_fixed_to
+    schedule_dynamic_count_from
+    schedule_dynamic_count_to
+    schedule_dynamic_unit
+    schedule_dynamic_direction
     assignments {
       type
       group {

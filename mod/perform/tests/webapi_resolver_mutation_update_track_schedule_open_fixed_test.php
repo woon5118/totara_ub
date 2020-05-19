@@ -55,7 +55,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_fixed_test
                 'track_id' => $track1->id,
                 'is_open' => true,
                 'is_fixed' => true,
-                'fixed_from' => 123,
+                'fixed_from' => 222,
             ],
         ];
 
@@ -76,7 +76,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_fixed_test
                 'track_id' => $this->track1_id,
                 'is_open' => true,
                 'is_fixed' => true,
-                'fixed_from' => 123,
+                'fixed_from' => 222,
             ],
         ];
 
@@ -89,20 +89,28 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_fixed_test
             $args
         );
         $result_track = $result['track'];
-        $result_errors = $result['validation_errors'];
 
         // Verify the resulting graphql data.
-        self::assertEmpty($result_errors);
         self::assertEquals($this->track1_id, $result_track->id);
         self::assertTrue($result_track->schedule_is_open);
         self::assertTrue($result_track->schedule_is_fixed);
+        self::assertEquals(222, $result_track->schedule_fixed_from);
+        self::assertNull($result_track->schedule_fixed_to);
+        self::assertNull($result_track->schedule_dynamic_count_from);
+        self::assertNull($result_track->schedule_dynamic_count_to);
+        self::assertNull($result_track->schedule_dynamic_unit);
+        self::assertNull($result_track->schedule_dynamic_direction);
 
         // Manually make the changes that we expect to make.
         $affected_track = $before_tracks[$this->track1_id];
         $affected_track->schedule_is_open = 1;
         $affected_track->schedule_is_fixed = 1;
-        $affected_track->schedule_fixed_from = 123;
+        $affected_track->schedule_fixed_from = 222;
         $affected_track->schedule_fixed_to = null;
+        $affected_track->schedule_dynamic_count_from = null;
+        $affected_track->schedule_dynamic_count_to = null;
+        $affected_track->schedule_dynamic_unit = null;
+        $affected_track->schedule_dynamic_direction = null;
 
         $after_tracks = $DB->get_records('perform_track', [], 'id');
         unset($after_tracks[$this->track1_id]->updated_at);

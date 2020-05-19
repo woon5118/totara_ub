@@ -182,6 +182,10 @@ class mod_perform_webapi_query_tracks_testcase extends advanced_testcase {
             'schedule_is_fixed' => $resolve('schedule_is_fixed'),
             'schedule_fixed_from' => $resolve('schedule_fixed_from'),
             'schedule_fixed_to' => $resolve('schedule_fixed_to'),
+            'schedule_dynamic_count_from' => $resolve('schedule_dynamic_count_from'),
+            'schedule_dynamic_count_to' => $resolve('schedule_dynamic_count_to'),
+            'schedule_dynamic_unit' => $resolve('schedule_dynamic_unit'),
+            'schedule_dynamic_direction' => $resolve('schedule_dynamic_direction'),
         ];
     }
 

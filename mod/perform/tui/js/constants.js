@@ -24,3 +24,13 @@
 // because the theme overrides don't support having more than one export per vue file.
 
 export const NOTIFICATION_DURATION = 10 * 1000; // 10 seconds (in milliseconds)
+
+export const SCHEDULE_IS_DYNAMIC = 'dynamic';
+export const SCHEDULE_IS_FIXED = 'fixed';
+export const SCHEDULE_IS_LIMITED = 'limited';
+export const SCHEDULE_IS_OPEN = 'open';
+export const SCHEDULE_DYNAMIC_DIRECTION_BEFORE = 'BEFORE';
+export const SCHEDULE_DYNAMIC_DIRECTION_AFTER = 'AFTER';
+export const SCHEDULE_DYNAMIC_UNIT_DAY = 'DAY';
+export const SCHEDULE_DYNAMIC_UNIT_WEEK = 'MONTH';
+export const SCHEDULE_DYNAMIC_UNIT_MONTH = 'YEAR';

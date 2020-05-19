@@ -10,6 +10,10 @@ mutation mod_perform_update_track_schedule(
       schedule_is_fixed
       schedule_fixed_from
       schedule_fixed_to
+      schedule_dynamic_count_from
+      schedule_dynamic_count_to
+      schedule_dynamic_unit
+      schedule_dynamic_direction
       assignments {
         type
         group {
@@ -19,10 +23,6 @@ mutation mod_perform_update_track_schedule(
           name
         }
       }
-    }
-    validation_errors {
-      error_code
-      error_message
     }
   }
 }

@@ -23,11 +23,12 @@
 
 namespace mod_perform\models\activity;
 
+use coding_exception;
 use core\orm\collection;
 use core\orm\entity\model;
 use mod_perform\entities\activity\track as track_entity;
-use mod_perform\exception\schedule_validation_exception;
 use mod_perform\user_groups\grouping;
+use moodle_exception;
 
 /**
  * Represents a single performance activity track.
@@ -40,6 +41,10 @@ use mod_perform\user_groups\grouping;
  * @property-read bool $schedule_is_fixed
  * @property-read int $schedule_fixed_from
  * @property-read int $schedule_fixed_to
+ * @property-read int $schedule_dynamic_count_from
+ * @property-read int $schedule_dynamic_count_to
+ * @property-read int $schedule_dynamic_unit
+ * @property-read int $schedule_dynamic_direction
  * @property-read int $created_at
  * @property-read int $updated_at
  *
@@ -57,6 +62,10 @@ class track extends model {
         'schedule_is_fixed',
         'schedule_fixed_from',
         'schedule_fixed_to',
+        'schedule_dynamic_count_from',
+        'schedule_dynamic_count_to',
+        'schedule_dynamic_unit',
+        'schedule_dynamic_direction',
         'created_at',
         'updated_at',
     ];
@@ -88,7 +97,7 @@ class track extends model {
      */
     public static function create(activity $parent, string $description = ''): track {
         if (!$parent->can_manage()) {
-            throw new \moodle_exception('nopermissions', '', '', 'create track');
+            throw new moodle_exception('nopermissions', '', '', 'create track');
         }
 
         $entity = new track_entity();
@@ -110,7 +119,7 @@ class track extends model {
      */
     public static function load_by_activity(activity $parent): collection {
         if (!$parent->can_manage()) {
-            throw new \moodle_exception('nopermissions', '', '', 'load track by activity');
+            throw new moodle_exception('nopermissions', '', '', 'load track by activity');
         }
 
         return track_entity::repository()
@@ -199,8 +208,8 @@ class track extends model {
      * @return track this instance.
      */
     public function add_assignment(int $assignment_type, grouping $group): track {
-        if (!in_array($assignment_type, track_assignment_type::get_allowed())) {
-            throw new \coding_exception("unknown assignment type: '$assignment_type'");
+        if (!in_array($assignment_type, track_assignment_type::get_allowed(), true)) {
+            throw new coding_exception("unknown assignment type: '$assignment_type'");
         }
 
         $this->require_manage('add track assignment');
@@ -222,8 +231,8 @@ class track extends model {
      * @return track this instance.
      */
     public function remove_assignment(int $assignment_type, grouping $group): track {
-        if (!in_array($assignment_type, track_assignment_type::get_allowed())) {
-            throw new \coding_exception("unknown assignment type: '$assignment_type'");
+        if (!in_array($assignment_type, track_assignment_type::get_allowed(), true)) {
+            throw new coding_exception("unknown assignment type: '$assignment_type'");
         }
 
         $this->require_manage('remove track assignment');
@@ -257,7 +266,7 @@ class track extends model {
     public function require_manage(string $op): void {
         $parent = activity::load_by_entity($this->entity->activity);
         if (!$parent->can_manage()) {
-            throw new \moodle_exception('nopermissions', '', '', $op);
+            throw new moodle_exception('nopermissions', '', '', $op);
         }
     }
 
@@ -268,18 +277,18 @@ class track extends model {
      * @param int $to
      */
     public function update_schedule_closed_fixed(int $from, int $to): void {
-        $entity = $this->entity;
-
         if ($to < $from) {
-            throw new schedule_validation_exception('schedule_fixed_closed_order_validation', 'mod_perform');
+            throw new moodle_exception('schedule_error_date_range', 'mod_perform');
         }
 
-        $entity->schedule_is_open = false;
-        $entity->schedule_is_fixed = true;
-        $entity->schedule_fixed_from = $from;
-        $entity->schedule_fixed_to = $to;
+        $properties_to_update = [
+            'schedule_is_open' => false,
+            'schedule_is_fixed' => true,
+            'schedule_fixed_from' => $from,
+            'schedule_fixed_to' => $to,
+        ];
 
-        $entity->update();
+        $this->update_schedule_properties($properties_to_update);
     }
 
     /**
@@ -288,41 +297,114 @@ class track extends model {
      * @param int $from
      */
     public function update_schedule_open_fixed(int $from): void {
-        $entity = $this->entity;
+        $properties_to_update = [
+            'schedule_is_open' => true,
+            'schedule_is_fixed' => true,
+            'schedule_fixed_from' => $from,
+        ];
 
-        $entity->schedule_is_open = true;
-        $entity->schedule_is_fixed = true;
-        $entity->schedule_fixed_from = $from;
-        $entity->schedule_fixed_to = null;
-
-        $entity->update();
+        $this->update_schedule_properties($properties_to_update);
     }
 
     /**
      * Set the schedule to be closed with dynamic dates
      *
-     * TODO some params
+     * @param int $count_from
+     * @param int $count_to
+     * @param int $unit
+     * @param int $direction
      */
-    public function update_schedule_closed_dynamic(): void {
-        $entity = $this->entity;
+    public function update_schedule_closed_dynamic(int $count_from, int $count_to, int $unit, int $direction): void {
+        if ($count_from < 0) {
+            throw new coding_exception('Count from must be a positive integer');
+        }
 
-        $entity->schedule_is_open = false;
-        $entity->schedule_is_fixed = false;
+        if (!isset(self::get_dynamic_schedule_units()[$unit])) {
+            throw new coding_exception('Invalid dynamic schedule unit');
+        }
 
-        $entity->update();
+        if (!isset(self::get_dynamic_schedule_directions()[$direction])) {
+            throw new coding_exception('Invalid dynamic schedule direction');
+        }
+
+        if ($direction === track_entity::SCHEDULE_DYNAMIC_DIRECTION_AFTER) {
+            if ($count_from > $count_to) {
+                throw new coding_exception('"count_from" must not be after "count_to" when dynamic schedule direction is "AFTER"');
+            }
+        } else if ($count_from < $count_to) {
+            throw new coding_exception('"count_from" must not be before "count_to" when dynamic schedule direction is "BEFORE"');
+        }
+
+        $properties_to_update = [
+            'schedule_is_open' => false,
+            'schedule_is_fixed' => false,
+            'schedule_dynamic_count_from' => $count_from,
+            'schedule_dynamic_count_to' => $count_to,
+            'schedule_dynamic_unit' => $unit,
+            'schedule_dynamic_direction' => $direction,
+        ];
+
+        $this->update_schedule_properties($properties_to_update);
     }
 
     /**
      * Set the schedule to be open ended with dynamic dates
      *
-     * TODO some params
+     * @param int $count_from
+     * @param int $unit
+     * @param int $direction
      */
-    public function update_schedule_open_dynamic(): void {
+    public function update_schedule_open_dynamic(int $count_from, int $unit, int $direction): void {
+        if (!isset(self::get_dynamic_schedule_units()[$unit])) {
+            throw new coding_exception('Invalid dynamic schedule unit');
+        }
+
+        if ($count_from < 0) {
+            throw new coding_exception('Count from must be a positive integer');
+        }
+
+        if (!isset(self::get_dynamic_schedule_directions()[$direction])) {
+            throw new coding_exception('Invalid dynamic schedule direction');
+        }
+
+        $properties_to_update = [
+            'schedule_is_open' => true,
+            'schedule_is_fixed' => false,
+            'schedule_dynamic_count_from' => $count_from,
+            'schedule_dynamic_unit' => $unit,
+            'schedule_dynamic_direction' => $direction,
+        ];
+
+        $this->update_schedule_properties($properties_to_update);
+    }
+
+    private function update_schedule_properties(array $properties): void {
         $entity = $this->entity;
 
-        $entity->schedule_is_open = true;
-        $entity->schedule_is_fixed = false;
+        $entity->schedule_is_open = $properties['schedule_is_open'];
+        $entity->schedule_is_fixed = $properties['schedule_is_fixed'];
+        $entity->schedule_fixed_from = $properties['schedule_fixed_from'] ?? null;
+        $entity->schedule_fixed_to = $properties['schedule_fixed_to'] ?? null;
+        $entity->schedule_dynamic_count_from = $properties['schedule_dynamic_count_from'] ?? null;
+        $entity->schedule_dynamic_count_to = $properties['schedule_dynamic_count_to'] ?? null;
+        $entity->schedule_dynamic_unit = $properties['schedule_dynamic_unit'] ?? null;
+        $entity->schedule_dynamic_direction = $properties['schedule_dynamic_direction'] ?? null;
 
-        $entity->update();
+        $this->entity->update();
+    }
+
+    public static function get_dynamic_schedule_units(): array {
+        return [
+            track_entity::SCHEDULE_DYNAMIC_UNIT_DAY => 'DAY',
+            track_entity::SCHEDULE_DYNAMIC_UNIT_MONTH => 'MONTH',
+            track_entity::SCHEDULE_DYNAMIC_UNIT_YEAR => 'YEAR',
+        ];
+    }
+
+    public static function get_dynamic_schedule_directions(): array {
+        return [
+            track_entity::SCHEDULE_DYNAMIC_DIRECTION_AFTER => 'AFTER',
+            track_entity::SCHEDULE_DYNAMIC_DIRECTION_BEFORE => 'BEFORE',
+        ];
     }
 }

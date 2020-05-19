@@ -16,43 +16,40 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-  @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
-  @package theme_ventura
+  @author Jaron Steenson <jaron.steenson@totaralearning.com>
+  @package mod_perform
 -->
 
 <style lang="scss">
-.tui-performManageActivityAssignmentsForm {
-  &__heading {
-    align-items: center;
-    margin-top: var(--tui-gap-2); // Check the content tab before changing this.
+.tui_performAssignmentScheduleToggles {
+  display: flex;
+  flex-wrap: wrap;
 
-    &-title {
-      @include tui-font-heading-small();
-    }
-
-    &-buttons {
-      display: flex;
-    }
-
-    &-dropdown {
-      margin-left: auto;
-    }
+  &__setting-group {
+    margin-right: var(--tui-gap-2);
   }
 
-  &__table {
-    margin-top: var(--tui-gap-4);
-  }
-
-  &__summary {
+  &__toggle-group {
     display: flex;
-    margin-top: var(--tui-gap-4);
+    flex-wrap: wrap;
+  }
 
-    &-count {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      margin-right: var(--tui-gap-4);
-    }
+  &__toggle-set {
+    margin-right: var(--tui-gap-4);
+    margin-bottom: var(--tui-gap-2);
+  }
+
+  &__toggle-button-group {
+    margin: var(--tui-gap-4);
+  }
+
+  &__toggle-button {
+    min-height: 50px;
+  }
+
+  &__button-label {
+    margin-top: var(--tui-gap-2);
+    font-weight: bold;
   }
 }
 </style>

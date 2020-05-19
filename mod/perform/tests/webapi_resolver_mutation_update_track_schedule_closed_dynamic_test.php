@@ -30,10 +30,14 @@ use mod_perform\models\activity\activity;
 use mod_perform\models\activity\track;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
+require_once(__DIR__ . '/generator/activity_generator_configuration.php');
+require_once(__DIR__ . '/webapi_resolver_mutation_update_track_schedule.php');
+
 /**
  * @group perform
  */
-class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_testcase extends advanced_testcase {
+class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_testcase
+    extends mod_perform_webapi_resolver_mutation_update_track_schedule_testcase {
 
     use webapi_phpunit_helper;
 
@@ -93,27 +97,44 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_
                 'track_id' => $track1->id,
                 'is_open' => false,
                 'is_fixed' => false,
+                'dynamic_count_from' => 555,
+                'dynamic_count_to' => 444,
+                'dynamic_unit' => 'YEAR',
+                'dynamic_direction' => 'BEFORE',
             ],
         ];
 
         $before_tracks = $DB->get_records('perform_track', [], 'id');
-        self::assertCount(4, $before_tracks);
+        self::assertCount(8, $before_tracks);
         unset($before_tracks[$track1->id]->updated_at);
 
-        $updated_track = $this->resolve_graphql_mutation(
+        $result = $this->resolve_graphql_mutation(
             'mod_perform_update_track_schedule',
             $args
-        )['track'];
+        );
+        $result_track = $result['track'];
 
         // Verify the resulting graphql data.
-        self::assertEquals($track1->id, $updated_track->id);
-        self::assertFalse($updated_track->schedule_is_open);
-        self::assertFalse($updated_track->schedule_is_fixed);
+        self::assertEquals($track1->id, $result_track->id);
+        self::assertFalse($result_track->schedule_is_open);
+        self::assertFalse($result_track->schedule_is_fixed);
+        self::assertNull($result_track->schedule_fixed_from);
+        self::assertNull($result_track->schedule_fixed_to);
+        self::assertEquals(555, $result_track->schedule_dynamic_count_from);
+        self::assertEquals(444, $result_track->schedule_dynamic_count_to);
+        self::assertEquals(track_entity::SCHEDULE_DYNAMIC_UNIT_YEAR, $result_track->schedule_dynamic_unit);
+        self::assertEquals(track_entity::SCHEDULE_DYNAMIC_DIRECTION_BEFORE, $result_track->schedule_dynamic_direction);
 
         // Manually make the changes that we expect to make.
         $affected_track = $before_tracks[$track1->id];
         $affected_track->schedule_is_open = 0;
         $affected_track->schedule_is_fixed = 0;
+        $affected_track->schedule_fixed_from = null;
+        $affected_track->schedule_fixed_to = null;
+        $affected_track->schedule_dynamic_count_from = 555;
+        $affected_track->schedule_dynamic_count_to = 444;
+        $affected_track->schedule_dynamic_unit = track_entity::SCHEDULE_DYNAMIC_UNIT_YEAR;
+        $affected_track->schedule_dynamic_direction = track_entity::SCHEDULE_DYNAMIC_DIRECTION_BEFORE;
 
         $after_tracks = $DB->get_records('perform_track', [], 'id');
         unset($after_tracks[$track1->id]->updated_at);
@@ -122,18 +143,26 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_
     }
 
     public function test_with_validation_errors(): void {
-        // None currently, but we will have when additional fields are added.
-    }
+        // To must be after or equal to from.
+        $args = [
+            'track_schedule' => [
+                'track_id' => $this->track1_id,
+                'is_open' => false,
+                'is_fixed' => false,
+                'dynamic_unit' => 'YEAR',
+                'dynamic_direction' => 'AFTER',
+                'dynamic_count_from' => 200,
+                'dynamic_count_to' => 100,
+            ],
+        ];
 
-    /**
-     * Helper to get execution context
-     *
-     * @param string $type
-     * @param string|null $operation
-     * @return execution_context
-     */
-    private function get_execution_context(string $type = 'dev', ?string $operation = null): execution_context {
-        return execution_context::create($type, $operation);
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('"count_from" must not be after "count_to" when dynamic schedule direction is "AFTER"');
+
+        $this->resolve_graphql_mutation(
+            'mod_perform_update_track_schedule',
+            $args
+        );
     }
 
 }

@@ -294,7 +294,8 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $track = track_entity::repository()->find($track1_id);
         $start_time = time() - 1000;
         $end_time = time() + 1000;
-        $track->schedule_type = track_entity::SCHEDULE_TYPE_CLOSED_FIXED;
+        $track->schedule_is_open = false;
+        $track->schedule_is_fixed = true;
         $track->schedule_fixed_from = $start_time;
         $track->schedule_fixed_to = $end_time;
         $track->save();
@@ -312,7 +313,8 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $this->assertEquals($end_time, $track_user_assignment->period_end_date);
 
         // Change to open_fixed and expand for a new user.
-        $track->schedule_type = track_entity::SCHEDULE_TYPE_OPEN_FIXED;
+        $track->schedule_is_open = true;
+        $track->schedule_is_fixed = true;
         $track->save();
 
         $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user2->id);

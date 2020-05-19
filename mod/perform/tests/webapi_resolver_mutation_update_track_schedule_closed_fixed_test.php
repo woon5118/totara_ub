@@ -25,11 +25,9 @@
 require_once(__DIR__ . '/generator/activity_generator_configuration.php');
 require_once(__DIR__ . '/webapi_resolver_mutation_update_track_schedule.php');
 
-use mod_perform\entities\activity\track as track_entity;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\track;
 use totara_webapi\phpunit\webapi_phpunit_helper;
-use totara_webapi\graphql;
 
 /**
  * @group perform
@@ -78,8 +76,8 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_fixed_te
                 'track_id' => $this->track1_id,
                 'is_open' => false,
                 'is_fixed' => true,
-                'fixed_from' => 123,
-                'fixed_to' => 234,
+                'fixed_from' => 222,
+                'fixed_to' => 333,
             ],
         ];
 
@@ -92,20 +90,28 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_fixed_te
             $args
         );
         $result_track = $result['track'];
-        $result_errors = $result['validation_errors'];
 
         // Verify the resulting graphql data.
-        self::assertEmpty($result_errors);
         self::assertEquals($this->track1_id, $result_track->id);
         self::assertFalse($result_track->schedule_is_open);
         self::assertTrue($result_track->schedule_is_fixed);
+        self::assertEquals(222, $result_track->schedule_fixed_from);
+        self::assertEquals(333, $result_track->schedule_fixed_to);
+        self::assertNull($result_track->schedule_dynamic_count_from);
+        self::assertNull($result_track->schedule_dynamic_count_to);
+        self::assertNull($result_track->schedule_dynamic_unit);
+        self::assertNull($result_track->schedule_dynamic_direction);
 
         // Manually make the changes that we expect to make.
         $affected_track = $before_tracks[$this->track1_id];
         $affected_track->schedule_is_open = 0;
         $affected_track->schedule_is_fixed = 1;
-        $affected_track->schedule_fixed_from = 123;
-        $affected_track->schedule_fixed_to = 234;
+        $affected_track->schedule_fixed_from = 222;
+        $affected_track->schedule_fixed_to = 333;
+        $affected_track->schedule_dynamic_count_from = null;
+        $affected_track->schedule_dynamic_count_to = null;
+        $affected_track->schedule_dynamic_unit = null;
+        $affected_track->schedule_dynamic_direction = null;
 
         $after_tracks = $DB->get_records('perform_track', [], 'id');
         unset($after_tracks[$this->track1_id]->updated_at);
@@ -113,10 +119,6 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_fixed_te
     }
 
     public function test_with_validation_errors(): void {
-        global $DB;
-
-        $before_tracks = $DB->get_records('perform_track', [], 'id');
-
         // To must be after or equal to from.
         $args = [
             'track_schedule' => [
@@ -128,21 +130,13 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_fixed_te
             ],
         ];
 
-        $result = $this->resolve_graphql_mutation(
+        $this->expectException(moodle_exception::class);
+        $this->expectExceptionMessage('Range end date cannot be before range start date');
+
+        $this->resolve_graphql_mutation(
             'mod_perform_update_track_schedule',
             $args
         );
-        $result_track = $result['track'];
-        $result_errors = $result['validation_errors'];
-
-        // Verify resulting graphql data.
-        self::assertNotEmpty($result_errors);
-        self::assertEquals('schedule_fixed_closed_order_validation', $result_errors[0]->error_code);
-        self::assertEquals(-1, $result_track->schedule_is_open);
-        self::assertEquals(-1, $result_track->schedule_is_fixed);
-
-        $after_tracks = $DB->get_records('perform_track', [], 'id');
-        self::assertEquals($after_tracks, $before_tracks);
     }
 
 }

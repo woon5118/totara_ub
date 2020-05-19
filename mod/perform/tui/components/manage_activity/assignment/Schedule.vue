@@ -21,93 +21,57 @@
 -->
 <template>
   <div class="tui_performAssignmentSchedule">
-    <h4>{{ $str('schedule_creation_range_and_date_type', 'mod_perform') }}</h4>
-    <div
-      v-if="initialValues"
-      class="tui_performAssignmentSchedule__controls-container"
-    >
-      <div class="tui_performAssignmentSchedule__controls">
-        <ToggleSet v-model="scheduleOpenClosed">
-          <ToggleButtonIcon
-            value="closed"
-            :label="$str('schedule_is_closed', 'mod_perform')"
-            class="tui_performAssignmentSchedule__toggle-button"
-          >
-            <div class="tui_performAssignmentSchedule__toggle-button-content">
-              <CalendarIcon />
-              <CalendarIcon />
-              <div class="tui_performAssignmentSchedule__button-label">
-                {{ $str('schedule_is_closed', 'mod_perform') }}
-              </div>
-            </div>
-          </ToggleButtonIcon>
-          <ToggleButtonIcon
-            value="open"
-            :label="$str('schedule_is_open', 'mod_perform')"
-            class="tui_performAssignmentSchedule__toggle-button"
-          >
-            <div class="tui_performAssignmentSchedule__toggle-button-content">
-              <CalendarIcon />
-              <CalendarIcon />
-              <CalendarIcon />
-              <div class="tui_performAssignmentSchedule__button-label">
-                {{ $str('schedule_is_open', 'mod_perform') }}
-              </div>
-            </div>
-          </ToggleButtonIcon>
-        </ToggleSet>
-      </div>
-      <div class="tui_performAssignmentSchedule__controls">
-        <ToggleSet v-model="scheduleFixedDynamic">
-          <ToggleButtonIcon
-            value="fixed"
-            :label="$str('schedule_is_fixed', 'mod_perform')"
-            class="tui_performAssignmentSchedule__toggle-button"
-          >
-            <div class="tui_performAssignmentSchedule__toggle-button-content">
-              <CalendarIcon :size="300" />
-              <div class="tui_performAssignmentSchedule__button-label">
-                {{ $str('schedule_is_fixed', 'mod_perform') }}
-              </div>
-            </div>
-          </ToggleButtonIcon>
-          <ToggleButtonIcon
-            value="dynamic"
-            :label="$str('schedule_is_dynamic', 'mod_perform')"
-            class="tui_performAssignmentSchedule__toggle-button"
-          >
-            <div class="tui_performAssignmentSchedule__toggle-button-content">
-              <UserIcon :size="300" />
-              <div class="tui_performAssignmentSchedule__button-label">
-                {{ $str('schedule_is_dynamic', 'mod_perform') }}
-              </div>
-            </div>
-          </ToggleButtonIcon>
-        </ToggleSet>
-      </div>
-    </div>
+    <h3>{{ $str('activity_instance_creation_heading', 'mod_perform') }}</h3>
+
+    <ScheduleToggles
+      :fixed-dynamic.sync="scheduleFixedDynamic"
+      :open-limited.sync="scheduleOpenLimited"
+    />
+
+    <h4 class="tui_performAssignmentSchedule__range-type-heading">
+      {{ scheduleRangeHeading }}
+    </h4>
+
     <Uniform
-      v-slot="{ reset }"
+      v-slot="{ getSubmitting, reset }"
       :initial-values="initialValues"
       input-width="full"
       @submit="trySave"
     >
-      <div class="tui_performAssignmentSchedule__data">
-        <component :is="getFormComponent()" :path="scheduleOpenClosed" />
+      <div class="tui_performAssignmentSchedule__range-type-settings">
+        <p>{{ $str('schedule_range_date_preamble', 'mod_perform') }}</p>
+        <FixedScheduleSettings
+          v-if="scheduleIsFixed"
+          :uniform-scope-path="FIXED_SCHEDULE_SCOPE"
+          fixed-from-name="fixed_from"
+          fixed-to-name="fixed_to"
+          :schedule-is-limited-fixed="scheduleIsLimitedFixed"
+          :schedule-is-open-fixed="scheduleIsOpenFixed"
+        />
+
+        <DynamicScheduleSettings
+          v-else-if="scheduleIsDynamic"
+          :uniform-scope-path="DYNAMIC_SCHEDULE_SCOPE"
+          dynamic-count-from-name="dynamic_count_from"
+          dynamic-count-to-name="dynamic_count_to"
+          dynamic-unit-name="dynamic_unit"
+          dynamic-direction-name="dynamic_direction"
+          :schedule-is-dynamic="scheduleIsDynamic"
+          :schedule-is-limited-dynamic="scheduleIsLimitedDynamic"
+        />
       </div>
 
       <div class="tui_performAssignmentSchedule__action">
         <ButtonGroup>
           <Button
+            :disabled="isSaving"
             :styleclass="{ primary: 'true' }"
             :text="$str('save_changes', 'mod_perform')"
             type="submit"
-            class="tui_performAssignmentSchedule__action-submit"
-            :disabled="isSaving"
           />
           <Button
-            :text="$str('cancel', 'moodle')"
             :disabled="isSaving"
+            :text="$str('cancel', 'moodle')"
             @click="reset"
           />
         </ButtonGroup>
@@ -115,35 +79,38 @@
     </Uniform>
   </div>
 </template>
+
 <script>
 import { Uniform } from 'totara_core/components/uniform';
 import { notify } from 'totara_core/notifications';
-import ToggleSet from 'totara_core/components/buttons/ToggleSet';
-import ToggleButtonIcon from 'totara_core/components/buttons/ToggleButtonIcon';
-import CalendarIcon from 'mod_perform/components/manage_activity/assignment/schedule/icon/Calendar';
-import UserIcon from 'mod_perform/components/manage_activity/assignment/schedule/icon/User';
 import ButtonGroup from 'totara_core/components/buttons/ButtonGroup';
 import Button from 'totara_core/components/buttons/Button';
-import DateRangeClosedFixed from 'mod_perform/components/manage_activity/assignment/schedule/DateRangeClosedFixed';
-import DateRangeOpenFixed from 'mod_perform/components/manage_activity/assignment/schedule/DateRangeOpenFixed';
 import UpdateTrackScheduleMutation from 'mod_perform/graphql/update_track_schedule';
+import { pick } from 'totara_core/util';
+import ScheduleToggles from './schedule/ScheduleToggles';
+import FixedScheduleSettings from './schedule/FixedScheduleSettings';
+import DynamicScheduleSettings from './schedule/DynamicScheduleSettings';
+import {
+  NOTIFICATION_DURATION,
+  SCHEDULE_IS_DYNAMIC,
+  SCHEDULE_IS_FIXED,
+  SCHEDULE_IS_LIMITED,
+  SCHEDULE_IS_OPEN,
+  SCHEDULE_DYNAMIC_DIRECTION_BEFORE,
+  SCHEDULE_DYNAMIC_UNIT_DAY,
+} from 'mod_perform/constants';
 
-const SCHEDULE_IS_OPEN = 'open';
-const SCHEDULE_IS_CLOSED = 'closed';
-const SCHEDULE_IS_FIXED = 'fixed';
-const SCHEDULE_IS_DYNAMIC = 'dynamic';
+const FIXED_SCHEDULE_SCOPE = 'fixed';
+const DYNAMIC_SCHEDULE_SCOPE = 'dynamic';
 
 export default {
   components: {
-    ToggleSet,
-    ToggleButtonIcon,
-    CalendarIcon,
-    UserIcon,
+    DynamicScheduleSettings,
+    FixedScheduleSettings,
+    ScheduleToggles,
     Uniform,
     ButtonGroup,
     Button,
-    DateRangeClosedFixed,
-    DateRangeOpenFixed,
   },
   props: {
     track: {
@@ -152,68 +119,120 @@ export default {
     },
   },
   data() {
-    const scheduleOpenClosed = this.track.schedule_is_open
-      ? SCHEDULE_IS_OPEN
-      : SCHEDULE_IS_CLOSED;
-    const scheduleFixedDynamic = this.track.schedule_is_fixed
-      ? SCHEDULE_IS_FIXED
-      : SCHEDULE_IS_DYNAMIC;
     let initialValues = {};
 
-    const fromDate = this.getFormattedTime(this.track.schedule_fixed_from);
-    const toDate = this.getFormattedTime(this.track.schedule_fixed_to);
+    const today = new Date().toISOString().substring(0, 10);
 
-    if (scheduleFixedDynamic === SCHEDULE_IS_FIXED) {
-      if (scheduleOpenClosed === SCHEDULE_IS_OPEN) {
-        initialValues = {
-          open: { from: fromDate },
-          closed: { from: fromDate },
-        };
-      } else {
-        // Closed.
-        initialValues = {
-          open: {
-            from: fromDate,
-          },
-          closed: { from: fromDate, to: toDate },
-        };
-      }
-    } else {
-      // Dynamic.
-      if (scheduleOpenClosed === SCHEDULE_IS_OPEN) {
-        // TODO in dynamic form patch
-      } else {
-        // Closed.
-        // TODO in dynamic form patch
-      }
+    let fixed_from = today;
+    if (this.track.schedule_fixed_from) {
+      fixed_from = this.dateFromUnixTime(this.track.schedule_fixed_from)
+        .toISOString()
+        .substring(0, 10);
+    }
+
+    let fixed_to = today;
+    if (this.track.schedule_fixed_to) {
+      fixed_to = this.dateFromUnixTime(this.track.schedule_fixed_to)
+        .toISOString()
+        .substring(0, 10);
+    }
+
+    initialValues[FIXED_SCHEDULE_SCOPE] = {
+      fixed_from,
+      fixed_to,
+    };
+
+    initialValues[DYNAMIC_SCHEDULE_SCOPE] = {
+      dynamic_count_from: this.track.schedule_dynamic_count_from || '0', // Uniform required validation doesn't support int 0 at time of writing.
+      dynamic_count_to: this.track.schedule_dynamic_count_to || '0', // Uniform required validation doesn't support int 0 at time of writing.
+      dynamic_unit:
+        this.track.schedule_dynamic_unit || SCHEDULE_DYNAMIC_UNIT_DAY,
+      dynamic_direction:
+        this.track.schedule_dynamic_direction ||
+        SCHEDULE_DYNAMIC_DIRECTION_BEFORE,
+    };
+
+    // Default to limited (Limited vs Open-ended) schedule.
+    let scheduleOpenLimited = SCHEDULE_IS_LIMITED;
+    if (this.track.schedule_is_open) {
+      scheduleOpenLimited = SCHEDULE_IS_OPEN;
+    }
+
+    // Default to fixed (Fixed vs Dynamic) schedule.
+    let scheduleFixedDynamic = SCHEDULE_IS_DYNAMIC;
+    if (this.track.schedule_is_fixed === null || this.track.schedule_is_fixed) {
+      scheduleFixedDynamic = SCHEDULE_IS_FIXED;
     }
 
     return {
-      scheduleOpenClosed: scheduleOpenClosed,
-      scheduleFixedDynamic: scheduleFixedDynamic,
-      initialValues: initialValues,
+      SCHEDULE_IS_OPEN,
+      SCHEDULE_IS_LIMITED,
+      SCHEDULE_IS_FIXED,
+      SCHEDULE_IS_DYNAMIC,
+
+      FIXED_SCHEDULE_SCOPE,
+      DYNAMIC_SCHEDULE_SCOPE,
+
+      initialValues,
+      scheduleOpenLimited,
+      scheduleFixedDynamic,
       isSaving: false,
     };
   },
-  methods: {
-    /**
-     * Get current form component
-     */
-    getFormComponent() {
-      // TODO in dynamic form patch
-      if (this.scheduleOpenClosed == SCHEDULE_IS_CLOSED) {
-        return 'DateRangeClosedFixed';
+  computed: {
+    scheduleRangeHeading() {
+      if (this.scheduleIsOpenFixed) {
+        return this.$str('schedule_range_heading_open_fixed', 'mod_perform'); // Open-ended range defined by fixed dates
       }
 
-      return 'DateRangeOpenFixed';
+      if (this.scheduleIsLimitedFixed) {
+        return this.$str('schedule_range_heading_limited_fixed', 'mod_perform'); // Limited creation range defined by fixed dates
+      }
+
+      if (this.scheduleIsLimitedDynamic) {
+        return this.$str(
+          'schedule_range_heading_limited_dynamic',
+          'mod_perform'
+        ); // Limited creation range defined by dynamic dates
+      }
+
+      return this.$str('schedule_range_heading_open_dynamic', 'mod_perform'); // Open-ended creation range defined by dynamic dates
     },
 
+    scheduleIsLimitedFixed() {
+      return this.scheduleIsLimited && this.scheduleIsFixed;
+    },
+    scheduleIsOpenFixed() {
+      return this.scheduleIsOpen && this.scheduleIsFixed;
+    },
+
+    scheduleIsLimitedDynamic() {
+      return this.scheduleIsLimited && this.scheduleIsDynamic;
+    },
+    scheduleIsOpenDynamic() {
+      return this.scheduleIsOpen && this.scheduleIsDynamic;
+    },
+
+    scheduleIsLimited() {
+      return this.scheduleOpenLimited === SCHEDULE_IS_LIMITED;
+    },
+    scheduleIsOpen() {
+      return this.scheduleOpenLimited === SCHEDULE_IS_OPEN;
+    },
+    scheduleIsFixed() {
+      return this.scheduleFixedDynamic === SCHEDULE_IS_FIXED;
+    },
+    scheduleIsDynamic() {
+      return this.scheduleFixedDynamic === SCHEDULE_IS_DYNAMIC;
+    },
+  },
+  methods: {
     /**
      * Show a generic saving error toast.
      */
     showErrorNotification() {
       notify({
-        duration: 10000,
+        duration: NOTIFICATION_DURATION,
         message: this.$str('toast_error_generic_update', 'mod_perform'),
         type: 'error',
       });
@@ -224,7 +243,7 @@ export default {
      */
     showSuccessNotification() {
       notify({
-        duration: 10000,
+        duration: NOTIFICATION_DURATION,
         message: this.$str('toast_success_save_schedule', 'mod_perform'),
         type: 'success',
       });
@@ -240,28 +259,8 @@ export default {
       this.isSaving = true;
 
       try {
-        const resultData = await this.save(values);
-        let fromDate = null;
-        let toDate = null;
-        console.log(resultData);
-        const track = resultData.mod_perform_update_track_schedule.track;
-        if (this.scheduleFixedDynamic == SCHEDULE_IS_FIXED) {
-          if (this.scheduleOpenClosed == SCHEDULE_IS_CLOSED) {
-            fromDate = this.getFormattedTime(track.schedule_fixed_from);
-            toDate = this.getFormattedTime(track.schedule_fixed_to);
-          } else {
-            // Open.
-            fromDate = this.getFormattedTime(track.schedule_fixed_from);
-            toDate = this.getFormattedTime(track.schedule_fixed_to);
-          }
-        }
-        this.initialValues = {
-          closed: {
-            from: fromDate,
-            to: toDate,
-          },
-          open: { from: fromDate },
-        };
+        await this.save(this.extractGqlVariables(values));
+
         this.showSuccessNotification();
       } catch (e) {
         this.showErrorNotification();
@@ -273,66 +272,123 @@ export default {
     },
 
     /**
+     * Extract the Uniform values and instance variables
+     * into a variable payload for the save mutation.
+     * @return {{track_schedule: Object}}
+     */
+    extractGqlVariables(formValues) {
+      const gqlValues = {
+        track_id: this.track.id,
+
+        // Toggle values.
+        is_open: this.scheduleIsOpen,
+        is_fixed: this.scheduleIsFixed,
+
+        // Fixed schedule values.
+        fixed_from: this.getUnixTime(
+          formValues[FIXED_SCHEDULE_SCOPE].fixed_from
+        ),
+        fixed_to: this.getUnixTime(formValues[FIXED_SCHEDULE_SCOPE].fixed_to),
+
+        // Dynamic schedule values.
+        dynamic_count_from: Number(
+          formValues[DYNAMIC_SCHEDULE_SCOPE].dynamic_count_from
+        ), // Gql does not handle "-1" and an int type.
+        dynamic_count_to: Number(
+          formValues[DYNAMIC_SCHEDULE_SCOPE].dynamic_count_to
+        ), // Gql does not handle "-1" and an int type.
+        dynamic_unit: formValues[DYNAMIC_SCHEDULE_SCOPE].dynamic_unit,
+        dynamic_direction: formValues[DYNAMIC_SCHEDULE_SCOPE].dynamic_direction,
+      };
+
+      // Fields common to all permutations of settings.
+      const relevantFields = ['track_id', 'is_open', 'is_fixed'];
+
+      // Add fields specific to the current toggle permutation.
+      relevantFields.push(...this.getScheduleTypeSpecificGqlFields());
+
+      const track_schedule = pick(gqlValues, relevantFields);
+
+      return { track_schedule };
+    },
+
+    getScheduleTypeSpecificGqlFields() {
+      switch (true) {
+        case this.scheduleIsOpenFixed:
+          return ['fixed_from'];
+        case this.scheduleIsLimitedFixed:
+          return ['fixed_from', 'fixed_to'];
+        case this.scheduleIsOpenDynamic:
+          return ['dynamic_count_from', 'dynamic_unit', 'dynamic_direction'];
+        case this.scheduleIsLimitedDynamic:
+          return [
+            'dynamic_count_from',
+            'dynamic_count_to',
+            'dynamic_unit',
+            'dynamic_direction',
+          ];
+      }
+
+      throw new Error('Invalid schedule type');
+    },
+
+    /**
      * Calling the mutation
      * @returns {Promise<any>}
      */
-    async save(values) {
-      let track_schedule = {
-        track_id: this.track.id,
-        is_open: this.scheduleOpenClosed == SCHEDULE_IS_OPEN,
-        is_fixed: this.scheduleFixedDynamic == SCHEDULE_IS_FIXED,
-      };
-      if (this.scheduleFixedDynamic == SCHEDULE_IS_FIXED) {
-        if (this.scheduleOpenClosed == SCHEDULE_IS_CLOSED) {
-          track_schedule.fixed_from = this.getUnixTime(values.closed.from);
-          track_schedule.fixed_to = this.getUnixTime(values.closed.to);
-        } else {
-          // Open.
-          track_schedule.fixed_from = this.getUnixTime(values.open.from);
-        }
-      } else {
-        // Dynamic.
-        if (this.scheduleOpenClosed == SCHEDULE_IS_CLOSED) {
-          // TODO in TL-24472
-        } else {
-          // Open.
-          // TODO in TL-24472
-        }
-      }
-
+    async save(variables) {
       const { data: resultData } = await this.$apollo.mutate({
         mutation: UpdateTrackScheduleMutation,
-        variables: {
-          track_schedule: track_schedule,
-        },
+        variables,
       });
+
       return resultData;
     },
-    getFormattedTime(timestamp) {
-      if (timestamp) {
-        return new Date(timestamp * 1000).toLocaleDateString('en-US');
-      }
+
+    /**
+     * Convert a unix time stamp into a Date.
+     *
+     * @param epoch {string|int|}
+     * @return {Date}
+     */
+    dateFromUnixTime(epoch) {
+      return new Date(epoch * 1000);
     },
+
+    /**
+     * Convert a date string date into a unix time stamp.
+     * If a falsey dateString value is supplied null will be returned.
+     * Please note: Note this is most likely temporary until the date picker component is built.
+     *
+     * @param dataString {string|null|undefined}
+     * @return {int|null}
+     */
     getUnixTime(dataString) {
+      if (!dataString) {
+        return null;
+      }
+
       return new Date(dataString).getTime() / 1000;
     },
   },
 };
 </script>
+
 <lang-strings>
   {
-  "mod_perform" : [
-    "save_changes",
-    "schedule_is_closed",
-    "schedule_is_fixed",
-    "schedule_is_dynamic",
-    "schedule_is_open",
-    "schedule_creation_range_and_date_type",
-    "toast_success_save_schedule",
-    "toast_error_generic_update"
-  ],
-  "moodle": [
-    "cancel"
-  ]
+    "mod_perform": [
+      "activity_instance_creation_heading",
+      "save_changes",
+      "schedule_range_date_preamble",
+      "schedule_range_heading_limited_dynamic",
+      "schedule_range_heading_limited_fixed",
+      "schedule_range_heading_open_dynamic",
+      "schedule_range_heading_open_fixed",
+      "toast_error_generic_update",
+      "toast_success_save_schedule"
+    ],
+    "moodle": [
+      "cancel"
+    ]
   }
 </lang-strings>

@@ -276,12 +276,10 @@ class expand_task {
      * @return int|null
      */
     private function calculate_user_assignment_start_date(track $track, int $user_id): ?int {
-        if (in_array($track->schedule_type, [
-            track::SCHEDULE_TYPE_OPEN_FIXED,
-            track::SCHEDULE_TYPE_CLOSED_FIXED,
-        ])) {
+        if ($track->schedule_is_fixed) {
             return $track->schedule_fixed_from;
         }
+
         return null;
     }
 
@@ -293,9 +291,10 @@ class expand_task {
      * @return int|null
      */
     private function calculate_user_assignment_end_date(track $track, int $user_id): ?int {
-        if ((int)$track->schedule_type === track::SCHEDULE_TYPE_CLOSED_FIXED) {
+        if ($track->schedule_is_fixed && !$track->schedule_is_open) {
             return $track->schedule_fixed_to;
         }
+
         return null;
     }
 

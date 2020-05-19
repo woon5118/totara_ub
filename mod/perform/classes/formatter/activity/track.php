@@ -25,7 +25,7 @@ namespace mod_perform\formatter\activity;
 
 use core\orm\formatter\entity_model_formatter;
 use core\webapi\formatter\field\string_field_formatter;
-use mod_perform\entities\activity\track as track_entity;
+use mod_perform\models\activity\track as track_model;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -46,6 +46,28 @@ class track extends entity_model_formatter {
             'schedule_is_fixed' => null,
             'schedule_fixed_from' => null,
             'schedule_fixed_to' => null,
+            'schedule_dynamic_count_from' => null,
+            'schedule_dynamic_count_to' => null,
+            'schedule_dynamic_unit' => function ($value) {
+                if (is_null($value)) {
+                    return null;
+                }
+                $map = track_model::get_dynamic_schedule_units();
+                if (!isset($map[$value])) {
+                    throw new \coding_exception('Unknow dynamic schedule unit: ' . $value);
+                }
+                return $map[$value];
+            },
+            'schedule_dynamic_direction' => function ($value) {
+                if (is_null($value)) {
+                    return null;
+                }
+                $map = track_model::get_dynamic_schedule_directions();
+                if (!isset($map[$value])) {
+                    throw new \coding_exception('Unknow dynamic schedule direction: ' . $value);
+                }
+                return $map[$value];
+            },
             'created_at' => null,
             'updated_at' => null,
             'assignments' => null

@@ -23,11 +23,10 @@
 
 namespace mod_perform\webapi\resolver\mutation;
 
+use coding_exception;
 use core\webapi\execution_context;
 use core\webapi\mutation_resolver;
-use mod_perform\exception\schedule_validation_exception;
 use mod_perform\models\activity\track;
-use mod_perform\models\response\element_validation_error;
 use totara_core\advanced_feature;
 
 class update_track_schedule implements mutation_resolver {
@@ -58,34 +57,36 @@ class update_track_schedule implements mutation_resolver {
 
         $errors = static::validate_inputs($track_schedule);
 
-        if (empty($errors)) {
-            try {
-                if ($track_schedule['is_fixed']) {
-                    if ($track_schedule['is_open']) {
-                        $track->update_schedule_open_fixed(
-                            $track_schedule['fixed_from']
-                        );
-                    } else { // Closed.
-                        $track->update_schedule_closed_fixed(
-                            $track_schedule['fixed_from'],
-                            $track_schedule['fixed_to']
-                        );
-                    }
-                } else { // Dynamic.
-                    if ($track_schedule['is_open']) {
-                        $track->update_schedule_open_dynamic(
-                            // TODO
-                        );
-                    } else { // Closed.
-                        $track->update_schedule_closed_dynamic(
-                            // TODO
-                        );
-                    }
-                }
-            } catch (schedule_validation_exception $e) {
-                $errors[] = new element_validation_error(
-                    $e->errorcode,
-                    $e->getMessage()
+        if ($errors) {
+            throw new coding_exception(implode(', ', $errors));
+        }
+
+        if ($track_schedule['is_fixed']) {
+            if ($track_schedule['is_open']) {
+                $track->update_schedule_open_fixed(
+                    $track_schedule['fixed_from']
+                );
+            } else { // Closed.
+                $track->update_schedule_closed_fixed(
+                    $track_schedule['fixed_from'],
+                    $track_schedule['fixed_to']
+                );
+            }
+        } else { // Dynamic.
+            $dynamic_units = array_flip(track::get_dynamic_schedule_units());
+            $dynamic_directions = array_flip(track::get_dynamic_schedule_directions());
+            if ($track_schedule['is_open']) {
+                $track->update_schedule_open_dynamic(
+                    $track_schedule['dynamic_count_from'],
+                    $dynamic_units[$track_schedule['dynamic_unit']],
+                    $dynamic_directions[$track_schedule['dynamic_direction']]
+                );
+            } else { // Closed.
+                $track->update_schedule_closed_dynamic(
+                    $track_schedule['dynamic_count_from'],
+                    $track_schedule['dynamic_count_to'],
+                    $dynamic_units[$track_schedule['dynamic_unit']],
+                    $dynamic_directions[$track_schedule['dynamic_direction']]
                 );
             }
         }
@@ -93,7 +94,6 @@ class update_track_schedule implements mutation_resolver {
         $ec->set_relevant_context($context);
         return [
             'track' => $track,
-            'validation_errors' => $errors,
         ];
     }
 
@@ -111,6 +111,10 @@ class update_track_schedule implements mutation_resolver {
         $all_fields = [
             'fixed_from',
             'fixed_to',
+            'dynamic_count_from',
+            'dynamic_count_to',
+            'dynamic_unit',
+            'dynamic_direction',
         ];
 
         if ($schedule['is_fixed']) {
@@ -127,11 +131,16 @@ class update_track_schedule implements mutation_resolver {
         } else { // Dynamic.
             if ($schedule['is_open']) {
                 $required_fields = [
-                    // TODO
+                    'dynamic_count_from',
+                    'dynamic_unit',
+                    'dynamic_direction',
                 ];
             } else { // Closed.
                 $required_fields = [
-                    // TODO
+                    'dynamic_count_from',
+                    'dynamic_count_to',
+                    'dynamic_unit',
+                    'dynamic_direction',
                 ];
             }
         }
@@ -146,6 +155,20 @@ class update_track_schedule implements mutation_resolver {
         foreach ($unwanted_fields as $unwanted_field) {
             if (isset($schedule[$unwanted_field]) && !is_null($schedule[$unwanted_field])) {
                 $errors[] = 'Given the specified configuration, an unexpected field was found: ' . $unwanted_field;
+            }
+        }
+
+        if (isset($schedule['dynamic_unit'])) {
+            $dynamic_units = array_flip(track::get_dynamic_schedule_units());
+            if (!isset($dynamic_units[$schedule['dynamic_unit']])) {
+                $errors[] = 'Invalid dynamic unit specified: ' . $schedule['dynamic_unit'];
+            }
+        }
+
+        if (isset($schedule['dynamic_direction'])) {
+            $dynamic_directions = array_flip(track::get_dynamic_schedule_directions());
+            if (!isset($dynamic_directions[$schedule['dynamic_direction']])) {
+                $errors[] = 'Invalid dynamic direction specified: ' . $schedule['dynamic_direction'];
             }
         }
 

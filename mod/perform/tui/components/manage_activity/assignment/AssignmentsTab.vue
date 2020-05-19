@@ -1,6 +1,9 @@
 <template>
   <div class="tui-performManageActivityAssignmentsForm">
-    <Grid class="tui-performManageActivityAssignmentsForm__heading">
+    <Grid
+      class="tui-performManageActivityAssignmentsForm__heading"
+      :stack-at="768"
+    >
       <GridItem :grows="true">
         <h3 class="tui-performManageActivityAssignmentsForm__heading-title">
           {{ $str('user_group_assignment_title', 'mod_perform') }}

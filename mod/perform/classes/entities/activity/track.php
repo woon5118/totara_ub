@@ -40,6 +40,10 @@ use core\orm\entity\relations\has_many_through;
  * @property bool $schedule_is_fixed
  * @property int $schedule_fixed_from when schedule type is FIXED, contains the start date of assignment
  * @property int $schedule_fixed_to when schedule type is CLOSED_FIXED, contains the end date of assignment
+ * @property int $schedule_dynamic_count_from number of units
+ * @property int $schedule_dynamic_count_to number of units
+ * @property int $schedule_dynamic_unit one of SCHEDULE_DYNAMIC_UNIT_XXX or null
+ * @property int $schedule_dynamic_direction one of SCHEDULE_DYNAMIC_DIRECTION_XXX or null
  * @property int $created_at record creation time
  * @property int $updated_at record modification time
  * @property-read collection|subject_instance[] $subject_instances
@@ -53,6 +57,13 @@ class track extends entity {
 
     public const STATUS_ACTIVE = 1;
     public const STATUS_PAUSED = 0;
+
+    public const SCHEDULE_DYNAMIC_UNIT_DAY = 0;
+    public const SCHEDULE_DYNAMIC_UNIT_MONTH = 1;
+    public const SCHEDULE_DYNAMIC_UNIT_YEAR = 2;
+
+    public const SCHEDULE_DYNAMIC_DIRECTION_AFTER = 0;
+    public const SCHEDULE_DYNAMIC_DIRECTION_BEFORE = 1;
 
     /**
      * Establishes the relationship with activity entities.
