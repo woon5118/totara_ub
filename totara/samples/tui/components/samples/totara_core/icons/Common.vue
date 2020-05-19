@@ -72,6 +72,8 @@
 import Add from 'totara_core/components/icons/common/Add';
 import AddUser from 'totara_core/components/icons/common/AddUser';
 import Archive from 'totara_core/components/icons/common/Archive';
+import BackArrow from 'totara_core/components/icons/common/BackArrow';
+import ForwardArrow from 'totara_core/components/icons/common/ForwardArrow';
 import CheckSuccess from 'totara_core/components/icons/common/CheckSuccess';
 import Close from 'totara_core/components/icons/common/Close';
 import Comment from 'totara_core/components/icons/common/Comment';
@@ -109,6 +111,7 @@ export default {
     Cell,
     HeaderCell,
     FormRow,
+    ForwardArrow,
     Radio,
     RadioGroup,
     SamplesCode,
@@ -134,6 +137,16 @@ export default {
           icon: Archive,
           name: 'Archive',
           desc: '...',
+        },
+        {
+          icon: BackArrow,
+          name: 'GoBack',
+          desc: 'Used for going back to previous page or place',
+        },
+        {
+          icon: ForwardArrow,
+          name: 'GoForward',
+          desc: 'Used for going forward to next page or place',
         },
         {
           icon: CheckSuccess,

@@ -154,6 +154,13 @@ $icons = array(
                     'classes' => 'fa-paperclip',
                 ),
         ),
+    'back-arrow' =>
+        array (
+            'data' =>
+                array (
+                    'classes' => 'fa-chevron-left ft-flip-rtl'
+                )
+        ),
     'backpack' =>
         array(
             'data' =>
@@ -1120,6 +1127,13 @@ $icons = array(
             'data' =>
                 array(
                     'classes' => 'fa-folder-open-o',
+                ),
+        ),
+    'forward-arrow' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-chevron-right ft-flip-rtl',
                 ),
         ),
     'grades' =>
