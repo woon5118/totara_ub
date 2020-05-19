@@ -46,7 +46,7 @@
         v-if="rows.length < maxRows"
         :aria-label="$str('add', 'moodle')"
         :aria-controls="uid"
-        :styleclass="{ small: true, circle: true }"
+        :styleclass="{ small: true }"
         :disabled="disabled"
         @click="$emit('add')"
       >
