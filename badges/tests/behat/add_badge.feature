@@ -9,25 +9,17 @@ Feature: Add badges to the system
     And I log in as "admin"
 
   @javascript
-  Scenario: Setting badges settings
-    Given I navigate to "Badges > Badges settings" in site administration
-    And I set the field "Badge issuer name" to "Test Badge Site"
-    And I set the field "Badge issuer email address" to "testuser@example.com"
-    And I press "Save changes"
-    And I follow "Manage badges"
-    When I click on "Add a new badge" "button"
-    And I press "Issuer details"
-    Then I should see "testuser@example.com"
-    And I should see "Test Badge Site"
-
-  @javascript
   Scenario: Accessing the badges
     Given I navigate to "Manage badges" node in "Site administration > Badges"
     Then I should see "There are no badges available."
 
   @javascript @_file_upload
   Scenario: Add a badge
-    Given I navigate to "Manage badges" node in "Site administration > Badges"
+    Given I navigate to "Badges > Badges settings" in site administration
+    And I set the field "Badge issuer name" to "Test Badge Site"
+    And I set the field "Badge issuer email address" to "testuser@example.com"
+    And I press "Save changes"
+    And I navigate to "Manage badges" node in "Site administration > Badges"
     And I press "Add a new badge"
     And I set the following fields to these values:
       | Name          | Test badge with 'apostrophe' and other friends (<>&@#) |
@@ -43,6 +35,11 @@ Feature: Add badges to the system
     And I should see "Endorsement"
     And I should see "Related badges (0)"
     And I should not see "Create badge"
+    And I should not see "Issuer details"
+    And I follow "Overview"
+    And I should see "Issuer details"
+    And I should see "Test Badge Site"
+    And I should see "testuser@example.com"
     And I follow "Manage badges"
     And I should see "Number of badges available: 1"
     And I should not see "There are no badges available."

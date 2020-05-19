@@ -94,9 +94,10 @@ class badge extends moodleform {
         $mform->setType('imagecaption', PARAM_TEXT);
         $mform->addHelpButton('imagecaption', 'imagecaption', 'badges');
 
-        $mform->addElement('header', 'issuerdetails', get_string('issuerdetails', 'badges'));
 
-        if (badges_open_badges_backpack_api() != OPEN_BADGES_V2) {
+        if (badges_open_badges_backpack_api() == OPEN_BADGES_V1) {
+            $mform->addElement('header', 'issuerdetails', get_string('issuerdetails', 'badges'));
+
             $mform->addElement('text', 'issuername', get_string('name'), array('size' => '70'));
             $mform->setType('issuername', PARAM_NOTAGS);
             $mform->addRule('issuername', null, 'required');
@@ -113,21 +114,6 @@ class badge extends moodleform {
             $mform->addHelpButton('issuercontact', 'contact', 'badges');
             // Set issuer URL.
             // Have to parse URL because badge issuer origin cannot be a subfolder in wwwroot.
-            $url = parse_url($CFG->wwwroot);
-            $mform->addElement('hidden', 'issuerurl', $url['scheme'] . '://' . $url['host']);
-            $mform->setType('issuerurl', PARAM_URL);
-
-        } else {
-            $name = $CFG->badges_defaultissuername;
-            $mform->addElement('static', 'issuernamelabel', get_string('name'), $name);
-            $mform->addElement('hidden', 'issuername', $name);
-            $mform->setType('issuername', PARAM_NOTAGS);
-
-            $contact = $CFG->badges_defaultissuercontact;
-            $mform->addElement('static', 'issuercontactlabel', get_string('contact', 'badges'), $contact);
-            $mform->addElement('hidden', 'issuercontact', $contact);
-            $mform->setType('issuercontact', PARAM_RAW);
-
             $url = parse_url($CFG->wwwroot);
             $mform->addElement('hidden', 'issuerurl', $url['scheme'] . '://' . $url['host']);
             $mform->setType('issuerurl', PARAM_URL);
@@ -196,7 +182,11 @@ class badge extends moodleform {
 
             // Freeze expiry and issuer elements if badge is active or locked.
             if ($badge->is_active() || $badge->is_locked()) {
-                $mform->freeze(array('image', 'issuername', 'issuercontact'));
+                $freezeElements = ['image'];
+                if (badges_open_badges_backpack_api() == OPEN_BADGES_V1) {
+                    $freezeElements = array_merge($freezeElements, ['issuername', 'issuercontact']);
+                }
+                $mform->freeze($freezeElements);
             }
         }
     }
@@ -229,7 +219,7 @@ class badge extends moodleform {
         global $DB;
         $errors = parent::validation($data, $files);
 
-        if (badges_open_badges_backpack_api() != OPEN_BADGES_V2) {
+        if (badges_open_badges_backpack_api() == OPEN_BADGES_V1) {
             if (!empty($data['issuercontact']) && !validate_email($data['issuercontact'])) {
                 $errors['issuercontact'] = get_string('invalidemail');
             }
