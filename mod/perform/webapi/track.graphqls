@@ -29,6 +29,15 @@ enum mod_perform_track_subject_instance_generation_enums {
   ONE_PER_JOB
 }
 
+"""
+A list of possible repeating types which can be used for repeating schedules
+"""
+enum mod_perform_track_repeating_type_enums {
+  AFTER_CREATION
+  AFTER_CREATION_WHEN_COMPLETE
+  AFTER_COMPLETION
+}
+
 type mod_perform_track {
   id: core_id!
   description(format: core_format = HTML): String!
@@ -49,6 +58,11 @@ type mod_perform_track {
   due_date_relative_count: Int
   due_date_relative_unit: mod_perform_track_dynamic_unit_enums
   repeating_is_enabled: Boolean!
+  repeating_relative_type: mod_perform_track_repeating_type_enums
+  repeating_relative_count: Int
+  repeating_relative_unit: mod_perform_track_dynamic_unit_enums
+  repeating_is_limited: Boolean
+  repeating_limit: Int
   assignments: [mod_perform_track_assignment!]!
 }
 
@@ -95,6 +109,11 @@ input mod_perform_track_schedule_input {
   due_date_relative_count: param_integer
   due_date_relative_unit: mod_perform_track_dynamic_unit_enums
   repeating_is_enabled: param_boolean!
+  repeating_relative_type: mod_perform_track_repeating_type_enums
+  repeating_relative_count: param_integer
+  repeating_relative_unit: mod_perform_track_dynamic_unit_enums
+  repeating_is_limited: param_boolean
+  repeating_limit: param_integer
 }
 
 """

@@ -179,6 +179,11 @@ class mod_perform_webapi_query_tracks_testcase extends advanced_testcase {
             'due_date_relative_count' => $resolve('due_date_relative_count'),
             'due_date_relative_unit' => $resolve('due_date_relative_unit'),
             'repeating_is_enabled' => $resolve('repeating_is_enabled'),
+            'repeating_relative_type' => $resolve('repeating_relative_type'),
+            'repeating_relative_count' => $resolve('repeating_relative_count'),
+            'repeating_relative_unit' => $resolve('repeating_relative_unit'),
+            'repeating_is_limited' => $resolve('repeating_is_limited'),
+            'repeating_limit' => $resolve('repeating_limit'),
         ];
     }
 }

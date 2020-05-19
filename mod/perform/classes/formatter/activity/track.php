@@ -58,6 +58,11 @@ class track extends entity_model_formatter {
             'due_date_relative_count' => null,
             'due_date_relative_unit' => null,
             'repeating_is_enabled' => null,
+            'repeating_relative_type' => null,
+            'repeating_relative_count' => null,
+            'repeating_relative_unit' => null,
+            'repeating_is_limited' => null,
+            'repeating_limit' => null,
             'created_at' => null,
             'updated_at' => null,
             'assignments' => null

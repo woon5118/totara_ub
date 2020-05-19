@@ -52,6 +52,11 @@ use core\orm\entity\relations\has_many_through;
  * @property int $due_date_relative_count
  * @property int $due_date_relative_unit
  * @property bool $repeating_is_enabled
+ * @property int $repeating_relative_type
+ * @property int $repeating_relative_count
+ * @property int $repeating_relative_unit
+ * @property bool $repeating_is_limited
+ * @property int $repeating_limit
  * @property int $created_at record creation time
  * @property int $updated_at record modification time
  * @property-read collection|subject_instance[] $subject_instances
@@ -77,6 +82,10 @@ class track extends entity {
 
     public const SCHEDULE_DYNAMIC_DIRECTION_AFTER = 0;
     public const SCHEDULE_DYNAMIC_DIRECTION_BEFORE = 1;
+
+    public const SCHEDULE_REPEATING_TYPE_AFTER_CREATION = 0;
+    public const SCHEDULE_REPEATING_TYPE_AFTER_CREATION_WHEN_COMPLETE = 1;
+    public const SCHEDULE_REPEATING_TYPE_AFTER_COMPLETION = 2;
 
     /**
      * Establishes the relationship with activity entities.
@@ -160,6 +169,20 @@ class track extends entity {
      */
     protected function get_repeating_is_enabled_attribute(): bool {
         return (bool) $this->get_attributes_raw()['repeating_is_enabled'];
+    }
+
+    /**
+     * Cast repeating_is_limited to bool type.
+     *
+     * @return bool|null
+     */
+    protected function get_repeating_is_limited_attribute(): ?bool {
+        $value = $this->get_attributes_raw()['repeating_is_limited'];
+        if (is_null($value)) {
+            return null;
+        } else {
+            return (bool) $this->get_attributes_raw()['repeating_is_limited'];
+        }
     }
 
 }

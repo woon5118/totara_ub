@@ -70,27 +70,24 @@ class update_track_schedule implements mutation_resolver, has_middleware {
                 );
             }
         } else { // Dynamic.
-            $dynamic_units = array_flip(track::get_dynamic_schedule_units());
-            $dynamic_directions = array_flip(track::get_dynamic_schedule_directions());
             if ($track_schedule['schedule_is_open']) {
                 $track->set_schedule_open_dynamic(
                     $track_schedule['schedule_dynamic_count_from'],
-                    $dynamic_units[$track_schedule['schedule_dynamic_unit']],
-                    $dynamic_directions[$track_schedule['schedule_dynamic_direction']]
+                    static::get_schedule_unit_value_from_string($track_schedule['schedule_dynamic_unit']),
+                    static::get_schedule_direction_value_from_string($track_schedule['schedule_dynamic_direction'])
                 );
             } else { // Closed.
                 $track->set_schedule_closed_dynamic(
                     $track_schedule['schedule_dynamic_count_from'],
                     $track_schedule['schedule_dynamic_count_to'],
-                    $dynamic_units[$track_schedule['schedule_dynamic_unit']],
-                    $dynamic_directions[$track_schedule['schedule_dynamic_direction']]
+                    static::get_schedule_unit_value_from_string($track_schedule['schedule_dynamic_unit']),
+                    static::get_schedule_direction_value_from_string($track_schedule['schedule_dynamic_direction'])
                 );
             }
         }
 
         // Due date (has a dependency on schedule_is_open and schedule_is_fixed).
         if ($track_schedule['due_date_is_enabled']) {
-            $dynamic_units = array_flip(track::get_dynamic_schedule_units());
             if (!$track_schedule['schedule_is_open'] && $track_schedule['schedule_is_fixed']) {
                 if ($track_schedule['due_date_is_fixed']) {
                     $track->set_due_date_fixed(
@@ -99,24 +96,27 @@ class update_track_schedule implements mutation_resolver, has_middleware {
                 } else { // Relative.
                     $track->set_due_date_relative(
                         $track_schedule['due_date_relative_count'],
-                        $dynamic_units[$track_schedule['due_date_relative_unit']]
+                        static::get_schedule_unit_value_from_string($track_schedule['due_date_relative_unit'])
                     );
                 }
             } else {
                 $track->set_due_date_relative(
                     $track_schedule['due_date_relative_count'],
-                    $dynamic_units[$track_schedule['due_date_relative_unit']]
+                    static::get_schedule_unit_value_from_string($track_schedule['due_date_relative_unit'])
                 );
             }
         } else { // Disabled.
             $track->set_due_date_disabled();
         }
 
-        $track->update();
-
         // Repeating.
         if ($track_schedule['repeating_is_enabled']) {
-            $track->set_repeating_enabled(); // TODO add params
+            $track->set_repeating_enabled(
+                static::get_schedule_repeating_type_value_from_string($track_schedule['repeating_relative_type']),
+                $track_schedule['repeating_relative_count'],
+                static::get_schedule_unit_value_from_string($track_schedule['repeating_relative_unit']),
+                $track_schedule['repeating_is_limited'] ? $track_schedule['repeating_limit'] : null
+            );
         } else { // Disabled.
             $track->set_repeating_disabled();
         }
@@ -204,6 +204,17 @@ class update_track_schedule implements mutation_resolver, has_middleware {
             }
         }
 
+        // Repeating.
+        if ($schedule['repeating_is_enabled']) {
+            $required_fields[] = 'repeating_relative_type';
+            $required_fields[] = 'repeating_relative_count';
+            $required_fields[] = 'repeating_relative_unit';
+            $required_fields[] = 'repeating_is_limited';
+            if (!empty($schedule['repeating_is_limited']) && $schedule['repeating_is_limited']) {
+                $required_fields[] = 'repeating_limit';
+            }
+        }
+
         // Subject instance generation.
         if ($track->get_subject_instance_generation_control_is_enabled()) {
             $required_fields[] = 'subject_instance_generation';
@@ -225,6 +236,51 @@ class update_track_schedule implements mutation_resolver, has_middleware {
         }
 
         return $errors;
+    }
+
+    /**
+     * Return the applicable unit value from the string value
+     *
+     * @param string $unit_string
+     * @return int
+     */
+    private static function get_schedule_unit_value_from_string(string $unit_string): int {
+        $dynamic_units = array_flip(track::get_dynamic_schedule_units());
+        if (!isset($dynamic_units[$unit_string])) {
+            throw new coding_exception('Unknown schedule unit ' . $unit_string);
+        }
+
+        return $dynamic_units[$unit_string];
+    }
+
+    /**
+     * Return the applicable direction value from the string value
+     *
+     * @param string $direction_string
+     * @return int
+     */
+    private static function get_schedule_direction_value_from_string(string $direction_string): int {
+        $dynamic_directions = array_flip(track::get_dynamic_schedule_directions());
+        if (!isset($dynamic_directions[$direction_string])) {
+            throw new coding_exception('Unknown schedule direction ' . $direction_string);
+        }
+
+        return $dynamic_directions[$direction_string];
+    }
+
+    /**
+     * Return the applicable repeating type value from the string value
+     *
+     * @param string $repeating_type_string
+     * @return int
+     */
+    private static function get_schedule_repeating_type_value_from_string(string $repeating_type_string): int {
+        $repeating_types = array_flip(track::get_repeating_relative_types());
+        if (!isset($repeating_types[$repeating_type_string])) {
+            throw new coding_exception('Unknown repeating type ' . $repeating_type_string);
+        }
+
+        return $repeating_types[$repeating_type_string];
     }
 
     /**

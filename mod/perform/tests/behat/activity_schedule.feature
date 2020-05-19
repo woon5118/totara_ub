@@ -360,8 +360,8 @@ Feature: Define track schedules to perform activities
     When I reload the page
     And I click on "Assignments" "link"
     Then the following fields match these values:
-      | dueDateIsFixed         |   |
-      | dueDateRelative[count] | 4 |
+      | dueDateIsFixed         | false  |
+      | dueDateRelative[count] | 4      |
 
   Scenario: Check multiple job assignments schedule settings when multiple job assignments enabled
     Given I log in as "admin"
@@ -387,3 +387,57 @@ Feature: Define track schedules to perform activities
     When I click on "Assignments" "link"
     Then I should not see "Additional settings"
     And I should not see "Multiple job assignments"
+
+  Scenario: Check repeating is disabled by default and can be enabled
+    Given I log in as "admin"
+    And I navigate to the manage perform activities page
+    And I click on "My Test Activity" "link"
+    And I click on "Assignments" "link"
+    Then I should see "Repeating disabled"
+    And I should see "Users will receive a maximum of 1 instance each"
+    When I click on "Repeating" "button"
+    Then I should see "Repeating enabled"
+    When I save the activity schedule
+    Then I should see "Activity schedule saved" in the tui "success" notification toast
+    And I reload the page
+    And I click on "Assignments" "link"
+    Then I should see "Repeating enabled"
+
+  Scenario: Save and view repeating performance activity schedule
+    Given I log in as "admin"
+    And I navigate to the manage perform activities page
+    And I click on "My Test Activity" "link"
+    And I click on "Assignments" "link"
+    And I click on "Repeating" "button"
+
+    And I click on the "AFTER_COMPLETION" tui radio in the "repeatingType" tui radio group
+    # When setting these fields in a single step, the count is not set - probably due to timing issues
+    And I set the following fields to these values:
+      | repeatingRelativeDates[AFTER_COMPLETION][count]  | 2     |
+    And I set the following fields to these values:
+      | repeatingRelativeDates[AFTER_COMPLETION][unit]   | weeks |
+    And I save the activity schedule
+    Then I should see "Activity schedule saved" in the tui "success" notification toast
+    When I reload the page
+    And I click on "Assignments" "link"
+    Then the following fields match these values:
+      | repeatingType                                    | AFTER_COMPLETION |
+      | repeatingRelativeDates[AFTER_COMPLETION][count]  | 2                |
+      | repeatingRelativeDates[AFTER_COMPLETION][unit]   | weeks            |
+
+    And I click on the "true" tui radio in the "repeatingIsLimited" tui radio group
+    And I set the following fields to these values:
+      | repeatingLimit | 4 |
+    And I save the activity schedule
+    Then I should see "Activity schedule saved" in the tui "success" notification toast
+    When I reload the page
+    And I click on "Assignments" "link"
+    Then the following fields match these values:
+      | repeatingIsLimited | true |
+      | repeatingLimit     | 4    |
+
+    # Limited / Open-ended display text
+    When I click on "Limited" "button"
+    Then I should see "until the creation period ends, with"
+    When I click on "Open-ended" "button"
+    Then I should see "no maximum limit (repeating continues indefinitely)"

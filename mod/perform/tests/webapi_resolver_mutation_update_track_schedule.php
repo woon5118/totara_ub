@@ -65,6 +65,11 @@ abstract class mod_perform_webapi_resolver_mutation_update_track_schedule_base e
         $DB->set_field('perform_track', 'due_date_relative_count', -1);
         $DB->set_field('perform_track', 'due_date_relative_unit', -1);
         $DB->set_field('perform_track', 'repeating_is_enabled', -1);
+        $DB->set_field('perform_track', 'repeating_relative_type', -1);
+        $DB->set_field('perform_track', 'repeating_relative_count', -1);
+        $DB->set_field('perform_track', 'repeating_relative_unit', -1);
+        $DB->set_field('perform_track', 'repeating_is_limited', -1);
+        $DB->set_field('perform_track', 'repeating_limit', -1);
 
         /** @var activity $activity1 */
         $activity1 = $activities->first();

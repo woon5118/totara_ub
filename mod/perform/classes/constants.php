@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * This file is part of Totara Learn
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
@@ -15,15 +15,21 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
+ * @author Riana Rossouw <riana.rossouw@totaralearning.com>
  * @package mod_perform
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace mod_perform;
 
-$plugin->version  = 2020061000;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2016120505;       // Requires this Moodle version.
-$plugin->component = 'mod_perform'; // To check on upgrade, that module sits in correct place
-$plugin->dependencies = ['container_perform' => 2020012400];
+use coding_exception;
+
+abstract class constants {
+    public const SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT = 'ONE_PER_SUBJECT';
+    public const SUBJECT_INSTANCE_GENERATION_ONE_PER_JOB = 'ONE_PER_JOB';
+
+    public const SCHEDULE_REPEATING_AFTER_CREATION = 'AFTER_CREATION';
+    public const SCHEDULE_REPEATING_AFTER_CREATION_WHEN_COMPLETE = 'AFTER_CREATION_WHEN_COMPLETE';
+    public const SCHEDULE_REPEATING_AFTER_COMPLETION = 'AFTER_COMPLETION';
+}

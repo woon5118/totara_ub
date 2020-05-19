@@ -42,6 +42,12 @@
     >
       <ScheduleSettings :is-open="scheduleIsOpen" :is-fixed="scheduleIsFixed" />
 
+      <FrequencySettings
+        :is-open="scheduleIsOpen"
+        :is-repeating="repeatingIsEnabled"
+        :repeating-type="repeatingType"
+      />
+
       <DueDateSettings
         :is-enabled="dueDateIsEnabled"
         :is-fixed="dueDateIsFixed"
@@ -74,6 +80,7 @@
 import AdditionalScheduleSettings from 'mod_perform/components/manage_activity/assignment/schedule/AdditionalScheduleSettings';
 import Button from 'totara_core/components/buttons/Button';
 import ButtonGroup from 'totara_core/components/buttons/ButtonGroup';
+import FrequencySettings from 'mod_perform/components/manage_activity/assignment/schedule/FrequencySettings';
 import DueDateSettings from 'mod_perform/components/manage_activity/assignment/schedule/DueDateSettings';
 import ScheduleSettings from 'mod_perform/components/manage_activity/assignment/schedule/ScheduleSettings';
 import ScheduleToggles from 'mod_perform/components/manage_activity/assignment/schedule/ScheduleToggles';
@@ -86,6 +93,9 @@ import {
   NOTIFICATION_DURATION,
   RELATIVE_DATE_DIRECTION_BEFORE,
   RELATIVE_DATE_UNIT_DAY,
+  SCHEDULE_REPEATING_TYPE_AFTER_CREATION,
+  SCHEDULE_REPEATING_TYPE_AFTER_CREATION_WHEN_COMPLETE,
+  SCHEDULE_REPEATING_TYPE_AFTER_COMPLETION,
 } from 'mod_perform/constants';
 
 export default {
@@ -93,6 +103,7 @@ export default {
     AdditionalScheduleSettings,
     Button,
     ButtonGroup,
+    FrequencySettings,
     DueDateSettings,
     ScheduleSettings,
     ScheduleToggles,
@@ -111,6 +122,9 @@ export default {
       dueDateIsEnabled: this.track.due_date_is_enabled,
       dueDateIsFixed: this.track.due_date_is_fixed || false,
       repeatingIsEnabled: this.track.repeating_is_enabled,
+      repeatingType:
+        this.track.repeating_relative_type ||
+        SCHEDULE_REPEATING_TYPE_AFTER_CREATION,
       isSaving: false,
       initialValues: this.getInitialValues(this.track),
       isGenerationControlEnabled: this.track
@@ -123,6 +137,7 @@ export default {
      */
     onChange(values) {
       this.dueDateIsFixed = values.dueDateIsFixed === 'true';
+      this.repeatingType = values.repeatingType;
     },
 
     /**
@@ -193,6 +208,14 @@ export default {
         additionalSettings: {
           multiple_job_assignment: track.subject_instance_generation,
         },
+
+        // Repeating initial settings
+        repeatingType:
+          track.repeating_relative_type ||
+          SCHEDULE_REPEATING_TYPE_AFTER_CREATION,
+        repeatingIsLimited: track.repeating_is_limited || false,
+        repeatingLimit: track.repeating_limit || '3',
+        repeatingRelativeDates: this.initRepeatingRelativeDates(track),
       };
     },
 
@@ -267,13 +290,50 @@ export default {
     },
 
     /**
+     * Initialise repeatingRelativeDates for each possible repeating type
+     * @param Object track
+     * @return Object
+     */
+    initRepeatingRelativeDates(track) {
+      // We want a separate relative relative date for each type. All get the same initial values
+      let repeatingRelativeDates = [];
+      let repeatingTypes = [
+        SCHEDULE_REPEATING_TYPE_AFTER_CREATION,
+        SCHEDULE_REPEATING_TYPE_AFTER_CREATION_WHEN_COMPLETE,
+        SCHEDULE_REPEATING_TYPE_AFTER_COMPLETION,
+      ];
+      repeatingTypes.forEach(function(type) {
+        repeatingRelativeDates[type] = {
+          count: track.repeating_relative_count || '14',
+          unit: track.repeating_relative_unit || RELATIVE_DATE_UNIT_DAY,
+        };
+      });
+
+      return repeatingRelativeDates;
+    },
+
+    /**
      * Add the required repeating variables for the mutation.
      * @return Object
      */
-    getRepeatingVariables() {
+    getRepeatingVariables(form) {
       const gql = {};
 
       gql.repeating_is_enabled = this.repeatingIsEnabled;
+      if (gql.repeating_is_enabled) {
+        gql.repeating_relative_type = form.repeatingType;
+
+        let key = gql.repeating_relative_type;
+        gql.repeating_relative_count = Number(
+          form.repeatingRelativeDates[key].count
+        );
+        gql.repeating_relative_unit = form.repeatingRelativeDates[key].unit;
+
+        gql.repeating_is_limited = form.repeatingIsLimited;
+        if (gql.repeating_is_limited) {
+          gql.repeating_limit = Number(form.repeatingLimit);
+        }
+      }
 
       return gql;
     },

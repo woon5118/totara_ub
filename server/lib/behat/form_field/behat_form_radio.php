@@ -59,8 +59,23 @@ class behat_form_radio extends behat_form_checkbox {
      * @return string The value attribute
      */
     public function get_value() {
-        return $this->field->isSelected();
+        return $this->field->getValue();
     }
+
+    /**
+     * Does the selected value match the expected value
+     *
+     * @param string $expectedvalue
+     * @return bool
+     */
+    public function matches($expectedvalue = false) {
+
+        if (trim($expectedvalue) != trim($this->get_value())) {
+            return false;
+        }
+        return true;
+    }
+
 
     /**
      * Sets the value of a radio

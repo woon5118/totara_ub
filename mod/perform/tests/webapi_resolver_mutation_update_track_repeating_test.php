@@ -22,9 +22,9 @@
  * @category test
  */
 
+use mod_perform\entities\activity\track;
 use mod_perform\entities\activity\track as track_entity;
 use mod_perform\models\activity\activity;
-use mod_perform\models\activity\track;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 require_once(__DIR__ . '/generator/activity_generator_configuration.php');
@@ -83,6 +83,11 @@ class mod_perform_webapi_resolver_mutation_update_track_repeating_testcase
         $affected_track->due_date_relative_count = null;
         $affected_track->due_date_relative_unit = null;
         $affected_track->repeating_is_enabled = 0;
+        $affected_track->repeating_relative_type = null;
+        $affected_track->repeating_relative_count = null;
+        $affected_track->repeating_relative_unit = null;
+        $affected_track->repeating_is_limited = 0;
+        $affected_track->repeating_limit = null;
 
         $after_tracks = $DB->get_records('perform_track', [], 'id');
         unset($after_tracks[$this->track1_id]->updated_at);
@@ -91,10 +96,77 @@ class mod_perform_webapi_resolver_mutation_update_track_repeating_testcase
     }
 
     public function test_correct_track_is_enabled(): void {
-        // TODO in next patch
-    }
+        global $DB;
 
-    public function test_with_validation_errors(): void {
-    }
+        self::setAdminUser();
 
+        $configuration = mod_perform_activity_generator_configuration::new();
+        $configuration->set_number_of_activities(2);
+        $configuration->set_number_of_tracks_per_activity(2);
+
+        /** @var mod_perform_generator $perform_generator */
+        $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        $activities = $perform_generator->create_full_activities($configuration);
+
+        /** @var activity $activity1 */
+        $activity1 = $activities->first();
+        /** @var track $track1 */
+        $track1 = $activity1->get_tracks()->first();
+
+        $args = [
+            'track_schedule' => [
+                'track_id' => $track1->id,
+                'subject_instance_generation' => 'ONE_PER_SUBJECT',
+                'schedule_is_open' => true,
+                'schedule_is_fixed' => true,
+                'schedule_fixed_from' => 222,
+                'due_date_is_enabled' => false,
+                'repeating_is_enabled' => true,
+                'repeating_relative_type' => 'AFTER_CREATION_WHEN_COMPLETE',
+                'repeating_relative_count' => 4,
+                'repeating_relative_unit' => 'WEEK',
+                'repeating_is_limited' => true,
+                'repeating_limit' => 5,
+            ],
+        ];
+
+        $before_tracks = $DB->get_records('perform_track', [], 'id');
+        self::assertCount(8, $before_tracks);
+        unset($before_tracks[$track1->id]->updated_at);
+
+        $result = $this->resolve_graphql_mutation(
+            'mod_perform_update_track_schedule',
+            $args
+        );
+        $result_track = $result['track'];
+
+        // Verify the resulting graphql data.
+        self::assertEquals($track1->id, $result_track->id);
+        self::assertTrue($result_track->repeating_is_enabled);
+
+        // Manually make the changes that we expect to make.
+        $affected_track = $before_tracks[$track1->id];
+        $affected_track->subject_instance_generation = track_entity::SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT;
+        $affected_track->schedule_is_open = 1;
+        $affected_track->schedule_is_fixed = 1;
+        $affected_track->schedule_fixed_from = 222;
+        $affected_track->schedule_fixed_to = null;
+        $affected_track->schedule_dynamic_count_from = null;
+        $affected_track->schedule_dynamic_count_to = null;
+        $affected_track->schedule_dynamic_unit = null;
+        $affected_track->schedule_dynamic_direction = null;
+        $affected_track->schedule_needs_sync = 1;
+        $affected_track->due_date_is_enabled = 0;
+        $affected_track->repeating_is_enabled = 1;
+        $affected_track->repeating_relative_type = track::SCHEDULE_REPEATING_TYPE_AFTER_CREATION_WHEN_COMPLETE;
+        $affected_track->repeating_relative_count = 4;
+        $affected_track->repeating_relative_unit = track_entity::SCHEDULE_DYNAMIC_UNIT_WEEK;
+        $affected_track->repeating_is_limited = 1;
+        $affected_track->repeating_limit = 5;
+
+        $after_tracks = $DB->get_records('perform_track', [], 'id');
+        unset($after_tracks[$track1->id]->updated_at);
+
+        self::assertEquals($after_tracks, $before_tracks);
+    }
 }

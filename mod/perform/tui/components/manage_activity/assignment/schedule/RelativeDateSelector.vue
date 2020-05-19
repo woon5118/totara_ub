@@ -110,7 +110,7 @@ export default {
   components: { FormSelect, FormNumber, FormScope, Label },
   props: {
     path: {
-      type: String,
+      type: [String, Array],
       required: true,
     },
     disabled: {

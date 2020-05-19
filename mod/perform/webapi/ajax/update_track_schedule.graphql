@@ -22,6 +22,11 @@ mutation mod_perform_update_track_schedule(
       due_date_relative_count
       due_date_relative_unit
       repeating_is_enabled
+      repeating_relative_type
+      repeating_relative_count
+      repeating_relative_unit
+      repeating_is_limited
+      repeating_limit
       assignments {
         type
         group {

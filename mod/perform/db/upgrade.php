@@ -1346,7 +1346,54 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020060401, 'perform');
     }
 
-    if ($oldversion < 2020060500) {
+    if ($oldversion < 2020060800) {
+        $table = new xmldb_table('perform_track');
+
+        // Define field repeating_relative_type to be added to perform_track.
+        $field = new xmldb_field('repeating_relative_type', XMLDB_TYPE_INTEGER, '2', null, null, null, null, 'repeating_is_enabled');
+
+        // Conditionally launch add field repeating_relative_type.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field repeating_relative_count to be added to perform_track.
+        $field = new xmldb_field('repeating_relative_count', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'repeating_type');
+
+        // Conditionally launch add field repeating_relative_count.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field repeating_relative_unit to be added to perform_track.
+        $field = new xmldb_field('repeating_relative_unit', XMLDB_TYPE_INTEGER, '2', null, null, null, null, 'repeating_relative_count');
+
+        // Conditionally launch add field repeating_relative_unit.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field repeating_is_limited to be added to perform_track.
+        $field = new xmldb_field('repeating_is_limited', XMLDB_TYPE_INTEGER, '1', null, null, null, null, 'repeating_relative_unit');
+
+        // Conditionally launch add field repeating_is_limited.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field repeating_limit to be added to perform_track.
+        $field = new xmldb_field('repeating_limit', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'repeating_is_limited');
+
+        // Conditionally launch add field repeating_limit.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020060800, 'perform');
+    }
+
+    if ($oldversion < 2020061000) {
         // Changing precision of field title on table perform_section to 1024.
         $table = new xmldb_table('perform_section');
         $field = new xmldb_field('title', XMLDB_TYPE_CHAR, '1024', null, XMLDB_NOTNULL, null, null, 'activity_id');
@@ -1355,7 +1402,7 @@ function xmldb_perform_upgrade($oldversion) {
         $dbman->change_field_precision($table, $field);
 
         // Perform savepoint reached.
-        upgrade_mod_savepoint(true, 2020060500, 'perform');
+        upgrade_mod_savepoint(true, 2020061000, 'perform');
     }
 
     return true;

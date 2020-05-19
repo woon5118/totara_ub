@@ -33,9 +33,6 @@ abstract class schedule_constants {
     public const WEEK = 'WEEK';
     public const MONTH = 'MONTH';
 
-    public const ONE_PER_SUBJECT = 'ONE_PER_SUBJECT';
-    public const ONE_PER_JOB = 'ONE_PER_JOB';
-
     /**
      * Ensure the supplied direction is valid for use in the mod_perform/dates namespace.
      *
@@ -55,17 +52,6 @@ abstract class schedule_constants {
     public static function validate_unit(string $unit): void {
         if (!in_array($unit, [self::DAY, self::WEEK, self::MONTH])) {
             throw new coding_exception(sprintf('Invalid unit %s', $unit));
-        }
-    }
-
-    /**
-     * Ensure the supplied subject instance generation method is valid for use in the mod_perform/dates namespace.
-     *
-     * @param string $method
-     */
-    public static function validate_method(string $method): void {
-        if (!in_array($method, [self::ONE_PER_SUBJECT, self::ONE_PER_JOB])) {
-            throw new coding_exception(sprintf('Invalid method %s', $method));
         }
     }
 }
