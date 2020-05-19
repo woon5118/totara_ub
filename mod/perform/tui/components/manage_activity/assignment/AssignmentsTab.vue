@@ -2,21 +2,23 @@
   <div class="tui-performManageActivityAssignmentsForm">
     <Grid
       class="tui-performManageActivityAssignmentsForm__heading"
-      :stack-at="768"
+      :stack-at="600"
+      :use-vertical-gap="false"
     >
-      <GridItem :grows="true">
+      <GridItem grows>
         <h3 class="tui-performManageActivityAssignmentsForm__heading-title">
           {{ $str('user_group_assignment_title', 'mod_perform') }}
         </h3>
       </GridItem>
       <GridItem
-        :units="2"
-        :class="'tui-performManageActivityAssignmentsForm__heading-buttons'"
+        grows
+        :units="1"
+        class="tui-performManageActivityAssignmentsForm__heading-buttons"
       >
         <Dropdown
-          :class="'tui-performManageActivityAssignmentsForm__heading-dropdown'"
+          class="tui-performManageActivityAssignmentsForm__heading-dropdown"
           :separator="true"
-          position="bottom-right"
+          :position="dropdownPosition"
         >
           <template v-slot:trigger="{ toggle, isOpen }">
             <Button
@@ -37,7 +39,7 @@
     </Grid>
 
     <Table
-      :class="'tui-performManageActivityAssignmentsForm__table'"
+      class="tui-performManageActivityAssignmentsForm__table"
       :data="assignments.length > 0 ? assignments : noAssignments"
     >
       <template v-slot:header-row>
@@ -184,6 +186,15 @@ export default {
       adminEnum: 1,
       cohortEnum: 1,
     };
+  },
+
+  computed: {
+    /**
+     * Get the position of the dropdown menu based upon the viewport size.
+     */
+    dropdownPosition() {
+      return screen.width > 600 ? 'bottom-right' : 'bottom-left';
+    },
   },
 
   watch: {

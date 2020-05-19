@@ -35,7 +35,12 @@
     }
 
     &-dropdown {
-      margin-left: auto;
+      @media (min-width: $tui-screen-xs) {
+        margin-left: auto;
+      }
+      @media (max-width: $tui-screen-xs) {
+        margin-top: var(--tui-gap-2);
+      }
     }
   }
 

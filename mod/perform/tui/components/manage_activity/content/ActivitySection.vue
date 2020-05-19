@@ -24,8 +24,8 @@
 <template>
   <Card class="mod-perform-activitySection">
     <Grid>
-      <GridItem :units="8" />
-      <GridItem :units="4">
+      <GridItem grows :units="1" />
+      <GridItem grows :units="1">
         <div class="mod-perform-activitySection__action-buttons">
           <Button
             :text="$str('edit_content', 'mod_perform')"
