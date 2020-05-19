@@ -26,8 +26,7 @@
 #page-footer {
   margin-top: $line-height-computed;
   padding: 0;
-  background-color: var(--tui-color-neutral-3);
-  border: transparent;
+  border-top: 1px solid var(--tui-color-neutral-5);
 
   .page-footer-main-content {
     a:link,
