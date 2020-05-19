@@ -34,9 +34,20 @@ $icons = [
             'classes' => 'fa-bell-slash',
         ],
     ],
+
     'mod_perform|icon' => [
         'data' => [
             'classes' => 'fa-compass',
+        ]
+    ],
+    'mod_perform|once-off' => [
+        'data' => [
+            'classes' => 'fa-sticky-note',
+        ],
+    ],
+    'mod_perform|repeat' => [
+        'data' => [
+            'classes' => 'fa-repeat',
         ],
     ],
 ];

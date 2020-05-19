@@ -22,29 +22,39 @@
  * @category test
  */
 
+use mod_perform\models\activity\activity;
+use mod_perform\models\activity\track;
+use totara_core\advanced_feature;
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 require_once(__DIR__ . '/generator/activity_generator_configuration.php');
 require_once(__DIR__ . '/webapi_resolver_mutation_update_track_schedule.php');
 
-use totara_webapi\phpunit\webapi_phpunit_helper;
-use totara_core\advanced_feature;
-
 /**
  * @group perform
  */
-class mod_perform_webapi_resolver_mutation_update_track_schedule_open_fixed_testcase
+class mod_perform_webapi_resolver_mutation_update_track_schedule_testcase
     extends mod_perform_webapi_resolver_mutation_update_track_schedule_base {
 
-    private const MUTATION = 'mod_perform_update_track_schedule';
+    protected const MUTATION = 'mod_perform_update_track_schedule';
 
     use webapi_phpunit_helper;
 
-    public function test_correct_track_is_updated(): void {
-        global $DB;
+    public function test_user_cannot_update_without_permission(): void {
+        self::setAdminUser();
+
+        /** @var mod_perform_generator $perform_generator */
+        $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        $activities = $perform_generator->create_full_activities();
+
+        /** @var activity $activity1 */
+        $activity1 = $activities->first();
+        /** @var track $track1 */
+        $track1 = $activity1->get_tracks()->first();
 
         $args = [
             'track_schedule' => [
-                'track_id' => $this->track1_id,
+                'track_id' => $track1->id,
                 'schedule_is_open' => true,
                 'schedule_is_fixed' => true,
                 'schedule_fixed_from' => 222,
@@ -53,44 +63,11 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_fixed_test
             ],
         ];
 
-        $before_tracks = $DB->get_records('perform_track', [], 'id');
-        self::assertCount(4, $before_tracks);
-        unset($before_tracks[$this->track1_id]->updated_at);
+        $user = self::getDataGenerator()->create_user();
+        self::setUser($user);
 
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
-        $this->assert_webapi_operation_successful($result);
-
-        $result = $this->get_webapi_operation_data($result);
-        $result_track = $result['track'];
-
-        // Verify the resulting graphql data.
-        self::assertEquals($this->track1_id, $result_track['id']);
-        self::assertTrue($result_track['schedule_is_open']);
-        self::assertTrue($result_track['schedule_is_fixed']);
-        self::assertEquals(222, $result_track['schedule_fixed_from']);
-        self::assertNull($result_track['schedule_fixed_to']);
-        self::assertNull($result_track['schedule_dynamic_count_from']);
-        self::assertNull($result_track['schedule_dynamic_count_to']);
-        self::assertNull($result_track['schedule_dynamic_unit']);
-        self::assertNull($result_track['schedule_dynamic_direction']);
-
-        // Manually make the changes that we expect to make.
-        $affected_track = $before_tracks[$this->track1_id];
-        $affected_track->schedule_is_open = 1;
-        $affected_track->schedule_is_fixed = 1;
-        $affected_track->schedule_fixed_from = 222;
-        $affected_track->schedule_fixed_to = null;
-        $affected_track->schedule_dynamic_count_from = null;
-        $affected_track->schedule_dynamic_count_to = null;
-        $affected_track->schedule_dynamic_unit = null;
-        $affected_track->schedule_dynamic_direction = null;
-        $affected_track->schedule_needs_sync = 1;
-        $affected_track->due_date_is_enabled = 0;
-        $affected_track->repeating_is_enabled = 0;
-
-        $after_tracks = $DB->get_records('perform_track', [], 'id');
-        unset($after_tracks[$this->track1_id]->updated_at);
-        self::assertEquals($after_tracks, $before_tracks);
+        $this->assert_webapi_operation_failed($result, 'accessible');
     }
 
     public function test_failed_ajax_call(): void {
@@ -124,7 +101,4 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_fixed_test
         $this->assert_webapi_operation_failed($result, "$track_id");
     }
 
-    public function test_with_validation_errors(): void {
-        // None currently, but we will have when additional fields are added.
-    }
 }

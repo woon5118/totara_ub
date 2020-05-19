@@ -52,6 +52,7 @@ use moodle_exception;
  * @property-read string $schedule_dynamic_unit
  * @property-read string $schedule_dynamic_direction
  * @property-read bool $due_date_is_enabled
+ * @property-read bool $repeating_is_enabled
  * @property-read int $created_at
  * @property-read int $updated_at
  *
@@ -72,6 +73,7 @@ class track extends model {
         'schedule_dynamic_count_from',
         'schedule_dynamic_count_to',
         'due_date_is_enabled',
+        'repeating_is_enabled',
         'created_at',
         'updated_at',
     ];
@@ -121,6 +123,7 @@ class track extends model {
         $entity->schedule_dynamic_unit = null;
         $entity->schedule_dynamic_direction = null;
         $entity->due_date_is_enabled = false;
+        $entity->repeating_is_enabled = false;
         $entity->save();
 
         return new track($entity);
@@ -398,6 +401,7 @@ class track extends model {
      * Disable the due date
      *
      * Clears all due date related fields.
+     * After calling, use track::update to save the changes to the DB
      */
     public function update_due_date_disabled(): void {
         $entity = $this->entity;
@@ -467,6 +471,39 @@ class track extends model {
             track_entity::SCHEDULE_DYNAMIC_UNIT_WEEK => schedule_constants::WEEK,
             track_entity::SCHEDULE_DYNAMIC_UNIT_MONTH => schedule_constants::MONTH,
         ];
+    }
+    /**
+     * Disable repeating
+     *
+     * Clears all repeating related fields.
+     * After calling, use track::update to save the changes to the DB
+     */
+    public function set_repeating_disabled(): void {
+        $entity = $this->entity;
+
+        $entity->repeating_is_enabled = false;
+    }
+
+    /**
+     * Set repeating to
+     *
+     * After calling, use track::update to save the changes to the DB
+     *
+     * TODO add params and/or split function
+     */
+    public function set_repeating_enabled(): void {
+        $entity = $this->entity;
+
+        $entity->repeating_is_enabled = true;
+    }
+
+    /**
+     * Saves changes to this model to the database
+     *
+     * Validation is performed before saving occurs. If validation fails, an exception is thrown.
+     */
+    public function update(): void {
+        $this->entity->update();
     }
 
     public static function get_dynamic_schedule_directions(): array {

@@ -28,51 +28,19 @@ require_once(__DIR__ . '/webapi_resolver_mutation_update_track_schedule.php');
 use mod_perform\entities\activity\track as track_entity;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\track;
-use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
+use totara_core\advanced_feature;
 
 
 /**
  * @group perform
  */
 class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_testcase
-    extends mod_perform_webapi_resolver_mutation_update_track_schedule_testcase {
+    extends mod_perform_webapi_resolver_mutation_update_track_schedule_base {
 
     private const MUTATION = 'mod_perform_update_track_schedule';
 
     use webapi_phpunit_helper;
-
-    public function test_user_cannot_update_without_permission(): void {
-        self::setAdminUser();
-
-        /** @var mod_perform_generator $perform_generator */
-        $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
-        $activities = $perform_generator->create_full_activities();
-
-
-        /** @var activity $activity1 */
-        $activity1 = $activities->first();
-        /** @var track $track1 */
-        $track1 = $activity1->get_tracks()->first();
-
-        $args = [
-            'track_schedule' => [
-                'track_id' => $track1->id,
-                'schedule_is_open' => false,
-                'schedule_is_fixed' => false,
-                'schedule_dynamic_count_from' => 555,
-                'schedule_dynamic_count_to' => 444,
-                'schedule_dynamic_unit' => 'MONTH',
-                'schedule_dynamic_direction' => 'BEFORE',
-                'due_date_is_enabled' => false,
-            ],
-        ];
-
-        $user = self::getDataGenerator()->create_user();
-        self::setUser($user);
-        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
-        $this->assert_webapi_operation_failed($result, 'accessible');
-    }
 
     public function test_correct_track_is_updated(): void {
         global $DB;
@@ -102,6 +70,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_
                 'schedule_dynamic_unit' => 'MONTH',
                 'schedule_dynamic_direction' => 'BEFORE',
                 'due_date_is_enabled' => false,
+                'repeating_is_enabled' => false,
             ],
         ];
 
@@ -138,6 +107,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_
         $affected_track->schedule_dynamic_direction = track_entity::SCHEDULE_DYNAMIC_DIRECTION_BEFORE;
         $affected_track->schedule_needs_sync = 1;
         $affected_track->due_date_is_enabled = 0;
+        $affected_track->repeating_is_enabled = 0;
 
         $after_tracks = $DB->get_records('perform_track', [], 'id');
         unset($after_tracks[$track1->id]->updated_at);
@@ -157,6 +127,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_
                 'schedule_dynamic_count_from' => 200,
                 'schedule_dynamic_count_to' => 100,
                 'due_date_is_enabled' => false,
+                'repeating_is_enabled' => false,
             ],
         ];
 
@@ -166,6 +137,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_
             '"count_from" must not be after "count_to" when dynamic schedule direction is "AFTER"'
         );
     }
+
 
     public function test_failed_ajax_query(): void {
         self::setAdminUser();
@@ -180,6 +152,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_
                 'schedule_dynamic_unit' => 'MONTH',
                 'schedule_dynamic_direction' => 'BEFORE',
                 'due_date_is_enabled' => false,
+                'repeating_is_enabled' => false,
             ],
         ];
 

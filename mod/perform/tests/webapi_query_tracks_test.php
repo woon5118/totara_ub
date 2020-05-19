@@ -172,6 +172,7 @@ class mod_perform_webapi_query_tracks_testcase extends advanced_testcase {
             'schedule_dynamic_unit' => $resolve('schedule_dynamic_unit'),
             'schedule_dynamic_direction' => $resolve('schedule_dynamic_direction'),
             'due_date_is_enabled' => $resolve('due_date_is_enabled'),
+            'repeating_is_enabled' => $resolve('repeating_is_enabled'),
         ];
     }
 }

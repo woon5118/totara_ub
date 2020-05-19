@@ -87,7 +87,7 @@ class update_track_schedule implements mutation_resolver, has_middleware {
                 );
             }
         }
-            
+
         // Due date (has a small dependency on is_open and is_fixed).
         if ($track_schedule['due_date_is_enabled']) {
             if (false && $track_schedule['schedule_is_open'] && $track_schedule['schedule_is_fixed']) { // TODO in next patch.
@@ -110,6 +110,15 @@ class update_track_schedule implements mutation_resolver, has_middleware {
         } else { // Disabled.
             $track->update_due_date_disabled();
         }
+
+        // Repeating.
+        if ($track_schedule['repeating_is_enabled']) {
+            $track->set_repeating_enabled(); // TODO add params
+        } else { // Disabled.
+            $track->set_repeating_disabled();
+        }
+
+        $track->update();
 
         $ec->set_relevant_context($context);
 

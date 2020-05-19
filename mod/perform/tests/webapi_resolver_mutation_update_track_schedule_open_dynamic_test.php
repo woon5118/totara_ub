@@ -25,7 +25,6 @@
 use mod_perform\entities\activity\track as track_entity;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\track;
-use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 require_once(__DIR__ . '/generator/activity_generator_configuration.php');
@@ -34,41 +33,12 @@ require_once(__DIR__ . '/webapi_resolver_mutation_update_track_schedule.php');
 /**
  * @group perform
  */
-class mod_perform_webapi_resolver_mutation_update_track_schedule_open_dynamic_testcasee
-    extends mod_perform_webapi_resolver_mutation_update_track_schedule_testcase {
-    protected const MUTATION = 'mod_perform_update_track_schedule';
+class mod_perform_webapi_resolver_mutation_update_track_schedule_open_dynamic_testcase
+    extends mod_perform_webapi_resolver_mutation_update_track_schedule_base {
+
+    private const MUTATION = 'mod_perform_update_track_schedule';
 
     use webapi_phpunit_helper;
-
-    public function test_user_cannot_update_without_permission(): void {
-        self::setAdminUser();
-
-        /** @var mod_perform_generator $perform_generator */
-        $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
-        $activities = $perform_generator->create_full_activities();
-
-        /** @var activity $activity1 */
-        $activity1 = $activities->first();
-        /** @var track $track1 */
-        $track1 = $activity1->get_tracks()->first();
-
-        $args = [
-            'track_schedule' => [
-                'track_id' => $track1->id,
-                'schedule_is_open' => true,
-                'schedule_is_fixed' => false,
-                'schedule_dynamic_count_from' => 555,
-                'schedule_dynamic_unit' => 'MONTH',
-                'schedule_dynamic_direction' => 'BEFORE',
-                'due_date_is_enabled' => false,
-            ],
-        ];
-
-        $user = self::getDataGenerator()->create_user();
-        self::setUser($user);
-        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
-        $this->assert_webapi_operation_failed($result, 'accessible');
-    }
 
     public function test_correct_track_is_updated(): void {
         global $DB;
@@ -97,6 +67,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_dynamic_te
                 'schedule_dynamic_unit' => 'MONTH',
                 'schedule_dynamic_direction' => 'BEFORE',
                 'due_date_is_enabled' => false,
+                'repeating_is_enabled' => false,
             ],
         ];
 
@@ -133,6 +104,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_dynamic_te
         $affected_track->schedule_dynamic_direction = track_entity::SCHEDULE_DYNAMIC_DIRECTION_BEFORE;
         $affected_track->schedule_needs_sync = 1;
         $affected_track->due_date_is_enabled = 0;
+        $affected_track->repeating_is_enabled = 0;
 
         $after_tracks = $DB->get_records('perform_track', [], 'id');
         unset($after_tracks[$track1->id]->updated_at);
@@ -150,6 +122,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_dynamic_te
                 'schedule_dynamic_direction' => 'AFTER',
                 'schedule_dynamic_count_from' => -234,
                 'due_date_is_enabled' => false,
+                'repeating_is_enabled' => false,
             ],
         ];
 
@@ -160,48 +133,5 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_dynamic_te
             'mod_perform_update_track_schedule',
             $args
         );
-    }
-
-    public function test_failed_ajax_query(): void {
-        self::setAdminUser();
-
-        /** @var mod_perform_generator $perform_generator */
-        $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
-        $activities = $perform_generator->create_full_activities();
-
-        /** @var activity $activity1 */
-        $activity1 = $activities->first();
-        /** @var track $track1 */
-        $track1 = $activity1->get_tracks()->first();
-
-        $args = [
-            'track_schedule' => [
-                'track_id' => $track1->id,
-                'schedule_is_open' => true,
-                'schedule_is_fixed' => false,
-                'schedule_dynamic_count_from' => 555,
-                'schedule_dynamic_unit' => 'MONTH',
-                'schedule_dynamic_direction' => 'BEFORE',
-                'due_date_is_enabled' => false,
-            ],
-        ];
-
-        $feature = 'performance_activities';
-        advanced_feature::disable($feature);
-        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
-        $this->assert_webapi_operation_failed($result, $feature);
-        advanced_feature::enable($feature);
-
-        $result = $this->parsed_graphql_operation(self::MUTATION, []);
-        $this->assert_webapi_operation_failed($result, 'track_schedule');
-
-        $args['track_schedule']['track_id'] = 0;
-        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
-        $this->assert_webapi_operation_failed($result, 'track id');
-
-        $track_id = 1293;
-        $args['track_schedule']['track_id'] = $track_id;
-        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
-        $this->assert_webapi_operation_failed($result, "$track_id");
     }
 }

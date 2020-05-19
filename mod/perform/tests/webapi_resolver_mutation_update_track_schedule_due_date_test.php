@@ -22,7 +22,6 @@
  * @category test
  */
 
-use mod_perform\entities\activity\track as track_entity;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\track;
 use totara_webapi\phpunit\webapi_phpunit_helper;
@@ -34,38 +33,9 @@ require_once(__DIR__ . '/webapi_resolver_mutation_update_track_schedule.php');
  * @group perform
  */
 class mod_perform_webapi_resolver_mutation_update_track_due_date_testcase
-    extends mod_perform_webapi_resolver_mutation_update_track_schedule_testcase {
+    extends mod_perform_webapi_resolver_mutation_update_track_schedule_base {
 
     use webapi_phpunit_helper;
-
-    public function test_user_cannot_update_without_permission(): void {
-        self::setAdminUser();
-
-        /** @var mod_perform_generator $perform_generator */
-        $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
-        $activities = $perform_generator->create_full_activities();
-
-        /** @var activity $activity1 */
-        $activity1 = $activities->first();
-        /** @var track $track1 */
-        $track1 = $activity1->get_tracks()->first();
-
-        $args = [
-            'track_schedule' => [
-                'track_id' => $track1->id,
-                'schedule_is_open' => true,
-                'schedule_is_fixed' => true,
-                'schedule_fixed_from' => 222,
-                'due_date_is_enabled' => false,
-            ],
-        ];
-
-        $user = self::getDataGenerator()->create_user();
-        self::setUser($user);
-
-        $result = $this->parsed_graphql_operation('mod_perform_update_track_schedule', $args);
-        $this->assert_webapi_operation_failed($result, 'accessible');
-    }
 
     public function test_correct_track_is_disabled(): void {
         global $DB;
@@ -80,9 +50,6 @@ class mod_perform_webapi_resolver_mutation_update_track_due_date_testcase
         $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
         $activities = $perform_generator->create_full_activities($configuration);
 
-        // Before we test, set them all to enabled, so we can see the effect of changing to disabled.
-        $DB->set_field('perform_track', 'due_date_is_enabled', true);
-
         /** @var activity $activity1 */
         $activity1 = $activities->first();
         /** @var track $track1 */
@@ -95,6 +62,7 @@ class mod_perform_webapi_resolver_mutation_update_track_due_date_testcase
                 'schedule_is_fixed' => true,
                 'schedule_fixed_from' => 222,
                 'due_date_is_enabled' => false,
+                'repeating_is_enabled' => false,
             ],
         ];
 
@@ -110,14 +78,6 @@ class mod_perform_webapi_resolver_mutation_update_track_due_date_testcase
 
         // Verify the resulting graphql data.
         self::assertEquals($track1->id, $result_track->id);
-        self::assertTrue($result_track->schedule_is_open);
-        self::assertTrue($result_track->schedule_is_fixed);
-        self::assertEquals($result_track->schedule_fixed_from, 222);
-        self::assertNull($result_track->schedule_fixed_to);
-        self::assertNull($result_track->schedule_dynamic_count_from);
-        self::assertNull($result_track->schedule_dynamic_count_to);
-        self::assertNull($result_track->schedule_dynamic_unit);
-        self::assertNull($result_track->schedule_dynamic_direction);
         self::assertFalse($result_track->due_date_is_enabled);
 
         // Manually make the changes that we expect to make.
@@ -132,7 +92,7 @@ class mod_perform_webapi_resolver_mutation_update_track_due_date_testcase
         $affected_track->schedule_dynamic_direction = null;
         $affected_track->schedule_needs_sync = 1;
         $affected_track->due_date_is_enabled = 0;
-
+        $affected_track->repeating_is_enabled = 0;
         $after_tracks = $DB->get_records('perform_track', [], 'id');
         unset($after_tracks[$track1->id]->updated_at);
 
@@ -167,7 +127,7 @@ class mod_perform_webapi_resolver_mutation_update_track_due_date_testcase
                 'schedule_is_fixed' => true,
                 'schedule_fixed_from' => 222,
                 'due_date_is_enabled' => true,
-                // TODO specify a fixed due date
+                'repeating_is_enabled' => false,
             ],
         ];
 
@@ -183,14 +143,6 @@ class mod_perform_webapi_resolver_mutation_update_track_due_date_testcase
 
         // Verify the resulting graphql data.
         self::assertEquals($track1->id, $result_track->id);
-        self::assertTrue($result_track->schedule_is_open);
-        self::assertTrue($result_track->schedule_is_fixed);
-        self::assertEquals($result_track->schedule_fixed_from, 222);
-        self::assertNull($result_track->schedule_fixed_to);
-        self::assertNull($result_track->schedule_dynamic_count_from);
-        self::assertNull($result_track->schedule_dynamic_count_to);
-        self::assertNull($result_track->schedule_dynamic_unit);
-        self::assertNull($result_track->schedule_dynamic_direction);
         self::assertTrue($result_track->due_date_is_enabled);
         // TODO Check due date field
 
@@ -206,8 +158,7 @@ class mod_perform_webapi_resolver_mutation_update_track_due_date_testcase
         $affected_track->schedule_dynamic_direction = null;
         $affected_track->schedule_needs_sync = 1;
         $affected_track->due_date_is_enabled = 1;
-        // TODO Set due date field
-
+        $affected_track->repeating_is_enabled = 0;
         $after_tracks = $DB->get_records('perform_track', [], 'id');
         unset($after_tracks[$track1->id]->updated_at);
 

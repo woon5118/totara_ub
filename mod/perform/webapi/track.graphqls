@@ -34,6 +34,7 @@ type mod_perform_track {
   schedule_dynamic_unit: mod_perform_track_dynamic_unit_enums
   schedule_dynamic_direction: mod_perform_track_dynamic_direction_enums
   due_date_is_enabled: Boolean!
+  repeating_is_enabled: Boolean!
   assignments: [mod_perform_track_assignment!]!
 }
 
@@ -74,6 +75,7 @@ input mod_perform_track_schedule_input {
   schedule_dynamic_unit: mod_perform_track_dynamic_unit_enums
   schedule_dynamic_direction: mod_perform_track_dynamic_direction_enums
   due_date_is_enabled: param_boolean!
+  repeating_is_enabled: param_boolean!
 }
 
 """

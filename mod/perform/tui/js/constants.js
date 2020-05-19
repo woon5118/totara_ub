@@ -27,6 +27,8 @@ export const NOTIFICATION_DURATION = 10 * 1000; // 10 seconds (in milliseconds)
 
 export const DUE_DATE_IS_ENABLED = 'enabled';
 export const DUE_DATE_IS_DISABLED = 'disabled';
+export const REPEATING_IS_ENABLED = 'enabled';
+export const REPEATING_IS_DISABLED = 'disabled';
 export const SCHEDULE_IS_DYNAMIC = 'dynamic';
 export const SCHEDULE_IS_FIXED = 'fixed';
 export const SCHEDULE_IS_LIMITED = 'limited';

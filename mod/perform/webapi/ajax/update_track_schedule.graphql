@@ -15,6 +15,7 @@ mutation mod_perform_update_track_schedule(
       schedule_dynamic_unit
       schedule_dynamic_direction
       due_date_is_enabled
+      repeating_is_enabled
       assignments {
         type
         group {

@@ -107,6 +107,56 @@
     </div>
     <div class="tui_performAssignmentSchedule__toggle-setting-group">
       <h4>
+        {{ $str('schedule_creation_frequency', 'mod_perform') }}
+      </h4>
+      <div class="tui_performAssignmentScheduleToggles__toggle-group">
+        <div class="tui_performAssignmentScheduleToggles__toggle-set">
+          <ToggleSet
+            :value="repeating"
+            @input="$emit('update:repeating', $event)"
+          >
+            <ToggleButtonIcon
+              :label="
+                $str('schedule_creation_frequency_once_off', 'mod_perform')
+              "
+              class="tui_performAssignmentScheduleToggles__toggle-button"
+              :value="REPEATING_IS_DISABLED"
+            >
+              <div
+                class="tui_performAssignmentScheduleToggles__toggle-button-content"
+              >
+                <RepeatingDisabled :size="300" />
+                <div class="tui_performAssignmentScheduleToggles__button-label">
+                  {{
+                    $str('schedule_creation_frequency_once_off', 'mod_perform')
+                  }}
+                </div>
+              </div>
+            </ToggleButtonIcon>
+            <ToggleButtonIcon
+              :label="
+                $str('schedule_creation_frequency_repeating', 'mod_perform')
+              "
+              class="tui_performAssignmentScheduleToggles__toggle-button"
+              :value="REPEATING_IS_ENABLED"
+            >
+              <div
+                class="tui_performAssignmentScheduleToggles__toggle-button-content"
+              >
+                <RepeatingEnabled :size="300" />
+                <div class="tui_performAssignmentScheduleToggles__button-label">
+                  {{
+                    $str('schedule_creation_frequency_repeating', 'mod_perform')
+                  }}
+                </div>
+              </div>
+            </ToggleButtonIcon>
+          </ToggleSet>
+        </div>
+      </div>
+    </div>
+    <div class="tui_performAssignmentSchedule__toggle-setting-group">
+      <h4>
         {{ $str('due_date', 'mod_perform') }}
       </h4>
       <div class="tui_performAssignmentScheduleToggles__toggle-group">
@@ -152,6 +202,8 @@ import ToggleButtonIcon from 'totara_core/components/buttons/ToggleButtonIcon';
 import ToggleSet from 'totara_core/components/buttons/ToggleSet';
 import EndDateEnabled from 'mod_perform/components/icons/EndDateEnabled';
 import EndDateDisabled from 'mod_perform/components/icons/EndDateDisabled';
+import RepeatingEnabled from 'mod_perform/components/icons/RepeatingEnabled';
+import RepeatingDisabled from 'mod_perform/components/icons/RepeatingDisabled';
 import {
   SCHEDULE_IS_OPEN,
   SCHEDULE_IS_LIMITED,
@@ -159,6 +211,8 @@ import {
   SCHEDULE_IS_DYNAMIC,
   DUE_DATE_IS_ENABLED,
   DUE_DATE_IS_DISABLED,
+  REPEATING_IS_ENABLED,
+  REPEATING_IS_DISABLED,
 } from 'mod_perform/constants';
 
 export default {
@@ -168,6 +222,8 @@ export default {
     ToggleSet,
     EndDateEnabled,
     EndDateDisabled,
+    RepeatingEnabled,
+    RepeatingDisabled,
   },
   props: {
     fixedDynamic: {
@@ -186,6 +242,12 @@ export default {
       validator: val =>
         [DUE_DATE_IS_ENABLED, DUE_DATE_IS_DISABLED].includes(val),
     },
+    repeating: {
+      required: true,
+      type: String,
+      validator: val =>
+        [REPEATING_IS_ENABLED, REPEATING_IS_DISABLED].includes(val),
+    },
   },
   data() {
     return {
@@ -195,6 +257,8 @@ export default {
       SCHEDULE_IS_DYNAMIC,
       DUE_DATE_IS_ENABLED,
       DUE_DATE_IS_DISABLED,
+      REPEATING_IS_ENABLED,
+      REPEATING_IS_DISABLED,
     };
   },
 };
@@ -203,7 +267,13 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
+      "due_date",
+      "due_date_is_enabled",
+      "due_date_is_disabled",
       "schedule_creation_range_and_date_type",
+      "schedule_creation_frequency",
+      "schedule_creation_frequency_once_off",
+      "schedule_creation_frequency_repeating",
       "schedule_is_dynamic",
       "schedule_is_fixed",
       "schedule_is_limited",

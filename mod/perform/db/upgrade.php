@@ -1119,6 +1119,7 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020052200, 'perform');
     }
 
+
     if ($oldversion < 2020052500) {
 
         // Define field schedule_needs_sync to be added to perform_track.
@@ -1130,7 +1131,6 @@ function xmldb_perform_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
-        // Perform savepoint reached.
         upgrade_mod_savepoint(true, 2020052500, 'perform');
     }
 
@@ -1168,7 +1168,21 @@ function xmldb_perform_upgrade($oldversion) {
             $dbman->add_key($table, $new_key);
         }
 
+        // Perform savepoint reached.
         upgrade_mod_savepoint(true, 2020052600, 'perform');
+    }
+    if ($oldversion < 2020052700) {
+        // Define field repeating_is_enabled to be added to perform_track.
+        $table = new xmldb_table('perform_track');
+        $field = new xmldb_field('repeating_is_enabled', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'due_date_is_enabled');
+
+        // Conditionally launch add field repeating_is_enabled.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020052700, 'perform');
     }
 
     return true;

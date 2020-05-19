@@ -27,6 +27,7 @@
       :fixed-dynamic.sync="scheduleFixedDynamic"
       :open-limited.sync="scheduleOpenLimited"
       :due-date.sync="scheduleDueDate"
+      :repeating.sync="scheduleRepeating"
     />
     <h4 class="tui_performAssignmentSchedule__range-type-heading">
       {{ scheduleRangeHeading }}
@@ -99,6 +100,8 @@ import {
   SCHEDULE_IS_OPEN,
   SCHEDULE_DYNAMIC_DIRECTION_BEFORE,
   SCHEDULE_DYNAMIC_UNIT_DAY,
+  REPEATING_IS_ENABLED,
+  REPEATING_IS_DISABLED,
 } from 'mod_perform/constants';
 
 const FIXED_SCHEDULE_SCOPE = 'fixed';
@@ -173,6 +176,14 @@ export default {
       scheduleDueDate = DUE_DATE_IS_ENABLED;
     }
 
+    let scheduleRepeating = REPEATING_IS_DISABLED;
+    if (
+      this.track.repeating_is_enabled === null ||
+      this.track.repeating_is_enabled
+    ) {
+      scheduleRepeating = REPEATING_IS_ENABLED;
+    }
+
     return {
       DUE_DATE_IS_ENABLED,
       DUE_DATE_IS_DISABLED,
@@ -187,6 +198,7 @@ export default {
       scheduleFixedDynamic,
       isSaving: false,
       scheduleDueDate,
+      scheduleRepeating,
     };
   },
   computed: {
@@ -237,6 +249,9 @@ export default {
     },
     dueDateIsEnabled() {
       return this.scheduleDueDate === DUE_DATE_IS_ENABLED;
+    },
+    repeatingIsEnabled() {
+      return this.scheduleRepeating === REPEATING_IS_ENABLED;
     },
   },
   methods: {
@@ -297,6 +312,7 @@ export default {
         schedule_is_open: this.scheduleIsOpen,
         schedule_is_fixed: this.scheduleIsFixed,
         due_date_is_enabled: this.dueDateIsEnabled,
+        repeating_is_enabled: this.repeatingIsEnabled,
         // Fixed schedule values.
         schedule_fixed_from: this.getUnixTime(
           formValues[FIXED_SCHEDULE_SCOPE].fixed_from
@@ -323,6 +339,7 @@ export default {
         'schedule_is_open',
         'schedule_is_fixed',
         'due_date_is_enabled',
+        'repeating_is_enabled',
       ];
 
       // Add fields specific to the current toggle permutation.

@@ -30,7 +30,7 @@ use mod_perform\models\activity\track;
 /**
  * @group perform
  */
-abstract class mod_perform_webapi_resolver_mutation_update_track_schedule_testcase extends advanced_testcase {
+abstract class mod_perform_webapi_resolver_mutation_update_track_schedule_base extends advanced_testcase {
 
     protected $track1_id;
 
@@ -57,6 +57,7 @@ abstract class mod_perform_webapi_resolver_mutation_update_track_schedule_testca
         $DB->set_field('perform_track', 'schedule_dynamic_unit', -1);
         $DB->set_field('perform_track', 'schedule_dynamic_direction', -1);
         $DB->set_field('perform_track', 'due_date_is_enabled', -1);
+        $DB->set_field('perform_track', 'repeating_is_enabled', -1);
 
         /** @var activity $activity1 */
         $activity1 = $activities->first();
