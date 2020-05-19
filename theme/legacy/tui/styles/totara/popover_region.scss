@@ -110,6 +110,7 @@ $popup-font-size-base: 1rem !default;
   visibility: visible;
   background-color: var(--tui-color-neutral-1);
   z-index: $popup-region-container-z-index;
+  box-shadow: var(--tui-shadow-3);
 }
 
 .popover-region-header-container {
