@@ -31,7 +31,7 @@
       >
         <div class="tui-adder">
           <div class="tui-adder__tabs">
-            <Tabs @input="tabChanged">
+            <Tabs :small-tabs="true" @input="tabChanged">
               <!-- Browse tab -->
               <Tab id="browse" :name="$str('adder_browse', 'totara_core')">
                 <!-- Browse Filters -->
