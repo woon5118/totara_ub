@@ -31,6 +31,10 @@
   }
 }
 
+.editor_atto_alert {
+  z-index: var(--tui-zindex-popover);
+}
+
 .editor_atto_alert .close {
   margin-right: -1px;
 }
