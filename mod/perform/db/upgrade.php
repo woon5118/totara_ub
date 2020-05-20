@@ -1036,5 +1036,40 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020051800, 'perform');
     }
 
+    if ($oldversion < 2020052000) {
+        // Define field schedule_dynamic_count_from to be added to perform_track.
+        $table = new xmldb_table('perform_track');
+        $field = new xmldb_field('schedule_dynamic_count_from', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'schedule_fixed_to');
+
+        // Conditionally launch add field schedule_dynamic_count_from.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('schedule_dynamic_count_to', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'schedule_dynamic_count_from');
+
+        // Conditionally launch add field schedule_dynamic_count_to.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('schedule_dynamic_unit', XMLDB_TYPE_INTEGER, '2', null, null, null, null, 'schedule_dynamic_count_to');
+
+        // Conditionally launch add field schedule_dynamic_unit.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('schedule_dynamic_direction', XMLDB_TYPE_INTEGER, '2', null, null, null, null, 'schedule_dynamic_unit');
+
+        // Conditionally launch add field schedule_dynamic_direction.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020052000, 'perform');
+    }
+
     return true;
 }
