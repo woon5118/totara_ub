@@ -114,6 +114,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_fixed_te
         $affected_track->schedule_dynamic_count_to = null;
         $affected_track->schedule_dynamic_unit = null;
         $affected_track->schedule_dynamic_direction = null;
+        $affected_track->schedule_needs_sync = 1;
         $affected_track->due_date_is_enabled = 0;
 
         $after_tracks = $DB->get_records('perform_track', [], 'id');

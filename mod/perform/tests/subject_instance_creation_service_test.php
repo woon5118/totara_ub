@@ -163,6 +163,24 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
         $this->assertEquals(0, subject_instance::repository()->count());
     }
 
+    public function test_instances_are_only_created_for_tracks_not_needing_sync() {
+        $data = $this->create_data();
+
+        /** @var track_entity $track */
+        $track = track_entity::repository()->find($data->track1->get_id());
+        $track->schedule_needs_sync = true;
+        $track->save();
+
+        // There should be three user assignments
+        $user_assignments = track_user_assignment::repository()->get();
+        $this->assertCount(3, $user_assignments);
+        $this->assertEquals(0, subject_instance::repository()->count());
+
+        $this->generate_instances();
+
+        $this->assertEquals(0, subject_instance::repository()->count());
+    }
+
     public function period_data_provider() {
         $yesterday = time() - 86400;
         $tomorrow = time() + 86400;

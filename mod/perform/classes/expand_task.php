@@ -34,6 +34,7 @@ use mod_perform\entities\activity\track_user_assignment;
 use mod_perform\entities\activity\track_user_assignment_via;
 use mod_perform\event\track_user_assigned_bulk;
 use mod_perform\event\track_user_unassigned;
+use mod_perform\models\activity\track as track_model;
 use mod_perform\user_groups\grouping;
 
 class expand_task {
@@ -276,11 +277,8 @@ class expand_task {
      * @return int|null
      */
     private function calculate_user_assignment_start_date(track $track, int $user_id): ?int {
-        if ($track->schedule_is_fixed) {
-            return $track->schedule_fixed_from;
-        }
-
-        return null;
+        $track_model = track_model::load_by_entity($track);
+        return $track_model->calculate_user_assignment_start_date($user_id);
     }
 
     /**
@@ -291,11 +289,8 @@ class expand_task {
      * @return int|null
      */
     private function calculate_user_assignment_end_date(track $track, int $user_id): ?int {
-        if ($track->schedule_is_fixed && !$track->schedule_is_open) {
-            return $track->schedule_fixed_to;
-        }
-
-        return null;
+        $track_model = track_model::load_by_entity($track);
+        return $track_model->calculate_user_assignment_end_date($user_id);
     }
 
     /**
@@ -413,6 +408,9 @@ class expand_task {
                     'updated_at' => time()
                 ]);
 
+            // Update the user assignment period according to track schedule settings.
+            $this->sync_schedule_for_user_assignments($deleted_user_assignments);
+
             // Trigger an event with all just newly reactivated user assignments
             track_user_assigned_bulk::create_from_user_assignments(
                 $assignment->track_id,
@@ -423,11 +421,38 @@ class expand_task {
     }
 
     /**
+     * @param collection|track_user_assignment[] $user_assignments
+     */
+    private function sync_schedule_for_user_assignments(collection $user_assignments): void {
+        // TODO: This will be replaced in TL-25161 with updates based on date resolver.
+        foreach ($user_assignments as $user_assignment) {
+            $user_assignment->period_start_date = $this->calculate_user_assignment_start_date(
+                $user_assignment->track,
+                $user_assignment->subject_user_id
+            );
+            $user_assignment->period_end_date = $this->calculate_user_assignment_end_date(
+                $user_assignment->track,
+                $user_assignment->subject_user_id
+            );
+            $user_assignment->save();
+        }
+    }
+
+    /**
      * Restore single user assignment
      *
      * @param track_user_assignment $user_assignment
      */
-    private function reactivate_user_assignment(track_user_assignment $user_assignment) {
+    private function reactivate_user_assignment(track_user_assignment $user_assignment): void {
+        // TODO TL-25161 update based on new date resolver.
+        $user_assignment->period_start_date = $this->calculate_user_assignment_start_date(
+            $user_assignment->track,
+            $user_assignment->subject_user_id
+        );
+        $user_assignment->period_end_date = $this->calculate_user_assignment_end_date(
+            $user_assignment->track,
+            $user_assignment->subject_user_id
+        );
         $user_assignment->deleted = false;
         $user_assignment->save();
     }

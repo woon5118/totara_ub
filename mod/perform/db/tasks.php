@@ -23,10 +23,20 @@
 
 use mod_perform\task\create_subject_instance_task;
 use mod_perform\task\expand_assignments_task;
+use mod_perform\task\sync_track_schedule_task;
 
 defined('MOODLE_INTERNAL') || die();
 
 $tasks = [
+    [
+        'classname' => sync_track_schedule_task::class,
+        'blocking' => 0,
+        'minute' => '*',
+        'hour' => '*',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    ],
     [
         'classname' => expand_assignments_task::class,
         'blocking' => 0,

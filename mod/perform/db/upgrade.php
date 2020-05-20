@@ -1119,5 +1119,20 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020052200, 'perform');
     }
 
+    if ($oldversion < 2020052500) {
+
+        // Define field schedule_needs_sync to be added to perform_track.
+        $table = new xmldb_table('perform_track');
+        $field = new xmldb_field('schedule_needs_sync', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'schedule_dynamic_direction');
+
+        // Conditionally launch add field schedule_needs_sync.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020052500, 'perform');
+    }
+
     return true;
 }

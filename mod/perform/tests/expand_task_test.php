@@ -197,6 +197,48 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, false);
     }
 
+    public function test_reactivated_user_assignment_gets_period_updated() {
+        $test_data = $this->prepare_assignments();
+        $track_id = $test_data->track1->id;
+        $user_id = $test_data->user1->id;
+
+        $now = time();
+        $test_data->track1->update_schedule_open_fixed($now);
+
+        // Add user to the cohort - we expect a user assignment with period according to track schedule settings.
+        $this->add_user_to_cohort($test_data->cohort1->id, $user_id);
+        (new expand_task())->expand_single($test_data->assignment1->id);
+        $this->assert_user_assignment_period($track_id, $user_id, $now, null);
+
+        // Remove user from cohort - period values should not be affected
+        $this->remove_user_from_cohort($test_data->cohort1->id, $user_id);
+        (new expand_task())->expand_single($test_data->assignment1->id);
+        $this->assert_user_assignment_period($track_id, $user_id, $now, null);
+
+        // User assignment is now marked as deleted
+        $this->assert_track_has_user_assignments($track_id, $user_id, true);
+
+        // Change the schedule for the track
+        $tomorrow = time() + 86400;
+        $yesterday = time() - 86400;
+        $test_data->track1->update_schedule_closed_fixed($yesterday, $tomorrow);
+
+        // Re-add user to cohort - we expect the reactivated user assignment gets the updated period settings
+        $this->add_user_to_cohort($test_data->cohort1->id, $user_id);
+        (new expand_task())->expand_single($test_data->assignment1->id);
+        $this->assert_user_assignment_period($track_id, $user_id, $yesterday, $tomorrow);
+    }
+
+    private function assert_user_assignment_period(int $track_id, int $user_id, ?int $start, ?int $end) {
+        /** @var track_user_assignment $user_assignment */
+        $user_assignment = track_user_assignment::repository()
+            ->where('track_id', $track_id)
+            ->where('subject_user_id', $user_id)
+            ->one();
+        $this->assertEquals($start, $user_assignment->period_start_date);
+        $this->assertEquals($end, $user_assignment->period_end_date);
+    }
+
     public function test_user_assignment_is_only_created_once() {
         $test_data = $this->prepare_assignments();
 

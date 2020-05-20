@@ -60,6 +60,8 @@ class subject_instance_creation {
     /**
      * Get all user assignments which do not yet have a subject instance and which have matching
      * period settings.
+     * Also skip tracks that need schedule synchronisation because that should happen before we create
+     * subject instances.
      *
      * @return collection
      */
@@ -71,6 +73,7 @@ class subject_instance_creation {
             ->filter_by_active()
             ->filter_by_active_track_and_activity()
             ->filter_by_time_interval()
+            ->filter_by_does_not_need_schedule_sync()
             ->with('track')
             ->get();
     }

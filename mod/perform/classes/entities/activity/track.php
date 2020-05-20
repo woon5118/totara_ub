@@ -45,11 +45,14 @@ use core\orm\entity\relations\has_many_through;
  * @property int $schedule_dynamic_unit one of SCHEDULE_DYNAMIC_UNIT_XXX or null
  * @property int $schedule_dynamic_direction one of SCHEDULE_DYNAMIC_DIRECTION_XXX or null
  * @property bool $due_date_is_enabled
+ * @property bool $schedule_needs_sync Flag indicating that the schedule sync task should run for this track
  * @property int $created_at record creation time
  * @property int $updated_at record modification time
  * @property-read collection|subject_instance[] $subject_instances
  * @property-read activity $activity
  * @property-read collection|track_assignment[] $assignments
+ *
+ * @method static track_repository repository()
  */
 class track extends entity {
     public const TABLE = 'perform_track';

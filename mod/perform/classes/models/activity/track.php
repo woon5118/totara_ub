@@ -27,6 +27,7 @@ use coding_exception;
 use core\orm\collection;
 use core\orm\entity\model;
 use mod_perform\entities\activity\track as track_entity;
+use mod_perform\state\activity\active;
 use mod_perform\user_groups\grouping;
 use moodle_exception;
 
@@ -448,6 +449,10 @@ class track extends model {
         $entity->schedule_dynamic_unit = $properties['schedule_dynamic_unit'] ?? null;
         $entity->schedule_dynamic_direction = $properties['schedule_dynamic_direction'] ?? null;
 
+        if ($this->get_activity()->get_status_state() instanceof active) {
+            $entity->schedule_needs_sync = true;
+        }
+
         $this->entity->update();
     }
 
@@ -464,5 +469,33 @@ class track extends model {
             track_entity::SCHEDULE_DYNAMIC_DIRECTION_AFTER => 'AFTER',
             track_entity::SCHEDULE_DYNAMIC_DIRECTION_BEFORE => 'BEFORE',
         ];
+    }
+
+    /**
+     * Calculate the assignment start date for a given user.
+     *
+     * @param int $user_id
+     * @return int|null
+     */
+    public function calculate_user_assignment_start_date(int $user_id) {
+        if ($this->schedule_is_fixed) {
+            return $this->schedule_fixed_from;
+        }
+
+        return null;
+    }
+
+    /**
+     * Calculate the assignment end date for a given user.
+     *
+     * @param int $user_id
+     * @return int|null
+     */
+    public function calculate_user_assignment_end_date(int $user_id) {
+        if ($this->schedule_is_fixed && !$this->schedule_is_open) {
+            return $this->schedule_fixed_to;
+        }
+
+        return null;
     }
 }

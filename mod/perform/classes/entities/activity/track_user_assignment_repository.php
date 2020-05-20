@@ -94,13 +94,28 @@ final class track_user_assignment_repository extends repository {
      */
     public function filter_by_active_track_and_activity(): self {
         if (!$this->has_join(track::TABLE, 'fbat')) {
-            $this->join([track::TABLE, 'fbat'], 'track_id', 'id')
-                ->join([activity::TABLE, 'fbaa'], 'fbat.activity_id', 'id')
-                ->where('fbat.status', track_status::ACTIVE)
-                ->where('fbaa.status', active::get_code());
+            $this->join([track::TABLE, 'fbat'], 'track_id', 'id');
+        }
+        if (!$this->has_join(activity::TABLE, 'fbaa')) {
+            $this->join([activity::TABLE, 'fbaa'], 'fbat.activity_id', 'id');
         }
 
+        $this->where('fbat.status', track_status::ACTIVE)
+            ->where('fbaa.status', active::get_code());
         return $this;
     }
 
+    /**
+     * Exclude records waiting for schedule synchronisation.
+     *
+     * @return $this
+     */
+    public function filter_by_does_not_need_schedule_sync(): self {
+        if (!$this->has_join(track::TABLE, 'fbat')) {
+            $this->join([track::TABLE, 'fbat'], 'track_id', 'id');
+        }
+        $this->where('fbat.schedule_needs_sync', false);
+
+        return $this;
+    }
 }

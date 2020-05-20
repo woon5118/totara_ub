@@ -165,6 +165,7 @@ $string['subject_instance_availability_open'] = 'Open';
 $string['subject_instance_status_complete'] = 'Complete';
 $string['subject_instance_status_in_progress'] = 'In progress';
 $string['subject_instance_status_not_started'] = 'Not started';
+$string['sync_track_schedule_task'] = 'Synchronize assignment schedules for performance activities';
 $string['system_activity_type:appraisal'] = 'Appraisal';
 $string['system_activity_type:check-in'] = 'Check-in';
 $string['system_activity_type:feedback'] = 'Feedback';

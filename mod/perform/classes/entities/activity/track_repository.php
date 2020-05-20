@@ -24,7 +24,41 @@
 namespace mod_perform\entities\activity;
 
 use core\orm\entity\repository;
+use mod_perform\models\activity\track_status;
+use mod_perform\state\activity\active;
 
 class track_repository extends repository {
+
+    /**
+     * Return only tracks marked for schedule synchronisation.
+     *
+     * @return $this
+     */
+    public function filter_by_schedule_needs_sync(): self {
+        $this->where('schedule_needs_sync', true);
+
+        return $this;
+    }
+
+    /**
+     * Return only active tracks.
+     *
+     * @return $this
+     */
+    public function filter_by_active(): self {
+        $this->where('status', track_status::ACTIVE);
+
+        return $this;
+    }
+
+    /**
+     * Return only tracks of active activities.
+     *
+     * @return $this
+     */
+    public function filter_by_active_activity(): self {
+        return $this->join([activity::TABLE, 'a'], 'activity_id', 'id')
+            ->where('a.status', active::get_code());
+    }
 
 }

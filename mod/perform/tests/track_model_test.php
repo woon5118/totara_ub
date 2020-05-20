@@ -24,9 +24,12 @@
 
 use core\collection;
 
+use mod_perform\entities\activity\activity as activity_entity;
+use mod_perform\models\activity\activity;
 use mod_perform\models\activity\track;
 use mod_perform\entities\activity\track as track_entity;
 use mod_perform\models\activity\track_status;
+use mod_perform\state\activity\active;
 use PHPUnit\Framework\MockObject\MockObject;
 
 /**
@@ -203,5 +206,59 @@ class mod_perform_track_model_testcase extends advanced_testcase {
                 'count_from" must not be before "count_to" when dynamic schedule direction is "BEFORE"'
             ],
         ];
+    }
+
+    public function update_schedule_methods_data_provider() {
+        return [
+            ['update_schedule_open_fixed', [111]],
+            ['update_schedule_closed_fixed', [111, 222]],
+            ['update_schedule_closed_dynamic', [111, 222, 1, 0]],
+            ['update_schedule_open_dynamic', [111, 1, 1]],
+        ];
+    }
+
+    /**
+     * @dataProvider update_schedule_methods_data_provider
+     * @param string $method_name
+     * @param array $params
+     */
+    public function test_schedule_sync_flag_is_set(string $method_name, array $params) {
+        $this->setAdminUser();
+
+        // Create an activity with a track.
+        $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        /** @var activity $activity */
+        $activity = $perform_generator->create_activity_in_container([
+            'create_track' => true,
+            'activity_status' => 'DRAFT'
+        ]);
+
+        $existing_tracks = track::load_by_activity($activity);
+        /** @var track $track */
+        $track = $existing_tracks->first();
+        /** @var track_entity $track_entity */
+        $track_entity = track_entity::repository()->find($track->get_id());
+        $this->assertEquals(0, $track_entity->schedule_needs_sync);
+
+        // Update method should not set flag because it's a draft.
+        $track->$method_name(...$params);
+        $track_entity->refresh();
+        $this->assertEquals(0, $track_entity->schedule_needs_sync);
+
+        // Set status to active.
+        /** @var activity_entity $activity_entity */
+        $activity_entity = activity_entity::repository()->find($activity->get_id());
+        $activity_entity->status = active::get_code();
+        $activity_entity->update();
+
+        // Update method should now set the flag because it's an active activity.
+        $existing_tracks = track::load_by_activity($activity);
+        /** @var track $track */
+        $track = $existing_tracks->first();
+        /** @var track_entity $track_entity */
+        $track_entity = track_entity::repository()->find($track->get_id());
+        $track->$method_name(...$params);
+        $track_entity->refresh();
+        $this->assertEquals(1, $track_entity->schedule_needs_sync);
     }
 }

@@ -131,6 +131,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_dynamic_te
         $affected_track->schedule_dynamic_count_to = null;
         $affected_track->schedule_dynamic_unit = track_entity::SCHEDULE_DYNAMIC_UNIT_MONTH;
         $affected_track->schedule_dynamic_direction = track_entity::SCHEDULE_DYNAMIC_DIRECTION_BEFORE;
+        $affected_track->schedule_needs_sync = 1;
         $affected_track->due_date_is_enabled = 0;
 
         $after_tracks = $DB->get_records('perform_track', [], 'id');
