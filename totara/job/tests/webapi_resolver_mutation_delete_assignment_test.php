@@ -57,7 +57,7 @@ class totara_job_webapi_resolver_mutation_delete_assignment_testcase extends adv
         $this->expectException(moodle_exception::class);
         $this->expectExceptionMessage('Course or activity not accessible. (You are not logged in)');
 
-        $this->resolve_grapqhl_mutation('totara_job_delete_assignment', ['userid' => $job1->userid, 'assignmentid' => $job2->id]);
+        $this->resolve_graphql_mutation('totara_job_delete_assignment', ['userid' => $job1->userid, 'assignmentid' => $job2->id]);
     }
 
     public function test_resolve_guestuser() {
@@ -69,7 +69,7 @@ class totara_job_webapi_resolver_mutation_delete_assignment_testcase extends adv
         $this->expectException(moodle_exception::class);
         $this->expectExceptionMessage('No permission to delete job assignments');
 
-        $this->resolve_grapqhl_mutation('totara_job_delete_assignment', ['userid' => $job1->userid, 'assignmentid' => $job2->id]);
+        $this->resolve_graphql_mutation('totara_job_delete_assignment', ['userid' => $job1->userid, 'assignmentid' => $job2->id]);
     }
 
     public function test_resolve_normaluser() {
@@ -82,7 +82,7 @@ class totara_job_webapi_resolver_mutation_delete_assignment_testcase extends adv
         $this->expectException(moodle_exception::class);
         $this->expectExceptionMessage('No permission to delete job assignments');
 
-        $this->resolve_grapqhl_mutation('totara_job_delete_assignment', ['userid' => $job1->userid, 'assignmentid' => $job2->id]);
+        $this->resolve_graphql_mutation('totara_job_delete_assignment', ['userid' => $job1->userid, 'assignmentid' => $job2->id]);
     }
 
     public function test_resolve_adminuser() {
@@ -94,14 +94,14 @@ class totara_job_webapi_resolver_mutation_delete_assignment_testcase extends adv
         $job2 = $this->create_job_assignment(['userid' => $job1->userid, 'idnumber' => 'j2']);
 
         self::assertCount(2, job_assignment::get_all($job1->userid));
-        $result = $this->resolve_grapqhl_mutation('totara_job_delete_assignment', ['assignmentid' => $job2->id, 'userid' => $job1->userid]);
+        $result = $this->resolve_graphql_mutation('totara_job_delete_assignment', ['assignmentid' => $job2->id, 'userid' => $job1->userid]);
         self::assertTrue($result);
         self::assertCount(1, job_assignment::get_all($job1->userid));
 
 
         // User defaults to current user, who doesn't have this job.
         try {
-            $this->resolve_grapqhl_mutation('totara_job_delete_assignment', ['assignmentid' => $job1->id]);
+            $this->resolve_graphql_mutation('totara_job_delete_assignment', ['assignmentid' => $job1->id]);
             $this->fail('Exception expected.');
         } catch (\moodle_exception $ex) {
             self::assertContains('Given Job Assignment does not belong to the given user.', $ex->getMessage());
@@ -109,7 +109,7 @@ class totara_job_webapi_resolver_mutation_delete_assignment_testcase extends adv
 
         // Incorrect Job ids
         try {
-            $this->resolve_grapqhl_mutation('totara_job_delete_assignment', ['userid' => $job1->userid, 'assignmentid' => 16]);
+            $this->resolve_graphql_mutation('totara_job_delete_assignment', ['userid' => $job1->userid, 'assignmentid' => 16]);
             $this->fail('Exception expected.');
         } catch (\moodle_exception $ex) {
             self::assertContains('Can not find data record in database', $ex->getMessage());
@@ -118,7 +118,7 @@ class totara_job_webapi_resolver_mutation_delete_assignment_testcase extends adv
         // Test job assignment belonging to deleted user.
         delete_user($DB->get_record('user', ['id' => $job1->userid]));
         try {
-            $this->resolve_grapqhl_mutation('totara_job_delete_assignment', ['userid' => $job1->userid, 'assignmentid' => $job1->id]);
+            $this->resolve_graphql_mutation('totara_job_delete_assignment', ['userid' => $job1->userid, 'assignmentid' => $job1->id]);
             self::fail('Expected a moodle_exception: cannot view job assignments');
         } catch (\dml_exception $ex) {
             self::assertContains('Can not find data record in database', $ex->getMessage());

@@ -58,7 +58,7 @@ class totara_job_webapi_resolver_mutation_move_assignments_testcase extends adva
         $this->expectException(moodle_exception::class);
         $this->expectExceptionMessage('Course or activity not accessible. (You are not logged in)');
 
-        $this->resolve_grapqhl_mutation(
+        $this->resolve_graphql_mutation(
             'totara_job_move_assignment',
             ['userid' => $job1->userid, 'assignmentid' => $job2->id, 'newposition' => 0]
         );
@@ -73,7 +73,7 @@ class totara_job_webapi_resolver_mutation_move_assignments_testcase extends adva
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage('No permission to sort job assignments');
 
-        $this->resolve_grapqhl_mutation(
+        $this->resolve_graphql_mutation(
             'totara_job_move_assignment',
             ['userid' => $job1->userid, 'assignmentid' => $job2->id, 'newposition' => 0]
         );
@@ -89,7 +89,7 @@ class totara_job_webapi_resolver_mutation_move_assignments_testcase extends adva
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage('No permission to sort job assignments');
 
-        $this->resolve_grapqhl_mutation(
+        $this->resolve_graphql_mutation(
             'totara_job_move_assignment',
             ['userid' => $job1->userid, 'assignmentid' => $job2->id, 'newposition' => 0]
         );
@@ -106,19 +106,19 @@ class totara_job_webapi_resolver_mutation_move_assignments_testcase extends adva
         // Confirm initial support
         self::assertEquals([$job1->id, $job2->id], array_keys($DB->get_records('job_assignment', ['userid' => $job1->userid], 'sortorder ASC', 'id')));
         // Sort: new order
-        $this->resolve_grapqhl_mutation(
+        $this->resolve_graphql_mutation(
             'totara_job_move_assignment',
             ['userid' => $job1->userid, 'assignmentid' => $job2->id, 'newposition' => 0]
         );
         self::assertEquals([$job2->id, $job1->id], array_keys($DB->get_records('job_assignment', ['userid' => $job1->userid], 'sortorder ASC', 'id')));
         // Sort: old order.
-        $this->resolve_grapqhl_mutation(
+        $this->resolve_graphql_mutation(
             'totara_job_move_assignment',
             ['userid' => $job1->userid, 'assignmentid' => $job2->id, 'newposition' => 1]
         );
         self::assertEquals([$job1->id, $job2->id], array_keys($DB->get_records('job_assignment', ['userid' => $job1->userid], 'sortorder ASC', 'id')));
         // Sort: no change.
-        $this->resolve_grapqhl_mutation(
+        $this->resolve_graphql_mutation(
             'totara_job_move_assignment',
             ['userid' => $job1->userid, 'assignmentid' => $job1->id, 'newposition' => 0]
         );
@@ -126,7 +126,7 @@ class totara_job_webapi_resolver_mutation_move_assignments_testcase extends adva
 
         // No user id
         try {
-            $this->resolve_grapqhl_mutation(
+            $this->resolve_graphql_mutation(
                 'totara_job_move_assignment',
                 ['assignmentid' => $job1->id, 'newposition' => 1]
             );
@@ -137,7 +137,7 @@ class totara_job_webapi_resolver_mutation_move_assignments_testcase extends adva
 
         // Incorrect Job ids
         try {
-            $this->resolve_grapqhl_mutation(
+            $this->resolve_graphql_mutation(
                 'totara_job_move_assignment',
                 ['userid' => $job1->userid, 'assignmentid' => 16, 'newposition' => 1]
             );
@@ -148,7 +148,7 @@ class totara_job_webapi_resolver_mutation_move_assignments_testcase extends adva
 
         // Position to low
         try {
-            $this->resolve_grapqhl_mutation(
+            $this->resolve_graphql_mutation(
                 'totara_job_move_assignment',
                 ['userid' => $job1->userid, 'assignmentid' => $job1->id, 'newposition' => -1]
             );
@@ -159,7 +159,7 @@ class totara_job_webapi_resolver_mutation_move_assignments_testcase extends adva
 
         // Position to high
         try {
-            $this->resolve_grapqhl_mutation(
+            $this->resolve_graphql_mutation(
                 'totara_job_move_assignment',
                 ['userid' => $job1->userid, 'assignmentid' => $job1->id, 'newposition' => 100]
             );
@@ -171,7 +171,7 @@ class totara_job_webapi_resolver_mutation_move_assignments_testcase extends adva
         // Test job assignment belonging to deleted user.
         delete_user($DB->get_record('user', ['id' => $job1->userid]));
         try {
-            $this->resolve_grapqhl_mutation(
+            $this->resolve_graphql_mutation(
                 'totara_job_move_assignment',
                 ['userid' => $job1->userid, 'assignmentid' => $job1->id, 'newposition' => 0]
             );

@@ -62,7 +62,7 @@ class totara_reportbuilder_webapi_resolver_mutation_update_report_title_testcase
         $this->expectException(moodle_exception::class);
         $this->expectExceptionMessage('Course or activity not accessible. (You are not logged in)');
 
-        $this->resolve_grapqhl_mutation(
+        $this->resolve_graphql_mutation(
             'totara_reportbuilder_update_report_title',
             ['reportid' => $r1, 'title' => 'Test Report 2']
         );
@@ -76,7 +76,7 @@ class totara_reportbuilder_webapi_resolver_mutation_update_report_title_testcase
         $this->expectException(moodle_exception::class);
         $this->expectExceptionMessage('No permission to edit reports');
 
-        $this->resolve_grapqhl_mutation(
+        $this->resolve_graphql_mutation(
             'totara_reportbuilder_update_report_title',
             ['reportid' => $r1, 'title' => 'Test Report 2']
         );
@@ -91,7 +91,7 @@ class totara_reportbuilder_webapi_resolver_mutation_update_report_title_testcase
         $this->expectException(moodle_exception::class);
         $this->expectExceptionMessage('No permission to edit reports');
 
-        $this->resolve_grapqhl_mutation(
+        $this->resolve_graphql_mutation(
             'totara_reportbuilder_update_report_title',
             ['reportid' => $r1, 'title' => 'Test Report 2']
         );
@@ -106,7 +106,7 @@ class totara_reportbuilder_webapi_resolver_mutation_update_report_title_testcase
         $r2 = $this->create_report('user', 'Test Report 2');
 
         // Check the returned result is the same
-        $result = $this->resolve_grapqhl_mutation(
+        $result = $this->resolve_graphql_mutation(
             'totara_reportbuilder_update_report_title',
             ['reportid' => $r1, 'title' => 'Test Report 3']
         );
@@ -124,7 +124,7 @@ class totara_reportbuilder_webapi_resolver_mutation_update_report_title_testcase
         $this->expectException(moodle_exception::class);
         $this->expectExceptionMessage('Attempted to edit a non-existent report');
 
-        $this->resolve_grapqhl_mutation(
+        $this->resolve_graphql_mutation(
             'totara_reportbuilder_update_report_title',
             ['reportid' => 100, 'title' => 'Test Report 6']
         );

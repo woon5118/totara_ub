@@ -31,6 +31,105 @@ use totara_webapi\default_resolver;
 use totara_webapi\graphql;
 
 trait webapi_phpunit_helper {
+    /**
+     * Helper function to create an execution context.
+     *
+     * @param string $operation_name name of the operation.
+     * @param string $type execution mode.
+     *
+     * @return execution_context
+     */
+    protected function create_webapi_context(
+        string $operation_name,
+        string $type = graphql::TYPE_AJAX
+    ): execution_context {
+        return execution_context::create($type, $operation_name);
+    }
+
+    /**
+     * Helper function to execute a graphql operation (with the entire graphql
+     * stack) and return the operation result as a (result, error) tuple.
+     *
+     * Note 'error' does NOT refer to domain specific errors which could be
+     * returned as part of the result. In this case, the graphql call actually
+     * succeeds.
+     *
+     * @param string $operation_name name of the operation.
+     * @param array $variables operation arguments.
+     * @param string $type execution mode.
+     *
+     * @return array a (result, error) tuple. Note even if there is an error, the
+     *         result may not be null.
+     */
+    protected function parsed_graphql_operation(
+        string $operation_name,
+        array $variables = [],
+        string $type = graphql::TYPE_AJAX
+    ): array {
+        $raw = $this->execute_graphql_operation($operation_name, $variables, $type)
+            ->toArray(true);
+
+        $result = $raw['data'][$operation_name] ?? null;
+
+        $errors = $raw['errors'][0] ?? [];
+        $error = $errors['debugMessage'] ?? $errors['message'] ?? null;
+
+        return [$result, $error];
+    }
+
+    /**
+     * Given a result from a parsed_graphql_operation() call, gets the domain
+     * specific data returned by the call.
+     *
+     * @param array $result_from_parsed_graphql_operation the result from the
+     *        call.
+     *
+     * @return mixed the execution result.
+     */
+    protected function get_webapi_operation_data(array $result_from_parsed_graphql_operation) {
+        [$result, ] = $result_from_parsed_graphql_operation;
+        return $result;
+    }
+
+    /**
+     * Given a result from a parsed_graphql_operation() call, validates the call
+     * executed "successfully". Throws a PHPUnit assertion error otherwise.
+     *
+     * Note "successful" here means the graphql framework did not detect any
+     * execution errors; there can still be domain specific errors but returned
+     * as call return data.
+     *
+     * @param array $result_from_parsed_graphql_operation the result from the
+     *        call.
+     */
+    protected function assert_webapi_operation_successful(array $result_from_parsed_graphql_operation) {
+        [, $error] = $result_from_parsed_graphql_operation;
+        $this->assertEmpty($error, "got execution errors: '$error'");
+    }
+
+    /**
+     * Given a result from a parsed_graphql_operation() call, validates the call
+     * executed with errors. Throws a PHPUnit assertion error otherwise.
+     *
+     * Note "errors" here refers to errors caught by the graphql framework; domain
+     * specific errors returned as part of the execution data is not checked.
+     *
+     * @param array $result_from_parsed_graphql_operation the result from the
+     *        call.
+     * @param string $expected_error if specified, also checks the text of the
+     *        error.
+     */
+    protected function assert_webapi_operation_failed(
+        array $result_from_parsed_graphql_operation,
+        ?string $expected_error = null
+    ) {
+        [, $error] = $result_from_parsed_graphql_operation;
+        $this->assertNotEmpty($error, "expected execution errors but got none");
+
+        if ($expected_error) {
+            $this->assertStringContainsString($expected_error, $error, 'wrong error');
+        }
+    }
 
     /**
      * Helper function to execute a graphql operation which executes it using the whole
@@ -47,15 +146,13 @@ trait webapi_phpunit_helper {
         string $type = graphql::TYPE_AJAX
     ): ExecutionResult {
         return graphql::execute_operation(
-            execution_context::create($type, $operation_name),
+            $this->create_webapi_context($operation_name, $type),
             $variables
         );
     }
 
     /**
      * This resolves a query using the default resolver to not add too much overhead by using the whole schema.
-     *
-     * This also does apply any middleware defined in the resolvers
      *
      * @param string $query_name
      * @param array $variables
@@ -72,7 +169,7 @@ trait webapi_phpunit_helper {
      * @param array $variables
      * @return mixed|null
      */
-    protected function resolve_grapqhl_mutation(string $mutation_name, array $variables = []) {
+    protected function resolve_graphql_mutation(string $mutation_name, array $variables = []) {
         return $this->resolve_query_mutation('Mutation', $mutation_name, $variables);
     }
 
@@ -80,11 +177,11 @@ trait webapi_phpunit_helper {
      * Resolve a query or mutation using the default resolver
      *
      * @param string $type
-     * @param string $nanme
+     * @param string $name
      * @param array $variables
      * @return mixed|null
      */
-    private function resolve_query_mutation(string $type, string $nanme, array $variables = []) {
+    private function resolve_query_mutation(string $type, string $name, array $variables = []) {
         $object_type_mock = $this->getMockBuilder(ObjectType::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -96,9 +193,9 @@ trait webapi_phpunit_helper {
             ->getMock();
 
         $resolve_info_mock->parentType = $object_type_mock;
-        $resolve_info_mock->fieldName = $nanme;
+        $resolve_info_mock->fieldName = $name;
 
-        $execution_context = execution_context::create(graphql::TYPE_AJAX, $nanme);
+        $execution_context = execution_context::create(graphql::TYPE_AJAX, $name);
 
         $resolver = new default_resolver();
         return $resolver(null, $variables, $execution_context, $resolve_info_mock);
@@ -132,5 +229,4 @@ trait webapi_phpunit_helper {
         $resolver = new default_resolver();
         return $resolver($source, $variables, $execution_context, $resolve_info_mock);
     }
-
 }
