@@ -661,8 +661,7 @@ final class export_helper {
      */
     private static function write_userfields($worksheet, \stdClass $fields, \stdClass $attendee, $dateformat,
                                              \context_course $coursecontext, int $i, int &$j) : void {
-        $course = new \stdClass();
-        $course->id = $coursecontext->instanceid;
+        $course = get_course($coursecontext->instanceid);
 
         // Filter out the attendee's information that the exporting user is not
         // allowed to see, based on permissions and config settings.
