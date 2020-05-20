@@ -41,6 +41,7 @@
       :aria-label="ariaLabel || placeholder"
       :disabled="disabled"
       :styleclass="{ small: true, transparent: true }"
+      class="tui-searchBox__button"
       @click="submit"
     >
       <SearchIcon />
