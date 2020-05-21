@@ -39,11 +39,6 @@
     border: var(--tui-border-width-thin) solid var(--tui-color-border);
     border-radius: var(--tui-border-radius-normal);
 
-    &-info,
-    &-relationship {
-      margin: auto 0;
-    }
-
     &-relationship {
       display: flex;
       padding-top: var(--tui-gap-3);
@@ -84,6 +79,10 @@
   .tui-participantContent {
     &__user {
       flex-direction: row;
+
+      &-info {
+        padding-right: var(--tui-gap-4);
+      }
 
       &-relationship {
         display: block;

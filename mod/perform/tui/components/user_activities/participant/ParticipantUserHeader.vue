@@ -27,6 +27,7 @@
       :size="size"
       :alt="userName"
       :aria-hidden="true"
+      class="tui-participantUserHeader__avatar"
     />
     <div class="tui-participantUserHeader__name">
       {{ userName }}

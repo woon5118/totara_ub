@@ -28,13 +28,12 @@
       @submit="submit"
     >
       <div class="tui-participantContent__user">
-        <div class="tui-participantContent__user-info">
-          <ParticipantUserHeader
-            :user-name="subjectUser.fullname"
-            :profile-picture="subjectUser.profileimageurlsmall"
-            size="small"
-          />
-        </div>
+        <ParticipantUserHeader
+          :user-name="subjectUser.fullname"
+          :profile-picture="subjectUser.profileimageurlsmall"
+          size="small"
+          class="tui-participantContent__user-info"
+        />
         <div class="tui-participantContent__user-relationship">
           {{ $str('user_activities_your_relationship_to_user', 'mod_perform') }}
           <h4 class="tui-participantContent__user-relationshipValue">

@@ -25,6 +25,10 @@
   display: flex;
   align-items: center;
 
+  &__avatar {
+    flex-shrink: 0;
+  }
+
   &__name {
     @include tui-font-heading-x-small();
     margin-left: var(--tui-gap-2);
