@@ -138,11 +138,11 @@ class mod_perform_data_provider_subject_instances_testcase extends mod_perform_s
             ->get();
         $this->assertCount(2, $participant_instances);
 
-        // Verify that only the participant_instance for the subject user is in the result.
+        // Verify that the participant_instance for the subject user is in the result.
         $subject_participant_instances = $participant_instances->filter('participant_id', self::$user->id);
         $returned_participant_instances = $returned_subject_instance->get_participant_instances();
         $this->assertCount(1, $subject_participant_instances);
         $this->assertCount(2, $returned_participant_instances);
-        $this->assertSame($subject_participant_instances->first()->id, $returned_participant_instances->first()->get_id());
+        $this->assertContains($subject_participant_instances->first()->id, $returned_participant_instances->pluck('id'));
     }
 }
