@@ -21,11 +21,14 @@
  * @package mod_perform
  */
 
-use mod_perform\controllers\activity\manage_activities;
 use Behat\Mink\Element\NodeElement;
+use Behat\Mink\Exception\DriverException;
 use Behat\Mink\Exception\ExpectationException;
+use mod_perform\controllers\activity\edit_activity;
+use mod_perform\controllers\activity\manage_activities;
 use mod_perform\controllers\activity\user_activities;
 use mod_perform\controllers\activity\view_user_activity;
+use mod_perform\entities\activity\activity;
 
 class behat_mod_perform extends behat_base {
 
@@ -84,6 +87,21 @@ class behat_mod_perform extends behat_base {
      */
     public function i_navigate_to_the_manage_perform_activities_page(): void {
         $this->navigate_to_page(manage_activities::get_url());
+    }
+
+    /**
+     * @When /^I navigate to the edit perform activities page for activity "([^"]*)"$/
+     * @param string $activity_name
+     */
+    public function i_navigate_to_the_edit_perform_activities_page_for(string $activity_name): void {
+        $activity = activity::repository()
+            ->where('name', $activity_name)
+            ->one();
+
+        if (!$activity) {
+            throw new DriverException('Activity with name \''.$activity_name.'\' not found.');
+        }
+        $this->navigate_to_page(edit_activity::get_url(['activity_id' => $activity->id]));
     }
 
     /**
