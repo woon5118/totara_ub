@@ -45,12 +45,13 @@
     }
 
     &-relationship {
+      display: flex;
       padding-top: var(--tui-gap-3);
     }
 
     &-relationshipValue {
       display: inline;
-      margin: var(--tui-gap-1) 0 0;
+      margin: auto 0 auto var(--tui-gap-1);
       @include tui-font-heading-x-small();
     }
   }
@@ -83,14 +84,16 @@
   .tui-participantContent {
     &__user {
       flex-direction: row;
-    }
 
-    &__user-relationship {
-      padding-top: 0;
-    }
+      &-relationship {
+        display: block;
+        padding-top: 0;
+      }
 
-    &__user-relationshipValue {
-      display: block;
+      &-relationshipValue {
+        display: block;
+        margin: var(--tui-gap-1) 0 0;
+      }
     }
   }
 }
