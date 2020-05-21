@@ -64,6 +64,7 @@ $string['error_activity_name_missing'] = 'You are not allowed to create an activ
 $string['error_activity_type_missing'] = 'You are not allowed to create an activity without a type';
 $string['error_activity_type_unknown'] = 'Invalid activity type id';
 $string['error_activate'] = 'Cannot activate this activity due to invalid state or conditions are not satisfied.';
+$string['error_access_permission_missing'] = 'You do not have the permission to access this performance activity';
 $string['error_create_permission_missing'] = 'You do not have the permission to create a performance activity';
 $string['error_subject_instance_id_wrong'] = 'Wrong subject instance id';
 $string['event_activity_activated'] = 'Performance activity activated';

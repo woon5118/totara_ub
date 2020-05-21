@@ -27,6 +27,7 @@ use moodle_url;
 use navigation_node_collection;
 use totara_core\advanced_feature;
 use totara_mvc\controller;
+use totara_mvc\view;
 
 /**
  * Common logic across all perform pages.
@@ -35,12 +36,44 @@ use totara_mvc\controller;
  */
 abstract class perform_controller extends controller {
 
+    /**
+     * Checks and call require_login if parameter is set, can be overridden if special set up is needed
+     *
+     * @return $this
+     */
+    protected function authorize() {
+        // We do not want to redirect due to not being enrolled
+        // we cannot prevent this when passing the course.
+        // In this case we do a normal require_login first to capture
+        // generic errors, like not being logged in, etc.
+        require_login(null, $this->auto_login_guest);
+
+        // Then we'll do a second require_login to capture errors due to not being able to access the course.
+        // This i quite a hacky approach but the only way at the moment
+        [$context, $course, $cm] = get_context_info_array($this->context->id);
+        if ($course) {
+            try {
+                require_login($course, $this->auto_login_guest, $cm, true, true);
+            } catch (\require_login_exception $exception) {
+                $this->page->set_cm($cm, $course);
+                echo $this->action_invalid()->render();
+                exit();
+            }
+        }
+
+        return $this;
+    }
+
     public function init_page_object() {
         advanced_feature::require('performance_activities');
         parent::init_page_object();
     }
 
     public function action() {
+        $this->remove_breadcrumbs();
+    }
+
+    protected function remove_breadcrumbs() {
         // Remove course-related settings blocks.
         $this->get_settings()->remove('categorysettings');
         $this->get_settings()->remove('modulesettings');
@@ -48,6 +81,16 @@ abstract class perform_controller extends controller {
 
         // Remove course-related breadcrumbs.
         $this->get_breadcrumbs()->remove('courses');
+    }
+
+    /**
+     * @return view
+     * @throws \coding_exception
+     */
+    public function action_invalid() {
+        $this->remove_breadcrumbs();
+        $notification = view::core_renderer()->notification(get_string('error_access_permission_missing', 'mod_perform'), 'error');
+        return view::create(null, $notification);
     }
 
     /**
