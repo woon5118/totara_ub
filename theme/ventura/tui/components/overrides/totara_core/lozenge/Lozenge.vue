@@ -23,13 +23,13 @@
 <style lang="scss">
 .tui-lozenge {
   display: inline-flex;
-  padding: 1px var(--tui-gap-2);
+  padding: 0 var(--tui-gap-2) calc(var(--tui-gap-1) / 2);
   color: var(--tui-color-neutral-1);
   @include tui-font-heading-label-small();
   font-weight: 500;
   line-height: 1.2;
   background: var(--tui-color-prompt-info);
-  border-radius: var(--tui-border-radius-curved);
+  border-radius: var(--tui-border-radius-small);
 
   &--alert {
     background: var(--tui-color-prompt-alert);
