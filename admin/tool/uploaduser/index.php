@@ -1233,7 +1233,7 @@ while ($linenum <= $previewrows and $fields = $cir->next()) {
     $rowcols = array();
     $rowcols['line'] = $linenum;
     foreach($fields as $key => $field) {
-        $rowcols[$filecolumns[$key]] = s(trim($field));
+        $rowcols[$filecolumns[$key]] = trim($field); // Totara: No s() here!!!
     }
     $rowcols['status'] = array();
 
@@ -1266,7 +1266,11 @@ while ($linenum <= $previewrows and $fields = $cir->next()) {
     }
     // Check if rowcols have custom profile field with correct data and update error state.
     $noerror = uu_check_custom_profile_data($rowcols) && $noerror;
-    $rowcols['status'] = implode('<br />', $rowcols['status']);
+    // Totara: data must be converted from plain text to html right before display, not before validation!
+    $status = implode('<br />', array_map('s', $rowcols['status']));
+    unset($rowcols['status']);
+    $rowcols = array_map('s', $rowcols);
+    $rowcols['status'] = $status;
     $data[] = $rowcols;
 }
 if ($fields = $cir->next()) {
