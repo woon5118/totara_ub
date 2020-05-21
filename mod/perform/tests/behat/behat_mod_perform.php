@@ -41,7 +41,7 @@ class behat_mod_perform extends behat_base {
     public const PERFORM_ACTIVITY_YOUR_RELATIONSHIP_LOCATOR = '.tui-participantContent__user-relationshipValue';
     public const PERFORM_SHOW_OTHERS_RESPONSES_INPUT_LOCATOR = '.tui-participantContent__sectionHeading-switch input';
     public const PERFORM_SHOW_OTHERS_RESPONSES_LABEL_LOCATOR = '.tui-participantContent__sectionHeading-switch label';
-    public const MANAGE_CONTENT_PARTICIPANT_ROW_LOCATOR = '.mod-perform-activitySection__participant-row';
+    public const MANAGE_CONTENT_PARTICIPANT_NAME_LOCATOR = '.mod-perform-activitySection__participant-name';
     public const MANAGE_CONTENT_ADD_PARTICIPANTS_BUTTON_LABEL = ".mod-perform-activitySection [aria-label='Add participants']";
 
     public const TUI_USER_ANSWER_ERROR_LOCATOR = '.tui-formFieldError';
@@ -362,19 +362,20 @@ class behat_mod_perform extends behat_base {
      */
     public function i_should_see_no_participants(): void {
         $this->ensure_element_does_not_exist(
-            self::MANAGE_CONTENT_PARTICIPANT_ROW_LOCATOR,
+            self::MANAGE_CONTENT_PARTICIPANT_NAME_LOCATOR,
             'css_element'
         );
     }
 
     /**
      * @Then /^I should see "([^"]*)" as the perform activity participants$/
+     * @param $expected_participant_list
      */
     public function i_should_see_as_the_participants($expected_participant_list): void {
         $expected_participants = explode(',', $expected_participant_list);
 
         /** @var NodeElement[] $rows */
-        $rows = $this->find_all('css', self::MANAGE_CONTENT_PARTICIPANT_ROW_LOCATOR);
+        $rows = $this->find_all('css', self::MANAGE_CONTENT_PARTICIPANT_NAME_LOCATOR);
 
         foreach ($expected_participants as $index => $expected_participant) {
             if (trim($rows[$index]->getText()) !== trim($expected_participant)) {
@@ -418,7 +419,7 @@ class behat_mod_perform extends behat_base {
      */
     public function i_remove_as_a_participant(string $participant_to_remove): void {
         /** @var NodeElement[] $rows */
-        $rows = $this->find_all('css', self::MANAGE_CONTENT_PARTICIPANT_ROW_LOCATOR);
+        $rows = $this->find_all('css', self::MANAGE_CONTENT_PARTICIPANT_NAME_LOCATOR);
 
         foreach ($rows as $participant_row) {
             if (trim($participant_row->getText()) === $participant_to_remove) {
