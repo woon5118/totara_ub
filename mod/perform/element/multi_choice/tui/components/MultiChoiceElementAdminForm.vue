@@ -96,6 +96,7 @@ import { Uniform, FormRow, FieldArray } from 'totara_core/components/uniform';
 import FormText from 'totara_core/components/uniform/FormText';
 import ElementAdminForm from 'mod_perform/components/element/ElementAdminForm';
 import FormActionButtons from 'mod_perform/components/element/admin_form/ActionButtons';
+import AdminFormMixin from 'mod_perform/components/element/admin_form/AdminFormMixin';
 import Repeater from 'totara_core/components/form/Repeater';
 import AddIcon from 'totara_core/components/icons/common/Add';
 import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
@@ -115,7 +116,7 @@ export default {
     AddIcon,
     ButtonIcon,
   },
-
+  mixins: [AdminFormMixin],
   props: {
     type: Object,
     title: String,
@@ -124,7 +125,6 @@ export default {
     rawData: Object,
     error: String,
   },
-
   data() {
     const initialValues = {
       title: this.title,
@@ -144,7 +144,6 @@ export default {
       minRows: MIN_OPTIONS,
     };
   },
-
   methods: {
     /**
      * Handle multi choice element submit data

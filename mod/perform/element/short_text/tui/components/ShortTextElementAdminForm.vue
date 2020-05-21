@@ -74,6 +74,7 @@ import { Uniform, FormRow, FormText } from 'totara_core/components/uniform';
 import Textarea from 'totara_core/components/form/Textarea';
 import ElementAdminForm from 'mod_perform/components/element/ElementAdminForm';
 import FormActionButtons from 'mod_perform/components/element/admin_form/ActionButtons';
+import AdminFormMixin from 'mod_perform/components/element/admin_form/AdminFormMixin';
 
 export default {
   components: {
@@ -84,7 +85,7 @@ export default {
     Textarea,
     FormActionButtons,
   },
-
+  mixins: [AdminFormMixin],
   props: {
     type: Object,
     title: String,
@@ -100,7 +101,6 @@ export default {
       };
     },
   },
-
   methods: {
     handleSubmit(values) {
       this.$emit('update', {

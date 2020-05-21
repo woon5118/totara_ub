@@ -17,19 +17,25 @@ Feature: Adding, Updating, Removing activity elements.
     And I click on "Add element" "button"
     And I click on "Questions" "button"
     And I click on "Short text" "link"
-    And I set the following fields to these values:
+    Then the focused element is "[name=rawTitle]" "css_element"
+
+    When I set the following fields to these values:
       | rawTitle | Question 1 |
     And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"
     And I click on "Add element" "button"
     And I click on "Questions" "button"
     And I click on "Short text" "link"
-    And I set the following fields to these values:
+    Then the focused element is "[name=rawTitle]" "css_element"
+
+    When I set the following fields to these values:
       | rawTitle | Question 2 |
     And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"
     And I click on "Add element" "button"
     And I click on "Questions" "button"
     And I click on "Short text" "link"
-    And I set the following fields to these values:
+    Then the focused element is "[name=rawTitle]" "css_element"
+
+    When I set the following fields to these values:
       | rawTitle | Question 3 |
     And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"
     And I click on "Submit" "button"
@@ -40,17 +46,23 @@ Feature: Adding, Updating, Removing activity elements.
 
     # Update multiple elements and save.
     When I click on "Question 1" "button"
-    Then the following fields match these values:
+    Then the focused element is "[name=rawTitle]" "css_element"
+
+    When the following fields match these values:
       | rawTitle | Question 1 |
     When I set the following fields to these values:
       | rawTitle | Test 1 |
     And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"
     And I click on "Question 2" "button"
-    And I set the following fields to these values:
+    Then the focused element is "[name=rawTitle]" "css_element"
+
+    When I set the following fields to these values:
       | rawTitle | Test 2 |
     And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"
     And I click on "Question 3" "button"
-    And I set the following fields to these values:
+    Then the focused element is "[name=rawTitle]" "css_element"
+
+    When I set the following fields to these values:
       | rawTitle | Test 3 |
     And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"
     And I click on "Submit" "button"
