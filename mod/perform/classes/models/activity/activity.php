@@ -212,7 +212,11 @@ class activity extends model {
             $container->add_module($modinfo);
 
             $container_context = $container->get_context();
-            if (!empty($CFG->performanceactivitycreatornewroleid) and !is_viewing($container_context)) {
+            // If the user does not have the manage capability from a higher context already
+            // assign him the role so that he can manage the activity in the future.
+            if (!empty($CFG->performanceactivitycreatornewroleid)
+                && !is_viewing($container_context, null, 'mod/perform:manage_activity')
+            ) {
                 role_assign($CFG->performanceactivitycreatornewroleid, $USER->id, $container_context);
             }
 
