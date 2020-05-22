@@ -117,7 +117,10 @@ class mod_perform_generator extends component_generator_base {
                 track::create($activity);
             }
 
-            if (isset($data['create_section']) && $data['create_section']) {
+            if (
+                !isset($data['create_section']) ||
+                (isset($data['create_section']) && $data['create_section'] == 'true')
+            ) {
                 section::create($activity);
             }
 
@@ -472,7 +475,7 @@ class mod_perform_generator extends component_generator_base {
         $previous_user = clone $USER;
 
         // For the activity generation we need to make sure the admin user is set
-        \advanced_testcase::setAdminUser();
+        advanced_testcase::setAdminUser();
 
         $activity_name_generator = new mod_perform_activity_name_generator();
 
@@ -481,7 +484,8 @@ class mod_perform_generator extends component_generator_base {
             [$name, $type] = $activity_name_generator->generate();
             $data = [
                 'activity_name' => $name,
-                'activity_type' => $type
+                'activity_type' => $type,
+                'create_section' => false,
             ];
 
             $activity = $this->create_activity_in_container($data);
@@ -537,7 +541,7 @@ class mod_perform_generator extends component_generator_base {
             (new subject_instance_creation())->generate_instances();
         }
 
-        \advanced_testcase::setUser($previous_user);
+        advanced_testcase::setUser($previous_user);
 
         return collection::new($activities);
     }
@@ -929,7 +933,7 @@ class mod_perform_generator extends component_generator_base {
     public function create_track_assignment(array $data): void {
         global $DB;
         $type = $data['assignment_type'];
-        /** @var track $track */
+        /** @var track_entity $track */
         $track = track_entity::repository()
             ->where('description', $data['track_description'])
             ->one(true);

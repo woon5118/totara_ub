@@ -46,7 +46,7 @@ class mod_perform_section_model_testcase extends mod_perform_relationship_testca
 
     public function test_get_title() {
         $this->setAdminUser();
-        $activity = $this->perform_generator()->create_activity_in_container();
+        $activity = $this->perform_generator()->create_activity_in_container(['create_section' => false]);
 
         $section1 = section::create($activity, 'Test Section');
         $section2 = section::create($activity, '   ');

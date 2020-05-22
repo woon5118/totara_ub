@@ -930,7 +930,7 @@ class behat_totara_tui extends behat_base {
         $rows = $table->findAll('css', self::DATA_TABLE_ROW_LOCATOR);
 
         $matches =  array_filter($rows, function (NodeElement $row) use ($heading_index, $cell_text) {
-            $cell =  $this->find_cell($heading_index, $row, false);
+            $cell =  $this->find_cell($heading_index, $row);
 
             if (trim($cell->getText()) === $cell_text) {
                 return $cell;

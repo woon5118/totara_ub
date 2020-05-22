@@ -31,9 +31,9 @@ Feature: Manage performance activity short text elements
     Then I should see "Optional"
     And I click on "Submit" "button"
     And I close the tui notification toast
-    Then I should see the tui datatable contains:
-      | Required questions     | Optional questions | Other content elements |
-      | 1                      | 1                  | 0                      |
+    Then I should see "1" in the "required" element summary of the activity section
+    And I should see "1" in the "optional" element summary of the activity section
+    And I should see "0" in the "other" element summary of the activity section
     When I click on "Edit content" "button"
     Then I should see "Optional"
     And I should see "Required"

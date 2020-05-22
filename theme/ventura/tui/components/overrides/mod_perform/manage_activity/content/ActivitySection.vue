@@ -21,20 +21,71 @@
 -->
 
 <style lang="scss">
-.mod-perform-activitySection {
-  padding: var(--tui-gap-6);
+.tui-performActivitySection {
+  &__multiple {
+    padding: var(--tui-gap-4);
+    & > * + * {
+      margin-top: var(--tui-gap-4);
+    }
+  }
+
+  &__editing {
+    padding: var(--tui-gap-4);
+    border: solid var(--tui-color-secondary) var(--tui-border-width-normal);
+  }
 
   &.tui-card {
     display: block;
   }
 
   &__action-buttons {
-    text-align: right;
+    display: flex;
+    justify-content: flex-end;
+    .tui-iconBtn {
+      min-width: auto;
+    }
+  }
+  &__saveButtons {
+    display: flex;
+    justify-content: flex-end;
   }
 
-  &__participant-heading {
-    @include totara-style-heading-label-small;
-    border-bottom: 1px solid var(--tui-card-border-color);
+  &__action-edit {
+    min-width: auto;
+  }
+
+  &__content {
+    padding: var(--tui-gap-4) 0;
+    border-top: var(--tui-border-width-thin) solid var(--tui-card-border-color);
+
+    &-autoSave {
+      margin-top: var(--tui-gap-4);
+      border-bottom: var(--tui-border-width-thin) solid
+        var(--tui-card-border-color);
+    }
+  }
+
+  &__participant {
+    & > * {
+      margin: var(--tui-gap-4) 0 0;
+    }
+
+    &-info {
+      @include tui-font-hint();
+    }
+
+    &-heading {
+      @include totara-style-heading-x-small;
+      display: inline-block;
+    }
+  }
+}
+
+@media (min-width: $tui-screen-lg) {
+  .tui-performActivitySection {
+    &__content-buttons {
+      text-align: right;
+    }
   }
 }
 </style>

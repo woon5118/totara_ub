@@ -60,7 +60,7 @@
 
 <script>
 import AssignmentsTab from 'mod_perform/components/manage_activity/assignment/AssignmentsTab';
-import ContentTab from 'mod_perform/components/manage_activity/content/ContentTab';
+import ActivityContentTab from 'mod_perform/components/manage_activity/content/ActivityContentTab';
 import FlexIcon from 'totara_core/components/icons/FlexIcon';
 import GeneralInfoTab from 'mod_perform/components/manage_activity/GeneralInfoTab';
 import Grid from 'totara_core/components/grid/Grid';
@@ -75,7 +75,7 @@ import { NOTIFICATION_DURATION } from 'mod_perform/constants';
 export default {
   components: {
     AssignmentsTab,
-    ContentTab,
+    ActivityContentTab,
     FlexIcon,
     Tab,
     Tabs,
@@ -110,7 +110,7 @@ export default {
         },
         {
           id: contentTabId,
-          component: 'ContentTab',
+          component: 'ActivityContentTab',
           name: this.$str('manage_activities_tabs_content', 'mod_perform'),
         },
         {

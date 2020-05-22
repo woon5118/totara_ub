@@ -330,7 +330,7 @@ class mod_perform_participant_section_creation_service_testcase extends advanced
         $generator = $this->get_perform_generator();
 
         $activity_tree = new stdClass();
-        $activity_tree->activity = $generator->create_activity_in_container();
+        $activity_tree->activity = $generator->create_activity_in_container(['create_section' => false]);
         $activity_tree->track = $this->create_activity_track($activity_tree->activity, 4);
 
         //create sections and add relationships to activity:

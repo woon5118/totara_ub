@@ -22,127 +22,158 @@
 -->
 
 <template>
-  <Card class="mod-perform-activitySection">
-    <Grid :stack-at="1200">
-      <GridItem :units="6">
-        <h3 class="mod-perform-activitySection__participant-heading">
+  <Card
+    class="tui-performActivitySection"
+    :no-border="autoSave"
+    :class="[!autoSave && 'tui-performActivitySection__multiple']"
+  >
+    <div
+      :class="[editMode && !autoSave && 'tui-performActivitySection__editing']"
+    >
+      <Grid v-if="!autoSave && !editMode">
+        <GridItem :units="10">
+          <h3>
+            {{ section.title || $str('untitled_section', 'mod_perform') }}
+          </h3>
+        </GridItem>
+        <GridItem :units="2">
+          <div class="tui-performActivitySection__action-buttons">
+            <EditIcon
+              class="tui-performActivitySection__action-edit"
+              @click="enableEditing"
+            />
+          </div>
+        </GridItem>
+      </Grid>
+      <InputText
+        v-if="!autoSave && editMode"
+        :value="title"
+        :placeholder="$str('untitled_section', 'mod_perform')"
+        :aria-label="$str('section_title', 'mod_perform')"
+        @input="updateTitle"
+      />
+      <div class="tui-performActivitySection__participant">
+        <h4 class="tui-performActivitySection__participant-heading">
           {{ $str('activity_participants_heading', 'mod_perform') }}
-        </h3>
-        <SectionRelationship
-          v-for="participant in displayedParticipantsSorted"
-          :key="participant.relationship.id"
-          :participant="participant"
-          @participant-removed="removeDisplayedParticipant"
-          @can-view-changed="updateParticipantData"
-        />
+        </h4>
+        <span v-if="!autoSave && !editMode">
+          {{ $str('activity_participant_view_other_responses', 'mod_perform') }}
+        </span>
+        <div class="tui-performActivitySection__participant-items">
+          <ActivitySectionRelationship
+            v-for="participant in displayedParticipantsSorted"
+            :key="participant.relationship.id"
+            :participant="participant"
+            :editable="autoSave || editMode"
+            @participant-removed="removeDisplayedParticipant"
+            @can-view-changed="updateParticipantData"
+          />
+        </div>
+
+        <div
+          v-if="
+            displayedParticipantsSorted.length === 0 && !autoSave && !editMode
+          "
+        >
+          <span class="tui-performActivitySection__participant-info">
+            {{ $str('no_participants_added', 'mod_perform') }}
+          </span>
+        </div>
         <ParticipantsPopover
+          v-if="autoSave || editMode"
           :active-participants="displayedParticipants"
           @update-participants="updateDisplayedParticipants"
         />
+      </div>
+    </div>
+    <ButtonGroup
+      v-if="!autoSave && editMode"
+      class="tui-performActivitySection__saveButtons"
+    >
+      <Button
+        :styleclass="{ primary: true }"
+        :text="$str('activity_section_done', 'mod_perform')"
+        :disabled="isSaving || !editMode"
+        @click="trySave"
+      />
+      <Button
+        :text="$str('cancel')"
+        :disabled="isSaving || !editMode"
+        @click="resetSectionChanges"
+      />
+    </ButtonGroup>
+    <div
+      class="tui-performActivitySection__content"
+      :class="[autoSave && 'tui-performActivitySection__content-autoSave']"
+    >
+      <Grid :stack-at="700">
+        <GridItem grows :units="10">
+          <ActivitySectionElementSummary
+            v-if="section.section_elements_summary"
+            :elements-summary="section.section_elements_summary"
+          />
+        </GridItem>
+        <GridItem grows :units="2">
+          <div class="tui-performActivitySection__content-buttons">
+            <Button
+              :text="$str('edit_content_elements', 'mod_perform')"
+              @click="modelOpen = true"
+            />
+          </div>
+        </GridItem>
+      </Grid>
+    </div>
 
-        <br />
-        <ButtonGroup>
-          <Button
-            :styleclass="{ primary: true }"
-            :text="$str('activity_section_save_changes', 'mod_perform')"
-            :disabled="isSaving || !hasChanges"
-            @click="trySave"
-          />
-          <Button
-            :styleclass="{ primary: false }"
-            :text="$str('cancel')"
-            :disabled="isSaving || !hasChanges"
-            @click="resetSectionChanges"
-          />
-        </ButtonGroup>
-      </GridItem>
-    </Grid>
-    <Grid>
-      <GridItem grows :units="10">
-        <Table
-          :data="elementsSummary"
-          :border-bottom-hidden="true"
-          :border-top-hidden="true"
-        >
-          <template v-slot:header-row>
-            <HeaderCell size="4">{{
-              $str('section_element_summary_required_questions', 'mod_perform')
-            }}</HeaderCell>
-            <HeaderCell size="4">{{
-              $str('section_element_summary_optional_questions', 'mod_perform')
-            }}</HeaderCell>
-            <HeaderCell size="4">{{
-              $str(
-                'section_element_summary_other_content_elements',
-                'mod_perform'
-              )
-            }}</HeaderCell>
-          </template>
-          <template v-slot:row="{ row }">
-            <Cell size="4">
-              {{ row.required_question_count }}
-            </Cell>
-            <Cell size="4">
-              {{ row.optional_question_count }}
-            </Cell>
-            <Cell size="4">
-              {{ row.other_element_count }}
-            </Cell>
-          </template>
-        </Table>
-      </GridItem>
-      <GridItem grows :units="1">
-        <div class="mod-perform-activitySection__action-buttons">
-          <Button
-            :text="$str('edit_content_elements', 'mod_perform')"
-            :styleclass="{ small: true }"
-            @click="modelOpen = true"
-          />
-        </div>
-      </GridItem>
-    </Grid>
     <ModalPresenter :open="modelOpen" @request-close="modalRequestClose">
       <EditSectionContentModal
         :section-id="section.id"
         @mutation-success="showMutationSuccessNotification"
         @mutation-error="showMutationErrorNotification"
-        @update-summary="updateSummary"
+        @update-summary="updateSection"
       />
     </ModalPresenter>
   </Card>
 </template>
 
 <script>
+import ActivitySectionElementSummary from 'mod_perform/components/manage_activity/content/ActivitySectionElementSummary';
+import ActivitySectionRelationship from 'mod_perform/components/manage_activity/content/ActivitySectionRelationship';
 import Button from 'totara_core/components/buttons/Button';
 import ButtonGroup from 'totara_core/components/buttons/ButtonGroup';
 import Card from 'totara_core/components/card/Card';
+import EditIcon from 'totara_core/components/buttons/EditIcon';
 import EditSectionContentModal from 'mod_perform/components/manage_activity/content/EditSectionContentModal';
 import Grid from 'totara_core/components/grid/Grid';
 import GridItem from 'totara_core/components/grid/GridItem';
+import InputText from 'totara_core/components/form/InputText';
 import ModalPresenter from 'totara_core/components/modal/ModalPresenter';
 import ParticipantsPopover from 'mod_perform/components/manage_activity/content/ParticipantsPopover';
-import SectionRelationship from 'mod_perform/components/manage_activity/content/SectionRelationship';
 import UpdateSectionRelationshipsMutation from 'mod_perform/graphql/update_section_relationships.graphql';
-import Table from 'totara_core/components/datatable/Table';
-import Cell from 'totara_core/components/datatable/Cell';
-import HeaderCell from 'totara_core/components/datatable/HeaderCell';
 
 export default {
   components: {
+    ActivitySectionElementSummary,
+    ActivitySectionRelationship,
     Button,
     ButtonGroup,
     Card,
+    EditIcon,
     EditSectionContentModal,
     Grid,
     GridItem,
+    InputText,
     ModalPresenter,
     ParticipantsPopover,
-    SectionRelationship,
-    Table,
-    Cell,
-    HeaderCell,
   },
   props: {
+    autoSave: {
+      type: Boolean,
+      default: false,
+    },
+    editMode: {
+      type: Boolean,
+      default: false,
+    },
     section: {
       type: Object,
       required: true,
@@ -153,18 +184,28 @@ export default {
       modelOpen: false,
       savedSection: this.section,
       displayedParticipants: this.getParticipantsFromSection(this.section),
+      title: this.getTitle(),
       isSaving: false,
-      elementsSummary: [this.section.section_elements_summary],
     };
   },
   computed: {
+    /**
+     * Get saved participants.
+     *
+     * @return {Array}
+     */
     savedParticipants() {
       return this.getParticipantsFromSection(this.savedSection);
     },
-    // Has anything changed compared to last saved state?
-    // Checks for difference between displayed & last saved participants arrays.
+    /**
+     * Has anything changed compared to last saved state?
+     * Checks for difference between displayed & last saved participants arrays.
+     *
+     * @return {Boolean}
+     */
     hasChanges: function() {
       return !(
+        this.title === this.section.title &&
         this.displayedParticipants.length === this.savedParticipants.length &&
         this.displayedParticipants.every(value => {
           return this.savedParticipants.find(participant => {
@@ -176,6 +217,11 @@ export default {
         })
       );
     },
+    /**
+     * Gets Sorted list of the displayed participants.
+     *
+     * @return {Array}
+     */
     displayedParticipantsSorted() {
       return this.displayedParticipants
         .slice()
@@ -183,13 +229,30 @@ export default {
     },
   },
   methods: {
+    /**
+     * Gets section relationships.
+     *
+     * @return {Array}
+     */
     getParticipantsFromSection(section) {
       if (section.section_relationships) {
         return section.section_relationships;
       }
       return [];
     },
-
+    /**
+     * Get section title.
+     *
+     * @return {string}
+     */
+    getTitle() {
+      return this.section.title;
+    },
+    /**
+     * Get section relationships.
+     *
+     * @return {Array}
+     */
     getSectionRelationships() {
       return this.displayedParticipants.map(participant => {
         return {
@@ -198,13 +261,41 @@ export default {
         };
       });
     },
+    /**
+     * Update section.
+     */
     updateSection(update) {
       const newValue = Object.assign({}, this.section, update);
       this.$emit('input', newValue);
     },
+    /**
+     * Update section title.
+     */
+    updateTitle(update) {
+      this.title = update;
+    },
+    /**
+     * Enable edit-mode on section.
+     */
+    enableEditing() {
+      this.$emit('toggle-edit-mode', true);
+    },
+    /**
+     * Disable edit-mode on section.
+     */
+    disableEditing() {
+      this.$emit('toggle-edit-mode', false);
+    },
+    /**
+     * Close edit section content modal.
+     */
     modalRequestClose() {
       this.modelOpen = false;
     },
+    /**
+     * Update the displayed participants.
+     * @param {Array} checkedParticipants List of new participants
+     */
     updateDisplayedParticipants(checkedParticipants) {
       this.displayedParticipants = this.displayedParticipants.concat(
         checkedParticipants.map(participant => {
@@ -214,51 +305,84 @@ export default {
           };
         })
       );
+      if (this.autoSave) {
+        this.trySave();
+      }
     },
+    /**
+     * Update data of a participant.
+     * @param {Object} participant
+     */
     updateParticipantData(participant) {
       this.displayedParticipants = this.displayedParticipants.map(value => {
         return value.relationship.id === participant.relationship.id
           ? participant
           : value;
       });
+      if (this.autoSave) {
+        this.trySave();
+      }
     },
+    /**
+     * Remove participant from displayed participant.
+     * @param {Object} participant
+     */
     removeDisplayedParticipant(participant) {
       this.displayedParticipants = this.displayedParticipants.filter(
         value => value.relationship.id !== participant.relationship.id
       );
+      if (this.autoSave) {
+        this.trySave();
+      }
     },
+    /**
+     * Reset changes made in the section.
+     */
     resetSectionChanges() {
       this.displayedParticipants = this.getParticipantsFromSection(
         this.savedSection
       );
+      this.disableEditing();
     },
-
+    /**
+     * Show success notification.
+     */
     showMutationSuccessNotification() {
       this.$emit('mutation-success');
     },
 
+    /**
+     * Show error notification.
+     */
     showMutationErrorNotification() {
       this.$emit('mutation-error');
     },
 
-    updateSummary(data) {
-      this.elementsSummary = [data];
-    },
-
+    /**
+     * Save section changes.
+     */
     async trySave() {
       this.isSaving = true;
 
       try {
-        const savedSection = await this.save();
-        this.updateSection(savedSection);
-        this.$emit('mutation-success');
-        this.isSaving = false;
+        if (this.hasChanges) {
+          const savedSection = await this.save();
+          this.updateSection(savedSection);
+          this.$emit('mutation-success');
+          this.isSaving = false;
+          this.disableEditing();
+        }
       } catch (e) {
         this.$emit('mutation-error', e);
         this.isSaving = false;
+        this.disableEditing();
       }
     },
 
+    /**
+     * Mutation call to save changes.
+     * @return {Object}
+     */
     async save() {
       const { data: resultData } = await this.$apollo.mutate({
         mutation: UpdateSectionRelationshipsMutation,
@@ -282,15 +406,13 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
+      "activity_participant_view_other_responses",
       "activity_participants_heading",
-      "activity_section_save_changes",
+      "activity_section_done",
       "edit_content_elements",
-      "activity_participants_add",
-      "activity_participants_heading",
-      "activity_section_save_changes",
-      "section_element_summary_required_questions",
-      "section_element_summary_optional_questions",
-      "section_element_summary_other_content_elements"
+      "no_participants_added",
+      "section_title",
+      "untitled_section"
     ],
     "moodle": [
       "cancel"

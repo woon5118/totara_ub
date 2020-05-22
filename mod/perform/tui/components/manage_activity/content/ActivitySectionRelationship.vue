@@ -21,49 +21,54 @@
 -->
 
 <template>
-  <div class="mod-perform-activitySection__participant-grid">
-    <div
-      class="mod-perform-activitySection__participant-grid-item mod-perform-activitySection__participant-name"
-    >
-      {{ participant.relationship.name }}
-      <ButtonIcon
-        :styleclass="{ small: true, transparent: true }"
-        :aria-label="$str('delete')"
-        @click="removeDisplayedParticipant(participant)"
-      >
-        <DeleteIcon />
-      </ButtonIcon>
+  <div class="tui-performActivitySectionRelationship">
+    <div v-if="editable" class="tui-performActivitySectionRelationship__item">
+      <div class="tui-performActivitySectionRelationship__item-name">
+        {{ participant.relationship.name }}
+        <DeleteIcon
+          :aria-label="
+            $str(
+              'delete_relationship',
+              'mod_perform',
+              participant.relationship.name
+            )
+          "
+          @click="removeDisplayedParticipant(participant)"
+        />
+      </div>
+      <div class="tui-performActivitySectionRelationship__item-options">
+        <Checkbox
+          v-model="participant_can_view"
+          @change="toggleCanViewOnParticipant"
+        >
+          {{ $str('activity_participant_can_view', 'mod_perform') }}
+        </Checkbox>
+      </div>
     </div>
-    <div
-      class="mod-perform-activitySection__participant-grid-item mod-perform-activitySection__participant-options"
-    >
-      <Checkbox
-        v-model="participant_can_view"
-        :label="
-          $str('activity_participant_view_other_responses', 'mod_perform')
-        "
-        @change="toggleCanViewOnParticipant"
-      >
-        {{ $str('activity_participant_view_other_responses', 'mod_perform') }}
-      </Checkbox>
+    <div v-else class="tui-performActivitySectionRelationship__item">
+      <p>
+        {{ participant.relationship.name }}{{ participant.can_view ? '*' : '' }}
+      </p>
     </div>
   </div>
 </template>
 
 <script>
-import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
 import Checkbox from 'totara_core/components/form/Checkbox';
-import DeleteIcon from 'totara_core/components/icons/common/Delete';
+import DeleteIcon from 'totara_core/components/buttons/DeleteIcon';
 
 export default {
   components: {
-    ButtonIcon,
     Checkbox,
     DeleteIcon,
   },
   props: {
     participant: {
       type: Object,
+      required: true,
+    },
+    editable: {
+      type: Boolean,
       required: true,
     },
   },
@@ -73,15 +78,28 @@ export default {
     };
   },
   methods: {
+    /**
+     * Gets can_view property of participant.
+     *
+     * @return {Boolean}
+     */
     getCanView() {
       return this.participant.can_view;
     },
+    /**
+     * Change can_view property on participant.
+     * @param {Boolean} checked Value to change can_view to
+     */
     toggleCanViewOnParticipant(checked) {
       const participant = Object.assign({}, this.participant, {
         can_view: checked,
       });
       this.$emit('can-view-changed', participant);
     },
+    /**
+     * Removes displayed participant.
+     * @param {Object} participant
+     */
     removeDisplayedParticipant(participant) {
       this.$emit('participant-removed', participant);
     },
@@ -92,10 +110,8 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
-      "activity_participant_view_other_responses"
-    ],
-    "moodle": [
-      "delete"
+      "activity_participant_can_view",
+      "delete_relationship"
     ]
   }
 </lang-strings>

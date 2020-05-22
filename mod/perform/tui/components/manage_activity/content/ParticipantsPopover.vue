@@ -58,6 +58,7 @@
         :styleclass="{ small: true }"
         :aria-label="$str('activity_participants_add', 'mod_perform')"
         :disabled="hasAddedAllParticipants"
+        class="tui-performActivitySectionParticipants__add"
       >
         <AddIcon size="100" />
       </ButtonIcon>
@@ -96,6 +97,11 @@ export default {
   },
 
   computed: {
+    /**
+     * Checks if all participants have been added.
+     *
+     * @return {Boolean}
+     */
     hasAddedAllParticipants() {
       return (
         this.availableParticipants.length === this.activeParticipants.length
@@ -114,12 +120,21 @@ export default {
       this.checkedParticipants = [];
     },
 
+    /**
+     * Checks if participant is active.
+     * @param {Object} participant
+     */
     isActiveParticipant(participant) {
       return this.activeParticipants
         .map(participant => participant.relationship.id)
         .includes(participant.id);
     },
 
+    /**
+     * Handles change in selected participants.
+     * @param {Boolean} isChecked
+     * @param {Object} participant
+     */
     handleChange(isChecked, participant) {
       if (isChecked) {
         this.checkedParticipants.push(participant);

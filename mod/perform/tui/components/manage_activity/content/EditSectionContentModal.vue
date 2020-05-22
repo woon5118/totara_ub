@@ -243,7 +243,6 @@ export default {
         this.$emit(
           'update-summary',
           result.mod_perform_update_section_elements.section
-            .section_elements_summary
         );
       } catch (e) {
         this.$emit('mutation-error', e);

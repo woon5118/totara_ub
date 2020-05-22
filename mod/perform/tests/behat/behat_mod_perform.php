@@ -43,15 +43,17 @@ class behat_mod_perform extends behat_base {
     public const MULTI_CHOICE_ANSWER_LOCATOR = '.tui-elementEditMultiChoiceParticipantResponse__answer';
     public const PERFORM_ACTIVITY_YOUR_RELATIONSHIP_LOCATOR = '.tui-participantContent__user-relationshipValue';
     public const PERFORM_SHOW_OTHERS_RESPONSES_LOCATOR      = '.tui-participantContent__sectionHeading-other-response-switch button';
-    public const MANAGE_CONTENT_PARTICIPANT_NAME_LOCATOR    = '.mod-perform-activitySection__participant-name';
-    public const MANAGE_CONTENT_ADD_PARTICIPANTS_BUTTON_LABEL = ".mod-perform-activitySection [aria-label='Add participants']";
+    public const MANAGE_CONTENT_PARTICIPANT_NAME_LOCATOR = '.tui-performActivitySectionRelationship__item-name';
+    public const MANAGE_CONTENT_ADD_PARTICIPANTS_BUTTON_LABEL = ".tui-performManageActivityContent__items .tui-performActivitySection:nth-of-type(%d) [aria-label='Add participants']";
+    public const MANAGE_CONTENT_ACTIVITY_SECTION = ".tui-performManageActivityContent__items .tui-performActivitySection:nth-of-type(%d)";
+    public const MANAGE_CONTENT_ACTIVITY_SECTION_CONTENT_SUMMARY = ".tui-grid-item:nth-of-type(%d) .tui-performActivitySectionElementSummary__count";
 
     public const TUI_USER_ANSWER_ERROR_LOCATOR = '.tui-formFieldError';
     public const USER_QUESTION_TEXT_LOCATOR = '.tui-collapsible__header-text';
     public const TUI_TAB_ELEMENT = '.tui-tabs__tabs';
     public const SCHEDULE_SAVE_LOCATOR = '.tui-performAssignmentSchedule__action .tui-formBtn--prim';
 
-    public const TUI_TRASH_ICON_BUTTON = "button[aria-label='Delete']";
+    public const TUI_TRASH_ICON_BUTTON = "button[aria-label='Delete %s']";
 
     /**
      * Navigate to the specified page and wait for JS.
@@ -112,6 +114,104 @@ class behat_mod_perform extends behat_base {
      */
     public function i_should_see_perform_question_is_unanswered(string $element_type, string $question_text): void {
          $this->i_should_see_perform_question_is_answered_with($element_type, $question_text, '');
+    }
+
+    /**
+     * @Given /^I should see "(?P<text_string>(?:[^"]|\\")*)" in the activity section$/
+     * @Given /^I should see "(?P<text_string>(?:[^"]|\\")*)" in the "(?P<section_number>\d+)" activity section$/
+     *
+     * @param string $text
+     * @param int $section_number
+     * @return void
+     */
+    public function i_should_see_in_section(string $text, int $section_number = 1): void {
+        $section_selector = sprintf(self::MANAGE_CONTENT_ACTIVITY_SECTION, $section_number);
+        $this->execute('behat_general::assert_element_contains_text',
+            [$text, $section_selector, 'css_element']
+        );
+    }
+
+    /**
+     * @Given /^I should not see "(?P<text_string>(?:[^"]|\\")*)" in the activity section$/
+     * @Given /^I should not see "(?P<text_string>(?:[^"]|\\")*)" in the "(?P<section_number>\d+)" activity section$/
+     *
+     * @param string $text
+     * @param int $section_number
+     * @return void
+     */
+    public function i_should_not_see_in_section(string $text, int $section_number = 1): void {
+        $section_selector = sprintf(self::MANAGE_CONTENT_ACTIVITY_SECTION, $section_number);
+        $this->execute('behat_general::assert_element_not_contains_text',
+            [$text, $section_selector, 'css_element']
+        );
+    }
+
+    /**
+     * @Given /^I click on "(?P<selector_string>(?:[^"]|\\")*)" css element in the activity section$/
+     * @Given /^I click on "(?P<selector_string>(?:[^"]|\\")*)" css element in the "(?P<section_number>\d+)" activity section$/
+     *
+     * @param string $css_selector
+     * @param int $section_number
+     * @return void
+     */
+    public function i_click_on_css_element_in_section(string $css_selector, int $section_number = 1): void {
+        $section_selector = sprintf(
+            self::MANAGE_CONTENT_ACTIVITY_SECTION,
+            $section_number
+        );
+        $this->execute('behat_general::i_click_on',
+            ["$section_selector $css_selector", 'css_element']
+        );
+    }
+
+    /**
+     * @Given /^I click on "(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>(?:[^"]|\\")*)" in the "(?P<element_container_string>(?:[^"]|\\")*)" css element of the activity section$/
+     * @Given /^I click on "(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>(?:[^"]|\\")*)" in the "(?P<element_container_string>(?:[^"]|\\")*)" css element of the "(?P<section_number>\d+)" activity section$/
+     *
+     * @param string $element
+     * @param string $selector_type
+     * @param string $parent_element
+     * @param int $section_number
+     * @return void
+     */
+    public function i_click_on_the_in_the_section(
+        string $element,
+        string $selector_type,
+        string $parent_element,
+        int $section_number = 1
+    ): void {
+        $section_selector = sprintf(
+            self::MANAGE_CONTENT_ACTIVITY_SECTION,
+            $section_number
+        );
+
+        $this->execute('behat_general::i_click_on_in_the',
+            [$element, $selector_type, "$section_selector $parent_element", 'css_element']
+        );
+    }
+
+    /**
+     * @Given /^I should see "(?P<text_string>(?:[^"]|\\")*)" in the "(?P<summary_item>(?:[^"]|\\")*)" element summary of the activity section$/
+     * @Given /^I should see "(?P<text_string>(?:[^"]|\\")*)" in the "(?P<summary_item>(?:[^"]|\\")*)" element summary of "(?P<section_number>\d+)" activity section$/
+     *
+     * @param int $count
+     * @param string $summary_item
+     * @param int $section_number
+     * @return void
+     */
+    public function i_should_see_in_section_summary(int $count, string $summary_item, int $section_number = 1): void {
+        $summary_map = [
+            'required' => 1,
+            'optional' => 2,
+            'other' => 3,
+        ];
+        $css_selector = sprintf(
+            self::MANAGE_CONTENT_ACTIVITY_SECTION . ' ' . self::MANAGE_CONTENT_ACTIVITY_SECTION_CONTENT_SUMMARY,
+            $section_number, $summary_map[$summary_item]
+        );
+        $this->execute('behat_general::assert_element_contains_text',
+            [$count, $css_selector, 'css_element']
+        );
     }
 
     /**
@@ -449,32 +549,47 @@ class behat_mod_perform extends behat_base {
     }
 
     /**
-     * @When /^I click the add perform activity participant button$/
+     * @When /^I click the add participant button$/
+     * @When /^I click the add participant button in "([^"]*)" activity section$/
+     *
+     * @param int $section_number
+     * @return void
      */
-    public function i_click_the_add_participant_button(): void {
+    public function i_click_the_add_participant_button(int $section_number = 1): void {
         behat_hooks::set_step_readonly(false);
+        $css_selector = sprintf(self::MANAGE_CONTENT_ADD_PARTICIPANTS_BUTTON_LABEL, $section_number);
 
         $this->find(
             'css',
-            self::MANAGE_CONTENT_ADD_PARTICIPANTS_BUTTON_LABEL
+            $css_selector
         )->click();
     }
 
     /**
-     * @When /^I should see the add perform activity participant button is disabled$/
+     * @When /^I should see the add participant button is disabled$/
+     * @When /^I should see the add participant button is disabled in "([^"]*)" activity section$/
+     *
+     * @param int $section_number
+     * @return void
      */
-    public function i_should_see_the_add_participant_button_is_disabled(): void {
+    public function i_should_see_the_add_participant_button_is_disabled(int $section_number = 1): void {
+        $css_selector = sprintf(self::MANAGE_CONTENT_ADD_PARTICIPANTS_BUTTON_LABEL, $section_number);
         $this->execute('behat_general::the_element_should_be_disabled',
-            [self::MANAGE_CONTENT_ADD_PARTICIPANTS_BUTTON_LABEL, 'css_element']
+            [$css_selector, 'css_element']
         );
     }
 
     /**
-     * @When /^I should see the add perform activity participant button$/
+     * @When /^I should see the add participant button$/
+     * @When /^I should see the add participant button in "([^"]*)" activity section$/
+     *
+     * @param int $section_number
+     * @return void
      */
-    public function i_should_see_the_add_participant_button(): void {
+    public function i_should_see_the_add_participant_button(int $section_number = 1): void {
+        $css_selector = sprintf(self::MANAGE_CONTENT_ADD_PARTICIPANTS_BUTTON_LABEL, $section_number);
         $this->ensure_element_exists(
-            self::MANAGE_CONTENT_ADD_PARTICIPANTS_BUTTON_LABEL,
+            $css_selector,
             'css_element'
         );
     }
@@ -491,7 +606,7 @@ class behat_mod_perform extends behat_base {
 
         foreach ($rows as $participant_row) {
             if (trim($participant_row->getText()) === $participant_to_remove) {
-                $participant_row->find('css', self::TUI_TRASH_ICON_BUTTON)->click();
+                $participant_row->find('css', sprintf( self::TUI_TRASH_ICON_BUTTON, $participant_to_remove))->click();
                 return;
             }
         }

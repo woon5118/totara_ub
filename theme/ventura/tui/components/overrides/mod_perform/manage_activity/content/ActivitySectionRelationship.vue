@@ -19,50 +19,43 @@
   @author Kunle Odusan <kunle.odusan@totaralearning.com>
   @package theme_ventura
 -->
-
 <style lang="scss">
-.mod-perform-activitySection {
-  &__participant-grid {
+.tui-performActivitySectionRelationship {
+  > * {
+    margin-top: var(--tui-gap-4);
+  }
+  &__item {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    margin-bottom: var(--tui-gap-4);
-  }
-
-  &__participant-grid-item {
-    flex-basis: 100%;
-  }
-
-  @media (min-width: $tui-screen-xs) {
-    &__participant-grid {
-      flex-direction: row;
-      margin-bottom: 0;
-    }
-
-    &__participant-name {
-      max-width: 500px;
-      margin-bottom: 0;
-    }
-
-    &__participant-options {
-      margin-bottom: var(--tui-gap-2);
+    &-name {
+      display: flex;
+      flex-grow: 1;
+      justify-content: space-between;
       padding: var(--tui-gap-2);
+      border: var(--tui-border-width-thin) solid var(--tui-color-neutral-5);
+      border-radius: var(--tui-border-radius-normal);
+    }
+    &-options {
+      margin-top: var(--tui-gap-4);
     }
   }
-
-  &__participant-name {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: var(--tui-gap-2);
-    padding: var(--tui-gap-2);
-    border: var(--tui-border-width-thin) solid var(--tui-color-neutral-5);
-    border-radius: var(--tui-border-radius-normal);
-  }
-
-  &__participant-options {
-    margin-top: 0;
-    margin-bottom: var(--tui-gap-4);
+}
+@media (min-width: $tui-screen-xs) {
+  .tui-performActivitySectionRelationship {
+    > * {
+      margin-top: var(--tui-gap-2);
+    }
+    &__item {
+      flex-direction: row;
+      &-name {
+        max-width: 500px;
+      }
+      &-options {
+        margin: auto 0;
+        padding: var(--tui-gap-2);
+      }
+    }
   }
 }
 </style>

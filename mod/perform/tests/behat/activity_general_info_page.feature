@@ -6,8 +6,8 @@ Feature: Create and update activity general info fields
   Background:
     Given I am on a totara site
     And the following "activities" exist in "mod_perform" plugin:
-      | activity_name       | description                     | activity_type | create_track |
-      | My Test Activity #1 | My Test Activity #1 description | check-in      | true         |
+      | activity_name       | description                     | activity_type | create_track | create_section |
+      | My Test Activity #1 | My Test Activity #1 description | check-in      | true         | true           |
 
   Scenario: Populate the general info fields for a new activity
     Given I log in as "admin"

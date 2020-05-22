@@ -92,9 +92,9 @@ Feature: Manage performance activity multiple choice elements
     Given I log in as "admin"
     And I navigate to the manage perform activities page
     And I click on "Activity one" "link"
-    Then I should see the tui datatable contains:
-      | Required questions     | Optional questions | Other content elements |
-      | 0                      | 0                  | 0                      |
+    Then I should see "0" in the "required" element summary of the activity section
+    And I should see "0" in the "optional" element summary of the activity section
+    And I should see "0" in the "other" element summary of the activity section
     # Add multiple elements
     And I navigate to manage perform activity content page
     And I click multi choice question element
@@ -114,9 +114,9 @@ Feature: Manage performance activity multiple choice elements
     Then I should see "Optional"
     And I click on "Submit" "button"
     When I close the tui notification toast
-    Then I should see the tui datatable contains:
-      | Required questions     | Optional questions | Other content elements |
-      | 1                      | 1                  | 0                      |
+    Then I should see "1" in the "required" element summary of the activity section
+    And I should see "1" in the "optional" element summary of the activity section
+    And I should see "0" in the "other" element summary of the activity section
     When I navigate to manage perform activity content page
     Then I should see "Optional"
     And I should see "Required"
