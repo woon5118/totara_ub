@@ -28,6 +28,12 @@ use mod_perform\entities\activity\participant_instance;
 
 class user {
 
+    protected const ALLOWED_FIELDS = [
+        'id',
+        'fullname',
+        'profileimageurlsmall',
+    ];
+
     /**
      * User access hook to check if one user can view another users profile field in the context of mod perform.
      *
@@ -38,39 +44,13 @@ class user {
             return;
         }
 
-        if (!static::is_allowed_profile_field($hook->field)) {
+        if (!in_array($hook->field, self::ALLOWED_FIELDS, true)) {
             return;
         }
 
-        if (static::should_allow_view_profile($hook->viewing_user_id, $hook->target_user_id)) {
+        if (participant_instance::repository()->user_can_view_other_users_profile($hook->viewing_user_id, $hook->target_user_id)) {
             $hook->give_permission();
         }
-    }
-
-    private static function is_allowed_profile_field(string $field): bool {
-        static $allowed_profile_fields = [
-            'id',
-            'fullname',
-            'profileimageurlsmall',
-        ];
-
-        return in_array($field, $allowed_profile_fields, true);
-    }
-
-    private static function should_allow_view_profile(int $viewing_user_id, int $target_user_id): bool {
-        static $cache = [];
-        $cache_key = $viewing_user_id . '-' . $target_user_id;
-
-        if (!array_key_exists($cache_key, $cache)) {
-            $result = participant_instance::repository()->user_can_view_other_users_profile(
-                $viewing_user_id,
-                $target_user_id
-            );
-
-            $cache[$cache_key] = $result;
-        }
-
-        return $cache[$cache_key];
     }
 
 }
