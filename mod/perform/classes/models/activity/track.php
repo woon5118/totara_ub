@@ -454,8 +454,8 @@ class track extends model {
     public static function get_dynamic_schedule_units(): array {
         return [
             track_entity::SCHEDULE_DYNAMIC_UNIT_DAY => 'DAY',
+            track_entity::SCHEDULE_DYNAMIC_UNIT_WEEK => 'WEEK',
             track_entity::SCHEDULE_DYNAMIC_UNIT_MONTH => 'MONTH',
-            track_entity::SCHEDULE_DYNAMIC_UNIT_YEAR => 'YEAR',
         ];
     }
 

@@ -11,7 +11,6 @@ enum mod_perform_track_dynamic_unit_enums {
   DAY
   MONTH
   WEEK
-  YEAR
 }
 
 """

@@ -219,7 +219,7 @@ class mod_perform_webapi_resolver_mutation_update_track_due_date_testcase
                 'track_id' => $this->track1_id,
                 'schedule_is_open' => false,
                 'schedule_is_fixed' => false,
-                'schedule_dynamic_unit' => 'YEAR',
+                'schedule_dynamic_unit' => 'MONTH',
                 'schedule_dynamic_direction' => 'AFTER',
                 'schedule_dynamic_count_from' => 200,
                 'schedule_dynamic_count_to' => 100,
