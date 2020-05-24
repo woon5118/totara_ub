@@ -567,7 +567,9 @@ function xmldb_perform_upgrade($oldversion) {
         $field = new xmldb_field('perform_relationship_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'id');
 
         // Launch rename field perform_relationship_id.
-        $dbman->rename_field($table, $field, 'activity_relationship_id');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->rename_field($table, $field, 'activity_relationship_id');
+        }
 
         // Perform savepoint reached.
         upgrade_mod_savepoint(true, 2020030901, 'perform');
@@ -580,7 +582,9 @@ function xmldb_perform_upgrade($oldversion) {
         $key = new xmldb_key('activity_relationship_id', XMLDB_KEY_FOREIGN, array('activity_relationship_id'), 'perform_relationship', array('id'));
 
         // Launch add key activity_relationship_id.
-        $dbman->add_key($table, $key);
+        if (!$dbman->key_exists($table, $key)) {
+            $dbman->add_key($table, $key);
+        }
 
         // Perform savepoint reached.
         upgrade_mod_savepoint(true, 2020030902, 'perform');
@@ -594,13 +598,25 @@ function xmldb_perform_upgrade($oldversion) {
         $key = new xmldb_key('participant_id', XMLDB_KEY_FOREIGN, array('participant_id'), 'user', array('id'), 'cascade');
 
         // Launch add key participant_id.
-        $dbman->add_key($table, $key);
+        if (!$dbman->key_exists($table, $key)) {
+            $dbman->add_key($table, $key);
+        }
 
         // Add created_at
-        $table->add_field('created_at', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $field = new xmldb_field('created_at', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'availability');
+
+        // Conditionally launch add field created_at.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
 
         // Add updated_at
-        $table->add_field('updated_at', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $field = new xmldb_field('updated_at', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'created_at');
+
+        // Conditionally launch add field updated_at.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
 
         // Define table perform_participant_section to be created.
         $table = new xmldb_table('perform_participant_section');
@@ -744,35 +760,39 @@ function xmldb_perform_upgrade($oldversion) {
         $field = new xmldb_field('class_name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, 'activity_id');
 
         // Launch rename field class_name.
-        $dbman->rename_field($table, $field, 'relationship_id');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->rename_field($table, $field, 'relationship_id');
 
-        // Changing type of field relationship_id on table perform_relationship to int.
-        $table = new xmldb_table('perform_relationship');
-        $field = new xmldb_field('relationship_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'activity_id');
+            // Changing type of field relationship_id on table perform_relationship to int.
+            $table = new xmldb_table('perform_relationship');
+            $field = new xmldb_field('relationship_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'activity_id');
 
-        // Launch change of type for field relationship_id.
-        $dbman->change_field_type($table, $field);
+            // Launch change of type for field relationship_id.
+            $dbman->change_field_type($table, $field);
 
-        // Changing precision of field relationship_id on table perform_relationship to (10).
-        $table = new xmldb_table('perform_relationship');
-        $field = new xmldb_field('relationship_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'activity_id');
+            // Changing precision of field relationship_id on table perform_relationship to (10).
+            $table = new xmldb_table('perform_relationship');
+            $field = new xmldb_field('relationship_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'activity_id');
 
-        // Launch change of precision for field relationship_id.
-        $dbman->change_field_precision($table, $field);
+            // Launch change of precision for field relationship_id.
+            $dbman->change_field_precision($table, $field);
 
-        // Define key relationship_id (foreign) to be added to perform_relationship.
-        $table = new xmldb_table('perform_relationship');
-        $key = new xmldb_key('relationship_id', XMLDB_KEY_FOREIGN, array('relationship_id'), 'totara_core_relationship', array('id'), 'restrict');
+            // Define key relationship_id (foreign) to be added to perform_relationship.
+            $table = new xmldb_table('perform_relationship');
+            $key = new xmldb_key('relationship_id', XMLDB_KEY_FOREIGN, array('relationship_id'), 'totara_core_relationship', array('id'), 'restrict');
 
-        // Launch add key relationship_id.
-        $dbman->add_key($table, $key);
+            // Launch add key relationship_id.
+            $dbman->add_key($table, $key);
+        }
 
         // Define index activity_id_relationship_id (unique) to be added to perform_relationship.
         $table = new xmldb_table('perform_relationship');
+
+        $field = new xmldb_field('relationship_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'activity_id');
         $index = new xmldb_index('activity_id_relationship_id', XMLDB_INDEX_UNIQUE, array('activity_id', 'relationship_id'));
 
         // Conditionally launch add index activity_id_relationship_id.
-        if (!$dbman->index_exists($table, $index)) {
+        if ($dbman->field_exists($table, $field) && !$dbman->index_exists($table, $index)) {
             $dbman->add_index($table, $index);
         }
 
@@ -817,14 +837,18 @@ function xmldb_perform_upgrade($oldversion) {
         $field = new xmldb_field('status', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'participant_instance_id');
 
         // Launch rename field status.
-        $dbman->rename_field($table, $field, 'progress');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->rename_field($table, $field, 'progress');
+        }
 
         // Rename field status on table perform_participant_instance to progress.
         $table = new xmldb_table('perform_participant_instance');
         $field = new xmldb_field('status', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'subject_instance_id');
 
         // Launch rename field status.
-        $dbman->rename_field($table, $field, 'progress');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->rename_field($table, $field, 'progress');
+        }
 
         // Perform savepoint reached.
         upgrade_mod_savepoint(true, 2020040800, 'perform');
