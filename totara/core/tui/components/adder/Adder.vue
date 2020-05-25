@@ -175,12 +175,12 @@ export default {
      * @return {String}
      */
     basketTabString() {
+      // Fetch string with a RTL bracket fix for count on safari.
       if (this.count) {
-        return this.$str(
-          'adder_selection_with_count',
-          'totara_core',
-          this.count
-        );
+        return this.$str('adder_selection_with_count', 'totara_core', {
+          count:
+            '\u202D' + this.$str('count', 'totara_core', this.count) + '\u202D',
+        });
       }
       return this.$str('adder_selection', 'totara_core');
     },
@@ -247,6 +247,7 @@ export default {
     "adder_browse",
     "adder_selection",
     "adder_selection_with_count",
+    "count",
     "loadmore"
   ]
 }
