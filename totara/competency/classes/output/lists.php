@@ -21,7 +21,9 @@
  * @package totara_core
  */
 
-namespace totara_core\output;
+namespace totara_competency\output;
+
+use totara_core\output\select;
 
 defined('MOODLE_INTERNAL') || die();
 

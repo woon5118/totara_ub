@@ -1,4 +1,4 @@
-@totara @totara_core @javascript
+@totara @totara_competency @javascript @perform
 Feature: Test lists component
 
   Background:
@@ -6,8 +6,8 @@ Feature: Test lists component
     And I log in as "admin"
 
   Scenario: The list is displayed correctly
-    When I navigate to the "lists" fixture in the "totara/core" plugin
-    Then I should see "\totara_core\output\lists testing page"
+    When I navigate to the "lists" fixture in the "totara/competency" plugin
+    Then I should see "\totara_competency\output\lists testing page"
     And I should see "Column 1"
     And I should see "Column 2"
     And I should see "Column 3"
@@ -70,19 +70,19 @@ Feature: Test lists component
     And ".tw-list__row[data-tw-list-row=8] .tw-list__cell_hierarchy_btn" "css_element" should exist
 
   Scenario: The list shows correctly without checkboxes, actions and hierarchy
-    When I navigate to the "lists" fixture in the "totara/core" plugin with the following settings
+    When I navigate to the "lists" fixture in the "totara/competency" plugin with the following settings
       | selectable | 0 |
     Then "Select all" "checkbox" should not exist
     And "Select" "checkbox" should not exist
-    When I navigate to the "lists" fixture in the "totara/core" plugin with the following settings
+    When I navigate to the "lists" fixture in the "totara/competency" plugin with the following settings
       | has_hierarchy | 0 |
     Then ".tw-list__cell_hierarchy_btn" "css_element" should not exist
-    When I navigate to the "lists" fixture in the "totara/core" plugin with the following settings
+    When I navigate to the "lists" fixture in the "totara/competency" plugin with the following settings
       | has_actions | 0 |
     Then ".tw-list__cell_action_btn" "css_element" should not exist
 
   Scenario: The list events are fired correctly
-    When I navigate to the "lists" fixture in the "totara/core" plugin
+    When I navigate to the "lists" fixture in the "totara/competency" plugin
     Then I should not see "Expanded item"
     # opening expanded view
     When I click on "22" "link"
@@ -122,7 +122,7 @@ Feature: Test lists component
     And I should not see "Two action icons"
 
   Scenario: The list checkboxes work as expected
-    When I navigate to the "lists" fixture in the "totara/core" plugin
+    When I navigate to the "lists" fixture in the "totara/competency" plugin
     # Select all checkboxes
     # first row is already preselected
     Then the field "tw-list__select_1" matches value "1"

@@ -1,13 +1,13 @@
-@totara @totara_core @javascript
+@totara @totara_competency @javascript @perform
 Feature: Test lists_manager component
 
   Background:
     Given I am on a totara site
     And I log in as "admin"
-    And I navigate to the "lists_manager" fixture in the "totara/core" plugin
+    And I navigate to the "lists_manager" fixture in the "totara/competency" plugin
 
   Scenario: The list with list manager in use is displayed correctly
-    Then I should see "\totara_core\output\lists_manager testing page"
+    Then I should see "\totara_competency\output\lists_manager testing page"
     And I should see "Column 1"
     And I should see "Column 2"
     And I should see "Column 3"

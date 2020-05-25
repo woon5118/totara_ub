@@ -34,13 +34,13 @@ if (!defined('BEHAT_SITE_RUNNING') || !BEHAT_SITE_RUNNING) {
         throw new coding_exception('Invalid access detected.');
     }
 }
-$title = '\totara_core\output\lists_manager testing page';
+$title = '\totara_competency\output\lists_manager testing page';
 
 require_login();
 $context = context_system::instance();
 require_capability('moodle/site:config', $context);
 $PAGE->set_context($context);
-$PAGE->set_url('/totara/core/tests/fixtures/lists_manager.php');
+$PAGE->set_url('/totara/competency/tests/fixtures/lists_manager.php');
 $PAGE->set_pagelayout('noblocks');
 $PAGE->set_title($title);
 

@@ -18,10 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
- * @package totara_core
+ * @package totara_competency
  */
 
-use totara_core\output\lists;
+use totara_competency\output\lists;
 
 require(__DIR__ . '/../../../../config.php');
 
@@ -33,13 +33,13 @@ if (!defined('BEHAT_SITE_RUNNING') || !BEHAT_SITE_RUNNING) {
         throw new coding_exception('Invalid access detected.');
     }
 }
-$title = '\totara_core\output\lists testing page';
+$title = '\totara_competency\output\lists testing page';
 
 require_login();
 $context = context_system::instance();
 require_capability('moodle/site:config', $context);
 $PAGE->set_context($context);
-$PAGE->set_url('/totara/core/tests/fixtures/lists.php');
+$PAGE->set_url('/totara/competency/tests/fixtures/lists.php');
 $PAGE->set_pagelayout('noblocks');
 $PAGE->set_title($title);
 
@@ -320,7 +320,7 @@ $list = lists::create(
     $has_actions
 );
 
-$PAGE->requires->js_call_amd('totara_core/test_lists', 'init');
+$PAGE->requires->js_call_amd('totara_competency/test_lists', 'init');
 
 echo $OUTPUT->render($list);
 echo $OUTPUT->footer();
