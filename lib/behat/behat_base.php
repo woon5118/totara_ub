@@ -805,8 +805,16 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
         // It is unlikely that Javascript code of a page or an AJAX request needs more than self::EXTENDED_TIMEOUT seconds
         // to be loaded, although when pages contains Javascript errors M.util.js_complete() can not be executed, so the
         // number of JS pending code and JS completed code will not match and we will reach this point.
+
+        // Totara: Append the list of pending_js to the exception message.
+        $get_pending_js = 'return "M" in window && "util" in M && "pending_js" in M.util ? M.util.pending_js : [];';
+        try {
+            $pending_js = ' (pending_js: ' . json_encode($this->getSession()->getDriver()->evaluateScript($get_pending_js), JSON_UNESCAPED_SLASHES | JSON_OBJECT_AS_ARRAY) . ')';
+        } catch (\Behat\Mink\Exception\DriverException $ex) {
+            $pending_js = '';
+        }
         throw new \Exception('Javascript code and/or AJAX requests are not ready after ' . self::EXTENDED_TIMEOUT .
-            ' seconds. There is a Javascript error or the code is extremely slow.');
+            ' seconds. There is a Javascript error or the code is extremely slow.' . $pending_js);
     }
 
     /**
