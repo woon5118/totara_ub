@@ -69,7 +69,7 @@ class manage_activities extends perform_controller {
     }
 
     public static function get_base_url(): string {
-        return '/mod/perform/manage/activity';
+        return '/mod/perform/manage/activity/index.php';
     }
 
 }

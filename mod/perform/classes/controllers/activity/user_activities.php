@@ -65,7 +65,7 @@ class user_activities extends perform_controller {
      * @return string
      */
     public static function get_base_url(): string {
-        return '/mod/perform/activity/';
+        return '/mod/perform/activity/index.php';
     }
 
 }
