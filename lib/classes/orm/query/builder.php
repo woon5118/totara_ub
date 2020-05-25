@@ -777,7 +777,9 @@ final class builder extends builder_base implements interacts_with_query, intera
                 break;
         }
 
-        $this->properties->orders[] = $column;
+        if ($this->can_add_order_by($column)) {
+            $this->properties->orders[] = $column;
+        }
 
         return $this;
     }
@@ -807,9 +809,36 @@ final class builder extends builder_base implements interacts_with_query, intera
                 break;
         }
 
-        $this->properties->orders[] = $what;
+        if ($this->can_add_order_by($what)) {
+            $this->properties->orders[] = $what;
+        }
 
         return $this;
+    }
+
+    /**
+     * Returns true if the order does not exist yet and can be safely added.
+     * Will throw an exception if the same field was set before but with a different direction.
+     *
+     * @param raw_field $new_order
+     * @return bool
+     * @throws coding_exception
+     */
+    private function can_add_order_by(raw_field $new_order): bool {
+        foreach ($this->properties->orders as $order) {
+            if ($order->get_field_column() === $new_order->get_field_column()) {
+                if ($order->sql() === $new_order->sql()) {
+                    // In case the same order is already set on the builder
+                    // do not set it twice to avoid issues with Mssql later on
+                    return false;
+                } else if (!$new_order->is_raw()) {
+                    throw new coding_exception(
+                        "Order for field '{$new_order->get_field_column()}' is already set with a different configuration."
+                    );
+                }
+            }
+        }
+        return true;
     }
 
     /**

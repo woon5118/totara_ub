@@ -613,32 +613,36 @@ class core_orm_builder_sql_testcase extends orm_query_builder_base {
         //
         // Passing field object
         //
-        $field = new order('c1');
+        $field1 = new order('c1');
+        $field2 = new order('c2');
         $builder = $this->new_test_where_builder()
-            ->order_by($field)
-            ->order_by_raw($field);
+            ->order_by($field1)
+            ->order_by_raw($field2);
 
-        $this->assertEquals($builder, $field->get_builder());
+        $this->assertEquals($builder, $field1->get_builder());
+        $this->assertEquals($builder, $field2->get_builder());
 
         // Sorts by a column in ascending order
         [$sql] = query::from_builder($builder)->build();
 
-        $this->assertEquals("SELECT {$table}.* FROM {{$this->table_name}} {$table} WHERE 1 = 1 ORDER BY {$table}.c1 ASC, {$table}.c1 ASC", $sql);
+        $this->assertEquals("SELECT {$table}.* FROM {{$this->table_name}} {$table} WHERE 1 = 1 ORDER BY {$table}.c1 ASC, {$table}.c2 ASC", $sql);
 
         //
         // Passing field object with a builder set, does not override it
         //
-        $field = new order('c1', 'desc', builder::table('table'));
+        $field1 = new order('c1', 'desc', builder::table('table'));
+        $field2 = new order('c2', 'desc', builder::table('table'));
         $builder = $this->new_test_where_builder()
-            ->order_by($field)
-            ->order_by_raw($field);
+            ->order_by($field1)
+            ->order_by_raw($field2);
 
-        $this->assertNotEquals($builder, $field->get_builder());
+        $this->assertNotEquals($builder, $field1->get_builder());
+        $this->assertNotEquals($builder, $field2->get_builder());
 
         // Sorts by a column in ascending order
         [$sql] = query::from_builder($builder)->build();
 
-        $this->assertEquals("SELECT {$table}.* FROM {{$this->table_name}} {$table} WHERE 1 = 1 ORDER BY \"table\".c1 DESC, \"table\".c1 DESC", $sql);
+        $this->assertEquals("SELECT {$table}.* FROM {{$this->table_name}} {$table} WHERE 1 = 1 ORDER BY \"table\".c1 DESC, \"table\".c2 DESC", $sql);
 
         //
         // Order by raw sql
@@ -646,7 +650,7 @@ class core_orm_builder_sql_testcase extends orm_query_builder_base {
         $builder = $this->new_test_where_builder()
             ->order_by(new sql('f1 ASC'));
 
-        $this->assertNotEquals($builder, $field->get_builder());
+        $this->assertNotEquals($builder, $field1->get_builder());
 
         // Sorts by a column in ascending order
         [$sql] = query::from_builder($builder)->build();
