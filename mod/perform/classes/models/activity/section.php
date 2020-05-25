@@ -53,6 +53,8 @@ class section extends model {
     protected $entity_attribute_whitelist = [
         'id',
         'activity_id',
+        'created_at',
+        'updated_at',
     ];
 
     protected $model_accessor_whitelist = [

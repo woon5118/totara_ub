@@ -296,6 +296,20 @@ input mod_perform_activate_activity_input {
 }
 
 """
+Input type for cloning an activity
+"""
+input mod_perform_clone_activity_input {
+  activity_id: core_id!
+}
+
+"""
+Mutation return type including a clone activity
+"""
+type mod_perform_clone_activity_result {
+  activity: mod_perform_activity!
+}
+
+"""
 Mutation return type including an activity
 """
 type mod_perform_activate_activity_result {
@@ -354,6 +368,13 @@ extend type Mutation {
   mod_perform_activate_activity(
     input: mod_perform_activate_activity_input!
   ): mod_perform_activate_activity_result!
+
+  """
+  Clone an activity
+  """
+  mod_perform_clone_activity(
+    input: mod_perform_clone_activity_input!
+  ): mod_perform_clone_activity_result!
 
   """
   Delete an activity

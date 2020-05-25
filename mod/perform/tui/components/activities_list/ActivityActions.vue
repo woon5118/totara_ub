@@ -53,6 +53,9 @@
       >
         {{ $str('activity_action_activate', 'mod_perform') }}
       </DropdownItem>
+      <DropdownItem @click="cloneActivity">
+        {{ $str('activity_action_clone', 'mod_perform') }}
+      </DropdownItem>
       <DropdownItem @click="showDeleteModal">
         {{ $str('activity_action_delete', 'mod_perform') }}
       </DropdownItem>
@@ -105,6 +108,7 @@
 
 <script>
 import ActivateActivityMutation from 'mod_perform/graphql/activate_activity.graphql';
+import ActivateCloneMutation from 'mod_perform/graphql/clone_activity.graphql';
 import ActivateDeleteMutation from 'mod_perform/graphql/delete_activity.graphql';
 import ActivityActionsIcon from 'mod_perform/components/icons/ActivityActions';
 import ActivityUsersToAssignCountQuery from 'mod_perform/graphql/activity_users_to_assign_count.graphql';
@@ -243,6 +247,38 @@ export default {
     },
 
     /**
+     * Clones the activity.
+     */
+    async cloneActivity() {
+      try {
+        await this.$apollo.mutate({
+          mutation: ActivateCloneMutation,
+          variables: {
+            input: {
+              activity_id: this.activity.id
+            },
+          },
+        });
+        this.showCloneSuccessNotification();
+      } catch (e) {
+        this.showErrorNotification();
+      }
+      this.$emit('refetch');
+    },
+
+    showCloneSuccessNotification() {
+      notify({
+        duration: NOTIFICATION_DURATION,
+        message: this.$str(
+          'toast_success_activity_cloned',
+          'mod_perform',
+          this.activity.name
+        ),
+        type: 'success',
+      });
+    },
+
+    /**
      * Display the modal for confirming the deletion of the activity.
      */
     showDeleteModal() {
@@ -336,6 +372,7 @@ export default {
   {
     "mod_perform": [
       "activity_action_activate",
+      "activity_action_clone",
       "activity_action_delete",
       "activity_action_options",
       "activity_draft_not_ready",
@@ -350,6 +387,7 @@ export default {
       "participation_reporting",
       "participation_reporting",
       "toast_error_generic_update",
+      "toast_success_activity_cloned",
       "toast_success_activity_activated",
       "toast_success_activity_deleted",
       "toast_success_draft_activity_deleted"

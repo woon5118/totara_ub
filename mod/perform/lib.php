@@ -73,3 +73,33 @@ function mod_perform_myprofile_navigation(tree $tree, $user, $is_current_user) {
 
     return true;
 }
+
+/**
+ * @param string $feature FEATURE_xx constant for requested feature
+ * @return mixed True if module supports feature, null if doesn't know
+ */
+function perform_supports($feature) {
+    switch ($feature) {
+        case FEATURE_NO_VIEW_LINK:
+        case FEATURE_BACKUP_MOODLE2:
+            return true;
+        case FEATURE_GRADE_HAS_GRADE:
+        case FEATURE_USES_QUESTIONS:
+        case FEATURE_COMPLETION_TRACKS_VIEWS:
+        case FEATURE_ARCHIVE_COMPLETION:
+        case FEATURE_COMPLETION_HAS_RULES:
+        case FEATURE_COMPLETION_TIME_IN_TIMECOMPLETED:
+        case FEATURE_SHOW_DESCRIPTION:
+        case FEATURE_COMMENT:
+        case FEATURE_MODEDIT_DEFAULT_COMPLETION:
+        case FEATURE_MOD_INTRO:
+        case FEATURE_GROUPINGS:
+        case FEATURE_GROUPS:
+        case FEATURE_IDNUMBER:
+        case FEATURE_GRADE_OUTCOMES:
+        case FEATURE_PLAGIARISM:
+            return false;
+        default:
+            return null;
+    }
+}

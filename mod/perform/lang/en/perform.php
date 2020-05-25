@@ -24,6 +24,7 @@
 $string['pluginname'] = 'Performance activity';
 
 $string['activity_action_activate'] = 'Activate';
+$string['activity_action_clone'] = 'Clone';
 $string['activity_action_delete'] = 'Delete';
 $string['activity_action_options'] = 'Actions';
 $string['activity_content_tab_heading'] = 'Content';
@@ -31,8 +32,10 @@ $string['activity_draft_not_ready'] = 'Draft is not yet ready for activation';
 $string['activity_general_tab_heading'] = 'General';
 $string['activity_instance_creation_heading'] = 'Activity instance creation';
 $string['activity_name'] = 'Performance activity name';
+$string['activity_name_restore_suffix'] = ' - Copy';
 $string['activity_participant_can_view'] = 'Can view others\' responses';
 $string['activity_participant_view_other_responses'] = '(*Can view others\' responses)';
+$string['activity_participant_view_other_responses'] = 'Can view others\' responses';
 $string['activity_participants_add'] = 'Add participants';
 $string['activity_participants_heading'] = 'Responding participants';
 $string['activity_participants_select_done'] = 'Done';
@@ -210,6 +213,7 @@ $string['toast_error_create_activity'] = 'An error occurred while saving, and th
 $string['toast_error_generic_update'] = 'An error occurred, and your latest changes have not been saved.';
 $string['toast_error_save_response'] = 'An error occurred while saving, and the activity responses could not be updated.';
 $string['toast_success_activity_activated'] = '"{$a}" was successfully activated.';
+$string['toast_success_activity_cloned'] = '"{$a}" activity successfully cloned.';
 $string['toast_success_activity_deleted'] = 'Activity and all associated user records successfully deleted.';
 $string['toast_success_activity_update'] = 'Activity saved.';
 $string['toast_success_draft_activity_deleted'] = 'Draft activity successfully deleted.';

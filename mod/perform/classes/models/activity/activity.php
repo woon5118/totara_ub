@@ -32,6 +32,7 @@ use core\orm\entity\model;
 use mod_perform\data_providers\activity\activity_settings;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\event\activity_deleted;
+use mod_perform\models\activity\helpers\activity_clone;
 use mod_perform\models\activity\helpers\activity_deletion;
 use mod_perform\entities\activity\track as track_entity;
 use mod_perform\entities\activity\track_assignment;
@@ -528,5 +529,15 @@ class activity extends model {
      */
     public function get_settings(): activity_settings {
         return new activity_settings($this);
+    }
+
+    /**
+     * Clone the activity and the associated child models.
+     * @see activity_clone
+     *
+     * @return activity
+     */
+    public function clone(): activity {
+        return (new activity_clone($this))->clone();
     }
 }
