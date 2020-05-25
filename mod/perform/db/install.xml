@@ -264,8 +264,8 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="section_id" TYPE="foreign" FIELDS="section_id" REFTABLE="perform_section" REFFIELDS="id" ONDELETE="cascade"/>
-        <KEY NAME="participant_instance_id" TYPE="foreign" FIELDS="participant_instance_id" REFTABLE="perform_participant_instance" REFFIELDS="id" ONDELETE="cascade"/>
+        <KEY NAME="section_id" TYPE="foreign" FIELDS="section_id" REFTABLE="perform_section" REFFIELDS="id" ONDELETE="restrict"/>
+        <KEY NAME="participant_instance_id" TYPE="foreign" FIELDS="participant_instance_id" REFTABLE="perform_participant_instance" REFFIELDS="id" ONDELETE="restrict"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="section_participant_instance" UNIQUE="true" FIELDS="section_id, participant_instance_id" COMMENT="Each participant instance can only have one record per section"/>

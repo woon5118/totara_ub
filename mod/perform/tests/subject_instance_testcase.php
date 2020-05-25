@@ -24,6 +24,7 @@
 use core\webapi\execution_context;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 use mod_perform\models\activity\subject_instance;
+use mod_perform\entities\activity\participant_section;
 
 /**
  * Class mod_perform_subject_instance_testcase
@@ -100,8 +101,10 @@ abstract class mod_perform_subject_instance_testcase extends advanced_testcase {
             ])
         );
 
+        foreach (self::$non_existing->get_participant_instances() as $participant_instance) {
+            participant_section::repository()->where('participant_instance_id', $participant_instance->get_id())->delete();
+        }
         $subject_instance_id = self::$non_existing->id;
-
         (new subject_instance_entity($subject_instance_id))->delete();
     }
 

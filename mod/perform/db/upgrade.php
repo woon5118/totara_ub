@@ -1134,5 +1134,42 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020052500, 'perform');
     }
 
+    if ($oldversion < 2020052600) {
+
+        $table = new xmldb_table('perform_section_relationship');
+        // Replave section_id key on delete.
+        $old_key = new xmldb_key('section_id', XMLDB_KEY_FOREIGN, array('section_id'), 'perform_section', array('id'), 'cascade');
+        if ($dbman->key_exists($table, $old_key)) {
+            $dbman->drop_key($table, $old_key);
+        }
+        $new_key = new xmldb_key('section_id', XMLDB_KEY_FOREIGN, array('section_id'), 'perform_section', array('id'), 'restrict');
+        if (!$dbman->key_exists($table, $new_key)) {
+            $dbman->add_key($table, $new_key);
+        }
+
+        $table = new xmldb_table('perform_participant_section');
+        // Replave section_id key on delete.
+        $old_key = new xmldb_key('section_id', XMLDB_KEY_FOREIGN, array('section_id'), 'perform_section', array('id'), 'cascade');
+        if ($dbman->key_exists($table, $old_key)) {
+            $dbman->drop_key($table, $old_key);
+        }
+        $new_key = new xmldb_key('section_id', XMLDB_KEY_FOREIGN, array('section_id'), 'perform_section', array('id'), 'restrict');
+        if (!$dbman->key_exists($table, $new_key)) {
+            $dbman->add_key($table, $new_key);
+        }
+
+        // Replace participant_instance_id key on delete.
+        $old_key = new xmldb_key('participant_instance_id', XMLDB_KEY_FOREIGN, array('participant_instance_id'), 'perform_participant_instance', array('id'), 'cascade');
+        if ($dbman->key_exists($table, $old_key)) {
+            $dbman->drop_key($table, $old_key);
+        }
+        $new_key = new xmldb_key('participant_instance_id', XMLDB_KEY_FOREIGN, array('participant_instance_id'), 'perform_participant_instance', array('id'), 'restrict');
+        if (!$dbman->key_exists($table, $new_key)) {
+            $dbman->add_key($table, $new_key);
+        }
+
+        upgrade_mod_savepoint(true, 2020052600, 'perform');
+    }
+
     return true;
 }
