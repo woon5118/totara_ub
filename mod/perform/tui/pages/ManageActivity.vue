@@ -174,10 +174,10 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
+      "back_to_all_activities",
       "manage_activities_tabs_assignment",
       "manage_activities_tabs_content",
       "manage_activities_tabs_general",
-      "back_to_all_activities",
       "manage_edit_draft_heading",
       "toast_error_generic_update",
       "toast_success_activity_update"

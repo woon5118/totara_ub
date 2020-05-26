@@ -22,9 +22,10 @@
  * @package mod_perform
  */
 
-use mod_perform\entities\activity\section as section_entity;
 use mod_perform\models\activity\section_element;
 use mod_perform\models\activity\section;
+use mod_perform\state\activity\active;
+use mod_perform\state\activity\draft;
 use totara_core\relationship\resolvers\subject;
 use totara_job\relationship\resolvers\appraiser;
 use totara_job\relationship\resolvers\manager;
@@ -258,5 +259,135 @@ class mod_perform_section_model_testcase extends mod_perform_relationship_testca
             'other_element_count' => 0
         ];
         $this->assertEquals($expected, $result);
+    }
+
+    public function test_delete_section_success() {
+        global $DB;
+
+        $data = $this->create_test_data();
+        $this->add_participant_section($data);
+        $activity = $data->activity1;
+        $section = $data->activity1_section1;
+
+        $this->assertCount(3, $activity->sections);
+        $this->assertCount(2, $section->section_relationships);
+        $this->assertCount(1, $section->participant_sections);
+        $section->delete();
+        $activity->refresh(true);
+
+        $this->assertCount(2, $activity->sections);
+        $section_relationships = $DB->get_records('perform_section_relationship', ['section_id' => $section->id]);
+        $this->assertCount(0, $section_relationships);
+        $participant_sections = $DB->get_records('perform_participant_section', ['section_id' => $section->id]);
+        $this->assertCount(0, $participant_sections);
+    }
+
+    public function test_fail_to_check_deletion_requirement_if_activity_is_active() {
+        $data = $this->create_test_data();
+        $activity = $data->activity1;
+        $this->assertEquals(active::get_code(), $activity->status);
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('section can not be deleted for active performance activity');
+        $section = $data->activity1_section1;
+        $section->check_deletion_requirements();
+    }
+
+    public function test_fail_to_check_deletion_requirement_if_no_enough_sections() {
+        self::setAdminUser();
+        $perform_generator = $this->perform_generator();
+        $activity = $perform_generator->create_activity_in_container(
+            ['activity_name' => 'Activity 1', 'activity_status' => draft::get_code(), 'create_section' => false]
+        );
+        $activity_section1 = $perform_generator->create_section($activity, ['title' => 'Activity 1 section 1']);
+        $activity_section2 = $perform_generator->create_section($activity, ['title' => 'Activity 1 section 2']);
+        $this->assertEquals(draft::get_code(), $activity->status);
+
+        $activity_section1->delete();
+        $activity->refresh(true);
+        $this->assertCount(1, $activity->sections);
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('activity does not have enough sections, section can not be deleted');
+        $activity_section2->check_deletion_requirements();
+    }
+
+    /**
+     * @param $data
+     * @throws coding_exception
+     */
+    private function add_participant_section($data): void {
+        $perform_generator = $this->perform_generator();
+        $user1 = self::getDataGenerator()->create_user();
+
+        $subject_instance = $perform_generator->create_subject_instance(
+            [
+                'activity_id'       => $data->activity1->id,
+                'subject_user_id'   => $user1->id,
+                'include_questions' => false,
+            ]
+        );
+        $data->activity1_section1_relationship1 = $perform_generator->create_section_relationship(
+            $data->activity1_section1,
+            ['class_name' => appraiser::class]
+        );
+        $participant_instance = $perform_generator->create_participant_instance(
+            $user1, $subject_instance->id, $data->activity1_section1_relationship1->id
+        );
+        $data->activity1_section_1_participant1 = $perform_generator->create_participant_section(
+            $data->activity1, $participant_instance, false, $data->activity1_section1
+        );
+    }
+
+    public function test_add_section_element_fail_if_section_is_deleted() {
+        [$section, $section_element, $element] = $this->create_section_element();
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('Section has been deleted, can not add section element');
+
+        $section->delete();
+        $section->add_element($element);
+    }
+
+    public function test_move_section_element_fail_if_section_is_deleted() {
+        [$section, $section_element] = $this->create_section_element();
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('Section has been deleted, can not move section elements');
+
+        $section->delete();
+        $section->move_section_elements([$section_element]);
+    }
+
+    public function test_remove_section_element_fail_if_section_is_deleted() {
+        [$section, $section_element] = $this->create_section_element();
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('Section has been deleted, can not remove section elements');
+
+        $section->delete();
+        $section->remove_section_elements([$section_element]);
+    }
+
+    public function test_update_relationship_fail_if_section_is_deleted() {
+        [$section] = $this->create_section_element();
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('Section has been deleted, can not update relationships');
+
+        $section->delete();
+        $section->update_relationships([]);
+    }
+
+    /**
+     * @return array
+     */
+    private function create_section_element(): array {
+        $data = $this->create_test_data();
+        $perform_generator = $this->perform_generator();
+        $element = $perform_generator->create_element(['title' => 'Question one']);
+        $section = $data->activity1_section1;
+        $section_element = $perform_generator->create_section_element($section, $element);
+        return [$section, $section_element, $element];
     }
 }

@@ -9,6 +9,9 @@ query mod_perform_activity($activity_id: core_id!) {
     edit_name: name(format: RAW)
     description
     edit_description: description(format: RAW)
+    state_details {
+      name
+    }
     sections {
       id
       title

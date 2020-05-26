@@ -133,6 +133,13 @@ type mod_perform_add_section_result {
   section: mod_perform_section!
 }
 
+"""
+Input type for deleting a section
+"""
+input mod_perform_delete_section_input {
+  section_id: core_id!
+}
+
 extend type Mutation {
   """
   Updates settings (including relationships) of given section
@@ -161,4 +168,9 @@ extend type Mutation {
   mod_perform_add_section(
     input: mod_perform_add_section_input!
   ): mod_perform_add_section_result!
+
+  """
+  Delete a section
+  """
+  mod_perform_delete_section(input: mod_perform_delete_section_input!): Boolean!
 }

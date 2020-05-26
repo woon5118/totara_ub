@@ -65,6 +65,9 @@
               >
                 {{ $str('section_action_add_below', 'mod_perform') }}
               </DropdownItem>
+              <DropdownItem v-if="canDelete" @click="showDeleteModal">
+                {{ $str('section_action_delete', 'mod_perform') }}
+              </DropdownItem>
             </Dropdown>
           </div>
         </GridItem>
@@ -159,6 +162,19 @@
         @update-summary="updateSection"
       />
     </ModalPresenter>
+
+    <ConfirmationModal
+      :open="deleteSectionModalOpen"
+      :title="$str('modal_section_delete_title', 'mod_perform')"
+      :confirm-button-text="$str('delete')"
+      :loading="deleting"
+      @confirm="deleteSection"
+      @cancel="closeDeleteSectionModal"
+    >
+      <template>
+        <p>{{ $str('modal_section_delete_message', 'mod_perform') }}</p>
+      </template>
+    </ConfirmationModal>
   </Card>
 </template>
 
@@ -170,6 +186,8 @@ import Button from 'totara_core/components/buttons/Button';
 import ButtonGroup from 'totara_core/components/buttons/ButtonGroup';
 import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
 import Card from 'totara_core/components/card/Card';
+import ConfirmationModal from 'totara_core/components/modal/ConfirmationModal';
+import DeleteSectionMutation from 'mod_perform/graphql/delete_section.graphql';
 import Dropdown from 'totara_core/components/dropdown/Dropdown';
 import DropdownItem from 'totara_core/components/dropdown/DropdownItem';
 import EditIcon from 'totara_core/components/buttons/EditIcon';
@@ -196,6 +214,7 @@ export default {
     ButtonGroup,
     ButtonIcon,
     Card,
+    ConfirmationModal,
     Dropdown,
     DropdownItem,
     EditIcon,
@@ -236,6 +255,10 @@ export default {
       type: Array,
       required: true,
     },
+    sectionCount: {
+      type: Number,
+      required: true,
+    },
   },
 
   data() {
@@ -246,6 +269,8 @@ export default {
       title: this.section.title,
       isSaving: false,
       TITLE_INPUT_MAX_LENGTH,
+      deleteSectionModalOpen: false,
+      deleting: false,
     };
   },
 
@@ -307,6 +332,9 @@ export default {
       return (
         this.savedSection.raw_created_at === this.savedSection.raw_updated_at
       );
+    },
+    canDelete() {
+      return this.sectionCount > 1;
     },
   },
 
@@ -494,6 +522,44 @@ export default {
       this.savedSection = result.section;
       return result;
     },
+
+    /**
+     * Display the modal for confirming the deletion of the section.
+     */
+    showDeleteModal() {
+      this.deleteSectionModalOpen = true;
+    },
+
+    /**
+     * close the section delete modal
+     */
+    closeDeleteSectionModal() {
+      this.deleteSectionModalOpen = false;
+      this.deleting = false;
+    },
+
+    /**
+     * delete a section
+     */
+    async deleteSection() {
+      this.deleting = true;
+      try {
+        await this.$apollo.mutate({
+          mutation: DeleteSectionMutation,
+          variables: {
+            input: {
+              section_id: this.section.id,
+            },
+          },
+        });
+        this.$emit('delete-section');
+        this.$emit('mutation-success');
+      } catch (e) {
+        this.$emit('mutation-error', e);
+      }
+
+      this.closeDeleteSectionModal();
+    },
   },
 };
 </script>
@@ -506,16 +572,20 @@ export default {
       "activity_section_done",
       "edit_content_elements",
       "edit_section",
+      "modal_section_delete_message",
+      "modal_section_delete_title",
       "no_participants_added",
       "section_action_add_above",
       "section_action_add_below",
+      "section_action_delete",
       "section_dropdown_menu",
       "section_title",
       "unsaved_changes_warning",
       "untitled_section"
     ],
     "moodle": [
-      "cancel"
+      "cancel",
+      "delete"
     ]
   }
 </lang-strings>

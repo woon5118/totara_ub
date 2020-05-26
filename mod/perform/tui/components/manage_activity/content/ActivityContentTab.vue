@@ -45,6 +45,7 @@
         :last-section="i === sectionStates.length - 1"
         :is-adding="isAdding"
         :sort-order="sectionState.sortOrder"
+        :section-count="sectionStates.length"
         :relationships="relationships"
         @input="updateSection($event, i)"
         @toggle-edit-mode="toggleSectionStateEditMode($event, i)"
@@ -52,6 +53,7 @@
         @mutation-error="$emit('mutation-error')"
         @add_above="addSectionAbove(i)"
         @add_below="addSectionBelow(i)"
+        @delete-section="deleteSection(i)"
       />
     </div>
 
@@ -346,6 +348,13 @@ export default {
       e.preventDefault();
       e.returnValue = discardUnsavedChanges;
       return discardUnsavedChanges;
+    },
+
+    /**
+     * delete section
+     */
+    deleteSection(sectionIndex) {
+      this.sectionStates.splice(sectionIndex, 1);
     },
   },
 

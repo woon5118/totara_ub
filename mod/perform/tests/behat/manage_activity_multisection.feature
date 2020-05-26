@@ -3,9 +3,10 @@ Feature: Managing an activity with multiple sections
 
   Background:
     Given the following "activities" exist in "mod_perform" plugin:
-      | activity_name             | create_section | create_track |
-      | Participant set up test   | true           | true         |
-      | Multiple section Activity | true           | true         |
+      | activity_name             | create_section | create_track | activity_status |
+      | Participant set up test   | true           | true         | Active          |
+      | Multiple section Activity | true           | true         | Active          |
+      | Multiple section Activity2| true           | true         | Draft           |
     And the following "activity sections" exist in "mod_perform" plugin:
       | activity_name             | section_name |
       | Multiple section Activity | Section B    |
@@ -284,3 +285,39 @@ Feature: Managing an activity with multiple sections
     And I reload the page
     Then I should see "The First Section!" in the "1" activity section
     And I should see "English Title" in the "2" activity section
+
+  Scenario: Delete a section
+    When I navigate to the edit perform activities page for activity "Multiple section Activity2"
+    Then "Add section" "button" should not be visible
+    When I click on ".tui-toggleBtn" "css_element"
+    Then I should see "All existing content will be grouped into the first section, along with the existing participant settings" in the tui modal
+    When I confirm the tui confirmation modal
+    And I close the tui notification toast
+    # Add one more section
+    When I click on "Add section" "button"
+    Then activity section "1" should exist
+    And activity section "2" should exist
+    When I click on "Cancel" "button" in the ".tui-performActivitySection__saveButtons" "css_element" of the "1" activity section
+    And I click on "Cancel" "button" in the ".tui-performActivitySection__saveButtons" "css_element" of the "2" activity section
+    # add section title
+    When I click on "button[aria-label='Edit section']" "css_element" in the "1" activity section
+    And I set the title of activity section "1" to "The first section"
+    And I click on "Done" "button" in the ".tui-performActivitySection__saveButtons" "css_element" of the "1" activity section
+    When I click on "button[aria-label='Edit section']" "css_element" in the "2" activity section
+    And I set the title of activity section "2" to "The second section"
+    And I click on "Done" "button" in the ".tui-performActivitySection__saveButtons" "css_element" of the "2" activity section
+    Then I should see "The first section" in the "1" activity section
+    And I should see "The second section" in the "2" activity section
+    # delete a section
+    When I click on ".tui-dropdown" "css_element" in the "1" activity section
+    And I click on "Delete" "link" in the "1" activity section
+    Then I should see "This will also delete all content elements contained in this section" in the tui modal
+    When I confirm the tui confirmation modal
+    And I close the tui notification toast
+    # check section is deleted
+    Then activity section "2" should not exist
+    # check the correct section is deleted
+    And I should see "The second section" in the "1" activity section
+    # There should not have a Delete link if only has one section
+    When I click on ".tui-dropdown" "css_element" in the "1" activity section
+    Then "Delete" "link" in the "1" activity section should not exist

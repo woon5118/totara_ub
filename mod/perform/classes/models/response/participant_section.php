@@ -274,4 +274,12 @@ class participant_section extends model {
         return $this->get_state(participant_section_availability::get_type());
     }
 
+    /**
+     * Delete the participant section
+     *
+     */
+    public function delete(): void {
+        $this->entity->delete();
+    }
+
 }
