@@ -60,8 +60,9 @@ class behat_mod_perform extends behat_base {
      * @param moodle_url $page_url
      */
     private function navigate_to_page(moodle_url $page_url): void {
+        behat_hooks::set_step_readonly(false);
+
         $this->getSession()->visit($this->locate_path($page_url->out(false)));
-        $this->wait_for_pending_js();
     }
 
     /**
@@ -161,6 +162,8 @@ class behat_mod_perform extends behat_base {
      * @readonly
      */
     public function i_click_show_others_responses(): void {
+        behat_hooks::set_step_readonly(false);
+
         $this->find('css', self::PERFORM_SHOW_OTHERS_RESPONSES_LABEL_LOCATOR)->click();
     }
 
@@ -276,6 +279,8 @@ class behat_mod_perform extends behat_base {
         string $question_text,
         string $new_answer
     ): void {
+        behat_hooks::set_step_readonly(false);
+
         $response = $this->find_question_response($element_type, $question_text);
 
         $response->setValue($new_answer);
@@ -292,6 +297,8 @@ class behat_mod_perform extends behat_base {
         string $question_text,
         int $character_count
     ): void {
+        behat_hooks::set_step_readonly(false);
+
         $response = $this->find_question_response($element_type, $question_text);
 
         $new_answer = random_string($character_count);
@@ -302,6 +309,8 @@ class behat_mod_perform extends behat_base {
      * @When /^I navigate to manage perform activity content page$/
      */
     public function i_navigate_to_manage_perform_activity_content_page(): void {
+        behat_hooks::set_step_readonly(false);
+
         $behat_general = behat_context_helper::get('behat_general');
         $behat_general->i_click_on_in_the(
             "Content",
@@ -316,6 +325,8 @@ class behat_mod_perform extends behat_base {
      * @When /^I save the activity schedule$/
      */
     public function i_save_the_activity_schedule(): void {
+        behat_hooks::set_step_readonly(false);
+
         $this->find('css', self::SCHEDULE_SAVE_LOCATOR)->click();
     }
 
@@ -406,6 +417,8 @@ class behat_mod_perform extends behat_base {
      * @When /^I click the add perform activity participant button$/
      */
     public function i_click_the_add_participant_button(): void {
+        behat_hooks::set_step_readonly(false);
+
         $this->find(
             'css',
             self::MANAGE_CONTENT_ADD_PARTICIPANTS_BUTTON_LABEL
@@ -436,6 +449,8 @@ class behat_mod_perform extends behat_base {
      * @param string $participant_to_remove
      */
     public function i_remove_as_a_participant(string $participant_to_remove): void {
+        behat_hooks::set_step_readonly(false);
+
         /** @var NodeElement[] $rows */
         $rows = $this->find_all('css', self::MANAGE_CONTENT_PARTICIPANT_NAME_LOCATOR);
 

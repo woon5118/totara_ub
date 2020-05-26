@@ -49,8 +49,9 @@ class behat_totara_competency extends behat_base {
      * @throws Exception
      */
     public function i_navigate_to_my_competency_profile(): void {
+        behat_hooks::set_step_readonly(false);
+
         $this->getSession()->visit($this->locate_path(self::TOTARA_COMPETENCY_PROFILE_PATH));
-        $this->wait_for_pending_js();
     }
 
     /**
@@ -59,8 +60,9 @@ class behat_totara_competency extends behat_base {
      * @throws Exception
      */
     public function i_navigate_to_the_competency_self_assignment_page(): void {
+        behat_hooks::set_step_readonly(false);
+
         $this->getSession()->visit($this->locate_path(self::TOTARA_COMPETENCY_USER_ASSIGNMENT_PATH));
-        $this->wait_for_pending_js();
     }
 
     /**
@@ -82,6 +84,8 @@ class behat_totara_competency extends behat_base {
      * @throws Exception
      */
     public function i_navigate_to_the_competency_user_assignment_page_for_guest_user(): void {
+        behat_hooks::set_step_readonly(false);
+
         /** @var User $user */
         $user = User::repository()
             ->select('id')
@@ -92,13 +96,14 @@ class behat_totara_competency extends behat_base {
         $url = $this->locate_path((string) new moodle_url(self::TOTARA_COMPETENCY_USER_ASSIGNMENT_PATH, ['user_id' => $user->id]));
 
         $this->getSession()->visit($url);
-        $this->wait_for_pending_js();
     }
 
     /**
      * @When /^I change the competency profile to list view$/
      */
     public function i_change_the_competency_profile_to_list_view(): void {
+        behat_hooks::set_step_readonly(false);
+
         $this->find('css', self::COMPETENCY_PROFILE_LIST_VIEW_TOGGLE_LOCATOR)->click();
     }
 
@@ -111,8 +116,6 @@ class behat_totara_competency extends behat_base {
      * @throws Exception
      */
     public function competency_scale_called_exists($scalename, TableNode $table) {
-        \behat_hooks::set_step_readonly(true); // Backend action.
-
         $scale_values = $this->parse_table(
             $table,
             ['name', 'proficient', 'default', 'sortorder'],
@@ -129,8 +132,6 @@ class behat_totara_competency extends behat_base {
      * @param string $competency
      */
     public function all_assignments_for_the_competency_are_archived($competency) {
-        \behat_hooks::set_step_readonly(true); // Backend action.
-
         $assignments = assignment::repository()
             ->filter_by_active()
             ->join([competency::TABLE, 'comp'], 'competency_id', 'id')
@@ -150,6 +151,8 @@ class behat_totara_competency extends behat_base {
      * @throws moodle_exception
      */
     public function i_navigate_to_the_competency_profile_details_page_for($competency, $user = null): void {
+        behat_hooks::set_step_readonly(false);
+
         $competency_id = $this->resolve_competency_id($competency);
         $query_params = ['competency_id' => $competency_id];
 
@@ -160,7 +163,6 @@ class behat_totara_competency extends behat_base {
         $detail_page_url = new moodle_url(self::TOTARA_COMPETENCY_PROFILE_DETAIL_PATH, $query_params);
 
         $this->getSession()->visit($this->locate_path($detail_page_url->out(false)));
-        $this->wait_for_pending_js();
     }
 
     private function resolve_competency_id($competency): int {
@@ -246,15 +248,14 @@ class behat_totara_competency extends behat_base {
     /**
      * Archive all assignments for a given assignment type.
      * @Given /^all assignments for the "([^"]*)" assignment type are archived$/
-     * @param string $assignmentType
+     *
+     * @param string $assignment_type
      * @throws Exception
      */
-    public function allAssignmentsForTheAssignmentTypeAreArchived($assignmentType) {
-        \behat_hooks::set_step_readonly(true); // Backend action.
-
+    public function all_assignments_for_the_assignment_type_are_archived($assignment_type) {
         $assignments = assignment::repository()
             ->filter_by_active()
-            ->where('user_group_type', $assignmentType)
+            ->where('user_group_type', $assignment_type)
             ->get_lazy();
         foreach ($assignments as $assignment) {
             assignment_model::load_by_entity($assignment)->archive();
