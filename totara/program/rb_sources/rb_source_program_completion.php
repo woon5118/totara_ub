@@ -34,6 +34,7 @@ class rb_source_program_completion extends rb_base_source {
     use \totara_program\rb\source\program_trait;
     use \totara_job\rb\source\report_trait;
     use \totara_cohort\rb\source\report_trait;
+    use \totara_reportbuilder\rb\source\report_trait;
 
     public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
         if ($groupid instanceof rb_global_restriction_set) {
@@ -131,6 +132,7 @@ class rb_source_program_completion extends rb_base_source {
             ),
         );
 
+        $this->add_context_tables($joinlist, 'base', 'programid', CONTEXT_PROGRAM, 'INNER');
         $this->add_core_user_tables($joinlist, 'base', 'userid');
         $this->add_totara_job_tables($joinlist, 'base', 'userid');
         $this->add_core_course_category_tables($joinlist, 'program', 'category');
@@ -529,6 +531,13 @@ class rb_source_program_completion extends rb_base_source {
 
         // Add the manager/position/organisation content options.
         $this->add_basic_user_content_options($contentoptions);
+
+        $contentoptions[] = new rb_content_option(
+            'program_visibility',
+            get_string('program_visibility', 'totara_reportbuilder'),
+            'base.programid',
+            ['ctx', 'program']
+        );
 
         $contentoptions[] = new rb_content_option(
             'completed_org',

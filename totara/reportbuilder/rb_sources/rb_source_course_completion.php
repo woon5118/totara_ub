@@ -30,6 +30,7 @@ class rb_source_course_completion extends rb_base_source {
     use \core_tag\rb\source\report_trait;
     use \totara_job\rb\source\report_trait;
     use \totara_cohort\rb\source\report_trait;
+    use \totara_reportbuilder\rb\source\report_trait;
 
     public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
         if ($groupid instanceof rb_global_restriction_set) {
@@ -132,6 +133,7 @@ class rb_source_course_completion extends rb_base_source {
         );
 
         // include some standard joins
+        $this->add_context_tables($joinlist, 'base', 'course', CONTEXT_COURSE, 'INNER');
         $this->add_core_user_tables($joinlist, 'base', 'userid');
         $this->add_core_course_tables($joinlist, 'base', 'course', 'INNER');
         // requires the course join
@@ -643,6 +645,13 @@ class rb_source_course_completion extends rb_base_source {
 
         // Add the manager/position/organisation content options.
         $this->add_basic_user_content_options($contentoptions);
+
+        $contentoptions[] = new rb_content_option(
+            'course_visibility',
+            get_string('course_visibility', 'totara_reportbuilder'),
+            'base.course',
+            ['ctx', 'course']
+        );
 
         $contentoptions[] = new rb_content_option(
             'completed_org',
