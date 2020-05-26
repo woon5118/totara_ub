@@ -1280,36 +1280,12 @@ function import_certification($importname, $importtime) {
                     c.activeperiod,
                     c.minimumactiveperiod,
                     c.windowperiod,
-                    cc.id AS ccid,
-                    cc.certifpath AS currentcertifpath,
-                    cc.status AS currentstatus,
-                    cc.renewalstatus AS currentrenewalstatus,
-                    cc.timewindowopens AS currenttimewindowopens,
-                    cc.timeexpires AS currenttimeexpires,
-                    cc.baselinetimeexpires AS currentbaselinetimeexpires,
-                    cc.timecompleted AS currenttimecompleted,
-                    pc.id AS pcid,
-                    pc.status AS currentprogstatus,
-                    pc.timedue AS currenttimedue,
-                    pc.timecompleted AS currentprogtimecompleted,
-                    u.id AS userid,
-                    pa.id AS assignmentid,
-                    pua.id AS puaid,
-                    pfa.id AS pfaid
+                    u.id AS userid
             FROM {totara_compl_import_cert} i
             JOIN {prog} p ON p.id = i.certificationid
             JOIN {certif} c ON c.id = p.certifid
             JOIN {user} u ON u.username = i.username
-            LEFT JOIN {prog_assignment} pa ON pa.programid = p.id
-            LEFT JOIN {prog_user_assignment} pua ON pua.assignmentid = pa.id AND pua.userid = u.id AND pua.programid = p.id
-            LEFT JOIN {prog_future_user_assignment} pfa ON pfa.assignmentid = pa.id AND pfa.userid = u.id AND pfa.programid = p.id
-            LEFT JOIN {certif_completion} cc ON cc.certifid = c.id AND cc.userid = u.id
-            LEFT JOIN {prog_completion} pc ON pc.programid = p.id AND pc.userid = u.id AND pc.coursesetid = 0
-            {$importsqlwhere}
-            AND ((pa.assignmenttype = :assignmenttype AND pa.assignmenttypeid = u.id)
-              OR (pfa.userid = u.id AND pfa.assignmentid IS NOT NULL)
-              OR (pua.userid = u.id AND pua.assignmentid IS NOT NULL))
-            ORDER BY progid, userid, importcompletiondate DESC";
+            {$importsqlwhere}";
     $recordstoprocess = $DB->get_recordset_sql($sql, $params);
 
     // If there are no records to process, return.
@@ -1370,12 +1346,16 @@ function import_certification($importname, $importtime) {
         $progcompletion->status = STATUS_PROGRAM_COMPLETE;
         $progcompletion->timestarted = $importtime;
 
+        // Get extra data we need
+        $certification_completion = $DB->get_record('certif_completion', ['certifid' => $certid, 'userid' => $userid]);
+        $program_completion = $DB->get_record('prog_completion', ['programid' => $progid, 'userid' => $userid, 'coursesetid' => 0]);
+
         // Calculate completion times.
         $timecompleted = $recordtoprocess->importcompletiondate;
         $importtimedue = totara_date_parse_from_format($csvdateformat, $recordtoprocess->importduedate);
         //TL-17804: Use baselinetimeexpires instead of timeexpires so we don't get unexpected shifts in recertification
         //windows when granting extensions
-        $base = get_certiftimebase($recordtoprocess->recertifydatetype, $recordtoprocess->currentbaselinetimeexpires, $timecompleted, $importtimedue,
+        $base = get_certiftimebase($recordtoprocess->recertifydatetype, $certification_completion->baselinetimeexpires, $timecompleted, $importtimedue,
             $recordtoprocess->activeperiod, $recordtoprocess->minimumactiveperiod, $recordtoprocess->windowperiod);
         $certcompletion->timeexpires = get_timeexpires($base, $recordtoprocess->activeperiod);
         $certcompletion->baselinetimeexpires = $certcompletion->timeexpires;
@@ -1402,15 +1382,15 @@ function import_certification($importname, $importtime) {
             // They should be handled by normal certification code (as opposed to completion upload).
             $action = 'addtohistory';
 
-        } else if (empty($recordtoprocess->ccid) && empty($recordtoprocess->pcid)) {
+        } else if (empty($certification_completion->id) && empty($program_completion->id)) {
             // Both records are missing. Create them and certify the user using the uploaded record.
             $action = 'createcertandprog';
 
-        } else if (empty($recordtoprocess->ccid)) {
+        } else if (empty($certification_completion->id)) {
             // The certif_completion record is missing. Create it and make sure the prog_completion record is updated.
             $action = 'createcertupdateprog';
 
-        } else if (empty($recordtoprocess->pcid)) {
+        } else if (empty($program_completion->id)) {
             // The prog_completion record is missing, so create it. It's possible that the certif_completion record contains
             // some useful information (imagine a user certified then prog_completion disappeared), so archive it before
             // certifying the user.
@@ -1421,17 +1401,17 @@ function import_certification($importname, $importtime) {
             // only be COMPLETE_INCOMPLETE or OVERRIDE_IF_NEWER.
 
             $currentcertcompletion = new stdClass();
-            $currentcertcompletion->status = $recordtoprocess->currentstatus;
-            $currentcertcompletion->renewalstatus = $recordtoprocess->currentrenewalstatus;
-            $currentcertcompletion->certifpath = $recordtoprocess->currentcertifpath;
-            $currentcertcompletion->timecompleted = $recordtoprocess->currenttimecompleted;
-            $currentcertcompletion->timewindowopens = $recordtoprocess->currenttimewindowopens;
-            $currentcertcompletion->timeexpires = $recordtoprocess->currenttimeexpires;
-            $currentcertcompletion->baselinetimeexpires = $recordtoprocess->currentbaselinetimeexpires;
+            $currentcertcompletion->status = $certification_completion->status; // currentstatus
+            $currentcertcompletion->renewalstatus = $certification_completion->renewalstatus; // currentrenewalstatus
+            $currentcertcompletion->certifpath = $certification_completion->certifpath; // currentcertifpath
+            $currentcertcompletion->timecompleted = $certification_completion->timecompleted; // currenttimecompleted
+            $currentcertcompletion->timewindowopens = $certification_completion->timewindowopens; // currenttime
+            $currentcertcompletion->timeexpires = $certification_completion->timeexpires; // currenttimeexpires
+            $currentcertcompletion->baselinetimeexpires = $certification_completion->baselinetimeexpires; //currentbaselinetimeexpires
             $currentprogcompletion = new stdClass();
-            $currentprogcompletion->status = $recordtoprocess->currentprogstatus;
-            $currentprogcompletion->timecompleted = $recordtoprocess->currentprogtimecompleted;
-            $currentprogcompletion->timedue = $recordtoprocess->currenttimedue;
+            $currentprogcompletion->status = $program_completion->status; // currentprogstatus
+            $currentprogcompletion->timecompleted = $program_completion->timecompleted; // currentprogtimecompleted
+            $currentprogcompletion->timedue = $program_completion->timedue; // currenttimedue
             $haserrors = certif_get_completion_errors($currentcertcompletion, $currentprogcompletion);
 
             if ($haserrors) {
@@ -1463,7 +1443,7 @@ function import_certification($importname, $importtime) {
 
                         } else { // Action must be OVERRIDE_IF_NEWER.
 
-                            if ($certcompletion->timecompleted > $recordtoprocess->currenttimecompleted) {
+                            if ($certcompletion->timecompleted > $certification_completion->timecompleted) {
                                 // The new completion expires after the current completion expires. We need to archive the
                                 // current completion before updating it with the new completion data.
                                 $action = 'archivecurrentandcertifyuser';
@@ -1482,7 +1462,7 @@ function import_certification($importname, $importtime) {
 
                         } else { // Action must be OVERRIDE_IF_NEWER.
 
-                            if ($certcompletion->timecompleted > $recordtoprocess->currenttimecompleted) {
+                            if ($certcompletion->timecompleted > $certification_completion->timecompleted) {
                                 // The new completion expires after the current completion expires. The current completion
                                 // record was was already copied in history, so just update the current completion record,
                                 // marking the user as certified again.
@@ -1517,7 +1497,7 @@ function import_certification($importname, $importtime) {
 
             case 'createcertupdateprog':
                 $batchinsertcertcompletion[] = $certcompletion;
-                $batchdeleteprogcompletion[] = $recordtoprocess->pcid;
+                $batchdeleteprogcompletion[] = $program_completion->id;
                 $batchinsertprogcompletion[] = $progcompletion;
                 $batchprogcompletionlog[] = completionimport_create_prog_completion_log_record($progid, $userid, $USER->id,
                     certif_calculate_completion_description($certcompletion, $progcompletion,
@@ -1529,8 +1509,8 @@ function import_certification($importname, $importtime) {
                     array(
                         'certifid' => $certid,
                         'userid' => $userid,
-                        'timecompleted' => $recordtoprocess->currenttimecompleted,
-                        'timeexpires' => $recordtoprocess->currenttimeexpires
+                        'timecompleted' => $certification_completion->timecompleted,
+                        'timeexpires' => $certification_completion->timeexpires
                     ));
                 if ($matchinghistoryid) {
                     $batchdeletecertcompletionhistory[] = $matchinghistoryid;
@@ -1540,20 +1520,20 @@ function import_certification($importname, $importtime) {
                 $certcompletionhistory = new stdClass(); // Note: The order of these fields must match $certcompletion above!
                 $certcompletionhistory->certifid = $certid;
                 $certcompletionhistory->userid = $userid;
-                $certcompletionhistory->certifpath = $recordtoprocess->currentcertifpath;
-                $certcompletionhistory->status = $recordtoprocess->currentstatus;
-                $certcompletionhistory->renewalstatus = $recordtoprocess->currentrenewalstatus;
+                $certcompletionhistory->certifpath = $certification_completion->certifpath;
+                $certcompletionhistory->status = $certification_completion->status;
+                $certcompletionhistory->renewalstatus = $certification_completion->renewalstatus;
                 $certcompletionhistory->timemodified = $importtime;
-                $certcompletionhistory->timeexpires = $recordtoprocess->currenttimeexpires;
-                $certcompletionhistory->baselinetimeexpires = $recordtoprocess->currentbaselinetimeexpires;
-                $certcompletionhistory->timewindowopens = $recordtoprocess->currenttimewindowopens;
-                $certcompletionhistory->timecompleted = $recordtoprocess->currenttimecompleted;
+                $certcompletionhistory->timeexpires = $certification_completion->timeexpires;
+                $certcompletionhistory->baselinetimeexpires = $certification_completion->baselinetimeexpires;
+                $certcompletionhistory->timewindowopens = $certification_completion->timewindowopens;
+                $certcompletionhistory->timecompleted = $certification_completion->timecompleted;
                 $certcompletionhistory->unassigned = 0;
                 $batchinsertcertcompletionhistory[] = $certcompletionhistory;
                 $batchprogcompletionlog[] = completionimport_create_prog_completion_log_record($progid, $userid, $USER->id,
                     certif_calculate_completion_history_description($certcompletionhistory,
                         'Completion archived during import'));
-                $batchdeletecertcompletion[] = $recordtoprocess->ccid;
+                $batchdeletecertcompletion[] = $certification_completion->id;
                 $batchinsertcertcompletion[] = $certcompletion;
                 $batchinsertprogcompletion[] = $progcompletion;
                 $batchprogcompletionlog[] = completionimport_create_prog_completion_log_record($progid, $userid, $USER->id,
@@ -1593,8 +1573,8 @@ function import_certification($importname, $importtime) {
                     array(
                         'certifid' => $certid,
                         'userid' => $userid,
-                        'timecompleted' => $recordtoprocess->currenttimecompleted,
-                        'timeexpires' => $recordtoprocess->currenttimeexpires
+                        'timecompleted' => $certification_completion->timecompleted,
+                        'timeexpires' => $certification_completion->timeexpires
                     ));
                 if ($matchinghistoryid) {
                     $batchdeletecertcompletionhistory[] = $matchinghistoryid;
@@ -1604,14 +1584,14 @@ function import_certification($importname, $importtime) {
                 $certcompletionhistory = new stdClass(); // Note: The order of these fields must match $certcompletion above!
                 $certcompletionhistory->certifid = $certid;
                 $certcompletionhistory->userid = $userid;
-                $certcompletionhistory->certifpath = $recordtoprocess->currentcertifpath;
-                $certcompletionhistory->status = $recordtoprocess->currentstatus;
-                $certcompletionhistory->renewalstatus = $recordtoprocess->currentrenewalstatus;
+                $certcompletionhistory->certifpath = $certification_completion->certifpath;
+                $certcompletionhistory->status = $certification_completion->status;
+                $certcompletionhistory->renewalstatus = $certification_completion->renewalstatus;
                 $certcompletionhistory->timemodified = $importtime;
-                $certcompletionhistory->timeexpires = $recordtoprocess->currenttimeexpires;
-                $certcompletionhistory->baselinetimeexpires = $recordtoprocess->currentbaselinetimeexpires;
-                $certcompletionhistory->timewindowopens = $recordtoprocess->currenttimewindowopens;
-                $certcompletionhistory->timecompleted = $recordtoprocess->currenttimecompleted;
+                $certcompletionhistory->timeexpires = $certification_completion->timeexpires;
+                $certcompletionhistory->baselinetimeexpires = $certification_completion->baselinetimeexpires;
+                $certcompletionhistory->timewindowopens = $certification_completion->timewindowopens;
+                $certcompletionhistory->timecompleted = $certification_completion->timecompleted;
                 $certcompletionhistory->unassigned = 0;
                 $batchinsertcertcompletionhistory[] = $certcompletionhistory;
                 $batchprogcompletionlog[] = completionimport_create_prog_completion_log_record($progid, $userid, $USER->id,
@@ -1620,9 +1600,9 @@ function import_certification($importname, $importtime) {
                 // Note: Break is missing here to prevent code duplication.
 
             case 'certifyuser':
-                $batchdeletecertcompletion[] = $recordtoprocess->ccid;
+                $batchdeletecertcompletion[] = $certification_completion->id;
                 $batchinsertcertcompletion[] = $certcompletion;
-                $batchdeleteprogcompletion[] = $recordtoprocess->pcid;
+                $batchdeleteprogcompletion[] = $program_completion->id;
                 $batchinsertprogcompletion[] = $progcompletion;
                 $batchprogcompletionlog[] = completionimport_create_prog_completion_log_record($progid, $userid, $USER->id,
                     certif_calculate_completion_description($certcompletion, $progcompletion,
