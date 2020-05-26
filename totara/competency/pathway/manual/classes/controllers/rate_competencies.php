@@ -145,7 +145,7 @@ class rate_competencies extends controller {
     private function get_return_url(): moodle_url {
         if (isset($this->assignment)) {
             // Came from competency details page
-            return new moodle_url('/totara/competency/profile/details/', [
+            return new moodle_url('/totara/competency/profile/details/index.php', [
                 'user_id' => $this->user->id,
                 'competency_id' => $this->assignment->competency_id,
             ]);

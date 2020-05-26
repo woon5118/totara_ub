@@ -121,7 +121,7 @@
               <ActionLink
                 v-if="row.assigned"
                 :href="
-                  $url('/totara/competency/profile/details/', {
+                  $url('/totara/competency/profile/details/index.php', {
                     competency_id: row.competency.id,
                     user_id: userId,
                   })

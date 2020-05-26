@@ -65,6 +65,7 @@ Feature: Test the create report interface
     And I should see "Appraisal Detail"
 
   Scenario: Report sources filtering works on report creation page
+    Given I disable the "competency_assignment" advanced feature
     When I click on "Certification" "link" in the ".tw-selectRegionPanel" "css_element"
     Then I should see "Certification Completion"
     And I should not see "Record of Learning: Competencies"

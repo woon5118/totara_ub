@@ -22,19 +22,18 @@
  */
 
 use Behat\Gherkin\Node\TableNode as TableNode;
-use totara_competency\achievement_configuration;
+use Behat\Mink\Exception\ExpectationException;
+use core\entities\user;
 use totara_competency\entities\assignment;
 use totara_competency\entities\competency;
 use totara_competency\models\assignment as assignment_model;
-use Behat\Mink\Exception\ExpectationException;
-use core\entities\user;
 
 class behat_totara_competency extends behat_base {
 
     private const COMPETENCY_PROFILE_LIST_VIEW_TOGGLE_LOCATOR = '.tui-iconBtn__icon > .fa-th-list.flex-icon.ft.ft-fw';
-    private const TOTARA_COMPETENCY_PROFILE_PATH = 'totara/competency/profile/';
-    private const TOTARA_COMPETENCY_PROFILE_DETAIL_PATH = 'totara/competency/profile/details';
-    private const TOTARA_COMPETENCY_USER_ASSIGNMENT_PATH = 'totara/competency/profile/assign/';
+    private const TOTARA_COMPETENCY_PROFILE_PATH = 'totara/competency/profile/index.php';
+    private const TOTARA_COMPETENCY_PROFILE_DETAIL_PATH = 'totara/competency/profile/details/index.php';
+    private const TOTARA_COMPETENCY_USER_ASSIGNMENT_PATH = 'totara/competency/profile/assign/index.php';
 
     /**
      * @var totara_competency_generator
@@ -69,8 +68,8 @@ class behat_totara_competency extends behat_base {
      * @Then /^I should be on my competency profile$/
      */
     public function i_should_be_on_my_competency_profile(): void {
-        $expected_path = $this->normalize_index_url($this->locate_path(self::TOTARA_COMPETENCY_PROFILE_PATH));
-        $actual_url = $this->normalize_index_url($this->getSession()->getCurrentUrl());
+        $expected_path = $this->locate_path(self::TOTARA_COMPETENCY_PROFILE_PATH);
+        $actual_url = $this->getSession()->getCurrentUrl();
 
         if ($expected_path !== $actual_url) {
             $exception_message = "Expected the current url to be {$expected_path}, instead was {$actual_url}";
@@ -239,10 +238,6 @@ class behat_totara_competency extends behat_base {
         }
 
         return $this->generator;
-    }
-
-    private function normalize_index_url(string $url): string {
-        return str_replace($url, 'index.php', '');
     }
 
     /**

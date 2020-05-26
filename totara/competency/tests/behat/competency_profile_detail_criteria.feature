@@ -49,9 +49,12 @@ Feature: Test viewing criteria fulfilment for a user on their competency details
     And I navigate to the competency profile details page for the "Comp1" competency
 
     # Course completion (aka flexible courses) criteria (Course 1 & 2)
-    And I wait for pending js
-    Then I should see "Complete courses" in the ".tui-criteriaCourseAchievement" "css_element"
-    And I should see "1 / 2" in the ".tui-criteriaCourseAchievement .tui-progressCircle__circle" "css_element"
+    And I wait until ".tui-competencyAchievementsScale" "css_element" exists
+    # Make sure we expand existing headers
+    And I click on ".tui-collapsible__header button[aria-expanded=false]" "css_element"
+    Then I should see "Complete courses" in the ".tui-competencyAchievementsScale > div:first-child .tui-criteriaCourseAchievement" "css_element"
+    And I should see "1 / 2" in the ".tui-competencyAchievementsScale > div:first-child .tui-criteriaCourseAchievement .tui-progressCircle__circle" "css_element"
+    Then I should see "Complete courses" in the ".tui-competencyAchievementsScale > div:last-child .tui-criteriaCourseAchievement" "css_element"
 
     # Course 1 - 100% Completed
     Then I should see "Course 1" under "Courses" on row "1" of the tui datatable in the ".tui-criteriaCourseAchievement" "css_element"
@@ -75,7 +78,7 @@ Feature: Test viewing criteria fulfilment for a user on their competency details
     Then I should see "Competency profile"
 
     # Linked courses criteria (Course 3)
-    And I wait for pending js
+    And I wait until ".tui-competencyAchievementsScale" "css_element" exists
     When I toggle the "Work towards level Just Barely Competent" tui collapsible
     Then I should see "Complete courses" in the ".tui-competencyAchievementsScale > div:last-child .tui-criteriaCourseAchievement" "css_element"
     And I should see "1 / 1" in the ".tui-competencyAchievementsScale > div:last-child .tui-criteriaCourseAchievement .tui-progressCircle__circle" "css_element"
@@ -122,8 +125,10 @@ Feature: Test viewing criteria fulfilment for a user on their competency details
     And I navigate to the competency profile details page for the "Comp1" competency
 
     # Other competencies
-    Then I should see "Achieve proficiency in other competencies" in the ".tui-competencyAchievementsScale__item:first-child" "css_element"
-    And I should see "0 / 2" in the ".tui-competencyAchievementsScale__item:first-child .tui-progressCircle__circle" "css_element"
+    # Make sure we expand existing headers
+    And I wait until ".tui-competencyAchievementsScale" "css_element" exists
+    Then I should see "Achieve proficiency in other competencies" in the ".tui-competencyAchievementsScale > div:first-child" "css_element"
+    And I should see "0 / 2" in the ".tui-competencyAchievementsScale > div:first-child .tui-progressCircle__circle" "css_element"
 
     # Other competency - Comp 4 - is not assigned and can not be self assigned.
     Then I should see "Comp4" under "Competencies" on row "2" of the tui datatable in the ".tui-competencyAchievementsScale__item:first-child" "css_element"
@@ -150,6 +155,7 @@ Feature: Test viewing criteria fulfilment for a user on their competency details
     When I navigate to the competency profile details page for the "Comp1" competency
 
     # Child competencies
+    And I wait until ".tui-competencyAchievementsScale" "css_element" exists
     Then I should see "Achieve proficiency in child competencies" in the ".tui-competencyAchievementsScale__item:last-child" "css_element"
     And I should see "1 / 1" in the ".tui-competencyAchievementsScale__item:last-child .tui-progressCircle__circle" "css_element"
 
@@ -175,5 +181,6 @@ Feature: Test viewing criteria fulfilment for a user on their competency details
     When I log in as "user"
     And I navigate to the competency profile details page for the "Comp1" competency
     # On activate criteria
+    And I wait until ".tui-competencyAchievementsScale" "css_element" exists
     Then I should see "Value achieved when the competency is assigned" in the ".tui-criteriaOnActiveAchievement" "css_element"
     And I should see "Achieved on" in the ".tui-criteriaOnActiveAchievement" "css_element"

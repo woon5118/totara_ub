@@ -34,4 +34,9 @@ $icons = [
             'classes' => 'fa-bell-slash',
         ],
     ],
+    'mod_perform|icon' => [
+        'data' => [
+            'classes' => 'fa-compass',
+        ],
+    ],
 ];

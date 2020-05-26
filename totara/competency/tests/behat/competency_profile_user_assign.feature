@@ -209,9 +209,7 @@ Feature: Test competencies can be user assigned
   Scenario: I am shown an empty list when there is no competencies to self assign
     Given I log in as "admin"
     And I navigate to the competency self assignment page
-
     Then I should see the tui datatable is empty
-
     And I should see "No items to display"
     And I should see "Self assignment" in the ".breadcrumb" "css_element"
     And I should see "Back to your competency profile"

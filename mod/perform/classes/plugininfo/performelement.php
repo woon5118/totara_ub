@@ -28,19 +28,9 @@ use core\plugininfo\base;
 defined('MOODLE_INTERNAL') || die();
 
 class performelement extends base {
+
     public function is_uninstall_allowed() {
-        return true;
+        return false;
     }
 
-    /**
-     * Pre-uninstall hook.
-     *
-     * This is intended for disabling of plugin, some DB table purging, etc.
-     *
-     * NOTE: to be called from uninstall_plugin() only.
-     * @private
-     */
-    public function uninstall_cleanup() {
-        parent::uninstall_cleanup();
-    }
 }

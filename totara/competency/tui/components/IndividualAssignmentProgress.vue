@@ -553,7 +553,7 @@ export default {
       if (!this.isMine) {
         params.user_id = this.userId;
       }
-      return this.$url('/totara/competency/profile/details/', params);
+      return this.$url('/totara/competency/profile/details/index.php', params);
     },
 
     chartHovered(event, context, thisChart, Chart) {

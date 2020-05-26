@@ -157,11 +157,14 @@ abstract class base extends controller {
     }
 
     public function get_profile_url(): moodle_url {
-        return new moodle_url('/totara/competency/profile', $this->is_for_current_user() ? [] : ['user_id' => $this->user->id]);
+        return new moodle_url(
+            '/totara/competency/profile/index.php',
+            $this->is_for_current_user() ? [] : ['user_id' => $this->user->id]
+        );
     }
 
     public function get_user_assignment_url(): moodle_url {
-        return new moodle_url('/totara/competency/profile/assign',
+        return new moodle_url('/totara/competency/profile/assign/index.php',
             $this->is_for_current_user() ? [] : ['user_id' => $this->user->id]
         );
     }

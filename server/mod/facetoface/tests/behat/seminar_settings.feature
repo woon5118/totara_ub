@@ -28,20 +28,18 @@ Feature: Disabling approval options in global settings would
       | Training | 1 |
     And I click on "Save changes" "button"
     And I set the following fields to these values:
-      | id_s__facetoface_approvaloptions_approval_role_10 | 1 |
+      | id_s__facetoface_approvaloptions_approval_role_12 | 1 |
     And I click on "Save changes" "button"
-    And I click on "Courses" in the totara menu
-    And I follow "Course101"
+    And I am on "Course101" course homepage
     And I turn editing mode on
     And I add a "Seminar" to section "1" and I fill the form with:
       | Name        | Seminar 1           |
       | Training    | 1                   |
     And I navigate to "Seminars > Global settings" in site administration
     And I set the following fields to these values:
-      | id_s__facetoface_approvaloptions_approval_role_10 | 0 |
+      | id_s__facetoface_approvaloptions_approval_role_12 | 0 |
     And I click on "Save changes" "button"
-    And I click on "Courses" in the totara menu
-    And I follow "Course101"
+    And I am on "Course101" course homepage
     And I follow "Seminar 1"
     And I follow "Edit settings"
     And I expand all fieldsets

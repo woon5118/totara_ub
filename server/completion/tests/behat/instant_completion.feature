@@ -28,9 +28,8 @@ Feature: Instant completion
       | Enable restricted access   | 1 |
     And I log out
     And I log in as "teacher1"
-    And I am on "Course 1" course homepage
+    And I am on "Course 1" course homepage with editing mode on
     And completion tracking is "Enabled" in current course
-    And I turn editing mode on
     And I add the "Course completion status" block
     And I click on "Edit settings" "link" in the "Administration" "block"
     And I set the following fields to these values:
@@ -52,8 +51,7 @@ Feature: Instant completion
     And I set the following fields to these values:
       | Quiz - Test quiz name | 1 |
     And I press "Save changes"
-    And I click on "Courses" in the totara menu
-    And I click on "Course 2" "link"
+    And I am on "Course 2" course homepage
     And completion tracking is "Enabled" in current course
     And I click on "Edit settings" "link" in the "Administration" "block"
     And I set the following fields to these values:
@@ -76,8 +74,7 @@ Feature: Instant completion
       | Quiz - Test quiz name2   | 1 |
       | id_criteria_course_value | Miscellaneous / Course 1 |
     And I press "Save changes"
-    And I click on "Courses" in the totara menu
-    And I click on "Course 3" "link"
+    And I am on "Course 3" course homepage
     And completion tracking is "Enabled" in current course
     And I add a "Assignment" to section "1" and I fill the form with:
       | Assignment name                     | Test assignment name                              |
@@ -104,8 +101,7 @@ Feature: Instant completion
       | user     | program  |
       | student1 | program1 |
     And I log in as "admin"
-    And I click on "Programs" in the totara menu
-    And I click on "Program1" "link"
+    And I am on "Program1" program homepage
     And I press "Edit program details"
     And I switch to "Content" tab
     And I set the following fields to these values:
@@ -123,8 +119,7 @@ Feature: Instant completion
     And I log out
 
     When I log in as "student1"
-    And I click on "Courses" in the totara menu
-    And I click on "Course 2" "link"
+    And I am on "Course 2" course homepage
     And I follow "Test quiz name2"
     And I press "Attempt quiz now"
     And I click on "True" "radio" in the ".answer" "css_element"
@@ -133,8 +128,7 @@ Feature: Instant completion
     And I click on "Submit all and finish" "button" in the "Confirmation" "dialogue"
     Then I should see "10.00 out of 10.00"
 
-    And I click on "Courses" in the totara menu
-    And I click on "Course 1" "link"
+    And I am on "Course 1" course homepage
     And I follow "Test quiz name"
     And I press "Attempt quiz now"
     And I click on "True" "radio" in the ".answer" "css_element"
@@ -143,8 +137,7 @@ Feature: Instant completion
     And I click on "Submit all and finish" "button" in the "Confirmation" "dialogue"
     Then I should see "10.00 out of 10.00"
 
-    And I click on "Courses" in the totara menu
-    And I click on "Course 3" "link"
+    When I am on "Course 3" course homepage
     And I follow "Test assignment name"
     And I press "Add submission"
     And I set the following fields to these values:
@@ -152,8 +145,7 @@ Feature: Instant completion
     And I press "Save changes"
     And I log out
     And I log in as "teacher1"
-    And I am on homepage
-    And I follow "Course 3"
+    And I am on "Course 3" course homepage
     And I follow "Test assignment name"
     And I follow "View all submissions"
     And I should see "Not marked" in the "Student First" "table_row"

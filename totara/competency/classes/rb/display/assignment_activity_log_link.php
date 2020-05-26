@@ -49,7 +49,7 @@ class assignment_activity_log_link extends base {
         $extrafields = self::get_extrafields_row($row, $column);
         if (capability_helper::can_view_profile($value)) {
             $url = new moodle_url(
-                '/totara/competency/profile/details/',
+                '/totara/competency/profile/details/index.php',
                 ['user_id' => $value, 'competency_id' => $extrafields->competency_id, 'show_activity_log' => '1']
             );
             return html_writer::link($url, get_string('activity_log', 'totara_competency'));

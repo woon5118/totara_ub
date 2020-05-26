@@ -68,7 +68,7 @@ class notify_users_of_proficiency_change {
      */
     private static function generate_lost_proficiency_message_content($competency_data, $user_id, $user_proficiency_data): array {
         $activity_log_url = new moodle_url(
-            '/totara/competency/profile/details',
+            '/totara/competency/profile/details/index.php',
             [
                 'competency_id' => $competency_data['id'],
                 'user_id' => $user_id,

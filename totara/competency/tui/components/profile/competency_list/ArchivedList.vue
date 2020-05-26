@@ -139,7 +139,7 @@ export default {
       if (!this.isMine) {
         params.user_id = this.userId;
       }
-      return this.$url(`${this.baseUrl}/details/`, params);
+      return this.$url(`${this.baseUrl}/details/index.php`, params);
     },
   },
 };

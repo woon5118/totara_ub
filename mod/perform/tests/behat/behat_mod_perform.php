@@ -127,6 +127,8 @@ class behat_mod_perform extends behat_base {
         string $question_text,
         string $expected_answer_text
     ): void {
+        $this->wait_for_pending_js();
+
         $response = $this->find_question_response($element_type, $question_text);
 
         $actual_answer_text = trim($response->getText());
@@ -280,6 +282,8 @@ class behat_mod_perform extends behat_base {
         string $new_answer
     ): void {
         behat_hooks::set_step_readonly(false);
+
+        $this->wait_for_pending_js();
 
         $response = $this->find_question_response($element_type, $question_text);
 

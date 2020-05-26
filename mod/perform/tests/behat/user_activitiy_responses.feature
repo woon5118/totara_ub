@@ -24,6 +24,7 @@ Feature: Viewing other responses
     And I should see perform "short text" question "Question one" is unanswered
     And I should see perform "short text" question "Question two" is unanswered
     And I should not see "Manager response"
+    And I wait until ".tui-elementResponse .tui-formField" "css_element" exists
     And I answer "short text" question "Question one" with "John Answer one"
     And I answer "short text" question "Question two" with "John Answer two"
 
@@ -33,8 +34,9 @@ Feature: Viewing other responses
     And the "Your activities" tui tab should be active
 
     When I click on "John is participating subject" "link"
+    And I wait until ".tui-otherParticipantResponses" "css_element" exists
     Then I should see that show others responses is toggled "on"
-    Then I should see "Manager response"
+    And I should see "Manager response"
     And I should see "No response submitted"
 
   Scenario: Manager can respond to other activities and I can view manager responses
@@ -45,6 +47,7 @@ Feature: Viewing other responses
 
     When I click on "John is participating subject" "link"
     Then I should see perform activity relationship to user "Manager"
+    And I wait until ".tui-elementResponse .tui-formField" "css_element" exists
     And I answer "short text" question "Question one" with "Manager Answer one"
     And I answer "short text" question "Question two" with "Manager Answer two"
     And I click on "Submit" "button"
@@ -61,5 +64,6 @@ Feature: Viewing other responses
     Then I should see that show others responses is toggled "off"
 
     When I click show others responses
+    And I wait until ".tui-otherParticipantResponses" "css_element" exists
     Then I should see perform "short text" question "Question one" is answered by "Manager" with "Manager Answer one"
     And I should see perform "short text" question "Question two" is answered by "Manager" with "Manager Answer two"

@@ -129,8 +129,7 @@ Feature: As a teacher I need to see an accurate list of subscribed users
       | student1 | C2     | student        |
       | student2 | C2     | student        |
       | student3 | C2     | student        |
-    And I click on "Courses" in the totara menu
-    And I follow "Course 2"
+    And I am on "Course 2" course homepage
     And I add a "Forum" to section "1" and I fill the form with:
       | Forum name        | Subscription Forum 1           |
       | Forum type        | Standard forum for general use |
