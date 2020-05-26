@@ -48,26 +48,8 @@ class track extends entity_model_formatter {
             'schedule_fixed_to' => null,
             'schedule_dynamic_count_from' => null,
             'schedule_dynamic_count_to' => null,
-            'schedule_dynamic_unit' => function ($value) {
-                if (is_null($value)) {
-                    return null;
-                }
-                $map = track_model::get_dynamic_schedule_units();
-                if (!isset($map[$value])) {
-                    throw new \coding_exception('Unknow dynamic schedule unit: ' . $value);
-                }
-                return $map[$value];
-            },
-            'schedule_dynamic_direction' => function ($value) {
-                if (is_null($value)) {
-                    return null;
-                }
-                $map = track_model::get_dynamic_schedule_directions();
-                if (!isset($map[$value])) {
-                    throw new \coding_exception('Unknow dynamic schedule direction: ' . $value);
-                }
-                return $map[$value];
-            },
+            'schedule_dynamic_unit' => null,
+            'schedule_dynamic_direction' => null,
             'due_date_is_enabled' => null,
             'created_at' => null,
             'updated_at' => null,

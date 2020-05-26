@@ -27,7 +27,7 @@ use core\entities\expandable;
 use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\query\builder;
-use mod_perform\entities\activity\track;
+use mod_perform\models\activity\track;
 use mod_perform\entities\activity\track_assignment;
 use mod_perform\entities\activity\track_assignment_repository;
 use mod_perform\entities\activity\track_user_assignment;
@@ -47,7 +47,7 @@ class expand_task {
      * Expand all active assignments
      */
     public function expand_all() {
-        $assignments = $this->get_repository()->get_lazy();
+        $assignments = $this->get_repository()->get();
         foreach ($assignments as $assignment) {
             $this->expand_assignment($assignment);
         }
@@ -65,7 +65,8 @@ class expand_task {
         if (!empty($assignment_ids)) {
             $assignments = $this->get_repository()
                 ->filter_by_ids($assignment_ids)
-                ->get_lazy();
+                ->get();
+
             foreach ($assignments as $assignment) {
                 $this->expand_assignment($assignment);
             }
@@ -95,15 +96,17 @@ class expand_task {
     private function get_repository(): track_assignment_repository {
         return track_assignment::repository()
             ->filter_by_expand()
-            ->filter_by_active_track_and_activity();
+            ->filter_by_active_track_and_activity()
+            ->with('track');
     }
 
     /**
      * Expand the given assignment.
      *
      * @param track_assignment $assignment
+     * @throws \Throwable
      */
-    private function expand_assignment(track_assignment $assignment) {
+    private function expand_assignment(track_assignment $assignment): void {
         // We ignore missing assignments to not cause failing tasks.
         // It can happen that an assignment was deleted before the task is run.
         // On the next run the assignments will be picked up again.
@@ -137,7 +140,7 @@ class expand_task {
                     if ($existing_user_assignment) {
                         $this->link_assignment($existing_user_assignment, $assignment);
                         if ($existing_user_assignment->deleted) {
-                            $this->reactivate_user_assignment($existing_user_assignment);
+                            $this->reactivate_user_assignment($existing_user_assignment, new track($assignment->track));
                         }
                     } else {
                         $this->add_to_assign_buffer($assignment, $user_id);
@@ -270,41 +273,15 @@ class expand_task {
     }
 
     /**
-     * Calculate track_user_assignment period start date for a given user.
-     *
-     * @param track $track
-     * @param int $user_id
-     * @return int|null
-     */
-    private function calculate_user_assignment_start_date(track $track, int $user_id): ?int {
-        $track_model = track_model::load_by_entity($track);
-        return $track_model->calculate_user_assignment_start_date($user_id);
-    }
-
-    /**
-     * Calculate track_user_assignment period end date for a given user.
-     *
-     * @param track $track
-     * @param int $user_id
-     * @return int|null
-     */
-    private function calculate_user_assignment_end_date(track $track, int $user_id): ?int {
-        $track_model = track_model::load_by_entity($track);
-        return $track_model->calculate_user_assignment_end_date($user_id);
-    }
-
-    /**
      * Add to assign buffer, also flushes the buffer if max amount per buffer is reached
      *
      * @param track_assignment $assignment
      * @param int $user_id
      */
-    private function add_to_assign_buffer(track_assignment $assignment, int $user_id) {
+    private function add_to_assign_buffer(track_assignment $assignment, int $user_id): void {
         $this->assign_buffer[] = [
             'track_id' => $assignment->track_id,
             'subject_user_id' => $user_id,
-            'period_start_date' => $this->calculate_user_assignment_start_date($assignment->track, $user_id),
-            'period_end_date' => $this->calculate_user_assignment_end_date($assignment->track, $user_id),
             'created_at' => time(),
             'deleted' => false
         ];
@@ -335,7 +312,18 @@ class expand_task {
      * @param track_assignment $assignment
      * @param array $to_create
      */
-    private function assign_bulk(track_assignment $assignment, array $to_create) {
+    private function assign_bulk(track_assignment $assignment, array $to_create): void {
+        // Bulk fetch all the start and end reference dates.
+        $user_ids = array_column($to_create, 'subject_user_id');
+        $date_resolver = (new track($assignment->track))->get_date_resolver($user_ids);
+
+        // Add the dates to the assignments.
+        foreach ($to_create as $index => $row) {
+            $to_create[$index]['period_start_date'] = $date_resolver->get_start_for($row['subject_user_id']);
+            $to_create[$index]['period_end_date'] = $date_resolver->get_end_for($row['subject_user_id']);
+        }
+
+        // Insert the assignments.
         builder::get_db()->insert_records('perform_track_user_assignment', $to_create);
 
         // Get all those newly created assignments from the table.
@@ -409,7 +397,7 @@ class expand_task {
                 ]);
 
             // Update the user assignment period according to track schedule settings.
-            $this->sync_schedule_for_user_assignments($deleted_user_assignments);
+            $this->sync_schedule_for_user_assignments($deleted_user_assignments, $user_ids);
 
             // Trigger an event with all just newly reactivated user assignments
             track_user_assigned_bulk::create_from_user_assignments(
@@ -422,19 +410,21 @@ class expand_task {
 
     /**
      * @param collection|track_user_assignment[] $user_assignments
+     * @param int[] $user_ids
      */
-    private function sync_schedule_for_user_assignments(collection $user_assignments): void {
-        // TODO: This will be replaced in TL-25161 with updates based on date resolver.
-        foreach ($user_assignments as $user_assignment) {
-            $user_assignment->period_start_date = $this->calculate_user_assignment_start_date(
-                $user_assignment->track,
-                $user_assignment->subject_user_id
-            );
-            $user_assignment->period_end_date = $this->calculate_user_assignment_end_date(
-                $user_assignment->track,
-                $user_assignment->subject_user_id
-            );
-            $user_assignment->save();
+    private function sync_schedule_for_user_assignments(collection $user_assignments, array $user_ids): void {
+        /** @var track_assignment $first_assignment */
+        $first_assignment = $user_assignments->first();
+        $track = new track($first_assignment->track);
+
+        // Bulk fetch all the start and end reference dates.;
+        $date_resolver = $track->get_date_resolver($user_ids);
+
+        foreach ($user_assignments as $assignment) {
+            $assignment->period_start_date = $date_resolver->get_start_for($assignment->subject_user_id);
+            $assignment->period_end_date = $date_resolver->get_end_for($assignment->subject_user_id);
+
+            $assignment->save();
         }
     }
 
@@ -442,17 +432,16 @@ class expand_task {
      * Restore single user assignment
      *
      * @param track_user_assignment $user_assignment
+     * @param track_model $track
      */
-    private function reactivate_user_assignment(track_user_assignment $user_assignment): void {
-        // TODO TL-25161 update based on new date resolver.
-        $user_assignment->period_start_date = $this->calculate_user_assignment_start_date(
-            $user_assignment->track,
-            $user_assignment->subject_user_id
-        );
-        $user_assignment->period_end_date = $this->calculate_user_assignment_end_date(
-            $user_assignment->track,
-            $user_assignment->subject_user_id
-        );
+    private function reactivate_user_assignment(track_user_assignment $user_assignment, track $track): void {
+        $user_id = $user_assignment->subject_user_id;
+
+        $date_resolver = $track->get_date_resolver([$user_id]);
+
+        $user_assignment->period_start_date = $date_resolver->get_start_for($user_id);
+        $user_assignment->period_end_date = $date_resolver->get_end_for($user_id);
+
         $user_assignment->deleted = false;
         $user_assignment->save();
     }

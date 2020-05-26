@@ -37,7 +37,7 @@ use mod_perform\models\activity\track as track_model;
  */
 class track_schedule_sync {
 
-    public function sync_all() {
+    public function sync_all(): void {
         $tracks = $this->get_tracks_to_be_synced();
         foreach ($tracks as $track) {
             $this->sync_track_schedule($track);
@@ -50,28 +50,28 @@ class track_schedule_sync {
      * @param track $track
      */
     private function sync_track_schedule(track $track): void {
-
         // Get active track_user_assignments and update the start-/end-dates.
         // For now we don't have to filter out the ones that already have subject_instances.
         $track_user_assignments = track_user_assignment::repository()
             ->filter_by_track_id($track->id)
             ->filter_by_active()
-            ->get_lazy();
+            ->get();
 
-        builder::get_db()->transaction(function () use ($track, $track_user_assignments) {
+        // Bulk fetch all the start and end reference dates.
+        $user_ids = $track_user_assignments->pluck('subject_user_id');
+        $date_resolver = (new track_model($track))->get_date_resolver($user_ids);
+
+        builder::get_db()->transaction(function () use ($track, $track_user_assignments, $date_resolver) {
             // Reset the flag.
             $track->schedule_needs_sync = false;
             $track->save();
 
-            $track_model = track_model::load_by_entity($track);
-            /** @var track_user_assignment $track_user_assignment */
-            foreach ($track_user_assignments as $track_user_assignment) {
-                // TODO TL-25161: adjust this to use the resolver concept.
-                $track_user_assignment->period_start_date = $track_model
-                    ->calculate_user_assignment_start_date($track_user_assignment->subject_user_id);
-                $track_user_assignment->period_end_date = $track_model
-                    ->calculate_user_assignment_end_date($track_user_assignment->subject_user_id);
-                $track_user_assignment->save();
+            /** @var track_user_assignment $assignment */
+            foreach ($track_user_assignments as $assignment) {
+                $assignment->period_start_date = $date_resolver->get_start_for($assignment->subject_user_id);
+                $assignment->period_end_date = $date_resolver->get_end_for($assignment->subject_user_id);
+
+                $assignment->save();
             }
         });
     }

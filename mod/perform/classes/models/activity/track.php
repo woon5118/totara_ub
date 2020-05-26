@@ -26,8 +26,13 @@ namespace mod_perform\models\activity;
 use coding_exception;
 use core\orm\collection;
 use core\orm\entity\model;
+use mod_perform\dates\resolvers\date_resolver;
+use mod_perform\dates\resolvers\fixed_range_resolver;
+use mod_perform\dates\resolvers\user_creation_date_resolver;
+use mod_perform\dates\schedule_constants;
 use mod_perform\entities\activity\track as track_entity;
 use mod_perform\state\activity\active;
+use mod_perform\models\activity\track as track_model;
 use mod_perform\user_groups\grouping;
 use moodle_exception;
 
@@ -44,8 +49,8 @@ use moodle_exception;
  * @property-read int $schedule_fixed_to
  * @property-read int $schedule_dynamic_count_from
  * @property-read int $schedule_dynamic_count_to
- * @property-read int $schedule_dynamic_unit
- * @property-read int $schedule_dynamic_direction
+ * @property-read string $schedule_dynamic_unit
+ * @property-read string $schedule_dynamic_direction
  * @property-read bool $due_date_is_enabled
  * @property-read int $created_at
  * @property-read int $updated_at
@@ -66,8 +71,6 @@ class track extends model {
         'schedule_fixed_to',
         'schedule_dynamic_count_from',
         'schedule_dynamic_count_to',
-        'schedule_dynamic_unit',
-        'schedule_dynamic_direction',
         'due_date_is_enabled',
         'created_at',
         'updated_at',
@@ -76,6 +79,8 @@ class track extends model {
     protected $model_accessor_whitelist = [
         'activity',
         'assignments',
+        'schedule_dynamic_direction',
+        'schedule_dynamic_unit',
     ];
 
     /**
@@ -458,44 +463,86 @@ class track extends model {
 
     public static function get_dynamic_schedule_units(): array {
         return [
-            track_entity::SCHEDULE_DYNAMIC_UNIT_DAY => 'DAY',
-            track_entity::SCHEDULE_DYNAMIC_UNIT_WEEK => 'WEEK',
-            track_entity::SCHEDULE_DYNAMIC_UNIT_MONTH => 'MONTH',
+            track_entity::SCHEDULE_DYNAMIC_UNIT_DAY => schedule_constants::DAY,
+            track_entity::SCHEDULE_DYNAMIC_UNIT_WEEK => schedule_constants::WEEK,
+            track_entity::SCHEDULE_DYNAMIC_UNIT_MONTH => schedule_constants::MONTH,
         ];
     }
 
     public static function get_dynamic_schedule_directions(): array {
         return [
-            track_entity::SCHEDULE_DYNAMIC_DIRECTION_AFTER => 'AFTER',
-            track_entity::SCHEDULE_DYNAMIC_DIRECTION_BEFORE => 'BEFORE',
+            track_entity::SCHEDULE_DYNAMIC_DIRECTION_AFTER => schedule_constants::AFTER,
+            track_entity::SCHEDULE_DYNAMIC_DIRECTION_BEFORE => schedule_constants::BEFORE,
         ];
     }
 
     /**
-     * Calculate the assignment start date for a given user.
+     * Get the string representation of the dynamic schedule direction.
      *
-     * @param int $user_id
-     * @return int|null
+     * @return string|null
      */
-    public function calculate_user_assignment_start_date(int $user_id) {
-        if ($this->schedule_is_fixed) {
-            return $this->schedule_fixed_from;
-        }
-
-        return null;
+    protected function get_schedule_dynamic_direction(): ?string {
+        return $this->map_from_entity(
+            $this->entity->schedule_dynamic_direction,
+            track_model::get_dynamic_schedule_directions(),
+            'Unknown dynamic schedule direction: %s'
+        );
     }
 
     /**
-     * Calculate the assignment end date for a given user.
+     * Get the string representation of the dynamic schedule unit.
      *
-     * @param int $user_id
-     * @return int|null
+     * @return string|null
      */
-    public function calculate_user_assignment_end_date(int $user_id) {
-        if ($this->schedule_is_fixed && !$this->schedule_is_open) {
-            return $this->schedule_fixed_to;
+    protected function get_schedule_dynamic_unit(): ?string {
+        return $this->map_from_entity(
+            $this->entity->schedule_dynamic_unit,
+            track_model::get_dynamic_schedule_units(),
+            'Unknown dynamic schedule unit: %s'
+        );
+    }
+
+    /**
+     * Maps an entity/db int constant to the string representation.
+     *
+     * @param int $entity_value
+     * @param array $map
+     * @param string $exception_message
+     * @return string
+     */
+    protected function map_from_entity(?int $entity_value, array $map,  string $exception_message): ?string {
+        if ($entity_value === null) {
+            return null;
         }
 
-        return null;
+        if (!array_key_exists($entity_value, $map)) {
+            throw new coding_exception(sprintf($exception_message, $entity_value));
+        }
+
+        return $map[$entity_value];
+    }
+
+    /**
+     * Get the date resolver for this track and a given set of users.
+     *
+     * @param array $user_ids
+     * @return date_resolver
+     */
+    public function get_date_resolver(array $user_ids): date_resolver {
+        if ($this->schedule_is_fixed) {
+            $to = $this->schedule_is_open ? null : $this->schedule_fixed_to;
+
+            return new fixed_range_resolver($this->schedule_fixed_from, $to);
+        }
+
+        $to = $this->schedule_is_open ? null : $this->schedule_dynamic_count_to;
+
+        return new user_creation_date_resolver(
+            $this->schedule_dynamic_count_from,
+            $to,
+            $this->get_schedule_dynamic_unit(),
+            $this->get_schedule_dynamic_direction(),
+            $user_ids
+        );
     }
 }
