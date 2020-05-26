@@ -126,7 +126,7 @@ if (has_capability('totara/program:handleexceptions', $context)) {
 }
 
 if (!$id) {
-    $inactive += array('overview', 'content', 'assignments', 'messages', 'certification', 'completion');
+    $inactive = array_merge($inactive, array('overview', 'content', 'assignments', 'messages', 'certification', 'completion'));
 }
 
 $tabs = array($toprow);
