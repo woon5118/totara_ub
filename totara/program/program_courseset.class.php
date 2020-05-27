@@ -1099,16 +1099,6 @@ class multi_course_set extends course_set {
                 $completeheading = false;
             }
 
-            // Get label for launch/view course button - applies to all courses.
-            $launchviewlabel = get_string('launchcourse', 'totara_program');
-            if (!empty($this->certifpath)) {
-                $certificationid = $DB->get_field('prog', 'certifid', array('id' => $this->programid));
-                $certifpath_user = get_certification_path_user($certificationid, $userid);
-                if ($certifpath_user == CERTIFPATH_RECERT && !certif_iswindowopen($certificationid, $userid)) {
-                    $launchviewlabel = get_string('viewcourse', 'totara_program');
-                }
-            }
-
             foreach ($this->courses as $course) {
                 $cells = array();
                 $coursecontext = context_course::instance($course->id);
@@ -1121,10 +1111,11 @@ class multi_course_set extends course_set {
                 $coursedetails = html_writer::empty_tag('img', array('src' => totara_get_icon($course->id, TOTARA_ICON_TYPE_COURSE),
                     'class' => 'course_icon', 'alt' => ''));
 
-                $showcourseset = false;
-                if ($userid) {
-                    $showcourseset = (is_enrolled($coursecontext, $userid) || totara_course_is_viewable($course->id, $userid))
-                                     && $accessible;
+                if ($userid && $accessible) {
+                    $showcourseset = totara_course_is_viewable($course->id, $userid);
+                } else {
+                    $showcourseset = is_viewing($coursecontext, $userid ? $userid : $USER->id) ? true :
+                        totara_course_is_viewable($course->id, $userid) && is_enrolled($coursecontext, $userid ? $userid : $USER->id, '', true);
                 }
 
                 // Site admin can access any course.
@@ -2053,10 +2044,20 @@ class competency_course_set extends course_set {
                 $cells = array();
                 $coursedetails = html_writer::empty_tag('img', array('src' => totara_get_icon($course->id, TOTARA_ICON_TYPE_COURSE),
                     'class' => 'course_icon', 'alt' => ''));
-                $coursedetails .= $accessible ? html_writer::link(new moodle_url('/course/view.php', array('id' => $course->id)),
-                                 format_string($course->fullname)) : format_string($course->fullname);
-                $cells[] = new html_table_cell($coursedetails);
-                if (is_siteadmin($USER->id) || $userid && $accessible && totara_course_is_viewable($course->id, $userid)) {
+
+                if (is_siteadmin($USER->id)) {
+                    $showcourseset = true;
+                } else if ($userid && $accessible) {
+                    $showcourseset = totara_course_is_viewable($course->id, $userid);
+                } else {
+                    $coursecontext = context_course::instance($course->id);
+                    $showcourseset = is_viewing($coursecontext, $userid ? $userid : $USER->id) ? true :
+                        totara_course_is_viewable($course->id, $userid) && is_enrolled($coursecontext, $userid ? $userid : $USER->id, '', true);
+                }
+
+                if ($showcourseset) {
+                    $coursedetails .= html_writer::link(new moodle_url('/course/view.php', array('id' => $course->id)),
+                        format_string($course->fullname));
                     $launch = html_writer::tag('div', $OUTPUT->single_button(new moodle_url('/course/view.php', array('id' => $course->id)),
                                      get_string('launchcourse', 'totara_program'), null), array('class' => 'prog-course-launch'));
                 } else if ($userid && $accessible && !empty($CFG->audiencevisibility) && $course->audiencevisible != COHORT_VISIBLE_NOUSERS) {
@@ -2066,12 +2067,16 @@ class competency_course_set extends course_set {
                     // This isn't needed for normal visibility because if the course is hidden then it will be inaccessible anyway.
                     $params = array('id' => $this->programid, 'cid' => $course->id, 'userid' => $userid, 'sesskey' => $USER->sesskey);
                     $requrl = new moodle_url('/totara/program/required.php', $params);
+                    $coursedetails .= html_writer::link($requrl, format_string($course->fullname));
                     $button = $OUTPUT->single_button($requrl, get_string('launchcourse', 'totara_program'), null);
                     $launch = html_writer::tag('div', $button, array('class' => 'prog-course-launch'));
                 } else {
+                    $coursedetails .= format_string($course->fullname);
                     $launch = html_writer::tag('div', $OUTPUT->single_button(null, get_string('notavailable', 'totara_program'), null,
                                      array('tooltip' => null, 'disabled' => true)), array('class' => 'prog-course-launch'));
                 }
+
+                $cells[] = new html_table_cell($coursedetails);
                 $cells[] = new html_table_cell($launch);
                 if ($userid) {
                     if (!$status = $DB->get_field('course_completions', 'status', array('userid' => $userid, 'course' => $course->id))) {
@@ -2651,13 +2656,25 @@ class recurring_course_set extends course_set {
             if (empty($course->icon)) {
                 $course->icon = 'default';
             }
+
             $coursedetails = html_writer::empty_tag('img', array('src' => totara_get_icon($course->id, TOTARA_ICON_TYPE_COURSE),
                 'class' => 'course_icon', 'alt' => ''));
-            $coursedetails .= $accessible ? html_writer::link(new moodle_url('/course/view.php', array('id' => $course->id)),
-                            format_string($course->fullname)) : format_string($course->fullname);
-            $cells[] = new html_table_cell($coursedetails);
 
-            if (is_siteadmin($USER->id) || $userid && $accessible && totara_course_is_viewable($course->id, $userid)) {
+            if (is_siteadmin($USER->id)) {
+                $showcourse = true;
+            } else if ($userid && $accessible) {
+                $showcourse = totara_course_is_viewable($course->id, $userid);
+            } else {
+                $coursecontext = context_course::instance($course->id);
+                $showcourse = is_viewing($coursecontext, $userid ? $userid : $USER->id) ? true :
+                    totara_course_is_viewable($course->id, $userid) && is_enrolled($coursecontext, $userid ? $userid : $USER->id, '', true);
+            }
+
+            // User must be enrolled or course can be viewed (checks audience visibility),
+            // And course must be accessible.
+            if ($showcourse) {
+                $coursedetails .= html_writer::link(new moodle_url('/course/view.php', array('id' => $course->id)),
+                    format_string($course->fullname));
                 $launch = html_writer::tag('div', $OUTPUT->single_button(new moodle_url('/course/view.php', array('id' => $course->id)),
                                  get_string('launchcourse', 'totara_program'), null), array('class' => 'prog-course-launch'));
             } else if ($userid && $accessible && !empty($CFG->audiencevisibility) && $course->audiencevisible != COHORT_VISIBLE_NOUSERS) {
@@ -2667,12 +2684,16 @@ class recurring_course_set extends course_set {
                 // This isn't needed for normal visibility because if the course is hidden then it will be inaccessible anyway.
                 $params = array('id' => $this->programid, 'cid' => $course->id, 'userid' => $userid, 'sesskey' => $USER->sesskey);
                 $requrl = new moodle_url('/totara/program/required.php', $params);
+                $coursedetails .= html_writer::link($requrl, format_string($course->fullname));
                 $button = $OUTPUT->single_button($requrl, get_string('launchcourse', 'totara_program'), null);
                 $launch = html_writer::tag('div', $button, array('class' => 'prog-course-launch'));
             } else {
+                $coursedetails .= format_string($course->fullname);
                 $launch = html_writer::tag('div', $OUTPUT->single_button(null, get_string('notavailable', 'totara_program'), null,
                                  array('tooltip' => null, 'disabled' => true)), array('class' => 'prog-course-launch'));
             }
+
+            $cells[] = new html_table_cell($coursedetails);
             $cells[] = new html_table_cell($launch);
 
             if ($userid) {

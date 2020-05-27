@@ -106,7 +106,17 @@ if (isset($program) && $program->user_is_assigned($userid)) {
                 $available = false;
 
                 foreach ($cs_group as $courseset) {
-                    $courses = $courseset->courses;
+                    switch ($courseset->contenttype) {
+                        case CONTENTTYPE_COMPETENCY:
+                            $courses = $courseset->get_competency_courses();
+                            break;
+                        case CONTENTTYPE_RECURRING:
+                            $courses = [$courseset->course];
+                            break;
+                        default:
+                            $courses = $courseset->courses;
+                    }
+
                     foreach ($courses as $course) {
                         if ($course->id == $courseid) {
                             // Found it, try and enrol the user.
