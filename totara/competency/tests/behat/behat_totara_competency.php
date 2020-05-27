@@ -18,15 +18,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
+ * @author Riana Rossouw <riana.rossouw@totaralearning.com>
  * @package totara_competency
  */
 
 use Behat\Gherkin\Node\TableNode as TableNode;
 use Behat\Mink\Exception\ExpectationException;
 use core\entities\user;
+use Behat\Mink\Element\NodeElement;
 use totara_competency\entities\assignment;
 use totara_competency\entities\competency;
 use totara_competency\models\assignment as assignment_model;
+use totara_competency\pathway_factory;
+use totara_criteria\criterion;
+use totara_criteria\criterion_factory;
 
 class behat_totara_competency extends behat_base {
 
@@ -34,11 +39,16 @@ class behat_totara_competency extends behat_base {
     private const TOTARA_COMPETENCY_PROFILE_PATH = 'totara/competency/profile/index.php';
     private const TOTARA_COMPETENCY_PROFILE_DETAIL_PATH = 'totara/competency/profile/details/index.php';
     private const TOTARA_COMPETENCY_USER_ASSIGNMENT_PATH = 'totara/competency/profile/assign/index.php';
+    private const TOTARA_COMPETENCY_ACHIEVEMENT_PATHS_PATH = 'totara/competency/competency_edit.php';
 
     /**
      * @var totara_competency_generator
      */
     protected $generator;
+
+    private $pathway_display_names = [];
+    private $criteria_display_names = [];
+    private $criteria_item_types = [];
 
     /**
      * Opens the current users competency profile.
@@ -255,6 +265,1106 @@ class behat_totara_competency extends behat_base {
         foreach ($assignments as $assignment) {
             assignment_model::load_by_entity($assignment)->archive();
         }
+    }
+
+    /**
+     * @Given /^I navigate to the competency achievement paths page for the "(?P<competency>(?:[^"]|\\")*)" competency$/
+     *
+     * @param string|int $competency
+     * @throws moodle_exception
+     */
+    public function i_navigate_to_the_competency_achievement_paths_page_for($competency): void {
+        \behat_hooks::set_step_readonly(false);
+
+        $competency_id = $this->resolve_competency_id($competency);
+        $query_params = ['s' => 'achievement_paths', 'id' => $competency_id];
+        $detail_page_url = new moodle_url(self::TOTARA_COMPETENCY_ACHIEVEMENT_PATHS_PATH, $query_params);
+
+        $this->getSession()->visit($this->locate_path($detail_page_url->out(false)));
+    }
+
+    /**
+     * Add an achievement path of the specified type
+     * @Given /^I add a "(?P<pathway_type>[^"]*)" pathway$/
+     * @param string $pathway_type
+     */
+    public function i_add_a_pathway(string $pathway_type): void {
+        \behat_hooks::set_step_readonly(false);
+
+        $xpath = "//*[@data-tw-editachievementpaths-add-pathway]//option[@value='$pathway_type']";
+        /** @var NodeElement $option */
+        $option = null;
+
+        try {
+            $option = $this->find('xpath', $xpath);
+        } catch (Exception $e) {
+            throw new ExpectationException(
+                "Invalid pathway type \"$pathway_type\".",
+                $this->getSession()
+            );
+        }
+
+        $option->click();
+    }
+
+    /**
+     * @Given /^I (should|should not) see "(?P<pathway_type>(?:[^"]|\\")*)" pathway$/
+     * @Given /^I (should|should not) see "(?P<pathway_type>(?:[^"]|\\")*)" pathway "(before|after)" criteria groups$/
+     * @param string $n
+     * @param string $pathway_type
+     * @param string|null $position
+     * @throws Exception
+     */
+    public function i_should_see_pathway_(string $not, string $pathway_type, ?string $position = null) {
+        \behat_hooks::set_step_readonly(true);
+
+        $expected = ($not === 'should');
+        $msg = '"' . $pathway_type . '" pathway' . ($position === null ? '' : ' "' . $position . '" criteria groups') ;
+
+        /** @var NodeElement $node */
+        $node = null;
+
+        try {
+            $node = $this->find_nth_pathway_node_with_type($pathway_type, "1", $position);
+        } catch (Exception $e) {
+            if ($expected) {
+                throw new ExpectationException(
+                    $msg . ' could not be found',
+                    $this->getSession()
+                );
+            }
+            return;
+        }
+
+        if (!$expected) {
+            throw new ExpectationException(
+                $msg . ' found when it should not be there',
+                $this->getSession()
+            );
+        }
+    }
+
+    /**
+     * @Given /^I (should|should not) see "(?P<text_string>(?:[^"]|\\")*)" in "(?P<pathway_type>(?:[^"]|\\")*)" pathway$/
+     * @Given /^I (should|should not) see "(?P<text_string>(?:[^"]|\\")*)" in "(?P<pathway_type>(?:[^"]|\\")*)" pathway "(?P<pathway_idx>[^"][0-9]*)"$/
+     * @Given /^I (should|should not) see "(?P<text_string>(?:[^"]|\\")*)" in "(?P<pathway_type>(?:[^"]|\\")*)" pathway "(?P<pathway_idx>[^"][0-9]*)" "(before|after)" criteria groups$/
+     * @param string $not
+     * @param string $search_string
+     * @param string $pathway_type
+     * @param string|null $pathway_idx
+     * @param string|null $position
+     * @throws Exception
+     */
+    public function i_should_see_in_pathway(string $not, string $text_string, string $pathway_type,
+        ?string $pathway_idx = null, ?string $position = null
+    ) {
+        \behat_hooks::set_step_readonly(true);
+
+        $expected = ($not === 'should');
+        $msg = $this->get_pathway_description($pathway_type, $pathway_idx, $position);
+
+        /** @var NodeElement $pathway_node */
+        $pathway_node = null;
+
+        try {
+            $pathway_node = $this->find_nth_pathway_node_with_type($pathway_type, $pathway_idx, $position);
+        } catch (Exception $e) {
+            throw new ExpectationException(
+                $msg . ' could not be found',
+                $this->getSession()
+            );
+        }
+
+        $text_node = null;
+        $fnd = true;
+        try {
+            $xpath = ".//span[contains(., '$text_string')]";
+            $text_node = $pathway_node->find('xpath', $xpath);
+        } catch (Exception $e) {
+            $fnd = false;
+        }
+
+        if ($fnd) {
+            try {
+                $this->ensure_node_is_visible($text_node);
+            } catch (Exception $e) {
+                $fnd = false;
+            }
+        }
+
+        if ($fnd !== $expected) {
+            $msg = '"' . $text_string . '"' . ($fnd ? '' : ' not') . ' found in ' . $msg . ($fnd ? ' when it should not be there' : '');
+            throw new ExpectationException($msg, $this->getSession());
+        }
+    }
+
+    /**
+     * @Given /^I click on "(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>[^"]*)" in "(?P<pathway_type>(?:[^"]|\\")*)" pathway$/
+     * @Given /^I click on "(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>[^"]*)" in "(?P<pathway_type>(?:[^"]|\\")*)" pathway "(?P<pathway_idx>[^"][0-9]*)"$/
+     * @Given /^I click on "(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>[^"]*)" in "(?P<pathway_type>(?:[^"]|\\")*)" pathway "(?P<pathway_idx>[^"][0-9]*)" "(before|after)" criteria groups$/
+     * @param string $element Element we look for
+     * @param string $selector_type The type of what we look for
+     * @param string pathway_type
+     * @param string|null $pathway_idx
+     * @param string|null $position
+     */
+    public function i_click_on_in_pathway(string $element, string $selector_type, string $pathway_type,
+        ?string $pathway_idx = null, ?string $position = null
+    ) {
+        \behat_hooks::set_step_readonly(false);
+
+        /** @var NodeElement $pathway_node */
+        $pathway_node = $this->find_nth_pathway_node_with_type($pathway_type, $pathway_idx, $position);
+        /** @var NodeElement $node */
+        $element_node = $this->find_element_in_node($pathway_node, $element, $selector_type);
+
+        try {
+            $this->ensure_node_is_visible($element_node);
+            $element_node->click();
+        } catch (Exception $e) {
+            $msg = '"' . $element . '" "' . $selector_type . '" in ' .
+                $this->get_pathway_description($pathway_type, $pathway_idx, $position) .
+                ' is not clickable';
+            throw new ExpectationException($msg, $this->getSession());
+        }
+    }
+
+    /**
+     * @Given /^"(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>[^"]*)" (should|should not) be visible in "(?P<pathway_type>(?:[^"]|\\")*)" pathway$/
+     * @Given /^"(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>[^"]*)" (should|should not) be visible in "(?P<pathway_type>(?:[^"]|\\")*)" pathway "(?P<pathway_idx>[^"][0-9]*)"$/
+     * @Given /^"(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>[^"]*)" (should|should not) be visible in "(?P<pathway_type>(?:[^"]|\\")*)" pathway "(?P<pathway_idx>[^"][0-0])" "(before|after)" criteria groups$/
+     * @param string $element Element we look for
+     * @param string $selector_type The type of what we look for
+     * @param string pathway_type
+     * @param string|null $pathway_idx
+     * @param string|null $position
+     */
+    public function element_in_pathway_should_be_visible(string $element, string $selector_type, string $not, string $pathway_type,
+        ?string $pathway_idx = null, ?string $position = null
+    ) {
+        \behat_hooks::set_step_readonly(true);
+
+        /** @var NodeElement $pathway_node */
+        $pathway_node = $this->find_nth_pathway_node_with_type($pathway_type, $pathway_idx, $position);
+        /** @var NodeElement $element_node */
+        $element_node = $this->find_element_in_node($pathway_node, $element, $selector_type);
+
+        $expected = ($not === 'should');
+        $visible = $element_node->isVisible();
+
+        if ($expected != $visible) {
+            $msg = '"' . $element . '" "' . $selector_type . '" is ' . ($visible ? '' : 'not ') .
+                'visible in ' . $this->get_pathway_description($pathway_type, $pathway_idx, $position);
+            throw new ExpectationException($msg, $this->getSession());
+        }
+    }
+
+    /**
+     * Find the nth pathway with the specified name before/after criteria groups
+     * @param string $pathway_type
+     * @param string|null $pathway_idx
+     * @param string|null $position
+     * @return NodeElement
+     */
+    private function find_nth_pathway_node_with_type(string $pathway_type, ?string $pathway_idx = null, ?string $position = null): NodeElement {
+        $div = ($position ?? 'before') === 'after' ? 'high-sortorder' : 'low-sortorder';
+
+        $display_name = $this->get_pathway_display_name($pathway_type);
+        $xpath = "//*[@data-tw-editachievementpaths-group=\"$div\"]" .
+            "//*[contains(., \"$display_name\")]" .
+            "/ancestor::div[@data-tw-editachievementpaths-pathway-key]";
+
+        /** @var NodeElement[] $pathway_nodes */
+        $pathway_nodes = null;
+
+        try {
+            $pathway_nodes = $this->find_all('xpath', $xpath);
+        } catch (Exception $e) {
+            throw new ExpectationException(
+                "\"$pathway_type\" pathway could not be found",
+                $this->getSession()
+            );
+        }
+
+        $nth = (int)($pathway_idx ?? "1");
+        if ($nth <= 0) {
+            throw new ExpectationException(
+                'Invalid pathway index "' . $pathway_idx . '"',
+                $this->getSession()
+            );
+        }
+
+        if (count($pathway_nodes) < $nth) {
+            $msg = '"' . $pathway_type . '"' . ($pathway_idx !== null ? " \"$pathway_idx\"" : '') . ' could not be found';
+            throw new ExpectationException($msg, $this->getSession());
+        }
+
+        return $pathway_nodes[$nth - 1];
+    }
+
+    /**
+     * @Given /^I should see the following singlevalue scale values:$/
+     * @param TableNode $table
+     * @throws Exception
+     */
+    public function singlevalue_scale_values_exists(TableNode $table) {
+        \behat_hooks::set_step_readonly(true); // Backend action.
+
+        $expected_scale_values = $this->parse_table(
+            $table,
+            ['name']
+        );
+
+        foreach ($expected_scale_values as $expected) {
+            try {
+                $scale_value_node = $this->find_scale_value_node($expected['name']);
+            } catch (Exception $e) {
+                $msg = '"' . $expected['name'] . '" could not be found';
+                throw new ExpectationException($msg, $this->getSession());
+                return;
+            }
+        }
+    }
+
+    /**
+     * @param NodeElement $node
+     * @param string $element
+     * @param string $selector_type
+     */
+    private function find_element_in_node(NodeElement $node, string $element, string $selector_type) {
+        // Getting Mink selector and locator.
+        list($selector, $locator) = $this->transform_selector($selector_type, $element);
+
+        // Gets the node based on the requested selector type and locator within the pathway.
+        return $this->find($selector, $locator, false, $node);
+    }
+
+    /**
+     * Add a criteria group containing the specified criterion to the scale value's achievement paths
+     * @Given /^I add a criteria group with "(?P<criterion_type>[^"]*)" criterion to "(?P<scale_value_name>(?:[^"]|\\")*)" scalevalue$/
+     * @param string $criterion_type
+     * @param string $scale_value_name
+     * @throws Exception
+     */
+    public function i_add_criteria_group_with_criterion_to_scalevalue(string $criterion_type, string $scale_value_name) {
+        \behat_hooks::set_step_readonly(false);
+
+        $scale_value_node = $this->find_scale_value_node($scale_value_name);
+        $this->select_criterion_type($scale_value_node, $criterion_type);
+    }
+
+    /**
+     * Add a criterion with the specified type to the nth criteria group resulting in the specific scale value
+     * @Given /^I add a "(?P<criterion_type>[^"]*)" criterion to criteria group "(?P<group_idx>[^"][0-9]*)" in "(?P<scale_value_name>(?:[^"]|\\")*)" scalevalue$/
+     * @param string $criterion_type
+     * @param string $group_idx
+     * @param string $scale_value_name
+     * @throws Exception
+     */
+    public function i_add_criterion_to_nth_criteria_group_in_scalevalue(string $criterion_type,
+        string $group_idx, string $scale_value_name
+    ) {
+        \behat_hooks::set_step_readonly(false);
+
+        $criteria_group_node = $this->find_nth_criteria_group($scale_value_name, $group_idx);
+        $this->select_criterion_type($criteria_group_node, $criterion_type);
+    }
+
+    /**
+     * Verify the criteria in criteria group
+     * @Given /^I should see "(?P<criterion_type>(?:[^"]|\\")*)" criterion in criteria group "(?P<group_idx>[^"][0-9]*)" in "(?P<scale_value_name>(?:[^"]|\\")*)" scalevalue$/
+     * @param string $criterion_type
+     * @param string $group_idx
+     * @param string $scale_value_name
+     * @throws Exception
+     */
+    public function i_should_see_criterion_in_nth_criteria_group_in_scalevalue(string $criterion_type,
+        string $group_idx, string $scale_value_name
+    ) {
+        \behat_hooks::set_step_readonly(true);
+
+        $this->find_nth_criterion_in_nth_criteria_group($criterion_type, "1", $group_idx, $scale_value_name);
+    }
+
+    /**
+     * @Given /^the "(?P<criterion_type>[^"]*)" criterion type option should be (enabled|disabled) in "(?P<scale_value_name>(?:[^"]|\\")*)" scalevalue$/
+     * @param string $criterion_type
+     * @param string $enabled
+     * @param string $scale_value_name
+     */
+    public function the_criterion_type_option_should_be_enabled_in_scalevalue(string $criterion_type, string $enabled,
+        string $scale_value_name
+    ) {
+        \behat_hooks::set_step_readonly(true);
+
+        $scale_value_node = $this->find_scale_value_node($scale_value_name);
+        /** @var NodeElement $criterion_type_option */
+        $criterion_type_option = $this->find_criterion_type_option($scale_value_node, $criterion_type);
+        $expected = $enabled === 'enabled';
+        $actual = !$criterion_type_option->hasAttribute('disabled');
+
+        if ($expected != $actual) {
+            $msg = '"' . $criterion_type . '" option is ' . ($actual ? 'enabled' : 'disabled') . ' when expected to be ' .
+                ($enabled ? 'enabled' : 'disabled'
+            );
+            throw new ExpectationException($msg, $this->getSession());
+        }
+    }
+
+    /**
+     * @Given /^the "(?P<criterion_type>[^"]*)" criterion type option should be (enabled|disabled) in criteria group "(?P<group_idx>[^"][0-9]*)" in "(?P<scale_value_name>(?:[^"]|\\")*)" scalevalue$/
+     * @param string $criterion_type
+     * @param string $enabled
+     * @param string $group_idx
+     * @param string $scale_value_name
+     */
+    public function the_criterion_type_option_should_be_enabled_in_nth_criteria_group_in_scalevalue(string $criterion_type,
+        string $enabled, string $group_idx, string $scale_value_name
+    ) {
+        \behat_hooks::set_step_readonly(true);
+
+        $criteria_group_node = $this->find_nth_criteria_group($scale_value_name, $group_idx);
+        /** @var NodeElement $criterion_type_button */
+        $criterion_type_option = $this->find_criterion_type_option($criteria_group_node, $criterion_type);
+        $expected = $enabled === 'enabled';
+        $actual = !$criterion_type_option->hasAttribute('disabled');
+
+        if ($expected != $actual) {
+            $msg = '"' . $criterion_type . '" option is ' . ($actual ? 'enabled' : 'disabled') . ' when expected to be ' .
+                ($enabled ? 'enabled' : 'disabled');
+            throw new ExpectationException($msg, $this->getSession());
+        }
+    }
+
+    /**
+     * @When /^I click on "(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>[^"]*)" in "(?P<criterion_type>(?:[^"]|\\")*)" criterion "(?P<criterion_idx>[^"][0-9]*)" in criteria group "(?P<group_idx>[^"][0-9]*)" in "(?P<scale_value_name>(?:[^"]|\\")*)" scalevalue$/
+     * @param string $element Element we look for
+     * @param string $selector_type The type of what we look for
+     * @param string $criterion_type
+     * @param string $criterion_idx
+     * @param string $group_idx
+     * @param string $scale_value_name
+     */
+    public function i_click_on_in_nth_criterion_in_nth_criteria_group_in_scalevalue(
+        string $element, string $selector_type, string $criterion_type, string $criterion_idx,
+        string $group_idx, string $scale_value_name
+    ) {
+        \behat_hooks::set_step_readonly(false);
+
+        /** @var NodeElement $criterion_node */
+        $criterion_node = $this->find_nth_criterion_in_nth_criteria_group($criterion_type, $criterion_idx,
+            $group_idx, $scale_value_name
+        );
+        /** @var NodeElement $element_node */
+        $element_node = $this->find_element_in_node($criterion_node, $element, $selector_type);
+
+        try {
+            $this->ensure_node_is_visible($element_node);
+            $element_node->click();
+        } catch (Exception $e) {
+            $msg = '"' . $element . '" "' . $selector_type . '" in ' .
+                $this->get_criterion_description($criterion_type, $criterion_idx, $group_idx, $scale_value_name) .
+                ' is not clickable';
+            throw new ExpectationException($msg, $this->getSession());
+        }
+    }
+
+    /**
+     * @When /^"(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>[^"]*)" in criteria group "(?P<group_idx>[^"][0-9]*)" in "(?P<scale_value_name>(?:[^"]|\\")*)" scalevalue (should|should not) be visible$/
+     * @param string $element Element we look for
+     * @param string $selector_type The type of what we look for
+     * @param string $group_idx
+     * @param string $scale_value_name
+     * @param string $not
+     */
+    public function element_in_nth_criteria_group_in_scalevalue_should_be_visible(
+        string $element, string $selector_type, string $group_idx, string $scale_value_name, string $not
+    ) {
+        \behat_hooks::set_step_readonly(true);
+
+        /** @var NodeElement $group_node */
+        $group_node = $this->find_nth_criteria_group($scale_value_name, $group_idx);
+        /** @var NodeElement $element_node */
+        $element_node = $this->find_element_in_node($group_node, $element, $selector_type);
+
+        $expected = ($not === 'should');
+        $visible = $element_node->isVisible();
+
+        if ($expected != $visible) {
+            $msg = '"' . $element . '" "' . $selector_type . '" in ' .
+                $this->get_nth_criteria_group_description($group_idx, $scale_value_name) .
+                ' is ' . ($visible ? '' : 'not ') . 'visible';
+            throw new ExpectationException($msg, $this->getSession());
+        }
+    }
+
+    /**
+     * @When /^"(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>[^"]*)" in "(?P<criterion_type>(?:[^"]|\\")*)" criterion "(?P<criterion_idx>[^"][0-9]*)" in criteria group "(?P<group_idx>[^"][0-9]*)" in "(?P<scale_value_name>(?:[^"]|\\")*)" scalevalue (should|should not) be visible$/
+     * @param string $element Element we look for
+     * @param string $selector_type The type of what we look for
+     * @param string $criterion_type
+     * @param string $criterion_idx
+     * @param string $group_idx
+     * @param string $scale_value_name
+     * @param string $not
+     */
+    public function element_in_nth_criterion_in_nth_criteria_group_in_scalevalue_should_be_visible(
+        string $element, string $selector_type, string $criterion_type, string $criterion_idx,
+        string $group_idx, string $scale_value_name, string $not
+    ) {
+        \behat_hooks::set_step_readonly(true);
+
+        /** @var NodeElement $criterion_node */
+        $criterion_node = $this->find_nth_criterion_in_nth_criteria_group($criterion_type, $criterion_idx,
+            $group_idx, $scale_value_name
+        );
+        /** @var NodeElement $element_node */
+        $element_node = $this->find_element_in_node($criterion_node, $element, $selector_type);
+
+        $expected = ($not === 'should');
+        $visible = $element_node->isVisible();
+
+        if ($expected != $visible) {
+            $msg = '"' . $element . '" "' . $selector_type . '" in ' .
+                $this->get_criterion_description($criterion_type, $criterion_idx, $group_idx, $scale_value_name) .
+                ' is ' . ($visible ? '' : 'not ') . 'visible';
+            throw new ExpectationException($msg, $this->getSession());
+        }
+    }
+
+    /**
+     * @When /^I (should|should not) see "(?P<text_string>(?:[^"]|\\")*)" in "(?P<criterion_type>(?:[^"]|\\")*)" criterion "(?P<criterion_idx>[^"][0-9]*)" in criteria group "(?P<group_idx>[^"][0-9]*)" in "(?P<scale_value_name>(?:[^"]|\\")*)" scalevalue$/
+     * @param string $not
+     * @param string $text_string
+     * @param string $criterion_type
+     * @param string $criterion_idx
+     * @param string $group_idx
+     * @param string $scale_value_name
+     */
+    public function i_should_see_in_nth_criterion_in_nth_criteria_group_in_scalevalue(
+        string $not, string $text_string, string $criterion_type, string $criterion_idx,
+        string $group_idx, string $scale_value_name
+    ) {
+        \behat_hooks::set_step_readonly(true);
+
+        $expected = ($not === 'should');
+        $msg = $this->get_criterion_description($criterion_type, $criterion_idx, $group_idx, $scale_value_name);
+
+        try {
+            /** @var NodeElement $criterion_node */
+            $criterion_node = $this->find_nth_criterion_in_nth_criteria_group($criterion_type, $criterion_idx,
+                $group_idx, $scale_value_name
+            );
+        } catch (Exception $e) {
+            throw new ExpectationException(
+                $msg . ' could not be found',
+                $this->getSession()
+            );
+        }
+
+        $text_node = null;
+        $fnd = true;
+        try {
+            $xpath = ".//span[contains(., '$text_string')]";
+            $text_node = $criterion_node->find('xpath', $xpath);
+        } catch (Exception $e) {
+            $fnd = false;
+        }
+
+        if ($fnd) {
+            try {
+                $this->ensure_node_is_visible($text_node);
+            } catch (Exception $e) {
+                $fnd = false;
+            }
+        }
+
+        if ($fnd !== $expected) {
+            $msg = '"' . $text_string . '"' . ($fnd ? '' : ' not') . ' found in ' . $msg . ($fnd ? ' when it should not be there' : '');
+            throw new ExpectationException($msg, $this->getSession());
+        }
+    }
+
+    /**
+     * @When /^I (should|should not) see error indicator for "(?P<criterion_type>(?:[^"]|\\")*)" criterion "(?P<criterion_idx>[^"][0-9]*)" in criteria group "(?P<group_idx>[^"][0-9]*)" in "(?P<scale_value_name>(?:[^"]|\\")*)" scalevalue$/
+     * @param string $not
+     * @param string $criterion_type
+     * @param string $criterion_idx
+     * @param string $group_idx
+     * @param string $scale_value_name
+     */
+    public function i_should_see_error_indicator_for_nth_criterion_in_nth_criteria_group_in_scalevalue(
+        string $not, string $criterion_type, string $criterion_idx,
+        string $group_idx, string $scale_value_name
+    ) {
+        \behat_hooks::set_step_readonly(true);
+
+        $expected = ($not === 'should');
+        $msg = $this->get_criterion_description($criterion_type, $criterion_idx, $group_idx, $scale_value_name);
+
+        try {
+            /** @var NodeElement $criterion_node */
+            $criterion_node = $this->find_nth_criterion_in_nth_criteria_group($criterion_type, $criterion_idx,
+                $group_idx, $scale_value_name
+            );
+        } catch (Exception $e) {
+            throw new ExpectationException(
+                $msg . ' could not be found',
+                $this->getSession()
+            );
+        }
+
+        $warning_node = null;
+        $fnd = true;
+        try {
+            $xpath = './/div[@class="criterion_title"]//span[@data-flex-icon="notification-warning"]';
+            $warning_node = $criterion_node->find('xpath', $xpath);
+        } catch (Exception $e) {
+            $fnd = false;
+        }
+
+        if ($fnd) {
+            try {
+                $this->ensure_node_is_visible($warning_node);
+            } catch (Exception $e) {
+                $fnd = false;
+            }
+        }
+
+        if ($fnd !== $expected) {
+            $msg = 'An error indication is' . ($fnd ? '' : ' not') . ' found for ' . $msg . ($fnd ? ' when it should not be there' : '');
+            throw new ExpectationException($msg, $this->getSession());
+        }
+    }
+
+    /**
+     * @When /^I (should|should not) see "(?P<error_text>(?:[^"]|\\")*)" error for "(?P<item>(?:[^"]|\\")*)" item in "(?P<criterion_type>(?:[^"]|\\")*)" criterion "(?P<criterion_idx>[^"][0-9]*)" in criteria group "(?P<group_idx>[^"][0-9]*)" in "(?P<scale_value_name>(?:[^"]|\\")*)" scalevalue$/
+     * @param string $not
+     * @param string $error_text
+     * @param string $item
+     * @param string $criterion_type
+     * @param string $criterion_idx
+     * @param string $group_idx
+     * @param string $scale_value_name
+     */
+    public function i_should_see_error_for_item_in_nth_criterion_in_nth_criteria_group_in_scalevalue(
+        string $not, string $error_text, string $item, string $criterion_type, string $criterion_idx,
+        string $group_idx, string $scale_value_name
+    ) {
+        \behat_hooks::set_step_readonly(true);
+
+        $expected = ($not === 'should');
+        $msg = 'Item "' . $item . '" in ' . $this->get_criterion_description($criterion_type, $criterion_idx, $group_idx, $scale_value_name);
+
+        /** @var NodeElement $item_node */
+        $item_node = null;
+        try {
+            $item_node = $this->find_item_in_criterion($item, $criterion_type, $criterion_idx,
+                $group_idx, $scale_value_name
+            );
+        } catch (Exception $e) {
+            throw new ExpectationException(
+                $msg . ' could not be found',
+                $this->getSession()
+            );
+        }
+
+        $warning_node = null;
+        $fnd = true;
+        try {
+            $xpath = './/span[@class="tw-editAchievementPaths__criterionForm-warning"]//span[contains(., "' . $error_text . '")]';
+            $warning_node = $item_node->find('xpath', $xpath);
+        } catch (Exception $e) {
+            $fnd = false;
+        }
+
+        if ($fnd) {
+            try {
+                $this->ensure_node_is_visible($warning_node);
+            } catch (Exception $e) {
+                $fnd = false;
+            }
+        }
+
+        if ($fnd !== $expected) {
+            $msg = 'Error "' . $error_text . '"' . ($fnd ? '' : ' not') . ' found for ' . $msg . ($fnd ? ' when it should not be there' : '');
+            throw new ExpectationException($msg, $this->getSession());
+        }
+    }
+
+    /**
+     * @When /^I remove "(?P<item>(?:[^"]|\\")*)" item in "(?P<criterion_type>(?:[^"]|\\")*)" criterion "(?P<criterion_idx>[^"][0-9]*)" in criteria group "(?P<group_idx>[^"][0-9]*)" in "(?P<scale_value_name>(?:[^"]|\\")*)" scalevalue$/
+     * @param string $item
+     * @param string $criterion_type
+     * @param string $criterion_idx
+     * @param string $group_idx
+     * @param string $scale_value_name
+     */
+    public function i_remove_item_in_nth_criterion_in_nth_criteria_group_in_scalevalue(
+        string $item, string $criterion_type, string $criterion_idx, string $group_idx, string $scale_value_name
+    ) {
+        \behat_hooks::set_step_readonly(true);
+
+        /** @var NodeElement $item_node */
+        $item_node = $this->find_item_in_criterion($item, $criterion_type, $criterion_idx, $group_idx, $scale_value_name);
+        $locator = '[data-tw-' . $this->get_criterion_item_type($criterion_type) . '-item-remove]';
+
+        try {
+            $remove_button = $item_node->find('css', $locator);
+            $remove_button->click();
+        } catch (Exception $e) {
+            $msg = 'Item "' . $item . '" in ' .
+                $this->get_criterion_description($criterion_type, $criterion_idx, $group_idx, $scale_value_name) .
+                ' could not be found';
+            throw new ExpectationException($msg, $this->getSession());
+        }
+    }
+
+    /**
+     * @When /^I toggle criterion detail of "(?P<criterion_type>(?:[^"]|\\")*)" criterion "(?P<criterion_idx>[^"][0-9]*)" in criteria group "(?P<group_idx>[^"][0-9]*)" in "(?P<scale_value_name>(?:[^"]|\\")*)" scalevalue$/
+     * @param string $criterion_type
+     * @param string $criterion_idx
+     * @param string $group_idx
+     * @param string $scale_value_name
+     */
+    public function i_toggle_criterion_detail(string $criterion_type, string $criterion_idx,
+        string $group_idx, string $scale_value_name
+    ) {
+        \behat_hooks::set_step_readonly(false);
+
+        /** @var NodeElement $criterion_node */
+        $criterion_node = $this->find_nth_criterion_in_nth_criteria_group($criterion_type, $criterion_idx,
+            $group_idx, $scale_value_name
+        );
+
+        try {
+            $toggle = $this->find('css', 'button[aria-expanded]', false, $criterion_node);
+            $toggle->click();
+        } catch (Exception $e) {
+            $msg = $criterion_type . '" criterion " has no detail';
+            throw new ExpectationException($msg, $this->getSession());
+        }
+    }
+
+    /**
+     * @Given /^I should see "(?P<group_count>[^"][0-9]*)" criteria groups in "(?P<scale_value_name>(?:[^"]|\\")*)" scalevalue$/
+     * @param string $group_count
+     * @param string $scale_value_name
+     * @throws Exception
+     */
+    public function i_should_see_count_criteria_groups_in_scalevalue(string $group_count, string $scale_value_name) {
+        \behat_hooks::set_step_readonly(true);
+
+        $expected = (int)$group_count;
+
+        /** @var NodeElement $scalevalue_node */
+        $scale_value_node = $this->find_scale_value_node($scale_value_name);
+
+        try {
+            /** @var NodeElement[] $criteria_group_nodes */
+            $criteria_group_nodes = $this->find_all('css', "[data-tw-editachievementpaths-pathway-key]",
+                false, $scale_value_node
+            );
+        } catch (Exception $e) {
+            if ($expected != 0) {
+                $msg = "Found 0 criteria groups in \"$scale_value_name\" when expecting $expected";
+                throw new ExpectationException($msg, $this->getSession());
+            }
+            return;
+        }
+
+        $actual = count($criteria_group_nodes);
+        if ($actual != $expected) {
+            $msg = "Found $actual criteria groups in \"$scale_value_name\" when expecting $expected";
+            throw new ExpectationException($msg, $this->getSession());
+        }
+    }
+
+    /**
+     * @When /^criterion aggregation should be set to complete "(?P<aggregation>(all|[^"][0-9]*))" in "(?P<criterion_type>(?:[^"]|\\")*)" criterion "(?P<criterion_idx>[^"][0-9]*)" in criteria group "(?P<group_idx>[^"][0-9]*)" in "(?P<scale_value_name>(?:[^"]|\\")*)" scalevalue$/
+     * @param string $aggregation
+     * @param string $criterion_type
+     * @param string $criterion_idx
+     * @param string $group_idx
+     * @param string $scale_value_name
+     */
+    public function criterion_aggregation_is_set_to(string $aggregation, string $criterion_type, string $criterion_idx,
+        string $group_idx, string $scale_value_name
+    ) {
+        \behat_hooks::set_step_readonly(false);
+
+        $aggregation_nodes = $this->get_criterion_aggregation_nodes($criterion_type, $criterion_idx,
+            $group_idx, $scale_value_name
+        );
+
+        /** @var NodeElement $node */
+        $node = null;
+
+        if ($aggregation === 'all') {
+            $node = $aggregation_nodes['method_all'];
+            if (!$node->isSelected()) {
+                $msg = 'Aggregation method of  ' .
+                    $this->get_criterion_description($criterion_type, $criterion_idx, $group_idx, $scale_value_name) .
+                    ' is set to "any ' . $node->getValue() . '" when expecting "all"';
+                throw new ExpectationException($msg, $this->getSession());
+            }
+        } else {
+            $node = $aggregation_nodes['method_any'];
+            if (!$node->isSelected()) {
+                $msg = 'Aggregation method of  ' .
+                    $this->get_criterion_description($criterion_type, $criterion_idx, $group_idx, $scale_value_name) .
+                    ' is set to "all" when expecting "any ' . $aggregation_nodes['req_items']->getValue() . '"';
+                throw new ExpectationException($msg, $this->getSession());
+            }
+
+            $node = $aggregation_nodes['req_items'];
+            if ($node->getValue() != $aggregation) {
+                $msg = 'Number or required items of ' .
+                    $this->get_criterion_description($criterion_type, $criterion_idx, $group_idx, $scale_value_name) .
+                    ' is set to "' . $node->getValue() . '" when exepecting "' . $aggregation . '""';
+                throw new ExpectationException($msg, $this->getSession());
+            }
+        }
+    }
+
+    /**
+     * @When /^I set criterion aggregation to complete "(?P<aggregation>(all|[^"][0-9]*))" in "(?P<criterion_type>(?:[^"]|\\")*)" criterion "(?P<criterion_idx>[^"][0-9]*)" in criteria group "(?P<group_idx>[^"][0-9]*)" in "(?P<scale_value_name>(?:[^"]|\\")*)" scalevalue$/
+     * @param string $aggregation
+     * @param string $criterion_type
+     * @param string $criterion_idx
+     * @param string $group_idx
+     * @param string $scale_value_name
+     */
+    public function i_set_criterion_aggregation(string $aggregation, string $criterion_type, string $criterion_idx,
+        string $group_idx, string $scale_value_name
+    ) {
+        \behat_hooks::set_step_readonly(false);
+
+        /** @var NodeElement[] $criterion_nodes */
+        $aggregation_nodes = $this->get_criterion_aggregation_nodes($criterion_type, $criterion_idx,
+            $group_idx, $scale_value_name
+        );
+
+        /** @var NodeElement $node */
+        $method_node = $aggregation === 'all' ? $aggregation_nodes['method_all'] : $aggregation_nodes['method_any'];
+
+        try {
+            $method_node->click();
+            if ($aggregation !== 'all') {
+                $aggregation_nodes['req_items']->setValue($aggregation);
+            }
+        } catch (Exception $e) {
+            $msg = 'Could not set aggregation detail for ' .
+                $this->get_criterion_description($criterion_type, $criterion_idx, $group_idx, $scale_value_name);
+            throw new ExpectationException($msg, $this->getSession());
+        }
+    }
+
+    /**
+     * @When /^"(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>[^"]*)" in "(?P<scale_value_name>(?:[^"]|\\")*)" scalevalue (should|should not) be visible$/
+     * @param string $element Element we look for
+     * @param string $selector_type The type of what we look for
+     * @param string $scale_value_name
+     * @param string $not
+     */
+    public function element_in_scalevalue_should_be_visible(
+        string $element, string $selector_type, string $scale_value_name, string $not
+    ) {
+        \behat_hooks::set_step_readonly(true);
+
+        /** @var NodeElement $scale_value_node */
+        $scale_value_node = $this->find_scale_value_node($scale_value_name);
+        $element_node = $this->find_element_in_node($scale_value_node, $element, $selector_type);
+
+        $expected = ($not === 'should');
+        $visible = $element_node->isVisible();
+
+        if ($expected != $visible) {
+            $msg = '"' . $element . '" "' . $selector_type . '" in scale value' . $scale_value_name .
+                ' is ' . ($visible ? '' : 'not ') . 'visible';
+            throw new ExpectationException($msg, $this->getSession());
+        }
+    }
+
+    /**
+     * Find the node for the specified scalevalue
+     *
+     * @param string $scale_value_name
+     * @return NodeElement
+     */
+    private function find_scale_value_node(string $scale_value_name): NodeElement {
+        $xpath = '//h4[@class="tw-editScaleValuePaths__scaleHeader-title"' .
+            ' and contains(.,"' . $scale_value_name . '")]' .
+            '/ancestor::div[@class="tw-editScaleValuePaths__scales-scale"]';
+        $scalevalue_node = $this->find('xpath', $xpath);
+
+        if ($scalevalue_node === null) {
+            throw new ExpectationException(
+                'Scale value "' . $scale_value_name . '" could not be found',
+                $this->getSession()
+            );
+        }
+
+        return $scalevalue_node;
+    }
+
+    /**
+     * Find nth criteria group with the scale value
+     *
+     * @param string $scale_value_name
+     * @param string $group_idx
+     * @return NodeElement
+     */
+    private function find_nth_criteria_group(string $scale_value_name, string $group_idx): NodeElement {
+        $nth = (int)$group_idx;
+        if ($nth <= 0) {
+            throw new ExpectationException(
+                'Invalid criteria group index "' . $group_idx . '"',
+                $this->getSession()
+            );
+        }
+
+        /** @var NodeElement $scalevalue_node */
+        $scale_value_node = $this->find_scale_value_node($scale_value_name);
+
+        /** @var NodeElement[] $criteria_group_nodes */
+        $criteria_group_nodes = $this->find_all('css', "[data-tw-editachievementpaths-pathway-key]",
+            false, $scale_value_node
+        );
+        if (count($criteria_group_nodes) < $nth) {
+            throw new ExpectationException(
+                'criteria group "' . $group_idx . '" could not be found in scalevalue "' . $scale_value_name . '"',
+                $this->getSession()
+            );
+        }
+
+        return $criteria_group_nodes[$group_idx - 1];
+    }
+
+    /**
+     * @param string $criterion_type
+     * @param string $criterion_idx
+     * @param string $group_idx
+     * @param string $scale_value_name
+     * @return NodeElement
+     */
+    private function find_nth_criterion_in_nth_criteria_group(string $criterion_type, string $criterion_idx,
+        string $group_idx, string $scale_value_name
+    ): NodeElement {
+        $criteria_group_node = $this->find_nth_criteria_group($scale_value_name, $group_idx);
+
+        $display_name = $this->get_criterion_display_name($criterion_type);
+        $xpath = "//*[@data-tw-editscalevaluepaths-criterion-key and contains(., '$display_name')]";
+        $criteria_nodes = $this->find_all('xpath', $xpath, false, $criteria_group_node);
+
+        $nth = (int)$criterion_idx;
+        if ($nth <= 0) {
+            throw new ExpectationException(
+                'Invalid criterion index "' . $criterion_idx . '"',
+                $this->getSession()
+            );
+        }
+
+        if (count($criteria_nodes) < $nth) {
+            $msg = '"' . $criterion_type . '" "' . $criterion_idx . '" could not be found in criteria_group "' .
+                $group_idx . '" in scalevalue "' . $scale_value_name . '"';
+            throw new ExpectationException($msg, $this->getSession());
+        }
+
+        return $criteria_nodes[$nth - 1];
+    }
+
+    /**
+     * @param string $item
+     * @param string $pathway_type
+     * @param string|null $pathway_idx
+     * @param string|null $position
+     * @throws ExpectationException
+     */
+    private function find_item_in_criterion(string $item, string $criterion_type, string $criterion_idx,
+        string $group_idx, string $scale_value_name
+    ) {
+        /** @var NodeElement $criterion_node */
+        $criterion_node = $this->find_nth_criterion_in_nth_criteria_group($criterion_type, $criterion_idx,
+            $group_idx, $scale_value_name
+        );
+
+        $item_type = $this->get_criterion_item_type($criterion_type);
+        $xpath = './/li[@data-tw-' . $item_type . '-item-value and contains(./span, "' . $item . '")]';
+        return $this->find('xpath', $xpath);
+    }
+
+
+    /**
+     * Return the Add criterion type button
+     * @param NodeElement $ancestor_node
+     * @return NodeElement
+     */
+    private function find_add_criteria_button(NodeElement $ancestor_node): NodeElement {
+        return $ancestor_node->find('css', '.tw-editScaleValuePaths__addButton');
+    }
+
+
+    /**
+     * Return the Option selector for the specific criterion type in the ancestor
+     * @param NodeElement $ancestor_node
+     * @param string $criterion_type
+     * @return NodeElement
+     */
+    private function find_criterion_type_option(NodeElement $ancestor_node, string $criterion_type): NodeElement {
+        return $ancestor_node->find('css', "[data-tw-editscalevaluepaths-dropdown-item-type='$criterion_type']");
+    }
+
+    /**
+     * Open the criteria type list and click the applicable type button
+     * @param NodeElement $ancestor_node
+     * @param string $criterion_type
+     * @throws ExpectationException
+     */
+    private function select_criterion_type(NodeElement $ancestor_node, string $criterion_type) {
+        /** @var NodeElement $add_button */
+        $add_button = null;
+
+        try {
+            $add_button = $this->find_add_criteria_button($ancestor_node);
+        } catch (Exception $e) {
+            throw new ExpectationException(
+                'Add criterion type button could not be found',
+                $this->getSession()
+            );
+        }
+
+        // Open the dropdown
+        $add_button->click();
+
+        /** @var NodeElement $criterion_type_button */
+        $criterion_type_button = null;
+
+        try {
+            $criterion_type_button = $this->find_criterion_type_option($ancestor_node, $criterion_type);
+        } catch (Exception $e) {
+            throw new ExpectationException(
+                'Criterion type option "' . $criterion_type . '" could not be found',
+                $this->getSession()
+            );
+        }
+
+        $criterion_type_button->click();
+    }
+
+    /**
+     * @param string $criterion_type
+     * @param string $criterion_idx
+     * @param string $group_idx
+     * @param string $scale_value_name
+     * @return NodeElement[] Aggregation nodes
+     */
+    private function get_criterion_aggregation_nodes(string $criterion_type, string $criterion_idx,
+        string $group_idx, string $scale_value_name
+    ): array {
+        $results = [];
+
+        /** @var NodeElement $criterion_node */
+        $criterion_node = $this->find_nth_criterion_in_nth_criteria_group($criterion_type, $criterion_idx,
+            $group_idx, $scale_value_name
+        );
+        $method_all_locator = './/div[@data-tw-criterion' . $criterion_type . '-aggregationmethod="' .
+            criterion::AGGREGATE_ALL . '"]//input[@type="radio"]';
+        $method_any_locator = './/div[@data-tw-criterion' . $criterion_type . '-aggregationmethod="' .
+            criterion::AGGREGATE_ANY_N . '"]//input[@type="radio"]';
+        $req_items_locator = './/div[@data-tw-criterion' . $criterion_type . '-aggregationcount]/input[@type="number"]';
+
+        try {
+            $results['method_all'] = $this->find('xpath', $method_all_locator, false, $criterion_node);
+            $results['method_any'] = $this->find('xpath', $method_any_locator, false, $criterion_node);
+            $results['req_items'] = $this->find('xpath', $req_items_locator, false, $criterion_node);
+        } catch (Exception $e) {
+            $msg = 'Could not find aggregation nodes for ' .
+                $this->get_criterion_description($criterion_type, $criterion_idx, $group_idx, $scale_value_name);
+            throw new ExpectationException($msg, $this->getSession());
+        }
+
+        return $results;
+    }
+
+    /**
+     * @param string $group_idx
+     * @param string $scale_value_name
+     * @return string
+     */
+    private function get_nth_criteria_group_description(string $group_idx, string $scale_value_name): string {
+        return 'criteria_group "' . $group_idx . '" in "' . $scale_value_name . '" scalevalue';
+    }
+
+    /**
+     * @param string $pathway_type
+     * @param string|null $pathway_idx
+     * @param string|null $position
+     * @return string
+     */
+    private function get_pathway_description(string $pathway_type, ?string $pathway_idx = null, ?string $position = null): string {
+        return '"' . $pathway_type . '" pathway' .
+            ($pathway_idx === null ? '' : ' "' . $pathway_idx . '"') .
+            ($position === null ? '' : ' "' . $position . '" criteria groups');
+    }
+
+    /**
+     * Return the pathway display name for the pathway_type
+     *
+     * @param string $pathway_type
+     * @return string Pathway name displayed in UI
+     */
+    private function get_pathway_display_name(string $pathway_type): string {
+        if (!isset($this->pathway_display_names[$pathway_type])) {
+            $pw = pathway_factory::create($pathway_type);
+            $this->pathway_display_names[$pathway_type] = $pw->get_title();
+        }
+
+        return $this->pathway_display_names[$pathway_type];
+    }
+
+    /**
+     * @param string $criterion_type
+     * @param string $criterion_idx
+     * @param string $group_idx
+     * @param string $scale_value_name
+     * @return string
+     */
+    private function get_criterion_description(string $criterion_type, string $criterion_idx,
+        string $group_idx, string $scale_value_name
+    ): string {
+        return '"' . $criterion_type . '" criterion "' . $criterion_idx .
+            '" in ' . $this->get_nth_criteria_group_description($group_idx, $scale_value_name);
+    }
+
+    /**
+     * Return the criterion display name for the criterion type
+     *
+     * @param string $criterion_type
+     * @return string Criterion name displayed in UI
+     */
+    private function get_criterion_display_name(string $criterion_type): string {
+        if (!isset($this->criterion_display_names[$criterion_type])) {
+            $criterion = criterion_factory::create($criterion_type);
+            $this->criteria_display_names[$criterion_type] = $criterion->get_title();
+        }
+
+        return $this->criteria_display_names[$criterion_type];
+    }
+
+    /**
+     * Return the criterion item type for the criterion type
+     *
+     * @param string $criterion_type
+     * @return string item_type of items in this criterion
+     */
+    private function get_criterion_item_type(string $criterion_type): string {
+        if (!isset($this->criterion_item_types[$criterion_type])) {
+            $criterion = criterion_factory::create($criterion_type);
+            $this->criteria_item_types[$criterion_type] = $criterion->get_items_type();
+        }
+
+        return $this->criteria_item_types[$criterion_type];
     }
 
 }

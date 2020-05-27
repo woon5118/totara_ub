@@ -68,7 +68,7 @@ data-tw-loader-target="">
             <div>
                 <div class="tw-editAchievementPaths__criterionForm-warning tw-editAchievementPaths--hidden" data-tw-criterionCourseCompletion-error="notenoughcourses">
                     {{#flex_icon}}notification-warning, error, criteria_coursecompletion{{/flex_icon}}
-                    {{#str}}error_not_enough_courses, criteria_coursecompletion{{/str}}
+                    <span>{{#str}}error_not_enough_courses, criteria_coursecompletion{{/str}}</span>
                 </div>
 
                 <button type="button" class="tw-editAchievementPaths__transparentBtn" data-tw-criterionCourseCompletion-addCourses="">
@@ -78,7 +78,7 @@ data-tw-loader-target="">
         </div>
     </div>
 
-    <form class="tw-editAchievementPaths__criterionForm" 
+    <form class="tw-editAchievementPaths__criterionForm"
     data-tw-criterionCourseCompletion-aggregation="{{#aggregation}}{{method}}{{/aggregation}}{{^aggregation}}1{{/aggregation}}"
     data-tw-criterionCourseCompletion-aggregation-reqitems="{{#aggregation}}{{reqitems}}{{/aggregation}}{{^aggregation}}1{{/aggregation}}">
 

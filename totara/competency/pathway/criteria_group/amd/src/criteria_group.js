@@ -207,6 +207,8 @@ define(['core/str', 'core/notification', 'core/templates'], function(str, notifi
 
         /**
          * Initialise the data and display it
+         *
+         * @return {Promise}
          */
         initData: function() {
             var that = this,
@@ -215,42 +217,45 @@ define(['core/str', 'core/notification', 'core/templates'], function(str, notifi
                 pwKey = 0,
                 pwId = 0;
 
-            if (pwWgt) {
-                pwKey = pwWgt.getAttribute('data-tw-editAchievementPaths-pathway-key') ? pwWgt.getAttribute('data-tw-editAchievementPaths-pathway-key') : 0;
-                pwId = pwWgt.getAttribute('data-tw-editAchievementPaths-pathway-id') ? pwWgt.getAttribute('data-tw-editAchievementPaths-pathway-id') : 0;
-            }
-
-            // Obtain the pathway detail from the dom
-
-            this.pwKey = pwKey;
-            if (svWgt) {
-                this.pathway.scalevalue = svWgt.getAttribute('data-tw-editScaleValuePaths-value') ? svWgt.getAttribute('data-tw-editScaleValuePaths-value') : 1;
-            }
-
-            if (pwId === 0) {
-                delete that.pathway.id;
-
-                // New pw - we need the competency id
-                // Get the competency ID from higher up in the DOM
-                var competencyIdNode = document.querySelector('[data-tw-editAchievementPaths-competency]'),
-                    competencyId = 1;
-
-                if (competencyIdNode) {
-                    competencyId = competencyIdNode.getAttribute('data-tw-editAchievementPaths-competency');
+            return new Promise(function(resolve) {
+                if (pwWgt) {
+                    pwKey = pwWgt.getAttribute('data-tw-editAchievementPaths-pathway-key') ? pwWgt.getAttribute('data-tw-editAchievementPaths-pathway-key') : 0;
+                    pwId = pwWgt.getAttribute('data-tw-editAchievementPaths-pathway-id') ? pwWgt.getAttribute('data-tw-editAchievementPaths-pathway-id') : 0;
                 }
 
-                this.pathway.competency_id = competencyId;
-                this.widget.setAttribute('data-tw-editAchievementPaths-save-endPoint', this.endpoints.create);
+                // Obtain the pathway detail from the dom
 
-            } else {
-                this.widget.setAttribute('data-tw-editAchievementPaths-save-endPoint', this.endpoints.update);
-                this.pathway.id = pwId;
-            }
+                that.pwKey = pwKey;
+                if (svWgt) {
+                    that.pathway.scalevalue = svWgt.getAttribute('data-tw-editScaleValuePaths-value') ? svWgt.getAttribute('data-tw-editScaleValuePaths-value') : 1;
+                }
 
-            // We can't add singleuse criteria with any other criteria
-            this.toggleSingleUse(false);
+                if (pwId === 0) {
+                    delete that.pathway.id;
 
-            this.triggerEvent('update', {pathway: this.pathway});
+                    // New pw - we need the competency id
+                    // Get the competency ID from higher up in the DOM
+                    var competencyIdNode = document.querySelector('[data-tw-editAchievementPaths-competency]'),
+                        competencyId = 1;
+
+                    if (competencyIdNode) {
+                        competencyId = competencyIdNode.getAttribute('data-tw-editAchievementPaths-competency');
+                    }
+
+                    that.pathway.competency_id = competencyId;
+                    that.widget.setAttribute('data-tw-editAchievementPaths-save-endPoint', that.endpoints.create);
+
+                } else {
+                    that.widget.setAttribute('data-tw-editAchievementPaths-save-endPoint', that.endpoints.update);
+                    that.pathway.id = pwId;
+                }
+
+                // We can't add singleuse criteria with any other criteria
+                that.toggleSingleUse(false);
+
+                that.triggerEvent('update', {pathway: that.pathway});
+                resolve();
+            });
         },
 
         /**
@@ -654,8 +659,14 @@ define(['core/str', 'core/notification', 'core/templates'], function(str, notifi
             wgt.setParent(parent);
             wgt.events();
             wgt.bubbledEventsListener();
-            wgt.initData();
             resolve(wgt);
+
+            M.util.js_pending('pathwayCriteriaGroup');
+            wgt.initData().then(function() {
+                M.util.js_complete('pathwayCriteriaGroup');
+            }).catch(function() {
+                // Failed
+            });
         });
     };
 

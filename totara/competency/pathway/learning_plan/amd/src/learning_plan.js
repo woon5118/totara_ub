@@ -52,50 +52,50 @@ define([], function() {
         /**
          * Initialise the data and display it
          *
-         * @param {node} wgt
+         * @return {Promise}
          */
-        initData: function(wgt) {
+        initData: function() {
             var that = this,
                 pwWgt = this.widget.closest('[data-tw-editAchievementPaths-pathway-key]'),
                 pwKey = 0,
                 pwId = 0,
                 idWgt = this.widget.closest('[data-tw-editAchievementPaths-pathway-id]'),
-                target;
+                target = this.widget;
 
-            if (pwWgt) {
-                pwKey = pwWgt.getAttribute('data-tw-editAchievementPaths-pathway-key') ? pwWgt.getAttribute('data-tw-editAchievementPaths-pathway-key') : 0;
-            }
-
-            if (idWgt) {
-                pwId = idWgt.getAttribute('data-tw-editAchievementPaths-pathway-id') ? idWgt.getAttribute('data-tw-editAchievementPaths-pathway-id') : 0;
-            }
-
-            that.pwKey = pwKey;
-
-            // Set the save-endpoint data attribute
-            target = wgt;
-
-            if (pwId === 0) {
-                delete that.pathway.id;
-
-                // New pw - we need the competency id
-                // Get the competency ID from higher up in the DOM
-                var competencyIdNode = document.querySelector('[data-tw-editAchievementPaths-competency]'),
-                    competencyId = 1;
-
-                if (competencyIdNode) {
-                    competencyId = competencyIdNode.getAttribute('data-tw-editAchievementPaths-competency');
+            return new Promise(function(resolve) {
+                if (pwWgt) {
+                    pwKey = pwWgt.getAttribute('data-tw-editAchievementPaths-pathway-key') ? pwWgt.getAttribute('data-tw-editAchievementPaths-pathway-key') : 0;
                 }
 
-                that.pathway.competency_id = competencyId;
-                target.setAttribute('data-tw-editAchievementPaths-save-endPoint', that.endpoints.create);
+                if (idWgt) {
+                    pwId = idWgt.getAttribute('data-tw-editAchievementPaths-pathway-id') ? idWgt.getAttribute('data-tw-editAchievementPaths-pathway-id') : 0;
+                }
 
-            } else {
-                that.pathway.id = pwId;
-                target.setAttribute('data-tw-editAchievementPaths-save-endPoint', that.endpoints.update);
-            }
+                that.pwKey = pwKey;
 
-            that.triggerEvent('update', {pathway: that.pathway});
+                if (pwId === 0) {
+                    delete that.pathway.id;
+
+                    // New pw - we need the competency id
+                    // Get the competency ID from higher up in the DOM
+                    var competencyIdNode = document.querySelector('[data-tw-editAchievementPaths-competency]'),
+                        competencyId = 1;
+
+                    if (competencyIdNode) {
+                        competencyId = competencyIdNode.getAttribute('data-tw-editAchievementPaths-competency');
+                    }
+
+                    that.pathway.competency_id = competencyId;
+                    target.setAttribute('data-tw-editAchievementPaths-save-endPoint', that.endpoints.create);
+
+                } else {
+                    that.pathway.id = pwId;
+                    target.setAttribute('data-tw-editAchievementPaths-save-endPoint', that.endpoints.update);
+                }
+
+                that.triggerEvent('update', {pathway: that.pathway});
+                resolve();
+            });
         },
 
         /**
@@ -126,8 +126,14 @@ define([], function() {
         return new Promise(function(resolve) {
             var wgt = new PwLearningPlan();
             wgt.setParent(parent);
-            wgt.initData(parent);
             resolve(wgt);
+
+            M.util.js_pending('pathwayLearningPlan');
+            wgt.initData().then(function() {
+                M.util.js_complete('pathwayLearningPlan');
+            }).catch(function() {
+                // Failed
+            });
         });
     };
 

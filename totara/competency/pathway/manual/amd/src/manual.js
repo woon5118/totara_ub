@@ -108,6 +108,8 @@ function(templates, notification, ajax, ModalList) {
 
         /**
          * Initialise the data
+         *
+         * @return {Promise}
          */
         initData: function() {
             var that = this,
@@ -115,45 +117,49 @@ function(templates, notification, ajax, ModalList) {
                 pwKey = 0,
                 pwId = 0;
 
-            if (pwWgt) {
-                pwKey = pwWgt.getAttribute('data-tw-editAchievementPaths-pathway-key') ? pwWgt.getAttribute('data-tw-editAchievementPaths-pathway-key') : 0;
-                pwId = pwWgt.getAttribute('data-tw-editAchievementPaths-pathway-id') ? pwWgt.getAttribute('data-tw-editAchievementPaths-pathway-id') : 0;
-            }
-
-            this.pwKey = pwKey;
-
-            if (pwId === 0) {
-                delete that.pathway.id;
-
-                // New pw - we need the competency id
-                // Get the competency ID from higher up in the DOM
-                var competencyIdNode = document.querySelector('[data-tw-editAchievementPaths-competency]'),
-                    competencyId = 1;
-
-                if (competencyIdNode) {
-                    competencyId = competencyIdNode.getAttribute('data-tw-editAchievementPaths-competency');
+            return new Promise(function(resolve, reject) {
+                if (pwWgt) {
+                    pwKey = pwWgt.getAttribute('data-tw-editAchievementPaths-pathway-key') ? pwWgt.getAttribute('data-tw-editAchievementPaths-pathway-key') : 0;
+                    pwId = pwWgt.getAttribute('data-tw-editAchievementPaths-pathway-id') ? pwWgt.getAttribute('data-tw-editAchievementPaths-pathway-id') : 0;
                 }
 
-                this.pathway.competency_id = competencyId;
-                this.widget.setAttribute('data-tw-editAchievementPaths-save-endPoint', this.endpoints.create);
+                that.pwKey = pwKey;
 
-            } else {
-                this.pathway.id = pwId;
-                this.widget.setAttribute('data-tw-editAchievementPaths-save-endPoint', this.endpoints.update);
+                if (pwId === 0) {
+                    delete that.pathway.id;
 
-                this.getRoles();
-            }
+                    // New pw - we need the competency id
+                    // Get the competency ID from higher up in the DOM
+                    var competencyIdNode = document.querySelector('[data-tw-editAchievementPaths-competency]'),
+                        competencyId = 1;
 
-            this.showHideNoRaters();
+                    if (competencyIdNode) {
+                        competencyId = competencyIdNode.getAttribute('data-tw-editAchievementPaths-competency');
+                    }
 
-            // Init the picker
-            this.initRolesPicker().then(function() {
-                that.triggerEvent('update', {pathway: that.pathway});
-            }).catch(function(e) {
-                notification.exception({
-                    fileName: that.filename,
-                    message: e[0] + ' modal: ' + e[1],
-                    name: 'Error initialising manual data'
+                    that.pathway.competency_id = competencyId;
+                    that.widget.setAttribute('data-tw-editAchievementPaths-save-endPoint', that.endpoints.create);
+
+                } else {
+                    that.pathway.id = pwId;
+                    that.widget.setAttribute('data-tw-editAchievementPaths-save-endPoint', that.endpoints.update);
+
+                    that.getRoles();
+                }
+
+                that.showHideNoRaters();
+
+                // Init the picker
+                that.initRolesPicker().then(function() {
+                    that.triggerEvent('update', {pathway: that.pathway});
+                    resolve();
+                }).catch(function(e) {
+                    notification.exception({
+                        fileName: that.filename,
+                        message: e[0] + ' modal: ' + e[1],
+                        name: 'Error initialising manual data'
+                    });
+                    reject();
                 });
             });
         },
@@ -353,8 +359,14 @@ function(templates, notification, ajax, ModalList) {
             var wgt = new PwManual();
             wgt.setParent(parent);
             wgt.events();
-            wgt.initData();
             resolve(wgt);
+
+            M.util.js_pending('pathwayManual');
+            wgt.initData().then(function() {
+                M.util.js_complete('pathwayManual');
+            }).catch(function() {
+                // Failed
+            });
         });
     };
 

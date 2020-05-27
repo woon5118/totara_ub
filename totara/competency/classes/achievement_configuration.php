@@ -366,7 +366,7 @@ class achievement_configuration {
             return [
                 'id' => $scale_value->id,
                 'name' => format_string($scale_value->name, true, ['context' => context_system::instance()]),
-                'proficient' => $scale_value->proficient,
+                'proficient' => (int)$scale_value->proficient,
                 'sortorder' => $scale_value->sortorder,
                 'pathways' => array_values($sv_pathways),
                 'num_pathways' => count($sv_pathways),

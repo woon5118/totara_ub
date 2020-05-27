@@ -45,11 +45,11 @@
 }}
 {{! data-tw-criterionothercompetency-competencies }}
 <li data-tw-{{type}}-item-value="{{value}}">
-    {{text}}
+    <span>{{text}}</span>
     {{#error}}
       <span class="tw-editAchievementPaths__criterionForm-warning">
         {{#flex_icon}}notification-warning{{/flex_icon}}
-        {{error}}
+        <span>{{error}}</span>
       </span>
     {{/error}}
 

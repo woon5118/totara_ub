@@ -350,7 +350,7 @@ class external extends \external_api {
             ->map(function (competency_framework $framework) {
                 return [
                     'id' => $framework->id,
-                    'fullname' => format_string($framework->fullname),
+                    'fullname' => format_string($framework->fullname, true, ['context' => context_system::instance()]),
                 ];
             })
             ->to_array();

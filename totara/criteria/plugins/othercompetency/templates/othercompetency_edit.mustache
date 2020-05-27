@@ -67,7 +67,7 @@ data-tw-loader-target="">
             <div>
                 <div class="tw-editAchievementPaths__criterionForm-warning tw-editAchievementPaths--hidden" data-tw-criterionOtherCompetency-error="notenoughothercompetency">
                     {{#flex_icon}}notification-warning, error, criteria_othercompetency{{/flex_icon}}
-                    {{#str}}error_not_enough_other_competency, criteria_othercompetency{{/str}}
+                    <span>{{#str}}error_not_enough_other_competency, criteria_othercompetency{{/str}}</span>
                 </div>
 
                 <button type="button" class="tw-editAchievementPaths__transparentBtn" data-tw-criterionOtherCompetency-addCompetencies="">
@@ -80,7 +80,7 @@ data-tw-loader-target="">
     <form class="tw-editAchievementPaths__criterionForm"
     data-tw-criterionOtherCompetency-aggregation="{{#aggregation}}{{method}}{{/aggregation}}{{^aggregation}}1{{/aggregation}}"
     data-tw-criterionOtherCompetency-aggregation-reqitems="{{#aggregation}}{{reqitems}}{{/aggregation}}{{^aggregation}}1{{/aggregation}}">
-        
+
         <h5 class="tw-editAchievementPaths__criterionForm-title" id="tw_criterionOtherCompetency-radioGroup-label-{{key}}">
             {{#str}}aggregation, totara_criteria{{/str}}
         </h5>
@@ -92,7 +92,7 @@ data-tw-loader-target="">
                 name="tw_criterionOtherCompetency_agg__{{key}}"
                 value="1"
                 data-tw-criterionOtherCompetency-aggregationMethod-changed="all"/>
-                
+
                 <label for="tw_criterionOtherCompetency_agg_all__{{key}}">
                     {{#str}}complete_all, totara_criteria{{/str}}
                 </label>
@@ -113,7 +113,7 @@ data-tw-loader-target="">
                 </label>
                 <span class="tf_loading" style="display: none;">
                     {{#pix}} i/loading, core, loading, totara_core{{/pix}}
-                </span>      
+                </span>
 
                 <div data-tw-criterionOtherCompetency-aggregationCount="">
                     <input type="number"

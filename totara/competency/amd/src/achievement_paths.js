@@ -351,19 +351,24 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
 
         /**
          * Retrieve the pathways, store the data in the
+         *
+         * @return {Promise}
          */
         initData: function() {
             var that = this;
 
+            return new Promise(function(resolve, reject) {
+                that.competencyId = that.widget.getAttribute('data-tw-editAchievementPaths-competency');
 
-            this.competencyId = this.widget.getAttribute('data-tw-editAchievementPaths-competency');
-
-            this.getCriteriaTypes().then(function() {
-                that.setOverallAggregation();
-            }).catch(function(e) {
-                e.fileName = that.filename;
-                e.name = 'Error retrieving criteria types';
-                notification.exception(e);
+                that.getCriteriaTypes().then(function() {
+                    that.setOverallAggregation();
+                    resolve();
+                }).catch(function(e) {
+                    e.fileName = that.filename;
+                    e.name = 'Error retrieving criteria types';
+                    notification.exception(e);
+                    reject();
+                });
             });
         },
 
@@ -615,6 +620,8 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                 return;
             }
 
+            M.util.js_pending('competencyAchievementPathsApplyChanges');
+
             // Resetting dirty early to avoid doubble submissions
             this.dirty = false;
             this.disableApplyChanges();
@@ -683,10 +690,12 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                     // TODO: For now simply reloading all pathways. Try to find a way to update ids for keys
                     that.updatePage().then(function() {
                         that.showNotification('success', 'apply_success', 'totara_competency', {});
+                        M.util.js_complete('competencyAchievementPathsApplyChanges');
                     }).catch(function(e) {
                         e.fileName = that.filename;
                         e.name = 'Error updating the page';
                         notification.exception(e);
+                        M.util.js_complete('competencyAchievementPathsApplyChanges');
                     });
                 }).catch(function(e) {
                     // If an error occurred while applying - reset dirty flag to allow retry
@@ -696,6 +705,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                     e.fileName = that.filename;
                     e.name = 'Error applying changes';
                     notification.exception(e);
+                    M.util.js_complete('competencyAchievementPathsApplyChanges');
                 });
             }
         },
@@ -796,6 +806,8 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
         removePathway: function(pwKey) {
             var pwTarget = this.widget.querySelector('[data-tw-editAchievementPaths-pathway-key="' + pwKey + '"]');
 
+            notification.clearNotifications();
+
             if (this.pathways[pwKey]) {
                 this.dirty = true;
                 this.enableApplyChanges();
@@ -886,13 +898,13 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                 return;
             }
 
+            notification.clearNotifications();
+
             // Handle the case where an existing single-use pathway has been removed, another one added
             // and then the user tries to undo removal of the original pathway
             if (this.markedForDeletionPathways[pwKey].singleuse) {
                 var singleUsePathways = this.widget.querySelectorAll('[data-tw-editAchievementPaths-singleUse-pathway="1"]');
                 if (singleUsePathways.length > 1) {
-                    notification.clearNotifications();
-
                     str.get_string('error_cant_undo_single_use', 'totara_competency').done(function(message) {
                         notification.addNotification({
                             message: message,
@@ -1007,19 +1019,22 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
             var criteriaDropDownNodes = this.widget.querySelectorAll('[data-tw-editScaleValuePaths-dropDown="scalevalue"]'),
                 scaleValueNode,
                 scaleValueId,
-                singleUseOptions;
+                singleUseOptions,
+                nPathways;
 
             // Update all criteria type drop downs on the top level only
             for (var a = 0; a < criteriaDropDownNodes.length; a++) {
                 scaleValueNode = criteriaDropDownNodes[a].closest('[data-tw-editScaleValuePaths-scale-id]');
                 scaleValueId = null;
+                nPathways = 0;
                 singleUseOptions = criteriaDropDownNodes[a].querySelectorAll('[data-tw-editScaleValuePaths-dropDown-item-singleUse="1"]');
 
                 if (scaleValueNode) {
                     scaleValueId = scaleValueNode.getAttribute('data-tw-editScaleValuePaths-scale-id');
+                    nPathways = parseInt(scaleValueNode.getAttribute('data-tw-editscalevaluepaths-pathway-list') || '0');
                 }
 
-                if (!scaleValueId || !singleUseOptions.length) {
+                if (!scaleValueId || !singleUseOptions.length || nPathways > 0) {
                     continue;
                 }
 
@@ -1256,8 +1271,14 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
             wgt.setParent(parent);
             wgt.events();
             wgt.bubbledEventsListener();
-            wgt.initData();
             resolve(wgt);
+
+            M.util.js_pending('competencyAchievementPaths');
+            wgt.initData().then(function() {
+                M.util.js_complete('competencyAchievementPaths');
+            }).catch(function() {
+                // Failed
+            });
         });
     };
 
