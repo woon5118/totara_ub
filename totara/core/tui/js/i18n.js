@@ -23,6 +23,7 @@
 /* global M */
 
 import amd from './amd';
+import pending from './pending';
 
 /**
  * Normalize component name for i18n API.
@@ -81,8 +82,10 @@ export function unloadedStrings(requests) {
  * @param {array} requests Array of format [{ component: 'foo', key: 'bar' }]
  */
 export async function loadStrings(requests) {
+  const done = pending('i18n-load-strings');
   const str = await amd('core/str');
   await str.get_strings(requests);
+  done();
 }
 
 let isRtlValue = null;

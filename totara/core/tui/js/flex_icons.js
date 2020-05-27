@@ -22,6 +22,7 @@
 
 import amd from './amd';
 import { memoizeLoad } from './util';
+import pending from './pending';
 
 let hasLoaded = false;
 let flexIcon;
@@ -32,9 +33,11 @@ let flexIcon;
  * @returns {Promise}
  */
 export const load = memoizeLoad(async () => {
+  const done = pending('flex-icon-load');
   flexIcon = await amd('core/flex_icon');
   await flexIcon.load();
   hasLoaded = true;
+  done();
 });
 
 /**
