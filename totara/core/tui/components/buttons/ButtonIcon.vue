@@ -23,6 +23,7 @@
 <template>
   <button
     class="tui-iconBtn"
+    :aria-describedby="ariaDescribedby"
     :aria-expanded="ariaExpanded"
     :aria-label="ariaLabel"
     :autofocus="autofocus"
@@ -76,6 +77,7 @@ export default {
   },
 
   props: {
+    ariaDescribedby: String,
     ariaExpanded: {
       type: [Boolean, String],
       default: false,

@@ -25,6 +25,7 @@
     class="tui-formBtn"
     :aria-expanded="ariaExpanded"
     :aria-disabled="ariaDisabled"
+    :aria-describedby="ariaDescribedby"
     :autofocus="autofocus"
     :class="{
       'tui-formBtn--alert': styleclass.alert,
@@ -63,6 +64,7 @@ export default {
 
   props: {
     ariaDisabled: [Boolean, String],
+    ariaDescribedby: String,
     ariaExpanded: {
       type: [Boolean, String],
       default: false,
