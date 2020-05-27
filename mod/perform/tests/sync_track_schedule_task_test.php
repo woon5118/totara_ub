@@ -65,7 +65,8 @@ class mod_perform_sync_track_schedule_task_testcase extends advanced_testcase {
         $track = $activity->get_tracks()->first();
         $tomorrow = time() + 86400;
         $yesterday = time() - 86400;
-        $track->update_schedule_closed_fixed($yesterday, $tomorrow);
+        $track->set_schedule_closed_fixed($yesterday, $tomorrow);
+        $track->update();
 
         // Expand creates the track_user_assignments with schedule restriction.
         (new expand_task())->expand_all();
@@ -75,7 +76,8 @@ class mod_perform_sync_track_schedule_task_testcase extends advanced_testcase {
         $this->assertEquals($tomorrow, $user_assignment->period_end_date);
 
         $now = time();
-        $track->update_schedule_open_fixed($now);
+        $track->set_schedule_open_fixed($now);
+        $track->update();
 
         (new track_schedule_sync())->sync_all();
         $user_assignment->refresh();
@@ -94,7 +96,8 @@ class mod_perform_sync_track_schedule_task_testcase extends advanced_testcase {
         $track = $activity->get_tracks()->first();
         $tomorrow = time() + 86400;
         $yesterday = time() - 86400;
-        $track->update_schedule_closed_fixed($yesterday, $tomorrow);
+        $track->set_schedule_closed_fixed($yesterday, $tomorrow);
+        $track->update();
 
         // Expand creates the track_user_assignments with schedule restriction.
         (new expand_task())->expand_all();
@@ -104,7 +107,8 @@ class mod_perform_sync_track_schedule_task_testcase extends advanced_testcase {
         $this->assertEquals($tomorrow, $user_assignment->period_end_date);
 
         $now = time();
-        $track->update_schedule_open_fixed($now);
+        $track->set_schedule_open_fixed($now);
+        $track->update();
 
         // Change activity status to draft
         activity::repository()->update_record([
@@ -131,7 +135,8 @@ class mod_perform_sync_track_schedule_task_testcase extends advanced_testcase {
         $track = $activity->get_tracks()->first();
         $tomorrow = time() + 86400;
         $yesterday = time() - 86400;
-        $track->update_schedule_closed_fixed($yesterday, $tomorrow);
+        $track->set_schedule_closed_fixed($yesterday, $tomorrow);
+        $track->update();
 
         // Expand creates the track_user_assignments with schedule restriction.
         (new expand_task())->expand_all();
@@ -141,7 +146,8 @@ class mod_perform_sync_track_schedule_task_testcase extends advanced_testcase {
         $this->assertEquals($tomorrow, $user_assignment->period_end_date);
 
         $now = time();
-        $track->update_schedule_open_fixed($now);
+        $track->set_schedule_open_fixed($now);
+        $track->update();
 
         // Pause track
         $track->pause();
@@ -171,7 +177,8 @@ class mod_perform_sync_track_schedule_task_testcase extends advanced_testcase {
         $track = $activity->get_tracks()->first();
         $tomorrow = time() + 86400;
         $yesterday = time() - 86400;
-        $track->update_schedule_open_fixed($tomorrow);
+        $track->set_schedule_open_fixed($tomorrow);
+        $track->update();
         $this->assertEquals(1, track::repository()->find($track->id)->schedule_needs_sync);
 
         // Sync flag is set, but calling sync doesn't do anything without any track_user_assignments.
@@ -189,7 +196,8 @@ class mod_perform_sync_track_schedule_task_testcase extends advanced_testcase {
         (new subject_instance_creation())->generate_instances();
         $this->assertCount(0, subject_instance::repository()->get());
 
-        $track->update_schedule_open_fixed($yesterday);
+        $track->set_schedule_open_fixed($yesterday);
+        $track->update();
 
         (new track_schedule_sync())->sync_all();
         (new subject_instance_creation())->generate_instances();

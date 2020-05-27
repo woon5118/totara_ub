@@ -167,7 +167,7 @@ class mod_perform_track_model_testcase extends advanced_testcase {
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage($expected_exception_message);
 
-        $track->update_schedule_closed_dynamic(
+        $track->set_schedule_closed_dynamic(
             $count_from,
             $unit,
             track_entity::SCHEDULE_DYNAMIC_UNIT_DAY,
@@ -208,17 +208,17 @@ class mod_perform_track_model_testcase extends advanced_testcase {
         ];
     }
 
-    public function update_schedule_methods_data_provider() {
+    public function set_schedule_methods_data_provider() {
         return [
-            ['update_schedule_open_fixed', [111]],
-            ['update_schedule_closed_fixed', [111, 222]],
-            ['update_schedule_closed_dynamic', [111, 222, 1, 0]],
-            ['update_schedule_open_dynamic', [111, 1, 1]],
+            ['set_schedule_open_fixed', [111]],
+            ['set_schedule_closed_fixed', [111, 222]],
+            ['set_schedule_closed_dynamic', [111, 222, 1, 0]],
+            ['set_schedule_open_dynamic', [111, 1, 1]],
         ];
     }
 
     /**
-     * @dataProvider update_schedule_methods_data_provider
+     * @dataProvider set_schedule_methods_data_provider
      * @param string $method_name
      * @param array $params
      */
@@ -242,6 +242,7 @@ class mod_perform_track_model_testcase extends advanced_testcase {
 
         // Update method should not set flag because it's a draft.
         $track->$method_name(...$params);
+        $track->update();
         $track_entity->refresh();
         $this->assertEquals(0, $track_entity->schedule_needs_sync);
 
@@ -258,7 +259,60 @@ class mod_perform_track_model_testcase extends advanced_testcase {
         /** @var track_entity $track_entity */
         $track_entity = track_entity::repository()->find($track->get_id());
         $track->$method_name(...$params);
+        $track->update();
         $track_entity->refresh();
         $this->assertEquals(1, $track_entity->schedule_needs_sync);
     }
+
+    public function test_update_performs_validation(): void {
+        $this->setAdminUser();
+
+        /** @var mod_perform_generator $perform_generator */
+        $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        $activity = $perform_generator->create_activity_in_container();
+        $track = track::create($activity);
+
+        $track->set_schedule_open_fixed(111);
+        $track->set_due_date_fixed(222);
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('Cannot set due date to fixed except when schedule is not open and fixed');
+
+        $track->update();
+    }
+
+    public function test_validate_fails_due_to_invalid_due_date_type(): void {
+        $this->setAdminUser();
+
+        /** @var mod_perform_generator $perform_generator */
+        $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        $activity = $perform_generator->create_activity_in_container();
+        $track = track::create($activity);
+
+        $track->set_schedule_open_fixed(111);
+        $track->set_due_date_fixed(222);
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('Cannot set due date to fixed except when schedule is not open and fixed');
+
+        $track->validate();
+    }
+
+    public function test_validate_fails_due_to_invalid_fixed_due_date(): void {
+        $this->setAdminUser();
+
+        /** @var mod_perform_generator $perform_generator */
+        $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        $activity = $perform_generator->create_activity_in_container();
+        $track = track::create($activity);
+
+        $track->set_schedule_closed_fixed(222, 444);
+        $track->set_due_date_fixed(333);
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('Cannot set fixed due date earlier than the schedule end date');
+
+        $track->validate();
+    }
+
 }

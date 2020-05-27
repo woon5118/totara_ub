@@ -85,6 +85,10 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_fixed_te
         $affected_track->schedule_dynamic_direction = null;
         $affected_track->schedule_needs_sync = 1;
         $affected_track->due_date_is_enabled = 0;
+        $affected_track->due_date_is_fixed = null;
+        $affected_track->due_date_fixed = null;
+        $affected_track->due_date_relative_count = null;
+        $affected_track->due_date_relative_unit = null;
         $affected_track->repeating_is_enabled = 0;
 
         $after_tracks = $DB->get_records('perform_track', [], 'id');

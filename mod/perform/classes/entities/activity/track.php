@@ -44,8 +44,12 @@ use core\orm\entity\relations\has_many_through;
  * @property int $schedule_dynamic_count_to number of units
  * @property int $schedule_dynamic_unit one of SCHEDULE_DYNAMIC_UNIT_XXX or null
  * @property int $schedule_dynamic_direction one of SCHEDULE_DYNAMIC_DIRECTION_XXX or null
- * @property bool $due_date_is_enabled
  * @property bool $schedule_needs_sync Flag indicating that the schedule sync task should run for this track
+ * @property bool $due_date_is_enabled
+ * @property bool $due_date_is_fixed
+ * @property int $due_date_fixed
+ * @property int $due_date_relative_count
+ * @property int $due_date_relative_unit
  * @property bool $repeating_is_enabled
  * @property int $created_at record creation time
  * @property int $updated_at record modification time
@@ -129,6 +133,20 @@ class track extends entity {
      */
     protected function get_due_date_is_enabled_attribute(): bool {
         return (bool) $this->get_attributes_raw()['due_date_is_enabled'];
+    }
+
+    /**
+     * Cast due_date_is_fixed to bool type.
+     *
+     * @return bool|null
+     */
+    protected function get_due_date_is_fixed_attribute(): ?bool {
+        $value = $this->get_attributes_raw()['due_date_is_fixed'];
+        if (is_null($value)) {
+            return null;
+        } else {
+            return (bool) $this->get_attributes_raw()['due_date_is_fixed'];
+        }
     }
 
     /**

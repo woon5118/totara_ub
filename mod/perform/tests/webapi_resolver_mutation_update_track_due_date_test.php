@@ -79,6 +79,10 @@ class mod_perform_webapi_resolver_mutation_update_track_due_date_testcase
         // Verify the resulting graphql data.
         self::assertEquals($track1->id, $result_track->id);
         self::assertFalse($result_track->due_date_is_enabled);
+        self::assertNull($result_track->due_date_is_fixed);
+        self::assertNull($result_track->due_date_fixed);
+        self::assertNull($result_track->due_date_relative_count);
+        self::assertNull($result_track->due_date_relative_unit);
 
         // Manually make the changes that we expect to make.
         $affected_track = $before_tracks[$track1->id];
@@ -92,7 +96,12 @@ class mod_perform_webapi_resolver_mutation_update_track_due_date_testcase
         $affected_track->schedule_dynamic_direction = null;
         $affected_track->schedule_needs_sync = 1;
         $affected_track->due_date_is_enabled = 0;
+        $affected_track->due_date_is_fixed = null;
+        $affected_track->due_date_fixed = null;
+        $affected_track->due_date_relative_count = null;
+        $affected_track->due_date_relative_unit = null;
         $affected_track->repeating_is_enabled = 0;
+
         $after_tracks = $DB->get_records('perform_track', [], 'id');
         unset($after_tracks[$track1->id]->updated_at);
 
@@ -123,10 +132,13 @@ class mod_perform_webapi_resolver_mutation_update_track_due_date_testcase
         $args = [
             'track_schedule' => [
                 'track_id' => $track1->id,
-                'schedule_is_open' => true,
+                'schedule_is_open' => false,
                 'schedule_is_fixed' => true,
                 'schedule_fixed_from' => 222,
+                'schedule_fixed_to' => 333,
                 'due_date_is_enabled' => true,
+                'due_date_is_fixed' => true,
+                'due_date_fixed' => 444,
                 'repeating_is_enabled' => false,
             ],
         ];
@@ -144,21 +156,29 @@ class mod_perform_webapi_resolver_mutation_update_track_due_date_testcase
         // Verify the resulting graphql data.
         self::assertEquals($track1->id, $result_track->id);
         self::assertTrue($result_track->due_date_is_enabled);
-        // TODO Check due date field
+        self::assertTrue($result_track->due_date_is_fixed);
+        self::assertEquals(444, $result_track->due_date_fixed);
+        self::assertNull($result_track->due_date_relative_count);
+        self::assertNull($result_track->due_date_relative_unit);
 
         // Manually make the changes that we expect to make.
         $affected_track = $before_tracks[$track1->id];
-        $affected_track->schedule_is_open = 1;
+        $affected_track->schedule_is_open = 0;
         $affected_track->schedule_is_fixed = 1;
         $affected_track->schedule_fixed_from = 222;
-        $affected_track->schedule_fixed_to = null;
+        $affected_track->schedule_fixed_to = 333;
         $affected_track->schedule_dynamic_count_from = null;
         $affected_track->schedule_dynamic_count_to = null;
         $affected_track->schedule_dynamic_unit = null;
         $affected_track->schedule_dynamic_direction = null;
         $affected_track->schedule_needs_sync = 1;
         $affected_track->due_date_is_enabled = 1;
+        $affected_track->due_date_is_fixed = true;
+        $affected_track->due_date_fixed = 444;
+        $affected_track->due_date_relative_count = null;
+        $affected_track->due_date_relative_unit = null;
         $affected_track->repeating_is_enabled = 0;
+
         $after_tracks = $DB->get_records('perform_track', [], 'id');
         unset($after_tracks[$track1->id]->updated_at);
 

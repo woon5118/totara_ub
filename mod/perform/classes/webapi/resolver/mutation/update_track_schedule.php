@@ -60,11 +60,11 @@ class update_track_schedule implements mutation_resolver, has_middleware {
         // Fixed and dynamic schedules.
         if ($track_schedule['schedule_is_fixed']) {
             if ($track_schedule['schedule_is_open']) {
-                $track->update_schedule_open_fixed(
+                $track->set_schedule_open_fixed(
                     $track_schedule['schedule_fixed_from']
                 );
             } else { // Closed.
-                $track->update_schedule_closed_fixed(
+                $track->set_schedule_closed_fixed(
                     $track_schedule['schedule_fixed_from'],
                     $track_schedule['schedule_fixed_to']
                 );
@@ -73,13 +73,13 @@ class update_track_schedule implements mutation_resolver, has_middleware {
             $dynamic_units = array_flip(track::get_dynamic_schedule_units());
             $dynamic_directions = array_flip(track::get_dynamic_schedule_directions());
             if ($track_schedule['schedule_is_open']) {
-                $track->update_schedule_open_dynamic(
+                $track->set_schedule_open_dynamic(
                     $track_schedule['schedule_dynamic_count_from'],
                     $dynamic_units[$track_schedule['schedule_dynamic_unit']],
                     $dynamic_directions[$track_schedule['schedule_dynamic_direction']]
                 );
             } else { // Closed.
-                $track->update_schedule_closed_dynamic(
+                $track->set_schedule_closed_dynamic(
                     $track_schedule['schedule_dynamic_count_from'],
                     $track_schedule['schedule_dynamic_count_to'],
                     $dynamic_units[$track_schedule['schedule_dynamic_unit']],
@@ -88,28 +88,31 @@ class update_track_schedule implements mutation_resolver, has_middleware {
             }
         }
 
-        // Due date (has a small dependency on is_open and is_fixed).
+        // Due date (has a dependency on schedule_is_open and schedule_is_fixed).
         if ($track_schedule['due_date_is_enabled']) {
-            if (false && $track_schedule['schedule_is_open'] && $track_schedule['schedule_is_fixed']) { // TODO in next patch.
-                if (false && $track_schedule['due_date_is_fixed']) { // TODO in next patch.
-                    $track->update_due_date_fixed(
-                        // TODO $track_schedule['due_date_fixed']
+            $dynamic_units = array_flip(track::get_dynamic_schedule_units());
+            if (!$track_schedule['schedule_is_open'] && $track_schedule['schedule_is_fixed']) {
+                if ($track_schedule['due_date_is_fixed']) {
+                    $track->set_due_date_fixed(
+                        $track_schedule['due_date_fixed']
                     );
                 } else { // Relative.
-                    $track->update_due_date_relative(
-                        // TODO $track_schedule['due_date_relative_count']
-                        // TODO $track_schedule['due_date_relative_unit']
+                    $track->set_due_date_relative(
+                        $track_schedule['due_date_relative_count'],
+                        $dynamic_units[$track_schedule['due_date_relative_unit']]
                     );
                 }
             } else {
-                $track->update_due_date_relative(
-                    // TODO $track_schedule['due_date_relative_count']
-                    // TODO $track_schedule['due_date_relative_unit']
+                $track->set_due_date_relative(
+                    $track_schedule['due_date_relative_count'],
+                    $dynamic_units[$track_schedule['due_date_relative_unit']]
                 );
             }
         } else { // Disabled.
-            $track->update_due_date_disabled();
+            $track->set_due_date_disabled();
         }
+
+        $track->update();
 
         // Repeating.
         if ($track_schedule['repeating_is_enabled']) {
@@ -138,6 +141,7 @@ class update_track_schedule implements mutation_resolver, has_middleware {
     private static function validate_inputs(array $schedule): array {
         $errors = [];
 
+        // Only includes the optional fields, not required ones such as schedule_is_open.
         $all_fields = [
             'schedule_fixed_from',
             'schedule_fixed_to',
@@ -145,40 +149,50 @@ class update_track_schedule implements mutation_resolver, has_middleware {
             'schedule_dynamic_count_to',
             'schedule_dynamic_unit',
             'schedule_dynamic_direction',
-            // TODO due date fields in next patch
+            'due_date_is_fixed',
+            'due_date_fixed',
+            'due_date_relative_count',
+            'due_date_relative_unit',
         ];
+
+        $required_fields = [];
 
         // Fixed and dynamic schedules.
         if ($schedule['schedule_is_fixed']) {
             if ($schedule['schedule_is_open']) {
-                $required_fields = [
-                    'schedule_fixed_from',
-                ];
+                $required_fields[] = 'schedule_fixed_from';
             } else { // Closed.
-                $required_fields = [
-                    'schedule_fixed_from',
-                    'schedule_fixed_to',
-                ];
+                $required_fields[] = 'schedule_fixed_from';
+                $required_fields[] = 'schedule_fixed_to';
             }
         } else { // Dynamic.
             if ($schedule['schedule_is_open']) {
-                $required_fields = [
-                    'schedule_dynamic_count_from',
-                    'schedule_dynamic_unit',
-                    'schedule_dynamic_direction',
-                ];
+                $required_fields[] = 'schedule_dynamic_count_from';
+                $required_fields[] = 'schedule_dynamic_unit';
+                $required_fields[] = 'schedule_dynamic_direction';
             } else { // Closed.
-                $required_fields = [
-                    'schedule_dynamic_count_from',
-                    'schedule_dynamic_count_to',
-                    'schedule_dynamic_unit',
-                    'schedule_dynamic_direction',
-                ];
+                $required_fields[] = 'schedule_dynamic_count_from';
+                $required_fields[] = 'schedule_dynamic_count_to';
+                $required_fields[] = 'schedule_dynamic_unit';
+                $required_fields[] = 'schedule_dynamic_direction';
             }
         }
 
-        // Due date (has a small dependency on is_open and is_fixed).
-        // TODO due date fields in next patch
+        // Due date (has a dependency on schedule_is_open and schedule_is_fixed).
+        if ($schedule['due_date_is_enabled']) {
+            if (!$schedule['schedule_is_open'] && $schedule['schedule_is_fixed']) {
+                $required_fields[] = 'due_date_is_fixed';
+                if (!empty($schedule['due_date_is_fixed'])) {
+                    $required_fields[] = 'due_date_fixed';
+                } else { // Relative.
+                    $required_fields[] = 'due_date_relative_count';
+                    $required_fields[] = 'due_date_relative_unit';
+                }
+            } else {
+                $required_fields[] = 'due_date_relative_count';
+                $required_fields[] = 'due_date_relative_unit';
+            }
+        }
 
         foreach ($required_fields as $required_field) {
             if (!isset($schedule[$required_field])) {
@@ -204,6 +218,13 @@ class update_track_schedule implements mutation_resolver, has_middleware {
             $dynamic_directions = array_flip(track::get_dynamic_schedule_directions());
             if (!isset($dynamic_directions[$schedule['schedule_dynamic_direction']])) {
                 $errors[] = 'Invalid dynamic direction specified: ' . $schedule['schedule_dynamic_direction'];
+            }
+        }
+
+        if (isset($schedule['due_date_relative_unit'])) {
+            $relative_units = array_flip(track::get_dynamic_schedule_units());
+            if (!isset($relative_units[$schedule['due_date_relative_unit']])) {
+                $errors[] = 'Invalid due date relative unit specified: ' . $schedule['due_date_relative_unit'];
             }
         }
 

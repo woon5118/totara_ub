@@ -1185,5 +1185,44 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020052700, 'perform');
     }
 
+    if ($oldversion < 2020052800) {
+        $table = new xmldb_table('perform_track');
+
+        // Define field due_date_is_fixed to be added to perform_track.
+        $field = new xmldb_field('due_date_is_fixed', XMLDB_TYPE_INTEGER, '1', null, null, null, null, 'due_date_is_enabled');
+
+        // Conditionally launch add field due_date_is_fixed.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field due_date_fixed to be added to perform_track.
+        $field = new xmldb_field('due_date_fixed', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'due_date_is_fixed');
+
+        // Conditionally launch add field due_date_fixed.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field due_date_relative_count to be added to perform_track.
+        $field = new xmldb_field('due_date_relative_count', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'due_date_fixed');
+
+        // Conditionally launch add field due_date_relative_count.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field due_date_relative_unit to be added to perform_track.
+        $field = new xmldb_field('due_date_relative_unit', XMLDB_TYPE_INTEGER, '2', null, null, null, null, 'due_date_relative_count');
+
+        // Conditionally launch add field due_date_relative_unit.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020052800, 'perform');
+    }
+
     return true;
 }

@@ -52,6 +52,10 @@ use moodle_exception;
  * @property-read string $schedule_dynamic_unit
  * @property-read string $schedule_dynamic_direction
  * @property-read bool $due_date_is_enabled
+ * @property-read bool $due_date_is_fixed
+ * @property-read int $due_date_fixed
+ * @property-read int $due_date_relative_count
+ * @property-read int $due_date_relative_unit
  * @property-read bool $repeating_is_enabled
  * @property-read int $created_at
  * @property-read int $updated_at
@@ -73,6 +77,9 @@ class track extends model {
         'schedule_dynamic_count_from',
         'schedule_dynamic_count_to',
         'due_date_is_enabled',
+        'due_date_is_fixed',
+        'due_date_fixed',
+        'due_date_relative_count',
         'repeating_is_enabled',
         'created_at',
         'updated_at',
@@ -83,6 +90,7 @@ class track extends model {
         'assignments',
         'schedule_dynamic_direction',
         'schedule_dynamic_unit',
+        'due_date_relative_unit',
     ];
 
     /**
@@ -123,6 +131,10 @@ class track extends model {
         $entity->schedule_dynamic_unit = null;
         $entity->schedule_dynamic_direction = null;
         $entity->due_date_is_enabled = false;
+        $entity->due_date_is_fixed = null;
+        $entity->due_date_fixed = null;
+        $entity->due_date_relative_count = null;
+        $entity->due_date_relative_unit = null;
         $entity->repeating_is_enabled = false;
         $entity->save();
 
@@ -144,7 +156,7 @@ class track extends model {
         return track_entity::repository()
             ->where('activity_id', $parent->get_id())
             ->get()
-            ->map_to(track::class);
+            ->map_to(static::class);
     }
 
     /**
@@ -292,10 +304,12 @@ class track extends model {
     /**
      * Set the schedule to be closed with fixed dates
      *
+     * After calling, use track::update to save the changes to the DB
+     *
      * @param int $from
      * @param int $to
      */
-    public function update_schedule_closed_fixed(int $from, int $to): void {
+    public function set_schedule_closed_fixed(int $from, int $to): void {
         if ($to < $from) {
             throw new moodle_exception('fixed_date_selector_error_range', 'mod_perform');
         }
@@ -307,33 +321,37 @@ class track extends model {
             'schedule_fixed_to' => $to,
         ];
 
-        $this->update_schedule_properties($properties_to_update);
+        $this->set_schedule_properties($properties_to_update);
     }
 
     /**
      * Set the schedule to be open ended with fixed dates
      *
+     * After calling, use track::update to save the changes to the DB
+     *
      * @param int $from
      */
-    public function update_schedule_open_fixed(int $from): void {
+    public function set_schedule_open_fixed(int $from): void {
         $properties_to_update = [
             'schedule_is_open' => true,
             'schedule_is_fixed' => true,
             'schedule_fixed_from' => $from,
         ];
 
-        $this->update_schedule_properties($properties_to_update);
+        $this->set_schedule_properties($properties_to_update);
     }
 
     /**
      * Set the schedule to be closed with dynamic dates
+     *
+     * After calling, use track::update to save the changes to the DB
      *
      * @param int $count_from
      * @param int $count_to
      * @param int $unit
      * @param int $direction
      */
-    public function update_schedule_closed_dynamic(int $count_from, int $count_to, int $unit, int $direction): void {
+    public function set_schedule_closed_dynamic(int $count_from, int $count_to, int $unit, int $direction): void {
         if ($count_from < 0) {
             throw new coding_exception('Count from must be a positive integer');
         }
@@ -363,17 +381,19 @@ class track extends model {
             'schedule_dynamic_direction' => $direction,
         ];
 
-        $this->update_schedule_properties($properties_to_update);
+        $this->set_schedule_properties($properties_to_update);
     }
 
     /**
      * Set the schedule to be open ended with dynamic dates
      *
+     * After calling, use track::update to save the changes to the DB
+     *
      * @param int $count_from
      * @param int $unit
      * @param int $direction
      */
-    public function update_schedule_open_dynamic(int $count_from, int $unit, int $direction): void {
+    public function set_schedule_open_dynamic(int $count_from, int $unit, int $direction): void {
         if (!isset(self::get_dynamic_schedule_units()[$unit])) {
             throw new coding_exception('Invalid dynamic schedule unit');
         }
@@ -394,59 +414,17 @@ class track extends model {
             'schedule_dynamic_direction' => $direction,
         ];
 
-        $this->update_schedule_properties($properties_to_update);
+        $this->set_schedule_properties($properties_to_update);
     }
 
     /**
-     * Disable the due date
-     *
-     * Clears all due date related fields.
+     * Set the creation range properties.
+     * This function resets scheduling properties that are not provided.
      * After calling, use track::update to save the changes to the DB
-     */
-    public function update_due_date_disabled(): void {
-        $entity = $this->entity;
-
-        $entity->due_date_is_enabled = false;
-        // TODO set fixed and relative due date fields set to null
-
-        $this->entity->update();
-    }
-
-    /**
-     * Update the due date to fixed (and enabled)
      *
-     * TODO add fixed due date param
+     * @param array $properties containing at least schedule_is_open and schedule_is_fixed
      */
-    public function update_due_date_fixed(): void {
-        $entity = $this->entity;
-
-        if ($entity->schedule_is_open || !$entity->schedule_is_fixed) {
-            throw new coding_exception('Cannot set due date to relative except when schedule is not open and fixed');
-        }
-
-        $entity->due_date_is_enabled = true;
-        // TODO set fixed due date field
-        // TODO set relative due date fields to null
-
-        $this->entity->update();
-    }
-
-    /**
-     * Update the due date to relative (and enabled)
-     *
-     * TODO add relative due date params
-     */
-    public function update_due_date_relative(): void {
-        $entity = $this->entity;
-
-        $entity->due_date_is_enabled = true;
-        // TODO set relative due date fields
-        // TODO set fixed due date fields to null
-
-        $this->entity->update();
-    }
-
-    private function update_schedule_properties(array $properties): void {
+    private function set_schedule_properties(array $properties): void {
         $entity = $this->entity;
 
         $entity->schedule_is_open = $properties['schedule_is_open'];
@@ -465,13 +443,6 @@ class track extends model {
         $this->entity->update();
     }
 
-    public static function get_dynamic_schedule_units(): array {
-        return [
-            track_entity::SCHEDULE_DYNAMIC_UNIT_DAY => schedule_constants::DAY,
-            track_entity::SCHEDULE_DYNAMIC_UNIT_WEEK => schedule_constants::WEEK,
-            track_entity::SCHEDULE_DYNAMIC_UNIT_MONTH => schedule_constants::MONTH,
-        ];
-    }
     /**
      * Disable repeating
      *
@@ -479,30 +450,100 @@ class track extends model {
      * After calling, use track::update to save the changes to the DB
      */
     public function set_repeating_disabled(): void {
-        $entity = $this->entity;
-
-        $entity->repeating_is_enabled = false;
+        $this->set_repeating_properties(['repeating_is_enabled' => false]);
     }
 
     /**
-     * Set repeating to
+     * Set repeating to ...
      *
      * After calling, use track::update to save the changes to the DB
      *
      * TODO add params and/or split function
      */
     public function set_repeating_enabled(): void {
-        $entity = $this->entity;
+        $properties_to_update = [
+            'repeating_is_enabled' => true,
+        ];
 
-        $entity->repeating_is_enabled = true;
+        $this->set_repeating_properties($properties_to_update);
     }
 
     /**
-     * Saves changes to this model to the database
+     * Set the due date properties.
+     * This function resets repeating properties that are not provided.
+     * After calling, use track::update to save the changes to the DB
      *
-     * Validation is performed before saving occurs. If validation fails, an exception is thrown.
+     * @param array $properties containing at least repeating_is_enabled
      */
-    public function update(): void {
+    private function set_repeating_properties(array $properties): void {
+        $entity = $this->entity;
+
+        $entity->repeating_is_enabled = $properties['repeating_is_enabled'];
+
+        $this->entity->update();
+    }
+
+    /**
+     * Disable the due date
+     *
+     * Clears all due date related fields.
+     */
+    public function set_due_date_disabled(): void {
+        $this->set_due_date_properties(['due_date_is_enabled' => false]);
+    }
+
+    /**
+     * Update the due date to fixed (and enabled)
+     *
+     * After calling, use track::update to save the changes to the DB
+     *
+     * @param int $fixed
+     */
+    public function set_due_date_fixed(int $fixed): void {
+        $properties_to_update = [
+            'due_date_is_enabled' => true,
+            'due_date_is_fixed' => true,
+            'due_date_fixed' => $fixed,
+        ];
+
+        $this->set_due_date_properties($properties_to_update);
+    }
+
+    /**
+     * Set the due date to relative (and enabled)
+     *
+     * After calling, use track::update to save the changes to the DB
+     *
+     * @param int $count
+     * @param int $unit
+     */
+    public function set_due_date_relative(int $count, int $unit): void {
+        $properties_to_update = [
+            'due_date_is_enabled' => true,
+            'due_date_is_fixed' => false,
+            'due_date_relative_count' => $count,
+            'due_date_relative_unit' => $unit,
+        ];
+
+        $this->set_due_date_properties($properties_to_update);
+    }
+
+    /**
+     * Set the due date properties.
+     * This function resets due date properties that are not provided.
+     * After calling, use track::update to save the changes to the DB
+     *
+     * @param array $properties containing at least due_date_is_enabled
+     */
+    private function set_due_date_properties(array $properties): void {
+        $entity = $this->entity;
+
+        $entity->due_date_is_enabled = $properties['due_date_is_enabled'];
+        $entity->due_date_is_fixed = $properties['due_date_is_fixed'] ?? null;
+        $entity->due_date_fixed = $properties['due_date_fixed'] ?? null;
+        $entity->due_date_relative_count = $properties['due_date_relative_count'] ?? null;
+        $entity->due_date_relative_unit = $properties['due_date_relative_unit'] ?? null;
+
         $this->entity->update();
     }
 
@@ -510,6 +551,14 @@ class track extends model {
         return [
             track_entity::SCHEDULE_DYNAMIC_DIRECTION_AFTER => schedule_constants::AFTER,
             track_entity::SCHEDULE_DYNAMIC_DIRECTION_BEFORE => schedule_constants::BEFORE,
+        ];
+    }
+
+    public static function get_dynamic_schedule_units(): array {
+        return [
+            track_entity::SCHEDULE_DYNAMIC_UNIT_DAY => schedule_constants::DAY,
+            track_entity::SCHEDULE_DYNAMIC_UNIT_WEEK => schedule_constants::WEEK,
+            track_entity::SCHEDULE_DYNAMIC_UNIT_MONTH => schedule_constants::MONTH,
         ];
     }
 
@@ -536,6 +585,19 @@ class track extends model {
             $this->entity->schedule_dynamic_unit,
             track_model::get_dynamic_schedule_units(),
             'Unknown dynamic schedule unit: %s'
+        );
+    }
+
+    /**
+     * Get the string representation of the relative due date unit.
+     *
+     * @return string|null
+     */
+    protected function get_due_date_relative_unit(): ?string {
+        return $this->map_from_entity(
+            $this->entity->due_date_relative_unit,
+            track_model::get_dynamic_schedule_units(),
+            'Unknown dynamic due date unit: %s'
         );
     }
 
@@ -582,4 +644,41 @@ class track extends model {
             $user_ids
         );
     }
+
+    /**
+     * Checks that the properties of this model are valid
+     *
+     * If validation fails, an exception is thrown.
+     *
+     * Schedule, due date and repeating field validation is not required, because schedules can only be
+     * set using the methods provided in this class. We only need to check the interdependencies between
+     * these sets of properties.
+     */
+    public function validate(): void {
+        $entity = $this->entity;
+
+        if ($entity->due_date_is_fixed) {
+            // Check that due date type is valid given schedule open/fixed.
+            if ($entity->schedule_is_open || !$entity->schedule_is_fixed) {
+                throw new coding_exception('Cannot set due date to fixed except when schedule is not open and fixed');
+            }
+
+            // Check that due date is not before schedule end date.
+            if ($entity->due_date_fixed <= $entity->schedule_fixed_to) {
+                throw new coding_exception('Cannot set fixed due date earlier than the schedule end date');
+            }
+        }
+    }
+
+    /**
+     * Saves changes to this model to the database
+     *
+     * Validation is performed before saving occurs. If validation fails, an exception is thrown.
+     */
+    public function update(): void {
+        $this->validate();
+
+        $this->entity->update();
+    }
+
 }

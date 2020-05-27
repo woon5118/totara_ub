@@ -204,7 +204,8 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $user_id = $test_data->user1->id;
 
         $now = time();
-        $test_data->track1->update_schedule_open_fixed($now);
+        $test_data->track1->set_schedule_open_fixed($now);
+        $test_data->track1->update();
 
         // Add user to the cohort - we expect a user assignment with period according to track schedule settings.
         $this->add_user_to_cohort($test_data->cohort1->id, $user_id);
@@ -222,7 +223,8 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         // Change the schedule for the track
         $tomorrow = time() + 86400;
         $yesterday = time() - 86400;
-        $test_data->track1->update_schedule_closed_fixed($yesterday, $tomorrow);
+        $test_data->track1->set_schedule_closed_fixed($yesterday, $tomorrow);
+        $test_data->track1->update();
 
         // Re-add user to cohort - we expect the reactivated user assignment gets the updated period settings
         $this->add_user_to_cohort($test_data->cohort1->id, $user_id);

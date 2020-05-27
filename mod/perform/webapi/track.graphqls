@@ -9,8 +9,8 @@ A list of possible units which can be used for relative dynamic date schedules
 """
 enum mod_perform_track_dynamic_unit_enums {
   DAY
-  MONTH
   WEEK
+  MONTH
 }
 
 """
@@ -34,6 +34,10 @@ type mod_perform_track {
   schedule_dynamic_unit: mod_perform_track_dynamic_unit_enums
   schedule_dynamic_direction: mod_perform_track_dynamic_direction_enums
   due_date_is_enabled: Boolean!
+  due_date_is_fixed: Boolean
+  due_date_fixed: Int
+  due_date_relative_count: Int
+  due_date_relative_unit: mod_perform_track_dynamic_unit_enums
   repeating_is_enabled: Boolean!
   assignments: [mod_perform_track_assignment!]!
 }
@@ -75,6 +79,10 @@ input mod_perform_track_schedule_input {
   schedule_dynamic_unit: mod_perform_track_dynamic_unit_enums
   schedule_dynamic_direction: mod_perform_track_dynamic_direction_enums
   due_date_is_enabled: param_boolean!
+  due_date_is_fixed: param_boolean
+  due_date_fixed: param_integer
+  due_date_relative_count: param_integer
+  due_date_relative_unit: mod_perform_track_dynamic_unit_enums
   repeating_is_enabled: param_boolean!
 }
 

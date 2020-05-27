@@ -86,11 +86,19 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_fixed_test
         $affected_track->schedule_dynamic_direction = null;
         $affected_track->schedule_needs_sync = 1;
         $affected_track->due_date_is_enabled = 0;
+        $affected_track->due_date_is_fixed = null;
+        $affected_track->due_date_fixed = null;
+        $affected_track->due_date_relative_count = null;
+        $affected_track->due_date_relative_unit = null;
         $affected_track->repeating_is_enabled = 0;
 
         $after_tracks = $DB->get_records('perform_track', [], 'id');
         unset($after_tracks[$this->track1_id]->updated_at);
         self::assertEquals($after_tracks, $before_tracks);
+    }
+
+    public function test_with_validation_errors(): void {
+        // None currently, but we will have when additional fields are added.
     }
 
     public function test_failed_ajax_call(): void {
@@ -122,9 +130,5 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_fixed_test
         $args['track_schedule']['track_id'] = $track_id;
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
         $this->assert_webapi_operation_failed($result, "$track_id");
-    }
-
-    public function test_with_validation_errors(): void {
-        // None currently, but we will have when additional fields are added.
     }
 }
