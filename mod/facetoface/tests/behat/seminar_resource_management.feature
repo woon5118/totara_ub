@@ -31,12 +31,14 @@ Feature: Seminar resource management
       | name                | intro                             | course |
       | Test seminar name 1 | <p>Test seminar description 1</p> | C1     |
       | Test seminar name 2 | <p>Test seminar description 2</p> | C1     |
+      | Test seminar name 3 | <p>Test seminar description 3</p> | C1     |
     And the following "seminar events" exist in "mod_facetoface" plugin:
       | facetoface          | details  |
       | Test seminar name 1 | event 1a |
       | Test seminar name 1 | event 1b |
       | Test seminar name 1 | event 1c |
       | Test seminar name 2 | event 2a |
+      | Test seminar name 3 | event 3a |
     And the following "seminar sessions" exist in "mod_facetoface" plugin:
       | eventdetails | start                | finish               |
       | event 1a     | 28 Feb next year 1pm | 28 Feb next year 5pm |
@@ -74,6 +76,9 @@ Feature: Seminar resource management
       | Ad-hoc facilitator 1 | 0              | 0      | <p>ad hoc!</p>   | trainer1    |
       | Ad-hoc facilitator 2 | 1              | 0      | <p>ad hoc!</p>   | trainer1    |
       | Ad-hoc facilitator 3 | 0              | 1      | <p>ad hoc!</p>   | trainer1    |
+    And the following "seminar sessions" exist in "mod_facetoface" plugin:
+      | eventdetails | assets                                         | rooms                                               | facilitators                                                          | start            | finish               |
+      | event 3a     | Light bulb,Pizza,Ad-hoc asset 1,Ad-hoc asset 2 | Fish tank,Memorial hall,Ad-hoc room 1,Ad-hoc room 2 | Volunteer,Teacher assistant,Ad-hoc facilitator 1,Ad-hoc facilitator 2 | 28 Feb last year | 28 Feb last year 1am |
     And the following "role assigns" exist:
       | user     | role           | contextlevel | reference |
       | trainer1 | editingteacher | System       |           |
@@ -143,3 +148,18 @@ Feature: Seminar resource management
       | Ad-hoc room 1        | No                      | No       | Yes     |
       | Ad-hoc room 2        | Yes                     | No       | Yes     |
       | Ad-hoc room 3        | No                      | No       | No      |
+
+  Scenario: Ensure the resourses attached to the seminar event by the generator
+    When I log in as "admin"
+    And I am on "Course 1" course homepage
+    And I follow "Test seminar name 3"
+    And I click on the seminar event action "Edit event" in row "#1"
+    Then the "f2fmanagedates" table should contain the following:
+      | Date and time | Rooms     | Rooms         | Rooms         | Rooms         |
+      | 28 February   | Fish tank | Memorial hall | Ad-hoc room 1 | Ad-hoc room 2 |
+    And the "f2fmanagedates" table should contain the following:
+      | Date and time | Facilitators | Facilitators      | Facilitators         | Facilitators         |
+      | 28 February   | Volunteer    | Teacher assistant | Ad-hoc facilitator 1 | Ad-hoc facilitator 2 |
+    And the "f2fmanagedates" table should contain the following:
+      | Date and time | Assets     | Assets | Assets         | Assets         |
+      | 28 February   | Light bulb | Pizza  | Ad-hoc asset 1 | Ad-hoc asset 2 |

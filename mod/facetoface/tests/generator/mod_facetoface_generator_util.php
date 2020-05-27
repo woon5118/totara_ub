@@ -155,7 +155,7 @@ final class mod_facetoface_generator_util {
 
             foreach ($facilitators as $facilitator) {
                 $o = new \stdClass();
-                $o->sessiondateid = $rc->id;
+                $o->sessionsdateid = $rc->id;
 
                 // Expecting facilitator to be existing in the storage, with the given name from the step.
                 $o->facilitatorid = $DB->get_field('facetoface_facilitator', 'id', ['name' => $facilitator], MUST_EXIST);
