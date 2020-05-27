@@ -232,15 +232,15 @@ select.menuf2f-select {
   &:hover,
   &:active:focus,
   &:active:hover {
-      background: transparent none;
-      border: none;
-      border-radius: 0;
-      box-shadow: none;
-      cursor: pointer;
-      font: inherit;
-      margin: 0;
-      outline: none;
-      padding: 0;
+    background: transparent none;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    cursor: pointer;
+    font: inherit;
+    margin: 0;
+    outline: none;
+    padding: 0;
   }
 }
 
@@ -292,9 +292,9 @@ select.menuf2f-select {
     // Un-commenting the following CSS rule brings back the old style.
     // Simulate highlight in T12
     // &.userbooked {
-    //     &:not(.over):not(.cancelled) {
-    //         @extend .highlight;
-    //     }
+    //   &:not(.over):not(.cancelled) {
+    //     @extend .highlight;
+    //   }
     // }
   }
 
@@ -302,8 +302,8 @@ select.menuf2f-select {
     @include no-list-style;
   }
 
-    // +++ Filters +++ //
-    // Note: do NOT use the 'ch' unit unless we can drop IE11
+  // +++ Filters +++ //
+  // Note: do NOT use the 'ch' unit unless we can drop IE11
   &__filter {
     @include flex-wrap-vertical-center;
 
@@ -414,12 +414,18 @@ select.menuf2f-select {
       display: block;
     }
 
+    // Split these out as there appears to be a bug with our SCSS parser
     &.loading &__debug,
-    &.loading &__empty,
-    &.loading .mod_facetoface__sessionlist__reservation,
-    &.loading .mod_facetoface__sessionlist__pastlink,
-    &.loading .mod_facetoface__sessionlist {
+    &.loading &__empty {
+      display: none;
+    }
+
+    &.loading .mod_facetoface {
+      &__sessionlist,
+      &__sessionlist__reservation,
+      &__sessionlist__pastlink {
         display: none;
+      }
     }
   }
 
@@ -466,7 +472,7 @@ select.menuf2f-select {
         background-color: $facetoface-table-bg-accent;
         // We don't use the hover colour at the moment.
         // &:hover {
-        //     background-color: @table-bg-hover;
+        //   background-color: @table-bg-hover;
         // }
       }
 
@@ -538,7 +544,7 @@ select.menuf2f-select {
         margin-left: var(--tui-gap-1);
         > .flex-icon {
           font-size: 111%;
-          // This hackery disables font hinting and grid fitting to get a better rendering result of the "..." button.
+          // This hackery disables font hinting and grid fitting to get a better rendering result of the '...' button.
           transform: rotate(.001deg);
         }
 
@@ -670,13 +676,13 @@ select.menuf2f-select {
     }
   }
 
-  // Put "Add event", "Edit event" et al on the right side of the heading text.
+  // Put 'Add event', 'Edit event' et al on the right side of the heading text.
   &__action-dashboard,
   &__action-eventinfo,
   &__action-eventdetail {
     float: right;
   }
-  // For some reason, "Edit event" needs a different method.
+  // For some reason, 'Edit event' needs a different method.
   &__action-editevent {
     position: absolute;
     right: floor(($grid-gutter-width / 2));
@@ -881,9 +887,9 @@ select.menuf2f-select {
 
           // We need the good-old clearfix in the description block of the detail page.
           &__intro::after {
-              clear: both;
-              content: '';
-              display: block;
+            clear: both;
+            content: '';
+            display: block;
           }
         }
       }
