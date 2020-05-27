@@ -16,37 +16,34 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-  @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
-  @package mod_perform
+  @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
+  @package theme_ventura
 -->
 
 <style lang="scss">
-.tui-performAssignmentSchedule {
-  width: max-content;
+.tui-performAssignmentScheduleRelativeDateSelector {
+  display: inline-flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: space-between;
+  align-items: baseline; // Before changing this to center or something else, check the validation errors line up ok.
+  justify-content: flex-start;
 
-  &__heading {
-    @include tui-font-heading-small;
+  & > *:not(:last-child) {
+    margin-right: var(--tui-gap-1);
   }
 
-  &__sectionHeading {
-    @include tui-font-heading-label;
+  &__count {
+    max-width: 5rem;
   }
 
-  &__data {
-    margin: var(--tui-gap-5) var(--tui-gap-2) var(--tui-gap-3);
-    background: var(--tui-color-neutral-2);
-    border: 1px solid var(--tui-color-neutral-5);
-    border-radius: 6px;
+  &__unit,
+  &__direction {
+    max-width: 10rem;
   }
 
-  &__action {
-    margin-top: var(--tui-gap-5);
-  }
-
-  &__radio {
-    &-disabled {
-      @include tui-font-body-disabled;
-    }
+  .tui-formFieldError__inner {
+    min-width: 20rem; // Should find a way to handle this better.
   }
 }
 </style>

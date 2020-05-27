@@ -297,7 +297,7 @@ class track extends model {
      */
     public function update_schedule_closed_fixed(int $from, int $to): void {
         if ($to < $from) {
-            throw new moodle_exception('schedule_error_date_range', 'mod_perform');
+            throw new moodle_exception('fixed_date_selector_error_range', 'mod_perform');
         }
 
         $properties_to_update = [

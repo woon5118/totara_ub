@@ -16,37 +16,23 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-  @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
-  @package mod_perform
+  @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
+  @package theme_ventura
 -->
 
 <style lang="scss">
-.tui-performAssignmentSchedule {
-  width: max-content;
+.tui-performAssignmentScheduleSettingContainer {
+  padding-top: var(--tui-gap-4);
 
-  &__heading {
-    @include tui-font-heading-small;
-  }
-
-  &__sectionHeading {
+  &__title {
     @include tui-font-heading-label;
+    margin-top: 0;
+    margin-bottom: var(--tui-gap-1);
   }
 
-  &__data {
-    margin: var(--tui-gap-5) var(--tui-gap-2) var(--tui-gap-3);
-    background: var(--tui-color-neutral-2);
-    border: 1px solid var(--tui-color-neutral-5);
-    border-radius: 6px;
-  }
-
-  &__action {
-    margin-top: var(--tui-gap-5);
-  }
-
-  &__radio {
-    &-disabled {
-      @include tui-font-body-disabled;
-    }
+  &__container {
+    padding: var(--tui-gap-2);
+    background-color: var(--tui-color-neutral-3);
   }
 }
 </style>

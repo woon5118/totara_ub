@@ -25,16 +25,8 @@
 
 export const NOTIFICATION_DURATION = 10 * 1000; // 10 seconds (in milliseconds)
 
-export const DUE_DATE_IS_ENABLED = 'enabled';
-export const DUE_DATE_IS_DISABLED = 'disabled';
-export const REPEATING_IS_ENABLED = 'enabled';
-export const REPEATING_IS_DISABLED = 'disabled';
-export const SCHEDULE_IS_DYNAMIC = 'dynamic';
-export const SCHEDULE_IS_FIXED = 'fixed';
-export const SCHEDULE_IS_LIMITED = 'limited';
-export const SCHEDULE_IS_OPEN = 'open';
-export const SCHEDULE_DYNAMIC_DIRECTION_BEFORE = 'BEFORE';
-export const SCHEDULE_DYNAMIC_DIRECTION_AFTER = 'AFTER';
-export const SCHEDULE_DYNAMIC_UNIT_DAY = 'DAY';
-export const SCHEDULE_DYNAMIC_UNIT_WEEK = 'WEEK';
-export const SCHEDULE_DYNAMIC_UNIT_MONTH = 'MONTH';
+export const RELATIVE_DATE_DIRECTION_AFTER = 'AFTER';
+export const RELATIVE_DATE_DIRECTION_BEFORE = 'BEFORE';
+export const RELATIVE_DATE_UNIT_DAY = 'DAY';
+export const RELATIVE_DATE_UNIT_WEEK = 'WEEK';
+export const RELATIVE_DATE_UNIT_MONTH = 'MONTH';

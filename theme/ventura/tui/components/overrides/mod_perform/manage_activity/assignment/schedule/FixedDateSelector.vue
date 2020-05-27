@@ -16,19 +16,29 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-  @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
+  @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
   @package theme_ventura
 -->
 
 <style lang="scss">
-.tui-PerformScheduleDateRangeOpenFixed {
-  &__input-container {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
+.tui-performAssignmentScheduleFixedDateSelector {
+  display: inline-flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: space-between;
+  align-items: baseline; // Before changing this to center or something else, check the validation errors line up ok.
+  justify-content: flex-start;
+
+  & > span {
+    margin: 0 var(--tui-gap-1);
   }
-  &__input-container-label {
-    margin-right: var(--tui-gap-3);
+
+  &__input {
+    max-width: 10rem;
+  }
+
+  .tui-formFieldError__inner {
+    min-width: 20rem; // Should find a way to handle this better.
   }
 }
 </style>

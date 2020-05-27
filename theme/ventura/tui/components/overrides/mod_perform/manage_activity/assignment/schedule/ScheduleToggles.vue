@@ -21,7 +21,7 @@
 -->
 
 <style lang="scss">
-.tui_performAssignmentScheduleToggles {
+.tui-performAssignmentScheduleToggles {
   display: flex;
   flex-wrap: wrap;
 

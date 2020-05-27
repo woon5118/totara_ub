@@ -16,19 +16,33 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-  @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
-  @package theme_ventura
+  @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
+  @package mod_perform
 -->
 
-<style lang="scss">
-.tui-PerformScheduleDateRangeClosedFixed {
-  &__input-container {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-  }
-  &__input-container-label {
-    margin-right: var(--tui-gap-3);
-  }
-}
-</style>
+<template>
+  <div class="tui-performAssignmentScheduleSettingContainer">
+    <h4
+      :id="$id('settings-container-title')"
+      class="tui-performAssignmentScheduleSettingContainer__title"
+    >
+      {{ title }}
+    </h4>
+    <div
+      :aria-labelledby="$id('settings-container-title')"
+      class="tui-performAssignmentScheduleSettingContainer__container"
+    >
+      <slot />
+    </div>
+  </div>
+</template>
+<script>
+export default {
+  props: {
+    title: {
+      required: true,
+      type: String,
+    },
+  },
+};
+</script>

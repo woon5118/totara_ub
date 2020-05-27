@@ -50,7 +50,7 @@ class behat_mod_perform extends behat_base {
     public const TUI_USER_ANSWER_ERROR_LOCATOR = '.tui-formFieldError';
     public const USER_QUESTION_TEXT_LOCATOR = '.tui-collapsible__header-text';
     public const TUI_TAB_ELEMENT = '.tui-tabs__tabs';
-    public const SCHEDULE_SAVE_LOCATOR = '.tui_performAssignmentSchedule__action .tui-formBtn--prim';
+    public const SCHEDULE_SAVE_LOCATOR = '.tui-performAssignmentSchedule__action .tui-formBtn--prim';
 
     public const TUI_TRASH_ICON_BUTTON = "button[aria-label='Delete']";
 
