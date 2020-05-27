@@ -84,6 +84,28 @@ class behat_totara_core extends behat_base {
     }
 
     /**
+     * Enable an advanced feature.
+     *
+     * @param string $feature Advanced feature name - e.g. 'appraisals' or 'competency_assignment'
+     * @When /^I enable the "([^"]*)" advanced feature$/
+     */
+    public function i_enable_the_advanced_feature(string $feature): void {
+        \behat_hooks::set_step_readonly(false);
+        \totara_core\advanced_feature::enable($feature);
+    }
+
+    /**
+     * Disable an advanced feature.
+     *
+     * @param string $feature Advanced feature name - e.g. 'appraisals' or 'competency_assignment'
+     * @When /^I disable the "([^"]*)" advanced feature$/
+     */
+    public function i_disable_the_advanced_feature(string $feature): void {
+        \behat_hooks::set_step_readonly(false);
+        \totara_core\advanced_feature::disable($feature);
+    }
+
+    /**
      * Finds a Totara Main menu item url.
      *
      * @param string $text
@@ -576,6 +598,30 @@ class behat_totara_core extends behat_base {
     }
 
     /**
+     * I should see a date in a particular format in the specified element.
+     *
+     * @Then /^I should see the current date in format "([^"]*)" in the "([^"]*)" "([^"]*)"$/
+     * @param string $format Date format to search for
+     * @param string $node_element Element we look in
+     * @param string $node_selector_type The type of selector where we look in
+     */
+    public function i_should_current_date_in_element(string $format, string $node_element, string $node_selector_type) {
+        $date = date($format);
+
+        // Getting the container where the text should be found.
+        $container = $this->get_selected_node($node_selector_type, $node_element);
+
+        $xpathliteral = behat_context_helper::escape($date);
+        $xpath = "/descendant-or-self::*[contains(., $xpathliteral)]";
+        $nodes = $this->find_all(
+            'xpath',
+            $xpath,
+            new ExpectationException('"' . $date . '" text was not found in the "' . $node_element . '" element', $this->getSession()),
+            $container
+        );
+    }
+
+    /**
      * Searches for a specific term in the totara dialog.
      *
      * @Given /^I search for "([^"]*)" in the "([^"]*)" totara dialogue$/
@@ -672,6 +718,27 @@ class behat_totara_core extends behat_base {
     }
 
     /**
+     * Navigates directly to the specified fixture.
+     *
+     * These pages are only used for acceptance testing and do not appear in the navigation.
+     * For that reason we must navigate directly to them.
+     *
+     * @Given /^I navigate to the "([^"]*)" fixture in the "([^"]*)" plugin with the following settings$/
+     * @param string $name
+     * @param string $path
+     */
+    public function i_navigate_to_the_fixture_in_the_plugin_with_the_following_settings($name, $path, TableNode $table) {
+        \behat_hooks::set_step_readonly(false);
+        $settings = [];
+        foreach ($table->getRows() as $row) {
+            $settings[$row[0]] = $row[1];
+        }
+        $url = new moodle_url("/{$path}/tests/fixtures/{$name}.php", $settings);
+        $this->getSession()->visit($url->out(false));
+        $this->wait_for_pending_js();
+    }
+
+    /**
      * @Then /^I should see the "([^"]*)" catalog page$/
      * @param string $name
      * @param string $path
@@ -721,4 +788,119 @@ class behat_totara_core extends behat_base {
         $this->getSession()->visit($this->locate_path($url->out_as_local_url(false)));
         $this->wait_for_pending_js();
     }
+
+    /**
+     * Set the global site theme for a device.
+     *
+     * @When /^I set the site theme to "([^"]*)" for device type "([^"]*)"$/
+     *
+     * @param string $theme_name The name of the theme, e.g. 'basis' or 'ventura'
+     * @param string $device_type The name of the device, e.g. 'default' or 'legacy'
+     */
+    public function i_set_the_site_theme_to_for_device_type($theme_name, $device_type) {
+        \behat_hooks::set_step_readonly(false);
+
+        $device_theme = core_useragent::get_device_type_cfg_var_name($device_type);
+        $theme = theme_config::load($theme_name);
+        set_config($device_theme, $theme->name);
+
+        $this->getSession()->reload();
+    }
+
+    /**
+     * Set the global default site theme.
+     *
+     * @When /^I set the site theme to "([^"]*)"$/
+     *
+     * @param string $theme_name The name of the theme, e.g. 'basis' or 'ventura'
+     */
+    public function i_set_the_site_theme_to($theme_name) {
+        $this->i_set_the_site_theme_to_for_device_type($theme_name, 'default');
+    }
+
+    /**
+     * Open/Close the admin quick access menu.
+     *
+     * @When /^I toggle open the admin quick access menu$/
+     * @throws ExpectationException
+     */
+    public function i_toggle_open_the_admin_quick_access_menu(): void {
+        $menu_button = $this->find('css', '.nav-link.totara_core__QuickAccess_icon.popover-region-toggle');
+        if ($menu_button === null || !$menu_button->isVisible()) {
+            throw new ExpectationException("Admin quick access menu toggle button not visible", $this->getSession());
+        }
+        $menu_button->click();
+        $this->wait_for_pending_js();
+    }
+
+    /**
+     * Get the navigation items listed in the admin quick access menu.
+     *
+     * @return string[]
+     */
+    private function get_quick_access_menu_items(): array {
+        return array_map(static function (NodeElement $element) {
+            return $element->getText();
+        }, $this->find_all('css', '#quickaccess-popover-content ul.totara_core__QuickAccess_group-list li'));
+    }
+
+    /**
+     * Make sure an item appears in the admin quick access menu.
+     *
+     * @Then /^I should see "([^"]*)" in the admin quick access menu$/
+     * @param string $expected
+     * @throws ExpectationException
+     */
+    public function i_should_see_in_the_admin_quick_access_menu(string $expected): void {
+        \behat_hooks::set_step_readonly(true);
+
+        if (!in_array($expected, $this->get_quick_access_menu_items())) {
+            throw new ExpectationException("\"{$expected}\" was not found in the admin quick access menu", $this->getSession());
+        }
+    }
+
+    /**
+     * Make sure an item does not appear in the admin quick access menu.
+     *
+     * @Then /^I should not see "([^"]*)" in the admin quick access menu$/
+     * @param string $expected
+     * @throws ExpectationException
+     */
+    public function i_should_not_see_in_the_admin_quick_access_menu(string $expected): void {
+        \behat_hooks::set_step_readonly(true);
+
+        if (in_array($expected, $this->get_quick_access_menu_items())) {
+            throw new ExpectationException("\"{$expected}\" was found in the admin quick access menu", $this->getSession());
+        }
+    }
+
+    /**
+     * Make sure multi-lang filtering is enabled
+     *
+     * @Given /^the multi-language content filter is enabled/
+     */
+    public function the_multi_language_content_filter_is_enabled(): void {
+        global $CFG;
+        require_once("$CFG->libdir/filterlib.php");
+
+        \behat_hooks::set_step_readonly(false);
+
+        filter_set_global_state('multilang', TEXTFILTER_ON);
+        filter_set_applies_to_strings('multilang', 1);
+    }
+
+    /**
+     * Make sure multi-lang filtering is disabled
+     *
+     * @Given /^the multi-language content filter is disabled/
+     */
+    public function the_multi_language_content_filter_is_disabled(): void {
+        global $CFG;
+        require_once("$CFG->libdir/filterlib.php");
+
+        \behat_hooks::set_step_readonly(false);
+
+        filter_set_global_state('multilang', TEXTFILTER_OFF);
+    }
+
 }
