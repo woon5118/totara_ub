@@ -31,7 +31,7 @@
           >
             <FormTextarea
               name="answer_text"
-              :validations="v => [v.required(), v.maxLength(1024)]"
+              :validations="v => [answerRequired, v.maxLength(1024)]"
             />
           </FormRow>
         </FormScope>
@@ -59,12 +59,35 @@ export default {
     type: Object,
     name: String,
     data: Object,
+    isRequired: {
+      type: Boolean,
+      default: false,
+    },
     error: String,
   },
   methods: {
     process(values) {
-      values.answer_text = values.answer_text.trim();
+      if (values) {
+        values.answer_text = values.answer_text.trim();
+      }
       return values;
+    },
+
+    /**
+     * answer validator based on element config
+     *
+     * @return {function[]}
+     */
+    answerRequired(val) {
+      if (this.isRequired) {
+        const isEmpty =
+          !val || (typeof val === 'string' && val.trim().length === 0);
+        if (isEmpty)
+          return this.$str(
+            'error_you_must_answer_this_question',
+            'performelement_short_text'
+          );
+      }
     },
   },
 };
@@ -72,7 +95,8 @@ export default {
 <lang-strings>
   {
   "performelement_short_text": [
-    "short_text_your_response"
+    "short_text_your_response",
+    "error_you_must_answer_this_question"
   ]
   }
 </lang-strings>

@@ -641,12 +641,17 @@ class mod_perform_generator extends component_generator_base {
         }
 
         if ($include_questions) {
+            $required_question = $data['include_required_questions'] ?? false;
+            // String conversion for behat, defaulting to false.
+            if (is_string($required_question) && $required_question !== 'true') {
+                $required_question = false;
+            }
             $section1 = $this->create_section($activity, ['title' => 'Part one']);
 
-            $element = $this->create_element(['title' => 'Question one']);
+            $element = $this->create_element(['title' => 'Question one', 'is_required' => (bool)$required_question]);
             $this->create_section_element($section1, $element);
 
-            $element2 = $this->create_element(['title' => 'Question two']);
+            $element2 = $this->create_element(['title' => 'Question two', 'is_required' => (bool)$required_question]);
             $this->create_section_element($section1, $element2, 2);
 
             foreach ([$subjects_participant_instance, $other_participant_instance] as $participant_instance) {

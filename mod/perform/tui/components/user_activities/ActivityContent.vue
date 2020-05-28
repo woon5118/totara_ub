@@ -52,13 +52,22 @@
             {{ section.title }}
           </h3>
 
-          <Checkbox
-            v-show="hasOtherResponse"
-            v-model="showOtherResponse"
-            class="tui-participantContent__sectionHeading-switch"
+          <div
+            class="tui-participantContent__sectionHeading-other-response-switch"
           >
-            {{ $str('user_activities_other_response_show', 'mod_perform') }}
-          </Checkbox>
+            <ToggleButton
+              v-show="hasOtherResponse"
+              v-model="showOtherResponse"
+              :text="$str('user_activities_other_response_show', 'mod_perform')"
+            />
+          </div>
+        </div>
+        <div class="tui-participantContent__section-required-container">
+          <span
+            class="tui-participantContent__section-response-required"
+            v-text="'*'"
+          />
+          {{ $str('section_element_response_required', 'mod_perform') }}
         </div>
 
         <Collapsible
@@ -68,6 +77,19 @@
           :initial-state="true"
           class="tui-participantContent__sectionItem"
         >
+          <template v-slot:label-extra>
+            <span
+              v-if="sectionElement.element.is_required"
+              class="tui-participantContent__section-response-required"
+              v-text="'*'"
+            />
+            <span
+              v-if="!sectionElement.element.is_required"
+              class="tui-participantContent__response-optional"
+            >
+              ({{ $str('section_element_response_optional', 'mod_perform') }})
+            </span>
+          </template>
           <div class="tui-participantContent__sectionItem-content">
             <component
               :is="sectionElement.component"
@@ -75,6 +97,7 @@
               :data="sectionElement.element.data"
               :title="sectionElement.element.title"
               :type="sectionElement.element.type"
+              :is-required="sectionElement.element.is_required"
               :error="errors && errors[sectionElement.clientId]"
             />
             <OtherParticipantResponses
@@ -106,6 +129,7 @@ import Collapsible from 'totara_core/components/collapsible/Collapsible';
 import OtherParticipantResponses from 'mod_perform/components/user_activities/participant/OtherParticipantResponses';
 import ParticipantUserHeader from 'mod_perform/components/user_activities/participant/ParticipantUserHeader';
 import { Uniform } from 'totara_core/components/uniform';
+import ToggleButton from 'totara_core/components/buttons/ToggleButton';
 // graphQL
 import SectionResponsesQuery from 'mod_perform/graphql/participant_section';
 import UpdateSectionResponsesMutation from 'mod_perform/graphql/update_section_responses';
@@ -120,6 +144,7 @@ export default {
     OtherParticipantResponses,
     ParticipantUserHeader,
     Uniform,
+    ToggleButton,
   },
 
   props: {
@@ -209,6 +234,7 @@ export default {
                 title: item.element.title,
                 identifier: item.element.identifier,
                 data: JSON.parse(item.element.data),
+                is_required: item.element.is_required,
                 responseData: null,
               },
               sort_order: item.sort_order,
@@ -404,6 +430,8 @@ export default {
   {
     "mod_perform": [
       "relation_to_subject_self",
+      "section_element_response_required",
+      "section_element_response_optional",
       "toast_error_save_response",
       "toast_success_save_response",
       "user_activities_other_response_show",

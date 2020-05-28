@@ -27,6 +27,7 @@ use core\collection;
 use mod_perform\entities\activity\element_response as element_response_entity;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\entities\activity\section_element as section_element_entity;
+use mod_perform\models\activity\element;
 use mod_perform\models\activity\element_plugin;
 use mod_perform\models\response\section_element_response;
 use mod_perform\models\response\element_validation_error;
@@ -123,7 +124,6 @@ class mod_perform_response_model_testcase extends advanced_testcase {
         $element_response->set_response_data(json_encode($response_data));
 
         self::assertTrue($element_response->validate_response());
-        self::assertEmpty($element_response->get_validation_errors()->all());
     }
 
     /**
@@ -170,7 +170,7 @@ class mod_perform_response_model_testcase extends advanced_testcase {
             public function __construct() {
             }
 
-            public function validate_response(?string $encoded_response_data): collection {
+            public function validate_response(?string $encoded_response_data, ?element $element): collection {
                 $error = new element_validation_error(1, 'There was a problem.');
                 $error2 = new element_validation_error(2, 'There was another problem.');
 
@@ -178,5 +178,5 @@ class mod_perform_response_model_testcase extends advanced_testcase {
             }
         };
     }
-
+    
 }

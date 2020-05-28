@@ -8,10 +8,10 @@ Feature: Viewing other responses
       | david    | David     | Two      | david.two@example.com   |
       | harry    | Harry     | Three    | harry.three@example.com |
     And the following "subject instances" exist in "mod_perform" plugin:
-      | activity_name                 | subject_username | subject_is_participating | other_participant_username |
-      | John is participating subject | john             | true                     | david                      |
-      | David is subject              | david            | false                    | admin                      |
-      | John is not participating     | harry            | true                     | david                      |
+      | activity_name                 | subject_username | subject_is_participating | other_participant_username | include_required_questions |
+      | John is participating subject | john             | true                     | david                      | true                       |
+      | David is subject              | david            | false                    | admin                      | true                       |
+      | John is not participating     | harry            | true                     | david                      | false                      |
 
   Scenario: I can respond to my activities and view other non-respond activities
     Given I log in as "john"
@@ -67,3 +67,20 @@ Feature: Viewing other responses
     And I wait until ".tui-otherParticipantResponses" "css_element" exists
     Then I should see perform "short text" question "Question one" is answered by "Manager" with "Manager Answer one"
     And I should see perform "short text" question "Question two" is answered by "Manager" with "Manager Answer two"
+
+  Scenario: I can see required and optional questions
+    Given I log in as "john"
+    When I navigate to the outstanding perform activities list page
+    And I click on "John is participating subject" "link"
+    And I should see "John is participating subject" in the ".tui-performUserActivity h2" "css_element"
+    Then I should see perform "Question one" question is "required"
+    And I should see perform "Question two" question is "required"
+    When I click on "Submit" "button"
+    Then I should see "Question one" has the validation error "You must answer this question"
+    And I should see "Question two" has the validation error "You must answer this question"
+    And I log out
+    Given I log in as "harry"
+    When I navigate to the outstanding perform activities list page
+    And I click on "John is not participating" "link"
+    Then I should see perform "Question one" question is "optional"
+    And I should see perform "Question two" question is "optional"

@@ -136,6 +136,7 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
                         ],
                     'title' => 'test element title',
                     'data' => null,
+                    'is_required' => false,
                 ],
             'sort_order' => 1,
             'response_data' => null,

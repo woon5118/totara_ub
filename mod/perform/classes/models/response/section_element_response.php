@@ -190,7 +190,7 @@ class section_element_response extends model {
      * @return bool
      */
     public function validate_response(): bool {
-        $this->validation_errors = $this->element_plugin->validate_response($this->entity->response_data);
+        $this->validation_errors = $this->element_plugin->validate_response($this->entity->response_data, $this->get_element());
 
         return $this->validation_errors->count() === 0;
     }
@@ -222,8 +222,13 @@ class section_element_response extends model {
         return (new relationship($relationship_entity))->get_name();
     }
 
-    public function get_element(): element {
-        return (new element($this->section_element_entity->element));
+    public function get_element(): ?element {
+        $element = null;
+        if ($this->section_element_entity->element) {
+            $element = new element($this->section_element_entity->element);
+        }
+
+        return $element;
     }
 
     /**

@@ -24,16 +24,12 @@
     <template v-slot:content>
       <FormScope :path="path">
         <FormRow :label="$str('your_response', 'performelement_multi_choice')">
-          <FormRadioGroup
-            :validations="v => [v.required()]"
-            name="answer_option"
-          >
+          <FormRadioGroup :validate="answerValidator" name="answer_option">
             <Radio
               v-for="item in data.options"
               :key="item.name"
               :value="item.name"
               :name="item.name"
-              :validations="v => [v.required()]"
               >{{ item.value }}</Radio
             >
           </FormRadioGroup>
@@ -64,14 +60,37 @@ export default {
     type: Object,
     name: String,
     data: Object,
+    isRequired: {
+      type: Boolean,
+      default: false,
+    },
     error: String,
+  },
+  methods: {
+    /**
+     * answer validator based on element config
+     *
+     * @return {function[]}
+     */
+    answerValidator(val) {
+      if (this.isRequired) {
+        const isEmpty =
+          !val || (typeof val === 'string' && val.trim().length === 0);
+        if (isEmpty)
+          return this.$str(
+            'error_you_must_answer_this_question',
+            'performelement_multi_choice'
+          );
+      }
+    },
   },
 };
 </script>
 <lang-strings>
   {
     "performelement_multi_choice": [
-      "your_response"
+      "your_response",
+      "error_you_must_answer_this_question"
     ]
   }
 </lang-strings>

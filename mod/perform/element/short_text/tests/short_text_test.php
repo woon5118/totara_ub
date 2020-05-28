@@ -44,7 +44,8 @@ class mod_perform_element_short_text_testcase extends advanced_testcase {
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage('Invalid response data format, expected "answer_text" field');
 
-        $short_text->validate_response(json_encode($response_data));
+        $element = $this->perform_generator()->create_element(['title'=>'element one', 'is_required'=>true]);
+        $short_text->validate_response(json_encode($response_data), $element);
     }
 
     public function invalid_response_data_format_provider(): array {
@@ -64,7 +65,8 @@ class mod_perform_element_short_text_testcase extends advanced_testcase {
         /** @var short_text $short_text */
         $short_text = element_plugin::load_by_plugin('short_text');
 
-        $errors = $short_text->validate_response(json_encode(['answer_text' => $answer_text]));
+        $element = $this->perform_generator()->create_element(['title'=>'element one', 'is_required'=>true]);
+        $errors = $short_text->validate_response(json_encode(['answer_text' => $answer_text]), $element);
 
         self::assertEquals($expected_errors, $errors);
     }
@@ -81,6 +83,16 @@ class mod_perform_element_short_text_testcase extends advanced_testcase {
                 new collection([new answer_length_exceeded_error()]), random_string(short_text::MAX_ANSWER_LENGTH + 1)
             ],
         ];
+    }
+
+    /**
+     * @return component_generator_base|mod_perform_generator
+     */
+    protected function perform_generator() {
+        if (!isset($this->perform_generator)) {
+            $this->perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        }
+        return $this->perform_generator;
     }
 
 }

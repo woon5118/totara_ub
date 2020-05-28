@@ -42,9 +42,8 @@ class behat_mod_perform extends behat_base {
     public const SHORT_TEXT_ANSWER_LOCATOR = '.tui-shortTextElementParticipantResponse__answer';
     public const MULTI_CHOICE_ANSWER_LOCATOR = '.tui-elementEditMultiChoiceParticipantResponse__answer';
     public const PERFORM_ACTIVITY_YOUR_RELATIONSHIP_LOCATOR = '.tui-participantContent__user-relationshipValue';
-    public const PERFORM_SHOW_OTHERS_RESPONSES_INPUT_LOCATOR = '.tui-participantContent__sectionHeading-switch input';
-    public const PERFORM_SHOW_OTHERS_RESPONSES_LABEL_LOCATOR = '.tui-participantContent__sectionHeading-switch label';
-    public const MANAGE_CONTENT_PARTICIPANT_NAME_LOCATOR = '.mod-perform-activitySection__participant-name';
+    public const PERFORM_SHOW_OTHERS_RESPONSES_LOCATOR      = '.tui-participantContent__sectionHeading-other-response-switch button';
+    public const MANAGE_CONTENT_PARTICIPANT_NAME_LOCATOR    = '.mod-perform-activitySection__participant-name';
     public const MANAGE_CONTENT_ADD_PARTICIPANTS_BUTTON_LABEL = ".mod-perform-activitySection [aria-label='Add participants']";
 
     public const TUI_USER_ANSWER_ERROR_LOCATOR = '.tui-formFieldError';
@@ -116,6 +115,18 @@ class behat_mod_perform extends behat_base {
     }
 
     /**
+     * @Given /^I should see perform "([^"]*)" question is "([^"]*)"$/
+     * @param string $question_text
+     * @param string $required
+     *
+     * @throws ExpectationException
+     */
+    public function i_should_see_perform_question_is_required(string $question_text, string $required): void {
+        $is_required = $required == 'required';
+        $this->find_required_question_from_text($question_text, $is_required);
+    }
+
+    /**
      * @Given /^I should see perform "([^"]*)" question "([^"]*)" is answered with "([^"]*)"$/
      * @param $element_type
      * @param $question_text
@@ -166,7 +177,7 @@ class behat_mod_perform extends behat_base {
     public function i_click_show_others_responses(): void {
         behat_hooks::set_step_readonly(false);
 
-        $this->find('css', self::PERFORM_SHOW_OTHERS_RESPONSES_LABEL_LOCATOR)->click();
+        $this->find('css', self::PERFORM_SHOW_OTHERS_RESPONSES_LOCATOR)->click();
     }
 
     /**
@@ -175,12 +186,13 @@ class behat_mod_perform extends behat_base {
      * @throws ExpectationException
      */
     public function i_should_see_that_show_others_responses_is(string $expected_state): void {
-        $expected_state = $expected_state === 'on';
+        if ($expected_state == 'on') {
 
-        $checked = $this->find('css', self::PERFORM_SHOW_OTHERS_RESPONSES_INPUT_LOCATOR)->isChecked();
+            $checked = $this->find('css', self::PERFORM_SHOW_OTHERS_RESPONSES_LOCATOR)->hasAttribute('aria-pressed');
 
-        if ($checked !== $expected_state) {
-            throw new ExpectationException('Others responses toggle was not on', $this->getSession());
+            if (!$checked) {
+                throw new ExpectationException('Others responses toggle was not on', $this->getSession());
+            }
         }
     }
 
@@ -381,13 +393,32 @@ class behat_mod_perform extends behat_base {
             if ($found_question === null) {
                 continue;
             }
-
-            if (trim($found_question->getText()) === $question_text) {
+            $actual_title = trim(str_replace(['(optional)', '*'],['',''], $found_question->getText()));
+            if ($actual_title === $question_text) {
                 return $question;
             }
         }
 
         throw new ExpectationException("Question not found with text {$question_text}", $this->getSession());
+    }
+
+    private function find_required_question_from_text(string $question_text, bool $is_required): NodeElement {
+        /** @var NodeElement[] $questions */
+        $questions = $this->find_all('css', self::PERFORM_ELEMENT_LOCATOR);
+
+        foreach ($questions as $question) {
+            $found_question = $question->find('css', self::PERFORM_ELEMENT_QUESTION_TEXT_LOCATOR);
+
+            if ($found_question === null) {
+                continue;
+            }
+            $actual_text = $is_required ? $question_text.' *' : $question_text.' (optional)';
+            if (trim($found_question->getText()) === $actual_text) {
+                return $question;
+            }
+        }
+
+        throw new ExpectationException("Required Question not found with text {$question_text}", $this->getSession());
     }
 
     /**

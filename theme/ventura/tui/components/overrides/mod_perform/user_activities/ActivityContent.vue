@@ -66,11 +66,25 @@
     }
   }
 
+  &__section {
+    &-required-container {
+      margin-top: var(--tui-gap-2);
+    }
+    &-response-required {
+      @include tui-font-heading-label();
+      color: var(--tui-color-prompt-alert);
+    }
+  }
+
   &__sectionItem {
     margin-top: var(--tui-gap-4);
     &-content {
       margin-top: var(--tui-gap-4);
     }
+  }
+  &__response-optional {
+    @include tui-font-body();
+    @include tui-font-hint();
   }
 }
 

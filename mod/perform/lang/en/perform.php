@@ -177,6 +177,7 @@ $string['section_default_name'] = 'Section {$a}';
 $string['section_delete_element'] = 'Delete';
 $string['section_element_questions'] = 'Questions';
 $string['section_element_response_required'] = 'Response required';
+$string['section_element_response_optional'] = 'optional';
 $string['section_element_tag_required'] = 'Required';
 $string['section_element_tag_optional'] = 'Optional';
 $string['section_element_summary_optional_questions'] = 'Optional questions';

@@ -22,6 +22,7 @@ query mod_perform_participant_section($participant_instance_id: core_id!) {
         }
         title
         data
+        is_required
       }
       sort_order
       response_data

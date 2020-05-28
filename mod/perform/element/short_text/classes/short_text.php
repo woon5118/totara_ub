@@ -25,6 +25,7 @@ namespace performelement_short_text;
 
 use coding_exception;
 use core\collection;
+use mod_perform\models\activity\element;
 use core_text;
 use mod_perform\models\activity\element_plugin;
 
@@ -35,12 +36,13 @@ class short_text extends element_plugin {
     /**
      * @inheritDoc
      */
-    public function validate_response(?string $encoded_response_data): collection {
+    public function validate_response(?string $encoded_response_data,?element $element): collection {
+
         $answer_text = $this->decode_answer_text($encoded_response_data);
 
         $errors = new collection();
 
-        if ((string) $answer_text === '') {
+        if ((string)$answer_text === '' && $element->is_required) {
             $errors->append(new answer_required_error());
         }
 
