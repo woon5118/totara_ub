@@ -402,7 +402,7 @@ function import_data_checks($importname, $importtime) {
                     AND NOT EXISTS (SELECT {enrol}.id
                                 FROM {enrol}
                                 WHERE {enrol}.enrol = :enrolname
-                                AND {enrol}.courseid = courseid)";
+                                AND {enrol}.courseid = {{$tablename}}.courseid)";
             $DB->execute($sql, $params);
         }
     }
