@@ -26,6 +26,7 @@ namespace totara_competency;
 
 use context_system;
 use core\format;
+use core\orm\query\builder;
 use totara_competency\entities\competency;
 use totara_competency\entities\competency_framework;
 use totara_competency\entities\course;
@@ -139,6 +140,10 @@ class external extends \external_api {
             ->filter_by_category($filters['category'] ?? null)
             ->filter_by_name($filters['name'] ?? null)
             ->filter_by_ids($filters['ids'] ?? null)
+            ->where(function (builder $builder) {
+                $builder->where_null('containertype')
+                    ->or_where('containertype', \container_course\course::get_type());
+            })
             ->where('id', '!=', SITEID)
             ->where('ctx.contextlevel', '=', CONTEXT_COURSE)
             ->where_raw($totara_visibility_sql, $totara_visibility_params)
