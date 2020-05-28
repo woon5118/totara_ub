@@ -23,6 +23,7 @@
 import apollo from '../apollo_client';
 import bundleQuery from 'totara_core/graphql/tui_bundles_nosession';
 import { globalConfig } from '../config';
+import pending from '../pending';
 
 /**
  * Possible states for a bundle
@@ -212,14 +213,17 @@ export default class BundleLoader {
    */
   _loadScript(url) {
     return new Promise((resolve, reject) => {
+      const done = pending('script-loading');
       const script = document.createElement('script');
       script.src = url;
       script.addEventListener('load', () => {
         script.remove();
+        done();
         resolve();
       });
       script.addEventListener('error', () => {
         script.remove();
+        done();
         reject();
       });
       document.head.appendChild(script);
@@ -235,11 +239,18 @@ export default class BundleLoader {
    */
   _loadStyle(url) {
     return new Promise((resolve, reject) => {
+      const done = pending('styles-loading');
       const link = document.createElement('link');
       link.rel = 'stylesheet';
       link.href = url;
-      link.addEventListener('load', () => resolve());
-      link.addEventListener('error', () => reject());
+      link.addEventListener('load', () => {
+        done();
+        return resolve();
+      });
+      link.addEventListener('error', () => {
+        done();
+        return reject();
+      });
 
       // last tui_scss link should be the theme css, so insert directly before that.
       const tuiLinks = document.head.querySelectorAll(
