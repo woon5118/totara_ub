@@ -475,6 +475,7 @@ class track extends model {
      */
     private function set_schedule_properties(array $properties): void {
         $entity = $this->entity;
+        $entity_before_changes = clone $entity;
 
         $entity->schedule_is_open = $properties['schedule_is_open'];
         $entity->schedule_is_fixed = $properties['schedule_is_fixed'];
@@ -485,9 +486,34 @@ class track extends model {
         $entity->schedule_dynamic_unit = $properties['schedule_dynamic_unit'] ?? null;
         $entity->schedule_dynamic_direction = $properties['schedule_dynamic_direction'] ?? null;
 
-        if ($this->get_activity()->get_status_state() instanceof active) {
+        if ($this->get_activity()->get_status_state() instanceof active
+            && $this->do_schedule_changes_need_sync($entity_before_changes)) {
             $entity->schedule_needs_sync = true;
         }
+    }
+
+    /**
+     * Detect if schedule changes have happened that require the sync flag to be set.
+     *
+     * @param track_entity $entity_before_changes
+     * @return bool
+     */
+    private function do_schedule_changes_need_sync(track_entity $entity_before_changes): bool {
+        foreach ([
+            'schedule_is_open',
+            'schedule_is_fixed',
+            'schedule_fixed_from',
+            'schedule_fixed_to',
+            'schedule_dynamic_count_from',
+            'schedule_dynamic_count_to',
+            'schedule_dynamic_unit',
+            'schedule_dynamic_direction',
+        ] as $relevant_field) {
+            if ((int)$this->entity->{$relevant_field} !== (int)$entity_before_changes->{$relevant_field}) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -662,7 +688,7 @@ class track extends model {
      *
      * @param int|null $value
      * @param array $map
-     * @param string $value_description Used in the execpection
+     * @param string $value_description Used in the exception
      * @return string|null
      */
     public static function mapped_value_to_string(?int $value, array $map, string $value_description): ?string {

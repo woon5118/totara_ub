@@ -222,46 +222,139 @@ class mod_perform_track_model_testcase extends advanced_testcase {
      * @param string $method_name
      * @param array $params
      */
-    public function test_schedule_sync_flag_is_set(string $method_name, array $params) {
+    public function test_schedule_sync_is_not_flagged_for_draft(string $method_name, array $params) {
         $this->setAdminUser();
 
-        // Create an activity with a track.
-        $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
-        /** @var activity $activity */
-        $activity = $perform_generator->create_activity_in_container([
-            'create_track' => true,
-            'activity_status' => 'DRAFT'
-        ]);
+        $track = $this->create_activity_track('DRAFT');
 
-        $existing_tracks = track::load_by_activity($activity);
-        /** @var track $track */
-        $track = $existing_tracks->first();
         /** @var track_entity $track_entity */
         $track_entity = track_entity::repository()->find($track->get_id());
         $this->assertEquals(0, $track_entity->schedule_needs_sync);
 
-        // Update method should not set flag because it's a draft.
+        // Update method should set flag.
         $track->$method_name(...$params);
         $track->update();
         $track_entity->refresh();
         $this->assertEquals(0, $track_entity->schedule_needs_sync);
+    }
 
-        // Set status to active.
-        /** @var activity_entity $activity_entity */
-        $activity_entity = activity_entity::repository()->find($activity->get_id());
-        $activity_entity->status = active::get_code();
-        $activity_entity->update();
+    /**
+     * @dataProvider set_schedule_methods_data_provider
+     * @param string $method_name
+     * @param array $params
+     */
+    public function test_schedule_sync_is_flagged_for_active_activity(string $method_name, array $params) {
+        $this->setAdminUser();
 
-        // Update method should now set the flag because it's an active activity.
-        $existing_tracks = track::load_by_activity($activity);
-        /** @var track $track */
-        $track = $existing_tracks->first();
+        $track = $this->create_activity_track('ACTIVE');
+
         /** @var track_entity $track_entity */
         $track_entity = track_entity::repository()->find($track->get_id());
+        $this->assertEquals(0, $track_entity->schedule_needs_sync);
+
+        // Update method should set flag.
         $track->$method_name(...$params);
         $track->update();
         $track_entity->refresh();
         $this->assertEquals(1, $track_entity->schedule_needs_sync);
+    }
+
+    /**
+     * @dataProvider set_schedule_methods_data_provider
+     * @param string $method_name
+     * @param array $params
+     */
+    public function test_schedule_sync_is_not_flagged_for_update_without_actual_changes(string $method_name, array $params) {
+        $this->setAdminUser();
+
+        $track = $this->create_activity_track('ACTIVE');
+
+        /** @var track_entity $track_entity */
+        $track_entity = track_entity::repository()->find($track->get_id());
+
+        // Update method sets flag because our test params are different from default data.
+        $track->$method_name(...$params);
+        $track->update();
+        $track_entity->refresh();
+        $this->assertEquals(1, $track_entity->schedule_needs_sync);
+
+        // Reset flag.
+        $track_entity->schedule_needs_sync = 0;
+        $track_entity->update();
+
+        // Update method doesn't set flag because the params are the same as the ones already saved.
+        $track->$method_name(...$params);
+        $track->update();
+        $track_entity->refresh();
+        $this->assertEquals(0, $track_entity->schedule_needs_sync);
+    }
+
+    public function schedule_changes_data_provider() {
+        return [
+            ['set_schedule_open_fixed', [111], [222]],
+            ['set_schedule_closed_fixed', [111, 999], [222, 999]],
+            ['set_schedule_closed_fixed', [111, 999], [111, 888]],
+            ['set_schedule_closed_dynamic', [111, 999, 1, 0], [222, 999, 1, 0]],
+            ['set_schedule_closed_dynamic', [111, 999, 1, 0], [111, 888, 1, 0]],
+            ['set_schedule_closed_dynamic', [111, 999, 1, 0], [111, 999, 0, 0]],
+            ['set_schedule_closed_dynamic', [111, 999, 1, 0], [999, 111, 1, 1]],
+            ['set_schedule_open_dynamic', [111, 1, 1], [222, 1, 1]],
+            ['set_schedule_open_dynamic', [111, 1, 1], [111, 0, 1]],
+            ['set_schedule_open_dynamic', [111, 1, 1], [111, 1, 0]],
+        ];
+    }
+
+    /**
+     * @dataProvider schedule_changes_data_provider
+     * @param string $method_name
+     * @param array $setup_params
+     * @param array $changed_params
+     */
+    public function test_schedule_sync_is_flagged_for_update_with_actual_changes(
+        string $method_name,
+        array $setup_params,
+        array $changed_params
+    ) {
+        $this->setAdminUser();
+
+        $track = $this->create_activity_track('ACTIVE');
+
+        /** @var track_entity $track_entity */
+        $track_entity = track_entity::repository()->find($track->get_id());
+
+        // Update method sets flag because our test params are different from default data.
+        $track->$method_name(...$setup_params);
+        $track->update();
+        $track_entity->refresh();
+        $this->assertEquals(1, $track_entity->schedule_needs_sync);
+
+        // Reset flag.
+        $track_entity->schedule_needs_sync = 0;
+        $track_entity->update();
+
+        // Update method sets flag because the params are different from the ones already saved.
+        $track->$method_name(...$changed_params);
+        $track->update();
+        $track_entity->refresh();
+        $this->assertEquals(1, $track_entity->schedule_needs_sync);
+    }
+
+
+    /**
+     * Create an activity with the given status and return the first created track.
+     *
+     * @param string $activity_status
+     * @return track
+     */
+    private function create_activity_track(string $activity_status): track {
+        $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        /** @var activity $activity */
+        $activity = $perform_generator->create_activity_in_container([
+            'create_track' => true,
+            'activity_status' => $activity_status
+        ]);
+
+        return track::load_by_activity($activity)->first();
     }
 
     public function test_update_performs_validation(): void {

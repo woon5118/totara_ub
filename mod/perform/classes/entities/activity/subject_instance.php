@@ -39,6 +39,7 @@ use totara_core\entities\relationship;
  * @property int $progress
  * @property int $availability
  * @property int|null $job_assignment_id
+ * @property int|null $completed_at
  * @property int $created_at
  * @property int $updated_at
  *

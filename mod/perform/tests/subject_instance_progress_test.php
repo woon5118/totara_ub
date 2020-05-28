@@ -245,6 +245,29 @@ class mod_perform_subject_instance_progress_testcase extends state_testcase {
         $sink->close();
     }
 
+    public function test_completion_sets_completed_at_date() {
+        $this->setAdminUser();
+
+        $configuration = mod_perform_activity_generator_configuration::new()
+            ->set_number_of_users_per_user_group_type(1);
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        $generator->create_full_activities($configuration);
+
+        // Set participant instance progress in DB so we can directly switch subject_instance to complete.
+        /** @var participant_instance $participant_instance */
+        $participant_instance = participant_instance::repository()->one(true);
+        $participant_instance->progress = complete_participant_instance::get_code();
+        $participant_instance->save();
+
+        $this->assertNull($participant_instance->subject_instance->completed_at);
+        $subject_instance_model = subject_instance::load_by_entity($participant_instance->subject_instance);
+        $subject_instance_model->switch_state(complete::class);
+
+        // Check that completed_at has ben set to current time (give a few seconds leeway just in case).
+        $participant_instance->subject_instance->refresh();
+        $this->assertGreaterThan(time() - 10, $participant_instance->subject_instance->completed_at);
+        $this->assertLessThanOrEqual(time(), $participant_instance->subject_instance->completed_at);
+    }
 
     public function test_get_all_translated() {
         $this->assertEqualsCanonicalizing([

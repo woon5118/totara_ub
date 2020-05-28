@@ -323,6 +323,7 @@ class restore_activity_structure_step extends \restore_activity_structure_step {
         // Keeping or moving these times makes little sense, but it is the expected Moodle way...
         $data->created_at = $this->apply_date_offset($data->created_at);
         $data->updated_at = $this->apply_date_offset($data->updated_at);
+        $data->completed_at = $this->apply_date_offset($data->completed_at);
 
         $new_item_id = $DB->insert_record('perform_subject_instance', $data);
         $this->set_mapping('perform_subject_instance', $old_id, $new_item_id);

@@ -228,6 +228,7 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
                 'progress',
                 'availability',
                 'job_assignment_id',
+                'completed_at',
             ]
         );
 

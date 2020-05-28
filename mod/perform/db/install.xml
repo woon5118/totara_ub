@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/perform/db" VERSION="20200529" COMMENT="XMLDB file for perform module"
+<XMLDB PATH="mod/perform/db" VERSION="20200603" COMMENT="XMLDB file for perform module"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -256,6 +256,7 @@
         <FIELD NAME="progress" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Progress status of the subject instance. 0 - not_started, 10 - in_progress, 20 - complete"/>
         <FIELD NAME="availability" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Availability status of the subject instance. 0 - open, 10 - closed"/>
         <FIELD NAME="job_assignment_id" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Related job assignment id (copied from track user assignment)"/>
+        <FIELD NAME="completed_at" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Recording the time when progress status went to complete."/>
         <FIELD NAME="created_at" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="updated_at" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
       </FIELDS>

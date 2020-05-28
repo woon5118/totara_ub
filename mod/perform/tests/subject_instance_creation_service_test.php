@@ -21,6 +21,7 @@
  * @package mod_perform
  */
 
+use core\orm\query\order;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\entities\activity\subject_instance;
 use mod_perform\entities\activity\track as track_entity;
@@ -32,6 +33,7 @@ use mod_perform\models\activity\activity as activity_model;
 use mod_perform\models\activity\track;
 use mod_perform\models\activity\track_status;
 use mod_perform\state\activity\draft;
+use mod_perform\state\subject_instance\complete;
 use mod_perform\task\service\subject_instance_creation;
 use mod_perform\task\service\subject_instance_dto;
 use mod_perform\user_groups\grouping;
@@ -41,6 +43,13 @@ use totara_job\job_assignment;
  * @group perform
  */
 class mod_perform_subject_instance_creation_service_testcase extends advanced_testcase {
+
+     /**
+     * @return mod_perform_generator|component_generator_base
+     */
+    protected function perform_generator(): mod_perform_generator {
+        return $this->getDataGenerator()->get_plugin_generator('mod_perform');
+    }
 
     /**
      * @dataProvider creation_mode_provider
@@ -382,4 +391,226 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
         return $data;
     }
 
+    public function test_repeating_type_after_creation() {
+        $track = $this->create_single_track_with_two_assignments();
+
+        // Set repeat to one day after creation.
+        $track->set_repeating_enabled(
+            track_entity::SCHEDULE_REPEATING_TYPE_AFTER_CREATION,
+            1,
+            track_entity::SCHEDULE_DYNAMIC_UNIT_DAY
+        );
+        $track->update();
+        $this->assert_subject_instance_count(0);
+
+        // Initial instances should be created.
+        (new subject_instance_creation())->generate_instances();
+        $this->assert_subject_instance_count(2);
+
+        // Calling instance generation again does not create more instances.
+        (new subject_instance_creation())->generate_instances();
+        $subject_instances = subject_instance::repository()->get()->all();
+        $this->assertCount(2, $subject_instances);
+
+        /** @var subject_instance $subject_instance_1 */
+        $subject_instance_1 = $subject_instances[0];
+        /** @var subject_instance $subject_instance_2 */
+        $subject_instance_2 = $subject_instances[1];
+
+        // Manipulate created_date so that one instance looks more than a day old.
+        $subject_instance_1->created_at = time() - (2 * 86400);
+        $subject_instance_1->update();
+
+        // Another instance should now have been created.
+        (new subject_instance_creation())->generate_instances();
+        $this->assert_subject_instance_count(2, $subject_instance_1->subject_user_id);
+        $this->assert_subject_instance_count(1, $subject_instance_2->subject_user_id);
+    }
+
+    public function test_repeating_type_after_creation_when_complete() {
+        $track = $this->create_single_track_with_two_assignments();
+
+        // Set repeat to one day after creation.
+        $track->set_repeating_enabled(
+            track_entity::SCHEDULE_REPEATING_TYPE_AFTER_CREATION_WHEN_COMPLETE,
+            1,
+            track_entity::SCHEDULE_DYNAMIC_UNIT_DAY
+        );
+        $track->update();
+
+        // Initial subject instances should be created.
+        (new subject_instance_creation())->generate_instances();
+        $subject_instances = subject_instance::repository()->get()->all();
+        $this->assertCount(2, $subject_instances);
+
+        /** @var subject_instance $subject_instance_1 */
+        $subject_instance_1 = $subject_instances[0];
+        /** @var subject_instance $subject_instance_2 */
+        $subject_instance_2 = $subject_instances[1];
+        $this->assert_subject_instance_count(1, $subject_instance_1->subject_user_id);
+        $this->assert_subject_instance_count(1, $subject_instance_2->subject_user_id);
+
+        // Manipulate created_at date so that instance looks more than a day old.
+        $subject_instance_1->created_at = time() - (2 * 86400);
+        $subject_instance_1->update();
+
+        // Another instance should not be created because subject instance is not complete.
+        (new subject_instance_creation())->generate_instances();
+        $this->assert_subject_instance_count(2);
+
+        $subject_instance_1->progress = complete::get_code();
+        $subject_instance_1->update();
+
+        // Another instance should now have been created.
+        (new subject_instance_creation())->generate_instances();
+        $this->assert_subject_instance_count(2, $subject_instance_1->subject_user_id);
+        $this->assert_subject_instance_count(1, $subject_instance_2->subject_user_id);
+    }
+
+    public function test_repeating_type_after_completion() {
+        $track = $this->create_single_track_with_two_assignments();
+
+        // Set repeat to one day after completion.
+        $track->set_repeating_enabled(
+            track_entity::SCHEDULE_REPEATING_TYPE_AFTER_COMPLETION,
+            1,
+            track_entity::SCHEDULE_DYNAMIC_UNIT_WEEK
+        );
+        $track->update();
+
+        // Initial subject instances should be created.
+        (new subject_instance_creation())->generate_instances();
+        $subject_instances = subject_instance::repository()->get()->all();
+        $this->assertCount(2, $subject_instances);
+
+        /** @var subject_instance $subject_instance_1 */
+        $subject_instance_1 = $subject_instances[0];
+        /** @var subject_instance $subject_instance_2 */
+        $subject_instance_2 = $subject_instances[1];
+        $this->assert_subject_instance_count(1, $subject_instance_1->subject_user_id);
+        $this->assert_subject_instance_count(1, $subject_instance_2->subject_user_id);
+
+        // Second instance should not be created yet because completion date is less than a day in the past.
+        $subject_instance_1->progress = complete::get_code();
+        $subject_instance_1->completed_at = time();
+        $subject_instance_1->update();
+        (new subject_instance_creation())->generate_instances();
+        $this->assert_subject_instance_count(2);
+
+        // Second instance should now be created.
+        $subject_instance_1->completed_at = time() - (8 * 86400);
+        $subject_instance_1->update();
+        (new subject_instance_creation())->generate_instances();
+        $this->assert_subject_instance_count(2, $subject_instance_1->subject_user_id);
+        $this->assert_subject_instance_count(1, $subject_instance_2->subject_user_id);
+    }
+
+    public function test_repeating_limit() {
+        $track = $this->create_single_track_with_two_assignments();
+
+        // Set repeat to one day after creation, limit 2.
+        $track->set_repeating_enabled(
+            track_entity::SCHEDULE_REPEATING_TYPE_AFTER_CREATION,
+            1,
+            track_entity::SCHEDULE_DYNAMIC_UNIT_DAY,
+            3
+        );
+        $track->update();
+
+        // Initial subject instance should be created.
+        (new subject_instance_creation())->generate_instances();
+        $subject_instances = subject_instance::repository()->get()->all();
+        $this->assertCount(2, $subject_instances);
+
+        /** @var subject_instance $subject_instance_1_1 */
+        $subject_instance_1_1 = $subject_instances[0];
+        /** @var subject_instance $subject_instance_2 */
+        $subject_instance_2 = $subject_instances[1];
+        $this->assert_subject_instance_count(1, $subject_instance_1_1->subject_user_id);
+        $this->assert_subject_instance_count(1, $subject_instance_2->subject_user_id);
+
+        // Calling instance generation again does not create a second instance.
+        (new subject_instance_creation())->generate_instances();
+        $this->assert_subject_instance_count(2);
+
+        // Manipulate created_date so that instance looks old enough to create a new one.
+        $subject_instance_1_1->created_at = time() - (2 * 86400);
+        $subject_instance_1_1->update();
+
+        // Second instance should now be created.
+        (new subject_instance_creation())->generate_instances();
+        $this->assert_subject_instance_count(2, $subject_instance_1_1->subject_user_id);
+        $this->assert_subject_instance_count(1, $subject_instance_2->subject_user_id);
+
+        /** @var subject_instance $subject_instance_1_2 */
+        $subject_instance_1_2 = subject_instance::repository()->order_by('id', order::DIRECTION_DESC)->first();
+        $this->assertGreaterThan($subject_instance_1_1->id, $subject_instance_1_2->id);
+        $this->assertEquals($subject_instance_1_1->subject_user_id, $subject_instance_1_2->subject_user_id);
+
+        // Calling instance generation again does not create an additional instance because the
+        // most recent subject instance (with the highest id) is not more than a day old.
+        (new subject_instance_creation())->generate_instances();
+        $this->assert_subject_instance_count(2, $subject_instance_1_1->subject_user_id);
+        $this->assert_subject_instance_count(1, $subject_instance_2->subject_user_id);
+
+        // Manipulate created_date so that latest instance looks old enough to create a new one.
+        $subject_instance_1_2->created_at = time() - (2 * 86400);
+        $subject_instance_1_2->update();
+
+        // Third instance should now be created.
+        (new subject_instance_creation())->generate_instances();
+        $this->assert_subject_instance_count(3, $subject_instance_1_1->subject_user_id);
+        $this->assert_subject_instance_count(1, $subject_instance_2->subject_user_id);
+
+        /** @var subject_instance $subject_instance_1_3 */
+        $subject_instance_1_3 = subject_instance::repository()->order_by('id', order::DIRECTION_DESC)->first();
+        $this->assertGreaterThan($subject_instance_1_2->id, $subject_instance_1_3->id);
+        $this->assertEquals($subject_instance_1_2->subject_user_id, $subject_instance_1_3->subject_user_id);
+
+        $subject_instance_1_3->created_at = time() - (2 * 86400);
+        $subject_instance_1_3->update();
+
+        // No further instances should be created because we have hit the limit.
+        (new subject_instance_creation())->generate_instances();
+        $this->assert_subject_instance_count(3, $subject_instance_1_1->subject_user_id);
+        $this->assert_subject_instance_count(1, $subject_instance_2->subject_user_id);
+
+        // Increase the limit, so additional instance is created.
+        $track->set_repeating_enabled(
+            track_entity::SCHEDULE_REPEATING_TYPE_AFTER_CREATION,
+            1,
+            track_entity::SCHEDULE_DYNAMIC_UNIT_DAY,
+            4
+        );
+        $track->update();
+        (new subject_instance_creation())->generate_instances();
+        $this->assert_subject_instance_count(4, $subject_instance_1_1->subject_user_id);
+        $this->assert_subject_instance_count(1, $subject_instance_2->subject_user_id);
+    }
+
+    /**
+     * @return track
+     */
+    private function create_single_track_with_two_assignments(): track {
+        $generator = $this->perform_generator();
+        $config = mod_perform_activity_generator_configuration::new()
+            ->disable_subject_instances()
+            ->set_number_of_users_per_user_group_type(2);
+        /** @var activity_model $activity */
+        $activity = $generator->create_full_activities($config)->first();
+        /** @var track $track */
+        return $activity->get_tracks()->first();
+    }
+
+    /**
+     * @param int $expected_count
+     * @param int|null $user_id
+     */
+    private function assert_subject_instance_count(int $expected_count, ?int $user_id = null) {
+        $repository = subject_instance::repository();
+        if ($user_id) {
+            $repository->where('subject_user_id', $user_id);
+        }
+        $this->assertCount($expected_count, $repository->get());
+    }
 }

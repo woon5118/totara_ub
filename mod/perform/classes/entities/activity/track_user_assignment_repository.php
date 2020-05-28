@@ -25,7 +25,7 @@ namespace mod_perform\entities\activity;
 
 use core\orm\entity\repository;
 use core\orm\query\builder;
-use mod_perform\models\activity\activity as activity_model;
+use core\orm\query\table;
 use mod_perform\models\activity\track_status;
 use mod_perform\state\activity\active;
 
@@ -69,6 +69,70 @@ final class track_user_assignment_repository extends repository {
             $builder->where_null('period_end_date')
                 ->or_where('period_end_date', '>', $now);
         });
+
+        return $this;
+    }
+
+    /**
+     * Filter for records that either don't have any instances or
+     * the repeat config is such that it potentially can have more.
+     *
+     * @return $this
+     */
+    public function filter_by_possibly_has_subject_instances_to_create(): self {
+        if (!$this->has_join(track::TABLE, 'fbat')) {
+            $this->join([track::TABLE, 'fbat'], 'track_id', 'id');
+        }
+
+        // Create a subquery getting the count of subject_instances and the id of the most
+        // recent one for each track_user_assignment.
+        $grouped_instances_sub_query = builder::table(subject_instance::TABLE)
+            ->select([
+                'max(id) as max_id',
+                'count(track_user_assignment_id) as instance_count'
+            ])
+            ->group_by('track_user_assignment_id');
+
+        // Join that subquery to subject_instance table so we have only the records for most recent subject_instances.
+        $instances_query = builder::table(subject_instance::TABLE)
+            ->select([
+                'grouped_si.instance_count',
+                'track_user_assignment_id',
+                'progress',
+                'completed_at',
+                'created_at',
+                'id'
+            ])
+            ->join((new table($grouped_instances_sub_query))->as('grouped_si'), 'id', 'grouped_si.max_id');
+
+        // We are interested in records that either don't have any subject instances
+        // or have repeating enabled for the track without having hit the repeat-limit.
+        $this->left_join((new table($instances_query))->as('si'), 'id', 'si.track_user_assignment_id')
+            ->where(function (builder $builder) {
+                $builder->where_null('si.id')
+                    ->or_where(function (builder $builder) {
+                        $builder->where('fbat.repeating_is_enabled', true)
+                            ->where('fbat.repeating_is_limited', false);
+                    })
+                    ->or_where(function (builder $builder) {
+                        $builder->where('fbat.repeating_is_enabled', true)
+                            ->where('fbat.repeating_is_limited', true)
+                            ->where_field('fbat.repeating_limit', '>', 'si.instance_count');
+                    });
+            });
+
+        // Add some helpful fields to the result.
+        $this->add_select([
+            'si.created_at as instance_created_at',
+            'si.progress as instance_progress',
+            'si.instance_count',
+            'si.completed_at as instance_completed_at',
+            // Add relevant track columns since we're already joining track table (faster than eager loading track relation).
+            'fbat.repeating_is_enabled',
+            'fbat.repeating_relative_type',
+            'fbat.repeating_relative_unit',
+            'fbat.repeating_relative_count'
+        ]);
 
         return $this;
     }

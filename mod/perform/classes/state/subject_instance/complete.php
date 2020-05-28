@@ -24,6 +24,7 @@
 namespace mod_perform\state\subject_instance;
 
 use core\event\base;
+use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 use mod_perform\event\subject_instance_progress_updated;
 use mod_perform\models\activity\subject_instance;
 use mod_perform\state\state_event;
@@ -65,5 +66,13 @@ class complete extends subject_instance_progress implements state_event {
         /** @var subject_instance $subject_instance */
         $subject_instance = $this->get_object();
         return subject_instance_progress_updated::create_from_subject_instance($subject_instance);
+    }
+
+    public function on_enter(): void {
+        // Set the completed_at date.
+        /** @var subject_instance_entity $subject_instance_entity */
+        $subject_instance_entity = subject_instance_entity::repository()->find($this->get_object()->get_id());
+        $subject_instance_entity->completed_at = time();
+        $subject_instance_entity->update();
     }
 }
