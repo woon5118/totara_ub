@@ -118,7 +118,7 @@ class has_many_through extends relation {
             ))
             ->join($this->intermediate::TABLE, $this->get_related_key(), $this->get_intermediate_related_foreign_key())
             ->where(new field($this->get_intermediate_foreign_key(), $intermediate_builder), $keys)
-            ->get();
+            ->get(true);
 
         // Now iterate over original collection and append the results there
         $collection->map(function ($item) use ($results, $name) {
