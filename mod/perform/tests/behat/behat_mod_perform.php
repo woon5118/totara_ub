@@ -38,7 +38,7 @@ class behat_mod_perform extends behat_base {
     public const SHORT_TEXT_RESPONSE_LOCATOR = 'textarea';
     public const MULTI_CHOICE_RESPONSE_LOCATOR = 'radio';
     public const PERFORM_ELEMENT_OTHER_RESPONSE_CONTAINER_LOCATOR = '.tui-otherParticipantResponses';
-    public const PERFORM_ELEMENT_OTHER_RESPONSE_RELATION_LOCATOR = '.tui-otherParticipantResponses__relation .tui-formLabel';
+    public const PERFORM_ELEMENT_OTHER_RESPONSE_RELATION_LOCATOR = '.tui-otherParticipantResponses .tui-formLabel';
     public const SHORT_TEXT_ANSWER_LOCATOR = '.tui-shortTextElementParticipantResponse__answer';
     public const MULTI_CHOICE_ANSWER_LOCATOR = '.tui-elementEditMultiChoiceParticipantResponse__answer';
     public const PERFORM_ACTIVITY_YOUR_RELATIONSHIP_LOCATOR = '.tui-participantContent__user-relationshipValue';

@@ -22,6 +22,8 @@
 
 <style lang="scss">
 .tui-participantContent {
+  @include tui-font-body();
+
   &__header {
     margin: var(--tui-gap-6) 0 0;
     @include tui-font-heading-medium();

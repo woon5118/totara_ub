@@ -29,57 +29,34 @@
           relationship: group.relationship_name,
         })
       "
-      class="tui-otherParticipantResponses__relation"
     >
-      <Grid
+      <div
         v-if="hasResponses(group.responses)"
-        direction="vertical"
-        :use-vertical-gap="false"
+        class="tui-otherParticipantResponses__response"
       >
-        <GridItem>
-          <Grid
-            v-for="(response, responseIndex) in group.responses"
-            :key="responseIndex"
-            direction="vertical"
-            :use-vertical-gap="false"
-          >
-            <GridItem>
-              <div class="tui-otherParticipantResponses__response">
-                <Grid direction="vertical" :use-vertical-gap="false">
-                  <GridItem
-                    class="tui-otherParticipantResponses__response__participant"
-                  >
-                    <ParticipantUserHeader
-                      :user-name="
-                        response.participant_instance.participant.fullname
-                      "
-                      :profile-picture="
-                        response.participant_instance.participant
-                          .profileimageurlsmall
-                      "
-                      size="xsmall"
-                    />
-                  </GridItem>
-                  <GridItem>
-                    <div
-                      class="tui-otherParticipantResponses__response__answer"
-                    >
-                      <component
-                        :is="componentFor()"
-                        :data="JSON.parse(response.response_data)"
-                        :element-data="sectionElement.element.data"
-                        :name="sectionElement.element.name"
-                        :type="sectionElement.element.type"
-                      />
-                    </div>
-                  </GridItem>
-                </Grid>
-              </div>
-            </GridItem>
-          </Grid>
-        </GridItem>
-      </Grid>
-      <div v-else class="tui-otherParticipantResponses__missing-participant">
+        <div
+          v-for="(response, responseIndex) in group.responses"
+          :key="responseIndex"
+          class="tui-otherParticipantResponses__response-participant"
+        >
+          <ParticipantUserHeader
+            :user-name="response.participant_instance.participant.fullname"
+            :profile-picture="
+              response.participant_instance.participant.profileimageurlsmall
+            "
+            size="xsmall"
+          />
+
+          <component
+            :is="componentFor()"
+            :data="JSON.parse(response.response_data)"
+            :element-data="sectionElement.element.data"
+            :name="sectionElement.element.name"
+            :type="sectionElement.element.type"
+          />
+        </div>
+      </div>
+      <div v-else class="tui-otherParticipantResponses__noParticipant">
         {{
           $str(
             'user_activities_other_response_no_participants_identified',
@@ -91,33 +68,33 @@
   </div>
 </template>
 <script>
-import Grid from 'totara_core/components/grid/Grid';
-import GridItem from 'totara_core/components/grid/GridItem';
 import ParticipantUserHeader from 'mod_perform/components/user_activities/participant/ParticipantUserHeader';
 import WarningIcon from 'totara_core/components/icons/common/Warning';
 import { FormRow } from 'totara_core/components/uniform';
+
 export default {
   components: {
-    Grid,
-    GridItem,
-    ParticipantUserHeader,
     FormRow,
+    ParticipantUserHeader,
     WarningIcon,
   },
+
   props: {
     sectionElement: {
       type: Object,
       required: true,
     },
   },
+
   data() {
     return {
       responderGroups: this.sectionElement.other_responder_groups,
     };
   },
+
   methods: {
     /**
-     *  Get an async component for participant response component
+     * Get an async component for participant response component
      * @returns {function}
      */
     componentFor() {
@@ -132,14 +109,12 @@ export default {
      * @returns {boolean}
      */
     hasResponses(groupResponses) {
-      if (groupResponses.length > 0) {
-        return true;
-      }
-      return false;
+      return groupResponses.length > 0;
     },
   },
 };
 </script>
+
 <lang-strings>
   {
     "mod_perform": [

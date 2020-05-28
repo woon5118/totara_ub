@@ -23,13 +23,22 @@
 <style lang="scss">
 .tui-otherParticipantResponses {
   &__response {
-    margin-bottom: var(--tui-gap-5);
+    width: 100%;
+    margin-top: var(--tui-gap-1);
 
-    &-answer {
-      margin-top: var(--tui-gap-2);
+    & > * + * {
+      margin-top: var(--tui-gap-6);
+    }
+
+    &-participant {
+      & > * + * {
+        margin-top: var(--tui-gap-2);
+      }
     }
   }
-  &__missing-participant {
+
+  &__noParticipant {
+    margin-top: var(--tui-gap-1);
     @include tui-font-hint();
   }
 }
