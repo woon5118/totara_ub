@@ -255,7 +255,7 @@ export default {
           mutation: ActivateCloneMutation,
           variables: {
             input: {
-              activity_id: this.activity.id
+              activity_id: this.activity.id,
             },
           },
         });

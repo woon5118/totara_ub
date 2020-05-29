@@ -50,7 +50,30 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
                 'created_at',
                 'updated_at',
                 'type_id',
-                'close_on_completion',
+            ]
+        );
+
+        $settings = new backup_nested_element('settings');
+        $setting = new backup_nested_element(
+            'setting',
+            ['id'],
+            [
+                'activity_id',
+                'name',
+                'value',
+                'created_at',
+                'updated_at',
+            ]
+        );
+
+        $relationships = new backup_nested_element('relationships');
+        $relationship = new backup_nested_element(
+            'relationship',
+            ['id'],
+            [
+                'activity_id',
+                'core_relationship_id',
+                'created_at',
             ]
         );
 
@@ -135,6 +158,12 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
                 'schedule_dynamic_direction',
                 'schedule_needs_sync',
                 'due_date_is_enabled',
+                'repeating_is_enabled',
+                'due_date_is_fixed',
+                'due_date_fixed',
+                'due_date_relative_count',
+                'due_date_relative_unit',
+                'subject_instance_generation',
             ]
         );
 
@@ -154,16 +183,82 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
             ]
         );
 
-        $relationships = new backup_nested_element('relationships');
-        $relationship = new backup_nested_element(
-            'relationship',
+        $track_user_assignments = new backup_nested_element('track_user_assignments');
+        $track_user_assignment = new backup_nested_element(
+            'track_user_assignment',
             ['id'],
             [
-                'activity_id',
-                'core_relationship_id',
+                'track_id',
+                'subject_user_id',
+                'deleted',
+                'created_at',
+                'updated_at',
+                'period_start_date',
+                'period_end_date',
+                'job_assignment_id',
+            ]
+        );
+
+        $track_user_assignment_vias = new backup_nested_element('track_user_assignment_vias');
+        $track_user_assignment_via = new backup_nested_element(
+            'track_user_assignment_via',
+            ['id'],
+            [
+                'track_assignment_id',
+                'track_user_assignment_id',
                 'created_at',
             ]
         );
+
+        $subject_instances = new backup_nested_element('subject_instances');
+        $subject_instance = new backup_nested_element(
+            'subject_instance',
+            ['id'],
+            [
+                'track_user_assignment_id',
+                'subject_user_id',
+                'created_at',
+                'updated_at',
+                'progress',
+                'availability',
+                'job_assignment_id',
+            ]
+        );
+
+        $participant_instances = new backup_nested_element('participant_instances');
+        $participant_instance = new backup_nested_element(
+            'participant_instance',
+            ['id'],
+            [
+                'activity_relationship_id',
+                'participant_id',
+                'subject_instance_id',
+                'progress',
+                'availability',
+                'created_at',
+                'updated_at',
+            ]
+        );
+
+        $participant_sections = new backup_nested_element('participant_sections');
+        $participant_section = new backup_nested_element(
+            'participant_section',
+            ['id'],
+            [
+                'section_id',
+                'participant_instance_id',
+                'progress',
+                'created_at',
+                'updated_at',
+                'availability',
+            ]
+        );
+
+        $perform->add_child($settings);
+        $settings->add_child($setting);
+
+        $perform->add_child($relationships);
+        $relationships->add_child($relationship);
 
         $perform->add_child($elements);
         $elements->add_child($element);
@@ -172,29 +267,46 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
         $sections->add_child($section);
         $section->add_child($section_elements);
         $section_elements->add_child($section_element);
+
+        $section_element->add_child($element_responses);
+        $element_responses->add_child($element_response);
+
         $section->add_child($section_relationships);
         $section_relationships->add_child($section_relationship);
-
 
         $perform->add_child($tracks);
         $tracks->add_child($track);
         $track->add_child($track_assignments);
         $track_assignments->add_child($track_assignment);
-
-        $perform->add_child($relationships);
-        $relationships->add_child($relationship);
+        $track->add_child($track_user_assignments);
+        $track_user_assignments->add_child($track_user_assignment);
+        $track_user_assignment->add_child($track_user_assignment_vias);
+        $track_user_assignment_vias->add_child($track_user_assignment_via);
+        $track_user_assignment->add_child($subject_instances);
+        $subject_instances->add_child($subject_instance);
+        $subject_instance->add_child($participant_instances);
+        $participant_instances->add_child($participant_instance);
+        $participant_instance->add_child($participant_sections);
+        $participant_sections->add_child($participant_section);
 
         // Define sources (in the same order as above).
         $perform->set_source_table('perform', ['id' => backup::VAR_ACTIVITYID]);
+        $setting->set_source_table('perform_setting', ['activity_id' => backup::VAR_PARENTID]);
+        $relationship->set_source_table('perform_relationship', ['activity_id' => backup::VAR_PARENTID]);
 
         $track->set_source_table('perform_track', ['activity_id' => backup::VAR_PARENTID]);
         $track_assignment->set_source_table('perform_track_assignment', ['track_id' => backup::VAR_PARENTID]);
+        $track_user_assignment->set_source_table('perform_track_user_assignment', ['track_id' => backup::VAR_PARENTID]);
+        $track_user_assignment_via->set_source_table('perform_track_user_assignment_via', ['track_user_assignment_id' => backup::VAR_PARENTID]);
+        $subject_instance->set_source_table('perform_subject_instance', ['track_user_assignment_id' => backup::VAR_PARENTID]);
+        $participant_instance->set_source_table('perform_participant_instance', ['subject_instance_id' => backup::VAR_PARENTID]);
+        $participant_section->set_source_table('perform_participant_section', ['participant_instance_id' => backup::VAR_PARENTID]);
 
         $section->set_source_table('perform_section', ['activity_id' => backup::VAR_PARENTID]);
         $section_element->set_source_table('perform_section_element', ['section_id' => backup::VAR_PARENTID]);
         $section_relationship->set_source_table('perform_section_relationship', ['section_id' => backup::VAR_PARENTID]);
 
-        $relationship->set_source_table('perform_relationship', ['activity_id' => backup::VAR_PARENTID]);
+        $element_response->set_source_table('perform_element_response', ['section_element_id' => backup::VAR_PARENTID]);
 
         $element->set_source_sql(
             "SELECT pe.*
@@ -206,7 +318,20 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
         );
 
         $perform->annotate_ids('perform_type', 'type_id');
+        $track_assignment->annotate_ids('user', 'created_by');
+        $track_user_assignment->annotate_ids('user', 'subject_user_id');
+        $track_user_assignment->annotate_ids('job_assignment', 'job_assignment_id');
+        $subject_instance->annotate_ids('user', 'subject_user_id');
+        $subject_instance->annotate_ids('job_assignment', 'job_assignment_id');
+
+        $participant_instance->annotate_ids('user', 'participant_id');
+        $element->annotate_ids('context', 'context_id');
         $relationship->annotate_ids('totara_core_relationship', 'core_relationship_id');
+
+        $element_response->annotate_ids('perform_participant_instance', 'participant_instance_id');// ???
+        $track_user_assignment_via->annotate_ids('perform_track_assignment', 'track_assignment_id');// ???
+        $participant_instance->annotate_ids('perform_relationship', 'activity_relationship_id');// ???
+        $participant_section->annotate_ids('perform_section', 'section_id');
 
         return $this->prepare_activity_structure($perform);
     }

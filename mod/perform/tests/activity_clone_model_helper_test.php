@@ -21,6 +21,7 @@
  * @package mod_perform
  */
 
+use mod_perform\backup\backup_activity_structure_step as backup_step;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\section;
@@ -32,6 +33,22 @@ use mod_perform\state\activity\draft;
  * @group perform
  */
 class mod_perform_activity_clone_model_helper_testcase extends advanced_testcase {
+
+    /**
+     * @var string[] table names which we do not back up
+     */
+    protected $ignored_tables = [
+        'perform_type'
+    ];
+
+    /**
+     * @var string[][] columns ignored by the backup check
+     */
+    protected $ignored_columns = [
+        'perform' => [
+            'course'
+        ]
+    ];
 
     /**
      * Test activity clone
@@ -58,7 +75,6 @@ class mod_perform_activity_clone_model_helper_testcase extends advanced_testcase
         $this->assertEquals($activity->name . get_string('activity_name_restore_suffix', 'mod_perform'), $new_activity->name);
         $this->assertEquals($activity->type, $new_activity->type);
         $this->assertEquals(draft::get_code(), $new_activity->status);
-        $this->assertEquals($activity->close_on_completion, $new_activity->close_on_completion);
         $this->assertEquals($activity->description, $new_activity->description);
         $this->assertGreaterThanOrEqual($activity->created_at, $new_activity->created_at);
         $this->assertGreaterThanOrEqual($activity->updated_at, $new_activity->updated_at);
@@ -121,5 +137,145 @@ class mod_perform_activity_clone_model_helper_testcase extends advanced_testcase
         $old_track_assignments = $old_track->get_assignments();
         $new_track_assignments = $new_track->get_assignments();
         $this->assertEquals(count($old_track_assignments), count($new_track_assignments));
+    }
+
+    public function test_backup_covers_all_tables_and_fields() {
+        global $CFG, $DB;
+
+        require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
+        require_once($CFG->dirroot . '/backup/moodle2/backup_stepslib.php');
+        require_once($CFG->dirroot . '/backup/moodle2/backup_activity_task.class.php');
+        require_once($CFG->dirroot . '/mod/perform/backup/moodle2/backup_perform_activity_task.class.php');
+
+        $task = $this->getMockBuilder(backup_perform_activity_task::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $step = new backup_step('test', 'filename.bck', $task);
+
+        $reflection = new ReflectionClass($step);
+        $method = $reflection->getMethod('define_structure');
+        $method->setAccessible(true);
+        /** @var backup_nested_element $root_element */
+        $root_element = $method->invoke($step);
+
+        $actual_tables = $DB->get_tables();
+
+        $actual_tables = array_filter($actual_tables, function ($table) {
+            return $table === 'perform' || strpos($table, 'perform_') === 0;
+        });
+
+        // We do not backup the type table
+        $actual_tables = array_values(array_diff($actual_tables, $this->ignored_tables));
+
+        $msg = '';
+
+        $tables_not_found = [];
+
+        $expected_tables = $this->get_tables_from_backup($root_element);
+        $expected_tables = array_values(array_diff($expected_tables, $this->ignored_tables));
+
+        foreach ($expected_tables as $expected_table) {
+            if (!in_array($expected_table, $actual_tables)) {
+                $tables_not_found[] = $expected_table;
+                continue;
+            }
+
+            // Remove from the tables as we've covered it
+            unset($actual_tables[array_search($expected_table, $actual_tables)]);
+
+            $actual_cols = array_keys($DB->get_columns($expected_table));
+            // The id can be safely ignored
+            unset($actual_cols[array_search('id', $actual_cols)]);
+
+            // Filter out ignored columns
+            if ($ignored_cols = $this->ignored_columns[$expected_table] ?? null) {
+                $actual_cols = array_values(array_diff($actual_cols, $ignored_cols));
+            }
+
+            // Get the element from the backup definition
+            $element = $this->find_backup_element_recursive($root_element, $expected_table);
+            $expected_cols = array_keys($element->get_final_elements());
+
+            $missing_cols = [];
+            foreach ($expected_cols as $expected_col) {
+                if (!in_array($expected_col, $actual_cols)) {
+                    $missing_cols[] = $expected_col;
+                    continue;
+                }
+
+                unset($actual_cols[array_search($expected_col, $actual_cols)]);
+            }
+
+            if (!empty($missing_cols)) {
+                $msg .= PHP_EOL . PHP_EOL;
+                $msg .= 'The backup structure for table \''.$expected_table.'\' defines the following fields which are missing in the current table:';
+                $msg .= PHP_EOL . PHP_EOL;
+                $msg .= implode(PHP_EOL, $missing_cols);
+            }
+
+            if (!empty($actual_cols)) {
+                $msg .= PHP_EOL . PHP_EOL;
+                $msg .= 'The table \''.$expected_table.'\' has the following fields which are missing in the current backup structure:';
+                $msg .= PHP_EOL . PHP_EOL;
+                $msg .= implode(PHP_EOL, $actual_cols);
+            }
+        }
+
+        if (!empty($tables_not_found)) {
+            $msg .= PHP_EOL . PHP_EOL;
+            $msg .= 'The following tables are defined in the backup step but do not exist in the database:';
+            $msg .= PHP_EOL . PHP_EOL;
+            $msg .= implode(PHP_EOL, $tables_not_found);
+        }
+
+        if (!empty($actual_tables)) {
+            $msg .= PHP_EOL . PHP_EOL;
+            $msg .= 'The following tables do exist in the database but are not defined in the backup step:';
+            $msg .= PHP_EOL . PHP_EOL;
+            $msg .= implode(PHP_EOL, $actual_tables);
+        }
+
+        if (!empty($msg)) {
+            $msg = 'Backup structure does not match the current database structure' . $msg;
+            $this->fail($msg);
+        }
+    }
+
+    private function get_tables_from_backup(backup_nested_element $element): array {
+        /** @var backup_nested_element[] $children */
+        $children = $element->get_children();
+        $result = [];
+        foreach ($children as $child) {
+            if (!empty($child->get_source_table())) {
+                $result[] = $child->get_source_table();
+            } else if (!empty($child->get_source_sql())) {
+                $result[] = 'perform_'.$child->get_name();
+            }
+            $nested_result = $this->get_tables_from_backup($child);
+            if (!empty($nested_result)) {
+                $result = array_merge($result, $nested_result);
+            }
+        }
+
+        return $result;
+    }
+
+
+    private function find_backup_element_recursive(backup_nested_element $element, $table_name) {
+        /** @var backup_nested_element[] $children */
+        $children = $element->get_children();
+        foreach ($children as $child) {
+            if ($child->get_source_table() === $table_name
+                || $child->get_name() === str_replace('perform_', '', $table_name)
+            ) {
+                return $child;
+            }
+            if ($element = $this->find_backup_element_recursive($child, $table_name)) {
+                return $element;
+            }
+        }
+
+        return null;
     }
 }

@@ -158,7 +158,6 @@ class activity extends model {
         global $USER;
 
         $userid = $userid ?? $USER->id;
-
         return has_capability('mod/perform:manage_activity', $this->get_context(), $userid);
     }
 

@@ -52,7 +52,7 @@ class activity_clone {
      * @return activity
      */
     public function clone(bool $is_cloning = true): activity {
-        global $USER, $CFG;
+        global $USER, $CFG, $DB;
 
         require_once($CFG->dirroot.'/backup/util/includes/backup_includes.php');
         require_once($CFG->dirroot.'/backup/util/includes/restore_includes.php');
@@ -87,10 +87,12 @@ class activity_clone {
             'groups' => 0,
             'users' => 0,
             'activities' => 1,
-            'role_assignments' => 1,
+            'role_assignments' => 0,
         ];
         foreach ($default_settings as $setting => $value) {
-            $backup_controller->get_plan()->set_setting($setting, $value);
+            $plan = $backup_controller->get_plan();
+            $plan->get_setting($setting)->set_status(\base_setting::NOT_LOCKED);
+            $plan->set_setting($setting, $value);
         }
         $backup_controller->execute_plan();
         $file = $backup_controller->get_results()['backup_destination'];
@@ -108,6 +110,13 @@ class activity_clone {
             $course->shortname . '_2',
             $course->category
         );
+        $DB->set_field('course', 'containertype', 'container_perform', ['id' => $new_course_id]);
+
+        $context = \context_course::instance($new_course_id);
+        if (!empty($CFG->performanceactivitycreatornewroleid) && !is_viewing($context, null, 'mod/perform:manage_activity')) {
+            role_assign($CFG->performanceactivitycreatornewroleid, $USER->id, $context);
+        }
+
         $restore_controller = new \restore_controller(
             $backup_id,
             $new_course_id,

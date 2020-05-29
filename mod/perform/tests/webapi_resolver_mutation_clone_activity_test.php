@@ -86,7 +86,7 @@ class mod_perform_webapi_resolver_mutation_clone_activity_testcase extends advan
         $activity_id = 999;
         $args['input']['activity_id'] = $activity_id;
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
-        $this->assert_webapi_operation_failed($result, "$activity_id");
+        $this->assert_webapi_operation_failed($result, 'Invalid activity');
 
         self::setGuestUser();
         $args['input']['activity_id'] = $activity->id;
