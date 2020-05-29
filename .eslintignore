@@ -12,7 +12,6 @@ blocks/totara_featured_links/slick/
 blocks/totara_featured_links/amd/src/slick.js
 enrol/lti/ims-blti/
 filter/algebra/AlgParser.pm
-filter/mathjaxloader/contrib/a11y/
 filter/tex/mimetex.*
 lib/editor/atto/yui/src/rangy/js/*.*
 lib/adodb/
