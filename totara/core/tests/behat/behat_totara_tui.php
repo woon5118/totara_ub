@@ -57,10 +57,8 @@ class behat_totara_tui extends behat_base {
 
     private const NOTIFICATION_BANNER_LOCATOR = '.tui-notificationBanner';
     private const NOTIFICATION_TOAST_LOCATOR = '.tui-notificationBanner--toast';
-    private const NOTIFICATION_TOAST_DISMISS_LOCATOR = '.tui-notificationBanner__dismiss';
 
     private const MODAL_CONTENT_SELECTOR = '.tui-modalContent';
-    private const MODAL_BODY_SELECTOR = '.tui-modalContent__content';
 
     private const COLLAPSIBLE_LOCATOR = '.tui-collapsible';
     private const COLLAPSIBLE_HEADER_TEXT_LOCATOR = '.tui-collapsible__header-text';
@@ -462,12 +460,18 @@ class behat_totara_tui extends behat_base {
 
     /**
      * @Then /^I click on the "([^"]*)" tui checkbox$/
+     * @Then /^I click on the "([^"]*)" tui checkbox in the "([^"]*)" css element$/
      * @param string $name
+     * @param string $parent_selector
      */
-    public function i_click_the_tui_checkbox(string $name): void {
+    public function i_click_the_tui_checkbox(string $name, string $parent_selector = ''): void {
         behat_hooks::set_step_readonly(false);
+        $locator = self::CHECKBOX_LOCATOR . "[name='{$name}']";
 
-        $checkbox_input = $this->find('css', self::CHECKBOX_LOCATOR . "[name='{$name}']");
+        if (!empty($parent_selector)) {
+            $locator = $parent_selector . ' ' . $locator;
+        }
+        $checkbox_input = $this->find('css', $locator);
 
         if ($checkbox_input === null) {
             $this->fail("No tui check box found with name {$name}");
