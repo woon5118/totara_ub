@@ -521,15 +521,19 @@ class rb_source_completionimport_course extends rb_base_source {
         }
     }
 
+    /**
+     * Gets all import upload times for use in the filter
+     *
+     * @return array
+     */
     public function rb_filter_timecreated() {
         global $DB;
 
         $out = array();
         $sql = "SELECT DISTINCT timecreated
                 FROM {totara_compl_import_course}
-                WHERE importerror = :importerror
                 ORDER BY timecreated DESC";
-        $times = $DB->get_records_sql($sql, array('importerror' => 0));
+        $times = $DB->get_records_sql($sql);
         foreach ($times as $time) {
             $out[$time->timecreated] = userdate($time->timecreated, get_string('strftimedatetimeshort', 'langconfig'));
         }
