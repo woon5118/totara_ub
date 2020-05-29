@@ -70,6 +70,8 @@ class behat_totara_tui extends behat_base {
 
     private const CHECKBOX_LOCATOR = '.tui-checkbox__input';
 
+    private const RADIO_LOCATOR = '.tui-radio__input';
+
     /**
      * @param string $locator CSS locator
      * @param string $element_name Human understandable name of the element - e.g. 'modal', 'popover', 'picker' etc
@@ -472,6 +474,27 @@ class behat_totara_tui extends behat_base {
         }
 
         $checkbox_input->getParent()->click();
+    }
+
+    /**
+     * @When /^I click on the "([^"]*)" tui radio in the "([^"]*)" tui radio group$/
+     * @param string $radio_value
+     * @param string $radio_group
+     */
+    public function i_click_the_tui_radio(string $radio_value, string $radio_group): void {
+        behat_hooks::set_step_readonly(false);
+
+        $input_identifier = self::RADIO_LOCATOR . "[name='$radio_group'][value='$radio_value']";
+        $radio_input = $this->find('css', $input_identifier);
+        if ($radio_input === null) {
+            $this->fail("Could not locate radio button with the value '{$radio_value}' and group '{$radio_group}'");
+        }
+
+        // The actual input element for the radio is hidden, and therefore cannot be interacted in a normal behat way.
+        // Instead we need this hack to manually click the hidden element via running some JS.
+        $click_script = "document.querySelector(\"{$input_identifier}\").click();";
+        $this->getSession()->getDriver()->executeScript($click_script);
+        $this->wait_for_pending_js();
     }
 
     /**
