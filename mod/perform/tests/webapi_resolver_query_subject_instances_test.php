@@ -69,8 +69,12 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                 'participant_instances' => [
                     [
                         'progress_status' => 'NOT_STARTED',
-                        'relationship_name' => 'Subject',
+                        'core_relationship' => [
+                            'id' => '1',
+                            'name' => 'Subject',
+                        ],
                         'participant_id' => $participant_instance->participant_id,
+                        'id' => $participant_instance->id,
                     ]
                 ],
             ]

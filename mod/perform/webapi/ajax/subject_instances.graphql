@@ -15,9 +15,13 @@ query mod_perform_subject_instances(
       fullname
     }
     participant_instances {
+      id
       participant_id
       progress_status
-      relationship_name
+      core_relationship {
+        id
+        name
+      }
     }
   }
 }

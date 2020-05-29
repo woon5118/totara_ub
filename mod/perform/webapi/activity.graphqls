@@ -117,7 +117,7 @@ type mod_perform_participant_instance {
   participant_sections: [mod_perform_participant_section!]!
   participant: core_user!
   progress_status: mod_perform_participant_instance_status!
-  relationship_name: String!
+  core_relationship: totara_core_relationship!
 }
 
 """

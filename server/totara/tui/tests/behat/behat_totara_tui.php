@@ -518,7 +518,7 @@ class behat_totara_tui extends behat_base {
      * @param string $radio_value
      * @param string $radio_group
      */
-    public function i_click_the_tui_radio(string $radio_value, string $radio_group): void {
+    public function i_click_the_tui_radio_in_the(string $radio_value, string $radio_group): void {
         behat_hooks::set_step_readonly(false);
 
         $input_identifier = self::RADIO_LOCATOR . "[name='$radio_group'][value='$radio_value']";
@@ -532,6 +532,22 @@ class behat_totara_tui extends behat_base {
         $click_script = "document.querySelector(\"{$input_identifier}\").click();";
         $this->getSession()->getDriver()->executeScript($click_script);
         $this->wait_for_pending_js();
+    }
+
+    /**
+     * @Then /^I click on the "([^"]*)" tui radio$/
+     * @param string $name
+     */
+    public function i_click_the_tui_radio(string $name): void {
+        behat_hooks::set_step_readonly(false);
+
+        $checkbox_input = $this->find('css', self::RADIO_LOCATOR . "[name='{$name}']");
+
+        if ($checkbox_input === null) {
+            $this->fail("No tui check box found with name {$name}");
+        }
+
+        $checkbox_input->getParent()->find('css', 'label')->click();
     }
 
     /**

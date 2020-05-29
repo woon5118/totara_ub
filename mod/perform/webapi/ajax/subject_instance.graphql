@@ -14,7 +14,9 @@ query mod_perform_subject_instance($subject_instance_id: core_id!) {
       id
       participant_id
       progress_status
-      relationship_name
+      core_relationship {
+        name
+      }
     }
   }
 }

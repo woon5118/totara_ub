@@ -58,7 +58,7 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
 
 
             $this->assertCount(1, $result['answerable_participant_instances']);
-            $this->assertSame('Subject', $result['answerable_participant_instances'][0]['relationship_name']);
+            $this->assertSame('Subject', $result['answerable_participant_instances'][0]['core_relationship']['name']);
 
             $section_element_responses = $result['section_element_responses'];
 

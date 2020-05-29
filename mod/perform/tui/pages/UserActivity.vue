@@ -33,10 +33,10 @@
         type="error"
       />
       <ActivityContent
-        v-if="activityFound"
+        v-else-if="activityFound"
         :current-user-id="currentUserId"
         :activity="subjectInstance.activity"
-        :participant-instance-id="firstParticipantInstanceIdForUser"
+        :participant-instance-id="participantInstanceId"
         :subject-user="subjectInstance.subject_user"
       />
     </Loader>
@@ -63,8 +63,12 @@ export default {
       required: true,
       type: Number,
     },
-    subjectInstanceId: {
+    participantInstanceId: {
       required: true,
+      type: Number,
+    },
+    subjectInstanceId: {
+      required: false,
       type: Number,
     },
   },
@@ -79,6 +83,9 @@ export default {
   apollo: {
     subjectInstance: {
       query: subjectInstanceQuery,
+      skip() {
+        return this.subjectInstanceId === null;
+      },
       variables() {
         return {
           subject_instance_id: this.subjectInstanceId,
@@ -98,24 +105,18 @@ export default {
      * to view the activity.
      */
     activityNotFound() {
+      if (this.subjectInstanceId === null) {
+        return true;
+      }
+
       return !this.$apollo.loading && this.subjectInstance === null;
     },
     activityFound() {
+      if (this.subjectInstanceId === null) {
+        return false;
+      }
+
       return !this.$apollo.loading && this.subjectInstance !== null;
-    },
-
-    /**
-     * Get the first participant instance belonging to the logged in user.
-     * This will need to change when we introduce multiple selections.
-     *
-     * @return {Number}
-     */
-    firstParticipantInstanceIdForUser() {
-      const firstId = this.subjectInstance.participant_instances.filter(
-        pi => Number(this.currentUserId) === Number(pi.participant_id)
-      )[0].id;
-
-      return Number(firstId);
     },
   },
 };

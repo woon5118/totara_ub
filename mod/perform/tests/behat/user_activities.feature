@@ -3,21 +3,26 @@ Feature: Viewing and responding to perform activities
 
   Background:
     Given the following "users" exist:
-      | username | firstname | lastname | email                   |
-      | john     | John      | One      | john.one@example.com    |
-      | david    | David     | Two      | david.two@example.com   |
-      | harry    | Harry     | Three    | harry.three@example.com |
+      | username          | firstname | lastname | email                              |
+      | john              | John      | One      | john.one@example.com               |
+      | david             | David     | Two      | david.two@example.com              |
+      | harry             | Harry     | Three    | harry.three@example.com            |
+      | manager-appraiser | combined  | Three    | manager-appraiser.four@example.com |
     And the following "subject instances" exist in "mod_perform" plugin:
       | activity_name                 | subject_username | subject_is_participating | other_participant_username |
       | John is participating subject | john             | true                     | david                      |
-      | David is subject              | david            | false                    | john                      |
+      | David is subject              | david            | false                    | john                       |
       | John is not participating     | harry            | true                     | david                      |
+    And the following "subject instances with single user manager-appraiser" exist in "mod_perform" plugin:
+      | activity_name                 | subject_username | manager_appraiser_username |
+      | single user manager-appraiser | john             | manager-appraiser          |
 
   Scenario: Can view and respond to activities I'm a participant in that are about me
     Given I log in as "john"
     When I navigate to the outstanding perform activities list page
     Then I should see the tui datatable contains:
       | Activity title                | Your progress   | Overall activity progress |
+      | single user manager-appraiser | Not yet started | Not yet started           |
       | John is participating subject | Not yet started | Not yet started           |
 
     When I click on "John is participating subject" "link"
@@ -43,8 +48,9 @@ Feature: Viewing and responding to perform activities
     And the "Your activities" tui tab should be active
     And I should see "Activity responses saved" in the tui "success" notification toast
     And I should see the tui datatable contains:
-      | Activity title                | Your progress | Overall activity progress |
-      | John is participating subject | Complete      | In progress               |
+      | Activity title                | Your progress   | Overall activity progress |
+      | single user manager-appraiser | Not yet started | Not yet started           |
+      | John is participating subject | Complete        | In progress               |
 
   Scenario: Can view and and respond to activities I'm a participant in but are not about me
     Given I log in as "john"
@@ -74,6 +80,65 @@ Feature: Viewing and responding to perform activities
       | Activity title   | User      | Your progress | Overall activity progress |
       | David is subject | David Two | Complete      | Complete                  |
 
+  Scenario: Can view and and respond to activities I have multiple roles in
+    Given I log in as "manager-appraiser"
+    When I navigate to the outstanding perform activities list page
+    And I click on "Activities about others" "link"
+    Then I should see the tui datatable contains:
+      | Activity title                | User     | Relationship to user | Your progress   | Overall activity progress |
+      | single user manager-appraiser | John One | Manager, Appraiser   | Not yet started | Not yet started           |
+
+    When I click on "single user manager-appraiser" "button"
+    Then I should see "Select relationship to continue" in the ".tui-modalContent" "css_element"
+    And the following fields match these values:
+      | Manager (Not yet started)   | 1 |
+      | Appraiser (Not yet started) | 0 |
+
+    When I click on "Continue" "button"
+    Then I should see "single user manager-appraiser" in the ".tui-performUserActivity h2" "css_element"
+    And I should see perform activity relationship to user "Manager"
+    And I should see "Part one"
+    And I should see that show others responses is toggled "off"
+    And I should see perform "short text" question "Question one" is unanswered
+
+    When I answer "short text" question "Question one" with "My first answer as manager"
+    And I click on "Submit" "button"
+    Then I should see "Performance activities"
+    And I should see "Activity responses saved" in the tui "success" notification toast
+
+    When I click on "single user manager-appraiser" "button"
+    Then I should see "Select relationship to continue" in the ".tui-modalContent" "css_element"
+    And the following fields match these values:
+      | Manager (Complete)          | 1 |
+      | Appraiser (Not yet started) | 0 |
+
+    When I click on the "Appraiser" tui radio
+    And I click on "Continue" "button"
+    Then I should see "single user manager-appraiser" in the ".tui-performUserActivity h2" "css_element"
+    And I should see perform activity relationship to user "Appraiser"
+    And I should see "Part one"
+    And I should see that show others responses is toggled "off"
+    And I should see perform "short text" question "Question one" is unanswered
+
+    When I answer "short text" question "Question one" with "My first answer as appraiser"
+    And I click on "Submit" "button"
+    Then I should see "Performance activities"
+    And I should see "Activity responses saved" in the tui "success" notification toast
+
+    When I click on "single user manager-appraiser" "button"
+    Then I should see "Select relationship to continue" in the ".tui-modalContent" "css_element"
+    And the following fields match these values:
+      | Manager (Complete)   | 1 |
+      | Appraiser (Complete) | 0 |
+
+    When I click on "Continue" "button"
+    Then I should see "single user manager-appraiser" in the ".tui-performUserActivity h2" "css_element"
+    And I should see perform activity relationship to user "Manager"
+    And I should see "Part one"
+    And I should see that show others responses is toggled "on"
+    And I should see "Appraiser response"
+    And I should see "My first answer as appraiser"
+
   Scenario: I can't visit activities that don't exist
     Given I log in as "john"
     When I navigate to the user activity page for id "99999999"
@@ -86,6 +151,7 @@ Feature: Viewing and responding to perform activities
     When I navigate to the outstanding perform activities list page
     Then I should see the tui datatable contains:
       | Activity title                | Your progress   | Overall activity progress |
+      | single user manager-appraiser | Not yet started | Not yet started           |
       | John is participating subject | Not yet started | Not yet started           |
 
     When I click on "John is participating subject" "link"
@@ -94,4 +160,5 @@ Feature: Viewing and responding to perform activities
     When I navigate to the outstanding perform activities list page
     Then I should see the tui datatable contains:
       | Activity title                | Your progress   | Overall activity progress |
+      | single user manager-appraiser | Not yet started | Not yet started           |
       | John is participating subject | In progress     | In progress               |

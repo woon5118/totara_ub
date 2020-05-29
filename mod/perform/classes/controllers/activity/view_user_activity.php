@@ -26,6 +26,7 @@ namespace mod_perform\controllers\activity;
 use context;
 use core\entities\user;
 use mod_perform\controllers\perform_controller;
+use mod_perform\entities\activity\participant_instance;
 use mod_perform\util;
 use totara_mvc\tui_view;
 
@@ -51,19 +52,30 @@ class view_user_activity extends perform_controller {
         $props = [
             'current-user-id' => user::logged_in()->id,
             'subject-instance-id' => $this->get_subject_instance_id(),
+            'participant-instance-id' => $this->get_participant_instance_id(),
         ];
 
         return tui_view::create('mod_perform/pages/UserActivity', $props)
             ->set_title(get_string('user_activities_page_title', 'mod_perform'))
-            ->set_url(static::get_url(['subject_instance_id' => $this->get_subject_instance_id()]));
+            ->set_url(static::get_url(['participant_instance_id' => $this->get_participant_instance_id()]));
     }
 
     public static function get_base_url(): string {
         return '/mod/perform/activity/view.php';
     }
 
-    protected function get_subject_instance_id(): int {
-        return required_param('subject_instance_id', PARAM_INT);
+    protected function get_participant_instance_id(): int {
+        return required_param('participant_instance_id', PARAM_INT);
+    }
+
+    protected function get_subject_instance_id(): ?int {
+        /** @var participant_instance $participant_instance */
+        $participant_instance = participant_instance::repository()->where('id', $this->get_participant_instance_id())
+            ->order_by('id')
+            ->first();
+
+        // We allow the return of null, because the front end will handle showing the not found message.
+        return $participant_instance ? $participant_instance->subject_instance_id : null;
     }
 
 }

@@ -243,7 +243,7 @@ export default {
         return this.$str('relation_to_subject_self', 'mod_perform');
       }
 
-      return this.answeringAs.relationship_name;
+      return this.answeringAs.core_relationship.name;
     },
 
     /**

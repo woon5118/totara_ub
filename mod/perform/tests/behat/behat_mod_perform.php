@@ -75,11 +75,11 @@ class behat_mod_perform extends behat_base {
 
     /**
      * @When /^I navigate to the user activity page for id "([^"]*)"$/
-     * @param int $subject_instance_id
+     * @param int $participant_instance_id
      * @throws Exception
      */
-    public function i_navigate_to_the_user_activity_profile_details_page_for_id(int $subject_instance_id): void {
-        $this->navigate_to_page(view_user_activity::get_url(['subject_instance_id' => $subject_instance_id]));
+    public function i_navigate_to_the_user_activity_profile_details_page_for_id(int $participant_instance_id): void {
+        $this->navigate_to_page(view_user_activity::get_url(['participant_instance_id' => $participant_instance_id]));
     }
 
     /**

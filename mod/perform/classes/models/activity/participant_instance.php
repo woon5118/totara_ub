@@ -49,7 +49,7 @@ use totara_core\relationship\relationship;
  * @property-read string $progress_status internal name of current progress state
  * @property-read participant_instance_progress|state $progress_state Current progress state
  * @property-read participant_instance_availability|state $availability_state Current availability state
- * @property-read string $relationship_name internal name of the participant instance's activity relationship
+ * @property-read string $core_relationship The core relationship
  */
 class participant_instance extends model {
 
@@ -75,7 +75,7 @@ class participant_instance extends model {
         'availability_state',
         'subject_instance',
         'participant',
-        'relationship_name'
+        'core_relationship',
     ];
 
     public static function get_entity_class(): string {
@@ -129,13 +129,13 @@ class participant_instance extends model {
     }
 
     /**
-     * Get relationship name
+     * Get the core relationship.
      *
-     * @return string
+     * @return relationship
      */
-    public function get_relationship_name(): string {
+    public function get_core_relationship(): relationship {
         $relationship_entity = $this->entity->activity_relationship->relationship;
-        return (new relationship($relationship_entity))->get_name();
+        return (new relationship($relationship_entity));
     }
 
     /**

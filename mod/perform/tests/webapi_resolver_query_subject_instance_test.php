@@ -81,13 +81,17 @@ class mod_perform_webapi_resolver_query_subject_instance_testcase extends mod_pe
                 [
                     'id' => (string)$subject_participant_instance->get_id(),
                     'progress_status' => not_started::get_name(),
-                    'relationship_name' => 'Subject',
+                    'core_relationship' => [
+                        'name' => 'Subject'
+                    ],
                     'participant_id' => $subject_participant_instance->participant_id,
                 ],
                 [
                     'id' => (string)$manager_participant_instance->get_id(),
                     'progress_status' => not_started::get_name(),
-                    'relationship_name' => 'Manager',
+                    'core_relationship' => [
+                        'name' => 'Manager'
+                    ],
                     'participant_id' => $manager_participant_instance->participant_id,
                 ],
             ]

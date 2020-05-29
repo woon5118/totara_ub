@@ -22,7 +22,11 @@
 -->
 <template>
   <Loader :loading="$apollo.loading">
-    <Table v-if="!$apollo.loading" :data="subjectInstances">
+    <Table
+      v-if="!$apollo.loading"
+      :data="subjectInstances"
+      class="tui-performUserActivityList"
+    >
       <template v-slot:header-row>
         <HeaderCell :size="isAboutOthers ? '4' : '8'">
           {{ $str('user_activities_title_header', 'mod_perform') }}
@@ -49,9 +53,20 @@
           :size="isAboutOthers ? '4' : '8'"
           :column-header="$str('user_activities_title_header', 'mod_perform')"
         >
-          <a :href="getViewActivityUrl(subjectInstance)">{{
-            subjectInstance.activity.name
-          }}</a>
+          <Button
+            v-if="
+              currentUserHasMultipleRelationships(
+                subjectInstance.participant_instances
+              )
+            "
+            :styleclass="{ transparent: true }"
+            class="tui-performUserActivityList__select-relationship-link"
+            :text="subjectInstance.activity.name"
+            @click.prevent="showRelationshipSelector(subjectInstance)"
+          />
+          <a v-else :href="getViewActivityUrl(subjectInstance)">
+            {{ subjectInstance.activity.name }}
+          </a>
         </Cell>
         <Cell
           v-if="isAboutOthers"
@@ -87,12 +102,85 @@
         </Cell>
       </template>
     </Table>
+
+    <ModalPresenter
+      :open="relationshipSelector"
+      @request-close="hideRelationshipSelector"
+    >
+      <Modal :aria-labelledby="$id('select-relationship-title')">
+        <ModalContent
+          v-if="selectedSubjectInstance"
+          :title="
+            $str('select_relationship_to_respond_as_title', 'mod_perform')
+          "
+          :title-id="$id('select-relationship-title')"
+          :close-button="false"
+        >
+          <p :id="$id('select-relationship-explanation')">
+            {{
+              $str(
+                'select_relationship_to_respond_as_explanation',
+                'mod_perform',
+                selectedSubjectInstance.subject_user.fullname
+              )
+            }}
+          </p>
+
+          <RadioGroup
+            v-model="relationshipToRespondAs"
+            required
+            :aria-labelledby="$id('select-relationship-explanation')"
+          >
+            <Radio
+              v-for="participantInstance in respondAsOptions"
+              :key="participantInstance.core_relationship.id"
+              :value="participantInstance.core_relationship.id"
+              :name="participantInstance.core_relationship.name"
+            >
+              {{
+                $str(
+                  'select_relationship_to_respond_as_option',
+                  'mod_perform',
+                  {
+                    relationship_name:
+                      participantInstance.core_relationship.name,
+                    progress_status: getStatusText(
+                      participantInstance.progress_status
+                    ),
+                  }
+                )
+              }}
+            </Radio>
+          </RadioGroup>
+
+          <template v-slot:buttons>
+            <Button
+              :styleclass="{ primary: true }"
+              :text="$str('continue', 'moodle')"
+              :disabled="!relationshipToRespondAs || relationshipConfirmed"
+              @click="confirmRelationshipSelection"
+            />
+            <CancelButton
+              :disabled="relationshipConfirmed"
+              @click="hideRelationshipSelector"
+            />
+          </template>
+        </ModalContent>
+      </Modal>
+    </ModalPresenter>
   </Loader>
 </template>
 <script>
+import Button from 'totara_core/components/buttons/Button';
+import CancelButton from 'totara_core/components/buttons/Cancel';
 import Cell from 'totara_core/components/datatable/Cell';
 import HeaderCell from 'totara_core/components/datatable/HeaderCell';
 import Loader from 'totara_core/components/loader/Loader';
+import Modal from 'totara_core/components/modal/Modal';
+import ModalContent from 'totara_core/components/modal/ModalContent';
+import ModalPresenter from 'totara_core/components/modal/ModalPresenter';
+import Radio from 'totara_core/components/form/Radio';
+import RadioGroup from 'totara_core/components/form/RadioGroup';
 import Table from 'totara_core/components/datatable/Table';
 
 import SubjectInstancesQuery from 'mod_perform/graphql/subject_instances.graphql';
@@ -102,9 +190,16 @@ const ABOUT_OTHERS = 'others';
 
 export default {
   components: {
+    Button,
+    CancelButton,
     Cell,
     HeaderCell,
     Loader,
+    Modal,
+    ModalContent,
+    ModalPresenter,
+    Radio,
+    RadioGroup,
     Table,
   },
   props: {
@@ -129,6 +224,10 @@ export default {
   data() {
     return {
       subjectInstances: [],
+      relationshipSelector: false,
+      selectedSubjectInstance: null,
+      relationshipToRespondAs: null,
+      relationshipConfirmed: false,
     };
   },
   computed: {
@@ -137,6 +236,20 @@ export default {
     },
     isAboutOthers() {
       return this.about === ABOUT_OTHERS;
+    },
+    respondAsOptions() {
+      if (this.selectedSubjectInstance === null) {
+        return [];
+      }
+
+      return this.filterToCurrentUser(
+        this.selectedSubjectInstance.participant_instances
+      );
+    },
+    selectedParticipantInstance() {
+      return this.selectedSubjectInstance.participant_instances.filter(pi => {
+        return pi.core_relationship.id === this.relationshipToRespondAs;
+      })[0];
     },
   },
   apollo: {
@@ -156,12 +269,47 @@ export default {
   methods: {
     /**
      * Get "view" url for a specific user activity.
+     * This method should only be used in the case of single relationships.
      *
-     * @param id {{Number}}
+     * @param subjectInstance {{Object}}
      * @returns {string}
+     * @see showRelationshipSelector
      */
-    getViewActivityUrl({ id }) {
-      return `${this.viewUrl}?subject_instance_id=${id}`;
+    getViewActivityUrl(subjectInstance) {
+      const participant_instance = this.filterToCurrentUser(
+        subjectInstance.participant_instances
+      )[0];
+
+      return this.$url(this.viewUrl, {
+        participant_instance_id: participant_instance.id,
+      });
+    },
+
+    /**
+     * Open the relationship selector modal.
+     */
+    showRelationshipSelector(selectedSubjectInstance) {
+      this.relationshipSelector = true;
+      this.selectedSubjectInstance = selectedSubjectInstance;
+      this.relationshipToRespondAs = this.respondAsOptions[0].core_relationship.id;
+      this.relationshipConfirmed = false;
+    },
+
+    /**
+     * Close the relationship selector modal.
+     */
+    hideRelationshipSelector() {
+      this.relationshipSelector = false;
+      this.selectedSubjectInstance = null;
+      this.relationshipToRespondAs = null;
+      this.relationshipConfirmed = false;
+    },
+
+    confirmRelationshipSelection() {
+      this.relationshipConfirmed = true;
+      window.location = this.$url(this.viewUrl, {
+        participant_instance_id: this.selectedParticipantInstance.id,
+      });
     },
 
     /**
@@ -227,10 +375,17 @@ export default {
      */
     getRelationshipText(participantInstances) {
       let relationships = this.filterToCurrentUser(participantInstances).map(
-        instance => instance.relationship_name
+        instance => instance.core_relationship.name
       );
 
       return relationships.join(', ');
+    },
+
+    /**
+     * Does the logged in user have multiple relationships to the subject on an acitivty.
+     */
+    currentUserHasMultipleRelationships(participantInstances) {
+      return this.filterToCurrentUser(participantInstances).length > 1;
     },
 
     /**
@@ -250,6 +405,11 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
+      "select_relationship_to_respond_as_explanation",
+      "select_relationship_to_respond_as_option",
+      "select_relationship_to_respond_as_title",
+      "toast_error_save_response",
+      "toast_success_save_response",
       "user_activities_status_complete",
       "user_activities_status_header_activity",
       "user_activities_status_header_participation",
@@ -257,9 +417,10 @@ export default {
       "user_activities_status_in_progress",
       "user_activities_status_not_started",
       "user_activities_subject_header",
-      "user_activities_title_header",
-      "toast_success_save_response",
-      "toast_error_save_response"
+      "user_activities_title_header"
+    ],
+    "moodle": [
+      "continue"
     ]
   }
 </lang-strings>

@@ -685,6 +685,13 @@ class mod_perform_generator extends component_generator_base {
         return $subject_instance;
     }
 
+    public function create_section_with_combined_manager_appraiser_for_behat(array $data): void {
+        $subject_user = user::repository()->where('username', $data['subject_username'])->one();
+        $manager_appraiser_user = user::repository()->where('username', $data['manager_appraiser_username'])->one();
+
+        $this->create_section_with_combined_manager_appraiser($subject_user, $manager_appraiser_user, $data['activity_name']);
+    }
+
     private function find_or_make_perform_activity($name, $type): activity {
         if (!$name) {
             return $this->create_activity_in_container(
@@ -844,11 +851,18 @@ class mod_perform_generator extends component_generator_base {
      *
      * @param stdClass|user $subject_user
      * @param stdClass|user $manager_appraiser_user
+     * @param null $activity_name
      * @return participant_section[] [$subject_section, $manager_section, $appraiser_section]
+     * @throws coding_exception
      */
-    public function create_section_with_combined_manager_appraiser($subject_user, $manager_appraiser_user): array {
+    public function create_section_with_combined_manager_appraiser(
+        $subject_user,
+        $manager_appraiser_user,
+        $activity_name = null
+    ): array {
         $subject_instance = $this->create_subject_instance([
-            'subject_is_participating' => true,
+            'activity_name' => $activity_name,
+            'subject_is_participating' => false, // The subject actually is participating, but we will create the instance below.
             'subject_user_id' => $subject_user->id,
             'other_participant_id' => null,
             'include_questions' => false,

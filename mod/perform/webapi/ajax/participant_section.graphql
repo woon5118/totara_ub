@@ -9,7 +9,9 @@ query mod_perform_participant_section($participant_instance_id: core_id!) {
     }
     answerable_participant_instances {
       id
-      relationship_name
+      core_relationship {
+        name
+      }
     }
     section_element_responses {
       section_element_id
