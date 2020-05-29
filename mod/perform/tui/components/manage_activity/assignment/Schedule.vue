@@ -36,9 +36,17 @@
       v-slot="{ getSubmitting, reset }"
       :initial-values="initialValues"
       input-width="full"
+      :validate="validator"
       @submit="trySave"
+      @change="onChange"
     >
       <ScheduleSettings :is-open="scheduleIsOpen" :is-fixed="scheduleIsFixed" />
+
+      <DueDateSettings
+        :is-enabled="dueDateIsEnabled"
+        :is-fixed="dueDateIsFixed"
+        :schedule-is-limited-fixed="!scheduleIsOpen && scheduleIsFixed"
+      />
 
       <div class="tui-performAssignmentSchedule__action">
         <ButtonGroup>
@@ -63,6 +71,7 @@
 // Imports
 import Button from 'totara_core/components/buttons/Button';
 import ButtonGroup from 'totara_core/components/buttons/ButtonGroup';
+import DueDateSettings from 'mod_perform/components/manage_activity/assignment/schedule/DueDateSettings';
 import ScheduleSettings from 'mod_perform/components/manage_activity/assignment/schedule/ScheduleSettings';
 import ScheduleToggles from 'mod_perform/components/manage_activity/assignment/schedule/ScheduleToggles';
 import UpdateTrackScheduleMutation from 'mod_perform/graphql/update_track_schedule';
@@ -80,6 +89,7 @@ export default {
   components: {
     Button,
     ButtonGroup,
+    DueDateSettings,
     ScheduleSettings,
     ScheduleToggles,
     Uniform,
@@ -95,6 +105,7 @@ export default {
       scheduleIsOpen: this.track.schedule_is_open,
       scheduleIsFixed: this.track.schedule_is_fixed,
       dueDateIsEnabled: this.track.due_date_is_enabled,
+      dueDateIsFixed: this.track.due_date_is_fixed || false,
       repeatingIsEnabled: this.track.repeating_is_enabled,
       isSaving: false,
       initialValues: this.getInitialValues(this.track),
@@ -162,6 +173,16 @@ export default {
           unit: track.schedule_dynamic_unit || RELATIVE_DATE_UNIT_DAY,
           direction:
             track.schedule_dynamic_direction || RELATIVE_DATE_DIRECTION_BEFORE,
+        },
+
+        // Due date initial settings
+        dueDateIsFixed: (track.due_date_is_fixed || false).toString(),
+        dueDateFixed: {
+          from: this.getInitialDate(track.due_date_fixed),
+        },
+        dueDateRelative: {
+          count: track.due_date_relative_count || '14', // Uniform required validation doesn't support int 0 at time of writing.
+          unit: track.due_date_relative_unit || RELATIVE_DATE_UNIT_DAY,
         },
       };
     },
@@ -251,10 +272,25 @@ export default {
      * Add the required due date variables for the mutation.
      * @return Object
      */
-    getDueDateVariables() {
+    getDueDateVariables(form) {
       const gql = {};
 
       gql.due_date_is_enabled = this.dueDateIsEnabled;
+
+      if (!this.dueDateIsEnabled) {
+        return gql;
+      }
+
+      if (!this.scheduleIsOpen && this.scheduleIsFixed) {
+        gql.due_date_is_fixed = this.dueDateIsFixed;
+      }
+
+      if (gql.due_date_is_fixed) {
+        gql.due_date_fixed = this.getUnixTime(form.dueDateFixed.from);
+      } else {
+        gql.due_date_relative_count = Number(form.dueDateRelative.count); // Gql does not handle "-1" and an int type.
+        gql.due_date_relative_unit = form.dueDateRelative.unit;
+      }
 
       return gql;
     },
@@ -334,6 +370,7 @@ export default {
   {
     "mod_perform": [
       "activity_instance_creation_heading",
+      "due_date_error_must_be_after_creation_date",
       "save_changes",
       "toast_error_generic_update",
       "toast_success_save_schedule"
