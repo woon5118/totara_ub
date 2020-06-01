@@ -48,6 +48,7 @@ abstract class mod_perform_webapi_resolver_mutation_update_track_schedule_base e
         $activities = $perform_generator->create_full_activities($configuration);
 
         // Set all records to some known values so that we can see which records and fields are being modified.
+        $DB->set_field('perform_track', 'subject_instance_generation', -1);
         $DB->set_field('perform_track', 'schedule_is_open', -1);
         $DB->set_field('perform_track', 'schedule_is_fixed', -1);
         $DB->set_field('perform_track', 'schedule_fixed_from', -1);

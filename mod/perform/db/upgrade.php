@@ -1171,6 +1171,7 @@ function xmldb_perform_upgrade($oldversion) {
         // Perform savepoint reached.
         upgrade_mod_savepoint(true, 2020052600, 'perform');
     }
+
     if ($oldversion < 2020052700) {
         // Define field repeating_is_enabled to be added to perform_track.
         $table = new xmldb_table('perform_track');
@@ -1275,6 +1276,20 @@ function xmldb_perform_upgrade($oldversion) {
 
         // Perform savepoint reached.
         upgrade_mod_savepoint(true, 2020052901, 'perform');
+    }
+
+    if ($oldversion < 2020060300) {
+        // Define field subject_instance_generation to be added to perform_track.
+        $table = new xmldb_table('perform_track');
+        $field = new xmldb_field('subject_instance_generation', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'status');
+
+        // Conditionally launch add field subject_instance_generation.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020060300, 'perform');
     }
 
     return true;

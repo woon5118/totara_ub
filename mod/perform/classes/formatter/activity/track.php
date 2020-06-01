@@ -42,6 +42,7 @@ class track extends entity_model_formatter {
             'id' => null,
             'description' => string_field_formatter::class,
             'status' => null,
+            'subject_instance_generation' => null,
             'schedule_is_open' => null,
             'schedule_is_fixed' => null,
             'schedule_fixed_from' => null,

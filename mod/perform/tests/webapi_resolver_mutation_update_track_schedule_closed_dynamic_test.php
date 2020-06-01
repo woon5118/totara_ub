@@ -63,6 +63,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_
         $args = [
             'track_schedule' => [
                 'track_id' => $track1->id,
+                'subject_instance_generation' => 'ONE_PER_SUBJECT',
                 'schedule_is_open' => false,
                 'schedule_is_fixed' => false,
                 'schedule_dynamic_count_from' => 555,
@@ -97,6 +98,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_
 
         // Manually make the changes that we expect to make.
         $affected_track = $before_tracks[$track1->id];
+        $affected_track->subject_instance_generation = track_entity::SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT;
         $affected_track->schedule_is_open = 0;
         $affected_track->schedule_is_fixed = 0;
         $affected_track->schedule_fixed_from = null;
@@ -124,6 +126,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_
         $args = [
             'track_schedule' => [
                 'track_id' => $this->track1_id,
+                'subject_instance_generation' => 'ONE_PER_SUBJECT',
                 'schedule_is_open' => false,
                 'schedule_is_fixed' => false,
                 'schedule_dynamic_unit' => 'MONTH',
@@ -149,6 +152,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_
         $args = [
             'track_schedule' => [
                 'track_id' => $this->track1_id,
+                'subject_instance_generation' => 'ONE_PER_SUBJECT',
                 'schedule_is_open' => false,
                 'schedule_is_fixed' => false,
                 'schedule_dynamic_count_from' => 555,

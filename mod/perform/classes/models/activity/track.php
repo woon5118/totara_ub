@@ -31,8 +31,8 @@ use mod_perform\dates\resolvers\fixed_range_resolver;
 use mod_perform\dates\resolvers\user_creation_date_resolver;
 use mod_perform\dates\schedule_constants;
 use mod_perform\entities\activity\track as track_entity;
-use mod_perform\state\activity\active;
 use mod_perform\models\activity\track as track_model;
+use mod_perform\state\activity\active;
 use mod_perform\user_groups\grouping;
 use moodle_exception;
 
@@ -43,6 +43,7 @@ use moodle_exception;
  * @property-read int $activity_id
  * @property-read string $description
  * @property-read int $status
+ * @property-read int $subject_instance_generation
  * @property-read bool $schedule_is_open
  * @property-read bool $schedule_is_fixed
  * @property-read int $schedule_fixed_from
@@ -88,6 +89,7 @@ class track extends model {
     protected $model_accessor_whitelist = [
         'activity',
         'assignments',
+        'subject_instance_generation',
         'schedule_dynamic_direction',
         'schedule_dynamic_unit',
         'due_date_relative_unit',
@@ -122,6 +124,7 @@ class track extends model {
         $entity->activity_id = $parent->get_id();
         $entity->description = $description;
         $entity->status = track_status::ACTIVE;
+        $entity->subject_instance_generation = track_entity::SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT;
         $entity->schedule_is_open = true;
         $entity->schedule_is_fixed = true;
         $entity->schedule_fixed_from = time();
@@ -418,6 +421,21 @@ class track extends model {
     }
 
     /**
+     * Set the subject instance generation method
+     *
+     * @param int $method
+     */
+    public function set_subject_instace_generation(int $method): void {
+        if (!isset(self::get_subject_instance_generation_methods()[$method])) {
+            throw new coding_exception('Invalid subject instance generation method');
+        }
+
+        $entity = $this->entity;
+
+        $entity->subject_instance_generation = $method;
+    }
+
+    /**
      * Set the creation range properties.
      * This function resets scheduling properties that are not provided.
      * After calling, use track::update to save the changes to the DB
@@ -560,6 +578,26 @@ class track extends model {
             track_entity::SCHEDULE_DYNAMIC_UNIT_WEEK => schedule_constants::WEEK,
             track_entity::SCHEDULE_DYNAMIC_UNIT_MONTH => schedule_constants::MONTH,
         ];
+    }
+
+    public static function get_subject_instance_generation_methods(): array {
+        return [
+            track_entity::SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT => schedule_constants::ONE_PER_SUBJECT,
+            track_entity::SUBJECT_INSTANCE_GENERATION_ONE_PER_JOB => schedule_constants::ONE_PER_JOB,
+        ];
+    }
+
+    /**
+     * Get the string representation of the subject instance generation method.
+     *
+     * @return string
+     */
+    protected function get_subject_instance_generation(): string {
+        return $this->map_from_entity(
+            $this->entity->subject_instance_generation,
+            track_model::get_subject_instance_generation_methods(),
+            'Unknown subject instance generation method: %s'
+        );
     }
 
     /**

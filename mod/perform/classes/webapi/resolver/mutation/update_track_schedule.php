@@ -121,6 +121,12 @@ class update_track_schedule implements mutation_resolver, has_middleware {
             $track->set_repeating_disabled();
         }
 
+        // Subject instance generation method.
+        $subject_instance_generation_methods = array_flip(track::get_subject_instance_generation_methods());
+        $track->set_subject_instace_generation(
+            $subject_instance_generation_methods[$track_schedule['subject_instance_generation']]
+        );
+
         $track->update();
 
         $ec->set_relevant_context($context);
@@ -204,27 +210,6 @@ class update_track_schedule implements mutation_resolver, has_middleware {
         foreach ($unwanted_fields as $unwanted_field) {
             if (isset($schedule[$unwanted_field]) && !is_null($schedule[$unwanted_field])) {
                 $errors[] = 'Given the specified configuration, an unexpected field was found: ' . $unwanted_field;
-            }
-        }
-
-        if (isset($schedule['schedule_dynamic_unit'])) {
-            $dynamic_units = array_flip(track::get_dynamic_schedule_units());
-            if (!isset($dynamic_units[$schedule['schedule_dynamic_unit']])) {
-                $errors[] = 'Invalid dynamic unit specified: ' . $schedule['schedule_dynamic_unit'];
-            }
-        }
-
-        if (isset($schedule['schedule_dynamic_direction'])) {
-            $dynamic_directions = array_flip(track::get_dynamic_schedule_directions());
-            if (!isset($dynamic_directions[$schedule['schedule_dynamic_direction']])) {
-                $errors[] = 'Invalid dynamic direction specified: ' . $schedule['schedule_dynamic_direction'];
-            }
-        }
-
-        if (isset($schedule['due_date_relative_unit'])) {
-            $relative_units = array_flip(track::get_dynamic_schedule_units());
-            if (!isset($relative_units[$schedule['due_date_relative_unit']])) {
-                $errors[] = 'Invalid due date relative unit specified: ' . $schedule['due_date_relative_unit'];
             }
         }
 

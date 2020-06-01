@@ -3,6 +3,7 @@ query mod_perform_track($track_id: param_integer!) {
     id
     description
     status
+    subject_instance_generation
     schedule_is_open
     schedule_is_fixed
     schedule_fixed_from

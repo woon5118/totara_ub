@@ -59,6 +59,7 @@ class mod_perform_webapi_resolver_mutation_update_track_repeating_testcase
         $args = [
             'track_schedule' => [
                 'track_id' => $track1->id,
+                'subject_instance_generation' => 'ONE_PER_SUBJECT',
                 'schedule_is_open' => true,
                 'schedule_is_fixed' => true,
                 'schedule_fixed_from' => 222,
@@ -83,6 +84,7 @@ class mod_perform_webapi_resolver_mutation_update_track_repeating_testcase
 
         // Manually make the changes that we expect to make.
         $affected_track = $before_tracks[$track1->id];
+        $affected_track->subject_instance_generation = track_entity::SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT;
         $affected_track->schedule_is_open = 1;
         $affected_track->schedule_is_fixed = 1;
         $affected_track->schedule_fixed_from = 222;

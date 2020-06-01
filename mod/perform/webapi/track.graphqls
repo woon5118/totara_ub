@@ -21,10 +21,19 @@ enum mod_perform_track_dynamic_direction_enums {
   BEFORE
 }
 
+"""
+A list of possible job behaviours for subject instance generation which a track can be set to
+"""
+enum mod_perform_track_subject_instance_generation_enums {
+  ONE_PER_SUBJECT
+  ONE_PER_JOB
+}
+
 type mod_perform_track {
   id: core_id!
   description(format: core_format = HTML): String!
   status: Int!
+  subject_instance_generation: mod_perform_track_subject_instance_generation_enums!
   schedule_is_open: Boolean!
   schedule_is_fixed: Boolean!
   schedule_fixed_from: Int
@@ -70,6 +79,7 @@ Input parameters required for open-ended track schedule period using fixed dates
 """
 input mod_perform_track_schedule_input {
   track_id: core_id!
+  subject_instance_generation: mod_perform_track_subject_instance_generation_enums!
   schedule_is_open: param_boolean!
   schedule_is_fixed: param_boolean!
   schedule_fixed_from: param_integer

@@ -3,6 +3,7 @@ mutation mod_perform_create_track($details: mod_perform_create_track_input!) {
     id
     description
     status
+    subject_instance_generation
     schedule_is_open
     schedule_is_fixed
     schedule_fixed_from

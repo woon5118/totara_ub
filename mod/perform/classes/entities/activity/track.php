@@ -38,6 +38,7 @@ use core\orm\entity\relations\has_many_through;
  * @property int $status track status
  * @property bool $schedule_is_open
  * @property bool $schedule_is_fixed
+ * @property int $subject_instance_generation the system used to decide what subject instances are generated
  * @property int $schedule_fixed_from when schedule type is FIXED, contains the start date of assignment
  * @property int $schedule_fixed_to when schedule type is CLOSED_FIXED, contains the end date of assignment
  * @property int $schedule_dynamic_count_from number of units
@@ -66,6 +67,9 @@ class track extends entity {
 
     public const STATUS_ACTIVE = 1;
     public const STATUS_PAUSED = 0;
+
+    public const SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT = 0;
+    public const SUBJECT_INSTANCE_GENERATION_ONE_PER_JOB = 1;
 
     public const SCHEDULE_DYNAMIC_UNIT_DAY = 0;
     public const SCHEDULE_DYNAMIC_UNIT_WEEK = 1;
