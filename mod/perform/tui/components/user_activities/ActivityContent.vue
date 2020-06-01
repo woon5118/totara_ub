@@ -321,8 +321,6 @@ export default {
       } catch (e) {
         this.showErrorNotification();
         this.isSaving = false;
-      } finally {
-        this.isSaving = false;
       }
     },
 

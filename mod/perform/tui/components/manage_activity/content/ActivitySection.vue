@@ -252,9 +252,9 @@ export default {
         const savedSection = await this.save();
         this.updateSection(savedSection);
         this.$emit('mutation-success');
+        this.isSaving = false;
       } catch (e) {
         this.$emit('mutation-error', e);
-      } finally {
         this.isSaving = false;
       }
     },

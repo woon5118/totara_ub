@@ -114,6 +114,7 @@ export default {
             message: this.$str('toast_success_activity_update', 'mod_perform'),
             type: 'success',
           });
+          this.formDisabled = false;
         })
         .catch(() => {
           this.close_on_completion = this.activity.close_on_completion;
@@ -122,8 +123,6 @@ export default {
             message: this.$str('toast_error_generic_update', 'mod_perform'),
             type: 'error',
           });
-        })
-        .finally(() => {
           this.formDisabled = false;
         });
     },

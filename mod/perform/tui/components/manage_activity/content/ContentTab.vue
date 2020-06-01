@@ -82,9 +82,9 @@ export default {
         // const updatedActivity = await this.$_save();
         this.updateActivity(updatedActivity);
         this.$emit('mutation-success');
+        this.isSaving = false;
       } catch (e) {
         this.$emit('mutation-error', e);
-      } finally {
         this.isSaving = false;
       }
     },

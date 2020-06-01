@@ -249,8 +249,6 @@ export default {
         this.$emit('mutation-error', e);
         // If something goes wrong during create, allow the user to try again.
         this.isSaving = false;
-      } finally {
-        this.isSaving = false;
       }
     },
 

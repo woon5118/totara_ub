@@ -232,11 +232,11 @@ export default {
             ),
             type: 'success',
           });
+          this.$emit('refetch');
+          this.closeActivateModal();
         })
         .catch(() => {
           this.showErrorNotification();
-        })
-        .finally(() => {
           this.$emit('refetch');
           this.closeActivateModal();
         });
