@@ -29,6 +29,7 @@ import {
 import amd from 'totara_core/amd';
 
 jest.mock('totara_core/amd');
+jest.mock('totara_core/pending');
 
 const M = (global.M = {
   util: {
