@@ -116,17 +116,6 @@ class redis extends handler {
     }
 
     /**
-     * Start the session.
-     *
-     * @return bool success
-     */
-    public function start() {
-        $result = parent::start();
-
-        return $result;
-    }
-
-    /**
      * Init session handler.
      */
     public function init() {
@@ -344,6 +333,10 @@ class redis extends handler {
      * @throws exception When we are unable to obtain a session lock.
      */
     protected function lock_session($id) {
+        if (!$this->uselocking) {
+            return false;
+        }
+
         $lockkey = $id.".lock";
 
         $haslock = isset($this->locks[$id]) && $this->time() < $this->locks[$id];
@@ -429,5 +422,16 @@ class redis extends handler {
         }
 
         $this->handler_destroy($sid);
+    }
+
+    /**
+     * Does this handler support both locking and non-locking sessions?
+     *
+     * @since Totara 13.0
+     *
+     * @return bool
+     */
+    public function is_locking_configurable(): bool {
+        return true;
     }
 }

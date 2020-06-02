@@ -34,7 +34,7 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class database extends handler {
-    /** @var \stdClass $record session record */
+    /** @var int|null $recordid session record id */
     protected $recordid = null;
 
     /** @var \moodle_database $database session database */
@@ -136,7 +136,9 @@ class database extends handler {
     public function handler_close() {
         if ($this->recordid) {
             try {
-                $this->database->release_session_lock($this->recordid);
+                if ($this->uselocking) {
+                    $this->database->release_session_lock($this->recordid);
+                }
             } catch (\Exception $ex) {
                 // Ignore any problems.
             }
@@ -171,8 +173,10 @@ class database extends handler {
                 return '';
             }
             if (!$this->recordid) {
-                // Lock session if exists and not already locked.
-                $this->database->get_session_lock($record->id, $this->acquiretimeout);
+                if ($this->uselocking) {
+                    // Lock session if exists and not already locked.
+                    $this->database->get_session_lock($record->id, $this->acquiretimeout);
+                }
                 $this->recordid = $record->id;
             }
         } catch (\dml_sessionwait_exception $ex) {
@@ -270,7 +274,9 @@ class database extends handler {
 
         if ($this->recordid and $session->id == $this->recordid) {
             try {
-                $this->database->release_session_lock($this->recordid);
+                if ($this->uselocking) {
+                    $this->database->release_session_lock($this->recordid);
+                }
             } catch (\Exception $ex) {
                 // Ignore problems.
             }
@@ -298,6 +304,17 @@ class database extends handler {
         }
         $params = array('purgebefore' => (time() - $stalelifetime));
         $this->database->delete_records_select('sessions', 'userid = 0 AND timemodified < :purgebefore', $params);
+        return true;
+    }
+
+    /**
+     * Does this handler support both locking and non-locking sessions?
+     *
+     * @since Totara 13.0
+     *
+     * @return bool
+     */
+    public function is_locking_configurable(): bool {
         return true;
     }
 }

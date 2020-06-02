@@ -70,15 +70,16 @@ class memcache extends handler {
     }
 
     /**
-     * Starts the session.
+     * Start the session.
      *
+     * @param bool $uselocking
      * @return bool success
      */
-    public function start() {
+    public function start(bool $uselocking) {
         $default = ini_get('max_execution_time');
         set_time_limit($this->acquiretimeout);
 
-        $result = parent::start();
+        $result = parent::start($uselocking);
 
         set_time_limit($default);
         return $result;
@@ -200,5 +201,17 @@ class memcache extends handler {
             $memcache->delete($sid);
             $memcache->close();
         }
+    }
+
+    /**
+     * Does this handler support both locking and non-locking sessions?
+     *
+     * @since Totara 13.0
+     *
+     * @return bool
+     */
+    public function is_locking_configurable(): bool {
+        // There does not appear to be any option to skip locking.
+        return false;
     }
 }

@@ -44,12 +44,11 @@ class memcached extends handler {
     protected $acquiretimeout = 120;
     /**
      * @var int $lockexpire how long to wait before expiring the lock so that other requests
-     * may continue execution, ignored if PECL memcached is below version 2.2.0.
+     * may continue execution,.
      */
     protected $lockexpire = 7200;
     /**
-     *
-     * @var integer $lockretrysleep Used for memcached 3.x (PHP7), the amount of time to
+     * @var integer $lockretrysleep The amount of time to
      * sleep between attempts to acquire the session lock. Mimics the deprecated config
      * memcached.sess_lock_wait.
      */
@@ -94,20 +93,24 @@ class memcached extends handler {
 
     /**
      * Start the session.
+     *
+     * @param bool $uselocking
      * @return bool success
      */
-    public function start() {
-        // NOTE: memcached before 2.2.0 expires session locks automatically after max_execution_time,
-        //       this leads to major difference compared to other session drivers that timeout
-        //       and stop the second request execution instead.
+    public function start(bool $uselocking) {
+        if (!$uselocking) {
+            ini_set('memcached.sess_locking', '0');
+            return parent::start(false);
+        }
 
+        ini_set('memcached.sess_locking', '1');
         $default = ini_get('max_execution_time');
         set_time_limit($this->acquiretimeout);
 
         $isnewsession = empty($_COOKIE[session_name()]);
         $starttimer = microtime(true);
 
-        $result = parent::start();
+        $result = parent::start(true);
 
         // If session_start returned TRUE, but it took as long
         // as the timeout value, and the $_SESSION returned is
@@ -133,10 +136,6 @@ class memcached extends handler {
         if (!extension_loaded('memcached')) {
             throw new exception('sessionhandlerproblem', 'error', '', null, 'memcached extension is not loaded');
         }
-        $version = phpversion('memcached');
-        if (!$version or version_compare($version, '2.0') < 0) {
-            throw new exception('sessionhandlerproblem', 'error', '', null, 'memcached extension version must be at least 2.0');
-        }
         if (empty($this->savepath)) {
             throw new exception('sessionhandlerproblem', 'error', '', null, '$CFG->session_memcached_save_path must be specified in config.php');
         }
@@ -144,39 +143,29 @@ class memcached extends handler {
         ini_set('session.save_handler', 'memcached');
         ini_set('session.save_path', $this->savepath);
         ini_set('memcached.sess_prefix', $this->prefix);
-        ini_set('memcached.sess_locking', '1'); // Locking is required!
         ini_set('memcached.sess_lock_expire', $this->lockexpire);
 
-        // Try to configure lock and expire timeouts - ignored if memcached is before version 2.2.0.
-        if (version_compare($version, '3.0.0-dev') >= 0) {
-            // With memcached 3.x (PHP 7) we configure the max retries to make
-            // and the time to sleep between each retry. There are two sleep
-            // config values, an initial and a max value. After each attempt
-            // the memcached module adjusts the sleep value to be the lesser of
-            // the configured max value, or 2X the previous value. With default
-            // memcached.ini configs (5, 1s, 2s) the result is only 5 attempts
-            // to lock over 9 sec. To mimic the behavior of the 2.2.x module so
-            // we get more attempts and much more frequently, config both sleep
-            // values to the old default value of 150 msec (making it constant)
-            // and calculate number of retries using the existing Moodle config
-            // $CFG->session_memcached_acquire_lock_timeout. Doing this so
-            // admins configure session lock attempt timeout in familiar terms,
-            // and more straight-forward to detect if lock attempt timeout has
-            // occurred in start(). If _min and _max values are not equal, the
-            // actual lock acquire timeout will not be the expected configured
-            // value in $CFG->session_memcached_acquire_lock_timeout; this will
-            // cause session data loss when failure to acquire the lock is not
-            // detected.
-            ini_set('memcached.sess_lock_wait_min', $this->lockretrysleep);
-            ini_set('memcached.sess_lock_wait_max', $this->lockretrysleep);
-            ini_set('memcached.sess_lock_retries', (int)(($this->acquiretimeout * 1000) / $this->lockretrysleep) + 1);
-        } else {
-            // With memcached 2.2.x we configure max time to attempt lock, and
-            // accept default value (in memcached.ini) for sleep time between
-            // each attempt (usually 150 msec), then memcached calculates the
-            // max number of retries to make.
-            ini_set('memcached.sess_lock_max_wait', $this->acquiretimeout);
-        }
+        // With memcached 3.x (PHP 7) we configure the max retries to make
+        // and the time to sleep between each retry. There are two sleep
+        // config values, an initial and a max value. After each attempt
+        // the memcached module adjusts the sleep value to be the lesser of
+        // the configured max value, or 2X the previous value. With default
+        // memcached.ini configs (5, 1s, 2s) the result is only 5 attempts
+        // to lock over 9 sec. To mimic the behavior of the 2.2.x module so
+        // we get more attempts and much more frequently, config both sleep
+        // values to the old default value of 150 msec (making it constant)
+        // and calculate number of retries using the existing Moodle config
+        // $CFG->session_memcached_acquire_lock_timeout. Doing this so
+        // admins configure session lock attempt timeout in familiar terms,
+        // and more straight-forward to detect if lock attempt timeout has
+        // occurred in start(). If _min and _max values are not equal, the
+        // actual lock acquire timeout will not be the expected configured
+        // value in $CFG->session_memcached_acquire_lock_timeout; this will
+        // cause session data loss when failure to acquire the lock is not
+        // detected.
+        ini_set('memcached.sess_lock_wait_min', $this->lockretrysleep);
+        ini_set('memcached.sess_lock_wait_max', $this->lockretrysleep);
+        ini_set('memcached.sess_lock_retries', (int)(($this->acquiretimeout * 1000) / $this->lockretrysleep) + 1);
     }
 
     /**
@@ -270,4 +259,14 @@ class memcached extends handler {
         }
     }
 
+    /**
+     * Does this handler support both locking and non-locking sessions?
+     *
+     * @since Totara 13.0
+     *
+     * @return bool
+     */
+    public function is_locking_configurable(): bool {
+        return true;
+    }
 }

@@ -84,7 +84,7 @@ function close_connection() {
         ob_end_clean();
     }
     if (session_id()) {
-        session_write_close();
+        core\session\manager::write_close();
     }
     if (function_exists('fastcgi_finish_request')) {
         fastcgi_finish_request();

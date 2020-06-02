@@ -356,9 +356,8 @@ $CFG->directorypermissions = 02777;
 //      $CFG->session_memcached_save_path = '127.0.0.1:11211';
 //      $CFG->session_memcached_prefix = 'memc.sess.key.';
 //      $CFG->session_memcached_acquire_lock_timeout = 120;
-//      $CFG->session_memcached_lock_expire = 7200;       // Ignored if PECL memcached is below version 2.2.0
-//      $CFG->session_memcached_lock_retry_sleep = 150;   // Spin-lock retry sleeptime (msec). Only effective
-//                                                        // for tuning php-memcached 3.0.x (PHP 7)
+//      $CFG->session_memcached_lock_expire = 7200;
+//      $CFG->session_memcached_lock_retry_sleep = 150;   // Spin-lock retry sleeptime (msec).
 //
 //   Redis session handler (requires redis server and redis extension):
 //      $CFG->session_handler_class = '\core\session\redis';
@@ -387,6 +386,10 @@ $CFG->directorypermissions = 02777;
 //
 // Following setting allows you to alter how frequently is timemodified updated in sessions table.
 //      $CFG->session_update_timemodified_frequency = 20; // In seconds.
+//
+// For performance reasons some scripts (such as file serving) are by default allowed to acquire
+// read-only sessions without locking. You can disable this feature by uncommenting following line:
+//      $CFG->allow_lockless_readonly_sessions = false;
 //
 // If this setting is set to true, then Totara will track the IP of the
 // current user to make sure it hasn't changed during a session.  This

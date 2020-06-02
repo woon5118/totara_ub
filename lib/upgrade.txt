@@ -3,6 +3,8 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* Custom session handlers must add new $uselocking constructor parameter and implement
+  \core\session\handler::is_locking_configurable() method.
 * All classes that override admin_setting::add_to_config_log() must be changed to use public access.
 * \core\event\admin_settings_changed was replaced by \core\hook\admin_setting_changed for security reasons,
   code needs to be updated to use new hook instead of previous event.

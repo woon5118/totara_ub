@@ -34,11 +34,17 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class handler {
+    /** @var bool $uselocking */
+    protected $uselocking;
+
     /**
      * Start the session.
+     *
+     * @param bool $uselocking
      * @return bool success
      */
-    public function start() {
+    public function start(bool $uselocking) {
+        $this->uselocking = $uselocking;
         return session_start();
     }
 
@@ -68,4 +74,13 @@ abstract class handler {
      * @param string $sid
      */
     public abstract function kill_session($sid);
+
+    /**
+     * Does this handler support both locking and non-locking sessions?
+     *
+     * @since Totara 13.0
+     *
+     * @return bool
+     */
+    abstract public function is_locking_configurable(): bool;
 }

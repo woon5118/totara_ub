@@ -63,13 +63,51 @@ class manager {
     }
 
     /**
+     * Is the current page request compatible with
+     * read only sessions without locks?
+     *
+     * @return bool
+     */
+    protected static function is_lockless_readonly_session_expected(): bool {
+        global $CFG, $SCRIPT;
+
+        // Enable by default for now because we want this to be beta-tested by everybody.
+        if (isset($CFG->allow_lockless_readonly_sessions) && !$CFG->allow_lockless_readonly_sessions) {
+            return false;
+        }
+
+        // NOTE: it will be safer to hardcode allowed scripts here instead of
+        //       allowing devs to add defines to random scripts.
+
+        if ($SCRIPT === '/pluginfile.php') {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Is regular active session expected in this script/request?
+     *
+     * @since Totara 13.0
+     *
+     * @return bool
+     */
+    public static function is_active_session_expected(): bool {
+        global $DB, $CFG;
+        if (empty($DB) or empty($CFG->version) or !defined('NO_MOODLE_COOKIES') or NO_MOODLE_COOKIES or CLI_SCRIPT) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
      * Start user session.
      *
      * Note: This is intended to be called only from lib/setup.php!
      */
     public static function start() {
-        global $CFG, $DB;
-
         if (isset(self::$sessionactive)) {
             debugging('Session was already started!', DEBUG_DEVELOPER);
             return;
@@ -79,7 +117,7 @@ class manager {
 
         // Init the session handler only if everything initialised properly in lib/setup.php file
         // and the session is actually required.
-        if (empty($DB) or empty($CFG->version) or !defined('NO_MOODLE_COOKIES') or NO_MOODLE_COOKIES or CLI_SCRIPT) {
+        if (!self::is_active_session_expected()) {
             self::$sessionactive = false;
             self::init_empty_session();
             return;
@@ -90,14 +128,39 @@ class manager {
             self::prepare_cookies();
             $isnewsession = empty($_COOKIE[session_name()]);
 
-            if (!self::$handler->start()) {
+            if ($isnewsession) {
+                $readonly = false;
+                $requirelock = true;
+            } else {
+                $readonly = self::is_lockless_readonly_session_expected();
+                if (self::$handler->is_locking_configurable()) {
+                    $requirelock = !$readonly;
+                } else {
+                    $requirelock = true;
+                }
+            }
+
+            if (!self::$handler->start($requirelock)) {
                 // Could not successfully start/recover session.
                 throw new \core\session\exception(get_string('servererror'));
             }
 
+            $initialsid = session_id();
             self::initialise_user_session($isnewsession);
             self::$sessionactive = true; // Set here, so the session can be cleared if the security check fails.
             self::check_security();
+
+            if ($readonly && $initialsid !== session_id()) {
+                // Session ID was regenerated, that means we should not allow read only sessions
+                // because things might break badly, lack of locking is just a small risk here.
+                $readonly = false;
+            }
+            if ($readonly) {
+                // Make sure the _SESSION changes are not permanent,
+                // this also releases locks for handlers that always require them.
+                session_abort();
+                self::$sessionactive = false;
+            }
 
             // Link global $USER and $SESSION,
             // this is tricky because PHP does not allow references to references
@@ -113,6 +176,7 @@ class manager {
             unset($GLOBALS['USER']->ignoresesskey);
 
         } catch (\Exception $ex) {
+            @session_abort(); // Just in case there would be an open session.
             self::init_empty_session();
             self::$sessionactive = false;
             throw $ex;
@@ -643,24 +707,14 @@ class manager {
      * Unblocks the sessions, other scripts may start executing in parallel.
      */
     public static function write_close() {
-        if (version_compare(PHP_VERSION, '5.6.0', '>=')) {
-            // More control over whether session data
-            // is persisted or not.
-            if (self::$sessionactive && session_id()) {
-                // Write session and release lock only if
-                // indication session start was clean.
-                session_write_close();
-            } else {
-                // Otherwise, if possibile lock exists want
-                // to clear it, but do not write session.
-                @session_abort();
-            }
+        if (self::$sessionactive && session_id()) {
+            // Write session and release lock only if
+            // indication session start was clean.
+            session_write_close();
         } else {
-            // Any indication session was started, attempt
-            // to close it.
-            if (self::$sessionactive || session_id()) {
-                session_write_close();
-            }
+            // Otherwise keep whatever data we have in session storage
+            // and release locks, keep $_SESSION the way it is.
+            @session_abort();
         }
         self::$sessionactive = false;
     }

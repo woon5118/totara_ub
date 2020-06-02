@@ -1871,6 +1871,10 @@ class cache_session extends cache {
      * @return bool True on success, false otherwise.
      */
     public function set($key, $data) {
+        if ($this->is_session_closed()) {
+            // No writes if session is already closed!
+            return false;
+        }
         $this->check_tracked_user();
         $loader = $this->get_loader();
         if ($loader !== false) {
@@ -1906,6 +1910,10 @@ class cache_session extends cache {
      * @return bool True of success, false otherwise.
      */
     public function delete($key, $recurse = true) {
+        if ($this->is_session_closed()) {
+            // No writes if session is already closed!
+            return false;
+        }
         $parsedkey = $this->parse_key($key);
         if ($recurse && $this->get_loader() !== false) {
             // Delete from the bottom of the stack first.
@@ -2025,6 +2033,10 @@ class cache_session extends cache {
      * @return int The number of items successfully deleted.
      */
     public function delete_many(array $keys, $recurse = true) {
+        if ($this->is_session_closed()) {
+            // No writes if session is already closed!
+            return 0;
+        }
         $parsedkeys = array_map(array($this, 'parse_key'), $keys);
         if ($recurse && $this->get_loader() !== false) {
             // Delete from the bottom of the stack first.
@@ -2057,6 +2069,10 @@ class cache_session extends cache {
      *      ... if they care that is.
      */
     public function set_many(array $keyvaluearray) {
+        if ($this->is_session_closed()) {
+            // No writes if session is already closed!
+            return 0;
+        }
         $this->check_tracked_user();
         $loader = $this->get_loader();
         if ($loader !== false) {
@@ -2216,6 +2232,19 @@ class cache_session extends cache {
      */
     protected function use_static_acceleration() {
         return false;
+    }
+
+    /**
+     * Is the session not active any more?
+     *
+     * @return bool
+     */
+    protected function is_session_closed(): bool {
+        if (PHPUNIT_TEST) {
+            // We need to test session stores.
+            return false;
+        }
+        return !\core\session\manager::is_session_active();
     }
 }
 

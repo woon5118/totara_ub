@@ -118,4 +118,16 @@ class file extends handler {
             @unlink($sessionfile);
         }
     }
+
+    /**
+     * Does this handler support both locking and non-locking sessions?
+     *
+     * @since Totara 13.0
+     *
+     * @return bool
+     */
+    public function is_locking_configurable(): bool {
+        // Without locking we might read incomplete content during file writing.
+        return false;
+    }
 }
