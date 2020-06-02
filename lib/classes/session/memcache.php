@@ -17,8 +17,7 @@
 /**
  * Memcache based session handler.
  *
- * This is based on the memcached code. It lacks some features, such as
- * locking options, but appears to work in practice.
+ * @deprecated since Totara 13.0, use memcached handler instead
  *
  * Note: You may need to manually configure redundancy and fail-over
  * if you specify multiple servers.

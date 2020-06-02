@@ -377,9 +377,8 @@ $CFG->directorypermissions = 02777;
 //      $CFG->session_handler_class = '\core\session\memcache';
 //      $CFG->session_memcache_save_path = '127.0.0.1:11211';
 //      $CFG->session_memcache_acquire_lock_timeout = 120;
-//      ** NOTE: Memcache extension has less features than memcached and may be
-//         less reliable. Use memcached where possible or if you encounter
-//         session problems. **
+//      ** NOTE: Memcache session handler is deprecated and will be removed in Totara 14.0,
+//               use memcached session handler instead. **
 //
 // Please be aware that when selecting either Memcached or Memcache for sessions that it is advised to use a dedicated
 // memcache server. The memcache and memcached extensions do not provide isolated environments for individual uses.
