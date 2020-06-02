@@ -54,7 +54,7 @@ if ($USER->id != $userid && !\totara_job\job_assignment::is_managing($USER->id, 
 $output = $PAGE->get_renderer('totara_reportbuilder');
 
 if ($USER->id != $userid) {
-    $strheading = get_string('pastbookingsfor', 'totara_core').fullname($user, true);
+    $strheading = get_string('pastbookingsforheading', 'totara_core', fullname($user, true));
     if (advanced_feature::is_enabled('myteam')) {
         $menuitem = 'myteam';
         $url = new moodle_url('/my/teammembers.php');

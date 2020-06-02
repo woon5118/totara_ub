@@ -58,7 +58,7 @@ $string['authdeleteusersfullproper'] = 'Full with random username';
 $string['authdeleteuserspartial'] = 'Keep username, email and ID number (legacy)';
 $string['blended'] = 'Blended';
 $string['bookings'] = 'Bookings';
-$string['bookingsfor'] = 'Bookings for ';
+$string['bookingsforheading'] = 'Bookings for {$a}';
 $string['browse'] = 'Browse';
 $string['browsecategories'] = 'Browse Categories';
 $string['cachedef_completion_progressinfo'] = 'Completion progressinfo cache';
@@ -476,7 +476,7 @@ $string['organisation_typeicon'] = 'Organisation type icon';
 $string['organisationatcompletion'] = 'Organisation at completion';
 $string['organisationsarrow'] = 'Organisations > ';
 $string['participant'] = 'Participant';
-$string['pastbookingsfor'] = 'Past Bookings for ';
+$string['pastbookingsforheading'] = 'Past Bookings for {$a}';
 $string['pathtowkhtmltopdf'] = 'Path to wkhtmltopdf';
 $string['pathtowkhtmltopdf_help'] = 'Specify location of the wkhtmltopdf executable file. wkhtmltopdf is used for creation of PDF snapshots.';
 $string['performinglocalpostinst'] = 'Local Post-installation setup';
@@ -721,3 +721,5 @@ $string['menuitem:topnavigation'] = 'Top navigation';
 
 // Deprecated in 13
 $string['strftimedateshortmonth'] = '%d %b %Y';
+$string['bookingsfor'] = 'Bookings for ';
+$string['pastbookingsfor'] = 'Past Bookings for ';

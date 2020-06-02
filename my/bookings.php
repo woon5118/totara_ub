@@ -49,7 +49,7 @@ if (!$user = $DB->get_record('user', array('id' => $userid))) {
 $renderer = $PAGE->get_renderer('totara_reportbuilder');
 
 if ($USER->id != $userid) {
-    $strheading = get_string('bookingsfor', 'totara_core').fullname($user, true);
+    $strheading = get_string('bookingsforheading', 'totara_core', fullname($user, true));
     if (advanced_feature::is_enabled('myteam')) {
         $menuitem = 'myteam';
         $url = new moodle_url('/my/teammembers.php');
