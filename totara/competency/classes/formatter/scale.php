@@ -23,14 +23,14 @@
 
 namespace totara_competency\formatter;
 
-use core\orm\formatter\entity_formatter;
 use core\webapi\formatter\field\date_field_formatter;
 use core\webapi\formatter\field\string_field_formatter;
+use core\webapi\formatter\formatter;
 
 /**
- * @property scale $object
+ * @property \totara_competency\entities\scale $object
  */
-class scale extends entity_formatter {
+class scale extends formatter {
 
     protected function get_map(): array {
         return [
@@ -42,6 +42,14 @@ class scale extends entity_formatter {
             'defaultid' => null,
             'values' => null
         ];
+    }
+
+    protected function get_field(string $field) {
+        return $this->object->$field;
+    }
+
+    protected function has_field(string $field): bool {
+        return isset($this->object->$field);
     }
 
 }
