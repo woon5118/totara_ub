@@ -286,7 +286,7 @@ $string['eventtimenowcron'] = 'Send immediately';
 $string['eventtiming'] = 'Timing';
 $string['eventtiming_help'] = '<p>This setting determines when the message will be sent out. There are three options:</p>
 
-* **Send Immedately** - Primarily for a user activated event like appraisal activation or stage completion, the message will be triggered on the next cron after the event occurs.
+* **Send Immediately** - Primarily for a user activated event like appraisal activation or stage completion, the message will be triggered on the next cron after the event occurs.
 * **Send Before** - Only for scheduled events like stage due dates, this will cause the message to be sent via the cron X days/weeks/months before the event is scheduled to happen. Other events can not use this timing since the system doesn\'t know when the event is going to happen.
 * **Send After** - For all events scheduled or user activated, this will cause the message to be sent via the cron X days/weeks/months after the event occurs. This can be set to 0 days to send on the first cron run after the event occurs.';
 $string['eventupdatedappraisal'] = 'Updated Appraisal';

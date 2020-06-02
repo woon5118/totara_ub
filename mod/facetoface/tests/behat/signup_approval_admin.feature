@@ -168,7 +168,7 @@ Feature: Seminar Signup Admin Approval
     And I am on "Classroom Connect Course" course homepage
     And I click on "Go to event" "link" in the "Upcoming" "table_row"
     And I should see "Manager and Administrative approval"
-    And I should see "Managers from all job assignements will be chosen if left empty"
+    And I should see "Managers from all job assignments will be chosen if left empty"
     And I press "Request approval"
     Then I should see "Your request was sent to your manager for approval."
     And I run all adhoc tasks
