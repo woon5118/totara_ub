@@ -570,5 +570,7 @@ function xmldb_totara_core_install() {
     // Migrate obsolete user fields.
     totara_core_upgrade_migrate_removed_user_fields();
 
+    totara_core_upgrade_create_relationship('totara_core\relationship\resolvers\subject');
+
     return true;
 }

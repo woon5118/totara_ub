@@ -51,6 +51,24 @@ type totara_core_learning_item {
 }
 
 """
+Represents a way that a user is related to other users.
+"""
+type totara_core_relationship {
+  """
+  Relationship ID.
+  """
+  id: core_id!
+  """
+  Name of the relationship.
+  """
+  name(format: core_format = PLAIN): String!
+  """
+  When this relationship was created.
+  """
+  created_at(format: core_date_format = TIMESTAMP): core_date!
+}
+
+"""
 TUI resource bundle
 """
 type totara_core_tui_bundle {

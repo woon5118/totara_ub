@@ -1099,5 +1099,47 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020050100, 'totara', 'core');
     }
 
+    if ($oldversion < 2020060200) {
+        // Define table totara_core_relationship to be created.
+        $table = new xmldb_table('totara_core_relationship');
+
+        // Adding fields to table totara_core_relationship.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('created_at', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'id');
+
+        // Adding keys to table totara_core_relationship.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+
+        // Conditionally launch create table for totara_core_relationship.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Define table totara_core_relationship_resolver to be created.
+        $table = new xmldb_table('totara_core_relationship_resolver');
+
+        // Adding fields to table totara_core_relationship_resolver.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('relationship_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('class_name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table totara_core_relationship_resolver.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('relationship_id', XMLDB_KEY_FOREIGN, array('relationship_id'), 'totara_core_relationship', array('id'), 'cascade');
+
+        // Adding indexes to table totara_core_relationship_resolver.
+        $table->add_index('relationship_id_class_name', XMLDB_INDEX_UNIQUE, array('relationship_id', 'class_name'));
+
+        // Conditionally launch create table for totara_core_relationship_resolver.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        totara_core_upgrade_create_relationship('totara_core\relationship\resolvers\subject');
+
+        // Core savepoint reached.
+        upgrade_plugin_savepoint(true, 2020060200, 'totara', 'core');
+    }
+
     return true;
 }

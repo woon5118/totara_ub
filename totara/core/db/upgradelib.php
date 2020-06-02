@@ -1224,3 +1224,38 @@ function totara_core_clear_preview_image_cache(?string $preview_mode = null): vo
         }
     }
 }
+
+/**
+ * Create a relationship and corresponding relationship resolver record for a relationship class.
+ *
+ * Please note that if you refactor/move a relationship resolver class, you will need to
+ * update all corresponding relationship resolver table rows that use that class_name!
+ *
+ * @param string $resolver_class_name
+ *
+ * @since Totara 13.0
+ */
+function totara_core_upgrade_create_relationship($resolver_class_name) {
+    global $DB;
+
+    $record = $DB->get_record(
+        'totara_core_relationship_resolver',
+        ['class_name' => $resolver_class_name]
+    );
+
+    if ($record) {
+        return;
+    }
+
+    $DB->transaction(static function () use ($DB, $resolver_class_name) {
+        $relationship_id = $DB->insert_record('totara_core_relationship', [
+            'created_at' => time(),
+        ]);
+
+
+        $DB->insert_record('totara_core_relationship_resolver', [
+            'relationship_id' => $relationship_id,
+            'class_name' => $resolver_class_name,
+        ]);
+    });
+}

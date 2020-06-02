@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="totara/core/db" VERSION="20191030" COMMENT="XMLDB file for Moodle totara/core"
+<XMLDB PATH="totara/core/db" VERSION="20200602" COMMENT="XMLDB file for Moodle totara/core"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -305,6 +305,29 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="programid-roleid" UNIQUE="true" FIELDS="programid, roleid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="totara_core_relationship" COMMENT="List of relationships that can exist between users">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="created_at" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="totara_core_relationship_resolver" COMMENT="The resolvers for each relationship">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="relationship_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The relationship this resolver is for"/>
+        <FIELD NAME="class_name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="The full class name for the resolver"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="relationship_id" TYPE="foreign" FIELDS="relationship_id" REFTABLE="totara_core_relationship" REFFIELDS="id" ONDELETE="cascade"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="relationship_id_class_name" UNIQUE="true" FIELDS="relationship_id, class_name" COMMENT="Each resolver class must be unique per relationship"/>
       </INDEXES>
     </TABLE>
   </TABLES>
