@@ -20,6 +20,7 @@
  * @package totara_core
  */
 
+require('../lib/environment_patch');
 const path = require('path');
 const fs = require('fs');
 const webpack = require('webpack');
