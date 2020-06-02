@@ -94,22 +94,22 @@ class mod_perform_webapi_query_tracks_testcase extends advanced_testcase {
         $feature = 'performance_activities';
         advanced_feature::disable($feature);
         $result = $this->parsed_graphql_operation(self::QUERY, $args);
-        $this->assert_webapi_operation_failed($result, $feature);
+        $this->assert_webapi_operation_failed($result, 'Feature performance_activities is not available.');
         advanced_feature::enable($feature);
 
         $result = $this->parsed_graphql_operation(self::QUERY, []);
-        $this->assert_webapi_operation_failed($result, 'activity_id');
+        $this->assert_webapi_operation_failed($result, 'Variable "$activity_id" of required type "param_integer!" was not provided.');
 
         $result = $this->parsed_graphql_operation(self::QUERY, ['activity_id' => 0]);
-        $this->assert_webapi_operation_failed($result, 'activity id');
+        $this->assert_webapi_operation_failed($result, 'Invalid parameter value detected (invalid activity id)');
 
         $id = 1293;
         $result = $this->parsed_graphql_operation(self::QUERY, ['activity_id' => $id]);
-        $this->assert_webapi_operation_failed($result, "$id");
+        $this->assert_webapi_operation_failed($result, "Invalid activity");
 
         self::setGuestUser();
         $result = $this->parsed_graphql_operation(self::QUERY, $args);
-        $this->assert_webapi_operation_failed($result, 'accessible');
+        $this->assert_webapi_operation_failed($result, 'Course or activity not accessible.');
     }
 
     /**

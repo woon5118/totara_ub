@@ -24,6 +24,7 @@
 namespace mod_perform\webapi\middleware;
 
 use Closure;
+use core\orm\query\exceptions\record_not_found_exception;
 use invalid_parameter_exception;
 use core\webapi\middleware;
 use core\webapi\resolver\payload;
@@ -31,6 +32,7 @@ use core\webapi\resolver\result;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\section;
 use mod_perform\models\activity\track;
+use moodle_exception;
 
 /**
  * Interceptor that uses activity related data in the incoming graphql payload
@@ -176,7 +178,11 @@ class require_activity implements middleware {
      */
     public function handle(payload $payload, Closure $next): result {
         $retrieve = $this->retriever;
-        $activity = $retrieve($payload);
+        try {
+            $activity = $retrieve($payload);
+        } catch (record_not_found_exception $exception) {
+            throw new moodle_exception('invalid_activity', 'mod_perform');
+        }
 
         [$course, $cm] = get_course_and_cm_from_instance($activity->id, 'perform');
         require_login($course, false, $cm, false, true);

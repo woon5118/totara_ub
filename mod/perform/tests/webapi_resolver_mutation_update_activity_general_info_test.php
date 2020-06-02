@@ -107,7 +107,7 @@ class mod_perform_webapi_resolver_mutation_update_activity_general_info_testcase
         $feature = 'performance_activities';
         advanced_feature::disable($feature);
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
-        $this->assert_webapi_operation_failed($result, $feature);
+        $this->assert_webapi_operation_failed($result, 'Feature performance_activities is not available.');
         advanced_feature::enable($feature);
 
         $result = $this->parsed_graphql_operation(self::MUTATION, []);

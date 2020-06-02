@@ -102,7 +102,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
         $feature = 'performance_activities';
         advanced_feature::disable($feature);
         $result = $this->parsed_graphql_operation(self::QUERY, []);
-        $this->assert_webapi_operation_failed($result, $feature);
+        $this->assert_webapi_operation_failed($result, 'Feature performance_activities is not available.');
         advanced_feature::enable($feature);
 
         $this->setUser();

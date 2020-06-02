@@ -143,12 +143,12 @@ class mod_perform_webapi_resolver_mutation_activate_activity_testcase extends ad
         $feature = 'performance_activities';
         advanced_feature::disable($feature);
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
-        $this->assert_webapi_operation_failed($result, $feature);
+        $this->assert_webapi_operation_failed($result, 'Feature performance_activities is not available.');
         advanced_feature::enable($feature);
 
         self::setGuestUser();
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
-        $this->assert_webapi_operation_failed($result, 'accessible');
+        $this->assert_webapi_operation_failed($result, 'Course or activity not accessible.');
     }
 
     /**

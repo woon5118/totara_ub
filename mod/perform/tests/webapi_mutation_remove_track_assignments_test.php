@@ -89,25 +89,25 @@ class mod_perform_webapi_mutation_remove_track_assignments_testcase extends adva
         $feature = 'performance_activities';
         advanced_feature::disable($feature);
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
-        $this->assert_webapi_operation_failed($result, $feature);
+        $this->assert_webapi_operation_failed($result, 'Feature performance_activities is not available.');
         advanced_feature::enable($feature);
 
         $result = $this->parsed_graphql_operation(self::MUTATION, []);
-        $this->assert_webapi_operation_failed($result, 'input');
+        $this->assert_webapi_operation_failed($result, 'Variable "$assignments" of required type "mod_perform_track_assignments_input!" was not provided.');
 
         $args['assignments']['track_id'] = 0;
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
-        $this->assert_webapi_operation_failed($result, 'track id');
+        $this->assert_webapi_operation_failed($result, 'Invalid parameter value detected (invalid track id)');
 
         $track_id = 1293;
         $args['assignments']['track_id'] = $track_id;
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
-        $this->assert_webapi_operation_failed($result, "$track_id");
+        $this->assert_webapi_operation_failed($result, "Invalid activity");
 
         self::setGuestUser();
         $args['assignments']['track_id'] = $track->id;
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
-        $this->assert_webapi_operation_failed($result, 'accessible');
+        $this->assert_webapi_operation_failed($result, 'Course or activity not accessible.');
     }
 
     /**

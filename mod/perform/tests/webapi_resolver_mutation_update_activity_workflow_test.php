@@ -97,16 +97,16 @@ class mod_perform_webapi_resolver_mutation_update_activity_workflow_testcase ext
         $feature = 'performance_activities';
         advanced_feature::disable($feature);
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
-        $this->assert_webapi_operation_failed($result, $feature);
+        $this->assert_webapi_operation_failed($result, 'Feature performance_activities is not available.');
         advanced_feature::enable($feature);
 
         $result = $this->parsed_graphql_operation(self::MUTATION, []);
-        $this->assert_webapi_operation_failed($result, 'input');
+        $this->assert_webapi_operation_failed($result, 'Variable "$input" of required type "update_activity_workflow_input!" was not provided.');
 
         $activity_id = 999;
         $args['input']['activity_id'] = $activity_id;
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
-        $this->assert_webapi_operation_failed($result, "$activity_id");
+        $this->assert_webapi_operation_failed($result, "Invalid activity");
     }
 
     /**

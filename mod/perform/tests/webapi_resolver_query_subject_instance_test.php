@@ -110,7 +110,7 @@ class mod_perform_webapi_resolver_query_subject_instance_testcase extends mod_pe
         $feature = 'performance_activities';
         advanced_feature::disable($feature);
         $result = $this->parsed_graphql_operation(self::QUERY, $args);
-        $this->assert_webapi_operation_failed($result, $feature);
+        $this->assert_webapi_operation_failed($result, 'Feature performance_activities is not available.');
         advanced_feature::enable($feature);
 
         $result = $this->parsed_graphql_operation(self::QUERY, []);

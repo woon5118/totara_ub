@@ -67,7 +67,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_testcase
         self::setUser($user);
 
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
-        $this->assert_webapi_operation_failed($result, 'accessible');
+        $this->assert_webapi_operation_failed($result, 'Course or activity not accessible.');
     }
 
     public function test_failed_ajax_call(): void {
@@ -85,7 +85,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_testcase
         $feature = 'performance_activities';
         advanced_feature::disable($feature);
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
-        $this->assert_webapi_operation_failed($result, $feature);
+        $this->assert_webapi_operation_failed($result, 'Feature performance_activities is not available.');
         advanced_feature::enable($feature);
 
         $result = $this->parsed_graphql_operation(self::MUTATION, []);
@@ -93,12 +93,12 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_testcase
 
         $args['track_schedule']['track_id'] = 0;
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
-        $this->assert_webapi_operation_failed($result, 'track id');
+        $this->assert_webapi_operation_failed($result, 'Invalid parameter value detected (invalid track id)');
 
         $track_id = 1293;
         $args['track_schedule']['track_id'] = $track_id;
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
-        $this->assert_webapi_operation_failed($result, "$track_id");
+        $this->assert_webapi_operation_failed($result, "Invalid activity");
     }
 
 }

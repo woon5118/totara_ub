@@ -58,22 +58,22 @@ class mod_perform_webapi_resolver_query_section_testcase extends advanced_testca
         $feature = 'performance_activities';
         advanced_feature::disable($feature);
         $result = $this->parsed_graphql_operation(self::QUERY, $args);
-        $this->assert_webapi_operation_failed($result, $feature);
+        $this->assert_webapi_operation_failed($result, 'Feature performance_activities is not available.');
         advanced_feature::enable($feature);
 
         $result = $this->parsed_graphql_operation(self::QUERY, []);
-        $this->assert_webapi_operation_failed($result, 'section_id');
+        $this->assert_webapi_operation_failed($result, 'Variable "$section_id" of required type "core_id!" was not provided.');
 
         $result = $this->parsed_graphql_operation(self::QUERY, ['section_id' => 0]);
-        $this->assert_webapi_operation_failed($result, 'section id');
+        $this->assert_webapi_operation_failed($result, 'Invalid parameter value detected (invalid section id)');
 
         $id = 1293;
         $result = $this->parsed_graphql_operation(self::QUERY, ['section_id' => $id]);
-        $this->assert_webapi_operation_failed($result, "$id");
+        $this->assert_webapi_operation_failed($result, "Invalid activity");
 
         $this->setUser();
         $result = $this->parsed_graphql_operation(self::QUERY, $args);
-        $this->assert_webapi_operation_failed($result, 'not logged in');
+        $this->assert_webapi_operation_failed($result, 'Course or activity not accessible. (You are not logged in)');
     }
 
     private function get_test_data() {

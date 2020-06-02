@@ -83,25 +83,25 @@ class mod_perform_webapi_resolver_mutation_delete_activity_testcase extends adva
         $feature = 'performance_activities';
         advanced_feature::disable($feature);
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
-        $this->assert_webapi_operation_failed($result, $feature);
+        $this->assert_webapi_operation_failed($result, 'Feature performance_activities is not available.');
         advanced_feature::enable($feature);
 
         $result = $this->parsed_graphql_operation(self::MUTATION, []);
-        $this->assert_webapi_operation_failed($result, 'input');
+        $this->assert_webapi_operation_failed($result, 'Variable "$input" of required type "mod_perform_delete_activity_input!" was not provided.');
 
         $args['input']['activity_id'] = 0;
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
-        $this->assert_webapi_operation_failed($result, 'activity id');
+        $this->assert_webapi_operation_failed($result, 'Invalid parameter value detected (invalid activity id)');
 
         $activity_id = 999;
         $args['input']['activity_id'] = $activity_id;
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
-        $this->assert_webapi_operation_failed($result, "$activity_id");
+        $this->assert_webapi_operation_failed($result, "Invalid activity");
 
         self::setGuestUser();
         $args['input']['activity_id'] = $activity->id;
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
-        $this->assert_webapi_operation_failed($result, 'not accessible');
+        $this->assert_webapi_operation_failed($result, 'Course or activity not accessible.');
     }
 
     private function container_course_exists(int $course_id): bool {
