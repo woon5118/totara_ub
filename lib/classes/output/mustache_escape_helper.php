@@ -62,7 +62,7 @@ class mustache_escape_helper {
 
         // Ensure that any mustache processing tags are replaced with something safe.
         $cleaned_answer = str_replace(['{{{', '}}}', '{{', '}}'], ['[[[', ']]]', '[[', ']]'], $answer);
-        if ($answer !== $cleaned_answer) {
+        if ((string)$answer !== (string)$cleaned_answer) {
             $this->debugging('Mustache processing quotes converted to square brackets for safety.');
         }
         $answer = $cleaned_answer;

@@ -96,11 +96,18 @@ class mustache_esc_helper_testcase extends advanced_testcase {
             $mustache->render('test')
         );
 
-        // Single variable
+        // Single variable, type string
         $loader->setTemplate('test', "{{#esc}}{{var}}{{/esc}}");
         $this->assertEquals(
             'Test',
             $mustache->render('test', ['var' => 'Test'])
+        );
+
+        // Single variable, type int
+        $loader->setTemplate('test', "{{#esc}}{{int}}{{/esc}}");
+        $this->assertEquals(
+            '3',
+            $mustache->render('test', ['int' => 3])
         );
 
         // Single variable escaping works
