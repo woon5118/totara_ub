@@ -71,12 +71,12 @@ export default {
       } else if (!this.isOpen && this.isFixed) {
         return this.$str('schedule_range_heading_limited_fixed', 'mod_perform'); // Limited creation range defined by fixed dates
       } else if (this.isOpen && !this.isFixed) {
+        return this.$str('schedule_range_heading_open_dynamic', 'mod_perform'); // Open-ended creation range defined by dynamic dates
+      } else {
         return this.$str(
           'schedule_range_heading_limited_dynamic',
           'mod_perform'
         ); // Limited creation range defined by dynamic dates
-      } else {
-        return this.$str('schedule_range_heading_open_dynamic', 'mod_perform'); // Open-ended creation range defined by dynamic dates
       }
     },
   },
