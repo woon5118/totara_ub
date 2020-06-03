@@ -625,11 +625,15 @@ $CFG->directorypermissions = 02777;
 //
 // "\\core\\lock\\postgres_lock_factory" - DB locking based on postgres advisory locks.
 //
+// "\\core\\lock\\mysql_lock_factory" - DB locking based on MySQL/MariaDB locks.
+//
 // Settings used by the lock factories
 //
 // Location for lock files used by the File locking factory. This must exist
 // on a shared file system that supports locking.
 //      $CFG->lock_file_root = $CFG->dataroot . '/lock';
+//
+// Locking should be tested using lib/tests/other/lockingtestpage.php page.
 //
 // Totara 2.9 allows administrators to customise the list of supported file types.
 // To add a new filetype or override the definition of an existing one, set the
