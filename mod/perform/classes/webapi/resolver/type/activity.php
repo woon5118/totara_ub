@@ -28,6 +28,7 @@ use core\webapi\execution_context;
 use core\webapi\type_resolver;
 use mod_perform\formatter\activity\activity as activity_formatter;
 use mod_perform\models\activity\activity as activity_model;
+use mod_perform\models\activity\activity_setting;
 
 /**
  * Note: It is the responsibility of the query to ensure the user is permitted to see an activity.
@@ -52,6 +53,14 @@ class activity implements type_resolver {
         }
         if ($field == 'can_manage') {
             return $activity->can_manage();
+        }
+        if ($field === 'settings') {
+            $settings = $activity->settings;
+
+            return [
+                'close_on_completion' => (bool)$settings->lookup(activity_setting::CLOSE_ON_COMPLETION),
+                'multisection' => (bool)$settings->lookup(activity_setting::MULTISECTION)
+            ];
         }
 
         $format = $args['format'] ?? format::FORMAT_HTML;

@@ -1,0 +1,9 @@
+mutation mod_perform_toggle_activity_multisection_setting(
+  $input: toggle_activity_setting!
+) {
+  mod_perform_toggle_activity_multisection_setting(input: $input) {
+    settings {
+      multisection
+    }
+  }
+}

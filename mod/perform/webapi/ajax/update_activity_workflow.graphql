@@ -1,7 +1,0 @@
-mutation mod_perform_update_activity_workflow(
-  $input: update_activity_workflow_input!
-) {
-  mod_perform_update_activity_workflow(input: $input) {
-    close_on_completion
-  }
-}

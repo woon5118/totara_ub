@@ -29,6 +29,7 @@ use core\entities\expandable;
 use core\entities\user;
 use core\orm\collection;
 use core\orm\entity\model;
+use mod_perform\data_providers\activity\activity_settings;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\event\activity_deleted;
 use mod_perform\models\activity\helpers\activity_deletion;
@@ -56,12 +57,12 @@ use mod_perform\state\activity\activity_state as activity_status;
  * @property-read int $status
  * @property-read activity_state $state
  * @property-read int $type
- * @property-read bool $close_on_completion
  * @property-read int $created_at
  * @property-read int $updated_at
  * @property-read collection|section[] $sections
  * @property-read collection|relationship[] $relationships
  * @property-read collection|track[] $tracks
+ * @property-read activity_settings $settings
  *
  * @package mod_perform\models\activity
  */
@@ -75,7 +76,6 @@ class activity extends model {
         'name',
         'description',
         'status',
-        'close_on_completion',
         'created_at',
         'updated_at',
     ];
@@ -83,6 +83,7 @@ class activity extends model {
     protected $model_accessor_whitelist = [
         'type',
         'sections',
+        'settings',
         'relationships',
         'tracks',
         'can_activate',
@@ -201,7 +202,6 @@ class activity extends model {
         $entity->description = $description;
         $entity->status = $status ?? draft::get_code();
         $entity->type_id = $type->id;
-        $entity->close_on_completion = false;
 
         return $DB->transaction(function () use ($entity, $modinfo, $container) {
             global $CFG, $USER;
@@ -425,17 +425,6 @@ class activity extends model {
     }
 
     /**
-     * Update settings on activity to close availability of participant & subject instance.
-     *
-     * @param bool $close_on_completion
-     * @return void
-     */
-    public function set_close_on_completion(bool $close_on_completion): void {
-        $this->entity->close_on_completion = $close_on_completion;
-        $this->entity->update();
-    }
-
-    /**
      * Activate this activity if possible
      *
      * @return $this
@@ -532,4 +521,12 @@ class activity extends model {
         return $this->get_state(activity_status::get_type());
     }
 
+    /**
+     * Returns the settings belonging to this activity.
+     *
+     * @return activity_settings the settings.
+     */
+    public function get_settings(): activity_settings {
+        return new activity_settings($this);
+    }
 }

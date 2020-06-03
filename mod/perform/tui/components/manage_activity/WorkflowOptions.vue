@@ -60,7 +60,7 @@
 </template>
 
 <script>
-import UpdateActivityWorkflowMutation from 'mod_perform/graphql/update_activity_workflow.graphql';
+import ToggleActivityCloseOnCompletion from 'mod_perform/graphql/toggle_activity_close_on_completion_setting.graphql';
 import Checkbox from 'totara_core/components/form/Checkbox';
 import Form from 'totara_core/components/form/Form';
 import FormRow from 'totara_core/components/form/FormRow';
@@ -82,9 +82,10 @@ export default {
   },
 
   data() {
+    const settings = this.activity.settings;
     return {
       formDisabled: false,
-      close_on_completion: this.activity.close_on_completion,
+      close_on_completion: settings.close_on_completion,
     };
   },
 
@@ -99,11 +100,11 @@ export default {
       this.formDisabled = true;
       this.$apollo
         .mutate({
-          mutation: UpdateActivityWorkflowMutation,
+          mutation: ToggleActivityCloseOnCompletion,
           variables: {
             input: {
               activity_id: this.activity.id,
-              close_on_completion: this.close_on_completion,
+              setting: this.close_on_completion,
             },
           },
           refetchAll: false, // Prevents 4 additional queries from executing unnecessarily
@@ -117,7 +118,7 @@ export default {
           this.formDisabled = false;
         })
         .catch(() => {
-          this.close_on_completion = this.activity.close_on_completion;
+          this.close_on_completion = this.activity.settings.close_on_completion;
           notify({
             duration: NOTIFICATION_DURATION,
             message: this.$str('toast_error_generic_update', 'mod_perform'),

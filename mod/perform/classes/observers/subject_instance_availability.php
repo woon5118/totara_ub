@@ -25,6 +25,7 @@ namespace mod_perform\observers;
 
 use core\event\base;
 use mod_perform\event\subject_instance_progress_updated;
+use mod_perform\models\activity\activity_setting;
 use mod_perform\models\activity\subject_instance;
 use mod_perform\state\subject_instance\complete;
 
@@ -51,8 +52,13 @@ class subject_instance_availability {
      * @return bool
      */
     private static function can_switch(subject_instance $subject_instance): bool {
+        $can_close = (bool)$subject_instance
+            ->activity
+            ->settings
+            ->lookup(activity_setting::CLOSE_ON_COMPLETION);
+
         return $subject_instance->progress_state instanceof complete
-            && $subject_instance->activity->close_on_completion;
+            && $can_close;
     }
 
 }

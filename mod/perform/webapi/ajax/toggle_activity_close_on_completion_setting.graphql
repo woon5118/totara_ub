@@ -1,0 +1,9 @@
+mutation mod_perform_toggle_activity_close_on_completion_setting(
+  $input: toggle_activity_setting!
+) {
+  mod_perform_toggle_activity_close_on_completion_setting(input: $input) {
+    settings {
+      close_on_completion
+    }
+  }
+}

@@ -27,6 +27,7 @@ use core\entities\user;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\models\activity\activity;
+use mod_perform\models\activity\activity_setting;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\models\response\section_element_response;
 use mod_perform\models\response\participant_section;
@@ -163,8 +164,9 @@ class mod_perform_participant_section_availability_testcase extends state_testca
             'Participant section should start with the open availability status'
         );
 
-        $only_activity = activity::load_by_entity(activity_entity::repository()->one());
-        $only_activity->set_close_on_completion($close_on_completion);
+        activity::load_by_entity(activity_entity::repository()->one())
+            ->settings
+            ->update([activity_setting::CLOSE_ON_COMPLETION => $close_on_completion]);
 
         $participant_section->set_element_responses($responses);
         $completion_success = $participant_section->complete();

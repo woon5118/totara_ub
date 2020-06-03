@@ -1224,5 +1224,58 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020052800, 'perform');
     }
 
+    if ($oldversion < 2020052900) {
+        // Define new perform_setting table.
+        $table = new xmldb_table('perform_setting');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('activity_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('name',XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('value',XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('created_at', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('updated_at', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+
+        // Adding keys to table perform_track.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('activity_id', XMLDB_KEY_FOREIGN, ['activity_id'], 'perform', ['id'], 'cascade');
+
+        // Conditionally launch create table.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        $index = new xmldb_index('activity_setting_name', XMLDB_INDEX_UNIQUE, array('activity_id', 'name'));
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020052900, 'perform');
+    }
+
+    if ($oldversion < 2020052901) {
+        // Remove field close_on_completion on activity table.
+        $table = new xmldb_table('perform');
+        $field = new xmldb_field('close_on_completion', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'status', [0, 1]);
+
+        if ($dbman->field_exists($table, $field)) {
+            // Transfer the close on completion setting to the new setting table first.
+            foreach ($DB->get_records('perform') as $activity) {
+                $setting_record = [
+                    'activity_id' => $activity->id,
+                    'name' => 'close_on_completion',
+                    'value' => $activity->close_on_completion,
+                    'created_at' => time()
+                ];
+
+                $DB->insert_record('perform_setting', $setting_record);
+            }
+
+            $dbman->drop_field($table, $field);
+        }
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020052901, 'perform');
+    }
+
     return true;
 }

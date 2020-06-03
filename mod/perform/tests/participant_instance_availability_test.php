@@ -27,6 +27,7 @@ use mod_perform\entities\activity\section_relationship;
 use mod_perform\event\participant_instance_availability_closed;
 use mod_perform\event\participant_instance_progress_updated;
 use mod_perform\models\activity\activity;
+use mod_perform\models\activity\activity_setting;
 use mod_perform\models\activity\participant_instance;
 use mod_perform\models\activity\section;
 use mod_perform\observers\participant_instance_availability;
@@ -144,7 +145,7 @@ class mod_perform_participant_instance_availability_testcase extends state_testc
          */
         [$participant1, $participant2, $participant1_entity, $activity] = $this->create_data();
 
-        $activity->set_close_on_completion(false);
+        $activity->settings->update([activity_setting::CLOSE_ON_COMPLETION => false]);
 
         $event_sink = $this->redirectEvents();
         $participant1->update_progress_status();
@@ -171,7 +172,7 @@ class mod_perform_participant_instance_availability_testcase extends state_testc
         $generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
 
         $activity = $generator->create_activity_in_container();
-        $activity->set_close_on_completion(true);
+        $activity->settings->update([activity_setting::CLOSE_ON_COMPLETION => true]);
 
         $user1 = self::getDataGenerator()->create_user();
         $user2 = self::getDataGenerator()->create_user();

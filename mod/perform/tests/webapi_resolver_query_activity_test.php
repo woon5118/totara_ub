@@ -107,6 +107,11 @@ class mod_perform_webapi_resolver_query_activity_testcase extends mod_perform_re
         $id = $data->activity1->id;
         $args = ['activity_id' => $id];
 
+        $settings = [
+            'multisection' => true
+        ];
+        $data->activity1->settings->update($settings);
+
         $result = $this->parsed_graphql_operation(self::QUERY, $args);
         $this->assert_webapi_operation_successful($result);
 
@@ -121,6 +126,13 @@ class mod_perform_webapi_resolver_query_activity_testcase extends mod_perform_re
             $expected_type->display_name,
             $actual_type['display_name'],
             "wrong type display"
+        );
+
+        $actual_settings = $result['settings'];
+        $this->assertEquals(
+            (string)$settings['multisection'],
+            (string)$actual_settings['multisection'],
+            'wrong value'
         );
 
         $section1 = array_filter($result['sections'], function ($section) use ($data) {

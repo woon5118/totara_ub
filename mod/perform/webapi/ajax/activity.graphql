@@ -9,7 +9,6 @@ query mod_perform_activity($activity_id: core_id!) {
     edit_name: name(format: RAW)
     description
     edit_description: description(format: RAW)
-    close_on_completion
     sections {
       id
       title
@@ -27,6 +26,10 @@ query mod_perform_activity($activity_id: core_id!) {
         optional_question_count
         other_element_count
       }
+    }
+    settings {
+      close_on_completion
+      multisection
     }
   }
 }

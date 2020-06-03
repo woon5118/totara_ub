@@ -8,6 +8,14 @@ type mod_perform_activity_state {
 }
 
 """
+Represents the activity settings.
+"""
+type mod_perform_activity_settings {
+  close_on_completion: Boolean!
+  multisection: Boolean!
+}
+
+"""
 This is generic performance activity
 """
 type mod_perform_activity {
@@ -20,9 +28,9 @@ type mod_perform_activity {
   can_potentially_activate: Boolean! # Whether this activity could be activated due to capability checks and current status, without checking further conditions
   can_activate: Boolean! # Whether the current user can activate this activity, only if it satisfies all conditions
   can_manage: Boolean! # Whether the current user can manage this activity
-  close_on_completion: Boolean! # Whether instances & sections should be closed on completion
   sections: [mod_perform_section!]!
   state_details: mod_perform_activity_state!
+  settings: mod_perform_activity_settings!
 }
 
 """
@@ -168,11 +176,11 @@ input mod_perform_delete_activity_input {
 }
 
 """
-Input for activity workflow settings change.
+Input for activity settings toggle.
 """
-input update_activity_workflow_input {
+input toggle_activity_setting {
   activity_id: core_id!
-  close_on_completion: Boolean!
+  setting: Boolean!
 }
 
 extend type Query {
@@ -329,13 +337,6 @@ extend type Mutation {
     description: param_text
   ): mod_perform_activity_result!
 
-  """
-  Update an activity's workflow settings.
-  """
-  mod_perform_update_activity_workflow(
-    input: update_activity_workflow_input!
-  ): mod_perform_activity!
-
   mod_perform_update_section_relationships(
     input: update_section_relationships_input!
   ): mod_perform_section_result!
@@ -360,6 +361,20 @@ extend type Mutation {
   mod_perform_delete_activity(
     input: mod_perform_delete_activity_input!
   ): Boolean!
+
+  """
+  Update an activity setting: close on completion.
+  """
+  mod_perform_toggle_activity_close_on_completion_setting(
+    input: toggle_activity_setting!
+  ): mod_perform_activity!
+
+  """
+  Update an activity setting: multisection.
+  """
+  mod_perform_toggle_activity_multisection_setting(
+    input: toggle_activity_setting!
+  ): mod_perform_activity!
 }
 
 """

@@ -25,10 +25,9 @@ namespace mod_perform\observers;
 
 use core\event\base;
 use mod_perform\event\participant_section_progress_updated;
+use mod_perform\models\activity\activity_setting;
 use mod_perform\models\response\participant_section;
-use mod_perform\state\participant_section\closed;
 use mod_perform\state\participant_section\complete;
-use mod_perform\state\participant_section\participant_section_availability as availability_state;
 
 class participant_section_availability {
 
@@ -53,7 +52,13 @@ class participant_section_availability {
      * @return bool
      */
     private static function can_switch(participant_section $participant_section): bool {
+        $can_close = (bool)$participant_section
+            ->get_section()
+            ->get_activity()
+            ->settings
+            ->lookup(activity_setting::CLOSE_ON_COMPLETION);
+
         return $participant_section->get_progress_state() instanceof complete
-            && $participant_section->get_section()->get_activity()->close_on_completion;
+            && $can_close;
     }
 }

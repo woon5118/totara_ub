@@ -26,6 +26,7 @@ use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 use mod_perform\event\subject_instance_availability_closed;
 use mod_perform\event\subject_instance_progress_updated;
 use mod_perform\models\activity\activity;
+use mod_perform\models\activity\activity_setting;
 use mod_perform\models\activity\subject_instance;
 use mod_perform\observers\subject_instance_availability;
 use mod_perform\state\state;
@@ -142,7 +143,7 @@ class mod_perform_subject_instance_availability_testcase extends state_testcase 
          */
         [$subject1, $subject2, $subject1_entity, $activity] = $this->create_data();
 
-        $activity->set_close_on_completion(false);
+        $activity->settings->update([activity_setting::CLOSE_ON_COMPLETION => false]);
 
         $event_sink = $this->redirectEvents();
         $subject1->update_progress_status();
@@ -169,7 +170,7 @@ class mod_perform_subject_instance_availability_testcase extends state_testcase 
         $generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
 
         $activity = $generator->create_activity_in_container();
-        $activity->set_close_on_completion(true);
+        $activity->settings->update([activity_setting::CLOSE_ON_COMPLETION => true]);
 
         $user1 = self::getDataGenerator()->create_user();
         $user2 = self::getDataGenerator()->create_user();
