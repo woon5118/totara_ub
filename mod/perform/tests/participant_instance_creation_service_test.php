@@ -26,6 +26,7 @@ use \mod_perform\entities\activity\activity_relationship;
 use mod_perform\entities\activity\participant_instance;
 use mod_perform\entities\activity\subject_instance;
 use mod_perform\entities\activity\track_user_assignment;
+use mod_perform\entities\activity\track as track_entity;
 use mod_perform\expand_task;
 use mod_perform\task\service\participant_instance_creation;
 use mod_perform\task\service\subject_instance_creation;
@@ -40,6 +41,8 @@ use totara_job\relationship\resolvers\manager;
  * @group perform
  */
 class mod_perform_participant_instance_creation_service_testcase extends advanced_testcase {
+
+    private const JOB_ASSIGNMENTS_PER_USER = 2;
 
     /**
      * Number of users per relationship.
@@ -64,24 +67,32 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
     /**
      * Test participant_instances watcher processes on subject_instance_creation hook call.
      *
+     * @dataProvider creation_mode_provider
+     * @param bool $expand_per_job_assignment
      * @return void
      */
-    public function test_subject_instance_creation_hook(): void {
+    public function test_subject_instance_creation_hook(bool $expand_per_job_assignment): void {
+        $this->setup_assignments($expand_per_job_assignment);
+
         $track_user_assignments = $this->get_track_user_assignments();
 
         $subject_instance_service = new subject_instance_creation();
         $subject_instance_service->generate_instances();
 
         $this->assert_activity_relationship_id_is_saved();
-        $this->assert_participant_instances_created($track_user_assignments);
+        $this->assert_participant_instances_created($track_user_assignments, $expand_per_job_assignment);
     }
 
     /**
      * Tests participants are created successfully.
      *
+     * @dataProvider creation_mode_provider
+     * @param bool $expand_per_job_assignment
      * @return void
      */
-    public function test_create_participant_instances(): void {
+    public function test_create_participant_instances(bool $expand_per_job_assignment): void {
+        $this->setup_assignments($expand_per_job_assignment);
+
         $track_user_assignments = $this->get_track_user_assignments();
         $subject_instance_dto_collection = $this->create_subject_instances($track_user_assignments);
 
@@ -89,32 +100,52 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
         $participant_instance_service->generate_instances($subject_instance_dto_collection);
 
         $this->assert_activity_relationship_id_is_saved();
-        $this->assert_participant_instances_created($track_user_assignments);
+        $this->assert_participant_instances_created($track_user_assignments, $expand_per_job_assignment);
+    }
+
+    public function creation_mode_provider(): array {
+        return [
+            'Expand one per user mode' => [true],
+            'Expand one per job mode' => [false],
+        ];
     }
 
     /**
      * Asserts participant instances created.
      *
      * @param collection $track_user_assignments
+     * @param bool $expand_per_job_assignment
      * @return void
      */
-    private function assert_participant_instances_created(collection $track_user_assignments): void {
+    private function assert_participant_instances_created(
+        collection $track_user_assignments,
+        $expand_per_job_assignment = false
+    ): void {
         $created_participants = participant_instance::repository()->get();
         $expected_participants_created = $track_user_assignments->count()
             * count($this->activity_relationships)
             * $this->users_per_relationship;
+
+        if ($expand_per_job_assignment) {
+            $expected_participants_created /= self::JOB_ASSIGNMENTS_PER_USER;
+        }
+
         $this->assertEquals($expected_participants_created, $created_participants->count());
 
-        $this->assert_each_participant_created_with_correct_data($created_participants);
+        $this->assert_each_participant_created_with_correct_data($created_participants, $expand_per_job_assignment);
     }
 
     /**
      * Asserts each participant instance is created with the right data.
      *
      * @param collection $created_participants
+     * @param bool $expand_per_job_assignment
      * @return void
      */
-    private function assert_each_participant_created_with_correct_data(collection $created_participants): void {
+    private function assert_each_participant_created_with_correct_data(
+        collection $created_participants,
+        $expand_per_job_assignment = false
+    ): void {
         $relationship_ids = [];
         $subject_instances = subject_instance::repository()->get();
         $subject_instance_ids = $subject_instances->pluck('id');
@@ -158,6 +189,11 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
         }
 
         $expected_participant_count = count($subject_instance_ids) / $this->users_per_relationship;
+
+        if ($expand_per_job_assignment) {
+            $expected_participant_count /= self::JOB_ASSIGNMENTS_PER_USER;
+        }
+
         foreach ($managers_and_appraisers_list as $activity_participants) {
             foreach ($activity_participants as $actual_participant) {
                 $this->assertEquals($expected_participant_count, $actual_participant['count']);
@@ -165,6 +201,11 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
         }
 
         $expected_subject_instance_count = count($this->activity_relationships) * $this->users_per_relationship;
+
+        if ($expand_per_job_assignment) {
+            $expected_subject_instance_count /= self::JOB_ASSIGNMENTS_PER_USER;
+        }
+
         foreach ($subject_instances_counter as $subject_instance_count) {
             $this->assertEquals($expected_subject_instance_count, $subject_instance_count);
         }
@@ -229,7 +270,7 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
     /**
      * Create subject instances for the track user assignments.
      *
-     * @param collection $track_user_assignments
+     * @param collection | track_user_assignment[] $track_user_assignments
      * @return collection
      */
     private function create_subject_instances(collection $track_user_assignments): collection {
@@ -239,6 +280,7 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
             $subject_instance = new subject_instance();
             $subject_instance->track_user_assignment_id = $user_assignment->id;
             $subject_instance->subject_user_id = $user_assignment->subject_user_id;
+            $subject_instance->job_assignment_id = $user_assignment->job_assignment_id;
             $subject_instance->save();
             $subject_instances->append(subject_instance_dto::create_from_entity($subject_instance));
         }
@@ -247,13 +289,15 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
 
     /**
      * Sets up test pre-conditions.
+     *
+     * @param bool $expand_per_job_assignment
      */
-    protected function setUp() {
+    protected function setup_assignments($expand_per_job_assignment = false): void {
         $this->setup_config_values();
         $this->activity_trees = [];
         $activity_count = 2;
         for ($i = 0; $i < $activity_count; $i++) {
-            $activity_tree = $this->setup_activity($i);
+            $activity_tree = $this->setup_activity($i, $expand_per_job_assignment);
             $activity_tree->identifier = $i;
             $this->activity_trees[$activity_tree->activity->id] = $this->setup_job_assignments($activity_tree);
         }
@@ -277,9 +321,11 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
      * Setup Activity details.
      *
      * @param int $identifier For number of activities to create.
+     * @param bool $expand_per_job_assignment
      * @return stdClass
+     * @throws coding_exception
      */
-    protected function setup_activity(int $identifier): stdClass {
+    protected function setup_activity(int $identifier, bool $expand_per_job_assignment = false): stdClass {
         /** @var mod_perform_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
         $activity_tree = new stdClass();
@@ -299,6 +345,17 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
         }
 
         $tracks = $generator->create_activity_tracks($activity_tree->activity);
+
+        if ($expand_per_job_assignment) {
+            set_config('totara_job_allowmultiplejobs', 1);
+
+            foreach ($tracks as $track) {
+                $track_entity = (new track_entity($track->id));
+                $track_entity->subject_instance_generation = track_entity::SUBJECT_INSTANCE_GENERATION_ONE_PER_JOB;
+                $track_entity->save();
+            }
+        }
+
         $activity_tree->track = $generator->create_track_assignments($tracks->first(), 0, 0, 0, 3);
 
         return $activity_tree;
@@ -335,6 +392,7 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
                 );
             }
         }
+
         (new expand_task())->expand_all();
 
         return $activity_tree;

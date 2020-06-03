@@ -34,7 +34,8 @@ use mod_perform\entities\activity\track_user_assignment;
 use mod_perform\entities\activity\track_user_assignment_via;
 use mod_perform\event\track_user_assigned_bulk;
 use mod_perform\event\track_user_unassigned;
-use mod_perform\models\activity\track as track_model;
+use mod_perform\task\expand_task\assignment_parameters;
+use mod_perform\task\expand_task\assignment_parameters_collection;
 use mod_perform\user_groups\grouping;
 
 class expand_task {
@@ -104,7 +105,6 @@ class expand_task {
      * Expand the given assignment.
      *
      * @param track_assignment $assignment
-     * @throws \Throwable
      */
     private function expand_assignment(track_assignment $assignment): void {
         // We ignore missing assignments to not cause failing tasks.
@@ -122,28 +122,37 @@ class expand_task {
         // to avoid more requests to the database when checking if entry
         // already exists.
         $existing_user_assignments = $this->load_current_entries($assignment);
-        $existing_user_ids = $existing_user_assignments->pluck('subject_user_id');
 
         $expanded_user_ids = $this->get_expanded_users($assignment->user_group_type, $assignment->user_group_id);
 
-        // Get all user ids which are not in the table at all
-        $create_user_ids = array_diff($expanded_user_ids, $existing_user_ids);
-        if (!empty($create_user_ids)) {
-            builder::get_db()->transaction(function () use ($create_user_ids, $assignment) {
-                // Get all user assignments of the track to be able to check if we just need to link or actually create
-                $existing_track_user_assignments = $this->get_existing_user_assignments_for_track($assignment, $create_user_ids);
+        $track = track::load_by_entity($assignment->track);
+        $assignment_parameter_collection = $this->get_assignment_parameters_collection($track, $expanded_user_ids);
 
-                foreach ($create_user_ids as $user_id) {
+        $create_assignment_parameters = $assignment_parameter_collection->remove_matching_user_assignments(
+            $existing_user_assignments
+        );
+
+        if ($create_assignment_parameters->count() > 0) {
+            builder::get_db()->transaction(function () use ($expanded_user_ids, $assignment, $create_assignment_parameters) {
+                // Get all user assignments of the track to be able to check if we just need to link or actually create
+                $existing_track_user_assignments = $this->get_existing_user_assignments_for_track($assignment, $expanded_user_ids);
+
+                foreach ($create_assignment_parameters as $assignment_parameters) {
                     // If there's already a user assignment for the current assignment just link it
                     // otherwise create a new assignment
-                    $existing_user_assignment = $existing_track_user_assignments->find('subject_user_id', $user_id);
+                    $existing_user_assignment = $existing_track_user_assignments->find(
+                        function (track_user_assignment $track_user_assignment) use ($assignment_parameters) {
+                            return $assignment_parameters->matches_track_user_assignment($track_user_assignment);
+                        }
+                    );
+
                     if ($existing_user_assignment) {
                         $this->link_assignment($existing_user_assignment, $assignment);
                         if ($existing_user_assignment->deleted) {
                             $this->reactivate_user_assignment($existing_user_assignment, new track($assignment->track));
                         }
                     } else {
-                        $this->add_to_assign_buffer($assignment, $user_id);
+                        $this->add_to_assign_buffer($assignment, $assignment_parameters);
                     }
                 }
 
@@ -153,10 +162,10 @@ class expand_task {
         }
 
         // Unlink all records which are not in the current assignment anymore from it
-        $this->unlink_users($assignment, $existing_user_assignments, $expanded_user_ids);
+        $this->unlink_users($assignment, $existing_user_assignments, $assignment_parameter_collection);
 
         // Restore user assignments which previously have been deleted
-        $this->reactivate_user_assignments($assignment, $expanded_user_ids);
+        $this->reactivate_user_assignments($assignment, $assignment_parameter_collection);
     }
 
     /**
@@ -183,6 +192,37 @@ class expand_task {
             $this->add_cache_entry($user_group_type, $user_group_id, $expanded_records);
         }
         return $expanded_records;
+    }
+
+    /**
+     * Get an array with entries consisting of user_id and job_assignment_id.
+     *
+     * If we are running in per job assignment mode there will be one entry
+     * for each users job assignment.
+     *
+     * If we are running in per user mode there will be an entry for each
+     * user, and the job_assignment_id value will be null.
+     *
+     * @param track $track
+     * @param array $users_ids
+     * @return assignment_parameters_collection
+     */
+    private function get_assignment_parameters_collection(
+        track $track,
+        array $users_ids
+    ): assignment_parameters_collection {
+        global $CFG;
+
+        if (!empty($CFG->totara_job_allowmultiplejobs) && $track->is_per_job_subject_instance_generation()) {
+            $job_assignments = builder::table('job_assignment')
+                ->select(['id', 'userid'])
+                ->where('userid', $users_ids)
+                ->get();
+
+            return assignment_parameters_collection::create_from_job_assignments($job_assignments);
+        }
+
+        return assignment_parameters_collection::create_from_user_ids($users_ids);
     }
 
     /**
@@ -276,14 +316,15 @@ class expand_task {
      * Add to assign buffer, also flushes the buffer if max amount per buffer is reached
      *
      * @param track_assignment $assignment
-     * @param int $user_id
+     * @param assignment_parameters $assignment_parameters
      */
-    private function add_to_assign_buffer(track_assignment $assignment, int $user_id): void {
+    private function add_to_assign_buffer(track_assignment $assignment, assignment_parameters $assignment_parameters): void {
         $this->assign_buffer[] = [
             'track_id' => $assignment->track_id,
-            'subject_user_id' => $user_id,
+            'subject_user_id' => $assignment_parameters->get_user_id(),
             'created_at' => time(),
-            'deleted' => false
+            'deleted' => false,
+            'job_assignment_id' => $assignment_parameters->get_job_assignment_id()
         ];
 
         $count = count($this->assign_buffer);
@@ -362,17 +403,22 @@ class expand_task {
      * Restore user assignments which previously have been deleted
      *
      * @param track_assignment $assignment
-     * @param array|int[] $user_ids
+     * @param assignment_parameters_collection $assignment_parameter_collection
      */
-    private function reactivate_user_assignments(track_assignment $assignment, array $user_ids) {
-        if (empty($user_ids)) {
+    private function reactivate_user_assignments(
+        track_assignment $assignment,
+        assignment_parameters_collection $assignment_parameter_collection
+    ): void {
+        if ($assignment_parameter_collection->count() === 0) {
             // Nothing to reactivate
             return;
         }
 
+        $user_ids = $assignment_parameter_collection->pluck_user_ids();
+
         // Load all user assignments which are marked as deleted but
         // do not have any link to the assignment
-        $deleted_user_assignments = track_user_assignment::repository()
+        $possible_deleted_user_assignments = track_user_assignment::repository()
             ->as('ua')
             ->where('track_id', $assignment->track_id)
             ->where('subject_user_id', $user_ids)
@@ -384,25 +430,32 @@ class expand_task {
             ->where('via.id', null)
             ->get();
 
+        // Also need to filter to matching job_assignment_ids too (not just user_id).
+        $deleted_user_assignments = $possible_deleted_user_assignments->filter(
+            function (track_user_assignment $track_user_assignment) use ($assignment_parameter_collection) {
+                return $assignment_parameter_collection->find_from_track_user_assignment($track_user_assignment);
+            }
+        );
+
         if ($deleted_user_assignments->count() > 0) {
             // Link them to the assignment and reactivate them
-            $this->link_assignments($deleted_user_assignments, $assignment);
+            $this->link_assignments($possible_deleted_user_assignments, $assignment);
 
             track_user_assignment::repository()
                 ->where('deleted', true)
-                ->where('id', $deleted_user_assignments->pluck('id'))
+                ->where('id', $possible_deleted_user_assignments->pluck('id'))
                 ->update([
                     'deleted' => false,
                     'updated_at' => time()
                 ]);
 
             // Update the user assignment period according to track schedule settings.
-            $this->sync_schedule_for_user_assignments($deleted_user_assignments, $user_ids);
+            $this->sync_schedule_for_user_assignments($possible_deleted_user_assignments, $user_ids);
 
             // Trigger an event with all just newly reactivated user assignments
             track_user_assigned_bulk::create_from_user_assignments(
                 $assignment->track_id,
-                $deleted_user_assignments->pluck('subject_user_id'),
+                $possible_deleted_user_assignments->pluck('subject_user_id'),
                 $assignment->type
             )->trigger();
         }
@@ -432,7 +485,7 @@ class expand_task {
      * Restore single user assignment
      *
      * @param track_user_assignment $user_assignment
-     * @param track_model $track
+     * @param track $track
      */
     private function reactivate_user_assignment(track_user_assignment $user_assignment, track $track): void {
         $user_id = $user_assignment->subject_user_id;
@@ -451,12 +504,19 @@ class expand_task {
      *
      * @param track_assignment $assignment
      * @param collection $current_records keys are identifier, values are entities
-     * @param array $new_user_ids newly determined user ids which should be in the group now
+     * @param assignment_parameters_collection $assignment_parameter_collection newly determined user ids job
+     *                                         assignment combinations which should be in the group now
      */
-    private function unlink_users(track_assignment $assignment, collection $current_records, array $new_user_ids) {
+    private function unlink_users(
+        track_assignment $assignment,
+        collection $current_records,
+        assignment_parameters_collection $assignment_parameter_collection
+    ): void {
         $records_to_delete = $current_records->filter(
-            function (track_user_assignment $assignment_user) use ($new_user_ids) {
-                return !in_array($assignment_user->subject_user_id, $new_user_ids);
+            function (track_user_assignment $track_user_assignment) use ($assignment_parameter_collection) {
+                $found = $assignment_parameter_collection->find_from_track_user_assignment($track_user_assignment);
+
+                return !$found;
             }
         );
 
@@ -471,7 +531,7 @@ class expand_task {
     /**
      * Mark all user assignments which are not linked to any assignment anymore as deleted
      */
-    private function delete_orphaned_user_assignments() {
+    private function delete_orphaned_user_assignments(): void {
         $orphaned_user_assignments = track_user_assignment::repository()
             ->left_join([track_user_assignment_via::TABLE, 'via'], 'id', 'track_user_assignment_id')
             ->where_null('via.id')

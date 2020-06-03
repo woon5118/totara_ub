@@ -210,6 +210,7 @@
         <FIELD NAME="period_start_date" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="period_end_date" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="deleted" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" COMMENT="Flag for soft-delete"/>
+        <FIELD NAME="job_assignment_id" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Related job assignment id"/>
         <FIELD NAME="created_at" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="updated_at" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
       </FIELDS>
@@ -219,7 +220,7 @@
         <KEY NAME="subject_user_id" TYPE="foreign" FIELDS="subject_user_id" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="track_id_subject_user_id" UNIQUE="true" FIELDS="track_id, subject_user_id" COMMENT="Within a specific track, each user should only be assigned once."/>
+        <INDEX NAME="track_id_subject_user_id" UNIQUE="false" FIELDS="track_id, subject_user_id" COMMENT="Used for look up in the expand task"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="perform_track_user_assignment_via" COMMENT="This table links the assignment with the user assignment table">
@@ -245,6 +246,7 @@
         <FIELD NAME="subject_user_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="progress" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Progress status of the subject instance. 0 - not_started, 10 - in_progress, 20 - complete"/>
         <FIELD NAME="availability" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Availability status of the subject instance. 0 - open, 10 - closed"/>
+        <FIELD NAME="job_assignment_id" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Related job assignment id (copied from track user assignment)"/>
         <FIELD NAME="created_at" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="updated_at" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
       </FIELDS>

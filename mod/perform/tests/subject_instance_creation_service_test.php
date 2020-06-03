@@ -35,14 +35,19 @@ use mod_perform\state\activity\draft;
 use mod_perform\task\service\subject_instance_creation;
 use mod_perform\task\service\subject_instance_dto;
 use mod_perform\user_groups\grouping;
+use totara_job\job_assignment;
 
 /**
  * @group perform
  */
 class mod_perform_subject_instance_creation_service_testcase extends advanced_testcase {
 
-    public function test_create_subject_instances() {
-        $data = $this->create_data();
+    /**
+     * @dataProvider creation_mode_provider
+     * @param bool $expand_per_job_assignment
+     */
+    public function test_create_subject_instances(bool $expand_per_job_assignment) {
+        $data = $this->create_data($expand_per_job_assignment);
 
         // There should be three user assignments now
         $user_assignments = track_user_assignment::repository()->get();
@@ -53,14 +58,42 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
 
         $created_instances = subject_instance::repository()->get();
         $this->assertCount(3, $created_instances);
-        $this->assertEqualsCanonicalizing(array_column($data->users, 'id'), $created_instances->pluck('subject_user_id'));
-        $this->assertEqualsCanonicalizing($user_assignments->pluck('id'), $created_instances->pluck('track_user_assignment_id'));
+        $this->assertEqualsCanonicalizing(
+            array_column($data->users, 'id'),
+            $created_instances->pluck('subject_user_id')
+        );
+
+        $this->assertEqualsCanonicalizing(
+            $user_assignments->pluck('id'),
+            $created_instances->pluck('track_user_assignment_id')
+        );
+
+        $this->assertEqualsCanonicalizing(
+            $user_assignments->pluck('job_assignment_id'),
+            $created_instances->pluck('job_assignment_id')
+        );
+
+        if ($expand_per_job_assignment) {
+            $this->assertNotCount(0, $created_instances);
+
+            foreach ($created_instances as $created_instance) {
+                $this->assertNotNull($created_instance);
+            }
+        }
+
         foreach ($created_instances->pluck('created_at') as $created_at) {
             $this->assertGreaterThan(0, $created_at);
         }
         foreach ($created_instances->pluck('updated_at') as $updated_at) {
             $this->assertNull($updated_at);
         }
+    }
+
+    public function creation_mode_provider(): array {
+        return [
+            'Expand one per user mode' => [false],
+            'Expand one per job mode' => [true],
+        ];
     }
 
     public function test_no_new_subject_instances_are_created() {
@@ -266,6 +299,9 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
             $this->assertEquals($subject_instance->subject_user_id, $dto->get_subject_user_id());
             $this->assertEquals($subject_instance->subject_user_id, $dto->subject_user_id);
 
+            $this->assertEquals($subject_instance->job_assignment_id, $dto->get_job_assignment_id());
+            $this->assertEquals($subject_instance->job_assignment_id, $dto->job_assignment_id);
+
             $this->assertEquals($subject_instance->created_at, $dto->get_created_at());
             $this->assertEquals($subject_instance->created_at, $dto->created_at);
 
@@ -295,7 +331,7 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
         return $sink;
     }
 
-    protected function create_data() {
+    protected function create_data(bool $use_per_job_creation = false) {
         $data = new class {
             public $assignments;
             public $activity1;
@@ -313,6 +349,14 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
         /** @var track $track1 */
         $data->track1 = track::load_by_activity($data->activity1)->first();
 
+        if ($use_per_job_creation) {
+            set_config('totara_job_allowmultiplejobs', 1);
+
+            $track = new track_entity($data->track1->id);
+            $track->subject_instance_generation = track_entity::SUBJECT_INSTANCE_GENERATION_ONE_PER_JOB;
+            $track->save();
+        }
+
         $generator->create_track_assignments($data->track1, 3, 0, 0, 0);
 
         $data->assignments = track_assignment::repository()
@@ -325,6 +369,10 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
             $user = $this->getDataGenerator()->create_user();
             $data->users[] = $user;
             $data->cohort_ids[] = $assignment->user_group_id;
+
+            if ($use_per_job_creation) {
+                job_assignment::create(['userid' => $user->id, 'idnumber' => "for-user-{$user->id}"]);
+            }
 
             cohort_add_member($assignment->user_group_id, $user->id);
         }

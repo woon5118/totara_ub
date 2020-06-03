@@ -416,7 +416,6 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020030305, 'perform');
     }
 
-
     if ($oldversion < 2020030306) {
 
         // Define field status to be dropped from perform_track_assignment.
@@ -1104,7 +1103,6 @@ function xmldb_perform_upgrade($oldversion) {
 
         // Perform savepoint reached.
         upgrade_mod_savepoint(true, 2020052001, 'perform');
-
     }
     if ($oldversion < 2020052200) {
         // Define field is_required to be added to perform_element.
@@ -1118,7 +1116,6 @@ function xmldb_perform_upgrade($oldversion) {
         }
         upgrade_mod_savepoint(true, 2020052200, 'perform');
     }
-
 
     if ($oldversion < 2020052500) {
 
@@ -1290,6 +1287,34 @@ function xmldb_perform_upgrade($oldversion) {
 
         // Perform savepoint reached.
         upgrade_mod_savepoint(true, 2020060300, 'perform');
+    }
+
+    if ($oldversion < 2020060301) {
+        $table = new xmldb_table('perform_track_user_assignment');
+        $field = new xmldb_field('job_assignment_id', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'deleted');
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $index = new xmldb_index('track_id_subject_user_id', XMLDB_INDEX_UNIQUE, ['track_id', 'subject_user_id']);
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        $new_index = new xmldb_index('track_id_subject_user_id', XMLDB_INDEX_NOTUNIQUE, array('track_id', 'subject_user_id'));
+        if (!$dbman->index_exists($table, $new_index)) {
+            $dbman->add_index($table, $new_index);
+        }
+
+        $table = new xmldb_table('perform_subject_instance');
+        $field = new xmldb_field('job_assignment_id', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'availability');
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2020060301, 'perform');
     }
 
     return true;

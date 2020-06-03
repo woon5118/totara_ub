@@ -218,7 +218,8 @@ export default {
         },
         this.getScheduleVariables(formValues),
         this.getRepeatingVariables(formValues),
-        this.getDueDateVariables(formValues)
+        this.getDueDateVariables(formValues),
+        { subject_instance_generation: 'ONE_PER_SUBJECT' }
       );
       return { track_schedule };
     },

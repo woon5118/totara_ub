@@ -38,6 +38,8 @@ use core\orm\entity\relations\has_many_through;
  * @property int $period_start_date start date of this assignment
  * @property int $period_end_date end date of this assignment
  * @property bool $deleted is this record deleted?
+ * @property int|null $job_assignment_id the job assignment this assignment is linked to,
+ *                                       can be null for when it is instead being driven by a user id
  * @property int $created_at record creation time
  * @property int $updated_at record modification time
  *

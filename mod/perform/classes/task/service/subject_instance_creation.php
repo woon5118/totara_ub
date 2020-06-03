@@ -44,10 +44,12 @@ class subject_instance_creation {
         $user_assignments  = $this->get_active_user_assignments();
 
         $dtos = new \core\collection();
+
         foreach ($user_assignments as $user_assignment) {
             $subject_instance = new subject_instance();
             $subject_instance->track_user_assignment_id = $user_assignment->id;
             $subject_instance->subject_user_id = $user_assignment->subject_user_id;
+            $subject_instance->job_assignment_id = $user_assignment->job_assignment_id;
             $subject_instance->save();
 
             $dtos->append(subject_instance_dto::create_from_entity($subject_instance));
@@ -63,7 +65,7 @@ class subject_instance_creation {
      * Also skip tracks that need schedule synchronisation because that should happen before we create
      * subject instances.
      *
-     * @return collection
+     * @return collection|track_user_assignment[]
      */
     private function get_active_user_assignments(): collection {
         // TODO Later we need to take the repeating schedule into account and the status of the subject instance.

@@ -29,7 +29,6 @@ use mod_perform\entities\activity\activity_relationship;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\hook\participant_instances_created;
 use mod_perform\state\participant_instance\not_started;
-use stdClass;
 use totara_core\relationship\helpers\relationship_collection_manager;
 
 /**
@@ -139,7 +138,6 @@ class participant_instance_creation {
      * Builds relationship class arguments from subject instance id.
      *
      * @param subject_instance_dto $subject_instance
-     * @param array $activity_relationships
      * @return array
      */
     private function build_relationship_arguments(
@@ -151,6 +149,7 @@ class participant_instance_creation {
         if ($should_use_subject_user_id) {
             $args['user_id'] = $subject_instance->subject_user_id;
         } else {
+            $args['user_id'] = $subject_instance->subject_user_id; // Always required for subject resolver.
             $args['job_assignment_id'] = $subject_instance->job_assignment_id;
         }
 

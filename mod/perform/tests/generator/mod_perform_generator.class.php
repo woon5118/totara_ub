@@ -336,7 +336,7 @@ class mod_perform_generator extends component_generator_base {
      * @param activity $activity parent activity.
      * @param int $track_count no of tracks to generate
      *
-     * @return collection $tracks the generated tracks.
+     * @return collection|track[] $tracks the generated tracks.
      */
     public function create_activity_tracks(activity $activity, int $track_count = 1): collection {
         return collection::new(range(0, $track_count - 1))

@@ -35,6 +35,7 @@ use mod_perform\entities\activity\subject_instance;
  * @property-read int $id
  * @property-read int $track_user_assignment_id
  * @property-read int $subject_user_id
+ * @property-read int|null $job_assignment_id
  * @property-read int $created_at
  * @property-read int|null $updated_at
  * @property-read int $track_id
@@ -48,6 +49,8 @@ class subject_instance_dto {
     protected $track_user_assignment_id;
     /** @var int */
     protected $subject_user_id;
+    /** @var int|null */
+    protected $job_assignment_id;
     /** @var int */
     protected $created_at;
     /** @var int|null */
@@ -68,6 +71,7 @@ class subject_instance_dto {
         $instance->id = $subject_instance->id;
         $instance->track_user_assignment_id = $subject_instance->track_user_assignment_id;
         $instance->subject_user_id = $subject_instance->subject_user_id;
+        $instance->job_assignment_id = $subject_instance->job_assignment_id;
         $instance->created_at = $subject_instance->created_at;
         $instance->updated_at = $subject_instance->updated_at;
         $instance->activity_id = $subject_instance->track->activity_id;
@@ -95,6 +99,13 @@ class subject_instance_dto {
      */
     public function get_subject_user_id(): int {
         return $this->subject_user_id;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function get_job_assignment_id(): ?int {
+        return $this->job_assignment_id;
     }
 
     /**

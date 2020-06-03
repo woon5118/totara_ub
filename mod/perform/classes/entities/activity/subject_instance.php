@@ -37,6 +37,7 @@ use core\orm\entity\relations\has_one_through;
  * @property int $track_user_assignment_id
  * @property int $progress
  * @property int $availability
+ * @property int|null $job_assignment_id
  * @property int $created_at
  * @property int $updated_at
  *

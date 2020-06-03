@@ -24,7 +24,9 @@
 
 use core\entities\user;
 use core\orm\entity\repository as entity_repository;
+use core\orm\query\builder;
 use mod_perform\entities\activity\activity;
+use mod_perform\entities\activity\track;
 use mod_perform\entities\activity\track as track_entity;
 use mod_perform\entities\activity\track_assignment;
 use mod_perform\entities\activity\track_user_assignment;
@@ -49,7 +51,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
     public static function setUpBeforeClass() {
         parent::setUpBeforeClass();
         global $CFG;
-        require_once($CFG->dirroot.'/cohort/lib.php');
+        require_once($CFG->dirroot . '/cohort/lib.php');
     }
 
     /**
@@ -101,6 +103,154 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id);
     }
 
+    public function test_expand_single_assignment_based_on_job_assignment(): void {
+        set_config('totara_job_allowmultiplejobs', 1);
+        $test_data = $this->prepare_assignments(track_entity::SUBJECT_INSTANCE_GENERATION_ONE_PER_JOB);
+
+        $track1_id = $test_data->track1->id;
+
+        $job_assignment_id = builder::table('job_assignment')->insert([
+            'userid' => $test_data->user1->id,
+            'timecreated' => time(),
+            'timemodified' => time(),
+            'usermodified' => time(),
+            'positionassignmentdate' => true,
+            'sortorder' => 0,
+        ]);
+
+        $this->assert_track_has_no_user_assignments($track1_id, $test_data->user1->id);
+
+        // No user added to cohort so nothing should happen
+        (new expand_task())->expand_single($test_data->assignment1->id);
+
+        $this->assert_track_has_no_user_assignments($track1_id, $test_data->user1->id);
+
+        // Add the users to the cohort
+        $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user1->id);
+
+        // This should now result in a user assignment
+        (new expand_task())->expand_single($test_data->assignment1->id);
+
+        $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, false, $job_assignment_id);
+        // The other user is not in a cohort yet
+        $this->assert_track_has_no_user_assignments($track1_id, $test_data->user2->id);
+
+        // Now add the other one
+        $this->add_user_to_cohort($test_data->cohort2->id, $test_data->user2->id);
+
+        (new expand_task())->expand_single($test_data->assignment1->id);
+
+        // Should have been expanded
+        $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, false, $job_assignment_id);
+    }
+
+    public function test_job_assignment_is_not_used_without_multiple_job_assignments_enabled(): void {
+        set_config('totara_job_allowmultiplejobs', 0);
+        $test_data = $this->prepare_assignments(track_entity::SUBJECT_INSTANCE_GENERATION_ONE_PER_JOB);
+
+        $track1_id = $test_data->track1->id;
+
+        $job_assignment_id = builder::table('job_assignment')->insert([
+            'userid' => $test_data->user1->id,
+            'timecreated' => time(),
+            'timemodified' => time(),
+            'usermodified' => time(),
+            'positionassignmentdate' => true,
+            'sortorder' => 0,
+        ]);
+
+        $this->assert_track_has_no_user_assignments($track1_id, $test_data->user1->id);
+
+        // No user added to cohort so nothing should happen
+        (new expand_task())->expand_single($test_data->assignment1->id);
+
+        // Add the users to the cohort
+        $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user1->id);
+
+        // Now add the other one
+        $this->add_user_to_cohort($test_data->cohort2->id, $test_data->user2->id);
+
+        (new expand_task())->expand_single($test_data->assignment1->id);
+
+        // Should have been expanded, but not with a job assignment id
+        $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, false, null);
+    }
+
+    public function test_expand_single_assignment_based_on_job_with_no_job_assignments(): void {
+        set_config('totara_job_allowmultiplejobs', 1);
+        $test_data = $this->prepare_assignments(track_entity::SUBJECT_INSTANCE_GENERATION_ONE_PER_JOB);
+
+        $track1_id = $test_data->track1->id;
+
+        $this->assert_track_has_no_user_assignments($track1_id, $test_data->user1->id);
+
+        // Add the users to the cohort
+        $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user1->id);
+
+        // Now add the other one
+        $this->add_user_to_cohort($test_data->cohort2->id, $test_data->user2->id);
+
+        (new expand_task())->expand_single($test_data->assignment1->id);
+
+        // Neither user should have been expanded
+        $this->assert_track_has_no_user_assignments($track1_id, $test_data->user1->id);
+        $this->assert_track_has_no_user_assignments($track1_id, $test_data->user2->id);
+    }
+
+    public function test_expand_single_assignment_based_on_multiple_job_assignment(): void {
+        set_config('totara_job_allowmultiplejobs', 1);
+        $test_data = $this->prepare_assignments(track_entity::SUBJECT_INSTANCE_GENERATION_ONE_PER_JOB);
+
+        $track1_id = $test_data->track1->id;
+
+        $job_assignment_id1 = builder::table('job_assignment')->insert([
+            'userid' => $test_data->user1->id,
+            'timecreated' => time(),
+            'timemodified' => time(),
+            'usermodified' => time(),
+            'positionassignmentdate' => true,
+            'sortorder' => 0,
+            'idnumber' => 1,
+        ]);
+
+        $job_assignment_id2 = builder::table('job_assignment')->insert([
+            'userid' => $test_data->user1->id,
+            'timecreated' => time(),
+            'timemodified' => time(),
+            'usermodified' => time(),
+            'positionassignmentdate' => true,
+            'sortorder' => 1,
+            'idnumber' => 2,
+        ]);
+
+        $this->assert_track_has_no_user_assignments($track1_id, $test_data->user1->id);
+
+        // No user added to cohort so nothing should happen
+        (new expand_task())->expand_single($test_data->assignment1->id);
+
+        $this->assert_track_has_no_user_assignments($track1_id, $test_data->user1->id);
+
+        // Add the users to the cohort
+        $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user1->id);
+
+        // This should now result in a user assignment
+        (new expand_task())->expand_single($test_data->assignment1->id);
+
+        $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, false, $job_assignment_id1);
+        $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, false, $job_assignment_id2);
+        // The other user is not in a cohort yet
+        $this->assert_track_has_no_user_assignments($track1_id, $test_data->user2->id);
+
+        // Now add the other one
+        $this->add_user_to_cohort($test_data->cohort2->id, $test_data->user2->id);
+
+        (new expand_task())->expand_single($test_data->assignment1->id);
+
+        // Should have been expanded
+        $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, false, $job_assignment_id1);
+        $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, false, $job_assignment_id2);
+    }
+
     public function test_user_gets_unassigned(): void {
         $test_data = $this->prepare_assignments();
 
@@ -122,6 +272,98 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
 
         // User is now marked as deleted
         $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, true);
+    }
+
+    public function test_user_assignment_gets_swapped_when_changing_generation_method(): void {
+        set_config('totara_job_allowmultiplejobs', 1);
+        $test_data = $this->prepare_assignments(track_entity::SUBJECT_INSTANCE_GENERATION_ONE_PER_JOB);
+
+        $track1_id = $test_data->track1->id;
+
+        $job_assignment_id1 = builder::table('job_assignment')->insert([
+            'userid' => $test_data->user1->id,
+            'timecreated' => time(),
+            'timemodified' => time(),
+            'usermodified' => time(),
+            'positionassignmentdate' => true,
+            'sortorder' => 0,
+            'idnumber' => 1,
+        ]);
+
+        $this->assert_track_has_no_user_assignments($track1_id, $test_data->user1->id, false, $job_assignment_id1);
+        $this->assert_track_has_no_user_assignments($track1_id, $test_data->user1->id, false, null);
+
+        // Add the users to the cohort
+        $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user1->id);
+
+        // This should now result in a user assignment
+        (new expand_task())->expand_single($test_data->assignment1->id);
+
+        $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, false, $job_assignment_id1);
+        $this->assert_track_has_no_user_assignments($track1_id, $test_data->user1->id, false, null);
+
+        // Change the track to per subject generation
+        $track1 = new track_entity($track1_id);
+        $track1->subject_instance_generation = track_entity::SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT;
+        $track1->save();
+
+        // Trigger re-expansion
+        $test_data->assignment1->expand = true;
+        $test_data->assignment1->save();
+
+        (new expand_task())->expand_single($test_data->assignment1->id);
+
+        // Assignment should now be swapped to be based on job assignment
+        $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, false, null);
+        $this->assert_track_has_no_user_assignments($track1_id, $test_data->user1->id, false, $job_assignment_id1);
+
+        // Change the track BACK to per job generation
+        $track1->subject_instance_generation = track_entity::SUBJECT_INSTANCE_GENERATION_ONE_PER_JOB;
+        $track1->save();
+
+        // Trigger re-expansion
+        $test_data->assignment1->expand = true;
+        $test_data->assignment1->save();
+
+        (new expand_task())->expand_single($test_data->assignment1->id);
+
+        // Assignment should now be swapped to be based on job assignment
+        $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, false, $job_assignment_id1);
+        $this->assert_track_has_no_user_assignments($track1_id, $test_data->user1->id, false, null);
+    }
+
+    public function test_user_gets_unassigned_based_on_job_assignment(): void {
+        set_config('totara_job_allowmultiplejobs', 1);
+        $test_data = $this->prepare_assignments(track_entity::SUBJECT_INSTANCE_GENERATION_ONE_PER_JOB);
+
+        $track1_id = $test_data->track1->id;
+
+        $job_assignment_id1 = builder::table('job_assignment')->insert([
+            'userid' => $test_data->user1->id,
+            'timecreated' => time(),
+            'timemodified' => time(),
+            'usermodified' => time(),
+            'positionassignmentdate' => true,
+            'sortorder' => 0,
+            'idnumber' => 1,
+        ]);
+
+        $this->assert_track_has_no_user_assignments($track1_id, $test_data->user1->id);
+
+        // Add the users to the cohort
+        $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user1->id);
+
+        // This should now result in a user assignment
+        (new expand_task())->expand_single($test_data->assignment1->id);
+
+        $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, false, $job_assignment_id1);
+
+        $this->remove_user_from_cohort($test_data->cohort1->id, $test_data->user1->id);
+
+        (new expand_task())->expand_single($test_data->assignment1->id);
+
+        // User is now marked as deleted
+        $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, true, $job_assignment_id1);
     }
 
     public function test_events_are_fired(): void {
@@ -198,7 +440,46 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, false);
     }
 
-    public function test_reactivated_user_assignment_gets_period_updated() {
+    public function test_user_assignment_gets_reactivated_based_on_job_assignment(): void {
+        set_config('totara_job_allowmultiplejobs', 1);
+        $test_data = $this->prepare_assignments(track_entity::SUBJECT_INSTANCE_GENERATION_ONE_PER_JOB);
+
+        $track1_id = $test_data->track1->id;
+
+        $job_assignment_id1 = builder::table('job_assignment')->insert([
+            'userid' => $test_data->user1->id,
+            'timecreated' => time(),
+            'timemodified' => time(),
+            'usermodified' => time(),
+            'positionassignmentdate' => true,
+            'sortorder' => 0,
+            'idnumber' => 1,
+        ]);
+
+        $this->assert_track_has_no_user_assignments($track1_id, $test_data->user1->id, false, $job_assignment_id1);
+
+        // Add the users to the cohort
+        $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user1->id);
+
+        // This should now result in a user assignment
+        (new expand_task())->expand_single($test_data->assignment1->id);
+
+        $this->remove_user_from_cohort($test_data->cohort1->id, $test_data->user1->id);
+
+        (new expand_task())->expand_single($test_data->assignment1->id);
+
+        // User is now marked as deleted
+        $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, true, $job_assignment_id1);
+
+        // Readd to group
+        $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user1->id);
+
+        (new expand_task())->expand_single($test_data->assignment1->id);
+
+        $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, false, $job_assignment_id1);
+    }
+
+    public function test_reactivated_user_assignment_gets_period_updated(): void {
         $test_data = $this->prepare_assignments();
         $track_id = $test_data->track1->id;
         $user_id = $test_data->user1->id;
@@ -232,7 +513,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $this->assert_user_assignment_period($track_id, $user_id, $yesterday, $tomorrow);
     }
 
-    private function assert_user_assignment_period(int $track_id, int $user_id, ?int $start, ?int $end) {
+    private function assert_user_assignment_period(int $track_id, int $user_id, ?int $start, ?int $end): void {
         /** @var track_user_assignment $user_assignment */
         $user_assignment = track_user_assignment::repository()
             ->where('track_id', $track_id)
@@ -242,7 +523,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $this->assertEquals($end, $user_assignment->period_end_date);
     }
 
-    public function test_user_assignment_is_only_created_once() {
+    public function test_user_assignment_is_only_created_once(): void {
         $test_data = $this->prepare_assignments();
 
         $track1_id = $test_data->track1->id;
@@ -439,10 +720,16 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
      * @param int $track_id
      * @param int|null $user_id
      * @param bool|null $deleted
+     * @param null $job_assignment_id
      */
-    private function assert_track_has_user_assignments(int $track_id, ?int $user_id = null, ?bool $deleted = null): void {
+    private function assert_track_has_user_assignments(
+        int $track_id,
+        ?int $user_id = null,
+        ?bool $deleted = null,
+        $job_assignment_id = null
+    ): void {
         $this->assertTrue(
-            $this->track_has_user_assignments($track_id, $user_id, $deleted),
+            $this->track_has_user_assignments($track_id, $user_id, $deleted, $job_assignment_id),
             'Track should have user assignments'
         );
     }
@@ -453,10 +740,16 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
      * @param int $track_id
      * @param int|null $user_id
      * @param bool|null $deleted
+     * @param null $job_assignment_id
      */
-    private function assert_track_has_no_user_assignments(int $track_id, ?int $user_id = null, ?bool $deleted = null): void {
+    private function assert_track_has_no_user_assignments(
+        int $track_id,
+        ?int $user_id = null,
+        ?bool $deleted = null,
+        $job_assignment_id = null
+    ): void {
         $this->assertFalse(
-            $this->track_has_user_assignments($track_id, $user_id, $deleted),
+            $this->track_has_user_assignments($track_id, $user_id, $deleted, $job_assignment_id),
             'Track should not have user assignments'
         );
     }
@@ -467,13 +760,20 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
      * @param int $track_id
      * @param int|null $user_id
      * @param bool|null $deleted
+     * @param null $job_assignment_id
      * @return bool
      */
-    private function track_has_user_assignments(int $track_id, ?int $user_id = null, ?bool $deleted = null): bool {
+    private function track_has_user_assignments(
+        int $track_id,
+        ?int $user_id = null,
+        ?bool $deleted = null,
+        $job_assignment_id = null
+    ): bool {
         $repo = track_user_assignment::repository()
             ->where('track_id', $track_id)
-            ->when($user_id, function (entity_repository $repository) use ($user_id) {
+            ->when($user_id, function (entity_repository $repository) use ($user_id, $job_assignment_id) {
                 $repository->where('subject_user_id', $user_id);
+                $repository->where('job_assignment_id', $job_assignment_id);
             })
             ->when($deleted !== null, function (entity_repository $repository) use ($deleted) {
                 $repository->where('deleted', $deleted);
@@ -497,15 +797,23 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         cohort_remove_member($cohort_id, $user_id);
     }
 
-    private function prepare_assignments() {
+    private function prepare_assignments(
+        $subject_instance_generation = track_entity::SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT
+    ) {
         $test_data = new class() {
             public $user1;
             public $user2;
             public $cohort1;
             public $cohort2;
             public $activity1;
+
+            /** @var $track1 track */
             public $track1;
+
+            /** @var $assignment1 track_assignment */
             public $assignment1;
+
+            /** @var $assignment1 track_assignment */
             public $assignment2;
         };
 
@@ -523,13 +831,17 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
             ->create_activity_tracks($test_data->activity1)
             ->first();
 
+        $track1 = new track_entity($test_data->track1->id);
+        $track1->subject_instance_generation = $subject_instance_generation;
+        $track1->save();
+
         $test_data->assignment1 = new track_assignment([
             'track_id' => $test_data->track1->id,
             'type' => track_assignment_type::ADMIN,
             'user_group_type' => grouping::COHORT,
             'user_group_id' => $test_data->cohort1->id,
             'created_by' => 0,
-            'expand' => true
+            'expand' => true,
         ]);
         $test_data->assignment1->save();
 

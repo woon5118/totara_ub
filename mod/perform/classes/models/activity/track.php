@@ -719,4 +719,13 @@ class track extends model {
         $this->entity->update();
     }
 
+    /**
+     * Should one subject instance be created for each users job assignments, regardless of job assignment configuration.
+     *
+     * @return bool
+     */
+    public function is_per_job_subject_instance_generation(): bool {
+        return (int) $this->entity->subject_instance_generation === track_entity::SUBJECT_INSTANCE_GENERATION_ONE_PER_JOB;
+    }
+
 }
