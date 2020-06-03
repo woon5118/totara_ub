@@ -24,16 +24,19 @@
 namespace mod_perform\webapi\resolver\mutation;
 
 use core\webapi\execution_context;
-use core\webapi\mutation_resolver;
 use core\webapi\middleware\require_advanced_feature;
+use core\webapi\mutation_resolver;
 use core\webapi\resolver\has_middleware;
-use mod_perform\webapi\middleware\require_activity;
 use mod_perform\models\activity\activity;
+use mod_perform\models\activity\activity_setting;
+use mod_perform\models\activity\section;
+use mod_perform\webapi\middleware\require_activity;
 use moodle_exception;
 
-class activate_activity implements mutation_resolver, has_middleware {
+class add_section implements mutation_resolver, has_middleware {
+
     /**
-     * This activates the activity
+     * This adds a new section to the activity
      *
      * {@inheritdoc}
      */
@@ -48,18 +51,13 @@ class activate_activity implements mutation_resolver, has_middleware {
             }
         }
 
-        // If activity is already active just return
-        if ($activity->is_active()) {
-            return ['activity' => $activity];
+        if (!$activity->get_settings()->lookup(activity_setting::MULTISECTION)) {
+            throw new moodle_exception('add_section_error_section_mode', 'mod_perform');
         }
 
-        if (!$activity->can_activate()) {
-            throw new moodle_exception('error_activate', 'mod_perform');
-        }
+        $section = section::create($activity);
 
-        $activity->activate();
-
-        return ['activity' => $activity];
+        return ['section' => $section];
     }
 
     /**

@@ -45,18 +45,33 @@
         @mutation-error="$emit('mutation-error')"
       />
     </div>
+
+    <ButtonIcon
+      v-show="value.settings.multisection"
+      :aria-label="$str('add_section', 'mod_perform')"
+      :text="$str('add_section', 'mod_perform')"
+      :styleclass="{ small: true }"
+      @click.prevent="addSection"
+    >
+      <AddIcon size="200" />
+    </ButtonIcon>
   </div>
 </template>
 
 <script>
 import ActivityMultipleSectionToggle from 'mod_perform/components/manage_activity/content/ActivityMultipleSectionToggle';
 import ActivitySection from 'mod_perform/components/manage_activity/content/ActivitySection';
+import AddIcon from 'totara_core/components/icons/common/Add';
+import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
+import AddSectionMutation from 'mod_perform/graphql/add_section.graphql';
 import WorkflowOptions from 'mod_perform/components/manage_activity/WorkflowOptions';
 
 export default {
   components: {
     ActivityMultipleSectionToggle,
     ActivitySection,
+    AddIcon,
+    ButtonIcon,
     WorkflowOptions,
   },
   props: {
@@ -132,12 +147,22 @@ export default {
     createSectionStates(activity) {
       return activity.sections && activity.sections.length > 0
         ? activity.sections.map(section => {
-            return {
-              editMode: false,
-              section: section,
-            };
+            return this.createSectionState(section);
           })
         : [];
+    },
+    /**
+     * Create section state for one section.
+     * @param {Object} section
+     * @param {Boolean} editMode
+     *
+     * @return {Object}
+     */
+    createSectionState(section, editMode = false) {
+      return {
+        editMode: editMode,
+        section: section,
+      };
     },
     /**
      * Update activity multisection.
@@ -168,14 +193,45 @@ export default {
         this.$emit('mutation-error', e);
       }
     },
+    /**
+     * Add a new section at the end of the list
+     * @return {Promise<void>}
+     */
+    async addSection() {
+      const {
+        data: {
+          mod_perform_add_section: { section },
+        },
+      } = await this.$apollo.mutate({
+        mutation: AddSectionMutation,
+        variables: {
+          input: {
+            activity_id: this.value.id,
+          },
+        },
+        refetchAll: false,
+      });
+
+      // Add newly created section to the list of section
+      this.sectionStates.push(this.createSectionState(section, true));
+
+      // Make sure we scroll to the newly created section
+      this.$nextTick(() => {
+        if (this.$children[this.$children.length - 1]) {
+          this.$children[this.$children.length - 1].$el.scrollIntoView();
+        }
+      });
+      return section;
+    },
   },
 };
 </script>
 
 <lang-strings>
   {
-    "mod_perform": [
-      "activity_content_tab_heading"
-    ]
+  "mod_perform": [
+  "activity_content_tab_heading",
+  "add_section"
+  ]
   }
 </lang-strings>

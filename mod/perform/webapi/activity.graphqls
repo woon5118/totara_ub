@@ -337,6 +337,20 @@ type mod_perform_participant_section_result {
   participant_section: mod_perform_section!
 }
 
+"""
+Input type for adding a new section to an activity
+"""
+input mod_perform_add_section_input {
+  activity_id: core_id!
+}
+
+"""
+Mutation return type including the section just added
+"""
+type mod_perform_add_section_result {
+  section: mod_perform_section!
+}
+
 extend type Mutation {
   mod_perform_create_activity(
     name: param_text!
@@ -396,6 +410,13 @@ extend type Mutation {
   mod_perform_toggle_activity_multisection_setting(
     input: toggle_activity_setting!
   ): mod_perform_activity!
+
+  """
+  Adds a new section at the end
+  """
+  mod_perform_add_section(
+    input: mod_perform_add_section_input!
+  ): mod_perform_add_section_result!
 }
 
 """

@@ -53,21 +53,8 @@ class mod_perform_section_model_testcase extends mod_perform_relationship_testca
         $section3 = section::create($activity);
 
         $this->assertEquals('Test Section', $section1->title);
-        $this->assertEquals('Section 2', $section2->title);
-        $this->assertEquals('Section 3', $section3->title);
-
-        section_entity::repository()->where('id', $section1->id)->delete();
-
-        $this->assertEquals('Section 1', $section2->title);
-        $this->assertEquals('Section 2', $section3->title);
-
-        $section4 = section::create($activity, '');
-        $section5 = section::create($activity, 0);
-        section_entity::repository()->where('id', $section3->id)->delete();
-
-        $this->assertEquals('Section 1', $section2->title);
-        $this->assertEquals('Section 2', $section4->title);
-        $this->assertEquals('0', $section5->title);
+        $this->assertEquals('   ', $section2->title);
+        $this->assertEquals('', $section3->title);
     }
 
     public function test_update_relationships() {

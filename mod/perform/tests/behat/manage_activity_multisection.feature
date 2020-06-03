@@ -13,8 +13,7 @@ Feature: Managing an activity with multiple sections
     And I navigate to the manage perform activities page
 
   Scenario: Manage participants for an activity with multiple sections.
-    Given I navigate to the manage perform activities page
-    When I click on "Multiple section Activity" "link"
+    When I navigate to the edit perform activities page for activity "Multiple section Activity"
     And I click on ".tui-toggleBtn" "css_element"
     Then I should see "All existing content will be grouped into the first section, along with the existing participant settings" in the tui modal
     And I confirm the tui confirmation modal
@@ -61,8 +60,7 @@ Feature: Managing an activity with multiple sections
     And I should see "Appraiser*" in the "2" activity section
 
   Scenario: Toggle multisection states
-    Given I navigate to the manage perform activities page
-    When I click on "Participant set up test" "link"
+    When I navigate to the edit perform activities page for activity "Participant set up test"
     And I click on ".tui-toggleBtn" "css_element"
     Then I should see "All existing content will be grouped into the first section, along with the existing participant settings" in the tui modal
     And I confirm the tui confirmation modal
@@ -80,3 +78,55 @@ Feature: Managing an activity with multiple sections
     Then I should see "Activity saved" in the tui "success" notification toast
     And I close the tui notification toast
     And I should not see "(*Can view others' responses)"
+
+  Scenario: Add sections
+    When I navigate to the edit perform activities page for activity "Participant set up test"
+    Then "Add section" "button" should not be visible
+    When I click on ".tui-toggleBtn" "css_element"
+    Then I should see "All existing content will be grouped into the first section, along with the existing participant settings" in the tui modal
+    When I confirm the tui confirmation modal
+    And I close the tui notification toast
+    # Only one section should be there
+    Then ".tui-performManageActivityContent__items .tui-performActivitySection:nth-child(1)" "css_element" should exist
+    And ".tui-performManageActivityContent__items .tui-performActivitySection:nth-child(2)" "css_element" should not exist
+    And "Add section" "button" should be visible
+    When I click on "Add section" "button"
+    # Now the second one exists and is in edit mode - form is displayed
+    Then ".tui-performManageActivityContent__items .tui-performActivitySection:nth-child(1)" "css_element" should exist
+    And ".tui-performManageActivityContent__items .tui-performActivitySection:nth-child(2) input[type=text]" "css_element" should exist
+    # Reload page
+    When I navigate to the edit perform activities page for activity "Participant set up test"
+    Then "Add section" "button" should be visible
+    # Titles should be displayed
+    And "Untitled Section" "text" in the ".tui-performManageActivityContent__items .tui-performActivitySection:nth-child(1)" "css_element" should be visible
+    And "Untitled Section" "text" in the ".tui-performManageActivityContent__items .tui-performActivitySection:nth-child(2)" "css_element" should be visible
+    # read-only mode - no form displayed
+    And ".tui-performManageActivityContent__items .tui-performActivitySection:nth-child(1) input[type=text]" "css_element" should not exist
+    And ".tui-performManageActivityContent__items .tui-performActivitySection:nth-child(2) input[type=text]" "css_element" should not exist
+    When I click on "Add section" "button"
+    # Now the third one exists and is in edit mode - form is displayed
+    Then ".tui-performManageActivityContent__items .tui-performActivitySection:nth-child(1)" "css_element" should exist
+    And ".tui-performManageActivityContent__items .tui-performActivitySection:nth-child(2)" "css_element" should exist
+    And ".tui-performManageActivityContent__items .tui-performActivitySection:nth-child(1) input[type=text]" "css_element" should not exist
+    And ".tui-performManageActivityContent__items .tui-performActivitySection:nth-child(2) input[type=text]" "css_element" should not exist
+    And ".tui-performManageActivityContent__items .tui-performActivitySection:nth-child(3) input[type=text]" "css_element" should exist
+    # Titles should be displayed
+    And "Untitled Section" "text" in the ".tui-performManageActivityContent__items .tui-performActivitySection:nth-child(1)" "css_element" should be visible
+    And "Untitled Section" "text" in the ".tui-performManageActivityContent__items .tui-performActivitySection:nth-child(2)" "css_element" should be visible
+    And "Untitled Section" "text" in the ".tui-performManageActivityContent__items .tui-performActivitySection:nth-child(3)" "css_element" should not be visible
+    When I click on "Add section" "button"
+    # Now the fourth one exists and is in edit mode - form is displayed
+    Then ".tui-performManageActivityContent__items .tui-performActivitySection:nth-child(1)" "css_element" should exist
+    And ".tui-performManageActivityContent__items .tui-performActivitySection:nth-child(2)" "css_element" should exist
+    And ".tui-performManageActivityContent__items .tui-performActivitySection:nth-child(3)" "css_element" should exist
+    And ".tui-performManageActivityContent__items .tui-performActivitySection:nth-child(4)" "css_element" should exist
+    And ".tui-performManageActivityContent__items .tui-performActivitySection:nth-child(1) input[type=text]" "css_element" should not exist
+    And ".tui-performManageActivityContent__items .tui-performActivitySection:nth-child(2) input[type=text]" "css_element" should not exist
+    And ".tui-performManageActivityContent__items .tui-performActivitySection:nth-child(3) input[type=text]" "css_element" should exist
+    And ".tui-performManageActivityContent__items .tui-performActivitySection:nth-child(4) input[type=text]" "css_element" should exist
+    And "Add section" "button" should be visible
+    # Titles should be displayed
+    And "Untitled Section" "text" in the ".tui-performManageActivityContent__items .tui-performActivitySection:nth-child(1)" "css_element" should be visible
+    And "Untitled Section" "text" in the ".tui-performManageActivityContent__items .tui-performActivitySection:nth-child(2)" "css_element" should be visible
+    And "Untitled Section" "text" in the ".tui-performManageActivityContent__items .tui-performActivitySection:nth-child(3)" "css_element" should not be visible
+    And "Untitled Section" "text" in the ".tui-performManageActivityContent__items .tui-performActivitySection:nth-child(4)" "css_element" should not be visible
