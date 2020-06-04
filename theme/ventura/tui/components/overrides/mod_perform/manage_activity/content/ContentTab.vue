@@ -25,10 +25,15 @@
   & > * + * {
     margin: var(--tui-gap-4) 0 0;
   }
+
   &__items {
     & > * + * {
       margin-top: var(--tui-gap-4);
     }
+  }
+
+  &__heading {
+    @include tui-font-heading-small();
   }
 }
 </style>

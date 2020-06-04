@@ -141,14 +141,14 @@
             <Button
               :text="$str('edit_content_elements', 'mod_perform')"
               :aria-label="$str('edit_content_elements', 'mod_perform')"
-              @click="modelOpen = true"
+              @click="modalOpen = true"
             />
           </div>
         </GridItem>
       </Grid>
     </div>
 
-    <ModalPresenter :open="modelOpen" @request-close="modalRequestClose">
+    <ModalPresenter :open="modalOpen" @request-close="modalRequestClose">
       <EditSectionContentModal
         :section-id="section.id"
         @mutation-success="showMutationSuccessNotification"
@@ -197,6 +197,7 @@ export default {
     ModalPresenter,
     ParticipantsPopover,
   },
+
   props: {
     autoSave: {
       type: Boolean,
@@ -223,15 +224,17 @@ export default {
       required: true,
     },
   },
+
   data() {
     return {
-      modelOpen: false,
+      modalOpen: false,
       savedSection: this.section,
       displayedParticipants: this.getParticipantsFromSection(this.section),
       title: this.getTitle(),
       isSaving: false,
     };
   },
+
   computed: {
     /**
      * Get saved participants.
@@ -241,6 +244,7 @@ export default {
     savedParticipants() {
       return this.getParticipantsFromSection(this.savedSection);
     },
+
     /**
      * Has anything changed compared to last saved state?
      * Checks for difference between displayed & last saved participants arrays.
@@ -261,6 +265,7 @@ export default {
         })
       );
     },
+
     /**
      * Gets Sorted list of the displayed participants.
      *
@@ -272,6 +277,7 @@ export default {
         .sort((a, b) => a.relationship.id - b.relationship.id);
     },
   },
+
   methods: {
     /**
      * Gets section relationships.
@@ -284,6 +290,7 @@ export default {
       }
       return [];
     },
+
     /**
      * Get section title.
      *
@@ -292,6 +299,7 @@ export default {
     getTitle() {
       return this.section.title;
     },
+
     /**
      * Get section relationships.
      *
@@ -305,6 +313,7 @@ export default {
         };
       });
     },
+
     /**
      * Update section.
      */
@@ -318,24 +327,28 @@ export default {
     updateTitle(update) {
       this.title = update;
     },
+
     /**
      * Enable edit-mode on section.
      */
     enableEditing() {
       this.$emit('toggle-edit-mode', true);
     },
+
     /**
      * Disable edit-mode on section.
      */
     disableEditing() {
       this.$emit('toggle-edit-mode', false);
     },
+
     /**
      * Close edit section content modal.
      */
     modalRequestClose() {
-      this.modelOpen = false;
+      this.modalOpen = false;
     },
+
     /**
      * Update the displayed participants.
      * @param {Array} checkedParticipants List of new participants
@@ -353,6 +366,7 @@ export default {
         this.trySave();
       }
     },
+
     /**
      * Update data of a participant.
      * @param {Object} participant
@@ -367,6 +381,7 @@ export default {
         this.trySave();
       }
     },
+
     /**
      * Remove participant from displayed participant.
      * @param {Object} participant
@@ -379,6 +394,7 @@ export default {
         this.trySave();
       }
     },
+
     /**
      * Reset changes made in the section.
      */
@@ -388,6 +404,7 @@ export default {
       );
       this.disableEditing();
     },
+
     /**
      * Show success notification.
      */

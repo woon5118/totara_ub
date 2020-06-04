@@ -24,7 +24,7 @@
 
 <template>
   <div class="tui-performManageActivityContent">
-    <WorkflowOptions :activity="value" />
+    <WorkflowSettings :activity="value" />
 
     <h3 class="tui-performManageActivityContent__heading">
       {{ $str('activity_content_tab_heading', 'mod_perform') }}
@@ -71,9 +71,9 @@
 import ActivityMultipleSectionToggle from 'mod_perform/components/manage_activity/content/ActivityMultipleSectionToggle';
 import ActivitySection from 'mod_perform/components/manage_activity/content/ActivitySection';
 import AddIcon from 'totara_core/components/icons/common/Add';
-import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
 import AddSectionMutation from 'mod_perform/graphql/add_section.graphql';
-import WorkflowOptions from 'mod_perform/components/manage_activity/WorkflowOptions';
+import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
+import WorkflowSettings from 'mod_perform/components/manage_activity/content/WorkflowSettings';
 
 export default {
   components: {
@@ -81,20 +81,23 @@ export default {
     ActivitySection,
     AddIcon,
     ButtonIcon,
-    WorkflowOptions,
+    WorkflowSettings,
   },
+
   props: {
     value: {
       type: Object,
       required: true,
     },
   },
+
   data() {
     return {
       sectionStates: this.createSectionStates(this.value),
       isAdding: false,
     };
   },
+
   computed: {
     /**
      * Checks if section should auto-save on changes.
@@ -105,6 +108,7 @@ export default {
       return !this.value.settings.multisection;
     },
   },
+
   methods: {
     /**
      * Updates an activity section.
@@ -122,6 +126,7 @@ export default {
       this.updateActivity(valueCopy);
       this.updateSectionState(updatedSection, sectionIndex);
     },
+
     /**
      * Changes edit mode for a section state.
      * @param {Boolean} editMode Section data
@@ -130,6 +135,7 @@ export default {
     toggleSectionStateEditMode(editMode, i) {
       this.sectionStates[i].editMode = editMode;
     },
+
     /**
      * Update a section state.
      * @param {Object} update Section data
@@ -138,6 +144,7 @@ export default {
     updateSectionState(update, i) {
       this.sectionStates[i].section = update;
     },
+
     /**
      * Create section states from sections.
      * @param {Object} activity
@@ -165,6 +172,7 @@ export default {
         section: section,
       };
     },
+
     /**
      * Update activity multisection.
      * @param {Object} update
@@ -173,6 +181,7 @@ export default {
       this.sectionStates[0].editMode = update.settings.multisection;
       this.updateActivity(update);
     },
+
     /**
      * Update activity.
      * @param {Object} update
@@ -182,6 +191,7 @@ export default {
 
       this.$emit('input', newValue);
     },
+
     /**
      * Save changes.
      */

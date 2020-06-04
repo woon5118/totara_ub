@@ -21,10 +21,10 @@
 -->
 
 <style lang="scss">
-.tui-performActivityWorkflowOptions {
+.tui-performActivityWorkflowSettings {
   padding-bottom: var(--tui-gap-8);
 
-  &__sectionTitle {
+  &__heading {
     @include tui-font-heading-small();
   }
 
@@ -35,6 +35,14 @@
 
     &-subtext {
       @include tui-font-body-small();
+    }
+  }
+}
+
+@media (min-width: $tui-screen-sm) {
+  .tui-performActivityWorkflowSettings {
+    & > * + * {
+      padding-top: var(--tui-gap-4);
     }
   }
 }

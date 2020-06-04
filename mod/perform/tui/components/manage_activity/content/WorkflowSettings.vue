@@ -21,9 +21,9 @@
 -->
 
 <template>
-  <div class="tui-performActivityWorkflowOptions">
-    <h3 class="tui-performActivityWorkflowOptions__sectionTitle">
-      {{ $str('workflow', 'mod_perform') }}
+  <div class="tui-performActivityWorkflowSettings">
+    <h3 class="tui-performActivityWorkflowSettings__heading">
+      {{ $str('workflow_settings', 'mod_perform') }}
     </h3>
     <Form>
       <FormRow
@@ -38,13 +38,13 @@
           "
           @change="save"
         >
-          <p class="tui-performActivityWorkflowOptions__automaticClosure-text">
+          <p class="tui-performActivityWorkflowSettings__automaticClosure-text">
             {{
               $str('workflow_automatic_closure_on_completion', 'mod_perform')
             }}
           </p>
           <p
-            class="tui-performActivityWorkflowOptions__automaticClosure-subtext"
+            class="tui-performActivityWorkflowSettings__automaticClosure-subtext"
           >
             {{
               $str(
@@ -134,11 +134,11 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
-      "workflow",
       "workflow_automatic_closure_label",
       "workflow_automatic_closure_label_help",
       "workflow_automatic_closure_on_completion",
       "workflow_automatic_closure_on_completion_help",
+      "workflow_settings",
       "toast_error_generic_update",
       "toast_success_activity_update"
     ]
