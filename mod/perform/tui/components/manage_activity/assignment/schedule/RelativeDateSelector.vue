@@ -103,7 +103,6 @@ import {
   RELATIVE_DATE_DIRECTION_AFTER,
   RELATIVE_DATE_UNIT_DAY,
   RELATIVE_DATE_UNIT_WEEK,
-  RELATIVE_DATE_UNIT_MONTH,
 } from 'mod_perform/constants';
 
 export default {
@@ -132,6 +131,7 @@ export default {
       },
     },
   },
+
   computed: {
     unitOptions() {
       return [
@@ -142,10 +142,6 @@ export default {
         {
           label: this.$str('relative_date_selector_weeks', 'mod_perform'),
           id: RELATIVE_DATE_UNIT_WEEK,
-        },
-        {
-          label: this.$str('relative_date_selector_months', 'mod_perform'),
-          id: RELATIVE_DATE_UNIT_MONTH,
         },
       ];
     },
@@ -221,7 +217,6 @@ export default {
       "relative_date_selector_direction",
       "relative_date_selector_error_range",
       "relative_date_selector_from",
-      "relative_date_selector_months",
       "relative_date_selector_unit",
       "relative_date_selector_until",
       "relative_date_selector_weeks"

@@ -31,7 +31,6 @@ abstract class schedule_constants {
 
     public const DAY = 'DAY';
     public const WEEK = 'WEEK';
-    public const MONTH = 'MONTH';
 
     /**
      * Ensure the supplied direction is valid for use in the mod_perform/dates namespace.
@@ -50,7 +49,7 @@ abstract class schedule_constants {
      * @param string $unit
      */
     public static function validate_unit(string $unit): void {
-        if (!in_array($unit, [self::DAY, self::WEEK, self::MONTH])) {
+        if (!in_array($unit, [self::DAY, self::WEEK])) {
             throw new coding_exception(sprintf('Invalid unit %s', $unit));
         }
     }

@@ -10,7 +10,6 @@ A list of possible units which can be used for relative dynamic date schedules
 enum mod_perform_track_dynamic_unit_enums {
   DAY
   WEEK
-  MONTH
 }
 
 """

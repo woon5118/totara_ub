@@ -53,12 +53,9 @@ class mod_perform_relative_date_adjuster_testcase extends advanced_testcase {
         return [
             '0 days' => [0, schedule_constants::DAY, $this->get_reference_timestamp()],
             '0 weeks' => [0, schedule_constants::WEEK, $this->get_reference_timestamp()],
-            '0 months' => [0, schedule_constants::MONTH, $this->get_reference_timestamp()],
 
             '7 days' => [7, schedule_constants::DAY, $this->get_one_week_earlier()],
             '1 week' => [1, schedule_constants::WEEK, $this->get_one_week_earlier()],
-
-            '1 month' => [1, schedule_constants::MONTH, $this->get_one_month_earlier()],
         ];
     }
 
@@ -83,45 +80,9 @@ class mod_perform_relative_date_adjuster_testcase extends advanced_testcase {
         return [
             '0 days' => [0, schedule_constants::DAY, $this->get_reference_timestamp()],
             '0 weeks' => [0, schedule_constants::WEEK, $this->get_reference_timestamp()],
-            '0 months' => [0, schedule_constants::MONTH, $this->get_reference_timestamp()],
 
             '7 days' => [7, schedule_constants::DAY, $this->get_one_week_later()],
             '1 week' => [1, schedule_constants::WEEK, $this->get_one_week_later()],
-
-            '1 month' => [1, schedule_constants::MONTH, $this->get_one_month_later()],
-        ];
-    }
-
-    /**
-     * @dataProvider month_adjustment_provider
-     * @param string $reference_date
-     * @param int $count
-     * @param string $unit
-     * @param string $expected
-     */
-    public function test_month_adjustment(string $reference_date, int $count, string $unit, string $expected): void {
-        $direction = $count > -1 ? schedule_constants::AFTER : schedule_constants::BEFORE;
-        $reference_timestamp = (new DateTimeImmutable($reference_date, new DateTimeZone('utc')))
-            ->getTimestamp();
-
-        $actual_timestamp = (new relative_date_adjuster())->adjust(
-            abs($count),
-            $unit,
-            $direction,
-            $reference_timestamp
-        );
-
-        $actual = (new DateTimeImmutable('@' . $actual_timestamp, new DateTimeZone('utc')))->format('Y-m-d');
-
-        self::assertEquals($expected, $actual);
-    }
-
-    public function month_adjustment_provider(): array {
-        return [
-            'Addition with no day overflow' => ['2020-05-15', 1, schedule_constants::MONTH, '2020-06-15'],
-            'Subtraction with no day overflow' => ['2020-05-15', -1, schedule_constants::MONTH, '2020-04-15'],
-            'Addition with day overflow' => ['2020-01-31', 1, schedule_constants::MONTH, '2020-03-02'],
-            'Subtraction with day overflow' => ['2020-03-31', -1, schedule_constants::MONTH, '2020-03-02'],
         ];
     }
 
@@ -153,18 +114,8 @@ class mod_perform_relative_date_adjuster_testcase extends advanced_testcase {
         return 1589328000; // (utc) Wednesday, 13 May 2020 00:00:00
     }
 
-    protected function get_one_month_earlier(): int {
-        // Using standard php date modification semantics.
-        return 1587340800; // (utc) Monday, 20 April 2020 00:00:00
-    }
-
     protected function get_one_week_later(): int {
         return 1590537600; // (utc) Wednesday, 27 May 2020 00:00:00
-    }
-
-    protected function get_one_month_later(): int {
-        // Using standard php date modification semantics.
-        return 1592611200; // (utc) Saturday, 20 June 2020 00:00:00
     }
 
 }

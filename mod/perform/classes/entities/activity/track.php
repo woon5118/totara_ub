@@ -78,7 +78,6 @@ class track extends entity {
 
     public const SCHEDULE_DYNAMIC_UNIT_DAY = 0;
     public const SCHEDULE_DYNAMIC_UNIT_WEEK = 1;
-    public const SCHEDULE_DYNAMIC_UNIT_MONTH = 2;
 
     public const SCHEDULE_DYNAMIC_DIRECTION_AFTER = 0;
     public const SCHEDULE_DYNAMIC_DIRECTION_BEFORE = 1;

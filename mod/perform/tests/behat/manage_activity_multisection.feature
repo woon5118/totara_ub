@@ -59,7 +59,7 @@ Feature: Managing an activity with multiple sections
     And I should see "Appraiser*" in the "1" activity section
     And I should see "Appraiser*" in the "2" activity section
 
-  Scenario: Toggle multisection states
+  Scenario: Manage activity - toggle multisection states
     When I navigate to the edit perform activities page for activity "Participant set up test"
     And I click on ".tui-toggleBtn" "css_element"
     Then I should see "All existing content will be grouped into the first section, along with the existing participant settings" in the tui modal
@@ -79,7 +79,7 @@ Feature: Managing an activity with multiple sections
     And I close the tui notification toast
     And I should not see "(*Can view others' responses)"
 
-  Scenario: Add section
+  Scenario: Manage activity - Add section.
     When I navigate to the edit perform activities page for activity "Participant set up test"
     Then "Add section" "button" should not be visible
     When I click on ".tui-toggleBtn" "css_element"
@@ -134,7 +134,7 @@ Feature: Managing an activity with multiple sections
     And I should not see "Untitled section" in the "3" activity section
     And I should not see "Untitled section" in the "4" activity section
 
-  Scenario: Add section above and below
+  Scenario: Manage activity - Add section above and below
     When I navigate to the edit perform activities page for activity "Participant set up test"
     Then "Add section" "button" should not be visible
     When I click on ".tui-toggleBtn" "css_element"
@@ -178,7 +178,7 @@ Feature: Managing an activity with multiple sections
     And activity section "4" should exist
     And activity section "5" should exist
 
-  Scenario: Edit the title for sections
+  Scenario: Manage activity - Edit the title for sections
     Given the multi-language content filter is enabled
     When I navigate to the edit perform activities page for activity "Multiple section Activity"
     And I click on ".tui-toggleBtn" "css_element"

@@ -664,7 +664,6 @@ class track extends model {
         return [
             track_entity::SCHEDULE_DYNAMIC_UNIT_DAY => schedule_constants::DAY,
             track_entity::SCHEDULE_DYNAMIC_UNIT_WEEK => schedule_constants::WEEK,
-            track_entity::SCHEDULE_DYNAMIC_UNIT_MONTH => schedule_constants::MONTH,
         ];
     }
 

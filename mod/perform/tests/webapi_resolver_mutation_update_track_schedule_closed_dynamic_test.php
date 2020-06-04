@@ -52,7 +52,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_
                 'schedule_is_fixed' => false,
                 'schedule_dynamic_count_from' => 555,
                 'schedule_dynamic_count_to' => 444,
-                'schedule_dynamic_unit' => 'MONTH',
+                'schedule_dynamic_unit' => 'WEEK',
                 'schedule_dynamic_direction' => 'BEFORE',
                 'due_date_is_enabled' => false,
                 'repeating_is_enabled' => false,
@@ -77,7 +77,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_
         self::assertNull($result_track['schedule_fixed_to']);
         self::assertEquals(555, $result_track['schedule_dynamic_count_from']);
         self::assertEquals(444, $result_track['schedule_dynamic_count_to']);
-        self::assertEquals('MONTH', $result_track['schedule_dynamic_unit']);
+        self::assertEquals('WEEK', $result_track['schedule_dynamic_unit']);
         self::assertEquals('BEFORE', $result_track['schedule_dynamic_direction']);
 
         // Manually make the changes that we expect to make.
@@ -88,7 +88,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_
         $affected_track->schedule_fixed_to = null;
         $affected_track->schedule_dynamic_count_from = 555;
         $affected_track->schedule_dynamic_count_to = 444;
-        $affected_track->schedule_dynamic_unit = track_entity::SCHEDULE_DYNAMIC_UNIT_MONTH;
+        $affected_track->schedule_dynamic_unit = track_entity::SCHEDULE_DYNAMIC_UNIT_WEEK;
         $affected_track->schedule_dynamic_direction = track_entity::SCHEDULE_DYNAMIC_DIRECTION_BEFORE;
         $affected_track->schedule_needs_sync = 1;
         $affected_track->due_date_is_enabled = 0;
@@ -116,7 +116,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_
                 'track_id' => $this->track1_id,
                 'schedule_is_open' => false,
                 'schedule_is_fixed' => false,
-                'schedule_dynamic_unit' => 'MONTH',
+                'schedule_dynamic_unit' => 'WEEK',
                 'schedule_dynamic_direction' => 'AFTER',
                 'schedule_dynamic_count_from' => 200,
                 'schedule_dynamic_count_to' => 100,
@@ -143,7 +143,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_
                 'schedule_is_fixed' => false,
                 'schedule_dynamic_count_from' => 555,
                 'schedule_dynamic_count_to' => 444,
-                'schedule_dynamic_unit' => 'MONTH',
+                'schedule_dynamic_unit' => 'WEEK',
                 'schedule_dynamic_direction' => 'BEFORE',
                 'due_date_is_enabled' => false,
                 'repeating_is_enabled' => false,

@@ -34,12 +34,9 @@ class relative_date_adjuster {
      * @param string $direction The direction/edge boundary to apply the adjustment towards.
      *                          Must be a direction const from schedule_constants.
      * @param string $unit The unit to apply the adjustment in. Must be a unit const from schedule_constants.
-     *                      Please note no special treatment has been given to months,
-     *                      normal php date time modification semantics apply (1 month after Jan 30 is March 1).
      * @param int $reference_date The unix timestamp of the reference date (date to shift before or after).
      *
      * @return int Unix timestamp
-     * @see https://stackoverflow.com/questions/3602405/php-datetimemodify-adding-and-subtracting-months
      */
     public function adjust(int $count, string $unit, string $direction, int $reference_date): int {
         schedule_constants::validate_unit($unit);

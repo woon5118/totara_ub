@@ -29,7 +29,6 @@ export const RELATIVE_DATE_DIRECTION_AFTER = 'AFTER';
 export const RELATIVE_DATE_DIRECTION_BEFORE = 'BEFORE';
 export const RELATIVE_DATE_UNIT_DAY = 'DAY';
 export const RELATIVE_DATE_UNIT_WEEK = 'WEEK';
-export const RELATIVE_DATE_UNIT_MONTH = 'MONTH';
 
 // These should correspond to constants found in mod/perform/classes/constants.php in the back end.
 export const SCHEDULE_REPEATING_TYPE_AFTER_CREATION = 'AFTER_CREATION';
