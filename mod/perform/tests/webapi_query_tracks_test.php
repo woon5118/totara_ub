@@ -163,6 +163,7 @@ class mod_perform_webapi_query_tracks_testcase extends advanced_testcase {
             'description' => $resolve('description'),
             'status' => $resolve('status'),
             'assignments' => $resolve('assignments'),
+            'subject_instance_generation_control_is_enabled' => $resolve('subject_instance_generation_control_is_enabled'),
             'subject_instance_generation' => $resolve('subject_instance_generation'),
             'schedule_is_open' => $resolve('schedule_is_open'),
             'schedule_is_fixed' => $resolve('schedule_is_fixed'),

@@ -45,25 +45,9 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_
     public function test_correct_track_is_updated(): void {
         global $DB;
 
-        self::setAdminUser();
-
-        $configuration = mod_perform_activity_generator_configuration::new();
-        $configuration->set_number_of_activities(2);
-        $configuration->set_number_of_tracks_per_activity(2);
-
-        /** @var mod_perform_generator $perform_generator */
-        $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
-        $activities = $perform_generator->create_full_activities($configuration);
-
-        /** @var activity $activity1 */
-        $activity1 = $activities->first();
-        /** @var track $track1 */
-        $track1 = $activity1->get_tracks()->first();
-
         $args = [
             'track_schedule' => [
-                'track_id' => $track1->id,
-                'subject_instance_generation' => 'ONE_PER_SUBJECT',
+                'track_id' => $this->track1_id,
                 'schedule_is_open' => false,
                 'schedule_is_fixed' => false,
                 'schedule_dynamic_count_from' => 555,
@@ -76,8 +60,8 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_
         ];
 
         $before_tracks = $DB->get_records('perform_track', [], 'id');
-        self::assertCount(8, $before_tracks);
-        unset($before_tracks[$track1->id]->updated_at);
+        self::assertCount(4, $before_tracks);
+        unset($before_tracks[$this->track1_id]->updated_at);
 
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
         $this->assert_webapi_operation_successful($result);
@@ -86,7 +70,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_
         $result_track = $result['track'];
 
         // Verify the resulting graphql data.
-        self::assertEquals($track1->id, $result_track['id']);
+        self::assertEquals($this->track1_id, $result_track['id']);
         self::assertFalse($result_track['schedule_is_open']);
         self::assertFalse($result_track['schedule_is_fixed']);
         self::assertNull($result_track['schedule_fixed_from']);
@@ -97,8 +81,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_
         self::assertEquals('BEFORE', $result_track['schedule_dynamic_direction']);
 
         // Manually make the changes that we expect to make.
-        $affected_track = $before_tracks[$track1->id];
-        $affected_track->subject_instance_generation = track_entity::SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT;
+        $affected_track = $before_tracks[$this->track1_id];
         $affected_track->schedule_is_open = 0;
         $affected_track->schedule_is_fixed = 0;
         $affected_track->schedule_fixed_from = null;
@@ -116,9 +99,9 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_
         $affected_track->repeating_is_enabled = 0;
 
         $after_tracks = $DB->get_records('perform_track', [], 'id');
-        unset($after_tracks[$track1->id]->updated_at);
+        unset($after_tracks[$this->track1_id]->updated_at);
 
-        self::assertEquals($after_tracks, $before_tracks);
+        self::assertEquals($before_tracks, $after_tracks);
     }
 
     public function test_with_validation_errors(): void {
@@ -126,7 +109,6 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_
         $args = [
             'track_schedule' => [
                 'track_id' => $this->track1_id,
-                'subject_instance_generation' => 'ONE_PER_SUBJECT',
                 'schedule_is_open' => false,
                 'schedule_is_fixed' => false,
                 'schedule_dynamic_unit' => 'MONTH',
@@ -152,7 +134,6 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_
         $args = [
             'track_schedule' => [
                 'track_id' => $this->track1_id,
-                'subject_instance_generation' => 'ONE_PER_SUBJECT',
                 'schedule_is_open' => false,
                 'schedule_is_fixed' => false,
                 'schedule_dynamic_count_from' => 555,

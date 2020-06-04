@@ -48,6 +48,8 @@
         :schedule-is-limited-fixed="!scheduleIsOpen && scheduleIsFixed"
       />
 
+      <AdditionalScheduleSettings v-if="isGenerationControlEnabled" />
+
       <div class="tui-performAssignmentSchedule__action">
         <ButtonGroup>
           <Button
@@ -69,6 +71,7 @@
 
 <script>
 // Imports
+import AdditionalScheduleSettings from 'mod_perform/components/manage_activity/assignment/schedule/AdditionalScheduleSettings';
 import Button from 'totara_core/components/buttons/Button';
 import ButtonGroup from 'totara_core/components/buttons/ButtonGroup';
 import DueDateSettings from 'mod_perform/components/manage_activity/assignment/schedule/DueDateSettings';
@@ -87,6 +90,7 @@ import {
 
 export default {
   components: {
+    AdditionalScheduleSettings,
     Button,
     ButtonGroup,
     DueDateSettings,
@@ -109,6 +113,8 @@ export default {
       repeatingIsEnabled: this.track.repeating_is_enabled,
       isSaving: false,
       initialValues: this.getInitialValues(this.track),
+      isGenerationControlEnabled: this.track
+        .subject_instance_generation_control_is_enabled,
     };
   },
   methods: {
@@ -184,6 +190,9 @@ export default {
           count: track.due_date_relative_count || '14', // Uniform required validation doesn't support int 0 at time of writing.
           unit: track.due_date_relative_unit || RELATIVE_DATE_UNIT_DAY,
         },
+        additionalSettings: {
+          multiple_job_assignment: track.subject_instance_generation,
+        },
       };
     },
 
@@ -219,7 +228,7 @@ export default {
         this.getScheduleVariables(formValues),
         this.getRepeatingVariables(formValues),
         this.getDueDateVariables(formValues),
-        { subject_instance_generation: 'ONE_PER_SUBJECT' }
+        this.getAdditionalSettingsVariables(formValues)
       );
       return { track_schedule };
     },
@@ -291,6 +300,20 @@ export default {
       } else {
         gql.due_date_relative_count = Number(form.dueDateRelative.count); // Gql does not handle "-1" and an int type.
         gql.due_date_relative_unit = form.dueDateRelative.unit;
+      }
+
+      return gql;
+    },
+
+    /**
+     * Add the additional settings variables for the mutation.
+     * @return Object
+     */
+    getAdditionalSettingsVariables(form) {
+      const gql = {};
+      if (this.isGenerationControlEnabled) {
+        gql.subject_instance_generation =
+          form.additionalSettings.multiple_job_assignment;
       }
 
       return gql;

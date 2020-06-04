@@ -38,27 +38,14 @@ class mod_perform_webapi_resolver_mutation_update_track_subject_instance_generat
 
     use webapi_phpunit_helper;
 
-    public function test_subject_instance_generation(): void {
+    public function test_when_subject_instance_generation_control_is_enabled(): void {
         global $DB;
 
-        self::setAdminUser();
-
-        $configuration = mod_perform_activity_generator_configuration::new();
-        $configuration->set_number_of_activities(2);
-        $configuration->set_number_of_tracks_per_activity(2);
-
-        /** @var mod_perform_generator $perform_generator */
-        $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
-        $activities = $perform_generator->create_full_activities($configuration);
-
-        /** @var activity $activity1 */
-        $activity1 = $activities->first();
-        /** @var track $track1 */
-        $track1 = $activity1->get_tracks()->first();
+        set_config('totara_job_allowmultiplejobs', 1);
 
         $args = [
             'track_schedule' => [
-                'track_id' => $track1->id,
+                'track_id' => $this->track1_id,
                 'subject_instance_generation' => 'ONE_PER_JOB',
                 'schedule_is_open' => true,
                 'schedule_is_fixed' => true,
@@ -69,8 +56,8 @@ class mod_perform_webapi_resolver_mutation_update_track_subject_instance_generat
         ];
 
         $before_tracks = $DB->get_records('perform_track', [], 'id');
-        self::assertCount(8, $before_tracks);
-        unset($before_tracks[$track1->id]->updated_at);
+        self::assertCount(4, $before_tracks);
+        unset($before_tracks[$this->track1_id]->updated_at);
 
         $result = $this->resolve_graphql_mutation(
             'mod_perform_update_track_schedule',
@@ -79,11 +66,11 @@ class mod_perform_webapi_resolver_mutation_update_track_subject_instance_generat
         $result_track = $result['track'];
 
         // Verify the resulting graphql data.
-        self::assertEquals($track1->id, $result_track->id);
+        self::assertEquals($this->track1_id, $result_track->id);
         self::assertEquals('ONE_PER_JOB', $result_track->subject_instance_generation);
 
         // Manually make the changes that we expect to make.
-        $affected_track = $before_tracks[$track1->id];
+        $affected_track = $before_tracks[$this->track1_id];
         $affected_track->subject_instance_generation = track_entity::SUBJECT_INSTANCE_GENERATION_ONE_PER_JOB;
         $affected_track->schedule_is_open = 1;
         $affected_track->schedule_is_fixed = 1;
@@ -95,11 +82,69 @@ class mod_perform_webapi_resolver_mutation_update_track_subject_instance_generat
         $affected_track->schedule_dynamic_direction = null;
         $affected_track->schedule_needs_sync = 1;
         $affected_track->due_date_is_enabled = 0;
+        $affected_track->due_date_is_fixed = null;
+        $affected_track->due_date_fixed = null;
+        $affected_track->due_date_relative_count = null;
+        $affected_track->due_date_relative_unit = null;
         $affected_track->repeating_is_enabled = 0;
         $after_tracks = $DB->get_records('perform_track', [], 'id');
-        unset($after_tracks[$track1->id]->updated_at);
+        unset($after_tracks[$this->track1_id]->updated_at);
 
-        self::assertEquals($after_tracks, $before_tracks);
+        self::assertEquals($before_tracks, $after_tracks);
+    }
+
+    public function test_when_subject_instance_generation_control_is_disabled(): void {
+        global $DB;
+
+        // Multiple jobs is set off in test base class.
+
+        $args = [
+            'track_schedule' => [
+                'track_id' => $this->track1_id,
+                'schedule_is_open' => true,
+                'schedule_is_fixed' => true,
+                'schedule_fixed_from' => 222,
+                'due_date_is_enabled' => false,
+                'repeating_is_enabled' => false,
+            ],
+        ];
+
+        $before_tracks = $DB->get_records('perform_track', [], 'id');
+        self::assertCount(4, $before_tracks);
+        unset($before_tracks[$this->track1_id]->updated_at);
+
+        $result = $this->resolve_graphql_mutation(
+            'mod_perform_update_track_schedule',
+            $args
+        );
+        $result_track = $result['track'];
+
+        // Verify the resulting graphql data.
+        self::assertEquals($this->track1_id, $result_track->id);
+        self::assertEquals(null, $result_track->subject_instance_generation); // Ignores actual value.
+
+        // Manually make the changes that we expect to make.
+        $affected_track = $before_tracks[$this->track1_id];
+        $affected_track->subject_instance_generation = -1; // Unchanged.
+        $affected_track->schedule_is_open = 1;
+        $affected_track->schedule_is_fixed = 1;
+        $affected_track->schedule_fixed_from = 222;
+        $affected_track->schedule_fixed_to = null;
+        $affected_track->schedule_dynamic_count_from = null;
+        $affected_track->schedule_dynamic_count_to = null;
+        $affected_track->schedule_dynamic_unit = null;
+        $affected_track->schedule_dynamic_direction = null;
+        $affected_track->schedule_needs_sync = 1;
+        $affected_track->due_date_is_enabled = 0;
+        $affected_track->due_date_is_fixed = null;
+        $affected_track->due_date_fixed = null;
+        $affected_track->due_date_relative_count = null;
+        $affected_track->due_date_relative_unit = null;
+        $affected_track->repeating_is_enabled = 0;
+        $after_tracks = $DB->get_records('perform_track', [], 'id');
+        unset($after_tracks[$this->track1_id]->updated_at);
+
+        self::assertEquals($before_tracks, $after_tracks);
     }
 
 }

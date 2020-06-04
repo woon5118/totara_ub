@@ -41,21 +41,9 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_testcase
     use webapi_phpunit_helper;
 
     public function test_user_cannot_update_without_permission(): void {
-        self::setAdminUser();
-
-        /** @var mod_perform_generator $perform_generator */
-        $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
-        $activities = $perform_generator->create_full_activities();
-
-        /** @var activity $activity1 */
-        $activity1 = $activities->first();
-        /** @var track $track1 */
-        $track1 = $activity1->get_tracks()->first();
-
         $args = [
             'track_schedule' => [
-                'track_id' => $track1->id,
-                'subject_instance_generation' => 'ONE_PER_SUBJECT',
+                'track_id' =>$this->track1_id,
                 'schedule_is_open' => true,
                 'schedule_is_fixed' => true,
                 'schedule_fixed_from' => 222,
@@ -75,7 +63,6 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_testcase
         $args = [
             'track_schedule' => [
                 'track_id' => $this->track1_id,
-                'subject_instance_generation' => 'ONE_PER_SUBJECT',
                 'schedule_is_open' => true,
                 'schedule_is_fixed' => true,
                 'schedule_fixed_from' => 222,

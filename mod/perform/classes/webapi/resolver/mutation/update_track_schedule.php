@@ -51,7 +51,7 @@ class update_track_schedule implements mutation_resolver, has_middleware {
             );
         }
 
-        $errors = static::validate_inputs($track_schedule);
+        $errors = static::validate_inputs($track_schedule, $track);
 
         if ($errors) {
             throw new coding_exception(implode(', ', $errors));
@@ -122,10 +122,12 @@ class update_track_schedule implements mutation_resolver, has_middleware {
         }
 
         // Subject instance generation method.
-        $subject_instance_generation_methods = array_flip(track::get_subject_instance_generation_methods());
-        $track->set_subject_instace_generation(
-            $subject_instance_generation_methods[$track_schedule['subject_instance_generation']]
-        );
+        if ($track->get_subject_instance_generation_control_is_enabled()) {
+            $subject_instance_generation_methods = array_flip(track::get_subject_instance_generation_methods());
+            $track->set_subject_instace_generation(
+                $subject_instance_generation_methods[$track_schedule['subject_instance_generation']]
+            );
+        }
 
         $track->update();
 
@@ -142,13 +144,15 @@ class update_track_schedule implements mutation_resolver, has_middleware {
      * Does not check that the values are valid. This checking is done within the model.
      *
      * @param array $schedule
+     * @param track $track
      * @return array
      */
-    private static function validate_inputs(array $schedule): array {
+    private static function validate_inputs(array $schedule, track $track): array {
         $errors = [];
 
         // Only includes the optional fields, not required ones such as schedule_is_open.
         $all_fields = [
+            'subject_instance_generation',
             'schedule_fixed_from',
             'schedule_fixed_to',
             'schedule_dynamic_count_from',
@@ -200,15 +204,22 @@ class update_track_schedule implements mutation_resolver, has_middleware {
             }
         }
 
+        // Subject instance generation.
+        if ($track->get_subject_instance_generation_control_is_enabled()) {
+            $required_fields[] = 'subject_instance_generation';
+        }
+
+        // Check for missing fields.
         foreach ($required_fields as $required_field) {
             if (!isset($schedule[$required_field])) {
                 $errors[] = 'Given the specified configuration, a field was missing: ' . $required_field;
             }
         }
 
+        // Check for unwanted fields.
         $unwanted_fields = array_diff($all_fields, $required_fields);
         foreach ($unwanted_fields as $unwanted_field) {
-            if (isset($schedule[$unwanted_field]) && !is_null($schedule[$unwanted_field])) {
+            if (array_key_exists($unwanted_field, $schedule) && !is_null($schedule[$unwanted_field])) {
                 $errors[] = 'Given the specified configuration, an unexpected field was found: ' . $unwanted_field;
             }
         }

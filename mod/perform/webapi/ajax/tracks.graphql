@@ -3,6 +3,7 @@ query mod_perform_tracks($activity_id: param_integer!) {
     id
     description
     status
+    subject_instance_generation_control_is_enabled
     subject_instance_generation
     schedule_is_open
     schedule_is_fixed

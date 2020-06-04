@@ -43,7 +43,8 @@ use moodle_exception;
  * @property-read int $activity_id
  * @property-read string $description
  * @property-read int $status
- * @property-read int $subject_instance_generation
+ * @property-read bool $subject_instance_generation_control_is_enabled
+ * @property-read int|null $subject_instance_generation
  * @property-read bool $schedule_is_open
  * @property-read bool $schedule_is_fixed
  * @property-read int $schedule_fixed_from
@@ -89,6 +90,7 @@ class track extends model {
     protected $model_accessor_whitelist = [
         'activity',
         'assignments',
+        'subject_instance_generation_control_is_enabled',
         'subject_instance_generation',
         'schedule_dynamic_direction',
         'schedule_dynamic_unit',
@@ -457,8 +459,6 @@ class track extends model {
         if ($this->get_activity()->get_status_state() instanceof active) {
             $entity->schedule_needs_sync = true;
         }
-
-        $this->entity->update();
     }
 
     /**
@@ -497,8 +497,6 @@ class track extends model {
         $entity = $this->entity;
 
         $entity->repeating_is_enabled = $properties['repeating_is_enabled'];
-
-        $this->entity->update();
     }
 
     /**
@@ -561,8 +559,6 @@ class track extends model {
         $entity->due_date_fixed = $properties['due_date_fixed'] ?? null;
         $entity->due_date_relative_count = $properties['due_date_relative_count'] ?? null;
         $entity->due_date_relative_unit = $properties['due_date_relative_unit'] ?? null;
-
-        $this->entity->update();
     }
 
     public static function get_dynamic_schedule_directions(): array {
@@ -590,9 +586,12 @@ class track extends model {
     /**
      * Get the string representation of the subject instance generation method.
      *
-     * @return string
+     * @return string|null
      */
-    protected function get_subject_instance_generation(): string {
+    protected function get_subject_instance_generation(): ?string {
+        if (!$this->get_subject_instance_generation_control_is_enabled()) {
+            return null;
+        }
         return $this->map_from_entity(
             $this->entity->subject_instance_generation,
             track_model::get_subject_instance_generation_methods(),
@@ -726,6 +725,10 @@ class track extends model {
      */
     public function is_per_job_subject_instance_generation(): bool {
         return (int) $this->entity->subject_instance_generation === track_entity::SUBJECT_INSTANCE_GENERATION_ONE_PER_JOB;
+    }
+
+    public function get_subject_instance_generation_control_is_enabled(): bool {
+        return !empty(get_config(null, 'totara_job_allowmultiplejobs'));
     }
 
 }

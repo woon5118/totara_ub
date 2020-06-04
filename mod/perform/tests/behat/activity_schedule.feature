@@ -362,3 +362,28 @@ Feature: Define track schedules to perform activities
     Then the following fields match these values:
       | dueDateIsFixed         |   |
       | dueDateRelative[count] | 4 |
+
+  Scenario: Check multiple job assignments schedule settings when multiple job assignments enabled
+    Given I log in as "admin"
+    And I set the following administration settings values:
+      | totara_job_allowmultiplejobs | 1 |
+    And I navigate to the manage perform activities page
+    And I click on "My Test Activity" "link"
+    And I click on "Assignments" "link"
+    When I click on the "ONE_PER_SUBJECT" tui radio in the "additionalSettings[multiple_job_assignment]" tui radio group
+    And I save the activity schedule
+    Then I should see "Activity schedule saved" in the tui "success" notification toast
+    When I reload the page
+    And I click on "Assignments" "link"
+    Then the following fields match these values:
+      | additionalSettings[multiple_job_assignment]   | ONE_PER_SUBJECT |
+
+  Scenario: Check multiple job assignments schedule settings when multiple job assignments disabled
+    Given I log in as "admin"
+    And I set the following administration settings values:
+      | totara_job_allowmultiplejobs | 0 |
+    And I navigate to the manage perform activities page
+    And I click on "My Test Activity" "link"
+    When I click on "Assignments" "link"
+    Then I should not see "Additional settings"
+    And I should not see "Multiple job assignments"

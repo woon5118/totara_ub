@@ -44,7 +44,6 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_fixed_te
         $args = [
             'track_schedule' => [
                 'track_id' => $this->track1_id,
-                'subject_instance_generation' => 'ONE_PER_SUBJECT',
                 'schedule_is_open' => false,
                 'schedule_is_fixed' => true,
                 'schedule_fixed_from' => 222,
@@ -77,7 +76,6 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_fixed_te
 
         // Manually make the changes that we expect to make.
         $affected_track = $before_tracks[$this->track1_id];
-        $affected_track->subject_instance_generation = track_entity::SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT;
         $affected_track->schedule_is_open = 0;
         $affected_track->schedule_is_fixed = 1;
         $affected_track->schedule_fixed_from = 222;
@@ -96,7 +94,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_fixed_te
 
         $after_tracks = $DB->get_records('perform_track', [], 'id');
         unset($after_tracks[$this->track1_id]->updated_at);
-        self::assertEquals($after_tracks, $before_tracks);
+        self::assertEquals($before_tracks, $after_tracks);
     }
 
     public function test_with_validation_errors(): void {
@@ -104,7 +102,6 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_fixed_te
         $args = [
             'track_schedule' => [
                 'track_id' => $this->track1_id,
-                'subject_instance_generation' => 'ONE_PER_SUBJECT',
                 'schedule_is_open' => false,
                 'schedule_is_fixed' => true,
                 'schedule_fixed_from' => 234,

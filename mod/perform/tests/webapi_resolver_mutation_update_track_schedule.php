@@ -39,6 +39,8 @@ abstract class mod_perform_webapi_resolver_mutation_update_track_schedule_base e
 
         self::setAdminUser();
 
+        set_config('totara_job_allowmultiplejobs', 0);
+
         $configuration = mod_perform_activity_generator_configuration::new();
         $configuration->set_number_of_activities(2);
         $configuration->set_number_of_tracks_per_activity(2);
