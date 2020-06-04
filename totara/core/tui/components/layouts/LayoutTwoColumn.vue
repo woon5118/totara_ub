@@ -29,6 +29,7 @@
         { name: 'medium', boundaries: [765, 1192] },
         { name: 'large', boundaries: [1193, 1672] },
       ]"
+      @responsive-resize="resize"
     >
       <div v-if="slotProps.currentBoundaryName === 'small'">
         <Grid direction="vertical">
@@ -90,6 +91,17 @@ export default {
     Grid,
     GridItem,
     Responsive,
+  },
+
+  methods: {
+    resize(boundary) {
+      if (boundary === 'small') {
+        this.$emit('direction-change', 'vertical');
+        return;
+      }
+
+      this.$emit('direction-change', 'horizontal');
+    },
   },
 };
 </script>
