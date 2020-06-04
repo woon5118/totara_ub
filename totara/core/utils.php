@@ -331,6 +331,10 @@ function totara_core_get_relative_time_text($timestamp, $compare_to = null, $ret
         $timestamp_dt = new DateTime('@' . $timestamp);
         $interval = $compare_to_dt->diff($timestamp_dt);
         $months = $interval->format('%m');
+        $years = $interval->format('%y');
+        if ($years > 0) {
+            $months += 12 * $years; // Make sure to take years into account if it's been more than 1.
+        }
 
         if ($months == 1) {
             $relative_time = get_string('relative_time_month', 'totara_core');

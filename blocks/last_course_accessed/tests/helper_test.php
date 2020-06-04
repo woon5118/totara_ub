@@ -162,6 +162,16 @@ class test_block_last_course_accessed extends advanced_testcase {
 
         $this->assertNotEquals('A month ago', $last_accessed);
         $this->assertEquals('27 days ago', $last_accessed);
+
+        // More than a year, but less than 2 years: make sure to count 12 months in a year.
+        // November 4, 2018.
+        $timestamp = 1543584094;
+        // June 4, 2020.
+        $compare_to = 1591302267;
+
+        $last_accessed = totara_core_get_relative_time_text($timestamp, $compare_to);
+
+        $this->assertEquals('18 months ago', $last_accessed);
     }
 
     /**
