@@ -627,6 +627,8 @@ $CFG->directorypermissions = 02777;
 //
 // "\\core\\lock\\mysql_lock_factory" - DB locking based on MySQL/MariaDB locks.
 //
+// "\\core\\lock\\mssql_lock_factory" - DB locking based on MS SQL Server application locks.
+//
 // Settings used by the lock factories
 //
 // Location for lock files used by the File locking factory. This must exist
