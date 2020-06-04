@@ -34,6 +34,7 @@ use mod_perform\entities\activity\section_element as section_element_entity;
 use mod_perform\entities\activity\section_relationship as section_relationship_entity;
 use mod_perform\entities\activity\track as track_entity;
 use mod_perform\entities\activity\track_user_assignment;
+use mod_perform\entities\activity\track_user_assignment_via;
 use mod_perform\event\activity_deleted;
 use mod_perform\models\activity\activity;
 
@@ -90,8 +91,6 @@ class activity_deletion {
             // Cascading delete will also delete rows fom the following tables:
             // - perform
             // - perform_track
-            // - perform_track_user_assignment
-            // - perform_track_user_assignment_via
             // - perform_subject_instance
             // - perform_section
             // - perform_section_element
@@ -172,11 +171,45 @@ class activity_deletion {
             return;
         }
 
+        $this->delete_user_assignments_via($track_ids);
+
         // The orm/builder doesn't support joins in deletes,
         // so we just pull out all the ids with a query and delete in the next.
         builder::create()
             ->from(track_user_assignment::TABLE, 'track_user_assignment')
             ->where('track_id', $track_ids)
+            ->delete();
+    }
+
+    /**
+     * Delete a list of user assignment via based on track ids.
+     *
+     * @param array $track_ids
+     */
+    protected function delete_user_assignments_via(array $track_ids): void {
+        $ids = builder::create()
+            ->select(
+                [
+                    'track_user_assignment.id as track_user_assignment_id'
+                ]
+            )
+            ->from(track_user_assignment::TABLE, 'track_user_assignment')
+            ->where('track_id', $track_ids)
+            ->get(true);
+
+        // Remove nulls and pluck ids.
+        $track_user_assignment_ids = array_unique(
+            $ids->filter('track_user_assignment_id', true, false)
+                ->pluck('track_user_assignment_id')
+        );
+        if (count($track_user_assignment_ids) === 0) {
+            return;
+        }
+        // The orm/builder doesn't support joins in deletes,
+        // so we just pull out all the ids with a query and delete in the next.
+        builder::create()
+            ->from(track_user_assignment_via::TABLE)
+            ->where('track_user_assignment_id', $track_user_assignment_ids)
             ->delete();
     }
 
