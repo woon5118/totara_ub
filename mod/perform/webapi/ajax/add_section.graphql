@@ -3,6 +3,7 @@ mutation mod_perform_add_section($input: mod_perform_add_section_input!) {
     section {
       id
       title
+      sort_order
       section_relationships {
         id
         can_view

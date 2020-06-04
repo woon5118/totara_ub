@@ -42,6 +42,29 @@
               class="tui-performActivitySection__action-edit"
               @click="enableEditing"
             />
+            <Dropdown position="bottom-right">
+              <template v-slot:trigger="{ toggle }">
+                <ButtonIcon
+                  :styleclass="{
+                    transparentNoPadding: true,
+                  }"
+                  :aria-label="$str('section_dropdown_menu', 'mod_perform')"
+                  @click="toggle"
+                >
+                  <ActivityActionsIcon size="200" />
+                </ButtonIcon>
+              </template>
+              <DropdownItem :disabled="isAdding" @click="$emit('add_above')">
+                {{ $str('section_action_add_above', 'mod_perform') }}
+              </DropdownItem>
+              <DropdownItem
+                v-if="!lastSection"
+                :disabled="isAdding"
+                @click="$emit('add_below')"
+              >
+                {{ $str('section_action_add_below', 'mod_perform') }}
+              </DropdownItem>
+            </Dropdown>
           </div>
         </GridItem>
       </Grid>
@@ -117,6 +140,7 @@
           <div class="tui-performActivitySection__content-buttons">
             <Button
               :text="$str('edit_content_elements', 'mod_perform')"
+              :aria-label="$str('edit_content_elements', 'mod_perform')"
               @click="modelOpen = true"
             />
           </div>
@@ -136,11 +160,15 @@
 </template>
 
 <script>
+import ActivityActionsIcon from 'mod_perform/components/icons/ActivityActions';
 import ActivitySectionElementSummary from 'mod_perform/components/manage_activity/content/ActivitySectionElementSummary';
 import ActivitySectionRelationship from 'mod_perform/components/manage_activity/content/ActivitySectionRelationship';
 import Button from 'totara_core/components/buttons/Button';
 import ButtonGroup from 'totara_core/components/buttons/ButtonGroup';
+import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
 import Card from 'totara_core/components/card/Card';
+import Dropdown from 'totara_core/components/dropdown/Dropdown';
+import DropdownItem from 'totara_core/components/dropdown/DropdownItem';
 import EditIcon from 'totara_core/components/buttons/EditIcon';
 import EditSectionContentModal from 'mod_perform/components/manage_activity/content/EditSectionContentModal';
 import Grid from 'totara_core/components/grid/Grid';
@@ -152,11 +180,15 @@ import UpdateSectionRelationshipsMutation from 'mod_perform/graphql/update_secti
 
 export default {
   components: {
+    ActivityActionsIcon,
     ActivitySectionElementSummary,
     ActivitySectionRelationship,
     Button,
     ButtonGroup,
+    ButtonIcon,
     Card,
+    Dropdown,
+    DropdownItem,
     EditIcon,
     EditSectionContentModal,
     Grid,
@@ -176,6 +208,18 @@ export default {
     },
     section: {
       type: Object,
+      required: true,
+    },
+    lastSection: {
+      type: Boolean,
+      required: true,
+    },
+    isAdding: {
+      type: Boolean,
+      required: true,
+    },
+    sortOrder: {
+      type: Number,
       required: true,
     },
   },
@@ -369,9 +413,9 @@ export default {
           const savedSection = await this.save();
           this.updateSection(savedSection);
           this.$emit('mutation-success');
-          this.isSaving = false;
-          this.disableEditing();
         }
+        this.isSaving = false;
+        this.disableEditing();
       } catch (e) {
         this.$emit('mutation-error', e);
         this.isSaving = false;
@@ -411,6 +455,9 @@ export default {
       "activity_section_done",
       "edit_content_elements",
       "no_participants_added",
+      "section_action_add_above",
+      "section_action_add_below",
+      "section_dropdown_menu",
       "section_title",
       "untitled_section"
     ],

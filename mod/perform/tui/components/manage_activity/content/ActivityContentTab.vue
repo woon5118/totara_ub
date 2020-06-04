@@ -17,6 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
   @author Jaron Steenson <jaron.steenson@totaralearning.com>
+  @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
+  @author Kunle Odusan <kunle.odusan@totaralearning.com>
   @package mod_perform
 -->
 
@@ -34,24 +36,31 @@
     />
     <div class="tui-performManageActivityContent__items">
       <ActivitySection
-        v-for="(sectionState, i) in displayedSectionStates"
-        :key="i"
+        v-for="(sectionState, i) in sectionStates"
+        ref="activitySection"
+        :key="sectionState.section.id"
         :auto-save="autoSave"
         :edit-mode="sectionState.editMode"
         :section="sectionState.section"
+        :last-section="i === sectionStates.length - 1"
+        :is-adding="isAdding"
+        :sort-order="sectionState.sortOrder"
         @input="updateSection($event, i)"
         @toggle-edit-mode="toggleSectionStateEditMode($event, i)"
         @mutation-success="$emit('mutation-success')"
         @mutation-error="$emit('mutation-error')"
+        @add_above="addSectionAbove(i)"
+        @add_below="addSectionBelow(i)"
       />
     </div>
 
     <ButtonIcon
-      v-show="value.settings.multisection"
+      v-if="value.settings.multisection"
+      :disabled="isAdding"
       :aria-label="$str('add_section', 'mod_perform')"
       :text="$str('add_section', 'mod_perform')"
       :styleclass="{ small: true }"
-      @click.prevent="addSection"
+      @click="addSection(null)"
     >
       <AddIcon size="200" />
     </ButtonIcon>
@@ -83,6 +92,7 @@ export default {
   data() {
     return {
       sectionStates: this.createSectionStates(this.value),
+      isAdding: false,
     };
   },
   computed: {
@@ -93,16 +103,6 @@ export default {
      */
     autoSave() {
       return !this.value.settings.multisection;
-    },
-    /**
-     * Returns section states.
-     *
-     * @return {Array}
-     */
-    displayedSectionStates() {
-      return this.value.settings.multisection
-        ? this.sectionStates
-        : [this.sectionStates[0]];
     },
   },
   methods: {
@@ -147,7 +147,7 @@ export default {
     createSectionStates(activity) {
       return activity.sections && activity.sections.length > 0
         ? activity.sections.map(section => {
-            return this.createSectionState(section);
+            return this.createSectionState(section, false);
           })
         : [];
     },
@@ -158,9 +158,10 @@ export default {
      *
      * @return {Object}
      */
-    createSectionState(section, editMode = false) {
+    createSectionState(section, editMode) {
       return {
         editMode: editMode,
+        sortOrder: section.sort_order,
         section: section,
       };
     },
@@ -194,34 +195,99 @@ export default {
       }
     },
     /**
+     * Adds a section above the given one.
+     * @param {Int} sectionIndex
+     */
+    addSectionAbove(sectionIndex) {
+      this.addSection(sectionIndex);
+    },
+    /**
+     * Adds a section below the given one
+     * @param {Int} sectionIndex Section index to add after
+     */
+    addSectionBelow(sectionIndex) {
+      this.addSection(sectionIndex + 1);
+    },
+    /**
      * Add a new section at the end of the list
      * @return {Promise<void>}
      */
-    async addSection() {
-      const {
-        data: {
-          mod_perform_add_section: { section },
-        },
-      } = await this.$apollo.mutate({
-        mutation: AddSectionMutation,
-        variables: {
-          input: {
-            activity_id: this.value.id,
+    async addSection(sectionIndex) {
+      this.isAdding = true;
+      const sectionAddBefore = sectionIndex
+        ? this.sectionStates[sectionIndex].sortOrder
+        : null;
+
+      try {
+        const {
+          data: {
+            mod_perform_add_section: { section },
           },
-        },
-        refetchAll: false,
-      });
+        } = await this.$apollo.mutate({
+          mutation: AddSectionMutation,
+          variables: {
+            input: {
+              activity_id: this.value.id,
+              add_before: sectionAddBefore,
+            },
+          },
+          refetchAll: false,
+        });
 
-      // Add newly created section to the list of section
-      this.sectionStates.push(this.createSectionState(section, true));
+        if (sectionIndex !== null) {
+          this.insertSectionAt(section, sectionIndex);
+        } else {
+          this.insertSectionAtEnd(section);
+        }
 
-      // Make sure we scroll to the newly created section
-      this.$nextTick(() => {
-        if (this.$children[this.$children.length - 1]) {
-          this.$children[this.$children.length - 1].$el.scrollIntoView();
+        this.scrollToSection(section);
+      } catch (e) {
+        this.$emit('mutation-error', e);
+      }
+
+      this.isAdding = false;
+    },
+    /**
+     * Go through all sections coming after the just added one and
+     * increase the sortOrder
+     * @param {Object} section
+     * @param {Int} sectionIndex
+     */
+    insertSectionAt(section, sectionIndex) {
+      // Go through all sections coming after the just added one and
+      // increase the sortOrder
+      this.sectionStates.forEach((sectionState, index) => {
+        if (sectionState.sortOrder >= section.sort_order) {
+          this.sectionStates[index].sortOrder++;
         }
       });
-      return section;
+
+      // Add newly created section at the right spot
+      this.sectionStates.splice(
+        sectionIndex,
+        0,
+        this.createSectionState(section, true)
+      );
+    },
+    /**
+     * Insert a new section at the end of the list
+     * @param {Object} section
+     */
+    insertSectionAtEnd(section) {
+      this.sectionStates.push(this.createSectionState(section, true));
+    },
+    /**
+     * Scroll to the section added at the index
+     * @param section
+     */
+    scrollToSection(section) {
+      this.$nextTick(() => {
+        this.$refs.activitySection.forEach((sectionElement, index) => {
+          if (sectionElement.sortOrder === section.sort_order) {
+            this.$refs.activitySection[index].$el.scrollIntoView();
+          }
+        });
+      });
     },
   },
 };
@@ -229,9 +295,9 @@ export default {
 
 <lang-strings>
   {
-  "mod_perform": [
-  "activity_content_tab_heading",
-  "add_section"
-  ]
+    "mod_perform": [
+      "add_section",
+      "activity_content_tab_heading"
+    ]
   }
 </lang-strings>

@@ -1317,5 +1317,34 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020060301, 'perform');
     }
 
+    if ($oldversion < 2020060401) {
+        // Define field sort_order to be added to perform_section.
+        $table = new xmldb_table('perform_section');
+        $field = new xmldb_field('sort_order', XMLDB_TYPE_INTEGER, '10', null, false, null, null, 'title');
+
+        // Conditionally launch add field sort_order.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+
+            $activities = $DB->get_records('perform');
+            foreach ($activities as $activity) {
+                $sections = $DB->get_records('perform_section', ['activity_id' => $activity->id], 'id');
+                $count = 1;
+                foreach ($sections as $section) {
+                    $section->sort_order = $count;
+                    $DB->update_record('perform_section', $section);
+                    $count++;
+                }
+            }
+
+            // Launch change of nullability for field sort_order.
+            $field = new xmldb_field('sort_order', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'title');
+            $dbman->change_field_notnull($table, $field);
+        }
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020060401, 'perform');
+    }
+
     return true;
 }

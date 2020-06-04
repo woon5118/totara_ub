@@ -84,6 +84,7 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
             [
                 'activity_id',
                 'title',
+                'sort_order',
                 'created_at',
                 'updated_at',
             ]

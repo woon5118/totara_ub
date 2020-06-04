@@ -44,9 +44,12 @@ class participant_section_repository extends repository {
         $first_participant_section = participant_section_entity::repository()
             ->as('ps')
             ->join([participant_instance_entity::TABLE, 'pi'], 'ps.participant_instance_id', 'pi.id')
+            ->join([section::TABLE, 's'], 'ps.section_id', 's.id')
             ->where('pi.participant_id', $participant_id)
             ->where('pi.id', $participant_instance_id)
-            ->order_by('ps.id', 'desc')
+            // This is a temporary fix to make sure the questions for the first section is loaded
+            // until we have proper support for showing different sections to the end user
+            ->order_by('s.sort_order', 'asc')
             ->first();
 
         if ($first_participant_section === null) {

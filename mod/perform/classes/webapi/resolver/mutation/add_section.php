@@ -51,11 +51,13 @@ class add_section implements mutation_resolver, has_middleware {
             }
         }
 
+        $add_before_sort_order = $args['add_before'] ?? null;
+
         if (!$activity->get_settings()->lookup(activity_setting::MULTISECTION)) {
             throw new moodle_exception('add_section_error_section_mode', 'mod_perform');
         }
 
-        $section = section::create($activity);
+        $section = section::create($activity, '', $add_before_sort_order);
 
         return ['section' => $section];
     }

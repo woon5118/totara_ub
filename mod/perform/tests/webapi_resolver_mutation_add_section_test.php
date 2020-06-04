@@ -24,13 +24,11 @@
 use mod_perform\models\activity\activity as activity;
 use mod_perform\models\activity\activity_setting;
 use mod_perform\models\activity\section;
-use mod_perform\state\activity\active;
 use mod_perform\state\activity\draft;
 use mod_perform\webapi\resolver\mutation\activate_activity;
 use mod_perform\webapi\resolver\mutation\add_section;
-use totara_core\feature_not_available_exception;
-use totara_job\relationship\resolvers\manager;
 use totara_core\advanced_feature;
+use totara_job\relationship\resolvers\manager;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**

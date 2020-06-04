@@ -238,8 +238,8 @@ class activity extends model {
             if ($this->entity->relation_loaded('relationships')) {
                 $this->entity->load_relation('relationships');
             }
-            if ($this->entity->relation_loaded('sections')) {
-                $this->entity->load_relation('sections');
+            if ($this->entity->relation_loaded('sections_ordered')) {
+                $this->entity->load_relation('sections_ordered');
             }
             if ($this->entity->relation_loaded('tracks')) {
                 $this->entity->load_relation('tracks');
@@ -325,7 +325,7 @@ class activity extends model {
      * @return collection|section[]
      */
     public function get_sections(): collection {
-        return $this->entity->sections->map_to(section::class);
+        return $this->entity->sections_ordered->map_to(section::class);
     }
 
     /**

@@ -107,7 +107,7 @@ class behat_mod_perform extends behat_base {
     }
 
     /**
-     * @Given /^I should see perform "([^"]*)" question "([^"]*)" is unanswered$/
+     * @Then /^I should see perform "([^"]*)" question "([^"]*)" is unanswered$/
      * @param string $element_type
      * @param string $question_text
      * @throws ExpectationException
@@ -117,8 +117,60 @@ class behat_mod_perform extends behat_base {
     }
 
     /**
-     * @Given /^I should see "(?P<text_string>(?:[^"]|\\")*)" in the activity section$/
-     * @Given /^I should see "(?P<text_string>(?:[^"]|\\")*)" in the "(?P<section_number>\d+)" activity section$/
+     * @Then /^activity section "(?P<section_number>\d+)" should exist$/
+     * @param int $section_number
+     */
+    public function section_exists(int $section_number): void {
+        $section_selector = sprintf(self::MANAGE_CONTENT_ACTIVITY_SECTION, $section_number);
+        $this->execute('behat_general::should_exist', [$section_selector, 'css_element']);
+    }
+
+    /**
+     * @Then /^activity section "(?P<section_number>\d+)" should not exist$/
+     * @param int $section_number
+     */
+    public function section_not_exists(int $section_number): void {
+        $section_selector = sprintf(self::MANAGE_CONTENT_ACTIVITY_SECTION, $section_number);
+        $this->execute('behat_general::should_not_exist', [$section_selector, 'css_element']);
+    }
+
+    /**
+     * @Then /^"(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>(?:[^"]|\\")*)" in the activity section should exist$/
+     * @Then /^"(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>(?:[^"]|\\")*)" in the "(?P<section_number>\d+)" activity section should exist$/
+     *
+     * @param string $element
+     * @param string $selector_type
+     * @param int $section_number
+     * @return void
+     */
+    public function element_in_section_exist(string $element, string $selector_type, int $section_number = 1): void {
+        $section_node = $this->get_section_node($section_number);
+        $this->find_element_in_container($section_node, $element, $selector_type, true);
+    }
+
+    /**
+     * @Then /^"(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>(?:[^"]|\\")*)" in the activity section should not exist$/
+     * @Then /^"(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>(?:[^"]|\\")*)" in the "(?P<section_number>\d+)" activity section should not exist$/
+     *
+     * @param string $element
+     * @param string $selector_type
+     * @param int $section_number
+     * @return void
+     */
+    public function element_in_section_no_exist(string $element, string $selector_type, int $section_number = 1): void {
+        $section_node = $this->get_section_node($section_number);
+        $element_found = $this->find_element_in_container($section_node, $element, $selector_type, false);
+        if ($element_found !== null) {
+            throw new ExpectationException(
+                'The element "' . $element_found . '" in the section '.$section_number.' should not exist but was found.',
+                $this->getSession()
+            );
+        }
+    }
+
+    /**
+     * @Then /^I should see "(?P<text_string>(?:[^"]|\\")*)" in the activity section$/
+     * @Then /^I should see "(?P<text_string>(?:[^"]|\\")*)" in the "(?P<section_number>\d+)" activity section$/
      *
      * @param string $text
      * @param int $section_number
@@ -132,8 +184,8 @@ class behat_mod_perform extends behat_base {
     }
 
     /**
-     * @Given /^I should not see "(?P<text_string>(?:[^"]|\\")*)" in the activity section$/
-     * @Given /^I should not see "(?P<text_string>(?:[^"]|\\")*)" in the "(?P<section_number>\d+)" activity section$/
+     * @Then /^I should not see "(?P<text_string>(?:[^"]|\\")*)" in the activity section$/
+     * @Then /^I should not see "(?P<text_string>(?:[^"]|\\")*)" in the "(?P<section_number>\d+)" activity section$/
      *
      * @param string $text
      * @param int $section_number
@@ -147,52 +199,103 @@ class behat_mod_perform extends behat_base {
     }
 
     /**
-     * @Given /^I click on "(?P<selector_string>(?:[^"]|\\")*)" css element in the activity section$/
-     * @Given /^I click on "(?P<selector_string>(?:[^"]|\\")*)" css element in the "(?P<section_number>\d+)" activity section$/
-     *
-     * @param string $css_selector
-     * @param int $section_number
-     * @return void
-     */
-    public function i_click_on_css_element_in_section(string $css_selector, int $section_number = 1): void {
-        $section_selector = sprintf(
-            self::MANAGE_CONTENT_ACTIVITY_SECTION,
-            $section_number
-        );
-        $this->execute('behat_general::i_click_on',
-            ["$section_selector $css_selector", 'css_element']
-        );
-    }
-
-    /**
-     * @Given /^I click on "(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>(?:[^"]|\\")*)" in the "(?P<element_container_string>(?:[^"]|\\")*)" css element of the activity section$/
-     * @Given /^I click on "(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>(?:[^"]|\\")*)" in the "(?P<element_container_string>(?:[^"]|\\")*)" css element of the "(?P<section_number>\d+)" activity section$/
+     * @When /^I click on "(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>(?:[^"]|\\")*)" in the activity section$/
+     * @When /^I click on "(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>(?:[^"]|\\")*)" in the "(?P<section_number>\d+)" activity section$/
      *
      * @param string $element
      * @param string $selector_type
-     * @param string $parent_element
+     * @param int $section_number
+     * @return void
+     */
+    public function i_click_on_css_element_in_section(string $element, string $selector_type, int $section_number = 1): void {
+        behat_hooks::set_step_readonly(false);
+
+        $section_node = $this->get_section_node($section_number);
+        $element_found = $this->find_element_in_container($section_node, $element, $selector_type);
+        $element_found->click();
+    }
+
+    /**
+     * @When /^I click on "(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>(?:[^"]|\\")*)" in the "(?P<container_element_string>(?:[^"]|\\")*)" "(?P<container_selector_string>(?:[^"]|\\")*)" of the activity section$/
+     * @When /^I click on "(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>(?:[^"]|\\")*)" in the "(?P<container_element_string>(?:[^"]|\\")*)" "(?P<container_selector_string>(?:[^"]|\\")*)" of the "(?P<section_number>\d+)" activity section$/
+     *
+     * @param string $element
+     * @param string $selector_type
+     * @param string $container_element
+     * @param string $container_selector
      * @param int $section_number
      * @return void
      */
     public function i_click_on_the_in_the_section(
         string $element,
         string $selector_type,
-        string $parent_element,
+        string $container_element,
+        string $container_selector,
         int $section_number = 1
     ): void {
-        $section_selector = sprintf(
-            self::MANAGE_CONTENT_ACTIVITY_SECTION,
-            $section_number
-        );
+        behat_hooks::set_step_readonly(false);
 
-        $this->execute('behat_general::i_click_on_in_the',
-            [$element, $selector_type, "$section_selector $parent_element", 'css_element']
-        );
+        $section_node = $this->get_section_node($section_number);
+        $container_found = $this->find_element_in_container($section_node, $container_element, $container_selector);
+        $element_found = $this->find_element_in_container($container_found, $element, $selector_type);
+        $element_found->click();
     }
 
     /**
-     * @Given /^I should see "(?P<text_string>(?:[^"]|\\")*)" in the "(?P<summary_item>(?:[^"]|\\")*)" element summary of the activity section$/
-     * @Given /^I should see "(?P<text_string>(?:[^"]|\\")*)" in the "(?P<summary_item>(?:[^"]|\\")*)" element summary of "(?P<section_number>\d+)" activity section$/
+     * Get the node for the given activity section.
+     *
+     * @param int $section_number
+     * @param bool $required
+     * @return NodeElement|null
+     */
+    private function get_section_node(int $section_number, bool $required = true): ?NodeElement {
+        $section_selector = sprintf(self::MANAGE_CONTENT_ACTIVITY_SECTION, $section_number);
+
+        // Transforming from steps definitions selector/locator format to Mink format and getting the NodeElement.
+        $section_node = $this->get_selected_node('css_element', $section_selector);
+
+        if ($required && $section_node === null) {
+            throw new ExpectationException(
+                'The element "' . $section_node . '" container element could not be found',
+                $this->getSession()
+            );
+        }
+
+        return $section_node;
+    }
+
+    /**
+     * Find element in given container
+     *
+     * @param NodeElement $container
+     * @param string $element
+     * @param string $selector_type
+     * @param bool $required
+     * @return NodeElement|null
+     */
+    private function find_element_in_container(
+        NodeElement $container,
+        string $element,
+        string $selector_type,
+        bool $required = true
+    ): ?NodeElement {
+        [$element_selector, $element_locator] = $this->transform_selector($selector_type, $element);
+
+        $element_found = $container->find($element_selector, $element_locator);
+
+        if ($required && $element_found === null) {
+            throw new ExpectationException(
+                'The element "' . $element . '" in the type '.$selector_type.' could not be found.',
+                $this->getSession()
+            );
+        }
+
+        return $element_found;
+    }
+
+    /**
+     * @Then /^I should see "(?P<text_string>(?:[^"]|\\")*)" in the "(?P<summary_item>(?:[^"]|\\")*)" element summary of the activity section$/
+     * @Then /^I should see "(?P<text_string>(?:[^"]|\\")*)" in the "(?P<summary_item>(?:[^"]|\\")*)" element summary of "(?P<section_number>\d+)" activity section$/
      *
      * @param int $count
      * @param string $summary_item
@@ -215,7 +318,7 @@ class behat_mod_perform extends behat_base {
     }
 
     /**
-     * @Given /^I should see perform "([^"]*)" question is "([^"]*)"$/
+     * @Then /^I should see perform "([^"]*)" question is "([^"]*)"$/
      * @param string $question_text
      * @param string $required
      *
@@ -227,7 +330,7 @@ class behat_mod_perform extends behat_base {
     }
 
     /**
-     * @Given /^I should see perform "([^"]*)" question "([^"]*)" is answered with "([^"]*)"$/
+     * @Then /^I should see perform "([^"]*)" question "([^"]*)" is answered with "([^"]*)"$/
      * @param $element_type
      * @param $question_text
      * @param $expected_answer_text
@@ -253,7 +356,7 @@ class behat_mod_perform extends behat_base {
     }
 
     /**
-     * @Given /^I should see perform activity relationship to user "([^"]*)"$/
+     * @Then /^I should see perform activity relationship to user "([^"]*)"$/
      * @param string $expected_relation
      * @throws ExpectationException
      */
@@ -271,7 +374,7 @@ class behat_mod_perform extends behat_base {
     }
 
     /**
-     * @Then /^I click show others responses$/
+     * @When /^I click show others responses$/
      * @readonly
      */
     public function i_click_show_others_responses(): void {
@@ -287,7 +390,6 @@ class behat_mod_perform extends behat_base {
      */
     public function i_should_see_that_show_others_responses_is(string $expected_state): void {
         if ($expected_state == 'on') {
-
             $checked = $this->find('css', self::PERFORM_SHOW_OTHERS_RESPONSES_LOCATOR)->hasAttribute('aria-pressed');
 
             if (!$checked) {
@@ -297,7 +399,7 @@ class behat_mod_perform extends behat_base {
     }
 
     /**
-     * @Given /^I should see perform "([^"]*)" question "([^"]*)" is answered by "([^"]*)" with "([^"]*)"$/
+     * @Then /^I should see perform "([^"]*)" question "([^"]*)" is answered by "([^"]*)" with "([^"]*)"$/
      * @param $element_type
      * @param $question_text
      * @param $expected_relation
@@ -403,7 +505,7 @@ class behat_mod_perform extends behat_base {
     }
 
     /**
-     * @Given /^I answer "([^"]*)" question "([^"]*)" with "([^"]*)" characters$/
+     * @When /^I answer "([^"]*)" question "([^"]*)" with "([^"]*)" characters$/
      * @param string $element_type
      * @param string $question_text
      * @param int $character_count
@@ -422,9 +524,10 @@ class behat_mod_perform extends behat_base {
     }
 
     /**
-     * @When /^I navigate to manage perform activity content page$/
+     * @Given /^I navigate to manage perform activity content page$/
+     * @Given /^I navigate to manage perform activity content page of "(?P<section_number>\d+)" activity section$/
      */
-    public function i_navigate_to_manage_perform_activity_content_page(): void {
+    public function i_navigate_to_manage_perform_activity_content_page(int $section_number = 1): void {
         behat_hooks::set_step_readonly(false);
 
         $behat_general = behat_context_helper::get('behat_general');
@@ -434,7 +537,12 @@ class behat_mod_perform extends behat_base {
             self::TUI_TAB_ELEMENT,
             "css_element"
         );
-        $behat_general->i_click_on("Edit content","button");
+
+        $this->wait_for_pending_js();
+
+        $section_node = $this->get_section_node($section_number);
+        $element_node = $this->find_element_in_container($section_node, "Edit content elements", "button");
+        $element_node->click();
     }
 
     /**

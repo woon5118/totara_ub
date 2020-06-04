@@ -38,6 +38,7 @@ class section extends entity_model_formatter {
             'id' => null,
             'title' => string_field_formatter::class,
             'activity' => null,
+            'sort_order' => null,
             'section_elements' => null,
             'section_relationships' => null,
             'section_elements_summary' => null,

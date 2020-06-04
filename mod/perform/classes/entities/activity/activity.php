@@ -45,6 +45,7 @@ use totara_core\entities\relationship;
  *
  * Relationships:
  * @property-read collection|section[] $sections
+ * @property-read collection|section[] $sections_ordered
  * @property-read collection|activity_relationship[] $activity_relationships
  * @property-read collection|relationship[] $relationships
  * @property-read collection|track[] $tracks
@@ -68,6 +69,16 @@ class activity extends entity {
      */
     public function sections(): has_many {
         return $this->has_many(section::class, 'activity_id');
+    }
+
+    /**
+     * Relationship with section entities ordered by sort order.
+     *
+     * @return has_many
+     */
+    public function sections_ordered(): has_many {
+        return $this->has_many(section::class, 'activity_id')
+            ->order_by('sort_order');
     }
 
     /**

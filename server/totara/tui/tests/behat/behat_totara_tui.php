@@ -216,16 +216,16 @@ class behat_totara_tui extends behat_base {
 
     /**
      * If there is an opened dropdown menu, close it by pressing escape.
+     *
+     * @When /^I close any visible tui dropdowns$/
      */
-    private function close_visible_dropdown(): void {
+    public function close_visible_dropdown(): void {
         behat_hooks::set_step_readonly(false);
 
         $open_menu = $this->find_visible_dropdown(false);
+
         if ($open_menu) {
-            $char = 27;
-            $open_menu->keyDown($char);
-            $open_menu->keyPress($char);
-            $open_menu->keyUp($char);
+            $open_menu->click();
         }
     }
 
@@ -237,7 +237,11 @@ class behat_totara_tui extends behat_base {
      * @throws ExpectationException
      */
     private function find_visible_dropdown($fail_on_not_found = true): ?NodeElement {
-        $menus = $this->find_all('css', '.tui-dropdown__menu');
+        try {
+            $menus = $this->find_all('css', '.tui-dropdown--open');
+        } catch (ElementNotFoundException $exception) {
+            $menus = [];
+        }
         $found_menus = [];
         /** @var NodeElement $menu */
         foreach ($menus as $menu) {
@@ -252,6 +256,7 @@ class behat_totara_tui extends behat_base {
         } else if ($fail_on_not_found) {
             throw new ExpectationException("Could not find any open dropdown.", $this->getSession());
         }
+
         return null;
     }
 

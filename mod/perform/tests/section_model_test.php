@@ -40,8 +40,83 @@ class mod_perform_section_model_testcase extends mod_perform_relationship_testca
         $this->setAdminUser();
         $activity = $this->perform_generator()->create_activity_in_container();
 
-        $section = section::create($activity, 'section name one');
-        $this->assertSame('section name one', $section->title);
+        $section2 = section::create($activity, 'section name two');
+        $this->assertSame('section name two', $section2->title);
+    }
+
+    public function test_sort_order() {
+        $this->setAdminUser();
+        $activity = $this->perform_generator()->create_activity_in_container();
+
+        $section1 = $activity->sections->first();
+        $this->assertEquals(1, $section1->sort_order);
+
+        $section2 = section::create($activity, 'section name two');
+        $this->assertEquals(2, $section2->sort_order);
+
+        // Add another section to check whether the sort order is correct
+        $section3 = section::create($activity, 'section name three');
+        $this->assertEquals(3, $section3->sort_order);
+
+        // Let's add one section in between
+        $section4 = section::create($activity, 'section name four', 2);
+        $this->assertEquals(2, $section4->sort_order);
+
+        $section1_reloaded = section::load_by_id($section1->id);
+        $this->assertEquals(1, $section1_reloaded->sort_order);
+        $section2_reloaded = section::load_by_id($section2->id);
+        $this->assertEquals(3, $section2_reloaded->sort_order);
+        $section3_reloaded = section::load_by_id($section3->id);
+        $this->assertEquals(4, $section3_reloaded->sort_order);
+
+        // Let's add one section at the beginning
+        $section5 = section::create($activity, 'section name five', 1);
+        $this->assertEquals(1, $section5->sort_order);
+
+        $section1_reloaded = section::load_by_id($section1->id);
+        $this->assertEquals(2, $section1_reloaded->sort_order);
+        $section4_reloaded = section::load_by_id($section4->id);
+        $this->assertEquals(3, $section4_reloaded->sort_order);
+        $section2_reloaded = section::load_by_id($section2->id);
+        $this->assertEquals(4, $section2_reloaded->sort_order);
+        $section3_reloaded = section::load_by_id($section3->id);
+        $this->assertEquals(5, $section3_reloaded->sort_order);
+
+        // Let's add one section at the end
+        $section6 = section::create($activity, 'section name six', 6);
+        $this->assertEquals(6, $section6->sort_order);
+
+        $section5_reloaded = section::load_by_id($section5->id);
+        $this->assertEquals(1, $section5_reloaded->sort_order);
+        $section1_reloaded = section::load_by_id($section1->id);
+        $this->assertEquals(2, $section1_reloaded->sort_order);
+        $section4_reloaded = section::load_by_id($section4->id);
+        $this->assertEquals(3, $section4_reloaded->sort_order);
+        $section2_reloaded = section::load_by_id($section2->id);
+        $this->assertEquals(4, $section2_reloaded->sort_order);
+        $section3_reloaded = section::load_by_id($section3->id);
+        $this->assertEquals(5, $section3_reloaded->sort_order);
+
+        // Let's add one section with a much higher sort order than the current max
+        $section7 = section::create($activity, 'section name seven', 666);
+        // And we still should get the next higher one
+        $this->assertEquals(7, $section7->sort_order);
+
+        // Delete a section and make sure the sort_order got recalculated
+        $section4_reloaded->delete();
+
+        $section5_reloaded = section::load_by_id($section5->id);
+        $this->assertEquals(1, $section5_reloaded->sort_order);
+        $section1_reloaded = section::load_by_id($section1->id);
+        $this->assertEquals(2, $section1_reloaded->sort_order);
+        $section2_reloaded = section::load_by_id($section2->id);
+        $this->assertEquals(3, $section2_reloaded->sort_order);
+        $section3_reloaded = section::load_by_id($section3->id);
+        $this->assertEquals(4, $section3_reloaded->sort_order);
+        $section6_reloaded = section::load_by_id($section6->id);
+        $this->assertEquals(5, $section6_reloaded->sort_order);
+        $section7_reloaded = section::load_by_id($section7->id);
+        $this->assertEquals(6, $section7_reloaded->sort_order);
     }
 
     public function test_get_title() {

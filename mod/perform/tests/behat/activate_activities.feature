@@ -50,10 +50,12 @@ Feature: Activation of activities
     When I open the dropdown menu in the tui datatable row with "Empty draft activity" "Name"
     Then I should see "Activate" option disabled in the dropdown menu
 
-    When I open the dropdown menu in the tui datatable row with "Active activity" "Name"
+    When I close any visible tui dropdowns
+    And I open the dropdown menu in the tui datatable row with "Active activity" "Name"
     Then I should not see "Activate" option in the dropdown menu
 
-    When I open the dropdown menu in the tui datatable row with "Complete draft activity" "Name"
+    When I close any visible tui dropdowns
+    And I open the dropdown menu in the tui datatable row with "Complete draft activity" "Name"
     Then I should see "Activate" option in the dropdown menu
 
     When I click on "Activate" option in the dropdown menu

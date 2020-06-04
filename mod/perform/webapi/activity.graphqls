@@ -58,46 +58,6 @@ type mod_perform_element {
 }
 
 """
-A relationship joined to a section
-"""
-type mod_perform_section_relationship {
-  id: core_id!
-  can_answer: Boolean!
-  can_view: Boolean!
-  relationship: totara_core_relationship!
-}
-
-"""
-A section
-"""
-type mod_perform_section {
-  id: core_id!
-  title: String!
-  activity: mod_perform_activity!
-  section_elements: [mod_perform_section_element!]!
-  section_relationships: [mod_perform_section_relationship!]!
-  section_elements_summary: mod_perform_section_elements_summary
-}
-"""
-An element statistics in a section
-"""
-type mod_perform_section_elements_summary {
-  required_question_count: Int!
-  optional_question_count: Int!
-  other_element_count: Int!
-}
-
-"""
-An element used in a section
-"""
-type mod_perform_section_element {
-  id: core_id!
-  section: mod_perform_section!
-  element: mod_perform_element!
-  sort_order: Int!
-}
-
-"""
 A validation error
 """
 type mod_perform_validation_error {
@@ -154,20 +114,6 @@ enum mod_perform_participant_instance_status {
   COMPLETE
 }
 
-input update_section_relationships_input {
-  section_id: core_id!
-  relationships: [section_relationship!]!
-}
-
-"""
-Section relationship object
-used to update section relationships.
-"""
-input section_relationship {
-  id: core_id!
-  can_view: Boolean = false
-}
-
 """
 Input type for deleting an activity
 """
@@ -181,6 +127,18 @@ Input for activity settings toggle.
 input toggle_activity_setting {
   activity_id: core_id!
   setting: Boolean!
+}
+
+"""
+Competency subject instance filters
+"""
+input mod_perform_subject_instance_filters {
+  about: [mod_perform_subject_instance_about_filter]
+}
+
+enum mod_perform_subject_instance_about_filter {
+  SELF
+  OTHERS
 }
 
 extend type Query {
@@ -205,11 +163,6 @@ extend type Query {
   mod_perform_element_plugins: [mod_perform_element_plugin!]!
 
   """
-  A section of elements for an admin to configure
-  """
-  mod_perform_section_admin(section_id: core_id!): mod_perform_section
-
-  """
   A list of all performance activities a user is participating in
   """
   mod_perform_subject_instances(
@@ -223,13 +176,6 @@ extend type Query {
   mod_perform_subject_instance(
     subject_instance_id: core_id!
   ): mod_perform_subject_instance
-
-  """
-  A section of elements for a user to respond to
-  """
-  mod_perform_participant_section(
-    participant_instance_id: core_id!
-  ): mod_perform_participant_section
 }
 
 """
@@ -259,33 +205,6 @@ input mod_perform_update_element_input {
   title: param_text!
   is_required: param_boolean
   data: String! # We cannot use param_text here as it would do some cleaning
-}
-
-"""
-Delete an existing section element
-"""
-input mod_perform_delete_section_element_input {
-  section_element_id: core_id!
-}
-
-"""
-Move an existing section element
-"""
-input mod_perform_move_section_element_input {
-  section_element_id: core_id!
-  sort_order: param_integer!
-}
-
-"""
-Update a section
-"""
-input mod_perform_update_section_elements_input {
-  section_id: core_id!
-  create_new: [mod_perform_create_new_element_input!]
-  create_link: [mod_perform_create_link_element_input!]
-  update: [mod_perform_update_element_input!]
-  delete: [mod_perform_delete_section_element_input!]
-  move: [mod_perform_move_section_element_input!]
 }
 
 """
@@ -323,34 +242,6 @@ type mod_perform_activity_result {
   activity: mod_perform_activity!
 }
 
-"""
-Mutation return type including a section
-"""
-type mod_perform_section_result {
-  section: mod_perform_section!
-}
-
-"""
-Mutation return type including a participant section
-"""
-type mod_perform_participant_section_result {
-  participant_section: mod_perform_section!
-}
-
-"""
-Input type for adding a new section to an activity
-"""
-input mod_perform_add_section_input {
-  activity_id: core_id!
-}
-
-"""
-Mutation return type including the section just added
-"""
-type mod_perform_add_section_result {
-  section: mod_perform_section!
-}
-
 extend type Mutation {
   mod_perform_create_activity(
     name: param_text!
@@ -364,17 +255,6 @@ extend type Mutation {
     name: param_text!
     description: param_text
   ): mod_perform_activity_result!
-
-  mod_perform_update_section_relationships(
-    input: update_section_relationships_input!
-  ): mod_perform_section_result!
-
-  """
-  Update the elements in a section
-  """
-  mod_perform_update_section_elements(
-    input: mod_perform_update_section_elements_input!
-  ): mod_perform_section_result!
 
   """
   Activate an activity
@@ -403,30 +283,4 @@ extend type Mutation {
   mod_perform_toggle_activity_close_on_completion_setting(
     input: toggle_activity_setting!
   ): mod_perform_activity!
-
-  """
-  Update an activity setting: multisection.
-  """
-  mod_perform_toggle_activity_multisection_setting(
-    input: toggle_activity_setting!
-  ): mod_perform_activity!
-
-  """
-  Adds a new section at the end
-  """
-  mod_perform_add_section(
-    input: mod_perform_add_section_input!
-  ): mod_perform_add_section_result!
-}
-
-"""
-Competency subject instance filters
-"""
-input mod_perform_subject_instance_filters {
-  about: [mod_perform_subject_instance_about_filter]
-}
-
-enum mod_perform_subject_instance_about_filter {
-  SELF
-  OTHERS
 }

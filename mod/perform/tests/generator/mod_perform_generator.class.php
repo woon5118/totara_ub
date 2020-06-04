@@ -717,7 +717,8 @@ class mod_perform_generator extends component_generator_base {
             return $this->create_activity_in_container(
                 [
                     'activity_name' => $name,
-                    'activity_type' => $type
+                    'activity_type' => $type,
+                    'create_section' => false
                 ]
             );
         }

@@ -33,7 +33,6 @@ use mod_perform\entities\activity\section as section_entity;
 use mod_perform\entities\activity\section_element as section_element_entity;
 use mod_perform\entities\activity\element as element_entity;
 
-
 /**
  * Class section
  *
@@ -43,6 +42,7 @@ use mod_perform\entities\activity\element as element_entity;
  * @property-read int $activity_id
  * @property-read string $title
  * @property-read activity $activity
+ * @property-read int $sort_order
  * @property-read collection|section_element[] $section_elements
  * @property-read collection|section_relationship[] $section_relationships
  *
@@ -54,6 +54,7 @@ class section extends model {
         'id',
         'activity_id',
         'title',
+        'sort_order',
         'created_at',
         'updated_at',
     ];
@@ -79,18 +80,69 @@ class section extends model {
     }
 
     /**
+     * Creates a new section
+     *
      * @param activity $activity
      * @param string $title
-     *
+     * @param int|null $sort_order if order is 0 or null the section will be added at the end
      * @return static
      */
-    public static function create(activity $activity, string $title = ''): self {
+    public static function create(activity $activity, string $title = '', ?int $sort_order = null): self {
+        $is_last_section = $sort_order <= 0;
+        $new_sort_order = self::get_new_sort_order($activity);
+
+        // Just making sure we are keeping the sequence
+        if (empty($sort_order) || $sort_order > $new_sort_order) {
+            $sort_order = $new_sort_order;
+        }
+
         $entity = new section_entity();
         $entity->activity_id = $activity->id;
         $entity->title = $title;
+        $entity->sort_order = $sort_order;
         $entity->save();
 
+        if (!$is_last_section && $sort_order !== $new_sort_order) {
+            self::update_sort_order($entity);
+        }
+
         return self::load_by_entity($entity);
+    }
+
+    /**
+     * Get new sort order if it's a new section added at the end
+     *
+     * @param activity $activity
+     * @return int
+     */
+    protected static function get_new_sort_order(activity $activity): int {
+        return section_entity::repository()
+            ->where('activity_id', $activity->id)
+            ->count() + 1;
+    }
+
+    /**
+     * Update the sort order of all sections coming after the given one
+     *
+     * @param section_entity $section_entity
+     * @return void
+     */
+    protected static function update_sort_order(section_entity $section_entity): void {
+        $sql = "
+            UPDATE {perform_section}
+            SET sort_order = sort_order + 1
+            WHERE activity_id = :activity_id
+                AND id != :section_id
+                AND sort_order >= :sort_order
+        ";
+
+        $params = [
+            'activity_id' => $section_entity->activity_id,
+            'section_id' => $section_entity->id,
+            'sort_order' => $section_entity->sort_order,
+        ];
+
+        builder::get_db()->execute($sql, $params);
     }
 
     /**
@@ -142,7 +194,7 @@ class section extends model {
      */
     public function get_section_elements_summary(): stdClass {
 
-        $total_count= section_element_entity::repository()
+        $total_count = section_element_entity::repository()
             ->where('section_id', $this->id)
             ->count();
 
@@ -161,7 +213,7 @@ class section extends model {
         return (object)[
             'required_question_count' => $required_count,
             'optional_question_count' => $optional_count,
-            'other_element_count'     => $total_count-($required_count+$optional_count),
+            'other_element_count'     => $total_count - ($required_count + $optional_count),
         ];
     }
 
@@ -182,7 +234,7 @@ class section extends model {
 
                 /** @var section_relationship $section_relationship */
                 $section_relationship = $existing_section_relationships->find(
-                    function($section_relationship) use ($core_relationship_id) {
+                    function ($section_relationship) use ($core_relationship_id) {
                         return $section_relationship->relationship->id === $core_relationship_id;
                     }
                 );
@@ -326,4 +378,39 @@ class section extends model {
     public function can_respond(int $user_id): bool {
         return true;
     }
+
+    /**
+     * Delete the section
+     */
+    public function delete(): void {
+        $this->entity->delete();
+
+        // Make sure the sort orders of the sections following the deleted one get recalculated
+        self::recalculate_sort_order($this->entity->activity_id);
+    }
+
+    /**
+     * Recalculate sort_order for given activity
+     *
+     * @param int $activity_id
+     */
+    protected static function recalculate_sort_order(int $activity_id): void {
+        builder::get_db()->transaction(function () use ($activity_id) {
+            $sections = section_entity::repository()
+                ->where('activity_id', $activity_id)
+                ->order_by('sort_order')
+                ->order_by('id')
+                ->get_lazy();
+
+            $sort_order = 1;
+            foreach ($sections as $section) {
+                if ($section->sort_order != $sort_order) {
+                    $section->sort_order = $sort_order;
+                    $section->save();
+                }
+                $sort_order++;
+            }
+        });
+    }
+
 }
