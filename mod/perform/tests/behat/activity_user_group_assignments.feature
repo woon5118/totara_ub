@@ -96,7 +96,7 @@ Feature: Assign user groups to perform activities
     And I click on "Audience" "link" in the ".tui-dropdown__menu" "css_element"
     And I toggle the adder picker entry with "22 SAS" for "Audience name"
     And I toggle the adder picker entry with "Seal Team 6" for "Short name"
-    And I click on "Selected items ( 2 )" "link"
+    And I click on "Selected items &#8237;( 2 )&#8237;" "link"
     Then I should see the following selected adder basket entries:
       | Audience name| Short name  |
       | Seal Team 6  | Seal Team 6 |
