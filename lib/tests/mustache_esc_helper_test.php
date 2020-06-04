@@ -136,9 +136,38 @@ class mustache_esc_helper_testcase extends advanced_testcase {
             $mustache->render('test', ['foo' => 'Foo'])
         );
 
+        // Single object variable
+        $loader->setTemplate('test', "{{#esc}}{{obj.var}}{{/esc}}");
+        $this->assertEquals(
+            'Test',
+            $mustache->render('test', ['obj' => ['var' => 'Test']])
+        );
+
+        // Multi object variable
+        $loader->setTemplate('test', "{{#esc}}{{obj.var.var}}{{/esc}}");
+        $this->assertEquals(
+            'Test',
+            $mustache->render('test', ['obj' => ['var' => ['var' => 'Test']]])
+        );
+
+        // stdClass variable
+        $loader->setTemplate('test', "{{#esc}}{{obj.var}}{{/esc}}");
+        $obj = new \stdClass();
+        $obj->var = 'Test';
+        $this->assertEquals(
+            'Test',
+            $mustache->render('test', ['obj' => $obj])
+        );
 
         // Missing var
         $loader->setTemplate('test', "{{#esc}}{{foo}}{{/esc}}");
+        $this->assertEquals(
+            '',
+            $mustache->render('test', ['bar' => 'Bar'])
+        );
+
+        // Missing object var
+        $loader->setTemplate('test', "{{#esc}}{{obj.foo}}{{/esc}}");
         $this->assertEquals(
             '',
             $mustache->render('test', ['bar' => 'Bar'])

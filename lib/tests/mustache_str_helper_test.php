@@ -207,6 +207,14 @@ class mustache_string_helper_testcase extends advanced_testcase {
         );
         $this->assertDebuggingCalled('Legacy string helper API in use, this will not be supported in the future.');
 
+        // Identifier + component + variable $a with object notation
+        $loader->setTemplate('test', '{{#str}}added,core,{{obj.var}}{{/str}}');
+        $this->assertEquals(
+            get_string('added', 'core', get_string('delete')),
+            $mustache->render('test', ['obj' => ['var' => get_string('delete')]])
+        );
+        $this->assertDebuggingCalled('Legacy string helper API in use, this will not be supported in the future.');
+
         // Variable identifier + variable component + variable alt escaped
         $loader->setTemplate('test', '{{#str}}{{identifier}}, {{component}}, {{{alt}}}{{/str}}');
         $this->assertEquals(
