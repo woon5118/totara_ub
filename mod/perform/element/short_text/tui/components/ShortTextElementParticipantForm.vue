@@ -31,7 +31,7 @@
           >
             <FormTextarea
               name="answer_text"
-              :validations="v => [answerRequired, v.maxLength(1024)]"
+              :validations="v => [answerRequired, maxLength]"
             />
           </FormRow>
         </FormScope>
@@ -45,6 +45,7 @@ import FormScope from 'totara_core/components/reform/FormScope';
 import { FormRow } from 'totara_core/components/uniform';
 import FormTextarea from 'totara_core/components/uniform/FormTextarea';
 import ElementParticipantForm from 'mod_perform/components/element/ElementParticipantForm';
+import { v as validation } from 'totara_core/validation';
 
 export default {
   components: {
@@ -66,11 +67,14 @@ export default {
     error: String,
   },
   methods: {
-    process(values) {
-      if (values) {
-        values.answer_text = values.answer_text.trim();
+    process(value) {
+      if (!value) {
+        return { answer_text: '' };
       }
-      return values;
+
+      value.answer_text = value.answer_text.trim();
+
+      return value;
     },
 
     /**
@@ -80,14 +84,37 @@ export default {
      */
     answerRequired(val) {
       if (this.isRequired) {
-        const isEmpty =
-          !val || (typeof val === 'string' && val.trim().length === 0);
-        if (isEmpty)
-          return this.$str(
-            'error_you_must_answer_this_question',
-            'performelement_short_text'
-          );
+        const requiredValidation = validation.required();
+
+        if (requiredValidation.validate(val)) {
+          return null;
+        }
+
+        return this.$str(
+          'error_you_must_answer_this_question',
+          'performelement_short_text'
+        );
       }
+    },
+
+    /**
+     * Slightly tweaked maxLength validator to support the fact val may not be set at all.
+     *
+     * @param val
+     * @return {string|null}
+     */
+    maxLength(val) {
+      if (!val) {
+        return null;
+      }
+
+      const maxLengthValidation = validation.maxLength(1024);
+
+      if (maxLengthValidation.validate(val)) {
+        return null;
+      }
+
+      return maxLengthValidation.message();
     },
   },
 };

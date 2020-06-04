@@ -37,7 +37,6 @@ class short_text extends element_plugin {
      * @inheritDoc
      */
     public function validate_response(?string $encoded_response_data,?element $element): collection {
-
         $answer_text = $this->decode_answer_text($encoded_response_data);
 
         $errors = new collection();

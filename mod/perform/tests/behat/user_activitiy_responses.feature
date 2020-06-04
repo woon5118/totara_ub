@@ -14,8 +14,8 @@ Feature: Viewing other responses
       | John is not participating     | harry            | true                     | david                      | false                      |
 
   Scenario: I can respond to my activities and view other non-respond activities
-    Given I log in as "john"
-    When I navigate to the outstanding perform activities list page
+    When I log in as "john"
+    And I navigate to the outstanding perform activities list page
     And I click on "John is participating subject" "link"
     Then I should see "John is participating subject" in the ".tui-performUserActivity h2" "css_element"
     And I should see "Part one"
@@ -40,8 +40,8 @@ Feature: Viewing other responses
     And I should see "No response submitted"
 
   Scenario: Manager can respond to other activities and I can view manager responses
-    Given I log in as "david"
-    When I navigate to the outstanding perform activities list page
+    When I log in as "david"
+    And I navigate to the outstanding perform activities list page
     And I click on "Activities about others" "link"
     Then I should see "John is participating subject" in the ".tui-performUserActivities" "css_element"
 
@@ -68,9 +68,9 @@ Feature: Viewing other responses
     Then I should see perform "short text" question "Question one" is answered by "Manager" with "Manager Answer one"
     And I should see perform "short text" question "Question two" is answered by "Manager" with "Manager Answer two"
 
-  Scenario: I can see required and optional questions
-    Given I log in as "john"
-    When I navigate to the outstanding perform activities list page
+  Scenario: I can see required questions
+    When I log in as "john"
+    And I navigate to the outstanding perform activities list page
     And I click on "John is participating subject" "link"
     And I should see "John is participating subject" in the ".tui-performUserActivity h2" "css_element"
     Then I should see perform "Question one" question is "required"
@@ -78,9 +78,15 @@ Feature: Viewing other responses
     When I click on "Submit" "button"
     Then I should see "Question one" has the validation error "You must answer this question"
     And I should see "Question two" has the validation error "You must answer this question"
-    And I log out
-    Given I log in as "harry"
-    When I navigate to the outstanding perform activities list page
+
+  Scenario: I can see and submit empty optional questions
+    When I log in as "harry"
+    And I navigate to the outstanding perform activities list page
     And I click on "John is not participating" "link"
     Then I should see perform "Question one" question is "optional"
     And I should see perform "Question two" question is "optional"
+
+    When I click on "Submit" "button"
+    Then I should see "Performance activities"
+    And I should see "Activity responses saved" in the tui "success" notification toast
+    And the "Your activities" tui tab should be active
