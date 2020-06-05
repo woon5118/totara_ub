@@ -1848,12 +1848,14 @@ class mysqli_native_moodle_database extends moodle_database {
     public function sql_regex($positivematch = true, $casesensitive = false) {
         $collation = '';
         if ($casesensitive) {
-            if (substr($this->get_dbcollation(), -4) !== '_bin') {
+            if (substr($this->get_dbcollation(), -4) !== '_bin' && substr($this->get_dbcollation(), -3) !== '_cs') {
                 $collationinfo = explode('_', $this->get_dbcollation());
                 $collation = 'COLLATE ' . $collationinfo[0] . '_bin ';
             }
         } else {
-            if ($this->get_dbcollation() == 'utf8_bin') {
+            if (substr($this->get_dbcollation(), -3) === '_cs') {
+                $collation = 'COLLATE ' . substr($this->get_dbcollation(), 0, -3) . '_ci ';
+            } else if ($this->get_dbcollation() == 'utf8_bin') {
                 $collation = 'COLLATE utf8_unicode_ci ';
             } else if ($this->get_dbcollation() == 'utf8mb4_bin') {
                 $collation = 'COLLATE utf8mb4_unicode_ci ';
