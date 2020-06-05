@@ -218,7 +218,6 @@ Feature: Seminar timezones in reports
     And I press "Edit this report"
     And I switch to "Columns" tab
     And I add the "Session Start Date/Time (linked to activity)" column to the report
-    And I add the "Session Start Date/Time" column to the report
 
     When I navigate to my "F2F summary" report
     Then I should see date "1 Jan next year Europe/Prague" formatted "%d %B %Y" in the "Test seminar 1 name" "table_row"

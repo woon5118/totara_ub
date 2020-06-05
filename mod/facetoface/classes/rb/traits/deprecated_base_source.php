@@ -1,10 +1,57 @@
 <?php
+/*
+* This file is part of Totara Learn
+*
+* Copyright (C) 2020 onwards Totara Learning Solutions LTD
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
+* @author Oleg Demeshev <oleg.demeshev@totaralearning.com>
+* @package mod_facetoface
+*/
 
 namespace mod_facetoface\rb\traits;
 
 defined('MOODLE_INTERNAL') || die();
 
+use core_text;
+use html_writer;
+use moodle_url;
+use rb_column_option;
+
 trait deprecated_base_source {
+
+    /**
+     * Add deprecated common facetoface session columns
+     * Requires 'sessions' join and custom named join to {facetoface_sessions_dates} (by default 'base')
+     * @param array $columnoptions
+     * @param string $sessiondatejoin Join that provides {facetoface_sessions_dates}
+     */
+    private function add_deprecated_session_common_to_columns(&$columnoptions, $sessiondatejoin = 'base') {
+        $columnoptions[] = new rb_column_option(
+            'facetoface',
+            'sessionid',
+            get_string('sessionid', 'rb_source_facetoface_room_assignments'),
+            'sessions.id',
+            array(
+                'deprecated' => true,
+                'joins' => 'sessions',
+                'dbdatatype' => 'integer',
+                'displayfunc' => 'integer'
+            )
+        );
+    }
 
     /**
      * Asset name linked to asset details

@@ -324,7 +324,7 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             new rb_column_option(
                 'status',
                 'grade',
-                get_string('eventgradeheader', 'mod_facetoface'),
+                get_string('eventgrade', 'rb_source_facetoface_sessions'),
                 'status.grade',
                 [
                     'joins' => 'status',
@@ -544,6 +544,12 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 )
             ),
             new rb_filter_option(
+                'status',
+                'grade',
+                get_string('eventgrade', 'rb_source_facetoface_sessions'),
+                'number'
+            ),
+            new rb_filter_option(
                 'date',
                 'timestart',
                 get_string('sessstart', 'rb_source_facetoface_sessions'),
@@ -556,6 +562,12 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
                 get_string('sessfinish', 'rb_source_facetoface_sessions'),
                 'date',
                 array('includetime' => true)
+            ),
+            new rb_filter_option(
+                'session',
+                'sessionid',
+                get_string('sessionid', 'rb_source_facetoface_sessions'),
+                'number'
             ),
             new rb_filter_option(
                 'session',
@@ -746,6 +758,10 @@ class rb_source_facetoface_sessions extends rb_facetoface_base_source {
             array(
                 'type' => 'date',
                 'value' => 'sessionstartdate',
+            ),
+            array(
+                'type' => 'session',
+                'value' => 'sessionid'
             ),
             array(
                 'type' => 'session',

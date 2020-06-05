@@ -27,7 +27,7 @@ $string['sourcetitle'] = 'Seminar Facilitators Assignments';
 
 $string['type_asset'] = 'Assets';
 $string['type_facilitator'] = 'Facilitators';
-$string['type_session'] = 'Sessions';
+$string['type_session'] = 'Events';
 $string['type_room'] = 'Rooms';
 $string['type_facetoface_asset'] = 'Assets';
 $string['type_facetoface_facilitator'] = 'Facilitators';

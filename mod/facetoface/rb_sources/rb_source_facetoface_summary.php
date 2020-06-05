@@ -536,7 +536,23 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
             ),
             array(
                 'type' => 'session',
+                'value' => 'sessionid',
+            ),
+            array(
+                'type' => 'session',
                 'value' => 'capacity',
+            ),
+            array(
+                'type' => 'date',
+                'value' => 'sessiondateid',
+            ),
+            array(
+                'type' => 'date',
+                'value' => 'sessionstartdate',
+            ),
+            array(
+                'type' => 'date',
+                'value' => 'sessionfinishdate',
             ),
             array(
                 'type' => 'session',
@@ -568,22 +584,6 @@ class rb_source_facetoface_summary extends rb_facetoface_base_source {
         );
 
         $this->add_audiencevisibility_columns($requiredcolumns);
-
-        $context = context_system::instance();
-        if (has_any_capability(['mod/facetoface:viewattendees'], $context)) {
-            $requiredcolumns[] = new rb_column(
-                'admin',
-                'actions',
-                get_string('actions', 'rb_source_facetoface_summary'),
-                'sessions.id',
-                [
-                    'noexport' => true,
-                    'nosort' => true,
-                    'extrafields' => ['facetofaceid' => 'sessions.facetoface'],
-                    'displayfunc' => 'f2f_actions'
-                ]
-            );
-        }
 
         return $requiredcolumns;
     }

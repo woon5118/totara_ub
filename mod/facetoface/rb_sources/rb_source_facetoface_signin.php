@@ -161,6 +161,28 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
                 'bookedby.id = CASE WHEN base.bookedby = 0 OR base.bookedby IS NULL THEN base.userid ELSE base.bookedby END',
                 REPORT_BUILDER_RELATION_MANY_TO_ONE
             ),
+            new rb_join(
+                'eventdateinfo',
+                'LEFT',
+                '(  SELECT  sd.sessionid,
+                            sd.eventstart,
+                            sd.eventfinish,
+                            tzstart.sessiontimezone AS tzstart,
+                            tzfinish.sessiontimezone AS tzfinish
+                    FROM (
+                            SELECT   sessionid,
+                                     MIN(timestart) AS eventstart,
+                                     MAX(timefinish) AS eventfinish
+                            FROM     {facetoface_sessions_dates}
+                            GROUP BY sessionid
+                         ) sd
+                    INNER JOIN {facetoface_sessions_dates} tzstart
+                        ON sd.eventstart = tzstart.timestart AND sd.sessionid = tzstart.sessionid
+                    INNER JOIN {facetoface_sessions_dates} tzfinish
+                        ON sd.eventfinish = tzfinish.timefinish AND sd.sessionid = tzfinish.sessionid )',
+                "eventdateinfo.sessionid = base.sessionid",
+                REPORT_BUILDER_RELATION_ONE_TO_MANY
+            ),
         );
 
         $this->add_rooms_to_join_list($joinlist, 'sessiondate');
@@ -261,6 +283,30 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
                 'base.id',
                 array(
                     'displayfunc' => 'f2f_signature'
+                )
+            ),
+            new rb_column_option(
+                'session',
+                'eventstartdate',
+                get_string('eventstartdatetime', 'rb_source_facetoface_events'),
+                "eventdateinfo.eventstart",
+                array(
+                    'joins' => array('eventdateinfo'),
+                    'displayfunc' => 'event_date',
+                    'extrafields' => array('timezone' => 'eventdateinfo.tzstart'),
+                    'dbdatatype' => 'timestamp',
+                )
+            ),
+            new rb_column_option(
+                'session',
+                'eventfinishdate',
+                get_string('eventfinishdatetime', 'rb_source_facetoface_events'),
+                "eventdateinfo.eventfinish",
+                array(
+                    'joins' => array('eventdateinfo'),
+                    'displayfunc' => 'event_date',
+                    'extrafields' => array('timezone' => 'eventdateinfo.tzfinish'),
+                    'dbdatatype' => 'timestamp',
                 )
             ),
         );
@@ -499,6 +545,18 @@ class rb_source_facetoface_signin extends rb_facetoface_base_source {
      */
     protected function define_defaultcolumns() {
         $defaultcolumns = array(
+            array(
+                'type' => 'session',
+                'value' => 'sessionid',
+            ),
+            array(
+                'type' => 'session',
+                'value' => 'eventstartdate',
+            ),
+            array(
+                'type' => 'session',
+                'value' => 'eventfinishdate',
+            ),
             array(
                 'type' => 'user',
                 'value' => 'namelink',

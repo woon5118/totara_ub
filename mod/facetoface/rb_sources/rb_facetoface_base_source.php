@@ -104,10 +104,12 @@ abstract class rb_facetoface_base_source extends rb_base_source {
      */
     public function add_session_common_to_columns(&$columnoptions, $sessiondatejoin = 'base') {
 
+        $this->add_deprecated_session_common_to_columns($columnoptions, $sessiondatejoin);
+
         $columnoptions[] = new rb_column_option(
-            'facetoface',
+            'session',
             'sessionid',
-            get_string('sessionid', 'rb_source_facetoface_room_assignments'),
+            get_string('sessionid', 'rb_source_facetoface_sessions'),
             'sessions.id',
             array(
                 'joins' => 'sessions',
@@ -126,6 +128,18 @@ abstract class rb_facetoface_base_source extends rb_base_source {
                 'dbdatatype' => 'integer',
                 'displayfunc' => 'integer'
             )
+        );
+
+        $columnoptions[] = new rb_column_option(
+            'date',
+            'sessiondateid',
+            get_string('sessdateid', 'rb_source_facetoface_summary'),
+            "{$sessiondatejoin}.id",
+            [
+                'joins' => [$sessiondatejoin],
+                'dbdatatype' => 'integer',
+                'displayfunc' => 'integer'
+            ]
         );
 
         $columnoptions[] = new rb_column_option(

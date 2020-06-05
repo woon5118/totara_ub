@@ -303,10 +303,12 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
             }
         }
 
+        $this->add_deprecated_event_columns($columnoptions);
+
         $columnoptions[] = new rb_column_option(
-            'facetoface',
+            'session',
             'sessionid',
-            get_string('sessionid', 'rb_source_facetoface_room_assignments'),
+            get_string('sessionid', 'rb_source_facetoface_sessions'),
             'base.id',
             array(
                 'dbdatatype' => 'integer',
@@ -651,6 +653,18 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
             ),
             array(
                 'type' => 'session',
+                'value' => 'sessionid',
+            ),
+            array(
+                'type' => 'session',
+                'value' => 'eventstartdate',
+            ),
+            array(
+                'type' => 'session',
+                'value' => 'eventfinishdate',
+            ),
+            array(
+                'type' => 'session',
                 'value' => 'eventattendancelink',
             ),
         );
@@ -665,22 +679,6 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
         $requiredcolumns = array();
 
         $this->add_audiencevisibility_columns($requiredcolumns);
-
-        $context = context_system::instance();
-        if (has_any_capability(['mod/facetoface:viewattendees'], $context)) {
-            $requiredcolumns[] = new rb_column(
-                'admin',
-                'actions',
-                get_string('actions', 'rb_source_facetoface_summary'),
-                'base.id',
-                array(
-                    'noexport' => true,
-                    'nosort' => true,
-                    'extrafields' => array('facetofaceid' => 'base.facetoface'),
-                    'displayfunc' => 'f2f_session_actions',
-                )
-            );
-        }
 
         return $requiredcolumns;
     }
