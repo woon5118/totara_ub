@@ -212,8 +212,6 @@ final class seminarevent_dashboard implements templatable {
 
         // Always add the "Reset" link
         $filterbar->add_link('Reset', '?f=' . $seminar->get_id());
-        // seminarevent_dashboard.js takes over seminarevent_filterbar.js
-        $filterbar->set_noscript(true);
         return $filterbar->build()->get_template_data();
     }
 }

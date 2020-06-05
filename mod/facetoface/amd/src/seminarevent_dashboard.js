@@ -200,6 +200,7 @@ define(['core/ajax', 'core/templates', 'core/notification', 'mod_facetoface/semi
     (function() {
         var ATTR_SHOW_TOOLTIPS = 'data-show-tooltips';
         var CSS_FILTER_ACTIVE = 'mod_facetoface__filter--active';
+        var CSS_FILTER_CLOSED = 'mod_facetoface__filter--closed';
 
         this.constructor = FilterBar;
 
@@ -230,9 +231,24 @@ define(['core/ajax', 'core/templates', 'core/notification', 'mod_facetoface/semi
             this.resetlink.addEventListener('click', this._onReset.bind(this));
             element.addEventListener('change', this._onChange.bind(this));
 
+            var toggle = element.querySelector('.mod_facetoface__filter__toggle-button__label');
+            if (toggle) {
+                toggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    this._showHideBar();
+                }.bind(this));
+            } else {
+                this._showHideBar(true);
+            }
+            window.addEventListener('resize', function() {
+                this._updateAriaAttributes();
+            }.bind(this));
+
             this.filters.forEach(function(el) {
                 el.disabled = false;
             });
+            element.classList.remove('mod_facetoface__filter--loading');
+            this._updateAriaAttributes();
             this.showResetLink();
         };
 
@@ -273,6 +289,35 @@ define(['core/ajax', 'core/templates', 'core/notification', 'mod_facetoface/semi
                 this._fireEvent();
             }
             event.preventDefault();
+        };
+
+        /**
+         * Update aria attributes.
+         */
+        this._updateAriaAttributes = function() {
+            var hidden = this.el.querySelector('.mod_facetoface__filter__toggle-button__label__hidden');
+            var shown = this.el.querySelector('.mod_facetoface__filter__toggle-button__label__shown');
+            var expanded = true;
+            if (hidden !== null && shown !== null && hidden.clientWidth && !shown.clientWidth) {
+                expanded = false;
+            }
+            this.el.setAttribute('aria-expanded', expanded.toString());
+        };
+
+        /**
+         * Show or hide the filter bar.
+         * @param {bool=} state
+         */
+        this._showHideBar = function(state) {
+            if (typeof state === 'undefined') {
+                state = !this.el.classList.contains(CSS_FILTER_CLOSED);
+            }
+            if (state) {
+                this.el.classList.add(CSS_FILTER_CLOSED);
+            } else {
+                this.el.classList.remove(CSS_FILTER_CLOSED);
+            }
+            this._updateAriaAttributes();
         };
 
         /**

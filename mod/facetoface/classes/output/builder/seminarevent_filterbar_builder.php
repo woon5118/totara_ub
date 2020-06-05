@@ -43,11 +43,6 @@ class seminarevent_filterbar_builder {
     private $method;
 
     /**
-     * @var boolean
-     */
-    private $noscript = false;
-
-    /**
      * @var string[]
      */
     private $togglelabel;
@@ -90,17 +85,6 @@ class seminarevent_filterbar_builder {
      */
     public function set_icon(?\pix_icon $icon): seminarevent_filterbar_builder {
         $this->icon = $icon;
-        return $this;
-    }
-
-    /**
-     * Enable or disable built-in script.
-     *
-     * @param boolean $noscript
-     * @return seminarevent_filterbar_builder
-     */
-    public function set_noscript(bool $noscript): seminarevent_filterbar_builder {
-        $this->noscript = $noscript;
         return $this;
     }
 
@@ -218,7 +202,6 @@ class seminarevent_filterbar_builder {
         $data = [
             'formid' => $this->id,
             'method' => $this->method,
-            'noscript' => $this->noscript,
             'togglelabel' => $this->togglelabel,
             'params' => $params,
             'filters' => $filters,

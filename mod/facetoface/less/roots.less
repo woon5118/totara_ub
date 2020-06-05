@@ -334,7 +334,7 @@ select.menuf2f-select {
         margin: @filter-margin-outer 0;
         padding: @filter-spacing-item-y @filter-spacing-item-x 0;
 
-        .flex-icon {
+        &__toggle-button > .flex-icon {
             font-size: @ft-size-400;
             margin-bottom: @filter-spacing-item-y;
         }
@@ -351,6 +351,7 @@ select.menuf2f-select {
         }
 
         &__toggle-button {
+            &__loading,
             &__label {
                 display: none;
             }
@@ -1091,11 +1092,14 @@ select.menuf2f-select {
             padding: 0;
 
             &__item {
-                display: none;
+                display: flex;
             }
 
-            &__toggle:checked ~ &__item {
-                display: flex;
+            &__toggle-button__loading {
+                display: none;
+                padding: @filter-spacing-small 0;
+                text-align: center;
+                width: 100%;
             }
 
             &__toggle-button {
@@ -1124,21 +1128,33 @@ select.menuf2f-select {
                     }
 
                     &__hidden {
-                        display: block;
+                        display: none;
                     }
 
                     &__shown {
-                        display: none;
+                        display: block;
                     }
                 }
             }
 
-            &__toggle:checked ~ &__toggle-button &__toggle-button__label__hidden {
+            &--loading &__toggle-button__loading {
+                display: block;
+            }
+
+            &--loading &__toggle-button__label {
                 display: none;
             }
 
-            &__toggle:checked ~ &__toggle-button &__toggle-button__label__shown {
+            &--closed &__item {
+                display: none;
+            }
+
+            &--closed &__toggle-button__label__hidden {
                 display: block;
+            }
+            
+            &--closed &__toggle-button__label__shown {
+                display: none;
             }
 
             &__item {
