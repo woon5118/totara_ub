@@ -306,6 +306,16 @@ if ($formdata = $mform2->is_cancelled()) {
             }
         }
 
+        // Make sure idnumber is unique and it's not assigned to another user.
+        if (isset($user->idnumber)) {
+            $idnumbertaken = $DB->record_exists_select('user', 'idnumber = :idnumber AND username != :username', array('idnumber' => $user->idnumber, 'username' => $user->username));
+            if (!empty($idnumbertaken)) {
+                $upt->track('status', get_string('idnumbertaken', 'error'), 'error');
+                $userserrors++;
+                continue;
+            }
+        }
+
         // normalize username
         $originalusername = $user->username;
         if ($standardusernames) {
@@ -1247,6 +1257,13 @@ while ($linenum <= $previewrows and $fields = $cir->next()) {
         }
     } else {
         $rowcols['status'][] = get_string('missingusername');
+    }
+
+    if (isset($rowcols['username']) && isset($rowcols['idnumber'])) {
+        $idnumbertaken = $DB->record_exists_select('user', 'idnumber = :idnumber AND username != :username', array('idnumber' => $rowcols['idnumber'], 'username' => $stdusername));
+        if ($idnumbertaken) {
+            $rowcols['status'][] = get_string('idnumbertaken', 'error');
+        }
     }
 
     if (isset($rowcols['email'])) {

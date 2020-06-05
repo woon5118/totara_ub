@@ -27,8 +27,9 @@ Feature: Upload users with incorrect data
     And I should see "group1"
     And I should see "Invalid email address"
     And I press "Upload users"
+    And I should see "This ID number is already in use"
     And I should see "Users created: 1"
-    And I should see "Errors: 2"
+    And I should see "Errors: 3"
     And I press "Continue"
     And I navigate to "Users > Manage users" in site administration
     And I should see "Jane Doe"
@@ -68,8 +69,9 @@ Feature: Upload users with incorrect data
     And I set the field "Upload type" to "Add new and update existing users"
     And I set the field "Existing user details" to "Override with file"
     And I press "Upload users"
+    And I should see "This ID number is already in use"
     And I should see "Users updated: 1"
-    And I should see "Errors: 2"
+    And I should see "Errors: 3"
     And I press "Continue"
     And I navigate to "Users > Manage users" in site administration
     And I should see "Jane Doe"
