@@ -876,7 +876,6 @@ class mysqli_native_moodle_database extends moodle_database {
                 $info->unique    = true;
             }
             // Return number of decimals, not bytes here.
-            $info->max_length    = $precision;
             if ($type === 'bigint') {
                 $maxlength = 18;
             } else if ($type === 'int' or $type === 'integer') {
@@ -893,7 +892,9 @@ class mysqli_native_moodle_database extends moodle_database {
             }
             // It is possible that display precision is different from storage type length,
             // always use the smaller value to make sure our data fits.
-            if ($maxlength < $info->max_length) {
+            if ($precision > 0 && $precision < $maxlength) {
+                $info->max_length = $precision;
+            } else {
                 $info->max_length = $maxlength;
             }
 
