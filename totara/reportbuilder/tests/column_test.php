@@ -1094,16 +1094,26 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
         if ($DB->get_dbfamily() === 'mysql') {
             // There are way too many columns for MySQL to handle, delete jobs related stuff.
             foreach (['user', 'manager', 'appraiser', 'tempmanager'] as $type) {
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'username'));
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'firstname'));
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'lastname'));
                 $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'fullname'));
                 $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'namelink'));
                 $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'namelinkicon'));
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'middlename'));
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'firstnamephonetic'));
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'lastnamephonetic'));
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'alternatename'));
                 $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'email'));
                 $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'emailunobscured'));
                 $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'auth'));
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'lang'));
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'phone1'));
                 $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'institution'));
                 $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'department'));
                 $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'address'));
                 $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'city'));
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'country'));
                 $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'idnumber'));
                 $DB->delete_records('report_builder_filters', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'fullname'));
                 $DB->delete_records('report_builder_filters', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'namelink'));
@@ -1116,6 +1126,29 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
                 $DB->delete_records('report_builder_filters', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'address'));
                 $DB->delete_records('report_builder_filters', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'city'));
                 $DB->delete_records('report_builder_filters', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'idnumber'));
+            }
+            foreach (['org', 'pos'] as $type) {
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'fullname'));
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'shortname'));
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'idnumber'));
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'frameworkfullname'));
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => $type, 'value' => 'frameworkidnumber'));
+            }
+            if ($sourcename === 'facetoface_sessions') {
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => 'asset', 'value' => 'namelink'));
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => 'asset', 'value' => 'name'));
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => 'asset', 'value' => 'description'));
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => 'room', 'value' => 'name'));
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => 'room', 'value' => 'namelink'));
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => 'room', 'value' => 'description'));
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => 'room', 'value' => 'url'));
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => 'facilitator', 'value' => 'name'));
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => 'facilitator', 'value' => 'namelink'));
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => 'facilitator', 'value' => 'description'));
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => 'job_assignment'));
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => 'tags'));
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => 'course'));
+                $DB->delete_records('report_builder_columns', array('reportid' => $bigreportid, 'type' => 'course_category'));
             }
         }
 
