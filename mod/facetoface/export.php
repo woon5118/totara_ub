@@ -40,6 +40,7 @@ $context = context_module::instance($cm->id);
 require_login($course, true, $cm);
 require_capability('mod/facetoface:view', $context);
 require_capability('mod/facetoface:viewattendees', $context);
+require_capability('mod/facetoface:exportattendance', $context);
 
 $timenow = time();
 $timeformat = str_replace(' ', '_', get_string('strftimedate', 'langconfig'));

@@ -457,4 +457,16 @@ $capabilities = array(
             'editingteacher' => CAP_ALLOW
         ),
     ),
+
+    // Ability to export attendance.
+    'mod/facetoface:exportattendance' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
+        )
+    ),
 );

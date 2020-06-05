@@ -45,6 +45,7 @@ Note that more recent update comes to the top.
 * PARAM_FILTER_xxx constants have been deprecated; please use filter_list instead
 
 --- Update in renderer ---
+* attendees_export_form() updated to require the mod/facetoface:exportattendance capability
 * get_sidebar_signup_failure() now uses the seminarevent_signup_card template
 * get_sidebars_cancellation() now uses the seminarevent_signup_card template
 * print_reservation_management_table() updated to not use the 2nd parameter $backtoallsessions
@@ -105,6 +106,8 @@ Note that more recent update comes to the top.
 * event_grade_input updated the aria-label to contain the name of an attendee for better accessibility
 
 --- Roles and capabilities ---
+* The following capabilities are added to 'tenantdomainmanager', 'manager', 'editingteacher' and 'teacher' roles:
+  * mod/facetoface:exportattendance
 * The following capabilities are added to 'editingteacher' and 'teacher' roles:
   * mod/facetoface:joinanyvirtualroom
   * mod/facetoface:manageadhocrooms

@@ -1089,7 +1089,7 @@ class mod_facetoface_renderer extends plugin_renderer_base {
     public function attendees_export_form(\mod_facetoface\seminar $seminar): void {
         global $OUTPUT;
 
-        if (has_capability('mod/facetoface:viewattendees', $this->context)) {
+        if (has_all_capabilities(['mod/facetoface:exportattendance', 'mod/facetoface:viewattendees'], $this->context)) {
             echo \html_writer::start_tag('form', array('action' => 'export.php', 'method' => 'post'));
             echo \html_writer::start_tag('div') . \html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'f', 'value' => $seminar->get_id()));
             echo $OUTPUT->help_icon('exportattendance', 'mod_facetoface', true) . '&nbsp;';

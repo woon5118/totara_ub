@@ -804,6 +804,7 @@ $string['facetoface:approveanyrequest'] = 'Approve any booking requests';
 $string['facetoface:configurecancellation'] = 'Allow the configuration of booking cancellations, upon adding/editing a seminar activity.';
 $string['facetoface:changesignedupjobassignment'] = 'Change signed up job assignment';
 $string['facetoface:editevents'] = 'Add, edit, copy and delete seminar events';
+$string['facetoface:exportattendance'] = 'Export attendance from all events';
 $string['facetoface:exportsessionsigninsheet'] = 'Export the seminar session sign-in sheet';
 $string['facetoface:joinanyvirtualroom'] = 'View \'Join now\' room link';
 $string['facetoface:manageadhocassets'] = 'Manage ad-hoc assets';
