@@ -14,11 +14,14 @@ A section
 type mod_perform_section {
   id: core_id!
   title: String!
+  display_title(format: core_format = PLAIN): String!
   activity: mod_perform_activity!
   sort_order: Int!
   section_elements: [mod_perform_section_element!]!
   section_relationships: [mod_perform_section_relationship!]!
   section_elements_summary: mod_perform_section_elements_summary
+  created_at(format: core_date_format = DATETIME): core_date!
+  updated_at(format: core_date_format = DATETIME): core_date!
 }
 
 """
@@ -41,10 +44,11 @@ type mod_perform_section_element {
 }
 
 """
-Update relationships input type
+Update settings input type
 """
-input update_section_relationships_input {
+input update_section_settings_input {
   section_id: core_id!
+  title: String
   relationships: [update_section_relationship_input!]!
 }
 
@@ -131,10 +135,10 @@ type mod_perform_add_section_result {
 
 extend type Mutation {
   """
-  Updates relationship of given section
+  Updates settings (including relationships) of given section
   """
-  mod_perform_update_section_relationships(
-    input: update_section_relationships_input!
+  mod_perform_update_section_settings(
+    input: update_section_settings_input!
   ): mod_perform_section_result!
 
   """

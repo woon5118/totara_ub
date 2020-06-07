@@ -5,7 +5,7 @@ query mod_perform_participant_section($participant_instance_id: core_id!) {
     id
     progress_status
     section {
-      title
+      display_title
     }
     answerable_participant_instances {
       id

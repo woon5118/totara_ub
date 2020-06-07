@@ -49,7 +49,7 @@ class mod_perform_webapi_resolver_query_section_testcase extends advanced_testca
         $this->assert_webapi_operation_successful($result);
 
         $section = $this->get_webapi_operation_data($result);
-        $this->assertSame($data->section1->title, $section['title'], 'wrong section title');
+        $this->assertSame($data->section1->display_title, $section['display_title'], 'wrong section title');
     }
 
     public function test_failed_ajax_query(): void {

@@ -6,7 +6,7 @@ mutation mod_perform_update_section_responses(
       id
       progress_status
       section {
-        title
+        display_title
       }
       section_element_responses {
         section_element_id

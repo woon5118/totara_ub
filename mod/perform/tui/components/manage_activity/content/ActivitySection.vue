@@ -32,14 +32,15 @@
     >
       <Grid v-if="!autoSave && !editMode">
         <GridItem :units="10">
-          <h3>
-            {{ section.title || $str('untitled_section', 'mod_perform') }}
+          <h3 class="tui-performActivitySection__title">
+            {{ savedSection.display_title }}
           </h3>
         </GridItem>
         <GridItem :units="2">
           <div class="tui-performActivitySection__action-buttons">
             <EditIcon
               class="tui-performActivitySection__action-edit"
+              :aria-label="$str('edit_section', 'mod_perform')"
               @click="enableEditing"
             />
             <Dropdown position="bottom-right">
@@ -73,7 +74,8 @@
         :value="title"
         :placeholder="$str('untitled_section', 'mod_perform')"
         :aria-label="$str('section_title', 'mod_perform')"
-        @input="updateTitle"
+        :maxlength="TITLE_INPUT_MAX_LENGTH"
+        @input="title = $event"
       />
       <div class="tui-performActivitySection__participant">
         <h4 class="tui-performActivitySection__participant-heading">
@@ -116,12 +118,12 @@
       <Button
         :styleclass="{ primary: true }"
         :text="$str('activity_section_done', 'mod_perform')"
-        :disabled="isSaving || !editMode"
+        :disabled="isSaving || !editMode || !hasChanges"
         @click="trySave"
       />
       <Button
         :text="$str('cancel')"
-        :disabled="isSaving || !editMode"
+        :disabled="isSaving || !editMode || !hasChanges"
         @click="resetSectionChanges"
       />
     </ButtonGroup>
@@ -176,7 +178,13 @@ import GridItem from 'totara_core/components/grid/GridItem';
 import InputText from 'totara_core/components/form/InputText';
 import ModalPresenter from 'totara_core/components/modal/ModalPresenter';
 import ParticipantsPopover from 'mod_perform/components/manage_activity/content/ParticipantsPopover';
-import UpdateSectionRelationshipsMutation from 'mod_perform/graphql/update_section_relationships.graphql';
+import UpdateSectionSettingsMutation from 'mod_perform/graphql/update_section_settings.graphql';
+
+/**
+ * Reflects the maximum length of the field in the database.
+ * @type {number}
+ */
+const TITLE_INPUT_MAX_LENGTH = 1024;
 
 export default {
   components: {
@@ -230,8 +238,9 @@ export default {
       modalOpen: false,
       savedSection: this.section,
       displayedParticipants: this.getParticipantsFromSection(this.section),
-      title: this.getTitle(),
+      title: this.section.title,
       isSaving: false,
+      TITLE_INPUT_MAX_LENGTH,
     };
   },
 
@@ -247,23 +256,31 @@ export default {
 
     /**
      * Has anything changed compared to last saved state?
-     * Checks for difference between displayed & last saved participants arrays.
+     * Checks for difference between displayed & last saved participants arrays, and changes to the title.
      *
      * @return {Boolean}
      */
-    hasChanges: function() {
-      return !(
-        this.title === this.section.title &&
-        this.displayedParticipants.length === this.savedParticipants.length &&
-        this.displayedParticipants.every(value => {
-          return this.savedParticipants.find(participant => {
-            return (
-              participant.relationship.id === value.relationship.id &&
-              participant.can_view === value.can_view
-            );
-          });
-        })
-      );
+    hasChanges() {
+      if (this.isNew) {
+        return true;
+      }
+
+      if (this.title !== this.savedSection.title) {
+        return true;
+      }
+
+      if (this.displayedParticipants.length !== this.savedParticipants.length) {
+        return true;
+      }
+
+      return !this.displayedParticipants.every(value => {
+        return this.savedParticipants.find(participant => {
+          return (
+            participant.relationship.id === value.relationship.id &&
+            participant.can_view === value.can_view
+          );
+        });
+      });
     },
 
     /**
@@ -275,6 +292,16 @@ export default {
       return this.displayedParticipants
         .slice()
         .sort((a, b) => a.relationship.id - b.relationship.id);
+    },
+
+    /**
+     * Has this section just been created?
+     * @return {Boolean}
+     */
+    isNew() {
+      return (
+        this.savedSection.raw_created_at === this.savedSection.raw_updated_at
+      );
     },
   },
 
@@ -321,6 +348,7 @@ export default {
       const newValue = Object.assign({}, this.section, update);
       this.$emit('input', newValue);
     },
+
     /**
      * Update section title.
      */
@@ -402,6 +430,7 @@ export default {
       this.displayedParticipants = this.getParticipantsFromSection(
         this.savedSection
       );
+      this.title = this.savedSection.title;
       this.disableEditing();
     },
 
@@ -426,11 +455,10 @@ export default {
       this.isSaving = true;
 
       try {
-        if (this.hasChanges) {
-          const savedSection = await this.save();
-          this.updateSection(savedSection);
-          this.$emit('mutation-success');
-        }
+        const savedSection = await this.save();
+        this.updateTitle(savedSection.section.title);
+        this.updateSection(savedSection);
+        this.$emit('mutation-success');
         this.isSaving = false;
         this.disableEditing();
       } catch (e) {
@@ -446,17 +474,18 @@ export default {
      */
     async save() {
       const { data: resultData } = await this.$apollo.mutate({
-        mutation: UpdateSectionRelationshipsMutation,
+        mutation: UpdateSectionSettingsMutation,
         variables: {
           input: {
             section_id: this.section.id,
+            title: this.title,
             relationships: this.getSectionRelationships(),
           },
         },
         refetchAll: false, // Don't refetch all the data again
       });
 
-      const result = resultData['mod_perform_update_section_relationships'];
+      const result = resultData.mod_perform_update_section_settings;
       this.savedSection = result.section;
       return result;
     },
@@ -471,11 +500,13 @@ export default {
       "activity_participants_heading",
       "activity_section_done",
       "edit_content_elements",
+      "edit_section",
       "no_participants_added",
       "section_action_add_above",
       "section_action_add_below",
       "section_dropdown_menu",
       "section_title",
+      "unsaved_changes_warning",
       "untitled_section"
     ],
     "moodle": [

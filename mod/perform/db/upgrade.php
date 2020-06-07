@@ -1346,5 +1346,17 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020060401, 'perform');
     }
 
+    if ($oldversion < 2020060500) {
+        // Changing precision of field title on table perform_section to 1024.
+        $table = new xmldb_table('perform_section');
+        $field = new xmldb_field('title', XMLDB_TYPE_CHAR, '1024', null, XMLDB_NOTNULL, null, null, 'activity_id');
+
+        // Launch change of precision for field title.
+        $dbman->change_field_precision($table, $field);
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020060500, 'perform');
+    }
+
     return true;
 }

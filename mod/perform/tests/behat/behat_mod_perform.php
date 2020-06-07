@@ -242,6 +242,27 @@ class behat_mod_perform extends behat_base {
     }
 
     /**
+     * @When /^I set the title of activity section "(?P<section_number>\d+)" to "([^"]*)"$/
+     * @When /^I set the title of activity section "(?P<section_number>\d+)" to '([^']*)'$/
+     *
+     * @param int $section_number
+     * @param string $section_title
+     * @return void
+     */
+    public function i_set_the_title_of_section_to(int $section_number, string $section_title): void {
+        behat_hooks::set_step_readonly(false);
+
+        $section_node = $this->get_section_node($section_number, true);
+
+        $editing_node = $section_node->find('css', '.tui-performActivitySection__editing');
+        if ($editing_node === null) {
+            throw new ExpectationException("Section {$section_number} is not in edit mode", $this->getSession());
+        }
+
+        $editing_node->find('css', 'input')->setValue($section_title);
+    }
+
+    /**
      * Get the node for the given activity section.
      *
      * @param int $section_number

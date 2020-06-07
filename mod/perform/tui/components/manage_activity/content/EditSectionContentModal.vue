@@ -27,7 +27,7 @@
     :aria-labelledby="$id('title')"
     :dismissable="{ backdropClick: false }"
   >
-    <ModalContent :title="section.title">
+    <ModalContent :title="section.display_title">
       <div class="tui-performEditSectionContentModal__form">
         <component
           :is="componentFor(sectionElement)"

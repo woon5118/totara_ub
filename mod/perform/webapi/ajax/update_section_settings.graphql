@@ -1,0 +1,22 @@
+mutation mod_perform_update_section_settings(
+  $input: update_section_settings_input!
+) {
+  mod_perform_update_section_settings(input: $input) {
+    section {
+      id
+      title
+      display_title
+      section_relationships {
+        id
+        can_view
+        can_answer
+        relationship {
+          id
+          name
+        }
+      }
+      raw_created_at: created_at(format: TIMESTAMP)
+      raw_updated_at: updated_at(format: TIMESTAMP)
+    }
+  }
+}

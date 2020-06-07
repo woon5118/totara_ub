@@ -53,7 +53,7 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
 
             $result = $this->get_webapi_operation_data($result);
             $this->assertEquals($participant_section->id, $result['id']);
-            $this->assertSame($participant_section->section->title, $result['section']['title']);
+            $this->assertSame($participant_section->section->title, $result['section']['display_title']);
             $this->assertSame('IN_PROGRESS', $result['progress_status']);
 
 

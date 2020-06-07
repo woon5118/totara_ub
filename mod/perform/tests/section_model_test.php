@@ -119,8 +119,9 @@ class mod_perform_section_model_testcase extends mod_perform_relationship_testca
         $this->assertEquals(6, $section7_reloaded->sort_order);
     }
 
-    public function test_get_title() {
+    public function test_get_display_title() {
         $this->setAdminUser();
+        $placeholder_string = get_string('untitled_section', 'mod_perform');
         $activity = $this->perform_generator()->create_activity_in_container(['create_section' => false]);
 
         $section1 = section::create($activity, 'Test Section');
@@ -128,8 +129,11 @@ class mod_perform_section_model_testcase extends mod_perform_relationship_testca
         $section3 = section::create($activity);
 
         $this->assertEquals('Test Section', $section1->title);
+        $this->assertEquals('Test Section', $section1->display_title);
         $this->assertEquals('   ', $section2->title);
+        $this->assertEquals($placeholder_string, $section2->display_title);
         $this->assertEquals('', $section3->title);
+        $this->assertEquals($placeholder_string, $section3->display_title);
     }
 
     public function test_update_relationships() {

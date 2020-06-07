@@ -49,7 +49,7 @@
       <div class="tui-participantContent__section">
         <div class="tui-participantContent__sectionHeading">
           <h3 class="tui-participantContent__sectionHeading-title">
-            {{ section.title }}
+            {{ section.display_title }}
           </h3>
 
           <div

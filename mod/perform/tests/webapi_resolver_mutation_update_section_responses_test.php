@@ -170,7 +170,7 @@ class mod_perform_webapi_resolver_mutation_update_section_responses_testcase ext
         // For now just ignore the error.
         [$result, ] = $this->parsed_graphql_operation(self::MUTATION, $args);
         $update_save_result = $result['participant_section'];
-        self::assertEquals('Part one', $update_save_result['section']['title']);
+        self::assertEquals('Part one', $update_save_result['section']['display_title']);
 
         // Everything is always returned, despite only patching one question.
         self::assertCount(2, $update_save_result['section_element_responses']);

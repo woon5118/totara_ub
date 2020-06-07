@@ -23,15 +23,15 @@
 
 namespace mod_perform\models\activity;
 
-use stdClass;
 use coding_exception;
 use core\orm\collection;
 use core\orm\entity\model;
 use core\orm\query\builder;
 use mod_perform\entities\activity\activity_relationship;
+use mod_perform\entities\activity\element as element_entity;
 use mod_perform\entities\activity\section as section_entity;
 use mod_perform\entities\activity\section_element as section_element_entity;
-use mod_perform\entities\activity\element as element_entity;
+use stdClass;
 
 /**
  * Class section
@@ -41,6 +41,7 @@ use mod_perform\entities\activity\element as element_entity;
  * @property-read int $id ID
  * @property-read int $activity_id
  * @property-read string $title
+ * @property-read string $display_title
  * @property-read activity $activity
  * @property-read int $sort_order
  * @property-read collection|section_element[] $section_elements
@@ -61,6 +62,7 @@ class section extends model {
 
     protected $model_accessor_whitelist = [
         'activity',
+        'display_title',
         'section_elements',
         'section_relationships',
         'participant_sections',
@@ -153,6 +155,20 @@ class section extends model {
     }
 
     /**
+     * Get the title of this section.
+     * If there is no title, then just show a default placeholder string.
+     *
+     * @return string
+     */
+    public function get_display_title(): string {
+        if (isset($this->entity->title) && trim($this->entity->title) !== '') {
+            return $this->entity->title;
+        }
+
+        return get_string('untitled_section', 'mod_perform');
+    }
+
+    /**
      * Get any array of all section elements in this section, indexed and sorted by sort_order
      *
      * @return section_element[]
@@ -215,6 +231,18 @@ class section extends model {
             'optional_question_count' => $optional_count,
             'other_element_count'     => $total_count - ($required_count + $optional_count),
         ];
+    }
+
+    /**
+     * Update the title of this section.
+     *
+     * @param string $title
+     * @return $this
+     */
+    public function update_title(string $title): self {
+        $this->entity->title = $title;
+        $this->entity->save();
+        return $this;
     }
 
     /**

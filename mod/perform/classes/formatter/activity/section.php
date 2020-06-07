@@ -24,6 +24,7 @@
 namespace mod_perform\formatter\activity;
 
 use core\orm\formatter\entity_model_formatter;
+use core\webapi\formatter\field\date_field_formatter;
 use core\webapi\formatter\field\string_field_formatter;
 
 /**
@@ -36,12 +37,15 @@ class section extends entity_model_formatter {
     protected function get_map(): array {
         return [
             'id' => null,
-            'title' => string_field_formatter::class,
+            'title' => null,
+            'display_title' => string_field_formatter::class,
             'activity' => null,
             'sort_order' => null,
             'section_elements' => null,
             'section_relationships' => null,
             'section_elements_summary' => null,
+            'created_at' => date_field_formatter::class,
+            'updated_at' => date_field_formatter::class,
         ];
     }
 }

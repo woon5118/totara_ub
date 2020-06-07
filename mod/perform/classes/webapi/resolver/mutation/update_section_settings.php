@@ -23,17 +23,16 @@
 
 namespace mod_perform\webapi\resolver\mutation;
 
+use coding_exception;
 use core\orm\query\exceptions\record_not_found_exception;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\mutation_resolver;
 use core\webapi\resolver\has_middleware;
 use mod_perform\models\activity\section;
-use totara_core\advanced_feature;
-use coding_exception;
 use mod_perform\webapi\middleware\require_activity;
 
-class update_section_relationships implements mutation_resolver, has_middleware {
+class update_section_settings implements mutation_resolver, has_middleware {
     /**
      * This updates the list of relationships for a specified section.
      *
@@ -50,6 +49,10 @@ class update_section_relationships implements mutation_resolver, has_middleware 
 
         $activity_context = $section->get_activity()->get_context();
         require_capability('mod/perform:manage_activity', $activity_context);
+
+        if (isset($args['title'])) {
+            $section->update_title($args['title']);
+        }
 
         return ['section' => $section->update_relationships($args['relationships'])];
     }

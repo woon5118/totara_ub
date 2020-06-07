@@ -22,6 +22,10 @@
 
 <style lang="scss">
 .tui-performActivitySection {
+  &__title {
+    margin: 0;
+  }
+
   &__multiple {
     padding: var(--tui-gap-4);
     & > * + * {

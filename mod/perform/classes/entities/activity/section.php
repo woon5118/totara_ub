@@ -51,6 +51,7 @@ class section extends entity {
     public const TABLE = 'perform_section';
     public const CREATED_TIMESTAMP = 'created_at';
     public const UPDATED_TIMESTAMP = 'updated_at';
+    public const SET_UPDATED_WHEN_CREATED = true;
 
     /**
      * Each section belongs to a particular activity.

@@ -21,27 +21,90 @@
  * @package mod_perform
  */
 
+use core\format;
 use mod_perform\entities\activity\section as section_entity;
+use mod_perform\formatter\activity\section as section_formatter;
 use mod_perform\models\activity\section;
-use mod_perform\models\activity\section_relationship;
-use mod_perform\webapi\resolver\mutation\update_section_relationships;
+use mod_perform\webapi\resolver\mutation\update_section_settings;
+use totara_core\advanced_feature;
 use totara_core\relationship\resolvers\subject;
 use totara_job\relationship\resolvers\appraiser;
 use totara_job\relationship\resolvers\manager;
-use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 require_once(__DIR__.'/relationship_testcase.php');
 
 /**
- * @coversDefaultClass update_section_relationships.
+ * @coversDefaultClass update_section_settings.
  *
  * @group perform
  */
-class mod_perform_webapi_resolver_mutation_update_section_relationships_testcase extends mod_perform_relationship_testcase {
-    private const MUTATION = 'mod_perform_update_section_relationships';
+class mod_perform_webapi_resolver_mutation_update_section_settings_testcase extends mod_perform_relationship_testcase {
+    private const MUTATION = 'mod_perform_update_section_settings';
+    private const TYPE = 'mod_perform_section';
 
     use webapi_phpunit_helper;
+
+    public function test_update_section_title() {
+        $this->setAdminUser();
+        $perform_generator = $this->perform_generator();
+        $activity = $perform_generator->create_activity_in_container(['activity_name' => 'Activity 1']);
+        $context = $activity->get_context();
+
+        /** @var section $section1 */
+        $section = $perform_generator->create_section($activity, ['title' => 'One']);
+        $this->assertEquals('One', $section->title);
+
+        // Entering null means no change.
+        $this->resolve_graphql_mutation(self::MUTATION, [
+            'input' => [
+                'section_id' => $section->id,
+                'relationships' => [],
+                'title' => null,
+            ]
+        ]);
+        $section = section::load_by_id($section->id);
+        $this->assertEquals(
+            'One',
+            $this->resolve_graphql_type(self::TYPE, 'title', $section, [], $context)
+        );
+
+        // Empty title
+        $this->resolve_graphql_mutation(self::MUTATION, [
+            'input' => [
+                'section_id' => $section->id,
+                'relationships' => [],
+                'title' => '',
+            ]
+        ]);
+        $section = section::load_by_id($section->id);
+        $this->assertEquals(
+            '',
+            $this->resolve_graphql_type(self::TYPE, 'title', $section, [], $context)
+        );
+        $this->assertEquals(
+            get_string('untitled_section', 'mod_perform'),
+            $this->resolve_graphql_type(self::TYPE, 'display_title', $section, [], $context)
+        );
+
+        $xss_title = 'Hello<script></script>';
+        $this->resolve_graphql_mutation(self::MUTATION, [
+            'input' => [
+                'section_id' => $section->id,
+                'relationships' => [],
+                'title' => $xss_title,
+            ]
+        ]);
+        $section = section::load_by_id($section->id);
+        $this->assertEquals(
+            $xss_title,
+            $this->resolve_graphql_type(self::TYPE, 'title', $section, [], $context)
+        );
+        $this->assertEquals(
+            'Hello',
+            $this->resolve_graphql_type(self::TYPE, 'display_title', $section, [], $context)
+        );
+    }
 
     public function test_update_invalid_section_id() {
         $this->setAdminUser();
@@ -62,7 +125,7 @@ class mod_perform_webapi_resolver_mutation_update_section_relationships_testcase
                 ]
             ]
         );
-        update_section_relationships::resolve($args, $context);
+        update_section_settings::resolve($args, $context);
     }
 
     public function test_update_missing_capability() {
@@ -88,7 +151,7 @@ class mod_perform_webapi_resolver_mutation_update_section_relationships_testcase
                 ],
             ]
         );
-        update_section_relationships::resolve($args, $context);
+        update_section_settings::resolve($args, $context);
     }
 
     public function test_update_successful() {
@@ -124,7 +187,7 @@ class mod_perform_webapi_resolver_mutation_update_section_relationships_testcase
                 ],
             ]
         );
-        $result = update_section_relationships::resolve($args, $context);
+        $result = update_section_settings::resolve($args, $context);
 
         /** @var section $returned_section */
         $returned_section = $result['section'];
@@ -137,7 +200,7 @@ class mod_perform_webapi_resolver_mutation_update_section_relationships_testcase
 
         // Remove all relationships.
         [$args, $context] = $this->create_args($section1->id, []);
-        update_section_relationships::resolve($args, $context);
+        update_section_settings::resolve($args, $context);
         $this->assert_section_relationships($section1, []);
         $this->assert_section_relationships($section2, []);
         $this->assert_activity_relationships($activity1, []);

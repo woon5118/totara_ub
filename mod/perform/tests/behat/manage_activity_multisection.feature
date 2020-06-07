@@ -95,11 +95,13 @@ Feature: Managing an activity with multiple sections
     Then activity section "1" should exist
     And activity section "2" should exist
     # Reload page
-    When I navigate to the edit perform activities page for activity "Participant set up test"
+    When I click on "Cancel" "button" in the ".tui-performActivitySection__saveButtons" "css_element" of the "1" activity section
+    And I click on "Cancel" "button" in the ".tui-performActivitySection__saveButtons" "css_element" of the "2" activity section
+    And I navigate to the edit perform activities page for activity "Participant set up test"
     Then "Add section" "button" should be visible
     # Titles should be displayed
-    And I should see "Untitled Section" in the "1" activity section
-    And I should see "Untitled Section" in the "2" activity section
+    And I should see "Untitled section" in the "1" activity section
+    And I should see "Untitled section" in the "2" activity section
     # read-only mode - no form displayed
     And "Section title" "field" in the "1" activity section should not exist
     And "Section title" "field" in the "2" activity section should not exist
@@ -112,9 +114,9 @@ Feature: Managing an activity with multiple sections
     And "Section title" "field" in the "2" activity section should not exist
     And "Section title" "field" in the "3" activity section should exist
     # Titles should be displayed
-    And I should see "Untitled Section" in the "1" activity section
-    And I should see "Untitled Section" in the "2" activity section
-    And I should not see "Untitled Section" in the "3" activity section
+    And I should see "Untitled section" in the "1" activity section
+    And I should see "Untitled section" in the "2" activity section
+    And I should not see "Untitled section" in the "3" activity section
     When I click on "Add section" "button"
     # Now the fourth one exists and is in edit mode - form is displayed
     Then activity section "1" should exist
@@ -127,10 +129,10 @@ Feature: Managing an activity with multiple sections
     And "Section title" "field" in the "4" activity section should exist
     And "Add section" "button" should be visible
     # Titles should be displayed
-    And I should see "Untitled Section" in the "1" activity section
-    And I should see "Untitled Section" in the "2" activity section
-    And I should not see "Untitled Section" in the "3" activity section
-    And I should not see "Untitled Section" in the "4" activity section
+    And I should see "Untitled section" in the "1" activity section
+    And I should see "Untitled section" in the "2" activity section
+    And I should not see "Untitled section" in the "3" activity section
+    And I should not see "Untitled section" in the "4" activity section
 
   Scenario: Add section above and below
     When I navigate to the edit perform activities page for activity "Participant set up test"
@@ -146,7 +148,10 @@ Feature: Managing an activity with multiple sections
     And activity section "2" should exist
     And activity section "3" should exist
     # Reload to make sure we have readonly mode for all
-    When I navigate to the edit perform activities page for activity "Participant set up test"
+    When I click on "Cancel" "button" in the ".tui-performActivitySection__saveButtons" "css_element" of the "1" activity section
+    And I click on "Cancel" "button" in the ".tui-performActivitySection__saveButtons" "css_element" of the "2" activity section
+    And I click on "Cancel" "button" in the ".tui-performActivitySection__saveButtons" "css_element" of the "3" activity section
+    And I navigate to the edit perform activities page for activity "Participant set up test"
     And I click on ".tui-dropdown" "css_element" in the "1" activity section
     And I click on "Add section above" "link" in the "1" activity section
     # One more section is there
@@ -172,3 +177,46 @@ Feature: Managing an activity with multiple sections
     And activity section "3" should exist
     And activity section "4" should exist
     And activity section "5" should exist
+
+  Scenario: Edit the title for sections
+    Given the multi-language content filter is enabled
+    When I navigate to the edit perform activities page for activity "Multiple section Activity"
+    And I click on ".tui-toggleBtn" "css_element"
+    Then I should see "All existing content will be grouped into the first section, along with the existing participant settings" in the tui modal
+    And I confirm the tui confirmation modal
+
+    # Test can save a section title without changing the title if it is the first section to be created
+    When I click on "Done" "button" in the ".tui-performActivitySection__saveButtons" "css_element" of the "1" activity section
+    Then I should see "Activity saved" in the tui "success" notification toast
+    And I should see "Untitled section" in the "1" activity section
+    When I reload the page
+    Then I should see "Untitled section" in the "1" activity section
+
+    # Test multi-lang filter
+    When I click on "button[aria-label='Edit section']" "css_element" in the "2" activity section
+    And I set the title of activity section "2" to '<span lang="en" class="multilang">English</span><span lang="de" class="multilang">German</span> Title'
+    And I click on "Done" "button" in the ".tui-performActivitySection__saveButtons" "css_element" of the "2" activity section
+    Then I should see "Activity saved" in the tui "success" notification toast
+    And I should see "English Title" in the "2" activity section
+    When I reload the page
+    Then I should see "Untitled section" in the "1" activity section
+    And I should see "English Title" in the "2" activity section
+
+    # Done/Cancel buttons should be disabled unless there have been changes
+    When I click on "button[aria-label='Edit section']" "css_element" in the "1" activity section
+    Then "button.tui-formBtn.tui-formBtn--prim[disabled]" "css_element" in the "1" activity section should exist
+    And "button.tui-formBtn:not(.tui-formBtn--prim)[disabled]" "css_element" in the "1" activity section should exist
+    When I set the title of activity section "1" to "The First Section!"
+    Then "button.tui-formBtn.tui-formBtn--prim[disabled]" "css_element" in the "1" activity section should not exist
+    And "button.tui-formBtn:not(.tui-formBtn--prim)[disabled]" "css_element" in the "1" activity section should not exist
+    When I click on "Done" "button" in the ".tui-performActivitySection__saveButtons" "css_element" of the "1" activity section
+    And I click on "button[aria-label='Edit section']" "css_element" in the "1" activity section
+    Then "button.tui-formBtn.tui-formBtn--prim[disabled]" "css_element" in the "1" activity section should exist
+    And "button.tui-formBtn:not(.tui-formBtn--prim)[disabled]" "css_element" in the "1" activity section should exist
+    When I set the title of activity section "1" to ""
+    Then "button.tui-formBtn.tui-formBtn--prim[disabled]" "css_element" in the "1" activity section should not exist
+    And "button.tui-formBtn:not(.tui-formBtn--prim)[disabled]" "css_element" in the "1" activity section should not exist
+    When I click on "Cancel" "button" in the ".tui-performActivitySection__saveButtons" "css_element" of the "1" activity section
+    And I reload the page
+    Then I should see "The First Section!" in the "1" activity section
+    And I should see "English Title" in the "2" activity section

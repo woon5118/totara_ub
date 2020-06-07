@@ -107,6 +107,22 @@ export default {
     autoSave() {
       return !this.value.settings.multisection;
     },
+
+    /**
+     * Are there any sections that have been edited without saving?
+     */
+    hasUnsavedChanges() {
+      return (
+        !this.autoSave &&
+        this.sectionStates.some(section => section.editMode) &&
+        this.$refs.activitySection.some(section => section.hasChanges)
+      );
+    },
+  },
+
+  mounted() {
+    // Confirm navigation away if user is currently editing.
+    window.addEventListener('beforeunload', this.unloadHandler);
   },
 
   methods: {
@@ -158,6 +174,7 @@ export default {
           })
         : [];
     },
+
     /**
      * Create section state for one section.
      * @param {Object} section
@@ -178,7 +195,7 @@ export default {
      * @param {Object} update
      */
     updateMultiSection(update) {
-      this.sectionStates[0].editMode = update.settings.multisection;
+      this.toggleSectionStateEditMode(update.settings.multisection, 0);
       this.updateActivity(update);
     },
 
@@ -204,6 +221,7 @@ export default {
         this.$emit('mutation-error', e);
       }
     },
+
     /**
      * Adds a section above the given one.
      * @param {Int} sectionIndex
@@ -211,6 +229,7 @@ export default {
     addSectionAbove(sectionIndex) {
       this.addSection(sectionIndex);
     },
+
     /**
      * Adds a section below the given one
      * @param {Int} sectionIndex Section index to add after
@@ -218,6 +237,7 @@ export default {
     addSectionBelow(sectionIndex) {
       this.addSection(sectionIndex + 1);
     },
+
     /**
      * Add a new section at the end of the list
      * @return {Promise<void>}
@@ -257,6 +277,7 @@ export default {
 
       this.isAdding = false;
     },
+
     /**
      * Go through all sections coming after the just added one and
      * increase the sortOrder
@@ -279,6 +300,7 @@ export default {
         this.createSectionState(section, true)
       );
     },
+
     /**
      * Insert a new section at the end of the list
      * @param {Object} section
@@ -286,6 +308,7 @@ export default {
     insertSectionAtEnd(section) {
       this.sectionStates.push(this.createSectionState(section, true));
     },
+
     /**
      * Scroll to the section added at the index
      * @param section
@@ -299,6 +322,26 @@ export default {
         });
       });
     },
+
+    /**
+     * Displays a warning message if the user tries to navigate away without saving.
+     * @param {Event} e
+     * @returns {String|void}
+     */
+    unloadHandler(e) {
+      if (!this.hasUnsavedChanges) {
+        return;
+      }
+
+      // For older browsers that still show custom message.
+      const discardUnsavedChanges = this.$str(
+        'unsaved_changes_warning',
+        'mod_perform'
+      );
+      e.preventDefault();
+      e.returnValue = discardUnsavedChanges;
+      return discardUnsavedChanges;
+    },
   },
 };
 </script>
@@ -306,8 +349,9 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
+      "activity_content_tab_heading",
       "add_section",
-      "activity_content_tab_heading"
+      "unsaved_changes_warning"
     ]
   }
 </lang-strings>
