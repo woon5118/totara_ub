@@ -24,13 +24,13 @@
 namespace mod_perform\data_providers\activity;
 
 use core\orm\collection;
-use core\orm\entity\repository;
 use core\orm\query\builder;
 use mod_perform\entities\activity\filters\subject_instance_id;
 use mod_perform\entities\activity\participant_instance;
 use mod_perform\models\activity\subject_instance as subject_instance_model;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 use mod_perform\entities\activity\filters\subject_instances_about;
+use totara_job\relationship\resolvers\manager;
 
 /**
  * Class subject_instance
@@ -98,7 +98,8 @@ class subject_instance_for_participant {
             ->as('si')
             ->with('subject_user')
             ->with('track.activity')
-            ->with('participant_instances')
+            // Eager loaded relationship resolvers because they are returned in the subject instance gql query
+            ->with('participant_instances.activity_relationship.relationship.resolvers')
             ->where_exists($this->get_target_participant_exists())
             // Newest subject instances at the top of the list
             ->order_by('si.created_at', 'desc')
