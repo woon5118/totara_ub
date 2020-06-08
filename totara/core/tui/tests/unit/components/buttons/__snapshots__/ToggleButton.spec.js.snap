@@ -1,16 +1,53 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ToggleButton.vue Checks snapshot 1`] = `
-<button
-  class="tui-toggleBtn"
-  type="button"
+exports[`ToggleButton.vue Renders correctly with an empty slot 1`] = `
+<div
+  class="tui-toggleBtn tui-toggleBtn_right"
 >
+  <button
+    class="tui-toggleBtn__btn"
+    type="button"
+  >
+    
+    toggle button text
   
-  toggle button text
-  
+  </button>
+   
+  <div
+    class="tui-toggleBtn__icon"
+  />
+   
   <span
     aria-hidden="true"
     class="tui-toggleBtn__ui"
   />
-</button>
+</div>
+`;
+
+exports[`ToggleButton.vue Renders correctly with something in the slot 1`] = `
+<div
+  class="tui-toggleBtn tui-toggleBtn_right"
+>
+  <button
+    class="tui-toggleBtn__btn"
+    type="button"
+  >
+    
+    toggle button text
+  
+  </button>
+   
+  <div
+    class="tui-toggleBtn__icon"
+  >
+    <div>
+      icon button
+    </div>
+  </div>
+   
+  <span
+    aria-hidden="true"
+    class="tui-toggleBtn__ui"
+  />
+</div>
 `;

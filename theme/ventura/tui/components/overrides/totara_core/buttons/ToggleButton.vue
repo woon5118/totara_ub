@@ -16,7 +16,7 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-  @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
+  @author Steve Barnett <steve.barnett@totaralearning.com>
   @package theme_ventura
 -->
 
@@ -27,35 +27,44 @@
   --tui-form-toggle-container-width: 4rem;
   --tui-form-toggle-container-height: 2rem;
   --tui-form-toggle-container-radius: 1rem;
-  --tui-form-toggle-text-offset: 5rem;
+  --tui-form-toggle-text-offset: var(--tui-gap-2);
   --tui-form-toggle-dot-offset: 0.2rem;
   --tui-form-toggle-bottom: 1.8rem;
 }
 
 .tui-toggleBtn {
-  @extend .tui-formBtn;
-  @extend .tui-formBtn--transparent;
+  display: flex;
+  align-items: center;
 
-  position: relative;
-  padding-left: var(--tui-form-toggle-text-offset);
-  color: var(--tui-form-toggle-color);
+  &__btn {
+    @extend .tui-formBtn;
+    @extend .tui-formBtn--transparent;
+    color: var(--tui-form-toggle-color);
 
+    &:focus,
+    &:active:focus {
+      color: var(--tui-form-toggle-color);
+      outline: none;
+    }
+
+    &:hover {
+      color: var(--tui-form-toggle-color);
+    }
+
+    &[disabled] {
+      opacity: 0.4;
+    }
+  }
+
+  // toggle size and shape
   &__ui {
-    position: absolute;
-    bottom: var(--tui-form-toggle-bottom);
-    left: 0;
+    position: relative;
+    width: var(--tui-form-toggle-container-width);
 
     // the toggle background
     &:before {
-      position: absolute;
-      top: 0;
-      left: 0;
       display: block;
-      width: var(--tui-form-toggle-container-width);
       height: var(--tui-form-toggle-container-height);
-      background-color: var(--tui-form-toggle-off-bg-color);
-      border: var(--tui-form-input-border-size) solid;
-      border-color: var(--tui-form-toggle-border-color);
       border-radius: var(--tui-form-toggle-container-radius);
       transition: background-color var(--tui-transition-button-duration)
           var(--tui-transition-button-function),
@@ -68,98 +77,145 @@
     &:after {
       position: absolute;
       top: var(--tui-form-toggle-dot-offset);
-      left: var(--tui-form-toggle-dot-offset);
       display: block;
       width: var(--tui-form-toggle-dot-size);
       height: var(--tui-form-toggle-dot-size);
-      background-color: var(--tui-form-toggle-dot-color);
       border-radius: 50%;
       box-shadow: var(--tui-shadow-2);
-      transition: right var(--tui-transition-toggle-duration)
+      transition: left var(--tui-transition-toggle-duration)
         var(--tui-transition-toggle-function);
       content: '';
     }
-  }
 
-  &:focus,
-  &:active:focus {
-    color: var(--tui-form-toggle-color);
-    outline: none;
-  }
-
-  &:hover {
-    color: var(--tui-form-toggle-color);
-  }
-
-  &:hover,
-  &:focus {
-    .tui-toggleBtn__ui {
+    &:hover,
+    &:focus {
+      cursor: pointer;
       &:before {
         background-color: var(--tui-form-toggle-off-bg-color-hover-focus);
         transition-duration: var(none--tui-transition-form-duration);
       }
     }
-  }
 
-  &[aria-pressed='true'] {
-    .tui-toggleBtn__ui {
-      &:before {
-        background-color: var(--tui-form-toggle-on-bg-color);
-        border-color: var(--tui-form-toggle-on-border-color);
-      }
+    &[disabled] {
+      opacity: 0.4;
+    }
 
-      &:after {
-        left: calc(
-          var(--tui-form-toggle-container-width) -
-            var(--tui-form-toggle-dot-offset) - var(--tui-form-toggle-dot-size)
-        );
-        background-color: var(--tui-form-toggle-dot-color);
-      }
+    // toggled off
+
+    // the toggle background
+    &:before {
+      background-color: var(--tui-form-toggle-off-bg-color);
+      border: var(--tui-form-input-border-size) solid;
+      border-color: var(--tui-form-toggle-border-color);
+    }
+
+    // the toggle dot
+    &:after {
+      background-color: var(--tui-form-toggle-dot-color);
     }
 
     &:hover,
     &:focus {
-      .tui-toggleBtn__ui {
+      &:before {
+        background-color: var(--tui-form-toggle-off-bg-color-hover-focus);
+      }
+    }
+  }
+
+  // toggled off, via the button
+  &__btn {
+    &:hover,
+    &:focus {
+      ~ .tui-toggleBtn__ui {
         &:before {
-          background-color: var(--tui-form-toggle-on-bg-color-hover-focus);
-          border-color: var(--tui-form-toggle-on-border-color-hover-focus);
-          transition-duration: var(none--tui-transition-form-duration);
+          background-color: var(--tui-form-toggle-off-bg-color-hover-focus);
         }
       }
     }
   }
 
-  &[disabled] {
-    opacity: 0.4;
+  // toggled on
+  &__ui.tui-toggleBtn__ui--aria-pressed {
+    // the toggle background
+    &:before {
+      background-color: var(--tui-form-toggle-on-bg-color);
+      border-color: var(--tui-form-toggle-on-border-color);
+    }
+
+    &:hover,
+    &:focus {
+      &:before {
+        background-color: var(--tui-form-toggle-on-bg-color-hover-focus);
+      }
+    }
+  }
+
+  // toggled on, via the button
+  &__btn {
+    &:hover,
+    &:focus {
+      ~ .tui-toggleBtn__ui.tui-toggleBtn__ui--aria-pressed {
+        &:before {
+          background-color: var(--tui-form-toggle-on-bg-color-hover-focus);
+        }
+      }
+    }
+  }
+
+  // toggle on the right, text on the left
+  &_right {
+    .tui-toggleBtn__ui {
+      margin-left: var(--tui-form-toggle-text-offset);
+    }
+  }
+
+  // toggle on the left, text on the right
+  &_left {
+    .tui-toggleBtn__ui {
+      order: 1;
+      margin-right: var(--tui-form-toggle-text-offset);
+    }
+
+    .tui-toggleBtn__btn {
+      order: 2;
+    }
+
+    .tui-toggleBtn__icon {
+      order: 3;
+    }
   }
 }
 
-.tui-toggleBtn__rtl {
-  padding-right: var(--tui-form-toggle-text-offset);
-  padding-left: 0;
+// left to right languages
+.dir-ltr {
   .tui-toggleBtn__ui {
-    right: 0;
-
-    &:before {
-      right: 0;
-      left: auto;
-    }
-
+    // the toggle dot
     &:after {
-      right: calc(
-        var(--tui-form-toggle-container-width) -
-          var(--tui-form-toggle-dot-offset) - var(--tui-form-toggle-dot-size)
-      );
-      left: auto;
+      left: var(--tui-form-toggle-dot-offset);
     }
   }
 
-  &[aria-pressed='true'] {
-    .tui-toggleBtn__ui {
-      &:after {
-        right: var(--tui-form-toggle-dot-offset);
-        left: auto;
-      }
+  .tui-toggleBtn__ui.tui-toggleBtn__ui--aria-pressed {
+    &:after {
+      right: var(--tui-form-toggle-dot-offset);
+      left: auto;
+    }
+  }
+}
+
+// right to left languages
+.dir-rtl {
+  .tui-toggleBtn__ui {
+    // the toggle dot
+    &:after {
+      right: var(--tui-form-toggle-dot-offset);
+    }
+  }
+
+  .tui-toggleBtn__ui.tui-toggleBtn__ui--aria-pressed {
+    &:after {
+      left: auto;
+      left: var(--tui-form-toggle-dot-offset);
     }
   }
 }

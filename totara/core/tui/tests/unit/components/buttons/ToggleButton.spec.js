@@ -28,6 +28,7 @@ expect.extend(toHaveNoViolations);
 
 let wrapper;
 let propsData;
+let button;
 
 describe('ToggleButton.vue', () => {
   beforeEach(() => {
@@ -40,23 +41,25 @@ describe('ToggleButton.vue', () => {
   describe('Toggles aria-pressed on click', () => {
     it('adds aria-pressed', async () => {
       wrapper = shallowMount(component, { propsData });
+      button = wrapper.find('button');
 
-      expect(wrapper.attributes('aria-pressed')).toBeUndefined();
-      wrapper.find('button').trigger('click');
+      expect(button.attributes('aria-pressed')).toBeUndefined();
+      button.trigger('click');
       await Vue.nextTick();
-      expect(wrapper.attributes('aria-pressed')).toBe('true');
+      expect(button.attributes('aria-pressed')).toBe('true');
     });
 
     it('removes aria-pressed when already pressed', async () => {
       wrapper = shallowMount(component, { propsData });
+      button = wrapper.find('button');
 
-      expect(wrapper.attributes('aria-pressed')).toBeUndefined();
-      wrapper.find('button').trigger('click');
+      expect(button.attributes('aria-pressed')).toBeUndefined();
+      button.trigger('click');
       await Vue.nextTick();
-      expect(wrapper.attributes('aria-pressed')).toBe('true');
-      wrapper.find('button').trigger('click');
+      expect(button.attributes('aria-pressed')).toBe('true');
+      button.trigger('click');
       await Vue.nextTick();
-      expect(wrapper.attributes('aria-pressed')).toBeUndefined();
+      expect(button.attributes('aria-pressed')).toBeUndefined();
     });
 
     it('does nothing if the button is disabled', async () => {
@@ -64,15 +67,30 @@ describe('ToggleButton.vue', () => {
       wrapper = shallowMount(component, {
         propsData,
       });
+      button = wrapper.find('button');
 
-      expect(wrapper.attributes('aria-pressed')).toBeUndefined();
-      wrapper.find('button').trigger('click');
+      expect(button.attributes('aria-pressed')).toBeUndefined();
+      button.trigger('click');
       await Vue.nextTick();
-      expect(wrapper.attributes('aria-pressed')).toBeUndefined();
+      expect(button.attributes('aria-pressed')).toBeUndefined();
     });
   });
 
-  it('Checks snapshot', () => {
+  it('Renders correctly with something in the slot', () => {
+    wrapper = shallowMount(component, {
+      propsData,
+      $mocks: { pressed: false },
+      scopedSlots: {
+        icon() {
+          return this.$createElement('div', {}, ['icon button']);
+        },
+      },
+    });
+
+    expect(wrapper.element).toMatchSnapshot();
+  });
+
+  it('Renders correctly with an empty slot', () => {
     wrapper = shallowMount(component, {
       propsData,
       $mocks: { pressed: false },
@@ -81,12 +99,38 @@ describe('ToggleButton.vue', () => {
     expect(wrapper.element).toMatchSnapshot();
   });
 
-  it('should not have any accessibility violations', async () => {
+  it('should not have any accessibility violations with something in the slot', async () => {
+    wrapper = shallowMount(component, {
+      propsData,
+      $mocks: { pressed: false },
+      scopedSlots: {
+        icon() {
+          return this.$createElement('div', {}, ['icon button']);
+        },
+      },
+    });
+
     const results = await axe(wrapper.element, {
       rules: {
         region: { enabled: false },
       },
     });
+
+    expect(results).toHaveNoViolations();
+  });
+
+  it('should not have any accessibility violations with an empty slot', async () => {
+    wrapper = shallowMount(component, {
+      propsData,
+      $mocks: { pressed: false },
+    });
+
+    const results = await axe(wrapper.element, {
+      rules: {
+        region: { enabled: false },
+      },
+    });
+
     expect(results).toHaveNoViolations();
   });
 });

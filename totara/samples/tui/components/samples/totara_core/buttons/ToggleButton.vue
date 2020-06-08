@@ -34,25 +34,55 @@
     </p>
 
     <SamplesExample>
-      <ToggleButton :text="text" />
+      <ToggleButton :text="text" :toggle-first="toggleFirst">
+        <template v-slot:icon>
+          <InfoIconButton :aria-label="'Help'">
+            Some content here...
+          </InfoIconButton>
+        </template>
+      </ToggleButton>
+
+      <br /><br />
+
+      <ToggleButton :text="text" :toggle-first="toggleFirst" />
     </SamplesExample>
+
+    <SamplesPropCtl>
+      <FormRow label="toggleFirst">
+        <RadioGroup v-model="toggleFirst" :horizontal="true">
+          <Radio :value="true">True</Radio>
+          <Radio :value="false">False</Radio>
+        </RadioGroup>
+      </FormRow>
+    </SamplesPropCtl>
   </div>
 </template>
 
 <script>
 // Components
 import ToggleButton from 'totara_core/components/buttons/ToggleButton';
+import InfoIconButton from 'totara_core/components/buttons/InfoIconButton';
+import FormRow from 'totara_core/components/form/FormRow';
+import Radio from 'totara_core/components/form/Radio';
+import RadioGroup from 'totara_core/components/form/RadioGroup';
 import SamplesExample from 'totara_samples/components/sample_parts/misc/SamplesExample';
+import SamplesPropCtl from 'totara_samples/components/sample_parts/misc/SamplesPropCtl';
 
 export default {
   components: {
     ToggleButton,
+    InfoIconButton,
+    FormRow,
+    Radio,
+    RadioGroup,
     SamplesExample,
+    SamplesPropCtl,
   },
 
   data() {
     return {
       text: 'Toggle something in the UI',
+      toggleFirst: true,
     };
   },
 };

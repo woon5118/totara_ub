@@ -21,21 +21,33 @@
 -->
 
 <template>
-  <button
-    type="button"
-    :class="'tui-toggleBtn' + rtlToggle"
-    :aria-pressed="ariaPressed"
-    :disabled="disabled"
-    @click="togglePressed"
-  >
-    {{ text }}
-    <span class="tui-toggleBtn__ui" aria-hidden="true" />
-  </button>
+  <div :class="'tui-toggleBtn' + showToggleFirst">
+    <button
+      type="button"
+      class="tui-toggleBtn__btn"
+      :aria-pressed="ariaPressed"
+      :disabled="disabled"
+      @click="togglePressed"
+    >
+      {{ text }}
+    </button>
+
+    <div class="tui-toggleBtn__icon">
+      <slot name="icon" />
+    </div>
+
+    <span
+      class="tui-toggleBtn__ui"
+      :class="{
+        'tui-toggleBtn__ui--aria-pressed': ariaPressed,
+      }"
+      aria-hidden="true"
+      @click="togglePressed"
+    />
+  </div>
 </template>
 
 <script>
-import { isRtl } from 'totara_core/i18n';
-
 export default {
   props: {
     disabled: {
@@ -47,17 +59,20 @@ export default {
       required: true,
     },
     initialState: {
-      default: false,
       type: Boolean,
+      default: false,
+    },
+    toggleFirst: {
+      type: Boolean,
+      default: false,
     },
     value: {
-      default: undefined,
       type: Boolean,
+      default: undefined,
     },
   },
   data() {
     return {
-      rtlToggle: isRtl() ? ' tui-toggleBtn__rtl' : '',
       state: this.initialState,
     };
   },
@@ -73,6 +88,10 @@ export default {
         return this.state;
       }
       return this.value;
+    },
+
+    showToggleFirst() {
+      return this.toggleFirst ? ' tui-toggleBtn_left' : ' tui-toggleBtn_right';
     },
   },
   methods: {
