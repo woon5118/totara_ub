@@ -30,6 +30,7 @@ class rb_base_embedded {
     public $url, $source, $fullname, $filters, $columns;
     public $contentmode, $contentsettings, $embeddedparams;
     public $hidden, $accessmode, $accesssettings, $shortname;
+    public $defaultsortcolumn, $defaultsortorder;
 
 /**
  * Class constructor

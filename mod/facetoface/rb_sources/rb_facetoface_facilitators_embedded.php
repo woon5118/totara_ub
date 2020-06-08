@@ -37,12 +37,12 @@ class rb_facetoface_facilitators_embedded extends rb_base_embedded {
             array('type' => 'facilitator', 'value' => 'visible', 'heading' => null),
             array('type' => 'facilitator', 'value' => 'actions', 'heading' => null)
         );
-
         $this->filters = array(
             array('type' => 'facilitator', 'value' => 'name', 'advanced' => 0),
             array('type' => 'facilitator', 'value' => 'facilitatoravailable', 'advanced' => 0),
             array('type' => 'facilitator', 'value' => 'published', 'advanced' => 0, 'defaultvalue' => ['value' => 0])
         );
+        $this->defaultsortcolumn = 'facilitator_name';
 
         if (isset($data['published']) && $data['published'] !== false) {
             $this->embeddedparams['published'] = $data['published'];

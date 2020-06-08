@@ -173,7 +173,8 @@ final class room_list implements \Iterator, \Countable {
                       JOIN {facetoface_sessions_dates} fsd ON fsd.id = frd.sessionsdateid
                       JOIN {facetoface_sessions} fs ON fs.id = fsd.sessionid AND fs.cancelledstatus = 0
                      WHERE fr.allowconflicts = 0 AND fsd.sessionid <> :sessionid
-                       AND (fsd.timestart < :timefinish AND fsd.timefinish > :timestart)";
+                       AND (fsd.timestart < :timefinish AND fsd.timefinish > :timestart)
+                  ORDER BY fr.name ASC, fr.id ASC";
 
             $bookedrooms = $DB->get_records_sql($sql, $params);
         }

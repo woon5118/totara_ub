@@ -74,7 +74,8 @@ final class facilitator_list  implements \Iterator {
                       JOIN {facetoface_sessions_dates} fsd ON fsd.id = ffd.sessionsdateid
                       JOIN {facetoface_sessions} fs ON fs.id = fsd.sessionid AND fs.cancelledstatus = 0
                      WHERE ff.allowconflicts = 0 AND fsd.sessionid <> :sessionid
-                       AND (fsd.timestart < :timefinish AND fsd.timefinish > :timestart)";
+                       AND (fsd.timestart < :timefinish AND fsd.timefinish > :timestart)
+                  ORDER BY ff.name ASC, ff.id ASC";
 
             $bookedfacilitators = $DB->get_records_sql($sql, $params);
         }
@@ -89,7 +90,8 @@ final class facilitator_list  implements \Iterator {
                  LEFT JOIN {user} u ON u.id = ff.userid
                  LEFT JOIN {facetoface_facilitator_dates} ffd ON ffd.facilitatorid = ff.id
                  LEFT JOIN {facetoface_sessions_dates} fsd ON fsd.id = ffd.sessionsdateid
-                     WHERE ff.custom = 0 AND (ff.hidden = 0 OR fsd.sessionid = :sessionid)";
+                     WHERE ff.custom = 0 AND (ff.hidden = 0 OR fsd.sessionid = :sessionid)
+                  ORDER BY ff.name ASC, ff.id ASC";
         } else {
             $sql = "SELECT ff.*, {$usernamefields}
                       FROM {facetoface_facilitator} ff
@@ -110,7 +112,8 @@ final class facilitator_list  implements \Iterator {
                       JOIN {facetoface_facilitator_dates} ffd ON ffd.facilitatorid = ff.id
                       JOIN {facetoface_sessions_dates} fsd ON fsd.id = ffd.sessionsdateid
                       JOIN {facetoface_sessions} fs ON fs.id = fsd.sessionid
-                     WHERE ff.custom = 1 AND fs.facetoface = :facetofaceid";
+                     WHERE ff.custom = 1 AND fs.facetoface = :facetofaceid
+                  ORDER BY ff.name ASC, ff.id ASC";
             $customfacilitators = $DB->get_records_sql($sql, $params);
             foreach ($customfacilitators as $facilitator) {
                 if (!isset($bookedfacilitators[$facilitator->id])) {
@@ -152,14 +155,13 @@ final class facilitator_list  implements \Iterator {
         global $DB;
         // Using distinct here, because there could be a possibility that different session dates are using the same
         // facilitator. And would cause an unexpecing debugging message where duplicated Id is appearing in the list.
-        $sql = "
-            SELECT DISTINCT f.*
+        $sql = "SELECT DISTINCT f.*
             FROM {facetoface_facilitator} f
             INNER JOIN {facetoface_facilitator_dates} ffd ON ffd.facilitatorid = f.id
             INNER JOIN {facetoface_sessions_dates} fsd ON fsd.id = ffd.sessionsdateid
             WHERE f.custom = 1
             AND fsd.sessionid = :sessionid
-        ";
+            ORDER BY f.name ASC, f.id ASC";
         $records = $DB->get_records_sql($sql, ['sessionid' => $seminareventid]);
         $list = new static();
         foreach ($records as $record) {
@@ -222,7 +224,8 @@ final class facilitator_list  implements \Iterator {
             INNER JOIN {facetoface_facilitator_dates} ffd ON ffd.facilitatorid = ff.id
             INNER JOIN {facetoface_sessions_dates} fsd ON fsd.id = ffd.sessionsdateid
             INNER JOIN {facetoface_sessions} fs ON fs.id = fsd.sessionid
-                 WHERE ff.hidden = 0 AND fs.id = :seminareventid";
+                 WHERE ff.hidden = 0 AND fs.id = :seminareventid
+              ORDER BY ff.name ASC, ff.id ASC";
         $rs = $DB->get_recordset_sql($sql, ['seminareventid' => $seminareventid]);
         $list = new static();
         foreach ($rs as $record) {

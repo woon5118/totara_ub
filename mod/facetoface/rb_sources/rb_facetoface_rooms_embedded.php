@@ -39,12 +39,12 @@ class rb_facetoface_rooms_embedded extends rb_base_embedded {
             array('type' => 'room', 'value' => 'visible', 'heading' => null),
             array('type' => 'room', 'value' => 'actions', 'heading' => null)
         );
-
         $this->filters = array(
             array('type' => 'room', 'value' => 'name', 'advanced' => 0),
             array('type' => 'room', 'value' => 'roomavailable', 'advanced' => 0),
             array('type' => 'room', 'value' => 'published', 'advanced' => 0, 'defaultvalue' => ['value' => 0])
         );
+        $this->defaultsortcolumn = 'room_name';
 
         if (isset($data['published']) && $data['published'] !== false) {
             $this->embeddedparams['published'] = $data['published'];

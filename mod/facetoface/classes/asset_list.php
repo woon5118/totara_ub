@@ -87,7 +87,8 @@ final class asset_list implements \Iterator {
                       JOIN {facetoface_sessions_dates} fsd ON fsd.id = fad.sessionsdateid
                       JOIN {facetoface_sessions} fs ON fs.id = fsd.sessionid AND fs.cancelledstatus = 0
                      WHERE fa.allowconflicts = 0 AND fsd.sessionid <> :sessionid
-                       AND (fsd.timestart < :timefinish AND fsd.timefinish > :timestart)";
+                       AND (fsd.timestart < :timefinish AND fsd.timefinish > :timestart)
+                  ORDER BY fa.name ASC, fa.id ASC";
 
             $bookedassets = $DB->get_records_sql($sql, $params);
         }
@@ -102,7 +103,8 @@ final class asset_list implements \Iterator {
                       FROM {facetoface_asset} fa
                  LEFT JOIN {facetoface_asset_dates} fad ON fad.assetid = fa.id
                  LEFT JOIN {facetoface_sessions_dates} fsd ON fsd.id = fad.sessionsdateid
-                     WHERE fa.custom = 0 AND (fa.hidden = 0 OR fsd.sessionid = :sessionid)";
+                     WHERE fa.custom = 0 AND (fa.hidden = 0 OR fsd.sessionid = :sessionid)
+                  ORDER BY fa.name ASC, fa.id ASC";
         } else {
             $sql = "SELECT fa.*
                       FROM {facetoface_asset} fa
@@ -121,7 +123,8 @@ final class asset_list implements \Iterator {
                       JOIN {facetoface_asset_dates} fad ON fad.assetid = fa.id
                       JOIN {facetoface_sessions_dates} fsd ON fsd.id = fad.sessionsdateid
                       JOIN {facetoface_sessions} fs ON fs.id = fsd.sessionid
-                     WHERE fa.custom = 1 AND fs.facetoface = :facetofaceid";
+                     WHERE fa.custom = 1 AND fs.facetoface = :facetofaceid
+                  ORDER BY fa.name ASC, fa.id ASC";
             $customassets = $DB->get_records_sql($sql, $params);
             foreach ($customassets as $asset) {
                 if (!isset($bookedassets[$asset->id])) {
@@ -163,14 +166,13 @@ final class asset_list implements \Iterator {
 
         // Using distinct here, because there could be a possibility that different session dates are using the same
         // asset. And would cause an unexpecing debugging message where duplicated Id is appearing in the list.
-        $sql = "
-            SELECT DISTINCT a.*
+        $sql = "SELECT DISTINCT a.*
             FROM {facetoface_asset} a
             INNER JOIN {facetoface_asset_dates} fad ON fad.assetid = a.id
             INNER JOIN {facetoface_sessions_dates} fsd ON fsd.id = fad.sessionsdateid
             WHERE a.custom = 1
             AND fsd.sessionid = :sessionid
-        ";
+         ORDER BY a.name ASC, a.id ASC";
 
         $records = $DB->get_records_sql($sql, ['sessionid' => $seminareventid]);
         $list = new static();

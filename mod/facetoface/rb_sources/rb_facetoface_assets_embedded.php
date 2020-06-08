@@ -34,12 +34,12 @@ class rb_facetoface_assets_embedded extends rb_base_embedded {
             array('type' => 'asset', 'value' => 'visible', 'heading' => null),
             array('type' => 'asset', 'value' => 'actions', 'heading' => null)
         );
-
         $this->filters = array(
             array('type' => 'asset', 'value' => 'name', 'advanced' => 0),
             array('type' => 'asset', 'value' => 'assetavailable', 'advanced' => 0),
             array('type' => 'asset', 'value' => 'published', 'advanced' => 0, 'defaultvalue' => ['value' => 0])
         );
+        $this->defaultsortcolumn = 'asset_name';
 
         if (isset($data['published']) && $data['published'] !== false) {
             $this->embeddedparams['published'] = $data['published'];
