@@ -813,7 +813,7 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
         } catch (\Behat\Mink\Exception\DriverException $ex) {
             $pending_js = '';
         }
-        throw new \Exception('Javascript code and/or AJAX requests are not ready after ' . self::EXTENDED_TIMEOUT .
+        throw new \behat_pending_js_exception('Javascript code and/or AJAX requests are not ready after ' . self::EXTENDED_TIMEOUT .
             ' seconds. There is a Javascript error or the code is extremely slow.' . $pending_js);
     }
 

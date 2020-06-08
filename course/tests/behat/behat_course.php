@@ -214,6 +214,12 @@ class behat_course extends behat_base {
             $activitynode = $this->find('xpath', $activityxpath);
             $activitynode->doubleClick();
 
+            // Totara: Explicitly wait for page loading, then give it a second chance if fails.
+            try {
+                $this->execute("behat_general::wait_until_the_page_is_ready");
+            } catch (\behat_pending_js_exception $ex) {
+                $this->wait_for_pending_js();
+            }
         } else {
             // Without Javascript.
 

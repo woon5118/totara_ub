@@ -828,3 +828,13 @@ class behat_stop_exception extends \Exception {
  */
 class behat_log_exception extends \Exception {
 }
+
+/**
+ * Behat pending_js exception
+ *
+ * This exception is thrown if wait_for_pending_js fails.
+ * @package    core_test
+ * @since      Totara 13
+ */
+class behat_pending_js_exception extends \Exception {
+}

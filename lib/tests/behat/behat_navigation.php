@@ -616,6 +616,20 @@ class behat_navigation extends behat_base {
         global $DB;
         $course = $DB->get_record("course", array("fullname" => $coursefullname), 'id', MUST_EXIST);
         $url = new moodle_url('/course/view.php', ['id' => $course->id]);
+        // Totara: Navigate the course homepage with editing mode on in a fast way.
+        if ($this->running_javascript()) {
+            try {
+                $sesskey = $this->getSession()->getDriver()->evaluateScript('return "M" in window && "cfg" in M ? M.cfg.sesskey : "";');
+                if (!empty($sesskey)) {
+                    $url->params(['edit' => 1, 'sesskey' => $sesskey]);
+                    $this->getSession()->visit($this->locate_path($url->out_as_local_url(false)));
+                    $this->wait_for_pending_js();
+                    return;
+                }
+            } catch (\Behat\Mink\Exception\DriverException $ex) {
+                // Fall back into the two-step tryout.
+            }
+        }
         $this->getSession()->visit($this->locate_path($url->out_as_local_url(false)));
         $this->wait_for_pending_js();
         try {
