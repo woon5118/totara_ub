@@ -658,15 +658,60 @@ class track extends model {
     }
 
     /**
+     * Maps a mapped int constant to the string representation.
+     *
+     * @param int|null $value
+     * @param array $map
+     * @param string $value_description Used in the execpection
+     * @return string|null
+     */
+    public static function mapped_value_to_string(?int $value, array $map, string $value_description): ?string {
+        if ($value === null) {
+            return null;
+        }
+
+        if (!array_key_exists($value, $map)) {
+            throw new coding_exception(sprintf("Unknonw %s: %s", $value_description, $value));
+        }
+
+        return $map[$value];
+    }
+
+    /**
+     * Maps a string representation to the mapped int constant
+     *
+     * @param string|null $string+value
+     * @param array $map
+     * @param string $exception_message
+     * @return int|null
+     */
+    public static function mapped_value_from_string(?string $string_value, array $map, string $exception_message): ?int {
+        if ($string_value === null) {
+            return null;
+        }
+
+        $string_map = array_flip($map);
+
+        if (!array_key_exists($string_value, $string_map)) {
+            throw new coding_exception(sprintf($exception_message, $string_value));
+        }
+
+        return $string_map[$string_value];
+    }
+
+    /**
      * Get the string representation of the subject instance generation method.
      *
      * @return string|null
      */
-    protected function get_subject_instance_generation(): string {
-        return $this->map_from_entity(
+    protected function get_subject_instance_generation(): ?string {
+        if (!$this->get_subject_instance_generation_control_is_enabled()) {
+            return null;
+        }
+        return track_model::mapped_value_to_string(
             $this->entity->subject_instance_generation,
             track_model::get_subject_instance_generation_methods(),
-            'Unknown subject instance generation method: %s'
+            'subject instance generation method'
         );
     }
 
@@ -676,10 +721,10 @@ class track extends model {
      * @return string|null
      */
     protected function get_schedule_dynamic_direction(): ?string {
-        return $this->map_from_entity(
+        return track_model::mapped_value_to_string(
             $this->entity->schedule_dynamic_direction,
             track_model::get_dynamic_schedule_directions(),
-            'Unknown dynamic schedule direction: %s'
+            'dynamic schedule direction'
         );
     }
 
@@ -689,10 +734,10 @@ class track extends model {
      * @return string|null
      */
     protected function get_schedule_dynamic_unit(): ?string {
-        return $this->map_from_entity(
+        return track_model::mapped_value_to_string(
             $this->entity->schedule_dynamic_unit,
             track_model::get_dynamic_schedule_units(),
-            'Unknown dynamic schedule unit: %s'
+            'dynamic schedule unit'
         );
     }
 
@@ -702,10 +747,10 @@ class track extends model {
      * @return string|null
      */
     protected function get_due_date_relative_unit(): ?string {
-        return $this->map_from_entity(
+        return track_model::mapped_value_to_string(
             $this->entity->due_date_relative_unit,
             track_model::get_dynamic_schedule_units(),
-            'Unknown dynamic due date unit: %s'
+            'dynamic due date unit'
         );
     }
 
@@ -715,10 +760,10 @@ class track extends model {
      * @return string|null
      */
     protected function get_repeating_relative_type(): ?string {
-        return $this->map_from_entity(
+        return track_model::mapped_value_to_string(
             $this->entity->repeating_relative_type,
             track_model::get_repeating_relative_types(),
-            'Unknown repeating type: %s'
+            'repeating relative type'
         );
     }
 
@@ -728,31 +773,11 @@ class track extends model {
      * @return string|null
      */
     protected function get_repeating_relative_unit(): ?string {
-        return $this->map_from_entity(
+        return track_model::mapped_value_to_string(
             $this->entity->repeating_relative_unit,
             track_model::get_dynamic_schedule_units(),
-            'Unknown repeating unit: %s'
+            'repeating relative unit'
         );
-    }
-
-    /**
-     * Maps an entity/db int constant to the string representation.
-     *
-     * @param int $entity_value
-     * @param array $map
-     * @param string $exception_message
-     * @return string
-     */
-    protected function map_from_entity(?int $entity_value, array $map, string $exception_message): ?string {
-        if ($entity_value === null) {
-            return null;
-        }
-
-        if (!array_key_exists($entity_value, $map)) {
-            throw new coding_exception(sprintf($exception_message, $entity_value));
-        }
-
-        return $map[$entity_value];
     }
 
     /**

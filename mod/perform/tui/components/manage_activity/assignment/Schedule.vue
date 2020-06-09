@@ -93,6 +93,7 @@ import {
   NOTIFICATION_DURATION,
   RELATIVE_DATE_DIRECTION_BEFORE,
   RELATIVE_DATE_UNIT_DAY,
+  RELATIVE_DATE_UNIT_WEEK,
   SCHEDULE_REPEATING_TYPE_AFTER_CREATION,
   SCHEDULE_REPEATING_TYPE_AFTER_CREATION_WHEN_COMPLETE,
   SCHEDULE_REPEATING_TYPE_AFTER_COMPLETION,
@@ -291,23 +292,35 @@ export default {
 
     /**
      * Initialise repeatingRelativeDates for each possible repeating type
-     * @param Object track
-     * @return Object
+     * @param {Object} track
+     * @return {Object}
      */
     initRepeatingRelativeDates(track) {
-      // We want a separate relative relative date for each type. All get the same initial values
+      // We want a separate relative relative date for each type.
       let repeatingRelativeDates = [];
       let repeatingTypes = [
         SCHEDULE_REPEATING_TYPE_AFTER_CREATION,
         SCHEDULE_REPEATING_TYPE_AFTER_CREATION_WHEN_COMPLETE,
         SCHEDULE_REPEATING_TYPE_AFTER_COMPLETION,
       ];
-      repeatingTypes.forEach(function(type) {
-        repeatingRelativeDates[type] = {
-          count: track.repeating_relative_count || '14',
-          unit: track.repeating_relative_unit || RELATIVE_DATE_UNIT_DAY,
+
+      // First set all to the default
+      repeatingTypes.forEach(currentType => {
+        repeatingRelativeDates[currentType] = {
+          count: '4',
+          unit: RELATIVE_DATE_UNIT_WEEK,
         };
       });
+
+      // Now set the currently selected type's stored values
+      if (track.repeating_relative_type) {
+        repeatingRelativeDates[track.repeating_relative_type].count =
+          track.repeating_relative_count ||
+          repeatingRelativeDates[track.repeating_relative_type].count;
+        repeatingRelativeDates[track.repeating_relative_type].unit =
+          track.repeating_relative_unit ||
+          repeatingRelativeDates[track.repeating_relative_type].unit;
+      }
 
       return repeatingRelativeDates;
     },
