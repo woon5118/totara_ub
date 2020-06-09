@@ -151,6 +151,10 @@ class mod_perform_activity_clone_model_helper_testcase extends advanced_testcase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $task->expects($this->any())
+            ->method('get_setting_value')
+            ->willReturn(1);
+
         $step = new backup_step('test', 'filename.bck', $task);
 
         $reflection = new ReflectionClass($step);
