@@ -269,9 +269,6 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
         $section->add_child($section_elements);
         $section_elements->add_child($section_element);
 
-        $section_element->add_child($element_responses);
-        $element_responses->add_child($element_response);
-
         $section->add_child($section_relationships);
         $section_relationships->add_child($section_relationship);
 
@@ -279,16 +276,6 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
         $tracks->add_child($track);
         $track->add_child($track_assignments);
         $track_assignments->add_child($track_assignment);
-        $track->add_child($track_user_assignments);
-        $track_user_assignments->add_child($track_user_assignment);
-        $track_user_assignment->add_child($track_user_assignment_vias);
-        $track_user_assignment_vias->add_child($track_user_assignment_via);
-        $track_user_assignment->add_child($subject_instances);
-        $subject_instances->add_child($subject_instance);
-        $subject_instance->add_child($participant_instances);
-        $participant_instances->add_child($participant_instance);
-        $participant_instance->add_child($participant_sections);
-        $participant_sections->add_child($participant_section);
 
         // Define sources (in the same order as above).
         $perform->set_source_table('perform', ['id' => backup::VAR_ACTIVITYID]);
@@ -297,17 +284,11 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
 
         $track->set_source_table('perform_track', ['activity_id' => backup::VAR_PARENTID]);
         $track_assignment->set_source_table('perform_track_assignment', ['track_id' => backup::VAR_PARENTID]);
-        $track_user_assignment->set_source_table('perform_track_user_assignment', ['track_id' => backup::VAR_PARENTID]);
-        $track_user_assignment_via->set_source_table('perform_track_user_assignment_via', ['track_user_assignment_id' => backup::VAR_PARENTID]);
-        $subject_instance->set_source_table('perform_subject_instance', ['track_user_assignment_id' => backup::VAR_PARENTID]);
-        $participant_instance->set_source_table('perform_participant_instance', ['subject_instance_id' => backup::VAR_PARENTID]);
-        $participant_section->set_source_table('perform_participant_section', ['participant_instance_id' => backup::VAR_PARENTID]);
+
 
         $section->set_source_table('perform_section', ['activity_id' => backup::VAR_PARENTID]);
         $section_element->set_source_table('perform_section_element', ['section_id' => backup::VAR_PARENTID]);
         $section_relationship->set_source_table('perform_section_relationship', ['section_id' => backup::VAR_PARENTID]);
-
-        $element_response->set_source_table('perform_element_response', ['section_element_id' => backup::VAR_PARENTID]);
 
         $element->set_source_sql(
             "SELECT pe.*
@@ -320,19 +301,62 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
 
         $perform->annotate_ids('perform_type', 'type_id');
         $track_assignment->annotate_ids('user', 'created_by');
-        $track_user_assignment->annotate_ids('user', 'subject_user_id');
-        $track_user_assignment->annotate_ids('job_assignment', 'job_assignment_id');
-        $subject_instance->annotate_ids('user', 'subject_user_id');
-        $subject_instance->annotate_ids('job_assignment', 'job_assignment_id');
 
-        $participant_instance->annotate_ids('user', 'participant_id');
         $element->annotate_ids('context', 'context_id');
         $relationship->annotate_ids('totara_core_relationship', 'core_relationship_id');
 
-        $element_response->annotate_ids('perform_participant_instance', 'participant_instance_id');// ???
-        $track_user_assignment_via->annotate_ids('perform_track_assignment', 'track_assignment_id');// ???
-        $participant_instance->annotate_ids('perform_relationship', 'activity_relationship_id');// ???
+        $participant_instance->annotate_ids('perform_relationship', 'activity_relationship_id');
         $participant_section->annotate_ids('perform_section', 'section_id');
+
+        if ($userinfo) {
+            $section_element->add_child($element_responses);
+            $element_responses->add_child($element_response);
+            $track->add_child($track_user_assignments);
+            $track_user_assignments->add_child($track_user_assignment);
+            $track_user_assignment->add_child($track_user_assignment_vias);
+            $track_user_assignment_vias->add_child($track_user_assignment_via);
+            $track_user_assignment->add_child($subject_instances);
+            $subject_instances->add_child($subject_instance);
+            $subject_instance->add_child($participant_instances);
+            $participant_instances->add_child($participant_instance);
+            $participant_instance->add_child($participant_sections);
+            $participant_sections->add_child($participant_section);
+
+            $element_response->set_source_table(
+                'perform_element_response',
+                ['section_element_id' => backup::VAR_PARENTID]
+            );
+            $track_user_assignment->set_source_table(
+                'perform_track_user_assignment',
+                ['track_id' => backup::VAR_PARENTID]
+            );
+            $track_user_assignment_via->set_source_table(
+                'perform_track_user_assignment_via',
+                ['track_user_assignment_id' => backup::VAR_PARENTID]
+            );
+            $subject_instance->set_source_table(
+                'perform_subject_instance',
+                ['track_user_assignment_id' => backup::VAR_PARENTID]
+            );
+            $participant_instance->set_source_table(
+                'perform_participant_instance',
+                ['subject_instance_id' => backup::VAR_PARENTID]
+            );
+            $participant_section->set_source_table(
+                'perform_participant_section',
+                ['participant_instance_id' => backup::VAR_PARENTID]
+            );
+
+            $track_user_assignment->annotate_ids('user', 'subject_user_id');
+            $track_user_assignment->annotate_ids('job_assignment', 'job_assignment_id');
+            $subject_instance->annotate_ids('user', 'subject_user_id');
+            $subject_instance->annotate_ids('job_assignment', 'job_assignment_id');
+
+            $participant_instance->annotate_ids('user', 'participant_id');
+
+            $element_response->annotate_ids('perform_participant_instance', 'participant_instance_id');
+            $track_user_assignment_via->annotate_ids('perform_track_assignment', 'track_assignment_id');
+        }
 
         return $this->prepare_activity_structure($perform);
     }
