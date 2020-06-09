@@ -439,4 +439,115 @@ class totara_reportbuilder_rb_filter_multicheck_testcase extends advanced_testca
         $records = $DB->get_records_sql($sql, $params);
         $this->assertCount(7, $records);
     }
+
+    public function test_multicheck_for_filters_with_concat_false() {
+        global $DB;
+
+        /** @var \mod_facetoface_generator $f2fgenerator */
+        $f2fgenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
+
+        // Create a couple of courses
+        $course1 = $this->getDataGenerator()->create_course();
+        $course2 = $this->getDataGenerator()->create_course();
+
+        // Create sessions for the courses.
+        $session1 = $f2fgenerator->create_session_for_course($course1);
+        $session2 = $f2fgenerator->create_session_for_course($course2, 2);
+
+        // Create some users
+        $student1 = $this->getDataGenerator()->create_user();
+        $student2 = $this->getDataGenerator()->create_user();
+        $student3 = $this->getDataGenerator()->create_user();
+        $student4 = $this->getDataGenerator()->create_user();
+
+        // Enrol users
+        $this->getDataGenerator()->enrol_user($student1->id, $course1->id);
+        $this->getDataGenerator()->enrol_user($student2->id, $course1->id);
+        $this->getDataGenerator()->enrol_user($student3->id, $course1->id);
+        $this->getDataGenerator()->enrol_user($student2->id, $course2->id);
+        $this->getDataGenerator()->enrol_user($student4->id, $course2->id);
+
+        // Generate signups for the users.
+        $f2fgenerator->create_signup($student1, $session1);
+        $f2fgenerator->create_signup($student2, $session1);
+        $f2fgenerator->create_signup($student3, $session1);
+        $f2fgenerator->create_signup($student2, $session2);
+        $f2fgenerator->create_signup($student4, $session2);
+
+        // Create cancellation
+        $f2fgenerator->create_cancellation($student2, $session1);
+
+        // Create report.
+        $config = (new rb_config())->set_nocache(true);
+        $report = reportbuilder::create_embedded('facetoface_sessions', $config);
+
+        // Add status filter.
+        $filter = new \stdClass();
+        $filter->reportid = $report->_id;
+        $filter->advanced = 0;
+        $filter->region = rb_filter_type::RB_FILTER_REGION_STANDARD;
+        $filter->type = 'status';
+        $filter->value = 'statuscode';
+        $filter->filtername = 'statusCode';
+        $filter->customname = 1;
+        $filter->sortorder = 1;
+        $DB->insert_record('report_builder_filters', $filter);
+
+        // Check filter was added.
+        $filters = $report->get_filters();
+        $filter = $filters['status-statuscode'];
+        $this->assertInstanceOf('rb_filter_multicheck', $filter);
+
+        // Check the filter has concat option set to false.
+        $reflection = new \ReflectionClass($filter);
+        $property = $reflection->getProperty('options');
+        $property->setAccessible(true);
+        $this->assertFalse($property->getValue($filter)['concat']);
+
+        // Check records without filters.
+        list($sql, $params, $cache) = $report->build_query(false, true);
+        $records = $DB->get_records_sql($sql, $params);
+        $this->assertCount(5, $records);
+
+        // Defining some of the status options.
+        $booked = \mod_facetoface\signup\state\booked::get_code();
+        $waitlisted = \mod_facetoface\signup\state\waitlisted::get_code();
+        $usercancelled = \mod_facetoface\signup\state\user_cancelled::get_code();
+        $eventcancelled = \mod_facetoface\signup\state\event_cancelled::get_code();
+
+        // Set filter to 'Any of the selected'.
+        $filter->set_data(['operator' => rb_filter_multicheck::RB_MULTICHECK_ANY, 'value' => [$booked => 1, $waitlisted => 1, $usercancelled => 0, $eventcancelled => 0]]);
+        $report = reportbuilder::create($report->_id);
+        list($sql, $params, $cache) = $report->build_query(false, true);
+        $records = $DB->get_records_sql($sql, $params);
+        $this->assertCount(4, $records);
+
+        // Set filter to 'All of the selected'.
+        $filter->set_data(['operator' => rb_filter_multicheck::RB_MULTICHECK_ALL, 'value' => [$booked => 1, $waitlisted => 1, $usercancelled => 0, $eventcancelled => 0]]);
+        $report = reportbuilder::create($report->_id);
+        list($sql, $params, $cache) = $report->build_query(false, true);
+        $records = $DB->get_records_sql($sql, $params);
+        $this->assertCount(0, $records);
+
+        // Set filter to 'Not any of the selected'.
+        $filter->set_data(['operator' => rb_filter_multicheck::RB_MULTICHECK_NOTANY, 'value' => [$booked => 1, $waitlisted => 1, $usercancelled => 0, $eventcancelled => 0]]);
+        $report = reportbuilder::create($report->_id);
+        list($sql, $params, $cache) = $report->build_query(false, true);
+        $records = $DB->get_records_sql($sql, $params);
+        $this->assertCount(1, $records);
+
+        // Set filter to 'Not all of the selected'.
+        $filter->set_data(['operator' => rb_filter_multicheck::RB_MULTICHECK_NOTALL, 'value' => [$booked => 1, $waitlisted => 1, $usercancelled => 1, $eventcancelled => 0]]);
+        $report = reportbuilder::create($report->_id);
+        list($sql, $params, $cache) = $report->build_query(false, true);
+        $records = $DB->get_records_sql($sql, $params);
+        $this->assertCount(5, $records);
+
+        // Set filter to 'Not all of the selected'.
+        $filter->set_data(['operator' => rb_filter_multicheck::RB_MULTICHECK_NOTALL, 'value' => [$booked => 1, $waitlisted => 0, $usercancelled => 0, $eventcancelled => 0]]);
+        $report = reportbuilder::create($report->_id);
+        list($sql, $params, $cache) = $report->build_query(false, true);
+        $records = $DB->get_records_sql($sql, $params);
+        $this->assertCount(1, $records);
+    }
 }

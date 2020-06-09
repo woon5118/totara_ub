@@ -393,7 +393,8 @@ class rb_filter_multicheck extends rb_filter_type {
                         $params[$uniqueparam] = '%|' . $DB->sql_like_escape($id) . '|%';
                     } else {
                         $uniqueparam = rb_unique_param("fmcequal_{$count}_");
-                        $filter = "( {$query} = :{$uniqueparam} )\n";
+                        $op = $not ? '!=' : '=';
+                        $filter = "( {$query} {$op} :{$uniqueparam} )\n";
                         $params[$uniqueparam] = $id;
                     }
 
