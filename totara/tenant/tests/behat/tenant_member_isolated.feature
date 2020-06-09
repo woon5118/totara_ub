@@ -60,10 +60,8 @@ Feature: Tenant member access with full tenant isolation
 
     When I click on "Find Learning" in the totara menu
     And I click on "Course 1A" "text"
-    And I click on "Go to course" "link"
     Then I should see "Topic 1"
 
     When I click on "Find Learning" in the totara menu
     And I click on "Course 1B" "text"
-    And I click on "Go to course" "link"
     Then I should see "You can not enrol yourself in this course."

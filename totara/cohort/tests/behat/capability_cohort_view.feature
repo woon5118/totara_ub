@@ -87,7 +87,6 @@ Feature: User with moodle/cohort:view can view but not manage audience details
     When I click on "Find Learning" in the totara menu
     And I should not see "Audiences"
     And I click on "CourseThree" "text"
-    And I click on "Go to course" "link"
     And I follow "CategoryTwo"
     And I should not see "Audiences"
     And I am on "CourseOne" course homepage

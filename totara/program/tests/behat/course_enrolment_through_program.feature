@@ -50,8 +50,15 @@ Feature: Course enrolment through programs
       | Learner must complete | All courses |
       | Minimum time required | 1           |
 
-    # Assign the position Learner program1
     And I log in as "admin"
+    And I click on "Find Learning" in the totara menu
+    And I follow "Configure catalogue"
+    And I follow "General"
+    And I set the following Totara form fields to these values:
+      | Details content | 1 |
+    And I click on "Save" "button"
+
+    # Assign the position Learner program1
     And I am on "Test Program 1" program homepage
     And I press "Edit program details"
     And I switch to "Assignments" tab

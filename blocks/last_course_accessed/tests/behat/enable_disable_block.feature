@@ -28,6 +28,5 @@ Feature: Site Administrator can enable and disable the LCA block.
     And I click on "[title='Show']" "css_element" in the "Last Course Accessed" "table_row"
     And I follow "Find Learning"
     And I click on "Course 1" "text"
-    And I follow "Go to course"
     Then I should see "Last Course Accessed"
     And I log out

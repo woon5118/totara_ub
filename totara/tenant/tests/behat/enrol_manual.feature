@@ -41,7 +41,6 @@ Feature: Tenant manual enrolment
     Given I log in as "teacher0"
     And I click on "Find Learning" in the totara menu
     And I click on "Course 0" "text"
-    And I click on "Go to course" "link"
 
     When I navigate to "Enrolled users" node in "Course administration > Users"
     And I press "Enrol users"
@@ -74,7 +73,6 @@ Feature: Tenant manual enrolment
     And I log in as "teacher0"
     And I click on "Find Learning" in the totara menu
     And I click on "Course 0" "text"
-    And I click on "Go to course" "link"
 
     When I navigate to "Enrolled users" node in "Course administration > Users"
     And I press "Enrol users"
@@ -106,7 +104,6 @@ Feature: Tenant manual enrolment
     Given I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
     And I click on "Course 1" "text"
-    And I click on "Go to course" "link"
 
     When I navigate to "Enrolled users" node in "Course administration > Users"
     And I press "Enrol users"
@@ -139,7 +136,6 @@ Feature: Tenant manual enrolment
     And I log in as "teacher1"
     And I click on "Find Learning" in the totara menu
     And I click on "Course 1" "text"
-    And I click on "Go to course" "link"
 
     When I navigate to "Enrolled users" node in "Course administration > Users"
     And I press "Enrol users"
@@ -171,7 +167,6 @@ Feature: Tenant manual enrolment
     Given I log in as "manager1"
     And I click on "Find Learning" in the totara menu
     And I click on "Course 1" "text"
-    And I click on "Go to course" "link"
 
     When I navigate to "Enrolled users" node in "Course administration > Users"
     And I press "Enrol users"
@@ -202,7 +197,6 @@ Feature: Tenant manual enrolment
     And I log in as "manager1"
     And I click on "Find Learning" in the totara menu
     And I click on "Course 1" "text"
-    And I click on "Go to course" "link"
 
     When I navigate to "Enrolled users" node in "Course administration > Users"
     And I press "Enrol users"

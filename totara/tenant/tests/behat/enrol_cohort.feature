@@ -39,7 +39,6 @@ Feature: Tenant cohort enrolment
     Given I log in as "manager1"
     And I click on "Find Learning" in the totara menu
     And I click on "Course 1" "text"
-    And I click on "Go to course" "link"
 
     When I navigate to "Enrolment methods" node in "Course administration > Users"
     And I set the field "Add method" to "Audience sync"
@@ -62,7 +61,6 @@ Feature: Tenant cohort enrolment
     And I log in as "manager1"
     And I click on "Find Learning" in the totara menu
     And I click on "Course 1" "text"
-    And I click on "Go to course" "link"
 
     When I navigate to "Enrolment methods" node in "Course administration > Users"
     And I set the field "Add method" to "Audience sync"

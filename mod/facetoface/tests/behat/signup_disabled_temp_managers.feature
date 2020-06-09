@@ -30,7 +30,6 @@ Feature: Test suitable job assignment for session sign-up
     And I press "Save changes"
     And I click on "Find Learning" in the totara menu
     And I click on "Course 1" "text"
-    And I follow "Go to course"
     And I follow "Test seminar name"
     And I follow "Add event"
     And I set the following fields to these values:
@@ -44,7 +43,6 @@ Feature: Test suitable job assignment for session sign-up
     When I log in as "student1"
     And I click on "Find Learning" in the totara menu
     And I click on "Course 1" "text"
-    And I follow "Go to course"
     And I follow "Test seminar name"
     And I click on the link "Go to event" in row 1
     Then I should see "You must have a suitable job assignment to sign up for this seminar activity."
