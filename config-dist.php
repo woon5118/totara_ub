@@ -359,6 +359,24 @@ $CFG->directorypermissions = 02777;
 //      $CFG->session_memcached_lock_expire = 7200;
 //      $CFG->session_memcached_lock_retry_sleep = 150;   // Spin-lock retry sleeptime (msec).
 //
+//   Native Redis session handler:
+//      $CFG->session_handler_class = '\core\session\redis5';
+//      $CFG->session_redis5_host = '127.0.0.1';              // Optional.
+//      $CFG->session_redis5_port = 6379;                     // Optional.
+//      $CFG->session_redis5_timeout = 5;                     // Optional (seconds).
+//      $CFG->session_redis5_database = 0;                    // Optional, database number.
+//      $CFG->session_redis5_auth = '';                       // Optional, password.
+//      $CFG->session_redis5_prefix = 'PHPREDIS_SESSION';     // Optional.
+//      $CFG->session_redis5_lock_expire = 7200;              // Optional, default is $CFG->sessiontimeout (seconds).
+//      $CFG->session_redis5_lock_wait_time = 200000;         // Optional, default is 0.2s (microseconds).
+//      $CFG->session_redis5_lock_retries = 100;              // Optional, default is 100 times.
+//      $CFG->session_redis5_serializer_use_igbinary = false; // Optional, default is PHP built-in serializer.
+//
+//      Notes: Single master setup is required; RedisArray and RedisCluster environments are not supported.
+//             Redis server must support EX and NX options of SET command.
+//             Minimum required version of PHP redis extension is 5.0.0.
+//             See https://github.com/phpredis/phpredis#php-session-handler for more information.
+//
 //   Redis session handler (requires redis server and redis extension):
 //      $CFG->session_handler_class = '\core\session\redis';
 //      $CFG->session_redis_host = '127.0.0.1';
