@@ -27,7 +27,6 @@ use coding_exception;
 use core\orm\entity\repository;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
-use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 
 class participant_section_repository extends repository {
 

@@ -100,9 +100,9 @@ class mod_perform_webapi_resolver_query_activity_testcase extends mod_perform_re
      */
     public function test_ajax_query_successful() {
         $data = $this->create_test_data();
-        $appraiser_id = $this->perform_generator()->get_relationship(appraiser::class);
-        $manager_id = $this->perform_generator()->get_relationship(manager::class);
-        $subject_id = $this->perform_generator()->get_relationship(subject::class);
+        $appraiser_id = $this->perform_generator()->get_core_relationship(appraiser::class);
+        $manager_id = $this->perform_generator()->get_core_relationship(manager::class);
+        $subject_id = $this->perform_generator()->get_core_relationship(subject::class);
 
         $id = $data->activity1->id;
         $args = ['activity_id' => $id];
@@ -145,7 +145,7 @@ class mod_perform_webapi_resolver_query_activity_testcase extends mod_perform_re
                 'id' => $data->activity1_section1_relationship1->id,
                 'can_view' => true,
                 'can_answer' => true,
-                'relationship' => [
+                'core_relationship' => [
                     'id' => $appraiser_id->get_id(),
                     'name' => $appraiser_id->get_name(),
                 ],
@@ -154,7 +154,7 @@ class mod_perform_webapi_resolver_query_activity_testcase extends mod_perform_re
                 'id' => $data->activity1_section1_relationship2->id,
                 'can_view' => true,
                 'can_answer' => true,
-                'relationship' => [
+                'core_relationship' => [
                     'id' => $manager_id->get_id(),
                     'name' => $manager_id->get_name(),
                 ],
@@ -175,7 +175,7 @@ class mod_perform_webapi_resolver_query_activity_testcase extends mod_perform_re
             'id' => $data->activity1_section2_relationship1->id,
             'can_view' => true,
             'can_answer' => true,
-            'relationship' => [
+            'core_relationship' => [
                 'id' => $subject_id->get_id(),
                 'name' => $subject_id->get_name(),
             ],

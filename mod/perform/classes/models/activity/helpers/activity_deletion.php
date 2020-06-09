@@ -25,7 +25,6 @@ namespace mod_perform\models\activity\helpers;
 
 use core\orm\query\builder;
 use mod_perform\entities\activity\activity as activity_entity;
-use mod_perform\entities\activity\activity_relationship;
 use mod_perform\entities\activity\element as element_entity;
 use mod_perform\entities\activity\element_response as element_response_entity;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
@@ -83,7 +82,6 @@ class activity_deletion {
             $this->delete_participant_sections($participant_section_ids);
             $this->delete_responses($response_ids); // Not linked so must be manually deleted.
             $this->delete_user_assignments($track_ids); // Must be deleted first due to foreign key constraints.
-            $this->delete_activity_relationships(); // Must be deleted first due to foreign key constraints.
 
             // Delete any elements that are directly owned by this activity (through shared context).
             $this->delete_own_elements();
@@ -210,17 +208,6 @@ class activity_deletion {
         builder::create()
             ->from(track_user_assignment_via::TABLE)
             ->where('track_user_assignment_id', $track_user_assignment_ids)
-            ->delete();
-    }
-
-    /**
-     * Delete all relationships linked to this activity.
-     * Perform relationships not core.
-     */
-    protected function delete_activity_relationships(): void {
-        builder::create()
-            ->from(activity_relationship::TABLE, 'activity_relationship')
-            ->where('activity_id', $this->activity->id)
             ->delete();
     }
 

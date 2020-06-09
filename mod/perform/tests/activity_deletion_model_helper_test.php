@@ -23,7 +23,6 @@
 
 use core\orm\entity\entity;
 use core\orm\query\builder;
-use mod_perform\entities\activity\activity_relationship;
 use mod_perform\entities\activity\participant_instance;
 use mod_perform\entities\activity\subject_instance;
 use mod_perform\entities\activity\track_assignment;
@@ -101,7 +100,6 @@ class mod_perform_activity_deletion_model_helper_testcase extends advanced_testc
             section_entity::class => self::greaterThan(0),
             section_element_entity::class => self::greaterThan(0),
             section_relationship_entity::class => self::greaterThan(0),
-            activity_relationship::class => self::greaterThan(0),
 
             track_user_assignment_via::class => self::equalTo(0),
             track_user_assignment::class => self::equalTo(0),
@@ -145,7 +143,6 @@ class mod_perform_activity_deletion_model_helper_testcase extends advanced_testc
             section_entity::class => self::equalTo(0),
             section_element_entity::class => self::equalTo(0),
             section_relationship_entity::class => self::equalTo(0),
-            activity_relationship::class => self::equalTo(0),
 
             track_user_assignment_via::class => self::equalTo(0),
             track_user_assignment::class => self::equalTo(0),
@@ -214,7 +211,9 @@ class mod_perform_activity_deletion_model_helper_testcase extends advanced_testc
      * @throws coding_exception
      */
     private function perform_generator(): mod_perform_generator {
-        return self::getDataGenerator()->get_plugin_generator('mod_perform');
+        /** @var mod_perform_generator $generator */
+        $generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
+        return $generator;
     }
 
 }

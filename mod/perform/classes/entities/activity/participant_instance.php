@@ -28,11 +28,12 @@ use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\entity\relations\belongs_to;
 use core\orm\entity\relations\has_many;
+use totara_core\entities\relationship;
 
 /**
  * Participant instance entity
  *
- * @property int $activity_relationship_id ID of activity relationship
+ * @property int $core_relationship_id ID of core relationship
  * @property int $participant_source
  * @property int $participant_id
  * @property int $subject_instance_id
@@ -41,7 +42,7 @@ use core\orm\entity\relations\has_many;
  * @property int $created_at
  * @property int $updated_at
  *
- * @property-read activity_relationship $activity_relationship
+ * @property-read relationship $core_relationship
  * @property-read subject_instance $subject_instance
  * @property-read collection|participant_section[] $participant_sections
  * @property-read user $participant_user
@@ -57,12 +58,12 @@ class participant_instance extends entity {
     public const UPDATED_TIMESTAMP = 'updated_at';
 
     /**
-     * Relationship with activity_relationship entities.
+     * Relationship with core_relationship entities.
      *
      * @return belongs_to
      */
-    public function activity_relationship(): belongs_to {
-        return $this->belongs_to(activity_relationship::class, 'activity_relationship_id');
+    public function core_relationship(): belongs_to {
+        return $this->belongs_to(relationship::class, 'core_relationship_id');
     }
 
     /**

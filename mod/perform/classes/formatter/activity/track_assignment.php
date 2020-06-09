@@ -53,6 +53,8 @@ class track_assignment extends formatter {
             case 'type':
                 return $this->object->$field;
         }
+
+        return parent::get_field($field);
     }
 
     /**
@@ -65,6 +67,10 @@ class track_assignment extends formatter {
             'group'
         ];
 
-        return in_array($field, $recognized);
+        if (in_array($field, $recognized)) {
+            return true;
+        }
+
+        return parent::has_field($field);
     }
 }

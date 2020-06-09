@@ -33,7 +33,7 @@ use mod_perform\models\activity\element;
 use mod_perform\models\activity\element_plugin;
 use mod_perform\models\activity\participant_instance;
 use mod_perform\models\activity\section_element;
-use totara_core\relationship\relationship;
+use totara_core\relationship\relationship as core_relationship_model;
 
 /**
  * Class element
@@ -218,8 +218,8 @@ class section_element_response extends model {
      * @return string
      */
     public function get_relationship_name(): string {
-        $relationship_entity = $this->participant_instance_entity->activity_relationship->relationship;
-        return (new relationship($relationship_entity))->get_name();
+        $core_relationship_entity = $this->participant_instance_entity->core_relationship;
+        return (new core_relationship_model($core_relationship_entity))->get_name();
     }
 
     public function get_element(): ?element {

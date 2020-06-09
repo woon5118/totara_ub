@@ -26,6 +26,7 @@ namespace totara_core\relationship;
 use coding_exception;
 use core\collection;
 use totara_core\entities\relationship as relationship_entity;
+use totara_core\entities\relationship_resolver as relationship_resolver_entity;
 
 /**
  * Data provider for relationships.
@@ -64,6 +65,16 @@ class relationship_provider {
             ->filter(static function (relationship $relationship) use ($compatible_fields) {
                 return $relationship->is_acceptable_input($compatible_fields);
             });
+    }
+
+    public static function get_by_class(string $class_name): relationship {
+        return relationship_entity::repository()
+            ->with('resolvers')
+            ->join([relationship_resolver_entity::TABLE, 'resolvers'], 'id', 'relationship_id')
+            ->where('resolvers.class_name', $class_name)
+            ->get()
+            ->transform_to(relationship::class)
+            ->first();
     }
 
 }

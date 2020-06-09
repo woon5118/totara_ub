@@ -21,9 +21,7 @@
  * @package mod_perform
  */
 
-use core\format;
 use mod_perform\entities\activity\section as section_entity;
-use mod_perform\formatter\activity\section as section_formatter;
 use mod_perform\models\activity\section;
 use mod_perform\webapi\resolver\mutation\update_section_settings;
 use totara_core\advanced_feature;
@@ -108,7 +106,7 @@ class mod_perform_webapi_resolver_mutation_update_section_settings_testcase exte
 
     public function test_update_invalid_section_id() {
         $this->setAdminUser();
-        $relationship_id = $this->perform_generator()->get_relationship(subject::class)->id;
+        $relationship_id = $this->perform_generator()->get_core_relationship(subject::class)->id;
         $non_existent_section_id = 1234;
         while (section_entity::repository()->where('id', $non_existent_section_id)->exists()) {
             $non_existent_section_id ++;
@@ -131,7 +129,7 @@ class mod_perform_webapi_resolver_mutation_update_section_settings_testcase exte
     public function test_update_missing_capability() {
         $this->setAdminUser();
         $perform_generator = $this->perform_generator();
-        $relationship_id = $this->perform_generator()->get_relationship(subject::class)->id;
+        $relationship_id = $this->perform_generator()->get_core_relationship(subject::class)->id;
         $activity1 = $perform_generator->create_activity_in_container();
         /** @var section $section1 */
         $section1 = $perform_generator->create_section($activity1);
@@ -157,11 +155,12 @@ class mod_perform_webapi_resolver_mutation_update_section_settings_testcase exte
     public function test_update_successful() {
         self::setAdminUser();
         $perform_generator = $this->perform_generator();
-        $subject_id = $perform_generator->get_relationship(subject::class)->id;
-        $manager_id = $perform_generator->get_relationship(manager::class)->id;
-        $appraiser_id = $perform_generator->get_relationship(appraiser::class)->id;
         $activity1 = $perform_generator->create_activity_in_container(['activity_name' => 'Activity 1']);
         $activity2 = $perform_generator->create_activity_in_container(['activity_name' => 'Activity 2']);
+
+        $appraiser_relationship = $perform_generator->get_core_relationship(appraiser::class);
+        $manager_relationship = $perform_generator->get_core_relationship(manager::class);
+        $subject_relationship = $perform_generator->get_core_relationship(subject::class);
 
         /** @var section $section1 */
         $section1 = $perform_generator->create_section($activity1);
@@ -174,15 +173,15 @@ class mod_perform_webapi_resolver_mutation_update_section_settings_testcase exte
             $section1->id,
             [
                 [
-                    'id' => $subject_id,
+                    'core_relationship_id' => $subject_relationship->id,
                     'can_view' => false,
                 ],
                 [
-                    'id' => $manager_id,
+                    'core_relationship_id' => $manager_relationship->id,
                     'can_view' => true,
                 ],
                 [
-                    'id' => $appraiser_id,
+                    'core_relationship_id' => $appraiser_relationship->id,
                     'can_view' => false,
                 ],
             ]
@@ -195,16 +194,12 @@ class mod_perform_webapi_resolver_mutation_update_section_settings_testcase exte
         $this->assert_section_relationships($section1, [subject::class, manager::class, appraiser::class]);
         $this->assert_can_view_status($section1, $args['input']['relationships']);
         $this->assert_section_relationships($section2, []);
-        $this->assert_activity_relationships($activity1, [subject::class, manager::class, appraiser::class]);
-        $this->assert_activity_relationships($activity2, []);
 
         // Remove all relationships.
         [$args, $context] = $this->create_args($section1->id, []);
         update_section_settings::resolve($args, $context);
         $this->assert_section_relationships($section1, []);
         $this->assert_section_relationships($section2, []);
-        $this->assert_activity_relationships($activity1, []);
-        $this->assert_activity_relationships($activity2, []);
     }
 
     /**
@@ -214,17 +209,18 @@ class mod_perform_webapi_resolver_mutation_update_section_settings_testcase exte
         $data = $this->create_test_data();
         // Section without relationships.
         $section_id = $data->activity2_section2->id;
-        $appraiser_id = $this->perform_generator()->get_relationship(appraiser::class)->id;
+        $appraiser_relationship = $this->perform_generator()->get_core_relationship(appraiser::class);
 
         [$args, ] = $this->create_args(
             $section_id,
             [
                 [
-                    'id' => $appraiser_id,
+                    'core_relationship_id' => $appraiser_relationship->id,
                     'can_view' => false,
                 ],
             ]
         );
+
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
         $this->assert_webapi_operation_successful($result);
 
@@ -236,12 +232,13 @@ class mod_perform_webapi_resolver_mutation_update_section_settings_testcase exte
     public function test_failed_ajax_query(): void {
         $data = $this->create_test_data();
         $section_id = $data->activity2_section2->id;
-        $appraiser_id = $this->perform_generator()->get_relationship(appraiser::class)->id;
+        $appraiser_relationship = $this->perform_generator()->get_core_relationship(appraiser::class);
+
         [$args, ] = $this->create_args(
             $section_id,
             [
                 [
-                    'id' => $appraiser_id,
+                    'core_relationship_id' => $appraiser_relationship->id,
                     'can_view' => true,
                 ]
             ]

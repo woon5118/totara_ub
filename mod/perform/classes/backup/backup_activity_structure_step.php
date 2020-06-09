@@ -66,17 +66,6 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
             ]
         );
 
-        $relationships = new backup_nested_element('relationships');
-        $relationship = new backup_nested_element(
-            'relationship',
-            ['id'],
-            [
-                'activity_id',
-                'core_relationship_id',
-                'created_at',
-            ]
-        );
-
         $sections = new backup_nested_element('sections');
         $section = new backup_nested_element(
             'section',
@@ -121,7 +110,7 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
             ['id'],
             [
                 'section_id',
-                'activity_relationship_id',
+                'core_relationship_id',
                 'can_view',
                 'can_answer',
                 'created_at',
@@ -238,7 +227,7 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
             'participant_instance',
             ['id'],
             [
-                'activity_relationship_id',
+                'core_relationship_id',
                 'participant_id',
                 'subject_instance_id',
                 'progress',
@@ -265,9 +254,6 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
         $perform->add_child($settings);
         $settings->add_child($setting);
 
-        $perform->add_child($relationships);
-        $relationships->add_child($relationship);
-
         $perform->add_child($elements);
         $elements->add_child($element);
 
@@ -287,11 +273,9 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
         // Define sources (in the same order as above).
         $perform->set_source_table('perform', ['id' => backup::VAR_ACTIVITYID]);
         $setting->set_source_table('perform_setting', ['activity_id' => backup::VAR_PARENTID]);
-        $relationship->set_source_table('perform_relationship', ['activity_id' => backup::VAR_PARENTID]);
 
         $track->set_source_table('perform_track', ['activity_id' => backup::VAR_PARENTID]);
         $track_assignment->set_source_table('perform_track_assignment', ['track_id' => backup::VAR_PARENTID]);
-
 
         $section->set_source_table('perform_section', ['activity_id' => backup::VAR_PARENTID]);
         $section_element->set_source_table('perform_section_element', ['section_id' => backup::VAR_PARENTID]);
@@ -310,9 +294,8 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
         $track_assignment->annotate_ids('user', 'created_by');
 
         $element->annotate_ids('context', 'context_id');
-        $relationship->annotate_ids('totara_core_relationship', 'core_relationship_id');
 
-        $participant_instance->annotate_ids('perform_relationship', 'activity_relationship_id');
+        $participant_instance->annotate_ids('totara_core_relationship', 'core_relationship_id');
         $participant_section->annotate_ids('perform_section', 'section_id');
 
         if ($userinfo) {

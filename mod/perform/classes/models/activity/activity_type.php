@@ -25,7 +25,6 @@ namespace mod_perform\models\activity;
 
 use core\collection;
 use core\orm\entity\model;
-
 use mod_perform\entities\activity\activity_type as activity_type_entity;
 
 /**
@@ -40,6 +39,11 @@ use mod_perform\entities\activity\activity_type as activity_type_entity;
  * @package mod_perform\models\activity
  */
 class activity_type extends model {
+    /**
+     * @var activity_type_entity
+     */
+    protected $entity;
+
     /**
      * {@inheritdoc}
      */

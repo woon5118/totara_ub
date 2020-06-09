@@ -68,27 +68,11 @@
         <INDEX NAME="sort_order" UNIQUE="false" FIELDS="sort_order"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="perform_relationship" COMMENT="Identifies the type of relationships between users used by each performance activity">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="activity_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Each row represents the use of a relationship within a single activity"/>
-        <FIELD NAME="core_relationship_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Each row represents the use of a relationship within a single activity"/>
-        <FIELD NAME="created_at" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="activity_id" TYPE="foreign" FIELDS="activity_id" REFTABLE="perform" REFFIELDS="id" ONDELETE="cascade"/>
-        <KEY NAME="core_relationship_id" TYPE="foreign" FIELDS="core_relationship_id" REFTABLE="totara_core_relationship" REFFIELDS="id" ONDELETE="restrict"/>
-      </KEYS>
-      <INDEXES>
-        <INDEX NAME="activity_id_core_relationship_id" UNIQUE="true" FIELDS="activity_id, core_relationship_id" COMMENT="Each relationship is only declared as used by a performance activity once"/>
-      </INDEXES>
-    </TABLE>
     <TABLE NAME="perform_section_relationship" COMMENT="Defines a relationship used in a specific section">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="section_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="activity_relationship_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="core_relationship_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="can_view" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="can_answer" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="created_at" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -96,12 +80,12 @@
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="section_id" TYPE="foreign" FIELDS="section_id" REFTABLE="perform_section" REFFIELDS="id" ONDELETE="restrict"/>
-        <KEY NAME="activity_relationship_id" TYPE="foreign" FIELDS="activity_relationship_id" REFTABLE="perform_relationship" REFFIELDS="id" ONDELETE="cascade"/>
+        <KEY NAME="core_relationship_id" TYPE="foreign" FIELDS="core_relationship_id" REFTABLE="totara_core_relationship" REFFIELDS="id" ONDELETE="cascade"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="can_view" UNIQUE="false" FIELDS="can_view"/>
         <INDEX NAME="can_answer" UNIQUE="false" FIELDS="can_answer"/>
-        <INDEX NAME="section_activity_relationship" UNIQUE="true" FIELDS="section_id, activity_relationship_id" COMMENT="Each available relationship can only be used once per section"/>
+        <INDEX NAME="section_core_relationship" UNIQUE="true" FIELDS="section_id, core_relationship_id" COMMENT="Each available relationship can only be used once per section"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="perform_element" COMMENT="An element used within a section of a performance activity">
@@ -273,7 +257,7 @@
     <TABLE NAME="perform_participant_instance" COMMENT="Each participant instance represents a form to be completed by a a single participant">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="activity_relationship_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="core_relationship_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="participant_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Identifies the actual user who is participating in this case"/>
         <FIELD NAME="subject_instance_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="progress" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Status of the participant instance. 0 - not_started, 10 - in_progress, 20 - complete"/>
@@ -283,7 +267,7 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="activity_relationship_id" TYPE="foreign" FIELDS="activity_relationship_id" REFTABLE="perform_relationship" REFFIELDS="id"/>
+        <KEY NAME="core_relationship_id" TYPE="foreign" FIELDS="core_relationship_id" REFTABLE="totara_core_relationship" REFFIELDS="id"/>
         <KEY NAME="subject_instance_id" TYPE="foreign" FIELDS="subject_instance_id" REFTABLE="perform_subject_instance" REFFIELDS="id" ONDELETE="cascade"/>
       </KEYS>
       <INDEXES>

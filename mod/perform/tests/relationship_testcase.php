@@ -21,7 +21,6 @@
  * @package mod_perform
  */
 
-use mod_perform\entities\activity\activity_relationship;
 use mod_perform\entities\activity\section_relationship;
 use mod_perform\models\activity\section_relationship as section_relationship_model;
 use mod_perform\models\activity\activity;
@@ -48,6 +47,7 @@ abstract class mod_perform_relationship_testcase extends advanced_testcase {
     }
 
     /**
+     * @param stdClass|null $as_user
      * @return object
      */
     protected function create_test_data(?stdClass $as_user = null) {
@@ -121,30 +121,13 @@ abstract class mod_perform_relationship_testcase extends advanced_testcase {
     protected function assert_section_relationships(section $section, array $expected_class_names): void {
         $actual_class_names = relationship_resolver::repository()
             ->select_raw('DISTINCT class_name')
-            ->join([activity_relationship::TABLE, 'activity_relationship'], 'relationship_id', 'core_relationship_id')
-            ->join([section_relationship::TABLE, 'section_relationships'], 'activity_relationship.id', 'activity_relationship_id')
+            ->join([section_relationship::TABLE, 'section_relationships'], 'relationship_id', 'core_relationship_id')
             ->where('section_relationships.section_id', $section->id)
             ->get()
             ->pluck('class_name');
 
         $this->assertEqualsCanonicalizing($expected_class_names, $actual_class_names);
     }
-
-    /**
-     * @param activity $activity
-     * @param array $expected_class_names
-     */
-    protected function assert_activity_relationships(activity $activity, array $expected_class_names): void {
-        $actual_class_names = relationship_resolver::repository()
-            ->select_raw('DISTINCT class_name')
-            ->join([activity_relationship::TABLE, 'activity_relationship'], 'relationship_id', 'core_relationship_id')
-            ->where('activity_relationship.activity_id', $activity->id)
-            ->get()
-            ->pluck('class_name');
-
-        $this->assertEqualsCanonicalizing($expected_class_names, $actual_class_names);
-    }
-
 
     /**
      * Asserts the right can_view status is saved for each relationship in a section.
@@ -158,8 +141,8 @@ abstract class mod_perform_relationship_testcase extends advanced_testcase {
 
         foreach ($relationships as $relationship) {
             $created_relationship = $section1_relationships->find(
-                function($section_relationship) use ($relationship) {
-                    return $relationship['id'] === $section_relationship->relationship->id;
+                function ($section_relationship) use ($relationship) {
+                    return $relationship['core_relationship_id'] == $section_relationship->core_relationship_id;
                 }
             );
             $this->assertInstanceOf(section_relationship_model::class, $created_relationship);

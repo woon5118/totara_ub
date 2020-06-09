@@ -33,6 +33,7 @@ use coding_exception;
  *
  * @property-read int $id
  * @property-read int $activity_id
+ * @property-read int $core_relationship_id
  */
 class participant_instance_dto {
 
@@ -43,21 +44,32 @@ class participant_instance_dto {
     protected $activity_id;
 
     /** @var int */
-    protected $activity_relationship_id;
+    protected $core_relationship_id;
 
     /**
      * Create a new dto from a given entity.
      *
-     * @param array $subject_instance
+     * @param array $data
      * @return self
      */
     public static function create_from_data(array $data): self {
-        $instance = new self();
-        $instance->id = $data['id'];
-        $instance->activity_id = $data['activity_id'];
-        $instance->activity_relationship_id = $data['activity_relationship_id'];
+        $instance = new self(
+            $data['id'],
+            $data['activity_id'],
+            $data['core_relationship_id']
+        );
 
         return $instance;
+    }
+
+    private function __construct(
+        int $id,
+        int $activity_id,
+        int $core_relationship_id
+    ) {
+        $this->id = $id;
+        $this->activity_id = $activity_id;
+        $this->core_relationship_id = $core_relationship_id;
     }
 
     /**
@@ -79,12 +91,12 @@ class participant_instance_dto {
     }
 
     /**
-     * Get activity relationship id.
+     * Get core relationship id.
      *
      * @return int
      */
-    public function get_activity_relationship_id(): int {
-        return $this->activity_relationship_id;
+    public function get_core_relationship_id(): int {
+        return $this->core_relationship_id;
     }
 
     final public function __get($name) {

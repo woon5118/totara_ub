@@ -24,13 +24,13 @@
   <div class="tui-performActivitySectionRelationship">
     <div v-if="editable" class="tui-performActivitySectionRelationship__item">
       <div class="tui-performActivitySectionRelationship__item-name">
-        {{ participant.relationship.name }}
+        {{ participant.core_relationship.name }}
         <DeleteIcon
           :aria-label="
             $str(
               'delete_relationship',
               'mod_perform',
-              participant.relationship.name
+              participant.core_relationship.name
             )
           "
           @click="removeDisplayedParticipant(participant)"
@@ -47,7 +47,8 @@
     </div>
     <div v-else class="tui-performActivitySectionRelationship__item">
       <p>
-        {{ participant.relationship.name }}{{ participant.can_view ? '*' : '' }}
+        {{ participant.core_relationship.name
+        }}{{ participant.can_view ? '*' : '' }}
       </p>
     </div>
   </div>

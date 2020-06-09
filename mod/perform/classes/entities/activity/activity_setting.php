@@ -36,7 +36,7 @@ use core\orm\entity\relations\belongs_to;
  * @property int $created_at record creation time
  * @property int $updated_at record modification time
  * @property-read activity $activity
- * @method static activity_settings_repository repository()
+ * @method static activity_setting_repository repository()
  */
 class activity_setting extends entity {
     public const TABLE = 'perform_setting';

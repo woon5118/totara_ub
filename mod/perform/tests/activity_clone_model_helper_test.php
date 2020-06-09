@@ -117,10 +117,6 @@ class mod_perform_activity_clone_model_helper_testcase extends advanced_testcase
         }
         $this->assertEmpty($old_sections);
 
-        $old_relationships = $activity->get_relationships();
-        $new_relationships = $new_activity->get_relationships();
-        $this->assertSameSize($old_relationships, $new_relationships);
-
         $old_tracks = $activity->get_tracks();
         $new_tracks = $new_activity->get_tracks();
         $this->assertSameSize($old_tracks, $new_tracks);

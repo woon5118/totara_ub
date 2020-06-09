@@ -126,7 +126,7 @@ export default {
      */
     isActiveParticipant(participant) {
       return this.activeParticipants
-        .map(participant => participant.relationship.id)
+        .map(participant => participant.core_relationship.id)
         .includes(participant.id);
     },
 

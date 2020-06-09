@@ -24,9 +24,7 @@
 namespace mod_perform\models\activity;
 
 use moodle_exception;
-
 use core\orm\entity\model;
-
 use mod_perform\entities\activity\activity_setting as activity_setting_entity;
 
 /**
@@ -38,6 +36,11 @@ use mod_perform\entities\activity\activity_setting as activity_setting_entity;
  * @property-read activity $activity
  */
 class activity_setting extends model {
+    /**
+     * @var activity_setting_entity
+     */
+    protected $entity;
+
     // List of known "out of the box" setting names.
     public const CLOSE_ON_COMPLETION = 'close_on_completion';
     public const MULTISECTION = 'multisection';

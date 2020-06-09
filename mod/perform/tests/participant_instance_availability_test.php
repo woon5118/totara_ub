@@ -23,13 +23,11 @@
  */
 
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
-use mod_perform\entities\activity\section_relationship;
 use mod_perform\event\participant_instance_availability_closed;
 use mod_perform\event\participant_instance_progress_updated;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\activity_setting;
 use mod_perform\models\activity\participant_instance;
-use mod_perform\models\activity\section;
 use mod_perform\observers\participant_instance_availability;
 use mod_perform\state\participant_instance\closed;
 use mod_perform\state\participant_instance\complete;
@@ -39,6 +37,7 @@ use mod_perform\state\participant_instance\open;
 use mod_perform\state\participant_instance\participant_instance_availability as participant_instance_availability_state;
 use mod_perform\state\state;
 use totara_core\relationship\resolvers\subject;
+use totara_core\relationship\relationship_provider;
 use totara_job\relationship\resolvers\manager;
 
 require_once(__DIR__ . '/state_testcase.php');
@@ -182,10 +181,10 @@ class mod_perform_participant_instance_availability_testcase extends state_testc
             'subject_user_id' => $user1->id,
         ]);
 
-        $section1 = $generator->create_section($activity);
+        //$section1 = $generator->create_section($activity);
 
-        $subject_relationship_id = $this->create_activity_relationship($section1, manager::class);
-        $manager_relationship_id = $this->create_activity_relationship($section1, subject::class);
+        $subject_relationship_id = relationship_provider::get_by_class(manager::class)->id;
+        $manager_relationship_id = relationship_provider::get_by_class(subject::class)->id;
 
         $participant1_entity = $generator->create_participant_instance($user1, $subject_instance->id, $subject_relationship_id);
         $participant2_entity = $generator->create_participant_instance($user2, $subject_instance->id, $manager_relationship_id);
@@ -202,24 +201,6 @@ class mod_perform_participant_instance_availability_testcase extends state_testc
         $participant2_entity->save();
 
         return [$participant1_model, $participant2_model, $participant1_entity, $activity];
-    }
-
-    /**
-     * Create a relationship for the activity and get the ID.
-     *
-     * @param section $section
-     * @param $relationship_class
-     * @return int
-     */
-    private function create_activity_relationship(section $section, $relationship_class): int {
-        /** @var mod_perform_generator $generator */
-        $generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
-        $subject_relationship = $generator->create_section_relationship($section, ['class_name' => $relationship_class]);
-        return section_relationship::repository()
-            ->select('activity_relationship_id')
-            ->where('id', $subject_relationship->id)
-            ->one()
-            ->activity_relationship_id;
     }
 
 }

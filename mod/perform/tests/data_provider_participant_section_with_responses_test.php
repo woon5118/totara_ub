@@ -267,9 +267,9 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
 
         foreach ($relationship_class_names as $relationship_class_name) {
             if ($relationship_class_name === manager::class) {
-                $activity_relationship_id = $manager_section_relationship->activity_relationship_id;
+                $core_relationship_id = $manager_section_relationship->core_relationship_id;
             } else {
-                $activity_relationship_id = $appraiser_section_relationship->activity_relationship_id;
+                $core_relationship_id = $appraiser_section_relationship->core_relationship_id;
             }
 
             $participant_user = self::getDataGenerator()->create_user();
@@ -278,7 +278,7 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
                 $participant_user,
                 $subject_instance->id,
                 $section,
-                $activity_relationship_id
+                $core_relationship_id
             );
         }
 
@@ -287,7 +287,7 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
             $subject_user->to_the_origins(),
             $subject_instance->id,
             $section,
-            $subject_section_relationship->activity_relationship_id
+            $subject_section_relationship->core_relationship_id
         );
 
         $data_provider = new participant_section_with_responses($subject_user_id, $subject_section->id);
@@ -364,7 +364,7 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
             $manager_user,
             $subject_instance->id,
             $section,
-            $manager_section_relationship->activity_relationship_id
+            $manager_section_relationship->core_relationship_id
         );
 
         $appraiser_section = $generator->create_participant_instance_and_section(
@@ -372,7 +372,7 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
             $appraiser_user,
             $subject_instance->id,
             $section,
-            $appraiser_section_relationship->activity_relationship_id
+            $appraiser_section_relationship->core_relationship_id
         );
 
         $generator->create_participant_instance_and_section(
@@ -380,7 +380,7 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
             $subject_user->to_the_origins(),
             $subject_instance->id,
             $section,
-            $subject_section_relationship->activity_relationship_id
+            $subject_section_relationship->core_relationship_id
         );
 
         $user_id = $fetching_as === 'Manager' ? $manager_user->id : $appraiser_user->id;
@@ -489,7 +489,7 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
             $manager_user,
             $subject_instance->id,
             $section,
-            $manager_section_relationship->activity_relationship_id
+            $manager_section_relationship->core_relationship_id
         );
 
         // The other managers section.
@@ -498,7 +498,7 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
             $other_manager_user,
             $subject_instance->id,
             $section,
-            $manager_section_relationship->activity_relationship_id
+            $manager_section_relationship->core_relationship_id
         );
 
         $generator->create_participant_instance_and_section(
@@ -506,7 +506,7 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
             $subject_user->to_the_origins(),
             $subject_instance->id,
             $section,
-            $subject_section_relationship->activity_relationship_id
+            $subject_section_relationship->core_relationship_id
         );
 
         $user_id = $manager_user->id;

@@ -23,7 +23,6 @@
 
 use mod_perform\entities\activity\participant_section;
 use mod_perform\entities\activity\section;
-use mod_perform\models\activity\section_relationship;
 use mod_perform\state\participant_instance\not_started;
 use mod_perform\task\service\participant_instance_creation;
 use mod_perform\task\service\participant_instance_dto;
@@ -36,7 +35,7 @@ use mod_perform\expand_task;
 use mod_perform\models\activity\track;
 use mod_perform\task\service\subject_instance_creation;
 use mod_perform\task\service\subject_instance_dto;
-use totara_core\relationship\relationship;
+use totara_core\relationship\relationship as core_relationship_model;
 use totara_core\relationship\resolvers\subject;
 use totara_job\job_assignment;
 use totara_job\relationship\resolvers\appraiser;
@@ -186,7 +185,6 @@ class mod_perform_participant_section_creation_service_testcase extends advanced
     /**
      * Setup participant_data.
      *
-     * @param stdClass $activity_tree
      * @return collection
      */
     private function setup_participant_instances(): collection {
@@ -203,35 +201,31 @@ class mod_perform_participant_section_creation_service_testcase extends advanced
         }
 
         //create participant instances.
-        /** @var section_relationship $section_relationship*/
-        foreach ($this->activity_trees as $activity_tree) {
-            foreach ($activity_tree->section_relationships as $section_relationship) {
-                /** @var relationship $relationship*/
-                $relationship = $section_relationship->get_relationship();
+        foreach ($subject_instances as $subject_instance) {
+            foreach ($this->activity_trees[$subject_instance->activity_id]->section_relationships as $section_relationship) {
+                /** @var core_relationship_model $core_relationship */
+                $core_relationship = $section_relationship->get_core_relationship();
+                $participants = $core_relationship->get_users(
+                    [
+                        'user_id' => $subject_instance->subject_user_id,
+                    ]
+                );
 
-                foreach ($subject_instances as $subject_instance) {
-                    $participants = $relationship->get_users(
+                foreach ($participants as $participant) {
+                    $participant_instance = new participant_instance();
+                    $participant_instance->subject_instance_id = $subject_instance->id;
+                    $participant_instance->participant_id = $participant;
+                    $participant_instance->core_relationship_id = $section_relationship->core_relationship_id;
+                    $participant_instance->progress = not_started::get_code();
+                    $participant_instance->save();
+                    $participant_instance_dto = participant_instance_dto::create_from_data(
                         [
-                            'user_id' => $subject_instance->subject_user_id,
+                            'activity_id' => $subject_instance->activity_id,
+                            'core_relationship_id' => $participant_instance->core_relationship_id,
+                            'id' => $participant_instance->id,
                         ]
                     );
-
-                    foreach ($participants as $participant) {
-                        $participant_instance = new participant_instance();
-                        $participant_instance->subject_instance_id = $subject_instance->id;
-                        $participant_instance->participant_id = $participant;
-                        $participant_instance->activity_relationship_id = $section_relationship->activity_relationship_id;
-                        $participant_instance->progress = not_started::get_code();
-                        $participant_instance->save();
-                        $participant_instance_dto = participant_instance_dto::create_from_data(
-                            [
-                                'activity_id' => $activity_tree->activity->id,
-                                'activity_relationship_id' => $participant_instance->activity_relationship_id,
-                                'id' => $participant_instance->id,
-                            ]
-                        );
-                        $participant_instance_dto_list->append($participant_instance_dto);
-                    }
+                    $participant_instance_dto_list->append($participant_instance_dto);
                 }
             }
         }
@@ -301,7 +295,7 @@ class mod_perform_participant_section_creation_service_testcase extends advanced
             $activity_tree = $this->setup_activity($i);
             $activity_tree->identifier = $i;
             $this->setup_job_assignments($activity_tree, $users_per_relationship);
-            $this->activity_trees[] = $activity_tree;
+            $this->activity_trees[$activity_tree->activity->id] = $activity_tree;
         }
     }
 

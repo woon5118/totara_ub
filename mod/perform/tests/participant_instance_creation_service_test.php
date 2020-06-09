@@ -22,7 +22,6 @@
  */
 
 use core\collection;
-use \mod_perform\entities\activity\activity_relationship;
 use mod_perform\entities\activity\participant_instance;
 use mod_perform\entities\activity\subject_instance;
 use mod_perform\entities\activity\track_user_assignment;
@@ -31,6 +30,7 @@ use mod_perform\expand_task;
 use mod_perform\task\service\participant_instance_creation;
 use mod_perform\task\service\subject_instance_creation;
 use mod_perform\task\service\subject_instance_dto;
+use totara_core\entities\relationship;
 use totara_job\job_assignment;
 use totara_job\relationship\resolvers\appraiser;
 use totara_job\relationship\resolvers\manager;
@@ -55,7 +55,7 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
      * Array of activity relationships.
      * @var array
      */
-    private $activity_relationships;
+    private $core_relationships;
 
     /**
      * Data of Activities used.
@@ -79,7 +79,6 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
         $subject_instance_service = new subject_instance_creation();
         $subject_instance_service->generate_instances();
 
-        $this->assert_activity_relationship_id_is_saved();
         $this->assert_participant_instances_created($track_user_assignments, $expand_per_job_assignment);
     }
 
@@ -99,7 +98,6 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
         $participant_instance_service = new participant_instance_creation();
         $participant_instance_service->generate_instances($subject_instance_dto_collection);
 
-        $this->assert_activity_relationship_id_is_saved();
         $this->assert_participant_instances_created($track_user_assignments, $expand_per_job_assignment);
     }
 
@@ -123,7 +121,7 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
     ): void {
         $created_participants = participant_instance::repository()->get();
         $expected_participants_created = $track_user_assignments->count()
-            * count($this->activity_relationships)
+            * count($this->core_relationships)
             * $this->users_per_relationship;
 
         if ($expand_per_job_assignment) {
@@ -180,11 +178,11 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
                 ];
             }
             if (is_null($relationship_ids[$activity_id][$participant_relationship])) {
-                $relationship_ids[$activity_id][$participant_relationship] = $created_participant->activity_relationship_id;
+                $relationship_ids[$activity_id][$participant_relationship] = $created_participant->core_relationship_id;
             }
             $this->assertEquals(
                 $relationship_ids[$activity_id][$participant_relationship],
-                $created_participant->activity_relationship_id
+                $created_participant->core_relationship_id
             );
         }
 
@@ -200,7 +198,7 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
             }
         }
 
-        $expected_subject_instance_count = count($this->activity_relationships) * $this->users_per_relationship;
+        $expected_subject_instance_count = count($this->core_relationships) * $this->users_per_relationship;
 
         if ($expand_per_job_assignment) {
             $expected_subject_instance_count /= self::JOB_ASSIGNMENTS_PER_USER;
@@ -233,24 +231,6 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
         }
 
         return $expected_participants;
-    }
-
-    /**
-     * Asserts the relationship ids saved in participant instances are the activity_relationship_id.
-     *
-     * @return void
-     */
-    private function assert_activity_relationship_id_is_saved(): void {
-        $activity_relationships = activity_relationship::repository()
-            ->select('id')
-            ->get()
-            ->pluck('id');
-        $participant_instance_relationships = participant_instance::repository()
-            ->select(['id', 'activity_relationship_id'])
-            ->get()
-            ->pluck('activity_relationship_id');
-
-        $this->assertEqualsCanonicalizing(array_unique($participant_instance_relationships), $activity_relationships);
     }
 
     /**
@@ -311,7 +291,7 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
     protected function setup_config_values(): void {
         $this->setAdminUser();
         $this->users_per_relationship = 2;
-        $this->activity_relationships = [
+        $this->core_relationships = [
             appraiser::class,
             manager::class,
         ];
@@ -337,7 +317,7 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
             ['title' => 'Test section for activity ' . $identifier]
         );
 
-        foreach ($this->activity_relationships as $relationship_class) {
+        foreach ($this->core_relationships as $relationship_class) {
             $generator->create_section_relationship(
                 $activity_tree->section,
                 ['class_name' => $relationship_class]
@@ -403,7 +383,7 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
      */
     protected function tearDown() {
         $this->users_per_relationship = null;
-        $this->activity_relationships = null;
+        $this->core_relationships = null;
         $this->activity_trees = null;
     }
 }

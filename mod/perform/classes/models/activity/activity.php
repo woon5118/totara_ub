@@ -329,15 +329,6 @@ class activity extends model {
     }
 
     /**
-     * Get the relationships for this activity.
-     *
-     * @return collection|relationship[]
-     */
-    public function get_relationships(): collection {
-        return $this->entity->relationships->map_to(relationship::class);
-    }
-
-    /**
      * Checks whether the current user can view the participation reporting
      *
      * @return bool

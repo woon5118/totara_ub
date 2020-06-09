@@ -98,19 +98,19 @@ class rb_source_perform_participant_instance extends rb_base_source {
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
             ),
             new rb_join(
-                'perform_relationship',
+                'core_relationship',
                 'LEFT',
-                "{perform_relationship}",
-                "perform_relationship.id = base.activity_relationship_id",
+                "{totara_core_relationship}",
+                'core_relationship.id = base.core_relationship_id',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE
             ),
             new rb_join(
-                'totara_relationship_resolver',
+                'core_relationship_resolver',
                 'LEFT',
                 "{totara_core_relationship_resolver}",
-                'totara_relationship_resolver.relationship_id = perform_relationship.core_relationship_id',
+                'core_relationship_resolver.relationship_id = core_relationship.id',
                 REPORT_BUILDER_RELATION_ONE_TO_ONE,
-                ['perform_relationship']
+                ['core_relationship']
             ),
         );
 
@@ -167,24 +167,23 @@ class rb_source_perform_participant_instance extends rb_base_source {
                 ]
             ),
             new rb_column_option(
-                'perform_relationship',
+                'core_relationship',
                 'class_name',
                 get_string('relationship_in_activity', 'rb_source_perform_participant_instance'),
-                'totara_relationship_resolver.class_name',
+                'core_relationship_resolver.class_name',
                 [
-                    'joins' => ['totara_relationship_resolver', 'perform_relationship'],
+                    'joins' => ['core_relationship_resolver'],
                     'dbdatatype' => 'char',
                     'outputformat' => 'text',
-                    'displayfunc' => 'perform_relationship',
+                    'displayfunc' => 'core_relationship',
                 ]
             ),
             new rb_column_option(
-                'perform_relationship',
+                'core_relationship',
                 'core_relationship_id',
-                get_string('relationship_id', 'rb_source_perform_participant_instance'),
-                'totara_relationship_resolver.relationship_id',
+                get_string('core_relationship_id', 'rb_source_perform_participant_instance'),
+                'base.core_relationship_id',
                 [
-                    'joins' => ['totara_relationship_resolver', 'perform_relationship'],
                     'dbdatatype' => 'integer',
                     'displayfunc' => 'integer',
                     'outputformat' => 'integer',
@@ -244,7 +243,7 @@ class rb_source_perform_participant_instance extends rb_base_source {
         }
         if ($this->resolvers) {
             $filteroptions[] = new rb_filter_option(
-                'perform_relationship',
+                'core_relationship',
                 'core_relationship_id',
                 get_string('relationship_in_activity', 'rb_source_perform_participant_instance'),
                 'select',
@@ -255,7 +254,7 @@ class rb_source_perform_participant_instance extends rb_base_source {
             );
         } else {
             $filteroptions[] = new rb_filter_option(
-                'perform_relationship',
+                'core_relationship',
                 'class_name',
                 get_string('relationship_in_activity', 'rb_source_perform_participant_instance'),
                 'text'
@@ -329,7 +328,7 @@ class rb_source_perform_participant_instance extends rb_base_source {
             ],
             // Relationship in activity
             [
-                'type' => 'perform_relationship',
+                'type' => 'core_relationship',
                 'value' => 'class_name',
                 'heading' => get_string('relationship_in_activity', 'rb_source_perform_participant_instance'),
             ],
@@ -370,12 +369,12 @@ class rb_source_perform_participant_instance extends rb_base_source {
         ];
         if (self::get_resolvers()) {
             $default_filters[] = [
-                'type' => 'perform_relationship',
+                'type' => 'core_relationship',
                 'value' => 'core_relationship_id',
             ];
         } else {
             $default_filters[] = [
-                'type' => 'perform_relationship',
+                'type' => 'core_relationship',
                 'value' => 'class_name',
             ];
         }
@@ -429,11 +428,7 @@ class rb_source_perform_participant_instance extends rb_base_source {
     private static function get_resolvers() {
         global $DB;
         $sql = "SELECT tcrr.class_name, tcrr.relationship_id
-                  FROM {totara_core_relationship_resolver} tcrr
-                 WHERE tcrr.relationship_id IN (
-                        SELECT DISTINCT pr2.core_relationship_id
-                          FROM {perform_relationship} pr2
-                        )";
+                  FROM {totara_core_relationship_resolver} tcrr";
         return $DB->get_records_sql($sql);
     }
 

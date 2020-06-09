@@ -5,7 +5,7 @@ type mod_perform_section_relationship {
   id: core_id!
   can_answer: Boolean!
   can_view: Boolean!
-  relationship: totara_core_relationship!
+  core_relationship: totara_core_relationship!
 }
 
 """
@@ -57,7 +57,7 @@ Section relationship object
 used to update section relationships.
 """
 input update_section_relationship_input {
-  id: core_id!
+  core_relationship_id: core_id!
   can_view: Boolean = false
 }
 

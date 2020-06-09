@@ -26,9 +26,7 @@ namespace mod_perform\entities\activity;
 use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\entity\relations\has_many;
-use core\orm\entity\relations\has_many_through;
 use core\orm\entity\relations\has_one;
-use totara_core\entities\relationship;
 
 /**
  * Activity entity
@@ -46,8 +44,6 @@ use totara_core\entities\relationship;
  * Relationships:
  * @property-read collection|section[] $sections
  * @property-read collection|section[] $sections_ordered
- * @property-read collection|activity_relationship[] $activity_relationships
- * @property-read collection|relationship[] $relationships
  * @property-read collection|track[] $tracks
  * @property-read activity_type $type
  *
@@ -82,37 +78,12 @@ class activity extends entity {
     }
 
     /**
-     * Activity relationships that are active for this activity.
-     *
-     * @return has_many
-     */
-    public function activity_relationships(): has_many {
-        return $this->has_many(activity_relationship::class, 'activity_id');
-    }
-
-    /**
      * Tracks for this activity.
      *
      * @return has_many
      */
     public function tracks(): has_many {
         return $this->has_many(track::class, 'activity_id');
-    }
-
-    /**
-     * Relationships that are active for this activity.
-     *
-     * @return has_many_through
-     */
-    public function relationships(): has_many_through {
-        return $this->has_many_through(
-            activity_relationship::class,
-            relationship::class,
-            'id',
-            'activity_id',
-            'core_relationship_id',
-            'id'
-        );
     }
 
     /**

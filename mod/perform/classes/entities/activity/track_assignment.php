@@ -57,9 +57,9 @@ class track_assignment extends entity {
      *
      * TBD: to remove once the base_entity handles this.
      *
-     * @param $value incoming id.
+     * @param int $value incoming id.
      *
-     * @return string the converted value.
+     * @return int the converted value.
      */
     public function get_user_group_id_attribute(?int $value = null): int {
         return (int)$value;

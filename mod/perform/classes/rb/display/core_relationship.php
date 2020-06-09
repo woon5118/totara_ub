@@ -23,14 +23,15 @@
 
 namespace mod_perform\rb\display;
 
+use totara_core\relationship\relationship_resolver;
 use totara_reportbuilder\rb\display\base;
 
-class perform_relationship extends base {
+class core_relationship extends base {
 
     /**
      * Handles the display
      *
-     * @param string $value
+     * @param string $class
      * @param string $format
      * @param \stdClass $row
      * @param \rb_column $column
@@ -41,6 +42,7 @@ class perform_relationship extends base {
         if (!$class) {
             return '';
         }
+        /** @var relationship_resolver $class */
         return $class::get_name();
     }
 

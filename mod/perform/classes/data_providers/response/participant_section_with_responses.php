@@ -25,7 +25,6 @@ namespace mod_perform\data_providers\response;
 
 use coding_exception;
 use core\collection;
-use mod_perform\entities\activity\activity_relationship;
 use mod_perform\entities\activity\element_response as element_response_entity;
 use mod_perform\models\response\participant_section;
 use mod_perform\models\response\responder_group;
@@ -33,7 +32,8 @@ use mod_perform\models\response\section_element_response;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
 use mod_perform\entities\activity\section_element as section_element_entity;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
-use totara_core\relationship\relationship;
+use totara_core\entities\relationship as core_relationship_entity;
+use totara_core\relationship\relationship as core_relationship_model;
 
 class participant_section_with_responses {
 
@@ -143,8 +143,8 @@ class participant_section_with_responses {
             // Bulk fetch all related entities that are required to build the domain models.
             ->with('section_elements.element') // Used in section element_response class (element is for validation).
             ->with('participant_instance') // For section element response class.
-            ->with('section.activity_relationships.relationship.resolvers') // To create other responder groups.
-            ->with('participant_instance.activity_relationship.relationship.resolvers') // For excluding main participant in other responder groups.
+            ->with('section.core_relationships.resolvers') // To create other responder groups.
+            ->with('participant_instance.core_relationship.resolvers') // For excluding main participant in other responder groups.
             // Ensure the user we are fetching responses for is a participant for the section they belong to.
             ->join([participant_instance_entity::TABLE, 'pi'], 'ps.participant_instance_id', 'pi.id')
             ->where('ps.id', $this->participant_section_id)
@@ -178,7 +178,7 @@ class participant_section_with_responses {
         return participant_instance_entity::repository()
             ->as('pi')
             // Bulk fetch all required related entities.
-            ->with('activity_relationship.relationship.resolvers') // Required for grouping section_element_responses by relationship_name.
+            ->with('core_relationship.resolvers') // Required for grouping section_element_responses by relationship_name.
             ->with('participant_user') // Required for the eventual output of other responders section_element_response models.
             ->join([participant_section_entity::TABLE, 'ps'], 'id', 'participant_instance_id')
             ->where('subject_instance_id', $participant_instance->subject_instance_id)
@@ -341,13 +341,11 @@ class participant_section_with_responses {
      */
     protected function get_other_participants_relationship_type_names(): array {
         if ($this->other_participant_relationship_type_names === null) {
-            /** @var collection|activity_relationship[] $section_relationships */
-            $activity_relationships_entities = $this->participant_section_entity->section->activity_relationships;
+            $core_relationship_entities = $this->participant_section_entity->section->core_relationships;
 
-            $names = $activity_relationships_entities->map(
-                function (activity_relationship $activity_relationships_entity) {
-                    $relationship_entity = $activity_relationships_entity->relationship;
-                    return (new relationship($relationship_entity))->get_name();
+            $names = $core_relationship_entities->map(
+                function (core_relationship_entity $core_relationship_entity) {
+                    return (new core_relationship_model($core_relationship_entity))->get_name();
                 }
             );
 
@@ -374,10 +372,9 @@ class participant_section_with_responses {
     protected function fetch_main_participant_relationship_name(): string {
         $main_participant_relationship_entity = $this->participant_section_entity
             ->participant_instance
-            ->activity_relationship
-            ->relationship;
+            ->core_relationship;
 
-        return (new relationship($main_participant_relationship_entity))->get_name();
+        return (new core_relationship_model($main_participant_relationship_entity))->get_name();
     }
 
 }

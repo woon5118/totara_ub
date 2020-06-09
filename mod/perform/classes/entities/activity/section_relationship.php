@@ -25,6 +25,7 @@ namespace mod_perform\entities\activity;
 
 use core\orm\entity\entity;
 use core\orm\entity\relations\belongs_to;
+use totara_core\entities\relationship;
 
 /**
  * Activity section relationship entity
@@ -32,14 +33,14 @@ use core\orm\entity\relations\belongs_to;
  * Properties:
  * @property-read int $id ID
  * @property int $section_id ID of activity section
- * @property int $activity_relationship_id ID of activity relationship
+ * @property int $core_relationship_id ID of core relationship
  * @property int $can_view Flag indicating whether relationship is able to view
  * @property int $can_answer Flag indicating whether relationship is able to answer
  * @property int $created_at
  *
  * Relationships:
  * @property-read section $section
- * @property-read activity_relationship $activity_relationship
+ * @property-read relationship $core_relationship
  *
  * @package mod_perform\entities
  */
@@ -57,11 +58,11 @@ class section_relationship extends entity {
     }
 
     /**
-     * Relationship with activity_relationship entities.
+     * Relationship with core relationship entities.
      *
      * @return belongs_to
      */
-    public function activity_relationship(): belongs_to {
-        return $this->belongs_to(activity_relationship::class, 'activity_relationship_id');
+    public function core_relationship(): belongs_to {
+        return $this->belongs_to(relationship::class, 'core_relationship_id');
     }
 }

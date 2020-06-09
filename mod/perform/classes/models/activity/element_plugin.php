@@ -24,7 +24,6 @@
 namespace mod_perform\models\activity;
 
 use core\collection;
-use mod_perform\models\activity\element;
 use mod_perform\models\response\element_validation_error;
 
 /**
@@ -131,7 +130,7 @@ abstract class element_plugin {
      * Should return a collection of element_validation_errors (or an empty collection when there are no errors).
      *
      * @param string|null                               $encoded_response_data
-     * @param \mod_perform\models\activity\element|null $element
+     * @param element|null $element
      *
      * @return collection|element_validation_error[]
      * @see element_validation_error

@@ -23,6 +23,7 @@
 
 namespace mod_perform\entities\activity;
 
+use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\entity\relations\has_many;
 
@@ -46,9 +47,9 @@ class activity_type extends entity {
      *
      * TBD: to remove once the base_entity handles this.
      *
-     * @param $value incoming value.
+     * @param int $value incoming value.
      *
-     * @return string the converted value.
+     * @return bool the converted value.
      */
     public function get_is_system_attribute(?int $value = null): bool {
         return (bool)$value;

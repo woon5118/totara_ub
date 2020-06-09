@@ -36,6 +36,11 @@ use mod_perform\user_groups\grouping;
  */
 class track_assignment extends model {
     /**
+     * @var track_assignment_entity
+     */
+    protected $entity;
+
+    /**
      * {@inheritdoc}
      */
     protected $entity_attribute_whitelist = [
@@ -64,7 +69,7 @@ class track_assignment extends model {
      * @param int $type assignment type; one of the track_assignment_type enums.
      * @param grouping $group assignment group details.
      *
-     * @return the newly created track.
+     * @return track_assignment the newly created track.
      */
     public static function create(
         track $parent,

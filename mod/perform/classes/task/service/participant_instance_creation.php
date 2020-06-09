@@ -25,11 +25,12 @@ namespace mod_perform\task\service;
 
 use core\collection;
 use core\orm\query\builder;
-use mod_perform\entities\activity\activity_relationship;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
+use mod_perform\entities\activity\section;
 use mod_perform\hook\participant_instances_created;
+use mod_perform\entities\activity\section_relationship;
 use mod_perform\state\participant_instance\not_started;
-use totara_core\relationship\helpers\relationship_collection_manager;
+use totara_core\relationship\helpers\relationship_collection_manager as core_relationship_collection_manager;
 
 /**
  * Class participation_service used to create participant instances for a collection of subject instances.
@@ -75,6 +76,7 @@ class participant_instance_creation {
      * @return void
      */
     private function aggregate_participant_instances(collection $subject_instance_dtos): void {
+        // Find all the activities that are related to the subject instances.
         $activity_ids = array_unique($subject_instance_dtos->pluck('activity_id'), SORT_NUMERIC);
         $activity_relationships = $this->get_activity_relationships($activity_ids);
         $core_relationship_ids = array_unique($activity_relationships->pluck('core_relationship_id'));
@@ -82,39 +84,46 @@ class participant_instance_creation {
         if (empty($core_relationship_ids)) {
             return;
         }
-        $relationship_manager = new relationship_collection_manager($core_relationship_ids);
+
+        // Initialise the core relationship manager with the core relationships that we will be using.
+        $relationship_manager = new core_relationship_collection_manager($core_relationship_ids);
         $relationships_per_activity = $this->group_relationship_ids_by_activity($activity_relationships);
 
+        // Process each subject instance, one at a time.
         foreach ($subject_instance_dtos as $subject_instance) {
+            // If there are no relationships defined for the activity then there is nothing to do.
             $has_no_relationships_for_activity = !isset($relationships_per_activity[$subject_instance->activity_id]);
-
             if ($has_no_relationships_for_activity) {
                 continue;
             }
+
             $relationship_arguments = $this->build_relationship_arguments($subject_instance);
 
             $participant_ids_for_relationships = $relationship_manager->get_users_for_relationships(
                 $relationship_arguments,
-                array_column($relationships_per_activity[$subject_instance->activity_id], 'core_relationship_id')
+                $relationships_per_activity[$subject_instance->activity_id]
             );
             $relationship_data = [
-                'activity_relationships' => $relationships_per_activity[$subject_instance->activity_id],
+                'core_relationship_ids' => $relationships_per_activity[$subject_instance->activity_id],
                 'subject_instance' => $subject_instance,
                 'participant_ids' => $participant_ids_for_relationships,
             ];
+
             $this->create_participant_instances_for_relationships($relationship_data);
         }
     }
 
     /**
-     * Get relationships for all activities.
+     * Get core_relationships for all activities.
      *
      * @param array $activity_ids
      * @return collection
      */
     private function get_activity_relationships(array $activity_ids): collection {
-        return activity_relationship::repository()
-            ->where_in('activity_id', $activity_ids)
+        return section_relationship::repository()
+            ->select(['id', 'section.activity_id', 'core_relationship_id'])
+            ->join([section::TABLE, 'section'], 'section_id', 'id')
+            ->where_in('section.activity_id', $activity_ids)
             ->get();
     }
 
@@ -128,7 +137,14 @@ class participant_instance_creation {
         $relationships_per_activity = [];
 
         foreach ($activity_relationships as $activity_relationship) {
-            $relationships_per_activity[$activity_relationship->activity_id][] = $activity_relationship;
+            if (!isset($relationships_per_activity[$activity_relationship->activity_id]) ||
+                !in_array(
+                    $activity_relationship->core_relationship_id,
+                    $relationships_per_activity[$activity_relationship->activity_id]
+                )
+            ) {
+                $relationships_per_activity[$activity_relationship->activity_id][] = $activity_relationship->core_relationship_id;
+            }
         }
 
         return $relationships_per_activity;
@@ -159,20 +175,20 @@ class participant_instance_creation {
     /**
      * Create participant instances for a list of relationships.
      *
-     * @param array $relationship_data Contains activity_relationships,activity_id, subject instance and participant ids.
+     * @param array $relationship_data Contains core_relationships, activity_id, subject instance and participant ids.
      * @return void
      */
     private function create_participant_instances_for_relationships(array $relationship_data): void {
-        $activity_relationships = $relationship_data['activity_relationships'];
+        $core_relationship_ids = $relationship_data['core_relationship_ids'];
         $subject_instance = $relationship_data['subject_instance'];
         $participant_ids = $relationship_data['participant_ids'];
 
-        foreach ($activity_relationships as $activity_relationship) {
-            $relationship_participants = $participant_ids[$activity_relationship->core_relationship_id];
+        foreach ($core_relationship_ids as $core_relationship_id) {
+            $relationship_participants = $participant_ids[$core_relationship_id] ?? null;
 
             if (!empty($relationship_participants)) {
                 $this->create_participant_instances_for_user_list(
-                    $this->build_participant_instance_data($activity_relationship->id, $subject_instance),
+                    $this->build_participant_instance_data($core_relationship_id, $subject_instance),
                     $relationship_participants
                 );
             }
@@ -182,14 +198,14 @@ class participant_instance_creation {
     /**
      * Build participant instance data.
      *
-     * @param $activity_relationship_id
+     * @param $core_relationship_id
      * @param $subject_instance
      * @return array
      */
-    private function build_participant_instance_data($activity_relationship_id, $subject_instance): array {
+    private function build_participant_instance_data($core_relationship_id, $subject_instance): array {
         return [
             'participant_data' => [
-                'activity_relationship_id' => $activity_relationship_id,
+                'core_relationship_id' => $core_relationship_id,
                 'subject_instance_id' => $subject_instance->id,
                 'status' => not_started::get_code(),
                 'created_at' => time(),
@@ -217,6 +233,7 @@ class participant_instance_creation {
                 $this->save_data();
             }
         }
+        $this->save_data();
     }
 
     /**
@@ -234,7 +251,7 @@ class participant_instance_creation {
         foreach ($this->participation_creation_list as $participant_instance) {
             $section_data = [];
             $section_data['activity_id'] = $participant_instance['activity_id'];
-            $section_data['activity_relationship_id'] = $participant_instance['participant_data']['activity_relationship_id'];
+            $section_data['core_relationship_id'] = $participant_instance['participant_data']['core_relationship_id'];
             $section_data['id'] = $db->insert_record(
                 participant_instance_entity::TABLE,
                 (object) $participant_instance['participant_data']

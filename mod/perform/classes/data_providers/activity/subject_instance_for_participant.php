@@ -99,7 +99,7 @@ class subject_instance_for_participant {
             ->with('subject_user')
             ->with('track.activity')
             // Eager loaded relationship resolvers because they are returned in the subject instance gql query
-            ->with('participant_instances.activity_relationship.relationship.resolvers')
+            ->with('participant_instances.core_relationship.resolvers')
             ->where_exists($this->get_target_participant_exists())
             // Newest subject instances at the top of the list
             ->order_by('si.created_at', 'desc')

@@ -27,7 +27,6 @@ use coding_exception;
 use core\orm\collection;
 use core\orm\entity\model;
 use core\orm\query\builder;
-use mod_perform\entities\activity\activity_relationship;
 use mod_perform\entities\activity\element as element_entity;
 use mod_perform\entities\activity\section as section_entity;
 use mod_perform\entities\activity\section_element as section_element_entity;
@@ -196,15 +195,6 @@ class section extends model {
     }
 
     /**
-     * Get the activity relationships that exist due to this section (not for all sections)
-     *
-     * @return collection|activity_relationship[]
-     */
-    public function get_activity_relationships(): collection {
-        return $this->entity->activity_relationships;
-    }
-
-    /**
      * Get section elements summary
      *
      * @return stdClass
@@ -249,43 +239,46 @@ class section extends model {
     /**
      * Update section relationships by a list of class names.
      *
-     * @param array[] $relationships_updates
+     * @param array[] $relationship_updates
      *
      * @return section
      */
-    public function update_relationships(array $relationships_updates): self {
+    public function update_relationships(array $relationship_updates): self {
         // Figure out which relationships to remove and which to add.
 
-        builder::get_db()->transaction(function () use ($relationships_updates) {
+        builder::get_db()->transaction(function () use ($relationship_updates) {
             $existing_section_relationships = $this->get_section_relationships();
-            foreach ($relationships_updates as $relationship_update) {
-                $core_relationship_id = $relationship_update['id'];
+            foreach ($relationship_updates as $relationship_update) {
+                $core_relationship_id = $relationship_update['core_relationship_id'];
 
                 /** @var section_relationship $section_relationship */
                 $section_relationship = $existing_section_relationships->find(
                     function ($section_relationship) use ($core_relationship_id) {
-                        return $section_relationship->relationship->id === $core_relationship_id;
+                        return $section_relationship->core_relationship_id === $core_relationship_id;
                     }
                 );
 
                 if ($section_relationship) {
-                    unset($relationship_update['id']);
+                    unset($relationship_update['core_relationship_id']);
                 }
                 $section_relationship
                     ? $section_relationship->update_can_view($relationship_update['can_view'])
-                    : section_relationship::create($this->get_id(), $relationship_update['id'], $relationship_update['can_view']);
+                    : section_relationship::create(
+                        $this->get_id(),
+                        $relationship_update['core_relationship_id'],
+                        $relationship_update['can_view']
+                    );
             }
 
-            $relationship_ids = array_column($relationships_updates, 'id');
+            $relationship_ids = array_column($relationship_updates, 'core_relationship_id');
             foreach ($existing_section_relationships as $section_relationship) {
-                if (!in_array($section_relationship->relationship->id, $relationship_ids, true)) {
-                    section_relationship::delete_with_properties($this->get_id(), $section_relationship->relationship->id);
+                if (!in_array($section_relationship->core_relationship_id, $relationship_ids)) {
+                    section_relationship::delete_with_properties($this->get_id(), $section_relationship->core_relationship_id);
                 }
             }
         });
 
         // Refresh entity cache.
-        $this->entity->load_relation('activity_relationships');
         $this->entity->load_relation('section_relationships');
         return $this;
     }
@@ -293,7 +286,7 @@ class section extends model {
     /**
      * Check if the sort orders on the section elements are valid and throw an exception if not
      *
-     * @throws \coding_exception when the ordering is not valid
+     * @throws coding_exception when the ordering is not valid
      */
     private function validate_sort_orders(): void {
         $section_elements = $this->get_section_elements();

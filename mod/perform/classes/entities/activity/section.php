@@ -28,6 +28,7 @@ use core\orm\entity\entity;
 use core\orm\entity\relations\belongs_to;
 use core\orm\entity\relations\has_many;
 use core\orm\entity\relations\has_many_through;
+use totara_core\entities\relationship;
 
 /**
  * Represents an activity section record.
@@ -42,7 +43,7 @@ use core\orm\entity\relations\has_many_through;
  *
  * Relationships:
  * @property-read activity $activity
- * @property-read collection|activity_relationship[] $activity_relationships
+ * @property-read collection|relationship[] $core_relationships
  * @property-read collection|section_element[] $section_elements
  * @property-read collection|section_relationship[] $section_relationships
  * @property-read collection|participant_section[] $participant_sections
@@ -85,13 +86,13 @@ class section extends entity {
      *
      * @return has_many_through
      */
-    public function activity_relationships(): has_many_through {
+    public function core_relationships(): has_many_through {
         return $this->has_many_through(
             section_relationship::class,
-            activity_relationship::class,
+            relationship::class,
             'id',
             'section_id',
-            'activity_relationship_id',
+            'core_relationship_id',
             'id'
         );
     }

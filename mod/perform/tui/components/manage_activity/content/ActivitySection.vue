@@ -87,7 +87,7 @@
         <div class="tui-performActivitySection__participant-items">
           <ActivitySectionRelationship
             v-for="participant in displayedParticipantsSorted"
-            :key="participant.relationship.id"
+            :key="participant.core_relationship.id"
             :participant="participant"
             :editable="autoSave || editMode"
             @participant-removed="removeDisplayedParticipant"
@@ -281,7 +281,7 @@ export default {
       return !this.displayedParticipants.every(value => {
         return this.savedParticipants.find(participant => {
           return (
-            participant.relationship.id === value.relationship.id &&
+            participant.core_relationship.id === value.core_relationship.id &&
             participant.can_view === value.can_view
           );
         });
@@ -296,7 +296,7 @@ export default {
     displayedParticipantsSorted() {
       return this.displayedParticipants
         .slice()
-        .sort((a, b) => a.relationship.id - b.relationship.id);
+        .sort((a, b) => a.core_relationship.id - b.core_relationship.id);
     },
 
     /**
@@ -340,7 +340,7 @@ export default {
     getSectionRelationships() {
       return this.displayedParticipants.map(participant => {
         return {
-          id: participant.relationship.id,
+          core_relationship_id: participant.core_relationship.id,
           can_view: participant.can_view,
         };
       });
@@ -391,7 +391,7 @@ export default {
         checkedParticipants.map(participant => {
           return {
             can_view: false,
-            relationship: participant,
+            core_relationship: participant,
           };
         })
       );
@@ -406,7 +406,7 @@ export default {
      */
     updateParticipantData(participant) {
       this.displayedParticipants = this.displayedParticipants.map(value => {
-        return value.relationship.id === participant.relationship.id
+        return value.core_relationship.id === participant.core_relationship.id
           ? participant
           : value;
       });
@@ -421,7 +421,7 @@ export default {
      */
     removeDisplayedParticipant(participant) {
       this.displayedParticipants = this.displayedParticipants.filter(
-        value => value.relationship.id !== participant.relationship.id
+        value => value.core_relationship.id !== participant.core_relationship.id
       );
       if (this.autoSave) {
         this.trySave();

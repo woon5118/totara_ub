@@ -146,23 +146,23 @@ class mod_perform_section_model_testcase extends mod_perform_relationship_testca
         $this->assert_section_relationships($section1, []);
         $this->assert_section_relationships($section2, []);
 
-        $appraiser_id = $perform_generator->get_relationship(appraiser::class)->id;
-        $manager_id = $perform_generator->get_relationship(manager::class)->id;
-        $subject_id = $perform_generator->get_relationship(subject::class)->id;
+        $appraiser_relationship = $perform_generator->get_core_relationship(appraiser::class);
+        $manager_relationship = $perform_generator->get_core_relationship(manager::class);
+        $subject_relationship = $perform_generator->get_core_relationship(subject::class);
 
         // Add three relationships to section1.
         $returned_section = $section1->update_relationships(
             [
                 [
-                    'id' => $appraiser_id,
+                    'core_relationship_id' => $appraiser_relationship->id,
                     'can_view' => true,
                 ],
                 [
-                    'id' => $manager_id,
+                    'core_relationship_id' => $manager_relationship->id,
                     'can_view' => true,
                 ],
                 [
-                    'id' => $subject_id,
+                    'core_relationship_id' => $subject_relationship->id,
                     'can_view' => true,
                 ],
             ]
@@ -170,58 +170,48 @@ class mod_perform_section_model_testcase extends mod_perform_relationship_testca
         $this->assertEquals($section1, $returned_section);
         $this->assert_section_relationships($section1, [appraiser::class, manager::class, subject::class]);
         $this->assert_section_relationships($section2, []);
-        $this->assert_activity_relationships($activity1, [appraiser::class, manager::class, subject::class]);
-        $this->assert_activity_relationships($activity2, []);
 
         // Remove one relationship.
         $section1->update_relationships(
             [
                 [
-                    'id' => $appraiser_id,
+                    'core_relationship_id' => $appraiser_relationship->id,
                     'can_view' => true,
                 ],
                 [
-                    'id' => $manager_id,
+                    'core_relationship_id' => $manager_relationship->id,
                     'can_view' => true,
                 ]
             ]
         );
         $this->assert_section_relationships($section1, [appraiser::class, manager::class]);
         $this->assert_section_relationships($section2, []);
-        $this->assert_activity_relationships($activity1, [appraiser::class, manager::class]);
-        $this->assert_activity_relationships($activity2, []);
 
         // Add to section2.
         $section2->update_relationships(
             [
                 [
-                    'id' => $manager_id,
+                    'core_relationship_id' => $manager_relationship->id,
                     'can_view' => true,
                 ],
                 [
-                    'id' => $subject_id,
+                    'core_relationship_id' => $subject_relationship->id,
                     'can_view' => true,
                 ]
             ]
         );
         $this->assert_section_relationships($section1, [appraiser::class, manager::class]);
         $this->assert_section_relationships($section2, [manager::class, subject::class]);
-        $this->assert_activity_relationships($activity1, [appraiser::class, manager::class, subject::class]);
-        $this->assert_activity_relationships($activity2, []);
 
         // Remove all from section1.
         $section1->update_relationships([]);
         $this->assert_section_relationships($section1, []);
         $this->assert_section_relationships($section2, [manager::class, subject::class]);
-        $this->assert_activity_relationships($activity1, [manager::class, subject::class]);
-        $this->assert_activity_relationships($activity2, []);
 
         // Remove all from section2.
         $section2->update_relationships([]);
         $this->assert_section_relationships($section1, []);
         $this->assert_section_relationships($section2, []);
-        $this->assert_activity_relationships($activity1, []);
-        $this->assert_activity_relationships($activity2, []);
     }
 
     public function test_get_section_element_stats() {

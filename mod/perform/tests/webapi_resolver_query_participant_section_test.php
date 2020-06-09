@@ -76,8 +76,8 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
     }
 
     public function test_failed_ajax_query(): void {
-        [$participants, ] = $this->create_test_data();
-        $participant_instance = $participants->first()->participant_instance;
+        [$participant_sections, ] = $this->create_test_data();
+        $participant_instance = $participant_sections->first()->participant_instance;
         $args = ['participant_instance_id' => $participant_instance->id];
 
         $feature = 'performance_activities';
@@ -115,11 +115,11 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
         $element = $perform_generator->create_element();
         $section_element = $perform_generator->create_section_element($section, $element);
 
-        $participant_section = participant_section_entity::repository()
+        $participant_sections = participant_section_entity::repository()
             ->order_by('id', 'desc')
             ->get();
 
-        return [$participant_section, $section_element];
+        return [$participant_sections, $section_element];
     }
 
     private function create_section_element_response(int $section_element_id): array {

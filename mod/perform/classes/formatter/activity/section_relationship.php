@@ -31,7 +31,7 @@ class section_relationship extends entity_model_formatter {
             'id' => null,
             'can_view' => null,
             'can_answer' => null,
-            'relationship' => null,
+            'core_relationship' => null,
         ];
     }
 }

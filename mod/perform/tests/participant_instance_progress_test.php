@@ -66,6 +66,9 @@ class mod_perform_participant_instance_progress_testcase extends state_testcase 
 
     /**
      * @dataProvider condition_all_sections_data_provider
+     * @param $section1_progress
+     * @param $section2_progress
+     * @param $expected_result
      */
     public function test_condition_all_sections_complete($section1_progress, $section2_progress, $expected_result) {
         $section1 = (object)['progress' => $section1_progress];
@@ -103,6 +106,9 @@ class mod_perform_participant_instance_progress_testcase extends state_testcase 
 
     /**
      * @dataProvider at_least_one_section_started_data_provider
+     * @param $section1_progress
+     * @param $section2_progress
+     * @param $expected_result
      */
     public function test_condition_at_least_one_section_started($section1_progress, $section2_progress, $expected_result) {
         $section1 = (object)['progress' => $section1_progress];
@@ -133,8 +139,9 @@ class mod_perform_participant_instance_progress_testcase extends state_testcase 
             ->set_number_of_sections_per_activity(2)
             ->set_number_of_users_per_user_group_type(2);
 
+        /** @var mod_perform_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
-        $activity = $generator->create_full_activities($configuration)->first();
+        $generator->create_full_activities($configuration);
         $participant_instances = participant_instance_entity::repository()->get()->all();
         $this->assertCount(2, $participant_instances);
         $participant_instance1 = $participant_instances[0];

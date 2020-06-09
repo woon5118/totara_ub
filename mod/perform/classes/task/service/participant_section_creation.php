@@ -60,11 +60,14 @@ class participant_section_creation {
     public function generate_sections(collection $participant_instances): void {
         builder::get_db()->transaction(
             function () use ($participant_instances) {
-                $activity_relationship_id = array_unique($participant_instances->pluck('activity_relationship_id'));
-                $section_ids = $this->get_section_ids_for_activity_relationships($activity_relationship_id);
+                $section_ids = $this->get_section_ids_for_core_relationships($participant_instances);
 
                 foreach ($participant_instances as $participant_instance) {
-                    foreach ($section_ids[$participant_instance->activity_relationship_id] as $section_id) {
+                    $participant_section_ids = $section_ids->filter(function ($section) use ($participant_instance) {
+                        return (int) $section->activity_id === $participant_instance->activity_id
+                            && (int) $section->core_relationship_id === $participant_instance->core_relationship_id;
+                    })->pluck('section_id');
+                    foreach ($participant_section_ids as $section_id) {
                         $data = new stdClass();
                         $data->section_id = $section_id;
                         $data->status = not_started::get_code();
@@ -76,30 +79,24 @@ class participant_section_creation {
                 $this->save_participant_sections();
             }
         );
-
     }
 
     /**
-     * Get section ids for the activity relationship ids.
+     * Get section ids for the core relationship ids.
      *
-     * @param array $activity_relationship_id
-     * @return array
+     * @param collection $participant_instances
+     * @return collection of section ids, grouped by core relationship id
      */
-    private function get_section_ids_for_activity_relationships(array $activity_relationship_id): array {
-        $relationship_sections = section_relationship::repository()
-            ->where_in('activity_relationship_id', $activity_relationship_id)
-            ->select(['id', 'section_id', 'activity_relationship_id'])
-            ->get();
-        $result = [];
+    private function get_section_ids_for_core_relationships(collection $participant_instances): collection {
+        $core_relationship_ids = array_unique($participant_instances->pluck('core_relationship_id'));
+        $activity_ids = array_unique($participant_instances->pluck('activity_id'));
 
-        foreach ($relationship_sections as $relationship_section) {
-            if (!isset($result[$relationship_section->activity_relationship_id])) {
-                $result[$relationship_section->activity_relationship_id] = [];
-            }
-            $result[$relationship_section->activity_relationship_id][] = $relationship_section->section_id;
-        }
-
-        return $result;
+        return section::repository()
+            ->join([section_relationship::TABLE, 'sr'], 'id', 'sr.section_id')
+            ->where_in('activity_id', $activity_ids)
+            ->where_in('sr.core_relationship_id', $core_relationship_ids)
+            ->select(['sr.section_id', 'activity_id', 'sr.core_relationship_id'])
+            ->get(true);
     }
 
     /**

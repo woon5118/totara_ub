@@ -33,7 +33,7 @@ use mod_perform\state\participant_instance\participant_instance_availability;
 use mod_perform\state\participant_instance\participant_instance_progress;
 use mod_perform\state\state;
 use mod_perform\state\state_aware;
-use totara_core\relationship\relationship;
+use totara_core\relationship\relationship as relationship_model;
 
 /**
  * Class participant_instance
@@ -131,11 +131,11 @@ class participant_instance extends model {
     /**
      * Get the core relationship.
      *
-     * @return relationship
+     * @return relationship_model
      */
-    public function get_core_relationship(): relationship {
-        $relationship_entity = $this->entity->activity_relationship->relationship;
-        return (new relationship($relationship_entity));
+    public function get_core_relationship(): relationship_model {
+        $relationship_entity = $this->entity->core_relationship;
+        return (new relationship_model($relationship_entity));
     }
 
     /**

@@ -29,7 +29,7 @@ use core\orm\entity\entity;
 use core\orm\entity\relations\belongs_to;
 use core\orm\entity\relations\has_many;
 use core\orm\entity\relations\has_one_through;
-use totara_core\entities\relationship;
+use totara_core\entities\relationship as core_relationship;
 
 /**
  * Subject instance id
@@ -108,8 +108,7 @@ class subject_instance extends entity {
      */
     public function participant_instances(): has_many {
         return $this->has_many(participant_instance::class, 'subject_instance_id')
-            ->left_join([activity_relationship::TABLE, 'ar'], 'activity_relationship_id', 'ar.id')
-            ->left_join([relationship::TABLE, 'cr'], 'ar.core_relationship_id', 'cr.id')
+            ->left_join([core_relationship::TABLE, 'cr'], 'core_relationship_id', 'cr.id')
             ->order_by('cr.id');
     }
 

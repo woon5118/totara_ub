@@ -24,7 +24,6 @@
 namespace mod_perform\entities\activity;
 
 use core\orm\entity\repository;
-use mod_perform\models\activity\activity as activity_model;
 use mod_perform\models\activity\track_status;
 use mod_perform\state\activity\active;
 

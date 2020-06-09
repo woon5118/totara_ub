@@ -55,9 +55,9 @@ use mod_perform\state\participant_section\not_started;
 use mod_perform\task\service\subject_instance_creation;
 use mod_perform\user_groups\grouping;
 use mod_perform\util;
-use totara_core\entities\relationship_resolver;
-use totara_core\relationship\relationship;
-use totara_core\relationship\relationship_provider;
+use totara_core\entities\relationship_resolver as core_relationship_resolver;
+use totara_core\relationship\relationship as core_relationship;
+use totara_core\relationship\relationship_provider as core_relationship_provider;
 use totara_core\relationship\resolvers\subject;
 use totara_job\job_assignment;
 use totara_job\relationship\resolvers\appraiser;
@@ -117,8 +117,7 @@ class mod_perform_generator extends component_generator_base {
                 track::create($activity);
             }
 
-            if (
-                !isset($data['create_section']) ||
+            if (!isset($data['create_section']) ||
                 (isset($data['create_section']) && $data['create_section'] == 'true')
             ) {
                 section::create($activity);
@@ -278,7 +277,7 @@ class mod_perform_generator extends component_generator_base {
      */
     public function create_section_relationship_from_name(array $data): void {
         $relationship_name = strtolower($data['relationship']);
-        $relationships = relationship_provider::fetch_all_relationships();
+        $relationships = core_relationship_provider::fetch_all_relationships();
         foreach ($relationships as $relationship) {
             if (strtolower($relationship->get_name()) === $relationship_name) {
                 $this->create_section_relationship(
@@ -304,33 +303,33 @@ class mod_perform_generator extends component_generator_base {
     }
 
     public function create_section_relationship(section $section, array $data): section_relationship_model {
-        $relationship = $this->get_relationship($data['class_name']);
+        $core_relationship = core_relationship_provider::get_by_class($data['class_name']);
         return section_relationship_model::create(
             $section->get_id(),
-            $relationship->id,
+            $core_relationship->id,
             true
         );
     }
 
-    public function get_relationship(string $class_name): relationship {
-        if (!isset($this->cache['relationships'][$class_name])) {
-            /** @var relationship_resolver|null $resolver */
-            $resolver = relationship_resolver::repository()
+    public function get_core_relationship(string $class_name): core_relationship {
+        if (!isset($this->cache['core_relationships'][$class_name])) {
+            /** @var core_relationship_resolver|null $resolver */
+            $resolver = core_relationship_resolver::repository()
                 ->with('relationship')
                 ->where('class_name', $class_name)
                 ->order_by('id')
                 ->first();
 
             if (isset($resolver)) {
-                $relationship = relationship::load_by_entity($resolver->relationship);
+                $core_relationship = core_relationship::load_by_entity($resolver->relationship);
             } else {
-                $relationship = relationship::create([$class_name]);
+                $core_relationship = core_relationship::create([$class_name]);
             }
 
-            $this->cache['relationships'][$class_name] = $relationship;
+            $this->cache['core_relationships'][$class_name] = $core_relationship;
         }
 
-        return $this->cache['relationships'][$class_name];
+        return $this->cache['core_relationships'][$class_name];
     }
 
     /**
@@ -620,7 +619,7 @@ class mod_perform_generator extends component_generator_base {
         $subjects_participant_instance = null;
         if ($subject_is_participating) {
             $subjects_participant_instance = new participant_instance_entity();
-            $subjects_participant_instance->activity_relationship_id = 0; // stubbed
+            $subjects_participant_instance->core_relationship_id = 0; // stubbed
             $subjects_participant_instance->participant_id = $subject->id; // Answering on activity about them self
             $subjects_participant_instance->subject_instance_id = $subject_instance->id;
             $subjects_participant_instance->progress = instance_not_started::get_code();
@@ -630,7 +629,7 @@ class mod_perform_generator extends component_generator_base {
         $other_participant_instance = null;
         if ($other_participant) {
             $other_participant_instance = new participant_instance_entity();
-            $other_participant_instance->activity_relationship_id = 0; // stubbed
+            $other_participant_instance->core_relationship_id = 0; // stubbed
             $other_participant_instance->participant_id = $other_participant->id;
             $other_participant_instance->subject_instance_id = $subject_instance->id;
             $other_participant_instance->progress = instance_not_started::get_code();
@@ -668,25 +667,25 @@ class mod_perform_generator extends component_generator_base {
 
             if ($subject_is_participating) {
                 $subject_relationship = $this->create_section_relationship($section1, ['class_name' => subject::class]);
-                $subjects_participant_instance->activity_relationship_id = $subject_relationship->activity_relationship_id;
+                $subjects_participant_instance->core_relationship_id = $subject_relationship->core_relationship_id;
                 $subjects_participant_instance->save();
             }
 
             if ($other_participant) {
                 $manager_relationship = $this->create_section_relationship($section1, ['class_name' => manager::class]);
-                $other_participant_instance->activity_relationship_id = $manager_relationship->activity_relationship_id;
+                $other_participant_instance->core_relationship_id = $manager_relationship->core_relationship_id;
                 $other_participant_instance->save();
             }
 
             if ($subject_is_participating) {
                 $subject_relationship = $this->create_section_relationship($section1, ['class_name' => subject::class]);
-                $subjects_participant_instance->activity_relationship_id = $subject_relationship->activity_relationship_id;
+                $subjects_participant_instance->core_relationship_id = $subject_relationship->core_relationship_id;
                 $subjects_participant_instance->save();
             }
 
             if ($other_participant) {
                 $manager_relationship = $this->create_section_relationship($section1, ['class_name' => manager::class]);
-                $other_participant_instance->activity_relationship_id = $manager_relationship->activity_relationship_id;
+                $other_participant_instance->core_relationship_id = $manager_relationship->core_relationship_id;
                 $other_participant_instance->save();
             }
         }
@@ -731,16 +730,16 @@ class mod_perform_generator extends component_generator_base {
      *
      * @param user|object $participant_user
      * @param int $subject_instance_id
-     * @param int $activity_relationship_id
+     * @param int $core_relationship_id
      * @return participant_instance_entity
      */
     public function create_participant_instance(
         $participant_user,
         int $subject_instance_id,
-        int $activity_relationship_id
+        int $core_relationship_id
     ): participant_instance_entity {
         $participant_instance = new participant_instance_entity();
-        $participant_instance->activity_relationship_id = $activity_relationship_id;
+        $participant_instance->core_relationship_id = $core_relationship_id;
         $participant_instance->participant_id = $participant_user->id;
         $participant_instance->subject_instance_id = $subject_instance_id;
         $participant_instance->progress = not_started::get_code();
@@ -755,7 +754,7 @@ class mod_perform_generator extends component_generator_base {
      * @param stdClass|user $participant_user
      * @param int $subject_instance_id
      * @param section $section
-     * @param int $activity_relationship_id
+     * @param int $core_relationship_id
      * @return participant_section_entity
      */
     public function create_participant_instance_and_section(
@@ -763,10 +762,10 @@ class mod_perform_generator extends component_generator_base {
         $participant_user,
         int $subject_instance_id,
         section $section,
-        int $activity_relationship_id
+        int $core_relationship_id
     ): participant_section {
         $participant_instance = $this->create_participant_instance(
-            $participant_user, $subject_instance_id, $activity_relationship_id
+            $participant_user, $subject_instance_id, $core_relationship_id
         );
 
         return $this->create_participant_section($activity, $participant_instance, false, $section);
@@ -894,7 +893,7 @@ class mod_perform_generator extends component_generator_base {
             $manager_appraiser_user,
             $subject_instance->id,
             $section,
-            $manager_section_relationship->activity_relationship_id
+            $manager_section_relationship->core_relationship_id
         );
 
         $appraiser_section = $this->create_participant_instance_and_section(
@@ -902,7 +901,7 @@ class mod_perform_generator extends component_generator_base {
             $manager_appraiser_user,
             $subject_instance->id,
             $section,
-            $appraiser_section_relationship->activity_relationship_id
+            $appraiser_section_relationship->core_relationship_id
         );
 
         $subject_section = $this->create_participant_instance_and_section(
@@ -910,7 +909,7 @@ class mod_perform_generator extends component_generator_base {
             $subject_user,
             $subject_instance->id,
             $section,
-            $subject_section_relationship->activity_relationship_id
+            $subject_section_relationship->core_relationship_id
         );
 
         return [$subject_section, $manager_section, $appraiser_section];

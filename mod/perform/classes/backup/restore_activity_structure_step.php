@@ -337,7 +337,6 @@ class restore_activity_structure_step extends \restore_activity_structure_step {
 
         //$data->participant_id = $this->get_mappingid('user', $data->participant_id);
         $data->subject_instance_id = $this->get_mappingid('perform_subject_instance', $data->subject_instance_id);
-        $data->activity_relationship_id = $this->get_mappingid('perform_relationship', $data->activity_relationship_id);
 
         // Keeping or moving these times makes little sense, but it is the expected Moodle way...
         $data->created_at = $this->apply_date_offset($data->created_at);
