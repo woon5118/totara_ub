@@ -1270,7 +1270,6 @@ function import_certification($importname, $importtime) {
     }
 
     // Now get the records to import. If one user/cert combination has multiple records, the most recent will be first.
-    $params = array_merge(array('assignmenttype' => ASSIGNTYPE_INDIVIDUAL), $importsqlparams);
     $sql = "SELECT DISTINCT i.id as importid,
                     i.completiondateparsed AS importcompletiondate,
                     i.duedate AS importduedate,
@@ -1285,8 +1284,9 @@ function import_certification($importname, $importtime) {
             JOIN {prog} p ON p.id = i.certificationid
             JOIN {certif} c ON c.id = p.certifid
             JOIN {user} u ON u.username = i.username
-            {$importsqlwhere}";
-    $recordstoprocess = $DB->get_recordset_sql($sql, $params);
+            {$importsqlwhere}
+            ORDER BY progid, userid, importcompletiondate DESC";
+    $recordstoprocess = $DB->get_recordset_sql($sql, $importsqlparams);
 
     // If there are no records to process, return.
     if (!$recordstoprocess->valid()) {
