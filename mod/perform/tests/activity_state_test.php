@@ -133,7 +133,7 @@ class mod_perform_activity_state_testcase extends advanced_testcase {
     }
 
 
-    public function test_can_activate_with_unsatisfied_conditions() {
+    public function test_cant_activate_with_unsatisfied_conditions() {
         $user = $this->getDataGenerator()->create_user();
 
         $this->setUser($user);
@@ -183,6 +183,53 @@ class mod_perform_activity_state_testcase extends advanced_testcase {
 
         $this->assertTrue($invalid_draft_activity->can_potentially_activate());
         $this->assertTrue($invalid_draft_activity->can_activate());
+    }
+
+
+    public function test_cant_activate_without_any_relationships() {
+        $user = $this->getDataGenerator()->create_user();
+
+        $this->setUser($user);
+
+        // Now lets create an activity which does not satisfy the conditions
+        // (at least one section with at least on question and one relationship)
+        $invalid_draft_activity = $this->create_activity();
+
+        // The user has the capability and the activity is in draft, so potentially can be activated
+        $this->assertTrue($invalid_draft_activity->can_potentially_activate());
+        // But not really as the conditions are not satisfied
+        $this->assertFalse($invalid_draft_activity->can_activate());
+
+        // Having a section won't change anything
+        $perform_generator = $this->generator();
+        $section = $perform_generator->create_section($invalid_draft_activity, ['title' => 'Test section 1']);
+
+        $invalid_draft_activity->refresh(true);
+
+        $this->assertTrue($invalid_draft_activity->can_potentially_activate());
+        $this->assertFalse($invalid_draft_activity->can_activate());
+
+        $invalid_draft_activity->refresh(true);
+
+        $this->assertTrue($invalid_draft_activity->can_potentially_activate());
+        $this->assertFalse($invalid_draft_activity->can_activate());
+
+        // Same with a section element
+        $element = $perform_generator->create_element(['title' => 'Question one']);
+        $perform_generator->create_section_element($section, $element);
+
+        $invalid_draft_activity->refresh(true);
+
+        $this->assertTrue($invalid_draft_activity->can_potentially_activate());
+        $this->assertFalse($invalid_draft_activity->can_activate());
+
+        // Finally, with a track and assignment we have everything in place EXCEPT relationships
+        $perform_generator->create_single_activity_track_and_assignment($invalid_draft_activity);
+
+        $invalid_draft_activity->refresh(true);
+
+        $this->assertTrue($invalid_draft_activity->can_potentially_activate());
+        $this->assertFalse($invalid_draft_activity->can_activate());
     }
 
     /**

@@ -171,9 +171,9 @@ class section extends model {
     /**
      * Get any array of all section elements in this section, indexed and sorted by sort_order
      *
-     * @return section_element[]
+     * @return collection|section_element[]
      */
-    public function get_section_elements(): array {
+    public function get_section_elements(): collection {
         $section_element_models = [];
 
         foreach ($this->entity->section_elements as $section_element_entity) {
@@ -183,7 +183,7 @@ class section extends model {
 
         ksort($section_element_models);
 
-        return $section_element_models;
+        return new collection($section_element_models);
     }
 
     /**
@@ -206,6 +206,7 @@ class section extends model {
 
     /**
      * Get section elements summary
+     *
      * @return stdClass
      */
     public function get_section_elements_summary(): stdClass {
@@ -298,11 +299,11 @@ class section extends model {
         $section_elements = $this->get_section_elements();
 
         // If there are no items then sorting can't be invalid.
-        if (empty($section_elements)) {
+        if ($section_elements->count() < 1) {
             return;
         }
 
-        $sort_orders = array_unique(array_column($section_elements, 'sort_order'));
+        $sort_orders = array_unique($section_elements->pluck('sort_order'));
 
         if (count($sort_orders) != count($section_elements)) {
             throw new coding_exception('Section element sort orders are not unique!');
@@ -310,7 +311,7 @@ class section extends model {
 
         sort($sort_orders);
 
-        if (reset($sort_orders) != 1 or end($sort_orders) != count($sort_orders)) {
+        if (reset($sort_orders) != 1 || end($sort_orders) != count($sort_orders)) {
             throw new coding_exception('Section element sort orders are not consecutive starting at 1!');
         }
     }
@@ -366,7 +367,6 @@ class section extends model {
                     $section_element->update_sort_order($i);
                 }
             }
-
             // No need to validate sort orders because we've just resorted everything.
         });
     }

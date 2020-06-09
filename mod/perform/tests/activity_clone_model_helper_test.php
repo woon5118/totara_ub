@@ -97,11 +97,11 @@ class mod_perform_activity_clone_model_helper_testcase extends advanced_testcase
 
             $old_section_relationships = $old_section->get_section_relationships();
             $new_section_relationships = $new_section->get_section_relationships();
-            $this->assertEquals(count($old_section_relationships), count($new_section_relationships));
+            $this->assertSameSize($old_section_relationships, $new_section_relationships);
 
             $old_section_elements = $old_section->get_section_elements();
-            $new_section_elements = \core\collection::new($new_section->get_section_elements());
-            $this->assertEquals(count($old_section_elements), count($new_section_elements));
+            $new_section_elements = $new_section->get_section_elements();
+            $this->assertSameSize($old_section_elements, $new_section_elements);
 
             /** @var section_element $old_section_element */
             foreach ($old_section_elements as $section_element_key => $old_section_element) {
@@ -109,7 +109,7 @@ class mod_perform_activity_clone_model_helper_testcase extends advanced_testcase
                     $this->fail('Section element was not cloned');
                 }
                 $this->assertEquals($old_section_element->sort_order, $new_section_element->sort_order);
-                unset($old_section_elements[$section_element_key]);
+                $old_section_elements->__unset($section_element_key);
             }
             $this->assertEmpty($old_section_elements);
 
@@ -119,11 +119,11 @@ class mod_perform_activity_clone_model_helper_testcase extends advanced_testcase
 
         $old_relationships = $activity->get_relationships();
         $new_relationships = $new_activity->get_relationships();
-        $this->assertEquals(count($old_relationships), count($new_relationships));
+        $this->assertSameSize($old_relationships, $new_relationships);
 
         $old_tracks = $activity->get_tracks();
         $new_tracks = $new_activity->get_tracks();
-        $this->assertEquals(count($old_tracks), count($new_tracks));
+        $this->assertSameSize($old_tracks, $new_tracks);
 
         /** @var track $new_track */
         if (!$new_track = $new_tracks->find('activity_id', $new_activity->get_id())) {
@@ -136,7 +136,7 @@ class mod_perform_activity_clone_model_helper_testcase extends advanced_testcase
 
         $old_track_assignments = $old_track->get_assignments();
         $new_track_assignments = $new_track->get_assignments();
-        $this->assertEquals(count($old_track_assignments), count($new_track_assignments));
+        $this->assertSameSize($old_track_assignments, $new_track_assignments);
     }
 
     public function test_backup_covers_all_tables_and_fields() {

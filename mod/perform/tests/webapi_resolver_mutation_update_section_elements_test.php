@@ -318,7 +318,7 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
         $context = $this->create_webapi_context(self::MUTATION);
         $result = update_section_elements::resolve($args, $context);
 
-        $section_elements = $section->get_section_elements();
+        $section_elements = $section->get_section_elements()->all(true);
 
         $args = [
             'input' => [
@@ -410,7 +410,7 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
         $context = $this->create_webapi_context(self::MUTATION);
         $result = update_section_elements::resolve($args, $context);
 
-        $section_elements = $section->get_section_elements();
+        $section_elements = $section->get_section_elements()->all(true);
 
         $args = [
             'input' => [
@@ -538,7 +538,7 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
         $context = $this->create_webapi_context(self::MUTATION);
         $result = update_section_elements::resolve($args, $context);
 
-        $section_elements = $section->get_section_elements();
+        $section_elements = $section->get_section_elements()->all(true);
 
         $element4 = $perform_generator->create_element([
             'title' => 'Test title 5',

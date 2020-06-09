@@ -44,7 +44,8 @@ class at_least_one_section_with_question_and_relationship extends condition {
         foreach ($sections as $section) {
             $relationships = $section->get_section_relationships();
             $section_elements = $section->get_section_elements();
-            if (!empty($relationships) && !empty($section_elements)) {
+
+            if ($relationships->count() >= 1 && $section_elements->count() >= 1) {
                 return true;
             }
         }
