@@ -22,6 +22,7 @@
  */
 
 use core\orm\query\order;
+use mod_perform\dates\schedule_constants;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\entities\activity\subject_instance;
 use mod_perform\entities\activity\track as track_entity;
@@ -36,6 +37,7 @@ use mod_perform\state\activity\draft;
 use mod_perform\state\subject_instance\complete;
 use mod_perform\task\service\subject_instance_creation;
 use mod_perform\task\service\subject_instance_dto;
+use mod_perform\task\service\track_schedule_sync;
 use mod_perform\user_groups\grouping;
 use totara_job\job_assignment;
 
@@ -392,7 +394,7 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
     }
 
     public function test_repeating_type_after_creation() {
-        $track = $this->create_single_track_with_two_assignments();
+        $track = $this->create_single_track_with_assignments(2);
 
         // Set repeat to one day after creation.
         $track->set_repeating_enabled(
@@ -428,7 +430,7 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
     }
 
     public function test_repeating_type_after_creation_when_complete() {
-        $track = $this->create_single_track_with_two_assignments();
+        $track = $this->create_single_track_with_assignments(2);
 
         // Set repeat to one day after creation.
         $track->set_repeating_enabled(
@@ -468,7 +470,7 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
     }
 
     public function test_repeating_type_after_completion() {
-        $track = $this->create_single_track_with_two_assignments();
+        $track = $this->create_single_track_with_assignments(2);
 
         // Set repeat to one day after completion.
         $track->set_repeating_enabled(
@@ -506,7 +508,7 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
     }
 
     public function test_repeating_limit() {
-        $track = $this->create_single_track_with_two_assignments();
+        $track = $this->create_single_track_with_assignments(2);
 
         // Set repeat to one day after creation, limit 2.
         $track->set_repeating_enabled(
@@ -588,14 +590,57 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
         $this->assert_subject_instance_count(1, $subject_instance_2->subject_user_id);
     }
 
+    public function test_due_date_disabled() {
+        $track = $this->create_single_track_with_assignments(1);
+        $track->set_due_date_disabled();
+        $track->update();
+
+        (new subject_instance_creation())->generate_instances();
+        /** @var subject_instance $subject_instance */
+        $subject_instance = subject_instance::repository()->one();
+        $this->assertNull($subject_instance->due_date);
+    }
+
+    public function test_due_date_fixed() {
+        $track = $this->create_single_track_with_assignments(1);
+        $yesterday = time() - 86400;
+        $tomorrow = time() + 86400;
+        $day_after_tomorrow = time() + (2 * 86400);
+        $track->set_schedule_closed_fixed($yesterday, $tomorrow);
+        $track->set_due_date_fixed($day_after_tomorrow);
+        $track->update();
+
+        // Also need to run schedule sync because we changed creation range.
+        (new track_schedule_sync())->sync_all();
+        (new subject_instance_creation())->generate_instances();
+        /** @var subject_instance $subject_instance */
+        $subject_instance = subject_instance::repository()->one();
+        $this->assertEquals($day_after_tomorrow, $subject_instance->due_date);
+    }
+
+    public function test_due_date_relative() {
+        $track = $this->create_single_track_with_assignments(1);
+        $day_after_tomorrow = (new \DateTimeImmutable('now', new DateTimeZone('utc')))
+            ->modify('+ 2 day')
+            ->getTimestamp();
+        $track->set_due_date_relative(2, track_entity::SCHEDULE_DYNAMIC_UNIT_DAY);
+        $track->update();
+
+        (new subject_instance_creation())->generate_instances();
+        /** @var subject_instance $subject_instance */
+        $subject_instance = subject_instance::repository()->one();
+        $this->assertGreaterThanOrEqual($day_after_tomorrow, $subject_instance->due_date);
+    }
+
     /**
+     * @param int $num_users
      * @return track
      */
-    private function create_single_track_with_two_assignments(): track {
+    private function create_single_track_with_assignments(int $num_users): track {
         $generator = $this->perform_generator();
         $config = mod_perform_activity_generator_configuration::new()
             ->disable_subject_instances()
-            ->set_number_of_users_per_user_group_type(2);
+            ->set_number_of_users_per_user_group_type($num_users);
         /** @var activity_model $activity */
         $activity = $generator->create_full_activities($config)->first();
         /** @var track $track */

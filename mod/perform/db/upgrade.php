@@ -1419,5 +1419,29 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020061001, 'perform');
     }
 
+    if ($oldversion < 2020061100) {
+
+        // Define field due_date to be added to perform_subject_instance.
+        $table = new xmldb_table('perform_subject_instance');
+        $field = new xmldb_field('due_date', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'job_assignment_id');
+
+        // Conditionally launch add field due_date.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define index due_date (not unique) to be added to perform_subject_instance.
+        $table = new xmldb_table('perform_subject_instance');
+        $index = new xmldb_index('due_date', XMLDB_INDEX_NOTUNIQUE, array('due_date'));
+
+        // Conditionally launch add index due_date.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020061100, 'perform');
+    }
+
     return true;
 }

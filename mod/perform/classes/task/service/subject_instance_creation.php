@@ -53,10 +53,13 @@ class subject_instance_creation {
             if (!$this->is_it_time_for_a_new_subject_instance($user_assignment)) {
                 continue;
             }
+            $now = time();
             $subject_instance = new subject_instance();
             $subject_instance->track_user_assignment_id = $user_assignment->id;
             $subject_instance->subject_user_id = $user_assignment->subject_user_id;
             $subject_instance->job_assignment_id = $user_assignment->job_assignment_id;
+            $subject_instance->created_at = $now;
+            $subject_instance->due_date = $this->calculate_due_date($user_assignment, $now);
             $subject_instance->save();
 
             $dtos->append(subject_instance_dto::create_from_entity($subject_instance));
@@ -64,6 +67,33 @@ class subject_instance_creation {
 
         $hook = new subject_instances_created($dtos);
         $hook->execute();
+    }
+
+    /**
+     * @param track_user_assignment $user_assignment
+     * @param int $reference_date
+     * @return int|null
+     */
+    private function calculate_due_date(track_user_assignment $user_assignment, int $reference_date): ?int {
+        if (!$user_assignment->due_date_is_enabled) {
+            return null;
+        }
+
+        if ($user_assignment->due_date_is_fixed) {
+            return $user_assignment->due_date_fixed;
+        }
+
+        $adjuster_relative_unit = track_model::mapped_value_to_string(
+            $user_assignment->due_date_relative_unit,
+            track_model::get_dynamic_schedule_units(),
+            'due date relative unit'
+        );
+        return (new relative_date_adjuster())->adjust(
+            $user_assignment->due_date_relative_count,
+            $adjuster_relative_unit,
+            schedule_constants::AFTER,
+            $reference_date
+        );
     }
 
     /**
