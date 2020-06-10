@@ -135,7 +135,7 @@
               v-for="participantInstance in respondAsOptions"
               :key="participantInstance.core_relationship.id"
               :value="participantInstance.core_relationship.id"
-              :name="participantInstance.core_relationship.name"
+              name="relationshipToRespondAs"
             >
               {{
                 $str(

@@ -86,9 +86,8 @@ Feature: Viewing and responding to perform activities
 
     When I click on "single user manager-appraiser" "button"
     Then I should see "Select relationship to continue" in the ".tui-modalContent" "css_element"
-    And the following fields match these values:
-      | Manager (Not yet started)   | 1 |
-      | Appraiser (Not yet started) | 0 |
+    And the "Manager (Not yet started)" radio button is selected
+    And the "Appraiser (Not yet started)" radio button is not selected
 
     When I click on "Continue" "button"
     Then I should see "single user manager-appraiser" in the ".tui-performUserActivity h2" "css_element"
@@ -104,11 +103,10 @@ Feature: Viewing and responding to perform activities
 
     When I click on "single user manager-appraiser" "button"
     Then I should see "Select relationship to continue" in the ".tui-modalContent" "css_element"
-    And the following fields match these values:
-      | Manager (Complete)          | 1 |
-      | Appraiser (Not yet started) | 0 |
+    And the "Manager (Complete)" radio button is selected
+    And the "Appraiser (Not yet started)" radio button is not selected
 
-    When I click on the "Appraiser" tui radio
+    When I click on the "3" tui radio in the "relationshipToRespondAs" tui radio group
     And I click on "Continue" "button"
     Then I should see "single user manager-appraiser" in the ".tui-performUserActivity h2" "css_element"
     And I should see perform activity relationship to user "Appraiser"
@@ -123,9 +121,8 @@ Feature: Viewing and responding to perform activities
 
     When I click on "single user manager-appraiser" "button"
     Then I should see "Select relationship to continue" in the ".tui-modalContent" "css_element"
-    And the following fields match these values:
-      | Manager (Complete)   | 1 |
-      | Appraiser (Complete) | 0 |
+    And the "Manager (Complete)" radio button is selected
+    And the "Appraiser (Complete)" radio button is not selected
 
     When I click on "Continue" "button"
     Then I should see "single user manager-appraiser" in the ".tui-performUserActivity h2" "css_element"

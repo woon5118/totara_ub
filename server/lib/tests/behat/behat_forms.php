@@ -602,5 +602,29 @@ class behat_forms extends behat_base {
         $csstarget = ".form-autocomplete-downarrow";
         $this->execute('behat_general::i_click_on', [$csstarget, 'css_element']);
     }
-    
+
+    /**
+     * Validate that the specific radio button (is|is not) selected
+     *
+     * @Given /^the "(?P<radio>(?:[^"]|\\")*)" radio button (is|is not) selected$/
+     * @param string $radio Radio button we look for
+     * @param string $not
+     */
+    public function the_radio_button_is_selected($radio, string $not) {
+        \behat_hooks::set_step_readonly(true);
+
+        $expected = $not === 'is';
+
+        // Gets the node based on the requested selector type and locator.
+        $node = $this->get_selected_node('radio', $radio);
+        $is_selected = $node->isSelected();
+
+        if ($expected != $is_selected) {
+            $msg = 'The "' . $radio . '" radio button is ' . ($is_selected ? '' : ' not') . ' selected when expected to ' .
+                ($expected ? '' : 'not ') . 'be' ;
+            throw new ExpectationException($msg, $this->getSession());
+        }
+    }
+
+
 }

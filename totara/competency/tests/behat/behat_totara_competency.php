@@ -310,7 +310,7 @@ class behat_totara_competency extends behat_base {
     /**
      * @Given /^I (should|should not) see "(?P<pathway_type>(?:[^"]|\\")*)" pathway$/
      * @Given /^I (should|should not) see "(?P<pathway_type>(?:[^"]|\\")*)" pathway "(before|after)" criteria groups$/
-     * @param string $n
+     * @param string $not
      * @param string $pathway_type
      * @param string|null $position
      * @throws Exception
