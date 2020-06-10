@@ -43,7 +43,7 @@ class core_calendar_rrule_manager_testcase extends advanced_testcase {
     /** @var calendar_event a dummy event */
     protected $event;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->event = null;
 
         parent::tearDown();
@@ -52,7 +52,7 @@ class core_calendar_rrule_manager_testcase extends advanced_testcase {
     /**
      * Set up method.
      */
-    protected function setUp() {
+    protected function setUp(): void {
         global $DB;
         $this->resetAfterTest();
 

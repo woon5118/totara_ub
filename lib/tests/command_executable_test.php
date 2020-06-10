@@ -46,7 +46,7 @@ class core_command_executable_testcase extends advanced_testcase {
         return $CFG->dirroot . '/lib/tests/notarealfile';
     }
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
         global $CFG;
@@ -56,7 +56,7 @@ class core_command_executable_testcase extends advanced_testcase {
         }
     }
 
-    public function tearDown() {
+    public function tearDown(): void {
         global $CFG;
 
         if (isset($this->cfg_pcntl_phpclipath)) {

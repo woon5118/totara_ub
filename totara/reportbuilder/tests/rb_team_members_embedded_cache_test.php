@@ -60,7 +60,7 @@ class totara_reportbuilder_rb_team_members_embedded_cache_testcase extends repor
     // Work data
     protected $users = array();
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->report_builder_data = null;
         $this->report_builder_columns_data = null;
         $this->report_builder_settings_data = null;
@@ -77,7 +77,7 @@ class totara_reportbuilder_rb_team_members_embedded_cache_testcase extends repor
      * - Make users1 as manager for users2,5
      *
      */
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setup();
 
         // Common parts of test cases:

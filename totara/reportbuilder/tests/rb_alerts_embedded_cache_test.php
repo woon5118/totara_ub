@@ -53,7 +53,7 @@ class totara_reportbuilder_rb_alerts_embedded_cache_testcase extends reportcache
     /**
      * Prepare mock data for testing
      */
-    protected function setUp() {
+    protected function setUp(): void {
         global $DB;
 
         parent::setup();
@@ -98,7 +98,7 @@ class totara_reportbuilder_rb_alerts_embedded_cache_testcase extends reportcache
     /**
      * Remove mock data
      */
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->report_builder_data = null;
         $this->report_builder_columns_data = null;
         $this->user1 = null;

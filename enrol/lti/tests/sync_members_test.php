@@ -59,7 +59,7 @@ class enrol_lti_sync_members_testcase extends advanced_testcase {
     /** @var  ResourceLink $resourcelink */
     protected $resourcelink;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->task = null;
         $this->tool = null;
         $this->members = null;
@@ -69,7 +69,7 @@ class enrol_lti_sync_members_testcase extends advanced_testcase {
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         $this->resetAfterTest();
 
         // Set this user as the admin.

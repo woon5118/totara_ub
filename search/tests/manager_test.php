@@ -41,12 +41,12 @@ class search_manager_testcase extends advanced_testcase {
     protected $forumpostareaid = null;
     protected $mycoursesareaid = null;
 
-    public function setUp() {
+    public function setUp(): void {
         $this->forumpostareaid = \core_search\manager::generate_areaid('mod_forum', 'post');
         $this->mycoursesareaid = \core_search\manager::generate_areaid('core_course', 'mycourse');
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->forumpostareaid = null;
         $this->mycoursesareaid = null;
         // Stop it from faking time in the search manager (if set by test).

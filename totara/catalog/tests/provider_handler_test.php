@@ -46,13 +46,13 @@ class totara_catalog_provider_handler_testcase extends config_base_testcase {
      */
     private $provider_handler = null;
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
         $this->provider_handler = provider_handler::instance();
     }
 
-    public function tearDown() {
+    public function tearDown(): void {
         $this->provider_handler = null;
         parent::tearDown();
     }

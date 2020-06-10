@@ -57,7 +57,7 @@ class totara_cohort_position_rules_testcase extends advanced_testcase {
     private $dateformat = '';
     const TEST_POSITION_COUNT_MEMBERS = 23;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->pos1 = null;
         $this->pos2 = null;
         $this->pos3 = null;
@@ -85,7 +85,7 @@ class totara_cohort_position_rules_testcase extends advanced_testcase {
      *
      * pos3 ----> user1, user5, user7, user11, user13, user17, user19, user23.
      */
-    public function setUp() {
+    public function setUp(): void {
         global $DB;
 
         parent::setup();

@@ -44,13 +44,13 @@ class totara_userdata_export_request_testcase extends advanced_testcase {
      */
     private $systemcontext = null;
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         $this->systemcontext = context_system::instance();
         $this->filestorage = get_file_storage();
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->filestorage = null;
         $this->systemcontext = null;
 

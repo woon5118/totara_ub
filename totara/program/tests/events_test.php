@@ -43,14 +43,14 @@ class totara_program_events_testcase extends advanced_testcase {
     private $program = null;
     private $user = null;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->program_generator = null;
         $this->program = null;
         $this->user = null;
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setup();
         $this->resetAfterTest(true);
         $this->program_generator = $this->getDataGenerator()->get_plugin_generator('totara_program');

@@ -37,7 +37,7 @@ class backup_step_testcase extends advanced_testcase {
     protected $userid;      // user record used for testing
 
     // Totara: resolve dependencies for the tests
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
 
         global $CFG;
@@ -45,7 +45,7 @@ class backup_step_testcase extends advanced_testcase {
         require_once($CFG->dirroot . '/backup/moodle2/backup_custom_fields.php');
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->moduleid = null;
         $this->sectionid = null;
         $this->courseid = null;
@@ -54,7 +54,7 @@ class backup_step_testcase extends advanced_testcase {
         parent::tearDown();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         global $DB, $CFG;
         parent::setUp();
 

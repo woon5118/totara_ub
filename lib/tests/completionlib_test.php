@@ -35,7 +35,7 @@ class core_completionlib_testcase extends advanced_testcase {
     protected $module1;
     protected $module2;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->course = null;
         $this->user = null;
         $this->module1 = null;

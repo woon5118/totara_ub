@@ -66,7 +66,7 @@ class totara_reportbuilder_rb_catalogcourses_embedded_cache_testcase extends rep
     protected $course3 = null;
     protected $course4 = null;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->report_builder_data = null;
         $this->report_builder_columns_data = null;
         $this->report_builder_filters_data = null;
@@ -86,7 +86,7 @@ class totara_reportbuilder_rb_catalogcourses_embedded_cache_testcase extends rep
      * Common part of all test cases:
      * - Add four courses
      */
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setup();
 
         // Common parts of test cases:

@@ -30,7 +30,7 @@ require_once(__DIR__ . '/fixtures/testable_antivirus.php');
 class core_antivirus_testcase extends advanced_testcase {
     protected $tempfile;
 
-    protected function setUp() {
+    protected function setUp(): void {
         global $CFG;
         // Use our special testable fixture plugin.
         $CFG->antiviruses = 'testable';
@@ -43,7 +43,7 @@ class core_antivirus_testcase extends advanced_testcase {
         touch($this->tempfile);
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         @unlink($this->tempfile);
         $this->tempfile = null;
         parent::tearDown();

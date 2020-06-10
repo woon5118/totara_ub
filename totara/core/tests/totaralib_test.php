@@ -32,7 +32,7 @@ require_once($CFG->dirroot . '/completion/cron.php');
 class totara_core_totaralib_testcase extends advanced_testcase {
     protected $user, $manager, $teamleader, $appraiser, $invaliduserid = 9999;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->user = null;
         $this->manager = null;
         $this->teamleader = null;
@@ -41,7 +41,7 @@ class totara_core_totaralib_testcase extends advanced_testcase {
         parent::tearDown();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
 
         $this->user = $this->getDataGenerator()->create_user();

@@ -33,6 +33,7 @@ Thumbs.db
 _notes
 diff.log
 phpunit.xml
+.phpunit.result.cache
 phpcs.xml
 # Composer support - only composer.json is to be in git, the rest is installed in each checkout.
 composer.phar

@@ -42,13 +42,13 @@ class block_totara_featured_links_tile_base_all_tiles_testcase extends test_help
     /**
      * Gets executed before every test case.
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $this->blockgenerator = $this->getDataGenerator()->get_plugin_generator('block_totara_featured_links');
         $this->tile_types = \core_component::get_namespace_classes('tile', 'block_totara_featured_links\tile\base');
     }
 
-    public function tearDown() {
+    public function tearDown(): void {
         parent::tearDown();
         $this->blockgenerator = null;
         $this->tile_types = null;

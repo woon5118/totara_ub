@@ -103,7 +103,7 @@ class tool_totara_sync_comp_csv_emptyfields_setting_testcase extends totara_sync
         'aggregationmethod' => 2
     );
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->config = null;
         $this->comp_framework_data1 = null;
         $this->comp_framework_data2 = null;
@@ -115,7 +115,7 @@ class tool_totara_sync_comp_csv_emptyfields_setting_testcase extends totara_sync
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
 
         $this->resetAfterTest(true);

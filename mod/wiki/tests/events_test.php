@@ -41,7 +41,7 @@ class mod_wiki_events_testcase extends advanced_testcase {
     private $student;
     private $teacher;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->course = null;
         $this->wiki = null;
         $this->wikigenerator = null;
@@ -53,7 +53,7 @@ class mod_wiki_events_testcase extends advanced_testcase {
     /**
      * Setup test data.
      */
-    public function setUp() {
+    public function setUp(): void {
         global $DB;
 
         $this->resetAfterTest();

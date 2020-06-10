@@ -69,7 +69,7 @@ class tool_totara_sync_comp_partial_sync_testcase extends advanced_testcase {
         'evidencecount' => 0,
     );
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->element = null;
         $this->comp_framework_data1 = null;
         $this->comp_data1 = null;
@@ -79,7 +79,7 @@ class tool_totara_sync_comp_partial_sync_testcase extends advanced_testcase {
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
 
         $this->resetAfterTest(true);

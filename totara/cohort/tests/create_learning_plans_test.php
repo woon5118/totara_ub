@@ -44,7 +44,7 @@ class totara_cohort_create_learning_plans_testcase extends advanced_testcase {
     /**
      * Common set up for all the tests in the file.
      */
-    public function setUp(){
+    public function setUp(): void {
         global $DB;
 
         parent::setup();
@@ -86,7 +86,7 @@ class totara_cohort_create_learning_plans_testcase extends advanced_testcase {
     /**
      * Clear down the class variables so they don't hog any memory.
      */
-    public function tearDown() {
+    public function tearDown(): void {
 
         $this->user = array();
         $this->cohort = null;

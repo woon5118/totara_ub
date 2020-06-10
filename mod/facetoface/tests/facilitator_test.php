@@ -40,14 +40,14 @@ class mod_facetoface_facilitator_testcase extends advanced_testcase {
 
     private $cfprefix = 'facetofacefacilitator', $cftableprefix = 'facetoface_facilitator';
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->facetoface_generator = null;
         $this->customfield_generator = null;
         $this->cfprefix = null;
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
 
         $this->facetoface_generator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');

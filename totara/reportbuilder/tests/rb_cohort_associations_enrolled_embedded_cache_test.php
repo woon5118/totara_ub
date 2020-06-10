@@ -63,7 +63,7 @@ class totara_reportbuilder_rb_cohort_associations_enrolled_embedded_cache_testca
 
     protected static $ind = 0;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->report_builder_data = null;
         $this->report_builder_columns_data = null;
         $this->report_builder_filters_data = null;
@@ -89,7 +89,7 @@ class totara_reportbuilder_rb_cohort_associations_enrolled_embedded_cache_testca
      * - Course2 has no enrolments
      *
      */
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setup();
         $this->setAdminUser();
         $this->getDataGenerator()->reset();

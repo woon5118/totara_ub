@@ -41,7 +41,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
     /** @var $rb reportbuilder */
     public $rb, $user, $shortname, $filter1, $filter4, $column1, $column4, $savedsearch;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->rb = null;
         $this->user = null;
         $this->shortname = null;
@@ -54,7 +54,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         parent::tearDown();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         global $DB;
         parent::setup();
         $this->setAdminUser();

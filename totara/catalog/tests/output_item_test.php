@@ -41,7 +41,7 @@ defined('MOODLE_INTERNAL') || die();
 class totara_catalog_output_item_testcase extends advanced_testcase {
     private $redirecturls = [];
 
-    public function tearDown() {
+    public function tearDown(): void {
         $this->redirecturls = null;
     }
 

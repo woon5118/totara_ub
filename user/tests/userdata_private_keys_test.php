@@ -37,7 +37,7 @@ class core_user_userdata_private_keys_test extends advanced_testcase {
     /**
      * Include necessary file.
      */
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
 
         global $CFG;
@@ -47,7 +47,7 @@ class core_user_userdata_private_keys_test extends advanced_testcase {
     /**
      * set up tests
      */
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
 
         $this->resetAfterTest(true);

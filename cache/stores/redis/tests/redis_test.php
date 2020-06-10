@@ -54,7 +54,7 @@ class cachestore_redis_test extends cachestore_tests {
         return 'cachestore_redis';
     }
 
-    public function setUp() {
+    public function setUp(): void {
         if (!cachestore_redis::are_requirements_met() || !defined('TEST_CACHESTORE_REDIS_TESTSERVERS')) {
             $this->markTestSkipped('Could not test cachestore_redis. Requirements are not met.');
         }
@@ -64,7 +64,7 @@ class cachestore_redis_test extends cachestore_tests {
         cache_config_testing::create_default_configuration();
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         if ($this->store instanceof cachestore_redis) {
             $this->store->purge();
         }
@@ -75,7 +75,7 @@ class cachestore_redis_test extends cachestore_tests {
     /**
      * Final task is to reset the cache system
      */
-    public static function tearDownAfterClass() {
+    public static function tearDownAfterClass(): void {
         cache_factory::reset();
         parent::tearDownAfterClass();
     }

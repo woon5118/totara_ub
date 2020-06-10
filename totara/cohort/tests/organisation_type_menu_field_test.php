@@ -56,7 +56,7 @@ extends advanced_testcase {
     private $number_assigned = 10;
 
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->cohorts = null;
         $this->audience = null;
         $this->rules = null;
@@ -101,7 +101,7 @@ extends advanced_testcase {
     /**
      * PhpUnit fixture method that runs after the test method executes.
      */
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setup();
         $this->resetAfterTest(true);
         $this->setAdminUser();

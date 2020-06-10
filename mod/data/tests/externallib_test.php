@@ -80,7 +80,7 @@ class mod_data_external_testcase extends externallib_advanced_testcase {
     /** @var stdClass Teacher role. */
     protected $teacherrole;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->database = null;
         $this->context = null;
         $this->course = null;
@@ -97,7 +97,7 @@ class mod_data_external_testcase extends externallib_advanced_testcase {
     /**
      * Set up for every test
      */
-    protected function setUp() {
+    protected function setUp(): void {
         global $DB;
         $this->resetAfterTest();
         $this->setAdminUser();

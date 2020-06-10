@@ -45,7 +45,7 @@ class totara_program_program_completion_testcase extends reportcache_advanced_te
     public $numtestprogs = 10;
     public $numtestcerts = 7;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->users = null;
         $this->programs = null;
         $this->certifications = null;

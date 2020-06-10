@@ -30,7 +30,7 @@ class mod_facetoface_seminar_testcase extends \advanced_testcase {
     /**
      * Set up tests.
      */
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
     }

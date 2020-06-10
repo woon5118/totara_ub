@@ -77,7 +77,7 @@ class totara_reportbuilder_rb_plan_programs_embedded_cache_testcase extends repo
      * - User3 is not added to any programs
      *
      */
-    protected function setUp() {
+    protected function setUp(): void {
         global $DB;
 
         parent::setup();
@@ -120,7 +120,7 @@ class totara_reportbuilder_rb_plan_programs_embedded_cache_testcase extends repo
         assign_capability('totara/plan:accessanyplan', CAP_ALLOW, $rolecoursecreator->id, $syscontext);
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->report_builder_data = null;
         $this->report_builder_columns_data = null;
         $this->report_builder_filters_data = null;

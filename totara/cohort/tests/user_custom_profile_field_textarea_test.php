@@ -50,7 +50,7 @@ class totara_cohort_user_custom_profile_field_textarea_testcase extends advanced
     protected $profilevegetableid;
     const TEST_USER_COUNT_MEMBERS = 53;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->cohort_generator = null;
         $this->cohort = null;
         $this->ruleset = null;
@@ -58,7 +58,7 @@ class totara_cohort_user_custom_profile_field_textarea_testcase extends advanced
         parent::tearDown();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         global $DB;
 
         parent::setup();

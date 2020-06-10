@@ -34,7 +34,7 @@ class totara_core_certification_visibility_testcase extends advanced_testcase {
 
     private const CAP = 'totara/certification:viewhiddencertifications';
 
-    public function setUp() {
+    public function setUp(): void {
         global $CFG;
         require_once($CFG->dirroot . '/totara/core/totara.php');
         parent::setUp();

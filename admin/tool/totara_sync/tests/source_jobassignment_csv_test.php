@@ -31,7 +31,7 @@ require_once($CFG->dirroot . '/admin/tool/totara_sync/sources/source_jobassignme
  */
 class tool_totara_sync_source_jobassignment_csv_testcase extends advanced_testcase {
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
         $this->preventResetByRollback();

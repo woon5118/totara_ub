@@ -59,7 +59,7 @@ class mod_facetoface_query_filter_testcase extends advanced_testcase {
     /** @var context */
     protected $context;
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $this->generator = $this->getDataGenerator();
         $this->facetoface_generator = $this->generator->get_plugin_generator('mod_facetoface');
@@ -69,7 +69,7 @@ class mod_facetoface_query_filter_testcase extends advanced_testcase {
         $this->context = context_module::instance($f2f->cmid);
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->context = null;
         $this->seminar = null;
         $this->course = null;

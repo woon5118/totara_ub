@@ -69,7 +69,7 @@ class mod_forum_userdata_tracking_testcase extends advanced_testcase {
     /**
      * Prepare general fixtures for the following tests
      */
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
 
         $this->resetAfterTest(true);
@@ -105,7 +105,7 @@ class mod_forum_userdata_tracking_testcase extends advanced_testcase {
     /**
      * Clear any properties
      */
-    protected function tearDown() {
+    protected function tearDown(): void {
         // We must clear the subscription caches. This has to be done both before each test, and after in case of other
         // tests using these functions.
         \mod_forum\subscriptions::reset_forum_cache();

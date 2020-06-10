@@ -27,12 +27,12 @@ defined('MOODLE_INTERNAL') || die();
 
 class core_dml_testcase extends database_driver_testcase {
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->prefix = null;
         parent::tearDown();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         $dbman = $this->tdb->get_manager(); // Loads DDL libs.
     }

@@ -37,7 +37,7 @@ defined('MOODLE_INTERNAL') || die();
  * Class mod_facetoface_signup_states_testcase
  */
 class mod_facetoface_signup_states_testcase extends advanced_testcase {
-    protected function setUp() {
+    protected function setUp(): void {
         $this->setAdminUser();
     }
 

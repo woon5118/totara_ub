@@ -58,7 +58,7 @@ class tool_usertours_role_filter_testcase extends advanced_testcase {
      */
     protected $roles;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->course = null;
         $this->student = null;
         $this->teacher = null;
@@ -67,7 +67,7 @@ class tool_usertours_role_filter_testcase extends advanced_testcase {
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         global $DB;
 
         $this->resetAfterTest(true);

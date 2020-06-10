@@ -37,7 +37,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 class core_badges_userdata_backpack_testcase extends advanced_testcase {
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
 
         global $CFG;

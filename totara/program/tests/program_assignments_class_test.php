@@ -37,14 +37,14 @@ class totara_program_program_assignments_class_testcase extends advanced_testcas
     /** @var totara_program_generator $program_generator */
     private $program_generator;
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
 
         global $CFG;
         require_once($CFG->dirroot . '/totara/program/program_assignments.class.php');
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
 
@@ -52,7 +52,7 @@ class totara_program_program_assignments_class_testcase extends advanced_testcas
         $this->program_generator = $this->data_generator->get_plugin_generator('totara_program');
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->data_generator = null;
         $this->program_generator = null;
 

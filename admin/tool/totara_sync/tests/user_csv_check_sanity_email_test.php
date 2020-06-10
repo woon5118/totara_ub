@@ -63,7 +63,7 @@ class tool_totara_sync_user_csv_check_email_sanity_testcase extends totara_sync_
     protected $sourcename   = 'totara_sync_source_user_csv';
     protected $source       = null;
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
 
         global $CFG;
@@ -73,7 +73,7 @@ class tool_totara_sync_user_csv_check_email_sanity_testcase extends totara_sync_
         require_once($CFG->dirroot . '/user/profile/lib.php');
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->filedir      = null;
         $this->configcsv    = null;
         $this->config       = null;
@@ -82,7 +82,7 @@ class tool_totara_sync_user_csv_check_email_sanity_testcase extends totara_sync_
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $this->setAdminUser();
 

@@ -31,7 +31,7 @@ defined('MOODLE_INTERNAL') || die();
 class totara_core_dml_testcase extends database_driver_testcase {
     protected $olddboptions = null;
 
-    public function tearDown() {
+    public function tearDown(): void {
         // Set our dboptions back to their initial values.
         if (isset($this->olddboptions)) {
             $reflection = new ReflectionClass($this->tdb);

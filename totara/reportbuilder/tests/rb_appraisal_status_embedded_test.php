@@ -36,7 +36,7 @@ class totara_reportbuilder_rb_appraisal_status_embedded_testcase extends advance
     /**
      * Prepare mock data for testing.
      */
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setup();
         $this->setAdminUser();
         $this->resetAfterTest(true);

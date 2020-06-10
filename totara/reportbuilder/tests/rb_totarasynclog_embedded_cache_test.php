@@ -68,7 +68,7 @@ class totara_reportbuilder_rb_totarasynclog_embedded_cache_testcase extends repo
     protected $logs = null;
     protected static $ind = 0;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->report_builder_data = null;
         $this->report_builder_columns_data = null;
         $this->report_builder_filters_data = null;
@@ -83,7 +83,7 @@ class totara_reportbuilder_rb_totarasynclog_embedded_cache_testcase extends repo
      * - Prepare 10 sync log records
      * - Record 3 and 5 has word 'critical'
      */
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setup();
         $this->setAdminUser();
         $this->loadDataSet($this->createArrayDataSet(array('report_builder' => array($this->report_builder_data),

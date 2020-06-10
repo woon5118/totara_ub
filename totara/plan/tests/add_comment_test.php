@@ -38,7 +38,7 @@ class totara_plan_add_comment_testcase extends advanced_testcase {
     /** @var testing_data_generator $datagenerator */
     private $datagenerator = null;
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setup();
 
         $this->resetAfterTest();
@@ -47,7 +47,7 @@ class totara_plan_add_comment_testcase extends advanced_testcase {
         $this->plangenerator = $this->datagenerator->get_plugin_generator('totara_plan');
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->datagenerator = null;
         $this->plangenerator = null;
         parent::tearDown();

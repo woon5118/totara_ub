@@ -66,7 +66,7 @@ class tool_totara_sync_org_partial_sync_testcase extends advanced_testcase {
         'timecreated' => 0, 'timemodified' => 0, 'usermodified' => 2, 'totarasync' => 1
     );
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->filedir = null;
         $this->configcsv = null;
         $this->config = null;
@@ -78,7 +78,7 @@ class tool_totara_sync_org_partial_sync_testcase extends advanced_testcase {
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         global $CFG;
 
         parent::setUp();

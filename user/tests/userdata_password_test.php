@@ -38,7 +38,7 @@ class core_user_userdata_password_testcase extends \advanced_testcase {
     /**
      * Set up some stuff.
      */
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         global $CFG;
 
         parent::setUpBeforeClass();

@@ -43,7 +43,7 @@ class totara_reportbuilder_templates_testcase extends advanced_testcase {
      */
     private $accessmodes;
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
 
         $this->graphtypes = array('column', 'line', 'bar', 'pie', 'scatter', 'area', 'doughnut', 'progress');
@@ -51,7 +51,7 @@ class totara_reportbuilder_templates_testcase extends advanced_testcase {
         $this->accessmodes = array(REPORT_BUILDER_ACCESS_MODE_NONE, REPORT_BUILDER_ACCESS_MODE_ANY, REPORT_BUILDER_ACCESS_MODE_ALL);
     }
 
-    public function tearDown() {
+    public function tearDown(): void {
         $this->graphtypes = null;
         $this->contentmodes = null;
         $this->accessmodes = null;

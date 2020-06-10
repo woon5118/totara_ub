@@ -65,7 +65,7 @@ class totara_reportbuilder_rb_plan_programs_recurring_embedded_cache_testcase ex
      * - Add user1 to program1
      * - Add user2 to program1 and program2
      */
-    protected function setUp() {
+    protected function setUp(): void {
         global $DB;
 
         parent::setup();
@@ -114,7 +114,7 @@ class totara_reportbuilder_rb_plan_programs_recurring_embedded_cache_testcase ex
         assign_capability('totara/plan:accessanyplan', CAP_ALLOW, $rolecoursecreator->id, $syscontext);
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->report_builder_data = null;
         $this->report_builder_columns_data = null;
         $this->user1 = null;

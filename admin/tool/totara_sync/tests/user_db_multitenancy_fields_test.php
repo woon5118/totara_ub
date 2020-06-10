@@ -46,7 +46,7 @@ class tool_totara_sync_user_db_multitenancy_fields_testcase extends totara_sync_
     /** @var totara_tenant_generator $tenantgenerator */
     protected $tenantgenerator  = null;
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
 
         global $CFG;
@@ -55,7 +55,7 @@ class tool_totara_sync_user_db_multitenancy_fields_testcase extends totara_sync_
         require_once($CFG->dirroot . '/admin/tool/totara_sync/sources/source_user_database.php');
     }
 
-    public function tearDown() {
+    public function tearDown(): void {
         $this->config           = null;
         $this->configdatabase   = null;
         $this->elementname      = null;
@@ -66,7 +66,7 @@ class tool_totara_sync_user_db_multitenancy_fields_testcase extends totara_sync_
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $this->setAdminUser();
 

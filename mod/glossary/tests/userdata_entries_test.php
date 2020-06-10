@@ -38,13 +38,13 @@ class core_user_userdata_entries_test extends advanced_testcase {
     /**
      * Set up tests.
      */
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
 
         $this->resetAfterTest(true);
     }
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
 
         global $CFG;

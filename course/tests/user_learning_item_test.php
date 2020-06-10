@@ -32,7 +32,7 @@ class core_course_user_learning_item_testcase extends advanced_testcase {
     private $course1, $course2, $course3, $course4, $course5, $course6;
     private $user1;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->generator = null;
         $this->completion_generator = null;
         $this->course1 = $this->course2 = $this->course3 = $this->course4 = $this->course5 = $this->course6 = null;
@@ -40,7 +40,7 @@ class core_course_user_learning_item_testcase extends advanced_testcase {
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         global $DB;
 
         $this->resetAfterTest(true);

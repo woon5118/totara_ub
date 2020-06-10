@@ -45,7 +45,7 @@ class totara_cohort_certification_date_rules_testcase extends totara_cohort_cert
     public $cohort                     = null;
     public $ruleset                    = null;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->program_generator        = null;
         $this->cohort_generator         = null;
         $this->user_groups              = null;
@@ -59,7 +59,7 @@ class totara_cohort_certification_date_rules_testcase extends totara_cohort_cert
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         global $DB;
 
         parent::setup();

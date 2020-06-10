@@ -56,7 +56,7 @@ class mod_feedback_events_testcase extends advanced_testcase {
     /** @var  stdClass value associated with $eventfeedbackitem . */
     private $eventfeedbackvalue;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->eventuser = null;
         $this->eventcourse = null;
         $this->eventfeedback = null;
@@ -67,7 +67,7 @@ class mod_feedback_events_testcase extends advanced_testcase {
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         global $DB;
 
         $this->setAdminUser();

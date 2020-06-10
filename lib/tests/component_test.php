@@ -36,7 +36,7 @@ class core_component_testcase extends advanced_testcase {
     // always verify that it does not collide with any existing add-on modules and subplugins!!!
     const SUBSYSTEMCOUNT = 62;
 
-    public function setUp() {
+    public function setUp(): void {
         $psr0namespaces = new ReflectionProperty('core_component', 'psr0namespaces');
         $psr0namespaces->setAccessible(true);
         $this->oldpsr0namespaces = $psr0namespaces->getValue(null);
@@ -45,7 +45,7 @@ class core_component_testcase extends advanced_testcase {
         $psr4namespaces->setAccessible(true);
         $this->oldpsr4namespaces = $psr4namespaces->getValue(null);
     }
-    protected function tearDown() {
+    protected function tearDown(): void {
         $psr0namespaces = new ReflectionProperty('core_component', 'psr0namespaces');
         $psr0namespaces->setAccessible(true);
         $psr0namespaces->setValue(null, $this->oldpsr0namespaces);

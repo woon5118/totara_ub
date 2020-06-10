@@ -50,7 +50,7 @@ abstract class orm_entity_testcase extends advanced_testcase {
     /**
      * Remove the created table after test
      */
-    protected function tearDown() {
+    protected function tearDown(): void {
         parent::tearDown();
         $this->drop_table();
     }

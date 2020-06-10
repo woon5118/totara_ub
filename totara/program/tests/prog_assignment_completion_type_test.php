@@ -42,7 +42,7 @@ class totara_program_prog_assignment_completion_type_testcase extends reportcach
     private $programgenerator, $programs, $positiongenerator, $positions, $courses;
     private $beforesetuptime, $aftersetuptime;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->users = null;
         $this->dates = null;
         $this->userfields = null;

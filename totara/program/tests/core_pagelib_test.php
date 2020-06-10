@@ -39,7 +39,7 @@ class totara_program_core_pagelib_testcase extends advanced_testcase {
      */
     private $second_theme = 'base';
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
 

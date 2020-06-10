@@ -34,7 +34,7 @@ class totara_core_messaging_testcase extends advanced_testcase {
 
     private $user1, $user2, $user3, $manager1, $manager2;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->plangenerator = null;
         $this->programgenerator = null;
         $this->user1 = $this->user2 = $this->user3 = null;
@@ -43,7 +43,7 @@ class totara_core_messaging_testcase extends advanced_testcase {
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setup();
 
         $this->programgenerator = $this->getDataGenerator()->get_plugin_generator('totara_program');

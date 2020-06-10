@@ -39,7 +39,7 @@ const COMPLETION_TEST_COURSES_CREATED = 3;
 
 class core_completion_course_completion_testcase extends advanced_testcase {
 
-    protected function setUp() {
+    protected function setUp(): void {
         global $CFG;
         parent::setup();
 

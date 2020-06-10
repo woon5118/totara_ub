@@ -152,13 +152,13 @@ class totara_core_xml_testcase extends advanced_testcase {
 
     private $defaultloadersetting;
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
 
         $this->defaultloadersetting = libxml_disable_entity_loader(false);
     }
 
-    public function tearDown() {
+    public function tearDown(): void {
         libxml_disable_entity_loader($this->defaultloadersetting);
         $this->defaultloadersetting = null;
         parent::tearDown();

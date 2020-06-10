@@ -48,7 +48,7 @@ class mod_lti_userdata_tool_testcase extends advanced_testcase {
     /**
      * {@inheritdoc}
      */
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         global $CFG;
 
         parent::setUpBeforeClass();

@@ -46,7 +46,7 @@ class totara_cohort_user_custom_profile_field_date_testcase extends advanced_tes
 
     protected $cohort_generator;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->profiledate1 = null;
         $this->profiledate2 = null;
         $this->profiledate3 = null;
@@ -55,7 +55,7 @@ class totara_cohort_user_custom_profile_field_date_testcase extends advanced_tes
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         $this->resetAfterTest();
         parent::setup();
 

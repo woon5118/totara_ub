@@ -92,13 +92,13 @@ class totara_reportbuilder_rb_global_restriction_set_testcase extends advanced_t
         ON base.instancetype = associations.instancetype AND base.instanceid = associations.instanceid
  WHERE ef_419295f028_insid = ? AND ef_419295f028_type = ?";
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         global $CFG;
         parent::setUpBeforeClass();
         require_once("$CFG->dirroot/totara/reportbuilder/classes/rb_global_restriction_set.php");
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->restr1 = null;
         $this->restr2 = null;
         $this->restrallusers = null;
@@ -113,7 +113,7 @@ class totara_reportbuilder_rb_global_restriction_set_testcase extends advanced_t
         parent::tearDown();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         global $DB, $CFG;
         parent::setUp();
 

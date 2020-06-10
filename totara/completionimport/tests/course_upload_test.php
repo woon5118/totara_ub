@@ -41,13 +41,13 @@ class totara_completionimport_course_upload_testcase extends advanced_testcase {
 
     protected $user1, $course1;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->user1 = null;
         $this->course1 = null;
         parent::tearDown();
     }
 
-    public function setup() {
+    public function setUp(): void {
         set_config('enablecompletion', 1);
 
         $datagen = $this->getDataGenerator();

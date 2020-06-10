@@ -54,7 +54,7 @@ class tool_totara_sync_pos_csv_check_sanity_testcase extends totara_sync_csv_tes
         'usermodified'      => 2
     ];
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->filedir                      = null;
         $this->configcsv                    = null;
         $this->config                       = null;
@@ -64,7 +64,7 @@ class tool_totara_sync_pos_csv_check_sanity_testcase extends totara_sync_csv_tes
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         global $CFG;
 
         parent::setUp();

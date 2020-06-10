@@ -54,7 +54,7 @@ class totara_reportbuilder_rb_global_restriction_core_testcase extends advanced_
      */
     protected $reportgen = null;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->user = null;
         $this->uservis = null;
         $this->usernonvis = null;
@@ -63,7 +63,7 @@ class totara_reportbuilder_rb_global_restriction_core_testcase extends advanced_
         parent::tearDown();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         global $CFG;
         parent::setUp();
 

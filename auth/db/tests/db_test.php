@@ -34,7 +34,7 @@ class auth_db_db_testcase extends advanced_testcase {
     /** @var int The amount of users to create for the large user set deletion test  */
     protected $largedeletionsetsize = 128;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->oldlog = null;
         $this->largedeletionsetsize = null;
         parent::tearDown();

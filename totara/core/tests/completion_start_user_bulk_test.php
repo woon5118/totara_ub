@@ -38,7 +38,7 @@ class totara_core_completion_start_user_bulk_testcase extends advanced_testcase 
     protected $course2;
     protected $course3;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->user1 = null;
         $this->user2 = null;
         $this->course1 = null;
@@ -47,7 +47,7 @@ class totara_core_completion_start_user_bulk_testcase extends advanced_testcase 
         parent::tearDown();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         set_config('enablecompletion', 1);
 

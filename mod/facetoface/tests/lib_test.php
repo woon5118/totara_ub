@@ -71,7 +71,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
     /** @var totara_customfield_generator */
     protected $customfield_generator;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->facetoface_generator = null;
         $this->customfield_generator = null;
         $this->facetoface_data = null;
@@ -111,7 +111,7 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         set_config('noreplyaddress', 'noreply@example.com');
         $this->facetoface_generator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');

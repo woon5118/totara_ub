@@ -58,7 +58,7 @@ class totara_core_clone_db_testcase extends advanced_testcase {
         $this->assertNull(totara_get_clone_db(true));
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         global $CFG;
 
         unset($CFG->clone_dbname);

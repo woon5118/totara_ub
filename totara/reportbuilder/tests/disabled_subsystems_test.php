@@ -38,7 +38,7 @@ class totara_reportbuilder_disabled_subsystems_testcase extends advanced_testcas
     /**
      * Do the setup.
      */
-    protected function setUp() {
+    protected function setUp(): void {
         global $DB;
         parent::setup();
         $this->setAdminUser();
@@ -53,7 +53,7 @@ class totara_reportbuilder_disabled_subsystems_testcase extends advanced_testcas
     /**
      * Tear down
      */
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->embedded_reports_id = null;
         parent::tearDown();
     }

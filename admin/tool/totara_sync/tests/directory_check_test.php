@@ -33,7 +33,7 @@ class tool_totara_sync_directory_check_testcase extends advanced_testcase {
 
     private $filedir = null;
 
-    public function setUp() {
+    public function setUp(): void {
         global $CFG;
 
         parent::setup();
@@ -42,7 +42,7 @@ class tool_totara_sync_directory_check_testcase extends advanced_testcase {
         $this->filedir = $CFG->dataroot . '/totara_sync';
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->filedir = null;
         parent::tearDown();
     }

@@ -73,7 +73,7 @@ class totara_reportbuilder_rb_plan_objectives_embedded_cache_testcase extends re
     protected $plan3 = null;
     protected $objectives = array();
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->report_builder_data = null;
         $this->report_builder_columns_data = null;
         $this->report_builder_filters_data = null;
@@ -96,7 +96,7 @@ class totara_reportbuilder_rb_plan_objectives_embedded_cache_testcase extends re
      * - Create plan2 and plan3 by user2
      * - Add 2 objectives to each plan
      */
-    protected function setUp() {
+    protected function setUp(): void {
         global $DB;
 
         parent::setup();

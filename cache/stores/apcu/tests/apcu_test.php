@@ -40,7 +40,7 @@ class cachestore_apcu_test extends cachestore_tests {
     /**
      * Set things back to the default before each test.
      */
-    public function setUp() {
+    public function setUp(): void {
         if (!cachestore_apcu::are_requirements_met()) {
             $this->markTestSkipped('Could not test cachestore_apcu. Requirements are not met.');
         }
@@ -53,7 +53,7 @@ class cachestore_apcu_test extends cachestore_tests {
     /**
      * Final task is to reset the cache system
      */
-    public static function tearDownAfterClass() {
+    public static function tearDownAfterClass(): void {
         cache_factory::reset();
         parent::tearDownAfterClass();
     }

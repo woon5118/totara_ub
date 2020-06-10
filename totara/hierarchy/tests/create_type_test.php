@@ -30,12 +30,12 @@ class totara_hierarchy_create_type_testcase extends advanced_testcase {
 
     protected $hierarchy_generator = null;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->hierarchy_generator = null;
         parent::tearDown();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setup();
         $this->resetAfterTest(true);
         $this->setAdminUser();

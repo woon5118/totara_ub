@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 class core_medialib_testcase extends advanced_testcase {
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->ext = null;
         $this->rank = null;
         $this->num = null;
@@ -40,7 +40,7 @@ class core_medialib_testcase extends advanced_testcase {
     /**
      * Pre-test setup. Preserves $CFG.
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
 
         // Reset $CFG and $SERVER.

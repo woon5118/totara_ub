@@ -37,7 +37,7 @@ class core_collator_testcase extends advanced_testcase {
     /**
      * Prepares things for this test case.
      */
-    protected function setUp() {
+    protected function setUp(): void {
         global $SESSION;
         parent::setUp();
         $SESSION->lang = 'en'; // Make sure we test en language to get consistent results, hopefully all systems have this locale.

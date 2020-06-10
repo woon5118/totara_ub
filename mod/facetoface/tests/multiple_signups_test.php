@@ -39,7 +39,7 @@ class mod_facetoface_multiple_signups_testcase extends \advanced_testcase {
     /**
      * Set up tests.
      */
-    protected function setUp() {
+    protected function setUp(): void {
         global $DB;
 
         parent::setUp();

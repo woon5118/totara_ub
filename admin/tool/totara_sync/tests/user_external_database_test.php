@@ -146,7 +146,7 @@ class tool_totara_sync_user_external_database_testcase extends advanced_testcase
         ),
     );
 
-    public function setUp() {
+    public function setUp(): void {
         global $CFG;
 
         parent::setup();
@@ -235,7 +235,7 @@ class tool_totara_sync_user_external_database_testcase extends advanced_testcase
         }
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         if (isset($this->ext_dbconnection)) {
             if ($this->configexists) {
                 // Drop sync table.

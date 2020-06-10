@@ -42,7 +42,7 @@ class mod_forum_maildigest_testcase extends advanced_testcase {
      * Set up message and mail sinks, and set up other requirements for the
      * cron to be tested here.
      */
-    public function setUp() {
+    public function setUp(): void {
         global $CFG;
 
         $this->helper = new stdClass();
@@ -81,7 +81,7 @@ class mod_forum_maildigest_testcase extends advanced_testcase {
     /**
      * Clear the message sinks set up in this test.
      */
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->helper->messagesink->clear();
         $this->helper->messagesink->close();
 

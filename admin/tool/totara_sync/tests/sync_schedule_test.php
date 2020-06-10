@@ -32,12 +32,12 @@ require_once($CFG->admin . '/tool/totara_sync/locallib.php');
  */
 class test_sync_schedule extends advanced_testcase {
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         parent::tearDown();
     }
 

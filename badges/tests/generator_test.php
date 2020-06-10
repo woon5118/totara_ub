@@ -31,7 +31,7 @@ require_once("{$CFG->dirroot}/lib/badgeslib.php");
  */
 class core_badges_generator_testcase extends advanced_testcase {
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
 
         global $CFG;

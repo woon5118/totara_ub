@@ -29,7 +29,7 @@ use totara_job\job_assignment;
  */
 class totara_hierarchy_update_competencies_task_testcase extends advanced_testcase {
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         global $CFG;
         parent::setUpBeforeClass();
         require_once($CFG->dirroot . '/totara/hierarchy/prefix/competency/evidence/lib.php');

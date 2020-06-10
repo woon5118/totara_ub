@@ -37,7 +37,7 @@ class core_eventslib_testcase extends advanced_testcase {
      * (meaning they should run on a brand new site). This means several items of
      * data have to be artificially inseminated (:-) in the DB.
      */
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         // Set global category settings to -1 (not force).
         eventslib_sample_function_handler('reset');

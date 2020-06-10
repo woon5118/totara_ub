@@ -48,7 +48,7 @@ class enrol_lti_tool_provider_testcase extends advanced_testcase {
      */
     protected $tool;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->tool = null;
         $this->success = null;
         parent::tearDown();
@@ -59,7 +59,7 @@ class enrol_lti_tool_provider_testcase extends advanced_testcase {
      *
      * This is executed before running any tests in this file.
      */
-    public function setUp() {
+    public function setUp(): void {
         global $SESSION;
         $this->resetAfterTest();
 

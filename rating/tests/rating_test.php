@@ -39,14 +39,14 @@ class core_rating_testcase extends advanced_testcase {
     protected $neededcaps = array('view', 'viewall', 'viewany', 'rate');
     protected $originaldefaultfrontpageroleid;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->syscontext = null;
         $this->neededcaps = null;
         $this->originaldefaultfrontpageroleid = null;
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         global $CFG;
         parent::setUp();
 

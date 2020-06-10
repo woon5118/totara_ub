@@ -37,7 +37,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 class core_tag_totara_catalog_tag_feature_testcase extends \advanced_testcase {
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
     }

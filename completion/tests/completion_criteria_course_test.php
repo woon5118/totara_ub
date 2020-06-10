@@ -37,13 +37,13 @@ class completion_completion_criteria_course_test extends advanced_testcase {
     /** @var core_completion_generator $completion_generator */
     protected $completion_generator;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->generator = null;
         $this->completion_generator = null;
         parent::tearDown();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setup();
         $this->resetAfterTest();
 

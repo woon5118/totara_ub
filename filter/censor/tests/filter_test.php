@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 class filter_censor_filter_testcase extends advanced_testcase {
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         global $CFG;
         require_once($CFG->dirroot . '/filter/censor/filter.php');
         parent::setUpBeforeClass();

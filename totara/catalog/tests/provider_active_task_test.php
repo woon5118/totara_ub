@@ -32,14 +32,14 @@ class totara_catalog_provider_active_task_testcase extends advanced_testcase {
 
     private $provider_active_task = null;
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setup();
         $this->setAdminUser();
         $this->resetAfterTest();
         $this->provider_active_task = new provider_active_task();
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->provider_active_task = null;
         parent::tearDown();
     }

@@ -50,7 +50,7 @@ class block_current_learning_course_data_testcase extends block_current_learning
     private $course1;
     private $course2;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->generator = null;
         $this->program_generator = null;
         $this->user1 = null;
@@ -62,7 +62,7 @@ class block_current_learning_course_data_testcase extends block_current_learning
         parent::tearDown();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         global $CFG;
         parent::setUp();
 

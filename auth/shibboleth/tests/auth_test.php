@@ -23,7 +23,7 @@
 
 class auth_shibboleth_auth_testcase extends advanced_testcase {
 
-    protected function setUp() {
+    protected function setUp(): void {
         global $CFG;
         require_once($CFG->dirroot . '/auth/shibboleth/auth.php');
         parent::setUp();

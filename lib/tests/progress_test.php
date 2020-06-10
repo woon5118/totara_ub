@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 class core_progress_testcase extends basic_testcase {
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->updatecalled = null;
         $this->time = null;
         parent::tearDown();

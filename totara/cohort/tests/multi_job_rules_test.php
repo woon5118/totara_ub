@@ -62,7 +62,7 @@ class totara_cohort_multi_jobs_rules_testcase extends advanced_testcase {
     private $hierarchy_generator = null;
     const TEST_POSITION_COUNT_MEMBERS = 24;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->controluser = null;
         $this->man1 = null;
         $this->man2 = null;
@@ -119,7 +119,7 @@ class totara_cohort_multi_jobs_rules_testcase extends advanced_testcase {
      * | User 24 |   1   |        |       |   1   |        |       |   1   |        |       |
      * + --------+--------------------------------------------------------------------------+
      */
-    public function setUp() {
+    public function setUp(): void {
         global $DB;
 
         parent::setup();

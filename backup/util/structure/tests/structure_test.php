@@ -52,7 +52,7 @@ class backup_structure_testcase extends advanced_testcase {
     /** @var int Official contextid for these tests */
     protected $contextid;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->forumid = null;
         $this->discussionid1 = $this->discussionid2 = null;
         $this->postid1 = $this->postid2 = $this->postid3 = $this->postid4 = null;
@@ -61,7 +61,7 @@ class backup_structure_testcase extends advanced_testcase {
         parent::tearDown();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
 
         $this->resetAfterTest(true);

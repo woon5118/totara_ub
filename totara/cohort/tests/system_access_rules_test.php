@@ -44,7 +44,7 @@ class totara_cohort_system_access_rules_testcase extends advanced_testcase {
     private $userseven = array();
     private $cohort_generator = null;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->cohort = null;
         $this->ruleset = null;
         $this->usersodd = null;
@@ -53,7 +53,7 @@ class totara_cohort_system_access_rules_testcase extends advanced_testcase {
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         global $DB;
 
         parent::setup();

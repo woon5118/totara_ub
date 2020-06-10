@@ -42,14 +42,14 @@ class tool_totara_sync_user_csv_testcase extends advanced_testcase {
     private $configcsv = array();
     private $config = array();
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->filedir = null;
         $this->configcsv = null;
         $this->config = null;
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         global $CFG;
 
         parent::setup();

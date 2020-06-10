@@ -57,7 +57,7 @@ class totara_cohort_organisation_rules_testcase extends advanced_testcase {
     private $hierarchy_generator = null;
     const TEST_ORGANISATION_COUNT_MEMBERS = 23;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->org1 = null;
         $this->org2 = null;
         $this->org3 = null;
@@ -84,7 +84,7 @@ class totara_cohort_organisation_rules_testcase extends advanced_testcase {
      *
      * org3 ----> user1, user5, user7, user11, user13, user17, user19, user23.
      */
-    public function setUp() {
+    public function setUp(): void {
         global $DB;
 
         parent::setup();

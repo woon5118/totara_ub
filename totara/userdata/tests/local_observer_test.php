@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
  * Tests the observer class.
  */
 class totara_userdata_local_observer_testcase extends advanced_testcase {
-    public static function setUpBeforeClass(){
+    public static function setUpBeforeClass(): void {
         global $CFG;
         parent::setUpBeforeClass();
         require_once("$CFG->dirroot/user/lib.php");

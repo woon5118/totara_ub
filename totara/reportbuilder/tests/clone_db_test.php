@@ -205,7 +205,7 @@ class totara_reportbuilder_clone_db_testcase extends advanced_testcase {
         $this->assertSame($writes, $reportdb->perf_get_writes());
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         global $CFG;
 
         unset($CFG->clone_dbname);

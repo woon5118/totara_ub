@@ -41,7 +41,7 @@ class mustache_userdate_helper_testcase extends advanced_testcase {
     protected static $engine;
 
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
 
         global $CFG;
 

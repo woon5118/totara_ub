@@ -35,7 +35,7 @@ class tool_totara_sync_org_database_field_mapping_testcase extends totara_sync_d
     protected $elementname  = 'org';
     protected $sourcename   = 'totara_sync_source_org_database';
 
-    public function setUp() {
+    public function setUp(): void {
         $this->sourcetable = 'totara_sync_org_source';
 
         parent::setUp();
@@ -48,7 +48,7 @@ class tool_totara_sync_org_database_field_mapping_testcase extends totara_sync_d
         $this->create_external_db_table();
     }
 
-    public function tearDown() {
+    public function tearDown(): void {
         $this->elementname = null;
         $this->sourcetable = null;
 

@@ -60,7 +60,7 @@ class totara_program_rb_source_program_overview_testcase extends reportcache_adv
                         array('id' => 222, 'reportid' => 123, 'type' => 'prog', 'value' => 'id',
                               'sortorder' => 1, 'advanced' => 0));
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->load = null;
         $this->report_builder_data = null;
         $this->report_builder_columns_data = null;
@@ -68,7 +68,7 @@ class totara_program_rb_source_program_overview_testcase extends reportcache_adv
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         if (getenv('load')) {
             $this->load = true;
         }

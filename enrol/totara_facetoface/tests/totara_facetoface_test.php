@@ -49,7 +49,7 @@ class enrol_totara_facetoface_testcase extends advanced_testcase {
             'usermodified' => 2)
     );
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->pos_framework_data = null;
         $this->pos_data = null;
         parent::tearDown();

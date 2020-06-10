@@ -62,11 +62,11 @@ class qtype_numerical_form_test extends advanced_testcase {
 
     protected $form;
 
-    protected function setUp() {
+    protected function setUp(): void {
         $this->form = new test_qtype_numerical_edit_form();
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->form = null;
         parent::tearDown();
     }

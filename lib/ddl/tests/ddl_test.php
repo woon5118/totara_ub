@@ -31,13 +31,13 @@ class core_ddl_testcase extends database_driver_testcase {
     /** @var array table name => array of stdClass test records loaded into that table. Created in setUp. */
     private $records = array();
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->tables = null;
         $this->records = null;
         parent::tearDown();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         $dbman = $this->tdb->get_manager(); // Loads DDL libs.
 

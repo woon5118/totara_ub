@@ -33,7 +33,7 @@ class tool_monitor_task_check_subscriptions_testcase extends advanced_testcase {
     private $teacherrole;
     private $studentrole;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->course = null;
         $this->user = null;
         $this->rule = null;
@@ -46,7 +46,7 @@ class tool_monitor_task_check_subscriptions_testcase extends advanced_testcase {
     /**
      * Test set up.
      */
-    public function setUp() {
+    public function setUp(): void {
         global $DB;
         set_config('enablemonitor', 1, 'tool_monitor');
         $this->resetAfterTest(true);

@@ -35,7 +35,7 @@ class totara_customfield_multiselect_testcase extends advanced_testcase {
     private $prefix = 'course';
     private $tableprefix = 'course';
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->generator = null;
         $this->item_obj = null;
         $this->prefix = null;
@@ -43,7 +43,7 @@ class totara_customfield_multiselect_testcase extends advanced_testcase {
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         $this->generator = $this->getDataGenerator()->get_plugin_generator('totara_customfield');
 
         // Create an custom field item object.

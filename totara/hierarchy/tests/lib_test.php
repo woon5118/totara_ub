@@ -47,7 +47,7 @@ class totara_hierarchy_lib_testcase extends advanced_testcase {
     private $type_field_data, $type_data_data, $competency_data, $template_data, $template_assignment_data, $org_pos_data;
     private $relations_data, $scale_assignments_data, $plan_competency_assign_data, $plan_course_assign_data, $events_handlers_data;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->competency = null;
         $this->nofwid = null;
         $this->frame1 = $this->frame2 = null;
@@ -68,7 +68,7 @@ class totara_hierarchy_lib_testcase extends advanced_testcase {
         parent::tearDown();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         global $DB;
         parent::setup();
 

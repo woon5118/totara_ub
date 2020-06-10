@@ -35,7 +35,7 @@ class totara_catalog_param_processor_testcase extends advanced_testcase {
      */
     private $param_processor = null;
 
-    protected function setUp() {
+    protected function setUp(): void {
         global $PAGE;
         parent::setup();
         $PAGE->set_context(context_system::instance());
@@ -43,7 +43,7 @@ class totara_catalog_param_processor_testcase extends advanced_testcase {
         $this->param_processor = new param_processor();
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->param_processor = null;
         parent::tearDown();
     }

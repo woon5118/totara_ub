@@ -83,7 +83,7 @@ class mod_assign_base_testcase extends advanced_testcase {
     /** @var array $groups List of 10 groups in the course */
     protected $groups = null;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->course = null;
         $this->teachers = null;
         $this->editingteachers = null;
@@ -99,7 +99,7 @@ class mod_assign_base_testcase extends advanced_testcase {
     /**
      * Setup function - we will create a course and add an assign instance to it.
      */
-    protected function setUp() {
+    protected function setUp(): void {
         global $DB;
 
         $this->resetAfterTest(true);

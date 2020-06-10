@@ -33,12 +33,12 @@ class test_block_last_course_accessed extends advanced_testcase {
 
     private $compare_to;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->compare_to = null;
         parent::tearDown();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
 

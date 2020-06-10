@@ -35,7 +35,7 @@ class tool_totara_sync_comp_database_field_mapping_testcase extends totara_sync_
     protected $elementname  = 'comp';
     protected $sourcename   = 'totara_sync_source_comp_database';
 
-    public function setUp() {
+    public function setUp(): void {
         $this->sourcetable = 'totara_sync_comp_source';
 
         parent::setUp();
@@ -48,7 +48,7 @@ class tool_totara_sync_comp_database_field_mapping_testcase extends totara_sync_
         $this->create_external_db_table();
     }
 
-    public function tearDown() {
+    public function tearDown(): void {
         $this->elementname = null;
         $this->sourcetable = null;
 

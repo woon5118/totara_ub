@@ -67,7 +67,7 @@ abstract class database_driver_testcase extends base_testcase {
         $this->setRunTestInSeparateProcess(false);
     }
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         global $CFG;
         parent::setUpBeforeClass();
 
@@ -101,7 +101,7 @@ abstract class database_driver_testcase extends base_testcase {
         self::$extradb = $d;
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         global $DB;
         parent::setUp();
 
@@ -112,7 +112,7 @@ abstract class database_driver_testcase extends base_testcase {
         }
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         // Totara: undo any transaction leftovers.
         if ($this->tdb->is_transaction_started()) {
             $this->tdb->force_transaction_rollback();
@@ -129,7 +129,7 @@ abstract class database_driver_testcase extends base_testcase {
         parent::tearDown();
     }
 
-    public static function tearDownAfterClass() {
+    public static function tearDownAfterClass(): void {
         if (self::$extradb) {
             self::$extradb->dispose();
             self::$extradb = null;

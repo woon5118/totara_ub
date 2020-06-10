@@ -31,7 +31,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 class totara_catalog_catalog_storage_testcase extends advanced_testcase {
 
-    public function setUp() {
+    public function setUp(): void {
         global $DB;
 
         parent::setUp();

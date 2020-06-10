@@ -52,7 +52,7 @@ class mod_quiz_attempt_walkthrough_from_csv_testcase extends advanced_testcase {
      */
     protected $randqids;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->files = null;
         $this->quiz = null;
         $this->randqids = null;

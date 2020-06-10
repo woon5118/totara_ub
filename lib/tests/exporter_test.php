@@ -39,7 +39,7 @@ class core_exporter_testcase extends advanced_testcase {
     protected $validdata = null;
     protected $invaliddata = null;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->validrelated = null;
         $this->invalidrelated = null;
         $this->validdata = null;
@@ -48,7 +48,7 @@ class core_exporter_testcase extends advanced_testcase {
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         $s = new stdClass();
         $this->validrelated = array(
             'simplestdClass' => $s,

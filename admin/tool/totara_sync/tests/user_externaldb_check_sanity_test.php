@@ -68,7 +68,7 @@ class tool_totara_sync_user_externaldb_check_sanity_testcase extends advanced_te
         "lang",
     );
 
-    public function setUp() {
+    public function setUp(): void {
         global $CFG;
 
         parent::setup();
@@ -195,7 +195,7 @@ class tool_totara_sync_user_externaldb_check_sanity_testcase extends advanced_te
         $this->getDataGenerator()->create_user(array('idnumber' => 'idnum030', 'totarasync' => 0));
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         if (isset($this->ext_dbconnection)) {
             if ($this->configexists) {
                 // Drop sync table.

@@ -49,7 +49,7 @@ class core_form_duration_testcase extends basic_testcase {
     /**
      * Initalize test wide variable, it is called in start of the testcase
      */
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
 
         // Get form data.
@@ -62,7 +62,7 @@ class core_form_duration_testcase extends basic_testcase {
      * Clears the data set in the setUp() method call.
      * @see duration_form_element_test::setUp()
      */
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->element = null;
         $this->mform = null;
         parent::tearDown();

@@ -46,7 +46,7 @@ class core_session_redis_testcase extends advanced_testcase {
     /** @var $redis The current testing redis connection */
     protected $redis = null;
 
-    public function setUp() {
+    public function setUp(): void {
         global $CFG;
 
         if (!extension_loaded('redis')) {
@@ -72,7 +72,7 @@ class core_session_redis_testcase extends advanced_testcase {
         $this->redis->connect(TEST_SESSION_REDIS_HOST);
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         if (!extension_loaded('redis') || !defined('TEST_SESSION_REDIS_HOST')) {
             return;
         }

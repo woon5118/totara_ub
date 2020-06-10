@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 
 class hierarchy_goal_permission_testcase extends advanced_testcase {
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
         global $CFG;
         require_once($CFG->dirroot . '/totara/hierarchy/lib.php');

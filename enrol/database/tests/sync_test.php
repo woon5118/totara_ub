@@ -34,7 +34,7 @@ class enrol_database_sync_testcase extends advanced_testcase {
     /** @var string Original error log */
     protected $oldlog;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->oldlog = null;
         parent::tearDown();
     }

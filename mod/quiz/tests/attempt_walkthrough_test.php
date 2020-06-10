@@ -40,7 +40,7 @@ require_once($CFG->dirroot . '/mod/quiz/locallib.php');
  */
 class mod_quiz_attempt_walkthrough_testcase extends advanced_testcase {
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->quizwithvariants = null;
         parent::tearDown();
     }

@@ -38,11 +38,11 @@ abstract class totara_cohort_certification_testcase extends reportcache_advanced
     const TEST_PROGRAMS_COUNT           = 2;
     const TEST_CERTIFICATIONS_COUNT     = 5;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setup();
     }
 

@@ -28,7 +28,7 @@ require_once($CFG->dirroot . '/totara/customfield/lib.php');
 
 class totara_customfield_event_custom_field_deleted_testcase extends advanced_testcase {
 
-    public function setUp() {
+    public function setUp(): void {
         $this->setAdminUser();
         $this->resetAfterTest();
     }

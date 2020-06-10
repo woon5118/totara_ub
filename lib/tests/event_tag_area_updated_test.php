@@ -29,7 +29,7 @@ use core_tag\output\tagareaenabled;
  */
 class event_tag_area_updated_test extends advanced_testcase {
 
-    public function setUp() {
+    public function setUp(): void {
         $this->setAdminUser();
         $this->resetAfterTest();
     }

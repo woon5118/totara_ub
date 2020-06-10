@@ -37,7 +37,7 @@ require_once(__DIR__ . '/fixtures/task_fixtures.php');
  */
 class core_adhoc_task_testcase extends advanced_testcase {
 
-    protected function setUp() {
+    protected function setUp(): void {
         global $DB;
         parent::setup();
 

@@ -35,7 +35,7 @@ class core_command_argument_testcase extends advanced_testcase {
      */
     private $cfg_pcntl_phpclipath;
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
         global $CFG;
@@ -48,7 +48,7 @@ class core_command_argument_testcase extends advanced_testcase {
         $this->enable_pcntl(false);
     }
 
-    public function tearDown() {
+    public function tearDown(): void {
         global $CFG;
 
         if (isset($this->cfg_pcntl_phpclipath)) {

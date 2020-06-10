@@ -46,7 +46,7 @@ class mod_facetoface_grade_helper_testcase extends advanced_testcase {
     /** @var grade_item */
     private $gradeitem;
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $this->gen = $this->getDataGenerator();
         $this->f2fgen = $this->gen->get_plugin_generator('mod_facetoface');
@@ -68,7 +68,7 @@ class mod_facetoface_grade_helper_testcase extends advanced_testcase {
         $this->gradeitem = new grade_item(['itemtype' => 'mod', 'itemmodule' => 'facetoface', 'iteminstance' => $this->seminar->get_id(), 'courseid' => $this->course]);
     }
 
-    public function tearDown() {
+    public function tearDown(): void {
         $this->gradeitem = null;
         $this->seminar = null;
         $this->course = 0;

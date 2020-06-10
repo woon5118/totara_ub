@@ -50,7 +50,7 @@ class mod_facetoface_userdata_signups_testcase extends mod_facetoface_facetoface
     /**
      * Set up tests.
      */
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
     }

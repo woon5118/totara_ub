@@ -61,7 +61,7 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
      * Set up the program to be used.
      * Set up another program that will be check after each test to ensure nothing leaked.
      */
-    public function setUp() {
+    public function setUp(): void {
         global $DB;
         parent::setup();
 
@@ -113,7 +113,7 @@ class totara_program_update_learner_assignments_testcase extends reportcache_adv
             array('programid' => $this->controlprogram->id));
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         // No asserts here!
         $this->programgenerator = null;
         $this->users = null;

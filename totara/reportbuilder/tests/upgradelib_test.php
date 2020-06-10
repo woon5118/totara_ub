@@ -40,7 +40,7 @@ class totara_reportbuilder_upgradelib_testcase extends advanced_testcase {
 
     private $report, $user, $rbcolumn, $contcol, $rbfilter, $contfil, $rbsaved, $contsave, $rbgraph;
 
-    public function setUp() {
+    public function setUp(): void {
         global $DB;
 
         parent::setUp();
@@ -136,7 +136,7 @@ class totara_reportbuilder_upgradelib_testcase extends advanced_testcase {
         $this->rbgraph = $rbgraph;
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->report = null;
         $this->user = null;
         $this->rbcolumn = null;

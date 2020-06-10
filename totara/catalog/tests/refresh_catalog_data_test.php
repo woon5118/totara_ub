@@ -31,14 +31,14 @@ class totara_catalog_refresh_catalog_data_testcase extends advanced_testcase {
 
     private $refresh_catalog_task = null;
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setup();
         $this->setAdminUser();
         $this->resetAfterTest();
         $this->refresh_catalog_task = new refresh_catalog_data();
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->refresh_catalog_task = null;
         parent::tearDown();
     }

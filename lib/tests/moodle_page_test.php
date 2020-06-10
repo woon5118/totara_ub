@@ -37,12 +37,12 @@ class core_moodle_page_testcase extends advanced_testcase {
      */
     protected $testpage;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->testpage = null;
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
         $this->testpage = new testable_moodle_page();

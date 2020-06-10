@@ -53,7 +53,7 @@ class totara_cohort_user_rules_testcase extends reportcache_advanced_testcase {
     private $profilevegetableid;
     const TEST_USER_COUNT_MEMBERS = 53;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->cohort_generator = null;
         $this->cohort = null;
         $this->ruleset = null;
@@ -61,7 +61,7 @@ class totara_cohort_user_rules_testcase extends reportcache_advanced_testcase {
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setup();
         global $DB;
         $this->resetAfterTest(true);

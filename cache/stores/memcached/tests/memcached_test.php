@@ -45,7 +45,7 @@ class cachestore_memcached_test extends cachestore_tests {
     /**
      * Set things back to the default before each test.
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         cache_factory::instance(true);
         cache_factory::reset();
@@ -55,7 +55,7 @@ class cachestore_memcached_test extends cachestore_tests {
     /**
      * Final task is to reset the cache system
      */
-    public static function tearDownAfterClass() {
+    public static function tearDownAfterClass(): void {
         cache_factory::reset();
         parent::tearDownAfterClass();
     }

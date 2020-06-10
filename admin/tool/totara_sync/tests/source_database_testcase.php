@@ -45,7 +45,7 @@ abstract class totara_sync_database_testcase extends advanced_testcase {
     protected $elementname = '';
     protected $sourcetable = '';
 
-    public function setUp() {
+    public function setUp(): void {
         $this->set_up_database_connection();
         parent::setup();
     }
@@ -101,7 +101,7 @@ abstract class totara_sync_database_testcase extends advanced_testcase {
     /**
      * Teardown function
      */
-    public function tearDown() {
+    public function tearDown(): void {
         // Unset all class variables
         $this->dbtype = null;
         $this->dbhost = null;

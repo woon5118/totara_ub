@@ -72,7 +72,7 @@ class totara_completionimport_importcertification_testcase extends reportcache_a
     private $initialexpirydate;
     private $filename;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->users = null;
         $this->program = null;
         $this->cohort = null;

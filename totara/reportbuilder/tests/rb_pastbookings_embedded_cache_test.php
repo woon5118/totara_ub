@@ -44,14 +44,14 @@ class totara_reportbuilder_rb_pastbookings_embedded_cache_testcase extends totar
     );
     protected $delta = -3600;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->report_builder_data = null;
         $this->report_builder_settings_data = null;
         $this->delta = null;
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         foreach($this->report_builder_columns_data as &$e) {
             $e['reportid'] = 9;
         }

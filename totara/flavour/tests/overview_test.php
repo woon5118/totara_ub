@@ -38,7 +38,7 @@ class totara_flavour_overview_testcase extends advanced_testcase {
      */
     protected $testflavouravailable = false;
 
-    protected function setUp() {
+    protected function setUp(): void {
         global $CFG;
         require_once($CFG->libdir . '/adminlib.php');
         parent::setUp();
@@ -48,7 +48,7 @@ class totara_flavour_overview_testcase extends advanced_testcase {
         $this->testflavouravailable = file_exists("$CFG->dirroot/totara/flavour/flavours/test/classes/definition.php");
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         global $CFG;
         // Make sure the $ADMIN static is not messed up by our flavours.
         unset($CFG->forceflavour);

@@ -41,7 +41,7 @@ class core_badges_badgeslib_testcase extends advanced_testcase {
     /** @var $assertion2 to define json format for Open badge version 2 */
     protected $assertion2;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->badgeid = null;
         $this->course = null;
         $this->user = null;
@@ -52,7 +52,7 @@ class core_badges_badgeslib_testcase extends advanced_testcase {
         parent::tearDown();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         global $DB, $CFG;
         $this->resetAfterTest(true);
         $CFG->enablecompletion = true;

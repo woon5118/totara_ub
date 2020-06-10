@@ -61,7 +61,7 @@ class totara_reportbuilder_rb_cohort_orphaned_users_embedded_cache_testcase exte
     protected $cohort2 = null;
     protected $cohort3 = null;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->report_builder_data = null;
         $this->report_builder_columns_data = null;
         $this->report_builder_filters_data = null;
@@ -85,7 +85,7 @@ class totara_reportbuilder_rb_cohort_orphaned_users_embedded_cache_testcase exte
      * - Cohort three without members
      *
      */
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setup();
         $this->setAdminUser();
         $this->getDataGenerator()->reset();

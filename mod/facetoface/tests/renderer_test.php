@@ -44,7 +44,7 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
     /** @var totara_customfield_generator */
     protected $customfield_generator;
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
 
         $this->data_generator = $this->getDataGenerator();
@@ -52,7 +52,7 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
         $this->customfield_generator = $this->getDataGenerator()->get_plugin_generator('totara_customfield');
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->data_generator = null;
         $this->facetoface_generator = null;
         $this->customfield_generator = null;

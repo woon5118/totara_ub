@@ -30,13 +30,13 @@ class totara_customfield_program_delete_testcase extends advanced_testcase {
     protected $program1 = null;
     protected $program2 = null;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->program1 = null;
         $this->program2 = null;
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
 
         // Create program customfields.

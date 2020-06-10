@@ -34,7 +34,7 @@ class totara_program_assignment_organisations_test extends advanced_testcase {
     /**
      * Unset all class variables
      */
-    public function tearDown() {
+    public function tearDown(): void {
         $this->generator = null;
         $this->programgenerator = null;
         $this->hierarchygenerator = null;

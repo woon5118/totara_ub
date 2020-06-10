@@ -63,7 +63,7 @@ class totara_reportbuilder_rb_catalogcertifications_embedded_cache_testcase exte
     protected $certification3 = null;
     protected $certification4 = null;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->report_builder_data = null;
         $this->report_builder_columns_data = null;
         $this->report_builder_filters_data = null;
@@ -83,7 +83,7 @@ class totara_reportbuilder_rb_catalogcertifications_embedded_cache_testcase exte
      * Common part of all test cases:
      * - Add four certifications
      */
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setup();
 
         // Common parts of test cases:

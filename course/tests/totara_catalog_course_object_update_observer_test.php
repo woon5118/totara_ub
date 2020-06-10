@@ -41,7 +41,7 @@ class core_course_totara_catalog_course_object_update_observer_testcase extends 
 
     private $provider_active_task = null;
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setup();
         $this->setAdminUser();
         $this->resetAfterTest();
@@ -49,7 +49,7 @@ class core_course_totara_catalog_course_object_update_observer_testcase extends 
         $this->provider_active_task = new provider_active_task();
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->course = null;
         $this->provider_active_task = null;
         parent::tearDown();

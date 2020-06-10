@@ -29,7 +29,7 @@ class mod_facetoface_registration_closure_testcase extends advanced_testcase {
     private $eventsink;
     private $emailsink;
 
-    public function setUp() {
+    public function setUp(): void {
         global $CFG;
 
         parent::setUp();
@@ -44,7 +44,7 @@ class mod_facetoface_registration_closure_testcase extends advanced_testcase {
         $this->emailsink = $this->redirectMessages();
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         global $CFG;
 
         if (isset($this->cfgemail)) {

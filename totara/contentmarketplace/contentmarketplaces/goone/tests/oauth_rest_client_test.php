@@ -35,7 +35,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 class contentmarketplace_goone_oauth_rest_client_testcase extends basic_testcase {
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
         require_once(__DIR__ . '/fixtures/mock_config_storage.php');
         require_once(__DIR__ . '/fixtures/mock_playback_curl.php');

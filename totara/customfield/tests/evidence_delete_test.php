@@ -33,7 +33,7 @@ class totara_customfield_evidence_delete_testcase extends advanced_testcase {
     protected $text = [];
     protected $files = [];
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->evidence1 = $this->evidence2 = $this->evidence3 = null;
         $this->multiselect = [];
         $this->text = [];
@@ -42,7 +42,7 @@ class totara_customfield_evidence_delete_testcase extends advanced_testcase {
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
 
         $user = $this->getDataGenerator()->create_user();

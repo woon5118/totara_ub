@@ -397,7 +397,7 @@ class totara_program_rb_display_program_course_newline_testcase extends advanced
     /**
      * Make sure that we reset self::force_resort_required()
      */
-    public function tearDown() {
+    public function tearDown(): void {
         self::force_resort_required(null);
         parent::tearDown();
     }

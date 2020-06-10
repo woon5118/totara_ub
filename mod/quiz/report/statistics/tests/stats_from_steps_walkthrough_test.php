@@ -56,7 +56,7 @@ class quiz_report_statistics_from_steps_testcase extends mod_quiz_attempt_walkth
      */
     protected $report;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->report = null;
         $this->files = null;
         parent::tearDown();

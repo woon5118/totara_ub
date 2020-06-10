@@ -40,7 +40,7 @@ require_once($CFG->dirroot.'/totara/catalog/tests/config_test_base.php');
  */
 class totara_catalog_config_form_helper_testcase extends config_base_testcase {
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
     }

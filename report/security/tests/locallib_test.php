@@ -30,7 +30,7 @@ require_once($CFG->dirroot . '/lib/filterlib.php');
 
 class report_security_locallib_testcase extends advanced_testcase {
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
     }

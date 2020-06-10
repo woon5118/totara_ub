@@ -45,7 +45,7 @@ class totara_certification_reassignment_testcase extends advanced_testcase {
     /**
      * Setup.
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setup();
 
         // Turn off programs. This is to test that it doesn't interfere with certification completion.

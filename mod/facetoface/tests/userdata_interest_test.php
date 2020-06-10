@@ -52,7 +52,7 @@ class mod_facetoface_userdata_interest_testcase extends advanced_testcase {
     /**
      * Set up tests.
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
 
         $this->resetAfterTest();
@@ -77,7 +77,7 @@ class mod_facetoface_userdata_interest_testcase extends advanced_testcase {
     /**
      * Unset properties to avoid PHPUnit memory problems.
      */
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->user1 = $this->user2 = null;
         $this->course1 = $this->course2 = null;
         $this->facetoface1 = $this->facetoface2 = $this->facetoface3 = null;

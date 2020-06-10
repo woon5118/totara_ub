@@ -37,7 +37,7 @@ class dashboard_events_testcase extends advanced_testcase {
     /** @var user cobject */
     protected $user;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->user = null;
         parent::tearDown();
     }
@@ -45,7 +45,7 @@ class dashboard_events_testcase extends advanced_testcase {
     /**
      * Setup often used objects for the following tests.
      */
-    protected function setup() {
+    protected function setUp(): void {
         global $USER;
 
         $this->resetAfterTest();

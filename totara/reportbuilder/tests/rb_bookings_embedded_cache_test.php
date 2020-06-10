@@ -74,7 +74,7 @@ class totara_reportbuilder_rb_bookings_embedded_cache_testcase extends reportcac
     protected $course2 = null;
     protected static $ind = 0;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->report_builder_data = null;
         $this->report_builder_columns_data = null;
         $this->report_builder_settings_data = null;
@@ -99,7 +99,7 @@ class totara_reportbuilder_rb_bookings_embedded_cache_testcase extends reportcac
      * - Create two bookings to user1, one for to user2, and one for user3
      * - Create four bookings (for each users in inverted time
      */
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setup();
         $this->setAdminUser();
         // Common parts of test cases:

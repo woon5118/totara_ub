@@ -35,7 +35,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 class logstore_legacy_userdata_log_testcase extends advanced_testcase {
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
 
         require_once(__DIR__ . '/fixtures/event.php');

@@ -32,7 +32,7 @@ require_once($CFG->dirroot . '/admin/tool/totara_sync/sources/source_comp_databa
  */
 class tool_totara_sync_comp_database_testcase extends totara_sync_database_testcase {
 
-    public function setUp() {
+    public function setUp(): void {
         $this->elementname = 'comp';
         $this->sourcetable = 'totara_sync_comp_source';
 
@@ -47,7 +47,7 @@ class tool_totara_sync_comp_database_testcase extends totara_sync_database_testc
         $this->create_external_db_table();
     }
 
-    public function tearDown() {
+    public function tearDown(): void {
         $this->elementname = null;
         $this->sourcetable = null;
 

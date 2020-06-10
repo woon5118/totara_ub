@@ -43,7 +43,7 @@ class totara_cohort_enrolment_rules_testcase extends advanced_testcase {
     private $program_generator = null;
     const TEST_COURSE_COUNT_USERS = 4;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->course1 = null;
         $this->course2 = null;
         $this->users = null;
@@ -102,7 +102,7 @@ Program 2 - Course 1 and Course 2
 
     */
 
-    public function setUp() {
+    public function setUp(): void {
         global $DB;
 
         parent::setup();

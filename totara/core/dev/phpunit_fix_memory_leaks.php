@@ -92,7 +92,7 @@ function phpunit_fix_file($file) {
             }
             $function = substr($chunk, $start);
         }
-        $teardown = "    protected function tearDown() {
+        $teardown = "    protected function tearDown(): void {
         parent::tearDown();
     }
 

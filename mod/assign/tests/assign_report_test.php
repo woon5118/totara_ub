@@ -29,7 +29,7 @@ require_once($CFG->dirroot . '/mod/assign/tests/base_test.php');
 class mod_assign_report_testcase extends mod_assign_base_testcase {
     use totara_reportbuilder\phpunit\report_testing;
 
-    protected function setUp() {
+    protected function setUp(): void {
         global $DB;
 
         parent::setUp();

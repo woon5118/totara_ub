@@ -40,7 +40,7 @@ class totara_hierarchy_moveitem_testcase extends advanced_testcase {
     private $org1, $org2, $org3, $org4, $org5, $org6, $org7, $org8, $org9, $org10, $org11, $org12, $org13, $org14, $org15, $org16;
     private $org;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->frame1 = $this->frame2 = null;
         $this->org1 = $this->org2 = $this->org3 = $this->org4 = $this->org5 = $this->org6 = $this->org7 = $this->org8 = null;
         $this->org9 = $this->org10 = $this->org11 = $this->org12 = $this->org13 = $this->org14 = $this->org15 = $this->org16 = null;
@@ -49,7 +49,7 @@ class totara_hierarchy_moveitem_testcase extends advanced_testcase {
         parent::tearDown();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         global $DB;
         parent::setup();
 

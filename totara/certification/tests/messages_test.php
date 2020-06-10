@@ -66,7 +66,7 @@ class totara_certification_messages_testcase extends reportcache_advanced_testca
     /* @var totara_program_generator $programgenerator */
     private $programgenerator;
 
-    public function setUp() {
+    public function setUp(): void {
         global $DB;
 
         parent::setUp();
@@ -103,7 +103,7 @@ class totara_certification_messages_testcase extends reportcache_advanced_testca
         $this->programgenerator = $this->getDataGenerator()->get_plugin_generator('totara_program');
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->sink->close();
         $this->cert1 = null;
         $this->cert2 = null;

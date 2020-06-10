@@ -52,7 +52,7 @@ class totara_core_courselib_testcase extends advanced_testcase {
 
     private $user1, $user2, $user3, $user4, $user5, $user6;
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
 
         // Ignore messages and silence debug output in cron.
@@ -73,7 +73,7 @@ class totara_core_courselib_testcase extends advanced_testcase {
         $this->user6 = $this->data_generator->create_user();
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->messagesink->close();
         $this->messagesink = null;
         $this->data_generator = null;

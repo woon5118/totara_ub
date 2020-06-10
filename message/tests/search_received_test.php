@@ -41,7 +41,7 @@ class message_received_search_testcase extends advanced_testcase {
      */
     protected $messagereceivedareaid = null;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->messagereceivedareaid = null;
 
         parent::tearDown();
@@ -51,7 +51,7 @@ class message_received_search_testcase extends advanced_testcase {
      * Setting up the test environment
      * @return void
      */
-    public function setUp() {
+    public function setUp(): void {
         $this->resetAfterTest(true);
         set_config('enableglobalsearch', true);
 

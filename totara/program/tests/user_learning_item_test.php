@@ -33,7 +33,7 @@ class totara_program_user_learning_item_testcase extends advanced_testcase {
     private $program1, $program2, $program3, $program4;
     private $user1;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->generator = null;
         $this->program_generator = null;
         $this->completion_generator = null;
@@ -54,7 +54,7 @@ class totara_program_user_learning_item_testcase extends advanced_testcase {
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         global $DB;
 
         $this->resetAfterTest(true);

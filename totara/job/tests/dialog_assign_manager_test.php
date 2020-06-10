@@ -37,7 +37,7 @@ class totara_job_dialog_assign_manager_testcase extends advanced_testcase {
     private $userids = array();
     private $userfullnames = array();
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->data_generator = null;
         $this->max_users = null;
         $this->users = null;
@@ -46,7 +46,7 @@ class totara_job_dialog_assign_manager_testcase extends advanced_testcase {
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setup();
         $this->resetAfterTest();
 

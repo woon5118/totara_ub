@@ -38,7 +38,7 @@ require_once("{$CFG->dirroot}/course/lib.php");
  */
 class core_course_totara_catalog_course_type_feature_testcase extends \advanced_testcase {
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
     }

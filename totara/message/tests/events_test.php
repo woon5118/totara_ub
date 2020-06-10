@@ -39,7 +39,7 @@ class totara_message_events_testcase extends advanced_testcase {
     private $sink;
     private $messagedata;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->userfrom = null;
         $this->userto = null;
         $this->sink = null;
@@ -50,7 +50,7 @@ class totara_message_events_testcase extends advanced_testcase {
     /**
      * Implements setUp().
      */
-    protected function setUp() {
+    protected function setUp(): void {
         global $CFG;
 
         require_once($CFG->dirroot . '/totara/message/messagelib.php');

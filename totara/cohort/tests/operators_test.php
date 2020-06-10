@@ -45,7 +45,7 @@ class totara_cohort_operators_testcase extends reportcache_advanced_testcase {
     private $course2 = null;
     const TEST_OPERATOR_USER_COUNT_MEMBERS = 30;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->cohort_generator = null;
         $this->cohort = null;
         $this->ruleset = null;
@@ -54,7 +54,7 @@ class totara_cohort_operators_testcase extends reportcache_advanced_testcase {
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         global $DB;
         parent::setup();
         set_config('enablecompletion', 1);

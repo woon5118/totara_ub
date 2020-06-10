@@ -34,7 +34,7 @@ require_once($CFG->dirroot . '/totara/reportbuilder/filters/lib.php');
  */
 class totara_reportbuilder_rb_filters_lib_testcase extends advanced_testcase {
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setup();
     }
 

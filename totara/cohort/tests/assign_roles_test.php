@@ -45,7 +45,7 @@ class totara_cohort_assign_roles_testcase extends advanced_testcase {
     private $usrs = null;
     const TEST_ROLES_COUNT_USERS = 8;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->cohort = null;
         $this->context = null;
         $this->assignableroles = null;
@@ -54,7 +54,7 @@ class totara_cohort_assign_roles_testcase extends advanced_testcase {
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         global $DB;
         parent::setup();
         $this->resetAfterTest(true);

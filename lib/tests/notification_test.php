@@ -43,7 +43,7 @@ class core_notification_testcase extends advanced_testcase {
      * This includes emptying the list of notifications on the session, resetting any session which exists, and setting
      * up a new moodle_page object.
      */
-    public function setUp() {
+    public function setUp(): void {
         global $PAGE, $SESSION;
         $this->resetAfterTest(); //Totara: ignore Moodle SESSION hacks!
 

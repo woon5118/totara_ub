@@ -36,7 +36,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 class core_course_userdata_request_testcase extends advanced_testcase {
 
-    protected function setUp() {
+    protected function setUp(): void {
         global $CFG;
 
         parent::setUp();

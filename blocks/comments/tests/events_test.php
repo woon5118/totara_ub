@@ -40,7 +40,7 @@ class block_comments_events_testcase extends advanced_testcase {
     /** @var stdClass Keeps wiki object */
     private $wiki;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->course = null;
         $this->wiki = null;
         parent::tearDown();
@@ -49,7 +49,7 @@ class block_comments_events_testcase extends advanced_testcase {
     /**
      * Setup test data.
      */
-    public function setUp() {
+    public function setUp(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
 

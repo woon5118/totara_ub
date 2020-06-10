@@ -38,7 +38,7 @@ class core_user_userdata_role_assignments_test extends advanced_testcase {
     /**
      * Set up tests.
      */
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
 
         $this->resetAfterTest(true);

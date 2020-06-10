@@ -38,7 +38,7 @@ class block_current_learning_plan_data_testcase extends block_current_learning_t
     private $program1, $program2;
     private $planrecord1;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->generator = null;
         $this->plan_generator = null;
         $this->program_generator = null;
@@ -49,7 +49,7 @@ class block_current_learning_plan_data_testcase extends block_current_learning_t
         parent::tearDown();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         global $CFG;
         parent::setUp();
 

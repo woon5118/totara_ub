@@ -43,7 +43,7 @@ class enrol_lti_helper_testcase extends advanced_testcase {
      */
     public $user2;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->user1 = null;
         $this->user2 = null;
         parent::tearDown();
@@ -54,7 +54,7 @@ class enrol_lti_helper_testcase extends advanced_testcase {
      *
      * This is executed before running any test in this file.
      */
-    public function setUp() {
+    public function setUp(): void {
         $this->resetAfterTest();
 
         // Set this user as the admin.

@@ -57,7 +57,7 @@ class question_engine_data_mapper_reporting_testcase extends qbehaviour_walkthro
     /** @var array */
     protected $allslots = array();
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->dm = null;
         $this->sa = null;
         $this->essay = null;

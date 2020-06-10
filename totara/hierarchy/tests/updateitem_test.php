@@ -38,7 +38,7 @@ class totara_hierarchy_updateitem_testcase extends advanced_testcase {
     private $org1, $org2, $org3, $org4;
     private $org;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->frame1 = $this->frame2 = null;
         $this->org1 = $this->org2 = $this->org3 = $this->org4 = null;
         $this->org = null;
@@ -46,7 +46,7 @@ class totara_hierarchy_updateitem_testcase extends advanced_testcase {
         parent::tearDown();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         global $DB;
         parent::setup();
 

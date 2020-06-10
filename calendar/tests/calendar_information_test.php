@@ -41,7 +41,7 @@ class core_calendar_calendar_information_testcase extends advanced_testcase {
 
     private $course1, $course2, $course3, $course4, $course5, $course6;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->data_generator = null;
         $this->facetoface_generator = null;
         $this->course1 = $this->course2 = $this->course3 = $this->course4 = $this->course5 = $this->course6 = null;
@@ -49,7 +49,7 @@ class core_calendar_calendar_information_testcase extends advanced_testcase {
         parent::tearDown();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         $this->resetAfterTest(true);
 
         $this->data_generator = $this->getDataGenerator();

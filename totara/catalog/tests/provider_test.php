@@ -35,7 +35,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 class totara_catalog_provider_testcase extends advanced_testcase {
 
-    public function setUp() {
+    public function setUp(): void {
         global $DB;
 
         $this->setAdminUser();

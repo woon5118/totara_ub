@@ -49,7 +49,7 @@ class totara_hierarchy_positionassign_testcase extends advanced_testcase {
               'timecreated' => 0, 'timemodified' => 0, 'usermodified' => 2)
     );
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->user1 = $this->user2 = $this->user3 = $this->user4 = $this->user5 = null;
         $this->pos_framework_data = null;
         $this->pos_data = null;
@@ -57,7 +57,7 @@ class totara_hierarchy_positionassign_testcase extends advanced_testcase {
         parent::tearDown();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         global $DB;
         parent::setUp();
 

@@ -34,7 +34,7 @@ require_once($CFG->libdir . '/reminderlib.php');
  */
 class core_reminderlib_testcase extends advanced_testcase {
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
     }

@@ -47,7 +47,7 @@ class totara_hierarchy_userdata_competency_progress_testcase extends advanced_te
     /**
      * {@inheritdoc}
      */
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         global $CFG;
 
         parent::setUpBeforeClass();
@@ -59,7 +59,7 @@ class totara_hierarchy_userdata_competency_progress_testcase extends advanced_te
     /**
      * {@inheritdoc}
      */
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         // This is done here because COMPETENCY_EVIDENCE_TYPE_COURSE_COMPLETION is only defined when abstract.php
         // is included and that is only done in setUpBeforeClass(). Initializing $competencytype at the declaration
@@ -67,7 +67,7 @@ class totara_hierarchy_userdata_competency_progress_testcase extends advanced_te
         $this->competencytype = COMPETENCY_EVIDENCE_TYPE_COURSE_COMPLETION;
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->competencytype = null;
 
         parent::tearDown();

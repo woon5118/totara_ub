@@ -63,7 +63,7 @@ class totara_reportbuilder_rb_tasks_embedded_cache_testcase extends reportcache_
      * - Add 3 users,
      * - Create tasks for users: 3->1, 2-1, 1-2, 1-2 (again), 3-2 (2 tasks to user1, 3 tasks to user2)
      */
-    protected function setUp() {
+    protected function setUp(): void {
         global $DB;
 
         $this->setAdminUser();
@@ -108,7 +108,7 @@ class totara_reportbuilder_rb_tasks_embedded_cache_testcase extends reportcache_
         assign_capability('totara/message:viewallmessages', CAP_ALLOW, $rolecoursecreator->id, $syscontext);
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->report_builder_data = null;
         $this->report_builder_columns_data = null;
         $this->report_builder_filters_data = null;

@@ -42,7 +42,7 @@ class mod_quiz_backup_restore_quiz_testcase extends advanced_testcase {
 
     private $course;
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
 
         self::setAdminUser();
@@ -65,7 +65,7 @@ class mod_quiz_backup_restore_quiz_testcase extends advanced_testcase {
         $this->questions['s2'] = $this->question_generator->create_question('match', null, $system_options);
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->generator = null;
         $this->quiz_generator = null;
         $this->question_generator = null;

@@ -54,7 +54,7 @@ class totara_certification_certification_testcase extends reportcache_advanced_t
 
     private $thirdcompletiontime, $thirdcompletiontimeminimum, $thirdcompletiontimemaximum;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->setuptimeminimum = null;
         $this->setuptimemaximum = null;
         $this->certprograms = null;

@@ -32,14 +32,14 @@ use totara_catalog\form\element\multiple_select,
     totara_form\test\test_form;
 
 class totara_catalog_form_element_multiple_select_testcase extends advanced_testcase {
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         require_once(__DIR__ . '/../../form/tests/fixtures/test_form.php');
         test_form::phpunit_reset();
         $this->resetAfterTest();
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         test_form::phpunit_reset();
         parent::tearDown();
     }

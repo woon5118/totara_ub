@@ -40,7 +40,7 @@ class totara_program_completions_task_testcase extends advanced_testcase {
      */
     protected $generator_program;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->generator = null;
         $this->generator_program = null;
         parent::tearDown();
@@ -49,7 +49,7 @@ class totara_program_completions_task_testcase extends advanced_testcase {
     /**
      * Prepares the environment prior to each test case.
      */
-    public function setUp() {
+    public function setUp(): void {
         // Make each generator more easily accessible.
         $this->generator = $this->getDataGenerator();
         $this->generator_program = $this->generator->get_plugin_generator('totara_program');

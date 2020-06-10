@@ -31,7 +31,7 @@ class tool_monitor_subscription_testcase extends advanced_testcase {
      */
     private $subscription;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->subscription = null;
         parent::tearDown();
     }
@@ -39,7 +39,7 @@ class tool_monitor_subscription_testcase extends advanced_testcase {
     /**
      * Test set up.
      */
-    public function setUp() {
+    public function setUp(): void {
         $this->resetAfterTest(true);
 
         // Create the mock subscription.

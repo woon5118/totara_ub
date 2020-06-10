@@ -37,7 +37,7 @@ class mod_facetoface_sessions_report_testcase extends advanced_testcase {
     protected $session = null;
 
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->facetofacegenerator = null;
         $this->facetoface = null;
         $this->course = null;
@@ -46,7 +46,7 @@ class mod_facetoface_sessions_report_testcase extends advanced_testcase {
         parent::tearDown();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
 
         $this->resetAfterTest();
         $this->setAdminUser();

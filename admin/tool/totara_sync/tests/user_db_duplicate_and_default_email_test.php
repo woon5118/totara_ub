@@ -35,7 +35,7 @@ class tool_totara_sync_user_db_duplicate_and_default_email extends totara_sync_d
     /**
      * Setup function
      */
-    public function setUp() {
+    public function setUp(): void {
         $this->elementname = 'user';
         $this->sourcetable = 'totara_sync_user_source';
 
@@ -52,7 +52,7 @@ class tool_totara_sync_user_db_duplicate_and_default_email extends totara_sync_d
     /**
      * Teardown function
      */
-    public function tearDown() {
+    public function tearDown(): void {
         $this->elementname = null;
         $this->sourcetable = null;
 

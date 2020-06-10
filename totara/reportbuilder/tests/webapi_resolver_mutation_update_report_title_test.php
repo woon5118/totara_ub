@@ -32,7 +32,7 @@ class totara_reportbuilder_webapi_resolver_mutation_update_report_title_testcase
 
     use webapi_phpunit_helper;
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
 
         global $CFG;

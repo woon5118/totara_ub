@@ -49,7 +49,7 @@ class totara_program_message_testcase extends advanced_testcase {
      */
     private $program1;
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
         $this->messagesink = $this->redirectMessages();
@@ -62,7 +62,7 @@ class totara_program_message_testcase extends advanced_testcase {
         $this->messagesink->clear();
     }
 
-    public function tearDown() {
+    public function tearDown(): void {
         $this->messagesink->clear();
         $this->messagesink->close();
         $this->messagesink = null;

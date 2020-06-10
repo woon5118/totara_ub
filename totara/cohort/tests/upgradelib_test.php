@@ -45,7 +45,7 @@ class totara_cohort_upgradelib_testcase extends advanced_testcase {
     private $program;
     private $course;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->generator = null;
         $this->cohort = null;
         $this->ruleset = null;
@@ -54,7 +54,7 @@ class totara_cohort_upgradelib_testcase extends advanced_testcase {
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
 
         $this->generator = $this->getDataGenerator()->get_plugin_generator('totara_cohort');
         // Creating dynamic cohort.

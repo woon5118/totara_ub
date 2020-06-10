@@ -60,7 +60,7 @@ class totara_program_messages_testcase extends reportcache_advanced_testcase {
     /** @var phpunit_message_sink */
     private $sink;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->program_generator = null;
         $this->program1 = $this->program2 = null;
         $this->user1 = $this->user2 = $this->user3 = $this->user4 = $this->user5 = $this->user6 = null;
@@ -73,7 +73,7 @@ class totara_program_messages_testcase extends reportcache_advanced_testcase {
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         global $DB;
 
         parent::setup();

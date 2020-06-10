@@ -35,12 +35,12 @@ class block_totara_featured_links_form_element_audience_list_testcase extends te
      */
     protected $blockgenerator;
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $this->blockgenerator = $this->getDataGenerator()->get_plugin_generator('block_totara_featured_links');
     }
 
-    public function tearDown() {
+    public function tearDown(): void {
         parent::tearDown();
         $this->blockgenerator = null;
     }

@@ -59,7 +59,7 @@ extends advanced_testcase {
     /**
      * Prepare mock data for testing.
      */
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setup();
         $this->setAdminUser();
         $this->resetAfterTest(true);
@@ -76,7 +76,7 @@ extends advanced_testcase {
     /**
      * Prepare mock data for testing.
      */
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->context = null;
         $this->role_id = null;
 

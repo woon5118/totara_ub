@@ -36,7 +36,7 @@ class backup_task_testcase extends advanced_testcase {
     protected $courseid;  // course id used for testing
     protected $userid;      // user record used for testing
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->moduleid = null;
         $this->sectionid = null;
         $this->courseid = null;
@@ -45,7 +45,7 @@ class backup_task_testcase extends advanced_testcase {
         parent::tearDown();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         global $DB, $CFG;
         parent::setUp();
 

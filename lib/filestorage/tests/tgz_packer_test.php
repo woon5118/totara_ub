@@ -45,7 +45,7 @@ class core_files_tgz_packer_testcase extends advanced_testcase implements file_p
         touch($path, $mtime);
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->progress = null;
         parent::tearDown();
     }

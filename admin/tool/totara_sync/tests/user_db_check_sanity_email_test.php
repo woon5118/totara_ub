@@ -56,7 +56,7 @@ class tool_totara_sync_user_db_check_email_sanity_testcase extends totara_sync_d
     protected $sourcename   = 'totara_sync_source_user_database';
     protected $source       = null;
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
 
         global $CFG;
@@ -65,7 +65,7 @@ class tool_totara_sync_user_db_check_email_sanity_testcase extends totara_sync_d
         require_once($CFG->dirroot . '/admin/tool/totara_sync/sources/source_user_database.php');
     }
 
-    public function tearDown() {
+    public function tearDown(): void {
         $this->config           = null;
         $this->configdatabase   = null;
         $this->elementname      = null;
@@ -75,7 +75,7 @@ class tool_totara_sync_user_db_check_email_sanity_testcase extends totara_sync_d
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $this->setAdminUser();
 

@@ -39,7 +39,7 @@ class workshopallocation_random_testcase extends advanced_testcase {
     /** allocator instance */
     protected $allocator;
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
         $this->setAdminUser();
@@ -55,7 +55,7 @@ class workshopallocation_random_testcase extends advanced_testcase {
         $this->allocator = new testable_workshop_random_allocator($this->workshop);
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->allocator    = null;
         $this->workshop     = null;
         $this->workshop = null;

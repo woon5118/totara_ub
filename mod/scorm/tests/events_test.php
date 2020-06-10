@@ -47,7 +47,7 @@ class mod_scorm_event_testcase extends advanced_testcase {
     /** @var stdClass store course module object */
     protected $eventcm;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->eventcourse = null;
         $this->eventuser = null;
         $this->eventscorm = null;
@@ -55,7 +55,7 @@ class mod_scorm_event_testcase extends advanced_testcase {
         parent::tearDown();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         $this->setAdminUser();
         $this->eventcourse = $this->getDataGenerator()->create_course();
         $this->eventuser = $this->getDataGenerator()->create_user();

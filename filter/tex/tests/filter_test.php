@@ -40,12 +40,12 @@ class filter_tex_filter_testcase extends advanced_testcase {
 
     protected $filter;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->filter = null;
         parent::tearDown();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
         $this->filter = new filter_tex(context_system::instance(), array());

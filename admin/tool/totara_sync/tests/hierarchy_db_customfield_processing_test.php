@@ -37,12 +37,12 @@ require_once($CFG->dirroot . '/admin/tool/totara_sync/elements/pos.php');
  */
 class tool_totara_sync_hierarchy_db_customfield_processing_testcase extends totara_sync_database_testcase {
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         ob_start();
     }
 
-    public function tearDown() {
+    public function tearDown(): void {
         ob_end_clean();
         parent::tearDown();
     }

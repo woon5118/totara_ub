@@ -35,11 +35,11 @@ class totara_reportbuilder_rb_filter_multicheck_testcase extends advanced_testca
 
     private $report = null;
 
-    public function tearDown() {
+    public function tearDown(): void {
         $this->report = null;
     }
 
-    public function setUp() {
+    public function setUp(): void {
         global $DB, $CFG;
 
         $this->resetAfterTest();

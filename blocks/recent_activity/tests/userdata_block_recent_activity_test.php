@@ -36,7 +36,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 class userdata_block_recent_activity_test extends advanced_testcase {
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
 
         global $CFG;

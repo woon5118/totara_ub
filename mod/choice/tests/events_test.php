@@ -47,7 +47,7 @@ class mod_choice_events_testcase extends advanced_testcase {
     /** @var context_object */
     protected $context;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->choice = null;
         $this->course = null;
         $this->cm = null;
@@ -58,7 +58,7 @@ class mod_choice_events_testcase extends advanced_testcase {
     /**
      * Setup often used objects for the following tests.
      */
-    protected function setup() {
+    protected function setUp(): void {
         global $DB;
 
         $this->resetAfterTest();

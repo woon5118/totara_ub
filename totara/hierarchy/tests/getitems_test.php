@@ -37,12 +37,12 @@ class totara_hierarchy_getitems_testcase extends advanced_testcase {
 
     private $orgs = array();
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->orgs = null;
         parent::tearDown();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         global $DB;
 
         parent::setup();

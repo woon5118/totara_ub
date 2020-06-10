@@ -32,7 +32,7 @@ require_once($CFG->dirroot . '/mod/quiz/report/reportlib.php');
 
 class testable_all_calculated_for_qubaid_condition extends \core_question\statistics\questions\all_calculated_for_qubaid_condition {
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->lateststeps = null;
         $this->statscollectionclassname = null;
         $this->qstats = null;

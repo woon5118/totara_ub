@@ -36,7 +36,7 @@ class totara_reportbuilder_rb_plan_certifications_history_embedded_testcase exte
     /**
      * Prepare mock data for testing.
      */
-    protected function setUp() {
+    protected function setUp(): void {
         global $DB;
 
         parent::setup();

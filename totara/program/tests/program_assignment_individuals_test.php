@@ -27,7 +27,7 @@ class totara_program_assignment_individuals_test extends advanced_testcase {
     private $programgenerator = null;
 
 
-    public function tearDown() {
+    public function tearDown(): void {
         $this->generator = null;
         $this->programgenerator = null;
 

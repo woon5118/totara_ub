@@ -27,17 +27,27 @@
 /**
  * Constraint that checks a simple object with an isEqual constrain, allowing for exceptions to be made for some fields.
  *
+ * NOTE: this used to extend \PHPUnit\Framework\Constraint\IsEqual which is now final, so let's ignore the copy/pasting here.
+ *
  * @package    core
  * @category   phpunit
  * @copyright  2015 Andrew Nicols <andrew@nicols.co.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class phpunit_constraint_object_is_equal_with_exceptions extends \PHPUnit\Framework\Constraint\IsEqual {
+class phpunit_constraint_object_is_equal_with_exceptions extends \PHPUnit\Framework\Constraint\Constraint {
+    /**
+     * @var mixed
+     */
+    private $value;
 
     /**
      * @var array $keys The list of exceptions.
      */
     protected $keys = array();
+
+    public function __construct($value) {
+        $this->value = $value;
+    }
 
     /**
      * Add an exception for the named key to use a different comparison
@@ -63,11 +73,11 @@ class phpunit_constraint_object_is_equal_with_exceptions extends \PHPUnit\Framew
      *
      * @param  mixed    $other              Value or object to evaluate.
      * @param  string   $description        Additional information about the test
-     * @param  bool     $shouldreturnesult  Whether to return a result or throw an exception
+     * @param  bool     $returnResult       Whether to return a result or throw an exception
      * @return mixed
      * @throws \PHPUnit\Framework\ExpectationFailedException
      */
-    public function evaluate($other, $description = '', $shouldreturnesult = false) {
+    public function evaluate($other, string $description = '', bool $returnResult = false) {
         foreach ($this->keys as $key => $comparison) {
             if (isset($other->$key) || isset($this->value->$key)) {
                 // One of the keys is present, therefore run the comparison.
@@ -79,8 +89,61 @@ class phpunit_constraint_object_is_equal_with_exceptions extends \PHPUnit\Framew
             }
         }
 
-        // Run the parent evaluation (isEqual).
-        return parent::evaluate($other, $description, $shouldreturnesult);
+        // Use isEqual code..
+
+        // If $this->value and $other are identical, they are also equal.
+        // This is the most common path and will allow us to skip
+        // initialization of all the comparators.
+        if ($this->value === $other) {
+            return true;
+        }
+
+        $comparatorFactory = \SebastianBergmann\Comparator\Factory::getInstance();
+
+        try {
+            $comparator = $comparatorFactory->getComparatorFor(
+                $this->value,
+                $other
+            );
+
+            $comparator->assertEquals(
+                $this->value,
+                $other
+            );
+        } catch (\SebastianBergmann\Comparator\ComparisonFailure $f) {
+            if ($returnResult) {
+                return false;
+            }
+
+            throw new \PHPUnit\Framework\ExpectationFailedException(
+                \trim($description . "\n" . $f->getMessage()),
+                $f
+            );
+        }
+
+        return true;
     }
 
+    /**
+     * Returns a string representation of the constraint.
+     *
+     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     */
+    public function toString(): string {
+        if (\is_string($this->value)) {
+            if (\strpos($this->value, "\n") !== false) {
+                return 'is equal to <text>';
+            }
+
+            return \sprintf(
+                "is equal to '%s'",
+                $this->value
+            );
+        }
+
+        return \sprintf(
+            'is equal to %s',
+            $this->exporter()->export($this->value)
+        );
+    }
 }

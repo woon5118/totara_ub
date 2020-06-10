@@ -42,7 +42,7 @@ class totara_cohort_events_testcase extends advanced_testcase {
     private $program_generator = null;
     private $cohort = null;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->cohort_generator = null;
         $this->program_generator = null;
         $this->cohort = null;
@@ -52,7 +52,7 @@ class totara_cohort_events_testcase extends advanced_testcase {
     /**
      * SetUp.
      */
-    public function setUp() {
+    public function setUp(): void {
         $this->cohort_generator = $this->getDataGenerator()->get_plugin_generator('totara_cohort');
         $this->program_generator = $this->getDataGenerator()->get_plugin_generator('totara_program');
         $this->cohort = $this->cohort_generator->create_cohort(array('cohorttype' => cohort::TYPE_DYNAMIC));

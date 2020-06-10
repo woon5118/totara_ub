@@ -32,12 +32,12 @@ class totara_job_lib_testcase extends advanced_testcase {
     /** @var  testing_data_generator */
     private $data_generator;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->data_generator = null;
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setup();
         $this->resetAfterTest();
 

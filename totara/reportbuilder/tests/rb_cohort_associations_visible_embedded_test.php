@@ -36,7 +36,7 @@ class totara_reportbuilder_rb_cohort_associations_visible_embedded_testcase exte
     /**
      * Prepare mock data for testing.
      */
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setup();
         $this->setAdminUser();
         $this->resetAfterTest(true);

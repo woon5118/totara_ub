@@ -30,14 +30,14 @@ use totara_form\form\element\checkboxes,
  * Test for \totara_form\form\element\checkboxes class.
  */
 class totara_form_element_checkboxes_testcase extends advanced_testcase {
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         require_once(__DIR__ . '/fixtures/test_form.php');
         test_form::phpunit_reset();
         $this->resetAfterTest();
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         test_form::phpunit_reset();
         parent::tearDown();
     }

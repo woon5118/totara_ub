@@ -41,7 +41,7 @@ class tool_totara_sync_jobassignment_db_emptyfields_setting_testcase extends tot
     /**
      * Setup funciton
      */
-    public function setUp() {
+    public function setUp(): void {
         $this->elementname = 'jobassignment';
         $this->sourcetable = 'job_assignment_user_source';
 
@@ -177,7 +177,7 @@ class tool_totara_sync_jobassignment_db_emptyfields_setting_testcase extends tot
     /**
      * Teardown function
      */
-    public function tearDown() {
+    public function tearDown(): void {
         $this->elementname = null;
         $this->sourcetable = null;
 

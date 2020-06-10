@@ -45,13 +45,13 @@ class totara_reportbuilder_external_testcase extends \advanced_testcase {
      */
     public $rb_generator;
 
-    protected function setUp() {
+    protected function setUp(): void {
         $this->resetAfterTest();
         $this->rb_generator = $this->getDataGenerator()->get_plugin_generator('totara_reportbuilder');
         parent::setup();
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->rb_generator = null;
         parent::tearDown();
     }

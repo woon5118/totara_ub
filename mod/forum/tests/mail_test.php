@@ -31,7 +31,7 @@ class mod_forum_mail_testcase extends advanced_testcase {
 
     protected $helper;
 
-    public function setUp() {
+    public function setUp(): void {
         // We must clear the subscription caches. This has to be done both before each test, and after in case of other
         // tests using these functions.
         \mod_forum\subscriptions::reset_forum_cache();
@@ -63,7 +63,7 @@ class mod_forum_mail_testcase extends advanced_testcase {
         $this->helper = $helper;
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         // We must clear the subscription caches. This has to be done both before each test, and after in case of other
         // tests using these functions.
         \mod_forum\subscriptions::reset_forum_cache();

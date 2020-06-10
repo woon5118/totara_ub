@@ -39,7 +39,7 @@ class totara_program_rb_source_program_completion_testcase extends advanced_test
      */
     protected $generator_program;
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
 
         self::setAdminUser();
@@ -48,7 +48,7 @@ class totara_program_rb_source_program_completion_testcase extends advanced_test
         $this->generator_program = $this->generator->get_plugin_generator('totara_program');
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->generator = null;
         $this->generator_program = null;
 

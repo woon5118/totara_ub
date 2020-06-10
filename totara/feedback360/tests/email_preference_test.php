@@ -50,7 +50,7 @@ class feedback360_email_preference_test extends feedback360_testcase {
     /**
      * PhpUnit fixture method that runs before the test method executes.
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
 
         $this->preventResetByRollback();
@@ -64,7 +64,7 @@ class feedback360_email_preference_test extends feedback360_testcase {
     /**
      * PhpUnit fixture method that runs after the test method executes.
      */
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->emailsink->close();
         $this->emailsink = null;
         $this->fingerprint = null;

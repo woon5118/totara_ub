@@ -40,7 +40,7 @@ class mod_facetoface_calendar_update_testcase extends advanced_testcase {
     protected $sessiondates = null;
     protected $facilitator = null;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->facetofacegenerator = null;
         $this->facetoface = null;
         $this->course = null;
@@ -50,7 +50,7 @@ class mod_facetoface_calendar_update_testcase extends advanced_testcase {
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         $this->facetofacegenerator = $this->getDataGenerator()->get_plugin_generator('mod_facetoface');
         $this->course = $this->getDataGenerator()->create_course();
         $this->users = array(

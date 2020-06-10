@@ -106,7 +106,7 @@ class totara_reportbuilder_rb_findcourses_embedded_cache_testcase extends report
     protected $course4 = null;
     protected static $ind = 0;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->report_builder_data = null;
         $this->report_builder_columns_data = null;
         $this->report_builder_filters_data = null;
@@ -136,7 +136,7 @@ class totara_reportbuilder_rb_findcourses_embedded_cache_testcase extends report
      * - Course4 haven't enroled any users
      *
      */
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setup();
 
         // Common parts of test cases:

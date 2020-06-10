@@ -25,12 +25,12 @@ defined('MOODLE_INTERNAL') || die();
 
 class customfield_events_testcase extends advanced_testcase {
 
-    protected function tearDown() {
+    protected function tearDown(): void {
 
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         global $DB;
         $this->resetAfterTest();
 

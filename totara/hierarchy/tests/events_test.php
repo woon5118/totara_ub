@@ -79,7 +79,7 @@ class totara_hierarchy_events_testcase extends advanced_testcase {
     protected $pos, $org, $comp, $comp2, $goal;
     protected $user, $cohort, $course, $module;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->pos_framework = null;
         $this->org_framework = null;
         $this->comp_framework = null;
@@ -97,7 +97,7 @@ class totara_hierarchy_events_testcase extends advanced_testcase {
         parent::tearDown();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setup();
         $this->resetAfterTest(true);
         $datagen = $this->getDataGenerator()->get_plugin_generator('totara_hierarchy');

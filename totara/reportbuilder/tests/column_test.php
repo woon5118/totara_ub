@@ -591,7 +591,7 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
     // See totara/reportbuilder/rb_sources/rb_source_reports.php for an example.
 
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
         global $DB;
         if ($DB->get_dbfamily() === 'mysql') {
@@ -607,7 +607,7 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
         }
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->user_info_field_data = null;
         $this->user_info_data_data = null;
         $this->org_framework_data = null;
@@ -715,7 +715,7 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
         parent::tearDown();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         global $DB;
         parent::setup();
         set_config('enablecompletion', 1);

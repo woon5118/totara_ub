@@ -62,7 +62,7 @@ class totara_customfield_area_testcase extends advanced_testcase {
     /**
      * Cleans up after these tests.
      */
-    public function tearDown() {
+    public function tearDown(): void {
 
         // Destroy the cached helper instance.
         $instance = \totara_customfield\helper::get_instance();

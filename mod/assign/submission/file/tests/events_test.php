@@ -32,7 +32,7 @@ class assignsubmission_file_events_testcase extends advanced_testcase {
     // Use the generator helper.
     use mod_assign_test_generator;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->user = null;
         $this->course = null;
         $this->cm = null;

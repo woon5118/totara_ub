@@ -43,7 +43,7 @@ class tool_totara_sync_jobassignment_csv_emptyfields_setting_testcase extends to
     protected $sourcename = 'totara_sync_source_jobassignment_csv';
     protected $source = null;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->filedir = null;
         $this->configcsv = null;
         $this->config = null;
@@ -52,7 +52,7 @@ class tool_totara_sync_jobassignment_csv_emptyfields_setting_testcase extends to
         parent::tearDown();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
 
         $this->resetAfterTest(true);

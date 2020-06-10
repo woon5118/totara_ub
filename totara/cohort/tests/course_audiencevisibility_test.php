@@ -76,7 +76,7 @@ class totara_cohort_course_audiencevisibility_testcase extends advanced_testcase
     /** @var stdClass $audience2 */
     private $audience2 = null;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->user1 = null;
         $this->user2 = null;
         $this->user3 = null;
@@ -101,7 +101,7 @@ class totara_cohort_course_audiencevisibility_testcase extends advanced_testcase
     /**
      * Setup.
      */
-    protected function setUp() {
+    protected function setUp(): void {
         global $DB;
         parent::setup();
         $this->setAdminUser();

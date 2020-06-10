@@ -624,7 +624,7 @@ abstract class base_testcase extends \PHPUnit\Framework\TestCase {
         fputcsv($fp, array(number_format($totaltime, 2), number_format($this->totalwaitforsecond, 2), $memdiff, $name, $classname));
     }
 
-    public static function tearDownAfterClass() {
+    public static function tearDownAfterClass(): void {
         if (!defined('PHPUNIT_PROFILING')) {
             parent::tearDownAfterClass();
             return;

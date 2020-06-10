@@ -42,7 +42,7 @@ class totara_program_extension_testcase extends reportcache_advanced_testcase {
     private $user, $course;
 
 
-    protected function setUp() {
+    protected function setUp(): void {
         global $DB, $CFG;
 
         parent::setUp();
@@ -68,7 +68,7 @@ class totara_program_extension_testcase extends reportcache_advanced_testcase {
         $this->module = $this->getDataGenerator()->create_module('forum', array('course' => $this->course->id), $completionsettings);
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->data_generator = null;
         $this->program_generator = null;
         $this->user = null;

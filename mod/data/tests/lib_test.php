@@ -45,7 +45,7 @@ class mod_data_lib_testcase extends advanced_testcase {
     /**
      * Tear Down to reset DB.
      */
-    protected function tearDown() {
+    protected function tearDown(): void {
         global $DB;
 
         if (isset($this->DB)) {

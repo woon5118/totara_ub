@@ -37,7 +37,7 @@ require_once($CFG->libdir . '/tests/orm_entity_relation_testcase.php');
  */
 class core_orm_entity_buffer_test extends orm_entity_relation_testcase {
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         buffer::clear();
     }

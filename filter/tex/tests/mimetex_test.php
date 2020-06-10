@@ -31,7 +31,7 @@ class filter_tex_mimetex_testcase extends advanced_testcase {
     private $cfg_pcntl_phpclipath;
     private $executable;
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
         global $CFG;
@@ -51,7 +51,7 @@ class filter_tex_mimetex_testcase extends advanced_testcase {
         }
     }
 
-    public function tearDown() {
+    public function tearDown(): void {
         global $CFG;
 
         $this->executable = null;

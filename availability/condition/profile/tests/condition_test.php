@@ -46,7 +46,7 @@ class availability_profile_condition_testcase extends advanced_testcase {
     /** @var \core_availability\info Current info */
     private $info;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->profilefield = null;
         $this->setusers = null;
         $this->cond = null;
@@ -54,7 +54,7 @@ class availability_profile_condition_testcase extends advanced_testcase {
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         global $DB, $CFG;
 
         $this->resetAfterTest();

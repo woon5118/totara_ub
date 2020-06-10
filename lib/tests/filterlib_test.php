@@ -42,7 +42,7 @@ class core_filterlib_testcase extends advanced_testcase {
     private $activity1context;
     private $activity2context;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->syscontext = null;
         $this->childcontext = null;
         $this->childcontext2 = null;
@@ -54,7 +54,7 @@ class core_filterlib_testcase extends advanced_testcase {
         parent::tearDown();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         global $DB;
         parent::setUp();
 

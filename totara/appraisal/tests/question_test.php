@@ -41,13 +41,13 @@ class appraisal_question_test extends appraisal_testcase {
      */
     protected $defmngr = array();
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->def = null;
         $this->defmngr = null;
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $this->def = array('name' => 'Appraisal', 'stages' => array(
             array('name' => 'St1', 'timedue' => time() + 86400, 'locks' => array(appraisal::ROLE_LEARNER => 1), 'pages' => array(

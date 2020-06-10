@@ -42,7 +42,7 @@ class totara_plan_components_testcase extends advanced_testcase {
     /** @var  totara_program_generator */
     private $program_generator;
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
         $this->messagesink = $this->redirectMessages();
@@ -51,7 +51,7 @@ class totara_plan_components_testcase extends advanced_testcase {
         $this->program_generator = $this->data_generator->get_plugin_generator('totara_program');
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->messagesink->clear();
         $this->messagesink->close();
         $this->messagesink = null;

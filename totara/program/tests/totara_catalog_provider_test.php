@@ -47,7 +47,7 @@ class totara_program_totara_catalog_provider_testcase extends \advanced_testcase
      */
     private $program = null;
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setup();
         $this->setAdminUser();
         $this->resetAfterTest();
@@ -57,7 +57,7 @@ class totara_program_totara_catalog_provider_testcase extends \advanced_testcase
         $this->program = $program_generator->create_program();
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->provider = null;
         $this->program = null;
         parent::tearDown();

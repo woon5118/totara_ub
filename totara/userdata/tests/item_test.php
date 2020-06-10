@@ -34,7 +34,7 @@ defined('MOODLE_INTERNAL') || die();
  * Tests the base item class.
  */
 class totara_userdata_item_testcase extends advanced_testcase {
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
         require_once(__DIR__ . '/fixtures/testitem.php');
         require_once(__DIR__ . '/fixtures/testitemminimal.php');

@@ -38,7 +38,7 @@ require_once($CFG->dirroot . '/webservice/xmlrpc/lib.php');
  */
 class webservice_xmlrpc_test extends advanced_testcase {
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->mockresponse = null;
         parent::tearDown();
     }
@@ -46,7 +46,7 @@ class webservice_xmlrpc_test extends advanced_testcase {
     /**
      * Setup.
      */
-    public function setUp() {
+    public function setUp(): void {
         $this->resetAfterTest();
 
         // All tests require xmlrpc. Skip tests, if xmlrpc is not installed.

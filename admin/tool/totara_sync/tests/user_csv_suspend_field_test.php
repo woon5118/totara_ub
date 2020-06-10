@@ -36,7 +36,7 @@ class tool_totara_sync_user_csv_suspend_field_testcase extends advanced_testcase
     private $synctable_clone;
     private $user = null;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->filedir = null;
         $this->element = null;
         $this->synctable = null;
@@ -48,7 +48,7 @@ class tool_totara_sync_user_csv_suspend_field_testcase extends advanced_testcase
     /**
      * Configure records, with one faulty record for each sub-check.
      */
-    public function setUp() {
+    public function setUp(): void {
         global $CFG, $DB;
 
         parent::setup();

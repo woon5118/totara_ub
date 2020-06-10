@@ -34,14 +34,14 @@ class totara_appraisal_generator_testcase extends advanced_testcase {
     // Array's can't be defined as a constant so declare it as a private variable.
     private $allroles = array(appraisal::ROLE_LEARNER, appraisal::ROLE_MANAGER, appraisal::ROLE_TEAM_LEAD, appraisal::ROLE_APPRAISER);
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->appraisalgenerator = null;
         $this->appraisal = null;
         $this->allroles = null;
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         $this->resetAfterTest();
 
         // All tests need the generator and an appraisal object.

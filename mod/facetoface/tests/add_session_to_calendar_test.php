@@ -31,7 +31,7 @@ class mod_facetoface_add_session_to_calendar_testcase extends advanced_testcase 
     protected $context = null;
 
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->facetofacegenerator = null;
         $this->facetoface = null;
         $this->course = null;
@@ -39,7 +39,7 @@ class mod_facetoface_add_session_to_calendar_testcase extends advanced_testcase 
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         global $DB;
         $this->resetAfterTest();
         $this->setAdminUser();

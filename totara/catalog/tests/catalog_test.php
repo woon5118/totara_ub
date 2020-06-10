@@ -32,7 +32,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 class totara_catalog_catalog_testcase extends advanced_testcase {
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
     }

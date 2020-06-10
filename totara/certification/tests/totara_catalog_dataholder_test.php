@@ -38,7 +38,7 @@ class totara_certification_totara_catalog_dataholder_testcase extends \advanced_
     /**
      * Create certification.
      */
-    protected function setUp() {
+    protected function setUp(): void {
         $this->resetAfterTest();
         
         // setup a specific certification with different long name and id

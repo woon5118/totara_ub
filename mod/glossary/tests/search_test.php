@@ -44,12 +44,12 @@ class mod_glossary_search_testcase extends advanced_testcase {
      */
     protected $entryareaid = null;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->entryareaid = null;
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         $this->resetAfterTest(true);
         set_config('enableglobalsearch', true);
 

@@ -41,7 +41,7 @@ class core_message_messagelib_testcase extends advanced_testcase {
     /** @var phpunit_message_sink keep track of messages. */
     protected $messagesink = null;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->messagesink = null;
         parent::tearDown();
     }
@@ -51,7 +51,7 @@ class core_message_messagelib_testcase extends advanced_testcase {
      *
      * This is executed before running any test in this file.
      */
-    public function setUp() {
+    public function setUp(): void {
         $this->preventResetByRollback(); // Messaging is not compatible with transactions.
         $this->messagesink = $this->redirectMessages();
         $this->resetAfterTest();

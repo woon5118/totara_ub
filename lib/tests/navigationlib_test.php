@@ -35,7 +35,7 @@ class core_navigationlib_testcase extends advanced_testcase {
      */
     public $node;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->node = null;
         $this->exposedkey = null;
         $this->exposedkey = null;

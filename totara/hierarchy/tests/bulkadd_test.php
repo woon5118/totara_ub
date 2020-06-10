@@ -59,12 +59,12 @@ class totara_hierarchy_bulkadd_testcase extends advanced_testcase {
 
     private $orgs = array();
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->orgs = null;
         parent::tearDown();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setup();
 
         $user = get_admin();

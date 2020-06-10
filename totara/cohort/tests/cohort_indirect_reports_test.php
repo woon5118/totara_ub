@@ -42,7 +42,7 @@ class totara_cohort_indirect_reports_testcase extends advanced_testcase {
 
     const TEST_COUNT_USERS = 20;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->users = null;
         $this->cohort = null;
         $this->ruleset = null;
@@ -50,7 +50,7 @@ class totara_cohort_indirect_reports_testcase extends advanced_testcase {
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setup();
         $this->resetAfterTest(true);
 

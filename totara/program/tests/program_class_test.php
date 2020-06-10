@@ -55,14 +55,14 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
     private $orgframe, $posframe;
     private $users = array(), $organisations = array(), $positions = array(), $audiences = array(), $managers = array(), $managerjas= array();
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
 
         global $CFG;
         require_once($CFG->dirroot . '/totara/program/program.class.php');
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
         $this->messagesink = $this->redirectMessages();
@@ -111,7 +111,7 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
         }
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->messagesink->clear();
         $this->messagesink->close();
 

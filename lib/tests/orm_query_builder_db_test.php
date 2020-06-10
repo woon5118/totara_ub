@@ -67,14 +67,14 @@ class core_orm_query_builder_db_testcase extends advanced_testcase {
      */
     public $data = null;
 
-    protected function setUp() {
+    protected function setUp(): void {
         $this->create_tables()
             ->create_data();
 
         parent::setUp();
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         parent::tearDown();
 
         $this->drop_test_tables();

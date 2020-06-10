@@ -51,14 +51,14 @@ class gradereport_user_lib_testcase extends advanced_testcase {
      */
     private $tree;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->user = null;
         $this->course = null;
         $this->tree = null;
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         $this->user = $this->getDataGenerator()->create_user();
         $this->course = $this->getDataGenerator()->create_course();
         $this->tree = new \core_user\output\myprofile\tree();

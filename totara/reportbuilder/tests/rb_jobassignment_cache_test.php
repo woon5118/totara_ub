@@ -66,7 +66,7 @@ class totara_reportbuilder_rb_jobassignment_cache_testcase extends reportcache_a
      *  - Set up a base report no columns or filters
      *
      */
-    protected function setUp(){
+    protected function setUp(): void {
         parent::setup();
         $this->setAdminUser();
         $this->loadDataSet($this->createArrayDataSet(array('report_builder' => array($this->report_builder_data))));

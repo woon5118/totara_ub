@@ -50,7 +50,7 @@ class totara_program_program_content_testcase extends advanced_testcase {
     /** @var program */
     private $program1, $program2;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->generator = null;
         $this->program_generator = null;
         $this->course1 = $this->course2 = $this->course3 = null;
@@ -59,7 +59,7 @@ class totara_program_program_content_testcase extends advanced_testcase {
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         $this->resetAfterTest(true);
         parent::setUp();
         global $DB;

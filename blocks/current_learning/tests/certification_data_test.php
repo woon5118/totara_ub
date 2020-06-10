@@ -38,7 +38,7 @@ class block_current_learning_certification_data_testcase extends block_current_l
     private $course1, $course2, $course3, $course4;
     private $program1, $program2;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->generator = null;
         $this->program_generator = null;
         $this->completion_generator = null;
@@ -49,7 +49,7 @@ class block_current_learning_certification_data_testcase extends block_current_l
         parent::tearDown();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         global $CFG, $DB;
         parent::setUp();
 

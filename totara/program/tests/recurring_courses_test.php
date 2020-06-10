@@ -34,7 +34,7 @@ class totara_program_recurring_courses_testcase extends reportcache_advanced_tes
 
     private $users;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->users = null;
         parent::tearDown();
     }

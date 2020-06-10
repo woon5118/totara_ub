@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die();
  * Test registration related code.
  */
 class totara_core_register_testcase extends advanced_testcase {
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         global $CFG;
         parent::setUpBeforeClass();
         require_once("$CFG->dirroot/$CFG->admin/registerlib.php");

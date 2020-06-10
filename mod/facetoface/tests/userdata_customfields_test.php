@@ -49,7 +49,7 @@ class mod_facetoface_userdata_customfields_testcase extends advanced_testcase {
     /**
      * Set up tests.
      */
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
     }

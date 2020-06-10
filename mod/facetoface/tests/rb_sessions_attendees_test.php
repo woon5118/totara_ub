@@ -29,7 +29,7 @@ class mod_facetoface_rb_sessions_attendees_testcase extends advanced_testcase {
     /**
      * Create course, seminar and a seminar session and add users to the session.
      */
-    public function setUp() {
+    public function setUp(): void {
         $this->setAdminUser();
         $time = time();
 

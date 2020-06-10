@@ -36,7 +36,7 @@ class totara_reportbuilder_rb_completionimport_course_embedded_testcase extends 
     /**
      * Prepare mock data for testing.
      */
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setup();
         set_config('enablecompletion', 1);
         $this->setAdminUser();

@@ -41,12 +41,12 @@ class user_search_testcase extends advanced_testcase {
      */
     protected $userareaid = null;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->userareaid = null;
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         $this->resetAfterTest(true);
         set_config('enableglobalsearch', true);
 

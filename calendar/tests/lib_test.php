@@ -35,7 +35,7 @@ require_once($CFG->dirroot . '/calendar/lib.php');
  */
 class core_calendar_lib_testcase extends advanced_testcase {
 
-    protected function setUp() {
+    protected function setUp(): void {
         $this->resetAfterTest(true);
     }
 

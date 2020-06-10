@@ -55,7 +55,7 @@ class core_blog_events_testcase extends advanced_testcase {
     /** @var $postid */
     private $postid;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->courseid = null;
         $this->cmid = null;
         $this->groupid = null;
@@ -68,7 +68,7 @@ class core_blog_events_testcase extends advanced_testcase {
     /**
      * Setup the tests.
      */
-    protected function setUp() {
+    protected function setUp(): void {
         global $DB;
         parent::setUp();
 

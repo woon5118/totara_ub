@@ -47,7 +47,7 @@ class core_course_totara_catalog_course_provider_testcase extends \advanced_test
      */
     private $course = null;
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setup();
         $this->setAdminUser();
         $this->resetAfterTest();
@@ -55,7 +55,7 @@ class core_course_totara_catalog_course_provider_testcase extends \advanced_test
         $this->course = $this->getDataGenerator()->create_course();
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->provider = null;
         $this->course = null;
         parent::tearDown();

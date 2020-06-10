@@ -33,13 +33,13 @@ class block_current_learning_testcase extends block_current_learning_testcase_ba
 
     private $generator;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->user1 = null;
         $this->generator = null;
         parent::tearDown();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         global $CFG, $DB;
 
         $this->resetAfterTest(true);

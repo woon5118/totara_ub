@@ -53,7 +53,7 @@ class totara_cohort_organisation_profile_field_checkbox_testcase extends advance
 
     const TEST_USER_COUNT_MEMBERS = 22; //53;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->cohort_generator = null;
         $this->hierarchy_generator = null;
         $this->cohort = null;
@@ -65,7 +65,7 @@ class totara_cohort_organisation_profile_field_checkbox_testcase extends advance
         parent::tearDown();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         global $DB;
 
         parent::setup();

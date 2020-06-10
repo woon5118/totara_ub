@@ -45,7 +45,7 @@ class core_calendar_events_testcase extends advanced_testcase {
      */
     private $course;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->user = null;
         $this->course = null;
         parent::tearDown();
@@ -54,7 +54,7 @@ class core_calendar_events_testcase extends advanced_testcase {
     /**
      * Test set up.
      */
-    protected function setUp() {
+    protected function setUp(): void {
         global $USER;
         // The user we are going to test this on.
         $this->setAdminUser();

@@ -48,7 +48,7 @@ class totara_cohort_position_custom_fields_testcase extends advanced_testcase {
 
     const TEST_USER_COUNT_MEMBERS = 10;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->cohort_generator = null;
         $this->posfw = null;
         $this->pos1 = null;
@@ -58,7 +58,7 @@ class totara_cohort_position_custom_fields_testcase extends advanced_testcase {
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         global $DB, $USER;
 
         parent::setup();

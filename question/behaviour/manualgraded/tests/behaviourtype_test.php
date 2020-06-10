@@ -42,12 +42,12 @@ class qbehaviour_manualgraded_type_test extends basic_testcase {
     /** @var qbehaviour_manualgraded_type */
     protected $behaviourtype;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->behaviourtype = null;
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $this->behaviourtype = question_engine::get_behaviour_type('manualgraded');
     }

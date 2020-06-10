@@ -53,7 +53,7 @@ class totara_program_lib_testcase extends reportcache_advanced_testcase {
     public $numtestcerts = 7;
     public $numtestprogs = 10;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->fixusers = null;
         $this->fixprograms = null;
         $this->fixcertifications = null;

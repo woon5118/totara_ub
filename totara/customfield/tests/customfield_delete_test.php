@@ -31,13 +31,13 @@ class totara_customfield_delete_testcase extends advanced_testcase {
     protected $course1 = null;
     protected $course2 = null;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->course1 = null;
         $this->course2 = null;
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
 
         // Create course customfields.

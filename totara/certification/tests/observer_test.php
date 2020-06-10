@@ -40,14 +40,14 @@ class totara_certification_observer_testcase extends reportcache_advanced_testca
     private $course1, $course2, $course3, $course4;
     private $certif1, $certif2;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->users = null;
         $this->course1 = $this->course2 = $this->course3 = $this->course4 = null;
         $this->certif1 = $this->certif2 = null;
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         global $DB, $CFG;
 
         parent::setUp();

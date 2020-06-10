@@ -38,7 +38,7 @@ class core_user_userdata_customfields_uservisible_testcase extends advanced_test
     /**
      * require necessary file
      */
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
 
         global $CFG;

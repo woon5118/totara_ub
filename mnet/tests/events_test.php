@@ -34,7 +34,7 @@ class mnet_events_testcase extends advanced_testcase {
     /** @var stdClass the mnet host we are using to test */
     protected $mnethost;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->mnethost = null;
         parent::tearDown();
     }
@@ -44,7 +44,7 @@ class mnet_events_testcase extends advanced_testcase {
      *
      * This is executed before running any test in this file.
      */
-    public function setUp() {
+    public function setUp(): void {
         global $DB;
 
         $this->resetAfterTest();

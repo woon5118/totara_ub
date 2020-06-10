@@ -27,7 +27,7 @@ require_once($CFG->dirroot.'/totara/question/field/coursefromplan.class.php');
 
 
 abstract class totara_question_testcase extends advanced_testcase {
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         question_storage_mock::$maxid = 0;
         question_manager::reset();

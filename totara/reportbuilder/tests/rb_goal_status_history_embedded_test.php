@@ -36,7 +36,7 @@ class totara_reportbuilder_rb_goal_status_history_embedded_testcase extends adva
     /**
      * Prepare mock data for testing.
      */
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setup();
         $this->setAdminUser();
         $this->resetAfterTest(true);

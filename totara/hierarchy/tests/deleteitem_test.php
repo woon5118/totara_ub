@@ -113,13 +113,13 @@ class totara_hierarchy_deleteitem_testcase extends advanced_testcase {
         ),
     );
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->comp_framework_data = null;
         $this->comp_data = null;
         parent::tearDown();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
 
         $this->loadDataSet($this->createArrayDataset(

@@ -54,7 +54,7 @@ class totara_reportbuilder_rb_findprograms_embedded_cache_testcase extends repor
     protected $program2 = null;
     protected $program3 = null;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->report_builder_data = null;
         $this->report_builder_columns_data = null;
         $this->report_builder_filters_data = null;
@@ -71,7 +71,7 @@ class totara_reportbuilder_rb_findprograms_embedded_cache_testcase extends repor
      * - Add three programs
      * - Program1 and program2 have word 'level' in fullname
      */
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setup();
         $this->loadDataSet($this->createArrayDataSet(array('report_builder' => array($this->report_builder_data),
                                                            'report_builder_columns' => $this->report_builder_columns_data,

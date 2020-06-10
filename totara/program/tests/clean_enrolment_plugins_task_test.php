@@ -39,7 +39,7 @@ class totara_clean_enrolments_plugins_task_testcase extends reportcache_advanced
 
     protected $programs, $courses, $users;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->generator_program = null;
         $this->programs = null;
         $this->courses = null;
@@ -50,7 +50,7 @@ class totara_clean_enrolments_plugins_task_testcase extends reportcache_advanced
     /**
      * Prepares the environment prior to each test case.
      */
-    public function setUp() {
+    public function setUp(): void {
         // Make each generator more easily accessible.
         $this->generator_program = $this->getDataGenerator()->get_plugin_generator('totara_program');
 

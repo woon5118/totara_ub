@@ -49,7 +49,7 @@ class totara_cohort_course_completion_rules_testcase extends reportcache_advance
     private $cohort_generator = null;
     const TEST_COURSE_COUNT_USERS = 53;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->course1 = null;
         $this->course2 = null;
         $this->course3 = null;
@@ -89,7 +89,7 @@ class totara_cohort_course_completion_rules_testcase extends reportcache_advance
      | user3  - user7  |  course4 |  now         |    no      |
      *-----------------*----------*--------------*------------*
     */
-    public function setUp() {
+    public function setUp(): void {
         global $DB;
 
         parent::setup();

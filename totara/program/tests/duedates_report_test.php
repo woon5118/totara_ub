@@ -39,7 +39,7 @@ class totara_program_duedates_report_testcase extends reportcache_advanced_testc
     /** @var totara_program_generator $program_generator */
     private $program_generator;
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
 
         $this->setAdminUser();
@@ -49,7 +49,7 @@ class totara_program_duedates_report_testcase extends reportcache_advanced_testc
         $this->program_generator = $this->data_generator->get_plugin_generator('totara_program');
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->data_generator = null;
         $this->program_generator = null;
 

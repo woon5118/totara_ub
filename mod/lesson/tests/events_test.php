@@ -37,7 +37,7 @@ class mod_lesson_events_testcase extends advanced_testcase {
     /** @var lesson the lesson used for testing */
     private $lesson;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->course = null;
         $this->lesson = null;
         parent::tearDown();
@@ -48,7 +48,7 @@ class mod_lesson_events_testcase extends advanced_testcase {
      *
      * This is executed before running any test in this file.
      */
-    public function setUp() {
+    public function setUp(): void {
         $this->resetAfterTest();
 
         $this->setAdminUser();

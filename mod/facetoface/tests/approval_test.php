@@ -47,7 +47,7 @@ class mod_facetoface_approval_testcase extends advanced_testcase {
      */
     private $cfgemail = null;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->emailsink->close();
         $this->emailsink = null;
         parent::tearDown();
@@ -56,7 +56,7 @@ class mod_facetoface_approval_testcase extends advanced_testcase {
     /**
      * PhpUnit fixture method that runs before the test method executes.
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
         $this->emailsink = $this->redirectEmails();

@@ -43,7 +43,7 @@ class tool_totara_sync_source_jobassignment_database_testcase extends advanced_t
     private $dbpass = '';
     private $dbtable = '';
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         if (isset($this->ext_dbconnection)) {
             $this->ext_dbconnection->dispose();
         }
@@ -53,7 +53,7 @@ class tool_totara_sync_source_jobassignment_database_testcase extends advanced_t
         parent::tearDown();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         global $CFG;
 
         if (defined('TEST_SYNC_DB_TYPE') ||

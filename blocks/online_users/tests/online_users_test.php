@@ -41,7 +41,7 @@ class block_online_users_testcase extends advanced_testcase {
 
     protected $data;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->data = null;
         parent::tearDown();
     }
@@ -52,7 +52,7 @@ class block_online_users_testcase extends advanced_testcase {
      * Prepare the site with some courses, groups, users and
      * simulate various recent accesses.
      */
-    protected function setUp() {
+    protected function setUp(): void {
 
         // Generate (simulated) recently logged-in users.
         $generator = $this->getDataGenerator()->get_plugin_generator('block_online_users');

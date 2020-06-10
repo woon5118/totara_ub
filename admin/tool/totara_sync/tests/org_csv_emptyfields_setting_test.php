@@ -101,7 +101,7 @@ class tool_totara_sync_org_csv_emptyfields_setting_testcase extends totara_sync_
         'description' => ''
     );
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->filedir = null;
         $this->configcsv = null;
         $this->config = null;
@@ -114,7 +114,7 @@ class tool_totara_sync_org_csv_emptyfields_setting_testcase extends totara_sync_
         parent::tearDown();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         global $CFG;
 
         parent::setUp();

@@ -47,7 +47,7 @@ class totara_certification_totara_catalog_provider_testcase extends \advanced_te
      */
     private $certification = null;
 
-    protected function setUp() {
+    protected function setUp(): void {
         global $DB;
         parent::setup();
         $this->setAdminUser();
@@ -58,7 +58,7 @@ class totara_certification_totara_catalog_provider_testcase extends \advanced_te
         $this->certification = $program_generator->create_certification();
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->provider = null;
         $this->certification = null;
         parent::tearDown();

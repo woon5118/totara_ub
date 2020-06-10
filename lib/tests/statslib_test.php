@@ -48,7 +48,7 @@ class core_statslib_testcase extends advanced_testcase {
     protected $replacements = null;
 
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->tables = null;
         $this->replacements = null;
         parent::tearDown();
@@ -58,7 +58,7 @@ class core_statslib_testcase extends advanced_testcase {
      * Setup function
      *   - Allow changes to CFG->debug for testing purposes.
      */
-    protected function setUp() {
+    protected function setUp(): void {
         global $CFG, $DB;
         parent::setUp();
 

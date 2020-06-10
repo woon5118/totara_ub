@@ -58,7 +58,7 @@ class core_calendar_type_testcase extends advanced_testcase {
      */
     private $user;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->mform = null;
         $this->user = null;
         parent::tearDown();
@@ -67,7 +67,7 @@ class core_calendar_type_testcase extends advanced_testcase {
     /**
      * Test set up.
      */
-    protected function setUp() {
+    protected function setUp(): void {
         // The user we are going to test this on.
         $this->user = self::getDataGenerator()->create_user();
         self::setUser($this->user);

@@ -37,7 +37,7 @@ class editor_atto_userdata_editor_atto_testcase extends advanced_testcase {
     /**
      * set up tests
      */
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
     }

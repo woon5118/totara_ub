@@ -485,7 +485,7 @@ abstract class advanced_testcase extends base_testcase {
      * @static
      * @return void
      */
-    public static function tearDownAfterClass() {
+    public static function tearDownAfterClass(): void {
         self::resetAllData();
         parent::tearDownAfterClass();
     }

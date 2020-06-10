@@ -38,7 +38,7 @@ class mod_glossary_userdata_rating_test extends advanced_testcase {
     /**
      * Set up tests.
      */
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
 
         $this->resetAfterTest(true);
@@ -47,7 +47,7 @@ class mod_glossary_userdata_rating_test extends advanced_testcase {
     /**
      * Set up required classes
      */
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
 
         global $CFG;

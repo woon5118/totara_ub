@@ -56,7 +56,7 @@ class totara_cohort_program_completion_rules_testcase extends reportcache_advanc
     private $user7;
     private $teststart = null;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->userprograms = null;
         $this->cohort_generator = null;
         $this->cohort = null;
@@ -100,7 +100,7 @@ class totara_cohort_program_completion_rules_testcase extends reportcache_advanc
      |  user1 - user7  | program3 - program4 |     now       |     now      |  ------------  |  --------------  |  -------------  |
      *-----------------*---------------------*---------------*--------------*----------------*------------------*-----------------*
     */
-    public function setUp() {
+    public function setUp(): void {
         global $DB, $CFG;
 
         parent::setup();
