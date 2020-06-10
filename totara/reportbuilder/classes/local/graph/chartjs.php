@@ -147,6 +147,18 @@ final class chartjs extends base {
         }
 
         foreach ($values as $k => $val) {
+            // Ensure val is a numeric data type
+            if ($val === '' or !is_numeric($val)) {
+                // There is no way to plot non-numeric data
+                $val = null;
+            } else if (is_string($val)) {
+                if ($val === (string)(int)$val) {
+                    $val = (int)$val;
+                } else {
+                    $val = (float)$val;
+                }
+            }
+
             $this->values[$k]['total'] = isset($this->values[$k]['total']) ? $this->values[$k]['total'] + $val : $val;
 
             if ($this->record->type === 'scatter') {
