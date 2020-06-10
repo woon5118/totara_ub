@@ -1,0 +1,6 @@
+extend type Query {
+  """
+  Returns all relationships between users that can be used for performance activities.
+  """
+  mod_perform_relationships(activity_id: core_id!): [totara_core_relationship!]!
+}

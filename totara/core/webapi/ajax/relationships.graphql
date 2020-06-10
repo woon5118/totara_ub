@@ -1,6 +1,0 @@
-query totara_core_relationships {
-  totara_core_relationships {
-    id
-    name
-  }
-}

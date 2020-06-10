@@ -29,16 +29,16 @@
       {{ $str('activity_participants_select_heading', 'mod_perform') }}
     </label>
     <Checkbox
-      v-for="participant in availableParticipants"
-      :key="participant.id"
-      :value="participant.id"
-      :name="participant.name"
-      :checked="isActiveParticipant(participant)"
-      :disabled="isActiveParticipant(participant)"
-      @change="isChecked => handleChange(isChecked, participant)"
+      v-for="relationship in relationships"
+      :key="relationship.id"
+      :value="relationship.id"
+      :name="relationship.name"
+      :checked="isActiveParticipant(relationship)"
+      :disabled="isActiveParticipant(relationship)"
+      @change="isChecked => handleChange(isChecked, relationship)"
     >
       <template>
-        {{ participant.name }}
+        {{ relationship.name }}
       </template>
     </Checkbox>
     <template v-slot:buttons="{ close }">
@@ -71,7 +71,6 @@ import Button from 'totara_core/components/buttons/Button';
 import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
 import Checkbox from 'totara_core/components/form/Checkbox';
 import Popover from 'totara_core/components/popover/Popover';
-import RelationshipsQuery from 'totara_core/graphql/relationships.graphql';
 
 export default {
   components: {
@@ -87,11 +86,14 @@ export default {
       required: true,
       type: Array,
     },
+    relationships: {
+      type: Array,
+      required: true,
+    },
   },
 
   data() {
     return {
-      availableParticipants: [],
       checkedParticipants: [],
     };
   },
@@ -103,9 +105,7 @@ export default {
      * @return {Boolean}
      */
     hasAddedAllParticipants() {
-      return (
-        this.availableParticipants.length === this.activeParticipants.length
-      );
+      return this.relationships.length === this.activeParticipants.length;
     },
   },
 
@@ -143,13 +143,6 @@ export default {
           value => value !== participant
         );
       }
-    },
-  },
-
-  apollo: {
-    availableParticipants: {
-      query: RelationshipsQuery,
-      update: data => data.totara_core_relationships,
     },
   },
 };

@@ -106,6 +106,7 @@
         </div>
         <ParticipantsPopover
           v-if="autoSave || editMode"
+          :relationships="relationships"
           :active-participants="displayedParticipants"
           @update-participants="updateDisplayedParticipants"
         />
@@ -229,6 +230,10 @@ export default {
     },
     sortOrder: {
       type: Number,
+      required: true,
+    },
+    relationships: {
+      type: Array,
       required: true,
     },
   },

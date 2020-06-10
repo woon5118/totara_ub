@@ -45,6 +45,7 @@
         :last-section="i === sectionStates.length - 1"
         :is-adding="isAdding"
         :sort-order="sectionState.sortOrder"
+        :relationships="relationships"
         @input="updateSection($event, i)"
         @toggle-edit-mode="toggleSectionStateEditMode($event, i)"
         @mutation-success="$emit('mutation-success')"
@@ -73,6 +74,7 @@ import ActivitySection from 'mod_perform/components/manage_activity/content/Acti
 import AddIcon from 'totara_core/components/icons/common/Add';
 import AddSectionMutation from 'mod_perform/graphql/add_section.graphql';
 import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
+import RelationshipsQuery from 'mod_perform/graphql/relationships.graphql';
 import WorkflowSettings from 'mod_perform/components/manage_activity/content/WorkflowSettings';
 
 export default {
@@ -94,6 +96,7 @@ export default {
   data() {
     return {
       sectionStates: this.createSectionStates(this.value),
+      relationships: [],
       isAdding: false,
     };
   },
@@ -340,6 +343,16 @@ export default {
       e.preventDefault();
       e.returnValue = discardUnsavedChanges;
       return discardUnsavedChanges;
+    },
+  },
+
+  apollo: {
+    relationships: {
+      query: RelationshipsQuery,
+      variables() {
+        return { activity_id: this.value.id };
+      },
+      update: data => data.mod_perform_relationships,
     },
   },
 };
