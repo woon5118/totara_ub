@@ -483,7 +483,6 @@ $string['selecting'] = 'With selected badges...';
 $string['setup'] = 'Set up connection';
 $string['sitebackpack'] = 'Active external backpack';
 $string['sitebackpack_help'] = 'The external backpack that users can connect to from this site. Note that changing this setting after users have connected their backpacks will require each user to go to their backpack settings page and disconnect then reconnect.';
-$string['sitebackpackverify'] = 'Backpack connection';
 $string['sitebackpackwarning'] = 'Could not connect to backpack. <br/><br/>Check that the "Badge issuer email address" admin setting is the valid email for an account on the backpack website. <br/><br/>Check that the "Badge issuer password" on the <a href="{$a->url}">site backpack settings page</a>, is the correct password for the account on the backpack website. <br/><br/>The backpack returned: "{$a->warning}"';
 $string['signinwithyouremail'] = 'Sign in with your email';
 $string['sitebadges'] = 'Site badges';
@@ -533,3 +532,4 @@ $string['error:nogroups'] = '<p>There are no public collections of badges availa
 $string['localbadges'] = 'My badges from {$a} web site';
 $string['nobackpackbadges'] = 'There are no badges in the collections you have selected. <a href="mybackpack.php">Add more collections</a>.';
 $string['nobackpackcollections'] = 'No badge collections have been selected. <a href="mybackpack.php">Add collections</a>.';
+$string['sitebackpackverify'] = 'Backpack connection';

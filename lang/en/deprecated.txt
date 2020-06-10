@@ -70,3 +70,4 @@ icqnumber,core
 aimid,core
 yahooid,core
 msnid,core
+sitebackpackverify,core_badges
