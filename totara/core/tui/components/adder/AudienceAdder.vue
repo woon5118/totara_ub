@@ -33,7 +33,10 @@
     @selected-tab-active="updateSelectedItems($event)"
   >
     <template v-slot:browse-filters>
-      <FilterBar :title="$str('filter_audiences', 'totara_core')">
+      <FilterBar
+        :has-top-bar="false"
+        :title="$str('filter_audiences', 'totara_core')"
+      >
         <template v-slot:filters-left="{ stacked }">
           <SearchFilter
             v-model="filters.search"
@@ -47,6 +50,8 @@
     </template>
     <template v-slot:browse-list="{ disabledItems, selectedItems, update }">
       <SelectTable
+        :large-check-box="true"
+        :no-label-offset="true"
         :value="selectedItems"
         :data="audiences && audiences.items ? audiences.items : []"
         :disabled-ids="disabledItems"
@@ -84,13 +89,15 @@
       </SelectTable>
     </template>
 
-    <template v-slot:basket-list="{ selectedItems, update }">
+    <template v-slot:basket-list="{ disabledItems, selectedItems, update }">
       <SelectTable
+        :large-check-box="true"
+        :no-label-offset="true"
         :value="selectedItems"
         :data="audienceSelectedItems"
+        :disabled-ids="disabledItems"
         checkbox-v-align="center"
         :border-bottom-hidden="true"
-        :color-odd-rows="true"
         :select-all-enabled="true"
         @input="update($event)"
       >

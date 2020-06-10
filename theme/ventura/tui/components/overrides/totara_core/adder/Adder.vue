@@ -22,22 +22,28 @@
 
 <style lang="scss">
 .tui-adder {
+  margin-top: calc(var(--tui-gap-6) - var(--tui-modal-content-separation));
+
   &__list {
-    height: 280px;
-    margin-top: var(--tui-gap-4);
-    overflow-y: scroll;
+    height: 316px;
+    overflow-y: auto;
 
     &-loadMore {
       margin: var(--tui-gap-1) 0 0;
       text-align: center;
     }
+
+    &::before {
+      display: block;
+      height: var(--tui-gap-4);
+      content: '';
+    }
   }
 
   &__footer {
     display: flex;
-    margin-top: var(--tui-gap-4);
     padding-top: var(--tui-gap-6);
-    border-top: 1px solid var(--tui-color-neutral-5);
+    border-top: var(--tui-border-width-normal) solid var(--tui-color-neutral-5);
   }
 
   &__summary {

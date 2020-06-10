@@ -22,13 +22,12 @@
 
 <template>
   <ModalPresenter :open="open" @request-close="$emit('cancel')">
-    <Modal size="large" :aria-labelledby="$id('adder')">
-      <ModalContent
-        :close-button="true"
-        :title="title"
-        :title-id="$id('adder')"
-        @dismiss="$emit('cancel')"
-      >
+    <Modal
+      :dismissable="dismissable"
+      size="large"
+      :aria-labelledby="$id('adder')"
+    >
+      <ModalContent :title="title" :title-id="$id('adder')">
         <div class="tui-adder">
           <div class="tui-adder__tabs">
             <Tabs :small-tabs="true" @input="tabChanged">
@@ -70,6 +69,7 @@
                 >
                   <slot
                     name="basket-list"
+                    :disabled-items="existingItems"
                     :selected-items="allSelectedItems"
                     :update="selectionUpdate"
                   />
@@ -153,6 +153,11 @@ export default {
     return {
       allSelectedItems: [],
       basketItems: [],
+      dismissable: {
+        overlayClose: false,
+        esc: true,
+        backdropClick: false,
+      },
     };
   },
 
