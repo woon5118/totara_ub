@@ -21,7 +21,7 @@ type mod_perform_section {
   section_relationships: [mod_perform_section_relationship!]!
   section_elements_summary: mod_perform_section_elements_summary
   created_at(format: core_date_format = DATETIME): core_date!
-  updated_at(format: core_date_format = DATETIME): core_date!
+  updated_at(format: core_date_format = DATETIME): core_date
 }
 
 """
