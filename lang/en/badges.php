@@ -75,6 +75,8 @@ $string['awardedtoyou'] = 'Issued to me';
 $string['awardoncron'] = 'Access to the badges was successfully enabled. Too many users can instantly earn this badge. To ensure site performance, this action will take some time to process.';
 $string['awards'] = 'Recipients';
 $string['backpackavailability'] = 'External badge verification';
+$string['backpackconnectionok'] = 'Backpack connection successfully established';
+$string['backpackconnectionnottested'] = 'Connection can not be tested for this backpack because only OBv2.0 backpacks support it.';
 $string['backpackneedsupdate'] = 'The backpack connected to this profile does not match the backpack for the site. You need to disconnect and reconnect the backpack.';
 $string['backpackavailability_help'] = 'For badge recipients to be able to prove they earned their badges from you, an external backpack service should be able to access your site and verify badges issued from it. Your site does not currently appear to be accessible, which means that badges you have already issued or will issue in the future cannot be verified.
 
@@ -504,6 +506,7 @@ Once a badge has been issued to at least one user, it automatically becomes **Lo
 
 Badges are locked because we want to make sure that all users complete the same requirements to earn a badge. Currently, it is not possible to revoke badges. If we allowed badges requirements to be modified all the time, we would most likely end up with users having the same badge for meeting completely different requirements.';
 $string['subject'] = 'Message subject';
+$string['testbackpack'] = 'Test backpack \'{$a}\'';
 $string['type'] = 'Type';
 $string['userdataitemconnectedbackpacks'] = 'Connected backpacks';
 $string['userdataitemissuedbadges'] = 'Issued badges';
