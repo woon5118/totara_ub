@@ -74,6 +74,7 @@ class behat_totara_tui extends behat_base {
     private const CHECKBOX_LOCATOR = '.tui-checkbox__input';
 
     private const RADIO_LOCATOR = '.tui-radio__input';
+    private const RADIO_LABEL_LOCATOR = '.tui-radio__label';
 
     private const TOGGLE_BUTTON_LOCATOR = '.tui-toggleSwitch__ui';
     private const TOGGLE_BUTTON_LABEL_LOCATOR = '.tui-toggleSwitch__btn';
@@ -519,40 +520,34 @@ class behat_totara_tui extends behat_base {
     }
 
     /**
+     * @When /^I click on the "([^"]*)" tui radio$/
      * @When /^I click on the "([^"]*)" tui radio in the "([^"]*)" tui radio group$/
-     * @param string $radio_value
-     * @param string $radio_group
+     * @param string $radio Can be the value or label
+     * @param string|null $group
      */
-    public function i_click_the_tui_radio_in_the(string $radio_value, string $radio_group): void {
+    public function i_click_the_tui_radio_in_the(string $radio, ?string $group = null): void {
         behat_hooks::set_step_readonly(false);
 
-        $input_identifier = self::RADIO_LOCATOR . "[name='$radio_group'][value='$radio_value']";
-        $radio_input = $this->find('css', $input_identifier);
+        $xpath = '//div[contains(@class, "tui-radio") and ' .
+            '(label[contains(@class, "tui-radio__label") and contains(., "' . $radio . '")] or ' .
+            'input[contains(@class, "tui-radio__input") and @value="' . $radio . '"' .
+            ($group === null ? '' : ' and @name="' . $group . '"') .
+            '])]/input[contains(@class, "tui-radio__input")]';
+
+        /** @var NodeElement $radio_input */
+        $radio_input = $this->find('xpath', $xpath);
         if ($radio_input === null) {
-            $this->fail("Could not locate radio button with the value '{$radio_value}' and group '{$radio_group}'");
+            $this->fail("Could not locate radio button with the label or value '{$radio}'" .
+                $group === null ? '' : " in group '{$group}'"
+            );
         }
 
+        $id = $radio_input->getAttribute('id');
         // The actual input element for the radio is hidden, and therefore cannot be interacted in a normal behat way.
         // Instead we need this hack to manually click the hidden element via running some JS.
-        $click_script = "document.querySelector(\"{$input_identifier}\").click();";
+        $click_script = "document.querySelector(\"#{$id}\").click();";
         $this->getSession()->getDriver()->executeScript($click_script);
         $this->wait_for_pending_js();
-    }
-
-    /**
-     * @Then /^I click on the "([^"]*)" tui radio$/
-     * @param string $name
-     */
-    public function i_click_the_tui_radio(string $name): void {
-        behat_hooks::set_step_readonly(false);
-
-        $checkbox_input = $this->find('css', self::RADIO_LOCATOR . "[name='{$name}']");
-
-        if ($checkbox_input === null) {
-            $this->fail("No tui check box found with name {$name}");
-        }
-
-        $checkbox_input->getParent()->find('css', 'label')->click();
     }
 
     /**

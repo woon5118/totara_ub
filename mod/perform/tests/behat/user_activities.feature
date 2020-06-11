@@ -106,7 +106,7 @@ Feature: Viewing and responding to perform activities
     And the "Manager (Complete)" radio button is selected
     And the "Appraiser (Not yet started)" radio button is not selected
 
-    When I click on the "3" tui radio in the "relationshipToRespondAs" tui radio group
+    When I click on the "Appraiser (Not yet started)" tui radio
     And I click on "Continue" "button"
     Then I should see "single user manager-appraiser" in the ".tui-performUserActivity h2" "css_element"
     And I should see perform activity relationship to user "Appraiser"
