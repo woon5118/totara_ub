@@ -198,8 +198,9 @@ export default {
      * @param {Object} update
      */
     updateMultiSection(update) {
-      this.toggleSectionStateEditMode(update.settings.multisection, 0);
+      this.sectionStates = this.createSectionStates(update);
       this.updateActivity(update);
+      this.toggleSectionStateEditMode(update.settings.multisection, 0);
     },
 
     /**

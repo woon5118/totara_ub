@@ -29,7 +29,6 @@ use core\webapi\middleware\require_advanced_feature;
 use core\webapi\resolver\has_middleware;
 
 use mod_perform\models\activity\activity;
-use mod_perform\models\activity\activity_setting;
 use mod_perform\webapi\middleware\require_activity;
 
 /**
@@ -50,13 +49,8 @@ class toggle_activity_multisection_setting implements mutation_resolver, has_mid
             throw new \invalid_parameter_exception('multisection setting not specified');
         }
 
-        $settings = activity::load_by_id($activity_id)->settings;
-        $existing_value = $settings->lookup(activity_setting::MULTISECTION);
-        if ((bool)$value !== (bool)$existing_value) {
-            $settings->update([activity_setting::MULTISECTION => (bool)$value]);
-        }
-
-        return $settings->get_activity();
+        return activity::load_by_id($activity_id)
+            ->toggle_multisection_setting((bool)$value);
     }
 
     /**

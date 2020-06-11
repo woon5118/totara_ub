@@ -59,6 +59,13 @@ class mod_perform_activity_generator_configuration {
     private $relationships_per_section = [subject::class];
 
     /**
+     * The number of elements that should be created per section.
+     *
+     * @var int
+     */
+    private $elements_per_section = 0;
+
+    /**
      * The number of assignments per activity
      *
      * @var int
@@ -165,6 +172,23 @@ class mod_perform_activity_generator_configuration {
      */
     public function set_relationships_per_section(array $relationship_classes): self {
         $this->relationships_per_section = $relationship_classes;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function get_number_of_elements_per_section(): int {
+        return $this->elements_per_section;
+    }
+
+    /**
+     * @param int $number
+     * @return $this
+     */
+    public function set_number_of_elements_per_section(int $number): self {
+        $this->elements_per_section = $number;
 
         return $this;
     }

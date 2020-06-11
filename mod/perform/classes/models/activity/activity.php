@@ -34,6 +34,7 @@ use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\event\activity_deleted;
 use mod_perform\models\activity\helpers\activity_clone;
 use mod_perform\models\activity\helpers\activity_deletion;
+use mod_perform\models\activity\helpers\activity_multisection_toggler;
 use mod_perform\entities\activity\track as track_entity;
 use mod_perform\entities\activity\track_assignment;
 use mod_perform\state\activity\active;
@@ -64,6 +65,7 @@ use mod_perform\state\activity\activity_state as activity_status;
  * @property-read collection|relationship[] $relationships
  * @property-read collection|track[] $tracks
  * @property-read activity_settings $settings
+ * @property bool multisection_setting
  *
  * @package mod_perform\models\activity
  */
@@ -89,7 +91,8 @@ class activity extends model {
         'tracks',
         'can_activate',
         'can_potentially_activate',
-        'state_details'
+        'state_details',
+        'multisection_setting'
     ];
 
     public const NAME_MAX_LENGTH = 1024;
@@ -529,5 +532,36 @@ class activity extends model {
      */
     public function clone(): activity {
         return (new activity_clone($this))->clone();
+    }
+
+    /**
+     * Returns the multisection setting.
+     *
+     * NB: do not use activity settings to directly get hold of the value. Use
+     * this method instead; it ensures the final value is consistent with other
+     * activity data values.
+     *
+     * @return bool the multisection value: true = multisection on, false = single
+     *         section.
+     */
+    public function get_multisection_setting(): bool {
+        return (new activity_multisection_toggler($this))
+            ->get_current_setting();
+    }
+
+    /**
+     * Registers whether activity content can be in multiple sections.
+     *
+     * NB: do not use activity settings to directly change the value. Use this
+     * method instead; it ensures the correct business rules execute as needed.
+     *
+     * @param bool $new_setting new multisection value: true = multisection on
+     *        false = single section.
+     *
+     * @return activity this object.
+     */
+    public function toggle_multisection_setting(bool $new_setting): activity {
+        return (new activity_multisection_toggler($this))
+            ->set($new_setting);
     }
 }

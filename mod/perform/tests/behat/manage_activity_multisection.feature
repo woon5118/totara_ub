@@ -13,19 +13,10 @@ Feature: Managing an activity with multiple sections
     And I navigate to the manage perform activities page
 
   Scenario: Manage participants for an activity with multiple sections.
+    # Note already in multisection mode because the generator created multiple sections.
     When I navigate to the edit perform activities page for activity "Multiple section Activity"
-    And I click on ".tui-toggleBtn" "css_element"
-    Then I should see "All existing content will be grouped into the first section, along with the existing participant settings" in the tui modal
-    And I confirm the tui confirmation modal
-    Then I should see "Activity saved" in the tui "success" notification toast
-    And I close the tui notification toast
-
-    # Done & cancel buttons not visible
-    Then I should see "Done"
-    And I should see "Cancel"
-
-    # First Section
-    When I click the add participant button in "1" activity section
+    And I click on "button[aria-label='Edit section']" "css_element" in the "1" activity section
+    And I click the add participant button in "1" activity section
     Then the following fields match these values:
       | Subject   | 0 |
       | Manager   | 0 |
@@ -68,16 +59,89 @@ Feature: Managing an activity with multiple sections
     And I close the tui notification toast
     Then I should see "Done"
     And I should see "Cancel"
+
     # Activity section in read-only mode
     When I click on "Cancel" "button" in the ".tui-performActivitySection__saveButtons" "css_element"
     Then I should see "(*Can view others' responses)"
 
+    When I click on "button[aria-label='Edit section']" "css_element" in the "1" activity section
+    And I set the title of activity section "1" to "Section #1"
+    And I click the add participant button in "1" activity section
+    And I click on the "Subject" tui checkbox in the ".tui-performManageActivityContent__items .tui-performActivitySection:nth-of-type(1) .tui-popoverFrame__content" css element
+    And I click on the "Appraiser" tui checkbox in the ".tui-performManageActivityContent__items .tui-performActivitySection:nth-of-type(1) .tui-popoverFrame__content" css element
+    And I click on "Done" "button" in the ".tui-popoverPositioner" "css_element" of the "1" activity section
+    And I click on "Done" "button" in the ".tui-performActivitySection__saveButtons" "css_element"
+    And I close the tui notification toast
+    And I navigate to manage perform activity content page of "1" activity section
+    And I click on "Add element" "button"
+    And I click on "Questions" "button"
+    And I click on "Short text" "link"
+    And I set the following fields to these values:
+      | rawTitle | S1Q1 |
+    And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"
+    And I click on "Submit" "button"
+    And I close the tui notification toast
+    Then I should see "0" in the "required" element summary of "1" activity section
+    And I should see "1" in the "optional" element summary of "1" activity section
+    And I should see "Subject"
+    And I should see "Appraiser"
+    And I should see "Section #1"
+
+    When I click on ".tui-dropdown" "css_element" in the "1" activity section
+    And I click on "Add section above" "link" in the "1" activity section
+    And I set the title of activity section "1" to "Section #2"
+    And I click on "Done" "button" in the ".tui-performActivitySection__saveButtons" "css_element"
+    And I close the tui notification toast
+    And I navigate to manage perform activity content page of "1" activity section
+    And I click on "Add element" "button"
+    And I click on "Questions" "button"
+    And I click on "Short text" "link"
+    And I set the following fields to these values:
+      | rawTitle | S2Q1 |
+    And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"
+    And I click on "Submit" "button"
+    And I close the tui notification toast
+    Then I should see "0" in the "required" element summary of "1" activity section
+    And I should see "1" in the "optional" element summary of "1" activity section
+    And I should see "Section #2"
+
+    # Multisection off => all sections merged into 1
     When I click on ".tui-toggleBtn" "css_element"
     Then I should see "All sections' content will be merged and section headings removed. Participant settings will be removed. This cannot be undone." in the tui modal
-    And I confirm the tui confirmation modal
-    Then I should see "Activity saved" in the tui "success" notification toast
+
+    When I confirm the tui confirmation modal
+    And I should see "Activity saved" in the tui "success" notification toast
+
     And I close the tui notification toast
+    Then I should not see "Section #1"
+    And I should not see "Section #2"
     And I should not see "(*Can view others' responses)"
+    And I should not see "Subject"
+    And I should not see "Manager"
+    And I should not see "Appraiser"
+    And I should see "0" in the "required" element summary of "1" activity section
+    And I should see "2" in the "optional" element summary of "1" activity section
+
+    When I navigate to manage perform activity content page of "1" activity section
+    Then I should see "S2Q1"
+    And I should see "S1Q1"
+
+    # Renable multisection; test can save a section title without changing the title
+    # for the first section to be created.
+    When I click on "Submit" "button"
+    And I close the tui notification toast
+    And I click on ".tui-toggleBtn" "css_element"
+    And I confirm the tui confirmation modal
+    And I close the tui notification toast
+    And I click on "Done" "button" in the ".tui-performActivitySection__saveButtons" "css_element"
+    And I close the tui notification toast
+    Then I should see "Untitled section"
+    And I should see "(*Can view others' responses)"
+    And I should not see "Subject"
+    And I should not see "Manager"
+    And I should not see "Appraiser"
+    And I should see "0" in the "required" element summary of "1" activity section
+    And I should see "2" in the "optional" element summary of "1" activity section
 
   Scenario: Manage activity - Add section.
     When I navigate to the edit perform activities page for activity "Participant set up test"
@@ -180,7 +244,7 @@ Feature: Managing an activity with multiple sections
 
   Scenario: Manage activity - Edit the title for sections
     Given the multi-language content filter is enabled
-    When I navigate to the edit perform activities page for activity "Multiple section Activity"
+    And I navigate to the edit perform activities page for activity "Participant set up test"
     And I click on ".tui-toggleBtn" "css_element"
     Then I should see "All existing content will be grouped into the first section, along with the existing participant settings" in the tui modal
     And I confirm the tui confirmation modal
@@ -193,7 +257,7 @@ Feature: Managing an activity with multiple sections
     Then I should see "Untitled section" in the "1" activity section
 
     # Test multi-lang filter
-    When I click on "button[aria-label='Edit section']" "css_element" in the "2" activity section
+    When I click on "Add section" "button"
     And I set the title of activity section "2" to '<span lang="en" class="multilang">English</span><span lang="de" class="multilang">German</span> Title'
     And I click on "Done" "button" in the ".tui-performActivitySection__saveButtons" "css_element" of the "2" activity section
     Then I should see "Activity saved" in the tui "success" notification toast

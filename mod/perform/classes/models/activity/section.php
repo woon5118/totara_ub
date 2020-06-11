@@ -30,6 +30,7 @@ use core\orm\query\builder;
 use mod_perform\entities\activity\element as element_entity;
 use mod_perform\entities\activity\section as section_entity;
 use mod_perform\entities\activity\section_element as section_element_entity;
+use mod_perform\models\response\participant_section;
 use stdClass;
 
 /**
@@ -242,9 +243,12 @@ class section extends model {
      * @param array[] $relationship_updates
      *
      * @return section
+     * @throws coding_exception|\Throwable
      */
     public function update_relationships(array $relationship_updates): self {
-        // Figure out which relationships to remove and which to add.
+        if ($this->is_section_deleted()) {
+            throw new coding_exception('Section has been deleted, can not update relationships');
+        }
 
         builder::get_db()->transaction(function () use ($relationship_updates) {
             $existing_section_relationships = $this->get_section_relationships();
@@ -317,8 +321,13 @@ class section extends model {
      *
      * @param element $element
      * @return section_element
+     * @throws coding_exception
      */
     public function add_element(element $element): section_element {
+        if ($this->is_section_deleted()) {
+            throw new coding_exception('Section has been deleted, can not add section element');
+        }
+
         $section_element = section_element::create(
             $this,
             $element,
@@ -334,9 +343,14 @@ class section extends model {
      * Will automatically re-order all remaining section elements.
      *
      * @param section_element[] $remove_section_elements
+     * @throws coding_exception|\Throwable
      */
     public function remove_section_elements(array $remove_section_elements): void {
         global $DB;
+
+        if ($this->is_section_deleted()) {
+            throw new coding_exception('Section has been deleted, can not remove section elements');
+        }
 
         if (empty($remove_section_elements)) {
             return;
@@ -370,9 +384,14 @@ class section extends model {
      * Will fail if the resulting sorting is not valid (all unique and sequential from 1).
      *
      * @param section_element[] $move_section_elements where $key is the new sort order and $value is the section element
+     * @throws coding_exception|\Throwable
      */
     public function move_section_elements(array $move_section_elements): void {
         global $DB;
+
+        if ($this->is_section_deleted()) {
+            throw new coding_exception('Section has been deleted, can not move section elements');
+        }
 
         if (empty($move_section_elements)) {
             return;
@@ -404,7 +423,24 @@ class section extends model {
      * Delete the section
      */
     public function delete(): void {
-        $this->entity->delete();
+        global $DB;
+        $section_relationships = $this->get_section_relationships();
+        $participant_sections = $this->get_participant_sections();
+
+        $DB->transaction(
+            function () use ($section_relationships, $participant_sections) {
+                // delete section relationship
+                foreach ($section_relationships as $section_relationship) {
+                    section_relationship::delete_with_properties($this->id, $section_relationship->core_relationship->id);
+                }
+                // delete participant section
+                foreach ($participant_sections as $participant_section) {
+                    $participant_section->delete();
+                }
+                // delete section
+                $this->entity->delete();
+            }
+        );
 
         // Make sure the sort orders of the sections following the deleted one get recalculated
         self::recalculate_sort_order($this->entity->activity_id);
@@ -434,4 +470,40 @@ class section extends model {
         });
     }
 
+    /**
+     * Get a list of all participant sections that this section has
+     *
+     * @return collection|participant_section[]
+     */
+    public function get_participant_sections(): collection {
+        return $this->entity->participant_sections->map_to(participant_section::class);
+    }
+
+    /**
+     * Check if section can be deleted
+     *
+     * @throws coding_exception
+     */
+    public function check_deletion_requirements(): void {
+        $is_active_activity = $this->get_activity()->is_active();
+        // only allow to delete section if activity status is draft
+        if ($is_active_activity) {
+            throw new coding_exception('section can not be deleted for active performance activity');
+        }
+
+        // only allow to delete section if activity has more than one sections
+        $has_enough_sections = $this->get_activity()->sections->count() > 1;
+        if (!$has_enough_sections) {
+            throw new coding_exception('activity does not have enough sections, section can not be deleted');
+        }
+    }
+
+    /**
+     * check if the section has already been deleted
+     *
+     * @return bool
+     */
+    private function is_section_deleted(): bool {
+        return $this->entity->deleted();
+    }
 }

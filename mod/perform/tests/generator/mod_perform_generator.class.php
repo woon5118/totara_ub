@@ -493,6 +493,12 @@ class mod_perform_generator extends component_generator_base {
                 foreach ($configuration->get_relationships_per_section() as $relationship_class) {
                     $this->create_section_relationship($section, ['class_name' => $relationship_class]);
                 }
+                for ($j = 0; $j < $configuration->get_number_of_elements_per_section(); $j++) {
+                    $title = $section->title . " element$j";
+                    $element = $this->create_element(['title' => $title]);
+
+                    section_element::create($section, $element, $j);
+                }
             }
             $this->create_activity_tracks($activity, $configuration->get_number_of_tracks_per_activity());
             $activities[] = $activity;

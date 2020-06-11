@@ -59,7 +59,7 @@ class activity implements type_resolver {
 
             return [
                 'close_on_completion' => (bool)$settings->lookup(activity_setting::CLOSE_ON_COMPLETION),
-                'multisection' => (bool)$settings->lookup(activity_setting::MULTISECTION)
+                'multisection' => $activity->multisection_setting
             ];
         }
 
