@@ -109,7 +109,7 @@ export default {
      * @return {{}}
      */
     fixedDateRangeValidator(values) {
-      if (this.disabled) {
+      if (this.disabled || !this.hasRange) {
         return {};
       }
 

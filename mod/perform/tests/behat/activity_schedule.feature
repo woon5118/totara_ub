@@ -91,6 +91,15 @@ Feature: Define track schedules to perform activities
     When I set the following fields to these values:
       | scheduleFixed[from] |  |
     Then I should see "Date required"
+    # Make sure the validation for limited range doesn't apply (this used to be a bug).
+    When I set the following fields to these values:
+      | scheduleFixed[from] | 2030-12-30 |
+    And I save the activity schedule
+    Then I should see "Activity schedule saved" in the tui "success" notification toast
+    When I close the tui notification toast
+    And I click on "Limited" "button"
+    And I save the activity schedule
+    Then I should see "Range end date cannot be before range start date"
 
   Scenario: Save and view limited dynamic performance activity schedule
     Given I log in as "admin"
