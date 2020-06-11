@@ -653,12 +653,8 @@ abstract class base_testcase extends \PHPUnit\Framework\TestCase {
      *
      * @deprecated Method was removed in PHPUnit 6 and is deprecated since Totara 13; use expectException() instead
      */
-    public function setExpectedException($exception, $message = null, $code = null) {
+    public function setExpectedException($exception, string $message = null, $code = null) {
         debugging("PHPUnits setExpectedException() method was removed in PHPUnit 6 and is deprecated since Totara 13; use expectException() instead.", DEBUG_DEVELOPER);
-
-        if (null !== $message && !is_string($message)) {
-            throw \PHPUnit\Util\InvalidArgumentHelper::factory(2, 'string');
-        }
 
         $this->expectException($exception);
 
@@ -676,17 +672,13 @@ abstract class base_testcase extends \PHPUnit\Framework\TestCase {
      * @param string $messageRegExp
      * @param int    $code
      *
-     * @deprecated Method was removed in PHPUnit 6 and is deprecated since Totara 13
+     * @deprecated Method was removed in PHPUnit 6 and is deprecated since Totara 13; use expectExceptionMessageMatches() instead
      */
-    public function setExpectedExceptionRegExp($exception, $messageRegExp = '', $code = null) {
-        debugging("PHPUnits setExpectedExceptionRegExp() method was removed in PHPUnit 6 and is deprecated since Totara 13", DEBUG_DEVELOPER);
-
-        if (!is_string($messageRegExp)) {
-            throw \PHPUnit\Util\InvalidArgumentHelper::factory(2, 'string');
-        }
+    public function setExpectedExceptionRegExp($exception, string $messageRegExp = '', $code = null) {
+        debugging("PHPUnits setExpectedExceptionRegExp() method was removed in PHPUnit 6 and is deprecated since Totara 13; use expectExceptionMessageMatches() instead.", DEBUG_DEVELOPER);
 
         $this->expectException($exception);
-        $this->expectExceptionMessageRegExp($messageRegExp);
+        $this->expectExceptionMessageMatches($messageRegExp);
 
         if ($code !== null) {
             $this->expectExceptionCode($code);
