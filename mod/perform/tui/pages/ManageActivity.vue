@@ -70,6 +70,7 @@ import AssignmentsTab from 'mod_perform/components/manage_activity/assignment/As
 import ActivityContentTab from 'mod_perform/components/manage_activity/content/ActivityContentTab';
 import FlexIcon from 'totara_core/components/icons/FlexIcon';
 import GeneralInfoTab from 'mod_perform/components/manage_activity/GeneralInfoTab';
+import NotificationsTab from 'mod_perform/components/manage_activity/notification/NotificationsTab';
 import Grid from 'totara_core/components/grid/Grid';
 import GridItem from 'totara_core/components/grid/GridItem';
 import Loader from 'totara_core/components/loader/Loader';
@@ -89,6 +90,7 @@ export default {
     Tabs,
     Loader,
     GeneralInfoTab,
+    NotificationsTab,
     Grid,
     GridItem,
   },
@@ -106,6 +108,7 @@ export default {
     const generalInfoTabId = this.$id('genral-info-tab');
     const contentTabId = this.$id('content-tab');
     const assignmentTabId = this.$id('assignments-tab');
+    const notificationTabId = this.$id('notifications-tab');
 
     return {
       activity: null,
@@ -125,6 +128,14 @@ export default {
           id: assignmentTabId,
           component: 'AssignmentsTab',
           name: this.$str('manage_activities_tabs_assignment', 'mod_perform'),
+        },
+        {
+          id: notificationTabId,
+          component: 'NotificationsTab',
+          name: this.$str(
+            'manage_activities_tabs_notifications',
+            'mod_perform'
+          ),
         },
       ],
     };
@@ -187,6 +198,7 @@ export default {
       "manage_activities_tabs_assignment",
       "manage_activities_tabs_content",
       "manage_activities_tabs_general",
+      "manage_activities_tabs_notifications",
       "toast_error_generic_update",
       "toast_success_activity_update"
     ]
