@@ -55,7 +55,7 @@
 // Background of form elements
 --tui-form-input-bg-color: var(--tui-color-neutral-1);
 --tui-form-input-bg-color-disabled: var(--tui-color-neutral-3);
---tui-form-input-bg-color-focus: var(--tui-color-state-highlight);
+--tui-form-input-bg-color-focus: var(--tui-form-input-bg-color);
 --tui-form-input-bg-color-invalid-focus: var(--tui-color-prompt-alert-bg);
 
 // Border of form elements
