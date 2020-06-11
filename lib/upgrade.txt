@@ -3,6 +3,8 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* PHPUnit has been upgraded to version 8.5.x,
+  see https://phpunit.de/announcements/phpunit-8.html for more information how to fix existing tests.
 * Custom session handlers must add new $uselocking constructor parameter and implement
   \core\session\handler::is_locking_configurable() method.
 * All classes that override admin_setting::add_to_config_log() must be changed to use public access.
