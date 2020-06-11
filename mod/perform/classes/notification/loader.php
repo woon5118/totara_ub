@@ -24,6 +24,7 @@
 namespace mod_perform\notification;
 
 use coding_exception;
+use invalid_parameter_exception;
 
 /**
  * The loader class.
@@ -121,19 +122,19 @@ class loader {
      * @param string $class_key
      * @return boolean
      */
-    public function has_triggers(string $class_key): bool {
+    public function support_triggers(string $class_key): bool {
         $info = $this->get_information($class_key);
-        return $info['has_triggers'] ?? false;
+        return $info['support_triggers'] ?? false;
     }
 
     /**
      * @param string $class_key
      * @return array
-     * @throws coding_exception
+     * @throws invalid_parameter_exception
      */
     private function get_information(string $class_key): array {
         if (!isset($this->notifications[$class_key])) {
-            throw new coding_exception("notification {$class_key} is not registered");
+            throw new invalid_parameter_exception("notification {$class_key} is not registered");
         }
         return $this->notifications[$class_key];
     }

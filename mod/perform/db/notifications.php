@@ -23,15 +23,18 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+// Please do not include this file and parse the contents!
+// Instead, use the loader instance returned by mod_perform\notification\factory::create_loader().
+
 $notifications = [
     'instance_created' => [
-        'name' => ['notification_instance_created', 'mod_perform'],
+        'name' => ['notification_broker_instance_created', 'mod_perform'],
         'class' => \mod_perform\notification\brokers\instance_created::class,
-        'has_triggers' => false,
+        'support_triggers' => false,
     ],
     'overdue' => [
-        'name' => ['notification_overdue', 'mod_perform'],
+        'name' => ['notification_broker_overdue', 'mod_perform'],
         'class' => \mod_perform\notification\brokers\overdue::class,
-        'has_triggers' => true,
+        'support_triggers' => true,
     ],
 ];

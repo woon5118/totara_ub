@@ -318,15 +318,15 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="active" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="notification_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="section_relationship_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="core_relationship_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="notification_fk" TYPE="foreign" FIELDS="notification_id" REFTABLE="perform_notification" REFFIELDS="id" ONDELETE="cascade"/>
-        <KEY NAME="section_relationship_fk" TYPE="foreign" FIELDS="section_relationship_id" REFTABLE="perform_section_relationship" REFFIELDS="id" ONDELETE="cascade"/>
+        <KEY NAME="core_relationship_fk" TYPE="foreign" FIELDS="core_relationship_id" REFTABLE="totara_core_relationship" REFFIELDS="id" ONDELETE="cascade"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="notification_recipient_ix" UNIQUE="true" FIELDS="notification_id, section_relationship_id"/>
+        <INDEX NAME="notification_recipient_ix" UNIQUE="true" FIELDS="notification_id, core_relationship_id"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="perform_notification_message" COMMENT="Represents a notification message that has been sent">

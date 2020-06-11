@@ -23,15 +23,15 @@
 
 namespace mod_perform\formatter\activity;
 
-use core\orm\formatter\entity_model_formatter;
 use core\webapi\formatter\field\string_field_formatter;
+use core\webapi\formatter\formatter;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
  * Maps the notification model class into a GraphQL mod_perform_notification.
  */
-class notification extends entity_model_formatter {
+class notification extends formatter {
     /**
      * {@inheritdoc}
      */
@@ -40,9 +40,17 @@ class notification extends entity_model_formatter {
             'id' => null,
             'name' => string_field_formatter::class,
             'active' => null,
+            'class_key' => null,
             'trigger_count' => null,
             'recipients' => null,
             'triggers' => null,
         ];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function has_field(string $field): bool {
+        return $this->object->has_attribute($field);
     }
 }

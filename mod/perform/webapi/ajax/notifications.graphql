@@ -1,5 +1,5 @@
-query mod_perform_notification($notification_id: core_id!) {
-  mod_perform_notification(notification_id: $notification_id) {
+query mod_perform_notifications($activity_id: core_id!) {
+  mod_perform_notifications(activity_id: $activity_id) {
     id
     name
     class_key

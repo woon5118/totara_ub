@@ -81,5 +81,36 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020070900, 'perform');
     }
 
+    if ($oldversion < 2020071000) {
+        $DB->delete_records('perform_notification_recipient');
+
+        // Define field core_relationship_id to be added to perform_notification_recipient.
+        $table = new xmldb_table('perform_notification_recipient');
+
+        $index = new xmldb_index('notification_recipient_ix', XMLDB_INDEX_UNIQUE, array('notification_id', 'section_relationship_id'));
+        // Conditionally launch drop index notification_recipient_ix.
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        $key = new xmldb_key('section_relationship_fk', XMLDB_KEY_FOREIGN, array('section_relationship_id'), 'perform_section_relationship', array('id'), 'cascade');
+        // Launch drop key section_relationship_fk.
+        $dbman->drop_key($table, $key);
+
+        $field = new xmldb_field('section_relationship_id');
+        // Conditionally launch drop field section_relationship_id.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        $field = new xmldb_field('core_relationship_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'notification_id');
+        // Conditionally launch add field core_relationship_id.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2020071000, 'perform');
+    }
+
     return true;
 }

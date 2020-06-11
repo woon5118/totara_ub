@@ -5,9 +5,11 @@ mutation mod_perform_toggle_notification(
     notification {
       id
       name
+      class_key
       active
       trigger_count
       recipients {
+        relationship_id
         name
         active
       }

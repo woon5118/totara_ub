@@ -25,6 +25,7 @@ namespace mod_perform\entities\activity;
 
 use core\orm\entity\entity;
 use core\orm\entity\relations\belongs_to;
+use totara_core\relationship\relationship;
 
 /**
  * Notification recipient entity
@@ -33,11 +34,11 @@ use core\orm\entity\relations\belongs_to;
  * @property-read integer $id ID
  * @property boolean $active is active?
  * @property integer $notification_id parent notification record id
- * @property integer $section_relationship_id parent relationship record id
+ * @property integer $core_relationship_id parent relationship record id
  *
  * Relationships:
  * @property-read notification $notification
- * @property-read section_relationship $section_relationship
+ * @property-read relationship $relationship
  *
  * @package mod_perform\entities
  */
@@ -58,7 +59,7 @@ class notification_recipient extends entity {
      *
      * @return belongs_to
      */
-    public function section_relationship(): belongs_to {
-        return $this->belongs_to(section_relationship::class, 'section_relationship_id');
+    public function relationship(): belongs_to {
+        return $this->belongs_to(relationship::class, 'core_relationship_id');
     }
 }

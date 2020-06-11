@@ -25,34 +25,21 @@
 use mod_perform\entities\activity\notification as notification_entity;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\notification;
+use mod_perform\models\activity\notification_recipient;
+use mod_perform\models\activity\section;
+use mod_perform\models\activity\section_relationship;
 use mod_perform\notification\broker;
 use mod_perform\notification\brokers\instance_created;
 use mod_perform\notification\brokers\overdue;
+use totara_core\relationship\relationship;
 use totara_core\relationship\relationship_provider;
+use totara_core\relationship\resolvers\subject;
+use totara_job\relationship\resolvers\appraiser;
+use totara_job\relationship\resolvers\manager;
 
-class mod_perform_notification_model_testcase extends advanced_testcase {
-    /** @var mod_perform_generator */
-    private $perfgen;
+require_once(__DIR__ . '/notification_testcase.php');
 
-    public function setUp(): void {
-        $this->setAdminUser();
-        $this->perfgen = $this->getDataGenerator()->get_plugin_generator('mod_perform');
-    }
-
-    public function tearDown(): void {
-        $this->perfgen = null;
-    }
-
-    /**
-     * Create an activity for testing.
-     *
-     * @param array $data
-     * @return activity
-     */
-    public function create_test_activity(array $data = []): activity {
-        return $this->perfgen->create_activity_in_container($data);
-    }
-
+class mod_perform_notification_model_testcase extends mod_perform_notification_testcase {
     /**
      * @return array
      */
@@ -68,11 +55,11 @@ class mod_perform_notification_model_testcase extends advanced_testcase {
      * @dataProvider data_create_success
      */
     public function test_create_success(string $class_key, string $name_expected) {
-        $activity = $this->create_test_activity();
+        $activity = $this->create_activity();
         $time = time();
         $notification = notification::create($activity, $class_key);
         $this->assertEquals($activity->id, $notification->activity->get_id());
-        $this->assertEquals($name_expected, $notification->name); // FIXME: fill this field
+        $this->assertEquals($name_expected, $notification->name);
         $this->assertFalse($notification->active);
         $this->assertSame(0, $notification->trigger_count);
 
@@ -83,47 +70,78 @@ class mod_perform_notification_model_testcase extends advanced_testcase {
     }
 
     public function test_create_failure() {
-        $activity = $this->create_test_activity();
+        $activity = $this->create_activity();
         try {
             $notification = notification::create($activity, 'he_who_must_not_be_named');
-            $this->fail('coding_exception expected');
-        } catch (\coding_exception $ex) {
+            $this->fail('invalid_parameter_exception expected');
+        } catch (\invalid_parameter_exception $ex) {
         }
     }
 
     public function test_delete() {
-        $activity = $this->create_test_activity();
+        $activity = $this->create_activity();
         $notification = notification::create($activity, 'instance_created');
         $notification->delete();
+        $this->assertFalse($notification->exists());
+        $notification->delete();
+        $this->assertFalse($notification->exists());
     }
 
     public function test_recipients() {
-        $activity = $this->create_test_activity();
+        $activity = $this->create_activity();
+        $section = $this->create_section($activity);
         $notification = notification::create($activity, 'instance_created');
-        // TODO: ?? figure out whether recipients returns all recipients in totara_core_relationship or just the ones in perform_relationship ??
-        // $this->assertCount(3, $notification->recipients);
-        $rels = relationship_provider::fetch_all_relationships();
-        // FIXME: ... add recipients here
-        // $notification->recipients;
-        // FIXME: ... and test here
-        $this->markTestIncomplete('todo');
+        $this->assertCount(0, $notification->recipients);
+        $this->create_section_relationships($section, [appraiser::class]);
+        $this->assertCount(1, $notification->recipients);
+        foreach ($notification->recipients as $recipient) {
+            $this->assertFalse($recipient->active);
+        }
+        $this->create_section_relationships($section, [subject::class]);
+        $this->assertCount(2, $notification->recipients);
+        foreach ($notification->recipients as $recipient) {
+            $this->assertFalse($recipient->active);
+        }
+        $this->create_section_relationships($section, [manager::class]);
+        $this->assertCount(3, $notification->recipients);
+        foreach ($notification->recipients as $recipient) {
+            $this->assertFalse($recipient->active);
+        }
     }
 
     public function test_activate() {
-        $activity = $this->create_test_activity();
+        $activity = $this->create_activity();
+        $section = $this->create_section($activity);
+        $this->create_section_relationships($section, [appraiser::class]);
         $notification = notification::create($activity, 'instance_created');
         $this->assertFalse($notification->active);
+        foreach ($notification->recipients as $recipient) {
+            $this->assertFalse($recipient->active);
+        }
         $notification->activate();
         $this->assertTrue($notification->active);
+        foreach ($notification->recipients as $recipient) {
+            $this->assertFalse($recipient->active);
+        }
         $notification->activate(false);
         $this->assertFalse($notification->active);
+        foreach ($notification->recipients as $recipient) {
+            $this->assertFalse($recipient->active);
+        }
         $notification->activate(true);
         $this->assertTrue($notification->active);
-        $notification->delete();
-        try {
-            $notification->activate();
-            $this->fail('coding_exception expected');
-        } catch (coding_exception $ex) {
+        foreach ($notification->recipients as $recipient) {
+            $this->assertFalse($recipient->active);
+        }
+        $notification->delete(); // extermination
+        $this->assertFalse($notification->exists());
+        foreach ($notification->recipients as $recipient) {
+            $this->assertFalse($recipient->active);
+        }
+        $notification->activate(); // reincarnation
+        $this->assertTrue($notification->exists());
+        foreach ($notification->recipients as $recipient) {
+            $this->assertFalse($recipient->active);
         }
     }
 }

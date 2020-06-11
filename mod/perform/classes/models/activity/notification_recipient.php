@@ -23,43 +23,103 @@
 
 namespace mod_perform\models\activity;
 
-use core\orm\entity\model;
+use coding_exception;
+use core\orm\collection;
+use core\orm\query\builder;
+use totara_core\entities\relationship as relationship_entity;
+use totara_core\entities\relationship_resolver as relationship_resolver_entity;
+use mod_perform\entities\activity\section as section_entity;
 use mod_perform\entities\activity\notification_recipient as notification_recipient_entity;
+use mod_perform\entities\activity\section_relationship as section_relationship_entity;
+use stdClass;
+use totara_core\relationship\relationship;
 
 /**
  * Represents a notification setting recipient.
  *
- * @property-read integer $id ID
+ * @property integer $id
+ * @property integer $relationship_id
+ * @property integer|null $recipient_id
+ * @property relationship $relationship
  * @property string $name
  * @property boolean $active is active?
  */
-class notification_recipient extends model {
+class notification_recipient {
+    /** @var integer */
+    private $relationship_id;
 
-    protected $entity_attribute_whitelist = [
-        'id',
-    ];
+    /** @var integer|null */
+    private $recipient_id;
 
-    protected $model_accessor_whitelist = [
-        'active',
-    ];
-
-    /**
-     * @var notification_recipient_entity
-     */
-    protected $entity;
+    /** @var boolean */
+    private $active;
 
     /**
-     * {@inheritdoc}
+     * @param notification_recipient_entity|stdClass $object
      */
-    protected static function get_entity_class(): string {
-        return notification_recipient_entity::class;
+    private function __construct($object) {
+        if ($object instanceof notification_recipient_entity) {
+            $this->relationship_id = $object->core_relationship_id;
+            $this->recipient_id = $object->id;
+            $this->active = $object->active;
+        } else {
+            $this->relationship_id = $object->relationship_id;
+            $this->recipient_id = $object->recipient_id;
+            $this->active = !empty($object->active);
+        }
+    }
+
+    /**
+     * @param string $name
+     * @return mixed
+     */
+    public function __get(string $name) {
+        $methodname = 'get_'.$name;
+        if (!method_exists($this, $methodname)) {
+            throw new coding_exception('unknown property: '.$name);
+        }
+        return $this->{$methodname}();
+    }
+
+    /**
+     * @param string $name
+     * @return boolean
+     */
+    public function has_attribute(string $name): bool {
+        $methodname = 'get_'.$name;
+        return method_exists($this, $methodname);
+    }
+
+    /**
+     * @return integer
+     */
+    public function get_id(): int {
+        return $this->relationship_id;
+    }
+
+    /**
+     * @return relationship
+     */
+    public function get_relationship(): relationship {
+        return relationship::load_by_id($this->relationship_id);
+    }
+
+    /**
+     * @return integer
+     */
+    public function get_relationship_id(): int {
+        return $this->relationship_id;
+    }
+
+    public function get_recipient_id(): ?int {
+        return $this->recipient_id;
     }
 
     /**
      * @return boolean
      */
     public function get_active(): bool {
-        return $this->entity->active;
+        return $this->active;
     }
 
     /**
@@ -68,17 +128,77 @@ class notification_recipient extends model {
      * @return string
      */
     public function get_name(): string {
-        throw new \Exception('not yet implemented');
+        return $this->get_relationship()->get_name();
     }
 
     /**
      * Create a new notification recipient.
      *
      * @param notification $parent
-     * @param section_relationship $relationship
+     * @param relationship $relationship
+     * @param boolean $active
      * @return self
      */
-    public static function create(notification $parent, section_relationship $relationship): self {
-        throw new \Exception('not yet implemented');
+    public static function create(notification $parent, relationship $relationship, bool $active = false): self {
+        if (!$parent->exists()) {
+            throw new coding_exception('parent record does not exist');
+        }
+        $entity = new notification_recipient_entity();
+        $entity->notification_id = $parent->get_id();
+        $entity->core_relationship_id = $relationship->get_id();
+        $entity->active = $active;
+        $entity->save();
+        $inst = new self($entity);
+        return $inst;
+    }
+
+    /**
+     * @param boolean $active
+     * @return self
+     */
+    public function activate(bool $active): self {
+        if (!$this->recipient_id) {
+            throw new coding_exception('not available; call create() instead');
+        }
+        $entity = notification_recipient_entity::repository()->find_or_fail($this->recipient_id);
+        $entity->active = $active;
+        $entity->save();
+        return $this;
+    }
+
+    /**
+     * Load all notification recipients.
+     *
+     * @param notification $parent
+     * @param boolean $active_only get only active recipients
+     * @return collection
+     */
+    public static function load_by_notification(notification $parent, bool $active_only = false): collection {
+        $notify_id = $parent->id;
+        $activity_id = $parent->activity->id;
+        return builder::table(relationship_entity::TABLE, 'r')
+            ->join([relationship_resolver_entity::TABLE, 'rr'], 'r.id', '=', 'rr.relationship_id')
+            ->join([section_relationship_entity::TABLE, 'sr'], 'r.id', '=', 'sr.core_relationship_id')
+            ->join([section_entity::TABLE, 's'], 's.id', '=', 'sr.section_id')
+            ->left_join([notification_recipient_entity::TABLE, 'nr'], function (builder $joining) use ($notify_id) {
+                $joining->where_field('r.id', '=', 'nr.core_relationship_id');
+                if ($notify_id !== null) {
+                    $joining->where('nr.notification_id', $notify_id);
+                } else {
+                    $joining->where_raw('1 != 1');
+                }
+            })
+            ->where('s.activity_id', $activity_id)
+            ->select(['r.id as relationship_id', 'nr.id as recipient_id', 'rr.class_name as resolver_class', 'nr.active as active'])
+            ->where(function (builder $builder) use ($active_only) {
+                if ($active_only) {
+                    $builder->where('nr.active', '<>', 0);
+                }
+            })
+            ->order_by('r.id')
+            ->map_to(function ($source) {
+                return new self($source);
+            })
+            ->get();
     }
 }

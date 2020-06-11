@@ -4,6 +4,7 @@ Represents a notification, possibly an abstract / uncreated one (id may be null)
 type mod_perform_notification {
   id: core_id
   name(format: core_format = PLAIN): String!
+  class_key: String!
   active: Boolean!
   trigger_count: Int
   recipients: [mod_perform_notification_recipient!]
@@ -14,6 +15,7 @@ type mod_perform_notification {
 Represents a notification recipient
 """
 type mod_perform_notification_recipient {
+  relationship_id: core_id
   name(format: core_format = PLAIN): String!
   active: Boolean!
 }
@@ -22,9 +24,7 @@ extend type Query {
   """
   A list of all notifications in an activity
   """
-  mod_perform_notification_info(
-    activity_id: core_id!
-  ): [mod_perform_notification!]!
+  mod_perform_notifications(activity_id: core_id!): [mod_perform_notification!]!
 
   """
   This query returns a single notification
@@ -61,7 +61,7 @@ Input type for toggling a notification recipient
 """
 input mod_perform_toggle_notification_recipient_input {
   notification_id: core_id!
-  recipient_name: param_text!
+  relationship_id: core_id!
   active: param_boolean!
 }
 

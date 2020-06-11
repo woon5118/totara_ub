@@ -45,8 +45,6 @@ use core\orm\entity\relations\has_many;
  * @property-read activity $activity
  * @property-read collection|notification_recipient[] $recipients
  *
- * @method static notification_repository repository()
- *
  * @package mod_perform\entities
  */
 class notification extends entity {

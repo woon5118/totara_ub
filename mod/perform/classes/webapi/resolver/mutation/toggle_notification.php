@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author  Chris Snyder <chris.snyder@totaralearning.com>
+ * @author Tatsuhiro Kirihara <tatsuhiro.kirihara@totaralearning.com>
  * @package mod_perform
  */
 
@@ -34,31 +34,29 @@ use mod_perform\webapi\middleware\require_manage_capability;
 use mod_perform\models\activity\activity as activity_model;
 use mod_perform\models\activity\notification as notification_model;
 
-/**
- * Handles the "mod_perform_create_notification" GraphQL mutation.
- */
-class create_notification implements mutation_resolver, has_middleware {
+class toggle_notification implements mutation_resolver, has_middleware {
     /**
      * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
-        // Activity id is verified, and activity is loaded, by middleware.
-        $activity = $args['activity'];
-
         // Get input from args
         $input = $args['input'] ?? 0;
         if (!$input) {
-            throw new \invalid_parameter_exception('missing mod_perform_create_notification_input');
+            throw new \invalid_parameter_exception('missing mod_perform_toggle_notification_input');
         }
 
-        $class_key = $input['class_key'] ?? 0;
-        if (!$class_key) {
-            throw new \invalid_parameter_exception('class_key not set as part of input');
+        $notification_id = $input['notification_id'] ?? 0;
+        if (!$notification_id) {
+            throw new \invalid_parameter_exception('notification_id not set as part of input');
         }
+        $notification = notification_model::load_by_id($notification_id);
 
-        // Create notification.
-        $active = $input['active'] ?? false;
-        $notification = notification_model::create($activity, $class_key, $active);
+        // Set activation.
+        if (!isset($input['active'])) {
+            throw new \invalid_parameter_exception('active not set as part of input');
+        }
+        $active = $input['active'];
+        $notification->activate($active);
 
         // Build and return result object.
         $result = new \stdClass();
@@ -73,7 +71,7 @@ class create_notification implements mutation_resolver, has_middleware {
     public static function get_middleware(): array {
         return [
             new require_advanced_feature('performance_activities'),
-            require_activity::by_activity_id('input.activity_id', true),
+            require_activity::by_notification_id('input.notification_id', true),
             require_manage_capability::class
         ];
     }

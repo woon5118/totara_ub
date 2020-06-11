@@ -6,7 +6,7 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -15,56 +15,31 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author  Chris Snyder <chris.snyder@totaralearning.com>
+ * @author Tatsuhiro Kirihara <tatsuhiro.kirihara@totaralearning.com>
  * @package mod_perform
  */
 
-namespace mod_perform\webapi\resolver\mutation;
+namespace mod_perform\webapi\resolver\query;
 
+use core\orm\collection;
 use core\webapi\execution_context;
-use core\webapi\mutation_resolver;
+use core\webapi\query_resolver;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\resolver\has_middleware;
-
 use mod_perform\webapi\middleware\require_activity;
 use mod_perform\webapi\middleware\require_manage_capability;
-
-use mod_perform\models\activity\activity as activity_model;
 use mod_perform\models\activity\notification as notification_model;
 
-/**
- * Handles the "mod_perform_create_notification" GraphQL mutation.
- */
-class create_notification implements mutation_resolver, has_middleware {
+class notifications implements query_resolver, has_middleware {
     /**
      * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
-        // Activity id is verified, and activity is loaded, by middleware.
         $activity = $args['activity'];
 
-        // Get input from args
-        $input = $args['input'] ?? 0;
-        if (!$input) {
-            throw new \invalid_parameter_exception('missing mod_perform_create_notification_input');
-        }
-
-        $class_key = $input['class_key'] ?? 0;
-        if (!$class_key) {
-            throw new \invalid_parameter_exception('class_key not set as part of input');
-        }
-
-        // Create notification.
-        $active = $input['active'] ?? false;
-        $notification = notification_model::create($activity, $class_key, $active);
-
-        // Build and return result object.
-        $result = new \stdClass();
-        $result->notification = $notification;
-
-        return $result;
+        return notification_model::load_all_by_activity($activity);
     }
 
     /**
@@ -73,7 +48,7 @@ class create_notification implements mutation_resolver, has_middleware {
     public static function get_middleware(): array {
         return [
             new require_advanced_feature('performance_activities'),
-            require_activity::by_activity_id('input.activity_id', true),
+            require_activity::by_activity_id('activity_id', true),
             require_manage_capability::class
         ];
     }

@@ -92,13 +92,13 @@ class mod_perform_notification_loader_testcase extends advanced_testcase {
         $notifications = [
             'test_instance_created' => [
                 'class' => instance_created::class,
-                'name' => ['notification_instance_created', 'mod_perform'],
-                'has_triggers' => false,
+                'name' => ['notification_broker_instance_created', 'mod_perform'],
+                'support_triggers' => false,
             ],
             'test_overdue' => [
                 'class' => overdue::class,
                 'name' => ['screenshot', 'moodle'],
-                'has_triggers' => true,
+                'support_triggers' => true,
             ],
             'kia_ora_koutou_katoa' => [
                 'class' => mod_perform_notification_loader_testcase::class,
@@ -129,35 +129,35 @@ class mod_perform_notification_loader_testcase extends advanced_testcase {
         $this->assertEquals(mod_perform_notification_loader_testcase::class, $loader->get_class_of('kia_ora_koutou_katoa'));
         try {
             $loader->get_class_of('he_who_must_not_be_named');
-            $this->fail('coding_exception expected');
-        } catch (coding_exception $ex) {
-            $this->assertStringContainsString('notification he_who_must_not_be_named is not registered', $ex->a);
+            $this->fail('invalid_parameter_exception expected');
+        } catch (invalid_parameter_exception $ex) {
+            $this->assertStringContainsString('notification he_who_must_not_be_named is not registered', $ex->debuginfo);
         }
     }
 
     public function test_get_name_of() {
         $loader = $this->create_loader();
-        $this->assertEquals(get_string('notification_instance_created', 'mod_perform'), $loader->get_name_of('test_instance_created'));
+        $this->assertEquals(get_string('notification_broker_instance_created', 'mod_perform'), $loader->get_name_of('test_instance_created'));
         $this->assertEquals(get_string('screenshot', 'moodle'), $loader->get_name_of('test_overdue'));
         $this->assertEquals(get_string('ok'), $loader->get_name_of('kia_ora_koutou_katoa'));
         try {
             $loader->get_name_of('he_who_must_not_be_named');
-            $this->fail('coding_exception expected');
-        } catch (coding_exception $ex) {
-            $this->assertStringContainsString('notification he_who_must_not_be_named is not registered', $ex->a);
+            $this->fail('invalid_parameter_exception expected');
+        } catch (invalid_parameter_exception $ex) {
+            $this->assertStringContainsString('notification he_who_must_not_be_named is not registered', $ex->debuginfo);
         }
     }
 
-    public function test_has_triggers() {
+    public function test_support_triggers() {
         $loader = $this->create_loader();
-        $this->assertFalse($loader->has_triggers('test_instance_created'));
-        $this->assertTrue($loader->has_triggers('test_overdue'));
-        $this->assertFalse($loader->has_triggers('kia_ora_koutou_katoa'));
+        $this->assertFalse($loader->support_triggers('test_instance_created'));
+        $this->assertTrue($loader->support_triggers('test_overdue'));
+        $this->assertFalse($loader->support_triggers('kia_ora_koutou_katoa'));
         try {
-            $loader->has_triggers('he_who_must_not_be_named');
-            $this->fail('coding_exception expected');
-        } catch (coding_exception $ex) {
-            $this->assertStringContainsString('notification he_who_must_not_be_named is not registered', $ex->a);
+            $loader->support_triggers('he_who_must_not_be_named');
+            $this->fail('invalid_parameter_exception expected');
+        } catch (invalid_parameter_exception $ex) {
+            $this->assertStringContainsString('notification he_who_must_not_be_named is not registered', $ex->debuginfo);
         }
     }
 }

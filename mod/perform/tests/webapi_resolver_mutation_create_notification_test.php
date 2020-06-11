@@ -65,7 +65,7 @@ class mod_perform_webapi_resolver_mutation_create_notification_testcase extends 
         $notification = $result->notification;
 
         $this->assertNotEmpty($notification->id);
-        $this->assertSame(get_string('notification_instance_created', 'mod_perform'), $notification->name);
+        $this->assertSame(get_string('notification_broker_instance_created', 'mod_perform'), $notification->name);
         $this->assertTrue($notification->active);
     }
 
@@ -85,7 +85,7 @@ class mod_perform_webapi_resolver_mutation_create_notification_testcase extends 
         $notification = $result->notification;
 
         $this->assertNotEmpty($notification->id);
-        $this->assertSame(get_string('notification_instance_created', 'mod_perform'), $notification->name);
+        $this->assertSame(get_string('notification_broker_instance_created', 'mod_perform'), $notification->name);
         $this->assertFalse($notification->active);
     }
 
@@ -174,7 +174,7 @@ class mod_perform_webapi_resolver_mutation_create_notification_testcase extends 
         ];
 
         $this->expectException(invalid_parameter_exception::class);
-        $this->expectExceptionMessage('Invalid parameter value detected (unimplemented notification class_key)');
+        $this->expectExceptionMessage('notification unimplemented_class is not registered');
         $result = $this->resolve_graphql_mutation(self::MUTATION, $args);
     }
 
@@ -193,7 +193,7 @@ class mod_perform_webapi_resolver_mutation_create_notification_testcase extends 
         $notification = $result->notification;
 
         $this->assertNotEmpty($notification->id);
-        $this->assertSame(get_string('notification_instance_created', 'mod_perform'), $notification->name);
+        $this->assertSame(get_string('notification_broker_instance_created', 'mod_perform'), $notification->name);
         $this->assertFalse($notification->active);
     }
 
@@ -218,7 +218,7 @@ class mod_perform_webapi_resolver_mutation_create_notification_testcase extends 
 
         $notification = $result['notification'];
         $this->assertNotEmpty($notification['id']);
-        $this->assertSame(get_string('notification_instance_created', 'mod_perform'), $notification['name']);
+        $this->assertSame(get_string('notification_broker_instance_created', 'mod_perform'), $notification['name']);
         $this->assertSame($args['input']['active'], $notification['active']);
 
         // Check your work.

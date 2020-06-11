@@ -22,40 +22,33 @@
  * @category test
  */
 
-use mod_perform\models\activity\activity;
 use mod_perform\models\activity\notification;
 use mod_perform\models\activity\notification_recipient;
-use mod_perform\models\notification\broker;
-use mod_perform\models\notification\brokers\instance_created;
 
-class mod_perform_notification_recipient_model_testcase extends advanced_testcase {
-    /** @var mod_perform_generator */
-    private $perfgen;
+require_once(__DIR__ . '/notification_testcase.php');
 
-    public function setUp(): void {
-        $this->setAdminUser();
-        $this->perfgen = $this->getDataGenerator()->get_plugin_generator('mod_perform');
-    }
-
-    public function tearDown(): void {
-        $this->perfgen = null;
-    }
-
-    /**
-     * Create an activity for testing.
-     *
-     * @param array $data
-     * @return activity
-     */
-    public function create_test_activity(array $data = []): activity {
-        return $this->perfgen->create_activity_in_container($data);
-    }
-
+class mod_perform_notification_recipient_model_testcase extends mod_perform_notification_testcase {
     public function test_create() {
-        $activity = $this->create_test_activity();
+        $activity = $this->create_activity();
+        $section = $this->create_section($activity);
         $notification = notification::create($activity, 'instance_created');
-        $this->markTestIncomplete('do it later');
-        // TODO: add tests
-        // $notification->recipients;
+        $relationships = $this->create_section_relationships($section);
+        notification_recipient::create($notification, $relationships[0], false);
+        notification_recipient::create($notification, $relationships[1], true);
+        $this->assertFalse($notification->recipients->find('relationship_id', $relationships[0]->id)->active);
+        $this->assertTrue($notification->recipients->find('relationship_id', $relationships[1]->id)->active);
+        $this->assertFalse($notification->recipients->find('relationship_id', $relationships[2]->id)->active);
+    }
+
+    public function test_load_by_notification() {
+        $activity = $this->create_activity();
+        $section = $this->create_section($activity);
+        $notification = notification::create($activity, 'instance_created');
+        $relationships = $this->create_section_relationships($section);
+        notification_recipient::create($notification, $relationships[0], false);
+        notification_recipient::create($notification, $relationships[1], true);
+
+        $this->assertCount(3, notification_recipient::load_by_notification($notification, false));
+        $this->assertCount(1, notification_recipient::load_by_notification($notification, true));
     }
 }
