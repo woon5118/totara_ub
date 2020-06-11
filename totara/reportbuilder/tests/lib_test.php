@@ -577,7 +577,7 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         $rb = reportbuilder::create_embedded($this->shortname);
         $problems = $rb->get_caching_problems();
         $this->assertCount(1, $problems);
-        $this->assertContains('Report caching is disabled.', $problems[0]);
+        $this->assertStringContainsString('Report caching is disabled.', $problems[0]);
 
         set_config('enablereportcaching', 1);
         $rb = reportbuilder::create_embedded($this->shortname);

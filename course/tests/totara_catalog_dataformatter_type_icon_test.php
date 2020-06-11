@@ -54,8 +54,8 @@ class core_course_totara_catalog_dataformatter_type_icon_testcase extends datafo
         $test_params = ['coursetype' => $TOTARA_COURSE_TYPES['elearning']];
         $result = $df->get_formatted_value($test_params, $context);
         $this->assertInstanceOf(stdClass::class, $result);
-        $this->assertContains('flex-icon', $result->icon);
-        $this->assertContains('E-Learning', $result->icon);
+        $this->assertStringContainsString('flex-icon', $result->icon);
+        $this->assertStringContainsString('E-Learning', $result->icon);
 
         $result = $df->get_formatted_value(['coursetype' => ''], $context);
         $this->assertSame(null, $result);

@@ -2589,42 +2589,42 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $fullmessagehtml = end($messages)->fullmessagehtml;
 
         // Confirm that hack worked.
-        $this->assertContains('borked', $fullmessage);
-        $this->assertNotContains('[borked]', $fullmessage);
+        $this->assertStringContainsString('borked', $fullmessage);
+        $this->assertStringNotContainsString('[borked]', $fullmessage);
 
         // Assertions for values that are already strings
-        $this->assertContains('coursename '.$course1->fullname, $fullmessage);
-        $this->assertContains('coursename '.$course1->fullname, $fullmessagehtml);
-        $this->assertContains('facetofacename '.$facetoface->name, $fullmessage);
-        $this->assertContains('facetofacename '.$facetoface->name, $fullmessagehtml);
-        $this->assertContains('seminarname '.$facetoface->name, $fullmessage);
-        $this->assertContains('seminarname '.$facetoface->name, $fullmessagehtml);
-        $this->assertContains('seminardescription '.$facetoface->intro, $fullmessage);
-        $this->assertContains('seminardescription '.$facetoface->intro, $fullmessagehtml);
-        $this->assertContains('firstname '.$user1->firstname, $fullmessage);
-        $this->assertContains('firstname '.$user1->firstname, $fullmessagehtml);
-        $this->assertContains('lastname '.$user1->lastname, $fullmessage);
-        $this->assertContains('lastname '.$user1->lastname, $fullmessagehtml);
-        $this->assertContains('cost '.$seminarevent->get_normalcost(), $fullmessage);
-        $this->assertContains('cost '.$seminarevent->get_normalcost(), $fullmessagehtml);
+        $this->assertStringContainsString('coursename '.$course1->fullname, $fullmessage);
+        $this->assertStringContainsString('coursename '.$course1->fullname, $fullmessagehtml);
+        $this->assertStringContainsString('facetofacename '.$facetoface->name, $fullmessage);
+        $this->assertStringContainsString('facetofacename '.$facetoface->name, $fullmessagehtml);
+        $this->assertStringContainsString('seminarname '.$facetoface->name, $fullmessage);
+        $this->assertStringContainsString('seminarname '.$facetoface->name, $fullmessagehtml);
+        $this->assertStringContainsString('seminardescription '.$facetoface->intro, $fullmessage);
+        $this->assertStringContainsString('seminardescription '.$facetoface->intro, $fullmessagehtml);
+        $this->assertStringContainsString('firstname '.$user1->firstname, $fullmessage);
+        $this->assertStringContainsString('firstname '.$user1->firstname, $fullmessagehtml);
+        $this->assertStringContainsString('lastname '.$user1->lastname, $fullmessage);
+        $this->assertStringContainsString('lastname '.$user1->lastname, $fullmessagehtml);
+        $this->assertStringContainsString('cost '.$seminarevent->get_normalcost(), $fullmessage);
+        $this->assertStringContainsString('cost '.$seminarevent->get_normalcost(), $fullmessagehtml);
 
         $assertions = function ($sessiondate, $session, $duration) use ($fullmessage, $fullmessagehtml) {
             $timestart = $session->get_timestart();
             $timefinish = $session->get_timefinish();
             $this->assertEquals($sessiondate->timestart, $timestart);
             $this->assertEquals($sessiondate->timefinish, $timefinish);
-            $this->assertContains('session:starttime '.ltrim(date_format_string($timestart, "%l:%M %p", 'Pacific/Auckland')), $fullmessage);
-            $this->assertContains('session:starttime '.ltrim(date_format_string($timestart, "%l:%M %p", 'Pacific/Auckland')), $fullmessagehtml);
-            $this->assertContains('session:startdate '.ltrim(date_format_string($timestart, "%e %B %Y", 'Pacific/Auckland')), $fullmessage);
-            $this->assertContains('session:startdate '.ltrim(date_format_string($timestart, "%e %B %Y", 'Pacific/Auckland')), $fullmessagehtml);
-            $this->assertContains('session:finishtime '.ltrim(date_format_string($timefinish, "%l:%M %p", 'Pacific/Auckland')), $fullmessage);
-            $this->assertContains('session:finishtime '.ltrim(date_format_string($timefinish, "%l:%M %p", 'Pacific/Auckland')), $fullmessagehtml);
-            $this->assertContains('session:finishdate '.ltrim(date_format_string($timefinish, "%e %B %Y", 'Pacific/Auckland')), $fullmessage);
-            $this->assertContains('session:finishdate '.ltrim(date_format_string($timefinish, "%e %B %Y", 'Pacific/Auckland')), $fullmessagehtml);
-            $this->assertContains('session:duration '.$duration, $fullmessage);
-            $this->assertContains('session:duration '.$duration, $fullmessagehtml);
-            $this->assertContains('session:timezone Pacific/Auckland', $fullmessage);
-            $this->assertContains('session:timezone Pacific/Auckland', $fullmessagehtml);
+            $this->assertStringContainsString('session:starttime '.ltrim(date_format_string($timestart, "%l:%M %p", 'Pacific/Auckland')), $fullmessage);
+            $this->assertStringContainsString('session:starttime '.ltrim(date_format_string($timestart, "%l:%M %p", 'Pacific/Auckland')), $fullmessagehtml);
+            $this->assertStringContainsString('session:startdate '.ltrim(date_format_string($timestart, "%e %B %Y", 'Pacific/Auckland')), $fullmessage);
+            $this->assertStringContainsString('session:startdate '.ltrim(date_format_string($timestart, "%e %B %Y", 'Pacific/Auckland')), $fullmessagehtml);
+            $this->assertStringContainsString('session:finishtime '.ltrim(date_format_string($timefinish, "%l:%M %p", 'Pacific/Auckland')), $fullmessage);
+            $this->assertStringContainsString('session:finishtime '.ltrim(date_format_string($timefinish, "%l:%M %p", 'Pacific/Auckland')), $fullmessagehtml);
+            $this->assertStringContainsString('session:finishdate '.ltrim(date_format_string($timefinish, "%e %B %Y", 'Pacific/Auckland')), $fullmessage);
+            $this->assertStringContainsString('session:finishdate '.ltrim(date_format_string($timefinish, "%e %B %Y", 'Pacific/Auckland')), $fullmessagehtml);
+            $this->assertStringContainsString('session:duration '.$duration, $fullmessage);
+            $this->assertStringContainsString('session:duration '.$duration, $fullmessagehtml);
+            $this->assertStringContainsString('session:timezone Pacific/Auckland', $fullmessage);
+            $this->assertStringContainsString('session:timezone Pacific/Auckland', $fullmessagehtml);
         };
 
         $sessions = $seminarevent->get_sessions();
@@ -2642,27 +2642,27 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         if (date_format_string($sessiondate2->timestart, "%e %B %Y", 'Pacific/Auckland') !== date_format_string($sessiondate2->timefinish, "%e %B %Y", 'Pacific/Auckland')){
             $firstsessiondate .= ' - '.ltrim(date_format_string($sessiondate2->timefinish, "%e %B %Y", 'Pacific/Auckland'));
         }
-        $this->assertContains('sessiondate '.$firstsessiondate, $fullmessage);
-        $this->assertContains('sessiondate '.$firstsessiondate, $fullmessagehtml);
+        $this->assertStringContainsString('sessiondate '.$firstsessiondate, $fullmessage);
+        $this->assertStringContainsString('sessiondate '.$firstsessiondate, $fullmessagehtml);
 
-        $this->assertContains('startdate '.ltrim(date_format_string($sessiondate2->timestart, "%e %B %Y", 'Pacific/Auckland')), $fullmessage);
-        $this->assertContains('startdate '.ltrim(date_format_string($sessiondate2->timestart, "%e %B %Y", 'Pacific/Auckland')), $fullmessagehtml);
-        $this->assertContains('finishdate '.ltrim(date_format_string($sessiondate2->timefinish, "%e %B %Y", 'Pacific/Auckland')), $fullmessage);
-        $this->assertContains('finishdate '.ltrim(date_format_string($sessiondate2->timefinish, "%e %B %Y", 'Pacific/Auckland')), $fullmessagehtml);
-        $this->assertContains('starttime '.ltrim(date_format_string($sessiondate2->timestart, "%l:%M %p", 'Pacific/Auckland')), $fullmessage);
-        $this->assertContains('starttime '.ltrim(date_format_string($sessiondate2->timestart, "%l:%M %p", 'Pacific/Auckland')), $fullmessagehtml);
-        $this->assertContains('finishtime '.ltrim(date_format_string($sessiondate2->timefinish, "%l:%M %p", 'Pacific/Auckland')), $fullmessage);
-        $this->assertContains('finishtime '.ltrim(date_format_string($sessiondate2->timefinish, "%l:%M %p", 'Pacific/Auckland')), $fullmessagehtml);
+        $this->assertStringContainsString('startdate '.ltrim(date_format_string($sessiondate2->timestart, "%e %B %Y", 'Pacific/Auckland')), $fullmessage);
+        $this->assertStringContainsString('startdate '.ltrim(date_format_string($sessiondate2->timestart, "%e %B %Y", 'Pacific/Auckland')), $fullmessagehtml);
+        $this->assertStringContainsString('finishdate '.ltrim(date_format_string($sessiondate2->timefinish, "%e %B %Y", 'Pacific/Auckland')), $fullmessage);
+        $this->assertStringContainsString('finishdate '.ltrim(date_format_string($sessiondate2->timefinish, "%e %B %Y", 'Pacific/Auckland')), $fullmessagehtml);
+        $this->assertStringContainsString('starttime '.ltrim(date_format_string($sessiondate2->timestart, "%l:%M %p", 'Pacific/Auckland')), $fullmessage);
+        $this->assertStringContainsString('starttime '.ltrim(date_format_string($sessiondate2->timestart, "%l:%M %p", 'Pacific/Auckland')), $fullmessagehtml);
+        $this->assertStringContainsString('finishtime '.ltrim(date_format_string($sessiondate2->timefinish, "%l:%M %p", 'Pacific/Auckland')), $fullmessage);
+        $this->assertStringContainsString('finishtime '.ltrim(date_format_string($sessiondate2->timefinish, "%l:%M %p", 'Pacific/Auckland')), $fullmessagehtml);
 
         // sessiondate1 is the latest of the three session dates.
-        $this->assertContains('lateststartdate '.ltrim(date_format_string($sessiondate1->timestart, "%e %B %Y", 'Pacific/Auckland')), $fullmessage);
-        $this->assertContains('lateststartdate '.ltrim(date_format_string($sessiondate1->timestart, "%e %B %Y", 'Pacific/Auckland')), $fullmessagehtml);
-        $this->assertContains('latestfinishdate '.ltrim(date_format_string($sessiondate1->timefinish, "%e %B %Y", 'Pacific/Auckland')), $fullmessage);
-        $this->assertContains('latestfinishdate '.ltrim(date_format_string($sessiondate1->timefinish, "%e %B %Y", 'Pacific/Auckland')), $fullmessagehtml);
-        $this->assertContains('lateststarttime '.ltrim(date_format_string($sessiondate1->timestart, "%l:%M %p", 'Pacific/Auckland')), $fullmessage);
-        $this->assertContains('lateststarttime '.ltrim(date_format_string($sessiondate1->timestart, "%l:%M %p", 'Pacific/Auckland')), $fullmessagehtml);
-        $this->assertContains('latestfinishtime '.ltrim(date_format_string($sessiondate1->timefinish, "%l:%M %p", 'Pacific/Auckland')), $fullmessage);
-        $this->assertContains('latestfinishtime '.ltrim(date_format_string($sessiondate1->timefinish, "%l:%M %p", 'Pacific/Auckland')), $fullmessagehtml);
+        $this->assertStringContainsString('lateststartdate '.ltrim(date_format_string($sessiondate1->timestart, "%e %B %Y", 'Pacific/Auckland')), $fullmessage);
+        $this->assertStringContainsString('lateststartdate '.ltrim(date_format_string($sessiondate1->timestart, "%e %B %Y", 'Pacific/Auckland')), $fullmessagehtml);
+        $this->assertStringContainsString('latestfinishdate '.ltrim(date_format_string($sessiondate1->timefinish, "%e %B %Y", 'Pacific/Auckland')), $fullmessage);
+        $this->assertStringContainsString('latestfinishdate '.ltrim(date_format_string($sessiondate1->timefinish, "%e %B %Y", 'Pacific/Auckland')), $fullmessagehtml);
+        $this->assertStringContainsString('lateststarttime '.ltrim(date_format_string($sessiondate1->timestart, "%l:%M %p", 'Pacific/Auckland')), $fullmessage);
+        $this->assertStringContainsString('lateststarttime '.ltrim(date_format_string($sessiondate1->timestart, "%l:%M %p", 'Pacific/Auckland')), $fullmessagehtml);
+        $this->assertStringContainsString('latestfinishtime '.ltrim(date_format_string($sessiondate1->timefinish, "%l:%M %p", 'Pacific/Auckland')), $fullmessage);
+        $this->assertStringContainsString('latestfinishtime '.ltrim(date_format_string($sessiondate1->timefinish, "%l:%M %p", 'Pacific/Auckland')), $fullmessagehtml);
 
         // As per duration setting in $sessiondata, durations is a setting that is not currently automatically adjusted
         // by generator when known session dates are added, so duration is not expected to equal difference between starttime
@@ -3187,8 +3187,8 @@ class mod_facetoface_lib_testcase extends mod_facetoface_facetoface_testcase {
         $this->assertCount(1, $messages, 'The test suit was expecting one message to be sent out regarding seminar event being under minimum booking.');
         $message = array_pop($messages);
         $this->assertSame('Event under minimum bookings for: facetoface1', $message->subject);
-        $this->assertContains('The following event is under minimum bookings:', $message->fullmessage);
-        $this->assertContains('Capacity: 1 / 10 (minimum: 4)', $message->fullmessage);
+        $this->assertStringContainsString('The following event is under minimum bookings:', $message->fullmessage);
+        $this->assertStringContainsString('Capacity: 1 / 10 (minimum: 4)', $message->fullmessage);
     }
 
     public function test_facetoface_is_signup_cancelled() {

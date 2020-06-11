@@ -113,7 +113,7 @@ class totara_reportbuilder_advanced_column_testcase extends advanced_testcase {
             $count++;
             $this->assertSame('6', $record->user_username);
             $this->assertSame('3', $record->user_institution);
-            $this->assertEquals(3, $record->user_firstaccess, '', 0.0001);
+            $this->assertEqualsWithDelta(3, $record->user_firstaccess, 0.0001);
             $this->assertSame('0', $record->user_timemodified);
             $this->assertSame('-10', $record->user_lastlogin);
             $this->assertSame('666', $record->user_timecreated);

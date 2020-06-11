@@ -76,7 +76,7 @@ class core_event_course_module_viewed_testcase extends advanced_testcase {
         set_debugging(DEBUG_NORMAL);
 
         $this->expectException('coding_exception');
-        $this->expectExceptionMessageRegExp('/course_module_viewed event must define objectid and object table\.$/');
+        $this->expectExceptionMessage('course_module_viewed event must define objectid and object table');
         \core_tests\event\course_module_viewed::create(array(
             'contextid' => 1,
             'courseid' => 2,
@@ -92,7 +92,7 @@ class core_event_course_module_viewed_testcase extends advanced_testcase {
 
         // Make sure objecttable and object id is always set.
         $this->expectException('coding_exception');
-        $this->expectExceptionMessageRegExp('/course_module_viewed event must define objectid and object table\.$/');
+        $this->expectExceptionMessage('course_module_viewed event must define objectid and object table');
         \core_tests\event\course_module_viewed_noinit::create(array(
             'contextid' => 1,
             'courseid' => 2,

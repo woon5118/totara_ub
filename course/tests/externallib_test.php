@@ -908,11 +908,11 @@ class core_course_externallib_testcase extends externallib_advanced_testcase {
         $this->assertCount(1, $lastsection['modules']);
         $this->assertEquals(2, $lastsection['section']);
         if (!empty($CFG->disableconsistentcleaning)) {
-            $this->assertContains('<iframe', $lastsection['summary']);
-            $this->assertContains('</iframe>', $lastsection['summary']);
+            $this->assertStringContainsString('<iframe', $lastsection['summary']);
+            $this->assertStringContainsString('</iframe>', $lastsection['summary']);
         } else {
-            $this->assertNotContains('<iframe', $lastsection['summary']);
-            $this->assertNotContains('</iframe>', $lastsection['summary']);
+            $this->assertStringNotContainsString('<iframe', $lastsection['summary']);
+            $this->assertStringNotContainsString('</iframe>', $lastsection['summary']);
         }
 
 
@@ -1930,7 +1930,7 @@ class core_course_externallib_testcase extends externallib_advanced_testcase {
         $this->assertEquals($course1->id, $result['courses'][0]['id']);
         // Check expected overview data for the module.
         $this->assertEquals('forum', $result['courses'][0]['overviews'][0]['module']);
-        $this->assertContains('1 total unread', $result['courses'][0]['overviews'][0]['overviewtext']);
+        $this->assertStringContainsString('1 total unread', $result['courses'][0]['overviews'][0]['overviewtext']);
     }
 
     /**

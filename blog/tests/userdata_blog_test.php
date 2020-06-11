@@ -290,8 +290,8 @@ class core_blog_userdata_blog_testcase extends advanced_testcase {
 
         $export = blog::execute_export($data->activeuser, $data->systemcontext);
 
-        $this->assertContains($attachmentfile, $export->files, '', false, false);
-        $this->assertContains($contentfile, $export->files, '', false, false);
+        $this->assertContainsEquals($attachmentfile, $export->files, '', false);
+        $this->assertContainsEquals($contentfile, $export->files, '', false);
 
         foreach ($export->data as $exportedblogentry) {
             $this->assertArrayHasKey('files', $exportedblogentry);

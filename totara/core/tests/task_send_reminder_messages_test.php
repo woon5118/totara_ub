@@ -212,9 +212,9 @@ class totara_core_task_send_reminder_messages_test extends reportcache_advanced_
         $output = ob_get_clean();
 
         $this->assertSame(0, $sink->count());
-        $this->assertContains('no users to send invitation message', $output);
-        $this->assertContains('no users to send reminder message', $output);
-        $this->assertContains('no users to send escalation message', $output);
+        $this->assertStringContainsString('no users to send invitation message', $output);
+        $this->assertStringContainsString('no users to send reminder message', $output);
+        $this->assertStringContainsString('no users to send escalation message', $output);
         $sink->close();
     }
 
@@ -238,9 +238,9 @@ class totara_core_task_send_reminder_messages_test extends reportcache_advanced_
 
         // There should be four messages, three to the learner and 1 to the learners manager.
         $this->assertSame(4, $sink->count());
-        $this->assertContains('1 "invitation" type messages sent', $output);
-        $this->assertContains('1 "reminder" type messages sent', $output);
-        $this->assertContains('2 "escalation" type messages sent', $output);
+        $this->assertStringContainsString('1 "invitation" type messages sent', $output);
+        $this->assertStringContainsString('1 "reminder" type messages sent', $output);
+        $this->assertStringContainsString('2 "escalation" type messages sent', $output);
 
         // Make sure that an escalation email did indeed go to the manager.
         $messages = $sink->get_messages();
@@ -309,9 +309,9 @@ class totara_core_task_send_reminder_messages_test extends reportcache_advanced_
 
         // There should be four messages, three to the learner and 1 to the learners manager.
         $this->assertSame(4, $sink->count());
-        $this->assertContains('1 "invitation" type messages sent', $output);
-        $this->assertContains('1 "reminder" type messages sent', $output);
-        $this->assertContains('2 "escalation" type messages sent', $output);
+        $this->assertStringContainsString('1 "invitation" type messages sent', $output);
+        $this->assertStringContainsString('1 "reminder" type messages sent', $output);
+        $this->assertStringContainsString('2 "escalation" type messages sent', $output);
 
         // Make sure that an escalation email did indeed go to the manager.
         $messages = $sink->get_messages();
@@ -366,9 +366,9 @@ class totara_core_task_send_reminder_messages_test extends reportcache_advanced_
         $task->execute();
         $output = ob_get_clean();
         $this->assertSame(2, $sink->count());
-        $this->assertContains('1 "invitation" type messages sent', $output);
-        $this->assertContains('1 "reminder" type messages sent', $output);
-        $this->assertNotContains('escalation', $output);
+        $this->assertStringContainsString('1 "invitation" type messages sent', $output);
+        $this->assertStringContainsString('1 "reminder" type messages sent', $output);
+        $this->assertStringNotContainsString('escalation', $output);
         // Clear the sink we don't want to keep track of this.
         $sink->clear();
 
@@ -390,9 +390,9 @@ class totara_core_task_send_reminder_messages_test extends reportcache_advanced_
         $task->execute();
         $output = ob_get_clean();
         $this->assertSame(0, $sink->count());
-        $this->assertContains('no users to send invitation message', $output);
-        $this->assertContains('no users to send reminder message', $output);
-        $this->assertContains('no users to send escalation message', $output);
+        $this->assertStringContainsString('no users to send invitation message', $output);
+        $this->assertStringContainsString('no users to send reminder message', $output);
+        $this->assertStringContainsString('no users to send escalation message', $output);
 
         // Now mark learner 2 as complete.
         $completion = $coursecompletion->get_completion($this->learner2->id, COMPLETION_CRITERIA_TYPE_SELF);
@@ -408,9 +408,9 @@ class totara_core_task_send_reminder_messages_test extends reportcache_advanced_
         // There should be four messages, three to the learner and 1 to the learners first manager.
         // The learner has a second manager, but only the first should get messaged.
         $this->assertSame(4, $sink->count());
-        $this->assertContains('1 "invitation" type messages sent', $output);
-        $this->assertContains('1 "reminder" type messages sent', $output);
-        $this->assertContains('2 "escalation" type messages sent', $output);
+        $this->assertStringContainsString('1 "invitation" type messages sent', $output);
+        $this->assertStringContainsString('1 "reminder" type messages sent', $output);
+        $this->assertStringContainsString('2 "escalation" type messages sent', $output);
 
         $sink->close();
     }
@@ -479,9 +479,9 @@ class totara_core_task_send_reminder_messages_test extends reportcache_advanced_
         // There are none sent to learner2 because that user's completion date + period value (-8 + 2 = 6 days ago)
         // is before the reminder creation date (5 days ago).
         $this->assertSame(6, $sink->count());
-        $this->assertContains('2 "invitation" type messages sent', $output);
-        $this->assertContains('2 "reminder" type messages sent', $output);
-        $this->assertContains('2 "escalation" type messages sent', $output);
+        $this->assertStringContainsString('2 "invitation" type messages sent', $output);
+        $this->assertStringContainsString('2 "reminder" type messages sent', $output);
+        $this->assertStringContainsString('2 "escalation" type messages sent', $output);
 
         $sink->close();
     }
@@ -556,9 +556,9 @@ class totara_core_task_send_reminder_messages_test extends reportcache_advanced_
         // There are none sent to learner2 because that user's completion date + period value (-8 + 2 = 6 days ago)
         // is before the reminder creation date (5 days ago). Plus their completion is before the limit anyway.
         $this->assertSame(2, $sink->count());
-        $this->assertContains('1 "invitation" type messages sent', $output);
-        $this->assertContains('1 "reminder" type messages sent', $output);
-        $this->assertContains('no users to send escalation message to', $output);
+        $this->assertStringContainsString('1 "invitation" type messages sent', $output);
+        $this->assertStringContainsString('1 "reminder" type messages sent', $output);
+        $this->assertStringContainsString('no users to send escalation message to', $output);
 
         $sink->close();
     }
@@ -633,9 +633,9 @@ class totara_core_task_send_reminder_messages_test extends reportcache_advanced_
         // There are none sent to learner2 because that user's completion date + period value (-8 + 2 = 6 days ago)
         // is before the reminder creation date (5 days ago).
         $this->assertSame(6, $sink->count());
-        $this->assertContains('2 "invitation" type messages sent', $output);
-        $this->assertContains('2 "reminder" type messages sent', $output);
-        $this->assertContains('2 "escalation" type messages sent', $output);
+        $this->assertStringContainsString('2 "invitation" type messages sent', $output);
+        $this->assertStringContainsString('2 "reminder" type messages sent', $output);
+        $this->assertStringContainsString('2 "escalation" type messages sent', $output);
 
         $sink->close();
     }
@@ -668,9 +668,9 @@ class totara_core_task_send_reminder_messages_test extends reportcache_advanced_
 
         // There should be three messages to the learner.
         $this->assertSame(3, $sink->count());
-        $this->assertContains('1 "invitation" type messages sent', $output);
-        $this->assertContains('1 "reminder" type messages sent', $output);
-        $this->assertContains('1 "escalation" type messages sent', $output);
+        $this->assertStringContainsString('1 "invitation" type messages sent', $output);
+        $this->assertStringContainsString('1 "reminder" type messages sent', $output);
+        $this->assertStringContainsString('1 "escalation" type messages sent', $output);
 
         // Do the run through to check the user got the escalation email, rather than there being an
         // attempt to send it to some non-existent manager.

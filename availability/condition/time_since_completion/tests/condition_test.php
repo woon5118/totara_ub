@@ -172,7 +172,7 @@ class availability_time_since_completion_condition_testcase extends advanced_tes
             $cond = new condition($structure);
             $this->fail();
         } catch (coding_exception $e) {
-            $this->assertContains('Missing or invalid ->cm', $e->getMessage());
+            $this->assertStringContainsString('Missing or invalid ->cm', $e->getMessage());
         }
 
         // Invalid $cm.
@@ -181,7 +181,7 @@ class availability_time_since_completion_condition_testcase extends advanced_tes
             $cond = new condition($structure);
             $this->fail();
         } catch (coding_exception $e) {
-            $this->assertContains('Missing or invalid ->cm', $e->getMessage());
+            $this->assertStringContainsString('Missing or invalid ->cm', $e->getMessage());
         }
 
         $structure->cm = 42;
@@ -191,7 +191,7 @@ class availability_time_since_completion_condition_testcase extends advanced_tes
             $cond = new condition($structure);
             $this->fail();
         } catch (coding_exception $e) {
-            $this->assertContains('Missing or invalid ->expectedcompletion', $e->getMessage());
+            $this->assertStringContainsString('Missing or invalid ->expectedcompletion', $e->getMessage());
         }
 
         // Invalid $expectedcompletion.
@@ -200,7 +200,7 @@ class availability_time_since_completion_condition_testcase extends advanced_tes
             $cond = new condition($structure);
             $this->fail();
         } catch (coding_exception $e) {
-            $this->assertContains('Missing or invalid ->expectedcompletion', $e->getMessage());
+            $this->assertStringContainsString('Missing or invalid ->expectedcompletion', $e->getMessage());
         }
 
         $structure->expectedcompletion = COMPLETION_COMPLETE;
@@ -210,7 +210,7 @@ class availability_time_since_completion_condition_testcase extends advanced_tes
             $cond = new condition($structure);
             $this->fail();
         } catch (coding_exception $e) {
-            $this->assertContains('Missing or invalid ->timeamount', $e->getMessage());
+            $this->assertStringContainsString('Missing or invalid ->timeamount', $e->getMessage());
         }
 
         // Invalid $timeamount.
@@ -219,7 +219,7 @@ class availability_time_since_completion_condition_testcase extends advanced_tes
             $cond = new condition($structure);
             $this->fail();
         } catch (coding_exception $e) {
-            $this->assertContains('Missing or invalid ->timeamount', $e->getMessage());
+            $this->assertStringContainsString('Missing or invalid ->timeamount', $e->getMessage());
         }
 
         // Invalid $a.
@@ -228,7 +228,7 @@ class availability_time_since_completion_condition_testcase extends advanced_tes
             $cond = new condition($structure);
             $this->fail();
         } catch (coding_exception $e) {
-            $this->assertContains('Missing or invalid ->timeamount', $e->getMessage());
+            $this->assertStringContainsString('Missing or invalid ->timeamount', $e->getMessage());
         }
 
         // Invalid $a.
@@ -237,7 +237,7 @@ class availability_time_since_completion_condition_testcase extends advanced_tes
             $cond = new condition($structure);
             $this->fail();
         } catch (coding_exception $e) {
-            $this->assertContains('Missing or invalid ->timeamount', $e->getMessage());
+            $this->assertStringContainsString('Missing or invalid ->timeamount', $e->getMessage());
         }
 
         $structure->timeamount = 2;
@@ -247,7 +247,7 @@ class availability_time_since_completion_condition_testcase extends advanced_tes
             $cond = new condition($structure);
             $this->fail();
         } catch (coding_exception $e) {
-            $this->assertContains('Missing or invalid ->timeperiod', $e->getMessage());
+            $this->assertStringContainsString('Missing or invalid ->timeperiod', $e->getMessage());
         }
 
         // Invalid $timeperiod.
@@ -256,7 +256,7 @@ class availability_time_since_completion_condition_testcase extends advanced_tes
             $cond = new condition($structure);
             $this->fail();
         } catch (coding_exception $e) {
-            $this->assertContains('Missing or invalid ->timeperiod', $e->getMessage());
+            $this->assertStringContainsString('Missing or invalid ->timeperiod', $e->getMessage());
         }
 
         $structure->timeperiod = condition::TIME_PERIOD_DAYS;

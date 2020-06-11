@@ -160,7 +160,7 @@ class core_orm_relation_belongs_to_test extends orm_entity_relation_testcase {
             $child->parent()->associate($parent);
             $this->fail('Coding exception should have been thrown');
         } catch (\coding_exception $exception) {
-            $this->assertContains('Entity to associate must exist and its key must not be null!', $exception->getMessage());
+            $this->assertStringContainsString('Entity to associate must exist and its key must not be null!', $exception->getMessage());
         }
 
         try {
@@ -172,7 +172,7 @@ class core_orm_relation_belongs_to_test extends orm_entity_relation_testcase {
             $child->parent()->associate($parent);
             $this->fail('Coding exception should have been thrown');
         } catch (\coding_exception $exception) {
-            $this->assertContains('Entity to associate must exist and its key must not be null!', $exception->getMessage());
+            $this->assertStringContainsString('Entity to associate must exist and its key must not be null!', $exception->getMessage());
         }
     }
 

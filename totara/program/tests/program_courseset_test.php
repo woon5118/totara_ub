@@ -105,8 +105,8 @@ class totara_program_program_courseset_testcase extends advanced_testcase {
 
         // The courses should already be returned prior to saving.
         // We can set $checkForObjectIdentity to false in the assertion.
-        $this->assertContains($this->course1, $multicourseset1->get_courses(), '', false, false);
-        $this->assertContains($this->course2, $multicourseset1->get_courses(), '', false, false);
+        $this->assertContainsEquals($this->course1, $multicourseset1->get_courses());
+        $this->assertContainsEquals($this->course2, $multicourseset1->get_courses());
         $this->assertCount(2, $multicourseset1->get_courses());
         $this->assertEquals(array($this->course3), $multicourseset2->get_courses());
 
@@ -114,8 +114,8 @@ class totara_program_program_courseset_testcase extends advanced_testcase {
         $multicourseset2->save_set();
 
         // After saving, the same courses should still be there.
-        $this->assertContains($this->course1, $multicourseset1->get_courses(), '', false, false);
-        $this->assertContains($this->course2, $multicourseset1->get_courses(), '', false, false);
+        $this->assertContainsEquals($this->course1, $multicourseset1->get_courses());
+        $this->assertContainsEquals($this->course2, $multicourseset1->get_courses());
         $this->assertCount(2, $multicourseset1->get_courses());
         $this->assertEquals(array($this->course3), $multicourseset2->get_courses());
 
@@ -127,8 +127,8 @@ class totara_program_program_courseset_testcase extends advanced_testcase {
         $coursesetrecord2 = $DB->get_record('prog_courseset', array('id' => $coursesetid2));
         $multicourseset1 = new multi_course_set($this->program1->id, $coursesetrecord1, $uniqueid);
         $multicourseset2 = new multi_course_set($this->program1->id, $coursesetrecord2, $uniqueid);
-        $this->assertContains($this->course1, $multicourseset1->get_courses(), '', false, false);
-        $this->assertContains($this->course2, $multicourseset1->get_courses(), '', false, false);
+        $this->assertContainsEquals($this->course1, $multicourseset1->get_courses());
+        $this->assertContainsEquals($this->course2, $multicourseset1->get_courses());
         $this->assertCount(2, $multicourseset1->get_courses());
         $this->assertEquals(array($this->course3), $multicourseset2->get_courses());
     }
@@ -158,8 +158,8 @@ class totara_program_program_courseset_testcase extends advanced_testcase {
         $multicourseset2->add_course($coursedata);
 
         // The courses should already be returned prior to saving.
-        $this->assertContains($this->course1, $multicourseset1->get_courses(), '', false, false);
-        $this->assertContains($this->course2, $multicourseset1->get_courses(), '', false, false);
+        $this->assertContainsEquals($this->course1, $multicourseset1->get_courses());
+        $this->assertContainsEquals($this->course2, $multicourseset1->get_courses());
         $this->assertCount(2, $multicourseset1->get_courses());
         $this->assertEquals(array($this->course3), $multicourseset2->get_courses());
 
@@ -218,8 +218,8 @@ class totara_program_program_courseset_testcase extends advanced_testcase {
         $multicourseset2->save_set();
 
         // Ensure the initial courses are returned after saving.
-        $this->assertContains($this->course1, $multicourseset1->get_courses(), '', false, false);
-        $this->assertContains($this->course2, $multicourseset1->get_courses(), '', false, false);
+        $this->assertContainsEquals($this->course1, $multicourseset1->get_courses());
+        $this->assertContainsEquals($this->course2, $multicourseset1->get_courses());
         $this->assertCount(2, $multicourseset1->get_courses());
         $this->assertEquals(array($this->course3), $multicourseset2->get_courses());
 

@@ -3689,7 +3689,9 @@ class core_accesslib_testcase extends advanced_testcase {
         foreach ($actual as $cap) {
             $actualnames[$cap->name] = $cap->name;
         }
-        $this->assertArraySubset(array_combine($expected, $expected), $actualnames);
+        foreach ($expected as $name) {
+            $this->assertContains($name, $actualnames);
+        }
     }
 
     /**

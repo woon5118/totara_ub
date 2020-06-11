@@ -177,24 +177,18 @@ class question_utils_test extends advanced_testcase {
         $this->assertSame('mmmcmxcix', question_utils::int_to_roman(3999));
     }
 
-    /**
-     * @expectedException moodle_exception
-     */
     public function test_int_to_roman_too_small() {
+        $this->expectException(moodle_exception::class);
         question_utils::int_to_roman(0);
     }
 
-    /**
-     * @expectedException moodle_exception
-     */
     public function test_int_to_roman_too_big() {
+        $this->expectException(moodle_exception::class);
         question_utils::int_to_roman(4000);
     }
 
-    /**
-     * @expectedException moodle_exception
-     */
     public function test_int_to_roman_not_int() {
+        $this->expectException(moodle_exception::class);
         question_utils::int_to_roman(1.5);
     }
 

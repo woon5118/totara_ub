@@ -575,7 +575,7 @@ class core_filelib_testcase extends advanced_testcase {
         $curl = new curl();
         $testurl = 'ftp://example.com/file.txt';
         $error = $curl->get($testurl);
-        $this->assertContains('ftp', $error);
+        $this->assertStringContainsString('ftp', $error);
         $this->assertNotEmpty($curl->error);
         $this->assertEquals(CURLE_UNSUPPORTED_PROTOCOL, $curl->errno);
 
@@ -589,21 +589,21 @@ class core_filelib_testcase extends advanced_testcase {
         $curl = new curl();
         $testurl = $this->getExternalTestFileUrl('/test_redir_proto.php');
         $error = $curl->get($testurl, array('proto' => 'file'));
-        $this->assertContains('file', $error);
+        $this->assertStringContainsString('file', $error);
         $this->assertNotEmpty($curl->error);
         $this->assertEquals(CURLE_UNSUPPORTED_PROTOCOL, $curl->errno);
 
         $curl = new curl();
         $testurl = $this->getExternalTestFileUrl('/test_redir_proto.php');
         $error = $curl->get($testurl, array('proto' => 'ftp'));
-        $this->assertContains('ftp', $error);
+        $this->assertStringContainsString('ftp', $error);
         $this->assertNotEmpty($curl->error);
         $this->assertEquals(CURLE_UNSUPPORTED_PROTOCOL, $curl->errno);
 
         $curl = new curl();
         $testurl = $this->getExternalTestFileUrl('/test_redir_proto.php');
         $error = $curl->get($testurl, array('proto' => 'telnet'));
-        $this->assertContains('telnet', $error);
+        $this->assertStringContainsString('telnet', $error);
         $this->assertNotEmpty($curl->error);
         $this->assertEquals(CURLE_UNSUPPORTED_PROTOCOL, $curl->errno);
     }
@@ -1047,7 +1047,7 @@ EOF;
 
         // Do the rewrite.
         $finaltext = file_rewrite_pluginfile_urls($originaltext, 'pluginfile.php', $syscontext->id, 'user', 'private', 0);
-        $this->assertContains("pluginfile.php", $finaltext);
+        $this->assertStringContainsString("pluginfile.php", $finaltext);
 
         // Now undo.
         $options = array('reverse' => true);
@@ -1313,11 +1313,11 @@ EOF;
     }
 
     /**
-     * @expectedException coding_exception
-     * @expectedExceptionMessage The disposition-type must be inline or attachment.
      * @dataProvider data_make_content_disposition_invalid_case
      */
     public function test_make_content_disposition_invalid_case($dispositiontype) {
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('The disposition-type must be inline or attachment.');
         make_content_disposition($dispositiontype, 'foo.txt');
     }
 }

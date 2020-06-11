@@ -103,12 +103,12 @@ class auth_approved_util_testcase extends advanced_testcase {
             'status' => 'pending',
         ]);
         $report = \auth_approved\util::render_request_details_view($requestid);
-        $this->assertContains('<dt>User First Name</dt><dd>test1 firstname</dd>', $report);
-        $this->assertContains('<dt>User Last Name</dt><dd>test1 surname</dd>', $report);
-        $this->assertContains('<dt>Username</dt><dd>test1_username</dd>', $report);
-        $this->assertContains('<dt>User&#39;s Email</dt><dd>test1@example.com</dd>', $report);
-        $this->assertContains('<dt>Email confirmed</dt><dd>No</dd>', $report);
-        $this->assertNotContains('monkey', $report);
+        $this->assertStringContainsString('<dt>User First Name</dt><dd>test1 firstname</dd>', $report);
+        $this->assertStringContainsString('<dt>User Last Name</dt><dd>test1 surname</dd>', $report);
+        $this->assertStringContainsString('<dt>Username</dt><dd>test1_username</dd>', $report);
+        $this->assertStringContainsString('<dt>User&#39;s Email</dt><dd>test1@example.com</dd>', $report);
+        $this->assertStringContainsString('<dt>Email confirmed</dt><dd>No</dd>', $report);
+        $this->assertStringNotContainsString('monkey', $report);
 
         // Now test with an approved signup.
         $requestid = $generator->create_signup([
@@ -120,12 +120,12 @@ class auth_approved_util_testcase extends advanced_testcase {
             'status' => 'approved',
         ]);
         $report = \auth_approved\util::render_request_details_view($requestid);
-        $this->assertContains('<dt>User First Name</dt><dd>test2 firstname</dd>', $report);
-        $this->assertContains('<dt>User Last Name</dt><dd>test2 surname</dd>', $report);
-        $this->assertContains('<dt>Username</dt><dd>test2_username</dd>', $report);
-        $this->assertContains('<dt>User&#39;s Email</dt><dd>test2@example.com</dd>', $report);
-        $this->assertContains('<dt>Email confirmed</dt><dd>No</dd>', $report);
-        $this->assertNotContains('monkey', $report);
+        $this->assertStringContainsString('<dt>User First Name</dt><dd>test2 firstname</dd>', $report);
+        $this->assertStringContainsString('<dt>User Last Name</dt><dd>test2 surname</dd>', $report);
+        $this->assertStringContainsString('<dt>Username</dt><dd>test2_username</dd>', $report);
+        $this->assertStringContainsString('<dt>User&#39;s Email</dt><dd>test2@example.com</dd>', $report);
+        $this->assertStringContainsString('<dt>Email confirmed</dt><dd>No</dd>', $report);
+        $this->assertStringNotContainsString('monkey', $report);
 
         // Now test with a rejected signup.
         $requestid = $generator->create_signup([
@@ -137,11 +137,11 @@ class auth_approved_util_testcase extends advanced_testcase {
             'status' => 'rejected',
         ]);
         $report = \auth_approved\util::render_request_details_view($requestid);
-        $this->assertContains('<dt>User First Name</dt><dd>test2 firstname</dd>', $report);
-        $this->assertContains('<dt>User Last Name</dt><dd>test2 surname</dd>', $report);
-        $this->assertContains('<dt>Username</dt><dd>test2_username</dd>', $report);
-        $this->assertContains('<dt>User&#39;s Email</dt><dd>test2@example.com</dd>', $report);
-        $this->assertContains('<dt>Email confirmed</dt><dd>No</dd>', $report);
-        $this->assertNotContains('monkey', $report);
+        $this->assertStringContainsString('<dt>User First Name</dt><dd>test2 firstname</dd>', $report);
+        $this->assertStringContainsString('<dt>User Last Name</dt><dd>test2 surname</dd>', $report);
+        $this->assertStringContainsString('<dt>Username</dt><dd>test2_username</dd>', $report);
+        $this->assertStringContainsString('<dt>User&#39;s Email</dt><dd>test2@example.com</dd>', $report);
+        $this->assertStringContainsString('<dt>Email confirmed</dt><dd>No</dd>', $report);
+        $this->assertStringNotContainsString('monkey', $report);
     }
 }

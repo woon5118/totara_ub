@@ -599,7 +599,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $preemails = $emailsink->get_messages();
         $emailsink->clear();
         foreach($preemails as $preemail) {
-            $this->assertContains("This is to confirm that you are now booked", $preemail->fullmessagehtml);
+            $this->assertStringContainsString("This is to confirm that you are now booked", $preemail->fullmessagehtml);
         }
 
         $icals = [
@@ -677,8 +677,8 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         usort($emails, function($email1, $email2) {
            return strcmp($email1->subject, $email2->subject);
         });
-        $this->assertContains("BOOKING CANCELLED", $emails[0]->fullmessagehtml);
-        $this->assertContains("The session you are booked on (or on the waitlist) has changed:", $emails[1]->fullmessagehtml);
+        $this->assertStringContainsString("BOOKING CANCELLED", $emails[0]->fullmessagehtml);
+        $this->assertStringContainsString("The session you are booked on (or on the waitlist) has changed:", $emails[1]->fullmessagehtml);
 
         // Now test cancelling the session.
         $result = $seminarevent->cancel();
@@ -690,12 +690,12 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $message = $messages[0];
         $emailsink->close();
 
-        $this->assertContains('Seminar event cancellation', $message->subject);
-        $this->assertContains('This is to advise that the following session has been cancelled',
+        $this->assertStringContainsString('Seminar event cancellation', $message->subject);
+        $this->assertStringContainsString('This is to advise that the following session has been cancelled',
             $message->fullmessagehtml);
-        $this->assertContains('Course:   Test course 1', $message->fullmessagehtml);
-        $this->assertContains('Seminar:   facetoface', $message->fullmessagehtml);
-        $this->assertContains('Details:', $message->fullmessagehtml);
+        $this->assertStringContainsString('Course:   Test course 1', $message->fullmessagehtml);
+        $this->assertStringContainsString('Seminar:   facetoface', $message->fullmessagehtml);
+        $this->assertStringContainsString('Details:', $message->fullmessagehtml);
 
         // seminar event needs to be reloaded with info from DB
         $seminarevent = new seminar_event($seminarevent->get_id());
@@ -1889,7 +1889,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $this->assertCount(1, $emails, 'Only one message is expected');
         $this->assertEquals($manager->id, $emails[0]->useridto);
         $joinedbody = str_replace("=\n", "", $emails[0]->fullmessagehtml);
-        $this->assertContains('you as their Team Leader', $joinedbody);
+        $this->assertStringContainsString('you as their Team Leader', $joinedbody);
     }
 
     public function test_booking_cancellation_no_ccmanager() {
@@ -1986,21 +1986,21 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
 
         $alldates = $this->get_user_date($sessiondate, $student1);
         // Test user timezone date with session timezone date.
-        $this->assertContains(
+        $this->assertStringContainsString(
             $alldates,
             $haystack[0]->fullmessagehtml,
             'Wrong session timezone date for student 1 Face-to-face booking confirmation notification');
 
         $alldates = $this->get_user_date($sessiondate, $student2);
         // Test user timezone date with session timezone date.
-        $this->assertContains(
+        $this->assertStringContainsString(
             $alldates,
             $haystack[1]->fullmessagehtml,
             'Wrong session timezone date for student 2 Face-to-face booking confirmation notification');
 
         $alldates = $this->get_user_date($sessiondate, $student3);
         // Test user timezone date with session timezone date.
-        $this->assertContains(
+        $this->assertStringContainsString(
             $alldates,
             $haystack[2]->fullmessagehtml,
             'Wrong session timezone date for student 3 Face-to-face booking confirmation notification');
@@ -2022,21 +2022,21 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
 
         $alldates = $this->get_user_date($sessiondate, $student1);
         // Test user timezone date with session timezone date.
-        $this->assertContains(
+        $this->assertStringContainsString(
             $alldates,
             $haystack[0]->fullmessagehtml,
             'Wrong session timezone date for student 1 of Face-to-face booking reminder notification');
 
         $alldates = $this->get_user_date($sessiondate, $student2);
         // Test user timezone date with session timezone date.
-        $this->assertContains(
+        $this->assertStringContainsString(
             $alldates,
             $haystack[1]->fullmessagehtml,
             'Wrong session timezone date for student 2 of Face-to-face booking reminder notification');
 
         $alldates = $this->get_user_date($sessiondate, $student3);
         // Test user timezone date with session timezone date.
-        $this->assertContains(
+        $this->assertStringContainsString(
             $alldates,
             $haystack[2]->fullmessagehtml,
             'Wrong session timezone date for student 3 of Face-to-face booking reminder notification');
@@ -2063,19 +2063,19 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $alldates = $this->get_user_date($sessiondate, $test);
 
         // Test user timezone date with session timezone date.
-        $this->assertContains(
+        $this->assertStringContainsString(
             $alldates,
             $haystack[0]->fullmessagehtml,
             'Wrong session timezone date for student 1 Face-to-face booking confirmation notification');
 
         // Test user timezone date with session timezone date.
-        $this->assertContains(
+        $this->assertStringContainsString(
             $alldates,
             $haystack[1]->fullmessagehtml,
             'Wrong session timezone date for student 2 Face-to-face booking confirmation notification');
 
         // Test user timezone date with session timezone date.
-        $this->assertContains(
+        $this->assertStringContainsString(
             $alldates,
             $haystack[2]->fullmessagehtml,
             'Wrong session timezone date for student 3 Face-to-face booking confirmation notification');
@@ -2096,19 +2096,19 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
             'Wrong notification, must be Face-to-face booking reminder');
 
         // Test user timezone date with session timezone date.
-        $this->assertContains(
+        $this->assertStringContainsString(
             $alldates,
             $haystack[0]->fullmessagehtml,
             'Wrong session timezone date for student 1 of Face-to-face booking reminder notification');
 
         // Test user timezone date with session timezone date.
-        $this->assertContains(
+        $this->assertStringContainsString(
             $alldates,
             $haystack[1]->fullmessagehtml,
             'Wrong session timezone date for student 2 of Face-to-face booking reminder notification');
 
         // Test user timezone date with session timezone date.
-        $this->assertContains(
+        $this->assertStringContainsString(
             $alldates,
             $haystack[2]->fullmessagehtml,
             'Wrong session timezone date for student 3 of Face-to-face booking reminder notification');
@@ -2204,10 +2204,10 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         // session is cancelled.
         $affectedusers = array($user2->id, $user3->id, $user4->id);
         foreach ($messages as $message) {
-            $this->assertContains('Seminar event cancellation', $message->subject);
-            $this->assertContains('This is to advise that the following session has been cancelled', $message->fullmessagehtml);
-            $this->assertContains('Course:   Test course 1', $message->fullmessagehtml);
-            $this->assertContains('Seminar:   Seminar ', $message->fullmessagehtml);
+            $this->assertStringContainsString('Seminar event cancellation', $message->subject);
+            $this->assertStringContainsString('This is to advise that the following session has been cancelled', $message->fullmessagehtml);
+            $this->assertStringContainsString('Course:   Test course 1', $message->fullmessagehtml);
+            $this->assertStringContainsString('Seminar:   Seminar ', $message->fullmessagehtml);
             $this->assertContains($message->useridto, $affectedusers);
         }
     }
@@ -2271,9 +2271,9 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
 
     private function notification_content_test($needlebody, $emails, $message) {
 
-        $this->assertContains($needlebody, $emails[0]->fullmessagehtml, $message);
-        $this->assertContains($needlebody, $emails[1]->fullmessagehtml, $message);
-        $this->assertContains($needlebody, $emails[2]->fullmessagehtml, $message);
+        $this->assertStringContainsString($needlebody, $emails[0]->fullmessagehtml, $message);
+        $this->assertStringContainsString($needlebody, $emails[1]->fullmessagehtml, $message);
+        $this->assertStringContainsString($needlebody, $emails[2]->fullmessagehtml, $message);
     }
 
     private function get_user_date($sessiondate, $date) {
@@ -2336,7 +2336,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
 
         $preemails = $emailsink->get_messages();
         foreach ($preemails as $preemail) {
-            $this->assertContains("This is to advise that you have been added to the waitlist", $preemail->fullmessagehtml);
+            $this->assertStringContainsString("This is to advise that you have been added to the waitlist", $preemail->fullmessagehtml);
         }
     }
 
@@ -2499,7 +2499,7 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
             $this->assertCount(0, $messages);
         } else {
             $this->assertCount(1, $messages);
-            $this->assertContains('Event under minimum bookings', current($messages)->subject);
+            $this->assertStringContainsString('Event under minimum bookings', current($messages)->subject);
         }
     }
 
@@ -2602,11 +2602,11 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $emailsink->close();
 
         $emails = $emailsink->get_messages();
-        $this->assertContains('Cost:', current($emails)->fullmessagehtml);
+        $this->assertStringContainsString('Cost:', current($emails)->fullmessagehtml);
         // Test normal cost
-        $this->assertNotContains('$100', current($emails)->fullmessagehtml);
+        $this->assertStringNotContainsString('$100', current($emails)->fullmessagehtml);
         // Test discount cost
-        $this->assertContains('$NZ20', current($emails)->fullmessagehtml);
+        $this->assertStringContainsString('$NZ20', current($emails)->fullmessagehtml);
     }
 
     /**
@@ -2623,11 +2623,11 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $emailsink->close();
 
         $emails = $emailsink->get_messages();
-        $this->assertContains('Cost:', current($emails)->fullmessagehtml);
+        $this->assertStringContainsString('Cost:', current($emails)->fullmessagehtml);
         // Test normal cost
-        $this->assertContains('$100', current($emails)->fullmessagehtml);
+        $this->assertStringContainsString('$100', current($emails)->fullmessagehtml);
         // Test discount cost
-        $this->assertNotContains('$NZ20', current($emails)->fullmessagehtml);
+        $this->assertStringNotContainsString('$NZ20', current($emails)->fullmessagehtml);
     }
 
     /**
@@ -2649,11 +2649,11 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $emailsink->close();
 
         $emails = $emailsink->get_messages();
-        $this->assertContains('Cost:', current($emails)->fullmessagehtml);
+        $this->assertStringContainsString('Cost:', current($emails)->fullmessagehtml);
         // Test normal cost
-        $this->assertNotContains('$100', current($emails)->fullmessagehtml);
+        $this->assertStringNotContainsString('$100', current($emails)->fullmessagehtml);
         // Test discount cost
-        $this->assertNotContains('$NZ20', current($emails)->fullmessagehtml);
+        $this->assertStringNotContainsString('$NZ20', current($emails)->fullmessagehtml);
 
         $emailsink = $this->redirectMessages();
         $signup = \mod_facetoface\signup::create($student2->id, $seminarevent);
@@ -2663,11 +2663,11 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $emailsink->close();
 
         $emails = $emailsink->get_messages();
-        $this->assertContains('Cost:', current($emails)->fullmessagehtml);
+        $this->assertStringContainsString('Cost:', current($emails)->fullmessagehtml);
         // Test normal cost
-        $this->assertNotContains('$100', current($emails)->fullmessagehtml);
+        $this->assertStringNotContainsString('$100', current($emails)->fullmessagehtml);
         // Test discount cost
-        $this->assertNotContains('$NZ20', current($emails)->fullmessagehtml);
+        $this->assertStringNotContainsString('$NZ20', current($emails)->fullmessagehtml);
     }
 
     /**
@@ -2687,11 +2687,11 @@ class mod_facetoface_notifications_testcase extends mod_facetoface_facetoface_te
         $emailsink->close();
 
         $emails = $emailsink->get_messages();
-        $this->assertContains('Cost:', current($emails)->fullmessagehtml);
+        $this->assertStringContainsString('Cost:', current($emails)->fullmessagehtml);
         // Test normal cost
-        $this->assertContains('$100', current($emails)->fullmessagehtml);
+        $this->assertStringContainsString('$100', current($emails)->fullmessagehtml);
         // Test discount cost
-        $this->assertNotContains('$NZ20', current($emails)->fullmessagehtml);
+        $this->assertStringNotContainsString('$NZ20', current($emails)->fullmessagehtml);
     }
 
     private function create_facetoface() {

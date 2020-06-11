@@ -60,7 +60,7 @@ class totara_userdata_task_purge_deleted_testcase extends advanced_testcase {
         $messages = $sink->get_messages();
 
         $this->assertCount(0, $messages);
-        $this->assertContains('Purge finished - Success', $output);
+        $this->assertStringContainsString('Purge finished - Success', $output);
 
         $purges = $DB->get_records('totara_userdata_purge', array('userid' => $user->id));
         $this->assertCount(1, $purges);

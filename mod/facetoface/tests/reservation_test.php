@@ -84,7 +84,7 @@ class mod_facetoface_reservation_testcase extends advanced_testcase {
         $messages = $sink->get_messages();
         $sink->clear();
 
-        $this->assertContains('BOOKING CANCELLED', $messages[0]->fullmessage);
+        $this->assertStringContainsString('BOOKING CANCELLED', $messages[0]->fullmessage);
         $this->assertEquals($user1->id, $messages[0]->useridto);
 
         $sink = $this->redirectMessages();
@@ -93,7 +93,7 @@ class mod_facetoface_reservation_testcase extends advanced_testcase {
         $this->assertSame(1, $sink->count());
         $messages = $sink->get_messages();
         $sink->clear();
-        $this->assertContains('BOOKING CANCELLED', $messages[0]->fullmessage);
+        $this->assertStringContainsString('BOOKING CANCELLED', $messages[0]->fullmessage);
         $this->assertEquals($user2->id, $messages[0]->useridto);
     }
 

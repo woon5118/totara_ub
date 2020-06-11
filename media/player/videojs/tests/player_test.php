@@ -229,8 +229,8 @@ class media_videojs_testcase extends advanced_testcase {
     }
 
     protected function youtube_plugin_engaged($t) {
-        $this->assertContains('mediaplugin_videojs', $t);
-        $this->assertContains('data-setup-lazy="{&quot;techOrder&quot;: [&quot;youtube&quot;]', $t);
+        $this->assertStringContainsString('mediaplugin_videojs', $t);
+        $this->assertStringContainsString('data-setup-lazy="{&quot;techOrder&quot;: [&quot;youtube&quot;]', $t);
     }
 
     /**
@@ -254,31 +254,31 @@ class media_videojs_testcase extends advanced_testcase {
         $url = new moodle_url('https://www.youtube.com/watch?v=dv2f_xfmbD8&index=4&list=PLxcO_MFWQBDcyn9xpbmx601YSDlDcTcr0');
         $t = $manager->embed_url($url);
         $this->youtube_plugin_engaged($t);
-        $this->assertContains('list=PLxcO_MFWQBDcyn9xpbmx601YSDlDcTcr0', $t);
+        $this->assertStringContainsString('list=PLxcO_MFWQBDcyn9xpbmx601YSDlDcTcr0', $t);
 
         // Format: youtube video with start time.
         $url = new moodle_url('https://www.youtube.com/watch?v=JNJMF1l3udM&t=1h11s');
         $t = $manager->embed_url($url);
         $this->youtube_plugin_engaged($t);
-        $this->assertContains('t=1h11s', $t);
+        $this->assertStringContainsString('t=1h11s', $t);
 
         // Format: youtube video within playlist with start time.
         $url = new moodle_url('https://www.youtube.com/watch?v=dv2f_xfmbD8&index=4&list=PLxcO_MFWQBDcyn9xpbmx601YSDlDcTcr0&t=1m5s');
         $t = $manager->embed_url($url);
         $this->youtube_plugin_engaged($t);
-        $this->assertContains('list=PLxcO_MFWQBDcyn9xpbmx601YSDlDcTcr0', $t);
-        $this->assertContains('t=1m5s', $t);
+        $this->assertStringContainsString('list=PLxcO_MFWQBDcyn9xpbmx601YSDlDcTcr0', $t);
+        $this->assertStringContainsString('t=1m5s', $t);
 
         // Format: youtube playlist - not supported.
         $url = new moodle_url('http://www.youtube.com/view_play_list?p=PL6E18E2927047B662');
         $t = $manager->embed_url($url);
-        $this->assertNotContains('mediaplugin_videojs', $t);
+        $this->assertStringNotContainsString('mediaplugin_videojs', $t);
         $url = new moodle_url('http://www.youtube.com/playlist?list=PL6E18E2927047B662');
         $t = $manager->embed_url($url);
-        $this->assertNotContains('mediaplugin_videojs', $t);
+        $this->assertStringNotContainsString('mediaplugin_videojs', $t);
         $url = new moodle_url('http://www.youtube.com/p/PL6E18E2927047B662');
         $t = $manager->embed_url($url);
-        $this->assertNotContains('mediaplugin_videojs', $t);
+        $this->assertStringNotContainsString('mediaplugin_videojs', $t);
 
     }
 }

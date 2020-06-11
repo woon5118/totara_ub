@@ -341,7 +341,7 @@ class core_orm_repository_testcase extends orm_entity_testcase {
         }
 
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessageRegExp("/Invalid attribute 'foo' passed to the entity/");
+        $this->expectExceptionMessage("Invalid attribute 'foo' passed to the entity");
 
         sample_entity::repository()->from_records($records);
     }

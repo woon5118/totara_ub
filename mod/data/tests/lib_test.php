@@ -948,10 +948,10 @@ class mod_data_lib_testcase extends advanced_testcase {
 
         // Admin can see everything.
         $res = mod_data_get_tagged_records($tag, false, 0, 0, 1, 0);
-        $this->assertContains('value11', $res->content);
-        $this->assertContains('value12', $res->content);
-        $this->assertContains('value13', $res->content);
-        $this->assertNotContains('value14', $res->content);
+        $this->assertStringContainsString('value11', $res->content);
+        $this->assertStringContainsString('value12', $res->content);
+        $this->assertStringContainsString('value13', $res->content);
+        $this->assertStringNotContainsString('value14', $res->content);
     }
 
     public function test_mod_data_get_tagged_records_approval() {
@@ -980,8 +980,8 @@ class mod_data_lib_testcase extends advanced_testcase {
 
         // Admin can see everything.
         $res = mod_data_get_tagged_records($tag, false, 0, 0, 1, 0);
-        $this->assertContains('value11', $res->content);
-        $this->assertContains('value21', $res->content);
+        $this->assertStringContainsString('value11', $res->content);
+        $this->assertStringContainsString('value21', $res->content);
         $this->assertEmpty($res->prevpageurl);
         $this->assertEmpty($res->nextpageurl);
 
@@ -996,8 +996,8 @@ class mod_data_lib_testcase extends advanced_testcase {
         core_tag_index_builder::reset_caches();
         $res = mod_data_get_tagged_records($tag, false, 0, 0, 1, 0);
 
-        $this->assertContains('value11', $res->content);
-        $this->assertNotContains('value21', $res->content);
+        $this->assertStringContainsString('value11', $res->content);
+        $this->assertStringNotContainsString('value21', $res->content);
 
         $recordtoupdate = new stdClass();
         $recordtoupdate->id = $record21;
@@ -1007,8 +1007,8 @@ class mod_data_lib_testcase extends advanced_testcase {
         core_tag_index_builder::reset_caches();
         $res = mod_data_get_tagged_records($tag, false, 0, 0, 1, 0);
 
-        $this->assertContains('value11', $res->content);
-        $this->assertContains('value21', $res->content);
+        $this->assertStringContainsString('value11', $res->content);
+        $this->assertStringContainsString('value21', $res->content);
     }
 
     public function test_mod_data_get_tagged_records_time() {
@@ -1041,8 +1041,8 @@ class mod_data_lib_testcase extends advanced_testcase {
 
         // Admin can see everything.
         $res = mod_data_get_tagged_records($tag, false, 0, 0, 1, 0);
-        $this->assertContains('value11', $res->content);
-        $this->assertContains('value21', $res->content);
+        $this->assertStringContainsString('value11', $res->content);
+        $this->assertStringContainsString('value21', $res->content);
         $this->assertEmpty($res->prevpageurl);
         $this->assertEmpty($res->nextpageurl);
 
@@ -1057,8 +1057,8 @@ class mod_data_lib_testcase extends advanced_testcase {
         core_tag_index_builder::reset_caches();
         $res = mod_data_get_tagged_records($tag, false, 0, 0, 1, 0);
 
-        $this->assertContains('value11', $res->content);
-        $this->assertNotContains('value21', $res->content);
+        $this->assertStringContainsString('value11', $res->content);
+        $this->assertStringNotContainsString('value21', $res->content);
 
         $data2->timeviewto = time() + YEARSECS;
         $DB->update_record('data', $data2);
@@ -1066,8 +1066,8 @@ class mod_data_lib_testcase extends advanced_testcase {
         core_tag_index_builder::reset_caches();
         $res = mod_data_get_tagged_records($tag, false, 0, 0, 1, 0);
 
-        $this->assertContains('value11', $res->content);
-        $this->assertContains('value21', $res->content);
+        $this->assertStringContainsString('value11', $res->content);
+        $this->assertStringContainsString('value21', $res->content);
     }
 
     public function test_mod_data_get_tagged_records_course_enrolment() {
@@ -1096,8 +1096,8 @@ class mod_data_lib_testcase extends advanced_testcase {
 
         // Admin can see everything.
         $res = mod_data_get_tagged_records($tag, false, 0, 0, 1, 0);
-        $this->assertContains('value11', $res->content);
-        $this->assertContains('value21', $res->content);
+        $this->assertStringContainsString('value11', $res->content);
+        $this->assertStringContainsString('value21', $res->content);
         $this->assertEmpty($res->prevpageurl);
         $this->assertEmpty($res->nextpageurl);
 
@@ -1112,16 +1112,16 @@ class mod_data_lib_testcase extends advanced_testcase {
         $coursecontext = context_course::instance($course1->id);
         $res = mod_data_get_tagged_records($tag, false, 0, 0, 1, 0);
 
-        $this->assertContains('value11', $res->content);
-        $this->assertNotContains('value21', $res->content);
+        $this->assertStringContainsString('value11', $res->content);
+        $this->assertStringNotContainsString('value21', $res->content);
 
         $this->getDataGenerator()->enrol_user($student->id, $course2->id, $studentrole->id, 'manual');
 
         core_tag_index_builder::reset_caches();
         $res = mod_data_get_tagged_records($tag, false, 0, 0, 1, 0);
 
-        $this->assertContains('value11', $res->content);
-        $this->assertContains('value21', $res->content);
+        $this->assertStringContainsString('value11', $res->content);
+        $this->assertStringContainsString('value21', $res->content);
     }
 
     public function test_mod_data_get_tagged_records_course_groups() {
@@ -1158,9 +1158,9 @@ class mod_data_lib_testcase extends advanced_testcase {
 
         // Admin can see everything.
         $res = mod_data_get_tagged_records($tag, false, 0, 0, 1, 0);
-        $this->assertContains('value11', $res->content);
-        $this->assertContains('value21', $res->content);
-        $this->assertContains('value22', $res->content);
+        $this->assertStringContainsString('value11', $res->content);
+        $this->assertStringContainsString('value21', $res->content);
+        $this->assertStringContainsString('value22', $res->content);
         $this->assertEmpty($res->prevpageurl);
         $this->assertEmpty($res->nextpageurl);
 
@@ -1176,17 +1176,17 @@ class mod_data_lib_testcase extends advanced_testcase {
         // User can search data records inside a course.
         $res = mod_data_get_tagged_records($tag, false, 0, 0, 1, 0);
 
-        $this->assertContains('value11', $res->content);
-        $this->assertContains('value21', $res->content);
-        $this->assertNotContains('value22', $res->content);
+        $this->assertStringContainsString('value11', $res->content);
+        $this->assertStringContainsString('value21', $res->content);
+        $this->assertStringNotContainsString('value22', $res->content);
 
         groups_add_member($groupb, $student);
         core_tag_index_builder::reset_caches();
         $res = mod_data_get_tagged_records($tag, false, 0, 0, 1, 0);
 
-        $this->assertContains('value11', $res->content);
-        $this->assertContains('value21', $res->content);
-        $this->assertContains('value22', $res->content);
+        $this->assertStringContainsString('value11', $res->content);
+        $this->assertStringContainsString('value21', $res->content);
+        $this->assertStringContainsString('value22', $res->content);
     }
 
     /**

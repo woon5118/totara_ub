@@ -908,10 +908,9 @@ class core_event_testcase extends advanced_testcase {
         $this->assertSame($event->get_data(), $data);
     }
 
-    /**
-     * @expectedException \PHPUnit\Framework\Error\Notice
-     */
     public function test_context_not_used() {
+        $this->expectException(\PHPUnit\Framework\Error\Notice::class);
+
         $event = \core_tests\event\context_used_in_event::create(array('other' => array('sample' => 1, 'xx' => 10)));
         $this->assertEventContextNotUsed($event);
 

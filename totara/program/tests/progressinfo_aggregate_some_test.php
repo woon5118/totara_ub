@@ -138,7 +138,7 @@ class progressinfo_aggregate_some_testcase extends advanced_testcase {
 
         $result = \totara_program\progress\progressinfo_aggregate_some::aggregate($progressinfo);
         $this->assertEquals(1, $result['weight']);
-        $this->assertEquals(0.75, $result['score'], '', 0.1);
+        $this->assertEqualsWithDelta(0.75, $result['score'], 0.1);
 
         $verifycustom = array('requiredcourses' => 3,
                               'requiredpoints' => 0,
@@ -186,7 +186,7 @@ class progressinfo_aggregate_some_testcase extends advanced_testcase {
 
         $result = \totara_program\progress\progressinfo_aggregate_some::aggregate($progressinfo);
         $this->assertEquals(1, $result['weight']);
-        $this->assertEquals(0.66, $result['score'], '', 0.01);
+        $this->assertEqualsWithDelta(0.66, $result['score'], 0.01);
 
         $verifycustom = array('requiredcourses' => 0,
                               'requiredpoints' => 75,
@@ -194,7 +194,7 @@ class progressinfo_aggregate_some_testcase extends advanced_testcase {
                               'totalpoints' => 50.125);
         $customdata = $progressinfo->get_customdata();
         foreach ($verifycustom as $key => $value) {
-            $this->assertEquals($value, $customdata[$key], '', 0.01);
+            $this->assertEqualsWithDelta($value, $customdata[$key], 0.01);
         }
    }
 
@@ -238,7 +238,7 @@ class progressinfo_aggregate_some_testcase extends advanced_testcase {
 
         $result = \totara_program\progress\progressinfo_aggregate_some::aggregate($progressinfo);
         $this->assertEquals(1, $result['weight']);
-        $this->assertEquals(0.66, $result['score'], '', 0.1);
+        $this->assertEqualsWithDelta(0.66, $result['score'], 0.1);
 
         $verifycustom = array('requiredcourses' => 3,
                               'requiredpoints' => 75,
@@ -246,7 +246,7 @@ class progressinfo_aggregate_some_testcase extends advanced_testcase {
                               'totalpoints' => 50.125);
         $customdata = $progressinfo->get_customdata();
         foreach ($verifycustom as $key => $value) {
-            $this->assertEquals($value, $customdata[$key], '', 0.01);
+            $this->assertEqualsWithDelta($value, $customdata[$key], 0.01);
         }
    }
 }

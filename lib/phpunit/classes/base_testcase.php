@@ -676,10 +676,10 @@ abstract class base_testcase extends \PHPUnit\Framework\TestCase {
      * @param string $messageRegExp
      * @param int    $code
      *
-     * @deprecated Method was removed in PHPUnit 6 and is deprecated since Totara 13; use expectExceptionMessageRegExp() instead
+     * @deprecated Method was removed in PHPUnit 6 and is deprecated since Totara 13
      */
     public function setExpectedExceptionRegExp($exception, $messageRegExp = '', $code = null) {
-        debugging("PHPUnits setExpectedExceptionRegExp() method was removed in PHPUnit 6 and is deprecated since Totara 13; use expectException() and expectExceptionMessageRegExp() instead.", DEBUG_DEVELOPER);
+        debugging("PHPUnits setExpectedExceptionRegExp() method was removed in PHPUnit 6 and is deprecated since Totara 13", DEBUG_DEVELOPER);
 
         if (!is_string($messageRegExp)) {
             throw \PHPUnit\Util\InvalidArgumentHelper::factory(2, 'string');

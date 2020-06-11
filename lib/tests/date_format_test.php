@@ -63,7 +63,7 @@ class core_date_format_testcase extends basic_testcase {
 
     public function test_unknown_lang_string() {
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessageRegExp('/No language string mapping defined for format qwerty/');
+        $this->expectExceptionMessage('No language string mapping defined for format qwerty');
         date_format::get_lang_string('qwerty');
     }
 

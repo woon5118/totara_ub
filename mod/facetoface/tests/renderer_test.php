@@ -80,8 +80,8 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
         $debugging = $this->getDebuggingMessages()[0]->message;
         $this->assertDebuggingCalled();
 
-        $this->assertContains('deprecated', $debugging);
-        $this->assertContains('mod_facetoface\\hook\\alternative_signup_link', $debugging);
+        $this->assertStringContainsString('deprecated', $debugging);
+        $this->assertStringContainsString('mod_facetoface\\hook\\alternative_signup_link', $debugging);
         $link = $renderer->get_signup_link($seminarevent);
         $this->assertEquals($expected, $link);
     }
@@ -339,8 +339,8 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
         $html = $renderer->render_session_list_table($sessions, $config);
 
         // .. multiple rooms in the session
-        $this->assertContains('Chamber', $html);
-        $this->assertContains('Arena', $html);
+        $this->assertStringContainsString('Chamber', $html);
+        $this->assertStringContainsString('Arena', $html);
 
         $doc = self::new_domdocument($html);
         $tables = $doc->getElementsByTagName('table');
@@ -350,13 +350,13 @@ class mod_facetoface_renderer_testcase extends advanced_testcase {
 
         /** @var DOMNode[] $rows */
         // .. and the list is sorted by custom order
-        $this->assertContains('April', $rows[0]->textContent);
-        $this->assertContains('August', $rows[1]->textContent);
-        $this->assertContains('February', $rows[2]->textContent);
-        $this->assertContains('March', $rows[3]->textContent);
-        $this->assertContains('December', $rows[4]->textContent);
-        $this->assertContains('Wait-listed', $rows[5]->textContent);
-        $this->assertContains('September', $rows[6]->textContent);
+        $this->assertStringContainsString('April', $rows[0]->textContent);
+        $this->assertStringContainsString('August', $rows[1]->textContent);
+        $this->assertStringContainsString('February', $rows[2]->textContent);
+        $this->assertStringContainsString('March', $rows[3]->textContent);
+        $this->assertStringContainsString('December', $rows[4]->textContent);
+        $this->assertStringContainsString('Wait-listed', $rows[5]->textContent);
+        $this->assertStringContainsString('September', $rows[6]->textContent);
     }
 
     /**

@@ -94,6 +94,6 @@ class mod_facetoface_rendering_signup_testcase extends advanced_testcase {
         $renderer = $this->create_f2f_renderer();
         $rendered = $renderer->render_seminar_event($event, false);
 
-        $this->assertContains(get_string('missingjobassignment', 'mod_facetoface'), $rendered);
+        $this->assertStringContainsString(get_string('missingjobassignment', 'mod_facetoface'), $rendered);
     }
 }

@@ -125,36 +125,30 @@ class totara_core_totara_testcase extends advanced_testcase {
 
     /**
      * Call totara_is_item_visibility_hidden passing an array instead of an object.
-     * @expectedException coding_exception
      */
     public function test_totara_is_item_visibility_hidden_no_object() {
-        $this->resetAfterTest(true);
-
         $item = array('visible' => 1, 'audiencevisible' => 1);
+        $this->expectException(coding_exception::class);
         totara_is_item_visibility_hidden($item);
     }
 
     /**
      * Call totara_is_item_visibility_hidden passing an object without visible property.
-     * @expectedException coding_exception
      */
     public function test_totara_is_item_visibility_hidden_without_visible_property() {
-        $this->resetAfterTest(true);
-
         $item = new stdClass();
         $item->audiencevisible = 1;
+        $this->expectException(coding_exception::class);
         totara_is_item_visibility_hidden($item);
     }
 
     /**
      * Call totara_is_item_visibility_hidden passing an object without audiencevisible property.
-     * @expectedException coding_exception
      */
     public function test_totara_is_item_visibility_hidden_without_audiencevisible_property() {
-        $this->resetAfterTest(true);
-
         $item = new stdClass();
         $item->visible = 1;
+        $this->expectException(coding_exception::class);
         totara_is_item_visibility_hidden($item);
     }
 

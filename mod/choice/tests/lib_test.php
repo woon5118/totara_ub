@@ -138,9 +138,6 @@ class mod_choice_lib_testcase extends externallib_advanced_testcase {
 
     }
 
-    /**
-     * @expectedException moodle_exception
-     */
     public function test_choice_user_submit_response_validation() {
         global $USER;
 
@@ -157,6 +154,8 @@ class mod_choice_lib_testcase extends externallib_advanced_testcase {
         $choicewithoptions2 = choice_get_choice($choice2->id);
         $optionids1 = array_keys($choicewithoptions1->option);
         $optionids2 = array_keys($choicewithoptions2->option);
+
+        $this->expectException(moodle_exception::class);
 
         // Make sure we cannot submit options from a different choice instance.
         choice_user_submit_response($optionids2[0], $choice1, $USER->id, $course, $cm);

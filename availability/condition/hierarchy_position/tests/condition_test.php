@@ -97,7 +97,7 @@ class availability_hierarchy_position_condition_testcase extends advanced_testca
             $cond = new condition($structure);
             $this->fail();
         } catch (coding_exception $e) {
-            $this->assertContains('Missing or invalid ->pos', $e->getMessage());
+            $this->assertStringContainsString('Missing or invalid ->pos', $e->getMessage());
         }
 
         // Invalid id (not int).
@@ -107,7 +107,7 @@ class availability_hierarchy_position_condition_testcase extends advanced_testca
             $condition = new condition($structure);
             $this->fail();
         } catch (coding_exception $e) {
-            $this->assertContains('Missing or invalid ->pos', $e->getMessage());
+            $this->assertStringContainsString('Missing or invalid ->pos', $e->getMessage());
         }
 
         // Valid structure.

@@ -246,15 +246,15 @@ class totara_core_dml_testcase extends database_driver_testcase {
         $records = $DB->get_records_sql($sql);
         $this->assertCount(3, $records);
         $this->assertCount(3, explode(',', $records[12]->grpconcat));
-        $this->assertContains('12345', $records[12]->grpconcat);
-        $this->assertContains('áéíóú', $records[12]->grpconcat);
-        $this->assertContains('abcde', $records[12]->grpconcat);
+        $this->assertStringContainsString('12345', $records[12]->grpconcat);
+        $this->assertStringContainsString('áéíóú', $records[12]->grpconcat);
+        $this->assertStringContainsString('abcde', $records[12]->grpconcat);
         $this->assertCount(3, explode(',', $records[24]->grpconcat));
-        $this->assertContains('abc12', $records[24]->grpconcat);
-        $this->assertContains('abcde', $records[24]->grpconcat);
-        $this->assertContains('abc12', $records[24]->grpconcat);
+        $this->assertStringContainsString('abc12', $records[24]->grpconcat);
+        $this->assertStringContainsString('abcde', $records[24]->grpconcat);
+        $this->assertStringContainsString('abc12', $records[24]->grpconcat);
         $this->assertCount(1, explode(',', $records[36]->grpconcat));
-        $this->assertContains('a\+1_', $records[36]->grpconcat);
+        $this->assertStringContainsString('a\+1_', $records[36]->grpconcat);
         if (!$sloppymssql) {
             // All decent databases can order the values properly.
             $this->assertEquals('12345,áéíóú,abcde', $records[12]->grpconcat);
@@ -266,15 +266,15 @@ class totara_core_dml_testcase extends database_driver_testcase {
         $records = $DB->get_records_sql($sql);
         $this->assertCount(3, $records);
         $this->assertCount(3, explode(',', $records[12]->grpconcat));
-        $this->assertContains('12345', $records[12]->grpconcat);
-        $this->assertContains('ÁÉÍÓÚ', $records[12]->grpconcat);
-        $this->assertContains('ABCDE', $records[12]->grpconcat);
+        $this->assertStringContainsString('12345', $records[12]->grpconcat);
+        $this->assertStringContainsString('ÁÉÍÓÚ', $records[12]->grpconcat);
+        $this->assertStringContainsString('ABCDE', $records[12]->grpconcat);
         $this->assertCount(3, explode(',', $records[24]->grpconcat));
-        $this->assertContains('ABC12', $records[24]->grpconcat);
-        $this->assertContains('ABCDE', $records[24]->grpconcat);
-        $this->assertContains('ABC12', $records[24]->grpconcat);
+        $this->assertStringContainsString('ABC12', $records[24]->grpconcat);
+        $this->assertStringContainsString('ABCDE', $records[24]->grpconcat);
+        $this->assertStringContainsString('ABC12', $records[24]->grpconcat);
         $this->assertCount(1, explode(',', $records[36]->grpconcat));
-        $this->assertContains('A\+1_', $records[36]->grpconcat);
+        $this->assertStringContainsString('A\+1_', $records[36]->grpconcat);
         if (!$sloppymssql) {
             // All decent databases can order the values properly.
             $this->assertEquals('12345,ÁÉÍÓÚ,ABCDE', $records[12]->grpconcat);
@@ -286,15 +286,15 @@ class totara_core_dml_testcase extends database_driver_testcase {
         $records = $DB->get_records_sql($sql);
         $this->assertCount(3, $records);
         $this->assertCount(3, explode("'", $records[12]->grpconcat));
-        $this->assertContains('12345', $records[12]->grpconcat);
-        $this->assertContains('ÁÉÍÓÚ', $records[12]->grpconcat);
-        $this->assertContains('ABCDE', $records[12]->grpconcat);
+        $this->assertStringContainsString('12345', $records[12]->grpconcat);
+        $this->assertStringContainsString('ÁÉÍÓÚ', $records[12]->grpconcat);
+        $this->assertStringContainsString('ABCDE', $records[12]->grpconcat);
         $this->assertCount(3, explode("'", $records[24]->grpconcat));
-        $this->assertContains('ABC12', $records[24]->grpconcat);
-        $this->assertContains('ABCDE', $records[24]->grpconcat);
-        $this->assertContains('ABC12', $records[24]->grpconcat);
+        $this->assertStringContainsString('ABC12', $records[24]->grpconcat);
+        $this->assertStringContainsString('ABCDE', $records[24]->grpconcat);
+        $this->assertStringContainsString('ABC12', $records[24]->grpconcat);
         $this->assertCount(1, explode("'", $records[36]->grpconcat));
-        $this->assertContains('A\+1_', $records[36]->grpconcat);
+        $this->assertStringContainsString('A\+1_', $records[36]->grpconcat);
         if (!$sloppymssql) {
             // All decent databases can order the values properly.
             $this->assertEquals('12345\'ÁÉÍÓÚ\'ABCDE', $records[12]->grpconcat);
@@ -306,15 +306,15 @@ class totara_core_dml_testcase extends database_driver_testcase {
         $records = $DB->get_records_sql($sql);
         $this->assertCount(3, $records);
         $this->assertCount(3, explode('\\', $records[12]->grpconcat));
-        $this->assertContains('12345', $records[12]->grpconcat);
-        $this->assertContains('ÁÉÍÓÚ', $records[12]->grpconcat);
-        $this->assertContains('ABCDE', $records[12]->grpconcat);
+        $this->assertStringContainsString('12345', $records[12]->grpconcat);
+        $this->assertStringContainsString('ÁÉÍÓÚ', $records[12]->grpconcat);
+        $this->assertStringContainsString('ABCDE', $records[12]->grpconcat);
         $this->assertCount(3, explode('\\', $records[24]->grpconcat));
-        $this->assertContains('ABC12', $records[24]->grpconcat);
-        $this->assertContains('ABCDE', $records[24]->grpconcat);
-        $this->assertContains('ABC12', $records[24]->grpconcat);
+        $this->assertStringContainsString('ABC12', $records[24]->grpconcat);
+        $this->assertStringContainsString('ABCDE', $records[24]->grpconcat);
+        $this->assertStringContainsString('ABC12', $records[24]->grpconcat);
         $this->assertCount(2, explode('\\', $records[36]->grpconcat));
-        $this->assertContains('A\+1_', $records[36]->grpconcat);
+        $this->assertStringContainsString('A\+1_', $records[36]->grpconcat);
         if (!$sloppymssql) {
             // All decent databases can order the values properly.
             $this->assertEquals('12345\ÁÉÍÓÚ\ABCDE', $records[12]->grpconcat);
@@ -326,17 +326,17 @@ class totara_core_dml_testcase extends database_driver_testcase {
         $records = $DB->get_records_sql($sql);
         $this->assertCount(3, $records);
         $this->assertCount(4, explode('|', $records[12]->grpconcat));
-        $this->assertContains('-', $records[12]->grpconcat);
-        $this->assertContains('12345', $records[12]->grpconcat);
-        $this->assertContains('áéíóú', $records[12]->grpconcat);
-        $this->assertContains('abcde', $records[12]->grpconcat);
+        $this->assertStringContainsString('-', $records[12]->grpconcat);
+        $this->assertStringContainsString('12345', $records[12]->grpconcat);
+        $this->assertStringContainsString('áéíóú', $records[12]->grpconcat);
+        $this->assertStringContainsString('abcde', $records[12]->grpconcat);
         $this->assertCount(3, explode('|', $records[24]->grpconcat));
-        $this->assertContains('abc12', $records[24]->grpconcat);
-        $this->assertContains('abcde', $records[24]->grpconcat);
-        $this->assertContains('abc12', $records[24]->grpconcat);
+        $this->assertStringContainsString('abc12', $records[24]->grpconcat);
+        $this->assertStringContainsString('abcde', $records[24]->grpconcat);
+        $this->assertStringContainsString('abc12', $records[24]->grpconcat);
         $this->assertCount(2, explode('|', $records[36]->grpconcat));
-        $this->assertContains('a\+1_', $records[36]->grpconcat);
-        $this->assertContains('-', $records[36]->grpconcat);
+        $this->assertStringContainsString('a\+1_', $records[36]->grpconcat);
+        $this->assertStringContainsString('-', $records[36]->grpconcat);
         if (!$sloppymssql) {
             // All decent databases can order the values properly.
             $this->assertEquals('-|abcde|áéíóú|12345', $records[12]->grpconcat);
@@ -349,15 +349,15 @@ class totara_core_dml_testcase extends database_driver_testcase {
         $records = $DB->get_records_sql($sql);
         $this->assertCount(3, $records);
         $this->assertCount(3, explode(':', $records[12]->grpconcat));
-        $this->assertContains('3', $records[12]->grpconcat);
-        $this->assertContains('4', $records[12]->grpconcat);
-        $this->assertContains('2', $records[12]->grpconcat);
+        $this->assertStringContainsString('3', $records[12]->grpconcat);
+        $this->assertStringContainsString('4', $records[12]->grpconcat);
+        $this->assertStringContainsString('2', $records[12]->grpconcat);
         $this->assertCount(3, explode(':', $records[24]->grpconcat));
-        $this->assertContains('6', $records[24]->grpconcat);
-        $this->assertContains('7', $records[24]->grpconcat);
-        $this->assertContains('5', $records[24]->grpconcat);
+        $this->assertStringContainsString('6', $records[24]->grpconcat);
+        $this->assertStringContainsString('7', $records[24]->grpconcat);
+        $this->assertStringContainsString('5', $records[24]->grpconcat);
         $this->assertCount(1, explode(':', $records[36]->grpconcat));
-        $this->assertContains('9', $records[36]->grpconcat);
+        $this->assertStringContainsString('9', $records[36]->grpconcat);
         if (!$sloppymssql) {
             // All decent databases can order the values properly.
             $this->assertEquals('3:4:2', $records[12]->grpconcat);
@@ -371,16 +371,16 @@ class totara_core_dml_testcase extends database_driver_testcase {
         $this->assertCount(3, $records);
         $this->assertCount(3, explode(':', $records[12]->grpconcat));
         $this->assertSame(23999, strlen($records[12]->grpconcat));
-        $this->assertContains($text.'3', $records[12]->grpconcat);
-        $this->assertContains($text.'1', $records[12]->grpconcat);
-        $this->assertContains($text.'2', $records[12]->grpconcat);
+        $this->assertStringContainsString($text.'3', $records[12]->grpconcat);
+        $this->assertStringContainsString($text.'1', $records[12]->grpconcat);
+        $this->assertStringContainsString($text.'2', $records[12]->grpconcat);
         $this->assertCount(2, explode(':', $records[24]->grpconcat));
         $this->assertSame(15999, strlen($records[24]->grpconcat));
-        $this->assertContains($text.'6', $records[24]->grpconcat);
-        $this->assertContains($text.'7', $records[24]->grpconcat);
+        $this->assertStringContainsString($text.'6', $records[24]->grpconcat);
+        $this->assertStringContainsString($text.'7', $records[24]->grpconcat);
         $this->assertCount(1, explode(':', $records[36]->grpconcat));
         $this->assertSame(7999, strlen($records[36]->grpconcat));
-        $this->assertContains($text.'8', $records[36]->grpconcat);
+        $this->assertStringContainsString($text.'8', $records[36]->grpconcat);
         if (!$sloppymssql) {
             // All decent databases can order the values properly.
             $this->assertEquals($text.'3:'.$text.'1:'.$text.'2', $records[12]->grpconcat);
@@ -394,16 +394,16 @@ class totara_core_dml_testcase extends database_driver_testcase {
         $this->assertSame(array(36, 24, 12), array_keys($records));
         $this->assertCount(3, explode(':', $records[12]->grpconcat));
         $this->assertSame(23999, strlen($records[12]->grpconcat));
-        $this->assertContains($text.'3', $records[12]->grpconcat);
-        $this->assertContains($text.'1', $records[12]->grpconcat);
-        $this->assertContains($text.'2', $records[12]->grpconcat);
+        $this->assertStringContainsString($text.'3', $records[12]->grpconcat);
+        $this->assertStringContainsString($text.'1', $records[12]->grpconcat);
+        $this->assertStringContainsString($text.'2', $records[12]->grpconcat);
         $this->assertCount(2, explode(':', $records[24]->grpconcat));
         $this->assertSame(15999, strlen($records[24]->grpconcat));
-        $this->assertContains($text.'6', $records[24]->grpconcat);
-        $this->assertContains($text.'7', $records[24]->grpconcat);
+        $this->assertStringContainsString($text.'6', $records[24]->grpconcat);
+        $this->assertStringContainsString($text.'7', $records[24]->grpconcat);
         $this->assertCount(1, explode(':', $records[36]->grpconcat));
         $this->assertSame(7999, strlen($records[36]->grpconcat));
-        $this->assertContains($text.'8', $records[36]->grpconcat);
+        $this->assertStringContainsString($text.'8', $records[36]->grpconcat);
         if (!$sloppymssql) {
             // All decent databases can order the values properly.
             $this->assertEquals($text.'3:'.$text.'1:'.$text.'2', $records[12]->grpconcat);
@@ -416,30 +416,30 @@ class totara_core_dml_testcase extends database_driver_testcase {
         $records = $DB->get_records_sql($sql);
         $this->assertCount(3, $records);
         $this->assertCount(3, explode(':', $records[12]->grpconcat));
-        $this->assertContains('3', $records[12]->grpconcat);
-        $this->assertContains('4', $records[12]->grpconcat);
-        $this->assertContains('2', $records[12]->grpconcat);
+        $this->assertStringContainsString('3', $records[12]->grpconcat);
+        $this->assertStringContainsString('4', $records[12]->grpconcat);
+        $this->assertStringContainsString('2', $records[12]->grpconcat);
         $this->assertCount(3, explode(':', $records[24]->grpconcat));
-        $this->assertContains('6', $records[24]->grpconcat);
-        $this->assertContains('7', $records[24]->grpconcat);
-        $this->assertContains('5', $records[24]->grpconcat);
+        $this->assertStringContainsString('6', $records[24]->grpconcat);
+        $this->assertStringContainsString('7', $records[24]->grpconcat);
+        $this->assertStringContainsString('5', $records[24]->grpconcat);
         $this->assertCount(1, explode(':', $records[36]->grpconcat));
-        $this->assertContains('9', $records[36]->grpconcat);
+        $this->assertStringContainsString('9', $records[36]->grpconcat);
 
         // Test new '^|:' uniquedelimiter which is using in rb_base_source and limited by 4 chars for MS SQL GROUP_CONCAT_D.
         $sql = 'SELECT groupid, ' . $DB->sql_group_concat('valint', '^|:') . ' AS grpconcat FROM {' . $tablename . '} GROUP BY groupid';
         $records = $DB->get_records_sql($sql);
         $this->assertCount(3, $records);
         $this->assertCount(3, explode('^|:', $records[12]->grpconcat));
-        $this->assertContains('3', $records[12]->grpconcat);
-        $this->assertContains('4', $records[12]->grpconcat);
-        $this->assertContains('2', $records[12]->grpconcat);
+        $this->assertStringContainsString('3', $records[12]->grpconcat);
+        $this->assertStringContainsString('4', $records[12]->grpconcat);
+        $this->assertStringContainsString('2', $records[12]->grpconcat);
         $this->assertCount(3, explode('^|:', $records[24]->grpconcat));
-        $this->assertContains('6', $records[24]->grpconcat);
-        $this->assertContains('7', $records[24]->grpconcat);
-        $this->assertContains('5', $records[24]->grpconcat);
+        $this->assertStringContainsString('6', $records[24]->grpconcat);
+        $this->assertStringContainsString('7', $records[24]->grpconcat);
+        $this->assertStringContainsString('5', $records[24]->grpconcat);
         $this->assertCount(1, explode('^|:', $records[36]->grpconcat));
-        $this->assertContains('9', $records[36]->grpconcat);
+        $this->assertStringContainsString('9', $records[36]->grpconcat);
 
         // Test invalid '\.|./' uniquedelimiter.
         $sql = 'SELECT groupid, ' . $DB->sql_group_concat('valint', '\.|./') . ' AS grpconcat FROM {' . $tablename . '} GROUP BY groupid';
@@ -484,14 +484,14 @@ class totara_core_dml_testcase extends database_driver_testcase {
         $records = $DB->get_records_sql($sql);
         $this->assertCount(3, $records);
         $this->assertCount(3, explode(',', $records[12]->grpconcat));
-        $this->assertContains('12345', $records[12]->grpconcat);
-        $this->assertContains('áéíóú', $records[12]->grpconcat);
-        $this->assertContains('abcde', $records[12]->grpconcat);
+        $this->assertStringContainsString('12345', $records[12]->grpconcat);
+        $this->assertStringContainsString('áéíóú', $records[12]->grpconcat);
+        $this->assertStringContainsString('abcde', $records[12]->grpconcat);
         $this->assertCount(2, explode(',', $records[24]->grpconcat));
-        $this->assertContains('abc12', $records[24]->grpconcat);
-        $this->assertContains('abcde', $records[24]->grpconcat);
+        $this->assertStringContainsString('abc12', $records[24]->grpconcat);
+        $this->assertStringContainsString('abcde', $records[24]->grpconcat);
         $this->assertCount(1, explode(',', $records[36]->grpconcat));
-        $this->assertContains('a\+1_', $records[36]->grpconcat);
+        $this->assertStringContainsString('a\+1_', $records[36]->grpconcat);
         $this->assertEquals('abc12,abcde', $records[24]->grpconcat);
         $this->assertEquals('a\+1_', $records[36]->grpconcat);
 
@@ -500,14 +500,14 @@ class totara_core_dml_testcase extends database_driver_testcase {
         $records = $DB->get_records_sql($sql);
         $this->assertCount(3, $records);
         $this->assertCount(3, explode(',', $records[12]->grpconcat));
-        $this->assertContains('12345', $records[12]->grpconcat);
-        $this->assertContains('ÁÉÍÓÚ', $records[12]->grpconcat);
-        $this->assertContains('ABCDE', $records[12]->grpconcat);
+        $this->assertStringContainsString('12345', $records[12]->grpconcat);
+        $this->assertStringContainsString('ÁÉÍÓÚ', $records[12]->grpconcat);
+        $this->assertStringContainsString('ABCDE', $records[12]->grpconcat);
         $this->assertCount(2, explode(',', $records[24]->grpconcat));
-        $this->assertContains('ABC12', $records[24]->grpconcat);
-        $this->assertContains('ABCDE', $records[24]->grpconcat);
+        $this->assertStringContainsString('ABC12', $records[24]->grpconcat);
+        $this->assertStringContainsString('ABCDE', $records[24]->grpconcat);
         $this->assertCount(1, explode(',', $records[36]->grpconcat));
-        $this->assertContains('A\+1_', $records[36]->grpconcat);
+        $this->assertStringContainsString('A\+1_', $records[36]->grpconcat);
         $this->assertEquals('ABC12,ABCDE', $records[24]->grpconcat);
         $this->assertEquals('A\+1_', $records[36]->grpconcat);
 
@@ -516,14 +516,14 @@ class totara_core_dml_testcase extends database_driver_testcase {
         $records = $DB->get_records_sql($sql);
         $this->assertCount(3, $records);
         $this->assertCount(3, explode("'", $records[12]->grpconcat));
-        $this->assertContains('12345', $records[12]->grpconcat);
-        $this->assertContains('ÁÉÍÓÚ', $records[12]->grpconcat);
-        $this->assertContains('ABCDE', $records[12]->grpconcat);
+        $this->assertStringContainsString('12345', $records[12]->grpconcat);
+        $this->assertStringContainsString('ÁÉÍÓÚ', $records[12]->grpconcat);
+        $this->assertStringContainsString('ABCDE', $records[12]->grpconcat);
         $this->assertCount(2, explode("'", $records[24]->grpconcat));
-        $this->assertContains('ABC12', $records[24]->grpconcat);
-        $this->assertContains('ABCDE', $records[24]->grpconcat);
+        $this->assertStringContainsString('ABC12', $records[24]->grpconcat);
+        $this->assertStringContainsString('ABCDE', $records[24]->grpconcat);
         $this->assertCount(1, explode("'", $records[36]->grpconcat));
-        $this->assertContains('A\+1_', $records[36]->grpconcat);
+        $this->assertStringContainsString('A\+1_', $records[36]->grpconcat);
         $this->assertEquals('ABC12\'ABCDE', $records[24]->grpconcat);
         $this->assertEquals('A\+1_', $records[36]->grpconcat);
 
@@ -532,14 +532,14 @@ class totara_core_dml_testcase extends database_driver_testcase {
         $records = $DB->get_records_sql($sql);
         $this->assertCount(3, $records);
         $this->assertCount(3, explode('\\', $records[12]->grpconcat));
-        $this->assertContains('12345', $records[12]->grpconcat);
-        $this->assertContains('ÁÉÍÓÚ', $records[12]->grpconcat);
-        $this->assertContains('ABCDE', $records[12]->grpconcat);
+        $this->assertStringContainsString('12345', $records[12]->grpconcat);
+        $this->assertStringContainsString('ÁÉÍÓÚ', $records[12]->grpconcat);
+        $this->assertStringContainsString('ABCDE', $records[12]->grpconcat);
         $this->assertCount(2, explode('\\', $records[24]->grpconcat));
-        $this->assertContains('ABC12', $records[24]->grpconcat);
-        $this->assertContains('ABCDE', $records[24]->grpconcat);
+        $this->assertStringContainsString('ABC12', $records[24]->grpconcat);
+        $this->assertStringContainsString('ABCDE', $records[24]->grpconcat);
         $this->assertCount(2, explode('\\', $records[36]->grpconcat));
-        $this->assertContains('A\+1_', $records[36]->grpconcat);
+        $this->assertStringContainsString('A\+1_', $records[36]->grpconcat);
         $this->assertEquals('ABC12\ABCDE', $records[24]->grpconcat);
         $this->assertEquals('A\+1_', $records[36]->grpconcat);
 
@@ -548,16 +548,16 @@ class totara_core_dml_testcase extends database_driver_testcase {
         $records = $DB->get_records_sql($sql);
         $this->assertCount(3, $records);
         $this->assertCount(4, explode('|', $records[12]->grpconcat));
-        $this->assertContains('-', $records[12]->grpconcat);
-        $this->assertContains('12345', $records[12]->grpconcat);
-        $this->assertContains('áéíóú', $records[12]->grpconcat);
-        $this->assertContains('abcde', $records[12]->grpconcat);
+        $this->assertStringContainsString('-', $records[12]->grpconcat);
+        $this->assertStringContainsString('12345', $records[12]->grpconcat);
+        $this->assertStringContainsString('áéíóú', $records[12]->grpconcat);
+        $this->assertStringContainsString('abcde', $records[12]->grpconcat);
         $this->assertCount(2, explode('|', $records[24]->grpconcat));
-        $this->assertContains('abc12', $records[24]->grpconcat);
-        $this->assertContains('abcde', $records[24]->grpconcat);
+        $this->assertStringContainsString('abc12', $records[24]->grpconcat);
+        $this->assertStringContainsString('abcde', $records[24]->grpconcat);
         $this->assertCount(2, explode('|', $records[36]->grpconcat));
-        $this->assertContains('a\+1_', $records[36]->grpconcat);
-        $this->assertContains('-', $records[36]->grpconcat);
+        $this->assertStringContainsString('a\+1_', $records[36]->grpconcat);
+        $this->assertStringContainsString('-', $records[36]->grpconcat);
 
         // Verify integers are cast to varchars.
         $grpconcat = $DB->sql_group_concat_unique('valint', ':');
@@ -565,15 +565,15 @@ class totara_core_dml_testcase extends database_driver_testcase {
         $records = $DB->get_records_sql($sql);
         $this->assertCount(3, $records);
         $this->assertCount(3, explode(':', $records[12]->grpconcat));
-        $this->assertContains('3', $records[12]->grpconcat);
-        $this->assertContains('4', $records[12]->grpconcat);
-        $this->assertContains('2', $records[12]->grpconcat);
+        $this->assertStringContainsString('3', $records[12]->grpconcat);
+        $this->assertStringContainsString('4', $records[12]->grpconcat);
+        $this->assertStringContainsString('2', $records[12]->grpconcat);
         $this->assertCount(3, explode(':', $records[24]->grpconcat));
-        $this->assertContains('6', $records[24]->grpconcat);
-        $this->assertContains('7', $records[24]->grpconcat);
-        $this->assertContains('5', $records[24]->grpconcat);
+        $this->assertStringContainsString('6', $records[24]->grpconcat);
+        $this->assertStringContainsString('7', $records[24]->grpconcat);
+        $this->assertStringContainsString('5', $records[24]->grpconcat);
         $this->assertCount(1, explode(':', $records[36]->grpconcat));
-        $this->assertContains('9', $records[36]->grpconcat);
+        $this->assertStringContainsString('9', $records[36]->grpconcat);
         $this->assertEquals('9', $records[36]->grpconcat);
 
         // Verify texts are cast to varchars.
@@ -583,16 +583,16 @@ class totara_core_dml_testcase extends database_driver_testcase {
         $this->assertCount(3, $records);
         $this->assertCount(3, explode(':', $records[12]->grpconcat));
         $this->assertSame(23999, strlen($records[12]->grpconcat));
-        $this->assertContains($text.'3', $records[12]->grpconcat);
-        $this->assertContains($text.'1', $records[12]->grpconcat);
-        $this->assertContains($text.'2', $records[12]->grpconcat);
+        $this->assertStringContainsString($text.'3', $records[12]->grpconcat);
+        $this->assertStringContainsString($text.'1', $records[12]->grpconcat);
+        $this->assertStringContainsString($text.'2', $records[12]->grpconcat);
         $this->assertCount(2, explode(':', $records[24]->grpconcat));
         $this->assertSame(15999, strlen($records[24]->grpconcat));
-        $this->assertContains($text.'6', $records[24]->grpconcat);
-        $this->assertContains($text.'7', $records[24]->grpconcat);
+        $this->assertStringContainsString($text.'6', $records[24]->grpconcat);
+        $this->assertStringContainsString($text.'7', $records[24]->grpconcat);
         $this->assertCount(1, explode(':', $records[36]->grpconcat));
         $this->assertSame(7999, strlen($records[36]->grpconcat));
-        $this->assertContains($text.'8', $records[36]->grpconcat);
+        $this->assertStringContainsString($text.'8', $records[36]->grpconcat);
         $this->assertEquals($text.'6:'.$text.'7', $records[24]->grpconcat);
         $this->assertEquals($text.'8', $records[36]->grpconcat);
 
@@ -603,16 +603,16 @@ class totara_core_dml_testcase extends database_driver_testcase {
         $this->assertCount(3, $records);
         $this->assertCount(3, explode('^|:', $records[12]->grpconcat));
         $this->assertSame(24003, strlen($records[12]->grpconcat));
-        $this->assertContains($text.'3', $records[12]->grpconcat);
-        $this->assertContains($text.'1', $records[12]->grpconcat);
-        $this->assertContains($text.'2', $records[12]->grpconcat);
+        $this->assertStringContainsString($text.'3', $records[12]->grpconcat);
+        $this->assertStringContainsString($text.'1', $records[12]->grpconcat);
+        $this->assertStringContainsString($text.'2', $records[12]->grpconcat);
         $this->assertCount(2, explode('^|:', $records[24]->grpconcat));
         $this->assertSame(16001, strlen($records[24]->grpconcat));
-        $this->assertContains($text.'6', $records[24]->grpconcat);
-        $this->assertContains($text.'7', $records[24]->grpconcat);
+        $this->assertStringContainsString($text.'6', $records[24]->grpconcat);
+        $this->assertStringContainsString($text.'7', $records[24]->grpconcat);
         $this->assertCount(1, explode('^|:', $records[36]->grpconcat));
         $this->assertSame(7999, strlen($records[36]->grpconcat));
-        $this->assertContains($text.'8', $records[36]->grpconcat);
+        $this->assertStringContainsString($text.'8', $records[36]->grpconcat);
         $this->assertEquals($text.'6^|:'.$text.'7', $records[24]->grpconcat);
         $this->assertEquals($text.'8', $records[36]->grpconcat);
 

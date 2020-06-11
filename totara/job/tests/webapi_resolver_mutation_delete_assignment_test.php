@@ -104,7 +104,7 @@ class totara_job_webapi_resolver_mutation_delete_assignment_testcase extends adv
             $this->resolve_graphql_mutation('totara_job_delete_assignment', ['assignmentid' => $job1->id]);
             $this->fail('Exception expected.');
         } catch (\moodle_exception $ex) {
-            self::assertContains('Given Job Assignment does not belong to the given user.', $ex->getMessage());
+            self::assertStringContainsString('Given Job Assignment does not belong to the given user.', $ex->getMessage());
         }
 
         // Incorrect Job ids
@@ -112,7 +112,7 @@ class totara_job_webapi_resolver_mutation_delete_assignment_testcase extends adv
             $this->resolve_graphql_mutation('totara_job_delete_assignment', ['userid' => $job1->userid, 'assignmentid' => 16]);
             $this->fail('Exception expected.');
         } catch (\moodle_exception $ex) {
-            self::assertContains('Can not find data record in database', $ex->getMessage());
+            self::assertStringContainsString('Can not find data record in database', $ex->getMessage());
         }
 
         // Test job assignment belonging to deleted user.
@@ -121,7 +121,7 @@ class totara_job_webapi_resolver_mutation_delete_assignment_testcase extends adv
             $this->resolve_graphql_mutation('totara_job_delete_assignment', ['userid' => $job1->userid, 'assignmentid' => $job1->id]);
             self::fail('Expected a moodle_exception: cannot view job assignments');
         } catch (\dml_exception $ex) {
-            self::assertContains('Can not find data record in database', $ex->getMessage());
+            self::assertStringContainsString('Can not find data record in database', $ex->getMessage());
         }
     }
 

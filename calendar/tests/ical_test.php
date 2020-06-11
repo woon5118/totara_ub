@@ -45,9 +45,6 @@ class core_calendar_ical_testcase extends advanced_testcase {
         require_once($CFG->dirroot . '/calendar/lib.php');
     }
 
-    /**
-     * @expectedException coding_exception
-     */
     public function test_calendar_update_subscription() {
         $this->resetAfterTest(true);
 
@@ -71,6 +68,8 @@ class core_calendar_ical_testcase extends advanced_testcase {
         $sub = calendar_get_subscription($id);
         $this->assertEquals($subscription->name, $sub->name);
         $this->assertEquals($subscription->pollinterval, $sub->pollinterval);
+
+        $this->expectException(coding_exception::class);
 
         $subscription = new stdClass();
         $subscription->name = 'awesome4';

@@ -37,7 +37,7 @@ class block_current_learning_helper_testcase extends advanced_testcase {
             \block_current_learning\helper::get_duedate_state(time() + YEARSECS, $config, time());
             $this->fail('coding_exception expected when alertperiod > warningperiod');
         } catch (\coding_exception $ex) {
-            $this->assertContains('Warning period cannot be before the alert period', $ex->getMessage());
+            $this->assertStringContainsString('Warning period cannot be before the alert period', $ex->getMessage());
         }
     }
 

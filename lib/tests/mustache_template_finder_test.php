@@ -110,11 +110,9 @@ class core_mustache_template_finder_testcase extends advanced_testcase {
         $this->assertEquals($correct, $dirs);
     }
 
-    /**
-     * @expectedException coding_exception
-     */
     public function test_invalid_get_template_directories_for_component() {
         // Test something invalid.
+        $this->expectException(coding_exception::class);
         $dirs = mustache_template_finder::get_template_directories_for_component('octopus', 'basis');
     }
 
@@ -126,11 +124,9 @@ class core_mustache_template_finder_testcase extends advanced_testcase {
         $this->assertSame($correct, $filename);
     }
 
-    /**
-     * @expectedException moodle_exception
-     */
     public function test_invalid_get_template_filepath() {
         // Test something invalid.
+        $this->expectException(moodle_exception::class);
         $dirs = mustache_template_finder::get_template_filepath('core/octopus', 'basis');
     }
 }

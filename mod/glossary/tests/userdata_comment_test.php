@@ -279,7 +279,7 @@ class mod_glossary_userdata_comment_test extends advanced_testcase {
         $this->assertEmpty($result->files);
 
         foreach ($result->data as $exportitem) {
-            $this->assertContains("user:" . $targetuser->id, $exportitem->content);
+            $this->assertStringContainsString("user:" . $targetuser->id, $exportitem->content);
             foreach (['content', 'glossaryid', 'itemid'] as $attribute) {
                 $this->assertObjectHasAttribute($attribute, $exportitem);
             }
@@ -312,7 +312,7 @@ class mod_glossary_userdata_comment_test extends advanced_testcase {
         $this->assertCount(1, $result->data);
         $this->assertEmpty($result->files);
         foreach ($result->data as $exportitem) {
-            $this->assertContains("user:" . $targetuser->id, $exportitem->content);
+            $this->assertStringContainsString("user:" . $targetuser->id, $exportitem->content);
             foreach (['content', 'glossaryid', 'itemid'] as $attribute) {
                 $this->assertObjectHasAttribute($attribute, $exportitem);
             }
@@ -323,7 +323,7 @@ class mod_glossary_userdata_comment_test extends advanced_testcase {
         $this->assertCount(2, $result->data);
         $this->assertEmpty($result->files);
         foreach ($result->data as $exportitem) {
-            $this->assertContains("user:" . $targetuser->id, $exportitem->content);
+            $this->assertStringContainsString("user:" . $targetuser->id, $exportitem->content);
             foreach (['content', 'glossaryid', 'itemid'] as $attribute) {
                 $this->assertObjectHasAttribute($attribute, $exportitem);
             }
@@ -356,7 +356,7 @@ class mod_glossary_userdata_comment_test extends advanced_testcase {
         $this->assertCount(1, $result->data);
         $this->assertEmpty($result->files);
         foreach ($result->data as $exportitem) {
-            $this->assertContains("user:" . $targetuser->id, $exportitem->content);
+            $this->assertStringContainsString("user:" . $targetuser->id, $exportitem->content);
             foreach (['content', 'glossaryid', 'itemid'] as $attribute) {
                 $this->assertObjectHasAttribute($attribute, $exportitem);
             }
@@ -367,7 +367,7 @@ class mod_glossary_userdata_comment_test extends advanced_testcase {
         $this->assertCount(2, $result->data);
         $this->assertEmpty($result->files);
         foreach ($result->data as $exportitem) {
-            $this->assertContains("user:" . $targetuser->id, $exportitem->content);
+            $this->assertStringContainsString("user:" . $targetuser->id, $exportitem->content);
             foreach (['content', 'glossaryid', 'itemid'] as $attribute) {
                 $this->assertObjectHasAttribute($attribute, $exportitem);
             }
@@ -400,7 +400,7 @@ class mod_glossary_userdata_comment_test extends advanced_testcase {
         $this->assertCount(1, $result->data);
         $this->assertEmpty($result->files);
         foreach ($result->data as $exportitem) {
-            $this->assertContains("user:" . $targetuser->id, $exportitem->content);
+            $this->assertStringContainsString("user:" . $targetuser->id, $exportitem->content);
             foreach (['content', 'glossaryid', 'itemid'] as $attribute) {
                 $this->assertObjectHasAttribute($attribute, $exportitem);
             }
@@ -411,7 +411,7 @@ class mod_glossary_userdata_comment_test extends advanced_testcase {
         $this->assertCount(2, $result->data);
         $this->assertEmpty($result->files);
         foreach ($result->data as $exportitem) {
-            $this->assertContains("user:" . $targetuser->id, $exportitem->content);
+            $this->assertStringContainsString("user:" . $targetuser->id, $exportitem->content);
             foreach (['content', 'glossaryid', 'itemid'] as $attribute) {
                 $this->assertObjectHasAttribute($attribute, $exportitem);
             }

@@ -132,7 +132,7 @@ class core_calendar_events_testcase extends advanced_testcase {
             $this->fail("Event validation should not allow \\core\\event\\calendar_event_created to be triggered without
                     other['repeatid']");
         } catch (coding_exception $e) {
-            $this->assertContains('The \'repeatid\' value must be set in other.', $e->getMessage());
+            $this->assertStringContainsString('The \'repeatid\' value must be set in other.', $e->getMessage());
         }
 
         // Test not setting other['name'].
@@ -148,7 +148,7 @@ class core_calendar_events_testcase extends advanced_testcase {
             $this->fail("Event validation should not allow \\core\\event\\calendar_event_created to be triggered without
                     other['name']");
         } catch (coding_exception $e) {
-            $this->assertContains('The \'name\' value must be set in other.', $e->getMessage());
+            $this->assertStringContainsString('The \'name\' value must be set in other.', $e->getMessage());
         }
 
         // Test not setting other['timestart'].
@@ -164,7 +164,7 @@ class core_calendar_events_testcase extends advanced_testcase {
             $this->fail("Event validation should not allow \\core\\event\\calendar_event_deleted to be triggered without
                     other['timestart']");
         } catch (coding_exception $e) {
-            $this->assertContains('The \'timestart\' value must be set in other.', $e->getMessage());
+            $this->assertStringContainsString('The \'timestart\' value must be set in other.', $e->getMessage());
         }
     }
 
@@ -245,7 +245,7 @@ class core_calendar_events_testcase extends advanced_testcase {
             $this->fail("Event validation should not allow \\core\\event\\calendar_event_updated to be triggered without
                     other['repeatid']");
         } catch (coding_exception $e) {
-            $this->assertContains('The \'repeatid\' value must be set in other.', $e->getMessage());
+            $this->assertStringContainsString('The \'repeatid\' value must be set in other.', $e->getMessage());
         }
 
         // Test not setting other['name'].
@@ -261,7 +261,7 @@ class core_calendar_events_testcase extends advanced_testcase {
             $this->fail("Event validation should not allow \\core\\event\\calendar_event_updated to be triggered without
                     other['name']");
         } catch (coding_exception $e) {
-            $this->assertContains('The \'name\' value must be set in other.', $e->getMessage());
+            $this->assertStringContainsString('The \'name\' value must be set in other.', $e->getMessage());
         }
 
         // Test not setting other['timestart'].
@@ -277,7 +277,7 @@ class core_calendar_events_testcase extends advanced_testcase {
             $this->fail("Event validation should not allow \\core\\event\\calendar_event_deleted to be triggered without
                     other['timestart']");
         } catch (coding_exception $e) {
-            $this->assertContains('The \'timestart\' value must be set in other.', $e->getMessage());
+            $this->assertStringContainsString('The \'timestart\' value must be set in other.', $e->getMessage());
         }
     }
 
@@ -357,7 +357,7 @@ class core_calendar_events_testcase extends advanced_testcase {
             $this->fail("Event validation should not allow \\core\\event\\calendar_event_deleted to be triggered without
                     other['repeatid']");
         } catch (coding_exception $e) {
-            $this->assertContains('The \'repeatid\' value must be set in other.', $e->getMessage());
+            $this->assertStringContainsString('The \'repeatid\' value must be set in other.', $e->getMessage());
         }
 
         // Test not setting other['name'].
@@ -373,7 +373,7 @@ class core_calendar_events_testcase extends advanced_testcase {
             $this->fail("Event validation should not allow \\core\\event\\calendar_event_deleted to be triggered without
                     other['name']");
         } catch (coding_exception $e) {
-            $this->assertContains('The \'name\' value must be set in other.', $e->getMessage());
+            $this->assertStringContainsString('The \'name\' value must be set in other.', $e->getMessage());
         }
 
         // Test not setting other['timestart'].
@@ -389,7 +389,7 @@ class core_calendar_events_testcase extends advanced_testcase {
             $this->fail("Event validation should not allow \\core\\event\\calendar_event_deleted to be triggered without
                     other['timestart']");
         } catch (coding_exception $e) {
-            $this->assertContains('The \'timestart\' value must be set in other.', $e->getMessage());
+            $this->assertStringContainsString('The \'timestart\' value must be set in other.', $e->getMessage());
         }
     }
 

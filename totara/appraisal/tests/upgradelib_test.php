@@ -405,7 +405,7 @@ class totara_appraisal_upgradelib_test extends appraisal_testcase {
             totara_appraisal_upgrade_add_user_assignment_index();
             $this->fail("upgrade went through");
         } catch (moodle_exception $e) {
-            $this->assertContains('duplicates', $e->getMessage(), 'wrong message');
+            $this->assertStringContainsString('duplicates', $e->getMessage(), 'wrong message');
         } catch (Exception $e) {
             $this->fail("wrong exception thrown");
         }

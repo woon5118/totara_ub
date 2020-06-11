@@ -91,19 +91,16 @@ class core_backup_moodle1_converter_testcase extends advanced_testcase {
         $this->assertInstanceOf('moodle1_converter', $converter);
     }
 
-    /**
-     * @expectedException moodle1_convert_storage_exception
-     */
     public function test_stash_storage_not_created() {
+        $this->expectException(moodle1_convert_storage_exception::class);
+
         $converter = convert_factory::get_converter('moodle1', $this->tempdir);
         $converter->set_stash('tempinfo', 12);
     }
 
-    /**
-     * @expectedException moodle1_convert_empty_storage_exception
-     */
     public function test_stash_requiring_empty_stash() {
-        $this->resetAfterTest(true);
+        $this->expectException(moodle1_convert_empty_storage_exception::class);
+
         $converter = convert_factory::get_converter('moodle1', $this->tempdir);
         $converter->create_stash_storage();
         $converter->set_stash('tempinfo', 12);
@@ -439,9 +436,6 @@ class core_backup_moodle1_converter_testcase extends advanced_testcase {
         $this->assertSame(null, $data['nothing']);
     }
 
-    /**
-     * @expectedException convert_path_exception
-     */
     public function test_grouped_data_on_nongrouped_convert_path() {
         // prepare some grouped data
         $data = array(
@@ -466,13 +460,12 @@ class core_backup_moodle1_converter_testcase extends advanced_testcase {
         // declare a non-grouped path
         $path = new convert_path('beer_style', '/ROOT/BEER_STYLES/BEER_STYLE');
 
+        $this->expectException(convert_path_exception::class);
+
         // an attempt to apply recipes throws exception because we do not expect grouped data
         $data = $path->apply_recipes($data);
     }
 
-    /**
-     * @expectedException convert_path_exception
-     */
     public function test_grouped_convert_path_with_recipes() {
         // prepare some grouped data
         $data = array(
@@ -498,6 +491,8 @@ class core_backup_moodle1_converter_testcase extends advanced_testcase {
         $path = new convert_path('beer_style', '/ROOT/BEER_STYLES/BEER_STYLE', array(), true);
         $data = $path->apply_recipes($data);
         $this->assertEquals('Heineken', $data['beers'][1]['beer']['name']);
+
+        $this->expectException(convert_path_exception::class);
 
         // an attempt to provide explicit recipes on grouped elements throws exception
         $path = new convert_path(

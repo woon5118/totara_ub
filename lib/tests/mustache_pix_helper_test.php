@@ -219,7 +219,7 @@ class mustache_pix_helper_testcase extends advanced_testcase {
             $renderer->render(new pix_icon('movehere', '<script>alert(window.location);</script>')),
             $mustache->render('test')
         );
-        $this->assertNotContains('window.location', $page->requires->get_end_code());
+        $this->assertStringNotContainsString('window.location', $page->requires->get_end_code());
         $this->assertDebuggingCalled('Legacy pix icon helper API in use, please use the pix icon template instead.');
 
         // Malicious alt 2, this is currently possible.
@@ -228,7 +228,7 @@ class mustache_pix_helper_testcase extends advanced_testcase {
             $renderer->render(new pix_icon('movehere', '')),
             $mustache->render('test')
         );
-        $this->assertNotContains('window.location', $page->requires->get_end_code());
+        $this->assertStringNotContainsString('window.location', $page->requires->get_end_code());
         $this->assertDebuggingCalled([
             'Escaped content contains unexpected mustache processing queues. It will be lost.',
             'Legacy pix icon helper API in use, please use the pix icon template instead.'

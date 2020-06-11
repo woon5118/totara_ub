@@ -116,9 +116,9 @@ class totara_cohort_multi_language_filter_testcase extends advanced_testcase {
         $content = ob_get_contents();
         ob_end_clean();
 
-        $this->assertContains($expected, $content);
+        $this->assertStringContainsString($expected, $content);
         foreach ($unexpected as $a) {
-            $this->assertNotContains($a, $content);
+            $this->assertStringNotContainsString($a, $content);
         }
     }
 
@@ -196,9 +196,9 @@ class totara_cohort_multi_language_filter_testcase extends advanced_testcase {
         $content = ob_get_contents();
         ob_end_clean();
     
-        $this->assertContains($expected, $content);
+        $this->assertStringContainsString($expected, $content);
         foreach ($unexpected as $a) {
-            $this->assertNotContains($a, $content);
+            $this->assertStringNotContainsString($a, $content);
         }
     }
 }

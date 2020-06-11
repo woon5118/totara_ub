@@ -59,10 +59,8 @@ class question_attempt_with_steps_test extends advanced_testcase {
         parent::tearDown();
     }
 
-    /**
-     * @expectedException moodle_exception
-     */
     public function test_get_step_before_start() {
+        $this->expectException(moodle_exception::class);
         $step = $this->qa->get_step(-1);
     }
 
@@ -76,10 +74,8 @@ class question_attempt_with_steps_test extends advanced_testcase {
         $this->assertEquals(2, $step->get_qt_var('i'));
     }
 
-    /**
-     * @expectedException moodle_exception
-     */
     public function test_get_step_past_end() {
+        $this->expectException(moodle_exception::class);
         $step = $this->qa->get_step(3);
     }
 

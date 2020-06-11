@@ -769,8 +769,8 @@ class totara_connect_util_testcase extends advanced_testcase {
         $requesttoken = sha1('dssddsds');
         $SESSION->totaraconnectssostarted = array('clientidnumber' => $client->clientidnumber, 'requesttoken' => $requesttoken);
         $result = util::login_page_info();
-        $this->assertContains('<div class="singlebutton">', $result);
-        $this->assertContains('<form method="post" action="https://www.example.com/moodle/totara/connect/sso_request.php">', $result);
+        $this->assertStringContainsString('<div class="singlebutton">', $result);
+        $this->assertStringContainsString('<form method="post" action="https://www.example.com/moodle/totara/connect/sso_request.php">', $result);
     }
 
     public function test_warn_if_not_https() {

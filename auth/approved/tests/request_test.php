@@ -204,17 +204,17 @@ class auth_approved_request_testcase extends advanced_testcase {
         $this->assertSame('PHPUnit test site: Confirmation of account request', $email->subject);
         $this->assertSame($noreplyuser->email, $email->from);
         $this->assertSame($request->email, $email->to);
-        $this->assertContains('Please go to this web address to confirm your request', $emailbody);
-        $this->assertContains('auth/approved/confirm.php?token', $emailbody);
-        $this->assertContains('If you need help, please contact support at this address: ' . $supportuser->email, $emailbody);
-        $this->assertNotContains('monkey', $emailbody);
+        $this->assertStringContainsString('Please go to this web address to confirm your request', $emailbody);
+        $this->assertStringContainsString('auth/approved/confirm.php?token', $emailbody);
+        $this->assertStringContainsString('If you need help, please contact support at this address: ' . $supportuser->email, $emailbody);
+        $this->assertStringNotContainsString('monkey', $emailbody);
 
         $messages = $messagesink->get_messages();
         $message = reset($messages);
         $this->assertEquals($approver->id, $message->useridto);
         $this->assertSame('Account request awaits email confirmation', $message->subject);
-        $this->assertContains('Applicant "test1 test1" requested an account with username "test1"; they were asked to confirm their email address "test_1@example.com"', $message->fullmessage);
-        $this->assertContains('Applicant "test1 test1" requested an account with username "test1"; they were asked to confirm their email address "test_1@example.com"', $message->smallmessage);
+        $this->assertStringContainsString('Applicant "test1 test1" requested an account with username "test1"; they were asked to confirm their email address "test_1@example.com"', $message->fullmessage);
+        $this->assertStringContainsString('Applicant "test1 test1" requested an account with username "test1"; they were asked to confirm their email address "test_1@example.com"', $message->smallmessage);
         $this->assertSame($noreplyuser->email, $message->fromemail);
 
         $events = $eventsink->get_events();
@@ -226,10 +226,10 @@ class auth_approved_request_testcase extends advanced_testcase {
         $this->assertCount(2, $event->other);
         $this->assertSame($request->email, $event->other['email']);
         $this->assertSame($request->username, $event->other['username']);
-        $this->assertNotContains('monkey', json_encode($event)); // Confirm the event does not contain the password!
-        $this->assertContains('registered for system access', $event->get_description());
+        $this->assertStringNotContainsString('monkey', json_encode($event)); // Confirm the event does not contain the password!
+        $this->assertStringContainsString('registered for system access', $event->get_description());
         $this->assertSame(get_string('eventrequestadded', 'auth_approved'), $event::get_name());
-        $this->assertContains('/auth/approved/index.php', (string)$event->get_url());
+        $this->assertStringContainsString('/auth/approved/index.php', (string)$event->get_url());
 
         $emailsink->close();
         $messagesink->close();
@@ -286,8 +286,8 @@ class auth_approved_request_testcase extends advanced_testcase {
         $this->assertSame('Some subject '.$request->username, $email->subject);
         $this->assertSame($noreplyuser->email, $email->from);
         $this->assertSame($request->email, $email->to);
-        $this->assertContains('This is the body '.$request->username, $emailbody);
-        $this->assertNotContains('monkey', $emailbody);
+        $this->assertStringContainsString('This is the body '.$request->username, $emailbody);
+        $this->assertStringNotContainsString('monkey', $emailbody);
 
         $emailsink->close();
         $messagesink->close();
@@ -330,8 +330,8 @@ class auth_approved_request_testcase extends advanced_testcase {
         $emails = $emailsink->get_messages();
         $email = reset($emails);
         $emailbody = str_replace("=\n", "", $email->body);
-        $this->assertContains('auth/approved/confirm.php?token', $emailbody);
-        $this->assertContains($token, $emailbody);
+        $this->assertStringContainsString('auth/approved/confirm.php?token', $emailbody);
+        $this->assertStringContainsString($token, $emailbody);
 
         // Clear we want to validate the stuff on a successfull confirmation.
         $emailsink->clear();
@@ -355,9 +355,9 @@ class auth_approved_request_testcase extends advanced_testcase {
         $this->assertSame('PHPUnit test site: Account request confirmed', $email->subject);
         $this->assertSame($noreplyuser->email, $email->from);
         $this->assertSame($request->email, $email->to);
-        $this->assertContains('Thank you for confirming your account request at \'PHPUnit test site\'', $emailbody);
-        $this->assertContains('If you need help, please contact support at this address: ' . $supportuser->email, $emailbody);
-        $this->assertNotContains('monkey', $emailbody);
+        $this->assertStringContainsString('Thank you for confirming your account request at \'PHPUnit test site\'', $emailbody);
+        $this->assertStringContainsString('If you need help, please contact support at this address: ' . $supportuser->email, $emailbody);
+        $this->assertStringNotContainsString('monkey', $emailbody);
 
         $events = $eventsink->get_events();
         $event = reset($events);
@@ -369,14 +369,14 @@ class auth_approved_request_testcase extends advanced_testcase {
         $this->assertCount(2, $event->other);
         $this->assertSame($request->email, $event->other['email']);
         $this->assertSame($request->username, $event->other['username']);
-        $this->assertNotContains('monkey', json_encode($event)); // Confirm the event does not contain the password!
+        $this->assertStringNotContainsString('monkey', json_encode($event)); // Confirm the event does not contain the password!
 
         $messages = $messagesink->get_messages();
         $message = reset($messages);
         $this->assertEquals($approver->id, $message->useridto);
         $this->assertSame('New account request requires approval', $message->subject);
-        $this->assertContains('Applicant "test1 test1", who requested an account with username "test1", has just confirmed their email address "test_1@example.com"', $message->fullmessage);
-        $this->assertContains('Applicant "test1 test1", who requested an account with username "test1", has just confirmed their email address "test_1@example.com"', $message->smallmessage);
+        $this->assertStringContainsString('Applicant "test1 test1", who requested an account with username "test1", has just confirmed their email address "test_1@example.com"', $message->fullmessage);
+        $this->assertStringContainsString('Applicant "test1 test1", who requested an account with username "test1", has just confirmed their email address "test_1@example.com"', $message->smallmessage);
         $this->assertSame($noreplyuser->email, $message->fromemail);
 
 
@@ -485,9 +485,9 @@ class auth_approved_request_testcase extends advanced_testcase {
         $this->assertSame('PHPUnit test site: Account request approved', $email->subject);
         $this->assertSame($noreplyuser->email, $email->from);
         $this->assertSame($request->email, $email->to);
-        $this->assertContains('A new account has been created at \'PHPUnit test site\' as requested.', $emailbody);
-        $this->assertContains('If you need help, please contact support at this address: ' . $supportuser->email, $emailbody);
-        $this->assertNotContains('monkey', $emailbody);
+        $this->assertStringContainsString('A new account has been created at \'PHPUnit test site\' as requested.', $emailbody);
+        $this->assertStringContainsString('If you need help, please contact support at this address: ' . $supportuser->email, $emailbody);
+        $this->assertStringNotContainsString('monkey', $emailbody);
 
         $events = $eventsink->get_events();
 
@@ -501,7 +501,7 @@ class auth_approved_request_testcase extends advanced_testcase {
         $this->assertCount(2, $event->other);
         $this->assertSame($request->email, $event->other['email']);
         $this->assertSame($request->username, $event->other['username']);
-        $this->assertNotContains('monkey', json_encode($event)); // Confirm the event does not contain the password!
+        $this->assertStringNotContainsString('monkey', json_encode($event)); // Confirm the event does not contain the password!
 
         // The user created event is expected first.
         $event = next($events);
@@ -509,7 +509,7 @@ class auth_approved_request_testcase extends advanced_testcase {
         $this->assertSame('core', $event->component);
         $this->assertSame('created', $event->action);
         $this->assertSame(CONTEXT_USER, $event->contextlevel);
-        $this->assertNotContains('monkey', json_encode($event)); // Confirm the event does not contain the password!
+        $this->assertStringNotContainsString('monkey', json_encode($event)); // Confirm the event does not contain the password!
 
         // Now the request approved event.
         $event = next($events);
@@ -521,10 +521,10 @@ class auth_approved_request_testcase extends advanced_testcase {
         $this->assertCount(2, $event->other);
         $this->assertSame($request->email, $event->other['email']);
         $this->assertSame($request->username, $event->other['username']);
-        $this->assertNotContains('monkey', json_encode($event)); // Confirm the event does not contain the password!
-        $this->assertContains('approved for system access', $event->get_description());
+        $this->assertStringNotContainsString('monkey', json_encode($event)); // Confirm the event does not contain the password!
+        $this->assertStringContainsString('approved for system access', $event->get_description());
         $this->assertSame(get_string('eventrequestapproved', 'auth_approved'), $event::get_name());
-        $this->assertContains('/auth/approved/index.php', (string)$event->get_url());
+        $this->assertStringContainsString('/auth/approved/index.php', (string)$event->get_url());
 
         // Verify approver notification.
         $messages = $messagesink->get_messages();
@@ -583,9 +583,9 @@ class auth_approved_request_testcase extends advanced_testcase {
         $this->assertSame('PHPUnit test site: Account request approved', $email->subject);
         $this->assertSame($noreplyuser->email, $email->from);
         $this->assertSame($request->email, $email->to);
-        $this->assertContains('A new account has been created at \'PHPUnit test site\' as requested.', $emailbody);
-        $this->assertContains('If you need help, please contact support at this address: ' . $supportuser->email, $emailbody);
-        $this->assertNotContains('monkey', $emailbody);
+        $this->assertStringContainsString('A new account has been created at \'PHPUnit test site\' as requested.', $emailbody);
+        $this->assertStringContainsString('If you need help, please contact support at this address: ' . $supportuser->email, $emailbody);
+        $this->assertStringNotContainsString('monkey', $emailbody);
 
         $events = $eventsink->get_events();
 
@@ -599,10 +599,10 @@ class auth_approved_request_testcase extends advanced_testcase {
         $this->assertCount(2, $event->other);
         $this->assertSame($request->email, $event->other['email']);
         $this->assertSame($request->username, $event->other['username']);
-        $this->assertNotContains('monkey', json_encode($event)); // Confirm the event does not contain the password!
-        $this->assertContains('confirmed email address', $event->get_description());
+        $this->assertStringNotContainsString('monkey', json_encode($event)); // Confirm the event does not contain the password!
+        $this->assertStringContainsString('confirmed email address', $event->get_description());
         $this->assertSame(get_string('eventrequestconfirmed', 'auth_approved'), $event::get_name());
-        $this->assertContains('/auth/approved/index.php', (string)$event->get_url());
+        $this->assertStringContainsString('/auth/approved/index.php', (string)$event->get_url());
 
         // The user created event is expected first.
         $event = next($events);
@@ -610,7 +610,7 @@ class auth_approved_request_testcase extends advanced_testcase {
         $this->assertSame('core', $event->component);
         $this->assertSame('created', $event->action);
         $this->assertSame(CONTEXT_USER, $event->contextlevel);
-        $this->assertNotContains('monkey', json_encode($event)); // Confirm the event does not contain the password!
+        $this->assertStringNotContainsString('monkey', json_encode($event)); // Confirm the event does not contain the password!
 
         // Now the request approved event.
         $event = next($events);
@@ -622,7 +622,7 @@ class auth_approved_request_testcase extends advanced_testcase {
         $this->assertCount(2, $event->other);
         $this->assertSame($request->email, $event->other['email']);
         $this->assertSame($request->username, $event->other['username']);
-        $this->assertNotContains('monkey', json_encode($event)); // Confirm the event does not contain the password!
+        $this->assertStringNotContainsString('monkey', json_encode($event)); // Confirm the event does not contain the password!
 
         // Verify approver notification.
         $messages = $messagesink->get_messages();
@@ -661,9 +661,9 @@ class auth_approved_request_testcase extends advanced_testcase {
         $this->assertSame('PHPUnit test site: Account request rejected', $email->subject);
         $this->assertSame($noreplyuser->email, $email->from);
         $this->assertSame($request->email, $email->to);
-        $this->assertContains('A custom rejection message', $emailbody);
-        $this->assertContains('If you need help, please contact support at this address: ' . $supportuser->email, $emailbody);
-        $this->assertNotContains('monkey', $emailbody);
+        $this->assertStringContainsString('A custom rejection message', $emailbody);
+        $this->assertStringContainsString('If you need help, please contact support at this address: ' . $supportuser->email, $emailbody);
+        $this->assertStringNotContainsString('monkey', $emailbody);
 
         $events = $eventsink->get_events();
         $event = reset($events);
@@ -675,10 +675,10 @@ class auth_approved_request_testcase extends advanced_testcase {
         $this->assertCount(2, $event->other);
         $this->assertSame($request->email, $event->other['email']);
         $this->assertSame($request->username, $event->other['username']);
-        $this->assertNotContains('monkey', json_encode($event)); // Confirm the event does not contain the password!
-        $this->assertContains('rejected for system access', $event->get_description());
+        $this->assertStringNotContainsString('monkey', json_encode($event)); // Confirm the event does not contain the password!
+        $this->assertStringContainsString('rejected for system access', $event->get_description());
         $this->assertSame(get_string('eventrequestrejected', 'auth_approved'), $event::get_name());
-        $this->assertContains('/auth/approved/index.php', (string)$event->get_url());
+        $this->assertStringContainsString('/auth/approved/index.php', (string)$event->get_url());
 
         $emailsink->clear();
         $eventsink->clear();
@@ -740,9 +740,9 @@ class auth_approved_request_testcase extends advanced_testcase {
         $this->assertSame('PHPUnit test site: Account request approved', $email->subject);
         $this->assertSame($noreplyuser->email, $email->from);
         $this->assertSame($request->email, $email->to);
-        $this->assertContains('A custom approval message', $emailbody);
-        $this->assertContains('If you need help, please contact support at this address: ' . $supportuser->email, $emailbody);
-        $this->assertNotContains('monkey', $emailbody);
+        $this->assertStringContainsString('A custom approval message', $emailbody);
+        $this->assertStringContainsString('If you need help, please contact support at this address: ' . $supportuser->email, $emailbody);
+        $this->assertStringNotContainsString('monkey', $emailbody);
 
         $events = $eventsink->get_events();
         // First job assignment updated.
@@ -751,7 +751,7 @@ class auth_approved_request_testcase extends advanced_testcase {
         $this->assertSame('totara_job', $event->component);
         $this->assertSame('created', $event->action);
         $this->assertSame(CONTEXT_SYSTEM, $event->contextlevel);
-        $this->assertNotContains('monkey', json_encode($event)); // Confirm the event does not contain the password!
+        $this->assertStringNotContainsString('monkey', json_encode($event)); // Confirm the event does not contain the password!
 
         // The user created event is expected next.
         $event = next($events);
@@ -760,7 +760,7 @@ class auth_approved_request_testcase extends advanced_testcase {
         $this->assertSame('created', $event->action);
         $this->assertSame(CONTEXT_USER, $event->contextlevel);
         $this->assertEquals($newuserid, $event->objectid);
-        $this->assertNotContains('monkey', json_encode($event)); // Confirm the event does not contain the password!
+        $this->assertStringNotContainsString('monkey', json_encode($event)); // Confirm the event does not contain the password!
 
         // Now the request approved event.
         $event = next($events);
@@ -772,7 +772,7 @@ class auth_approved_request_testcase extends advanced_testcase {
         $this->assertCount(2, $event->other);
         $this->assertSame($request->email, $event->other['email']);
         $this->assertSame($request->username, $event->other['username']);
-        $this->assertNotContains('monkey', json_encode($event)); // Confirm the event does not contain the password!
+        $this->assertStringNotContainsString('monkey', json_encode($event)); // Confirm the event does not contain the password!
 
         $emailsink->clear();
         $eventsink->clear();
@@ -845,11 +845,11 @@ class auth_approved_request_testcase extends advanced_testcase {
         $data['email'] = 'exists@example.com';
         $errors = \auth_approved\request::validate_signup_form_data($data, \auth_approved\request::STAGE_APPROVAL);
         $this->assertArrayHasKey('email', $errors);
-        $this->assertContains('This email address is already registered.', $errors['email']);
+        $this->assertStringContainsString('This email address is already registered.', $errors['email']);
 
         $errors = \auth_approved\request::validate_signup_form_data($data, \auth_approved\request::STAGE_SIGNUP);
         $this->assertArrayHasKey('email', $errors);
-        $this->assertContains('This email address is already registered', $errors['email']);
+        $this->assertStringContainsString('This email address is already registered', $errors['email']);
 
         // With an email that has an existing request.
         $data['email'] = 'request@example.com';
@@ -858,7 +858,7 @@ class auth_approved_request_testcase extends advanced_testcase {
 
         $errors = \auth_approved\request::validate_signup_form_data($data, \auth_approved\request::STAGE_SIGNUP);
         $this->assertArrayHasKey('email', $errors);
-        $this->assertContains('Pending request with the same email address already exists', $errors['email']);
+        $this->assertStringContainsString('Pending request with the same email address already exists', $errors['email']);
 
         // Next with an email address that is not allowed.
         set_config('denyemailaddresses', 'example.com');
@@ -867,7 +867,7 @@ class auth_approved_request_testcase extends advanced_testcase {
 
         $errors = \auth_approved\request::validate_signup_form_data($data, \auth_approved\request::STAGE_SIGNUP);
         $this->assertArrayHasKey('email', $errors);
-        $this->assertContains('Email addresses in these domains are not allowed', $errors['email']);
+        $this->assertStringContainsString('Email addresses in these domains are not allowed', $errors['email']);
     }
 
     public function test_validate_signup_form_data_password() {
@@ -900,7 +900,7 @@ class auth_approved_request_testcase extends advanced_testcase {
 
         $errors = \auth_approved\request::validate_signup_form_data($data, \auth_approved\request::STAGE_SIGNUP);
         $this->assertArrayHasKey('password', $errors);
-        $this->assertContains('Passwords must be at least 8 characters long', $errors['password']);
+        $this->assertStringContainsString('Passwords must be at least 8 characters long', $errors['password']);
     }
 
     public function test_validate_signup_form_data_username() {
@@ -926,11 +926,11 @@ class auth_approved_request_testcase extends advanced_testcase {
         $data['username'] = 'frank';
         $errors = \auth_approved\request::validate_signup_form_data($data, \auth_approved\request::STAGE_APPROVAL);
         $this->assertArrayHasKey('username', $errors);
-        $this->assertContains(get_string('usernameexists'), $errors['username']);
+        $this->assertStringContainsString(get_string('usernameexists'), $errors['username']);
 
         $errors = \auth_approved\request::validate_signup_form_data($data, \auth_approved\request::STAGE_SIGNUP);
         $this->assertArrayHasKey('username', $errors);
-        $this->assertContains(get_string('usernameexists'), $errors['username']);
+        $this->assertStringContainsString(get_string('usernameexists'), $errors['username']);
 
         // With a username that has an existing request.
         $data['username'] = 'request';
@@ -939,27 +939,27 @@ class auth_approved_request_testcase extends advanced_testcase {
 
         $errors = \auth_approved\request::validate_signup_form_data($data, \auth_approved\request::STAGE_SIGNUP);
         $this->assertArrayHasKey('username', $errors);
-        $this->assertContains(get_string('requestusernameexists', 'auth_approved'), $errors['username']);
+        $this->assertStringContainsString(get_string('requestusernameexists', 'auth_approved'), $errors['username']);
 
         // Next with an invalid username.
         $data['username'] = '-ALPha-';
         $errors = \auth_approved\request::validate_signup_form_data($data, \auth_approved\request::STAGE_APPROVAL);
         $this->assertArrayHasKey('username', $errors);
-        $this->assertContains('Only lowercase letters allowed', $errors['username']);
+        $this->assertStringContainsString('Only lowercase letters allowed', $errors['username']);
 
         $errors = \auth_approved\request::validate_signup_form_data($data, \auth_approved\request::STAGE_SIGNUP);
         $this->assertArrayHasKey('username', $errors);
-        $this->assertContains('Only lowercase letters allowed', $errors['username']);
+        $this->assertStringContainsString('Only lowercase letters allowed', $errors['username']);
 
         // And again.
         $data['username'] = '-*al**pha*-';
         $errors = \auth_approved\request::validate_signup_form_data($data, \auth_approved\request::STAGE_APPROVAL);
         $this->assertArrayHasKey('username', $errors);
-        $this->assertContains('The username can only contain alphanumeric lowercase', $errors['username']);
+        $this->assertStringContainsString('The username can only contain alphanumeric lowercase', $errors['username']);
 
         $errors = \auth_approved\request::validate_signup_form_data($data, \auth_approved\request::STAGE_SIGNUP);
         $this->assertArrayHasKey('username', $errors);
-        $this->assertContains('The username can only contain alphanumeric lowercase', $errors['username']);
+        $this->assertStringContainsString('The username can only contain alphanumeric lowercase', $errors['username']);
     }
 
     public function test_validate_signup_form_data_organisation() {
@@ -990,7 +990,7 @@ class auth_approved_request_testcase extends advanced_testcase {
 
         $errors = \auth_approved\request::validate_signup_form_data($data, \auth_approved\request::STAGE_APPROVAL);
         $this->assertArrayHasKey('organisationid', $errors);
-        $this->assertContains(get_string('errorunknownorganisationid', 'auth_approved', (object)$data), $errors['organisationid']);
+        $this->assertStringContainsString(get_string('errorunknownorganisationid', 'auth_approved', (object)$data), $errors['organisationid']);
 
         $errors = \auth_approved\request::validate_signup_form_data($data, \auth_approved\request::STAGE_SIGNUP);
         $this->assertEmpty($errors);
@@ -1002,15 +1002,15 @@ class auth_approved_request_testcase extends advanced_testcase {
 
         $errors = \auth_approved\request::validate_signup_form_data($data, \auth_approved\request::STAGE_APPROVAL);
         $this->assertArrayHasKey('organisationid', $errors);
-        $this->assertContains(get_string('errormissingorg', 'auth_approved'), $errors['organisationid']);
+        $this->assertStringContainsString(get_string('errormissingorg', 'auth_approved'), $errors['organisationid']);
         $this->assertArrayHasKey('organisationselector', $errors);
-        $this->assertContains(get_string('errormissingorg', 'auth_approved'), $errors['organisationselector']);
+        $this->assertStringContainsString(get_string('errormissingorg', 'auth_approved'), $errors['organisationselector']);
 
         $errors = \auth_approved\request::validate_signup_form_data($data, \auth_approved\request::STAGE_SIGNUP);
         $this->assertArrayHasKey('organisationid', $errors);
-        $this->assertContains(get_string('errormissingorg', 'auth_approved'), $errors['organisationid']);
+        $this->assertStringContainsString(get_string('errormissingorg', 'auth_approved'), $errors['organisationid']);
         $this->assertArrayHasKey('organisationfreetext', $errors);
-        $this->assertContains(get_string('errormissingorg', 'auth_approved'), $errors['organisationfreetext']);
+        $this->assertStringContainsString(get_string('errormissingorg', 'auth_approved'), $errors['organisationfreetext']);
     }
 
     public function test_validate_signup_form_data_position() {
@@ -1041,7 +1041,7 @@ class auth_approved_request_testcase extends advanced_testcase {
 
         $errors = \auth_approved\request::validate_signup_form_data($data, \auth_approved\request::STAGE_APPROVAL);
         $this->assertArrayHasKey('positionid', $errors);
-        $this->assertContains(get_string('errorunknownpositionid', 'auth_approved', (object)$data), $errors['positionid']);
+        $this->assertStringContainsString(get_string('errorunknownpositionid', 'auth_approved', (object)$data), $errors['positionid']);
 
         $errors = \auth_approved\request::validate_signup_form_data($data, \auth_approved\request::STAGE_SIGNUP);
         $this->assertEmpty($errors);
@@ -1053,15 +1053,15 @@ class auth_approved_request_testcase extends advanced_testcase {
 
         $errors = \auth_approved\request::validate_signup_form_data($data, \auth_approved\request::STAGE_APPROVAL);
         $this->assertArrayHasKey('positionid', $errors);
-        $this->assertContains(get_string('errormissingpos', 'auth_approved'), $errors['positionid']);
+        $this->assertStringContainsString(get_string('errormissingpos', 'auth_approved'), $errors['positionid']);
         $this->assertArrayHasKey('positionselector', $errors);
-        $this->assertContains(get_string('errormissingpos', 'auth_approved'), $errors['positionselector']);
+        $this->assertStringContainsString(get_string('errormissingpos', 'auth_approved'), $errors['positionselector']);
 
         $errors = \auth_approved\request::validate_signup_form_data($data, \auth_approved\request::STAGE_SIGNUP);
         $this->assertArrayHasKey('positionid', $errors);
-        $this->assertContains(get_string('errormissingpos', 'auth_approved'), $errors['positionid']);
+        $this->assertStringContainsString(get_string('errormissingpos', 'auth_approved'), $errors['positionid']);
         $this->assertArrayHasKey('positionfreetext', $errors);
-        $this->assertContains(get_string('errormissingpos', 'auth_approved'), $errors['positionfreetext']);
+        $this->assertStringContainsString(get_string('errormissingpos', 'auth_approved'), $errors['positionfreetext']);
     }
 
     public function test_validate_signup_form_data_manager() {
@@ -1091,11 +1091,11 @@ class auth_approved_request_testcase extends advanced_testcase {
         $data['managerjaid'] = -10;
         $errors = \auth_approved\request::validate_signup_form_data($data, \auth_approved\request::STAGE_APPROVAL);
         $this->assertArrayHasKey('managerjaid', $errors);
-        $this->assertContains(get_string('errorunknownmanagerjaid', 'auth_approved', (object)$data), $errors['managerjaid']);
+        $this->assertStringContainsString(get_string('errorunknownmanagerjaid', 'auth_approved', (object)$data), $errors['managerjaid']);
 
         $errors = \auth_approved\request::validate_signup_form_data($data, \auth_approved\request::STAGE_SIGNUP);
         $this->assertArrayHasKey('managerjaid', $errors);
-        $this->assertContains(get_string('errorunknownmanagerjaid', 'auth_approved', (object)$data), $errors['managerjaid']);
+        $this->assertStringContainsString(get_string('errorunknownmanagerjaid', 'auth_approved', (object)$data), $errors['managerjaid']);
 
         // With an empty position id when required.
         set_config('requiremanager', true, 'auth_approved');
@@ -1104,15 +1104,15 @@ class auth_approved_request_testcase extends advanced_testcase {
 
         $errors = \auth_approved\request::validate_signup_form_data($data, \auth_approved\request::STAGE_APPROVAL);
         $this->assertArrayHasKey('managerjaid', $errors);
-        $this->assertContains(get_string('errormissingmgr', 'auth_approved'), $errors['managerjaid']);
+        $this->assertStringContainsString(get_string('errormissingmgr', 'auth_approved'), $errors['managerjaid']);
         $this->assertArrayHasKey('managerselector', $errors);
-        $this->assertContains(get_string('errormissingmgr', 'auth_approved'), $errors['managerselector']);
+        $this->assertStringContainsString(get_string('errormissingmgr', 'auth_approved'), $errors['managerselector']);
 
         $errors = \auth_approved\request::validate_signup_form_data($data, \auth_approved\request::STAGE_SIGNUP);
         $this->assertArrayHasKey('managerjaid', $errors);
-        $this->assertContains(get_string('errormissingmgr', 'auth_approved'), $errors['managerjaid']);
+        $this->assertStringContainsString(get_string('errormissingmgr', 'auth_approved'), $errors['managerjaid']);
         $this->assertArrayHasKey('managerfreetext', $errors);
-        $this->assertContains(get_string('errormissingmgr', 'auth_approved'), $errors['managerfreetext']);
+        $this->assertStringContainsString(get_string('errormissingmgr', 'auth_approved'), $errors['managerfreetext']);
     }
 
     private function hierarchy_data($type, $no) {

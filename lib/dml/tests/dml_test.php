@@ -4298,7 +4298,7 @@ class core_dml_testcase extends database_driver_testcase {
         $this->assertSame('91.10', next($records)->name);
         // And verify we can operate with them without too much problem with at least 6 decimals scale accuracy.
         $sql = "SELECT AVG(" . $DB->sql_cast_char2real('name') . ") FROM {{$tablename}}";
-        $this->assertEquals(37.44444443333333, (float)$DB->get_field_sql($sql), '', 1.0E-6);
+        $this->assertEqualsWithDelta(37.44444443333333, (float)$DB->get_field_sql($sql), 1.0E-6);
 
         // Casting text field.
         $sql = "SELECT * FROM {{$tablename}} WHERE ".$DB->sql_cast_char2real('nametext', true)." > res";
@@ -4313,7 +4313,7 @@ class core_dml_testcase extends database_driver_testcase {
         $this->assertSame('91.10', next($records)->nametext);
         // And verify we can operate with them without too much problem with at least 6 decimals scale accuracy.
         $sql = "SELECT AVG(" . $DB->sql_cast_char2real('nametext', true) . ") FROM {{$tablename}}";
-        $this->assertEquals(37.44444443333333, (float)$DB->get_field_sql($sql), '', 1.0E-6);
+        $this->assertEqualsWithDelta(37.44444443333333, (float)$DB->get_field_sql($sql), 1.0E-6);
 
         // Check it works with values passed as param.
         $sql = "SELECT name FROM {{$tablename}} WHERE FLOOR(res - " . $DB->sql_cast_char2real(':param') . ") = 0";

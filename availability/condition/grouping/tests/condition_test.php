@@ -133,7 +133,7 @@ class availability_grouping_condition_testcase extends advanced_testcase {
             $cond = new condition($structure);
             $this->fail();
         } catch (coding_exception $e) {
-            $this->assertContains('Missing ->id / ->activity', $e->getMessage());
+            $this->assertStringContainsString('Missing ->id / ->activity', $e->getMessage());
         }
 
         // Invalid id (not int).
@@ -142,7 +142,7 @@ class availability_grouping_condition_testcase extends advanced_testcase {
             $cond = new condition($structure);
             $this->fail();
         } catch (coding_exception $e) {
-            $this->assertContains('Invalid ->id', $e->getMessage());
+            $this->assertStringContainsString('Invalid ->id', $e->getMessage());
         }
 
         // Invalid activity option (not bool).
@@ -152,7 +152,7 @@ class availability_grouping_condition_testcase extends advanced_testcase {
             $cond = new condition($structure);
             $this->fail();
         } catch (coding_exception $e) {
-            $this->assertContains('Invalid ->activity', $e->getMessage());
+            $this->assertStringContainsString('Invalid ->activity', $e->getMessage());
         }
 
         // Invalid activity option (false).
@@ -161,7 +161,7 @@ class availability_grouping_condition_testcase extends advanced_testcase {
             $cond = new condition($structure);
             $this->fail();
         } catch (coding_exception $e) {
-            $this->assertContains('Invalid ->activity', $e->getMessage());
+            $this->assertStringContainsString('Invalid ->activity', $e->getMessage());
         }
 
         // Valid with id.

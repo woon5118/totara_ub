@@ -91,7 +91,7 @@ class totara_job_webapi_resolver_query_assignments_testcase extends advanced_tes
             $this->resolve_graphql_query('totara_job_assignments', []);
             self::fail('Expected a moodle_exception: no user argument provided');
         } catch (\moodle_exception $ex) {
-            self::assertContains('A required parameter (userid) was missing', $ex->getMessage());
+            self::assertStringContainsString('A required parameter (userid) was missing', $ex->getMessage());
         }
 
         // Test invalid user id.
@@ -99,13 +99,13 @@ class totara_job_webapi_resolver_query_assignments_testcase extends advanced_tes
             $this->resolve_graphql_query('totara_job_assignments', ['userid' => 0]);
             self::fail('Expected a moodle_exception: cannot view job assignments');
         } catch (\dml_exception $ex) {
-            self::assertContains('Can not find data record in database.', $ex->getMessage());
+            self::assertStringContainsString('Can not find data record in database.', $ex->getMessage());
         }
         try {
             $this->resolve_graphql_query('totara_job_assignments', ['userid' => '-2']);
             self::fail('Expected a moodle_exception: cannot view job assignments');
         } catch (\dml_exception $ex) {
-            self::assertContains('Can not find data record in database.', $ex->getMessage());
+            self::assertStringContainsString('Can not find data record in database.', $ex->getMessage());
         }
 
         // Test job assignment belonging to deleted user.
@@ -114,7 +114,7 @@ class totara_job_webapi_resolver_query_assignments_testcase extends advanced_tes
             $this->resolve_graphql_query('totara_job_assignments', ['userid' => $job1->userid]);
             self::fail('Expected a moodle_exception: cannot view job assignments');
         } catch (\dml_exception $ex) {
-            self::assertContains('Can not find data record in database.', $ex->getMessage());
+            self::assertStringContainsString('Can not find data record in database.', $ex->getMessage());
         }
     }
 

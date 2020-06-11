@@ -1096,7 +1096,7 @@ class tool_sitepolicy_policyversion_test extends \advanced_testcase {
             $this->fail('It should not be possible to publish a draft version that is not complete.');
         } catch (\Exception $e) {
             self::assertInstanceOf(\coding_exception::class, $e);
-            self::assertContains('Cannot publish incomplete version', $e->getMessage());
+            self::assertStringContainsString('Cannot publish incomplete version', $e->getMessage());
         }
 
         // Add the forth option to Dutch.

@@ -358,10 +358,10 @@ class core_outputcomponents_testcase extends advanced_testcase {
         $p->strings_for_js(['info', 'error', 'confirm'], 'moodle');
         $end = $p->get_end_code(false);
 
-        $this->assertContains('"info":"Information"', $end);
-        $this->assertContains('"error":"Error"', $end);
-        $this->assertContains('"confirm":"Confirm"', $end);
-        $this->assertContains('M.util.add_strings', $end);
-        $this->assertNotContains("M.str", $end);
+        $this->assertStringContainsString('"info":"Information"', $end);
+        $this->assertStringContainsString('"error":"Error"', $end);
+        $this->assertStringContainsString('"confirm":"Confirm"', $end);
+        $this->assertStringContainsString('M.util.add_strings', $end);
+        $this->assertStringNotContainsString("M.str", $end);
     }
 }

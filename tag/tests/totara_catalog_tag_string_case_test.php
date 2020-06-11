@@ -70,13 +70,13 @@ class core_tag_totara_catalog_tag_string_case_testcase extends advanced_testcase
         $catalog = param_processor::get_template();
         $renderer = $OUTPUT->render($catalog);
 
-        static::assertContains(
+        static::assertStringContainsString(
             "Hello World",
             $renderer,
             "The tag name must be rendedered with the same character case as the value inserted"
         );
 
-        static::assertNotContains("hello world", $renderer);
+        static::assertStringNotContainsString("hello world", $renderer);
     }
 
     /**
@@ -122,12 +122,12 @@ class core_tag_totara_catalog_tag_string_case_testcase extends advanced_testcase
         $catalog = param_processor::get_template();
         $rendered = $OUTPUT->render($catalog);
 
-        static::assertContains(
+        static::assertStringContainsString(
             'Hello World',
             $rendered,
             "The tag name must be rendedered with the same character case as the value inserted"
         );
 
-        static::assertNotContains('hello world', $rendered);
+        static::assertStringNotContainsString('hello world', $rendered);
     }
 }

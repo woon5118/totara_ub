@@ -719,10 +719,10 @@ class totara_plan_components_testcase extends advanced_testcase {
         $messages = $this->messagesink->get_messages();
         $this->assertCount(3, $messages);
         foreach ($messages as $message) {
-            $this->assertContains(fullname($learner1), $message->subject);
-            $this->assertContains('Programs in learning plan "'.$plan->name .'" updated:', $message->fullmessage);
-            $this->assertContains('Some custom update info', $message->fullmessage);
-            $this->assertContains($component_program->get_url()->out(true), $message->fullmessagehtml);
+            $this->assertStringContainsString(fullname($learner1), $message->subject);
+            $this->assertStringContainsString('Programs in learning plan "'.$plan->name .'" updated:', $message->fullmessage);
+            $this->assertStringContainsString('Some custom update info', $message->fullmessage);
+            $this->assertStringContainsString($component_program->get_url()->out(true), $message->fullmessagehtml);
             $this->assertContains($message->useridto, array($manager1->id, $manager2->id, $manager3->id));
             $this->assertNotEquals($learner1->id, $message->useridto);
             $this->assertNotEquals($learner2->id, $message->useridto);
@@ -738,10 +738,10 @@ class totara_plan_components_testcase extends advanced_testcase {
         $this->assertCount(1, $messages);
 
         $message = array_shift($messages);
-        $this->assertContains('Programs updated', $message->subject);
-        $this->assertContains('Programs in learning plan "'.$plan->name .'" updated:', $message->fullmessage);
-        $this->assertContains('Some other update info', $message->fullmessage);
-        $this->assertContains($component_program->get_url()->out(true), $message->fullmessagehtml);
+        $this->assertStringContainsString('Programs updated', $message->subject);
+        $this->assertStringContainsString('Programs in learning plan "'.$plan->name .'" updated:', $message->fullmessage);
+        $this->assertStringContainsString('Some other update info', $message->fullmessage);
+        $this->assertStringContainsString($component_program->get_url()->out(true), $message->fullmessagehtml);
         $this->assertNotContains($message->useridto, array($manager1->id, $manager2->id, $manager3->id));
         $this->assertEquals($learner1->id, $message->useridto);
         $this->assertNotEquals($learner2->id, $message->useridto);
@@ -798,10 +798,10 @@ class totara_plan_components_testcase extends advanced_testcase {
         $messages = $this->messagesink->get_messages();
         $this->assertCount(3, $messages);
         foreach ($messages as $message) {
-            $this->assertContains(fullname($learner1), $message->subject);
-            $this->assertContains('Programs in learning plan "'.$plan->name .'" approved:', $message->fullmessage);
-            $this->assertContains('The reason given for this decision was: The approval reason', $message->fullmessage);
-            $this->assertContains($component_program->get_url()->out(true), $message->fullmessagehtml);
+            $this->assertStringContainsString(fullname($learner1), $message->subject);
+            $this->assertStringContainsString('Programs in learning plan "'.$plan->name .'" approved:', $message->fullmessage);
+            $this->assertStringContainsString('The reason given for this decision was: The approval reason', $message->fullmessage);
+            $this->assertStringContainsString($component_program->get_url()->out(true), $message->fullmessagehtml);
             $this->assertContains($message->useridto, array($manager1->id, $manager2->id, $manager3->id));
             $this->assertNotEquals($learner1->id, $message->useridto);
             $this->assertNotEquals($learner2->id, $message->useridto);
@@ -820,10 +820,10 @@ class totara_plan_components_testcase extends advanced_testcase {
         $this->assertCount(1, $messages);
 
         $message = array_shift($messages);
-        $this->assertContains($program1->fullname . ' declined', $message->subject);
-        $this->assertContains('Programs in learning plan "'.$plan->name .'" declined:', $message->fullmessage);
-        $this->assertContains('The reason given for this decision was: The disapproval reason', $message->fullmessage);
-        $this->assertContains($component_program->get_url()->out(true), $message->fullmessagehtml);
+        $this->assertStringContainsString($program1->fullname . ' declined', $message->subject);
+        $this->assertStringContainsString('Programs in learning plan "'.$plan->name .'" declined:', $message->fullmessage);
+        $this->assertStringContainsString('The reason given for this decision was: The disapproval reason', $message->fullmessage);
+        $this->assertStringContainsString($component_program->get_url()->out(true), $message->fullmessagehtml);
         $this->assertNotContains($message->useridto, array($manager1->id, $manager2->id, $manager3->id));
         $this->assertEquals($learner1->id, $message->useridto);
         $this->assertNotEquals($learner2->id, $message->useridto);
@@ -876,10 +876,10 @@ class totara_plan_components_testcase extends advanced_testcase {
         $messages = $this->messagesink->get_messages();
         $this->assertCount(3, $messages);
         foreach ($messages as $message) {
-            $this->assertContains(fullname($learner1), $message->subject);
-            $this->assertContains('Programs in learning plan "'.$plan->name .'" completed:', $message->fullmessage);
-            $this->assertContains('Some completion text', $message->fullmessage);
-            $this->assertContains($component_program->get_url()->out(true), $message->fullmessagehtml);
+            $this->assertStringContainsString(fullname($learner1), $message->subject);
+            $this->assertStringContainsString('Programs in learning plan "'.$plan->name .'" completed:', $message->fullmessage);
+            $this->assertStringContainsString('Some completion text', $message->fullmessage);
+            $this->assertStringContainsString($component_program->get_url()->out(true), $message->fullmessagehtml);
             $this->assertContains($message->useridto, array($manager1->id, $manager2->id, $manager3->id));
             $this->assertNotEquals($learner1->id, $message->useridto);
             $this->assertNotEquals($learner2->id, $message->useridto);
@@ -895,10 +895,10 @@ class totara_plan_components_testcase extends advanced_testcase {
         $this->assertCount(1, $messages);
 
         $message = array_shift($messages);
-        $this->assertContains($program1->fullname . ' completed', $message->subject);
-        $this->assertContains('Programs in learning plan "'.$plan->name .'" completed:', $message->fullmessage);
-        $this->assertContains('Some completion text', $message->fullmessage);
-        $this->assertContains($component_program->get_url()->out(true), $message->fullmessagehtml);
+        $this->assertStringContainsString($program1->fullname . ' completed', $message->subject);
+        $this->assertStringContainsString('Programs in learning plan "'.$plan->name .'" completed:', $message->fullmessage);
+        $this->assertStringContainsString('Some completion text', $message->fullmessage);
+        $this->assertStringContainsString($component_program->get_url()->out(true), $message->fullmessagehtml);
         $this->assertNotContains($message->useridto, array($manager1->id, $manager2->id, $manager3->id));
         $this->assertEquals($learner1->id, $message->useridto);
         $this->assertNotEquals($learner2->id, $message->useridto);

@@ -88,7 +88,7 @@ class availability_audience_condition_testcase extends advanced_testcase {
             $cond = new condition($structure);
             $this->fail();
         } catch (coding_exception $e) {
-            $this->assertContains('Missing or invalid ->cohort', $e->getMessage());
+            $this->assertStringContainsString('Missing or invalid ->cohort', $e->getMessage());
         }
 
         // Invalid id (not int).
@@ -98,7 +98,7 @@ class availability_audience_condition_testcase extends advanced_testcase {
             $condition = new condition($structure);
             $this->fail();
         } catch (coding_exception $e) {
-            $this->assertContains('Missing or invalid ->cohort', $e->getMessage());
+            $this->assertStringContainsString('Missing or invalid ->cohort', $e->getMessage());
         }
 
         // Valid structure.

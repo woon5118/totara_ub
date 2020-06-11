@@ -96,7 +96,7 @@ class availability_hierarchy_organisation_condition_testcase extends advanced_te
             $cond = new condition($structure);
             $this->fail();
         } catch (coding_exception $e) {
-            $this->assertContains('Missing or invalid ->org', $e->getMessage());
+            $this->assertStringContainsString('Missing or invalid ->org', $e->getMessage());
         }
 
         // Invalid id (not int).
@@ -106,7 +106,7 @@ class availability_hierarchy_organisation_condition_testcase extends advanced_te
             $condition = new condition($structure);
             $this->fail();
         } catch (coding_exception $e) {
-            $this->assertContains('Missing or invalid ->org', $e->getMessage());
+            $this->assertStringContainsString('Missing or invalid ->org', $e->getMessage());
         }
 
         // Valid structure.

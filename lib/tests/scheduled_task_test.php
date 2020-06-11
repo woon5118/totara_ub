@@ -141,7 +141,7 @@ class core_scheduled_task_testcase extends advanced_testcase {
         // Should be today or tomorrow 11:15 AM.
         $userdate = userdate($nexttime, '', 'Asia/Kathmandu');
 
-        $this->assertContains('11:15 AM', core_text::strtoupper($userdate));
+        $this->assertStringContainsString('11:15 AM', core_text::strtoupper($userdate));
     }
 
     public function test_reset_scheduled_tasks_for_component() {

@@ -85,7 +85,7 @@ class totara_core_course_image_upgrade_testcase extends advanced_testcase {
         // Start checking the course is still able to find its own image.
         foreach ($courses as $course) {
             $url = course_get_image($course);
-            $this->assertContains(
+            $this->assertStringContainsString(
                 $course->cacherev,
                 $url->out(),
                 "The course's image for course id '{$course->id}' is invalid after upgrade, " .

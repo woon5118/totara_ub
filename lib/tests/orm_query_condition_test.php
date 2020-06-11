@@ -109,7 +109,7 @@ class core_orm_query_condition_testcase extends advanced_testcase {
             ->set_value('value');
 
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessageRegExp('/Condition must be one of the following/');
+        $this->expectExceptionMessage('Condition must be one of the following');
 
         $condition->where_sql();
     }
@@ -124,7 +124,7 @@ class core_orm_query_condition_testcase extends advanced_testcase {
             ->set_value($object);
 
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessageRegExp('/The combination of operator and value is not supported./');
+        $this->expectExceptionMessage('The combination of operator and value is not supported.');
 
         $condition->where_sql();
     }
@@ -504,7 +504,7 @@ class core_orm_query_condition_testcase extends advanced_testcase {
 
         $this->expectException(coding_exception::class);
         $msg = 'Comparing strings supported only with =, != (<>), <, >, <=, >= or (!)(i)like(_[raw|[starts|ends]_with]).';
-        $this->expectExceptionMessageRegExp('/'.preg_quote($msg, '/').'/');
+        $this->expectExceptionMessage($msg);
 
         $condition->where_sql();
     }

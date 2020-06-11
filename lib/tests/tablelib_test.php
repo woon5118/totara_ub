@@ -198,7 +198,7 @@ class core_tablelib_testcase extends basic_testcase {
         );
         $output = ob_get_contents();
         ob_end_clean();
-        $this->assertNotContains(get_string('hide'), $output);
+        $this->assertStringNotContainsString(get_string('hide'), $output);
     }
 
     public function test_has_sort() {
@@ -243,7 +243,7 @@ class core_tablelib_testcase extends basic_testcase {
         );
         $output = ob_get_contents();
         ob_end_clean();
-        $this->assertNotContains(get_string('sortby'), $output);
+        $this->assertStringNotContainsString(get_string('sortby'), $output);
     }
 
     public function test_has_not_next_pagination() {
@@ -268,7 +268,7 @@ class core_tablelib_testcase extends basic_testcase {
 
         $output = ob_get_contents();
         ob_end_clean();
-        $this->assertNotContains(get_string('next'), $output);
+        $this->assertStringNotContainsString(get_string('next'), $output);
     }
 
     public function test_1_col() {

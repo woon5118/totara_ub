@@ -71,12 +71,12 @@ class mod_facetoface_allocation_testcase extends advanced_testcase {
         $message = $messages[0];
         $this->assertSame($user2->email, $message->to);
         $this->assertStringStartsWith('Seminar booking confirmation: Test seminar', $message->subject);
-        $this->assertContains('BEGIN:VCALENDAR', $message->body);
+        $this->assertStringContainsString('BEGIN:VCALENDAR', $message->body);
 
         // The manager.
         $message = $messages[1];
         $this->assertSame($user1->email, $message->to);
         $this->assertStringStartsWith('Seminar booking confirmation: Test seminar', $message->subject);
-        $this->assertNotContains('BEGIN:VCALENDAR', $message->body);
+        $this->assertStringNotContainsString('BEGIN:VCALENDAR', $message->body);
     }
 }

@@ -2389,7 +2389,7 @@ class core_course_courselib_testcase extends advanced_testcase {
             $this->fail("Event validation should not allow \\core\\event\\course_module_created to be triggered without
                     other['instanceid']");
         } catch (coding_exception $e) {
-            $this->assertContains("The 'instanceid' value must be set in other.", $e->getMessage());
+            $this->assertStringContainsString("The 'instanceid' value must be set in other.", $e->getMessage());
         }
 
         // Test not setting modulename.
@@ -2406,7 +2406,7 @@ class core_course_courselib_testcase extends advanced_testcase {
             $this->fail("Event validation should not allow \\core\\event\\course_module_created to be triggered without
                     other['modulename']");
         } catch (coding_exception $e) {
-            $this->assertContains("The 'modulename' value must be set in other.", $e->getMessage());
+            $this->assertStringContainsString("The 'modulename' value must be set in other.", $e->getMessage());
         }
 
         // Test not setting name.
@@ -2424,7 +2424,7 @@ class core_course_courselib_testcase extends advanced_testcase {
             $this->fail("Event validation should not allow \\core\\event\\course_module_created to be triggered without
                     other['name']");
         } catch (coding_exception $e) {
-            $this->assertContains("The 'name' value must be set in other.", $e->getMessage());
+            $this->assertStringContainsString("The 'name' value must be set in other.", $e->getMessage());
         }
 
     }
@@ -2541,7 +2541,7 @@ class core_course_courselib_testcase extends advanced_testcase {
             $this->fail("Event validation should not allow \\core\\event\\course_module_updated to be triggered without
                     other['instanceid']");
         } catch (coding_exception $e) {
-            $this->assertContains("The 'instanceid' value must be set in other.", $e->getMessage());
+            $this->assertStringContainsString("The 'instanceid' value must be set in other.", $e->getMessage());
         }
 
         // Test not setting modulename.
@@ -2558,7 +2558,7 @@ class core_course_courselib_testcase extends advanced_testcase {
             $this->fail("Event validation should not allow \\core\\event\\course_module_updated to be triggered without
                     other['modulename']");
         } catch (coding_exception $e) {
-            $this->assertContains("The 'modulename' value must be set in other.", $e->getMessage());
+            $this->assertStringContainsString("The 'modulename' value must be set in other.", $e->getMessage());
         }
 
         // Test not setting name.
@@ -2576,7 +2576,7 @@ class core_course_courselib_testcase extends advanced_testcase {
             $this->fail("Event validation should not allow \\core\\event\\course_module_updated to be triggered without
                     other['name']");
         } catch (coding_exception $e) {
-            $this->assertContains("The 'name' value must be set in other.", $e->getMessage());
+            $this->assertStringContainsString("The 'name' value must be set in other.", $e->getMessage());
         }
 
     }
@@ -2644,7 +2644,7 @@ class core_course_courselib_testcase extends advanced_testcase {
             $this->fail("Event validation should not allow \\core\\event\\course_module_deleted to be triggered without
                     other['instanceid']");
         } catch (coding_exception $e) {
-            $this->assertContains("The 'instanceid' value must be set in other.", $e->getMessage());
+            $this->assertStringContainsString("The 'instanceid' value must be set in other.", $e->getMessage());
         }
 
         // Test not setting modulename.
@@ -2661,7 +2661,7 @@ class core_course_courselib_testcase extends advanced_testcase {
             $this->fail("Event validation should not allow \\core\\event\\course_module_deleted to be triggered without
                     other['modulename']");
         } catch (coding_exception $e) {
-            $this->assertContains("The 'modulename' value must be set in other.", $e->getMessage());
+            $this->assertStringContainsString("The 'modulename' value must be set in other.", $e->getMessage());
         }
     }
 

@@ -46,9 +46,9 @@ class totara_catalog_datasearch_datasearch_testcase extends advanced_testcase {
 
         $this->assertEmpty($join);
 
-        $this->assertContains('testsourcefield1', $where);
-        $this->assertContains('testsourcefield2', $where);
-        $this->assertContains('AND', $where);
+        $this->assertStringContainsString('testsourcefield1', $where);
+        $this->assertStringContainsString('testsourcefield2', $where);
+        $this->assertStringContainsString('AND', $where);
 
         $this->assertCount(2, $params);
         foreach ($params as $key => $value) {
@@ -72,9 +72,9 @@ class totara_catalog_datasearch_datasearch_testcase extends advanced_testcase {
 
         list($join, $where, $params) = $df->get_filter_joins();
 
-        $this->assertContains('WHERE testsourcefield1', $join);
-        $this->assertContains('WHERE testsourcefield2', $join);
-        $this->assertContains('UNION', $join);
+        $this->assertStringContainsString('WHERE testsourcefield1', $join);
+        $this->assertStringContainsString('WHERE testsourcefield2', $join);
+        $this->assertStringContainsString('UNION', $join);
         $this->assertEquals(1, substr_count($join, 'JOIN'));
 
         $this->assertEmpty($where);
@@ -119,15 +119,15 @@ class totara_catalog_datasearch_datasearch_testcase extends advanced_testcase {
 
         list($join, $where, $params) = $df->get_filter_joins();
 
-        $this->assertContains('testsourcetable1', $join);
-        $this->assertContains('testsourcealias1', $join);
-        $this->assertContains('testsourcetable2', $join);
-        $this->assertContains('testsourcealias2', $join);
+        $this->assertStringContainsString('testsourcetable1', $join);
+        $this->assertStringContainsString('testsourcealias1', $join);
+        $this->assertStringContainsString('testsourcetable2', $join);
+        $this->assertStringContainsString('testsourcealias2', $join);
         $this->assertEquals(2, substr_count($join, 'JOIN')); // This is the key!
 
-        $this->assertContains('testsourcefield1', $where);
-        $this->assertContains('testsourcefield2', $where);
-        $this->assertContains('AND', $where);
+        $this->assertStringContainsString('testsourcefield1', $where);
+        $this->assertStringContainsString('testsourcefield2', $where);
+        $this->assertStringContainsString('AND', $where);
 
         $this->assertCount(2, $params);
         foreach ($params as $key => $value) {
@@ -169,13 +169,13 @@ class totara_catalog_datasearch_datasearch_testcase extends advanced_testcase {
 
         list($join, $where, $params) = $df->get_filter_joins();
 
-        $this->assertContains('testsourcetable', $join);
-        $this->assertContains('testsourcealias', $join);
+        $this->assertStringContainsString('testsourcetable', $join);
+        $this->assertStringContainsString('testsourcealias', $join);
         $this->assertEquals(1, substr_count($join, 'JOIN')); // This is the key!
 
-        $this->assertContains('testsourcefield1', $where);
-        $this->assertContains('testsourcefield2', $where);
-        $this->assertContains('AND', $where);
+        $this->assertStringContainsString('testsourcefield1', $where);
+        $this->assertStringContainsString('testsourcefield2', $where);
+        $this->assertStringContainsString('AND', $where);
 
         $this->assertCount(2, $params);
         foreach ($params as $key => $value) {
@@ -195,8 +195,8 @@ class totara_catalog_datasearch_datasearch_testcase extends advanced_testcase {
 
         $this->assertEmpty($join);
 
-        $this->assertContains('testsourcefield', $where);
-        $this->assertNotContains('AND', $where); // This is the key!
+        $this->assertStringContainsString('testsourcefield', $where);
+        $this->assertStringNotContainsString('AND', $where); // This is the key!
 
         $this->assertCount(1, $params);
         foreach ($params as $key => $value) {
@@ -226,7 +226,7 @@ class totara_catalog_datasearch_datasearch_testcase extends advanced_testcase {
 
         $this->assertEmpty($join);
 
-        $this->assertContains('testsourcefield', $where);
+        $this->assertStringContainsString('testsourcefield', $where);
         $this->assertEquals(2, substr_count($where, 'AND')); // This is the key!
 
         $this->assertCount(3, $params);
@@ -251,11 +251,11 @@ class totara_catalog_datasearch_datasearch_testcase extends advanced_testcase {
         list($selectsql, $countsql, $params) = $df->get_sql();
 
         // Make sure there is only stuff we are expecting.
-        $this->assertContains("SELECT DISTINCT testoutputcolumns", $selectsql);
-        $this->assertContains("FROM testbasetable", $selectsql);
-        $this->assertNotContains("WHERE", $selectsql);
-        $this->assertNotContains("JOIN", $selectsql);
-        $this->assertNotContains("ORDER BY", $selectsql);
+        $this->assertStringContainsString("SELECT DISTINCT testoutputcolumns", $selectsql);
+        $this->assertStringContainsString("FROM testbasetable", $selectsql);
+        $this->assertStringNotContainsString("WHERE", $selectsql);
+        $this->assertStringNotContainsString("JOIN", $selectsql);
+        $this->assertStringNotContainsString("ORDER BY", $selectsql);
 
         // Confirm that count and normal select are the same base query.
         $expectedcountsql = str_replace("SELECT DISTINCT testoutputcolumns", "SELECT COUNT(1)", $selectsql);
@@ -270,14 +270,14 @@ class totara_catalog_datasearch_datasearch_testcase extends advanced_testcase {
         list($selectsql, $countsql, $params) = $df->get_sql();
 
         // Make sure there is only stuff we are expecting.
-        $this->assertContains("SELECT DISTINCT testoutputcolumns", $selectsql);
-        $this->assertContains("FROM testbasetable", $selectsql);
-        $this->assertContains("ORDER BY testsortby", $selectsql);
-        $this->assertNotContains("WHERE", $selectsql);
-        $this->assertNotContains("JOIN", $selectsql);
+        $this->assertStringContainsString("SELECT DISTINCT testoutputcolumns", $selectsql);
+        $this->assertStringContainsString("FROM testbasetable", $selectsql);
+        $this->assertStringContainsString("ORDER BY testsortby", $selectsql);
+        $this->assertStringNotContainsString("WHERE", $selectsql);
+        $this->assertStringNotContainsString("JOIN", $selectsql);
 
         // Confirm that count doesn't contain an order by.
-        $this->assertNotContains("ORDER BY", $countsql);
+        $this->assertStringNotContainsString("ORDER BY", $countsql);
 
         $this->assertEmpty($params);
     }
@@ -301,16 +301,16 @@ class totara_catalog_datasearch_datasearch_testcase extends advanced_testcase {
         $this->assertNotEmpty($expectedjoin);
         $this->assertEmpty($expectedwhere);
 
-        $this->assertContains("SELECT DISTINCT testoutputcolumns", $selectsql);
-        $this->assertContains("FROM testbasetable", $selectsql);
-        $this->assertContains("JOIN", $selectsql);
+        $this->assertStringContainsString("SELECT DISTINCT testoutputcolumns", $selectsql);
+        $this->assertStringContainsString("FROM testbasetable", $selectsql);
+        $this->assertStringContainsString("JOIN", $selectsql);
         $this->assertEquals(3, substr_count($selectsql, 'SELECT'));
         $this->assertEquals(3, substr_count($selectsql, 'FROM'));
         $this->assertEquals(1, substr_count($selectsql, 'UNION'));
-        $this->assertContains("WHERE testsourcefield1 = ", $selectsql);
-        $this->assertContains("WHERE testsourcefield2 = ", $selectsql);
-        $this->assertContains("testfilter", $selectsql);
-        $this->assertNotContains("ORDER BY", $selectsql);
+        $this->assertStringContainsString("WHERE testsourcefield1 = ", $selectsql);
+        $this->assertStringContainsString("WHERE testsourcefield2 = ", $selectsql);
+        $this->assertStringContainsString("testfilter", $selectsql);
+        $this->assertStringNotContainsString("ORDER BY", $selectsql);
 
         // Confirm that count and normal select are the same base query.
         $expectedcountsql = str_replace("SELECT DISTINCT testoutputcolumns", "SELECT COUNT(1)", $selectsql);
@@ -338,14 +338,14 @@ class totara_catalog_datasearch_datasearch_testcase extends advanced_testcase {
         $this->assertEmpty($expectedjoin);
         $this->assertNotEmpty($expectedwhere);
 
-        $this->assertContains("SELECT DISTINCT testoutputcolumns", $selectsql);
-        $this->assertContains("FROM testbasetable", $selectsql);
-        $this->assertContains("WHERE", $selectsql);
-        $this->assertContains("testsourcefield1 = ", $selectsql);
-        $this->assertContains("AND", $selectsql);
-        $this->assertContains("testsourcefield2 = ", $selectsql);
-        $this->assertNotContains("JOIN", $selectsql);
-        $this->assertNotContains("ORDER BY", $selectsql);
+        $this->assertStringContainsString("SELECT DISTINCT testoutputcolumns", $selectsql);
+        $this->assertStringContainsString("FROM testbasetable", $selectsql);
+        $this->assertStringContainsString("WHERE", $selectsql);
+        $this->assertStringContainsString("testsourcefield1 = ", $selectsql);
+        $this->assertStringContainsString("AND", $selectsql);
+        $this->assertStringContainsString("testsourcefield2 = ", $selectsql);
+        $this->assertStringNotContainsString("JOIN", $selectsql);
+        $this->assertStringNotContainsString("ORDER BY", $selectsql);
 
         // Confirm that count and normal select are the same base query.
         $expectedcountsql = str_replace("SELECT DISTINCT testoutputcolumns", "SELECT COUNT(1)", $selectsql);

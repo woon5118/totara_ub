@@ -789,8 +789,8 @@ abstract class qbehaviour_walkthrough_test_base extends question_testcase {
                 // so explicity check not null in this case.
                 $this->assertNotNull($this->quba->get_question_mark($this->slot));
             }
-            $this->assertEquals($mark, $this->quba->get_question_mark($this->slot),
-                'Expected mark and actual mark differ.', 0.000001);
+            $this->assertEqualsWithDelta($mark, $this->quba->get_question_mark($this->slot),
+                0.000001, 'Expected mark and actual mark differ.');
         }
     }
 
@@ -865,13 +865,13 @@ abstract class qbehaviour_walkthrough_test_base extends question_testcase {
 
     protected function check_output_contains($string) {
         $this->render();
-        $this->assertContains($string, $this->currentoutput,
+        $this->assertStringContainsString($string, $this->currentoutput,
                 'Expected string ' . $string . ' not found in ' . $this->currentoutput);
     }
 
     protected function check_output_does_not_contain($string) {
         $this->render();
-        $this->assertNotContains($string, $this->currentoutput,
+        $this->assertStringNotContainsString($string, $this->currentoutput,
                 'String ' . $string . ' unexpectedly found in ' . $this->currentoutput);
     }
 

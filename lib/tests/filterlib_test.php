@@ -114,10 +114,8 @@ class core_filterlib_testcase extends advanced_testcase {
         $this->assert_only_one_filter_globally('name', TEXTFILTER_DISABLED);
     }
 
-    /**
-     * @expectedException coding_exception
-     */
     public function test_global_config_exception_on_invalid_state() {
+        $this->expectException(coding_exception::class);
         filter_set_global_state('name', 0);
     }
 
@@ -248,19 +246,15 @@ class core_filterlib_testcase extends advanced_testcase {
         $this->assert_no_local_setting();
     }
 
-    /**
-     * @expectedException coding_exception
-     */
     public function test_local_invalid_state_throws_exception() {
         // Exercise SUT.
+        $this->expectException(coding_exception::class);
         filter_set_local_state('name', 123, -9999);
     }
 
-    /**
-     * @expectedException coding_exception
-     */
     public function test_throws_exception_when_setting_global() {
         // Exercise SUT.
+        $this->expectException(coding_exception::class);
         filter_set_local_state('name', context_system::instance()->id, TEXTFILTER_INHERIT);
     }
 
@@ -475,12 +469,10 @@ class core_filterlib_testcase extends advanced_testcase {
         $this->assertEquals(array(), $filters);
     }
 
-    /**
-     * @expectedException coding_exception
-     */
     public function test_available_in_context_exception_with_syscontext() {
         $this->setup_available_in_context_tests();
         // Exercise SUT.
+        $this->expectException(coding_exception::class);
         filter_get_available_in_context($this->syscontext);
     }
 

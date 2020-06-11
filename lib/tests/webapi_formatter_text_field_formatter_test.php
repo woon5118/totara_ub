@@ -201,7 +201,7 @@ class core_webapi_formatter_text_field_formatter_testcase extends advanced_testc
         $value = '<span class="myhtml">test</span>';
 
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessageRegExp('/You must provide the pluginfile url options via set_pluginfile_url_options()/');
+        $this->expectExceptionMessage('You must provide the pluginfile url options via set_pluginfile_url_options()');
 
         $formatter->format($value);
     }
@@ -219,7 +219,7 @@ class core_webapi_formatter_text_field_formatter_testcase extends advanced_testc
         $formatter->enable_pluginfile_url_rewrite();
 
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessageRegExp('/You must provide the pluginfile url options via set_pluginfile_url_options()/');
+        $this->expectExceptionMessage('You must provide the pluginfile url options via set_pluginfile_url_options()');
 
         $formatter->format($value);
     }
@@ -232,7 +232,7 @@ class core_webapi_formatter_text_field_formatter_testcase extends advanced_testc
         $value = '<span class="myhtml">test</span>';
 
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessageRegExp('/Invalid format given/');
+        $this->expectExceptionMessage('Invalid format given');
 
         $formatter->format($value);
     }

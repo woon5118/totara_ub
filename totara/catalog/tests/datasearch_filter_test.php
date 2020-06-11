@@ -118,17 +118,17 @@ class totara_catalog_datasearch_filter_testcase extends advanced_testcase {
 
         list($join, $where, $params) = $filter->make_sql();
 
-        $this->assertContains('testjoinfield1 AS testfield1', $join); // Joinons.
-        $this->assertContains('testjoinfield2 AS testfield2', $join); // Joinons.
-        $this->assertContains('testadditionalselectfield1 AS testadditionalselectbase1', $join); // Additional select.
-        $this->assertContains('testadditionalselectfield2 AS testadditionalselectbase2', $join); // Additional select.
-        $this->assertContains('testsourcetable1 testsourcealias1', $join); // Table, alias.
-        $this->assertContains('testsourcefield1 = :', $join); // Filterfield.
-        $this->assertContains('AND testadditionalcriteria1', $join); // Additionalcriteria.
-        $this->assertContains('testjoinfield3 AS testfield1', $join);
-        $this->assertContains('testjoinfield4 AS testfield2', $join);
-        $this->assertContains('testsourcetable3 testsourcealias3', $join);
-        $this->assertContains('testsourcefield3 = :', $join);
+        $this->assertStringContainsString('testjoinfield1 AS testfield1', $join); // Joinons.
+        $this->assertStringContainsString('testjoinfield2 AS testfield2', $join); // Joinons.
+        $this->assertStringContainsString('testadditionalselectfield1 AS testadditionalselectbase1', $join); // Additional select.
+        $this->assertStringContainsString('testadditionalselectfield2 AS testadditionalselectbase2', $join); // Additional select.
+        $this->assertStringContainsString('testsourcetable1 testsourcealias1', $join); // Table, alias.
+        $this->assertStringContainsString('testsourcefield1 = :', $join); // Filterfield.
+        $this->assertStringContainsString('AND testadditionalcriteria1', $join); // Additionalcriteria.
+        $this->assertStringContainsString('testjoinfield3 AS testfield1', $join);
+        $this->assertStringContainsString('testjoinfield4 AS testfield2', $join);
+        $this->assertStringContainsString('testsourcetable3 testsourcealias3', $join);
+        $this->assertStringContainsString('testsourcefield3 = :', $join);
 
         $this->assertEmpty($where);
 
@@ -336,7 +336,7 @@ class totara_catalog_datasearch_filter_testcase extends advanced_testcase {
         list($join, $where, $params) = $filter->make_sql();
 
         $this->assertEmpty($join);
-        $this->assertContains('testsourcefield = :', $where);
+        $this->assertStringContainsString('testsourcefield = :', $where);
         $this->assertCount(1, $params);
         foreach ($params as $param => $value) {
             $this->assertEquals('testdata', $value);
@@ -362,8 +362,8 @@ class totara_catalog_datasearch_filter_testcase extends advanced_testcase {
         list($join, $where, $params) = $filter->make_sql();
 
         $this->assertEmpty($join);
-        $this->assertContains('testsourcefield = :', $where);
-        $this->assertContains('testadditionalcriteria', $where);
+        $this->assertStringContainsString('testsourcefield = :', $where);
+        $this->assertStringContainsString('testadditionalcriteria', $where);
         $this->assertCount(3, $params);
         $this->assertEquals('testadditionaldata1', $params['testadditionalparam1']); // Additionlparams.
         $this->assertEquals('testadditionaldata2', $params['testadditionalparam2']); // Additionlparams.
@@ -395,9 +395,9 @@ class totara_catalog_datasearch_filter_testcase extends advanced_testcase {
 
         list($join, $where, $params) = $filter->make_sql();
 
-        $this->assertContains('TESTJOINTYPE testsourcetable testsourcealias', $join);
-        $this->assertContains('testbasealias.testjoin1 = testjoinsource1', $join);
-        $this->assertContains('testbasealias.testjoin2 = testjoinsource2', $join);
+        $this->assertStringContainsString('TESTJOINTYPE testsourcetable testsourcealias', $join);
+        $this->assertStringContainsString('testbasealias.testjoin1 = testjoinsource1', $join);
+        $this->assertStringContainsString('testbasealias.testjoin2 = testjoinsource2', $join);
         $this->assertEmpty($where);
         $this->assertEmpty($params);
 
@@ -426,10 +426,10 @@ class totara_catalog_datasearch_filter_testcase extends advanced_testcase {
 
         list($join, $where, $params) = $filter->make_sql();
 
-        $this->assertContains('TESTJOINTYPE testsourcetable testsourcealias', $join);
-        $this->assertContains('testbasealias.testjoin1 = testjoinsource1', $join);
-        $this->assertContains('testbasealias.testjoin2 = testjoinsource2', $join);
-        $this->assertContains('testadditionalcriteria', $join);
+        $this->assertStringContainsString('TESTJOINTYPE testsourcetable testsourcealias', $join);
+        $this->assertStringContainsString('testbasealias.testjoin1 = testjoinsource1', $join);
+        $this->assertStringContainsString('testbasealias.testjoin2 = testjoinsource2', $join);
+        $this->assertStringContainsString('testadditionalcriteria', $join);
         $this->assertEmpty($where);
         $this->assertCount(2, $params);
         $this->assertEquals('testadditionaldata1', $params['testadditionalparam1']); // Additionlparams.
@@ -455,10 +455,10 @@ class totara_catalog_datasearch_filter_testcase extends advanced_testcase {
 
         list($join, $where, $params) = $filter->make_sql();
 
-        $this->assertContains('TESTJOINTYPE testsourcetable testsourcealias', $join);
-        $this->assertContains('testbasealias.testjoin1 = testjoinsource1', $join);
-        $this->assertContains('testbasealias.testjoin2 = testjoinsource2', $join);
-        $this->assertContains('testsourcefield = :', $where);
+        $this->assertStringContainsString('TESTJOINTYPE testsourcetable testsourcealias', $join);
+        $this->assertStringContainsString('testbasealias.testjoin1 = testjoinsource1', $join);
+        $this->assertStringContainsString('testbasealias.testjoin2 = testjoinsource2', $join);
+        $this->assertStringContainsString('testsourcefield = :', $where);
         $this->assertCount(1, $params);
         foreach ($params as $param => $value) {
             $this->assertEquals('testdata', $value);
@@ -488,10 +488,10 @@ class totara_catalog_datasearch_filter_testcase extends advanced_testcase {
 
         list($join, $where, $params) = $filter->make_sql();
 
-        $this->assertContains('JOIN testsourcetable testsourcealias', $join);
-        $this->assertContains('testbasealias.testjoin1 = testjoinsource1', $join);
-        $this->assertContains('testbasealias.testjoin2 = testjoinsource2', $join);
-        $this->assertContains('testsourcefield = :', $where);
+        $this->assertStringContainsString('JOIN testsourcetable testsourcealias', $join);
+        $this->assertStringContainsString('testbasealias.testjoin1 = testjoinsource1', $join);
+        $this->assertStringContainsString('testbasealias.testjoin2 = testjoinsource2', $join);
+        $this->assertStringContainsString('testsourcefield = :', $where);
         $this->assertCount(3, $params);
         $this->assertEquals('testadditionaldata1', $params['testadditionalparam1']); // Additionlparams.
         $this->assertEquals('testadditionaldata2', $params['testadditionalparam2']); // Additionlparams.
@@ -524,12 +524,12 @@ class totara_catalog_datasearch_filter_testcase extends advanced_testcase {
         list($join, $where, $params) = $filter->make_sql();
 
         $this->assertEquals(1, substr_count($join, 'JOIN'));
-        $this->assertContains('FROM testsourcetable1 testsourcealias1', $join);
-        $this->assertContains('FROM testsourcetable2 testsourcealias2', $join);
+        $this->assertStringContainsString('FROM testsourcetable1 testsourcealias1', $join);
+        $this->assertStringContainsString('FROM testsourcetable2 testsourcealias2', $join);
         $this->assertEquals(1, substr_count($join, 'UNION'));
         $this->assertEquals(1, substr_count($join, 'WHERE')); // Only added for additional criteria.
-        $this->assertContains('WHERE testadditionalcriteria2', $join);
-        $this->assertContains('testfilter', $join);
+        $this->assertStringContainsString('WHERE testadditionalcriteria2', $join);
+        $this->assertStringContainsString('testfilter', $join);
         $this->assertEmpty($where);
         $this->assertEmpty($params);
 
@@ -554,14 +554,14 @@ class totara_catalog_datasearch_filter_testcase extends advanced_testcase {
         list($join, $where, $params) = $filter->make_sql();
 
         $this->assertEquals(1, substr_count($join, 'JOIN'));
-        $this->assertContains('FROM testsourcetable1 testsourcealias1', $join);
-        $this->assertContains('FROM testsourcetable2 testsourcealias2', $join);
+        $this->assertStringContainsString('FROM testsourcetable1 testsourcealias1', $join);
+        $this->assertStringContainsString('FROM testsourcetable2 testsourcealias2', $join);
         $this->assertEquals(1, substr_count($join, 'UNION'));
         $this->assertEquals(2, substr_count($join, 'WHERE'));
-        $this->assertContains('testsourcefield1 = :', $join);
-        $this->assertContains('testsourcefield2 = :', $join);
-        $this->assertContains('testadditionalcriteria2', $join);
-        $this->assertContains('testfilter', $join);
+        $this->assertStringContainsString('testsourcefield1 = :', $join);
+        $this->assertStringContainsString('testsourcefield2 = :', $join);
+        $this->assertStringContainsString('testadditionalcriteria2', $join);
+        $this->assertStringContainsString('testfilter', $join);
         $this->assertEmpty($where);
         $this->assertCount(2, $params);
         foreach ($params as $param => $value) {
@@ -608,24 +608,24 @@ class totara_catalog_datasearch_filter_testcase extends advanced_testcase {
 
         $this->assertEquals(1, substr_count($join, 'TESTJOINTYPE'));
         $this->assertEquals(1, substr_count($join, 'JOIN')); // 'TESTJOINTYPE'.
-        $this->assertContains('testsourcejoin1 AS testjoin1', $join);
-        $this->assertContains('testsourcejoin2 AS testjoin2', $join);
-        $this->assertContains('testsourcejoin3 AS testjoin1', $join);
-        $this->assertContains('testsourcejoin4 AS testjoin2', $join);
-        $this->assertContains('additionalselectsource1 AS additionalselectalias1', $join);
-        $this->assertContains('additionalselectsource2 AS additionalselectalias2', $join);
-        $this->assertContains('FROM testsourcetable1 testsourcealias1', $join);
-        $this->assertContains('FROM testsourcetable2 testsourcealias2', $join);
+        $this->assertStringContainsString('testsourcejoin1 AS testjoin1', $join);
+        $this->assertStringContainsString('testsourcejoin2 AS testjoin2', $join);
+        $this->assertStringContainsString('testsourcejoin3 AS testjoin1', $join);
+        $this->assertStringContainsString('testsourcejoin4 AS testjoin2', $join);
+        $this->assertStringContainsString('additionalselectsource1 AS additionalselectalias1', $join);
+        $this->assertStringContainsString('additionalselectsource2 AS additionalselectalias2', $join);
+        $this->assertStringContainsString('FROM testsourcetable1 testsourcealias1', $join);
+        $this->assertStringContainsString('FROM testsourcetable2 testsourcealias2', $join);
         $this->assertEquals(1, substr_count($join, 'UNION'));
         $this->assertEquals(2, substr_count($join, 'WHERE'));
-        $this->assertContains('testsourcefield1 = :', $join);
-        $this->assertContains('testsourcefield2 = :', $join);
-        $this->assertContains('testadditionalcriteria2', $join);
-        $this->assertContains('testfilter', $join);
+        $this->assertStringContainsString('testsourcefield1 = :', $join);
+        $this->assertStringContainsString('testsourcefield2 = :', $join);
+        $this->assertStringContainsString('testadditionalcriteria2', $join);
+        $this->assertStringContainsString('testfilter', $join);
         $this->assertEquals(2, substr_count($join, 'ON')); // 'ON' + 'UNION'!
         $this->assertEquals(2, substr_count($join, 'AND')); // 'additionalcriteria' and 'ON'!
-        $this->assertContains('testbasealias.testjoin1 = testfilter.testjoin1', $join);
-        $this->assertContains('testbasealias.testjoin2 = testfilter.testjoin2', $join);
+        $this->assertStringContainsString('testbasealias.testjoin1 = testfilter.testjoin1', $join);
+        $this->assertStringContainsString('testbasealias.testjoin2 = testfilter.testjoin2', $join);
         $this->assertEmpty($where);
         $this->assertCount(4, $params);
         $this->assertEquals('testadditionaldata1', $params['testadditionalparam1']); // Additionlparams.

@@ -57,7 +57,7 @@ abstract class dataformatter_test_base extends advanced_testcase {
                 $df->get_formatted_value($params, $context);
                 $this->fail('coding_exception was not thrown when expected.');
             } catch (coding_exception $e) {
-                $this->assertContains("data formatter expects '{$k}'", $e->getMessage());
+                $this->assertStringContainsString("data formatter expects '{$k}'", $e->getMessage());
             }
         }
     }

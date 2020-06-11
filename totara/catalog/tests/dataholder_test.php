@@ -264,7 +264,7 @@ class totara_catalog_dataholder_testcase extends advanced_testcase {
                 try {
                     $dataholder->get_formatted_value($type, ['text' => 'test_text'], $context);
                 } catch (coding_exception $e) {
-                    $this->assertContains('Invalid formatter type', $e->getMessage());
+                    $this->assertStringContainsString('Invalid formatter type', $e->getMessage());
                 }
             }
         }

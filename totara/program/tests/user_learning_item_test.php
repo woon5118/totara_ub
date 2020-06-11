@@ -648,7 +648,7 @@ class totara_program_user_learning_item_testcase extends advanced_testcase {
         $info = $program_item->export_for_template();
         $this->assertEquals($this->program1->id, $info->id);
         $this->assertEquals($this->program1->fullname, $info->fullname);
-        $this->assertContains('totara/program/required.php', $info->coursesets[0]->courses[0]->url_view);
+        $this->assertStringContainsString('totara/program/required.php', $info->coursesets[0]->courses[0]->url_view);
     }
 
     public function test_export_for_template_with_disabled_audience_visibility() {
@@ -668,7 +668,7 @@ class totara_program_user_learning_item_testcase extends advanced_testcase {
         $info = $program_item->export_for_template();
         $this->assertEquals($this->program1->id, $info->id);
         $this->assertEquals($this->program1->fullname, $info->fullname);
-        $this->assertContains('course/view.php', $info->coursesets[0]->courses[0]->url_view);
+        $this->assertStringContainsString('course/view.php', $info->coursesets[0]->courses[0]->url_view);
     }
 
     function test_process_coursesets_1() {

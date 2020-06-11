@@ -82,7 +82,7 @@ class totara_job_webapi_resolver_query_assignment_testcase extends advanced_test
             $this->resolve_graphql_query('totara_job_assignment', []);
             self::fail('Expected a moodle_exception: A required parameter (assignmentid) was missing');
         } catch (\moodle_exception $ex) {
-            self::assertContains('A required parameter (assignmentid) was missing', $ex->getMessage());
+            self::assertStringContainsString('A required parameter (assignmentid) was missing', $ex->getMessage());
         }
 
         // Test invalid job assignment id.
@@ -90,13 +90,13 @@ class totara_job_webapi_resolver_query_assignment_testcase extends advanced_test
             $this->resolve_graphql_query('totara_job_assignment', ['assignmentid' => 0]);
             self::fail('Expected a moodle_exception: cannot view job assignments');
         } catch (\dml_exception $ex) {
-            self::assertContains('Can not find data record in database.', $ex->getMessage());
+            self::assertStringContainsString('Can not find data record in database.', $ex->getMessage());
         }
         try {
             $this->resolve_graphql_query('totara_job_assignment', ['assignmentid' => - 73]);
             self::fail('Expected a moodle_exception: cannot view job assignments');
         } catch (\dml_exception $ex) {
-            self::assertContains('Can not find data record in database.', $ex->getMessage());
+            self::assertStringContainsString('Can not find data record in database.', $ex->getMessage());
         }
 
         // Test job assignment belonging to deleted user.
@@ -105,7 +105,7 @@ class totara_job_webapi_resolver_query_assignment_testcase extends advanced_test
             $this->resolve_graphql_query('totara_job_assignment', ['assignmentid' => $job->id]);
             self::fail('Expected a moodle_exception: cannot view job assignments');
         } catch (\dml_exception $ex) {
-            self::assertContains('Can not find data record in database.', $ex->getMessage());
+            self::assertStringContainsString('Can not find data record in database.', $ex->getMessage());
         }
     }
 

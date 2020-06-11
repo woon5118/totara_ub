@@ -6,11 +6,9 @@ use FontLib\Font;
 
 class FontTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @expectedException \Fontlib\Exception\FontNotFoundException
-     */
     public function testLoadFileNotFound()
     {
+        $this->expectException(\Fontlib\Exception\FontNotFoundException::class);
         Font::load('non-existing/font.ttf');
     }
 

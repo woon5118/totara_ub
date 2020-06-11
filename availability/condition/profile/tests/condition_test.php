@@ -114,7 +114,7 @@ class availability_profile_condition_testcase extends advanced_testcase {
             $cond = new condition($structure);
             $this->fail();
         } catch (coding_exception $e) {
-            $this->assertContains('Missing or invalid ->op', $e->getMessage());
+            $this->assertStringContainsString('Missing or invalid ->op', $e->getMessage());
         }
 
         // Invalid op.
@@ -123,7 +123,7 @@ class availability_profile_condition_testcase extends advanced_testcase {
             $cond = new condition($structure);
             $this->fail();
         } catch (coding_exception $e) {
-            $this->assertContains('Missing or invalid ->op', $e->getMessage());
+            $this->assertStringContainsString('Missing or invalid ->op', $e->getMessage());
         }
 
         // Missing value.
@@ -132,7 +132,7 @@ class availability_profile_condition_testcase extends advanced_testcase {
             $cond = new condition($structure);
             $this->fail();
         } catch (coding_exception $e) {
-            $this->assertContains('Missing or invalid ->v', $e->getMessage());
+            $this->assertStringContainsString('Missing or invalid ->v', $e->getMessage());
         }
 
         // Invalid value (not string).
@@ -141,7 +141,7 @@ class availability_profile_condition_testcase extends advanced_testcase {
             $cond = new condition($structure);
             $this->fail();
         } catch (coding_exception $e) {
-            $this->assertContains('Missing or invalid ->v', $e->getMessage());
+            $this->assertStringContainsString('Missing or invalid ->v', $e->getMessage());
         }
 
         // Unexpected value.
@@ -150,7 +150,7 @@ class availability_profile_condition_testcase extends advanced_testcase {
             $cond = new condition($structure);
             $this->fail();
         } catch (coding_exception $e) {
-            $this->assertContains('Unexpected ->v', $e->getMessage());
+            $this->assertStringContainsString('Unexpected ->v', $e->getMessage());
         }
 
         // Missing field.
@@ -160,7 +160,7 @@ class availability_profile_condition_testcase extends advanced_testcase {
             $cond = new condition($structure);
             $this->fail();
         } catch (coding_exception $e) {
-            $this->assertContains('Missing ->sf or ->cf', $e->getMessage());
+            $this->assertStringContainsString('Missing ->sf or ->cf', $e->getMessage());
         }
 
         // Invalid field (not string).
@@ -169,7 +169,7 @@ class availability_profile_condition_testcase extends advanced_testcase {
             $cond = new condition($structure);
             $this->fail();
         } catch (coding_exception $e) {
-            $this->assertContains('Invalid ->sf', $e->getMessage());
+            $this->assertStringContainsString('Invalid ->sf', $e->getMessage());
         }
 
         // Both fields.
@@ -179,7 +179,7 @@ class availability_profile_condition_testcase extends advanced_testcase {
             $cond = new condition($structure);
             $this->fail();
         } catch (coding_exception $e) {
-            $this->assertContains('Both ->sf and ->cf', $e->getMessage());
+            $this->assertStringContainsString('Both ->sf and ->cf', $e->getMessage());
         }
 
         // Invalid ->cf field (not string).
@@ -189,7 +189,7 @@ class availability_profile_condition_testcase extends advanced_testcase {
             $cond = new condition($structure);
             $this->fail();
         } catch (coding_exception $e) {
-            $this->assertContains('Invalid ->cf', $e->getMessage());
+            $this->assertStringContainsString('Invalid ->cf', $e->getMessage());
         }
 
         // Valid examples (checks values are correctly included).

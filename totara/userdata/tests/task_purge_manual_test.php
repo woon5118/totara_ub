@@ -59,7 +59,7 @@ class totara_userdata_task_purge_manual_testcase extends advanced_testcase {
         $purge = $DB->get_record('totara_userdata_purge', array('id' => $oldpurge->id), '*', MUST_EXIST);
         $messages = $sink->get_messages();
 
-        $this->assertContains('Purge - Success', $output);
+        $this->assertStringContainsString('Purge - Success', $output);
         $this->assertTimeCurrent($purge->timestarted);
         $this->assertTimeCurrent($purge->timefinished);
         $this->assertEquals(-1, $purge->result);

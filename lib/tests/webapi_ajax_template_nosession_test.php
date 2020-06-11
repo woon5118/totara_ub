@@ -30,7 +30,7 @@ class core_webapi_ajax_template_nosession_testcase extends advanced_testcase {
 
         $result = graphql::execute_operation(execution_context::create('ajax', 'core_template_nosession'), ['name' => 'block', 'component' => 'core', 'theme' => 'base']);
         $result = $result->toArray(true);
-        $this->assertContains('The purpose of this template is to render a block and its contents.', $result['data']['template']);
+        $this->assertStringContainsString('The purpose of this template is to render a block and its contents.', $result['data']['template']);
 
         $result = graphql::execute_operation(execution_context::create('ajax', 'core_template_nosession'), ['name' => 'block', 'component' => 'core', 'theme' => 'xxxbase']);
         $result = $result->toArray(true);

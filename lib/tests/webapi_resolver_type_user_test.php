@@ -90,7 +90,7 @@ class core_webapi_resolver_type_user_testcase extends advanced_testcase {
             $this->resolve_graphql_type('core_user', 'fullname', $user, []);
             $this->fail('Exception expected');
         } catch (coding_exception $exception) {
-            self::assertContains('You did not check you can view a user before resolving them', $exception->getMessage());
+            self::assertStringContainsString('You did not check you can view a user before resolving them', $exception->getMessage());
         }
 
         $this->setAdminUser();
@@ -275,7 +275,7 @@ class core_webapi_resolver_type_user_testcase extends advanced_testcase {
         self::assertNull($this->resolve_graphql_type('core_user', 'profileimageurl', $user, []));
 
         $this->setAdminUser();
-        self::assertContains('theme/image.php/_s/basis/core/1/u/f1', $this->resolve_graphql_type('core_user', 'profileimageurl', $user, []));
+        self::assertStringContainsString('theme/image.php/_s/basis/core/1/u/f1', $this->resolve_graphql_type('core_user', 'profileimageurl', $user, []));
     }
 
     public function test_resolver_profileimageurlsmall() {
@@ -283,7 +283,7 @@ class core_webapi_resolver_type_user_testcase extends advanced_testcase {
         self::assertNull($this->resolve_graphql_type('core_user', 'profileimageurlsmall', $user, []));
 
         $this->setAdminUser();
-        self::assertContains('theme/image.php/_s/basis/core/1/u/f2', $this->resolve_graphql_type('core_user', 'profileimageurlsmall', $user, []));
+        self::assertStringContainsString('theme/image.php/_s/basis/core/1/u/f2', $this->resolve_graphql_type('core_user', 'profileimageurlsmall', $user, []));
     }
 
     public function test_resolver_profileimagealt() {

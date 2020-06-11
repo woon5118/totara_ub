@@ -127,7 +127,7 @@ class core_session_redis_testcase extends advanced_testcase {
             $this->fail('Session lock must fail to be obtained.');
         } catch (\core\session\exception $e) {
             $this->assertContains("Unable to obtain session lock", $e->getMessage());
-            $this->assertContains('Cannot obtain session lock for sid: sess1', file_get_contents($errorlog));
+            $this->assertStringContainsString('Cannot obtain session lock for sid: sess1', file_get_contents($errorlog));
         }
 
         $this->assertTrue($sessblocked->handler_close());

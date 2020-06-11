@@ -169,7 +169,7 @@ class totara_job_job_assignment_testcase extends advanced_testcase {
             $ja3 = \totara_job\job_assignment::create_default($data['userid'], array('idnumber' => $ja2->idnumber));
             $this->fail('Exception was not triggered!');
         } catch (\coding_exception $e) {
-            $this->assertContains('Tried to create job assignment idnumber which is not unique for this user', $e->getMessage());
+            $this->assertStringContainsString('Tried to create job assignment idnumber which is not unique for this user', $e->getMessage());
         }
 
         // Check that both temp manager jaid and expiry date must be specified together.
@@ -177,13 +177,13 @@ class totara_job_job_assignment_testcase extends advanced_testcase {
             $ja3 = \totara_job\job_assignment::create_default($this->users[9]->id, array('tempmanagerjaid' => $ja2->id));
             $this->fail('Exception was not triggered!');
         } catch (\coding_exception $e) {
-            $this->assertContains('Temporary manager and expiry date must either both be provided or both be empty in job_assignment::create', $e->getMessage());
+            $this->assertStringContainsString('Temporary manager and expiry date must either both be provided or both be empty in job_assignment::create', $e->getMessage());
         }
         try {
             $ja3 = \totara_job\job_assignment::create_default($this->users[9]->id, array('tempmanagerexpirydate' => time() + YEARSECS * 2));
             $this->fail('Exception was not triggered!');
         } catch (\coding_exception $e) {
-            $this->assertContains('Temporary manager and expiry date must either both be provided or both be empty in job_assignment::create', $e->getMessage());
+            $this->assertStringContainsString('Temporary manager and expiry date must either both be provided or both be empty in job_assignment::create', $e->getMessage());
         }
     }
 
@@ -208,19 +208,19 @@ class totara_job_job_assignment_testcase extends advanced_testcase {
             $teamleaderja->update(array('managerjaid' => $staffja->id));
             $this->fail('Exception was not triggered!');
         } catch (\coding_exception $e) {
-            $this->assertContains('Tried to create a manager path loop in job_assignment::calculate_managerjapath', $e->getMessage());
+            $this->assertStringContainsString('Tried to create a manager path loop in job_assignment::calculate_managerjapath', $e->getMessage());
         }
         try {
             $managerja->update(array('managerjaid' => $staffja->id));
             $this->fail('Exception was not triggered!');
         } catch (\coding_exception $e) {
-            $this->assertContains('Tried to create a manager path loop in job_assignment::calculate_managerjapath', $e->getMessage());
+            $this->assertStringContainsString('Tried to create a manager path loop in job_assignment::calculate_managerjapath', $e->getMessage());
         }
         try {
             $staffja->update(array('managerjaid' => $staffja->id));
             $this->fail('Exception was not triggered!');
         } catch (\coding_exception $e) {
-            $this->assertContains('Tried to create a manager path loop in job_assignment::calculate_managerjapath', $e->getMessage());
+            $this->assertStringContainsString('Tried to create a manager path loop in job_assignment::calculate_managerjapath', $e->getMessage());
         }
     }
 
@@ -386,7 +386,7 @@ class totara_job_job_assignment_testcase extends advanced_testcase {
             $jobassignment->update(array('userid' => $this->users[1]->id));
             $this->fail('Exception was not thrown!');
         } catch (\coding_exception $e) {
-            $this->assertContains("Invalid field specified when updating job_assignment (not allowed or doesn't exist).", $e->getMessage());
+            $this->assertStringContainsString("Invalid field specified when updating job_assignment (not allowed or doesn't exist).", $e->getMessage());
         }
 
         // Make sure that passing no data doesn't fail and doesn't update the timemodified or usermodified.
@@ -415,7 +415,7 @@ class totara_job_job_assignment_testcase extends advanced_testcase {
             $jobassignment->update(array('idnumber' => $seconddata['idnumber'])); // Update first to match second.
             $this->fail('Exception was not triggered!');
         } catch (\coding_exception $e) {
-            $this->assertContains('Tried to update job assignment to an idnumber which is not unique for this user', $e->getMessage());
+            $this->assertStringContainsString('Tried to update job assignment to an idnumber which is not unique for this user', $e->getMessage());
         }
 
         // Make sure that update of $jobassignment isn't messing with other job assignment records.
@@ -450,13 +450,13 @@ class totara_job_job_assignment_testcase extends advanced_testcase {
             $jobassignment->update(array('tempmanagerjaid' => $tempmanagerja->id));
             $this->fail('Exception was not triggered!');
         } catch (\coding_exception $e) {
-            $this->assertContains('Temporary manager and expiry date must either both be provided or both be empty in job_assignment::update_internal', $e->getMessage());
+            $this->assertStringContainsString('Temporary manager and expiry date must either both be provided or both be empty in job_assignment::update_internal', $e->getMessage());
         }
         try {
             $jobassignment->update(array('tempmanagerexpirydate' => time() + DAYSECS * 100));
             $this->fail('Exception was not triggered!');
         } catch (\coding_exception $e) {
-            $this->assertContains('Temporary manager and expiry date must either both be provided or both be empty in job_assignment::update_internal', $e->getMessage());
+            $this->assertStringContainsString('Temporary manager and expiry date must either both be provided or both be empty in job_assignment::update_internal', $e->getMessage());
         }
 
         // Check that unsetting the managerjaid will reset the managerjapath.
@@ -776,7 +776,7 @@ class totara_job_job_assignment_testcase extends advanced_testcase {
             $retrievedja = \totara_job\job_assignment::get_with_idnumber($u3ja1->userid, 'notarealidnumber');
             $this->fail('Exception not triggered!');
         } catch (\dml_exception $e) {
-            $this->assertContains('Can not find data record in database', $e->getMessage());
+            $this->assertStringContainsString('Can not find data record in database', $e->getMessage());
         }
 
         // Test mustexist false.
@@ -804,7 +804,7 @@ class totara_job_job_assignment_testcase extends advanced_testcase {
             $retrievedja = \totara_job\job_assignment::get_with_id(-1);
             $this->fail('Exception not triggered!');
         } catch (\dml_exception $e) {
-            $this->assertContains('Can not find data record in database', $e->getMessage());
+            $this->assertStringContainsString('Can not find data record in database', $e->getMessage());
         }
 
         // Test mustexist false.
@@ -922,7 +922,7 @@ class totara_job_job_assignment_testcase extends advanced_testcase {
             $retrievedja = \totara_job\job_assignment::get_first($this->users[1]->id);
             $this->fail('Exception not triggered!');
         } catch (\dml_exception $e) {
-            $this->assertContains('Can not find data record in database', $e->getMessage());
+            $this->assertStringContainsString('Can not find data record in database', $e->getMessage());
         }
 
         // Test mustexist false.
@@ -1584,7 +1584,7 @@ class totara_job_job_assignment_testcase extends advanced_testcase {
             \totara_job\job_assignment::swap_order($u1ja3->id, $u2ja2->id);
             $this->fail('Exception not triggered!');
         } catch (\coding_exception $e) {
-            $this->assertContains('Cannot swap order of two job assignments belonging to different users.', $e->getMessage());
+            $this->assertStringContainsString('Cannot swap order of two job assignments belonging to different users.', $e->getMessage());
         }
     }
 
@@ -1647,7 +1647,7 @@ class totara_job_job_assignment_testcase extends advanced_testcase {
             \totara_job\job_assignment::move_up($u2ja3->id);
             $this->fail('Exception not triggered!');
         } catch (\coding_exception $e) {
-            $this->assertContains('Tried to move the first job assignment up.', $e->getMessage());
+            $this->assertStringContainsString('Tried to move the first job assignment up.', $e->getMessage());
         }
     }
 
@@ -1710,7 +1710,7 @@ class totara_job_job_assignment_testcase extends advanced_testcase {
             \totara_job\job_assignment::move_down($u2ja1->id);
             $this->fail('Exception not triggered!');
         } catch (\coding_exception $e) {
-            $this->assertContains('Tried to move the last job assignment down.', $e->getMessage());
+            $this->assertStringContainsString('Tried to move the last job assignment down.', $e->getMessage());
         }
     }
 
@@ -1919,21 +1919,21 @@ class totara_job_job_assignment_testcase extends advanced_testcase {
             \totara_job\job_assignment::move($user->id, $job3->id, -1);
             self::fail('Exception expected');
         } catch (\coding_exception $exception) {
-            self::assertContains('Invalid job position.', $exception->getMessage());
+            self::assertStringContainsString('Invalid job position.', $exception->getMessage());
         }
 
         try {
             \totara_job\job_assignment::move($user->id, $job3->id, -10);
             self::fail('Exception expected');
         } catch (\coding_exception $exception) {
-            self::assertContains('Invalid job position.', $exception->getMessage());
+            self::assertStringContainsString('Invalid job position.', $exception->getMessage());
         }
 
         try {
             \totara_job\job_assignment::move($user->id, $job3->id, 100);
             self::fail('Exception expected');
         } catch (\coding_exception $exception) {
-            self::assertContains('Invalid job position.', $exception->getMessage());
+            self::assertStringContainsString('Invalid job position.', $exception->getMessage());
         }
 
         // Invalid jobs
@@ -1944,14 +1944,14 @@ class totara_job_job_assignment_testcase extends advanced_testcase {
             \totara_job\job_assignment::move($user->id, $jobid, 1);
             self::fail('Exception expected');
         } catch (\coding_exception $exception) {
-            self::assertContains('Invalid job.', $exception->getMessage());
+            self::assertStringContainsString('Invalid job.', $exception->getMessage());
         }
 
         try {
             \totara_job\job_assignment::move($user->id, 0, 1);
             self::fail('Exception expected');
         } catch (\coding_exception $exception) {
-            self::assertContains('Invalid job.', $exception->getMessage());
+            self::assertStringContainsString('Invalid job.', $exception->getMessage());
         }
     }
 }

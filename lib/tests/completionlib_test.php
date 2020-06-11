@@ -1149,7 +1149,7 @@ class core_completionlib_testcase extends advanced_testcase {
         $this->assertEquals(0, $log->userid);
         $this->assertEquals($course1->id, $log->courseid);
         $this->assertEquals($USER->id, $log->changeuserid);
-        $this->assertContains('Deleted current completion and all crit compl records in delete_course_completion_data_including_rpl', $log->description);
+        $this->assertStringContainsString('Deleted current completion and all crit compl records in delete_course_completion_data_including_rpl', $log->description);
     }
 
     public function test_delete_course_completion_data() {
@@ -1227,7 +1227,7 @@ class core_completionlib_testcase extends advanced_testcase {
         $this->assertEquals($user1->id, $log->userid);
         $this->assertEquals($course1->id, $log->courseid);
         $this->assertEquals($USER->id, $log->changeuserid);
-        $this->assertContains('Deleted current completion and all crit compl records in delete_course_completion_data', $log->description);
+        $this->assertStringContainsString('Deleted current completion and all crit compl records in delete_course_completion_data', $log->description);
 
         // Clear out any logs that might have been created above.
         $DB->delete_records('course_completion_log');
@@ -1259,7 +1259,7 @@ class core_completionlib_testcase extends advanced_testcase {
         $this->assertEquals(0, $log->userid);
         $this->assertEquals($course2->id, $log->courseid);
         $this->assertEquals($USER->id, $log->changeuserid);
-        $this->assertContains('Deleted current completion and all crit compl records except where the current completion was RPL in delete_course_completion_data', $log->description);
+        $this->assertStringContainsString('Deleted current completion and all crit compl records except where the current completion was RPL in delete_course_completion_data', $log->description);
     }
 
     /**

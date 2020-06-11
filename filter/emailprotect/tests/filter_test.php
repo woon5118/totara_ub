@@ -53,13 +53,13 @@ class filter_emailprotect_filter_testcase extends advanced_testcase {
 
         // Check it filters at the course context level.
         $filter = new filter_emailprotect($coursecontext, []);
-        $this->assertNotContains($email, $filter->filter($text));
-        $this->assertNotContains($email, $filter->filter($mailto));
+        $this->assertStringNotContainsString($email, $filter->filter($text));
+        $this->assertStringNotContainsString($email, $filter->filter($mailto));
 
         // Check it filters at the system level.
         $filter = new filter_emailprotect(\context_system::instance(), []);
-        $this->assertNotContains($email, $filter->filter($text));
-        $this->assertNotContains($email, $filter->filter($mailto));
+        $this->assertStringNotContainsString($email, $filter->filter($text));
+        $this->assertStringNotContainsString($email, $filter->filter($mailto));
 
         // Confirm that this filter is not compatible with clean_text.
         $filtered = $filter->filter($text);

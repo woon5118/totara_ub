@@ -87,7 +87,7 @@ class totara_job_webapi_resolver_query_my_assignments_testcase extends advanced_
             $this->resolve_graphql_query('totara_job_my_assignments', []);
             self::fail('Expected a moodle_exception: cannot view job assignments');
         } catch (\moodle_exception $ex) {
-            self::assertContains(
+            self::assertStringContainsString(
                 'Sorry, but you do not currently have permissions to do that (view job assignments)',
                 $ex->getMessage()
             );

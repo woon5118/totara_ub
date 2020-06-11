@@ -94,7 +94,7 @@ class filter_tex_mimetex_testcase extends advanced_testcase {
         $command = new \core\command\executable($this->executable);
         $command->add_value('1');
         $command->execute();
-        $this->assertContains('...**...', $command->get_output());
+        $this->assertStringContainsString('...**...', $command->get_output());
         $this->assertEquals(0, $command->get_return_status());
     }
 
@@ -104,7 +104,7 @@ class filter_tex_mimetex_testcase extends advanced_testcase {
         $command = new \core\command\executable($this->executable);
         $command->add_value('1');
         $command->execute();
-        $this->assertContains('...**...', $command->get_output());
+        $this->assertStringContainsString('...**...', $command->get_output());
         $this->assertEquals(0, $command->get_return_status());
 
         // Test the pcntl files were deleted after use.
@@ -119,7 +119,7 @@ class filter_tex_mimetex_testcase extends advanced_testcase {
         $command->add_value('1');
         $command->redirect_stderr_to_stdout(true);
         $command->execute();
-        $this->assertContains('...**...', $command->get_output());
+        $this->assertStringContainsString('...**...', $command->get_output());
         $this->assertEquals(0, $command->get_return_status());
     }
 
@@ -130,7 +130,7 @@ class filter_tex_mimetex_testcase extends advanced_testcase {
         $command->add_value('1');
         $command->redirect_stderr_to_stdout(true);
         $command->execute();
-        $this->assertContains('...**...', $command->get_output());
+        $this->assertStringContainsString('...**...', $command->get_output());
         $this->assertEquals(0, $command->get_return_status());
 
         // Test the pcntl files were deleted after use.

@@ -65,17 +65,17 @@ class totara_completioneditor_install_testcase extends advanced_testcase {
         $this->assertEquals(2, $DB->count_records('course_completion_log'));
 
         $log = $DB->get_record('course_completion_log', array('courseid' => 123, 'userid' => 234));
-        $this->assertContains((string)$cmcid1, $log->description);
-        $this->assertContains('34', $log->description);
-        $this->assertContains('456', $log->description);
+        $this->assertStringContainsString((string)$cmcid1, $log->description);
+        $this->assertStringContainsString('34', $log->description);
+        $this->assertStringContainsString('456', $log->description);
 
         $log = $DB->get_record('course_completion_log', array('courseid' => 123, 'userid' => 222));
-        $this->assertContains((string)$cmcid2, $log->description);
-        $this->assertContains('33', $log->description);
-        $this->assertContains('44', $log->description);
-        $this->assertContains('555', $log->description);
-        $this->assertContains('666', $log->description);
-        $this->assertContains('777', $log->description);
+        $this->assertStringContainsString((string)$cmcid2, $log->description);
+        $this->assertStringContainsString('33', $log->description);
+        $this->assertStringContainsString('44', $log->description);
+        $this->assertStringContainsString('555', $log->description);
+        $this->assertStringContainsString('666', $log->description);
+        $this->assertStringContainsString('777', $log->description);
     }
 
     public function test_totara_completioneditor_install_log_existing_criteria_completions() {
@@ -104,14 +104,14 @@ class totara_completioneditor_install_testcase extends advanced_testcase {
         $this->assertEquals(2, $DB->count_records('course_completion_log'));
 
         $log = $DB->get_record('course_completion_log', array('userid' => 111, 'courseid' => 222));
-        $this->assertContains((string)$ccccid1, $log->description);
+        $this->assertStringContainsString((string)$ccccid1, $log->description);
 
         $log = $DB->get_record('course_completion_log', array('userid' => 123, 'courseid' => 234));
-        $this->assertContains((string)$ccccid2, $log->description);
-        $this->assertContains('45.67', $log->description);
-        $this->assertContains('567', $log->description);
-        $this->assertContains('a reason', $log->description);
-        $this->assertContains('789', $log->description);
+        $this->assertStringContainsString((string)$ccccid2, $log->description);
+        $this->assertStringContainsString('45.67', $log->description);
+        $this->assertStringContainsString('567', $log->description);
+        $this->assertStringContainsString('a reason', $log->description);
+        $this->assertStringContainsString('789', $log->description);
     }
 
     public function test_totara_completioneditor_install_log_existing_history_completions() {
@@ -136,12 +136,12 @@ class totara_completioneditor_install_testcase extends advanced_testcase {
         $this->assertEquals(2, $DB->count_records('course_completion_log'));
 
         $log = $DB->get_record('course_completion_log', array('courseid' => 111, 'userid' => 222));
-        $this->assertContains((string)$cchid1, $log->description);
+        $this->assertStringContainsString((string)$cchid1, $log->description);
 
         $log = $DB->get_record('course_completion_log', array('courseid' => 123, 'userid' => 234));
-        $this->assertContains((string)$cchid2, $log->description);
-        $this->assertContains('345', $log->description);
-        $this->assertContains('45.67', $log->description);
+        $this->assertStringContainsString((string)$cchid2, $log->description);
+        $this->assertStringContainsString('345', $log->description);
+        $this->assertStringContainsString('45.67', $log->description);
     }
 
     public function test_totara_completioneditor_install_log_existing_current_completions() {
@@ -174,12 +174,12 @@ class totara_completioneditor_install_testcase extends advanced_testcase {
         $this->assertNotEmpty($log->description);
 
         $log = $DB->get_record('course_completion_log', array('userid' => 123, 'courseid' => 234));
-        $this->assertContains('345', $log->description);
-        $this->assertContains('456', $log->description);
-        $this->assertContains('567', $log->description);
-        $this->assertContains('678', $log->description);
-        $this->assertContains('a reason', $log->description);
-        $this->assertContains('78.09', $log->description);
-        $this->assertContains('89', $log->description);
+        $this->assertStringContainsString('345', $log->description);
+        $this->assertStringContainsString('456', $log->description);
+        $this->assertStringContainsString('567', $log->description);
+        $this->assertStringContainsString('678', $log->description);
+        $this->assertStringContainsString('a reason', $log->description);
+        $this->assertStringContainsString('78.09', $log->description);
+        $this->assertStringContainsString('89', $log->description);
     }
 }

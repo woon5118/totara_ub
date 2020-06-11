@@ -64,8 +64,8 @@ class block_rss_client_cron_testcase extends advanced_testcase {
         error_reporting($errorlevel);
 
         $cronoutput = ob_get_clean();
-        $this->assertContains('skipping until ' . userdate($record->skipuntil), $cronoutput);
-        $this->assertContains('0 feeds refreshed (took ', $cronoutput);
+        $this->assertStringContainsString('skipping until ' . userdate($record->skipuntil), $cronoutput);
+        $this->assertStringContainsString('0 feeds refreshed (took ', $cronoutput);
     }
 
     /**
@@ -126,24 +126,24 @@ class block_rss_client_cron_testcase extends advanced_testcase {
         $cronoutput = ob_get_clean();
         $skiptime1 = $record->skiptime * 2;
         $message1 = 'http://example.com/rss Error: could not load/find the RSS feed - skipping for ' . $skiptime1 . ' seconds.';
-        $this->assertContains($message1, $cronoutput);
+        $this->assertStringContainsString($message1, $cronoutput);
         $skiptime2 = 330; // Assumes that the cron time in the version file is 300.
         $message2 = 'http://example.com/rss2 Error: could not load/find the RSS feed - skipping for ' . $skiptime2 . ' seconds.';
-        $this->assertContains($message2, $cronoutput);
+        $this->assertStringContainsString($message2, $cronoutput);
         $skiptime3 = block_rss_client::CLIENT_MAX_SKIPTIME;
         $message3 = 'http://example.com/rss3 Error: could not load/find the RSS feed - skipping for ' . $skiptime3 . ' seconds.';
-        $this->assertContains($message3, $cronoutput);
-        $this->assertContains('0 feeds refreshed (took ', $cronoutput);
+        $this->assertStringContainsString($message3, $cronoutput);
+        $this->assertStringContainsString('0 feeds refreshed (took ', $cronoutput);
 
         // Test that the records have been correctly updated.
         $newrecord = $DB->get_record('block_rss_client', array('id' => $record->id));
-        $this->assertAttributeEquals($skiptime1, 'skiptime', $newrecord);
-        $this->assertAttributeGreaterThanOrEqual($time + $skiptime1, 'skipuntil', $newrecord);
+        $this->assertEquals($skiptime1, $newrecord->skiptime);
+        $this->assertGreaterThanOrEqual($time + $skiptime1, $newrecord->skipuntil);
         $newrecord2 = $DB->get_record('block_rss_client', array('id' => $record2->id));
-        $this->assertAttributeEquals($skiptime2, 'skiptime', $newrecord2);
-        $this->assertAttributeGreaterThanOrEqual($time + $skiptime2, 'skipuntil', $newrecord2);
+        $this->assertEquals($skiptime2, $newrecord2->skiptime);
+        $this->assertGreaterThanOrEqual($time + $skiptime2, $newrecord2->skipuntil);
         $newrecord3 = $DB->get_record('block_rss_client', array('id' => $record3->id));
-        $this->assertAttributeEquals($skiptime3, 'skiptime', $newrecord3);
-        $this->assertAttributeGreaterThanOrEqual($time + $skiptime3, 'skipuntil', $newrecord3);
+        $this->assertEquals($skiptime3, $newrecord3->skiptime);
+        $this->assertGreaterThanOrEqual($time + $skiptime3,  $newrecord3->skipuntil);
     }
 }

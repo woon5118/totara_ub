@@ -190,6 +190,6 @@ class totara_reportbuilder_userdata_scheduled_reports_test extends advanced_test
         $this->assertContains(fullname($seed->otheruser), $data['users']);
 
         $this->assertCount(1, $data['external']);
-        $this->assertContains('@example.com', current($data['external']));
+        $this->assertStringContainsString('@example.com', current($data['external']));
     }
 }

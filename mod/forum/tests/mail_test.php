@@ -894,12 +894,12 @@ class mod_forum_mail_testcase extends advanced_testcase {
         // New posts should not have Re: in the subject.
         list($discussion, $post) = $this->helper_post_to_forum($forum, $author);
         $messages = $this->helper_run_cron_check_count($post, 2);
-        $this->assertNotContains($strre, $messages[0]->subject);
+        $this->assertStringNotContainsString($strre, $messages[0]->subject);
 
         // Replies should have Re: in the subject.
         $reply = $this->helper_post_to_discussion($forum, $discussion, $commenter);
         $messages = $this->helper_run_cron_check_count($reply, 2);
-        $this->assertContains($strre, $messages[0]->subject);
+        $this->assertStringContainsString($strre, $messages[0]->subject);
     }
 
     /**

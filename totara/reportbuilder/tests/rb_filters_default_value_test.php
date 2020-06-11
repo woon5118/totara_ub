@@ -105,8 +105,8 @@ class totara_reportbuilder_rb_filters_default_value_testcase extends advanced_te
         $this->assertEquals('startdate', $filter->value);
         $this->assertEquals('1', $filter->advanced);
         $this->assertEquals(['after' => 0, 'before' => 0, 'daysafter'=> 22, 'daysbefore' => 13], $filter->defaultvalue);
-        $this->assertContains('Course Start Date is after ', $filter->get_label($filter->defaultvalue));
-        $this->assertContains('and before ', $filter->get_label($filter->defaultvalue));
+        $this->assertStringContainsString('Course Start Date is after ', $filter->get_label($filter->defaultvalue));
+        $this->assertStringContainsString('and before ', $filter->get_label($filter->defaultvalue));
 
         // Testing badges report.
         $rid = $this->create_report('badge_issued', 'custom_badge_issued_report');

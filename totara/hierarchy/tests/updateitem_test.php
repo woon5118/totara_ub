@@ -144,9 +144,6 @@ class totara_hierarchy_updateitem_testcase extends advanced_testcase {
         $this->resetAfterTest(true);
     }
 
-    /**
-     * @expectedException moodle_exception
-     */
     public function test_invalid_new_parent_id() {
         global $DB;
 
@@ -155,11 +152,9 @@ class totara_hierarchy_updateitem_testcase extends advanced_testcase {
         $updatedorg->parentid = '9999'; // Invalid id
 
         $before = $DB->get_records_menu('org', array('frameworkid' => $org->frameworkid), 'sortthread', 'id,parentid');
-        $this->assertFalse((bool)$this->org->update_hierarchy_item($org->id, $updatedorg));
-        $after = $DB->get_records_menu('org', array('frameworkid' => $org->frameworkid), 'sortthread', 'id,parentid');
 
-        // Nothing should be updated.
-        $this->assertEquals($before, $after);
+        $this->expectException(moodle_exception::class);
+        $this->org->update_hierarchy_item($org->id, $updatedorg);
     }
 
 
@@ -183,9 +178,6 @@ class totara_hierarchy_updateitem_testcase extends advanced_testcase {
         $this->assertEquals($this->frame2->id, $after->frameworkid);
     }
 
-    /**
-     * @expectedException moodle_exception
-     */
     public function test_invalid_new_framework_id() {
         global $DB;
 
@@ -194,11 +186,8 @@ class totara_hierarchy_updateitem_testcase extends advanced_testcase {
         $updatedorg->frameworkid = '9999'; // Invalid id
 
         $before = $DB->get_record('org', array('id' => $org->id));
-        $this->assertFalse((bool)$this->org->update_hierarchy_item($org->id, $updatedorg, true, true, false));
-        $after = $DB->get_record('org', array('id' => $org->id));
-
-        // Nothing should be updated.
-        $this->assertEquals($before, $after);
+        $this->expectException(moodle_exception::class);
+        $this->org->update_hierarchy_item($org->id, $updatedorg, true, true, false);
     }
 
     public function test_moving_to_top_of_hierarchy() {

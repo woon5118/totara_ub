@@ -38,21 +38,21 @@ class core_user_access_controller_testcase extends advanced_testcase {
             access_controller::for($user->id);
             self::fail('Exception expected');
         } catch (coding_exception $exception) {
-            self::assertContains('User access controllers can only be used for real users.', $exception->getMessage());
+            self::assertStringContainsString('User access controllers can only be used for real users.', $exception->getMessage());
         }
 
         try {
             access_controller::for(null);
             self::fail('Exception expected');
         } catch (coding_exception $exception) {
-            self::assertContains('User access controllers can only be used for real users.', $exception->getMessage());
+            self::assertStringContainsString('User access controllers can only be used for real users.', $exception->getMessage());
         }
 
         try {
             access_controller::for((object)['id' => 0]);
             self::fail('Exception expected');
         } catch (coding_exception $exception) {
-            self::assertContains('User access controllers can only be used for real users.', $exception->getMessage());
+            self::assertStringContainsString('User access controllers can only be used for real users.', $exception->getMessage());
         }
 
         try {
@@ -60,7 +60,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
             access_controller::for($user);
             self::fail('Exception expected');
         } catch (coding_exception $exception) {
-            self::assertContains('User access controllers can only be used for real users.', $exception->getMessage());
+            self::assertStringContainsString('User access controllers can only be used for real users.', $exception->getMessage());
         }
 
     }
@@ -77,14 +77,14 @@ class core_user_access_controller_testcase extends advanced_testcase {
             access_controller::for_user_id(0);
             self::fail('Exception expected');
         } catch (coding_exception $exception) {
-            self::assertContains('Userid does not belong to a real user.', $exception->getMessage());
+            self::assertStringContainsString('Userid does not belong to a real user.', $exception->getMessage());
         }
 
         try {
             access_controller::for_user_id(-1);
             self::fail('Exception expected');
         } catch (coding_exception $exception) {
-            self::assertContains('Userid does not belong to a real user.', $exception->getMessage());
+            self::assertStringContainsString('Userid does not belong to a real user.', $exception->getMessage());
         }
 
         try {
@@ -92,7 +92,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
             access_controller::for_user_id($id);
             self::fail('Exception expected');
         } catch (dml_missing_record_exception $exception) {
-            self::assertContains('Can not find data record in database', $exception->getMessage());
+            self::assertStringContainsString('Can not find data record in database', $exception->getMessage());
         }
     }
 
@@ -105,14 +105,14 @@ class core_user_access_controller_testcase extends advanced_testcase {
             access_controller::for_current_user();
             self::fail('Exception expected');
         } catch (coding_exception $exception) {
-            self::assertContains('There is no current user', $exception->getMessage());
+            self::assertStringContainsString('There is no current user', $exception->getMessage());
         }
 
         try {
             access_controller::for_current_user($course);
             self::fail('Exception expected');
         } catch (coding_exception $exception) {
-            self::assertContains('There is no current user', $exception->getMessage());
+            self::assertStringContainsString('There is no current user', $exception->getMessage());
         }
 
         $this->setUser($user);
@@ -185,7 +185,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
             access_controller::for((object)['id' => 0]);
             self::fail('Exception expected');
         } catch (coding_exception $exception) {
-            self::assertContains('User access controllers can only be used for real users.', $exception->getMessage());
+            self::assertStringContainsString('User access controllers can only be used for real users.', $exception->getMessage());
         }
 
         // Test for invalid user.
@@ -193,7 +193,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
             access_controller::for((object)['id' => -10]);
             self::fail('Exception expected');
         } catch (coding_exception $exception) {
-            self::assertContains('User access controllers can only be used for real users.', $exception->getMessage());
+            self::assertStringContainsString('User access controllers can only be used for real users.', $exception->getMessage());
         }
 
         // Test for fake user direct to constructor.
@@ -205,7 +205,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
             $constructor->invoke($controller, (object)['id' => 0]);
             self::fail('Exception expected');
         } catch (coding_exception $exception) {
-            self::assertContains('User access controllers can only be used for real users.', $exception->getMessage());
+            self::assertStringContainsString('User access controllers can only be used for real users.', $exception->getMessage());
         }
     }
 
@@ -839,7 +839,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
             $controller->can_view_field('blah');
             $this->fail('Exception expected');
         } catch (coding_exception $exception) {
-            self::assertContains('Unknown user field', $exception->getMessage());
+            self::assertStringContainsString('Unknown user field', $exception->getMessage());
         }
     }
 

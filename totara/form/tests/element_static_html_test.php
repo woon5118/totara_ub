@@ -92,8 +92,8 @@ class totara_form_element_static_html_testcase extends advanced_testcase {
         $form = new test_form();
 
         $output = $form->render();
-        $this->assertContains('some plain &amp; text', $output);
-        $this->assertContains('some cleaned alert(666) text', $output);
-        $this->assertContains('some not cleaned <javascript>alert(666)</javascript>text', $output);
+        $this->assertStringContainsString('some plain &amp; text', $output);
+        $this->assertStringContainsString('some cleaned alert(666) text', $output);
+        $this->assertStringContainsString('some not cleaned <javascript>alert(666)</javascript>text', $output);
     }
 }

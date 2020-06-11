@@ -112,7 +112,7 @@ class core_orm_query_field_testcase extends advanced_testcase {
                 new field($field);
                 $this->fail('We have expected a coding exception here for: ' . (string) $field);
             } catch (coding_exception $exception) {
-                $this->assertContains('Invalid field passed', $exception->getMessage());
+                $this->assertStringContainsString('Invalid field passed', $exception->getMessage());
             }
         }
     }

@@ -130,7 +130,7 @@ class totara_reportbuilder_user_link_display_testcase extends advanced_testcase 
             );
 
             $this->assertNotEmpty($value);
-            $this->assertContains("course={$course->id}", $value);
+            $this->assertStringContainsString("course={$course->id}", $value);
         }
 
         foreach ($users as $user) {
@@ -146,8 +146,8 @@ class totara_reportbuilder_user_link_display_testcase extends advanced_testcase 
             );
 
             $this->assertNotEmpty($value);
-            $this->assertNotContains("course={$course->id}", $value);
-            $this->assertContains("id={$user->id}", $value);
+            $this->assertStringNotContainsString("course={$course->id}", $value);
+            $this->assertStringContainsString("id={$user->id}", $value);
         }
     }
 }

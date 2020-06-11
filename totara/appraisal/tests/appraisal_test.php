@@ -958,7 +958,7 @@ class totara_appraisal_appraisal_testcase extends appraisal_testcase {
         // Check for missing job assignment warning.
         $warnings = $appraisal->validate_roles();
         $this->assertEquals(1, count($warnings));
-        $this->assertContains('has not selected a job assignment yet', reset($warnings));
+        $this->assertStringContainsString('has not selected a job assignment yet', reset($warnings));
 
         $this->update_job_assignments($appraisal);
 
@@ -969,7 +969,7 @@ class totara_appraisal_appraisal_testcase extends appraisal_testcase {
         // Now we check for missing role warnings!
         $warnings = $appraisal->validate_roles();
         $this->assertEquals(1, count($warnings));
-        $this->assertContains('is missing their', reset($warnings));
+        $this->assertStringContainsString('is missing their', reset($warnings));
     }
 
     /**

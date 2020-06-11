@@ -99,7 +99,7 @@ class mod_facetoface_view_attendee_list_testcase extends advanced_testcase {
         // Expecting the header actions should not appear here for the report html. Because the current actor does not have the
         // ability to manage the attendee's signup note.
         [$reporthtml, $debughtml] = $renderer->report_html($report, false);
-        $this->assertNotContains('facetoface_signup_manage_custom_field_edit_all', $reporthtml);
+        $this->assertStringNotContainsString('facetoface_signup_manage_custom_field_edit_all', $reporthtml);
     }
 
     public function test_view_attendees_list_as_an_editingtrainer_role() {
@@ -150,6 +150,6 @@ class mod_facetoface_view_attendee_list_testcase extends advanced_testcase {
 
         // Expecting the column 'actions' to appear in the $reporthtml, because the user has the permission to manage
         // the attendee's singup notes.
-        $this->assertContains('facetoface_signup_manage_custom_field_edit_all', $reporthtml);
+        $this->assertStringContainsString('facetoface_signup_manage_custom_field_edit_all', $reporthtml);
     }
 }

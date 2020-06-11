@@ -678,7 +678,7 @@ class mod_quiz_external_testcase extends externallib_advanced_testcase {
         } catch (moodle_exception $e) {
             // Totara: fix test for bogus error message
             $this->assertSame('notlocalisederrormessage', $e->errorcode);
-            $this->assertContains(get_string('passworderror', 'quizaccess_password'), $e->getMessage());
+            $this->assertStringContainsString(get_string('passworderror', 'quizaccess_password'), $e->getMessage());
         }
 
         // Now, try everything correct.
@@ -776,7 +776,7 @@ class mod_quiz_external_testcase extends externallib_advanced_testcase {
         } catch (moodle_exception $e) {
             // Totara: fix test for bogus error message
             $this->assertSame('notlocalisederrormessage', $e->errorcode);
-            $this->assertContains(get_string('passworderror', 'quizaccess_password'), $e->getMessage());
+            $this->assertStringContainsString(get_string('passworderror', 'quizaccess_password'), $e->getMessage());
         }
 
         // Now, try everything correct.
@@ -794,7 +794,7 @@ class mod_quiz_external_testcase extends externallib_advanced_testcase {
         } catch (moodle_quiz_exception $e) {
             // Totara: fix test for bogus error message
             $this->assertSame('notlocalisederrormessage', $e->errorcode);
-            $this->assertContains('Invalid page number', $e->getMessage());
+            $this->assertStringContainsString('Invalid page number', $e->getMessage());
         }
 
         $params['page'] = 0;
@@ -1397,7 +1397,7 @@ class mod_quiz_external_testcase extends externallib_advanced_testcase {
         } catch (moodle_quiz_exception $e) {
             // Totara: fix test for bogus error message
             $this->assertSame('notlocalisederrormessage', $e->errorcode);
-            $this->assertContains('Out of sequence access', $e->getMessage());
+            $this->assertStringContainsString('Out of sequence access', $e->getMessage());
         }
 
     }

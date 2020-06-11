@@ -162,7 +162,7 @@ class tool_behat_manager_util_testcase extends advanced_testcase {
             $this->assertCount(count($paths), $suites[$themename]['paths']);
 
             foreach ($paths as $key => $feature) {
-                $this->assertContains($feature, $suites[$themename]['paths'][$key]);
+                $this->assertStringContainsString($feature, $suites[$themename]['paths'][$key]);
             }
         }
 
@@ -216,7 +216,7 @@ class tool_behat_manager_util_testcase extends advanced_testcase {
             $this->assertCount(count($paths), $suites[$themename]['paths']);
 
             foreach ($paths as $key => $feature) {
-                $this->assertContains($feature, $suites[$themename]['paths'][$key]);
+                $this->assertStringContainsString($feature, $suites[$themename]['paths'][$key]);
             }
         }
 
@@ -261,7 +261,7 @@ class tool_behat_manager_util_testcase extends advanced_testcase {
             $this->assertCount(count($paths), $suites[$themename]['paths']);
 
             foreach ($paths as $key => $feature) {
-                $this->assertContains($feature, $suites[$themename]['paths'][$key]);
+                $this->assertStringContainsString($feature, $suites[$themename]['paths'][$key]);
             }
         }
 
@@ -292,7 +292,7 @@ class tool_behat_manager_util_testcase extends advanced_testcase {
             $this->assertCount(count($paths), $suites[$themename]['paths']);
 
             foreach ($paths as $key => $feature) {
-                $this->assertContains($feature, $suites[$themename]['paths'][$key]);
+                $this->assertStringContainsString($feature, $suites[$themename]['paths'][$key]);
             }
         }
         // Check contexts.
@@ -321,7 +321,7 @@ class tool_behat_manager_util_testcase extends advanced_testcase {
             $this->assertCount(count($paths), $suites[$themename]['paths']);
 
             foreach ($paths as $key => $feature) {
-                $this->assertContains($feature, $suites[$themename]['paths'][$key]);
+                $this->assertStringContainsString($feature, $suites[$themename]['paths'][$key]);
             }
         }
         // Check contexts.
@@ -365,7 +365,7 @@ class tool_behat_manager_util_testcase extends advanced_testcase {
             $this->assertCount(count($paths), $suites[$themename]['paths']);
 
             foreach ($paths as $key => $feature) {
-                $this->assertContains($feature, $suites[$themename]['paths'][$key]);
+                $this->assertStringContainsString($feature, $suites[$themename]['paths'][$key]);
             }
         }
         // Check contexts.
@@ -396,7 +396,7 @@ class tool_behat_manager_util_testcase extends advanced_testcase {
             $this->assertCount(count($paths), $suites[$themename]['paths']);
 
             foreach ($paths as $key => $feature) {
-                $this->assertContains($feature, $suites[$themename]['paths'][$key]);
+                $this->assertStringContainsString($feature, $suites[$themename]['paths'][$key]);
             }
         }
         // Check contexts.
@@ -425,7 +425,7 @@ class tool_behat_manager_util_testcase extends advanced_testcase {
             $this->assertCount(count($paths), $suites[$themename]['paths']);
 
             foreach ($paths as $key => $feature) {
-                $this->assertContains($feature, $suites[$themename]['paths'][$key]);
+                $this->assertStringContainsString($feature, $suites[$themename]['paths'][$key]);
             }
         }
         // Check contexts.
@@ -529,7 +529,7 @@ class tool_behat_manager_util_testcase extends advanced_testcase {
             $this->assertCount(count($paths), $suites[$themename]['paths']);
 
             foreach ($paths as $key => $feature) {
-                $this->assertContains($feature, $suites[$themename]['paths'][$key]);
+                $this->assertStringContainsString($feature, $suites[$themename]['paths'][$key]);
             }
         }
         // Check contexts.
@@ -608,7 +608,7 @@ class tool_behat_manager_util_testcase extends advanced_testcase {
             $this->assertCount(count($paths), $suites[$themename]['paths']);
 
             foreach ($paths as $key => $feature) {
-                $this->assertContains($feature, $suites[$themename]['paths'][$key]);
+                $this->assertStringContainsString($feature, $suites[$themename]['paths'][$key]);
             }
         }
         // Check contexts.
@@ -643,7 +643,7 @@ class tool_behat_manager_util_testcase extends advanced_testcase {
             $this->assertCount(count($paths), $suites[$themename]['paths']);
 
             foreach ($paths as $key => $feature) {
-                $this->assertContains($feature, $suites[$themename]['paths'][$key]);
+                $this->assertStringContainsString($feature, $suites[$themename]['paths'][$key]);
             }
         }
 
@@ -659,7 +659,7 @@ class tool_behat_manager_util_testcase extends advanced_testcase {
             $this->assertCount(count($paths), $suites[$themename]['paths']);
 
             foreach ($paths as $key => $feature) {
-                $this->assertContains($feature, $suites[$themename]['paths'][$key]);
+                $this->assertStringContainsString($feature, $suites[$themename]['paths'][$key]);
             }
         }
 
@@ -675,7 +675,7 @@ class tool_behat_manager_util_testcase extends advanced_testcase {
             $this->assertCount(count($paths), $suites[$themename]['paths']);
 
             foreach ($paths as $key => $feature) {
-                $this->assertContains($feature, $suites[$themename]['paths'][$key]);
+                $this->assertStringContainsString($feature, $suites[$themename]['paths'][$key]);
             }
         }
 
@@ -690,7 +690,7 @@ class tool_behat_manager_util_testcase extends advanced_testcase {
             $this->assertCount(count($paths), $suites[$themename]['paths']);
 
             foreach ($paths as $key => $feature) {
-                $this->assertContains($feature, $suites[$themename]['paths'][$key]);
+                $this->assertStringContainsString($feature, $suites[$themename]['paths'][$key]);
             }
         }
     }

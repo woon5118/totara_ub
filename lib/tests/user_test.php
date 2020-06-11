@@ -375,10 +375,6 @@ class core_user_testcase extends advanced_testcase {
 
     /**
      * Test get_property_default().
-     *
-     *
-     * @expectedException        coding_exception
-     * @expectedExceptionMessage Invalid property requested, or the property does not has a default value.
      */
     public function test_get_property_default() {
         global $CFG;
@@ -405,6 +401,9 @@ class core_user_testcase extends advanced_testcase {
         core_user::reset_caches();
         $timezone = core_user::get_property_default('timezone');
         $this->assertEquals('Pacific/Auckland', $timezone);
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('Invalid property requested, or the property does not has a default value.');
 
         core_user::get_property_default('firstname');
     }

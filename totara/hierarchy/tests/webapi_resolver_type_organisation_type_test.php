@@ -50,7 +50,7 @@ class totara_hierarchy_webapi_resolver_type_organisation_type_testcase extends a
             self::assertSame(null, $this->resolve($field, [$field => null]));
             $this->fail('Exception expected');
         } catch (\coding_exception $ex) {
-            self::assertContains('Expected value, but was not found and was not nullable', $ex->getMessage());
+            self::assertStringContainsString('Expected value, but was not found and was not nullable', $ex->getMessage());
         }
     }
 
@@ -68,7 +68,7 @@ class totara_hierarchy_webapi_resolver_type_organisation_type_testcase extends a
             self::assertSame(null, $this->resolve($field, ['id' => 6, $field => null]));
             $this->fail('Exception expected');
         } catch (\coding_exception $ex) {
-            self::assertContains('Expected value, but was not found and was not nullable', $ex->getMessage());
+            self::assertStringContainsString('Expected value, but was not found and was not nullable', $ex->getMessage());
         }
     }
 

@@ -68,7 +68,7 @@ class core_event_fail_observer_testcase extends advanced_testcase {
         $message = $debug->message;
 
         $cls = static::class;
-        $this->assertContains(
+        $this->assertStringContainsString(
             "{$cls}::fail_observer",
             $message,
             "Expect the observer callable to be crafted as a string"

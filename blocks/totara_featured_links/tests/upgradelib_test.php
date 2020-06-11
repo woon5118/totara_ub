@@ -81,9 +81,9 @@ class block_totara_featured_links_upgradelib_testcase extends advanced_testcase 
         $DB->update_record('block_totara_featured_links_tiles', $databaserow);
 
         $datastring = $DB->get_field('block_totara_featured_links_tiles', 'dataraw', ['id' => $data->oldgallerytile->id]);
-        $this->assertContains('heading', $datastring);
-        $this->assertContains('text', $datastring);
-        $this->assertContains('/', $datastring);
+        $this->assertStringContainsString('heading', $datastring);
+        $this->assertStringContainsString('text', $datastring);
+        $this->assertStringContainsString('/', $datastring);
 
         // Second old gallery tile.
         $data->oldgallerytile2 = $blockgenerator->create_gallery_tile($data->block->id);
@@ -119,9 +119,9 @@ class block_totara_featured_links_upgradelib_testcase extends advanced_testcase 
         $DB->update_record('block_totara_featured_links_tiles', $databaserow);
 
         $datastring = $DB->get_field('block_totara_featured_links_tiles', 'dataraw', ['id' => $data->oldgallerytile2->id]);
-        $this->assertContains('heading', $datastring);
-        $this->assertContains('text', $datastring);
-        $this->assertContains('/', $datastring);
+        $this->assertStringContainsString('heading', $datastring);
+        $this->assertStringContainsString('text', $datastring);
+        $this->assertStringContainsString('/', $datastring);
 
         return $data;
     }

@@ -67,8 +67,8 @@ class totara_catalog_dataformatter_totara_icon_testcase extends dataformatter_te
         $result = $df->get_formatted_value($test_params, $context);
 
         // Check that we get a url back that includes default icon in its path.
-        $this->assertContains($CFG->wwwroot, $result->url);
-        $this->assertContains('/courseicons/default', $result->url);
+        $this->assertStringContainsString($CFG->wwwroot, $result->url);
+        $this->assertStringContainsString('/courseicons/default', $result->url);
         $this->assertSame('test_alt_text', $result->alt);
 
         $this->assert_exceptions($df, $test_params);

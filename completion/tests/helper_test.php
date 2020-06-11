@@ -59,7 +59,7 @@ class core_completion_helper_testcase extends advanced_testcase {
         $this->assertEquals(1, $DB->count_records('course_completion_log'));
         $log = $DB->get_record('course_completion_log', array('courseid' => $course1->id, 'userid' => $user1->id));
         $this->assertEquals($USER->id, $log->changeuserid);
-        $this->assertContains('Current completion created', $log->description);
+        $this->assertStringContainsString('Current completion created', $log->description);
 
         // Insert without problem inserts only the specified record and writes specified log.
         $coursecompletion = new stdClass();
@@ -73,7 +73,7 @@ class core_completion_helper_testcase extends advanced_testcase {
         $this->assertEquals(2, $DB->count_records('course_completion_log'));
         $log = $DB->get_record('course_completion_log', array('courseid' => $course2->id, 'userid' => $user1->id));
         $this->assertEquals($USER->id, $log->changeuserid);
-        $this->assertContains('custom message', $log->description);
+        $this->assertStringContainsString('custom message', $log->description);
 
         // Insert some more control data.
         $coursecompletion = new stdClass();
@@ -92,7 +92,7 @@ class core_completion_helper_testcase extends advanced_testcase {
             helper::write_course_completion($coursecompletion);
             $this->fail("Shouldn't reach this code, exception not triggered!");
         } catch (coding_exception $e) {
-            $this->assertContains("Course_completions already exists", $e->getMessage());
+            $this->assertStringContainsString("Course_completions already exists", $e->getMessage());
         }
         $this->assertEquals(3, $DB->count_records('course_completions'));
 
@@ -107,7 +107,7 @@ class core_completion_helper_testcase extends advanced_testcase {
             helper::write_course_completion($coursecompletion);
             $this->fail("Shouldn't reach this code, exception not triggered!");
         } catch (coding_exception $e) {
-            $this->assertContains("Either course_completions doesn't exist or belongs to a different user or course", $e->getMessage());
+            $this->assertStringContainsString("Either course_completions doesn't exist or belongs to a different user or course", $e->getMessage());
         }
         $this->assertEquals($expectedrecords, $DB->get_records('course_completions'));
 
@@ -118,7 +118,7 @@ class core_completion_helper_testcase extends advanced_testcase {
             helper::write_course_completion($coursecompletion);
             $this->fail("Shouldn't reach this code, exception not triggered!");
         } catch (coding_exception $e) {
-            $this->assertContains("Either course_completions doesn't exist or belongs to a different user or course", $e->getMessage());
+            $this->assertStringContainsString("Either course_completions doesn't exist or belongs to a different user or course", $e->getMessage());
         }
         $this->assertEquals($expectedrecords, $DB->get_records('course_completions'));
 
@@ -129,7 +129,7 @@ class core_completion_helper_testcase extends advanced_testcase {
             helper::write_course_completion($coursecompletion);
             $this->fail("Shouldn't reach this code, exception not triggered!");
         } catch (coding_exception $e) {
-            $this->assertContains("Either course_completions doesn't exist or belongs to a different user or course", $e->getMessage());
+            $this->assertStringContainsString("Either course_completions doesn't exist or belongs to a different user or course", $e->getMessage());
         }
         $this->assertEquals($expectedrecords, $DB->get_records('course_completions'));
 
@@ -142,8 +142,8 @@ class core_completion_helper_testcase extends advanced_testcase {
         $this->assertEquals(1, $DB->count_records('course_completion_log'));
         $log = $DB->get_record('course_completion_log', array('courseid' => $course1->id, 'userid' => $user1->id));
         $this->assertEquals($USER->id, $log->changeuserid);
-        $this->assertContains('An error occurred. Message of caller was', $log->description);
-        $this->assertContains('Current completion updated', $log->description);
+        $this->assertStringContainsString('An error occurred. Message of caller was', $log->description);
+        $this->assertStringContainsString('Current completion updated', $log->description);
 
         // Insert with invalid data fails and creates log.
         $DB->delete_records('course_completion_log');
@@ -156,8 +156,8 @@ class core_completion_helper_testcase extends advanced_testcase {
         $this->assertEquals(1, $DB->count_records('course_completion_log'));
         $log = $DB->get_record('course_completion_log', array('courseid' => $course2->id, 'userid' => $user2->id));
         $this->assertEquals($USER->id, $log->changeuserid);
-        $this->assertContains('An error occurred. Message of caller was', $log->description);
-        $this->assertContains('Current completion created', $log->description);
+        $this->assertStringContainsString('An error occurred. Message of caller was', $log->description);
+        $this->assertStringContainsString('Current completion created', $log->description);
 
         // Update without problem updates only specified record and creates log.
         $DB->delete_records('course_completion_log');
@@ -170,7 +170,7 @@ class core_completion_helper_testcase extends advanced_testcase {
         $this->assertEquals(1, $DB->count_records('course_completion_log'));
         $log = $DB->get_record('course_completion_log', array('courseid' => $course1->id, 'userid' => $user1->id));
         $this->assertEquals($USER->id, $log->changeuserid);
-        $this->assertContains('Current completion updated', $log->description);
+        $this->assertStringContainsString('Current completion updated', $log->description);
 
         // Update with custom log message.
         $DB->delete_records('course_completion_log');
@@ -180,7 +180,7 @@ class core_completion_helper_testcase extends advanced_testcase {
         $this->assertEquals(1, $DB->count_records('course_completion_log'));
         $log = $DB->get_record('course_completion_log', array('courseid' => $course1->id, 'userid' => $user1->id));
         $this->assertEquals($USER->id, $log->changeuserid);
-        $this->assertContains('custom message', $log->description);
+        $this->assertStringContainsString('custom message', $log->description);
     }
 
     public function test_write_course_completion_history() {
@@ -207,7 +207,7 @@ class core_completion_helper_testcase extends advanced_testcase {
         $this->assertEquals(1, $DB->count_records('course_completion_log'));
         $log = $DB->get_record('course_completion_log', array('courseid' => $course1->id, 'userid' => $user1->id));
         $this->assertEquals($USER->id, $log->changeuserid);
-        $this->assertContains('History completion created', $log->description);
+        $this->assertStringContainsString('History completion created', $log->description);
 
         // Insert without problem inserts only the specified record and writes specified log.
         $cch = new stdClass();
@@ -221,7 +221,7 @@ class core_completion_helper_testcase extends advanced_testcase {
         $this->assertEquals(2, $DB->count_records('course_completion_log'));
         $log = $DB->get_record('course_completion_log', array('courseid' => $course2->id, 'userid' => $user1->id));
         $this->assertEquals($USER->id, $log->changeuserid);
-        $this->assertContains('custom message', $log->description);
+        $this->assertStringContainsString('custom message', $log->description);
 
         // Insert some more control data.
         $cch = new stdClass();
@@ -250,7 +250,7 @@ class core_completion_helper_testcase extends advanced_testcase {
             helper::write_course_completion_history($cch);
             $this->fail("Shouldn't reach this code, exception not triggered!");
         } catch (coding_exception $e) {
-            $this->assertContains("Either course_completion_history doesn't exist or belongs to a different user or course", $e->getMessage());
+            $this->assertStringContainsString("Either course_completion_history doesn't exist or belongs to a different user or course", $e->getMessage());
         }
         $this->assertEquals($expectedrecords, $DB->get_records('course_completion_history'));
 
@@ -262,7 +262,7 @@ class core_completion_helper_testcase extends advanced_testcase {
             helper::write_course_completion_history($cch);
             $this->fail("Shouldn't reach this code, exception not triggered!");
         } catch (coding_exception $e) {
-            $this->assertContains("Either course_completion_history doesn't exist or belongs to a different user or course", $e->getMessage());
+            $this->assertStringContainsString("Either course_completion_history doesn't exist or belongs to a different user or course", $e->getMessage());
         }
         $this->assertEquals($expectedrecords, $DB->get_records('course_completion_history'));
 
@@ -273,7 +273,7 @@ class core_completion_helper_testcase extends advanced_testcase {
             helper::write_course_completion_history($cch);
             $this->fail("Shouldn't reach this code, exception not triggered!");
         } catch (coding_exception $e) {
-            $this->assertContains("Either course_completion_history doesn't exist or belongs to a different user or course", $e->getMessage());
+            $this->assertStringContainsString("Either course_completion_history doesn't exist or belongs to a different user or course", $e->getMessage());
         }
         $this->assertEquals($expectedrecords, $DB->get_records('course_completion_history'));
 
@@ -288,7 +288,7 @@ class core_completion_helper_testcase extends advanced_testcase {
         $this->assertEquals(1, $DB->count_records('course_completion_log'));
         $log = $DB->get_record('course_completion_log', array('courseid' => $course2->id, 'userid' => $user1->id));
         $this->assertEquals($USER->id, $log->changeuserid);
-        $this->assertContains('History completion updated', $log->description);
+        $this->assertStringContainsString('History completion updated', $log->description);
 
         // Update with custom log message.
         $DB->delete_records('course_completion_log');
@@ -298,7 +298,7 @@ class core_completion_helper_testcase extends advanced_testcase {
         $this->assertEquals(1, $DB->count_records('course_completion_log'));
         $log = $DB->get_record('course_completion_log', array('courseid' => $course2->id, 'userid' => $user1->id));
         $this->assertEquals($USER->id, $log->changeuserid);
-        $this->assertContains('custom message', $log->description);
+        $this->assertStringContainsString('custom message', $log->description);
     }
 
     public function test_write_criteria_completion() {
@@ -326,7 +326,7 @@ class core_completion_helper_testcase extends advanced_testcase {
         $this->assertEquals(1, $DB->count_records('course_completion_log'));
         $log = $DB->get_record('course_completion_log', array('courseid' => $course1->id, 'userid' => $user1->id));
         $this->assertEquals($USER->id, $log->changeuserid);
-        $this->assertContains('Criteria completion created', $log->description);
+        $this->assertStringContainsString('Criteria completion created', $log->description);
 
         // Insert without problem inserts only the specified record and writes specified log.
         $cccc = new stdClass();
@@ -341,7 +341,7 @@ class core_completion_helper_testcase extends advanced_testcase {
         $this->assertEquals(2, $DB->count_records('course_completion_log'));
         $log = $DB->get_record('course_completion_log', array('courseid' => $course2->id, 'userid' => $user1->id));
         $this->assertEquals($USER->id, $log->changeuserid);
-        $this->assertContains('custom message', $log->description);
+        $this->assertStringContainsString('custom message', $log->description);
 
         // Insert some more control data.
         $cccc = new stdClass();
@@ -362,7 +362,7 @@ class core_completion_helper_testcase extends advanced_testcase {
             helper::write_criteria_completion($cccc);
             $this->fail("Shouldn't reach this code, exception not triggered!");
         } catch (coding_exception $e) {
-            $this->assertContains("Course_completion_crit_compl already exists", $e->getMessage());
+            $this->assertStringContainsString("Course_completion_crit_compl already exists", $e->getMessage());
         }
         $this->assertEquals(3, $DB->count_records('course_completion_crit_compl'));
 
@@ -375,7 +375,7 @@ class core_completion_helper_testcase extends advanced_testcase {
             helper::write_criteria_completion($cccc);
             $this->fail("Shouldn't reach this code, exception not triggered!");
         } catch (coding_exception $e) {
-            $this->assertContains("Either course_completion_crit_compl doesn't exist or belongs to a different user, course or criteria", $e->getMessage());
+            $this->assertStringContainsString("Either course_completion_crit_compl doesn't exist or belongs to a different user, course or criteria", $e->getMessage());
         }
         $this->assertEquals($expectedrecords, $DB->get_records('course_completion_crit_compl'));
 
@@ -387,7 +387,7 @@ class core_completion_helper_testcase extends advanced_testcase {
             helper::write_criteria_completion($cccc);
             $this->fail("Shouldn't reach this code, exception not triggered!");
         } catch (coding_exception $e) {
-            $this->assertContains("Either course_completion_crit_compl doesn't exist or belongs to a different user, course or criteria", $e->getMessage());
+            $this->assertStringContainsString("Either course_completion_crit_compl doesn't exist or belongs to a different user, course or criteria", $e->getMessage());
         }
         $this->assertEquals($expectedrecords, $DB->get_records('course_completion_crit_compl'));
 
@@ -398,7 +398,7 @@ class core_completion_helper_testcase extends advanced_testcase {
             helper::write_criteria_completion($cccc);
             $this->fail("Shouldn't reach this code, exception not triggered!");
         } catch (coding_exception $e) {
-            $this->assertContains("Either course_completion_crit_compl doesn't exist or belongs to a different user, course or criteria", $e->getMessage());
+            $this->assertStringContainsString("Either course_completion_crit_compl doesn't exist or belongs to a different user, course or criteria", $e->getMessage());
         }
         $this->assertEquals($expectedrecords, $DB->get_records('course_completion_crit_compl'));
 
@@ -409,7 +409,7 @@ class core_completion_helper_testcase extends advanced_testcase {
             helper::write_criteria_completion($cccc);
             $this->fail("Shouldn't reach this code, exception not triggered!");
         } catch (coding_exception $e) {
-            $this->assertContains("Either course_completion_crit_compl doesn't exist or belongs to a different user, course or criteria", $e->getMessage());
+            $this->assertStringContainsString("Either course_completion_crit_compl doesn't exist or belongs to a different user, course or criteria", $e->getMessage());
         }
         $this->assertEquals($expectedrecords, $DB->get_records('course_completion_crit_compl'));
 
@@ -424,7 +424,7 @@ class core_completion_helper_testcase extends advanced_testcase {
         $this->assertEquals(1, $DB->count_records('course_completion_log'));
         $log = $DB->get_record('course_completion_log', array('courseid' => $course2->id, 'userid' => $user1->id));
         $this->assertEquals($USER->id, $log->changeuserid);
-        $this->assertContains('Criteria completion updated', $log->description);
+        $this->assertStringContainsString('Criteria completion updated', $log->description);
 
         // Update with custom log message.
         $DB->delete_records('course_completion_log');
@@ -434,7 +434,7 @@ class core_completion_helper_testcase extends advanced_testcase {
         $this->assertEquals(1, $DB->count_records('course_completion_log'));
         $log = $DB->get_record('course_completion_log', array('courseid' => $course2->id, 'userid' => $user1->id));
         $this->assertEquals($USER->id, $log->changeuserid);
-        $this->assertContains('custom message', $log->description);
+        $this->assertStringContainsString('custom message', $log->description);
     }
 
     public function test_write_module_completion() {
@@ -476,7 +476,7 @@ class core_completion_helper_testcase extends advanced_testcase {
         $this->assertEquals(1, $DB->count_records('course_completion_log'));
         $log = $DB->get_record('course_completion_log', array('courseid' => $course1->id, 'userid' => $user1->id));
         $this->assertEquals($USER->id, $log->changeuserid);
-        $this->assertContains('Module completion created', $log->description);
+        $this->assertStringContainsString('Module completion created', $log->description);
 
         // Insert without problem inserts only the specified record and writes specified log.
         $cmc = new stdClass();
@@ -492,7 +492,7 @@ class core_completion_helper_testcase extends advanced_testcase {
         $this->assertEquals(2, $DB->count_records('course_completion_log'));
         $log = $DB->get_record('course_completion_log', array('courseid' => $course2->id, 'userid' => $user1->id));
         $this->assertEquals($USER->id, $log->changeuserid);
-        $this->assertContains('custom message', $log->description);
+        $this->assertStringContainsString('custom message', $log->description);
 
         // Insert some more control data.
         $cmc = new stdClass();
@@ -515,7 +515,7 @@ class core_completion_helper_testcase extends advanced_testcase {
             helper::write_module_completion($cmc);
             $this->fail("Shouldn't reach this code, exception not triggered!");
         } catch (coding_exception $e) {
-            $this->assertContains("Course_modules_completion already exists", $e->getMessage());
+            $this->assertStringContainsString("Course_modules_completion already exists", $e->getMessage());
         }
         $this->assertEquals(3, $DB->count_records('course_modules_completion'));
 
@@ -528,7 +528,7 @@ class core_completion_helper_testcase extends advanced_testcase {
             helper::write_module_completion($cmc);
             $this->fail("Shouldn't reach this code, exception not triggered!");
         } catch (coding_exception $e) {
-            $this->assertContains("Either course_modules_completion doesn't exist or belongs to a different user or module", $e->getMessage());
+            $this->assertStringContainsString("Either course_modules_completion doesn't exist or belongs to a different user or module", $e->getMessage());
         }
         $this->assertEquals($expectedrecords, $DB->get_records('course_modules_completion'));
 
@@ -540,7 +540,7 @@ class core_completion_helper_testcase extends advanced_testcase {
             helper::write_module_completion($cmc);
             $this->fail("Shouldn't reach this code, exception not triggered!");
         } catch (coding_exception $e) {
-            $this->assertContains("Either course_modules_completion doesn't exist or belongs to a different user or module", $e->getMessage());
+            $this->assertStringContainsString("Either course_modules_completion doesn't exist or belongs to a different user or module", $e->getMessage());
         }
         $this->assertEquals($expectedrecords, $DB->get_records('course_modules_completion'));
 
@@ -551,7 +551,7 @@ class core_completion_helper_testcase extends advanced_testcase {
             helper::write_module_completion($cmc);
             $this->fail("Shouldn't reach this code, exception not triggered!");
         } catch (coding_exception $e) {
-            $this->assertContains("Either course_modules_completion doesn't exist or belongs to a different user or module", $e->getMessage());
+            $this->assertStringContainsString("Either course_modules_completion doesn't exist or belongs to a different user or module", $e->getMessage());
         }
         $this->assertEquals($expectedrecords, $DB->get_records('course_modules_completion'));
 
@@ -566,7 +566,7 @@ class core_completion_helper_testcase extends advanced_testcase {
         $this->assertEquals(1, $DB->count_records('course_completion_log'));
         $log = $DB->get_record('course_completion_log', array('courseid' => $course2->id, 'userid' => $user1->id));
         $this->assertEquals($USER->id, $log->changeuserid);
-        $this->assertContains('Module completion updated', $log->description);
+        $this->assertStringContainsString('Module completion updated', $log->description);
 
         // Update with custom log message.
         $DB->delete_records('course_completion_log');
@@ -576,7 +576,7 @@ class core_completion_helper_testcase extends advanced_testcase {
         $this->assertEquals(1, $DB->count_records('course_completion_log'));
         $log = $DB->get_record('course_completion_log', array('courseid' => $course2->id, 'userid' => $user1->id));
         $this->assertEquals($USER->id, $log->changeuserid);
-        $this->assertContains('custom message', $log->description);
+        $this->assertStringContainsString('custom message', $log->description);
     }
 
     public function test_make_log_record() {
@@ -671,8 +671,8 @@ class core_completion_helper_testcase extends advanced_testcase {
         $this->assertEquals($courseid, $log->courseid);
         $this->assertEquals($userid, $log->userid);
         $this->assertEquals($USER->id, $log->changeuserid);
-        $this->assertContains('Current completion record logged', $log->description);
-        $this->assertContains('Not yet started (10)', $log->description);
+        $this->assertStringContainsString('Current completion record logged', $log->description);
+        $this->assertStringContainsString('Not yet started (10)', $log->description);
         $this->assertGreaterThanOrEqual($timebefore,$log->timemodified);
         $this->assertLessThanOrEqual($timeafter,$log->timemodified);
 
@@ -682,7 +682,7 @@ class core_completion_helper_testcase extends advanced_testcase {
         $this->assertCount(2, $logs);
         $log = reset($logs);
         $this->assertEquals(789, $log->changeuserid);
-        $this->assertContains('Another message', $log->description);
+        $this->assertStringContainsString('Another message', $log->description);
     }
 
     public function test_get_course_completion_log_description() {
@@ -698,14 +698,14 @@ class core_completion_helper_testcase extends advanced_testcase {
 
         $description = helper::get_course_completion_log_description($coursecompletion);
 
-        $this->assertContains('Current completion record logged', $description);
-        $this->assertContains('In progress (25)', $description);
-        $this->assertContains('1234', $description);
-        $this->assertContains('2345', $description);
-        $this->assertContains('3456', $description);
-        $this->assertContains('4567', $description);
-        $this->assertContains('a reason?', $description);
-        $this->assertContains('5678', $description);
+        $this->assertStringContainsString('Current completion record logged', $description);
+        $this->assertStringContainsString('In progress (25)', $description);
+        $this->assertStringContainsString('1234', $description);
+        $this->assertStringContainsString('2345', $description);
+        $this->assertStringContainsString('3456', $description);
+        $this->assertStringContainsString('4567', $description);
+        $this->assertStringContainsString('a reason?', $description);
+        $this->assertStringContainsString('5678', $description);
 
         // Custom message.
         $coursecompletion->status = COMPLETION_STATUS_COMPLETEVIARPL;
@@ -713,14 +713,14 @@ class core_completion_helper_testcase extends advanced_testcase {
 
         $description = helper::get_course_completion_log_description($coursecompletion, 'MessageX');
 
-        $this->assertContains('MessageX', $description);
-        $this->assertContains('Complete via rpl (75)', $description);
-        $this->assertContains('1234', $description);
-        $this->assertContains('2345', $description);
-        $this->assertContains('3456', $description);
-        $this->assertContains('4567', $description);
-        $this->assertContains('Empty', $description);
-        $this->assertContains('5678', $description);
+        $this->assertStringContainsString('MessageX', $description);
+        $this->assertStringContainsString('Complete via rpl (75)', $description);
+        $this->assertStringContainsString('1234', $description);
+        $this->assertStringContainsString('2345', $description);
+        $this->assertStringContainsString('3456', $description);
+        $this->assertStringContainsString('4567', $description);
+        $this->assertStringContainsString('Empty', $description);
+        $this->assertStringContainsString('5678', $description);
     }
 
     public function test_log_course_completion_history() {
@@ -749,8 +749,8 @@ class core_completion_helper_testcase extends advanced_testcase {
         $this->assertEquals($courseid, $log->courseid);
         $this->assertEquals($userid, $log->userid);
         $this->assertEquals($USER->id, $log->changeuserid);
-        $this->assertContains('Course completion history logged', $log->description);
-        $this->assertContains('345', $log->description);
+        $this->assertStringContainsString('Course completion history logged', $log->description);
+        $this->assertStringContainsString('345', $log->description);
         $this->assertGreaterThanOrEqual($timebefore,$log->timemodified);
         $this->assertLessThanOrEqual($timeafter,$log->timemodified);
 
@@ -760,8 +760,8 @@ class core_completion_helper_testcase extends advanced_testcase {
         $this->assertCount(2, $logs);
         $log = reset($logs);
         $this->assertEquals(789, $log->changeuserid);
-        $this->assertContains('Another message', $log->description);
-        $this->assertContains('345', $log->description);
+        $this->assertStringContainsString('Another message', $log->description);
+        $this->assertStringContainsString('345', $log->description);
     }
 
     public function test_get_course_completion_history_log_description() {
@@ -773,18 +773,18 @@ class core_completion_helper_testcase extends advanced_testcase {
 
         $description = helper::get_course_completion_history_log_description($historycompletion);
 
-        $this->assertContains('Course completion history logged', $description);
-        $this->assertContains('123', $description);
-        $this->assertContains('234', $description);
-        $this->assertContains('345', $description);
+        $this->assertStringContainsString('Course completion history logged', $description);
+        $this->assertStringContainsString('123', $description);
+        $this->assertStringContainsString('234', $description);
+        $this->assertStringContainsString('345', $description);
 
         // Custom message, no id.
         unset($historycompletion->id);
         $description = helper::get_course_completion_history_log_description($historycompletion, 'MessageX');
 
-        $this->assertContains('MessageX', $description);
-        $this->assertContains('234', $description);
-        $this->assertContains('345', $description);
+        $this->assertStringContainsString('MessageX', $description);
+        $this->assertStringContainsString('234', $description);
+        $this->assertStringContainsString('345', $description);
     }
 
     public function test_log_criteria_completion() {
@@ -817,13 +817,13 @@ class core_completion_helper_testcase extends advanced_testcase {
         $this->assertEquals($courseid, $log->courseid);
         $this->assertEquals($userid, $log->userid);
         $this->assertEquals($USER->id, $log->changeuserid);
-        $this->assertContains('Crit compl logged', $log->description);
-        $this->assertContains((string)$ccccid, $log->description);
-        $this->assertContains('345', $log->description);
-        $this->assertContains('456', $log->description);
-        $this->assertContains('567', $log->description);
-        $this->assertContains('678', $log->description);
-        $this->assertContains('789', $log->description);
+        $this->assertStringContainsString('Crit compl logged', $log->description);
+        $this->assertStringContainsString((string)$ccccid, $log->description);
+        $this->assertStringContainsString('345', $log->description);
+        $this->assertStringContainsString('456', $log->description);
+        $this->assertStringContainsString('567', $log->description);
+        $this->assertStringContainsString('678', $log->description);
+        $this->assertStringContainsString('789', $log->description);
         $this->assertGreaterThanOrEqual($timebefore,$log->timemodified);
         $this->assertLessThanOrEqual($timeafter,$log->timemodified);
 
@@ -834,9 +834,9 @@ class core_completion_helper_testcase extends advanced_testcase {
         $this->assertCount(2, $logs);
         $log = reset($logs);
         $this->assertEquals(890, $log->changeuserid);
-        $this->assertContains('Another message', $log->description);
-        $this->assertContains((string)$ccccid, $log->description);
-        $this->assertContains('Empty', $log->description);
+        $this->assertStringContainsString('Another message', $log->description);
+        $this->assertStringContainsString((string)$ccccid, $log->description);
+        $this->assertStringContainsString('Empty', $log->description);
     }
 
     public function test_log_course_module_completion() {
@@ -873,12 +873,12 @@ class core_completion_helper_testcase extends advanced_testcase {
         $this->assertEquals($courseid, $log->courseid);
         $this->assertEquals($userid, $log->userid);
         $this->assertEquals($USER->id, $log->changeuserid);
-        $this->assertContains('Module completion logged', $log->description);
-        $this->assertContains((string)$cmcid, $log->description);
-        $this->assertContains('Yes', $log->description);
-        $this->assertContains('345', $log->description);
-        $this->assertContains('456', $log->description);
-        $this->assertContains('567', $log->description);
+        $this->assertStringContainsString('Module completion logged', $log->description);
+        $this->assertStringContainsString((string)$cmcid, $log->description);
+        $this->assertStringContainsString('Yes', $log->description);
+        $this->assertStringContainsString('345', $log->description);
+        $this->assertStringContainsString('456', $log->description);
+        $this->assertStringContainsString('567', $log->description);
         $this->assertGreaterThanOrEqual($timebefore,$log->timemodified);
         $this->assertLessThanOrEqual($timeafter,$log->timemodified);
 
@@ -888,8 +888,8 @@ class core_completion_helper_testcase extends advanced_testcase {
         $this->assertCount(2, $logs);
         $log = reset($logs);
         $this->assertEquals(890, $log->changeuserid);
-        $this->assertContains('Another message', $log->description);
-        $this->assertContains((string)$cmcid, $log->description);
+        $this->assertStringContainsString('Another message', $log->description);
+        $this->assertStringContainsString((string)$cmcid, $log->description);
     }
 
     public function test_load_course_completion() {
@@ -925,7 +925,7 @@ class core_completion_helper_testcase extends advanced_testcase {
             helper::load_course_completion(765, 432);
             $this->fail("Shouldn't reach this code, exception not triggered!");
         } catch (coding_exception $e) {
-            $this->assertContains("Tried to load a course_completions but it does not exist", $e->getMessage());
+            $this->assertStringContainsString("Tried to load a course_completions but it does not exist", $e->getMessage());
         }
 
         $result = helper::load_course_completion(765, 432, false);
@@ -956,7 +956,7 @@ class core_completion_helper_testcase extends advanced_testcase {
             helper::load_course_completion_history(765);
             $this->fail("Shouldn't reach this code, exception not triggered!");
         } catch (coding_exception $e) {
-            $this->assertContains("Tried to load a course_completion_history but it does not exist", $e->getMessage());
+            $this->assertStringContainsString("Tried to load a course_completion_history but it does not exist", $e->getMessage());
         }
 
         $result = helper::load_course_completion_history(765, false);
@@ -1065,9 +1065,9 @@ class core_completion_helper_testcase extends advanced_testcase {
         $logs = $DB->get_records('course_completion_log', array(), 'id DESC');
         $this->assertCount(4, $logs);
         $log = reset($logs);
-        $this->assertContains('This is a custom message', $log->description);
+        $this->assertStringContainsString('This is a custom message', $log->description);
         $log = next($logs);
-        $this->assertContains('History deleted', $log->description);
+        $this->assertStringContainsString('History deleted', $log->description);
     }
 
     public function test_delete_criteria_completion() {
@@ -1127,9 +1127,9 @@ class core_completion_helper_testcase extends advanced_testcase {
         $logs = $DB->get_records('course_completion_log', array(), 'id DESC');
         $this->assertCount(4, $logs);
         $log = reset($logs);
-        $this->assertContains('This is a custom message', $log->description);
+        $this->assertStringContainsString('This is a custom message', $log->description);
         $log = next($logs);
-        $this->assertContains('Crit compl deleted', $log->description);
+        $this->assertStringContainsString('Crit compl deleted', $log->description);
     }
 
     public function test_delete_module_completion() {
@@ -1191,9 +1191,9 @@ class core_completion_helper_testcase extends advanced_testcase {
         $logs = $DB->get_records('course_completion_log', array(), 'id DESC');
         $this->assertCount(3, $logs);
         $log = reset($logs);
-        $this->assertContains('This is a custom message', $log->description);
+        $this->assertStringContainsString('This is a custom message', $log->description);
         $log = next($logs);
-        $this->assertContains('Module completion deleted', $log->description);
+        $this->assertStringContainsString('Module completion deleted', $log->description);
     }
 
     /**
@@ -1734,9 +1734,9 @@ class core_completion_helper_testcase extends advanced_testcase {
         $this->assertEquals('Not set ()', helper::format_log_date(''));
         $this->assertEquals('Not set (null)', helper::format_log_date(null));
         $result = helper::format_log_date(1234567890);
-        $this->assertContains('Feb', $result);
-        $this->assertContains('2009', $result);
-        $this->assertContains('(1234567890)', $result);
+        $this->assertStringContainsString('Feb', $result);
+        $this->assertStringContainsString('2009', $result);
+        $this->assertStringContainsString('(1234567890)', $result);
     }
 
     public function test_module_uses_timecompleted() {

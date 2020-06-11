@@ -132,7 +132,7 @@ class totara_job_webapi_resolver_mutation_move_assignments_testcase extends adva
             );
             $this->fail('Exception expected.');
         } catch (\moodle_exception $ex) {
-            self::assertContains('A required parameter (userid) was missing (assignmentid,newposition)', $ex->getMessage());
+            self::assertStringContainsString('A required parameter (userid) was missing (assignmentid,newposition)', $ex->getMessage());
         }
 
         // Incorrect Job ids
@@ -143,7 +143,7 @@ class totara_job_webapi_resolver_mutation_move_assignments_testcase extends adva
             );
             $this->fail('Exception expected.');
         } catch (\coding_exception $ex) {
-            self::assertContains('Invalid job.', $ex->getMessage());
+            self::assertStringContainsString('Invalid job.', $ex->getMessage());
         }
 
         // Position to low
@@ -154,7 +154,7 @@ class totara_job_webapi_resolver_mutation_move_assignments_testcase extends adva
             );
             $this->fail('Exception expected.');
         } catch (\coding_exception $ex) {
-            self::assertContains('Invalid job position.', $ex->getMessage());
+            self::assertStringContainsString('Invalid job position.', $ex->getMessage());
         }
 
         // Position to high
@@ -165,7 +165,7 @@ class totara_job_webapi_resolver_mutation_move_assignments_testcase extends adva
             );
             $this->fail('Exception expected.');
         } catch (\coding_exception $ex) {
-            self::assertContains('Invalid job position.', $ex->getMessage());
+            self::assertStringContainsString('Invalid job position.', $ex->getMessage());
         }
 
         // Test job assignment belonging to deleted user.
@@ -177,7 +177,7 @@ class totara_job_webapi_resolver_mutation_move_assignments_testcase extends adva
             );
             self::fail('Expected a moodle_exception: cannot view job assignments');
         } catch (\dml_exception $ex) {
-            self::assertContains('Can not find data record in database', $ex->getMessage());
+            self::assertStringContainsString('Can not find data record in database', $ex->getMessage());
         }
     }
 

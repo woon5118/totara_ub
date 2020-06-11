@@ -284,7 +284,7 @@ class mustache_string_helper_testcase extends advanced_testcase {
             'Escaped content contains unexpected mustache processing queues. It will be lost.',
             'Legacy string helper API in use, this will not be supported in the future.'
         ]);
-        $this->assertNotContains('alert(window.location);', $page->requires->get_end_code());
+        $this->assertStringNotContainsString('alert(window.location);', $page->requires->get_end_code());
 
         // Odd mix of content.
         $loader->setTemplate('test', '{{#str}} {{identifier}} , {{component}} , {test}, core {{/str}}');

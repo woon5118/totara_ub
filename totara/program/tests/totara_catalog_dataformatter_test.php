@@ -70,9 +70,9 @@ class totara_program_totara_catalog_dataformatter_test extends dataformatter_tes
         $result = (array) $result;
 
         // Check that we get a theme-independent default icon reference.
-        $this->assertContains($CFG->wwwroot, $result['url']);
-        $this->assertContains('moodle/theme/image.php', $result['url']);
-        $this->assertContains('defaultimage', $result['url']);
+        $this->assertStringContainsString($CFG->wwwroot, $result['url']);
+        $this->assertStringContainsString('moodle/theme/image.php', $result['url']);
+        $this->assertStringContainsString('defaultimage', $result['url']);
         $this->assertSame('test_alt_text', $result['alt']);
 
         $this->assert_exceptions($df, $test_params);

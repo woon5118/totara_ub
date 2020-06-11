@@ -33,7 +33,7 @@ class totara_core_accesslib_testcase extends advanced_testcase {
         foreach ($capabilities as $capability) {
             $name = get_capability_string($capability->name);
             $this->assertDebuggingNotCalled("Debugging not expected when getting name of capability {$capability->name}");
-            $this->assertNotContains('???', $name, "Unexpected problem when getting name of capability {$capability->name}");
+            $this->assertStringNotContainsString('???', $name, "Unexpected problem when getting name of capability {$capability->name}");
         }
     }
 

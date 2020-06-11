@@ -167,54 +167,54 @@ class totara_reportbuilder_graph_testcase extends advanced_testcase {
 
         $graph = $this->init_graph($rid);
         $data = $graph->render();
-        $this->assertNotContains('Zero length axis', $data);
-        $this->assertContains($user1->username, $data);
-        $this->assertContains($user2->username, $data);
+        $this->assertStringNotContainsString('Zero length axis', $data);
+        $this->assertStringContainsString($user1->username, $data);
+        $this->assertStringContainsString($user2->username, $data);
 
         $graph = $this->init_graph($rid);
         $data = $graph->render(400, 400, false);
-        $this->assertNotContains('Zero length axis', $data);
-        $this->assertContains($user1->username, $data);
-        $this->assertContains($user2->username, $data);
+        $this->assertStringNotContainsString('Zero length axis', $data);
+        $this->assertStringContainsString($user1->username, $data);
+        $this->assertStringContainsString($user2->username, $data);
 
         $graph = $this->init_graph($rid);
         $data = $graph->render(1000, 1000);
-        $this->assertNotContains('Zero length axis', $data);
-        $this->assertContains($user1->username, $data);
-        $this->assertContains($user2->username, $data);
+        $this->assertStringNotContainsString('Zero length axis', $data);
+        $this->assertStringContainsString($user1->username, $data);
+        $this->assertStringContainsString($user2->username, $data);
 
         $DB->set_field('report_builder_graph', 'type', 'bar', array('id' => $graphrecord->id));
         $graph = $this->init_graph($rid);
         $data = $graph->render();
-        $this->assertNotContains('Zero length axis', $data);
-        $this->assertContains($user1->username, $data);
-        $this->assertContains($user2->username, $data);
+        $this->assertStringNotContainsString('Zero length axis', $data);
+        $this->assertStringContainsString($user1->username, $data);
+        $this->assertStringContainsString($user2->username, $data);
 
         $DB->set_field('report_builder_graph', 'type', 'line', array('id' => $graphrecord->id));
         $graph = $this->init_graph($rid);
         $data = $graph->render();
-        $this->assertNotContains('Zero length axis', $data);
-        $this->assertContains($user1->username, $data);
-        $this->assertContains($user2->username, $data);
+        $this->assertStringNotContainsString('Zero length axis', $data);
+        $this->assertStringContainsString($user1->username, $data);
+        $this->assertStringContainsString($user2->username, $data);
 
         $DB->set_field('report_builder_graph', 'type', 'scatter', array('id' => $graphrecord->id));
         $graph = $this->init_graph($rid);
         $data = $graph->render();
-        $this->assertNotContains('Zero length axis', $data);
-        $this->assertContains($user1->username, $data);
-        $this->assertContains($user2->username, $data);
+        $this->assertStringNotContainsString('Zero length axis', $data);
+        $this->assertStringContainsString($user1->username, $data);
+        $this->assertStringContainsString($user2->username, $data);
 
         $DB->set_field('report_builder_graph', 'type', 'area', array('id' => $graphrecord->id));
         $graph = $this->init_graph($rid);
         $data = $graph->render();
-        $this->assertNotContains('Zero length axis', $data);
-        $this->assertContains($user1->username, $data);
-        $this->assertContains($user2->username, $data);
+        $this->assertStringNotContainsString('Zero length axis', $data);
+        $this->assertStringContainsString($user1->username, $data);
+        $this->assertStringContainsString($user2->username, $data);
 
         $DB->set_field('report_builder_graph', 'type', 'pie', array('id' => $graphrecord->id));
         $graph = $this->init_graph($rid);
         $data = $graph->render();
-        $this->assertContains('Empty pie chart', $data);
+        $this->assertStringContainsString('Empty pie chart', $data);
     }
 
     public function test_remove_empty_series() {
@@ -239,10 +239,10 @@ class totara_reportbuilder_graph_testcase extends advanced_testcase {
         $graph = $this->init_graph($rid);
         $data = $graph->render();
         $this->assertNotEquals($data, '');
-        $this->assertContains($user1->username, $data);
-        $this->assertContains($user2->username, $data);
-        $this->assertContains('admin', $data);
-        $this->assertContains('guest', $data);
+        $this->assertStringContainsString($user1->username, $data);
+        $this->assertStringContainsString($user2->username, $data);
+        $this->assertStringContainsString('admin', $data);
+        $this->assertStringContainsString('guest', $data);
 
         $graphrecord = reset($graphrecords);
         $graphrecord->settings = '{ "custom": { "remove_empty_series" : true }}';
@@ -268,20 +268,20 @@ class totara_reportbuilder_graph_testcase extends advanced_testcase {
         $graph = $this->init_graph($rid);
         $data = $graph->render();
         $this->assertNotEquals($data, '');
-        $this->assertContains($user1->username, $data);
-        $this->assertContains($user2->username, $data);
-        $this->assertContains('admin', $data);
-        $this->assertContains('guest', $data);
+        $this->assertStringContainsString($user1->username, $data);
+        $this->assertStringContainsString($user2->username, $data);
+        $this->assertStringContainsString('admin', $data);
+        $this->assertStringContainsString('guest', $data);
 
         $graphrecord = reset($graphrecords);
         $graphrecord->settings = '{ "custom": { "remove_empty_series" : true }}';
         $DB->update_record('report_builder_graph', $graphrecord);
         $graph = $this->init_graph($rid);
         $this->assertNotEquals($data, '');
-        $this->assertContains($user1->username, $data);
-        $this->assertContains($user2->username, $data);
-        $this->assertContains('admin', $data);
-        $this->assertContains('guest', $data);
+        $this->assertStringContainsString($user1->username, $data);
+        $this->assertStringContainsString($user2->username, $data);
+        $this->assertStringContainsString('admin', $data);
+        $this->assertStringContainsString('guest', $data);
 
         // Removal of empty series.
 
@@ -302,13 +302,13 @@ class totara_reportbuilder_graph_testcase extends advanced_testcase {
         $graph = $this->init_graph($rid);
         $data = $graph->render();
         $this->assertNotEquals($data, '');
-        $this->assertContains($user1->username, $data);
-        $this->assertContains($user2->username, $data);
-        $this->assertContains('admin', $data);
-        $this->assertContains('guest', $data);
-        $this->assertContains('User Creation Time - day of year', $data);
-        $this->assertContains('User\'s Courses Completed Count', $data);
-        $this->assertContains('User\'s Courses Started Count', $data);
+        $this->assertStringContainsString($user1->username, $data);
+        $this->assertStringContainsString($user2->username, $data);
+        $this->assertStringContainsString('admin', $data);
+        $this->assertStringContainsString('guest', $data);
+        $this->assertStringContainsString('User Creation Time - day of year', $data);
+        $this->assertStringContainsString('User\'s Courses Completed Count', $data);
+        $this->assertStringContainsString('User\'s Courses Started Count', $data);
 
         $graphrecord = reset($graphrecords);
         $graphrecord->settings = '{ "custom": { "remove_empty_series" : true }}';
@@ -316,12 +316,12 @@ class totara_reportbuilder_graph_testcase extends advanced_testcase {
         $graph = $this->init_graph($rid);
         $data = $graph->render();
         $this->assertNotEquals($data, '');
-        $this->assertContains($user1->username, $data);
-        $this->assertContains($user2->username, $data);
-        $this->assertContains('admin', $data);
-        $this->assertContains('guest', $data);
-        $this->assertContains('User Creation Time - day of year', $data);
-        $this->assertNotContains('User\'s Courses Completed Count', $data);
-        $this->assertNotContains('User\'s Courses Started Count', $data);
+        $this->assertStringContainsString($user1->username, $data);
+        $this->assertStringContainsString($user2->username, $data);
+        $this->assertStringContainsString('admin', $data);
+        $this->assertStringContainsString('guest', $data);
+        $this->assertStringContainsString('User Creation Time - day of year', $data);
+        $this->assertStringNotContainsString('User\'s Courses Completed Count', $data);
+        $this->assertStringNotContainsString('User\'s Courses Started Count', $data);
     }
 }

@@ -110,13 +110,11 @@ class core_blocklib_testcase extends advanced_testcase {
         $this->assertEqualsCanonicalizing(array('a-region-name', 'another-region'), $this->blockmanager->get_regions());
     }
 
-    /**
-     * @expectedException coding_exception
-     */
     public function test_cannot_add_region_after_loaded() {
         // Set up fixture.
         $this->blockmanager->mark_loaded();
         // Exercise SUT.
+        $this->expectException(coding_exception::class);
         $this->blockmanager->add_region('too-late', false);
     }
 
@@ -167,12 +165,12 @@ class core_blocklib_testcase extends advanced_testcase {
 
     /**
      * Test to ensure that we cannot add a region after the blocks have been loaded.
-     * @expectedException coding_exception
      */
     public function test_cannot_add_custom_region_after_loaded() {
         // Set up fixture.
         $this->blockmanager->mark_loaded();
         // Exercise SUT.
+        $this->expectException(coding_exception::class);
         $this->blockmanager->add_region('too-late');
     }
 
@@ -185,21 +183,17 @@ class core_blocklib_testcase extends advanced_testcase {
         $this->assertEquals('a-region-name', $this->blockmanager->get_default_region());
     }
 
-    /**
-     * @expectedException coding_exception
-     */
     public function test_cannot_set_unknown_region_as_default() {
         // Exercise SUT.
+        $this->expectException(coding_exception::class);
         $this->blockmanager->set_default_region('a-region-name');
     }
 
-    /**
-     * @expectedException coding_exception
-     */
     public function test_cannot_change_default_region_after_loaded() {
         // Set up fixture.
         $this->blockmanager->mark_loaded();
         // Exercise SUT.
+        $this->expectException(coding_exception::class);
         $this->blockmanager->set_default_region('too-late');
     }
 
@@ -868,13 +862,13 @@ return;
         $code = implode(';', $requirements->get_raw_amd_js_code());
 
         // Current UTF-8 fixer will recover invalid UTF-8 sequence with "1".
-        $this->assertContains('{"blockname":"name1","blocktitle":"title1"}', $code);
-        $this->assertContains('{"blockname":"invalid21","blocktitle":"title2"}', $code);
-        $this->assertContains('{"blockname":"title3","blocktitle":"invalid31"}', $code);
-        $this->assertContains('{"blockname":"name4","blocktitle":"title4"}', $code);
+        $this->assertStringContainsString('{"blockname":"name1","blocktitle":"title1"}', $code);
+        $this->assertStringContainsString('{"blockname":"invalid21","blocktitle":"title2"}', $code);
+        $this->assertStringContainsString('{"blockname":"title3","blocktitle":"invalid31"}', $code);
+        $this->assertStringContainsString('{"blockname":"name4","blocktitle":"title4"}', $code);
 
         // Confirm that default region works correctly.
-        $this->assertContains('"default-region"', $code);
+        $this->assertStringContainsString('"default-region"', $code);
     }
 }
 

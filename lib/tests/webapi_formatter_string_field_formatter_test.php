@@ -195,7 +195,7 @@ class core_webapi_formatter_string_field_formatter_testcase extends advanced_tes
         $value = '<span class="myhtml">test</span>';
 
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessageRegExp('/Invalid format given/');
+        $this->expectExceptionMessage('Invalid format given');
 
         $formatter->format($value);
     }

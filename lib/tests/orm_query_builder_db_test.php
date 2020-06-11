@@ -912,7 +912,7 @@ class core_orm_query_builder_db_testcase extends advanced_testcase {
                 ->update_record(['price' => 5]);
             $this->fail('Exception should have been thrown');
         } catch (coding_exception $exception) {
-            $this->assertContains('Id is required to update a single record. Please use \core\orm\query\builder::update() instead', $exception->getMessage());
+            $this->assertStringContainsString('Id is required to update a single record. Please use \core\orm\query\builder::update() instead', $exception->getMessage());
         }
 
         // And now as object, just in case
@@ -921,7 +921,7 @@ class core_orm_query_builder_db_testcase extends advanced_testcase {
                 ->update_record((object) ['price' => 5]);
             $this->fail('Exception should have been thrown');
         } catch (coding_exception $exception) {
-            $this->assertContains('Id is required to update a single record. Please use \core\orm\query\builder::update() instead', $exception->getMessage());
+            $this->assertStringContainsString('Id is required to update a single record. Please use \core\orm\query\builder::update() instead', $exception->getMessage());
         }
     }
 
@@ -979,7 +979,7 @@ class core_orm_query_builder_db_testcase extends advanced_testcase {
 
     public function test_it_fails_insert_with_conditions() {
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessageRegExp('/conditions cannot be used with action insert()/');
+        $this->expectExceptionMessage('conditions cannot be used with action insert()');
 
         $record = [
             'item_id' => 1,
@@ -1001,7 +1001,7 @@ class core_orm_query_builder_db_testcase extends advanced_testcase {
      */
     public function test_it_fails_insert(builder $builder, $property) {
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessageRegExp('/'.$property.' cannot be used with action insert()/');
+        $this->expectExceptionMessage($property.' cannot be used with action insert()');
 
         $record = [
             'item_id' => 1,
@@ -1021,7 +1021,7 @@ class core_orm_query_builder_db_testcase extends advanced_testcase {
      */
     public function test_it_fails_update(builder $builder, $property) {
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessageRegExp('/'.$property.' cannot be used with action update()/');
+        $this->expectExceptionMessage($property.' cannot be used with action update()');
 
         $record = [
             'item_id' => 1,
@@ -1040,7 +1040,7 @@ class core_orm_query_builder_db_testcase extends advanced_testcase {
      */
     public function test_it_fails_delete(builder $builder, $property) {
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessageRegExp('/'.$property.' cannot be used with action delete()/');
+        $this->expectExceptionMessage($property.' cannot be used with action delete()');
 
         $builder->delete();
     }

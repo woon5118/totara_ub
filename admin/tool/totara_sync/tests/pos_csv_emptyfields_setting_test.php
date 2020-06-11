@@ -727,8 +727,6 @@ class tool_totara_sync_pos_csv_emptyfields_setting_testcase extends totara_sync_
     /**
      * An exception is expected here as the file being imported contains an
      * empty framework id which is not allowed.
-     *
-     * @expectedException moodle_exception
      */
     public function test_empty_frameworkidnumber_save_emptyfields() {
         global $DB;
@@ -740,13 +738,9 @@ class tool_totara_sync_pos_csv_emptyfields_setting_testcase extends totara_sync_
 
         $this->add_csv('position_empty_fields_5.csv', 'pos');
 
+        $this->expectException(moodle_exception::class);
+
         $this->get_element()->sync(); // Run the sync.
-
-        $position2 = $this->get_position('777');
-
-        $this->assertCount(1, $DB->get_records('pos')); // Check the correct count of positions.
-        $this->assertEquals('Position 2', $position2->fullname);
-        $this->assertEquals(1, $position2->frameworkid);
     }
 
     /**
@@ -776,8 +770,6 @@ class tool_totara_sync_pos_csv_emptyfields_setting_testcase extends totara_sync_
     /**
      *  We expect an exception here as it is impossible to create a new item
      *  with a blank framework id
-     *
-     *  @expectedException moodle_exception
      */
     public function test_create_pos_with_empty_frameworkidnumber() {
         global $DB;
@@ -788,6 +780,8 @@ class tool_totara_sync_pos_csv_emptyfields_setting_testcase extends totara_sync_
         $this->set_element_config($config);
 
         $this->add_csv('position_empty_fields_7.csv', 'pos');
+
+        $this->expectException(moodle_exception::class);
 
         $this->get_element()->sync(); // Run the sync.
 

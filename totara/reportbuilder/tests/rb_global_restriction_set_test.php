@@ -635,21 +635,17 @@ class totara_reportbuilder_rb_global_restriction_set_testcase extends advanced_t
         $this->assertContains(9923432942, $norm[1]);
     }
 
-    /**
-     * @expectedException coding_exception
-     */
     public function test_convert_qm_named_less() {
         // Test less values.
         $params = array(-1, 0, 2, 9923432942);
+        $this->expectException(coding_exception::class);
         rb_global_restriction_set::convert_qm_named($this->query, $params);
     }
 
-    /**
-     * @expectedException coding_exception
-     */
     public function test_convert_qm_named_more() {
         // Test more values.
         $params = array(-1, 0, 2, 9923432942, "test", 42);
+        $this->expectException(coding_exception::class);
         rb_global_restriction_set::convert_qm_named($this->query, $params);
     }
 

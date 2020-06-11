@@ -155,7 +155,7 @@ class mod_facetoface_custom_room_search_testcase extends advanced_testcase {
             'Seminar Room'
         );
         $markup = $this->set_data($event, $time, $time + 3600, $post);
-        $this->assertContains("Seminar Room", $markup, implode(" ", $messages));
+        $this->assertStringContainsString("Seminar Room", $markup, implode(" ", $messages));
     }
 
     /**
@@ -193,7 +193,7 @@ class mod_facetoface_custom_room_search_testcase extends advanced_testcase {
         ];
 
         $markup = $this->set_data($event2, $time, $time + 3600, $post);
-        $this->assertContains('No results found for "Seminar Room"', $markup);
+        $this->assertStringContainsString('No results found for "Seminar Room"', $markup);
     }
 
     /**
@@ -225,7 +225,7 @@ class mod_facetoface_custom_room_search_testcase extends advanced_testcase {
         ];
 
         $markup = $this->set_data($event2, $time, $time + 3600, $post);
-        $this->assertContains('No results found for "Seminar Room"', $markup);
+        $this->assertStringContainsString('No results found for "Seminar Room"', $markup);
     }
 
     private function set_data($event, $timestart, $timefinish, $post) {

@@ -88,7 +88,7 @@ class totara_catalog_settings_hook_testcase extends advanced_testcase {
 
         $course_update_event->trigger();
         $data = $DB->get_record('catalog', ['objecttype' => 'course']);
-        $this->assertContains('newtagname', $data->ftsmedium);
+        $this->assertStringContainsString('newtagname', $data->ftsmedium);
 
         // turn off tags
         admin_write_settings(['s__usetags' => '0']);
@@ -103,7 +103,7 @@ class totara_catalog_settings_hook_testcase extends advanced_testcase {
         // check the result after adhoc task completed
         $this->assertSame(1, $DB->count_records('catalog'));
         $data = $DB->get_record('catalog', ['objecttype' => 'course']);
-        $this->assertNotContains('newtagname', $data->ftsmedium);
+        $this->assertStringNotContainsString('newtagname', $data->ftsmedium);
     }
 
     public function test_turn_off_certification_observer() {

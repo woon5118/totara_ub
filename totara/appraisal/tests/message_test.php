@@ -773,12 +773,12 @@ class appraisal_message_test extends appraisal_testcase {
         $body_0 = preg_replace('|\R--(.{0,69})\R|', '', $emails[0]->body);
         $body_1 = preg_replace('|\R--(.{0,69})\R|', '', $emails[1]->body);
 
-        $this->assertContains('Test alert body text', $body_0);
+        $this->assertStringContainsString('Test alert body text', $body_0);
 
         // A bug (TL-20258) used to append a contexturl string for each appraisal closure message.
         // Make sure the bug is not re-introduced by checking both bodies are the same and don't contain this text.
         $this->assertSame($body_0, $body_1);
-        $this->assertNotContains('More details can be found at', $body_1);
+        $this->assertStringNotContainsString('More details can be found at', $body_1);
 
         $sink->clear();
         $sink->close();

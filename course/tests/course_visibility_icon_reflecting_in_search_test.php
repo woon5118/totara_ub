@@ -91,7 +91,7 @@ class course_visibility_icon_reflecting_in_search_test extends advanced_testcase
 
         // The data visible should be 0, as the $course->audiencevisible is set to COHORT_VISIBLE_NOUSERS
         $datavisible = "data-visible=\"0\"";
-        $this->assertContains($datavisible, $content);
+        $this->assertStringContainsString($datavisible, $content);
 
         if ($resetconfig) {
             $CFG->audiencevisibility = 0;

@@ -182,7 +182,7 @@ class totara_completionimport_lib_testcase extends advanced_testcase {
         $result = move_sourcefile($filename, $tempfilename);
         $this->assertFalse($result);
         $output = ob_get_clean();
-        $this->assertContains('Additional configuration settings are required', $output);
+        $this->assertStringContainsString('Additional configuration settings are required', $output);
 
         // No temp file should have been created whether this was a unit test or not.
         $this->assertFalse(is_readable($tempfilename));
@@ -272,7 +272,7 @@ class totara_completionimport_lib_testcase extends advanced_testcase {
         $result = move_sourcefile($filename, $tempfilename);
         $this->assertFalse($result);
         $output = ob_get_clean();
-        $this->assertContains('The CSV file name must include the full path to the file and begin with ', $output);
+        $this->assertStringContainsString('The CSV file name must include the full path to the file and begin with ', $output);
 
         // No temp file should have been created whether this was a unit test or not.
         $this->assertFalse(is_readable($tempfilename));

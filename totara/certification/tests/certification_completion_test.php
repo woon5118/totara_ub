@@ -2000,7 +2000,7 @@ class totara_certification_certification_completion_testcase extends reportcache
             $result = certif_write_completion($certcompletion, $progcompletion);
             $this->assertEquals("Shouldn't reach this code, exception not triggered!", $result);
         } catch (exception $e) {
-            $this->assertContains(get_string('error:updatinginvalidcompletionrecords', 'totara_certification'), $e->getMessage());
+            $this->assertStringContainsString(get_string('error:updatinginvalidcompletionrecords', 'totara_certification'), $e->getMessage());
         }
 
         // Cert and prog don't match #2.
@@ -2010,7 +2010,7 @@ class totara_certification_certification_completion_testcase extends reportcache
             $result = certif_write_completion($certcompletion, $progcompletion);
             $this->assertEquals("Shouldn't reach this code, exception not triggered!", $result);
         } catch (exception $e) {
-            $this->assertContains(get_string('error:updatinginvalidcompletionrecords', 'totara_certification'), $e->getMessage());
+            $this->assertStringContainsString(get_string('error:updatinginvalidcompletionrecords', 'totara_certification'), $e->getMessage());
         }
 
         // Cert and prog don't match #3.
@@ -2020,7 +2020,7 @@ class totara_certification_certification_completion_testcase extends reportcache
             $result = certif_write_completion($certcompletion, $progcompletion);
             $this->assertEquals("Shouldn't reach this code, exception not triggered!", $result);
         } catch (exception $e) {
-            $this->assertContains(get_string('error:updatinginvalidcompletionrecords', 'totara_certification'), $e->getMessage());
+            $this->assertStringContainsString(get_string('error:updatinginvalidcompletionrecords', 'totara_certification'), $e->getMessage());
         }
 
         // Cert and prog don't match #4.
@@ -2030,7 +2030,7 @@ class totara_certification_certification_completion_testcase extends reportcache
             $result = certif_write_completion($certcompletion, $progcompletion);
             $this->assertEquals("Shouldn't reach this code, exception not triggered!", $result);
         } catch (exception $e) {
-            $this->assertContains(get_string('error:updatinginvalidcompletionrecords', 'totara_certification'), $e->getMessage());
+            $this->assertStringContainsString(get_string('error:updatinginvalidcompletionrecords', 'totara_certification'), $e->getMessage());
         }
 
         // Cert completion exists but program completion doesn't.
@@ -2041,7 +2041,7 @@ class totara_certification_certification_completion_testcase extends reportcache
             $result = certif_write_completion($certcompletion, $progcompletion);
             $this->assertEquals("Shouldn't reach this code, exception not triggered!", $result);
         } catch (exception $e) {
-            $this->assertContains(get_string('error:updatinginvalidcompletionrecords', 'totara_certification'), $e->getMessage());
+            $this->assertStringContainsString(get_string('error:updatinginvalidcompletionrecords', 'totara_certification'), $e->getMessage());
         }
 
         // Prog completion exists but cert completion doesn't.
@@ -2052,7 +2052,7 @@ class totara_certification_certification_completion_testcase extends reportcache
             $result = certif_write_completion($certcompletion, $progcompletion);
             $this->assertEquals("Shouldn't reach this code, exception not triggered!", $result);
         } catch (exception $e) {
-            $this->assertContains(get_string('error:updatinginvalidcompletionrecords', 'totara_certification'), $e->getMessage());
+            $this->assertStringContainsString(get_string('error:updatinginvalidcompletionrecords', 'totara_certification'), $e->getMessage());
         }
 
         // Trying to insert when the records already exist.
@@ -2064,7 +2064,7 @@ class totara_certification_certification_completion_testcase extends reportcache
             $result = certif_write_completion($certcompletion, $progcompletion);
             $this->assertEquals("Shouldn't reach this code, exception not triggered!", $result);
         } catch (exception $e) {
-            $this->assertContains(get_string('error:updatinginvalidcompletionrecords', 'totara_certification'), $e->getMessage());
+            $this->assertStringContainsString(get_string('error:updatinginvalidcompletionrecords', 'totara_certification'), $e->getMessage());
         }
 
         // Update, but records don't match the database #1.
@@ -2075,7 +2075,7 @@ class totara_certification_certification_completion_testcase extends reportcache
             $result = certif_write_completion($certcompletion, $progcompletion);
             $this->assertEquals("Shouldn't reach this code, exception not triggered!", $result);
         } catch (exception $e) {
-            $this->assertContains(get_string('error:updatinginvalidcompletionrecords', 'totara_certification'), $e->getMessage());
+            $this->assertStringContainsString(get_string('error:updatinginvalidcompletionrecords', 'totara_certification'), $e->getMessage());
         }
 
         // Update, but records don't match the database #2.
@@ -2086,7 +2086,7 @@ class totara_certification_certification_completion_testcase extends reportcache
             $result = certif_write_completion($certcompletion, $progcompletion);
             $this->assertEquals("Shouldn't reach this code, exception not triggered!", $result);
         } catch (exception $e) {
-            $this->assertContains(get_string('error:updatinginvalidcompletionrecords', 'totara_certification'), $e->getMessage());
+            $this->assertStringContainsString(get_string('error:updatinginvalidcompletionrecords', 'totara_certification'), $e->getMessage());
         }
 
         // Update, but records don't match the database #3.
@@ -2097,7 +2097,7 @@ class totara_certification_certification_completion_testcase extends reportcache
             $result = certif_write_completion($certcompletion, $progcompletion);
             $this->assertEquals("Shouldn't reach this code, exception not triggered!", $result);
         } catch (exception $e) {
-            $this->assertContains(get_string('error:updatinginvalidcompletionrecords', 'totara_certification'), $e->getMessage());
+            $this->assertStringContainsString(get_string('error:updatinginvalidcompletionrecords', 'totara_certification'), $e->getMessage());
         }
 
         // Update, but records don't match the database #4.
@@ -2108,7 +2108,7 @@ class totara_certification_certification_completion_testcase extends reportcache
             $result = certif_write_completion($certcompletion, $progcompletion);
             $this->assertEquals("Shouldn't reach this code, exception not triggered!", $result);
         } catch (exception $e) {
-            $this->assertContains(get_string('error:updatinginvalidcompletionrecords', 'totara_certification'), $e->getMessage());
+            $this->assertStringContainsString(get_string('error:updatinginvalidcompletionrecords', 'totara_certification'), $e->getMessage());
         }
 
         // Check that all records are valid.
@@ -2451,7 +2451,7 @@ class totara_certification_certification_completion_testcase extends reportcache
             $result = certif_write_completion_history($histcompletion);
             $this->assertEquals("Shouldn't reach this code, exception not triggered!", $result);
         } catch (exception $e) {
-            $this->assertContains(get_string('error:updatinginvalidcompletionhistoryrecord', 'totara_certification'), $e->getMessage());
+            $this->assertStringContainsString(get_string('error:updatinginvalidcompletionhistoryrecord', 'totara_certification'), $e->getMessage());
         }
 
         // Update, but records don't match the database #2.
@@ -2461,7 +2461,7 @@ class totara_certification_certification_completion_testcase extends reportcache
             $result = certif_write_completion_history($histcompletion);
             $this->assertEquals("Shouldn't reach this code, exception not triggered!", $result);
         } catch (exception $e) {
-            $this->assertContains(get_string('error:updatinginvalidcompletionhistoryrecord', 'totara_certification'), $e->getMessage());
+            $this->assertStringContainsString(get_string('error:updatinginvalidcompletionhistoryrecord', 'totara_certification'), $e->getMessage());
         }
 
         // Trying to insert when the record already exists.
@@ -2471,7 +2471,7 @@ class totara_certification_certification_completion_testcase extends reportcache
             $result = certif_write_completion_history($historycompletion);
             $this->assertEquals("Shouldn't reach this code, exception not triggered!", $result);
         } catch (exception $e) {
-            $this->assertContains(get_string('error:updatinginvalidcompletionhistoryrecord', 'totara_certification'), $e->getMessage());
+            $this->assertStringContainsString(get_string('error:updatinginvalidcompletionhistoryrecord', 'totara_certification'), $e->getMessage());
         }
 
         // Trying to insert when the record already exists but this is a different timeexpires (so can be inserted).
@@ -3206,7 +3206,7 @@ class totara_certification_certification_completion_testcase extends reportcache
             $this->assertEquals("Shouldn't reach this code, exception not triggered!", $certcompletion);
         } catch (exception $e) {
             $a = array('programid' => 1234321, 'userid' => -5);
-            $this->assertContains(s(get_string('error:cannotloadcompletionrecords', 'totara_certification', $a)), $e->getMessage());
+            $this->assertStringContainsString(s(get_string('error:cannotloadcompletionrecords', 'totara_certification', $a)), $e->getMessage());
         }
     }
 

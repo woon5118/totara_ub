@@ -111,10 +111,10 @@ class totara_hierarchy_update_competencies_task_testcase extends advanced_testca
 
         $this->assertSame(6, $DB->count_records('comp_record', ['reaggregate' => 0]));
 
-        $this->assertContains('Aggregating competency items evidence for user '.$user1->id.' for competency '.$comp2id, $output);
-        $this->assertContains('Aggregating competency items evidence for user '.$user2->id.' for competency '.$comp2id, $output);
-        $this->assertContains('Aggregating competency items evidence for user '.$user3->id.' for competency '.$comp2id, $output);
-        $this->assertContains("Aggregating competency items evidence for user ".$user3->id." for competency ".$comp1id."\nUpdate proficiency to 1", $output);
+        $this->assertStringContainsString('Aggregating competency items evidence for user '.$user1->id.' for competency '.$comp2id, $output);
+        $this->assertStringContainsString('Aggregating competency items evidence for user '.$user2->id.' for competency '.$comp2id, $output);
+        $this->assertStringContainsString('Aggregating competency items evidence for user '.$user3->id.' for competency '.$comp2id, $output);
+        $this->assertStringContainsString("Aggregating competency items evidence for user ".$user3->id." for competency ".$comp1id."\nUpdate proficiency to 1", $output);
 
         $this->assert_user_hold_competencies($user1, [$comp3id]);
         $this->assert_user_hold_competencies($user2, []);
@@ -135,8 +135,8 @@ class totara_hierarchy_update_competencies_task_testcase extends advanced_testca
 
         $this->assertSame(7, $DB->count_records('comp_record', ['reaggregate' => 0]));
 
-        $this->assertContains('Aggregating competency items evidence for user '.$user1->id.' for competency '.$comp1id, $output);
-        $this->assertContains('Aggregating competency items evidence for user '.$user1->id.' for competency '.$comp2id, $output);
+        $this->assertStringContainsString('Aggregating competency items evidence for user '.$user1->id.' for competency '.$comp1id, $output);
+        $this->assertStringContainsString('Aggregating competency items evidence for user '.$user1->id.' for competency '.$comp2id, $output);
 
         $this->assert_user_hold_competencies($user1, [$comp1id, $comp2id, $comp3id]);
         $this->assert_user_hold_competencies($user2, []);
@@ -200,15 +200,15 @@ class totara_hierarchy_update_competencies_task_testcase extends advanced_testca
         $this->assertSame(0, $DB->count_records('comp_record', ['reaggregate' => $reaggregatetime]));
         $this->assertSame(9, $DB->count_records('comp_record', ['reaggregate' => 0]));
 
-        $this->assertContains('Aggregating competency items evidence for user '.$user1->id.' for competency '.$comp9id, $output);
-        $this->assertContains('Aggregating competency items evidence for user '.$user1->id.' for competency '.$comp8id, $output);
-        $this->assertContains('Aggregating competency items evidence for user '.$user1->id.' for competency '.$comp7id, $output);
-        $this->assertContains('Aggregating competency items evidence for user '.$user1->id.' for competency '.$comp6id, $output);
-        $this->assertContains('Aggregating competency items evidence for user '.$user1->id.' for competency '.$comp5id, $output);
-        $this->assertContains('Aggregating competency items evidence for user '.$user1->id.' for competency '.$comp4id, $output);
-        $this->assertContains('Aggregating competency items evidence for user '.$user1->id.' for competency '.$comp3id, $output);
-        $this->assertContains('Aggregating competency items evidence for user '.$user1->id.' for competency '.$comp2id, $output);
-        $this->assertContains('Aggregating competency items evidence for user '.$user1->id.' for competency '.$comp1id, $output);
+        $this->assertStringContainsString('Aggregating competency items evidence for user '.$user1->id.' for competency '.$comp9id, $output);
+        $this->assertStringContainsString('Aggregating competency items evidence for user '.$user1->id.' for competency '.$comp8id, $output);
+        $this->assertStringContainsString('Aggregating competency items evidence for user '.$user1->id.' for competency '.$comp7id, $output);
+        $this->assertStringContainsString('Aggregating competency items evidence for user '.$user1->id.' for competency '.$comp6id, $output);
+        $this->assertStringContainsString('Aggregating competency items evidence for user '.$user1->id.' for competency '.$comp5id, $output);
+        $this->assertStringContainsString('Aggregating competency items evidence for user '.$user1->id.' for competency '.$comp4id, $output);
+        $this->assertStringContainsString('Aggregating competency items evidence for user '.$user1->id.' for competency '.$comp3id, $output);
+        $this->assertStringContainsString('Aggregating competency items evidence for user '.$user1->id.' for competency '.$comp2id, $output);
+        $this->assertStringContainsString('Aggregating competency items evidence for user '.$user1->id.' for competency '.$comp1id, $output);
 
         $expected = [
             $comp9id,
@@ -227,7 +227,7 @@ class totara_hierarchy_update_competencies_task_testcase extends advanced_testca
 
         $output = $this->run_task();
 
-        $this->assertNotContains('Aggregating competency items evidence for user', $output);
+        $this->assertStringNotContainsString('Aggregating competency items evidence for user', $output);
 
         $expected = [
             $comp9id,

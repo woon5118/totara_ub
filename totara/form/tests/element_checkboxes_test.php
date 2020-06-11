@@ -328,7 +328,7 @@ class totara_form_element_checkboxes_testcase extends advanced_testcase {
         $html = $form->render();
         $expected = $OUTPUT->help_icon('pos_description', 'totara_core', '');
         $notexpected = $OUTPUT->help_icon('pathtowkhtmltopdf', 'totara_core', '');
-        $this->assertContains($expected, $html);
-        $this->assertNotContains($notexpected, $html);
+        $this->assertStringContainsString($expected, $html);
+        $this->assertStringNotContainsString($notexpected, $html);
     }
 }

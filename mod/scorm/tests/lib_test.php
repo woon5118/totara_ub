@@ -268,7 +268,7 @@ class mod_scorm_lib_testcase extends externallib_advanced_testcase {
         $this->assertIsArray($scormdetails);
         $this->assertCount(1, $scormdetails);
         $this->assertArrayHasKey('scorm', $scormdetails);
-        $this->assertContains('SCORM package:', $scormdetails['scorm']);
+        $this->assertStringContainsString('SCORM package:', $scormdetails['scorm']);
     }
 
     /**

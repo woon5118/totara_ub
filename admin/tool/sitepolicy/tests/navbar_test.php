@@ -54,8 +54,8 @@ class tool_sitepolicy_navbar_test extends \advanced_testcase {
         $output = message_popup_render_navbar_output($corerenderer);
         $CFG->enablesitepolicies = $prepolicies;
 
-        $this->assertContains("nav-message-popover-container", $output);
-        $this->assertContains("nav-notification-popover-container", $output);
+        $this->assertStringContainsString("nav-message-popover-container", $output);
+        $this->assertStringContainsString("nav-notification-popover-container", $output);
     }
 
     /**
@@ -77,8 +77,8 @@ class tool_sitepolicy_navbar_test extends \advanced_testcase {
 
         $output = message_popup_render_navbar_output($corerenderer);
 
-        $this->assertContains("nav-message-popover-container", $output);
-        $this->assertContains("nav-notification-popover-container", $output);
+        $this->assertStringContainsString("nav-message-popover-container", $output);
+        $this->assertStringContainsString("nav-notification-popover-container", $output);
     }
 
     /**
@@ -104,8 +104,8 @@ class tool_sitepolicy_navbar_test extends \advanced_testcase {
         $output = message_popup_render_navbar_output($corerenderer);
         $CFG->enablesitepolicies = $prepolicies;
 
-        $this->assertNotContains("nav-message-popover-container", $output);
-        $this->assertNotContains("nav-notification-popover-container", $output);
+        $this->assertStringNotContainsString("nav-message-popover-container", $output);
+        $this->assertStringNotContainsString("nav-notification-popover-container", $output);
     }
 
     /**
@@ -137,7 +137,7 @@ class tool_sitepolicy_navbar_test extends \advanced_testcase {
         $output = message_popup_render_navbar_output($corerenderer);
         $CFG->enablesitepolicies = $prepolicies;
 
-        $this->assertContains("nav-message-popover-container", $output);
-        $this->assertContains("nav-notification-popover-container", $output);
+        $this->assertStringContainsString("nav-message-popover-container", $output);
+        $this->assertStringContainsString("nav-notification-popover-container", $output);
     }
 }

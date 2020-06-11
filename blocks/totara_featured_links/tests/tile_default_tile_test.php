@@ -165,7 +165,7 @@ class block_totara_featured_links_tile_default_tile_testcase extends test_helper
         $this->call_protected_method($tile1, 'decode_data');
 
         $content = $tile1->render_content_wrapper($PAGE->get_renderer('core'), []);
-        $this->assertContains($tile1->id, $content);
+        $this->assertStringContainsString($tile1->id, $content);
     }
 
     /**
@@ -192,6 +192,6 @@ class block_totara_featured_links_tile_default_tile_testcase extends test_helper
         $content = $tile1->render_content_wrapper($PAGE->get_renderer('core'), []);
         $this->assertStringStartsWith('<div', $content);
         $this->assertStringEndsWith('</div>', $content);
-        $this->assertContains('block-totara-featured-links-content-top', $content);
+        $this->assertStringContainsString('block-totara-featured-links-content-top', $content);
     }
 }

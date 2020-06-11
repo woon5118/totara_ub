@@ -176,8 +176,6 @@ class mod_choice_events_testcase extends advanced_testcase {
 
     /**
      * Test custom validations.
-     *
-     * @expectedException coding_exception
      */
     public function test_answer_created_other_exception() {
         // Generate user data.
@@ -189,6 +187,8 @@ class mod_choice_events_testcase extends advanced_testcase {
         $eventdata['userid'] = $user->id;
         $eventdata['courseid'] = $this->course->id;
         $eventdata['other'] = array();
+
+        $this->expectException(coding_exception::class);
 
         // Make sure content identifier is always set.
         $event = \mod_choice\event\answer_created::create($eventdata);

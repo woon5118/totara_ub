@@ -123,7 +123,7 @@ class block_totara_featured_links_learning_item_tile_testcase extends test_helpe
         $content = $tiledata['tile']->render_content_wrapper($PAGE->get_renderer('core'), []);
         $this->assertStringStartsWith('<div', $content);
         $this->assertStringEndsWith('</div>', $content);
-        $this->assertContains('Test course 1', $content);
+        $this->assertStringContainsString('Test course 1', $content);
     }
 
     public function test_user_can_view_content() {

@@ -87,7 +87,7 @@ class mod_facetoface_cancelled_event_testcase extends advanced_testcase {
 
         // Start assertion to locate that whether the room name is included in the cancellation message.
         foreach ($messages as $msg) {
-            $this->assertContains('This is custom room', $msg->fullmessage);
+            $this->assertStringContainsString('This is custom room', $msg->fullmessage);
         }
     }
 

@@ -55,7 +55,7 @@ class totara_userdata_task_export_testcase extends advanced_testcase {
         $export = $DB->get_record('totara_userdata_export', array('id' => $oldexport->id), '*', MUST_EXIST);
         $messages = $sink->get_messages();
 
-        $this->assertContains('Export - Success', $output);
+        $this->assertStringContainsString('Export - Success', $output);
         $this->assertTimeCurrent($export->timestarted);
         $this->assertTimeCurrent($export->timefinished);
         $this->assertEquals(-1, $export->result);

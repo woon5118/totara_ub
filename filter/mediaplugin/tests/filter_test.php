@@ -135,7 +135,7 @@ class filter_mediaplugin_testcase extends advanced_testcase {
         $precededlongurl = '<a href="http://moodle.org/testfile/test.mp3">test.mp3</a>'. $longurl;
         $filter = $filterplugin->filter($precededlongurl);
         $this->assertEquals(1, substr_count($filter, '</audio>'));
-        $this->assertContains($longurl, $filter);
+        $this->assertStringContainsString($longurl, $filter);
 
         // Testing for cases where: to be filtered content has 6+ text afterwards.
         $filter = $filterplugin->filter($paddedurl);
@@ -193,15 +193,15 @@ class filter_mediaplugin_testcase extends advanced_testcase {
     }
 
     private function assertContainsObject($text, $url) {
-        $this->assertContains('<span class="mediaplugin mediaplugin_swf">', $text);
-        $this->assertContains('<object classid="clsid:', $text);
-        $this->assertContains('<param name="movie" value="'.htmlentities($url).'" />', $text);
+        $this->assertStringContainsString('<span class="mediaplugin mediaplugin_swf">', $text);
+        $this->assertStringContainsString('<object classid="clsid:', $text);
+        $this->assertStringContainsString('<param name="movie" value="'.htmlentities($url).'" />', $text);
     }
 
     private function assertNotContainsObject($text, $url) {
-        $this->assertNotContains('<span class="mediaplugin mediaplugin_swf">', $text);
-        $this->assertNotContains('<object classid="clsid:', $text);
-        $this->assertNotContains('<param name="movie" value="'.htmlentities($url).'" />', $text);
+        $this->assertStringNotContainsString('<span class="mediaplugin mediaplugin_swf">', $text);
+        $this->assertStringNotContainsString('<object classid="clsid:', $text);
+        $this->assertStringNotContainsString('<param name="movie" value="'.htmlentities($url).'" />', $text);
     }
 
     /**

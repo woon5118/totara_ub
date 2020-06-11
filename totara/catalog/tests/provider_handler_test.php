@@ -141,10 +141,8 @@ class totara_catalog_provider_handler_testcase extends config_base_testcase {
         }
     }
 
-    /**
-     * @expectedException coding_exception
-     */
     public function test_get_invalid_provider() {
+        $this->expectException(coding_exception::class);
         $this->provider_handler->get_provider('seminar');
     }
 

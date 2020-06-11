@@ -80,8 +80,8 @@ class block_totara_certifications_testcase extends advanced_testcase {
         // By default Certification should be enabled / visible.
         $blockinstance = $this->create_totara_certifications_block_instance();
         $content = $blockinstance->get_content()->text;
-        $this->assertContains('The following certifications are due for renewal or require completing', $content);
-        $this->assertContains('Test Certification 1', $content);
+        $this->assertStringContainsString('The following certifications are due for renewal or require completing', $content);
+        $this->assertStringContainsString('Test Certification 1', $content);
 
         // Now disable Certifications. The block should not show.
         set_config('enablecertifications', advanced_feature::DISABLED);
@@ -105,8 +105,8 @@ class block_totara_certifications_testcase extends advanced_testcase {
         // The certification is visible, the content should show.
         $blockinstance = $this->create_totara_certifications_block_instance();
         $content = $blockinstance->get_content()->text;
-        $this->assertContains('The following certifications are due for renewal or require completing', $content);
-        $this->assertContains('Test Certification 1', $content);
+        $this->assertStringContainsString('The following certifications are due for renewal or require completing', $content);
+        $this->assertStringContainsString('Test Certification 1', $content);
 
         // Mark the certification as hidden, the content should not be displayed.
         $cert = $DB->get_record('prog', ['id' => $data->programid]);
@@ -116,8 +116,8 @@ class block_totara_certifications_testcase extends advanced_testcase {
         $blockinstance = $this->create_totara_certifications_block_instance();
         $content = $blockinstance->get_content()->text;
 
-        $this->assertContains('No certifications due', $content);
-        $this->assertNotContains('Test Certification 1', $content);
+        $this->assertStringContainsString('No certifications due', $content);
+        $this->assertStringNotContainsString('Test Certification 1', $content);
     }
 
     /**
@@ -144,8 +144,8 @@ class block_totara_certifications_testcase extends advanced_testcase {
         // The certification is visible, the content should show.
         $blockinstance = $this->create_totara_certifications_block_instance();
         $content = $blockinstance->get_content()->text;
-        $this->assertContains('The following certifications are due for renewal or require completing', $content);
-        $this->assertContains('Test Certification 1', $content);
+        $this->assertStringContainsString('The following certifications are due for renewal or require completing', $content);
+        $this->assertStringContainsString('Test Certification 1', $content);
 
         // Mark the certification visibility as no users
         $cert->audiencevisible = COHORT_VISIBLE_NOUSERS;
@@ -154,8 +154,8 @@ class block_totara_certifications_testcase extends advanced_testcase {
         // The certification content should not show.
         $blockinstance = $this->create_totara_certifications_block_instance();
         $content = $blockinstance->get_content()->text;
-        $this->assertContains('No certifications due', $content);
-        $this->assertNotContains('Test Certification 1', $content);
+        $this->assertStringContainsString('No certifications due', $content);
+        $this->assertStringNotContainsString('Test Certification 1', $content);
 
         // Mark the certification visibility to Enrolled users only.
         $cert->audiencevisible = COHORT_VISIBLE_ENROLLED;
@@ -164,8 +164,8 @@ class block_totara_certifications_testcase extends advanced_testcase {
         // The certification content should show, the user is enrolled.
         $blockinstance = $this->create_totara_certifications_block_instance();
         $content = $blockinstance->get_content()->text;
-        $this->assertContains('The following certifications are due for renewal or require completing', $content);
-        $this->assertContains('Test Certification 1', $content);
+        $this->assertStringContainsString('The following certifications are due for renewal or require completing', $content);
+        $this->assertStringContainsString('Test Certification 1', $content);
 
         // Mark the certification visibility to Enrolled users and member of audience.
         $cert->audiencevisible = COHORT_VISIBLE_AUDIENCE;
@@ -175,7 +175,7 @@ class block_totara_certifications_testcase extends advanced_testcase {
         // an audience as the slq is checking record exists in prog_user_assignment).
         $blockinstance = $this->create_totara_certifications_block_instance();
         $content = $blockinstance->get_content()->text;
-        $this->assertContains('The following certifications are due for renewal or require completing', $content);
-        $this->assertContains('Test Certification 1', $content);
+        $this->assertStringContainsString('The following certifications are due for renewal or require completing', $content);
+        $this->assertStringContainsString('Test Certification 1', $content);
     }
 }

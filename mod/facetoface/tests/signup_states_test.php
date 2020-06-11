@@ -259,36 +259,42 @@ class mod_facetoface_signup_states_testcase extends advanced_testcase {
 
     /**
      * Confirm that not_set state cannot be stored in signup_status.
-     * @expectedException \mod_facetoface\exception\signup_exception
-     * @expectedExceptionMessage Cannot update status without state set
      */
     public function test_signup_status_not_set_cannot_be_saved() {
         $status = new signup_status();
         $status->set_statuscode(signup\state\not_set::get_code());
         $status->set_signupid(42);
+
+        $this->expectException(mod_facetoface\exception\signup_exception::class);
+        $this->expectExceptionMessage('Cannot update status without state set');
+
         $status->save();
     }
 
     /**
      * Confirm signup_status cannot be stored if status was never set.
-     * @expectedException \mod_facetoface\exception\signup_exception
-     * @expectedExceptionMessage Cannot update status without state set
      */
     public function test_signup_status_cannot_be_saved_if_set_statuscode_is_never_called() {
         $status = new signup_status();
         $status->set_signupid(42);
+
+        $this->expectException(mod_facetoface\exception\signup_exception::class);
+        $this->expectExceptionMessage('Cannot update status without state set');
+
         $status->save();
     }
 
     /**
      * Confirm that not_set state cannot be stored as signup state.
-     * @expectedException \mod_facetoface\exception\signup_exception
-     * @expectedExceptionMessage New booking status cannot be 'not set'
      */
     public function test_signup_cannot_be_updated_to_not_set() {
         $signup = new signup();
         $reflection = new ReflectionMethod($signup, 'update_status');
         $reflection->setAccessible(true);
+
+        $this->expectException(mod_facetoface\exception\signup_exception::class);
+        $this->expectExceptionMessage('New booking status cannot be \'not set\'');
+
         $reflection->invoke($signup, new not_set($signup));
     }
 
@@ -346,7 +352,7 @@ class mod_facetoface_signup_states_testcase extends advanced_testcase {
             $signup->switch_state_with_grade($grade, $options, ...$newstates);
             $this->fail('signup_exception expected');
         } catch (signup_exception $ex) {
-            $this->assertContains($message, $ex->getMessage());
+            $this->assertStringContainsString($message, $ex->getMessage());
         }
     }
 
@@ -417,7 +423,7 @@ class mod_facetoface_signup_states_testcase extends advanced_testcase {
             $rm->invoke($signup, $state, 0, 0, $grade, $options);
             $this->fail('signup_exception expected');
         } catch (signup_exception $ex) {
-            $this->assertContains($message, $ex->getMessage());
+            $this->assertStringContainsString($message, $ex->getMessage());
         }
     }
 

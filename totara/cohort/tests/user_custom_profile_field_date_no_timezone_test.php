@@ -136,12 +136,12 @@ class totara_cohort_user_custom_profile_field_date_no_timezone_testcase extends 
         profile_load_custom_fields($users[2]);
 
         // all timestamps should convert to midday when using UTC timezone. Checking a selection of dates for this
-        $this->assertContains('12:00', userdate($users[0]->profile_field_date1, '%H:%M', 'UTC'));
-        $this->assertContains('12:00', userdate($users[1]->profile_field_date1, '%H:%M', 'UTC'));
-        $this->assertContains('12:00', userdate($users[1]->profile_field_date2, '%H:%M', 'UTC'));
-        $this->assertContains('12:00', userdate($users[1]->profile_field_date3, '%H:%M', 'UTC'));
-        $this->assertContains('12:00', userdate($users[2]->profile_field_date1, '%H:%M', 'UTC'));
-        $this->assertContains('12:00', userdate($users[2]->profile_field_date2, '%H:%M', 'UTC'));
+        $this->assertStringContainsString('12:00', userdate($users[0]->profile_field_date1, '%H:%M', 'UTC'));
+        $this->assertStringContainsString('12:00', userdate($users[1]->profile_field_date1, '%H:%M', 'UTC'));
+        $this->assertStringContainsString('12:00', userdate($users[1]->profile_field_date2, '%H:%M', 'UTC'));
+        $this->assertStringContainsString('12:00', userdate($users[1]->profile_field_date3, '%H:%M', 'UTC'));
+        $this->assertStringContainsString('12:00', userdate($users[2]->profile_field_date1, '%H:%M', 'UTC'));
+        $this->assertStringContainsString('12:00', userdate($users[2]->profile_field_date2, '%H:%M', 'UTC'));
 
         $this->users = $users;
     }

@@ -131,7 +131,7 @@ class search_manager_testcase extends advanced_testcase {
             $search->reset_config($fakeareaid);
             $this->fail('An exception should be triggered if the provided search area does not exist.');
         } catch (moodle_exception $ex) {
-            $this->assertContains($fakeareaid . ' search area is not available.', $ex->getMessage());
+            $this->assertStringContainsString($fakeareaid . ' search area is not available.', $ex->getMessage());
         }
 
         // We clean it all but enabled components.
@@ -770,14 +770,14 @@ class search_manager_testcase extends advanced_testcase {
         $progress->reset_buffer();
 
         // Check that it's done both areas.
-        $this->assertContains(
+        $this->assertStringContainsString(
                 'Indexing requested context: Course: TCourse (search area: mod_label-activity)',
                 $out);
-        $this->assertContains(
+        $this->assertStringContainsString(
                 'Completed requested context: Course: TCourse (search area: mod_label-activity)',
                 $out);
-        $this->assertContains('Indexing requested context: Forum: TForum1', $out);
-        $this->assertContains('Completed requested context: Forum: TForum1', $out);
+        $this->assertStringContainsString('Indexing requested context: Forum: TForum1', $out);
+        $this->assertStringContainsString('Completed requested context: Forum: TForum1', $out);
 
         // Check the requests database table is now empty.
         $this->assertEquals(0, $DB->count_records('search_index_requests'));
@@ -795,11 +795,11 @@ class search_manager_testcase extends advanced_testcase {
         $progress->reset_buffer();
 
         // Confirm the right wrapper information was logged.
-        $this->assertContains(
+        $this->assertStringContainsString(
                 'Indexing requested context: Course: TCourse (search area: mod_forum-activity)',
                 $out);
-        $this->assertContains('Stopping indexing due to time limit', $out);
-        $this->assertContains(
+        $this->assertStringContainsString('Stopping indexing due to time limit', $out);
+        $this->assertStringContainsString(
                 'Ending requested context: Course: TCourse (search area: mod_forum-activity)',
                 $out);
 
@@ -812,10 +812,10 @@ class search_manager_testcase extends advanced_testcase {
         $search->process_index_requests(0.1, $progress);
         $out = $progress->get_buffer();
         $progress->reset_buffer();
-        $this->assertContains(
+        $this->assertStringContainsString(
                 'Completed requested context: Course: TCourse (search area: mod_forum-activity)',
                 $out);
-        $this->assertContains(
+        $this->assertStringContainsString(
                 'Completed requested context: Course: TCourse (search area: mod_forum-post)',
                 $out);
 
@@ -836,7 +836,7 @@ class search_manager_testcase extends advanced_testcase {
         $search->process_index_requests(10, $progress);
         $out = $progress->get_buffer();
         $progress->reset_buffer();
-        $this->assertContains('Skipped deleted context: ' . $context->id, $out);
+        $this->assertStringContainsString('Skipped deleted context: ' . $context->id, $out);
 
         // Confirm request table is now empty.
         $this->assertEquals(0, $DB->count_records('search_index_requests'));

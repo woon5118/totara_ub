@@ -749,8 +749,6 @@ class tool_totara_sync_comp_csv_emptyfields_setting_testcase extends totara_sync
     /**
      * An exception is exptected from the sync() function here as the file being
      * imported contains an empty framework id which is not allowed.
-     *
-     * @expectedException moodle_exception
      */
     public function test_empty_frameworkidnumber_save_emptyfields() {
 
@@ -761,6 +759,8 @@ class tool_totara_sync_comp_csv_emptyfields_setting_testcase extends totara_sync
         $csv = "idnumber,fullname,shortname,frameworkidnumber,timemodified,description,parentidnumber,aggregationmethod\n";
         $csv .= "777,Competency 2,comp2,,0,Description 2,,1";
         $element->source->set_csv_in_memory($csv);
+
+        $this->expectException(moodle_exception::class);
 
         $element->sync();
     }

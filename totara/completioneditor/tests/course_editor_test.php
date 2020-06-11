@@ -39,7 +39,7 @@ class totara_completioneditor_course_editor_testcase extends advanced_testcase {
      */
     public function test_get_error_solution() {
         $solution = course_editor::get_error_solution('imaginaryproblemkey');
-        $this->assertContains('There is no specific information', $solution);
+        $this->assertStringContainsString('There is no specific information', $solution);
     }
 
     /**

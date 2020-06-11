@@ -56,7 +56,7 @@ class block_totara_stats_testcase extends advanced_testcase {
             $this->assertNotEmpty($statdata->sql);
             $this->assertTrue(isset($statdata->sqlparams));
             $this->assertNotEmpty($statdata->string);
-            $this->assertContains('1 <> 1', $statdata->sql);
+            $this->assertStringContainsString('1 <> 1', $statdata->sql);
         }
 
     }

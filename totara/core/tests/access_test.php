@@ -366,13 +366,13 @@ class totara_core_access_testcase extends advanced_testcase {
 
         $user = $this->getDataGenerator()->create_user();
         list($hascapsql, $params) = totara_core\access::get_has_capability_sql('moodle/site:config', '{something}.contextid', $user->id);
-        $this->assertContains('{something}.contextid', $hascapsql);
+        $this->assertStringContainsString('{something}.contextid', $hascapsql);
 
         list($hascapsql, $params) = totara_core\access::get_has_capability_sql('moodle/site:config', 'some_thing3.xyz_3ed', $user->id);
-        $this->assertContains('some_thing3.xyz_3ed', $hascapsql);
+        $this->assertStringContainsString('some_thing3.xyz_3ed', $hascapsql);
 
         list($hascapsql, $params) = totara_core\access::get_has_capability_sql('moodle/site:config', 'xyz_3ed', $user->id);
-        $this->assertContains('xyz_3ed', $hascapsql);
+        $this->assertStringContainsString('xyz_3ed', $hascapsql);
     }
 
     /**

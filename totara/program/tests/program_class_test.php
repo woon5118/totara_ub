@@ -2193,9 +2193,9 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
         $prefix = chr(0) . '*' . chr(0);
 
         // Check that we get a theme-independent default icon reference.
-        $this->assertContains($result[$prefix . 'host'], $CFG->wwwroot);
-        $this->assertContains('moodle/theme/image.php', $result[$prefix . 'path']);
-        $this->assertContains('defaultimage', $result[$prefix . 'slashargument']);
+        $this->assertStringContainsString($result[$prefix . 'host'], $CFG->wwwroot);
+        $this->assertStringContainsString('moodle/theme/image.php', $result[$prefix . 'path']);
+        $this->assertStringContainsString('defaultimage', $result[$prefix . 'slashargument']);
 
         // Upload a default.
         $draftfile = core_files_external::upload(
@@ -2269,9 +2269,9 @@ class totara_program_program_class_testcase extends reportcache_advanced_testcas
         $prefix = chr(0) . '*' . chr(0);
 
         // Check that we get a theme-independent default icon reference.
-        $this->assertContains($result[$prefix . 'host'], $CFG->wwwroot);
-        $this->assertContains('moodle/theme/image.php', $result[$prefix . 'path']);
-        $this->assertContains('defaultimage', $result[$prefix . 'slashargument']);
+        $this->assertStringContainsString($result[$prefix . 'host'], $CFG->wwwroot);
+        $this->assertStringContainsString('moodle/theme/image.php', $result[$prefix . 'path']);
+        $this->assertStringContainsString('defaultimage', $result[$prefix . 'slashargument']);
 
         $draftfile = core_files_external::upload(
             $usercontext->id,

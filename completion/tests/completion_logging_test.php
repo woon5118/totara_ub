@@ -55,8 +55,8 @@ class core_completion_completion_logging_testcase extends advanced_testcase {
         $this->assertEquals($user->id, $log->userid);
         $this->assertEquals($course->id, $log->courseid);
         $this->assertEquals($USER->id, $log->changeuserid);
-        $this->assertContains('Created current completion in completion_completion->_save', $log->description);
-        $this->assertContains('Status', $log->description);
+        $this->assertStringContainsString('Created current completion in completion_completion->_save', $log->description);
+        $this->assertStringContainsString('Status', $log->description);
 
         // Then test that "updated" logs are created.
         $DB->delete_records('course_completion_log');
@@ -72,8 +72,8 @@ class core_completion_completion_logging_testcase extends advanced_testcase {
         $this->assertEquals($user->id, $log->userid);
         $this->assertEquals($course->id, $log->courseid);
         $this->assertEquals($USER->id, $log->changeuserid);
-        $this->assertContains('Updated current completion in completion_completion->_save', $log->description);
-        $this->assertContains('Status', $log->description);
+        $this->assertStringContainsString('Updated current completion in completion_completion->_save', $log->description);
+        $this->assertStringContainsString('Status', $log->description);
     }
 
     public function test_archive_course_activities() {
@@ -126,8 +126,8 @@ class core_completion_completion_logging_testcase extends advanced_testcase {
         $this->assertEquals($user1->id, $log->userid);
         $this->assertEquals($course->id, $log->courseid);
         $this->assertEquals($USER->id, $log->changeuserid);
-        $this->assertContains('Deleted module completion in archive_course_activities', $log->description);
-        $this->assertContains((string)$cmcid, $log->description);
+        $this->assertStringContainsString('Deleted module completion in archive_course_activities', $log->description);
+        $this->assertStringContainsString((string)$cmcid, $log->description);
     }
 
     public function test_archive_course_completion() {
@@ -162,11 +162,11 @@ class core_completion_completion_logging_testcase extends advanced_testcase {
         $this->assertEquals($user1->id, $log1->userid);
         $this->assertEquals($course->id, $log1->courseid);
         $this->assertEquals($USER->id, $log1->changeuserid);
-        $this->assertContains('History created in archive_course_completion', $log1->description);
+        $this->assertStringContainsString('History created in archive_course_completion', $log1->description);
 
         $this->assertEquals($user1->id, $log2->userid);
         $this->assertEquals($course->id, $log2->courseid);
         $this->assertEquals($USER->id, $log2->changeuserid);
-        $this->assertContains('Deleted current completion and all crit compl records in delete_course_completion_data', $log2->description);
+        $this->assertStringContainsString('Deleted current completion and all crit compl records in delete_course_completion_data', $log2->description);
     }
 }

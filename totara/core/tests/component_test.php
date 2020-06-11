@@ -31,7 +31,7 @@ class totara_core_component_testcase extends advanced_testcase {
         $displayclasses = core_component::get_namespace_classes('rb\display');
         $this->assertIsArray($displayclasses);
         foreach ($displayclasses as $displayclass) {
-            $this->assertContains('\rb\display\\', $displayclass);
+            $this->assertStringContainsString('\rb\display\\', $displayclass);
         }
         $this->assertContains('totara_reportbuilder\rb\display\base', $displayclasses);
         $count = count($displayclasses);
@@ -39,7 +39,7 @@ class totara_core_component_testcase extends advanced_testcase {
         $displayclasses = core_component::get_namespace_classes('rb\display', 'totara_reportbuilder\rb\display\base');
         $this->assertIsArray($displayclasses);
         foreach ($displayclasses as $displayclass) {
-            $this->assertContains('\rb\display\\', $displayclass);
+            $this->assertStringContainsString('\rb\display\\', $displayclass);
         }
         // NOTE: the display base class is not abstract.
         $this->assertCount($count, $displayclasses, 'All classes in rb\dispaly are expected to be extending base class!');
@@ -52,14 +52,14 @@ class totara_core_component_testcase extends advanced_testcase {
         $displayclasses = core_component::get_namespace_classes('rb\aggregate', null, null, true);
         $this->assertIsArray($displayclasses);
         foreach ($displayclasses as $displayclass) {
-            $this->assertContains('rb\aggregate\\', $displayclass);
+            $this->assertStringContainsString('rb\aggregate\\', $displayclass);
         }
         $this->assertNotContains('totara_reportbuilder\rb\aggregate\base', $displayclasses);
 
         $displayclasses = core_component::get_namespace_classes('rb\aggregate', null, null, false);
         $this->assertIsArray($displayclasses);
         foreach ($displayclasses as $displayclass) {
-            $this->assertContains('rb\aggregate\\', $displayclass);
+            $this->assertStringContainsString('rb\aggregate\\', $displayclass);
         }
         $this->assertContains('totara_reportbuilder\rb\aggregate\base', $displayclasses);
 
@@ -67,7 +67,7 @@ class totara_core_component_testcase extends advanced_testcase {
         $this->assertIsArray($displayclasses);
         $this->assertGreaterThan(15, count($displayclasses));
         foreach ($displayclasses as $displayclass) {
-            $this->assertContains('totara_reportbuilder\rb\display\\', $displayclass);
+            $this->assertStringContainsString('totara_reportbuilder\rb\display\\', $displayclass);
         }
 
         $logreaders = core_component::get_namespace_classes('log', 'core\log\reader');

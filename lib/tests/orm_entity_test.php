@@ -421,7 +421,7 @@ class core_orm_entity_testcase extends orm_entity_testcase {
 
         $this->assertNotNull($entity->created_at);
         $this->assertNull($entity->updated_at);
-        $this->assertEquals(floatval(time()), floatval($entity->created_at), 'Created timestamp was not set properly', 2);
+        $this->assertEqualsWithDelta(floatval(time()), floatval($entity->created_at), 2, 'Created timestamp was not set properly');
 
         // Test that it doesn't set the timestamp if it has already been provided
         $record['created_at'] = 0;
@@ -430,8 +430,8 @@ class core_orm_entity_testcase extends orm_entity_testcase {
 
         $this->assertNotNull($entity->created_at);
         $this->assertNull($entity->updated_at);
-        $this->assertEquals(0, $entity->created_at, 'Created timestamp was not set properly', 2);
-        $this->assertNotEquals(floatval(time()), $entity->created_at, 'Created timestamp was not set properly', 2);
+        $this->assertEqualsWithDelta(0, $entity->created_at, 2, 'Created timestamp was not set properly');
+        $this->assertNotEqualsWithDelta(floatval(time()), $entity->created_at, 2, 'Created timestamp was not set properly');
 
         // Test that it doesn't set the timestamp if it has been disabled
         $record['created_at'] = 0;
@@ -440,8 +440,8 @@ class core_orm_entity_testcase extends orm_entity_testcase {
 
         $this->assertNotNull($entity->created_at);
         $this->assertNull($entity->updated_at);
-        $this->assertEquals(0, $entity->created_at, 'Created timestamp was not set properly', 2);
-        $this->assertNotEquals(floatval(time()), $entity->created_at, 'Created timestamp was not set properly', 2);
+        $this->assertEqualsWithDelta(0, $entity->created_at, 2, 'Created timestamp was not set properly');
+        $this->assertNotEqualsWithDelta(floatval(time()), $entity->created_at, 2, 'Created timestamp was not set properly');
     }
 
     public function test_it_sets_updated_timestamp_automatically() {
@@ -466,7 +466,7 @@ class core_orm_entity_testcase extends orm_entity_testcase {
 
         $this->assertNotNull($entity->updated_at);
         $this->assertNull($entity->created_at);
-        $this->assertEquals(floatval(time()), floatval($entity->updated_at), 'Updated timestamp was not set properly', 2);
+        $this->assertEqualsWithDelta(floatval(time()), floatval($entity->updated_at), 2, 'Updated timestamp was not set properly');
 
         $old_updated_at = $entity->updated_at;
 
@@ -488,7 +488,7 @@ class core_orm_entity_testcase extends orm_entity_testcase {
         $entity->save();
         $this->assertNotNull($entity->updated_at);
         $this->assertNull($entity->created_at);
-        $this->assertEquals(floatval(time()), floatval($entity->updated_at), 'Updated timestamp was not set properly', 2);
+        $this->assertEqualsWithDelta(floatval(time()), floatval($entity->updated_at), 2, 'Updated timestamp was not set properly');
 
         // Do not set updated timestamps if the functionality is disabled
         $entity = new extended_sample_entity_updated_at($record);
@@ -540,8 +540,8 @@ class core_orm_entity_testcase extends orm_entity_testcase {
 
         $this->assertNotNull($entity->created_at);
         $this->assertNotNull($entity->get_attribute('updated_at'));
-        $this->assertEquals(floatval(time()), floatval($entity->created_at), 'Created timestamp was not set properly', 2);
-        $this->assertEquals(floatval(time()), floatval($entity->updated_at), 'Updated timestamp was not set properly', 2);
+        $this->assertEqualsWithDelta(floatval(time()), floatval($entity->created_at), 2, 'Created timestamp was not set properly');
+        $this->assertEqualsWithDelta(floatval(time()), floatval($entity->updated_at), 2, 'Updated timestamp was not set properly');
 
         // Timestamps set when creating entity, but updated timestamp disabled
         $entity = new extended_sample_entity_created_updated_at($record);
@@ -550,12 +550,12 @@ class core_orm_entity_testcase extends orm_entity_testcase {
 
         $this->assertNotNull($entity->created_at);
         $this->assertNull($entity->get_attribute('updated_at'));
-        $this->assertEquals(floatval(time()), floatval($entity->created_at), 'Created timestamp was not set properly', 2);
+        $this->assertEqualsWithDelta(floatval(time()), floatval($entity->created_at), 2, 'Created timestamp was not set properly');
 
         $entity->save();
 
         $this->assertNotNull($entity->updated_at);
-        $this->assertEquals(floatval(time()), floatval($entity->updated_at), 'Updated timestamp was not set properly', 2);
+        $this->assertEqualsWithDelta(floatval(time()), floatval($entity->updated_at), 2, 'Updated timestamp was not set properly');
 
         // Any attribute can be a timestamp
         $entity = new extended_sample_entity_created_at_custom($record);
@@ -564,7 +564,7 @@ class core_orm_entity_testcase extends orm_entity_testcase {
         $this->assertNotNull($entity->params);
         $this->assertNull($entity->created_at);
         $this->assertNull($entity->get_attribute('updated_at'));
-        $this->assertEquals(floatval(time()), floatval($entity->params), 'Created timestamp was not set properly', 2);
+        $this->assertEqualsWithDelta(floatval(time()), floatval($entity->params), 2, 'Created timestamp was not set properly');
 
         // Any attribute can be a timestamp
         $entity = new extended_sample_entity_updated_at_custom($record);
@@ -573,7 +573,7 @@ class core_orm_entity_testcase extends orm_entity_testcase {
         $this->assertNotNull($entity->params);
         $this->assertNull($entity->created_at);
         $this->assertNull($entity->get_attribute('updated_at'));
-        $this->assertEquals(floatval(time()), floatval($entity->params), 'Created timestamp was not set properly', 2);
+        $this->assertEqualsWithDelta(floatval(time()), floatval($entity->params), 2, 'Created timestamp was not set properly');
     }
 
     public function test_it_sets_timestamps_with_different_constructor_args() {
@@ -979,7 +979,7 @@ class core_orm_entity_testcase extends orm_entity_testcase {
         $this->assertEquals('Jones', $user->lastname);
 
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessageRegExp("/Invalid attribute 'blablabla' passed to the entity /");
+        $this->expectExceptionMessage("Invalid attribute 'blablabla' passed to the entity");
 
         $attributes['blablabla'] = 123;
         new class($attributes) extends entity
@@ -1005,7 +1005,7 @@ class core_orm_entity_testcase extends orm_entity_testcase {
         $user->email =  'myemailaddress@example.com';
 
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessageRegExp("/Invalid attribute 'foobar' passed to the entity /");
+        $this->expectExceptionMessage("Invalid attribute 'foobar' passed to the entity");
 
         $user->foobar = 'mygod';
     }

@@ -36,8 +36,8 @@ class totara_core_help_icon_testcase extends advanced_testcase {
 
         $renderedicon = $OUTPUT->help_icon('allowbookingscancellationsdefault', 'facetoface');
 
-        $this->assertContains('title="Help with Default ‘allow cancellations’ setting for all events"', $renderedicon);
+        $this->assertStringContainsString('title="Help with Default ‘allow cancellations’ setting for all events"', $renderedicon);
 
-        $this->assertNotContains('title="Help with Default &amp;lsquo;allow cancellations&amp;rsquo; setting for all events"', $renderedicon);
+        $this->assertStringNotContainsString('title="Help with Default &amp;lsquo;allow cancellations&amp;rsquo; setting for all events"', $renderedicon);
     }
 }

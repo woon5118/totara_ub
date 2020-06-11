@@ -444,7 +444,7 @@ class core_command_argument_testcase extends advanced_testcase {
         }
         $this->assertEmpty($argument->get_argument_string());
         $this->assertEmpty($argument->get_argument_array());
-        $this->assertContains('error/unknownparamtype', $exceptionmessage);
+        $this->assertStringContainsString('error/unknownparamtype', $exceptionmessage);
     }
 
     /**

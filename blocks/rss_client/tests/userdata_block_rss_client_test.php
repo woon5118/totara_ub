@@ -136,7 +136,7 @@ class userdata_block_rss_client_test extends advanced_testcase {
         foreach ($result->data as $exportitem) {
             $this->assertEquals($targetuser->id, $exportitem->userid);
             $this->assertNotEquals($controluser->id, $exportitem->userid);
-            $this->assertContains("/" . $exportitem->userid . "/", $exportitem->url);
+            $this->assertStringContainsString("/" . $exportitem->userid . "/", $exportitem->url);
             foreach (['id', 'userid', 'title', 'preferredtitle', 'description', 'shared', 'url', 'skiptime', 'skipuntil'] as $attribute) {
                 $this->assertObjectHasAttribute($attribute, $exportitem);
             }

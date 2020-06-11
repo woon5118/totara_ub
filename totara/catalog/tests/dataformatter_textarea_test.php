@@ -65,7 +65,7 @@ class totara_catalog_dataformatter_textarea_testcase extends dataformatter_test_
             'itemid' => 123,
         ];
         $result = $df->get_formatted_value($test_params, $context);
-        $this->assertContains($html, $result);
+        $this->assertStringContainsString($html, $result);
 
         $this->assert_exceptions($df, $test_params);
     }
@@ -86,7 +86,7 @@ class totara_catalog_dataformatter_textarea_testcase extends dataformatter_test_
             'itemid' => 123,
         ];
         $result = $df->get_formatted_value($test_params, $context);
-        $this->assertContains($text, $result);
+        $this->assertStringContainsString($text, $result);
 
         $this->assert_exceptions($df, $test_params);
     }

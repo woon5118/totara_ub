@@ -48,7 +48,7 @@ class totara_core_requirejs_testcase extends advanced_testcase {
         $this->assertIsArray($config['bundles']['core/bundle']);
         foreach($config['bundles']['core/bundle'] as $amd) {
             $this->assertRegExp('/^[a-z0-9_]+\/[a-z0-9_-]+$/', $amd, 'Invalid AMD module name: ' . $amd);
-            $this->assertNotContains('-lazy', $amd);
+            $this->assertStringNotContainsString('-lazy', $amd);
         }
 
         self::assertSame(1, $hook_sink->count());
@@ -65,7 +65,7 @@ class totara_core_requirejs_testcase extends advanced_testcase {
         $this->assertIsArray($config['bundles']['core/bundle']);
         foreach($config['bundles']['core/bundle'] as $amd) {
             $this->assertRegExp('/^[a-z0-9_]+\/[a-z0-9_-]+$/', $amd, 'Invalid AMD module name: ' . $amd);
-            $this->assertNotContains('-lazy', $amd);
+            $this->assertStringNotContainsString('-lazy', $amd);
         }
 
         self::assertSame(1, $hook_sink->count());

@@ -190,6 +190,6 @@ class mod_facetoface_room_search_testcase extends advanced_testcase {
         $content = $dialog->generate_search();
         $paging_rendering_expected = '<div class="search-paging"><div class="paging"></div></div>';
 
-        $this->assertContains($paging_rendering_expected, $content);
+        $this->assertStringContainsString($paging_rendering_expected, $content);
     }
 }

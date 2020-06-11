@@ -59,7 +59,7 @@ class core_webapi_formatter_date_field_formatter_testcase extends basic_testcase
         $formatter = new date_field_formatter('foo', context_system::instance());
 
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessageRegExp('/Invalid format given/');
+        $this->expectExceptionMessage('Invalid format given');
 
         $formatter->format(time());
     }

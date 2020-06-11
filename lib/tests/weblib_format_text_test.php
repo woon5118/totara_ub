@@ -248,10 +248,10 @@ class core_weblib_format_text_testcase extends advanced_testcase {
     public function test_wiki() {
         $text = 'I\'m the needle<a onclick="alert(1)">Hack</a>';
         $filtered = format_text($text, FORMAT_WIKI);
-        self::assertContains(s($text), $filtered);
-        self::assertNotContains($text, $filtered);
-        self::assertNotContains('<a', $filtered);
-        self::assertContains('NOTICE: Wiki-like formatting has been removed from Moodle', $filtered);
+        self::assertStringContainsString(s($text), $filtered);
+        self::assertStringNotContainsString($text, $filtered);
+        self::assertStringNotContainsString('<a', $filtered);
+        self::assertStringContainsString('NOTICE: Wiki-like formatting has been removed from Moodle', $filtered);
     }
 
     public function test_option_none() {

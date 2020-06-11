@@ -94,7 +94,7 @@ class availability_language_condition_testcase extends advanced_testcase {
             $cond = new condition($structure);
             $this->fail();
         } catch (coding_exception $e) {
-            $this->assertContains('Missing ->lang for language condition', $e->getMessage());
+            $this->assertStringContainsString('Missing ->lang for language condition', $e->getMessage());
         }
 
         // Valid structure.

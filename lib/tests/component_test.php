@@ -541,7 +541,7 @@ class core_component_testcase extends advanced_testcase {
         $this->assertIsArray($displayclasses);
         $this->assertGreaterThan(26, $displayclasses);
         foreach ($displayclasses as $displayclass => $classpaths) {
-            $this->assertContains('totara_reportbuilder\rb\display\\', $displayclass);
+            $this->assertStringContainsString('totara_reportbuilder\rb\display\\', $displayclass);
             $this->assertCount(1, $classpaths);
             $this->assertSame('totara_reportbuilder\rb\display\\', reset($classpaths));
         }

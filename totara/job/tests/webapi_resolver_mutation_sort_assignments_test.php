@@ -131,7 +131,7 @@ class totara_job_webapi_resolver_mutation_sort_assignments_testcase extends adva
             );
             $this->fail('Exception expected.');
         } catch (\moodle_exception $ex) {
-            self::assertContains('A required parameter (userid) was missing (assignmentids)', $ex->getMessage());
+            self::assertStringContainsString('A required parameter (userid) was missing (assignmentids)', $ex->getMessage());
         }
 
         // Not enough jobids
@@ -142,7 +142,7 @@ class totara_job_webapi_resolver_mutation_sort_assignments_testcase extends adva
             );
             $this->fail('Exception expected.');
         } catch (\moodle_exception $ex) {
-            self::assertContains('Jobs given do not match existing jobs.)', $ex->getMessage());
+            self::assertStringContainsString('Jobs given do not match existing jobs.)', $ex->getMessage());
         }
 
         // Too many jobids
@@ -153,7 +153,7 @@ class totara_job_webapi_resolver_mutation_sort_assignments_testcase extends adva
             );
             $this->fail('Exception expected.');
         } catch (\moodle_exception $ex) {
-            self::assertContains('Incomplete job list in submit data.', $ex->getMessage());
+            self::assertStringContainsString('Incomplete job list in submit data.', $ex->getMessage());
         }
 
         // Incorrect Job ids
@@ -164,7 +164,7 @@ class totara_job_webapi_resolver_mutation_sort_assignments_testcase extends adva
             );
             $this->fail('Exception expected.');
         } catch (\moodle_exception $ex) {
-            self::assertContains('Jobs given do not match existing jobs.)', $ex->getMessage());
+            self::assertStringContainsString('Jobs given do not match existing jobs.)', $ex->getMessage());
         }
 
         // Test job assignment belonging to deleted user.
@@ -176,7 +176,7 @@ class totara_job_webapi_resolver_mutation_sort_assignments_testcase extends adva
             );
             self::fail('Expected a moodle_exception: cannot view job assignments');
         } catch (\dml_exception $ex) {
-            self::assertContains('Can not find data record in database', $ex->getMessage());
+            self::assertStringContainsString('Can not find data record in database', $ex->getMessage());
         }
     }
 

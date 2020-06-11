@@ -292,8 +292,8 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
         $fileiconlink = html_writer::link($fileurl, $fileicon . 'readme.txt', array('class' => 'icon'));
 
         // The markup is pretty fluid, there is no way to guess the exact chars, sorry.
-        $this->assertContains($fileurl, $processed[1]);
-        $this->assertContains($fileicon, $processed[1]);
+        $this->assertStringContainsString($fileurl, $processed[1]);
+        $this->assertStringContainsString($fileicon, $processed[1]);
 
         $this->assertSame('volba1', $processed[2]);
         $this->assertSame('<img src="https://www.example.com/moodle/theme/image.php/_s/' . $theme . '/totara_core/1/courseicons/business-modelling" id="icon_preview" class="course_icon" alt="volba1" title="volba1" />', $processed[3]);
@@ -354,7 +354,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
         $row = reset($records);
 
         $this->assertSame('a', $row->user_institution);
-        $this->assertEquals(50, $row->course_completion_iscomplete, '', 0.0001);
+        $this->assertEqualsWithDelta(50, $row->course_completion_iscomplete, 0.0001);
 
         $processed = $report->src->process_data_row($row, 'html', $report);
 
@@ -408,7 +408,7 @@ class totara_reportbuilder_display_testcase extends advanced_testcase {
         $row = reset($records);
 
         $this->assertSame('a', $row->user_institution);
-        $this->assertEquals(0.50000000000000000000, $row->course_completion_iscomplete, '', 0.0001);
+        $this->assertEqualsWithDelta(0.50000000000000000000, $row->course_completion_iscomplete, 0.0001);
 
         $processed = $report->src->process_data_row($row, 'html', $report);
 

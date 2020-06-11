@@ -94,7 +94,7 @@ class core_webapi_formatter_testcase extends advanced_testcase {
         $formatter = $this->get_formatter($data);
 
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessageRegExp('/Invalid format given/');
+        $this->expectExceptionMessage('Invalid format given');
 
         $formatter->format('datetimefield', format::FORMAT_HTML);
     }
@@ -110,7 +110,7 @@ class core_webapi_formatter_testcase extends advanced_testcase {
         $formatter = $this->get_formatter($data);
 
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessageRegExp('/Field name cannot be empty./');
+        $this->expectExceptionMessage('Field name cannot be empty');
 
         $formatter->format('', format::FORMAT_HTML);
     }
@@ -126,7 +126,7 @@ class core_webapi_formatter_testcase extends advanced_testcase {
         $formatter = $this->get_formatter($data);
 
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessageRegExp('/Unknown field foobar/');
+        $this->expectExceptionMessage('Unknown field foobar');
 
         $formatter->format('foobar', format::FORMAT_HTML);
     }
@@ -214,7 +214,7 @@ class core_webapi_formatter_testcase extends advanced_testcase {
         $formatter = $this->get_formatter($data);
 
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessageRegExp('/Field was not found in the format map./');
+        $this->expectExceptionMessage('Field was not found in the format map');
 
         $formatter->format('teststring');
     }
@@ -235,7 +235,7 @@ class core_webapi_formatter_testcase extends advanced_testcase {
         };
 
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessageRegExp('/Format method not found!/');
+        $this->expectExceptionMessage('Format method not found!');
 
         $formatter->format('multilangstring');
     }
@@ -255,7 +255,7 @@ class core_webapi_formatter_testcase extends advanced_testcase {
 
         // This one does not work with a null value
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessageRegExp('/Invalid format given/');
+        $this->expectExceptionMessage('Invalid format given');
 
         $value = $formatter->format('multilangstring', null);
         $this->assertEquals('Summer', $value);

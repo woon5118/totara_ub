@@ -721,7 +721,7 @@ class totara_form_form_testcase extends advanced_testcase {
     public function test_render() {
         $form = new test_form();
         $result = $form->render();
-        $this->assertContains('<form', $result);
+        $this->assertStringContainsString('<form', $result);
     }
 
     public function test_legacy() {
@@ -732,7 +732,7 @@ class totara_form_form_testcase extends advanced_testcase {
         $result = ob_get_contents();
         ob_end_clean();
         $this->assertDebuggingCalled();
-        $this->assertContains('<form', $result);
+        $this->assertStringContainsString('<form', $result);
 
         $form->focus();
         $this->assertDebuggingCalled();

@@ -154,7 +154,7 @@ class totara_cohort_rendering_audience_testcase extends advanced_testcase {
             $this->fail("Unable to get the rule decription output");
         }
 
-        $this->assertContains("Deleted (ID: {$deletedprogram->id})", $ruleoutput->ruledescription);
+        $this->assertStringContainsString("Deleted (ID: {$deletedprogram->id})", $ruleoutput->ruledescription);
     }
 
     /**
@@ -195,7 +195,7 @@ class totara_cohort_rendering_audience_testcase extends advanced_testcase {
             $this->fail("Unable to retrieve the ruleoutput");
         }
 
-        $this->assertContains("Deleted (ID: {$deletedcourse->id})", $ruleoutput->ruledescription);
+        $this->assertStringContainsString("Deleted (ID: {$deletedcourse->id})", $ruleoutput->ruledescription);
     }
 
     /**
@@ -236,6 +236,6 @@ class totara_cohort_rendering_audience_testcase extends advanced_testcase {
             $this->fail("Unable to retrieve the ruleoutput");
         }
 
-        $this->assertContains("Deleted (ID: {$deletedposition->id}", $ruleoutput->ruledescription);
+        $this->assertStringContainsString("Deleted (ID: {$deletedposition->id}", $ruleoutput->ruledescription);
     }
 }

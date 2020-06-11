@@ -117,7 +117,7 @@ class totara_core_quickaccessmenu_external_testcase extends advanced_testcase {
         } catch (\moodle_exception $ex) {
             self::assertDebuggingCalled('Invalid item key specified green');
             self::assertInstanceOf('coding_exception', $ex);
-            self::assertContains("The requested item 'green' cannot be added to the group 'learn'", $ex->getMessage());
+            self::assertStringContainsString("The requested item 'green' cannot be added to the group 'learn'", $ex->getMessage());
         }
     }
 

@@ -105,26 +105,20 @@ class core_exporter_testcase extends advanced_testcase {
         $this->assertArrayNotHasKey('otherstrings', $structure->keys);
     }
 
-    /**
-     * @expectedException coding_exception
-     */
     public function test_invalid_data() {
         global $PAGE;
         $exporter = new core_testable_exporter($this->invaliddata, $this->validrelated);
         $output = $PAGE->get_renderer('core');
 
+        $this->expectException(coding_exception::class);
         $result = $exporter->export($output);
     }
 
-    /**
-     * @expectedException coding_exception
-     */
     public function test_invalid_related() {
         global $PAGE;
-        $exporter = new core_testable_exporter($this->validdata, $this->invalidrelated);
-        $output = $PAGE->get_renderer('core');
+        $this->expectException(coding_exception::class);
 
-        $result = $exporter->export($output);
+        $exporter = new core_testable_exporter($this->validdata, $this->invalidrelated);
     }
 
     public function test_valid_data_and_related() {

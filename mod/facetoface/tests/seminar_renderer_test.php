@@ -187,7 +187,7 @@ class mod_facetoface_seminar_renderer_testcase extends advanced_testcase {
         $doc = $this->new_domdocument($content);
         $button = $doc->getElementById('id_submitbutton');
         $this->assertNotNull($button);
-        $this->assertContains($displaytext, $button->getAttribute('value'));
+        $this->assertStringContainsString($displaytext, $button->getAttribute('value'));
     }
 
     /**

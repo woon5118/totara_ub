@@ -333,7 +333,9 @@ class core_user_userdata_entries_test extends advanced_testcase {
             }
         }
         $this->assertCount(3, $deleted_entry_ids);
-        $this->assertArraySubset([$data->entry_11->id, $data->entry_12->id, $data->entry_13->id], $deleted_entry_ids);
+        $this->assertContains($data->entry_11->id, $deleted_entry_ids);
+        $this->assertContains($data->entry_12->id, $deleted_entry_ids);
+        $this->assertContains($data->entry_13->id, $deleted_entry_ids);
 
         // Verify that expected data was removed for purged user1 and control user2 wasn't affected.
         // Glossary entries.
@@ -437,7 +439,7 @@ class core_user_userdata_entries_test extends advanced_testcase {
             }
         }
         $this->assertCount(1, $deleted_entry_ids);
-        $this->assertArraySubset([$data->entry_11->id], $deleted_entry_ids);
+        $this->assertContains($data->entry_11->id, $deleted_entry_ids);
 
         // Verify that expected data was removed for purged user1/course1 and control user2 wasn't affected.
         $this->assertCount(2, $DB->get_records('glossary_entries', ['userid' => $data->user1->id]));
@@ -546,7 +548,8 @@ class core_user_userdata_entries_test extends advanced_testcase {
             }
         }
         $this->assertCount(2, $deleted_entry_ids);
-        $this->assertArraySubset([$data->entry_12->id, $data->entry_13->id], $deleted_entry_ids);
+        $this->assertContains($data->entry_12->id, $deleted_entry_ids);
+        $this->assertContains($data->entry_13->id, $deleted_entry_ids);
 
         // Verify that expected data was removed for purged user1/course1 and control user2 wasn't affected.
         $this->assertCount(1, $DB->get_records('glossary_entries', ['userid' => $data->user1->id]));
@@ -653,7 +656,7 @@ class core_user_userdata_entries_test extends advanced_testcase {
             }
         }
         $this->assertCount(1, $deleted_entry_ids);
-        $this->assertArraySubset([$data->entry_12->id], $deleted_entry_ids);
+        $this->assertContains($data->entry_12->id, $deleted_entry_ids);
 
         // Verify that expected data was removed for purged user1/module2 and control user2 wasn't affected.
         $this->assertCount(2, $DB->get_records('glossary_entries', ['userid' => $data->user1->id]));

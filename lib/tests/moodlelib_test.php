@@ -1879,12 +1879,10 @@ class core_moodlelib_testcase extends advanced_testcase {
         $COURSE->lang = $originallang;
     }
 
-    /**
-     * @expectedException \PHPUnit\Framework\Error\Warning
-     */
     public function test_get_string_limitation() {
         // This is one of the limitations to the lang_string class. It can't be
         // used as a key.
+        $this->expectException(\PHPUnit\Framework\Error\Warning::class);
         $array = array(get_string('yes', null, null, true) => 'yes');
     }
 
@@ -3366,7 +3364,7 @@ class core_moodlelib_testcase extends advanced_testcase {
         $this->assertRegExp('/^[' . $pool . ']+$/', $result);
 
         $result = complex_random_string();
-        $this->assertEquals(28, strlen($result), '', 4); // Expected length is 24 - 32.
+        $this->assertEqualsWithDelta(28, strlen($result), 4); // Expected length is 24 - 32.
         $this->assertRegExp('/^[' . $pool . ']+$/', $result);
 
         $this->assertDebuggingNotCalled();
@@ -3738,6 +3736,6 @@ class core_moodlelib_testcase extends advanced_testcase {
         $result = $sink->get_messages();
         $sink->close();
 
-        $this->assertContains('passwords cannot be reset on this site', quoted_printable_decode($result[0]->body));
+        $this->assertStringContainsString('passwords cannot be reset on this site', quoted_printable_decode($result[0]->body));
     }
 }

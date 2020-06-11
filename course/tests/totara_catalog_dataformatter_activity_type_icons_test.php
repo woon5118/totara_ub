@@ -54,21 +54,21 @@ class core_course_totara_catalog_dataformatter_activity_type_icons_testcase exte
         $this->assertCount(4, $result);
         foreach ($result as $icon_object) {
             $this->assertInstanceOf(stdClass::class, $icon_object);
-            $this->assertContains('flex-icon', $icon_object->icon);
+            $this->assertStringContainsString('flex-icon', $icon_object->icon);
         }
         // Result should be sorted predictably.
-        $this->assertContains('Assignment', $result[0]->icon);
-        $this->assertContains('Book', $result[1]->icon);
-        $this->assertContains('File', $result[2]->icon);
-        $this->assertContains('Forum', $result[3]->icon);
+        $this->assertStringContainsString('Assignment', $result[0]->icon);
+        $this->assertStringContainsString('Book', $result[1]->icon);
+        $this->assertStringContainsString('File', $result[2]->icon);
+        $this->assertStringContainsString('Forum', $result[3]->icon);
 
         $result = $df->get_formatted_value(['modules' => ''], $context);
         $this->assertSame([], $result);
 
         $result = $df->get_formatted_value(['modules' => ',,,forum ,,,book ,,,'], $context);
         $this->assertCount(2, $result);
-        $this->assertContains('Book', $result[0]->icon);
-        $this->assertContains('Forum', $result[1]->icon);
+        $this->assertStringContainsString('Book', $result[0]->icon);
+        $this->assertStringContainsString('Forum', $result[1]->icon);
 
         $this->assert_exceptions($df, $test_params);
     }

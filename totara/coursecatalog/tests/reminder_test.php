@@ -48,12 +48,12 @@ class totara_coursecatalog_reminder_testcase extends advanced_testcase {
         $content = implode(", ", $place);
 
         $newcontent = reminder_email_substitutions($content, $user, $course, $message, null);
-        $this->assertContains("First name: Terry", $newcontent);
-        $this->assertContains("Last name: Craig", $newcontent);
-        $this->assertContains("Course URL: https://www.example.com/moodle/course/view.php?id={$course->id}", $newcontent);
-        $this->assertContains("Course name: Test course 1", $newcontent);
-        $this->assertContains("Manager name: (no manager set)", $newcontent);
-        $this->assertContains("Period: 5 days", $newcontent);
-        $this->assertContains("Dead line: 2 weeks", $newcontent);
+        $this->assertStringContainsString("First name: Terry", $newcontent);
+        $this->assertStringContainsString("Last name: Craig", $newcontent);
+        $this->assertStringContainsString("Course URL: https://www.example.com/moodle/course/view.php?id={$course->id}", $newcontent);
+        $this->assertStringContainsString("Course name: Test course 1", $newcontent);
+        $this->assertStringContainsString("Manager name: (no manager set)", $newcontent);
+        $this->assertStringContainsString("Period: 5 days", $newcontent);
+        $this->assertStringContainsString("Dead line: 2 weeks", $newcontent);
     }
 }

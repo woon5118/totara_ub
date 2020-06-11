@@ -121,13 +121,13 @@ class mod_facetoface_attendees_list_testcase extends advanced_testcase {
 
         // As user #0 had been deleted earlier, therefore, we are expecting this user to not be included in the
         // embedded report builder.
-        $this->assertNotContains(fullname($users[0]), $reporthtml);
+        $this->assertStringNotContainsString(fullname($users[0]), $reporthtml);
 
         // User #1 .. #4 must be included
-        $this->assertContains(fullname($users[1]), $reporthtml);
-        $this->assertContains(fullname($users[2]), $reporthtml);
-        $this->assertContains(fullname($users[3]), $reporthtml);
-        $this->assertContains(fullname($users[4]), $reporthtml);
+        $this->assertStringContainsString(fullname($users[1]), $reporthtml);
+        $this->assertStringContainsString(fullname($users[2]), $reporthtml);
+        $this->assertStringContainsString(fullname($users[3]), $reporthtml);
+        $this->assertStringContainsString(fullname($users[4]), $reporthtml);
     }
 
     /**
@@ -212,10 +212,10 @@ class mod_facetoface_attendees_list_testcase extends advanced_testcase {
         [$reporthtml, $debughtml] = $output->report_html($report, 0);
 
         // All users must be included
-        $this->assertContains(fullname($users[0]), $reporthtml);
-        $this->assertContains(fullname($users[1]), $reporthtml);
-        $this->assertContains(fullname($users[2]), $reporthtml);
-        $this->assertContains(fullname($users[3]), $reporthtml);
-        $this->assertContains(fullname($users[4]), $reporthtml);
+        $this->assertStringContainsString(fullname($users[0]), $reporthtml);
+        $this->assertStringContainsString(fullname($users[1]), $reporthtml);
+        $this->assertStringContainsString(fullname($users[2]), $reporthtml);
+        $this->assertStringContainsString(fullname($users[3]), $reporthtml);
+        $this->assertStringContainsString(fullname($users[4]), $reporthtml);
     }
 }

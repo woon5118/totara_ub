@@ -146,7 +146,7 @@ class enrol_lti_sync_members_testcase extends advanced_testcase {
         $this->task->execute();
         $output = ob_get_clean();
         $message = 'Skipping task - ' . get_string('pluginnotenabled', 'auth', get_string('pluginname', 'auth_lti'));
-        $this->assertContains($message, $output);
+        $this->assertStringContainsString($message, $output);
     }
 
     /**
@@ -160,7 +160,7 @@ class enrol_lti_sync_members_testcase extends advanced_testcase {
         $this->task->execute();
         $output = ob_get_clean();
         $message = 'Skipping task - ' . get_string('enrolisdisabled', 'enrol_lti');
-        $this->assertContains($message, $output);
+        $this->assertStringContainsString($message, $output);
     }
 
     /**
@@ -178,10 +178,10 @@ class enrol_lti_sync_members_testcase extends advanced_testcase {
         $output = ob_get_clean();
 
         $membersyncmessage = "Completed - Synced members for tool '{$this->tool->id}' in the course '{$this->tool->courseid}'";
-        $this->assertContains($membersyncmessage, $output);
+        $this->assertStringContainsString($membersyncmessage, $output);
 
         $imagesyncmessage = "Completed - Synced 0 profile images.";
-        $this->assertContains($imagesyncmessage, $output);
+        $this->assertStringContainsString($imagesyncmessage, $output);
     }
 
     /**

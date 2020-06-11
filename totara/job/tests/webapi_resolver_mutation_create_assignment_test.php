@@ -135,7 +135,7 @@ class totara_job_webapi_resolver_mutation_create_assignment_testcase extends adv
             $this->resolve_graphql_mutation('totara_job_create_assignment', ['idnumber' => 'j1']);
             $this->fail('Exception expected.');
         } catch (\moodle_exception $ex) {
-            self::assertContains('A required parameter (userid) was missing (idnumber)', $ex->getMessage());
+            self::assertStringContainsString('A required parameter (userid) was missing (idnumber)', $ex->getMessage());
         }
 
         // Duplicate id number.
@@ -143,7 +143,7 @@ class totara_job_webapi_resolver_mutation_create_assignment_testcase extends adv
             $this->resolve_graphql_mutation('totara_job_create_assignment', ['userid' => $job->userid, 'idnumber' => $job->idnumber]);
             $this->fail('Exception expected.');
         } catch (\moodle_exception $ex) {
-            self::assertContains('Tried to create job assignment idnumber which is not unique for this user', $ex->getMessage());
+            self::assertStringContainsString('Tried to create job assignment idnumber which is not unique for this user', $ex->getMessage());
         }
     }
 

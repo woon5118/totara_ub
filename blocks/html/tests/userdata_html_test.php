@@ -193,20 +193,14 @@ class block_html_userdata_html_testcase extends advanced_testcase {
         $this->assertContains('User1 Block1', $titles);
         $this->assertContains('User1 Block2', $titles);
 
-        $this->assertContains(
+        $this->assertContainsEquals(
             $fixtures->block1->get_content(),
             $contents,
-            'Block1 not found in export',
-            false,
-            false
-        );
-        $this->assertContains(
+            'Block1 not found in export');
+        $this->assertContainsEquals(
             $fixtures->block2->get_content(),
             $contents,
-            'Block2 not found in export',
-            false,
-            false
-        );
+            'Block2 not found in export');
     }
 
     /**

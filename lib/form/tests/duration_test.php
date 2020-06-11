@@ -70,11 +70,11 @@ class core_form_duration_testcase extends basic_testcase {
 
     /**
      * Testcase for testing contructor.
-     * @expectedException coding_exception
      * @retrun void
      */
     public function test_constructor() {
         // Test trying to create with an invalid unit.
+        $this->expectException(coding_exception::class);
         $this->element = $this->mform->addElement('duration', 'testel', null, array('defaultunit' => 123, 'optional' => false));
     }
 
