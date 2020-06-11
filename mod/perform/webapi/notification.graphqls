@@ -1,0 +1,104 @@
+"""
+Represents a notification, possibly an abstract / uncreated one (id may be null)
+"""
+type mod_perform_notification {
+  id: core_id
+  name(format: core_format = PLAIN): String!
+  active: Boolean!
+  trigger_count: Int
+  recipients: [mod_perform_notification_recipient!]
+  triggers: [String!]
+}
+
+"""
+Represents a notification recipient
+"""
+type mod_perform_notification_recipient {
+  name(format: core_format = PLAIN): String!
+  active: Boolean!
+}
+
+extend type Query {
+  """
+  A list of all notifications in an activity
+  """
+  mod_perform_notification_info(
+    activity_id: core_id!
+  ): [mod_perform_notification!]!
+
+  """
+  This query returns a single notification
+  """
+  mod_perform_notification(notification_id: core_id!): mod_perform_notification!
+}
+
+"""
+Result type for creating a notification or managing its settings
+"""
+type mod_perform_create_notification_result {
+  notification: mod_perform_notification!
+}
+
+"""
+Input type for creating a notification
+"""
+input mod_perform_create_notification_input {
+  activity_id: core_id!
+  class_key: param_text!
+  active: param_boolean
+}
+
+"""
+Input type for toggling a notification
+"""
+input mod_perform_toggle_notification_input {
+  notification_id: core_id!
+  active: param_boolean!
+}
+
+"""
+Input type for toggling a notification recipient
+"""
+input mod_perform_toggle_notification_recipient_input {
+  notification_id: core_id!
+  recipient_name: param_text!
+  active: param_boolean!
+}
+
+"""
+Input type for updating notification trigger's value
+"""
+input mod_perform_update_notification_triggers_input {
+  notification_id: core_id!
+  values: [param_integer!]!
+}
+
+extend type Mutation {
+  """
+  Create a notification object
+  """
+  mod_perform_create_notification(
+    input: mod_perform_create_notification_input!
+  ): mod_perform_create_notification_result!
+
+  """
+  Activate or deactivate a notification
+  """
+  mod_perform_toggle_notification(
+    input: mod_perform_toggle_notification_input!
+  ): mod_perform_create_notification_result!
+
+  """
+  Activate or deactivate a notification recipient
+  """
+  mod_perform_toggle_notification_recipient(
+    input: mod_perform_toggle_notification_recipient_input!
+  ): mod_perform_create_notification_result!
+
+  """
+  Set trigger values
+  """
+  mod_perform_update_notification_triggers(
+    input: mod_perform_update_notification_triggers_input!
+  ): mod_perform_create_notification_result!
+}

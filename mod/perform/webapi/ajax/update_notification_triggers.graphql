@@ -1,0 +1,8 @@
+mutation mod_perform_update_notification_trigger(
+  $input: mod_perform_update_notification_triggers_input!
+) {
+  mod_perform_update_notification_triggers(input: $input) {
+    success
+    triggers
+  }
+}

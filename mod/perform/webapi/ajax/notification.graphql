@@ -1,0 +1,13 @@
+query mod_perform_notification($notification_id: core_id!) {
+  mod_perform_notification(notification_id: $notification_id) {
+    id
+    name
+    active
+    trigger_count
+    recipients {
+      name
+      active
+    }
+    triggers
+  }
+}

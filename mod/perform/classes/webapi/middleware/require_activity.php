@@ -2,7 +2,7 @@
 /**
  * This file is part of Totara Learn
  *
- * Copyright (C) 2020 onwards Totara Learning Solutions LTDvs
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@ use core\webapi\middleware;
 use core\webapi\resolver\payload;
 use core\webapi\resolver\result;
 use mod_perform\models\activity\activity;
+use mod_perform\models\activity\notification;
 use mod_perform\models\activity\helpers\access_checks;
 use mod_perform\models\activity\section;
 use mod_perform\models\activity\track;
@@ -77,6 +78,34 @@ class require_activity implements middleware {
             }
 
             return activity::load_by_id($id);
+        };
+
+        return new require_activity($retriever, $set_relevant_context);
+    }
+
+    /**
+     * Creates an object instance that validates based on an activity notification id
+     * in the incoming payload.
+     *
+     * @param string $payload_keys the keys in the payload to use to extract the
+     *        id from the payload. For example if the keys are "a.b.c", then the
+     *        id is retrieved as $payload['a']['b']['c'].
+     * @param bool $set_relevant_context if true, sets the graphql execution
+     *        context's relevant context field with the activity context.
+     *
+     * @return require_activity the object instance.
+     */
+    public static function by_notification_id(
+        string $payload_keys,
+        bool $set_relevant_context = false
+    ): require_activity {
+        $retriever = function (payload $payload) use ($payload_keys): activity {
+            $id = self::get_id($payload_keys, $payload);
+            if (!$id) {
+                throw new invalid_parameter_exception('invalid notification id');
+            }
+
+            return notification::load_by_id($id)->get_activity();
         };
 
         return new require_activity($retriever, $set_relevant_context);
