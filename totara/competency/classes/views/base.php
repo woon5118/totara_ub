@@ -31,13 +31,11 @@ abstract class base extends view {
 
     protected $content_template = '';
 
-    protected $location = '/totara/competency/assignments/';
-
     protected function prepare_output($output) {
         $output = [
-            'create_btn_url' => $this->get_absolute_url('create.php'),
-            'index_url' => $this->get_absolute_url('index.php'),
-            'save_url' => $this->get_absolute_url('save.php'),
+            'create_btn_url' => new moodle_url('/totara/competency/assignments/create.php'),
+            'index_url' => new moodle_url('/totara/competency/assignments/index.php'),
+            'save_url' => new moodle_url('/totara/competency/assignments/save.php'),
             'report_btn_url' => 'users.php',
             'has_back_btn' => false,
             'has_page_btns' => true,

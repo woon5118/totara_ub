@@ -32,28 +32,26 @@ class users extends report_view {
     protected $title = ['title_users', 'totara_competency'];
 
     protected function prepare_output($report) {
-        $output = array_merge(
+        return array_merge(
             parent::prepare_output($report),
             [
-                'index_url' => new moodle_url($this->config->wwwroot.'/totara/competency/assignments/index.php'),
                 'title' => $this->title,
             ]
         );
-        return $output;
     }
 
     protected function set_button(reportbuilder $report) {
         $edit_button = $report->edit_button();
         $sync_button = '';
         if (has_capability('totara/competency:manage_assignments', \context_system::instance())) {
-            $sync_button = $this->renderer->single_button(
+            $sync_button = $this->get_renderer()->single_button(
                 new moodle_url('/totara/competency/assignments/sync.php'),
                 get_string('button_sync_users', 'totara_competency'),
                 'post'
             );
         }
 
-        $this->page->set_button($sync_button.$edit_button);
+        $this->get_page()->set_button($sync_button.$edit_button);
     }
 
 }

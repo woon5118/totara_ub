@@ -34,6 +34,8 @@ use totara_mvc\tui_view;
 class user_assignment extends base {
 
     public function action() {
+        $this->set_url('/totara/competency/profile/assign/index.php', ['user_id' => $this->user->id]);
+
         capability_helper::require_can_assign($this->user->id, $this->context);
 
         $this->add_navigation($this->get_page_name());

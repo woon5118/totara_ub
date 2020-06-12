@@ -10,7 +10,7 @@ Feature: Make sure the correct navigation breadcrumbs and blocks are shown.
     # Manage performance activities page
     When I navigate to the manage perform activities page
     Then I should see "Manage performance activities"
-    And I should not see "Category:" in the "#settingsnav" "css_element"
+    And "#settingsnav" "css_element" should not exist
 
     # Edit activity page
     When I click on "activity_one" "link"

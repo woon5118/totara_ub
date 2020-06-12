@@ -88,7 +88,7 @@ class behat_mod_perform extends behat_base {
      * @throws Exception
      */
     public function i_navigate_to_the_manage_perform_activities_page(): void {
-        $this->navigate_to_page(manage_activities::get_url());
+        $this->navigate_to_page(new moodle_url(manage_activities::URL));
     }
 
     /**

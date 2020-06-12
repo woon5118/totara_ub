@@ -25,13 +25,12 @@ namespace mod_perform\controllers\reporting\participation;
 
 use context;
 use context_system;
-use core\notification;
+use core\output\notification;
 use mod_perform\controllers\perform_controller;
 use mod_perform\models\activity\activity;
 use moodle_exception;
 use moodle_url;
 use totara_mvc\has_report;
-use totara_mvc\report_view;
 use totara_mvc\view;
 
 class subject_instances extends perform_controller {
@@ -45,7 +44,7 @@ class subject_instances extends perform_controller {
     private $activity = null;
 
     public function setup_context(): context {
-        if ($this->get_param('activity_id', PARAM_INT)) {
+        if ($this->get_optional_param('activity_id', null, PARAM_INT)) {
             return $this->get_activity()->get_context();
         } else {
             return context_system::instance();
@@ -53,28 +52,27 @@ class subject_instances extends perform_controller {
     }
 
     public function action() {
-        parent::action();
+        $this->set_url(static::get_url(['activity_id' => $this->get_activity()->id]));
 
-        if ($this->get_param('activity_id', PARAM_INT)) {
+        if ($this->get_optional_param('activity_id', null, PARAM_INT)) {
             $report = $this->load_embedded_report('perform_subject_instance', ['activity_id' => $this->get_activity()->id]);
 
-            $sid = $this->get_param('sid', PARAM_INT, 0);
-            $debug = $this->get_param('debug', PARAM_INT, 0);
+            $debug = $this->get_optional_param('debug', 0, PARAM_INT);
 
-            return (new report_view('mod_perform/report', $report, $sid, $debug))
+            return self::create_report_view($report, $debug)
                 ->set_title($this->get_activity()->name)
-                ->set_url(static::get_url(['activity_id' => $this->get_activity()->id]))
-                ->set_backto(
+                ->set_back_to(
                     new moodle_url('/mod/perform/manage/activity/index.php'),
                     get_string('back_to_all_activities', 'mod_perform')
                 );
         } else {
             $url = new moodle_url('/mod/perform/manage/activity/index.php');
-            return (new view('mod_perform/no_report', [
-                'content' => notification::warning(
-                    get_string('report_activity_warning_message', 'mod_perform', (object)['url' => $url->out(true)])
+            return self::create_view('mod_perform/no_report', [
+                'content' => view::core_renderer()->notification(
+                    get_string('report_activity_warning_message', 'mod_perform', (object)['url' => $url->out(true)]),
+                    notification::NOTIFY_WARNING
                 )
-            ]));
+            ]);
         }
     }
 
@@ -85,7 +83,7 @@ class subject_instances extends perform_controller {
     private function get_activity(): activity {
         if (!isset($this->activity)) {
             try {
-                $activity_id = $this->get_param('activity_id', PARAM_INT, null, true);
+                $activity_id = $this->get_required_param('activity_id', PARAM_INT);
                 $this->activity = activity::load_by_id($activity_id);
             } catch (\Exception $e) {
                 throw new moodle_exception('error_activity_id_wrong', 'mod_perform', '', null, $e);

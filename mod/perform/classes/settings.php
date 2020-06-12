@@ -25,6 +25,7 @@ namespace mod_perform;
 
 use admin_externalpage;
 use context_coursecat;
+use mod_perform\controllers\activity\manage_activities;
 use moodle_url;
 
 /**
@@ -69,7 +70,7 @@ class settings {
                 new admin_externalpage(
                     'mod_perform_manage_activities',
                     get_string('menu_title_activity_management', 'mod_perform'),
-                    new moodle_url("/mod/perform/manage/activity/index.php"),
+                    new moodle_url(manage_activities::URL),
                     'mod/perform:view_manage_activities',
                     false,
                     $context

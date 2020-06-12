@@ -65,9 +65,9 @@ trait has_role {
     /**
      * Validate that the logged in user has permission to view this page.
      *
-     * @return self
+     * @return void
      */
-    protected function authorize() {
+    protected function authorize(): void {
         parent::authorize();
         advanced_feature::require('competency_assignment');
 
@@ -83,8 +83,6 @@ trait has_role {
                 $this->user_lacks_role();
             }
         }
-
-        return $this;
     }
 
 }

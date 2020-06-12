@@ -47,7 +47,7 @@ class view_user_activity extends perform_controller {
      * @return tui_view
      */
     public function action(): tui_view {
-        parent::action();
+        $this->set_url(static::get_url(['participant_instance_id' => $this->get_participant_instance_id()]));
 
         $props = [
             'current-user-id' => user::logged_in()->id,
@@ -55,9 +55,8 @@ class view_user_activity extends perform_controller {
             'participant-instance-id' => $this->get_participant_instance_id(),
         ];
 
-        return tui_view::create('mod_perform/pages/UserActivity', $props)
-            ->set_title(get_string('user_activities_page_title', 'mod_perform'))
-            ->set_url(static::get_url(['participant_instance_id' => $this->get_participant_instance_id()]));
+        return self::create_tui_view('mod_perform/pages/UserActivity', $props)
+            ->set_title(get_string('user_activities_page_title', 'mod_perform'));
     }
 
     public static function get_base_url(): string {

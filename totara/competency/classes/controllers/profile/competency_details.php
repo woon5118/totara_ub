@@ -29,8 +29,15 @@ use totara_mvc\tui_view;
 class competency_details extends base {
 
     public function action() {
+        $competency_id = $this->get_required_param('competency_id', PARAM_INT);
 
-        $competency_id = $this->get_param('competency_id', PARAM_INT, null, true);
+        $this->set_url(
+            '/totara/competency/profile/details/index.php',
+            [
+                'user_id' => $this->user->id,
+                'competency_id' => $competency_id
+            ]
+        );
 
         $title = get_string('competencydetails', 'totara_hierarchy');
 
@@ -41,7 +48,7 @@ class competency_details extends base {
         // Add breadcrumbs.
         $this->add_navigation($title);
 
-        $show_activity_log_by_default = $this->get_param('show_activity_log', PARAM_INT, null, false) == 1;
+        $show_activity_log_by_default = $this->get_optional_param('show_activity_log', null, PARAM_INT) == 1;
 
         $props = [
             'user-id'                      => $this->user->id,

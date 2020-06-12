@@ -64,10 +64,10 @@ class rate_competencies extends controller {
 
     public function __construct() {
         require_login();
-        $user_id = $this->get_param('user_id', PARAM_INT);
+        $user_id = $this->get_optional_param('user_id', null, PARAM_INT);
         $this->user = $user_id ? new user($user_id) : user::logged_in();
 
-        if ($assignment_id = $this->get_param('assignment_id', PARAM_INT)) {
+        if ($assignment_id = $this->get_optional_param('assignment_id', null, PARAM_INT)) {
             $this->assignment = $this->get_assignment($assignment_id);
         }
 
@@ -134,7 +134,7 @@ class rate_competencies extends controller {
     private function get_user_picture_url(): string {
         $user_picture = new \user_picture((object) $this->user->to_array());
         $user_picture->size = 1; // Size f1.
-        return $user_picture->get_url($this->page);
+        return $user_picture->get_url($this->get_page());
     }
 
     /**
@@ -165,7 +165,7 @@ class rate_competencies extends controller {
      */
     private function apply_page_navigation(view $view) {
         $parent_page_url = new \moodle_url('/totara/competency/rate_users.php');
-        $page_url = new \moodle_url('/totara/competency/rate_competencies.php', ['user_id' => $this->user->id]);
+        $this->set_url('/totara/competency/rate_competencies.php', ['user_id' => $this->user->id]);
 
         $parent_page_title = get_string('rate_competencies', 'pathway_manual');
 
@@ -173,12 +173,12 @@ class rate_competencies extends controller {
             $page_title = $parent_page_title;
         } else {
             $page_title = get_string('rate_user', 'pathway_manual', $this->user->fullname);
-            $this->page->navbar->add($parent_page_title, $parent_page_url);
+            $this->get_page()->navbar->add($parent_page_title, $parent_page_url);
         }
 
-        $this->page->navbar->add($page_title);
+        $this->get_page()->navbar->add($page_title);
 
-        $view->set_title($page_title)->set_url($page_url);
+        $view->set_title($page_title);
     }
 
     /**

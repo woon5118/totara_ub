@@ -32,14 +32,12 @@ class competency_controllers_profile_base_testcase extends advanced_testcase {
     public function test_attempt_to_setup_invalid_user(): void {
         self::setAdminUser();
 
+        $_GET['user_id'] = 90000; // Non existent user id
+
         $this->expectException(moodle_exception::class);
         $this->expectExceptionMessage(get_string('invaliduser', 'error'));
 
-        new class extends base_controller {
-
-            public function get_param(string $name, string $type, $default = null, bool $required = false) {
-                return 90000; // Non existent user id
-            }
+        $controller = new class extends base_controller {
 
         };
     }

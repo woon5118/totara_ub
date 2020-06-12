@@ -24,6 +24,8 @@
 namespace totara_competency\controllers\assignment;
 
 use context_system;
+use moodle_url;
+use totara_competency\views\users as users_report_view;
 use totara_mvc\has_report;
 
 class users extends base {
@@ -35,15 +37,15 @@ class users extends base {
     public function action() {
         $this->require_capability('totara/competency:view_assignments', context_system::instance());
 
-        // Reportbuilder basic arguments
-        $sid = $this->get_param('sid',  PARAM_INT, 0);
-        $debug = $this->get_param('debug', PARAM_BOOL, false);
+        $debug = $this->get_optional_param('debug', false, PARAM_BOOL);
 
         $report = $this->load_embedded_report('competency_assignment_users');
 
-        \totara_reportbuilder\event\report_viewed::create_from_report($report)->trigger();
-
-        return new \totara_competency\views\users('totara_competency/users', $report, $sid, $debug);
+        return users_report_view::create_from_report($report, $debug)
+            ->set_back_to(
+                new moodle_url('/totara/competency/assignments/index.php'),
+                get_string('assignment_back_to_assignments', 'totara_competency')
+            );
     }
 
 }

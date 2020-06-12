@@ -34,6 +34,7 @@ use user_picture;
 class index extends base {
 
     public function action() {
+        $this->set_url('/totara/competency/profile/index.php', ['user_id' => $this->user->id]);
 
         // Add breadcrumbs.
         $this->add_navigation();
@@ -58,6 +59,6 @@ class index extends base {
     protected function get_my_profile_picture_url(int $size = 100): string {
         $avatar = new user_picture((object)($this->user->to_array()));
         $avatar->size = $size;
-        return $avatar->get_url($this->page);
+        return $avatar->get_url($this->get_page());
     }
 }

@@ -24,6 +24,7 @@
 namespace totara_competency\controllers\assignment;
 
 use core\output\notification;
+use moodle_url;
 use totara_competency\baskets\competency_basket;
 use totara_competency\views;
 use core\external\cohort;
@@ -66,13 +67,13 @@ class save extends base {
 
         if (empty($items)) {
             $message = get_string('basket_empty_basket_can_not_proceed_creating_assignment', 'totara_competency');
-            redirect($view->get_absolute_url('create.php'), $message, null, notification::NOTIFY_ERROR);
+            redirect(new moodle_url('/totara/competency/assignments/create.php'), $message, null, notification::NOTIFY_ERROR);
         }
 
         $basket_diff = $basket->sync();
         if (!empty($basket_diff)) {
             $message = get_string('error_competencies_out_of_sync', 'totara_competency', count($basket_diff));
-            redirect($view->get_absolute_url('create.php'), $message, null, notification::NOTIFY_WARNING);
+            redirect(new moodle_url('/totara/competency/assignments/create.php'), $message, null, notification::NOTIFY_WARNING);
         }
 
         $total = 0;

@@ -1,8 +1,8 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
- * Copyright (C) 2018 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,28 +18,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package totara_competency
+ * @package mod_perform
  */
 
-namespace totara_competency\views;
+namespace mod_perform\views;
 
-use moodle_url;
 use totara_mvc\view;
+use totara_mvc\view_override;
 
-class save extends view {
+class override_nav_breadcrumbs implements view_override {
 
-    protected $url = 'save.php';
+    /**
+     * @inheritDoc
+     */
+    public function apply(view $view): void {
+        $page = $view->get_page();
 
-    protected $title = ['title_create', 'totara_competency'];
+        $settings = $page->settingsnav->children;
+        // Remove course-related settings blocks.
+        $settings->remove('categorysettings');
+        $settings->remove('modulesettings');
+        $settings->remove('courseadmin');
 
-    protected function prepare_output($output) {
-        $output = array_merge($output, [
-            'create_url' => new moodle_url('/totara/competency/assignments/create.php'),
-            'index_url' => new moodle_url('/totara/competency/assignments/index.php'),
-            'has_crumbtrail' => true,
-            'title' => $this->title,
-        ]);
-
-        return $output;
+        // Remove course-related breadcrumbs.
+        $breadcrumbs = $page->navigation->children;
+        $breadcrumbs->remove('courses');
     }
+
 }

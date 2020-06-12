@@ -81,7 +81,7 @@ class competency_controller extends admin_controller {
 
         $this->framework = $this->competency->framework;
 
-        $this->page->navbar
+        $this->get_page()->navbar
             ->add(
                 format_string($this->framework->fullname),
                 new moodle_url('/totara/hierarchy/index.php', [
@@ -99,9 +99,9 @@ class competency_controller extends admin_controller {
             'framework' => format_string($this->framework->fullname),
             'fullname' => format_string($this->competency->display_name)
         ]);
-        $this->page->set_url($url);
-        $this->page->set_title($title);
-        $this->page->navbar->add(format_string($this->competency->display_name));
+        $this->get_page()->set_url($url);
+        $this->get_page()->set_title($title);
+        $this->get_page()->navbar->add(format_string($this->competency->display_name));
 
         // This event is triggered for 3rd party backwards compatibility with the hierarchy plugin
         competency_viewed::create_from_instance((object)$this->competency->to_array())->trigger();
@@ -122,8 +122,8 @@ class competency_controller extends admin_controller {
         $this->setup();
         require_capability('totara/hierarchy:updatecompetency', context_system::instance());
 
-        $section = $this->get_param('s', PARAM_ALPHA, null, true);
-        $notify = $this->get_param('notify', PARAM_INT, 0, false);
+        $section = $this->get_required_param('s', PARAM_ALPHA);
+        $notify = $this->get_optional_param('notify', 0, PARAM_INT);
 
         $exportmethod = "export_{$section}_edit";
         if (!method_exists($this, $exportmethod)) {
@@ -134,7 +134,7 @@ class competency_controller extends admin_controller {
         $tab = get_string('competencytab' . $section, 'totara_hierarchy');
         $title = get_string('edit_competency_title', 'totara_competency', ['header' => $heading, 'tab' => $tab]);
 
-        $this->page->navbar->add($heading);
+        $this->get_page()->navbar->add($heading);
 
         $this->competency = new competency($this->competency->id);
         $config = new achievement_configuration($this->competency);

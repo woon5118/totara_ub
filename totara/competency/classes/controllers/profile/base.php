@@ -59,15 +59,13 @@ abstract class base extends controller {
     /**
      * Authorize the user
      *
-     * @return $this
+     * @return void
      */
-    protected function authorize() {
+    protected function authorize(): void {
         advanced_feature::require('competency_assignment');
 
         // parent::authorize(); We don't need to call require login here, it's always required.
         capability_helper::require_can_view_profile($this->user->id, $this->context);
-
-        return $this;
     }
 
     /**
@@ -93,7 +91,7 @@ abstract class base extends controller {
             return $this;
         }
 
-        $id = $this->get_param('user_id', PARAM_INT, self::LOGGED_IN_USER);
+        $id = $this->get_optional_param('user_id', self::LOGGED_IN_USER, PARAM_INT);
 
         if ($id === self::LOGGED_IN_USER) {
             $id = $this->currently_logged_in_user()->id;
@@ -115,10 +113,10 @@ abstract class base extends controller {
      * @return $this
      */
     protected function add_navigation(...$pages) {
-        $this->page->navigation->extend_for_user((object)($this->user->to_array()));
+        $this->get_page()->navigation->extend_for_user((object)($this->user->to_array()));
 
         if (!empty($pages)) {
-            $this->page->navbar->add(
+            $this->get_page()->navbar->add(
                 get_string('competency_profile', 'totara_competency'),
                 $this->get_profile_url()
             );
@@ -128,10 +126,10 @@ abstract class base extends controller {
                     $page = [$page];
                 }
 
-                $this->page->navbar->add(...$page);
+                $this->get_page()->navbar->add(...$page);
             }
         } else {
-            $this->page->navbar->add(get_string('competency_profile', 'totara_competency'));
+            $this->get_page()->navbar->add(get_string('competency_profile', 'totara_competency'));
         }
 
         return $this;

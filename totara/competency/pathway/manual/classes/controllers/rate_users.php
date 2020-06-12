@@ -35,6 +35,8 @@ class rate_users extends controller {
 
     use has_role;
 
+    protected $url = '/totara/competency/rate_users.php';
+
     /**
      * @return context_system
      */
@@ -49,8 +51,7 @@ class rate_users extends controller {
      */
     public function action() {
         $page_title = get_string('rate_competencies', 'pathway_manual');
-        $page_url = new \moodle_url('/totara/competency/rate_users.php');
-        $this->page->navbar->add($page_title);
+        $this->get_page()->navbar->add($page_title);
 
         $vue_props = ['current-user-id' => user::logged_in()->id];
 
@@ -59,8 +60,7 @@ class rate_users extends controller {
         }
 
         return tui_view::create('pathway_manual/pages/RateUsers', $vue_props)
-            ->set_title($page_title)
-            ->set_url($page_url);
+            ->set_title($page_title);
     }
 
     /**

@@ -18,15 +18,15 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
+ * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
  * @package mod_perform
  */
 
-use core\webapi\execution_context;
 use core\webapi\mutation_resolver;
 use core\webapi\query_resolver;
 use totara_core\advanced_feature;
 use totara_core\feature_not_available_exception;
-
+use totara_mvc\admin_controller;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
@@ -40,89 +40,96 @@ class mod_perform_advanced_feature_disable_testcase extends advanced_testcase {
         advanced_feature::disable('performance_activities');
     }
 
-    private function get_webapi_mutation_provider(): array {
+    public function get_webapi_mutation_data_provider(): array {
         $result = [];
         $mutations = core_component::get_namespace_classes('webapi\\resolver\\mutation', mutation_resolver::class, 'mod_perform');
         foreach ($mutations as $mutation) {
-            $result[] = [$mutation];
+            $result[$mutation] = [$mutation];
         }
         return $result;
     }
 
-    public function test_webapi_mutators_throw_error_if_feature_is_disabled() {
-        /** @var mutation_resolver[] $mutators */
-        $mutators = core_component::get_namespace_classes('webapi\\resolver\\mutation', mutation_resolver::class, 'mod_perform');
-        $this->assertGreaterThan(0, count($mutators));
+    /**
+     * @dataProvider get_webapi_mutation_data_provider
+     * @param string $mutation_name
+     */
+    public function test_webapi_mutators_throw_error_if_feature_is_disabled(string $mutation_name) {
+        $this->expectException(feature_not_available_exception::class);
+        $this->expectExceptionMessage('Feature performance_activities is not available.');
 
-        foreach ($mutators as $mutator) {
-            try {
-                $operation = str_replace('\\webapi\\resolver\\mutation\\', '_', $mutator);
-                $this->resolve_graphql_mutation($operation);
-                $this->fail('Mutator ' . $mutator . ' must call advanced_feature::require(\'performance_activities\')');
-            } catch (feature_not_available_exception $exception) {
-                continue;
-            } catch (Exception $exception) {
-                $this->fail('Mutator ' . $mutator . ' must call advanced_feature::require(\'performance_activities\')');
-            }
-        }
+        $operation = str_replace('\\webapi\\resolver\\mutation\\', '_', $mutation_name);
+        $this->resolve_graphql_mutation($operation);
     }
 
-    public function test_webapi_queries_throw_error_if_feature_is_disabled() {
-        /** @var mutation_resolver[] $queries */
+    public function get_webapi_query_data_provider(): array {
+        $result = [];
         $queries = core_component::get_namespace_classes('webapi\\resolver\\query', query_resolver::class, 'mod_perform');
-        $this->assertGreaterThan(0, $queries);
-
         foreach ($queries as $query) {
-            try {
-                $operation = str_replace('\\webapi\\resolver\\query\\', '_', $query);
-                $this->resolve_graphql_query($operation);
-                $this->fail('Query' . $query . ' must call advanced_feature::require(\'performance_activities\')');
-            } catch (\totara_core\feature_not_available_exception $exception) {
-                continue;
-            } catch (Exception $exception) {
-                $this->fail('Query' . $query . ' must call advanced_feature::require(\'performance_activities\')');
-            }
+            $result[$query] = [$query];
         }
-    }
-
-    public function test_controllers_throw_error_if_feature_is_disabled() {
-        $controllers = $this->get_controller_classes();
-        $this->assertGreaterThan(0, count($controllers));
-
-        foreach ($controllers as $controller) {
-            try {
-                (new $controller())->process();
-                $this->fail('Controller ' . $controller . ' must call advanced_feature::require(\'performance_activities\')');
-            } catch (feature_not_available_exception $exception) {
-                continue;
-            } catch (Exception $exception) {
-                $this->fail('Controller ' . $controller . ' must call advanced_feature::require(\'performance_activities\')');
-            }
-        }
+        return $result;
     }
 
     /**
-     * @return \totara_mvc\controller[]
+     * @dataProvider get_webapi_query_data_provider
+     * @param string $query_name
+     */
+    public function test_webapi_queries_throw_error_if_feature_is_disabled(string $query_name) {
+        $this->expectException(feature_not_available_exception::class);
+        $this->expectExceptionMessage('Feature performance_activities is not available.');
+
+        $operation = str_replace('\\webapi\\resolver\\query\\', '_', $query_name);
+        $this->resolve_graphql_query($operation);
+    }
+
+    /**
+     * Returns an array with all mod_perform controllers
+     *
+     * @return string[]
+     */
+    public function get_controller_data_provider(): array {
+        $result = [];
+        $controllers  = $this->get_controller_classes();
+        foreach ($controllers as $controller) {
+            $result[$controller] = [$controller];
+        }
+        return $result;
+    }
+
+    /**
+     * @return string[]
      */
     private function get_controller_classes(): array {
         return array_filter(
-            array_keys(core_component::get_component_classes_in_namespace('mod_perform')),
+            array_keys(core_component::get_component_classes_in_namespace('mod_perform', 'controllers')),
             static function (string $class_name) {
-                return strpos($class_name, 'mod_perform\\controllers') !== false &&
-                    !(new ReflectionClass($class_name))->isAbstract();
+                // Admin controllers do check features differently so ignore those
+                return !is_subclass_of($class_name, admin_controller::class)
+                    && !(new ReflectionClass($class_name))->isAbstract();
             }
         );
     }
 
     /**
-     * Helper to get execution context
-     *
-     * @param string $type
-     * @param string|null $operation
-     * @return execution_context
+     * @dataProvider get_controller_data_provider
+     * @param string $controller
+     * @throws coding_exception
      */
-    private function get_execution_context(string $type = 'dev', ?string $operation = null): execution_context {
-        return execution_context::create($type, $operation);
+    public function test_controllers_throw_error_if_feature_is_disabled(string $controller) {
+        $this->setAdminUser();
+
+        $data_generator = $this->getDataGenerator();
+        /** @var mod_perform_generator $perform_generator */
+        $perform_generator = $data_generator->get_plugin_generator('mod_perform');
+
+        $activity = $perform_generator->create_activity_in_container();
+
+        $_GET['activity_id'] = $activity->id;
+
+        $this->expectException(feature_not_available_exception::class);
+        $this->expectExceptionMessage('Feature performance_activities is not available.');
+
+        (new $controller())->process();
     }
 
 }

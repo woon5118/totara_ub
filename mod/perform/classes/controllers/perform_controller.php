@@ -23,10 +23,13 @@
 
 namespace mod_perform\controllers;
 
+use mod_perform\views\override_nav_breadcrumbs;
 use moodle_url;
-use navigation_node_collection;
+use reportbuilder;
 use totara_core\advanced_feature;
 use totara_mvc\controller;
+use totara_mvc\report_view;
+use totara_mvc\tui_view;
 use totara_mvc\view;
 
 /**
@@ -41,12 +44,14 @@ abstract class perform_controller extends controller {
      *
      * @return $this
      */
-    protected function authorize() {
+    protected function authorize(): void {
         // We do not want to redirect due to not being enrolled
         // we cannot prevent this when passing the course.
         // In this case we do a normal require_login first to capture
         // generic errors, like not being logged in, etc.
         require_login(null, $this->auto_login_guest);
+
+        advanced_feature::require('performance_activities');
 
         // Then we'll do a second require_login to capture errors due to not being able to access the course.
         // This i quite a hacky approach but the only way at the moment
@@ -55,32 +60,13 @@ abstract class perform_controller extends controller {
             try {
                 require_login($course, $this->auto_login_guest, $cm, true, true);
             } catch (\require_login_exception $exception) {
-                $this->page->set_cm($cm, $course);
+                // TODO: Replace this temporary solution with something else in TL-25510
+                $this->get_page()->set_url('/mod/perform/manage/activity/index.php');
+                $this->get_page()->set_cm($cm, $course);
                 echo $this->action_invalid()->render();
                 exit();
             }
         }
-
-        return $this;
-    }
-
-    public function init_page_object() {
-        advanced_feature::require('performance_activities');
-        parent::init_page_object();
-    }
-
-    public function action() {
-        $this->remove_breadcrumbs();
-    }
-
-    protected function remove_breadcrumbs() {
-        // Remove course-related settings blocks.
-        $this->get_settings()->remove('categorysettings');
-        $this->get_settings()->remove('modulesettings');
-        $this->get_settings()->remove('courseadmin');
-
-        // Remove course-related breadcrumbs.
-        $this->get_breadcrumbs()->remove('courses');
     }
 
     /**
@@ -88,27 +74,8 @@ abstract class perform_controller extends controller {
      * @throws \coding_exception
      */
     public function action_invalid() {
-        $this->remove_breadcrumbs();
         $notification = view::core_renderer()->notification(get_string('error_access_permission_missing', 'mod_perform'), 'error');
-        return view::create(null, $notification);
-    }
-
-    /**
-     * Collection of the settings navigation blocks to be displayed.
-     *
-     * @return navigation_node_collection
-     */
-    private function get_settings(): navigation_node_collection {
-        return $this->page->settingsnav->children;
-    }
-
-    /**
-     * Collection of the breadcrumb navigation nodes to be displayed.
-     *
-     * @return navigation_node_collection
-     */
-    private function get_breadcrumbs(): navigation_node_collection {
-        return $this->page->navigation->children;
+        return self::create_view(null, $notification);
     }
 
     /**
@@ -126,6 +93,42 @@ abstract class perform_controller extends controller {
      */
     final public static function get_url(array $params = []): moodle_url {
         return new moodle_url(static::get_base_url(), $params);
+    }
+
+    /**
+     * Returns tui view for all perform controllers
+     *
+     * @param string $component
+     * @param array $props
+     * @return tui_view
+     */
+    public static function create_tui_view(string $component, array $props = []): tui_view {
+        return tui_view::create($component, $props)
+            ->add_override(new override_nav_breadcrumbs());
+    }
+
+    /**
+     * Returns report view for all perform controllers
+     *
+     * @param reportbuilder $report
+     * @param bool $debug
+     * @return report_view
+     */
+    public static function create_report_view(reportbuilder $report, bool $debug): report_view {
+        return report_view::create_from_report($report, $debug)
+            ->add_override(new override_nav_breadcrumbs());
+    }
+
+    /**
+     * Returns view for all perform controllers
+     *
+     * @param string|null $template
+     * @param array $data
+     * @return view
+     */
+    public static function create_view(?string $template, $data = []): view {
+        return view::create($template, $data)
+            ->add_override(new override_nav_breadcrumbs());
     }
 
 }

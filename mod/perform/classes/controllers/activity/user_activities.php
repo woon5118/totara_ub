@@ -47,18 +47,17 @@ class user_activities extends perform_controller {
      * @return tui_view
      */
     public function action(): tui_view {
-        parent::action();
+        $this->set_url(self::get_url());
 
         $props = [
             'current-user-id' => user::logged_in()->id,
             'view-activity-url' => (string) view_user_activity::get_url(),
-            'show-about-others-tab' => (bool) $this->get_param('show_about_others_tab', PARAM_BOOL, false),
-            'completion-save-success' => (bool) $this->get_param('completion_save_success', PARAM_BOOL, false),
+            'show-about-others-tab' => (bool) $this->get_optional_param('show_about_others_tab', false, PARAM_BOOL),
+            'completion-save-success' => (bool) $this->get_optional_param('completion_save_success', false, PARAM_BOOL),
         ];
 
-        return tui_view::create('mod_perform/pages/UserActivities', $props)
-            ->set_title(get_string('user_activities_page_title', 'mod_perform'))
-            ->set_url(self::get_url());
+        return self::create_tui_view('mod_perform/pages/UserActivities', $props)
+            ->set_title(get_string('user_activities_page_title', 'mod_perform'));
     }
 
     /**
