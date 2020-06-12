@@ -295,5 +295,55 @@
         <INDEX NAME="section_participant_instance" UNIQUE="true" FIELDS="section_id, participant_instance_id" COMMENT="Each participant instance can only have one record per section"/>
       </INDEXES>
     </TABLE>
+    <TABLE NAME="perform_notification" COMMENT="Represents a single notification setting">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="activity_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="class_key" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="active" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="triggers" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="last_run_at" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="created_at" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="updated_at" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="activity_fk" TYPE="foreign" FIELDS="activity_id" REFTABLE="perform" REFFIELDS="id" ONDELETE="cascade"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="notification_ix" UNIQUE="true" FIELDS="activity_id, class_key"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="perform_notification_recipient" COMMENT="Represents a notification setting recipient">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="active" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="notification_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="section_relationship_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="notification_fk" TYPE="foreign" FIELDS="notification_id" REFTABLE="perform_notification" REFFIELDS="id" ONDELETE="cascade"/>
+        <KEY NAME="section_relationship_fk" TYPE="foreign" FIELDS="section_relationship_id" REFTABLE="perform_section_relationship" REFFIELDS="id" ONDELETE="cascade"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="notification_recipient_ix" UNIQUE="true" FIELDS="notification_id, section_relationship_id"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="perform_notification_message" COMMENT="Represents a notification message that has been sent">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="sent_at" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="notification_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="core_relationship_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="created_at" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="updated_at" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="notification_fk" TYPE="foreign" FIELDS="notification_id" REFTABLE="perform_notification" REFFIELDS="id" ONDELETE="cascade"/>
+        <KEY NAME="core_relationship_fk" TYPE="foreign" FIELDS="core_relationship_id" REFTABLE="totara_core_relationship" REFFIELDS="id" ONDELETE="cascade"/>
+      </KEYS>
+    </TABLE>
   </TABLES>
 </XMLDB>

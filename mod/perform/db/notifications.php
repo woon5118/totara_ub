@@ -17,13 +17,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
+ * @author Tatsuhiro Kirihara <tatsuhiro.kirihara@totaralearning.com>
  * @package mod_perform
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2020061900;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2016120505;       // Requires this Moodle version.
-$plugin->component = 'mod_perform'; // To check on upgrade, that module sits in correct place
-$plugin->dependencies = ['container_perform' => 2020012400];
+$notifications = [
+    'instance_created' => [
+        'name' => ['notification_instance_created', 'mod_perform'],
+        'class' => \mod_perform\notification\brokers\instance_created::class,
+        'has_triggers' => false,
+    ],
+    'overdue' => [
+        'name' => ['notification_overdue', 'mod_perform'],
+        'class' => \mod_perform\notification\brokers\overdue::class,
+        'has_triggers' => true,
+    ],
+];

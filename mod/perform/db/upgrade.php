@@ -32,7 +32,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 function xmldb_perform_upgrade($oldversion) {
-    global $DB;
+    global $DB, $CFG;
 
     $dbman = $DB->get_manager();
 
@@ -68,6 +68,79 @@ function xmldb_perform_upgrade($oldversion) {
 
         // Perform savepoint reached.
         upgrade_mod_savepoint(true, 2020061801, 'perform');
+    }
+
+    if ($oldversion < 2020061900) {
+
+        // Define table perform_notification to be created.
+        $table = new xmldb_table('perform_notification');
+
+        // Adding fields to table perform_notification.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('activity_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('class_key', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('active', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('triggers', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+        $table->add_field('last_run_at', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('created_at', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('updated_at', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+
+        // Adding keys to table perform_notification.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('activity_fk', XMLDB_KEY_FOREIGN, array('activity_id'), 'perform', array('id'), 'cascade');
+
+        // Adding indexes to table perform_notification.
+        $table->add_index('notification_ix', XMLDB_INDEX_UNIQUE, array('activity_id', 'class_key'));
+
+        // Conditionally launch create table for perform_notification.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Define table perform_notification_recipient to be created.
+        $table = new xmldb_table('perform_notification_recipient');
+
+        // Adding fields to table perform_notification_recipient.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('active', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('notification_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('section_relationship_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table perform_notification_recipient.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('notification_fk', XMLDB_KEY_FOREIGN, array('notification_id'), 'perform_notification', array('id'), 'cascade');
+        $table->add_key('section_relationship_fk', XMLDB_KEY_FOREIGN, array('section_relationship_id'), 'perform_section_relationship', array('id'), 'cascade');
+
+        // Adding indexes to table perform_notification_recipient.
+        $table->add_index('notification_recipient_ix', XMLDB_INDEX_UNIQUE, array('notification_id', 'section_relationship_id'));
+
+        // Conditionally launch create table for perform_notification_recipient.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Define table perform_notification_message to be created.
+        $table = new xmldb_table('perform_notification_message');
+
+        // Adding fields to table perform_notification_message.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('sent_at', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('notification_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('core_relationship_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('created_at', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('updated_at', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+
+        // Adding keys to table perform_notification_message.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('notification_fk', XMLDB_KEY_FOREIGN, array('notification_id'), 'perform_notification', array('id'), 'cascade');
+        $table->add_key('core_relationship_fk', XMLDB_KEY_FOREIGN, array('core_relationship_id'), 'totara_core_relationship', array('id'), 'cascade');
+
+        // Conditionally launch create table for perform_notification_message.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        upgrade_mod_savepoint(true, 2020061900, 'perform');
     }
 
     return true;

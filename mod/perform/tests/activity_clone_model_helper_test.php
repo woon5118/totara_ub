@@ -41,6 +41,9 @@ class mod_perform_activity_clone_model_helper_testcase extends advanced_testcase
      * @var string[] table names which we do not back up
      */
     protected $ignored_tables = [
+        'perform_notification',             // TODO: work it out later in TL-25541
+        'perform_notification_recipient',   // TODO: work it out later in TL-25541
+        'perform_notification_message',     // TODO: work it out later in TL-25541
         'perform_type'
     ];
 

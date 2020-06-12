@@ -17,13 +17,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
+ * @author Tatsuhiro Kirihara <tatsuhiro.kirihara@totaralearning.com>
  * @package mod_perform
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace mod_perform\notification;
 
-$plugin->version  = 2020061900;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2016120505;       // Requires this Moodle version.
-$plugin->component = 'mod_perform'; // To check on upgrade, that module sits in correct place
-$plugin->dependencies = ['container_perform' => 2020012400];
+/**
+ * broker interface
+ */
+interface broker {
+    /**
+     * @return array
+     */
+    public function get_default_triggers(): array;
+
+    /**
+     * @param object $kia_ora_koutou_katoa
+     */
+    public function execute(object $kia_ora_koutou_katoa): void;
+}
