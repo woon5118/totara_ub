@@ -552,7 +552,7 @@ class totara_core_menu_helper_testcase extends advanced_testcase {
 
         $defaultoptions = helper::create_parentid_form_options(0);
         // Note: update following test to match default menu structure if it changes.
-        $this->assertSame(array('Top', 'Learn', 'Learn / Find Learning (Legacy catalogues)', 'Unused'), array_values($defaultoptions));
+        $this->assertSame(array('Top', 'Learn', 'Develop', 'Learn / Find Learning (Legacy catalogues)', 'Unused'), array_values($defaultoptions));
 
         $data = new stdClass();
         $data->type = 'container';

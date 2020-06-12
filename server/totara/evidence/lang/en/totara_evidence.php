@@ -83,6 +83,7 @@ $string['go_back'] = 'Go back';
 $string['idnumber'] = 'ID number';
 $string['manage_evidence_types'] = 'Manage evidence types';
 $string['manage_types'] = 'Manage types';
+$string['menu_title_my_evidence'] = 'Evidence bank';
 $string['modified_by'] = 'Last modified by';
 $string['modified_on'] = 'Last modified on';
 $string['navigation_back_to_evidence_bank'] = '« Back to evidence bank';

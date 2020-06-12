@@ -39,7 +39,7 @@ class mygoals extends \totara_core\totara\menu\item {
     }
 
     public function get_default_sortorder() {
-        return 44000;
+        return 50020;
     }
 
     protected function check_visibility() {
@@ -78,7 +78,7 @@ class mygoals extends \totara_core\totara\menu\item {
     }
 
     protected function get_default_parent() {
-        return '\totara_appraisal\totara\menu\appraisal';
+        return '\totara_core\totara\menu\perform';
     }
 
     public function get_incompatible_preset_rules(): array {

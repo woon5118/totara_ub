@@ -27,7 +27,6 @@ use totara_core\advanced_feature;
 use totara_job\job_assignment;
 
 class myteam extends item {
-
     protected function get_default_title() {
         return get_string('team', 'totara_core');
     }
@@ -37,7 +36,7 @@ class myteam extends item {
     }
 
     public function get_default_sortorder() {
-        return 50000;
+        return 50010;
     }
 
     protected function check_visibility() {
@@ -61,11 +60,10 @@ class myteam extends item {
         return $cache;
     }
 
-    /**
-     * Is this menu item completely disabled?
-     *
-     * @return bool
-     */
+    protected function get_default_parent() {
+        return '\totara_core\totara\menu\perform';
+    }
+
     public function is_disabled() {
         return advanced_feature::is_disabled('myteam');
     }

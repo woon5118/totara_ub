@@ -480,6 +480,7 @@ $string['menuitem:withrestrictionall'] = 'Users matching <strong>all</strong> of
 $string['menuitem:withrestrictionany'] = 'Users matching <strong>any</strong> of the criteria below can view this menu item.';
 $string['menulifetime'] = 'Main menu cache life time';
 $string['menulifetime_desc'] = 'Higher values improve performance but some changes in menu structure may be delayed.';
+$string['menu_title_perform'] = 'Develop';
 $string['minutelyon'] = 'Minutely on';
 $string['mnetdeprecated'] = 'MNET functionality is deprecated and will be removed in Totara 14';
 $string['mnetdeprecateduserspresent'] = 'MNET users were detected, they will need to be migrated to regular accounts before upgrading to Totara 14';

@@ -270,6 +270,7 @@ $string['linked_courses_saved'] = 'Linked courses have been saved';
 $string['linkedcourses_mustsavechange'] = 'Changes must be saved before they will be applied';
 $string['loading'] = 'Loading...';
 $string['mandatory'] = 'Mandatory';
+$string['menu_title_my_competencies'] = 'Competencies';
 $string['messageprovider:expand_task_finished'] = 'Sync assigned users finished';
 $string['messageprovider:no_longer_proficient'] = 'No longer proficient';
 $string['more_information'] = 'More information';
