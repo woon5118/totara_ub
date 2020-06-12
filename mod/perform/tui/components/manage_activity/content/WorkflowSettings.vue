@@ -30,48 +30,48 @@
         :label="$str('workflow_automatic_closure_label', 'mod_perform')"
         :helpmsg="$str('workflow_automatic_closure_label_help', 'mod_perform')"
       >
-        <Checkbox
-          v-model="close_on_completion"
-          :disabled="formDisabled"
-          :label="
-            $str('workflow_automatic_closure_on_completion', 'mod_perform')
-          "
-          @change="save"
-        >
-          <p class="tui-performActivityWorkflowSettings__automaticClosure-text">
+        <div>
+          <Checkbox
+            v-model="close_on_completion"
+            :disabled="formDisabled"
+            @change="save"
+          >
             {{
               $str('workflow_automatic_closure_on_completion', 'mod_perform')
             }}
-          </p>
-          <p
-            class="tui-performActivityWorkflowSettings__automaticClosure-subtext"
-          >
+          </Checkbox>
+
+          <FormRowDetails>
             {{
               $str(
                 'workflow_automatic_closure_on_completion_help',
                 'mod_perform'
               )
             }}
-          </p>
-        </Checkbox>
+          </FormRowDetails>
+        </div>
       </FormRow>
     </Form>
   </div>
 </template>
 
 <script>
-import ToggleActivityCloseOnCompletion from 'mod_perform/graphql/toggle_activity_close_on_completion_setting.graphql';
 import Checkbox from 'totara_core/components/form/Checkbox';
 import Form from 'totara_core/components/form/Form';
 import FormRow from 'totara_core/components/form/FormRow';
+import FormRowDetails from 'totara_core/components/form/FormRowDetails';
+// Util
 import { notify } from 'totara_core/notifications';
 import { NOTIFICATION_DURATION } from 'mod_perform/constants';
+// Queries
+import toggleActivityCloseOnCompletion from 'mod_perform/graphql/toggle_activity_close_on_completion_setting';
 
 export default {
   components: {
     Checkbox,
     Form,
     FormRow,
+    FormRowDetails,
   },
 
   props: {
@@ -82,10 +82,9 @@ export default {
   },
 
   data() {
-    const settings = this.activity.settings;
     return {
       formDisabled: false,
-      close_on_completion: settings.close_on_completion,
+      close_on_completion: this.activity.settings.close_on_completion,
     };
   },
 
@@ -100,7 +99,7 @@ export default {
       this.formDisabled = true;
       this.$apollo
         .mutate({
-          mutation: ToggleActivityCloseOnCompletion,
+          mutation: toggleActivityCloseOnCompletion,
           variables: {
             input: {
               activity_id: this.activity.id,

@@ -37,13 +37,10 @@
 
     <Dropdown v-if="activity.can_manage" position="bottom-right">
       <template v-slot:trigger="{ toggle }">
-        <a href="#" @click.prevent="toggle">
-          <ActivityActionsIcon
-            :alt="$str('activity_action_options', 'mod_perform')"
-            :title="$str('activity_action_options', 'mod_perform')"
-            size="200"
-          />
-        </a>
+        <MoreButton
+          :aria-label="$str('activity_action_options', 'mod_perform')"
+          @click="toggle"
+        />
       </template>
       <DropdownItem
         v-if="activity.can_potentially_activate"
@@ -70,15 +67,23 @@
       @cancel="closeActivateModal"
     >
       <Loader :loading="$apollo.queries.activityUsersToAssignCount.loading">
-        <span
-          v-html="
-            $str(
-              'modal_activate_message',
-              'mod_perform',
-              activityUsersToAssignCount
-            )
-          "
-        />
+        <div>
+          <p>
+            {{ $str('modal_activate_message', 'mod_perform') }}
+          </p>
+          <p
+            v-html="
+              $str(
+                'modal_activate_message_users',
+                'mod_perform',
+                activityUsersToAssignCount
+              )
+            "
+          />
+          <p>
+            {{ $str('modal_activate_message_question', 'mod_perform') }}
+          </p>
+        </div>
       </Loader>
     </ConfirmationModal>
 
@@ -107,26 +112,28 @@
 </template>
 
 <script>
-import ActivateActivityMutation from 'mod_perform/graphql/activate_activity.graphql';
-import ActivateCloneMutation from 'mod_perform/graphql/clone_activity.graphql';
-import ActivateDeleteMutation from 'mod_perform/graphql/delete_activity.graphql';
-import ActivityActionsIcon from 'mod_perform/components/icons/ActivityActions';
-import ActivityUsersToAssignCountQuery from 'mod_perform/graphql/activity_users_to_assign_count.graphql';
 import ConfirmationModal from 'totara_core/components/modal/ConfirmationModal';
 import Dropdown from 'totara_core/components/dropdown/Dropdown';
 import DropdownItem from 'totara_core/components/dropdown/DropdownItem';
 import Loader from 'totara_core/components/loader/Loader';
+import MoreButton from 'totara_core/components/buttons/MoreIcon';
 import ParticipationReportingIcon from 'mod_perform/components/icons/ParticipationReporting';
 import { notify } from 'totara_core/notifications';
 import { NOTIFICATION_DURATION } from 'mod_perform/constants';
 
+// Queries
+import activateActivityMutation from 'mod_perform/graphql/activate_activity';
+import activateCloneMutation from 'mod_perform/graphql/clone_activity';
+import activateDeleteMutation from 'mod_perform/graphql/delete_activity';
+import activityUsersToAssignCountQuery from 'mod_perform/graphql/activity_users_to_assign_count';
+
 export default {
   components: {
-    ActivityActionsIcon,
     ConfirmationModal,
     Dropdown,
     DropdownItem,
     Loader,
+    MoreButton,
     ParticipationReportingIcon,
   },
 
@@ -149,17 +156,6 @@ export default {
 
   computed: {
     /**
-     * Get the url to the participation tracking
-     *
-     * @return {string}
-     */
-    participationReportingUrl() {
-      return this.$url('/mod/perform/reporting/participation/index.php', {
-        activity_id: this.activity.id,
-      });
-    },
-
-    /**
      * For certain cases, get a title text for the 'Activate" dropdown option.
      */
     activateOptionTitle() {
@@ -170,6 +166,15 @@ export default {
         return this.$str('activity_draft_not_ready', 'mod_perform');
       }
       return this.$str('activity_action_activate', 'mod_perform');
+    },
+
+    /**
+     * Is the activity in draft state.
+     *
+     * @return {boolean}
+     */
+    activityIsDraft() {
+      return this.activity.state_details.name === 'DRAFT';
     },
 
     /**
@@ -186,31 +191,33 @@ export default {
     },
 
     /**
-     * Is the activity in draft state.
+     * Get the url to the participation tracking
      *
-     * @return {boolean}
+     * @return {string}
      */
-    activityIsDraft() {
-      return this.activity.state_details.name === 'DRAFT';
+    participationReportingUrl() {
+      return this.$url('/mod/perform/reporting/participation/index.php', {
+        activity_id: this.activity.id,
+      });
+    },
+  },
+
+  apollo: {
+    activityUsersToAssignCount: {
+      query: activityUsersToAssignCountQuery,
+      variables() {
+        return {
+          activity_id: this.activity.id,
+        };
+      },
+      update: data => data.mod_perform_activity_users_to_assign_count,
+      skip() {
+        return !this.activateModalOpen || this.activating;
+      },
     },
   },
 
   methods: {
-    /**
-     * Display the modal for confirming the activation of the activity.
-     */
-    showActivateModal() {
-      this.activateModalOpen = true;
-    },
-
-    /**
-     * Close the modal for confirming the activation of the activity.
-     */
-    closeActivateModal() {
-      this.activateModalOpen = false;
-      this.activating = false;
-    },
-
     /**
      * Activate an activity
      */
@@ -219,7 +226,7 @@ export default {
 
       this.$apollo
         .mutate({
-          mutation: ActivateActivityMutation,
+          mutation: activateActivityMutation,
           variables: {
             input: {
               activity_id: this.activity.id,
@@ -237,11 +244,13 @@ export default {
             type: 'success',
           });
           this.$emit('refetch');
+          this.activating = false;
           this.closeActivateModal();
         })
         .catch(() => {
           this.showErrorNotification();
           this.$emit('refetch');
+          this.activating = false;
           this.closeActivateModal();
         });
     },
@@ -252,7 +261,7 @@ export default {
     async cloneActivity() {
       try {
         await this.$apollo.mutate({
-          mutation: ActivateCloneMutation,
+          mutation: activateCloneMutation,
           variables: {
             input: {
               activity_id: this.activity.id,
@@ -264,6 +273,53 @@ export default {
         this.showErrorNotification();
       }
       this.$emit('refetch');
+    },
+
+    /**
+     * Close the modal for confirming the activation of the activity.
+     */
+    closeActivateModal() {
+      this.activateModalOpen = false;
+    },
+
+    /**
+     * Close the modal for confirming the deletion of the activity.
+     */
+    closeDeleteModal() {
+      this.deleteModalOpen = false;
+      this.deleting = false;
+    },
+
+    /**
+     * Deletes the activity.
+     */
+    async deleteActivity() {
+      this.deleting = true;
+
+      try {
+        await this.$apollo.mutate({
+          mutation: activateDeleteMutation,
+          variables: {
+            input: {
+              activity_id: this.activity.id,
+            },
+          },
+        });
+
+        this.showDeleteSuccessNotification();
+      } catch (e) {
+        this.showErrorNotification();
+      }
+
+      this.$emit('refetch');
+      this.closeDeleteModal();
+    },
+
+    /**
+     * Display the modal for confirming the activation of the activity.
+     */
+    showActivateModal() {
+      this.activateModalOpen = true;
     },
 
     showCloneSuccessNotification() {
@@ -283,39 +339,6 @@ export default {
      */
     showDeleteModal() {
       this.deleteModalOpen = true;
-    },
-
-    /**
-     * Close the modal for confirming the deletion of the activity.
-     */
-    closeDeleteModal() {
-      this.deleteModalOpen = false;
-      this.deleting = false;
-    },
-
-    /**
-     * Deletes the activity.
-     */
-    async deleteActivity() {
-      this.deleting = true;
-
-      try {
-        await this.$apollo.mutate({
-          mutation: ActivateDeleteMutation,
-          variables: {
-            input: {
-              activity_id: this.activity.id,
-            },
-          },
-        });
-
-        this.showDeleteSuccessNotification();
-      } catch (e) {
-        this.showErrorNotification();
-      }
-
-      this.$emit('refetch');
-      this.closeDeleteModal();
     },
 
     showDeleteSuccessNotification() {
@@ -350,21 +373,6 @@ export default {
       });
     },
   },
-
-  apollo: {
-    activityUsersToAssignCount: {
-      query: ActivityUsersToAssignCountQuery,
-      variables() {
-        return {
-          activity_id: this.activity.id,
-        };
-      },
-      update: data => data.mod_perform_activity_users_to_assign_count,
-      skip() {
-        return !this.activateModalOpen || this.activating;
-      },
-    },
-  },
 };
 </script>
 
@@ -377,6 +385,8 @@ export default {
       "activity_action_options",
       "activity_draft_not_ready",
       "modal_activate_message",
+      "modal_activate_message_question",
+      "modal_activate_message_users",
       "modal_activate_title",
       "modal_delete_confirmation_line",
       "modal_delete_draft_message",
@@ -384,7 +394,6 @@ export default {
       "modal_delete_message",
       "modal_delete_message_data_recovery_warning",
       "modal_delete_title",
-      "participation_reporting",
       "participation_reporting",
       "toast_error_generic_update",
       "toast_success_activity_cloned",

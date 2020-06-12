@@ -21,12 +21,19 @@
   @package mod_perform
 -->
 <template>
-  <div class="tui-elementEditDisplay" role="button" tabindex="0" @click="edit">
+  <div
+    class="tui-performElementEditDisplay"
+    role="button"
+    tabindex="0"
+    @click="edit"
+  >
     <div v-if="error">{{ error }}</div>
-    <div class="tui-elementEditDisplay__inner">
-      <div class="tui-elementEditDisplay__inner-header">
-        <div class="tui-elementEditDisplay__title">{{ title }}</div>
-        <div class="tui-elementEditDisplay__info">
+    <div class="tui-performElementEditDisplay__inner">
+      <div class="tui-performElementEditDisplay__inner-header">
+        <div class="tui-performElementEditDisplay__title">
+          {{ title }}
+        </div>
+        <div class="tui-performElementEditDisplay__info">
           <Lozenge
             v-show="isRequired"
             :text="$str('section_element_tag_required', 'mod_perform')"
@@ -38,7 +45,7 @@
           />
         </div>
       </div>
-      <div class="tui-elementEditDisplay__inner-content">
+      <div class="tui-performElementEditDisplay__inner-content">
         <slot name="content" />
       </div>
     </div>
@@ -59,6 +66,7 @@ export default {
     type: Object,
     error: String,
   },
+
   methods: {
     edit() {
       this.$emit('edit');
@@ -69,11 +77,12 @@ export default {
   },
 };
 </script>
+
 <lang-strings>
   {
-  "mod_perform": [
-    "section_element_tag_required",
-    "section_element_tag_optional"
-  ]
+    "mod_perform": [
+      "section_element_tag_required",
+      "section_element_tag_optional"
+    ]
   }
 </lang-strings>

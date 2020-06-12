@@ -29,48 +29,51 @@
       {{ $str('activity_general_tab_heading', 'mod_perform') }}
     </h3>
 
-    <Form class="tui-performManageActivityGeneralInfoForm">
+    <Form>
       <FormRow
-        v-slot="{ id, label }"
+        v-slot="{ id }"
         :label="$str('general_info_label_activity_title', 'mod_perform')"
       >
         <InputText
           :id="id"
           :value="activity.edit_name"
-          :placeholder="label"
           :maxlength="ACTIVITY_NAME_MAX_LENGTH"
           @input="updateActivity({ edit_name: $event })"
         />
       </FormRow>
 
       <FormRow
-        v-slot="{ id, label }"
+        v-slot="{ id }"
         :label="$str('general_info_label_activity_description', 'mod_perform')"
       >
         <Textarea
           :id="id"
           :value="activity.edit_description"
-          :placeholder="label"
           @input="updateActivity({ edit_description: $event })"
         />
       </FormRow>
 
       <FormRow
-        v-slot="{ id, label }"
+        v-slot="{ id }"
         :label="$str('general_info_label_activity_type', 'mod_perform')"
       >
-        <SelectFilter
+        <Select
           v-if="disableAfterSave"
+          :id="id"
           v-model="activityTypeSelection"
-          :label="$str('general_info_label_activity_type', 'mod_perform')"
+          :aria-labelledby="id"
           :options="activityTypes"
-          :show-label="false"
-          :stacked="false"
         />
         <span v-else>{{ activityTypeName }}</span>
       </FormRow>
 
-      <FormRow :style="actionButtonStyling">
+      <FormRow
+        :class="
+          useModalStyling
+            ? 'tui-performManageActivityGeneralInfo__modalBtnRow'
+            : ''
+        "
+      >
         <ButtonGroup>
           <Button
             :styleclass="{ primary: true }"
@@ -91,13 +94,13 @@ import ButtonGroup from 'totara_core/components/buttons/ButtonGroup';
 import Form from 'totara_core/components/form/Form';
 import FormRow from 'totara_core/components/form/FormRow';
 import InputText from 'totara_core/components/form/InputText';
-import SelectFilter from 'totara_core/components/filters/SelectFilter';
+import Select from 'totara_core/components/form/Select';
 import Textarea from 'totara_core/components/form/Textarea';
-import UpdateGeneralInfoMutation from 'mod_perform/graphql/update_activity_general_info.graphql';
-import CreateActivityMutation from 'mod_perform/graphql/create_activity.graphql';
 
 //GraphQL
-import ActivityTypesQuery from 'mod_perform/graphql/activity_types';
+import activityTypesQuery from 'mod_perform/graphql/activity_types';
+import createActivityMutation from 'mod_perform/graphql/create_activity';
+import updateGeneralInfoMutation from 'mod_perform/graphql/update_activity_general_info';
 
 // This should correspond to mod_perform\models\activity\activity::NAME_MAX_LENGTH in the back end.
 const ACTIVITY_NAME_MAX_LENGTH = 1024;
@@ -109,32 +112,30 @@ export default {
     Form,
     FormRow,
     InputText,
-    SelectFilter,
+    Select,
     Textarea,
   },
+
   props: {
-    value: {
-      type: Object,
-      required: false,
-    },
     disableAfterSave: {
       type: Boolean,
-      required: false,
-      default: false,
-    },
-    useModalStyling: {
-      type: Boolean,
-      required: false,
       default: false,
     },
     submitButtonText: {
       type: String,
-      required: false,
       default() {
         return this.$str('save_changes', 'mod_perform');
       },
     },
+    useModalStyling: {
+      type: Boolean,
+      default: false,
+    },
+    value: {
+      type: Object,
+    },
   },
+
   data() {
     const activity = Object.assign({}, this.value);
     const typeId = activity && activity.id ? activity.type.id : 0;
@@ -142,6 +143,8 @@ export default {
       activity && activity.id ? activity.type.display_name : 'unknown';
 
     return {
+      activity: activity,
+      activityTypeName: typeName,
       activityTypes: [
         {
           id: 0,
@@ -149,12 +152,11 @@ export default {
         },
       ],
       activityTypeSelection: typeId,
-      activityTypeName: typeName,
       isSaving: false,
       mutationError: null,
-      activity: activity,
     };
   },
+
   computed: {
     /**
      * Has the activity not yet been saved to the back-end.
@@ -184,31 +186,69 @@ export default {
     hasNoType() {
       return this.activityTypeSelection === 0;
     },
-
-    /**
-     * This is a hack to make the action button look okish in the create modal context.
-     */
-    actionButtonStyling() {
-      if (this.useModalStyling) {
-        return { marginTop: 'var(--tui-gap-6)', marginBottom: '0' };
-      }
-
-      return null;
-    },
   },
+
   created() {
     this.ACTIVITY_NAME_MAX_LENGTH = ACTIVITY_NAME_MAX_LENGTH;
   },
+
+  apollo: {
+    activityTypes: {
+      query: activityTypesQuery,
+      variables() {
+        return [];
+      },
+      update({ mod_perform_activity_types: types }) {
+        const options = types
+          .map(type => {
+            return { id: type.id, label: type.display_name };
+          })
+          .sort((a, b) => a.label.localeCompare(b.label));
+
+        options.unshift({
+          id: 0,
+          label: this.$str('general_info_select_activity_type', 'mod_perform'),
+        });
+
+        return options;
+      },
+    },
+  },
+
   methods: {
     /**
-     * Emmit an input event with an updated activity object, changes are patched into the existing value (activity).
-     *
-     * @param {object} update - The new values to patch into the activity object emitted.
+     * @returns {Promise<{id, name, description}>}
      */
-    updateActivity(update) {
-      this.activity = Object.assign({}, this.activity, update);
+    async save() {
+      let mutation, mutationName, variables;
 
-      this.$emit('input', this.activity);
+      if (this.exists) {
+        mutation = updateGeneralInfoMutation;
+        mutationName = 'mod_perform_update_activity_general_info';
+
+        variables = {
+          activity_id: this.activity.id,
+          name: this.activity.edit_name,
+          description: this.activity.edit_description,
+        };
+      } else {
+        mutation = createActivityMutation;
+        mutationName = 'mod_perform_create_activity';
+
+        variables = {
+          name: this.activity.edit_name,
+          description: this.activity.edit_description,
+          type: this.activityTypeSelection,
+        };
+      }
+
+      const { data: resultData } = await this.$apollo.mutate({
+        mutation,
+        variables,
+        refetchAll: false, // Don't refetch all the data again
+      });
+
+      return resultData[mutationName].activity;
     },
 
     /**
@@ -241,61 +281,14 @@ export default {
     },
 
     /**
-     * @returns {Promise<{id, name, description}>}
+     * Emit an input event with an updated activity object, changes are patched into the existing value (activity).
+     *
+     * @param {object} update - The new values to patch into the activity object emitted.
      */
-    async save() {
-      let mutation, mutationName, variables;
+    updateActivity(update) {
+      this.activity = Object.assign({}, this.activity, update);
 
-      if (this.exists) {
-        mutation = UpdateGeneralInfoMutation;
-        mutationName = 'mod_perform_update_activity_general_info';
-
-        variables = {
-          activity_id: this.activity.id,
-          name: this.activity.edit_name,
-          description: this.activity.edit_description,
-        };
-      } else {
-        mutation = CreateActivityMutation;
-        mutationName = 'mod_perform_create_activity';
-
-        variables = {
-          name: this.activity.edit_name,
-          description: this.activity.edit_description,
-          type: this.activityTypeSelection,
-        };
-      }
-
-      const { data: resultData } = await this.$apollo.mutate({
-        mutation,
-        variables,
-        refetchAll: false, // Don't refetch all the data again
-      });
-
-      return resultData[mutationName].activity;
-    },
-  },
-
-  apollo: {
-    activityTypes: {
-      query: ActivityTypesQuery,
-      variables() {
-        return [];
-      },
-      update({ mod_perform_activity_types: types }) {
-        const options = types
-          .map(type => {
-            return { id: type.id, label: type.display_name };
-          })
-          .sort((a, b) => a.label.localeCompare(b.label));
-
-        options.unshift({
-          id: 0,
-          label: this.$str('general_info_select_activity_type', 'mod_perform'),
-        });
-
-        return options;
-      },
+      this.$emit('input', this.activity);
     },
   },
 };

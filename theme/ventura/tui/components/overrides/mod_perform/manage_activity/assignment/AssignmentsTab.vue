@@ -35,12 +35,7 @@
     }
 
     &-dropdown {
-      @media (min-width: $tui-screen-xs) {
-        margin-left: auto;
-      }
-      @media (max-width: $tui-screen-xs) {
-        margin-top: var(--tui-gap-2);
-      }
+      margin-top: var(--tui-gap-2);
     }
   }
 
@@ -57,6 +52,17 @@
       flex-direction: column;
       justify-content: center;
       margin-right: var(--tui-gap-4);
+    }
+  }
+}
+
+@media (min-width: $tui-screen-xs) {
+  .tui-performManageActivityAssignmentsForm {
+    &__heading {
+      &-dropdown {
+        margin-top: 0;
+        margin-left: auto;
+      }
     }
   }
 }

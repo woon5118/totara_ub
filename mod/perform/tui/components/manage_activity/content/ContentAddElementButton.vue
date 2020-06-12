@@ -23,7 +23,7 @@
   <div class="tui-performEditSectionContentAddElement">
     <ButtonIcon
       v-show="!isElementsVisible"
-      :aria-label="'Add'"
+      :aria-label="$str('section_add_element', 'mod_perform')"
       :text="$str('section_add_element', 'mod_perform')"
       :styleclass="{ small: true }"
       @click.prevent="showElements"
@@ -38,7 +38,7 @@
         <template v-slot:trigger="{ toggle, isOpen }">
           <ButtonIcon
             :aria-expanded="isOpen ? 'true' : 'false'"
-            :aria-label="'Add'"
+            :aria-label="$str('section_element_questions', 'mod_perform')"
             :text="$str('section_element_questions', 'mod_perform')"
             :caret="true"
             :styleclass="{ small: true }"
@@ -99,9 +99,9 @@ export default {
 
 <lang-strings>
   {
-  "mod_perform": [
-    "section_element_questions",
-    "section_add_element"
-  ]
+    "mod_perform": [
+      "section_element_questions",
+      "section_add_element"
+    ]
   }
 </lang-strings>

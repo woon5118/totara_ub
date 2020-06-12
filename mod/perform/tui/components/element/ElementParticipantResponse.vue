@@ -20,7 +20,7 @@
   @package mod_perform
 -->
 <template>
-  <div class="tui-elementParticipantResponse">
+  <div class="tui-performElementParticipantResponse">
     <slot name="content" />
   </div>
 </template>

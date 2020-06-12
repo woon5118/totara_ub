@@ -25,5 +25,9 @@
   &__heading {
     @include tui-font-heading-small();
   }
+
+  &__modalBtnRow.tui-formRow {
+    margin: var(--tui-gap-6) 0 0;
+  }
 }
 </style>

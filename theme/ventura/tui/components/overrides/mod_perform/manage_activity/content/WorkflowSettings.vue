@@ -22,20 +22,8 @@
 
 <style lang="scss">
 .tui-performActivityWorkflowSettings {
-  padding-bottom: var(--tui-gap-8);
-
   &__heading {
     @include tui-font-heading-small();
-  }
-
-  &__automaticClosure {
-    &-text {
-      margin-bottom: var(--tui-gap-1);
-    }
-
-    &-subtext {
-      @include tui-font-body-small();
-    }
   }
 }
 

@@ -28,7 +28,7 @@ class behat_performelement_multi_choice extends behat_base {
     public const DONE_BUTTON_LOCATOR  = '.tui-elementAdminFormActionButtons__done';
     public const EDIT_ELEMENT_LOCATOR = '.tui-elementEditMultiChoice';
     public const ADD_OPTION_LOCATOR   = '.tui-elementEditMultiChoice__add-option';
-    public const QUESTION_DISPLAY_TITLE_LOCATOR = '.tui-elementEditDisplay__title';
+    public const QUESTION_DISPLAY_TITLE_LOCATOR = '.tui-performElementEditDisplay__title';
     public const QUESTION_DISPLAY_OPTIONS_LOCATOR = '.tui-radio__label';
 
     /**
@@ -94,7 +94,7 @@ class behat_performelement_multi_choice extends behat_base {
 
     private function find_question_from_text(string $question_text): NodeElement {
         /** @var NodeElement[] $questions */
-        $questions = $this->find_all('css', '.tui-elementEditDisplay');
+        $questions = $this->find_all('css', '.tui-performElementEditDisplay');
 
         foreach ($questions as $question) {
             $question_title = $question->find('css', self::QUESTION_DISPLAY_TITLE_LOCATOR);

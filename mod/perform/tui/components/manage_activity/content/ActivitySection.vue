@@ -45,15 +45,11 @@
             />
             <Dropdown position="bottom-right">
               <template v-slot:trigger="{ toggle }">
-                <ButtonIcon
-                  :styleclass="{
-                    transparentNoPadding: true,
-                  }"
+                <MoreButton
                   :aria-label="$str('section_dropdown_menu', 'mod_perform')"
+                  :no-padding="true"
                   @click="toggle"
-                >
-                  <ActivityActionsIcon size="200" />
-                </ButtonIcon>
+                />
               </template>
               <DropdownItem :disabled="isAdding" @click="$emit('add_above')">
                 {{ $str('section_action_add_above', 'mod_perform') }}
@@ -179,12 +175,10 @@
 </template>
 
 <script>
-import ActivityActionsIcon from 'mod_perform/components/icons/ActivityActions';
 import ActivitySectionElementSummary from 'mod_perform/components/manage_activity/content/ActivitySectionElementSummary';
 import ActivitySectionRelationship from 'mod_perform/components/manage_activity/content/ActivitySectionRelationship';
 import Button from 'totara_core/components/buttons/Button';
 import ButtonGroup from 'totara_core/components/buttons/ButtonGroup';
-import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
 import Card from 'totara_core/components/card/Card';
 import ConfirmationModal from 'totara_core/components/modal/ConfirmationModal';
 import DeleteSectionMutation from 'mod_perform/graphql/delete_section.graphql';
@@ -196,6 +190,7 @@ import Grid from 'totara_core/components/grid/Grid';
 import GridItem from 'totara_core/components/grid/GridItem';
 import InputText from 'totara_core/components/form/InputText';
 import ModalPresenter from 'totara_core/components/modal/ModalPresenter';
+import MoreButton from 'totara_core/components/buttons/MoreIcon';
 import ParticipantsPopover from 'mod_perform/components/manage_activity/content/ParticipantsPopover';
 import UpdateSectionSettingsMutation from 'mod_perform/graphql/update_section_settings.graphql';
 
@@ -207,12 +202,10 @@ const TITLE_INPUT_MAX_LENGTH = 1024;
 
 export default {
   components: {
-    ActivityActionsIcon,
     ActivitySectionElementSummary,
     ActivitySectionRelationship,
     Button,
     ButtonGroup,
-    ButtonIcon,
     Card,
     ConfirmationModal,
     Dropdown,
@@ -223,6 +216,7 @@ export default {
     GridItem,
     InputText,
     ModalPresenter,
+    MoreButton,
     ParticipantsPopover,
   },
 

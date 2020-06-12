@@ -20,7 +20,7 @@
   @package mod_perform
 -->
 <template>
-  <div class="tui-elementResponse">
+  <div class="tui-performElementResponse">
     <div v-if="error">{{ error }}</div>
     <slot name="content" />
   </div>

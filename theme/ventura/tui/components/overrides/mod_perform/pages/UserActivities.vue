@@ -16,14 +16,12 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-  @author Jaron Steenson <jaron.steenson@totaralearning.com>
+  @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
   @package mod_perform
 -->
 
 <style lang="scss">
-.tui-performUserActivityList {
-  &__select-relationship-link.tui-formBtn {
-    font-size: inherit; // To force the button to have the same size as normal links in the table.
-  }
+.tui-performUserActivities {
+  @include tui-font-body();
 }
 </style>

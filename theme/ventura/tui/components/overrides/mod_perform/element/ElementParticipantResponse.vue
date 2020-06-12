@@ -20,7 +20,7 @@
   @package mod_perform
 -->
 <style lang="scss">
-.tui-elementParticipantResponse {
+.tui-performElementParticipantResponse {
   display: flex;
   &__name {
     @include tui-font-body();

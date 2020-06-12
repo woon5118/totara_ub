@@ -149,19 +149,19 @@ export default {
 
   props: {
     /**
-     * The id of the logged in user.
-     */
-    currentUserId: {
-      required: true,
-      type: Number,
-    },
-
-    /**
      * The abstract perform activity this is an instance of.
      */
     activity: {
       required: true,
       type: Object,
+    },
+
+    /**
+     * The id of the logged in user.
+     */
+    currentUserId: {
+      required: true,
+      type: Number,
     },
 
     /**
@@ -189,6 +189,8 @@ export default {
 
   data() {
     return {
+      answerableParticipantInstances: null,
+      answeringAsParticipantId: this.participantInstanceId,
       errors: null,
       hasOtherResponse: false,
       initialValues: null,
@@ -200,9 +202,6 @@ export default {
       },
       sectionElements: [],
       showOtherResponse: false,
-      completionSaveSuccess: false,
-      answeringAsParticipantId: this.participantInstanceId,
-      answerableParticipantInstances: null,
     };
   },
 
@@ -433,7 +432,6 @@ export default {
       "section_element_response_required",
       "section_element_response_optional",
       "toast_error_save_response",
-      "toast_success_save_response",
       "user_activities_other_response_show",
       "user_activities_your_relationship_to_user"
     ]

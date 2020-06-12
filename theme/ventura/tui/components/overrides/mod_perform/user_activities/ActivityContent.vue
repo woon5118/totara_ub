@@ -81,7 +81,9 @@
   &__sectionItem {
     margin-top: var(--tui-gap-4);
     &-content {
-      margin-top: var(--tui-gap-4);
+      & > * {
+        margin-top: var(--tui-gap-4);
+      }
     }
   }
   &__response-optional {
