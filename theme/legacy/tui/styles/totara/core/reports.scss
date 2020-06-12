@@ -229,44 +229,37 @@
 .totara_core__myreports__itemstyletoggle {
   display: flex;
   float: right;
-  margin-bottom: $myReports-toggle-spacing-bottom;
+  margin-bottom: var(--tui-gap-1);
+  border-radius: var(--tui-btn-radius);
+  background-color: var(--tui-color-neutral-4);
+  border: 1px solid var(--tui-color-neutral-5);
 
   &__btn {
-    color: $myReports-toggle-btn-text-color;
-    background: $myReports-toggle-btn-bg-color;
-    border: 1px solid $myReports-toggle-btn-border-color;
-    font-size: $myReports-toggle-btn-text-size;
-    padding: $myReports-toggle-btn-spacing;
+    font-size: var(--tui-font-size-13);
+    padding: var(--tui-gap-1);
     transition: background-color 0.2s ease;
-
-    &--narrow {
-      border-radius: $myReports-toggle-btn-border-radius 0 0 $myReports-toggle-btn-border-radius;
-    }
-
-    &--wide {
-      border-left: 0px;
-      border-radius: 0 $myReports-toggle-btn-border-radius $myReports-toggle-btn-border-radius 0;
-    }
+    margin: 1px;
+    border-width: 1px;
 
     &:active,
     &:focus,
     &:hover {
-      color: $myReports-toggle-btn-text-color;
-      text-decoration: none;
-      background: $myReports-toggle-btn-bg-color-focus;
+      color: var(--tui-color-state-hover);
       outline: 0;
+      text-decoration: none;
     }
 
     &_active {
-      color: $myReports-toggle-btn-text-color-selected;
-      background: $myReports-toggle-btn-bg-color-selected;
+      color: var(--tui-color-neutral-7);
+      border: 1px solid var(--tui-color-neutral-5);
+      border-radius: var(--tui-btn-radius);
+      background-color: var(--tui-color-neutral-1);
       cursor: default;
 
       &:active,
       &:focus,
       &:hover {
-        color: $myReports-toggle-btn-text-color-selected;
-        background: $myReports-toggle-btn-bg-color-selected;
+        color: inherit;
       }
     }
   }

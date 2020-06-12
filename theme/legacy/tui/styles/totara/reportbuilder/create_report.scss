@@ -298,34 +298,19 @@
   display: flex;
   margin: auto var(--tui-gap-1) var(--tui-gap-1) auto;
   float: right;
+  border-radius: var(--tui-btn-radius);
+  background-color: var(--tui-color-neutral-4);
+  border: 1px solid var(--tui-color-neutral-5);
 
   &_btn {
-    border: 1px solid var(--tui-color-neutral-5);
-    color: var(--tui-color-state);
     font-size: var(--tui-font-size-13);
-    padding: var(--tui-gap-2);
+    padding: var(--tui-gap-1);
+    transition: background-color 0.2s ease;
+    margin: 1px;
+    border-width: 1px;
 
-    &:active,
-    &:focus,
-    &:hover {
-      background: var(--tui-color-neutral-2);
-      color: var(--tui-color-neutral-7);
-      outline: 0;
-      text-decoration: none;
-    }
-
-    &_active {
-      background: var(--tui-color-neutral-3);
-      color: var(--tui-color-neutral-7);
-      cursor: default;
-
-      &:active,
-      &:focus,
-      &:hover {
-        background: var(--tui-color-neutral-3);
-        color: var(--tui-color-neutral-7);
-      }
-    }
+    // Active etc is defined in theme/legacy/tui/styles/totara/core/reports.scss
+    // CSS classes aren't using totara_reportbuilder... as base
   }
 
   @media (min-width: $myReports-screen-xsm-min) {

@@ -27,49 +27,36 @@ $catalogItemStyleToggle-screen_xsm_min: 500px !default;
 .tw-catalogItemStyleToggle {
   display: flex;
   margin: auto var(--tui-gap-1) auto auto;
+  border-radius: var(--tui-btn-radius);
+  background-color: var(--tui-color-neutral-4);
+  border: 1px solid var(--tui-color-neutral-5);
 
   &__btn {
-    color: var(--tui-catalog-togglebtn-text-color);
-    background: var(--tui-catalog-togglebtn-bg-color);
-    border: 1px solid var(--tui-catalog-togglebtn-border-color);
     font-size: var(--tui-font-size-13);
-    padding: var(--tui-gap-2);
+    padding: var(--tui-gap-1);
     transition: background-color 0.2s ease;
-
-    &--narrow {
-      border-radius: 6px 0 0 6px;
-    }
-
-    &--wide {
-      border-left: 0px;
-      border-radius: 0 6px 6px 0;
-    }
+    margin: 1px;
+    border-width: 1px;
 
     &:focus,
-    &:hover {
-      color: var(--tui-catalog-togglebtn-text-color);
-      background: var(--tui-catalog-togglebtn-bg-color-focus);
-      outline: 0;
-      text-decoration: none;
-    }
-
+    &:hover,
     &:active {
-      color: var(--tui-catalog-togglebtn-text-color);
-      background: var(--tui-catalog-togglebtn-bg-color-active);
+      color: var(--tui-color-state-hover);
       outline: 0;
       text-decoration: none;
     }
 
     &_active {
-      color: var(--tui-catalog-togglebtn-text-color);
-      background: var(--tui-catalog-togglebtn-bg-color-selected);
+      color: var(--tui-color-neutral-7);
+      border: 1px solid var(--tui-color-neutral-5);
+      border-radius: var(--tui-btn-radius);
+      background-color: var(--tui-color-neutral-1);
       cursor: default;
 
       &:active,
       &:focus,
       &:hover {
-        color: var(--tui-catalog-togglebtn-text-color);
-        background: var(--tui-catalog-togglebtn-bg-color-selected);
+        color: inherit;
       }
     }
   }
