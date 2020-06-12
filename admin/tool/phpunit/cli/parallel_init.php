@@ -34,7 +34,7 @@ require_once(__DIR__.'/../../../../vendor/autoload.php');
 list($options, $unrecognized) = cli_get_params(
     array(
         'force'                 => false,
-        'processes'             => 5, // This must match \ParaTest\Console\Commands\ParaTestCommand::configure()
+        'processes'             => 0, // Both init and run must use the same explicit number of processes now.
         'help'                  => false,
     ),
     array(
@@ -42,25 +42,12 @@ list($options, $unrecognized) = cli_get_params(
     )
 );
 
-// Replicate the process number logic from \ParaTest\Runners\PHPUnit\Options class.
-if ($options['processes'] === 'auto') {
-    $processes = \ParaTest\Runners\PHPUnit\Options::getNumberOfCPUCores();
-} else if ($options['processes'] === 'half') {
-    $processes = intdiv(\ParaTest\Runners\PHPUnit\Options::getNumberOfCPUCores(), 2);
-} else {
-    $processes = intval($options['processes']);
-}
-
-if ($processes < 1 or $processes > 99) {
-    cli_error('Processes argument cannot be higher than 99');
-}
-
-if ($options['help'] or !$processes) {
+if ($options['help'] || !$options['processes']) {
     $help = "Init PHPUnit parallel runs
 
 Options:
 --force          Force dropping of existing environments
---processes  Specifies how many environments should be initialised, use integer, 'auto' or 'half'
+--processes=N    Specifies how many environments should be initialised, use integer number.
 
 -h, --help        Print out this help
 
@@ -69,7 +56,7 @@ Example:
 \$ php parallel_run.php --processes=4
 ";
     echo $help;
-    if ($processes) {
+    if ($options['help']) {
         exit(0);
     } else {
         exit(1);
@@ -79,6 +66,11 @@ Example:
 if ($unrecognized) {
     echo('Unkown parameter: ' . implode("\n  ", $unrecognized) . "\n");
     die(1);
+}
+
+$processes = intval($options['processes']);
+if ($processes < 1 or $processes > 99) {
+    cli_error('Processes argument must be an integer number in the range 1...99');
 }
 
 testing_update_composer_dependencies();
