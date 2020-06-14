@@ -248,7 +248,9 @@ export default {
     async addSection(sectionIndex) {
       this.isAdding = true;
       const sectionAddBefore =
-        sectionIndex >= 0 ? this.sectionStates[sectionIndex].sortOrder : null;
+        sectionIndex !== null
+          ? this.sectionStates[sectionIndex].sortOrder
+          : null;
 
       try {
         const {
