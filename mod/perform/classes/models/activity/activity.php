@@ -24,6 +24,8 @@
 
 namespace mod_perform\models\activity;
 
+use container_perform\backup\backup_helper;
+use container_perform\backup\restore_helper;
 use container_perform\perform as perform_container;
 use core\entities\expandable;
 use core\entities\user;
@@ -31,13 +33,14 @@ use core\orm\collection;
 use core\orm\entity\model;
 use mod_perform\data_providers\activity\activity_settings;
 use mod_perform\entities\activity\activity as activity_entity;
+use mod_perform\entities\activity\track as track_entity;
+use mod_perform\entities\activity\track_assignment;
 use mod_perform\event\activity_deleted;
 use mod_perform\models\activity\helpers\activity_clone;
 use mod_perform\models\activity\helpers\activity_deletion;
 use mod_perform\models\activity\helpers\activity_multisection_toggler;
-use mod_perform\entities\activity\track as track_entity;
-use mod_perform\entities\activity\track_assignment;
 use mod_perform\state\activity\active;
+use mod_perform\state\activity\activity_state as activity_status;
 use mod_perform\state\activity\draft;
 use mod_perform\state\state;
 use mod_perform\state\state_aware;
@@ -45,7 +48,6 @@ use mod_perform\user_groups\grouping;
 use mod_perform\util;
 use mod_perform\webapi\resolver\type\activity_state;
 use totara_core\relationship\relationship;
-use mod_perform\state\activity\activity_state as activity_status;
 
 /**
  * Class activity
@@ -66,6 +68,7 @@ use mod_perform\state\activity\activity_state as activity_status;
  * @property-read collection|track[] $tracks
  * @property-read activity_settings $settings
  * @property bool multisection_setting
+ * @property-read bool $can_clone
  *
  * @package mod_perform\models\activity
  */
@@ -92,7 +95,8 @@ class activity extends model {
         'can_activate',
         'can_potentially_activate',
         'state_details',
-        'multisection_setting'
+        'multisection_setting',
+        'can_clone',
     ];
 
     public const NAME_MAX_LENGTH = 1024;
@@ -522,6 +526,16 @@ class activity extends model {
      */
     public function get_settings(): activity_settings {
         return new activity_settings($this);
+    }
+
+    /**
+     * Is the user allowed to clone this activity?
+     *
+     * @return bool
+     */
+    public function get_can_clone(): bool {
+        return has_capability(backup_helper::CAPABILITY_CONTAINER, \context_course::instance($this->entity->course))
+            && has_capability(restore_helper::CAPABILITY_CONTAINER, \context_course::instance($this->entity->course));
     }
 
     /**

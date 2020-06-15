@@ -245,6 +245,58 @@ class mod_perform_activity_clone_model_helper_testcase extends advanced_testcase
         }
     }
 
+    public function clone_capabilities_data_provider(): array {
+        return [
+            'requires ' . backup_helper::CAPABILITY_CONTAINER => [
+                backup_helper::CAPABILITY_CONTAINER, backup_controller_exception::class, 'error/backup_user_missing_capability',
+            ],
+            'requires ' . restore_helper::CAPABILITY_CONTAINER => [
+                restore_helper::CAPABILITY_CONTAINER, restore_controller_exception::class, 'error/restore_user_missing_capability',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider clone_capabilities_data_provider
+     * @param string $capability
+     * @param string $exception_class
+     * @param string $exception_message
+     */
+    public function test_clone_capabilities(string $capability, string $exception_class, string $exception_message): void {
+        /** @var mod_perform_generator $generator */
+        $generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
+
+        $role_id = builder::table('role')->where('shortname', 'performanceactivitycreator')->value('id');
+
+        self::setAdminUser();
+        $user = self::getDataGenerator()->create_user();
+        $activity = $generator->create_activity_in_container();
+
+        // User Can't clone because not assigned to the role
+        self::setUser($user);
+        $this->assertFalse($activity->can_clone);
+
+        role_assign($role_id, $user->id, context_system::instance());
+
+        // User can now clone
+        $this->assertTrue($activity->can_clone);
+        $this->assertEquals(1, activity_entity::repository()->count());
+        $activity->clone();
+        $this->assertEquals(2, activity_entity::repository()->count());
+
+        unassign_capability($capability, $role_id);
+
+        $this->assertFalse($activity->can_clone);
+
+        // Try cloning when not allowed - we expect an exception with course/user/capability details in it.
+        $this->expectException($exception_class);
+        $this->expectExceptionMessage($exception_message);
+        $this->expectExceptionMessageRegExp("/[user_id] => {$user->id}/");
+        $this->expectExceptionMessageRegExp("/[courseid] => {$activity->course}/");
+        $this->expectExceptionMessageRegExp('/' . str_replace('container/', '', $capability) . '/');
+        $activity->clone();
+    }
+
     public function test_clone_no_unexpected_roles_assigned(): void {
         /** @var mod_perform_generator $generator */
         $generator = self::getDataGenerator()->get_plugin_generator('mod_perform');

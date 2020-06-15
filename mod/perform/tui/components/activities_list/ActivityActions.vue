@@ -53,7 +53,7 @@
       >
         {{ $str('activity_action_activate', 'mod_perform') }}
       </DropdownItem>
-      <DropdownItem @click="cloneActivity">
+      <DropdownItem v-if="activity.can_clone" @click="cloneActivity">
         {{ $str('activity_action_clone', 'mod_perform') }}
       </DropdownItem>
       <DropdownItem @click="showDeleteModal">

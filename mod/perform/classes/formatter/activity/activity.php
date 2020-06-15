@@ -45,7 +45,8 @@ class activity extends entity_model_formatter {
             'status' => null,
             'state_details' => null,
             'can_activate' => null,
-            'can_potentially_activate' => null
+            'can_potentially_activate' => null,
+            'can_clone' => null,
         ];
     }
 }

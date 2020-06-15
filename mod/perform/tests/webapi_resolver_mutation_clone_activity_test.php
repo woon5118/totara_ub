@@ -21,8 +21,10 @@
  * @package mod_perform
  */
 
-use mod_perform\state\activity\draft;
+use container_perform\backup\backup_helper;
+use core\orm\query\builder;
 use mod_perform\data_providers\activity\activity;
+use mod_perform\state\activity\draft;
 use mod_perform\webapi\resolver\mutation\clone_activity;
 use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
@@ -92,6 +94,32 @@ class mod_perform_webapi_resolver_mutation_clone_activity_testcase extends advan
         $args['input']['activity_id'] = $activity->id;
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
         $this->assert_webapi_operation_failed($result, 'not accessible');
+    }
+
+    public function test_requires_capability(): void {
+        self::setAdminUser();
+
+        [$activity, $args, ] = $this->create_activity();
+
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_successful($result);
+
+        $user = self::getDataGenerator()->create_user();
+        self::setUser($user);
+
+        $creator_role_id = builder::table('role')->where('shortname', 'performanceactivitymanager')->value('id');
+        role_assign($creator_role_id, $user->id, context_system::instance());
+
+        // We've assigned the manage role, but actually the creator role is required.
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_failed($result);
+
+        $creator_role_id = builder::table('role')->where('shortname', 'performanceactivitycreator')->value('id');
+        role_assign($creator_role_id, $user->id, context_system::instance());
+
+        // Now has the correct capability.
+        $result = $this->parsed_graphql_operation(self::MUTATION, $args);
+        $this->assert_webapi_operation_successful($result);
     }
 
     private function container_course_exists(int $course_id): bool {

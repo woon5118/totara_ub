@@ -23,6 +23,7 @@
 
 namespace mod_perform\webapi\resolver\mutation;
 
+use container_perform\backup\backup_helper;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\mutation_resolver;
@@ -49,10 +50,10 @@ class clone_activity implements mutation_resolver, has_middleware {
         }
 
         $activity = activity::load_by_id($activity_id);
-        if (!$activity->can_manage()) {
+        if (!$activity->can_clone) {
             throw new \required_capability_exception(
                 $activity->get_context(),
-                'mod/perform:manage_activity',
+                backup_helper::CAPABILITY_CONTAINER,
                 'nopermission',
                 ''
             );
