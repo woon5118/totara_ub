@@ -3906,7 +3906,7 @@ function get_default_contextlevels($rolearchetype) {
         'tenantdomainmanager' => array(CONTEXT_COURSECAT, CONTEXT_COURSE, CONTEXT_MODULE),
         'tenantusermanager' => array(CONTEXT_TENANT),
         'performanceactivitycreator' => array(CONTEXT_SYSTEM, CONTEXT_COURSECAT),
-        'performanceactivitymanager' => array(CONTEXT_COURSE, CONTEXT_MODULE),
+        'performanceactivitymanager' => array(CONTEXT_SYSTEM, CONTEXT_COURSECAT, CONTEXT_COURSE, CONTEXT_MODULE),
     );
 
     if (isset($defaults[$rolearchetype])) {
