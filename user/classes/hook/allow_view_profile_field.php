@@ -26,6 +26,8 @@
 
 namespace core_user\hook;
 
+use context_course;
+use stdClass;
 use totara_core\hook\base;
 
 /**
@@ -53,6 +55,16 @@ class allow_view_profile_field extends base {
     public $viewing_user_id;
 
     /**
+     * @var stdClass|null
+     */
+    protected $course;
+
+    /**
+     * @var context_course|null
+     */
+    protected $course_context;
+
+    /**
      * @var bool $allow_view_profile_field Whether the viewing user is allowed to view the target user's profile field
      */
     private $allow_view_profile_field = false;
@@ -62,11 +74,37 @@ class allow_view_profile_field extends base {
      * @param string $field
      * @param int $target_user_id
      * @param int $viewing_user_id
+     * @param stdClass|null $course the course object
+     * @param context_course|null $course_context
      */
-    public function __construct(string $field, int $target_user_id, int $viewing_user_id) {
+    public function __construct(
+        string $field,
+        int $target_user_id,
+        int $viewing_user_id,
+        ?stdClass $course = null,
+        ?context_course $course_context = null
+    ) {
         $this->field = $field;
         $this->target_user_id = $target_user_id;
         $this->viewing_user_id = $viewing_user_id;
+        $this->course = $course;
+        $this->course_context = $course_context;
+    }
+
+    /**
+     * @return stdClass|null
+     */
+    public function get_course(): ?stdClass {
+        return $this->course;
+    }
+
+    /**
+     * Returns the course context
+     *
+     * @return context_course|null
+     */
+    public function get_course_context(): ?context_course {
+        return $this->course_context;
     }
 
     public function give_permission() {

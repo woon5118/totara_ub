@@ -300,10 +300,7 @@ class access_controller {
             return $this->cachedcourse;
         }
 
-        // List of fields taken from \enrol_get_all_users_courses()
-
-        $basefields = 'id, category, sortorder, shortname, fullname, idnumber, startdate, visible, defaultgroupingid, groupmode, groupmodeforce';
-        $this->cachedcourse = $DB->get_record('course', ['id' => $this->courseid], $basefields);
+        $this->cachedcourse = $DB->get_record('course', ['id' => $this->courseid]);
 
         if ($this->cachedcourse === false) {
             return null;
@@ -952,7 +949,10 @@ class access_controller {
     private function has_plugin_granting_view_profile(): bool {
         global $USER;
         if (!isset($this->resolutioncache[__METHOD__])) {
-            $hook = new allow_view_profile($this->userid, $USER->id);
+            // The course should not be modified when passed along
+            $course = $this->get_course();
+            $course = $course ? clone $course : null;
+            $hook = new allow_view_profile($this->userid, $USER->id, $course, $this->context_course);
             $this->resolutioncache[__METHOD__] = $hook->execute()->has_permission();
         }
         return $this->resolutioncache[__METHOD__];
@@ -968,7 +968,10 @@ class access_controller {
         global $USER;
         $key = __METHOD__ . '::' . $field;
         if (!isset($this->resolutioncache[$key])) {
-            $hook = new allow_view_profile_field($field, $this->userid, $USER->id);
+            // The course should not be modified when passed along
+            $course = $this->get_course();
+            $course = $course ? clone $course : null;
+            $hook = new allow_view_profile_field($field, $this->userid, $USER->id, $course, $this->context_course);
             $this->resolutioncache[$key] = $hook->execute()->has_permission();
         }
         return $this->resolutioncache[$key];
