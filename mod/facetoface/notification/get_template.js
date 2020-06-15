@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Totara LMS
  *
  * Copyright (C) 2010 onwards Totara Learning Solutions LTD
@@ -18,18 +18,17 @@
  *
  * @author Aaron Barnes <aaron.barnes@totaralms.com>
  * @author Alastair Munro <alastair.munro@totaralms.com>
- * @package totara
- * @subpackage facetoface
+ * @author Oleg Demeshev <oleg.demeshev@totaralearning.com>
+ * @package mod_facetoface
  */
 
+/* global $ */
 M.totara_f2f_notification_template = M.totara_f2f_notification_template || {
 
     Y: null,
     // optional php params and defaults defined here, args passed to init method
     // below will override these values
     config: {},
-    // public handler reference for the dialog
-    totaraDialog_handler_preRequisite: null,
 
     /**
      * module initialisation method called by php js_init_call()
@@ -37,10 +36,8 @@ M.totara_f2f_notification_template = M.totara_f2f_notification_template || {
      * @param object    YUI instance
      * @param string    args supplied in JSON format
      */
-    init: function(Y, args){
-        var module = this;
-
-        // save a reference to the Y instance (all of its dependencies included)
+    init: function(Y, args) {
+        // Save a reference to the Y instance (all of its dependencies included)
         this.Y = Y;
 
         // if defined, parse args into this module's config object
@@ -61,14 +58,11 @@ M.totara_f2f_notification_template = M.totara_f2f_notification_template || {
         var templates = M.totara_f2f_notification_template.config.templates;
 
         $(function() {
-
             // Attach event to drop down
             $('select#id_templateid').change(function() {
                 var select = $(this);
-
                 // Get current value
                 var current = select.val();
-
                 // Overwrite form data.
                 if (current !== '0') {
                     $('input#id_title').val(templates[current].title);
@@ -82,7 +76,6 @@ M.totara_f2f_notification_template = M.totara_f2f_notification_template || {
                         templatecontent = templates[current].managerprefix;
                     }
                     $('textarea#id_managerprefix_editor').val(templatecontent);
-
                 } else {
                     $('input#id_title').val('');
                     $('textarea#id_body_editor').val('');
@@ -91,49 +84,35 @@ M.totara_f2f_notification_template = M.totara_f2f_notification_template || {
                 }
                 // Try to update editor
                 var bodyeditor = Y.one('#id_body_editor').getData('editor');
-                if(bodyeditor && typeof bodyeditor.updateFromTextArea === "function") {
+                if (bodyeditor && typeof bodyeditor.updateFromTextArea === "function") {
                     bodyeditor.updateFromTextArea();
                 }
 
                 var prefixeditor = Y.one('#id_managerprefix_editor').getData('editor');
-                if(prefixeditor && typeof prefixeditor.updateFromTextArea === "function") {
+                if (prefixeditor && typeof prefixeditor.updateFromTextArea === "function") {
                     prefixeditor.updateFromTextArea();
                 }
             });
 
-            // Detecting element error here
-            var f2fbookedtypeelement = $('select#f2f-booked-type'),
-                container = f2fbookedtypeelement.parent('div'),
-                errormsgbox = null;
-
-            if (f2fbookedtypeelement.attr('data-error') == 'error') {
-                // Idicating that it has an error here, and it is going to input message with an icon
-                f2fbookedtypeelement.addClass('f2f-booked-type-error');
-
-                var errormsg = $('<span></span>');
-                errormsg.text(M.util.get_string('required', 'core'));
-
-                errormsgbox = $('<div></div>');
-                errormsgbox.addClass('f2f-booked-type-error-hint').append(errormsg);
-
-                container.append(errormsgbox);
-            }
-
-            // Just remove the error outline when user is changing the value to
-            // something else.
-            f2fbookedtypeelement.change(function() {
-                var self = $(this);
-                if (self.val() != 0) {
-                    self.removeClass('f2f-booked-type-error');
-
-                    // Removing the text here, only if it exist
-                    if (errormsgbox) {
-                        errormsgbox.remove();
+            $('#id_submitbutton').on('click', function(e) {
+                if ($("div#fgroup_id_recipients input").length) {
+                    if ($("div#fgroup_id_recipients input:checked").length == 0) {
+                        $('div#fgroup_id_recipients > fieldset.fgroup').addClass('error');
+                        var errormsg = $('<span></span>').addClass('error').text(M.totara_f2f_notification_template.config.recipients_error);
+                        $('div#fgroup_id_recipients > fieldset > div.felement').prepend(errormsg);
+                        $('html,body').scrollTop($("#user_notification").offset().top);
+                        e.preventDefault();
+                        return false;
                     }
                 }
             });
+            if ($("div#fgroup_id_recipients input").length) {
+                $('div#fgroup_id_recipients input').on('click', function(e) {
+                    $('div#fgroup_id_recipients > fieldset.fgroup').removeClass('error');
+                    $('span.error').remove();
+                });
+            }
         });
-
         // We want to listen to changes, however when the editor processes the body and manager copy it may
         // change spacing, encode entities, or change non-visual markup.
         // These all lead to a change event, which we don't care about, as its the editor changing content, not the user.
@@ -146,4 +125,4 @@ M.totara_f2f_notification_template = M.totara_f2f_notification_template || {
             });
         });
     }
-}
+};

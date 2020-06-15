@@ -23,10 +23,29 @@
  * @subpackage facetoface
  */
 
-use mod_facetoface\{attendees_helper, seminar_event, output\session_time};
-use mod_facetoface\signup\state\{attendance_state, booked, waitlisted};
+use mod_facetoface\{
+    attendees_helper,
+    seminar_event,
+    output\session_time
+};
+use mod_facetoface\signup\state\{
+    attendance_state,
+    booked,
+    waitlisted,
+    fully_attended,
+    partially_attended,
+    no_show,
+    user_cancelled,
+    unable_to_attend,
+    requested,
+    requestedadmin,
+    requestedrole
+};
+use mod_facetoface\event_time;
+use mod_facetoface\query\event\filter\event_time_filter;
 use mod_facetoface\task\send_user_message_adhoc_task;
 use mod_facetoface\notification\notification_map;
+use mod_facetoface\query\event\query_notifications;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -128,7 +147,8 @@ class facetoface_notification extends data_object {
         'requested' => 0,
         'status' => 0,
         'issent' => 0,
-        'templateid' => 0
+        'templateid' => 0,
+        'recipients' => null,
     );
 
     // Required table fields.
@@ -167,11 +187,15 @@ class facetoface_notification extends data_object {
 
     public $cancelled;
 
+    public $requested;
+
     public $templateid;
 
     public $status;
 
     public $issent;
+
+    public $recipients;
 
     private $_event;
 
@@ -278,6 +302,53 @@ class facetoface_notification extends data_object {
         return $unit * $this->scheduleamount;
     }
 
+    /**
+     * Get recipients list including new options
+     *
+     * @access  private
+     * @param   int     $sessionid  (optional)
+     * @return  object|false    Recordset or false on error
+     */
+    private function load_recipients(?int $sessionid = null, array $recipients) {
+        global $DB;
+
+        $query = new query_notifications($sessionid, $this);
+
+        foreach ($recipients as $recipient => $value) {
+            switch ($recipient) {
+                case 'upcoming_events':
+                    if ((int)$value == 1) {
+                        $query->with_filter(new event_time_filter(event_time::FUTURE));
+                    }
+                    break;
+                case 'events_in_progress':
+                    if ((int)$value == 1) {
+                        $query->with_filter(new event_time_filter(event_time::INPROGRESS));
+                    }
+                    break;
+                case 'past_events':
+                    if ((int)$value == 1) {
+                        $query->with_filter(new event_time_filter(event_time::PAST));
+                    }
+                    break;
+                default:
+                    // 'fully_attended', 'partially_attended', 'unable_to_attend',
+                    // 'no_show', 'waitlisted', 'user_cancelled',
+                    // 'requested', 'requestedrole', 'requestedadmin'
+                    if ((int)$value == 1) {
+                        $query->with_status($recipient);
+                        if ($recipient == 'requested') {
+                            $query->with_status('requestedrole');
+                            $query->with_status('requestedadmin');
+                        }
+                    }
+                    break;
+            }
+        }
+
+        $statement = $query->get_statement();
+        return $DB->get_recordset_sql($statement->get_sql(), $statement->get_parameters());
+    }
 
     /**
      * Get recipients list
@@ -294,31 +365,31 @@ class facetoface_notification extends data_object {
         if ($this->booked) {
             switch ((int) $this->booked) {
                 case MDL_F2F_RECIPIENTS_ALLBOOKED:
-                    $status = array_keys(\mod_facetoface\attendees_helper::get_status(true));
+                    $status = array_keys(attendees_helper::get_status(true));
                     break;
 
                 case MDL_F2F_RECIPIENTS_ATTENDED:
-                    $status[] = \mod_facetoface\signup\state\fully_attended::get_code();
+                    $status[] = fully_attended::get_code();
                     break;
 
                 case MDL_F2F_RECIPIENTS_NOSHOWS:
-                    $status[] = \mod_facetoface\signup\state\no_show::get_code();
+                    $status[] = no_show::get_code();
                     break;
             }
         }
 
         if ($this->waitlisted) {
-            $status[] = \mod_facetoface\signup\state\waitlisted::get_code();
+            $status[] = waitlisted::get_code();
         }
 
         if ($this->cancelled) {
-            $status[] = \mod_facetoface\signup\state\user_cancelled::get_code();
+            $status[] = user_cancelled::get_code();
         }
 
         if ($this->requested) {
-            $status[] = \mod_facetoface\signup\state\requested::get_code();
-            $status[] = \mod_facetoface\signup\state\requestedrole::get_code();
-            $status[] = \mod_facetoface\signup\state\requestedadmin::get_code();
+            $status[] = requested::get_code();
+            $status[] = requestedrole::get_code();
+            $status[] = requestedadmin::get_code();
         }
 
         $where = 'f.id = ? ';
@@ -389,27 +460,15 @@ class facetoface_notification extends data_object {
         }
 
         // Generate SQL
-        $sql = '
-            SELECT
-                u.*,
-                s.id AS sessionid
-            FROM
-                {user} u
-            INNER JOIN
-                {facetoface_signups} si
-             ON si.userid = u.id
-            INNER JOIN
-                {facetoface_signups_status} sis
-             ON si.id = sis.signupid
-            AND sis.superceded = 0
-            INNER JOIN
-                {facetoface_sessions} s
-             ON s.id = si.sessionid
-            INNER JOIN
-                {facetoface} f
-             ON s.facetoface = f.id
-            WHERE ' . $where . '
-         ORDER BY u.id';
+        $sql =
+          "SELECT u.*, s.id AS sessionid
+             FROM {user} u
+            INNER JOIN {facetoface_signups} si ON si.userid = u.id
+            INNER JOIN {facetoface_signups_status} sis ON si.id = sis.signupid AND sis.superceded = 0
+            INNER JOIN {facetoface_sessions} s ON s.id = si.sessionid
+            INNER JOIN {facetoface} f ON s.facetoface = f.id
+            WHERE {$where}
+         ORDER BY u.id";
 
         $recordset = $DB->get_recordset_sql($sql, $params);
 
@@ -700,7 +759,6 @@ class facetoface_notification extends data_object {
      * @return  void
      */
     public function send_to_users($sessionid = null) {
-        global $DB;
 
         $notificationdisable = get_config(null, 'facetoface_notificationdisable');
         if (!empty($notificationdisable)) {
@@ -708,7 +766,12 @@ class facetoface_notification extends data_object {
         }
 
         // Get recipients
-        $recipients = $this->_get_recipients($sessionid);
+        $recipients = (array)json_decode($this->recipients);
+        if (!empty($recipients) && array_search('1', $recipients)) {
+            $recipients = $this->load_recipients($sessionid, $recipients);
+        } else {
+            $recipients = $this->_get_recipients($sessionid);
+        }
 
         if (!$recipients->valid()) {
             if (!CLI_SCRIPT) {
@@ -727,6 +790,7 @@ class facetoface_notification extends data_object {
                 if ($senttouser) {
                     $this->send_to_manager($recipient, $recipient->sessionid);
                     $this->send_to_thirdparty($recipient, $recipient->sessionid);
+                    $this->sent();
                 }
                 $this->delete_ical_attachment();
             }
@@ -1332,6 +1396,13 @@ class facetoface_notification extends data_object {
             $recips[] = get_string('status_pending_requests', 'facetoface');
         }
 
+        $recipients = (array)json_decode($this->recipients);
+        foreach ($recipients as $recipient => $value) {
+            if ((int)$value == 1) {
+                $recips[] = get_string("status_{$recipient}", 'mod_facetoface');
+            }
+        }
+
         $notificationmap = new notification_map($this);
 
         $recipients = $notificationmap->get_recipients();
@@ -1350,7 +1421,7 @@ class facetoface_notification extends data_object {
      * @return  boolean
      */
     public function is_frozen() {
-        return $this->id && $this->status && $this->type == MDL_F2F_NOTIFICATION_MANUAL;
+        return $this->id && $this->status && $this->type == MDL_F2F_NOTIFICATION_MANUAL && $this->issent == MDL_F2F_NOTIFICATION_STATE_FULLY_SENT;
     }
 
     /**
@@ -1418,6 +1489,19 @@ class facetoface_notification extends data_object {
             'waitlistautoclean' => MDL_F2F_CONDITION_WAITLIST_AUTOCLEAN,
             'undercapacity' => MDL_F2F_CONDITION_SESSION_UNDER_CAPACITY,
         );
+    }
+
+    /**
+     * Make sure 'send_notifications_task' set the flag true to avoid any spamming.
+     *
+     * @return facetoface_notification
+     */
+    public function sent(): facetoface_notification {
+        global $DB;
+        if ($this->type == MDL_F2F_NOTIFICATION_MANUAL) {
+            $DB->set_field('facetoface_notification', 'issent', MDL_F2F_NOTIFICATION_STATE_FULLY_SENT, ['id' => $this->id]);
+        }
+        return $this;
     }
 }
 

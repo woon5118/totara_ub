@@ -206,17 +206,6 @@ body.path-mod-facetoface div#fgroup_id_recipients input[id*="id_booked_type"] {
     margin-bottom: 48px;
 }
 
-.f2f-booked-type-error {
-    border: 1px solid @mod_facetoface-error-colour;
-    display: inline-block;
-}
-
-.f2f-booked-type-error-hint {
-    color: @mod_facetoface-error-colour;
-    display: inline-block;
-    width: 50%;
-}
-
 select.menuf2f-actions,
 select.menuf2f-select {
     display: inline-block;
@@ -1562,6 +1551,21 @@ a.mod_facetoface__action_goback {
         td.facilitator_name {
             span.userfullname {
                 margin-left: @totara_style-spacing_x_small;
+            }
+        }
+    }
+}
+
+.path-mod-facetoface-notification {
+    form.facetoface_notification_form {
+        div#fgroup_id_recipients {
+            fieldset.fgroup {
+                div.fitem {
+                    margin-bottom: @totara_style-size_8;
+                    span.recipients_status {
+                        font-weight: bold;
+                    }
+                }
             }
         }
     }

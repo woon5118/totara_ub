@@ -305,6 +305,7 @@ For example if you have a user custom profile field with the shortname \'suburb\
 
 To use placeholders in URL\'s, an admin will need to enable the **Enable trusted content** setting and grant **Trust submitted content** capability to approved roles.';
 $string['booked'] = 'Booked';
+$string['booked_status'] = 'Booked ({$a})';
 $string['bookingcancelled'] = 'Your booking has been cancelled.';
 $string['bookingconflict'] = 'Booking conflict';
 $string['bookingcompleted'] = 'Your request was accepted.';
@@ -1010,6 +1011,9 @@ $string['notallowedtocancel'] = 'You are not allowed to cancel your booking in t
 $string['notapplicable'] = 'N/A';
 $string['note'] = 'Note';
 $string['notefull'] = 'Even if the event is fully booked you can still register. You will be queued (marked in red). If someone signs out, the first learner in the queue will be moved into registered learners and a notification will be sent to him/her by mail.';
+$string['notification_attendance_status'] = 'Attendance status';
+$string['notification_booking_status'] = 'Booking status';
+$string['notification_other_status'] = 'Other';
 $string['notificationalreadysent'] = 'This notification has already been sent, so can no longer be edited.';
 $string['notificationdeleted'] = 'Notification deleted';
 $string['notificationduplicatesfound'] = 'Duplicates of auto notifications found. Please remove them manually on <a href="{$a}">Notifications page</a> to avoid wrong notifications being sent.';
@@ -1287,6 +1291,7 @@ $string['sendlater'] = 'Send later';
 $string['sendmessage'] = 'Send message';
 $string['sendnotificationstask'] = 'Send seminar notifications';
 $string['sendnow'] = 'Send now';
+$string['sent'] = 'Sent';
 $string['sentxnotifications'] = 'Send {$a} notifications';
 $string['sentremindermanager'] = 'Sent reminder email to user manager';
 $string['sentreminderuser'] = 'Sent reminder email to user';
@@ -2404,22 +2409,26 @@ $string['state_waitlisteveryoneenabled_desc'] = 'The waitlist everyone setting i
 $string['statemessage_declined'] = 'Your request to attend this event has been declined.';
 $string['statemessage_user_cancelled'] = 'Your signup to the event has been cancelled.';
 $string['status'] = 'Status';
+$string['status_approved'] = 'Approved';
+$string['status_attended'] = 'Attended';
 $string['status_booked'] = 'Booked';
 $string['status_capacity_waitlisted'] = '{$a} on waitlist';
+$string['status_declined'] = 'Declined';
+$string['status_event_cancelled'] = 'Event Cancelled';
+$string['status_events_in_progress'] = 'Events in progress';
 $string['status_fully_attended'] = 'Fully attended';
 $string['status_no_show'] = 'No show';
 $string['status_not_set'] = 'Not set';
 $string['status_partially_attended'] = 'Partially attended';
+$string['status_past_events'] = 'Past events';
 $string['status_pending_requests'] = 'Pending Requests';
 $string['status_requested'] = 'Requested';
 $string['status_requestedrole'] = 'Requested';
 $string['status_requestedadmin'] = 'Requested (2step)';
+$string['status_unable_to_attend'] = 'Unable to attend';
+$string['status_upcoming_events'] = 'Upcoming events';
 $string['status_user_cancelled'] = 'User Cancelled';
 $string['status_waitlisted'] = 'On waitlist';
-$string['status_approved'] = 'Approved';
-$string['status_declined'] = 'Declined';
-$string['status_event_cancelled'] = 'Event Cancelled';
-$string['status_unable_to_attend'] = 'Unable to attend';
 $string['submitcsvtext'] = 'Submit CSV text';
 $string['successfullyaddededitedxattendees'] = 'Successfully added/edited {$a} attendees.';
 $string['successfullyremovedxattendees'] = 'Successfully removed {$a} attendees.';
@@ -2619,9 +2628,13 @@ $string['notificationtype_help'] = 'Notification Type allows the learner to sele
 * Email notification and iCalendar appointment.
 * Email notification only.
 * No Email notification.';
-$string['recipients_help'] = 'The options are* **Booked**: Allows you to send the notification to all users who were booked, only those who attended, or only those who did not attend.
+$string['recipients_help'] = 'Use this setting to target learners based on their status.
 
-Please note, when selecting **All booked**, notifications will be issued to all booked users, regardless of their attendance status, for events past and present.* **Wait-listed**: Will send a notification to those who are signed up for an event which allows overbooking, but are not yet booked.* **User cancelled**: Will send a notification to users for whom an event was cancelled or users who removed themselves from an event.* **Pending Requests**: Will send a notification to users for whom have requested a booking from their manager/role/admin that has not been approved or declined yet.';
+Booking status:<br>Past events, events in progress, upcoming events.
+
+Attendance status:<br>Fully attended, partially attended, unable to attend, no show.
+
+Other:<br>On waitlist, cancelled, pending requests.';
 $string['reminderinstrmngr'] = '# Notice for Manager';
 $string['reminderinstrmngr_help'] = 'When **Send notice to manager** is checked, the text in the **Notice for Manager** field is sent to a learner\'s manager advising that they have signed up for a seminar event.';
 $string['remindermessage_help'] = 'This message is sent out a few days before an event\'s start date.';

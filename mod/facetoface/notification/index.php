@@ -147,6 +147,7 @@ foreach ($notifications as $note) {
     $notification->cancelled = $note->cancelled;
     $notification->requested = $note->requested;
     $notification->conditiontype = $note->conditiontype;
+    $notification->recipients = $note->recipients;
 
     $row[] = $notification->get_recipient_description();
 
@@ -168,22 +169,44 @@ foreach ($notifications as $note) {
             $typestr = '';
     }
 
+    /**
+     * @see facetoface_notification::is_frozen()
+     */
+    $is_frozen = $note->id && $note->status && $note->type == MDL_F2F_NOTIFICATION_MANUAL && $note->issent == MDL_F2F_NOTIFICATION_STATE_FULLY_SENT;
+
     //Status
-    if ($note->status == 1) {
-        $statusstr = get_string('active');
+    if (!$is_frozen) {
+        if ($note->status == 1) {
+            $statusstr = get_string('active');
+        } else {
+            $statusstr = get_string('inactive');
+        }
     } else {
-        $statusstr = get_string('inactive');
+        $statusstr = get_string('sent', 'facetoface');
     }
 
     $row[] = $typestr;
     $row[] = $statusstr;
 
-    $buttons[] = $OUTPUT->action_icon(new moodle_url('/mod/facetoface/notification/edit.php', array('f' => $facetoface->id, 'id' => $note->id)), new pix_icon('t/edit', $str_edit));
-
-    if ($note->status == 1) {
-        $buttons[] = $OUTPUT->action_icon(new moodle_url('/mod/facetoface/notification/status.php', array('update' => $update, 'id' => $note->id, 'status' => '0', 'sesskey' => sesskey())), new pix_icon('t/hide', $str_inactive));
+    if (!$is_frozen) {
+        $buttons[] = $OUTPUT->action_icon(new moodle_url('/mod/facetoface/notification/edit.php',
+            array('f' => $facetoface->id, 'id' => $note->id)), new pix_icon('t/edit', $str_edit));
     } else {
-        $buttons[] = $OUTPUT->action_icon(new moodle_url('/mod/facetoface/notification/status.php', array('update' => $update, 'id' => $note->id, 'status' => '1', 'sesskey' => sesskey())), new pix_icon('t/show', $str_active));
+        $buttons[] = $OUTPUT->flex_icon('settings', ['alt' => get_string('inactive'), 'class' => 'ft-state-disabled']);
+    }
+
+    if (!$is_frozen) {
+        if ($note->status == 1) {
+            $buttons[] = $OUTPUT->action_icon(new moodle_url('/mod/facetoface/notification/status.php',
+                array('update' => $update, 'id' => $note->id, 'status' => '0', 'sesskey' => sesskey())),
+                new pix_icon('t/hide', $str_inactive));
+        } else {
+            $buttons[] = $OUTPUT->action_icon(new moodle_url('/mod/facetoface/notification/status.php',
+                array('update' => $update, 'id' => $note->id, 'status' => '1', 'sesskey' => sesskey())),
+                new pix_icon('t/show', $str_active));
+        }
+    } else {
+        $buttons[] = $OUTPUT->flex_icon('show', ['alt' => get_string('inactive'), 'class' => 'ft-state-disabled']);
     }
 
     if ($note->type != MDL_F2F_NOTIFICATION_AUTO) {

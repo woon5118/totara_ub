@@ -19,8 +19,7 @@
  *
  * @author Aaron Barnes <aaron.barnes@totaralms.com>
  * @author Alastair Munro <alastair.munro@totaralms.com>
- * @package modules
- * @subpackage facetoface
+ * @package mod_facetoface
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -28,7 +27,34 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/formslib.php');
 require_once($CFG->dirroot . '/mod/facetoface/lib.php');
 
+use mod_facetoface\signup\state\{
+    attendance_state,
+    booked,
+    waitlisted,
+    fully_attended,
+    partially_attended,
+    no_show,
+    user_cancelled,
+    unable_to_attend,
+    requested,
+    requestedadmin,
+    requestedrole
+};
+
 class mod_facetoface_notification_form extends moodleform {
+
+    private $recipients = [
+        'past_events' => '0',
+        'events_in_progress' => '0',
+        'upcoming_events' => '0',
+        'fully_attended' => '0',
+        'partially_attended' => '0',
+        'unable_to_attend' => '0',
+        'no_show' => '0',
+        'waitlisted' => '0',
+        'user_cancelled' => '0',
+        'requested' => '0',
+    ];
 
     function definition() {
 
@@ -37,14 +63,11 @@ class mod_facetoface_notification_form extends moodleform {
         /** @var facetoface_notification $notification */
         $notification = $this->_customdata['notification'];
 
-        $isfrozen = $notification->is_frozen();
-
         $mform->addElement('hidden', 'id', (int)$notification->id);
         $mform->setType('id', PARAM_INT);
 
-        // If frozen, display details at top
         // Hide scheduling/recipient selectors for automatic notifications
-        if ($isfrozen || $notification->type == MDL_F2F_NOTIFICATION_AUTO) {
+        if ($notification->type == MDL_F2F_NOTIFICATION_AUTO) {
 
             $description = $notification->get_condition_description();
             $recipients = $notification->get_recipient_description();
@@ -84,45 +107,54 @@ class mod_facetoface_notification_form extends moodleform {
             $mform->addGroup($group, 'schedule', '', array(' '), false);
             $mform->disabledIf('schedule', 'type', 'ne', MDL_F2F_NOTIFICATION_SCHEDULED);
 
-            $mform->addElement('html', '<br /><br />');
+            $mform->addElement('html', html_writer::empty_tag('br'));
 
-            $group = array();
-            $group[] = $mform->createElement('advcheckbox', 'booked', get_string('status_booked', 'facetoface'));
-            $group[] = &$mform->createElement('select','booked_type', '', array(
-                0 => get_string('selectwithdot', 'facetoface'),
-                MDL_F2F_RECIPIENTS_ALLBOOKED => get_string('recipients_allbooked', 'facetoface'),
-                MDL_F2F_RECIPIENTS_ATTENDED => get_string('recipients_attendedonly', 'facetoface'),
-                MDL_F2F_RECIPIENTS_NOSHOWS => get_string('recipients_noshowsonly', 'facetoface')
-            ), array('id' => 'f2f-booked-type'));
+            $group = [];
+            $string = \html_writer::span(get_string('notification_booking_status', 'mod_facetoface'), '', ['class' => 'recipients_status']);
+            $group[] = $mform->createElement('static', 'booking_status', '', $string);
+            $string = get_string('booked_status', 'mod_facetoface', \core_text::strtolower(get_string('status_past_events', 'mod_facetoface')));
+            $group[] = $mform->createElement('advcheckbox', 'past_events', $string);
+            $string = get_string('booked_status', 'mod_facetoface', \core_text::strtolower(get_string('status_events_in_progress', 'mod_facetoface')));
+            $group[] = $mform->createElement('advcheckbox', 'events_in_progress', $string);
+            $string = get_string('booked_status', 'mod_facetoface', \core_text::strtolower(get_string('status_upcoming_events', 'mod_facetoface')));
+            $group[] = $mform->createElement('advcheckbox', 'upcoming_events', $string);
 
-            $group[] = $mform->createElement('advcheckbox', 'waitlisted', get_string('status_waitlisted', 'facetoface'));
-            $group[] = $mform->createElement('advcheckbox', 'cancelled', get_string('status_user_cancelled', 'facetoface'));
-            $group[] = $mform->createElement('advcheckbox', 'requested', get_string('status_pending_requests', 'facetoface'));
+            $string = \html_writer::span(get_string('notification_attendance_status', 'mod_facetoface'), '', ['class' => 'recipients_status']);
+            $group[] = $mform->createElement('static', 'attendance_status', '', $string);
+            $group[] = $mform->createElement('advcheckbox', 'fully_attended', get_string('status_fully_attended', 'mod_facetoface'));
+            $group[] = $mform->createElement('advcheckbox', 'partially_attended', get_string('status_partially_attended', 'mod_facetoface'));
+            $group[] = $mform->createElement('advcheckbox', 'unable_to_attend', get_string('status_unable_to_attend', 'mod_facetoface'));
+            $group[] = $mform->createElement('advcheckbox', 'no_show', get_string('status_no_show', 'mod_facetoface'));
+            $string = \html_writer::span(get_string('notification_other_status', 'mod_facetoface'), '', ['class' => 'recipients_status']);
+            $group[] = $mform->createElement('static', 'other_status', '', $string);
+            $group[] = $mform->createElement('advcheckbox', 'waitlisted', get_string('status_waitlisted', 'mod_facetoface'));
+            $group[] = $mform->createElement('advcheckbox', 'user_cancelled', get_string('status_user_cancelled', 'mod_facetoface'));
+            $group[] = $mform->createElement('advcheckbox', 'requested', get_string('status_pending_requests', 'mod_facetoface'));
 
-            $mform->addGroup($group, 'recipients', get_string('recipients', 'facetoface'), '', false);
+            $mform->addGroup($group, 'recipients', get_string('recipients', 'mod_facetoface'), '', true);
             $mform->addHelpButton('recipients', 'recipients', 'facetoface');
+            $mform->addRule('recipients', get_string('error:norecipientsselected', 'facetoface'), 'required');
+            $mform->setType('recipients', PARAM_SEQUENCE);
 
-            $mform->setType('booked', PARAM_BOOL);
-            $mform->disabledIf('booked_type', 'booked', 'notchecked');
-            $mform->setType('booked_type', PARAM_INT);
-            if (!empty($notification->booked)) {
-                $mform->setDefault('booked', true);
-                $mform->setDefault('booked_type', $notification->booked);
+            foreach ($this->recipients as $el) {
+                $mform->setType("recipients[$el]", PARAM_BOOL);
             }
-
-            $mform->setType('waitlisted', PARAM_BOOL);
-            $mform->setType('cancelled', PARAM_BOOL);
+            $recipients = json_decode($notification->recipients) ?? $this->recipients;
+            foreach ($recipients as $element => $val) {
+                // Old one, compatibility with < t13
+                $val = $this->set_recipient_value($element, (int)$val);
+                $mform->setDefault("recipients[$element]", (bool)$val);
+            }
 
             $renderer =& $mform->defaultRenderer();
             $elementtemplate = '<div class="fitem">{element} <label>{label}</label></div>';
             $renderer->setGroupElementTemplate($elementtemplate, 'recipients');
         }
 
-        $mform->addElement('html', '<br /><br />');
-
+        $mform->addElement('html', html_writer::empty_tag('br'));
 
         // Display template picker
-        if (!$isfrozen && $this->_customdata['templates']) {
+        if ($this->_customdata['templates']) {
             $tpls = array();
             $tpls[0] = '';
             foreach ($this->_customdata['templates'] as $tpl) {
@@ -141,29 +173,17 @@ class mod_facetoface_notification_form extends moodleform {
         $mform->addHelpButton('body_editor', 'body', 'facetoface');
         $mform->setType('body', PARAM_RAW);
 
-        if (!$isfrozen) {
-            $mform->addElement('html', html_writer::empty_tag('br'));
+        $mform->addElement('html', html_writer::empty_tag('br'));
 
-            $mform->addElement('checkbox', 'ccmanager', get_string('ccmanager', 'facetoface'), get_string('ccmanager_note', 'facetoface'));
-            $mform->setType('ccmanager', PARAM_INT);
+        $mform->addElement('checkbox', 'ccmanager', get_string('ccmanager', 'facetoface'), get_string('ccmanager_note', 'facetoface'));
+        $mform->setType('ccmanager', PARAM_INT);
 
-            $mform->addElement('editor', 'managerprefix_editor', get_string('managerprefix', 'facetoface'));
-            $mform->setType('managerprefix_editor', PARAM_RAW);
-        } else {
-            if ($notification->ccmanager) {
-                $mform->addElement('editor', 'managerprefix_editor', get_string('managerprefix', 'facetoface'));
-                $mform->setType('managerprefix_editor', PARAM_RAW);
-            }
-        }
+        $mform->addElement('editor', 'managerprefix_editor', get_string('managerprefix', 'facetoface'));
+        $mform->setType('managerprefix_editor', PARAM_RAW);
 
         // Enable checkbox.
         $mform->addElement('checkbox', 'status', get_string('status'));
         $mform->setType('status', PARAM_INT);
-
-        // Is form frozen?
-        if ($isfrozen) {
-            $mform->hardFreeze();
-        }
 
         $this->add_action_buttons(true, get_string('save', 'admin'));
     }
@@ -186,16 +206,9 @@ class mod_facetoface_notification_form extends moodleform {
             $recipients = $mform->getElement('recipients');
             $elements = $recipients->getElements();
 
-            // Validating the booked type here
-            $errors = $this->validate_booked_type();
-            if (!empty($errors)) {
-                return $errors;
-            }
-
-            $rc = array('booked', 'waitlisted', 'cancelled', 'requested');
             $has_val = false;
             foreach ($elements as $element) {
-                if (in_array($element->getName(), $rc)) {
+                if (in_array($element->getName(), array_keys($this->recipients))) {
                     if ($element->getValue()) {
                         $has_val = true;
                         break;
@@ -212,66 +225,41 @@ class mod_facetoface_notification_form extends moodleform {
     }
 
     /**
-     * A method to validate whether the booked type is being set or not, if the checkbox booked
-     * is being checked. Since there is no default booked type anymore, therefore user has to
-     * do this manually, and it might be missed out (either accientally or tempt to do so).
+     * Compatibility with < t13
      *
-     * @return array
+     * @param string $element
+     * @param int $value
+     * @return int
      */
-    private function validate_booked_type(): array {
-        global $PAGE;
-
-        /** @var MoodleQuickForm_group $recipients */
-        $recipients =& $this->_form->getElement('recipients');
-        $elements = $recipients->getElements();
-
-        $errors = array();
-        foreach ($elements as $index => $element) {
-            if ($element->getName() === 'booked' && $element->getValue()) {
-                $hasbookedtype = true;
-                continue;
-            }
-
-            if ($hasbookedtype && $element->getName() === 'booked_type') {
-                // Since this booked_type element is not a multple select element, therefore it
-                // will always has an only one value at index 0.
-                $values = $element->getValue();
-                if (empty($values[0])) {
-                    // It fail there validation here.
-                    $elements[$index]->updateAttributes(array(
-                        'data-error' => 'error'
-                    ));
-
-                    // Reloading the elements for recipients element, so that it is updated.
-                    $recipients->setElements($elements);
-
-                    // Adding string for page here, as the form is failing to validate, and it
-                    // need to notify user
-                    $PAGE->requires->string_for_js('required', 'core');
-
-                    // Make it having data here, so that moodle form can fail the validation, and
-                    // force the user to provide the data for the missing fields.
-                    return array('booked_type' => '');
-                }
+    private function set_recipient_value(string $element, int $value): int {
+        /** @var facetoface_notification $notification */
+        $notification = $this->_customdata['notification'];
+        switch ($element) {
+            case 'past_events':
+                $value = ((int)$notification->booked == MDL_F2F_RECIPIENTS_ALLBOOKED) ? 1 : $value;
                 break;
-            }
+            case 'events_in_progress':
+                $value = ((int)$notification->booked == MDL_F2F_RECIPIENTS_ALLBOOKED) ? 1 : $value;
+                break;
+            case 'upcoming_events':
+                $value = ((int)$notification->booked == MDL_F2F_RECIPIENTS_ALLBOOKED) ? 1 : $value;
+                break;
+            case 'fully_attended':
+                $value = ((int)$notification->booked == MDL_F2F_RECIPIENTS_ATTENDED) ? 1 : $value;
+                break;
+            case 'no_show':
+                $value = ((int)$notification->booked == MDL_F2F_RECIPIENTS_NOSHOWS) ? 1 : $value;
+                break;
+            case 'waitlisted':
+                $value = ((int)$notification->waitlisted == 1) ? 1 : $value;
+                break;
+            case 'user_cancelled':
+                $value = ((int)$notification->cancelled == 1) ? 1 : $value;
+                break;
+            case 'requested':
+                $value = ((int)$notification->requested == 1) ? 1 : $value;
+                break;
         }
-        return array();
-    }
-
-    /**
-     * Setting default values of the form, and modify the method here to tweak the recipients
-     * default data. Overiding this method, because {$notification->booked} is a value of
-     * constants, rather zero and one, therefore, with the {parent::set_data} function, it would
-     * not understand those values.
-     *
-     * @inheritdoc
-     * @param stdClass|array $defaultvalues
-     * @return void
-     */
-    public function set_data($defaultvalues) {
-        parent::set_data($defaultvalues);
-        $notification = (object)(array) $defaultvalues;
-        $this->_form->setDefault('booked', !empty($notification->booked));
+        return $value;
     }
 }

@@ -68,6 +68,7 @@ $id = 0;
 $notification->id = 0;
 $notification->title = get_string('copynotificationtitle', 'facetoface', $notification->title);
 $notification->status = 0;
+$notification->issent = 0;
 $id = $notification->insert();
 
 $url = new moodle_url('/mod/facetoface/notification/edit.php', array('f' => $facetoface->id, 'id' => $id));

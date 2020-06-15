@@ -29,6 +29,7 @@ use stdClass;
 use coding_exception;
 use core\orm\query\builder;
 use core\orm\query\sql\query;
+use core\orm\query\table;
 use mod_facetoface\seminar;
 use mod_facetoface\signup\state\attendance_state;
 use mod_facetoface\signup\state\booked;
@@ -67,6 +68,51 @@ final class filter_factory {
         return builder::table('facetoface_sessions', 's')
             ->left_join([$subquery, 'm'], 'id', 'sessionid')
             ->where('facetoface', '=', $f2fid);
+    }
+
+    /**
+     * Return the query of joint sessions and dates.
+     *
+     * @param int $sessionid
+     * @param \facetoface_notification $facetoface_notification
+     * @return builder
+     */
+    public static function query_notifications_sessions_and_dates(
+        ?int $sessionid = null,
+        \facetoface_notification $facetoface_notification
+    ): builder {
+        $subquery1 = builder::table('facetoface_sessions_dates', 'fsd')
+            ->select([
+                'fsd.sessionid',
+                'COUNT(fsd.id) AS cntdates',
+                'MIN(fsd.timestart) AS mintimestart',
+                'MAX(fsd.timestart) AS maxtimestart',
+                'MIN(fsd.timefinish) AS mintimefinish',
+                'MAX(fsd.timefinish) AS maxtimefinish'
+            ])
+            ->group_by('fsd.sessionid');
+
+        $subquery2 = builder::table('facetoface_notification_sent', 'ns')
+            ->join((new table('user'))->as('usr'), 'usr.id', '=', 'ns.userid')
+            ->join('facetoface_sessions', 'facetoface_sessions.id', '=', 'ns.sessionid')
+            ->select('id')
+            ->where('ns.notificationid', '=', $facetoface_notification->id);
+
+        $builder = builder::table('user', 'u')
+            ->join((new table('facetoface_signups'))->as('si'), 'si.userid', '=', 'u.id')
+            ->join((new table('facetoface_signups_status'))->as('sis'), 'sis.signupid', '=', 'si.id')
+            ->join((new table('facetoface_sessions'))->as('s'), 's.id', '=', 'si.sessionid')
+            ->join((new table('facetoface'))->as('f'), 'f.id', '=', 's.facetoface')
+            ->left_join([$subquery1, 'm'], 's.id', 'sessionid')
+            ->select(['*', 's.id AS sessionid'])
+            ->where('f.id', '=', $facetoface_notification->facetofaceid)
+            ->where('sis.superceded', '=', 0)
+            ->where_not_exists($subquery2);
+
+        if ((int)$sessionid > 0) {
+            $builder->where('s.id', '=', $sessionid);
+        }
+        return $builder;
     }
 
     /**

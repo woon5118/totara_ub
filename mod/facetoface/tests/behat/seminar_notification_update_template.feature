@@ -23,9 +23,8 @@ Feature: User is able to see the template used when editting a seminar notificat
     And I follow "Notifications"
     And I click on "Add" "button"
     And I set the following fields to these values:
-      | booked         | 1              |
-      | booked_type    | 1              |
-      | Template       | This is title  |
+      | recipients[upcoming_events] | 1              |
+      | Template                    | This is title  |
     And I click on "Save" "button"
     When I click on "Edit" "link" in the "This is title" "table_row"
     Then I should see "This is title" exactly "2" times

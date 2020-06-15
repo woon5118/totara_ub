@@ -888,5 +888,16 @@ function xmldb_facetoface_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020021700, 'facetoface');
     }
 
+    if ($oldversion < 2020061100) {
+        $table = new xmldb_table('facetoface_notification');
+        $field = new xmldb_field('recipients', XMLDB_TYPE_TEXT, null, null, false, null, null);
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2020061100, 'facetoface');
+    }
     return true;
 }

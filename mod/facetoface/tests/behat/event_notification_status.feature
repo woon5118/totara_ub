@@ -14,11 +14,11 @@ Feature: Seminar event notification must not be available for user after it has 
     And the following "course enrolments" exist:
       | user     | course | role           |
       | student1 | C1     | student        |
+    And the following "activities" exist:
+      | activity   | name              | course | idnumber |
+      | facetoface | Test seminar name | C1     | seminar  |
     When I log in as "admin"
     And I am on "Course 1" course homepage with editing mode on
-    And I add a "Seminar" to section "1" and I fill the form with:
-      | Name        | Test seminar name        |
-      | Description | Test seminar description |
     And I turn editing mode off
     And I follow "View all events"
     And I follow "Add event"
@@ -83,7 +83,6 @@ Feature: Seminar event notification must not be available for user after it has 
     Then I <visibility> "Notify cancelled attendees"
     Then I <visibility> "Notify cancelled attendees' managers"
     And I log out
-
     Examples:
       | cancellation_enabled | visibility     |
       | 1                    | should see     |

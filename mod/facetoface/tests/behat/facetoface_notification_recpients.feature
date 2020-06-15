@@ -15,14 +15,13 @@ Feature: User is not able to create a notification with a booked recipients chec
     And I follow "Seminar 1"
     And I click on "Notifications" "link" in the "Administration" "block"
     When I click on "Add" "button"
-    Then "select[name='booked_type']" "css_element" should exist
+    Then "recipients[upcoming_events]" "checkbox" should exist
     And I set the following fields to these values:
-      | booked     | 1 |
       | templateid | 1 |
 
     When I click on "Save" "button"
-    Then I should see "Required"
-    And I set the field "booked_type" to "1"
+    Then I should see "You must choose which learners will receive this notification"
+    And I set the field "recipients[upcoming_events]" to "1"
     # Notification created at this point
     When I click on "Save" "button"
-    Then I should not see "Required"
+    Then I should not see "You must choose which learners will receive this notification"

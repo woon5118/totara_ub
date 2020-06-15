@@ -49,32 +49,19 @@ $context = context_module::instance($cm->id);
 require_capability('moodle/course:manageactivities', $context);
 
 $redirectto = new moodle_url('/mod/facetoface/notification/index.php', array('update' => $cm->id));
-$formurl = new moodle_url('/mod/facetoface/notification/edit.php', array('f' => $f, 'id' => $id));
-
-// Load templates.
-$templates = $DB->get_records('facetoface_notification_tpl', array('status' => 1));
-$json_templates = json_encode($templates);
-$args = array('args' => '{"templates":'.$json_templates.'}');
-
-$jsmodule = array(
-    'name' => 'totara_f2f_notification_template',
-    'fullpath' => '/mod/facetoface/notification/get_template.js',
-    'requires' => array('json', 'totara_core'));
-
-$PAGE->requires->js_init_call('M.totara_f2f_notification_template.init', $args, false, $jsmodule);
-// Setup page.
-$PAGE->set_url($redirectto);
 
 // Load data.
 if ($id) {
     $notification = new facetoface_notification(array('id' => $id));
-    if (!$notification) {
-        print_error('error:notificationcouldnotbefound', 'facetoface');
-    }
 } else {
     $notification = new facetoface_notification();
 }
+if ($notification->is_frozen()) {
+    \core\notification::error(get_string('notificationalreadysent', 'facetoface'));
+    redirect($redirectto);
+}
 
+$formurl = new moodle_url('/mod/facetoface/notification/edit.php', array('f' => $f, 'id' => $id));
 // Setup editors
 $editoroptions = array(
     'trusttext'=> 1,
@@ -91,12 +78,13 @@ $notification = file_prepare_standard_editor($notification, 'body', $editoroptio
 $notification = file_prepare_standard_editor($notification, 'managerprefix', $editoroptions, $context, 'mod_facetoface', 'notification', $id);
 
 // Create form
+$templates = $DB->get_records('facetoface_notification_tpl', array('status' => 1));
 $customdata = array(
     'templates'    => $templates,
     'notification' => $notification,
     'editoroptions'=> $editoroptions
 );
-$form = new mod_facetoface_notification_form($formurl, $customdata);
+$form = new mod_facetoface_notification_form($formurl, $customdata, 'post', '', ['class' => 'facetoface_notification_form']);
 $form->set_data($notification);
 
 // Process data
@@ -110,13 +98,11 @@ if ($form->is_cancelled()) {
     facetoface_notification::set_from_form($notification, $data);
 
     if ($notification->type != MDL_F2F_NOTIFICATION_AUTO) {
-        if (!empty($data->booked)) {
-            // If one of the booked radio boxes are selected then the value
-            // will be taken from booked_type instead of booked (checkbox).
-            $notification->booked = $data->booked_type;
-        } else {
-            $notification->booked = 0;
-        }
+        $notification->recipients = json_encode((array)$data->recipients);
+        $notification->booked = 0;
+        $notification->waitlisted = 0;
+        $notification->cancelled = 0;
+        $notification->requested = 0;
     }
 
     $notification->courseid = $course->id;
@@ -124,7 +110,7 @@ if ($form->is_cancelled()) {
     $notification->ccmanager = (isset($data->ccmanager) ? 1 : 0);
     $notification->status = (isset($data->status) ? 1 : 0);
     $notification->templateid = $data->templateid;
-
+    /** @var facetoface_notification $notification */
     $notification->save();
 
     if ($data->templateid != 0) {
@@ -161,37 +147,37 @@ $pagetitle = format_string($facetoface->name);
 if ($id) {
     $PAGE->navbar->add(get_string('edit', 'moodle'));
 } else {
-    $PAGE->navbar->add(get_string('add', 'moodle'));
+    $PAGE->navbar->add(get_string('addnotification', 'facetoface'));
 }
-
+// Setup page.
+$PAGE->set_url($formurl);
 $PAGE->set_title($pagetitle);
-$PAGE->set_heading(format_string($SITE->fullname));
-$PAGE->set_focuscontrol('');
 $PAGE->set_cacheable(true);
-echo $OUTPUT->header();
+$PAGE->set_context($context);
+$PAGE->set_cm($cm);
+$PAGE->set_pagelayout('standard');
+// Load templates.
+$args = [
+    'templates' => $templates,
+    'recipients_error' => get_string('error:norecipientsselected', 'facetoface')
+];
+$PAGE->requires->js_init_call(
+    'M.totara_f2f_notification_template.init',
+    ['args' => json_encode($args)],
+    false,
+    [
+        'name'     => 'totara_f2f_notification_template',
+        'fullpath' => '/mod/facetoface/notification/get_template.js',
+        'requires' => ['json', 'totara_core']
+    ]
+);
 
+echo $OUTPUT->header();
 if ($id) {
     $notification_title = format_string($notification->title);
     echo $OUTPUT->heading(get_string('editnotificationx', 'facetoface', $notification_title));
 } else {
     echo $OUTPUT->heading(get_string('addnotification', 'facetoface'));
 }
-
-// Check if form frozen, mention why
-$isfrozen = $notification->is_frozen();
-if ($isfrozen) {
-    echo $OUTPUT->notification(get_string('notificationalreadysent', 'facetoface'));
-}
-
 $form->display();
-
-if ($isfrozen) {
-    echo $OUTPUT->container_start('continuebutton');
-    $continueurl = clone($formurl);
-    $continueurl->param('duplicate', 1);
-    echo $OUTPUT->single_button($continueurl, get_string('duplicate'), 'get');
-    echo $OUTPUT->single_button($redirectto, get_string('return', 'facetoface'), 'get');
-    echo $OUTPUT->container_end();
-}
-
 echo $OUTPUT->footer($course);
