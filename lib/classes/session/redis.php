@@ -55,7 +55,7 @@ class redis extends handler {
     /** @var int $lockretry how long to wait between session lock attempts in ms */
     protected $lockretry = 100;
     /** @var int $serializer The serializer to use */
-    protected $serializer = \Redis::SERIALIZER_PHP;
+    protected $serializer; // Totara: we must not use redis constant before checking extension is loaded!
     /**
      * @var int $lockexpire how long to wait in seconds before expiring the lock automatically
      * so that other requests may continue execution, ignored if PECL redis is below version 2.2.0.
@@ -76,6 +76,16 @@ class redis extends handler {
      */
     public function __construct() {
         global $CFG;
+
+        if (!extension_loaded('redis')) {
+            throw new exception('sessionhandlerproblem', 'error', '', null, 'redis extension is not loaded');
+        }
+
+        // The session handler requires a version of Redis with the SETEX command (at least 2.0).
+        $version = phpversion('Redis');
+        if (!$version or version_compare($version, '2.0') <= 0) {
+            throw new exception('sessionhandlerproblem', 'error', '', null, 'redis extension version must be at least 2.0');
+        }
 
         if (isset($CFG->session_redis_host)) {
             $this->host = $CFG->session_redis_host;
@@ -107,6 +117,8 @@ class redis extends handler {
 
         if (!empty($CFG->session_redis_serializer_use_igbinary) && defined('\Redis::SERIALIZER_IGBINARY')) {
             $this->serializer = \Redis::SERIALIZER_IGBINARY; // Set igbinary serializer if phpredis supports it.
+        } else {
+            $this->serializer = \Redis::SERIALIZER_PHP;
         }
 
         // The following configures the session lifetime in redis to allow some
@@ -125,20 +137,12 @@ class redis extends handler {
      * Init session handler.
      */
     public function init() {
-        if (!extension_loaded('redis')) {
-            throw new exception('sessionhandlerproblem', 'error', '', null, 'redis extension is not loaded');
-        }
 
         if (empty($this->host)) {
             throw new exception('sessionhandlerproblem', 'error', '', null,
                     '$CFG->session_redis_host must be specified in config.php');
         }
 
-        // The session handler requires a version of Redis with the SETEX command (at least 2.0).
-        $version = phpversion('Redis');
-        if (!$version or version_compare($version, '2.0') <= 0) {
-            throw new exception('sessionhandlerproblem', 'error', '', null, 'redis extension version must be at least 2.0');
-        }
 
         $this->connection = new \Redis();
 

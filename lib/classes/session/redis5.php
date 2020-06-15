@@ -65,6 +65,15 @@ final class redis5 extends handler {
     public function __construct() {
         global $CFG;
 
+        if (!extension_loaded('redis')) {
+            throw new exception('sessionhandlerproblem', 'error', '', null, 'redis extension is not loaded');
+        }
+
+        $version = phpversion('Redis');
+        if (!$version || version_compare($version, '5.0', '<')) {
+            throw new exception('sessionhandlerproblem', 'error', '', null, 'redis extension version must be 5.0 or higher');
+        }
+
         // Parse all settings, this should be ideally fully compatible with old redis handler settings.
 
         if (isset($CFG->session_redis5_host) && $CFG->session_redis5_host !== '') {
@@ -107,15 +116,6 @@ final class redis5 extends handler {
 
         if (!empty($CFG->session_redis5_serializer_use_igbinary) && function_exists('igbinary_serialize')) {
             $this->use_igbinary = true;
-        }
-
-        if (!extension_loaded('redis')) {
-            throw new exception('sessionhandlerproblem', 'error', '', null, 'redis extension is not loaded');
-        }
-
-        $version = phpversion('Redis');
-        if (!$version || version_compare($version, '5.0', '<')) {
-            throw new exception('sessionhandlerproblem', 'error', '', null, 'redis extension version must be 5.0 or higher');
         }
     }
 
