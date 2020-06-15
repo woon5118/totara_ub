@@ -118,10 +118,6 @@
     }
   }
 
-  &--square {
-    border-radius: var(--tui-btn-square-radius);
-  }
-
   &--transparent {
     @extend .tui-formBtn--transparent;
   }
@@ -153,15 +149,13 @@
     border-color: var(--tui-btn-toggle-border-color);
 
     &:first-child {
-      border-radius: var(--tui-btn-square-radius) 0 0
-        var(--tui-btn-square-radius);
+      border-radius: var(--tui-btn-radius) 0 0 var(--tui-btn-radius);
     }
 
     &:last-child,
     &:last-child:active {
       border-left: 0;
-      border-radius: 0 var(--tui-btn-square-radius) var(--tui-btn-square-radius)
-        0;
+      border-radius: 0 var(--tui-btn-radius) var(--tui-btn-radius) 0;
     }
 
     .flex-icon {

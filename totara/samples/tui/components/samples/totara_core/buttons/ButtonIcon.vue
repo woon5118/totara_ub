@@ -34,7 +34,6 @@
           circle: circleStyle,
           primary: primaryStyle,
           small: smallStyle,
-          square: squareStyle,
           textFirst: textFirstStyle,
           transparent: transparentStyle,
           stealth: stealthStyle,
@@ -60,7 +59,6 @@
               circle: circleStyle,
               primary: primaryStyle,
               small: smallStyle,
-              square: squareStyle,
               textFirst: textFirstStyle,
               transparent: transparentStyle,
               stealth: stealthStyle,
@@ -119,13 +117,6 @@
 
       <FormRow label="Circle">
         <RadioGroup v-model="circleStyle" :horizontal="true">
-          <Radio :value="true">True</Radio>
-          <Radio :value="false">False</Radio>
-        </RadioGroup>
-      </FormRow>
-
-      <FormRow label="Square">
-        <RadioGroup v-model="squareStyle" :horizontal="true">
           <Radio :value="true">True</Radio>
           <Radio :value="false">False</Radio>
         </RadioGroup>
@@ -224,7 +215,6 @@ export default {
       textFirstStyle: false,
       smallStyle: false,
       xsmallStyle: false,
-      squareStyle: false,
       text: '',
       transparentStyle: false,
       paddingStyle: false,
@@ -240,7 +230,6 @@ export default {
     circle: circleStyle,
     primary: primaryStyle,
     small: smallStyle,
-    square: squareStyle,
     textFirst: textFirstStyle,
     transparent: transparentStyle,
   }"
