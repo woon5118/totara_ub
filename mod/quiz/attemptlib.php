@@ -538,7 +538,7 @@ class quiz_attempt {
     protected $questionnumbers;
 
     /** @var array slot => page number for this slot. */
-    protected $questionpages;
+    protected $questionpages = array();
 
     /** @var mod_quiz_display_options cache for the appropriate review options. */
     protected $reviewoptions = null;
