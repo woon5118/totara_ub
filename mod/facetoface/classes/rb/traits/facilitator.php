@@ -196,7 +196,8 @@ trait facilitator {
                 'selectchoices' => array(
                     '0' => get_string('yes'),
                     '1' => get_string('no'),
-                )
+                ),
+                'customhelptext' => array('sitewide', 'rb_source_facetoface_facilitator')
             )
         );
         $filteroptions[] = new rb_filter_option(

@@ -99,6 +99,16 @@ class editroom extends \moodleform {
         // Custom fields: Building and Location.
         customfield_definition($mform, (object)['id' => $room->get_id()], 'facetofaceroom', 0, 'facetoface_room');
 
+        // Add to sitewide list.
+        $capability = has_capability('mod/facetoface:managesitewiderooms', \context_system::instance());
+        if ($capability and !empty($seminar) and $room->get_custom()) {
+            $mform->addElement('advcheckbox', 'notcustom', get_string('addtositewidelist', 'mod_facetoface'));
+        } else {
+            $mform->addElement('hidden', 'notcustom');
+        }
+        $mform->setType('notcustom', PARAM_INT);
+        $mform->closeHeaderBefore('notcustom');
+
         // Version control.
         if (!empty($room) && $room->exists()) {
             $mform->addElement('header', 'versions', get_string('versioncontrol', 'mod_facetoface'));
@@ -119,16 +129,6 @@ class editroom extends \moodleform {
                 );
             }
         }
-
-        // Add to sitewide list.
-        $capability = has_capability('mod/facetoface:managesitewiderooms', \context_system::instance());
-        if ($capability and !empty($seminar) and $room->get_custom()) {
-            $mform->addElement('advcheckbox', 'notcustom', get_string('addtositewidelist', 'mod_facetoface'));
-        } else {
-            $mform->addElement('hidden', 'notcustom');
-        }
-        $mform->setType('notcustom', PARAM_INT);
-        $mform->closeHeaderBefore('notcustom');
 
         // Buttons.
         if (empty($seminar)) {

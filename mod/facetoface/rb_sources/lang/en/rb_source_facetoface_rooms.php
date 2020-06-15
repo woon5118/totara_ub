@@ -49,6 +49,7 @@ $string['roomvisible'] = 'Room Visible';
 $string['sessionfinishdatetime'] = 'Finish Time';
 $string['sessionstartdatetime'] = 'Start Time';
 $string['sitewide'] = 'Sitewide';
+$string['sitewide_help'] = 'Use this filter to search only rooms that are on the sitewide list, only custom (ad-hoc) rooms (ie not on the sitewide list), or both types.';
 $string['type_date'] = 'Date/time';
 $string['type_facetoface_room'] = 'Room';
 $string['type_room'] = 'Room';

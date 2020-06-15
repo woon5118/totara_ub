@@ -40,6 +40,7 @@ $string['id'] = 'ID';
 $string['name'] = 'Name';
 $string['namelink'] = 'Name (linked to asset details page)';
 $string['sitewide'] = 'Sitewide';
+$string['sitewide_help'] = 'Use this filter to search only assets that are on the sitewide list, only custom (ad-hoc) assets (ie not on the sitewide list), or both types.';
 $string['type_asset'] = 'Assets';
 $string['type_facetoface_asset'] = 'Asset Custom Fields';
 $string['visible'] = 'Visible';

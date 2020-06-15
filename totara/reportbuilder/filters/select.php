@@ -83,6 +83,7 @@ class rb_filter_select extends rb_filter_type {
         $defaultvalue = $this->defaultvalue;
         $simplemode = $this->options['simplemode'];
         $attr = $this->options['attributes'];
+        $customhelptext = isset($this->options['customhelptext']) ? $this->options['customhelptext'] : null;
 
         $options = array();
         foreach ($this->options['selectchoices'] as $key => $option) {
@@ -95,7 +96,7 @@ class rb_filter_select extends rb_filter_type {
             $mform->addElement('select', $this->name, $label, $choices, $attr);
             $mform->setType($this->name, PARAM_TEXT);
 
-            $this->add_help_button($mform, $this->name, 'filtersimpleselect', 'filters');
+            $this->add_help_button($mform, $this->name, 'filtersimpleselect', 'filters', $customhelptext);
             if ($advanced) {
                 $mform->setAdvanced($this->name);
             }

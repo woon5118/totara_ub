@@ -133,6 +133,16 @@ class facilitator_edit extends \moodleform {
         // Facilitator custom fields.
         customfield_definition($mform, (object)['id' => $facilitator->get_id()], $prefix, 0, $tblprefix);
 
+        // Add to sitewide list.
+        $capability = has_capability('mod/facetoface:managesitewidefacilitators', \context_system::instance());
+        if ($capability and !empty($seminar) and $facilitator->get_custom()) {
+            $mform->addElement('advcheckbox', 'notcustom', get_string('addtositewidelist', 'mod_facetoface'));
+        } else {
+            $mform->addElement('hidden', 'notcustom');
+        }
+        $mform->setType('notcustom', PARAM_INT);
+        $mform->closeHeaderBefore('notcustom');
+
         // Version control.
         if ($facilitator->exists()) {
             $mform->addElement('header', 'versions', get_string('versioncontrol', 'mod_facetoface'));
@@ -153,16 +163,6 @@ class facilitator_edit extends \moodleform {
                 );
             }
         }
-
-        // Add to sitewide list.
-        $capability = has_capability('mod/facetoface:managesitewidefacilitators', \context_system::instance());
-        if ($capability and !empty($seminar) and $facilitator->get_custom()) {
-            $mform->addElement('advcheckbox', 'notcustom', get_string('addtositewidelist', 'mod_facetoface'));
-        } else {
-            $mform->addElement('hidden', 'notcustom');
-        }
-        $mform->setType('notcustom', PARAM_INT);
-        $mform->closeHeaderBefore('notcustom');
 
         // Buttons.
         if (empty($seminar)) {

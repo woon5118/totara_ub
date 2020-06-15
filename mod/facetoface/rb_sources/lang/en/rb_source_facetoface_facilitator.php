@@ -42,6 +42,7 @@ $string['id'] = 'ID';
 $string['name'] = 'Name';
 $string['namelink'] = 'Name (linked to facilitator details page)';
 $string['sitewide'] = 'Sitewide';
+$string['sitewide_help'] = 'Use this filter to search only facilitators that are on the sitewide list, only custom (ad-hoc) facilitators (ie not on the sitewide list), or both types.';
 $string['userid'] = 'User ID';
 $string['visible'] = 'Visible';
 
