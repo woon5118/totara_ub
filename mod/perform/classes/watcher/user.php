@@ -23,8 +23,11 @@
 
 namespace mod_perform\watcher;
 
+use container_perform\perform;
+use core_user\hook\allow_view_profile;
 use core_user\hook\allow_view_profile_field;
 use mod_perform\entities\activity\participant_instance;
+use totara_core\hook\base;
 
 class user {
 
@@ -46,6 +49,17 @@ class user {
 
         if (!in_array($hook->field, self::ALLOWED_FIELDS, true)) {
             return;
+        }
+
+        $course = $hook->get_course();
+        // Ignore anything other than perform containers
+        if (!$course || $course->containertype !== perform::get_type()) {
+            return;
+        }
+
+        // Handle site admins explicitly
+        if (is_siteadmin()) {
+            $hook->give_permission();
         }
 
         if (participant_instance::repository()->user_can_view_other_users_profile($hook->viewing_user_id, $hook->target_user_id)) {
