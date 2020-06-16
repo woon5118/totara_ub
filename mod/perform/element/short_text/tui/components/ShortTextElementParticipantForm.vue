@@ -29,7 +29,7 @@
               $str('short_text_your_response', 'performelement_short_text')
             "
           >
-            <FormTextarea
+            <FormText
               name="answer_text"
               :validations="v => [answerRequired, maxLength]"
             />
@@ -41,18 +41,17 @@
 </template>
 
 <script>
-import FormScope from 'totara_core/components/reform/FormScope';
-import { FormRow } from 'totara_core/components/uniform';
-import FormTextarea from 'totara_core/components/uniform/FormTextarea';
 import ElementParticipantForm from 'mod_perform/components/element/ElementParticipantForm';
+import FormScope from 'totara_core/components/reform/FormScope';
+import { FormRow,FormText } from 'totara_core/components/uniform';
 import { v as validation } from 'totara_core/validation';
 
 export default {
   components: {
-    FormScope,
-    FormRow,
-    FormTextarea,
     ElementParticipantForm,
+    FormRow,
+    FormScope,
+    FormText,
   },
 
   props: {
