@@ -26,33 +26,26 @@
  */
 $exceptions = array(
     'core_admin' => array(
-        'configallowoverride2', 'configallowswitch', 'configallowuserswitchrolestheycantassign', 'showuseridentity_desc', // Caps.
+        'configallowoverride2',
+        'configallowswitch',
+        'configallowuserswitchrolestheycantassign',
+        'showuseridentity_desc', // Caps.
         'requiredentrieschanged', // Upgrade notes.
         'cfgwwwrootslashwarning', // Link to moodle tracker
         'cfgwwwrootwarning', // Link to moodle tracker,
         'eventshandlersinuse', // Link to docs
         'profilevisible_help', // Capabilities for profile editing
-        'unsupporteddbfileformat', // Link to docs
         'moodlerelease', // Reference to real Moodle version in registration data
     ),
     'core_cohort' => array('visible_help'), // Caps.
-    'core_completion' => array('err_noroles', 'manualcompletionbynote', 'err_noroles'), // Caps.
-    'core_error' => array('mimetexisnotexist', 'mssqlrcsmodemissing', 'pluginrequirementsnotmet'),
-    'core_hub' => true,
+    'core_completion' => array('manualcompletionbynote', 'err_noroles'), // Caps.
+    'core_error' => array('pluginrequirementsnotmet'),
     'core_install' => array('welcomep40'), // Placeholders.
-    'core_moodle' => array('backupnonisowarning', 'gpl', 'gpl3', 'moodleversion', 'moodlerelease', 'registrationinfo', 'registrationsend'),
     'core_question' => array('cwrqpfsinfo'),
     'core_rating' => array('rolewarning_help'), // Caps.
     'core_webservice' => array('testauserwithtestclientdescription'), // Caps.
     'tool_xmldb' => array('confirmcheckoraclesemantics'),
-    'totara_core' => array(
-        'error:cannotupgradefromnewermoodle', 'moodlecore', 'totaracopyright',
-    ),
-    'tool_behat' => array('fieldvalueargument_help'), // Docs link.
+    'totara_core' => array('error:cannotupgradefromnewermoodle', 'moodlecore'),
     'enrol_ldap' => array('autocreate'),
-    'mod_facetoface' => array('mincapacity_help'),
-    'auth_ldap' => array('auth_ntlmsso_enabled'),
     'tool_premigration' => array('pluginname'),
-    'tool_usertours' => true, // Not implemented yet
-
 );
