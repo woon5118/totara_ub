@@ -139,6 +139,7 @@ if ($group === 0 && $course->groupmode == SEPARATEGROUPS) {
 }
 
 $showeditorlink = has_capability('totara/completioneditor:editcoursecompletion', $context);
+$canmarkcomplete = has_capability('moodle/course:markcomplete', $context);
 
 /**
  * Load data
@@ -210,8 +211,11 @@ if (!$csv) {
         foreach ($rcriteria as $rcriterion) {
             $users = get_role_users($rcriterion->role, $context, true);
 
-            // If logged in user has this role, allow marking complete
-            if ($users && in_array($USER->id, array_keys($users))) {
+            // If logged in user has this role and still has marking capability, allow marking complete.
+            // Totara: adding check for $canmarkcomplete is not an ideal solution as the role will still
+            // appear in the table, but at least it won't be able to mark users as completed where the
+            // role capability has been removed retrospectively.
+            if ($users && in_array($USER->id, array_keys($users)) && $canmarkcomplete) {
                 $allow_marking = true;
                 $allow_marking_criteria = $rcriterion->id;
                 break;
@@ -771,7 +775,7 @@ foreach ($progress as $user) {
 
                 // Decide if we need to display an RPL
                 if (in_array($criterion->id, $criteria_with_rpl)) {
-                    if ($is_complete) {
+                    if ($is_complete || !$canmarkcomplete) {
                         show_rpl_readonly($criteria_completion->rpl, $describe);
                     } else {
                         show_rpl($criterion->id, $user, $criteria_completion->rpl, $describe, $fulldescribe, $criterion->moduleinstance);
@@ -874,7 +878,7 @@ foreach ($progress as $user) {
         print $OUTPUT->flex_icon('completion-auto-' . $completiontype, ['alt' => s($describe)]);
 
         if ($CFG->enablecourserpl) {
-            if ($ccompletion->is_complete()) {
+            if ($ccompletion->is_complete() || !$canmarkcomplete) {
                 show_rpl_readonly($ccompletion->rpl, $describe);
             } else {
                 show_rpl('course', $user, $ccompletion->rpl, $describe, $fulldescribe);
