@@ -47,6 +47,9 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
         this.nPaths = 0;
         this.pathways = [];
         this.singlevalShown = false;
+        this.dropPlaceholder = document.createElement('div');
+        this.dropPlaceholder.className = 'tw-editAchievementPaths__dropPlaceholder';
+        this.dropPlaceholder.innerText = '\xa0'; // nbsp
 
         this.endpoints = {
             criteriaTypes: 'pathway_criteria_group_get_criteria_types',
@@ -54,6 +57,8 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
             deletePathways: 'totara_competency_delete_pathways',
             setOverallAggregation: 'totara_competency_set_overall_aggregation'
         };
+
+        this.handleDrop = this.handleDrop.bind(this);
     }
 
     AchievementPaths.prototype = {
@@ -155,12 +160,24 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                 // If a draggable item
                 if (e.target.hasAttribute('data-tw-editAchievementPaths-draggable')) {
                     that.draggedNode = e.target;
+                    setTimeout(function() {
+                        that.dropPosition = that.getDropPosition(that.draggedNode, e.clientY);
+                        if (that.dropPosition) {
+                            that.insertChildAtIndex(that.dropPosition.groupNode, that.dropPosition.index, that.dropPlaceholder);
+                        }
+                        if (that.draggedNode === e.target) {
+                            that.draggedNode.style.display = 'none';
+                        }
+                    }, 0);
                 }
             });
 
             // Listen for drag end event
-            this.widget.addEventListener('dragend', function() {
+            this.widget.addEventListener('dragend', function(e) {
+                that.handleDrop(e);
+                that.draggedNode.style.display = '';
                 that.draggedNode = '';
+                that.dropPlaceholder.remove();
             });
 
             // Listen for dragged item over drop zone event
@@ -168,72 +185,15 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                 e.preventDefault();
             });
 
-            // Listen for dragged item entering valid drop zone
-            this.widget.addEventListener('dragenter', function(e) {
-                if (!e.target.classList || !e.target.classList.contains('tw-editAchievementPaths__activeDropZone')) {
-                    return;
-                }
-
-                e.target.classList.add('tw-editAchievementPaths__activeDropZone-over');
-            });
-
-            // Listen for dragged item leaving valid drop zone
-            this.widget.addEventListener('dragleave', function(e) {
-                if (!e.target.classList || !e.target.classList.contains('tw-editAchievementPaths__activeDropZone')) {
-                    return;
-                }
-
-                e.target.classList.remove('tw-editAchievementPaths__activeDropZone-over');
-            });
-
-            // Listen for dragged item dropped in drop zone event
-            this.widget.addEventListener('drop', function(e) {
-                e.preventDefault();
-
+            this.widget.addEventListener('drag', function(e) {
                 if (!that.draggedNode) {
                     return;
                 }
 
-                if (e.target.closest('[data-tw-editAchievementPaths-draggable]')) {
-                    var dropTarget = e.target.closest('[data-tw-editAchievementPaths-draggable]'),
-                        dropTargetGroup = dropTarget.closest('[data-tw-editAchievementPaths-group]').getAttribute('data-tw-editAchievementPaths-group'),
-                        draggedGroup = that.draggedNode.closest('[data-tw-editAchievementPaths-group]').getAttribute('data-tw-editAchievementPaths-group'),
-                        highOrderGroup = that.widget.querySelector('[data-tw-editAchievementPaths-group="high-sortorder"]'),
-                        lowOrderGroup = that.widget.querySelector('[data-tw-editAchievementPaths-group="low-sortorder"]');
-
-                    // If single value group moved reorder other nodes
-                    if (draggedGroup === 'singlevalue') {
-                        var groupNodes,
-                            targetNodeIndex;
-
-                        // Move all high items above the drop to low items group
-                        if (dropTargetGroup === 'high-sortorder') {
-                            groupNodes = Array.prototype.slice.call(highOrderGroup.children);
-                            targetNodeIndex = groupNodes.indexOf(dropTarget);
-                            for (var a = 0; a <= targetNodeIndex; a++) {
-                                lowOrderGroup.appendChild(groupNodes[a]);
-                            }
-
-                        // Move all low items below the drop to high items group
-                        } else if (dropTargetGroup === 'low-sortorder') {
-                            groupNodes = Array.prototype.slice.call(lowOrderGroup.children);
-                            targetNodeIndex = groupNodes.indexOf(dropTarget);
-                            for (var b = targetNodeIndex; b < groupNodes.length; b++) {
-                                highOrderGroup.appendChild(groupNodes[b]);
-                            }
-                        }
-
-                    // If dropped on singleValue group, move to start of 'high sort order' group
-                    } else if (dropTargetGroup === 'singlevalue') {
-                        highOrderGroup.insertBefore(that.draggedNode, highOrderGroup.childNodes[0]);
-
-                    } else {
-                        dropTarget.parentNode.insertBefore(that.draggedNode, dropTarget.nextSibling);
-                    }
+                that.dropPosition = that.getDropPosition(that.draggedNode, e.clientY);
+                if (that.dropPosition) {
+                    that.insertChildAtIndex(that.dropPosition.groupNode, that.dropPosition.index, that.dropPlaceholder);
                 }
-
-                // Remove dragging over class
-                that.widget.querySelector('.tw-editAchievementPaths__activeDropZone-over').classList.remove('tw-editAchievementPaths__activeDropZone-over');
             });
 
             window.addEventListener('beforeunload', function(e) {
@@ -1054,7 +1014,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
          * Toggle availability of single use criteria types on a specific scalevalue level
          *
          * @param {bool} allowSingleUse
-         * @param int} scalevalueId
+         * @param {int} scalevalueId
          */
         toggleSingleUseCriteriaTypes: function(allowSingleUse, scalevalueId) {
             var scaleValueNode = this.widget.querySelector('[data-tw-editScaleValuePaths-scale-id="' + scalevalueId + '"]'),
@@ -1173,6 +1133,9 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                     onOrderingItems[b].disabled = true;
                 }
             }
+
+            // Handling 'Apply changes' button separately
+            this.disableApplyChanges();
         },
 
         /**
@@ -1206,12 +1169,14 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                 }
             }
 
-            // TO DO
             if (this.aggFunction) {
                 if (typeof this[this.aggFunction] === 'function') {
                     this[this.aggFunction]();
                 }
             }
+
+            // Handling 'Apply changes' button separately
+            this.enableApplyChanges();
         },
 
         /**
@@ -1242,7 +1207,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
          */
         enableApplyChanges: function() {
             var applyChangesButton = this.widget.querySelector('[data-tw-editAchievementPaths-action="apply"]');
-            if (applyChangesButton) {
+            if (applyChangesButton && this.dirty) {
                 applyChangesButton.removeAttribute('disabled');
             }
         },
@@ -1254,6 +1219,112 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
             var applyChangesButton = this.widget.querySelector('[data-tw-editAchievementPaths-action="apply"]');
             if (applyChangesButton) {
                 applyChangesButton.setAttribute('disabled', '');
+            }
+        },
+
+        /**
+         * Get position to drop the dragging node at.
+         *
+         * @param {Element} node dragging node
+         * @param {Number} mouseY
+         * @returns {?{groupNode: Element, index: Number}}
+         */
+        getDropPosition: function(node, mouseY) {
+            if (!mouseY) {
+                return null;
+            }
+
+            var highOrderGroup = this.widget.querySelector('[data-tw-editAchievementPaths-group="high-sortorder"]'),
+                lowOrderGroup = this.widget.querySelector('[data-tw-editAchievementPaths-group="low-sortorder"]');
+
+            var allDraggables = Array.prototype.slice.call(this.widget.querySelectorAll('.tw-editAchievementPaths__activeDropZone'));
+            // default to start of first group
+            var result = {groupNode: lowOrderGroup, index: 0};
+            // find new position from mouse
+            allDraggables.forEach(function(draggable) {
+                var bcr = draggable.getBoundingClientRect();
+                if (bcr.height === 0) {
+                    return; // not visible. continue
+                }
+                var centerpoint = bcr.top + bcr.height / 2;
+                if (mouseY > centerpoint) {
+                    var container = draggable.closest('[data-tw-editAchievementPaths-group]');
+                    var containerGroup = container.getAttribute('data-tw-editAchievementPaths-group');
+                    if (containerGroup === 'singlevalue') {
+                        result = {groupNode: highOrderGroup, index: 0};
+                        return; // continue
+                    }
+                    // get index
+                    var parentChildren = Array.prototype.slice.call(container.children);
+                    var draggableIndex = parentChildren.indexOf(draggable);
+                    result = {
+                        groupNode: container,
+                        index: draggableIndex + 1
+                    };
+                }
+            });
+            return result;
+        },
+
+        /**
+         * Insert an element at the specified index in parent
+         *
+         * @param {Element} parent
+         * @param {Number} index
+         * @param {Element} child
+        */
+        insertChildAtIndex: function(parent, index, child) {
+            if (!parent.children[index]) {
+                parent.appendChild(child);
+            } else {
+                parent.insertBefore(child, parent.children[index]);
+            }
+        },
+
+        /**
+         * Listen for dragged item dropped event
+         *
+         * @param {DragEvent} e
+         */
+        handleDrop: function(e) {
+            var that = this;
+            e.preventDefault();
+            e.stopPropagation();
+
+            var dropPosition = this.draggedNode && (this.dropPosition || this.getDropPosition(this.draggedNode, e.clientY));
+
+            if (this.draggedNode && dropPosition) {
+                var dropTargetGroup = dropPosition.groupNode.getAttribute('data-tw-editAchievementPaths-group');
+                var draggedGroup = this.draggedNode.closest('[data-tw-editAchievementPaths-group]').getAttribute('data-tw-editAchievementPaths-group');
+                var highOrderGroup = this.widget.querySelector('[data-tw-editAchievementPaths-group="high-sortorder"]');
+                var lowOrderGroup = this.widget.querySelector('[data-tw-editAchievementPaths-group="low-sortorder"]');
+
+                this.draggedNode.style.display = '';
+
+                // If single value group moved reorder other nodes
+                if (draggedGroup === 'singlevalue') {
+                    var groupNodes = Array.prototype.slice.call(dropPosition.groupNode.children);
+
+                    // Move all items below the drop to the high group
+                    if (dropTargetGroup === 'low-sortorder') {
+                        groupNodes.slice(dropPosition.index).forEach(function(node, index) {
+                            that.insertChildAtIndex(highOrderGroup, index, node);
+                        });
+                    } else if (dropTargetGroup === 'high-sortorder') {
+                        groupNodes.slice(0, dropPosition.index).forEach(function(node) {
+                            lowOrderGroup.appendChild(node);
+                        });
+                    }
+                } else {
+                    this.insertChildAtIndex(dropPosition.groupNode, dropPosition.index, this.draggedNode);
+                }
+
+                this.dirty = true;
+            }
+
+            // must remove dropPlaceholder after (not before) or it it will throw off indexes
+            if (this.dropPlaceholder.parentNode) {
+                this.dropPlaceholder.remove();
             }
         }
 

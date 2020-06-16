@@ -108,15 +108,19 @@
   &__activeDropZone {
     .tw-editAchievementPaths__group & {
       border: var(--tui-border-width-thin) dashed var(--tui-color-neutral-6);
+      background-color: var(--tui-color-background);
     }
 
     > * {
       pointer-events: none;
     }
+  }
 
-    &-over {
-      background: var(--tui-color-state-highlight);
-    }
+  &__dropPlaceholder {
+    padding: var(--tui-gap-4);
+    background-color: var(--tui-color-neutral-4);
+    border: 1px solid var(--tui-color-neutral-4);
+    border-radius: var(--tui-border-radius-normal);
   }
 
   &__empty {

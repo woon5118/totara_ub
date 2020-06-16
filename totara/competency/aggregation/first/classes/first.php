@@ -62,7 +62,7 @@ class first extends overall_aggregation {
      *                     aggregation type
      */
     public function get_aggregation_js_function(): ?string {
-        return 'calculateSortorderFromDisplay';
+        return 'calculateSortOrderFromDisplay';
     }
 
 }
