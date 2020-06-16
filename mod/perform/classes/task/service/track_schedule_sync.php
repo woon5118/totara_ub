@@ -59,7 +59,7 @@ class track_schedule_sync {
 
         // Bulk fetch all the start and end reference dates.
         $user_ids = $track_user_assignments->pluck('subject_user_id');
-        $date_resolver = (new track_model($track))->get_date_resolver($user_ids);
+        $date_resolver = (new track_model($track))->get_date_resolver_for_users($user_ids);
 
         builder::get_db()->transaction(function () use ($track, $track_user_assignments, $date_resolver) {
             // Reset the flag.

@@ -28,6 +28,7 @@ use core\webapi\execution_context;
 use core\webapi\mutation_resolver;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\resolver\has_middleware;
+use mod_perform\dates\resolvers\dynamic\resolver_option;
 use mod_perform\models\activity\track;
 use mod_perform\webapi\middleware\require_activity;
 use moodle_exception;
@@ -68,6 +69,11 @@ class update_track_schedule implements mutation_resolver, has_middleware {
                 );
             }
         } else { // Dynamic.
+            $dynamic_resolver_option = resolver_option::create_from_json(
+                $track_schedule['schedule_resolver_option'],
+                true
+            );
+
             if ($track_schedule['schedule_is_open']) {
                 $track->set_schedule_open_dynamic(
                     $track_schedule['schedule_dynamic_count_from'],
@@ -78,7 +84,8 @@ class update_track_schedule implements mutation_resolver, has_middleware {
                     track::mapped_value_from_string($track_schedule['schedule_dynamic_direction'],
                         track::get_dynamic_schedule_directions(),
                         'schedule dynamic direction'
-                    )
+                    ),
+                    $dynamic_resolver_option
                 );
             } else { // Closed.
                 $track->set_schedule_closed_dynamic(
@@ -91,7 +98,8 @@ class update_track_schedule implements mutation_resolver, has_middleware {
                     track::mapped_value_from_string($track_schedule['schedule_dynamic_direction'],
                         track::get_dynamic_schedule_directions(),
                         'schedule dynamic direction'
-                    )
+                    ),
+                    $dynamic_resolver_option
                 );
             }
         }
@@ -146,7 +154,7 @@ class update_track_schedule implements mutation_resolver, has_middleware {
         // Subject instance generation method.
         if ($track->get_subject_instance_generation_control_is_enabled()) {
             $subject_instance_generation_methods = array_flip(track::get_subject_instance_generation_methods());
-            $track->set_subject_instace_generation(
+            $track->set_subject_instance_generation(
                 $subject_instance_generation_methods[$track_schedule['subject_instance_generation']]
             );
         }
@@ -179,6 +187,7 @@ class update_track_schedule implements mutation_resolver, has_middleware {
             'schedule_dynamic_count_to',
             'schedule_dynamic_unit',
             'schedule_dynamic_direction',
+            'schedule_resolver_option',
             'due_date_is_fixed',
             'due_date_fixed',
             'due_date_relative_count',
@@ -200,11 +209,13 @@ class update_track_schedule implements mutation_resolver, has_middleware {
                 $required_fields[] = 'schedule_dynamic_count_from';
                 $required_fields[] = 'schedule_dynamic_unit';
                 $required_fields[] = 'schedule_dynamic_direction';
+                $required_fields[] = 'schedule_resolver_option';
             } else { // Closed.
                 $required_fields[] = 'schedule_dynamic_count_from';
                 $required_fields[] = 'schedule_dynamic_count_to';
                 $required_fields[] = 'schedule_dynamic_unit';
                 $required_fields[] = 'schedule_dynamic_direction';
+                $required_fields[] = 'schedule_resolver_option';
             }
         }
 

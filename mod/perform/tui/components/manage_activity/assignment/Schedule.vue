@@ -40,7 +40,11 @@
       @submit="trySave"
       @change="onChange"
     >
-      <ScheduleSettings :is-open="scheduleIsOpen" :is-fixed="scheduleIsFixed" />
+      <ScheduleSettings
+        :is-open="scheduleIsOpen"
+        :is-fixed="scheduleIsFixed"
+        :date-resolver-options="dateResolverOptions"
+      />
 
       <FrequencySettings
         :is-open="scheduleIsOpen"
@@ -115,6 +119,10 @@ export default {
       type: Object,
       required: true,
     },
+    dateResolverOptions: {
+      type: Array,
+      required: true,
+    },
   },
   data() {
     return {
@@ -183,6 +191,11 @@ export default {
      * @return {Object}
      */
     getInitialValues(track) {
+      let resolver_option = null;
+      if (track.schedule_resolver_option) {
+        resolver_option = `${track.schedule_resolver_option.resolver_class_name}--${track.schedule_resolver_option.option_key}`;
+      }
+
       return {
         // Creation range initial settings
         scheduleFixed: {
@@ -195,6 +208,7 @@ export default {
           unit: track.schedule_dynamic_unit || RELATIVE_DATE_UNIT_DAY,
           direction:
             track.schedule_dynamic_direction || RELATIVE_DATE_DIRECTION_BEFORE,
+          resolver_option,
         },
 
         // Due date initial settings
@@ -280,6 +294,14 @@ export default {
         gql.schedule_dynamic_count_from = Number(form.scheduleDynamic.count); // Gql does not handle "-1" and an int type.
         gql.schedule_dynamic_unit = form.scheduleDynamic.unit;
         gql.schedule_dynamic_direction = form.scheduleDynamic.direction;
+
+        const resolverOptionParts = form.scheduleDynamic.resolver_option.split(
+          '--'
+        );
+        gql.schedule_resolver_option = {
+          resolver_class_name: resolverOptionParts[0],
+          option_key: resolverOptionParts[1],
+        };
 
         if (!this.scheduleIsOpen) {
           // Dynamic start date with closing date

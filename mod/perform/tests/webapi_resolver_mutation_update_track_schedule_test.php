@@ -43,7 +43,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_testcase
     public function test_user_cannot_update_without_permission(): void {
         $args = [
             'track_schedule' => [
-                'track_id' =>$this->track1_id,
+                'track_id' => $this->track1_id,
                 'schedule_is_open' => true,
                 'schedule_is_fixed' => true,
                 'schedule_fixed_from' => 222,

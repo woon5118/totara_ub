@@ -33,12 +33,12 @@
       path="scheduleDynamic"
       has-direction
       :has-range="!isOpen"
+      :date-resolver-options="dateResolverOptions"
     />
     <template v-if="isOpen">
       <span v-if="isFixed">{{
         $str('schedule_date_range_onwards', 'mod_perform')
       }}</span>
-      <strong v-else>{{ $str('user_creation_date', 'mod_perform') }}</strong>
     </template>
   </ScheduleSettingContainer>
 </template>
@@ -61,6 +61,10 @@ export default {
     },
     isFixed: {
       type: Boolean,
+      required: true,
+    },
+    dateResolverOptions: {
+      type: Array,
       required: true,
     },
   },

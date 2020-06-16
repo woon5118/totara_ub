@@ -109,10 +109,11 @@ Feature: Define track schedules to perform activities
     And I click on "Limited" "button"
     And I click on "Dynamic" "button"
     And I set the following fields to these values:
-      | scheduleDynamic[count]      | 1     |
-      | scheduleDynamic[count_to]   | 4     |
-      | scheduleDynamic[unit]       | weeks |
-      | scheduleDynamic[direction]  | after |
+      | scheduleDynamic[count]           | 1                  |
+      | scheduleDynamic[count_to]        | 4                  |
+      | scheduleDynamic[unit]            | weeks              |
+      | scheduleDynamic[direction]       | after              |
+      | scheduleDynamic[resolver_option] | User creation date |
     When I save the activity schedule
     Then I should see "Activity schedule saved" in the tui "success" notification toast
 
@@ -120,10 +121,11 @@ Feature: Define track schedules to perform activities
     And I click on "My Test Activity" "link"
     And I click on "Assignments" "link"
     Then the following fields match these values:
-      | scheduleDynamic[count]      | 1     |
-      | scheduleDynamic[count_to]   | 4     |
-      | scheduleDynamic[unit]       | weeks |
-      | scheduleDynamic[direction]  | after |
+      | scheduleDynamic[count]           | 1                  |
+      | scheduleDynamic[count_to]        | 4                  |
+      | scheduleDynamic[unit]            | weeks              |
+      | scheduleDynamic[direction]       | after              |
+      | scheduleDynamic[resolver_option] | User creation date |
 
   Scenario: Save and view open ended dynamic performance activity schedule
     Given I log in as "admin"
@@ -132,9 +134,10 @@ Feature: Define track schedules to perform activities
     And I click on "Assignments" "link"
     And I click on "Dynamic" "button"
     And I set the following fields to these values:
-      | scheduleDynamic[count]      | 1     |
-      | scheduleDynamic[unit]       | weeks |
-      | scheduleDynamic[direction]  | after |
+      | scheduleDynamic[count]           | 1                  |
+      | scheduleDynamic[unit]            | weeks              |
+      | scheduleDynamic[direction]       | after              |
+      | scheduleDynamic[resolver_option] | User creation date |
     Then I should not see "until" in the ".tui-performAssignmentScheduleRelativeDateSelector" "css_element"
     And "input[name='scheduleDynamic[count_to]']" "css_element" should not exist in the ".tui-performAssignmentScheduleRelativeDateSelector" "css_element"
 
@@ -145,9 +148,10 @@ Feature: Define track schedules to perform activities
     And I click on "My Test Activity" "link"
     And I click on "Assignments" "link"
     Then the following fields match these values:
-      | scheduleDynamic[count]      | 1     |
-      | scheduleDynamic[unit]       | weeks |
-      | scheduleDynamic[direction]  | after |
+      | scheduleDynamic[count]           | 1                  |
+      | scheduleDynamic[unit]            | weeks              |
+      | scheduleDynamic[direction]       | after              |
+      | scheduleDynamic[resolver_option] | User creation date |
     And I should not see "until" in the ".tui-performAssignmentScheduleRelativeDateSelector" "css_element"
     And "input[name='scheduleDynamic[count_to]']" "css_element" should not exist in the ".tui-performAssignmentScheduleRelativeDateSelector" "css_element"
 
@@ -159,7 +163,8 @@ Feature: Define track schedules to perform activities
     And I click on "Dynamic" "button"
     And I click on "Open-ended" "button"
     And I set the following fields to these values:
-      | scheduleDynamic[count] | 100 |
+      | scheduleDynamic[count]           | 100                |
+      | scheduleDynamic[resolver_option] | User creation date |
     When I save the activity schedule
     Then I should see "Activity schedule saved" in the tui "success" notification toast
 
@@ -168,8 +173,8 @@ Feature: Define track schedules to perform activities
     And I click on "Assignments" "link"
     And I click on "Limited" "button"
     Then the following fields match these values:
-      | scheduleDynamic[count]      | 100 |
-      | scheduleDynamic[count_to]   | 0   |
+      | scheduleDynamic[count]    | 100 |
+      | scheduleDynamic[count_to] | 0   |
 
   Scenario: Check validation messages of dynamic activity schedule
     Given I log in as "admin"
@@ -180,32 +185,34 @@ Feature: Define track schedules to perform activities
     And I click on "Dynamic" "button"
 
     When I set the following fields to these values:
-      | scheduleDynamic[count]      | 0.3 |
-      | scheduleDynamic[count_to]   | 0.4 |
+      | scheduleDynamic[count]    | 0.3 |
+      | scheduleDynamic[count_to] | 0.4 |
     And I save the activity schedule
     Then I should see "Please enter a valid whole number"
 
     When I set the following fields to these values:
-      | scheduleDynamic[count]      |  |
-      | scheduleDynamic[count_to]   |  |
+      | scheduleDynamic[count]    |  |
+      | scheduleDynamic[count_to] |  |
     Then I should see "Required"
 
     When I set the following fields to these values:
-      | scheduleDynamic[count]      | -1 |
-      | scheduleDynamic[count_to]   | -1 |
+      | scheduleDynamic[count]    | -1 |
+      | scheduleDynamic[count_to] | -1 |
     Then I should see "Number must be 0 or more"
 
     When I set the following fields to these values:
-      | scheduleDynamic[direction]  | after |
-      | scheduleDynamic[count]      | 100   |
-      | scheduleDynamic[count_to]   | 10    |
+      | scheduleDynamic[direction]       | after              |
+      | scheduleDynamic[count]           | 100                |
+      | scheduleDynamic[count_to]        | 10                 |
+      | scheduleDynamic[resolver_option] | User creation date |
     And I save the activity schedule
     Then I should see "Range end date cannot be before range start date"
 
     When I set the following fields to these values:
-      | scheduleDynamic[direction]  | before |
-      | scheduleDynamic[count]      | 10     |
-      | scheduleDynamic[count_to]   | 100    |
+      | scheduleDynamic[direction]       | before             |
+      | scheduleDynamic[count]           | 10                 |
+      | scheduleDynamic[count_to]        | 100                |
+      | scheduleDynamic[resolver_option] | User creation date |
     And I save the activity schedule
     Then I should see "Range end date cannot be before range start date"
 
@@ -238,10 +245,11 @@ Feature: Define track schedules to perform activities
 
     When I click on "Dynamic" "button"
     And I set the following fields to these values:
-      | scheduleDynamic[count]      | 1     |
-      | scheduleDynamic[count_to]   | 4     |
-      | scheduleDynamic[unit]       | weeks |
-      | scheduleDynamic[direction]  | after |
+      | scheduleDynamic[count]           | 1                  |
+      | scheduleDynamic[count_to]        | 4                  |
+      | scheduleDynamic[unit]            | weeks              |
+      | scheduleDynamic[direction]       | after              |
+      | scheduleDynamic[resolver_option] | User creation date |
 
     When I click on "Fixed" "button"
     Then the following fields match these values:
@@ -250,10 +258,11 @@ Feature: Define track schedules to perform activities
 
     When I click on "Dynamic" "button"
     Then the following fields match these values:
-      | scheduleDynamic[count]      | 1     |
-      | scheduleDynamic[count_to]   | 4     |
-      | scheduleDynamic[unit]       | weeks |
-      | scheduleDynamic[direction]  | after |
+      | scheduleDynamic[count]           | 1                  |
+      | scheduleDynamic[count_to]        | 4                  |
+      | scheduleDynamic[unit]            | weeks              |
+      | scheduleDynamic[direction]       | after              |
+      | scheduleDynamic[resolver_option] | User creation date |
 
   Scenario: Check due date is disabled by default and can be enabled
     Given I log in as "admin"
@@ -300,10 +309,11 @@ Feature: Define track schedules to perform activities
     When I click on "Open-ended" "button"
     And I click on "Dynamic" "button"
     And I set the following fields to these values:
-      | scheduleDynamic[count]      | 3     |
-      | scheduleDynamic[unit]       | weeks |
-      | scheduleDynamic[direction]  | after |
-      | dueDateRelative[count]      | 0     |
+      | scheduleDynamic[count]           | 3                  |
+      | scheduleDynamic[unit]            | weeks              |
+      | scheduleDynamic[direction]       | after              |
+      | scheduleDynamic[resolver_option] | User creation date |
+      | dueDateRelative[count]           | 0                  |
     And I save the activity schedule
     Then I should see "Due date must be after the creation end date"
     When I set the following fields to these values:
@@ -319,11 +329,12 @@ Feature: Define track schedules to perform activities
     When I click on "Limited" "button"
     And I click on "Dynamic" "button"
     And I set the following fields to these values:
-      | scheduleDynamic[count]      | 1     |
-      | scheduleDynamic[count_to]   | 4     |
-      | scheduleDynamic[unit]       | weeks |
-      | scheduleDynamic[direction]  | after |
-      | dueDateRelative[count]      | 0     |
+      | scheduleDynamic[count]           | 1                  |
+      | scheduleDynamic[count_to]        | 4                  |
+      | scheduleDynamic[unit]            | weeks              |
+      | scheduleDynamic[direction]       | after              |
+      | scheduleDynamic[resolver_option] | User creation date |
+      | dueDateRelative[count]           | 0                  |
     And I save the activity schedule
     Then I should see "Due date must be after the creation end date"
     When I set the following fields to these values:
@@ -343,11 +354,11 @@ Feature: Define track schedules to perform activities
       | scheduleFixed[to]   | 2030-12-30 |
     And I click on the "true" tui radio in the "dueDateIsFixed" tui radio group
     And I set the following fields to these values:
-      | dueDateFixed[from]  | 2030-12-30 |
+      | dueDateFixed[from] | 2030-12-30 |
     And I save the activity schedule
     Then I should see "Due date must be after the creation end date"
     When I set the following fields to these values:
-      | dueDateFixed[from]  | 2030-12-31 |
+      | dueDateFixed[from] | 2030-12-31 |
     And I save the activity schedule
     Then I should see "Activity schedule saved" in the tui "success" notification toast
     When I reload the page
@@ -369,8 +380,8 @@ Feature: Define track schedules to perform activities
     When I reload the page
     And I click on "Assignments" "link"
     Then the following fields match these values:
-      | dueDateIsFixed         | false  |
-      | dueDateRelative[count] | 4      |
+      | dueDateIsFixed         | false |
+      | dueDateRelative[count] | 4     |
 
   Scenario: Check multiple job assignments schedule settings when multiple job assignments enabled
     Given I log in as "admin"
@@ -385,7 +396,7 @@ Feature: Define track schedules to perform activities
     When I reload the page
     And I click on "Assignments" "link"
     Then the following fields match these values:
-      | additionalSettings[multiple_job_assignment]   | ONE_PER_SUBJECT |
+      | additionalSettings[multiple_job_assignment] | ONE_PER_SUBJECT |
 
   Scenario: Check multiple job assignments schedule settings when multiple job assignments disabled
     Given I log in as "admin"
@@ -422,17 +433,17 @@ Feature: Define track schedules to perform activities
     And I click on the "AFTER_COMPLETION" tui radio in the "repeatingType" tui radio group
     # When setting these fields in a single step, the count is not set - probably due to timing issues
     And I set the following fields to these values:
-      | repeatingRelativeDates[AFTER_COMPLETION][count]  | 2     |
+      | repeatingRelativeDates[AFTER_COMPLETION][count] | 2 |
     And I set the following fields to these values:
-      | repeatingRelativeDates[AFTER_COMPLETION][unit]   | weeks |
+      | repeatingRelativeDates[AFTER_COMPLETION][unit] | weeks |
     And I save the activity schedule
     Then I should see "Activity schedule saved" in the tui "success" notification toast
     When I reload the page
     And I click on "Assignments" "link"
     Then the following fields match these values:
-      | repeatingType                                    | AFTER_COMPLETION |
-      | repeatingRelativeDates[AFTER_COMPLETION][count]  | 2                |
-      | repeatingRelativeDates[AFTER_COMPLETION][unit]   | weeks            |
+      | repeatingType                                   | AFTER_COMPLETION |
+      | repeatingRelativeDates[AFTER_COMPLETION][count] | 2                |
+      | repeatingRelativeDates[AFTER_COMPLETION][unit]  | weeks            |
 
     And I click on the "true" tui radio in the "repeatingIsLimited" tui radio group
     And I set the following fields to these values:
@@ -450,3 +461,47 @@ Feature: Define track schedules to perform activities
     Then I should see "until the creation period ends, with"
     When I click on "Open-ended" "button"
     Then I should see "no maximum limit (repeating continues indefinitely)"
+
+  Scenario: User custom field dynamic schedule
+    Given I log in as "admin"
+    And I navigate to "User profile fields" node in "Site administration > Users"
+    When I set the following fields to these values:
+      | datatype | datetime |
+    And I set the following fields to these values:
+      | Name                       | Date one |
+      | Short name                 | date1    |
+      | Should the data be unique? | Yes      |
+    And I press "Save changes"
+    Then I should see "Date one"
+    When I set the following fields to these values:
+      | datatype | datetime |
+    And I set the following fields to these values:
+      | Name                       | Date two |
+      | Short name                 | date2    |
+      | Should the data be unique? | Yes      |
+    And I press "Save changes"
+    Then I should see "Date two"
+    When I navigate to the manage perform activities page
+    And I click on "My Test Activity" "link"
+    And I click on "Assignments" "link"
+    When I click on "Open-ended" "button"
+    And I click on "Dynamic" "button"
+    And I set the following fields to these values:
+      | scheduleDynamic[count]           | 3                  |
+      | scheduleDynamic[unit]            | weeks              |
+      | scheduleDynamic[direction]       | after              |
+      | scheduleDynamic[resolver_option] | Date one           |
+    And I save the activity schedule
+    Then I should see "Activity schedule saved" in the tui "success" notification toast
+    When I reload the page
+    And I click on "Assignments" "link"
+    Then the following fields match these values:
+      | scheduleDynamic[resolver_option] | Date one |
+    When I navigate to "User profile fields" node in "Site administration > Users"
+    And I click on "Delete" "link" in the "Date one" "table_row"
+    Then I should not see "Date one"
+    When I navigate to the manage perform activities page
+    And I click on "My Test Activity" "link"
+    And I click on "Assignments" "link"
+    Then the following fields match these values:
+      | scheduleDynamic[resolver_option] | Date one (deleted) |

@@ -62,13 +62,12 @@ final class track_user_assignment_repository extends repository {
      */
     public function filter_by_time_interval(): self {
         $now = time();
-        $this->where(function (builder $builder) use ($now) {
-            $builder->where_null('period_start_date')
-                ->or_where('period_start_date', '<=', $now);
-        })->where(function (builder $builder) use ($now) {
-            $builder->where_null('period_end_date')
-                ->or_where('period_end_date', '>', $now);
-        });
+        $this->where_not_null('period_start_date')
+            ->where('period_start_date', '<=', $now)
+            ->where(function (builder $builder) use ($now) {
+                $builder->where_null('period_end_date')
+                    ->or_where('period_end_date', '>', $now);
+            });
 
         return $this;
     }

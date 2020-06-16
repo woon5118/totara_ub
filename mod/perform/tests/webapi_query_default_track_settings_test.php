@@ -41,8 +41,8 @@ use totara_webapi\phpunit\webapi_phpunit_helper;
  *
  * @group perform
  */
-class mod_perform_webapi_query_default_track_testcase extends advanced_testcase {
-    private const QUERY = 'mod_perform_default_track';
+class mod_perform_webapi_query_default_track_settings_testcase extends advanced_testcase {
+    private const QUERY = 'mod_perform_default_track_settings';
 
     use webapi_phpunit_helper;
 
@@ -61,7 +61,7 @@ class mod_perform_webapi_query_default_track_testcase extends advanced_testcase 
             'wrong count'
         );
 
-        foreach ($actual_assignments->all() as $assignment) {
+        foreach ($actual_assignments as $assignment) {
             $group = $assignment->group;
             $group_id = $group->get_id();
             $this->assertArrayHasKey($group_id, $groups_by_id, 'unknown track');
@@ -79,10 +79,12 @@ class mod_perform_webapi_query_default_track_testcase extends advanced_testcase 
     public function test_successful_ajax_call(): void {
         [$groups_by_id, $args, $context] = $this->setup_env();
 
-        $result = $this->parsed_graphql_operation(self::QUERY, $args);
-        $this->assert_webapi_operation_successful($result);
+        $raw_result = $this->execute_graphql_operation(self::QUERY, $args);
 
-        $track = $this->get_webapi_operation_data($result);
+        self::assertCount(0, $raw_result->errors);
+        self::assertGreaterThan(0, count($raw_result->data['mod_perform_available_date_resolver_options']));
+
+        $track = $raw_result->data['mod_perform_default_track'];
         $this->assertEquals(track_status::ACTIVE, $track['status'], 'wrong track status');
 
         $actual_assignments = $track['assignments'];
@@ -106,23 +108,32 @@ class mod_perform_webapi_query_default_track_testcase extends advanced_testcase 
 
         $feature = 'performance_activities';
         advanced_feature::disable($feature);
-        $result = $this->parsed_graphql_operation(self::QUERY, $args);
-        $this->assert_webapi_operation_failed($result, 'Feature performance_activities is not available.');
+        $raw_result = $this->execute_graphql_operation(self::QUERY, $args);
+        self::assertCount(1, $raw_result->errors);
+        self::assertEquals('Feature performance_activities is not available.', $raw_result->errors[0]->message);
         advanced_feature::enable($feature);
 
-        $result = $this->parsed_graphql_operation(self::QUERY, []);
-        $this->assert_webapi_operation_failed($result, 'Variable "$activity_id" of required type "param_integer!" was not provided.');
 
-        $result = $this->parsed_graphql_operation(self::QUERY, ['activity_id' => 0]);
-        $this->assert_webapi_operation_failed($result, 'Invalid parameter value detected (invalid activity id)');
+        $raw_result = $this->execute_graphql_operation(self::QUERY, []);
+        self::assertCount(1, $raw_result->errors);
+        self::assertEquals('Variable "$activity_id" of required type "param_integer!" was not provided.', $raw_result->errors[0]->message);
+
+
+        $raw_result = $this->execute_graphql_operation(self::QUERY, ['activity_id' => 0]);
+        self::assertCount(1, $raw_result->errors);
+        self::assertEquals('Invalid parameter value detected (invalid activity id)', $raw_result->errors[0]->message);
+
 
         $id = 1293;
-        $result = $this->parsed_graphql_operation(self::QUERY, ['activity_id' => $id]);
-        $this->assert_webapi_operation_failed($result, "Invalid activity");
+        $raw_result = $this->execute_graphql_operation(self::QUERY, ['activity_id' => $id]);
+        self::assertCount(1, $raw_result->errors);
+        self::assertEquals('Invalid activity', $raw_result->errors[0]->message);
+
 
         self::setGuestUser();
-        $result = $this->parsed_graphql_operation(self::QUERY, $args);
-        $this->assert_webapi_operation_failed($result, 'Course or activity not accessible.');
+        $raw_result = $this->execute_graphql_operation(self::QUERY, $args);
+        self::assertCount(1, $raw_result->errors);
+        self::assertEquals('Course or activity not accessible. (Not enrolled)', $raw_result->errors[0]->message);
     }
 
     /**

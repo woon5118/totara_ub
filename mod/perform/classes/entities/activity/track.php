@@ -23,11 +23,13 @@
 
 namespace mod_perform\entities\activity;
 
+use coding_exception;
 use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\entity\relations\belongs_to;
 use core\orm\entity\relations\has_many;
 use core\orm\entity\relations\has_many_through;
+use mod_perform\dates\resolvers\dynamic\resolver_option;
 
 /**
  * Represents an activity track record in the repository.
@@ -45,6 +47,7 @@ use core\orm\entity\relations\has_many_through;
  * @property int $schedule_dynamic_count_to number of units
  * @property int $schedule_dynamic_unit one of SCHEDULE_DYNAMIC_UNIT_XXX or null
  * @property int $schedule_dynamic_direction one of SCHEDULE_DYNAMIC_DIRECTION_XXX or null
+ * @property resolver_option | null $schedule_resolver_option a resolver_option for dynamic schedule (saved as json)
  * @property bool $schedule_needs_sync Flag indicating that the schedule sync task should run for this track
  * @property bool $due_date_is_enabled
  * @property bool $due_date_is_fixed
@@ -118,6 +121,49 @@ class track extends entity {
             'id',
             'track_user_assignment_id'
         );
+    }
+
+    /**
+     * Unserialize schedule_resolver_option.
+     *
+     * @return resolver_option
+     */
+    protected function get_schedule_resolver_option_attribute(): ?resolver_option {
+        $json_encoded =  $this->get_attributes_raw()['schedule_resolver_option'];
+
+        if ($json_encoded === null) {
+            return null;
+        }
+
+        return resolver_option::create_from_json($json_encoded);
+    }
+
+    /**
+     * Serialize (or skip) schedule_resolver_option.
+     *
+     * @param string | resolver_option | null
+     * @return track
+     */
+    protected function set_schedule_resolver_option_attribute($resolver_option = null): self {
+        $json_encoded = $this->encode_resolver_option($resolver_option);
+
+        return $this->set_attribute_raw('schedule_resolver_option', $json_encoded);
+    }
+
+    protected function encode_resolver_option($resolver_option) {
+        switch ($resolver_option) {
+            case null:
+                return null;
+            case is_array($resolver_option):
+            case is_string($resolver_option):
+                return json_encode(resolver_option::create_from_json($resolver_option));
+            case $resolver_option instanceof resolver_option:
+                return json_encode($resolver_option);
+            default:
+                throw new coding_exception(
+                    'schedule dynamic resolver must be a resolver_option, null, or json encoded resolver_option'
+                );
+        }
     }
 
     /**

@@ -24,12 +24,13 @@
 
 use core\collection;
 
-use mod_perform\entities\activity\activity as activity_entity;
+use core\orm\entity\entity;
+use mod_perform\dates\resolvers\dynamic\resolver_option;
+use mod_perform\dates\resolvers\dynamic\user_creation_date;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\track;
 use mod_perform\entities\activity\track as track_entity;
 use mod_perform\models\activity\track_status;
-use mod_perform\state\activity\active;
 use PHPUnit\Framework\MockObject\MockObject;
 
 /**
@@ -153,6 +154,7 @@ class mod_perform_track_model_testcase extends advanced_testcase {
      * @param int $count_from
      * @param int $unit
      * @param int $direction
+     * @param resolver_option $resolver_option
      * @param string $expected_exception_message
      * @throws coding_exception
      */
@@ -160,6 +162,7 @@ class mod_perform_track_model_testcase extends advanced_testcase {
         int $count_from,
         int $unit,
         int $direction,
+        resolver_option $resolver_option,
         string $expected_exception_message
     ): void {
         $track = track::load_by_entity($this->mock_existing_entity(track_entity::class));
@@ -171,7 +174,8 @@ class mod_perform_track_model_testcase extends advanced_testcase {
             $count_from,
             $unit,
             track_entity::SCHEDULE_DYNAMIC_UNIT_DAY,
-            $direction
+            $direction,
+            $resolver_option
         );
     }
 
@@ -182,38 +186,52 @@ class mod_perform_track_model_testcase extends advanced_testcase {
      * "existing" entity, such as testing a model method that doesn't directly need the database.
      *
      * @param string $class
-     * @return \core\orm\entity\entity|MockObject
+     * @return entity | MockObject
      */
-    protected function mock_existing_entity(string $class): \core\orm\entity\entity {
-        $mock = $this->getMockBuilder($class)->getMock();
+    protected function mock_existing_entity(string $class): entity {
+        $mock = $this->getMockBuilder($class)->setMethods(['exists'])->getMock();
         $mock->method('exists')->willReturn(true);
 
         return $mock;
     }
 
     public function invalid_open_dynamic_schedule_from_to_permutations_provider(): array {
+        $available_resolver_option = (new user_creation_date())->get_options()->first();
+        $unavailable_resolver_option = new resolver_option(null, 'default', 'Birthday');
+
         return [
-            [
+            'From after to' => [
                 100,
                 0,
                 track_entity::SCHEDULE_DYNAMIC_DIRECTION_AFTER,
+                $available_resolver_option,
                 '"count_from" must not be after "count_to" when dynamic schedule direction is "AFTER"'
             ],
-            [
+            'To before from' => [
                 0,
                 100,
                 track_entity::SCHEDULE_DYNAMIC_DIRECTION_BEFORE,
+                $available_resolver_option,
                 'count_from" must not be before "count_to" when dynamic schedule direction is "BEFORE"'
+            ],
+            'Unavailable date resolver option' => [
+                100,
+                0,
+                track_entity::SCHEDULE_DYNAMIC_DIRECTION_BEFORE,
+                $unavailable_resolver_option,
+                'Resolver option must be available'
             ],
         ];
     }
 
-    public function set_schedule_methods_data_provider() {
+    public function set_schedule_methods_data_provider(): array {
+        $resolver_option = resolver_option::all_available()->first();
+
         return [
             ['set_schedule_open_fixed', [111]],
             ['set_schedule_closed_fixed', [111, 222]],
-            ['set_schedule_closed_dynamic', [111, 222, 1, 0]],
-            ['set_schedule_open_dynamic', [111, 1, 1]],
+            ['set_schedule_closed_dynamic', [111, 222, 1, 0, $resolver_option]],
+            ['set_schedule_open_dynamic', [111, 1, 1, $resolver_option]],
         ];
     }
 
@@ -226,6 +244,7 @@ class mod_perform_track_model_testcase extends advanced_testcase {
         $this->setAdminUser();
 
         $track = $this->create_activity_track('DRAFT');
+
 
         /** @var track_entity $track_entity */
         $track_entity = track_entity::repository()->find($track->get_id());
@@ -289,18 +308,20 @@ class mod_perform_track_model_testcase extends advanced_testcase {
         $this->assertEquals(0, $track_entity->schedule_needs_sync);
     }
 
-    public function schedule_changes_data_provider() {
+    public function schedule_changes_data_provider(): array {
+        $resolver_option = resolver_option::all_available()->first();
+
         return [
             ['set_schedule_open_fixed', [111], [222]],
             ['set_schedule_closed_fixed', [111, 999], [222, 999]],
             ['set_schedule_closed_fixed', [111, 999], [111, 888]],
-            ['set_schedule_closed_dynamic', [111, 999, 1, 0], [222, 999, 1, 0]],
-            ['set_schedule_closed_dynamic', [111, 999, 1, 0], [111, 888, 1, 0]],
-            ['set_schedule_closed_dynamic', [111, 999, 1, 0], [111, 999, 0, 0]],
-            ['set_schedule_closed_dynamic', [111, 999, 1, 0], [999, 111, 1, 1]],
-            ['set_schedule_open_dynamic', [111, 1, 1], [222, 1, 1]],
-            ['set_schedule_open_dynamic', [111, 1, 1], [111, 0, 1]],
-            ['set_schedule_open_dynamic', [111, 1, 1], [111, 1, 0]],
+            ['set_schedule_closed_dynamic', [111, 999, 1, 0, $resolver_option], [222, 999, 1, 0, $resolver_option]],
+            ['set_schedule_closed_dynamic', [111, 999, 1, 0, $resolver_option], [111, 888, 1, 0, $resolver_option]],
+            ['set_schedule_closed_dynamic', [111, 999, 1, 0, $resolver_option], [111, 999, 0, 0, $resolver_option]],
+            ['set_schedule_closed_dynamic', [111, 999, 1, 0, $resolver_option], [999, 111, 1, 1, $resolver_option]],
+            ['set_schedule_open_dynamic', [111, 1, 1, $resolver_option], [222, 1, 1, $resolver_option]],
+            ['set_schedule_open_dynamic', [111, 1, 1, $resolver_option], [111, 0, 1, $resolver_option]],
+            ['set_schedule_open_dynamic', [111, 1, 1, $resolver_option], [111, 1, 0, $resolver_option]],
         ];
     }
 
@@ -406,6 +427,66 @@ class mod_perform_track_model_testcase extends advanced_testcase {
         $this->expectExceptionMessage('Cannot set fixed due date earlier than the schedule end date');
 
         $track->validate();
+    }
+
+    public function test_get_resolver_option_when_set(): void {
+        /** @var track_entity | MockObject $entity */
+        $entity = $this->mock_existing_entity(track_entity::class);
+
+        /** @var resolver_option $option */
+        $option = (new user_creation_date())->get_options()->first();
+
+        $entity->schedule_resolver_option = $option;
+
+        $track = new track($entity);
+
+        $selected_option = $track->schedule_resolver_option;
+
+        self::assertInstanceOf(resolver_option::class, $selected_option);
+
+        self::assertEqualsCanonicalizing([
+            'resolver_class_name' => user_creation_date::class,
+            'option_key' => user_creation_date::DEFAULT_KEY,
+            'display_name' => 'User creation date',
+            'is_available' => true,
+        ], $selected_option->jsonSerialize());
+    }
+
+    public function test_get_resolver_option_when_key_is_no_longer_available(): void {
+        /** @var track_entity | MockObject $entity */
+        $entity = $this->mock_existing_entity(track_entity::class);
+
+        /** @var resolver_option $option */
+        $option = (new user_creation_date())->get_options()->first();
+
+        $data = $option->jsonSerialize();
+        $data['option_key'] = 'non-existing';
+
+        $entity->schedule_resolver_option = $data;
+
+        $track = new track($entity);
+
+        $selected_option = $track->schedule_resolver_option;
+
+        self::assertInstanceOf(resolver_option::class, $selected_option);
+
+        self::assertEquals([
+            'resolver_class_name' => user_creation_date::class,
+            'option_key' => 'non-existing',
+            'display_name' => 'User creation date',
+            'is_available' => false,
+        ], $selected_option->jsonSerialize());
+    }
+
+    public function test_get_resolver_option_when_not_set(): void {
+        /** @var track_entity | MockObject $entity */
+        $entity = $this->mock_existing_entity(track_entity::class);
+
+        $entity->schedule_resolver_option = null;
+
+        $track = new track($entity);
+
+        self::assertNull($track->schedule_resolver_option);
     }
 
 }

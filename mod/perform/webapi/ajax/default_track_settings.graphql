@@ -1,4 +1,4 @@
-query mod_perform_default_track($activity_id: param_integer!) {
+query mod_perform_default_track_settings($activity_id: param_integer!) {
   mod_perform_default_track(activity_id: $activity_id) {
     id
     description
@@ -13,6 +13,12 @@ query mod_perform_default_track($activity_id: param_integer!) {
     schedule_dynamic_count_to
     schedule_dynamic_unit
     schedule_dynamic_direction
+    schedule_resolver_option {
+      resolver_class_name
+      option_key
+      display_name
+      is_available
+    }
     due_date_is_enabled
     due_date_is_fixed
     due_date_fixed
@@ -33,5 +39,11 @@ query mod_perform_default_track($activity_id: param_integer!) {
         name
       }
     }
+  }
+  mod_perform_available_date_resolver_options {
+    resolver_class_name
+    option_key
+    display_name
+    is_available
   }
 }

@@ -164,6 +164,8 @@ class mod_perform_webapi_resolver_mutation_update_track_due_date_testcase
     }
 
     public function test_with_validation_errors(): void {
+        [, $resolver_option_input] = $this->get_user_create_date_resolver_option();
+
         // To must be after or equal to from.
         $args = [
             'track_schedule' => [
@@ -174,6 +176,7 @@ class mod_perform_webapi_resolver_mutation_update_track_due_date_testcase
                 'schedule_dynamic_direction' => 'AFTER',
                 'schedule_dynamic_count_from' => 200,
                 'schedule_dynamic_count_to' => 100,
+                'schedule_resolver_option' => $resolver_option_input,
                 'due_date_is_enabled' => false,
                 'repeating_is_enabled' => false,
             ],

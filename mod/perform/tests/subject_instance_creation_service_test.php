@@ -225,16 +225,21 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
         $this->assertEquals(0, subject_instance::repository()->count());
     }
 
-    public function period_data_provider() {
+    public function period_data_provider(): array {
+        // Note that while an end date only should not happen in the real system.,
+        // having both null start and end date can happen when there the schedule
+        // window period is using a custom date resolver which can have unset
+        // reference dates.
+
         $yesterday = time() - 86400;
         $tomorrow = time() + 86400;
         return [
-            [null, null, true],
-            [$yesterday, $tomorrow, true],
-            [$yesterday, null, true],
-            [null, $tomorrow, true],
-            [$tomorrow, null, false],
-            [null, $yesterday, false],
+            'No dates (empty reference dates)' => [null, null, false],
+            'Closed schedule inside assignment period' => [$yesterday, $tomorrow, true],
+            'Open ended inside assignment period' => [$yesterday, null, true],
+            'End date only within assignment period (invalid combination)' => [null, $tomorrow, false],
+            'Start date only, outside assignment period' => [$tomorrow, null, false],
+            'No start, end date outside assignment period (invalid combination)' => [null, $yesterday, false],
         ];
     }
 

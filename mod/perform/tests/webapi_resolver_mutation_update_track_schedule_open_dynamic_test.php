@@ -22,9 +22,8 @@
  * @category test
  */
 
+use mod_perform\dates\resolvers\dynamic\resolver_option;
 use mod_perform\entities\activity\track as track_entity;
-use mod_perform\models\activity\activity;
-use mod_perform\models\activity\track;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 require_once(__DIR__ . '/generator/activity_generator_configuration.php');
@@ -43,6 +42,9 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_dynamic_te
     public function test_correct_track_is_updated(): void {
         global $DB;
 
+        /** @var $date_resolver_option resolver_option */
+        [$date_resolver_option, $resolver_selection] = $this->get_user_create_date_resolver_option();
+
         $args = [
             'track_schedule' => [
                 'track_id' => $this->track1_id,
@@ -51,6 +53,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_dynamic_te
                 'schedule_dynamic_count_from' => 555,
                 'schedule_dynamic_unit' => 'WEEK',
                 'schedule_dynamic_direction' => 'BEFORE',
+                'schedule_resolver_option' => $resolver_selection,
                 'due_date_is_enabled' => false,
                 'repeating_is_enabled' => false,
             ],
@@ -76,6 +79,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_dynamic_te
         self::assertNull($result_track['schedule_dynamic_count_to']);
         self::assertEquals('WEEK', $result_track['schedule_dynamic_unit']);
         self::assertEquals('BEFORE', $result_track['schedule_dynamic_direction']);
+        self::assertEquals($date_resolver_option->jsonSerialize(), $result_track['schedule_resolver_option']);
 
         // Manually make the changes that we expect to make.
         $affected_track = $before_tracks[$this->track1_id];
@@ -87,6 +91,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_dynamic_te
         $affected_track->schedule_dynamic_count_to = null;
         $affected_track->schedule_dynamic_unit = track_entity::SCHEDULE_DYNAMIC_UNIT_WEEK;
         $affected_track->schedule_dynamic_direction = track_entity::SCHEDULE_DYNAMIC_DIRECTION_BEFORE;
+        $affected_track->schedule_resolver_option = json_encode($date_resolver_option);
         $affected_track->schedule_needs_sync = 1;
         $affected_track->due_date_is_enabled = 0;
         $affected_track->due_date_is_fixed = null;
@@ -106,6 +111,8 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_dynamic_te
     }
 
     public function test_with_validation_errors(): void {
+        [, $resolver_selection] = $this->get_user_create_date_resolver_option();
+
         // To must be after or equal to from.
         $args = [
             'track_schedule' => [
@@ -114,6 +121,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_dynamic_te
                 'schedule_is_fixed' => false,
                 'schedule_dynamic_unit' => 'WEEK',
                 'schedule_dynamic_direction' => 'AFTER',
+                'schedule_resolver_option' => $resolver_selection,
                 'schedule_dynamic_count_from' => -234,
                 'due_date_is_enabled' => false,
                 'repeating_is_enabled' => false,
@@ -128,4 +136,5 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_dynamic_te
             $args
         );
     }
+
 }

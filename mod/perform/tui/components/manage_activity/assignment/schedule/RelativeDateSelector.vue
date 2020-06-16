@@ -87,6 +87,23 @@
           :disabled="disabled"
         />
       </div>
+      <div
+        v-if="hasDirection"
+        class="tui-performAssignmentScheduleRelativeDateSelector__reference-date"
+      >
+        <Label
+          :for="$id('relative-date-reference-date')"
+          :label="$str('relative_date_selector_reference_date', 'mod_perform')"
+          hidden
+        />
+        <FormSelect
+          v-if="dateResolverOptions"
+          :id="$id('relative-date-reference-date')"
+          name="resolver_option"
+          :options="resolverOptionsForSelect"
+          :disabled="disabled"
+        />
+      </div>
     </div>
   </FormScope>
 </template>
@@ -130,6 +147,10 @@ export default {
         return this.$str('relative_date_selector_until', 'mod_perform');
       },
     },
+    dateResolverOptions: {
+      type: Array,
+      required: false,
+    },
   },
 
   computed: {
@@ -156,6 +177,18 @@ export default {
           id: RELATIVE_DATE_DIRECTION_AFTER,
         },
       ];
+    },
+    resolverOptionsForSelect() {
+      if (!this.dateResolverOptions) {
+        return [];
+      }
+
+      return this.dateResolverOptions.map(option => {
+        return {
+          label: option.display_name,
+          id: `${option.resolver_class_name}--${option.option_key}`,
+        };
+      });
     },
   },
 
@@ -215,6 +248,7 @@ export default {
       "relative_date_selector_count",
       "relative_date_selector_days",
       "relative_date_selector_direction",
+      "relative_date_selector_reference_date",
       "relative_date_selector_error_range",
       "relative_date_selector_from",
       "relative_date_selector_unit",

@@ -20,11 +20,14 @@
  * @author Jaron Steenson <jaron.steenson@totaralearning.com>
  * @package mod_perform
  */
-namespace mod_perform\dates\resolvers;
+namespace mod_perform\dates\resolvers\dynamic;
 
+use core\collection;
 use core\orm\query\builder;
 
-class user_creation_date_resolver extends base_dynamic_date_resolver {
+class user_creation_date extends base_dynamic_date_resolver {
+
+    public const DEFAULT_KEY = 'default';
 
     /**
      * @inheritDoc
@@ -41,4 +44,35 @@ class user_creation_date_resolver extends base_dynamic_date_resolver {
             })->all(true);
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function get_options(): collection {
+        return new collection(
+            [$this->make_option(static::DEFAULT_KEY)]
+        );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function option_is_available(string $option_key): bool {
+        return in_array($option_key, $this->get_supported_option_keys(), true);
+    }
+
+    protected function get_supported_option_keys(): array {
+        return [static::DEFAULT_KEY];
+    }
+
+    protected function get_option_display_name(?string $option_key) {
+        return get_string('user_creation_date', 'mod_perform');
+    }
+
+    protected function make_option(string $option_key): resolver_option {
+        return new resolver_option(
+            $this,
+            $option_key,
+            $this->get_option_display_name($option_key)
+        );
+    }
 }

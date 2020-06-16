@@ -28,8 +28,9 @@ use core\orm\collection;
 use core\orm\entity\model;
 use mod_perform\constants;
 use mod_perform\dates\resolvers\date_resolver;
+use mod_perform\dates\resolvers\dynamic\dynamic_date_resolver;
+use mod_perform\dates\resolvers\dynamic\resolver_option;
 use mod_perform\dates\resolvers\fixed_range_resolver;
-use mod_perform\dates\resolvers\user_creation_date_resolver;
 use mod_perform\dates\schedule_constants;
 use mod_perform\entities\activity\track as track_entity;
 use mod_perform\models\activity\track as track_model;
@@ -54,6 +55,7 @@ use moodle_exception;
  * @property-read int $schedule_dynamic_count_to
  * @property-read string $schedule_dynamic_unit
  * @property-read string $schedule_dynamic_direction
+ * @property-read resolver_option | null $schedule_resolver_option
  * @property-read bool $due_date_is_enabled
  * @property-read bool $due_date_is_fixed
  * @property-read int $due_date_fixed
@@ -81,9 +83,8 @@ class track extends model {
         'schedule_is_open',
         'schedule_is_fixed',
         'schedule_fixed_from',
-        'schedule_fixed_to',
         'schedule_dynamic_count_from',
-        'schedule_dynamic_count_to',
+        'schedule_resolver_option',
         'due_date_is_enabled',
         'due_date_is_fixed',
         'due_date_fixed',
@@ -102,6 +103,8 @@ class track extends model {
         'assignments',
         'subject_instance_generation_control_is_enabled',
         'subject_instance_generation',
+        'schedule_fixed_to',
+        'schedule_dynamic_count_to',
         'schedule_dynamic_direction',
         'schedule_dynamic_unit',
         'due_date_relative_unit',
@@ -147,6 +150,7 @@ class track extends model {
         $entity->schedule_dynamic_count_to = null;
         $entity->schedule_dynamic_unit = null;
         $entity->schedule_dynamic_direction = null;
+        $entity->schedule_resolver_option = null;
         $entity->due_date_is_enabled = false;
         $entity->due_date_is_fixed = null;
         $entity->due_date_fixed = null;
@@ -331,6 +335,7 @@ class track extends model {
      * @param int $from
      * @param int $to
      * @return track
+     * @throws moodle_exception
      */
     public function set_schedule_closed_fixed(int $from, int $to): self {
         if ($to < $from) {
@@ -378,9 +383,17 @@ class track extends model {
      * @param int $count_to
      * @param int $unit
      * @param int $direction
+     * @param resolver_option $resolver_option
      * @return track
+     * @throws coding_exception
      */
-    public function set_schedule_closed_dynamic(int $count_from, int $count_to, int $unit, int $direction): self {
+    public function set_schedule_closed_dynamic(
+        int $count_from,
+        int $count_to,
+        int $unit,
+        int $direction,
+        resolver_option $resolver_option
+    ): self {
         if ($count_from < 0) {
             throw new coding_exception('Count from must be a positive integer');
         }
@@ -401,6 +414,10 @@ class track extends model {
             throw new coding_exception('"count_from" must not be before "count_to" when dynamic schedule direction is "BEFORE"');
         }
 
+        if (!$resolver_option->is_available()) {
+            throw new coding_exception('Resolver option must be available');
+        }
+
         $properties_to_update = [
             'schedule_is_open' => false,
             'schedule_is_fixed' => false,
@@ -408,6 +425,7 @@ class track extends model {
             'schedule_dynamic_count_to' => $count_to,
             'schedule_dynamic_unit' => $unit,
             'schedule_dynamic_direction' => $direction,
+            'schedule_resolver_option' => $resolver_option,
         ];
 
         $this->set_schedule_properties($properties_to_update);
@@ -423,9 +441,16 @@ class track extends model {
      * @param int $count_from
      * @param int $unit
      * @param int $direction
+     * @param resolver_option $resolver_option
      * @return track
+     * @throws coding_exception
      */
-    public function set_schedule_open_dynamic(int $count_from, int $unit, int $direction): self {
+    public function set_schedule_open_dynamic(
+        int $count_from,
+        int $unit,
+        int $direction,
+        resolver_option $resolver_option
+    ): self {
         if (!isset(self::get_dynamic_schedule_units()[$unit])) {
             throw new coding_exception('Invalid dynamic schedule unit');
         }
@@ -438,12 +463,17 @@ class track extends model {
             throw new coding_exception('Invalid dynamic schedule direction');
         }
 
+        if (!$resolver_option->is_available()) {
+            throw new coding_exception('Resolver option must be available');
+        }
+
         $properties_to_update = [
             'schedule_is_open' => true,
             'schedule_is_fixed' => false,
             'schedule_dynamic_count_from' => $count_from,
             'schedule_dynamic_unit' => $unit,
             'schedule_dynamic_direction' => $direction,
+            'schedule_resolver_option' => $resolver_option,
         ];
 
         $this->set_schedule_properties($properties_to_update);
@@ -456,7 +486,7 @@ class track extends model {
      *
      * @param int $method
      */
-    public function set_subject_instace_generation(int $method): void {
+    public function set_subject_instance_generation(int $method): void {
         if (!isset(self::get_subject_instance_generation_methods()[$method])) {
             throw new coding_exception('Invalid subject instance generation method');
         }
@@ -485,6 +515,7 @@ class track extends model {
         $entity->schedule_dynamic_count_to = $properties['schedule_dynamic_count_to'] ?? null;
         $entity->schedule_dynamic_unit = $properties['schedule_dynamic_unit'] ?? null;
         $entity->schedule_dynamic_direction = $properties['schedule_dynamic_direction'] ?? null;
+        $entity->schedule_resolver_option = $properties['schedule_resolver_option'] ?? null;
 
         if ($this->get_activity()->get_status_state() instanceof active
             && $this->do_schedule_changes_need_sync($entity_before_changes)) {
@@ -809,22 +840,31 @@ class track extends model {
      * Get the date resolver for this track and a given set of users.
      *
      * @param array $user_ids
-     * @return date_resolver
+     * @return date_resolver|dynamic_date_resolver
      */
-    public function get_date_resolver(array $user_ids): date_resolver {
+    public function get_date_resolver_for_users(array $user_ids): date_resolver {
         if ($this->schedule_is_fixed) {
-            $to = $this->schedule_is_open ? null : $this->schedule_fixed_to;
-
-            return new fixed_range_resolver($this->schedule_fixed_from, $to);
+            return new fixed_range_resolver($this->schedule_fixed_from, $this->get_schedule_fixed_to());
         }
 
-        $to = $this->schedule_is_open ? null : $this->schedule_dynamic_count_to;
+        $resolver_option = $this->entity->schedule_resolver_option;
 
-        return new user_creation_date_resolver(
+        if ($resolver_option === null) {
+            throw new coding_exception('Dynamic date resolver not set');
+        }
+
+        $resolver = $resolver_option->get_resolver();
+
+        if ($resolver === null) {
+            throw new coding_exception('Dynamic date resolver not set');
+        }
+
+        return $resolver->set_parameters(
             $this->schedule_dynamic_count_from,
-            $to,
+            $this->get_schedule_dynamic_count_to(),
             $this->get_schedule_dynamic_unit(),
             $this->get_schedule_dynamic_direction(),
+            $resolver_option->get_option_key(),
             $user_ids
         );
     }
@@ -875,11 +915,23 @@ class track extends model {
      * @return bool
      */
     public function is_per_job_subject_instance_generation(): bool {
+        if (!$this->get_subject_instance_generation_control_is_enabled()) {
+            return false;
+        }
+
         return (int) $this->entity->subject_instance_generation === track_entity::SUBJECT_INSTANCE_GENERATION_ONE_PER_JOB;
     }
 
     public function get_subject_instance_generation_control_is_enabled(): bool {
         return !empty(get_config(null, 'totara_job_allowmultiplejobs'));
+    }
+
+    public function get_schedule_dynamic_count_to() :?int {
+        return $this->entity->schedule_is_open ? null : $this->entity->schedule_dynamic_count_to;
+    }
+
+    public function get_schedule_fixed_to() :?int {
+        return $this->entity->schedule_is_open ? null : $this->entity->schedule_fixed_to;
     }
 
 }

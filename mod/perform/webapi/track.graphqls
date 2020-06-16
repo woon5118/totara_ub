@@ -4,6 +4,13 @@ type mod_perform_track_assignment {
   group: mod_perform_user_grouping!
 }
 
+type mod_perform_date_resolver_option {
+  resolver_class_name: String!
+  option_key: String
+  display_name: String!
+  is_available: Boolean!
+}
+
 """
 A list of possible units which can be used for relative dynamic date schedules
 """
@@ -51,6 +58,7 @@ type mod_perform_track {
   schedule_dynamic_count_to: Int
   schedule_dynamic_unit: mod_perform_track_dynamic_unit_enums
   schedule_dynamic_direction: mod_perform_track_dynamic_direction_enums
+  schedule_resolver_option: mod_perform_date_resolver_option
   due_date_is_enabled: Boolean!
   due_date_is_fixed: Boolean
   due_date_fixed: Int
@@ -75,6 +83,11 @@ extend type Query {
   multiple tracks per activity gets implemented in the front end.
   """
   mod_perform_default_track(activity_id: param_integer!): mod_perform_track!
+
+  """
+  Get all available options for dynamic schedule date resolver options.
+  """
+  mod_perform_available_date_resolver_options: [mod_perform_date_resolver_option!]!
 }
 
 input mod_perform_track_assignments_input {
@@ -86,6 +99,11 @@ input mod_perform_track_assignments_input {
 input mod_perform_create_track_input {
   activity_id: param_integer!
   description: param_text
+}
+
+input mod_perform_date_resolver_option_input {
+  resolver_class_name: param_text!
+  option_key: param_text
 }
 
 """
@@ -102,6 +120,7 @@ input mod_perform_track_schedule_input {
   schedule_dynamic_count_to: param_integer
   schedule_dynamic_unit: mod_perform_track_dynamic_unit_enums
   schedule_dynamic_direction: mod_perform_track_dynamic_direction_enums
+  schedule_resolver_option: mod_perform_date_resolver_option_input
   due_date_is_enabled: param_boolean!
   due_date_is_fixed: param_boolean
   due_date_fixed: param_integer

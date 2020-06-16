@@ -25,6 +25,7 @@
 use core\entities\user;
 use core\orm\entity\repository as entity_repository;
 use core\orm\query\builder;
+use mod_perform\dates\resolvers\dynamic\user_creation_date;
 use mod_perform\entities\activity\activity;
 use mod_perform\entities\activity\track;
 use mod_perform\entities\activity\track as track_entity;
@@ -660,11 +661,14 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
 
         $track1_id = $test_data->track1->id;
 
+        $resolver_option = (new user_creation_date())->get_options()->first();
+
         /** @var track_entity $track */
         $track = track_entity::repository()->find($track1_id);
         $track->schedule_is_open = false;
         $track->schedule_is_fixed = false;
         $track->schedule_dynamic_direction = track_entity::SCHEDULE_DYNAMIC_DIRECTION_BEFORE;
+        $track->schedule_resolver_option = $resolver_option;
         $track->schedule_dynamic_count_from = 7;
         $track->schedule_dynamic_count_to = 0;
         $track->schedule_dynamic_unit = track_entity::SCHEDULE_DYNAMIC_UNIT_DAY;

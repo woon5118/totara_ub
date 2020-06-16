@@ -146,6 +146,7 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
                 'schedule_dynamic_count_to',
                 'schedule_dynamic_unit',
                 'schedule_dynamic_direction',
+                'schedule_resolver_option',
                 'schedule_needs_sync',
                 'due_date_is_enabled',
                 'repeating_is_enabled',

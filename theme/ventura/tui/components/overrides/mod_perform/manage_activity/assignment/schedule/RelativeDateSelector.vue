@@ -30,6 +30,7 @@
   justify-content: flex-start;
 
   & > *:not(:last-child) {
+    margin-top: var(--tui-gap-1);
     margin-right: var(--tui-gap-1);
   }
 
@@ -43,6 +44,7 @@
   }
 
   .tui-formFieldError__inner {
+    margin-top: var(--tui-gap-1);
     min-width: 20rem; // Should find a way to handle this better.
   }
 }

@@ -16,6 +16,12 @@ mutation mod_perform_update_track_schedule(
       schedule_dynamic_count_to
       schedule_dynamic_unit
       schedule_dynamic_direction
+      schedule_resolver_option {
+        resolver_class_name
+        option_key
+        display_name
+        is_available
+      }
       due_date_is_enabled
       due_date_is_fixed
       due_date_fixed

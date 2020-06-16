@@ -30,7 +30,7 @@ interface date_resolver {
      * @param int $user_id
      * @return int
      */
-    public function get_start_for(int $user_id): int;
+    public function get_start_for(int $user_id): ?int;
 
     /**
      * Get the end date for a user.

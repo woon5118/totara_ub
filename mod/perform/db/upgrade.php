@@ -40,5 +40,20 @@ function xmldb_perform_upgrade($oldversion) {
         throw new upgrade_exception('mod_perform', '2020061500', 'Cannot upgrade from an earlier version - do a fresh install instead');
     }
 
+    if ($oldversion < 2020061201) {
+
+        // Define field completed_at to be added to perform_subject_instance.
+        $table = new xmldb_table('perform_track');
+        $field = new xmldb_field('schedule_resolver_option', XMLDB_TYPE_TEXT, null, null, null, null, null, 'schedule_dynamic_direction');
+
+        // Conditionally launch add field completed_at.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020061201, 'perform');
+    }
+
     return true;
 }

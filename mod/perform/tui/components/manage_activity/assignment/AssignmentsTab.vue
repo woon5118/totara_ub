@@ -102,7 +102,11 @@
       </template>
     </Table>
     <div class="tui-performManageActivityAssignmentsForm__summary">
-      <Schedule v-if="track" :track="track" />
+      <Schedule
+        v-if="track"
+        :track="track"
+        :date-resolver-options="dateResolverOptions"
+      />
     </div>
     <AudienceAdder
       :open="isAdderOpen"
@@ -140,7 +144,7 @@ import Table from 'totara_core/components/datatable/Table';
 import Schedule from 'mod_perform/components/manage_activity/assignment/Schedule';
 
 //GraphQL
-import TrackQuery from 'mod_perform/graphql/default_track';
+import TrackSettingsQuery from 'mod_perform/graphql/default_track_settings';
 import AddTrackAssignmentMutation from 'mod_perform/graphql/add_track_assignments';
 import RemoveTrackAssignmentMutation from 'mod_perform/graphql/remove_track_assignments';
 
@@ -171,6 +175,8 @@ export default {
   data() {
     return {
       track: null,
+      dateResolverOptions: [],
+      trackSettings: null,
       assignments: [],
       noAssignments: [
         {
@@ -209,6 +215,20 @@ export default {
           .map(assignment => assignment.group.id);
       }
       this.assignments;
+    },
+
+    /**
+     * Used so we can get both track and date resolver options in one query.
+     */
+    trackSettings(newValue) {
+      this.track = newValue.track;
+
+      if (this.track.schedule_resolver_option &&
+        this.track.schedule_resolver_option.is_available === false) {
+        this.dateResolverOptions = this.addedDeletedDateResolverOptionToList(newValue.dateResolverOptions);
+      } else {
+        this.dateResolverOptions = newValue.dateResolverOptions;
+      }
     },
   },
 
@@ -281,6 +301,29 @@ export default {
     },
 
     /**
+     * Add the currently selected date resolver to the front of the selections,
+     * with a modified "deleted" label.
+     */
+    addedDeletedDateResolverOptionToList(dateResolverOptions) {
+      const deletedDisplayName = this.$str(
+        'deleted_resolver_option_label',
+        'mod_perform',
+        this.track.schedule_resolver_option.display_name
+      );
+
+      const deletedOption = Object.assign(
+        {},
+        this.track.schedule_resolver_option,
+        {display_name: deletedDisplayName}
+      )
+
+      const options = [deletedOption]
+      options.push.apply(options, dateResolverOptions);
+
+      return options;
+    },
+
+    /**
      * Convenience function to execute a graphql mutation.
      */
     async updateAssignmentsInRepository(mutation, mutationName, assignments) {
@@ -333,14 +376,19 @@ export default {
   },
 
   apollo: {
-    track: {
-      query: TrackQuery,
+    trackSettings: {
+      query: TrackSettingsQuery,
       variables() {
         return {
           activity_id: this.activityId,
         };
       },
-      update: data => data.mod_perform_default_track,
+      update: data => {
+        return {
+          track: data.mod_perform_default_track,
+          dateResolverOptions: data.mod_perform_available_date_resolver_options,
+        };
+      },
     },
   },
 };
@@ -349,6 +397,7 @@ export default {
 <lang-strings>
   {
     "mod_perform" : [
+      "deleted_resolver_option_label",
       "user_group_assignment_add_group",
       "user_group_assignment_confirm_remove",
       "user_group_assignment_confirm_remove_title",
