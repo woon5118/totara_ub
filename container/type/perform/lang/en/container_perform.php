@@ -24,4 +24,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Performance activity container';
+$string['perform:backup'] = 'Backup performance activities';
 $string['perform:create'] = 'Create performance activities';
+$string['perform:restore'] = 'Restore performance activities';

@@ -22,12 +22,38 @@
  */
 
 $capabilities = [
-    // Create a performance container. Addtionally requires 'mod/perform:view_manage_activities' to access
-    // the page where creation is done.
+    // Create a performance container.
+    // Additionally requires 'mod/perform:view_manage_activities' to access the page where creation is done.
     'container/perform:create' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSECAT,
         'archetypes' => [
+            'performanceactivitycreator' => CAP_ALLOW,
+        ]
+    ],
+    // Backup a performance container.
+    // Requires course context as the container course the activity is in must be backed up.
+    // This and 'container/perform:restore' are required for cloning,
+    // and 'mod/perform:view_manage_activities' to access the page where cloning is done.
+    'container/perform:backup' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => [
+            'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
+            'performanceactivitycreator' => CAP_ALLOW,
+        ]
+    ],
+    // Restore a performance container.
+    // Requires course context as the container course the activity is in must be restored up.
+    // This and 'container/perform:backup' are required for cloning,
+    // and 'mod/perform:view_manage_activities' to access the page where cloning is done.
+    'container/perform:restore' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => [
+            'manager' => CAP_ALLOW,
+            'tenantdomainmanager' => CAP_ALLOW,
             'performanceactivitycreator' => CAP_ALLOW,
         ]
     ],

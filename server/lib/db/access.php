@@ -141,7 +141,6 @@ $capabilities = array(
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW,
             'tenantdomainmanager' => CAP_ALLOW,
-            'performanceactivitycreator' => CAP_ALLOW,
         ),
 
         'clonepermissionsfrom' =>  'moodle/site:backup'
@@ -251,7 +250,6 @@ $capabilities = array(
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW,
             'tenantdomainmanager' => CAP_ALLOW,
-            'performanceactivitycreator' => CAP_ALLOW,
         )
     ),
 
@@ -325,7 +323,6 @@ $capabilities = array(
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW,
             'tenantdomainmanager' => CAP_ALLOW,
-            'performanceactivitycreator' => CAP_ALLOW,
         ),
 
         'clonepermissionsfrom' =>  'moodle/site:restore'
@@ -411,7 +408,6 @@ $capabilities = array(
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW,
             'tenantdomainmanager' => CAP_ALLOW,
-            'performanceactivitycreator' => CAP_ALLOW,
         )
     ),
 

@@ -21,6 +21,9 @@
  * @package mod_perform
  */
 
+use container_perform\backup\backup_helper;
+use container_perform\backup\restore_helper;
+use core\orm\query\builder;
 use mod_perform\backup\backup_activity_structure_step as backup_step;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\models\activity\activity;
@@ -240,6 +243,34 @@ class mod_perform_activity_clone_model_helper_testcase extends advanced_testcase
             $msg = 'Backup structure does not match the current database structure' . $msg;
             $this->fail($msg);
         }
+    }
+
+    public function test_clone_no_unexpected_roles_assigned(): void {
+        /** @var mod_perform_generator $generator */
+        $generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
+
+        $perform_role_id = builder::table('role')->where('shortname', 'performanceactivitycreator')->value('id');
+        $editingteacher_role_id = builder::table('role')->where('shortname', 'editingteacher')->value('id');
+
+        self::setAdminUser();
+        $user = self::getDataGenerator()->create_user();
+        $activity = $generator->create_activity_in_container();
+
+        role_assign($perform_role_id, $user->id, context_system::instance());
+
+        self::setUser($user);
+
+        $editing_teacher_assignments_before = builder::table('role_assignments')
+            ->where('roleid', $editingteacher_role_id)
+            ->count();
+
+        $activity->clone();
+
+        // No additional editing teacher roles should have been assigned.
+        $this->assertEquals($editing_teacher_assignments_before, builder::table('role_assignments')
+            ->where('roleid', $editingteacher_role_id)
+            ->count()
+        );
     }
 
     private function get_tables_from_backup(backup_nested_element $element): array {
