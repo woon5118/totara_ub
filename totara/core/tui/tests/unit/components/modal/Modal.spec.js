@@ -23,6 +23,8 @@
 import Vue from 'vue';
 import { shallowMount, createWrapper } from '@vue/test-utils';
 import Modal from 'totara_core/components/modal/Modal';
+import { axe, toHaveNoViolations } from 'jest-axe';
+expect.extend(toHaveNoViolations);
 
 let wrapper;
 let modalWrapper;
@@ -54,5 +56,14 @@ describe('Modal', () => {
 
   it('checks snapshot', () => {
     expect(modalWrapper.element).toMatchSnapshot();
+  });
+
+  it('should not have any accessibility violations', async () => {
+    const results = await axe(wrapper.element, {
+      rules: {
+        region: { enabled: false },
+      },
+    });
+    expect(results).toHaveNoViolations();
   });
 });
