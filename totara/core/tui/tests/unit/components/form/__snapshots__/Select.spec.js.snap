@@ -5,6 +5,7 @@ exports[`presentation/form/Select.vue matches snapshot 1`] = `
   class="tui-select"
 >
   <select
+    aria-label="Letters"
     class="tui-select__input"
   >
     <option

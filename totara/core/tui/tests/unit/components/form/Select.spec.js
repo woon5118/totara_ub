@@ -22,6 +22,8 @@
 
 import { shallowMount } from '@vue/test-utils';
 import Select from 'totara_core/components/form/Select';
+import { axe, toHaveNoViolations } from 'jest-axe';
+expect.extend(toHaveNoViolations);
 
 describe('presentation/form/Select.vue', () => {
   let handleInput, wrapper;
@@ -37,6 +39,7 @@ describe('presentation/form/Select.vue', () => {
             options: ['ABC', { id: 'DEF', label: 'GHI' }],
           },
         ],
+        ariaLabel: 'Letters',
       },
       listeners: {
         input: handleInput,
@@ -46,5 +49,14 @@ describe('presentation/form/Select.vue', () => {
 
   it('matches snapshot', () => {
     expect(wrapper.element).toMatchSnapshot();
+  });
+
+  it('should not have any accessibility violations', async () => {
+    const results = await axe(wrapper.element, {
+      rules: {
+        region: { enabled: false },
+      },
+    });
+    expect(results).toHaveNoViolations();
   });
 });
