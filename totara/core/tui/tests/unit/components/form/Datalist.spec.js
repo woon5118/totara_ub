@@ -22,6 +22,8 @@
 
 import { shallowMount } from '@vue/test-utils';
 import component from 'totara_core/components/form/Datalist.vue';
+import { axe, toHaveNoViolations } from 'jest-axe';
+expect.extend(toHaveNoViolations);
 let wrapper;
 
 const props = { id: 'example', options: ['aaa', 'bbb'] };
@@ -39,5 +41,14 @@ describe('presentation/form/InputText.vue', () => {
 
   it('Checks snapshot', () => {
     expect(wrapper.element).toMatchSnapshot();
+  });
+
+  it('should not have any accessibility violations', async () => {
+    const results = await axe(wrapper.element, {
+      rules: {
+        region: { enabled: false },
+      },
+    });
+    expect(results).toHaveNoViolations();
   });
 });
