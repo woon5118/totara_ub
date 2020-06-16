@@ -186,6 +186,7 @@ input mod_perform_create_new_element_input {
   plugin_name: param_text!
   title: param_text!
   is_required: param_boolean
+  identifier: param_text!
   data: String
   sort_order: param_integer!
 }
@@ -204,6 +205,7 @@ Update an existing element
 input mod_perform_update_element_input {
   element_id: core_id!
   title: param_text!
+  identifier: param_text!
   is_required: param_boolean
   data: String! # We cannot use param_text here as it would do some cleaning
 }

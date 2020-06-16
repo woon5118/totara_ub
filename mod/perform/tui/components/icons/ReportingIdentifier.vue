@@ -10,41 +10,40 @@
 
   This program is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
   GNU General Public License for more details.
 
   You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-  @author Oleg Demeshev <oleg.demeshev@totaralearning.com>
-  @package performelement_long_text
+  @author Matthias Bonk <matthias.bonk@totaralearning.com>
+  @package mod_perform
 -->
-<template>
-  <ElementAdminDisplay
-    :type="type"
-    :title="title"
-    :identifier="identifier"
-    :error="error"
-    :is-required="isRequired"
-    @edit="$emit('edit')"
-    @remove="$emit('remove')"
-  />
-</template>
 
 <script>
-import ElementAdminDisplay from 'mod_perform/components/element/ElementAdminDisplay';
+import FlexIcon from 'totara_core/components/icons/FlexIcon';
 
 export default {
+  functional: true,
+
   components: {
-    ElementAdminDisplay,
+    FlexIcon,
   },
+
   props: {
+    alt: String,
+    customClass: [String, Object, Array],
+    styleClass: Object,
+    size: [String, Number],
     title: String,
-    identifier: String,
-    type: Object,
-    data: Object,
-    isRequired: Boolean,
-    error: String,
+  },
+
+  render(h, { props }) {
+    return h(FlexIcon, {
+      props: Object.assign({}, props, {
+        icon: 'mod_perform|reporting',
+      }),
+    });
   },
 };
 </script>

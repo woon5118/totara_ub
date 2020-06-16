@@ -15,9 +15,10 @@ Feature: Manage performance activity multiple choice-answers elements
     And I navigate to manage perform activity content page
     And I click multiple answers question element
     And I set the following fields to these values:
-      | rawTitle   | Question 1 |
-      | answers[0] | Option one |
-      | answers[1] | Option two |
+      | rawTitle   | Question 1   |
+      | answers[0] | Option one   |
+      | answers[1] | Option two   |
+      | identifier | Identifier 1 |
     And I save multiple answers question element data
     And I click multiple answers question element
     And I set the following fields to these values:
@@ -37,6 +38,8 @@ Feature: Manage performance activity multiple choice-answers elements
     Then I should see perform multiple answers question "Question 1" is saved with options "Option one,Option two"
     And I should see perform multiple answers question "Question 2" is saved with options "Option three,Option four"
     And I should see perform multiple answers question "Question 3" is saved with options "Option five,Option six"
+    When I click on identifier icon for question "Question 1"
+    Then I should see "Identifier 1"
 
   Scenario: Save multiple choice multiple answers elements with more options
     Given I log in as "admin"

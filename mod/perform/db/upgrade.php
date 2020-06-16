@@ -40,5 +40,18 @@ function xmldb_perform_upgrade($oldversion) {
         throw new upgrade_exception('mod_perform', '2020063000', 'Cannot upgrade from an earlier version - do a fresh install instead');
     }
 
+    if ($oldversion < 2020063001) {
+
+        // Changing type of field identifier on table perform_element to char.
+        $table = new xmldb_table('perform_element');
+        $field = new xmldb_field('identifier', XMLDB_TYPE_CHAR, '1024', null, true, null, null, 'title');
+
+        // Launch change of type for field identifier.
+        $dbman->change_field_type($table, $field);
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020063001, 'perform');
+    }
+
     return true;
 }

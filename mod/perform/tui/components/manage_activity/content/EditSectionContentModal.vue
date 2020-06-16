@@ -38,6 +38,7 @@
           :raw-data="sectionElement.element.raw_data"
           :title="sectionElement.element.title"
           :raw-title="sectionElement.element.raw_title"
+          :identifier="sectionElement.element.identifier"
           :is-required="sectionElement.element.is_required"
           :type="sectionElement.element.type"
           :error="errors[sectionElement.clientId]"
@@ -145,7 +146,7 @@ export default {
           type: plugin,
           title: '',
           raw_title: '',
-          identifier: null,
+          identifier: '',
           data: {},
           raw_data: {},
         },
@@ -160,9 +161,10 @@ export default {
     /**
      * update existing elements and shows display view of the element
      */
-    update(sectionElement, { title, data, is_required }) {
+    update(sectionElement, { title, identifier, data, is_required }) {
       sectionElement.element.title = title;
       sectionElement.element.raw_title = title;
+      sectionElement.element.identifier = identifier;
       sectionElement.element.data = data;
       sectionElement.element.raw_data = data;
       sectionElement.element.is_required = is_required;
@@ -269,6 +271,7 @@ export default {
           createNew.push({
             plugin_name: item.element.type.plugin_name,
             title: item.element.raw_title,
+            identifier: item.element.identifier,
             is_required: item.element.is_required,
             data: JSON.stringify(item.element.raw_data),
             sort_order: sortOrder,
@@ -277,6 +280,7 @@ export default {
           update.push({
             element_id: item.element.id,
             title: item.element.raw_title,
+            identifier: item.element.identifier,
             is_required: item.element.is_required,
             data: JSON.stringify(item.element.raw_data),
           });

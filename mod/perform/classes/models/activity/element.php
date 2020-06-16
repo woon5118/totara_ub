@@ -23,6 +23,7 @@
 
 namespace mod_perform\models\activity;
 
+use coding_exception;
 use core\orm\entity\model;
 use mod_perform\entities\activity\element as element_entity;
 
@@ -76,7 +77,7 @@ class element extends model {
      * @param \context $context
      * @param string $plugin_name
      * @param string $title
-     * @param int $identifier
+     * @param string $identifier
      * @param string $data
      * @param bool $is_required
      *
@@ -86,7 +87,7 @@ class element extends model {
         \context $context,
         string $plugin_name,
         string $title,
-        int $identifier = 0,
+        string $identifier = '',
         string $data = null,
         bool $is_required = null
     ): self {
@@ -94,9 +95,10 @@ class element extends model {
         $entity->context_id = $context->id;
         $entity->plugin_name = $plugin_name;
         $entity->title = $title;
-        $entity->identifier = $identifier ;
+        $entity->identifier = $identifier;
         $entity->data = $data;
         $entity->is_required  = $is_required;
+        self::validate($entity);
         $entity->save();
 
         /** @var self $model */
@@ -140,12 +142,49 @@ class element extends model {
      * @param string $title
      * @param string $data
      * @param bool $is_required
+     * @param string $identifier
      */
-    public function update_details(string $title, string $data = null, bool $is_required = null) {
+    public function update_details(string $title, string $data = null, bool $is_required = null, string $identifier = '') {
         $this->entity->title = $title;
         $this->entity->data = $data;
         $this->entity->is_required = $is_required;
+        $this->entity->identifier = $identifier;
+        self::validate($this->entity);
         $this->entity->save();
     }
 
+    /**
+     * Checks that the properties of an element entity are valid
+     *
+     * If validation fails, an exception is thrown.
+     *
+     * @param element_entity $entity
+     * @throws coding_exception
+     */
+    public static function validate(element_entity $entity): void {
+        if (!self::is_valid_identifier_for_plugin($entity->identifier, $entity->plugin_name)) {
+            throw new coding_exception(
+                "Cannot set identifier {$entity->identifier} for plugin_name {$entity->plugin_name}"
+            );
+        }
+    }
+
+    /**
+     * Check if the given identifier is valid for the specified plugin_name.
+     *
+     * The rule is that the same identifier must not be used for different plugin_names.
+     *
+     * @param string $identifier
+     * @param string $plugin_name
+     * @return bool
+     */
+    public static function is_valid_identifier_for_plugin(string $identifier, string $plugin_name): bool {
+        if (empty($identifier)) {
+            return true;
+        }
+        return !element_entity::repository()
+            ->where('identifier', $identifier)
+            ->where('plugin_name', '!=', $plugin_name)
+            ->exists();
+    }
 }

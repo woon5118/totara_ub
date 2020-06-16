@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/perform/db" VERSION="20200611" COMMENT="XMLDB file for perform module"
+<XMLDB PATH="mod/perform/db" VERSION="20200616" COMMENT="XMLDB file for perform module"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -94,7 +94,7 @@
         <FIELD NAME="context_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The context which owns this element, either a perform activity or a category/tenant"/>
         <FIELD NAME="plugin_name" TYPE="char" LENGTH="1024" NOTNULL="true" SEQUENCE="false" COMMENT="Name of plugin that manages element of this type"/>
         <FIELD NAME="title" TYPE="char" LENGTH="1024" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="identifier" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Secondary identifier used to allow distinct questions to be aggregated together for reporting purposes."/>
+        <FIELD NAME="identifier" TYPE="char" LENGTH="1024" NOTNULL="false" SEQUENCE="false" COMMENT="Secondary identifier used to allow distinct questions to be aggregated together for reporting purposes."/>
         <FIELD NAME="is_required" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" COMMENT="1=required, 0=optional, null=irrelevant"/>
         <FIELD NAME="data" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="configuration data, format specific to element plugin"/>
       </FIELDS>

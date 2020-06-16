@@ -70,7 +70,9 @@ class behat_performelement_multi_choice extends behat_base {
         string $question_text,
         string $question_options
     ): void {
-        $question = $this->find_question_from_text($question_text);
+        /** @var behat_mod_perform $behat_mod_perform */
+        $behat_mod_perform = behat_context_helper::get('behat_mod_perform');
+        $question = $behat_mod_perform->find_edit_display_question_from_text($question_text);
         $options = $question->findAll('css', self::QUESTION_DISPLAY_OPTIONS_LOCATOR);
         $expected_options = explode(",", $question_options);
         $actual_options = [];
@@ -90,20 +92,5 @@ class behat_performelement_multi_choice extends behat_base {
     public function i_delete_multi_choice_question_option(): void {
         $delete_button = $this->find('css', '.tui-elementEditMultiChoice .tui-iconBtn--stealth');
         $delete_button->click();
-    }
-
-    private function find_question_from_text(string $question_text): NodeElement {
-        /** @var NodeElement[] $questions */
-        $questions = $this->find_all('css', '.tui-performElementEditDisplay');
-
-        foreach ($questions as $question) {
-            $question_title = $question->find('css', self::QUESTION_DISPLAY_TITLE_LOCATOR);
-
-            if (trim($question_title->getText()) === $question_text) {
-                return $question;
-            }
-        }
-
-        throw new ExpectationException("Question not found with text {$question_text}", $this->getSession());
     }
 }

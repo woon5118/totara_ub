@@ -36,7 +36,7 @@ class mod_perform_element_model_testcase extends advanced_testcase {
             $default_context,
             'short_text',
             'test element 1 title',
-            123,
+            'test identifier',
             null,
             true
         );
@@ -47,7 +47,56 @@ class mod_perform_element_model_testcase extends advanced_testcase {
 
         $this->assertSame('short_text', $element_model->plugin_name);
         $this->assertSame('test element 1 title', $element_model->title);
+        $this->assertSame('test identifier', $element_model->identifier);
         $this->assertTrue($element_model->is_required);
     }
 
+    public function validation_data_provider() {
+        return [
+            ['multi_choice', 'Test-ID', 'multi_choice', 'Test-ID', true],
+            ['multi_choice', 'Test-ID', 'short_text', 'Test-ID', false],
+            ['multi_choice', '', 'short_text', '', true],
+            ['multi_choice', '', 'short_text', 'Test-ID', true],
+            ['multi_choice', 'Test-ID', 'short_text', '', true],
+        ];
+    }
+
+    /**
+     * @dataProvider validation_data_provider
+     * @param string $plugin1
+     * @param string $id1
+     * @param string $plugin2
+     * @param string $id2
+     * @param bool $passes_validation
+     */
+    public function test_validate(string $plugin1, string $id1, string $plugin2, string $id2, bool $passes_validation) {
+        $default_context = context_coursecat::instance(perform::get_default_category_id());
+
+        element::create(
+            $default_context,
+            $plugin1,
+            'test title',
+            $id1,
+            null,
+            true
+        );
+
+        if (!$passes_validation) {
+            $this->expectException(coding_exception::class);
+            $this->expectExceptionMessage('Cannot set identifier');
+        }
+
+        $element2 = element::create(
+            $default_context,
+            $plugin2,
+            'test title',
+            $id2,
+            null,
+            true
+        );
+
+        if ($passes_validation) {
+            $this->assertEquals($id2, $element2->identifier);
+        }
+    }
 }

@@ -15,15 +15,16 @@ Feature: Manage performance activity multiple choice elements
     And I navigate to manage perform activity content page
     And I click multi choice question element
     And I set the following fields to these values:
-      | rawTitle   | Question 1 |
-      | answers[0] | Option one |
-      | answers[1] | Option two |
+      | rawTitle   | Question 1   |
+      | answers[0] | Option one   |
+      | answers[1] | Option two   |
+      | identifier | Identifier 1 |
     And I save multi choice question element data
     And I click multi choice question element
     And I set the following fields to these values:
-      | rawTitle   | Question 2 |
+      | rawTitle   | Question 2   |
       | answers[0] | Option three |
-      | answers[1] | Option four |
+      | answers[1] | Option four  |
     And I save multi choice question element data
     And I click multi choice question element
     And I set the following fields to these values:
@@ -37,6 +38,8 @@ Feature: Manage performance activity multiple choice elements
     Then I should see perform multi choice question "Question 1" is saved with options "Option one,Option two"
     And I should see perform multi choice question "Question 2" is saved with options "Option three,Option four"
     And I should see perform multi choice question "Question 3" is saved with options "Option five,Option six"
+    When I click on identifier icon for question "Question 1"
+    Then I should see "Identifier 1"
 
   Scenario: Save multiple choice elements with more options
     Given I log in as "admin"

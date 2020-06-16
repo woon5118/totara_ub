@@ -16,37 +16,31 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-  @author Simon Chester <simon.chester@totaralearning.com>
-  @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
-  @package performelement_short_text
+  @author Matthias Bonk <matthias.bonk@totaralearning.com>
+  @package mod_perform
 -->
 <template>
-  <ElementAdminDisplay
-    :type="type"
-    :title="title"
-    :identifier="identifier"
-    :error="error"
-    :is-required="isRequired"
-    @edit="$emit('edit')"
-    @remove="$emit('remove')"
-  />
+  <FormRow :label="$str('reporting_identifier_form_label', 'mod_perform')">
+    <div>
+      <FormText name="identifier" :validations="v => [v.maxLength(1024)]" />
+    </div>
+  </FormRow>
 </template>
 
 <script>
-import ElementAdminDisplay from 'mod_perform/components/element/ElementAdminDisplay';
+import { FormRow, FormText } from 'totara_core/components/uniform';
 
 export default {
   components: {
-    ElementAdminDisplay,
-  },
-
-  props: {
-    title: String,
-    identifier: String,
-    type: Object,
-    data: Object,
-    isRequired: Boolean,
-    error: String,
+    FormRow,
+    FormText,
   },
 };
 </script>
+<lang-strings>
+  {
+    "mod_perform": [
+      "reporting_identifier_form_label"
+    ]
+  }
+</lang-strings>

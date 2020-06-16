@@ -38,7 +38,7 @@ Feature: Multiple answers element supports multi-lang filters in titles and opti
     And I should not see "erste Option"
     And I should see "it's the second option"
     And I should not see "zweite Option"
-    When I click on "it's an English question" "button"
+    When I click on edit icon for question "it's an English question"
     Then "rawTitle" "field" should be visible
     And the following fields match these values:
       | rawTitle   | <span lang="en" class="multilang">it's an English question</span><span lang="de" class="multilang">deutsche Frage</span> |

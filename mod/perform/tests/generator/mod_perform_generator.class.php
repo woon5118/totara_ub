@@ -277,7 +277,7 @@ class mod_perform_generator extends component_generator_base {
             $data['context'] ?? context_coursecat::instance(perform_container::get_default_category_id()),
             $data['plugin_name'] ?? 'short_text',
             $data['title'] ?? 'test element title',
-            $data['identifier'] ?? 0,
+            $data['identifier'] ?? '',
             $data['data'] ?? null,
             $data['is_required'] ?? false
         );

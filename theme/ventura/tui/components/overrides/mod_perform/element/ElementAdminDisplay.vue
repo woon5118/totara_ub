@@ -15,5 +15,20 @@
       justify-content: space-between;
     }
   }
+
+  &__info {
+    display: flex;
+    flex-direction: row;
+  }
+
+  &__reportingId {
+    &-header {
+      margin: 0;
+      @include tui-font-heading-label();
+    }
+    &-content {
+      margin-top: var(--tui-gap-2);
+    }
+  }
 }
 </style>

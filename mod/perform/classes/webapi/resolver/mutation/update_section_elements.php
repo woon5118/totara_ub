@@ -45,6 +45,11 @@ class update_section_elements implements mutation_resolver, has_middleware {
 
         $section = section::load_by_id($section_form_data['section_id']);
 
+        $errors = static::validate_inputs($section_form_data);
+        if ($errors) {
+            throw new \coding_exception(implode(', ', $errors));
+        }
+
         builder::get_db()->transaction(function () use ($section, $section_form_data) {
             // Remove elements from the section.
             $delete_section_elements = [];
@@ -65,7 +70,7 @@ class update_section_elements implements mutation_resolver, has_middleware {
                         $context,
                         $create_new_form_data['plugin_name'],
                         $create_new_form_data['title'],
-                        $create_new_form_data['identifier'] ?? 0,
+                        $create_new_form_data['identifier'],
                         $create_new_form_data['data'] ?? null,
                         $create_new_form_data['is_required'] ?? null
                     );
@@ -91,7 +96,8 @@ class update_section_elements implements mutation_resolver, has_middleware {
                 $element->update_details(
                     $update_form_data['title'],
                     $update_form_data['data'],
-                    $update_form_data['is_required'] ?? null
+                    $update_form_data['is_required'] ?? null,
+                    $update_form_data['identifier']
                 );
             }
         });
@@ -99,6 +105,35 @@ class update_section_elements implements mutation_resolver, has_middleware {
         return [
             'section' => section::load_by_id($section->id)
         ];
+    }
+
+    /**
+     * @param array $section_form_data
+     * @return array
+     */
+    private static function validate_inputs(array $section_form_data): array {
+        $errors = [];
+        foreach ($section_form_data['create_new'] ?? [] as $create_new_form_data) {
+            if (!element::is_valid_identifier_for_plugin(
+                $create_new_form_data['identifier'],
+                $create_new_form_data['plugin_name']
+            )) {
+                $errors[] = "Cannot save identifier {$create_new_form_data['identifier']} "
+                    . "for plugin_name {$create_new_form_data['plugin_name']}";
+            }
+        }
+
+        foreach ($section_form_data['update'] ?? [] as $update_form_data) {
+            $element = element::load_by_id($update_form_data['element_id']);
+            if (!element::is_valid_identifier_for_plugin(
+                $update_form_data['identifier'],
+                $element->plugin_name
+            )) {
+                $errors[] = "Cannot update identifier {$update_form_data['identifier']} "
+                    . "for plugin_name {$element->plugin_name}";
+            }
+        }
+        return $errors;
     }
 
     /**

@@ -32,7 +32,7 @@ Feature: Long text element supports multi-lang filters in titles
     Then "rawTitle" "field" should not be visible
     And I should see "it's an English question"
     And I should not see "deutsche Frage"
-    When I click on "it's an English question" "button"
+    When I click on edit icon for question "it's an English question"
     Then "rawTitle" "field" should be visible
     And the following fields match these values:
       | rawTitle | <span lang="en" class="multilang">it's an English question</span><span lang="de" class="multilang">deutsche Frage</span> |

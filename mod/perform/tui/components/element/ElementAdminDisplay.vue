@@ -21,12 +21,7 @@
   @package mod_perform
 -->
 <template>
-  <div
-    class="tui-performElementEditDisplay"
-    role="button"
-    tabindex="0"
-    @click="edit"
-  >
+  <div class="tui-performElementEditDisplay" tabindex="0">
     <div v-if="error">{{ error }}</div>
     <div class="tui-performElementEditDisplay__inner">
       <div class="tui-performElementEditDisplay__inner-header">
@@ -34,6 +29,32 @@
           {{ title }}
         </div>
         <div class="tui-performElementEditDisplay__info">
+          <Popover
+            v-if="identifier"
+            class="tui-performElementEditDisplay__reportingId"
+          >
+            <h2 class="tui-performElementEditDisplay__reportingId-header">
+              {{ $str('reporting_identifier', 'mod_perform') }}
+            </h2>
+            <div class="tui-performElementEditDisplay__reportingId-content">
+              {{ identifier }}
+            </div>
+            <template v-slot:trigger>
+              <ButtonIcon
+                :aria-label="$str('reporting_identifier', 'mod_perform')"
+                :styleclass="{ transparentNoPadding: true }"
+              >
+                <template>
+                  <ReportingIdentifierIcon
+                    :alt="$str('reporting_identifier', 'mod_perform')"
+                    :title="$str('reporting_identifier', 'mod_perform')"
+                    size="200"
+                  />
+                </template>
+              </ButtonIcon>
+            </template>
+          </Popover>
+          <EditIcon @click="edit" />
           <Lozenge
             v-show="isRequired"
             :text="$str('section_element_tag_required', 'mod_perform')"
@@ -53,15 +74,24 @@
 </template>
 
 <script>
+import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
+import EditIcon from 'totara_core/components/buttons/EditIcon';
 import Lozenge from 'totara_core/components/lozenge/Lozenge';
+import Popover from 'totara_core/components/popover/Popover';
+import ReportingIdentifierIcon from 'mod_perform/components/icons/ReportingIdentifier';
 
 export default {
   components: {
+    ButtonIcon,
+    EditIcon,
     Lozenge,
+    Popover,
+    ReportingIdentifierIcon,
   },
 
   props: {
     title: String,
+    identifier: String,
     isRequired: Boolean,
     type: Object,
     error: String,
@@ -81,6 +111,7 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
+      "reporting_identifier",
       "section_element_tag_required",
       "section_element_tag_optional"
     ]

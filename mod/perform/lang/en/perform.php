@@ -173,6 +173,8 @@ $string['relative_date_selector_until'] = 'until';
 $string['relative_date_selector_weeks'] = 'weeks';
 $string['report_activity_warning_message'] = 'This report page can only show details for a single activity at a time - to select which activity\'s report to view, go to <a href="{$a->url}">Manage performance activities</a>, and click on the relevant activity\'s reporting icon.';
 $string['report_participant_warning_message'] = 'This report page can only show details for a single subject instance at a time - to select which subject instance\'s report to view, go to <a href="{$a->url}">Manage performance activities</a>, click on the reporting icon of the activity to which the subject instance belongs. From the report\'s list of subject instances, navigate to the relevant one\'s participant instance report by clicking on its participant count.';
+$string['reporting_identifier'] = 'Reporting ID';
+$string['reporting_identifier_form_label'] = 'Reporting ID (optional)';
 $string['save_changes'] = 'Save changes';
 $string['section_dropdown_menu'] = 'Section dropdown menu';
 $string['schedule_activity_instance_creation_period'] = 'Activity instance creation period';

@@ -23,6 +23,7 @@
   <ElementAdminDisplay
     :type="type"
     :title="title"
+    :identifier="identifier"
     :error="error"
     :is-required="isRequired"
     @edit="$emit('edit')"
@@ -56,6 +57,7 @@ export default {
 
   props: {
     title: String,
+    identifier: String,
     type: Object,
     data: Object,
     isRequired: Boolean,

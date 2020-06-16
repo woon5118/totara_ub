@@ -53,6 +53,7 @@
               {{ $str('section_element_response_required', 'mod_perform') }}
             </Checkbox>
           </FormRow>
+          <IdentifierInput />
           <FormRow>
             <div class="tui-elementEditLongText__action-buttons">
               <FormActionButtons
@@ -68,28 +69,31 @@
 </template>
 
 <script>
-import { Uniform, FormRow, FormText } from 'totara_core/components/uniform';
-import Textarea from 'totara_core/components/form/Textarea';
-import ElementAdminForm from 'mod_perform/components/element/ElementAdminForm';
-import FormActionButtons from 'mod_perform/components/element/admin_form/ActionButtons';
 import AdminFormMixin from 'mod_perform/components/element/admin_form/AdminFormMixin';
 import Checkbox from 'totara_core/components/form/Checkbox';
+import ElementAdminForm from 'mod_perform/components/element/ElementAdminForm';
+import FormActionButtons from 'mod_perform/components/element/admin_form/ActionButtons';
+import IdentifierInput from 'mod_perform/components/element/admin_form/IdentifierInput';
+import Textarea from 'totara_core/components/form/Textarea';
+import { Uniform, FormRow, FormText } from 'totara_core/components/uniform';
 
 export default {
   components: {
+    Checkbox,
     ElementAdminForm,
-    Uniform,
+    FormActionButtons,
     FormRow,
     FormText,
+    IdentifierInput,
     Textarea,
-    FormActionButtons,
-    Checkbox,
+    Uniform,
   },
   mixins: [AdminFormMixin],
   props: {
     type: Object,
     title: String,
     rawTitle: String,
+    identifier: String,
     data: Object,
     isRequired: {
       type: Boolean,
@@ -101,6 +105,7 @@ export default {
     const initialValues = {
       title: this.title,
       rawTitle: this.rawTitle,
+      identifier: this.identifier,
       responseRequired: this.isRequired,
     };
     return {
@@ -112,6 +117,7 @@ export default {
     handleSubmit(values) {
       this.$emit('update', {
         title: values.rawTitle,
+        identifier: values.identifier,
         data: {},
         is_required: this.responseRequired,
       });

@@ -55,6 +55,9 @@ class behat_mod_perform extends behat_base {
 
     public const TUI_TRASH_ICON_BUTTON = "button[aria-label='Delete %s']";
 
+    public const EDIT_QUESTION_DISPLAY_TITLE_LOCATOR = '.tui-performElementEditDisplay__title';
+
+
     /**
      * Navigate to the specified page and wait for JS.
      *
@@ -545,6 +548,53 @@ class behat_mod_perform extends behat_base {
     }
 
     /**
+     * @When /^I click on edit icon for question "([^"]*)"$/
+     * @param string $question_text
+     */
+    public function i_click_on_edit_icon_for_question(string $question_text) {
+        $question = $this->find_edit_display_question_from_text($question_text);
+        $question->find('css', 'span[data-flex-icon=edit]')->click();
+    }
+
+    /**
+     * @When /^I click on identifier icon for question "([^"]*)"$/
+     * @param string $question_text
+     */
+    public function i_click_on_identifier_icon_for_question(string $question_text) {
+        $this->close_all_popovers();
+        $question = $this->find_edit_display_question_from_text($question_text);
+        $question->find('css', "span[data-flex-icon='mod_perform|reporting']")->click();
+    }
+
+    /**
+     * @Then /^I should not see identifier icon for question "([^"]*)"$/
+     * @param string $question_text
+     */
+    public function i_should_not_see_identifier_icon_for_question(string $question_text) {
+        $question = $this->find_edit_display_question_from_text($question_text);
+        $element_found = $question->find('css', "span[data-flex-icon='mod_perform|reporting']");
+        if ($element_found !== null) {
+            throw new ExpectationException(
+                "Identifier icon for question '{$question_text}' should not exist but was found.",
+                $this->getSession()
+            );
+        }
+    }
+
+    /**
+     * @When /^I close popovers$/
+     */
+    public function close_all_popovers() {
+        /** @var NodeElement[] $popover_close_buttons */
+        $popover_close_buttons = $this->find_all('css', '.tui-popoverFrame__close');
+        foreach ($popover_close_buttons as $close_button) {
+            if ($close_button->isVisible()) {
+                $close_button->click();
+            }
+        }
+    }
+
+    /**
      * @Given /^I navigate to manage perform activity content page$/
      * @Given /^I navigate to manage perform activity content page of "(?P<section_number>\d+)" activity section$/
      */
@@ -624,6 +674,21 @@ class behat_mod_perform extends behat_base {
             }
             $actual_title = trim(str_replace(['(optional)', '*'],['',''], $found_question->getText()));
             if ($actual_title === $question_text) {
+                return $question;
+            }
+        }
+
+        throw new ExpectationException("Question not found with text {$question_text}", $this->getSession());
+    }
+
+    public function find_edit_display_question_from_text(string $question_text): NodeElement {
+        /** @var NodeElement[] $questions */
+        $questions = $this->find_all('css', '.tui-performElementEditDisplay');
+
+        foreach ($questions as $question) {
+            $question_title = $question->find('css', self::EDIT_QUESTION_DISPLAY_TITLE_LOCATOR);
+
+            if (trim($question_title->getText()) === $question_text) {
                 return $question;
             }
         }

@@ -29,7 +29,7 @@ use mod_perform\models\response\element_validation_error;
 /**
  * Class element_plugin
  *
- * Base class for defining a type of element, including it's specific behaviour.
+ * Base class for defining a type of element, including its specific behaviour.
  *
  * @package mod_perform\models\activity
  */

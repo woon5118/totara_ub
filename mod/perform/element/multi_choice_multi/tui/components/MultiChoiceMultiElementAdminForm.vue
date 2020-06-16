@@ -82,6 +82,7 @@
               {{ $str('section_element_response_required', 'mod_perform') }}
             </Checkbox>
           </FormRow>
+          <IdentifierInput />
           <FormRow>
             <div class="tui-elementEditMultiChoice__action-buttons">
               <FormActionButtons
@@ -97,37 +98,40 @@
 </template>
 
 <script>
-import { Uniform, FormRow, FieldArray } from 'totara_core/components/uniform';
-import FormText from 'totara_core/components/uniform/FormText';
-import ElementAdminForm from 'mod_perform/components/element/ElementAdminForm';
-import FormActionButtons from 'mod_perform/components/element/admin_form/ActionButtons';
-import AdminFormMixin from 'mod_perform/components/element/admin_form/AdminFormMixin';
-import Repeater from 'totara_core/components/form/Repeater';
 import AddIcon from 'totara_core/components/icons/common/Add';
+import AdminFormMixin from 'mod_perform/components/element/admin_form/AdminFormMixin';
 import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
 import Checkbox from 'totara_core/components/form/Checkbox';
+import ElementAdminForm from 'mod_perform/components/element/ElementAdminForm';
+import FormActionButtons from 'mod_perform/components/element/admin_form/ActionButtons';
+import FormText from 'totara_core/components/uniform/FormText';
+import IdentifierInput from 'mod_perform/components/element/admin_form/IdentifierInput';
+import Repeater from 'totara_core/components/form/Repeater';
+import { Uniform, FormRow, FieldArray } from 'totara_core/components/uniform';
 
 const MIN_OPTIONS = 2;
 const OPTION_PREFIX = 'option_';
 
 export default {
   components: {
-    ElementAdminForm,
-    FormActionButtons,
-    Uniform,
-    FormRow,
-    FormText,
-    Repeater,
-    FieldArray,
     AddIcon,
     ButtonIcon,
     Checkbox,
+    ElementAdminForm,
+    FieldArray,
+    FormActionButtons,
+    FormRow,
+    FormText,
+    IdentifierInput,
+    Repeater,
+    Uniform,
   },
   mixins: [AdminFormMixin],
   props: {
     type: Object,
     title: String,
     rawTitle: String,
+    identifier: String,
     isRequired: {
       type: Boolean,
       default: false,
@@ -140,6 +144,7 @@ export default {
     const initialValues = {
       title: this.title,
       rawTitle: this.rawTitle,
+      identifier: this.identifier,
       responseRequired: this.isRequired,
       answers: [],
     };
@@ -170,6 +175,7 @@ export default {
       });
       this.$emit('update', {
         title: values.rawTitle,
+        identifier: values.identifier,
         data: { options: optionList },
         is_required: this.responseRequired,
       });

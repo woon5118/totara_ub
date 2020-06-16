@@ -54,6 +54,7 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
                     [
                         'plugin_name' => 'short_text',
                         'title' => 'Test title 1',
+                        'identifier' => 'Test identifier 1',
                         'data' => 'aaa',
                         'is_required' => true,
                         'sort_order' => 2,
@@ -61,6 +62,7 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
                     [
                         'plugin_name' => 'short_text',
                         'title' => 'Test title 2',
+                        'identifier' => 'Test identifier 2',
                         'data' => 'bbb',
                         'is_required' => true,
                         'sort_order' => 1,
@@ -82,11 +84,13 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
 
         $element1 = $DB->get_record('perform_element', ['id' => $section_elements[1]->element_id]);
         $this->assertEquals('Test title 2', $element1->title);
+        $this->assertEquals('Test identifier 2', $element1->identifier);
         $this->assertEquals('bbb', $element1->data);
         $this->assertEquals(1, $element1->is_required);
 
         $element2 = $DB->get_record('perform_element', ['id' => $section_elements[2]->element_id]);
         $this->assertEquals('Test title 1', $element2->title);
+        $this->assertEquals('Test identifier 1', $element2->identifier);
         $this->assertEquals('aaa', $element2->data);
         $this->assertEquals(1, $element2->is_required);
 
@@ -118,12 +122,12 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
         $element1 = $perform_generator->create_element([
             'title' => 'Test title 1',
             'data' => 'aaa',
-            'identifier' => 111,
+            'identifier' => 'Test identifier 1',
         ]);
         $element2 = $perform_generator->create_element([
             'title' => 'Test title 2',
             'data' => 'bbb',
-            'identifier' => 222,
+            'identifier' => 'Test identifier 2',
         ]);
 
         $args = [
@@ -155,10 +159,12 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
 
         $element1 = $DB->get_record('perform_element', ['id' => $section_elements[1]->element_id]);
         $this->assertEquals('Test title 2', $element1->title);
+        $this->assertEquals('Test identifier 2', $element1->identifier);
         $this->assertEquals('bbb', $element1->data);
 
         $element2 = $DB->get_record('perform_element', ['id' => $section_elements[2]->element_id]);
         $this->assertEquals('Test title 1', $element2->title);
+        $this->assertEquals('Test identifier 1', $element2->identifier);
         $this->assertEquals('aaa', $element2->data);
 
         $this->assertEquals($section->id, $section_elements[1]->section_id);
@@ -223,11 +229,13 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
                     [
                         'element_id' => $element1->id,
                         'title' => 'Test title 3',
+                        'identifier' => 'Test identifier 3',
                         'data' => 'ccc',
                     ],
                     [
                         'element_id' => $element2->id,
                         'title' => 'Test title 4',
+                        'identifier' => 'Test identifier 4',
                         'data' => 'ddd',
                     ],
                 ],
@@ -248,10 +256,12 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
 
         $element1 = $DB->get_record('perform_element', ['id' => $section_elements[1]->element_id]);
         $this->assertEquals('Test title 4', $element1->title);
+        $this->assertEquals('Test identifier 4', $element1->identifier);
         $this->assertEquals('ddd', $element1->data);
 
         $element2 = $DB->get_record('perform_element', ['id' => $section_elements[2]->element_id]);
         $this->assertEquals('Test title 3', $element2->title);
+        $this->assertEquals('Test identifier 3', $element2->identifier);
         $this->assertEquals('ccc', $element2->data);
 
         $this->assertEquals($section->id, $section_elements[1]->section_id);
@@ -287,24 +297,28 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
                     [
                         'plugin_name' => 'short_text',
                         'title' => 'Test title 1',
+                        'identifier' => 'Test identifier 1',
                         'data' => 'aaa',
                         'sort_order' => 3,
                     ],
                     [
                         'plugin_name' => 'short_text',
                         'title' => 'Test title 2',
+                        'identifier' => 'Test identifier 2',
                         'data' => 'bbb',
                         'sort_order' => 1,
                     ],
                     [
                         'plugin_name' => 'short_text',
                         'title' => 'Test title 3',
+                        'identifier' => 'Test identifier 3',
                         'data' => 'ccc',
                         'sort_order' => 4,
                     ],
                     [
                         'plugin_name' => 'short_text',
                         'title' => 'Test title 4',
+                        'identifier' => 'Test identifier 4',
                         'data' => 'ddd',
                         'sort_order' => 2,
                     ],
@@ -351,10 +365,12 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
 
         $element1 = $DB->get_record('perform_element', ['id' => $section_elements[1]->element_id]);
         $this->assertEquals('Test title 4', $element1->title);
+        $this->assertEquals('Test identifier 4', $element1->identifier);
         $this->assertEquals('ddd', $element1->data);
 
         $element2 = $DB->get_record('perform_element', ['id' => $section_elements[2]->element_id]);
         $this->assertEquals('Test title 3', $element2->title);
+        $this->assertEquals('Test identifier 3', $element2->identifier);
         $this->assertEquals('ccc', $element2->data);
 
         $this->assertEquals($section->id, $section_elements[1]->section_id);
@@ -390,12 +406,14 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
                     [
                         'plugin_name' => 'short_text',
                         'title' => 'Test title 1',
+                        'identifier' => 'Test identifier 1',
                         'data' => 'aaa',
                         'sort_order' => 2,
                     ],
                     [
                         'plugin_name' => 'short_text',
                         'title' => 'Test title 2',
+                        'identifier' => 'Test identifier 2',
                         'data' => 'bbb',
                         'sort_order' => 1,
                     ],
@@ -414,12 +432,14 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
                     [
                         'plugin_name' => 'short_text',
                         'title' => 'Test title 3',
+                        'identifier' => 'Test identifier 3',
                         'data' => 'ccc',
                         'sort_order' => 2,
                     ],
                     [
                         'plugin_name' => 'short_text',
                         'title' => 'Test title 4',
+                        'identifier' => 'Test identifier 4',
                         'data' => 'ddd',
                         'sort_order' => 4,
                     ],
@@ -450,18 +470,22 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
 
         $element1 = $DB->get_record('perform_element', ['id' => $section_elements[1]->element_id]);
         $this->assertEquals('Test title 1', $element1->title);
+        $this->assertEquals('Test identifier 1', $element1->identifier);
         $this->assertEquals('aaa', $element1->data);
 
         $element2 = $DB->get_record('perform_element', ['id' => $section_elements[2]->element_id]);
         $this->assertEquals('Test title 3', $element2->title);
+        $this->assertEquals('Test identifier 3', $element2->identifier);
         $this->assertEquals('ccc', $element2->data);
 
         $element3 = $DB->get_record('perform_element', ['id' => $section_elements[3]->element_id]);
         $this->assertEquals('Test title 2', $element3->title);
+        $this->assertEquals('Test identifier 2', $element3->identifier);
         $this->assertEquals('bbb', $element3->data);
 
         $element4 = $DB->get_record('perform_element', ['id' => $section_elements[4]->element_id]);
         $this->assertEquals('Test title 4', $element4->title);
+        $this->assertEquals('Test identifier 4', $element4->identifier);
         $this->assertEquals('ddd', $element4->data);
 
         $this->assertEquals($section->id, $section_elements[1]->section_id);
@@ -508,6 +532,7 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
                     [
                         'plugin_name' => 'short_text',
                         'title' => 'Test title 1',
+                        'identifier' => 'Test identifier 1',
                         'data' => 'aaa',
                         'is_required' => true,
                         'sort_order' => 1,
@@ -515,6 +540,7 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
                     [
                         'plugin_name' => 'short_text',
                         'title' => 'Test title 2',
+                        'identifier' => 'Test identifier 2',
                         'data' => 'bbb',
                         'is_required' => true,
                         'sort_order' => 2,
@@ -522,6 +548,7 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
                     [
                         'plugin_name' => 'short_text',
                         'title' => 'Test title 3',
+                        'identifier' => 'Test identifier 3',
                         'data' => 'ccc',
                         'is_required' => true,
                         'sort_order' => 3,
@@ -548,6 +575,7 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
                     [
                         'plugin_name' => 'short_text',
                         'title' => 'Test title 4',
+                        'identifier' => 'Test ID',
                         'data' => 'ddd',
                         'is_required' => true,
                         'sort_order' => 1,
@@ -563,6 +591,7 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
                     [
                         'element_id' => $element4->id,
                         'title' => 'Test title 6',
+                        'identifier' => 'Test ID2',
                         'is_required' => true,
                         'data' => 'fff',
                     ],
@@ -602,11 +631,13 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
 
         $element1 = $DB->get_record('perform_element', ['id' => $section_elements[1]->element_id]);
         $this->assertEquals('Test title 4', $element1->title);
+        $this->assertEquals('Test ID', $element1->identifier);
         $this->assertEquals('ddd', $element1->data);
 
         $element2 = $DB->get_record('perform_element', ['id' => $section_elements[2]->element_id]);
         $this->assertEquals('Test title 6', $element2->title);
         $this->assertEquals('fff', $element2->data);
+        $this->assertEquals('Test ID2', $element2->identifier);
 
         $element3 = $DB->get_record('perform_element', ['id' => $section_elements[3]->element_id]);
         $this->assertEquals('Test title 3', $element3->title);
@@ -637,4 +668,118 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
         $this->assertCount(4, $result_data['section']['section_elements']);
     }
 
+    public function validation_create_new_data_provider() {
+        return [
+            ['multi_choice', 'Test-ID', 'multi_choice', 'Test-ID', true],
+            ['multi_choice', 'Test-ID', 'short_text', 'Test-ID', false],
+            ['multi_choice', '', 'short_text', '', true],
+        ];
+    }
+
+    /**
+     * @dataProvider validation_create_new_data_provider
+     * @param string $plugin1
+     * @param string $id1
+     * @param string $plugin2
+     * @param string $id2
+     * @param bool $passes_validation
+     */
+    public function test_validation_create_new(string $plugin1, string $id1, string $plugin2, string $id2, bool $passes_validation) {
+        self::setAdminUser();
+
+        /** @var mod_perform_generator $perform_generator */
+        $perform_generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
+
+        $activity = $perform_generator->create_activity_in_container();
+        $section = $perform_generator->create_section($activity);
+        $perform_generator->create_element([
+            'plugin_name' => $plugin1,
+            'title' => 'Test title',
+            'identifier' => $id1,
+            'data' => 'aaa',
+        ]);
+
+        $args = [
+            'input' => [
+                'section_id' => $section->id,
+                'create_new' => [
+                    [
+                        'plugin_name' => $plugin2,
+                        'title' => 'Test title',
+                        'identifier' => $id2,
+                        'data' => 'aaa',
+                        'is_required' => true,
+                        'sort_order' => 1,
+                    ],
+                ],
+            ]
+        ];
+
+        if (!$passes_validation) {
+            $this->expectException(coding_exception::class);
+            $this->expectExceptionMessage('Cannot save identifier');
+        }
+        $context = $this->create_webapi_context(self::MUTATION);
+        $result = update_section_elements::resolve($args, $context);
+        if ($passes_validation) {
+            /** @var section $result_section */
+            $result_section = $result['section'];
+            $this->assertEquals($section->id, $result_section->id);
+        }
+    }
+
+    public function test_validation_update() {
+        self::setAdminUser();
+
+        /** @var mod_perform_generator $perform_generator */
+        $perform_generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
+
+        $activity = $perform_generator->create_activity_in_container();
+        $section = $perform_generator->create_section($activity);
+        $perform_generator->create_element([
+            'plugin_name' => 'multi_choice',
+            'title' => 'Test title',
+            'identifier' => 'Test-ID multi_choice',
+            'data' => 'aaa',
+        ]);
+        $element_to_update = $perform_generator->create_element([
+            'plugin_name' => 'short_text',
+            'title' => 'Test title',
+            'identifier' => 'Test-ID short_text',
+            'data' => 'aaa',
+        ]);
+
+        $args = [
+            'input' => [
+                'section_id' => $section->id,
+                'create_link' => [
+                    [
+                        'element_id' => $element_to_update->id,
+                        'sort_order' => 1,
+                    ],
+                ],
+            ]
+        ];
+        $context = $this->create_webapi_context(self::MUTATION);
+        update_section_elements::resolve($args, $context);
+
+        $args = [
+            'input' => [
+                'section_id' => $section->id,
+                'update' => [
+                    [
+                        'element_id' => $element_to_update->id,
+                        'title' => 'Test title',
+                        'identifier' => 'Test-ID multi_choice',
+                        'data' => 'ccc',
+                    ],
+                ],
+            ]
+        ];
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('Cannot update identifier');
+        $context = $this->create_webapi_context(self::MUTATION);
+        update_section_elements::resolve($args, $context);
+    }
 }

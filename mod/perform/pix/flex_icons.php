@@ -50,4 +50,9 @@ $icons = [
             'classes' => 'fa-repeat',
         ],
     ],
+    'mod_perform|reporting' => [
+        'data' => [
+            'classes' => 'fa-bar-chart',
+        ],
+    ],
 ];

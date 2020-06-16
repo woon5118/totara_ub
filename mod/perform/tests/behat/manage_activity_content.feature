@@ -20,7 +20,8 @@ Feature: Adding, Updating, Removing activity elements.
     Then the focused element is "[name=rawTitle]" "css_element"
 
     When I set the following fields to these values:
-      | rawTitle | Question 1 |
+      | rawTitle   | Question 1   |
+      | identifier | Identifier 1 |
     And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"
     And I click on "Add element" "button"
     And I click on "Questions" "button"
@@ -28,7 +29,8 @@ Feature: Adding, Updating, Removing activity elements.
     Then the focused element is "[name=rawTitle]" "css_element"
 
     When I set the following fields to these values:
-      | rawTitle | Question 2 |
+      | rawTitle   | Question 2   |
+      | identifier | Identifier 2 |
     And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"
     And I click on "Add element" "button"
     And I click on "Questions" "button"
@@ -44,27 +46,37 @@ Feature: Adding, Updating, Removing activity elements.
     Then I should see "Question 1"
     And I should see "Question 2"
     And I should see "Question 3"
+    When I click on identifier icon for question "Question 1"
+    Then I should see "Identifier 1"
+    When I click on identifier icon for question "Question 2"
+    Then I should see "Identifier 2"
+    And I close popovers
+    And I should not see identifier icon for question "Question 3"
 
     # Update multiple elements and save.
-    When I click on "Question 1" "button"
+    When I click on edit icon for question "Question 1"
     Then the focused element is "[name=rawTitle]" "css_element"
 
-    When the following fields match these values:
-      | rawTitle | Question 1 |
+    And the following fields match these values:
+      | rawTitle   | Question 1   |
+      | identifier | Identifier 1 |
     When I set the following fields to these values:
-      | rawTitle | Test 1 |
+      | rawTitle   | Test 1       |
+      | identifier | Identifier A |
     And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"
-    And I click on "Question 2" "button"
+    And I click on edit icon for question "Question 2"
     Then the focused element is "[name=rawTitle]" "css_element"
 
     When I set the following fields to these values:
-      | rawTitle | Test 2 |
+      | rawTitle   | Test 2 |
+      | identifier |        |
     And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"
-    And I click on "Question 3" "button"
+    And I click on edit icon for question "Question 3"
     Then the focused element is "[name=rawTitle]" "css_element"
 
     When I set the following fields to these values:
-      | rawTitle | Test 3 |
+      | rawTitle   | Test 3       |
+      | identifier | Identifier C |
     And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"
     And I click on "Submit" "button"
     And I close the tui notification toast
@@ -72,12 +84,18 @@ Feature: Adding, Updating, Removing activity elements.
     Then I should see "Test 1"
     And I should see "Test 2"
     And I should see "Test 3"
+    When I click on identifier icon for question "Test 1"
+    Then I should see "Identifier A"
+    When I click on identifier icon for question "Test 3"
+    Then I should see "Identifier C"
+    And I close popovers
+    And I should not see identifier icon for question "Test 2"
 
     # Delete multiple elements.
-    When I click on "Test 2" "button"
+    When I click on edit icon for question "Test 1"
     And I click on "Actions" "button"
     And I click on "Delete" "link"
-    And I click on "Test 1" "button"
+    And I click on edit icon for question "Test 2"
     And I click on "Actions" "button"
     And I click on "Delete" "link"
     And I click on "Submit" "button"
