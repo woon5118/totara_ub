@@ -1452,7 +1452,7 @@ class core_plugin_manager {
             ),
 
             'performelement' => array(
-                'short_text', 'multi_choice', 'long_text'
+                'short_text', 'multi_choice', 'long_text', 'multi_choice_multi',
             ),
 
             'plagiarism' => array(
