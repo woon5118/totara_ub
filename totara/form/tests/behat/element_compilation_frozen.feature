@@ -31,7 +31,7 @@ Feature: Totara form frozen element compilation tests
     And "tel" row "Value" column of "form_results" table should contain "«+202-555-0174»"
     And "text" row "Value" column of "form_results" table should contain "«Totara 9.0»"
     And "textarea" row "Value" column of "form_results" table should contain "«Some random text, Some random text, Some random text, Some random text»"
-    And "url" row "Value" column of "form_results" table should contain "«https://www.totaralms.com»"
+    And "url" row "Value" column of "form_results" table should contain "«https://www.totaralearning.com»"
     And "utc10date" row "Value" column of "form_results" table should contain "«1485338400 (2017/01/25)»"
     And "yesno" row "Value" column of "form_results" table should contain "«1»"
 
@@ -122,7 +122,7 @@ Feature: Totara form frozen element compilation tests
     And "tel" row "Value" column of "form_results" table should contain "«+202-555-0174»"
     And "text" row "Value" column of "form_results" table should contain "«Totara 9.0»"
     And "textarea" row "Value" column of "form_results" table should contain "«Some random text, Some random text, Some random text, Some random text»"
-    And "url" row "Value" column of "form_results" table should contain "«https://www.totaralms.com»"
+    And "url" row "Value" column of "form_results" table should contain "«https://www.totaralearning.com»"
     And "utc10date" row "Value" column of "form_results" table should contain "«1485338400 (2017/01/25)»"
     And "yesno" row "Value" column of "form_results" table should contain "«1»"
 

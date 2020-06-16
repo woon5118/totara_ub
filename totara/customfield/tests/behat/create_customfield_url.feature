@@ -57,7 +57,7 @@ Feature: Administrators can add a custom URL field to complete during course cre
     Then I should see "You must supply a value here." in the "#fgroup_id_customfield_url1_group" "css_element"
 
     When I set the following fields to these values:
-      | customfield_url1[url] | https://www.totaralms.com  |
+      | customfield_url1[url] | https://www.totaralearning.com  |
     And I press "Save and display"
     Then I should see "Course 1" in the page title
     And I log out
@@ -170,18 +170,18 @@ Feature: Administrators can add a custom URL field to complete during course cre
     Then I should see "The URL needs to start with http://, https:// or /" in the "#fgroup_id_customfield_url2_group" "css_element"
 
     When I set the following fields to these values:
-      | customfield_url2[url]    | https://www.totaralms.com |
-      | customfield_url2[text]   | Totara LMS                |
-      | customfield_url2[target] | 1                         |
-      | customfield_url3[url]    | /my                       |
-      | customfield_url3[text]   | My Learning               |
-      | customfield_url3[target] | 0                         |
+      | customfield_url2[url]    | https://www.totaralearning.com |
+      | customfield_url2[text]   | Totara LMS                     |
+      | customfield_url2[target] | 1                              |
+      | customfield_url3[url]    | /my                            |
+      | customfield_url3[text]   | My Learning                    |
+      | customfield_url3[target] | 0                              |
     And I press "Save and display"
     Then I should see "Course 1" in the page title
 
     # Check the field have been set correctly
     When I navigate to "Edit settings" node in "Course administration"
-    Then the field "customfield_url2[url]" matches value "https://www.totaralms.com"
+    Then the field "customfield_url2[url]" matches value "https://www.totaralearning.com"
     And the field "customfield_url2[text]" matches value "Totara LMS"
     And the field "customfield_url2[target]" matches value "1"
     And the field "customfield_url3[url]" matches value "/my"

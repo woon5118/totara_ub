@@ -14,12 +14,12 @@ Feature: Administrators can add a regex to custom text input field
   @javascript
   Scenario: Create a custom text input with regex and check that it works
     When I set the following fields to these values:
-      | fullname    | Custom Text Input Field                    |
-      | shortname   | textinput                                  |
-      | defaultdata | http://www.totaralms.com/partners              |
-      | param1      | 50                                         |
-      | param2      | 50                                         |
-      | regex       | /^https?:\/\/www\.totaralms\.com\/[^\?]*$/ |
+      | fullname    | Custom Text Input Field                         |
+      | shortname   | textinput                                       |
+      | defaultdata | http://www.totaralearning.com/partners          |
+      | param1      | 51                                              |
+      | param2      | 51                                              |
+      | regex       | /^https?:\/\/www\.totaralearning\.com\/[^\?]*$/ |
     And I press "Save changes"
     And I should see "Custom Text Input Field"
 
@@ -29,7 +29,7 @@ Feature: Administrators can add a regex to custom text input field
     And I should see "Add a new course"
     And I expand all fieldsets
     And I should see "Custom Text Input Field"
-    Then the field "customfield_textinput" matches value "http://www.totaralms.com/partners"
+    Then the field "customfield_textinput" matches value "http://www.totaralearning.com/partners"
 
     # Check when field doesn't match pattern
     When I set the following fields to these values:
@@ -41,14 +41,14 @@ Feature: Administrators can add a regex to custom text input field
 
     # Check when field match pattern
     When I set the following fields to these values:
-      | fullname              | Course One                                     |
-      | shortname             | course1                                        |
-      | customfield_textinput | https://www.totaralms.com/solutions/totara-lms |
+      | fullname              | Course One                                          |
+      | shortname             | course1                                             |
+      | customfield_textinput | https://www.totaralearning.com/solutions/totara-lms |
     And I press "Save and display"
     Then I should see "Course One" in the page title
     And I navigate to "Edit settings" node in "Course administration"
     And I expand all fieldsets
-    And the field "customfield_textinput" matches value "https://www.totaralms.com/solutions/totara-lms"
+    And the field "customfield_textinput" matches value "https://www.totaralearning.com/solutions/totara-lms"
 
   @javascript
   Scenario: Check that default value also enforced to match pattern

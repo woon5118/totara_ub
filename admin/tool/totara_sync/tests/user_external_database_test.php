@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Simon Player <simon.player@totaralms.com>
+ * @author Simon Player <simon.player@totaralearning.com>
  * @package totara_sync
  */
 
@@ -112,7 +112,7 @@ class tool_totara_sync_user_external_database_testcase extends advanced_testcase
         'url' => array(
             'maxfieldsize' => 255,
             'type' => 'string',
-            'data' => 'https://www.totaralms.com/',
+            'data' => 'https://www.totaralearning.com/',
         ),
         'institution' => array(
             'maxfieldsize' => 255,

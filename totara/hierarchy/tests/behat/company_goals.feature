@@ -152,9 +152,9 @@ Feature: Verify creation and use of company goal types and custom fields.
       | Select 3                       | 1            |
       | Text area 1                    | Text area 1  |
       | Text input 1                   | Text input 1 |
-      | customfield_url1[url]          | https://www.totaralms.com |
-      | customfield_url1[text]         | Totara LMS                |
-      | customfield_url1[target]       | 1                         |
+      | customfield_url1[url]          | https://www.totaralearning.com |
+      | customfield_url1[text]         | Totara LMS                     |
+      | customfield_url1[target]       | 1                              |
     And I upload "/totara/hierarchy/tests/behat/fixtures/logo.png" file to "File 1" filemanager
     And I press "Save changes"
     # Check that all the data has been added to the company goal.

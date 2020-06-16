@@ -243,20 +243,20 @@ Feature: Verify creation and use of personal goal types and custom fields.
     # We can only add the custom field data after the goal has been created.
     When I click on "Edit" "link" in the ".personal_table" "css_element"
     And I set the following fields to these values:
-      | Checkbox 1                     | 1                         |
-      | customfield_datetime1[enabled] | 1                         |
-      | customfield_datetime1[month]   | December                  |
-      | customfield_datetime1[day]     | 31                        |
-      | customfield_datetime1[year]    | 2035                      |
-      | customfield_menuofchoices1     | Choice 1                  |
-      | Select 1                       | 1                         |
-      | Select 2                       | 1                         |
-      | Select 3                       | 1                         |
-      | Text area 1                    | Text area 1               |
-      | Text input 1                   | Text input 1              |
-      | customfield_url1[url]          | https://www.totaralms.com |
-      | customfield_url1[text]         | Totara LMS                |
-      | customfield_url1[target]       | 1                         |
+      | Checkbox 1                     | 1                              |
+      | customfield_datetime1[enabled] | 1                              |
+      | customfield_datetime1[month]   | December                       |
+      | customfield_datetime1[day]     | 31                             |
+      | customfield_datetime1[year]    | 2035                           |
+      | customfield_menuofchoices1     | Choice 1                       |
+      | Select 1                       | 1                              |
+      | Select 2                       | 1                              |
+      | Select 3                       | 1                              |
+      | Text area 1                    | Text area 1                    |
+      | Text input 1                   | Text input 1                   |
+      | customfield_url1[url]          | https://www.totaralearning.com |
+      | customfield_url1[text]         | Totara LMS                     |
+      | customfield_url1[target]       | 1                              |
     # The file upload won't work while there's an existing problem with the file manager loading.
     # Uncomment tag over scenario and lines below when problem with the file manager fixed.
     # And I upload "/totara/core/pix/logo.png" file to "File 1" filemanager
@@ -449,7 +449,7 @@ Feature: Verify creation and use of personal goal types and custom fields.
       | Select 3                           | 1                         |
       | Text area 1                        | Text area 1               |
       | Text input 1                       | Text input 1              |
-      | customfield_url1_1_1[url]          | https://www.totaralms.com |
+      | customfield_url1_1_1[url]          | https://www.totaralearning.com |
       | customfield_url1_1_1[text]         | Totara LMS                |
       | customfield_url1_1_1[target]       | 1                         |
       | Your answer                        | How did I do?             |
@@ -475,7 +475,7 @@ Feature: Verify creation and use of personal goal types and custom fields.
     And the field "Select 3" matches value "1"
     And the field "Text area 1" matches value "Text area 1"
     And the field "Text input 1" matches value "Text input 1"
-    And the field "customfield_url1_1_2[url]" matches value "https://www.totaralms.com"
+    And the field "customfield_url1_1_2[url]" matches value "https://www.totaralearning.com"
     And the field "customfield_url1_1_2[text]" matches value "Totara LMS"
     And the field "customfield_url1_1_2[target]" matches value "1"
 

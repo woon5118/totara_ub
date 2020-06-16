@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Sam Hemelryk <sam.hemelryk@totaralms.com>
+ * @author Sam Hemelryk <sam.hemelryk@totaralearning.com>
  * @package totara_form
  */
 
@@ -48,8 +48,8 @@ use totara_form\form\group\section;
 /**
  * Element compilation test form.
  *
- * @author Sam Hemelryk <sam.hemelryk@totaralms.com>
- * @copyright 2016 Totara Learning Solutions Ltd {@link http://www.totaralms.com/}
+ * @author Sam Hemelryk <sam.hemelryk@totaralearning.com>
+ * @copyright 2016 Totara Learning Solutions Ltd {@link http://www.totaralearning.com/}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @package totara_form
  */
@@ -108,7 +108,7 @@ class element_compilation_frozen extends form {
             'text' => 'Totara 9.0',
             'textarea' => 'Some random text, Some random text, Some random text, Some random text',
             'utc10date' => 1485338400,
-            'url' => 'https://www.totaralms.com',
+            'url' => 'https://www.totaralearning.com',
             'yesno' => '1',
         ];
     }

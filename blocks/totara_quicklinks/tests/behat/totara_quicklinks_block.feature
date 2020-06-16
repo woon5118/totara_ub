@@ -36,7 +36,7 @@ Feature: Test Quick Links block
     And I expand all fieldsets
     And I click on "Manage links" "link"
     And I set the "linktitle" Totara form field to "Totara"
-    And I set the "linkurl" Totara form field to "https://www.totaralms.com/"
+    And I set the "linkurl" Totara form field to "https://www.totaralearning.com/"
     And I click on "Add link" "button"
     And I should see "Successfully added new quicklink"
     # Refresh the page to remove "Successfully added new quicklink" message
@@ -99,7 +99,7 @@ Feature: Test Quick Links block
     And I expand all fieldsets
     And I click on "Manage links" "link"
     And I set the "linktitle" Totara form field to "Totara"
-    And I set the "linkurl" Totara form field to "https://www.totaralms.com/"
+    And I set the "linkurl" Totara form field to "https://www.totaralearning.com/"
     And I click on "Add link" "button"
     And I should see "Successfully added new quicklink"
     Then I am on "Course 1" course homepage

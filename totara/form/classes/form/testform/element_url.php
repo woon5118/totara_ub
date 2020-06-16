@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Sam Hemelryk <sam.hemelryk@totaralms.com>
+ * @author Sam Hemelryk <sam.hemelryk@totaralearning.com>
  * @package totara_form
  */
 
@@ -30,8 +30,8 @@ use totara_form\form\clientaction\hidden_if;
 /**
  * URL test form
  *
- * @author Sam Hemelryk <sam.hemelryk@totaralms.com>
- * @copyright 2016 Totara Learning Solutions Ltd {@link http://www.totaralms.com/}
+ * @author Sam Hemelryk <sam.hemelryk@totaralearning.com>
+ * @copyright 2016 Totara Learning Solutions Ltd {@link http://www.totaralearning.com/}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @package totara_form
  */
@@ -51,8 +51,8 @@ class element_url extends form {
      */
     public static function get_current_data_for_test() {
         return [
-            'url_with_current_data' => 'http://www.totaralms.com',
-            'url_frozen_with_current_data' => 'https://www.totaralms.com',
+            'url_with_current_data' => 'http://www.totaralearning.com',
+            'url_frozen_with_current_data' => 'https://www.totaralearning.com',
         ];
     }
 
@@ -73,15 +73,15 @@ class element_url extends form {
         $hiddenif_primary = $section->add(new url('hiddenif_primary', 'Hidden if reference'));
         $hiddenif_secondary_a = $section->add(new url('hiddenif_secondary_a', 'Visible when test is not empty'));
         $hiddenif_secondary_b = $section->add(new url('hiddenif_secondary_b', 'Visible when test is empty'));
-        $hiddenif_secondary_c = $section->add(new url('hiddenif_secondary_c', 'Visible when test is not equal to \'https://totaralms.com\''));
-        $hiddenif_secondary_d = $section->add(new url('hiddenif_secondary_d', 'Visible when test equals \'https://totaralms.com\''));
+        $hiddenif_secondary_c = $section->add(new url('hiddenif_secondary_c', 'Visible when test is not equal to \'https://totaralearning.com\''));
+        $hiddenif_secondary_d = $section->add(new url('hiddenif_secondary_d', 'Visible when test equals \'https://totaralearning.com\''));
         $hiddenif_secondary_e = $section->add(new url('hiddenif_secondary_e', 'Visible when test is not filled'));
         $hiddenif_secondary_f = $section->add(new url('hiddenif_secondary_f', 'Visible when test is filled'));
 
         $this->model->add_clientaction(new hidden_if($hiddenif_secondary_a))->is_empty($hiddenif_primary);
         $this->model->add_clientaction(new hidden_if($hiddenif_secondary_b))->not_empty($hiddenif_primary);
-        $this->model->add_clientaction(new hidden_if($hiddenif_secondary_c))->is_equal($hiddenif_primary, 'https://totaralms.com');
-        $this->model->add_clientaction(new hidden_if($hiddenif_secondary_d))->not_equals($hiddenif_primary, 'https://totaralms.com');
+        $this->model->add_clientaction(new hidden_if($hiddenif_secondary_c))->is_equal($hiddenif_primary, 'https://totaralearning.com');
+        $this->model->add_clientaction(new hidden_if($hiddenif_secondary_d))->not_equals($hiddenif_primary, 'https://totaralearning.com');
         $this->model->add_clientaction(new hidden_if($hiddenif_secondary_e))->is_filled($hiddenif_primary);
         $this->model->add_clientaction(new hidden_if($hiddenif_secondary_f))->not_filled($hiddenif_primary);
 
