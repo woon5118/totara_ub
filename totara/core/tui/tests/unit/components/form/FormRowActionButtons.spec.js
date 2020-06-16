@@ -20,23 +20,38 @@
  * @package totara_core
  */
 
-import { shallowMount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import component from 'totara_core/components/form/FormRowActionButtons.vue';
+import { axe, toHaveNoViolations } from 'jest-axe';
+expect.extend(toHaveNoViolations);
 let wrapper;
 const eventFunc = jest.fn();
 
 describe('presentation/form/FormRowActionButtons.vue', () => {
   beforeAll(() => {
-    wrapper = shallowMount(component, {
+    wrapper = mount(component, {
       listeners: {
         cancel: eventFunc,
         submit: eventFunc,
       },
       propsData: { id: 'example' },
+      mocks: {
+        $id: x => 'id-' + x,
+      },
+      stubs: ['ButtonCancel', 'ButtonSubmit'],
     });
   });
 
   it('Checks snapshot', () => {
     expect(wrapper.element).toMatchSnapshot();
+  });
+
+  it('should not have any accessibility violations', async () => {
+    const results = await axe(wrapper.element, {
+      rules: {
+        region: { enabled: false },
+      },
+    });
+    expect(results).toHaveNoViolations();
   });
 });

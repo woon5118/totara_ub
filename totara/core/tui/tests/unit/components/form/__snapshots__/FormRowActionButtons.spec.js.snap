@@ -1,9 +1,28 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`presentation/form/FormRowActionButtons.vue Checks snapshot 1`] = `
-<formrow-stub
+<div
+  class="tui-formRow"
   id="example"
 >
-  <submitcancelgroup-stub />
-</formrow-stub>
+  <div
+    class="tui-formRow__desc"
+  >
+    <!---->
+     
+    <!---->
+  </div>
+   
+  <div
+    class="tui-formRow__action"
+  >
+    <div
+      class="tui-formBtnGroup"
+    >
+      <buttonsubmit-stub />
+       
+      <buttoncancel-stub />
+    </div>
+  </div>
+</div>
 `;
