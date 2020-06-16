@@ -318,4 +318,37 @@ final class factory {
 
         throw new \coding_exception("There is already a container class that set for type '{$type}'");
     }
+
+    /**
+     * Get the helper for container specific functionality for backing up via the Moodle2 Backup API.
+     *
+     * @param int|object $course Course ID or record
+     * @return backup_helper
+     */
+    public static function get_backup_helper($course): backup_helper {
+        global $CFG;
+        require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
+
+        $container = is_object($course) ? self::from_record($course) : self::from_id($course);
+        $helper_class_name = (new ReflectionClass($container))->getNamespaceName() . '\backup\backup_helper';
+
+        return class_exists($helper_class_name) ? new $helper_class_name($container) : new backup_helper($container);
+    }
+
+    /**
+     * Get the helper for container specific functionality for restoring via the Moodle2 Backup API.
+     *
+     * @param int|object $course Course ID or record
+     * @return restore_helper
+     */
+    public static function get_restore_helper($course): restore_helper {
+        global $CFG;
+        require_once($CFG->dirroot . '/backup/util/includes/restore_includes.php');
+
+        $container = is_object($course) ? self::from_record($course) : self::from_id($course);
+        $helper_class_name = (new ReflectionClass($container))->getNamespaceName() . '\backup\restore_helper';
+
+        return class_exists($helper_class_name) ? new $helper_class_name($container) : new restore_helper($container);
+    }
+
 }
