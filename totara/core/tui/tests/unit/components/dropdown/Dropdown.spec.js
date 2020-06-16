@@ -20,14 +20,16 @@
  * @package totara_core
  */
 
-import { shallowMount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import Dropdown from 'totara_core/components/dropdown/Dropdown';
+import { axe, toHaveNoViolations } from 'jest-axe';
+expect.extend(toHaveNoViolations);
 
 let wrapper;
 
 describe('Dropdown', () => {
   beforeEach(() => {
-    wrapper = shallowMount(Dropdown, {
+    wrapper = mount(Dropdown, {
       mocks: {
         $id: x => 'id-' + x,
       },
@@ -54,5 +56,14 @@ describe('Dropdown', () => {
     wrapper.setProps({ canClose: false });
     wrapper.vm.$_clickedOutside(event);
     expect(wrapper.vm.triggerOpen).toBeTruthy();
+  });
+
+  it('should not have any accessibility violations', async () => {
+    const results = await axe(wrapper.element, {
+      rules: {
+        region: { enabled: false },
+      },
+    });
+    expect(results).toHaveNoViolations();
   });
 });
