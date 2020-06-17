@@ -29,6 +29,7 @@
 }
 
 .tui-modalContent {
+  @include tui-font-body();
   display: flex;
   flex-direction: column;
   flex-grow: 1;
