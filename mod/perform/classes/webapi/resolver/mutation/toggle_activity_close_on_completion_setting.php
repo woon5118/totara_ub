@@ -31,6 +31,7 @@ use core\webapi\resolver\has_middleware;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\activity_setting;
 use mod_perform\webapi\middleware\require_activity;
+use moodle_exception;
 
 /**
  * Handles the "mod_perform_toggle_activity_close_on_completion_setting" GraphQL mutation.
@@ -45,12 +46,22 @@ class toggle_activity_close_on_completion_setting implements mutation_resolver, 
             throw new \invalid_parameter_exception('unknown activity id');
         }
 
+        try {
+            $activity = activity::load_by_id($activity_id);
+        } finally {
+            if (!isset($activity) || !$activity->can_manage()) {
+                throw new moodle_exception('invalid_activity', 'mod_perform');
+            }
+        }
+
+        $ec->set_relevant_context($activity->get_context());
+
         $value = $args['input']['setting'] ?? null;
         if (is_null($value)) {
             throw new \invalid_parameter_exception('close on completion setting not specified');
         }
 
-        return activity::load_by_id($activity_id)
+        return $activity
             ->settings
             ->update([activity_setting::CLOSE_ON_COMPLETION => (bool)$value])
             ->get_activity();

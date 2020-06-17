@@ -30,6 +30,7 @@ use core\webapi\resolver\has_middleware;
 
 use mod_perform\models\activity\activity;
 use mod_perform\webapi\middleware\require_activity;
+use moodle_exception;
 
 /**
  * Handles the "mod_perform_toggle_activity_multisection_setting" GraphQL mutation.
@@ -49,8 +50,17 @@ class toggle_activity_multisection_setting implements mutation_resolver, has_mid
             throw new \invalid_parameter_exception('multisection setting not specified');
         }
 
-        return activity::load_by_id($activity_id)
-            ->toggle_multisection_setting((bool)$value);
+        try {
+            $activity = activity::load_by_id($activity_id);
+        } finally {
+            if (!isset($activity) || !$activity->can_manage()) {
+                throw new moodle_exception('invalid_activity', 'mod_perform');
+            }
+        }
+
+        $ec->set_relevant_context($activity->get_context());
+
+        return $activity->toggle_multisection_setting((bool)$value);
     }
 
     /**

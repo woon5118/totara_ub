@@ -48,6 +48,8 @@ class activate_activity implements mutation_resolver, has_middleware {
             }
         }
 
+        $ec->set_relevant_context($activity->get_context());
+
         // If activity is already active just return
         if ($activity->is_active()) {
             return ['activity' => $activity];

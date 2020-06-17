@@ -51,6 +51,8 @@ class add_section implements mutation_resolver, has_middleware {
             }
         }
 
+        $ec->set_relevant_context($activity->get_context());
+
         $add_before_sort_order = $args['add_before'] ?? null;
 
         if (!$activity->get_settings()->lookup(activity_setting::MULTISECTION)) {

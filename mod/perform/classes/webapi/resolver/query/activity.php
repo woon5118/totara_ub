@@ -24,12 +24,12 @@
 namespace mod_perform\webapi\resolver\query;
 
 use core\webapi\execution_context;
-use core\webapi\query_resolver;
 use core\webapi\middleware\require_advanced_feature;
+use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
-
-use mod_perform\webapi\middleware\require_activity;
 use mod_perform\models\activity\activity as activity_model;
+use mod_perform\webapi\middleware\require_activity;
+use moodle_exception;
 
 class activity implements query_resolver, has_middleware {
     /**
@@ -37,17 +37,14 @@ class activity implements query_resolver, has_middleware {
      */
     public static function resolve(array $args, execution_context $ec) {
         // This may be opened up later, but for now user needs manage capability.
-        /** @var activity_model $activity */
         $activity = activity_model::load_by_id($args['activity_id']);
 
+        $context = $activity->get_context();
         if (!$activity->can_manage()) {
-            throw new \required_capability_exception(
-                $activity->get_context(),
-                'mod/perform:manage_activity',
-                'nopermission',
-                ''
-            );
+            throw new moodle_exception('invalid_activity', 'mod_perform');
         }
+
+        $ec->set_relevant_context($context);
 
         return $activity;
     }

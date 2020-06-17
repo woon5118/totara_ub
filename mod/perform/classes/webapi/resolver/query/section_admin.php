@@ -24,11 +24,12 @@
 namespace mod_perform\webapi\resolver\query;
 
 use core\webapi\execution_context;
-use core\webapi\query_resolver;
 use core\webapi\middleware\require_advanced_feature;
+use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
 use mod_perform\models\activity\section as section_model;
 use mod_perform\webapi\middleware\require_activity;
+use moodle_exception;
 
 class section_admin implements query_resolver, has_middleware {
     /**
@@ -48,12 +49,7 @@ class section_admin implements query_resolver, has_middleware {
         $activity_context = $activity->get_context();
 
         if (!$activity->can_manage()) {
-            throw new \required_capability_exception(
-                $activity_context,
-                'mod/perform:manage_activity',
-                'nopermission',
-                ''
-            );
+            throw new moodle_exception('invalid_activity', 'mod_perform');
         }
 
         $ec->set_relevant_context($activity_context);

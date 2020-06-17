@@ -45,9 +45,12 @@ class update_section_elements implements mutation_resolver, has_middleware {
 
         $section = section::load_by_id($section_form_data['section_id']);
 
-        if (!$section->get_activity()->can_manage()) {
+        $activity = $section->get_activity();
+        if (!$activity->can_manage()) {
             throw new \coding_exception('No permission to manage section elements');
         }
+
+        $ec->set_relevant_context($activity->get_context());
 
         $DB->transaction(function () use ($section, $section_form_data) {
             // Remove elements from the section.

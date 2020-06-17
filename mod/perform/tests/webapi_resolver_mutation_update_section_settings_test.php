@@ -137,8 +137,8 @@ class mod_perform_webapi_resolver_mutation_update_section_settings_testcase exte
         $user1 = $this->getDataGenerator()->create_user();
         $this->setUser($user1);
 
-        $this->expectException(required_capability_exception::class);
-        $this->expectExceptionMessage('you do not currently have permissions to do that (Manage performance activities)');
+        $this->expectException(moodle_exception::class);
+        $this->expectExceptionMessage('Invalid activity');
 
         [$args, $context] = $this->create_args(
             $section1->id,

@@ -30,6 +30,7 @@ use core\webapi\mutation_resolver;
 use core\webapi\resolver\has_middleware;
 use mod_perform\models\activity\activity;
 use mod_perform\webapi\middleware\require_activity;
+use moodle_exception;
 
 class clone_activity implements mutation_resolver, has_middleware {
 
@@ -51,13 +52,10 @@ class clone_activity implements mutation_resolver, has_middleware {
 
         $activity = activity::load_by_id($activity_id);
         if (!$activity->can_clone) {
-            throw new \required_capability_exception(
-                $activity->get_context(),
-                backup_helper::CAPABILITY_CONTAINER,
-                'nopermission',
-                ''
-            );
+            throw new moodle_exception('invalid_activity', 'mod_perform');
         }
+
+        $ec->set_relevant_context($activity->get_context());
 
         return ['activity' => $activity->clone()];
     }

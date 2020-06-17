@@ -24,13 +24,12 @@
 namespace mod_perform\webapi\resolver\query;
 
 use core\webapi\execution_context;
-use core\webapi\query_resolver;
 use core\webapi\middleware\require_advanced_feature;
+use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
-
-use mod_perform\webapi\middleware\require_activity;
-
 use mod_perform\models\activity\track as track_model;
+use mod_perform\webapi\middleware\require_activity;
+use moodle_exception;
 
 /**
  * Handles the "mod_perform_track" GraphQL query.
@@ -45,7 +44,17 @@ class track implements query_resolver, has_middleware {
             throw new \invalid_parameter_exception('invalid track id');
         }
 
-        return track_model::load_by_id($track_id);
+        $track = track_model::load_by_id($track_id);
+
+        $activity = $track->get_activity();
+        $context = $activity->get_context();
+        if (!$activity->can_manage()) {
+            throw new moodle_exception('invalid_activity', 'mod_perform');
+        }
+
+        $ec->set_relevant_context($context);
+
+        return $track;
     }
 
     /**

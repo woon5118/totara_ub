@@ -30,6 +30,7 @@ use core\webapi\middleware\require_advanced_feature;
 use core\webapi\resolver\has_middleware;
 use mod_perform\models\activity\track;
 use mod_perform\webapi\middleware\require_activity;
+use moodle_exception;
 
 class update_track_schedule implements mutation_resolver, has_middleware {
     /**
@@ -43,13 +44,10 @@ class update_track_schedule implements mutation_resolver, has_middleware {
         $context = $activity->get_context();
 
         if (!$activity->can_manage()) {
-            throw new \required_capability_exception(
-                $context,
-                'mod/perform:manage_activity',
-                'nopermission',
-                ''
-            );
+            throw new moodle_exception('invalid_activity', 'mod_perform');
         }
+
+        $ec->set_relevant_context($context);
 
         $errors = static::validate_inputs($track_schedule, $track);
 
@@ -154,8 +152,6 @@ class update_track_schedule implements mutation_resolver, has_middleware {
         }
 
         $track->update();
-
-        $ec->set_relevant_context($context);
 
         return [
             'track' => $track,

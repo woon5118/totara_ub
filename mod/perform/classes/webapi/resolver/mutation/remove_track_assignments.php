@@ -54,6 +54,8 @@ class remove_track_assignments implements mutation_resolver, has_middleware {
         }
         $track = track::load_by_id($track_id);
 
+        $ec->set_relevant_context($track->get_activity()->get_context());
+
         $assignment_type = $assignments['type'] ?? track_assignment_type::ADMIN;
         $groups = $assignments['groups'] ?? [];
 

@@ -31,6 +31,7 @@ use core\webapi\mutation_resolver;
 use core\webapi\resolver\has_middleware;
 use mod_perform\models\activity\section;
 use mod_perform\webapi\middleware\require_activity;
+use moodle_exception;
 
 class update_section_settings implements mutation_resolver, has_middleware {
     /**
@@ -47,8 +48,13 @@ class update_section_settings implements mutation_resolver, has_middleware {
             throw new coding_exception('Specified section id does not exist');
         }
 
-        $activity_context = $section->get_activity()->get_context();
-        require_capability('mod/perform:manage_activity', $activity_context);
+        $activity = $section->get_activity();
+        $context = $activity->get_context();
+        if (!$activity->can_manage()) {
+            throw new moodle_exception('invalid_activity', 'mod_perform');
+        }
+
+        $ec->set_relevant_context($context);
 
         if (isset($args['title'])) {
             $section->update_title($args['title']);

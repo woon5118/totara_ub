@@ -71,7 +71,9 @@ class mod_perform_webapi_resolver_query_relationships_testcase extends advanced_
         $user = self::getDataGenerator()->create_user();
         self::setUser($user);
 
-        $this->expectException(required_capability_exception::class);
+        $this->expectException(moodle_exception::class);
+        $this->expectExceptionMessage('Invalid activity');
+
         $this->resolve_graphql_query(self::QUERY, ['activity_id' => $this->activity->id]);
     }
 

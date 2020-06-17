@@ -43,8 +43,8 @@ class mod_perform_webapi_resolver_mutation_update_activity_general_info_testcase
         $user = self::getDataGenerator()->create_user();
         self::setUser($user);
 
-        $this->expectException(required_capability_exception::class);
-        $this->expectExceptionMessage('Manage performance activities');
+        $this->expectException(moodle_exception::class);
+        $this->expectExceptionMessage('Invalid activity');
 
         update_activity_general_info::resolve($args, $context);
     }

@@ -24,14 +24,13 @@
 namespace mod_perform\webapi\resolver\query;
 
 use core\webapi\execution_context;
-use core\webapi\query_resolver;
 use core\webapi\middleware\require_advanced_feature;
+use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
-
-use mod_perform\webapi\middleware\require_activity;
-
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\track;
+use mod_perform\webapi\middleware\require_activity;
+use moodle_exception;
 
 /**
  * Handles the "mod_perform_default_track" GraphQL query.
@@ -50,6 +49,13 @@ class default_track implements query_resolver, has_middleware {
         if (!$activity_id) {
             throw new \invalid_parameter_exception('invalid activity id');
         }
+
+        $context = $activity->get_context();
+        if (!$activity->can_manage()) {
+            throw new moodle_exception('invalid_activity', 'mod_perform');
+        }
+
+        $ec->set_relevant_context($context);
 
         $default_track = track::load_by_activity($activity)->first();
         if (!$default_track) {

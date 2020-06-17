@@ -53,7 +53,7 @@ class subject_instance implements query_resolver, has_middleware {
         $ec->set_relevant_context(subject_instance_model::load_by_entity($subject_instance_entity)->get_context());
 
         /** @var user $target_participant */
-        $participant_id = User::logged_in()->id;
+        $participant_id = user::logged_in()->id;
 
         /** @var subject_instance_model $subject_instance */
         return (new subject_instance_data_provider($participant_id))

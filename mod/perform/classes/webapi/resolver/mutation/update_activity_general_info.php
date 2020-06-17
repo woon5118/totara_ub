@@ -27,17 +27,25 @@ use core\webapi\execution_context;
 use core\webapi\mutation_resolver;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\resolver\has_middleware;
+use mod_perform\models\activity\activity;
 use mod_perform\models\activity\activity as activity_model;
 use mod_perform\webapi\middleware\require_activity;
+use moodle_exception;
 
 class update_activity_general_info implements mutation_resolver, has_middleware {
     /**
      * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
-        $activity = activity_model::load_by_id($args['activity_id']);
+        try {
+            $activity = activity::load_by_id($args['activity_id']);
+        } finally {
+            if (!isset($activity) || !$activity->can_manage()) {
+                throw new moodle_exception('invalid_activity', 'mod_perform');
+            }
+        }
 
-        require_capability('mod/perform:manage_activity', $activity->get_context());
+        $ec->set_relevant_context($activity->get_context());
 
         $activity->update_general_info($args['name'], $args['description'] ?? null);
 

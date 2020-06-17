@@ -52,6 +52,8 @@ class create_track implements mutation_resolver, has_middleware {
         }
 
         $activity = activity::load_by_id($activity_id);
+        $ec->set_relevant_context($activity->get_context());
+
         $description = $details['description'] ?? '';
 
         return track::create($activity, $description);
