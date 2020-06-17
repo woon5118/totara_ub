@@ -53,7 +53,7 @@ class image extends formatter {
      * @return \stdClass
      */
     public function get_formatted_value(array $data, \context $context): \stdClass {
-        global $CFG;
+        global $CFG, $PAGE;
 
         require_once($CFG->dirroot . '/totara/program/program.class.php');
 
@@ -68,7 +68,8 @@ class image extends formatter {
         $prog = new \program($data['programid']);
 
         $image = new \stdClass();
-        $image->url = $prog->get_image();
+        $imageurl = new \moodle_url($prog->get_image(), ['preview' => 'totara_catalog_medium', 'theme' => $PAGE->theme->name]);
+        $image->url = $imageurl->out();
         $image->alt = format_string($data['alt'], true, ['context' => $context]);
 
         return $image;

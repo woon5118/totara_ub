@@ -122,7 +122,7 @@ class program_tile extends learning_item_tile {
      * @return array
      */
     protected function get_content_wrapper_template_data(\renderer_base $renderer, array $settings = []): array {
-        global $CFG;
+        global $CFG, $PAGE;
         $data = parent::get_content_wrapper_template_data($renderer, $settings);
         if (!empty($this->get_program())) {
             $programid = $this->get_program()->id;
@@ -132,6 +132,9 @@ class program_tile extends learning_item_tile {
             // Get program tile image to use it as background.
             $image = $this->get_program()->get_image($programid);
             if ($image) {
+                $image = new \moodle_url($image, ['preview' => 'block_totara_featured_links_large', 'theme' => $PAGE->theme->name]);
+                $image->url = $image->out();
+
                 $data['background_img'] = $image;
             }
         }

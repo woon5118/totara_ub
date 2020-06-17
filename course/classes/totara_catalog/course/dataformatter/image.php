@@ -53,6 +53,7 @@ class image extends formatter {
      * @return \stdClass
      */
     public function get_formatted_value(array $data, \context $context): \stdClass {
+        global $PAGE;
 
         if (!array_key_exists('courseid', $data)) {
             throw new \coding_exception("Course image data formatter expects 'courseid'");
@@ -63,7 +64,9 @@ class image extends formatter {
         }
 
         $image = new \stdClass();
-        $image->url = course_get_image($data['courseid'])->out();
+        $course_image = course_get_image($data['courseid'])->out();
+        $imageurl = new \moodle_url($course_image, ['preview' => 'totara_catalog_medium', 'theme' => $PAGE->theme->name]);
+        $image->url = $imageurl->out();
         $image->alt = format_string($data['alt'], true, ['context' => $context]);
 
         return $image;

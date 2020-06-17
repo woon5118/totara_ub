@@ -110,7 +110,7 @@ class course_tile extends learning_item_tile {
      * @return array
      */
     protected function get_content_wrapper_template_data(\renderer_base $renderer, array $settings = []): array {
-        global $CFG;
+        global $CFG, $PAGE;
         require_once($CFG->dirroot . "/course/lib.php");
         $data = parent::get_content_wrapper_template_data($renderer, $settings);
         if (!empty($this->get_course())) {
@@ -120,6 +120,7 @@ class course_tile extends learning_item_tile {
 
             // Get course tile image to use it as background.
             $image = course_get_image($course);
+            $image = new \moodle_url($image->out(), ['preview' => 'block_totara_featured_links_large', 'theme' => $PAGE->theme->name]);
             $data['background_img'] = $image->out();
         }
 

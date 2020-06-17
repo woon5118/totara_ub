@@ -22,5 +22,5 @@
  */
 
 $plugin->component = 'block_totara_featured_links';
-$plugin->version = 2019102300; // Version of the block YYYYMMDDHH.
+$plugin->version = 2020070100; // Version of the block YYYYMMDDHH.
 $plugin->requires = 2017111309; // Version of moodle the block requires YYYYMMDDHH.
