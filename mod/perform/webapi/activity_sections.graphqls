@@ -70,7 +70,8 @@ extend type Query {
   A section of elements for a user to respond to
   """
   mod_perform_participant_section(
-    participant_instance_id: core_id!
+    participant_instance_id: core_id
+    participant_section_id: core_id
   ): mod_perform_participant_section
 }
 

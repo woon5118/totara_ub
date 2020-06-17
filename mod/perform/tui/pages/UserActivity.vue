@@ -37,6 +37,7 @@
         :current-user-id="currentUserId"
         :activity="subjectInstance.activity"
         :participant-instance-id="participantInstanceId"
+        :participant-section-id="participantSectionId"
         :subject-user="subjectInstance.subject_user"
       />
     </Loader>
@@ -64,7 +65,11 @@ export default {
       type: Number,
     },
     participantInstanceId: {
-      required: true,
+      required: false,
+      type: Number,
+    },
+    participantSectionId: {
+      required: false,
       type: Number,
     },
     subjectInstanceId: {

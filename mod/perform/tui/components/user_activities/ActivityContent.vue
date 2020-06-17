@@ -143,8 +143,8 @@ export default {
     Collapsible,
     OtherParticipantResponses,
     ParticipantUserHeader,
-    Uniform,
     ToggleButton,
+    Uniform,
   },
 
   props: {
@@ -169,7 +169,13 @@ export default {
      * This will change when we introduce multiple sections.
      */
     participantInstanceId: {
-      required: true,
+      type: Number,
+    },
+
+    /**
+     * participant section id
+     */
+    participantSectionId: {
       type: Number,
     },
 
@@ -191,11 +197,13 @@ export default {
     return {
       answerableParticipantInstances: null,
       answeringAsParticipantId: this.participantInstanceId,
+      answeringAsSectionId: this.participantSectionId,
+      completionSaveSuccess: false,
       errors: null,
       hasOtherResponse: false,
       initialValues: null,
       isSaving: false,
-      participantSectionId: null,
+      participantSectionIdParam: this.participantSectionId,
       section: {
         title: '',
         section_elements: [],
@@ -211,11 +219,13 @@ export default {
       variables() {
         return {
           participant_instance_id: this.answeringAsParticipantId,
+          participant_section_id: this.answeringAsSectionId,
         };
       },
       update: data => data.mod_perform_participant_section.section,
       result({ data }) {
-        this.participantSectionId = data.mod_perform_participant_section.id;
+        this.participantSectionIdParam =
+          data.mod_perform_participant_section.id;
         this.answerableParticipantInstances =
           data.mod_perform_participant_section.answerable_participant_instances;
         this.initialValues = {};
@@ -367,7 +377,7 @@ export default {
         mutation: UpdateSectionResponsesMutation,
         variables: {
           input: {
-            participant_section_id: this.participantSectionId,
+            participant_section_id: this.participantSectionIdParam,
             update: update,
           },
         },

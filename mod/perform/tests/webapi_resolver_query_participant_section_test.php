@@ -40,7 +40,7 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
 
     use webapi_phpunit_helper;
 
-    public function test_get_participant_section(): void {
+    public function test_get_participant_section_by_participant_instance_id(): void {
         [$participant_sections, $section_element] = $this->create_test_data();
 
         foreach ($participant_sections as $participant_section) {
@@ -75,8 +75,42 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
         }
     }
 
+    public function test_get_participant_section_by_participant_section_id() {
+        [$participant_sections, $section_element] = $this->create_test_data();
+
+        foreach ($participant_sections as $participant_section) {
+            self::setUser($participant_section->participant_instance->participant_user->id);
+
+            $args = ['participant_section_id' => $participant_section->id];
+
+            $result = $this->parsed_graphql_operation(self::QUERY, $args);
+            $this->assert_webapi_operation_successful($result);
+
+            $result = $this->get_webapi_operation_data($result);
+            $this->assertEquals($participant_section->id, $result['id']);
+            $this->assertSame($participant_section->section->title, $result['section']['display_title']);
+            $this->assertSame('IN_PROGRESS', $result['progress_status']);
+
+            $this->assertCount(1, $result['answerable_participant_instances']);
+            $this->assertSame('Subject', $result['answerable_participant_instances'][0]['core_relationship']['name']);
+
+            $section_element_responses = $result['section_element_responses'];
+
+            $this->assertCount(
+                1,
+                $section_element_responses,
+                'Expected one section element'
+            );
+
+            $this->assertEquals(
+                $this->create_section_element_response($section_element->id),
+                $section_element_responses[0]
+            );
+        }
+    }
+
     public function test_failed_ajax_query(): void {
-        [$participant_sections, ] = $this->create_test_data();
+        [$participant_sections,] = $this->create_test_data();
         $participant_instance = $participant_sections->first()->participant_instance;
         $args = ['participant_instance_id' => $participant_instance->id];
 
@@ -86,14 +120,31 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
         $this->assert_webapi_operation_failed($result, 'Feature performance_activities is not available.');
         advanced_feature::enable($feature);
 
+        // fail if does not provide any parameter
         $result = $this->parsed_graphql_operation(self::QUERY, []);
-        $this->assert_webapi_operation_failed($result, 'participant_instance_id');
+        $this->assert_webapi_operation_failed($result, 'One parameter is required, either participant_instance_id or participant_section_id');
 
+        // fail if provide participant_instance_id and participant_section_id at the same time
+        $result = $this->parsed_graphql_operation(self::QUERY, ['participant_instance_id' => 1, 'participant_section_id' => 1]);
+        $this->assert_webapi_operation_failed($result, 'One parameter is required, either participant_instance_id or participant_section_id');
+
+        // fail if participant_instance_id is invalid
         $result = $this->parsed_graphql_operation(self::QUERY, ['participant_instance_id' => 0]);
-        $this->assert_webapi_operation_failed($result, 'participant instance id');
+        $this->assert_webapi_operation_failed($result, 'One parameter is required, either participant_instance_id or participant_section_id');
 
+        // fail if participant_section_id is invalid
+        $result = $this->parsed_graphql_operation(self::QUERY, ['participant_section_id' => 0]);
+        $this->assert_webapi_operation_failed($result, 'One parameter is required, either participant_instance_id or participant_section_id');
+
+        // fail if not participant section related to the participant_instance_id
         $result = $this->parsed_graphql_operation(self::QUERY, ['participant_instance_id' => 1293]);
         $this->assert_webapi_operation_failed($result, "No participant section");
+
+        // If the section does not exist we return an empty result
+        $result = $this->parsed_graphql_operation(self::QUERY, ['participant_section_id' => 1293]);
+        $this->assert_webapi_operation_successful($result);
+        [$data, ] = $result;
+        $this->assertNull($data);
 
         $this->setUser();
         $result = $this->parsed_graphql_operation(self::QUERY, $args);
