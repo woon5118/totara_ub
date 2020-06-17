@@ -98,3 +98,57 @@ Feature: Managers can create courses
     And I follow "Courses Report"
     Then I should see "This is still a very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long shortname"
     And I should see "Course 1"
+
+  # Courses 1 & 3 created by trainer, courses 2 & 4 created by admin
+  @javascript
+  Scenario: Course default audience visibility setting is set
+    Given I am on a totara site
+    And the following "users" exist:
+      | username | firstname | lastname | email                   |
+      | trainer1 | Trainer   | One      | trainer.one@example.com |
+    And the following "role assigns" exist:
+      | user     | role          | contextlevel | reference |
+      | trainer1 | coursecreator | System       |           |
+    And I log in as "admin"
+    And I set the following administration settings values:
+      | Enable audience-based visibility | 1 |
+    And I navigate to "Course default settings" node in "Site administration >  Courses"
+    And I set the field "Audience-based visibility" to "No users"
+    And I click on "Save changes" "button"
+    And I log out
+    And I log in as "trainer1"
+    And I create a course with:
+      | Course full name  | Course 1 |
+      | Course short name | course1  |
+    And I log out
+    And I log in as "admin"
+    And I create a course with:
+      | Course full name  | Course 2 |
+      | Course short name | course2  |
+    When I navigate to "Edit settings" node in "Course administration"
+    Then the field "Course full name" matches value "Course 2"
+    And the field "audiencevisible" matches value "No users"
+    And I am on "Course 1" course homepage
+    When I navigate to "Edit settings" node in "Course administration"
+    Then the field "Course full name" matches value "Course 1"
+    And the field "audiencevisible" matches value "No users"
+    And I navigate to "Course default settings" node in "Site administration >  Courses"
+    And I set the field "Audience-based visibility" to "Enrolled users only"
+    And I click on "Save changes" "button"
+    And I log out
+    And I log in as "trainer1"
+    And I create a course with:
+      | Course full name  | Course 3 |
+      | Course short name | course3  |
+    And I log out
+    And I log in as "admin"
+    And I create a course with:
+      | Course full name  | Course 4 |
+      | Course short name | course4  |
+    When I navigate to "Edit settings" node in "Course administration"
+    Then the field "Course full name" matches value "Course 4"
+    And the field "audiencevisible" matches value "Enrolled users only"
+    And I am on "Course 3" course homepage
+    When I navigate to "Edit settings" node in "Course administration"
+    Then the field "Course full name" matches value "Course 3"
+    And the field "audiencevisible" matches value "Enrolled users only"

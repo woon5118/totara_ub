@@ -416,7 +416,10 @@ class core_course_edit_form {
         }
 
         if (!has_capability('totara/coursecatalog:manageaudiencevisibility', $context)) {
-            // Nothing to do here the user cannot manage visibility in this context.
+            // Add hidden field for course defaults
+            $mform->addElement('hidden', 'audiencevisible', $courseconfig->visiblelearning);
+            $mform->setType('audiencevisible', PARAM_INT);
+
             return;
         }
 
