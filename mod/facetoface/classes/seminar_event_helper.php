@@ -26,7 +26,8 @@ namespace mod_facetoface;
 
 defined('MOODLE_INTERNAL') || die();
 
-use context_module;
+use mod_facetoface\hook\resources_are_being_updated;
+use mod_facetoface\hook\sessions_are_being_updated;
 use mod_facetoface\internal\session_data;
 use mod_facetoface\signup\state\{
     attendance_state,
@@ -65,6 +66,17 @@ final class seminar_event_helper {
 
         // Get a list of sessions that should be updated/inserted.
         $dates = self::filter_sessions($dates, $sessionstobedeleted);
+
+        // Notify watchers only if sessions are being inserted or deleted, or session time is updated.
+        $datesinserted = array_filter($dates, function ($date) {
+            return empty($date->id);
+        });
+        $datesupdated = array_filter($dates, function ($date) {
+            return !empty($date->id);
+        });
+        if (!empty($datesinserted) || !empty($datesupdated) || !$sessionstobedeleted->is_empty()) {
+            (new sessions_are_being_updated($seminarevent, $datesinserted, $datesupdated, $sessionstobedeleted))->execute();
+        }
 
         // Move out conflict dates.
         /** @var seminar_session[] $sessionsindb */
@@ -125,6 +137,13 @@ final class seminar_event_helper {
                 $date->id = $DB->insert_record('facetoface_sessions_dates', $date);
             }
 
+            // Notify watchers.
+            $datecloned = clone $date;
+            $datecloned->assetids = $assets;
+            $datecloned->roomids = $rooms;
+            $datecloned->facilitatorids = $facilitators;
+            (new resources_are_being_updated($datecloned))->execute();
+
             room_helper::sync($date->id, array_unique($rooms));
             asset_helper::sync($date->id, array_unique($assets));
             facilitator_helper::sync($date->id, array_unique($facilitators));
@@ -148,12 +167,16 @@ final class seminar_event_helper {
         return array_filter($dates, function ($date) use (&$sessions) {
             $date->id = isset($date->id) ? $date->id : 0;
             if ($sessions->contains($date->id)) {
+                /** @var seminar_session $session */
                 $session = $sessions->get($date->id);
                 $sessions->remove($date->id);
                 if ($session->get_sessiontimezone() == $date->sessiontimezone
                     && $session->get_timestart() == $date->timestart
                     && $session->get_timefinish() == $date->timefinish)
                 {
+                    // Notify watchers.
+                    (new resources_are_being_updated($date))->execute();
+
                     $date->roomids = (isset($date->roomids) && is_array($date->roomids)) ? $date->roomids : [];
                     room_helper::sync($date->id, array_unique($date->roomids));
 

@@ -1,8 +1,8 @@
 <?php
 /*
- * This file is part of Totara LMS
+ * This file is part of Totara Learn
  *
- * Copyright (C) 2019 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,37 +26,32 @@ namespace mod_facetoface\hook;
 use mod_facetoface\seminar_event;
 
 /**
- * Alternative sign-up link hook.
+ * A hook called when a seminar event is about to be cancelled or deleted.
  *
  * @package mod_facetoface\hook
  */
-class alternative_signup_link extends \totara_core\hook\base {
-
+class event_is_being_cancelled extends \totara_core\hook\base {
     /**
+     * A seminar event associated to the hook. **Do not modify the instance!!**
      * @var seminar_event
      */
     public $seminarevent;
 
     /**
-     * @var string
+     * Has the seminar event been cancelled during deletion? **Do not modify the value!!**
+     *
+     * @var boolean
      */
-    public $signuplink;
-
-    /**
-     * @var string for terms and conditions
-     */
-    public $signuptsandcslink;
+    public $deleted;
 
     /**
      * The constructor.
      *
      * @param seminar_event $seminarevent
-     * @param string $signuplink
-     * @param string $signuptsandcslink
+     * @param boolean $deleted
      */
-    public function __construct(seminar_event $seminarevent, string $signuplink = '', string $signuptsandcslink = '') {
-        $this->seminarevent = $seminarevent;
-        $this->signuplink = $signuplink;
-        $this->signuptsandcslink = $signuptsandcslink;
+    public function __construct(seminar_event $seminarevent, bool $deleted) {
+        $this->seminarevent = clone $seminarevent;
+        $this->deleted = $deleted;
     }
 }

@@ -158,6 +158,10 @@ class mod_facetoface_code_quality_testcase extends advanced_testcase {
         self::add_inherited_classes($tested_classes, 'query\event\sortorder', query_sortorder::class, 'classes/query/event/sortorder');
         // Load all detail content generator classes
         self::add_inherited_classes($tested_classes, 'detail', detail_content_generator::class, 'classes/detail');
+        // Load all hook classes
+        self::add_inherited_classes($tested_classes, 'hook', null, 'classes/hook');
+        // Load all service classes
+        self::add_inherited_classes($tested_classes, 'hook\service', null, 'classes/hook/service');
         // Load all template classes
         self::add_inherited_classes($tested_classes, 'output', null, 'classes/output');
         // Load all template builder classes
@@ -185,7 +189,12 @@ class mod_facetoface_code_quality_testcase extends advanced_testcase {
             if ($baseclass !== null) {
                 $classes = array_filter($classes, function ($class) use ($baseclass) {
                     $rc = new ReflectionClass($class);
-                    return $rc->implementsInterface($baseclass) || $rc->isSubclassOf($baseclass);
+                    $rcbase = new ReflectionClass($baseclass);
+                    if ($rcbase->isInterface()) {
+                        return $rc->implementsInterface($baseclass);
+                    } else {
+                        return $rc->isSubclassOf($baseclass);
+                    }
                 });
             }
         }
@@ -515,7 +524,8 @@ class mod_facetoface_code_quality_testcase extends advanced_testcase {
      */
     private static function insert_summary_if_any_error(array &$errors, string $classname, string $problem): void {
         if (!empty($errors)) {
-            array_unshift($errors, sprintf("[[ %d problem(s) with %s %s ]]", count($errors), $problem, $classname));
+            $rc = new ReflectionClass($classname);
+            array_unshift($errors, sprintf("[[ %d problem(s) with %s %s at %s:%d ]]", count($errors), $problem, $classname, $rc->getFileName(), $rc->getStartLine()));
         }
     }
 

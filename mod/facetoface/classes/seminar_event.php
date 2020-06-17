@@ -27,6 +27,7 @@ use context_module;
 use mod_facetoface\attendance\attendance_helper;
 use mod_facetoface\signup\condition\event_taking_attendance;
 use mod_facetoface\event\session_cancelled;
+use mod_facetoface\hook\event_is_being_cancelled;
 use mod_facetoface\signup\state\booked;
 use mod_facetoface\signup\state\event_cancelled;
 
@@ -203,9 +204,10 @@ final class seminar_event implements seminar_iterator_item {
     /**
      * Cancel the seminar event.
      *
-     * @return bool
+     * @param boolean $delete is the seminar event being deleted?
+     * @return boolean
      */
-    public function cancel(): bool {
+    private function cancel_internal(bool $delete): bool {
         global $DB;
 
         if (!$this->is_cancellable()) {
@@ -252,11 +254,25 @@ final class seminar_event implements seminar_iterator_item {
         // Notify managers who had reservations.
         notice_sender::reservation_cancelled($this);
 
+        if (!$delete) {
+            // Notify watchers.
+            (new event_is_being_cancelled($this, false))->execute();
+        }
+
         $cm = get_coursemodule_from_instance('facetoface', $this->get_facetoface());
         $context = context_module::instance($cm->id);
         \mod_facetoface\event\session_cancelled::create_from_session($this->to_record(), $context)->trigger();
 
         return true;
+    }
+
+    /**
+     * Cancel the seminar event.
+     *
+     * @return bool
+     */
+    public function cancel(): bool {
+        return $this->cancel_internal(false);
     }
 
     /**
@@ -282,8 +298,14 @@ final class seminar_event implements seminar_iterator_item {
         $session->mintimestart = $this->get_mintimestart();
         $session->sessiondates = $this->get_sessions()->sort('timestart')->to_records(false);
 
+        $alreadycancelled = !empty($this->get_cancelledstatus());
         // Cancel the event first.
-        $this->cancel();
+        $this->cancel_internal(true);
+
+        // Notify watchers.
+        if (!$alreadycancelled) {
+            (new event_is_being_cancelled($this, true))->execute();
+        }
 
         // Remove entries from the calendars.
         calendar::remove_all_entries($this);

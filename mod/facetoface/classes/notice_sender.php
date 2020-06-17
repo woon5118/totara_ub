@@ -342,6 +342,86 @@ class notice_sender {
     }
 
     /**
+     * Notify facilitators when seminar session(s) are deleted.
+     *
+     * @param integer $recipientid
+     * @param seminar_event $seminarevent
+     */
+    public static function session_facilitator_cancellation(int $recipientid, seminar_event $seminarevent, bool $attachical = true): void {
+        global $CFG;
+
+        // Notify all facilitators.
+        $params = array(
+            'facetofaceid'  => $seminarevent->get_facetoface(),
+            'type'          => MDL_F2F_NOTIFICATION_AUTO,
+            'conditiontype' => MDL_F2F_CONDITION_FACILITATOR_SESSION_CANCELLATION
+        );
+
+        $icalattachmenttype = (empty($CFG->facetoface_disableicalcancel) && $attachical) ? MDL_F2F_BOTH : MDL_F2F_TEXT;
+        static::send_notice($seminarevent, $recipientid, $params, $icalattachmenttype);
+    }
+
+    /**
+     * Notify facilitators when seminar session(s) are deleted.
+     *
+     * @param integer $recipientid
+     * @param seminar_event $seminarevent
+     */
+    public static function session_facilitator_datetime_changed(int $recipientid, seminar_event $seminarevent, array $olddates, bool $attachical = true): void {
+        global $CFG;
+
+        // Notify all facilitators.
+        $params = array(
+            'facetofaceid'  => $seminarevent->get_facetoface(),
+            'type'          => MDL_F2F_NOTIFICATION_AUTO,
+            'conditiontype' => MDL_F2F_CONDITION_FACILITATOR_SESSION_DATETIME_CHANGE
+        );
+
+        $icalattachmenttype = (empty($CFG->facetoface_disableicalcancel) && $attachical) ? MDL_F2F_BOTH : MDL_F2F_TEXT;
+        static::send_notice($seminarevent, $recipientid, $params, $icalattachmenttype, MDL_F2F_INVITE, null, $olddates);
+    }
+
+    /**
+     * Notify facilitators when facilitator(s) are assigned to a seminar event.
+     *
+     * @param integer $recipientid
+     * @param seminar_event $seminarevent
+     */
+    public static function session_facilitator_assigned(int $recipientid, seminar_event $seminarevent, bool $attachical = true): void {
+        global $CFG;
+
+        // Notify all facilitators.
+        $params = array(
+            'facetofaceid'  => $seminarevent->get_facetoface(),
+            'type'          => MDL_F2F_NOTIFICATION_AUTO,
+            'conditiontype' => MDL_F2F_CONDITION_FACILITATOR_SESSION_ASSIGNED
+        );
+
+        $icalattachmenttype = (empty($CFG->facetoface_disableicalcancel) && $attachical) ? MDL_F2F_BOTH : MDL_F2F_TEXT;
+        static::send_notice($seminarevent, $recipientid, $params, $icalattachmenttype);
+    }
+
+    /**
+     * Notify facilitators when facilitator(s) are unassigned to a seminar event.
+     *
+     * @param integer $recipientid
+     * @param seminar_event $seminarevent
+     */
+    public static function session_facilitator_unassigned(int $recipientid, seminar_event $seminarevent, bool $attachical = true): void {
+        global $CFG;
+
+        // Notify all facilitators.
+        $params = array(
+            'facetofaceid'  => $seminarevent->get_facetoface(),
+            'type'          => MDL_F2F_NOTIFICATION_AUTO,
+            'conditiontype' => MDL_F2F_CONDITION_FACILITATOR_SESSION_UNASSIGNED
+        );
+
+        $icalattachmenttype = (empty($CFG->facetoface_disableicalcancel) && $attachical) ? MDL_F2F_BOTH : MDL_F2F_TEXT;
+        static::send_notice($seminarevent, $recipientid, $params, $icalattachmenttype);
+    }
+
+    /**
      * Send a notice (all session dates in one message).
      *
      * @param seminar_event $seminarevent

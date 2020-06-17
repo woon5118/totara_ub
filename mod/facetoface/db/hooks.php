@@ -21,12 +21,32 @@
  * @package totara_gap
  */
 
+use mod_facetoface\hook\event_is_being_cancelled;
+use mod_facetoface\hook\resources_are_being_updated;
+use mod_facetoface\hook\sessions_are_being_updated;
+use mod_facetoface\watcher\seminar_session_watcher;
+
 $watchers = [
     [
         // Called at the end of user_editadvanced_form::definition.
         // Used by Totara to add Totara specific elements to the seminar sing-up.
         'hookname' => '\mod_facetoface\hook\calendar_dynamic_content',
         'callback' => '\mod_facetoface\watcher\seminar_calendar_dynamic_content::signup',
+        'priority' => 100,
+    ],
+    [
+        'hookname' => sessions_are_being_updated::class,
+        'callback' => seminar_session_watcher::class . '::sessions_updated',
+        'priority' => 100,
+    ],
+    [
+        'hookname' => event_is_being_cancelled::class,
+        'callback' => seminar_session_watcher::class . '::event_cancelled',
+        'priority' => 100,
+    ],
+    [
+        'hookname' => resources_are_being_updated::class,
+        'callback' => seminar_session_watcher::class . '::resources_updated',
         'priority' => 100,
     ]
 ];

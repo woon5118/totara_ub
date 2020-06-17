@@ -218,6 +218,7 @@ final class seminar_session_list implements \Iterator, \Countable {
      * @return seminar_session|null
      */
     public function get_last(): ?seminar_session {
+        /** @var seminar_session|null */
         $found = null;
         /** @var seminar_session $item */
         foreach ($this->items as $id => $item) {
@@ -234,6 +235,7 @@ final class seminar_session_list implements \Iterator, \Countable {
      * @return seminar_session|null
      */
     public function get_first(): ?seminar_session {
+        /** @var seminar_session|null */
         $found = null;
         /** @var seminar_session $item */
         foreach ($this->items as $id => $item) {

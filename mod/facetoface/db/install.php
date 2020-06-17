@@ -47,6 +47,10 @@ function xmldb_facetoface_install() {
         'setting:defaultpendingreqclosuresubjectdefault' => get_string('setting:defaultpendingreqclosuresubjectdefault', 'facetoface'),
         'setting:defaultwaitlistautocleansubjectdefault' => get_string('setting:defaultwaitlistautocleansubjectdefault', 'facetoface'),
         'setting:defaultundercapacitysubjectdefault' => get_string('setting:defaultundercapacitysubjectdefault', 'facetoface'),
+        'setting:defaultfacilitatorcancelsubjectdefault' => get_string('setting:defaultfacilitatorcancelsubjectdefault', 'facetoface'),
+        'setting:defaultfacilitatortimechangesubjectdefault' => get_string('setting:defaultfacilitatortimechangesubjectdefault', 'facetoface'),
+        'setting:defaultfacilitatorassignedsubjectdefault' => get_string('setting:defaultfacilitatorassignedsubjectdefault', 'facetoface'),
+        'setting:defaultfacilitatorunassignedsubjectdefault' => get_string('setting:defaultfacilitatorunassignedsubjectdefault', 'facetoface'),
     );
 
     foreach ($titles as $key => $title) {
@@ -220,6 +224,22 @@ function xmldb_facetoface_install() {
     $tpl_undercapacity->body = text_to_html(get_string('setting:defaultundercapacitymessagedefault', 'facetoface'));
     $tpl_undercapacity->ccmanager = 0;
     $DB->insert_record('facetoface_notification_tpl', $tpl_undercapacity);
+
+    $references = [
+        'facilitatorcancel' => ['setting:defaultfacilitatorcancelsubjectdefault', 'setting:defaultfacilitatorcancelmessagedefault'],
+        'facilitatortimechange' => ['setting:defaultfacilitatortimechangesubjectdefault', 'setting:defaultfacilitatortimechangemessagedefault'],
+        'facilitatorassigned' => ['setting:defaultfacilitatorassignedsubjectdefault', 'setting:defaultfacilitatorassignedmessagedefault'],
+        'facilitatorunassigned' => ['setting:defaultfacilitatorunassignedsubjectdefault', 'setting:defaultfacilitatorunassignedmessagedefault'],
+    ];
+    foreach ($references as $reference => $data) {
+        $tpl_record = new stdClass();
+        $tpl_record->status = 1;
+        $tpl_record->reference = $reference;
+        $tpl_record->title = $titles[$data[0]];
+        $tpl_record->body = text_to_html(get_string($data[1], 'mod_facetoface'));
+        $tpl_record->ccmanager = 0;
+        $DB->insert_record('facetoface_notification_tpl', $tpl_record);
+    }
 
     // Setting room, building, and address as default filters.
     set_config('facetoface_calendarfilters', 'room_1');

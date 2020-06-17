@@ -33,6 +33,23 @@ defined('MOODLE_INTERNAL') || die();
  * Class facilitator_user combines a facilitator instance with a formatted user fullname if the facilitator is internal.
  *
  * @package mod_facetoface
+ *
+ * @method boolean exists()
+ * @method boolean is_used()
+ * @method boolean is_available()
+ * @method boolean has_conflicts()
+ * @method integer get_id()
+ * @method integer get_userid()
+ * @method string  get_name()
+ * @method string  get_description()
+ * @method boolean get_allowconflicts()
+ * @method integer get_usercreated()
+ * @method integer get_usermodified()
+ * @method integer get_timecreated()
+ * @method integer get_timemodified()
+ * @method boolean get_custom()
+ * @method boolean get_hidden()
+ * @method boolean can_show()
  */
 class facilitator_user {
 
@@ -44,14 +61,16 @@ class facilitator_user {
 
     /**
      * Seminar facilitator_user constructor
-     * @param facilitator|stdClass $facilitator
+     * @param facilitator|stdClass|integer $facilitator
      */
     public function __construct($facilitator) {
         if ($facilitator instanceof facilitator) {
             $this->facilitator = $facilitator;
-        } else {
+        } else if (is_object($facilitator)) {
             $this->facilitator = new facilitator();
             $this->facilitator->from_record((object)$facilitator);
+        } else {
+            $this->facilitator = new facilitator($facilitator);
         }
         $this->set_fullname($facilitator);
     }

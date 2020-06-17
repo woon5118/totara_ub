@@ -480,4 +480,60 @@ class mod_facetoface_upgradelib_testcase extends advanced_testcase {
         $events = $DB->get_records('event', array('modulename' => 'facetoface'),'timestart');
         $this->assertEquals(6, count($events));
     }
+
+    /**
+     * @return array
+     */
+    public function data_upgradelib_add_new_template(): array {
+        $longtext1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean tempor sed metus quis porta. Sed volutpat arcu eget nibh ultricies ultricies. Sed ac ligula enim. Ut posuere scelerisque lacus. Aliquam cursus leo dui, sit amet viverra velit lobortis non. Sed quis ullamcorper leo.';
+        $longtext2 = "\u{1D576}\u{1D58E}\u{1D586}\u{1D57A}\u{1D597}\u{1D586}\u{1D576}\u{1D594}\u{1D59A}\u{1D599}\u{1D594}\u{1D59A}\u{1D576}\u{1D586}\u{1D599}\u{1D594}\u{1D586}\u{1D4D0}\u{1D4F8}\u{1D4FD}\u{1D4EE}\u{1D4EA}\u{1D4FB}\u{1D4F8}\u{1D4EA}\u{1D55F}\u{1D556}\u{1D568}\u{1D56B}\u{1D556}\u{1D552}\u{1D55D}\u{1D552}\u{1D55F}\u{1D555}";
+        return [
+            ['New template title', "Lorem ipsum\r\ndolor sit amet", 'New template title', "<div class=\"text_to_html\">Lorem ipsum<br />\r\ndolor sit amet</div>"],
+            [$longtext1, 'Lorem ipsum', substr($longtext1, 0, 255), '<div class="text_to_html">Lorem ipsum</div>'],
+            [$longtext2, 'Lorem ipsum', $longtext2, '<div class="text_to_html">Lorem ipsum</div>'],
+        ];
+    }
+
+    /**
+     * @param string $reference
+     * @param string $title
+     * @param string $body
+     * @param string $expected_title
+     * @param string $expected_body
+     * @dataProvider data_upgradelib_add_new_template
+     */
+    public function test_facetoface_upgradelib_add_new_template(string $title, string $body, string $expected_title, string $expected_body) {
+        global $DB, $CFG;
+        /** @var moodle_database $DB */
+        require_once($CFG->dirroot.'/mod/facetoface/lib.php');
+
+        $conditiontype = 1 << 30;
+        if ($DB->record_exists('facetoface_notification', ['conditiontype' => $conditiontype])) {
+            $this->fail('Change the conditiontype to a value that has not been taken!!');
+        }
+
+        $gen = $this->getDataGenerator();
+        $f2fgen = $gen->get_plugin_generator('mod_facetoface');
+        /** @var mod_facetoface_generator $f2fgen */
+        $course = $gen->create_course();
+        $f2f = $f2fgen->create_instance(['course' => $course->id]);
+        facetoface_upgradelib_add_new_template('kiaorakoutoukatoa', $title, $body, $conditiontype);
+
+        $tpl = $DB->get_record('facetoface_notification_tpl', ['reference' => 'kiaorakoutoukatoa']);
+        $this->assertNotEmpty($tpl, 'DB record does not exist');
+        $this->assertEquals(1, $tpl->status);
+        $this->assertEquals(0, $tpl->ccmanager);
+        $this->assertEquals($expected_title, $tpl->title);
+        $this->assertEquals($expected_body, $tpl->body);
+
+        $notifs = $DB->get_records('facetoface_notification', ['facetofaceid' => $f2f->id, 'templateid' => $tpl->id]);
+        $this->assertNotEmpty($notifs, 'DB record does not exist');
+        $this->assertCount(1, $notifs);
+        $notif = reset($notifs);
+        $this->assertEquals(MDL_F2F_NOTIFICATION_AUTO, $notif->type);
+        $this->assertEquals($conditiontype, $notif->conditiontype);
+        $this->assertEquals($course->id, $notif->courseid);
+        $this->assertEquals($expected_title, $notif->title);
+        $this->assertEquals($expected_body, $notif->body);
+    }
 }

@@ -1,8 +1,8 @@
 <?php
 /*
- * This file is part of Totara LMS
+ * This file is part of Totara Learn
  *
- * Copyright (C) 2019 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,40 +23,27 @@
 
 namespace mod_facetoface\hook;
 
-use mod_facetoface\seminar_event;
+use mod_facetoface\hook\service\seminar_session_resource;
+use stdClass;
 
 /**
- * Alternative sign-up link hook.
+ * A hook called when assets, rooms or facilitators are about to be attached to/detached from a session.
  *
  * @package mod_facetoface\hook
  */
-class alternative_signup_link extends \totara_core\hook\base {
-
+class resources_are_being_updated extends \totara_core\hook\base {
     /**
-     * @var seminar_event
+     * A seminar session associated to the hook. **Do not modify the instance!!**
+     * @var seminar_session_resource
      */
-    public $seminarevent;
-
-    /**
-     * @var string
-     */
-    public $signuplink;
-
-    /**
-     * @var string for terms and conditions
-     */
-    public $signuptsandcslink;
+    public $session;
 
     /**
      * The constructor.
      *
-     * @param seminar_event $seminarevent
-     * @param string $signuplink
-     * @param string $signuptsandcslink
+     * @param stdClass $sessiondate a facetoface_sessions_dates record optionally containing assetids, roomids and facilitatorids
      */
-    public function __construct(seminar_event $seminarevent, string $signuplink = '', string $signuptsandcslink = '') {
-        $this->seminarevent = $seminarevent;
-        $this->signuplink = $signuplink;
-        $this->signuptsandcslink = $signuptsandcslink;
+    public function __construct(stdClass $sessiondate) {
+        $this->session = seminar_session_resource::from_record($sessiondate);
     }
 }

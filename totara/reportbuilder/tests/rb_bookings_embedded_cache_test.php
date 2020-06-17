@@ -172,7 +172,7 @@ class totara_reportbuilder_rb_bookings_embedded_cache_testcase extends reportcac
         // Dates time will be adjusted afte sign ups
         $sessiondate = new stdClass();
         $sessiondate->sessionid = self::$ind;
-        $sessiondate->roomid = 0;
+        $sessiondate->roomids = [];
         $sessiondate->timestart = time() + HOURSECS * self::$ind;
         $sessiondate->timefinish = time() + 2 * HOURSECS * self::$ind - 1;
         $sessiondate->sessiontimezone = 'Europe/London';

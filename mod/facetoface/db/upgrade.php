@@ -899,5 +899,43 @@ function xmldb_facetoface_upgrade($oldversion) {
         // Facetoface savepoint reached.
         upgrade_mod_savepoint(true, 2020061100, 'facetoface');
     }
+
+    if ($oldversion < 2020061700) {
+        // Create the default notification template for facilitatorcancel.
+        facetoface_upgradelib_add_new_template(
+            'facilitatorcancel',
+            get_string('setting:defaultfacilitatorcancelsubjectdefault', 'facetoface'),
+            get_string('setting:defaultfacilitatorcancelmessagedefault', 'facetoface'),
+            1 << 21 // Constant MDL_F2F_CONDITION_FACILITATOR_SESSION_CANCELLATION
+        );
+
+        // Create the default notification template for facilitatortimechange.
+        facetoface_upgradelib_add_new_template(
+            'facilitatortimechange',
+            get_string('setting:defaultfacilitatortimechangesubjectdefault', 'facetoface'),
+            get_string('setting:defaultfacilitatortimechangemessagedefault', 'facetoface'),
+            1 << 22 // Constant MDL_F2F_CONDITION_FACILITATOR_SESSION_DATETIME_CHANGE
+        );
+
+        // Create the default notification template for facilitatorassigned.
+        facetoface_upgradelib_add_new_template(
+            'facilitatorassigned',
+            get_string('setting:defaultfacilitatorassignedsubjectdefault', 'facetoface'),
+            get_string('setting:defaultfacilitatorassignedmessagedefault', 'facetoface'),
+            1 << 23 // Constant MDL_F2F_CONDITION_FACILITATOR_SESSION_ASSIGNED
+        );
+
+        // Create the default notification template for facilitatorunassigned.
+        facetoface_upgradelib_add_new_template(
+            'facilitatorunassigned',
+            get_string('setting:defaultfacilitatorunassignedsubjectdefault', 'facetoface'),
+            get_string('setting:defaultfacilitatorunassignedmessagedefault', 'facetoface'),
+            1 << 24 // Constant MDL_F2F_CONDITION_FACILITATOR_SESSION_UNASSIGNED
+        );
+
+        // Facetoface savepoint reached.
+        upgrade_mod_savepoint(true, 2020061700, 'facetoface');
+    }
+
     return true;
 }

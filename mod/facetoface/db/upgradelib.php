@@ -238,3 +238,73 @@ function facetoface_upgradelib_delete_orphaned_events() {
                         )";
     $DB->execute($sql);
 }
+
+/**
+ * Wrapper for adding a new template.
+ *
+ * @param string $reference
+ * @param string $title
+ * @param string $body
+ * @param integer $conditiontype MDL_F2F_CONDITION_xx as **a magic number**
+ */
+function facetoface_upgradelib_add_new_template(string $reference, string $title, string $body, int $conditiontype) {
+    global $DB;
+    /** @var moodle_database $DB */
+
+    if (\core_text::strlen($title) > 255) {
+        $title = \core_text::substr($title, 0, 255);
+    }
+
+    // Make sure that $conditiontype is a power of 2.
+    if (($conditiontype & ($conditiontype - 1)) !== 0) {
+        throw new coding_exception('$conditiontype is not a valid number.');
+    }
+
+    $body = text_to_html($body);
+
+    $templateid = $DB->get_field('facetoface_notification_tpl', 'id', ['reference' => $reference]);
+    if ($templateid === false) {
+        $templateid = $DB->insert_record('facetoface_notification_tpl', [
+            'status' => 1,
+            'reference' => $reference,
+            'title' => $title,
+            'body' => $body,
+            'ccmanager' => 0,
+        ]);
+    }
+
+    // Now add the new template to existing seminars that don't already have one.
+    // NOTE: We don't normally want to do this, but it's safe to do
+    //       here since this is replacing an existing non-template notification.
+    $sql = 'SELECT f.id, f.course
+              FROM {facetoface} f
+         LEFT JOIN {facetoface_notification} fn
+                ON fn.facetofaceid = f.id
+               AND fn.conditiontype = :ctype
+             WHERE fn.id IS NULL';
+    $f2fs = $DB->get_records_sql($sql, ['ctype' => $conditiontype]);
+
+    $data = [
+        'type' => 4, // MDL_F2F_NOTIFICATION_AUTO.
+        'conditiontype' => $conditiontype,
+        'booked' => 0,
+        'waitlisted' => 0,
+        'cancelled' => 0,
+        'requested' => 0,
+        'issent' => 0,
+        'status' => 1, // Replacing a hard-coded template
+        'templateid' => $templateid,
+        'ccmanager' => 0,
+        'title' => $title,
+        'body' => $body,
+    ];
+
+    foreach ($f2fs as $f2f) {
+        $notification = array_merge([
+            'facetofaceid' => $f2f->id,
+            'courseid' => $f2f->course,
+        ], $data);
+
+        $DB->insert_record('facetoface_notification', $notification);
+    }
+}

@@ -149,9 +149,9 @@ class mod_facetoface_generator extends testing_module_generator {
     }
 
     /**
-     * Add facetoface session
+     * Add facetoface session aka seminar event
      * @param array|stdClass $record
-     * @param array $options
+     * @param array $options not used
      * @throws coding_exception
      * @return bool|int session created
      */
@@ -187,6 +187,9 @@ class mod_facetoface_generator extends testing_module_generator {
                     $sessiondate->facilitatorids = array();
                     return $sessiondate;
                 } else {
+                    if (isset($date->roomid)) {
+                        throw new coding_exception('roomid is no longer valid. please use roomids instead.');
+                    }
                     return (object) (array) $date;
                 }
             }, $record->sessiondates);

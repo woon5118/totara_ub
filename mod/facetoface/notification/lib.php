@@ -97,6 +97,10 @@ define('MDL_F2F_CONDITION_BOOKING_REQUEST_ADMIN',        131072);
 define('MDL_F2F_CONDITION_BEFORE_REGISTRATION_ENDS',     262144);
 define('MDL_F2F_CONDITION_WAITLIST_AUTOCLEAN',           524288);
 define('MDL_F2F_CONDITION_SESSION_UNDER_CAPACITY',       1048576);
+define('MDL_F2F_CONDITION_FACILITATOR_SESSION_CANCELLATION',    1 << 21);
+define('MDL_F2F_CONDITION_FACILITATOR_SESSION_DATETIME_CHANGE', 1 << 22);
+define('MDL_F2F_CONDITION_FACILITATOR_SESSION_ASSIGNED',        1 << 23);
+define('MDL_F2F_CONDITION_FACILITATOR_SESSION_UNASSIGNED',      1 << 24);
 
 /**
  * Notification sent state
@@ -1369,6 +1373,9 @@ class facetoface_notification extends data_object {
      * @return  string
      */
     public function get_recipient_description() {
+        if (in_array($this->conditiontype, [MDL_F2F_CONDITION_FACILITATOR_SESSION_CANCELLATION, MDL_F2F_CONDITION_FACILITATOR_SESSION_DATETIME_CHANGE, MDL_F2F_CONDITION_FACILITATOR_SESSION_ASSIGNED, MDL_F2F_CONDITION_FACILITATOR_SESSION_UNASSIGNED])) {
+            return get_string('facilitator', 'mod_facetoface');
+        }
         $recips = array();
         if ($this->booked) {
             switch ($this->booked) {
@@ -1488,6 +1495,10 @@ class facetoface_notification extends data_object {
             'registrationclosure' => MDL_F2F_CONDITION_BEFORE_REGISTRATION_ENDS,
             'waitlistautoclean' => MDL_F2F_CONDITION_WAITLIST_AUTOCLEAN,
             'undercapacity' => MDL_F2F_CONDITION_SESSION_UNDER_CAPACITY,
+            'facilitatorcancel' => MDL_F2F_CONDITION_FACILITATOR_SESSION_CANCELLATION,
+            'facilitatortimechange' => MDL_F2F_CONDITION_FACILITATOR_SESSION_DATETIME_CHANGE,
+            'facilitatorassigned' => MDL_F2F_CONDITION_FACILITATOR_SESSION_ASSIGNED,
+            'facilitatorunassigned' => MDL_F2F_CONDITION_FACILITATOR_SESSION_UNASSIGNED,
         );
     }
 
@@ -2593,6 +2604,29 @@ function facetoface_get_default_notifications($facetofaceid) {
         $notifications[MDL_F2F_CONDITION_SESSION_UNDER_CAPACITY] = $undercapacity;
     } else {
         $missingtemplates[] = 'undercapacity';
+    }
+
+    $facreferences = [
+        'facilitatorcancel' => MDL_F2F_CONDITION_FACILITATOR_SESSION_CANCELLATION,
+        'facilitatortimechange' => MDL_F2F_CONDITION_FACILITATOR_SESSION_DATETIME_CHANGE,
+        'facilitatorassigned' => MDL_F2F_CONDITION_FACILITATOR_SESSION_ASSIGNED,
+        'facilitatorunassigned' => MDL_F2F_CONDITION_FACILITATOR_SESSION_UNASSIGNED,
+    ];
+    foreach ($facreferences as $reference => $conditiontype) {
+        if (isset($templates[$reference])) {
+            $template = $templates[$reference];
+            $notif = new facetoface_notification($defaults, false);
+            $notif->title = $template->title;
+            $notif->body = $template->body;
+            $notif->managerprefix = $template->managerprefix;
+            $notif->conditiontype = $conditiontype;
+            $notif->ccmanager = $template->ccmanager;
+            $notif->status = $template->status;
+            $notif->templateid = $template->id;
+            $notifications[$conditiontype] = $notif;
+        } else {
+            $missingtemplates[] = $reference;
+        }
     }
 
     return array($notifications, $missingtemplates);

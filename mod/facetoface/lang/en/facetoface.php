@@ -2046,6 +2046,77 @@ Duration: [session:duration]
 This request will expire on [registrationcutoff]
 ';
 $string['setting:defaultadminrequestsubjectdefault'] = 'Seminar booking admin request: [seminarname], [eventperiod]';
+$string['setting:defaultfacilitatorassignedmessagedefault'] = 'This is to confirm that you are now assigned to deliver training on the following seminar session(s):
+
+Facilitator: [firstname] [lastname]
+Course: [coursename](link)
+Seminar: [seminarname](link)
+
+Date(s) and location(s):
+[#sessions]
+[session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+Duration: [session:duration]
+Room: [session:room:name]
+Building: [session:room:cf_building]
+Location: [session:room:cf_location]
+[session:room:link]
+[/sessions]
+
+[details]';
+$string['setting:defaultfacilitatorassignedsubjectdefault'] = 'Seminar session facilitator confirmation';
+$string['setting:defaultfacilitatorcancelmessagedefault'] = 'This is to advise that the seminar session(s) you are assigned to as facilitator have been cancelled:
+
+***SESSION CANCELLED***
+
+Facilitator: [firstname] [lastname]
+Course: ([coursename]link)
+Seminar: ([seminarname]link)
+
+Date(s) and location(s):
+[#sessions]
+[session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+Duration: [session:duration]
+Room: [session:room:name]
+Building: [session:room:cf_building]
+Location: [session:room:cf_location]
+[session:room:link]
+[/sessions]';
+$string['setting:defaultfacilitatorcancelsubjectdefault'] = 'Seminar session facilitator cancellation';
+$string['setting:defaultfacilitatortimechangemessagedefault'] = 'The seminar session(s) you are assigned to facilitate have been changed:
+
+Facilitator: [firstname] [lastname]
+Course: [coursename](link)
+Seminar: [seminarname] (link)
+
+The updated information is:
+Date(s) and location(s):
+[#sessions]
+[session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+Duration: [session:duration]
+Room: [session:room:name]
+Building: [session:room:cf_building]
+Location: [session:room:cf_location]
+[session:room:link]
+[/sessions]';
+$string['setting:defaultfacilitatortimechangesubjectdefault'] = 'Seminar session date/time changed: [seminarname], [starttime]-[finishtime], [sessiondate]';
+$string['setting:defaultfacilitatorunassignedmessagedefault'] = 'This is to advise that you have been unassigned from facilitating the following seminar session(s):
+
+***SESSION UNASSIGNED***
+
+Facilitator: [firstname] [lastname]
+Course: [coursename] (link)
+Seminar: [seminarname] (link)
+
+Date(s) and location(s):
+[#sessions]
+[session:startdate], [session:starttime] - [session:finishdate], [session:finishtime] [session:timezone]
+Duration: [session:duration]
+Room: [session:room:name]
+Building: [session:room:cf_building]
+Location: [session:room:cf_location]
+[session:room:link]
+[/sessions]';
+$string['setting:defaultfacilitatorunassignedsubjectdefault'] = 'Seminar session facilitator unassigned';
 $string['setting:defaulttrainerconfirmationmessage'] = 'Default message sent to trainers when assigned to an event.';
 $string['setting:defaulttrainerconfirmationmessage_caption'] = 'Trainer confirmation message';
 $string['setting:defaulttrainerconfirmationmessagedefault'] = 'This is to confirm that you are now assigned to deliver training on the following course:
@@ -2450,6 +2521,10 @@ $string['templateconfirmation'] = 'Booking request confirmation';
 $string['templatecontainsoldplaceholders'] = 'This template contains a deprecated placeholder';
 $string['templatedecline'] = 'Booking request declined';
 $string['templatemanagerrequest'] = 'Booking manager request';
+$string['templatefacilitatorcancel'] = 'Session cancellation (facilitator)';
+$string['templatefacilitatorassigned'] = 'Facilitator assigned';
+$string['templatefacilitatortimechange'] = 'Session time changed (facilitator)';
+$string['templatefacilitatorunassigned'] = 'Facilitator unassigned';
 $string['templatesoldplaceholders'] = 'Some templates contain deprecated placeholders. Please review the templates marked with a warning icon and update where necessary.';
 $string['templatereminder'] = 'Reminder';
 $string['templatereservationcancel'] = 'Reservation cancelled';

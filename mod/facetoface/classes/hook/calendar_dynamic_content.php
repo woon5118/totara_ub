@@ -44,7 +44,7 @@ class calendar_dynamic_content extends \totara_core\hook\base {
      * The calendar_dynamic_content constructor.
      *
      * @param \stdClass $event
-     * @param string $content
+     * @param mixed $content
      */
     public function __construct(\stdClass $event, &$content) {
         $this->event   = $event;

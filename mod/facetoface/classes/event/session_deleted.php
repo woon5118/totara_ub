@@ -25,7 +25,7 @@ namespace mod_facetoface\event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Event triggered when a session is deleted.
+ * Event triggered when a seminar event is deleted.
  *
  * @property-read array $other {
  * Extra information about the event.
