@@ -84,6 +84,10 @@ export default {
       required: true,
       type: Boolean,
     },
+    closedOnCompletion: {
+      type: Boolean,
+      default: false,
+    },
   },
   computed: {
     initialTab() {
@@ -95,17 +99,22 @@ export default {
   mounted() {
     // Show the save notification if we have been redirected back here after saving.
     if (this.completionSaveSuccess) {
-      this.showSuccessNotification();
+      let message = this.closedOnCompletion
+        ? 'toast_success_save_close_on_completion_response'
+        : 'toast_success_save_response';
+      this.showSuccessNotification(message, 'mod_perform');
     }
   },
   methods: {
     /**
-     * Show a generic success toast.
+     * Shows a success toast.
+     * @param {String} message
+     * @param {String} component
      */
-    showSuccessNotification() {
+    showSuccessNotification(message, component) {
       notify({
         duration: NOTIFICATION_DURATION,
-        message: this.$str('toast_success_save_response', 'mod_perform'),
+        message: this.$str(message, component),
         type: 'success',
       });
     },
@@ -115,6 +124,7 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
+      "toast_success_save_close_on_completion_response",
       "toast_success_save_response",
       "user_activities_activities_about_others_title",
       "user_activities_page_title",

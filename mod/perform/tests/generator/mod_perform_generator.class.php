@@ -38,6 +38,7 @@ use mod_perform\entities\activity\track as track_entity;
 use mod_perform\entities\activity\track_user_assignment;
 use mod_perform\expand_task;
 use mod_perform\models\activity\activity;
+use mod_perform\models\activity\activity_setting;
 use mod_perform\models\activity\activity_type;
 use mod_perform\models\activity\element;
 use mod_perform\models\activity\section;
@@ -181,6 +182,32 @@ class mod_perform_generator extends component_generator_base {
     public function create_section(activity $activity, $data = []): section {
         $title = $data['title'] ?? "test Section";
         return section::create($activity, $title);
+    }
+
+    /**
+     * Creates activity settings.
+     *
+     * @param array $data
+     * @return void
+     */
+    public function create_activity_settings(array $data): void {
+        $activity = $this->get_activity_from_name($data['activity_name']);
+
+        if (isset($data[activity_setting::CLOSE_ON_COMPLETION])) {
+            activity_setting::create(
+                $activity,
+                activity_setting::CLOSE_ON_COMPLETION,
+                $data[activity_setting::CLOSE_ON_COMPLETION] === 'yes'
+            );
+        }
+        if (isset($data[activity_setting::MULTISECTION])) {
+            activity_setting::create(
+                $activity,
+                activity_setting::MULTISECTION,
+                $data[activity_setting::MULTISECTION] === 'yes'
+            );
+        }
+
     }
 
     /**

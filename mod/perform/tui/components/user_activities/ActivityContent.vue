@@ -21,104 +21,137 @@
 -->
 <template>
   <div class="tui-participantContent">
-    <Uniform
-      v-if="initialValues"
-      v-slot="{ getSubmitting }"
-      :initial-values="initialValues"
-      @submit="submit"
-    >
-      <div class="tui-participantContent__user">
-        <ParticipantUserHeader
-          :user-name="subjectUser.fullname"
-          :profile-picture="subjectUser.profileimageurlsmall"
-          size="small"
-          class="tui-participantContent__user-info"
-        />
-        <div class="tui-participantContent__user-relationship">
-          {{ $str('user_activities_your_relationship_to_user', 'mod_perform') }}
-          <h4 class="tui-participantContent__user-relationshipValue">
-            {{ relationshipToUser }}
-          </h4>
-        </div>
-      </div>
-
-      <h2 class="tui-participantContent__header">
-        {{ activity.name }}
-      </h2>
-
-      <div class="tui-participantContent__section">
-        <div class="tui-participantContent__sectionHeading">
-          <h3 class="tui-participantContent__sectionHeading-title">
-            {{ section.display_title }}
-          </h3>
-
-          <div
-            class="tui-participantContent__sectionHeading-other-response-switch"
-          >
-            <ToggleButton
-              v-show="hasOtherResponse"
-              v-model="showOtherResponse"
-              :text="$str('user_activities_other_response_show', 'mod_perform')"
-            />
+    <Loader :loading="$apollo.loading">
+      <ConfirmationModal
+        :open="modalOpen"
+        :close-button="false"
+        :confirm-button-text="$str('submit', 'moodle')"
+        :title="
+          $str('user_activities_submit_confirmation_title', 'mod_perform')
+        "
+        @confirm="confirmModal"
+        @cancel="cancelModal"
+      >
+        <p>
+          {{
+            $str('user_activities_submit_confirmation_message', 'mod_perform')
+          }}
+        </p>
+        <p v-if="activity.settings.close_on_completion">
+          {{
+            $str(
+              'user_activities_close_on_completion_submit_confirmation_message',
+              'mod_perform'
+            )
+          }}
+        </p>
+      </ConfirmationModal>
+      <Uniform
+        v-if="initialValues"
+        :key="activeParticipantSectionId"
+        v-slot="{ getSubmitting }"
+        :initial-values="initialValues"
+        @submit="openModal"
+      >
+        <div class="tui-participantContent__user">
+          <ParticipantUserHeader
+            :user-name="subjectUser.fullname"
+            :profile-picture="subjectUser.profileimageurlsmall"
+            size="small"
+            class="tui-participantContent__user-info"
+          />
+          <div class="tui-participantContent__user-relationship">
+            {{
+              $str('user_activities_your_relationship_to_user', 'mod_perform')
+            }}
+            <h4 class="tui-participantContent__user-relationshipValue">
+              {{ relationshipToUser }}
+            </h4>
           </div>
         </div>
-        <div class="tui-participantContent__section-required-container">
-          <span
-            class="tui-participantContent__section-response-required"
-            v-text="'*'"
-          />
-          {{ $str('section_element_response_required', 'mod_perform') }}
-        </div>
 
-        <Collapsible
-          v-for="sectionElement in sectionElements"
-          :key="sectionElement.id"
-          :label="sectionElement.element.title"
-          :initial-state="true"
-          class="tui-participantContent__sectionItem"
-        >
-          <template v-slot:label-extra>
+        <h2 class="tui-participantContent__header">
+          {{ activity.name }}
+        </h2>
+
+        <div class="tui-participantContent__section">
+          <div class="tui-participantContent__sectionHeading">
+            <h3 class="tui-participantContent__sectionHeading-title">
+              {{ section.display_title }}
+            </h3>
+
+            <div
+              class="tui-participantContent__sectionHeading-other-response-switch"
+            >
+              <ToggleButton
+                v-show="hasOtherResponse"
+                v-model="showOtherResponse"
+                :text="
+                  $str('user_activities_other_response_show', 'mod_perform')
+                "
+              />
+            </div>
+          </div>
+          <div class="tui-participantContent__section-required-container">
             <span
-              v-if="sectionElement.element.is_required"
               class="tui-participantContent__section-response-required"
               v-text="'*'"
             />
-            <span
-              v-if="!sectionElement.element.is_required"
-              class="tui-participantContent__response-optional"
-            >
-              ({{ $str('section_element_response_optional', 'mod_perform') }})
-            </span>
-          </template>
-          <div class="tui-participantContent__sectionItem-content">
-            <component
-              :is="sectionElement.component"
-              :path="['sectionElements', sectionElement.id]"
-              :data="sectionElement.element.data"
-              :title="sectionElement.element.title"
-              :type="sectionElement.element.type"
-              :is-required="sectionElement.element.is_required"
-              :error="errors && errors[sectionElement.clientId]"
-            />
-            <OtherParticipantResponses
-              v-show="showOtherResponse"
-              :section-element="sectionElement"
-            />
+            {{ $str('section_element_response_required', 'mod_perform') }}
           </div>
-        </Collapsible>
-      </div>
 
-      <ButtonGroup class="tui-participantContent__buttons">
-        <ButtonSubmit :submitting="getSubmitting()" />
-        <ButtonCancel @click="goBackToListCancel" />
-      </ButtonGroup>
-    </Uniform>
+          <Collapsible
+            v-for="sectionElement in sectionElements"
+            :key="sectionElement.id"
+            :label="sectionElement.element.title"
+            :initial-state="true"
+            class="tui-participantContent__sectionItem"
+          >
+            <template v-slot:label-extra>
+              <span
+                v-if="sectionElement.element.is_required"
+                class="tui-participantContent__section-response-required"
+              >
+                *
+              </span>
+              <span
+                v-if="!sectionElement.element.is_required"
+                class="tui-participantContent__response-optional"
+              >
+                ({{ $str('section_element_response_optional', 'mod_perform') }})
+              </span>
+            </template>
+            <div class="tui-participantContent__sectionItem-content">
+              <component
+                :is="sectionElement.component"
+                :path="['sectionElements', sectionElement.id]"
+                :data="sectionElement.element.data"
+                :title="sectionElement.element.title"
+                :type="sectionElement.element.type"
+                :is-required="sectionElement.element.is_required"
+                :error="errors && errors[sectionElement.clientId]"
+              />
+              <OtherParticipantResponses
+                v-show="showOtherResponse"
+                :section-element="sectionElement"
+              />
+            </div>
+          </Collapsible>
+        </div>
+
+        <ButtonGroup class="tui-participantContent__buttons">
+          <ButtonSubmit :submitting="getSubmitting()" />
+          <ButtonCancel @click="goBackToListCancel" />
+        </ButtonGroup>
+      </Uniform>
+    </Loader>
   </div>
 </template>
 
 <script>
 // Util
 import { uniqueId } from 'totara_core/util';
+import { NOTIFICATION_DURATION } from 'mod_perform/constants';
 import { notify } from 'totara_core/notifications';
 // Components
 import ButtonCancel from 'totara_core/components/buttons/Cancel';
@@ -126,10 +159,12 @@ import ButtonGroup from 'totara_core/components/buttons/ButtonGroup';
 import ButtonSubmit from 'totara_core/components/buttons/Submit';
 import Checkbox from 'totara_core/components/form/Checkbox';
 import Collapsible from 'totara_core/components/collapsible/Collapsible';
+import ConfirmationModal from 'totara_core/components/modal/ConfirmationModal';
+import Loader from 'totara_core/components/loader/Loader';
 import OtherParticipantResponses from 'mod_perform/components/user_activities/participant/OtherParticipantResponses';
 import ParticipantUserHeader from 'mod_perform/components/user_activities/participant/ParticipantUserHeader';
-import { Uniform } from 'totara_core/components/uniform';
 import ToggleButton from 'totara_core/components/buttons/ToggleButton';
+import { Uniform } from 'totara_core/components/uniform';
 // graphQL
 import SectionResponsesQuery from 'mod_perform/graphql/participant_section';
 import UpdateSectionResponsesMutation from 'mod_perform/graphql/update_section_responses';
@@ -141,6 +176,8 @@ export default {
     ButtonSubmit,
     Checkbox,
     Collapsible,
+    ConfirmationModal,
+    Loader,
     OtherParticipantResponses,
     ParticipantUserHeader,
     ToggleButton,
@@ -197,19 +234,21 @@ export default {
     return {
       answerableParticipantInstances: null,
       answeringAsParticipantId: this.participantInstanceId,
-      answeringAsSectionId: this.participantSectionId,
+      activeParticipantSectionId: this.participantSectionId,
       completionSaveSuccess: false,
       errors: null,
       hasOtherResponse: false,
       initialValues: null,
       isSaving: false,
-      participantSectionIdParam: this.participantSectionId,
       section: {
         title: '',
         section_elements: [],
       },
       sectionElements: [],
       showOtherResponse: false,
+      modalOpen: false,
+      formValues: {},
+      participantSections: [],
     };
   },
 
@@ -219,17 +258,20 @@ export default {
       variables() {
         return {
           participant_instance_id: this.answeringAsParticipantId,
-          participant_section_id: this.answeringAsSectionId,
+          participant_section_id: this.participantSectionId,
         };
       },
       update: data => data.mod_perform_participant_section.section,
       result({ data }) {
-        this.participantSectionIdParam =
-          data.mod_perform_participant_section.id;
         this.answerableParticipantInstances =
           data.mod_perform_participant_section.answerable_participant_instances;
-        this.initialValues = {};
-        this.initialValues.sectionElements = {};
+        this.activeParticipantSectionId =
+          data.mod_perform_participant_section.id;
+        this.participantSections =
+          data.mod_perform_participant_section.participant_instance.participant_sections;
+        this.initialValues = {
+          sectionElements: {},
+        };
         this.sectionElements = data.mod_perform_participant_section.section_element_responses.map(
           item => {
             return {
@@ -310,10 +352,48 @@ export default {
      */
     showErrorNotification() {
       notify({
-        duration: 10000,
+        duration: NOTIFICATION_DURATION,
         message: this.$str('toast_error_save_response', 'mod_perform'),
         type: 'error',
       });
+    },
+
+    /**
+     * Show a generic success toast.
+     */
+    showSuccessNotification() {
+      let message = this.activity.settings.close_on_completion
+        ? 'toast_success_save_close_on_completion_response'
+        : 'toast_success_save_response';
+      notify({
+        duration: NOTIFICATION_DURATION,
+        message: this.$str(message, 'mod_perform'),
+        type: 'success',
+      });
+    },
+
+    /**
+     * Shows Confirmation Modal
+     * @param {Object} values Form values.
+     */
+    openModal(values) {
+      this.formValues = values;
+      this.modalOpen = true;
+    },
+
+    /**
+     * Confirms confirmation modal.
+     */
+    confirmModal() {
+      this.submit(this.formValues);
+      this.modalOpen = false;
+    },
+
+    /**
+     * Close confirmation modal.
+     */
+    cancelModal() {
+      this.modalOpen = false;
     },
 
     /**
@@ -328,18 +408,18 @@ export default {
 
       // assign values from submission to the section elements
       this.sectionElements.forEach(sectionElement => {
-        const result = values.sectionElements[sectionElement.id];
-        sectionElement.element.responseData = result;
+        sectionElement.element.responseData =
+          values.sectionElements[sectionElement.id];
       });
 
       this.isSaving = true;
       try {
         const sectionResponsesResult = await this.save();
-        const element_responses =
+        const submittedParticipantSection =
           sectionResponsesResult.mod_perform_update_section_responses
-            .participant_section.section_element_responses;
+            .participant_section;
         //assign errors to individual elements
-        this.errors = element_responses
+        this.errors = submittedParticipantSection.section_element_responses
           .filter(item => item.validation_errors)
           .reduce((acc, cur) => {
             cur.validation_errors.forEach(error => {
@@ -347,16 +427,57 @@ export default {
             });
             return acc;
           }, null);
+        let nextParticipantSectionId = this.getNextParticipantSection(
+          submittedParticipantSection.id
+        );
 
         //show validation if no errors
         if (!this.errors) {
-          this.goBackToListCompletionSuccess();
+          if (nextParticipantSectionId) {
+            // Redirect to next section.
+            this.showSuccessNotification();
+            await this.loadParticipantSection(nextParticipantSectionId);
+          } else {
+            // Go back to activity list
+            this.goBackToListCompletionSuccess();
+          }
         }
-        this.isSaving = false;
       } catch (e) {
         this.showErrorNotification();
-        this.isSaving = false;
       }
+      this.isSaving = false;
+    },
+
+    /**
+     * Loads the participant section as active participant section.
+     *
+     * @param {Number} participantSectionId
+     * @return {NULL}
+     */
+    async loadParticipantSection(participantSectionId) {
+      await this.$apollo.queries.section.refetch({
+        participant_section_id: participantSectionId,
+      });
+    },
+
+    /**
+     * Get the next available participant section to fill.
+     *
+     * @param {Number} participantSectionId Completed participant section id
+     * @return {Number|NULL} next participant section id
+     */
+    getNextParticipantSection(participantSectionId) {
+      let indexOfCurrent = this.participantSections.findIndex(
+        function(participantSection) {
+          return participantSection.id === participantSectionId;
+        },
+        { participantSectionId }
+      );
+      let nextParticipantSectionIndex = indexOfCurrent + 1;
+
+      return nextParticipantSectionIndex < this.participantSections.length
+        ? this.participantSections[nextParticipantSectionIndex].id
+        : null;
     },
 
     /**
@@ -377,7 +498,7 @@ export default {
         mutation: UpdateSectionResponsesMutation,
         variables: {
           input: {
-            participant_section_id: this.participantSectionIdParam,
+            participant_section_id: this.activeParticipantSectionId,
             update: update,
           },
         },
@@ -393,6 +514,7 @@ export default {
       this.redirectWithPost(url, {
         show_about_others_tab: !this.currentUserIsSubject,
         completion_save_success: true,
+        closed_on_completion: this.activity.settings.close_on_completion,
       });
     },
 
@@ -442,8 +564,16 @@ export default {
       "section_element_response_required",
       "section_element_response_optional",
       "toast_error_save_response",
+      "toast_success_save_close_on_completion_response",
+      "toast_success_save_response",
+      "user_activities_close_on_completion_submit_confirmation_message",
       "user_activities_other_response_show",
+      "user_activities_submit_confirmation_message",
+      "user_activities_submit_confirmation_title",
       "user_activities_your_relationship_to_user"
+    ],
+    "moodle": [
+       "submit"
     ]
   }
 </lang-strings>

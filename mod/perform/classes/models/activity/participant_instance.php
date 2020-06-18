@@ -29,6 +29,7 @@ use core\entities\user;
 use core\orm\entity\model;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
+use mod_perform\models\response\participant_section;
 use mod_perform\state\participant_instance\participant_instance_availability;
 use mod_perform\state\participant_instance\participant_instance_progress;
 use mod_perform\state\state;
@@ -65,7 +66,6 @@ class participant_instance extends model {
         'progress',
         'availability',
         'participant_id',
-        'participant_sections',
         'subject_instance_id',
     ];
 
@@ -76,6 +76,7 @@ class participant_instance extends model {
         'subject_instance',
         'participant',
         'core_relationship',
+        'participant_sections',
     ];
 
     public static function get_entity_class(): string {
@@ -93,6 +94,15 @@ class participant_instance extends model {
 
     public function get_subject_instance(): subject_instance {
         return subject_instance::load_by_entity($this->entity->subject_instance);
+    }
+
+    /**
+     * Gets collection of participant sections.
+     *
+     * @return collection
+     */
+    public function get_participant_sections(): collection {
+        return $this->entity->participant_sections->map_to(participant_section::class);
     }
 
     /**

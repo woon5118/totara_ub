@@ -8,6 +8,8 @@ type mod_perform_participant_section {
   answerable_participant_instances: [mod_perform_participant_instance!]! # All participant instances the linked user (particiapnt_instance) can asnwer as
   section_element_responses: [mod_perform_section_element_response!]!
   progress_status: mod_perform_participant_section_progress_status!
+  availability_status: mod_perform_participant_section_availability_status!
+  other_participant_sections: [mod_perform_participant_section!]
 }
 
 """
@@ -71,4 +73,12 @@ enum mod_perform_participant_section_progress_status {
   COMPLETE
   IN_PROGRESS
   NOT_STARTED
+}
+
+"""
+A list of possible availability status states that a user participant section can be in
+"""
+enum mod_perform_participant_section_availability_status {
+  OPEN
+  CLOSED
 }

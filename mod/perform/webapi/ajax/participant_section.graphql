@@ -52,5 +52,17 @@ query mod_perform_participant_section(
         }
       }
     }
+    participant_instance {
+      participant_sections {
+        id
+        progress_status
+        availability_status
+        section {
+          id
+          title
+          sort_order
+        }
+      }
+    }
   }
 }

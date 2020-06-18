@@ -424,6 +424,10 @@ class behat_totara_data_generators extends behat_base {
                 'datagenerator' => 'activity_in_container',
                 'required' => array('activity_name')
             ),
+            'activity settings' => array(
+                'datagenerator' => 'activity_settings',
+                'required' => array('activity_name')
+            ),
             'activity sections' => array(
                 'datagenerator' => 'activity_section',
                 'required' => array('activity_name', 'section_name')

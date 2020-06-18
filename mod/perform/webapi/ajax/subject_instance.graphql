@@ -4,6 +4,9 @@ query mod_perform_subject_instance($subject_instance_id: core_id!) {
     progress_status
     activity {
       name
+      settings {
+        close_on_completion
+      }
     }
     subject_user {
       id

@@ -5,6 +5,7 @@ mutation mod_perform_update_section_responses(
     participant_section {
       id
       progress_status
+      availability_status
       section {
         display_title
       }

@@ -85,6 +85,9 @@ export default {
     activeParticipants: {
       required: true,
       type: Array,
+      default() {
+        return [];
+      },
     },
     relationships: {
       type: Array,

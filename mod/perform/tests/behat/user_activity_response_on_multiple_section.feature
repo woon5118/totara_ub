@@ -1,0 +1,91 @@
+@totara @perform @mod_perform @javascript @vuejs
+Feature: Respond to activity with multiple sections
+  Background:
+    And I log in as "admin"
+    Given the following "users" exist:
+      | username | firstname | lastname | email             |
+      | user1    | user      | 1        | user1@example.com |
+      | user2    | user      | 2        | user2@example.com |
+    And the following "cohorts" exist:
+      | name | idnumber |
+      | aud1 | aud1     |
+    And the following "cohort members" exist:
+      | user  | cohort |
+      | user1 | aud1   |
+      | user2 | aud1   |
+    And the following "activities" exist in "mod_perform" plugin:
+      | activity_name   | activity_type | activity_status | create_section |
+      | Closed activity | check-in      | Active          | false          |
+      | Open activity   | check-in      | Active          | false          |
+    And the following "activity settings" exist in "mod_perform" plugin:
+      | activity_name   | close_on_completion | multisection |
+      | Closed activity | yes                 | yes          |
+      | Open activity   | no                  | no           |
+    And the following "activity sections" exist in "mod_perform" plugin:
+      | activity_name   | section_name |
+      | Closed activity | section 1    |
+      | Closed activity | section 2    |
+      | Open activity   | section A    |
+    And the following "section relationships" exist in "mod_perform" plugin:
+      | section_name | relationship |
+      | section 1    | subject      |
+      | section 2    | subject      |
+      | section A    | subject      |
+    And the following "section elements" exist in "mod_perform" plugin:
+      | section_name | element_name |
+      | section 1    | short_text   |
+      | section 2    | short_text   |
+      | section A    | short_text   |
+    And the following "activity tracks" exist in "mod_perform" plugin:
+      | activity_name   | track_description |
+      | Closed activity | closed track 1    |
+      | Open activity   | open track 2      |
+    And the following "track assignments" exist in "mod_perform" plugin:
+      | track_description | assignment_type | assignment_name |
+      | closed track 1    | cohort          | aud1            |
+      | open track 2      | cohort          | aud1            |
+    And I trigger cron
+    And I am on homepage
+    And I log out
+
+  Scenario: Auto navigate to next section and redirect to list after responding to last section.
+    Given I log in as "user1"
+    And I navigate to the outstanding perform activities list page
+    And I click on "Closed activity" "link"
+    Then I should see "section 1"
+    When I answer "short text" question "test element title" with "John Answer one"
+    And I click on "Submit" "button"
+    Then I should see "You will not be able to update your responses after submission."
+    And I confirm the tui confirmation modal
+    Then I should see "Section submitted and closed." in the tui "success" notification toast
+    And I should see "section 2"
+
+    When I answer "short text" question "test element title" with "John Answer two"
+    And I click on "Submit" "button"
+    Then I should see "You will not be able to update your responses after submission."
+    And I confirm the tui confirmation modal
+    And I should see "Performance activities"
+    And I should see "Section submitted and closed." in the tui "success" notification toast
+
+  Scenario: Displays close on completion confirmation text when close on completion is enabled.
+    Given I log in as "user1"
+    And I navigate to the outstanding perform activities list page
+    And I click on "Closed activity" "link"
+    Then I should see "section 1"
+    When I answer "short text" question "test element title" with "John Answer one"
+    And I click on "Submit" "button"
+    Then I should see "You will not be able to update your responses after submission."
+    And I confirm the tui confirmation modal
+    And I should see "Section submitted and closed." in the tui "success" notification toast
+
+  Scenario: Does not display close on completion confirmation text when close on completion is disabled.
+    Given I log in as "user1"
+    And I navigate to the outstanding perform activities list page
+    When I click on "Open activity" "link"
+    Then I should see "section A"
+    And I answer "short text" question "test element title" with "John Answer one"
+    And I click on "Submit" "button"
+    Then I should see "Once submitted, your responses will be visible to other users who have permission to view them."
+    And I should not see "You will not be able to update your responses after submission."
+    And I confirm the tui confirmation modal
+    And I should see "Section submitted." in the tui "success" notification toast

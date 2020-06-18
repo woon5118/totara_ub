@@ -79,7 +79,9 @@ class participant_instance extends entity {
      * @return has_many
      */
     public function participant_sections(): has_many {
-        return $this->has_many(participant_section::class, 'participant_instance_id');
+        return $this->has_many(participant_section::class, 'participant_instance_id')
+            ->join([section::TABLE, 's'], 'section_id', 's.id')
+            ->order_by('s.sort_order', 'asc');
     }
 
     /**

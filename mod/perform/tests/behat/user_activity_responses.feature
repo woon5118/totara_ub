@@ -29,8 +29,9 @@ Feature: Viewing other responses
     And I answer "short text" question "Question two" with "John Answer two"
 
     When I click on "Submit" "button"
+    And I confirm the tui confirmation modal
     Then I should see "Performance activities"
-    And I should see "Activity responses saved" in the tui "success" notification toast
+    And I should see "Section submitted." in the tui "success" notification toast
     And the "Your activities" tui tab should be active
 
     When I click on "John is participating subject" "link"
@@ -51,9 +52,10 @@ Feature: Viewing other responses
     And I answer "short text" question "Question one" with "Manager Answer one"
     And I answer "short text" question "Question two" with "Manager Answer two"
     And I click on "Submit" "button"
+    And I confirm the tui confirmation modal
 
     Then I should see "Performance activities"
-    And I should see "Activity responses saved" in the tui "success" notification toast
+    And I should see "Section submitted." in the tui "success" notification toast
     And the "Activities about others" tui tab should be active
 
     When I click on "Close" "button"
@@ -87,8 +89,9 @@ Feature: Viewing other responses
     And I should see perform "Question two" question is "optional"
 
     When I click on "Submit" "button"
+    And I confirm the tui confirmation modal
     Then I should see "Performance activities"
-    And I should see "Activity responses saved" in the tui "success" notification toast
+    And I should see "Section submitted." in the tui "success" notification toast
     And the "Your activities" tui tab should be active
 
   Scenario: User answer multi select questions
@@ -127,6 +130,7 @@ Feature: Viewing other responses
     When I click on the "option_0" tui radio in the "sectionElements[7][answer_option]" tui radio group
     And I click on the "option_0" tui radio in the "sectionElements[8][answer_option]" tui radio group
     And I click on "Submit" "button"
+    And I confirm the tui confirmation modal
     Then I should see "Performance activities"
-    And I should see "Activity responses saved" in the tui "success" notification toast
+    And I should see "Section submitted." in the tui "success" notification toast
     And the "Your activities" tui tab should be active

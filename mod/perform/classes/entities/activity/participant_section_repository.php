@@ -24,6 +24,7 @@
 namespace mod_perform\entities\activity;
 
 use coding_exception;
+use core\collection;
 use core\orm\entity\repository;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
@@ -40,15 +41,9 @@ class participant_section_repository extends repository {
      */
     public function fetch_default(int $participant_instance_id, int $participant_id): participant_section_entity {
         /** @var participant_section_entity $first_participant_section */
-        $first_participant_section = participant_section_entity::repository()
-            ->as('ps')
+        $first_participant_section = $this->build_participant_sections_by_instance_id($participant_instance_id)
             ->join([participant_instance_entity::TABLE, 'pi'], 'ps.participant_instance_id', 'pi.id')
-            ->join([section::TABLE, 's'], 'ps.section_id', 's.id')
             ->where('pi.participant_id', $participant_id)
-            ->where('pi.id', $participant_instance_id)
-            // This is a temporary fix to make sure the questions for the first section is loaded
-            // until we have proper support for showing different sections to the end user
-            ->order_by('s.sort_order', 'asc')
             ->first();
 
         if ($first_participant_section === null) {
@@ -58,4 +53,17 @@ class participant_section_repository extends repository {
         return $first_participant_section;
     }
 
+    /**
+     * Create query builder to get sorted participant sections by participant instance id.
+     *
+     * @param int $participant_instance_id
+     * @return repository
+     */
+    private function build_participant_sections_by_instance_id(int $participant_instance_id): repository {
+        return participant_section_entity::repository()
+            ->as('ps')
+            ->join([section::TABLE, 's'], 'ps.section_id', 's.id')
+            ->where('participant_instance_id', $participant_instance_id)
+            ->order_by('s.sort_order', 'asc');
+    }
 }
