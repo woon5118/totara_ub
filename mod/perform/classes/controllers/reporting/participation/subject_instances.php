@@ -52,12 +52,12 @@ class subject_instances extends perform_controller {
     }
 
     public function action() {
-        $this->set_url(static::get_url(['activity_id' => $this->get_activity()->id]));
-
         if ($this->get_optional_param('activity_id', null, PARAM_INT)) {
             $report = $this->load_embedded_report('perform_subject_instance', ['activity_id' => $this->get_activity()->id]);
 
             $debug = $this->get_optional_param('debug', 0, PARAM_INT);
+
+            $this->set_url(static::get_url(['activity_id' => $this->get_activity()->id]));
 
             return self::create_report_view($report, $debug)
                 ->set_title($this->get_activity()->name)
@@ -67,6 +67,7 @@ class subject_instances extends perform_controller {
                 );
         } else {
             $url = new moodle_url('/mod/perform/manage/activity/index.php');
+            $this->set_url(static::get_url());
             return self::create_view('mod_perform/no_report', [
                 'content' => view::core_renderer()->notification(
                     get_string('report_activity_warning_message', 'mod_perform', (object)['url' => $url->out(true)]),
