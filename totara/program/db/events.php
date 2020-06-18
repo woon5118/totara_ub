@@ -73,6 +73,10 @@ $observers = array(
         'callback'  => 'totara_program_observer::cohort_members_updated',
     ),
     array(
+        'eventname' => '\core\event\cohort_deleted',
+        'callback'  => 'totara_program_observer::cohort_deleted',
+    ),
+    array(
         'eventname' => '\totara_job\event\job_assignment_updated',
         'callback'  => 'totara_program_observer::job_assignment_updated',
     ),

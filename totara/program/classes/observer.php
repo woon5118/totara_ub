@@ -687,4 +687,22 @@ class totara_program_observer {
 
         return true;
     }
+
+    /**
+     * Deletes associated program / certification assignments when an audience is
+     * deleted
+     *
+     * @param \core\event\cohort_deleted $event
+     */
+    public static function cohort_deleted(\core\event\cohort_deleted $event) {
+        global $DB;
+
+        $cohortid = $event->objectid;
+        $assignments = $DB->get_records('prog_assignment', ['assignmenttype' => \totara_program\assignment\cohort::ASSIGNTYPE_COHORT, 'assignmenttypeid' => $cohortid]);
+
+        foreach ($assignments as $assignment_record) {
+            $assignment = \totara_program\assignment\cohort::create_from_id($assignment_record->id);
+            $assignment->remove();
+        }
+    }
 }

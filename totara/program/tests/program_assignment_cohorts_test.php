@@ -183,7 +183,8 @@ class totara_program_assignment_cohorts_test extends advanced_testcase {
         $user_assignments = $DB->get_records('prog_user_assignment');
         $this->assertCount(3, $user_assignments);
 
-        cohort_delete_cohort($audience1);
+        // Delete record manually to circumvent any clean up
+        $DB->delete_records('cohort', ['id' => $audience1->id]);
 
         $audience_assignment = $DB->get_record('prog_assignment', ['assignmenttype' => ASSIGNTYPE_COHORT, 'assignmenttypeid' => $audience1->id]);
         $assignment = \totara_program\assignment\cohort::create_from_id($audience_assignment->id);
@@ -200,5 +201,58 @@ class totara_program_assignment_cohorts_test extends advanced_testcase {
         $user_assignment = reset($user_assignments);
         $this->assertEquals($user3->id, $user_assignment->userid);
         $this->assertEquals($assignment->id, $user_assignment->assignmentid);
+    }
+
+    public function test_program_assignment_cohort_deleted() {
+        global $DB;
+
+        $this->setAdminUser();
+
+        // Generate program and cohort assignments
+        $generator = $this->getDataGenerator();
+        $programgenerator = $generator->get_plugin_generator('totara_program');
+        $cohortgenerator = $this->getDataGenerator()->get_plugin_generator('totara_cohort');
+
+        $user1 = $generator->create_user();
+        $user2 = $generator->create_user();
+        $user3 = $generator->create_user();
+        $user4 = $generator->create_user();
+        $user5 = $generator->create_user();
+
+        $audience1 = $this->getDataGenerator()->create_cohort(['name' => 'Audience 1']);
+        $audience2 = $this->getDataGenerator()->create_cohort(['name' => 'Audience 2']);
+
+        $cohortgenerator->cohort_assign_users($audience1->id, [$user1->id, $user2->id]);
+        $cohortgenerator->cohort_assign_users($audience2->id, [$user3->id, $user4->id]);
+
+        $program1 = $programgenerator->create_program();
+
+        $programgenerator->assign_to_program($program1->id, ASSIGNTYPE_COHORT, $audience1->id);
+        $programgenerator->assign_to_program($program1->id, ASSIGNTYPE_COHORT, $audience2->id);
+        $programgenerator->assign_to_program($program1->id, ASSIGNTYPE_INDIVIDUAL, $user5->id);
+
+        // Run cron
+        $task = new \totara_program\task\user_assignments_task();
+        $task->execute();
+
+        $assignments1 = $DB->get_records_menu('prog_assignment', ['programid' => $program1->id], '', 'assignmenttypeid, id');
+        $user_assignments = $DB->get_records('prog_user_assignment', ['programid' => $program1->id]);
+        $this->assertCount(3, $assignments1);
+        $this->assertCount(5, $user_assignments);
+
+        // Delete cohort using the cohort UI
+        cohort_delete_cohort($audience1);
+
+        // Check the correct records remain
+        $assignments2 = $DB->get_records('prog_assignment', ['programid' => $program1->id]);
+        $user_assignments = $DB->get_records('prog_user_assignment', ['programid' => $program1->id]);
+        $this->assertCount(2, $assignments2);
+        $this->assertCount(3, $user_assignments);
+
+        $this->assertNotEmpty($assignments2[$assignments1[$audience2->id]]);
+        $this->assertNotEmpty($assignments2[$assignments1[$user5->id]]);
+
+        $audience_user_assignments = $DB->get_records('prog_user_assignment', ['assignmentid' => $assignments1[$audience1->id]]);
+        $this->assertCount(0, $audience_user_assignments);
     }
 }

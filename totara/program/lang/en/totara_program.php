@@ -159,6 +159,7 @@ $string['chosedenyextensionexception'] = 'You have chosen to deny the selected e
 $string['chosegrantextensionexception'] = 'You have chosen to grant the selected extension request(s)';
 $string['choseoverrideexception'] = 'You have chosen to override the exception and continue with the assignment';
 $string['cleanenrolmentpluginstask'] = 'Clean enrolment plugins in programs';
+$string['cleanprogramassignmentstask'] = 'Clean up program and certification assignments';
 $string['clicktofixcompletions'] = 'Click here to automatically fix currently selected completion records affected by this problem';
 $string['cohort'] = 'Audience';
 $string['cohortname'] = 'Audience name';
