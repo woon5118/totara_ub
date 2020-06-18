@@ -1440,6 +1440,7 @@ class behat_general extends behat_base {
                     $columnliteral . "] or div[normalize-space(text())=" . $columnliteral . "])]";
 
             // Totara: Moodle stuff was not working properly, so let's make this easier by looking up the column number instead.
+            // We are looking for 2 different node sets - thus '|' operator
             $columnheaderxpath = "$tablexpath/$theadheaderxpath | $tablexpath/$tbodyheaderxpath";
             $columnheader = $this->getSession()->getDriver()->find($columnheaderxpath);
             if (empty($columnheader)) {
@@ -1458,10 +1459,10 @@ class behat_general extends behat_base {
         // GoutteDriver uses DomCrawler\Crawler and it is making XPath relative to the current context, so use descendant.
         if ($mustequal) {
             $rowxpath = $tablexpath . "/tbody/tr[descendant::th[normalize-space(.)=" . $rowliteral .
-                        "] | descendant::td[normalize-space(.)=" . $rowliteral . "]]";
+                        "] or descendant::td[normalize-space(.)=" . $rowliteral . "]]";
         } else {
             $rowxpath = $tablexpath . "/tbody/tr[descendant::th[contains(.," . $rowliteral .
-                        ")] | descendant::td[contains(.," . $rowliteral . ")]]";
+                        ")] or descendant::td[contains(.," . $rowliteral . ")]]";
         }
 
         $columnvaluexpath = $rowxpath . $columnpositionxpath . "[contains(normalize-space(.)," . $valueliteral . ")]";
