@@ -22,36 +22,37 @@
 
 <template>
   <div class="tui-layoutOneColumnWithSidepanel">
-    <Responsive
-      :breakpoints="[
-        { name: 'small', boundaries: [0, 764] },
-        { name: 'medium', boundaries: [765, 1192] },
-        { name: 'large', boundaries: [1193, 1672] },
-      ]"
-      @responsive-resize="$_resize"
-    >
+    <Responsive :breakpoints="breakpoints" @responsive-resize="$_resize">
       <Grid :direction="gridDirection">
         <GridItem :units="gridUnitsLeft">
           <h3 class="tui-layoutOneColumnWithSidepanel__heading">
             <slot name="page-title" />
           </h3>
-          <slot name="column" :units="gridUnitsLeft" />
+          <slot
+            name="column"
+            :units="gridUnitsLeft"
+            :direction="gridDirection"
+          />
         </GridItem>
         <GridItem :units="1" :grows="false" :shrinks="false" />
         <GridItem :units="gridUnitsRight" :grows="false">
           <SidePanel
             ref="sidepanel"
             direction="rtl"
-            :animated="currentBoundaryName !== 'small'"
-            :sticky="currentBoundaryName !== 'small'"
-            :grow-height-on-scroll="currentBoundaryName !== 'small'"
-            :show-button-control="currentBoundaryName !== 'small'"
+            :animated="sidePanelAnimated"
+            :sticky="sidePanelSticky"
+            :grow-height-on-scroll="sidePanelGrowHeightOnScroll"
+            :show-button-control="sidePanelShowButtonControl"
             :initially-open="true"
             :overflows="false"
             @sidepanel-expanding="expandRequest"
             @sidepanel-collapsing="collapseRequest"
           >
-            <slot name="sidepanel" :units="gridUnitsRight" />
+            <slot
+              name="sidepanel"
+              :units="gridUnitsRight"
+              :direction="gridDirection"
+            />
           </SidePanel>
         </GridItem>
       </Grid>
@@ -72,54 +73,99 @@ export default {
     Responsive,
     SidePanel,
   },
+
+  props: {
+    sidePanelAnimated: {
+      type: Boolean,
+      default: true,
+    },
+
+    sidePanelSticky: {
+      type: Boolean,
+      default: true,
+    },
+
+    sidePanelGrowHeightOnScroll: {
+      type: Boolean,
+      default: true,
+    },
+
+    sidePanelShowButtonControl: {
+      type: Boolean,
+      default: true,
+    },
+
+    boundaries: {
+      type: Object,
+      default() {
+        /**
+         * Total expanded/collapsed units should equal 11, not 12, as 1 unit is
+         * reserved for a GridItem between main content and the SidePanel
+         **/
+        return {
+          small: {
+            gridDirection: 'vertical',
+            gridUnitsLeftExpanded: 12,
+            gridUnitsLeftCollapsed: 12,
+            gridUnitsRightExpanded: 12,
+            gridUnitsRightCollapsed: 12,
+          },
+          medium: {
+            gridDirection: 'horizontal',
+            gridUnitsLeftExpanded: 6,
+            gridUnitsLeftCollapsed: 10,
+            gridUnitsRightExpanded: 5,
+            gridUnitsRightCollapsed: 1,
+          },
+          large: {
+            gridDirection: 'horizontal',
+            gridUnitsLeftExpanded: 6,
+            gridUnitsLeftCollapsed: 10,
+            gridUnitsRightExpanded: 5,
+            gridUnitsRightCollapsed: 1,
+          },
+        };
+      },
+    },
+
+    defaultBoundaryName: {
+      type: String,
+      default: 'large',
+    },
+
+    breakpoints: {
+      type: Array,
+      default() {
+        return [
+          { name: 'small', boundaries: [0, 764] },
+          { name: 'medium', boundaries: [765, 1192] },
+          { name: 'large', boundaries: [1193, 1672] },
+        ];
+      },
+    },
+  },
+
   data() {
     return {
-      /**
-       * Total expanded/collapsed units should equal 11, not 12, as 1 unit is
-       * reserved for a GridItem between main content and the SidePanel
-       **/
-      boundaryDefaults: {
-        small: {
-          gridDirection: 'vertical',
-          gridUnitsLeftExpanded: 12,
-          gridUnitsLeftCollapsed: 12,
-          gridUnitsRightExpanded: 12,
-          gridUnitsRightCollapsed: 12,
-        },
-        medium: {
-          gridDirection: 'horizontal',
-          gridUnitsLeftExpanded: 6,
-          gridUnitsLeftCollapsed: 10,
-          gridUnitsRightExpanded: 5,
-          gridUnitsRightCollapsed: 1,
-        },
-        large: {
-          gridDirection: 'horizontal',
-          gridUnitsLeftExpanded: 6,
-          gridUnitsLeftCollapsed: 10,
-          gridUnitsRightExpanded: 5,
-          gridUnitsRightCollapsed: 1,
-        },
-      },
-      currentBoundaryName: 'large',
+      currentBoundaryName: this.defaultBoundaryName,
       sidePanelIsOpen: true,
     };
   },
   computed: {
     gridDirection() {
-      return this.boundaryDefaults[this.currentBoundaryName].gridDirection;
+      return this.boundaries[this.currentBoundaryName].gridDirection;
     },
     gridUnitsLeft() {
       let left = this.sidePanelIsOpen
         ? 'gridUnitsLeftExpanded'
         : 'gridUnitsLeftCollapsed';
-      return this.boundaryDefaults[this.currentBoundaryName][left];
+      return this.boundaries[this.currentBoundaryName][left];
     },
     gridUnitsRight() {
       let right = this.sidePanelIsOpen
         ? 'gridUnitsRightExpanded'
         : 'gridUnitsRightCollapsed';
-      return this.boundaryDefaults[this.currentBoundaryName][right];
+      return this.boundaries[this.currentBoundaryName][right];
     },
   },
   methods: {
@@ -130,6 +176,7 @@ export default {
      **/
     $_resize(boundaryName) {
       this.currentBoundaryName = boundaryName;
+      this.$emit('resize', boundaryName);
     },
 
     expandRequest: function() {
