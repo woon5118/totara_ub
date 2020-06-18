@@ -142,7 +142,7 @@ function (str, templates, ModalList, ajax, notification, Loader) {
             var row = {
                 actions: [actionBtn],
                 actions_width: 'xxsm',
-                aria_label: ariaLabel,
+                aria_label: ariaLabel || course.fullname,
                 columns: [
                     {
                         value: course.fullname

@@ -33,6 +33,7 @@
 
         Context variables required for this template:
         * mandatory: Bool, linked course is mandatory
+        * aria_label: string, course full name
 }}
 
-<input type="checkbox" data-linked-courses-checkbox="" {{#mandatory}}checked="checked"{{/mandatory}}>
+<input type="checkbox" data-linked-courses-checkbox="" {{#mandatory}}checked="checked"{{/mandatory}} aria-label="{{aria_label}}">
