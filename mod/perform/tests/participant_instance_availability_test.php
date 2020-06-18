@@ -181,10 +181,8 @@ class mod_perform_participant_instance_availability_testcase extends state_testc
             'subject_user_id' => $user1->id,
         ]);
 
-        //$section1 = $generator->create_section($activity);
-
-        $subject_relationship_id = relationship_provider::get_by_class(manager::class)->id;
-        $manager_relationship_id = relationship_provider::get_by_class(subject::class)->id;
+        $subject_relationship_id = $generator->get_core_relationship(subject::class)->id;
+        $manager_relationship_id = $generator->get_core_relationship(manager::class)->id;
 
         $participant1_entity = $generator->create_participant_instance($user1, $subject_instance->id, $subject_relationship_id);
         $participant2_entity = $generator->create_participant_instance($user2, $subject_instance->id, $manager_relationship_id);

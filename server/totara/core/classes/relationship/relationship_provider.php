@@ -67,14 +67,4 @@ class relationship_provider {
             });
     }
 
-    public static function get_by_class(string $class_name): relationship {
-        return relationship_entity::repository()
-            ->with('resolvers')
-            ->join([relationship_resolver_entity::TABLE, 'resolvers'], 'id', 'relationship_id')
-            ->where('resolvers.class_name', $class_name)
-            ->get()
-            ->transform_to(relationship::class)
-            ->first();
-    }
-
 }

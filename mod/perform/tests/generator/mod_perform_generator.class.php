@@ -55,7 +55,10 @@ use mod_perform\state\participant_section\not_started;
 use mod_perform\task\service\subject_instance_creation;
 use mod_perform\user_groups\grouping;
 use mod_perform\util;
+use totara_core\entities\relationship as relationship_entity;
 use totara_core\entities\relationship_resolver as core_relationship_resolver;
+use totara_core\entities\relationship_resolver as relationship_resolver_entity;
+use totara_core\relationship\relationship;
 use totara_core\relationship\relationship as core_relationship;
 use totara_core\relationship\relationship_provider as core_relationship_provider;
 use totara_core\relationship\resolvers\subject;
@@ -303,7 +306,7 @@ class mod_perform_generator extends component_generator_base {
     }
 
     public function create_section_relationship(section $section, array $data): section_relationship_model {
-        $core_relationship = core_relationship_provider::get_by_class($data['class_name']);
+        $core_relationship = $this->get_core_relationship($data['class_name']);
         return section_relationship_model::create(
             $section->get_id(),
             $core_relationship->id,
@@ -954,4 +957,5 @@ class mod_perform_generator extends component_generator_base {
         }
         $this->create_track_assignments_with_existing_groups(track::load_by_entity($track), $cohort_ids);
     }
+
 }
