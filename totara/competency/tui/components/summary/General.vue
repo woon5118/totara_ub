@@ -23,9 +23,9 @@
 <template>
   <div v-if="!$apollo.loading" class="tui-competencySummaryGeneral">
     <div class="tui-competencySummaryGeneral__header">
-      <div class="tui-competencySummaryGeneral__header_title">
+      <h3 class="tui-competencySummaryGeneral__header_title">
         {{ $str('general', 'moodle') }}
-      </div>
+      </h3>
       <a
         :href="editUrl"
         class="tui-competencySummaryGeneral__header_edit"
@@ -34,7 +34,7 @@
         <FlexIcon icon="edit" size="200" :alt="$str('edit', 'moodle')" />
       </a>
     </div>
-    <div class="tui-competencySummaryGeneral__list" role="grid">
+    <div class="tui-competencySummaryGeneral__list" role="table">
       <div
         v-if="competency.display_name"
         class="tui-competencySummaryGeneral__list_row"
@@ -43,7 +43,7 @@
         <div class="tui-competencySummaryGeneral__list_label" role="rowheader">
           {{ $str('fullname', 'totara_competency') }}
         </div>
-        <div class="tui-competencySummaryGeneral__list_value" role="gridcell">
+        <div class="tui-competencySummaryGeneral__list_value" role="cell">
           {{ competency.display_name }}
         </div>
       </div>
@@ -55,7 +55,7 @@
         <div class="tui-competencySummaryGeneral__list_label" role="rowheader">
           {{ $str('idnumber', 'totara_competency') }}
         </div>
-        <div class="tui-competencySummaryGeneral__list_value" role="gridcell">
+        <div class="tui-competencySummaryGeneral__list_value" role="cell">
           {{ competency.idnumber }}
         </div>
       </div>
@@ -69,7 +69,7 @@
         </div>
         <div
           class="tui-competencySummaryGeneral__list_value"
-          role="gridcell"
+          role="cell"
           v-html="competency.description"
         />
       </div>
@@ -81,7 +81,7 @@
         <div class="tui-competencySummaryGeneral__list_label" role="rowheader">
           {{ $str('type', 'totara_competency') }}
         </div>
-        <div class="tui-competencySummaryGeneral__list_value" role="gridcell">
+        <div class="tui-competencySummaryGeneral__list_value" role="cell">
           {{ competency.type.display_name }}
         </div>
       </div>
@@ -97,7 +97,7 @@
         </div>
         <div
           class="tui-competencySummaryGeneral__list_value"
-          role="gridcell"
+          role="cell"
           v-html="field.value"
         />
       </div>
@@ -110,7 +110,7 @@
         <div class="tui-competencySummaryGeneral__list_label" role="rowheader">
           {{ $str('assignment_creation_availability', 'totara_competency') }}
         </div>
-        <div class="tui-competencySummaryGeneral__list_value" role="gridcell">
+        <div class="tui-competencySummaryGeneral__list_value" role="cell">
           <div v-for="val in competency.assign_availability" :key="val">
             {{ assignAvailabilityNames[val] }}
           </div>
@@ -124,7 +124,7 @@
         <div class="tui-competencySummaryGeneral__list_label" role="rowheader">
           {{ $str('aggregationmethod', 'totara_hierarchy') }}
         </div>
-        <div class="tui-competencySummaryGeneral__list_value" role="gridcell">
+        <div class="tui-competencySummaryGeneral__list_value" role="cell">
           {{ aggregationMethodName }}
         </div>
       </div>

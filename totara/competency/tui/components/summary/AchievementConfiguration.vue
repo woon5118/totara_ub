@@ -23,9 +23,9 @@
 <template>
   <div class="tui-competencySummaryAchievementConfiguration">
     <div class="tui-competencySummaryAchievementConfiguration__header">
-      <div class="tui-competencySummaryAchievementConfiguration__header_title">
+      <h3 class="tui-competencySummaryAchievementConfiguration__header_title">
         {{ $str('achievement_paths', 'totara_competency') }}
-      </div>
+      </h3>
       <a
         :href="editUrl"
         class="tui-competencySummaryAchievementConfiguration__header_edit"
@@ -40,7 +40,7 @@
       class="tui-competencySummaryAchievementConfiguration__response"
     >
       <div class="tui-competencySummaryAchievementConfiguration__aggregation">
-        <Label :label="$str('overall_rating_calc', 'totara_competency')" />
+        <strong>{{ $str('overall_rating_calc', 'totara_competency') }}</strong>
         <div
           class="tui-competencySummaryAchievementConfiguration__aggregation_title"
         >

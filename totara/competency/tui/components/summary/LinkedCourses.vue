@@ -23,9 +23,9 @@
 <template>
   <div class="tui-competencyOverviewLinkedCourses">
     <div class="tui-competencyOverviewLinkedCourses__header">
-      <div class="tui-competencyOverviewLinkedCourses__header_title">
+      <h3 class="tui-competencyOverviewLinkedCourses__header_title">
         {{ $str('linked_courses', 'totara_competency') }}
-      </div>
+      </h3>
       <a
         :href="editUrl"
         class="tui-competencyOverviewLinkedCourses__header_edit"
@@ -40,12 +40,11 @@
     >
       {{ $str('no_courses_linked_yet', 'totara_competency') }}
     </div>
-    <div v-else class="tui-competencyOverviewLinkedCourses__list" role="grid">
+    <div v-else class="tui-competencyOverviewLinkedCourses__list">
       <div
         v-for="(course, id) in data"
         :key="id"
         class="tui-competencyOverviewLinkedCourses__list_row"
-        role="grid"
       >
         <span>
           <a :href="courseUrl(course.course_id)" :title="course.fullname">
