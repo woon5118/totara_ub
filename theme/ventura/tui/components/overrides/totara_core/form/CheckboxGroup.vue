@@ -1,7 +1,7 @@
 <!--
   This file is part of Totara Learn
 
-  Copyright (C) 2019 onwards Totara Learning Solutions LTD
+  Copyright (C) 2020 onwards Totara Learning Solutions LTD
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -22,35 +22,35 @@
 
 <style lang="scss">
 :root {
-  --tui-form-radio-group-padding: var(--tui-gap-2);
-  --tui-form-radio-group-spacing-v: var(--tui-gap-4);
-  --tui-form-radio-group-spacing-h: var(--tui-gap-4);
+  --tui-form-checkbox-group-padding: var(--tui-gap-2);
+  --tui-form-checkbox-group-spacing-v: var(--tui-gap-4);
+  --tui-form-checkbox-group-spacing-h: var(--tui-gap-4);
 }
 
-.tui-radioGroup {
+.tui-checkboxGroup {
   display: flex;
   flex-direction: column;
-  padding: var(--tui-form-radio-group-padding) 0;
+  padding: var(--tui-form-checkbox-group-padding) 0;
 
   & > * + * {
-    margin-top: var(--tui-form-radio-group-spacing-v);
+    margin-top: var(--tui-form-checkbox-group-spacing-v);
   }
 }
 
 @media screen and (min-width: $tui-screen-sm) {
-  .tui-radioGroup--horizontal {
+  .tui-checkboxGroup--horizontal {
     flex-direction: row;
     flex-wrap: wrap;
     // stylelint-disable length-zero-no-unit
     margin-top: calc(
-      0px - var(--tui-form-radio-group-spacing-v) +
-        var(--tui-form-radio-group-padding)
+      0px - var(--tui-form-checkbox-group-spacing-v) +
+        var(--tui-form-checkbox-group-padding)
     );
     padding-top: 0;
 
     & > * {
-      margin-top: var(--tui-form-radio-group-spacing-v);
-      margin-right: var(--tui-form-radio-group-spacing-h);
+      margin-top: var(--tui-form-checkbox-group-spacing-v);
+      margin-right: var(--tui-form-checkbox-group-spacing-h);
     }
   }
 }

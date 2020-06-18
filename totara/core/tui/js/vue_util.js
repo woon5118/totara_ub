@@ -24,8 +24,28 @@ import Vue from 'vue';
 
 import { baseSet } from './internal/util/object';
 
+function getOptions(component) {
+  return Vue.extend(component).options;
+}
+
+/**
+ * Get props from Vue component definition.
+ *
+ * @param {*} component Vue component definition.
+ * @returns {object}
+ */
 export function getPropDefs(component) {
-  return Object.assign({}, Vue.extend(component).options.props);
+  return getOptions(component).props;
+}
+
+/**
+ * Get `model: { prop, event }` setting from Vue component definition.
+ *
+ * @param {*} component Vue component definition.
+ * @returns {object}
+ */
+export function getModelDef(component) {
+  return getOptions(component).model;
 }
 
 /**

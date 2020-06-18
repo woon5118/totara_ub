@@ -21,14 +21,13 @@
  */
 
 import { pick } from 'totara_core/util';
-import { getPropDefs } from 'totara_core/vue_util';
+import { getPropDefs, getModelDef } from 'totara_core/vue_util';
 import FormField from 'totara_core/components/uniform/FormField';
 
 /**
- * Create a wrapper conponent for an input.
+ * Create a wrapper component for an input.
  *
- * Only requirement is that input takes a value prop and emits an "input" event
- * with the new value.
+ * The only hard requirement is that the input component works with v-model.
  *
  * @param {(object|Vue)} input Input component to wrap.
  * @param {object} [options]
@@ -36,7 +35,7 @@ import FormField from 'totara_core/components/uniform/FormField';
  * @returns {(object|Vue)} Vue component.
  */
 export function createUniformInputWrapper(input, options = {}) {
-  const inputProps = getPropDefs(input);
+  const inputProps = Object.assign({}, getPropDefs(input));
   delete inputProps.name;
   delete inputProps.validate;
   delete inputProps.validations;
@@ -54,6 +53,10 @@ export function createUniformInputWrapper(input, options = {}) {
     validate: Function,
     validations: [Function, Array],
   });
+
+  const model = getModelDef(input);
+  const modelProp = (model && model.prop) || 'value';
+  const modelEvent = (model && model.event) || 'input';
 
   return {
     functional: true,
@@ -86,9 +89,8 @@ export function createUniformInputWrapper(input, options = {}) {
             errorId,
             labelId,
           }) => {
-            const finalProps = Object.assign({}, propsForInput, {
-              value,
-            });
+            const finalProps = Object.assign({}, propsForInput);
+            finalProps[modelProp] = value;
             // attrs that are actually props will automatically be moved to
             // props by Vue
             const attrs = {
@@ -106,7 +108,7 @@ export function createUniformInputWrapper(input, options = {}) {
                 props: finalProps,
                 attrs,
                 on: {
-                  input: value => update(value),
+                  [modelEvent]: value => update(value),
                   blur,
                 },
               },

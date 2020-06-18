@@ -53,6 +53,12 @@
       <FormNumber name="age" />
     </FormRow>
 
+    <FormRow>
+      <FormCheckbox name="isLizard" :validations="v => [v.required()]">
+        I'm a lizard, Barry!
+      </FormCheckbox>
+    </FormRow>
+
     <FormRow label="Bread" required>
       <FormRadioGroup name="bread" :validations="v => [v.required()]">
         <Radio value="chorleywood">Chorleywood</Radio>
@@ -85,7 +91,19 @@
 
     <SampleFormPart path="fullName" />
 
+    <FormRow label="Pizza toppings" required>
+      <FormCheckboxGroup name="toppings" :validations="v => [v.required()]">
+        <Checkbox value="chicken">Chicken</Checkbox>
+        <Checkbox value="jalapenos">Jalapeños</Checkbox>
+        <Checkbox value="mushroom">Mushroom</Checkbox>
+        <Checkbox value="ruined">Pineapple</Checkbox>
+      </FormCheckboxGroup>
+    </FormRow>
+
     <FormRowActionButtons :submitting="getSubmitting()" @cancel="cancel" />
+
+    <h3 v-if="value">Current value</h3>
+    <pre v-if="value">{{ value }}</pre>
 
     <h3 v-if="result">Result</h3>
     <pre v-if="result">{{ result }}</pre>
@@ -102,8 +120,11 @@ import {
   FormText,
   FormNumber,
   FormRadioGroup,
+  FormCheckbox,
+  FormCheckboxGroup,
 } from 'totara_core/components/uniform';
 import InputText from 'totara_core/components/form/InputText';
+import Checkbox from 'totara_core/components/form/Checkbox';
 import Radio from 'totara_core/components/form/Radio';
 import FormRowActionButtons from 'totara_core/components/form/FormRowActionButtons';
 import SampleFormPart from 'totara_samples/components/sample_parts/totara_core/form/FormPart';
@@ -124,6 +145,9 @@ export default {
     FormRowActionButtons,
     SampleFormPart,
     Repeater,
+    FormCheckbox,
+    FormCheckboxGroup,
+    Checkbox,
   },
 
   data() {
@@ -132,6 +156,7 @@ export default {
         answers: ['first value', '', 'third value'],
       },
       errors: null,
+      value: null,
       result: null,
     };
   },
@@ -147,7 +172,8 @@ export default {
       return errors;
     },
 
-    handleChange() {
+    handleChange(values) {
+      this.value = values;
       if (this.errors) {
         this.errors = null;
       }
