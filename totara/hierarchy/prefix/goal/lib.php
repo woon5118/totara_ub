@@ -83,6 +83,9 @@ class goal extends hierarchy {
             if (!empty($jobassignment->managerid)) {
                 $managers[] = $jobassignment->managerid;
             }
+            if (!empty($jobassignment->tempmanagerid)) {
+                $managers[] = $jobassignment->tempmanagerid;
+            }
             if (!empty($jobassignment->teamleaderid)) {
                 $teamleaders[] = $jobassignment->teamleaderid;
             }
