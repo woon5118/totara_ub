@@ -64,7 +64,7 @@ class execution_context {
      * @param string|null $operationname the name of query or mutation
      * @return execution_context
      */
-    final public static function create(string $type, ?string $operationname = null) {
+    final public static function create(string $type, ?string $operationname = null): self {
         // NOTE: the main purpose of this method is to allow us to introduce subclasses for different types
         //       without breaking BC.
         return new self($type, $operationname);
@@ -74,7 +74,7 @@ class execution_context {
      * @internal
      * @param ResolveInfo|null $info
      */
-    final public function set_resolve_info(?ResolveInfo $info) {
+    final public function set_resolve_info(?ResolveInfo $info): void {
         $this->resolveinfo = $info;
     }
 
@@ -83,7 +83,7 @@ class execution_context {
      *
      * @return ResolveInfo|null
      */
-    final public function get_resolve_info() {
+    final public function get_resolve_info(): ?ResolveInfo {
         return $this->resolveinfo;
     }
 
@@ -92,14 +92,14 @@ class execution_context {
      *
      * @return string|null
      */
-    final public function get_type() {
+    final public function get_type(): ?string {
         return $this->type;
     }
 
     /**
      * @param string|null $operationname
      */
-    public function set_operationname(?string $operationname) {
+    public function set_operationname(?string $operationname): void {
         $this->operationname = $operationname;
     }
 
@@ -108,7 +108,7 @@ class execution_context {
      *
      * @return string|null
      */
-    final public function get_operationname() {
+    final public function get_operationname(): ?string {
         return $this->operationname;
     }
 
@@ -116,7 +116,7 @@ class execution_context {
      * Sets the context most relevant to this execution.
      * @param \context $context
      */
-    final public function set_relevant_context(\context $context) {
+    final public function set_relevant_context(\context $context): void {
         if (isset($this->relevantcontext)) {
             throw new \coding_exception('Context can only be set once per execution');
         }
