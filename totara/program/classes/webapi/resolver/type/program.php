@@ -58,10 +58,9 @@ class program implements type_resolver {
         }
 
         $format = $args['format'] ?? null;
-        $programcontext = context_program::instance($program->id);
-        $ec->set_relevant_context($programcontext);
+        $program_context = context_program::instance($program->id);
 
-        if (!self::authorize($field, $format, $programcontext)) {
+        if (!self::authorize($field, $format, $program_context)) {
             return null;
         }
 
@@ -87,18 +86,18 @@ class program implements type_resolver {
             return $content->get_course_sets();
         }
 
-        $formatter = new program_formatter($program, $programcontext);
+        $formatter = new program_formatter($program, $program_context);
         return $formatter->format($field, $format);
     }
 
-    public static function authorize(string $field, ?string $format, context_program $programcontext) {
+    public static function authorize(string $field, ?string $format, context_program $context) {
         // Permission to see RAW formatted string fields
         if (in_array($field, ['fullname', 'shortname']) && $format == format::FORMAT_RAW) {
-            return has_capability('totara/program:configuredetails', $programcontext);
+            return has_capability('totara/program:configuredetails', $context);
         }
         // Permission to see RAW formatted text fields
         if (in_array($field, ['summary']) && $format == format::FORMAT_RAW) {
-            return has_capability('totara/program:configuredetails', $programcontext);
+            return has_capability('totara/program:configuredetails', $context);
         }
         return true;
     }

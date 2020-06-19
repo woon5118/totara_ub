@@ -24,6 +24,7 @@
 
 namespace totara_program\webapi\resolver\query;
 
+use context_program;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
@@ -59,6 +60,8 @@ class program implements query_resolver, has_middleware {
         if (!$program->is_viewable($USER)) {
             throw new \coding_exception('Current user can not access this program.');
         }
+
+        $ec->set_relevant_context(context_program::instance($program->id));
 
         return $program;
     }

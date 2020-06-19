@@ -40,13 +40,12 @@ class course implements type_resolver {
         }
 
         $format = $args['format'] ?? null;
-        if (!$coursecontext = context_course::instance($course->id, IGNORE_MISSING)) {
+        if (!$course_context = context_course::instance($course->id, IGNORE_MISSING)) {
             // If there is no matching context we have a bad object, ignore missing so we can do our own error.
             throw new \coding_exception('Only valid course objects are accepted');
         }
-        $ec->set_relevant_context($coursecontext);
 
-        if (!self::authorize($field, $format, $coursecontext)) {
+        if (!self::authorize($field, $format, $course_context)) {
             return null;
         }
 
@@ -86,18 +85,18 @@ class course implements type_resolver {
             return \course_modinfo::instance($course->id, $USER->id)->get_section_info_all();
         }
 
-        $formatter = new course_formatter($course, $coursecontext);
+        $formatter = new course_formatter($course, $course_context);
         return $formatter->format($field, $format);
     }
 
-    public static function authorize(string $field, ?string $format, context_course $ec) {
+    public static function authorize(string $field, ?string $format, context_course $context) {
         // Permission to see RAW formatted string fields
         if (in_array($field, ['shortname', 'fullname']) && $format == format::FORMAT_RAW) {
-            return has_capability('moodle/course:update', $ec);
+            return has_capability('moodle/course:update', $context);
         }
         // Permission to see RAW formatted text fields
         if (in_array($field, ['summary']) && $format == format::FORMAT_RAW) {
-            return has_capability('moodle/course:update', $ec);
+            return has_capability('moodle/course:update', $context);
         }
         return true;
     }

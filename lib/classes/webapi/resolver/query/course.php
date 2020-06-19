@@ -24,6 +24,7 @@
 
 namespace core\webapi\resolver\query;
 
+use context_course;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_login_course;
 use core\webapi\query_resolver;
@@ -38,6 +39,8 @@ final class course implements query_resolver, has_middleware {
         // Course visibility and access is already covered in the course_require_login middleware
         $course = get_course($args['courseid']);
         $course->image = course_get_image($course);
+
+        $ec->set_relevant_context(context_course::instance($course->id));
 
         return (object)$course;
     }

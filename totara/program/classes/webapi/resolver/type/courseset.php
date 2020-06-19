@@ -58,21 +58,20 @@ class courseset implements type_resolver {
         }
 
         $format = $args['format'] ?? null;
-        $programcontext = context_program::instance($courseset->programid);
-        $ec->set_relevant_context($programcontext);
+        $program_context = context_program::instance($courseset->programid);
 
-        if (!self::authorize($field, $format, $ec)) {
+        if (!self::authorize($field, $format, $program_context)) {
             return null;
         }
 
-        $formatter = new courseset_formatter($courseset, $programcontext);
+        $formatter = new courseset_formatter($courseset, $program_context);
         return $formatter->format($field, $format);
     }
 
-    public static function authorize(string $field, ?string $format, execution_context $ec) {
+    public static function authorize(string $field, ?string $format, context_program $context) {
         // Permission to see RAW formatted string fields
         if (in_array($field, ['label']) && $format == format::FORMAT_RAW) {
-            return has_capability('totara/program:configurecontent', $ec->get_relevant_context());
+            return has_capability('totara/program:configurecontent', $context);
         }
         return true;
     }

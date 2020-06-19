@@ -38,15 +38,14 @@ class category implements type_resolver {
         require_once($CFG->dirroot . '/course/lib.php');
 
         $format = $args['format'] ?? null;
-        $categorycontext = context_coursecat::instance($category->id);
-        $ec->set_relevant_context($categorycontext);
 
-        if (!self::authorize($field, $format, $ec)) {
+        $category_context = context_coursecat::instance($category->id);
+        if (!self::authorize($field, $format, $category_context)) {
             return null;
         }
 
         $datefields = ['timemodified'];
-        if (in_array($field, $datefields) && empty($course->{$field})) {
+        if (in_array($field, $datefields) && empty($category->{$field})) {
             // Highly unlikely this is set to 1/1/1970, return null for notset dates.
             return null;
         }
@@ -81,18 +80,18 @@ class category implements type_resolver {
             }
         }
 
-        $formatter = new category_formatter($category, $categorycontext);
+        $formatter = new category_formatter($category, $category_context);
         return $formatter->format($field, $format);
     }
 
-    public static function authorize(string $field, ?string $format, execution_context $ec) {
+    public static function authorize(string $field, ?string $format, context_coursecat $context) {
         // Permission to see RAW formatted string fields
         if (in_array($field, ['name']) && $format == format::FORMAT_RAW) {
-            return has_capability('moodle/category:manage', $ec->get_relevant_context());
+            return has_capability('moodle/category:manage', $context);
         }
         // Permission to see RAW formatted text fields
         if (in_array($field, ['description']) && $format == format::FORMAT_RAW) {
-            return has_capability('moodle/category:manage', $ec->get_relevant_context());
+            return has_capability('moodle/category:manage', $context);
         }
         return true;
     }

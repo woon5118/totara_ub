@@ -24,6 +24,7 @@
 
 namespace core\webapi\resolver\query;
 
+use context_coursecat;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
@@ -38,6 +39,8 @@ final class category implements query_resolver, has_middleware {
 
         // Note: This takes care of visibility checks as long as the 3rd parameter is false.
         $category = coursecat::get($args['categoryid'], MUST_EXIST, false);
+
+        $ec->set_relevant_context(context_coursecat::instance($category->id));
 
         return (object)$category;
     }

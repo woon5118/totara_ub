@@ -24,6 +24,7 @@
 
 namespace core\webapi\resolver\query;
 
+use context_coursecat;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
@@ -47,6 +48,8 @@ final class courses_by_parent_category implements query_resolver, has_middleware
 
         $options['idonly'] = true;
         $category = \coursecat::get($args['categoryid']);
+        $ec->set_relevant_context(context_coursecat::instance($category->id));
+
         $courseids = $category->get_courses($options);
         if (empty($courseids)) {
             // There are no courses in this category.

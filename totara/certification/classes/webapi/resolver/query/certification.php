@@ -23,6 +23,7 @@
 
 namespace totara_certification\webapi\resolver\query;
 
+use context_program;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
@@ -60,6 +61,9 @@ class certification implements query_resolver, has_middleware {
         if (!$program->is_viewable($USER)) {
             throw new \coding_exception('Current user can not access this certification.');
         }
+
+        $context = context_program::instance($program->id);
+        $ec->set_relevant_context($context);
 
         return $program;
     }

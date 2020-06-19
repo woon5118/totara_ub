@@ -24,6 +24,7 @@
 
 namespace core\webapi\resolver\query;
 
+use context_coursecat;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
@@ -47,6 +48,8 @@ final class categories_by_parent_category implements query_resolver, has_middlew
 
         // Note: This takes care of visibility checks as long as the 3rd parameter is false.
         $category = \coursecat::get($args['categoryid']);
+
+        $ec->set_relevant_context(context_coursecat::instance($category->id));
 
         // Note: This seems to handle the visibility of the child categories.
         return $category->get_children($options);
