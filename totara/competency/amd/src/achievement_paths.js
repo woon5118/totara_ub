@@ -582,6 +582,9 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
 
             M.util.js_pending('competencyAchievementPathsApplyChanges');
 
+            // Disable ordering so that the form elements get enabled again
+            this.disableOrdering();
+
             // Resetting dirty early to avoid doubble submissions
             this.dirty = false;
             this.disableApplyChanges();
@@ -1133,9 +1136,6 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                     onOrderingItems[b].disabled = true;
                 }
             }
-
-            // Handling 'Apply changes' button separately
-            this.disableApplyChanges();
         },
 
         /**
@@ -1148,6 +1148,12 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
          *
          */
         disableOrdering: function() {
+            // This function also gets called from applyChanges, make sure we update the edit toggle to be correct.
+            this.widget.querySelector('.tw-editAchievementPaths__btn-active')
+                .classList.remove('tw-editAchievementPaths__btn-active');
+            this.widget.querySelector('.tw-editAchievementPaths__btn[data-tw-editachievementpaths-aggregation-action=edit]')
+                .classList.add('tw-editAchievementPaths__btn-active');
+
             var orderableItems = this.widget.querySelectorAll('[data-tw-editAchievementPaths-draggable]'),
                 onOrderingItems = this.widget.querySelectorAll('[data-tw-editAchievementPaths-on-ordering]'),
                 action;
@@ -1174,9 +1180,6 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                     this[this.aggFunction]();
                 }
             }
-
-            // Handling 'Apply changes' button separately
-            this.enableApplyChanges();
         },
 
         /**
@@ -1320,6 +1323,7 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
                 }
 
                 this.dirty = true;
+                this.enableApplyChanges();
             }
 
             // must remove dropPlaceholder after (not before) or it it will throw off indexes
