@@ -117,7 +117,7 @@ class execution_context {
      * @param \context $context
      */
     final public function set_relevant_context(\context $context) {
-        if (isset($this->context)) {
+        if (isset($this->relevantcontext)) {
             throw new \coding_exception('Context can only be set once per execution');
         }
         if ($context->contextlevel == CONTEXT_SYSTEM) {
