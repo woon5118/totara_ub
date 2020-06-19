@@ -382,22 +382,15 @@ class base {
         $this->ensure_category_loaded();
         $this->ensure_program_loaded();
 
-        // Dummy assignment object
-        $assignment = new \stdClass();
-        $assignment->id = $this->id;
-        $assignment->assignmenttypeid = $this->instanceid;
+        // Users with prog_user_assignment records
+        $userids = $DB->get_records_menu('prog_user_assignment', ['assignmentid' => $this->id], '', 'id, userid');
 
-        $users = $this->category->get_affected_users_by_assignment($assignment);
-
-        if (count($users) > PROG_UPDATE_ASSIGNMENTS_DEFER_COUNT) {
+        if (count($userids) > PROG_UPDATE_ASSIGNMENTS_DEFER_COUNT) {
             $DB->set_field('prog', 'assignmentsdeferred', 1, ['id' => $this->programid]);
             $DB->delete_records('prog_assignment', ['id' => $this->id]);
 
             return true;
         }
-
-        // IDs of all users assigned via this assignment
-        $userids = array_map(function($o) { return $o->id; }, $users);
 
         // Get array of users that are still assigned
         $sql = "SELECT id, userid FROM {prog_user_assignment}

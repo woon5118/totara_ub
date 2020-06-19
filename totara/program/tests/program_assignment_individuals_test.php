@@ -47,7 +47,6 @@ class totara_program_assignment_individuals_test extends advanced_testcase {
     public function test_create_from_instance_id() {
         global $DB, $CFG;
 
-        $this->resetAfterTest(true);
         $this->setAdminUser();
 
         $this->create_individual_data();
@@ -73,11 +72,9 @@ class totara_program_assignment_individuals_test extends advanced_testcase {
         $this->assertEquals(0, $record->status);
     }
 
-
     public function test_create_from_id() {
         global $DB;
 
-        $this->resetAfterTest(true);
         $this->setAdminUser();
 
         $generator = $this->getDataGenerator();
@@ -113,7 +110,7 @@ class totara_program_assignment_individuals_test extends advanced_testcase {
 
     public function test_get_type() {
         global $DB;
-        $this->resetAfterTest(true);
+
         $this->setAdminUser();
 
         $generator = $this->getDataGenerator();
@@ -132,7 +129,7 @@ class totara_program_assignment_individuals_test extends advanced_testcase {
 
     public function test_get_name() {
         global $DB;
-        $this->resetAfterTest(true);
+
         $this->setAdminUser();
 
         $generator = $this->getDataGenerator();
@@ -153,7 +150,7 @@ class totara_program_assignment_individuals_test extends advanced_testcase {
 
     public function test_get_programid() {
         global $DB;
-        $this->resetAfterTest(true);
+
         $this->setAdminUser();
 
         $generator = $this->getDataGenerator();
@@ -174,7 +171,7 @@ class totara_program_assignment_individuals_test extends advanced_testcase {
 
     public function test_includechildren() {
         global $DB;
-        $this->resetAfterTest(true);
+
         $this->setAdminUser();
 
         $generator = $this->getDataGenerator();
@@ -198,7 +195,7 @@ class totara_program_assignment_individuals_test extends advanced_testcase {
      */
     public function test_get_duedate_fixed_date() {
         global $DB;
-        $this->resetAfterTest(true);
+
         $this->setAdminUser();
 
         $generator = $this->getDataGenerator();
@@ -263,7 +260,7 @@ class totara_program_assignment_individuals_test extends advanced_testcase {
 
     public function test_get_duedate_first_login() {
         global $DB;
-        $this->resetAfterTest(true);
+
         $this->setAdminUser();
 
         $this->create_individual_data();
@@ -303,7 +300,7 @@ class totara_program_assignment_individuals_test extends advanced_testcase {
 
     public function test_set_duedate_static_date() {
         global $DB;
-        $this->resetAfterTest(true);
+
         $this->setAdminUser();
 
         $generator = $this->getDataGenerator();
@@ -360,7 +357,6 @@ class totara_program_assignment_individuals_test extends advanced_testcase {
     public function test_set_due_date_based_on_first_login() {
         global $DB;
 
-        $this->resetAfterTest(true);
         $this->setAdminUser();
         $this->create_individual_data();
 
@@ -438,7 +434,6 @@ class totara_program_assignment_individuals_test extends advanced_testcase {
     public function test_set_due_date_based_on_prog_enrolment() {
         global $DB;
 
-        $this->resetAfterTest(true);
         $this->setAdminUser();
         $this->create_individual_data();
 
@@ -485,7 +480,6 @@ class totara_program_assignment_individuals_test extends advanced_testcase {
     public function test_get_actual_duedate() {
         global $DB;
 
-        $this->resetAfterTest(true);
         $this->setAdminUser();
 
         $generator = $this->getDataGenerator();
@@ -531,7 +525,7 @@ class totara_program_assignment_individuals_test extends advanced_testcase {
 
     public function test_remove() {
         global $DB;
-        $this->resetAfterTest(true);
+
         $this->setAdminUser();
 
         $generator = $this->getDataGenerator();
@@ -561,7 +555,7 @@ class totara_program_assignment_individuals_test extends advanced_testcase {
 
     public function test_update_user_assignments() {
         global $DB;
-        $this->resetAfterTest(true);
+
         $this->setAdminUser();
 
         $generator = $this->getDataGenerator();
@@ -588,7 +582,6 @@ class totara_program_assignment_individuals_test extends advanced_testcase {
     public function test_user_assignment_records() {
         global $DB;
 
-        $this->resetAfterTest(true);
         $this->setAdminUser();
 
         $generator = $this->getDataGenerator();
@@ -618,7 +611,6 @@ class totara_program_assignment_individuals_test extends advanced_testcase {
     public function test_ensure_category_loaded() {
         global $DB, $CFG;
 
-        $this->resetAfterTest(true);
         $this->setAdminUser();
 
         $generator = $this->getDataGenerator();
@@ -651,7 +643,6 @@ class totara_program_assignment_individuals_test extends advanced_testcase {
     public function test_ensure_program_loaded() {
         global $DB, $CFG;
 
-        $this->resetAfterTest(true);
         $this->setAdminUser();
 
         $generator = $this->getDataGenerator();
@@ -687,7 +678,7 @@ class totara_program_assignment_individuals_test extends advanced_testcase {
 
     public function test_get_user_count() {
         global $DB;
-        $this->resetAfterTest(true);
+
         $this->setAdminUser();
 
         $generator = $this->getDataGenerator();
@@ -706,5 +697,41 @@ class totara_program_assignment_individuals_test extends advanced_testcase {
         $assignment = \totara_program\assignment\individual::create_from_id($assignid);
 
         $this->assertEquals(1, $assignment->get_user_count());
+    }
+
+    public function test_individual_assignment_delete() {
+        global $DB;
+
+        $this->setAdminUser();
+
+        $generator = $this->getDataGenerator();
+        $programgenerator = $generator->get_plugin_generator('totara_program');
+
+        $user1 = $generator->create_user();
+        $user2 = $generator->create_user();
+        $user3 = $generator->create_user();
+        $program1 = $programgenerator->create_program();
+
+        $programgenerator->assign_to_program($program1->id, ASSIGNTYPE_INDIVIDUAL, $user1->id);
+        $programgenerator->assign_to_program($program1->id, ASSIGNTYPE_INDIVIDUAL, $user2->id);
+        $programgenerator->assign_to_program($program1->id, ASSIGNTYPE_INDIVIDUAL, $user3->id);
+
+        // Run cron
+        $task = new \totara_program\task\user_assignments_task();
+        $task->execute();
+
+        $assignments = $DB->get_records('prog_assignment', ['programid' => $program1->id]);
+        $this->assertCount(3, $assignments);
+        $user_assignments = $DB->get_records('prog_user_assignment');
+        $this->assertCount(3, $user_assignments);
+
+        $assignment = $DB->get_record('prog_assignment', ['assignmenttype' => ASSIGNTYPE_INDIVIDUAL, 'assignmenttypeid' => $user1->id]);
+        $assignment = \totara_program\assignment\cohort::create_from_id($assignment->id);
+        $assignment->remove();
+
+        $assignments = $DB->get_records('prog_assignment', ['programid' => $program1->id]);
+        $this->assertCount(2, $assignments);
+        $user_assignments = $DB->get_records('prog_user_assignment');
+        $this->assertCount(2, $user_assignments);
     }
 }

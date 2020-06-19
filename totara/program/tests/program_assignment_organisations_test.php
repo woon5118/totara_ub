@@ -77,7 +77,6 @@ class totara_program_assignment_organisations_test extends advanced_testcase {
 
     public function test_create_from_id() {
         global $DB;
-        $this->resetAfterTest(true);
 
         $this->create_organisation_data();
         $this->programgenerator->assign_to_program($this->programs[1]->id, ASSIGNTYPE_ORGANISATION, $this->organisations[1]->id);
@@ -97,7 +96,6 @@ class totara_program_assignment_organisations_test extends advanced_testcase {
     public function test_create_from_instance_id() {
         global $DB;
 
-        $this->resetAfterTest(true);
         $this->setAdminUser();
 
         $this->create_organisation_data();
@@ -132,7 +130,6 @@ class totara_program_assignment_organisations_test extends advanced_testcase {
 
     public function test_get_user_count() {
         global $DB;
-        $this->resetAfterTest(true);
 
         $this->create_organisation_data();
 
@@ -157,7 +154,6 @@ class totara_program_assignment_organisations_test extends advanced_testcase {
 
     public function test_get_duedate() {
         global $DB;
-        $this->resetAfterTest(true);
         $this->create_organisation_data();
 
         $this->programgenerator->assign_to_program($this->programs[1]->id, ASSIGNTYPE_ORGANISATION, $this->organisations[1]->id);
@@ -227,7 +223,6 @@ class totara_program_assignment_organisations_test extends advanced_testcase {
 
     public function test_set_duedate() {
         global $DB;
-        $this->resetAfterTest(true);
         $this->setAdminUser();
         $this->create_organisation_data();
 
@@ -260,7 +255,6 @@ class totara_program_assignment_organisations_test extends advanced_testcase {
 
     public function test_create_user_assignment_records() {
         global $DB;
-        $this->resetAfterTest(true);
         $this->create_organisation_data();
 
         $this->programgenerator->assign_to_program($this->programs[1]->id, ASSIGNTYPE_ORGANISATION, $this->organisations[1]->id);
@@ -279,5 +273,46 @@ class totara_program_assignment_organisations_test extends advanced_testcase {
         $this->assertEquals(2, $DB->count_records('prog_completion', ['programid' => $this->programs[1]->id]));
         $this->assertEquals(1, $DB->count_records('prog_completion', ['programid' => $this->programs[1]->id, 'userid' => $this->users[1]->id]));
         $this->assertEquals(1, $DB->count_records('prog_completion', ['programid' => $this->programs[1]->id, 'userid' => $this->users[3]->id]));
+    }
+
+    public function test_organisation_assignment_delete() {
+        global $DB;
+
+        $this->setAdminUser();
+
+        $this->create_organisation_data();
+
+        $program1_id = $this->programs[1]->id;
+
+        $this->programgenerator->assign_to_program($this->programs[1]->id, ASSIGNTYPE_ORGANISATION, $this->organisations[1]->id);
+        $this->programgenerator->assign_to_program($program1_id, ASSIGNTYPE_INDIVIDUAL, $this->users[5]->id);
+
+        // Run cron
+        $task = new \totara_program\task\user_assignments_task();
+        $task->execute();
+
+        $assignments = $DB->get_records('prog_assignment', ['programid' => $program1_id]);
+        $this->assertCount(2, $assignments);
+        $user_assignments = $DB->get_records('prog_user_assignment');
+        $this->assertCount(3, $user_assignments);
+
+        $hierarchy = new \organisation();
+        $hierarchy->delete_hierarchy_item($this->organisations[1]->id);
+
+        $organisation_assignment = $DB->get_record('prog_assignment', ['assignmenttype' => ASSIGNTYPE_ORGANISATION, 'assignmenttypeid' => $this->organisations[1]->id]);
+        $assignment = \totara_program\assignment\manager::create_from_id($organisation_assignment->id);
+        $assignment->remove();
+
+        $assignments = $DB->get_records('prog_assignment', ['programid' => $program1_id]);
+        $this->assertCount(1, $assignments);
+        $assignment = reset($assignments);
+        $this->assertEquals(ASSIGNTYPE_INDIVIDUAL, $assignment->assignmenttype);
+        $this->assertEquals($this->users[5]->id, $assignment->assignmenttypeid);
+
+        $user_assignments = $DB->get_records('prog_user_assignment');
+        $this->assertCount(1, $user_assignments);
+        $user_assignment = reset($user_assignments);
+        $this->assertEquals($this->users[5]->id, $user_assignment->userid);
+        $this->assertEquals($assignment->id, $user_assignment->assignmentid);
     }
 }
