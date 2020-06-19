@@ -29,7 +29,6 @@
               v-for="item in data.options"
               :key="item.name"
               :value="item.name"
-              :name="item.name"
               >{{ item.value }}</Radio
             >
           </FormRadioGroup>
