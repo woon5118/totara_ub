@@ -26,7 +26,6 @@ use mod_perform\models\activity\activity_setting;
 use mod_perform\models\activity\section;
 use mod_perform\state\activity\draft;
 use mod_perform\webapi\resolver\mutation\activate_activity;
-use mod_perform\webapi\resolver\mutation\add_section;
 use totara_core\advanced_feature;
 use totara_job\relationship\resolvers\manager;
 use totara_webapi\phpunit\webapi_phpunit_helper;
@@ -43,7 +42,7 @@ class mod_perform_webapi_resolver_mutation_add_section_testcase extends advanced
     use webapi_phpunit_helper;
 
     public function test_add_section(): void {
-        [$activity, $args, $context] = $this->create_activity();
+        [$activity, $args] = $this->create_activity();
 
         $this->assertCount(1, $activity->get_sections());
 
@@ -65,7 +64,7 @@ class mod_perform_webapi_resolver_mutation_add_section_testcase extends advanced
 
     public function test_activity_is_not_in_multi_section_mode() {
         /** @var activity $activity */
-        [$activity, $args, $context] = $this->create_activity();
+        [$activity, $args] = $this->create_activity();
 
         $activity->get_settings()->update([activity_setting::MULTISECTION => false]);
 
@@ -79,7 +78,7 @@ class mod_perform_webapi_resolver_mutation_add_section_testcase extends advanced
         $user1 = $this->getDataGenerator()->create_user();
         $user2 = $this->getDataGenerator()->create_user();
 
-        [, $args, $context] = $this->create_activity(null, $user1);
+        [, $args] = $this->create_activity(null, $user1);
 
         $this->setUser($user2);
 
@@ -87,7 +86,7 @@ class mod_perform_webapi_resolver_mutation_add_section_testcase extends advanced
         $this->expectExceptionMessage('Invalid activity');
 
         // Calling the resolver directly here as otherwise the middleware would already intervene
-        add_section::resolve($args, $context);
+        $this->resolve_graphql_mutation('mod_perform_add_section', $args);
     }
 
     public function test_activate_non_existing_activity(): void {
@@ -97,13 +96,11 @@ class mod_perform_webapi_resolver_mutation_add_section_testcase extends advanced
             ]
         ];
 
-        $context = $this->create_webapi_context(self::MUTATION);
-
         $this->expectException(moodle_exception::class);
         $this->expectExceptionMessage('Invalid activity');
 
         // Calling the resolver directly here as otherwise the middleware would already intervene
-        add_section::resolve($args, $context);
+        $this->resolve_graphql_mutation('mod_perform_add_section', $args);
     }
 
     /**
@@ -133,7 +130,7 @@ class mod_perform_webapi_resolver_mutation_add_section_testcase extends advanced
         self::setGuestUser();
         $args['input']['activity_id'] = $activity->id;
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
-        $this->assert_webapi_operation_failed($result, 'Course or activity not accessible.');
+        $this->assert_webapi_operation_failed($result, 'Invalid activity');
     }
 
     /**
@@ -141,7 +138,7 @@ class mod_perform_webapi_resolver_mutation_add_section_testcase extends advanced
      *
      * @param int|null $status defaults to draft
      * @param stdClass $as_user user that creates the activity.
-     * @return array [activity, graphql args, graphql context] tuple.
+     * @return array [activity, graphql args] tuple.
      */
     protected function create_activity(?int $status = null, ?stdClass $as_user = null): array {
         if ($as_user) {
@@ -167,9 +164,6 @@ class mod_perform_webapi_resolver_mutation_add_section_testcase extends advanced
             ]
         ];
 
-        $context = $this->create_webapi_context(self::MUTATION);
-        $context->set_relevant_context($activity->get_context());
-
         $section = $activity->get_sections()->first();
 
         $perform_generator->create_section_relationship(
@@ -177,9 +171,6 @@ class mod_perform_webapi_resolver_mutation_add_section_testcase extends advanced
             ['class_name' => manager::class]
         );
 
-        $element = $perform_generator->create_element(['title' => 'Question one']);
-        $perform_generator->create_section_element($section, $element);
-
-        return [$activity, $args, $context];
+        return [$activity, $args];
     }
 }

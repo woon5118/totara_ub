@@ -33,7 +33,6 @@ use mod_perform\models\activity\activity;
 use mod_perform\models\response\participant_section;
 use mod_perform\state\participant_section\complete;
 use mod_perform\state\participant_section\not_started;
-use mod_perform\webapi\resolver\mutation\update_section_responses;
 use performelement_short_text\answer_length_exceeded_error;
 use performelement_short_text\short_text;
 use totara_core\advanced_feature;
@@ -102,7 +101,7 @@ class mod_perform_webapi_resolver_mutation_update_section_responses_testcase ext
 
         // Initial save of responses.
         /** @var participant_section $initial_save_result */
-        $initial_save_result = update_section_responses::resolve($args, $context)['participant_section'];
+        $initial_save_result = $this->resolve_graphql_mutation(self::MUTATION, $args)['participant_section'];
 
         self::assertEquals('COMPLETE', $initial_save_result->get_progress_status());
         self::assertCount(2, $initial_save_result->get_section_element_responses());
@@ -322,8 +321,7 @@ class mod_perform_webapi_resolver_mutation_update_section_responses_testcase ext
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage("Participant section not found for id {$participant_section->id}");
 
-        $context = $this->create_webapi_context(self::MUTATION);
-        update_section_responses::resolve($args, $context);
+        $this->resolve_graphql_mutation(self::MUTATION, $args);
     }
 
     public function test_can_not_update_responses_for_a_participant_section_that_doesnt_exist(): void {
@@ -348,8 +346,7 @@ class mod_perform_webapi_resolver_mutation_update_section_responses_testcase ext
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage('Participant section not found for id 1');
 
-        $context = $this->create_webapi_context(self::MUTATION);
-        update_section_responses::resolve($args, $context);
+        $this->resolve_graphql_mutation(self::MUTATION, $args);
     }
 
     public function test_can_not_save_responses_for_section_elements_that_belong_to_a_different_section(): void {
@@ -415,8 +412,7 @@ class mod_perform_webapi_resolver_mutation_update_section_responses_testcase ext
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage("Section element not found for id {$other_participants_section_element_id}");
 
-        $context = $this->create_webapi_context(self::MUTATION);
-        update_section_responses::resolve($args, $context);
+        $this->resolve_graphql_mutation(self::MUTATION, $args);
     }
 
     public function test_can_not_save_responses_for_section_elements_that_dont_exist(): void {
@@ -467,8 +463,7 @@ class mod_perform_webapi_resolver_mutation_update_section_responses_testcase ext
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage('Section element not found for id 0');
 
-        $context = $this->create_webapi_context(self::MUTATION);
-        update_section_responses::resolve($args, $context);
+        $this->resolve_graphql_mutation(self::MUTATION, $args);
     }
 
     public function test_failed_ajax_query(): void {

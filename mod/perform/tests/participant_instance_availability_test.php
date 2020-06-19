@@ -37,7 +37,6 @@ use mod_perform\state\participant_instance\open;
 use mod_perform\state\participant_instance\participant_instance_availability as participant_instance_availability_state;
 use mod_perform\state\state;
 use totara_core\relationship\resolvers\subject;
-use totara_core\relationship\relationship_provider;
 use totara_job\relationship\resolvers\manager;
 
 require_once(__DIR__ . '/state_testcase.php');

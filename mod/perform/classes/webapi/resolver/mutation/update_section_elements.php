@@ -23,6 +23,7 @@
 
 namespace mod_perform\webapi\resolver\mutation;
 
+use core\orm\query\builder;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\mutation_resolver;
@@ -31,6 +32,7 @@ use mod_perform\models\activity\element;
 use mod_perform\models\activity\section;
 use mod_perform\models\activity\section_element;
 use mod_perform\webapi\middleware\require_activity;
+use mod_perform\webapi\middleware\require_manage_capability;
 
 class update_section_elements implements mutation_resolver, has_middleware {
     /**
@@ -39,20 +41,11 @@ class update_section_elements implements mutation_resolver, has_middleware {
      * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
-        global $DB;
-
         $section_form_data = $args['input'];
 
         $section = section::load_by_id($section_form_data['section_id']);
 
-        $activity = $section->get_activity();
-        if (!$activity->can_manage()) {
-            throw new \coding_exception('No permission to manage section elements');
-        }
-
-        $ec->set_relevant_context($activity->get_context());
-
-        $DB->transaction(function () use ($section, $section_form_data) {
+        builder::get_db()->transaction(function () use ($section, $section_form_data) {
             // Remove elements from the section.
             $delete_section_elements = [];
             foreach ($section_form_data['delete'] ?? [] as $delete_section_element_form_data) {
@@ -114,7 +107,8 @@ class update_section_elements implements mutation_resolver, has_middleware {
     public static function get_middleware(): array {
         return [
             new require_advanced_feature('performance_activities'),
-            require_activity::by_section_id('input.section_id', true)
+            require_activity::by_section_id('input.section_id', true),
+            require_manage_capability::class
         ];
     }
 }

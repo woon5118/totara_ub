@@ -24,7 +24,6 @@
 use mod_perform\state\condition;
 use mod_perform\state\invalid_state_switch_exception;
 use mod_perform\state\state as base_state;
-use mod_perform\state\state_helper;
 use mod_perform\state\transition;
 
 /**

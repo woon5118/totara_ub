@@ -23,8 +23,6 @@
 
 namespace mod_perform\data_providers\activity;
 
-use moodle_exception;
-
 use core\collection;
 
 use mod_perform\entities\activity\activity_setting as activity_setting_entity;

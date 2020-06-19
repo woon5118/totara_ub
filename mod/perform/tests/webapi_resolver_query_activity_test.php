@@ -49,7 +49,7 @@ class mod_perform_webapi_resolver_query_activity_testcase extends mod_perform_re
 
         $context = $this->create_webapi_context(self::QUERY);
         $context->set_relevant_context($created_activity->get_context());
-        $returned_activity = activity::resolve($args, $context);
+        $returned_activity = $this->resolve_graphql_query(self::QUERY, $args);
 
         $this->assertEquals($id, $returned_activity->id);
         $this->assertEquals($created_activity->name, $returned_activity->name);
@@ -70,29 +70,26 @@ class mod_perform_webapi_resolver_query_activity_testcase extends mod_perform_re
         $id = $created_activity->id;
         $args = ['activity_id' => $id];
 
-        $context = $this->create_webapi_context(self::QUERY);
-        $context->set_relevant_context($created_activity->get_context());
-
         // Returns the activity for the user that created it
-        $returned_activity = activity::resolve($args, $context);
+        $returned_activity = $this->resolve_graphql_query(self::QUERY, $args);
         $this->assertEquals($id, $returned_activity->id);
         $this->assertEquals($created_activity->name, $returned_activity->name);
 
         self::setUser($user2);
         $this->expectException(moodle_exception::class);
-        activity::resolve($args, $context);
+
+        $this->resolve_graphql_query(self::QUERY, $args);
     }
 
     public function test_get_activity_non_admin(): void {
         $created_activity = $this->create_test_data()->activity3;
         $args = ['activity_id' => $created_activity->id];
 
-        $context = $this->create_webapi_context(self::QUERY);
-        $context->set_relevant_context($created_activity->get_context());
+        self::setGuestUser();
 
         $this->expectException(moodle_exception::class);
-        self::setGuestUser();
-        activity::resolve($args, $context);
+
+        $this->resolve_graphql_query(self::QUERY, $args);
     }
 
     /**

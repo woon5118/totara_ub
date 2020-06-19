@@ -21,7 +21,6 @@
  * @package mod_perform
  */
 
-use container_perform\backup\backup_helper;
 use core\orm\query\builder;
 use mod_perform\data_providers\activity\activity;
 use mod_perform\state\activity\draft;
@@ -40,10 +39,10 @@ class mod_perform_webapi_resolver_mutation_clone_activity_testcase extends advan
     use webapi_phpunit_helper;
 
     public function test_clone_activity(): void {
-        [$activity, $args, $context] = $this->create_activity();
+        [$activity, $args] = $this->create_activity();
         self::assertTrue($this->container_course_exists($activity->course));
 
-        $clone_activity = clone_activity::resolve($args, $context);
+        $clone_activity = $this->resolve_graphql_mutation('mod_perform_clone_activity', $args);
         $this->assertIsObject($clone_activity['activity']);
         $data_provider = new activity();
         $activities = $data_provider->fetch()->get();
@@ -54,7 +53,7 @@ class mod_perform_webapi_resolver_mutation_clone_activity_testcase extends advan
      * Test the mutation through the GraphQL stack.
      */
     public function test_execute_query_successful(): void {
-        [$activity, $args, ] = $this->create_activity();
+        [$activity, $args] = $this->create_activity();
         self::assertTrue($this->container_course_exists($activity->course));
 
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
@@ -70,7 +69,7 @@ class mod_perform_webapi_resolver_mutation_clone_activity_testcase extends advan
     }
 
     public function test_failed_ajax_query(): void {
-        [$activity, $args, ] = $this->create_activity();
+        [$activity, $args] = $this->create_activity();
 
         $feature = 'performance_activities';
         advanced_feature::disable($feature);
@@ -93,13 +92,13 @@ class mod_perform_webapi_resolver_mutation_clone_activity_testcase extends advan
         self::setGuestUser();
         $args['input']['activity_id'] = $activity->id;
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
-        $this->assert_webapi_operation_failed($result, 'not accessible');
+        $this->assert_webapi_operation_failed($result, 'Invalid activity');
     }
 
     public function test_requires_capability(): void {
         self::setAdminUser();
 
-        [$activity, $args, ] = $this->create_activity();
+        [$activity, $args] = $this->create_activity();
 
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
         $this->assert_webapi_operation_successful($result);
@@ -144,9 +143,6 @@ class mod_perform_webapi_resolver_mutation_clone_activity_testcase extends advan
             ]
         ];
 
-        $context = $this->create_webapi_context(self::MUTATION);
-        $context->set_relevant_context($activity->get_context());
-
-        return [$activity, $args, $context];
+        return [$activity, $args];
     }
 }

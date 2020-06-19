@@ -21,15 +21,11 @@
  * @package mod_perform
  */
 
-use core\entities\user;
+use core\orm\query\builder;
 use mod_perform\data_providers\activity\subject_instance_for_participant;
 use mod_perform\entities\activity\filters\subject_instances_about;
 use mod_perform\entities\activity\participant_instance;
-use mod_perform\models\activity\activity;
 use mod_perform\models\activity\subject_instance as subject_instance_model;
-use totara_core\relationship\resolvers\subject;
-use totara_job\relationship\resolvers\appraiser;
-use totara_job\relationship\resolvers\manager;
 
 require_once(__DIR__ . '/subject_instance_testcase.php');
 
@@ -55,6 +51,29 @@ class mod_perform_data_provider_subject_instances_testcase extends mod_perform_s
         self::assert_same_subject_instance(
             self::$about_user_and_participating, $returned_subject_instances->last()
         ); // 538001
+    }
+
+    /**
+     * Hidden activities should be filtered out
+     */
+    public function test_get_excludes_hidden_courses(): void {
+        // Hide one of the activities
+        builder::table('course')
+            ->where('id', self::$about_user_and_participating->get_activity()->course)
+            ->update([
+                'visible' => 0,
+                'visibleold' => 0
+            ]);
+
+        $returned_subject_instances = (new subject_instance_for_participant(self::$user->id))
+            ->fetch()
+            ->get();
+
+        self::assertCount(1, $returned_subject_instances);
+
+        self::assert_same_subject_instance(
+            self::$about_someone_else_and_participating, $returned_subject_instances->first()
+        ); // 538003
     }
 
     /**

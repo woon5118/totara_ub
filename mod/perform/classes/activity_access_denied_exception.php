@@ -15,37 +15,21 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
  * @package mod_perform
  */
 
-namespace mod_perform\state\activity\condition;
+namespace mod_perform;
 
-use mod_perform\models\activity\activity;
-use mod_perform\state\condition;
+class activity_access_denied_exception extends \moodle_exception {
 
-defined('MOODLE_INTERNAL') || die();
-
-/**
- * The activity has at least one track with one assignment
- */
-class at_least_one_track_with_one_assignment extends condition {
-
-    public function pass(): bool {
-        /** @var activity $activity */
-        $activity = $this->object;
-
-        $tracks = $activity->get_tracks();
-
-        // Check whether the activity has at least one track with one assignment
-        foreach ($tracks as $track) {
-            if ($track->has_assignments()) {
-                return true;
-            }
-        }
-
-        return false;
+    /**
+     * @param string|\Exception|null $debug_info additional debug information
+     */
+    public function __construct($debug_info = null) {
+        parent::__construct('access_check_error', 'mod_perform', '', null, $debug_info);
     }
+
 }

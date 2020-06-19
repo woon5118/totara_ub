@@ -26,11 +26,10 @@ namespace mod_perform\webapi\resolver\query;
 
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
-use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
-use mod_perform\models\activity\activity as activity_model;
-use moodle_exception;
+use mod_perform\webapi\middleware\require_activity;
+use mod_perform\webapi\middleware\require_manage_capability;
 use totara_core\relationship\relationship;
 use totara_core\relationship\relationship_provider;
 
@@ -47,15 +46,6 @@ class relationships implements query_resolver, has_middleware {
      * @return relationship[]
      */
     public static function resolve(array $args, execution_context $ec) {
-        $activity = activity_model::load_by_id($args['activity_id']);
-
-        $context = $activity->get_context();
-        if (!$activity->can_manage()) {
-            throw new moodle_exception('invalid_activity', 'mod_perform');
-        }
-
-        $ec->set_relevant_context($context);
-
         return relationship_provider::fetch_compatible_relationships(['user_id']);
     }
 
@@ -65,7 +55,8 @@ class relationships implements query_resolver, has_middleware {
     public static function get_middleware(): array {
         return [
             new require_advanced_feature('performance_activities'),
-            new require_login(),
+            require_activity::by_activity_id('activity_id', true),
+            require_manage_capability::class
         ];
     }
 

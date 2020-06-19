@@ -22,7 +22,6 @@
  */
 
 use mod_perform\state\activity\draft;
-use mod_perform\webapi\resolver\query\activity_users_to_assign_count;
 use totara_core\relationship\resolvers\subject;
 use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
@@ -40,22 +39,23 @@ class mod_perform_webapi_resolver_query_activity_users_to_assign_count_testcase 
      * We don't need to thoroughly test permissions as the query simply extends the query activity.
      */
     public function test_query_permissions(): void {
-        [$args, $context] = $this->create_test_data();
+        [$args] = $this->create_test_data();
 
-        $this->expectException(moodle_exception::class);
         self::setGuestUser();
-        activity_users_to_assign_count::resolve($args, $context);
+        $this->expectException(moodle_exception::class);
+
+        $this->resolve_graphql_query(self::QUERY, $args);
     }
 
     public function test_query_successful() {
-        [$args, $context] = $this->create_test_data();
+        [$args] = $this->create_test_data();
 
-        $result = activity_users_to_assign_count::resolve($args, $context);
+        $result = $this->resolve_graphql_query(self::QUERY, $args);
         $this->assertEquals(1, $result);
     }
 
     public function test_successful_ajax_call(): void {
-        [$args, ] = $this->create_test_data();
+        [$args] = $this->create_test_data();
 
         $result = $this->parsed_graphql_operation(self::QUERY, $args);
         $this->assert_webapi_operation_successful($result);
@@ -65,7 +65,7 @@ class mod_perform_webapi_resolver_query_activity_users_to_assign_count_testcase 
     }
 
     public function test_failed_ajax_query(): void {
-        [$args, ] = $this->create_test_data();
+        [$args] = $this->create_test_data();
 
         $feature = 'performance_activities';
         advanced_feature::disable($feature);
@@ -85,7 +85,7 @@ class mod_perform_webapi_resolver_query_activity_users_to_assign_count_testcase 
 
         self::setGuestUser();
         $result = $this->parsed_graphql_operation(self::QUERY, $args);
-        $this->assert_webapi_operation_failed($result, 'Course or activity not accessible.');
+        $this->assert_webapi_operation_failed($result, 'Invalid activity');
     }
 
     private function create_test_data(): array {
@@ -107,11 +107,8 @@ class mod_perform_webapi_resolver_query_activity_users_to_assign_count_testcase 
         $user = self::getDataGenerator()->create_user();
         $generator->create_track_assignments_with_existing_groups($track, [], [], [], [$user->id]);
 
-        $context = $this->create_webapi_context(self::QUERY);
-        $context->set_relevant_context($activity->get_context());
-
         $args = ['activity_id' => $activity->id];
 
-        return [$args, $context];
+        return [$args];
     }
 }

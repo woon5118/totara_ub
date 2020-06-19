@@ -31,7 +31,6 @@ use hierarchy_organisation\entities\organisation;
 use hierarchy_position\entities\position;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
-use mod_perform\entities\activity\participant_section;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
 use mod_perform\entities\activity\section as section_entity;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
@@ -55,10 +54,7 @@ use mod_perform\state\participant_section\not_started;
 use mod_perform\task\service\subject_instance_creation;
 use mod_perform\user_groups\grouping;
 use mod_perform\util;
-use totara_core\entities\relationship as relationship_entity;
 use totara_core\entities\relationship_resolver as core_relationship_resolver;
-use totara_core\entities\relationship_resolver as relationship_resolver_entity;
-use totara_core\relationship\relationship;
 use totara_core\relationship\relationship as core_relationship;
 use totara_core\relationship\relationship_provider as core_relationship_provider;
 use totara_core\relationship\resolvers\subject;
@@ -772,7 +768,7 @@ class mod_perform_generator extends component_generator_base {
         int $subject_instance_id,
         section $section,
         int $core_relationship_id
-    ): participant_section {
+    ): participant_section_entity {
         $participant_instance = $this->create_participant_instance(
             $participant_user, $subject_instance_id, $core_relationship_id
         );
@@ -870,7 +866,7 @@ class mod_perform_generator extends component_generator_base {
      * @param stdClass|user $subject_user
      * @param stdClass|user $manager_appraiser_user
      * @param null $activity_name
-     * @return participant_section[] [$subject_section, $manager_section, $appraiser_section]
+     * @return participant_section_entity[] [$subject_section, $manager_section, $appraiser_section]
      * @throws coding_exception
      */
     public function create_section_with_combined_manager_appraiser(

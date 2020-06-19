@@ -111,10 +111,10 @@ class mod_perform_webapi_resolver_mutation_update_section_settings_testcase exte
         while (section_entity::repository()->where('id', $non_existent_section_id)->exists()) {
             $non_existent_section_id ++;
         }
-        $this->expectException(coding_exception::class);
-        $this->expectExceptionMessage('Specified section id does not exist');
+        $this->expectException(moodle_exception::class);
+        $this->expectExceptionMessage('Invalid activity');
 
-        [$args, $context] = $this->create_args(
+        $args = $this->create_args(
             $non_existent_section_id,
             [
                 [
@@ -123,7 +123,7 @@ class mod_perform_webapi_resolver_mutation_update_section_settings_testcase exte
                 ]
             ]
         );
-        update_section_settings::resolve($args, $context);
+        $this->resolve_graphql_mutation(self::MUTATION, $args);
     }
 
     public function test_update_missing_capability() {
@@ -140,7 +140,7 @@ class mod_perform_webapi_resolver_mutation_update_section_settings_testcase exte
         $this->expectException(moodle_exception::class);
         $this->expectExceptionMessage('Invalid activity');
 
-        [$args, $context] = $this->create_args(
+        $args = $this->create_args(
             $section1->id,
             [
                 [
@@ -149,7 +149,7 @@ class mod_perform_webapi_resolver_mutation_update_section_settings_testcase exte
                 ],
             ]
         );
-        update_section_settings::resolve($args, $context);
+        $this->resolve_graphql_mutation(self::MUTATION, $args);
     }
 
     public function test_update_successful() {
@@ -169,7 +169,7 @@ class mod_perform_webapi_resolver_mutation_update_section_settings_testcase exte
         $this->assert_section_relationships($section2, []);
 
         // Add three relationships to section1.
-        [$args, $context] = $this->create_args(
+        $args = $this->create_args(
             $section1->id,
             [
                 [
@@ -186,7 +186,7 @@ class mod_perform_webapi_resolver_mutation_update_section_settings_testcase exte
                 ],
             ]
         );
-        $result = update_section_settings::resolve($args, $context);
+        $result = $this->resolve_graphql_mutation('mod_perform_update_section_settings', $args);
 
         /** @var section $returned_section */
         $returned_section = $result['section'];
@@ -196,8 +196,8 @@ class mod_perform_webapi_resolver_mutation_update_section_settings_testcase exte
         $this->assert_section_relationships($section2, []);
 
         // Remove all relationships.
-        [$args, $context] = $this->create_args($section1->id, []);
-        update_section_settings::resolve($args, $context);
+        $args = $this->create_args($section1->id, []);
+        $this->resolve_graphql_mutation('mod_perform_update_section_settings', $args);
         $this->assert_section_relationships($section1, []);
         $this->assert_section_relationships($section2, []);
     }
@@ -211,7 +211,7 @@ class mod_perform_webapi_resolver_mutation_update_section_settings_testcase exte
         $section_id = $data->activity2_section2->id;
         $appraiser_relationship = $this->perform_generator()->get_core_relationship(appraiser::class);
 
-        [$args, ] = $this->create_args(
+        $args = $this->create_args(
             $section_id,
             [
                 [
@@ -234,7 +234,7 @@ class mod_perform_webapi_resolver_mutation_update_section_settings_testcase exte
         $section_id = $data->activity2_section2->id;
         $appraiser_relationship = $this->perform_generator()->get_core_relationship(appraiser::class);
 
-        [$args, ] = $this->create_args(
+        $args = $this->create_args(
             $section_id,
             [
                 [
@@ -256,15 +256,11 @@ class mod_perform_webapi_resolver_mutation_update_section_settings_testcase exte
     }
 
     private function create_args(int $section_id, array $relationships): array {
-        $args = [
+        return [
             'input' => [
                 'section_id' => $section_id,
                 'relationships' => $relationships
             ]
         ];
-
-        $context = $this->create_webapi_context(self::MUTATION);
-
-        return [$args, $context];
     }
 }

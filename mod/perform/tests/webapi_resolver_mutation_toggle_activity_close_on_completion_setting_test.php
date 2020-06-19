@@ -23,11 +23,8 @@
  */
 
 use mod_perform\models\activity\activity_setting;
-
 use mod_perform\webapi\resolver\mutation\toggle_activity_close_on_completion_setting;
-
 use totara_core\advanced_feature;
-
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
@@ -44,7 +41,7 @@ class mod_perform_webapi_mutation_toggle_activity_close_on_completion_setting_te
      * @covers ::resolve
      */
     public function test_change_close_on_completion(): void {
-        [$activity, $args, $context] = $this->setup_env(false);
+        [$activity, $args] = $this->setup_env(false);
 
         $settings = $activity->settings;
         $this->assertEquals(0, $settings->get()->count(), 'wrong settings count');
@@ -53,7 +50,7 @@ class mod_perform_webapi_mutation_toggle_activity_close_on_completion_setting_te
             'wrong setting value'
         );
 
-        $result = toggle_activity_close_on_completion_setting::resolve($args, $context)->settings;
+        $result = $this->resolve_graphql_mutation(self::MUTATION, $args)->settings;
         $this->assertEquals(1, $result->get()->count(), 'wrong settings count');
         $this->assertFalse(
             (bool)$result->lookup(activity_setting::CLOSE_ON_COMPLETION, true),
@@ -61,7 +58,7 @@ class mod_perform_webapi_mutation_toggle_activity_close_on_completion_setting_te
         );
 
         $args['input']['setting'] = true;
-        $result = toggle_activity_close_on_completion_setting::resolve($args, $context)->settings;
+        $result = $this->resolve_graphql_mutation(self::MUTATION, $args)->settings;
         $this->assertEquals(1, $result->get()->count(), 'wrong settings count');
         $this->assertTrue(
             (bool)$result->lookup(activity_setting::CLOSE_ON_COMPLETION, false),
@@ -73,7 +70,7 @@ class mod_perform_webapi_mutation_toggle_activity_close_on_completion_setting_te
      * @covers ::resolve
      */
     public function test_successful_ajax_call(): void {
-        [$activity, $args, ] = $this->setup_env(true);
+        [$activity, $args] = $this->setup_env(true);
         $this->assertEquals(0, $activity->settings->get()->count(), 'wrong settings count');
 
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
@@ -92,7 +89,7 @@ class mod_perform_webapi_mutation_toggle_activity_close_on_completion_setting_te
      * @covers ::resolve
      */
     public function test_failed_ajax_call(): void {
-        [$activity, $args, ] = $this->setup_env();
+        [$activity, $args] = $this->setup_env();
 
         $feature = 'performance_activities';
         advanced_feature::disable($feature);
@@ -111,7 +108,7 @@ class mod_perform_webapi_mutation_toggle_activity_close_on_completion_setting_te
         self::setGuestUser();
         $args['input']['activity_id'] = $activity->id;
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
-        $this->assert_webapi_operation_failed($result, 'accessible');
+        $this->assert_webapi_operation_failed($result, 'Invalid activity');
     }
 
     /**
@@ -134,9 +131,6 @@ class mod_perform_webapi_mutation_toggle_activity_close_on_completion_setting_te
         ];
         $args = ['input' => $activity_details];
 
-        $context = $this->create_webapi_context(self::MUTATION);
-        $context->set_relevant_context($activity->get_context());
-
-        return [$activity, $args, $context];
+        return [$activity, $args];
     }
 }

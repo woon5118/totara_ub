@@ -51,17 +51,13 @@ class mod_perform_webapi_resolver_mutation_delete_section_testcase extends advan
                 'section_id' => $section->id,
             ],
         ];
-        $context = $this->create_webapi_context(self::MUTATION);
-        $context->set_relevant_context($activity->get_context());
 
         $this->assertCount(2, $activity->sections);
         $this->assertCount(2, $section->section_relationships);
         $this->assertCount(1, $section->participant_sections);
 
-        $result = $this->resolve_graphql_mutation(
-            self::MUTATION,
-            $args
-        );
+        $result = $this->resolve_graphql_mutation(self::MUTATION, $args);
+
         $this->assertTrue($result);
         $activity->refresh(true);
         $this->assertCount(1, $activity->sections);
@@ -79,27 +75,20 @@ class mod_perform_webapi_resolver_mutation_delete_section_testcase extends advan
         $activity = $data->activity1;
         $section = $data->activity1_section1;
 
-        $context = $this->create_webapi_context(self::MUTATION);
-        $context->set_relevant_context($activity->get_context());
-
         $args = [
             'input' => [
                 'section_id' => $section->id,
             ],
         ];
 
-        $this->expectException(require_login_exception::class);
-        $this->expectExceptionMessage('Course or activity not accessible. (Not enrolled)');
+        $this->expectException(moodle_exception::class);
+        $this->expectExceptionMessage('Invalid activity');
 
-        $this->resolve_graphql_mutation(
-            self::MUTATION,
-            $args
-        );
+        $this->resolve_graphql_mutation(self::MUTATION, $args);
     }
 
     public function test_delete_with_invalid_section_id() {
-        $data = $this->create_test_data();
-        $activity = $data->activity1;
+        $this->create_test_data();
 
         $args = [
             'input' => [
@@ -107,24 +96,15 @@ class mod_perform_webapi_resolver_mutation_delete_section_testcase extends advan
             ],
         ];
 
-        $context = $this->create_webapi_context(self::MUTATION);
-        $context->set_relevant_context($activity->get_context());
-
         $this->expectException(moodle_exception::class);
         $this->expectExceptionMessage('Invalid activity');
-        $this->resolve_graphql_mutation(
-            self::MUTATION,
-            $args
-        );
+
+        $this->resolve_graphql_mutation(self::MUTATION, $args);
     }
 
     public function test_delete_section_fail_on_active_activity() {
         $data = $this->create_test_data();
-        $activity = $data->activity2;
         $section = $data->activity2_section1;
-
-        $context = $this->create_webapi_context(self::MUTATION);
-        $context->set_relevant_context($activity->get_context());
 
         $args = [
             'input' => [
@@ -134,7 +114,8 @@ class mod_perform_webapi_resolver_mutation_delete_section_testcase extends advan
 
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage('section can not be deleted for active performance activity');
-        delete_section::resolve($args, $context);
+
+        $this->resolve_graphql_mutation(self::MUTATION, $args);
     }
 
     public function test_delete_section_fail_when_activity_has_one_section() {
@@ -149,15 +130,10 @@ class mod_perform_webapi_resolver_mutation_delete_section_testcase extends advan
             ],
         ];
 
-        $context = $this->create_webapi_context(self::MUTATION);
-        $context->set_relevant_context($activity->get_context());
-
         $this->assertCount(2, $activity->sections);
 
-        $this->resolve_graphql_mutation(
-            self::MUTATION,
-            $args1
-        );
+        $this->resolve_graphql_mutation(self::MUTATION, $args1);
+
         $activity->refresh(true);
         $this->assertCount(1, $activity->sections);
 
@@ -169,10 +145,8 @@ class mod_perform_webapi_resolver_mutation_delete_section_testcase extends advan
 
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage('activity does not have enough sections, section can not be deleted');
-        $this->resolve_graphql_mutation(
-            self::MUTATION,
-            $args2
-        );
+
+        $this->resolve_graphql_mutation(self::MUTATION, $args2);
     }
 
     /**

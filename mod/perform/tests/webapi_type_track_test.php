@@ -28,6 +28,7 @@ use core\webapi\execution_context;
 use mod_perform\models\activity\track as track_model;
 
 use mod_perform\webapi\resolver\type\track;
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
  * @coversDefaultClass track.
@@ -36,16 +37,20 @@ use mod_perform\webapi\resolver\type\track;
  */
 class mod_perform_webapi_type_track_testcase extends advanced_testcase {
 
+    use webapi_phpunit_helper;
+
+    private const TYPE = 'mod_perform_track';
+
     /**
      * @covers ::resolve
      */
     public function test_invalid_input(): void {
-        [, $context] = $this->create_track();
-        $webapi_context = $this->get_webapi_context($context);
+        $this->create_track();
 
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessageRegExp("/track/");
-        track::resolve('id', new stdClass(), [], $webapi_context);
+
+        $this->resolve_graphql_type(self::TYPE, 'id', new \stdClass());
     }
 
     /**
@@ -53,12 +58,12 @@ class mod_perform_webapi_type_track_testcase extends advanced_testcase {
      */
     public function test_invalid_field(): void {
         [$track, $context] = $this->create_track();
-        $webapi_context = $this->get_webapi_context($context);
         $field = 'unknown';
 
         $this->expectException(moodle_exception::class);
         $this->expectExceptionMessageRegExp("/$field/");
-        track::resolve($field, $track, [], $webapi_context);
+
+        $this->resolve_graphql_type(self::TYPE, $field, $track, [], $context);
     }
 
     /**
@@ -73,7 +78,6 @@ class mod_perform_webapi_type_track_testcase extends advanced_testcase {
         [$source, $context] = $this->create_track(
             '<h1>This is a <strong>test</strong> description</h1>'
         );
-        $webapi_context = $this->get_webapi_context($context);
         $plain_desc = format_string($source->description, true, ['context' => $context]);
 
         $testcases = [
@@ -87,7 +91,7 @@ class mod_perform_webapi_type_track_testcase extends advanced_testcase {
             [$field, $format, $expected] = $testcase;
             $args = $format ? ['format' => $format] : [];
 
-            $value = track::resolve($field, $source, $args, $webapi_context);
+            $value = $this->resolve_graphql_type(self::TYPE, $field, $source, $args, $context);
             $this->assertEquals($expected, $value, "[$id] wrong value");
         }
     }

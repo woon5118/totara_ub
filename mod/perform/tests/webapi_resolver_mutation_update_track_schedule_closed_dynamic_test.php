@@ -27,10 +27,8 @@ require_once(__DIR__ . '/webapi_resolver_mutation_update_track_schedule.php');
 
 use mod_perform\dates\resolvers\dynamic\dynamic_source;
 use mod_perform\entities\activity\track as track_entity;
-use mod_perform\webapi\resolver\mutation\update_track_schedule;
-use totara_webapi\phpunit\webapi_phpunit_helper;
 use totara_core\advanced_feature;
-
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
  * @group perform
@@ -174,7 +172,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage($expected_exception_message);
 
-        update_track_schedule::resolve($args, $context);
+        $this->resolve_graphql_mutation(self::MUTATION, $args);
     }
 
     public function date_resolver_validation_errors_provider(): array {

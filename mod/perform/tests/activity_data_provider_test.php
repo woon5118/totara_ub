@@ -24,7 +24,10 @@
 /**
  * @group perform
  */
+
+use core\orm\query\builder;
 use  mod_perform\data_providers\activity\activity;
+use mod_perform\models\activity\activity as activity_model;
 
 class mod_perform_activity_data_provider_testcase extends advanced_testcase {
 
@@ -40,6 +43,36 @@ class mod_perform_activity_data_provider_testcase extends advanced_testcase {
         $this->assertEqualsCanonicalizing(
             [$data->activity1->name, $data->activity2->name],
             [$performs[0]->name, $performs[1]->name]
+        );
+    }
+
+    public function test_fetch_excludes_hidden_courses() {
+        global $CFG;
+        require_once($CFG->dirroot . '/course/lib.php');
+
+        $user = $this->getDataGenerator()->create_user();
+
+        $this->setUser($user);
+
+        $data = $this->create_test_data();
+
+        /** @var activity_model $activity2 */
+        $activity2 = $data->activity2;
+
+        builder::table('course')
+            ->where('id', $activity2->course)
+            ->update([
+                'visible' => 0,
+                'visibleold' => 0
+            ]);
+
+        $data_provider = new activity();
+        $performs = $data_provider->fetch()->get();
+
+        $this->assertCount(1, $performs);
+        $this->assertEqualsCanonicalizing(
+            [$data->activity1->name],
+            [$performs[0]->name]
         );
     }
 

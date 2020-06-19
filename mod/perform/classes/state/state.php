@@ -24,8 +24,6 @@
 
 namespace mod_perform\state;
 
-use mod_perform\state\activity\active;
-
 defined('MOODLE_INTERNAL') || die();
 
 /**

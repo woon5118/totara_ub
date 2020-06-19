@@ -23,6 +23,9 @@
 
 namespace mod_perform\controllers;
 
+use context_module;
+use mod_perform\activity_access_denied_exception;
+use mod_perform\models\activity\helpers\access_checks;
 use mod_perform\views\override_nav_breadcrumbs;
 use moodle_url;
 use reportbuilder;
@@ -53,16 +56,15 @@ abstract class perform_controller extends controller {
 
         advanced_feature::require('performance_activities');
 
-        // Then we'll do a second require_login to capture errors due to not being able to access the course.
-        // This i quite a hacky approach but the only way at the moment
-        [$context, $course, $cm] = get_context_info_array($this->context->id);
-        if ($course) {
+        // If we are in an activity context do some additional checks
+        if ($this->context instanceof context_module) {
+            $helper = access_checks::for_module_context($this->context);
             try {
-                require_login($course, $this->auto_login_guest, $cm, true, true);
-            } catch (\require_login_exception $exception) {
-                // TODO: Replace this temporary solution with something else in TL-25510
+                $helper->check();
+                $this->get_page()->set_cm($helper->get_cm(), $helper->get_course());
+            } catch (activity_access_denied_exception $exception) {
                 $this->get_page()->set_url('/mod/perform/manage/activity/index.php');
-                $this->get_page()->set_cm($cm, $course);
+                $this->get_page()->set_cm($helper->get_cm(), $helper->get_course());
                 echo $this->action_invalid()->render();
                 exit();
             }

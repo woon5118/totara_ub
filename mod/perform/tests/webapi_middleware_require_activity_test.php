@@ -22,9 +22,11 @@
  * @category test
  */
 
+use core\orm\query\builder;
 use core\webapi\execution_context;
 use core\webapi\resolver\payload;
 use core\webapi\resolver\result;
+use mod_perform\activity_access_denied_exception;
 use mod_perform\webapi\middleware\require_activity;
 
 /**
@@ -73,6 +75,68 @@ class mod_perform_webapi_middleware_require_activity_testcase extends advanced_t
         $this->expectExceptionMessage('activity id');
         require_activity::by_activity_id($id_key, true)
             ->handle($composite_key_payload, $next);
+    }
+
+    /**
+     * @covers ::by_activity_id
+     * @covers ::handle
+     */
+    public function test_require_on_hidden_activity(): void {
+        $user = $this->getDataGenerator()->create_user();
+
+        $expected = 34324;
+        [$activity, $context, $next] = $this->create_test_data($expected, $user);
+
+        builder::table('course')
+            ->where('id', $activity->course)
+            ->update([
+                'visible' => 0,
+                'visibleold' => 0
+            ]);
+
+        $single_key_args = ['activity_id' => $activity->id];
+        $single_key_payload = payload::create($single_key_args, $context);
+
+        $this->expectException(activity_access_denied_exception::class);
+        $this->expectExceptionMessage('Cannot access this activity (Activity is hidden)');
+
+        require_activity::by_activity_id('activity_id', false)
+            ->handle($single_key_payload, $next);
+    }
+
+    /**
+     * @covers ::by_activity_id
+     * @covers ::handle
+     */
+    public function test_require_on_wrong_tenant(): void {
+        $tenantgenerator = $this->getDataGenerator()->get_plugin_generator('totara_tenant');
+        $tenantgenerator->enable_tenants();
+
+        $tenant1 = $tenantgenerator->create_tenant();
+        $user1 = $this->getDataGenerator()->create_user(['tenantid' => $tenant1->id]);
+        $tenant2 = $tenantgenerator->create_tenant();
+        $user2 = $this->getDataGenerator()->create_user(['tenantid' => $tenant2->id]);
+
+        $expected = 34324;
+        [$activity, $context, $next] = $this->create_test_data($expected, $user1);
+
+        $this->setUser($user2);
+
+        builder::table('course')
+            ->where('id', $activity->course)
+            ->update([
+                'visible' => 0,
+                'visibleold' => 0
+            ]);
+
+        $single_key_args = ['activity_id' => $activity->id];
+        $single_key_payload = payload::create($single_key_args, $context);
+
+        $this->expectException(activity_access_denied_exception::class);
+        $this->expectExceptionMessage('Cannot access this activity (Cannot access activity)');
+
+        require_activity::by_activity_id('activity_id', false)
+            ->handle($single_key_payload, $next);
     }
 
     /**
@@ -165,19 +229,23 @@ class mod_perform_webapi_middleware_require_activity_testcase extends advanced_t
      * @param mixed $expected_result value to return as the result of the next
      *        chained "processor" after the require_activity handler.
      *
+     * @param stdClass|null $as_user
      * @return array (activity with one track and one section, graphql execution
      *         context, next handler to execute) tuple.
+     * @throws coding_exception
      */
-    private function create_test_data($expected_result = null): array {
-        $this->setAdminUser();
+    private function create_test_data($expected_result = null, stdClass $as_user = null): array {
+        if ($as_user) {
+            $this->setUser($as_user);
+        } else {
+            $this->setAdminUser();
+        }
 
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
-        $activity = $generator->create_activity_in_container(
-            [
-                'create_track' => true,
-                'create_section' => true,
-            ]
-        );
+        $activity = $generator->create_activity_in_container([
+            'create_track' => true,
+            'create_section' => true,
+        ]);
 
         $next = function (payload $payload) use ($expected_result): result {
             return new result($expected_result);

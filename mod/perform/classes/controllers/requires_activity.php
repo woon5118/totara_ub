@@ -15,37 +15,40 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package mod_perform
+ * @package totara_userstatus
  */
 
-namespace mod_perform\state\activity\condition;
+namespace mod_perform\controllers;
 
 use mod_perform\models\activity\activity;
-use mod_perform\state\condition;
-
-defined('MOODLE_INTERNAL') || die();
+use moodle_exception;
 
 /**
- * The activity has at least one track with one assignment
+ * Use the methods in this trait if your controller requires an activity
  */
-class at_least_one_track_with_one_assignment extends condition {
+trait requires_activity {
 
-    public function pass(): bool {
-        /** @var activity $activity */
-        $activity = $this->object;
-
-        $tracks = $activity->get_tracks();
-
-        // Check whether the activity has at least one track with one assignment
-        foreach ($tracks as $track) {
-            if ($track->has_assignments()) {
-                return true;
-            }
-        }
-
-        return false;
+    /**
+     * @return int
+     */
+    protected function get_activity_id_param(): int {
+        return $this->get_required_param('activity_id', PARAM_INT);
     }
+
+    /**
+     * Loads activity model from parameters
+     * @return activity
+     * @throws moodle_exception
+     */
+    protected function get_activity_from_param(): activity {
+        try {
+            return activity::load_by_id($this->get_activity_id_param());
+        } catch (\Exception $exception) {
+            throw new moodle_exception('invalid_activity', 'mod_perform');
+        }
+    }
+
 }

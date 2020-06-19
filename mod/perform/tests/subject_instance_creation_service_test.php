@@ -22,7 +22,6 @@
  */
 
 use core\orm\query\order;
-use mod_perform\dates\schedule_constants;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\entities\activity\subject_instance;
 use mod_perform\entities\activity\track as track_entity;

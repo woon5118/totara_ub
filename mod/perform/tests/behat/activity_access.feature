@@ -19,11 +19,6 @@ Feature: Checking access to performance activities in different situations
       | David is subject              | david            | false                    | john                      |
       | John is not participating     | harry            | true                     | david                      |
 
-  Scenario: Cannot access a manage activity page as a user
-    Given I log in as "john"
-    When I navigate to the edit perform activities page for activity "John is not participating"
-    Then I should see "You do not have the permission to access this performance activity"
-
   Scenario: As a site manager I can access the manage activity page
     Given I log in as "sitemanager"
     When I navigate to the manage perform activities page
@@ -58,5 +53,3 @@ Feature: Checking access to performance activities in different situations
     And I should see the tui datatable contains:
       | Name             |
       | My Test Activity |
-    When I navigate to the edit perform activities page for activity "John is not participating"
-    Then I should see "You do not have the permission to access this performance activity"

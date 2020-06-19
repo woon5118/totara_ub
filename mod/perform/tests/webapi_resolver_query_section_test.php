@@ -36,9 +36,9 @@ class mod_perform_webapi_resolver_query_section_testcase extends advanced_testca
     use webapi_phpunit_helper;
 
     public function test_get_section() {
-        [$data, $args, $context] = $this->get_test_data();
+        [$data, $args] = $this->get_test_data();
 
-        $section = section_admin::resolve($args, $context);
+        $section = $this->resolve_graphql_query(self::QUERY, $args);
         $this->assertSame($section->title, $data->section1->title);
     }
 
@@ -53,7 +53,7 @@ class mod_perform_webapi_resolver_query_section_testcase extends advanced_testca
     }
 
     public function test_failed_ajax_query(): void {
-        [, $args,] = $this->get_test_data();
+        [, $args] = $this->get_test_data();
 
         $feature = 'performance_activities';
         advanced_feature::disable($feature);
@@ -91,9 +91,6 @@ class mod_perform_webapi_resolver_query_section_testcase extends advanced_testca
 
         $args = ['section_id' => $section->id];
 
-        $context = $this->create_webapi_context(self::QUERY);
-        $context->set_relevant_context($section->activity->get_context());
-
-        return [$data, $args, $context];
+        return [$data, $args];
     }
 }

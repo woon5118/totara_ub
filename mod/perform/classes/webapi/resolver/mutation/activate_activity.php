@@ -28,7 +28,7 @@ use core\webapi\mutation_resolver;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\resolver\has_middleware;
 use mod_perform\webapi\middleware\require_activity;
-use mod_perform\models\activity\activity;
+use mod_perform\webapi\middleware\require_manage_capability;
 use moodle_exception;
 
 class activate_activity implements mutation_resolver, has_middleware {
@@ -38,17 +38,8 @@ class activate_activity implements mutation_resolver, has_middleware {
      * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
-        $args = $args['input'];
-
-        try {
-            $activity = activity::load_by_id($args['activity_id']);
-        } finally {
-            if (!isset($activity) || !$activity->can_manage()) {
-                throw new moodle_exception('invalid_activity', 'mod_perform');
-            }
-        }
-
-        $ec->set_relevant_context($activity->get_context());
+        // The require_activity middleware loads the activity and passes it along via the args
+        $activity = $args['activity'];
 
         // If activity is already active just return
         if ($activity->is_active()) {
@@ -70,7 +61,8 @@ class activate_activity implements mutation_resolver, has_middleware {
     public static function get_middleware(): array {
         return [
             new require_advanced_feature('performance_activities'),
-            require_activity::by_activity_id('input.activity_id', true)
+            require_activity::by_activity_id('input.activity_id', true),
+            require_manage_capability::class
         ];
     }
 }

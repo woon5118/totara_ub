@@ -132,13 +132,6 @@ Feature: Viewing and responding to perform activities
     And I should see "Appraiser response"
     And I should see "My first answer as appraiser"
 
-  Scenario: I can't visit activities that don't exist
-    Given I log in as "john"
-    When I navigate to the user activity page for id "99999999"
-    Then I should not see "Submit"
-    Then I should not see "Cancel"
-    Then I should see "The requested performance activity could not be found." in the tui "error" notification banner
-
   Scenario: First access of a section changes both my progress and overall progress to 'In Progress'
     Given I log in as "john"
     When I navigate to the outstanding perform activities list page

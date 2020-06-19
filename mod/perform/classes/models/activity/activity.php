@@ -47,6 +47,7 @@ use mod_perform\state\state_aware;
 use mod_perform\user_groups\grouping;
 use mod_perform\util;
 use mod_perform\webapi\resolver\type\activity_state;
+use moodle_exception;
 use totara_core\relationship\relationship;
 
 /**
@@ -259,13 +260,15 @@ class activity extends model {
      * Return the context object for this activity.
      */
     public function get_context(): \context_module {
-        $cm = get_coursemodule_from_instance(
-            'perform',
-            $this->entity->id,
-            $this->entity->course,
-            false,
-            MUST_EXIST
-        );
+        global $USER;
+
+        $mod_info = get_fast_modinfo($this->course, $USER->id);
+        $instances = $mod_info->get_instances_of('perform');
+        if (!array_key_exists($this->id, $instances)) {
+            throw new moodle_exception('invalidmoduleid', 'error', $this->id);
+        }
+        $cm = $instances[$this->id];
+
         return \context_module::instance($cm->id);
     }
 

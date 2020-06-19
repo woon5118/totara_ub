@@ -22,10 +22,8 @@
  * @package mod_perform
  */
 
-use mod_perform\webapi\resolver\mutation\update_activity_general_info;
-
+use mod_perform\models\activity\activity;
 use totara_core\advanced_feature;
-
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
@@ -38,7 +36,7 @@ class mod_perform_webapi_resolver_mutation_update_activity_general_info_testcase
     use webapi_phpunit_helper;
 
     public function test_user_cannot_update_without_permission(): void {
-        [, $args, $context] = $this->create_activity();
+        [, $args] = $this->create_activity();
 
         $user = self::getDataGenerator()->create_user();
         self::setUser($user);
@@ -46,14 +44,14 @@ class mod_perform_webapi_resolver_mutation_update_activity_general_info_testcase
         $this->expectException(moodle_exception::class);
         $this->expectExceptionMessage('Invalid activity');
 
-        update_activity_general_info::resolve($args, $context);
+        $this->resolve_graphql_mutation(self::MUTATION, $args);
     }
 
     public function test_update_success(): void {
-        [$activity, $args, $context] = $this->create_activity();
+        [$activity, $args] = $this->create_activity();
         $expected_type = $activity->type;
 
-        ['activity' => $activity] = update_activity_general_info::resolve($args, $context);
+        ['activity' => $activity] = $this->resolve_graphql_mutation(self::MUTATION, $args);
 
         // Return values should be updated
         self::assertEquals($activity->id, $args['activity_id']);
@@ -71,21 +69,22 @@ class mod_perform_webapi_resolver_mutation_update_activity_general_info_testcase
         $user1 = $data_generator->create_user();
         $user2 = $data_generator->create_user();
 
-        [$created_activity, $args, $context] = $this->create_activity($user1);
+        [$created_activity, $args] = $this->create_activity($user1);
 
         /** @type activity $returned_activity */
-        ['activity' => $returned_activity] = update_activity_general_info::resolve($args, $context);
+        ['activity' => $returned_activity] = $this->resolve_graphql_mutation(self::MUTATION, $args);
 
         $this->assertEquals($created_activity->id, $returned_activity->id);
         $this->assertEquals($created_activity->name, $returned_activity->name);
 
         self::setUser($user2);
         $this->expectException(moodle_exception::class);
-        update_activity_general_info::resolve($args, $context);
+
+        $this->resolve_graphql_mutation(self::MUTATION, $args);
     }
 
     public function test_successful_ajax_call(): void {
-        [$activity, $args, ] = $this->create_activity();
+        [$activity, $args] = $this->create_activity();
 
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
         $this->assert_webapi_operation_successful($result);
@@ -102,7 +101,7 @@ class mod_perform_webapi_resolver_mutation_update_activity_general_info_testcase
     }
 
     public function test_failed_ajax_query(): void {
-        [, $args, ] = $this->create_activity();
+        [, $args] = $this->create_activity();
 
         $feature = 'performance_activities';
         advanced_feature::disable($feature);
@@ -131,9 +130,6 @@ class mod_perform_webapi_resolver_mutation_update_activity_general_info_testcase
             'description' => $activity->description,
         ];
 
-        $context = $this->create_webapi_context(self::MUTATION);
-        $context->set_relevant_context($activity->get_context());
-
-        return [$activity, $args, $context];
+        return [$activity, $args];
     }
 }

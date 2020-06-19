@@ -30,8 +30,8 @@ use core\webapi\resolver\has_middleware;
 
 use mod_perform\webapi\middleware\require_activity;
 
-use mod_perform\models\activity\activity;
 use mod_perform\models\activity\track;
+use mod_perform\webapi\middleware\require_manage_capability;
 
 /**
  * Handles the "mod_perform_create_track" GraphQL mutation.
@@ -46,13 +46,7 @@ class create_track implements mutation_resolver, has_middleware {
             throw new \invalid_parameter_exception('activity details not given');
         }
 
-        $activity_id = (int)$details['activity_id'] ?? 0;
-        if (!$activity_id) {
-            throw new \invalid_parameter_exception('unknown activity id');
-        }
-
-        $activity = activity::load_by_id($activity_id);
-        $ec->set_relevant_context($activity->get_context());
+        $activity = $args['activity'] ;
 
         $description = $details['description'] ?? '';
 
@@ -65,7 +59,8 @@ class create_track implements mutation_resolver, has_middleware {
     public static function get_middleware(): array {
         return [
             new require_advanced_feature('performance_activities'),
-            require_activity::by_activity_id('details.activity_id', true)
+            require_activity::by_activity_id('details.activity_id', true),
+            require_manage_capability::class
         ];
     }
 }

@@ -22,15 +22,9 @@
  * @category test
  */
 
-use core\webapi\execution_context;
-
 use mod_perform\models\activity\track as track_model;
-
 use mod_perform\webapi\resolver\query\tracks;
-use mod_perform\webapi\resolver\type\track;
-
 use totara_core\advanced_feature;
-
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
@@ -47,8 +41,8 @@ class mod_perform_webapi_query_tracks_testcase extends advanced_testcase {
      * @covers ::resolve
      */
     public function test_find(): void {
-        [$activity_id, $tracks_by_id, $args, $context] = $this->setup_env();
-        $actual_tracks = tracks::resolve($args, $context);
+        [$activity_id, $tracks_by_id, $args, ] = $this->setup_env();
+        $actual_tracks = $this->resolve_graphql_query('mod_perform_tracks', $args);
         $this->assertCount(count($tracks_by_id), $actual_tracks, 'wrong retrieve count');
 
         foreach ($actual_tracks as $track) {
@@ -94,22 +88,37 @@ class mod_perform_webapi_query_tracks_testcase extends advanced_testcase {
         $feature = 'performance_activities';
         advanced_feature::disable($feature);
         $result = $this->parsed_graphql_operation(self::QUERY, $args);
-        $this->assert_webapi_operation_failed($result, 'Feature performance_activities is not available.');
+        $this->assert_webapi_operation_failed(
+            $result,
+            'Feature performance_activities is not available.'
+        );
         advanced_feature::enable($feature);
 
         $result = $this->parsed_graphql_operation(self::QUERY, []);
-        $this->assert_webapi_operation_failed($result, 'Variable "$activity_id" of required type "param_integer!" was not provided.');
+        $this->assert_webapi_operation_failed(
+            $result,
+            'Variable "$activity_id" of required type "param_integer!" was not provided.'
+        );
 
         $result = $this->parsed_graphql_operation(self::QUERY, ['activity_id' => 0]);
-        $this->assert_webapi_operation_failed($result, 'Invalid parameter value detected (invalid activity id)');
+        $this->assert_webapi_operation_failed(
+            $result,
+            'Invalid parameter value detected (invalid activity id)'
+        );
 
         $id = 1293;
         $result = $this->parsed_graphql_operation(self::QUERY, ['activity_id' => $id]);
-        $this->assert_webapi_operation_failed($result, "Invalid activity");
+        $this->assert_webapi_operation_failed(
+            $result,
+            "Invalid activity"
+        );
 
         self::setGuestUser();
         $result = $this->parsed_graphql_operation(self::QUERY, $args);
-        $this->assert_webapi_operation_failed($result, 'Course or activity not accessible.');
+        $this->assert_webapi_operation_failed(
+            $result,
+            'Invalid activity'
+        );
     }
 
     /**
@@ -118,7 +127,7 @@ class mod_perform_webapi_query_tracks_testcase extends advanced_testcase {
      * @param int $no_of_tracks no of tracks to generate.
      *
      * @return array (activity id, the generated tracks by ids, graphql query
-     *         arguments, graphql execution context) tuple.
+     *         arguments, context) tuple.
      */
     private function setup_env(int $no_of_tracks=10): array {
         $this->setAdminUser();
@@ -138,10 +147,7 @@ class mod_perform_webapi_query_tracks_testcase extends advanced_testcase {
         $activity_id = $activity->get_id();
         $args = ['activity_id' => $activity_id];
 
-        $context = $this->create_webapi_context(self::QUERY);
-        $context->set_relevant_context($activity->get_context());
-
-        return [$activity_id, $tracks_by_id, $args, $context];
+        return [$activity_id, $tracks_by_id, $args, $activity->get_context()];
     }
 
     /**
@@ -149,13 +155,13 @@ class mod_perform_webapi_query_tracks_testcase extends advanced_testcase {
      * return.
      *
      * @param track_model $track source track.
-     * @param execution_context $context graphql execution context.
+     * @param context $context
      *
      * @return array the expected graphql data values.
      */
-    private function graphql_return(track_model $track, execution_context $context): array {
+    private function graphql_return(track_model $track, context $context): array {
         $resolve = function (string $field) use ($track, $context) {
-            return track::resolve($field, $track, [], $context);
+            return $this->resolve_graphql_type('mod_perform_track', $field, $track, [], $context);
         };
 
         return [

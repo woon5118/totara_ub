@@ -21,6 +21,7 @@
  * @package mod_perform
  */
 
+use mod_perform\models\activity\element_plugin;
 use mod_perform\webapi\resolver\query\element_plugins;
 use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
@@ -37,11 +38,10 @@ class mod_perform_webapi_resolver_query_element_plugins_testcase extends advance
 
     public function test_get_element_plugins() {
         $this->setAdminUser();
-        $context = $this->create_webapi_context(self::QUERY);
 
-        $element_plugins = element_plugins::resolve([], $context);
+        $element_plugins = $this->resolve_graphql_query(self::QUERY);
         foreach ($element_plugins as $element_plugin) {
-            $this->assertInstanceOf('mod_perform\models\activity\element_plugin', $element_plugin);
+            $this->assertInstanceOf(element_plugin::class, $element_plugin);
             $this->assertNotEmpty($element_plugin->get_plugin_name());
             $this->assertNotEmpty($element_plugin->get_name());
             $this->assertNotEmpty($element_plugin->get_admin_form_component());

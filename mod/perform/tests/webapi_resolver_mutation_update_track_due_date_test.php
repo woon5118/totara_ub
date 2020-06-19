@@ -22,9 +22,6 @@
  * @category test
  */
 
-use mod_perform\entities\activity\track as track_entity;
-use mod_perform\models\activity\activity;
-use mod_perform\models\activity\track;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 require_once(__DIR__ . '/generator/activity_generator_configuration.php');

@@ -23,6 +23,7 @@
 
 $string['pluginname'] = 'Performance activity';
 
+$string['access_check_error'] = 'Cannot access this activity';
 $string['activity_action_activate'] = 'Activate';
 $string['activity_action_clone'] = 'Clone';
 $string['activity_action_delete'] = 'Delete';

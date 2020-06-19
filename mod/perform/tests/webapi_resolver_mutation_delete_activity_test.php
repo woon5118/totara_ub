@@ -37,10 +37,10 @@ class mod_perform_webapi_resolver_mutation_delete_activity_testcase extends adva
     use webapi_phpunit_helper;
 
     public function test_activate_delete_activity(): void {
-        [$activity, $args, $context] = $this->create_activity();
+        [$activity, $args] = $this->create_activity();
         self::assertTrue($this->container_course_exists($activity->course));
 
-        $result = delete_activity::resolve($args, $context);
+        $result = $this->resolve_graphql_mutation(self::MUTATION, $args);
         $this->assertTrue($result);
         self::assertNull(activity_entity::repository()->find($activity->id));
         self::assertFalse($this->container_course_exists($activity->course));
@@ -50,21 +50,22 @@ class mod_perform_webapi_resolver_mutation_delete_activity_testcase extends adva
         $user1 = self::getDataGenerator()->create_user();
         $user2 = self::getDataGenerator()->create_user();
 
-        [$activity, $args, $context] = $this->create_activity($user1);
+        [$activity, $args] = $this->create_activity($user1);
         self::assertTrue($this->container_course_exists($activity->course));
 
         self::setUser($user2);
 
         $this->expectException(moodle_exception::class);
         $this->expectExceptionMessage('Invalid activity');
-        delete_activity::resolve($args, $context);
+
+        $this->resolve_graphql_mutation(self::MUTATION, $args);
     }
 
     /**
      * Test the mutation through the GraphQL stack.
      */
     public function test_execute_query_successful(): void {
-        [$activity, $args, ] = $this->create_activity();
+        [$activity, $args] = $this->create_activity();
         self::assertTrue($this->container_course_exists($activity->course));
 
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
@@ -78,30 +79,45 @@ class mod_perform_webapi_resolver_mutation_delete_activity_testcase extends adva
     }
 
     public function test_failed_ajax_query(): void {
-        [$activity, $args, ] = $this->create_activity();
+        [$activity, $args] = $this->create_activity();
 
         $feature = 'performance_activities';
         advanced_feature::disable($feature);
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
-        $this->assert_webapi_operation_failed($result, 'Feature performance_activities is not available.');
+        $this->assert_webapi_operation_failed(
+            $result,
+            'Feature performance_activities is not available.'
+        );
         advanced_feature::enable($feature);
 
         $result = $this->parsed_graphql_operation(self::MUTATION, []);
-        $this->assert_webapi_operation_failed($result, 'Variable "$input" of required type "mod_perform_delete_activity_input!" was not provided.');
+        $this->assert_webapi_operation_failed(
+            $result,
+            'Variable "$input" of required type "mod_perform_delete_activity_input!" was not provided.'
+        );
 
         $args['input']['activity_id'] = 0;
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
-        $this->assert_webapi_operation_failed($result, 'Invalid parameter value detected (invalid activity id)');
+        $this->assert_webapi_operation_failed(
+            $result,
+            'Invalid parameter value detected (invalid activity id)'
+        );
 
         $activity_id = 999;
         $args['input']['activity_id'] = $activity_id;
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
-        $this->assert_webapi_operation_failed($result, "Invalid activity");
+        $this->assert_webapi_operation_failed(
+            $result,
+            "Invalid activity"
+        );
 
         self::setGuestUser();
         $args['input']['activity_id'] = $activity->id;
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
-        $this->assert_webapi_operation_failed($result, 'Course or activity not accessible.');
+        $this->assert_webapi_operation_failed(
+            $result,
+            'Invalid activity'
+        );
     }
 
     private function container_course_exists(int $course_id): bool {
@@ -126,9 +142,6 @@ class mod_perform_webapi_resolver_mutation_delete_activity_testcase extends adva
             ]
         ];
 
-        $context = $this->create_webapi_context(self::MUTATION);
-        $context->set_relevant_context($activity->get_context());
-
-        return [$activity, $args, $context];
+        return [$activity, $args];
     }
 }

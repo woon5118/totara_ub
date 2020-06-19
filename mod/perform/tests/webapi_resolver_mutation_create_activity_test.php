@@ -22,6 +22,7 @@
  */
 
 use container_perform\create_exception;
+use mod_perform\models\activity\activity;
 use mod_perform\models\activity\activity_type;
 use mod_perform\webapi\resolver\mutation\create_activity;
 use totara_core\advanced_feature;
@@ -45,10 +46,9 @@ class mod_perform_webapi_resolver_mutation_create_activity_testcase extends adva
             'description' => "Test Description",
             'type' => $expected_type->id
         ];
-        $context = $this->create_webapi_context(self::MUTATION);
 
         /** @type activity $result */
-        ['activity' => $result] = create_activity::resolve($args, $context);
+        ['activity' => $result] = $this->resolve_graphql_mutation(self::MUTATION, $args);
         $this->assertSame('Mid year performance review', $result->name);
         $this->assertSame('Test Description', $result->description);
 
@@ -65,11 +65,11 @@ class mod_perform_webapi_resolver_mutation_create_activity_testcase extends adva
             'description' => 'Test Description',
             'type' => activity_type::load_by_name('appraisal')->id
         ];
-        $context = $this->create_webapi_context(self::MUTATION);
 
         $this->expectException(create_exception::class);
         $this->expectExceptionMessage('You do not have the permission to create a performance activity');
-        create_activity::resolve($args, $context);
+
+        $this->resolve_graphql_mutation('mod_perform_create_activity', $args);
     }
 
     public function test_create_activity_with_empty_name(): void {
@@ -79,11 +79,11 @@ class mod_perform_webapi_resolver_mutation_create_activity_testcase extends adva
             'description' => 'Test Description',
             'type' => activity_type::load_by_name('feedback')->id
         ];
-        $context = $this->create_webapi_context(self::MUTATION);
 
         $this->expectException(create_exception::class);
         $this->expectExceptionMessage('You are not allowed to create an activity with an empty name');
-        create_activity::resolve($args, $context);
+
+        $this->resolve_graphql_mutation('mod_perform_create_activity', $args);
     }
 
     public function test_create_activity_with_empty_description(): void {
@@ -94,9 +94,8 @@ class mod_perform_webapi_resolver_mutation_create_activity_testcase extends adva
             'description' => "",
             'type' => $type_id
         ];
-        $context = $this->create_webapi_context(self::MUTATION);
 
-        ['activity' => $result] = create_activity::resolve($args, $context);
+        ['activity' => $result] = $this->resolve_graphql_mutation(self::MUTATION, $args);
         $this->assertSame('Mid year performance review', $result->name);
         $this->assertSame('', $result->description);
 
@@ -106,7 +105,7 @@ class mod_perform_webapi_resolver_mutation_create_activity_testcase extends adva
             'type' => $type_id
         ];
 
-        ['activity' => $result] = create_activity::resolve($args, $context);
+        ['activity' => $result] = $this->resolve_graphql_mutation(self::MUTATION, $args);
         $this->assertSame('Mid year performance review', $result->name);
         $this->assertNull($result->description);
     }
@@ -116,11 +115,11 @@ class mod_perform_webapi_resolver_mutation_create_activity_testcase extends adva
         $args = [
             'name' => 'Mid year performance review'
         ];
-        $context = $this->create_webapi_context(self::MUTATION);
 
         $this->expectException(create_exception::class);
         $this->expectExceptionMessageRegExp("/type/");
-        create_activity::resolve($args, $context);
+
+        $this->resolve_graphql_mutation(self::MUTATION, $args);
     }
 
     public function test_create_activity_with_invalid_type(): void {
@@ -129,11 +128,11 @@ class mod_perform_webapi_resolver_mutation_create_activity_testcase extends adva
             'name' => 'Mid year performance review',
             'type' => 12334
         ];
-        $context = $this->create_webapi_context(self::MUTATION);
 
         $this->expectException(create_exception::class);
         $this->expectExceptionMessageRegExp("/type id/");
-        create_activity::resolve($args, $context);
+
+        $this->resolve_graphql_mutation(self::MUTATION, $args);
     }
 
     /**

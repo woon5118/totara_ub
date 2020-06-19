@@ -22,18 +22,11 @@
  * @category test
  */
 
-use core\webapi\execution_context;
-
 use mod_perform\models\activity\track as track_model;
 use mod_perform\models\activity\track_assignment as track_assignment_model;
 use mod_perform\models\activity\track_status;
-
 use mod_perform\webapi\resolver\query\track;
-use mod_perform\webapi\resolver\type\track_assignment;
-use mod_perform\webapi\resolver\type\user_grouping;
-
 use totara_core\advanced_feature;
-
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
@@ -50,8 +43,8 @@ class mod_perform_webapi_query_track_testcase extends advanced_testcase {
      * @covers ::resolve
      */
     public function test_find(): void {
-        [$track_id, $groups_by_id, $args, $context] = $this->setup_env();
-        $track = track::resolve($args, $context);
+        [$track_id, $groups_by_id, $args, ] = $this->setup_env();
+        $track = $this->resolve_graphql_query('mod_perform_track', $args);
 
         $this->assertEquals($track_id, $track->id, 'wrong track id');
         $this->assertEquals(track_status::ACTIVE, $track->status, 'wrong track status');
@@ -125,14 +118,14 @@ class mod_perform_webapi_query_track_testcase extends advanced_testcase {
 
         self::setGuestUser();
         $result = $this->parsed_graphql_operation(self::QUERY, $args);
-        $this->assert_webapi_operation_failed($result, 'Course or activity not accessible.');
+        $this->assert_webapi_operation_failed($result, 'Invalid activity');
     }
 
     /**
      * Generates test data.
      *
      * @return array (track, the generated assignments by group id, graphql query
-     *         arguments, graphql execution context) tuple.
+     *         arguments, context) tuple.
      */
     private function setup_env(): array {
         $this->setAdminUser();
@@ -155,10 +148,7 @@ class mod_perform_webapi_query_track_testcase extends advanced_testcase {
         $track_id = $track->id;
         $args = ['track_id' => $track_id];
 
-        $context = $this->create_webapi_context(self::QUERY);
-        $context->set_relevant_context($track->activity->get_context());
-
-        return [$track_id, $groups_by_id, $args, $context];
+        return [$track_id, $groups_by_id, $args, $track->activity->get_context()];
     }
 
     /**
@@ -166,21 +156,21 @@ class mod_perform_webapi_query_track_testcase extends advanced_testcase {
      * return.
      *
      * @param track_assignment_model $track_assignment source assignment.
-     * @param execution_context $context graphql execution context.
+     * @param context $context context.
      *
      * @return array the expected graphql data values.
      */
     private function graphql_return(
         track_assignment_model $track_assignment,
-        execution_context $context
+        context $context
     ): array {
         $track_resolve = function (string $field) use ($track_assignment, $context) {
-            return track_assignment::resolve($field, $track_assignment, [], $context);
+            return $this->resolve_graphql_type('mod_perform_track_assignment', $field, $track_assignment, [], $context);
         };
 
         $group = $track_assignment->group;
         $grouping_resolve = function (string $field) use ($group, $context) {
-            return user_grouping::resolve($field, $group, [], $context);
+            return $this->resolve_graphql_type('mod_perform_user_grouping', $field, $group, [], $context);
         };
 
         return [

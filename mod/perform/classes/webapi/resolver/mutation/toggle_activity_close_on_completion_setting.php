@@ -28,10 +28,9 @@ use core\webapi\mutation_resolver;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\resolver\has_middleware;
 
-use mod_perform\models\activity\activity;
 use mod_perform\models\activity\activity_setting;
 use mod_perform\webapi\middleware\require_activity;
-use moodle_exception;
+use mod_perform\webapi\middleware\require_manage_capability;
 
 /**
  * Handles the "mod_perform_toggle_activity_close_on_completion_setting" GraphQL mutation.
@@ -41,20 +40,8 @@ class toggle_activity_close_on_completion_setting implements mutation_resolver, 
      * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
-        $activity_id = $args['input']['activity_id'] ?? 0;
-        if (!$activity_id) {
-            throw new \invalid_parameter_exception('unknown activity id');
-        }
-
-        try {
-            $activity = activity::load_by_id($activity_id);
-        } finally {
-            if (!isset($activity) || !$activity->can_manage()) {
-                throw new moodle_exception('invalid_activity', 'mod_perform');
-            }
-        }
-
-        $ec->set_relevant_context($activity->get_context());
+        // The require_activity middleware loads the activity and passes it along via the args
+        $activity = $args['activity'];
 
         $value = $args['input']['setting'] ?? null;
         if (is_null($value)) {
@@ -73,7 +60,8 @@ class toggle_activity_close_on_completion_setting implements mutation_resolver, 
     public static function get_middleware(): array {
         return [
             new require_advanced_feature('performance_activities'),
-            require_activity::by_activity_id('input.activity_id', true)
+            require_activity::by_activity_id('input.activity_id', true),
+            require_manage_capability::class
         ];
     }
 }

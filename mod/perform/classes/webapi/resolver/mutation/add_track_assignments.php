@@ -34,6 +34,7 @@ use mod_perform\models\activity\track;
 use mod_perform\models\activity\track_assignment_type;
 
 use mod_perform\user_groups\grouping;
+use mod_perform\webapi\middleware\require_manage_capability;
 
 /**
  * Handles the "mod_perform_add_track_assignments" GraphQL mutation.
@@ -53,8 +54,6 @@ class add_track_assignments implements mutation_resolver, has_middleware {
             throw new \invalid_parameter_exception('invalid track id');
         }
         $track = track::load_by_id($track_id);
-
-        $ec->set_relevant_context($track->get_activity()->get_context());
 
         $assignment_type = $assignments['type'] ?? track_assignment_type::ADMIN;
         $groups = $assignments['groups'] ?? [];
@@ -80,7 +79,8 @@ class add_track_assignments implements mutation_resolver, has_middleware {
     public static function get_middleware(): array {
         return [
             new require_advanced_feature('performance_activities'),
-            require_activity::by_track_id('assignments.track_id', true)
+            require_activity::by_track_id('assignments.track_id', true),
+            require_manage_capability::class
         ];
     }
 }

@@ -24,11 +24,8 @@
 
 use mod_perform\models\activity\track;
 use mod_perform\models\activity\track_status;
-
 use mod_perform\webapi\resolver\mutation\create_track;
-
 use totara_core\advanced_feature;
-
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
@@ -51,7 +48,7 @@ class mod_perform_webapi_mutation_create_track_testcase extends advanced_testcas
         $tracks = track::load_by_activity($activity);
         $this->assertEquals(0, $tracks->count(), 'wrong existing track count');
 
-        $track = create_track::resolve($args, $context);
+        $track = $this->resolve_graphql_mutation('mod_perform_create_track', $args);
         $this->assertNotNull($track, 'track creation failed');
         $this->assertEquals($activity->id, $track->activity_id, 'wrong track parent');
         $this->assertEquals($desc, $track->description, 'wrong track parent');
@@ -111,7 +108,7 @@ class mod_perform_webapi_mutation_create_track_testcase extends advanced_testcas
         self::setGuestUser();
         $args['details']['activity_id'] = $activity->id;
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
-        $this->assert_webapi_operation_failed($result, 'Course or activity not accessible.');
+        $this->assert_webapi_operation_failed($result, 'Invalid activity');
     }
 
     /**

@@ -22,9 +22,6 @@
  * @category test
  */
 
-use core\collection;
-use mod_perform\entities\activity\participant_section as participant_section_entity;
-use mod_perform\models\activity\participant_instance;
 use mod_perform\models\response\participant_section;
 
 /**

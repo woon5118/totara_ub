@@ -27,4 +27,22 @@ use core\orm\entity\repository;
 
 class activity_repository extends repository {
 
+    /**
+     * Filter by visible activities only, this will include course visibility checks
+     *
+     * @param int|null $for_user_id if omitted will check for logged-in user
+     * @return $this
+     */
+    public function filter_by_visible(int $for_user_id = null): self {
+        global $CFG;
+        require_once($CFG->dirroot . "/totara/coursecatalog/lib.php");
+
+        [$totara_visibility_sql, $totara_visibility_params] = totara_visibility_where($for_user_id);
+
+        $this->join('course', 'course', 'id')
+            ->where_raw($totara_visibility_sql, $totara_visibility_params);
+
+        return $this;
+    }
+
 }

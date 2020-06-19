@@ -23,7 +23,6 @@
 
 use mod_perform\entities\activity\section_relationship;
 use mod_perform\models\activity\section_relationship as section_relationship_model;
-use mod_perform\models\activity\activity;
 use mod_perform\models\activity\section;
 use totara_core\entities\relationship_resolver;
 use totara_core\relationship\resolvers\subject;

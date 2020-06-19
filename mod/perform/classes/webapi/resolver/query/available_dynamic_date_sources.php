@@ -37,9 +37,6 @@ class available_dynamic_date_sources implements query_resolver, has_middleware {
      * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
-        $context = util::get_default_context();
-        $ec->set_relevant_context($context);
-
         return dynamic_source::all_available();
     }
 

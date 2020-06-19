@@ -27,7 +27,6 @@ use core\event\base;
 use mod_perform\event\participant_instance_progress_updated;
 use mod_perform\models\activity\participant_instance;
 use mod_perform\state\participant_instance\condition\not_all_sections_complete;
-use mod_perform\state\state;
 use mod_perform\state\state_event;
 use mod_perform\state\transition;
 

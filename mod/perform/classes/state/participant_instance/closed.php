@@ -27,7 +27,6 @@ use core\event\base;
 use mod_perform\event\participant_instance_availability_closed;
 use mod_perform\models\activity\participant_instance;
 use mod_perform\state\state_event;
-use mod_perform\state\transition;
 
 defined('MOODLE_INTERNAL') || die();
 

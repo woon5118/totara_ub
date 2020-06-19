@@ -22,8 +22,6 @@
  * @category test
  */
 
-use mod_perform\models\activity\activity;
-use mod_perform\models\activity\track;
 use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
@@ -56,7 +54,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_testcase
         self::setUser($user);
 
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
-        $this->assert_webapi_operation_failed($result, 'Course or activity not accessible.');
+        $this->assert_webapi_operation_failed($result, 'Invalid activity');
     }
 
     public function test_failed_ajax_call(): void {

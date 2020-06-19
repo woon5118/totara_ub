@@ -23,12 +23,10 @@
 
 namespace mod_perform\webapi\resolver\mutation;
 
-use container_perform\backup\backup_helper;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\mutation_resolver;
 use core\webapi\resolver\has_middleware;
-use mod_perform\models\activity\activity;
 use mod_perform\webapi\middleware\require_activity;
 use moodle_exception;
 
@@ -45,17 +43,10 @@ class clone_activity implements mutation_resolver, has_middleware {
             throw new \invalid_parameter_exception('activity details not given');
         }
 
-        $activity_id = (int)$details['activity_id'] ?? 0;
-        if (!$activity_id) {
-            throw new \invalid_parameter_exception('unknown activity id');
-        }
-
-        $activity = activity::load_by_id($activity_id);
-        if (!$activity->can_clone) {
+        $activity = $args['activity'] ?? null;
+        if (empty($activity) || !$activity->can_clone) {
             throw new moodle_exception('invalid_activity', 'mod_perform');
         }
-
-        $ec->set_relevant_context($activity->get_context());
 
         return ['activity' => $activity->clone()];
     }

@@ -24,7 +24,6 @@
 use core\collection;
 use mod_perform\models\activity\activity;
 use totara_core\relationship\relationship;
-use totara_core\entities\relationship as relationship_entity;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**

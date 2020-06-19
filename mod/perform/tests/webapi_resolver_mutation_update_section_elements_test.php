@@ -69,8 +69,7 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
             ]
         ];
 
-        $context = $this->create_webapi_context(self::MUTATION);
-        $result = update_section_elements::resolve($args, $context);
+        $result = $this->resolve_graphql_mutation(self::MUTATION, $args);
 
         // Check that the changes were made.
         $section_element_records = $DB->get_records('perform_section_element', ['section_id' => $section->id]);
@@ -143,8 +142,7 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
             ]
         ];
 
-        $context = $this->create_webapi_context(self::MUTATION);
-        $result = update_section_elements::resolve($args, $context);
+        $result = $this->resolve_graphql_mutation(self::MUTATION, $args);
 
         // Check that the changes were made.
         $section_element_records = $DB->get_records('perform_section_element', ['section_id' => $section->id]);
@@ -216,8 +214,7 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
         ];
         // Section sort order 1 => element 2 (title 2), section sort order 2 => element 1 (title 1).
 
-        $context = $this->create_webapi_context(self::MUTATION);
-        $result = update_section_elements::resolve($args, $context);
+        $result = $this->resolve_graphql_mutation(self::MUTATION, $args);
 
         $args = [
             'input' => [
@@ -238,7 +235,7 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
         ];
         // Section sort order 1 => element 2 (title 4), section sort order 2 => element 1 (title 3).
 
-        $result = update_section_elements::resolve($args, $context);
+        $result = $this->resolve_graphql_mutation(self::MUTATION, $args);
 
         // Check that the changes were made.
         $section_element_records = $DB->get_records('perform_section_element', ['section_id' => $section->id]);
@@ -315,8 +312,7 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
             ]
         ];
 
-        $context = $this->create_webapi_context(self::MUTATION);
-        $result = update_section_elements::resolve($args, $context);
+        $result = $this->resolve_graphql_mutation(self::MUTATION, $args);
 
         $section_elements = $section->get_section_elements()->all(true);
 
@@ -342,7 +338,7 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
             ]
         ];
 
-        $result = update_section_elements::resolve($args, $context);
+        $result = $this->resolve_graphql_mutation(self::MUTATION, $args);
 
         // Check that the changes were made.
         $section_element_records = $DB->get_records('perform_section_element', ['section_id' => $section->id]);
@@ -407,8 +403,7 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
             ]
         ];
 
-        $context = $this->create_webapi_context(self::MUTATION);
-        $result = update_section_elements::resolve($args, $context);
+        $result = $this->resolve_graphql_mutation(self::MUTATION, $args);
 
         $section_elements = $section->get_section_elements()->all(true);
 
@@ -442,7 +437,7 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
             ]
         ];
 
-        $result = update_section_elements::resolve($args, $context);
+        $result = $this->resolve_graphql_mutation(self::MUTATION, $args);
 
         // Check that the changes were made.
         $section_element_records = $DB->get_records('perform_section_element', ['section_id' => $section->id]);
@@ -535,8 +530,7 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
             ]
         ];
 
-        $context = $this->create_webapi_context(self::MUTATION);
-        $result = update_section_elements::resolve($args, $context);
+        $result = $this->resolve_graphql_mutation(self::MUTATION, $args);
 
         $section_elements = $section->get_section_elements()->all(true);
 

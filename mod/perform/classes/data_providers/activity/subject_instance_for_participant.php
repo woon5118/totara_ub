@@ -25,12 +25,14 @@ namespace mod_perform\data_providers\activity;
 
 use core\orm\collection;
 use core\orm\query\builder;
+use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\entities\activity\filters\subject_instance_id;
 use mod_perform\entities\activity\participant_instance;
+use mod_perform\entities\activity\track as track_entity;
+use mod_perform\entities\activity\track_user_assignment as track_user_assignment_entity;
 use mod_perform\models\activity\subject_instance as subject_instance_model;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 use mod_perform\entities\activity\filters\subject_instances_about;
-use totara_job\relationship\resolvers\manager;
 
 /**
  * Class subject_instance
@@ -94,10 +96,20 @@ class subject_instance_for_participant {
      * @return $this
      */
     protected function fetch_subject_instances(): self {
+        global $CFG;
+        require_once($CFG->dirroot . "/totara/coursecatalog/lib.php");
+
+        [$totara_visibility_sql, $totara_visibility_params] = totara_visibility_where();
+
         $repo = subject_instance_entity::repository()
             ->as('si')
             ->with('subject_user')
             ->with('track.activity')
+            ->join([track_user_assignment_entity::TABLE, 'tua'], 'track_user_assignment_id', 'id')
+            ->join([track_entity::TABLE, 't'], 'tua.track_id', 'id')
+            ->join([activity_entity::TABLE, 'a'], 't.activity_id', 'id')
+            ->join('course', 'a.course', 'id')
+            ->where_raw($totara_visibility_sql, $totara_visibility_params)
             // Eager loaded relationship resolvers because they are returned in the subject instance gql query
             ->with('participant_instances.core_relationship.resolvers')
             ->where_exists($this->get_target_participant_exists())

@@ -23,8 +23,6 @@
 
 namespace mod_perform;
 
-use coding_exception;
-
 abstract class constants {
     public const SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT = 'ONE_PER_SUBJECT';
     public const SUBJECT_INSTANCE_GENERATION_ONE_PER_JOB = 'ONE_PER_JOB';

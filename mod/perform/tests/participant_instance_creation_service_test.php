@@ -30,7 +30,6 @@ use mod_perform\expand_task;
 use mod_perform\task\service\participant_instance_creation;
 use mod_perform\task\service\subject_instance_creation;
 use mod_perform\task\service\subject_instance_dto;
-use totara_core\entities\relationship;
 use totara_job\job_assignment;
 use totara_job\relationship\resolvers\appraiser;
 use totara_job\relationship\resolvers\manager;

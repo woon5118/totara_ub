@@ -25,8 +25,8 @@ use mod_perform\models\activity\activity as activity;
 use mod_perform\state\activity\active;
 use mod_perform\state\activity\draft;
 use mod_perform\webapi\resolver\mutation\activate_activity;
-use totara_job\relationship\resolvers\manager;
 use totara_core\advanced_feature;
+use totara_job\relationship\resolvers\manager;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
@@ -40,28 +40,28 @@ class mod_perform_webapi_resolver_mutation_activate_activity_testcase extends ad
     use webapi_phpunit_helper;
 
     public function test_activate_draft_activity(): void {
-        [$activity, $args, $context] = $this->create_valid_activity();
+        [$activity, $args] = $this->create_valid_activity();
 
         /** @var activity $result */
-        ['activity' => $result] = activate_activity::resolve($args, $context);
+        ['activity' => $result] = $this->resolve_graphql_mutation('mod_perform_activate_activity', $args);
         $this->assertEquals($activity->id, $result->id);
         $this->assertEquals(active::get_code(), $result->status);
     }
 
     public function test_activate_draft_activity_which_does_not_satisfy_conditions(): void {
-        [, $args, $context] = $this->create_activity();
+        [, $args] = $this->create_activity();
 
         $this->expectException(moodle_exception::class);
         $this->expectExceptionMessage('Cannot activate this activity due to invalid state or conditions are not satisfied.');
 
-        activate_activity::resolve($args, $context);
+        $this->resolve_graphql_mutation('mod_perform_activate_activity', $args);
     }
 
     public function test_activate_active_activity(): void {
-        [$activity, $args, $context] = $this->create_valid_activity(active::get_code());
+        [$activity, $args] = $this->create_valid_activity(active::get_code());
 
         /** @var activity $result */
-        ['activity' => $result] = activate_activity::resolve($args, $context);
+        ['activity' => $result] = $this->resolve_graphql_mutation('mod_perform_activate_activity', $args);
         $this->assertEquals($activity->id, $result->id);
         $this->assertEquals(active::get_code(), $result->status);
     }
@@ -70,13 +70,13 @@ class mod_perform_webapi_resolver_mutation_activate_activity_testcase extends ad
         $user1 = $this->getDataGenerator()->create_user();
         $user2 = $this->getDataGenerator()->create_user();
 
-        [, $args, $context] = $this->create_valid_activity(null, $user1);
+        [, $args] = $this->create_valid_activity(null, $user1);
 
         $this->setUser($user2);
 
         $this->expectException(moodle_exception::class);
         $this->expectExceptionMessage('Invalid activity');
-        activate_activity::resolve($args, $context);
+        $this->resolve_graphql_mutation('mod_perform_activate_activity', $args);
     }
 
     public function test_activate_nonexisting_activity(): void {
@@ -88,12 +88,10 @@ class mod_perform_webapi_resolver_mutation_activate_activity_testcase extends ad
             ]
         ];
 
-        $context = $this->create_webapi_context(self::MUTATION);
-
         $this->expectException(moodle_exception::class);
         $this->expectExceptionMessage('Invalid activity');
 
-        activate_activity::resolve($args, $context);
+        $this->resolve_graphql_mutation('mod_perform_activate_activity', $args);
     }
 
     /**
@@ -148,7 +146,7 @@ class mod_perform_webapi_resolver_mutation_activate_activity_testcase extends ad
 
         self::setGuestUser();
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
-        $this->assert_webapi_operation_failed($result, 'Course or activity not accessible.');
+        $this->assert_webapi_operation_failed($result, 'Invalid activity');
     }
 
     /**
@@ -156,7 +154,7 @@ class mod_perform_webapi_resolver_mutation_activate_activity_testcase extends ad
      *
      * @param int|null $status defaults to draft
      * @param stdClass $as_user user that creates the activity.
-     * @return array [activity, graphql args, graphql context] tuple.
+     * @return array [activity, graphql args] tuple.
      */
     protected function create_activity(int $status = null, ?stdClass $as_user = null): array {
         if ($as_user) {
@@ -180,24 +178,21 @@ class mod_perform_webapi_resolver_mutation_activate_activity_testcase extends ad
             ]
         ];
 
-        $context = $this->create_webapi_context(self::MUTATION);
-        $context->set_relevant_context($activity->get_context());
-
-        return [$activity, $args, $context];
+        return [$activity, $args];
     }
 
     /**
      * Creates an activity with one section, one question and one relationship
      *
      * @param int|null $status defaults to draft
-     * @return array [activity, graphql args, graphql context] tuple.
+     * @return array [activity, graphql args] tuple.
      */
     protected function create_valid_activity(int $status = null): array {
         $data_generator = $this->getDataGenerator();
         /** @var mod_perform_generator $perform_generator */
         $perform_generator = $data_generator->get_plugin_generator('mod_perform');
 
-        [$activity, $args, $context] = $this->create_activity($status);
+        [$activity, $args] = $this->create_activity($status);
 
         $section = $perform_generator->create_section($activity, ['title' => 'Test section 1']);
 
@@ -211,6 +206,6 @@ class mod_perform_webapi_resolver_mutation_activate_activity_testcase extends ad
 
         $perform_generator->create_single_activity_track_and_assignment($activity);
 
-        return [$activity, $args, $context];
+        return [$activity, $args];
     }
 }

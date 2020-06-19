@@ -24,10 +24,8 @@
 namespace mod_perform\watcher;
 
 use container_perform\perform;
-use core_user\hook\allow_view_profile;
 use core_user\hook\allow_view_profile_field;
 use mod_perform\entities\activity\participant_instance;
-use totara_core\hook\base;
 
 class user {
 

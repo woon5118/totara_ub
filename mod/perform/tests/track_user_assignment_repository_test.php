@@ -21,7 +21,6 @@
  * @package mod_perform
  */
 
-use core\orm\query\order;
 use mod_perform\entities\activity\subject_instance;
 use mod_perform\entities\activity\track as track_entity;
 use mod_perform\entities\activity\track_user_assignment;

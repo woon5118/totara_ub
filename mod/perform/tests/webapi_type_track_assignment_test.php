@@ -25,6 +25,7 @@
 use core\webapi\execution_context;
 
 use mod_perform\webapi\resolver\type\track_assignment;
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
  * @coversDefaultClass track_assignment.
@@ -32,16 +33,21 @@ use mod_perform\webapi\resolver\type\track_assignment;
  * @group perform
  */
 class mod_perform_webapi_type_track_assignment_testcase extends advanced_testcase {
+
+    use webapi_phpunit_helper;
+
+    private const TYPE = 'mod_perform_track_assignment';
+
     /**
      * @covers ::resolve
      */
     public function test_invalid_input(): void {
-        [, $context] = $this->create_assignment();
-        $webapi_context = $this->get_webapi_context($context);
+        $this->create_assignment();
 
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessageRegExp("/track assignment model/");
-        track_assignment::resolve('id', new \stdClass(), [], $webapi_context);
+
+        $this->resolve_graphql_type(self::TYPE, 'id', new \stdClass());
     }
 
     /**
@@ -49,12 +55,12 @@ class mod_perform_webapi_type_track_assignment_testcase extends advanced_testcas
      */
     public function test_invalid_field(): void {
         [$assignment, $context] = $this->create_assignment();
-        $webapi_context = $this->get_webapi_context($context);
         $field = 'unknown';
 
         $this->expectException(moodle_exception::class);
         $this->expectExceptionMessageRegExp("/$field/");
-        track_assignment::resolve($field, $assignment, [], $webapi_context);
+
+        $this->resolve_graphql_type(self::TYPE, $field, $assignment, [], $context);
     }
 
     /**
@@ -67,7 +73,6 @@ class mod_perform_webapi_type_track_assignment_testcase extends advanced_testcas
         // visible to _all_ tests. In other words, with dataproviders, current
         // and yet unborn tests do not start in a clean state!
         [$source, $context] = $this->create_assignment();
-        $webapi_context = $this->get_webapi_context($context);
 
         $testcases = [
             'track id' => ['track_id', null, $source->track_id],
@@ -79,7 +84,7 @@ class mod_perform_webapi_type_track_assignment_testcase extends advanced_testcas
             [$field, $format, $expected] = $testcase;
             $args = $format ? ['format' => $format] : [];
 
-            $value = track_assignment::resolve($field, $source, $args, $webapi_context);
+            $value = $this->resolve_graphql_type(self::TYPE, $field, $source, $args, $context);
             $this->assertEquals($expected, $value, "[$id] wrong value");
         }
     }

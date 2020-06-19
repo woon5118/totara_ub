@@ -22,22 +22,15 @@
  * @category test
  */
 
-use core\webapi\execution_context;
-
 use mod_perform\models\activity\track;
 use mod_perform\models\activity\track_assignment as track_assignment_model;
 use mod_perform\models\activity\track_status;
-
 use mod_perform\webapi\resolver\query\default_track;
-use mod_perform\webapi\resolver\type\track_assignment;
-use mod_perform\webapi\resolver\type\user_grouping;
-
 use totara_core\advanced_feature;
-
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
- * @coversDefaultClass track.
+ * @coversDefaultClass default_track
  *
  * @group perform
  */
@@ -50,8 +43,8 @@ class mod_perform_webapi_query_default_track_settings_testcase extends advanced_
      * @covers ::resolve
      */
     public function test_find(): void {
-        [$groups_by_id, $args, $context] = $this->setup_env();
-        $track = default_track::resolve($args, $context);
+        [$groups_by_id, $args, ] = $this->setup_env();
+        $track = $this->resolve_graphql_query('mod_perform_default_track', $args);
         $this->assertEquals(track_status::ACTIVE, $track->status, 'wrong track status');
 
         $actual_assignments = $track->assignments;
@@ -108,39 +101,42 @@ class mod_perform_webapi_query_default_track_settings_testcase extends advanced_
 
         $feature = 'performance_activities';
         advanced_feature::disable($feature);
-        $raw_result = $this->execute_graphql_operation(self::QUERY, $args);
-        self::assertCount(1, $raw_result->errors);
-        self::assertEquals('Feature performance_activities is not available.', $raw_result->errors[0]->message);
+        $result = $this->parsed_graphql_operation(self::QUERY, $args);
+        $this->assert_webapi_operation_failed($result, 'Feature performance_activities is not available.');
         advanced_feature::enable($feature);
 
+        $result = $this->parsed_graphql_operation(self::QUERY, []);
+        $this->assert_webapi_operation_failed(
+            $result,
+            'Variable "$activity_id" of required type "param_integer!" was not provided.'
+        );
 
-        $raw_result = $this->execute_graphql_operation(self::QUERY, []);
-        self::assertCount(1, $raw_result->errors);
-        self::assertEquals('Variable "$activity_id" of required type "param_integer!" was not provided.', $raw_result->errors[0]->message);
-
-
-        $raw_result = $this->execute_graphql_operation(self::QUERY, ['activity_id' => 0]);
-        self::assertCount(1, $raw_result->errors);
-        self::assertEquals('Invalid parameter value detected (invalid activity id)', $raw_result->errors[0]->message);
-
+        $result = $this->parsed_graphql_operation(self::QUERY, ['activity_id' => 0]);
+        $this->assert_webapi_operation_failed(
+            $result,
+            'Invalid parameter value detected (invalid activity id)'
+        );
 
         $id = 1293;
-        $raw_result = $this->execute_graphql_operation(self::QUERY, ['activity_id' => $id]);
-        self::assertCount(1, $raw_result->errors);
-        self::assertEquals('Invalid activity', $raw_result->errors[0]->message);
-
+        $result = $this->parsed_graphql_operation(self::QUERY, ['activity_id' => $id]);
+        $this->assert_webapi_operation_failed(
+            $result,
+            "Invalid activity"
+        );
 
         self::setGuestUser();
-        $raw_result = $this->execute_graphql_operation(self::QUERY, $args);
-        self::assertCount(1, $raw_result->errors);
-        self::assertEquals('Course or activity not accessible. (Not enrolled)', $raw_result->errors[0]->message);
+        $result = $this->parsed_graphql_operation(self::QUERY, $args);
+        $this->assert_webapi_operation_failed(
+            $result,
+            'Invalid activity'
+        );
     }
 
     /**
      * Generates test data.
      *
      * @return array (default track assignments by group id, graphql query
-     *         arguments, graphql execution context) tuple.
+     *         arguments, context) tuple.
      */
     private function setup_env(): array {
         $this->setAdminUser();
@@ -162,10 +158,7 @@ class mod_perform_webapi_query_default_track_settings_testcase extends advanced_
 
         $args = ['activity_id' => $activity->get_id()];
 
-        $context = $this->create_webapi_context(self::QUERY);
-        $context->set_relevant_context($activity->get_context());
-
-        return [$groups_by_id, $args, $context];
+        return [$groups_by_id, $args, $activity->get_context()];
     }
 
     /**
@@ -173,21 +166,21 @@ class mod_perform_webapi_query_default_track_settings_testcase extends advanced_
      * return.
      *
      * @param track_assignment_model $track_assignment source assignment.
-     * @param execution_context $context graphql execution context.
+     * @param context $context
      *
      * @return array the expected graphql data values.
      */
     private function graphql_return(
         track_assignment_model $track_assignment,
-        execution_context $context
+        context $context
     ): array {
         $track_resolve = function (string $field) use ($track_assignment, $context) {
-            return track_assignment::resolve($field, $track_assignment, [], $context);
+            return $this->resolve_graphql_type('mod_perform_track_assignment', $field, $track_assignment, [], $context);
         };
 
         $group = $track_assignment->group;
         $grouping_resolve = function (string $field) use ($group, $context) {
-            return user_grouping::resolve($field, $group, [], $context);
+            return $this->resolve_graphql_type('mod_perform_user_grouping', $field, $group, [], $context);
         };
 
         return [

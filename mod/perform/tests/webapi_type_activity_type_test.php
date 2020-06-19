@@ -22,9 +22,9 @@
  * @category test
  */
 
-use core\webapi\execution_context;
 use mod_perform\models\activity\activity_type as activity_type_model;
 use mod_perform\webapi\resolver\type\activity_type;
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
  * @coversDefaultClass activity_type.
@@ -32,15 +32,19 @@ use mod_perform\webapi\resolver\type\activity_type;
  * @group perform
  */
 class mod_perform_webapi_type_activity_type_testcase extends advanced_testcase {
+
+    use webapi_phpunit_helper;
+
+    private const TYPE = 'mod_perform_activity_type';
+
     /**
      * @covers ::resolve
      */
     public function test_invalid_input(): void {
-        $webapi_context = $this->get_webapi_context();
-
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessageRegExp("/activity_type/");
-        activity_type::resolve('id', new stdClass(), [], $webapi_context);
+
+        $this->resolve_graphql_type(self::TYPE, 'id', new stdClass());
     }
 
     /**
@@ -48,12 +52,12 @@ class mod_perform_webapi_type_activity_type_testcase extends advanced_testcase {
      */
     public function test_invalid_field(): void {
         $type = activity_type_model::load_by_name('feedback');
-        $webapi_context = $this->get_webapi_context();
         $field = 'unknown';
 
         $this->expectException(moodle_exception::class);
         $this->expectExceptionMessageRegExp("/$field/");
-        activity_type::resolve($field, $type, [], $webapi_context);
+
+        $this->resolve_graphql_type(self::TYPE, $field, $type);
     }
 
     /**
@@ -66,7 +70,6 @@ class mod_perform_webapi_type_activity_type_testcase extends advanced_testcase {
         // visible to _all_ tests. In other words, with dataproviders, current
         // and yet unborn tests do not start in a clean state!
         $type = activity_type_model::load_by_name('appraisal');
-        $webapi_context = $this->get_webapi_context();
 
         $testcases = [
             'id' => ['id', null, $type->id],
@@ -78,17 +81,9 @@ class mod_perform_webapi_type_activity_type_testcase extends advanced_testcase {
             [$field, $format, $expected] = $testcase;
             $args = $format ? ['format' => $format] : [];
 
-            $value = activity_type::resolve($field, $type, $args, $webapi_context);
+            $value = $this->resolve_graphql_type(self::TYPE, $field, $type, $args);
             $this->assertEquals($expected, $value, "[$id] wrong value");
         }
     }
 
-    /**
-     * Creates a graphql execution context.
-     *
-     * @return execution_context the context.
-     */
-    private function get_webapi_context(): execution_context {
-        return execution_context::create('dev', null);
-    }
 }

@@ -24,15 +24,18 @@
 namespace mod_perform\webapi\middleware;
 
 use Closure;
+use context_course;
 use core\orm\query\exceptions\record_not_found_exception;
 use invalid_parameter_exception;
 use core\webapi\middleware;
 use core\webapi\resolver\payload;
 use core\webapi\resolver\result;
 use mod_perform\models\activity\activity;
+use mod_perform\models\activity\helpers\access_checks;
 use mod_perform\models\activity\section;
 use mod_perform\models\activity\track;
 use moodle_exception;
+use require_login_exception;
 
 /**
  * Interceptor that uses activity related data in the incoming graphql payload
@@ -177,6 +180,8 @@ class require_activity implements middleware {
      * @inheritDoc
      */
     public function handle(payload $payload, Closure $next): result {
+        global $PAGE;
+
         $retrieve = $this->retriever;
         try {
             $activity = $retrieve($payload);
@@ -184,13 +189,20 @@ class require_activity implements middleware {
             throw new moodle_exception('invalid_activity', 'mod_perform');
         }
 
-        [$course, $cm] = get_course_and_cm_from_instance($activity->id, 'perform');
-        require_login($course, false, $cm, false, true);
+        \require_login(null, false, null, false, true);
+
+        $helper = access_checks::for_activity_model($activity);
+        $helper->check();
+
+        $PAGE->set_cm($helper->get_cm(), $helper->get_course());
 
         if ($this->set_relevant_context) {
             $context = $activity->get_context();
             $payload->get_execution_context()->set_relevant_context($context);
         }
+
+        // Store the loaded activity in the payload for later use
+        $payload->set_variable('activity', $activity);
 
         return $next($payload);
     }

@@ -23,6 +23,7 @@
 
 namespace mod_perform\data_providers\activity;
 
+use core\entities\user;
 use core\orm\collection;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\models\activity\activity as activity_model;
@@ -52,12 +53,12 @@ class activity {
      */
     protected function fetch_activities() {
         $repo = activity_entity::repository()
+            ->filter_by_visible()
             ->order_by('id');
         $entities = $repo->get();
         $this->items = [];
 
         foreach ($entities as $entity) {
-            /** @var activity_model $item */
             $item = activity_model::load_by_entity($entity);
             if ($item->can_manage() || $item->can_view_participation_reporting()) {
                 $this->items[] = $item;

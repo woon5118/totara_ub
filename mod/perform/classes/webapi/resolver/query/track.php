@@ -29,7 +29,7 @@ use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
 use mod_perform\models\activity\track as track_model;
 use mod_perform\webapi\middleware\require_activity;
-use moodle_exception;
+use mod_perform\webapi\middleware\require_manage_capability;
 
 /**
  * Handles the "mod_perform_track" GraphQL query.
@@ -44,17 +44,7 @@ class track implements query_resolver, has_middleware {
             throw new \invalid_parameter_exception('invalid track id');
         }
 
-        $track = track_model::load_by_id($track_id);
-
-        $activity = $track->get_activity();
-        $context = $activity->get_context();
-        if (!$activity->can_manage()) {
-            throw new moodle_exception('invalid_activity', 'mod_perform');
-        }
-
-        $ec->set_relevant_context($context);
-
-        return $track;
+        return track_model::load_by_id($track_id);
     }
 
     /**
@@ -63,7 +53,8 @@ class track implements query_resolver, has_middleware {
     public static function get_middleware(): array {
         return [
             new require_advanced_feature('performance_activities'),
-            require_activity::by_track_id('track_id', true)
+            require_activity::by_track_id('track_id', true),
+            require_manage_capability::class
         ];
     }
 }

@@ -25,17 +25,20 @@ namespace mod_perform\controllers\activity;
 
 use context;
 use mod_perform\controllers\perform_controller;
+use mod_perform\controllers\requires_activity;
 use mod_perform\models\activity\activity;
 use moodle_url;
 use totara_mvc\tui_view;
 
 class edit_activity extends perform_controller {
 
+    use requires_activity;
+
     /**
      * @inheritDoc
      */
     protected function setup_context(): context {
-        return activity::load_by_id($this->get_activity_id())->get_context();
+        return $this->get_activity_from_param()->get_context();
     }
 
     /**
@@ -43,19 +46,15 @@ class edit_activity extends perform_controller {
      */
     public function action(): tui_view {
         $this->require_capability('mod/perform:manage_activity', $this->get_context());
-        $this->set_url(self::get_url(['activity_id' => $this->get_activity_id()]));
+        $this->set_url(self::get_url(['activity_id' => $this->get_activity_id_param()]));
 
         $props = [
-            'activity-id' => $this->get_activity_id(),
+            'activity-id' => $this->get_activity_id_param(),
             'go-back-link' => (string) new moodle_url(manage_activities::URL),
         ];
 
         return self::create_tui_view('mod_perform/pages/ManageActivity', $props)
             ->set_title(get_string('manage_activity_page_title', 'mod_perform'));
-    }
-
-    private function get_activity_id(): int {
-        return required_param('activity_id', PARAM_INT);
     }
 
     public static function get_base_url(): string {

@@ -29,7 +29,7 @@ use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
 use mod_perform\models\activity\section as section_model;
 use mod_perform\webapi\middleware\require_activity;
-use moodle_exception;
+use mod_perform\webapi\middleware\require_manage_capability;
 
 class section_admin implements query_resolver, has_middleware {
     /**
@@ -41,20 +41,7 @@ class section_admin implements query_resolver, has_middleware {
             throw new \invalid_parameter_exception('invalid section id');
         }
 
-        /** @var section_model $section */
-        $section = section_model::load_by_id($section_id);
-
-        $activity = $section->get_activity();
-
-        $activity_context = $activity->get_context();
-
-        if (!$activity->can_manage()) {
-            throw new moodle_exception('invalid_activity', 'mod_perform');
-        }
-
-        $ec->set_relevant_context($activity_context);
-
-        return $section;
+        return section_model::load_by_id($section_id);
     }
 
     /**
@@ -63,7 +50,8 @@ class section_admin implements query_resolver, has_middleware {
     public static function get_middleware(): array {
         return [
             new require_advanced_feature('performance_activities'),
-            require_activity::by_section_id('section_id', true)
+            require_activity::by_section_id('section_id', true),
+            require_manage_capability::class
         ];
     }
 }

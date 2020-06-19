@@ -24,7 +24,6 @@
 namespace mod_perform\task;
 
 use core\task\scheduled_task;
-use mod_perform\expand_task;
 use mod_perform\task\service\track_schedule_sync;
 
 /**

@@ -23,8 +23,6 @@
 
 require_once(__DIR__ . '/generator/activity_generator_configuration.php');
 
-use core\collection;
-
 use mod_perform\entities\activity\section as section_entity;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\activity_setting;

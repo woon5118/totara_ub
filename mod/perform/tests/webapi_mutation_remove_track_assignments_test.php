@@ -25,11 +25,8 @@
 use mod_perform\models\activity\track;
 use mod_perform\models\activity\track_assignment;
 use mod_perform\models\activity\track_assignment_type;
-
 use mod_perform\webapi\resolver\mutation\remove_track_assignments;
-
 use totara_core\advanced_feature;
-
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
@@ -52,7 +49,7 @@ class mod_perform_webapi_mutation_remove_track_assignments_testcase extends adva
         $assignments = $track->assignments;
         $this->assertNotEmpty($assignments->all(), 'track has no assignments');
 
-        $updated_track = remove_track_assignments::resolve($args, $context);
+        $updated_track = $this->resolve_graphql_mutation('mod_perform_remove_track_assignments', $args);
         $this->assertNotNull($updated_track, 'track assignment failed');
         $this->assertInstanceOf(track::class, $updated_track, 'wrong return type');
         $this->assertEquals($track->id, $updated_track->id, 'wrong track returned');
@@ -107,7 +104,7 @@ class mod_perform_webapi_mutation_remove_track_assignments_testcase extends adva
         self::setGuestUser();
         $args['assignments']['track_id'] = $track->id;
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
-        $this->assert_webapi_operation_failed($result, 'Course or activity not accessible.');
+        $this->assert_webapi_operation_failed($result, 'Invalid activity');
     }
 
     /**

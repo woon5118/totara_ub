@@ -23,16 +23,11 @@
  */
 
 use core\webapi\execution_context;
-
 use mod_perform\entities\activity\activity_type as activity_type_entity;
 use mod_perform\models\activity\activity_type as activity_type_model;
 use mod_perform\webapi\resolver\query\activity_types;
-use mod_perform\webapi\resolver\type\activity_type;
-
 use totara_core\advanced_feature;
-
 use totara_webapi\phpunit\webapi_phpunit_helper;
-
 
 /**
  * @coversDefaultClass activity_types.
@@ -50,11 +45,10 @@ class mod_perform_webapi_query_activity_types_testcase extends advanced_testcase
     public function test_find(): void {
         [$expected_types, $context] = $this->setup_env();
 
-        $actual_types = activity_types::resolve([], $context)
-            ->all();
+        $actual_types = $this->resolve_graphql_query('mod_perform_activity_types');
 
         $this->assertCount(count($expected_types), $actual_types, 'wrong count');
-        $this->assertEqualsCanonicalizing($expected_types, $actual_types, 'wrong types');
+        $this->assertEqualsCanonicalizing($expected_types, $actual_types->all(), 'wrong types');
     }
 
     /**
@@ -131,7 +125,7 @@ class mod_perform_webapi_query_activity_types_testcase extends advanced_testcase
      */
     private function graphql_return(activity_type_model $type, execution_context $context): array {
         $type_resolve = function (string $field) use ($type, $context) {
-            return activity_type::resolve($field, $type, [], $context);
+            return $this->resolve_graphql_type('mod_perform_activity_type', $field, $type);
         };
 
         return [

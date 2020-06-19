@@ -28,6 +28,7 @@ use core\webapi\execution_context;
 use mod_perform\user_groups\grouping;
 
 use mod_perform\webapi\resolver\type\user_grouping;
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
  * @coversDefaultClass user_grouping.
@@ -38,16 +39,21 @@ use mod_perform\webapi\resolver\type\user_grouping;
  * totara core somewhere.
  */
 class mod_perform_webapi_type_user_grouping_testcase extends advanced_testcase {
+
+    use webapi_phpunit_helper;
+
+    private const TYPE = 'mod_perform_user_grouping';
+
     /**
      * @covers ::resolve
      */
     public function test_invalid_input(): void {
-        [, $context] = $this->create_grouping();
-        $webapi_context = $this->get_webapi_context($context);
+        $this->create_grouping();
 
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessageRegExp("/user_grouping/");
-        user_grouping::resolve('id', new stdClass(), [], $webapi_context);
+
+        $this->resolve_graphql_type(self::TYPE, 'id', new \stdClass());
     }
 
     /**
@@ -55,12 +61,12 @@ class mod_perform_webapi_type_user_grouping_testcase extends advanced_testcase {
      */
     public function test_invalid_field(): void {
         [$grouping, $context] = $this->create_grouping();
-        $webapi_context = $this->get_webapi_context($context);
         $field = 'unknown';
 
         $this->expectException(moodle_exception::class);
         $this->expectExceptionMessageRegExp("/$field/");
-        user_grouping::resolve($field, $grouping, [], $webapi_context);
+
+        $this->resolve_graphql_type(self::TYPE, $field, $grouping, [], $context);
     }
 
     /**
@@ -73,7 +79,6 @@ class mod_perform_webapi_type_user_grouping_testcase extends advanced_testcase {
         // visible to _all_ tests. In other words, with dataproviders, current
         // and yet unborn tests do not start in a clean state!
         [$source, $context] = $this->create_grouping(grouping::ORG);
-        $webapi_context = $this->get_webapi_context($context);
         $plain_name = format_string($source->get_name(), true, ['context' => $context]);
 
         $testcases = [
@@ -88,7 +93,7 @@ class mod_perform_webapi_type_user_grouping_testcase extends advanced_testcase {
             [$field, $format, $expected] = $testcase;
             $args = $format ? ['format' => $format] : [];
 
-            $value = user_grouping::resolve($field, $source, $args, $webapi_context);
+            $value = $this->resolve_graphql_type(self::TYPE, $field, $source, $args, $context);
             $this->assertEquals($expected, $value, "[$id] wrong value");
         }
     }

@@ -30,6 +30,7 @@ use core\webapi\mutation_resolver;
 use core\webapi\resolver\has_middleware;
 use mod_perform\models\activity\section;
 use mod_perform\webapi\middleware\require_activity;
+use mod_perform\webapi\middleware\require_manage_capability;
 use moodle_exception;
 
 class delete_section implements mutation_resolver, has_middleware {
@@ -42,24 +43,17 @@ class delete_section implements mutation_resolver, has_middleware {
      * @throws moodle_exception
      */
     public static function resolve(array $args, execution_context $ec) {
-        $args = $args['input'];
-        if (!$args) {
+        $input = $args['input'];
+        if (!$input) {
             throw new \invalid_parameter_exception('section details not given');
         }
 
-        $section_id = (int)$args['section_id'] ?? 0;
+        $section_id = (int)$input['section_id'] ?? 0;
         if (!$section_id) {
             throw new \invalid_parameter_exception('unknown section id');
         }
 
         $section = section::load_by_id($section_id);
-        $activity = $section->get_activity();
-
-        if (!$activity || !$activity->can_manage()) {
-            throw new moodle_exception('invalid_activity', 'mod_perform');
-        }
-
-        $ec->set_relevant_context($activity->get_context());
 
         $section->check_deletion_requirements();
 
@@ -75,6 +69,7 @@ class delete_section implements mutation_resolver, has_middleware {
         return [
             new require_advanced_feature('performance_activities'),
             require_activity::by_section_id('input.section_id', true),
+            require_manage_capability::class
         ];
     }
 }

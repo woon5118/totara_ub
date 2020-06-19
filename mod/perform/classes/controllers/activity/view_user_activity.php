@@ -29,7 +29,6 @@ use invalid_parameter_exception;
 use mod_perform\controllers\perform_controller;
 use mod_perform\models\activity\participant_instance as participant_instance_model;
 use mod_perform\models\response\participant_section as participant_section_model;
-use mod_perform\util;
 use moodle_exception;
 use totara_mvc\tui_view;
 
@@ -39,11 +38,26 @@ use totara_mvc\tui_view;
 class view_user_activity extends perform_controller {
 
     /**
+     * @var participant_instance_model
+     */
+    protected $participant_instance;
+
+    /**
      * @inheritDoc
      */
     protected function setup_context(): context {
-        $category_id = util::get_default_category_id();
-        return \context_coursecat::instance($category_id);
+        $participant_instance_id = $this->get_participant_instance_id();
+        $participant_section_id = $this->get_participant_section_id();
+
+        $this->check_required_params($participant_instance_id, $participant_section_id);
+
+        try {
+            $this->participant_instance = $this->get_participant_instance($participant_instance_id, $participant_section_id);
+        } catch (\Exception $exception) {
+            throw new moodle_exception('invalid_activity', 'mod_perform');
+        }
+
+        return $this->participant_instance->get_context();
     }
 
     /**
@@ -53,27 +67,20 @@ class view_user_activity extends perform_controller {
     public function action(): tui_view {
         $participant_instance_id = $this->get_participant_instance_id();
         $participant_section_id = $this->get_participant_section_id();
-        $this->check_required_params($participant_instance_id, $participant_section_id);
-
-        $participant_instance = $this->get_participant_instance($participant_instance_id, $participant_section_id);
 
         $props = [
             'current-user-id' => user::logged_in()->id,
         ];
         $url_args = [];
 
-        if ($participant_instance instanceof participant_instance_model) {
-            $props['subject-instance-id'] = $participant_instance->subject_instance_id;
-            $props['participant-instance-id'] = $participant_instance->id;
-        }
-
-        if ($participant_instance_id > 0) {
-            $url_args['participant_instance_id'] = $participant_instance_id;
-        }
+        $props['subject-instance-id'] = $this->participant_instance->subject_instance_id;
+        $props['participant-instance-id'] = $this->participant_instance->id;
 
         if ($participant_section_id > 0) {
             $props['participant-section-id'] = $participant_section_id;
             $url_args['participant_section_id'] = $participant_section_id;
+        } else if ($participant_instance_id > 0) {
+            $url_args['participant_instance_id'] = $participant_instance_id;
         }
 
         $url = self::get_url($url_args);
@@ -105,21 +112,19 @@ class view_user_activity extends perform_controller {
     }
 
     /**
-     * Get participant instance
-     * We allow the return of null, because the front end will handle showing the not found message.
+     * Returns the participant instance for this controller
      *
      * @param int $participant_instance_id
      * @param int $participant_section_id
-     * @return participant_instance_model|null
+     * @return participant_instance_model
      */
-    private function get_participant_instance(int $participant_instance_id, int $participant_section_id): ?participant_instance_model {
-        try {
-            return $participant_section_id
-                ? participant_section_model::load_by_id($participant_section_id)->get_participant_instance()
-                : participant_instance_model::load_by_id($participant_instance_id);
-        } catch (moodle_exception $exception) {
-            return null;
-        }
+    private function get_participant_instance(
+        int $participant_instance_id,
+        int $participant_section_id
+    ): participant_instance_model {
+        return $participant_section_id
+            ? participant_section_model::load_by_id($participant_section_id)->get_participant_instance()
+            : participant_instance_model::load_by_id($participant_instance_id);
     }
 
     /**

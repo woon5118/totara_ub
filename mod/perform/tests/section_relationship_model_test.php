@@ -23,8 +23,6 @@
 
 use core\orm\query\exceptions\record_not_found_exception;
 use mod_perform\entities\activity\section;
-use mod_perform\entities\activity\section_relationship as section_relationship_entity;
-use mod_perform\models\activity\activity;
 use mod_perform\models\activity\section_relationship;
 use totara_core\relationship\resolvers\subject;
 use totara_job\relationship\resolvers\appraiser;

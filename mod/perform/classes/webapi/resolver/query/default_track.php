@@ -27,10 +27,9 @@ use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
-use mod_perform\models\activity\activity;
 use mod_perform\models\activity\track;
 use mod_perform\webapi\middleware\require_activity;
-use moodle_exception;
+use mod_perform\webapi\middleware\require_manage_capability;
 
 /**
  * Handles the "mod_perform_default_track" GraphQL query.
@@ -44,18 +43,8 @@ class default_track implements query_resolver, has_middleware {
      * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
-        $activity_id = (int)$args['activity_id'];
-        $activity = activity::load_by_id($activity_id);
-        if (!$activity_id) {
-            throw new \invalid_parameter_exception('invalid activity id');
-        }
-
-        $context = $activity->get_context();
-        if (!$activity->can_manage()) {
-            throw new moodle_exception('invalid_activity', 'mod_perform');
-        }
-
-        $ec->set_relevant_context($context);
+        // The require_activity middleware loads the activity and passes it along via the args
+        $activity = $args['activity'];
 
         $default_track = track::load_by_activity($activity)->first();
         if (!$default_track) {
@@ -71,7 +60,8 @@ class default_track implements query_resolver, has_middleware {
     public static function get_middleware(): array {
         return [
             new require_advanced_feature('performance_activities'),
-            require_activity::by_activity_id('activity_id', true)
+            require_activity::by_activity_id('activity_id', true),
+            require_manage_capability::class
         ];
     }
 }

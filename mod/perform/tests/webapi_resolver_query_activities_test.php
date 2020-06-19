@@ -21,7 +21,6 @@
  * @package mod_perform
  */
 use core\collection;
-use core\webapi\execution_context;
 use mod_perform\webapi\resolver\query\activities;
 use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
@@ -38,11 +37,11 @@ class mod_perform_webapi_resolver_query_activities_testcase extends advanced_tes
 
     public function test_get_activities() {
         $names = ['Mid year performance', 'End year performance'];
-        $context = $this->create_test_data($names);
+        $this->create_test_data($names);
 
         /** @var mod_perform\models\activity\activity[] $activities */
-        $activities = collection::new(activities::resolve([], $context))
-            ->pluck('name');
+        $result = $this->resolve_graphql_query(self::QUERY);
+        $activities = collection::new($result)->pluck('name');
 
         $this->assertCount(count($names), $activities);
         $this->assertEqualsCanonicalizing($names, $activities);
@@ -58,8 +57,7 @@ class mod_perform_webapi_resolver_query_activities_testcase extends advanced_tes
         assign_capability('mod/perform:view_manage_activities', CAP_ALLOW, $user_role->id, SYSCONTEXTID, true);
 
         /** @var mod_perform\models\activity\activity[] $activities */
-        $context = $this->create_webapi_context(self::QUERY);
-        $activities = activities::resolve([], $context);
+        $activities = $this->resolve_graphql_query(self::QUERY);
 
         // There are not activities but also no exceptions
         $this->assertEmpty($activities);
@@ -127,20 +125,19 @@ class mod_perform_webapi_resolver_query_activities_testcase extends advanced_tes
     }
 
     public function test_get_empty_activities() {
-        $context = $this->create_test_data([]);
-        $activities = activities::resolve([], $context);
+        $this->setAdminUser();
+
+        $activities = $this->resolve_graphql_query(self::QUERY);
 
         $this->assertCount(0, $activities);
     }
 
-    /**
-     * @expectedException moodle_exception
-     */
     public function test_get_activities_non_admin() {
-        $context = $this->create_test_data([]);
         $this->setGuestUser();
 
-        activities::resolve([], $context);
+        $this->expectException(required_capability_exception::class);
+
+        $this->resolve_graphql_query(self::QUERY);
     }
 
     public function test_ajax_query() {
@@ -162,7 +159,7 @@ class mod_perform_webapi_resolver_query_activities_testcase extends advanced_tes
         advanced_feature::enable($feature);
     }
 
-    private function create_test_data(array $activity_names): execution_context {
+    private function create_test_data(array $activity_names) {
         $this->setAdminUser();
 
         /** @var mod_perform_generator $perform_generator */
@@ -170,7 +167,5 @@ class mod_perform_webapi_resolver_query_activities_testcase extends advanced_tes
         foreach ($activity_names as $name) {
             $perform_generator->create_activity_in_container(['activity_name' => $name]);
         }
-
-        return $this->create_webapi_context(self::QUERY);
     }
 }
