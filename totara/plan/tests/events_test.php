@@ -213,65 +213,6 @@ class totara_plan_events_testcase extends advanced_testcase {
         $this->assertEquals('u', $event->crud);
     }
 
-    public function test_evidence_events() {
-        $this->resetAfterTest();
-
-        /** @var totara_plan_generator $plangenerator */
-        $plangenerator = $this->getDataGenerator()->get_plugin_generator('totara_plan');
-
-        $user = $this->getDataGenerator()->create_user();
-        $evidencetype = $plangenerator->create_evidence_type();
-        $evidence = $plangenerator->create_evidence(array('evidencetypeid' => $evidencetype->id, 'userid' => $user->id));
-
-        $event = \totara_plan\event\evidence_type_created::create_from_type($evidencetype);
-        $event->trigger();
-        $this->assertEventContextNotUsed($event);
-        $this->assertNotEmpty($event->get_name());
-        $this->assertNotEmpty($event->get_url());
-        $this->assertEquals($event::LEVEL_OTHER, $event->edulevel);
-        $this->assertEquals('c', $event->crud);
-
-        $event = \totara_plan\event\evidence_type_updated::create_from_type($evidencetype);
-        $event->trigger();
-        $this->assertEventContextNotUsed($event);
-        $this->assertNotEmpty($event->get_name());
-        $this->assertNotEmpty($event->get_url());
-        $this->assertEquals($event::LEVEL_OTHER, $event->edulevel);
-        $this->assertEquals('u', $event->crud);
-
-        $event = \totara_plan\event\evidence_type_deleted::create_from_type($evidencetype);
-        $event->trigger();
-        $this->assertEventContextNotUsed($event);
-        $this->assertNotEmpty($event->get_name());
-        $this->assertNull($event->get_url());
-        $this->assertEquals($event::LEVEL_OTHER, $event->edulevel);
-        $this->assertEquals('d', $event->crud);
-
-        $event = \totara_plan\event\evidence_created::create_from_instance($evidence);
-        $event->trigger();
-        $this->assertEventContextNotUsed($event);
-        $this->assertNotEmpty($event->get_name());
-        $this->assertNotEmpty($event->get_url());
-        $this->assertEquals($event::LEVEL_OTHER, $event->edulevel);
-        $this->assertEquals('c', $event->crud);
-
-        $event = \totara_plan\event\evidence_updated::create_from_instance($evidence);
-        $event->trigger();
-        $this->assertEventContextNotUsed($event);
-        $this->assertNotEmpty($event->get_name());
-        $this->assertNotEmpty($event->get_url());
-        $this->assertEquals($event::LEVEL_OTHER, $event->edulevel);
-        $this->assertEquals('u', $event->crud);
-
-        $event = \totara_plan\event\evidence_deleted::create_from_instance($evidence);
-        $event->trigger();
-        $this->assertEventContextNotUsed($event);
-        $this->assertNotEmpty($event->get_name());
-        $this->assertNotEmpty($event->get_url());
-        $this->assertEquals($event::LEVEL_OTHER, $event->edulevel);
-        $this->assertEquals('d', $event->crud);
-    }
-
     public function test_objective_scale_events() {
         global $DB;
         $this->resetAfterTest();

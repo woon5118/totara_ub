@@ -4,6 +4,12 @@ information provided here is intended especially for developers.
 === 13.0 ===
 
 * Removed deprecated function customfield_get_fields()
+* Moved functions move(), get_conditions_swapfields(), get_field_to_move(), reorder_fields(), get_fields_sql_where(), get_next_sortorder()
+  from hierarchy_type into a trait called unique_type, allowing plugins other than hierarchy to have unique sets of custom fields
+  per plugin defined 'type'
+* type_base - added get_page_url() function to type_base which stores the URL of the custom fields area, allowing a custom area URL to be used
+* customfield_tabs_link() - added $action parameter that allows conditionally showing headings based on the current page action
+* add_totara_customfield_base() - removed dp_plan_evidence table
 
 === 12.0 ===
 

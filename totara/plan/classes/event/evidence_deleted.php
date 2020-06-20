@@ -27,10 +27,12 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Event triggered when evidence deleted.
  *
+ * @deprecated since Totara 13
  * @property-read array $other {
  * Extra information about the event.
  *   - name
  * }
+ * @deprecated since Totara 13
  */
 class evidence_deleted extends \core\event\base {
     /**
@@ -41,10 +43,12 @@ class evidence_deleted extends \core\event\base {
 
     /**
      * Create an event.
+     * @deprecated since Totara 13
      * @param \stdClass $instance
      * @return evidence_deleted
      */
     public static function create_from_instance($instance) {
+        debugging('\totara_plan\event\evidence_deleted has been deprecated and is no longer used, please use totara_evidence\event\evidence_item_deleted instead.', DEBUG_DEVELOPER);
         $data = array(
             'objectid' => $instance->id,
             'context' => \context_system::instance(),
@@ -57,7 +61,6 @@ class evidence_deleted extends \core\event\base {
         self::$preventcreatecall = false;
         /** @var evidence_deleted $event */
         $event = self::create($data);
-        $event->add_record_snapshot('dp_plan_evidence', $instance);
         self::$preventcreatecall = true;
 
         return $event;

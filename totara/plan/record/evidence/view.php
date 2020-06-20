@@ -26,6 +26,8 @@
  */
 
 use totara_core\advanced_feature;
+use totara_evidence\models\evidence_item;
+use totara_evidence\output\view_item;
 
 require_once(__DIR__ . '/../../../../config.php');
 require_once($CFG->dirroot . '/totara/plan/lib.php');
@@ -41,10 +43,8 @@ if (advanced_feature::is_disabled('recordoflearning')) {
 
 $evidenceid = required_param('id', PARAM_INT); // evidence assignment id
 
-if (!$evidence = $DB->get_record('dp_plan_evidence', array('id' => $evidenceid))) {
-    print_error('error:evidenceidincorrect', 'totara_plan');
-}
-$userid = $evidence->userid;
+$evidence = evidence_item::load_by_id($evidenceid);
+$userid = $evidence->user_id;
 
 if (!$user = $DB->get_record('user', array('id' => $userid))) {
     print_error('error:usernotfound', 'totara_plan');
@@ -54,6 +54,8 @@ $systemcontext = context_system::instance();
 $PAGE->set_context($systemcontext);
 $PAGE->set_pagelayout('report');
 $PAGE->set_url('/totara/plan/record/evidence/view.php', array('id' => $evidenceid));
+
+$view_evidence = view_item::create($evidence);
 
 if ($USER->id != $userid && !(\totara_job\job_assignment::is_managing($USER->id, $userid)) && !has_capability('totara/plan:accessanyplan', context_system::instance())) {
     print_error('error:cannotviewpage', 'totara_plan');
@@ -97,9 +99,7 @@ echo $OUTPUT->heading($strheading);
 
 dp_print_rol_tabs(null, 'evidence', $userid);
 
-echo display_evidence_detail($evidenceid);
-
-echo list_evidence_in_use($evidenceid);
+echo $OUTPUT->render($view_evidence);
 
 echo $OUTPUT->container_end();
 

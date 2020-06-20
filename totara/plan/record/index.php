@@ -23,6 +23,8 @@
  */
 
 use totara_core\advanced_feature;
+use totara_core\totara\menu\myteam;
+use totara_plan\totara\menu\recordoflearning;
 
 require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot . '/totara/plan/lib.php');
@@ -47,5 +49,29 @@ if ($visible = dp_get_rol_tabs_visible($userid)) {
     }
 }
 
-// No tabs are visible (shouldn't happen), redirect to homepage.
-redirect(new moodle_url('/'));
+// No tabs are visible so show a message
+$PAGE->set_context(context_system::instance());
+$PAGE->set_url(new moodle_url('/totara/plan/record/index.php', ['userid' => $userid]));
+$PAGE->set_totara_menu_selected(recordoflearning::class);
+
+if ($USER->id == $userid) {
+    $heading = get_string('recordoflearning', 'totara_core');
+    $role = 'learner';
+} else {
+    $heading = get_string('recordoflearningforname', 'totara_core', fullname($DB->get_record('user', ['id' => $userid]), true));
+    $role = 'manager';
+
+    if (advanced_feature::is_enabled('myteam')) {
+        $PAGE->set_totara_menu_selected(myteam::class);
+        $PAGE->navbar->add(get_string('team', 'totara_core'), new moodle_url('/my/teammembers.php'));
+    }
+}
+
+$PAGE->set_title($heading);
+$PAGE->navbar->add($heading);
+dp_display_plans_menu($userid, 0, $role, 'index', 'none', false);
+
+echo $OUTPUT->header();
+echo $OUTPUT->heading($heading);
+echo html_writer::tag('i', get_string('norecords', 'totara_plan'));
+echo $OUTPUT->footer();

@@ -89,8 +89,7 @@ Feature: Learner creates learning plan with competencies.
     And I click on "Records" "link" in the "Bob1 Learner1" "table_row"
     And the field "competencyevidencestatus1" matches value "Not competent"
     And I set the field "competencyevidencestatus1" to "Competent"
-    And I switch to "Other Evidence" tab
-    And I switch to "Competencies" tab
+    And I reload the page
     Then the field "competencyevidencestatus1" matches value "Competent"
     And I log out
 

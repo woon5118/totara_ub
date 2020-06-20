@@ -71,7 +71,8 @@ $string['courseblankrefs'] = 'Blank course shortname and course ID number';
 $string['coursefieldarialabel'] = 'Upload course {$a}';
 $string['courseloglifetime'] = 'Keep course completion upload logs for';
 $string['courseloglifetime_desc'] = 'This specifies the length of time to keep course completion upload logs. Logs that are older than this will be automatically deleted.';
-$string['creategenericevidence'] = 'Create generic evidence';
+$string['create_evidence'] = 'Create evidence';
+$string['create_evidence_help'] = 'When selected, any courses or certifications that do not match with those in the system will be recorded as an evidence item in the Record of Learning.';
 $string['csvdateformat'] = 'CSV Date format';
 $string['csvdelimiter'] = 'CSV Text Delimited with';
 $string['csvencoding'] = 'CSV File encoding';
@@ -81,7 +82,6 @@ $string['csvgradeunit_point'] = 'Real';
 $string['csvimportdone'] = 'CSV import completed';
 $string['csvimportfailed'] = 'Failed to import the CSV file';
 $string['csvseparator'] = 'CSV Values separated by';
-$string['donotcreateevidence'] = 'Do not create evidence';
 $string['duplicate'] = 'Duplicate';
 $string['duplicateidnumber'] = 'Duplicate ID Number';
 $string['emptyfile'] = 'File is empty : {$a}';
@@ -104,24 +104,6 @@ $string['evidence_shortname_certification'] = 'Completed certification : {$a}';
 $string['evidence_shortname_course'] = 'Completed course : {$a}';
 $string['evidence_idnumber_certification'] = 'Completed certification ID : {$a}';
 $string['evidence_idnumber_course'] = 'Completed course ID : {$a}';
-$string['evidencedescriptionfield'] = 'Evidence field for the description';
-$string['evidencedescriptionfield_help'] = 'Any courses or certificates that can\'t be found will be added as evidence in the evidence bank.
-
-Please choose a text evidence custom field to store a description of the created evidence.
-
-If the CSV file has a column specifying the custom field directly, this value will be used instead.';
-$string['evidencedatefield'] = 'Evidence field for completion date';
-$string['evidencedatefield_help'] = 'Any courses or certificates that can\'t be found will be added as evidence in the evidence bank.
-
-Please choose a date/time evidence custom field to store the completiondate value.
-
-If the CSV file has a column specifying the custom field directly, this value will be used instead.';
-$string['evidencetype'] = 'Default evidence type';
-$string['evidencetype_help'] = 'Any courses or certificates that can\'t be found can be added as evidence in the evidence bank.
-
-If you do not want any evidence to be created by this import, select \'Do not create evidence\'.
-
-Otherwise, please choose the default evidence type you wish to use.';
 $string['fieldarialabel'] = '{$a}';
 $string['fieldcountmismatch'] = 'Field count mismatch';
 $string['fileisinuse'] = 'File is currently being used elsewhere : {$a}';
@@ -239,21 +221,31 @@ $string['timeuploaded'] = 'Time uploaded';
 $string['unknowncolumn'] = 'Unknown column \'{$a->columnname}\'';
 $string['unreadablefile'] = 'File is unreadable : {$a}';
 $string['uploadcertification'] = 'Certification';
-$string['uploadcertificationintro'] = 'This will import historical records from a CSV file as certifications.
-Any certifications that do not exist in the current system will be created as evidence in the evidence bank.
+$string['uploadcertificationintro'] = 'This will import historical completion records from a CSV file.
 
-The CSV file must contain the following columns:
+Where these match with certifications that exist in the current system, the user will be enrolled into the specified certifications with the corresponding completion data recorded.
+Where these do not match with certifications that exist in the current system, there is the option to have them listed as \'Other evidence\' on the user’s Record of Learning – select \'Create evidence\' below to achieve this.
+
+If you are only intending to upload completion records of certifications in the system, it is recommended that you do not select \'Create evidence\', as any errors in the file could lead to a non-match, with the item instead being added as evidence of a certification external to the system.
+
+The CSV file should contain the following columns in the first line of the file:
 {$a}
 
-Note: The duedate field should indicate what the due date was at the time of completion, not when the completion is due to expire. The column must be provided, but can be left empty. When recertification is set to "Use certification expiry date" or "Use fixed expiry date", then the expiry date will be calculated using the uploaded duedate field. If it is empty or if the recertification is set to "Use certification completion date", then only the completion date will be used to calculate the expiry date';
-$string['uploadcourse'] = 'Course Completion';
-$string['uploadcourseintro'] = 'This will import historical completion records from a CSV file and enrol users onto the specified courses.
-Any courses that do not exist in the current system will be created as evidence in the evidence bank.
+Note: The duedate field should indicate what the due date was at the time of completion, not when the completion is due to expire. The column must be provided in the CSV file, but can be left empty. When recertification is set to "Use certification expiry date" or "Use fixed expiry date", then the expiry date will be calculated using the uploaded duedate field. If it is empty or if the recertification is set to "Use certification completion date", then only the completion date will be used to calculate the expiry date.
 
-The CSV file must contain the following columns:
-{$a}';
-$string['uploadcoursecustomfieldsintro'] = 'Additional columns below can also be included to allow custom field data in evidence:
-{$a}';
+';
+$string['uploadcourse'] = 'Course Completion';
+$string['uploadcourseintro'] = 'This will import historical completion records from a CSV file.
+
+Where these match with courses that exist in the current system, the user will be enrolled into the specified courses with the corresponding completion data recorded.
+Where these do not match with courses that exist in the current system, there is the option to have them listed as \'Other evidence\' on the user’s Record of Learning – select \'Create evidence\' below to achieve this.
+
+If you are only intending to upload completion records of courses in the system, it is recommended that you do not select \'Create evidence\', as any errors in the file could lead to a non-match, with the item instead being added as evidence of a course external to the system.
+
+The CSV file should contain the following columns in the first line of the file:
+{$a}
+
+';
 $string['uploadfilerequired'] = 'Please select a file to upload';
 $string['uploadsuccess'] = 'Uploaded files successfully';
 $string['uploadvia_directory'] = 'Alternatively upload CSV files via a directory on the server';
@@ -262,3 +254,34 @@ $string['usernamenotfound'] = 'User name not found';
 $string['validfilenames'] = 'Please note, these are the only valid file names, anything else will be ignored :';
 $string['viewingwithembeddedfilters'] = 'Currently viewing records with embedded filters';
 $string['viewreports'] = 'View import errors';
+
+
+/*
+ * Deprecated in Totara 13
+ */
+
+$string['creategenericevidence'] = 'Create generic evidence';
+$string['donotcreateevidence'] = 'Do not create evidence';
+$string['evidencedescriptionfield'] = 'Evidence field for the description';
+$string['evidencedescriptionfield_help'] = 'Any courses or certificates that can\'t be found will be added as evidence in the record of learning.
+
+Please choose a text evidence custom field to store a description of the created evidence.
+
+If the CVS file has a column specifying the custom field directly, this value will be used instead.';
+$string['evidencedatefield'] = 'Evidence field for completion date';
+$string['evidencedatefield_help'] = 'Any courses or certificates that can\'t be found will be added as evidence in the record of learning.
+
+Please choose a date/time evidence custom field to store the completiondate value.
+
+If the CVS file has a column specifying the custom field directly, this value will be used instead.';
+$string['evidencetype'] = 'Default evidence type';
+$string['evidencetype_help'] = 'Any courses or certificates that can\'t be found can be added as evidence in the record of learning.
+
+If you do not want any evidence to be created by this import, select \'Do not create evidence\'.
+
+Otherwise, please choose the default evidence type you wish to use.';
+$string['uploadcoursecustomfieldsintro'] = '
+Additional columns below can also be included in the CSV to allow custom field data to be uploaded for evidence
+
+{$a}
+';

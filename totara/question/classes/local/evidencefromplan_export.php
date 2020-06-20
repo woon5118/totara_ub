@@ -48,7 +48,7 @@ class evidencefromplan_export extends review_export {
         $sql =
             "SELECT DISTINCT {$key} AS id, evidence.name
                FROM {{$prefix}_review_data} rd
-               JOIN {dp_plan_evidence} evidence ON rd.itemid = evidence.id
+               JOIN {totara_evidence_item} evidence ON rd.itemid = evidence.id
               WHERE rd.{$prefix}questfieldid = :questfieldid
                 AND rd.{$answerfield} = :answerfieldid";
 

@@ -101,5 +101,11 @@ function xmldb_totara_plan_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019012200, 'totara', 'plan');
     }
 
+    if ($oldversion < 2020062600) {
+        totara_plan_upgrade_remove_evidence_tables();
+
+        upgrade_plugin_savepoint(true, 2020062600, 'totara', 'plan');
+    }
+
     return true;
 }

@@ -117,7 +117,6 @@ class totara_reportbuilder_disabled_subsystems_testcase extends advanced_testcas
         self::assertTrue($this->embedded_report_exists($records, 'Record of Learning: Certifications'));
         self::assertTrue($this->embedded_report_exists($records, 'Record of Learning: Competencies'));
         self::assertTrue($this->embedded_report_exists($records, 'Record of Learning: Courses'));
-        self::assertTrue($this->embedded_report_exists($records, 'Record of Learning: Evidence'));
         self::assertTrue($this->embedded_report_exists($records, 'Record of Learning: Objectives'));
         self::assertTrue($this->embedded_report_exists($records, 'Record of Learning: Previous Certifications'));
         self::assertTrue($this->embedded_report_exists($records, 'Record of Learning: Programs Completion History'));
@@ -131,7 +130,6 @@ class totara_reportbuilder_disabled_subsystems_testcase extends advanced_testcas
         self::assertTrue(in_array('Record of Learning: Certifications', $reports));
         self::assertTrue(in_array('Record of Learning: Competencies', $reports));
         self::assertTrue(in_array('Record of Learning: Courses', $reports));
-        self::assertTrue(in_array('Record of Learning: Evidence', $reports));
         self::assertTrue(in_array('Record of Learning: Objectives', $reports));
         self::assertTrue(in_array('Record of Learning: Previous Certifications', $reports));
         self::assertTrue(in_array('Record of Learning: Previous Course Completions', $reports));
@@ -147,7 +145,6 @@ class totara_reportbuilder_disabled_subsystems_testcase extends advanced_testcas
         self::assertFalse($this->embedded_report_exists($records, 'Record of Learning: Certifications'));
         self::assertFalse($this->embedded_report_exists($records, 'Record of Learning: Competencies'));
         self::assertFalse($this->embedded_report_exists($records, 'Record of Learning: Courses'));
-        self::assertFalse($this->embedded_report_exists($records, 'Record of Learning: Evidence'));
         self::assertFalse($this->embedded_report_exists($records, 'Record of Learning: Objectives'));
         self::assertFalse($this->embedded_report_exists($records, 'Record of Learning: Previous Certifications'));
         self::assertFalse($this->embedded_report_exists($records, 'Record of Learning: Programs Completion History'));
@@ -161,7 +158,6 @@ class totara_reportbuilder_disabled_subsystems_testcase extends advanced_testcas
         self::assertFalse(in_array('Record of Learning: Certifications', $reports));
         self::assertFalse(in_array('Record of Learning: Competencies', $reports));
         self::assertFalse(in_array('Record of Learning: Courses', $reports));
-        self::assertFalse(in_array('Record of Learning: Evidence', $reports));
         self::assertFalse(in_array('Record of Learning: Objectives', $reports));
         self::assertFalse(in_array('Record of Learning: Previous Certifications', $reports));
         self::assertFalse(in_array('Record of Learning: Previous Course Completions', $reports));

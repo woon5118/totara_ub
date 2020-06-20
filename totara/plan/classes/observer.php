@@ -30,20 +30,14 @@ class totara_plan_observer {
      * Clears relevant user data when the user is deleted
      *  - Evidence records
      *
+     * @deprecated since Totara 13
+     *
      * @param \core\event\user_deleted $event
      *
      */
     public static function user_deleted(\core\event\user_deleted $event) {
-        global $CFG, $DB;
-        require_once($CFG->dirroot . '/totara/plan/record/evidence/lib.php');
-
-        $userid = $event->objectid;
-
-        // Clear all the deleted users evidence records.
-        $evidenceitems = $DB->get_records('dp_plan_evidence', array('userid' => $userid), 'id');
-        foreach ($evidenceitems as $evidence) {
-            evidence_delete($evidence->id);
-        }
+        debugging('\totara_plan_observer::user_deleted has been deprecated and is no longer used, please use totara_evidence\observer::user_deleted instead.', DEBUG_DEVELOPER);
+        totara_evidence\observer::user_deleted($event);
     }
 
     /*

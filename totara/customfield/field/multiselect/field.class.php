@@ -97,7 +97,7 @@ class customfield_multiselect extends customfield_base {
      */
     public function edit_field_add(&$mform) {
         $ind = 0;
-        $title = format_string($this->field->fullname);
+        $title = $this->get_display_fullname();
         $chkgrp = array();
         while ($ind < count($this->options)) {
             if (isset($this->options[$ind])) {

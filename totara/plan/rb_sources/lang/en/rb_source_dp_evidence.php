@@ -21,6 +21,10 @@
  * @subpackage reportbuilder
  */
 
+/*
+ * Deprecated in Totara 13
+ */
+
 $string['actionlinks'] = 'Actions';
 $string['attachment'] = 'Attachments';
 $string['attachmentlink'] = 'Attachments';

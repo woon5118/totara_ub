@@ -57,8 +57,8 @@ $renderer = $PAGE->get_renderer('totara_customfield');
 
 // Set redirect.
 $redirectoptions = $renderer->get_redirect_options($prefix, $id, $typeid, $class);
-$redirectpage = '/totara/customfield/index.php';
-$redirect = new moodle_url('/totara/customfield/index.php', $redirectoptions);
+$redirectpage = $customfieldtype->get_page_url();
+$redirect = new moodle_url($redirectpage, $redirectoptions);
 
 $PAGE->set_url($redirect);
 
@@ -68,13 +68,14 @@ if ($class) {
     $adminpagename = $renderer->get_admin_page($prefix);
 }
 
-admin_externalpage_setup($adminpagename);
+// $_GET is passed so URL params are kept when blocks editing mode is turned on/off or caches are purged
+admin_externalpage_setup($adminpagename, '', $_GET);
 
 // Check if any actions need to be performed.
 switch ($action) {
     case 'showlist':
         echo $OUTPUT->header();
-        echo $renderer->customfield_tabs_link($prefix, $redirectoptions);
+        echo $renderer->customfield_tabs_link($prefix, $redirectoptions, $action);
         echo $renderer->get_heading($prefix, $action);
 
         $options = customfield_list_datatypes();
@@ -104,7 +105,7 @@ switch ($action) {
         }
 
         echo $OUTPUT->header();
-        echo $renderer->customfield_tabs_link($prefix, $redirectoptions);
+        echo $renderer->customfield_tabs_link($prefix, $redirectoptions, $action);
         echo $renderer->get_heading($prefix, $action);
 
         // Ask for confirmation.
@@ -125,7 +126,7 @@ switch ($action) {
         $datatype = $field->datatype;
         $datatypes = customfield_list_datatypes();
 
-        $tabs = $renderer->customfield_tabs_link($prefix, $redirectoptions);
+        $tabs = $renderer->customfield_tabs_link($prefix, $redirectoptions, $action);
         $heading = $renderer->get_heading($prefix, $action, $datatypes[$datatype]);
 
         $renderer->customfield_manage_edit_form($prefix, $typeid, $tableprefix, $field, $redirect, $heading, $tabs, array(), $class, $customfieldtype);
@@ -146,7 +147,7 @@ switch ($action) {
 
     default:
         echo $OUTPUT->header();
-        echo $renderer->customfield_tabs_link($prefix, $redirectoptions);
+        echo $renderer->customfield_tabs_link($prefix, $redirectoptions, $action);
         print_error('actiondoesnotexist', 'totara_customfield');
         break;
 }

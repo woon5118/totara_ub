@@ -39,7 +39,7 @@ class reports implements \totara_core\quickaccessmenu\provider {
                 'rbmanagereports',
                 group::get(group::PLATFORM),
                 new \lang_string('reports'),
-                7000
+                8000
             )
         ];
     }

@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is part of Totara LMS
+ * This file is part of Totara Learn
  *
  * Copyright (C) 2015 onwards Totara Learning Solutions LTD
  *
@@ -18,10 +18,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Simon Player <simon.player@totaralms.com>
+ * @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
  * @package totara_customfield
  */
 
 namespace totara_customfield\prefix;
+
+use moodle_url;
+use totara_core\advanced_feature;
+use totara_evidence\customfield_area\evidence;
+use totara_evidence\models;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -29,22 +36,35 @@ defined('MOODLE_INTERNAL') || die();
  */
 class evidence_type extends type_base {
 
-    /**
-     * evidence_type constructor.
-     *
-     * @param string $prefix
-     * @param string $context
-     * @param array $extrainfo
-     */
-    public function __construct($prefix, $context, $extrainfo = array()) {
-        parent::__construct($prefix, 'dp_plan_evidence', 'dp_plan_evidence', $context, $extrainfo);
+    use unique_type;
+
+    public function __construct($prefix, $context, $extrainfo = []) {
+        global $PAGE;
+        parent::__construct($prefix, evidence::get_base_table(), evidence::get_area_name(), $context, $extrainfo);
+
+        // Check that we are actually allowed to view this custom fields area
+        $type = models\evidence_type::load_by_id($extrainfo['typeid']);
+        $type::can_manage(true);
+        if (!$type->can_modify()) {
+            print_error(
+                'error_notification_edit_type',
+                'totara_evidence',
+                new moodle_url('/totara/evidence/type/index.php'),
+                $type->get_display_name()
+            );
+        }
+        $PAGE->navbar->add(get_string('edit_x_type', 'totara_evidence', $type->get_display_name()));
     }
 
-    /**
-     * Returns the capability that is required in order to manage evidence custom fields.
-     * @return string
-     */
+    public function is_feature_type_disabled() {
+        return advanced_feature::is_disabled('evidence');
+    }
+
     public function get_capability_managefield() {
-        return 'totara/plan:evidencemanagecustomfield';
+        return 'totara/evidence:managetype';
+    }
+
+    public function get_page_url(): string {
+        return new moodle_url('/totara/evidence/type/fields.php');
     }
 }

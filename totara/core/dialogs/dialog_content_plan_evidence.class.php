@@ -78,7 +78,7 @@ class totara_dialog_content_plan_evidence extends totara_dialog_content_plan {
         $params = array('planid' => $this->plan->id);
 
         $sql = "SELECT DISTINCT pe.id, pe.name
-                  FROM {dp_plan_evidence} pe
+                  FROM {totara_evidence_item} pe
                   JOIN {dp_plan_evidence_relation} per
                     ON pe.id = per.evidenceid
                  WHERE " . $where . "
@@ -128,7 +128,7 @@ class totara_dialog_content_plan_evidence extends totara_dialog_content_plan {
             $where .= ' AND '.$searchsql;
         }
 
-        $sql = "FROM {dp_plan_evidence} pe
+        $sql = "FROM {totara_evidence_item} pe
                 JOIN {dp_plan_evidence_relation} per ON
                     pe.id = per.evidenceid
                 WHERE $where";

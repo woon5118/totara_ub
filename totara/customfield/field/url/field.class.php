@@ -72,7 +72,7 @@ class customfield_url extends customfield_base {
         $checkboxlabel = html_writer::tag('label', get_string('customfieldtypeurltarget', 'totara_customfield'), array('for' => 'id_' . $this->inputname . '_target'));
         $urlgrp[] = $mform->createElement('static', uniqid("{$this->inputname}_checkboxlabel_"), null, $checkboxlabel)->set_allow_xss(true);
 
-        $mform->addGroup($urlgrp, $urlgrpname, format_string($this->field->fullname), null, false);
+        $mform->addGroup($urlgrp, $urlgrpname, $this->get_display_fullname(), null, false);
         $mform->setType($this->inputname . '[url]', PARAM_URL);
         $mform->setType($this->inputname . '[text]', PARAM_TEXT);
         $mform->setType($this->inputname . '[target]', PARAM_BOOL);

@@ -47,7 +47,7 @@ class customfield_checkbox extends customfield_base {
 
     function edit_field_add(&$form) {
         /// Create the form field
-        $checkbox = &$form->addElement('advcheckbox', $this->inputname, format_string($this->field->fullname));
+        $checkbox = &$form->addElement('advcheckbox', $this->inputname, $this->get_display_fullname());
         if ($this->data == '1') {
             $checkbox->setChecked(true);
         }

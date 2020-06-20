@@ -35,6 +35,8 @@ require_once($CFG->dirroot . '/totara/customfield/field/multiselect/define.class
 require_once($CFG->dirroot . '/totara/customfield/field/multiselect/field.class.php');
 require_once($CFG->dirroot . '/totara/customfield/field/text/field.class.php');
 require_once($CFG->dirroot . '/totara/customfield/field/text/define.class.php');
+require_once($CFG->dirroot . '/totara/customfield/field/textarea/field.class.php');
+require_once($CFG->dirroot . '/totara/customfield/field/textarea/define.class.php');
 require_once($CFG->dirroot . '/totara/customfield/field/datetime/field.class.php');
 require_once($CFG->dirroot . '/totara/customfield/field/datetime/define.class.php');
 require_once($CFG->dirroot . '/totara/customfield/field/location/field.class.php');
@@ -150,13 +152,23 @@ class totara_customfield_generator extends testing_data_generator {
      * @param string $tableprefix
      */
     public function set_textarea($item, $cfid, $value, $prefix, $tableprefix) {
-        $field = new customfield_text($cfid, $item, $prefix, $tableprefix);
-        $field->inputname = 'cftest';
+        global $DB;
+
+        $field = new customfield_textarea($cfid, $item, $prefix, $tableprefix);
+        $field->inputname = $editor = "cftest_editor";
 
         $data = new stdClass();
         $data->id = $item->id;
-        $data->cftest = $value;
+        $data->$editor = [
+            'text' => $value,
+            'format' => FORMAT_HTML
+        ];
         $field->edit_save_data($data, $prefix, $tableprefix);
+
+        return $DB->get_record(
+            $tableprefix.'_info_data',
+            array($prefix.'id' => $item->id, 'fieldid' => $field->fieldid)
+        );
     }
 
     /**

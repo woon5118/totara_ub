@@ -24,6 +24,8 @@
  * @subpackage plan
  */
 
+use totara_core\advanced_feature;
+
 require_once(__DIR__ . '/../../../../config.php');
 require_once($CFG->dirroot . '/totara/plan/lib.php');
 require_once($CFG->dirroot . '/totara/core/js/lib/setup.php');
@@ -145,7 +147,9 @@ $plan->print_header($componentname, array(), false);
 print $component->display_program_detail($progassid);
 
 // Display linked evidence
-echo $evidence->display_linked_evidence($currenturl, $canupdate, $plancompleted);
+if (advanced_feature::is_enabled('evidence')) {
+    echo $evidence->display_linked_evidence($currenturl, $canupdate, $plancompleted);
+}
 
 if (!empty($CFG->usecomments)) {
     // Comments

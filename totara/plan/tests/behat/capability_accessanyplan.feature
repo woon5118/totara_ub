@@ -34,23 +34,13 @@ Feature: Verify capability accessanyplan.
     And the following "objectives" exist in "totara_plan" plugin:
       | user     | plan                   | name        |
       | learner1 | learner1 Learning Plan | Objective 1 |
-
-    # Log in as the learner and create some evidence.
-    When I log in as "learner1"
-    And I click on "Record of Learning" in the totara menu
-    And I press "Add evidence"
-    And I set the following fields to these values:
-      | Evidence name        | My Evidence 1                  |
-    And I press "Add evidence"
-    Then I should see "Evidence created"
-
-    When I press "Add evidence"
-    And I set the following fields to these values:
-      | Evidence name        | My Evidence 2                  |
-    And I press "Add evidence"
-    Then I should see "Evidence created"
+    And the following "evidence" exist in "totara_evidence" plugin:
+      | user       | name          |
+      | learner1   | My Evidence 1 |
+      | learner1   | My Evidence 2 |
 
     # Navigate to the learners plan
+    When I log in as "learner1"
     And I click on "Dashboard" in the totara menu
     And I click on "Learning Plans" "link"
     And I click on "learner1 Learning Plan" "link"

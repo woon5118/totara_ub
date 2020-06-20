@@ -28,6 +28,8 @@ global $CFG;
 /**
  * To test, run this from the command line from the $CFG->dirroot.
  * vendor/bin/phpunit --verbose totara_plan_components_testcase totara/plan/tests/components_test.php
+ *
+ * @group totara_evidence
  */
 class totara_plan_components_testcase extends advanced_testcase {
     /** @var phpunit_message_sink $messagesink */
@@ -42,6 +44,9 @@ class totara_plan_components_testcase extends advanced_testcase {
     /** @var  totara_program_generator */
     private $program_generator;
 
+    /** @var  totara_evidence_generator */
+    private $evidence_generator;
+
     protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
@@ -49,6 +54,7 @@ class totara_plan_components_testcase extends advanced_testcase {
         $this->data_generator = $this->getDataGenerator();
         $this->plan_generator = $this->data_generator->get_plugin_generator('totara_plan');
         $this->program_generator = $this->data_generator->get_plugin_generator('totara_program');
+        $this->evidence_generator = $this->data_generator->get_plugin_generator('totara_evidence');
     }
 
     protected function tearDown(): void {
@@ -58,6 +64,7 @@ class totara_plan_components_testcase extends advanced_testcase {
         $this->data_generator = null;
         $this->plan_generator = null;
         $this->program_generator = null;
+        $this->evidence_generator = null;
         parent::tearDown();
     }
 
@@ -232,12 +239,10 @@ class totara_plan_components_testcase extends advanced_testcase {
         $course2 = $datagenerator->create_course();
 
         // Add Some evidence.
-        $data = array('userid' => $user->id);
-        $plangenerator = $datagenerator->get_plugin_generator('totara_plan');
-        $evidence1 = $plangenerator->create_evidence($data);
-        $evidence2 = $plangenerator->create_evidence($data);
-        $evidence3 = $plangenerator->create_evidence($data);
-        $evidence4 = $plangenerator->create_evidence($data);
+        $evidence1 = $this->evidence_generator->create_evidence_item_entity(['user_id' => $user->id]);
+        $evidence2 = $this->evidence_generator->create_evidence_item_entity(['user_id' => $user->id]);
+        $evidence3 = $this->evidence_generator->create_evidence_item_entity(['user_id' => $user->id]);
+        $evidence4 = $this->evidence_generator->create_evidence_item_entity(['user_id' => $user->id]);
 
         $hierarchygenerator->assign_linked_course_to_competency($competency1, $course1);
         $hierarchygenerator->assign_linked_course_to_competency($competency1, $course2);
@@ -313,13 +318,12 @@ class totara_plan_components_testcase extends advanced_testcase {
         $competency2 = $hierarchygenerator->create_hierarchy($competencyframework->id, 'competency', array('fullname' => 'Competency 2'));
 
         // Add Some evidence.
-        $data = array('userid' => $user->id);
-        $plangenerator = $datagenerator->get_plugin_generator('totara_plan');
-        $evidence1 = $plangenerator->create_evidence($data);
-        $evidence2 = $plangenerator->create_evidence($data);
-        $evidence3 = $plangenerator->create_evidence($data);
+        $evidence1 = $this->evidence_generator->create_evidence_item_entity(['user_id' => $user->id]);
+        $evidence2 = $this->evidence_generator->create_evidence_item_entity(['user_id' => $user->id]);
+        $evidence3 = $this->evidence_generator->create_evidence_item_entity(['user_id' => $user->id]);
 
         // Create a plan.
+        $plangenerator = $datagenerator->get_plugin_generator('totara_plan');
         $planrecord = $plangenerator->create_learning_plan(array('userid' => $user->id));
         $plan = new development_plan($planrecord->id);
 
@@ -419,9 +423,8 @@ class totara_plan_components_testcase extends advanced_testcase {
         $objectivecomponent->update_linked_components($objective1->id, 'course', $data);
 
         // Create some evidence.
-        $evidencedata = array('userid' => $user->id);
-        $evidence1 = $plangenerator->create_evidence($evidencedata);
-        $evidence2 = $plangenerator->create_evidence($evidencedata);
+        $evidence1 = $this->evidence_generator->create_evidence_item_entity(['user_id' => $user->id]);
+        $evidence2 = $this->evidence_generator->create_evidence_item_entity(['user_id' => $user->id]);
 
         // Assign evidence to objective.
         $evidence = new dp_evidence_relation($plan->id, 'objective', $objective1->id);
@@ -466,9 +469,8 @@ class totara_plan_components_testcase extends advanced_testcase {
         $plan = new development_plan($planrecord->id);
 
         // Create some evidence.
-        $evidencedata = array('userid' => $user->id);
-        $evidence1 = $plangenerator->create_evidence($evidencedata);
-        $evidence2 = $plangenerator->create_evidence($evidencedata);
+        $evidence1 = $this->evidence_generator->create_evidence_item_entity(['user_id' => $user->id]);
+        $evidence2 = $this->evidence_generator->create_evidence_item_entity(['user_id' => $user->id]);
 
         $programgenerator = $datagenerator->get_plugin_generator('totara_program');
         $program1 = $programgenerator->create_program();

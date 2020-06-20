@@ -26,6 +26,11 @@
  * Devplan linked evidence specific evidence dialog generator
  */
 
+use core\entities\user;
+use core\orm\entity\repository;
+use totara_evidence\entities\evidence_item;
+use totara_evidence\models\helpers\evidence_item_capability_helper;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/totara/core/dialogs/dialog_content.class.php');
@@ -38,7 +43,7 @@ class totara_dialog_linked_evidence_content_evidence extends totara_dialog_conte
      * @access  public
      * @var     string
      */
-    public $searchtype = 'dp_plan_evidence';
+    public $searchtype = 'evidence_item';
 
     /**
      * Loads the selected evidence for this component
@@ -58,7 +63,7 @@ class totara_dialog_linked_evidence_content_evidence extends totara_dialog_conte
         $sql = "
             SELECT e.id AS id, e.name AS fullname
             FROM {dp_plan_evidence_relation} er
-            JOIN {dp_plan_evidence} e ON e.id = er.evidenceid
+            JOIN {totara_evidence_item} e ON e.id = er.evidenceid
             WHERE er.planid = ?
             AND er.component = ?
             AND er.itemid = ?
@@ -70,19 +75,18 @@ class totara_dialog_linked_evidence_content_evidence extends totara_dialog_conte
 
     /**
      * Loads all the evidence available for this user
-     *
-     * @global type $DB
      */
     public function load_evidence($userid) {
-        global $DB, $USER;
+        $can_view_own_items_only = evidence_item_capability_helper::for_user($userid)->can_view_own_items_only();
 
-        $sql = "
-            SELECT e.id AS id, e.name AS fullname
-            FROM {dp_plan_evidence} e
-            WHERE e.userid = ?
-            ORDER BY e.name";
-        $params = array($userid);
-
-        $this->items = $DB->get_records_sql($sql, $params);
+        $this->items = evidence_item::repository()
+            ->select(['id', 'name AS fullname'])
+            ->where('user_id', $userid)
+            ->when($can_view_own_items_only, function (repository $repository) {
+                $repository->where('created_by', user::logged_in()->id);
+            })
+            ->order_by('name')
+            ->get()
+            ->all();
     }
 }

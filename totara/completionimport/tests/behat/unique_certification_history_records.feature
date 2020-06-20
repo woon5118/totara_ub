@@ -1,4 +1,4 @@
-@totara @totara_certification @totara_completion_upload @javascript @_file_upload
+@totara @totara_certification @totara_completion_upload @totara_evidence @javascript @_file_upload
 Feature: Certification history can be imported as long as records are considered unique
   Uploaded history records respect the certification history uniqueness rules
   Allowing an admin to create valid data
@@ -15,7 +15,7 @@ Feature: Certification history can be imported as long as records are considered
     Given I log in as "admin"
     When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
     And I upload "totara/completionimport/tests/behat/fixtures/certification_completion_history_similar_records.csv" file to "Certification CSV file to upload" filemanager
-    And I set the field "Upload certification Default evidence type" to "0"
+    And I set the field "Upload certification Create evidence" to "1"
     And I set the field "Upload certification Import action" to "Save to history"
     And I click on "Save" "button" in the ".totara_completionimport__uploadcertification_form" "css_element"
     Then I should see "Certification completion file successfully imported"
@@ -89,7 +89,7 @@ Feature: Certification history can be imported as long as records are considered
     Given I log in as "admin"
     When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
     And I upload "totara/completionimport/tests/behat/fixtures/certification_completion_history_matching_records.csv" file to "Certification CSV file to upload" filemanager
-    And I set the field "Upload certification Default evidence type" to "0"
+    And I set the field "Upload certification Create evidence" to "1"
     And I set the field "Upload certification Import action" to "Save to history"
     And I click on "Save" "button" in the ".totara_completionimport__uploadcertification_form" "css_element"
     Then I should see "Certification completion file successfully imported"

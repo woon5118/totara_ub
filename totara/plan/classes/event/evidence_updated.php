@@ -26,6 +26,8 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Event triggered when evidence updated.
+ *
+ * @deprecated since Totara 13
  */
 class evidence_updated extends \core\event\base {
     /**
@@ -36,10 +38,12 @@ class evidence_updated extends \core\event\base {
 
     /**
      * Create an event.
+     * @deprecated since Totara 13
      * @param \stdClass $instance
      * @return evidence_updated
      */
     public static function create_from_instance($instance) {
+        debugging('\totara_plan\event\evidence_updated has been deprecated and is no longer used, please use totara_evidence\event\evidence_item_updated instead.', DEBUG_DEVELOPER);
         $data = array(
             'objectid' => $instance->id,
             'context' => \context_system::instance(),
@@ -49,7 +53,6 @@ class evidence_updated extends \core\event\base {
         self::$preventcreatecall = false;
         /** @var evidence_updated $event */
         $event = self::create($data);
-        $event->add_record_snapshot('dp_plan_evidence', $instance);
         self::$preventcreatecall = true;
 
         return $event;

@@ -41,6 +41,7 @@ require_once($CFG->libdir . '/completionlib.php');
  * Class totara_completionimport_importcourse_testcase
  *
  * @group totara_completionimport
+ * @group totara_evidence
  */
 class totara_completionimport_importcourse_testcase extends advanced_testcase {
 
@@ -131,6 +132,8 @@ class totara_completionimport_importcourse_testcase extends advanced_testcase {
         // Time info for load testing - 4.4 minutes for 10,000 csv rows on postgresql.
         $generatorstop = time();
 
+        set_config('create_evidence', 1, 'totara_completionimport_' . $importname);
+
         $importstart = time();
         \totara_completionimport\csv_import::import($content, $importname, $importstart);
         $importstop = time();
@@ -138,7 +141,7 @@ class totara_completionimport_importcourse_testcase extends advanced_testcase {
         $importtablename = get_tablename($importname);
         $this->assertEquals(self::COUNT_CSV_ROWS + $countevidence, $DB->count_records($importtablename),
             'Record count mismatch in the import table ' . $importtablename);
-        $this->assertEquals($countevidence, $DB->count_records('dp_plan_evidence'),
+        $this->assertEquals($countevidence, $DB->count_records('totara_evidence_item'),
             'There should be two evidence records');
         $this->assertEquals(self::COUNT_CSV_ROWS, $DB->count_records('course_completions'),
             'Record count mismatch in the course_completions table');
@@ -202,7 +205,7 @@ class totara_completionimport_importcourse_testcase extends advanced_testcase {
         $import = end($importdata);
 
         $this->assertEmpty($import->importerrormsg,'There should be no import errors: ' . $import->importerrormsg);
-        $this->assertEquals(0, $DB->count_records('dp_plan_evidence'), 'Evidence should not be created');
+        $this->assertEquals(0, $DB->count_records('totara_evidence_item'), 'Evidence should not be created');
         $this->assertEquals($course1->id, $import->courseid, 'The course was not matched');
 
         //
@@ -224,7 +227,7 @@ class totara_completionimport_importcourse_testcase extends advanced_testcase {
         $import = end($importdata);
 
         $this->assertEmpty($import->importerrormsg,'There should be no import errors: ' . $import->importerrormsg);
-        $this->assertEquals(0, $DB->count_records('dp_plan_evidence'), 'Evidence should not be created');
+        $this->assertEquals(0, $DB->count_records('totara_evidence_item'), 'Evidence should not be created');
         $this->assertEquals($course1->id, $import->courseid, 'The course was not matched');
 
         //
@@ -246,7 +249,7 @@ class totara_completionimport_importcourse_testcase extends advanced_testcase {
         $import = end($importdata);
 
         $this->assertEmpty($import->importerrormsg,'There should be no import errors: ' . $import->importerrormsg);
-        $this->assertEquals(0, $DB->count_records('dp_plan_evidence'), 'Evidence should not be created');
+        $this->assertEquals(0, $DB->count_records('totara_evidence_item'), 'Evidence should not be created');
         $this->assertEquals($course2->id, $import->courseid, 'The course was not matched');
 
         //
@@ -268,7 +271,7 @@ class totara_completionimport_importcourse_testcase extends advanced_testcase {
         $import = end($importdata);
 
         $this->assertEmpty($import->importerrormsg,'There should be no import errors: ' . $import->importerrormsg);
-        $this->assertEquals(0, $DB->count_records('dp_plan_evidence'), 'Evidence should not be created');
+        $this->assertEquals(0, $DB->count_records('totara_evidence_item'), 'Evidence should not be created');
         $this->assertEquals($course2->id, $import->courseid, 'The course was not matched');
 
         //
@@ -284,13 +287,15 @@ class totara_completionimport_importcourse_testcase extends advanced_testcase {
         $data['grade'] = 77;
         $content .= implode(",", $data) . "\n";
 
+        set_config('create_evidence', 1, 'totara_completionimport_' . $importname);
+
         \totara_completionimport\csv_import::import($content, $importname, $importstart);
 
         $importdata = $DB->get_records($importtablename, null, 'id asc');
         $import = end($importdata);
 
         $this->assertEmpty($import->importerrormsg,'There should be no import errors: ' . $import->importerrormsg);
-        $this->assertEquals(1, $DB->count_records('dp_plan_evidence'), 'Evidence should be created');
+        $this->assertEquals(1, $DB->count_records('totara_evidence_item'), 'Evidence should be created');
         $this->assertEquals(null, $import->courseid, 'A courseid should not be set');
     }
 }

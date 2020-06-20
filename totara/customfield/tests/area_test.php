@@ -22,6 +22,9 @@
  * @package totara_customfield
  */
 
+/**
+ * @group totara_evidence
+ */
 class totara_customfield_area_testcase extends advanced_testcase {
 
     /**
@@ -50,7 +53,7 @@ class totara_customfield_area_testcase extends advanced_testcase {
                 'organisation' => array('organisation', 'organisation_filemgr'),
                 'competency' => array('competency', 'competency_filemgr'),
             ),
-            'totara_plan' => array(
+            'totara_evidence' => array(
                 'evidence' => array('evidence', 'evidence_filemgr')
             ),
             'totara_program' => array(

@@ -24,8 +24,12 @@
 
 require_once($CFG->libdir.'/formslib.php');
 
+/**
+ * @deprecated since Totara 13
+ */
 class edit_evidencetype_form extends moodleform {
     function definition() {
+        debugging('\edit_evidencetype_form has been deprecated and is no longer used, please use totara_evidence\forms\edit_type instead.', DEBUG_DEVELOPER);
         global $TEXTAREA_OPTIONS;
         $mform =& $this->_form;
 

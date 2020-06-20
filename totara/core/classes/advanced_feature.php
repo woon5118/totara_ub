@@ -122,6 +122,7 @@ class advanced_feature {
             'appraisals',
             'certifications',
             'competencies',
+            'evidence',
             'feedback360',
             'goals',
             'learningplans',

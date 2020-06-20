@@ -74,36 +74,18 @@ class upload_form extends moodleform {
         }
 
         if ($data->showdescription ?? false) {
-            // Get any evidence custom fields.
-            $evidence_customfields = get_evidence_customfields();
             $uploadintro = '';
-            $uploadcustomfieldsintro = '';
 
             if ($data->importname == 'course') {
                 $columnnames = implode(',', get_columnnames('course'));
                 $uploadintro = get_string('uploadcourseintro', 'totara_completionimport', $columnnames);
-
-                // If any available evidence custom fields, show them as a option.
-                if ($evidence_customfields) {
-                    $columnnames = implode(',', $evidence_customfields);
-                    $uploadcustomfieldsintro = get_string('uploadcoursecustomfieldsintro', 'totara_completionimport', $columnnames);
-                }
             } else if ($data->importname == 'certification') {
                 $columnnames = implode(',', get_columnnames('certification'));
                 $uploadintro = get_string('uploadcertificationintro', 'totara_completionimport', $columnnames);
-
-                // If any available evidence custom fields, show them as a option.
-                if ($evidence_customfields) {
-                    $columnnames = implode(',', $evidence_customfields);
-                    $uploadcustomfieldsintro = get_string('uploadcoursecustomfieldsintro', 'totara_completionimport', $columnnames);
-                }
             }
 
             if ($uploadintro !== '') {
                 $mform->addElement('html', \html_writer::tag('p', format_text($uploadintro, FORMAT_MOODLE, ['para' => false])));
-            }
-            if ($uploadcustomfieldsintro !== '') {
-                $mform->addElement('html', \html_writer::tag('p', format_text($uploadcustomfieldsintro, FORMAT_MOODLE, ['para' => false])));
             }
         }
 
@@ -126,38 +108,14 @@ class upload_form extends moodleform {
             $mform->addRule($upload_field, get_string('uploadfilerequired', 'totara_completionimport'), 'required');
         }
 
-        // Evidence type.
-        $options = $DB->get_records_select_menu('dp_evidence_type', null, null, 'sortorder', 'id, name');
-        $selector = array(-1 => get_string('donotcreateevidence', 'totara_completionimport'), 0 => get_string('creategenericevidence', 'totara_completionimport'));
-        $selectoptions = $selector + $options;
-        $mform->addElement('select', 'evidencetype', get_string('evidencetype', 'totara_completionimport'), $selectoptions,
-            array('aria-label' => get_string($field_aria_label, 'totara_completionimport', get_string('evidencetype', 'totara_completionimport'))));
-        $mform->setType('evidencetype', PARAM_INT);
-        $mform->addHelpButton('evidencetype', 'evidencetype', 'totara_completionimport');
-
-        // Evidence custom field for completion date.
-        $selectoptions = array(get_string('selectanevidencedatefield', 'totara_completionimport'));
-        $options = $DB->get_records('dp_plan_evidence_info_field', array('datatype' => 'datetime', 'hidden' => 0), 'sortorder');
-        foreach ($options as $option) {
-            $selectoptions[$option->shortname] = format_string($option->fullname);
-        }
-        $mform->addElement('select', 'evidencedatefield', get_string('evidencedatefield', 'totara_completionimport'), $selectoptions,
-            array('aria-label' => get_string($field_aria_label, 'totara_completionimport', get_string('evidencedatefield', 'totara_completionimport'))));
-        $mform->setType('evidencedatefield', PARAM_TEXT);
-        $mform->addHelpButton('evidencedatefield', 'evidencedatefield', 'totara_completionimport');
-        $mform->disabledIf('evidencedatefield', 'evidencetype', 'eq', -1);
-
-        // Evidence custom field for the import description.
-        $selectoptions = array(get_string('selectanevidencedescriptionfield', 'totara_completionimport'));
-        $options = $DB->get_records('dp_plan_evidence_info_field', array('datatype' => 'textarea', 'hidden' => 0), 'sortorder');
-        foreach ($options as $option) {
-            $selectoptions[$option->shortname] = format_string($option->fullname);
-        }
-        $mform->addElement('select', 'evidencedescriptionfield', get_string('evidencedescriptionfield', 'totara_completionimport'), $selectoptions,
-            array('aria-label' => get_string($field_aria_label, 'totara_completionimport', get_string('evidencedescriptionfield', 'totara_completionimport'))));
-        $mform->setType('evidencedescriptionfield', PARAM_TEXT);
-        $mform->addHelpButton('evidencedescriptionfield', 'evidencedescriptionfield', 'totara_completionimport');
-        $mform->disabledIf('evidencedescriptionfield', 'evidencetype', 'eq', -1);
+        $mform->addElement('advcheckbox', 'create_evidence', get_string('create_evidence', 'totara_completionimport'), '', [
+            'aria-label' => get_string(
+                $field_aria_label,
+                'totara_completionimport',
+                get_string('create_evidence', 'totara_completionimport')
+            ),
+        ]);
+        $mform->addHelpButton('create_evidence', 'create_evidence', 'totara_completionimport');
 
         $dateformats = get_dateformats();
         $mform->addElement('select', 'csvdateformat', get_string('csvdateformat', 'totara_completionimport'), $dateformats,

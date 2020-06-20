@@ -62,7 +62,7 @@ class question_evidencefromplan extends review {
                       FROM {dp_plan_evidence_relation} link
                       JOIN {dp_plan} pl
                         ON link.planid = pl.id
-                      JOIN {dp_plan_evidence} item
+                      JOIN {totara_evidence_item} item
                         ON link.evidenceid = item.id
                      WHERE pl.userid = ?
                        AND pl.status >= ?';
@@ -87,7 +87,7 @@ class question_evidencefromplan extends review {
                       FROM {'.$this->prefix.'_review_data} reviewdata
                       LEFT JOIN {dp_plan_evidence_relation} per
                         ON reviewdata.itemid = per.evidenceid
-                      LEFT JOIN {dp_plan_evidence} pe
+                      LEFT JOIN {totara_evidence_item} pe
                         ON per.evidenceid = pe.id
                      WHERE reviewdata.'.$this->prefix.'questfieldid = ?
                        AND reviewdata.'.$this->storage->answerfield.' '.$answerssql.'
@@ -143,7 +143,7 @@ class question_evidencefromplan extends review {
 
         $sql = 'SELECT DISTINCT pe.id, pe.name as fullname
                   FROM {' . $this->prefix . '_review_data} review_data
-                  JOIN {dp_plan_evidence} pe
+                  JOIN {totara_evidence_item} pe
                     ON review_data.itemid = pe.id
                   JOIN {dp_plan_evidence_relation} per
                     ON pe.id = per.evidenceid

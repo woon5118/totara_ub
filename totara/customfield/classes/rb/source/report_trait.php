@@ -75,9 +75,6 @@ trait report_trait {
                 case '{goal_personal}':
                     $joindata['custom_personal_goal'] = ['jointable' => 'goal_personal', 'cf_prefix' => 'goal_user', 'joinfield' => 'goal_userid'];
                     break;
-                case '{dp_plan_evidence}':
-                    $joindata['custom_evidence'] = ['jointable' => 'dp_plan_evidence', 'cf_prefix' => 'dp_plan_evidence', 'joinfield' => 'evidenceid'];
-                    break;
             }
         }
 
@@ -107,9 +104,6 @@ trait report_trait {
                 break;
             case '{goal_personal}':
                 $joindata['custom_personal_goal'] = ['jointable' => 'base', 'cf_prefix' => 'goal_user', 'joinfield' => 'goal_userid'];
-                break;
-            case '{dp_plan_evidence}':
-                $joindata['custom_evidence'] = ['jointable' => 'base', 'cf_prefix' => 'dp_plan_evidence', 'joinfield' => 'evidenceid'];
                 break;
         }
 

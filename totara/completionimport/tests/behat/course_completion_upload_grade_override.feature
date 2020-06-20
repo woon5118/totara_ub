@@ -24,18 +24,12 @@ Feature: Verify grade unit and override option when uploading course completion
     And I switch to "Columns" tab
     And I add the "Grade" column to the report
     And I press "Save changes"
-    And I navigate to "Manage embedded reports" node in "Site administration > Reports"
-    And I click on "Record of Learning: Evidence" "link"
-    And I switch to "Columns" tab
-    And I add the "Date completed" column to the report
-    And I add the "Time Created" column to the report
-    And I press "Save changes"
 
   Scenario Outline: Upload course completion with grade format and no override
     When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
     And I upload "totara/completionimport/tests/behat/fixtures/course_completion_3a.csv" file to "Course CSV file to upload" filemanager
     And I set the following fields to these values:
-      | Upload course Default evidence type | 0 |
+      | Upload course Create evidence  | 1            |
       | Upload course CSV Grade format | <grade_unit> |
       | Upload course Override current course completions | Never |
     And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
@@ -49,12 +43,12 @@ Feature: Verify grade unit and override option when uploading course completion
     Then the "completionimport_course" table should contain the following:
       | Line number | Course Shortname | Completion date | Grade                |
       | 2           | C1               | 2011-11-11      | <grade_imported_1st> |
-      | 3           | thisisevidence   | 2012-12-12      | 90                   |
+      | 3           | evidence_a       | 2012-12-12      | 90                   |
 
     When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
     And I upload "totara/completionimport/tests/behat/fixtures/course_completion_3b.csv" file to "Course CSV file to upload" filemanager
     And I set the following fields to these values:
-      | Upload course Default evidence type | 0 |
+      | Upload course Create evidence  | 1            |
       | Upload course CSV Grade format | <grade_unit> |
       | Upload course Override current course completions | Never |
     And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
@@ -68,12 +62,12 @@ Feature: Verify grade unit and override option when uploading course completion
     Then the "completionimport_course" table should contain the following:
       | Line number | Course Shortname | Completion date | Grade                |
       | 2           | C1               | 2016-06-06      | <grade_imported_2nd> |
-      | 3           | thisisevidence   | 2018-08-08      | 40                   |
+      | 3           | evidence_b       | 2018-08-08      | 40                   |
 
     When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
     And I upload "totara/completionimport/tests/behat/fixtures/course_completion_3c.csv" file to "Course CSV file to upload" filemanager
     And I set the following fields to these values:
-      | Upload course Default evidence type | 0 |
+      | Upload course Create evidence  | 1            |
       | Upload course CSV Grade format | <grade_unit> |
       | Upload course Override current course completions | Never |
     And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
@@ -87,12 +81,12 @@ Feature: Verify grade unit and override option when uploading course completion
     Then the "completionimport_course" table should contain the following:
       | Line number | Course Shortname | Completion date | Grade                |
       | 2           | C1               | 2003-03-03      | <grade_imported_3rd> |
-      | 3           | thisisevidence   | 2004-04-04      | 60                   |
+      | 3           | evidence_c       | 2004-04-04      | 60                   |
 
     When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
     And I upload "totara/completionimport/tests/behat/fixtures/course_completion_3d.csv" file to "Course CSV file to upload" filemanager
     And I set the following fields to these values:
-      | Upload course Default evidence type | 0 |
+      | Upload course Create evidence  | 1            |
       | Upload course CSV Grade format | <grade_unit> |
       | Upload course Override current course completions | Never |
     And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
@@ -105,7 +99,7 @@ Feature: Verify grade unit and override option when uploading course completion
     When I follow "Course import report"
     Then the "completionimport_course" table should contain the following:
       | Line number | Course Shortname | Completion date | Grade |
-      | 3           | thisisevidence   | 2004-04-04      | 20    |
+      | 3           | evidence_d       | 2004-04-04      | 20    |
 
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
@@ -121,41 +115,43 @@ Feature: Verify grade unit and override option when uploading course completion
       | 3 Mar 2003          | Course 1     | <grade_history_3rd>         |
 
     When I follow "Other Evidence"
-    And I click on "Time Created" "link" in the "plan_evidence" "table"
     Then the "plan_evidence" table should contain the following:
-      | Date completed | Name                              |
-      | 12 Dec 2012    | Completed course : thisisevidence |
-      | 8 Aug 2018     | Completed course : thisisevidence |
-      | 4 Apr 2004     | Completed course : thisisevidence |
-    And I should see "4 Apr 2004" in the "#plan_evidence tr:nth-child(3)" "css_element"
-    And I should see "4 Apr 2004" in the "#plan_evidence tr:nth-child(4)" "css_element"
+      | Name                          |
+      | Completed course : evidence_a |
+      | Completed course : evidence_b |
+      | Completed course : evidence_c |
+      | Completed course : evidence_d |
 
-    When I click on "Completed course : thisisevidence" "link" in the "12 Dec 2012" "table_row"
-    Then I should see "Completed course : thisisevidence"
-    And I should see "Course ID number : notacourse"
-    And I should see "Grade : 90"
-    And I should see "Date completed : 12 December 2012"
-
-    When I press the "back" button in the browser
-    And I click on "Completed course : thisisevidence" "link" in the "8 Aug 2018" "table_row"
-    Then I should see "Completed course : thisisevidence"
-    And I should see "Course ID number : notacourse"
-    And I should see "Grade : 40"
-    And I should see "Date completed : 8 August 2018"
+    When I click on "Completed course : evidence_a" "link"
+    Then I should see "Completed course : evidence_a"
+    And I should see "evidence_a" in the "Course short name" evidence item field
+    And I should see "notacourse" in the "Course ID number" evidence item field
+    And I should see "12 December 2012" in the "Completion date" evidence item field
+    And I should see "90" in the "Grade" evidence item field
 
     When I press the "back" button in the browser
-    And I click on "Completed course : thisisevidence" "link" in the "#plan_evidence tr:nth-child(3)" "css_element"
-    Then I should see "Completed course : thisisevidence"
-    And I should see "Course ID number : notacourse"
-    And I should see "Grade : 60"
-    And I should see "Date completed : 4 April 2004"
+    And I click on "Completed course : evidence_b" "link"
+    Then I should see "Completed course : evidence_b"
+    And I should see "evidence_b" in the "Course short name" evidence item field
+    And I should see "notacourse" in the "Course ID number" evidence item field
+    And I should see "8 August 2018" in the "Completion date" evidence item field
+    And I should see "40" in the "Grade" evidence item field
 
     When I press the "back" button in the browser
-    And I click on "Completed course : thisisevidence" "link" in the "#plan_evidence tr:nth-child(4)" "css_element"
-    Then I should see "Completed course : thisisevidence"
-    And I should see "Course ID number : notacourse"
-    And I should see "Grade : 20"
-    And I should see "Date completed : 4 April 2004"
+    And I click on "Completed course : evidence_c" "link"
+    Then I should see "Completed course : evidence_c"
+    And I should see "evidence_c" in the "Course short name" evidence item field
+    And I should see "notacourse" in the "Course ID number" evidence item field
+    And I should see "4 April 2004" in the "Completion date" evidence item field
+    And I should see "60" in the "Grade" evidence item field
+
+    When I press the "back" button in the browser
+    And I click on "Completed course : evidence_d" "link"
+    Then I should see "Completed course : evidence_d"
+    And I should see "evidence_d" in the "Course short name" evidence item field
+    And I should see "notacourse" in the "Course ID number" evidence item field
+    And I should see "4 April 2004" in the "Completion date" evidence item field
+    And I should see "20" in the "Grade" evidence item field
 
     When I navigate to my "CCIH report" report
     Then the "ccih_report" table should contain the following:
@@ -173,7 +169,7 @@ Feature: Verify grade unit and override option when uploading course completion
     When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
     And I upload "totara/completionimport/tests/behat/fixtures/course_completion_3a.csv" file to "Course CSV file to upload" filemanager
     And I set the following fields to these values:
-      | Upload course Default evidence type | 0 |
+      | Upload course Create evidence  | 1            |
       | Upload course CSV Grade format | <grade_unit> |
       | Upload course Override current course completions | Always |
     And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
@@ -187,12 +183,12 @@ Feature: Verify grade unit and override option when uploading course completion
     Then the "completionimport_course" table should contain the following:
       | Line number | Course Shortname | Completion date | Grade                |
       | 2           | C1               | 2011-11-11      | <grade_imported_1st> |
-      | 3           | thisisevidence   | 2012-12-12      | 90                   |
+      | 3           | evidence_a       | 2012-12-12      | 90                   |
 
     When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
     And I upload "totara/completionimport/tests/behat/fixtures/course_completion_3b.csv" file to "Course CSV file to upload" filemanager
     And I set the following fields to these values:
-      | Upload course Default evidence type | 0 |
+      | Upload course Create evidence  | 1            |
       | Upload course CSV Grade format | <grade_unit> |
       | Upload course Override current course completions | Always |
     And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
@@ -206,12 +202,12 @@ Feature: Verify grade unit and override option when uploading course completion
     Then the "completionimport_course" table should contain the following:
       | Line number | Course Shortname | Completion date | Grade                |
       | 2           | C1               | 2016-06-06      | <grade_imported_2nd> |
-      | 3           | thisisevidence   | 2018-08-08      | 40                   |
+      | 3           | evidence_b       | 2018-08-08      | 40                   |
 
     When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
     And I upload "totara/completionimport/tests/behat/fixtures/course_completion_3c.csv" file to "Course CSV file to upload" filemanager
     And I set the following fields to these values:
-      | Upload course Default evidence type | 0 |
+      | Upload course Create evidence  | 1            |
       | Upload course CSV Grade format | <grade_unit> |
       | Upload course Override current course completions | Always |
     And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
@@ -225,12 +221,12 @@ Feature: Verify grade unit and override option when uploading course completion
     Then the "completionimport_course" table should contain the following:
       | Line number | Course Shortname | Completion date | Grade                |
       | 2           | C1               | 2003-03-03      | <grade_imported_3rd> |
-      | 3           | thisisevidence   | 2004-04-04      | 60                   |
+      | 3           | evidence_c       | 2004-04-04      | 60                   |
 
     When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
     And I upload "totara/completionimport/tests/behat/fixtures/course_completion_3d.csv" file to "Course CSV file to upload" filemanager
     And I set the following fields to these values:
-      | Upload course Default evidence type | 0 |
+      | Upload course Create evidence  | 1            |
       | Upload course CSV Grade format | <grade_unit> |
       | Upload course Override current course completions | Always |
     And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
@@ -244,7 +240,7 @@ Feature: Verify grade unit and override option when uploading course completion
     Then the "completionimport_course" table should contain the following:
       | Line number | Course Shortname | Completion date | Grade                |
       | 2           | C1               | 2003-03-03      | <grade_imported_4th> |
-      | 3           | thisisevidence   | 2004-04-04      | 20                   |
+      | 3           | evidence_d       | 2004-04-04      | 20                   |
 
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
@@ -256,15 +252,13 @@ Feature: Verify grade unit and override option when uploading course completion
       | Course Title | Previous Completions | Previous Completions | Previous Completions | Previous Completions |
       | Course 1     | 1                    | 2                    | 3                    | 4                    |
 
-    When I switch to "Other Evidence" tab
-    And I click on "Time Created" "link" in the "plan_evidence" "table"
+    When I follow "Other Evidence"
     Then the "plan_evidence" table should contain the following:
-      | Date completed | Name                              |
-      | 12 Dec 2012    | Completed course : thisisevidence |
-      | 8 Aug 2018     | Completed course : thisisevidence |
-      | 4 Apr 2004     | Completed course : thisisevidence |
-    And I should see "4 Apr 2004" in the "#plan_evidence tr:nth-child(3)" "css_element"
-    And I should see "4 Apr 2004" in the "#plan_evidence tr:nth-child(4)" "css_element"
+      | Name                          |
+      | Completed course : evidence_a |
+      | Completed course : evidence_b |
+      | Completed course : evidence_c |
+      | Completed course : evidence_d |
     # Repetitive steps omitted
 
     When I navigate to my "CCIH report" report
@@ -281,7 +275,7 @@ Feature: Verify grade unit and override option when uploading course completion
     When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
     And I upload "totara/completionimport/tests/behat/fixtures/course_completion_3a.csv" file to "Course CSV file to upload" filemanager
     And I set the following fields to these values:
-      | Upload course Default evidence type | 0 |
+      | Upload course Create evidence  | 1            |
       | Upload course CSV Grade format | <grade_unit> |
       | Upload course Override current course completions | Never |
     And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
@@ -295,12 +289,12 @@ Feature: Verify grade unit and override option when uploading course completion
     Then the "completionimport_course" table should contain the following:
       | Line number | Course Shortname | Completion date | Grade                |
       | 2           | C1               | 2011-11-11      | <grade_imported_1st> |
-      | 3           | thisisevidence   | 2012-12-12      | 90                   |
+      | 3           | evidence_a       | 2012-12-12      | 90                   |
 
     When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
     And I upload "totara/completionimport/tests/behat/fixtures/course_completion_3b.csv" file to "Course CSV file to upload" filemanager
     And I set the following fields to these values:
-      | Upload course Default evidence type | 0 |
+      | Upload course Create evidence  | 1            |
       | Upload course CSV Grade format | <grade_unit> |
       | Upload course Override current course completions | If more recent |
     And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
@@ -314,12 +308,12 @@ Feature: Verify grade unit and override option when uploading course completion
     Then the "completionimport_course" table should contain the following:
       | Line number | Course Shortname | Completion date | Grade                |
       | 2           | C1               | 2016-06-06      | <grade_imported_2nd> |
-      | 3           | thisisevidence   | 2018-08-08      | 40                   |
+      | 3           | evidence_b       | 2018-08-08      | 40                   |
 
     When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
     And I upload "totara/completionimport/tests/behat/fixtures/course_completion_3c.csv" file to "Course CSV file to upload" filemanager
     And I set the following fields to these values:
-      | Upload course Default evidence type | 0 |
+      | Upload course Create evidence  | 1            |
       | Upload course CSV Grade format | <grade_unit> |
       | Upload course Override current course completions | If more recent |
     And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
@@ -333,12 +327,12 @@ Feature: Verify grade unit and override option when uploading course completion
     Then the "completionimport_course" table should contain the following:
       | Line number | Course Shortname | Completion date | Grade                |
       | 2           | C1               | 2003-03-03      | <grade_imported_3rd> |
-      | 3           | thisisevidence   | 2004-04-04      | 60                   |
+      | 3           | evidence_c       | 2004-04-04      | 60                   |
 
     When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
     And I upload "totara/completionimport/tests/behat/fixtures/course_completion_3d.csv" file to "Course CSV file to upload" filemanager
     And I set the following fields to these values:
-      | Upload course Default evidence type | 0 |
+      | Upload course Create evidence  | 1            |
       | Upload course CSV Grade format | <grade_unit> |
       | Upload course Override current course completions | If more recent |
     And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
@@ -351,7 +345,7 @@ Feature: Verify grade unit and override option when uploading course completion
     When I follow "Course import report"
     Then the "completionimport_course" table should contain the following:
       | Line number | Course Shortname | Completion date | Grade |
-      | 3           | thisisevidence   | 2004-04-04      | 20    |
+      | 3           | evidence_d       | 2004-04-04      | 20    |
 
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
@@ -369,14 +363,12 @@ Feature: Verify grade unit and override option when uploading course completion
       | 6 Jun 2016          |
 
     When I follow "Other Evidence"
-    And I click on "Time Created" "link" in the "plan_evidence" "table"
     Then the "plan_evidence" table should contain the following:
-      | Date completed | Name                              |
-      | 12 Dec 2012    | Completed course : thisisevidence |
-      | 8 Aug 2018     | Completed course : thisisevidence |
-      | 4 Apr 2004     | Completed course : thisisevidence |
-    And I should see "4 Apr 2004" in the "#plan_evidence tr:nth-child(3)" "css_element"
-    And I should see "4 Apr 2004" in the "#plan_evidence tr:nth-child(4)" "css_element"
+      | Name                          |
+      | Completed course : evidence_a |
+      | Completed course : evidence_b |
+      | Completed course : evidence_c |
+      | Completed course : evidence_d |
     # Repetitive steps omitted
 
     When I navigate to my "CCIH report" report

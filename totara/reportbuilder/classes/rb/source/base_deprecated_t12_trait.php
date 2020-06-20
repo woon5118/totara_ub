@@ -2070,9 +2070,7 @@ trait base_deprecated_t12_trait {
                                                   array &$filteroptions, $basetable = 'dp_plan_evidence') {
 
         debugging(__FUNCTION__ . ' is deprecated. Please use add_totara_customfield_component in totara_customfield\rb\source\report_trait instead', DEBUG_DEVELOPER);
-
-        $trait = $this->get_bc_trait_instance();
-        return $trait->add_totara_customfield_component('dp_plan_evidence',  $basetable, 'evidenceid', $joinlist, $columnoptions, $filteroptions);
+        throw new \coding_exception('\totara_reportbuilder\rb\source\base_deprecated_t12_trait::add_custom_evidence_fields is deprecated. Please use add_totara_customfield_component in totara_customfield\rb\source\report_trait instead');
     }
 
     /**

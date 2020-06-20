@@ -63,6 +63,8 @@ information provided here is intended especially for developers.
 * totara_display_course_progress_bar() added fourth argument $hideifnotactive
 * totara_export_course_progress() added fourth argument $hideifnotactive
 * Updated totara_core/select_search_text template, changing remove text string
+* Changed class totara_dialog_content_plan_evidence and file totara/core/dialogs/search.php to use the new totara evidence tables
+    and totara/core/dialogs/search.php now searches the text and text area content of evidence in addition to just the name.
 
 === 12.0 ===
 

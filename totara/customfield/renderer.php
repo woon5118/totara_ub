@@ -44,6 +44,9 @@ class totara_customfield_renderer extends plugin_renderer_base {
     * @return string HTML to output.
     */
     public function totara_customfield_print_list($fields, $can_manage, $options, $urlbase, $paramsurlbase) {
+        global $CFG;
+        require_once($CFG->dirroot . '/totara/customfield/lib.php');
+
         $table = new \html_table();
         $table->head  = array(get_string('customfield', 'totara_customfield'), get_string('type', 'totara_hierarchy'));
 
@@ -63,7 +66,7 @@ class totara_customfield_renderer extends plugin_renderer_base {
 
             $helpicon = $reserved ? $this->output->help_icon('customfieldshortnamereserved', 'totara_customfield') : '';
             $class    = $field->hidden ? 'dimmed_text' : '';
-            $fullname = \html_writer::span(format_string($field->fullname), $class);
+            $fullname = \html_writer::span(customfield_format_fullname($field->fullname, $paramsurlbase['prefix']), $class);
             $row = array($fullname.$helpicon, get_string('customfieldtype'.$field->datatype, 'totara_customfield'));
             if ($can_manage) {
                 $row[] = $this->customfield_edit_icons($field, $fieldcount, $urlbase, $paramsurlbase, $can_manage, $position);
@@ -132,6 +135,9 @@ class totara_customfield_renderer extends plugin_renderer_base {
             case 'course':
                 return 'coursecustomfields';
                 break;
+            case 'evidence':
+                return 'manage_evidence_types';
+                break;
             default:
                 return $prefix . 'typemanage';
                 break;
@@ -146,6 +152,9 @@ class totara_customfield_renderer extends plugin_renderer_base {
      * @return array
      */
     public function get_navbar($prefix, $fullname) {
+        global $CFG;
+        require_once($CFG->dirroot . '/totara/customfield/lib.php');
+
         $navbar = array();
         switch ($prefix) {
             case 'program':
@@ -160,7 +169,7 @@ class totara_customfield_renderer extends plugin_renderer_base {
                     new moodle_url('/totara/hierarchy/type/index.php',
                     array('prefix' => $prefix))
                 );
-                $navbar[] = array(format_string($fullname));
+                $navbar[] = array(customfield_format_fullname($fullname, $prefix));
                 break;
         }
         return $navbar;
@@ -203,9 +212,6 @@ class totara_customfield_renderer extends plugin_renderer_base {
             case 'course':
                 $strheading = get_string('coursecustomfields', 'totara_customfield');
                 break;
-            case 'evidence':
-                $strheading = get_string('availableevdiencecustomfields', 'totara_customfield');
-                break;
             default:
                 $strheading = format_string($heading);
                 break;
@@ -231,9 +237,10 @@ class totara_customfield_renderer extends plugin_renderer_base {
      *
      * @param $prefix
      * @param $urlparams
+     * @param $action
      * @return string
      */
-    public function customfield_tabs_link($prefix, $urlparams) {
+    public function customfield_tabs_link($prefix, $urlparams, $action = null) {
         switch ($prefix) {
             case 'program':
             case 'course':
@@ -247,6 +254,13 @@ class totara_customfield_renderer extends plugin_renderer_base {
                 $urlbase = new moodle_url('/totara/hierarchy/type/index.php', $urlparams);
                 $text = "&laquo; " . get_string('alltypes', 'totara_hierarchy');
                 return html_writer::tag('p', $this->output->action_link($urlbase, $text));
+                break;
+            case 'evidence':
+                // Evidence types requires both link and tabs so we use a custom header
+                return $this->output->render(\totara_evidence\output\header::create_for_type(
+                    \totara_evidence\models\evidence_type::load_by_id($urlparams['typeid']),
+                    $action === 'showlist', 'custom_fields'
+                ));
                 break;
             default:
                 return '';

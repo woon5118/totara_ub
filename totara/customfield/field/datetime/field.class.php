@@ -47,9 +47,9 @@ class customfield_datetime extends customfield_base {
 
         // Check if they wanted to include time as well
         if (!empty($this->field->param3)) {
-            $mform->addElement('date_time_selector', $this->inputname, format_string($this->field->fullname), $attributes);
+            $mform->addElement('date_time_selector', $this->inputname, $this->get_display_fullname(), $attributes);
         } else {
-            $mform->addElement('date_selector', $this->inputname, format_string($this->field->fullname), $attributes);
+            $mform->addElement('date_selector', $this->inputname, $this->get_display_fullname(), $attributes);
         }
     }
 

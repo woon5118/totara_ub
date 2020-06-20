@@ -39,4 +39,4 @@ Feature: Check Record of Learning feature visibility
     And I navigate to "Manage users" node in "Site administration > Users"
     And I click on "test user" "link"
     And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
-    Then I should see "0 records shown"
+    Then I should see "There are no records to display"

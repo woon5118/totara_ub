@@ -1,4 +1,4 @@
-@totara @totara_customfield @totara_completion_upload @javascript @_file_upload
+@totara @totara_customfield @totara_completion_upload @totara_evidence @javascript @_file_upload
 Feature: Verify the case insensitive shortnames for certification completion imports works as expected
   As an admin
   I import certification completions with case mismatches
@@ -46,7 +46,7 @@ Feature: Verify the case insensitive shortnames for certification completion imp
     When I log in as "admin"
     And I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
     And I upload "totara/completionimport/tests/behat/fixtures/certification_mismatch_fields_1.csv" file to "Certification CSV file to upload" filemanager
-    And I set the field "Upload certification Default evidence type" to "0"
+    And I set the field "Upload certification Create evidence" to "1"
     And I click on "Show more" "link" in the ".totara_completionimport__uploadcertification_form" "css_element"
     And I set the field "Upload certification Case insensitive shortnames" to "1"
     And I click on "Save" "button" in the ".totara_completionimport__uploadcertification_form" "css_element"
@@ -71,11 +71,8 @@ Feature: Verify the case insensitive shortnames for certification completion imp
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
     And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
-    Then I should see "Record of Learning for Bob1 Learner1 : Other Evidence"
-    And I should see "0 records shown"
-
-    When I click on "Certifications" "link" in the "#dp-plan-content" "css_element"
-    Then "Certification 1" row "Previous completions" column of "plan_certifications" table should contain "1"
+    Then I should not see "Other Evidence" in the ".tabtree" "css_element"
+    And "Certification 1" row "Previous completions" column of "plan_certifications" table should contain "1"
     And "Certification 2" row "Previous completions" column of "plan_certifications" table should contain "1"
 
     When I navigate to "Manage users" node in "Site administration > Users"
@@ -99,11 +96,10 @@ Feature: Verify the case insensitive shortnames for certification completion imp
     And "Certification 2" row "Previous completions" column of "plan_certifications" table should contain "0"
 
   Scenario: Basic certification completion import case insensitive is turned off
-
     When I log in as "admin"
     And I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
     And I upload "totara/completionimport/tests/behat/fixtures/certification_mismatch_fields_1.csv" file to "Certification CSV file to upload" filemanager
-    And I set the field "Upload certification Default evidence type" to "0"
+    And I set the field "Upload certification Create evidence" to "1"
     And I click on "Save" "button" in the ".totara_completionimport__uploadcertification_form" "css_element"
     Then I should see "Certification completion file successfully imported"
     And I should see "12 Records imported pending processing"
@@ -136,11 +132,8 @@ Feature: Verify the case insensitive shortnames for certification completion imp
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob1 Learner1"
     And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
-    Then I should see "Record of Learning for Bob1 Learner1 : Other Evidence"
-    And I should see "0 records shown"
-
-    When I click on "Certifications" "link" in the "#dp-plan-content" "css_element"
-    Then "Certification 1" row "Previous completions" column of "plan_certifications" table should contain "0"
+    Then I should not see "Other Evidence" in the ".tabtree" "css_element"
+    And "Certification 1" row "Previous completions" column of "plan_certifications" table should contain "0"
     And "Certification 2" row "Previous completions" column of "plan_certifications" table should contain "0"
 
     When I navigate to "Manage users" node in "Site administration > Users"
@@ -156,9 +149,6 @@ Feature: Verify the case insensitive shortnames for certification completion imp
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob8 Learner8"
     And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
-    Then I should see "Record of Learning for Bob8 Learner8 : Other Evidence"
-    And I should see "0 records shown"
-
-    When I click on "Certifications" "link" in the "#dp-plan-content" "css_element"
-    Then "Certification 1" row "Previous completions" column of "plan_certifications" table should contain "0"
+    Then I should not see "Other Evidence" in the ".tabtree" "css_element"
+    And "Certification 1" row "Previous completions" column of "plan_certifications" table should contain "0"
     And "Certification 2" row "Previous completions" column of "plan_certifications" table should contain "0"

@@ -55,7 +55,7 @@ Feature: User reassignment to a certification
     And I log out
     And I log in as "jimmy"
     And I click on "Record of Learning" in the totara menu
-    Then I should not see "Certifications" in the ".tabtree" "css_element"
+    Then I should see "There are no records to display"
     And I log out
     And I log in as "admin"
 
@@ -144,7 +144,7 @@ Feature: User reassignment to a certification
     And I log out
     And I log in as "jimmy"
     And I click on "Record of Learning" in the totara menu
-    Then I should not see "Certifications" in the ".tabtree" "css_element"
+    Then I should see "There are no records to display"
 
     # And I reassign jimmy.
     And I log out
@@ -316,7 +316,7 @@ Feature: User reassignment to a certification
     And I log out
     And I log in as "jimmy"
     And I click on "Record of Learning" in the totara menu
-    Then I should not see "Certifications" in the ".tabtree" "css_element"
+    Then I should see "There are no records to display"
 
     # And I reassign jimmy.
     And I log out

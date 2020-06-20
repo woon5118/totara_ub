@@ -92,7 +92,7 @@ class customfield_menu extends customfield_base {
             $mform->addElement(
                 'static',
                 'freezedisplay',
-                format_string($this->field->fullname),
+                $this->get_display_fullname(),
                 html_writer::div(
                     !empty($this->data) ? format_text($this->data) : get_string('readonlyemptyfield', 'totara_customfield'),
                     null,
@@ -100,7 +100,7 @@ class customfield_menu extends customfield_base {
                 )
             )->set_allow_xss(true);
         } else {
-            $mform->addElement('select', $this->inputname, format_string($this->field->fullname), $this->formoptions);
+            $mform->addElement('select', $this->inputname, $this->get_display_fullname(), $this->formoptions);
         }
     }
 

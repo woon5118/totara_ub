@@ -28,7 +28,7 @@ class customfield_text extends customfield_base {
         $size = $this->field->param1;
         $maxlength = $this->field->param2;
         $fieldtype = ($this->field->param3 == 1 ? 'password' : 'text');
-        $fullname = format_string($this->field->fullname);
+        $fullname = $this->get_display_fullname();
         $regex = '';
         if (!empty($this->field->param4) && $param4 = json_decode($this->field->param4, true)) {
             $regex = !empty($param4['regex']) ? $param4['regex'] : '';

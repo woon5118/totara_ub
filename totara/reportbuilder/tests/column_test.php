@@ -332,15 +332,6 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
         'priority' => 10, 'duedate' => 1234567890, 'scalevalueid' => 1, 'approved' => 10,
     );
 
-    protected $dp_plan_evidence_type_data = array(
-        'id' => 1, 'name' => 'plan evidence type', 'description' => 'plan evidence description', 'timemodified' => 0, 'usermodified' => 2, 'sortorder' => 1,
-    );
-
-    protected $dp_plan_evidence_data = array(
-        'name' => 'plan evidence', 'description' => 'plan evidence description', 'timecreated' => 0, 'timemodified' => 0, 'usermodified' => 2,
-        'evidencetypeid' => 1, 'evidencelink' => 1, 'institution' => 'plan evidence institution', 'datecompleted' => 0, 'userid' => 2, 'readonly' => 0,
-    );
-
     protected $dp_plan_evidence_relation_data = array(
         'id' => 1, 'evidenceid' => 1, 'planid' => 1, 'component' => 'competency', 'itemid' => 1,
     );
@@ -660,8 +651,6 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
         $this->dp_plan_competency_assign_data = null;
         $this->dp_plan_course_assign_data = null;
         $this->dp_plan_objective_data = null;
-        $this->dp_plan_evidence_type_data = null;
-        $this->dp_plan_evidence_data = null;
         $this->dp_plan_evidence_relation_data = null;
         $this->dp_plan_component_relation_data = null;
         $this->cohort_data = null;
@@ -793,8 +782,6 @@ class totara_reportbuilder_column_testcase extends reportcache_advanced_testcase
             'dp_plan_competency_assign' => array($this->dp_plan_competency_assign_data),
             'dp_plan_course_assign' => array($this->dp_plan_course_assign_data),
             'dp_plan_objective' => array($this->dp_plan_objective_data),
-            'dp_evidence_type' => array($this->dp_plan_evidence_type_data),
-            'dp_plan_evidence' => array($this->dp_plan_evidence_data),
             'dp_plan_evidence_relation' => array($this->dp_plan_evidence_relation_data),
             'dp_plan_component_relation' => array($this->dp_plan_component_relation_data),
             'cohort' => array($this->cohort_data),

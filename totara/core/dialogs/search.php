@@ -499,36 +499,32 @@ switch ($searchtype) {
     /**
      * Evidence search
      */
-    case 'dp_plan_evidence':
+    case 'evidence_item':
         // Generate search SQL
+        $userid = $this->customdata['userid'] ?? $USER->id;
         $keywords = totara_search_parse_keywords($query);
-        $fields = array('e.name', 'eid.data');
-        list($searchsql, $params) = totara_search_get_keyword_where_clause($keywords, $fields);
+        list($name_search_sql, $name_params) = totara_search_get_keyword_where_clause($keywords, ['item.name']);
+        list($text_search_sql, $text_params) = totara_search_get_keyword_where_clause($keywords, ['data.data']);
 
-        $search_info->id = 'e.id';
-        $search_info->fullname = 'e.name';
-        $search_info->sql = "
-              FROM {dp_plan_evidence} e
-         LEFT JOIN {dp_plan_evidence_info_field} eif
-                ON eif.shortname = 'evidencedescription'
-         LEFT JOIN {dp_plan_evidence_info_data} eid
-                ON eid.fieldid = eif.id AND eid.evidenceid = e.id
-             WHERE {$searchsql}
-               AND e.userid = ?
-        ";
-        // This query is weird. It first joins the main table to every field record which is a description (if it exists),
-        // then the second join joins on both the main record's id and the field's id.
-        // TODO TL-10834 "evidencedescription" is a custom field, so can be removed or renamed, and some other field could
-        // even be renamed to this name. Might make more sense to be searching all text/textarea custom fields instead?
-
-        $search_info->order = " ORDER BY e.name";
-        if (!empty($this->customdata['userid'])) {
-            $params[] = $this->customdata['userid'];
-        } else {
-            $params[] = $USER->id;
+        $user_where_sql = 'AND item.user_id = ' . $userid;
+        if (\totara_evidence\models\helpers\evidence_item_capability_helper::for_user($userid)->can_view_own_items_only()) {
+            $user_where_sql .= ' AND item.created_by = ' . $USER->id;
         }
 
-        $search_info->params = $params;
+        // We want to search the name of the evidence item, as well as the text inside any of it's text or text area fields
+        $names_and_text_search_sql = "FROM (
+            SELECT DISTINCT item.* FROM {totara_evidence_item} item
+            LEFT JOIN {totara_evidence_type_info_data} data ON item.id = data.evidenceid
+            LEFT JOIN {totara_evidence_type_info_field} field ON data.fieldid = field.id 
+            WHERE ({$name_search_sql} OR ({$text_search_sql} AND field.datatype IN ('text', 'textarea')))
+            {$user_where_sql}
+        ) evidence";
+
+        $search_info->id = 'evidence.id';
+        $search_info->fullname = 'evidence.name';
+        $search_info->sql = $names_and_text_search_sql;
+        $search_info->order = " ORDER BY evidence.name";
+        $search_info->params = array_merge($name_params, $text_params);
         break;
 
     case 'temporary_manager':

@@ -42,6 +42,10 @@ Feature: Verify capability manageanyplan.
       | learner1 | learner1 Learning Plan | Objective 1 |
       | learner1 | learner1 Learning Plan | Objective 2 |
       | learner1 | learner1 Learning Plan | Objective 3 |
+    And the following "evidence" exist in "totara_evidence" plugin:
+      | user       | name          |
+      | learner1   | My Evidence 1 |
+      | learner1   | My Evidence 2 |
 
     # Login as admin and give the site manager the manageanyplan capability.
     When I log in as "admin"
@@ -53,22 +57,7 @@ Feature: Verify capability manageanyplan.
     And I press "Save changes"
     Then I log out
 
-    # Log in as the learner and create some evidence.
-    When I log in as "learner1"
-    And I click on "Record of Learning" in the totara menu
-    And I press "Add evidence"
-    And I set the following fields to these values:
-      | Evidence name        | My Evidence 1                  |
-    And I press "Add evidence"
-    Then I should see "Evidence created"
-
-    When I press "Add evidence"
-    And I set the following fields to these values:
-      | Evidence name        | My Evidence 2                  |
-    And I press "Add evidence"
-    Then I should see "Evidence created"
-    And I log out
-
+  @javascript
   Scenario: Check a user can access and approve the plan with manageanyplan capability.
 
     # Login as the learner and navigate to the learning plan.
@@ -124,6 +113,7 @@ Feature: Verify capability manageanyplan.
     Then I should see "You are viewing firstname1 lastname1's plan"
     And I should see "Plan \"learner1 Learning Plan\" has been approved"
 
+  @javascript
   Scenario: Check a user can amend plan courses with manageanyplan capability.
 
     # As the manager, access the learners plans.
@@ -201,6 +191,7 @@ Feature: Verify capability manageanyplan.
     And I click on "Remove selected links" "button" in the "#dp-component-evidence-container" "css_element"
     Then I should see "The selected linked evidence have been removed from this course"
 
+  @javascript
   Scenario: Check a user can amend plan competencies with manageanyplan capability.
 
     # As the manager, access the learners plans.
@@ -274,6 +265,7 @@ Feature: Verify capability manageanyplan.
     And I click on "Remove selected links" "button" in the "#dp-component-evidence-container" "css_element"
     Then I should see "The selected linked evidence have been removed from this competency"
 
+  @javascript
   Scenario: Check a user can amend plan objectives with manageanyplan capability.
 
     # As the manager, access the learners plans.
@@ -341,6 +333,7 @@ Feature: Verify capability manageanyplan.
     And I click on "Remove selected links" "button" in the "#dp-component-evidence-container" "css_element"
     Then I should see "The selected linked evidence have been removed from this objective"
 
+  @javascript
   Scenario: Check a user can amend plan programs with manageanyplan capability.
 
     # As the manager, access the learners plans.

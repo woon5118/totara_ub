@@ -83,6 +83,16 @@ class customfield_base {
         print_error('error:abstractmethod', 'totara_customfield');
     }
 
+    /**
+     * Get the full name of this field
+     *
+     * @return string
+     */
+    protected function get_display_fullname() {
+        global $CFG;
+        require_once($CFG->dirroot . '/totara/customfield/lib.php');
+        return customfield_format_fullname($this->field->fullname, $this->prefix);
+    }
 
 /***** The following methods may be overwritten by child classes *****/
 

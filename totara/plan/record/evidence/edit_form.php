@@ -35,6 +35,9 @@ if (!defined('MOODLE_INTERNAL')) {
 require_once("{$CFG->libdir}/formslib.php");
 require_once("{$CFG->libdir}/uploadlib.php");
 
+/**
+ * @deprecated since Totara 13
+ */
 class plan_evidence_edit_form extends moodleform {
 
     /**
@@ -45,6 +48,7 @@ class plan_evidence_edit_form extends moodleform {
      * @global object $DB
      */
     function definition() {
+        debugging('\plan_evidence_edit_form has been deprecated and is no longer used, please use totara_evidence\forms\edit_evidence instead.', DEBUG_DEVELOPER);
         global $DB;
 
         $mform =& $this->_form;

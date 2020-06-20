@@ -52,6 +52,9 @@ $PAGE->set_url('/totara/plan/components/evidence/view.php', array('id' => $id));
 $PAGE->set_pagelayout('report');
 $PAGE->set_totara_menu_selected('\totara_plan\totara\menu\learningplans');
 
+$evidence_item = totara_evidence\models\evidence_item::load_by_id($evidence->evidenceid);
+$evidence_page = totara_evidence\output\view_item::create($evidence_item);
+
 dp_get_plan_base_navlinks($plan->userid);
 $PAGE->navbar->add($plan->name, new moodle_url('/totara/plan/view.php', array('id' => $plan->id)));
 $PAGE->navbar->add(get_string('viewitem', 'totara_plan'));
@@ -61,6 +64,7 @@ $plan->print_header($evidence->component, null, false);
 $url = new moodle_url("/totara/plan/components/{$evidence->component}/view.php",
         array('id' => $evidence->planid, 'itemid' => $evidence->itemid));
 
-echo dp_evidence_relation::display_linked_evidence_detail($id);
+echo $evidence_page->render();
+
 echo $OUTPUT->container_end();
 echo $OUTPUT->footer();

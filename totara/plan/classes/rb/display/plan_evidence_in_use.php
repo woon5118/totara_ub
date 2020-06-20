@@ -29,11 +29,14 @@ use totara_reportbuilder\rb\display\base;
  *
  * @author Simon Player <simon.player@totaralearning.com>
  * @package totara_plan
+ * @deprecated since Totara 13
  */
 class plan_evidence_in_use extends base {
 
     /**
      * Handles the display
+     *
+     * @deprecated since Totara 13
      *
      * @param string $value
      * @param string $format
@@ -43,6 +46,7 @@ class plan_evidence_in_use extends base {
      * @return string
      */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
+        debugging('\totara_plan\rb\display\plan_evidence_in_use has been deprecated and is no longer used. Please use totara_reportbuilder\rb\display\yes_or_no instead.', DEBUG_DEVELOPER);
         return (empty($value)) ? get_string('no') : get_string('yes');
     }
 

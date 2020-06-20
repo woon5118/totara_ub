@@ -211,6 +211,13 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
         new lang_string('enableteam_desc', 'totara_core'),
         advanced_feature::ENABLED));
 
+    $optionalsubsystems->add(new totara_core_admin_setting_feature(
+        'enableevidence',
+        new lang_string('enable_evidence', 'totara_evidence'),
+        new lang_string('enable_evidence_description', 'totara_evidence'),
+        advanced_feature::ENABLED
+    ));
+
     $defaultenhanced = 0;
     $setting = new admin_setting_configcheckbox('enableprogramcompletioneditor',
         new lang_string('enableprogramcompletioneditor', 'totara_program'),

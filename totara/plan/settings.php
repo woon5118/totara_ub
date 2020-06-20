@@ -57,21 +57,3 @@ defined('MOODLE_INTERNAL') || die;
         )
     );
 
-    $ADMIN->add('totara_plan',
-        new admin_externalpage('evidencetypes',
-            new lang_string('evidencetypes', 'totara_plan'),
-            "$CFG->wwwroot/totara/plan/evidencetypes/index.php",
-            array('totara/plan:configureplans'),
-            advanced_feature::is_disabled('learningplans')
-        )
-    );
-
-    $ADMIN->add('totara_plan',
-        new admin_externalpage('evidencetypemanage',
-            new lang_string('evidencecustomfields', 'totara_plan'),
-            "$CFG->wwwroot/totara/customfield/index.php?prefix=evidence",
-            array('totara/plan:evidencemanagecustomfield'),
-            advanced_feature::is_disabled('learningplans')
-        )
-    );
-

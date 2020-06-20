@@ -25,6 +25,7 @@
 /**
  * @group totara_userdata
  * @group totara_question
+ * @group totara_evidence
  *
  * To test, run this from the command line from the $CFG->dirroot.
  * vendor/bin/phpunit --verbose totara_question_evidencefromplan_export_testcase totara/question/tests/export/evidencefromplan_export_test.php
@@ -52,12 +53,11 @@ class totara_question_evidencefromplan_export_testcase extends advanced_testcase
         $user1 = $this->getDataGenerator()->create_user();
         $user2 = $this->getDataGenerator()->create_user();
 
-        /** @var totara_plan_generator $plangenerator */
-        $plangenerator = $this->getDataGenerator()->get_plugin_generator('totara_plan');
-        $evidencetype = $plangenerator->create_evidence_type();
-        $evidence1 = $plangenerator->create_evidence(array('evidencetypeid' => $evidencetype->id, 'userid' => $user1->id));
-        $evidence2 = $plangenerator->create_evidence(array('evidencetypeid' => $evidencetype->id, 'userid' => $user1->id));
-        $evidence3 = $plangenerator->create_evidence(array('evidencetypeid' => $evidencetype->id, 'userid' => $user2->id));
+        /** @var totara_evidence_generator $evidence_generator */
+        $evidence_generator = self::getDataGenerator()->get_plugin_generator('totara_evidence');
+        $evidence1 = $evidence_generator->create_evidence_item_entity(['user_id' => $user1->id]);
+        $evidence2 = $evidence_generator->create_evidence_item_entity(['user_id' => $user1->id]);
+        $evidence3 = $evidence_generator->create_evidence_item_entity(['user_id' => $user2->id]);
 
         // Target.
         $rd1 = new stdClass();

@@ -98,6 +98,7 @@ class user_with_components_links extends base {
         $appraisalstr = get_string('appraisals', 'totara_appraisal');
         $feedback360str = get_string('feedback360', 'totara_feedback360');
         $goalstr = get_string('goalplural', 'totara_hierarchy');
+        $evidencestr = get_string('evidence', 'totara_evidence');
         $rol_link = \html_writer::link("{$CFG->wwwroot}/totara/plan/record/index.php?userid={$userid}", $recordstr);
         $required_link = \html_writer::link(new \moodle_url('/totara/program/required.php',
             array('userid' => $userid)), $requiredstr);
@@ -107,6 +108,7 @@ class user_with_components_links extends base {
         $appraisal_link = \html_writer::link("{$CFG->wwwroot}/totara/appraisal/index.php?subjectid={$userid}", $appraisalstr);
         $feedback_link = \html_writer::link("{$CFG->wwwroot}/totara/feedback360/index.php?userid={$userid}", $feedback360str);
         $goal_link = \html_writer::link("{$CFG->wwwroot}/totara/hierarchy/prefix/goal/mygoals.php?userid={$userid}", $goalstr);
+        $evidence_link = \html_writer::link(new \moodle_url('/totara/evidence/index.php', ['user_id' => $userid]), $evidencestr);
 
         $show_plan_link = advanced_feature::is_enabled('learningplans') && dp_can_view_users_plans($userid);
 
@@ -135,6 +137,12 @@ class user_with_components_links extends base {
 
         if ((advanced_feature::is_enabled('programs') || advanced_feature::is_enabled('certifications')) && prog_can_view_users_required_learning($userid)) {
             $links .= \html_writer::tag('li', $required_link);
+        }
+
+        if (advanced_feature::is_enabled('evidence') &&
+            class_exists('\totara_evidence\models\helpers\evidence_item_capability_helper') &&
+            \totara_evidence\models\helpers\evidence_item_capability_helper::for_user($userid)->can_view_list()) {
+            $links .= \html_writer::tag('li', $evidence_link);
         }
 
         $links .= \html_writer::end_tag('ul');

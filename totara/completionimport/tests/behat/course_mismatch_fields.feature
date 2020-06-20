@@ -1,4 +1,4 @@
-@totara @totara_customfield @totara_completion_upload @javascript @_file_upload
+@totara @totara_customfield @totara_completion_upload @totara_evidence @javascript @_file_upload
 Feature: Verify the case insensitive shortnames for course completion imports works as expected
   As an admin
   I import course completions with case mismatches
@@ -46,7 +46,7 @@ Feature: Verify the case insensitive shortnames for course completion imports wo
     When I log in as "admin"
     And I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
     And I upload "totara/completionimport/tests/behat/fixtures/course_mismatch_fields_1.csv" file to "Course CSV file to upload" filemanager
-    And I set the field "Upload course Default evidence type" to "0"
+    And I set the field "Upload course Create evidence" to "1"
     And I click on "Show more" "link" in the ".totara_completionimport__uploadcourse_form" "css_element"
     And I set the field "Upload course Case insensitive shortnames" to "1"
     And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
@@ -102,7 +102,7 @@ Feature: Verify the case insensitive shortnames for course completion imports wo
     When I log in as "admin"
     And I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
     And I upload "totara/completionimport/tests/behat/fixtures/course_mismatch_fields_1.csv" file to "Course CSV file to upload" filemanager
-    And I set the field "Upload course Default evidence type" to "0"
+    And I set the field "Upload course Create evidence" to "1"
     And I click on "Save" "button" in the ".totara_completionimport__uploadcourse_form" "css_element"
     Then I should see "CSV import completed"
     And I should see "9 Records with data errors - these were ignored"
@@ -138,11 +138,9 @@ Feature: Verify the case insensitive shortnames for course completion imports wo
     And I follow "Bob1 Learner1"
     And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     Then I should see "Record of Learning for Bob1 Learner1 : All Courses"
+    And I should not see "Other Evidence" in the ".tabtree" "css_element"
     And "Course 1" row "Progress" column of "plan_courses" table should contain "Not tracked"
     And "Course 2" row "Progress" column of "plan_courses" table should contain "Not tracked"
-
-    When I follow "Other Evidence"
-    Then I should see "0 records shown"
 
     When I navigate to "Manage users" node in "Site administration > Users"
     And I follow "Bob4 Learner4"
@@ -158,8 +156,6 @@ Feature: Verify the case insensitive shortnames for course completion imports wo
     And I follow "Bob8 Learner8"
     And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     Then I should see "Record of Learning for Bob8 Learner8 : All Courses"
+    And I should not see "Other Evidence" in the ".tabtree" "css_element"
     And "Course 1" row "Progress" column of "plan_courses" table should contain "Not tracked"
     And "Course 2" row "Progress" column of "plan_courses" table should contain "Not tracked"
-
-    When I follow "Other Evidence"
-    Then I should see "0 records shown"

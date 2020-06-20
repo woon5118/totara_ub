@@ -149,3 +149,20 @@ function totara_customfield_set_hidden_by_id($tableprefix, $id, $datatype = '') 
     $hidden = (int)!$field->hidden;
     $DB->set_field($tableprefix.'_info_field', 'hidden', $hidden, ['id' => $id]);
 }
+
+/**
+ * Format the custom field's full name for output.
+ *
+ * @param string $fullname
+ * @param string $prefix
+ *
+ * @return string
+ */
+function customfield_format_fullname(string $fullname, string $prefix) {
+    switch ($prefix) {
+        case 'evidence':
+            return format_string(\totara_evidence\models\helpers\multilang_helper::parse_field_name_string($fullname));
+        default:
+            return format_string($fullname);
+    }
+}

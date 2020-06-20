@@ -29,6 +29,7 @@ defined('MOODLE_INTERNAL') || die();
  * Tests methods within the \totara_completionimport\csv_import class.
  *
  * @group totara_completionimport
+ * @group totara_evidence
  */
 class totara_completionimport_csv_import_testcase extends advanced_testcase {
 
@@ -168,29 +169,6 @@ class totara_completionimport_csv_import_testcase extends advanced_testcase {
     }
 
     /**
-     * Tests the validate_columns() method with extra columns matching evidence custom fields.
-     *
-     * @param string $importname - course or certification.
-     * @param array $columns - array of all standard column names for this importname.
-     *
-     * @dataProvider data_provider_importname_and_columns
-     */
-    public function test_validate_columns_with_evidencefields($importname, $columns) {
-        /** @var totara_customfield_generator $customfieldgenerator */
-        $customfieldgenerator = $this->getDataGenerator()->get_plugin_generator('totara_customfield');
-
-        // Create 3 text customfields.
-        $customfieldgenerator->create_text('dp_plan_evidence', array('text1', 'text2', 'text3'));
-
-        $columns[] = 'customfield_text1';
-        // We're leaving out text2 and this should not produce an error as these are optional.
-        $columns[] = 'customfield_text3';
-        $errors = $this->execute_restricted_static_method('\totara_completionimport\csv_import', 'validate_columns',
-            array($columns, $importname));
-        $this->assertEmpty($errors);
-    }
-
-    /**
      * Tests the new_row_object() method with data sufficient to generate a record with no errors.
      *
      * Note that this method assumes columns were already validated, meaning that it does not check
@@ -291,63 +269,6 @@ class totara_completionimport_csv_import_testcase extends advanced_testcase {
         $this->assertEquals('value1', $result->column1);
         $this->assertEquals('value2', $result->column2);
         $this->assertFalse(isset($result->customfields));
-
-        $this->assertEquals($completiondate, $result->completiondate);
-        // In the interests of avoiding timezone issues, we'll parse the expected output in code.
-        $expectedparsedcompletiondate = totara_date_parse_from_format('Y-m-d', $completiondate);
-        $this->assertEquals($expectedparsedcompletiondate, $result->completiondateparsed);
-
-        $this->assertEquals($importtime, $result->timecreated);
-        $this->assertEquals(0, $result->timeupdated);
-        $admin = get_admin();
-        $this->assertEquals($admin->id, $result->importuserid);
-        $this->assertEquals(3, $result->rownumber);
-    }
-
-    /**
-     * Tests the new_row_object() field with customfield data.
-     *
-     * Also covered here is how customfields must be passed in through the $customfield
-     * parameter when calling the function, otherwise that column will be treated as a standard column.
-     */
-    public function test_new_row_object_with_customfields() {
-        $this->setAdminUser();
-
-        // Just defining an arbitrary completion date for testing against.
-        $completiondate = 1484442000;
-
-        /** @var totara_customfield_generator $customfieldgenerator */
-        $customfieldgenerator = $this->getDataGenerator()->get_plugin_generator('totara_customfield');
-        // Create 3 text customfields.
-        $customfieldgenerator->create_text('dp_plan_evidence', array('text1', 'text2', 'text3'));
-
-        // We'll pass in text2 and text3, but we're not going to be using text2.
-        $customfields = array('customfield_text2', 'customfield_text3');
-
-        // We're adding text1 into the allcolumns array, but we haven't added it into the customfields array.
-        $allcolumns = ['column1', 'column2', 'completiondate', 'customfield_text1', 'customfield_text3'];
-        $item = ['value1', 'value2', $completiondate, 'textvalue1', 'textvalue3'];
-        $rownumber = 3;
-        $importtime = time();
-        $csvdateformat = 'Y-m-d';
-
-        $result = $this->execute_restricted_static_method('\totara_completionimport\csv_import', 'new_row_object',
-            array($item, $rownumber, $allcolumns, $importtime, $csvdateformat, $customfields));
-
-        // Confirm the fieldcountmismatcherror was found.
-        $this->assertEquals(0, $result->importerror);
-        $this->assertEquals('', $result->importerrormsg);
-
-        // The supplied columns.
-        $this->assertEquals('value1', $result->column1);
-        $this->assertEquals('value2', $result->column2);
-        // Probably not what was wanted, but text1 should have been added to the customfields array.
-        $this->assertTrue(isset($result->customfield_text1));
-        // The next 2 aren't set as they were in the customfields array as they should have been.
-        // Meaning values from them are serialised and added to $result->customfields instead.
-        $this->assertFalse(isset($result->customfield_text2));
-        $this->assertFalse(isset($result->customfield_text3));
-        $this->assertEquals('a:1:{s:17:"customfield_text3";s:10:"textvalue3";}', $result->customfields);
 
         $this->assertEquals($completiondate, $result->completiondate);
         // In the interests of avoiding timezone issues, we'll parse the expected output in code.

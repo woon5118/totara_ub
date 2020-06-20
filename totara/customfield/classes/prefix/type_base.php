@@ -59,6 +59,15 @@ abstract class type_base {
     }
 
     /**
+     * Get the URL for the custom fields page
+     *
+     * @return string
+     */
+    public function get_page_url(): string {
+        return new \moodle_url('/totara/customfield/index.php');
+    }
+
+    /**
      * Get the table prefix.
      *
      * @return string The table prefix

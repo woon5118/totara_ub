@@ -19,6 +19,7 @@
  *
  * @author Simon Player <simon.player@totaralearning.com>
  * @package totara_plan
+ * @deprecated since Totara 13
  */
 
 namespace totara_plan\rb\display;
@@ -29,11 +30,14 @@ use totara_reportbuilder\rb\display\base;
  *
  * @author Simon Player <simon.player@totaralearning.com>
  * @package totara_plan
+ * @deprecated since Totara 13
  */
 class plan_evidence_name_link extends base {
 
     /**
      * Handles the display
+     *
+     * @deprecated since Totara 13
      *
      * @param string $value
      * @param string $format
@@ -43,6 +47,7 @@ class plan_evidence_name_link extends base {
      * @return string
      */
     public static function display($value, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
+        debugging('\totara_plan\rb\display\plan_evidence_name_link has been deprecated and is no longer used, please use totara_evidence\rb\display\evidence_item_name instead.', DEBUG_DEVELOPER);
         $isexport = ($format !== 'html');
         $extrafields = self::get_extrafields_row($row, $column);
 

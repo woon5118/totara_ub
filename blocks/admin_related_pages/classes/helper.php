@@ -185,6 +185,13 @@ final class helper {
                 // One way link for reports to old system reports categories.
                 new item('reportlog', 'server', 'admin', ['reportsmain']),
                 new item('reportsecurity', 'security', 'admin', ['reportsmain']),
+
+                // Link evidence
+                new item('manage_evidence_types', 'evidence', 'totara_evidence', ['learningplans', 'appraisals', 'competencies']),
+                new item('managetemplates', 'learningplans', 'totara_plan', ['totara_evidence']),
+                new item('competencymanage', 'competencies', 'totara_hierarchy', ['totara_evidence']),
+                new item('manageappraisals', 'appraisals', 'totara_appraisal', ['totara_evidence']),
+                new item('editusers', 'users', 'admin', ['totara_evidence']),
             ]
         );
 

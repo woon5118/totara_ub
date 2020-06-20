@@ -302,6 +302,24 @@ class behat_totara_data_generators extends behat_base {
                 'required' => array('fullname', 'shortname', 'source'),
             )
         ),
+        'totara_evidence' => array(
+            'evidence' => array(
+                'datagenerator' => 'evidence_item_for_behat',
+                'required' => array('name')
+            ),
+            'types' => array(
+                'datagenerator' => 'evidence_type_for_behat',
+                'required' => array('name')
+            ),
+            'users' => array(
+                'datagenerator' => 'evidence_user_for_behat',
+                'required' => array('username')
+            ),
+            'plan relations' => array(
+                'datagenerator' => 'evidence_plan_relation_for_behat',
+                'required' => array('evidence')
+            ),
+        ),
         'auth_approved' => array(
             'signups' => array(
                 'datagenerator' => 'signup',

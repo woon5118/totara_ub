@@ -43,6 +43,7 @@ require_once($CFG->dirroot . '/totara/reportbuilder/tests/reportcache_advanced_t
  * Class totara_completionimport_importcertification_testcase
  *
  * @group totara_completionimport
+ * @group totara_evidence
  */
 class totara_completionimport_importcertification_testcase extends reportcache_advanced_testcase {
 
@@ -165,7 +166,7 @@ class totara_completionimport_importcertification_testcase extends reportcache_a
         $importtablename = get_tablename($importname);
         $this->assertEquals(self::COUNT_CSV_ROWS, $DB->count_records($importtablename),
             'Record count mismatch in the import table ' . $importtablename);
-        $this->assertEquals(0, $DB->count_records('dp_plan_evidence'),
+        $this->assertEquals(0, $DB->count_records('totara_evidence_item'),
             'There should be no evidence records');
         $this->assertEquals(self::COUNT_CSV_ROWS, $DB->count_records('certif_completion'),
             'Record count mismatch in the certif_completion table');
@@ -231,7 +232,7 @@ class totara_completionimport_importcertification_testcase extends reportcache_a
         $import = end($importdata);
 
         $this->assertEmpty($import->importerrormsg,'There should be no import errors: ' . $import->importerrormsg);
-        $this->assertEquals(0, $DB->count_records('dp_plan_evidence'), 'Evidence should not be created');
+        $this->assertEquals(0, $DB->count_records('totara_evidence_item'), 'Evidence should not be created');
         $this->assertEquals($cert1->id, $import->certificationid, 'The certification was not matched');
 
         //
@@ -253,7 +254,7 @@ class totara_completionimport_importcertification_testcase extends reportcache_a
         $import = end($importdata);
 
         $this->assertEmpty($import->importerrormsg,'There should be no import errors: ' . $import->importerrormsg);
-        $this->assertEquals(0, $DB->count_records('dp_plan_evidence'), 'Evidence should not be created');
+        $this->assertEquals(0, $DB->count_records('totara_evidence_item'), 'Evidence should not be created');
         $this->assertEquals($cert1->id, $import->certificationid, 'The certification was not matched');
 
         //
@@ -275,7 +276,7 @@ class totara_completionimport_importcertification_testcase extends reportcache_a
         $import = end($importdata);
 
         $this->assertEmpty($import->importerrormsg,'There should be no import errors: ' . $import->importerrormsg);
-        $this->assertEquals(0, $DB->count_records('dp_plan_evidence'), 'Evidence should not be created');
+        $this->assertEquals(0, $DB->count_records('totara_evidence_item'), 'Evidence should not be created');
         $this->assertEquals($cert2->id, $import->certificationid, 'The certification was not matched');
 
         //
@@ -297,7 +298,7 @@ class totara_completionimport_importcertification_testcase extends reportcache_a
         $import = end($importdata);
 
         $this->assertEmpty($import->importerrormsg,'There should be no import errors: ' . $import->importerrormsg);
-        $this->assertEquals(0, $DB->count_records('dp_plan_evidence'), 'Evidence should not be created');
+        $this->assertEquals(0, $DB->count_records('totara_evidence_item'), 'Evidence should not be created');
         $this->assertEquals($cert2->id, $import->certificationid, 'The certification was not matched');
 
         //
@@ -313,13 +314,15 @@ class totara_completionimport_importcertification_testcase extends reportcache_a
         $data['duedate'] = $completiondate;
         $content .= implode(",", $data) . "\n";
 
+        set_config('create_evidence', 1, 'totara_completionimport_' . $importname);
+
         \totara_completionimport\csv_import::import($content, $importname, $importstart);
 
         $importdata = $DB->get_records($importtablename, null, 'id asc');
         $import = end($importdata);
 
         $this->assertEmpty($import->importerrormsg,'There should be no import errors: ' . $import->importerrormsg);
-        $this->assertEquals(1, $DB->count_records('dp_plan_evidence'), 'Evidence should be created');
+        $this->assertEquals(1, $DB->count_records('totara_evidence_item'), 'Evidence should be created');
         $this->assertEquals(null, $import->certificationid, 'A certificationid should not be set');
     }
 
@@ -474,7 +477,7 @@ class totara_completionimport_importcertification_testcase extends reportcache_a
         $importtablename = get_tablename($importname);
         $this->assertEquals(self::COUNT_USERS+2, $DB->count_records($importtablename),
             'Record count mismatch in the import table ' . $importtablename);
-        $this->assertEquals(0, $DB->count_records('dp_plan_evidence'),
+        $this->assertEquals(0, $DB->count_records('totara_evidence_item'),
             'There should be no evidence records');
         $this->assertEquals(self::COUNT_USERS+2, $DB->count_records('certif_completion'),
             'Record count mismatch in the certif_completion table');

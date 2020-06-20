@@ -21,16 +21,19 @@
  * @subpackage plan
  */
 
+use totara_evidence\models\evidence_type;
+
 /**
  * Determine whether a evidence type is in use or not.
  *
  * "in use" means that items are assigned any of the evidence type's values.
  *
+ * @deprecated since Totara 13
+ *
  * @param int $evidencetypeid The evidence type to check
  * @return boolean
  */
 function dp_evidence_type_is_used($evidencetypeid) {
-    global $DB;
-
-    return $DB->record_exists('dp_plan_evidence', array('evidencetypeid' => $evidencetypeid));
+    debugging('dp_evidence_type_is_used() has been deprecated and is no longer used, please use totara_evidence\models\evidence_type::in_use() instead.', DEBUG_DEVELOPER);
+    return evidence_type::load_by_id($evidencetypeid)->in_use();
 }

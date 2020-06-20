@@ -50,7 +50,7 @@ function totara_plan_upgrade_clean_deleted_evidence_files() {
         AND (f.filearea = 'evidence' OR f.filearea = 'evidence_filemgr')
         AND NOT EXISTS (
           SELECT 1
-            FROM {dp_plan_evidence_info_data} dp
+            FROM {totara_evidence_type_info_data} dp
           WHERE dp.id = f.itemid
         )
     ";
@@ -63,4 +63,29 @@ function totara_plan_upgrade_clean_deleted_evidence_files() {
         $fs->delete_area_files($context, $rs->component, $rs->filearea, $rs->itemid);
     }
     $results->close();
+}
+
+/**
+ * As part of the new evidence feature (TL-19315) we no longer need these tables,
+ * since we use new ones defined in totara_evidence.
+ *
+ * We still need dp_plan_evidence_relation however.
+ */
+function totara_plan_upgrade_remove_evidence_tables() {
+    global $DB;
+    $dbman = $DB->get_manager();
+
+    $old_evidence_tables = [
+        new xmldb_table('dp_plan_evidence'),
+        new xmldb_table('dp_plan_evidence_info_field'),
+        new xmldb_table('dp_plan_evidence_info_data'),
+        new xmldb_table('dp_plan_evidence_info_data_param'),
+        new xmldb_table('dp_evidence_type'),
+    ];
+
+    foreach ($old_evidence_tables as $table) {
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+    }
 }

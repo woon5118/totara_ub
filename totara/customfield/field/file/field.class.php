@@ -81,7 +81,7 @@ class customfield_file extends customfield_base {
         );
 
         // Create the file picker
-        $mform->addElement('filemanager', $this->inputname.'_filemanager', format_string($this->field->fullname), null, $options);
+        $mform->addElement('filemanager', $this->inputname.'_filemanager', $this->get_display_fullname(), null, $options);
     }
 
     /**

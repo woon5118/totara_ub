@@ -23,7 +23,9 @@
  * @subpackage plan
  */
 
-use totara_job\job_assignment;
+use totara_evidence\models\evidence_item;
+use totara_evidence\models\helpers\evidence_item_capability_helper;
+use totara_evidence\output\view_item;
 
 /**
  * Display attachments to an evidence
@@ -70,136 +72,43 @@ function evidence_display_attachment($userid, $evidenceid) {
 /**
  * Deletes a selected evidence item.
  *
- * @param int $evidenceid - dp_plan_evidence->id
+ * @deprecated since Totara 13
+ *
+ * @param int $evidenceid - totara_evidence_item->id
  */
 function evidence_delete($evidenceid) {
-    global $DB;
-
-    if (!$evidence = $DB->get_record('dp_plan_evidence', array('id' => $evidenceid))) {
-        // Well we can't delete something that isn't there.
-        return;
-    }
-
-    $transaction = $DB->start_delegated_transaction();
-
-    // Delete the evidence item.
-    $DB->delete_records('dp_plan_evidence', array('id' => $evidence->id));
-
-    // Delete any evidence relations.
-    $DB->delete_records('dp_plan_evidence_relation', array('evidenceid' => $evidence->id));
-
-    $fs = get_file_storage();
-    $systemcontext = \context_system::instance();
-
-    $cfdata = totara_plan_get_custom_fields($evidenceid);
-    foreach ($cfdata as $customfield) {
-        // Delete any custom field files
-        if ($customfield->datatype === 'file') {
-            $fs->delete_area_files($systemcontext->id, 'totara_customfield', 'evidence_filemgr', $customfield->data);
-        } else if ($customfield->datatype === 'textarea') {
-            $fs->delete_area_files($systemcontext->id, 'totara_customfield', 'evidence', $customfield->id);
-        }
-    }
-
-    // Delete custom field data.
-    $DB->delete_records_select('dp_plan_evidence_info_data_param',
-                               'EXISTS (SELECT 1 FROM {dp_plan_evidence_info_data} dpeid
-                                WHERE dpeid.id = dataid AND dpeid.evidenceid = :evidenceid)',
-                               array('evidenceid' => $evidence->id));
-    $DB->delete_records('dp_plan_evidence_info_data', array('evidenceid' => $evidence->id));
-
-    $transaction->allow_commit();
-
-    \totara_plan\event\evidence_deleted::create_from_instance($evidence)->trigger();
+    debugging('evidence_delete() has been deprecated and is no longer used, please use totara_evidence\models\evidence_item->delete() instead.', DEBUG_DEVELOPER);
+    evidence_item::load_by_id($evidenceid)->delete();
 }
 
 /**
  * Get custom fields
+ *
+ * @deprecated since Totara 13
+ *
  * @param int $itemid the evidence id
  * @return array
  */
 function totara_plan_get_custom_fields($itemid) {
-    global $DB;
-
-    $sql = "SELECT c.*, f.datatype, f.hidden, f.fullname
-              FROM {dp_plan_evidence_info_data} c
-        INNER JOIN {dp_plan_evidence_info_field} f ON c.fieldid = f.id
-             WHERE c.evidenceid = :itemid
-          ORDER BY f.sortorder";
-
-    return $DB->get_records_sql($sql, array('itemid' => $itemid));
+    debugging('totara_plan_get_custom_fields() has been deprecated and is no longer used, please use totara_evidence\entities\evidence_item->data instead.', DEBUG_DEVELOPER);
+    return evidence_item::load_by_id($itemid)->get_customfield_data()->to_array();
 }
 
 /**
  * Returns markup to display an individual evidence relation
  *
+ * @deprecated since Totara 13
+ *
  * @global object $USER
  * @global object $DB
  * @global object $OUTPUT
- * @param int $evidenceid - dp_plan_evidence->id
+ * @param int $evidenceid - totara_evidence_item->id
  * @param bool $delete - display a delete link
  * @return string html markup
  */
-function display_evidence_detail($evidenceid, $delete = false) {
-    global $USER, $DB, $OUTPUT, $CFG;
-
-    $sql ="
-        SELECT
-            e.id,
-            e.name,
-            e.evidencetypeid,
-            et.name as evidencetypename,
-            e.userid,
-            e.readonly
-        FROM {dp_plan_evidence} e
-        LEFT JOIN {dp_evidence_type} et on e.evidencetypeid = et.id
-        WHERE e.id = ?";
-
-    if (!$item = $DB->get_record_sql($sql, array($evidenceid))) {
-        return get_string('error:evidencenotfound', 'totara_plan');
-    }
-
-    if (!empty($item->userid)) {
-        $usercontext = context_user::instance($item->userid);
-    } else {
-        $usercontext = null;
-    }
-
-    $out = '';
-
-    $icon = 'evidence-regular';
-    $img = $OUTPUT->pix_icon('/msgicons/' . $icon,
-            format_string($item->name),
-            'totara_core',
-            array('class' => 'evidence-state-icon'));
-
-    $out .= $OUTPUT->heading($img . $item->name, 4);
-
-    if (!$delete && can_create_or_edit_evidence($item->userid, !empty($evidenceid), $item->readonly)) {
-        $buttonlabel = get_string('editdetails', 'totara_plan');
-        $editurl = new moodle_url('/totara/plan/record/evidence/edit.php',
-                array('id' => $evidenceid, 'userid' => $item->userid));
-        $out .= html_writer::tag('div', $OUTPUT->single_button($editurl, $buttonlabel, null),
-                array('class' => 'add-linked-competency'));
-    }
-
-    if (!empty($item->evidencetypename)) {
-        $out .=  html_writer::tag('p', html_writer::tag('strong', get_string('evidencetype', 'totara_plan')) . ' : ' . $item->evidencetypename);
-    }
-
-    $cfdata = totara_plan_get_custom_fields($evidenceid);
-    if ($cfdata) {
-        foreach ($cfdata as $cf) {
-            // Don't show hidden custom fields.
-            if ($cf->hidden) {
-                continue;
-            }
-            $cf_class = "customfield_{$cf->datatype}";
-            require_once($CFG->dirroot.'/totara/customfield/field/'.$cf->datatype.'/field.class.php');
-            $out .=  html_writer::tag('p', html_writer::tag('strong', $cf->fullname) . ' : ' . call_user_func(array($cf_class, 'display_item_data'), $cf->data, array('prefix' => 'evidence', 'itemid' => $cf->id)));
-        }
-    }
-    return $out;
+function display_evidence_detail($evidenceid, $delete = false, $return_url = null) {
+    debugging('display_evidence_detail() has been deprecated and is no longer used, please use totara_evidence\output\view_item::create() instead.', DEBUG_DEVELOPER);
+    return view_item::create(evidence_item::load_by_id($evidenceid));
 }
 
 /**
@@ -291,32 +200,14 @@ function list_evidence_in_use($evidenceid) {
 /**
  * Check whether the current user has permission to create, edit or delete evidence
  *
+ * @deprecated since Totara 13
+ *
  * @param int $userid The ID of the user the evidence is for
- * @param bool $is_editing Are we wanting to edit/delete the evidence? Defaults to creating (false)
- * @param bool $read_only Is the evidence read-only? Defaults to false
+ * @param bool $is_editing obsolete, unused
+ * @param bool $read_only obsolete, unused
  * @return bool
  */
 function can_create_or_edit_evidence(int $userid, bool $is_editing = false, bool $read_only = false): bool {
-    global $USER;
-    $user_context = context_user::instance($userid);
-
-    if (has_capability('totara/plan:editsiteevidence', $user_context) ||
-        has_capability('totara/plan:accessanyplan', context_system::instance())) {
-        return true;
-    }
-
-    if ($read_only) {
-        return false;
-    }
-
-    if ($USER->id != $userid) {
-        return job_assignment::is_managing($USER->id, $userid);
-    }
-
-    if ($is_editing) {
-        return has_capability('totara/plan:editownsiteevidence', $user_context);
-    }
-
-    // A user can always create evidence for themselves no matter what
-    return true;
+    debugging('can_create_or_edit_evidence() has been deprecated and is no longer used, please use totara_evidence\models\helpers\evidence_item_capability_helper instead.', DEBUG_DEVELOPER);
+    return evidence_item_capability_helper::for_user($userid)->can_create();
 }

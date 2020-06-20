@@ -23,6 +23,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * @group totara_evidence
+ */
 class totara_customfield_lib_testcase extends advanced_testcase {
     public function test_customfield_get_record_by_id() {
         global $CFG;
@@ -100,5 +103,16 @@ class totara_customfield_lib_testcase extends advanced_testcase {
         } catch (moodle_exception $e) {
             $this->assertInstanceOf('invalid_parameter_exception', $e);
         }
+    }
+
+    public function test_customfield_format_fullname() {
+        global $CFG;
+        require_once($CFG->dirroot . '/totara/customfield/lib.php');
+
+        $lang_string_identifier = 'multilang:old_type';
+        $lang_string_output = get_string('system_field_name:old_type', 'totara_evidence');
+
+        $this->assertEquals($lang_string_identifier, customfield_format_fullname($lang_string_identifier, 'course'));
+        $this->assertEquals($lang_string_output, customfield_format_fullname($lang_string_identifier, 'evidence'));
     }
 }

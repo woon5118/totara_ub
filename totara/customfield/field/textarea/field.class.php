@@ -38,7 +38,7 @@ class customfield_textarea extends customfield_base {
 
         // Create the form field.
         if ($this->itemid == 0) { // If its new record.
-            $mform->addElement('editor', $this->inputname, format_string($this->field->fullname), array('cols' => $cols, 'rows' => $rows), $TEXTAREA_OPTIONS);
+            $mform->addElement('editor', $this->inputname, $this->get_display_fullname(), array('cols' => $cols, 'rows' => $rows), $TEXTAREA_OPTIONS);
             if (!empty($this->field->defaultdata)) {
                 $data = file_rewrite_pluginfile_urls($this->field->defaultdata, 'pluginfile.php', $context->id, 'totara_customfield', 'textarea', $this->fieldid);
                 $mform->setDefault($this->inputname, array('text' => $data));
@@ -51,7 +51,7 @@ class customfield_textarea extends customfield_base {
                 $mform->addElement(
                     'static',
                     'freezedisplay',
-                    format_string($this->field->fullname),
+                    $this->get_display_fullname(),
                     html_writer::div(
                         !empty($data) ? format_text($data, FORMAT_MOODLE) : get_string('readonlyemptyfield', 'totara_customfield'),
                         null,
@@ -59,7 +59,7 @@ class customfield_textarea extends customfield_base {
                     )
                 )->set_allow_xss(true);
             } else {
-                $mform->addElement('editor', $this->inputname, format_string($this->field->fullname), array('cols' => $cols, 'rows' => $rows), $TEXTAREA_OPTIONS);
+                $mform->addElement('editor', $this->inputname, $this->get_display_fullname(), array('cols' => $cols, 'rows' => $rows), $TEXTAREA_OPTIONS);
                 $data = file_rewrite_pluginfile_urls($this->data, 'pluginfile.php', $context->id, 'totara_customfield', 'textarea', $this->fieldid);
                 $mform->setDefault($this->inputname, array('text' => $data));
                 $mform->setType($this->inputname, PARAM_CLEANHTML);

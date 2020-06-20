@@ -155,6 +155,7 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
                 'organisationmanage' => 'Organisations',
                 'managebadges' => 'Badges',
                 'competencymanage' => 'Competencies',
+                'manage_evidence_types' => 'Evidence',
                 'rbmanagereports' => 'Reports',
             ],
             group::LEARN => [
@@ -210,6 +211,7 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
                 'organisationmanage' => 'Organisations',
                 'managebadges' => 'Badges',
                 'competencymanage' => 'Competencies',
+                'manage_evidence_types' => 'Evidence',
                 'rbmanagereports' => 'Reports',
             ],
             group::LEARN => [
@@ -1100,6 +1102,7 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
               'organisationmanage' => 'Organisations',
               'managebadges'       => 'Badges',
               'competencymanage'   => 'Competencies',
+              'manage_evidence_types' => 'Evidence',
               'rbmanagereports'    => 'Reports',
             ],
             group::LEARN         => [
@@ -1134,6 +1137,7 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
                 'organisationmanage' => 'Organisations',
                 'managebadges'       => 'Badges',
                 'competencymanage'   => 'Competencies',
+                'manage_evidence_types' => 'Evidence',
                 'rbmanagereports'    => 'Reports',
             ],
             group::LEARN         => [
@@ -1176,6 +1180,7 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
                 'organisationmanage' => 'Organisations',
                 'managebadges'       => 'Badges',
                 'competencymanage'   => 'Competencies',
+                'manage_evidence_types' => 'Evidence',
                 'rbmanagereports'    => 'Reports',
             ],
             group::LEARN         => [
@@ -1208,6 +1213,7 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
                 'organisationmanage' => 'Organisations',
                 'managebadges'       => 'Badges',
                 'competencymanage'   => 'Competencies',
+                'manage_evidence_types' => 'Evidence',
                 'rbmanagereports'    => 'Reports',
             ],
             group::LEARN         => [

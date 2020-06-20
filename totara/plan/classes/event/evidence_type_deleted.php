@@ -27,6 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Event triggered when evidence type deleted.
  *
+ * @deprecated since Totara 13
  * @property-read array $other {
  * Extra information about the event.
  *    - name
@@ -42,10 +43,12 @@ class evidence_type_deleted extends \core\event\base {
 
     /**
      * Create an event.
+     * @deprecated since Totara 13
      * @param \stdClass $type
      * @return evidence_type_deleted
      */
     public static function create_from_type($type) {
+        debugging('\totara_plan\event\evidence_type_deleted has been deprecated and is no longer used, please use totara_evidence\event\evidence_type_deleted instead.', DEBUG_DEVELOPER);
         $data = array(
             'objectid' => $type->id,
             'context' => \context_system::instance(),
@@ -55,7 +58,6 @@ class evidence_type_deleted extends \core\event\base {
         self::$preventcreatecall = false;
         /** @var evidence_type_deleted $event */
         $event = self::create($data);
-        $event->add_record_snapshot('dp_evidence_type', $type);
         self::$preventcreatecall = true;
 
         return $event;

@@ -31,10 +31,6 @@ if (!defined('MOODLE_INTERNAL')) {
 
 $observers = array(
     array(
-        'eventname' => '\core\event\user_deleted',
-        'callback' => 'totara_plan_observer::user_deleted',
-    ),
-    array(
         'eventname' => '\core\event\course_deleted',
         'callback'  => 'totara_plan_observer::course_deleted',
     ),

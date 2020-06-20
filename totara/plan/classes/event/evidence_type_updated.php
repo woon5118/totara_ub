@@ -26,6 +26,8 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Event triggered when evidence type created.
+ *
+ * @deprecated since Totara 13
  */
 class evidence_type_updated extends \core\event\base {
     /**
@@ -36,10 +38,12 @@ class evidence_type_updated extends \core\event\base {
 
     /**
      * Create an event.
+     * @deprecated since Totara 13
      * @param \stdClass $type
      * @return evidence_type_updated
      */
     public static function create_from_type($type) {
+        debugging('\totara_plan\event\evidence_type_updated has been deprecated and is no longer used, please use totara_evidence\event\evidence_type_updated instead.', DEBUG_DEVELOPER);
         $data = array(
             'objectid' => $type->id,
             'context' => \context_system::instance(),
@@ -48,7 +52,6 @@ class evidence_type_updated extends \core\event\base {
         self::$preventcreatecall = false;
         /** @var evidence_type_updated $event */
         $event = self::create($data);
-        $event->add_record_snapshot('dp_evidence_type', $type);
         self::$preventcreatecall = true;
 
         return $event;

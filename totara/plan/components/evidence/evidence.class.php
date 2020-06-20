@@ -22,6 +22,14 @@
  * @subpackage plan
  */
 
+use core\entities\user;
+use core\orm\query\builder;
+use totara_evidence\entities\evidence_item as evidence_item_entity;
+use totara_evidence\models\evidence_item;
+use totara_evidence\models\helpers\evidence_item_capability_helper;
+use totara_evidence\output\view_item;
+use totara_plan\entities\plan_evidence_relation;
+
 if (!defined('MOODLE_INTERNAL')) {
     die('Direct access to this script is forbidden.');    //  It must be included from a Moodle page
 }
@@ -56,7 +64,7 @@ class dp_evidence_relation {
      * @param bool $canupdate
      * @param bool $plancompleted
      * @todo Display the remove selected button after adding evidence
-     * @return type $out - output for display
+     * @return string $out - output for display
      */
     public function display_linked_evidence($currenturl, $canupdate, $plancompleted) {
         global $OUTPUT;
@@ -174,23 +182,24 @@ class dp_evidence_relation {
      * @return  false|string  $out  the table to display
      */
     public function list_linked_evidence($canremove) {
-        global $DB;
+        $for_user = builder::table('dp_plan')->where('id', $this->planid)->value('userid');
 
-        $selectsql = "SELECT er.id AS id, e.name AS fullname";
-        $countsql = "SELECT COUNT('x')";
-        $wheresql = "
-            FROM {dp_plan_evidence_relation} er
-            JOIN {dp_plan_evidence} e ON e.id = er.evidenceid
-            WHERE er.planid = ?
-            AND er.component = ?
-            AND er.itemid = ?";
-        $ordersql = " ORDER BY e.name";
+        $items = builder::table(plan_evidence_relation::TABLE)
+            ->select(['id', 'evidence.name AS fullname'])
+            ->join([evidence_item_entity::TABLE, 'evidence'], 'evidenceid', 'id')
+            ->where('planid', $this->planid)
+            ->where('component', $this->componentname)
+            ->where('itemid', $this->itemid)
+            ->when(evidence_item_capability_helper::for_user($for_user)->can_view_own_items_only(), function (builder $builder) {
+                $builder->where('evidence.created_by', user::logged_in()->id);
+            })
+            ->order_by('evidence.name')
+            ->fetch();
 
-        $params = array($this->planid, $this->componentname, $this->itemid);
-        if (!$items = $DB->get_recordset_sql($selectsql . $wheresql . $ordersql, $params)) {
+        if (!$items) {
             return false;
         }
-        $numberrows = $DB->count_records_sql($countsql . $wheresql, $params);
+        $numberrows = count($items);
         $rownumber = 0;
 
         $tableheaders = array(get_string('evidencename', 'totara_plan'));
@@ -230,8 +239,6 @@ class dp_evidence_relation {
             }
         }
 
-        $items->close();
-
         // return instead of outputing table contents
         $table->finish_html();
         $out = ob_get_contents();
@@ -245,13 +252,16 @@ class dp_evidence_relation {
      *
      * Used by evidence/view.php
      *
+     * @deprecated since Totara 13
+     *
      * @global object $CFG
      * @global object $DB
      * @param int $evidenceid
      * @prama object $component
-     * @return void
+     * @return view_item
      */
     static public function display_linked_evidence_detail($linkedid, $delete = false) {
+        debugging('\dp_evidence_relation::display_linked_evidence_detail has been deprecated and is no longer used, please use totara_evidence\output\view_item::create() instead.', DEBUG_DEVELOPER);
         global $CFG, $DB;
         require_once($CFG->dirroot . '/totara/plan/record/evidence/lib.php');
 
@@ -259,7 +269,7 @@ class dp_evidence_relation {
             return false;
         }
 
-        return display_evidence_detail($item->evidenceid, $delete);;
+        return view_item::create(evidence_item::load_by_id($item->evidenceid));
     }
 
     /**
@@ -337,7 +347,7 @@ class dp_evidence_relation {
         $out = '';
 
         $sql = "SELECT e.name
-                FROM {dp_plan_evidence} e
+                FROM {totara_evidence_item} e
                 JOIN {dp_plan_evidence_relation} er ON er.evidenceid = e.id
                 WHERE er.planid = ?
                 AND er.component = ?

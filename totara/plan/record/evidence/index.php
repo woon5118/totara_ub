@@ -65,8 +65,8 @@ if ($USER->id == $userid) {
     }
 }
 
-$config = (new rb_config())->set_sid($sid)->set_embeddata(['userid' => $userid]);
-$report = reportbuilder::create_embedded('plan_evidence', $config);
+$config = (new rb_config())->set_sid($sid)->set_embeddata(['user_id' => $userid]);
+$report = reportbuilder::create_embedded('evidence_record_of_learning', $config);
 
 $logurl = $PAGE->url->out_as_local_url();
 if ($format != '') {
@@ -117,10 +117,6 @@ echo $renderer->print_description($report->description, $report->_id);
 $report->display_saved_search_options();
 $report->display_search();
 $report->display_sidebar_search();
-
-print $OUTPUT->single_button(
-        new moodle_url("/totara/plan/record/evidence/edit.php",
-                array('id' => 0, 'userid' => $userid)), get_string('addevidence', 'totara_plan'), 'get');
 
 echo $renderer->showhide_button($report);
 echo $reporthtml;

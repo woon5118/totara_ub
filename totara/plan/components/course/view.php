@@ -201,7 +201,9 @@ if ($objectivesenabled) {
 }
 
 // Display linked evidence
-echo $evidence->display_linked_evidence($currenturl, $canupdate, $plancompleted);
+if (advanced_feature::is_enabled('evidence')) {
+    echo $evidence->display_linked_evidence($currenturl, $canupdate, $plancompleted);
+}
 
 if (!empty($CFG->usecomments)) {
     // Comments

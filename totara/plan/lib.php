@@ -26,7 +26,10 @@
  * @subpackage plan
  */
 
+use core\entities\user;
 use totara_core\advanced_feature;
+use totara_evidence\entities\evidence_item;
+use totara_evidence\models\helpers\evidence_item_capability_helper;
 
 require_once($CFG->dirroot . '/totara/plan/development_plan.class.php');
 require_once($CFG->dirroot . '/totara/plan/role.class.php');
@@ -541,7 +544,17 @@ function dp_get_rol_tabs_visible($userid) {
         $visible[] = 'programs';
     }
 
-    $visible[] = 'evidence';
+    $evidence_capabilities = evidence_item_capability_helper::for_user($userid);
+    $has_evidence_records = evidence_item::repository()
+        ->filter_by_rol_location()
+        ->where('user_id', $userid)
+        ->when($evidence_capabilities->can_view_own_items_only(), static function (\core\orm\entity\repository $repository) {
+            $repository->where('created_by', user::logged_in()->id);
+        })
+        ->exists();
+    if ($has_evidence_records && $evidence_capabilities->can_view_list() && advanced_feature::is_enabled('evidence')) {
+        $visible[] = 'evidence';
+    }
 
     $certification_progs = prog_get_certification_programs($userid, '', '', '', true, true);
     $unassignedcertifications = $DB->record_exists('certif_completion_history', array('userid' => $userid, 'unassigned' => 1));

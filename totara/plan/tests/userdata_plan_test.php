@@ -24,7 +24,6 @@
 use totara_plan\userdata\plan;
 use totara_userdata\userdata\item;
 use totara_userdata\userdata\target_user;
-use totara_userdata\userdata\export;
 
 global $CFG;
 
@@ -35,6 +34,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @group totara_plan
  * @group totara_userdata
+ * @group totara_evidence
  */
 class totara_plan_userdata_plan_test extends advanced_testcase {
 
@@ -114,9 +114,9 @@ class totara_plan_userdata_plan_test extends advanced_testcase {
         $data->link2 = $link2_data;
 
         // Add linked evidence
-        $evidence_data1 = new stdClass();
-        $evidence_data1->userid = $data->user1->id;
-        $data->evidenceitem1 = $plangenerator->create_evidence($evidence_data1);
+        /** @var totara_evidence_generator $evidence_generator */
+        $evidence_generator = $this->getDataGenerator()->get_plugin_generator('totara_evidence');
+        $data->evidenceitem1 = $evidence_generator->create_evidence_item_entity(['user_id' => $data->user1->id]);
 
         $evidencelink1_data = new \stdClass();
         $evidencelink1_data->evidenceid = $data->evidenceitem1->id;
