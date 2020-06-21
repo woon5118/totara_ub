@@ -30,6 +30,7 @@ use mod_perform\controllers\perform_controller;
 use mod_perform\models\activity\participant_instance as participant_instance_model;
 use mod_perform\models\response\participant_section as participant_section_model;
 use mod_perform\util;
+use moodle_exception;
 use totara_mvc\tui_view;
 
 /*
@@ -52,24 +53,30 @@ class view_user_activity extends perform_controller {
     public function action(): tui_view {
         $participant_instance_id = $this->get_participant_instance_id();
         $participant_section_id = $this->get_participant_section_id();
-
         $this->check_required_params($participant_instance_id, $participant_section_id);
 
-        $subject_instance_id = $this->get_subject_instance_id($participant_instance_id, $participant_section_id);
+        $participant_instance = $this->get_participant_instance($participant_instance_id, $participant_section_id);
 
         $props = [
             'current-user-id' => user::logged_in()->id,
-            'subject-instance-id' => $subject_instance_id,
-            'participant-instance-id' => $participant_instance_id,
-            'participant-section-id' => $participant_section_id,
         ];
+        $url_args = [];
 
-        if ($participant_instance_id) {
-            $url = static::get_url(['participant_instance_id' => $participant_instance_id]);
-        } else {
-            $url = static::get_url(['participant_section_id' => $participant_section_id]);
+        if ($participant_instance instanceof participant_instance_model) {
+            $props['subject-instance-id'] = $participant_instance->subject_instance_id;
+            $props['participant-instance-id'] = $participant_instance->id;
         }
 
+        if ($participant_instance_id > 0) {
+            $url_args['participant_instance_id'] = $participant_instance_id;
+        }
+
+        if ($participant_section_id > 0) {
+            $props['participant-section-id'] = $participant_section_id;
+            $url_args['participant_section_id'] = $participant_section_id;
+        }
+
+        $url = self::get_url($url_args);
         $this->set_url($url);
 
         return self::create_tui_view('mod_perform/pages/UserActivity', $props)
@@ -98,28 +105,19 @@ class view_user_activity extends perform_controller {
     }
 
     /**
-     * get subject instance id
+     * Get participant instance
      * We allow the return of null, because the front end will handle showing the not found message.
      *
      * @param int $participant_instance_id
      * @param int $participant_section_id
-     * @return int|null
+     * @return participant_instance_model|null
      */
-    protected function get_subject_instance_id(int $participant_instance_id, int $participant_section_id): ?int {
-        if ($participant_section_id) {
-            try {
-                $participant_section = participant_section_model::load_by_id($participant_section_id);
-            } catch (\Exception $e) {
-                return null;
-            }
-            $participant_instance = $participant_section->get_participant_instance();
-            return $participant_instance->subject_instance_id;
-        }
-
+    private function get_participant_instance(int $participant_instance_id, int $participant_section_id): ?participant_instance_model {
         try {
-            $participant_instance = participant_instance_model::load_by_id($participant_instance_id);
-            return $participant_instance->subject_instance_id;
-        } catch (\Exception $e) {
+            return $participant_section_id
+                ? participant_section_model::load_by_id($participant_section_id)->get_participant_instance()
+                : participant_instance_model::load_by_id($participant_instance_id);
+        } catch (moodle_exception $exception) {
             return null;
         }
     }
@@ -132,9 +130,9 @@ class view_user_activity extends perform_controller {
      * @throws invalid_parameter_exception
      */
     private function check_required_params(int $participant_instance_id, int $participant_section_id): void {
-        if (($participant_instance_id && $participant_section_id) || !($participant_instance_id || $participant_section_id)) {
+        if (!$participant_instance_id && !$participant_section_id) {
             throw new invalid_parameter_exception(
-                "One parameter is required, either participant_instance_id or participant_section_id"
+                'At least one parameter is required, either participant_instance_id or participant_section_id'
             );
         }
     }

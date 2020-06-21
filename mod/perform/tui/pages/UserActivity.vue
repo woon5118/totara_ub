@@ -89,7 +89,7 @@ export default {
     subjectInstance: {
       query: subjectInstanceQuery,
       skip() {
-        return this.subjectInstanceId === null;
+        return !this.subjectInstanceId;
       },
       variables() {
         return {

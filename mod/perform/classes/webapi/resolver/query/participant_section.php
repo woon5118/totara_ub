@@ -32,6 +32,7 @@ use core\webapi\resolver\has_middleware;
 use mod_perform\data_providers\response\participant_section_with_responses;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
 use mod_perform\models\response\participant_section as participant_section_model;
+use invalid_parameter_exception;
 
 class participant_section implements query_resolver, has_middleware {
     /**
@@ -94,12 +95,12 @@ class participant_section implements query_resolver, has_middleware {
      * check if participant_instance_id and participant_section_id are both provided or on one is provided
      * @param int $participant_instance_id
      * @param int $participant_section_id
-     * @throws \invalid_parameter_exception
+     * @throws invalid_parameter_exception
      */
     private static function check_required_args(int $participant_instance_id, int $participant_section_id): void {
-        if (($participant_instance_id && $participant_section_id) || !($participant_instance_id || $participant_section_id)) {
-            throw new \invalid_parameter_exception(
-                'One parameter is required, either participant_instance_id or participant_section_id'
+        if (!$participant_instance_id && !$participant_section_id) {
+            throw new invalid_parameter_exception(
+                'At least one parameter is required, either participant_instance_id or participant_section_id'
             );
         }
     }

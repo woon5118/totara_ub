@@ -48,30 +48,7 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
 
             $args = ['participant_instance_id' => $participant_section->participant_instance->id];
 
-            $result = $this->parsed_graphql_operation(self::QUERY, $args);
-            $this->assert_webapi_operation_successful($result);
-
-            $result = $this->get_webapi_operation_data($result);
-            $this->assertEquals($participant_section->id, $result['id']);
-            $this->assertSame($participant_section->section->title, $result['section']['display_title']);
-            $this->assertSame('IN_PROGRESS', $result['progress_status']);
-
-
-            $this->assertCount(1, $result['answerable_participant_instances']);
-            $this->assertSame('Subject', $result['answerable_participant_instances'][0]['core_relationship']['name']);
-
-            $section_element_responses = $result['section_element_responses'];
-
-            $this->assertCount(
-                1,
-                $section_element_responses,
-                'Expected one section element'
-            );
-
-            $this->assertEquals(
-                $this->create_section_element_response($section_element->id),
-                $section_element_responses[0]
-            );
+            $this->assert_query_success($args, $participant_section, $section_element);
         }
     }
 
@@ -83,29 +60,22 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
 
             $args = ['participant_section_id' => $participant_section->id];
 
-            $result = $this->parsed_graphql_operation(self::QUERY, $args);
-            $this->assert_webapi_operation_successful($result);
+            $this->assert_query_success($args, $participant_section, $section_element);
+        }
+    }
 
-            $result = $this->get_webapi_operation_data($result);
-            $this->assertEquals($participant_section->id, $result['id']);
-            $this->assertSame($participant_section->section->title, $result['section']['display_title']);
-            $this->assertSame('IN_PROGRESS', $result['progress_status']);
+    public function test_get_participant_section_by_participant_section_id_and_participant_instance_id() {
+        [$participant_sections, $section_element] = $this->create_test_data();
 
-            $this->assertCount(1, $result['answerable_participant_instances']);
-            $this->assertSame('Subject', $result['answerable_participant_instances'][0]['core_relationship']['name']);
+        foreach ($participant_sections as $participant_section) {
+            self::setUser($participant_section->participant_instance->participant_user->id);
 
-            $section_element_responses = $result['section_element_responses'];
+            $args = [
+                'participant_instance_id' => $participant_section->participant_instance->id,
+                'participant_section_id'  => $participant_section->id,
+            ];
 
-            $this->assertCount(
-                1,
-                $section_element_responses,
-                'Expected one section element'
-            );
-
-            $this->assertEquals(
-                $this->create_section_element_response($section_element->id),
-                $section_element_responses[0]
-            );
+            $this->assert_query_success($args, $participant_section, $section_element);
         }
     }
 
@@ -122,19 +92,21 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
 
         // fail if does not provide any parameter
         $result = $this->parsed_graphql_operation(self::QUERY, []);
-        $this->assert_webapi_operation_failed($result, 'One parameter is required, either participant_instance_id or participant_section_id');
-
-        // fail if provide participant_instance_id and participant_section_id at the same time
-        $result = $this->parsed_graphql_operation(self::QUERY, ['participant_instance_id' => 1, 'participant_section_id' => 1]);
-        $this->assert_webapi_operation_failed($result, 'One parameter is required, either participant_instance_id or participant_section_id');
+        $this->assert_webapi_operation_failed(
+            $result, 'At least one parameter is required, either participant_instance_id or participant_section_id'
+        );
 
         // fail if participant_instance_id is invalid
         $result = $this->parsed_graphql_operation(self::QUERY, ['participant_instance_id' => 0]);
-        $this->assert_webapi_operation_failed($result, 'One parameter is required, either participant_instance_id or participant_section_id');
+        $this->assert_webapi_operation_failed(
+            $result, 'At least one parameter is required, either participant_instance_id or participant_section_id'
+        );
 
         // fail if participant_section_id is invalid
         $result = $this->parsed_graphql_operation(self::QUERY, ['participant_section_id' => 0]);
-        $this->assert_webapi_operation_failed($result, 'One parameter is required, either participant_instance_id or participant_section_id');
+        $this->assert_webapi_operation_failed(
+            $result, 'At least one parameter is required, either participant_instance_id or participant_section_id'
+        );
 
         // fail if not participant section related to the participant_instance_id
         $result = $this->parsed_graphql_operation(self::QUERY, ['participant_instance_id' => 1293]);
@@ -195,5 +167,39 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
             'other_responder_groups' => [],
             'visible_to' => [],
         ];
+    }
+
+    /**
+     * Check participant section query success
+     *
+     * @param array $args
+     * @param $participant_section
+     * @param $section_element
+     */
+    private function assert_query_success(array $args, $participant_section, $section_element): void {
+        $result = $this->parsed_graphql_operation(self::QUERY, $args);
+        $this->assert_webapi_operation_successful($result);
+
+        $result = $this->get_webapi_operation_data($result);
+        $this->assertEquals($participant_section->id, $result['id']);
+        $this->assertSame($participant_section->section->title, $result['section']['display_title']);
+        $this->assertSame('IN_PROGRESS', $result['progress_status']);
+
+
+        $this->assertCount(1, $result['answerable_participant_instances']);
+        $this->assertSame('Subject', $result['answerable_participant_instances'][0]['core_relationship']['name']);
+
+        $section_element_responses = $result['section_element_responses'];
+
+        $this->assertCount(
+            1,
+            $section_element_responses,
+            'Expected one section element'
+        );
+
+        $this->assertEquals(
+            $this->create_section_element_response($section_element->id),
+            $section_element_responses[0]
+        );
     }
 }
