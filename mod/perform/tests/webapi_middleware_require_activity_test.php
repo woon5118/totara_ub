@@ -28,6 +28,7 @@ use core\webapi\resolver\payload;
 use core\webapi\resolver\result;
 use mod_perform\activity_access_denied_exception;
 use mod_perform\webapi\middleware\require_activity;
+use mod_perform\models\activity\notification as notification_model;
 
 /**
  * @coversDefaultClass require_activity.
@@ -220,6 +221,48 @@ class mod_perform_webapi_middleware_require_activity_testcase extends advanced_t
         $this->expectException(invalid_parameter_exception::class);
         $this->expectExceptionMessage('section id');
         require_activity::by_section_id($id_key, true)
+            ->handle($composite_key_payload, $next);
+    }
+
+    /**
+     * @covers ::by_notification_id
+     * @covers ::handle
+     */
+    public function test_require_by_notification_id(): void {
+        $expected = 34324;
+        [$activity, $context, $next] = $this->create_test_data($expected);
+        $notification = notification_model::create($activity, 'instance_created');
+
+        $id_key = 'abc';
+        $single_key_args = [$id_key => $notification->id];
+        $single_key_payload = payload::create($single_key_args, $context);
+
+        $result = require_activity::by_notification_id($id_key, false)
+            ->handle($single_key_payload, $next);
+
+        $this->assertEquals($expected, $result->get_data(), 'wrong result');
+        $this->assertFalse($context->has_relevant_context(), 'relevant context set');
+
+        // Test with composite key.
+        $root_key = 'xyz';
+        $composite_key_args = [$root_key => $single_key_args];
+        $composite_key_payload = payload::create($composite_key_args, $context);
+
+        $result = require_activity::by_notification_id("$root_key.$id_key", true)
+            ->handle($composite_key_payload, $next);
+
+        $this->assertEquals($expected, $result->get_data(), 'wrong result');
+        $this->assertTrue($context->has_relevant_context(), 'relevant context not set');
+        $this->assertEquals(
+            $activity->get_context()->id,
+            $context->get_relevant_context()->id,
+            'wrong context id'
+        );
+
+        // Test with wrong key.
+        $this->expectException(invalid_parameter_exception::class);
+        $this->expectExceptionMessage('notification id');
+        require_activity::by_notification_id($id_key, true)
             ->handle($composite_key_payload, $next);
     }
 
