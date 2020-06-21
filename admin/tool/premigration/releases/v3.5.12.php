@@ -1,9 +1,9 @@
 <?php
 
 $versions = array (
-  'tag' => 'v3.5.11',
-  'version' => 2018051711.0,
-  'release' => '3.5.11 (Build: 20200309)',
+  'tag' => 'v3.5.12',
+  'version' => 2018051712.0,
+  'release' => '3.5.12 (Build: 20200511)',
   'plugins' => 
   array (
     'antivirus_clamav' => 
@@ -1189,9 +1189,9 @@ $versions = array (
     array (
       'type' => 'filter',
       'name' => 'mathjaxloader',
-      'version' => 2018051400,
+      'version' => 2018051401,
       'has_install' => false,
-      'has_upgrade' => false,
+      'has_upgrade' => true,
       'relative_path' => '/filter/mathjaxloader',
     ),
     'filter_mediaplugin' => 
