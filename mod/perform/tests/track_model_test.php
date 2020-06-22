@@ -25,6 +25,7 @@
 use core\collection;
 use core\orm\entity\entity;
 use core\orm\query\builder;
+use mod_perform\dates\date_offset;
 use mod_perform\dates\resolvers\dynamic\dynamic_source;
 use mod_perform\dates\resolvers\dynamic\user_creation_date;
 use mod_perform\dates\resolvers\dynamic\user_custom_field;
@@ -153,16 +154,16 @@ class mod_perform_track_model_testcase extends advanced_testcase {
     /**
      * @dataProvider invalid_open_dynamic_schedule_from_to_permutations_provider
      * @param int $count_from
-     * @param int $unit
-     * @param int $direction
+     * @param int $count_to
+     * @param string $direction
      * @param dynamic_source $dynamic_source
      * @param string $expected_exception_message
      * @throws coding_exception
      */
     public function test_invalid_open_dynamic_schedule_from_to_permutations(
         int $count_from,
-        int $unit,
-        int $direction,
+        int $count_to,
+        string $direction,
         dynamic_source $dynamic_source,
         string $expected_exception_message
     ): void {
@@ -171,11 +172,19 @@ class mod_perform_track_model_testcase extends advanced_testcase {
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage($expected_exception_message);
 
-        $track->set_schedule_closed_dynamic(
+        $from = new date_offset(
             $count_from,
-            $unit,
-            track_entity::SCHEDULE_DYNAMIC_UNIT_DAY,
-            $direction,
+            date_offset::UNIT_DAY,
+            $direction
+        );
+        $to = new date_offset(
+            $count_to,
+            date_offset::UNIT_DAY,
+            $direction
+        );
+        $track->set_schedule_closed_dynamic(
+            $from,
+            $to,
             $dynamic_source
         );
     }
@@ -204,21 +213,21 @@ class mod_perform_track_model_testcase extends advanced_testcase {
             'From after to' => [
                 100,
                 0,
-                track_entity::SCHEDULE_DYNAMIC_DIRECTION_AFTER,
+                date_offset::DIRECTION_AFTER,
                 $available_dynamic_source,
-                '"count_from" must not be after "count_to" when dynamic schedule direction is "AFTER"'
+                '"from" must not be after "to"'
             ],
             'To before from' => [
                 0,
                 100,
-                track_entity::SCHEDULE_DYNAMIC_DIRECTION_BEFORE,
+                date_offset::DIRECTION_BEFORE,
                 $available_dynamic_source,
-                'count_from" must not be before "count_to" when dynamic schedule direction is "BEFORE"'
+                'from" must not be after "to"'
             ],
             'Unavailable date resolver option' => [
                 100,
                 0,
-                track_entity::SCHEDULE_DYNAMIC_DIRECTION_BEFORE,
+                date_offset::DIRECTION_BEFORE,
                 $unavailable_dynamic_source,
                 'Dynamic source must be available'
             ],
@@ -231,8 +240,21 @@ class mod_perform_track_model_testcase extends advanced_testcase {
         return [
             ['set_schedule_open_fixed', [111]],
             ['set_schedule_closed_fixed', [111, 222]],
-            ['set_schedule_closed_dynamic', [111, 222, 1, 0, $dynamic_source]],
-            ['set_schedule_open_dynamic', [111, 1, 1, $dynamic_source]],
+            [
+                'set_schedule_closed_dynamic',
+                [
+                    new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
+                    new date_offset(222, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
+                    $dynamic_source
+                ]
+            ],
+            [
+                'set_schedule_open_dynamic',
+                [
+                    new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_BEFORE),
+                    $dynamic_source
+                ]
+            ],
         ];
     }
 
@@ -326,60 +348,127 @@ class mod_perform_track_model_testcase extends advanced_testcase {
         $user_creation_date_source = (new user_creation_date())->get_options()->first();
 
         return [
-            ['set_schedule_open_fixed',
+            [
+                'set_schedule_open_fixed',
                 [111],
                 [222]
             ],
-            ['set_schedule_closed_fixed',
+            [
+                'set_schedule_closed_fixed',
                 [111, 999],
                 [222, 999]
             ],
-            ['set_schedule_closed_fixed',
+            [
+                'set_schedule_closed_fixed',
                 [111, 999],
                 [111, 888]
             ],
-            ['set_schedule_closed_dynamic',
-                [111, 999, 1, 0, $user_creation_date_source],
-                [222, 999, 1, 0, $user_creation_date_source]
+            [
+                'set_schedule_closed_dynamic',
+                [
+                    new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
+                    new date_offset(999, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
+                    $user_creation_date_source
+                ],
+                [
+                    new date_offset(222, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
+                    new date_offset(999, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
+                    $user_creation_date_source
+                ]
             ],
-            ['set_schedule_closed_dynamic',
-                [111, 999, 1, 0, $user_creation_date_source],
-                [111, 888, 1, 0, $user_creation_date_source]
+            [
+                'set_schedule_closed_dynamic',
+                [
+                    new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
+                    new date_offset(999, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
+                    $user_creation_date_source
+                ],
+                [
+                    new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
+                    new date_offset(888, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
+                    $user_creation_date_source
+                ]
             ],
-            ['set_schedule_closed_dynamic',
-                [111, 999, 1, 0, $user_creation_date_source],
-                [111, 999, 0, 0, $user_creation_date_source]
+            [
+                'set_schedule_closed_dynamic',
+                [
+                    new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
+                    new date_offset(999, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
+                    $user_creation_date_source
+                ],
+                [
+                    new date_offset(111, date_offset::UNIT_DAY, date_offset::DIRECTION_AFTER),
+                    new date_offset(999, date_offset::UNIT_DAY, date_offset::DIRECTION_AFTER),
+                    $user_creation_date_source
+                ]
             ],
-            ['set_schedule_closed_dynamic',
-                [111, 999, 1, 0, $user_creation_date_source],
-                [999, 111, 1, 1, $user_creation_date_source]
+            [
+                'set_schedule_closed_dynamic',
+                [
+                    new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
+                    new date_offset(999, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
+                    $user_creation_date_source
+                ],
+                [
+                    new date_offset(999, date_offset::UNIT_WEEK, date_offset::DIRECTION_BEFORE),
+                    new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_BEFORE),
+                    $user_creation_date_source
+                ]
             ],
-            ['set_schedule_open_dynamic',
-                [111, 1, 1, $user_creation_date_source],
-                [222, 1, 1, $user_creation_date_source]
+            [
+                'set_schedule_open_dynamic',
+                [
+                    new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_BEFORE),
+                    $user_creation_date_source
+                ],
+                [
+                    new date_offset(222, date_offset::UNIT_WEEK, date_offset::DIRECTION_BEFORE),
+                    $user_creation_date_source
+                ]
             ],
-            ['set_schedule_open_dynamic',
-                [111, 1, 1, $user_creation_date_source],
-                [111, 0, 1, $user_creation_date_source]
+            [
+                'set_schedule_open_dynamic',
+                [
+                    new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_BEFORE),
+                    $user_creation_date_source
+                ],
+                [
+                    new date_offset(111, date_offset::UNIT_DAY, date_offset::DIRECTION_BEFORE),
+                    $user_creation_date_source
+                ]
             ],
-            ['set_schedule_open_dynamic',
-                [111, 1, 1, $user_creation_date_source],
-                [111, 1, 0, $user_creation_date_source]
+            [
+                'set_schedule_open_dynamic',
+                [
+                    new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_BEFORE),
+                    $user_creation_date_source
+                ],
+                [
+                    new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
+                    $user_creation_date_source
+                ]
             ],
             'open dynamic - dynamic source resolver change' => [
                 'set_schedule_open_dynamic',
-                [111, 1, 1, $user_creation_date_source],
                 [
-                    111,
-                    1,
-                    1,
+                    new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_BEFORE),
+                    $user_creation_date_source
+                ],
+                [
+                    new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_BEFORE),
                     get_custom_field_source('time-custom')
                 ]
             ],
             'open dynamic - dynamic source option change' => [
                 'set_schedule_open_dynamic',
-                [111, 1, 1, get_custom_field_source('time-custom1')],
-                [111, 1, 1, get_custom_field_source('time-custom2')]
+                [
+                    new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_BEFORE),
+                    get_custom_field_source('time-custom1')
+                ],
+                [
+                    new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_BEFORE),
+                    get_custom_field_source('time-custom2')
+                ]
             ],
         ];
     }
@@ -427,6 +516,7 @@ class mod_perform_track_model_testcase extends advanced_testcase {
      * @return track
      */
     private function create_activity_track(string $activity_status): track {
+        /** @var mod_perform_generator $perform_generator */
         $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
         /** @var activity $activity */
         $activity = $perform_generator->create_activity_in_container([

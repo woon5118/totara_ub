@@ -4,6 +4,12 @@ type mod_perform_track_assignment {
   group: mod_perform_user_grouping!
 }
 
+type mod_perform_dynamic_date_offset {
+  count: Int!
+  unit: mod_perform_track_dynamic_unit_enums!
+  direction: mod_perform_track_dynamic_direction_enums
+}
+
 type mod_perform_dynamic_date_source {
   resolver_class_name: String!
   option_key: String
@@ -54,21 +60,17 @@ type mod_perform_track {
   schedule_is_fixed: Boolean!
   schedule_fixed_from: Int
   schedule_fixed_to: Int
-  schedule_dynamic_count_from: Int
-  schedule_dynamic_count_to: Int
-  schedule_dynamic_unit: mod_perform_track_dynamic_unit_enums
-  schedule_dynamic_direction: mod_perform_track_dynamic_direction_enums
+  schedule_dynamic_from: mod_perform_dynamic_date_offset
+  schedule_dynamic_to: mod_perform_dynamic_date_offset
   schedule_dynamic_source: mod_perform_dynamic_date_source
   schedule_use_anniversary: Boolean!
   due_date_is_enabled: Boolean!
   due_date_is_fixed: Boolean
   due_date_fixed: Int
-  due_date_relative_count: Int
-  due_date_relative_unit: mod_perform_track_dynamic_unit_enums
+  due_date_offset: mod_perform_dynamic_date_offset
   repeating_is_enabled: Boolean!
-  repeating_relative_type: mod_perform_track_repeating_type_enums
-  repeating_relative_count: Int
-  repeating_relative_unit: mod_perform_track_dynamic_unit_enums
+  repeating_type: mod_perform_track_repeating_type_enums
+  repeating_offset: mod_perform_dynamic_date_offset
   repeating_is_limited: Boolean
   repeating_limit: Int
   assignments: [mod_perform_track_assignment!]!
@@ -102,6 +104,12 @@ input mod_perform_create_track_input {
   description: param_text
 }
 
+input mod_perform_dynamic_date_offset_input {
+  count: param_integer!
+  unit: mod_perform_track_dynamic_unit_enums!
+  direction: mod_perform_track_dynamic_direction_enums
+}
+
 input mod_perform_dynamic_date_source_input {
   resolver_class_name: param_text!
   option_key: param_text
@@ -117,21 +125,17 @@ input mod_perform_track_schedule_input {
   schedule_is_fixed: param_boolean!
   schedule_fixed_from: param_integer
   schedule_fixed_to: param_integer
-  schedule_dynamic_count_from: param_integer
-  schedule_dynamic_count_to: param_integer
-  schedule_dynamic_unit: mod_perform_track_dynamic_unit_enums
-  schedule_dynamic_direction: mod_perform_track_dynamic_direction_enums
+  schedule_dynamic_from: mod_perform_dynamic_date_offset_input
+  schedule_dynamic_to: mod_perform_dynamic_date_offset_input
   schedule_dynamic_source: mod_perform_dynamic_date_source_input
   schedule_use_anniversary: param_boolean
   due_date_is_enabled: param_boolean!
   due_date_is_fixed: param_boolean
   due_date_fixed: param_integer
-  due_date_relative_count: param_integer
-  due_date_relative_unit: mod_perform_track_dynamic_unit_enums
+  due_date_offset: mod_perform_dynamic_date_offset_input
   repeating_is_enabled: param_boolean!
-  repeating_relative_type: mod_perform_track_repeating_type_enums
-  repeating_relative_count: param_integer
-  repeating_relative_unit: mod_perform_track_dynamic_unit_enums
+  repeating_type: mod_perform_track_repeating_type_enums
+  repeating_offset: mod_perform_dynamic_date_offset_input
   repeating_is_limited: param_boolean
   repeating_limit: param_integer
 }

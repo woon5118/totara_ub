@@ -128,14 +128,12 @@ final class track_user_assignment_repository extends repository {
             'si.completed_at as instance_completed_at',
             // Add relevant track columns since we're already joining track table (faster than eager loading track relation).
             'fbat.repeating_is_enabled',
-            'fbat.repeating_relative_type',
-            'fbat.repeating_relative_unit',
-            'fbat.repeating_relative_count',
+            'fbat.repeating_type',
+            'fbat.repeating_offset',
             'fbat.due_date_is_enabled',
             'fbat.due_date_is_fixed',
             'fbat.due_date_fixed',
-            'fbat.due_date_relative_count',
-            'fbat.due_date_relative_unit',
+            'fbat.due_date_offset',
         ]);
 
         return $this;

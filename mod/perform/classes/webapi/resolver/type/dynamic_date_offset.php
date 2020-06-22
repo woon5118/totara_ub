@@ -17,38 +17,36 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Jaron Steenson <jaron.steenson@totaralearning.com>
+ * @author Nathan Lewis <nathan.lewis@totaralearning.com>
  * @package mod_perform
  */
 
 namespace mod_perform\webapi\resolver\type;
 
 use core\format;
-
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
-
-use mod_perform\dates\resolvers\dynamic\dynamic_source;
-use mod_perform\formatter\activity\dynamic_date_source as dynamic_date_source_formatter;
+use mod_perform\dates\date_offset;
+use mod_perform\formatter\activity\dynamic_date_offset as dynamic_date_offset_formatter;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Maps the dynamic_source class into the GraphQL mod_perform_dynamic_date_source type.
+ * Maps the date_offset class into the GraphQL mod_perform_dynamic_date_offset type.
  */
-class dynamic_date_source implements type_resolver {
+class dynamic_date_offset implements type_resolver {
 
     /**
      * {@inheritdoc}
      */
     public static function resolve(string $field, $option, array $args, execution_context $ec) {
-        if (!$option instanceof dynamic_source) {
-            throw new \coding_exception(__METHOD__ . ' requires a dynamic_source object');
+        if (!$option instanceof date_offset) {
+            throw new \coding_exception(__METHOD__ . ' requires a date_offset object');
         }
 
         $format = $args['format'] ?? format::FORMAT_PLAIN;
         $context = $ec->get_relevant_context();
-        $formatter = new dynamic_date_source_formatter($option, $context);
+        $formatter = new dynamic_date_offset_formatter($option, $context);
 
         return $formatter->format($field, $format);
     }

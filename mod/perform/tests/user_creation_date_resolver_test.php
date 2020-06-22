@@ -22,9 +22,9 @@
  */
 
 use core\entities\user;
+use mod_perform\dates\date_offset;
 use mod_perform\dates\resolvers\dynamic\dynamic_source;
 use mod_perform\dates\resolvers\dynamic\user_creation_date;
-use mod_perform\dates\schedule_constants;
 
 class mod_perform_user_creation_date_resolver_testcase extends advanced_testcase {
 
@@ -52,10 +52,8 @@ class mod_perform_user_creation_date_resolver_testcase extends advanced_testcase
         $admin = user::repository()->find(2);
 
         $resolver = (new user_creation_date())->set_parameters(
-            0,
-            1,
-            schedule_constants::DAY,
-            schedule_constants::AFTER,
+            new date_offset(0, date_offset::UNIT_DAY, date_offset::DIRECTION_AFTER),
+            new date_offset(1, date_offset::UNIT_DAY, date_offset::DIRECTION_AFTER),
             user_creation_date::DEFAULT_KEY,
             [$user->id, $admin->id]
         );

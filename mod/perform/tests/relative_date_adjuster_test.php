@@ -22,8 +22,7 @@
  * @category test
  */
 
-use mod_perform\dates\relative_date_adjuster;
-use mod_perform\dates\schedule_constants;
+use mod_perform\dates\date_offset;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -39,23 +38,23 @@ class mod_perform_relative_date_adjuster_testcase extends advanced_testcase {
      * @param int $expected
      */
     public function test_before_adjustments(int $count, string $unit, int $expected): void {
-        $actual = (new relative_date_adjuster())->adjust(
+        $offset = new date_offset(
             $count,
             $unit,
-            schedule_constants::BEFORE,
-            $this->get_reference_timestamp()
+            date_offset::DIRECTION_BEFORE
         );
 
+        $actual = $offset->apply($this->get_reference_timestamp());
         self::assertEquals($expected, $actual);
     }
 
     public function before_adjustments_provider(): array {
         return [
-            '0 days' => [0, schedule_constants::DAY, $this->get_reference_timestamp()],
-            '0 weeks' => [0, schedule_constants::WEEK, $this->get_reference_timestamp()],
+            '0 days' => [0, date_offset::UNIT_DAY, $this->get_reference_timestamp()],
+            '0 weeks' => [0, date_offset::UNIT_WEEK, $this->get_reference_timestamp()],
 
-            '7 days' => [7, schedule_constants::DAY, $this->get_one_week_earlier()],
-            '1 week' => [1, schedule_constants::WEEK, $this->get_one_week_earlier()],
+            '7 days' => [7, date_offset::UNIT_DAY, $this->get_one_week_earlier()],
+            '1 week' => [1, date_offset::UNIT_WEEK, $this->get_one_week_earlier()],
         ];
     }
 
@@ -66,23 +65,23 @@ class mod_perform_relative_date_adjuster_testcase extends advanced_testcase {
      * @param int $expected
      */
     public function test_after_adjustments(int $count, string $unit, int $expected): void {
-        $actual = (new relative_date_adjuster())->adjust(
+        $offset = new date_offset(
             $count,
             $unit,
-            schedule_constants::AFTER,
-            $this->get_reference_timestamp()
+            date_offset::DIRECTION_AFTER
         );
 
+        $actual = $offset->apply($this->get_reference_timestamp());
         self::assertEquals($expected, $actual);
     }
 
     public function after_adjustments_provider(): array {
         return [
-            '0 days' => [0, schedule_constants::DAY, $this->get_reference_timestamp()],
-            '0 weeks' => [0, schedule_constants::WEEK, $this->get_reference_timestamp()],
+            '0 days' => [0, date_offset::UNIT_DAY, $this->get_reference_timestamp()],
+            '0 weeks' => [0, date_offset::UNIT_WEEK, $this->get_reference_timestamp()],
 
-            '7 days' => [7, schedule_constants::DAY, $this->get_one_week_later()],
-            '1 week' => [1, schedule_constants::WEEK, $this->get_one_week_later()],
+            '7 days' => [7, date_offset::UNIT_DAY, $this->get_one_week_later()],
+            '1 week' => [1, date_offset::UNIT_WEEK, $this->get_one_week_later()],
         ];
     }
 
@@ -90,12 +89,13 @@ class mod_perform_relative_date_adjuster_testcase extends advanced_testcase {
         $reference_timestamp = (new DateTimeImmutable('2020-05-20 15:00:00', new DateTimeZone('Pacific/Auckland')))
             ->getTimestamp();
 
-        $actual_timestamp = (new relative_date_adjuster())->adjust(
+        $offset = new date_offset(
             1,
-            schedule_constants::DAY,
-            schedule_constants::AFTER,
-            $reference_timestamp
+            date_offset::UNIT_DAY,
+            date_offset::DIRECTION_AFTER
         );
+
+        $actual_timestamp = $offset->apply($reference_timestamp);
 
         $actual = (new DateTimeImmutable('@' . $actual_timestamp))->setTimezone(new DateTimeZone('Pacific/Auckland'));
 

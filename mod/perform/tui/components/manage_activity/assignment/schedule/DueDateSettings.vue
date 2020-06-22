@@ -33,7 +33,7 @@
         $str('due_date_enabled_description_before', 'mod_perform')
       }}</span>
       <span>{{ $str('due_date_within', 'mod_perform') }}</span>
-      <RelativeDateSelector path="dueDateRelative" />
+      <RelativeDateSelector path="dueDateOffset" />
       <span>{{
         $str('due_date_enabled_description_after', 'mod_perform')
       }}</span>
@@ -61,7 +61,7 @@
           }"
         >
           <span>{{ $str('due_date_within', 'mod_perform') }}</span>
-          <RelativeDateSelector path="dueDateRelative" :disabled="isFixed" />
+          <RelativeDateSelector path="dueDateOffset" :disabled="isFixed" />
           <span>{{
             $str('due_date_enabled_description_after', 'mod_perform')
           }}</span>

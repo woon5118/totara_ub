@@ -22,6 +22,7 @@
  */
 
 use core\orm\query\order;
+use mod_perform\dates\date_offset;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\entities\activity\subject_instance;
 use mod_perform\entities\activity\track as track_entity;
@@ -401,10 +402,13 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
         $track = $this->create_single_track_with_assignments(2);
 
         // Set repeat to one day after creation.
+        $offset = new date_offset(
+            1,
+            date_offset::UNIT_DAY
+        );
         $track->set_repeating_enabled(
             track_entity::SCHEDULE_REPEATING_TYPE_AFTER_CREATION,
-            1,
-            track_entity::SCHEDULE_DYNAMIC_UNIT_DAY
+            $offset
         );
         $track->update();
         $this->assert_subject_instance_count(0);
@@ -437,10 +441,13 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
         $track = $this->create_single_track_with_assignments(2);
 
         // Set repeat to one day after creation.
+        $offset = new date_offset(
+            1,
+            date_offset::UNIT_DAY
+        );
         $track->set_repeating_enabled(
             track_entity::SCHEDULE_REPEATING_TYPE_AFTER_CREATION_WHEN_COMPLETE,
-            1,
-            track_entity::SCHEDULE_DYNAMIC_UNIT_DAY
+            $offset
         );
         $track->update();
 
@@ -477,10 +484,13 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
         $track = $this->create_single_track_with_assignments(2);
 
         // Set repeat to one day after completion.
+        $offset = new date_offset(
+            1,
+            date_offset::UNIT_WEEK
+        );
         $track->set_repeating_enabled(
             track_entity::SCHEDULE_REPEATING_TYPE_AFTER_COMPLETION,
-            1,
-            track_entity::SCHEDULE_DYNAMIC_UNIT_WEEK
+            $offset
         );
         $track->update();
 
@@ -515,10 +525,13 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
         $track = $this->create_single_track_with_assignments(2);
 
         // Set repeat to one day after creation, limit 2.
+        $offset = new date_offset(
+            1,
+            date_offset::UNIT_DAY
+        );
         $track->set_repeating_enabled(
             track_entity::SCHEDULE_REPEATING_TYPE_AFTER_CREATION,
-            1,
-            track_entity::SCHEDULE_DYNAMIC_UNIT_DAY,
+            $offset,
             3
         );
         $track->update();
@@ -582,10 +595,13 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
         $this->assert_subject_instance_count(1, $subject_instance_2->subject_user_id);
 
         // Increase the limit, so additional instance is created.
+        $offset = new date_offset(
+            1,
+            date_offset::UNIT_DAY
+        );
         $track->set_repeating_enabled(
             track_entity::SCHEDULE_REPEATING_TYPE_AFTER_CREATION,
-            1,
-            track_entity::SCHEDULE_DYNAMIC_UNIT_DAY,
+            $offset,
             4
         );
         $track->update();
@@ -627,7 +643,11 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
         $day_after_tomorrow = (new \DateTimeImmutable('now', new DateTimeZone('utc')))
             ->modify('+ 2 day')
             ->getTimestamp();
-        $track->set_due_date_relative(2, track_entity::SCHEDULE_DYNAMIC_UNIT_DAY);
+        $offset = new date_offset(
+            2,
+            date_offset::UNIT_DAY
+        );
+        $track->set_due_date_relative($offset);
         $track->update();
 
         (new subject_instance_creation())->generate_instances();

@@ -26,46 +26,28 @@
     <div class="tui-performAssignmentScheduleRelativeDateSelector">
       <div class="tui-performAssignmentScheduleRelativeDateSelector__count">
         <Label
-          :for="$id('relative-date-count-from')"
+          :for="$id('relative-date-from-count')"
           :label="$str('relative_date_selector_count', 'mod_perform')"
           hidden
         />
         <FormNumber
-          :id="$id('relative-date-count-from')"
-          name="count"
+          :id="$id('relative-date-from-count')"
+          name="from_count"
           :disabled="disabled"
           :validations="countValidator"
           :min="0"
         />
       </div>
 
-      <template v-if="hasRange">
-        <span>{{ untilText }}</span>
-        <div class="tui-performAssignmentScheduleRelativeDateSelector__count">
-          <Label
-            :for="$id('relative-date-count-to')"
-            :label="$str('relative_date_selector_count', 'mod_perform')"
-            hidden
-          />
-          <FormNumber
-            :id="$id('relative-date-count-to')"
-            name="count_to"
-            :disabled="disabled"
-            :validations="countValidator"
-            :min="0"
-          />
-        </div>
-      </template>
-
       <div class="tui-performAssignmentScheduleRelativeDateSelector__unit">
         <Label
-          :for="$id('relative-date-unit')"
+          :for="$id('relative-date-from-unit')"
           :label="$str('relative_date_selector_unit', 'mod_perform')"
           hidden
         />
         <FormSelect
-          :id="$id('relative-date-unit')"
-          name="unit"
+          :id="$id('relative-date-from-unit')"
+          name="from_unit"
           :options="unitOptions"
           :disabled="disabled"
         />
@@ -76,17 +58,67 @@
         class="tui-performAssignmentScheduleRelativeDateSelector__direction"
       >
         <Label
-          :for="$id('relative-date-direction')"
+          :for="$id('relative-date-from-direction')"
           :label="$str('relative_date_selector_direction', 'mod_perform')"
           hidden
         />
         <FormSelect
-          :id="$id('relative-date-direction')"
-          name="direction"
+          :id="$id('relative-date-from-direction')"
+          name="from_direction"
           :options="directionOptions"
           :disabled="disabled"
         />
       </div>
+
+      <template v-if="hasRange">
+        <span>{{ untilText }}</span>
+        <div class="tui-performAssignmentScheduleRelativeDateSelector__count">
+          <Label
+            :for="$id('relative-date-to-count')"
+            :label="$str('relative_date_selector_count', 'mod_perform')"
+            hidden
+          />
+          <FormNumber
+            :id="$id('relative-date-to-count')"
+            name="to_count"
+            :disabled="disabled"
+            :validations="countValidator"
+            :min="0"
+          />
+        </div>
+
+        <div class="tui-performAssignmentScheduleRelativeDateSelector__unit">
+          <Label
+            :for="$id('relative-date-to-unit')"
+            :label="$str('relative_date_selector_unit', 'mod_perform')"
+            hidden
+          />
+          <FormSelect
+            :id="$id('relative-date-to-unit')"
+            name="to_unit"
+            :options="unitOptions"
+            :disabled="disabled"
+          />
+        </div>
+
+        <div
+          v-if="hasDirection"
+          class="tui-performAssignmentScheduleRelativeDateSelector__direction"
+        >
+          <Label
+            :for="$id('relative-date-to-direction')"
+            :label="$str('relative_date_selector_direction', 'mod_perform')"
+            hidden
+          />
+          <FormSelect
+            :id="$id('relative-date-to-direction')"
+            name="to_direction"
+            :options="directionOptions"
+            :disabled="disabled"
+          />
+        </div>
+      </template>
+
       <div
         class="tui-performAssignmentScheduleRelativeDateSelector__reference-date"
       >
@@ -216,20 +248,46 @@ export default {
         return {};
       }
 
-      const direction = values.direction;
-      const from = Number(values.count);
-      const to = Number(values.count_to);
+      let from_count = Number(values.from_count);
+      const from_direction = values.from_direction;
+      let to_count = Number(values.to_count);
+      const to_direction = values.to_direction;
 
-      if (direction === RELATIVE_DATE_DIRECTION_AFTER && from > to) {
+      if (values.from_unit == RELATIVE_DATE_UNIT_WEEK) {
+        from_count *= 7;
+      }
+
+      if (values.to_unit == RELATIVE_DATE_UNIT_WEEK) {
+        to_count *= 7;
+      }
+
+      const rangeOrderErrorString = this.$str(
+        'relative_date_selector_error_range',
+        'mod_perform'
+      );
+
+      if (
+        from_direction === RELATIVE_DATE_DIRECTION_AFTER &&
+        to_direction === RELATIVE_DATE_DIRECTION_BEFORE
+      ) {
         return {
-          count_to: this.$str(
-            'relative_date_selector_error_range',
-            'mod_perform'
-          ),
+          to_direction: rangeOrderErrorString,
         };
-      } else if (direction === RELATIVE_DATE_DIRECTION_BEFORE && from < to) {
+      } else if (
+        from_direction === RELATIVE_DATE_DIRECTION_AFTER &&
+        to_direction === RELATIVE_DATE_DIRECTION_AFTER &&
+        from_count > to_count
+      ) {
         return {
-          count: this.$str('relative_date_selector_error_range', 'mod_perform'),
+          to_count: rangeOrderErrorString,
+        };
+      } else if (
+        from_direction === RELATIVE_DATE_DIRECTION_BEFORE &&
+        to_direction === RELATIVE_DATE_DIRECTION_BEFORE &&
+        from_count < to_count
+      ) {
+        return {
+          to_count: rangeOrderErrorString,
         };
       }
 

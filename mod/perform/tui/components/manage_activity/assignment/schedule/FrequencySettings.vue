@@ -59,7 +59,7 @@
                   v-html="$str('schedule_repeating_every', 'mod_perform')"
                 />
                 <RelativeDateSelector
-                  :path="['repeatingRelativeDates', typeOptions.afterCreation]"
+                  :path="['repeatingOffset', typeOptions.afterCreation]"
                   :disabled="!typeIsAfterCreation"
                 />
                 <span
@@ -98,7 +98,7 @@
                 />
                 <RelativeDateSelector
                   :path="[
-                    'repeatingRelativeDates',
+                    'repeatingOffset',
                     typeOptions.afterCreationWhenComplete,
                   ]"
                   :disabled="!typeIsAfterCreationWhenComplete"
@@ -129,10 +129,7 @@
                   v-html="$str('schedule_repeating_every', 'mod_perform')"
                 />
                 <RelativeDateSelector
-                  :path="[
-                    'repeatingRelativeDates',
-                    typeOptions.afterCompletion,
-                  ]"
+                  :path="['repeatingOffset', typeOptions.afterCompletion]"
                   :disabled="!typeIsAfterCompletion"
                 />
                 <span

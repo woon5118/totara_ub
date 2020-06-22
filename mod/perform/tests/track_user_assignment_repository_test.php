@@ -21,6 +21,7 @@
  * @package mod_perform
  */
 
+use mod_perform\dates\date_offset;
 use mod_perform\entities\activity\subject_instance;
 use mod_perform\entities\activity\track as track_entity;
 use mod_perform\entities\activity\track_user_assignment;
@@ -83,10 +84,13 @@ class mod_perform_track_user_assignment_repository_testcase extends advanced_tes
         $this->assertEquals(null, $assignment->instance_count);
 
         // Turn repeating on. We expect results for all 4 assignments.
+        $offset = new date_offset(
+            5,
+            date_offset::UNIT_DAY
+        );
         $track->set_repeating_enabled(
             track_entity::SCHEDULE_REPEATING_TYPE_AFTER_CREATION,
-            5,
-            track_entity::SCHEDULE_DYNAMIC_UNIT_DAY
+            $offset
         );
         $track->update();
         $track_user_assignments = track_user_assignment::repository()
@@ -108,10 +112,13 @@ class mod_perform_track_user_assignment_repository_testcase extends advanced_tes
         $this->assertEquals(null, $assignment->instance_count);
 
         // Set repeat limit and check expected results.
+        $offset = new date_offset(
+            5,
+            date_offset::UNIT_DAY
+        );
         $track->set_repeating_enabled(
             track_entity::SCHEDULE_REPEATING_TYPE_AFTER_CREATION,
-            5,
-            track_entity::SCHEDULE_DYNAMIC_UNIT_DAY,
+            $offset,
             2
         );
         $track->update();
@@ -124,10 +131,13 @@ class mod_perform_track_user_assignment_repository_testcase extends advanced_tes
         $this->assertNotNull($track_user_assignments->find('id', $subject_instance_4->track_user_assignment_id));
 
         // Increase repeat limit and check expected results.
+        $offset = new date_offset(
+            5,
+            date_offset::UNIT_DAY
+        );
         $track->set_repeating_enabled(
             track_entity::SCHEDULE_REPEATING_TYPE_AFTER_CREATION,
-            5,
-            track_entity::SCHEDULE_DYNAMIC_UNIT_DAY,
+            $offset,
             3
         );
         $track->update();
@@ -140,7 +150,6 @@ class mod_perform_track_user_assignment_repository_testcase extends advanced_tes
         $this->assertNotNull($track_user_assignments->find('id', $subject_instance_2->track_user_assignment_id));
         $this->assertNotNull($track_user_assignments->find('id', $subject_instance_4->track_user_assignment_id));
     }
-
 
     /**
      * Create an additional subject instance for test data setup.

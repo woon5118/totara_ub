@@ -23,6 +23,7 @@
 
 namespace mod_perform\dates\resolvers\dynamic;
 
+use mod_perform\dates\date_offset;
 use mod_perform\dates\resolvers\date_resolver;
 use core\collection;
 
@@ -35,21 +36,17 @@ interface dynamic_date_resolver extends date_resolver {
      * Generally all users from $reference_user_ids will be resolved lazily from a
      * get_start/end_for call.
      *
-     * @param int $from_count
-     * @param int|null $to_count
-     * @param string $unit
-     * @param string $direction
+     * @param date_offset $from
+     * @param date_offset|null $to
      * @param array $reference_user_ids The user ids to resolve dates for.
      * @param string $option_key
      * @return static
      * @see get_start_for
      * @see get_end_for
-     */
+ ***/
     public function set_parameters(
-        int $from_count,
-        ?int $to_count,
-        string $unit,
-        string $direction,
+        date_offset $from,
+        ?date_offset $to,
         string $option_key,
         array $reference_user_ids
     ): self;

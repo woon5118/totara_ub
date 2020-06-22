@@ -27,11 +27,11 @@ use coding_exception;
 use core\orm\collection;
 use core\orm\entity\model;
 use mod_perform\constants;
+use mod_perform\dates\date_offset;
 use mod_perform\dates\resolvers\date_resolver;
 use mod_perform\dates\resolvers\dynamic\dynamic_date_resolver;
 use mod_perform\dates\resolvers\dynamic\dynamic_source;
 use mod_perform\dates\resolvers\fixed_range_resolver;
-use mod_perform\dates\schedule_constants;
 use mod_perform\entities\activity\track as track_entity;
 use mod_perform\models\activity\track as track_model;
 use mod_perform\state\activity\active;
@@ -51,21 +51,17 @@ use moodle_exception;
  * @property-read bool $schedule_is_fixed
  * @property-read int $schedule_fixed_from
  * @property-read int $schedule_fixed_to
- * @property-read int $schedule_dynamic_count_from
- * @property-read int $schedule_dynamic_count_to
- * @property-read string $schedule_dynamic_unit
- * @property-read string $schedule_dynamic_direction
+ * @property-read date_offset|null $schedule_dynamic_from
+ * @property-read date_offset|null $schedule_dynamic_to
  * @property-read dynamic_source|null $schedule_dynamic_source
  * @property-read bool $schedule_use_anniversary
  * @property-read bool $due_date_is_enabled
  * @property-read bool $due_date_is_fixed
  * @property-read int $due_date_fixed
- * @property-read int $due_date_relative_count
- * @property-read int $due_date_relative_unit
+ * @property-read dynamic_source|null $due_date_offset
  * @property-read bool $repeating_is_enabled
- * @property-read int $repeating_relative_type
- * @property-read int $repeating_relative_count
- * @property-read int $repeating_relative_unit
+ * @property-read int $repeating_type
+ * @property-read date_offset|null $repeating_offset
  * @property-read bool $repeating_is_limited
  * @property-read int $repeating_limit
  * @property-read int $created_at
@@ -84,16 +80,16 @@ class track extends model {
         'schedule_is_open',
         'schedule_is_fixed',
         'schedule_fixed_from',
-        'schedule_dynamic_count_from',
+        'schedule_dynamic_from',
+        'schedule_dynamic_to',
         'schedule_dynamic_source',
         'schedule_use_anniversary',
         'due_date_is_enabled',
         'due_date_is_fixed',
         'due_date_fixed',
-        'due_date_relative_count',
+        'due_date_offset',
         'repeating_is_enabled',
-        'repeating_relative_count',
-        'repeating_relative_unit',
+        'repeating_offset',
         'repeating_is_limited',
         'repeating_limit',
         'created_at',
@@ -106,12 +102,7 @@ class track extends model {
         'subject_instance_generation_control_is_enabled',
         'subject_instance_generation',
         'schedule_fixed_to',
-        'schedule_dynamic_count_to',
-        'schedule_dynamic_direction',
-        'schedule_dynamic_unit',
-        'due_date_relative_unit',
-        'repeating_relative_type',
-        'repeating_relative_unit',
+        'repeating_type',
     ];
 
     /**
@@ -148,20 +139,16 @@ class track extends model {
         $entity->schedule_is_fixed = true;
         $entity->schedule_fixed_from = time();
         $entity->schedule_fixed_to = null;
-        $entity->schedule_dynamic_count_from = null;
-        $entity->schedule_dynamic_count_to = null;
-        $entity->schedule_dynamic_unit = null;
-        $entity->schedule_dynamic_direction = null;
+        $entity->schedule_dynamic_from = null;
+        $entity->schedule_dynamic_to = null;
         $entity->schedule_dynamic_source = null;
         $entity->due_date_is_enabled = false;
         $entity->due_date_is_fixed = null;
         $entity->due_date_fixed = null;
-        $entity->due_date_relative_count = null;
-        $entity->due_date_relative_unit = null;
+        $entity->due_date_offset = null;
         $entity->repeating_is_enabled = false;
-        $entity->repeating_relative_type = null;
-        $entity->repeating_relative_count = null;
-        $entity->repeating_relative_unit = null;
+        $entity->repeating_type = null;
+        $entity->repeating_offset = null;
         $entity->repeating_is_limited = null;
         $entity->repeating_limit = null;
         $entity->save();
@@ -381,40 +368,21 @@ class track extends model {
      *
      * After calling, use track::update to save the changes to the DB
      *
-     * @param int $count_from
-     * @param int $count_to
-     * @param int $unit
-     * @param int $direction
+     * @param date_offset $from
+     * @param date_offset $to
      * @param dynamic_source $dynamic_source
      * @param bool $use_anniversary
      * @return track
      */
     public function set_schedule_closed_dynamic(
-        int $count_from,
-        int $count_to,
-        int $unit,
-        int $direction,
+        date_offset $from,
+        date_offset $to,
         dynamic_source $dynamic_source,
         bool $use_anniversary = false
     ): self {
-        if ($count_from < 0) {
-            throw new coding_exception('Count from must be a positive integer');
-        }
-
-        if (!isset(self::get_dynamic_schedule_units()[$unit])) {
-            throw new coding_exception('Invalid dynamic schedule unit');
-        }
-
-        if (!isset(self::get_dynamic_schedule_directions()[$direction])) {
-            throw new coding_exception('Invalid dynamic schedule direction');
-        }
-
-        if ($direction === track_entity::SCHEDULE_DYNAMIC_DIRECTION_AFTER) {
-            if ($count_from > $count_to) {
-                throw new coding_exception('"count_from" must not be after "count_to" when dynamic schedule direction is "AFTER"');
-            }
-        } else if ($count_from < $count_to) {
-            throw new coding_exception('"count_from" must not be before "count_to" when dynamic schedule direction is "BEFORE"');
+        $now = time();
+        if ($from->apply($now) > $to->apply($now)) {
+            throw new coding_exception('"from" must not be after "to"');
         }
 
         if (!$dynamic_source->is_available()) {
@@ -424,10 +392,8 @@ class track extends model {
         $properties_to_update = [
             'schedule_is_open' => false,
             'schedule_is_fixed' => false,
-            'schedule_dynamic_count_from' => $count_from,
-            'schedule_dynamic_count_to' => $count_to,
-            'schedule_dynamic_unit' => $unit,
-            'schedule_dynamic_direction' => $direction,
+            'schedule_dynamic_from' => $from,
+            'schedule_dynamic_to' => $to,
             'schedule_dynamic_source' => $dynamic_source,
             'schedule_use_anniversary' => $use_anniversary,
         ];
@@ -442,32 +408,16 @@ class track extends model {
      *
      * After calling, use track::update to save the changes to the DB
      *
-     * @param int $count_from
-     * @param int $unit
-     * @param int $direction
+     * @param date_offset $from
      * @param dynamic_source $dynamic_source
      * @param bool $use_anniversary
      * @return track
      */
     public function set_schedule_open_dynamic(
-        int $count_from,
-        int $unit,
-        int $direction,
+        date_offset $from,
         dynamic_source $dynamic_source,
         bool $use_anniversary = false
     ): self {
-        if (!isset(self::get_dynamic_schedule_units()[$unit])) {
-            throw new coding_exception('Invalid dynamic schedule unit');
-        }
-
-        if ($count_from < 0) {
-            throw new coding_exception('Count from must be a positive integer');
-        }
-
-        if (!isset(self::get_dynamic_schedule_directions()[$direction])) {
-            throw new coding_exception('Invalid dynamic schedule direction');
-        }
-
         if (!$dynamic_source->is_available()) {
             throw new coding_exception('Dynamic source must be available');
         }
@@ -475,9 +425,7 @@ class track extends model {
         $properties_to_update = [
             'schedule_is_open' => true,
             'schedule_is_fixed' => false,
-            'schedule_dynamic_count_from' => $count_from,
-            'schedule_dynamic_unit' => $unit,
-            'schedule_dynamic_direction' => $direction,
+            'schedule_dynamic_from' => $from,
             'schedule_dynamic_source' => $dynamic_source,
             'schedule_use_anniversary' => $use_anniversary,
         ];
@@ -517,10 +465,8 @@ class track extends model {
         $entity->schedule_is_fixed = $properties['schedule_is_fixed'];
         $entity->schedule_fixed_from = $properties['schedule_fixed_from'] ?? null;
         $entity->schedule_fixed_to = $properties['schedule_fixed_to'] ?? null;
-        $entity->schedule_dynamic_count_from = $properties['schedule_dynamic_count_from'] ?? null;
-        $entity->schedule_dynamic_count_to = $properties['schedule_dynamic_count_to'] ?? null;
-        $entity->schedule_dynamic_unit = $properties['schedule_dynamic_unit'] ?? null;
-        $entity->schedule_dynamic_direction = $properties['schedule_dynamic_direction'] ?? null;
+        $entity->schedule_dynamic_from = $properties['schedule_dynamic_from'] ?? null;
+        $entity->schedule_dynamic_to = $properties['schedule_dynamic_to'] ?? null;
         $entity->schedule_dynamic_source = $properties['schedule_dynamic_source'] ?? null;
         $entity->schedule_use_anniversary = $properties['schedule_use_anniversary'] ?? false;
 
@@ -541,15 +487,19 @@ class track extends model {
             return true;
         }
 
+        if ($this->entity->schedule_dynamic_from != $entity_before_changes->schedule_dynamic_from) {
+            return true;
+        }
+
+        if ($this->entity->schedule_dynamic_to != $entity_before_changes->schedule_dynamic_to) {
+            return true;
+        }
+
         foreach ([
             'schedule_is_open',
             'schedule_is_fixed',
             'schedule_fixed_from',
             'schedule_fixed_to',
-            'schedule_dynamic_count_from',
-            'schedule_dynamic_count_to',
-            'schedule_dynamic_unit',
-            'schedule_dynamic_direction',
             'schedule_use_anniversary',
         ] as $relevant_field) {
             if ((int)$this->entity->{$relevant_field} !== (int)$entity_before_changes->{$relevant_field}) {
@@ -570,9 +520,8 @@ class track extends model {
     public function set_repeating_disabled(): self {
         $this->set_repeating_properties([
             'repeating_is_enabled' => false,
-            'repeating_relative_type' => null,
-            'repeating_relative_count' => null,
-            'repeating_relative_unit' => null,
+            'repeating_type' => null,
+            'repeating_offset' => null,
             'repeating_is_limited' => false,
             'repeating_limit' => null,
         ]);
@@ -586,17 +535,15 @@ class track extends model {
      * After calling, use track::update to save the changes to the DB
      *
      * @param int $type
-     * @param int $count
-     * @param int $unit
+     * @param date_offset $offset
      * @param int|null $limit
      * @return track
      */
-    public function set_repeating_enabled(int $type, int $count, int $unit, ?int $limit = null): self {
+    public function set_repeating_enabled(int $type, date_offset $offset, ?int $limit = null): self {
         $properties_to_update = [
             'repeating_is_enabled' => true,
-            'repeating_relative_type' => $type,
-            'repeating_relative_count' => $count,
-            'repeating_relative_unit' => $unit,
+            'repeating_type' => $type,
+            'repeating_offset' => $offset,
             'repeating_is_limited' => !is_null($limit),
             'repeating_limit' => $limit,
         ];
@@ -617,9 +564,8 @@ class track extends model {
         $entity = $this->entity;
 
         $entity->repeating_is_enabled = $properties['repeating_is_enabled'];
-        $entity->repeating_relative_type = $properties['repeating_relative_type'] ?? null;
-        $entity->repeating_relative_count = $properties['repeating_relative_count'] ?? null;
-        $entity->repeating_relative_unit = $properties['repeating_relative_unit'] ?? null;
+        $entity->repeating_type = $properties['repeating_type'] ?? null;
+        $entity->repeating_offset = $properties['repeating_offset'] ?? null;
         $entity->repeating_is_limited = $properties['repeating_is_limited'] ?? false;
         $entity->repeating_limit = $properties['repeating_limit'] ?? null;
     }
@@ -662,16 +608,14 @@ class track extends model {
      *
      * After calling, use track::update to save the changes to the DB
      *
-     * @param int $count
-     * @param int $unit
+     * @param date_offset $offset
      * @return track
      */
-    public function set_due_date_relative(int $count, int $unit): self {
+    public function set_due_date_relative(date_offset $offset): self {
         $properties_to_update = [
             'due_date_is_enabled' => true,
             'due_date_is_fixed' => false,
-            'due_date_relative_count' => $count,
-            'due_date_relative_unit' => $unit,
+            'due_date_offset' => $offset,
         ];
 
         $this->set_due_date_properties($properties_to_update);
@@ -692,25 +636,10 @@ class track extends model {
         $entity->due_date_is_enabled = $properties['due_date_is_enabled'];
         $entity->due_date_is_fixed = $properties['due_date_is_fixed'] ?? null;
         $entity->due_date_fixed = $properties['due_date_fixed'] ?? null;
-        $entity->due_date_relative_count = $properties['due_date_relative_count'] ?? null;
-        $entity->due_date_relative_unit = $properties['due_date_relative_unit'] ?? null;
+        $entity->due_date_offset = $properties['due_date_offset'] ?? null;
     }
 
-    public static function get_dynamic_schedule_directions(): array {
-        return [
-            track_entity::SCHEDULE_DYNAMIC_DIRECTION_AFTER => schedule_constants::AFTER,
-            track_entity::SCHEDULE_DYNAMIC_DIRECTION_BEFORE => schedule_constants::BEFORE,
-        ];
-    }
-
-    public static function get_dynamic_schedule_units(): array {
-        return [
-            track_entity::SCHEDULE_DYNAMIC_UNIT_DAY => schedule_constants::DAY,
-            track_entity::SCHEDULE_DYNAMIC_UNIT_WEEK => schedule_constants::WEEK,
-        ];
-    }
-
-    public static function get_repeating_relative_types(): array {
+    public static function get_repeating_types(): array {
         return [
             track_entity::SCHEDULE_REPEATING_TYPE_AFTER_CREATION => constants::SCHEDULE_REPEATING_AFTER_CREATION,
             track_entity::SCHEDULE_REPEATING_TYPE_AFTER_CREATION_WHEN_COMPLETE => constants::SCHEDULE_REPEATING_AFTER_CREATION_WHEN_COMPLETE,
@@ -748,7 +677,7 @@ class track extends model {
     /**
      * Maps a string representation to the mapped int constant
      *
-     * @param string|null $string+value
+     * @param string|null $string_value
      * @param array $map
      * @param string $exception_message
      * @return int|null
@@ -784,67 +713,15 @@ class track extends model {
     }
 
     /**
-     * Get the string representation of the dynamic schedule direction.
-     *
-     * @return string|null
-     */
-    protected function get_schedule_dynamic_direction(): ?string {
-        return track_model::mapped_value_to_string(
-            $this->entity->schedule_dynamic_direction,
-            track_model::get_dynamic_schedule_directions(),
-            'dynamic schedule direction'
-        );
-    }
-
-    /**
-     * Get the string representation of the dynamic schedule unit.
-     *
-     * @return string|null
-     */
-    protected function get_schedule_dynamic_unit(): ?string {
-        return track_model::mapped_value_to_string(
-            $this->entity->schedule_dynamic_unit,
-            track_model::get_dynamic_schedule_units(),
-            'dynamic schedule unit'
-        );
-    }
-
-    /**
-     * Get the string representation of the relative due date unit.
-     *
-     * @return string|null
-     */
-    protected function get_due_date_relative_unit(): ?string {
-        return track_model::mapped_value_to_string(
-            $this->entity->due_date_relative_unit,
-            track_model::get_dynamic_schedule_units(),
-            'dynamic due date unit'
-        );
-    }
-
-    /**
      * Get the string representation of the relative repeating type.
      *
      * @return string|null
      */
-    protected function get_repeating_relative_type(): ?string {
+    protected function get_repeating_type(): ?string {
         return track_model::mapped_value_to_string(
-            $this->entity->repeating_relative_type,
-            track_model::get_repeating_relative_types(),
+            $this->entity->repeating_type,
+            track_model::get_repeating_types(),
             'repeating relative type'
-        );
-    }
-
-    /**
-     * Get the string representation of the relative repeating unit.
-     *
-     * @return string|null
-     */
-    protected function get_repeating_relative_unit(): ?string {
-        return track_model::mapped_value_to_string(
-            $this->entity->repeating_relative_unit,
-            track_model::get_dynamic_schedule_units(),
-            'repeating relative unit'
         );
     }
 
@@ -872,10 +749,8 @@ class track extends model {
         }
 
         return $resolver->set_parameters(
-            $this->schedule_dynamic_count_from,
-            $this->get_schedule_dynamic_count_to(),
-            $this->get_schedule_dynamic_unit(),
-            $this->get_schedule_dynamic_direction(),
+            $this->schedule_dynamic_from,
+            $this->schedule_dynamic_to,
             $dynamic_source->get_option_key(),
             $user_ids
         );
@@ -936,10 +811,6 @@ class track extends model {
 
     public function get_subject_instance_generation_control_is_enabled(): bool {
         return !empty(get_config(null, 'totara_job_allowmultiplejobs'));
-    }
-
-    public function get_schedule_dynamic_count_to() :?int {
-        return $this->entity->schedule_is_open ? null : $this->entity->schedule_dynamic_count_to;
     }
 
     public function get_schedule_fixed_to() :?int {

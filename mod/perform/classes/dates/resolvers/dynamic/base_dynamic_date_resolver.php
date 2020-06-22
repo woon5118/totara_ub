@@ -26,8 +26,7 @@ namespace mod_perform\dates\resolvers\dynamic;
 use coding_exception;
 use core\collection;
 use core_component;
-use mod_perform\dates\schedule_constants;
-use mod_perform\dates\relative_date_adjuster;
+use mod_perform\dates\date_offset;
 
 abstract class base_dynamic_date_resolver implements dynamic_date_resolver {
 
@@ -37,34 +36,19 @@ abstract class base_dynamic_date_resolver implements dynamic_date_resolver {
     protected $date_map;
 
     /**
-     * @var string
-     */
-    protected $direction;
-
-    /**
      * @var int[]
      */
     protected $reference_user_ids;
 
     /**
-     * @var string
+     * @var date_offset
      */
-    protected $unit;
+    protected $from;
 
     /**
-     * @var int
+     * @var date_offset|null
      */
-    protected $from_count;
-
-    /**
-     * @var int|null
-     */
-    protected $to_count;
-
-    /**
-     * @var relative_date_adjuster
-     */
-    protected $date_adjuster;
+    protected $to;
 
     /**
      * @var bool
@@ -75,10 +59,6 @@ abstract class base_dynamic_date_resolver implements dynamic_date_resolver {
      * @var string
      */
     protected $option_key;
-
-    public function __construct() {
-        $this->date_adjuster = new relative_date_adjuster();
-    }
 
     /**
      * Get one instance of each dynamic date resolver.
@@ -100,33 +80,24 @@ abstract class base_dynamic_date_resolver implements dynamic_date_resolver {
     }
 
     /**
-     * @param int $from_count
-     * @param int|null $to_count
-     * @param string $unit
-     * @param string $direction
+     * @param date_offset $from
+     * @param date_offset|null $to
      * @param array $reference_user_ids
      * @param string $option_key
      * @return dynamic_date_resolver
      */
     public function set_parameters(
-        int $from_count,
-        ?int $to_count,
-        string $unit,
-        string $direction,
+        date_offset $from,
+        ?date_offset $to,
         string $option_key,
         array $reference_user_ids
     ): dynamic_date_resolver {
-        schedule_constants::validate_direction($direction);
-        schedule_constants::validate_unit($unit);
-
         if (!$this->option_is_available($option_key)) {
             throw new coding_exception(sprintf('Invalid option key %s', $option_key));
         }
 
-        $this->direction = $direction;
-        $this->unit = $unit;
-        $this->from_count = $from_count;
-        $this->to_count = $to_count;
+        $this->from = $from;
+        $this->to = $to;
         $this->reference_user_ids = $reference_user_ids;
         $this->option_key = $option_key;
 
@@ -159,7 +130,7 @@ abstract class base_dynamic_date_resolver implements dynamic_date_resolver {
 
         $reference_date = $this->date_map[$user_id];
 
-        return $this->adjust_date($this->from_count, $reference_date);
+        return $this->from->apply($reference_date);
     }
 
     /**
@@ -172,7 +143,7 @@ abstract class base_dynamic_date_resolver implements dynamic_date_resolver {
             $this->resolve();
         }
 
-        if ($this->to_count === null) {
+        if ($this->to === null) {
             return null;
         }
 
@@ -182,22 +153,13 @@ abstract class base_dynamic_date_resolver implements dynamic_date_resolver {
 
         $reference_date = $this->date_map[$user_id];
 
-        return $this->adjust_date($this->to_count, $reference_date);
+        return $this->to->apply($reference_date);
     }
 
     protected function check_ready_to_resolve(): void {
         if (!$this->ready_to_resolve) {
             throw new coding_exception('Can not call resolve before setting parameters');
         }
-    }
-
-    protected function adjust_date(int $count, int $reference_date): int {
-        return $this->date_adjuster->adjust(
-            $count,
-            $this->unit,
-            $this->direction,
-            $reference_date
-        );
     }
 
 }

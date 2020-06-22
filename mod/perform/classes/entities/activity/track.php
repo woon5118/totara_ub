@@ -29,6 +29,7 @@ use core\orm\entity\entity;
 use core\orm\entity\relations\belongs_to;
 use core\orm\entity\relations\has_many;
 use core\orm\entity\relations\has_many_through;
+use mod_perform\dates\date_offset;
 use mod_perform\dates\resolvers\dynamic\dynamic_source;
 
 /**
@@ -43,10 +44,8 @@ use mod_perform\dates\resolvers\dynamic\dynamic_source;
  * @property int $subject_instance_generation the system used to decide what subject instances are generated
  * @property int $schedule_fixed_from when schedule type is FIXED, contains the start date of assignment
  * @property int $schedule_fixed_to when schedule type is CLOSED_FIXED, contains the end date of assignment
- * @property int $schedule_dynamic_count_from number of units
- * @property int $schedule_dynamic_count_to number of units
- * @property int $schedule_dynamic_unit one of SCHEDULE_DYNAMIC_UNIT_XXX or null
- * @property int $schedule_dynamic_direction one of SCHEDULE_DYNAMIC_DIRECTION_XXX or null
+ * @property date_offset|null $schedule_dynamic_from an offset for dynamic schedule (saved as json)
+ * @property date_offset|null $schedule_dynamic_to an offset for dynamic schedule (saved as json)
  * @property dynamic_source|null $schedule_dynamic_source a dynamic_source for dynamic schedule (saved as json)
  * @property bool $schedule_use_anniversary should the dynamic schedule use the anniversary (next occurrence)
  *                                          of reference date if it is in the past
@@ -54,12 +53,10 @@ use mod_perform\dates\resolvers\dynamic\dynamic_source;
  * @property bool $due_date_is_enabled
  * @property bool $due_date_is_fixed
  * @property int $due_date_fixed
- * @property int $due_date_relative_count
- * @property int $due_date_relative_unit
+ * @property date_offset|null $due_date_offset
  * @property bool $repeating_is_enabled
- * @property int $repeating_relative_type
- * @property int $repeating_relative_count
- * @property int $repeating_relative_unit
+ * @property int $repeating_type
+ * @property date_offset|null $repeating_offset
  * @property bool $repeating_is_limited
  * @property int $repeating_limit
  * @property int $created_at record creation time
@@ -80,12 +77,6 @@ class track extends entity {
 
     public const SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT = 0;
     public const SUBJECT_INSTANCE_GENERATION_ONE_PER_JOB = 1;
-
-    public const SCHEDULE_DYNAMIC_UNIT_DAY = 0;
-    public const SCHEDULE_DYNAMIC_UNIT_WEEK = 1;
-
-    public const SCHEDULE_DYNAMIC_DIRECTION_AFTER = 0;
-    public const SCHEDULE_DYNAMIC_DIRECTION_BEFORE = 1;
 
     public const SCHEDULE_REPEATING_TYPE_AFTER_CREATION = 0;
     public const SCHEDULE_REPEATING_TYPE_AFTER_CREATION_WHEN_COMPLETE = 1;
@@ -128,10 +119,10 @@ class track extends entity {
     /**
      * Unserialize schedule_dynamic_source.
      *
-     * @return dynamic_source
+     * @return dynamic_source | null
      */
     protected function get_schedule_dynamic_source_attribute(): ?dynamic_source {
-        $json_encoded =  $this->get_attributes_raw()['schedule_dynamic_source'];
+        $json_encoded = $this->get_attributes_raw()['schedule_dynamic_source'];
 
         if ($json_encoded === null) {
             return null;
@@ -164,6 +155,130 @@ class track extends entity {
             default:
                 throw new coding_exception(
                     'schedule dynamic resolver must be a dynamic_source, null, or json encoded dynamic_source'
+                );
+        }
+    }
+
+    /**
+     * Unserialize schedule_dynamic_from.
+     *
+     * @return date_offset | null
+     */
+    protected function get_schedule_dynamic_from_attribute(): ?date_offset {
+        $json_encoded = $this->get_attributes_raw()['schedule_dynamic_from'];
+
+        if ($json_encoded === null) {
+            return null;
+        }
+
+        return date_offset::create_from_json($json_encoded);
+    }
+
+    /**
+     * Serialize (or skip) schedule_dynamic_from.
+     *
+     * @param string | date_offset | null
+     * @return track
+     */
+    protected function set_schedule_dynamic_from_attribute($dynamic_offset = null): self {
+        $json_encoded = $this->encode_dynamic_offset($dynamic_offset);
+
+        return $this->set_attribute_raw('schedule_dynamic_from', $json_encoded);
+    }
+
+    /**
+     * Unserialize schedule_dynamic_to.
+     *
+     * @return date_offset | null
+     */
+    protected function get_schedule_dynamic_to_attribute(): ?date_offset {
+        $json_encoded = $this->get_attributes_raw()['schedule_dynamic_to'];
+
+        if ($json_encoded === null) {
+            return null;
+        }
+
+        return date_offset::create_from_json($json_encoded);
+    }
+
+    /**
+     * Serialize (or skip) schedule_dynamic_to.
+     *
+     * @param string | date_offset | null
+     * @return track
+     */
+    protected function set_schedule_dynamic_to_attribute($dynamic_offset = null): self {
+        $json_encoded = $this->encode_dynamic_offset($dynamic_offset);
+
+        return $this->set_attribute_raw('schedule_dynamic_to', $json_encoded);
+    }
+
+    /**
+     * Unserialize repeating_offset.
+     *
+     * @return date_offset | null
+     */
+    protected function get_repeating_offset_attribute(): ?date_offset {
+        $json_encoded = $this->get_attributes_raw()['repeating_offset'];
+
+        if ($json_encoded === null) {
+            return null;
+        }
+
+        return date_offset::create_from_json($json_encoded);
+    }
+
+    /**
+     * Serialize (or skip) repeating_offset.
+     *
+     * @param string | date_offset | null
+     * @return track
+     */
+    protected function set_repeating_offset_attribute($dynamic_offset = null): self {
+        $json_encoded = $this->encode_dynamic_offset($dynamic_offset);
+
+        return $this->set_attribute_raw('repeating_offset', $json_encoded);
+    }
+
+    /**
+     * Unserialize due_date_offset.
+     *
+     * @return date_offset | null
+     */
+    protected function get_due_date_offset_attribute(): ?date_offset {
+        $json_encoded = $this->get_attributes_raw()['due_date_offset'];
+
+        if ($json_encoded === null) {
+            return null;
+        }
+
+        return date_offset::create_from_json($json_encoded);
+    }
+
+    /**
+     * Serialize (or skip) due_date_offset.
+     *
+     * @param string | date_offset | null
+     * @return track
+     */
+    protected function set_due_date_offset_attribute($dynamic_offset = null): self {
+        $json_encoded = $this->encode_dynamic_offset($dynamic_offset);
+
+        return $this->set_attribute_raw('due_date_offset', $json_encoded);
+    }
+
+    protected function encode_dynamic_offset($dynamic_offset) {
+        switch ($dynamic_offset) {
+            case null:
+                return null;
+            case is_array($dynamic_offset):
+            case is_string($dynamic_offset):
+                return json_encode(date_offset::create_from_json($dynamic_offset));
+            case $dynamic_offset instanceof date_offset:
+                return json_encode($dynamic_offset);
+            default:
+                throw new coding_exception(
+                    'dynamic offset must be a dynamic_offset, null, or json encoded dynamic_offset'
                 );
         }
     }

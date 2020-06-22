@@ -24,6 +24,7 @@
 
 require_once(__DIR__ . '/generator/activity_generator_configuration.php');
 
+use mod_perform\dates\date_offset;
 use mod_perform\dates\resolvers\dynamic\dynamic_source;
 use mod_perform\dates\resolvers\dynamic\user_creation_date;
 use mod_perform\models\activity\activity;
@@ -52,24 +53,25 @@ abstract class mod_perform_webapi_resolver_mutation_update_track_schedule_base e
         $activities = $perform_generator->create_full_activities($configuration);
 
         // Set all records to some known values so that we can see which records and fields are being modified.
+        $control_offset = json_encode(new date_offset(
+            -1,
+            date_offset::UNIT_WEEK,
+            date_offset::DIRECTION_BEFORE
+        ));
         $DB->set_field('perform_track', 'subject_instance_generation', -1);
         $DB->set_field('perform_track', 'schedule_is_open', -1);
         $DB->set_field('perform_track', 'schedule_is_fixed', -1);
         $DB->set_field('perform_track', 'schedule_fixed_from', -1);
         $DB->set_field('perform_track', 'schedule_fixed_to', -1);
-        $DB->set_field('perform_track', 'schedule_dynamic_count_from', -1);
-        $DB->set_field('perform_track', 'schedule_dynamic_count_to', -1);
-        $DB->set_field('perform_track', 'schedule_dynamic_unit', -1);
-        $DB->set_field('perform_track', 'schedule_dynamic_direction', -1);
+        $DB->set_field('perform_track', 'schedule_dynamic_from', $control_offset);
+        $DB->set_field('perform_track', 'schedule_dynamic_to', $control_offset);
         $DB->set_field('perform_track', 'due_date_is_enabled', -1);
         $DB->set_field('perform_track', 'due_date_is_fixed', -1);
         $DB->set_field('perform_track', 'due_date_fixed', -1);
-        $DB->set_field('perform_track', 'due_date_relative_count', -1);
-        $DB->set_field('perform_track', 'due_date_relative_unit', -1);
+        $DB->set_field('perform_track', 'due_date_offset', $control_offset);
         $DB->set_field('perform_track', 'repeating_is_enabled', -1);
-        $DB->set_field('perform_track', 'repeating_relative_type', -1);
-        $DB->set_field('perform_track', 'repeating_relative_count', -1);
-        $DB->set_field('perform_track', 'repeating_relative_unit', -1);
+        $DB->set_field('perform_track', 'repeating_type', -1);
+        $DB->set_field('perform_track', 'repeating_offset', $control_offset);
         $DB->set_field('perform_track', 'repeating_is_limited', -1);
         $DB->set_field('perform_track', 'repeating_limit', -1);
 

@@ -21,6 +21,7 @@
  * @package mod_perform
  */
 
+use mod_perform\dates\date_offset;
 use mod_perform\dates\resolvers\dynamic\user_custom_field;
 
 class mod_perform_user_custom_field_date_resolver_testcase extends advanced_testcase {
@@ -43,7 +44,12 @@ class mod_perform_user_custom_field_date_resolver_testcase extends advanced_test
     public function test_resolve() {
         $data = $this->generate_test_data();
         $custom_field_date_resolver = new user_custom_field();
-        $custom_field_date_resolver->set_parameters(1,1,'DAY', 'BEFORE', 'datetime-1', [$data['user1']->id]);
+        $custom_field_date_resolver->set_parameters(
+            new date_offset(1, date_offset::UNIT_DAY, date_offset::DIRECTION_BEFORE),
+            new date_offset(1, date_offset::UNIT_DAY, date_offset::DIRECTION_BEFORE),
+            'datetime-1',
+            [$data['user1']->id]
+        );
         $start_date_ts = $custom_field_date_resolver->get_start_for($data['user1']->id);
         $start_date = (new DateTime())->setTimestamp($start_date_ts);
         $this->assertSame('2020-06-12', $start_date->format('Y-m-d'));

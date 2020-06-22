@@ -145,22 +145,18 @@
         <FIELD NAME="schedule_is_fixed" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
         <FIELD NAME="schedule_fixed_from" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="schedule_fixed_to" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="schedule_dynamic_count_from" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="schedule_dynamic_count_to" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="schedule_dynamic_unit" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="schedule_dynamic_direction" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="schedule_dynamic_from" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="schedule_dynamic_to" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="schedule_dynamic_source" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="schedule_use_anniversary" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="schedule_needs_sync" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Flag whether schedule changes should be synchronised on the next schedule sync task run."/>
         <FIELD NAME="due_date_is_enabled" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="due_date_is_fixed" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="due_date_fixed" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="due_date_relative_count" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="due_date_relative_unit" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="due_date_offset" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="repeating_is_enabled" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="repeating_relative_type" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="repeating_relative_count" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="repeating_relative_unit" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="repeating_type" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="repeating_offset" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="repeating_is_limited" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="repeating_limit" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="created_at" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>

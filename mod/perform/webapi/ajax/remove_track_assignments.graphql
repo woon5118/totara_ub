@@ -3,29 +3,6 @@ mutation mod_perform_remove_track_assignments(
 ) {
   mod_perform_remove_track_assignments(assignments: $assignments) {
     id
-    description
-    status
-    subject_instance_generation_control_is_enabled
-    subject_instance_generation
-    schedule_is_open
-    schedule_is_fixed
-    schedule_fixed_from
-    schedule_fixed_to
-    schedule_dynamic_count_from
-    schedule_dynamic_count_to
-    schedule_dynamic_unit
-    schedule_dynamic_direction
-    due_date_is_enabled
-    due_date_is_fixed
-    due_date_fixed
-    due_date_relative_count
-    due_date_relative_unit
-    repeating_is_enabled
-    repeating_relative_type
-    repeating_relative_count
-    repeating_relative_unit
-    repeating_is_limited
-    repeating_limit
     assignments {
       type
       group {

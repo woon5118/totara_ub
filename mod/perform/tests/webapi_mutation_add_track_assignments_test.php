@@ -96,7 +96,6 @@ class mod_perform_webapi_mutation_add_track_assignments_testcase extends advance
         $updated_track = $this->get_webapi_operation_data($result);
         $this->assertNotNull($updated_track, 'track creation failed');
         $this->assertEquals($track->id, $updated_track['id'], 'wrong track returned');
-        $this->assertEquals($track->status, $updated_track['status'], 'wrong track status');
 
         $expected = [];
         foreach ($args['assignments']['groups'] as $group) {

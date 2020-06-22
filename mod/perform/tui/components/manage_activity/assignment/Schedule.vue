@@ -132,8 +132,7 @@ export default {
       dueDateIsFixed: this.track.due_date_is_fixed || false,
       repeatingIsEnabled: this.track.repeating_is_enabled,
       repeatingType:
-        this.track.repeating_relative_type ||
-        SCHEDULE_REPEATING_TYPE_AFTER_CREATION,
+        this.track.repeating_type || SCHEDULE_REPEATING_TYPE_AFTER_CREATION,
       isSaving: false,
       initialValues: this.getInitialValues(this.track),
       isGenerationControlEnabled: this.track
@@ -161,6 +160,7 @@ export default {
         'due_date_error_must_be_after_creation_date',
         'mod_perform'
       );
+
       if (this.dueDateIsFixed) {
         let creationEndDate = new Date(values.scheduleFixed.to);
         let dueDate = new Date(values.dueDateFixed.from);
@@ -172,10 +172,10 @@ export default {
           };
         }
       } else {
-        if (values.dueDateRelative.count <= 0) {
+        if (values.dueDateOffset.from_count <= 0) {
           return {
-            dueDateRelative: {
-              count: dueDateErrorString,
+            dueDateOffset: {
+              from_count: dueDateErrorString,
             },
           };
         }
@@ -191,6 +191,31 @@ export default {
      * @return {Object}
      */
     getInitialValues(track) {
+      let schedule_dynamic_from_count = '0';
+      let schedule_dynamic_from_unit = RELATIVE_DATE_UNIT_DAY;
+      let schedule_dynamic_from_direction = RELATIVE_DATE_DIRECTION_BEFORE;
+      if (track.schedule_dynamic_from) {
+        schedule_dynamic_from_count = track.schedule_dynamic_from.count;
+        schedule_dynamic_from_unit = track.schedule_dynamic_from.unit;
+        schedule_dynamic_from_direction = track.schedule_dynamic_from.direction;
+      }
+
+      let schedule_dynamic_to_count = '0';
+      let schedule_dynamic_to_unit = RELATIVE_DATE_UNIT_DAY;
+      let schedule_dynamic_to_direction = RELATIVE_DATE_DIRECTION_BEFORE;
+      if (track.schedule_dynamic_to) {
+        schedule_dynamic_to_count = track.schedule_dynamic_to.count;
+        schedule_dynamic_to_unit = track.schedule_dynamic_to.unit;
+        schedule_dynamic_to_direction = track.schedule_dynamic_to.direction;
+      }
+
+      let due_date_offset_count = '14';
+      let due_date_offset_unit = RELATIVE_DATE_UNIT_DAY;
+      if (track.due_date_offset) {
+        due_date_offset_count = track.due_date_offset.count;
+        due_date_offset_unit = track.due_date_offset.unit;
+      }
+
       return {
         // Creation range initial settings
         scheduleFixed: {
@@ -198,11 +223,12 @@ export default {
           to: this.getInitialDate(track.schedule_fixed_to),
         },
         scheduleDynamic: {
-          count: track.schedule_dynamic_count_from || '0', // Uniform required validation doesn't support int 0 at time of writing.
-          count_to: track.schedule_dynamic_count_to || '0', // Uniform required validation doesn't support int 0 at time of writing.
-          unit: track.schedule_dynamic_unit || RELATIVE_DATE_UNIT_DAY,
-          direction:
-            track.schedule_dynamic_direction || RELATIVE_DATE_DIRECTION_BEFORE,
+          from_count: schedule_dynamic_from_count, // Uniform required validation doesn't support int 0 at time of writing.
+          from_unit: schedule_dynamic_from_unit,
+          from_direction: schedule_dynamic_from_direction,
+          to_count: schedule_dynamic_to_count, // Uniform required validation doesn't support int 0 at time of writing.
+          to_unit: schedule_dynamic_to_unit,
+          to_direction: schedule_dynamic_to_direction,
           dynamic_source: this.getCombinedDynamicSourceKey(track),
           use_anniversary: track.schedule_use_anniversary,
         },
@@ -212,9 +238,9 @@ export default {
         dueDateFixed: {
           from: this.getInitialDate(track.due_date_fixed),
         },
-        dueDateRelative: {
-          count: track.due_date_relative_count || '14', // Uniform required validation doesn't support int 0 at time of writing.
-          unit: track.due_date_relative_unit || RELATIVE_DATE_UNIT_DAY,
+        dueDateOffset: {
+          from_count: due_date_offset_count, // Uniform required validation doesn't support int 0 at time of writing.
+          from_unit: due_date_offset_unit,
         },
         additionalSettings: {
           multiple_job_assignment: track.subject_instance_generation,
@@ -222,11 +248,10 @@ export default {
 
         // Repeating initial settings
         repeatingType:
-          track.repeating_relative_type ||
-          SCHEDULE_REPEATING_TYPE_AFTER_CREATION,
+          track.repeating_type || SCHEDULE_REPEATING_TYPE_AFTER_CREATION,
         repeatingIsLimited: track.repeating_is_limited || false,
         repeatingLimit: track.repeating_limit || '3',
-        repeatingRelativeDates: this.initRepeatingRelativeDates(track),
+        repeatingOffset: this.initRepeatingOffset(track),
       };
     },
 
@@ -304,9 +329,13 @@ export default {
         }
       } else {
         // Dynamic start date
-        gql.schedule_dynamic_count_from = Number(form.scheduleDynamic.count); // Gql does not handle "-1" and an int type.
-        gql.schedule_dynamic_unit = form.scheduleDynamic.unit;
-        gql.schedule_dynamic_direction = form.scheduleDynamic.direction;
+        gql.schedule_dynamic_from = {};
+        gql.schedule_dynamic_from.count = Number(
+          form.scheduleDynamic.from_count
+        ); // Gql does not handle "-1" and an int type.
+        gql.schedule_dynamic_from.unit = form.scheduleDynamic.from_unit;
+        gql.schedule_dynamic_from.direction =
+          form.scheduleDynamic.from_direction;
         gql.schedule_use_anniversary = form.scheduleDynamic.use_anniversary;
 
         const dynamicDateSourceParts = form.scheduleDynamic.dynamic_source.split(
@@ -317,9 +346,14 @@ export default {
           option_key: dynamicDateSourceParts[1],
         };
 
+        gql.due_date_offset = null;
+
         if (!this.scheduleIsOpen) {
           // Dynamic start date with closing date
-          gql.schedule_dynamic_count_to = Number(form.scheduleDynamic.count_to); // Gql does not handle "-1" and an int type.
+          gql.schedule_dynamic_to = {};
+          gql.schedule_dynamic_to.count = Number(form.scheduleDynamic.to_count); // Gql does not handle "-1" and an int type.
+          gql.schedule_dynamic_to.unit = form.scheduleDynamic.to_unit;
+          gql.schedule_dynamic_to.direction = form.scheduleDynamic.to_direction;
         }
       }
 
@@ -327,13 +361,13 @@ export default {
     },
 
     /**
-     * Initialise repeatingRelativeDates for each possible repeating type
+     * Initialise repeatingOffset for each possible repeating type
      * @param {Object} track
      * @return {Object}
      */
-    initRepeatingRelativeDates(track) {
+    initRepeatingOffset(track) {
       // We want a separate relative relative date for each type.
-      let repeatingRelativeDates = [];
+      let repeatingOffset = [];
       let repeatingTypes = [
         SCHEDULE_REPEATING_TYPE_AFTER_CREATION,
         SCHEDULE_REPEATING_TYPE_AFTER_CREATION_WHEN_COMPLETE,
@@ -342,23 +376,29 @@ export default {
 
       // First set all to the default
       repeatingTypes.forEach(currentType => {
-        repeatingRelativeDates[currentType] = {
-          count: '4',
-          unit: RELATIVE_DATE_UNIT_WEEK,
+        repeatingOffset[currentType] = {
+          from_count: '4',
+          from_unit: RELATIVE_DATE_UNIT_WEEK,
         };
       });
 
       // Now set the currently selected type's stored values
-      if (track.repeating_relative_type) {
-        repeatingRelativeDates[track.repeating_relative_type].count =
-          track.repeating_relative_count ||
-          repeatingRelativeDates[track.repeating_relative_type].count;
-        repeatingRelativeDates[track.repeating_relative_type].unit =
-          track.repeating_relative_unit ||
-          repeatingRelativeDates[track.repeating_relative_type].unit;
+      if (track.repeating_type) {
+        let repeating_offset_count =
+          repeatingOffset[track.repeating_type].from_count;
+        let repeating_offset_unit =
+          repeatingOffset[track.repeating_type].from_unit;
+        if (track.repeating_offset) {
+          repeating_offset_count = track.repeating_offset.count;
+          repeating_offset_unit = track.repeating_offset.unit;
+        }
+        repeatingOffset[
+          track.repeating_type
+        ].from_count = repeating_offset_count;
+        repeatingOffset[track.repeating_type].from_unit = repeating_offset_unit;
       }
 
-      return repeatingRelativeDates;
+      return repeatingOffset;
     },
 
     /**
@@ -370,13 +410,14 @@ export default {
 
       gql.repeating_is_enabled = this.repeatingIsEnabled;
       if (gql.repeating_is_enabled) {
-        gql.repeating_relative_type = form.repeatingType;
+        gql.repeating_type = form.repeatingType;
 
-        let key = gql.repeating_relative_type;
-        gql.repeating_relative_count = Number(
-          form.repeatingRelativeDates[key].count
+        let key = gql.repeating_type;
+        gql.repeating_offset = {};
+        gql.repeating_offset.count = Number(
+          form.repeatingOffset[key].from_count
         );
-        gql.repeating_relative_unit = form.repeatingRelativeDates[key].unit;
+        gql.repeating_offset.unit = form.repeatingOffset[key].from_unit;
 
         gql.repeating_is_limited = form.repeatingIsLimited;
         if (gql.repeating_is_limited) {
@@ -407,8 +448,9 @@ export default {
       if (gql.due_date_is_fixed) {
         gql.due_date_fixed = this.getUnixTime(form.dueDateFixed.from);
       } else {
-        gql.due_date_relative_count = Number(form.dueDateRelative.count); // Gql does not handle "-1" and an int type.
-        gql.due_date_relative_unit = form.dueDateRelative.unit;
+        gql.due_date_offset = {};
+        gql.due_date_offset.count = Number(form.dueDateOffset.from_count); // Gql does not handle "-1" and an int type.
+        gql.due_date_offset.unit = form.dueDateOffset.from_unit;
       }
 
       return gql;

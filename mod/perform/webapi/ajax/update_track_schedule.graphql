@@ -4,18 +4,20 @@ mutation mod_perform_update_track_schedule(
   mod_perform_update_track_schedule(track_schedule: $track_schedule) {
     track {
       id
-      description
-      status
-      subject_instance_generation_control_is_enabled
-      subject_instance_generation
       schedule_is_open
       schedule_is_fixed
       schedule_fixed_from
       schedule_fixed_to
-      schedule_dynamic_count_from
-      schedule_dynamic_count_to
-      schedule_dynamic_unit
-      schedule_dynamic_direction
+      schedule_dynamic_from {
+        count
+        unit
+        direction
+      }
+      schedule_dynamic_to {
+        count
+        unit
+        direction
+      }
       schedule_dynamic_source {
         resolver_class_name
         option_key
@@ -26,23 +28,20 @@ mutation mod_perform_update_track_schedule(
       due_date_is_enabled
       due_date_is_fixed
       due_date_fixed
-      due_date_relative_count
-      due_date_relative_unit
+      due_date_offset {
+        count
+        unit
+      }
       repeating_is_enabled
-      repeating_relative_type
-      repeating_relative_count
-      repeating_relative_unit
+      repeating_type
+      repeating_offset {
+        count
+        unit
+      }
       repeating_is_limited
       repeating_limit
-      assignments {
-        type
-        group {
-          id
-          type
-          type_label
-          name
-        }
-      }
+      subject_instance_generation_control_is_enabled
+      subject_instance_generation
     }
   }
 }

@@ -69,10 +69,8 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_fixed_test
         self::assertTrue($result_track['schedule_is_fixed']);
         self::assertEquals(222, $result_track['schedule_fixed_from']);
         self::assertNull($result_track['schedule_fixed_to']);
-        self::assertNull($result_track['schedule_dynamic_count_from']);
-        self::assertNull($result_track['schedule_dynamic_count_to']);
-        self::assertNull($result_track['schedule_dynamic_unit']);
-        self::assertNull($result_track['schedule_dynamic_direction']);
+        self::assertNull($result_track['schedule_dynamic_from']);
+        self::assertNull($result_track['schedule_dynamic_to']);
 
         // Manually make the changes that we expect to make.
         $affected_track = $before_tracks[$this->track1_id];
@@ -80,20 +78,16 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_fixed_test
         $affected_track->schedule_is_fixed = 1;
         $affected_track->schedule_fixed_from = 222;
         $affected_track->schedule_fixed_to = null;
-        $affected_track->schedule_dynamic_count_from = null;
-        $affected_track->schedule_dynamic_count_to = null;
-        $affected_track->schedule_dynamic_unit = null;
-        $affected_track->schedule_dynamic_direction = null;
+        $affected_track->schedule_dynamic_from = null;
+        $affected_track->schedule_dynamic_to = null;
         $affected_track->schedule_needs_sync = 1;
         $affected_track->due_date_is_enabled = 0;
         $affected_track->due_date_is_fixed = null;
         $affected_track->due_date_fixed = null;
-        $affected_track->due_date_relative_count = null;
-        $affected_track->due_date_relative_unit = null;
+        $affected_track->due_date_offset = null;
         $affected_track->repeating_is_enabled = 0;
-        $affected_track->repeating_relative_type = null;
-        $affected_track->repeating_relative_count = null;
-        $affected_track->repeating_relative_unit = null;
+        $affected_track->repeating_type = null;
+        $affected_track->repeating_offset = null;
         $affected_track->repeating_is_limited = 0;
         $affected_track->repeating_limit = null;
 

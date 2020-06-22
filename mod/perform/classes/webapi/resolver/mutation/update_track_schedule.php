@@ -28,6 +28,7 @@ use core\webapi\execution_context;
 use core\webapi\mutation_resolver;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\resolver\has_middleware;
+use mod_perform\dates\date_offset;
 use mod_perform\dates\resolvers\dynamic\dynamic_source;
 use mod_perform\models\activity\track;
 use mod_perform\webapi\middleware\require_activity;
@@ -66,32 +67,24 @@ class update_track_schedule implements mutation_resolver, has_middleware {
                 true
             );
 
+            $dynamic_from = date_offset::create_from_json(
+                $track_schedule['schedule_dynamic_from']
+            );
+
             if ($track_schedule['schedule_is_open']) {
                 $track->set_schedule_open_dynamic(
-                    $track_schedule['schedule_dynamic_count_from'],
-                    track::mapped_value_from_string($track_schedule['schedule_dynamic_unit'],
-                        track::get_dynamic_schedule_units(),
-                        'schedule dynamic unit'
-                    ),
-                    track::mapped_value_from_string($track_schedule['schedule_dynamic_direction'],
-                        track::get_dynamic_schedule_directions(),
-                        'schedule dynamic direction'
-                    ),
+                    $dynamic_from,
                     $dynamic_source,
                     $track_schedule['schedule_use_anniversary']
                 );
             } else { // Closed.
+                $dynamic_to = date_offset::create_from_json(
+                    $track_schedule['schedule_dynamic_to']
+                );
+
                 $track->set_schedule_closed_dynamic(
-                    $track_schedule['schedule_dynamic_count_from'],
-                    $track_schedule['schedule_dynamic_count_to'],
-                    track::mapped_value_from_string($track_schedule['schedule_dynamic_unit'],
-                        track::get_dynamic_schedule_units(),
-                        'schedule dynamic unit'
-                    ),
-                    track::mapped_value_from_string($track_schedule['schedule_dynamic_direction'],
-                        track::get_dynamic_schedule_directions(),
-                        'schedule dynamic direction'
-                    ),
+                    $dynamic_from,
+                    $dynamic_to,
                     $dynamic_source,
                     $track_schedule['schedule_use_anniversary']
                 );
@@ -106,21 +99,21 @@ class update_track_schedule implements mutation_resolver, has_middleware {
                         $track_schedule['due_date_fixed']
                     );
                 } else { // Relative.
+                    $due_date_offset = date_offset::create_from_json(
+                        $track_schedule['due_date_offset']
+                    );
+
                     $track->set_due_date_relative(
-                        $track_schedule['due_date_relative_count'],
-                        track::mapped_value_from_string($track_schedule['due_date_relative_unit'],
-                            track::get_dynamic_schedule_units(),
-                            'schedule dynamic direction'
-                        )
+                        $due_date_offset
                     );
                 }
             } else {
+                $due_date_offset = date_offset::create_from_json(
+                    $track_schedule['due_date_offset']
+                );
+
                 $track->set_due_date_relative(
-                    $track_schedule['due_date_relative_count'],
-                    track::mapped_value_from_string($track_schedule['due_date_relative_unit'],
-                        track::get_dynamic_schedule_units(),
-                        'due date relative unit'
-                    )
+                    $due_date_offset
                 );
             }
         } else { // Disabled.
@@ -129,16 +122,16 @@ class update_track_schedule implements mutation_resolver, has_middleware {
 
         // Repeating.
         if ($track_schedule['repeating_is_enabled']) {
+            $repeating_offset = date_offset::create_from_json(
+                $track_schedule['repeating_offset']
+            );
+
             $track->set_repeating_enabled(
-                track::mapped_value_from_string($track_schedule['repeating_relative_type'],
-                    track::get_repeating_relative_types(),
-                    'repeating relative type'
+                track::mapped_value_from_string($track_schedule['repeating_type'],
+                    track::get_repeating_types(),
+                    'repeating type'
                 ),
-                $track_schedule['repeating_relative_count'],
-                track::mapped_value_from_string($track_schedule['repeating_relative_unit'],
-                    track::get_dynamic_schedule_units(),
-                    'repeating relative unit'
-                ),
+                $repeating_offset,
                 $track_schedule['repeating_is_limited'] ? $track_schedule['repeating_limit'] : null
             );
         } else { // Disabled.
@@ -177,16 +170,13 @@ class update_track_schedule implements mutation_resolver, has_middleware {
             'subject_instance_generation',
             'schedule_fixed_from',
             'schedule_fixed_to',
-            'schedule_dynamic_count_from',
-            'schedule_dynamic_count_to',
-            'schedule_dynamic_unit',
-            'schedule_dynamic_direction',
+            'schedule_dynamic_from',
+            'schedule_dynamic_to',
             'schedule_dynamic_source',
             'schedule_use_anniversary',
             'due_date_is_fixed',
             'due_date_fixed',
-            'due_date_relative_count',
-            'due_date_relative_unit',
+            'due_date_offset',
         ];
 
         $required_fields = [];
@@ -201,16 +191,12 @@ class update_track_schedule implements mutation_resolver, has_middleware {
             }
         } else { // Dynamic.
             if ($schedule['schedule_is_open']) {
-                $required_fields[] = 'schedule_dynamic_count_from';
-                $required_fields[] = 'schedule_dynamic_unit';
-                $required_fields[] = 'schedule_dynamic_direction';
+                $required_fields[] = 'schedule_dynamic_from';
                 $required_fields[] = 'schedule_dynamic_source';
                 $required_fields[] = 'schedule_use_anniversary';
             } else { // Closed.
-                $required_fields[] = 'schedule_dynamic_count_from';
-                $required_fields[] = 'schedule_dynamic_count_to';
-                $required_fields[] = 'schedule_dynamic_unit';
-                $required_fields[] = 'schedule_dynamic_direction';
+                $required_fields[] = 'schedule_dynamic_from';
+                $required_fields[] = 'schedule_dynamic_to';
                 $required_fields[] = 'schedule_dynamic_source';
                 $required_fields[] = 'schedule_use_anniversary';
             }
@@ -223,20 +209,17 @@ class update_track_schedule implements mutation_resolver, has_middleware {
                 if (!empty($schedule['due_date_is_fixed'])) {
                     $required_fields[] = 'due_date_fixed';
                 } else { // Relative.
-                    $required_fields[] = 'due_date_relative_count';
-                    $required_fields[] = 'due_date_relative_unit';
+                    $required_fields[] = 'due_date_offset';
                 }
             } else {
-                $required_fields[] = 'due_date_relative_count';
-                $required_fields[] = 'due_date_relative_unit';
+                $required_fields[] = 'due_date_offset';
             }
         }
 
         // Repeating.
         if ($schedule['repeating_is_enabled']) {
-            $required_fields[] = 'repeating_relative_type';
-            $required_fields[] = 'repeating_relative_count';
-            $required_fields[] = 'repeating_relative_unit';
+            $required_fields[] = 'repeating_type';
+            $required_fields[] = 'repeating_offset';
             $required_fields[] = 'repeating_is_limited';
             if (!empty($schedule['repeating_is_limited']) && $schedule['repeating_is_limited']) {
                 $required_fields[] = 'repeating_limit';

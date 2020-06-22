@@ -25,6 +25,7 @@
 use core\entities\user;
 use core\orm\entity\repository as entity_repository;
 use core\orm\query\builder;
+use mod_perform\dates\date_offset;
 use mod_perform\dates\resolvers\dynamic\dynamic_source;
 use mod_perform\dates\resolvers\dynamic\user_creation_date;
 use mod_perform\dates\resolvers\dynamic\user_custom_field;
@@ -669,12 +670,18 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $track = track_entity::repository()->find($track1_id);
         $track->schedule_is_open = false;
         $track->schedule_is_fixed = false;
-        $track->schedule_dynamic_direction = track_entity::SCHEDULE_DYNAMIC_DIRECTION_BEFORE;
+        $track->schedule_dynamic_from = new date_offset(
+            7,
+            date_offset::UNIT_DAY,
+            date_offset::DIRECTION_BEFORE
+        );
+        $track->schedule_dynamic_to = new date_offset(
+            0,
+            date_offset::UNIT_DAY,
+            date_offset::DIRECTION_BEFORE
+        );
         $track->schedule_dynamic_source = $dynamic_source;
-        $track->schedule_dynamic_count_from = 7;
-        $track->schedule_dynamic_count_to = 0;
         $track->schedule_use_anniversary = false;
-        $track->schedule_dynamic_unit = track_entity::SCHEDULE_DYNAMIC_UNIT_DAY;
         $track->save();
 
         $create_date = 1589932800;
@@ -698,9 +705,9 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $this->assertEquals($seven_days_before_create_date, $track_user_assignment->period_start_date);
         $this->assertEquals($create_date, $track_user_assignment->period_end_date);
 
-        // Change to open_fixed and expand for a new user.
+        // Change to open and expand for a new user.
         $track->schedule_is_open = true;
-        $track->schedule_is_fixed = false;
+        $track->schedule_dynamic_to = null;
         $track->save();
 
         // Set the users created date.
@@ -732,12 +739,18 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $track = track_entity::repository()->find($track1_id);
         $track->schedule_is_open = false;
         $track->schedule_is_fixed = false;
-        $track->schedule_dynamic_direction = track_entity::SCHEDULE_DYNAMIC_DIRECTION_BEFORE;
+        $track->schedule_dynamic_from = new date_offset(
+            0,
+            date_offset::UNIT_DAY,
+            date_offset::DIRECTION_BEFORE
+        );
+        $track->schedule_dynamic_to = new date_offset(
+            0,
+            date_offset::UNIT_DAY,
+            date_offset::DIRECTION_BEFORE
+        );
         $track->schedule_dynamic_source = $dynamic_source;
-        $track->schedule_dynamic_count_from = 0;
-        $track->schedule_dynamic_count_to = 0;
         $track->schedule_use_anniversary = true;
-        $track->schedule_dynamic_unit = track_entity::SCHEDULE_DYNAMIC_UNIT_DAY;
         $track->save();
 
         $create_date = (new DateTime('2000-01-01T00:00:00', new DateTimeZone('UTC')))->getTimestamp();
@@ -760,9 +773,9 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $this->assert_anniversary_date($track_user_assignment->period_start_date, 1, 1);
         $this->assert_anniversary_date($track_user_assignment->period_end_date, 1, 1);
 
-        // Change to open_fixed and expand for a new user.
+        // Change to open and expand for a new user.
         $track->schedule_is_open = true;
-        $track->schedule_is_fixed = false;
+        $track->schedule_dynamic_to = null;
         $track->save();
 
         // Set the users created date.
@@ -803,10 +816,16 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $track->schedule_is_open = false;
         $track->schedule_is_fixed = false;
         $track->schedule_dynamic_source = $dynamic_source;
-        $track->schedule_dynamic_count_from = 1;
-        $track->schedule_dynamic_count_to = 2;
-        $track->schedule_dynamic_unit = track_entity::SCHEDULE_DYNAMIC_UNIT_DAY;
-        $track->schedule_dynamic_direction = track_entity::SCHEDULE_DYNAMIC_DIRECTION_AFTER;
+        $track->schedule_dynamic_from = new date_offset(
+            1,
+            date_offset::UNIT_DAY,
+            date_offset::DIRECTION_AFTER
+        );
+        $track->schedule_dynamic_to = new date_offset(
+            2,
+            date_offset::UNIT_DAY,
+            date_offset::DIRECTION_AFTER
+        );
         $track->save();
 
         $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user1->id);

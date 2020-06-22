@@ -25,6 +25,7 @@
 require_once(__DIR__ . '/generator/activity_generator_configuration.php');
 require_once(__DIR__ . '/webapi_resolver_mutation_update_track_schedule.php');
 
+use mod_perform\dates\date_offset;
 use mod_perform\dates\resolvers\dynamic\dynamic_source;
 use mod_perform\entities\activity\track as track_entity;
 use totara_core\advanced_feature;
@@ -46,17 +47,26 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_
         /** @var $date_dynamic_source dynamic_source */
         [$date_dynamic_source, $dynamic_source_input] = $this->get_user_creation_date_dynamic_source();
 
+        $from = [
+            'count' => 555,
+            'unit' => date_offset::UNIT_WEEK,
+            'direction' => date_offset::DIRECTION_BEFORE,
+        ];
+        $to = [
+            'count' => 444,
+            'unit' => date_offset::UNIT_WEEK,
+            'direction' => date_offset::DIRECTION_BEFORE,
+        ];
+
         $args = [
             'track_schedule' => [
                 'track_id' => $this->track1_id,
                 'schedule_is_open' => false,
                 'schedule_is_fixed' => false,
-                'schedule_dynamic_count_from' => 555,
-                'schedule_dynamic_count_to' => 444,
-                'schedule_dynamic_unit' => 'WEEK',
-                'schedule_dynamic_direction' => 'BEFORE',
-                'schedule_use_anniversary' => true,
+                'schedule_dynamic_from' => $from,
+                'schedule_dynamic_to' => $to,
                 'schedule_dynamic_source' => $dynamic_source_input,
+                'schedule_use_anniversary' => true,
                 'due_date_is_enabled' => false,
                 'repeating_is_enabled' => false,
             ],
@@ -79,10 +89,8 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_
         self::assertTrue($result_track['schedule_use_anniversary']);
         self::assertNull($result_track['schedule_fixed_from']);
         self::assertNull($result_track['schedule_fixed_to']);
-        self::assertEquals(555, $result_track['schedule_dynamic_count_from']);
-        self::assertEquals(444, $result_track['schedule_dynamic_count_to']);
-        self::assertEquals('WEEK', $result_track['schedule_dynamic_unit']);
-        self::assertEquals('BEFORE', $result_track['schedule_dynamic_direction']);
+        self::assertEquals($from, $result_track['schedule_dynamic_from']);
+        self::assertEquals($to, $result_track['schedule_dynamic_to']);
         self::assertEquals($date_dynamic_source->jsonSerialize(), $result_track['schedule_dynamic_source']);
 
         // Manually make the changes that we expect to make.
@@ -91,22 +99,18 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_
         $affected_track->schedule_is_fixed = 0;
         $affected_track->schedule_fixed_from = null;
         $affected_track->schedule_fixed_to = null;
-        $affected_track->schedule_dynamic_count_from = 555;
-        $affected_track->schedule_dynamic_count_to = 444;
-        $affected_track->schedule_dynamic_unit = track_entity::SCHEDULE_DYNAMIC_UNIT_WEEK;
-        $affected_track->schedule_dynamic_direction = track_entity::SCHEDULE_DYNAMIC_DIRECTION_BEFORE;
+        $affected_track->schedule_dynamic_from = json_encode($from);
+        $affected_track->schedule_dynamic_to = json_encode($to);
         $affected_track->schedule_dynamic_source = json_encode($date_dynamic_source);
         $affected_track->schedule_use_anniversary = 1;
         $affected_track->schedule_needs_sync = 1;
         $affected_track->due_date_is_enabled = 0;
         $affected_track->due_date_is_fixed = null;
         $affected_track->due_date_fixed = null;
-        $affected_track->due_date_relative_count = null;
-        $affected_track->due_date_relative_unit = null;
+        $affected_track->due_date_offset = null;
         $affected_track->repeating_is_enabled = 0;
-        $affected_track->repeating_relative_type = null;
-        $affected_track->repeating_relative_count = null;
-        $affected_track->repeating_relative_unit = null;
+        $affected_track->repeating_type = null;
+        $affected_track->repeating_offset = null;
         $affected_track->repeating_is_limited = 0;
         $affected_track->repeating_limit = null;
 
@@ -125,12 +129,18 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_
                 'track_id' => $this->track1_id,
                 'schedule_is_open' => false,
                 'schedule_is_fixed' => false,
-                'schedule_dynamic_unit' => 'WEEK',
-                'schedule_dynamic_direction' => 'AFTER',
+                'schedule_dynamic_from' => [
+                    'count' => 200,
+                    'unit' => date_offset::UNIT_WEEK,
+                    'direction' => date_offset::DIRECTION_AFTER
+                ],
+                'schedule_dynamic_to' => [
+                    'count' => 100,
+                    'unit' => date_offset::UNIT_WEEK,
+                    'direction' => date_offset::DIRECTION_AFTER
+                ],
                 'schedule_dynamic_source' => $resolver_selection,
                 'schedule_use_anniversary' => true,
-                'schedule_dynamic_count_from' => 200,
-                'schedule_dynamic_count_to' => 100,
                 'due_date_is_enabled' => false,
                 'repeating_is_enabled' => false,
             ],
@@ -139,7 +149,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
         $this->assert_webapi_operation_failed(
             $result,
-            '"count_from" must not be after "count_to" when dynamic schedule direction is "AFTER"'
+            '"from" must not be after "to"'
         );
     }
 
@@ -156,12 +166,18 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_
                 'track_id' => $this->track1_id,
                 'schedule_is_open' => false,
                 'schedule_is_fixed' => false,
-                'schedule_dynamic_unit' => 'MONTH',
-                'schedule_dynamic_direction' => 'AFTER',
+                'schedule_dynamic_from' => [
+                    'count' => 100,
+                    'unit' => date_offset::UNIT_WEEK,
+                    'direction' => date_offset::DIRECTION_AFTER,
+                ],
+                'schedule_dynamic_to' => [
+                    'count' => 200,
+                    'unit' => date_offset::UNIT_WEEK,
+                    'direction' => date_offset::DIRECTION_AFTER,
+                ],
                 'schedule_dynamic_source' => $resolver_selection,
                 'schedule_use_anniversary' => true,
-                'schedule_dynamic_count_from' => 100,
-                'schedule_dynamic_count_to' => 200,
                 'due_date_is_enabled' => false,
                 'repeating_is_enabled' => false,
             ],
@@ -182,7 +198,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_
         return [
             'Invalid resolver class name' => [
                 [
-                    'resolver_class_name' => \DateTime::class,
+                    'resolver_class_name' => \DateTime::class, // Valid class but invalid subclass.
                     'option_key' => $date_dynamic_source->get_option_key(),
                 ],
                 'Source is not available'
@@ -208,10 +224,16 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_
                 'track_id' => $this->track1_id,
                 'schedule_is_open' => false,
                 'schedule_is_fixed' => false,
-                'schedule_dynamic_count_from' => 555,
-                'schedule_dynamic_count_to' => 444,
-                'schedule_dynamic_unit' => 'WEEK',
-                'schedule_dynamic_direction' => 'BEFORE',
+                'schedule_dynamic_from' => [
+                    'count' => 555,
+                    'unit' => date_offset::UNIT_WEEK,
+                    'direction' => date_offset::DIRECTION_BEFORE,
+                ],
+                'schedule_dynamic_to' => [
+                    'count' => 444,
+                    'unit' => date_offset::UNIT_WEEK,
+                    'direction' => date_offset::DIRECTION_BEFORE,
+                ],
                 'schedule_dynamic_source' => $dynamic_source_input,
                 'schedule_use_anniversary' => true,
                 'due_date_is_enabled' => false,

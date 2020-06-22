@@ -22,6 +22,7 @@
  * @category test
  */
 
+use mod_perform\dates\date_offset;
 use mod_perform\dates\resolvers\dynamic\dynamic_source;
 use mod_perform\entities\activity\track as track_entity;
 use totara_webapi\phpunit\webapi_phpunit_helper;
@@ -45,14 +46,18 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_dynamic_te
         /** @var $dynamic_source dynamic_source */
         [$dynamic_source, $dynamic_source_input] = $this->get_user_creation_date_dynamic_source();
 
+        $from = [
+            'count' => 555,
+            'unit' => date_offset::UNIT_WEEK,
+            'direction' => date_offset::DIRECTION_BEFORE
+        ];
+
         $args = [
             'track_schedule' => [
                 'track_id' => $this->track1_id,
                 'schedule_is_open' => true,
                 'schedule_is_fixed' => false,
-                'schedule_dynamic_count_from' => 555,
-                'schedule_dynamic_unit' => 'WEEK',
-                'schedule_dynamic_direction' => 'BEFORE',
+                'schedule_dynamic_from' => $from,
                 'schedule_dynamic_source' => $dynamic_source_input,
                 'schedule_use_anniversary' => true,
                 'due_date_is_enabled' => false,
@@ -77,10 +82,8 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_dynamic_te
         self::assertFalse($result_track['schedule_is_fixed']);
         self::assertNull($result_track['schedule_fixed_from']);
         self::assertNull($result_track['schedule_fixed_to']);
-        self::assertEquals(555, $result_track['schedule_dynamic_count_from']);
-        self::assertNull($result_track['schedule_dynamic_count_to']);
-        self::assertEquals('WEEK', $result_track['schedule_dynamic_unit']);
-        self::assertEquals('BEFORE', $result_track['schedule_dynamic_direction']);
+        self::assertEquals($from, $result_track['schedule_dynamic_from']);
+        self::assertNull($result_track['schedule_dynamic_to']);
         self::assertEquals($dynamic_source->jsonSerialize(), $result_track['schedule_dynamic_source']);
 
         // Manually make the changes that we expect to make.
@@ -89,22 +92,18 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_dynamic_te
         $affected_track->schedule_is_fixed = 0;
         $affected_track->schedule_fixed_from = null;
         $affected_track->schedule_fixed_to = null;
-        $affected_track->schedule_dynamic_count_from = 555;
-        $affected_track->schedule_dynamic_count_to = null;
-        $affected_track->schedule_dynamic_unit = track_entity::SCHEDULE_DYNAMIC_UNIT_WEEK;
-        $affected_track->schedule_dynamic_direction = track_entity::SCHEDULE_DYNAMIC_DIRECTION_BEFORE;
+        $affected_track->schedule_dynamic_from = json_encode($from);
+        $affected_track->schedule_dynamic_to = null;
         $affected_track->schedule_dynamic_source = json_encode($dynamic_source);
         $affected_track->schedule_use_anniversary = true;
         $affected_track->schedule_needs_sync = 1;
         $affected_track->due_date_is_enabled = 0;
         $affected_track->due_date_is_fixed = null;
         $affected_track->due_date_fixed = null;
-        $affected_track->due_date_relative_count = null;
-        $affected_track->due_date_relative_unit = null;
+        $affected_track->due_date_offset = null;
         $affected_track->repeating_is_enabled = 0;
-        $affected_track->repeating_relative_type = null;
-        $affected_track->repeating_relative_count = null;
-        $affected_track->repeating_relative_unit = null;
+        $affected_track->repeating_type = null;
+        $affected_track->repeating_offset = null;
         $affected_track->repeating_is_limited = 0;
         $affected_track->repeating_limit = null;
 
@@ -114,31 +113,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_dynamic_te
     }
 
     public function test_with_validation_errors(): void {
-        [, $dynamic_source_input] = $this->get_user_creation_date_dynamic_source();
-
-        // To must be after or equal to from.
-        $args = [
-            'track_schedule' => [
-                'track_id' => $this->track1_id,
-                'schedule_is_open' => true,
-                'schedule_is_fixed' => false,
-                'schedule_dynamic_unit' => 'WEEK',
-                'schedule_dynamic_direction' => 'AFTER',
-                'schedule_dynamic_source' => $dynamic_source_input,
-                'schedule_use_anniversary' => true,
-                'schedule_dynamic_count_from' => -234,
-                'due_date_is_enabled' => false,
-                'repeating_is_enabled' => false,
-            ],
-        ];
-
-        $this->expectException(coding_exception::class);
-        $this->expectExceptionMessage('Count from must be a positive integer');
-
-        $this->resolve_graphql_mutation(
-            'mod_perform_update_track_schedule',
-            $args
-        );
+        // None currently, but we will have when additional fields are added.
     }
 
 }

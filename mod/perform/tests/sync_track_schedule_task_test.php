@@ -23,6 +23,7 @@
  */
 
 use core\entities\user;
+use mod_perform\dates\date_offset;
 use mod_perform\dates\resolvers\dynamic\user_creation_date;
 use mod_perform\entities\activity\activity;
 use mod_perform\entities\activity\subject_instance;
@@ -102,10 +103,8 @@ class mod_perform_sync_track_schedule_task_testcase extends advanced_testcase {
         $dynamic_source = (new user_creation_date())->get_options()->first();
 
         $track->set_schedule_closed_dynamic(
-            0,
-            1,
-            track::SCHEDULE_DYNAMIC_UNIT_DAY,
-            track::SCHEDULE_DYNAMIC_DIRECTION_AFTER,
+            new date_offset(0, date_offset::UNIT_DAY, date_offset::DIRECTION_AFTER),
+            new date_offset(1, date_offset::UNIT_DAY, date_offset::DIRECTION_AFTER),
             $dynamic_source,
             true
         )->update();
@@ -125,9 +124,7 @@ class mod_perform_sync_track_schedule_task_testcase extends advanced_testcase {
         $this->assert_anniversary_date($user_assignment->period_end_date, 4, 2);
 
         $track->set_schedule_open_dynamic(
-            0,
-            track::SCHEDULE_DYNAMIC_UNIT_DAY,
-            track::SCHEDULE_DYNAMIC_DIRECTION_AFTER,
+            new date_offset(0, date_offset::UNIT_DAY, date_offset::DIRECTION_AFTER),
             $dynamic_source,
             true
         )->update();

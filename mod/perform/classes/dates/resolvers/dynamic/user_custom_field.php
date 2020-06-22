@@ -57,8 +57,7 @@ class user_custom_field extends base_dynamic_date_resolver {
                 $item->shortname,
                 $item->name
             );
-        }
-        );
+        });
     }
 
     /**

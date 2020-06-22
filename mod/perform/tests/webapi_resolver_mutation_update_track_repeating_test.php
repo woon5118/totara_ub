@@ -22,6 +22,7 @@
  * @category test
  */
 
+use mod_perform\dates\date_offset;
 use mod_perform\entities\activity\track;
 use mod_perform\entities\activity\track as track_entity;
 use mod_perform\models\activity\activity;
@@ -72,20 +73,16 @@ class mod_perform_webapi_resolver_mutation_update_track_repeating_testcase
         $affected_track->schedule_is_fixed = 1;
         $affected_track->schedule_fixed_from = 222;
         $affected_track->schedule_fixed_to = null;
-        $affected_track->schedule_dynamic_count_from = null;
-        $affected_track->schedule_dynamic_count_to = null;
-        $affected_track->schedule_dynamic_unit = null;
-        $affected_track->schedule_dynamic_direction = null;
+        $affected_track->schedule_dynamic_from = null;
+        $affected_track->schedule_dynamic_to = null;
         $affected_track->schedule_needs_sync = 1;
         $affected_track->due_date_is_enabled = 0;
         $affected_track->due_date_is_fixed = null;
         $affected_track->due_date_fixed = null;
-        $affected_track->due_date_relative_count = null;
-        $affected_track->due_date_relative_unit = null;
+        $affected_track->due_date_offset = null;
         $affected_track->repeating_is_enabled = 0;
-        $affected_track->repeating_relative_type = null;
-        $affected_track->repeating_relative_count = null;
-        $affected_track->repeating_relative_unit = null;
+        $affected_track->repeating_type = null;
+        $affected_track->repeating_offset = null;
         $affected_track->repeating_is_limited = 0;
         $affected_track->repeating_limit = null;
 
@@ -121,9 +118,11 @@ class mod_perform_webapi_resolver_mutation_update_track_repeating_testcase
                 'schedule_fixed_from' => 222,
                 'due_date_is_enabled' => false,
                 'repeating_is_enabled' => true,
-                'repeating_relative_type' => 'AFTER_CREATION_WHEN_COMPLETE',
-                'repeating_relative_count' => 4,
-                'repeating_relative_unit' => 'WEEK',
+                'repeating_type' => 'AFTER_CREATION_WHEN_COMPLETE',
+                'repeating_offset' => [
+                    'count' => 4,
+                    'unit' => date_offset::UNIT_WEEK,
+                ],
                 'repeating_is_limited' => true,
                 'repeating_limit' => 5,
             ],
@@ -150,16 +149,17 @@ class mod_perform_webapi_resolver_mutation_update_track_repeating_testcase
         $affected_track->schedule_is_fixed = 1;
         $affected_track->schedule_fixed_from = 222;
         $affected_track->schedule_fixed_to = null;
-        $affected_track->schedule_dynamic_count_from = null;
-        $affected_track->schedule_dynamic_count_to = null;
-        $affected_track->schedule_dynamic_unit = null;
-        $affected_track->schedule_dynamic_direction = null;
+        $affected_track->schedule_dynamic_from = null;
+        $affected_track->schedule_dynamic_to = null;
         $affected_track->schedule_needs_sync = 1;
         $affected_track->due_date_is_enabled = 0;
         $affected_track->repeating_is_enabled = 1;
-        $affected_track->repeating_relative_type = track::SCHEDULE_REPEATING_TYPE_AFTER_CREATION_WHEN_COMPLETE;
-        $affected_track->repeating_relative_count = 4;
-        $affected_track->repeating_relative_unit = track_entity::SCHEDULE_DYNAMIC_UNIT_WEEK;
+        $affected_track->repeating_type = track::SCHEDULE_REPEATING_TYPE_AFTER_CREATION_WHEN_COMPLETE;
+        $affected_track->repeating_offset = json_encode([
+            'count' => 4,
+            'unit' => date_offset::UNIT_WEEK,
+            'direction' => date_offset::DIRECTION_AFTER
+        ]);
         $affected_track->repeating_is_limited = 1;
         $affected_track->repeating_limit = 5;
 

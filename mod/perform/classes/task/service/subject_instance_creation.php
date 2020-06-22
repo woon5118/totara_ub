@@ -24,13 +24,11 @@
 namespace mod_perform\task\service;
 
 use core\orm\collection;
-use mod_perform\dates\relative_date_adjuster;
-use mod_perform\dates\schedule_constants;
+use mod_perform\dates\date_offset;
 use mod_perform\entities\activity\subject_instance;
 use mod_perform\entities\activity\track;
 use mod_perform\entities\activity\track_user_assignment;
 use mod_perform\hook\subject_instances_created;
-use mod_perform\models\activity\track as track_model;
 use mod_perform\state\subject_instance\complete;
 
 /**
@@ -83,17 +81,8 @@ class subject_instance_creation {
             return $user_assignment->due_date_fixed;
         }
 
-        $adjuster_relative_unit = track_model::mapped_value_to_string(
-            $user_assignment->due_date_relative_unit,
-            track_model::get_dynamic_schedule_units(),
-            'due date relative unit'
-        );
-        return (new relative_date_adjuster())->adjust(
-            $user_assignment->due_date_relative_count,
-            $adjuster_relative_unit,
-            schedule_constants::AFTER,
-            $reference_date
-        );
+        $offset = date_offset::create_from_json($user_assignment->due_date_offset);
+        return $offset->apply($reference_date);
     }
 
     /**
@@ -117,7 +106,7 @@ class subject_instance_creation {
         // Check if repeat settings require to create a new subject instance.
         $reference_date = null;
         $is_latest_instance_complete = ((int)$user_assignment->instance_progress === complete::get_code());
-        switch ($user_assignment->repeating_relative_type) {
+        switch ($user_assignment->repeating_type) {
             case track::SCHEDULE_REPEATING_TYPE_AFTER_CREATION:
                 $reference_date = $user_assignment->instance_created_at;
                 break;
@@ -134,27 +123,11 @@ class subject_instance_creation {
                 $reference_date = $user_assignment->instance_completed_at;
                 break;
             default:
-                throw new \coding_exception("Bad repeating_relative_type: {$user_assignment->repeating_relative_type}");
+                throw new \coding_exception("Bad repeating_type: {$user_assignment->repeating_type}");
         }
 
-        $adjuster_relative_unit = track_model::mapped_value_to_string(
-            $user_assignment->repeating_relative_unit,
-            track_model::get_dynamic_schedule_units(),
-            'repeating relative unit'
-        );
-        if (is_null($adjuster_relative_unit)) {
-            throw new \coding_exception(
-                "Bad repeating settings: repeating_relative_unit must not be null when repeating is enabled."
-            );
-        }
-
-        $threshold = (new relative_date_adjuster())->adjust(
-            $user_assignment->repeating_relative_count,
-            $adjuster_relative_unit,
-            schedule_constants::AFTER,
-            $reference_date
-        );
-
+        $offset = date_offset::create_from_json($user_assignment->repeating_offset);
+        $threshold = $offset->apply($reference_date);
         return (time() > $threshold);
     }
 

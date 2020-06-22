@@ -53,7 +53,6 @@ class mod_perform_webapi_mutation_remove_track_assignments_testcase extends adva
         $this->assertNotNull($updated_track, 'track assignment failed');
         $this->assertInstanceOf(track::class, $updated_track, 'wrong return type');
         $this->assertEquals($track->id, $updated_track->id, 'wrong track returned');
-        $this->assertEquals($track->status, $updated_track->status, 'wrong track status');
         $this->assertEquals(0, $updated_track->assignments->count(), 'assignments not removed');
     }
 
@@ -73,7 +72,6 @@ class mod_perform_webapi_mutation_remove_track_assignments_testcase extends adva
         $updated_track = $this->get_webapi_operation_data($result);
         $this->assertNotNull($updated_track, 'track creation failed');
         $this->assertEquals($track->id, $updated_track['id'], 'wrong track returned');
-        $this->assertEquals($track->status, $updated_track['status'], 'wrong track status');
         $this->assertEmpty($updated_track['assignments'], 'assignments not removed');
     }
 

@@ -17,23 +17,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Jaron Steenson <jaron.steenson@totaralearning.com>
+ * @author Nathan Lewis <nathan.lewis@totaralearning.com>
  * @package mod_perform
  */
 
 namespace mod_perform\formatter\activity;
 
 use core\webapi\formatter\formatter;
-use mod_perform\dates\resolvers\dynamic\dynamic_source;
+use mod_perform\dates\date_offset;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Maps the dynamic_source class into the GraphQL mod_perform_dynamic_date_source type.
+ * Maps the date_offset class into the GraphQL mod_perform_dynamic_date_offset type.
  */
-class dynamic_date_source extends formatter {
+class dynamic_date_offset extends formatter {
 
-    /** @var dynamic_source */
+    /** @var date_offset */
     protected $object;
 
     /**
@@ -41,10 +41,9 @@ class dynamic_date_source extends formatter {
      */
     protected function get_map(): array {
         return [
-            'resolver_class_name' => null,
-            'option_key' => null,
-            'display_name' => null,
-            'is_available' => null,
+            'count' => null,
+            'unit' => null,
+            'direction' => null,
         ];
     }
 
@@ -53,10 +52,9 @@ class dynamic_date_source extends formatter {
      */
     protected function has_field(string $field): bool {
         switch ($field) {
-            case 'resolver_class_name':
-            case 'option_key':
-            case 'display_name':
-            case 'is_available':
+            case 'count':
+            case 'unit':
+            case 'direction':
                 return true;
             default:
                 return false;
@@ -68,14 +66,12 @@ class dynamic_date_source extends formatter {
      */
     protected function get_field(string $field) {
         switch ($field) {
-            case 'resolver_class_name':
-                return $this->object->get_resolver_class_name();
-            case 'option_key':
-                return $this->object->get_option_key();
-            case 'display_name':
-                return $this->object->get_display_name();
-            case 'is_available':
-                return $this->object->is_available();
+            case 'count':
+                return $this->object->get_count();
+            case 'unit':
+                return $this->object->get_unit();
+            case 'direction':
+                return $this->object->get_direction();
             default:
                 return null;
         }
