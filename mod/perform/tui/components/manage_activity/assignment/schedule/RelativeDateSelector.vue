@@ -88,7 +88,6 @@
         />
       </div>
       <div
-        v-if="hasDirection"
         class="tui-performAssignmentScheduleRelativeDateSelector__reference-date"
       >
         <Label
@@ -97,10 +96,10 @@
           hidden
         />
         <FormSelect
-          v-if="dateResolverOptions"
+          v-if="dynamicDateSources"
           :id="$id('relative-date-reference-date')"
-          name="resolver_option"
-          :options="resolverOptionsForSelect"
+          name="dynamic_source"
+          :options="dynamicSourcesForSelect"
           :disabled="disabled"
         />
       </div>
@@ -147,7 +146,7 @@ export default {
         return this.$str('relative_date_selector_until', 'mod_perform');
       },
     },
-    dateResolverOptions: {
+    dynamicDateSources: {
       type: Array,
       required: false,
     },
@@ -178,12 +177,12 @@ export default {
         },
       ];
     },
-    resolverOptionsForSelect() {
-      if (!this.dateResolverOptions) {
+    dynamicSourcesForSelect() {
+      if (!this.dynamicDateSources) {
         return [];
       }
 
-      return this.dateResolverOptions.map(option => {
+      return this.dynamicDateSources.map(option => {
         return {
           label: option.display_name,
           id: `${option.resolver_class_name}--${option.option_key}`,

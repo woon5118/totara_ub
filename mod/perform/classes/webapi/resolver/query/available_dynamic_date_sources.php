@@ -28,10 +28,10 @@ use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\resolver\has_middleware;
-use mod_perform\dates\resolvers\dynamic\resolver_option;
+use mod_perform\dates\resolvers\dynamic\dynamic_source;
 use mod_perform\util;
 
-class available_date_resolver_options implements query_resolver, has_middleware {
+class available_dynamic_date_sources implements query_resolver, has_middleware {
 
     /**
      * {@inheritdoc}
@@ -40,7 +40,7 @@ class available_date_resolver_options implements query_resolver, has_middleware 
         $context = util::get_default_context();
         $ec->set_relevant_context($context);
 
-        return resolver_option::all_available();
+        return dynamic_source::all_available();
     }
 
     /**

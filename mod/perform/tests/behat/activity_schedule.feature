@@ -113,7 +113,7 @@ Feature: Define track schedules to perform activities
       | scheduleDynamic[count_to]        | 4                  |
       | scheduleDynamic[unit]            | weeks              |
       | scheduleDynamic[direction]       | after              |
-      | scheduleDynamic[resolver_option] | User creation date |
+      | scheduleDynamic[dynamic_source] | User creation date |
     When I save the activity schedule
     Then I should see "Activity schedule saved" in the tui "success" notification toast
 
@@ -125,7 +125,7 @@ Feature: Define track schedules to perform activities
       | scheduleDynamic[count_to]        | 4                  |
       | scheduleDynamic[unit]            | weeks              |
       | scheduleDynamic[direction]       | after              |
-      | scheduleDynamic[resolver_option] | User creation date |
+      | scheduleDynamic[dynamic_source] | User creation date |
 
   Scenario: Save and view open ended dynamic performance activity schedule
     Given I log in as "admin"
@@ -137,7 +137,7 @@ Feature: Define track schedules to perform activities
       | scheduleDynamic[count]           | 1                  |
       | scheduleDynamic[unit]            | weeks              |
       | scheduleDynamic[direction]       | after              |
-      | scheduleDynamic[resolver_option] | User creation date |
+      | scheduleDynamic[dynamic_source] | User creation date |
     Then I should not see "until" in the ".tui-performAssignmentScheduleRelativeDateSelector" "css_element"
     And "input[name='scheduleDynamic[count_to]']" "css_element" should not exist in the ".tui-performAssignmentScheduleRelativeDateSelector" "css_element"
 
@@ -151,7 +151,7 @@ Feature: Define track schedules to perform activities
       | scheduleDynamic[count]           | 1                  |
       | scheduleDynamic[unit]            | weeks              |
       | scheduleDynamic[direction]       | after              |
-      | scheduleDynamic[resolver_option] | User creation date |
+      | scheduleDynamic[dynamic_source] | User creation date |
     And I should not see "until" in the ".tui-performAssignmentScheduleRelativeDateSelector" "css_element"
     And "input[name='scheduleDynamic[count_to]']" "css_element" should not exist in the ".tui-performAssignmentScheduleRelativeDateSelector" "css_element"
 
@@ -164,7 +164,7 @@ Feature: Define track schedules to perform activities
     And I click on "Open-ended" "button"
     And I set the following fields to these values:
       | scheduleDynamic[count]           | 100                |
-      | scheduleDynamic[resolver_option] | User creation date |
+      | scheduleDynamic[dynamic_source] | User creation date |
     When I save the activity schedule
     Then I should see "Activity schedule saved" in the tui "success" notification toast
 
@@ -204,7 +204,7 @@ Feature: Define track schedules to perform activities
       | scheduleDynamic[direction]       | after              |
       | scheduleDynamic[count]           | 100                |
       | scheduleDynamic[count_to]        | 10                 |
-      | scheduleDynamic[resolver_option] | User creation date |
+      | scheduleDynamic[dynamic_source] | User creation date |
     And I save the activity schedule
     Then I should see "Range end date cannot be before range start date"
 
@@ -212,7 +212,7 @@ Feature: Define track schedules to perform activities
       | scheduleDynamic[direction]       | before             |
       | scheduleDynamic[count]           | 10                 |
       | scheduleDynamic[count_to]        | 100                |
-      | scheduleDynamic[resolver_option] | User creation date |
+      | scheduleDynamic[dynamic_source] | User creation date |
     And I save the activity schedule
     Then I should see "Range end date cannot be before range start date"
 
@@ -249,7 +249,7 @@ Feature: Define track schedules to perform activities
       | scheduleDynamic[count_to]        | 4                  |
       | scheduleDynamic[unit]            | weeks              |
       | scheduleDynamic[direction]       | after              |
-      | scheduleDynamic[resolver_option] | User creation date |
+      | scheduleDynamic[dynamic_source] | User creation date |
 
     When I click on "Fixed" "button"
     Then the following fields match these values:
@@ -262,7 +262,7 @@ Feature: Define track schedules to perform activities
       | scheduleDynamic[count_to]        | 4                  |
       | scheduleDynamic[unit]            | weeks              |
       | scheduleDynamic[direction]       | after              |
-      | scheduleDynamic[resolver_option] | User creation date |
+      | scheduleDynamic[dynamic_source] | User creation date |
 
   Scenario: Check due date is disabled by default and can be enabled
     Given I log in as "admin"
@@ -312,7 +312,7 @@ Feature: Define track schedules to perform activities
       | scheduleDynamic[count]           | 3                  |
       | scheduleDynamic[unit]            | weeks              |
       | scheduleDynamic[direction]       | after              |
-      | scheduleDynamic[resolver_option] | User creation date |
+      | scheduleDynamic[dynamic_source] | User creation date |
       | dueDateRelative[count]           | 0                  |
     And I save the activity schedule
     Then I should see "Due date must be after the creation end date"
@@ -333,7 +333,7 @@ Feature: Define track schedules to perform activities
       | scheduleDynamic[count_to]        | 4                  |
       | scheduleDynamic[unit]            | weeks              |
       | scheduleDynamic[direction]       | after              |
-      | scheduleDynamic[resolver_option] | User creation date |
+      | scheduleDynamic[dynamic_source] | User creation date |
       | dueDateRelative[count]           | 0                  |
     And I save the activity schedule
     Then I should see "Due date must be after the creation end date"
@@ -490,13 +490,13 @@ Feature: Define track schedules to perform activities
       | scheduleDynamic[count]           | 3                  |
       | scheduleDynamic[unit]            | weeks              |
       | scheduleDynamic[direction]       | after              |
-      | scheduleDynamic[resolver_option] | Date one           |
+      | scheduleDynamic[dynamic_source] | Date one           |
     And I save the activity schedule
     Then I should see "Activity schedule saved" in the tui "success" notification toast
     When I reload the page
     And I click on "Assignments" "link"
     Then the following fields match these values:
-      | scheduleDynamic[resolver_option] | Date one |
+      | scheduleDynamic[dynamic_source] | Date one |
     When I navigate to "User profile fields" node in "Site administration > Users"
     And I click on "Delete" "link" in the "Date one" "table_row"
     Then I should not see "Date one"
@@ -504,4 +504,4 @@ Feature: Define track schedules to perform activities
     And I click on "My Test Activity" "link"
     And I click on "Assignments" "link"
     Then the following fields match these values:
-      | scheduleDynamic[resolver_option] | Date one (deleted) |
+      | scheduleDynamic[dynamic_source] | Date one (deleted) |

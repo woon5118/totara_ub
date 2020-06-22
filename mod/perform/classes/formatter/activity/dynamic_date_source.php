@@ -24,16 +24,16 @@
 namespace mod_perform\formatter\activity;
 
 use core\webapi\formatter\formatter;
-use mod_perform\dates\resolvers\dynamic\resolver_option;
+use mod_perform\dates\resolvers\dynamic\dynamic_source;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
  * Maps the track model class into the GraphQL mod_perform_track type.
  */
-class date_resolver_option extends formatter {
+class dynamic_date_source extends formatter {
 
-    /** @var resolver_option */
+    /** @var dynamic_source */
     protected $object;
 
     /**

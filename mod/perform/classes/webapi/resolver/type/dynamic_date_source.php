@@ -28,27 +28,27 @@ use core\format;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
 
-use mod_perform\dates\resolvers\dynamic\resolver_option as resolver_option;
-use mod_perform\formatter\activity\date_resolver_option as date_resolver_option_formatter;
+use mod_perform\dates\resolvers\dynamic\dynamic_source;
+use mod_perform\formatter\activity\dynamic_date_source as dynamic_date_source_formatter;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
  * Maps the track model class into the GraphQL mod_perform_track type.
  */
-class date_resolver_option implements type_resolver {
+class dynamic_date_source implements type_resolver {
 
     /**
      * {@inheritdoc}
      */
     public static function resolve(string $field, $option, array $args, execution_context $ec) {
-        if (!$option instanceof resolver_option) {
-            throw new \coding_exception(__METHOD__ . ' requires a resolver_option object');
+        if (!$option instanceof dynamic_source) {
+            throw new \coding_exception(__METHOD__ . ' requires a dynamic_source object');
         }
 
         $format = $args['format'] ?? format::FORMAT_PLAIN;
         $context = $ec->get_relevant_context();
-        $formatter = new date_resolver_option_formatter($option, $context);
+        $formatter = new dynamic_date_source_formatter($option, $context);
 
         return $formatter->format($field, $format);
     }

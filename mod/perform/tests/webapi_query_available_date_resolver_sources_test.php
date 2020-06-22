@@ -22,14 +22,9 @@
  * @category test
  */
 
-use core\webapi\execution_context;
-use mod_perform\dates\resolvers\dynamic\resolver_option;
+use mod_perform\dates\resolvers\dynamic\dynamic_source;
 use mod_perform\models\activity\track;
-use mod_perform\models\activity\track_assignment as track_assignment_model;
-use mod_perform\webapi\resolver\query\available_date_resolver_options;
-use mod_perform\webapi\resolver\type\track_assignment;
-use mod_perform\webapi\resolver\type\user_grouping;
-use totara_core\advanced_feature;
+use mod_perform\webapi\resolver\query\available_dynamic_date_sources;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
@@ -37,22 +32,22 @@ use totara_webapi\phpunit\webapi_phpunit_helper;
  *
  * @group perform
  */
-class mod_perform_webapi_query_available_date_resolver_options_testcase extends advanced_testcase {
+class mod_perform_webapi_query_available_dynamic_date_sources_testcase extends advanced_testcase {
     private const QUERY = 'mod_perform_default_track_settings';
 
     use webapi_phpunit_helper;
 
     /**
-     * Please note that this resolver is called from a multiple operation query
+     * Please note that this resolver is called from a multiple operation query.
      * @see mod_perform_webapi_query_default_track_settings_testcase
      */
     public function test_find(): void {
         $context = $this->create_webapi_context(self::QUERY);
 
-        $resolver_options = available_date_resolver_options::resolve([], $context);
+        $dynamic_sources = available_dynamic_date_sources::resolve([], $context);
 
-        self::assertGreaterThan(0, count($resolver_options));
-        self::assertContainsOnlyInstancesOf(resolver_option::class, $resolver_options);
+        self::assertGreaterThan(0, count($dynamic_sources));
+        self::assertContainsOnlyInstancesOf(dynamic_source::class, $dynamic_sources);
     }
 
 }

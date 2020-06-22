@@ -28,11 +28,18 @@ use core\collection;
 use JsonSerializable;
 
 /**
- * The class represents dynamic date resolver option; a user selection of a resolver class and option key selection.
+ * The class represents a pointer to a specific dynamic date source,
+ * a date source is comprised of a dynamic date resolver class and a option key.
+ *
+ * This class also holds the display name of the option itself for the
+ * case when the resolver or option_key become unavailable and we still
+ * want to display a selected but deleted option.
  *
  * @package mod_perform\dates\resolvers\dynamic
+ * @see dynamic_date_resolver
+ * @see dynamic_date_resolver::get_options()
  */
-class resolver_option implements JsonSerializable {
+class dynamic_source implements JsonSerializable {
 
     /**
      * @var dynamic_date_resolver
@@ -50,7 +57,7 @@ class resolver_option implements JsonSerializable {
     protected $display_name;
 
     /**
-     * resolver_option constructor.
+     * dynamic_source constructor.
      *
      * @param dynamic_date_resolver $resolver
      * @param string $option_key
@@ -115,8 +122,8 @@ class resolver_option implements JsonSerializable {
             $source_option = static::get_option_from_key($resolver->get_options(), $option_key);
         }
 
-        if ($must_be_available && $source_option === null) {
-            throw new coding_exception('Resolver option is not available');
+        if ($must_be_available && ($resolver === null || $source_option === null)) {
+            throw new coding_exception('Source is not available');
         }
 
         if ($source_option !== null) {
@@ -137,15 +144,15 @@ class resolver_option implements JsonSerializable {
         return collection::new(array_reduce($date_resolver_classes->all(), $combine_all_options, []));
     }
 
-    protected static function sort_by_display_name(collection $resolver_options): collection {
-        return $resolver_options->sort(function (resolver_option $a, resolver_option $b) {
+    protected static function sort_by_display_name(collection $dynamic_sources): collection {
+        return $dynamic_sources->sort(function (dynamic_source $a, dynamic_source $b) {
             return strcmp($a->get_display_name(), $b->get_display_name());
         });
     }
 
-    protected static function get_option_from_key(collection $options, string $option_key): ?resolver_option {
-        return $options->find(function (resolver_option $resolver_option) use ($option_key) {
-            return $resolver_option->get_option_key() === $option_key;
+    protected static function get_option_from_key(collection $options, string $option_key): ?dynamic_source {
+        return $options->find(function (dynamic_source $dynamic_source) use ($option_key) {
+            return $dynamic_source->get_option_key() === $option_key;
         });
     }
 

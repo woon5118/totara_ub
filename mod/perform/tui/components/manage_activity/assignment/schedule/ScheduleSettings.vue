@@ -33,7 +33,7 @@
       path="scheduleDynamic"
       has-direction
       :has-range="!isOpen"
-      :date-resolver-options="dateResolverOptions"
+      :dynamic-date-sources="dynamicDateSources"
     />
     <template v-if="isOpen">
       <span v-if="isFixed">{{
@@ -63,7 +63,7 @@ export default {
       type: Boolean,
       required: true,
     },
-    dateResolverOptions: {
+    dynamicDateSources: {
       type: Array,
       required: true,
     },

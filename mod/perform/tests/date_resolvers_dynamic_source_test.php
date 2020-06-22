@@ -22,7 +22,7 @@
  * @category test
  */
 
-use mod_perform\dates\resolvers\dynamic\resolver_option;
+use mod_perform\dates\resolvers\dynamic\dynamic_source;
 use mod_perform\dates\resolvers\dynamic\user_creation_date;
 use mod_perform\models\activity\track;
 
@@ -31,73 +31,90 @@ use mod_perform\models\activity\track;
  *
  * @group perform
  */
-class dynamic_date_resolver_option_test_testcase extends advanced_testcase {
+class mod_perform_date_resolvers_dynamic_source_testcase extends advanced_testcase {
 
     /**
      * Simple sanity test.
      */
     public function test_all_available_factory_method(): void {
-        $all_options = resolver_option::all_available();
+        $all_options = dynamic_source::all_available();
 
         self::assertGreaterThan(0, $all_options->count());
-        self::assertContainsOnlyInstancesOf(resolver_option::class, $all_options);
+        self::assertContainsOnlyInstancesOf(dynamic_source::class, $all_options);
     }
 
     public function test_create_from_json_missing_fields(): void {
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage('resolver_class_name and option_key fields are mandatory');
 
-        resolver_option::create_from_json([]);
+        dynamic_source::create_from_json([]);
     }
 
     /**
      * Test that options that may have been valid at one point can still be created.
+     * Or not if the must be available flag is set.
      */
-    public function test_create_from_json_unavailable_option(): void {
-        $resolver_option = resolver_option::create_from_json([
+    public function test_create_from_json_unavailable_resolver_class(): void {
+        $dynamic_source = dynamic_source::create_from_json([
             'resolver_class_name' => 'fake_resolver_class_name',
             'option_key' => 'fake_option_key',
             'display_name' => 'Display name fed in',
         ]);
 
-        self::assertFalse($resolver_option->is_available());
-        self::assertNull($resolver_option->get_resolver_class_name());
-        self::assertEquals('Display name fed in', $resolver_option->get_display_name());
-        self::assertEquals('fake_option_key', $resolver_option->get_option_key());
+        self::assertFalse($dynamic_source->is_available());
+        self::assertNull($dynamic_source->get_resolver_class_name());
+        self::assertEquals('Display name fed in', $dynamic_source->get_display_name());
+        self::assertEquals('fake_option_key', $dynamic_source->get_option_key());
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('Source is not available');
+        dynamic_source::create_from_json([
+            'resolver_class_name' => 'fake_resolver_class_name',
+            'option_key' => 'fake_option_key',
+            'display_name' => 'Display name fed in',
+        ], true);
     }
 
     public function test_create_from_json_invalid_option_key(): void {
-        /** @var resolver_option $user_creation_date_option */
+        /** @var dynamic_source $user_creation_date_option */
         $user_creation_date_option = (new user_creation_date())->get_options()->first();
 
-        $resolver_option = resolver_option::create_from_json([
+        $dynamic_source = dynamic_source::create_from_json([
             'resolver_class_name' => $user_creation_date_option->get_resolver_class_name(),
             'option_key' => 'fake_option_key',
             'display_name' => $user_creation_date_option->get_display_name(),
         ]);
 
-        self::assertFalse($resolver_option->is_available());
-        self::assertEquals(user_creation_date::class, $resolver_option->get_resolver_class_name());
-        self::assertEquals('User creation date', $resolver_option->get_display_name());
-        self::assertEquals('fake_option_key', $resolver_option->get_option_key());
+        self::assertFalse($dynamic_source->is_available());
+        self::assertEquals(user_creation_date::class, $dynamic_source->get_resolver_class_name());
+        self::assertEquals('User creation date', $dynamic_source->get_display_name());
+        self::assertEquals('fake_option_key', $dynamic_source->get_option_key());
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('Source is not available');
+        dynamic_source::create_from_json([
+            'resolver_class_name' => $user_creation_date_option->get_resolver_class_name(),
+            'option_key' => 'fake_option_key',
+            'display_name' => $user_creation_date_option->get_display_name(),
+        ], true);
     }
 
     /**
-     * @param string | array $data
+     * @param string|array $data
      * @param bool $must_be_available
      * @dataProvider create_from_json_available_provider
      */
     public function test_create_from_json_valid_and_available($data, bool $must_be_available): void {
-        $resolver_option = resolver_option::create_from_json($data, $must_be_available);
+        $dynamic_source = dynamic_source::create_from_json($data, $must_be_available);
 
-        self::assertTrue($resolver_option->is_available());
-        self::assertEquals(user_creation_date::class, $resolver_option->get_resolver_class_name());
-        self::assertEquals('User creation date', $resolver_option->get_display_name());
-        self::assertEquals(user_creation_date::DEFAULT_KEY, $resolver_option->get_option_key());
+        self::assertTrue($dynamic_source->is_available());
+        self::assertEquals(user_creation_date::class, $dynamic_source->get_resolver_class_name());
+        self::assertEquals('User creation date', $dynamic_source->get_display_name());
+        self::assertEquals(user_creation_date::DEFAULT_KEY, $dynamic_source->get_option_key());
     }
 
     public function create_from_json_available_provider(): array {
-        /** @var resolver_option $user_creation_date_option */
+        /** @var dynamic_source $user_creation_date_option */
         $user_creation_date_option = (new user_creation_date())->get_options()->first();
 
         $data = [

@@ -39,6 +39,11 @@ class user_creation_date extends base_dynamic_date_resolver {
             ->where('id', $this->reference_user_ids)
             ->get()
             ->map(function ($row) {
+                // Admins have a 0 created date, and will be excluded.
+                if ((int)$row->timecreated === 0) {
+                    return null;
+                }
+
                 // Using map (rather than pluck) to preserve keys.
                 return $row->timecreated;
             })->all(true);
@@ -68,8 +73,8 @@ class user_creation_date extends base_dynamic_date_resolver {
         return get_string('user_creation_date', 'mod_perform');
     }
 
-    protected function make_option(string $option_key): resolver_option {
-        return new resolver_option(
+    protected function make_option(string $option_key): dynamic_source {
+        return new dynamic_source(
             $this,
             $option_key,
             $this->get_option_display_name($option_key)

@@ -4,7 +4,7 @@ type mod_perform_track_assignment {
   group: mod_perform_user_grouping!
 }
 
-type mod_perform_date_resolver_option {
+type mod_perform_dynamic_date_source {
   resolver_class_name: String!
   option_key: String
   display_name: String!
@@ -58,7 +58,7 @@ type mod_perform_track {
   schedule_dynamic_count_to: Int
   schedule_dynamic_unit: mod_perform_track_dynamic_unit_enums
   schedule_dynamic_direction: mod_perform_track_dynamic_direction_enums
-  schedule_resolver_option: mod_perform_date_resolver_option
+  schedule_dynamic_source: mod_perform_dynamic_date_source
   due_date_is_enabled: Boolean!
   due_date_is_fixed: Boolean
   due_date_fixed: Int
@@ -87,7 +87,7 @@ extend type Query {
   """
   Get all available options for dynamic schedule date resolver options.
   """
-  mod_perform_available_date_resolver_options: [mod_perform_date_resolver_option!]!
+  mod_perform_available_dynamic_date_sources: [mod_perform_dynamic_date_source!]!
 }
 
 input mod_perform_track_assignments_input {
@@ -101,7 +101,7 @@ input mod_perform_create_track_input {
   description: param_text
 }
 
-input mod_perform_date_resolver_option_input {
+input mod_perform_dynamic_date_source_input {
   resolver_class_name: param_text!
   option_key: param_text
 }
@@ -120,7 +120,7 @@ input mod_perform_track_schedule_input {
   schedule_dynamic_count_to: param_integer
   schedule_dynamic_unit: mod_perform_track_dynamic_unit_enums
   schedule_dynamic_direction: mod_perform_track_dynamic_direction_enums
-  schedule_resolver_option: mod_perform_date_resolver_option_input
+  schedule_dynamic_source: mod_perform_dynamic_date_source_input
   due_date_is_enabled: param_boolean!
   due_date_is_fixed: param_boolean
   due_date_fixed: param_integer

@@ -43,7 +43,7 @@
       <ScheduleSettings
         :is-open="scheduleIsOpen"
         :is-fixed="scheduleIsFixed"
-        :date-resolver-options="dateResolverOptions"
+        :dynamic-date-sources="dynamicDateSources"
       />
 
       <FrequencySettings
@@ -119,7 +119,7 @@ export default {
       type: Object,
       required: true,
     },
-    dateResolverOptions: {
+    dynamicDateSources: {
       type: Array,
       required: true,
     },
@@ -191,11 +191,6 @@ export default {
      * @return {Object}
      */
     getInitialValues(track) {
-      let resolver_option = null;
-      if (track.schedule_resolver_option) {
-        resolver_option = `${track.schedule_resolver_option.resolver_class_name}--${track.schedule_resolver_option.option_key}`;
-      }
-
       return {
         // Creation range initial settings
         scheduleFixed: {
@@ -208,7 +203,7 @@ export default {
           unit: track.schedule_dynamic_unit || RELATIVE_DATE_UNIT_DAY,
           direction:
             track.schedule_dynamic_direction || RELATIVE_DATE_DIRECTION_BEFORE,
-          resolver_option,
+          dynamic_source: this.getCombinedDynamicSourceKey(track),
         },
 
         // Due date initial settings
@@ -232,6 +227,23 @@ export default {
         repeatingLimit: track.repeating_limit || '3',
         repeatingRelativeDates: this.initRepeatingRelativeDates(track),
       };
+    },
+
+    /**
+     * Get a string key representing a resolver and option key pair.
+     *
+     * @param track {Object}
+     * @returns {String}
+     */
+    getCombinedDynamicSourceKey(track) {
+      let dynamic_source = null;
+      if (track.schedule_dynamic_source) {
+        dynamic_source = track.schedule_dynamic_source;
+      } else {
+        dynamic_source = this.dynamicDateSources[0];
+      }
+
+      return `${dynamic_source.resolver_class_name}--${dynamic_source.option_key}`;
     },
 
     /**
@@ -295,12 +307,12 @@ export default {
         gql.schedule_dynamic_unit = form.scheduleDynamic.unit;
         gql.schedule_dynamic_direction = form.scheduleDynamic.direction;
 
-        const resolverOptionParts = form.scheduleDynamic.resolver_option.split(
+        const dynamicDateSourceParts = form.scheduleDynamic.dynamic_source.split(
           '--'
         );
-        gql.schedule_resolver_option = {
-          resolver_class_name: resolverOptionParts[0],
-          option_key: resolverOptionParts[1],
+        gql.schedule_dynamic_source = {
+          resolver_class_name: dynamicDateSourceParts[0],
+          option_key: dynamicDateSourceParts[1],
         };
 
         if (!this.scheduleIsOpen) {

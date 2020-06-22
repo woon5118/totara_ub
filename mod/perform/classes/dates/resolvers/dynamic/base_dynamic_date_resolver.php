@@ -23,6 +23,7 @@
 
 namespace mod_perform\dates\resolvers\dynamic;
 
+use coding_exception;
 use core\collection;
 use core_component;
 use mod_perform\dates\schedule_constants;
@@ -119,7 +120,7 @@ abstract class base_dynamic_date_resolver implements dynamic_date_resolver {
         schedule_constants::validate_unit($unit);
 
         if (!$this->option_is_available($option_key)) {
-            throw new \coding_exception(sprintf('Invalid option key %s', $option_key));
+            throw new coding_exception(sprintf('Invalid option key %s', $option_key));
         }
 
         $this->direction = $direction;
@@ -175,6 +176,10 @@ abstract class base_dynamic_date_resolver implements dynamic_date_resolver {
             return null;
         }
 
+        if (!isset($this->date_map[$user_id])) {
+            return null;
+        }
+
         $reference_date = $this->date_map[$user_id];
 
         return $this->adjust_date($this->to_count, $reference_date);
@@ -182,7 +187,7 @@ abstract class base_dynamic_date_resolver implements dynamic_date_resolver {
 
     protected function check_ready_to_resolve(): void {
         if (!$this->ready_to_resolve) {
-            throw new \coding_exception('Can not call resolve before setting parameters');
+            throw new coding_exception('Can not call resolve before setting parameters');
         }
     }
 

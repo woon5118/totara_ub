@@ -29,7 +29,7 @@ use core\orm\entity\entity;
 use core\orm\entity\relations\belongs_to;
 use core\orm\entity\relations\has_many;
 use core\orm\entity\relations\has_many_through;
-use mod_perform\dates\resolvers\dynamic\resolver_option;
+use mod_perform\dates\resolvers\dynamic\dynamic_source;
 
 /**
  * Represents an activity track record in the repository.
@@ -47,7 +47,7 @@ use mod_perform\dates\resolvers\dynamic\resolver_option;
  * @property int $schedule_dynamic_count_to number of units
  * @property int $schedule_dynamic_unit one of SCHEDULE_DYNAMIC_UNIT_XXX or null
  * @property int $schedule_dynamic_direction one of SCHEDULE_DYNAMIC_DIRECTION_XXX or null
- * @property resolver_option | null $schedule_resolver_option a resolver_option for dynamic schedule (saved as json)
+ * @property dynamic_source|null $schedule_dynamic_source a dynamic_source for dynamic schedule (saved as json)
  * @property bool $schedule_needs_sync Flag indicating that the schedule sync task should run for this track
  * @property bool $due_date_is_enabled
  * @property bool $due_date_is_fixed
@@ -124,44 +124,56 @@ class track extends entity {
     }
 
     /**
-     * Unserialize schedule_resolver_option.
+     * Get all subject instance for this track
      *
-     * @return resolver_option
+     * @return has_many
      */
-    protected function get_schedule_resolver_option_attribute(): ?resolver_option {
-        $json_encoded =  $this->get_attributes_raw()['schedule_resolver_option'];
+    public function user_assignments(): has_many {
+        return $this->has_many(
+            track_user_assignment::class,
+            'track_id'
+        );
+    }
+
+    /**
+     * Unserialize schedule_dynamic_source.
+     *
+     * @return dynamic_source
+     */
+    protected function get_schedule_dynamic_source_attribute(): ?dynamic_source {
+        $json_encoded =  $this->get_attributes_raw()['schedule_dynamic_source'];
 
         if ($json_encoded === null) {
             return null;
         }
 
-        return resolver_option::create_from_json($json_encoded);
+        return dynamic_source::create_from_json($json_encoded);
     }
 
     /**
-     * Serialize (or skip) schedule_resolver_option.
+     * Serialize (or skip) schedule_dynamic_source.
      *
-     * @param string | resolver_option | null
+     * @param string | dynamic_source | null
      * @return track
      */
-    protected function set_schedule_resolver_option_attribute($resolver_option = null): self {
-        $json_encoded = $this->encode_resolver_option($resolver_option);
+    protected function set_schedule_dynamic_source_attribute($dynamic_source = null): self {
+        $json_encoded = $this->encode_dynamic_source($dynamic_source);
 
-        return $this->set_attribute_raw('schedule_resolver_option', $json_encoded);
+        return $this->set_attribute_raw('schedule_dynamic_source', $json_encoded);
     }
 
-    protected function encode_resolver_option($resolver_option) {
-        switch ($resolver_option) {
+    protected function encode_dynamic_source($dynamic_source) {
+        switch ($dynamic_source) {
             case null:
                 return null;
-            case is_array($resolver_option):
-            case is_string($resolver_option):
-                return json_encode(resolver_option::create_from_json($resolver_option));
-            case $resolver_option instanceof resolver_option:
-                return json_encode($resolver_option);
+            case is_array($dynamic_source):
+            case is_string($dynamic_source):
+                return json_encode(dynamic_source::create_from_json($dynamic_source));
+            case $dynamic_source instanceof dynamic_source:
+                return json_encode($dynamic_source);
             default:
                 throw new coding_exception(
-                    'schedule dynamic resolver must be a resolver_option, null, or json encoded resolver_option'
+                    'schedule dynamic resolver must be a dynamic_source, null, or json encoded dynamic_source'
                 );
         }
     }

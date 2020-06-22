@@ -25,8 +25,10 @@
 use core\collection;
 
 use core\orm\entity\entity;
-use mod_perform\dates\resolvers\dynamic\resolver_option;
+use core\orm\query\builder;
+use mod_perform\dates\resolvers\dynamic\dynamic_source;
 use mod_perform\dates\resolvers\dynamic\user_creation_date;
+use mod_perform\dates\resolvers\dynamic\user_custom_field;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\track;
 use mod_perform\entities\activity\track as track_entity;
@@ -154,7 +156,7 @@ class mod_perform_track_model_testcase extends advanced_testcase {
      * @param int $count_from
      * @param int $unit
      * @param int $direction
-     * @param resolver_option $resolver_option
+     * @param dynamic_source $dynamic_source
      * @param string $expected_exception_message
      * @throws coding_exception
      */
@@ -162,7 +164,7 @@ class mod_perform_track_model_testcase extends advanced_testcase {
         int $count_from,
         int $unit,
         int $direction,
-        resolver_option $resolver_option,
+        dynamic_source $dynamic_source,
         string $expected_exception_message
     ): void {
         $track = track::load_by_entity($this->mock_existing_entity(track_entity::class));
@@ -175,7 +177,7 @@ class mod_perform_track_model_testcase extends advanced_testcase {
             $unit,
             track_entity::SCHEDULE_DYNAMIC_UNIT_DAY,
             $direction,
-            $resolver_option
+            $dynamic_source
         );
     }
 
@@ -196,42 +198,42 @@ class mod_perform_track_model_testcase extends advanced_testcase {
     }
 
     public function invalid_open_dynamic_schedule_from_to_permutations_provider(): array {
-        $available_resolver_option = (new user_creation_date())->get_options()->first();
-        $unavailable_resolver_option = new resolver_option(null, 'default', 'Birthday');
+        $available_dynamic_source = (new user_creation_date())->get_options()->first();
+        $unavailable_dynamic_source = new dynamic_source(null, 'default', 'Birthday');
 
         return [
             'From after to' => [
                 100,
                 0,
                 track_entity::SCHEDULE_DYNAMIC_DIRECTION_AFTER,
-                $available_resolver_option,
+                $available_dynamic_source,
                 '"count_from" must not be after "count_to" when dynamic schedule direction is "AFTER"'
             ],
             'To before from' => [
                 0,
                 100,
                 track_entity::SCHEDULE_DYNAMIC_DIRECTION_BEFORE,
-                $available_resolver_option,
+                $available_dynamic_source,
                 'count_from" must not be before "count_to" when dynamic schedule direction is "BEFORE"'
             ],
             'Unavailable date resolver option' => [
                 100,
                 0,
                 track_entity::SCHEDULE_DYNAMIC_DIRECTION_BEFORE,
-                $unavailable_resolver_option,
-                'Resolver option must be available'
+                $unavailable_dynamic_source,
+                'Dynamic source must be available'
             ],
         ];
     }
 
     public function set_schedule_methods_data_provider(): array {
-        $resolver_option = resolver_option::all_available()->first();
+        $dynamic_source = dynamic_source::all_available()->first();
 
         return [
             ['set_schedule_open_fixed', [111]],
             ['set_schedule_closed_fixed', [111, 222]],
-            ['set_schedule_closed_dynamic', [111, 222, 1, 0, $resolver_option]],
-            ['set_schedule_open_dynamic', [111, 1, 1, $resolver_option]],
+            ['set_schedule_closed_dynamic', [111, 222, 1, 0, $dynamic_source]],
+            ['set_schedule_open_dynamic', [111, 1, 1, $dynamic_source]],
         ];
     }
 
@@ -309,19 +311,77 @@ class mod_perform_track_model_testcase extends advanced_testcase {
     }
 
     public function schedule_changes_data_provider(): array {
-        $resolver_option = resolver_option::all_available()->first();
+        function get_custom_field_source(string $option_key) {
+            builder::get_db()->insert_record(
+                'user_info_field',
+                (object)['shortname' => $option_key, 'name' => 'time-custom', 'categoryid' => 1, 'datatype' => 'datetime']
+            );
+
+            return (new user_custom_field())->get_options()->find(
+                function (dynamic_source $source) use ($option_key) {
+                    return $source->get_option_key() === $option_key;
+                }
+            );
+        }
+
+        $user_creation_date_source = (new user_creation_date())->get_options()->first();
 
         return [
-            ['set_schedule_open_fixed', [111], [222]],
-            ['set_schedule_closed_fixed', [111, 999], [222, 999]],
-            ['set_schedule_closed_fixed', [111, 999], [111, 888]],
-            ['set_schedule_closed_dynamic', [111, 999, 1, 0, $resolver_option], [222, 999, 1, 0, $resolver_option]],
-            ['set_schedule_closed_dynamic', [111, 999, 1, 0, $resolver_option], [111, 888, 1, 0, $resolver_option]],
-            ['set_schedule_closed_dynamic', [111, 999, 1, 0, $resolver_option], [111, 999, 0, 0, $resolver_option]],
-            ['set_schedule_closed_dynamic', [111, 999, 1, 0, $resolver_option], [999, 111, 1, 1, $resolver_option]],
-            ['set_schedule_open_dynamic', [111, 1, 1, $resolver_option], [222, 1, 1, $resolver_option]],
-            ['set_schedule_open_dynamic', [111, 1, 1, $resolver_option], [111, 0, 1, $resolver_option]],
-            ['set_schedule_open_dynamic', [111, 1, 1, $resolver_option], [111, 1, 0, $resolver_option]],
+            ['set_schedule_open_fixed',
+                [111],
+                [222]
+            ],
+            ['set_schedule_closed_fixed',
+                [111, 999],
+                [222, 999]
+            ],
+            ['set_schedule_closed_fixed',
+                [111, 999],
+                [111, 888]
+            ],
+            ['set_schedule_closed_dynamic',
+                [111, 999, 1, 0, $user_creation_date_source],
+                [222, 999, 1, 0, $user_creation_date_source]
+            ],
+            ['set_schedule_closed_dynamic',
+                [111, 999, 1, 0, $user_creation_date_source],
+                [111, 888, 1, 0, $user_creation_date_source]
+            ],
+            ['set_schedule_closed_dynamic',
+                [111, 999, 1, 0, $user_creation_date_source],
+                [111, 999, 0, 0, $user_creation_date_source]
+            ],
+            ['set_schedule_closed_dynamic',
+                [111, 999, 1, 0, $user_creation_date_source],
+                [999, 111, 1, 1, $user_creation_date_source]
+            ],
+            ['set_schedule_open_dynamic',
+                [111, 1, 1, $user_creation_date_source],
+                [222, 1, 1, $user_creation_date_source]
+            ],
+            ['set_schedule_open_dynamic',
+                [111, 1, 1, $user_creation_date_source],
+                [111, 0, 1, $user_creation_date_source]
+            ],
+            ['set_schedule_open_dynamic',
+                [111, 1, 1, $user_creation_date_source],
+                [111, 1, 0, $user_creation_date_source]
+            ],
+            'open dynamic - dynamic source resolver change' => [
+                'set_schedule_open_dynamic',
+                [111, 1, 1, $user_creation_date_source],
+                [
+                    111,
+                    1,
+                    1,
+                    get_custom_field_source('time-custom')
+                ]
+            ],
+            'open dynamic - dynamic source option change' => [
+                'set_schedule_open_dynamic',
+                [111, 1, 1, get_custom_field_source('time-custom1')],
+                [111, 1, 1, get_custom_field_source('time-custom2')]
+            ],
         ];
     }
 
@@ -433,16 +493,16 @@ class mod_perform_track_model_testcase extends advanced_testcase {
         /** @var track_entity | MockObject $entity */
         $entity = $this->mock_existing_entity(track_entity::class);
 
-        /** @var resolver_option $option */
+        /** @var dynamic_source $option */
         $option = (new user_creation_date())->get_options()->first();
 
-        $entity->schedule_resolver_option = $option;
+        $entity->schedule_dynamic_source = $option;
 
         $track = new track($entity);
 
-        $selected_option = $track->schedule_resolver_option;
+        $selected_option = $track->schedule_dynamic_source;
 
-        self::assertInstanceOf(resolver_option::class, $selected_option);
+        self::assertInstanceOf(dynamic_source::class, $selected_option);
 
         self::assertEqualsCanonicalizing([
             'resolver_class_name' => user_creation_date::class,
@@ -456,19 +516,19 @@ class mod_perform_track_model_testcase extends advanced_testcase {
         /** @var track_entity | MockObject $entity */
         $entity = $this->mock_existing_entity(track_entity::class);
 
-        /** @var resolver_option $option */
+        /** @var dynamic_source $option */
         $option = (new user_creation_date())->get_options()->first();
 
         $data = $option->jsonSerialize();
         $data['option_key'] = 'non-existing';
 
-        $entity->schedule_resolver_option = $data;
+        $entity->schedule_dynamic_source = $data;
 
         $track = new track($entity);
 
-        $selected_option = $track->schedule_resolver_option;
+        $selected_option = $track->schedule_dynamic_source;
 
-        self::assertInstanceOf(resolver_option::class, $selected_option);
+        self::assertInstanceOf(dynamic_source::class, $selected_option);
 
         self::assertEquals([
             'resolver_class_name' => user_creation_date::class,
@@ -482,11 +542,11 @@ class mod_perform_track_model_testcase extends advanced_testcase {
         /** @var track_entity | MockObject $entity */
         $entity = $this->mock_existing_entity(track_entity::class);
 
-        $entity->schedule_resolver_option = null;
+        $entity->schedule_dynamic_source = null;
 
         $track = new track($entity);
 
-        self::assertNull($track->schedule_resolver_option);
+        self::assertNull($track->schedule_dynamic_source);
     }
 
 }

@@ -57,7 +57,7 @@ interface dynamic_date_resolver extends date_resolver {
     /**
      * Get all source date options for this resolver.
      *
-     * @return collection|resolver_option[]
+     * @return collection|dynamic_source[]
      */
     public function get_options(): collection;
 

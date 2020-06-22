@@ -24,7 +24,7 @@
 
 require_once(__DIR__ . '/generator/activity_generator_configuration.php');
 
-use mod_perform\dates\resolvers\dynamic\resolver_option;
+use mod_perform\dates\resolvers\dynamic\dynamic_source;
 use mod_perform\dates\resolvers\dynamic\user_creation_date;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\track;
@@ -81,16 +81,16 @@ abstract class mod_perform_webapi_resolver_mutation_update_track_schedule_base e
         $this->track1_id = $track1->id;
     }
 
-    protected function get_user_create_date_resolver_option(): array {
-        $date_resolver_option = (new user_creation_date())->get_options()->first();
+    protected function get_user_creation_date_dynamic_source(): array {
+        $date_dynamic_source = (new user_creation_date())->get_options()->first();
 
-        /* @var $date_resolver_option resolver_option */
-        $resolver_option_input = [
+        /* @var $date_dynamic_source dynamic_source */
+        $dynamic_source_input = [
             'resolver_class_name' => user_creation_date::class,
-            'option_key' => $date_resolver_option->get_option_key(),
+            'option_key' => $date_dynamic_source->get_option_key(),
         ];
 
-        return [$date_resolver_option, $resolver_option_input];
+        return [$date_dynamic_source, $dynamic_source_input];
     }
 
     public function tearDown() {

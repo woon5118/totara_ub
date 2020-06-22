@@ -29,7 +29,7 @@ use core\orm\entity\model;
 use mod_perform\constants;
 use mod_perform\dates\resolvers\date_resolver;
 use mod_perform\dates\resolvers\dynamic\dynamic_date_resolver;
-use mod_perform\dates\resolvers\dynamic\resolver_option;
+use mod_perform\dates\resolvers\dynamic\dynamic_source;
 use mod_perform\dates\resolvers\fixed_range_resolver;
 use mod_perform\dates\schedule_constants;
 use mod_perform\entities\activity\track as track_entity;
@@ -55,7 +55,7 @@ use moodle_exception;
  * @property-read int $schedule_dynamic_count_to
  * @property-read string $schedule_dynamic_unit
  * @property-read string $schedule_dynamic_direction
- * @property-read resolver_option | null $schedule_resolver_option
+ * @property-read dynamic_source|null $schedule_dynamic_source
  * @property-read bool $due_date_is_enabled
  * @property-read bool $due_date_is_fixed
  * @property-read int $due_date_fixed
@@ -84,7 +84,7 @@ class track extends model {
         'schedule_is_fixed',
         'schedule_fixed_from',
         'schedule_dynamic_count_from',
-        'schedule_resolver_option',
+        'schedule_dynamic_source',
         'due_date_is_enabled',
         'due_date_is_fixed',
         'due_date_fixed',
@@ -150,7 +150,7 @@ class track extends model {
         $entity->schedule_dynamic_count_to = null;
         $entity->schedule_dynamic_unit = null;
         $entity->schedule_dynamic_direction = null;
-        $entity->schedule_resolver_option = null;
+        $entity->schedule_dynamic_source = null;
         $entity->due_date_is_enabled = false;
         $entity->due_date_is_fixed = null;
         $entity->due_date_fixed = null;
@@ -383,7 +383,7 @@ class track extends model {
      * @param int $count_to
      * @param int $unit
      * @param int $direction
-     * @param resolver_option $resolver_option
+     * @param dynamic_source $dynamic_source
      * @return track
      * @throws coding_exception
      */
@@ -392,7 +392,7 @@ class track extends model {
         int $count_to,
         int $unit,
         int $direction,
-        resolver_option $resolver_option
+        dynamic_source $dynamic_source
     ): self {
         if ($count_from < 0) {
             throw new coding_exception('Count from must be a positive integer');
@@ -414,8 +414,8 @@ class track extends model {
             throw new coding_exception('"count_from" must not be before "count_to" when dynamic schedule direction is "BEFORE"');
         }
 
-        if (!$resolver_option->is_available()) {
-            throw new coding_exception('Resolver option must be available');
+        if (!$dynamic_source->is_available()) {
+            throw new coding_exception('Dynamic source must be available');
         }
 
         $properties_to_update = [
@@ -425,7 +425,7 @@ class track extends model {
             'schedule_dynamic_count_to' => $count_to,
             'schedule_dynamic_unit' => $unit,
             'schedule_dynamic_direction' => $direction,
-            'schedule_resolver_option' => $resolver_option,
+            'schedule_dynamic_source' => $dynamic_source,
         ];
 
         $this->set_schedule_properties($properties_to_update);
@@ -441,7 +441,7 @@ class track extends model {
      * @param int $count_from
      * @param int $unit
      * @param int $direction
-     * @param resolver_option $resolver_option
+     * @param dynamic_source $dynamic_source
      * @return track
      * @throws coding_exception
      */
@@ -449,7 +449,7 @@ class track extends model {
         int $count_from,
         int $unit,
         int $direction,
-        resolver_option $resolver_option
+        dynamic_source $dynamic_source
     ): self {
         if (!isset(self::get_dynamic_schedule_units()[$unit])) {
             throw new coding_exception('Invalid dynamic schedule unit');
@@ -463,8 +463,8 @@ class track extends model {
             throw new coding_exception('Invalid dynamic schedule direction');
         }
 
-        if (!$resolver_option->is_available()) {
-            throw new coding_exception('Resolver option must be available');
+        if (!$dynamic_source->is_available()) {
+            throw new coding_exception('Dynamic source must be available');
         }
 
         $properties_to_update = [
@@ -473,7 +473,7 @@ class track extends model {
             'schedule_dynamic_count_from' => $count_from,
             'schedule_dynamic_unit' => $unit,
             'schedule_dynamic_direction' => $direction,
-            'schedule_resolver_option' => $resolver_option,
+            'schedule_dynamic_source' => $dynamic_source,
         ];
 
         $this->set_schedule_properties($properties_to_update);
@@ -515,7 +515,7 @@ class track extends model {
         $entity->schedule_dynamic_count_to = $properties['schedule_dynamic_count_to'] ?? null;
         $entity->schedule_dynamic_unit = $properties['schedule_dynamic_unit'] ?? null;
         $entity->schedule_dynamic_direction = $properties['schedule_dynamic_direction'] ?? null;
-        $entity->schedule_resolver_option = $properties['schedule_resolver_option'] ?? null;
+        $entity->schedule_dynamic_source = $properties['schedule_dynamic_source'] ?? null;
 
         if ($this->get_activity()->get_status_state() instanceof active
             && $this->do_schedule_changes_need_sync($entity_before_changes)) {
@@ -530,6 +530,10 @@ class track extends model {
      * @return bool
      */
     private function do_schedule_changes_need_sync(track_entity $entity_before_changes): bool {
+        if ($this->entity->schedule_dynamic_source != $entity_before_changes->schedule_dynamic_source) {
+            return true;
+        }
+
         foreach ([
             'schedule_is_open',
             'schedule_is_fixed',
@@ -847,13 +851,13 @@ class track extends model {
             return new fixed_range_resolver($this->schedule_fixed_from, $this->get_schedule_fixed_to());
         }
 
-        $resolver_option = $this->entity->schedule_resolver_option;
+        $dynamic_source = $this->entity->schedule_dynamic_source;
 
-        if ($resolver_option === null) {
+        if ($dynamic_source === null) {
             throw new coding_exception('Dynamic date resolver not set');
         }
 
-        $resolver = $resolver_option->get_resolver();
+        $resolver = $dynamic_source->get_resolver();
 
         if ($resolver === null) {
             throw new coding_exception('Dynamic date resolver not set');
@@ -864,7 +868,7 @@ class track extends model {
             $this->get_schedule_dynamic_count_to(),
             $this->get_schedule_dynamic_unit(),
             $this->get_schedule_dynamic_direction(),
-            $resolver_option->get_option_key(),
+            $dynamic_source->get_option_key(),
             $user_ids
         );
     }

@@ -105,7 +105,7 @@
       <Schedule
         v-if="track"
         :track="track"
-        :date-resolver-options="dateResolverOptions"
+        :dynamic-date-sources="dynamicDateSources"
       />
     </div>
     <AudienceAdder
@@ -175,7 +175,7 @@ export default {
   data() {
     return {
       track: null,
-      dateResolverOptions: [],
+      dynamicDateSources: [],
       trackSettings: null,
       assignments: [],
       noAssignments: [
@@ -223,11 +223,15 @@ export default {
     trackSettings(newValue) {
       this.track = newValue.track;
 
-      if (this.track.schedule_resolver_option &&
-        this.track.schedule_resolver_option.is_available === false) {
-        this.dateResolverOptions = this.addedDeletedDateResolverOptionToList(newValue.dateResolverOptions);
+      if (
+        this.track.schedule_dynamic_source &&
+        this.track.schedule_dynamic_source.is_available === false
+      ) {
+        this.dynamicDateSources = this.addedDeletedDateSourceToList(
+          newValue.dynamicDateSources
+        );
       } else {
-        this.dateResolverOptions = newValue.dateResolverOptions;
+        this.dynamicDateSources = newValue.dynamicDateSources;
       }
     },
   },
@@ -304,21 +308,21 @@ export default {
      * Add the currently selected date resolver to the front of the selections,
      * with a modified "deleted" label.
      */
-    addedDeletedDateResolverOptionToList(dateResolverOptions) {
+    addedDeletedDateSourceToList(dynamicDateSources) {
       const deletedDisplayName = this.$str(
-        'deleted_resolver_option_label',
+        'deleted_dynamic_source_label',
         'mod_perform',
-        this.track.schedule_resolver_option.display_name
+        this.track.schedule_dynamic_source.display_name
       );
 
       const deletedOption = Object.assign(
         {},
-        this.track.schedule_resolver_option,
-        {display_name: deletedDisplayName}
-      )
+        this.track.schedule_dynamic_source,
+        { display_name: deletedDisplayName }
+      );
 
-      const options = [deletedOption]
-      options.push.apply(options, dateResolverOptions);
+      const options = [deletedOption];
+      options.push.apply(options, dynamicDateSources);
 
       return options;
     },
@@ -386,7 +390,7 @@ export default {
       update: data => {
         return {
           track: data.mod_perform_default_track,
-          dateResolverOptions: data.mod_perform_available_date_resolver_options,
+          dynamicDateSources: data.mod_perform_available_dynamic_date_sources,
         };
       },
     },
@@ -397,7 +401,7 @@ export default {
 <lang-strings>
   {
     "mod_perform" : [
-      "deleted_resolver_option_label",
+      "deleted_dynamic_source_label",
       "user_group_assignment_add_group",
       "user_group_assignment_confirm_remove",
       "user_group_assignment_confirm_remove_title",

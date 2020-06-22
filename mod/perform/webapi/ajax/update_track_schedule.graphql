@@ -16,7 +16,7 @@ mutation mod_perform_update_track_schedule(
       schedule_dynamic_count_to
       schedule_dynamic_unit
       schedule_dynamic_direction
-      schedule_resolver_option {
+      schedule_dynamic_source {
         resolver_class_name
         option_key
         display_name

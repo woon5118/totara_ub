@@ -82,7 +82,7 @@ class mod_perform_webapi_query_default_track_settings_testcase extends advanced_
         $raw_result = $this->execute_graphql_operation(self::QUERY, $args);
 
         self::assertCount(0, $raw_result->errors);
-        self::assertGreaterThan(0, count($raw_result->data['mod_perform_available_date_resolver_options']));
+        self::assertGreaterThan(0, count($raw_result->data['mod_perform_available_dynamic_date_sources']));
 
         $track = $raw_result->data['mod_perform_default_track'];
         $this->assertEquals(track_status::ACTIVE, $track['status'], 'wrong track status');

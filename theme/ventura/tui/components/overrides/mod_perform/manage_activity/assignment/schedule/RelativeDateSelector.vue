@@ -44,8 +44,8 @@
   }
 
   .tui-formFieldError__inner {
-    margin-top: var(--tui-gap-1);
     min-width: 20rem; // Should find a way to handle this better.
+    margin-top: var(--tui-gap-1);
   }
 }
 </style>

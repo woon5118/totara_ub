@@ -28,7 +28,7 @@ use core\webapi\execution_context;
 use core\webapi\mutation_resolver;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\resolver\has_middleware;
-use mod_perform\dates\resolvers\dynamic\resolver_option;
+use mod_perform\dates\resolvers\dynamic\dynamic_source;
 use mod_perform\models\activity\track;
 use mod_perform\webapi\middleware\require_activity;
 use moodle_exception;
@@ -69,8 +69,8 @@ class update_track_schedule implements mutation_resolver, has_middleware {
                 );
             }
         } else { // Dynamic.
-            $dynamic_resolver_option = resolver_option::create_from_json(
-                $track_schedule['schedule_resolver_option'],
+            $dynamic_source = dynamic_source::create_from_json(
+                $track_schedule['schedule_dynamic_source'],
                 true
             );
 
@@ -85,7 +85,7 @@ class update_track_schedule implements mutation_resolver, has_middleware {
                         track::get_dynamic_schedule_directions(),
                         'schedule dynamic direction'
                     ),
-                    $dynamic_resolver_option
+                    $dynamic_source
                 );
             } else { // Closed.
                 $track->set_schedule_closed_dynamic(
@@ -99,7 +99,7 @@ class update_track_schedule implements mutation_resolver, has_middleware {
                         track::get_dynamic_schedule_directions(),
                         'schedule dynamic direction'
                     ),
-                    $dynamic_resolver_option
+                    $dynamic_source
                 );
             }
         }
@@ -187,7 +187,7 @@ class update_track_schedule implements mutation_resolver, has_middleware {
             'schedule_dynamic_count_to',
             'schedule_dynamic_unit',
             'schedule_dynamic_direction',
-            'schedule_resolver_option',
+            'schedule_dynamic_source',
             'due_date_is_fixed',
             'due_date_fixed',
             'due_date_relative_count',
@@ -209,13 +209,13 @@ class update_track_schedule implements mutation_resolver, has_middleware {
                 $required_fields[] = 'schedule_dynamic_count_from';
                 $required_fields[] = 'schedule_dynamic_unit';
                 $required_fields[] = 'schedule_dynamic_direction';
-                $required_fields[] = 'schedule_resolver_option';
+                $required_fields[] = 'schedule_dynamic_source';
             } else { // Closed.
                 $required_fields[] = 'schedule_dynamic_count_from';
                 $required_fields[] = 'schedule_dynamic_count_to';
                 $required_fields[] = 'schedule_dynamic_unit';
                 $required_fields[] = 'schedule_dynamic_direction';
-                $required_fields[] = 'schedule_resolver_option';
+                $required_fields[] = 'schedule_dynamic_source';
             }
         }
 

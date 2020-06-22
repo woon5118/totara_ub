@@ -25,7 +25,9 @@
 use core\entities\user;
 use core\orm\entity\repository as entity_repository;
 use core\orm\query\builder;
+use mod_perform\dates\resolvers\dynamic\dynamic_source;
 use mod_perform\dates\resolvers\dynamic\user_creation_date;
+use mod_perform\dates\resolvers\dynamic\user_custom_field;
 use mod_perform\entities\activity\activity;
 use mod_perform\entities\activity\track;
 use mod_perform\entities\activity\track as track_entity;
@@ -661,14 +663,14 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
 
         $track1_id = $test_data->track1->id;
 
-        $resolver_option = (new user_creation_date())->get_options()->first();
+        $dynamic_source = (new user_creation_date())->get_options()->first();
 
         /** @var track_entity $track */
         $track = track_entity::repository()->find($track1_id);
         $track->schedule_is_open = false;
         $track->schedule_is_fixed = false;
         $track->schedule_dynamic_direction = track_entity::SCHEDULE_DYNAMIC_DIRECTION_BEFORE;
-        $track->schedule_resolver_option = $resolver_option;
+        $track->schedule_dynamic_source = $dynamic_source;
         $track->schedule_dynamic_count_from = 7;
         $track->schedule_dynamic_count_to = 0;
         $track->schedule_dynamic_unit = track_entity::SCHEDULE_DYNAMIC_UNIT_DAY;
@@ -716,6 +718,63 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
 
         $this->assertEquals($seven_days_before_create_date, $track_user_assignment->period_start_date);
         $this->assertEquals(null, $track_user_assignment->period_end_date);
+    }
+
+    public function test_null_dynamic_assignment_period_dates_are_populated(): void {
+        $test_data = $this->prepare_assignments();
+
+        // No user_info_data is inserted, this is how we get the null data.
+        builder::get_db()->insert_record(
+            'user_info_field',
+            (object)['shortname' => 'datetime-custom-field-1', 'name' => 'time 2', 'categoryid' => 1, 'datatype' => 'datetime']
+        );
+
+        $track1_id = $test_data->track1->id;
+
+        $dynamic_source = (new user_custom_field())->get_options()->find(function (dynamic_source $source) {
+            return $source->get_option_key() === 'datetime-custom-field-1';
+        });
+
+        /** @var track_entity $track */
+        $track = track_entity::repository()->find($track1_id);
+        $track->schedule_is_open = false;
+        $track->schedule_is_fixed = false;
+        $track->schedule_dynamic_source = $dynamic_source;
+        $track->schedule_dynamic_count_from = 1;
+        $track->schedule_dynamic_count_to = 2;
+        $track->schedule_dynamic_unit = track_entity::SCHEDULE_DYNAMIC_UNIT_DAY;
+        $track->schedule_dynamic_direction = track_entity::SCHEDULE_DYNAMIC_DIRECTION_AFTER;
+        $track->save();
+
+        $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user1->id);
+
+        (new expand_task())->expand_all();
+
+        /** @var track_user_assignment $track_user_assignment */
+        $track_user_assignment = track_user_assignment::repository()
+            ->where('track_id', $track1_id)
+            ->where('subject_user_id', $test_data->user1->id)
+            ->one();
+
+        $this->assertNull($track_user_assignment->period_start_date);
+        $this->assertNull($track_user_assignment->period_end_date);
+
+        // Change to open_fixed and expand for a new user.
+        $track->schedule_is_open = true;
+        $track->schedule_is_fixed = false;
+        $track->save();
+
+        $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user2->id);
+
+        (new expand_task())->expand_all();
+        /** @var track_user_assignment $track_user_assignment */
+        $track_user_assignment = track_user_assignment::repository()
+            ->where('track_id', $track1_id)
+            ->where('subject_user_id', $test_data->user2->id)
+            ->one();
+
+        $this->assertNull($track_user_assignment->period_start_date);
+        $this->assertNull($track_user_assignment->period_end_date);
     }
 
     /**

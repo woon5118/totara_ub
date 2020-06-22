@@ -13,7 +13,7 @@ query mod_perform_default_track_settings($activity_id: param_integer!) {
     schedule_dynamic_count_to
     schedule_dynamic_unit
     schedule_dynamic_direction
-    schedule_resolver_option {
+    schedule_dynamic_source {
       resolver_class_name
       option_key
       display_name
@@ -40,7 +40,7 @@ query mod_perform_default_track_settings($activity_id: param_integer!) {
       }
     }
   }
-  mod_perform_available_date_resolver_options {
+  mod_perform_available_dynamic_date_sources {
     resolver_class_name
     option_key
     display_name
