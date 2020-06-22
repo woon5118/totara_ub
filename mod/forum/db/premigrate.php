@@ -30,9 +30,11 @@ function xmldb_mod_forum_premigrate() {
 
     $version = premigrate_get_plugin_version('mod', 'forum');
 
-    if ($version > 2019111801) {
+    if ($version > 2020061500) {
         throw new coding_exception("Invalid plugin (mod_forum) version ($version) for pre-migration");
     }
+
+    // Moodle 3.9 pre-migration line.
 
     if ($version >= 2019100109) {
         $table = new xmldb_table('forum');

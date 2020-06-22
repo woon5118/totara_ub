@@ -30,12 +30,24 @@ function xmldb_ltiservice_gradebookservices_premigrate() {
 
     $version = premigrate_get_plugin_version('ltiservice', 'gradebookservices');
 
-    if ($version > 2019111800) {
+    if ($version > 2020061500) {
         throw new coding_exception("Invalid plugin (ltiservice_gradebookservices) version ($version) for pre-migration");
     }
 
+    if ($version >= 2020042401) {
+        $table = new xmldb_table('ltiservice_gradebookservices');
+        $field = new xmldb_field('resourceid', XMLDB_TYPE_CHAR, "512", null, null, null, null);
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        $version = premigrate_plugin_savepoint(2020042401, 'ltiservice', 'gradebookservices');
+    }
+
+    // Moodle 3.9 pre-migration line.
+
     // Plugin was backported from Moodle 3.8.1 to Totara 13.
     if ($version > 2019111800) {
-        $version = premigrate_plugin_savepoint(2019111800, 'mod', 'gradebookservices');
+        $version = premigrate_plugin_savepoint(2019111800, 'ltiservice', 'gradebookservices');
     }
 }

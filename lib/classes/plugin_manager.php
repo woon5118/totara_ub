@@ -1139,6 +1139,16 @@ class core_plugin_manager {
     public static function is_deleted_standard_plugin($type, $name) {
         // TOTARA: Do not include plugins that were removed during upgrades to Totara 9 or Moodle 3.0 and earlier.
         $plugins = array(
+            // Moodle 3.9.x premigration removals.
+            'mod_h5pactivity',
+            'quizaccess_seb',
+            'tool_licensemanager',
+            'tool_moodlenet',
+            'report_status',
+            'repository_contentbank',
+            'contenttype_h5p',
+            'h5plib_v124',
+
             // Moodle 3.8.x premigration removals.
             'filter_displayh5p',
             'atto_emojipicker',

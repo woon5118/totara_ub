@@ -30,9 +30,11 @@ function xmldb_tool_oauth2_premigrate() {
 
     $version = premigrate_get_plugin_version('tool', 'oauth2');
 
-    if ($version > 2019111800) {
+    if ($version > 2020061500) {
         throw new coding_exception("Invalid plugin (tool_oauth2) version ($version) for pre-migration");
     }
+
+    // Moodle 3.9 pre-migration line.
 
     // OAuth was backported from Moodle 3.8.1
     if ($version > 2019111800) {

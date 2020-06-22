@@ -30,9 +30,11 @@ function xmldb_mod_assign_premigrate() {
 
     $version = premigrate_get_plugin_version('mod', 'assign');
 
-    if ($version > 2019111800) {
+    if ($version > 2020061500) {
         throw new coding_exception("Invalid plugin (mod_assign) version ($version) for pre-migration");
     }
+
+    // Moodle 3.9 pre-migration line.
 
     // Moodle 3.8 pre-migration line.
 

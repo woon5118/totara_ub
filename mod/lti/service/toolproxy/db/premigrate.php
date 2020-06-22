@@ -30,12 +30,14 @@ function xmldb_ltiservice_toolproxy_premigrate() {
 
     $version = premigrate_get_plugin_version('ltiservice', 'toolproxy');
 
-    if ($version > 2019111800) {
+    if ($version > 2020061500) {
         throw new coding_exception("Invalid plugin (ltiservice_toolproxy) version ($version) for pre-migration");
     }
 
+    // Moodle 3.9 pre-migration line.
+
     // Plugin was backported from Moodle 3.8.1 to Totara 13.
     if ($version > 2019111800) {
-        $version = premigrate_plugin_savepoint(2019111800, 'mod', 'toolproxy');
+        $version = premigrate_plugin_savepoint(2019111800, 'ltiservice', 'toolproxy');
     }
 }

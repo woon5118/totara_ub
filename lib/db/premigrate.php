@@ -30,6 +30,101 @@ function xmldb_core_premigrate() {
 
     $version = $CFG->version;
 
+    if ($version >= 2020060500.01) {
+        $table = new xmldb_table('user');
+        $field = new xmldb_field('moodlenetprofile', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'alternatename');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        $version = premigrate_main_savepoint(2020060500.01);
+    }
+
+    if ($version >= 2020052200.01) {
+        $table = new xmldb_table('license');
+        $field = new xmldb_field('custom', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        $field = new xmldb_field('sortorder', XMLDB_TYPE_INTEGER, '5', null, XMLDB_NOTNULL, null, '0');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        $table = new xmldb_table('files');
+        $index = new xmldb_index('license', XMLDB_INDEX_NOTUNIQUE, ['license']);
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        $version = premigrate_main_savepoint(2020052200.01);
+    }
+
+    if ($version >= 2020052000.00) {
+        $table = new xmldb_table('badge_backpack_oauth2');
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        $tablebadgeexternalbackpack = new xmldb_table('badge_external_backpack');
+        $fieldoauth2issuerid = new xmldb_field('oauth2_issuerid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'password');
+        $keybackpackoauth2key = new xmldb_key('backpackoauth2key', XMLDB_KEY_FOREIGN, ['oauth2_issuerid'], 'oauth2_issuer', ['id']);
+        if ($dbman->field_exists($tablebadgeexternalbackpack, $fieldoauth2issuerid)) {
+            $dbman->drop_key($tablebadgeexternalbackpack, $keybackpackoauth2key);
+            $dbman->drop_field($tablebadgeexternalbackpack, $fieldoauth2issuerid);
+        }
+
+        $tablebadgeexternal = new xmldb_table('badge_external');
+        $fieldassertion = new xmldb_field('assertion', XMLDB_TYPE_TEXT, null, null, null, null, null, 'entityid');
+        if ($dbman->field_exists($tablebadgeexternal, $fieldassertion)) {
+            $dbman->drop_field($tablebadgeexternal, $fieldassertion);
+        }
+
+        $version = premigrate_main_savepoint(2020052000.00);
+    }
+
+    if ($version >= 2020051900.01) {
+        $table = new xmldb_table('event');
+        $index = new xmldb_index('component', XMLDB_INDEX_NOTUNIQUE, ['component', 'eventtype', 'instance']);
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        $table = new xmldb_table('event');
+        $field = new xmldb_field('component', XMLDB_TYPE_CHAR, '100', null, null, null, null, 'repeatid');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        $version = premigrate_main_savepoint(2020051900.01);
+    }
+
+    if ($version >= 2020041500.00) {
+        $table = new xmldb_table('contentbank_content');
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        $version = premigrate_main_savepoint(2020041500.00);
+    }
+
+    if ($version >= 2020010900.02) {
+        $table = new xmldb_table('event');
+
+        $index = new xmldb_index('eventtype', XMLDB_INDEX_NOTUNIQUE, ['eventtype']);
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        $index = new xmldb_index('modulename-instance', XMLDB_INDEX_NOTUNIQUE, ['modulename', 'instance']);
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        $version = premigrate_main_savepoint(2020010900.02);
+    }
+
     if ($version >= 2019102500.04) {
         $table = new xmldb_table('h5p_libraries');
         if ($dbman->table_exists($table)) {
