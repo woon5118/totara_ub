@@ -589,10 +589,11 @@ final class course_editor {
         if (!empty($data->cmid)) {
             $cmc = $DB->get_record('course_modules_completion',
                 array('coursemoduleid' => $data->cmid, 'userid' => $data->userid),
-                'id, timecompleted');
+                'id, timecompleted, reaggregate');
 
             if (empty($cmc)) {
                 $cmc = new \stdClass();
+                $cmc->reaggregate = 0;
             }
 
             $cmc->coursemoduleid = $data->cmid;

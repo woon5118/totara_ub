@@ -195,6 +195,18 @@ if ($form->is_cancelled()) {
             } else {
                 \core_completion\helper::write_module_completion($cmc, 'Module completion manually updated');
             }
+
+            // Trigger an event for course module completion changed.
+            $event = \core\event\course_module_completion_updated::create(array(
+                'objectid' => $cmc->id,
+                'context' => context_module::instance($cmc->coursemoduleid),
+                'relateduserid' => $cmc->userid,
+                'other' => array(
+                    'relateduserid' => $cmc->userid
+                )
+            ));
+            $event->add_record_snapshot('course_modules_completion', $cmc);
+            $event->trigger();
         }
 
         if (!empty($cccc)) {

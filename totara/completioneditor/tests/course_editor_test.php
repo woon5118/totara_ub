@@ -291,6 +291,7 @@ class totara_completioneditor_course_editor_testcase extends advanced_testcase {
         $expectedcmc->completionstate = 234;
         $expectedcmc->viewed = 345;
         $expectedcmc->timecompleted = null;
+        $expectedcmc->reaggregate = 0;
 
         $timebefore = time();
         list($actualcmc, $actualcccc) = course_editor::get_module_and_criteria_from_data($data);
@@ -316,6 +317,7 @@ class totara_completioneditor_course_editor_testcase extends advanced_testcase {
         $expectedcmc->completionstate = 234;
         $expectedcmc->viewed = 345;
         $expectedcmc->timecompleted = 567;
+        $expectedcmc->reaggregate = 0;
 
         $timebefore = time();
         list($actualcmc, $actualcccc) = course_editor::get_module_and_criteria_from_data($data);
@@ -340,6 +342,7 @@ class totara_completioneditor_course_editor_testcase extends advanced_testcase {
         $expectedcmc->completionstate = 234;
         $expectedcmc->viewed = 345;
         $expectedcmc->timecompleted = null;
+        $expectedcmc->reaggregate = 0;
 
         $timebefore = time();
         list($actualcmc, $actualcccc) = course_editor::get_module_and_criteria_from_data($data);
@@ -366,6 +369,7 @@ class totara_completioneditor_course_editor_testcase extends advanced_testcase {
         $expectedcmc->viewed = 345;
         $expectedcmc->timemodified = 567;
         $expectedcmc->timecompleted = null;
+        $expectedcmc->reaggregate = 0;
 
         list($actualcmc, $actualcccc) = course_editor::get_module_and_criteria_from_data($data);
 
@@ -397,6 +401,7 @@ class totara_completioneditor_course_editor_testcase extends advanced_testcase {
         $expectedcmc->completionstate = 234;
         $expectedcmc->viewed = 345;
         $expectedcmc->timecompleted = 567;
+        $expectedcmc->reaggregate = 0;
 
         $timebefore = time();
         list($actualcmc, $actualcccc) = course_editor::get_module_and_criteria_from_data($data);
@@ -527,6 +532,7 @@ class totara_completioneditor_course_editor_testcase extends advanced_testcase {
         $expectedcccc->criteriaid = 456;
         $expectedcccc->rpl = null;
         $expectedcccc->timecompleted = null;
+        $expectedcmc->reaggregate = 0;
 
         $timebefore = time();
         list($actualcmc, $actualcccc) = course_editor::get_module_and_criteria_from_data($data);
@@ -557,6 +563,7 @@ class totara_completioneditor_course_editor_testcase extends advanced_testcase {
         $expectedcmc->completionstate = 234;
         $expectedcmc->viewed = 345;
         $expectedcmc->timecompleted = 567;
+        $expectedcmc->reaggregate = 0;
 
         $expectedcccc = new stdClass();
         $expectedcccc->userid = $user->id;
@@ -594,6 +601,7 @@ class totara_completioneditor_course_editor_testcase extends advanced_testcase {
         $expectedcmc->completionstate = 234;
         $expectedcmc->viewed = 345;
         $expectedcmc->timecompleted = 567;
+        $expectedcmc->reaggregate = 0;
 
         $expectedcccc = new stdClass();
         $expectedcccc->userid = $user->id;
