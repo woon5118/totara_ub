@@ -23,6 +23,7 @@
 
 namespace totara_webapi\phpunit;
 
+use context;
 use core\webapi\execution_context;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\Type\Definition\ObjectType;
@@ -208,9 +209,16 @@ trait webapi_phpunit_helper {
      * @param string $field_name
      * @param $source
      * @param array $variables
+     * @param context $context
      * @return mixed|null
      */
-    protected function resolve_graphql_type(string $type_name, string $field_name, $source, array $variables = []) {
+    protected function resolve_graphql_type(
+        string $type_name,
+        string $field_name,
+        $source,
+        array $variables = [],
+        context $context = null
+    ) {
         $object_type_mock = $this->getMockBuilder(ObjectType::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -225,6 +233,9 @@ trait webapi_phpunit_helper {
         $resolve_info_mock->fieldName = $field_name;
 
         $execution_context = execution_context::create(graphql::TYPE_AJAX, null);
+        if (isset($context)) {
+            $execution_context->set_relevant_context($context);
+        }
 
         $resolver = new default_resolver();
         return $resolver($source, $variables, $execution_context, $resolve_info_mock);
