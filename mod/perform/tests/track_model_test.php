@@ -236,8 +236,7 @@ class mod_perform_track_model_testcase extends advanced_testcase {
     }
 
     public function set_schedule_methods_data_provider(): array {
-        $dynamic_source = dynamic_source::all_available()->first();
-
+        $dynamic_source = dynamic_source::all_available()->last();
         return [
             'set_schedule_open_fixed' => [
                 'set_schedule_open_fixed', [new date_time_setting(111)]
@@ -642,6 +641,8 @@ class mod_perform_track_model_testcase extends advanced_testcase {
             'option_key' => user_creation_date::DEFAULT_KEY,
             'display_name' => 'User creation date',
             'is_available' => true,
+            'custom_setting_component' => null,
+            'custom_data' => null,
         ], $selected_option->jsonSerialize());
     }
 
@@ -668,6 +669,8 @@ class mod_perform_track_model_testcase extends advanced_testcase {
             'option_key' => 'non-existing',
             'display_name' => 'User creation date',
             'is_available' => false,
+            'custom_setting_component' => null,
+            'custom_data' => null,
         ], $selected_option->jsonSerialize());
     }
 

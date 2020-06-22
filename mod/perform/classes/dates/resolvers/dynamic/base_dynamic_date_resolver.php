@@ -61,6 +61,11 @@ abstract class base_dynamic_date_resolver implements dynamic_date_resolver {
     protected $option_key;
 
     /**
+     * @var string|null
+     */
+    protected $custom_data;
+
+    /**
      * Get one instance of each dynamic date resolver.
      *
      * @return collection
@@ -160,6 +165,44 @@ abstract class base_dynamic_date_resolver implements dynamic_date_resolver {
         if (!$this->ready_to_resolve) {
             throw new coding_exception('Can not call resolve before setting parameters');
         }
+    }
+
+    /**
+     * This custom setting component name
+     *
+     * @return string|null
+     */
+    public function get_custom_setting_component(): ?string {
+        return null;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function get_custom_data(): ?string {
+        return $this->custom_data;
+    }
+
+    /**
+     * @param string|null $custom_data
+     */
+    public function set_custom_data(?string $custom_data) {
+        if (!$this->is_valid_custom_data($custom_data)) {
+            throw new \coding_exception("Invalid custom data");
+        }
+        $this->custom_data = $custom_data;
+    }
+
+    /**
+     * Check the validity of custom data
+     * need to implement this method if the resolver class contains custom data  
+     *
+     * @param string|null $custom_data
+     *
+     * @return bool
+     */
+    public function is_valid_custom_data(?string $custom_data): bool {
+        return is_null($custom_data);
     }
 
 }

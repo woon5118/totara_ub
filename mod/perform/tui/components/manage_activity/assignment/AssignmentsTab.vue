@@ -107,6 +107,7 @@
         :track="track"
         :dynamic-date-sources="dynamicDateSources"
         :default-fixed-date="defaultFixedDateSetting"
+        :activity-id="activityId"
       />
     </div>
     <AudienceAdder

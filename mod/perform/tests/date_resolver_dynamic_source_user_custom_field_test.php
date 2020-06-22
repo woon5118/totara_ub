@@ -24,7 +24,7 @@
 use mod_perform\dates\date_offset;
 use mod_perform\dates\resolvers\dynamic\user_custom_field;
 
-class mod_perform_user_custom_field_date_resolver_testcase extends advanced_testcase {
+class mod_perform_date_resolver_dynamic_source_user_custom_field_testcase extends advanced_testcase {
 
     public function test_get_option() {
         $this->generate_test_data();
@@ -65,6 +65,7 @@ class mod_perform_user_custom_field_date_resolver_testcase extends advanced_test
         $data_generator = $this->getDataGenerator();
         $data['user1'] = $data_generator->create_user();
         $data['user2'] = $data_generator->create_user();
+        $DB->delete_records('user_info_field');
         $DB->insert_record('user_info_field', (object)['shortname' => 'ch-1', 'name' => 'n 1', 'categoryid' => 1, 'datatype' => 'checkbox']);
         $DB->insert_record('user_info_field', (object)['shortname' => 'rex-1', 'name' => 'text 1', 'categoryid' => 1, 'datatype' => 'text']);
         $data['datetime-1']  = $DB->insert_record('user_info_field', (object)['shortname' => 'datetime-1', 'name' => 'time 1', 'categoryid' => 1, 'datatype' => 'datetime']);

@@ -41,6 +41,7 @@
       has-direction
       :has-range="!isOpen"
       :dynamic-date-sources="dynamicDateSources"
+      :dynamic-date-setting-component="dynamicDateSettingComponent"
     />
     <div
       v-if="isOpen && isFixed"
@@ -86,6 +87,9 @@ export default {
     dynamicDateSources: {
       type: Array,
       required: true,
+    },
+    dynamicDateSettingComponent: {
+      type: Object,
     },
   },
   computed: {

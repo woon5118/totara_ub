@@ -511,3 +511,28 @@ Feature: Define track schedules to perform activities
     And I click on "Assignments" "link"
     Then the following fields match these values:
       | scheduleDynamic[dynamic_source] | Date one (deleted) |
+
+  Scenario: Another activity dynamic schedule
+    Given the following "activities" exist in "mod_perform" plugin:
+      | activity_name    | description      | activity_type | create_track |
+      | Activity one     | Activity one     | feedback      | true         |
+      | Activity two     | MActivity two    | feedback      | true         |
+    And I log in as "admin"
+    When I navigate to the manage perform activities page
+    And I click on "Activity one" "link"
+    And I click on "Assignments" "link"
+    When I click on "Open-ended" "button"
+    And I click on "Dynamic" "button"
+    And I set the following fields to these values:
+      | scheduleDynamic[from_count]                      | 3                                   |
+      | scheduleDynamic[from_unit]                       | weeks                               |
+      | scheduleDynamic[from_direction]                  | after                               |
+      | scheduleDynamic[dynamic_source]                  | Completion date of another activity |
+      | scheduleDynamic[dynamicCustomSettings][activity] | Activity two                        |
+    And I save the activity schedule
+    Then I should see "Activity schedule saved" in the tui "success" notification toast
+    When I reload the page
+    And I click on "Assignments" "link"
+    Then the following fields match these values:
+      | scheduleDynamic[dynamic_source]                  | Completion date of another activity |
+      | scheduleDynamic[dynamicCustomSettings][activity] | Activity two                        |

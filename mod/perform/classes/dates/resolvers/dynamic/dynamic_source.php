@@ -108,6 +108,7 @@ class dynamic_source implements JsonSerializable {
         $resolver_class = $data['resolver_class_name'] ?? null;
         $option_key = $data['option_key'] ?? null;
         $display_name = $data['display_name'] ?? null;
+        $custom_data = $data['custom_data'] ?? null;
 
         // Note: that we don't require display name because we will try load that from the resolver.
         if ($resolver_class === null || $option_key === null) {
@@ -119,6 +120,8 @@ class dynamic_source implements JsonSerializable {
         if (is_subclass_of($resolver_class, dynamic_date_resolver::class)) {
             /** @var dynamic_date_resolver $resolver */
             $resolver = new $resolver_class();
+            $resolver->set_custom_data($custom_data);
+
             $source_option = static::get_option_from_key($resolver->get_options(), $option_key);
         }
 
@@ -166,6 +169,8 @@ class dynamic_source implements JsonSerializable {
             'option_key' => $this->get_option_key(),
             'display_name' => $this->get_display_name(),
             'is_available' => $this->is_available(),
+            'custom_setting_component' => $this->resolver->get_custom_setting_component(),
+            'custom_data' => $this->resolver->get_custom_data()
         ];
     }
 
@@ -199,6 +204,23 @@ class dynamic_source implements JsonSerializable {
         }
 
         return $this->resolver->option_is_available($this->option_key);
+    }
+
+    /**
+     * Get custom setting component
+     *
+     * @return string|null
+     */
+    public function get_custom_setting_component(): ?string {
+        return $this->resolver->get_custom_setting_component();
+    }
+
+    /**
+     *
+     * @return string|null
+     */
+    public function get_custom_data(): ?string {
+        return $this->resolver->get_custom_data();
     }
 
     public function get_resolver(): ?dynamic_date_resolver {

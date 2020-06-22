@@ -30,6 +30,8 @@ query mod_perform_track($track_id: param_integer!) {
       option_key
       display_name
       is_available
+      custom_setting_component
+      custom_data
     }
     due_date_is_enabled
     due_date_is_fixed

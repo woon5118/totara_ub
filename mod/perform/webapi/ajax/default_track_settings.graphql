@@ -30,6 +30,8 @@ query mod_perform_default_track_settings($activity_id: param_integer!) {
       option_key
       display_name
       is_available
+      custom_setting_component
+      custom_data
     }
     schedule_use_anniversary
     due_date_is_enabled
@@ -67,6 +69,8 @@ query mod_perform_default_track_settings($activity_id: param_integer!) {
     option_key
     display_name
     is_available
+    custom_setting_component
+    custom_data
   }
   mod_perform_default_fixed_date_setting {
     iso

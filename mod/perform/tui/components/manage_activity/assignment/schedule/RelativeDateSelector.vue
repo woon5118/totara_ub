@@ -38,7 +38,6 @@
           :min="0"
         />
       </div>
-
       <div class="tui-performAssignmentScheduleRelativeDateSelector__unit">
         <Label
           :for="$id('relative-date-from-unit')"
@@ -118,7 +117,6 @@
           />
         </div>
       </template>
-
       <div
         class="tui-performAssignmentScheduleRelativeDateSelector__reference-date"
       >
@@ -134,6 +132,16 @@
           :options="dynamicSourcesForSelect"
           :disabled="disabled"
         />
+        <div
+          class="tui-performAssignmentScheduleRelativeDateSelector__reference-date-customSettings"
+        >
+          <component
+            :is="dynamicSettingComponentFor()"
+            v-if="showCustomDynamicSetting"
+            :data="dynamicDateSettingComponent.data"
+            :config-data="dynamicDateSettingComponent.configData"
+          />
+        </div>
       </div>
     </div>
   </FormScope>
@@ -182,6 +190,9 @@ export default {
       type: Array,
       required: false,
     },
+    dynamicDateSettingComponent: {
+      type: Object,
+    },
   },
 
   computed: {
@@ -220,6 +231,15 @@ export default {
           id: `${option.resolver_class_name}--${option.option_key}`,
         };
       });
+    },
+    showCustomDynamicSetting() {
+      if (
+        !this.dynamicDateSettingComponent ||
+        !this.dynamicDateSettingComponent.name
+      ) {
+        return false;
+      }
+      return true;
     },
   },
 
@@ -292,6 +312,13 @@ export default {
       }
 
       return {};
+    },
+
+    /**
+     * get dynamic date custom setting component
+     */
+    dynamicSettingComponentFor() {
+      return tui.asyncComponent(this.dynamicDateSettingComponent.name);
     },
   },
 };

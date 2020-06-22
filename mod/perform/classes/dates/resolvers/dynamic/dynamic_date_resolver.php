@@ -66,4 +66,25 @@ interface dynamic_date_resolver extends date_resolver {
      */
     public function option_is_available(string $option_key): bool;
 
+    /**
+     * This custom setting component name
+     *
+     * @return string|null
+     */
+    public function get_custom_setting_component(): ?string ;
+
+    /**
+     * Get custom data
+     *
+     * @return string|null
+     */
+    public function get_custom_data(): ?string ;
+
+
+    /**
+     * Set custom data
+     *
+     * @param string|null $custom_data
+     */
+    public function set_custom_data(?string $custom_data);
 }

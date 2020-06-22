@@ -43,6 +43,15 @@
     max-width: 10rem;
   }
 
+  &__reference-date {
+    display: flex;
+    flex-direction: row;
+    &-customSettings {
+      min-width: 20rem;
+      margin-left: var(--tui-gap-1);
+    }
+  }
+
   .tui-formFieldError__inner {
     min-width: 20rem; // Should find a way to handle this better.
     margin-top: var(--tui-gap-1);

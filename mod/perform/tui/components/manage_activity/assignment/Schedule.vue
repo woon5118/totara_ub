@@ -44,6 +44,7 @@
         :is-open="scheduleIsOpen"
         :is-fixed="scheduleIsFixed"
         :dynamic-date-sources="dynamicDateSources"
+        :dynamic-date-setting-component="dynamicDateSettingComponent"
       />
 
       <FrequencySettings
@@ -126,6 +127,9 @@ export default {
     },
     defaultFixedDate: {
       type: Object,
+    },
+    activityId: {
+      type: Number,
       required: true,
     },
   },
@@ -142,6 +146,11 @@ export default {
       initialValues: this.getInitialValues(this.track),
       isGenerationControlEnabled: this.track
         .subject_instance_generation_control_is_enabled,
+      dynamicDateSettingComponent: {
+        name: this.getDynamicCustomSettingComponent(),
+        data: this.getDynamicCustomSettingData(this.track),
+        configData: this.getDynamicCustomSettingConfig(),
+      },
     };
   },
   methods: {
@@ -151,6 +160,22 @@ export default {
     onChange(values) {
       this.dueDateIsFixed = values.dueDateIsFixed === 'true';
       this.repeatingType = values.repeatingType;
+
+      if (values.scheduleDynamic.dynamic_source) {
+        let selectedSource = this.dynamicDateSources
+          .filter(
+            item =>
+              `${item.resolver_class_name}--${item.option_key}` ==
+              values.scheduleDynamic.dynamic_source
+          )
+          .shift();
+        this.dynamicDateSettingComponent.name =
+          selectedSource.custom_setting_component;
+
+        this.dynamicDateSettingComponent.data = JSON.parse(
+          selectedSource.custom_data
+        );
+      }
     },
 
     /**
@@ -186,7 +211,6 @@ export default {
           };
         }
       }
-
       return {};
     },
 
@@ -237,6 +261,7 @@ export default {
           to_direction: schedule_dynamic_to_direction,
           dynamic_source: this.getCombinedDynamicSourceKey(track),
           use_anniversary: track.schedule_use_anniversary,
+          dynamicCustomSettings: this.getDynamicCustomSettingData(track),
         },
 
         // Due date initial settings
@@ -353,9 +378,18 @@ export default {
         const dynamicDateSourceParts = form.scheduleDynamic.dynamic_source.split(
           '--'
         );
+        let customData = null;
+        if (
+          this.isDynamicCustomSettingSource(form.scheduleDynamic.dynamic_source)
+        ) {
+          customData = JSON.stringify(
+            form.scheduleDynamic.dynamicCustomSettings
+          );
+        }
         gql.schedule_dynamic_source = {
           resolver_class_name: dynamicDateSourceParts[0],
           option_key: dynamicDateSourceParts[1],
+          custom_data: customData,
         };
 
         gql.due_date_offset = null;
@@ -515,6 +549,58 @@ export default {
         message: this.$str('toast_success_save_schedule', 'mod_perform'),
         type: 'success',
       });
+    },
+
+    /**
+     * Get dynamic custom setting data
+     * @param track
+     * @returns object
+     */
+    getDynamicCustomSettingData(track) {
+      let data = {};
+      if (track.schedule_dynamic_source) {
+        data = JSON.parse(track.schedule_dynamic_source.custom_data);
+      } else {
+        data = JSON.parse(this.dynamicDateSources[0].custom_data);
+      }
+      return data;
+    },
+
+    /**
+     * Get dynamic custom setting component
+     * @returns string
+     */
+    getDynamicCustomSettingComponent() {
+      let componentName = null;
+      if (this.track && this.track.schedule_dynamic_source) {
+        componentName = this.track.schedule_dynamic_source
+          .custom_setting_component;
+      } else {
+        componentName = this.dynamicDateSources[0].custom_setting_component;
+      }
+      return componentName;
+    },
+
+    /**
+     * Get dynamic custom setting general configs
+     * @returns object
+     */
+    getDynamicCustomSettingConfig() {
+      return { activityId: this.activityId };
+    },
+
+    /**
+     * Check selected source contains custom settings
+     * @param optionKey
+     * @returns {boolean}
+     */
+    isDynamicCustomSettingSource(optionKey) {
+      let source = this.dynamicDateSources
+        .filter(
+          item => `${item.resolver_class_name}--${item.option_key}` == optionKey
+        )
+        .shift();
+      return !(source.custom_setting_component === null);
     },
   },
 };

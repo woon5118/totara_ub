@@ -30,6 +30,8 @@ mutation mod_perform_create_track($details: mod_perform_create_track_input!) {
       option_key
       display_name
       is_available
+      custom_setting_component
+      custom_data
     }
     due_date_is_enabled
     due_date_is_fixed

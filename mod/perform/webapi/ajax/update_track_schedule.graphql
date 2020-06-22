@@ -29,6 +29,8 @@ mutation mod_perform_update_track_schedule(
         option_key
         display_name
         is_available
+        custom_setting_component
+        custom_data
       }
       schedule_use_anniversary
       due_date_is_enabled
