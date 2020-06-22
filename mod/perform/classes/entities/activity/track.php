@@ -48,6 +48,8 @@ use mod_perform\dates\resolvers\dynamic\dynamic_source;
  * @property int $schedule_dynamic_unit one of SCHEDULE_DYNAMIC_UNIT_XXX or null
  * @property int $schedule_dynamic_direction one of SCHEDULE_DYNAMIC_DIRECTION_XXX or null
  * @property dynamic_source|null $schedule_dynamic_source a dynamic_source for dynamic schedule (saved as json)
+ * @property bool $schedule_use_anniversary should the dynamic schedule use the anniversary (next occurrence)
+ *                                          of reference date if it is in the past
  * @property bool $schedule_needs_sync Flag indicating that the schedule sync task should run for this track
  * @property bool $due_date_is_enabled
  * @property bool $due_date_is_fixed
@@ -124,18 +126,6 @@ class track extends entity {
     }
 
     /**
-     * Get all subject instance for this track
-     *
-     * @return has_many
-     */
-    public function user_assignments(): has_many {
-        return $this->has_many(
-            track_user_assignment::class,
-            'track_id'
-        );
-    }
-
-    /**
      * Unserialize schedule_dynamic_source.
      *
      * @return dynamic_source
@@ -153,7 +143,7 @@ class track extends entity {
     /**
      * Serialize (or skip) schedule_dynamic_source.
      *
-     * @param string | dynamic_source | null
+     * @param string|dynamic_source|null
      * @return track
      */
     protected function set_schedule_dynamic_source_attribute($dynamic_source = null): self {
@@ -240,6 +230,20 @@ class track extends entity {
         } else {
             return (bool) $this->get_attributes_raw()['repeating_is_limited'];
         }
+    }
+
+    /**
+     * Cast schedule_use_anniversary to bool type, and guard from being true
+     * when using fixed schedule.
+     *
+     * @return bool
+     */
+    protected function get_schedule_use_anniversary_attribute(): bool {
+        if ($this->schedule_is_fixed) {
+            return false;
+        }
+
+        return (bool) $this->get_attributes_raw()['schedule_use_anniversary'];
     }
 
 }

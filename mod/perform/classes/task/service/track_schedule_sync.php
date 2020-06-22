@@ -26,8 +26,9 @@ namespace mod_perform\task\service;
 use core\orm\collection;
 use core\orm\lazy_collection;
 use core\orm\query\builder;
+use mod_perform\dates\resolvers\anniversary_of;
+use mod_perform\dates\resolvers\date_resolver;
 use mod_perform\entities\activity\track;
-use mod_perform\entities\activity\track_assignment;
 use mod_perform\entities\activity\track_user_assignment;
 use mod_perform\models\activity\track as track_model;
 
@@ -59,21 +60,41 @@ class track_schedule_sync {
 
         // Bulk fetch all the start and end reference dates.
         $user_ids = $track_user_assignments->pluck('subject_user_id');
-        $date_resolver = (new track_model($track))->get_date_resolver_for_users($user_ids);
+        $date_resolver = (new track_model($track))->get_date_resolver($user_ids);
 
         builder::get_db()->transaction(function () use ($track, $track_user_assignments, $date_resolver) {
             // Reset the flag.
             $track->schedule_needs_sync = false;
             $track->save();
 
-            /** @var track_user_assignment $assignment */
-            foreach ($track_user_assignments as $assignment) {
-                $assignment->period_start_date = $date_resolver->get_start_for($assignment->subject_user_id);
-                $assignment->period_end_date = $date_resolver->get_end_for($assignment->subject_user_id);
-
-                $assignment->save();
-            }
+            self::sync_user_assignment_schedules($date_resolver, $track_user_assignments, $track->schedule_use_anniversary);
         });
+    }
+
+    /**
+     * @param date_resolver $date_resolver
+     * @param collection|track_user_assignment[] $track_user_assignments
+     * @param bool $use_anniversary
+     */
+    public static function sync_user_assignment_schedules(
+        date_resolver $date_resolver,
+        collection $track_user_assignments,
+        bool $use_anniversary
+    ): void {
+        foreach ($track_user_assignments as $assignment) {
+            if ($use_anniversary) {
+                // It's important to that ordinarily a resolver is used on a set of users so that
+                // the dates can be bulk fetched. However the anniversary_of decorator is created
+                // once for each assignment, because we must set a different cut of date for
+                // each one. Because it uses the original dates, the bulk fetch is still used.
+                $date_resolver = new anniversary_of($date_resolver, $assignment->created_at);
+            }
+
+            $assignment->period_start_date = $date_resolver->get_start_for($assignment->subject_user_id);
+            $assignment->period_end_date = $date_resolver->get_end_for($assignment->subject_user_id);
+
+            $assignment->save();
+        }
     }
 
     /**

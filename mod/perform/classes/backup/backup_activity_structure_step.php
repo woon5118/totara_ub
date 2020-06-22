@@ -148,6 +148,7 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
                 'schedule_dynamic_direction',
                 'schedule_dynamic_source',
                 'schedule_needs_sync',
+                'schedule_use_anniversary',
                 'due_date_is_enabled',
                 'repeating_is_enabled',
                 'repeating_relative_type',

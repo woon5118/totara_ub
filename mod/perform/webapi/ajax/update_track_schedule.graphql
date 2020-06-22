@@ -22,6 +22,7 @@ mutation mod_perform_update_track_schedule(
         display_name
         is_available
       }
+      schedule_use_anniversary
       due_date_is_enabled
       due_date_is_fixed
       due_date_fixed

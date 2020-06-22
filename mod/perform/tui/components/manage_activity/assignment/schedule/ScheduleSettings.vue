@@ -20,7 +20,10 @@
   @package mod_perform
 -->
 <template>
-  <ScheduleSettingContainer :title="title">
+  <ScheduleSettingContainer
+    :title="title"
+    class="tui-performAssignmentScheduleSettings"
+  >
     <p>{{ $str('schedule_range_date_preamble', 'mod_perform') }}</p>
     <span>{{ $str('schedule_date_from', 'mod_perform') }}</span>
     <FixedDateSelector
@@ -40,6 +43,14 @@
         $str('schedule_date_range_onwards', 'mod_perform')
       }}</span>
     </template>
+
+    <FormScope path="scheduleDynamic">
+      <div class="tui-performAssignmentScheduleSettings__use-anniversary">
+        <FormCheckbox v-if="!isFixed" name="use_anniversary">
+          {{ $str('schedule_use_anniversary_label', 'mod_perform') }}
+        </FormCheckbox>
+      </div>
+    </FormScope>
   </ScheduleSettingContainer>
 </template>
 
@@ -47,9 +58,13 @@
 import RelativeDateSelector from 'mod_perform/components/manage_activity/assignment/schedule/RelativeDateSelector';
 import ScheduleSettingContainer from 'mod_perform/components/manage_activity/assignment/schedule/ScheduleSettingContainer';
 import FixedDateSelector from 'mod_perform/components/manage_activity/assignment/schedule/FixedDateSelector';
+import FormCheckbox from 'totara_core/components/uniform/FormCheckbox';
+import FormScope from 'totara_core/components/reform/FormScope';
 
 export default {
   components: {
+    FormCheckbox,
+    FormScope,
     FixedDateSelector,
     RelativeDateSelector,
     ScheduleSettingContainer,
@@ -97,7 +112,8 @@ export default {
       "schedule_range_heading_limited_fixed",
       "schedule_range_heading_open_dynamic",
       "schedule_range_heading_open_fixed",
-      "user_creation_date"
+      "user_creation_date",
+      "schedule_use_anniversary_label"
     ]
   }
 </lang-strings>

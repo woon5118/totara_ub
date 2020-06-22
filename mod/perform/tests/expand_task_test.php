@@ -29,7 +29,7 @@ use mod_perform\dates\resolvers\dynamic\dynamic_source;
 use mod_perform\dates\resolvers\dynamic\user_creation_date;
 use mod_perform\dates\resolvers\dynamic\user_custom_field;
 use mod_perform\entities\activity\activity;
-use mod_perform\entities\activity\track;
+use mod_perform\models\activity\track;
 use mod_perform\entities\activity\track as track_entity;
 use mod_perform\entities\activity\track_assignment;
 use mod_perform\entities\activity\track_user_assignment;
@@ -673,6 +673,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $track->schedule_dynamic_source = $dynamic_source;
         $track->schedule_dynamic_count_from = 7;
         $track->schedule_dynamic_count_to = 0;
+        $track->schedule_use_anniversary = false;
         $track->schedule_dynamic_unit = track_entity::SCHEDULE_DYNAMIC_UNIT_DAY;
         $track->save();
 
@@ -717,6 +718,68 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
             ->one();
 
         $this->assertEquals($seven_days_before_create_date, $track_user_assignment->period_start_date);
+        $this->assertEquals(null, $track_user_assignment->period_end_date);
+    }
+
+    public function test_dynamic_assignment_period_dates_are_populated_from_anniversary_date_resolution(): void {
+        $test_data = $this->prepare_assignments();
+
+        $track1_id = $test_data->track1->id;
+
+        $dynamic_source = (new user_creation_date())->get_options()->first();
+
+        /** @var track_entity $track */
+        $track = track_entity::repository()->find($track1_id);
+        $track->schedule_is_open = false;
+        $track->schedule_is_fixed = false;
+        $track->schedule_dynamic_direction = track_entity::SCHEDULE_DYNAMIC_DIRECTION_BEFORE;
+        $track->schedule_dynamic_source = $dynamic_source;
+        $track->schedule_dynamic_count_from = 0;
+        $track->schedule_dynamic_count_to = 0;
+        $track->schedule_use_anniversary = true;
+        $track->schedule_dynamic_unit = track_entity::SCHEDULE_DYNAMIC_UNIT_DAY;
+        $track->save();
+
+        $create_date = (new DateTime('2000-01-01T00:00:00', new DateTimeZone('UTC')))->getTimestamp();
+
+        // Set the users created date.
+        $user1 = new user($test_data->user1->id);
+        $user1->timecreated = $create_date;
+        $user1->save();
+
+        $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user1->id);
+
+        (new expand_task())->expand_all();
+
+        /** @var track_user_assignment $track_user_assignment */
+        $track_user_assignment = track_user_assignment::repository()
+            ->where('track_id', $track1_id)
+            ->where('subject_user_id', $test_data->user1->id)
+            ->one();
+
+        $this->assert_anniversary_date($track_user_assignment->period_start_date, 1, 1);
+        $this->assert_anniversary_date($track_user_assignment->period_end_date, 1, 1);
+
+        // Change to open_fixed and expand for a new user.
+        $track->schedule_is_open = true;
+        $track->schedule_is_fixed = false;
+        $track->save();
+
+        // Set the users created date.
+        $user2 = new user($test_data->user2->id);
+        $user2->timecreated = $create_date;
+        $user2->save();
+
+        $this->add_user_to_cohort($test_data->cohort1->id, $test_data->user2->id);
+
+        (new expand_task())->expand_all();
+        /** @var track_user_assignment $track_user_assignment */
+        $track_user_assignment = track_user_assignment::repository()
+            ->where('track_id', $track1_id)
+            ->where('subject_user_id', $test_data->user2->id)
+            ->one();
+
+        $this->assert_anniversary_date($track_user_assignment->period_start_date, 1, 1);
         $this->assertEquals(null, $track_user_assignment->period_end_date);
     }
 
@@ -814,6 +877,34 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $this->assertFalse(
             $this->track_has_user_assignments($track_id, $user_id, $deleted, $job_assignment_id),
             'Track should not have user assignments'
+        );
+    }
+
+    /**
+     * Assert that a date is this year or next and that the day and month are particular values.
+     *
+     * @param int $date
+     * @param int $expected_day
+     * @param int $expected_month
+     */
+    private function assert_anniversary_date(
+        int $date,
+        int $expected_day,
+        int $expected_month
+    ): void {
+        [$year, $month, $day] = explode(
+            '-',
+            (new DateTime("@{$date}"))->format('Y-m-d')
+        );
+
+        $this_year = (new DateTime())->format('Y');
+        $next_year = (new DateTime())->modify('+1 year')->format('Y');
+
+        $this->assertEquals($expected_day, (int) $day);
+        $this->assertEquals($expected_month, (int) $month);
+        $this->assertTrue(
+            $year === $this_year || $year === $next_year,
+            'Year was not this year or next'
         );
     }
 

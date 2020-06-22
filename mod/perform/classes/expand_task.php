@@ -27,6 +27,7 @@ use core\entities\expandable;
 use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\query\builder;
+use mod_perform\dates\resolvers\anniversary_of;
 use mod_perform\models\activity\track;
 use mod_perform\entities\activity\track_assignment;
 use mod_perform\entities\activity\track_assignment_repository;
@@ -36,6 +37,7 @@ use mod_perform\event\track_user_assigned_bulk;
 use mod_perform\event\track_user_unassigned;
 use mod_perform\task\expand_task\assignment_parameters;
 use mod_perform\task\expand_task\assignment_parameters_collection;
+use mod_perform\task\service\track_schedule_sync;
 use mod_perform\user_groups\grouping;
 
 class expand_task {
@@ -354,7 +356,11 @@ class expand_task {
     private function assign_bulk(track_assignment $assignment, array $to_create): void {
         // Bulk fetch all the start and end reference dates.
         $user_ids = array_column($to_create, 'subject_user_id');
-        $date_resolver = (new track($assignment->track))->get_date_resolver_for_users($user_ids);
+        $date_resolver = (new track($assignment->track))->get_date_resolver($user_ids);
+
+        if ($assignment->track->schedule_use_anniversary) {
+            $date_resolver = new anniversary_of($date_resolver, time());
+        }
 
         // Add the dates to the assignments.
         foreach ($to_create as $index => $row) {
@@ -469,14 +475,9 @@ class expand_task {
         $track = new track($first_assignment->track);
 
         // Bulk fetch all the start and end reference dates.;
-        $date_resolver = $track->get_date_resolver_for_users($user_ids);
+        $date_resolver = $track->get_date_resolver($user_ids);
 
-        foreach ($user_assignments as $assignment) {
-            $assignment->period_start_date = $date_resolver->get_start_for($assignment->subject_user_id);
-            $assignment->period_end_date = $date_resolver->get_end_for($assignment->subject_user_id);
-
-            $assignment->save();
-        }
+        track_schedule_sync::sync_user_assignment_schedules($date_resolver, $user_assignments, $track->schedule_use_anniversary);
     }
 
     /**
@@ -488,10 +489,13 @@ class expand_task {
     private function reactivate_user_assignment(track_user_assignment $user_assignment, track $track): void {
         $user_id = $user_assignment->subject_user_id;
 
-        $date_resolver = $track->get_date_resolver_for_users([$user_id]);
+        $date_resolver = $track->get_date_resolver([$user_id]);
 
-        $user_assignment->period_start_date = $date_resolver->get_start_for($user_id);
-        $user_assignment->period_end_date = $date_resolver->get_end_for($user_id);
+        track_schedule_sync::sync_user_assignment_schedules(
+            $date_resolver,
+            collection::new([$user_assignment]),
+            $track->schedule_use_anniversary
+        );
 
         $user_assignment->deleted = false;
         $user_assignment->save();

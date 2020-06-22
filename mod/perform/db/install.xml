@@ -150,6 +150,7 @@
         <FIELD NAME="schedule_dynamic_unit" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="schedule_dynamic_direction" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="schedule_dynamic_source" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="schedule_use_anniversary" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="schedule_needs_sync" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Flag whether schedule changes should be synchronised on the next schedule sync task run."/>
         <FIELD NAME="due_date_is_enabled" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="due_date_is_fixed" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false"/>

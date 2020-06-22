@@ -19,6 +19,7 @@ query mod_perform_default_track_settings($activity_id: param_integer!) {
       display_name
       is_available
     }
+    schedule_use_anniversary
     due_date_is_enabled
     due_date_is_fixed
     due_date_fixed

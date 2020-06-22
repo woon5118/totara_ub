@@ -85,7 +85,8 @@ class update_track_schedule implements mutation_resolver, has_middleware {
                         track::get_dynamic_schedule_directions(),
                         'schedule dynamic direction'
                     ),
-                    $dynamic_source
+                    $dynamic_source,
+                    $track_schedule['schedule_use_anniversary']
                 );
             } else { // Closed.
                 $track->set_schedule_closed_dynamic(
@@ -99,7 +100,8 @@ class update_track_schedule implements mutation_resolver, has_middleware {
                         track::get_dynamic_schedule_directions(),
                         'schedule dynamic direction'
                     ),
-                    $dynamic_source
+                    $dynamic_source,
+                    $track_schedule['schedule_use_anniversary']
                 );
             }
         }
@@ -188,6 +190,7 @@ class update_track_schedule implements mutation_resolver, has_middleware {
             'schedule_dynamic_unit',
             'schedule_dynamic_direction',
             'schedule_dynamic_source',
+            'schedule_use_anniversary',
             'due_date_is_fixed',
             'due_date_fixed',
             'due_date_relative_count',
@@ -210,12 +213,14 @@ class update_track_schedule implements mutation_resolver, has_middleware {
                 $required_fields[] = 'schedule_dynamic_unit';
                 $required_fields[] = 'schedule_dynamic_direction';
                 $required_fields[] = 'schedule_dynamic_source';
+                $required_fields[] = 'schedule_use_anniversary';
             } else { // Closed.
                 $required_fields[] = 'schedule_dynamic_count_from';
                 $required_fields[] = 'schedule_dynamic_count_to';
                 $required_fields[] = 'schedule_dynamic_unit';
                 $required_fields[] = 'schedule_dynamic_direction';
                 $required_fields[] = 'schedule_dynamic_source';
+                $required_fields[] = 'schedule_use_anniversary';
             }
         }
 

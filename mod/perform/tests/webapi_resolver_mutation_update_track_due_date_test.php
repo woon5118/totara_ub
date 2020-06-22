@@ -177,6 +177,7 @@ class mod_perform_webapi_resolver_mutation_update_track_due_date_testcase
                 'schedule_dynamic_count_from' => 200,
                 'schedule_dynamic_count_to' => 100,
                 'schedule_dynamic_source' => $dynamic_source_input,
+                'schedule_use_anniversary' => false,
                 'due_date_is_enabled' => false,
                 'repeating_is_enabled' => false,
             ],

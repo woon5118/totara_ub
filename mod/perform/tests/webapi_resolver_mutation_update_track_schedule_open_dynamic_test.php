@@ -54,6 +54,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_dynamic_te
                 'schedule_dynamic_unit' => 'WEEK',
                 'schedule_dynamic_direction' => 'BEFORE',
                 'schedule_dynamic_source' => $dynamic_source_input,
+                'schedule_use_anniversary' => true,
                 'due_date_is_enabled' => false,
                 'repeating_is_enabled' => false,
             ],
@@ -72,6 +73,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_dynamic_te
         // Verify the resulting graphql data.
         self::assertEquals($this->track1_id, $result_track['id']);
         self::assertTrue($result_track['schedule_is_open']);
+        self::assertTrue($result_track['schedule_use_anniversary']);
         self::assertFalse($result_track['schedule_is_fixed']);
         self::assertNull($result_track['schedule_fixed_from']);
         self::assertNull($result_track['schedule_fixed_to']);
@@ -92,6 +94,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_dynamic_te
         $affected_track->schedule_dynamic_unit = track_entity::SCHEDULE_DYNAMIC_UNIT_WEEK;
         $affected_track->schedule_dynamic_direction = track_entity::SCHEDULE_DYNAMIC_DIRECTION_BEFORE;
         $affected_track->schedule_dynamic_source = json_encode($dynamic_source);
+        $affected_track->schedule_use_anniversary = true;
         $affected_track->schedule_needs_sync = 1;
         $affected_track->due_date_is_enabled = 0;
         $affected_track->due_date_is_fixed = null;
@@ -122,6 +125,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_open_dynamic_te
                 'schedule_dynamic_unit' => 'WEEK',
                 'schedule_dynamic_direction' => 'AFTER',
                 'schedule_dynamic_source' => $dynamic_source_input,
+                'schedule_use_anniversary' => true,
                 'schedule_dynamic_count_from' => -234,
                 'due_date_is_enabled' => false,
                 'repeating_is_enabled' => false,

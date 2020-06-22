@@ -55,5 +55,20 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020061800, 'perform');
     }
 
+    if ($oldversion < 2020061801) {
+
+        // Define field completed_at to be added to perform_subject_instance.
+        $table = new xmldb_table('perform_track');
+        $field = new xmldb_field('schedule_use_anniversary', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, 0, 'schedule_dynamic_source');
+
+        // Conditionally launch add field completed_at.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020061801, 'perform');
+    }
+
     return true;
 }

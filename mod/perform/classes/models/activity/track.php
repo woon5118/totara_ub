@@ -56,6 +56,7 @@ use moodle_exception;
  * @property-read string $schedule_dynamic_unit
  * @property-read string $schedule_dynamic_direction
  * @property-read dynamic_source|null $schedule_dynamic_source
+ * @property-read bool $schedule_use_anniversary
  * @property-read bool $due_date_is_enabled
  * @property-read bool $due_date_is_fixed
  * @property-read int $due_date_fixed
@@ -85,6 +86,7 @@ class track extends model {
         'schedule_fixed_from',
         'schedule_dynamic_count_from',
         'schedule_dynamic_source',
+        'schedule_use_anniversary',
         'due_date_is_enabled',
         'due_date_is_fixed',
         'due_date_fixed',
@@ -384,15 +386,16 @@ class track extends model {
      * @param int $unit
      * @param int $direction
      * @param dynamic_source $dynamic_source
+     * @param bool $use_anniversary
      * @return track
-     * @throws coding_exception
      */
     public function set_schedule_closed_dynamic(
         int $count_from,
         int $count_to,
         int $unit,
         int $direction,
-        dynamic_source $dynamic_source
+        dynamic_source $dynamic_source,
+        bool $use_anniversary = false
     ): self {
         if ($count_from < 0) {
             throw new coding_exception('Count from must be a positive integer');
@@ -426,6 +429,7 @@ class track extends model {
             'schedule_dynamic_unit' => $unit,
             'schedule_dynamic_direction' => $direction,
             'schedule_dynamic_source' => $dynamic_source,
+            'schedule_use_anniversary' => $use_anniversary,
         ];
 
         $this->set_schedule_properties($properties_to_update);
@@ -442,14 +446,15 @@ class track extends model {
      * @param int $unit
      * @param int $direction
      * @param dynamic_source $dynamic_source
+     * @param bool $use_anniversary
      * @return track
-     * @throws coding_exception
      */
     public function set_schedule_open_dynamic(
         int $count_from,
         int $unit,
         int $direction,
-        dynamic_source $dynamic_source
+        dynamic_source $dynamic_source,
+        bool $use_anniversary = false
     ): self {
         if (!isset(self::get_dynamic_schedule_units()[$unit])) {
             throw new coding_exception('Invalid dynamic schedule unit');
@@ -474,6 +479,7 @@ class track extends model {
             'schedule_dynamic_unit' => $unit,
             'schedule_dynamic_direction' => $direction,
             'schedule_dynamic_source' => $dynamic_source,
+            'schedule_use_anniversary' => $use_anniversary,
         ];
 
         $this->set_schedule_properties($properties_to_update);
@@ -516,6 +522,7 @@ class track extends model {
         $entity->schedule_dynamic_unit = $properties['schedule_dynamic_unit'] ?? null;
         $entity->schedule_dynamic_direction = $properties['schedule_dynamic_direction'] ?? null;
         $entity->schedule_dynamic_source = $properties['schedule_dynamic_source'] ?? null;
+        $entity->schedule_use_anniversary = $properties['schedule_use_anniversary'] ?? false;
 
         if ($this->get_activity()->get_status_state() instanceof active
             && $this->do_schedule_changes_need_sync($entity_before_changes)) {
@@ -543,6 +550,7 @@ class track extends model {
             'schedule_dynamic_count_to',
             'schedule_dynamic_unit',
             'schedule_dynamic_direction',
+            'schedule_use_anniversary',
         ] as $relevant_field) {
             if ((int)$this->entity->{$relevant_field} !== (int)$entity_before_changes->{$relevant_field}) {
                 return true;
@@ -846,7 +854,7 @@ class track extends model {
      * @param array $user_ids
      * @return date_resolver|dynamic_date_resolver
      */
-    public function get_date_resolver_for_users(array $user_ids): date_resolver {
+    public function get_date_resolver(array $user_ids): date_resolver {
         if ($this->schedule_is_fixed) {
             return new fixed_range_resolver($this->schedule_fixed_from, $this->get_schedule_fixed_to());
         }

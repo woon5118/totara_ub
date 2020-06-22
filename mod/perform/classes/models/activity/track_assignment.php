@@ -24,11 +24,8 @@
 namespace mod_perform\models\activity;
 
 use core\collection;
-
 use core\orm\entity\model;
-
 use mod_perform\entities\activity\track_assignment as track_assignment_entity;
-
 use mod_perform\user_groups\grouping;
 
 /**
@@ -171,4 +168,5 @@ class track_assignment extends model {
         $this->entity->refresh();
         return $this;
     }
+
 }

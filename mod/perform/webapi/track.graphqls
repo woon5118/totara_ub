@@ -59,6 +59,7 @@ type mod_perform_track {
   schedule_dynamic_unit: mod_perform_track_dynamic_unit_enums
   schedule_dynamic_direction: mod_perform_track_dynamic_direction_enums
   schedule_dynamic_source: mod_perform_dynamic_date_source
+  schedule_use_anniversary: Boolean!
   due_date_is_enabled: Boolean!
   due_date_is_fixed: Boolean
   due_date_fixed: Int
@@ -121,6 +122,7 @@ input mod_perform_track_schedule_input {
   schedule_dynamic_unit: mod_perform_track_dynamic_unit_enums
   schedule_dynamic_direction: mod_perform_track_dynamic_direction_enums
   schedule_dynamic_source: mod_perform_dynamic_date_source_input
+  schedule_use_anniversary: param_boolean
   due_date_is_enabled: param_boolean!
   due_date_is_fixed: param_boolean
   due_date_fixed: param_integer

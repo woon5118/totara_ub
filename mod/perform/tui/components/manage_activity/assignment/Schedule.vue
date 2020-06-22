@@ -204,6 +204,7 @@ export default {
           direction:
             track.schedule_dynamic_direction || RELATIVE_DATE_DIRECTION_BEFORE,
           dynamic_source: this.getCombinedDynamicSourceKey(track),
+          use_anniversary: track.schedule_use_anniversary,
         },
 
         // Due date initial settings
@@ -306,6 +307,7 @@ export default {
         gql.schedule_dynamic_count_from = Number(form.scheduleDynamic.count); // Gql does not handle "-1" and an int type.
         gql.schedule_dynamic_unit = form.scheduleDynamic.unit;
         gql.schedule_dynamic_direction = form.scheduleDynamic.direction;
+        gql.schedule_use_anniversary = form.scheduleDynamic.use_anniversary;
 
         const dynamicDateSourceParts = form.scheduleDynamic.dynamic_source.split(
           '--'

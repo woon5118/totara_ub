@@ -52,6 +52,7 @@ class track extends entity_model_formatter {
             'schedule_dynamic_unit' => null,
             'schedule_dynamic_direction' => null,
             'schedule_dynamic_source' => null,
+            'schedule_use_anniversary' => null,
             'due_date_is_enabled' => null,
             'due_date_is_fixed' => null,
             'due_date_fixed' => null,
