@@ -34,11 +34,11 @@ class user_custom_field extends base_dynamic_date_resolver {
      */
     protected function resolve(): void {
         $this->date_map = builder::create()
-            ->select(['id.userid', 'id.data'])
-            ->from('user_info_data', 'id')
-            ->join(['user_info_field', 'if'], 'fieldid', 'id')
-            ->where('if.shortname', $this->option_key)
-            ->where('id.userid', $this->reference_user_ids)
+            ->select(['uid.userid', 'uid.data'])
+            ->from('user_info_data', 'uid')
+            ->join(['user_info_field', 'uif'], 'fieldid', 'id')
+            ->where('uif.shortname', $this->option_key)
+            ->where('uid.userid', $this->reference_user_ids)
             ->get()
             ->map(function ($row) {
                 // Using map (rather than pluck) to preserve keys.
