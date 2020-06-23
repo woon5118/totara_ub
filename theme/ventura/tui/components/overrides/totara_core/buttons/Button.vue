@@ -25,6 +25,8 @@
   // Btn shadow
   --tui-btn-shadow-focus: var(--tui-shadow-2);
   --tui-btn-shadow-active: var(--tui-shadow-3);
+  --tui-btn-min-width: 72px;
+  --tui-btn-min-height: 3.6rem;
 }
 // Reset
 .tui-formBtn {
@@ -71,9 +73,9 @@
   position: relative;
   display: inline-block;
   flex-shrink: 0;
-  min-width: 0;
+  min-width: var(--tui-btn-min-width);
   max-width: 100%;
-  min-height: 3.6rem;
+  min-height: var(--tui-btn-min-height);
   padding: 0 var(--tui-gap-4);
 
   padding: calc(
@@ -251,6 +253,7 @@
   &--transparent,
   &--reveal,
   &--stealth {
+    min-width: 0;
     color: var(--tui-color-state);
     background: transparent;
     border: none;
@@ -334,6 +337,7 @@
   }
 
   &--toolbar {
+    min-width: 0;
     height: var(--tui-gap-6);
     padding: var(--tui-gap-1);
     color: var(--tui-btn-toolbar-text-color);

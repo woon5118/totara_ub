@@ -25,6 +25,7 @@
   @extend .tui-formBtn;
 
   display: inline-block;
+  min-width: 0;
   padding: 0 var(--tui-gap-2);
 
   // in order to vertically center content in IE we need this display: flex
