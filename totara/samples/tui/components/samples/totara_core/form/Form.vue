@@ -35,6 +35,10 @@
           />
         </FormRow>
 
+        <FormRow label="Colour">
+          <InputColor v-model="hexColour" />
+        </FormRow>
+
         <FormRow label="Favourite group">
           <RadioGroup v-model="colour" :horizontal="true" :disabled="disabled">
             <Radio value="red">
@@ -105,6 +109,7 @@ import SamplesPropCtl from 'totara_samples/components/sample_parts/misc/SamplesP
 import Checkbox from 'totara_core/components/form/Checkbox';
 import FormRowActionButtons from 'totara_core/components/form/FormRowActionButtons';
 import InputText from 'totara_core/components/form/InputText';
+import InputColor from 'totara_core/components/form/InputColor';
 import Radio from 'totara_core/components/form/Radio';
 import RadioGroup from 'totara_core/components/form/RadioGroup';
 import Select from 'totara_core/components/form/Select';
@@ -124,12 +129,14 @@ export default {
     RadioGroup,
     Select,
     Textarea,
+    InputColor,
   },
 
   data() {
     return {
       name: '',
       colour: '',
+      hexColour: '#000000',
       comment: '',
       select: 1,
       terms: '',

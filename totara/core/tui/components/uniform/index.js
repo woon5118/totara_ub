@@ -38,6 +38,7 @@ export { default as FormPassword } from 'totara_core/components/uniform/FormPass
 export { default as FormRadioGroup } from 'totara_core/components/uniform/FormRadioGroup';
 export { default as FormSearch } from 'totara_core/components/uniform/FormSearch';
 export { default as FormSelect } from 'totara_core/components/uniform/FormSelect';
+export { default as FormColor } from 'totara_core/components/uniform/FormColor';
 export { default as FormTel } from 'totara_core/components/uniform/FormTel';
 export { default as FormText } from 'totara_core/components/uniform/FormText';
 export { default as FormTextarea } from 'totara_core/components/uniform/FormTextarea';

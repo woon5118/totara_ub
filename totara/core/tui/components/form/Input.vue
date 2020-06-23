@@ -109,6 +109,7 @@ export default {
           'time',
           'url',
           'week',
+          'color',
         ];
         return allowedOptions.indexOf(value) !== -1;
       },

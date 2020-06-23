@@ -33,7 +33,15 @@
       <FormText name="title" :validations="v => [v.required()]" />
     </FormRow>
 
+    <FormRow label="Colour">
+      <FormColor
+        name="color"
+        :validations="v => [v.required(), v.colorValueHex()]"
+      />
+    </FormRow>
+
     <!-- or specify the input by hand -->
+
     <FormRow label="Length" required>
       <FormField
         v-slot="{ id, value, update, blur }"
@@ -117,6 +125,7 @@ import {
   FieldArray,
   FormRow,
   FormRowFieldset,
+  FormColor,
   FormText,
   FormNumber,
   FormRadioGroup,
@@ -129,6 +138,7 @@ import Radio from 'totara_core/components/form/Radio';
 import FormRowActionButtons from 'totara_core/components/form/FormRowActionButtons';
 import SampleFormPart from 'totara_samples/components/sample_parts/totara_core/form/FormPart';
 import Repeater from 'totara_core/components/form/Repeater';
+import theme from 'totara_core/theme';
 
 export default {
   components: {
@@ -138,6 +148,7 @@ export default {
     FormRow,
     FormRowFieldset,
     FormText,
+    FormColor,
     FormNumber,
     FormRadioGroup,
     InputText,
@@ -154,6 +165,7 @@ export default {
     return {
       initialValues: {
         answers: ['first value', '', 'third value'],
+        color: theme.getVar('tui-color-primary'),
       },
       errors: null,
       value: null,

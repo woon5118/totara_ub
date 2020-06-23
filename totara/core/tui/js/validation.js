@@ -124,6 +124,12 @@ export const v = {
     message: () => `Number must be ${max} or less`,
   }),
 
+  colorValueHex: () => ({
+    validate: val => /^#[0-9A-F]{6}$/i.test(val),
+    message: () =>
+      'Value should begin with # followed by 6 valid hexadecimal code characters',
+  }),
+
   // for testing async validation
   delay: (t = 1000) => ({
     validate: () => new Promise(r => setTimeout(() => r(true), t)),

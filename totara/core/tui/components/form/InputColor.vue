@@ -1,0 +1,140 @@
+<!--
+  This file is part of Totara Learn
+
+  Copyright (C) 2019 onwards Totara Learning Solutions LTD
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+  @author Dave Wallace <dave.wallace@totaralearning.com>
+  @package totara_core
+-->
+
+<template>
+  <div class="tui-colorPicker__group">
+    <!-- this colour block acts as a view for the last input valid hex value as
+          we're going to hide the initial colour picker control for modern
+          browsers so we have full control over styling. IE11 relies on this
+          to display the result of the manual text Input because it doesn't
+          get a native color Input at all -->
+    <div
+      class="tui-colorPicker__colorBlock"
+      :class="[disabled ? 'tui-colorPicker__colorBlock--disabled' : '']"
+      :style="{
+        backgroundColor: lastValidHexValue,
+      }"
+    />
+
+    <!-- for modern browsers, we can use the native HTML5 color picker. IE11
+        will only be provided with the manual hex Input control -->
+    <Input
+      v-if="!isIE"
+      :value="lastValidHexValue"
+      type="color"
+      class="tui-colorPicker__picker"
+      tabindex="-1"
+      :disabled="disabled"
+      :readonly="readonly"
+      v-on="$listeners"
+      @input="handlePickerInput"
+    />
+
+    <!-- all browsers will show a manual hex Input control -->
+    <Input
+      :id="$id('tui-colorPicker__input')"
+      class="tui-colorPicker__input"
+      v-bind="$props"
+      type="text"
+      :maxlength="7"
+      v-on="$listeners"
+      @input="handleTextChange"
+    />
+  </div>
+</template>
+
+<script>
+import Input from 'totara_core/components/form/Input';
+
+export default {
+  components: {
+    Input,
+  },
+  inheritAttrs: false,
+
+  /* eslint-disable vue/require-prop-types */
+  props: [
+    'ariaDescribedby',
+    'ariaInvalid',
+    'ariaLabel',
+    'ariaLabelledby',
+    'autofocus',
+    'disabled',
+    'id',
+    'name',
+    'readonly',
+    'required',
+    'styleclass',
+    'value',
+  ],
+
+  data() {
+    return {
+      isIE: document.body.classList.contains('ie'),
+      lastValidHexValue: this.isValidHexCode(this.value)
+        ? this.value
+        : '#000000',
+    };
+  },
+
+  methods: {
+    /**
+     * If a valid hex value is manually entered into the text Input, cache that
+     * value so we have a reliable value for when an invalid value is entered.
+     */
+    handleTextChange(e) {
+      this.lastValidHexValue = this.isValidHexCode(e)
+        ? e
+        : this.lastValidHexValue;
+      this.$emit('input', this.lastValidHexValue);
+      return;
+    },
+
+    /**
+     * A valid hex value is always received from the color Input element, so
+     * if the element is not readonly, update the cached reliable value with the
+     * value set by the picker.
+     **/
+    handlePickerInput(e) {
+      // the readonly attribute does not apply to the color input element as per
+      // spec, however we may still need to handle this condition. because the
+      // the attribute isn't supported, the OS color picker may still launch,
+      // but our approach to this means we can do nothing if a new colour is
+      // selected
+      if (!this.readonly) {
+        this.lastValidHexValue = e;
+        this.$emit('input', e);
+      }
+      return;
+    },
+
+    /**
+     * Manual validation check applied to the text Input so that we're not
+     * updating the color Input with invalid values on input events
+     *
+     * Note that 3-digit hex values are not valid as per spec, a minor loss
+     * in productivity for those who remember and enjoy using shorthand codes
+     **/
+    isValidHexCode: val => /^#[0-9A-F]{6}$/i.test(val),
+  },
+};
+</script>
