@@ -90,6 +90,23 @@ type mod_perform_participant_instance {
 }
 
 """
+Details about perform activity that a user is involved with associated activity
+sections.
+"""
+type mod_perform_subject_sections {
+  subject: mod_perform_subject_instance!
+  sections: [mod_perform_section_participants!]!
+}
+
+"""
+Details about an activity section and their participants
+"""
+type mod_perform_section_participants {
+  section: mod_perform_section!
+  participants: [mod_perform_participant_instance!]!
+}
+
+"""
 A list of possible states that a performance activity can be in
 """
 enum mod_perform_activity_state_enums {
@@ -131,7 +148,7 @@ input toggle_activity_setting {
 }
 
 """
-Competency subject instance filters
+Activity subject instance filters
 """
 input mod_perform_subject_instance_filters {
   about: [mod_perform_subject_instance_about_filter]
@@ -169,7 +186,7 @@ extend type Query {
   mod_perform_subject_instances(
     participant_id: core_id
     filters: mod_perform_subject_instance_filters
-  ): [mod_perform_subject_instance!]!
+  ): [mod_perform_subject_sections!]!
 
   """
   A specific performance activity (perform_subject_instance) a user is participating in

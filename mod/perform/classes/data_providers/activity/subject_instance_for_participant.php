@@ -23,7 +23,7 @@
 
 namespace mod_perform\data_providers\activity;
 
-use core\orm\collection;
+use core\collection;
 use core\orm\query\builder;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\entities\activity\filters\subject_instance_id;
@@ -31,6 +31,7 @@ use mod_perform\entities\activity\participant_instance;
 use mod_perform\entities\activity\track as track_entity;
 use mod_perform\entities\activity\track_user_assignment as track_user_assignment_entity;
 use mod_perform\models\activity\subject_instance as subject_instance_model;
+use mod_perform\models\response\subject_sections;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 use mod_perform\entities\activity\filters\subject_instances_about;
 
@@ -45,7 +46,7 @@ class subject_instance_for_participant {
     protected $participant_id;
 
     /** @var collection */
-    protected $items;
+    protected $items = null;
 
     /** @var array */
     private $filters = [];
@@ -133,6 +134,10 @@ class subject_instance_for_participant {
      * @return collection|subject_instance_model[]
      */
     public function get(): collection {
+        if (is_null($this->items)) {
+            $this->fetch();
+        }
+
         return $this->items;
     }
 
@@ -142,5 +147,16 @@ class subject_instance_for_participant {
             ->where_raw('target_participant.subject_instance_id = si.id')
             ->where('participant_id', $this->participant_id)
             ->get_builder();
+    }
+
+    /**
+     * Returns sections and their participants related to the current set of
+     * subject instances.
+     *
+     * @return collection|subject_sections[] a list of subject sections.
+     */
+    public function get_subject_sections(): collection {
+        $subject_instances = $this->get();
+        return subject_sections::create_from_subject_instances($subject_instances);
     }
 }

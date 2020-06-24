@@ -6,21 +6,40 @@ query mod_perform_subject_instances(
     participant_id: $participant_id
     filters: $filters
   ) {
-    id
-    progress_status
-    activity {
-      name
-    }
-    subject_user {
-      fullname
-    }
-    participant_instances {
+    subject {
       id
-      participant_id
       progress_status
-      core_relationship {
-        id
+      activity {
         name
+      }
+      subject_user {
+        fullname
+      }
+      participant_instances {
+        id
+        participant_id
+        progress_status
+        core_relationship {
+          id
+          name
+        }
+      }
+    }
+    sections {
+      section {
+        id
+        display_title
+        sort_order
+      }
+      participants {
+        participant_id
+        participant {
+          fullname
+        }
+        progress_status
+        core_relationship {
+          name
+        }
       }
     }
   }

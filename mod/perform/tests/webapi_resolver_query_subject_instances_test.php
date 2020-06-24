@@ -21,6 +21,7 @@
  * @package mod_perform
  */
 
+use core\entities\user;
 use mod_perform\entities\activity\filters\subject_instances_about;
 use mod_perform\entities\activity\participant_instance;
 use mod_perform\models\activity\subject_instance;
@@ -44,7 +45,8 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
         $participant_instance = participant_instance::repository()->get()->first();
         $subject_instance = subject_instance::load_by_id($participant_instance->subject_instance_id);
 
-        self::setUser($participant_instance->participant_id);
+        $participant_id = $participant_instance->participant_id;
+        self::setUser($participant_id);
 
         $args = [
             'filters' => [
@@ -56,31 +58,55 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
         $this->assert_webapi_operation_successful($result);
 
         $actual = $this->get_webapi_operation_data($result);
-        $expected = [
-            [
-                'id' => (string) $subject_instance->id,
-                'progress_status' => $subject_instance->get_progress_status(),
-                'activity' => [
-                    'name' => $activity->name
-                ],
-                'subject_user' => [
-                    'fullname' => $subject_instance->subject_user->fullname
-                ],
-                'participant_instances' => [
-                    [
-                        'progress_status' => 'NOT_STARTED',
-                        'core_relationship' => [
-                            'id' => '1',
-                            'name' => 'Subject',
-                        ],
-                        'participant_id' => $participant_instance->participant_id,
-                        'id' => (string) $participant_instance->id,
+        $this->assertCount(1, $actual, 'wrong subject count');
+
+        $subject = $actual[0];
+        $expected_subject = [
+            'id' => (string) $subject_instance->id,
+            'progress_status' => $subject_instance->get_progress_status(),
+            'activity' => [
+                'name' => $activity->name
+            ],
+            'subject_user' => [
+                'fullname' => $subject_instance->subject_user->fullname
+            ],
+            'participant_instances' => [
+                [
+                    'progress_status' => 'NOT_STARTED',
+                    'core_relationship' => [
+                        'id' => '1',
+                        'name' => 'Subject',
                     ],
-                ],
+                    'participant_id' => $participant_id,
+                    'id' => (string) $participant_instance->id,
+                ]
+            ]
+        ];
+        self::assertEquals($expected_subject, $subject['subject']);
+
+        $section = $activity->sections->first();
+        $expected_section = [
+            'section' => [
+                'id' => $section->id,
+                'display_title' => $section->display_title,
+                'sort_order' => 1
+            ],
+            'participants' => [
+                [
+                    'participant_id' => $participant_id,
+                    'participant' => [
+                        'fullname' => (new user($participant_id))->fullname
+                    ],
+                    'progress_status' => 'NOT_STARTED',
+                    'core_relationship' => [
+                        'name' => 'Subject',
+                    ],
+                ]
             ]
         ];
 
-        self::assertEquals($expected, $actual);
+        $this->assertCount(1, $subject["sections"], 'wrong sections count');
+        self::assertEquals($expected_section, $subject['sections'][0]);
     }
 
     public function test_query_invalid_filter(): void {
