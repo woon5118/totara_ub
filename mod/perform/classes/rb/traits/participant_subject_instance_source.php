@@ -72,6 +72,14 @@ trait participant_subject_instance_source {
             REPORT_BUILDER_RELATION_ONE_TO_MANY,
             'perform'
         );
+        $joinlist[] = new rb_join(
+            'job_assignment',
+            'LEFT',
+            "{job_assignment}",
+            "job_assignment.id = {$join}.job_assignment_id",
+            REPORT_BUILDER_RELATION_MANY_TO_MANY,
+            $join
+        );
     }
 
     /**
@@ -109,6 +117,34 @@ trait participant_subject_instance_source {
                 ],
             ]
         );
+
+        // Job assignment columns.
+        if (self::multiple_jobs_allowed()) {
+            $columnoptions[] = new rb_column_option(
+                'subject_instance',
+                'job_assignment_name',
+                get_string('activity_job_title', 'mod_perform'),
+                'job_assignment.fullname',
+                [
+                    'joins' => [$join, 'job_assignment'],
+                    'dbdatatype' => 'text',
+                    'outputformat' => 'text',
+                    'displayfunc' => 'format_string',
+                ]
+            );
+            $columnoptions[] = new rb_column_option(
+                'subject_instance',
+                'job_assignment_idnumber',
+                get_string('activity_job_idnumber', 'mod_perform'),
+                'job_assignment.idnumber',
+                [
+                    'joins' => [$join, 'job_assignment'],
+                    'dbdatatype' => 'text',
+                    'outputformat' => 'text',
+                    'displayfunc' => 'format_string',
+                ]
+            );
+        }
     }
 
     /**
@@ -131,6 +167,22 @@ trait participant_subject_instance_source {
             'select',
             ['selectchoices' => $this->get_activity_type_options()]
         );
+
+        // Job assignment filters.
+        if (self::multiple_jobs_allowed()) {
+            $filteroptions[] = new rb_filter_option(
+                'subject_instance',
+                'job_assignment_name',
+                get_string('activity_job_title', 'mod_perform'),
+                'text'
+            );
+            $filteroptions[] = new rb_filter_option(
+                'subject_instance',
+                'job_assignment_idnumber',
+                get_string('activity_job_idnumber', 'mod_perform'),
+                'text'
+            );
+        }
     }
 
     /**
@@ -150,6 +202,14 @@ trait participant_subject_instance_source {
                 return $a <=> $b;
             })
             ->all(true);
+    }
+
+    /**
+     * Are multiple job assignments allowed?
+     * @return bool
+     */
+    protected static function multiple_jobs_allowed(): bool {
+        return get_config(null, 'totara_job_allowmultiplejobs');
     }
 
 }
