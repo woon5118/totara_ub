@@ -25,9 +25,10 @@ defined('MOODLE_INTERNAL') || die();
 
 use mod_perform\rb\traits\participant_subject_instance_source;
 use mod_perform\state\state_helper;
+use mod_perform\state\subject_instance\subject_instance_availability;
+use mod_perform\state\subject_instance\subject_instance_progress;
 use totara_core\advanced_feature;
 use totara_job\rb\source\report_trait;
-use mod_perform\state\subject_instance\subject_instance_progress;
 
 /**
  * Performance subject instance report.
@@ -133,12 +134,30 @@ class rb_source_perform_subject_instance extends rb_base_source {
             ),
             new rb_column_option(
                 'subject_instance',
-                'subject_status',
-                get_string('subject_instance_status', 'rb_source_perform_subject_instance'),
+                'subject_progress',
+                get_string('progress', 'mod_perform'),
                 'base.progress',
                 [
                     'dbdatatype' => 'integer',
-                    'displayfunc' => 'subject_progress'
+                    'displayfunc' => 'state_display_name',
+                    'extracontext' => [
+                        'object_type' => 'subject_instance',
+                        'state_type' => subject_instance_progress::get_type(),
+                    ],
+                ]
+            ),
+            new rb_column_option(
+                'subject_instance',
+                'subject_availability',
+                get_string('availability', 'mod_perform'),
+                'base.availability',
+                [
+                    'dbdatatype' => 'integer',
+                    'displayfunc' => 'state_display_name',
+                    'extracontext' => [
+                        'object_type' => 'subject_instance',
+                        'state_type' => subject_instance_availability::get_type(),
+                    ],
                 ]
             ),
             // TODO: uncomment when its available
@@ -183,11 +202,24 @@ class rb_source_perform_subject_instance extends rb_base_source {
             ),
             new rb_filter_option(
                 'subject_instance',
-                "subject_status",
-                get_string('subject_instance_status', 'mod_perform'),
+                'subject_progress',
+                get_string('progress', 'mod_perform'),
                 'select',
                 [
-                    'selectchoices' => state_helper::get_all_display_names('subject_instance', subject_instance_progress::get_type()),
+                    'selectchoices' => state_helper::get_all_display_names(
+                        'subject_instance', subject_instance_progress::get_type()
+                    ),
+                ]
+            ),
+            new rb_filter_option(
+                'subject_instance',
+                'subject_availability',
+                get_string('availability', 'mod_perform'),
+                'select',
+                [
+                    'selectchoices' => state_helper::get_all_display_names(
+                        'subject_instance', subject_instance_availability::get_type()
+                    ),
                     'simplemode' => true,
                 ]
             ),
@@ -253,8 +285,13 @@ class rb_source_perform_subject_instance extends rb_base_source {
             ],
             [
                 'type' => 'subject_instance',
-                'value' => 'subject_status',
-                'heading' => get_string('subject_instance_status', 'mod_perform')
+                'value' => 'subject_progress',
+                'heading' => get_string('progress', 'mod_perform')
+            ],
+            [
+                'type' => 'subject_instance',
+                'value' => 'subject_availability',
+                'heading' => get_string('availability', 'mod_perform')
             ],
             [
                 'type' => 'participant_instance',
@@ -287,6 +324,14 @@ class rb_source_perform_subject_instance extends rb_base_source {
             [
                 'type' => 'perform',
                 'value' => 'type'
+            ],
+            [
+                'type' => 'subject_instance',
+                'value' => 'subject_progress',
+            ],
+            [
+                'type' => 'subject_instance',
+                'value' => 'subject_availability',
             ],
         ];
     }

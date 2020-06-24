@@ -29,7 +29,6 @@ $string['activity_subject'] = 'Subject of the activity';
 $string['core_relationship_id'] = 'Relationship ID';
 $string['date_created'] = 'Date instance created';
 $string['participant_name'] = 'Participant\'s full name';
-$string['participant_status'] = 'Status of participant instance';
 $string['relationship_in_activity'] = 'Relationship in activity';
 
 $string['type_core_relationship'] = 'Core relationship';

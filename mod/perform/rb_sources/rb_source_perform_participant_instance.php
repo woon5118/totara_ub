@@ -24,10 +24,12 @@
 defined('MOODLE_INTERNAL') || die();
 
 use mod_perform\rb\traits\participant_subject_instance_source;
+use mod_perform\state\participant_instance\participant_instance_availability;
+use mod_perform\state\participant_instance\participant_instance_progress;
 use mod_perform\state\state_helper;
 use totara_core\advanced_feature;
 use totara_job\rb\source\report_trait;
-use mod_perform\state\participant_instance\participant_instance_progress;
+
 /**
  * Performance participant instance report.
  *
@@ -135,11 +137,29 @@ class rb_source_perform_participant_instance extends rb_base_source {
             new rb_column_option(
                 'participant_instance',
                 'participant_progress',
-                get_string('participant_status', 'rb_source_perform_participant_instance'),
+                get_string('progress', 'mod_perform'),
                 'base.progress',
                 [
                     'dbdatatype' => 'integer',
-                    'displayfunc' => 'participant_progress'
+                    'displayfunc' => 'state_display_name',
+                    'extracontext' => [
+                        'object_type' => 'participant_instance',
+                        'state_type' => participant_instance_progress::get_type(),
+                    ],
+                ]
+            ),
+            new rb_column_option(
+                'participant_instance',
+                'participant_availability',
+                get_string('availability', 'mod_perform'),
+                'base.availability',
+                [
+                    'dbdatatype' => 'integer',
+                    'displayfunc' => 'state_display_name',
+                    'extracontext' => [
+                        'object_type' => 'participant_instance',
+                        'state_type' => participant_instance_availability::get_type(),
+                    ],
                 ]
             ),
             new rb_column_option(
@@ -222,14 +242,28 @@ class rb_source_perform_participant_instance extends rb_base_source {
                 get_string('date_created', 'rb_source_perform_participant_instance'),
                 'date'
             ),
-            // Status of participant instance
+            // Progress of participant instance
             new rb_filter_option(
                 'participant_instance',
                 'participant_progress',
-                get_string('participant_status', 'rb_source_perform_participant_instance'),
+                get_string('progress', 'mod_perform'),
                 'select',
                 [
-                    'selectchoices' => state_helper::get_all_display_names('participant_instance', participant_instance_progress::get_type()),
+                    'selectchoices' => state_helper::get_all_display_names(
+                        'participant_instance', participant_instance_progress::get_type()
+                    ),
+                ]
+            ),
+            // Availability of participant instance
+            new rb_filter_option(
+                'participant_instance',
+                'participant_availability',
+                get_string('availability', 'mod_perform'),
+                'select',
+                [
+                    'selectchoices' => state_helper::get_all_display_names(
+                        'participant_instance', participant_instance_availability::get_type()
+                    ),
                     'simplemode' => true
                 ]
             ),
@@ -338,11 +372,17 @@ class rb_source_perform_participant_instance extends rb_base_source {
                 'value' => 'activity_subject',
                 'heading' => get_string('activity_subject', 'rb_source_perform_participant_instance'),
             ],
-            // Status of participant instance
+            // Progress of participant instance
             [
                 'type' => 'participant_instance',
                 'value' => 'participant_progress',
-                'heading' => get_string('participant_status', 'rb_source_perform_participant_instance'),
+                'heading' => get_string('progress', 'mod_perform'),
+            ],
+            // Availability of participant instance
+            [
+                'type' => 'participant_instance',
+                'value' => 'participant_availability',
+                'heading' => get_string('availability', 'mod_perform'),
             ],
         ];
     }
@@ -365,7 +405,19 @@ class rb_source_perform_participant_instance extends rb_base_source {
             [
                 'type' => 'subject_instance',
                 'value' => 'activity_subject',
-            ]
+            ],
+            [
+                'type' => 'subject_instance',
+                'value' => 'overdue',
+            ],
+            [
+                'type' => 'participant_instance',
+                'value' => 'participant_progress',
+            ],
+            [
+                'type' => 'participant_instance',
+                'value' => 'participant_availability',
+            ],
         ];
         if (self::get_resolvers()) {
             $default_filters[] = [
