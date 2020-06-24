@@ -44,7 +44,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @group perform
  */
-class mod_perform_sync_track_schedule_task_testcase extends advanced_testcase {
+class mod_perform_track_schedule_sync_testcase extends advanced_testcase {
 
     /**
      * @return mod_perform_generator|component_generator_base
@@ -83,7 +83,7 @@ class mod_perform_sync_track_schedule_task_testcase extends advanced_testcase {
         $track->set_schedule_open_fixed(new date_time_setting($now));
         $track->update();
 
-        (new track_schedule_sync())->sync_all();
+        (new track_schedule_sync())->sync_all_flagged();
         $user_assignment->refresh();
         $this->assertEquals($now, $user_assignment->period_start_date);
         $this->assertEquals(null, $user_assignment->period_end_date);
@@ -130,7 +130,7 @@ class mod_perform_sync_track_schedule_task_testcase extends advanced_testcase {
             true
         )->update();
 
-        (new track_schedule_sync())->sync_all();
+        (new track_schedule_sync())->sync_all_flagged();
         $user_assignment->refresh();
         $this->assert_anniversary_date($user_assignment->period_start_date, 3, 2);
         $this->assertEquals(null, $user_assignment->period_end_date);
@@ -167,7 +167,7 @@ class mod_perform_sync_track_schedule_task_testcase extends advanced_testcase {
             'status' => draft::get_code()
         ]);
 
-        (new track_schedule_sync())->sync_all();
+        (new track_schedule_sync())->sync_all_flagged();
 
         // No change expected
         $user_assignment->refresh();
@@ -204,7 +204,7 @@ class mod_perform_sync_track_schedule_task_testcase extends advanced_testcase {
         $track->pause();
 
         // No change expected
-        (new track_schedule_sync())->sync_all();
+        (new track_schedule_sync())->sync_all_flagged();
         $user_assignment->refresh();
         $this->assertEquals($yesterday->get_timestamp(), $user_assignment->period_start_date);
         $this->assertEquals($tomorrow->get_timestamp(), $user_assignment->period_end_date);
@@ -212,7 +212,7 @@ class mod_perform_sync_track_schedule_task_testcase extends advanced_testcase {
         // Re-activated track should be synced
         $track->activate();
 
-        (new track_schedule_sync())->sync_all();
+        (new track_schedule_sync())->sync_all_flagged();
         $user_assignment->refresh();
         $this->assertEquals($now, $user_assignment->period_start_date);
         $this->assertEquals(null, $user_assignment->period_end_date);
@@ -234,7 +234,7 @@ class mod_perform_sync_track_schedule_task_testcase extends advanced_testcase {
 
         // Sync flag is set, but calling sync doesn't do anything without any track_user_assignments.
         // It only resets the flag.
-        (new track_schedule_sync())->sync_all();
+        (new track_schedule_sync())->sync_all_flagged();
         $this->assertEquals(0, track::repository()->find($track->id)->schedule_needs_sync);
         $this->assertCount(0, track_user_assignment::repository()->get());
         $this->assertCount(0, subject_instance::repository()->get());
@@ -250,7 +250,7 @@ class mod_perform_sync_track_schedule_task_testcase extends advanced_testcase {
         $track->set_schedule_open_fixed($yesterday);
         $track->update();
 
-        (new track_schedule_sync())->sync_all();
+        (new track_schedule_sync())->sync_all_flagged();
         (new subject_instance_creation())->generate_instances();
 
         $this->assertCount(5, track_user_assignment::repository()->get());
@@ -283,5 +283,60 @@ class mod_perform_sync_track_schedule_task_testcase extends advanced_testcase {
             $year === $this_year || $year === $next_year,
             'Year was not this year or next'
         );
+    }
+
+    public function sync_flag_and_unflagged_data_provider() {
+        return [
+            ['sync_all_flagged', false, false],
+            ['sync_all_flagged', true, true],
+            ['sync_all', true, true],
+            ['sync_all', false, true],
+        ];
+    }
+
+    /**
+     * Make sure sync_all_flagged() only picks up flagged tracks and sync_all() picks
+     * up tracks no matter if flagged or not.
+     *
+     * @dataProvider sync_flag_and_unflagged_data_provider
+     * @param string $method_name
+     * @param bool $flagged
+     * @param bool $is_sync_expected
+     */
+    public function test_sync_flagged_and_unflagged(string $method_name, bool $flagged, bool $is_sync_expected) {
+        $generator = $this->generator();
+        $config = mod_perform_activity_generator_configuration::new()
+            ->disable_user_assignments()
+            ->set_number_of_users_per_user_group_type(1);
+        /** @var activity_model $activity */
+        $activity = $generator->create_full_activities($config)->first();
+        /** @var track_model $track */
+        $track = $activity->get_tracks()->first();
+        $tomorrow = new date_time_setting(time() + 86400);
+        $yesterday = new date_time_setting(time() - 86400);
+        $track->set_schedule_closed_fixed($yesterday, $tomorrow);
+        $track->update();
+
+        // Let expand task create the track_user_assignment with current schedule restrictions.
+        (new expand_task())->expand_all();
+        /** @var track_user_assignment $user_assignment */
+        $user_assignment = track_user_assignment::repository()->where('track_id', $track->id)->one();
+
+        $now = time();
+        $track->set_schedule_open_fixed(new date_time_setting($now));
+        $track->update();
+
+        // Set or unset the flag.
+        track::repository()->where('id', $track->id)->update(['schedule_needs_sync' => $flagged]);
+
+        (new track_schedule_sync())->$method_name();
+        $user_assignment->refresh();
+        if ($is_sync_expected) {
+            $this->assertEquals($now, $user_assignment->period_start_date);
+            $this->assertEquals(null, $user_assignment->period_end_date);
+        } else {
+            $this->assertEquals($yesterday->get_timestamp(), $user_assignment->period_start_date);
+            $this->assertEquals($tomorrow->get_timestamp(), $user_assignment->period_end_date);
+        }
     }
 }

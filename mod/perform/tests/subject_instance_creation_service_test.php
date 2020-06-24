@@ -632,7 +632,7 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
         $track->update();
 
         // Also need to run schedule sync because we changed creation range.
-        (new track_schedule_sync())->sync_all();
+        (new track_schedule_sync())->sync_all_flagged();
         (new subject_instance_creation())->generate_instances();
         /** @var subject_instance $subject_instance */
         $subject_instance = subject_instance::repository()->one();

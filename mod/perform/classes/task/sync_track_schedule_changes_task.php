@@ -28,16 +28,18 @@ use mod_perform\task\service\track_schedule_sync;
 
 /**
  * Synchronise track schedule updates to track_user_assignments.
+ *
+ * This will only do anything if relevant track schedule changes were made on active activities.
+ * Therefore, it can be run often.
  */
-class sync_track_schedule_task extends scheduled_task {
+class sync_track_schedule_changes_task extends scheduled_task {
 
     public function get_name() {
         return get_string('sync_track_schedule_task', 'mod_perform');
     }
 
     public function execute() {
-        $track_schedule_sync = new track_schedule_sync();
-        $track_schedule_sync->sync_all();
+        (new track_schedule_sync())->sync_all_flagged();
     }
 
 }

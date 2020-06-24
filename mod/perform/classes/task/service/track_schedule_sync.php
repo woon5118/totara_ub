@@ -23,7 +23,6 @@
 
 namespace mod_perform\task\service;
 
-use core\orm\collection;
 use core\orm\lazy_collection;
 use core\orm\query\builder;
 use mod_perform\dates\resolvers\anniversary_of;
@@ -39,7 +38,18 @@ use mod_perform\models\activity\track as track_model;
 class track_schedule_sync {
 
     public function sync_all(): void {
-        $tracks = $this->get_tracks_to_be_synced();
+        $this->sync_active_tracks(false);
+    }
+
+    public function sync_all_flagged(): void {
+        $this->sync_active_tracks(true);
+    }
+
+    /**
+     * @param bool $only_flagged
+     */
+    private function sync_active_tracks(bool $only_flagged): void {
+        $tracks = $this->get_active_tracks($only_flagged);
         foreach ($tracks as $track) {
             $this->sync_track_schedule($track);
         }
@@ -51,15 +61,18 @@ class track_schedule_sync {
      * @param track $track
      */
     private function sync_track_schedule(track $track): void {
-        // Get active track_user_assignments and update the start-/end-dates.
-        // For now we don't have to filter out the ones that already have subject_instances.
+        // Get active track_user_assignments and update the start-/end-dates if necessary.
+        // Note: If any changes are made to fetching the assignments here, please check if method
+        // get_assigned_user_ids_for_track() has to be adjusted.
         $track_user_assignments = track_user_assignment::repository()
             ->filter_by_track_id($track->id)
             ->filter_by_active()
-            ->get();
+            ->get_lazy();
+
+        // Get user ids separately so we can use memory-saving lazy loading for the track_user_assignments.
+        $user_ids = $this->get_assigned_user_ids_for_track($track);
 
         // Bulk fetch all the start and end reference dates.
-        $user_ids = $track_user_assignments->pluck('subject_user_id');
         $date_resolver = (new track_model($track))->get_date_resolver($user_ids);
 
         builder::get_db()->transaction(function () use ($track, $track_user_assignments, $date_resolver) {
@@ -72,13 +85,28 @@ class track_schedule_sync {
     }
 
     /**
+     * Get all the user ids for a track.
+     *
+     * @param track $track
+     * @return array
+     */
+    private function get_assigned_user_ids_for_track(track $track): array {
+        return builder::table(track_user_assignment::TABLE)
+            ->select('subject_user_id')
+            ->where('track_id', $track->id)
+            ->where('deleted', false)
+            ->get(true)
+            ->pluck('subject_user_id');
+    }
+
+    /**
      * @param date_resolver $date_resolver
-     * @param collection|track_user_assignment[] $track_user_assignments
+     * @param \Iterator|track_user_assignment[] $track_user_assignments
      * @param bool $use_anniversary
      */
     public static function sync_user_assignment_schedules(
         date_resolver $date_resolver,
-        collection $track_user_assignments,
+        \Iterator $track_user_assignments,
         bool $use_anniversary
     ): void {
         foreach ($track_user_assignments as $assignment) {
@@ -90,26 +118,30 @@ class track_schedule_sync {
                 $date_resolver = new anniversary_of($date_resolver, $assignment->created_at);
             }
 
-            $assignment->period_start_date = $date_resolver->get_start_for($assignment->subject_user_id);
-            $assignment->period_end_date = $date_resolver->get_end_for($assignment->subject_user_id);
-
-            $assignment->save();
+            $new_start_date = $date_resolver->get_start_for($assignment->subject_user_id);
+            $new_end_date = $date_resolver->get_end_for($assignment->subject_user_id);
+            if ((int)$assignment->period_start_date !== (int)$new_start_date
+                || (int)$assignment->period_end_date !== (int)$new_end_date) {
+                $assignment->period_start_date = $new_start_date;
+                $assignment->period_end_date = $new_end_date;
+                $assignment->save();
+            }
         }
     }
 
     /**
-     * Get all tracks that need schedule synchronisation.
-     * Only active tracks of active activities are picked up. That means e.g. schedule changes to paused tracks
-     * will not have any effect until the track is re-activated.
+     * Get all active tracks of active activities.
      *
+     * @param bool $only_flagged  when true: only get tracks flagged up for schedule synchronisation
      * @return lazy_collection
      */
-    private function get_tracks_to_be_synced(): lazy_collection {
-        return track::repository()
-            ->filter_by_schedule_needs_sync()
-            ->filter_by_active()
+    private function get_active_tracks($only_flagged): lazy_collection {
+        $repo = track::repository();
+        if ($only_flagged) {
+            $repo->filter_by_schedule_needs_sync();
+        }
+        return $repo->filter_by_active()
             ->filter_by_active_activity()
             ->get_lazy();
     }
-
 }
