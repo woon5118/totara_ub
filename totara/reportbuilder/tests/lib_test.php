@@ -1148,8 +1148,9 @@ class totara_reportbuilder_lib_testcase extends advanced_testcase {
         // Should return an array of content options.
         $this->assertTrue((bool)is_array($contentoptions));
         // Should have the right amount of options in the appropriate format.
-        $this->assertCount(6, $contentoptions);
+        $this->assertCount(7, $contentoptions);
         $this->assertTrue(in_array('user', $contentoptions));
+        $this->assertTrue(in_array('user_visibility', $contentoptions));
         $this->assertTrue(in_array('current_pos', $contentoptions));
         $this->assertTrue(in_array('current_org', $contentoptions));
         $this->assertTrue(in_array('completed_org', $contentoptions));

@@ -1033,6 +1033,14 @@ trait report_trait {
      * @return boolean
      */
     protected function add_basic_user_content_options(&$contentoptions, $join = 'auser') {
+        // Add deleted user and tenant restrictions.
+        $contentoptions[] = new \rb_content_option(
+            'user_visibility',
+            get_string('user_visibility', 'totara_reportbuilder'),
+            "{$join}.id",
+            "{$join}"
+        );
+
         // Add the manager/staff content options.
         $contentoptions[] = new \rb_content_option(
             'user',
