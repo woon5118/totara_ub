@@ -50,7 +50,7 @@ class core_course_renderer_testcase extends advanced_testcase {
         $section = $this->getDataGenerator()->create_course_section(['course' => $course, 'section' => 1]);
         $forum = $this->getDataGenerator()->create_module('forum', [
             'course' => $course,
-            'section' => $section->id,
+            'section' => 1, // '1' here means first section after the '0' section.
             'shortname' => 'Test forum',
             'idnumber' => 'test_forum',
             'introeditor' => [

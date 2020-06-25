@@ -519,13 +519,7 @@ EOD;
 
         $course = create_course((object)$record);
         context_course::instance($course->id);
-        if (!empty($options['createsections'])) {
-            if (isset($course->numsections)) {
-                course_create_sections_if_missing($course, range(0, $course->numsections));
-            } else {
-                course_create_sections_if_missing($course, 0);
-            }
-        }
+        // Note: create_course() always creates at least section '0', if 'numsections' given then all other sections too.
 
         return $course;
     }

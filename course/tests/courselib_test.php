@@ -659,20 +659,161 @@ class core_course_courselib_testcase extends advanced_testcase {
         $this->assertTrue($sectioncreated);
     }
 
-    public function test_create_course_sections() {
+    public function test_course_add_section() {
         global $DB;
-        $this->resetAfterTest(true);
+
+        $course = $this->getDataGenerator()->create_course(['numsections' => 0]);
+
+        $dbsections = $DB->get_fieldset_select('course_sections', 'section', 'course = ?', [$course->id]);
+        sort($dbsections);
+        $this->assertSame(['0'], $dbsections);
+
+        $sink = $this->redirectEvents();
+        $this->setCurrentTimeStart();
+        $section = course_add_section($course->id, 2);
+        $events = $sink->get_events();
+        $sink->close();
+        $this->assertInstanceOf(stdClass::class, $section);
+        $this->assertSame($course->id, $section->course);
+        $this->assertSame('2', $section->section);
+        $this->assertSame('', $section->summary);
+        $this->assertSame((string)FORMAT_HTML, $section->summaryformat);
+        $this->assertSame('', $section->sequence);
+        $this->assertSame(null, $section->name);
+        $this->assertSame('1', $section->visible);
+        $this->assertSame(null, $section->availability);
+        $this->assertTimeCurrent($section->timemodified);
+        $this->assertCount(1, $events);
+        $this->assertInstanceOf(core\event\course_section_created::class, $events[0]);
+        $dbsections = $DB->get_fieldset_select('course_sections', 'section', 'course = ?', [$course->id]);
+        sort($dbsections);
+        $this->assertSame(['0', '2'], $dbsections);
+
+        $sink = $this->redirectEvents();
+        $section = course_add_section($course->id, 3, false);
+        $this->assertInstanceOf(stdClass::class, $section);
+        $this->assertSame($course->id, $section->course);
+        $this->assertSame('3', $section->section);
+        $events = $sink->get_events();
+        $sink->close();
+        $this->assertCount(0, $events);
+        $dbsections = $DB->get_fieldset_select('course_sections', 'section', 'course = ?', [$course->id]);
+        sort($dbsections);
+        $this->assertSame(['0', '2', '3'], $dbsections);
+
+        $section = course_add_section($course->id, 3, false);
+        $this->assertFalse($section);
+        $dbsections = $DB->get_fieldset_select('course_sections', 'section', 'course = ?', [$course->id]);
+        sort($dbsections);
+        $this->assertSame(['0', '2', '3'], $dbsections);
+
+        try {
+            course_add_section($course->id, COURSE_SECTION_HARD_LIMIT + 1);
+            $this->fail('coding_exception expected');
+        } catch (moodle_exception $e) {
+            $this->assertInstanceOf(coding_exception::class, $e);
+            $this->assertSame('Coding error detected, it must be fixed by a programmer: Invalid section number: 5001', $e->getMessage());
+        }
+    }
+
+    public function test_course_create_section() {
+        global $DB;
+
+        $course = $this->getDataGenerator()->create_course(['numsections' => 1]);
+
+        $dbsections = $DB->get_fieldset_select('course_sections', 'section', 'course = ?', [$course->id]);
+        sort($dbsections);
+        $this->assertSame(['0', '1'], $dbsections);
+
+        $sink = $this->redirectEvents();
+        $this->setCurrentTimeStart();
+        $section = course_create_section($course->id, 0);
+        $events = $sink->get_events();
+        $sink->close();
+        $this->assertInstanceOf(stdClass::class, $section);
+        $this->assertSame($course->id, $section->course);
+        $this->assertSame('2', $section->section);
+        $this->assertSame('', $section->summary);
+        $this->assertSame((string)FORMAT_HTML, $section->summaryformat);
+        $this->assertSame('', $section->sequence);
+        $this->assertSame(null, $section->name);
+        $this->assertSame('1', $section->visible);
+        $this->assertSame(null, $section->availability);
+        $this->assertTimeCurrent($section->timemodified);
+        $this->assertCount(1, $events);
+        $this->assertInstanceOf(core\event\course_section_created::class, $events[0]);
+        $dbsections = $DB->get_fieldset_select('course_sections', 'section', 'course = ?', [$course->id]);
+        sort($dbsections);
+        $this->assertSame(['0', '1', '2'], $dbsections);
+
+        $sink = $this->redirectEvents();
+        $this->setCurrentTimeStart();
+        $section = course_create_section($course->id, 1);
+        $events = $sink->get_events();
+        $sink->close();
+        $this->assertInstanceOf(stdClass::class, $section);
+        $this->assertSame($course->id, $section->course);
+        $this->assertSame('1', $section->section);
+        $this->assertSame('', $section->summary);
+        $this->assertSame((string)FORMAT_HTML, $section->summaryformat);
+        $this->assertSame('', $section->sequence);
+        $this->assertSame(null, $section->name);
+        $this->assertSame('1', $section->visible);
+        $this->assertSame(null, $section->availability);
+        $this->assertTimeCurrent($section->timemodified);
+        $this->assertCount(1, $events);
+        $this->assertInstanceOf(core\event\course_section_created::class, $events[0]);
+        $dbsections = $DB->get_fieldset_select('course_sections', 'section', 'course = ?', [$course->id]);
+        sort($dbsections);
+        $this->assertSame(['0', '1', '2', '3'], $dbsections);
+
+        $sink = $this->redirectEvents();
+        $this->setCurrentTimeStart();
+        $section = course_create_section($course->id, COURSE_SECTION_HARD_LIMIT + 1);
+        $events = $sink->get_events();
+        $sink->close();
+        $this->assertInstanceOf(stdClass::class, $section);
+        $this->assertSame($course->id, $section->course);
+        $this->assertSame('4', $section->section);
+        $this->assertSame('', $section->summary);
+        $this->assertSame((string)FORMAT_HTML, $section->summaryformat);
+        $this->assertSame('', $section->sequence);
+        $this->assertSame(null, $section->name);
+        $this->assertSame('1', $section->visible);
+        $this->assertSame(null, $section->availability);
+        $this->assertTimeCurrent($section->timemodified);
+        $this->assertCount(1, $events);
+        $this->assertInstanceOf(core\event\course_section_created::class, $events[0]);
+        $dbsections = $DB->get_fieldset_select('course_sections', 'section', 'course = ?', [$course->id]);
+        sort($dbsections);
+        $this->assertSame(['0', '1', '2', '3', '4'], $dbsections);
+
+        $sink = $this->redirectEvents();
+        $section = course_create_section($course->id, 0);
+        $events = $sink->get_events();
+        $this->assertCount(1, $events);
+        $this->assertInstanceOf(core\event\course_section_created::class, $events[0]);
+        $dbsections = $DB->get_fieldset_select('course_sections', 'section', 'course = ?', [$course->id]);
+        sort($dbsections);
+        $this->assertSame(['0', '1', '2', '3', '4', '5'], $dbsections);
+    }
+
+    public function test_course_create_sections_if_missing() {
+        global $DB;
 
         $numsections = 5;
         $course = $this->getDataGenerator()->create_course(
                 array('shortname' => 'GrowingCourse',
                     'fullname' => 'Growing Course',
-                    'numsections' => $numsections),
-                array('createsections' => true));
+                    'numsections' => $numsections));
 
         // Ensure all 6 (0-5) sections were created and course content cache works properly
         $sectionscreated = array_keys(get_fast_modinfo($course)->get_section_info_all());
         $this->assertEquals(range(0, $numsections), $sectionscreated);
+
+        $dbsections = $DB->get_fieldset_select('course_sections', 'section', 'course = ?', [$course->id]);
+        sort($dbsections);
+        $this->assertEquals(range(0, $numsections), $dbsections);
 
         // this will do nothing, section already exists
         $this->assertFalse(course_create_sections_if_missing($course, $numsections));

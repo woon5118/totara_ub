@@ -32,6 +32,11 @@ require_once($CFG->dirroot.'/totara/customfield/fieldlib.php');
 define('COURSE_MAX_LOGS_PER_PAGE', 1000);       // Records.
 define('COURSE_MAX_RECENT_PERIOD', 172800);     // Two days, in seconds.
 
+if (!defined('COURSE_SECTION_HARD_LIMIT')) {
+    /** Absolute limit for number of sections in any course, this prevents fatal errors and running out of memory */
+    define('COURSE_SECTION_HARD_LIMIT', 5000);
+}
+
 /**
  * Number of courses to display when summaries are included.
  * @var int
@@ -872,30 +877,32 @@ function add_course_module($mod) {
 }
 
 /**
- * Creates a course section and adds it to the specified position
+ * Create a new course section at given position.
  *
  * @param int|stdClass $courseorid course id or course object
- * @param int $position position to add to, 0 means to the end. If position is greater than
- *        number of existing secitons, the section is added to the end. This will become sectionnum of the
- *        new section. All existing sections at this or bigger position will be shifted down.
- * @param bool $skipcheck the check has already been made and we know that the section with this position does not exist
- * @return stdClass created section object
+ * @param int $position section number, cannot be higher than COURSE_SECTION_HARD_LIMIT
+ * @param bool $triggerevent
+ * @return stdClass|bool course_section record on success, false if already exists
  */
-function course_create_section($courseorid, $position = 0, $skipcheck = false) {
+function course_add_section($courseorid, int $position, bool $triggerevent = true) {
     global $DB;
-    $courseid = is_object($courseorid) ? $courseorid->id : $courseorid;
 
-    // Find the last sectionnum among existing sections.
-    if ($skipcheck) {
-        $lastsection = $position - 1;
-    } else {
-        $lastsection = (int)$DB->get_field_sql('SELECT max(section) from {course_sections} WHERE course = ?', [$courseid]);
+    if ($position < 0 || $position > COURSE_SECTION_HARD_LIMIT) {
+        throw new coding_exception('Invalid section number: ' . $position);
     }
 
-    // First add section to the end.
+    $courseid = is_object($courseorid) ? $courseorid->id : $courseorid;
+
+    // Course must exist.
+    $course = $DB->get_record('course', ['id' => $courseid], '*', MUST_EXIST);
+
+    if ($DB->record_exists('course_sections', ['course' => $course->id, 'section' => $position])) {
+        return false;
+    }
+
     $cw = new stdClass();
     $cw->course   = $courseid;
-    $cw->section  = $lastsection + 1;
+    $cw->section  = $position;
     $cw->summary  = '';
     $cw->summaryformat = FORMAT_HTML;
     $cw->sequence = '';
@@ -905,16 +912,58 @@ function course_create_section($courseorid, $position = 0, $skipcheck = false) {
     $cw->timemodified = time();
     $cw->id = $DB->insert_record("course_sections", $cw);
 
-    // Now move it to the specified position.
-    if ($position > 0 && $position <= $lastsection) {
-        $course = is_object($courseorid) ? $courseorid : get_course($courseorid);
-        move_section_to($course, $cw->section, $position, true);
-        $cw->section = $position;
+    rebuild_course_cache($course->id, true);
+
+    $cw = $DB->get_record('course_sections', ['id' => $cw->id]);
+
+    if ($triggerevent) {
+        $event = core\event\course_section_created::create_from_section($cw);
+        $event->add_record_snapshot('course_sections', $cw);
+        $event->add_record_snapshot('course', $course);
+        $event->trigger();
     }
 
-    core\event\course_section_created::create_from_section($cw)->trigger();
+    return $cw;
+}
 
-    rebuild_course_cache($courseid, true);
+/**
+ * Creates a course section and adds it to the specified position
+ *
+ * @param int|stdClass $courseorid course id or course object
+ * @param int $position position to add to, 0 means to the end. If position is greater than
+ *        number of existing sections, the section is added to the end. This will become sectionnum of the
+ *        new section. All existing sections at this or bigger position will be shifted down.
+ * @param bool $skipcheckignored no cheating here
+ * @return stdClass created section object
+ */
+function course_create_section($courseorid, $position = 0, $skipcheckignored = false) {
+    global $DB;
+
+    // Always load fresh copy of course from DB, do NOT rely on any kind of caches here!
+    $courseid = is_object($courseorid) ? $courseorid->id : $courseorid;
+    $course = $DB->get_record('course', ['id' => $courseid], '*', MUST_EXIST);
+
+    // Find the highest section among existing sections.
+    $lastsection = (int)$DB->get_field('course_sections', 'MAX(section)', ['course' => $course->id]);
+
+    $cw = course_add_section($courseid, $lastsection + 1, false);
+    if (!$cw) {
+        throw new coding_exception('Unknown error creating new section');
+    }
+
+    // Now move it to the specified position if position already occupied.
+    if ($position > 0 && $position <= $lastsection) {
+        if (!move_section_to($course, $cw->section, $position, true)) {
+            debugging("Error moving new section to position '$position'", DEBUG_DEVELOPER);
+        }
+        $cw = $DB->get_record('course_sections', ['id' => $cw->id], '*', MUST_EXIST);
+    }
+
+    $event = core\event\course_section_created::create_from_section($cw);
+    $event->add_record_snapshot('course_sections', $cw);
+    $event->add_record_snapshot('course', $course);
+    $event->trigger();
+
     return $cw;
 }
 
@@ -932,7 +981,7 @@ function course_create_sections_if_missing($courseorid, $sections) {
     $existing = array_keys(get_fast_modinfo($courseorid)->get_section_info_all());
     if ($newsections = array_diff($sections, $existing)) {
         foreach ($newsections as $sectionnum) {
-            course_create_section($courseorid, $sectionnum, true);
+            course_add_section($courseorid, $sectionnum);
         }
         return true;
     }
@@ -1446,6 +1495,10 @@ function move_section_to($course, $section, $destination, $ignorenumsections = f
 
     if (!$destination && $destination != 0) {
         return true;
+    }
+
+    if ($destination < 0 || $destination > COURSE_SECTION_HARD_LIMIT) {
+        throw new coding_exception('Invalid destination section number: ' . $destination);
     }
 
     // compartibility with course formats using field 'numsections'
@@ -2362,7 +2415,7 @@ function course_overviewfiles_options($course) {
  *
  * @param array $editoroptions course description editor options
  * @param object $data  - all the data needed for an entry in the 'course' table
- * @return object new course instance
+ * @return stdClass new course record with extra format properties
  */
 function create_course($data, $editoroptions = NULL) {
     global $DB, $CFG;
@@ -2453,7 +2506,7 @@ function create_course($data, $editoroptions = NULL) {
     $existingsections = $DB->get_fieldset_sql('SELECT section from {course_sections} WHERE course = ?', [$newcourseid]);
     $newsections = array_diff(range(0, $numsections), $existingsections);
     foreach ($newsections as $sectionnum) {
-        course_create_section($newcourseid, $sectionnum, true);
+        course_add_section($newcourseid, $sectionnum);
     }
 
     // Save any custom role names.
