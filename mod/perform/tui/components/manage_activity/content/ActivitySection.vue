@@ -123,7 +123,7 @@
       />
       <Button
         :text="$str('cancel')"
-        :disabled="isSaving || !editMode || !hasChanges"
+        :disabled="isSaving || !editMode"
         @click="resetSectionChanges"
       />
     </ButtonGroup>

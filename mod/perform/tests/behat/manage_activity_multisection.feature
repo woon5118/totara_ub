@@ -249,9 +249,11 @@ Feature: Managing an activity with multiple sections
     And I click on ".tui-toggleBtn__ui" "css_element"
     Then I should see "All existing content will be grouped into the first section, along with the existing participant settings" in the tui modal
     And I confirm the tui confirmation modal
+    And I wait until the page is ready
 
     # Test can save a section title without changing the title if it is the first section to be created
     When I click on "Done" "button" in the ".tui-performActivitySection__saveButtons" "css_element" of the "1" activity section
+    And I wait until the page is ready
     Then I should see "Activity saved" in the tui "success" notification toast
     And I should see "Untitled section" in the "1" activity section
     When I reload the page
@@ -261,27 +263,30 @@ Feature: Managing an activity with multiple sections
     When I click on "Add section" "button"
     And I set the title of activity section "2" to '<span lang="en" class="multilang">English</span><span lang="de" class="multilang">German</span> Title'
     And I click on "Done" "button" in the ".tui-performActivitySection__saveButtons" "css_element" of the "2" activity section
+    And I wait until the page is ready
     Then I should see "Activity saved" in the tui "success" notification toast
     And I should see "English Title" in the "2" activity section
     When I reload the page
     Then I should see "Untitled section" in the "1" activity section
     And I should see "English Title" in the "2" activity section
 
-    # Done/Cancel buttons should be disabled unless there have been changes
+    # Done button should be disabled unless there have been changes
     When I click on "button[aria-label='Edit section']" "css_element" in the "1" activity section
     Then "button.tui-formBtn.tui-formBtn--prim[disabled]" "css_element" in the "1" activity section should exist
-    And "button.tui-formBtn:not(.tui-formBtn--prim)[disabled]" "css_element" in the "1" activity section should exist
+    And "button.tui-formBtn:not(.tui-formBtn--prim)[disabled]" "css_element" in the "1" activity section should not exist
     When I set the title of activity section "1" to "The First Section!"
     Then "button.tui-formBtn.tui-formBtn--prim[disabled]" "css_element" in the "1" activity section should not exist
     And "button.tui-formBtn:not(.tui-formBtn--prim)[disabled]" "css_element" in the "1" activity section should not exist
     When I click on "Done" "button" in the ".tui-performActivitySection__saveButtons" "css_element" of the "1" activity section
+    And I wait until the page is ready
     And I click on "button[aria-label='Edit section']" "css_element" in the "1" activity section
     Then "button.tui-formBtn.tui-formBtn--prim[disabled]" "css_element" in the "1" activity section should exist
-    And "button.tui-formBtn:not(.tui-formBtn--prim)[disabled]" "css_element" in the "1" activity section should exist
+    And "button.tui-formBtn:not(.tui-formBtn--prim)[disabled]" "css_element" in the "1" activity section should not exist
     When I set the title of activity section "1" to ""
     Then "button.tui-formBtn.tui-formBtn--prim[disabled]" "css_element" in the "1" activity section should not exist
     And "button.tui-formBtn:not(.tui-formBtn--prim)[disabled]" "css_element" in the "1" activity section should not exist
     When I click on "Cancel" "button" in the ".tui-performActivitySection__saveButtons" "css_element" of the "1" activity section
+    And I wait until the page is ready
     And I reload the page
     Then I should see "The First Section!" in the "1" activity section
     And I should see "English Title" in the "2" activity section
