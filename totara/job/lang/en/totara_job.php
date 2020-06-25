@@ -36,6 +36,10 @@ $string['allowsignupmanagersecurityrisk'] =  'Security risk: Please be aware tha
 $string['allowsignupmanager_help'] = 'When this option is selected and **Self-registration** is enabled,
 the manager field will be available for users in the sign-up.';
 $string['appraiser'] = 'Appraiser';
+$string['assignmentdates'] = 'Assignment dates';
+$string['assignmentdates_description'] = 'Job assignment dates serve multiple purposes, from reporting to dynamic audience rules to program and certification assignments and more.
+
+However, they are not used to determine if the job assignment is active in any other part of Totara.';
 $string['chooseappraiser'] = 'Choose appraiser';
 $string['chooseappraiser_help'] = 'Click **Choose appraiser** to select the user\'s appraiser.';
 $string['choosemanager'] = 'Choose manager';
@@ -87,12 +91,13 @@ $string['eventjobassignmentdeleted'] = 'User job assignment deleted';
 $string['eventjobassignmentupdated'] = 'User job assignment updated';
 $string['eventjobassignmentviewed'] = 'User job assignment viewed';
 $string['globalsettings'] = 'Global Settings';
+$string['jobdetails'] = 'Job details';
 $string['job:managejobs'] = 'Manager jobs';
 $string['jobassignment'] = 'Job assignment';
 $string['jobassignmentadd'] = 'Add job assignment';
 $string['jobassignmentdefaultfullname'] = 'Unnamed job assignment (ID: {$a})';
 $string['jobassignmentenddate'] = 'End date';
-$string['jobassignmentenddate_help'] = 'Date that the user ends in this job assignment. This date can be used in dynamic audience rules. However, this date is NOT used to determine if the job assignment is **active** in any other part of Totara.';
+$string['jobassignmentenddate_help'] = 'Date that the user ends in this job assignment. This date can be used in dynamic audience rules. However, this date is not used to determine if the job assignment is **active** in any other part of Totara.';
 $string['jobassignmentfullname'] = 'Full name';
 $string['jobassignmentfullname_help'] = 'The full name of the job assignment. Used when job assignment is displayed and for selecting job assignments in dialogs.';
 $string['jobassignmentidnumber'] = 'ID Number';
@@ -102,7 +107,7 @@ $string['jobassignmentsaved'] = 'Job assignment saved';
 $string['jobassignmentshortname'] = 'Short name';
 $string['jobassignmentshortname_help'] = 'Only used as additional information on this page.';
 $string['jobassignmentstartdate'] = 'Start date';
-$string['jobassignmentstartdate_help'] = 'Date that the user started in this job assignment. This date can be used in dynamic audience rules. However, this date is NOT used to determine if the job assignment is **active** in any other part of Totara.';
+$string['jobassignmentstartdate_help'] = 'Date that the user started in this job assignment. This date can be used in dynamic audience rules. However, this date is not used to determine if the job assignment is **active** in any other part of Totara.';
 $string['jobmanagement'] = 'Job Management';
 $string['manager'] = 'Manager';
 $string['managernomatchja'] = 'Make sure you are selecting a job assignment linked to your manager. If that is what you were doing, delete your manager selection and try selecting it again. Or have your manager assigned after sign-up.';

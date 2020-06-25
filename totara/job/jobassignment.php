@@ -330,6 +330,7 @@ if ($jobassignment) {
 }
 
 echo $OUTPUT->header();
+echo $OUTPUT->heading(get_string('jobassignment', 'totara_job'));
 
 $form->display();
 

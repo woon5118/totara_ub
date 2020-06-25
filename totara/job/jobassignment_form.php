@@ -122,7 +122,8 @@ class job_assignment_form extends moodleform {
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
 
-        $mform->addElement('header', 'general', get_string('jobassignment', 'totara_job'));
+        $mform->addElement('header', 'general', get_string('general'));
+        $mform->setExpanded('general');
 
         $mform->addElement('hidden', 'userid');
         $mform->setType('userid', PARAM_INT);
@@ -144,6 +145,10 @@ class job_assignment_form extends moodleform {
         $mform->addElement('editor', 'description_editor', get_string('description'), null, $editoroptions);
         $mform->setType('description_editor', PARAM_CLEANHTML);
 
+        $mform->addElement('header', 'assignmentdates', get_string('assignmentdates', 'totara_job'));
+        $mform->setExpanded('assignmentdates');
+
+        $mform->addElement('static', 'assignmentdateshelp', '', get_string('assignmentdates_description', 'totara_job'));
         $mform->addElement('date_selector', 'startdate', get_string('jobassignmentstartdate', 'totara_job'),
             array('optional' => true));
         $mform->addHelpButton('startdate', 'jobassignmentstartdate', 'totara_job');
@@ -154,6 +159,8 @@ class job_assignment_form extends moodleform {
         $mform->addHelpButton('enddate', 'jobassignmentenddate', 'totara_job');
         $mform->setDefault('enddate', 0);
 
+        $mform->addElement('header', 'jobdetails', get_string('jobdetails', 'totara_job'));
+        $mform->setExpanded('jobdetails');
         if (!advanced_feature::is_disabled('positions')) {
             $pos_class = strlen($positiontitle) ? 'nonempty' : '';
             $mform->addElement('static', 'positionselector', get_string('position', 'totara_job'),
