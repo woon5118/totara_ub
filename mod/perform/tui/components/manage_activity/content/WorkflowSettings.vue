@@ -34,6 +34,7 @@
           <Checkbox
             v-model="close_on_completion"
             :disabled="formDisabled"
+            :aria-describedby="$id('aria-describedby')"
             @change="save"
           >
             {{
@@ -41,7 +42,7 @@
             }}
           </Checkbox>
 
-          <FormRowDetails>
+          <FormRowDetails :id="$id('aria-describedby')">
             {{
               $str(
                 'workflow_automatic_closure_on_completion_help',

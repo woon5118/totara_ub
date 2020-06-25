@@ -46,6 +46,7 @@ $string['activity_section_done'] = 'Done';
 $string['activity_status_active'] = 'Active';
 $string['activity_status_draft'] = 'Draft';
 $string['activity_type'] = 'Activity type';
+$string['activity_type_help_text'] = 'This can be changed later as long as the activity is still in draft.';
 $string['add_activity'] = 'Add activity';
 $string['add_section'] = 'Add section';
 $string['add_section_error_section_mode'] = 'Activity is not in multi-section mode';

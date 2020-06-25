@@ -33,6 +33,7 @@
       <FormRow
         v-slot="{ id }"
         :label="$str('general_info_label_activity_title', 'mod_perform')"
+        required
       >
         <InputText
           :id="id"
@@ -56,15 +57,23 @@
       <FormRow
         v-slot="{ id }"
         :label="$str('general_info_label_activity_type', 'mod_perform')"
+        required
       >
-        <Select
-          v-if="disableAfterSave"
-          :id="id"
-          v-model="activityTypeSelection"
-          :aria-labelledby="id"
-          :options="activityTypes"
-        />
-        <span v-else>{{ activityTypeName }}</span>
+        <div>
+          <Select
+            v-if="disableAfterSave"
+            :id="id"
+            v-model="activityTypeSelection"
+            :aria-labelledby="id"
+            :aria-describedby="$id('aria-describedby')"
+            :options="activityTypes"
+          />
+          <span v-else>{{ activityTypeName }}</span>
+
+          <FormRowDetails :id="$id('aria-describedby')">
+            {{ $str('activity_type_help_text', 'mod_perform') }}
+          </FormRowDetails>
+        </div>
       </FormRow>
 
       <FormRow
@@ -93,6 +102,7 @@ import Button from 'totara_core/components/buttons/Button';
 import ButtonGroup from 'totara_core/components/buttons/ButtonGroup';
 import Form from 'totara_core/components/form/Form';
 import FormRow from 'totara_core/components/form/FormRow';
+import FormRowDetails from 'totara_core/components/form/FormRowDetails';
 import InputText from 'totara_core/components/form/InputText';
 import Select from 'totara_core/components/form/Select';
 import Textarea from 'totara_core/components/form/Textarea';
@@ -111,6 +121,7 @@ export default {
     ButtonGroup,
     Form,
     FormRow,
+    FormRowDetails,
     InputText,
     Select,
     Textarea,
@@ -298,6 +309,7 @@ export default {
   {
     "mod_perform": [
       "activity_general_tab_heading",
+      "activity_type_help_text",
       "general_info_label_activity_description",
       "general_info_label_activity_title",
       "general_info_label_activity_type",
