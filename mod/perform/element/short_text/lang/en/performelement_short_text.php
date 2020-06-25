@@ -28,5 +28,4 @@ $string['pluginname'] = 'Short text element';
 $string['name'] = 'Short text';
 $string['short_text_answer_placeholder'] = 'Short text answer field';
 $string['short_text_response_no_response_submitted'] = 'No response submitted';
-$string['short_text_your_response'] = 'Your response';
 $string['short_text_title'] = 'Question text';

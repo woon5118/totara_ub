@@ -31,10 +31,12 @@ use core\orm\query\builder;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
 use mod_perform\models\activity\participant_instance;
 use mod_perform\models\activity\section;
+use mod_perform\state\participant_section\closed;
 use mod_perform\state\participant_section\participant_section_availability;
 use mod_perform\state\participant_section\participant_section_progress;
 use mod_perform\state\state;
 use mod_perform\state\state_aware;
+use moodle_exception;
 
 /**
  * Class participant_section
@@ -150,8 +152,13 @@ class participant_section extends model {
      * @param array $update_request_payload
      * @return $this
      * @throws coding_exception
+     * @throws moodle_exception
      */
     public function set_responses_data_from_request(array $update_request_payload): self {
+        if ($this->get_availability_state() instanceof closed) {
+            throw new moodle_exception('invalid_change_on_closed_participant_section', 'mod_perform');
+        }
+
         foreach ($update_request_payload as $update) {
             $section_element_id = $update['section_element_id'];
             $updated_response_data = $update['response_data'];

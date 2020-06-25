@@ -20,46 +20,28 @@
   @package performelement_long_text
 -->
 <template>
-  <ElementParticipantForm :name="name">
-    <template v-slot:content>
-      <div>
-        <FormScope :path="path" :process="process">
-          <FormRow :label="$str('your_response', 'performelement_long_text')">
-            <FormTextarea
-              rows="6"
-              name="answer_text"
-              :validations="v => [answerRequired]"
-            />
-          </FormRow>
-        </FormScope>
-      </div>
-    </template>
-  </ElementParticipantForm>
+  <FormScope :path="path" :process="process">
+    <FormTextarea
+      :rows="6"
+      name="answer_text"
+      :validations="v => [answerRequired]"
+    />
+  </FormScope>
 </template>
 
 <script>
 import FormScope from 'totara_core/components/reform/FormScope';
-import { FormRow } from 'totara_core/components/uniform';
 import FormTextarea from 'totara_core/components/uniform/FormTextarea';
-import ElementParticipantForm from 'mod_perform/components/element/ElementParticipantForm';
 
 export default {
   components: {
     FormScope,
-    FormRow,
     FormTextarea,
-    ElementParticipantForm,
   },
   props: {
     path: [String, Array],
-    type: Object,
-    name: String,
-    data: Object,
-    isRequired: {
-      type: Boolean,
-      default: false,
-    },
     error: String,
+    element: Object,
   },
   methods: {
     process(values) {
@@ -73,7 +55,7 @@ export default {
      * @return {function[]}
      */
     answerRequired(val) {
-      if (this.isRequired) {
+      if (this.element.is_required) {
         const isEmpty =
           !val || (typeof val === 'string' && val.trim().length === 0);
         if (isEmpty) {
@@ -91,7 +73,6 @@ export default {
 <lang-strings>
   {
     "performelement_long_text": [
-      "your_response",
       "error_you_must_answer_this_question"
     ]
   }

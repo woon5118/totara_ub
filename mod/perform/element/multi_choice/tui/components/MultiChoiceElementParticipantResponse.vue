@@ -20,43 +20,34 @@
   @package performelement_multi_choice
 -->
 <template>
-  <ElementParticipantResponse>
-    <template v-slot:content>
-      <div class="tui-elementEditMultiChoiceParticipantResponse">
-        <div
-          v-if="answerOption"
-          class="tui-elementEditMultiChoiceParticipantResponse__answer"
-        >
-          {{ answerOption }}
-        </div>
-        <div
-          v-else
-          class="tui-elementEditMultiChoiceParticipantResponse__noResponse"
-        >
-          {{ $str('no_response_submitted', 'performelement_multi_choice') }}
-        </div>
-      </div>
-    </template>
-  </ElementParticipantResponse>
+  <div class="tui-elementEditMultiChoiceParticipantResponse">
+    <div
+      v-if="answerOption"
+      class="tui-elementEditMultiChoiceParticipantResponse__answer"
+    >
+      {{ answerOption }}
+    </div>
+    <div
+      v-else
+      class="tui-elementEditMultiChoiceParticipantResponse__noResponse"
+    >
+      {{ $str('no_response_submitted', 'performelement_multi_choice') }}
+    </div>
+  </div>
 </template>
 
 <script>
-import ElementParticipantResponse from 'mod_perform/components/element/ElementParticipantResponse';
-
 export default {
-  components: {
-    ElementParticipantResponse,
-  },
   props: {
     data: Object,
-    elementData: Object,
+    element: Object,
   },
   computed: {
     answerOption: {
       get() {
         let optionValue = '';
         if (this.data) {
-          this.elementData.options.forEach(item => {
+          this.element.data.options.forEach(item => {
             if (item.name == this.data.answer_option) {
               optionValue = item.value;
             }

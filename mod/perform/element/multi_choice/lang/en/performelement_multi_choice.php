@@ -31,4 +31,3 @@ $string['option_required_error'] = 'Option field cannot be left blank';
 $string['pluginname'] = 'Multiple choice single select element';
 $string['question_title'] = 'Question text';
 $string['single_select_options'] = 'Single-select options';
-$string['your_response'] = 'Your response';

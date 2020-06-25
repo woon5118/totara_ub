@@ -28,5 +28,4 @@ $string['name'] = 'Long text';
 $string['pluginname'] = 'Long text element';
 $string['response_no_response_submitted'] = 'No response submitted';
 $string['title'] = 'Question text';
-$string['your_response'] = 'Your response';
 

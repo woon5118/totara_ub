@@ -20,50 +20,34 @@
   @package performelement_multi_choice
 -->
 <template>
-  <ElementParticipantForm :name="name">
-    <template v-slot:content>
-      <FormScope :path="path">
-        <FormRow :label="$str('your_response', 'performelement_multi_choice')">
-          <FormRadioGroup :validate="answerValidator" name="answer_option">
-            <Radio
-              v-for="item in data.options"
-              :key="item.name"
-              :value="item.name"
-              >{{ item.value }}</Radio
-            >
-          </FormRadioGroup>
-        </FormRow>
-      </FormScope>
-    </template>
-  </ElementParticipantForm>
+  <FormScope :path="path">
+    <FormRadioGroup :validate="answerValidator" name="answer_option">
+      <Radio
+        v-for="item in element.data.options"
+        :key="item.name"
+        :value="item.name"
+        >{{ item.value }}</Radio
+      >
+    </FormRadioGroup>
+  </FormScope>
 </template>
 
 <script>
 import FormScope from 'totara_core/components/reform/FormScope';
-import ElementParticipantForm from 'mod_perform/components/element/ElementParticipantForm';
-import { FormRow } from 'totara_core/components/uniform';
 import Radio from 'totara_core/components/form/Radio';
 import FormRadioGroup from 'totara_core/components/uniform/FormRadioGroup';
 
 export default {
   components: {
     FormScope,
-    FormRow,
-    ElementParticipantForm,
     Radio,
     FormRadioGroup,
   },
 
   props: {
     path: [String, Array],
-    type: Object,
-    name: String,
-    data: Object,
-    isRequired: {
-      type: Boolean,
-      default: false,
-    },
     error: String,
+    element: Object,
   },
   methods: {
     /**
@@ -72,7 +56,7 @@ export default {
      * @return {function[]}
      */
     answerValidator(val) {
-      if (this.isRequired) {
+      if (this.element.is_required) {
         const isEmpty =
           !val || (typeof val === 'string' && val.trim().length === 0);
         if (isEmpty)
@@ -88,7 +72,6 @@ export default {
 <lang-strings>
   {
     "performelement_multi_choice": [
-      "your_response",
       "error_you_must_answer_this_question"
     ]
   }

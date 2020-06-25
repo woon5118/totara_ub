@@ -20,35 +20,26 @@
   @package performelement_short_text
 -->
 <template>
-  <ElementParticipantResponse>
-    <template v-slot:content>
-      <div class="tui-shortTextElementParticipantResponse">
-        <div
-          v-if="answerText"
-          class="tui-shortTextElementParticipantResponse__answer"
-        >
-          {{ answerText }}
-        </div>
-        <div v-else class="tui-shortTextElementParticipantResponse__noResponse">
-          {{
-            $str(
-              'short_text_response_no_response_submitted',
-              'performelement_short_text'
-            )
-          }}
-        </div>
-      </div>
-    </template>
-  </ElementParticipantResponse>
+  <div class="tui-shortTextElementParticipantResponse">
+    <div
+      v-if="answerText"
+      class="tui-shortTextElementParticipantResponse__answer"
+    >
+      {{ answerText }}
+    </div>
+    <div v-else class="tui-shortTextElementParticipantResponse__noResponse">
+      {{
+        $str(
+          'short_text_response_no_response_submitted',
+          'performelement_short_text'
+        )
+      }}
+    </div>
+  </div>
 </template>
 
 <script>
-import ElementParticipantResponse from 'mod_perform/components/element/ElementParticipantResponse';
-
 export default {
-  components: {
-    ElementParticipantResponse,
-  },
   props: {
     data: Object,
   },

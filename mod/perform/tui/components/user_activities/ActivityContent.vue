@@ -48,7 +48,7 @@
       </ConfirmationModal>
       <Uniform
         v-if="initialValues"
-        :key="activeParticipantSectionId"
+        :key="activeParticipantSection.id"
         v-slot="{ getSubmitting }"
         :initial-values="initialValues"
         @submit="openModal"
@@ -122,15 +122,14 @@
               </span>
             </template>
             <div class="tui-participantContent__sectionItem-content">
-              <component
-                :is="sectionElement.component"
-                :path="['sectionElements', sectionElement.id]"
-                :data="sectionElement.element.data"
-                :title="sectionElement.element.title"
-                :type="sectionElement.element.type"
-                :is-required="sectionElement.element.is_required"
-                :error="errors && errors[sectionElement.clientId]"
-              />
+              <ElementParticipantForm>
+                <template v-slot:content>
+                  <component
+                    :is="sectionElement.component"
+                    v-bind="loadUserSectionElementProps(sectionElement)"
+                  />
+                </template>
+              </ElementParticipantForm>
               <OtherParticipantResponses
                 v-show="showOtherResponse"
                 :section-element="sectionElement"
@@ -139,11 +138,40 @@
           </Collapsible>
         </div>
 
-        <ButtonGroup class="tui-participantContent__buttons">
+        <ButtonGroup
+          v-if="!activeSectionIsClosed"
+          class="tui-participantContent__buttons"
+        >
           <ButtonSubmit :submitting="getSubmitting()" />
           <ButtonCancel @click="goBackToListCancel" />
         </ButtonGroup>
       </Uniform>
+
+      <div class="tui-participantContent__navigation">
+        <Grid v-if="activeSectionIsClosed">
+          <GridItem :units="6">
+            <Button
+              v-if="hasPreviousSection"
+              :text="$str('previous_section', 'mod_perform')"
+              @click="loadPreviousParticipantSection"
+            />
+          </GridItem>
+          <GridItem :units="6">
+            <div class="tui-participantContent__navigation-buttons">
+              <Button
+                v-if="hasNextSection"
+                :styleclass="{ primary: 'true' }"
+                :text="$str('next_section', 'mod_perform')"
+                @click="loadNextParticipantSection"
+              />
+              <Button
+                :text="$str('button_close', 'mod_perform')"
+                @click="goBackToListCancel"
+              />
+            </div>
+          </GridItem>
+        </Grid>
+      </div>
     </Loader>
   </div>
 </template>
@@ -154,12 +182,16 @@ import { uniqueId } from 'totara_core/util';
 import { NOTIFICATION_DURATION } from 'mod_perform/constants';
 import { notify } from 'totara_core/notifications';
 // Components
+import Button from 'totara_core/components/buttons/Button';
 import ButtonCancel from 'totara_core/components/buttons/Cancel';
 import ButtonGroup from 'totara_core/components/buttons/ButtonGroup';
 import ButtonSubmit from 'totara_core/components/buttons/Submit';
 import Checkbox from 'totara_core/components/form/Checkbox';
 import Collapsible from 'totara_core/components/collapsible/Collapsible';
 import ConfirmationModal from 'totara_core/components/modal/ConfirmationModal';
+import ElementParticipantForm from 'mod_perform/components/element/ElementParticipantForm';
+import Grid from 'totara_core/components/grid/Grid';
+import GridItem from 'totara_core/components/grid/GridItem';
 import Loader from 'totara_core/components/loader/Loader';
 import OtherParticipantResponses from 'mod_perform/components/user_activities/participant/OtherParticipantResponses';
 import ParticipantUserHeader from 'mod_perform/components/user_activities/participant/ParticipantUserHeader';
@@ -171,12 +203,16 @@ import UpdateSectionResponsesMutation from 'mod_perform/graphql/update_section_r
 
 export default {
   components: {
+    Button,
     ButtonCancel,
     ButtonGroup,
     ButtonSubmit,
     Checkbox,
     Collapsible,
     ConfirmationModal,
+    ElementParticipantForm,
+    Grid,
+    GridItem,
     Loader,
     OtherParticipantResponses,
     ParticipantUserHeader,
@@ -234,7 +270,7 @@ export default {
     return {
       answerableParticipantInstances: null,
       answeringAsParticipantId: this.participantInstanceId,
-      activeParticipantSectionId: this.participantSectionId,
+      activeParticipantSection: {},
       completionSaveSuccess: false,
       errors: null,
       hasOtherResponse: false,
@@ -265,21 +301,22 @@ export default {
       result({ data }) {
         this.answerableParticipantInstances =
           data.mod_perform_participant_section.answerable_participant_instances;
-        this.activeParticipantSectionId =
-          data.mod_perform_participant_section.id;
+        this.activeParticipantSection = data.mod_perform_participant_section;
         this.participantSections =
           data.mod_perform_participant_section.participant_instance.participant_sections;
+        this.formValues = {};
         this.initialValues = {
           sectionElements: {},
         };
         this.sectionElements = data.mod_perform_participant_section.section_element_responses.map(
           item => {
+            let component = this.activeSectionIsClosed
+              ? item.element.element_plugin.participant_response_component
+              : item.element.element_plugin.participant_form_component;
             return {
               id: item.section_element_id,
               clientId: uniqueId(),
-              component: tui.asyncComponent(
-                item.element.element_plugin.participant_form_component
-              ),
+              component: tui.asyncComponent(component),
               element: {
                 type: item.element.element_plugin,
                 title: item.element.title,
@@ -330,6 +367,44 @@ export default {
       return Number(this.currentUserId) === Number(this.subjectUser.id);
     },
 
+    /**
+     * Checks if active participant section is closed.
+     *
+     * @return {Boolean}
+     */
+    activeSectionIsClosed() {
+      return (
+        this.activeParticipantSection &&
+        this.activeParticipantSection.availability_status === 'CLOSED'
+      );
+    },
+
+    /**
+     * Checks if there's a next section to load for the navigation.
+     *
+     * @return {Boolean}
+     */
+    hasNextSection() {
+      let nextSectionId = this.getNextParticipantSection(
+        this.activeParticipantSection.id
+      );
+
+      return nextSectionId !== null;
+    },
+
+    /**
+     * Checks if there's a previous section to load for the navigation.
+     *
+     * @return {Boolean}
+     */
+    hasPreviousSection() {
+      let previousSectionId = this.getPreviousParticipantSection(
+        this.activeParticipantSection.id
+      );
+
+      return previousSectionId !== null;
+    },
+
     /*
      * Get the participant instance we are currently answering as.
      */
@@ -347,6 +422,27 @@ export default {
   },
 
   methods: {
+    /**
+     * Creates user section element component props
+     *
+     * @param {Object} sectionElement
+     * @return {Object}
+     */
+    loadUserSectionElementProps(sectionElement) {
+      let props = {
+        element: sectionElement.element,
+      };
+      if (this.activeSectionIsClosed) {
+        props.data = JSON.parse(sectionElement.response_data);
+        props.class = 'tui-participantContent__readonly';
+      } else {
+        props.path = ['sectionElements', sectionElement.id];
+        props.error = this.errors && this.errors[sectionElement.id];
+      }
+
+      return props;
+    },
+
     /**
      * Show a generic saving error toast.
      */
@@ -449,6 +545,57 @@ export default {
     },
 
     /**
+     * Extract section elements into new. update , delete and move
+     * and call the GQL mutation to save section elements
+     *
+     * @returns {Object}
+     */
+    async save() {
+      const update = this.sectionElements.map(item => {
+        return {
+          section_element_id: item.id,
+          response_data: JSON.stringify(item.element.responseData),
+        };
+      });
+
+      const { data: resultData } = await this.$apollo.mutate({
+        mutation: UpdateSectionResponsesMutation,
+        variables: {
+          input: {
+            participant_section_id: this.activeParticipantSection.id,
+            update: update,
+          },
+        },
+        refetchAll: false,
+      });
+      return resultData;
+    },
+
+    /**
+     * Loads the next participant section.
+     */
+    loadNextParticipantSection() {
+      let nextSection = this.getNextParticipantSection(
+        this.activeParticipantSection.id
+      );
+      if (nextSection) {
+        this.loadParticipantSection(nextSection);
+      }
+    },
+
+    /**
+     * Loads the previous participant section.
+     */
+    loadPreviousParticipantSection() {
+      let previousSection = this.getPreviousParticipantSection(
+        this.activeParticipantSection.id
+      );
+      if (previousSection) {
+        this.loadParticipantSection(previousSection);
+      }
+    },
+
+    /**
      * Loads the participant section as active participant section.
      *
      * @param {Number} participantSectionId
@@ -467,11 +614,8 @@ export default {
      * @return {Number|NULL} next participant section id
      */
     getNextParticipantSection(participantSectionId) {
-      let indexOfCurrent = this.participantSections.findIndex(
-        function(participantSection) {
-          return participantSection.id === participantSectionId;
-        },
-        { participantSectionId }
+      let indexOfCurrent = this.getIndexOfParticipantSection(
+        participantSectionId
       );
       let nextParticipantSectionIndex = indexOfCurrent + 1;
 
@@ -481,32 +625,40 @@ export default {
     },
 
     /**
-     * Extract section elements into new. update , delete and move
-     * and call the GQL mutation to save section elements
+     * Get the previous participant section in reference to the provided participant section id.
      *
-     * @returns {Object}
+     * @param {Number} participantSectionId
+     * @return {Number|NULL}
      */
-    async save() {
-      const update = this.sectionElements.map(item => {
-        return {
-          section_element_id: item.id,
-          response_data: JSON.stringify(item.element.responseData),
-        };
-      });
+    getPreviousParticipantSection(participantSectionId) {
+      let indexOfCurrent = this.getIndexOfParticipantSection(
+        participantSectionId
+      );
+      let previousParticipantSectionIndex = indexOfCurrent - 1;
 
-      const { data: resultData } = await this.$apollo.mutate({
-        mutation: UpdateSectionResponsesMutation,
-        variables: {
-          input: {
-            participant_section_id: this.activeParticipantSectionId,
-            update: update,
-          },
-        },
-        refetchAll: false,
-      });
-      return resultData;
+      return previousParticipantSectionIndex >= 0
+        ? this.participantSections[previousParticipantSectionIndex].id
+        : null;
     },
 
+    /**
+     * Get the nexy participant section in reference to the provided participant section id.
+     *
+     * @param {Number} participantSectionId
+     * @return {Number|NULL}
+     */
+    getIndexOfParticipantSection(participantSectionId) {
+      return this.participantSections.findIndex(
+        function(participantSection) {
+          return participantSection.id === participantSectionId;
+        },
+        { participantSectionId }
+      );
+    },
+
+    /**
+     * Redirects back to the list of user activities with a success message.
+     */
     goBackToListCompletionSuccess() {
       // Post requests require a real url (activity/index.php no activity/).
       const url = this.$url('/mod/perform/activity/index.php');
@@ -518,6 +670,9 @@ export default {
       });
     },
 
+    /**
+     * Redirects back to the list of user activities on click of cancel/close.
+     */
     goBackToListCancel() {
       // Post requests require a real url (activity/index.php no activity/).
       const url = this.$url('/mod/perform/activity/index.php');
@@ -560,9 +715,12 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
+      "button_close",
+      "next_section",
+      "previous_section",
       "relation_to_subject_self",
-      "section_element_response_required",
       "section_element_response_optional",
+      "section_element_response_required",
       "toast_error_save_response",
       "toast_success_save_close_on_completion_response",
       "toast_success_save_response",

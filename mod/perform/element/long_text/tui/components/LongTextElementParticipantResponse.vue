@@ -20,31 +20,20 @@
   @package performelement_long_text
 -->
 <template>
-  <ElementParticipantResponse>
-    <template v-slot:content>
-      <div class="tui-longTextElementParticipantResponse">
-        <div
-          v-if="answerText"
-          class="tui-longTextElementParticipantResponse__answer"
-          v-html="answerText"
-        />
-        <div v-else class="tui-longTextElementParticipantResponse__noResponse">
-          {{
-            $str('response_no_response_submitted', 'performelement_long_text')
-          }}
-        </div>
-      </div>
-    </template>
-  </ElementParticipantResponse>
+  <div class="tui-longTextElementParticipantResponse">
+    <div
+      v-if="answerText"
+      class="tui-longTextElementParticipantResponse__answer"
+      v-html="answerText"
+    />
+    <div v-else class="tui-longTextElementParticipantResponse__noResponse">
+      {{ $str('response_no_response_submitted', 'performelement_long_text') }}
+    </div>
+  </div>
 </template>
 
 <script>
-import ElementParticipantResponse from 'mod_perform/components/element/ElementParticipantResponse';
-
 export default {
-  components: {
-    ElementParticipantResponse,
-  },
   props: {
     data: Object,
   },

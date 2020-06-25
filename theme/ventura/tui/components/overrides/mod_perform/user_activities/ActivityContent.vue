@@ -52,6 +52,15 @@
       @include tui-font-heading-x-small();
     }
   }
+  &__navigation {
+    margin-top: var(--tui-gap-4);
+    &-buttons {
+      text-align: right;
+      :not(:first-child) {
+        margin-left: var(--tui-gap-4);
+      }
+    }
+  }
 
   &__sectionHeading {
     display: flex;
@@ -83,8 +92,12 @@
     &-content {
       & > * {
         margin-top: var(--tui-gap-4);
+        margin-left: var(--tui-gap-12);
       }
     }
+  }
+  &__readonly {
+    padding-top: var(--tui-gap-1);
   }
   &__response-optional {
     @include tui-font-body();

@@ -20,30 +20,20 @@
   @package performelement_multi_choice_multi
 -->
 <template>
-  <ElementParticipantForm :name="name">
-    <template v-slot:content>
-      <FormScope :path="path">
-        <FormRow
-          :label="$str('your_response', 'performelement_multi_choice_multi')"
-        >
-          <FormCheckboxGroup :validate="answerValidator" name="answer_option">
-            <Checkbox
-              v-for="item in data.options"
-              :key="item.name"
-              :value="item.name"
-              >{{ item.value }}</Checkbox
-            >
-          </FormCheckboxGroup>
-        </FormRow>
-      </FormScope>
-    </template>
-  </ElementParticipantForm>
+  <FormScope :path="path">
+    <FormCheckboxGroup :validate="answerValidator" name="answer_option">
+      <Checkbox
+        v-for="item in element.data.options"
+        :key="item.name"
+        :value="item.name"
+        >{{ item.value }}</Checkbox
+      >
+    </FormCheckboxGroup>
+  </FormScope>
 </template>
 
 <script>
 import FormScope from 'totara_core/components/reform/FormScope';
-import ElementParticipantForm from 'mod_perform/components/element/ElementParticipantForm';
-import { FormRow } from 'totara_core/components/uniform';
 import FormCheckboxGroup from 'totara_core/components/uniform/FormCheckboxGroup';
 import Checkbox from 'totara_core/components/form/Checkbox';
 import { v as validation } from 'totara_core/validation';
@@ -52,21 +42,13 @@ export default {
   components: {
     Checkbox,
     FormScope,
-    FormRow,
-    ElementParticipantForm,
     FormCheckboxGroup,
   },
 
   props: {
     path: [String, Array],
-    type: Object,
-    name: String,
-    data: Object,
-    isRequired: {
-      type: Boolean,
-      default: false,
-    },
     error: String,
+    element: Object,
   },
   methods: {
     /**
@@ -74,7 +56,7 @@ export default {
      * @return {function[]}
      */
     answerValidator(val) {
-      if (this.isRequired) {
+      if (this.element.is_required) {
         const requiredValidation = validation.required();
         if (requiredValidation.validate(val)) {
           return null;
@@ -90,9 +72,8 @@ export default {
 </script>
 <lang-strings>
   {
-  "performelement_multi_choice_multi": [
-  "your_response",
-  "error_you_must_answer_this_question"
-  ]
+    "performelement_multi_choice_multi": [
+      "error_you_must_answer_this_question"
+    ]
   }
 </lang-strings>

@@ -8,6 +8,7 @@ query mod_perform_participant_section(
   ) {
     id
     progress_status
+    availability_status
     section {
       display_title
     }

@@ -37,6 +37,7 @@ use performelement_short_text\answer_length_exceeded_error;
 use performelement_short_text\short_text;
 use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
+use mod_perform\models\activity\activity_setting;
 
 /**
  * @group perform
@@ -197,6 +198,62 @@ class mod_perform_webapi_resolver_mutation_update_section_responses_testcase ext
             $events,
             'Expected no events to be fired'
         );
+    }
+
+    /**
+     * Tests exception is thrown when updating a closed participant section.
+     *
+     * @return void
+    */
+    public function test_can_not_update_closed_participant_section_response() {
+
+        self::setAdminUser();
+        $subject = self::getDataGenerator()->create_user();
+
+        /** @var mod_perform_generator $generator */
+        $generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
+        $activity = $generator->create_activity_in_container();
+        $activity->settings->update([activity_setting::CLOSE_ON_COMPLETION => true]);
+
+        $subject_instance = $generator->create_subject_instance([
+            'subject_is_participating' => true,
+            'subject_user_id' => $subject->id,
+            'other_participant_id' => user::logged_in()->id,
+            'activity_id' => $activity->id,
+        ]);
+
+        /** @var participant_instance $other_participant_instance */
+        $other_participant_instance = $subject_instance->participant_instances()
+            ->where('participant_id', user::logged_in()->id)
+            ->one();
+
+        /** @var participant_section_entity $participant_section */
+        $participant_section =  $other_participant_instance->participant_sections()->one();
+
+        /** @var collection|section_element[] $section_elements */
+        $section_elements = $participant_section->section_elements()->get();
+
+        $args = [
+            'input' => [
+                'participant_section_id' => $participant_section->id,
+                'update' => [
+                    [
+                        'section_element_id' => $section_elements->first()->id,
+                        'response_data' => json_encode(['answer_text' => 'A quick brown fox']),
+                    ],
+                    [
+                        'section_element_id' => $section_elements->last()->id,
+                        'response_data' => json_encode(['answer_text' => 'Answer 2']),
+                    ],
+                ],
+            ],
+        ];
+
+        /** @var participant_section $initial_save_result */
+        $this->resolve_graphql_mutation(self::MUTATION, $args)['participant_section'];
+        $this->expectException(moodle_exception::class);
+        $this->expectExceptionMessage('Can not update response to a closed participant section');
+        $this->resolve_graphql_mutation(self::MUTATION, $args);
     }
 
     public function test_with_validation_errors(): void {

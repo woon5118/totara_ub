@@ -20,44 +20,33 @@
   @package performelement_multi_choice_multi
 -->
 <template>
-  <ElementParticipantResponse>
-    <template v-slot:content>
-      <div class="tui-elementEditMultiChoiceMultiParticipantResponse">
-        <div
-          v-if="answerOption"
-          class="tui-elementEditMultiChoiceMultiParticipantResponse__answer"
-          v-html="answerOption"
-        />
-        <div
-          v-else
-          class="tui-elementEditMultiChoiceMultiParticipantResponse__noResponse"
-        >
-          {{
-            $str('no_response_submitted', 'performelement_multi_choice_multi')
-          }}
-        </div>
-      </div>
-    </template>
-  </ElementParticipantResponse>
+  <div class="tui-elementEditMultiChoiceMultiParticipantResponse">
+    <div
+      v-if="answerOption"
+      class="tui-elementEditMultiChoiceMultiParticipantResponse__answer"
+      v-html="answerOption"
+    />
+    <div
+      v-else
+      class="tui-elementEditMultiChoiceMultiParticipantResponse__noResponse"
+    >
+      {{ $str('no_response_submitted', 'performelement_multi_choice_multi') }}
+    </div>
+  </div>
 </template>
 
 <script>
-import ElementParticipantResponse from 'mod_perform/components/element/ElementParticipantResponse';
-
 export default {
-  components: {
-    ElementParticipantResponse,
-  },
   props: {
     data: Object,
-    elementData: Object,
+    element: Object,
   },
   computed: {
     answerOption: {
       get() {
         let optionValue = [];
         if (this.data) {
-          this.elementData.options.forEach(item => {
+          this.element.data.options.forEach(item => {
             if (this.data.answer_option.includes(item.name)) {
               optionValue.push(item.value);
             }
@@ -71,8 +60,8 @@ export default {
 </script>
 <lang-strings>
   {
-  "performelement_multi_choice_multi": [
-  "no_response_submitted"
-  ]
+    "performelement_multi_choice_multi": [
+      "no_response_submitted"
+    ]
   }
 </lang-strings>

@@ -25,16 +25,19 @@ Feature: Respond to activity with multiple sections
       | activity_name   | section_name |
       | Closed activity | section 1    |
       | Closed activity | section 2    |
+      | Closed activity | section 3    |
       | Open activity   | section A    |
     And the following "section relationships" exist in "mod_perform" plugin:
       | section_name | relationship |
       | section 1    | subject      |
       | section 2    | subject      |
+      | section 3    | subject      |
       | section A    | subject      |
     And the following "section elements" exist in "mod_perform" plugin:
       | section_name | element_name |
       | section 1    | short_text   |
       | section 2    | short_text   |
+      | section 3    | short_text   |
       | section A    | short_text   |
     And the following "activity tracks" exist in "mod_perform" plugin:
       | activity_name   | track_description |
@@ -48,24 +51,75 @@ Feature: Respond to activity with multiple sections
     And I am on homepage
     And I log out
 
-  Scenario: Auto navigate to next section and redirect to list after responding to last section.
+  Scenario: Shows read-only mode on closed participant section, auto navigate to next section and redirect to list after responding to last section.
     Given I log in as "user1"
     And I navigate to the outstanding perform activities list page
     And I click on "Closed activity" "link"
+
+    # Section 1
     Then I should see "section 1"
     When I answer "short text" question "test element title" with "John Answer one"
     And I click on "Submit" "button"
     Then I should see "You will not be able to update your responses after submission."
     And I confirm the tui confirmation modal
     Then I should see "Section submitted and closed." in the tui "success" notification toast
-    And I should see "section 2"
+    And I close the tui notification toast
 
+    # Section 2
+    And I should see "section 2"
     When I answer "short text" question "test element title" with "John Answer two"
+    And I click on "Submit" "button"
+    Then I should see "You will not be able to update your responses after submission."
+    And I confirm the tui confirmation modal
+    Then I should see "Section submitted and closed." in the tui "success" notification toast
+    And I close the tui notification toast
+    And I should see "section 3"
+
+    # Section 3
+    When I answer "short text" question "test element title" with "John Answer three"
     And I click on "Submit" "button"
     Then I should see "You will not be able to update your responses after submission."
     And I confirm the tui confirmation modal
     And I should see "Performance activities"
     And I should see "Section submitted and closed." in the tui "success" notification toast
+    And I close the tui notification toast
+
+    # View participant section in read-only mode.
+    And I click on "Closed activity" "link"
+
+    # Section 1
+    Then I should see "section 1"
+    And I should not see "Submit"
+    And I should not see "Cancel"
+    And I should see "John Answer one" in the ".tui-performElementResponse" "css_element"
+    And I should not see "Previous section" in the ".tui-participantContent__navigation" "css_element"
+    And I should see "Next section" in the ".tui-participantContent__navigation" "css_element"
+    And I should see "Close" in the ".tui-participantContent__navigation" "css_element"
+    And I click on "Next section" "button"
+
+    # Section 2
+    Then I should see "section 2"
+    And I should not see "Submit"
+    And I should not see "Cancel"
+    And I should see "John Answer two" in the ".tui-performElementResponse" "css_element"
+    And I should see "Previous section" in the ".tui-participantContent__navigation" "css_element"
+    And I should see "Next section" in the ".tui-participantContent__navigation" "css_element"
+    And I should see "Close" in the ".tui-participantContent__navigation" "css_element"
+    And I click on "Next section" "button"
+
+    # Section 3
+    Then I should see "section 3"
+    And I should not see "Submit"
+    And I should not see "Cancel"
+    Then I should see "John Answer three" in the ".tui-performElementResponse" "css_element"
+    And I should see "Previous section" in the ".tui-participantContent__navigation" "css_element"
+    And I should not see "Next section" in the ".tui-participantContent__navigation" "css_element"
+    And I should see "Close" in the ".tui-participantContent__navigation" "css_element"
+    And I click on "Close" "button"
+    Then I should see "Performance activities"
+    And I should see "Closed activity"
+    And I should see "Open activity"
+
 
   Scenario: Displays close on completion confirmation text when close on completion is enabled.
     Given I log in as "user1"

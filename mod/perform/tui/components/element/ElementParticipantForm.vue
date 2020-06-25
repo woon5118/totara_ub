@@ -22,12 +22,16 @@
 <template>
   <div class="tui-performElementResponse">
     <div v-if="error">{{ error }}</div>
-    <slot name="content" />
+    <FormRow :label="$str('your_response', 'mod_perform')">
+      <slot name="content" />
+    </FormRow>
   </div>
 </template>
 
 <script>
+import FormRow from 'totara_core/components/form/FormRow';
 export default {
+  components: { FormRow },
   props: {
     name: String,
     type: Object,
@@ -35,3 +39,10 @@ export default {
   },
 };
 </script>
+<lang-strings>
+  {
+    "mod_perform": [
+      "your_response"
+    ]
+  }
+</lang-strings>

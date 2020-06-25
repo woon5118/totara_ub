@@ -19,22 +19,13 @@
   @package performelement_static_content
 -->
 <template>
-  <ElementParticipantForm :name="name">
-    <template v-slot:content>
-      <div class="tui-staticContentElementParticipantForm">
-        {{ data.textValue }}
-      </div>
-    </template>
-  </ElementParticipantForm>
+  <div class="tui-staticContentElementParticipantForm">
+    {{ data.textValue }}
+  </div>
 </template>
 
 <script>
-import ElementParticipantForm from 'mod_perform/components/element/ElementParticipantForm';
-
 export default {
-  components: {
-    ElementParticipantForm,
-  },
   props: {
     name: String,
     data: Object,

@@ -47,13 +47,15 @@
             size="xsmall"
           />
 
-          <component
-            :is="componentFor()"
-            :data="JSON.parse(response.response_data)"
-            :element-data="sectionElement.element.data"
-            :name="sectionElement.element.name"
-            :type="sectionElement.element.type"
-          />
+          <ElementParticipantResponse>
+            <template v-slot:content>
+              <component
+                :is="componentFor()"
+                :data="JSON.parse(response.response_data)"
+                :element="sectionElement.element"
+              />
+            </template>
+          </ElementParticipantResponse>
         </div>
       </div>
       <div v-else class="tui-otherParticipantResponses__noParticipant">
@@ -68,12 +70,14 @@
   </div>
 </template>
 <script>
+import ElementParticipantResponse from '../../element/ElementParticipantResponse';
 import ParticipantUserHeader from 'mod_perform/components/user_activities/participant/ParticipantUserHeader';
 import WarningIcon from 'totara_core/components/icons/common/Warning';
 import { FormRow } from 'totara_core/components/uniform';
 
 export default {
   components: {
+    ElementParticipantResponse,
     FormRow,
     ParticipantUserHeader,
     WarningIcon,
@@ -98,8 +102,9 @@ export default {
      * @returns {function}
      */
     componentFor() {
-      const { type } = this.sectionElement.element;
-      return tui.asyncComponent(type.participant_response_component);
+      return tui.asyncComponent(
+        this.sectionElement.element.type.participant_response_component
+      );
     },
 
     /**

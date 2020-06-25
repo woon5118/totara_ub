@@ -20,50 +20,29 @@
   @package performelement_short_text
 -->
 <template>
-  <ElementParticipantForm :name="name">
-    <template v-slot:content>
-      <div>
-        <FormScope :path="path" :process="process">
-          <FormRow
-            :label="
-              $str('short_text_your_response', 'performelement_short_text')
-            "
-          >
-            <FormText
-              name="answer_text"
-              :validations="v => [answerRequired, maxLength]"
-            />
-          </FormRow>
-        </FormScope>
-      </div>
-    </template>
-  </ElementParticipantForm>
+  <FormScope :path="path" :process="process">
+    <FormText
+      name="answer_text"
+      :validations="v => [answerRequired, maxLength]"
+    />
+  </FormScope>
 </template>
 
 <script>
-import ElementParticipantForm from 'mod_perform/components/element/ElementParticipantForm';
 import FormScope from 'totara_core/components/reform/FormScope';
-import { FormRow, FormText } from 'totara_core/components/uniform';
+import { FormText } from 'totara_core/components/uniform';
 import { v as validation } from 'totara_core/validation';
 
 export default {
   components: {
-    ElementParticipantForm,
-    FormRow,
     FormScope,
     FormText,
   },
 
   props: {
     path: [String, Array],
-    type: Object,
-    name: String,
-    data: Object,
-    isRequired: {
-      type: Boolean,
-      default: false,
-    },
     error: String,
+    element: Object,
   },
   methods: {
     process(value) {
@@ -82,7 +61,7 @@ export default {
      * @return {function[]}
      */
     answerRequired(val) {
-      if (this.isRequired) {
+      if (this.element.is_required) {
         const requiredValidation = validation.required();
 
         if (requiredValidation.validate(val)) {
@@ -121,7 +100,6 @@ export default {
 <lang-strings>
   {
   "performelement_short_text": [
-    "short_text_your_response",
     "error_you_must_answer_this_question"
   ]
   }
