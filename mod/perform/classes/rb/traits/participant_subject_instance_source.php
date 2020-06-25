@@ -117,6 +117,16 @@ trait participant_subject_instance_source {
                 ],
             ]
         );
+        $columnoptions[] = new rb_column_option(
+            'subject_instance',
+            'due_date',
+            get_string('due_date', 'mod_perform'),
+            "{$join}.due_date",
+            [
+                'dbdatatype' => 'timestamp',
+                'displayfunc' => 'nice_date'
+            ]
+        );
 
         // Job assignment columns.
         if (self::multiple_jobs_allowed()) {
@@ -166,6 +176,12 @@ trait participant_subject_instance_source {
             get_string('activity_type', 'mod_perform'),
             'select',
             ['selectchoices' => $this->get_activity_type_options()]
+        );
+        $filteroptions[] = new rb_filter_option(
+            'subject_instance',
+            'due_date',
+            get_string('due_date', 'mod_perform'),
+            'date'
         );
 
         // Job assignment filters.

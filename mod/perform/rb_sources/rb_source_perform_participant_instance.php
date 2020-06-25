@@ -24,6 +24,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 use mod_perform\rb\traits\participant_subject_instance_source;
+use mod_perform\state\participant_instance\closed;
+use mod_perform\state\participant_instance\complete;
 use mod_perform\state\participant_instance\participant_instance_availability;
 use mod_perform\state\participant_instance\participant_instance_progress;
 use mod_perform\state\state_helper;
@@ -210,7 +212,27 @@ class rb_source_perform_participant_instance extends rb_base_source {
                     'hidden' => 1,
                     'noexport' => true
                 ]
-            )
+            ),
+            new rb_column_option(
+                'participant_instance',
+                'overdue',
+                get_string('overdue', 'mod_perform'),
+                "CASE 
+                    WHEN
+                        subject_instance.due_date <= " . time() . "
+                        AND NOT (
+                            base.progress = " . complete::get_code() . "
+                            OR base.availability = " . closed::get_code() . "
+                        )
+                    THEN 1
+                    ELSE 0
+                END",
+                [
+                    'joins' => 'subject_instance',
+                    'dbdatatype' => 'boolean',
+                    'displayfunc' => 'yes_or_no',
+                ]
+            ),
         ];
 
         $this->add_fields_to_columns($columnoptions, 'subject_instance');
@@ -265,6 +287,17 @@ class rb_source_perform_participant_instance extends rb_base_source {
                         'participant_instance', participant_instance_availability::get_type()
                     ),
                     'simplemode' => true
+                ]
+            ),
+            // Overdue status
+            new rb_filter_option(
+                'participant_instance',
+                'overdue',
+                get_string('overdue', 'mod_perform'),
+                'multicheck',
+                [
+                    'simplemode' => true,
+                    'selectfunc' => 'yesno_list',
                 ]
             ),
         ];
@@ -405,10 +438,6 @@ class rb_source_perform_participant_instance extends rb_base_source {
             [
                 'type' => 'subject_instance',
                 'value' => 'activity_subject',
-            ],
-            [
-                'type' => 'subject_instance',
-                'value' => 'overdue',
             ],
             [
                 'type' => 'participant_instance',

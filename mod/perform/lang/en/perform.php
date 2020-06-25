@@ -139,6 +139,7 @@ $string['multiple_sections_label_help'] = 'Having multiple sections provides mor
 $string['no_participants_added'] = 'No participants added';
 $string['notification_instance_created'] = 'Participant instance created';
 $string['notification_overdue'] = 'Overdue reminder';
+$string['overdue'] = 'Overdue?';
 $string['participant_instance_availability_closed'] = 'Closed';
 $string['participant_instance_availability_open'] = 'Open';
 $string['participant_instance_status_complete'] = 'Complete';

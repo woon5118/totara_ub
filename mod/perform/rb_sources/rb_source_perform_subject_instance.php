@@ -25,6 +25,8 @@ defined('MOODLE_INTERNAL') || die();
 
 use mod_perform\rb\traits\participant_subject_instance_source;
 use mod_perform\state\state_helper;
+use mod_perform\state\subject_instance\closed;
+use mod_perform\state\subject_instance\complete;
 use mod_perform\state\subject_instance\subject_instance_availability;
 use mod_perform\state\subject_instance\subject_instance_progress;
 use totara_core\advanced_feature;
@@ -160,6 +162,25 @@ class rb_source_perform_subject_instance extends rb_base_source {
                     ],
                 ]
             ),
+            new rb_column_option(
+                'subject_instance',
+                'overdue',
+                get_string('overdue', 'mod_perform'),
+                "CASE 
+                    WHEN
+                        " . time() . " >= base.due_date
+                        AND NOT (
+                            base.progress = " . complete::get_code() . "
+                            OR base.availability = " . closed::get_code() . "
+                        )
+                    THEN 1
+                    ELSE 0
+                END",
+                [
+                    'dbdatatype' => 'boolean',
+                    'displayfunc' => 'yes_or_no',
+                ]
+            ),
             // TODO: uncomment when its available
             // new rb_column_option(
             //     'track',
@@ -199,6 +220,16 @@ class rb_source_perform_subject_instance extends rb_base_source {
                 'namelink',
                 get_string('subject_name', 'rb_source_perform_subject_instance'),
                 'text'
+            ),
+            new rb_filter_option(
+                'subject_instance',
+                'overdue',
+                get_string('overdue', 'mod_perform'),
+                'multicheck',
+                [
+                    'simplemode' => true,
+                    'selectfunc' => 'yesno_list',
+                ]
             ),
             new rb_filter_option(
                 'subject_instance',
