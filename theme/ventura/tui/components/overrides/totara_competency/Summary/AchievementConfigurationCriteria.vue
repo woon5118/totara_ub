@@ -16,34 +16,38 @@
   You should have received a copy of the GNU General Public License
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-  @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
-  @package totara_competency
+  @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
+  @package theme_ventura
 -->
 
-<template>
-  <transition name="tui-competencyPreloader__transition-fade">
-    <div v-if="display" class="tui-competencyPreloader">
-      <div>
-        <h1 class="title is-1" v-text="$str('loading', 'totara_competency')" />
-      </div>
-    </div>
-  </transition>
-</template>
+<style lang="scss">
+.tui-competencySummaryAchievementCriteria {
+  width: 100%;
 
-<script>
-export default {
-  props: {
-    display: {
-      required: false,
-      type: Boolean,
-      default: true,
-    },
-  },
-};
-</script>
+  &--multi {
+    padding: var(--tui-gap-4);
+  }
 
-<lang-strings>
-{
-  "totara_competency": ["loading"]
+  &__and {
+    width: 50%;
+    margin: 0;
+  }
+
+  &__criterion {
+    &-header {
+      display: inline-block;
+      width: 40%;
+      margin: 0;
+      @include tui-font-heading-label();
+    }
+
+    &-aggregation {
+      @include tui-font-hint();
+    }
+
+    &-items {
+      margin-top: var(--tui-gap-1);
+    }
+  }
 }
-</lang-strings>
+</style>

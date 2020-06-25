@@ -16,44 +16,40 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-  @author Jaron Steenson <jaron.steenson@totaralearning.com>
+  @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
   @package theme_ventura
 -->
 
 <style lang="scss">
-.tui-competencySelfAssignment {
-  &__table {
-    & > * + * {
-      margin-top: var(--tui-gap-2);
-    }
-  }
+.tui-competencySummary {
+  @include tui-font-body();
 
-  &__tableExpand {
-    & > * + * {
-      margin: var(--tui-gap-2) 0 0;
-    }
-
-    &-header {
-      @include tui-font-heading-small();
-    }
-
-    &-subHeader {
-      @include tui-font-heading-x-small();
-    }
-  }
-
-  &__actions {
-    justify-content: space-between;
-    margin-bottom: var(--tui-gap-5);
+  & > * + * {
+    margin-top: var(--tui-gap-4);
   }
 
   &__header {
-    margin: 0;
-    @include tui-font-heading-small();
+    &-title {
+      @include tui-font-heading-medium();
+      margin: var(--tui-gap-2) 0 0;
+    }
   }
 
-  &__table {
-    margin-bottom: var(--tui-gap-5);
+  &__sectionHeader {
+    display: flex;
+    align-items: center;
+    padding-bottom: var(--tui-gap-1);
+    border-bottom: var(--tui-border-width-thin) solid var(--tui-color-neutral-5);
+
+    &-title {
+      margin: 0;
+      @include tui-font-heading-small();
+    }
+
+    &-edit {
+      margin-left: auto;
+      padding-left: var(--tui-gap-2);
+    }
   }
 }
 </style>

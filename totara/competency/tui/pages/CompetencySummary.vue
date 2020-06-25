@@ -21,13 +21,18 @@
 -->
 
 <template>
-  <div>
+  <div class="tui-competencySummary">
     <div class="tui-competencySummary__header">
-      <a :href="backLinkUrl" class="tui-competencySummary__header_backLink">
+      <a :href="backLinkUrl">
         {{ $str('back_to', 'totara_competency', frameworkName) }}
       </a>
-      <h2 class="tui-competencySummary__header_title">
-        {{ competencyTitle }}
+      <h2 class="tui-competencySummary__header-title">
+        {{
+          $str('competency_title', 'totara_hierarchy', {
+            framework: frameworkName,
+            fullname: competencyName,
+          })
+        }}
       </h2>
     </div>
     <General :competency-id="competencyId" />
@@ -40,15 +45,15 @@
 </template>
 
 <script>
-import General from 'totara_competency/components/summary/General';
-import LinkedCourses from 'totara_competency/components/summary/LinkedCourses';
 import AchievementConfiguration from 'totara_competency/components/summary/AchievementConfiguration';
+import General from 'totara_competency/components/summary/CompetencySummaryGeneral';
+import LinkedCourses from 'totara_competency/components/summary/LinkedCourses';
 
 export default {
   components: {
+    AchievementConfiguration,
     General,
     LinkedCourses,
-    AchievementConfiguration,
   },
 
   props: {
@@ -81,31 +86,9 @@ export default {
         frameworkid: this.frameworkId,
       });
     },
-
-    competencyTitle() {
-      return this.$str('competencytitle', 'totara_hierarchy', {
-        framework: this.frameworkName,
-        fullname: this.competencyName,
-      });
-    },
   },
 };
 </script>
-
-<style lang="scss">
-.tui-competencySummary {
-  &__header {
-    &_backLink {
-      display: inline-block;
-      padding-bottom: var(--tui-gap-1);
-    }
-    &_title {
-      margin: 0;
-      padding-bottom: var(--tui-gap-4);
-    }
-  }
-}
-</style>
 
 <lang-strings>
   {
@@ -113,7 +96,7 @@ export default {
       "back_to"
     ],
     "totara_hierarchy": [
-      "competencytitle"
+      "competency_title"
     ]
   }
 </lang-strings>

@@ -21,7 +21,7 @@
  * @package totara_criteria
  */
 
-$string['pluginname'] = 'Assignment Activation';
+$string['pluginname'] = 'Assignment activation';
 
 $string['achievement_display'] = 'Value achieved when the competency is assigned';
 $string['achievement_via'] = 'Competency assignment';

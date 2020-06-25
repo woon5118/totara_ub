@@ -346,7 +346,7 @@ When setting up a training event, for example an induction course, this could be
 $string['competencytemplatemanage'] = 'Manage templates';
 $string['competencytemplates'] = 'Competency templates';
 $string['competencytemplateshortname_help'] = 'Template short name is a quick reference name for the competency template and can be used for display purposes.';
-$string['competencytitle'] = '{$a->framework} - {$a->fullname}';
+$string['competency_title'] = '{$a->framework} - {$a->fullname}';
 $string['competencytype'] = 'Type';
 $string['competencytype_help'] = 'A type defines a set of custom fields intended to capture metadata that is relevant only to a subset of competencies on the site, i.e. those classified as that type. Administrators must first create the types in order for them to appear as options here. Once classified as a type, a competency can be reclassified, but any data captured in the fields of the original type will need to be mapped to the new ones to avoid being deleted.';
 $string['competencytypecustomfields'] = 'Competency type custom fields';

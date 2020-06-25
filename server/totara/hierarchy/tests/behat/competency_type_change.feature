@@ -34,7 +34,7 @@ Feature: Test competency type changes in hierarchies
       | Type | Competency type 1     |
     And I press "Save changes"
     And I click on "Back to Competency page" "link"
-    And I click on ".tui-competencySummaryGeneral__header_edit" "css_element"
+    And I click on ".tui-competencySummary__sectionHeader-edit" "css_element"
     And I set the following fields to these values:
       | Custom field 1_1 | Some text 1 |
       | Custom field 1_2 | Some text 2 |

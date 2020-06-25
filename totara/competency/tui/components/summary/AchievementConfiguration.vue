@@ -22,97 +22,63 @@
 
 <template>
   <div class="tui-competencySummaryAchievementConfiguration">
-    <div class="tui-competencySummaryAchievementConfiguration__header">
-      <h3 class="tui-competencySummaryAchievementConfiguration__header_title">
+    <div class="tui-competencySummary__sectionHeader">
+      <h3 class="tui-competencySummary__sectionHeader-title">
         {{ $str('achievement_paths', 'totara_competency') }}
       </h3>
       <a
         :href="editUrl"
-        class="tui-competencySummaryAchievementConfiguration__header_edit"
+        class="tui-competencySummary__sectionHeader-edit"
         :title="$str('edit', 'moodle')"
       >
-        <FlexIcon icon="edit" size="200" :alt="$str('edit', 'moodle')" />
+        <EditIcon :size="200" :alt="$str('edit', 'moodle')" />
       </a>
     </div>
 
-    <div
-      v-if="!$apollo.loading && hasPathways"
-      class="tui-competencySummaryAchievementConfiguration__response"
-    >
+    <template v-if="!$apollo.loading && hasPathways">
       <div class="tui-competencySummaryAchievementConfiguration__aggregation">
-        <strong>{{ $str('overall_rating_calc', 'totara_competency') }}</strong>
-        <div
-          class="tui-competencySummaryAchievementConfiguration__aggregation_title"
+        <span
+          class="tui-competencySummaryAchievementConfiguration__aggregation-label"
         >
-          {{ achievementConfiguration.overall_aggregation.title }}
-        </div>
-      </div>
+          {{ $str('overall_rating_calc', 'totara_competency') }}
+        </span>
 
-      <div
-        v-for="pathGroup in pathGroups"
-        :key="pathGroup.key"
-        class="tui-competencySummaryAchievementConfiguration__pathgroup"
+        {{ achievementConfiguration.overall_aggregation.title }}
+      </div>
+      <Card
+        v-for="(pathGroup, pathGroupId) in pathGroups"
+        :key="'pathGroup' + pathGroupId"
       >
-        <div
-          v-for="scaleValue in pathGroup.scaleValues"
-          :key="scaleValue.value"
-          class="tui-competencySummaryAchievementConfiguration__pathgroup_scalevalue"
-        >
-          <Label :label="scaleValue.value" />
-
-          <div
-            class="tui-competencySummaryAchievementConfiguration__pathgroup_scalevalue__paths"
+        <div class="tui-competencySummaryAchievementConfiguration__pathGroup">
+          <Grid
+            v-for="(scaleValue, scaleValueId) in pathGroup.scaleValues"
+            :key="'scaleValue' + scaleValueId"
+            class="tui-competencySummaryAchievementConfiguration__scaleValue"
+            :stack-at="700"
           >
-            <div
-              v-for="(path, pathIdx) in scaleValue.paths"
-              :key="path.id"
-              class="tui-competencySummaryAchievementConfiguration__pathgroup_scalevalue__path"
-            >
-              <Divider v-if="pathIdx" label="OR" bordered />
-
-              <div
-                class="tui-competencySummaryAchievementConfiguration__pathgroup_scalevalue__path__criteria"
-                :class="{ bordered: path.multiCriteria }"
+            <GridItem :units="2">
+              <h4
+                class="tui-competencySummaryAchievementConfiguration__scaleValue-header"
               >
-                <div
-                  v-for="(criterion, criterionIdx) in path.criteria_summary"
-                  :key="criterionIdx"
-                  class="tui-competencySummaryAchievementConfiguration__pathgroup_scalevalue__path_criterion"
+                {{ scaleValue.value }}
+              </h4>
+            </GridItem>
+
+            <GridItem :units="10">
+              <div v-for="(path, pathIdx) in scaleValue.paths" :key="path.id">
+                <Separator
+                  v-if="pathIdx"
+                  class="tui-competencySummaryAchievementConfiguration__scaleValue-or"
                 >
-                  <Divider v-if="criterionIdx" label="AND" />
-
-                  <span v-if="criterion.error"
-                    ><FlexIcon
-                      icon="notification-warning"
-                      size="200"
-                      :alt="$str('warning', 'moodle')"
-                  /></span>
-                  <Label :label="criterion.item_type" />
-                  <span v-if="criterion.item_aggregation"
-                    >({{ criterion.item_aggregation }})</span
-                  >
-
-                  <div
-                    v-for="(item, itemIdx) in criterion.items"
-                    :key="itemIdx"
-                  >
-                    {{ item.description }}
-                    <span v-if="item.error"
-                      ><FlexIcon
-                        icon="notification-warning"
-                        size="100"
-                        :alt="$str('warning', 'moodle')"
-                      />
-                      {{ item.error }}</span
-                    >
-                  </div>
-                </div>
+                  <OrBox />
+                </Separator>
+                <Criteria :path="path" />
               </div>
-            </div>
-          </div>
+            </GridItem>
+          </Grid>
         </div>
-      </div>
-    </div>
+      </Card>
+    </template>
     <div
       v-else-if="!$apollo.loading"
       class="tui-competencySummaryAchievementConfiguration__noPaths"
@@ -123,20 +89,27 @@
 </template>
 
 <script>
-// Import components
-import Label from 'totara_core/components/form/Label';
-import FlexIcon from 'totara_core/components/icons/FlexIcon';
-import Divider from 'totara_competency/components/common/Divider';
+// Components
+import Card from 'totara_core/components/card/Card';
+import Criteria from 'totara_competency/components/summary/AchievementConfigurationCriteria';
+import EditIcon from 'totara_core/components/icons/common/Edit';
+import Grid from 'totara_core/components/grid/Grid';
+import GridItem from 'totara_core/components/grid/GridItem';
+import OrBox from 'totara_core/components/decor/OrBox';
+import Separator from 'totara_core/components/decor/Separator';
 
-// Import queries
+// Queries
 import achievementConfigurationQuery from 'totara_competency/graphql/achievement_criteria';
 
 export default {
-  // Register required components
   components: {
-    Label,
-    FlexIcon,
-    Divider,
+    Card,
+    Criteria,
+    EditIcon,
+    Grid,
+    GridItem,
+    OrBox,
+    Separator,
   },
 
   props: {
@@ -147,37 +120,30 @@ export default {
 
   data() {
     return {
-      filterValue: '123',
+      editUrl: '',
+      paths: [],
     };
   },
 
   computed: {
-    editUrl() {
-      return this.$url('/totara/competency/competency_edit.php', {
-        s: 'achievement_paths',
-        id: this.competencyId,
-      });
-    },
-
     hasPathways() {
       return (
-        this.achievementConfiguration.paths != null &&
+        this.achievementConfiguration.paths &&
         this.achievementConfiguration.paths.length > 0
       );
     },
 
-    // Order paths by sortorder
-    // Group paths - MULTIVALUE paths will always be in their own group
-    //             - all SINGLEVALUE paths are placed in a single group
-    pathGroups: function() {
-      let sortedPaths = [...this.achievementConfiguration.paths].sort(
-          (a, b) => a.sortorder - b.sortorder
-        ),
-        topGroups = [],
-        singleValueGroup = null,
-        bottomGroups = [];
-      for (let idx in sortedPaths) {
-        let path = Object.assign({}, sortedPaths[idx]);
+    // Order paths by sort order
+    // Group paths - multi value paths will always be in their own group
+    //             - all single value paths are placed in a single group
+    pathGroups() {
+      let bottomGroups = [];
+      let singleValueGroup = null;
+      let paths = this.paths;
+      let topGroups = [];
+
+      for (let idx in paths) {
+        let path = Object.assign({}, paths[idx]);
         path.multiCriteria = path.criteria_summary.length > 1;
 
         // multi-value paths are always placed in their own group with scale value 'Any value'
@@ -228,9 +194,12 @@ export default {
       }
 
       // Now merge all 3 together and return
-      return singleValueGroup
-        ? [...topGroups, singleValueGroup, ...bottomGroups]
-        : topGroups;
+
+      if (!singleValueGroup) {
+        return topGroups;
+      } else {
+        return [].concat(topGroups, singleValueGroup, bottomGroups);
+      }
     },
   },
 
@@ -243,106 +212,19 @@ export default {
           summarized: true,
         };
       },
-      update: data => data.totara_competency_achievement_criteria,
+      update({ totara_competency_achievement_criteria: data }) {
+        this.editUrl = this.$url('/totara/competency/competency_edit.php', {
+          s: 'achievement_paths',
+          id: this.competencyId,
+        });
+        this.paths = data.paths;
+
+        return data;
+      },
     },
   },
-
-  methods: {},
 };
 </script>
-
-<style lang="scss">
-.tui-competencySummaryAchievementConfiguration {
-  padding-top: var(--tui-gap-4);
-  &__header {
-    margin-bottom: var(--tui-gap-2);
-    padding-bottom: var(--tui-gap-1);
-    border-bottom: 1px solid var(--tui-color-neutral-5);
-
-    &_title {
-      display: inline-block;
-      margin-top: auto;
-      margin-bottom: auto;
-      margin-left: var(--tui-gap-2);
-      font-weight: bold;
-      font-size: var(--tui-font-size-18);
-    }
-
-    &_edit {
-      float: right;
-      margin-bottom: var(--tui-gap-4);
-      padding-left: var(--tui-gap-2);
-    }
-  }
-
-  &__noPaths {
-    padding: var(--tui-font-size-8);
-    font-style: italic;
-  }
-
-  &__aggregation {
-    display: flex;
-    flex-direction: row;
-
-    &_title {
-      margin-right: 0.4rem;
-      margin-left: 1rem;
-      padding-top: 0.4rem;
-      line-height: 1.5;
-    }
-  }
-
-  &__pathgroup {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    margin-bottom: 0.5em;
-    padding: 1em;
-    border: 1px solid black;
-    border-radius: 6px;
-
-    &_scalevalue {
-      display: flex;
-      border-top: 1px solid grey;
-
-      &:first-child {
-        border: none;
-      }
-
-      .tui-formLabel {
-        width: 20%;
-        font-weight: normal;
-        text-transform: uppercase;
-      }
-
-      &__paths {
-        width: 80%;
-      }
-
-      &__path {
-        &__criteria {
-          .tui-formLabel {
-            min-width: 10em;
-            font-weight: bold;
-            text-transform: none;
-          }
-
-          span {
-            font-style: italic;
-          }
-        }
-
-        &__criteria.bordered {
-          margin-bottom: 0.5em;
-          padding: 1em;
-          border: 0.5px solid lightgrey;
-          border-radius: 6px;
-        }
-      }
-    }
-  }
-}
-</style>
 
 <lang-strings>
 {

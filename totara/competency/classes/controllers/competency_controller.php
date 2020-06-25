@@ -95,7 +95,7 @@ class competency_controller extends admin_controller {
         require_capability('totara/hierarchy:viewcompetency', context_system::instance());
 
         $url = new moodle_url('/totara/competency/competency_summary.php', ['id' => $this->competency->id]);
-        $title = get_string('competencytitle', 'totara_hierarchy', (object) [
+        $title = get_string('competency_title', 'totara_hierarchy', (object) [
             'framework' => format_string($this->framework->fullname),
             'fullname' => format_string($this->competency->display_name)
         ]);

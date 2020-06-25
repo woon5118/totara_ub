@@ -34,8 +34,8 @@ Feature: Manage Learning plan achievement paths
     When I click on "Apply changes" "button"
     Then I should see "Changes applied successfully"
     When I follow "Back to Competency page"
-    Then I should see "Any scale value" in the ".tui-competencySummaryAchievementConfiguration__pathgroup_scalevalue" "css_element"
-    And I should see "Learning plan" in the ".tui-competencySummaryAchievementConfiguration__pathgroup_scalevalue__path_criterion" "css_element"
+    Then I should see "Any scale value" in the ".tui-competencySummaryAchievementConfiguration__scaleValue" "css_element"
+    And I should see "Learning plan" in the ".tui-competencySummaryAchievementCriteria__criterion" "css_element"
 
     # When a new learning plan is added while an removal of an existing one has not yet been applied, you are
     # not allowed to undo the removal of the original pathway

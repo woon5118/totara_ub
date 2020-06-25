@@ -16,44 +16,53 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-  @author Jaron Steenson <jaron.steenson@totaralearning.com>
+  @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
   @package theme_ventura
 -->
 
 <style lang="scss">
-.tui-competencySelfAssignment {
-  &__table {
-    & > * + * {
-      margin-top: var(--tui-gap-2);
+.tui-competencySummaryAchievementConfiguration {
+  & > * + * {
+    margin-top: var(--tui-gap-2);
+  }
+
+  &__aggregation {
+    margin-top: var(--tui-gap-4);
+    &-label {
+      @include tui-font-heavy();
+      margin-right: var(--tui-gap-2);
     }
   }
 
-  &__tableExpand {
+  &__noPaths {
+    padding: var(--tui-font-size-8);
+    font-style: italic;
+  }
+
+  &__pathGroup {
+    flex-grow: 1;
+    padding: var(--tui-gap-4);
+
     & > * + * {
-      margin: var(--tui-gap-2) 0 0;
+      &.tui-grid {
+        margin-top: var(--tui-gap-4);
+        padding-top: var(--tui-gap-4);
+        border-top: var(--tui-border-width-thin) solid
+          var(--tui-card-border-color);
+      }
     }
+  }
 
+  &__scaleValue {
     &-header {
-      @include tui-font-heading-small();
-    }
-
-    &-subHeader {
+      margin: 0;
       @include tui-font-heading-x-small();
     }
-  }
 
-  &__actions {
-    justify-content: space-between;
-    margin-bottom: var(--tui-gap-5);
-  }
-
-  &__header {
-    margin: 0;
-    @include tui-font-heading-small();
-  }
-
-  &__table {
-    margin-bottom: var(--tui-gap-5);
+    &-or {
+      width: 50%;
+      margin: 0;
+    }
   }
 }
 </style>

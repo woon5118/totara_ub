@@ -22,53 +22,62 @@
 
 <template>
   <div class="tui-competencyOverviewLinkedCourses">
-    <div class="tui-competencyOverviewLinkedCourses__header">
-      <h3 class="tui-competencyOverviewLinkedCourses__header_title">
+    <div class="tui-competencySummary__sectionHeader">
+      <h3 class="tui-competencySummary__sectionHeader-title">
         {{ $str('linked_courses', 'totara_competency') }}
       </h3>
       <a
         :href="editUrl"
-        class="tui-competencyOverviewLinkedCourses__header_edit"
+        class="tui-competencySummary__sectionHeader-edit"
         :title="$str('edit', 'moodle')"
       >
-        <FlexIcon icon="edit" size="200" :alt="$str('edit', 'moodle')" />
+        <EditIcon :size="200" :alt="$str('edit', 'moodle')" />
       </a>
     </div>
-    <div
-      v-if="noCoursesLinked"
-      class="tui-competencyOverviewLinkedCourses__noCourses"
+
+    <Table
+      :data="data"
+      :border-bottom-hidden="true"
+      :border-top-hidden="true"
+      :border-separator-hidden="true"
+      :hover-off="true"
+      :no-items-text="$str('no_courses_linked_yet', 'totara_competency')"
     >
-      {{ $str('no_courses_linked_yet', 'totara_competency') }}
-    </div>
-    <div v-else class="tui-competencyOverviewLinkedCourses__list">
-      <div
-        v-for="(course, id) in data"
-        :key="id"
-        class="tui-competencyOverviewLinkedCourses__list_row"
-      >
-        <span>
-          <a :href="courseUrl(course.course_id)" :title="course.fullname">
-            {{ course.fullname }}
+      <template v-slot:row="{ row }">
+        <Cell size="6" valign="center">
+          <a :href="courseUrl(row.course_id)">
+            {{ row.fullname }}
           </a>
-        </span>
-        <span v-if="course.is_mandatory">
-          {{ $str('mandatory', 'totara_competency') }}
-        </span>
-        <span v-else>
-          {{ $str('optional', 'totara_competency') }}
-        </span>
-      </div>
-    </div>
+        </Cell>
+        <Cell size="10" valign="center">
+          <span>
+            {{
+              $str(
+                row.is_mandatory ? 'mandatory' : 'optional',
+                'totara_competency'
+              )
+            }}
+          </span>
+        </Cell>
+      </template>
+    </Table>
   </div>
 </template>
 
 <script>
-import FlexIcon from 'totara_core/components/icons/FlexIcon';
-
-import LinkedCoursesQuery from 'totara_competency/graphql/linked_courses';
+// Components
+import Cell from 'totara_core/components/datatable/Cell';
+import EditIcon from 'totara_core/components/icons/common/Edit';
+import Table from 'totara_core/components/datatable/Table';
+// Query
+import linkedCoursesQuery from 'totara_competency/graphql/linked_courses';
 
 export default {
-  components: { FlexIcon },
+  components: {
+    Cell,
+    EditIcon,
+    Table,
+  },
 
   props: {
     competencyId: {
@@ -80,19 +89,25 @@ export default {
   data: function() {
     return {
       data: [],
+      editUrl: '',
     };
   },
 
-  computed: {
-    noCoursesLinked() {
-      return this.data.length === 0;
-    },
-
-    editUrl() {
-      return this.$url('/totara/competency/competency_edit.php', {
-        s: 'linkedcourses',
-        id: this.competencyId,
-      });
+  apollo: {
+    data: {
+      query: linkedCoursesQuery,
+      variables() {
+        return {
+          competency_id: this.competencyId,
+        };
+      },
+      update({ totara_competency_linked_courses: data }) {
+        this.editUrl = this.$url('/totara/competency/competency_edit.php', {
+          s: 'linkedcourses',
+          id: this.competencyId,
+        });
+        return data;
+      },
     },
   },
 
@@ -103,78 +118,8 @@ export default {
       });
     },
   },
-
-  apollo: {
-    data: {
-      query: LinkedCoursesQuery,
-      variables() {
-        return {
-          competency_id: this.competencyId,
-        };
-      },
-      update: data => data.totara_competency_linked_courses,
-    },
-  },
 };
 </script>
-
-<style lang="scss">
-.tui-competencyOverviewLinkedCourses {
-  padding-top: var(--tui-gap-4);
-  &__header {
-    margin-bottom: var(--tui-gap-2);
-    padding-bottom: var(--tui-gap-1);
-    border-bottom: 1px solid var(--tui-color-neutral-5);
-
-    &_title {
-      display: inline-block;
-      margin-top: auto;
-      margin-bottom: auto;
-      margin-left: var(--tui-gap-2);
-      font-weight: bold;
-      font-size: var(--tui-font-size-18);
-    }
-
-    &_edit {
-      float: right;
-      margin-bottom: var(--tui-gap-4);
-      padding-left: var(--tui-gap-2);
-    }
-  }
-
-  &__noCourses {
-    padding: var(--tui-font-size-8);
-    font-style: italic;
-  }
-
-  &__list {
-    padding: var(--tui-font-size-8) 0;
-    &_row {
-      display: flex;
-      flex-direction: column;
-      margin-bottom: var(--tui-font-size-12);
-      padding-right: var(--tui-font-size-8);
-      padding-bottom: var(--tui-font-size-12);
-      padding-left: var(--tui-font-size-8);
-      border-bottom: var(--tui-font-size-1) solid var(--tui-color-neutral-4);
-
-      &:first-child {
-        padding-top: var(--tui-font-size-12);
-        border-top: var(--tui-font-size-1) solid var(--tui-color-neutral-4);
-      }
-
-      span {
-        display: inline-block;
-        width: 50%;
-      }
-
-      @media (min-width: $tui-screen-sm) {
-        flex-direction: row;
-      }
-    }
-  }
-}
-</style>
 
 <lang-strings>
   {
@@ -183,8 +128,8 @@ export default {
     ],
     "totara_competency": [
       "linked_courses",
-      "no_courses_linked_yet",
       "mandatory",
+      "no_courses_linked_yet",
       "optional"
     ]
   }

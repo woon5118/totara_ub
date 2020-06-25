@@ -52,9 +52,9 @@ Feature: Test competencies can be user assigned
       | Self assignable no description | Not assigned       |                    |
 
     # Open the expandable content
-    When I follow "Self assignable"
-    Then I should see "Self assignable" in the ".tui-dataTableExpandableRow__content" "css_element"
-    And I should see "Description" in the ".tui-dataTableExpandableRow__content" "css_element"
+    When I toggle expanding row "1" of the tui datatable
+    Then I should see "Self assignable" under the expanded row of the tui datatable
+    And I should see "Description" under the expanded row of the tui datatable
     # Assert there is an html description that has actually rendered html
     And I should see "Find out more" in the "Find out more" "link"
 

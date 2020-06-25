@@ -49,7 +49,7 @@ Feature: User gets a message notification due to a configuration change in an as
     And I navigate to "Manage competencies" node in "Site administration > Competencies"
     And I click on "Competency Framework One" "link"
     And I click on "Comp2" "link"
-    And I click on ".tui-competencySummaryAchievementConfiguration__header_edit" "css_element"
+    And I click on ".tui-competencySummaryAchievementConfiguration .tui-competencySummary__sectionHeader-edit" "css_element"
     And I click on "[data-tw-editscalevaluepaths-criterion-action=\"toggle-detail\"]" "css_element"
     And I set the field "Complete all" to "1"
     And I click on "Apply changes" "button"

@@ -22,16 +22,10 @@
 
 <template>
   <div v-if="display" class="tui-noCompetencyAssignments">
-    <div class="alert alert-info alert-with-icon">
-      <!-- TODO bootstrap alert -->
-      <div class="alert-icon">
-        <FlexIcon icon="notification-info" />
-      </div>
-      <div
-        class="alert-message"
-        v-text="$str('no_competencies_assigned', 'totara_competency')"
-      />
-    </div>
+    <NotificationBanner
+      type="warning"
+      :message="$str('no_competencies_assigned', 'totara_competency')"
+    />
     <div class="tui-noCompetencyAssignments__search-competencies">
       <ActionLink
         :href="selfAssignmentUrl"
@@ -47,11 +41,14 @@
 </template>
 
 <script>
-import FlexIcon from 'totara_core/components/icons/FlexIcon';
 import ActionLink from 'totara_core/components/links/ActionLink';
+import NotificationBanner from 'totara_core/components/notifications/NotificationBanner';
 
 export default {
-  components: { FlexIcon, ActionLink },
+  components: {
+    ActionLink,
+    NotificationBanner,
+  },
 
   props: {
     display: {

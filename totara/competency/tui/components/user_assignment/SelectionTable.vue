@@ -22,48 +22,50 @@
 
 <template>
   <div>
-    <h3>
+    <h3 class="tui-competencySelfAssignment__header">
       {{ $str('competencies', 'totara_competency', totalCompetencyCount) }}
     </h3>
 
     <SelectTable
       :value="value"
-      :color-odd-rows="colorOddRows"
       :data="competencies"
       :expandable-rows="true"
       :select-all-enabled="true"
       @input="$emit('input', $event)"
     >
       <template v-slot:header-row>
-        <HeaderCell size="16">{{
-          $str('header_competency', 'totara_competency')
-        }}</HeaderCell>
-        <HeaderCell size="16">{{
-          $str('header_assignment_status', 'totara_competency')
-        }}</HeaderCell>
-        <HeaderCell size="16">{{
-          $str('header_assignment_reasons', 'totara_competency')
-        }}</HeaderCell>
+        <ExpandCell :header="true" />
+        <HeaderCell size="4">
+          {{ $str('header_competency', 'totara_competency') }}
+        </HeaderCell>
+        <HeaderCell size="4">
+          {{ $str('header_assignment_status', 'totara_competency') }}
+        </HeaderCell>
+        <HeaderCell size="4">
+          {{ $str('header_assignment_reasons', 'totara_competency') }}
+        </HeaderCell>
       </template>
 
-      <template v-slot:row="{ row, expand }">
+      <template v-slot:row="{ row, expand, expandState }">
+        <ExpandCell
+          :empty="!row.description"
+          :expand-state="expandState"
+          @click="expand()"
+        />
         <Cell
-          size="16"
+          size="4"
           :column-header="$str('header_competency', 'totara_competency')"
         >
-          <a v-if="row.description" href="#" @click.prevent="expand()">{{
-            row.display_name
-          }}</a>
-          <template v-else>{{ row.display_name }}</template>
+          {{ row.display_name }}
         </Cell>
         <Cell
-          size="16"
+          size="4"
           :column-header="$str('header_assignment_status', 'totara_competency')"
         >
           {{ getAssignmentStatus(row) }}
         </Cell>
         <Cell
-          size="16"
+          size="4"
           :column-header="
             row.user_assignments.length > 0
               ? $str('header_assignment_reasons', 'totara_competency')
@@ -82,9 +84,15 @@
       </template>
 
       <template v-slot:expand-content="{ row }">
-        <h3>{{ row.display_name }}</h3>
-        <h4>{{ $str('description', 'totara_competency') }}</h4>
-        <div v-html="row.description" />
+        <div class="tui-competencySelfAssignment__tableExpand">
+          <h4 class="tui-competencySelfAssignment__tableExpand-header">
+            {{ row.display_name }}
+          </h4>
+          <h5 class="tui-competencySelfAssignment__tableExpand-subHeader">
+            {{ $str('description', 'totara_competency') }}
+          </h5>
+          <div v-html="row.description" />
+        </div>
       </template>
     </SelectTable>
   </div>
@@ -92,12 +100,14 @@
 
 <script>
 import Cell from 'totara_core/components/datatable/Cell';
+import ExpandCell from 'totara_core/components/datatable/ExpandCell';
 import HeaderCell from 'totara_core/components/datatable/HeaderCell';
 import SelectTable from 'totara_core/components/datatable/SelectTable';
 
 export default {
   components: {
     Cell,
+    ExpandCell,
     HeaderCell,
     SelectTable,
   },
@@ -117,7 +127,6 @@ export default {
   },
   data() {
     return {
-      colorOddRows: false,
       page: 0,
     };
   },
