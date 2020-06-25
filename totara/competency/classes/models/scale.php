@@ -59,7 +59,7 @@ class scale extends model {
         parent::__construct($entity);
     }
 
-    public static function get_entity_class(): string {
+    protected static function get_entity_class(): string {
         return scale_entity::class;
     }
 

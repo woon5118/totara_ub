@@ -257,7 +257,7 @@ class core_orm_entity_model_testcase extends orm_entity_testcase {
  * @property-read string $entity_class
  */
 class sample_model extends model {
-    public static function get_entity_class(): string {
+    protected static function get_entity_class(): string {
         return sample_entity::class;
     }
 }

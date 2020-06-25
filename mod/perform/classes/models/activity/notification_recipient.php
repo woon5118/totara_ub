@@ -51,7 +51,7 @@ class notification_recipient extends model {
     /**
      * {@inheritdoc}
      */
-    public static function get_entity_class(): string {
+    protected static function get_entity_class(): string {
         return notification_recipient_entity::class;
     }
 

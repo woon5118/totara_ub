@@ -23,28 +23,73 @@
 
 namespace mod_perform\models\response;
 
-use \Closure;
-use \stdClass;
-
+use Closure;
 use core\collection;
-
+use mod_perform\models\activity\participant_instance;
 use mod_perform\models\activity\section;
 use mod_perform\models\activity\subject_instance;
-use mod_perform\models\activity\participant_instance;
+use stdClass;
 
 /**
  * Holds participants for a specific section in an activity.
  */
 class section_participants {
+
     /**
      * @var section parent section.
      */
     private $section;
 
     /**
-     * @var collection|participant_instance[] participant instances.
+     * @var collection|participant_section[] participant sections.
      */
-    private $participant_instances;
+    private $participant_sections;
+
+    /**
+     *  Default constructor.
+     *
+     * @param section $section parent section.
+     * @param collection|participant_section[] $participant_sections set of participant instances.
+     */
+    public function __construct(section $section, collection $participant_sections) {
+        $this->section = $section;
+        $this->participant_sections = $participant_sections;
+    }
+
+    /**
+     * Returns the parent section.
+     *
+     * @return section the parent section.
+     */
+    public function get_section(): section {
+        return $this->section;
+    }
+
+    /**
+     * Returns the associated participant sections.
+     *
+     * @return collection|participant_section[] participant sections.
+     */
+    public function get_participant_sections(): collection {
+        return $this->participant_sections;
+    }
+
+    /**
+     * Returns true if the current (or given) user can participate in
+     *
+     * @param int|null $user_id if omitted will check for the current user
+     * @return bool
+     */
+    public function can_participate(int $user_id = null): bool {
+        if (!$user_id) {
+            global $USER;
+            $user_id = (int) $USER->id;
+        }
+
+        return $this->participant_sections->find(function (participant_section $item) use ($user_id) {
+            return (int) $item->participant_instance->participant_id === $user_id;
+        }) !== null;
+    }
 
     /**
      * Formulates sections and their participants for a target activity subject
@@ -61,9 +106,12 @@ class section_participants {
                 Closure::fromCallable([self::class, 'create_from_participant_instance']),
                 collection::new([])
             )
+            ->sort(function ($a, $b) {
+                return $a->section->sort_order <=> $b->section->sort_order;
+            })
             ->map(
                 function (stdClass $raw): section_participants {
-                    return new section_participants($raw->section, $raw->participant_instances);
+                    return new section_participants($raw->section, $raw->participant_sections);
                 }
             );
     }
@@ -74,8 +122,7 @@ class section_participants {
      *
      * @param collection|stdClass[] $by_sections mapping of section ids to section
      *        and participant details.
-     * @param participant_instance $subject_instance target subject instance.
-     *
+     * @param participant_instance $participant_instance
      * @return collection|stdClass[] the updated section mappings.
      */
     private static function create_from_participant_instance(
@@ -87,9 +134,9 @@ class section_participants {
 
             $raw = $by_sections->item($section->id) ?? (object) [
                 'section' => $section,
-                'participant_instances' => collection::new([])
+                'participant_sections' => collection::new([])
             ];
-            $raw->participant_instances->append($participant_instance);
+            $raw->participant_sections->append($participant_section);
 
             $by_sections->set($raw, $section->id);
         }
@@ -97,32 +144,4 @@ class section_participants {
         return $by_sections;
     }
 
-    /**
-     *  Default constructor.
-     *
-     * @param section $section parent section.
-     * @param collection $participant_instances set of participant instances.
-     */
-    public function __construct(section $section, collection $participant_instances) {
-        $this->section = $section;
-        $this->participant_instances = $participant_instances;
-    }
-
-    /**
-     * Returns the parent section.
-     *
-     * @return section the parent section.
-     */
-    public function get_section(): section {
-        return $this->section;
-    }
-
-    /**
-     * Returns the associated participant instances.
-     *
-     * @return collection|participant_instance[] participant instances.
-     */
-    public function get_participant_instances(): collection {
-        return $this->participant_instances;
-    }
 }

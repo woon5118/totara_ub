@@ -23,6 +23,7 @@
 
 namespace mod_perform\webapi\resolver\type;
 
+use coding_exception;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
 
@@ -40,19 +41,17 @@ class subject_sections implements type_resolver {
      */
     public static function resolve(string $field, $source, array $args, execution_context $ec) {
         if (!$source instanceof subject_sections_model) {
-            throw new \coding_exception(__METHOD__ . ' requires a subject sections model');
+            throw new coding_exception(__METHOD__ . ' requires a subject sections model');
         }
 
         switch ($field) {
             case 'subject':
                 return $source->get_subject_instance();
-
             case 'sections':
                 return $source->get_sections();
-
             default:
                 $err = "Unknown field '$field' requested in subject sections type resolver";
-                throw new \coding_exception($err);
+                throw new coding_exception($err);
         }
     }
 }

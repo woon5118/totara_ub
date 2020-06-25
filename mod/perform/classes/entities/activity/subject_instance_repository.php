@@ -27,4 +27,21 @@ use core\orm\entity\repository;
 
 class subject_instance_repository extends repository {
 
+    /**
+     * Filter by an activity_id
+     *
+     * @param int $activity_id
+     * @return $this
+     */
+    public function filter_by_activity_id(int $activity_id): self {
+        // Only filter if the
+        if ($this->has_join(track_user_assignment::TABLE, 'fbai_tua')
+            && $this->has_join(track::TABLE, 'fbai_tr')) {
+            debugging('This filter function has already been applied to this builder instance.', DEBUG_DEVELOPER);
+        }
+        return $this->join([track_user_assignment::TABLE, 'fbai_tua'], 'track_user_assignment_id', 'id')
+            ->join([track::TABLE, 'fbai_tr'], '"fbai_tua".track_id', 'id')
+            ->where('"fbai_tr".activity_id', $activity_id);
+    }
+
 }

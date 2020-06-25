@@ -23,14 +23,13 @@
  */
 
 use core\collection;
-
-use mod_perform\expand_task;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
+use mod_perform\expand_task;
 use mod_perform\models\activity\section_element;
 use mod_perform\models\activity\subject_instance;
+use mod_perform\models\response\participant_section;
 use mod_perform\models\response\section_participants;
 use mod_perform\task\service\subject_instance_creation;
-
 use totara_core\relationship\resolvers\subject;
 use totara_job\job_assignment;
 use totara_job\relationship\resolvers\appraiser;
@@ -56,16 +55,17 @@ class mod_perform_section_participants_model_testcase extends advanced_testcase 
             $section = $sections->item($mapping->get_section()->id) ?? null;
             $this->assertNotNull($section, 'unknown section in mapping');
 
-            $participant_instances = $mapping->get_participant_instances();
+            $participant_sections = $mapping->get_participant_sections();
             $this->assertEquals(
                 $relationships->count(),
-                $participant_instances->count(),
+                $participant_sections->count(),
                 'wrong participant instance count'
             );
 
-            foreach ($participant_instances as $participant_instance) {
-                $user_id = $participant_instance->participant_id;
-                $relationship = $participant_instance->core_relationship->name;
+            foreach ($participant_sections as $participant_section) {
+                $this->assertInstanceOf(participant_section::class, $participant_section);
+                $user_id = $participant_section->participant_instance->participant_id;
+                $relationship = $participant_section->participant_instance->core_relationship->name;
 
                 $expected = $relationships->item($user_id) ?? null;
                 $this->assertNotNull($expected, 'unknown participant in mapping');

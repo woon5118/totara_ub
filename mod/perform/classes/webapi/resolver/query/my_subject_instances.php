@@ -25,14 +25,14 @@ namespace mod_perform\webapi\resolver\query;
 
 use core\entities\user;
 use core\webapi\execution_context;
-use core\webapi\query_resolver;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
+use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
 use mod_perform\data_providers\activity\subject_instance_for_participant as subject_instance_data_provider;
 use mod_perform\util;
 
-class subject_instances implements query_resolver, has_middleware {
+class my_subject_instances implements query_resolver, has_middleware {
     /**
      * {@inheritdoc}
      */

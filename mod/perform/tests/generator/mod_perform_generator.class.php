@@ -507,6 +507,7 @@ class mod_perform_generator extends component_generator_base {
         $activities = [];
         for ($i = 0; $i < $configuration->get_number_of_activities(); $i++) {
             [$name, $type] = $activity_name_generator->generate();
+
             $data = [
                 'activity_name' => $name,
                 'activity_type' => $type,
@@ -514,6 +515,11 @@ class mod_perform_generator extends component_generator_base {
             ];
 
             $activity = $this->create_activity_in_container($data);
+
+            if ($configuration->get_number_of_sections_per_activity() > 1) {
+                $activity->get_settings()->update([activity_setting::MULTISECTION => true]);
+            }
+
             for ($k = 0; $k < $configuration->get_number_of_sections_per_activity(); $k++) {
                 $section = $this->create_section($activity, ['title' => $activity->name . ' section ' . $k]);
                 foreach ($configuration->get_relationships_per_section() as $relationship_class) {

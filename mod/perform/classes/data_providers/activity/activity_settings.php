@@ -23,8 +23,8 @@
 
 namespace mod_perform\data_providers\activity;
 
+use coding_exception;
 use core\collection;
-
 use mod_perform\entities\activity\activity_setting as activity_setting_entity;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\activity_setting;
@@ -33,23 +33,31 @@ use mod_perform\models\activity\activity_setting;
  * Handles groups of performance activity settings.
  */
 class activity_settings {
+
     /**
      * @var activity parent activity.
      */
-    private $activity = null;
+    private $activity;
 
     /**
-     * @var collection settings.
+     * @var collection|activity_setting[]|null settings.
      */
     private $items = null;
 
     /**
-     * Default constructor.
-     *
      * @param activity $parent parent activity.
+     * @param collection|null $settings optionally can pass already loaded instances if preloaded
      */
-    public function __construct(activity $parent) {
+    public function __construct(activity $parent, collection $settings = null) {
         $this->activity = $parent;
+        if ($settings && $settings->count() > 0) {
+            foreach ($settings as $setting) {
+                if (!$setting instanceof activity_setting) {
+                    throw new coding_exception('Expected a collection of activity_setting model instances');
+                }
+            }
+            $this->items = $settings;
+        }
     }
 
     /**

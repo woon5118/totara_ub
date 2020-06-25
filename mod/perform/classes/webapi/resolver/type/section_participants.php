@@ -23,36 +23,37 @@
 
 namespace mod_perform\webapi\resolver\type;
 
+use coding_exception;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
-
 use mod_perform\models\response\section_participants as section_participants_model;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Maps the section_participants model class into a GraphQL mod_perform_section_participants
- * type.
+ * Maps the section_participants model class into a GraphQL mod_perform_section_participants type.
  */
 class section_participants implements type_resolver {
+
     /**
      * {@inheritdoc}
      */
     public static function resolve(string $field, $source, array $args, execution_context $ec) {
         if (!$source instanceof section_participants_model) {
-            throw new \coding_exception(__METHOD__ . ' requires a section participants model');
+            throw new coding_exception(__METHOD__ . ' requires a section participants model');
         }
 
         switch ($field) {
+            case 'can_participate':
+                return $source->can_participate();
             case 'section':
                 return $source->get_section();
-
-            case 'participants':
-                return $source->get_participant_instances();
-
+            case 'participant_sections':
+                return $source->get_participant_sections();
             default:
                 $err = "Unknown field '$field' requested in section participants type resolver";
-                throw new \coding_exception($err);
+                throw new coding_exception($err);
         }
     }
+
 }

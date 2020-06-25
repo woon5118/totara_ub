@@ -28,7 +28,6 @@ use core\collection;
 use core\entities\user;
 use core\orm\entity\model;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
-use mod_perform\entities\activity\participant_section as participant_section_entity;
 use mod_perform\models\response\participant_section;
 use mod_perform\state\participant_instance\participant_instance_availability;
 use mod_perform\state\participant_instance\participant_instance_progress;
@@ -46,11 +45,11 @@ use totara_core\relationship\relationship as relationship_model;
  * @property-read int $participant_id
  * @property-read subject_instance $subject_instance
  * @property-read int $subject_instance_id
- * @property-read collection|participant_section_entity[] $participant_sections
+ * @property-read collection|participant_section[] $participant_sections
  * @property-read string $progress_status internal name of current progress state
  * @property-read participant_instance_progress|state $progress_state Current progress state
  * @property-read participant_instance_availability|state $availability_state Current availability state
- * @property-read string $core_relationship The core relationship
+ * @property-read relationship_model $core_relationship The core relationship
  */
 class participant_instance extends model {
 
@@ -67,6 +66,7 @@ class participant_instance extends model {
         'availability',
         'participant_id',
         'subject_instance_id',
+        'core_relationship_id',
     ];
 
     protected $model_accessor_whitelist = [
@@ -77,9 +77,10 @@ class participant_instance extends model {
         'participant',
         'core_relationship',
         'participant_sections',
+        'is_for_current_user'
     ];
 
-    public static function get_entity_class(): string {
+    protected static function get_entity_class(): string {
         return participant_instance_entity::class;
     }
 
@@ -164,6 +165,17 @@ class participant_instance extends model {
      */
     public function get_availability_state(): state {
         return $this->get_state(participant_instance_availability::get_type());
+    }
+
+    /**
+     * Returns true of this participant instance is for the current user
+     *
+     * @return bool
+     */
+    public function get_is_for_current_user(): bool {
+        global $USER;
+
+        return $this->participant_id == $USER->id;
     }
 
 }

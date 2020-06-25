@@ -24,6 +24,7 @@
 namespace mod_perform\data_providers\activity;
 
 use core\collection;
+use core\orm\entity\repository;
 use core\orm\query\builder;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\entities\activity\filters\subject_instance_id;
@@ -105,14 +106,20 @@ class subject_instance_for_participant {
         $repo = subject_instance_entity::repository()
             ->as('si')
             ->with('subject_user')
-            ->with('track.activity')
+            ->with('track.activity.settings')
+            ->with([
+                'participant_instances' => function (repository $repository) {
+                    $repository->with('participant_sections.section')
+                        ->with('core_relationship.resolvers')
+                        ->with('participant_user');
+                }
+            ])
             ->join([track_user_assignment_entity::TABLE, 'tua'], 'track_user_assignment_id', 'id')
             ->join([track_entity::TABLE, 't'], 'tua.track_id', 'id')
             ->join([activity_entity::TABLE, 'a'], 't.activity_id', 'id')
             ->join('course', 'a.course', 'id')
             ->where_raw($totara_visibility_sql, $totara_visibility_params)
             // Eager loaded relationship resolvers because they are returned in the subject instance gql query
-            ->with('participant_instances.core_relationship.resolvers')
             ->where_exists($this->get_target_participant_exists())
             // Newest subject instances at the top of the list
             ->order_by('si.created_at', 'desc')

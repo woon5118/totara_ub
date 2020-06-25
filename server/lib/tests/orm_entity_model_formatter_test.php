@@ -152,7 +152,7 @@ class sample_formatted_model extends model {
         'collection'
     ];
 
-    public static function get_entity_class(): string {
+    protected static function get_entity_class(): string {
         return sample_entity::class;
     }
 

@@ -102,7 +102,7 @@ class participant_section extends model {
     /**
      * @inheritDoc
      */
-    public static function get_entity_class(): string {
+    protected static function get_entity_class(): string {
         return participant_section_entity::class;
     }
 

@@ -1,0 +1,296 @@
+<!--
+  This file is part of Totara Learn
+
+  Copyright (C) 2020 onwards Totara Learning Solutions LTD
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+  @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
+  @package mod_perform
+-->
+<template>
+  <div class="tui-performUserActivityListSections">
+    <div
+      v-for="subjectSection in subjectSectionsSubset"
+      :key="subjectSection.section.id"
+      class="tui-performUserActivityListSection"
+    >
+      <h3
+        v-if="isMultiSectionActive"
+        class="tui-performUserActivityListSection__header"
+      >
+        <Button
+          v-if="
+            subjectSection.canParticipate &&
+              currentUserHasMultipleRelationships(subjectSection)
+          "
+          :styleclass="{ transparent: true }"
+          :text="subjectSection.section.display_title"
+          @click.prevent="showRelationshipSelector(subjectSection)"
+        />
+        <a
+          v-else-if="subjectSection.canParticipate"
+          :href="
+            $url(viewUrl, {
+              participant_section_id: getFirstSectionIdToParticipate(
+                subjectSection
+              ),
+            })
+          "
+        >
+          {{ subjectSection.section.display_title }}
+        </a>
+        <template v-else>
+          {{ subjectSection.section.display_title }}
+        </template>
+      </h3>
+
+      <Table
+        :data="subjectSection.participation"
+        class="tui-performUserActivityListSection__data"
+        :border-bottom-hidden="true"
+        :border-separator-hidden="true"
+        :border-top-hidden="!isMultiSectionActive"
+      >
+        <template v-slot:row="{ row }">
+          <Cell
+            size="4"
+            :column-header="
+              $str('user_activities_status_header_relationship', 'mod_perform')
+            "
+            :heavy="row.isForCurrentUser"
+            valign="center"
+          >
+            {{ row.relationship }}
+          </Cell>
+          <Cell
+            size="4"
+            :column-header="
+              $str('user_activities_subject_header', 'mod_perform')
+            "
+            :heavy="row.isForCurrentUser"
+            valign="center"
+          >
+            <Avatar
+              :src="row.participant.profileimageurlsmall"
+              :alt="row.participant.fullname"
+              size="xsmall"
+              class="tui-bulkManualRatingRateUsersList__avatar"
+            />
+            <template v-if="row.isForCurrentUser">
+              {{ $str('user_activities_you', 'mod_perform') }}
+            </template>
+
+            <template v-else>
+              {{ row.participant.fullname }}
+            </template>
+          </Cell>
+          <Cell
+            size="4"
+            :column-header="
+              $str(
+                'user_activities_status_header_section_progress',
+                'mod_perform'
+              )
+            "
+            :heavy="row.isForCurrentUser"
+            valign="center"
+          >
+            {{ getStatusText(row.progressStatus) }}
+          </Cell>
+        </template>
+      </Table>
+    </div>
+
+    <RelationshipSelector
+      v-model="isRelationshipSelectorShown"
+      :current-user-id="currentUserId"
+      :participant-sections="selectedParticipantSections"
+      :is-for-section="true"
+      :subject-user="subjectUser"
+      :view-url="viewUrl"
+    />
+  </div>
+</template>
+
+<script>
+import Avatar from 'totara_core/components/avatar/Avatar';
+import Button from 'totara_core/components/buttons/Button';
+import Cell from 'totara_core/components/datatable/Cell';
+import RelationshipSelector from 'mod_perform/components/user_activities/list/RelationshipSelector';
+import Table from 'totara_core/components/datatable/Table';
+
+export default {
+  components: {
+    Avatar,
+    Button,
+    Cell,
+    RelationshipSelector,
+    Table,
+  },
+
+  props: {
+    /**
+     * The id of the logged in user.
+     */
+    currentUserId: {
+      required: true,
+      type: Number,
+    },
+    isMultiSectionActive: {
+      required: true,
+      type: Boolean,
+    },
+    subjectSections: {
+      required: true,
+      type: Array,
+    },
+    viewUrl: {
+      required: true,
+      type: String,
+    },
+    subjectUser: {
+      required: true,
+      type: Object,
+    },
+  },
+
+  data() {
+    return {
+      isRelationshipSelectorShown: false,
+      selectedParticipantSections: [],
+    };
+  },
+
+  computed: {
+    /**
+     * Reduce the data set to the required values for this template
+     *
+     */
+    subjectSectionsSubset() {
+      const items = this.subjectSections.map(item => {
+        const participation = item.participant_sections.map(
+          participantSection => {
+            return {
+              id: participantSection.id,
+              isForCurrentUser:
+                participantSection.participant_instance.is_for_current_user,
+              participant: participantSection.participant_instance.participant,
+              progressStatus: participantSection.progress_status,
+              relationship:
+                participantSection.participant_instance.core_relationship.name,
+              relationship_id:
+                participantSection.participant_instance.core_relationship.id,
+            };
+          }
+        );
+
+        return {
+          canParticipate: item.can_participate,
+          participation: participation,
+          participant_sections: item.participant_sections,
+          section: item.section,
+        };
+      });
+
+      return items;
+    },
+  },
+
+  methods: {
+    /**
+     * Get the localized status text for a particular user activity.
+     *
+     * @param status {String}
+     * @returns {string}
+     */
+    getStatusText(status) {
+      switch (status) {
+        case 'NOT_STARTED':
+          return this.$str('user_activities_status_not_started', 'mod_perform');
+        case 'IN_PROGRESS':
+          return this.$str('user_activities_status_in_progress', 'mod_perform');
+        case 'COMPLETE':
+          return this.$str('user_activities_status_complete', 'mod_perform');
+        default:
+          return '';
+      }
+    },
+
+    /**
+     * Get the first section id, if relationship id is supplied it
+     * will get the first section for the user
+     *
+     * @param {Object} subjectSection
+     * @return {Int}
+     */
+    getFirstSectionIdToParticipate(subjectSection) {
+      let item = subjectSection.participation.find(
+        item => item.isForCurrentUser
+      );
+      if (!item) {
+        throw 'Section for user not found.';
+      }
+      return item.id;
+    },
+
+    /**
+     * Does the logged in user have multiple relationships to the subject on an activity.
+     *
+     * @param {Object} subjectSection
+     * @return {Boolean}
+     */
+    currentUserHasMultipleRelationships(subjectSection) {
+      return this.filterToCurrentUser(subjectSection.participation).length > 1;
+    },
+
+    /**
+     * Open the relationship selector modal.
+     *
+     * @param {Object} subjectSection
+     */
+    showRelationshipSelector(subjectSection) {
+      this.selectedParticipantSections = [];
+      subjectSection.participant_sections.forEach(participantSection => {
+        this.selectedParticipantSections.push(participantSection);
+      });
+      this.isRelationshipSelectorShown = true;
+    },
+
+    /**
+     * Filter participant instances to only ones that belong to the logged in user.
+     *
+     * @param {Object[]} participantSections
+     * @return {Object[]}
+     */
+    filterToCurrentUser(participantSections) {
+      return participantSections.filter(ps => ps.isForCurrentUser);
+    },
+  },
+};
+</script>
+
+<lang-strings>
+  {
+    "mod_perform": [
+      "user_activities_status_complete",
+      "user_activities_status_header_section_progress",
+      "user_activities_status_header_relationship",
+      "user_activities_status_in_progress",
+      "user_activities_status_not_started",
+      "user_activities_subject_header",
+      "user_activities_you"
+    ]
+  }
+</lang-strings>

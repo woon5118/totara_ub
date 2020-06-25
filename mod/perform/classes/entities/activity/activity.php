@@ -45,6 +45,7 @@ use core\orm\entity\relations\has_one;
  * @property-read collection|section[] $sections
  * @property-read collection|section[] $sections_ordered
  * @property-read collection|track[] $tracks
+ * @property-read collection|activity_setting[] $settings
  * @property-read activity_type $type
  *
  * @method static activity_repository repository()
@@ -94,4 +95,14 @@ class activity extends entity {
     public function type(): has_one {
         return $this->has_one(activity_type::class, 'id', 'type_id');
     }
+
+    /**
+     * Get the settings for this activity
+     *
+     * @return has_many
+     */
+    public function settings(): has_many {
+        return $this->has_many(activity_setting::class, 'activity_id');
+    }
+
 }

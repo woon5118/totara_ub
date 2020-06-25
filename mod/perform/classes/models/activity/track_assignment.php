@@ -55,7 +55,7 @@ class track_assignment extends model {
     /**
      * {@inheritdoc}
      */
-    public static function get_entity_class(): string {
+    protected static function get_entity_class(): string {
         return track_assignment_entity::class;
     }
 

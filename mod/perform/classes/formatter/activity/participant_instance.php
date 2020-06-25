@@ -42,6 +42,7 @@ class participant_instance extends entity_model_formatter {
         return [
             'id' => null,
             'participant' => null,
+            'is_for_current_user' => null,
             'progress_status' => null,
             'core_relationship' => null,
             'participant_id' => null,

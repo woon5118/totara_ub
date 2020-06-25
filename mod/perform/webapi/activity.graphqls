@@ -83,6 +83,7 @@ Details about a participant_instance
 type mod_perform_participant_instance {
   id: core_id!
   participant_id: core_id!
+  is_for_current_user: Boolean!
   participant_sections: [mod_perform_participant_section!]!
   participant: core_user!
   progress_status: mod_perform_participant_instance_status!
@@ -102,8 +103,9 @@ type mod_perform_subject_sections {
 Details about an activity section and their participants
 """
 type mod_perform_section_participants {
+  can_participate: Boolean!
   section: mod_perform_section!
-  participants: [mod_perform_participant_instance!]!
+  participant_sections: [mod_perform_participant_section!]!
 }
 
 """
@@ -151,7 +153,7 @@ input toggle_activity_setting {
 Activity subject instance filters
 """
 input mod_perform_subject_instance_filters {
-  about: [mod_perform_subject_instance_about_filter]
+  about: [mod_perform_subject_instance_about_filter!]!
 }
 
 enum mod_perform_subject_instance_about_filter {
@@ -181,11 +183,12 @@ extend type Query {
   mod_perform_element_plugins: [mod_perform_element_plugin!]!
 
   """
-  A list of all performance activities a user is participating in
+  A list of all performance activities the current user is participating in.
+  This can be filtered to show only the ones the user is the subject in and
+  the ones the user is not the subject in but participating.
   """
-  mod_perform_subject_instances(
-    participant_id: core_id
-    filters: mod_perform_subject_instance_filters
+  mod_perform_my_subject_instances(
+    filters: mod_perform_subject_instance_filters!
   ): [mod_perform_subject_sections!]!
 
   """

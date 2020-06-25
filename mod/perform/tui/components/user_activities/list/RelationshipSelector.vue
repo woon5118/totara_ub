@@ -1,0 +1,273 @@
+<!--
+  This file is part of Totara Learn
+
+  Copyright (C) 2020 onwards Totara Learning Solutions LTD
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+  @author Jaron Steenson <jaron.steenson@totaralearning.com>
+  @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
+  @package mod_perform
+-->
+<template>
+  <ModalPresenter :open="value" @request-close="hideRelationshipSelector">
+    <Modal :aria-labelledby="$id('select-relationship-title')">
+      <ModalContent
+        v-if="participantSections.length > 0"
+        :title="$str('select_relationship_to_respond_as_title', 'mod_perform')"
+        :title-id="$id('select-relationship-title')"
+        :close-button="false"
+      >
+        <p :id="$id('select-relationship-explanation')">
+          {{
+            $str(
+              'select_relationship_to_respond_as_explanation',
+              'mod_perform',
+              subjectUser.fullname
+            )
+          }}
+        </p>
+
+        <RadioGroup
+          v-model="relationshipToRespondAs"
+          required
+          :aria-labelledby="$id('select-relationship-explanation')"
+        >
+          <Radio
+            v-for="respondAsOption in respondAsOptions"
+            :key="respondAsOption.participant_instance.core_relationship.id"
+            :value="respondAsOption.participant_instance.core_relationship.id"
+            name="relationshipToRespondAs"
+          >
+            {{
+              $str('select_relationship_to_respond_as_option', 'mod_perform', {
+                relationship_name:
+                  respondAsOption.participant_instance.core_relationship.name,
+                progress_status: getStatusText(respondAsOption),
+              })
+            }}
+          </Radio>
+        </RadioGroup>
+
+        <template v-slot:buttons>
+          <Button
+            :styleclass="{ primary: true }"
+            :text="$str('continue', 'moodle')"
+            :disabled="!relationshipToRespondAs || relationshipConfirmed"
+            @click="confirmRelationshipSelection"
+          />
+          <CancelButton
+            :disabled="relationshipConfirmed"
+            @click="hideRelationshipSelector"
+          />
+        </template>
+      </ModalContent>
+    </Modal>
+  </ModalPresenter>
+</template>
+<script>
+import Button from 'totara_core/components/buttons/Button';
+import CancelButton from 'totara_core/components/buttons/Cancel';
+import Modal from 'totara_core/components/modal/Modal';
+import ModalContent from 'totara_core/components/modal/ModalContent';
+import ModalPresenter from 'totara_core/components/modal/ModalPresenter';
+import Radio from 'totara_core/components/form/Radio';
+import RadioGroup from 'totara_core/components/form/RadioGroup';
+
+export default {
+  components: {
+    Button,
+    CancelButton,
+    Modal,
+    ModalContent,
+    ModalPresenter,
+    Radio,
+    RadioGroup,
+  },
+
+  props: {
+    /**
+     * The id of the logged in user.
+     */
+    currentUserId: {
+      required: true,
+      type: Number,
+    },
+    participantSections: {
+      type: Array,
+      required: true,
+    },
+    isForSection: {
+      type: Boolean,
+      required: true,
+    },
+    subjectUser: {
+      type: Object,
+      required: true,
+    },
+    viewUrl: {
+      type: String,
+      required: true,
+    },
+    value: {
+      type: Boolean,
+      required: true,
+    },
+  },
+
+  data() {
+    return {
+      relationshipToRespondAs: null,
+      relationshipConfirmed: false,
+    };
+  },
+
+  computed: {
+    respondAsOptions() {
+      if (this.participantSections.length === 0) {
+        return [];
+      }
+
+      return this.filterToCurrentUser(this.participantSections);
+    },
+
+    /**
+     * This will find the first section for the current user which
+     * matches the selected relationship
+     */
+    selectedParticipantSection() {
+      return this.getFirstSectionToParticipate(
+        this.participantSections,
+        this.relationshipToRespondAs
+      );
+    },
+  },
+
+  methods: {
+    /**
+     * Get the first section, if relationship id is supplied it will get the first section
+     * for the user with the given relationship
+     *
+     * @param {Array} participantSections
+     * @param {Int} relationship_id optional relationship,
+     * @return {Object|Null} returns a participant_section object
+     */
+    getFirstSectionToParticipate(participantSections, relationship_id) {
+      relationship_id =
+        typeof relationship_id !== 'undefined' ? relationship_id : null;
+
+      let foundSection = null;
+
+      participantSections.forEach(participantSection => {
+        const instance = participantSection.participant_instance;
+        const isForCurrentUser = instance.is_for_current_user;
+        const instanceRelationshipId = instance.core_relationship.id;
+
+        if (
+          foundSection === null &&
+          isForCurrentUser === true &&
+          (relationship_id === null ||
+            relationship_id === instanceRelationshipId)
+        ) {
+          foundSection = participantSection;
+        }
+      });
+
+      return foundSection;
+    },
+
+    /**
+     * Close the relationship selector modal.
+     */
+    hideRelationshipSelector() {
+      this.relationshipToRespondAs = null;
+      this.relationshipConfirmed = false;
+
+      this.$emit('input', false);
+    },
+
+    /**
+     * When the relationship selection is confirmed redirect to the
+     * participant instance of the relationship selected
+     */
+    confirmRelationshipSelection() {
+      this.relationshipConfirmed = true;
+      if (!this.selectedParticipantSection) {
+        throw 'Selected section not found';
+      }
+      window.location = this.$url(this.viewUrl, {
+        participant_section_id: this.selectedParticipantSection.id,
+      });
+    },
+
+    /**
+     * Get the localized status text for a particular user activity.
+     *
+     * @param {Object} participantSection
+     * @returns {string}
+     */
+    getStatusText(participantSection) {
+      let progressStatus = this.isForSection
+        ? participantSection.progress_status
+        : participantSection.participant_instance.progress_status;
+
+      switch (progressStatus) {
+        case 'NOT_STARTED':
+          return this.$str('user_activities_status_not_started', 'mod_perform');
+        case 'IN_PROGRESS':
+          return this.$str('user_activities_status_in_progress', 'mod_perform');
+        case 'COMPLETE':
+          return this.$str('user_activities_status_complete', 'mod_perform');
+        default:
+          return '';
+      }
+    },
+
+    /**
+     * Filter participant instances to only ones that belong to the logged in user.
+     * This also makes sure only one record per relationship is returned.
+     *
+     * @param {Object[]} participantSections
+     * @return {Object[]}
+     */
+    filterToCurrentUser(participantSections) {
+      let relationships = [];
+      return participantSections.filter(ps => {
+        const isForCurrentUser = ps.participant_instance.is_for_current_user;
+        const relationship = ps.participant_instance.core_relationship.name;
+        if (isForCurrentUser && relationships.indexOf(relationship) === -1) {
+          relationships.push(relationship);
+          return true;
+        }
+        return false;
+      });
+    },
+  },
+};
+</script>
+<lang-strings>
+  {
+    "mod_perform": [
+      "select_relationship_to_respond_as_explanation",
+      "select_relationship_to_respond_as_option",
+      "select_relationship_to_respond_as_title",
+      "user_activities_status_complete",
+      "user_activities_status_in_progress",
+      "user_activities_status_not_started"
+    ],
+    "moodle": [
+      "continue"
+    ]
+  }
+</lang-strings>

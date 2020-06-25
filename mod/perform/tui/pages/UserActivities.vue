@@ -54,7 +54,7 @@
 <script>
 import Tab from 'totara_core/components/tabs/Tab';
 import Tabs from 'totara_core/components/tabs/Tabs';
-import UserActivityList from 'mod_perform/components/user_activities/UserActivityList';
+import UserActivityList from 'mod_perform/components/user_activities/list/Activities';
 import { notify } from 'totara_core/notifications';
 import { NOTIFICATION_DURATION } from 'mod_perform/constants';
 

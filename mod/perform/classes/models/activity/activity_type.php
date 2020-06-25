@@ -64,7 +64,7 @@ class activity_type extends model {
     /**
      * {@inheritdoc}
      */
-    public static function get_entity_class(): string {
+    protected static function get_entity_class(): string {
         return activity_type_entity::class;
     }
 

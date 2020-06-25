@@ -1,0 +1,53 @@
+query mod_perform_my_subject_instances(
+  $filters: mod_perform_subject_instance_filters!
+) {
+  mod_perform_my_subject_instances(filters: $filters) {
+    subject {
+      id
+      progress_status
+      activity {
+        name
+        settings {
+          multisection
+        }
+      }
+      subject_user {
+        fullname
+      }
+      participant_instances {
+        id
+        participant_id
+        progress_status
+        core_relationship {
+          id
+          name
+        }
+      }
+    }
+    sections {
+      can_participate
+      section {
+        id
+        display_title
+        sort_order
+      }
+      participant_sections {
+        id
+        progress_status
+        participant_instance {
+          progress_status
+          participant_id
+          participant {
+            fullname
+            profileimageurlsmall
+          }
+          core_relationship {
+            id
+            name
+          }
+          is_for_current_user
+        }
+      }
+    }
+  }
+}

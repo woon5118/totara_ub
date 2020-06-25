@@ -121,7 +121,7 @@ class track extends model {
     /**
      * {@inheritdoc}
      */
-    public static function get_entity_class(): string {
+    protected static function get_entity_class(): string {
         return track_entity::class;
     }
 

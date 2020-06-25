@@ -528,7 +528,10 @@ class activity extends model {
      * @return activity_settings the settings.
      */
     public function get_settings(): activity_settings {
-        return new activity_settings($this);
+        // Preloading settings to save queries in case the relation got eager loaded
+        $settings = $this->entity->settings;
+
+        return new activity_settings($this, $settings->map_to(activity_setting::class));
     }
 
     /**

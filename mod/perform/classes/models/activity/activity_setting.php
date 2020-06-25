@@ -58,7 +58,7 @@ class activity_setting extends model {
     /**
      * {@inheritdoc}
      */
-    public static function get_entity_class(): string {
+    protected static function get_entity_class(): string {
         return activity_setting_entity::class;
     }
 

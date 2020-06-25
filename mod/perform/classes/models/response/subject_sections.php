@@ -24,14 +24,13 @@
 namespace mod_perform\models\response;
 
 use core\collection;
-
 use mod_perform\models\activity\subject_instance;
-use mod_perform\models\response\section_participants;
 
 /**
  * Holds the related activity sections for a specific subject.
  */
 class subject_sections {
+
     /**
      * @var subject_instance parent subject.
      */
@@ -43,28 +42,6 @@ class subject_sections {
     private $sections;
 
     /**
-     * Given a set of subject instances, returns sections and their participants
-     * related to those subject instances (and by extension, activities since 1
-     * activity => one subject instance).
-     *
-     * @param collection|subject_instance[] $subject_instances target subject
-     *        instances.
-     *
-     * @return collection|section_participants[] section participant objects.
-     */
-    public static function create_from_subject_instances(collection $subject_instances): collection {
-        return $subject_instances
-            ->map(
-                function (subject_instance $subject): subject_sections {
-                    $sections = section_participants::create_from_subject_instance($subject);
-                    return new subject_sections($subject, $sections);
-                }
-            );
-    }
-
-    /**
-     *  Default constructor.
-     *
      * @param subject_instance $subject_instance parent subject.
      * @param collection|section_participants[] $sections associated sections.
      */
@@ -74,9 +51,9 @@ class subject_sections {
     }
 
     /**
-     * Returns the parent subject.
+     * Returns the subject instance this belongs to
      *
-     * @return section the parent subject.
+     * @return subject_instance the parent subject.
      */
     public function get_subject_instance(): subject_instance {
         return $this->subject;
@@ -90,4 +67,23 @@ class subject_sections {
     public function get_sections(): collection {
         return $this->sections;
     }
+
+    /**
+     * Given a set of subject instances, returns sections and their participants
+     * related to those subject instances (and by extension, activities since 1
+     * activity => one subject instance).
+     *
+     * @param collection|subject_instance[] $subject_instances target subject instances.
+     * @return collection|section_participants[] section participant objects.
+     */
+    public static function create_from_subject_instances(collection $subject_instances): collection {
+        return $subject_instances
+            ->map(
+                function (subject_instance $subject): subject_sections {
+                    $sections = section_participants::create_from_subject_instance($subject);
+                    return new subject_sections($subject, $sections);
+                }
+            );
+    }
+
 }
