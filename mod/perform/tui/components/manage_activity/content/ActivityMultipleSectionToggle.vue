@@ -37,7 +37,9 @@
 
     <ConfirmationModal
       :open="modalOpen"
+      :close-button="false"
       :title="$str('multiple_sections_confirmation_title', 'mod_perform')"
+      :confirm-button-text="$str('modal_confirm', 'mod_perform')"
       @confirm="modalConfirmed"
       @cancel="modalCancelled"
     >
@@ -149,6 +151,7 @@ export default {
       "multiple_sections_enabled_confirmation_text",
       "multiple_sections_confirmation_title",
       "multiple_sections_label_help",
+      "modal_confirm",
       "toast_success_activity_update",
       "toast_error_generic_update"
     ],

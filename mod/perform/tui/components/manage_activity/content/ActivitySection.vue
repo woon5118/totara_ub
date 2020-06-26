@@ -32,9 +32,9 @@
     >
       <Grid v-if="!autoSave && !editMode">
         <GridItem :units="10">
-          <h3 class="tui-performActivitySection__title">
+          <h4 class="tui-performActivitySection__title">
             {{ savedSection.display_title }}
-          </h3>
+          </h4>
         </GridItem>
         <GridItem :units="2">
           <div class="tui-performActivitySection__action-buttons">
@@ -116,13 +116,14 @@
       class="tui-performActivitySection__saveButtons"
     >
       <Button
-        :styleclass="{ primary: true }"
+        :styleclass="{ primary: true, small: true }"
         :text="$str('activity_section_done', 'mod_perform')"
         :disabled="isSaving || !editMode || !hasChanges"
         @click="trySave"
       />
       <Button
         :text="$str('cancel')"
+        :styleclass="{ small: true }"
         :disabled="isSaving || !editMode"
         @click="resetSectionChanges"
       />
@@ -132,15 +133,16 @@
       :class="[autoSave && 'tui-performActivitySection__content-autoSave']"
     >
       <Grid :stack-at="700">
-        <GridItem grows :units="10">
+        <GridItem grows :units="9">
           <ActivitySectionElementSummary
             v-if="section.section_elements_summary"
             :elements-summary="section.section_elements_summary"
           />
         </GridItem>
-        <GridItem grows :units="2">
+        <GridItem grows :units="3">
           <div class="tui-performActivitySection__content-buttons">
             <Button
+              :styleclass="{ small: true }"
               :text="$str('edit_content_elements', 'mod_perform')"
               :aria-label="$str('edit_content_elements', 'mod_perform')"
               @click="modalOpen = true"

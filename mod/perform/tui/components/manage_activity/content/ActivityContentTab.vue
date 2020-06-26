@@ -62,7 +62,6 @@
       :disabled="isAdding"
       :aria-label="$str('add_section', 'mod_perform')"
       :text="$str('add_section', 'mod_perform')"
-      :styleclass="{ small: true }"
       @click="addSection(null)"
     >
       <AddIcon size="200" />

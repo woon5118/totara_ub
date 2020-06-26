@@ -75,7 +75,7 @@
     }
 
     &-info {
-      @include tui-font-hint();
+      font-style: italic;
     }
 
     &-heading {
