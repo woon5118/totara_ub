@@ -68,8 +68,8 @@ class totara_reportbuilder_chartjs_testcase extends advanced_testcase {
         $graph = $this->init_graph($rid);
 
         $data = $graph->render();
-        $this->assertNotContains('Zero length axis', $data);
-        $this->assertContains($user1->username, $data);
-        $this->assertContains($user2->username, $data);
+        $this->assertStringNotContainsString('Zero length axis', $data);
+        $this->assertStringContainsString($user1->username, $data);
+        $this->assertStringContainsString($user2->username, $data);
     }
 }
