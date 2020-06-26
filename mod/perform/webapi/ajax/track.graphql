@@ -3,7 +3,6 @@ query mod_perform_track($track_id: param_integer!) {
     id
     description
     status
-    subject_instance_generation_control_is_enabled
     subject_instance_generation
     schedule_is_open
     schedule_is_fixed
@@ -51,7 +50,6 @@ query mod_perform_track($track_id: param_integer!) {
     }
     repeating_is_limited
     repeating_limit
-    subject_instance_generation_control_is_enabled
     subject_instance_generation
     assignments {
       type

@@ -26,22 +26,54 @@
     </h4>
     <FormScope path="additionalSettings">
       <FormRow
-        :label="$str('schedule_multiple_job_assignments', 'mod_perform')"
-        :helpmsg="$str('schedule_multiple_job_assignments_help', 'mod_perform')"
+        :label="$str('schedule_job_assignment_based_instances', 'mod_perform')"
       >
-        <FormRadioGroup name="multiple_job_assignment">
-          <Radio :value="ONE_PER_SUBJECT">{{
-            $str(
-              'schedule_multiple_job_assignments_single_subject_multiple_job',
-              'mod_perform'
-            )
-          }}</Radio>
-          <Radio :value="ONE_PER_JOB">{{
-            $str(
-              'schedule_multiple_job_assignments_single_subject_per_job',
-              'mod_perform'
-            )
-          }}</Radio>
+        <FormRadioGroup name="subject_instance_generation">
+          <Radio
+            :value="SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT"
+            :aria-describedby="$id('aria-describedby')"
+            >{{
+              $str(
+                'schedule_job_assignment_based_instances_disabled',
+                'mod_perform'
+              )
+            }}</Radio
+          >
+          <FormRowDetails :id="$id('aria-describedby')">
+            <span
+              class="tui-performAssignmentScheduleAdditionalSettings__radio_description"
+            >
+              {{
+                $str(
+                  'schedule_job_assignment_based_instances_disabled_description',
+                  'mod_perform'
+                )
+              }}
+            </span>
+          </FormRowDetails>
+          <Radio
+            :value="SUBJECT_INSTANCE_GENERATION_ONE_PER_JOB"
+            :aria-describedby="$id('aria-describedby')"
+            class="tui-performAssignmentSchedule__radio"
+            >{{
+              $str(
+                'schedule_job_assignment_based_instances_enabled',
+                'mod_perform'
+              )
+            }}</Radio
+          >
+          <FormRowDetails :id="$id('aria-describedby')">
+            <span
+              class="tui-performAssignmentScheduleAdditionalSettings__radio_description"
+            >
+              {{
+                $str(
+                  'schedule_job_assignment_based_instances_enabled_description',
+                  'mod_perform'
+                )
+              }}
+            </span>
+          </FormRowDetails>
         </FormRadioGroup>
       </FormRow>
     </FormScope>
@@ -53,22 +85,25 @@ import {
   FormRadioGroup,
   FormRow,
 } from 'totara_core/components/uniform';
+import FormRowDetails from 'totara_core/components/form/FormRowDetails';
 import Radio from 'totara_core/components/form/Radio';
-
-const ONE_PER_SUBJECT = 'ONE_PER_SUBJECT';
-const ONE_PER_JOB = 'ONE_PER_JOB';
+import {
+  SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT,
+  SUBJECT_INSTANCE_GENERATION_ONE_PER_JOB,
+} from 'mod_perform/constants';
 
 export default {
   components: {
     FormRadioGroup,
     FormRow,
+    FormRowDetails,
     FormScope,
     Radio,
   },
   data() {
     return {
-      ONE_PER_SUBJECT,
-      ONE_PER_JOB,
+      SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT,
+      SUBJECT_INSTANCE_GENERATION_ONE_PER_JOB,
     };
   },
 };
@@ -77,10 +112,11 @@ export default {
   {
     "mod_perform": [
       "schedule_additional_settings",
-      "schedule_multiple_job_assignments",
-      "schedule_multiple_job_assignments_help",
-      "schedule_multiple_job_assignments_single_subject_multiple_job",
-      "schedule_multiple_job_assignments_single_subject_per_job"
+      "schedule_job_assignment_based_instances",
+      "schedule_job_assignment_based_instances_disabled",
+      "schedule_job_assignment_based_instances_disabled_description",
+      "schedule_job_assignment_based_instances_enabled",
+      "schedule_job_assignment_based_instances_enabled_description"
     ]
   }
 

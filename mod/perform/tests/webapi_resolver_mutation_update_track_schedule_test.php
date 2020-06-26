@@ -22,6 +22,7 @@
  * @category test
  */
 
+use mod_perform\constants;
 use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
@@ -50,6 +51,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_testcase
                 ],
                 'due_date_is_enabled' => false,
                 'repeating_is_enabled' => false,
+                'subject_instance_generation' => constants::SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT,
             ],
         ];
 
@@ -72,6 +74,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_testcase
                 ],
                 'due_date_is_enabled' => false,
                 'repeating_is_enabled' => false,
+                'subject_instance_generation' => constants::SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT,
             ],
         ];
 

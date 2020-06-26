@@ -109,7 +109,6 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
     }
 
     public function test_expand_single_assignment_based_on_job_assignment(): void {
-        set_config('totara_job_allowmultiplejobs', 1);
         $test_data = $this->prepare_assignments(track_entity::SUBJECT_INSTANCE_GENERATION_ONE_PER_JOB);
 
         $track1_id = $test_data->track1->id;
@@ -149,7 +148,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, false, $job_assignment_id);
     }
 
-    public function test_job_assignment_is_not_used_without_multiple_job_assignments_enabled(): void {
+    public function test_job_assignment_is_used_without_multiple_job_assignments_enabled(): void {
         set_config('totara_job_allowmultiplejobs', 0);
         $test_data = $this->prepare_assignments(track_entity::SUBJECT_INSTANCE_GENERATION_ONE_PER_JOB);
 
@@ -177,8 +176,8 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
 
         (new expand_task())->expand_single($test_data->assignment1->id);
 
-        // Should have been expanded, but not with a job assignment id
-        $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, false, null);
+        // Should have been expanded, but with he job assignment id
+        $this->assert_track_has_user_assignments($track1_id, $test_data->user1->id, false, $job_assignment_id);
     }
 
     public function test_expand_single_assignment_based_on_job_with_no_job_assignments(): void {

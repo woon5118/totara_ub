@@ -59,7 +59,7 @@
         :schedule-is-limited-fixed="!scheduleIsOpen && scheduleIsFixed"
       />
 
-      <AdditionalScheduleSettings v-if="isGenerationControlEnabled" />
+      <AdditionalScheduleSettings />
 
       <div class="tui-performAssignmentSchedule__action">
         <ButtonGroup>
@@ -144,8 +144,6 @@ export default {
         this.track.repeating_type || SCHEDULE_REPEATING_TYPE_AFTER_CREATION,
       isSaving: false,
       initialValues: this.getInitialValues(this.track),
-      isGenerationControlEnabled: this.track
-        .subject_instance_generation_control_is_enabled,
       dynamicDateSettingComponent: {
         name: this.getDynamicCustomSettingComponent(),
         data: this.getDynamicCustomSettingData(this.track),
@@ -272,7 +270,7 @@ export default {
           from_unit: due_date_offset_unit,
         },
         additionalSettings: {
-          multiple_job_assignment: track.subject_instance_generation,
+          subject_instance_generation: track.subject_instance_generation,
         },
 
         // Repeating initial settings
@@ -508,10 +506,8 @@ export default {
      */
     getAdditionalSettingsVariables(form) {
       const gql = {};
-      if (this.isGenerationControlEnabled) {
-        gql.subject_instance_generation =
-          form.additionalSettings.multiple_job_assignment;
-      }
+      gql.subject_instance_generation =
+        form.additionalSettings.subject_instance_generation;
 
       return gql;
     },

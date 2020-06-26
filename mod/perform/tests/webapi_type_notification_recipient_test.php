@@ -69,7 +69,7 @@ class mod_perform_webapi_type_notification_recipient_testcase extends advanced_t
         [$notification, $section_relationship, $context] = $this->create_test_data();
 
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessageRegExp("/notification recipient/");
+        $this->expectExceptionMessageMatches("/notification recipient/");
         $this->resolve_graphql_type(self::TYPE, 'id', new \stdClass());
     }
 
@@ -84,7 +84,7 @@ class mod_perform_webapi_type_notification_recipient_testcase extends advanced_t
         $field = 'unknown';
 
         $this->expectException(moodle_exception::class);
-        $this->expectExceptionMessageRegExp("/$field/");
+        $this->expectExceptionMessageMatches("/$field/");
         $this->resolve_graphql_type(self::TYPE, $field, $recipient, [], $context);
     }
 

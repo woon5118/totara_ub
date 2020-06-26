@@ -21,8 +21,10 @@
  * @package mod_perform
  * @category test
  */
-use totara_webapi\phpunit\webapi_phpunit_helper;
+
+use mod_perform\constants;
 use mod_perform\entities\activity\track as track_entity;
+use totara_webapi\phpunit\webapi_phpunit_helper;
 
 require_once(__DIR__ . '/generator/activity_generator_configuration.php');
 require_once(__DIR__ . '/webapi_resolver_mutation_update_track_schedule.php');
@@ -55,6 +57,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_fixed_te
                 ],
                 'due_date_is_enabled' => false,
                 'repeating_is_enabled' => false,
+                'subject_instance_generation' => constants::SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT,
             ],
         ];
 
@@ -104,6 +107,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_fixed_te
         $affected_track->repeating_offset = null;
         $affected_track->repeating_is_limited = 0;
         $affected_track->repeating_limit = null;
+        $affected_track->subject_instance_generation = track_entity::SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT;
 
         $after_tracks = $DB->get_records('perform_track', [], 'id');
         unset($after_tracks[$this->track1_id]->updated_at);
@@ -127,6 +131,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_fixed_te
                 ],
                 'due_date_is_enabled' => false,
                 'repeating_is_enabled' => false,
+                'subject_instance_generation' => constants::SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT,
             ],
         ];
 

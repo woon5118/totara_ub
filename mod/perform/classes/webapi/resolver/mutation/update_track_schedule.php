@@ -138,12 +138,12 @@ class update_track_schedule implements mutation_resolver, has_middleware {
         }
 
         // Subject instance generation method.
-        if ($track->get_subject_instance_generation_control_is_enabled()) {
-            $subject_instance_generation_methods = array_flip(track::get_subject_instance_generation_methods());
-            $track->set_subject_instance_generation(
-                $subject_instance_generation_methods[$track_schedule['subject_instance_generation']]
-            );
-        }
+        $track->set_subject_instance_generation(
+            track::mapped_value_from_string($track_schedule['subject_instance_generation'],
+                track::get_subject_instance_generation_methods(),
+                'instance generation method'
+            )
+        );
 
         $track->update();
 
@@ -226,9 +226,7 @@ class update_track_schedule implements mutation_resolver, has_middleware {
         }
 
         // Subject instance generation.
-        if ($track->get_subject_instance_generation_control_is_enabled()) {
-            $required_fields[] = 'subject_instance_generation';
-        }
+        $required_fields[] = 'subject_instance_generation';
 
         // Check for missing fields.
         foreach ($required_fields as $required_field) {

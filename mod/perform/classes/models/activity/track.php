@@ -46,7 +46,6 @@ use moodle_exception;
  * @property-read int $activity_id
  * @property-read string $description
  * @property-read int $status
- * @property-read bool $subject_instance_generation_control_is_enabled
  * @property-read int|null $subject_instance_generation
  * @property-read bool $schedule_is_open
  * @property-read bool $schedule_is_fixed
@@ -104,7 +103,6 @@ class track extends model {
     protected $model_accessor_whitelist = [
         'activity',
         'assignments',
-        'subject_instance_generation_control_is_enabled',
         'subject_instance_generation',
         'schedule_fixed_to',
         'repeating_type',
@@ -720,9 +718,6 @@ class track extends model {
      * @return string|null
      */
     protected function get_subject_instance_generation(): ?string {
-        if (!$this->get_subject_instance_generation_control_is_enabled()) {
-            return null;
-        }
         return track_model::mapped_value_to_string(
             $this->entity->subject_instance_generation,
             track_model::get_subject_instance_generation_methods(),
@@ -853,10 +848,6 @@ class track extends model {
      * @return bool
      */
     public function is_per_job_subject_instance_generation(): bool {
-        if (!$this->get_subject_instance_generation_control_is_enabled()) {
-            return false;
-        }
-
         return (int) $this->entity->subject_instance_generation === track_entity::SUBJECT_INSTANCE_GENERATION_ONE_PER_JOB;
     }
 
