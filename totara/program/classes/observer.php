@@ -25,7 +25,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/totara/program/program_assignments.class.php'); // Needed for ASSIGNTYPE_XXX constants.
 require_once($CFG->dirroot . '/totara/program/lib.php');
 
 class totara_program_observer {
@@ -185,7 +184,7 @@ class totara_program_observer {
                  LEFT JOIN {prog_user_assignment} pua
                         ON pua.assignmentid = pa.id
                        AND pua.userid = :uid
-                     WHERE pa.assignmenttype = " . ASSIGNTYPE_POSITION . "
+                     WHERE pa.assignmenttype = " . \totara_program\assignment\position::ASSIGNTYPE_POSITION . "
                        AND pua.id IS NULL
                        AND ( p.id = :pid
                              OR
@@ -207,7 +206,7 @@ class totara_program_observer {
                  LEFT JOIN {prog_user_assignment} pua
                         ON pua.assignmentid = pa.id
                        AND pua.userid = :uid
-                     WHERE pa.assignmenttype = " . ASSIGNTYPE_ORGANISATION . "
+                     WHERE pa.assignmenttype = " . \totara_program\assignment\organisation::ASSIGNTYPE_ORGANISATION . "
                        AND pua.id IS NULL
                        AND ( o.id = :oid
                              OR
@@ -229,7 +228,7 @@ class totara_program_observer {
                  LEFT JOIN {prog_user_assignment} pua
                         ON pua.assignmentid = pa.id
                        AND pua.userid = :uid
-                     WHERE pa.assignmenttype = " . ASSIGNTYPE_MANAGERJA . "
+                     WHERE pa.assignmenttype = " . \totara_program\assignment\manager::ASSIGNTYPE_MANAGER . "
                        AND pua.id IS NULL
                        AND ( ja.id = :mjaid
                              OR
@@ -249,7 +248,7 @@ class totara_program_observer {
                 LEFT JOIN {prog_user_assignment} pua
                        ON pua.assignmentid = pa.id
                       AND pua.userid = :uid
-                    WHERE pa.assignmenttype = ' . ASSIGNTYPE_COHORT . '
+                    WHERE pa.assignmenttype = ' . \totara_program\assignment\cohort::ASSIGNTYPE_COHORT . '
                       AND pua.id IS NULL
                       AND EXISTS ( SELECT 1
                                      FROM {cohort_members} cm
@@ -343,7 +342,7 @@ class totara_program_observer {
         $transaction = $DB->start_delegated_transaction();
 
         // Delete all the individual assignments for the user.
-        $DB->delete_records('prog_assignment', array('assignmenttype' => ASSIGNTYPE_INDIVIDUAL, 'assignmenttypeid' => $userid));
+        $DB->delete_records('prog_assignment', array('assignmenttype' => \totara_program\assignment\individual::ASSIGNTYPE_INDIVIDUAL, 'assignmenttypeid' => $userid));
 
         // Delete any future assignments for the user.
         $DB->delete_records('prog_future_user_assignment', array('userid' => $userid));
@@ -460,7 +459,7 @@ class totara_program_observer {
                                 FROM {prog_assignment}
                                WHERE assignmenttype = :assignmenttypecohort
                                  AND assignmenttypeid = :cohortid)";
-        $DB->execute($sql, array('assignmenttypecohort' => ASSIGNTYPE_COHORT, 'cohortid' => $cohortid));
+        $DB->execute($sql, array('assignmenttypecohort' => \totara_program\assignment\cohort::ASSIGNTYPE_COHORT, 'cohortid' => $cohortid));
 
         return true;
     }
@@ -506,7 +505,7 @@ class totara_program_observer {
             }
 
             if (!empty($directmanagerjaidstoprocess) || !empty($indirectmanagerjaidstoprocess)) {
-                $params = array('assignmenttypemanager' => ASSIGNTYPE_MANAGERJA);
+                $params = array('assignmenttypemanager' => \totara_program\assignment\manager::ASSIGNTYPE_MANAGER);
                 $managersql = "";
 
                 if (!empty($directmanagerjaidstoprocess)) {
@@ -552,7 +551,7 @@ class totara_program_observer {
                                         FROM {prog_assignment}
                                        WHERE assignmenttype = :assignmenttypeposition
                                          AND assignmenttypeid {$insql})";
-                $params['assignmenttypeposition'] = ASSIGNTYPE_POSITION;
+                $params['assignmenttypeposition'] = \totara_program\assignment\position::ASSIGNTYPE_POSITION;
                 $DB->execute($sql, $params);
 
                 // Now do the same check for programs where includechildren is set.
@@ -577,7 +576,7 @@ class totara_program_observer {
                                        WHERE assignmenttype = :assignmenttypeposition
                                          AND includechildren = 1
                                          AND assignmenttypeid {$insql})";
-                    $params['assignmenttypeposition'] = ASSIGNTYPE_POSITION;
+                    $params['assignmenttypeposition'] = \totara_program\assignment\position::ASSIGNTYPE_POSITION;
                     $DB->execute($sql, $params);
                 }
             }
@@ -601,7 +600,7 @@ class totara_program_observer {
                                         FROM {prog_assignment}
                                        WHERE assignmenttype = :assignmenttypeorganisation
                                          AND assignmenttypeid {$insql})";
-                $params['assignmenttypeorganisation'] = ASSIGNTYPE_ORGANISATION;
+                $params['assignmenttypeorganisation'] = \totara_program\assignment\organisation::ASSIGNTYPE_ORGANISATION;
                 $DB->execute($sql, $params);
 
                 // Now do the same check for programs where includechildren is set.
@@ -626,7 +625,7 @@ class totara_program_observer {
                                        WHERE assignmenttype = :assignmenttypeorganisation
                                          AND includechildren = 1
                                          AND assignmenttypeid {$insql})";
-                    $params['assignmenttypeorganisation'] = ASSIGNTYPE_ORGANISATION;
+                    $params['assignmenttypeorganisation'] = \totara_program\assignment\organisation::ASSIGNTYPE_ORGANISATION;
                     $DB->execute($sql, $params);
                 }
             }
