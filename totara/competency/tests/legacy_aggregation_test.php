@@ -44,7 +44,7 @@ use totara_criteria\entities\criterion as criterion_entity;
 
 class totara_competency_legacy_aggregation_testcase extends advanced_testcase {
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
 
         global $CFG;

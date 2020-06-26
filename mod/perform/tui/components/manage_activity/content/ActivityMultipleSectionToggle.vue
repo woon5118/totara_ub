@@ -21,20 +21,18 @@
 -->
 
 <template>
-  <div>
-    <Label>
-      {{ $str('multiple_sections_enabled', 'mod_perform') }}
-    </Label>
-    <HelpIcon
-      desc-id="activity_multisection"
-      :helpmsg="$str('multiple_sections_label_help', 'mod_perform')"
-    />
+  <div class="tui-activityMultipleSectionToggle">
     <ToggleButton
       v-model="value"
-      :disabled="isSaving"
-      text=""
+      :text="$str('multiple_sections_enabled', 'mod_perform')"
       @input="valueChanged"
-    />
+    >
+      <template v-slot:icon>
+        <InfoIconButton :aria-label="$str('help', 'moodle')">
+          {{ $str('multiple_sections_label_help', 'mod_perform') }}
+        </InfoIconButton>
+      </template>
+    </ToggleButton>
 
     <ConfirmationModal
       :open="modalOpen"
@@ -55,14 +53,14 @@
 import { notify } from 'totara_core/notifications';
 import { NOTIFICATION_DURATION } from 'mod_perform/constants';
 import ConfirmationModal from 'totara_core/components/modal/ConfirmationModal';
-import HelpIcon from 'totara_core/components/form/HelpIcon';
+import InfoIconButton from 'totara_core/components/buttons/InfoIconButton';
 import ToggleActivityMultiSectionSettingMutation from 'mod_perform/graphql/toggle_activity_multisection_setting.graphql';
 import ToggleButton from 'totara_core/components/buttons/ToggleButton';
 
 export default {
   components: {
     ConfirmationModal,
-    HelpIcon,
+    InfoIconButton,
     ToggleButton,
   },
 
@@ -152,6 +150,9 @@ export default {
       "multiple_sections_label_help",
       "toast_success_activity_update",
       "toast_error_generic_update"
+    ],
+    "moodle": [
+      "help"
     ]
   }
 </lang-strings>

@@ -35,7 +35,7 @@ class behat_totara_tui_adder extends behat_base {
      * @Given /^I save my selections and close the adder$/
      */
     public function i_save_my_selections_and_close_the_adder(): void {
-        behat_hooks::set_step_readonly(true);
+        behat_hooks::set_step_readonly(false);
         $this->find('css', '.tui-adder__actions .tui-formBtn--prim')->click();
     }
 
@@ -45,8 +45,8 @@ class behat_totara_tui_adder extends behat_base {
      * @Given /^I discard my selections and close the adder$/
      */
     public function i_discard_my_selections_and_close_the_adder(): void {
-        behat_hooks::set_step_readonly(true);
-        $this->find('css', '.tui-modalContent__header-close')->click();
+        behat_hooks::set_step_readonly(false);
+        $this->execute("behat_general::i_click_on_in_the", ['Cancel', 'button', '.tui-adder__actions', 'css_element']);
     }
 
     /**
@@ -167,7 +167,7 @@ class behat_totara_tui_adder extends behat_base {
      * @param string $column the targetted column in the picker table.
      */
     public function i_toggle_the_adder_picker_entry_with_for(string $value, string $column): void {
-        behat_hooks::set_step_readonly(true);
+        behat_hooks::set_step_readonly(false);
         $this->toggle_entry_with_value($this->picker(), $value, $column);
     }
 
@@ -229,7 +229,7 @@ class behat_totara_tui_adder extends behat_base {
      * @param string $column the targetted column in the basket table.
      */
     public function i_toggle_the_adder_basket_entry_with_for(string $value, string $column): void {
-        behat_hooks::set_step_readonly(true);
+        behat_hooks::set_step_readonly(false);
         $this->toggle_entry_with_value($this->basket(), $value, $column);
     }
 

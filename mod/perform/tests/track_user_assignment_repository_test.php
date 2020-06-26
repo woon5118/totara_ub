@@ -39,7 +39,7 @@ class mod_perform_track_user_assignment_repository_testcase extends advanced_tes
         return $this->getDataGenerator()->get_plugin_generator('mod_perform');
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         $this->setAdminUser();
     }

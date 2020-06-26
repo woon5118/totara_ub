@@ -28,7 +28,7 @@ use totara_criteria\evaluators\item_evaluator_user_source;
 
 class totara_criteria_course_item_evaluator_testcase extends advanced_testcase {
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
         global $CFG;
         require_once($CFG->dirroot . '/completion/completion_completion.php');

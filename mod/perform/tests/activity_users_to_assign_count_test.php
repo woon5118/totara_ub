@@ -41,12 +41,12 @@ class mod_perform_activity_users_to_assign_count_testcase extends advanced_testc
      */
     protected $generator;
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         self::setAdminUser();
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         parent::tearDown();
         $this->generator = null;
     }

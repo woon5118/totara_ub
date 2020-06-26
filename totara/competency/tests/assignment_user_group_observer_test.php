@@ -33,7 +33,7 @@ use totara_job\job_assignment;
  */
 class totara_competency_assignment_user_group_observer_testcase extends advanced_testcase {
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
 
         global $CFG;

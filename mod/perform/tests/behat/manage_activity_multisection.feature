@@ -53,7 +53,7 @@ Feature: Managing an activity with multiple sections
 
   Scenario: Manage activity - toggle multisection states
     When I navigate to the edit perform activities page for activity "Participant set up test"
-    And I click on ".tui-toggleBtn" "css_element"
+    And I click on ".tui-toggleBtn__ui" "css_element"
     Then I should see "All existing content will be grouped into the first section, along with the existing participant settings" in the tui modal
     And I confirm the tui confirmation modal
     Then I should see "Activity saved" in the tui "success" notification toast
@@ -107,7 +107,7 @@ Feature: Managing an activity with multiple sections
     And I should see "Section #2"
 
     # Multisection off => all sections merged into 1
-    When I click on ".tui-toggleBtn" "css_element"
+    When I click on ".tui-toggleBtn__ui" "css_element"
     Then I should see "All sections' content will be merged and section headings removed. Participant settings will be removed. This cannot be undone." in the tui modal
 
     When I confirm the tui confirmation modal
@@ -131,7 +131,7 @@ Feature: Managing an activity with multiple sections
     # for the first section to be created.
     When I click on "Submit" "button"
     And I close the tui notification toast
-    And I click on ".tui-toggleBtn" "css_element"
+    And I click on ".tui-toggleBtn__ui" "css_element"
     And I confirm the tui confirmation modal
     And I close the tui notification toast
     And I click on "Done" "button" in the ".tui-performActivitySection__saveButtons" "css_element"
@@ -147,7 +147,7 @@ Feature: Managing an activity with multiple sections
   Scenario: Manage activity - Add section.
     When I navigate to the edit perform activities page for activity "Participant set up test"
     Then "Add section" "button" should not be visible
-    When I click on ".tui-toggleBtn" "css_element"
+    When I click on ".tui-toggleBtn__ui" "css_element"
     Then I should see "All existing content will be grouped into the first section, along with the existing participant settings" in the tui modal
     When I confirm the tui confirmation modal
     And I close the tui notification toast
@@ -202,7 +202,7 @@ Feature: Managing an activity with multiple sections
   Scenario: Manage activity - Add section above and below
     When I navigate to the edit perform activities page for activity "Participant set up test"
     Then "Add section" "button" should not be visible
-    When I click on ".tui-toggleBtn" "css_element"
+    When I click on ".tui-toggleBtn__ui" "css_element"
     Then I should see "All existing content will be grouped into the first section, along with the existing participant settings" in the tui modal
     When I confirm the tui confirmation modal
     And I close the tui notification toast
@@ -246,7 +246,7 @@ Feature: Managing an activity with multiple sections
   Scenario: Manage activity - Edit the title for sections
     Given the multi-language content filter is enabled
     And I navigate to the edit perform activities page for activity "Participant set up test"
-    And I click on ".tui-toggleBtn" "css_element"
+    And I click on ".tui-toggleBtn__ui" "css_element"
     Then I should see "All existing content will be grouped into the first section, along with the existing participant settings" in the tui modal
     And I confirm the tui confirmation modal
 
@@ -289,7 +289,7 @@ Feature: Managing an activity with multiple sections
   Scenario: Delete a section
     When I navigate to the edit perform activities page for activity "Multiple section Activity2"
     Then "Add section" "button" should not be visible
-    When I click on ".tui-toggleBtn" "css_element"
+    When I click on ".tui-toggleBtn__ui" "css_element"
     Then I should see "All existing content will be grouped into the first section, along with the existing participant settings" in the tui modal
     When I confirm the tui confirmation modal
     And I close the tui notification toast

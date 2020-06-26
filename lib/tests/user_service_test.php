@@ -28,7 +28,7 @@ class core_user_service_testcase extends advanced_testcase {
 
     use \totara_core\phpunit\webservice_utils;
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         $this->setAdminUser();
     }

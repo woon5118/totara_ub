@@ -31,7 +31,7 @@ defined('MOODLE_INTERNAL') || die();
 
 class totara_core_basket_testcase extends advanced_testcase {
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
     }

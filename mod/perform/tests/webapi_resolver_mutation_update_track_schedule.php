@@ -36,7 +36,7 @@ abstract class mod_perform_webapi_resolver_mutation_update_track_schedule_base e
 
     protected $track1_id;
 
-    public function setUp() {
+    public function setUp(): void {
         global $DB;
 
         self::setAdminUser();
@@ -93,7 +93,7 @@ abstract class mod_perform_webapi_resolver_mutation_update_track_schedule_base e
         return [$date_dynamic_source, $dynamic_source_input];
     }
 
-    public function tearDown() {
+    public function tearDown(): void {
         $this->track1_id = null;
 
         parent::tearDown();

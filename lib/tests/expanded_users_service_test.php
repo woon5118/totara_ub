@@ -34,7 +34,7 @@ class core_expanded_users_service_testcase extends expanded_users_testcase {
 
     use webservice_utils;
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         $this->setAdminUser();
     }

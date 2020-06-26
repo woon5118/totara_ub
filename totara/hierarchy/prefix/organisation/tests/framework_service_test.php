@@ -28,7 +28,7 @@ class hierarchy_organisation_framework_service_testcase extends advanced_testcas
 
     use \totara_core\phpunit\webservice_utils;
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         $this->setAdminUser();
     }

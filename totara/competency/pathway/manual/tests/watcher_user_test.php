@@ -44,14 +44,14 @@ class watcher_user_testcase extends advanced_testcase {
      */
     protected $manager_user;
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         $this->generator = self::getDataGenerator()->get_plugin_generator('totara_competency');
         $this->staff_user = self::getDataGenerator()->create_user();
         $this->manager_user = self::getDataGenerator()->create_user();
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         parent::tearDown();
         $this->generator = null;
         $this->staff_user = null;

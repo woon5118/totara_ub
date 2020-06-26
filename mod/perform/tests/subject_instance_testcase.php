@@ -48,7 +48,7 @@ abstract class mod_perform_subject_instance_testcase extends advanced_testcase {
     /** @var subject_instance A user activity that doesn't actually exist in the database anymore */
     protected static $non_existing;
 
-    protected function setUp() {
+    protected function setUp(): void {
         self::$user = self::getDataGenerator()->create_user();
 
         self::create_user_activities(self::$user);
@@ -56,7 +56,7 @@ abstract class mod_perform_subject_instance_testcase extends advanced_testcase {
         self::setUser(self::$user);
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         parent::tearDown();
 
         self::$user = null;

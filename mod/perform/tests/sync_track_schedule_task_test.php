@@ -51,7 +51,7 @@ class mod_perform_sync_track_schedule_task_testcase extends advanced_testcase {
         return $this->getDataGenerator()->get_plugin_generator('mod_perform');
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         $this->setAdminUser();
     }

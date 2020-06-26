@@ -103,7 +103,7 @@ class totara_competency_notify_users_of_proficiency_change_test extends advanced
     /**
      * Setup users for test.
      */
-    protected function setUp() {
+    protected function setUp(): void {
         $generator = $this->getDataGenerator();
         $competency_generator = $generator->get_plugin_generator('totara_competency');
         $framework = $competency_generator->create_framework();
@@ -118,7 +118,7 @@ class totara_competency_notify_users_of_proficiency_change_test extends advanced
     /**
      * @inheritDoc
      */
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->user_count = null;
         $this->user_ids = null;
         $this->competency = null;

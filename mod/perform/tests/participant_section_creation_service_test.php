@@ -236,7 +236,7 @@ class mod_perform_participant_section_creation_service_testcase extends advanced
     /**
      * Setup test pre-conditions.
      */
-    protected function setUp() {
+    protected function setUp(): void {
         $this->setAdminUser();
         $this->activity_trees = [];
     }
@@ -418,7 +418,7 @@ class mod_perform_participant_section_creation_service_testcase extends advanced
     /**
      * Cleans class properties.
      */
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->activity_trees = null;
     }
 

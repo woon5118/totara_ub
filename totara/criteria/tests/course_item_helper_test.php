@@ -34,7 +34,7 @@ class course_item_helper_testcase extends advanced_testcase {
     const NUM_USERS = 5;
     const NUM_COURSES = 5;
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
         global $CFG;
         require_once($CFG->dirroot . '/completion/completion_completion.php');

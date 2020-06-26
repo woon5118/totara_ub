@@ -54,7 +54,7 @@ class totara_competency_userdata_testcase extends advanced_testcase {
      */
     private $scale_value;
 
-    protected function setUp() {
+    protected function setUp(): void {
         $this->competency = $this->generator()->create_competency();
         $this->scale_value = scale_value::repository()->order_by('id')->first();
 
@@ -65,7 +65,7 @@ class totara_competency_userdata_testcase extends advanced_testcase {
         $this->user2->achievements = $this->create_achievement_data($this->user2, 2);
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->user1 = null;
         $this->user2 = null;
         $this->competency = null;

@@ -51,7 +51,7 @@ class totara_competency_assignment_generator_testcase extends advanced_testcase 
         return $this->getDataGenerator()->get_plugin_generator('totara_competency');
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
     }
 

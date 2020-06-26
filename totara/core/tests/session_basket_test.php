@@ -36,7 +36,7 @@ class totara_core_session_basket_testcase extends advanced_testcase {
 
     private const BASKETS_KEY = 'baskets';
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
     }

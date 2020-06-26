@@ -123,8 +123,7 @@ Feature: Competency profile landing page - an overview of their progress towards
 
     When I am on a totara site
     And I log in as "user2"
-    And I am on profile page for user "user1"
-    And I click on "Competency profile" "link" in the ".userprofile" "css_element"
+    And I navigate to the competency profile of user "user1"
 
   @chartjs
   Scenario: View the charts and filter the competency charts

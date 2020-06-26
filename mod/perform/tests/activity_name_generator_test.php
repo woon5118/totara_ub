@@ -28,7 +28,7 @@
  */
 class mod_perform_activity_name_generator_testcase extends advanced_testcase {
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         global $CFG;
         require_once $CFG->dirroot.'/mod/perform/tests/generator/activity_name_generator.php';
 

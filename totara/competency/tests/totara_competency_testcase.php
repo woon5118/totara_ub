@@ -44,7 +44,7 @@ abstract class totara_competency_testcase extends advanced_testcase {
     /**
      * Setup before the test
      */
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
 
         $this->warpTime();
@@ -53,7 +53,7 @@ abstract class totara_competency_testcase extends advanced_testcase {
     /**
      * Clean up after each test
      */
-    protected function tearDown() {
+    protected function tearDown(): void {
         unset($this->time);
 
         parent::tearDown();

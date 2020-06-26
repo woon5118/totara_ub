@@ -41,7 +41,7 @@ class criteria_othercompetency_webapi_query_achievements_testcase extends totara
      */
     private $other_competency_items;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         parent::tearDown();
         $this->other_competency_items = null;
     }

@@ -74,8 +74,7 @@ Feature: Archive user assignments on competency details page and view archived a
 
   Scenario: Archive self-assigned and other-assigned competency as manager
     Given I log in as "teacher"
-    When I am on profile page for user "student"
-    And I click on "Competency profile" "link" in the ".userprofile" "css_element"
+    When I navigate to the competency profile of user "student"
     And I change the competency profile to list view
     And I click on "Comp 1" "link"
     And I select "Self-assigned" from the "select_assignment" singleselect
@@ -94,8 +93,7 @@ Feature: Archive user assignments on competency details page and view archived a
 
   Scenario: Hide Archive directly-assigned competency button for User profile
     Given I log in as "student"
-    When I am on profile page for user "student"
-    And I click on "Competency profile" "link" in the ".userprofile" "css_element"
+    When I navigate to the competency profile of user "student"
     And I change the competency profile to list view
     And I click on "Comp 1" "link"
     And I select "Directly assigned by Admin User (Manager)" from the "select_assignment" singleselect

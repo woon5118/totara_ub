@@ -380,7 +380,7 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
     /**
      * Cleans up test post-conditions.
      */
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->users_per_relationship = null;
         $this->core_relationships = null;
         $this->activity_trees = null;

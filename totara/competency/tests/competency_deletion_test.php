@@ -47,12 +47,12 @@ class totara_competency_competency_deletion_testcase extends advanced_testcase {
     /** @var \totara_competency\entities\competency */
     private $comp_2;
 
-    protected function setUp() {
+    protected function setUp(): void {
         $this->comp_1 = $this->generator()->create_competency('A');
         $this->comp_2 = $this->generator()->create_competency('B');
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->comp_1 = null;
         $this->comp_2 = null;
     }

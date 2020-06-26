@@ -36,7 +36,7 @@ class totara_competency_assignment_service_create_from_baskets_testcase extends 
 
     use \totara_core\phpunit\webservice_utils;
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         $this->setAdminUser();
     }

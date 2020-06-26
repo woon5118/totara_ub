@@ -31,7 +31,7 @@ class totara_competency_webapi_resolver_type_scale_value_testcase extends advanc
     /** @var scale_value $scale_value */
     protected $scale_value;
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
 
         $this->scale_value = new scale_value([
@@ -45,7 +45,7 @@ class totara_competency_webapi_resolver_type_scale_value_testcase extends advanc
         ]);
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         parent::tearDown();
 
         $this->scale_value = null;

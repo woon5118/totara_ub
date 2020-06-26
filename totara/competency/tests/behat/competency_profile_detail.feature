@@ -39,8 +39,7 @@ Feature: Competency profile detail page - an overview of their progress (or lack
 
   Scenario: I can navigate to the details page for a competency I am assigned to
     When I log in as "user"
-    And I am on profile page for user "user"
-    And I click on "Competency profile" "link" in the ".userprofile" "css_element"
+    And I navigate to the competency profile of user "user"
     And I change the competency profile to list view
     And I click on "Typing slow" "link"
 
@@ -57,8 +56,7 @@ Feature: Competency profile detail page - an overview of their progress (or lack
       | user | 1        | manager |
 
     When I log in as "manager"
-    And I am on profile page for user "user"
-    And I click on "Competency profile" "link" in the ".userprofile" "css_element"
+    And I navigate to the competency profile of user "user"
     And I change the competency profile to list view
     And I click on "Typing slow" "link"
 
@@ -75,9 +73,7 @@ Feature: Competency profile detail page - an overview of their progress (or lack
       | user | 1        | appraiser |
 
     When I log in as "appraiser"
-    And I am on profile page for user "user"
-    And I click on "Competency profile" "link" in the ".userprofile" "css_element"
-    And I wait for pending js
+    And I navigate to the competency profile of user "user"
     And I change the competency profile to list view
     And I click on "Typing slow" "link"
 

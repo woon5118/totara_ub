@@ -36,7 +36,7 @@ require_once(__DIR__ . '/pathway_manual_base_test.php');
 
 class pathway_manual_data_provider_user_rateable_competencies_testcase extends pathway_manual_base_testcase {
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         $this->setUser($this->user1->id);
     }

@@ -1,10 +1,9 @@
-@totara @perform @mod_perform
+@totara @perform @mod_perform @javascript
 Feature: Disable performance activities feature at site-level
 
   Background:
     When I log in as "admin"
 
-  @javascript
   Scenario: Disable in the advanced features page
     When I toggle open the admin quick access menu
     Then I should see "Activity Management" in the admin quick access menu
@@ -17,13 +16,13 @@ Feature: Disable performance activities feature at site-level
     Then I should not see "Activity Management" in the admin quick access menu
 
   Scenario: Hide performance activities link in users profile
+    Given the "miscellaneous" user profile block exists
     When I am on profile page for user "admin"
-    Then I should see "Performance activities" in the ".userprofile" "css_element"
+    Then I should see "Performance activities" in the "Miscellaneous" "block"
     When I disable the "performance_activities" advanced feature
     And I reload the page
-    Then I should not see "Performance activities" in the ".userprofile" "css_element"
+    Then I should not see "Performance activities" in the "Miscellaneous" "block"
 
-  @javascript
   Scenario: Hide report source in user reports interface
     When I navigate to "Reports > Manage user reports" in site administration
     And I click on "Create report" "button"

@@ -42,7 +42,7 @@ class pathway_manual_webapi_resolver_query_rateable_users_testcase extends pathw
     /**
      * Assign user to competency.
      */
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
 
         $this->manager_user = $this->getDataGenerator()->create_user();
@@ -66,7 +66,7 @@ class pathway_manual_webapi_resolver_query_rateable_users_testcase extends pathw
         (new expand_task(builder::get_db()))->expand_all();
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         parent::tearDown();
         $this->manager_user = null;
     }

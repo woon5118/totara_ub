@@ -56,7 +56,7 @@ class pathway_manual_userdata_testcase extends advanced_testcase {
      */
     private $scale_value;
 
-    protected function setUp() {
+    protected function setUp(): void {
         $this->user1 = $this->getDataGenerator()->create_user();
         $this->user2 = $this->getDataGenerator()->create_user();
 
@@ -71,7 +71,7 @@ class pathway_manual_userdata_testcase extends advanced_testcase {
         $this->create_rating($this->user2, $this->user1, 'Rating On Other 2');
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->user1 = null;
         $this->user2 = null;
         $this->ratings = null;

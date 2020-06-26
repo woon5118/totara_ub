@@ -26,7 +26,7 @@ use totara_core\advanced_feature;
 
 class totara_competency_install_testcase extends advanced_testcase {
 
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         global $CFG;
         require_once($CFG->dirroot . '/totara/competency/db/upgradelib.php');

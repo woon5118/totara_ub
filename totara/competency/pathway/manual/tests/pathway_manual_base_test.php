@@ -66,7 +66,7 @@ abstract class pathway_manual_base_testcase extends advanced_testcase {
     /**
      * Create testing data.
      */
-    protected function setUp() {
+    protected function setUp(): void {
         $this->generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
 
         $this->user1 = new user($this->getDataGenerator()->create_user(), false);
@@ -91,7 +91,7 @@ abstract class pathway_manual_base_testcase extends advanced_testcase {
     /**
      * Unset the testing data.
      */
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->generator = null;
         $this->user1 = null;
         $this->user2 = null;

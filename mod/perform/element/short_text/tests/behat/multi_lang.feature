@@ -28,6 +28,7 @@ Feature: Short text element supports multi-lang filters in titles
     # Currently a changed text won't be filtered until saved
     Then I should see "<span lang=\"en\" class=\"multilang\">it's an English question</span><span lang=\"de\" class=\"multilang\">deutsche Frage</span>"
     When I click on "Submit" "button"
+    And I close the tui notification toast
     And I click on "Edit content elements" "button"
     Then "rawTitle" "field" should not be visible
     And I should see "it's an English question"
@@ -42,9 +43,11 @@ Feature: Short text element supports multi-lang filters in titles
     # Currently a changed text won't be filtered until saved
     Then I should see "<span lang=\"en\" class=\"multilang\">changed & updated</span><span lang=\"de\" class=\"multilang\">geaendert & gespeichert</span>"
     When I click on "Submit" "button"
+    And I close the tui notification toast
     And I click on "Edit content elements" "button"
     Then I should see "changed & updated"
     When I click on "Submit" "button"
+    And I close the tui notification toast
     # Going back to edit mode and saving without changes should not change anything
     And I click on "Edit content elements" "button"
     And I click on "Submit" "button"

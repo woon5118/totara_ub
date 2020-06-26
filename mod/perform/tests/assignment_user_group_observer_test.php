@@ -34,7 +34,7 @@ use totara_cohort\event\members_updated;
  */
 class mod_perform_assignment_user_group_observer_testcase extends advanced_testcase {
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
 
         global $CFG;

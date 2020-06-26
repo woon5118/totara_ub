@@ -13,7 +13,7 @@ Feature: Manage performance activity short text elements
     # Add multiple elements
     When I click on "Add Element Activity" "link"
     And I click on "Content" "link" in the ".tui-tabs__tabs" "css_element"
-    And I click on "Edit content" "button"
+    And I click on "Edit content elements" "button"
     And I click on "Add element" "button"
     And I click on "Questions" "button"
     And I click on "Short text" "link"
@@ -34,6 +34,6 @@ Feature: Manage performance activity short text elements
     Then I should see "1" in the "required" element summary of the activity section
     And I should see "1" in the "optional" element summary of the activity section
     And I should see "0" in the "other" element summary of the activity section
-    When I click on "Edit content" "button"
+    When I click on "Edit content elements" "button"
     Then I should see "Optional"
     And I should see "Required"

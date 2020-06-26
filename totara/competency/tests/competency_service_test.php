@@ -34,7 +34,7 @@ class totara_competency_competency_service_testcase extends advanced_testcase {
 
     use \totara_core\phpunit\webservice_utils;
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         $this->setAdminUser();
     }

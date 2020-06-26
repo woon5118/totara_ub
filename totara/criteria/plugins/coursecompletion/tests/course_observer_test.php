@@ -37,7 +37,7 @@ class criteria_coursecompletion_course_observer_testcase extends advanced_testca
     const NUM_USERS = 5;
     const NUM_COURSES = 5;
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
         global $CFG;
         require_once($CFG->dirroot . '/completion/completion_completion.php');

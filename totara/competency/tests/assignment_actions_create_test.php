@@ -34,10 +34,10 @@ class totara_competency_actions_create_testcase extends totara_competency_assign
 
     /**
      * @dataProvider previously_archived_assignments_can_be_recreated_provider
-     * @param string $recreate_with_status
+     * @param int $recreate_with_status
      * @throws coding_exception
      */
-    public function test_previously_archived_assignments_can_be_recreated(string $recreate_with_status): void {
+    public function test_previously_archived_assignments_can_be_recreated(int $recreate_with_status): void {
         $competency = $this->generator()->create_competency();
         $user = $this->generator()->assignment_generator()->create_user();
         $model = new assignment_actions();

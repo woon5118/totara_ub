@@ -20,8 +20,7 @@ Feature: Message is shown if there are no competencies to be shown for a user's 
 
   Scenario: User views their own competency profile that has no competencies
     When I log in as "user1"
-    And I am on profile page for user "user1"
-    And I click on "Competency profile" "link" in the ".userprofile" "css_element"
+    And I navigate to the competency profile of user "user1"
     Then I should see "User One" in the ".breadcrumb-nav" "css_element"
     And I should see "Competency profile" in the ".breadcrumb-nav" "css_element"
     And I should see "Competency profile" in the ".tui-competencyProfile__titleSection" "css_element"
@@ -42,8 +41,7 @@ Feature: Message is shown if there are no competencies to be shown for a user's 
 
   Scenario: User views their staff's competency profile that has no competencies
     When I log in as "user2"
-    And I am on profile page for user "user1"
-    And I click on "Competency profile" "link" in the ".userprofile" "css_element"
+    And I navigate to the competency profile of user "user1"
     Then I should see "User One" in the ".breadcrumb-nav" "css_element"
     And I should see "User One" in the ".tui-competencyUserHeader" "css_element"
     And I should see "There are no competencies currently assigned."

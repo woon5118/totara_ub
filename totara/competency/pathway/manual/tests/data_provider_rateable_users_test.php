@@ -41,7 +41,7 @@ class pathway_manual_data_provider_rateable_users_testcase extends pathway_manua
      */
     private $user_generator;
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         parent::tearDown();
         $this->user_generator = null;
     }

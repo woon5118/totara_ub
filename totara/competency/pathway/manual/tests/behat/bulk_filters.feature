@@ -68,8 +68,7 @@ Feature: Test filtering by users, roles, assignments etc. functions as expected.
     And I should not see "User 2-Two"
 
   Scenario: Rate competencies for a user and switch roles
-    When I am on profile page for user "user3"
-    And I click on "Competency profile" "link" in the ".userprofile" "css_element"
+    When I navigate to the competency profile of user "user3"
     And I click on "Rate competencies" "link"
 
     # Select manager role
@@ -108,8 +107,7 @@ Feature: Test filtering by users, roles, assignments etc. functions as expected.
     And I should not see "Competent" in the "//div[@class='tui-dataTableRow'][1]" "xpath_element"
 
   Scenario: Filter the list of competencies when rating a user
-    When I am on profile page for user "user3"
-    And I click on "Competency profile" "link" in the ".userprofile" "css_element"
+    When I navigate to the competency profile of user "user3"
     And I click on "Rate competencies" "link"
     When I set the field with xpath "//select[@class='tui-select__input']" to "manager"
 

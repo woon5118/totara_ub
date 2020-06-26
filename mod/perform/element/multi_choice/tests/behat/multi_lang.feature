@@ -29,7 +29,8 @@ Feature: Multiple choice element supports multi-lang filters in titles and optio
     # Currently a changed text won't be filtered until saved
     Then I should see "<span lang=\"en\" class=\"multilang\">it's an English question</span><span lang=\"de\" class=\"multilang\">deutsche Frage</span>"
     When I click on "Submit" "button"
-    And I click on "Edit content" "button"
+    And I close the tui notification toast
+    And I click on "Edit content elements" "button"
     Then "rawTitle" "field" should not be visible
     And I should see "it's an English question"
     And I should not see "deutsche Frage"
@@ -51,7 +52,8 @@ Feature: Multiple choice element supports multi-lang filters in titles and optio
     # Currently a changed text won't be filtered until saved
     Then I should see "<span lang=\"en\" class=\"multilang\">changed & updated</span><span lang=\"de\" class=\"multilang\">geaendert & gespeichert</span>"
     When I click on "Submit" "button"
-    And I click on "Edit content" "button"
+    And I close the tui notification toast
+    And I click on "Edit content elements" "button"
     Then I should see "changed & updated"
     And I should not see "geaendert & gespeichert"
     And I should see "it's the first changed option"
@@ -59,11 +61,12 @@ Feature: Multiple choice element supports multi-lang filters in titles and optio
     And I should see "it's the second changed option"
     And I should not see "zweite geaenderte Option"
     When I click on "Submit" "button"
+    And I close the tui notification toast
     # Going back to edit mode and saving without changes should not change anything
-    And I click on "Edit content" "button"
+    And I click on "Edit content elements" "button"
     And I click on "Submit" "button"
     And I close the tui notification toast
-    And I click on "Edit content" "button"
+    And I click on "Edit content elements" "button"
     Then I should see "changed & updated"
     And I should not see "geaendert & gespeichert"
     And I should see "it's the first changed option"

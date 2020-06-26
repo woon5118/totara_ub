@@ -31,8 +31,7 @@ Feature: Test rating a competency for a user as different roles via the user's c
 
   Scenario: Make a rating for myself
     Given I log in as "user1"
-    When I am on profile page for user "user1"
-    And I click on "Competency profile" "link" in the ".userprofile" "css_element"
+    When I navigate to the competency profile of user "user1"
     And I click on "Rate competencies" "link"
     Then I should see "Rate competencies" in the "#page h2" "css_element"
     And I should not see the "User One" image in the ".tui-bulkManualRatingPageHeader" "css_element"
@@ -48,8 +47,7 @@ Feature: Test rating a competency for a user as different roles via the user's c
 
   Scenario: As a manager, make a rating for a user via their competency profile
     Given I log in as "user2"
-    When I am on profile page for user "user1"
-    And I click on "Competency profile" "link" in the ".userprofile" "css_element"
+    When I navigate to the competency profile of user "user1"
     And I click on "Rate competencies" "link"
     Then I should see "Rate User One" in the "#page h2" "css_element"
     And I should see the "User One" image in the ".tui-bulkManualRatingPageHeader" "css_element"
@@ -65,8 +63,7 @@ Feature: Test rating a competency for a user as different roles via the user's c
 
   Scenario: As an appraiser, make a rating for a user via their competency profile
     Given I log in as "user3"
-    When I am on profile page for user "user1"
-    And I click on "Competency profile" "link" in the ".userprofile" "css_element"
+    When I navigate to the competency profile of user "user1"
     And I click on "Rate competencies" "link"
     Then I should see "Rate User One" in the "#page h2" "css_element"
     And I should see the "User One" image in the ".tui-bulkManualRatingPageHeader" "css_element"

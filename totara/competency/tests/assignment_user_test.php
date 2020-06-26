@@ -31,7 +31,7 @@ defined('MOODLE_INTERNAL') || die();
 
 class totara_competency_assignment_user_testcase extends advanced_testcase {
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         $this->setAdminUser();
     }

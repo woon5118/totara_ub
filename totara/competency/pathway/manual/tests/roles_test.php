@@ -37,7 +37,7 @@ class pathway_manual_roles_testcase extends advanced_testcase {
      */
     private $all_role_classes;
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         $this->all_role_classes = \core_component::get_namespace_classes(
             'models\roles',
@@ -46,7 +46,7 @@ class pathway_manual_roles_testcase extends advanced_testcase {
         );
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         parent::tearDown();
         $this->all_role_classes = null;
     }

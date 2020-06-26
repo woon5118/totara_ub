@@ -44,13 +44,13 @@ class totara_competency_integration_aggregation extends advanced_testcase {
 
     protected $assignments;
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
         global $CFG;
         require_once($CFG->dirroot . '/completion/completion_completion.php');
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         advanced_feature::enable('competency_assignment');
 
@@ -59,7 +59,7 @@ class totara_competency_integration_aggregation extends advanced_testcase {
         // }
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         parent::tearDown();
         $this->assignments = null;
     }

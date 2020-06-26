@@ -35,7 +35,7 @@ use totara_userdata\userdata\target_user;
 
 class totara_competency_userdata_assignment_user_testcase extends advanced_testcase {
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         $this->setAdminUser();
     }

@@ -51,7 +51,7 @@ use totara_competency\user_groups;
  */
 class totara_competency_achievement_aggregator_testcase extends advanced_testcase {
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         // individual tests may disable the feature
         \totara_core\advanced_feature::enable('competency_assignment');

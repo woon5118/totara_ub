@@ -47,13 +47,13 @@ class totara_competency_expand_task_testcase extends advanced_testcase {
         return self::getDataGenerator();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         $this->db = $GLOBALS['DB'];
         $this->setAdminUser();
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->db = null;
         parent::tearDown();
     }

@@ -38,12 +38,12 @@ class totara_plan_webapi_resolver_type_learning_plan_testcase extends advanced_t
 
     private $user2;
 
-    protected function setUp() {
+    protected function setUp(): void {
         $this->user1 = $this->getDataGenerator()->create_user();
         $this->user2 = $this->getDataGenerator()->create_user();
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->user1 = null;
         $this->user2 = null;
     }

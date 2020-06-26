@@ -40,12 +40,12 @@ class totara_competency_crumbtrail_testcase extends advanced_testcase {
         return self::getDataGenerator();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         $this->db = $GLOBALS['DB'];
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->db = null;
         parent::tearDown();
     }

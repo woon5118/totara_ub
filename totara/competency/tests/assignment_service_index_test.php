@@ -31,7 +31,7 @@ class totara_competency_assignment_index_service_testcase extends advanced_testc
 
     use \totara_core\phpunit\webservice_utils;
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         $this->setAdminUser();
     }

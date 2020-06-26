@@ -51,7 +51,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 class mod_perform_expand_task_testcase extends advanced_testcase {
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
         global $CFG;
         require_once($CFG->dirroot . '/cohort/lib.php');
@@ -66,12 +66,12 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         return self::getDataGenerator();
     }
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         $this->setAdminUser();
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         parent::tearDown();
     }
 

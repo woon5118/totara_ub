@@ -30,8 +30,7 @@ Feature: Test miscellaneous bulk manual rating features.
 
   Scenario: Show last rating help for myself
     Given I log in as "user1"
-    When I am on profile page for user "user1"
-    And I click on "Competency profile" "link" in the ".userprofile" "css_element"
+    When I navigate to the competency profile of user "user1"
     And I click on "Rate competencies" "link"
 
     Then I should see "Previous rating"
@@ -62,8 +61,7 @@ Feature: Test miscellaneous bulk manual rating features.
 
   Scenario: Show rating scale help
     Given I log in as "user1"
-    When I am on profile page for user "user1"
-    And I click on "Competency profile" "link" in the ".userprofile" "css_element"
+    When I navigate to the competency profile of user "user1"
     And I click on "Rate competencies" "link"
 
     Then I should see "New rating"

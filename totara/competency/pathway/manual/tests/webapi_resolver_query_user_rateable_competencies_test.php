@@ -41,7 +41,7 @@ class pathway_manual_webapi_resolver_query_user_rateable_competencies_testcase e
     /**
      * Assign user to competency.
      */
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
 
         $this->generator->create_manual($this->competency1, [self_role::class]);

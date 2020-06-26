@@ -46,7 +46,7 @@ class pathway_manual_webapi_resolver_query_role_ratings_testcase extends pathway
 
     private $user1_assignment;
 
-    protected function setUp() {
+    protected function setUp(): void {
         global $DB;
         parent::setUp();
 
@@ -71,7 +71,7 @@ class pathway_manual_webapi_resolver_query_role_ratings_testcase extends pathway
         $this->setAdminUser();
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         parent::tearDown();
         $this->scalevalue1 = null;
         $this->scalevalue2 = null;

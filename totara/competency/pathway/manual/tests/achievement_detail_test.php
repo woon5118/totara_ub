@@ -38,12 +38,12 @@ class pathway_manual_achievement_detail_testcase extends pathway_manual_base_tes
 
     private $manual;
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         $this->manual = $this->generator->create_manual($this->competency1);
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         parent::tearDown();
         $this->manual = null;
     }

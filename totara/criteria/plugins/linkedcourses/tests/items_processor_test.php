@@ -33,7 +33,7 @@ use totara_core\advanced_feature;
 
 class criteria_linkedcourses_items_processor_testcase extends advanced_testcase {
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
         global $CFG;
         require_once($CFG->dirroot . '/completion/completion_completion.php');

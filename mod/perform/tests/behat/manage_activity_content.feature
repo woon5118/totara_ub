@@ -13,7 +13,7 @@ Feature: Adding, Updating, Removing activity elements.
     # Add multiple elements
     When I click on "Add Element Activity" "link"
     And I click on "Content" "link" in the ".tui-tabs__tabs" "css_element"
-    And I click on "Edit content" "button"
+    And I click on "Edit content elements" "button"
     And I click on "Add element" "button"
     And I click on "Questions" "button"
     And I click on "Short text" "link"
@@ -39,7 +39,8 @@ Feature: Adding, Updating, Removing activity elements.
       | rawTitle | Question 3 |
     And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"
     And I click on "Submit" "button"
-    And I click on "Edit content" "button"
+    And I close the tui notification toast
+    And I click on "Edit content elements" "button"
     Then I should see "Question 1"
     And I should see "Question 2"
     And I should see "Question 3"
@@ -66,7 +67,8 @@ Feature: Adding, Updating, Removing activity elements.
       | rawTitle | Test 3 |
     And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"
     And I click on "Submit" "button"
-    And I click on "Edit content" "button"
+    And I close the tui notification toast
+    And I click on "Edit content elements" "button"
     Then I should see "Test 1"
     And I should see "Test 2"
     And I should see "Test 3"
@@ -79,7 +81,8 @@ Feature: Adding, Updating, Removing activity elements.
     And I click on "Actions" "button"
     And I click on "Delete" "link"
     And I click on "Submit" "button"
-    And I click on "Edit content" "button"
+    And I close the tui notification toast
+    And I click on "Edit content elements" "button"
     Then I should see "Test 3"
     And I should not see "Test 1"
     And I should not see "Test 2"

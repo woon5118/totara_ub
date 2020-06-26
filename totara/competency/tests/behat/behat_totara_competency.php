@@ -54,13 +54,22 @@ class behat_totara_competency extends behat_base {
      * Opens the current users competency profile.
      *
      * @When /^I navigate to my competency profile$/
+     * @When /^I navigate to the competency profile of user "(?P<user>(?:[^"]|\\")*)"$/
+     * @param string|int|null $user
      * @return void
      * @throws Exception
      */
-    public function i_navigate_to_my_competency_profile(): void {
+    public function i_navigate_to_my_competency_profile($user = null): void {
         behat_hooks::set_step_readonly(false);
 
-        $this->getSession()->visit($this->locate_path(self::TOTARA_COMPETENCY_PROFILE_PATH));
+        $query_params = [];
+        if ($user) {
+            $query_params['user_id'] = $this->resolve_user_id($user);
+        }
+
+        $detail_page_url = new moodle_url(self::TOTARA_COMPETENCY_PROFILE_PATH, $query_params);
+
+        $this->getSession()->visit($this->locate_path($detail_page_url->out(false)));
     }
 
     /**

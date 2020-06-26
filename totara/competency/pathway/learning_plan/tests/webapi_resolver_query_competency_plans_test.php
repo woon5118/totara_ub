@@ -49,7 +49,7 @@ class totara_competency_webapi_resolver_query_competency_plans_testcase extends 
 
     private $user2;
 
-    protected function setUp() {
+    protected function setUp(): void {
         global $DB;
 
         /** @var totara_hierarchy_generator $totara_hierarchy_generator */
@@ -87,7 +87,7 @@ class totara_competency_webapi_resolver_query_competency_plans_testcase extends 
         $this->setAdminUser();
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         $this->scalevalue1 = null;
         $this->scalevalue2 = null;
         $this->user1 = null;

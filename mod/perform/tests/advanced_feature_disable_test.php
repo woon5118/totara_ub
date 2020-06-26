@@ -38,7 +38,7 @@ use totara_webapi\phpunit\webapi_phpunit_helper;
 class mod_perform_advanced_feature_disable_testcase extends advanced_testcase {
     use webapi_phpunit_helper;
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         advanced_feature::disable('performance_activities');
     }

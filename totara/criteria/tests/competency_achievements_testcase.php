@@ -74,13 +74,13 @@ abstract class totara_criteria_competency_achievements_testcase extends advanced
      */
     protected $competency_generator;
 
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setUp();
         $this->competency_generator = $this->getDataGenerator()->get_plugin_generator('totara_competency');
         $this->data = $this->create_data();
     }
 
-    protected function tearDown() {
+    protected function tearDown(): void {
         parent::tearDown();
         $this->data = null;
         $this->competency_generator = null;

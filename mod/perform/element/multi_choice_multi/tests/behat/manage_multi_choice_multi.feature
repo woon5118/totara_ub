@@ -32,6 +32,7 @@ Feature: Manage performance activity multiple choice-answers elements
       | answers[1] | Option six  |
     And I save multiple answers question element data
     And I click on "Submit" "button"
+    And I close the tui notification toast
     When I navigate to manage perform activity content page
     Then I should see perform multiple answers question "Question 1" is saved with options "Option one,Option two"
     And I should see perform multiple answers question "Question 2" is saved with options "Option three,Option four"
@@ -53,6 +54,7 @@ Feature: Manage performance activity multiple choice-answers elements
       |answers[2]        | Option three |
     And I save multiple answers question element data
     And I click on "Submit" "button"
+    And I close the tui notification toast
     And I navigate to manage perform activity content page
     Then I should see perform multiple answers question "Question 1" is saved with options "Option one,Option two,Option three"
 
@@ -73,6 +75,7 @@ Feature: Manage performance activity multiple choice-answers elements
     And I delete multiple answers question option
     And I save multiple answers question element data
     And I click on "Submit" "button"
+    And I close the tui notification toast
     And I navigate to manage perform activity content page
     Then I should see perform multiple answers question "Question 1" is saved with options "Option one,Option two"
 
