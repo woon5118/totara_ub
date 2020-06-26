@@ -27,6 +27,9 @@ global $CFG;
 require_once($CFG->dirroot . '/mod/facetoface/rb_sources/rb_facetoface_base_source.php');
 require_once($CFG->dirroot . '/totara/customfield/field/location/define.class.php');
 
+/**
+ * Seminar Facilitators
+ */
 class rb_source_facetoface_facilitator extends rb_facetoface_base_source {
 
     use \mod_facetoface\rb\traits\facilitator;

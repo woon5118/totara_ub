@@ -26,6 +26,9 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/mod/facetoface/rb_sources/rb_facetoface_base_source.php');
 
+/**
+ * Seminar Sessions
+ */
 class rb_source_facetoface_summary extends rb_facetoface_base_source {
 
     use \core_course\rb\source\report_trait;

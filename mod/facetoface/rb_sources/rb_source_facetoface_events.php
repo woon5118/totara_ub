@@ -25,6 +25,9 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/mod/facetoface/rb_sources/rb_facetoface_base_source.php');
 
+/**
+ * Seminar Events
+ */
 class rb_source_facetoface_events extends rb_facetoface_base_source {
 
     use \core_course\rb\source\report_trait;
@@ -593,10 +596,19 @@ class rb_source_facetoface_events extends rb_facetoface_base_source {
             new rb_filter_option(
                 'session',
                 'bookingstatus',
-                get_string('bookingstatus', 'rb_source_facetoface_summary'),
+                get_string('bookingstatus', 'rb_source_facetoface_events'),
                 'select',
                 array(
                     'selectchoices' => self::get_bookingstatus_options(),
+                )
+            ),
+            new rb_filter_option(
+                'session',
+                'overallstatus',
+                get_string('overallstatus', 'rb_source_facetoface_events'),
+                'select',
+                array(
+                    'selectfunc' => 'overallstatus',
                 )
             ),
             new rb_filter_option(

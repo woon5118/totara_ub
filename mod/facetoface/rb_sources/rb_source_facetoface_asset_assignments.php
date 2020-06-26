@@ -25,6 +25,9 @@ global $CFG;
 require_once($CFG->dirroot . '/mod/facetoface/rb_sources/rb_facetoface_base_source.php');
 require_once($CFG->dirroot . '/totara/customfield/field/location/define.class.php');
 
+/**
+ * Seminar Asset Assignments
+ */
 class rb_source_facetoface_asset_assignments extends rb_facetoface_base_source {
     use \core_course\rb\source\report_trait;
     use \mod_facetoface\rb\traits\rooms;

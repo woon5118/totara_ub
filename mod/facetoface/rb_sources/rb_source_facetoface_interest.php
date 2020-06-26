@@ -24,6 +24,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Seminar Interest
+ */
 class rb_source_facetoface_interest extends rb_base_source {
     use \core_course\rb\source\report_trait;
     use \totara_job\rb\source\report_trait;

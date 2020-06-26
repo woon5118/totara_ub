@@ -28,9 +28,7 @@ global $CFG;
 require_once($CFG->dirroot . '/mod/facetoface/rb_sources/rb_facetoface_base_source.php');
 
 /**
- * FacetoFace downloadable sign in sheet report.
- *
- * Class rb_source_facetoface_signin
+ * Seminar Sign-in Sheet
  */
 class rb_source_facetoface_signin extends rb_facetoface_base_source {
 
