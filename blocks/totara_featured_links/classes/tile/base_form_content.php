@@ -61,6 +61,10 @@ abstract class base_form_content extends base_form {
             if (!empty($this->get_parameters()['parentid']) && $ismetatile) {
                 continue;
             }
+            // If the feature is not enabled, don't add the type to the list. (It applies to programs and certification at the moment)
+            if (!$class_str::is_feature_enabled()) {
+                continue;
+            }
             $class_options[$plugin_name.'-'.$class_name] = $class_str::get_name();
         }
 

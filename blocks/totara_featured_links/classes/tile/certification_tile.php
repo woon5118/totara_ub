@@ -46,6 +46,15 @@ class certification_tile extends program_tile {
     }
 
     /**
+     * Returns true if the feature is enabled so we can create tiles of this type.
+     *
+     * @return bool
+     */
+    public static function is_feature_enabled(): bool {
+        return \totara_core\advanced_feature::is_enabled('certifications');
+    }
+
+    /**
      * Gets the data for the learning item content form and adds the
      * certification name and id.
      *

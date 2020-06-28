@@ -87,9 +87,9 @@ class block_totara_featured_links extends block_base {
         if ($tiles != false) {
             foreach ($tiles as $tile) {
                 $tile = base::get_tile_instance($tile->id);
-                // Show the tile if it is visible or in editing mode and the user has the capability to edit the tile.
-                if ($tile->is_visible()
-                    || ($editing && parent::user_can_edit() && $tile->can_edit_tile())) {
+                // Show the tile if the featured is enabled and it is visible or in editing mode and the user has the capability to edit the tile.
+                if ($tile::is_feature_enabled() && ($tile->is_visible()
+                    || ($editing && parent::user_can_edit() && $tile->can_edit_tile()))) {
                     $tile_data[$tile->sortorder]['content'] = $tile->render_content_wrapper($core_renderer, $data);
                 }
             }

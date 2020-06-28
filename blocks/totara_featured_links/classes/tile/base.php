@@ -219,6 +219,14 @@ abstract class base {
     public abstract function add_tile(): void;
 
     /**
+     * This returns if the feature is enabled on the system.
+     * @return bool
+     */
+    public static function is_feature_enabled() {
+        return true;
+    }
+
+    /**
      * Deletes the current tile.
      * @return bool whether or not the tile was successfully removed
      */
