@@ -24,6 +24,7 @@
   <div class="tui-activityMultipleSectionToggle">
     <ToggleButton
       v-model="value"
+      :disabled="isSaving"
       :text="$str('multiple_sections_enabled', 'mod_perform')"
       @input="valueChanged"
     >
