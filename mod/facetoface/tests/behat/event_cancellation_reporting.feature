@@ -99,7 +99,7 @@ Feature: Seminar event cancellation reporting
     Then I should see "Test Seminar" in the "Course 1" "table_row"
     And I should see "Course 1" in the "Test Seminar" "table_row"
     And I should see "20" in the "Test Seminar" "table_row"
-    When I click on "Attendees" "link" in the "Test Seminar" "table_row"
+    When I click on "View attendees" "link" in the "Test Seminar" "table_row"
 
     And I click on "Cancellations" "link"
     And I should see "User Cancelled" in the "Learner One" "table_row"
