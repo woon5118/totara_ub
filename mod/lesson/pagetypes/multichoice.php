@@ -115,7 +115,7 @@ class lesson_page_type_multichoice extends lesson_page {
         $answers = $this->get_used_answers();
         shuffle($answers);
         $action = $CFG->wwwroot.'/mod/lesson/continue.php';
-        $params = array('answers'=>$answers, 'lessonid'=>$this->lesson->id, 'contents'=>$this->get_contents(), 'attempt'=>$attempt);
+        $params = array('answers'=>$answers, 'lessonid'=>$this->lesson->id, 'contents'=>$this->get_contents(), 'attempt'=>$attempt, 'pagetitle'=>$this->properties->title);
         if ($this->properties->qoption) {
             $mform = new lesson_display_answer_form_multichoice_multianswer($action, $params);
         } else {
@@ -499,7 +499,12 @@ class lesson_display_answer_form_multichoice_singleanswer extends moodleform {
         // Disable shortforms.
         $mform->setDisableShortforms();
 
-        $mform->addElement('header', 'pageheader');
+        $title = isset($this->_customdata['pagetitle']) ? $this->_customdata['pagetitle'] : '';
+        if (!empty($title)) {
+            $mform->addElement('header', 'pageheader', $title);
+        } else {
+            $mform->addElement('header', 'pageheader');
+        }
 
         $mform->addElement('html', $OUTPUT->container($contents, 'contents'));
 
@@ -555,7 +560,12 @@ class lesson_display_answer_form_multichoice_multianswer extends moodleform {
         // Disable shortforms.
         $mform->setDisableShortforms();
 
-        $mform->addElement('header', 'pageheader');
+        $title = isset($this->_customdata['pagetitle']) ? $this->_customdata['pagetitle'] : '';
+        if (!empty($title)) {
+            $mform->addElement('header', 'pageheader', $title);
+        } else {
+            $mform->addElement('header', 'pageheader');
+        }
 
         $mform->addElement('html', $OUTPUT->container($contents, 'contents'));
 

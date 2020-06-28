@@ -55,7 +55,7 @@ class lesson_page_type_truefalse extends lesson_page {
         }
         shuffle($answers);
 
-        $params = array('answers'=>$answers, 'lessonid'=>$this->lesson->id, 'contents'=>$this->get_contents(), 'attempt'=>$attempt);
+        $params = array('answers'=>$answers, 'lessonid'=>$this->lesson->id, 'contents'=>$this->get_contents(), 'attempt'=>$attempt, 'pagetitle'=>$this->properties->title);
         $mform = new lesson_display_answer_form_truefalse($CFG->wwwroot.'/mod/lesson/continue.php', $params);
         $data = new stdClass;
         $data->id = $PAGE->cm->id;
@@ -387,7 +387,12 @@ class lesson_display_answer_form_truefalse extends moodleform {
         // Disable shortforms.
         $mform->setDisableShortforms();
 
-        $mform->addElement('header', 'pageheader');
+        $title = isset($this->_customdata['pagetitle']) ? $this->_customdata['pagetitle'] : '';
+        if (!empty($title)) {
+            $mform->addElement('header', 'pageheader', $title);
+        } else {
+            $mform->addElement('header', 'pageheader');
+        }
 
         $hasattempt = false;
         $disabled = '';

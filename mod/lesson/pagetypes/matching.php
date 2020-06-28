@@ -119,7 +119,7 @@ class lesson_page_type_matching extends lesson_page {
         }
 
         $action = $CFG->wwwroot.'/mod/lesson/continue.php';
-        $params = array('answers'=>$answers, 'useranswers'=>$useranswers, 'responseoptions'=>$responseoptions, 'lessonid'=>$this->lesson->id, 'contents'=>$this->get_contents());
+        $params = array('answers'=>$answers, 'useranswers'=>$useranswers, 'responseoptions'=>$responseoptions, 'lessonid'=>$this->lesson->id, 'contents'=>$this->get_contents(), 'pagetitle'=>$this->properties->title);
         $mform = new lesson_display_answer_form_matching($action, $params);
         return $mform;
     }
@@ -570,7 +570,12 @@ class lesson_display_answer_form_matching extends moodleform {
         // Disable shortforms.
         $mform->setDisableShortforms();
 
-        $mform->addElement('header', 'pageheader');
+        $title = isset($this->_customdata['pagetitle']) ? $this->_customdata['pagetitle'] : '';
+        if (!empty($title)) {
+            $mform->addElement('header', 'pageheader', $title);
+        } else {
+            $mform->addElement('header', 'pageheader');
+        }
 
         $mform->addElement('html', $OUTPUT->container($contents, 'contents'));
 
