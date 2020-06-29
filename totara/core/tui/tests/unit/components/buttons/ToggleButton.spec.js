@@ -99,6 +99,21 @@ describe('ToggleButton.vue', () => {
     expect(wrapper.element).toMatchSnapshot();
   });
 
+  it('Renders correctly with something in the slot and an aria-label', () => {
+    propsData = { ...propsData, ariaLabel: 'Different button text' };
+    wrapper = shallowMount(component, {
+      propsData,
+      $mocks: { pressed: false },
+      scopedSlots: {
+        icon() {
+          return this.$createElement('div', {}, ['icon button']);
+        },
+      },
+    });
+
+    expect(wrapper.element).toMatchSnapshot();
+  });
+
   it('should not have any accessibility violations with something in the slot', async () => {
     wrapper = shallowMount(component, {
       propsData,

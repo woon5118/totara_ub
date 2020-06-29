@@ -26,10 +26,11 @@
       type="button"
       class="tui-toggleBtn__btn"
       :aria-pressed="ariaPressed"
+      :aria-label="ariaLabel"
       :disabled="disabled"
       @click="togglePressed"
     >
-      {{ text }}
+      <span :class="{ 'sr-only': ariaLabel }">{{ text }}</span>
     </button>
 
     <div class="tui-toggleBtn__icon">
@@ -50,6 +51,7 @@
 <script>
 export default {
   props: {
+    ariaLabel: String,
     disabled: {
       type: Boolean,
       default: false,
@@ -96,6 +98,7 @@ export default {
   },
   methods: {
     togglePressed() {
+      if (this.disabled) return;
       // If no value prop provided toggle internal state
       if (this.value === undefined) {
         this.state = !this.state;

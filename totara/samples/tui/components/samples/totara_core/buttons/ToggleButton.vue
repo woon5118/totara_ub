@@ -45,6 +45,14 @@
       <br /><br />
 
       <ToggleButton :text="text" :toggle-first="toggleFirst" />
+
+      <br /><br />
+
+      <ToggleButton
+        :text="text"
+        :toggle-first="toggleFirst"
+        :aria-label="ariaLabel"
+      />
     </SamplesExample>
 
     <SamplesPropCtl>
@@ -53,6 +61,10 @@
           <Radio :value="true">True</Radio>
           <Radio :value="false">False</Radio>
         </RadioGroup>
+      </FormRow>
+
+      <FormRow label="ariaLabel">
+        <InputText v-model="ariaLabel" />
       </FormRow>
     </SamplesPropCtl>
   </div>
@@ -65,6 +77,7 @@ import InfoIconButton from 'totara_core/components/buttons/InfoIconButton';
 import FormRow from 'totara_core/components/form/FormRow';
 import Radio from 'totara_core/components/form/Radio';
 import RadioGroup from 'totara_core/components/form/RadioGroup';
+import InputText from 'totara_core/components/form/InputText';
 import SamplesExample from 'totara_samples/components/sample_parts/misc/SamplesExample';
 import SamplesPropCtl from 'totara_samples/components/sample_parts/misc/SamplesPropCtl';
 
@@ -75,6 +88,7 @@ export default {
     FormRow,
     Radio,
     RadioGroup,
+    InputText,
     SamplesExample,
     SamplesPropCtl,
   },
@@ -83,6 +97,7 @@ export default {
     return {
       text: 'Toggle something in the UI',
       toggleFirst: true,
+      ariaLabel: 'The toggle button text',
     };
   },
 };
