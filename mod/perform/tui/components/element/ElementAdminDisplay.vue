@@ -23,89 +23,111 @@
 <template>
   <div class="tui-performElementEditDisplay">
     <div v-if="error">{{ error }}</div>
-    <div class="tui-performElementEditDisplay__inner">
-      <div class="tui-performElementEditDisplay__inner-header">
-        <div class="tui-performElementEditDisplay__title">
-          {{ title }}
+
+    <div class="tui-performElementEditDisplay__action">
+      <Popover
+        v-if="identifier && !isActive"
+        class="tui-performElementEditDisplay__reportingId"
+      >
+        <h2 class="tui-performElementEditDisplay__reportingId-header">
+          {{ $str('reporting_identifier', 'mod_perform') }}
+        </h2>
+        <div class="tui-performElementEditDisplay__reportingId-content">
+          {{ identifier }}
         </div>
-        <div class="tui-performElementEditDisplay__info">
-          <Popover
-            v-if="identifier"
-            class="tui-performElementEditDisplay__reportingId"
+        <template v-slot:trigger>
+          <ButtonIcon
+            :aria-label="$str('reporting_identifier', 'mod_perform')"
+            :styleclass="{ transparentNoPadding: true }"
           >
-            <h2 class="tui-performElementEditDisplay__reportingId-header">
-              {{ $str('reporting_identifier', 'mod_perform') }}
-            </h2>
-            <div class="tui-performElementEditDisplay__reportingId-content">
-              {{ identifier }}
-            </div>
-            <template v-slot:trigger>
-              <ButtonIcon
-                :aria-label="$str('reporting_identifier', 'mod_perform')"
-                :styleclass="{ transparentNoPadding: true }"
-              >
-                <template>
-                  <ReportingIdentifierIcon
-                    :alt="$str('reporting_identifier', 'mod_perform')"
-                    :title="$str('reporting_identifier', 'mod_perform')"
-                    size="200"
-                  />
-                </template>
-              </ButtonIcon>
+            <template>
+              <ReportingIdentifierIcon
+                :alt="$str('reporting_identifier', 'mod_perform')"
+                :title="$str('reporting_identifier', 'mod_perform')"
+                size="200"
+              />
             </template>
-          </Popover>
-          <div class="tui-performElementEditDisplay__actions">
-            <EditIcon
-              :aria-label="$str('edit_element', 'mod_perform')"
-              @click="edit"
-            />
-            <DeleteIcon
-              :aria-label="$str('delete_element', 'mod_perform')"
-              @click="remove"
-            />
-          </div>
-          <Lozenge
-            v-show="isRequired"
-            :text="$str('section_element_tag_required', 'mod_perform')"
-          />
-          <Lozenge
-            v-show="!isRequired"
-            :text="$str('section_element_tag_optional', 'mod_perform')"
-            type="warning"
-          />
-        </div>
-      </div>
-      <div class="tui-performElementEditDisplay__inner-content">
-        <slot name="content" />
-      </div>
+          </ButtonIcon>
+        </template>
+      </Popover>
+      <EditIcon
+        v-if="!isActive"
+        :aria-label="$str('edit_element', 'mod_perform')"
+        @click="edit"
+      />
+      <DeleteIcon
+        v-if="!isActive"
+        :aria-label="$str('delete_element', 'mod_perform')"
+        @click="remove"
+      />
+      <ButtonIcon
+        v-if="isActive"
+        :aria-label="$str('setting_element', 'mod_perform')"
+        :styleclass="{ transparentNoPadding: true }"
+        class="tui-performElementEditDisplay__action-settings"
+        @click.prevent="displayRead()"
+      >
+        <SettingsIcon size="200" />
+      </ButtonIcon>
+    </div>
+    <div class="tui-performElementEditDisplay__title">
+      {{ title }}
+
+      <span
+        v-if="isRequired"
+        class="tui-performElementEditDisplay__title-response-required"
+        >*</span
+      >
+    </div>
+    <div class="tui-performElementEditDisplay__content">
+      <slot name="content" />
     </div>
   </div>
 </template>
 
 <script>
-import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
-import DeleteIcon from 'totara_core/components/buttons/DeleteIcon';
 import EditIcon from 'totara_core/components/buttons/EditIcon';
-import Lozenge from 'totara_core/components/lozenge/Lozenge';
+import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
+import SettingsIcon from 'totara_core/components/icons/common/Settings';
 import Popover from 'totara_core/components/popover/Popover';
 import ReportingIdentifierIcon from 'mod_perform/components/icons/ReportingIdentifier';
-
+import DeleteIcon from 'totara_core/components/buttons/DeleteIcon';
 export default {
   components: {
     ButtonIcon,
     DeleteIcon,
     EditIcon,
-    Lozenge,
+    SettingsIcon,
     Popover,
     ReportingIdentifierIcon,
   },
 
   props: {
-    title: String,
+    title: {
+      type: String,
+      required: true,
+    },
+    activityState: {
+      type: Object,
+      required: true,
+    },
+    type: {
+      type: Object,
+      required: true,
+    },
+    error: {
+      type: String,
+    },
+    isRequired: {
+      type: Boolean,
+    },
     identifier: String,
-    isRequired: Boolean,
-    type: Object,
-    error: String,
+  },
+
+  computed: {
+    isActive() {
+      return this.activityState.name === 'ACTIVE';
+    },
   },
 
   methods: {
@@ -114,6 +136,9 @@ export default {
     },
     remove() {
       this.$emit('remove');
+    },
+    displayRead() {
+      this.$emit('display-read');
     },
   },
 };
@@ -125,6 +150,7 @@ export default {
       "delete_element",
       "edit_element",
       "reporting_identifier",
+      "setting_element",
       "section_element_tag_required",
       "section_element_tag_optional"
     ]

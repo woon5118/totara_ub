@@ -93,6 +93,15 @@ abstract class element_plugin {
     }
 
     /**
+     * This method return element's admin read only display vue component name
+     *
+     * @return string
+     */
+    public function get_admin_read_only_display_component(): string {
+        return $this->get_component_path('AdminReadOnlyDisplay');
+    }
+
+    /**
      * This method return element's user form vue component name
      * @return string
      */

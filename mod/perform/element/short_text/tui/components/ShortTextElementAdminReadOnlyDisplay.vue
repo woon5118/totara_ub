@@ -16,30 +16,28 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-  @author Oleg Demeshev <oleg.demeshev@totaralearning.com>
-  @package performelement_long_text
+  @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
+  @package performelement_short_text
 -->
 <template>
-  <ElementAdminDisplay
+  <ElementAdminReadOnlyDisplay
     :type="type"
     :title="title"
     :identifier="identifier"
-    :error="error"
     :is-required="isRequired"
     :activity-state="activityState"
-    @edit="$emit('edit')"
-    @remove="$emit('remove')"
-    @display-read="$emit('display-read')"
+    @display="$emit('display')"
   />
 </template>
 
 <script>
-import ElementAdminDisplay from 'mod_perform/components/element/ElementAdminDisplay';
+import ElementAdminReadOnlyDisplay from 'mod_perform/components/element/ElementAdminReadOnlyDisplay';
 
 export default {
   components: {
-    ElementAdminDisplay,
+    ElementAdminReadOnlyDisplay,
   },
+
   props: {
     title: String,
     identifier: String,

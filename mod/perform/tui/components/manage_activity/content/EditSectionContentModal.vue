@@ -53,13 +53,18 @@
                 :is-required="sectionElement.element.is_required"
                 :type="sectionElement.element.type"
                 :error="errors[sectionElement.clientId]"
+                :activity-state="activityState"
                 @update="update(sectionElement, $event, index)"
                 @edit="edit(sectionElement)"
                 @display="display(sectionElement)"
+                @display-read="displayReadOnly(sectionElement)"
                 @remove="tryDelete(sectionElement)"
               />
 
-              <ContentAddElementButton @add-element-item="add" />
+              <ContentAddElementButton
+                v-if="!isActive"
+                @add-element-item="add"
+              />
             </div>
           </Loader>
 
@@ -129,6 +134,10 @@ export default {
   },
 
   props: {
+    activityState: {
+      type: Object,
+      required: true,
+    },
     sectionId: {
       type: String,
       required: true,
@@ -148,6 +157,8 @@ export default {
       },
       sectionElements: [],
       editingIds: [],
+      readOnlyIds: [],
+      removeIds: [],
       errors: {},
       isSaving: false,
       deleteModalOpen: false,
@@ -193,6 +204,15 @@ export default {
      */
     hasUnsavedChanges() {
       return this.editingIds.length > 0;
+    },
+
+    /**
+     * check active status
+     *
+     * @return {Boolean}
+     */
+    isActive() {
+      return this.activityState.name === 'ACTIVE';
     },
   },
 
@@ -330,15 +350,28 @@ export default {
      * Remove creating view if section element move to display mode
      */
     display(sectionElement) {
-      this.stopEditing(sectionElement);
-      if (sectionElement.creating) {
-        this.remove(sectionElement);
+      if (this.isElementEditable()) {
+        this.stopEditing(sectionElement);
+        if (sectionElement.creating) {
+          this.remove(sectionElement);
+        }
+      } else {
+        pull(this.readOnlyIds, sectionElement.clientId);
       }
     },
 
     /**
-     * Remove section element from the display list.
+     * Display Read only section element when activity in active mode
      * @param {Object} sectionElement
+     *
+     */
+    displayReadOnly(sectionElement) {
+      this.readOnlyIds.push(sectionElement.clientId);
+    },
+
+    /**
+     * Remove section element
+     * if section element already saved update remove list
      */
     remove(sectionElement) {
       this.stopEditing(sectionElement);
@@ -404,9 +437,14 @@ export default {
     componentFor(sectionElement) {
       const { type } = sectionElement.element;
       const isEditing = this.editingIds.includes(sectionElement.clientId);
-      return tui.asyncComponent(
-        isEditing ? type.admin_form_component : type.admin_display_component
-      );
+      const isReadOnly = this.readOnlyIds.includes(sectionElement.clientId);
+      let componentName = isEditing
+        ? type.admin_form_component
+        : type.admin_display_component;
+      if (isReadOnly) {
+        componentName = type.admin_read_only_display_component;
+      }
+      return tui.asyncComponent(componentName);
     },
 
     /**
@@ -501,6 +539,13 @@ export default {
         message: this.$str('toast_error_generic_update', 'mod_perform'),
         type: 'error',
       });
+    },
+
+    /**
+     * Check element editable
+     */
+    isElementEditable() {
+      return this.activityState.name !== 'ACTIVE';
     },
   },
 };

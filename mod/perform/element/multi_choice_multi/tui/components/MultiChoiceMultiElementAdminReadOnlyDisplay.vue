@@ -16,41 +16,66 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-  @author Oleg Demeshev <oleg.demeshev@totaralearning.com>
-  @package performelement_long_text
+  @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
+  @package performelement_multi_choice_multi
 -->
 <template>
-  <ElementAdminDisplay
+  <ElementAdminReadOnlyDisplay
     :type="type"
     :title="title"
     :identifier="identifier"
-    :error="error"
     :is-required="isRequired"
     :activity-state="activityState"
-    @edit="$emit('edit')"
-    @remove="$emit('remove')"
-    @display-read="$emit('display-read')"
-  />
+    @display="$emit('display')"
+  >
+    <template v-slot:content>
+      <FormRow
+        :label="
+          $str('multi_select_options', 'performelement_multi_choice_multi')
+        "
+      >
+        <div class="tui-MultiChoiceSingleElementAdminReadOnlyDisplay__options">
+          <div
+            v-for="item in data.options"
+            :key="item.name"
+            class="tui-MultiChoiceSingleElementAdminReadOnlyDisplay__options-item"
+          >
+            {{ item.value }}
+          </div>
+        </div>
+      </FormRow>
+    </template>
+  </ElementAdminReadOnlyDisplay>
 </template>
 
 <script>
-import ElementAdminDisplay from 'mod_perform/components/element/ElementAdminDisplay';
+import ElementAdminReadOnlyDisplay from 'mod_perform/components/element/ElementAdminReadOnlyDisplay';
+import FormRow from 'totara_core/components/form/FormRow';
 
 export default {
   components: {
-    ElementAdminDisplay,
+    FormRow,
+    ElementAdminReadOnlyDisplay,
   },
+
   props: {
     title: String,
     identifier: String,
     type: Object,
     data: Object,
     isRequired: Boolean,
+    error: String,
     activityState: {
       type: Object,
       required: true,
     },
-    error: String,
   },
 };
 </script>
+<lang-strings>
+  {
+  "performelement_multi_choice_multi": [
+    "multi_select_options"
+  ]
+  }
+</lang-strings>

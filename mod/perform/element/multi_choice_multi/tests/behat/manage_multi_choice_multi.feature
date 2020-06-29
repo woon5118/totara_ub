@@ -117,12 +117,8 @@ Feature: Manage performance activity multiple choice-answers elements
       | answers[0] | Option one |
       | answers[1] | Option two |
     And I save multiple answers question element data
-    Then I should see "Optional"
     When I close the tui notification toast
     And I close the tui modal
     Then I should see "1" in the "required" element summary of the activity section
     And I should see "1" in the "optional" element summary of the activity section
     And I should see "0" in the "other" element summary of the activity section
-    When I navigate to manage perform activity content page
-    Then I should see "Optional"
-    And I should see "Required"

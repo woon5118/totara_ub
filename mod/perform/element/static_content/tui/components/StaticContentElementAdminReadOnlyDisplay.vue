@@ -16,30 +16,40 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-  @author Oleg Demeshev <oleg.demeshev@totaralearning.com>
-  @package performelement_long_text
+  @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
+  @package performelement_static_content
 -->
 <template>
-  <ElementAdminDisplay
+  <ElementAdminReadOnlyDisplay
     :type="type"
     :title="title"
     :identifier="identifier"
-    :error="error"
     :is-required="isRequired"
     :activity-state="activityState"
-    @edit="$emit('edit')"
-    @remove="$emit('remove')"
-    @display-read="$emit('display-read')"
-  />
+    @display="$emit('display')"
+  >
+    <template v-slot:content>
+      <FormRow
+        :label="
+          $str('static_content_placeholder', 'performelement_static_content')
+        "
+      >
+        {{ data.textValue }}
+      </FormRow>
+    </template>
+  </ElementAdminReadOnlyDisplay>
 </template>
 
 <script>
-import ElementAdminDisplay from 'mod_perform/components/element/ElementAdminDisplay';
+import ElementAdminReadOnlyDisplay from 'mod_perform/components/element/ElementAdminReadOnlyDisplay';
+import FormRow from 'totara_core/components/form/FormRow';
 
 export default {
   components: {
-    ElementAdminDisplay,
+    ElementAdminReadOnlyDisplay,
+    FormRow,
   },
+
   props: {
     title: String,
     identifier: String,
@@ -54,3 +64,10 @@ export default {
   },
 };
 </script>
+<lang-strings>
+  {
+  "performelement_static_content": [
+    "static_content_placeholder"
+  ]
+  }
+</lang-strings>

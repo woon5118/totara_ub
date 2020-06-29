@@ -724,7 +724,9 @@ class behat_mod_perform extends behat_base {
         foreach ($questions as $question) {
             $question_title = $question->find('css', self::EDIT_QUESTION_DISPLAY_TITLE_LOCATOR);
 
-            if (trim($question_title->getText()) === $question_text) {
+            $actual_title = trim(str_replace('*','', $question_title->getText()));
+
+            if ($actual_title === $question_text) {
                 return $question;
             }
         }

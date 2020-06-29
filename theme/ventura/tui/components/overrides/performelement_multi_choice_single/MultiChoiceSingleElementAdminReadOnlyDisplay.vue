@@ -1,5 +1,5 @@
 <!--
-  This file is part of Totara Learn
+  This file is part of Totara Perform
 
   Copyright (C) 2020 onwards Totara Learning Solutions LTD
 
@@ -16,49 +16,16 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-  @author Simon Chester <simon.chester@totaralearning.com>
   @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
-  @package mod_perform
+  @package performelement_multi_choice_multi
 -->
-<template>
-  <div class="tui-performElementAdminForm">
-    <div v-if="error">{{ error }}</div>
-    <slot name="content" />
-  </div>
-</template>
+<style lang="scss">
+.tui-multiChoiceSingleElementAdminReadOnlyDisplay__options {
+  display: flex;
+  flex-direction: column;
 
-<script>
-export default {
-  props: {
-    type: {
-      type: Object,
-      required: true,
-    },
-    activityState: {
-      type: Object,
-      required: true,
-    },
-    error: {
-      type: String,
-    },
-  },
-
-  methods: {
-    edit() {
-      this.$emit('edit');
-    },
-
-    remove() {
-      this.$emit('remove');
-    },
-  },
-};
-</script>
-<lang-strings>
-  {
-    "mod_perform": [
-      "activity_action_options",
-      "section_delete_element"
-    ]
+  &-item {
+    margin-top: var(--tui-gap-2);
   }
-</lang-strings>
+}
+</style>

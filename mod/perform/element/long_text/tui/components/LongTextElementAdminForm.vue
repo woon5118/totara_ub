@@ -20,7 +20,12 @@
   @package performelement_long_text
 -->
 <template>
-  <ElementAdminForm :type="type" :error="error" @remove="$emit('remove')">
+  <ElementAdminForm
+    :type="type"
+    :error="error"
+    :activity-state="activityState"
+    @remove="$emit('remove')"
+  >
     <template v-slot:content>
       <div class="tui-elementEditLongText">
         <Uniform
@@ -98,6 +103,10 @@ export default {
     isRequired: {
       type: Boolean,
       default: false,
+    },
+    activityState: {
+      type: Object,
+      required: true,
     },
     error: String,
   },

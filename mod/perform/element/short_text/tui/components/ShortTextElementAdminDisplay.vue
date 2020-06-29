@@ -27,8 +27,10 @@
     :identifier="identifier"
     :error="error"
     :is-required="isRequired"
+    :activity-state="activityState"
     @edit="$emit('edit')"
     @remove="$emit('remove')"
+    @display-read="$emit('display-read')"
   />
 </template>
 
@@ -46,6 +48,10 @@ export default {
     type: Object,
     data: Object,
     isRequired: Boolean,
+    activityState: {
+      type: Object,
+      required: true,
+    },
     error: String,
   },
 };

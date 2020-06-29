@@ -10,9 +10,5 @@
     margin-bottom: var(--tui-gap-2);
     font-weight: bold;
   }
-  &__action {
-    display: flex;
-    justify-content: flex-end;
-  }
 }
 </style>

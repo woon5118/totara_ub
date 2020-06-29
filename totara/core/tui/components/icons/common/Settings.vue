@@ -16,41 +16,34 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-  @author Oleg Demeshev <oleg.demeshev@totaralearning.com>
-  @package performelement_long_text
+  @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
+  @package totara_core
 -->
-<template>
-  <ElementAdminDisplay
-    :type="type"
-    :title="title"
-    :identifier="identifier"
-    :error="error"
-    :is-required="isRequired"
-    :activity-state="activityState"
-    @edit="$emit('edit')"
-    @remove="$emit('remove')"
-    @display-read="$emit('display-read')"
-  />
-</template>
 
 <script>
-import ElementAdminDisplay from 'mod_perform/components/element/ElementAdminDisplay';
+import FlexIcon from 'totara_core/components/icons/FlexIcon';
 
 export default {
+  functional: true,
+
   components: {
-    ElementAdminDisplay,
+    FlexIcon,
   },
+
   props: {
+    alt: String,
+    customClass: [String, Object, Array],
+    styleClass: Object,
+    size: [String, Number],
     title: String,
-    identifier: String,
-    type: Object,
-    data: Object,
-    isRequired: Boolean,
-    activityState: {
-      type: Object,
-      required: true,
-    },
-    error: String,
+  },
+
+  render(h, { props }) {
+    return h(FlexIcon, {
+      props: Object.assign({}, props, {
+        icon: 'settings',
+      }),
+    });
   },
 };
 </script>

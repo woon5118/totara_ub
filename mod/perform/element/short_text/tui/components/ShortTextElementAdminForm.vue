@@ -28,6 +28,7 @@
           v-slot="{ getSubmitting }"
           :initial-values="initialValues"
           :vertical="true"
+          :activity-state="activityState"
           input-width="full"
           @submit="handleSubmit"
         >
@@ -105,6 +106,10 @@ export default {
     isRequired: {
       type: Boolean,
       default: false,
+    },
+    activityState: {
+      type: Object,
+      required: true,
     },
     error: String,
   },

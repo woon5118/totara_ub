@@ -16,41 +16,41 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-  @author Oleg Demeshev <oleg.demeshev@totaralearning.com>
-  @package performelement_long_text
+  @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
+  @package performelement_date_picker
 -->
 <template>
-  <ElementAdminDisplay
+  <ElementAdminReadOnlyDisplay
     :type="type"
     :title="title"
-    :identifier="identifier"
     :error="error"
+    :identifier="identifier"
     :is-required="isRequired"
     :activity-state="activityState"
     @edit="$emit('edit')"
     @remove="$emit('remove')"
-    @display-read="$emit('display-read')"
+    @display="$emit('display')"
   />
 </template>
 
 <script>
-import ElementAdminDisplay from 'mod_perform/components/element/ElementAdminDisplay';
+import ElementAdminReadOnlyDisplay from 'mod_perform/components/element/ElementAdminReadOnlyDisplay';
 
 export default {
   components: {
-    ElementAdminDisplay,
+    ElementAdminReadOnlyDisplay,
   },
+
   props: {
     title: String,
     identifier: String,
     type: Object,
-    data: Object,
     isRequired: Boolean,
+    error: String,
     activityState: {
       type: Object,
       required: true,
     },
-    error: String,
   },
 };
 </script>

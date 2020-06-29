@@ -27,14 +27,12 @@ Feature: Manage performance activity long text elements
     And I set the following fields to these values:
       | rawTitle | Question 2 |
     And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"
-    Then I should see "Optional"
     And I close the tui notification toast
     And I close the tui modal
     Then I should see "1" in the "required" element summary of the activity section
     And I should see "1" in the "optional" element summary of the activity section
     And I should see "0" in the "other" element summary of the activity section
     When I click on "Edit content elements" "button"
-    Then I should see "Optional"
     And I should see "Required"
     When I click on identifier icon for question "Question 1"
     Then I should see "Identifier 1"

@@ -49,9 +49,6 @@ Feature: Adding, Updating, Removing activity elements.
     When I click on identifier icon for question "Question 1"
     Then I should see "Identifier 1"
     And I close popovers
-    And I click on identifier icon for question "Question 2"
-    Then I should see "Identifier 2"
-    And I close popovers
     And I should not see identifier icon for question "Question 3"
 
     # Update multiple elements and save.
@@ -88,23 +85,17 @@ Feature: Adding, Updating, Removing activity elements.
     When I click on identifier icon for question "Test 1"
     Then I should see "Identifier A"
     And I close popovers
-    When I click on identifier icon for question "Test 3"
-    Then I should see "Identifier C"
-    And I close popovers
     And I should not see identifier icon for question "Test 2"
+    And I close the tui notification toast
 
-    # Delete element while editing
-    When I click on edit icon for question "Test 1"
-    And I click on "Actions" "button"
-    And I click on "Delete" "link"
+    And I click on delete icon for question "Test 1"
 
     # Deletion confirmation modal.
     Then I should see "Confirm delete element" in the tui modal
     And I should see "This cannot be undone." in the tui modal
     When I close the tui modal
     Then I should not see "Element deleted."
-    When I click on "Actions" "button"
-    And I click on "Delete" "link"
+    And I click on delete icon for question "Test 1"
     And I confirm the tui confirmation modal
     Then I should see "Element deleted." in the tui "success" notification toast
     And I close the tui notification toast

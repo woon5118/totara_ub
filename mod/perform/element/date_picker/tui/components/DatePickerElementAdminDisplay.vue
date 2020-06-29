@@ -26,8 +26,10 @@
     :error="error"
     :identifier="identifier"
     :is-required="isRequired"
+    :activity-state="activityState"
     @edit="$emit('edit')"
     @remove="$emit('remove')"
+    @display-read="$emit('display-read')"
   >
     <template v-slot:content>
       <DateSelector
@@ -55,6 +57,10 @@ export default {
     type: Object,
     isRequired: Boolean,
     error: String,
+    activityState: {
+      type: Object,
+      required: true,
+    },
   },
 };
 </script>

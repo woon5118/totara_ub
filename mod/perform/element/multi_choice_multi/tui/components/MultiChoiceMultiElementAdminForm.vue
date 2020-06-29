@@ -20,7 +20,12 @@
   @package performelement_multi_choice_multi
 -->
 <template>
-  <ElementAdminForm :type="type" :error="error" @remove="$emit('remove')">
+  <ElementAdminForm
+    :type="type"
+    :error="error"
+    :activity-state="activityState"
+    @remove="$emit('remove')"
+  >
     <template v-slot:content>
       <div class="tui-elementEditMultiChoiceMulti">
         <Uniform
@@ -170,6 +175,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    activityState: {
+      type: Object,
+      required: true,
+    },
     data: Object,
     rawData: Object,
     error: String,
@@ -302,11 +311,7 @@ export default {
   "restriction_maximum_label"
   ],
   "mod_perform": [
-  "section_element_response_required"
-  ],
-  "moodle": [
-  "add",
-  "delete"
+    "section_element_response_required"
   ]
   }
 </lang-strings>

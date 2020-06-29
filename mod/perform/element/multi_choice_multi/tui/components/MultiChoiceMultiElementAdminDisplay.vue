@@ -26,8 +26,10 @@
     :identifier="identifier"
     :error="error"
     :is-required="isRequired"
+    :activity-state="activityState"
     @edit="$emit('edit')"
     @remove="$emit('remove')"
+    @display-read="$emit('display-read')"
   >
     <template v-slot:content>
       <CheckboxGroup :disabled="true">
@@ -62,6 +64,10 @@ export default {
     data: Object,
     isRequired: Boolean,
     error: String,
+    activityState: {
+      type: Object,
+      required: true,
+    },
   },
 };
 </script>

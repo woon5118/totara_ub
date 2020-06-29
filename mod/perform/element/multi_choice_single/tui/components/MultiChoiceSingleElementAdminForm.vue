@@ -20,7 +20,12 @@
   @package performelement_multi_choice_single
 -->
 <template>
-  <ElementAdminForm :type="type" :error="error" @remove="$emit('remove')">
+  <ElementAdminForm
+    :type="type"
+    :error="error"
+    :activity-state="activityState"
+    @remove="$emit('remove')"
+  >
     <template v-slot:content>
       <div class="tui-elementEditMultiChoiceSingle">
         <Uniform
@@ -144,6 +149,10 @@ export default {
     isRequired: {
       type: Boolean,
       default: false,
+    },
+    activityState: {
+      type: Object,
+      required: true,
     },
     data: Object,
     rawData: Object,

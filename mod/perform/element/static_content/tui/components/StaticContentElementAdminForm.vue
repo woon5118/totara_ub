@@ -19,7 +19,12 @@
   @package performelement_static_content
 -->
 <template>
-  <ElementAdminForm :type="type" :error="error" @remove="$emit('remove')">
+  <ElementAdminForm
+    :type="type"
+    :error="error"
+    :activity-state="activityState"
+    @remove="$emit('remove')"
+  >
     <template v-slot:content>
       <div class="tui-elementEditStaticContent">
         <Uniform
@@ -87,6 +92,10 @@ export default {
     data: Object,
     rawData: Object,
     error: String,
+    activityState: {
+      type: Object,
+      required: true,
+    },
   },
   data() {
     const initialValues = {

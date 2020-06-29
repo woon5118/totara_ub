@@ -43,6 +43,7 @@ type mod_perform_element_plugin {
   name: String!
   admin_form_component: String!
   admin_display_component: String!
+  admin_read_only_display_component: String!
   participant_form_component: String!
   participant_response_component: String!
 }

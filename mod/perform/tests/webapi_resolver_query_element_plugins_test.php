@@ -46,6 +46,7 @@ class mod_perform_webapi_resolver_query_element_plugins_testcase extends advance
             $this->assertNotEmpty($element_plugin->get_name());
             $this->assertNotEmpty($element_plugin->get_admin_form_component());
             $this->assertNotEmpty($element_plugin->get_admin_display_component());
+            $this->assertNotEmpty($element_plugin->get_admin_read_only_display_component());
             $this->assertNotEmpty($element_plugin->get_participant_form_component());
         }
     }
@@ -64,6 +65,7 @@ class mod_perform_webapi_resolver_query_element_plugins_testcase extends advance
             $this->assertNotEmpty($element_plugin['name']);
             $this->assertNotEmpty($element_plugin['admin_form_component']);
             $this->assertNotEmpty($element_plugin['admin_display_component']);
+            $this->assertNotEmpty($element_plugin['admin_read_only_display_component']);
             $this->assertNotEmpty($element_plugin['participant_form_component']);
         }
     }

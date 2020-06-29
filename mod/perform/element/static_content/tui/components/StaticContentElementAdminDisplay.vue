@@ -23,8 +23,10 @@
     :type="type"
     :title="title"
     :error="error"
+    :activity-state="activityState"
     @edit="$emit('edit')"
     @remove="$emit('remove')"
+    @display-read="$emit('display-read')"
   >
     <template v-slot:content :disabled="true">
       <div class="tui-staticContentElementAdminDisplay">
@@ -46,6 +48,10 @@ export default {
     type: Object,
     data: Object,
     error: String,
+    activityState: {
+      type: Object,
+      required: true,
+    },
   },
 };
 </script>

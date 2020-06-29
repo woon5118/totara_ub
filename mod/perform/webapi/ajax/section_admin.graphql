@@ -10,6 +10,7 @@ query mod_perform_section_admin($section_id: core_id!) {
           name
           admin_form_component
           admin_display_component
+          admin_read_only_display_component
           participant_form_component
         }
         title

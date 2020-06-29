@@ -149,6 +149,7 @@
                   ? savedSection.display_title
                   : activityName
               "
+              :activity-state="activityState"
               @update-summary="updateSection"
             >
               <template v-slot:trigger="{ open }">
@@ -267,7 +268,6 @@ export default {
     },
     multipleSectionsEnabled: {
       type: Boolean,
-      required: true,
     },
     activityState: {
       type: Object,
