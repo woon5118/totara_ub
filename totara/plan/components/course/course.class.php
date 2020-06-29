@@ -563,19 +563,24 @@ class dp_course_component extends dp_base_component {
 
         if (empty($CFG->disable_visibility_maps)) {
             $visibility = \totara_core\visibility_controller::course()->sql_where_visible($this->plan->userid, 'c');
-            if (!empty($visibility->is_empty())) {
+            if (!$visibility->is_empty()) {
                 $where .= ' AND ' . $visibility->get_sql();
                 $params = array_merge($params, $visibility->get_params());
             }
         } else {
-            list($visibilitysql, $visibilityparams) = totara_visibility_where($this->plan->userid,
+            list($visibilitysql, $visibilityparams) = totara_visibility_where(
+                $this->plan->userid,
                 'c.id',
                 'c.visible',
                 'c.audiencevisible',
                 'c',
-                'course');
-            $where .= ' AND ' . $visibilitysql;
-            $params = array_merge($params, $visibilityparams);
+                'course'
+            );
+
+            if (!empty($visibilitysql)) {
+                $where .= ' AND ' . $visibilitysql;
+                $params = array_merge($params, $visibilityparams);
+            }
         }
 
         $sort = " ORDER BY c.fullname";
