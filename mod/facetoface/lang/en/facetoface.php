@@ -1023,6 +1023,7 @@ $string['notificationduplicatesfound'] = 'Duplicates of auto notifications found
 $string['notificationduplicatesmessage'] = 'This message has duplicate. Please remove all duplicates manually.';
 $string['notificationnotesetonintendeddate'] = 'NOTE: This notification was not sent on its originally intended date';
 $string['notifications'] = 'Notifications';
+$string['notificationsin'] = 'Notifications in {$a}';
 $string['notificationsaved'] = 'Notification saved';
 $string['notificationssuccessfullyreset'] = 'Notifications successfully reset';
 $string['notificationtemplatedeleted'] = 'Notification template deleted';
