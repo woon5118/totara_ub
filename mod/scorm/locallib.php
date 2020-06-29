@@ -1018,16 +1018,23 @@ function scorm_print_launch ($user, $scorm, $action, $cm) {
                 echo html_writer::checkbox('newattempt', 'on', false, '', array('id' => 'a'));
                 echo html_writer::label(get_string('newattempt', 'scorm'), 'a');
         }
+        $enter_attributes = [
+            'type' => 'submit',
+            'value' => get_string('enter', 'scorm'),
+            'class' => 'btn btn-primary',
+        ];
+
         if (!empty($scorm->popup)) {
             echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'display', 'value' => 'popup'));
+            $enter_attributes['aria-describedby'] = 'mod_scorm--enter_popup';
+            echo html_writer::span(get_string('opensinnewwindow', 'mod_scorm'), 'sr-only', ['id' => 'mod_scorm--enter_popup']);
         }
 
         echo html_writer::empty_tag('br');
         echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'scoid', 'value' => $launchsco));
         echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'cm', 'value' => $cm->id));
         echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'currentorg', 'value' => $orgidentifier));
-        echo html_writer::empty_tag('input', array('type' => 'submit', 'value' => get_string('enter', 'scorm'),
-                'class' => 'btn btn-primary'));
+        echo html_writer::empty_tag('input', $enter_attributes);
         echo html_writer::end_tag('form');
         echo html_writer::end_div();
     }

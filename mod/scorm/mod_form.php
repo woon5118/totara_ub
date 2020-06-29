@@ -105,6 +105,7 @@ class mod_scorm_mod_form extends moodleform_mod {
         $mform->addElement('select', 'popup', get_string('display', 'scorm'), scorm_get_popup_display_array());
         $mform->setDefault('popup', $cfgscorm->popup);
         $mform->setAdvanced('popup', $cfgscorm->popup_adv);
+        $mform->addHelpButton('popup', 'display', 'scorm');
 
         // Width.
         $mform->addElement('text', 'width', get_string('width', 'scorm'), 'maxlength="5" size="5"');
