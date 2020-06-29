@@ -200,17 +200,6 @@ body.path-mod-facetoface div#fgroup_id_recipients input[id*='id_booked_type'] {
   margin-bottom: 48px;
 }
 
-.f2f-booked-type-error {
-  border: 1px solid $facetoface-border-color-error;
-  display: inline-block;
-}
-
-.f2f-booked-type-error-hint {
-  color: $facetoface-text-color-error;
-  display: inline-block;
-  width: 50%;
-}
-
 select.menuf2f-actions,
 select.menuf2f-select {
   display: inline-block;
@@ -1545,5 +1534,20 @@ a.mod_facetoface__action_goback {
         margin-left: var(--tui-gap-1);
       }
     }
+  }
+}
+
+.path-mod-facetoface-notification {
+  form.facetoface_notification_form {
+      div#fgroup_id_recipients {
+          fieldset.fgroup {
+              div.fitem {
+                  margin-bottom: var(--tui-gap-2);
+                  span.recipients_status {
+                      font-weight: bold;
+                  }
+              }
+          }
+      }
   }
 }
