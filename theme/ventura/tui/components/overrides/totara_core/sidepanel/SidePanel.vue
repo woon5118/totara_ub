@@ -62,7 +62,7 @@
     margin-left: 4px; /* ensure focus shadow is not cut off by container */
     border-right-width: 0;
     border-left-width: 1px;
-    border-radius: var(--tui-btn-square-radius) 0 0 var(--tui-btn-square-radius);
+    border-radius: var(--tui-btn-radius) 0 0 var(--tui-btn-radius);
 
     &:hover,
     &:active,
@@ -83,7 +83,7 @@
     margin-left: -1px;
     border-right-width: 1px;
     border-left-width: 0;
-    border-radius: 0 var(--tui-btn-square-radius) var(--tui-btn-square-radius) 0;
+    border-radius: 0 var(--tui-btn-radius) var(--tui-btn-radius) 0;
 
     &:hover,
     &:active,
