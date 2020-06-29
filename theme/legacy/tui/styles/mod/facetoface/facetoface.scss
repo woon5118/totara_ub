@@ -1330,7 +1330,7 @@ a.mod_facetoface__action_goback {
 .mod_facetoface__grade {
   display: flex;
 
-  &__input {
+  & &__input {
     width: 6em;
 
     &:focus::placeholder {
