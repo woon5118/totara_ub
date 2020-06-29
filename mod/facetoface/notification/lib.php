@@ -1578,14 +1578,15 @@ function facetoface_notification_session_dates(\stdClass $session) {
  * @access  public
  * @param   string  $msg            Email message
  * @param   string  $facetofacename F2F name
- * @param   obj     $user           The subject of the message
- * @param   obj     $data           Session data
+ * @param   object  $user           The subject of the message
+ * @param   object  $data           Session data
  * @param   int     $sessionid      Session ID
  * @param   int     $approvalrole   The id of the role set to approve the facetoface (optional)
  * @return  string
  */
 function facetoface_message_substitutions($msg, $coursename, $facetofacename, $user, $data, $sessionid, $approvalrole = null) {
     global $DB;
+    static $courselinks = [], $seminarlinks = []; // Cache.
 
     if (empty($msg)) {
         return '';
@@ -1596,6 +1597,14 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
     try {
         $seminarevent = new \mod_facetoface\seminar_event($sessionid);
         $seminar = $seminarevent->get_seminar();
+        $courseid = $seminar->get_course();
+        $seminarid = $seminar->get_id();
+        $courselink = $courselinks[$courseid] ?? ($courselinks[$courseid] = course_get_url($courseid));
+        $seminarlink = $seminarlinks[$seminarid] ?? ($seminarlinks[$seminarid] = new moodle_url('/mod/facetoface/view.php', ['f' => $seminarid]));
+        $eventlink = new moodle_url('/mod/facetoface/eventinfo.php', ['s' => $sessionid]);
+        $courselink = html_writer::link($courselink, htmlentities($coursename));
+        $seminarlink = html_writer::link($seminarlink, htmlentities($facetofacename));
+        $eventlink = html_writer::link($eventlink, htmlentities($eventlink));
         $seminarintro = $seminar->get_intro();
         $signup = \mod_facetoface\signup::create($user->id, $seminarevent);
         $cost = $signup->get_cost();
@@ -1613,6 +1622,10 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
             $cost = '';
         }
         $booked = 0;
+        // Just return names.
+        $courselink = $coursename;
+        $seminarlink = $facetofacename;
+        $eventlink = '';
     }
 
     // Get timezone setting.
@@ -1671,6 +1684,9 @@ function facetoface_message_substitutions($msg, $coursename, $facetofacename, $u
     $msg = str_replace('[coursename]', $coursename, $msg);
     $msg = str_replace('[facetofacename]', $facetofacename, $msg);
     $msg = str_replace('[seminarname]', $facetofacename, $msg);
+    $msg = str_replace('[coursenamelink]', $courselink, $msg);
+    $msg = str_replace('[seminarnamelink]', $seminarlink, $msg);
+    $msg = str_replace('[eventpagelink]', $eventlink, $msg);
     $msg = str_replace('[firstname]', $user->firstname, $msg);
     $msg = str_replace('[lastname]', $user->lastname, $msg);
     $msg = str_replace('[cost]', $cost, $msg);

@@ -183,8 +183,11 @@ You can find out which placeholder are available, and how custom field placehold
 The details of the seminar can be added to the notification by using the desired placeholders from the following list.
 
 * [coursename] - Name of course
+* [coursenamelink] - Name of course with link
 * [seminarname] - Name of seminar activity
+* [seminarnamelink] - Name of seminar activity with link
 * [seminardescription] - Seminar description
+* [eventpagelink] - Link to the event page
 * [cost] - Cost of event
 * [reminderperiod] - Amount of time before the event that the reminder message is sent
 * [sessiondate] - Date of the event the learner is booked on
