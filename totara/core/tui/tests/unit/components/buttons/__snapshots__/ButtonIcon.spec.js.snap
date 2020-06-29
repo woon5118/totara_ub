@@ -5,6 +5,7 @@ exports[`presentation/form/ButtonIcon.vue Checks snapshot 1`] = `
   aria-label="btn icon"
   class="tui-iconBtn tui-iconBtn--hasText"
   id="buttonicon"
+  title="btn icon"
   type="button"
 >
   <span

@@ -25,6 +25,7 @@ exports[`presentation/form/SearchBox.vue matches snapshot 1`] = `
   <button
     aria-label="label"
     class="tui-iconBtn tui-searchBox__button tui-iconBtn--small tui-iconBtn--transparent"
+    title="label"
     type="button"
   >
     <span

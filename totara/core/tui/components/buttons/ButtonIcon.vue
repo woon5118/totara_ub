@@ -51,6 +51,7 @@
     :formtarget="formtarget"
     :name="name"
     :type="type"
+    :title="titleText"
     :value="value"
     @click="$emit('click', $event)"
   >
@@ -132,6 +133,7 @@ export default {
     },
     name: String,
     text: String,
+    title: String,
     type: {
       default: 'button',
       type: String,
@@ -141,6 +143,13 @@ export default {
       },
     },
     value: String,
+  },
+  computed: {
+    titleText() {
+      if (this.title) return this.title;
+
+      return this.text !== this.ariaLabel ? this.ariaLabel : false;
+    },
   },
 };
 </script>

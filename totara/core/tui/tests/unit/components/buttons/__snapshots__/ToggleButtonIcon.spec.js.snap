@@ -4,6 +4,7 @@ exports[`ToggleSet Checks snapshot 1`] = `
 <button
   aria-label="label text"
   class="tui-iconBtn tui-iconBtn--small tui-iconBtn--toggle"
+  title="label text"
   type="button"
 >
   <span
