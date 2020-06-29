@@ -560,6 +560,94 @@ class totara_core_courselib_testcase extends advanced_testcase {
         $this->assertEquals(COMPLETION_COMPLETE, $labelmodulecompletions[$this->user6->id]->completionstate);
     }
 
+    public function test_archive_course_and_activities_with_pass_grades() {
+        global $DB;
+
+        $timenow = time();
+        $course = $this->data_generator->create_course(['enablecompletion' => 1]);
+
+        // Create quiz activity and add a question.
+        $options = [
+            'course'           => $course->id,
+            'questionsperpage' => 1,
+            'grade'            => 100.0,
+            'sumgrades'        => 1,
+            'completion'       => COMPLETION_TRACKING_AUTOMATIC,
+            'completionpass'   => 1,
+        ];
+        $quiz = $this->data_generator->create_module('quiz', $options);
+
+        /** @var core_question_generator $questiongenerator */
+        $questiongenerator = $this->data_generator->get_plugin_generator('core_question');
+        $cat = $questiongenerator->create_question_category();
+        $question = $questiongenerator->create_question('truefalse', null, ['category' => $cat->id]);
+        quiz_add_quiz_question($question->id, $quiz, 100.0);
+
+        // Set grade to pass for the quiz activity.
+        $item = grade_item::fetch(['courseid' => $course->id, 'itemtype' => 'mod', 'itemmodule' => 'quiz', 'iteminstance' => $quiz->id]);
+        $item->gradepass = 80;
+        $item->update();
+
+        // Set the course to be complete if the quiz is complete.
+        /** @var core_completion_generator $cgen */
+        $cgen = $this->data_generator->get_plugin_generator('core_completion');
+        $cgen->set_activity_completion($course->id, [$quiz]);
+
+        // Enrol a couple users.
+        $this->data_generator->enrol_user($this->user1->id, $course->id);
+        $this->data_generator->enrol_user($this->user2->id, $course->id);
+
+        // Start the passing attempt for user1.
+        $quizobj = quiz::create($quiz->id, $this->user1->id);
+        $quba = question_engine::make_questions_usage_by_activity('mod_quiz', $quizobj->get_context());
+        $quba->set_preferred_behaviour($quizobj->get_quiz()->preferredbehaviour);
+
+        $attempt = quiz_create_attempt($quizobj, 1, null, $timenow, false, $this->user1->id);
+        $attempt = quiz_start_new_attempt($quizobj, $quba, $attempt, 1, $timenow);
+        $attempt = quiz_attempt_save_started($quizobj, $quba, $attempt);
+
+        // Process a response.
+        $attemptobj = quiz_attempt::create($attempt->id);
+        $tosubmit = [1 => ['answer' => '1']];
+        $attemptobj->process_submitted_actions($timenow, false, $tosubmit);
+        self::assertTrue($attemptobj->has_response_to_at_least_one_graded_question());
+        $attemptobj->process_finish($timenow, false);
+
+        // Check module completions: user1 is complete, user2 has no completion records.
+        $quizcompletions = $DB->get_records('course_modules_completion', ['coursemoduleid' => $quiz->cmid], '', 'userid, completionstate');
+        self::assertEquals(COMPLETION_COMPLETE_PASS, $quizcompletions[$this->user1->id]->completionstate);
+        self::assertFalse(isset($quizcompletions[$this->user2->id]));
+        $grade = $DB->get_record('grade_grades', ['itemid' => $item->id, 'userid' => $this->user1->id]);
+        self::assertSame('100.00000', $grade->finalgrade);
+        self::assertFalse($DB->get_record('grade_grades', ['itemid' => $item->id, 'userid' => $this->user2->id]));
+
+        // Check course criteria completions: user1 is complete, user2 has no completion records.
+        $criteria = $DB->get_field('course_completion_criteria', 'id', ['course' => $course->id, 'criteriatype' => 4, 'module' => 'quiz', 'moduleinstance' => $quiz->cmid]);
+        $critcompletions = $DB->get_records('course_completion_crit_compl', ['course' => $course->id, 'criteriaid' => $criteria], '', 'userid, timecompleted');
+        self::assertCount(1, $critcompletions);
+        self::assertNotEmpty($critcompletions[$this->user1->id]->timecompleted);
+        self::assertFalse(isset($critcompletions[$this->user2->id]));
+
+        // Archive course and activities for both users.
+        archive_course_completion($this->user1->id, $course->id);
+        archive_course_activities($this->user1->id, $course->id);
+
+        archive_course_completion($this->user2->id, $course->id);
+        archive_course_activities($this->user2->id, $course->id);
+
+        // Check module completions.
+        $quizcompletions = $DB->get_records('course_modules_completion', ['coursemoduleid' => $quiz->cmid], '', 'userid, completionstate');
+        self::assertFalse(isset($quizcompletions[$this->user1->id]));
+        self::assertFalse(isset($quizcompletions[$this->user2->id]));
+        self::assertFalse($DB->get_record('grade_grades', ['itemid' => $item->id, 'userid' => $this->user1->id]));
+
+        // Check course criteria completions.
+        $critcompletions = $DB->get_records('course_completion_crit_compl', ['course' => $course->id, 'criteriaid' => $criteria], '', 'userid, timecompleted');
+        self::assertCount(0, $critcompletions);
+        self::assertFalse(isset($critcompletions[$this->user1->id]));
+        self::assertFalse(isset($critcompletions[$this->user2->id]));
+    }
+
     public function test_archive_course_purge_gradebook_manual_grades() {
         global $DB;
 

@@ -998,16 +998,22 @@ function certificate_get_grade($certificate, $course, $userid = null, $valueonly
  *
  * @param stdClass $certificate
  * @param stdClass $course
+ * @param null     $userid
+ *
  * @return string the outcome
  */
-function certificate_get_outcome($certificate, $course) {
+function certificate_get_outcome($certificate, $course, $userid = null) {
     global $USER;
+
+    if (empty($userid)) {
+        $userid = $USER->id;
+    }
 
     if ($certificate->printoutcome > 0) {
         if ($grade_item = new grade_item(array('id' => $certificate->printoutcome))) {
             $outcomeinfo = new stdClass;
             $outcomeinfo->name = $grade_item->get_name();
-            $outcome = new grade_grade(array('itemid' => $grade_item->id, 'userid' => $USER->id));
+            $outcome = new grade_grade(array('itemid' => $grade_item->id, 'userid' => $userid));
             $outcomeinfo->grade = grade_format_gradevalue($outcome->finalgrade, $grade_item, true, GRADE_DISPLAY_TYPE_REAL);
 
             return $outcomeinfo->name . ': ' . $outcomeinfo->grade;

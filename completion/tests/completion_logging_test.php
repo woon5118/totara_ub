@@ -77,9 +77,8 @@ class core_completion_completion_logging_testcase extends advanced_testcase {
     }
 
     public function test_archive_course_activities() {
-        global $DB, $USER;
-
-        $this->resetAfterTest(true);
+        global $DB, $USER, $CFG;
+        require_once($CFG->dirroot . '/mod/certificate/locallib.php'); // To issue a certificate.
 
         $user1 = $this->getDataGenerator()->create_user();
         $user2 = $this->getDataGenerator()->create_user();
@@ -110,6 +109,7 @@ class core_completion_completion_logging_testcase extends advanced_testcase {
         $coursemodule = get_coursemodule_from_instance('certificate', $moduleinstance->id, $course->id);
         $completioninfo = new completion_info($course);
         $completioninfo->set_module_viewed($coursemodule, $user1->id);
+        certificate_get_issue($course, $user1, $moduleinstance, $coursemodule); // Replicate issuing of a certificate.
         $cmcid = $DB->get_field('course_modules_completion', 'id',
             array('coursemoduleid' => $coursemodule->id, 'userid' => $user1->id));
 
@@ -119,8 +119,9 @@ class core_completion_completion_logging_testcase extends advanced_testcase {
         // Run the function.
         archive_course_activities($user1->id, $course->id);
 
-        $logs = $DB->get_records('course_completion_log');
-        $this->assertCount(1,$logs);
+        $this->assertCount(1, $DB->get_records('certificate_issues_history'));
+        $logs = $DB->get_records('course_completion_log', null, 'id DESC');
+        $this->assertCount(3, $logs);
         $log = reset($logs);
 
         $this->assertEquals($user1->id, $log->userid);
@@ -132,8 +133,6 @@ class core_completion_completion_logging_testcase extends advanced_testcase {
 
     public function test_archive_course_completion() {
         global $DB, $USER;
-
-        $this->resetAfterTest(true);
 
         $user1 = $this->getDataGenerator()->create_user();
         $user2 = $this->getDataGenerator()->create_user();

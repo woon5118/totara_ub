@@ -1921,9 +1921,16 @@ function quiz_get_completion_state($course, $cm, $userid, $type) {
 /**
  * Delete completion records
  *
- * @global object $DB
+ * @internal This function should only be used by the course archiving API.
+ *           It should never invalidate grades or activity completion state as these
+ *           operations need to be performed in specific order and are done inside
+ *           the archive_course_activities() function.
+ *
  * @param int $userid
  * @param int $courseid
+ * @param int $windowopens
+ *
+ * @return boolean
  */
 function quiz_archive_completion($userid, $courseid, $windowopens = NULL) {
     global $DB, $CFG;
@@ -1936,11 +1943,7 @@ function quiz_archive_completion($userid, $courseid, $windowopens = NULL) {
                         WHERE qa.quiz = q.id
                         AND userid = :userid)';
     if ($quizs = $DB->get_records_sql($sql, array('courseid' => $courseid, 'userid' => $userid))) {
-        require_once($CFG->libdir . '/completionlib.php');
         require_once($CFG->dirroot . '/mod/quiz/locallib.php');
-
-        $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
-        $completion = new completion_info($course);
 
         foreach ($quizs as $quiz) {
             // Deletion code copied from function quiz_delete_attempt() in /mod/quiz/locallib.php.
@@ -1961,14 +1964,10 @@ function quiz_archive_completion($userid, $courseid, $windowopens = NULL) {
             }
 
             // NOTE: grades are deleted automatically during archiving, no need to do it here.
-
-            // Reset completion.
-            $course_module = get_coursemodule_from_instance('quiz', $quiz->id, $courseid);
-            // Reset viewed
-            $completion->set_module_viewed_reset($course_module, $userid);
+            //       Caches invalidation also happens automatically during archiving.
         }
-        $completion->invalidatecache($courseid, $userid, true);
     }
+    return true;
 }
 
 /**

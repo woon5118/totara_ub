@@ -3350,14 +3350,19 @@ function feedback_can_view_analysis($feedback, $context, $courseid = false) {
 /**
  * Archives user's feedback for a course
  *
+ * @internal This function should only be used by the course archiving API.
+ *           It should never invalidate grades or activity completion state as these
+ *           operations need to be performed in specific order and are done inside
+ *           the archive_course_activities() function.
+ *
  * @param int $userid
  * @param int $courseid
+ * @param int $windowopens
+ *
+ * @return boolean
  */
 function feedback_archive_completion($userid, $courseid, $windowopens = NULL) {
-    global $DB, $CFG;
-
-    $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
-    $completion = new completion_info($course);
+    global $DB;
 
     $sql = "SELECT fc.*
             FROM {feedback_completed} fc
@@ -3388,14 +3393,19 @@ function feedback_archive_completion($userid, $courseid, $windowopens = NULL) {
                 $DB->insert_records_via_batch('feedback_value_history', $newvalues);
                 unset($newvalues);
 
-                // Then do the necessary
-                feedback_delete_completed($completed->id);
-                $course_module = get_coursemodule_from_instance('feedback', $completed->feedback, $courseid);
-                // Reset viewed
-                $completion->set_module_viewed_reset($course_module, $userid);
+                // Records clean up.
+                // IMPORTANT: do not call feedback_delete_completed() here as it messes with the activity
+                //            completion state and triggers events which should never be done in this function.
+                // First we delete all related values.
+                $DB->delete_records('feedback_value', array('completed' => $completed->id));
+
+                // Delete the completed record.
+                $DB->delete_records('feedback_completed', array('id' => $completed->id));
+
+                // NOTE: grades are deleted automatically during archiving, no need to do it here.
+                //       Caches invalidation also happens automatically during archiving.
             }
         }
-        $completion->invalidatecache($courseid, $userid, true);
     }
 
     return true;

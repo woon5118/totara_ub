@@ -1140,24 +1140,22 @@ function facetoface_pluginfile($course, $cm, $context, $filearea, $args, $forced
 /**
  * Removes grades and resets completion
  *
- * @global object $CFG
- * @global object $DB
+ * @internal This function should only be used by the course archiving API.
+ *           It should never invalidate grades or activity completion state as these
+ *           operations need to be performed in specific order and are done inside
+ *           the archive_course_activities() function.
+ *
  * @param int $userid
  * @param int $courseid
  * @param int|null $windowopens
  * @return boolean
  */
 function facetoface_archive_completion($userid, $courseid, $windowopens = NULL) {
-    global $DB, $CFG;
-
-    require_once($CFG->libdir . '/completionlib.php');
+    global $DB;
 
     if (!isset($windowopens)) {
         $windowopens = time();
     }
-
-    $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
-    $completion = new completion_info($course);
 
     // All facetoface sessions with this course and user.
     $sql = "SELECT f.*
@@ -1194,13 +1192,9 @@ function facetoface_archive_completion($userid, $courseid, $windowopens = NULL) 
         $DB->execute($sql, $params);
 
         // NOTE: grades are deleted automatically during archiving, no need to do it here.
-
-        // Set completion to incomplete.
-        // Reset viewed.
-        $course_module = get_coursemodule_from_instance('facetoface', $facetoface->id, $courseid);
-        $completion->set_module_viewed_reset($course_module, $userid);
-        $completion->invalidatecache($courseid, $userid, true);
+        //       Caches invalidation also happens automatically during archiving.
     }
+    return true;
 }
 
 /**

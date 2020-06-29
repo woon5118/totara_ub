@@ -1658,8 +1658,16 @@ function assign_check_updates_since(cm_info $cm, $from, $filter = array()) {
 /**
  * Archives user's assignments for a course
  *
+ * @internal This function should only be used by the course archiving API.
+ *           It should never invalidate grades or activity completion state as these
+ *           operations need to be performed in specific order and are done inside
+ *           the archive_course_activities() function.
+ *
  * @param int $userid
  * @param int $courseid
+ * @param int $windowopens
+ *
+ * @return boolean
  */
 function assign_archive_completion($userid, $courseid, $windowopens = NULL) {
     global $CFG, $DB;
@@ -1678,9 +1686,7 @@ function assign_archive_completion($userid, $courseid, $windowopens = NULL) {
         $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 
         // NOTE: grades are deleted automatically during archiving, no need to do it here.
-
-        // Create the course completion info.
-        $completion = new completion_info($course);
+        //       Caches invalidation also happens automatically during archiving.
 
         foreach ($submissions as $submission) {
             $cm = get_coursemodule_from_instance('assign', $submission->assignid, $course->id);
@@ -1690,11 +1696,7 @@ function assign_archive_completion($userid, $courseid, $windowopens = NULL) {
             $assignment = new assign($context, $cm, $course);
             $assignment->delete_user_submission($userid);
             $assignment->unlock_submission($userid);
-
-            // Reset viewed.
-            $completion->set_module_viewed_reset($cm, $userid);
         }
-        $completion->invalidatecache($courseid, $userid, true);
     }
 
     return true;

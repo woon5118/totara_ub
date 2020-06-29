@@ -1677,17 +1677,19 @@ function scorm_set_completion($scorm, $userid, $completionstate = COMPLETION_COM
 /**
  * Deletion archive completion records
  *
- * @global object $DB
+ * @internal This function should only be used by the course archiving API.
+ *           It should never invalidate grades or activity completion state as these
+ *           operations need to be performed in specific order and are done inside
+ *           the archive_course_activities() function.
+ *
  * @param int $userid
  * @param int $courseid
+ * @param int $windowopens
+ *
+ * @return boolean
  */
 function scorm_archive_completion($userid, $courseid, $windowopens = NULL) {
-    global $DB, $CFG;
-
-    require_once($CFG->libdir . '/completionlib.php');
-
-    $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
-    $completion = new completion_info($course);
+    global $DB;
 
     $sql = 'SELECT s.*
             FROM {scorm} s
@@ -1701,12 +1703,9 @@ function scorm_archive_completion($userid, $courseid, $windowopens = NULL) {
         $DB->delete_records('scorm_scoes_track', array('userid' => $userid, 'scormid' => $scorm->id));
 
         // NOTE: grades are deleted automatically during archiving, no need to do it here.
-
-        // Reset viewed.
-        $course_module = get_coursemodule_from_instance('scorm', $scorm->id, $courseid);
-        $completion->set_module_viewed_reset($course_module, $userid);
+        //       Caches invalidation also happens automatically during archiving.
     }
-    $completion->invalidatecache($courseid, $userid, true);
+    return true;
 }
 
 /*

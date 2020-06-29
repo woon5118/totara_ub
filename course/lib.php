@@ -3685,6 +3685,11 @@ function archive_course_activities($userid, $courseid, $windowopens = NULL) {
                     // Get all instances doesn't return the completion columns.
                     $cm = get_coursemodule_from_id($mod->name, $cm->coursemodule, $courseid);
 
+                    // Reset 'viewed' if activity supports tracking views.
+                    if (plugin_supports('mod', $mod->name, FEATURE_COMPLETION_TRACKS_VIEWS, 0)) {
+                        $completion->set_module_viewed_reset($cm, $userid);
+                    }
+
                     // Delete the course module completion, if it exists.
                     $cmcid = $DB->get_field('course_modules_completion', 'id', array('coursemoduleid' => $cm->id, 'userid' => $userid));
                     if (!empty($cmcid)) {
@@ -3693,11 +3698,11 @@ function archive_course_activities($userid, $courseid, $windowopens = NULL) {
                         \core_completion\helper::save_completion_log($courseid, $userid, "Deleted module completion in archive_course_activities<br><ul><li>CMCID: {$cmcid}</li></ul>");
                         $transaction->allow_commit();
                     }
-
-                    $completion->invalidatecache($courseid, $userid, true);
                 }
             }
         }
+
+        $completion->invalidatecache($courseid, $userid, true);
     }
     return true;
 }

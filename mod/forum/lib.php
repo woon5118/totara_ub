@@ -7753,20 +7753,21 @@ function forum_get_posts_by_user($user, array $courses, $musthaveaccess = false,
 /**
  * Copied code from forum_reset_userdata()
  *
- * @global type $CFG
- * @global object $DB
- * @param type $userid
- * @param type $courseid
+ * @internal This function should only be used by the course archiving API.
+ *           It should never invalidate grades or activity completion state as these
+ *           operations need to be performed in specific order and are done inside
+ *           the archive_course_activities() function.
+ *
+ * @param int $userid
+ * @param int $courseid
+ * @param int $windowopens
+ *
  * @return boolean
  */
 function forum_archive_completion($userid, $courseid, $windowopens = NULL) {
     global $DB, $CFG;
 
-    require_once($CFG->libdir . '/completionlib.php');
     require_once($CFG->dirroot . '/rating/lib.php');
-
-    $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
-    $completion = new completion_info($course);
 
     // All forums associated with this course and user
     $sql = 'SELECT f.*
@@ -7830,13 +7831,9 @@ function forum_archive_completion($userid, $courseid, $windowopens = NULL) {
         $DB->execute($sql, $params);
 
         // NOTE: grades are deleted automatically during archiving, no need to do it here.
-
-        // Set completion to incomplete
-        // Reset viewed
-        $completion->set_module_viewed_reset($course_module, $userid);
+        //       Caches invalidation also happens automatically during archiving.
     }
-
-    $completion->invalidatecache($courseid, $userid, true);
+    return true;
 }
 
 /**
