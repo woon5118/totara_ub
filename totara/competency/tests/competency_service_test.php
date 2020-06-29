@@ -51,7 +51,7 @@ class totara_competency_competency_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals(1, $result['page']);
         $this->assertEquals(1, $result['pages']);
         $this->assertNull($result['prev']);
@@ -84,7 +84,7 @@ class totara_competency_competency_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
 
         $expected_ids = competency::repository()
             ->order_by_raw('frameworkid ASC, sortthread ASC, id ASC')
@@ -109,7 +109,7 @@ class totara_competency_competency_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals(1, $result['page']);
         $this->assertEquals(1, $result['pages']);
         $this->assertNull($result['prev']);
@@ -129,7 +129,7 @@ class totara_competency_competency_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals(1, $result['page']);
         $this->assertEquals(1, $result['pages']);
         $this->assertNull($result['prev']);
@@ -154,7 +154,7 @@ class totara_competency_competency_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals(1, $result['page']);
         $this->assertEquals(1, $result['pages']);
         $this->assertNull($result['prev']);
@@ -182,7 +182,7 @@ class totara_competency_competency_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals(1, $result['page']);
         $this->assertEquals(1, $result['pages']);
         $this->assertNull($result['prev']);
@@ -215,7 +215,7 @@ class totara_competency_competency_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals(1, $result['page']);
         $this->assertEquals(1, $result['pages']);
         $this->assertNull($result['prev']);
@@ -243,7 +243,7 @@ class totara_competency_competency_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals(1, $result['page']);
         $this->assertEquals(1, $result['pages']);
         $this->assertNull($result['prev']);
@@ -272,7 +272,7 @@ class totara_competency_competency_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals(1, $result['page']);
         $this->assertEquals(1, $result['pages']);
         $this->assertNull($result['prev']);
@@ -290,7 +290,7 @@ class totara_competency_competency_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertCount(12, $result['items']);
         $this->assertEquals(1, $result['page']);
         $this->assertEquals(1, $result['pages']);
@@ -311,7 +311,7 @@ class totara_competency_competency_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals(1, $result['page']);
         $this->assertEquals(1, $result['pages']);
         $this->assertNull($result['prev']);
@@ -340,7 +340,7 @@ class totara_competency_competency_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals(1, $result['page']);
         $this->assertEquals(1, $result['pages']);
         $this->assertNull($result['prev']);
@@ -364,7 +364,7 @@ class totara_competency_competency_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals([
             'Talking',
         ], array_column($result['items'], 'display_name'));
@@ -379,7 +379,7 @@ class totara_competency_competency_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals([
             'Coding',
         ], array_column($result['items'], 'display_name'));
@@ -394,7 +394,7 @@ class totara_competency_competency_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals([
             'Hacking',
         ], array_column($result['items'], 'display_name'));
@@ -409,7 +409,7 @@ class totara_competency_competency_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals([
             'Coding',
             'Talking'
@@ -425,7 +425,7 @@ class totara_competency_competency_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals([
             'Chef proficiency',
         ], array_column($result['items'], 'display_name'));
@@ -440,7 +440,7 @@ class totara_competency_competency_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals([
             'Baking skill-set',
         ], array_column($result['items'], 'display_name'));
@@ -455,7 +455,7 @@ class totara_competency_competency_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals([
             'Cooking',
         ], array_column($result['items'], 'display_name'));
@@ -470,7 +470,7 @@ class totara_competency_competency_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals([
             'Accounting',
             'Designing interiors',
@@ -486,7 +486,7 @@ class totara_competency_competency_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals([
             'Coding',
             'Cooking',
@@ -504,7 +504,7 @@ class totara_competency_competency_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals([
             'Accounting',
             'Cooking',
@@ -530,7 +530,7 @@ class totara_competency_competency_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals([
             'Accounting',
             'Coding',
@@ -553,7 +553,7 @@ class totara_competency_competency_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals([
             'Accounting',
             'Chef proficiency',
@@ -570,7 +570,7 @@ class totara_competency_competency_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals([
             'Baking skill-set',
             'Coding',
@@ -592,7 +592,7 @@ class totara_competency_competency_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals([
             'Accounting',
             'Baking skill-set',
@@ -620,7 +620,7 @@ class totara_competency_competency_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertCount(20, $first = $result['items']);
         $this->assertEquals(80, $result['total']);
         $this->assertEquals(1, $result['page']);
@@ -637,7 +637,7 @@ class totara_competency_competency_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertCount(20, $second = $result['items']);
         $this->assertEquals(80, $result['total']);
         $this->assertEquals(2, $result['page']);
@@ -654,7 +654,7 @@ class totara_competency_competency_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertCount(20, $fourth = $result['items']);
         $this->assertEquals(80, $result['total']);
         $this->assertEquals(4, $result['page']);
@@ -671,7 +671,7 @@ class totara_competency_competency_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertCount(0, $fifth = $result['items']);
         $this->assertEquals(80, $result['total']);
         $this->assertEquals(5, $result['page']);
@@ -695,7 +695,7 @@ class totara_competency_competency_service_testcase extends advanced_testcase {
             'direction' => 'asc'
         ]);
         $result = $res['data'] ?? null;
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals(11, $result['total']);
 
         //index service will filter out a certain competency if provide a competency_id
@@ -707,7 +707,7 @@ class totara_competency_competency_service_testcase extends advanced_testcase {
             'direction' => 'asc'
         ]);
         $result = $res['data'] ?? null;
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals(10, $result['total']);
 
         //assert first competency is not in list
@@ -725,7 +725,7 @@ class totara_competency_competency_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals($comp[2]->id, $result['id']);
         $this->assertRegExp("/{$comp[2]->description}/", $result['description']);
         $this->assertEquals($comp[2]->frameworkid, $result['frameworkid']);
@@ -743,7 +743,7 @@ class totara_competency_competency_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals($comp[2]->id, $result['id']);
         $this->assertRegExp("/{$comp[2]->description}/", $result['description']);
         $this->assertEquals($comp[2]->frameworkid, $result['frameworkid']);
@@ -778,7 +778,7 @@ class totara_competency_competency_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals($comp[2]->id, $result['id']);
         $this->assertRegExp("/{$comp[2]->description}/", $result['description']);
         $this->assertEquals($comp[2]->frameworkid, $result['frameworkid']);

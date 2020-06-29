@@ -175,7 +175,7 @@ class mod_perform_subject_instance_progress_testcase extends state_testcase {
         $participant_instance2 = $participant_instances[1];
         /** @var user $subject_user1 */
         $subject_user1 = user::repository()->find($participant_instance1->participant_id);
-        $this->setUser($subject_user1->to_the_origins());
+        $this->setUser($subject_user1->get_record());
 
         // Make one participant instance go to in_progress.
         $this->proceed_participant_instance_progress($participant_instance1, in_progress_participant_instance::class);

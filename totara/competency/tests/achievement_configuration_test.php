@@ -88,7 +88,7 @@ class totara_competency_achievement_configuration_testcase extends advanced_test
         $data = $this->setup_data();
 
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessageRegExp('/Invalid configuration change type/');
+        $this->expectExceptionMessageMatches('/Invalid configuration change type/');
 
         configuration_change::add_competency_entry(
             $data->config->get_competency()->id,

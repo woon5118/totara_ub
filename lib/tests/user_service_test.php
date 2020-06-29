@@ -45,7 +45,7 @@ class core_user_service_testcase extends advanced_testcase {
 
         $data = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals(1, $data['page']);
         $this->assertEquals(1, $data['pages']);
         $this->assertNull($data['prev']);
@@ -73,7 +73,7 @@ class core_user_service_testcase extends advanced_testcase {
 
         $data = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals(1, $data['page']);
         $this->assertEquals(1, $data['pages']);
         $this->assertNull($data['prev']);
@@ -107,7 +107,7 @@ class core_user_service_testcase extends advanced_testcase {
         $data = $res['data'] ?? null;
 
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals(
             [
                 'Ivan Ivanovich',
@@ -129,7 +129,7 @@ class core_user_service_testcase extends advanced_testcase {
 
         $data = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEmpty($data['items']);
     }
 
@@ -145,7 +145,7 @@ class core_user_service_testcase extends advanced_testcase {
 
         $data = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertCount(20, $first = $data['items']);
         $this->assertEquals(51, $data['total']); // 50 we've created + admin is already there and guest is filtered out
         $this->assertEquals(1, $data['page']);
@@ -162,7 +162,7 @@ class core_user_service_testcase extends advanced_testcase {
 
         $data = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertCount(20, $second = $data['items']);
         $this->assertEquals(51, $data['total']); // 50 we've created + admin is already there and guest is filtered out
         $this->assertEquals(2, $data['page']);
@@ -179,7 +179,7 @@ class core_user_service_testcase extends advanced_testcase {
 
         $data = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertCount(11, $third = $data['items']);
         $this->assertEquals(51, $data['total']); // 50 we've created + admin is already there and guest is filtered out
         $this->assertEquals(3, $data['page']);
@@ -196,7 +196,7 @@ class core_user_service_testcase extends advanced_testcase {
 
         $data = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertCount(0, $fourth = $data['items']);
         $this->assertEquals(51, $data['total']); // 50 we've created + admin is already there and guest is filtered out
         $this->assertEquals(4, $data['page']);

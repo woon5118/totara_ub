@@ -294,9 +294,9 @@ class mod_perform_activity_clone_model_helper_testcase extends advanced_testcase
         // Try cloning when not allowed - we expect an exception with course/user/capability details in it.
         $this->expectException($exception_class);
         $this->expectExceptionMessage($exception_message);
-        $this->expectExceptionMessageRegExp("/[user_id] => {$user->id}/");
-        $this->expectExceptionMessageRegExp("/[courseid] => {$activity->course}/");
-        $this->expectExceptionMessageRegExp('/' . str_replace('container/', '', $capability) . '/');
+        $this->expectExceptionMessageMatches("/[user_id] => {$user->id}/");
+        $this->expectExceptionMessageMatches("/[courseid] => {$activity->course}/");
+        $this->expectExceptionMessageMatches('/' . str_replace('container/', '', $capability) . '/');
         $activity->clone();
     }
 

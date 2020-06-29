@@ -168,7 +168,7 @@ class mod_perform_participant_instance_progress_testcase extends state_testcase 
         $participant_section1 = participant_section::load_by_entity($participant_section1_entity);
         $participant_section2 = participant_section::load_by_entity($participant_section2_entity);
 
-        $this->setUser($subject_user1->to_the_origins());
+        $this->setUser($subject_user1->get_record());
 
         // Progress section1 to in_progress - instance is expected to be in_progress as a result.
         $participant_section1->switch_state(in_progress_section::class);

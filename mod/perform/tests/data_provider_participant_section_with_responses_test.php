@@ -284,7 +284,7 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
 
         $subject_section = $generator->create_participant_instance_and_section(
             $activity,
-            $subject_user->to_the_origins(),
+            $subject_user->get_record(),
             $subject_instance->id,
             $section,
             $subject_section_relationship->core_relationship_id
@@ -377,7 +377,7 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
 
         $generator->create_participant_instance_and_section(
             $activity,
-            $subject_user->to_the_origins(),
+            $subject_user->get_record(),
             $subject_instance->id,
             $section,
             $subject_section_relationship->core_relationship_id
@@ -503,7 +503,7 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
 
         $generator->create_participant_instance_and_section(
             $activity,
-            $subject_user->to_the_origins(),
+            $subject_user->get_record(),
             $subject_instance->id,
             $section,
             $subject_section_relationship->core_relationship_id

@@ -46,7 +46,7 @@ class totara_core_basket_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals([1, 2, 3, 4], $result['ids']);
         $this->assertGreaterThan(0, $result['limit']);
     }
@@ -58,7 +58,7 @@ class totara_core_basket_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals([], $result['ids']);
         $this->assertGreaterThan(0, $result['limit']);
     }
@@ -75,7 +75,7 @@ class totara_core_basket_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals([1, 2, 3, 4, 5, 6, 7], $result['ids']);
         $this->assertGreaterThan(0, $result['limit']);
 
@@ -94,7 +94,7 @@ class totara_core_basket_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals([5, 6, 7], $result['ids']);
         $this->assertGreaterThan(0, $result['limit']);
 
@@ -113,7 +113,7 @@ class totara_core_basket_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals([1, 2], $result['ids']);
         $this->assertGreaterThan(0, $result['limit']);
 
@@ -132,7 +132,7 @@ class totara_core_basket_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals([1, 2, 3, 4], $result['ids']);
         $this->assertGreaterThan(0, $result['limit']);
 
@@ -149,7 +149,7 @@ class totara_core_basket_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals([], $result['ids']);
         $this->assertGreaterThan(0, $result['limit']);
 
@@ -168,7 +168,7 @@ class totara_core_basket_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals([1, 2, 3, 4], $result['ids']);
         $this->assertGreaterThan(0, $result['limit']);
 
@@ -194,7 +194,7 @@ class totara_core_basket_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals([1, 2, 3, 4], $result['ids']);
         $this->assertGreaterThan(0, $result['limit']);
 
@@ -217,7 +217,7 @@ class totara_core_basket_service_testcase extends advanced_testcase {
             ]
         ]);
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $basket = new session_basket('test2');
         $this->assertEquals([1, 2, 3, 4], $basket->load());
 
@@ -237,7 +237,7 @@ class totara_core_basket_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals([1, 2, 3, 4], $result['ids']);
         $this->assertGreaterThan(0, $result['limit']);
 
@@ -260,7 +260,7 @@ class totara_core_basket_service_testcase extends advanced_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals([1, 2, 3, 4, 5, 6, 7, 8], $result['ids']);
         $this->assertGreaterThan(0, $result['limit']);
     }
@@ -281,7 +281,7 @@ class totara_core_basket_service_testcase extends advanced_testcase {
         ]);
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals([1, 2, 3, 4], $result['ids']);
         $this->assertGreaterThan(0, $result['limit']);
     }
@@ -302,7 +302,7 @@ class totara_core_basket_service_testcase extends advanced_testcase {
         ]);
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals([], $result['ids']);
         $this->assertGreaterThan(0, $result['limit']);
     }

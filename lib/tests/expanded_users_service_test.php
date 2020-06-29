@@ -52,7 +52,7 @@ class core_expanded_users_service_testcase extends expanded_users_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertArrayHasKey('items', $result);
         $this->assertCount(0, $result['items']);
         $this->assertEquals(0, $result['total']);
@@ -74,7 +74,7 @@ class core_expanded_users_service_testcase extends expanded_users_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertArrayHasKey('items', $result);
         $this->assertCount(0, $result['items']);
         $this->assertEquals(0, $result['total']);
@@ -98,7 +98,7 @@ class core_expanded_users_service_testcase extends expanded_users_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertArrayHasKey('items', $result);
         $this->assertCount(2, $result['items']);
 
@@ -138,7 +138,7 @@ class core_expanded_users_service_testcase extends expanded_users_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertArrayHasKey('items', $result);
         $this->assertCount(3, $result['items']);
 
@@ -203,7 +203,7 @@ class core_expanded_users_service_testcase extends expanded_users_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertArrayHasKey('items', $result);
         $this->assertCount(5, $result['items']);
 
@@ -282,7 +282,7 @@ class core_expanded_users_service_testcase extends expanded_users_testcase {
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertArrayHasKey('items', $result);
         $this->assertCount(10, $result['items']);
 

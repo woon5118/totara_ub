@@ -170,7 +170,7 @@ class pathway_manual_roles_testcase extends advanced_testcase {
         $this->assertFalse(role_factory::roles_exist($invalid_role_name, false));
         $this->assertFalse(role_factory::roles_exist([$invalid_role_name, $invalid_role_name], false));
 
-        $this->expectExceptionMessageRegExp("|Invalid role specified: '{$invalid_role_name}'|");
+        $this->expectExceptionMessageMatches("|Invalid role specified: '{$invalid_role_name}'|");
         $this->assertFalse(role_factory::roles_exist($invalid_role_name, true));
     }
 
@@ -183,7 +183,7 @@ class pathway_manual_roles_testcase extends advanced_testcase {
 
         $this->assertTrue((new self_role())->set_subject_user($user->id)->has_role());
 
-        $this->expectExceptionMessageRegExp("|Must set the subject user with set_subject_user()|");
+        $this->expectExceptionMessageMatches("|Must set the subject user with set_subject_user()|");
         (new self_role())->has_role();
     }
 

@@ -48,7 +48,7 @@ class mod_perform_webapi_resolver_query_subject_instance_testcase extends mod_pe
         $actual = $this->get_webapi_operation_data($result);
 
         $profile_image_small_url = (new \user_picture(
-            self::$about_user_and_participating->subject_user->to_the_origins(),
+            self::$about_user_and_participating->subject_user->get_record(),
             0
         ))->get_url($GLOBALS['PAGE'])->out(false);
 

@@ -45,7 +45,7 @@ class mod_perform_webapi_type_track_assignment_testcase extends advanced_testcas
         $this->create_assignment();
 
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessageRegExp("/track assignment model/");
+        $this->expectExceptionMessageMatches("/track assignment model/");
 
         $this->resolve_graphql_type(self::TYPE, 'id', new \stdClass());
     }
@@ -58,7 +58,7 @@ class mod_perform_webapi_type_track_assignment_testcase extends advanced_testcas
         $field = 'unknown';
 
         $this->expectException(moodle_exception::class);
-        $this->expectExceptionMessageRegExp("/$field/");
+        $this->expectExceptionMessageMatches("/$field/");
 
         $this->resolve_graphql_type(self::TYPE, $field, $assignment, [], $context);
     }

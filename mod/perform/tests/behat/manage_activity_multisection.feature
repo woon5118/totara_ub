@@ -272,6 +272,7 @@ Feature: Managing an activity with multiple sections
 
     # Done button should be disabled unless there have been changes
     When I click on "button[aria-label='Edit section']" "css_element" in the "1" activity section
+    And I wait for pending js
     Then "button.tui-formBtn.tui-formBtn--prim[disabled]" "css_element" in the "1" activity section should exist
     And "button.tui-formBtn:not(.tui-formBtn--prim)[disabled]" "css_element" in the "1" activity section should not exist
     When I set the title of activity section "1" to "The First Section!"

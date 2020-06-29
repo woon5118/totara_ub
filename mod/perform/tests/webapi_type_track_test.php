@@ -48,7 +48,7 @@ class mod_perform_webapi_type_track_testcase extends advanced_testcase {
         $this->create_track();
 
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessageRegExp("/track/");
+        $this->expectExceptionMessageMatches("/track/");
 
         $this->resolve_graphql_type(self::TYPE, 'id', new \stdClass());
     }
@@ -61,7 +61,7 @@ class mod_perform_webapi_type_track_testcase extends advanced_testcase {
         $field = 'unknown';
 
         $this->expectException(moodle_exception::class);
-        $this->expectExceptionMessageRegExp("/$field/");
+        $this->expectExceptionMessageMatches("/$field/");
 
         $this->resolve_graphql_type(self::TYPE, $field, $track, [], $context);
     }

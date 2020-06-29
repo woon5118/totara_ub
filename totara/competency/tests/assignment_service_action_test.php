@@ -43,8 +43,8 @@ class totara_competency_assignment_action_service_testcase extends advanced_test
             'extra' => []
         ]);
 
-        $this->assertWebserviceError($res);
-        $this->assertWebserviceHasExceptionMessage('You must supply either basket_id or assignment_id, not both of them', $res);
+        $this->assert_webservice_error($res);
+        $this->assert_webservice_has_exception_message('You must supply either basket_id or assignment_id, not both of them', $res);
     }
 
     public function test_action_both_not_null() {
@@ -55,8 +55,8 @@ class totara_competency_assignment_action_service_testcase extends advanced_test
             'extra' => []
         ]);
 
-        $this->assertWebserviceError($res);
-        $this->assertWebserviceHasExceptionMessage('You must supply either basket_id or assignment_id, not both of them', $res);
+        $this->assert_webservice_error($res);
+        $this->assert_webservice_has_exception_message('You must supply either basket_id or assignment_id, not both of them', $res);
     }
 
     public function test_action_archive() {
@@ -74,7 +74,7 @@ class totara_competency_assignment_action_service_testcase extends advanced_test
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals([$assignment1->id], $result);
 
         $assignment1->refresh();
@@ -109,7 +109,7 @@ class totara_competency_assignment_action_service_testcase extends advanced_test
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEqualsCanonicalizing([$assignment1->id, $assignment2->id], $result);
 
         $assignment1->refresh();
@@ -149,7 +149,7 @@ class totara_competency_assignment_action_service_testcase extends advanced_test
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
 
         // assignment 3 is not in the result as it could not be archived
         $this->assertEqualsCanonicalizing([$assignment1->id, $assignment2->id], $result);
@@ -178,8 +178,8 @@ class totara_competency_assignment_action_service_testcase extends advanced_test
             'extra' => []
         ]);
 
-        $this->assertWebserviceError($res);
-        $this->assertWebserviceHasExceptionMessage('unknown action for update webservice', $res);
+        $this->assert_webservice_error($res);
+        $this->assert_webservice_has_exception_message('unknown action for update webservice', $res);
     }
 
     public function test_action_activate() {
@@ -198,7 +198,7 @@ class totara_competency_assignment_action_service_testcase extends advanced_test
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals([$assignment1->id], $result);
 
         $assignment1->refresh();
@@ -233,7 +233,7 @@ class totara_competency_assignment_action_service_testcase extends advanced_test
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEqualsCanonicalizing([$assignment1->id, $assignment2->id], $result);
 
         $assignment1->refresh();
@@ -273,7 +273,7 @@ class totara_competency_assignment_action_service_testcase extends advanced_test
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEqualsCanonicalizing([$assignment1->id], $result);
 
         $assignment1->refresh();
@@ -301,7 +301,7 @@ class totara_competency_assignment_action_service_testcase extends advanced_test
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals([$assignment1->id], $result);
 
         // assignment is gone
@@ -335,7 +335,7 @@ class totara_competency_assignment_action_service_testcase extends advanced_test
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEqualsCanonicalizing([$assignment1->id, $assignment3->id], $result);
 
         // assignments are gone

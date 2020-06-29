@@ -117,7 +117,7 @@ class mod_perform_webapi_resolver_mutation_create_activity_testcase extends adva
         ];
 
         $this->expectException(create_exception::class);
-        $this->expectExceptionMessageRegExp("/type/");
+        $this->expectExceptionMessageMatches("/type/");
 
         $this->resolve_graphql_mutation(self::MUTATION, $args);
     }
@@ -130,7 +130,7 @@ class mod_perform_webapi_resolver_mutation_create_activity_testcase extends adva
         ];
 
         $this->expectException(create_exception::class);
-        $this->expectExceptionMessageRegExp("/type id/");
+        $this->expectExceptionMessageMatches("/type id/");
 
         $this->resolve_graphql_mutation(self::MUTATION, $args);
     }

@@ -45,7 +45,7 @@ class core_cohort_service_testcase extends advanced_testcase {
 
         $data = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals(1, $data['page']);
         $this->assertEquals(1, $data['pages']);
         $this->assertNull($data['prev']);
@@ -85,7 +85,7 @@ class core_cohort_service_testcase extends advanced_testcase {
 
         $data = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals(1, $data['page']);
         $this->assertEquals(1, $data['pages']);
         $this->assertNull($data['prev']);
@@ -110,7 +110,7 @@ class core_cohort_service_testcase extends advanced_testcase {
 
         $data = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals(1, $data['page']);
         $this->assertEquals(1, $data['pages']);
         $this->assertNull($data['prev']);
@@ -140,7 +140,7 @@ class core_cohort_service_testcase extends advanced_testcase {
 
         $data = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEqualsCanonicalizing(
             [
                 'Cohort 2',
@@ -162,7 +162,7 @@ class core_cohort_service_testcase extends advanced_testcase {
 
         $data = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEmpty($data['items']);
     }
 
@@ -178,7 +178,7 @@ class core_cohort_service_testcase extends advanced_testcase {
 
         $data = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals(1, $data['page']);
         $this->assertEquals(1, $data['pages']);
         $this->assertNull($data['prev']);
@@ -194,7 +194,7 @@ class core_cohort_service_testcase extends advanced_testcase {
 
         $data = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertCount(6, $data['items']);
         $this->assertEquals(1, $data['page']);
         $this->assertEquals(1, $data['pages']);
@@ -214,7 +214,7 @@ class core_cohort_service_testcase extends advanced_testcase {
 
         $data = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertCount(20, $first = $data['items']);
         $this->assertEquals(70, $data['total']);
         $this->assertEquals(1, $data['page']);
@@ -231,7 +231,7 @@ class core_cohort_service_testcase extends advanced_testcase {
 
         $data = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertCount(20, $second = $data['items']);
         $this->assertEquals(70, $data['total']);
         $this->assertEquals(2, $data['page']);
@@ -248,7 +248,7 @@ class core_cohort_service_testcase extends advanced_testcase {
 
         $data = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertCount(10, $fourth = $data['items']);
         $this->assertEquals(70, $data['total']);
         $this->assertEquals(4, $data['page']);
@@ -265,7 +265,7 @@ class core_cohort_service_testcase extends advanced_testcase {
 
         $data = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertCount(0, $fifth = $data['items']);
         $this->assertEquals(70, $data['total']);
         $this->assertEquals(5, $data['page']);

@@ -98,7 +98,7 @@ class progress {
         $assignments = assignments::for($user_id)->set_filters($filters)->fetch();
 
         // This converts user to an stdClass, there is a stupid hardcoded check for stdClasses
-        $this->user = $assignments->get_user()->to_the_origins();
+        $this->user = $assignments->get_user()->get_record();
 
         $this->items = item::build_from_assignments_provider($assignments);
 

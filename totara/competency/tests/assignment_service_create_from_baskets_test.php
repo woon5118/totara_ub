@@ -52,7 +52,7 @@ class totara_competency_assignment_service_create_from_baskets_testcase extends 
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertCount(2, $result);
 
         // Check first assignment
@@ -88,7 +88,7 @@ class totara_competency_assignment_service_create_from_baskets_testcase extends 
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertCount(2, $result);
 
         $this->assertEmpty(
@@ -115,7 +115,7 @@ class totara_competency_assignment_service_create_from_baskets_testcase extends 
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertCount(2, $result);
 
         foreach ($result as $assignment) {
@@ -144,7 +144,7 @@ class totara_competency_assignment_service_create_from_baskets_testcase extends 
             'usergroups' => $data['user_groups'],
             'status' => assignment::STATUS_DRAFT
         ]);
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assert_has_notification(
             \core\notification::SUCCESS,
             get_string('confirm_assignment_creation_draft_plural', 'totara_competency', (object) ['created' => 2])
@@ -159,7 +159,7 @@ class totara_competency_assignment_service_create_from_baskets_testcase extends 
             'usergroups' => $data['user_groups'],
             'status' => assignment::STATUS_ACTIVE
         ]);
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assert_has_notification(
             \core\notification::SUCCESS,
             get_string('confirm_assignment_creation_active_plural', 'totara_competency', (object) ['created' => 2])
@@ -179,7 +179,7 @@ class totara_competency_assignment_service_create_from_baskets_testcase extends 
             'usergroups' => [user_groups::USER => 'single'],
             'status' => assignment::STATUS_DRAFT
         ]);
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assert_has_notification(
             \core\notification::SUCCESS,
             get_string('confirm_assignment_creation_draft_singular', 'totara_competency', (object) ['created' => 1])
@@ -199,7 +199,7 @@ class totara_competency_assignment_service_create_from_baskets_testcase extends 
             'usergroups' => [user_groups::USER => 'single'],
             'status' => assignment::STATUS_ACTIVE
         ]);
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assert_has_notification(
             \core\notification::SUCCESS,
             get_string('confirm_assignment_creation_active_singular', 'totara_competency', (object) ['created' => 1])
@@ -272,7 +272,7 @@ class totara_competency_assignment_service_create_from_baskets_testcase extends 
             'usergroups' => [user_groups::USER => 'single'],
             'status' => assignment::STATUS_DRAFT
         ]);
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
 
         $this->assert_has_notification(
             \core\notification::SUCCESS,
@@ -289,7 +289,7 @@ class totara_competency_assignment_service_create_from_baskets_testcase extends 
             'status' => assignment::STATUS_DRAFT
         ]);
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEmpty($res['data']);
         $this->assert_has_notification(\core\notification::ERROR);
     }
@@ -303,7 +303,7 @@ class totara_competency_assignment_service_create_from_baskets_testcase extends 
             'status' => assignment::STATUS_DRAFT
         ]);
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEmpty($res['data']);
         $this->assert_has_notification(\core\notification::ERROR);
     }
@@ -317,8 +317,8 @@ class totara_competency_assignment_service_create_from_baskets_testcase extends 
             'status' => 325
         ]);
 
-        $this->assertWebserviceError($res);
-        $this->assertWebserviceHasExceptionMessage('Invalid assignment status supplied', $res);
+        $this->assert_webservice_error($res);
+        $this->assert_webservice_has_exception_message('Invalid assignment status supplied', $res);
     }
 
     public function test_no_duplicates_are_created() {
@@ -332,7 +332,7 @@ class totara_competency_assignment_service_create_from_baskets_testcase extends 
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertCount(2, $result);
 
         // Rerun the same assignment creation again, it should not create new ones
@@ -348,7 +348,7 @@ class totara_competency_assignment_service_create_from_baskets_testcase extends 
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertCount(0, $result);
 
         // Add a non existing assignment
@@ -369,7 +369,7 @@ class totara_competency_assignment_service_create_from_baskets_testcase extends 
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertCount(1, $result);
     }
 
@@ -386,7 +386,7 @@ class totara_competency_assignment_service_create_from_baskets_testcase extends 
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertCount(0, $result);
         $this->assert_has_notification(\core\notification::ERROR);
     }

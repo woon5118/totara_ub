@@ -51,7 +51,7 @@ class mod_perform_webapi_type_user_grouping_testcase extends advanced_testcase {
         $this->create_grouping();
 
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessageRegExp("/user_grouping/");
+        $this->expectExceptionMessageMatches("/user_grouping/");
 
         $this->resolve_graphql_type(self::TYPE, 'id', new \stdClass());
     }
@@ -64,7 +64,7 @@ class mod_perform_webapi_type_user_grouping_testcase extends advanced_testcase {
         $field = 'unknown';
 
         $this->expectException(moodle_exception::class);
-        $this->expectExceptionMessageRegExp("/$field/");
+        $this->expectExceptionMessageMatches("/$field/");
 
         $this->resolve_graphql_type(self::TYPE, $field, $grouping, [], $context);
     }

@@ -78,7 +78,7 @@ class pathway_manual_rating_model_testcase extends pathway_manual_base_testcase 
         );
 
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessageRegExp('|Invalid role specified: \'non-existent-role\'|');
+        $this->expectExceptionMessageMatches('|Invalid role specified: \'non-existent-role\'|');
         rating_model::for_user_and_role($this->user2->id, 'non-existent-role')->create(
             $this->competency1->id,
             $this->get_scale_value_id('11'),
@@ -101,7 +101,7 @@ class pathway_manual_rating_model_testcase extends pathway_manual_base_testcase 
         );
 
         $this->expectException(moodle_exception::class);
-        $this->expectExceptionMessageRegExp('|The following competencies: [\d]+ do not have the manager role enabled.|');
+        $this->expectExceptionMessageMatches('|The following competencies: [\d]+ do not have the manager role enabled.|');
         rating_model::for_user_and_role($this->user2->id, manager::class)->create(
             $this->competency1->id,
             $this->get_scale_value_id('11'),
@@ -119,7 +119,7 @@ class pathway_manual_rating_model_testcase extends pathway_manual_base_testcase 
         $this->generator->create_manual($this->competency1, [self_role::class]);
 
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessageRegExp('|The following competencies: [\d]+ do not have the manager role enabled|');
+        $this->expectExceptionMessageMatches('|The following competencies: [\d]+ do not have the manager role enabled|');
         rating_model::for_user_and_role($this->user1->id, manager::class)->create(
             $this->competency1->id,
             $this->get_scale_value_id('11'),
@@ -138,7 +138,7 @@ class pathway_manual_rating_model_testcase extends pathway_manual_base_testcase 
 
         // Try to set scale value from scale2.
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessageRegExp('|Invalid scale value|');
+        $this->expectExceptionMessageMatches('|Invalid scale value|');
         rating_model::for_user_and_role($this->user1->id, manager::class)->create(
             $this->competency1->id,
             $this->get_scale_value_id('22'),
@@ -263,7 +263,7 @@ class pathway_manual_rating_model_testcase extends pathway_manual_base_testcase 
         );
 
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessageRegExp('|The following competencies: [\d]+ do not have the self role enabled|');
+        $this->expectExceptionMessageMatches('|The following competencies: [\d]+ do not have the self role enabled|');
         rating_model::for_user_and_role($this->user1->id, self_role::class)
             ->validate_role_for_competencies([$this->competency1->id, $this->competency2->id]);
     }
@@ -280,7 +280,7 @@ class pathway_manual_rating_model_testcase extends pathway_manual_base_testcase 
         ]));
 
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessageRegExp('|Invalid scale value|');
+        $this->expectExceptionMessageMatches('|Invalid scale value|');
         rating_model::validate_scale_values_for_competencies([
             $this->competency1->id => $this->get_scale_value_id('11'),
             $this->competency2->id => $this->get_scale_value_id('12'),

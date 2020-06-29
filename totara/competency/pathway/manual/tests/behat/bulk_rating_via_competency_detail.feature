@@ -30,6 +30,7 @@ Feature: Test rating a single competency via the competency detail page.
     And I run the scheduled task "totara_competency\task\expand_assignments_task"
     When I log in as "user1"
     And I navigate to the competency profile of user "user1"
+    And I change the competency profile to list view
     And I click on "Comp1" "link"
     And I click on "Add rating" "link"
 

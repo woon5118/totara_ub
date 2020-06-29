@@ -41,7 +41,7 @@ class mod_perform_track_model_security_policy_testcase extends advanced_testcase
 
         self::setGuestUser();
         $this->expectException(moodle_exception::class);
-        $this->expectExceptionMessageRegExp("/permission/");
+        $this->expectExceptionMessageMatches("/permission/");
         track::create($activity);
     }
 
@@ -56,7 +56,7 @@ class mod_perform_track_model_security_policy_testcase extends advanced_testcase
 
         self::setGuestUser();
         $this->expectException(moodle_exception::class);
-        $this->expectExceptionMessageRegExp("/permission/");
+        $this->expectExceptionMessageMatches("/permission/");
         track::load_by_activity($activity);
     }
 }

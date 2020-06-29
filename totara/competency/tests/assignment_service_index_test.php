@@ -48,7 +48,7 @@ class totara_competency_assignment_index_service_testcase extends advanced_testc
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertCount(count($ass), $result['items']);
         $this->assertEquals(count($ass), $result['total']);
 
@@ -71,7 +71,7 @@ class totara_competency_assignment_index_service_testcase extends advanced_testc
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assert_is_ordered_by('competency_name', 'asc', $result);
     }
 
@@ -87,7 +87,7 @@ class totara_competency_assignment_index_service_testcase extends advanced_testc
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assert_is_ordered_by('competency_name', 'desc', $result);
     }
 
@@ -103,7 +103,7 @@ class totara_competency_assignment_index_service_testcase extends advanced_testc
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assert_is_ordered_by('user_group_name', 'asc', $result);
     }
 
@@ -119,7 +119,7 @@ class totara_competency_assignment_index_service_testcase extends advanced_testc
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assert_is_ordered_by('user_group_name', 'desc', $result);
     }
 
@@ -143,7 +143,7 @@ class totara_competency_assignment_index_service_testcase extends advanced_testc
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assert_is_ordered_by('updated_at', 'desc', $result);
     }
 
@@ -168,7 +168,7 @@ class totara_competency_assignment_index_service_testcase extends advanced_testc
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assert_result_contains_ids([$ass[0]->id, $ass[1]->id], $result);
 
         // Mix of user_group_type and type
@@ -182,7 +182,7 @@ class totara_competency_assignment_index_service_testcase extends advanced_testc
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assert_result_contains_ids([$ass[1]->id, $ass[3]->id], $result);
 
         // Just one system filter
@@ -196,7 +196,7 @@ class totara_competency_assignment_index_service_testcase extends advanced_testc
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assert_result_contains_ids([$ass[2]->id], $result);
 
         // Just user group types
@@ -210,7 +210,7 @@ class totara_competency_assignment_index_service_testcase extends advanced_testc
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assert_result_contains_ids([$ass[3]->id, $ass[4]->id], $result);
 
         // non existing types are ignored
@@ -224,7 +224,7 @@ class totara_competency_assignment_index_service_testcase extends advanced_testc
 
         $result = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals(count($ass), $result['total']);
     }
 

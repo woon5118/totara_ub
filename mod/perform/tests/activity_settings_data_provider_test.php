@@ -109,7 +109,7 @@ class mod_perform_activity_settings_data_provider_testcase extends advanced_test
             activity_setting::CLOSE_ON_COMPLETION => true
         ];
 
-        $this->expectExceptionMessageRegExp("/$name/");
+        $this->expectExceptionMessageMatches("/$name/");
         $settings->update($updated);
     }
 
@@ -121,7 +121,7 @@ class mod_perform_activity_settings_data_provider_testcase extends advanced_test
 
         $this->setGuestUser();
 
-        $this->expectExceptionMessageRegExp("/permission/");
+        $this->expectExceptionMessageMatches("/permission/");
         $settings->update([activity_setting::MULTISECTION => true]);
     }
 

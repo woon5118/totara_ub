@@ -47,7 +47,7 @@ class hierarchy_position_service_testcase extends advanced_testcase {
 
         $data = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals(1, $data['page']);
         $this->assertEquals(1, $data['pages']);
         $this->assertNull($data['prev']);
@@ -86,7 +86,7 @@ class hierarchy_position_service_testcase extends advanced_testcase {
 
         $data = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals(1, $data['page']);
         $this->assertEquals(1, $data['pages']);
         $this->assertNull($data['prev']);
@@ -104,7 +104,7 @@ class hierarchy_position_service_testcase extends advanced_testcase {
 
         $data = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals(1, $data['page']);
         $this->assertEquals(1, $data['pages']);
         $this->assertNull($data['prev']);
@@ -132,7 +132,7 @@ class hierarchy_position_service_testcase extends advanced_testcase {
 
         $data = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals(1, $data['page']);
         $this->assertEquals(1, $data['pages']);
         $this->assertNull($data['prev']);
@@ -158,7 +158,7 @@ class hierarchy_position_service_testcase extends advanced_testcase {
 
         $data = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals(1, $data['page']);
         $this->assertEquals(1, $data['pages']);
         $this->assertNull($data['prev']);
@@ -188,7 +188,7 @@ class hierarchy_position_service_testcase extends advanced_testcase {
 
         $data = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals(1, $data['page']);
         $this->assertEquals(1, $data['pages']);
         $this->assertNull($data['prev']);
@@ -215,7 +215,7 @@ class hierarchy_position_service_testcase extends advanced_testcase {
 
         $data = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals(1, $data['page']);
         $this->assertEquals(1, $data['pages']);
         $this->assertNull($data['prev']);
@@ -241,7 +241,7 @@ class hierarchy_position_service_testcase extends advanced_testcase {
 
         $data = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals(1, $data['page']);
         $this->assertEquals(1, $data['pages']);
         $this->assertNull($data['prev']);
@@ -257,7 +257,7 @@ class hierarchy_position_service_testcase extends advanced_testcase {
 
         $data = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertCount(6, $data['items']);
         $this->assertEquals(1, $data['page']);
         $this->assertEquals(1, $data['pages']);
@@ -278,7 +278,7 @@ class hierarchy_position_service_testcase extends advanced_testcase {
 
         $data = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals(
             [
                 'Accountant',
@@ -297,7 +297,7 @@ class hierarchy_position_service_testcase extends advanced_testcase {
 
         $data = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals(
             [
                 'Baker',
@@ -317,7 +317,7 @@ class hierarchy_position_service_testcase extends advanced_testcase {
 
         $data = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals(
             [
                 'Accountant',
@@ -342,7 +342,7 @@ class hierarchy_position_service_testcase extends advanced_testcase {
 
         $data = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertCount(20, $first = $data['items']);
         $this->assertEquals(80, $data['total']);
         $this->assertEquals(1, $data['page']);
@@ -359,7 +359,7 @@ class hierarchy_position_service_testcase extends advanced_testcase {
 
         $data = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertCount(20, $second = $data['items']);
         $this->assertEquals(80, $data['total']);
         $this->assertEquals(2, $data['page']);
@@ -376,7 +376,7 @@ class hierarchy_position_service_testcase extends advanced_testcase {
 
         $data = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertCount(20, $fourth = $data['items']);
         $this->assertEquals(80, $data['total']);
         $this->assertEquals(4, $data['page']);
@@ -393,7 +393,7 @@ class hierarchy_position_service_testcase extends advanced_testcase {
 
         $data = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertCount(0, $fifth = $data['items']);
         $this->assertEquals(80, $data['total']);
         $this->assertEquals(5, $data['page']);
@@ -417,7 +417,7 @@ class hierarchy_position_service_testcase extends advanced_testcase {
 
         $data = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals($pos[2]->id, $data['id']);
         $this->assertEquals($pos[2]->shortname, $data['shortname']);
         $this->assertEquals($pos[2]->idnumber, $data['idnumber']);
@@ -433,7 +433,7 @@ class hierarchy_position_service_testcase extends advanced_testcase {
 
         $data = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEquals($pos[4]->id, $data['id']);
         $this->assertEquals($pos[4]->shortname, $data['shortname']);
         $this->assertEquals($pos[4]->idnumber, $data['idnumber']);
@@ -467,7 +467,7 @@ class hierarchy_position_service_testcase extends advanced_testcase {
 
         $data = $res['data'] ?? null;
 
-        $this->assertWebserviceSuccess($res);
+        $this->assert_webservice_success($res);
         $this->assertEmpty($data);
     }
 

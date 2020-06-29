@@ -77,7 +77,8 @@ Feature: Manage Manual rating achievement paths
     And I wait for pending js
     Then I should see "Changes applied successfully"
 
-    When I click on "Remove pathway" "button" in "manual" pathway
+    When I wait for pending js
+    And I click on "Remove pathway" "button" in "manual" pathway
     Then I should see "manual" pathway
     And "Remove pathway" "button" should not be visible in "manual" pathway
     And "Undo remove pathway" "button" should be visible in "manual" pathway

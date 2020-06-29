@@ -103,7 +103,7 @@ class watcher_user_testcase extends advanced_testcase {
         $invalid_rating2 = $this->generator->create_manual_rating($competency, $user3, $user2, manager::class);
 
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessageRegExp('/You did not check you can view a user before resolving them./');
+        $this->expectExceptionMessageMatches('/You did not check you can view a user before resolving them./');
         $this->resolve_graphql_type('core_user', 'fullname', $user2);
     }
 

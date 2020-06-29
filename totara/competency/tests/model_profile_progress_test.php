@@ -53,7 +53,7 @@ class totara_competency_model_profile_progress_testcase extends totara_competenc
 
         // Let's build data for a user
         /** @var user $user */
-        $user = $data['users']->first()->add_extra_attribute('fullname');
+        $user = $data['users']->first();
 
         $progress = progress::for($user->id);
 
