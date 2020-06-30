@@ -24,7 +24,8 @@
 use core\orm\query\builder;
 use mod_perform\data_providers\activity\activity;
 use mod_perform\state\activity\draft;
-use mod_perform\webapi\resolver\mutation\clone_activity;
+use mod_perform\models\activity\activity as activity_model;
+use mod_perform\util;
 use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
@@ -64,8 +65,11 @@ class mod_perform_webapi_resolver_mutation_clone_activity_testcase extends advan
 
         $activity_result = $result['activity'] ?? null;
         $this->assertNotEmpty($activity_result, 'result empty');
-        $this->assertEquals($activity->name . get_string('activity_name_restore_suffix', 'mod_perform'), $activity_result['name']);
         $this->assertEquals(draft::get_code(), $activity_result['state_details']['code']);
+
+        $suffix = get_string('activity_name_restore_suffix', 'mod_perform');
+        $cloned_name = util::augment_text($activity->name, activity_model::NAME_MAX_LENGTH, '', $suffix);
+        $this->assertEquals($cloned_name, $activity_result['name']);
     }
 
     public function test_failed_ajax_query(): void {

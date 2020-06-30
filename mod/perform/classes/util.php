@@ -28,6 +28,7 @@ use mod_perform\entities\activity\activity_type;
 
 use context;
 use context_coursecat;
+use core_text;
 
 class util {
 
@@ -126,5 +127,42 @@ class util {
     public static function get_default_context(): context {
         $category_id = self::get_default_category_id();
         return context_coursecat::instance($category_id);
+    }
+
+    /**
+     * Convenience function for adding a prefix/suffix to string. If necessary,
+     * the original string is truncated to ensure the new string fits within a
+     * length limit.
+     *
+     * @param string $text text to which to add a prefix and suffix.
+     * @param int $max_chars maximum no of _characters_ (not bytes) allowed for
+     *        the resultant string.
+     * @param string $prefix text that leads the resultant string.
+     * @param string $suffix text at the end of the resultant string.
+     *
+     * @return string the new string.
+     */
+    public static function augment_text(
+        string $text,
+        int $max_chars,
+        string $prefix='',
+        string $suffix=''
+    ): string {
+        // Note the use of _character_ (instead of byte) aware methods to get a
+        // resultant string.
+        $prefix_size = core_text::strlen($prefix);
+        $suffix_size = core_text::strlen($suffix);
+        $new_text_size = $prefix_size + core_text::strlen($text) + $suffix_size;
+
+        if ($new_text_size <= $max_chars) {
+            return "$prefix$text$suffix";
+        }
+
+        $ellipsis = "...";
+        $ellipsis_size = core_text::strlen($ellipsis);
+        $truncated_size = $max_chars - $prefix_size - $ellipsis_size - $suffix_size;
+
+        $truncated = core_text::substr($text, 0, $truncated_size);
+        return "$prefix$truncated$ellipsis$suffix";
     }
 }

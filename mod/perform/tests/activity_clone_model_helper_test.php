@@ -31,6 +31,7 @@ use mod_perform\models\activity\section;
 use mod_perform\models\activity\section_element;
 use mod_perform\models\activity\track;
 use mod_perform\state\activity\draft;
+use mod_perform\util;
 
 /**
  * @group perform
@@ -78,7 +79,10 @@ class mod_perform_activity_clone_model_helper_testcase extends advanced_testcase
         $entity = activity_entity::repository()->find($activity->get_id());
         $new_activity = activity::load_by_entity($entity)->clone(true);
 
-        $this->assertEquals($activity->name . get_string('activity_name_restore_suffix', 'mod_perform'), $new_activity->name);
+        $suffix = get_string('activity_name_restore_suffix', 'mod_perform');
+        $cloned_name = util::augment_text($activity->name, activity::NAME_MAX_LENGTH, '', $suffix);
+        $this->assertEquals($cloned_name, $new_activity->name);
+
         $this->assertEquals($activity->type, $new_activity->type);
         $this->assertEquals(draft::get_code(), $new_activity->status);
         $this->assertEquals($activity->description, $new_activity->description);

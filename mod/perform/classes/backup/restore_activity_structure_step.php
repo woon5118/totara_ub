@@ -28,6 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 
 use restore_path_element;
 use mod_perform\models\activity\activity;
+use mod_perform\util;
 
 global $CFG;
 require_once($CFG->dirroot . '/backup/moodle2/restore_stepslib.php');
@@ -127,7 +128,8 @@ class restore_activity_structure_step extends \restore_activity_structure_step {
 
         $is_cloning = $this->get_setting_value('is_cloning');
         if ($is_cloning && !preg_match('/^multilang:/', $data->name)) {
-            $data->name = $data->name . get_string('activity_name_restore_suffix', 'mod_perform');
+            $suffix = get_string('activity_name_restore_suffix', 'mod_perform');
+            $data->name = util::augment_text($data->name, activity::NAME_MAX_LENGTH, '', $suffix);
         }
 
         // Keeping or moving these times makes little sense, but it is the expected Moodle way...
