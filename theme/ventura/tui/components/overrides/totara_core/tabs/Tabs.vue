@@ -118,17 +118,15 @@
     &:focus {
       color: var(--tui-tabs-text-color-focus);
       background: var(--tui-tabs-bg-color-focus);
-      outline: none;
-
-      .tui-tabs__tabLabel {
-        @include tui-focus();
-      }
+      outline: dashed 1px var(--tui-color-state-focus);
+      outline-offset: -0.75rem;
     }
 
     &:active,
     &:active:focus,
     &:active:hover {
       color: var(--tui-tabs-text-color-active);
+      outline: none;
     }
 
     #{$mod-horizontal} & {
