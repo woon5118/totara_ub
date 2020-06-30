@@ -746,4 +746,13 @@ abstract class advanced_testcase extends base_testcase {
             \core\task\manager::adhoc_task_complete($task);
         }
     }
+
+    /**
+     * Skip test unless TOTARA_DISTRIBUTION_TEST is enabled in config.php
+     */
+    public static function markTestSkippedIfNotTotaraDistribution() {
+        if (!TOTARA_DISTRIBUTION_TEST) {
+            static::markTestSkipped('Totara distribution test skipped');
+        }
+    }
 }

@@ -272,6 +272,11 @@ if (!defined('NO_OUTPUT_BUFFERING')) {
 if (!defined('PHPUNIT_TEST')) {
     define('PHPUNIT_TEST', false);
 }
+if (PHPUNIT_TEST || (defined('BEHAT_SITE_RUNNING') && BEHAT_SITE_RUNNING)) {
+    if (!defined('TOTARA_DISTRIBUTION_TEST')) {
+        define('TOTARA_DISTRIBUTION_TEST', false);
+    }
+}
 
 // Performance tests needs to always display performance info, even in redirections.
 if (defined('MDL_PERF_TEST')) {

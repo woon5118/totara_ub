@@ -390,4 +390,23 @@ class core_plugin_manager_testcase extends advanced_testcase {
         $misdeps = $pluginman->missing_dependencies();
         $this->assertFalse($misdeps['foo_bar']);
     }
+
+    public function test_addition_plugins_in_distribution() {
+        $this->markTestSkippedIfNotTotaraDistribution();
+
+        $pluginman = core_plugin_manager::instance();
+        $allplugins = $pluginman->get_plugins();
+        $additions = [];
+
+        foreach ($allplugins as $type => $plugins) {
+            foreach ($plugins as $plugin) {
+                /** @var \core\plugininfo\base $plugin */
+                if ($plugin->source == core_plugin_manager::PLUGIN_SOURCE_EXTENSION) {
+                    $additions[] = $plugin->type . '_' . $plugin->name;
+                }
+            }
+        }
+
+        $this->assertSame([], $additions, 'Totara distribution cannot contain additional plugins!');
+    }
 }
