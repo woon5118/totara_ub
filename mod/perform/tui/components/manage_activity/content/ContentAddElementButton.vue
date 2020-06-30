@@ -60,7 +60,6 @@ export default {
   },
   data() {
     return {
-      isElementsVisible: false,
       elementPlugins: [],
     };
   },
@@ -74,11 +73,7 @@ export default {
     },
   },
   methods: {
-    showElements() {
-      this.isElementsVisible = true;
-    },
     addElementPlugin(plugin) {
-      this.isElementsVisible = false;
       this.$emit('add-element-item', plugin);
     },
   },

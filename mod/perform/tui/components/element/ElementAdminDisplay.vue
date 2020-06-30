@@ -21,7 +21,7 @@
   @package mod_perform
 -->
 <template>
-  <div class="tui-performElementEditDisplay" tabindex="0">
+  <div class="tui-performElementEditDisplay">
     <div v-if="error">{{ error }}</div>
     <div class="tui-performElementEditDisplay__inner">
       <div class="tui-performElementEditDisplay__inner-header">

@@ -4,7 +4,6 @@
   background: var(--tui-color-neutral-2);
   border: var(--tui-border-width-thin) solid var(--tui-color-neutral-5);
   border-radius: var(--tui-border-radius-normal);
-  cursor: pointer;
 
   &__inner {
     display: flex;
