@@ -737,14 +737,10 @@ select.menuf2f-select {
     padding-top: var(--tui-gap-2);
   }
 
-    // +++ Navigation bar +++ //
+  // +++ Navigation bar +++ //
   &__navigation {
-    @include divider;
-
-    background-color: var(--tui-color-neutral-4);
     color: var(--tui-color-neutral-1);
-    margin-left:  0px - ceil(($grid-gutter-width / 2));
-    margin-right: 0px - floor(($grid-gutter-width / 2));
+    margin: var(--tui-gap-4) (0px - floor(($grid-gutter-width / 2))) var(--tui-gap-4) 0px - ceil(($grid-gutter-width / 2));
     padding-left:  ceil(($grid-gutter-width / 2));
     padding-right: floor(($grid-gutter-width / 2));
     position: relative; // IE11 does not support sticky position
