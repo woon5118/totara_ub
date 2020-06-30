@@ -22,15 +22,35 @@
 
 <template>
   <div class="tui-layoutOneColumnWithSidepanel">
-    <Responsive :breakpoints="breakpoints" @responsive-resize="$_resize">
-      <Grid :direction="gridDirection">
-        <GridItem :units="gridUnitsLeft">
+    <Responsive
+      :breakpoints="[
+        { name: 'xsmall', boundaries: [0, 480] },
+        { name: 'small', boundaries: [481, 764] },
+        { name: 'medium', boundaries: [765, 1192] },
+        { name: 'large', boundaries: [1193, 1396] },
+        { name: 'xlarge', boundaries: [1397, 1672] },
+      ]"
+      @responsive-resize="$_resize"
+    >
+      <!--
+        Wait for the boundary name is populated so that the initial state of several components
+        within this layout will be calculated correctly when rendering.
+       -->
+      <Grid v-if="currentBoundaryName !== null" :direction="gridDirection">
+        <GridItem
+          :units="gridUnitsLeft"
+          :class="{
+            'tui-layoutOneColumnWithSidepanel__column--hidden':
+              sidePanelIsOpen && onSmallScreen,
+          }"
+        >
           <h3 class="tui-layoutOneColumnWithSidepanel__heading">
             <slot name="page-title" />
           </h3>
           <slot
             name="column"
             :units="gridUnitsLeft"
+            :boundary-name="currentBoundaryName"
             :direction="gridDirection"
           />
         </GridItem>
@@ -39,11 +59,11 @@
           <SidePanel
             ref="sidepanel"
             direction="rtl"
-            :animated="sidePanelAnimated"
-            :sticky="sidePanelSticky"
-            :grow-height-on-scroll="sidePanelGrowHeightOnScroll"
-            :show-button-control="sidePanelShowButtonControl"
-            :initially-open="true"
+            :animated="!onSmallScreen"
+            :sticky="!onSmallScreen"
+            :grow-height-on-scroll="!onSmallScreen"
+            :show-button-control="true"
+            :initially-open="!onSmallScreen"
             :overflows="false"
             @sidepanel-expanding="expandRequest"
             @sidepanel-collapsing="collapseRequest"
@@ -51,6 +71,7 @@
             <slot
               name="sidepanel"
               :units="gridUnitsRight"
+              :boundary-name="currentBoundaryName"
               :direction="gridDirection"
             />
           </SidePanel>
@@ -73,99 +94,77 @@ export default {
     Responsive,
     SidePanel,
   },
-
-  props: {
-    sidePanelAnimated: {
-      type: Boolean,
-      default: true,
-    },
-
-    sidePanelSticky: {
-      type: Boolean,
-      default: true,
-    },
-
-    sidePanelGrowHeightOnScroll: {
-      type: Boolean,
-      default: true,
-    },
-
-    sidePanelShowButtonControl: {
-      type: Boolean,
-      default: true,
-    },
-
-    boundaries: {
-      type: Object,
-      default() {
-        /**
-         * Total expanded/collapsed units should equal 11, not 12, as 1 unit is
-         * reserved for a GridItem between main content and the SidePanel
-         **/
-        return {
-          small: {
-            gridDirection: 'vertical',
-            gridUnitsLeftExpanded: 12,
-            gridUnitsLeftCollapsed: 12,
-            gridUnitsRightExpanded: 12,
-            gridUnitsRightCollapsed: 12,
-          },
-          medium: {
-            gridDirection: 'horizontal',
-            gridUnitsLeftExpanded: 6,
-            gridUnitsLeftCollapsed: 10,
-            gridUnitsRightExpanded: 5,
-            gridUnitsRightCollapsed: 1,
-          },
-          large: {
-            gridDirection: 'horizontal',
-            gridUnitsLeftExpanded: 6,
-            gridUnitsLeftCollapsed: 10,
-            gridUnitsRightExpanded: 5,
-            gridUnitsRightCollapsed: 1,
-          },
-        };
-      },
-    },
-
-    defaultBoundaryName: {
-      type: String,
-      default: 'large',
-    },
-
-    breakpoints: {
-      type: Array,
-      default() {
-        return [
-          { name: 'small', boundaries: [0, 764] },
-          { name: 'medium', boundaries: [765, 1192] },
-          { name: 'large', boundaries: [1193, 1672] },
-        ];
-      },
-    },
-  },
-
   data() {
     return {
-      currentBoundaryName: this.defaultBoundaryName,
-      sidePanelIsOpen: true,
+      /**
+       * Total expanded/collapsed units should equal 11, not 12, as 1 unit is
+       * reserved for a GridItem between main content and the SidePanel
+       **/
+      boundaryDefaults: {
+        xsmall: {
+          gridDirection: 'horizontal',
+          gridUnitsLeftExpanded: 1,
+          gridUnitsLeftCollapsed: 9,
+          gridUnitsRightExpanded: 10,
+          gridUnitsRightCollapsed: 2,
+        },
+        small: {
+          gridDirection: 'horizontal',
+          gridUnitsLeftExpanded: 1,
+          gridUnitsLeftCollapsed: 9,
+          gridUnitsRightExpanded: 10,
+          gridUnitsRightCollapsed: 2,
+        },
+        medium: {
+          gridDirection: 'horizontal',
+          gridUnitsLeftExpanded: 6,
+          gridUnitsLeftCollapsed: 10,
+          gridUnitsRightExpanded: 5,
+          gridUnitsRightCollapsed: 1,
+        },
+        large: {
+          gridDirection: 'horizontal',
+          gridUnitsLeftExpanded: 6,
+          gridUnitsLeftCollapsed: 10,
+          gridUnitsRightExpanded: 5,
+          gridUnitsRightCollapsed: 1,
+        },
+        xlarge: {
+          gridDirection: 'horizontal',
+          gridUnitsLeftExpanded: 6,
+          gridUnitsLeftCollapsed: 10,
+          gridUnitsRightExpanded: 5,
+          gridUnitsRightCollapsed: 1,
+        },
+      },
+
+      // Note: the initial state of the boundary or side panel should not be set to any default value, as
+      // it will calculate the wrong initial state of other components within this layout.
+      currentBoundaryName: null,
+      sidePanelIsOpen: null,
     };
   },
   computed: {
     gridDirection() {
-      return this.boundaries[this.currentBoundaryName].gridDirection;
+      return this.boundaryDefaults[this.currentBoundaryName].gridDirection;
     },
     gridUnitsLeft() {
       let left = this.sidePanelIsOpen
         ? 'gridUnitsLeftExpanded'
         : 'gridUnitsLeftCollapsed';
-      return this.boundaries[this.currentBoundaryName][left];
+      return this.boundaryDefaults[this.currentBoundaryName][left];
     },
     gridUnitsRight() {
       let right = this.sidePanelIsOpen
         ? 'gridUnitsRightExpanded'
         : 'gridUnitsRightCollapsed';
-      return this.boundaries[this.currentBoundaryName][right];
+      return this.boundaryDefaults[this.currentBoundaryName][right];
+    },
+    onSmallScreen() {
+      return (
+        this.currentBoundaryName === 'xsmall' ||
+        this.currentBoundaryName === 'small'
+      );
     },
   },
   methods: {
@@ -176,7 +175,6 @@ export default {
      **/
     $_resize(boundaryName) {
       this.currentBoundaryName = boundaryName;
-      this.$emit('resize', boundaryName);
     },
 
     expandRequest: function() {
