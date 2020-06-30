@@ -4135,7 +4135,7 @@ function create_evidence_items($evidence_items, $data, $generator) {
                 'created_by' => $item['created_by']->id,
                 'user_id' => $user_for->id,
                 'name' => evidence_item::get_default_name(
-                    new \totara_evidence\models\user($user_for->id),
+                    new user($user_for),
                     \totara_evidence\models\evidence_type::load_by_entity($item['type'])
                 ),
             ]));
