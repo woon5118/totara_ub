@@ -59,7 +59,11 @@
                       :name="[index]"
                       :validations="v => [v.required()]"
                       :aria-label="
-                        $str('answer_text', 'performelement_multi_choice')
+                        $str(
+                          'answer_text',
+                          'performelement_multi_choice',
+                          index + 1
+                        )
                       "
                     />
                   </div>
