@@ -143,3 +143,26 @@ Feature: Respond to activity with multiple sections
     And I should not see "You will not be able to update your responses after submission."
     And I confirm the tui confirmation modal
     And I should see "Section submitted." in the tui "success" notification toast
+
+  Scenario: Navigate to next section from side panel
+    Given I log in as "user1"
+    And I navigate to the outstanding perform activities list page
+    And I click on "Closed activity" "link"
+    Then I should see "section 1" in the ".tui-sidePanel__content" "css_element"
+    And I should see "section 2" in the ".tui-sidePanel__content" "css_element"
+    And I should see "section 1" in the ".tui-participantContent__sectionHeading-title" "css_element"
+    When I click on "section 2" "button"
+    Then I should see "section 2" in the ".tui-participantContent__sectionHeading-title" "css_element"
+
+  Scenario: Show browser based warning message when navigate to different section with unsaved change
+    Given I log in as "user1"
+    And I navigate to the outstanding perform activities list page
+    And I click on "Closed activity" "link"
+    And I click on "section 2" "button"
+    # test popup confirm when it has unsaved changes
+    When I answer "short text" question "test element title" with "John Answer two"
+    And I click on "section 1" "button"
+    Then I should see "You have unsaved changes" in browser confirmation popup
+    # test click "OK" on popup confirm, then show correct section
+    When I confirm the browser confirmation popup
+    Then I should see "section 1" in the ".tui-participantContent__sectionHeading-title" "css_element"

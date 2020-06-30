@@ -16,8 +16,8 @@
   @module mod_perform
 -->
 <template>
-  <div class="tui-participantContent">
-    <Loader :loading="$apollo.loading">
+  <Loader :loading="$apollo.loading">
+    <div class="tui-participantContent">
       <ConfirmationModal
         :open="modalOpen"
         :confirm-button-text="$str('submit', 'moodle')"
@@ -41,145 +41,186 @@
           }}
         </p>
       </ConfirmationModal>
-      <Uniform
-        v-if="initialValues"
-        :key="activeParticipantSection.id"
-        v-slot="{ getSubmitting }"
-        :initial-values="initialValues"
-        @submit="openModal"
-      >
-        <div class="tui-participantContent__user">
-          <ParticipantUserHeader
-            :user-name="subjectUser.fullname"
-            :profile-picture="subjectUser.profileimageurlsmall"
-            size="small"
-            class="tui-participantContent__user-info"
-          />
-          <div class="tui-participantContent__user-relationship">
-            {{
-              $str('user_activities_your_relationship_to_user', 'mod_perform')
-            }}
-            <h4 class="tui-participantContent__user-relationshipValue">
-              {{ relationshipToUser }}
-            </h4>
-          </div>
+      <div class="tui-participantContent__user">
+        <ParticipantUserHeader
+          :user-name="subjectUser.fullname"
+          :profile-picture="subjectUser.profileimageurlsmall"
+          size="small"
+          class="tui-participantContent__user-info"
+        />
+        <div class="tui-participantContent__user-relationship">
+          {{ $str('user_activities_your_relationship_to_user', 'mod_perform') }}
+          <h4 class="tui-participantContent__user-relationshipValue">
+            {{ relationshipToUser }}
+          </h4>
         </div>
-
-        <h2 class="tui-participantContent__header">
-          {{ activity.name }}
-        </h2>
-
-        <div class="tui-participantContent__section">
-          <div class="tui-participantContent__sectionHeading">
-            <h3
-              v-if="activity.settings.multisection"
-              class="tui-participantContent__sectionHeading-title"
-            >
-              {{ section.display_title }}
-            </h3>
-          </div>
-          <div class="tui-participantContent__sectionHeadingOtherResponsesBar">
-            <ResponsesAreVisibleToDescription
-              class="tui-participantContent__sectionHeadingOtherResponsesDescription"
-              :current-user-is-subject="currentUserIsSubject"
-              :visible-to-relationships="responsesAreVisibleTo"
-              :anonymous-responses="activity.anonymous_responses"
-            />
-            <div
-              class="tui-participantContent__sectionHeading-other-response-switch"
-            >
-              <ToggleSwitch
-                v-if="hasOtherResponse"
-                v-model="showOtherResponse"
-                :text="
-                  $str('user_activities_other_response_show', 'mod_perform')
-                "
-              />
-            </div>
-          </div>
-          <div class="tui-participantContent__section-required-container">
-            <span
-              class="tui-participantContent__section-response-required"
-              v-text="'*'"
-            />
-            {{ $str('section_element_response_required', 'mod_perform') }}
-          </div>
-
-          <Collapsible
-            v-for="sectionElement in sectionElements"
-            :key="sectionElement.id"
-            :label="sectionElement.element.title"
-            :initial-state="true"
-            class="tui-participantContent__sectionItem"
-          >
-            <template v-slot:label-extra>
-              <span
-                v-if="sectionElement.element.is_required"
-                class="tui-participantContent__section-response-required"
-              >
-                *
-              </span>
-              <span
-                v-if="!sectionElement.element.is_required"
-                class="tui-participantContent__response-optional"
-              >
-                ({{ $str('section_element_response_optional', 'mod_perform') }})
-              </span>
-            </template>
-            <div class="tui-participantContent__sectionItem-content">
-              <ElementParticipantForm>
-                <template v-slot:content>
-                  <component
-                    :is="sectionElement.component"
-                    v-bind="loadUserSectionElementProps(sectionElement)"
-                  />
-                </template>
-              </ElementParticipantForm>
-              <OtherParticipantResponses
-                v-show="showOtherResponse"
-                :section-element="sectionElement"
-                :anonymous-responses="activity.anonymous_responses"
-              />
-            </div>
-          </Collapsible>
-        </div>
-
-        <ButtonGroup
-          v-if="!activeSectionIsClosed"
-          class="tui-participantContent__buttons"
-        >
-          <ButtonSubmit :submitting="getSubmitting()" />
-          <ButtonCancel @click="goBackToListCancel" />
-        </ButtonGroup>
-      </Uniform>
-
-      <div class="tui-participantContent__navigation">
-        <Grid v-if="activeSectionIsClosed">
-          <GridItem :units="6">
-            <Button
-              v-if="hasPreviousSection"
-              :text="$str('previous_section', 'mod_perform')"
-              @click="loadPreviousParticipantSection"
-            />
-          </GridItem>
-          <GridItem :units="6">
-            <div class="tui-participantContent__navigation-buttons">
-              <Button
-                v-if="hasNextSection"
-                :styleclass="{ primary: 'true' }"
-                :text="$str('next_section', 'mod_perform')"
-                @click="loadNextParticipantSection"
-              />
-              <Button
-                :text="$str('button_close', 'mod_perform')"
-                @click="goBackToListCancel"
-              />
-            </div>
-          </GridItem>
-        </Grid>
       </div>
-    </Loader>
-  </div>
+
+      <h2
+        id="tui-participantContentHeader"
+        class="tui-participantContent__header"
+      >
+        {{ activity.name }}
+      </h2>
+
+      <Grid :class="showSidePanel ? 'tui-participantContent__layout' : ''">
+        <GridItem
+          v-show="showSidePanel"
+          :units="2"
+          class="tui-participantContent__sidePanel"
+        >
+          <SidePanel
+            :initially-open="true"
+            :limit-height="false"
+            :show-button-control="false"
+            :sticky="false"
+          >
+            <SidePanelNav
+              v-model="selectedParticipantSectionId"
+              :aria-label="false"
+              @change="navChange($event)"
+            >
+              <SidePanelNavGroup>
+                <SidePanelNavButtonItem
+                  v-for="participantSection in participantSections"
+                  :id="participantSection.id"
+                  :key="participantSection.id"
+                  :text="participantSection.section.display_title"
+                />
+              </SidePanelNavGroup>
+            </SidePanelNav>
+          </SidePanel>
+        </GridItem>
+        <GridItem :units="showSidePanel ? 10 : 12">
+          <Uniform
+            v-if="initialValues"
+            :key="activeParticipantSection.id"
+            v-slot="{ getSubmitting }"
+            :initial-values="initialValues"
+            @submit="openModal"
+            @change="handleChange"
+          >
+            <div class="tui-participantContent__section">
+              <div class="tui-participantContent__sectionHeading">
+                <h3
+                  v-if="activity.settings.multisection"
+                  class="tui-participantContent__sectionHeading-title"
+                >
+                  {{ section.display_title }}
+                </h3>
+
+                <div
+                  class="tui-participantContent__sectionHeadingOtherResponsesBar"
+                >
+                  <ResponsesAreVisibleToDescription
+                    class="tui-participantContent__sectionHeadingOtherResponsesDescription"
+                    :current-user-is-subject="currentUserIsSubject"
+                    :visible-to-relationships="responsesAreVisibleTo"
+                    :anonymous-responses="activity.anonymous_responses"
+                  />
+                  <div
+                    class="tui-participantContent__sectionHeading-other-response-switch"
+                  >
+                    <ToggleSwitch
+                      v-if="hasOtherResponse"
+                      v-model="showOtherResponse"
+                      :text="
+                        $str(
+                          'user_activities_other_response_show',
+                          'mod_perform'
+                        )
+                      "
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="tui-participantContent__section-required-container">
+                <span
+                  class="tui-participantContent__section-response-required"
+                  v-text="'*'"
+                />
+                {{ $str('section_element_response_required', 'mod_perform') }}
+              </div>
+
+              <Collapsible
+                v-for="sectionElement in sectionElements"
+                :key="sectionElement.id"
+                :label="sectionElement.element.title"
+                :initial-state="true"
+                class="tui-participantContent__sectionItem"
+              >
+                <template v-slot:label-extra>
+                  <span
+                    v-if="sectionElement.element.is_required"
+                    class="tui-participantContent__section-response-required"
+                  >
+                    *
+                  </span>
+                  <span
+                    v-if="!sectionElement.element.is_required"
+                    class="tui-participantContent__response-optional"
+                  >
+                    ({{
+                      $str('section_element_response_optional', 'mod_perform')
+                    }})
+                  </span>
+                </template>
+                <div class="tui-participantContent__sectionItem-content">
+                  <ElementParticipantForm>
+                    <template v-slot:content>
+                      <component
+                        :is="sectionElement.component"
+                        v-bind="loadUserSectionElementProps(sectionElement)"
+                      />
+                    </template>
+                  </ElementParticipantForm>
+                  <OtherParticipantResponses
+                    v-show="showOtherResponse"
+                    :section-element="sectionElement"
+                    :anonymous-responses="activity.anonymous_responses"
+                  />
+                </div>
+              </Collapsible>
+            </div>
+
+            <ButtonGroup
+              v-if="!activeSectionIsClosed"
+              class="tui-participantContent__buttons"
+            >
+              <ButtonSubmit :submitting="getSubmitting()" />
+              <ButtonCancel @click="goBackToListCancel" />
+            </ButtonGroup>
+
+            <div class="tui-participantContent__navigation">
+              <Grid v-if="activeSectionIsClosed">
+                <GridItem :units="6">
+                  <Button
+                    v-if="hasPreviousSection"
+                    :text="$str('previous_section', 'mod_perform')"
+                    @click="loadPreviousParticipantSection"
+                  />
+                </GridItem>
+                <GridItem :units="6">
+                  <div class="tui-participantContent__navigation-buttons">
+                    <Button
+                      v-if="hasNextSection"
+                      :styleclass="{ primary: 'true' }"
+                      :text="$str('next_section', 'mod_perform')"
+                      @click="loadNextParticipantSection"
+                    />
+                    <Button
+                      :text="$str('button_close', 'mod_perform')"
+                      @click="goBackToListCancel"
+                    />
+                  </div>
+                </GridItem>
+              </Grid>
+            </div>
+          </Uniform>
+        </GridItem>
+      </Grid>
+    </div>
+  </Loader>
 </template>
 
 <script>
@@ -202,6 +243,10 @@ import Loader from 'tui/components/loader/Loader';
 import OtherParticipantResponses from 'mod_perform/components/user_activities/participant/OtherParticipantResponses';
 import ParticipantUserHeader from 'mod_perform/components/user_activities/participant/ParticipantUserHeader';
 import ResponsesAreVisibleToDescription from 'mod_perform/components/user_activities/participant/ResponsesAreVisibleToDescription';
+import SidePanel from 'tui/components/sidepanel/SidePanel';
+import SidePanelNav from 'tui/components/sidepanel/SidePanelNav';
+import SidePanelNavButtonItem from 'tui/components/sidepanel/SidePanelNavButtonItem';
+import SidePanelNavGroup from 'tui/components/sidepanel/SidePanelNavGroup';
 import ToggleSwitch from 'tui/components/toggle/ToggleSwitch';
 import { Uniform } from 'tui/components/uniform';
 // graphQL
@@ -211,7 +256,6 @@ import UpdateSectionResponsesMutation from 'mod_perform/graphql/update_section_r
 export default {
   components: {
     Button,
-    ResponsesAreVisibleToDescription,
     ButtonCancel,
     ButtonGroup,
     ButtonSubmit,
@@ -224,6 +268,11 @@ export default {
     Loader,
     OtherParticipantResponses,
     ParticipantUserHeader,
+    ResponsesAreVisibleToDescription,
+    SidePanel,
+    SidePanelNav,
+    SidePanelNavButtonItem,
+    SidePanelNavGroup,
     ToggleSwitch,
     Uniform,
   },
@@ -282,6 +331,7 @@ export default {
       completionSaveSuccess: false,
       errors: null,
       hasOtherResponse: false,
+      hasUnsavedChanges: false,
       initialValues: null,
       isSaving: false,
       section: {
@@ -293,7 +343,9 @@ export default {
       modalOpen: false,
       formValues: {},
       participantSections: [],
+      hasChanges: false,
       responsesAreVisibleTo: [],
+      selectedParticipantSectionId: this.participantSectionId,
     };
   },
 
@@ -352,6 +404,8 @@ export default {
             ] = JSON.parse(item.response_data);
             if (item.other_responder_groups.length > 0) {
               this.hasOtherResponse = true;
+            } else {
+              this.hasOtherResponse = false;
             }
             item.other_responder_groups.forEach(group => {
               if (group.responses.length > 0 && item.response_data) {
@@ -369,7 +423,7 @@ export default {
         return this.$str('relation_to_subject_self', 'mod_perform');
       }
 
-      return this.answeringAs.core_relationship.name;
+      return this.answeringAs ? this.answeringAs.core_relationship.name : null;
     },
 
     /**
@@ -432,7 +486,7 @@ export default {
     answeringAs: {
       get() {
         if (this.answerableParticipantInstances === null) {
-          return {};
+          return null;
         }
 
         return this.answerableParticipantInstances.find(
@@ -440,6 +494,18 @@ export default {
         );
       },
     },
+
+    /**
+     * Show navigation side panel only when there are more than one sections
+     */
+    showSidePanel() {
+      return this.activity.settings.multisection;
+    },
+  },
+
+  mounted() {
+    // Confirm navigation away if user is currently editing.
+    window.addEventListener('beforeunload', this.unloadHandler);
   },
 
   methods: {
@@ -504,6 +570,7 @@ export default {
     confirmModal() {
       this.submit(this.formValues);
       this.modalOpen = false;
+      this.hasUnsavedChanges = false;
     },
 
     /**
@@ -554,6 +621,7 @@ export default {
             // Redirect to next section.
             this.showSuccessNotification();
             await this.loadParticipantSection(nextParticipantSectionId);
+            this.selectedParticipantSectionId = nextParticipantSectionId;
           } else {
             // Go back to activity list
             this.goBackToListCompletionSuccess();
@@ -730,6 +798,88 @@ export default {
 
       hiddenForm.submit();
     },
+
+    /**
+     * check if there is unsaved changes in response form
+     *
+     * @param values
+     */
+    handleChange(values) {
+      for (let i in this.initialValues.sectionElements) {
+        let formValue = values.sectionElements[i];
+        let initValue = JSON.stringify(this.initialValues.sectionElements[i]);
+        // handle initValue is null, but formValue is empty string or array
+        // convert empty formValue to null, then we can compare the difference
+        let isEmptyForm =
+          formValue === null || Object.values(formValue)[0].length === 0;
+        if (isEmptyForm) {
+          formValue = null;
+        }
+        formValue = JSON.stringify(formValue);
+        // compare init value with form value
+        if (initValue !== formValue) {
+          this.hasUnsavedChanges = true;
+          break;
+        }
+        this.hasUnsavedChanges = false;
+      }
+    },
+
+    /**
+     * navigate to a different participant section
+     *
+     * @param selectedParticipantSection
+     */
+    navChange(selectedParticipantSection) {
+      //check unsaved changes
+      if (this.hasUnsavedChanges) {
+        let message = this.$str('unsaved_changes_warning', 'mod_perform');
+        let answer = window.confirm(message);
+        if (!answer) {
+          this.selectedParticipantSectionId = this.activeParticipantSection.id;
+          return;
+        }
+        this.hasUnsavedChanges = false;
+      }
+
+      this.updateUrlParam(selectedParticipantSection.id);
+      this.loadParticipantSection(selectedParticipantSection.id);
+    },
+
+    /**
+     * Update the URL param
+     *
+     * @param participantSectionId
+     */
+    updateUrlParam(participantSectionId) {
+      let url = new URL(window.location.href);
+      let search_params = url.searchParams;
+      search_params.delete('participant_instance_id');
+      search_params.set('participant_section_id', participantSectionId);
+      url.search = search_params.toString();
+      let new_url = url.toString();
+      window.history.replaceState({}, '', new_url);
+    },
+
+    /**
+     * Displays a warning message if the user tries to navigate away without saving.
+     * @param {Event} e
+     * @returns {String|void}
+     */
+    unloadHandler(e) {
+      if (!this.hasUnsavedChanges) {
+        return;
+      }
+
+      // For older browsers that still show custom message.
+      const discardUnsavedChanges = this.$str(
+        'unsaved_changes_warning',
+        'mod_perform'
+      );
+      e.preventDefault();
+      e.returnValue = discardUnsavedChanges;
+      return discardUnsavedChanges;
+    },
   },
 };
 </script>
@@ -745,6 +895,7 @@ export default {
       "toast_error_save_response",
       "toast_success_save_close_on_completion_response",
       "toast_success_save_response",
+      "unsaved_changes_warning",
       "user_activities_close_on_completion_submit_confirmation_message",
       "user_activities_other_response_show",
       "user_activities_submit_confirmation_message",

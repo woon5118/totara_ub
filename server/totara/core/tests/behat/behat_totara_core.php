@@ -903,4 +903,30 @@ class behat_totara_core extends behat_base {
         filter_set_global_state('multilang', TEXTFILTER_OFF);
     }
 
+    /**
+     * @When /^(?:|I )confirm the browser confirmation popup$/
+     */
+    public function i_confirm_the_browser_confirmation_popup() {
+        $this->getSession()->getDriver()->getWebDriverSession()->accept_alert();
+    }
+
+    /**
+     * @When /^(?:|I )cancel the browser confirmation popup$/
+     */
+    public function i_cancel_the_browser_confirmation_popup() {
+        $this->getSession()->getDriver()->getWebDriverSession()->dismiss_alert();
+    }
+
+    /**
+     * @When /^(?:|I )should see "([^"]*)" in browser confirmation popup$/
+     *
+     * @param string $expected_message The message.
+     * @throws ExpectationException
+     */
+    public function i_should_see_the_message_in_browser_confirmation_popup(string $expected_message) {
+        $actual_message = $this->getSession()->getDriver()->getWebDriverSession()->getAlert_text();
+        if ($expected_message != $actual_message) {
+            throw new ExpectationException("\"{$expected_message}\" was not found in the popup message", $this->getSession());
+        }
+    }
 }

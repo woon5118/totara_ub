@@ -20,6 +20,10 @@
 .tui-participantContent {
   @include tui-font-body();
 
+  &__layout.tui-grid {
+    margin-top: var(--tui-gap-6);
+  }
+
   &__header {
     margin: var(--tui-gap-6) 0 0;
     @include tui-font-heading-medium();
@@ -62,7 +66,6 @@
   }
 
   &__sectionHeading {
-    display: flex;
     justify-content: flex-end;
     margin-top: var(--tui-gap-6);
 
