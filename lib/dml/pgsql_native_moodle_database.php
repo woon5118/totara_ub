@@ -28,6 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once(__DIR__.'/moodle_database.php');
 require_once(__DIR__.'/pgsql_native_moodle_recordset.php');
+require_once(__DIR__.'/pgsql_native_huge_recordset.php');
 require_once(__DIR__.'/pgsql_native_moodle_temptables.php');
 
 /**
@@ -46,6 +47,9 @@ class pgsql_native_moodle_database extends moodle_database {
 
     /** @var bool savepoint hack for MDL-35506 - workaround for automatic transaction rollback on error */
     protected $savepointpresent = false;
+
+    /** @var int Number of cursors used (for constructing a unique ID) */
+    protected $cursorcount = 0;
 
     /** @var array cached server information */
     protected $serverinfo = null;
@@ -190,6 +194,17 @@ class pgsql_native_moodle_database extends moodle_database {
         if ($status === false or $status === PGSQL_CONNECTION_BAD) {
             $this->pgsql = null;
             throw new dml_connection_exception($dberr);
+        }
+
+        if (!empty($this->dboptions['dbpersist'])) {
+            // There are rare situations (such as PHP out of memory errors) when open cursors may
+            // not be closed at the end of a connection. When using persistent connections, the
+            // cursors remain open and 'get in the way' of future connections. To avoid this
+            // problem, close all cursors here.
+            $result = pg_query($this->pgsql, 'CLOSE ALL');
+            if ($result) {
+                pg_free_result($result);
+            }
         }
 
         if (!empty($this->dboptions['dbhandlesoptions'])) {
@@ -748,18 +763,17 @@ class pgsql_native_moodle_database extends moodle_database {
     /**
      * Get a number of records as a moodle_recordset using a SQL statement.
      *
-     * Since this method is a little less readable, use of it should be restricted to
-     * code where it's possible there might be large datasets being returned.  For known
-     * small datasets use get_records_sql - it leads to simpler code.
+     * This method is intended for queries with reasonable result size only,
+     * @see moodle_database::get_huge_recordset_sql() if the results might not fit into memory.
      *
-     * The return type is like:
-     * @see function get_recordset.
+     * The result may be used as iterator in foreach(), if you want to obtain
+     * an array with incremental numeric keys @see moodle_recordset::to_array()
      *
      * @param string|sql $sql the SQL select query to execute.
-     * @param array $params array of sql parameters
-     * @param int $limitfrom return a subset of records, starting at this point (optional, required if $limitnum is set).
+     * @param array|null $params array of sql parameters
+     * @param int $limitfrom return a subset of records, starting at this point (optional).
      * @param int $limitnum return a subset comprising this many records (optional, required if $limitfrom is set).
-     * @return moodle_recordset instance
+     * @return moodle_recordset A moodle_recordset instance.
      * @throws dml_exception A DML specific exception is thrown for any errors.
      */
     public function get_recordset_sql($sql, array $params=null, $limitfrom=0, $limitnum=0) {
@@ -781,11 +795,113 @@ class pgsql_native_moodle_database extends moodle_database {
         $result = pg_query_params($this->pgsql, $sql, $params);
         $this->query_end($result);
 
-        return $this->create_recordset($result);
+        return new pgsql_native_moodle_recordset($result);
     }
 
-    protected function create_recordset($result) {
-        return new pgsql_native_moodle_recordset($result);
+    /**
+     * Get records as a moodle_recordset using a SQL statement.
+     *
+     * This is intended to be used instead of @see moodle_database::get_recordset_sql()
+     * when results may not fit into available PHP memory.
+     *
+     * Notes:
+     *   - it is not acceptable to modify referenced tables during iteration due to MS SQL Server limitations
+     *   - transactions cannot be started while iterating the records due to MS SQL Server limitations
+     *
+     * @since Totara 13.0
+     *
+     * @param string|sql $sql the SQL select query to execute.
+     * @param array $params array of sql parameters
+     * @return moodle_recordset A moodle_recordset instance.
+     * @throws dml_exception A DML specific exception is thrown for any errors.
+     */
+    public function get_huge_recordset_sql($sql, array $params = null): moodle_recordset {
+        list($sql, $params, $type) = $this->fix_sql_params($sql, $params);
+
+        $this->query_start($sql, $params, SQL_QUERY_SELECT);
+
+        // Any session-unique identifier will do.
+        $this->cursorcount++;
+        $cursorname = 'crs' . $this->cursorcount;
+
+        // Create a cursor for given query.
+        $sql = "DECLARE $cursorname NO SCROLL CURSOR WITH HOLD FOR $sql";
+        $result = pg_query_params($this->pgsql, $sql, $params);
+
+        $this->query_end($result);
+        pg_free_result($result);
+
+        return new pgsql_native_huge_recordset($this, $cursorname);
+    }
+
+    /**
+     * Gets size of the buffer used for cursor recordset fetching.
+     *
+     * @internal to be used only from {@see pgsql_native_huge_recordset}
+     *
+     * @return int buffer size (positive integer)
+     */
+    public function _get_fetch_buffer_size(): int {
+        if (PHPUNIT_TEST) {
+            // There is no need to create thousands of records for testing.
+            return 5;
+        }
+        if (!empty($this->dboptions['fetchbuffersize']) && $this->dboptions['fetchbuffersize'] > 0) {
+            return (int)$this->dboptions['fetchbuffersize'];
+        } else {
+            return 10000;
+        }
+    }
+
+    /**
+     * Retrieve data using active cursor.
+     *
+     * @internal to be used only from {@see pgsql_native_huge_recordset}
+     *
+     * @param string $cursorname Name of cursor to read from
+     * @return array rows objects fetched from database
+     */
+    public function _fetch_from_cursor(string $cursorname): array {
+        $count = $this->_get_fetch_buffer_size();
+        $sql = 'FETCH ' . $count . ' FROM ' . $cursorname;
+        $this->query_start($sql, [], SQL_QUERY_AUX);
+        $result = pg_query($this->pgsql, $sql);
+        $this->query_end($result);
+
+        // Find out if there are any blobs.
+        $numfields = pg_num_fields($result);
+        $blobs = [];
+        for ($i = 0; $i < $numfields; $i++) {
+            $type = pg_field_type($result, $i);
+            if ($type === 'bytea') {
+                $blobs[] = pg_field_name($result, $i);
+            }
+        }
+
+        $rows = [];
+        while ($row = pg_fetch_assoc($result)) {
+            foreach ($blobs as $blob) {
+                $row[$blob] = ($row[$blob] !== null ? pg_unescape_bytea($row[$blob]) : null);
+            }
+            $rows[] = (object)$row;
+        }
+        pg_free_result($result);
+        return $rows;
+    }
+
+    /**
+     * Close the recordset cursor.
+     *
+     * @internal to be used from pgsql_native_huge_recordset class only
+     *
+     * @param string $cursorname Name of cursor to close
+     */
+    public function _close_cursor(string $cursorname): void {
+        $sql = 'CLOSE ' . $cursorname;
+        $this->query_start($sql, [], SQL_QUERY_AUX);
+        $result = pg_query($this->pgsql, $sql);
+        $this->query_end($result);
+        pg_free_result($result);
     }
 
     /**

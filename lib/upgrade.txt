@@ -3,6 +3,7 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* New methods for iteration over very large record sets were added to DML, see $DB->get_huge_recorset methods.
 * PHPUnit has been upgraded to version 8.5.x,
   see https://phpunit.de/announcements/phpunit-8.html for more information how to fix existing tests.
 * Custom session handlers must add new $uselocking constructor parameter and implement

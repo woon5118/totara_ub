@@ -67,7 +67,7 @@ class tabexport_source extends \totara_core\tabexport_source {
         }
 
         $reportdb = $this->report->get_report_db();
-        $this->rs = $reportdb->get_recordset_sql($sql . $order, $params);
+        $this->rs = $reportdb->get_huge_recordset_sql($sql . $order, $params);
     }
 
     /**

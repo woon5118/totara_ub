@@ -104,7 +104,11 @@ class store implements \tool_log\log\writer, \core\log\sql_internal_table_reader
 
         $sort = self::tweak_sort_by_id($sort);
 
-        $recordset = $DB->get_recordset_select('logstore_standard_log', $selectwhere, $params, $sort, '*', $limitfrom, $limitnum);
+        if ((int)$limitfrom <= 0 && (int)$limitnum <= 0) {
+            $recordset = $DB->get_huge_recordset_select('logstore_standard_log', $selectwhere, $params, $sort, '*');
+        } else {
+            $recordset = $DB->get_recordset_select('logstore_standard_log', $selectwhere, $params, $sort, '*', $limitfrom, $limitnum);
+        }
 
         return new \core\dml\recordset_walk($recordset, array($this, 'get_log_event'));
     }

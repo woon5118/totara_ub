@@ -1943,6 +1943,68 @@ class core_dml_testcase extends database_driver_testcase {
         }
     }
 
+    public function test_get_huge_recordset_methods() {
+        $DB = $this->tdb;
+        $dbman = $DB->get_manager();
+
+        $table = $this->get_test_table();
+        $tablename = $table->getName();
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('course', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, null, null, '0');
+        $table->add_field('onetext', XMLDB_TYPE_TEXT, 'big', null, null, null);
+        $table->add_index('course', XMLDB_INDEX_NOTUNIQUE, array('course'));
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $dbman->create_table($table);
+
+        $data = [
+            (object)['course' => 3, 'name' => 'record1', 'onetext' => 'abc'],
+            (object)['course' => 3, 'name' => 'record2', 'onetext' => 'abcd'],
+            (object)['course' => 7, 'name' => 'record3', 'onetext' => 'abcde'],
+            (object)['course' => 7, 'name' => 'record4', 'onetext' => 'abcdeo'],
+            (object)['course' => 7, 'name' => 'record5', 'onetext' => 'abcdez'],
+            (object)['course' => 7, 'name' => 'record6', 'onetext' => 'abcdey'],
+            (object)['course' => 7, 'name' => 'record7', 'onetext' => 'abcdex'],
+        ];
+
+        foreach ($data as $key => $record) {
+            $DB->insert_record($tablename, $record);
+        }
+
+        $expected = $DB->get_records($tablename, ['course' => -1], 'id ASC');
+        $result = iterator_to_array($DB->get_huge_recordset($tablename, ['course' => -1], 'id ASC'));
+        $this->assertEquals($expected, $result);
+        $result = iterator_to_array($DB->get_huge_recordset_select($tablename, 'course = ?', [-1], 'id ASC'));
+        $this->assertEquals($expected, $result);
+        $result = iterator_to_array($DB->get_huge_recordset_sql("SELECT * FROM {{$tablename}} WHERE course = ? ORDER BY id ASC", [-1], 'id ASC'));
+        $this->assertEquals($expected, $result);
+
+        $expected = $DB->get_records($tablename, ['course' => 7], 'id ASC');
+        $result = iterator_to_array($DB->get_huge_recordset($tablename, ['course' => 7], 'id ASC'));
+        $this->assertEquals($expected, $result);
+        $result = iterator_to_array($DB->get_huge_recordset_select($tablename, 'course = ?', [7], 'id ASC'));
+        $this->assertEquals($expected, $result);
+        $result = iterator_to_array($DB->get_huge_recordset_sql("SELECT * FROM {{$tablename}} WHERE course = ? ORDER BY id ASC", [7], 'id ASC'));
+        $this->assertEquals($expected, $result);
+
+        $expected = $DB->get_records($tablename, ['course' => 3], 'id ASC');
+        $result = iterator_to_array($DB->get_huge_recordset($tablename, ['course' => 3], 'id ASC'));
+        $this->assertEquals($expected, $result);
+        $result = iterator_to_array($DB->get_huge_recordset_select($tablename, 'course = ?', [3], 'id ASC'));
+        $this->assertEquals($expected, $result);
+        $result = iterator_to_array($DB->get_huge_recordset_sql("SELECT * FROM {{$tablename}} WHERE course = ? ORDER BY id ASC", [3], 'id ASC'));
+        $this->assertEquals($expected, $result);
+
+        $expected = $DB->get_records($tablename, [], 'id ASC');
+        $result = iterator_to_array($DB->get_huge_recordset($tablename, [], 'id ASC'));
+        $this->assertEquals($expected, $result);
+        $result = iterator_to_array($DB->get_huge_recordset_select($tablename, '', [], 'id ASC'));
+        $this->assertEquals($expected, $result);
+        $result = iterator_to_array($DB->get_huge_recordset_sql("SELECT * FROM {{$tablename}} ORDER BY id ASC", [], 'id ASC'));
+        $this->assertEquals($expected, $result);
+    }
+
     public function test_get_field() {
         $DB = $this->tdb;
         $dbman = $DB->get_manager();

@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+use core\dml\sql;
+
 /**
  * Native MariaDB class representing moodle database interface.
  *
@@ -258,17 +260,18 @@ class mariadb_native_moodle_database extends mysqli_native_moodle_database {
     /**
      * Get a number of records as a moodle_recordset using a SQL statement.
      *
-     * Since this method is a little less readable, use of it should be restricted to
-     * code where it's possible there might be large datasets being returned.  For known
-     * small datasets use get_records_sql - it leads to simpler code.
+     * This method is intended for queries with reasonable result size only,
+     * @see moodle_database::get_huge_recordset_sql() if the results might not fit into memory.
      *
-     * Overridden to apply hints if required.
+     * The result may be used as iterator in foreach(), if you want to obtain
+     * an array with incremental numeric keys @see moodle_recordset::to_array()
      *
-     * @param string|core\dml\sql $sql
-     * @param array|null $params
-     * @param int $limitfrom
-     * @param int $limitnum
-     * @return moodle_recordset
+     * @param string|sql $sql the SQL select query to execute.
+     * @param array|null $params array of sql parameters
+     * @param int $limitfrom return a subset of records, starting at this point (optional).
+     * @param int $limitnum return a subset comprising this many records (optional, required if $limitfrom is set).
+     * @return moodle_recordset A moodle_recordset instance.
+     * @throws dml_exception A DML specific exception is thrown for any errors.
      */
     public function get_recordset_sql($sql, array $params = null, $limitfrom = 0, $limitnum = 0) {
         if (!$this->query_requires_environment_modification()) {

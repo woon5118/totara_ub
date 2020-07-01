@@ -1316,17 +1316,16 @@ abstract class moodle_database {
      *
      * If $fields is specified, only those fields are returned.
      *
-     * Since this method is a little less readable, use of it should be restricted to
-     * code where it's possible there might be large datasets being returned.  For known
-     * small datasets use get_records - it leads to simpler code.
+     * This method is intended for queries with reasonable result size only,
+     * @see moodle_database::get_huge_recordset() if the results might not fit into memory.
      *
      * If you only want some of the records, specify $limitfrom and $limitnum.
      * The query will skip the first $limitfrom records (according to the sort
      * order) and then return the next $limitnum records. If either of $limitfrom
      * or $limitnum is specified, both must be present.
      *
-     * The return value is a moodle_recordset
-     * if the query succeeds. If an error occurs, false is returned.
+     * The result may be used as iterator in foreach(), if you want to obtain
+     * an array with incremental numeric keys @see moodle_recordset::to_array()
      *
      * @param string $table the table to query.
      * @param array $conditions optional array $fieldname=>requestedvalue with AND in between
@@ -1350,6 +1349,9 @@ abstract class moodle_database {
      *
      * Other arguments and the return type are like {@link function get_recordset}.
      *
+     * The result may be used as iterator in foreach(), if you want to obtain
+     * an array with incremental numeric keys @see moodle_recordset::to_array()
+     *
      * @param string $table the table to query.
      * @param string $field a field to check (optional).
      * @param array $values array of values the field must have
@@ -1372,6 +1374,9 @@ abstract class moodle_database {
      * otherwise all records from the table are returned.
      *
      * Other arguments and the return type are like {@link function get_recordset}.
+     *
+     * The result may be used as iterator in foreach(), if you want to obtain
+     * an array with incremental numeric keys @see moodle_recordset::to_array()
      *
      * @param string $table the table to query.
      * @param string|sql $select A fragment of SQL to be used in a where clause in the SQL call.
@@ -1406,18 +1411,105 @@ abstract class moodle_database {
     /**
      * Get a number of records as a moodle_recordset using a SQL statement.
      *
-     * Since this method is a little less readable, use of it should be restricted to
-     * code where it's possible there might be large datasets being returned.  For known
-     * small datasets use get_records_sql - it leads to simpler code.
+     * This method is intended for queries with reasonable result size only,
+     * @see moodle_database::get_huge_recordset_sql() if the results might not fit into memory.
+     *
+     * The result may be used as iterator in foreach(), if you want to obtain
+     * an array with incremental numeric keys @see moodle_recordset::to_array()
      *
      * @param string|sql $sql the SQL select query to execute.
-     * @param array $params array of sql parameters
+     * @param array|null $params array of sql parameters
      * @param int $limitfrom return a subset of records, starting at this point (optional).
      * @param int $limitnum return a subset comprising this many records (optional, required if $limitfrom is set).
      * @return moodle_recordset A moodle_recordset instance.
      * @throws dml_exception A DML specific exception is thrown for any errors.
      */
     public abstract function get_recordset_sql($sql, array $params=null, $limitfrom=0, $limitnum=0);
+
+    /**
+     * Get records from database as a moodle_recordset where all the given conditions met.
+     *
+     * This is intended to be used instead of @see moodle_database::get_recordset()
+     * when results may not fit into available PHP memory.
+     *
+     * Notes:
+     *   - it is not acceptable to modify referenced tables during iteration due to MS SQL Server limitations
+     *   - transactions cannot be started while iterating the records due to MS SQL Server limitations
+     *
+     * @since Totara 13.0
+     *
+     * @param string $table the table to query.
+     * @param array $conditions optional array $fieldname=>requestedvalue with AND in between
+     * @param string $sort an order to sort the results in (optional, a valid SQL ORDER BY parameter).
+     * @param string $fields a comma separated list of fields to return (optional, by default all fields are returned).
+     * @return moodle_recordset A moodle_recordset instance
+     * @throws dml_exception A DML specific exception is thrown for any errors.
+     */
+    public function get_huge_recordset($table, array $conditions = null, $sort = '', $fields = '*'): moodle_recordset {
+        list($select, $params) = $this->where_clause($table, $conditions);
+        return $this->get_huge_recordset_select($table, $select, $params, $sort, $fields);
+    }
+
+    /**
+     * Get records as a moodle_recordset which match a particular WHERE clause.
+     *
+     * This is intended to be used instead of @see moodle_database::get_recordset_select()
+     * when results may not fit into available PHP memory.
+     *
+     * Notes:
+     *   - it is not acceptable to modify referenced tables during iteration due to MS SQL Server limitations
+     *   - transactions cannot be started while iterating the records due to MS SQL Server limitations
+     *
+     * @since Totara 13.0
+     *
+     * @param string $table the table to query.
+     * @param string|sql $select A fragment of SQL to be used in a where clause in the SQL call.
+     * @param array $params array of sql parameters
+     * @param string $sort an order to sort the results in (optional, a valid SQL ORDER BY parameter).
+     * @param string $fields a comma separated list of fields to return (optional, by default all fields are returned).
+     * @return moodle_recordset A moodle_recordset instance.
+     * @throws dml_exception A DML specific exception is thrown for any errors.
+     */
+    public function get_huge_recordset_select($table, $select, array $params = null, $sort = '', $fields = '*'): moodle_recordset {
+        if ($select instanceof sql) {
+            $sql = self::sql("SELECT $fields FROM {{$table}}");
+            $sql = $sql->append($select->prepend("WHERE"));
+            if ($sort) {
+                $sql = $sql->append("ORDER BY $sort");
+            }
+        } else {
+            $sql = "SELECT $fields FROM {{$table}}";
+            if ($select) {
+                $sql .= " WHERE $select";
+            }
+            if ($sort) {
+                $sql .= " ORDER BY $sort";
+            }
+        }
+
+        return $this->get_huge_recordset_sql($sql, $params);
+    }
+
+    /**
+     * Get records as a moodle_recordset using a SQL statement.
+     *
+     * This is intended to be used instead of @see moodle_database::get_recordset_sql()
+     * when results may not fit into available PHP memory.
+     *
+     * Notes:
+     *   - it is not acceptable to modify referenced tables during iteration due to MS SQL Server limitations
+     *   - transactions cannot be started while iterating the records due to MS SQL Server limitations
+     *
+     * @since Totara 13.0
+     *
+     * @param string|sql $sql the SQL select query to execute.
+     * @param array $params array of sql parameters
+     * @return moodle_recordset A moodle_recordset instance.
+     * @throws dml_exception A DML specific exception is thrown for any errors.
+     */
+    public function get_huge_recordset_sql($sql, array $params = null): moodle_recordset {
+        return $this->get_recordset_sql($sql, $params);
+    }
 
     /**
      * Get all records from a table.
@@ -1430,7 +1522,10 @@ abstract class moodle_database {
      * @throws dml_exception A DML specific exception is thrown for any errors.
      */
     public function export_table_recordset($table) {
-        return $this->get_recordset($table, array());
+        $columns = $this->get_columns($table, true);
+        $sort = isset($columns['id']) ? 'id ASC' : '';
+
+        return $this->get_huge_recordset($table, [], $sort);
     }
 
     /**
@@ -1441,6 +1536,10 @@ abstract class moodle_database {
      * record found. The array key is the value from the first
      * column of the result set. The object associated with that key
      * has a member variable for each column of the results.
+     *
+     * Note that the first column must have unique values because it is used as array key,
+     * if you want to obtain array with incremental numeric keys use
+     * $DB->get_recordset(...)->to_array() with the same parameters.
      *
      * @param string $table the table to query.
      * @param array $conditions optional array $fieldname=>requestedvalue with AND in between
@@ -1484,7 +1583,9 @@ abstract class moodle_database {
     /**
      * Get a number of records as an array of objects where one field match one list of values.
      *
-     * Return value is like {@link function get_records}.
+     * Note that the first column must have unique values because it is used as array key,
+     * if you want to obtain array with incremental numeric keys use
+     * $DB->get_recordset_list(...)->to_array() with the same parameters.
      *
      * @param string $table The database table to be checked against.
      * @param string $field The field to search
@@ -1506,7 +1607,9 @@ abstract class moodle_database {
     /**
      * Get a number of records as an array of objects which match a particular WHERE clause.
      *
-     * Return value is like {@link function get_records}.
+     * Note that the first column must have unique values because it is used as array key,
+     * if you want to obtain array with incremental numeric keys use
+     * $DB->get_recordset_select(...)->to_array() with the same parameters.
      *
      * @param string $table The table to query.
      * @param string|sql $select A fragment of SQL to be used in a where clause in the SQL call.
@@ -1546,7 +1649,9 @@ abstract class moodle_database {
     /**
      * Get a number of records as an array of objects using a SQL statement.
      *
-     * Return value is like {@link function get_records}.
+     * Note that the first column must have unique values because it is used as array key,
+     * if you want to obtain array with incremental numeric keys use
+     * $DB->get_recordset_sql(...)->to_array() with the same parameters.
      *
      * @param string|sql $sql the SQL select query to execute. The first column of this SELECT statement
      *   must be a unique value (usually the 'id' field), as it will be used as the key of the

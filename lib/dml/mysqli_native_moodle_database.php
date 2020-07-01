@@ -1141,18 +1141,17 @@ class mysqli_native_moodle_database extends moodle_database {
     /**
      * Get a number of records as a moodle_recordset using a SQL statement.
      *
-     * Since this method is a little less readable, use of it should be restricted to
-     * code where it's possible there might be large datasets being returned.  For known
-     * small datasets use get_records_sql - it leads to simpler code.
+     * This method is intended for queries with reasonable result size only,
+     * @see moodle_database::get_huge_recordset_sql() if the results might not fit into memory.
      *
-     * The return type is like:
-     * @see function get_recordset.
+     * The result may be used as iterator in foreach(), if you want to obtain
+     * an array with incremental numeric keys @see moodle_recordset::to_array()
      *
      * @param string|sql $sql the SQL select query to execute.
-     * @param array $params array of sql parameters
-     * @param int $limitfrom return a subset of records, starting at this point (optional, required if $limitnum is set).
+     * @param array|null $params array of sql parameters
+     * @param int $limitfrom return a subset of records, starting at this point (optional).
      * @param int $limitnum return a subset comprising this many records (optional, required if $limitfrom is set).
-     * @return moodle_recordset instance
+     * @return moodle_recordset A moodle_recordset instance.
      * @throws dml_exception A DML specific exception is thrown for any errors.
      */
     public function get_recordset_sql($sql, array $params=null, $limitfrom=0, $limitnum=0) {

@@ -141,7 +141,11 @@ class store implements \tool_log\log\store, \core\log\sql_reader {
         list($selectwhere, $params, $sort) = self::replace_sql_legacy($selectwhere, $params, $sort);
 
         try {
-            $recordset = $DB->get_recordset_select('log', $selectwhere, $params, $sort, '*', $limitfrom, $limitnum);
+            if ((int)$limitfrom <= 0 && (int)$limitnum <= 0) {
+                $recordset = $DB->get_huge_recordset_select('log', $selectwhere, $params, $sort, '*');
+            } else {
+                $recordset = $DB->get_recordset_select('log', $selectwhere, $params, $sort, '*', $limitfrom, $limitnum);
+            }
         } catch (\moodle_exception $ex) {
             debugging("error converting legacy event data " . $ex->getMessage() . $ex->debuginfo, DEBUG_DEVELOPER);
             return new \EmptyIterator;
