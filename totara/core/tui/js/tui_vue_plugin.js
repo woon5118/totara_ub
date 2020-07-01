@@ -133,5 +133,22 @@ export default {
         focusHandlers.delete(el);
       },
     });
+
+    // Passthrough component, renders its default slot without any wrapping
+    // element.
+    // Useful for e.g. <component :is="var ? 'MyWrapper' : 'passthrough'">
+    Vue.component('passthrough', {
+      functional: true,
+      render(h, { scopedSlots }) {
+        return scopedSlots.default && scopedSlots.default();
+      },
+    });
+
+    Vue.component('render', {
+      functional: true,
+      // eslint-disable-next-line vue/require-prop-types
+      props: ['vnode'],
+      render: (h, { props }) => props.vnode,
+    });
   },
 };
