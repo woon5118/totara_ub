@@ -185,8 +185,8 @@ class mod_perform_webapi_resolver_mutation_update_track_due_date_testcase
                 'track_id' => $this->track1_id,
                 'schedule_is_open' => false,
                 'schedule_is_fixed' => true,
-                'schedule_fixed_from' => 222,
-                'schedule_fixed_to' => 333,
+                'schedule_fixed_from' => ['iso' => '2020-12-04', 'timezone' => 'Pacific/Auckland'],
+                'schedule_fixed_to' => ['iso' => '2020-12-05', 'timezone' => 'Pacific/Auckland'],
                 'due_date_is_enabled' => true,
                 'due_date_is_fixed' => false,
                 'due_date_offset' => [
@@ -224,8 +224,9 @@ class mod_perform_webapi_resolver_mutation_update_track_due_date_testcase
         $affected_track = $before_tracks[$this->track1_id];
         $affected_track->schedule_is_open = 0;
         $affected_track->schedule_is_fixed = 1;
-        $affected_track->schedule_fixed_from = 222;
-        $affected_track->schedule_fixed_to = 333;
+        $affected_track->schedule_fixed_from =  $this->get_timestamp_from_date('2020-12-04', 'Pacific/Auckland');
+        $affected_track->schedule_fixed_to =  $this->get_timestamp_from_date('2020-12-05', 'Pacific/Auckland', true);
+        $affected_track->schedule_fixed_timezone = 'Pacific/Auckland';
         $affected_track->schedule_dynamic_from = null;
         $affected_track->schedule_dynamic_to = null;
         $affected_track->schedule_needs_sync = 1;
