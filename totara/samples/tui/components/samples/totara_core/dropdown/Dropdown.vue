@@ -168,6 +168,12 @@ export default {
 </Dropdown>`,
     };
   },
+
+  methods: {
+    doThing() {
+      console.log('clicked');
+    },
+  },
 };
 </script>
 
