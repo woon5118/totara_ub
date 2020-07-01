@@ -86,12 +86,16 @@
       }
 
       &-button {
-        @extend .btn;
         @extend .btn-sm;
         border-radius: 0;
+        height: 3rem;
       }
 
-      // &-input {}
+      &-input {
+        border-color: var(--tui-form-input-border-color);
+        height: 3rem;
+        padding-left: 8px;
+      }
     }
 
     &-header {
