@@ -15,6 +15,9 @@
 /* jshint node: true, browser: false */
 /* eslint-env node */
 
+// Prevent misleading "Browserslist: caniuse-lite is outdated. Please run next command `npm update`" warning
+process.env.BROWSERSLIST_IGNORE_OLD_DATA = true;
+
 /**
  * @copyright  2014 Andrew Nicols
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -439,6 +442,19 @@ module.exports = function(grunt) {
                     filter: prefix_filter
                 }]
             },
+            prefixlegacy: {
+                options: {
+                    processors: [
+                        require('autoprefixer')()
+                    ],
+                    parser: require('postcss-scss'),
+                    stringifier: require('postcss-scss'),
+                },
+                files: [{
+                    expand: true,
+                    src: 'theme/legacy/scss/**/*.scss'
+                }]
+            },
             rtl: {
                 options: {
                     processors: [
@@ -740,7 +756,8 @@ module.exports = function(grunt) {
         'less:totara',
         'postcss:prefix',
         'postcss:rtl',
-        'stylelint:css'
+        'stylelint:css',
+        'postcss:prefixlegacy',
     ]);
 
     // Register the startup task.
