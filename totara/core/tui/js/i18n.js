@@ -156,8 +156,8 @@ class LangString {
  * @param {*=} param Optional variable to populate placeholder with.
  * @returns {LangString}
  */
-export function langString(...args) {
-  return new LangString(...args);
+export function langString(key, component, param) {
+  return new LangString(key, component, param);
 }
 
 /**
@@ -180,4 +180,21 @@ export async function loadLangStrings(strings) {
   return loadStrings(
     strings.filter(x => isLangString(x) && !x.loaded()).map(x => x.toRequest())
   );
+}
+
+/**
+ * Convert language string request to vue requirements format.
+ *
+ * @param {Array<{ component: 'foo', key: 'bar' }|LangString>} strings
+ * @returns {object}
+ */
+export function toVueRequirements(strings) {
+  const obj = {};
+  strings.forEach(str => {
+    if (isLangString(str)) str = str.toRequest();
+    const cmp = str.component;
+    if (!obj[cmp]) obj[cmp] = [];
+    if (!obj[cmp].includes(str.key)) obj[cmp].push(str.key);
+  });
+  return obj;
 }
