@@ -44,9 +44,12 @@ export default {
     element: Object,
   },
   methods: {
-    process(values) {
-      values.answer_text = values.answer_text.trim();
-      return values;
+    process(value) {
+      if (!value) {
+        return { answer_text: '' };
+      }
+      value.answer_text = value.answer_text.trim();
+      return value;
     },
 
     /**
