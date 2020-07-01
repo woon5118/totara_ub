@@ -29,6 +29,8 @@
       'tui-dataTableRow--disabled': disabled,
       'tui-dataTableRow--inGroup': inGroup,
       'tui-dataTableRow--selected': selected,
+      'tui-dataTableRow--draggable': draggable,
+      'tui-dataTableRow--dragging': dragging,
       'tui-dataTableRow--borderTopFirstOff': borderTopHidden,
       'tui-dataTableRow--borderBottomLastOff': borderBottomHidden,
       'tui-dataTableRow--borderSeparatorOff': borderSeparatorHidden,
@@ -51,6 +53,8 @@ export default {
     hoverOff: Boolean,
     inGroup: Boolean,
     selected: Boolean,
+    draggable: Boolean,
+    dragging: Boolean,
   },
 };
 </script>

@@ -115,6 +115,31 @@
   &--disabled {
     color: var(--tui-color-neutral-6);
   }
+
+  // don't show hover background when another item is being dragged over it
+  [data-tui-droppable-any-active] &:hover {
+    background: var(--tui-datatable-row-bg-color);
+  }
+
+  &--draggable {
+    // apply a background so you don't see through the row when dragging
+    // (default is transparent)
+    background: var(--tui-color-background);
+    user-select: none;
+    &.tui-focusWithin,
+    &:active,
+    &:hover {
+      background: var(--tui-color-background);
+    }
+  }
+
+  &--draggable > .tui-dataTableCell {
+    pointer-events: none;
+  }
+
+  &--dragging {
+    box-shadow: var(--tui-shadow-3);
+  }
 }
 
 @media (min-width: $tui-screen-xs) {

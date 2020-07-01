@@ -32,7 +32,11 @@
     }"
     role="table"
   >
-    <HeaderRow :empty="!this.$slots['header-row']">
+    <HeaderRow :empty="!$slots['header-row']">
+      <HeaderCell
+        v-if="$slots['header-row'] && draggableRows"
+        class="tui-dataTable__row-move-cell"
+      />
       <slot name="header-row" />
     </HeaderRow>
 
@@ -40,36 +44,83 @@
       <slot name="pre-rows" />
     </PreRows>
 
+    <render :vnode="draggableDropTarget" />
+
     <RowGroup
       v-for="{ group, groupId, rows, expandGroup } in rowGroupData"
       :key="groupId"
       :selected="isSelected(groupId)"
       :wrap="groupMode"
     >
-      <template v-for="({ row, id, expand }, index) in rows">
-        <Row
+      <template v-for="({ row, id, expand, index }, groupIndex) in rows">
+        <!--
+          Workarounds for Vue limitations:
+            * It is difficult to conditionally wrap a component when using
+              template syntax (it is easier with JSX), so we need to do a trick
+              using <component :is> and a special "passthrough" component that
+              just renders its children.
+            * Vue can't bind native listeners with v-on="object" syntax, so we
+              need to use PropsProvider to enable that - which results in another
+              <component :is> passthrough. This is fixed in Vue 3.
+        -->
+        <component
+          :is="draggableRows ? 'Draggable' : 'passthrough'"
           :key="id"
-          :border-bottom-hidden="borderBottomHidden"
-          :border-separator-hidden="borderSeparatorHidden"
-          :border-top-hidden="borderTopHidden"
-          :disabled="isDisabled(id)"
-          :hover-off="hoverOff"
-          :in-group="groupMode"
-          :selected="isSelected(id)"
-          :color-odd="colorOddRows"
+          v-slot="{
+            dragging,
+            attrs,
+            nativeEvents,
+            moveMenu,
+          }"
+          :type="getDraggableType(row)"
+          :value="getDraggableValue(row)"
+          :index="index + indexOffset"
+          :renderless="true"
         >
-          <slot
-            :id="id"
-            :expand="expand"
-            :expandState="expandableRows && id == expanded"
-            :expand-group="expandGroup"
-            :first-in-group="index === 0"
-            :group-id="groupId"
-            :in-group="groupMode"
-            name="row"
-            :row="row"
-          />
-        </Row>
+          <component
+            :is="draggableRows ? 'PropsProvider' : 'passthrough'"
+            :key="id"
+            :provide="{ nativeListeners: nativeEvents }"
+          >
+            <Row
+              :key="id"
+              :border-bottom-hidden="borderBottomHidden"
+              :border-separator-hidden="borderSeparatorHidden"
+              :border-top-hidden="borderTopHidden"
+              :disabled="isDisabled(id)"
+              :hover-off="hoverOff"
+              :in-group="groupMode"
+              :selected="isSelected(id)"
+              :color-odd="colorOddRows && !draggableRows"
+              :draggable="draggableRows"
+              :dragging="dragging"
+              v-bind="attrs"
+            >
+              <Cell
+                v-if="draggableRows"
+                class="tui-dataTable__row-move-cell"
+                valign="center"
+              >
+                <DragHandleIcon />
+                <div v-if="draggableRows" class="tui-dataTable__row-move-menu">
+                  <render :vnode="moveMenu" />
+                </div>
+              </Cell>
+              <slot
+                :id="id"
+                name="row"
+                :expand="expand"
+                :expandState="expandableRows && id == expanded"
+                :expand-group="expandGroup"
+                :first-in-group="groupIndex === 0"
+                :group-id="groupId"
+                :in-group="groupMode"
+                :row="row"
+                :dragging="dragging"
+              />
+            </Row>
+          </component>
+        </component>
 
         <ExpandedRow
           v-if="expandableRows && id == expanded"
@@ -88,6 +139,8 @@
         <slot name="group-expand-content" :group="group" />
       </ExpandedRow>
     </RowGroup>
+
+    <render :vnode="draggablePlaceholder" />
   </div>
 </template>
 
@@ -97,6 +150,11 @@ import HeaderRow from 'totara_core/components/datatable/HeaderRow';
 import PreRows from 'totara_core/components/datatable/PreRows';
 import Row from 'totara_core/components/datatable/Row';
 import RowGroup from 'totara_core/components/datatable/RowGroup';
+import Draggable from 'totara_core/components/drag_drop/Draggable';
+import PropsProvider from 'totara_core/components/util/PropsProvider';
+import Cell from 'totara_core/components/datatable/Cell';
+import HeaderCell from 'totara_core/components/datatable/HeaderCell';
+import DragHandleIcon from 'totara_core/components/icons/common/DragHandle';
 
 export default {
   components: {
@@ -105,6 +163,11 @@ export default {
     PreRows,
     Row,
     RowGroup,
+    Draggable,
+    PropsProvider,
+    Cell,
+    HeaderCell,
+    DragHandleIcon,
   },
 
   props: {
@@ -146,6 +209,21 @@ export default {
     groupMode: Boolean,
     // ID's of selected rows
     selection: Array,
+
+    // draggable:
+    draggableRows: Boolean,
+    draggablePlaceholder: Object,
+    draggableDropTarget: Object,
+    indexOffset: {
+      type: Number,
+      default: 0,
+    },
+    draggableValue: {
+      type: Function,
+    },
+    draggableType: {
+      type: [String, Function],
+    },
   },
 
   data() {
@@ -170,6 +248,7 @@ export default {
         return {
           row,
           id,
+          index,
           expand: () => this.updateExpandedRow(id),
         };
       });
@@ -181,7 +260,7 @@ export default {
      * @return {Array}
      */
     rowGroupData() {
-      if (!this.groupMode) {
+      if (!this.groupMode || this.draggableRows) {
         return [{ id: null, rows: this.rowData }];
       }
 
@@ -243,6 +322,33 @@ export default {
       this.expanded = null;
       const expand = this.expandedGroup !== groupId;
       this.expandedGroup = groupId !== undefined && expand ? groupId : null;
+    },
+
+    /**
+     * Get the value to use for a draggable row.
+     */
+    getDraggableValue(row) {
+      return typeof this.draggableValue === 'function'
+        ? this.draggableValue(row)
+        : row;
+    },
+
+    /**
+     * Get the type to use for a draggable row.
+     */
+    getDraggableType(row) {
+      if (!this.draggableRows) {
+        return;
+      }
+
+      if (typeof this.draggableType === 'string') {
+        return this.draggableType;
+      } else if (typeof this.draggableType === 'function') {
+        return this.draggableType(row);
+      }
+      console.error(
+        'draggable-type prop must be supplied to Table when draggable-rows is true.'
+      );
     },
   },
 };

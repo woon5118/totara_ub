@@ -7,26 +7,45 @@ exports[`presentation/datatable/Table.vue Checks snapshot 1`] = `
 >
   <headerrow-stub
     empty="true"
-  />
+  >
+    <!---->
+     
+  </headerrow-stub>
+   
+  <!---->
    
   <!---->
    
   <rowgroup-stub>
-    <row-stub />
+    <row-stub>
+      <!---->
+       
+    </row-stub>
      
     <!---->
-    <row-stub />
+    <row-stub>
+      <!---->
+       
+    </row-stub>
      
     <!---->
-    <row-stub />
+    <row-stub>
+      <!---->
+       
+    </row-stub>
      
     <!---->
-    <row-stub />
+    <row-stub>
+      <!---->
+       
+    </row-stub>
      
     <!---->
      
     <!---->
   </rowgroup-stub>
+   
+  <!---->
 </div>
 `;
 

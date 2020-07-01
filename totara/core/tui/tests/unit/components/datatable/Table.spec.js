@@ -24,6 +24,20 @@ import { shallowMount } from '@vue/test-utils';
 import component from 'totara_core/components/datatable/Table.vue';
 let wrapper;
 
+const stubs = {
+  passthrough: {
+    functional: true,
+    render(h, { scopedSlots }) {
+      return scopedSlots.default && scopedSlots.default();
+    },
+  },
+  render: {
+    functional: true,
+    props: ['vnode'],
+    render: (h, { props }) => props.vnode,
+  },
+};
+
 const propsData = {
   data: [
     {
@@ -55,6 +69,7 @@ describe('presentation/datatable/Table.vue', () => {
           return 'No items to display';
         },
       },
+      stubs,
     });
 
     expect(wrapper.element).toMatchSnapshot();
@@ -68,6 +83,7 @@ describe('presentation/datatable/Table.vue', () => {
           return 'No items to display';
         },
       },
+      stubs,
     });
 
     expect(wrapper.element).toMatchSnapshot();

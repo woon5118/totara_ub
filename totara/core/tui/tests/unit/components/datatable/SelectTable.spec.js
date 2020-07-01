@@ -27,6 +27,20 @@ let wrapper;
 
 Vue.directive('focus-within', {});
 
+const stubs = {
+  passthrough: {
+    functional: true,
+    render(h, { scopedSlots }) {
+      return scopedSlots.default && scopedSlots.default();
+    },
+  },
+  render: {
+    functional: true,
+    props: ['vnode'],
+    render: (h, { props }) => props.vnode,
+  },
+};
+
 const propsData = {
   value: [],
   data: [
@@ -63,6 +77,7 @@ describe('presentation/datatable/SelectTabel.vue', () => {
           return `lang string ${i++}`;
         },
       },
+      stubs,
     });
   });
 

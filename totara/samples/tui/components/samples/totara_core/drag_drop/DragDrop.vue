@@ -148,6 +148,54 @@
           </div>
         </Droppable>
       </div>
+      <div class="tui-sampleDragDrop__drag-tables">
+        <h4>Table</h4>
+        <Droppable
+          v-slot="{
+            attrs,
+            events,
+            isActive,
+            isDropValid,
+            dropTarget,
+            placeholder,
+          }"
+          :disabled="!reorderRows"
+          :source-id="$id('table')"
+          source-name="Sample Table"
+          :accept-drop="info => validateDrop(table, info)"
+          @remove="handleRemove(table, $event)"
+          @drop="handleDrop(table, $event)"
+        >
+          <div v-bind="attrs" v-on="events">
+            <Table
+              :data="table"
+              :draggable-rows="reorderRows"
+              draggable-type="row-test"
+              :draggable-placeholder="placeholder"
+              :draggable-drop-target="dropTargets ? dropTarget : null"
+            >
+              <template v-slot:header-row>
+                <HeaderCell size="2">ID</HeaderCell>
+                <HeaderCell size="10">Name</HeaderCell>
+              </template>
+              <template v-slot:row="{ row }">
+                <Cell size="2" column-header="col 2" valign="center">
+                  {{ row.id }}
+                </Cell>
+                <Cell size="10" column-header="col 1" valign="center">
+                  <InputText v-model="row.name" />
+                </Cell>
+              </template>
+            </Table>
+          </div>
+        </Droppable>
+        <ToggleSwitch
+          v-model="reorderRows"
+          class="tui-sampleDragDrop__table-toggle"
+          text="Re-order rows"
+          :toggle-first="true"
+        />
+      </div>
       <h4>Wrapping Grid</h4>
       <div>
         <Droppable
@@ -219,7 +267,11 @@ export default {
   components: {
     Draggable,
     Droppable,
+    Table,
+    Cell,
+    HeaderCell,
     ToggleSwitch,
+    InputText,
     PropsProvider,
     DragHandleIcon,
   },
@@ -243,10 +295,17 @@ export default {
         { id: 10, customHeight: 100 },
         { id: 11 },
       ],
+      table: [
+        { id: 341, name: 'John' },
+        { id: 957, name: 'Paul' },
+        { id: 274, name: 'George' },
+        { id: 817, name: 'Ringo' },
+      ],
       gridA: [45, 81, 77, 69, 12, 75, 17, 90, 19, 57, 13, 30].map(x => ({
         id: x,
       })),
 
+      reorderRows: false,
       scrollAll: false,
       dropTargets: true,
     };

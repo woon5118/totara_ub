@@ -25,5 +25,17 @@
   &--archived {
     background: var(--tui-datatable-bg-archived);
   }
+
+  &__row-move-cell {
+    flex-basis: var(--tui-gap-5);
+    flex-grow: 0;
+  }
+
+  &__row-move-menu {
+    position: absolute;
+    top: 0;
+    left: var(--tui-gap-8);
+    background: var(--tui-color-background);
+  }
 }
 </style>
