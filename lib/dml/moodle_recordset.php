@@ -90,4 +90,11 @@ abstract class moodle_recordset implements Iterator {
         }
         return $result;
     }
+
+    /**
+     * @deprecated do not use
+     */
+    public function preload() {
+        debugging('SQL server recordset preloading was removed, do not use', DEBUG_DEVELOPER);
+    }
 }

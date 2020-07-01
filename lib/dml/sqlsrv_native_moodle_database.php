@@ -27,7 +27,8 @@ use core\dml\sql;
 defined('MOODLE_INTERNAL') || die();
 
 require_once(__DIR__.'/moodle_database.php');
-require_once(__DIR__.'/sqlsrv_native_moodle_recordset.php');
+require_once(__DIR__.'/array_recordset.php');
+require_once(__DIR__.'/sqlsrv_native_huge_recordset.php');
 require_once(__DIR__.'/sqlsrv_native_moodle_temptables.php');
 
 /**
@@ -44,14 +45,6 @@ class sqlsrv_native_moodle_database extends moodle_database {
     /** @var sqlsrv_native_moodle_temptables */
     protected $temptables; // Control existing temptables
     protected $collation;  // current DB collation cache
-    /**
-     * Does the used db version support ANSI way of limiting (2012 and higher)
-     * @var bool
-     */
-    protected $supportsoffsetfetch;
-
-    /** @var sqlsrv_native_moodle_recordset[] list of open recordsets */
-    protected $recordsets = array();
 
     /** @var array cached server information */
     protected $serverinfo = null;
@@ -89,7 +82,7 @@ class sqlsrv_native_moodle_database extends moodle_database {
         return 'mssql';
     }
 
-   /**
+    /**
      * Returns more specific database driver type
      * Note: can be used before connect()
      * @return string db type mysqli, pgsql, oci, mssql, sqlsrv
@@ -98,7 +91,7 @@ class sqlsrv_native_moodle_database extends moodle_database {
         return 'sqlsrv';
     }
 
-   /**
+    /**
      * Returns general database library name
      * Note: can be used before connect()
      * @return string db type pdo, native
@@ -273,10 +266,6 @@ class sqlsrv_native_moodle_database extends moodle_database {
         $this->query_end($result);
         $this->free_result($result);
 
-        $serverinfo = $this->get_server_info();
-        // Fetch/offset is supported staring from SQL Server 2012.
-        $this->supportsoffsetfetch = version_compare($serverinfo['version'], '11', '>');
-
         // We can enable logging now.
         $this->query_log_allow();
 
@@ -359,7 +348,7 @@ class sqlsrv_native_moodle_database extends moodle_database {
         ];
 
         // Do not use ger_record() or similar here because it might internally need the server version and end up in infinite loop.
-        $rsrc = $this->do_query("SELECT compatibility_level FROM sys.databases WHERE name=?", [$this->dbname], SQL_QUERY_AUX, false, false);
+        $rsrc = $this->do_query("SELECT compatibility_level FROM sys.databases WHERE name=?", [$this->dbname], SQL_QUERY_AUX, false);
         if ($rsrc) {
             if ($row = sqlsrv_fetch_array($rsrc, SQLSRV_FETCH_ASSOC)) {
                 if (isset($compatibility_levels[$row['compatibility_level']])) {
@@ -432,32 +421,20 @@ class sqlsrv_native_moodle_database extends moodle_database {
      * @param array $params array of params for binding. If NULL, they are ignored.
      * @param int $sql_query_type - Type of operation
      * @param bool $free_result - Default true, transaction query will be freed.
-     * @param bool $scrollable - Default false, to use for quickly seeking to target records
      * @return resource|bool result
      */
-    private function do_query($sql, $params, $sql_query_type, $free_result = true, $scrollable = false) {
+    private function do_query($sql, $params, $sql_query_type, bool $free_result = true) {
         list($sql, $params, $type) = $this->fix_sql_params($sql, $params);
 
         /*
-         * Bound variables *are* supported. Until I can get it to work, emulate the bindings
-         * The challenge/problem/bug is that although they work, doing a SELECT SCOPE_IDENTITY()
-         * doesn't return a value (no result set)
+         * Bound variables in sqlsrv have too many limitations, so emulate them instead.
          *
-         * -- somebody from MS
+         * -- skodak
          */
 
         $sql = $this->emulate_bound_params($sql, $params);
         $this->query_start($sql, $params, $sql_query_type);
-        if (!$scrollable) { // Only supporting next row
-            $result = sqlsrv_query($this->sqlsrv, $sql);
-        } else { // Supporting absolute/relative rows
-            $result = sqlsrv_query($this->sqlsrv, $sql, array(), array('Scrollable' => SQLSRV_CURSOR_STATIC));
-        }
-
-        if ($result === false) {
-            // TODO do something with error or just use if DEV or DEBUG?
-            $dberr = $this->get_last_error();
-        }
+        $result = sqlsrv_query($this->sqlsrv, $sql);
 
         $this->query_end($result);
 
@@ -739,7 +716,7 @@ class sqlsrv_native_moodle_database extends moodle_database {
     /**
      * Selectively call sqlsrv_free_stmt(), avoiding some warnings without using the horrible @
      *
-     * @param sqlsrv_resource $resource resource to be freed if possible
+     * @param resource $resource resource to be freed if possible
      * @return bool
      */
     private function free_result($resource) {
@@ -895,83 +872,109 @@ class sqlsrv_native_moodle_database extends moodle_database {
     }
 
     /**
+     * Fetch records from database.
+     *
+     * @param string|sql $sql
+     * @param array $params
+     * @param int $limitfrom
+     * @param int $limitnum
+     * @param bool $numkeys
+     * @return array
+     * @throws dml_exception A DML specific exception is thrown for any errors.
+     */
+    private function fetch_records($sql, ?array $params, int $limitfrom, int $limitnum, bool $numkeys): array {
+        list($sql, $params, $type) = $this->fix_sql_params($sql, $params);
+
+        if ($limitfrom || $limitnum) {
+            // Remove problematic trailing semicolons, hopefully there are no comments in the statement.
+            $sql = rtrim($sql);
+            $sql = rtrim($sql, ';');
+
+            // We need order by to use FETCH/OFFSET.
+            // Ordering by first column shouldn't break anything if there was no order in the first place.
+            if (!strpos(strtoupper($sql), "ORDER BY")) {
+                $sql .= " ORDER BY 1";
+            }
+
+            $sql .= " OFFSET " . $limitfrom . " ROWS ";
+
+            if ($limitnum > 0) {
+                $sql .= " FETCH NEXT " . $limitnum . " ROWS ONLY";
+            }
+        }
+
+        $rsrc = $this->do_query($sql, $params, SQL_QUERY_SELECT, false);
+
+        $result = [];
+        while ($row = sqlsrv_fetch_array($rsrc, SQLSRV_FETCH_ASSOC)) {
+            $row = array_change_key_case($row, CASE_LOWER);
+            // Totara expects everything from DB as strings.
+            foreach ($row as $k => $v) {
+                if (is_null($v)) {
+                    continue;
+                }
+                if (!is_string($v)) {
+                    $row[$k] = (string)$v;
+                }
+            }
+            if ($numkeys) {
+                $result[] = (object)$row;
+            } else {
+                $id = reset($row);
+                if (isset($result[$id])) {
+                    $colname = key($row);
+                    debugging("Did you remember to make the first column something unique in your call to get_records? Duplicate value '$id' found in column '$colname'.", DEBUG_DEVELOPER);
+                }
+                $result[$id] = (object)$row;
+            }
+        }
+        sqlsrv_free_stmt($rsrc);
+
+        return $result;
+    }
+
+    /**
      * Get a number of records as a moodle_recordset using a SQL statement.
      *
-     * Since this method is a little less readable, use of it should be restricted to
-     * code where it's possible there might be large datasets being returned.  For known
-     * small datasets use get_records_sql - it leads to simpler code.
+     * This method is intended for queries with reasonable result size only,
+     * @see moodle_database::get_huge_recordset_sql() if the results might not fit into memory.
      *
-     * The return type is like:
-     * @see function get_recordset.
+     * The result may be used as iterator in foreach(), if you want to obtain
+     * an array with incremental numeric keys @see moodle_recordset::to_array()
      *
      * @param string|sql $sql the SQL select query to execute.
-     * @param array $params array of sql parameters
-     * @param int $limitfrom return a subset of records, starting at this point (optional, required if $limitnum is set).
+     * @param array|null $params array of sql parameters
+     * @param int $limitfrom return a subset of records, starting at this point (optional).
      * @param int $limitnum return a subset comprising this many records (optional, required if $limitfrom is set).
-     * @return moodle_recordset instance
+     * @return moodle_recordset A moodle_recordset instance.
      * @throws dml_exception A DML specific exception is thrown for any errors.
      */
     public function get_recordset_sql($sql, array $params = null, $limitfrom = 0, $limitnum = 0) {
-        list($sql, $params, $type) = $this->fix_sql_params($sql, $params);
-
         list($limitfrom, $limitnum) = $this->normalise_limit_from_num($limitfrom, $limitnum);
-        $needscrollable = (bool)$limitfrom; // To determine if we'll need to perform scroll to $limitfrom.
-
-        if ($limitfrom or $limitnum) {
-            if (!$this->supportsoffsetfetch) {
-                if ($limitnum >= 1) { // Only apply TOP clause if we have any limitnum (limitfrom offset is handled later).
-                    $fetch = $limitfrom + $limitnum;
-                    if (PHP_INT_MAX - $limitnum < $limitfrom) { // Check PHP_INT_MAX overflow.
-                        $fetch = PHP_INT_MAX;
-                    }
-                    $sql = preg_replace('/^([\s(])*SELECT([\s]+(DISTINCT|ALL))?(?!\s*TOP\s*\()/i',
-                                        "\\1SELECT\\2 TOP $fetch", $sql);
-                }
-            } else {
-                $needscrollable = false; // Using supported fetch/offset, no need to scroll anymore.
-                $sql = (substr($sql, -1) === ';') ? substr($sql, 0, -1) : $sql;
-                // We need order by to use FETCH/OFFSET.
-                // Ordering by first column shouldn't break anything if there was no order in the first place.
-                if (!strpos(strtoupper($sql), "ORDER BY")) {
-                    $sql .= " ORDER BY 1";
-                }
-
-                $sql .= " OFFSET ".$limitfrom." ROWS ";
-
-                if ($limitnum > 0) {
-                    $sql .= " FETCH NEXT ".$limitnum." ROWS ONLY";
-                }
-            }
-        }
-        $result = $this->do_query($sql, $params, SQL_QUERY_SELECT, false, $needscrollable);
-
-        if ($needscrollable) { // Skip $limitfrom records.
-            sqlsrv_fetch($result, SQLSRV_SCROLL_ABSOLUTE, $limitfrom - 1);
-        }
-        return $this->create_recordset($result);
+        $data = $this->fetch_records($sql, $params, $limitfrom, $limitnum, true);
+        return new array_recordset($data);
     }
 
     /**
-     * Create a record set and initialize with first row
+     * Get records as a moodle_recordset using a SQL statement.
      *
-     * @param mixed $result
-     * @return sqlsrv_native_moodle_recordset
+     * This is intended to be used instead of @see moodle_database::get_recordset_sql()
+     * when results may not fit into available PHP memory.
+     *
+     * Notes:
+     *   - it is not acceptable to modify referenced tables during iteration due to MS SQL Server limitations
+     *   - transactions cannot be started while iterating the records due to MS SQL Server limitations
+     *
+     * @since Totara 13.0
+     *
+     * @param string|sql $sql the SQL select query to execute.
+     * @param array $params array of sql parameters
+     * @return moodle_recordset A moodle_recordset instance.
+     * @throws dml_exception A DML specific exception is thrown for any errors.
      */
-    protected function create_recordset($result) {
-        $rs = new sqlsrv_native_moodle_recordset($result, $this);
-        $this->recordsets[] = $rs;
-        return $rs;
-    }
-
-    /**
-     * Do not use outside of recordset class.
-     * @internal
-     * @param sqlsrv_native_moodle_recordset $rs
-     */
-    public function recordset_closed(sqlsrv_native_moodle_recordset $rs) {
-        if ($key = array_search($rs, $this->recordsets, true)) {
-            unset($this->recordsets[$key]);
-        }
+    public function get_huge_recordset_sql($sql, array $params = null): moodle_recordset {
+        $rsrc = $this->do_query($sql, $params, SQL_QUERY_SELECT, false);
+        return new sqlsrv_native_huge_recordset($rsrc);
     }
 
     /**
@@ -1014,17 +1017,13 @@ class sqlsrv_native_moodle_database extends moodle_database {
      * @throws dml_exception A DML specific exception is thrown for any errors.
      */
     public function get_fieldset_sql($sql, array $params = null) {
+        $data = $this->fetch_records($sql, $params, 0, 0, true);
 
-        $rs = $this->get_recordset_sql($sql, $params);
-
-        $results = array ();
-
-        foreach ($rs as $row) {
-            $results[] = reset($row);
+        foreach ($data as $k => $row) {
+            $data[$k] = reset($row);
         }
-        $rs->close();
 
-        return $results;
+        return $data;
     }
 
     /**
@@ -1089,7 +1088,14 @@ class sqlsrv_native_moodle_database extends moodle_database {
         }
 
         if ($returnid) {
-            return (int)$this->get_field_sql('SELECT SCOPE_IDENTITY()');
+            // Totara: use low level API so that the identity value does not get lost
+            $sql = 'SELECT SCOPE_IDENTITY() AS id';
+            $this->query_start($sql, null, SQL_QUERY_AUX);
+            $result = sqlsrv_query($this->sqlsrv, $sql);
+            $this->query_end($result);
+            $id = sqlsrv_fetch_array($result)['id'];
+            $this->free_result($result);
+            return (int)$id;
         } else {
             return true;
         }
@@ -1130,24 +1136,6 @@ class sqlsrv_native_moodle_database extends moodle_database {
         }
         // We should never get here, if we do phpunit will most likely fail in some weird way...
         return array();
-    }
-
-    /**
-     * Fetch a single row into an numbered array
-     *
-     * @param mixed $query_id
-     */
-    private function sqlsrv_fetchrow($query_id) {
-        $row = sqlsrv_fetch_array($query_id, SQLSRV_FETCH_NUMERIC);
-        if ($row === false) {
-            $dberr = $this->get_last_error();
-            return false;
-        }
-
-        foreach ($row as $key => $value) {
-            $row[$key] = ($value === ' ' || $value === NULL) ? '' : $value;
-        }
-        return $row;
     }
 
     /**
@@ -1649,23 +1637,11 @@ class sqlsrv_native_moodle_database extends moodle_database {
     }
 
     /**
-     * Recordsets do not work well with transactions in SQL Server,
-     * let's prefetch the recordsets to memory to work around these problems.
-     */
-    protected function fetch_all_recordsets() {
-        foreach ($this->recordsets as $rs) {
-            $rs->transaction_starts();
-        }
-    }
-
-    /**
      * Driver specific start of real database transaction,
      * this can not be used directly in code.
      * @return void
      */
     protected function begin_transaction() {
-        $this->fetch_all_recordsets();
-
         $this->query_start('native sqlsrv_begin_transaction', NULL, SQL_QUERY_AUX);
         $result = sqlsrv_begin_transaction($this->sqlsrv);
         $this->query_end($result);
@@ -1677,8 +1653,6 @@ class sqlsrv_native_moodle_database extends moodle_database {
      * @return void
      */
     protected function commit_transaction() {
-        $this->fetch_all_recordsets();
-
         $this->query_start('native sqlsrv_commit', NULL, SQL_QUERY_AUX);
         $result = sqlsrv_commit($this->sqlsrv);
         $this->query_end($result);
@@ -1690,8 +1664,6 @@ class sqlsrv_native_moodle_database extends moodle_database {
      * @return void
      */
     protected function rollback_transaction() {
-        $this->fetch_all_recordsets();
-
         $this->query_start('native sqlsrv_rollback', null, SQL_QUERY_AUX);
         $result = sqlsrv_rollback($this->sqlsrv);
         $this->query_end($result);
@@ -1702,8 +1674,6 @@ class sqlsrv_native_moodle_database extends moodle_database {
      * @param string $name
      */
     protected function create_savepoint(string $name) {
-        $this->fetch_all_recordsets();
-
         $sql = "SAVE TRANSACTION {$name}";
         $this->query_start($sql, null, SQL_QUERY_AUX);
         $result = sqlsrv_query($this->sqlsrv, $sql);
@@ -1715,7 +1685,7 @@ class sqlsrv_native_moodle_database extends moodle_database {
      * @param string $name
      */
     protected function release_savepoint(string $name) {
-        $this->fetch_all_recordsets();
+        // nothing to do
     }
 
     /**
@@ -1723,8 +1693,6 @@ class sqlsrv_native_moodle_database extends moodle_database {
      * @param string $name
      */
     protected function rollback_savepoint(string $name) {
-        $this->fetch_all_recordsets();
-
         $sql = "ROLLBACK TRANSACTION {$name}";
         $this->query_start($sql, null, SQL_QUERY_AUX);
         $result = sqlsrv_query($this->sqlsrv, $sql);

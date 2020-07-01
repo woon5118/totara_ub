@@ -381,10 +381,6 @@ class restore_gradebook_structure_step extends restore_structure_step {
             //'itemid'   => $itemid
         );
         $rs = $DB->get_recordset('backup_ids_temp', $conditions);
-        // Totara: Records in set may be changed, which could lock MSSQL unless pre-loaded.
-        if ($DB->get_dbfamily() === 'mssql') {
-            $rs->preload();
-        }
 
         // We need this for calculation magic later on.
         $mappings = array();
@@ -423,10 +419,6 @@ class restore_gradebook_structure_step extends restore_structure_step {
                  WHERE gi.id {$sql} AND
                        calculation IS NOT NULL";
         $rs = $DB->get_recordset_sql($sql, $params);
-        // Totara: Records in set may be changed, which could lock MSSQL unless pre-loaded.
-        if ($DB->get_dbfamily() === 'mssql') {
-            $rs->preload();
-        }
         foreach ($rs as $gradeitem) {
             // Collect all of the used grade item id references
             if (preg_match_all('/##gi(\d+)##/', $gradeitem->calculation, $matches) < 1) {
@@ -474,10 +466,6 @@ class restore_gradebook_structure_step extends restore_structure_step {
         );
 
         $rs = $DB->get_recordset('grade_categories', $conditions);
-        // Totara: Records in set may be changed, which could lock MSSQL unless pre-loaded.
-        if ($DB->get_dbfamily() === 'mssql') {
-            $rs->preload();
-        }
         // Get all the parents correct first as grade_category::build_path() loads category parents from the DB
         foreach ($rs as $gc) {
             if (!empty($gc->parent)) {
@@ -491,10 +479,6 @@ class restore_gradebook_structure_step extends restore_structure_step {
 
         // Now we can rebuild all the paths
         $rs = $DB->get_recordset('grade_categories', $conditions);
-        // Totara: Records in set may be changed, which could lock MSSQL unless pre-loaded.
-        if ($DB->get_dbfamily() === 'mssql') {
-            $rs->preload();
-        }
         foreach ($rs as $gc) {
             $grade_category = new stdClass();
             $grade_category->id = $gc->id;
