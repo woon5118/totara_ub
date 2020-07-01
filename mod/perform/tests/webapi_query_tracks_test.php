@@ -25,6 +25,7 @@
 use mod_perform\models\activity\track as track_model;
 use mod_perform\webapi\resolver\query\tracks;
 use totara_core\advanced_feature;
+use totara_core\dates\date_time_setting;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
@@ -163,6 +164,9 @@ class mod_perform_webapi_query_tracks_testcase extends advanced_testcase {
         $resolve = function (string $field) use ($track, $context) {
             return $this->resolve_graphql_type('mod_perform_track', $field, $track, [], $context);
         };
+
+        /** @var date_time_setting $from */
+        $from = $resolve('schedule_fixed_from');
 
         return [
             'id' => $resolve('id'),

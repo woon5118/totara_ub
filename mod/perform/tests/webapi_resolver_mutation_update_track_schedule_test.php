@@ -44,7 +44,10 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_testcase
                 'track_id' => $this->track1_id,
                 'schedule_is_open' => true,
                 'schedule_is_fixed' => true,
-                'schedule_fixed_from' => 222,
+                'schedule_fixed_from' => [
+                    'iso' => '1991-12-04',
+                    'timezone' => \core_date::get_user_timezone(),
+                ],
                 'due_date_is_enabled' => false,
                 'repeating_is_enabled' => false,
             ],
@@ -63,7 +66,10 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_testcase
                 'track_id' => $this->track1_id,
                 'schedule_is_open' => true,
                 'schedule_is_fixed' => true,
-                'schedule_fixed_from' => 222,
+                'schedule_fixed_from' => [
+                    'iso' => '1991-12-04',
+                    'timezone' => \core_date::get_user_timezone(),
+                ],
                 'due_date_is_enabled' => false,
                 'repeating_is_enabled' => false,
             ],

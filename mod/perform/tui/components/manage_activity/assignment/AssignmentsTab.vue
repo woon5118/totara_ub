@@ -106,6 +106,7 @@
         v-if="track"
         :track="track"
         :dynamic-date-sources="dynamicDateSources"
+        :default-fixed-date="defaultFixedDateSetting"
       />
     </div>
     <AudienceAdder
@@ -176,6 +177,7 @@ export default {
     return {
       track: null,
       dynamicDateSources: [],
+      defaultFixedDateSetting: null,
       trackSettings: null,
       assignments: [],
       noAssignments: [
@@ -218,10 +220,11 @@ export default {
     },
 
     /**
-     * Used so we can get both track and date resolver options in one query.
+     * Used so we can get track, date resolver options, and default fixed date setting in one query.
      */
     trackSettings(newValue) {
       this.track = newValue.track;
+      this.defaultFixedDateSetting = newValue.defaultFixedDateSetting;
 
       if (
         this.track.schedule_dynamic_source &&
@@ -391,6 +394,7 @@ export default {
         return {
           track: data.mod_perform_default_track,
           dynamicDateSources: data.mod_perform_available_dynamic_date_sources,
+          defaultFixedDateSetting: data.mod_perform_default_fixed_date_setting,
         };
       },
     },

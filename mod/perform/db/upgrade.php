@@ -53,5 +53,22 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020063001, 'perform');
     }
 
+    if ($oldversion < 2020070100) {
+        $table = new xmldb_table('perform_track');
+        $field = new xmldb_field('schedule_fixed_timezone',  XMLDB_TYPE_CHAR, '255',  null, null, null, null, 'schedule_fixed_to');
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('due_date_fixed_timezone',  XMLDB_TYPE_CHAR, '255',  null, null, null, null, 'due_date_fixed');
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2020070100, 'perform');
+    }
+
     return true;
 }

@@ -77,6 +77,19 @@ type totara_core_relationship {
   created_at(format: core_date_format = TIMESTAMP): core_date!
 }
 
+type totara_core_date_time_setting {
+  iso: String!
+  timezone: String
+}
+
+"""
+Represents a date setting with optional time and timezone parts.
+"""
+input param_date_time_setting {
+  iso: String!
+  timezone: String
+}
+
 extend type Query {
   """
   Return all learning items assigned to the current user

@@ -34,6 +34,7 @@ use mod_perform\models\activity\activity;
 use mod_perform\models\activity\track;
 use mod_perform\models\activity\track_status;
 use PHPUnit\Framework\MockObject\MockObject;
+use totara_core\dates\date_time_setting;
 
 /**
  * @coversDefaultClass track.
@@ -238,19 +239,26 @@ class mod_perform_track_model_testcase extends advanced_testcase {
         $dynamic_source = dynamic_source::all_available()->first();
 
         return [
-            ['set_schedule_open_fixed', [111]],
-            ['set_schedule_closed_fixed', [111, 222]],
-            [
-                'set_schedule_closed_dynamic',
-                [
+            'set_schedule_open_fixed' => [
+                'set_schedule_open_fixed', [new date_time_setting(111)]
+            ],
+            'set_schedule_open_fixed - timezone only change' => [
+                'set_schedule_open_fixed',
+                [new date_time_setting(111, 'UTC')],
+                [new date_time_setting(111, 'Pacific/Auckland')],
+            ],
+            'set_schedule_closed_fixed' => [
+                'set_schedule_closed_fixed', [new date_time_setting(111), new date_time_setting(222)]
+            ],
+            'set_schedule_closed_dynamic' => [
+                'set_schedule_closed_dynamic', [
                     new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
                     new date_offset(222, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
                     $dynamic_source
                 ]
             ],
-            [
-                'set_schedule_open_dynamic',
-                [
+            'set_schedule_open_dynamic' => [
+                'set_schedule_open_dynamic', [
                     new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_BEFORE),
                     $dynamic_source
                 ]
@@ -262,15 +270,30 @@ class mod_perform_track_model_testcase extends advanced_testcase {
      * @dataProvider set_schedule_methods_data_provider
      * @param string $method_name
      * @param array $params
+     * @param array|null $before_params
+     * @throws coding_exception
      */
-    public function test_schedule_sync_is_not_flagged_for_draft(string $method_name, array $params) {
+    public function test_schedule_sync_is_not_flagged_for_draft(
+        string $method_name,
+        array $params,
+        array $before_params = null
+    ): void {
         $this->setAdminUser();
 
         $track = $this->create_activity_track('DRAFT');
 
-
         /** @var track_entity $track_entity */
         $track_entity = track_entity::repository()->find($track->get_id());
+
+        if ($before_params !== null) {
+            $track->$method_name(...$before_params);
+            $track->update();
+            $track_entity->refresh();
+            $track_entity->schedule_needs_sync = false;
+            $track_entity->save();
+            $track->refresh();
+        }
+
         $this->assertEquals(0, $track_entity->schedule_needs_sync);
 
         // Update method should set flag.
@@ -284,14 +307,30 @@ class mod_perform_track_model_testcase extends advanced_testcase {
      * @dataProvider set_schedule_methods_data_provider
      * @param string $method_name
      * @param array $params
+     * @param array|null $before_params
+     * @throws coding_exception
      */
-    public function test_schedule_sync_is_flagged_for_active_activity(string $method_name, array $params) {
+    public function test_schedule_sync_is_flagged_for_active_activity(
+        string $method_name,
+        array $params,
+        array $before_params = null
+    ): void {
         $this->setAdminUser();
 
         $track = $this->create_activity_track('ACTIVE');
 
         /** @var track_entity $track_entity */
         $track_entity = track_entity::repository()->find($track->get_id());
+
+        if ($before_params !== null) {
+            $track->$method_name(...$before_params);
+            $track->update();
+            $track_entity->refresh();
+            $track_entity->schedule_needs_sync = false;
+            $track_entity->save();
+            $track->refresh();
+        }
+
         $this->assertEquals(0, $track_entity->schedule_needs_sync);
 
         // Update method should set flag.
@@ -306,7 +345,7 @@ class mod_perform_track_model_testcase extends advanced_testcase {
      * @param string $method_name
      * @param array $params
      */
-    public function test_schedule_sync_is_not_flagged_for_update_without_actual_changes(string $method_name, array $params) {
+    public function test_schedule_sync_is_not_flagged_for_update_without_actual_changes(string $method_name, array $params): void {
         $this->setAdminUser();
 
         $track = $this->create_activity_track('ACTIVE');
@@ -348,22 +387,27 @@ class mod_perform_track_model_testcase extends advanced_testcase {
         $user_creation_date_source = (new user_creation_date())->get_options()->first();
 
         return [
-            [
+            'set_schedule_open_fixed' => [
                 'set_schedule_open_fixed',
-                [111],
-                [222]
+                [new date_time_setting(111)],
+                [new date_time_setting(222)],
             ],
-            [
+            'set_schedule_open_fixed - timezone change' => [
+                'set_schedule_open_fixed',
+                [new date_time_setting(111, 'UTC')],
+                [new date_time_setting(111, 'Pacific/Auckland')],
+            ],
+            'set_schedule_closed_fixed - start change' => [
                 'set_schedule_closed_fixed',
-                [111, 999],
-                [222, 999]
+                [new date_time_setting(111), new date_time_setting(999)],
+                [new date_time_setting(222), new date_time_setting(999)],
             ],
-            [
+            'set_schedule_closed_fixed - end change' => [
                 'set_schedule_closed_fixed',
-                [111, 999],
-                [111, 888]
+                [new date_time_setting(111), new date_time_setting(999)],
+                [new date_time_setting(111), new date_time_setting(888)],
             ],
-            [
+            'set_schedule_closed_dynamic - from offset changes' => [
                 'set_schedule_closed_dynamic',
                 [
                     new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
@@ -376,7 +420,7 @@ class mod_perform_track_model_testcase extends advanced_testcase {
                     $user_creation_date_source
                 ]
             ],
-            [
+            'set_schedule_closed_dynamic - to offset changes' => [
                 'set_schedule_closed_dynamic',
                 [
                     new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
@@ -389,7 +433,7 @@ class mod_perform_track_model_testcase extends advanced_testcase {
                     $user_creation_date_source
                 ]
             ],
-            [
+            'set_schedule_closed_dynamic - unit changes' => [
                 'set_schedule_closed_dynamic',
                 [
                     new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
@@ -402,7 +446,7 @@ class mod_perform_track_model_testcase extends advanced_testcase {
                     $user_creation_date_source
                 ]
             ],
-            [
+            'set_schedule_closed_dynamic - direction changes' => [
                 'set_schedule_closed_dynamic',
                 [
                     new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_AFTER),
@@ -415,7 +459,7 @@ class mod_perform_track_model_testcase extends advanced_testcase {
                     $user_creation_date_source
                 ]
             ],
-            [
+            'set_schedule_open_dynamic - offset changes' => [
                 'set_schedule_open_dynamic',
                 [
                     new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_BEFORE),
@@ -426,7 +470,7 @@ class mod_perform_track_model_testcase extends advanced_testcase {
                     $user_creation_date_source
                 ]
             ],
-            [
+            'set_schedule_open_dynamic - unit changes' => [
                 'set_schedule_open_dynamic',
                 [
                     new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_BEFORE),
@@ -437,7 +481,7 @@ class mod_perform_track_model_testcase extends advanced_testcase {
                     $user_creation_date_source
                 ]
             ],
-            [
+            'set_schedule_open_dynamic - direction changes' => [
                 'set_schedule_open_dynamic',
                 [
                     new date_offset(111, date_offset::UNIT_WEEK, date_offset::DIRECTION_BEFORE),
@@ -483,7 +527,7 @@ class mod_perform_track_model_testcase extends advanced_testcase {
         string $method_name,
         array $setup_params,
         array $changed_params
-    ) {
+    ): void {
         $this->setAdminUser();
 
         $track = $this->create_activity_track('ACTIVE');
@@ -535,8 +579,8 @@ class mod_perform_track_model_testcase extends advanced_testcase {
         $activity = $perform_generator->create_activity_in_container();
         $track = track::create($activity);
 
-        $track->set_schedule_open_fixed(111);
-        $track->set_due_date_fixed(222);
+        $track->set_schedule_open_fixed(new date_time_setting(111));
+        $track->set_due_date_fixed(new date_time_setting(222));
 
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage('Cannot set due date to fixed except when schedule is not open and fixed');
@@ -552,8 +596,8 @@ class mod_perform_track_model_testcase extends advanced_testcase {
         $activity = $perform_generator->create_activity_in_container();
         $track = track::create($activity);
 
-        $track->set_schedule_open_fixed(111);
-        $track->set_due_date_fixed(222);
+        $track->set_schedule_open_fixed(new date_time_setting(111));
+        $track->set_due_date_fixed(new date_time_setting(222));
 
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage('Cannot set due date to fixed except when schedule is not open and fixed');
@@ -569,8 +613,8 @@ class mod_perform_track_model_testcase extends advanced_testcase {
         $activity = $perform_generator->create_activity_in_container();
         $track = track::create($activity);
 
-        $track->set_schedule_closed_fixed(222, 444);
-        $track->set_due_date_fixed(333);
+        $track->set_schedule_closed_fixed(new date_time_setting(222), new date_time_setting(444));
+        $track->set_due_date_fixed(new date_time_setting(333));
 
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage('Cannot set fixed due date earlier than the schedule end date');

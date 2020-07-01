@@ -93,6 +93,7 @@ import { Uniform } from 'totara_core/components/uniform';
 
 // Util
 import { notify } from 'totara_core/notifications';
+import { isIsoAfter } from 'totara_core/date';
 import {
   NOTIFICATION_DURATION,
   RELATIVE_DATE_DIRECTION_BEFORE,
@@ -121,6 +122,10 @@ export default {
     },
     dynamicDateSources: {
       type: Array,
+      required: true,
+    },
+    defaultFixedDate: {
+      type: Object,
       required: true,
     },
   },
@@ -162,13 +167,14 @@ export default {
       );
 
       if (this.dueDateIsFixed) {
-        let creationEndDate = new Date(values.scheduleFixed.to);
-        let dueDate = new Date(values.dueDateFixed.from);
-        if (creationEndDate >= dueDate) {
+        // Due date must be at least a day after. Note timezones are not factored in here,
+        // but with an entire day difference there is a very slim chance of the validation being technically incorrect.
+        if (
+          values.dueDateFixed.iso === values.scheduleFixed.to.iso ||
+          !isIsoAfter(values.dueDateFixed.iso, values.scheduleFixed.to.iso)
+        ) {
           return {
-            dueDateFixed: {
-              from: dueDateErrorString,
-            },
+            dueDateFixed: dueDateErrorString,
           };
         }
       } else {
@@ -219,8 +225,8 @@ export default {
       return {
         // Creation range initial settings
         scheduleFixed: {
-          from: this.getInitialDate(track.schedule_fixed_from),
-          to: this.getInitialDate(track.schedule_fixed_to),
+          from: track.schedule_fixed_from || this.defaultFixedDate,
+          to: track.schedule_fixed_to || this.defaultFixedDate,
         },
         scheduleDynamic: {
           from_count: schedule_dynamic_from_count, // Uniform required validation doesn't support int 0 at time of writing.
@@ -235,9 +241,7 @@ export default {
 
         // Due date initial settings
         dueDateIsFixed: (track.due_date_is_fixed || false).toString(),
-        dueDateFixed: {
-          from: this.getInitialDate(track.due_date_fixed),
-        },
+        dueDateFixed: track.due_date_fixed || this.defaultFixedDate,
         dueDateOffset: {
           from_count: due_date_offset_count, // Uniform required validation doesn't support int 0 at time of writing.
           from_unit: due_date_offset_unit,
@@ -320,12 +324,20 @@ export default {
       gql.schedule_is_fixed = this.scheduleIsFixed;
 
       if (this.scheduleIsFixed) {
+        let timezone = form.scheduleFixed.from.timezone;
+
         // Fixed start date
-        gql.schedule_fixed_from = this.getUnixTime(form.scheduleFixed.from);
+        gql.schedule_fixed_from = {
+          iso: form.scheduleFixed.from.iso,
+          timezone,
+        };
 
         if (!this.scheduleIsOpen) {
           // Fixed start date with closing date
-          gql.schedule_fixed_to = this.getUnixTime(form.scheduleFixed.to);
+          gql.schedule_fixed_to = {
+            iso: form.scheduleFixed.to.iso,
+            timezone,
+          };
         }
       } else {
         // Dynamic start date
@@ -446,7 +458,7 @@ export default {
       }
 
       if (gql.due_date_is_fixed) {
-        gql.due_date_fixed = this.getUnixTime(form.dueDateFixed.from);
+        gql.due_date_fixed = form.dueDateFixed;
       } else {
         gql.due_date_offset = {};
         gql.due_date_offset.count = Number(form.dueDateOffset.from_count); // Gql does not handle "-1" and an int type.
@@ -481,39 +493,6 @@ export default {
       });
 
       return resultData.mod_perform_update_track_schedule.track;
-    },
-
-    /**
-     * TODO: Remove this and usages after proper date picker implementation.
-     *
-     * Convert a date string date into a unix time stamp.
-     * If a falsey dateString value is supplied null will be returned.
-     *
-     * @param dataString {string|null|undefined}
-     * @return {int|null}
-     */
-    getUnixTime(dataString) {
-      if (!dataString) {
-        return null;
-      }
-
-      return new Date(dataString).getTime() / 1000;
-    },
-
-    /**
-     * TODO: Remove this and usages after proper date picker implementation.
-     *
-     * Get the initial time to display from graphql attribute.
-     *
-     * @param variable {int}
-     * @return String date string
-     */
-    getInitialDate(variable) {
-      let date = new Date();
-      if (variable) {
-        date = new Date(variable * 1000);
-      }
-      return date.toISOString().substring(0, 10);
     },
 
     /**

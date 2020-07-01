@@ -58,15 +58,15 @@ type mod_perform_track {
   subject_instance_generation: mod_perform_track_subject_instance_generation_enums
   schedule_is_open: Boolean!
   schedule_is_fixed: Boolean!
-  schedule_fixed_from: Int
-  schedule_fixed_to: Int
+  schedule_fixed_from: totara_core_date_time_setting
+  schedule_fixed_to: totara_core_date_time_setting
   schedule_dynamic_from: mod_perform_dynamic_date_offset
   schedule_dynamic_to: mod_perform_dynamic_date_offset
   schedule_dynamic_source: mod_perform_dynamic_date_source
   schedule_use_anniversary: Boolean!
   due_date_is_enabled: Boolean!
   due_date_is_fixed: Boolean
-  due_date_fixed: Int
+  due_date_fixed: totara_core_date_time_setting
   due_date_offset: mod_perform_dynamic_date_offset
   repeating_is_enabled: Boolean!
   repeating_type: mod_perform_track_repeating_type_enums
@@ -91,6 +91,11 @@ extend type Query {
   Get all available options for dynamic schedule date resolver options.
   """
   mod_perform_available_dynamic_date_sources: [mod_perform_dynamic_date_source!]!
+
+  """
+  Get the default date and timezone to use in case a date time setting has not been configured in a track schedule.
+  """
+  mod_perform_default_fixed_date_setting: totara_core_date_time_setting!
 }
 
 input mod_perform_track_assignments_input {
@@ -123,15 +128,15 @@ input mod_perform_track_schedule_input {
   subject_instance_generation: mod_perform_track_subject_instance_generation_enums
   schedule_is_open: param_boolean!
   schedule_is_fixed: param_boolean!
-  schedule_fixed_from: param_integer
-  schedule_fixed_to: param_integer
+  schedule_fixed_from: param_date_time_setting
+  schedule_fixed_to: param_date_time_setting
   schedule_dynamic_from: mod_perform_dynamic_date_offset_input
   schedule_dynamic_to: mod_perform_dynamic_date_offset_input
   schedule_dynamic_source: mod_perform_dynamic_date_source_input
   schedule_use_anniversary: param_boolean
   due_date_is_enabled: param_boolean!
   due_date_is_fixed: param_boolean
-  due_date_fixed: param_integer
+  due_date_fixed: param_date_time_setting
   due_date_offset: mod_perform_dynamic_date_offset_input
   repeating_is_enabled: param_boolean!
   repeating_type: mod_perform_track_repeating_type_enums

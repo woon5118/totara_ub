@@ -25,6 +25,8 @@ namespace mod_perform\formatter\activity;
 
 use core\orm\formatter\entity_model_formatter;
 use core\webapi\formatter\field\string_field_formatter;
+use core_date;
+use \DateTime;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -32,6 +34,11 @@ defined('MOODLE_INTERNAL') || die();
  * Maps the track model class into the GraphQL mod_perform_track type.
  */
 class track extends entity_model_formatter {
+
+    /**
+     * @var \mod_perform\models\activity\track
+     */
+    protected $object;
 
     /**
      * {@inheritdoc}
@@ -45,15 +52,21 @@ class track extends entity_model_formatter {
             'subject_instance_generation' => null,
             'schedule_is_open' => null,
             'schedule_is_fixed' => null,
-            'schedule_fixed_from' => null,
-            'schedule_fixed_to' => null,
+            'schedule_fixed_from' => function () {
+                return $this->object->get_schedule_fixed_from_setting();
+            },
+            'schedule_fixed_to' => function () {
+                return $this->object->get_schedule_fixed_to_setting();
+            },
             'schedule_dynamic_from' => null,
             'schedule_dynamic_to' => null,
             'schedule_dynamic_source' => null,
             'schedule_use_anniversary' => null,
             'due_date_is_enabled' => null,
             'due_date_is_fixed' => null,
-            'due_date_fixed' => null,
+            'due_date_fixed' => function () {
+                return $this->object->get_due_date_fixed_setting();
+            },
             'due_date_offset' => null,
             'repeating_is_enabled' => null,
             'repeating_type' => null,

@@ -39,6 +39,7 @@ use mod_perform\task\service\subject_instance_creation;
 use mod_perform\task\service\subject_instance_dto;
 use mod_perform\task\service\track_schedule_sync;
 use mod_perform\user_groups\grouping;
+use totara_core\dates\date_time_setting;
 use totara_job\job_assignment;
 
 /**
@@ -623,9 +624,9 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
 
     public function test_due_date_fixed() {
         $track = $this->create_single_track_with_assignments(1);
-        $yesterday = time() - 86400;
-        $tomorrow = time() + 86400;
-        $day_after_tomorrow = time() + (2 * 86400);
+        $yesterday = new date_time_setting(time() - 86400);
+        $tomorrow = new date_time_setting(time() + 86400);
+        $day_after_tomorrow = new date_time_setting(time() + (2 * 86400));
         $track->set_schedule_closed_fixed($yesterday, $tomorrow);
         $track->set_due_date_fixed($day_after_tomorrow);
         $track->update();
@@ -635,7 +636,7 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
         (new subject_instance_creation())->generate_instances();
         /** @var subject_instance $subject_instance */
         $subject_instance = subject_instance::repository()->one();
-        $this->assertEquals($day_after_tomorrow, $subject_instance->due_date);
+        $this->assertEquals($day_after_tomorrow->get_timestamp(), $subject_instance->due_date);
     }
 
     public function test_due_date_relative() {

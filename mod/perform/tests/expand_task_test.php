@@ -42,6 +42,7 @@ use mod_perform\models\activity\track_assignment_type;
 use mod_perform\models\activity\track_status;
 use mod_perform\state\activity\draft;
 use mod_perform\user_groups\grouping;
+use totara_core\dates\date_time_setting;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -488,7 +489,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $track_id = $test_data->track1->id;
         $user_id = $test_data->user1->id;
 
-        $now = time();
+        $now = date_time_setting::now();
         $test_data->track1->set_schedule_open_fixed($now);
         $test_data->track1->update();
 
@@ -506,8 +507,8 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $this->assert_track_has_user_assignments($track_id, $user_id, true);
 
         // Change the schedule for the track
-        $tomorrow = time() + 86400;
-        $yesterday = time() - 86400;
+        $tomorrow = new date_time_setting(time() + 86400);
+        $yesterday = new date_time_setting(time() - 86400);
         $test_data->track1->set_schedule_closed_fixed($yesterday, $tomorrow);
         $test_data->track1->update();
 
@@ -517,7 +518,15 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $this->assert_user_assignment_period($track_id, $user_id, $yesterday, $tomorrow);
     }
 
-    private function assert_user_assignment_period(int $track_id, int $user_id, ?int $start, ?int $end): void {
+    private function assert_user_assignment_period(int $track_id, int $user_id, $start, $end): void {
+        if ($start instanceof date_time_setting) {
+            $start = $start->get_timestamp();
+        }
+
+        if ($end instanceof date_time_setting) {
+            $end = $end->get_timestamp();
+        }
+
         /** @var track_user_assignment $user_assignment */
         $user_assignment = track_user_assignment::repository()
             ->where('track_id', $track_id)

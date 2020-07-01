@@ -21,7 +21,10 @@
 -->
 
 <template>
-  <ScheduleSettingContainer :title="title">
+  <ScheduleSettingContainer
+    class="tui-performAssignmentDueDateSettings"
+    :title="title"
+  >
     <!-- Due Date Disabled -->
     <template v-if="!isEnabled">{{
       $str('due_date_disabled_description', 'mod_perform')
@@ -44,43 +47,71 @@
       <span>{{
         $str('due_date_enabled_description_before', 'mod_perform')
       }}</span>
-      <FormRadioGroup name="dueDateIsFixed">
-        <Radio
-          value="true"
-          :class="{
-            'tui-performAssignmentSchedule__radio-disabled': !isFixed,
-          }"
-        >
-          <span>{{ $str('due_date_by', 'mod_perform') }}</span>
-          <FixedDateSelector path="dueDateFixed" :disabled="!isFixed" />
-        </Radio>
-        <Radio
-          value="false"
-          :class="{
-            'tui-performAssignmentSchedule__radio-disabled': isFixed,
-          }"
-        >
-          <span>{{ $str('due_date_within', 'mod_perform') }}</span>
-          <RelativeDateSelector path="dueDateOffset" :disabled="isFixed" />
-          <span>{{
-            $str('due_date_enabled_description_after', 'mod_perform')
-          }}</span>
-        </Radio>
-      </FormRadioGroup>
+      <Responsive
+        v-slot="{ currentBoundaryName }"
+        :breakpoints="[
+          { name: 'small', boundaries: [0, 700] },
+          { name: null, boundaries: [701, 701] },
+        ]"
+      >
+        <FormRadioGroup name="dueDateIsFixed">
+          <Radio
+            value="true"
+            :class="{
+              'tui-performAssignmentDueDateSettings__fixed': true,
+              'tui-performAssignmentSchedule__radio-disabled': !isFixed,
+            }"
+          >
+            <span>{{ $str('due_date_by', 'mod_perform') }}</span>
+            <FormDateSelector
+              v-if="currentBoundaryName !== 'small'"
+              :id="$id('fixed-date-from')"
+              name="dueDateFixed"
+              :disabled="!isFixed"
+              :validations="v => [v.required()]"
+              type="date"
+              has-timezone
+            />
+          </Radio>
+          <FormDateSelector
+            v-if="currentBoundaryName === 'small'"
+            :id="$id('fixed-date-from')"
+            name="dueDateFixed"
+            :disabled="!isFixed"
+            :validations="v => [v.required()]"
+            type="date"
+            has-timezone
+          />
+          <Radio
+            value="false"
+            :class="{
+              'tui-performAssignmentSchedule__radio-disabled': isFixed,
+            }"
+          >
+            <span>{{ $str('due_date_within', 'mod_perform') }}</span>
+            <RelativeDateSelector path="dueDateOffset" :disabled="isFixed" />
+            <span>{{
+              $str('due_date_enabled_description_after', 'mod_perform')
+            }}</span>
+          </Radio>
+        </FormRadioGroup>
+      </Responsive>
     </template>
   </ScheduleSettingContainer>
 </template>
 
 <script>
-import FixedDateSelector from 'mod_perform/components/manage_activity/assignment/schedule/FixedDateSelector';
+import FormDateSelector from 'totara_core/components/uniform/FormDateSelector';
 import FormRadioGroup from 'totara_core/components/uniform/FormRadioGroup';
 import Radio from 'totara_core/components/form/Radio';
+import Responsive from 'totara_core/components/responsive/Responsive';
 import RelativeDateSelector from 'mod_perform/components/manage_activity/assignment/schedule/RelativeDateSelector';
 import ScheduleSettingContainer from 'mod_perform/components/manage_activity/assignment/schedule/ScheduleSettingContainer';
 
 export default {
   components: {
-    FixedDateSelector,
+    Responsive,
+    FormDateSelector,
     FormRadioGroup,
     Radio,
     RelativeDateSelector,

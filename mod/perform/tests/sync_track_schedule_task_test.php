@@ -35,6 +35,7 @@ use mod_perform\models\activity\track as track_model;
 use mod_perform\state\activity\draft;
 use mod_perform\task\service\subject_instance_creation;
 use mod_perform\task\service\track_schedule_sync;
+use totara_core\dates\date_time_setting;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -57,7 +58,7 @@ class mod_perform_sync_track_schedule_task_testcase extends advanced_testcase {
         $this->setAdminUser();
     }
 
-    public function test_sync_updates_user_assignment_dates() {
+    public function test_sync_updates_user_assignment_dates(): void {
         $generator = $this->generator();
         $config = mod_perform_activity_generator_configuration::new()
             ->disable_user_assignments()
@@ -66,8 +67,8 @@ class mod_perform_sync_track_schedule_task_testcase extends advanced_testcase {
         $activity = $generator->create_full_activities($config)->first();
         /** @var track_model $track */
         $track = $activity->get_tracks()->first();
-        $tomorrow = time() + 86400;
-        $yesterday = time() - 86400;
+        $tomorrow = new date_time_setting(time() + 86400);
+        $yesterday = new date_time_setting(time() - 86400);
         $track->set_schedule_closed_fixed($yesterday, $tomorrow);
         $track->update();
 
@@ -75,11 +76,11 @@ class mod_perform_sync_track_schedule_task_testcase extends advanced_testcase {
         (new expand_task())->expand_all();
         /** @var track_user_assignment $user_assignment */
         $user_assignment = track_user_assignment::repository()->one();
-        $this->assertEquals($yesterday, $user_assignment->period_start_date);
-        $this->assertEquals($tomorrow, $user_assignment->period_end_date);
+        $this->assertEquals($yesterday->get_timestamp(), $user_assignment->period_start_date);
+        $this->assertEquals($tomorrow->get_timestamp(), $user_assignment->period_end_date);
 
         $now = time();
-        $track->set_schedule_open_fixed($now);
+        $track->set_schedule_open_fixed(new date_time_setting($now));
         $track->update();
 
         (new track_schedule_sync())->sync_all();
@@ -88,7 +89,7 @@ class mod_perform_sync_track_schedule_task_testcase extends advanced_testcase {
         $this->assertEquals(null, $user_assignment->period_end_date);
     }
 
-    public function test_sync_updates_user_assignment_dates_using_anniversary_date_resolution() {
+    public function test_sync_updates_user_assignment_dates_using_anniversary_date_resolution(): void {
         $generator = $this->generator();
         $config = mod_perform_activity_generator_configuration::new()
             ->disable_user_assignments()
@@ -135,7 +136,7 @@ class mod_perform_sync_track_schedule_task_testcase extends advanced_testcase {
         $this->assertEquals(null, $user_assignment->period_end_date);
     }
 
-    public function test_draft_activity_is_not_synced() {
+    public function test_draft_activity_is_not_synced(): void {
         $generator = $this->generator();
         $config = mod_perform_activity_generator_configuration::new()
             ->disable_user_assignments()
@@ -144,8 +145,8 @@ class mod_perform_sync_track_schedule_task_testcase extends advanced_testcase {
         $activity = $generator->create_full_activities($config)->first();
         /** @var track_model $track */
         $track = $activity->get_tracks()->first();
-        $tomorrow = time() + 86400;
-        $yesterday = time() - 86400;
+        $tomorrow = new date_time_setting(time() + 86400);
+        $yesterday = new date_time_setting(time() - 86400);
         $track->set_schedule_closed_fixed($yesterday, $tomorrow);
         $track->update();
 
@@ -153,11 +154,11 @@ class mod_perform_sync_track_schedule_task_testcase extends advanced_testcase {
         (new expand_task())->expand_all();
         /** @var track_user_assignment $user_assignment */
         $user_assignment = track_user_assignment::repository()->one();
-        $this->assertEquals($yesterday, $user_assignment->period_start_date);
-        $this->assertEquals($tomorrow, $user_assignment->period_end_date);
+        $this->assertEquals($yesterday->get_timestamp(), $user_assignment->period_start_date);
+        $this->assertEquals($tomorrow->get_timestamp(), $user_assignment->period_end_date);
 
         $now = time();
-        $track->set_schedule_open_fixed($now);
+        $track->set_schedule_open_fixed(new date_time_setting($now));
         $track->update();
 
         // Change activity status to draft
@@ -170,11 +171,11 @@ class mod_perform_sync_track_schedule_task_testcase extends advanced_testcase {
 
         // No change expected
         $user_assignment->refresh();
-        $this->assertEquals($yesterday, $user_assignment->period_start_date);
-        $this->assertEquals($tomorrow, $user_assignment->period_end_date);
+        $this->assertEquals($yesterday->get_timestamp(), $user_assignment->period_start_date);
+        $this->assertEquals($tomorrow->get_timestamp(), $user_assignment->period_end_date);
     }
 
-    public function test_paused_track_is_not_synced() {
+    public function test_paused_track_is_not_synced(): void {
         $generator = $this->generator();
         $config = mod_perform_activity_generator_configuration::new()
             ->disable_user_assignments()
@@ -183,8 +184,8 @@ class mod_perform_sync_track_schedule_task_testcase extends advanced_testcase {
         $activity = $generator->create_full_activities($config)->first();
         /** @var track_model $track */
         $track = $activity->get_tracks()->first();
-        $tomorrow = time() + 86400;
-        $yesterday = time() - 86400;
+        $tomorrow = new date_time_setting(time() + 86400);
+        $yesterday = new date_time_setting(time() - 86400);
         $track->set_schedule_closed_fixed($yesterday, $tomorrow);
         $track->update();
 
@@ -192,11 +193,11 @@ class mod_perform_sync_track_schedule_task_testcase extends advanced_testcase {
         (new expand_task())->expand_all();
         /** @var track_user_assignment $user_assignment */
         $user_assignment = track_user_assignment::repository()->one();
-        $this->assertEquals($yesterday, $user_assignment->period_start_date);
-        $this->assertEquals($tomorrow, $user_assignment->period_end_date);
+        $this->assertEquals($yesterday->get_timestamp(), $user_assignment->period_start_date);
+        $this->assertEquals($tomorrow->get_timestamp(), $user_assignment->period_end_date);
 
         $now = time();
-        $track->set_schedule_open_fixed($now);
+        $track->set_schedule_open_fixed(new date_time_setting($now));
         $track->update();
 
         // Pause track
@@ -205,8 +206,8 @@ class mod_perform_sync_track_schedule_task_testcase extends advanced_testcase {
         // No change expected
         (new track_schedule_sync())->sync_all();
         $user_assignment->refresh();
-        $this->assertEquals($yesterday, $user_assignment->period_start_date);
-        $this->assertEquals($tomorrow, $user_assignment->period_end_date);
+        $this->assertEquals($yesterday->get_timestamp(), $user_assignment->period_start_date);
+        $this->assertEquals($tomorrow->get_timestamp(), $user_assignment->period_end_date);
 
         // Re-activated track should be synced
         $track->activate();
@@ -217,7 +218,7 @@ class mod_perform_sync_track_schedule_task_testcase extends advanced_testcase {
         $this->assertEquals(null, $user_assignment->period_end_date);
     }
 
-    public function test_expand_picks_up_synced_dates() {
+    public function test_expand_picks_up_synced_dates(): void {
         $generator = $this->generator();
         $config = mod_perform_activity_generator_configuration::new()
             ->disable_user_assignments();
@@ -225,8 +226,8 @@ class mod_perform_sync_track_schedule_task_testcase extends advanced_testcase {
         $activity = $generator->create_full_activities($config)->first();
         /** @var track_model $track */
         $track = $activity->get_tracks()->first();
-        $tomorrow = time() + 86400;
-        $yesterday = time() - 86400;
+        $tomorrow = new date_time_setting(time() + 86400);
+        $yesterday = new date_time_setting(time() - 86400);
         $track->set_schedule_open_fixed($tomorrow);
         $track->update();
         $this->assertEquals(1, track::repository()->find($track->id)->schedule_needs_sync);

@@ -23,6 +23,7 @@
  */
 
 use mod_perform\entities\activity\track as track_entity;
+use totara_core\dates\date_time_setting;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 require_once(__DIR__ . '/generator/activity_generator_configuration.php');
@@ -47,7 +48,7 @@ class mod_perform_webapi_resolver_mutation_update_track_subject_instance_generat
                 'subject_instance_generation' => 'ONE_PER_JOB',
                 'schedule_is_open' => true,
                 'schedule_is_fixed' => true,
-                'schedule_fixed_from' => 222,
+                'schedule_fixed_from' => ['iso' => (new date_time_setting(222))->get_iso()],
                 'due_date_is_enabled' => false,
                 'repeating_is_enabled' => false,
             ],
@@ -68,11 +69,13 @@ class mod_perform_webapi_resolver_mutation_update_track_subject_instance_generat
         self::assertEquals('ONE_PER_JOB', $result_track->subject_instance_generation);
 
         // Manually make the changes that we expect to make.
+        /** @var track_entity $affected_track */
         $affected_track = $before_tracks[$this->track1_id];
         $affected_track->subject_instance_generation = track_entity::SUBJECT_INSTANCE_GENERATION_ONE_PER_JOB;
         $affected_track->schedule_is_open = 1;
         $affected_track->schedule_is_fixed = 1;
         $affected_track->schedule_fixed_from = 222;
+        $affected_track->schedule_fixed_timezone = core_date::get_user_timezone();
         $affected_track->schedule_fixed_to = null;
         $affected_track->schedule_dynamic_from = null;
         $affected_track->schedule_dynamic_to = null;
@@ -103,7 +106,7 @@ class mod_perform_webapi_resolver_mutation_update_track_subject_instance_generat
                 'track_id' => $this->track1_id,
                 'schedule_is_open' => true,
                 'schedule_is_fixed' => true,
-                'schedule_fixed_from' => 222,
+                'schedule_fixed_from' => ['iso' => (new date_time_setting(222))->get_iso()],
                 'due_date_is_enabled' => false,
                 'repeating_is_enabled' => false,
             ],
@@ -124,12 +127,14 @@ class mod_perform_webapi_resolver_mutation_update_track_subject_instance_generat
         self::assertEquals(null, $result_track->subject_instance_generation); // Ignores actual value.
 
         // Manually make the changes that we expect to make.
+        /** @var track_entity $affected_track */
         $affected_track = $before_tracks[$this->track1_id];
         $affected_track->subject_instance_generation = -1; // Unchanged.
         $affected_track->schedule_is_open = 1;
         $affected_track->schedule_is_fixed = 1;
         $affected_track->schedule_fixed_from = 222;
         $affected_track->schedule_fixed_to = null;
+        $affected_track->schedule_fixed_timezone = core_date::get_server_timezone();
         $affected_track->schedule_dynamic_from = null;
         $affected_track->schedule_dynamic_to = null;
         $affected_track->schedule_needs_sync = 1;

@@ -7,8 +7,14 @@ query mod_perform_default_track_settings($activity_id: param_integer!) {
     subject_instance_generation
     schedule_is_open
     schedule_is_fixed
-    schedule_fixed_from
-    schedule_fixed_to
+    schedule_fixed_from {
+      iso
+      timezone
+    }
+    schedule_fixed_to {
+      iso
+      timezone
+    }
     schedule_dynamic_from {
       count
       unit
@@ -28,7 +34,10 @@ query mod_perform_default_track_settings($activity_id: param_integer!) {
     schedule_use_anniversary
     due_date_is_enabled
     due_date_is_fixed
-    due_date_fixed
+    due_date_fixed {
+      iso
+      timezone
+    }
     due_date_offset {
       count
       unit
@@ -58,5 +67,9 @@ query mod_perform_default_track_settings($activity_id: param_integer!) {
     option_key
     display_name
     is_available
+  }
+  mod_perform_default_fixed_date_setting {
+    iso
+    timezone
   }
 }

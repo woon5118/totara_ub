@@ -28,6 +28,7 @@ use core\orm\collection;
 use core\orm\entity\model;
 use mod_perform\constants;
 use mod_perform\dates\date_offset;
+use totara_core\dates\date_time_setting;
 use mod_perform\dates\resolvers\date_resolver;
 use mod_perform\dates\resolvers\dynamic\dynamic_date_resolver;
 use mod_perform\dates\resolvers\dynamic\dynamic_source;
@@ -51,6 +52,7 @@ use moodle_exception;
  * @property-read bool $schedule_is_fixed
  * @property-read int $schedule_fixed_from
  * @property-read int $schedule_fixed_to
+ * @property-read string|null $schedule_fixed_timezone
  * @property-read date_offset|null $schedule_dynamic_from
  * @property-read date_offset|null $schedule_dynamic_to
  * @property-read dynamic_source|null $schedule_dynamic_source
@@ -58,6 +60,7 @@ use moodle_exception;
  * @property-read bool $due_date_is_enabled
  * @property-read bool $due_date_is_fixed
  * @property-read int $due_date_fixed
+ * @property-read string|null $due_date_timezone
  * @property-read dynamic_source|null $due_date_offset
  * @property-read bool $repeating_is_enabled
  * @property-read int $repeating_type
@@ -80,6 +83,7 @@ class track extends model {
         'schedule_is_open',
         'schedule_is_fixed',
         'schedule_fixed_from',
+        'schedule_fixed_timezone',
         'schedule_dynamic_from',
         'schedule_dynamic_to',
         'schedule_dynamic_source',
@@ -87,6 +91,7 @@ class track extends model {
         'due_date_is_enabled',
         'due_date_is_fixed',
         'due_date_fixed',
+        'due_date_fixed_timezone',
         'due_date_offset',
         'repeating_is_enabled',
         'repeating_offset',
@@ -103,6 +108,9 @@ class track extends model {
         'subject_instance_generation',
         'schedule_fixed_to',
         'repeating_type',
+        'schedule_fixed_from_setting',
+        'schedule_fixed_to_setting',
+        'due_date_fixed_setting',
     ];
 
     /**
@@ -321,12 +329,12 @@ class track extends model {
      *
      * After calling, use track::update to save the changes to the DB
      *
-     * @param int $from
-     * @param int $to
+     * @param date_time_setting $from
+     * @param date_time_setting $to
      * @return track
      * @throws moodle_exception
      */
-    public function set_schedule_closed_fixed(int $from, int $to): self {
+    public function set_schedule_closed_fixed(date_time_setting $from, date_time_setting $to): self {
         if ($to < $from) {
             throw new moodle_exception('fixed_date_selector_error_range', 'mod_perform');
         }
@@ -334,8 +342,9 @@ class track extends model {
         $properties_to_update = [
             'schedule_is_open' => false,
             'schedule_is_fixed' => true,
-            'schedule_fixed_from' => $from,
-            'schedule_fixed_to' => $to,
+            'schedule_fixed_from' => $from->get_timestamp(),
+            'schedule_fixed_to' => $to->get_timestamp(),
+            'schedule_fixed_timezone' => $to->get_timezone(),
         ];
 
         $this->set_schedule_properties($properties_to_update);
@@ -348,14 +357,15 @@ class track extends model {
      *
      * After calling, use track::update to save the changes to the DB
      *
-     * @param int $from
+     * @param date_time_setting $from
      * @return track
      */
-    public function set_schedule_open_fixed(int $from): self {
+    public function set_schedule_open_fixed(date_time_setting $from): self {
         $properties_to_update = [
             'schedule_is_open' => true,
             'schedule_is_fixed' => true,
-            'schedule_fixed_from' => $from,
+            'schedule_fixed_from' => $from->get_timestamp(),
+            'schedule_fixed_timezone' => $from->get_timezone(),
         ];
 
         $this->set_schedule_properties($properties_to_update);
@@ -465,6 +475,7 @@ class track extends model {
         $entity->schedule_is_fixed = $properties['schedule_is_fixed'];
         $entity->schedule_fixed_from = $properties['schedule_fixed_from'] ?? null;
         $entity->schedule_fixed_to = $properties['schedule_fixed_to'] ?? null;
+        $entity->schedule_fixed_timezone = $properties['schedule_fixed_timezone'] ?? null;
         $entity->schedule_dynamic_from = $properties['schedule_dynamic_from'] ?? null;
         $entity->schedule_dynamic_to = $properties['schedule_dynamic_to'] ?? null;
         $entity->schedule_dynamic_source = $properties['schedule_dynamic_source'] ?? null;
@@ -495,6 +506,11 @@ class track extends model {
             return true;
         }
 
+        if ($this->entity->schedule_fixed_timezone !== $entity_before_changes->schedule_fixed_timezone) {
+            return true;
+        }
+
+        // All int and bool fields.
         foreach ([
             'schedule_is_open',
             'schedule_is_fixed',
@@ -588,14 +604,15 @@ class track extends model {
      *
      * After calling, use track::update to save the changes to the DB
      *
-     * @param int $fixed
+     * @param date_time_setting $fixed_due_date
      * @return track
      */
-    public function set_due_date_fixed(int $fixed): self {
+    public function set_due_date_fixed(date_time_setting $fixed_due_date): self {
         $properties_to_update = [
             'due_date_is_enabled' => true,
             'due_date_is_fixed' => true,
-            'due_date_fixed' => $fixed,
+            'due_date_fixed' => $fixed_due_date->get_timestamp(),
+            'due_date_fixed_timezone' => $fixed_due_date->get_timezone(),
         ];
 
         $this->set_due_date_properties($properties_to_update);
@@ -636,6 +653,7 @@ class track extends model {
         $entity->due_date_is_enabled = $properties['due_date_is_enabled'];
         $entity->due_date_is_fixed = $properties['due_date_is_fixed'] ?? null;
         $entity->due_date_fixed = $properties['due_date_fixed'] ?? null;
+        $entity->due_date_fixed_timezone = $properties['due_date_fixed_timezone'] ?? null;
         $entity->due_date_offset = $properties['due_date_offset'] ?? null;
     }
 
@@ -726,6 +744,39 @@ class track extends model {
     }
 
     /**
+     * @return date_time_setting|null
+     */
+    public function get_schedule_fixed_from_setting(): ?date_time_setting {
+        if ($this->entity->schedule_fixed_from === null) {
+            return null;
+        }
+
+        return new date_time_setting($this->entity->schedule_fixed_from, $this->entity->schedule_fixed_timezone);
+    }
+
+    /**
+     * @return date_time_setting|null
+     */
+    public function get_schedule_fixed_to_setting(): ?date_time_setting {
+        if ($this->entity->schedule_fixed_to === null) {
+            return null;
+        }
+
+        return new date_time_setting($this->entity->schedule_fixed_to, $this->entity->schedule_fixed_timezone);
+    }
+
+    /**
+     * @return date_time_setting|null
+     */
+    public function get_due_date_fixed_setting(): ?date_time_setting {
+        if ($this->entity->due_date_fixed === null) {
+            return null;
+        }
+
+        return new date_time_setting($this->entity->due_date_fixed, $this->entity->due_date_fixed_timezone);
+    }
+
+    /**
      * Get the date resolver for this track and a given set of users.
      *
      * @param array $user_ids
@@ -774,7 +825,7 @@ class track extends model {
                 throw new coding_exception('Cannot set due date to fixed except when schedule is not open and fixed');
             }
 
-            // Check that due date is not before schedule end date.
+            // Check that due date is after schedule end date.
             if ($entity->due_date_fixed <= $entity->schedule_fixed_to) {
                 throw new coding_exception('Cannot set fixed due date earlier than the schedule end date');
             }

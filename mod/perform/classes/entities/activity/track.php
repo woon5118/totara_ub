@@ -44,6 +44,7 @@ use mod_perform\dates\resolvers\dynamic\dynamic_source;
  * @property int $subject_instance_generation the system used to decide what subject instances are generated
  * @property int $schedule_fixed_from when schedule type is FIXED, contains the start date of assignment
  * @property int $schedule_fixed_to when schedule type is CLOSED_FIXED, contains the end date of assignment
+ * @property string|null $schedule_fixed_timezone
  * @property date_offset|null $schedule_dynamic_from an offset for dynamic schedule (saved as json)
  * @property date_offset|null $schedule_dynamic_to an offset for dynamic schedule (saved as json)
  * @property dynamic_source|null $schedule_dynamic_source a dynamic_source for dynamic schedule (saved as json)
@@ -53,6 +54,7 @@ use mod_perform\dates\resolvers\dynamic\dynamic_source;
  * @property bool $due_date_is_enabled
  * @property bool $due_date_is_fixed
  * @property int $due_date_fixed
+ * @property string|null $due_date_fixed_timezone
  * @property date_offset|null $due_date_offset
  * @property bool $repeating_is_enabled
  * @property int $repeating_type

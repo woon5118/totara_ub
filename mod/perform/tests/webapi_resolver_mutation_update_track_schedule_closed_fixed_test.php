@@ -21,8 +21,8 @@
  * @package mod_perform
  * @category test
  */
-
 use totara_webapi\phpunit\webapi_phpunit_helper;
+use mod_perform\entities\activity\track as track_entity;
 
 require_once(__DIR__ . '/generator/activity_generator_configuration.php');
 require_once(__DIR__ . '/webapi_resolver_mutation_update_track_schedule.php');
@@ -45,8 +45,14 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_fixed_te
                 'track_id' => $this->track1_id,
                 'schedule_is_open' => false,
                 'schedule_is_fixed' => true,
-                'schedule_fixed_from' => 222,
-                'schedule_fixed_to' => 333,
+                'schedule_fixed_from' => [
+                    'iso' => '1991-12-04',
+                    'timezone' => 'UTC', // Important to note that only the to timezone is saved.
+                ],
+                'schedule_fixed_to' => [
+                    'iso' => '1991-12-05',
+                    'timezone' => 'UTC',
+                ],
                 'due_date_is_enabled' => false,
                 'repeating_is_enabled' => false,
             ],
@@ -66,23 +72,32 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_fixed_te
         self::assertEquals($this->track1_id, $result_track['id']);
         self::assertFalse($result_track['schedule_is_open']);
         self::assertTrue($result_track['schedule_is_fixed']);
-        self::assertEquals(222, $result_track['schedule_fixed_from']);
-        self::assertEquals(333, $result_track['schedule_fixed_to']);
+        self::assertEquals([
+            'iso' => '1991-12-04T00:00:00',
+            'timezone' => 'UTC'
+        ], $result_track['schedule_fixed_from']);
+        self::assertEquals([
+            'iso' => '1991-12-05T00:00:00',
+            'timezone' => 'UTC'
+        ], $result_track['schedule_fixed_to']);
         self::assertNull($result_track['schedule_dynamic_from']);
         self::assertNull($result_track['schedule_dynamic_to']);
 
         // Manually make the changes that we expect to make.
+        /** @var track_entity $affected_track */
         $affected_track = $before_tracks[$this->track1_id];
         $affected_track->schedule_is_open = 0;
         $affected_track->schedule_is_fixed = 1;
-        $affected_track->schedule_fixed_from = 222;
-        $affected_track->schedule_fixed_to = 333;
+        $affected_track->schedule_fixed_from = $this->get_timestamp_from_date('1991-12-04', 'UTC');
+        $affected_track->schedule_fixed_to = $this->get_timestamp_from_date('1991-12-05', 'UTC');
+        $affected_track->schedule_fixed_timezone = 'UTC';
         $affected_track->schedule_dynamic_from = null;
         $affected_track->schedule_dynamic_to = null;
         $affected_track->schedule_needs_sync = 1;
         $affected_track->due_date_is_enabled = 0;
         $affected_track->due_date_is_fixed = null;
         $affected_track->due_date_fixed = null;
+        $affected_track->due_date_fixed_timezone = null;
         $affected_track->due_date_offset = null;
         $affected_track->repeating_is_enabled = 0;
         $affected_track->repeating_type = null;
@@ -102,8 +117,14 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_fixed_te
                 'track_id' => $this->track1_id,
                 'schedule_is_open' => false,
                 'schedule_is_fixed' => true,
-                'schedule_fixed_from' => 234,
-                'schedule_fixed_to' => 123,
+                'schedule_fixed_from' => [
+                    'iso' => '1991-12-05',
+                    'timezone' => 'UTC', // Important to note that only the to timezone is saved.
+                ],
+                'schedule_fixed_to' => [
+                    'iso' => '1991-12-04',
+                    'timezone' => 'UTC',
+                ],
                 'due_date_is_enabled' => false,
                 'repeating_is_enabled' => false,
             ],

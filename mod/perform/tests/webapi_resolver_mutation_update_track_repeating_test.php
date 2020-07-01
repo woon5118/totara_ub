@@ -26,6 +26,7 @@ use mod_perform\dates\date_offset;
 use mod_perform\entities\activity\track;
 use mod_perform\entities\activity\track as track_entity;
 use mod_perform\models\activity\activity;
+use totara_core\dates\date_time_setting;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 require_once(__DIR__ . '/generator/activity_generator_configuration.php');
@@ -47,7 +48,7 @@ class mod_perform_webapi_resolver_mutation_update_track_repeating_testcase
                 'track_id' => $this->track1_id,
                 'schedule_is_open' => true,
                 'schedule_is_fixed' => true,
-                'schedule_fixed_from' => 222,
+                'schedule_fixed_from' => ['iso' => (new date_time_setting(222))->get_iso()],
                 'due_date_is_enabled' => false,
                 'repeating_is_enabled' => false,
             ],
@@ -68,10 +69,12 @@ class mod_perform_webapi_resolver_mutation_update_track_repeating_testcase
         self::assertFalse($result_track->repeating_is_enabled);
 
         // Manually make the changes that we expect to make.
+        /** @var track_entity $affected_track */
         $affected_track = $before_tracks[$this->track1_id];
         $affected_track->schedule_is_open = 1;
         $affected_track->schedule_is_fixed = 1;
         $affected_track->schedule_fixed_from = 222;
+        $affected_track->schedule_fixed_timezone = core_date::get_user_timezone();
         $affected_track->schedule_fixed_to = null;
         $affected_track->schedule_dynamic_from = null;
         $affected_track->schedule_dynamic_to = null;
@@ -115,7 +118,7 @@ class mod_perform_webapi_resolver_mutation_update_track_repeating_testcase
                 'track_id' => $track1->id,
                 'schedule_is_open' => true,
                 'schedule_is_fixed' => true,
-                'schedule_fixed_from' => 222,
+                'schedule_fixed_from' => ['iso' => (new date_time_setting(222))->get_iso()],
                 'due_date_is_enabled' => false,
                 'repeating_is_enabled' => true,
                 'repeating_type' => 'AFTER_CREATION_WHEN_COMPLETE',
@@ -143,12 +146,14 @@ class mod_perform_webapi_resolver_mutation_update_track_repeating_testcase
         self::assertTrue($result_track->repeating_is_enabled);
 
         // Manually make the changes that we expect to make.
+        /** @var track_entity $affected_track */
         $affected_track = $before_tracks[$track1->id];
         $affected_track->subject_instance_generation = track_entity::SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT;
         $affected_track->schedule_is_open = 1;
         $affected_track->schedule_is_fixed = 1;
         $affected_track->schedule_fixed_from = 222;
         $affected_track->schedule_fixed_to = null;
+        $affected_track->schedule_fixed_timezone = core_date::get_user_timezone();
         $affected_track->schedule_dynamic_from = null;
         $affected_track->schedule_dynamic_to = null;
         $affected_track->schedule_needs_sync = 1;

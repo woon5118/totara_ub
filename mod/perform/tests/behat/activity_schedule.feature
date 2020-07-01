@@ -15,18 +15,18 @@ Feature: Define track schedules to perform activities
     And I click on "My Test Activity" "link"
     And I click on "Assignments" "link"
     And I click on "Limited" "button"
-    And I set the following fields to these values:
-      | scheduleFixed[from] | 2020-01-01 |
-      | scheduleFixed[to]   | 2030-12-30 |
+    And I set the "scheduleFixed[from]" tui date selector to "1 January 2020"
+    And I set the "scheduleFixed[from]" tui date selector timezone to "UTC"
+    And I set the "scheduleFixed[to]" tui date selector to "30 December 2030"
     When I save the activity schedule
     Then I should see "Activity schedule saved" in the tui "success" notification toast
 
     When I navigate to the manage perform activities page
     And I click on "My Test Activity" "link"
     And I click on "Assignments" "link"
-    Then the following fields match these values:
-      | scheduleFixed[from] | 2020-01-01 |
-      | scheduleFixed[to]   | 2030-12-30 |
+    Then the "scheduleFixed[from]" tui date selector should be set to "1 January 2020"
+    And the "scheduleFixed[from]" tui date selector timezone should be set to "UTC"
+    And the "scheduleFixed[to]" tui date selector should be set to "30 December 2030"
 
   Scenario: Save and view open ended fixed performance activity schedule
     Given I log in as "admin"
@@ -34,34 +34,37 @@ Feature: Define track schedules to perform activities
     And I click on "My Test Activity" "link"
     And I click on "Assignments" "link"
     And I click on "Open-ended" "button"
-    And I set the following fields to these values:
-      | scheduleFixed[from] | 2020-01-01 |
+    And I set the "scheduleFixed[from]" tui date selector to "1 January 2020"
+    And I set the "scheduleFixed[from]" tui date selector timezone to "UTC"
     When I save the activity schedule
     Then I should see "Activity schedule saved" in the tui "success" notification toast
 
     When I navigate to the manage perform activities page
     And I click on "My Test Activity" "link"
     And I click on "Assignments" "link"
-    Then the following fields match these values:
-      | scheduleFixed[from] | 2020-01-01 |
+
+    Then the "scheduleFixed[from]" tui date selector should be set to "1 January 2020"
+    And the "scheduleFixed[from]" tui date selector timezone should be set to "UTC"
 
   Scenario: Check remembered toggling between fixed options
     Given I log in as "admin"
     And I navigate to the manage perform activities page
     And I click on "My Test Activity" "link"
-    And I click on "Assignments" "link"
+
+    When I click on "Assignments" "link"
     And I click on "Open-ended" "button"
-    And I set the following fields to these values:
-      | scheduleFixed[from] | 2020-01-01 |
-    When I save the activity schedule
+    And I set the "scheduleFixed[from]" tui date selector to "1 January 2020"
+    And I set the "scheduleFixed[from]" tui date selector timezone to "UTC"
+    And I save the activity schedule
     Then I should see "Activity schedule saved" in the tui "success" notification toast
 
     When I navigate to the manage perform activities page
     And I click on "My Test Activity" "link"
     And I click on "Assignments" "link"
     And I click on "Limited" "button"
-    Then the following fields match these values:
-      | scheduleFixed[from] | 2020-01-01 |
+
+    Then the "scheduleFixed[from]" tui date selector should be set to "1 January 2020"
+    And the "scheduleFixed[from]" tui date selector timezone should be set to "UTC"
 
   Scenario: Check validation messages of fixed activity schedule
     Given I log in as "admin"
@@ -69,37 +72,27 @@ Feature: Define track schedules to perform activities
     And I click on "My Test Activity" "link"
     And I click on "Assignments" "link"
     And I click on "Limited" "button"
-    And I set the following fields to these values:
-      | scheduleFixed[from] | abc |
-      | scheduleFixed[to]   | xyz |
-    When I save the activity schedule
-    Then I should see "Date required"
-    When I set the following fields to these values:
-      | scheduleFixed[from] |  |
-      | scheduleFixed[to]   |  |
-    Then I should see "Date required"
-    When I set the following fields to these values:
-      | scheduleFixed[from] | 2030-12-30 |
-      | scheduleFixed[to]   | 2020-01-01 |
+
+    When I set the "scheduleFixed[from]" tui date selector to "2 January 2020"
+    And I set the "scheduleFixed[from]" tui date selector timezone to "UTC"
+    And I set the "scheduleFixed[to]" tui date selector to "1 January 2020"
     And I save the activity schedule
     Then I should see "Range end date cannot be before range start date"
-    When I click on "Open-ended" "button"
-    And I set the following fields to these values:
-      | scheduleFixed[from] | abc |
-    When I save the activity schedule
-    Then I should see "Date required"
-    When I set the following fields to these values:
-      | scheduleFixed[from] |  |
-    Then I should see "Date required"
-    # Make sure the validation for limited range doesn't apply (this used to be a bug).
-    When I set the following fields to these values:
-      | scheduleFixed[from] | 2030-12-30 |
+
+     # Make sure the validation for limited range doesn't apply (this used to be a bug).
+    When I click on "Limited" "button"
+    And I set the "scheduleFixed[from]" tui date selector to "30 June 2020"
+    And I set the "scheduleFixed[to]" tui date selector to "3 January 2020"
+    And I click on "Open-ended" "button"
     And I save the activity schedule
     Then I should see "Activity schedule saved" in the tui "success" notification toast
+
     When I close the tui notification toast
     And I click on "Limited" "button"
+    And I set the "scheduleFixed[from]" tui date selector to "1 January 2020"
+    And I set the "scheduleFixed[to]" tui date selector to "1 January 2020"
     And I save the activity schedule
-    Then I should see "Range end date cannot be before range start date"
+    Then I should see "Activity schedule saved" in the tui "success" notification toast
 
   Scenario: Save and view limited dynamic performance activity schedule
     Given I log in as "admin"
@@ -247,9 +240,8 @@ Feature: Define track schedules to perform activities
     And I click on "My Test Activity" "link"
     And I click on "Assignments" "link"
     And I click on "Limited" "button"
-    And I set the following fields to these values:
-      | scheduleFixed[from] | 2020-01-01 |
-      | scheduleFixed[to]   | 2030-12-30 |
+    Then I set the "scheduleFixed[from]" tui date selector to "1 January 2020"
+    And I set the "scheduleFixed[to]" tui date selector to "30 December 2030"
 
     When I click on "Dynamic" "button"
     And I set the following fields to these values:
@@ -263,9 +255,9 @@ Feature: Define track schedules to perform activities
     And I click on the "scheduleDynamic[use_anniversary]" tui checkbox
 
     When I click on "Fixed" "button"
-    Then the following fields match these values:
-      | scheduleFixed[from] | 2020-01-01 |
-      | scheduleFixed[to]   | 2030-12-30 |
+
+    Then the "scheduleFixed[from]" tui date selector should be set to "1 January 2020"
+    And the "scheduleFixed[to]" tui date selector should be set to "30 December 2030"
 
     When I click on "Dynamic" "button"
     Then the following fields match these values:
@@ -303,9 +295,9 @@ Feature: Define track schedules to perform activities
     # Open & Fixed
     When I click on "Open-ended" "button"
     And I click on "Fixed" "button"
+    And I set the "scheduleFixed[from]" tui date selector to "1 January 2020"
     And I set the following fields to these values:
-      | scheduleFixed[from]       | 2020-01-01 |
-      | dueDateOffset[from_count] | 0          |
+      | dueDateRelative[from_count] | 0          |
     And I save the activity schedule
     Then I should see "Due date must be after the creation end date"
     And the following fields match these values:
@@ -365,25 +357,23 @@ Feature: Define track schedules to perform activities
     # Limited & Fixed
     When I click on "Limited" "button"
     And I click on "Fixed" "button"
-    And I set the following fields to these values:
-      | scheduleFixed[from] | 2020-01-01 |
-      | scheduleFixed[to]   | 2030-12-30 |
+    When I set the "scheduleFixed[from]" tui date selector to "1 January 2020"
+    And I set the "scheduleFixed[to]" tui date selector to "30 December 2030"
     And I click on the "true" tui radio in the "dueDateIsFixed" tui radio group
-    And I set the following fields to these values:
-      | dueDateFixed[from] | 2030-12-30 |
+    And I set the "dueDateFixed" tui date selector to "30 December 2030"
     And I save the activity schedule
     Then I should see "Due date must be after the creation end date"
-    When I set the following fields to these values:
-      | dueDateFixed[from] | 2030-12-31 |
+    When I set the "dueDateFixed" tui date selector to "31 December 2030"
     And I save the activity schedule
     Then I should see "Activity schedule saved" in the tui "success" notification toast
     When I reload the page
     And I click on "Assignments" "link"
+
+    When I set the "scheduleFixed[from]" tui date selector to "1 January 2020"
+    And I set the "scheduleFixed[to]" tui date selector to "30 December 2030"
     Then the following fields match these values:
-      | scheduleFixed[from] | 2020-01-01 |
-      | scheduleFixed[to]   | 2030-12-30 |
-      | dueDateIsFixed      | true       |
-      | dueDateFixed[from]  | 2030-12-31 |
+      | dueDateIsFixed | true |
+    And I set the "dueDateFixed" tui date selector to "31 December 2030"
     And I click on the "false" tui radio in the "dueDateIsFixed" tui radio group
     And I set the following fields to these values:
       | dueDateOffset[from_count] | 0 |

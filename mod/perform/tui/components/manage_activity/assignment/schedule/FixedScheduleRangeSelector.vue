@@ -23,34 +23,42 @@
 
 <template>
   <FormScope :validate="fixedDateRangeValidator" :path="path">
-    <div class="tui-performAssignmentScheduleFixedDateSelector">
+    <div
+      :class="{
+        'tui-performAssignmentScheduleFixedDateSelector': true,
+        'tui-performAssignmentScheduleFixedDateSelector--has-range': hasRange,
+      }"
+    >
       <div class="tui-performAssignmentScheduleFixedDateSelector__input">
         <Label
+          class="tui-performAssignmentScheduleFixedDateSelector__label"
           :for="$id('fixed-date-from')"
-          :label="$str('fixed_date_selector_date', 'mod_perform')"
-          hidden
+          :label="this.$str('fixed_date_selector_from', 'mod_perform')"
+          :hidden="!hasRange"
         />
-        <FormText
+        <FormDateSelector
           :id="$id('fixed-date-from')"
           name="from"
           :disabled="disabled"
-          :validations="dateValidator"
+          :validations="v => [v.required()]"
+          type="date"
+          has-timezone
         />
       </div>
 
       <template v-if="hasRange">
-        <span>{{ toText }}</span>
         <div class="tui-performAssignmentScheduleFixedDateSelector__input">
           <Label
+            class="tui-performAssignmentScheduleFixedDateSelector__label"
             :for="$id('fixed-date-to')"
-            :label="$str('fixed_date_selector_date', 'mod_perform')"
-            hidden
+            :label="this.$str('fixed_date_selector_to', 'mod_perform')"
           />
-          <FormText
+          <FormDateSelector
             :id="$id('fixed-date-to')"
             name="to"
             :disabled="disabled"
-            :validations="dateValidator"
+            :validations="v => [v.required()]"
+            type="date"
           />
         </div>
       </template>
@@ -60,11 +68,16 @@
 
 <script>
 import Label from 'totara_core/components/form/Label';
-import { FormText, FormScope } from 'totara_core/components/uniform';
+import { isIsoAfter } from 'totara_core/date';
+import { FormScope, FormDateSelector } from 'totara_core/components/uniform';
 
 export default {
-  components: { FormText, FormScope, Label },
+  components: { FormDateSelector, FormScope, Label },
   props: {
+    initialStartDate: {
+      type: String,
+      required: false,
+    },
     path: {
       type: String,
       required: true,
@@ -77,29 +90,9 @@ export default {
       type: Boolean,
       default: false,
     },
-    toText: {
-      type: String,
-      default() {
-        return this.$str('fixed_date_selector_to', 'mod_perform');
-      },
-    },
   },
 
   methods: {
-    /**
-     * Validator for date strings.
-     * Please note: Note this is most likely temporary until the date picker component is built.
-     *
-     * @return {{}}
-     */
-    dateValidator() {
-      return {
-        validate: val => this.disabled || !isNaN(Date.parse(val)),
-        message: () =>
-          this.$str('fixed_date_selector_error_required', 'mod_perform'),
-      };
-    },
-
     /**
      * Validator for the fixed instance creation to/from range.
      * From must not be after to.
@@ -114,10 +107,8 @@ export default {
       }
 
       const errors = {};
-      const fromDate = Date.parse(values.from);
-      const toDate = Date.parse(values.to);
 
-      if (fromDate > toDate) {
+      if (!isIsoAfter(values.to.iso, values.from.iso)) {
         errors.to = this.$str('fixed_date_selector_error_range', 'mod_perform');
       }
 
@@ -133,7 +124,8 @@ export default {
       "fixed_date_selector_date",
       "fixed_date_selector_error_range",
       "fixed_date_selector_error_required",
-      "fixed_date_selector_to"
+      "fixed_date_selector_to",
+      "fixed_date_selector_from"
     ]
   }
 </lang-strings>

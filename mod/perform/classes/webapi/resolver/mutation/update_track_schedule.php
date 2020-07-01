@@ -28,6 +28,7 @@ use core\webapi\execution_context;
 use core\webapi\mutation_resolver;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\resolver\has_middleware;
+use totara_core\dates\date_time_setting;
 use mod_perform\dates\date_offset;
 use mod_perform\dates\resolvers\dynamic\dynamic_source;
 use mod_perform\models\activity\track;
@@ -51,15 +52,13 @@ class update_track_schedule implements mutation_resolver, has_middleware {
 
         // Fixed and dynamic schedules.
         if ($track_schedule['schedule_is_fixed']) {
+            $from = date_time_setting::create_from_array($track_schedule['schedule_fixed_from']);
+
             if ($track_schedule['schedule_is_open']) {
-                $track->set_schedule_open_fixed(
-                    $track_schedule['schedule_fixed_from']
-                );
+                $track->set_schedule_open_fixed($from);
             } else { // Closed.
-                $track->set_schedule_closed_fixed(
-                    $track_schedule['schedule_fixed_from'],
-                    $track_schedule['schedule_fixed_to']
-                );
+                $to = date_time_setting::create_from_array($track_schedule['schedule_fixed_to']);
+                $track->set_schedule_closed_fixed($from, $to);
             }
         } else { // Dynamic.
             $dynamic_source = dynamic_source::create_from_json(
@@ -96,7 +95,7 @@ class update_track_schedule implements mutation_resolver, has_middleware {
             if (!$track_schedule['schedule_is_open'] && $track_schedule['schedule_is_fixed']) {
                 if ($track_schedule['due_date_is_fixed']) {
                     $track->set_due_date_fixed(
-                        $track_schedule['due_date_fixed']
+                        date_time_setting::create_from_array($track_schedule['due_date_fixed'])
                     );
                 } else { // Relative.
                     $due_date_offset = date_offset::create_from_json(

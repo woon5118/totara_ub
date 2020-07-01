@@ -16,29 +16,31 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-  @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
-  @package theme_ventura
+  @author Jaron Steenson <jaron.steenson@totaralearning.com>
+  @package mod_perform
 -->
 
 <style lang="scss">
-.tui-performAssignmentScheduleFixedDateSelector {
-  display: inline-flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-content: space-between;
-  align-items: baseline; // Before changing this to center or something else, check the validation errors line up ok.
-  justify-content: flex-start;
+.tui-performAssignmentDueDateSettings {
+  &__fixed {
+    .tui-radio__label {
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: baseline;
 
-  & > span {
-    margin: 0 var(--tui-gap-1);
-  }
+      @media (min-width: $tui-screen-sm) {
+        flex-wrap: nowrap;
+      }
+    }
 
-  &__input {
-    max-width: 10rem;
-  }
+    div.tui-dateSelector__date,
+    div.tui-dateSelector__time {
+      margin: var(--tui-gap-2) var(--tui-gap-2) 0;
 
-  .tui-formFieldError__inner {
-    min-width: 20rem; // Should find a way to handle this better.
+      @media (min-width: $tui-screen-sm) {
+        margin-top: 0;
+      }
+    }
   }
 }
 </style>

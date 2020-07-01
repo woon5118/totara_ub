@@ -22,7 +22,9 @@
 
 <style lang="scss">
 .tui-performAssignmentScheduleSettingContainer {
-  padding-top: var(--tui-gap-4);
+  &__preamble {
+    margin: 0;
+  }
 
   &__title {
     @include tui-font-heading-label;

@@ -870,6 +870,79 @@ class behat_totara_tui extends behat_base {
     }
 
     /**
+     * @Given /^I set the "([^"]*)" tui date selector to "([^"]*)"$/
+     * @param string $field_name
+     * @param string $date_value day month year; 26 June 2020
+     */
+    public function i_set_the_tui_date_selector_to(string $field_name, string $date_value): void {
+        $date_selector = $this->find_date_selector_by_name($field_name);
+
+        [$day_to_set, $month_to_set, $year_to_set] = explode(' ', $date_value);
+
+        $selections = [
+            'day' => $day_to_set,
+            'month' => $month_to_set,
+            'year' => $year_to_set,
+        ];
+
+        foreach ($selections as $key => $selection) {
+            /** @var NodeElement $select_node */
+            $select_node = $date_selector->find('css', ".tui-dateSelector__date-$key select");
+            $select_node->selectOption($selection);
+        }
+    }
+
+    /**
+     * @Then /^the "([^"]*)" tui date selector should be set to "([^"]*)"$/
+     * @param string $field_name
+     * @param string $date_value
+     */
+    public function the_tui_date_selector_should_be_set_to(string $field_name, string $date_value): void {
+        $date_selector = $this->find_date_selector_by_name($field_name);
+
+        [$day_expected, $month_expected, $year_expected] = explode(' ', $date_value);
+
+        $selections = [
+            'day' => $day_expected,
+            'month' => $month_expected,
+            'year' => $year_expected,
+        ];
+
+        foreach ($selections as $key => $expected_value) {
+            /** @var NodeElement $select_node */
+            $select_node = $date_selector->find('css', ".tui-dateSelector__date-$key select");
+
+            $this->assert_selected_option($select_node, $key, $expected_value);
+        }
+    }
+
+    /**
+     * @Given /^I set the "([^"]*)" tui date selector timezone to "([^"]*)"$/
+     * @param string $field_name
+     * @param string $timezone_value
+     */
+    public function i_set_the_tui_date_selector_timezone_to(string $field_name, string $timezone_value): void {
+        $date_selector = $this->find_date_selector_by_name($field_name);
+
+        /** @var NodeElement $timezone_select_node */
+        $timezone_select_node  = $date_selector->find('css', '.tui-dateSelector__time select');
+        $timezone_select_node->selectOption($timezone_value);
+    }
+
+    /**
+     * @Then /^the "([^"]*)" tui date selector timezone should be set to "([^"]*)"$/
+     * @param string $field_name
+     * @param string $expected_value
+     */
+    public function the_tui_date_selector_timezone_should_be_set_to(string $field_name, string $expected_value): void {
+        $date_selector = $this->find_date_selector_by_name($field_name);
+
+        /** @var NodeElement $timezone_select_node */
+        $timezone_select_node  = $date_selector->find('css', '.tui-dateSelector__time select');
+        $this->assert_selected_option($timezone_select_node, 'timezone', $expected_value);
+    }
+
+    /*
      * @param string $table_selector_type
      * @param string $table_locator
      * @return NodeElement
@@ -1065,6 +1138,31 @@ class behat_totara_tui extends behat_base {
      */
     private function fail(string $error): void {
         throw new ExpectationException($error, $this->getSession());
+    }
+
+    /**
+     * @param $field_name
+     * @return NodeElement
+     */
+    private function find_date_selector_by_name($field_name): NodeElement {
+        $date_selectors = $this->find_all('css', ".tui-dateSelector");
+
+        $matching_date_selectors = array_filter($date_selectors, function (NodeElement $element) use ($field_name) {
+            return $element->getAttribute('name') === $field_name;
+        });
+
+        return reset($matching_date_selectors);
+    }
+
+    private function assert_selected_option(NodeElement $select_node, string $name, string $expected_value): void {
+        $value = $select_node->getValue();
+
+        /** @var NodeElement $selected_option */
+        $selected_option = $select_node->find('css', "[value='{$value}']");
+
+        if (trim($selected_option->getText()) !== $expected_value) {
+            $this->fail("{$name} did not match {$expected_value}");
+        }
     }
 
 }

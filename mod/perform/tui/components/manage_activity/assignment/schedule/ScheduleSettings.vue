@@ -20,13 +20,17 @@
   @package mod_perform
 -->
 <template>
-  <ScheduleSettingContainer
-    :title="title"
-    class="tui-performAssignmentScheduleSettings"
-  >
-    <p>{{ $str('schedule_range_date_preamble', 'mod_perform') }}</p>
-    <span>{{ $str('schedule_date_from', 'mod_perform') }}</span>
-    <FixedDateSelector
+  <ScheduleSettingContainer :title="title">
+    <p
+      v-if="isOpen"
+      class="tui-performAssignmentScheduleSettingContainer__preamble"
+    >
+      {{ $str('schedule_range_date_preamble_with_from', 'mod_perform') }}
+    </p>
+    <p v-else class="tui-performAssignmentScheduleSettingContainer__preamble">
+      {{ $str('schedule_range_date_preamble', 'mod_perform') }}
+    </p>
+    <FixedScheduleRangeSelector
       v-if="isFixed"
       path="scheduleFixed"
       :has-range="!isOpen"
@@ -38,15 +42,16 @@
       :has-range="!isOpen"
       :dynamic-date-sources="dynamicDateSources"
     />
-    <template v-if="isOpen">
-      <span v-if="isFixed">{{
-        $str('schedule_date_range_onwards', 'mod_perform')
-      }}</span>
-    </template>
+    <div
+      v-if="isOpen && isFixed"
+      class="tui-performAssignmentScheduleSettingContainer__onwards"
+    >
+      {{ $str('schedule_date_range_onwards', 'mod_perform') }}
+    </div>
 
-    <FormScope path="scheduleDynamic">
+    <FormScope v-if="!isFixed" path="scheduleDynamic">
       <div class="tui-performAssignmentScheduleSettings__use-anniversary">
-        <FormCheckbox v-if="!isFixed" name="use_anniversary">
+        <FormCheckbox name="use_anniversary">
           {{ $str('schedule_use_anniversary_label', 'mod_perform') }}
         </FormCheckbox>
       </div>
@@ -57,15 +62,15 @@
 <script>
 import RelativeDateSelector from 'mod_perform/components/manage_activity/assignment/schedule/RelativeDateSelector';
 import ScheduleSettingContainer from 'mod_perform/components/manage_activity/assignment/schedule/ScheduleSettingContainer';
-import FixedDateSelector from 'mod_perform/components/manage_activity/assignment/schedule/FixedDateSelector';
+import FixedScheduleRangeSelector from 'mod_perform/components/manage_activity/assignment/schedule/FixedScheduleRangeSelector';
 import FormCheckbox from 'totara_core/components/uniform/FormCheckbox';
 import FormScope from 'totara_core/components/reform/FormScope';
 
 export default {
   components: {
+    FixedScheduleRangeSelector,
     FormCheckbox,
     FormScope,
-    FixedDateSelector,
     RelativeDateSelector,
     ScheduleSettingContainer,
   },
@@ -105,9 +110,9 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
-      "schedule_date_from",
       "schedule_date_range_onwards",
       "schedule_range_date_preamble",
+      "schedule_range_date_preamble_with_from",
       "schedule_range_heading_limited_dynamic",
       "schedule_range_heading_limited_fixed",
       "schedule_range_heading_open_dynamic",

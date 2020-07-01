@@ -95,6 +95,10 @@ abstract class mod_perform_webapi_resolver_mutation_update_track_schedule_base e
         return [$date_dynamic_source, $dynamic_source_input];
     }
 
+    protected function get_timestamp_from_date(string $date, string $timezone): string {
+        return (new DateTime($date, new DateTimeZone($timezone)))->getTimestamp();
+    }
+
     public function tearDown(): void {
         $this->track1_id = null;
 

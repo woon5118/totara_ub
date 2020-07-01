@@ -89,16 +89,19 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_
         self::assertTrue($result_track['schedule_use_anniversary']);
         self::assertNull($result_track['schedule_fixed_from']);
         self::assertNull($result_track['schedule_fixed_to']);
+        self::assertNull($result_track['due_date_fixed']);
         self::assertEquals($from, $result_track['schedule_dynamic_from']);
         self::assertEquals($to, $result_track['schedule_dynamic_to']);
         self::assertEquals($date_dynamic_source->jsonSerialize(), $result_track['schedule_dynamic_source']);
 
         // Manually make the changes that we expect to make.
+        /** @var track_entity $affected_track */
         $affected_track = $before_tracks[$this->track1_id];
         $affected_track->schedule_is_open = 0;
         $affected_track->schedule_is_fixed = 0;
         $affected_track->schedule_fixed_from = null;
         $affected_track->schedule_fixed_to = null;
+        $affected_track->schedule_fixed_timezone = null;
         $affected_track->schedule_dynamic_from = json_encode($from);
         $affected_track->schedule_dynamic_to = json_encode($to);
         $affected_track->schedule_dynamic_source = json_encode($date_dynamic_source);
@@ -107,6 +110,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_dynamic_
         $affected_track->due_date_is_enabled = 0;
         $affected_track->due_date_is_fixed = null;
         $affected_track->due_date_fixed = null;
+        $affected_track->due_date_fixed_timezone = null;
         $affected_track->due_date_offset = null;
         $affected_track->repeating_is_enabled = 0;
         $affected_track->repeating_type = null;

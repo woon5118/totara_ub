@@ -6,8 +6,14 @@ mutation mod_perform_update_track_schedule(
       id
       schedule_is_open
       schedule_is_fixed
-      schedule_fixed_from
-      schedule_fixed_to
+      schedule_fixed_from {
+        iso
+        timezone
+      }
+      schedule_fixed_to {
+        iso
+        timezone
+      }
       schedule_dynamic_from {
         count
         unit
@@ -27,7 +33,10 @@ mutation mod_perform_update_track_schedule(
       schedule_use_anniversary
       due_date_is_enabled
       due_date_is_fixed
-      due_date_fixed
+      due_date_fixed {
+        iso
+        timezone
+      }
       due_date_offset {
         count
         unit
