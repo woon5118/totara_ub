@@ -1,0 +1,383 @@
+<!--
+  This file is part of Totara Learn
+
+  Copyright (C) 2020 onwards Totara Learning Solutions LTD
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+  @author Simon Chester <simon.chester@totaralearning.com>
+  @package totara_core
+-->
+
+<template>
+  <div
+    class="tui-sampleDragDrop"
+    :class="{
+      'tui-sampleDragDrop--scrollAll': scrollAll,
+    }"
+  >
+    <div class="tui-sampleDragDrop__options">
+      <p>
+        <ToggleSwitch
+          v-model="scrollAll"
+          text="Wrap sample in a scrollable div"
+          :toggle-first="true"
+        />
+      </p>
+      <p>
+        <ToggleSwitch
+          v-model="dropTargets"
+          text="Render drop target placeholders"
+          :toggle-first="true"
+        />
+      </p>
+      <p>
+        In this demo, items with even-numbered IDs can be moved between lists,
+        while odd-numbered IDs can not.
+      </p>
+    </div>
+    <div class="tui-sampleDragDrop__droppables">
+      <h4>Lists</h4>
+      <div class="tui-sampleDragDrop__dragLists">
+        <Droppable
+          v-slot="{
+            attrs,
+            events,
+            isActive,
+            isDropValid,
+            dropTarget,
+            placeholder,
+          }"
+          :source-id="$id('list-a')"
+          source-name="Sample List A"
+          :accept-drop="info => validateDrop(listA, info)"
+          @remove="handleRemove(listA, $event)"
+          @drop="handleDrop(listA, $event)"
+        >
+          <div
+            class="tui-sampleDragDrop__dragList"
+            :class="{
+              'tui-sampleDragDrop__dragList--valid': isActive && isDropValid,
+            }"
+            v-bind="attrs"
+            v-on="events"
+          >
+            <render v-if="dropTargets" :vnode="dropTarget" />
+            <Draggable
+              v-for="(x, index) in listA"
+              :key="x.id"
+              v-slot="{ dragging, attrs, events, moveMenu }"
+              :index="index"
+              type="sample"
+              :value="x"
+            >
+              <div
+                class="tui-sampleDragDrop__draggableItem"
+                :class="{
+                  'tui-sampleDragDrop__draggableItem--dragging': dragging,
+                }"
+                :style="x.customHeight && { minHeight: x.customHeight + 'px' }"
+                v-bind="attrs"
+                v-on="events"
+              >
+                <render :vnode="moveMenu" />
+                id {{ x.id }}
+              </div>
+            </Draggable>
+            <render :vnode="placeholder" />
+          </div>
+        </Droppable>
+
+        <Droppable
+          v-slot="{
+            attrs,
+            events,
+            isActive,
+            isDropValid,
+            dropTarget,
+            placeholder,
+          }"
+          :source-id="$id('list-b')"
+          source-name="Sample List B"
+          :accept-drop="info => validateDrop(listB, info)"
+          @remove="handleRemove(listB, $event)"
+          @drop="handleDrop(listB, $event)"
+        >
+          <div
+            class="tui-sampleDragDrop__dragList"
+            :class="{
+              'tui-sampleDragDrop__dragList--valid': isActive && isDropValid,
+            }"
+            v-bind="attrs"
+            v-on="events"
+          >
+            <render v-if="dropTargets" :vnode="dropTarget" />
+            <Draggable
+              v-for="(x, index) in listB"
+              :key="x.id"
+              v-slot="{ dragging, attrs, events, moveMenu }"
+              :index="index"
+              type="sample"
+              :value="x"
+            >
+              <div
+                class="tui-sampleDragDrop__draggableItem"
+                :class="{
+                  'tui-sampleDragDrop__draggableItem--dragging': dragging,
+                }"
+                :style="x.customHeight && { minHeight: x.customHeight + 'px' }"
+                v-bind="attrs"
+                v-on="events"
+              >
+                <render :vnode="moveMenu" />
+                id {{ x.id }}
+              </div>
+            </Draggable>
+            <render :vnode="placeholder" />
+          </div>
+        </Droppable>
+      </div>
+      <h4>Wrapping Grid</h4>
+      <div>
+        <Droppable
+          v-slot="{ attrs, events, isActive, isDropValid }"
+          :source-id="$id('grid-a')"
+          source-name="Sample grid A"
+          :accept-drop="info => validateDrop(gridA, info)"
+          layout-interaction="grid-line"
+          axis="horizontal"
+          @remove="handleRemove(gridA, $event)"
+          @drop="handleDrop(gridA, $event)"
+        >
+          <PropsProvider :provide="{ nativeListeners: events }">
+            <transition-group
+              name="tui-sampleDragDrop__dragGrid-item-transition"
+              tag="div"
+              class="tui-sampleDragDrop__dragGrid"
+              :class="{
+                'tui-sampleDragDrop__dragGrid--valid': isActive && isDropValid,
+              }"
+              v-bind="attrs"
+            >
+              <Draggable
+                v-for="(x, index) in gridA"
+                :key="x.id"
+                v-slot="{ dragging, anyDragging, attrs, events, moveMenu }"
+                :index="index"
+                type="sample-grid-item"
+                :value="x"
+              >
+                <div
+                  class="tui-sampleDragDrop__dragGrid-item"
+                  :class="{
+                    'tui-sampleDragDrop__dragGrid-item--dragging': dragging,
+                  }"
+                  v-bind="attrs"
+                  v-on="events"
+                >
+                  <div
+                    v-if="!anyDragging || dragging"
+                    class="tui-sampleDragDrop__dragGrid-item-moveIcon"
+                  >
+                    <DragHandleIcon />
+                  </div>
+                  <render :vnode="moveMenu" />
+                  id {{ x.id }}
+                </div>
+              </Draggable>
+            </transition-group>
+          </PropsProvider>
+        </Droppable>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import Draggable from 'totara_core/components/drag_drop/Draggable';
+import Droppable from 'totara_core/components/drag_drop/Droppable';
+import Table from 'totara_core/components/datatable/Table';
+import Cell from 'totara_core/components/datatable/Cell';
+import HeaderCell from 'totara_core/components/datatable/HeaderCell';
+import ToggleSwitch from 'totara_core/components/toggle/ToggleSwitch';
+import InputText from 'totara_core/components/form/InputText';
+import PropsProvider from 'totara_core/components/util/PropsProvider';
+import DragHandleIcon from 'totara_core/components/icons/common/DragHandle';
+
+export default {
+  components: {
+    Draggable,
+    Droppable,
+    ToggleSwitch,
+    PropsProvider,
+    DragHandleIcon,
+  },
+
+  data() {
+    return {
+      listA: [
+        { id: 30 },
+        { id: 5 },
+        { id: 60, customHeight: 80 },
+        { id: 2 },
+        { id: 3 },
+        { id: 4, customHeight: 100 },
+        { id: 50 },
+      ],
+      listB: [
+        { id: 16 },
+        { id: 7 },
+        { id: 18, customHeight: 80 },
+        { id: 9 },
+        { id: 10, customHeight: 100 },
+        { id: 11 },
+      ],
+      gridA: [45, 81, 77, 69, 12, 75, 17, 90, 19, 57, 13, 30].map(x => ({
+        id: x,
+      })),
+
+      scrollAll: false,
+      dropTargets: true,
+    };
+  },
+
+  methods: {
+    /**
+     * Called to check whether a drop is allowed.
+     *
+     * @param {Array} list
+     * @param {DropInfo} info
+     */
+    validateDrop(list, info) {
+      return (
+        info.destination.sourceId == info.source.sourceId ||
+        info.item.value.id % 2 == 0
+      );
+    },
+
+    /**
+     * Called when item is dropped on another droppable (but not the same droppable)
+     *
+     * @param {Array} list
+     * @param {DropInfo} info
+     */
+    handleRemove(list, info) {
+      list.splice(info.source.index, 1);
+    },
+
+    /**
+     * Called when item is dropped on a list.
+     *
+     * @param {Array} list
+     * @param {DropInfo} info
+     */
+    handleDrop(list, info) {
+      if (info.destination.sourceId == info.source.sourceId) {
+        // reorder
+        const item = list.splice(info.source.index, 1)[0];
+        list.splice(info.destination.index, 0, item);
+      } else {
+        // move
+        list.splice(info.destination.index, 0, info.item.value);
+      }
+    },
+  },
+};
+</script>
+
+<style lang="scss">
+.tui-sampleDragDrop {
+  &--scrollAll &__droppables {
+    max-height: 500px;
+    overflow-y: scroll;
+  }
+
+  &__table-toggle {
+    margin-top: var(--tui-gap-2);
+  }
+
+  &__dragLists {
+    display: flex;
+    align-items: flex-start;
+  }
+
+  &__dragList {
+    width: 200px;
+    margin-right: 50px;
+    padding: var(--tui-gap-2);
+    background: var(--tui-color-neutral-4);
+    transition: background-color 0.15s;
+
+    &--valid {
+      background: #d2edf9;
+    }
+
+    > [data-tui-draggable-placeholder] {
+      margin-bottom: var(--tui-gap-2);
+    }
+  }
+
+  &__draggableItem {
+    margin-bottom: var(--tui-gap-2);
+    padding: var(--tui-gap-4);
+    background: white;
+    border: 1px solid black;
+    transition: box-shadow 0.15s;
+    user-select: none;
+
+    &--dragging {
+      box-shadow: var(--tui-shadow-3);
+    }
+  }
+
+  &__dragGrid {
+    display: flex;
+    flex-wrap: wrap;
+    max-width: 800px;
+
+    &-item {
+      position: relative;
+      display: flex;
+      flex-grow: 0;
+      flex-shrink: 0;
+      align-items: center;
+      justify-content: center;
+      width: 150px;
+      height: 180px;
+      margin: var(--tui-gap-2);
+      padding: var(--tui-gap-4);
+      background: white;
+      border: 1px solid black;
+      transition: box-shadow 0.15s;
+      user-select: none;
+
+      &-moveIcon {
+        position: absolute;
+        top: var(--tui-gap-2);
+        left: var(--tui-gap-2);
+        display: none;
+      }
+
+      &:hover &-moveIcon,
+      &--dragging &-moveIcon {
+        display: block;
+      }
+    }
+
+    &-item-transition-move {
+      transition: transform 0.25s;
+    }
+  }
+}
+</style>

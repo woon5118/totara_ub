@@ -43,7 +43,9 @@ export function getDocumentPosition(element) {
 
   // account for scrolling of elements
   // do not account for document scrolling
-  while (el && el !== document.documentElement) {
+  // - in most browsers, it is documentElement which scrolls
+  // - in pre-Chromium Edge, it is document.body which scrolls
+  while (el && el !== document.documentElement && el !== document.body) {
     x -= el.scrollLeft || 0;
     y -= el.scrollTop || 0;
     el = el.parentNode;
@@ -90,12 +92,12 @@ export function getBox(el, { transformed = false, viewport = false } = {}) {
   let position;
   let size;
   if (transformed) {
-    const bcr = el.getBoundingClientRect();
-    position = new Point(bcr.x, bcr.y);
+    const clientRect = el.getBoundingClientRect();
+    position = new Point(clientRect.x, clientRect.y);
     if (!viewport) {
       position = position.add(getViewportRect().getPosition());
     }
-    size = new Size(bcr.width, bcr.height);
+    size = new Size(clientRect.width, clientRect.height);
   } else {
     position = getDocumentPosition(el);
     if (viewport) {

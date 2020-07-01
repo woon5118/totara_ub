@@ -33,3 +33,7 @@ html {
     color: var(--tui-color-state);
   }
 }
+
+.tui-sr-only {
+  @include sr-only();
+}
