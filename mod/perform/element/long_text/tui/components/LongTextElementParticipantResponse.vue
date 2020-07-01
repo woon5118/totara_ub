@@ -26,9 +26,8 @@
         <div
           v-if="answerText"
           class="tui-longTextElementParticipantResponse__answer"
-        >
-          {{ answerText }}
-        </div>
+          v-html="answerText"
+        />
         <div v-else class="tui-longTextElementParticipantResponse__noResponse">
           {{
             $str('response_no_response_submitted', 'performelement_long_text')

@@ -26,7 +26,7 @@ namespace mod_perform\formatter\response;
 use core\orm\formatter\entity_model_formatter;
 
 /**
- * Class section_element
+ * Class section_element_response
  *
  * @package mod_perform\formatter\response
  * @property \mod_perform\models\response\section_element_response object
@@ -38,7 +38,7 @@ class section_element_response extends entity_model_formatter {
             'section_element_id' => null,
             'element' => null,
             'sort_order' => null,
-            'response_data' => null,
+            'response_data' => element_response_formatter::for_element($this->object->element),
             'participant_instance' => null,
             'other_responder_groups' => null,
             'visible_to' => null,
