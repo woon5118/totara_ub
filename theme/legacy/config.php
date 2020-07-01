@@ -30,7 +30,9 @@ $THEME->enable_dock = true;
 $THEME->enable_hide = true;
 // $THEME->sheets = ['totara', 'settings-noprocess'];
 $THEME->enable_dock = true;
-$THEME->tui = true;
+$THEME->scss = function($theme) {
+    return theme_legacy_get_main_scss_content($theme);
+};
 
 $THEME->rendererfactory = 'theme_overridden_renderer_factory';
 // $THEME->csspostprocess = 'theme_legacy_process_css';

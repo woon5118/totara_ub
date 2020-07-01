@@ -86,13 +86,12 @@
       }
 
       &-button {
-        @extend .tui-iconBtn--small;
+        @extend .btn;
+        @extend .btn-sm;
         border-radius: 0;
       }
 
-      &-input {
-          @extend .tui-formInput;
-      }
+      // &-input {}
     }
 
     &-header {

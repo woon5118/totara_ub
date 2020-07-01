@@ -97,5 +97,5 @@ theme/basis/less/bootstrap3/
 theme/basis/style/settings-noprocess.css
 theme/roots/less/totara/totara_jquery/
 theme/roots/less/bootstrap3/
-theme/legacy/tui/
+theme/legacy/scss/
 theme/legacy/style/settings-noprocess.css

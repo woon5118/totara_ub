@@ -1,7 +1,7 @@
 //
 // This file is part of Totara Learn
 //
-// Copyright (C) 2019 onwards Totara Learning Solutions LTD
+// Copyright (C) 2020 onwards Totara Learning Solutions LTD
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 // @copyright 2019 onwards Totara Learning Solutions LTD
 // @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 // @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
-// @package   theme_ventura
+// @package   theme_legacy
 
 //
 // Theme colours for legacy bootstrap
@@ -83,3 +83,58 @@ $boot-color-neutral-6: #767676;
 $boot-color-neutral-7: #262626;
 // Only used for legacy theme (Deprecated)
 $boot-color-neutral-legacy-7: #3d444b;
+
+//
+// Font mixins
+//
+
+@mixin tui-font-heading-large {
+  font-weight: bold;
+  font-size: var(--tui-font-size-50);
+  line-height: 1;
+}
+
+@mixin tui-font-heading-medium {
+  font-weight: bold;
+  font-size: var(--tui-font-size-30);
+  line-height: 1;
+}
+
+@mixin tui-font-heading-small {
+  font-weight: bold;
+  font-size: var(--tui-font-size-20);
+  line-height: 1.25;
+}
+
+@mixin tui-font-heading-small-regular {
+  font-weight: normal;
+  font-size: var(--tui-font-size-20);
+  line-height: 1.25;
+}
+
+@mixin tui-font-heading-x-small {
+  font-weight: bold;
+  font-size: var(--tui-font-size-16);
+  line-height: 1.25;
+}
+
+@mixin tui-font-heading-label {
+  font-weight: bold;
+  font-size: var(--tui-font-size-15);
+  line-height: 1.2;
+}
+
+@mixin tui-font-heading-label-small {
+  font-weight: bold;
+  font-size: var(--tui-font-size-13);
+  line-height: 1.15;
+}
+
+//
+// Display breakpoints
+//
+$tui-screen-xs: 600px;
+$tui-screen-sm: 768px; // Matches @screen-sm-min
+$tui-screen-md: 992px; // Matches @screen-md-min
+$tui-screen-lg: 1200px; // Matches @screen-lg-min
+$tui-screen-xl: 1400px;
