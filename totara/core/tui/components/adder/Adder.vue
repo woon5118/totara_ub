@@ -80,13 +80,16 @@
 
           <!-- Footer (count & action buttons) -->
           <div class="tui-adder__footer">
-            <div class="tui-adder__summary">Items selected: {{ count }}</div>
+            <div :id="$id('items-added')" class="tui-adder__summary">
+              {{ $str('itemsselected', 'totara_core', count) }}
+            </div>
             <div class="tui-adder__actions">
               <ButtonGroup>
                 <Button
                   :disabled="!count"
                   :text="$str('add', 'totara_core')"
                   :styleclass="{ primary: true }"
+                  :aria-describedby="$id('items-added')"
                   @click="$emit('added', allSelectedItems)"
                 />
                 <ButtonCancel @click="$emit('cancel')" />
@@ -253,7 +256,8 @@ export default {
     "adder_selection",
     "adder_selection_with_count",
     "count",
-    "loadmore"
+    "loadmore",
+    "itemsselected"
   ]
 }
 </lang-strings>

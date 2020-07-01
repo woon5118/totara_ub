@@ -330,6 +330,7 @@ $string['installdemoquestion'] = 'Do you want to include demo data with this ins
 $string['installingdemodata'] = 'Installing Demo Data';
 $string['invalidsearchtable'] = 'Invalid search table';
 $string['itemstoadd'] = 'Items to add';
+$string['itemsselected'] = 'Items selected: {$a}';
 $string['lasterroroccuredat'] = 'Last error occurred at {$a}';
 $string['learning'] = 'Learning';
 $string['learningplans'] = 'Learning Plans';
