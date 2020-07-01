@@ -24,7 +24,6 @@
   &__action-buttons {
     display: flex;
     align-items: end;
-    justify-content: flex-end;
     width: 100%;
     margin-bottom: 0;
   }

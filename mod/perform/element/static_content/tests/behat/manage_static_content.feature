@@ -13,14 +13,13 @@ Feature: Manage performance activity static content
     When I navigate to the edit perform activities page for activity "Add Element Activity"
     And I click on "Edit content" "button"
     And I click on "Add element" "button"
-    And I click on "Questions" "button"
     And I click on "Static content" "link"
     When I set the following fields to these values:
       | rawTitle | Static content 1|
       | rawText | I see trees of green, red roses too. I see them bloom for me and you. And I think to myself what a wonderful world. |
     And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"
     Then I should see "I see them bloom for me and you."
-    And I click on "Submit" "button"
+    When I close the tui modal
     And I close the tui notification toast
     And I should see "1" in the "other" element summary of the activity section
 

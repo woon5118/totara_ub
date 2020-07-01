@@ -121,7 +121,6 @@ export default {
   {
   "performelement_static_content": [
   "title",
-  "error_you_must_fill_the_area",
   "static_content_placeholder"
   ]
   }

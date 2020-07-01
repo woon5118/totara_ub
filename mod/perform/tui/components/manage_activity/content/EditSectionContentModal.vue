@@ -22,40 +22,81 @@
 -->
 
 <template>
-  <Modal
-    size="sheet"
-    :aria-labelledby="$id('title')"
-    :dismissable="{ backdropClick: false }"
-  >
-    <ModalContent :title="section.display_title">
-      <div class="tui-performEditSectionContentModal__form">
-        <component
-          :is="componentFor(sectionElement)"
-          v-for="sectionElement in sectionElements"
-          ref="sectionElements"
-          :key="sectionElement.clientId"
-          :data="sectionElement.element.data"
-          :raw-data="sectionElement.element.raw_data"
-          :title="sectionElement.element.title"
-          :raw-title="sectionElement.element.raw_title"
-          :identifier="sectionElement.element.identifier"
-          :is-required="sectionElement.element.is_required"
-          :type="sectionElement.element.type"
-          :error="errors[sectionElement.clientId]"
-          @update="update(sectionElement, $event)"
-          @edit="edit(sectionElement)"
-          @display="display(sectionElement)"
-          @remove="remove(sectionElement)"
-        />
+  <span>
+    <slot name="trigger" :open="openThis" />
 
-        <ContentAddElementButton @add-element-item="add" />
-        <ButtonGroup>
-          <ButtonSubmit :disabled="!canSubmit()" @click.prevent="trySave" />
-          <ButtonCancel @click="cancel" />
-        </ButtonGroup>
-      </div>
-    </ModalContent>
-  </Modal>
+    <ModalPresenter :open="isOpen" @request-close="tryCloseThis">
+      <Modal
+        size="sheet"
+        :aria-labelledby="$id('title')"
+        :dismissable="{ backdropClick: false }"
+      >
+        <ModalContent>
+          <template v-slot:title>
+            <h2 class="tui-performEditSectionContentModal__title">
+              {{ title }}
+            </h2>
+          </template>
+
+          <Loader :loading="isLoading">
+            <div class="tui-performEditSectionContentModal__form">
+              <component
+                :is="componentFor(sectionElement)"
+                v-for="(sectionElement, index) in sectionElements"
+                ref="sectionElements"
+                :key="sectionElement.clientId"
+                :data="sectionElement.element.data"
+                :raw-data="sectionElement.element.raw_data"
+                :title="sectionElement.element.title"
+                :raw-title="sectionElement.element.raw_title"
+                :identifier="sectionElement.element.identifier"
+                :is-required="sectionElement.element.is_required"
+                :type="sectionElement.element.type"
+                :error="errors[sectionElement.clientId]"
+                @update="update(sectionElement, $event, index)"
+                @edit="edit(sectionElement)"
+                @display="display(sectionElement)"
+                @remove="tryDelete(sectionElement)"
+              />
+
+              <ContentAddElementButton @add-element-item="add" />
+            </div>
+          </Loader>
+
+          <template v-slot:buttons>
+            <Button
+              :id="$id('edit-content-close')"
+              :text="$str('button_close', 'mod_perform')"
+              @click="tryCloseThis"
+            />
+          </template>
+        </ModalContent>
+      </Modal>
+    </ModalPresenter>
+
+    <ConfirmationModal
+      :open="deleteModalOpen"
+      :close-button="false"
+      :title="$str('modal_element_delete_title', 'mod_perform')"
+      :confirm-button-text="$str('delete')"
+      :loading="isSaving"
+      @confirm="deleteSelectedElement"
+      @cancel="closeDeleteModal"
+    >
+      <p>{{ $str('modal_element_delete_message', 'mod_perform') }}</p>
+    </ConfirmationModal>
+
+    <ConfirmationModal
+      :open="unsavedChangesModalOpen"
+      :close-button="false"
+      :title="$str('modal_element_unsaved_changes_title', 'mod_perform')"
+      :confirm-button-text="$str('button_close', 'mod_perform')"
+      @confirm="closeThis"
+      @cancel="unsavedChangesModalOpen = false"
+    >
+      <p>{{ $str('modal_element_unsaved_changes_message', 'mod_perform') }}</p>
+    </ConfirmationModal>
+  </span>
 </template>
 
 <script>
@@ -63,12 +104,17 @@ import Button from 'totara_core/components/buttons/Button';
 import ButtonCancel from 'totara_core/components/buttons/Cancel';
 import ButtonGroup from 'totara_core/components/buttons/ButtonGroup';
 import ButtonSubmit from 'totara_core/components/buttons/Submit';
+import ConfirmationModal from 'totara_core/components/modal/ConfirmationModal';
 import ContentAddElementButton from 'mod_perform/components/manage_activity/content/ContentAddElementButton';
+import Loader from 'totara_core/components/loader/Loader';
 import Modal from 'totara_core/components/modal/Modal';
 import ModalContent from 'totara_core/components/modal/ModalContent';
+import ModalPresenter from 'totara_core/components/modal/ModalPresenter';
 import sectionDetailQuery from 'mod_perform/graphql/section_admin';
-import updateSectionElementMutation from 'mod_perform/graphql/update_section_elements.graphql';
+import updateSectionElementMutation from 'mod_perform/graphql/update_section_elements';
+import { notify } from 'totara_core/notifications';
 import { pull, uniqueId } from 'totara_core/util';
+import { NOTIFICATION_DURATION } from 'mod_perform/constants';
 
 export default {
   components: {
@@ -76,12 +122,20 @@ export default {
     ButtonCancel,
     ButtonGroup,
     ButtonSubmit,
+    ConfirmationModal,
     ContentAddElementButton,
+    Loader,
     Modal,
     ModalContent,
+    ModalPresenter,
   },
+
   props: {
     sectionId: {
+      type: String,
+      required: true,
+    },
+    title: {
       type: String,
       required: true,
     },
@@ -89,15 +143,19 @@ export default {
 
   data() {
     return {
+      isOpen: false,
       section: {
         title: '',
         section_elements: [],
       },
       sectionElements: [],
       editingIds: [],
-      removeIds: [],
       errors: {},
       isSaving: false,
+      deleteModalOpen: false,
+      elementToDelete: null,
+      unsavedChangesModalOpen: false,
+      skipQuery: true,
     };
   },
 
@@ -110,32 +168,82 @@ export default {
       update: data => data.mod_perform_section_admin,
       fetchPolicy: 'network-only',
       result({ data }) {
-        this.sectionElements = data.mod_perform_section_admin.section_elements.map(
-          item => {
-            return {
-              id: item.id,
-              clientId: uniqueId(),
-              element: {
-                id: item.element.id,
-                type: item.element.element_plugin,
-                title: item.element.title,
-                raw_title: item.element.raw_title,
-                identifier: item.element.identifier,
-                data: JSON.parse(item.element.data),
-                raw_data: JSON.parse(item.element.raw_data),
-                is_required: item.element.is_required,
-              },
-              sort_order: item.sort_order,
-            };
-          }
+        this.updateSectionElementData(
+          data.mod_perform_section_admin.section_elements
         );
+      },
+      skip() {
+        return this.skipQuery;
       },
     },
   },
 
+  computed: {
+    /**
+     * Are we currently mutating or querying data via graphQL?
+     *
+     * @return {Boolean}
+     */
+    isLoading() {
+      return this.$apollo.loading || this.isSaving;
+    },
+
+    /**
+     * Are there any elements still being edited?
+     *
+     * @return {Boolean}
+     */
+    hasUnsavedChanges() {
+      return this.editingIds.length > 0;
+    },
+  },
+
+  mounted() {
+    // Confirm navigation away if user is currently editing.
+    window.addEventListener('beforeunload', this.unloadHandler);
+  },
+
+  beforeDestroy() {
+    // Modal will no longer exist so remove the navigation warning.
+    window.removeEventListener('beforeunload', this.unloadHandler);
+  },
+
   methods: {
     /**
-     * Add new plugin element
+     * Open this modal.
+     */
+    openThis() {
+      // Manually execute the query so data is refreshed every time the modal is opened.
+      this.skipQuery = false;
+      this.$apollo.queries.section.refresh();
+      this.isOpen = true;
+    },
+
+    /**
+     * Attempt to close this modal.
+     * Ask the user to confirm if there are elements still being edited.
+     */
+    tryCloseThis() {
+      if (this.hasUnsavedChanges) {
+        this.unsavedChangesModalOpen = true;
+      } else {
+        this.closeThis();
+      }
+    },
+
+    /**
+     * Close this modal.
+     */
+    closeThis() {
+      // Prevent query from running when modal is closed.
+      this.skipQuery = true;
+      this.editingIds = [];
+      this.unsavedChangesModalOpen = false;
+      this.isOpen = false;
+    },
+
+    /**
+     * Add new plugin element.
      */
     add(plugin) {
       const sectionElement = {
@@ -159,16 +267,49 @@ export default {
     },
 
     /**
-     * update existing elements and shows display view of the element
+     * Update existing elements and shows display view of the element.
      */
-    update(sectionElement, { title, identifier, data, is_required }) {
-      sectionElement.element.title = title;
-      sectionElement.element.raw_title = title;
-      sectionElement.element.identifier = identifier;
-      sectionElement.element.data = data;
-      sectionElement.element.raw_data = data;
-      sectionElement.element.is_required = is_required;
-      delete sectionElement.creating;
+    update(sectionElement, elementData, index) {
+      sectionElement.element = Object.assign(
+        sectionElement.element,
+        elementData,
+        {
+          raw_title: elementData.title,
+          raw_data: elementData.data,
+        }
+      );
+
+      const elementToSave = {
+        title: sectionElement.element.raw_title,
+        data: JSON.stringify(sectionElement.element.raw_data),
+      };
+
+      // 'identifier' and 'is_required' attributes don't exist for static elements so need to handle them.
+      if (sectionElement.element.identifier != null) {
+        elementToSave.identifier = sectionElement.element.identifier;
+      }
+      if (sectionElement.element.is_required != null) {
+        elementToSave.is_required = sectionElement.element.is_required;
+      }
+
+      const toSave = {};
+      if (sectionElement.creating) {
+        delete sectionElement.creating;
+        toSave.create_new = [
+          Object.assign(elementToSave, {
+            plugin_name: sectionElement.element.type.plugin_name,
+            sort_order: index + 1,
+          }),
+        ];
+      } else {
+        toSave.update = [
+          Object.assign(elementToSave, {
+            element_id: sectionElement.element.id,
+          }),
+        ];
+      }
+      this.save(toSave);
+
       this.display(sectionElement);
     },
 
@@ -180,34 +321,83 @@ export default {
     },
 
     /**
+     * Remove element from the edit list.
+     */
+    stopEditing(sectionElement) {
+      pull(this.editingIds, sectionElement.clientId);
+    },
+
+    /**
      * Display section element
      * Remove creating view if section element move to display mode
      */
     display(sectionElement) {
-      pull(this.editingIds, sectionElement.clientId);
+      this.stopEditing(sectionElement);
       if (sectionElement.creating) {
         this.remove(sectionElement);
       }
     },
 
     /**
-     * Remove section element
-     * if section element already saved update remove list
+     * Remove section element from the display list.
+     * @param {Object} sectionElement
      */
     remove(sectionElement) {
+      this.stopEditing(sectionElement);
       pull(this.sectionElements, sectionElement);
+    },
+
+    /**
+     * Try delete the section element.
+     * If it exists in the DB, show a confirmation before deleting.
+     * @param {Object} sectionElement
+     */
+    tryDelete(sectionElement) {
       if (sectionElement.element.id) {
-        this.removeIds.push({
-          section_element_id: sectionElement.element.id,
-        });
+        this.deleteModalOpen = true;
+        this.elementToDelete = sectionElement;
+      } else {
+        this.remove(sectionElement);
       }
     },
 
     /**
-     * check element is editing
+     * Trigger mutation to delete the element from the DB.
      */
-    isEditing(sectionElement) {
-      return this.editingIds.includes(sectionElement.clientId);
+    async deleteSelectedElement() {
+      this.isSaving = true;
+
+      // Need to recalculate the sort orders if deleting
+      const move = this.sectionElements
+        .filter(element => element.id !== this.elementToDelete.id)
+        .map((element, index) => {
+          return {
+            section_element_id: element.id,
+            sort_order: index + 1,
+          };
+        });
+
+      await this.save(
+        {
+          move,
+          delete: [
+            {
+              section_element_id: this.elementToDelete.id,
+            },
+          ],
+        },
+        this.$str('toast_success_delete_element', 'mod_perform')
+      );
+      this.remove(this.elementToDelete);
+      this.closeDeleteModal();
+    },
+
+    /**
+     * Close element deletion confirmation modal.
+     */
+    closeDeleteModal() {
+      this.deleteModalOpen = false;
+      this.elementToDelete = null;
     },
 
     /**
@@ -222,118 +412,117 @@ export default {
     },
 
     /**
-     * Close the modal if cancel
-     */
-    cancel() {
-      this.$emit('request-close');
-    },
-
-    /**
      * Try to persist the activity elements to the back end
-     * Emitting events on success/failure.
+     * Shows toasts and emits events on success/failure.
      *
-     * @returns {Promise<void>}
+     * @param {Object} variables
+     * @param {String} [saveNotificationMessage] Override text that is shown in the success notification.
      */
-    async trySave() {
+    async save(variables, saveNotificationMessage) {
       this.isSaving = true;
 
       try {
-        const result = await this.save();
-        this.$emit('mutation-success');
+        const { data: result } = await this.$apollo.mutate({
+          mutation: updateSectionElementMutation,
+          variables: {
+            input: Object.assign(variables, {
+              section_id: this.sectionId,
+            }),
+          },
+          refetchAll: false,
+        });
+        const section = result.mod_perform_update_section_elements.section;
+        this.updateSectionElementData(section.section_elements);
+        this.$emit('update-summary', section);
+        this.showSuccessNotification(saveNotificationMessage);
         this.isSaving = false;
-        this.$emit('request-close');
-        this.$emit(
-          'update-summary',
-          result.mod_perform_update_section_elements.section
-        );
       } catch (e) {
-        this.$emit('mutation-error', e);
+        this.showErrorNotification();
         // If something goes wrong during create, allow the user to try again.
         this.isSaving = false;
       }
     },
 
     /**
-     * Extract section elements into new. update , delete and move
-     * and call the GQL mutation to save section elements
-     * @returns {Promise<any>}
+     * Displays a warning message if the user tries to navigate away without saving.
+     * @param {Event} e
+     * @returns {String|void}
      */
-    async save() {
-      let variables,
-        createNew = [],
-        createLink = [],
-        update = [],
-        move = [];
+    unloadHandler(e) {
+      if (!this.hasUnsavedChanges) {
+        return;
+      }
 
-      this.sectionElements.forEach(function(item, index) {
-        let sortOrder = index + 1;
-        if (!item.element.id) {
-          createNew.push({
-            plugin_name: item.element.type.plugin_name,
-            title: item.element.raw_title,
-            identifier: item.element.identifier,
-            is_required: item.element.is_required,
-            data: JSON.stringify(item.element.raw_data),
-            sort_order: sortOrder,
-          });
-        } else {
-          update.push({
-            element_id: item.element.id,
-            title: item.element.raw_title,
-            identifier: item.element.identifier,
-            is_required: item.element.is_required,
-            data: JSON.stringify(item.element.raw_data),
-          });
-          move.push({
-            section_element_id: item.id,
-            sort_order: sortOrder,
-          });
-        }
-      });
-      variables = {
-        input: {
-          section_id: this.sectionId,
-          create_new: createNew,
-          create_link: createLink,
-          update: update,
-          delete: this.removeIds,
-          move: move,
-        },
-      };
-
-      const { data: resultData } = await this.$apollo.mutate({
-        mutation: updateSectionElementMutation,
-        variables: variables,
-        refetchAll: false,
-      });
-
-      return resultData;
-    },
-
-    canSubmit() {
-      return (
-        (!this.isSaving &&
-          Object.keys(this.errors).length === 0 &&
-          this.hasElementsToAdd()) ||
-        this.hasElementsToRemove()
+      // For older browsers that still show custom message.
+      const discardUnsavedChanges = this.$str(
+        'unsaved_changes_warning',
+        'mod_perform'
       );
+      e.preventDefault();
+      e.returnValue = discardUnsavedChanges;
+      return discardUnsavedChanges;
     },
 
     /**
-     * Runs check if modal has elements to remove.
+     * Process and apply the section element data from gql for use within vue.
      */
-    hasElementsToRemove() {
-      return this.removeIds.length > 0;
+    updateSectionElementData(data) {
+      this.sectionElements = data.map(item => {
+        return Object.assign({}, item, {
+          clientId: uniqueId(),
+          element: Object.assign({}, item.element, {
+            type: item.element.element_plugin,
+            data: JSON.parse(item.element.data),
+            raw_data: JSON.parse(item.element.raw_data),
+          }),
+        });
+      });
     },
 
     /**
-     * Runs check if modal has elements to add.
+     * Show a generic saving success toast.
+     *
+     * @param {String} messageString Override the message text.
      */
-    hasElementsToAdd() {
-      const lastSectionElement = [...this.sectionElements].pop();
+    showSuccessNotification(messageString) {
+      notify({
+        duration: NOTIFICATION_DURATION,
+        message:
+          messageString ||
+          this.$str('toast_success_save_element', 'mod_perform'),
+        type: 'success',
+      });
+    },
 
-      return this.sectionElements.length > 0 && !lastSectionElement.creating;
+    /**
+     * Show a generic saving error toast.
+     */
+    showErrorNotification() {
+      notify({
+        duration: NOTIFICATION_DURATION,
+        message: this.$str('toast_error_generic_update', 'mod_perform'),
+        type: 'error',
+      });
     },
   },
 };
 </script>
+
+<lang-strings>
+{
+  "mod_perform": [
+    "button_close",
+    "modal_element_delete_message",
+    "modal_element_delete_title",
+    "modal_element_unsaved_changes_message",
+    "modal_element_unsaved_changes_title",
+    "toast_error_generic_update",
+    "toast_success_delete_element",
+    "toast_success_save_element",
+    "unsaved_changes_warning"
+  ],
+  "moodle": [
+    "delete"
+  ]
+}
+</lang-strings>

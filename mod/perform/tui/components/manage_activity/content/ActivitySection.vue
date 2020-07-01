@@ -141,25 +141,28 @@
         </GridItem>
         <GridItem grows :units="3">
           <div class="tui-performActivitySection__content-buttons">
-            <Button
-              :styleclass="{ small: true }"
-              :text="$str('edit_content_elements', 'mod_perform')"
-              :aria-label="$str('edit_content_elements', 'mod_perform')"
-              @click="modalOpen = true"
-            />
+            <EditSectionContentModal
+              :section-id="section.id"
+              :title="
+                multipleSectionsEnabled
+                  ? savedSection.display_title
+                  : activityName
+              "
+              @update-summary="updateSection"
+            >
+              <template v-slot:trigger="{ open }">
+                <Button
+                  :styleclass="{ small: true }"
+                  :text="$str('edit_content_elements', 'mod_perform')"
+                  :aria-label="$str('edit_content_elements', 'mod_perform')"
+                  @click="open"
+                />
+              </template>
+            </EditSectionContentModal>
           </div>
         </GridItem>
       </Grid>
     </div>
-
-    <ModalPresenter :open="modalOpen" @request-close="modalRequestClose">
-      <EditSectionContentModal
-        :section-id="section.id"
-        @mutation-success="showMutationSuccessNotification"
-        @mutation-error="showMutationErrorNotification"
-        @update-summary="updateSection"
-      />
-    </ModalPresenter>
 
     <ConfirmationModal
       :open="deleteSectionModalOpen"
@@ -191,7 +194,6 @@ import EditSectionContentModal from 'mod_perform/components/manage_activity/cont
 import Grid from 'totara_core/components/grid/Grid';
 import GridItem from 'totara_core/components/grid/GridItem';
 import InputText from 'totara_core/components/form/InputText';
-import ModalPresenter from 'totara_core/components/modal/ModalPresenter';
 import MoreButton from 'totara_core/components/buttons/MoreIcon';
 import ParticipantsPopover from 'mod_perform/components/manage_activity/content/ParticipantsPopover';
 import UpdateSectionSettingsMutation from 'mod_perform/graphql/update_section_settings.graphql';
@@ -217,7 +219,6 @@ export default {
     Grid,
     GridItem,
     InputText,
-    ModalPresenter,
     MoreButton,
     ParticipantsPopover,
   },
@@ -255,11 +256,18 @@ export default {
       type: Number,
       required: true,
     },
+    activityName: {
+      type: String,
+      required: true,
+    },
+    multipleSectionsEnabled: {
+      type: Boolean,
+      required: true,
+    },
   },
 
   data() {
     return {
-      modalOpen: false,
       savedSection: this.section,
       displayedParticipants: this.getParticipantsFromSection(this.section),
       title: this.section.title,
@@ -329,6 +337,12 @@ export default {
         this.savedSection.raw_created_at === this.savedSection.raw_updated_at
       );
     },
+
+    /**
+     * We only allow deletion if there are multiple sections.
+     *
+     * @return {Boolean}
+     */
     canDelete() {
       return this.sectionCount > 1;
     },
@@ -400,13 +414,6 @@ export default {
     },
 
     /**
-     * Close edit section content modal.
-     */
-    modalRequestClose() {
-      this.modalOpen = false;
-    },
-
-    /**
      * Update the displayed participants.
      * @param {Array} checkedParticipants List of new participants
      */
@@ -461,20 +468,6 @@ export default {
       );
       this.title = this.savedSection.title;
       this.disableEditing();
-    },
-
-    /**
-     * Show success notification.
-     */
-    showMutationSuccessNotification() {
-      this.$emit('mutation-success');
-    },
-
-    /**
-     * Show error notification.
-     */
-    showMutationErrorNotification() {
-      this.$emit('mutation-error');
     },
 
     /**

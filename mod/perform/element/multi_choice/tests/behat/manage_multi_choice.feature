@@ -32,8 +32,8 @@ Feature: Manage performance activity multiple choice elements
       | answers[0] | Option five |
       | answers[1] | Option six |
     And I save multi choice question element data
-    And I click on "Submit" "button"
     And I close the tui notification toast
+    And I close the tui modal
     When I navigate to manage perform activity content page
     Then I should see perform multi choice question "Question 1" is saved with options "Option one,Option two"
     And I should see perform multi choice question "Question 2" is saved with options "Option three,Option four"
@@ -56,8 +56,8 @@ Feature: Manage performance activity multiple choice elements
     And I set the following fields to these values:
       |answers[2]        | Option three |
     And I save multi choice question element data
-    And I click on "Submit" "button"
     And I close the tui notification toast
+    And I close the tui modal
     And I navigate to manage perform activity content page
     Then I should see perform multi choice question "Question 1" is saved with options "Option one,Option two,Option three"
 
@@ -77,8 +77,8 @@ Feature: Manage performance activity multiple choice elements
       | answers[2] | Option three |
     And I delete multi choice question option
     And I save multi choice question element data
-    And I click on "Submit" "button"
     And I close the tui notification toast
+    And I close the tui modal
     And I navigate to manage perform activity content page
     Then I should see perform multi choice question "Question 1" is saved with options "Option one,Option two"
 
@@ -118,8 +118,8 @@ Feature: Manage performance activity multiple choice elements
       | answers[1] | Option two |
     And I save multi choice question element data
     Then I should see "Optional"
-    And I click on "Submit" "button"
     When I close the tui notification toast
+    And I close the tui modal
     Then I should see "1" in the "required" element summary of the activity section
     And I should see "1" in the "optional" element summary of the activity section
     And I should see "0" in the "other" element summary of the activity section

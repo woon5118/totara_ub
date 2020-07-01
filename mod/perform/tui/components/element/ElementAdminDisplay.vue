@@ -54,7 +54,16 @@
               </ButtonIcon>
             </template>
           </Popover>
-          <EditIcon @click="edit" />
+          <div class="tui-performElementEditDisplay__actions">
+            <EditIcon
+              :aria-label="$str('edit_element', 'mod_perform')"
+              @click="edit"
+            />
+            <DeleteIcon
+              :aria-label="$str('delete_element', 'mod_perform')"
+              @click="remove"
+            />
+          </div>
           <Lozenge
             v-show="isRequired"
             :text="$str('section_element_tag_required', 'mod_perform')"
@@ -75,6 +84,7 @@
 
 <script>
 import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
+import DeleteIcon from 'totara_core/components/buttons/DeleteIcon';
 import EditIcon from 'totara_core/components/buttons/EditIcon';
 import Lozenge from 'totara_core/components/lozenge/Lozenge';
 import Popover from 'totara_core/components/popover/Popover';
@@ -83,6 +93,7 @@ import ReportingIdentifierIcon from 'mod_perform/components/icons/ReportingIdent
 export default {
   components: {
     ButtonIcon,
+    DeleteIcon,
     EditIcon,
     Lozenge,
     Popover,
@@ -111,6 +122,8 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
+      "delete_element",
+      "edit_element",
       "reporting_identifier",
       "section_element_tag_required",
       "section_element_tag_optional"

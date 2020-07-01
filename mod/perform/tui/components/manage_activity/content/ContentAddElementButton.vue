@@ -21,39 +21,27 @@
 -->
 <template>
   <div class="tui-performEditSectionContentAddElement">
-    <ButtonIcon
-      v-show="!isElementsVisible"
-      :aria-label="$str('section_add_element', 'mod_perform')"
-      :text="$str('section_add_element', 'mod_perform')"
-      :styleclass="{ small: true }"
-      @click.prevent="showElements"
-    >
-      <AddIcon size="200" />
-    </ButtonIcon>
-    <div
-      v-show="isElementsVisible"
-      class="tui-performEditSectionContentAddElement__menu"
-    >
-      <Dropdown>
-        <template v-slot:trigger="{ toggle, isOpen }">
-          <ButtonIcon
-            :aria-expanded="isOpen ? 'true' : 'false'"
-            :aria-label="$str('section_element_questions', 'mod_perform')"
-            :text="$str('section_element_questions', 'mod_perform')"
-            :caret="true"
-            :styleclass="{ small: true }"
-            @click.prevent="toggle"
-          />
-        </template>
-        <DropdownItem
-          v-for="plugin in elementPlugins"
-          :key="plugin.plugin_name"
-          @click="addElementPlugin(plugin)"
+    <Dropdown :separator="true">
+      <template v-slot:trigger="{ toggle, isOpen }">
+        <ButtonIcon
+          :aria-expanded="isOpen ? 'true' : 'false'"
+          :aria-label="$str('section_add_element', 'mod_perform')"
+          :text="$str('section_add_element', 'mod_perform')"
+          :styleclass="{ small: true }"
+          :caret="true"
+          @click.prevent="toggle"
         >
-          {{ plugin.name }}
-        </DropdownItem>
-      </Dropdown>
-    </div>
+          <AddIcon size="200" />
+        </ButtonIcon>
+      </template>
+      <DropdownItem
+        v-for="plugin in elementPlugins"
+        :key="plugin.plugin_name"
+        @click="addElementPlugin(plugin)"
+      >
+        {{ plugin.name }}
+      </DropdownItem>
+    </Dropdown>
   </div>
 </template>
 <script>

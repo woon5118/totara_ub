@@ -75,13 +75,12 @@ Feature: Managing an activity with multiple sections
     And I close the tui notification toast
     And I navigate to manage perform activity content page of "1" activity section
     And I click on "Add element" "button"
-    And I click on "Questions" "button"
     And I click on "Short text" "link"
     And I set the following fields to these values:
       | rawTitle | S1Q1 |
     And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"
-    And I click on "Submit" "button"
     And I close the tui notification toast
+    And I close the tui modal
     Then I should see "0" in the "required" element summary of "1" activity section
     And I should see "1" in the "optional" element summary of "1" activity section
     And I should see "Subject"
@@ -95,13 +94,12 @@ Feature: Managing an activity with multiple sections
     And I close the tui notification toast
     And I navigate to manage perform activity content page of "1" activity section
     And I click on "Add element" "button"
-    And I click on "Questions" "button"
     And I click on "Short text" "link"
     And I set the following fields to these values:
       | rawTitle | S2Q1 |
     And I click on "Done" "button" in the ".tui-performEditSectionContentModal__form" "css_element"
-    And I click on "Submit" "button"
     And I close the tui notification toast
+    And I close the tui modal
     Then I should see "0" in the "required" element summary of "1" activity section
     And I should see "1" in the "optional" element summary of "1" activity section
     And I should see "Section #2"
@@ -129,7 +127,7 @@ Feature: Managing an activity with multiple sections
 
     # Renable multisection; test can save a section title without changing the title
     # for the first section to be created.
-    When I click on "Submit" "button"
+    When I close the tui modal
     And I close the tui notification toast
     And I click on ".tui-toggleBtn__ui" "css_element"
     And I confirm the tui confirmation modal

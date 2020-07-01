@@ -4,7 +4,6 @@ mutation mod_perform_update_section_elements(
   mod_perform_update_section_elements(input: $input) {
     section {
       id
-      display_title
       section_elements {
         id
         element {
@@ -12,10 +11,14 @@ mutation mod_perform_update_section_elements(
           element_plugin {
             plugin_name
             name
+            admin_form_component
+            admin_display_component
           }
           title
+          raw_title: title(format: RAW)
           identifier
           data
+          raw_data: data(format: RAW)
           is_required
         }
         sort_order

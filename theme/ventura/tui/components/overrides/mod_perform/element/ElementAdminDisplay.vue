@@ -30,5 +30,12 @@
       margin-top: var(--tui-gap-2);
     }
   }
+
+  &__actions {
+    padding: 0 var(--tui-gap-2);
+    .tui-iconBtn {
+      padding: 0;
+    }
+  }
 }
 </style>

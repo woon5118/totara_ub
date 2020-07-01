@@ -57,7 +57,6 @@ class behat_mod_perform extends behat_base {
 
     public const EDIT_QUESTION_DISPLAY_TITLE_LOCATOR = '.tui-performElementEditDisplay__title';
 
-
     /**
      * Navigate to the specified page and wait for JS.
      *
@@ -548,10 +547,23 @@ class behat_mod_perform extends behat_base {
     }
 
     /**
+     * @When /^I click on delete icon for question "([^"]*)"$/
+     * @param string $question_text
+     */
+    public function i_click_on_delete_icon_for_question(string $question_text) {
+        behat_hooks::set_step_readonly(false);
+
+        $question = $this->find_edit_display_question_from_text($question_text);
+        $question->find('css', 'span[data-flex-icon=trash]')->click();
+    }
+
+    /**
      * @When /^I click on edit icon for question "([^"]*)"$/
      * @param string $question_text
      */
     public function i_click_on_edit_icon_for_question(string $question_text) {
+        behat_hooks::set_step_readonly(false);
+
         $question = $this->find_edit_display_question_from_text($question_text);
         $question->find('css', 'span[data-flex-icon=edit]')->click();
     }
@@ -561,6 +573,8 @@ class behat_mod_perform extends behat_base {
      * @param string $question_text
      */
     public function i_click_on_identifier_icon_for_question(string $question_text) {
+        behat_hooks::set_step_readonly(false);
+
         $this->close_all_popovers();
         $question = $this->find_edit_display_question_from_text($question_text);
         $question->find('css', "span[data-flex-icon='mod_perform|reporting']")->click();
@@ -585,6 +599,8 @@ class behat_mod_perform extends behat_base {
      * @When /^I close popovers$/
      */
     public function close_all_popovers() {
+        behat_hooks::set_step_readonly(false);
+
         /** @var NodeElement[] $popover_close_buttons */
         $popover_close_buttons = $this->find_all('css', '.tui-popoverFrame__close');
         foreach ($popover_close_buttons as $close_button) {

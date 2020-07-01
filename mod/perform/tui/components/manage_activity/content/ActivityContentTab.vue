@@ -47,6 +47,8 @@
         :sort-order="sectionState.sortOrder"
         :section-count="sectionStates.length"
         :relationships="relationships"
+        :activity-name="value.name"
+        :multiple-sections-enabled="value.settings.multisection"
         @input="updateSection($event, i)"
         @toggle-edit-mode="toggleSectionStateEditMode($event, i)"
         @mutation-success="$emit('mutation-success')"

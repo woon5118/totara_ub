@@ -116,8 +116,8 @@ Feature: Viewing other responses
     And I click on the "responseRequired" tui checkbox
     And I save multi choice question element data
     Then I should see "Required"
-    And I click on "Submit" "button"
     And I close the tui notification toast
+    And I close the tui modal
     And I log out
     When I log in as "john"
     And I navigate to the outstanding perform activities list page
