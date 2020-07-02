@@ -170,6 +170,9 @@ class feedback_item_textarea extends feedback_item_base {
             $row_offset++;
             $sizeofdata = count($data);
             for ($i = 1; $i < $sizeofdata; $i++) {
+                if (empty($data[$i])) {
+                    continue;
+                }
                 $worksheet->write_string($row_offset, 2, htmlspecialchars_decode($data[$i], ENT_QUOTES), $xls_formats->default);
                 $row_offset++;
             }
