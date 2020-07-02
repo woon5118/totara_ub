@@ -297,7 +297,7 @@ Feature: Define track schedules to perform activities
     And I click on "Fixed" "button"
     And I set the "scheduleFixed[from]" tui date selector to "1 January 2020"
     And I set the following fields to these values:
-      | dueDateRelative[from_count] | 0          |
+      | dueDateOffset[from_count] | 0 |
     And I save the activity schedule
     Then I should see "Due date must be after the creation end date"
     And the following fields match these values:
