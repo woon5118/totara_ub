@@ -2,11 +2,13 @@ mutation mod_perform_update_activity_general_info(
   $activity_id: core_id!
   $name: param_text!
   $description: param_text
+  $type_id: core_id
 ) {
   mod_perform_update_activity_general_info(
     activity_id: $activity_id
     name: $name
     description: $description
+    type_id: $type_id
   ) {
     activity {
       id

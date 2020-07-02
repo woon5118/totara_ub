@@ -68,22 +68,25 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
         $original_data->description = 'Existing activity description';
 
         $activity_type = 'check-in';
-        $activity = $this->create_activity($original_data, $activity_type);
+        $activity = $this->create_activity($original_data, $activity_type, draft::get_code());
 
         $this->assertEquals($activity->name, $original_data->name);
         $this->assertEquals($activity->description, $original_data->description);
         $this->assertEquals($activity->type->name, $activity_type);
 
-        $activity->update_general_info('New name for existing activity', 'New description');
+        $new_type_id = activity_type::load_by_name('feedback')->id;
+        $activity->update_general_info('New name for existing activity', 'New description', $new_type_id);
 
         // Assert in memory state is correct
         $this->assertEquals($activity->name, 'New name for existing activity');
         $this->assertEquals($activity->description, 'New description');
+        $this->assertEquals($new_type_id, $activity->type->id);
 
         // Assert persisted state is correct
         $from_database = activity::load_by_id($activity->id);
         $this->assertEquals($from_database->name, 'New name for existing activity');
         $this->assertEquals($from_database->description, 'New description');
+        $this->assertEquals($new_type_id, $from_database->type->id);
     }
 
     public function test_update_general_info_accepts_null_description(): void {
@@ -98,7 +101,7 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
         $this->assertEquals($activity->description, $original_data->description);
         $this->assertEquals($activity->type->name, $activity_type);
 
-        $activity->update_general_info('New name for existing activity', null);
+        $activity->update_general_info('New name for existing activity', null, null);
 
         // Assert in memory state is correct
         $this->assertEquals($activity->name, 'New name for existing activity');
@@ -126,7 +129,29 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage($expected_message);
 
-        $activity->update_general_info($new_name, 'New description');
+        $activity->update_general_info($new_name, 'New description', null);
+    }
+
+    public function test_update_general_should_not_update_type_for_active_activity() {
+        $this->setAdminUser();
+
+        $data_generator = $this->getDataGenerator();
+        /** @var mod_perform_generator $perform_generator */
+        $perform_generator = $data_generator->get_plugin_generator('mod_perform');
+
+        $active_activity = $perform_generator->create_activity_in_container(
+            [
+                'activity_name' => 'User1 One',
+                'activity_status' => active::get_code(),
+            ]
+        );
+
+        $this->assertEquals(active::get_code(), $active_activity->status);
+        $this->assertEquals(1, $active_activity->type->id);
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage("Cannot change type of activity " . $active_activity->id . " since it is no longer a draft");
+        $active_activity->update_general_info('New name for existing activity', null, 2);
     }
 
     public function update_general_should_validate_new_attributes(): array {
@@ -162,7 +187,7 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
         $this->expectExceptionMessage('You can not update a entity that does not exist yet or was deleted.');
 
         $new_entity->exists_now = false;
-        $activity->update_general_info('name', 'description');
+        $activity->update_general_info('name', 'description', null);
     }
 
     public function test_status() {
@@ -172,20 +197,24 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
         /** @var mod_perform_generator $perform_generator */
         $perform_generator = $data_generator->get_plugin_generator('mod_perform');
 
-        $draft_activity = $perform_generator->create_activity_in_container([
-            'activity_name' => 'User1 One',
-            'activity_status' => draft::get_code()
-        ]);
+        $draft_activity = $perform_generator->create_activity_in_container(
+            [
+                'activity_name' => 'User1 One',
+                'activity_status' => draft::get_code(),
+            ]
+        );
 
         $this->assertEquals(draft::get_code(), $draft_activity->status);
         $state = $draft_activity->get_status_state();
         $this->assertEquals('DRAFT', $state->get_name());
         $this->assertEquals('Draft', $state->get_display_name());
 
-        $active_activity = $perform_generator->create_activity_in_container([
-            'activity_name' => 'User1 One',
-            'activity_status' => active::get_code()
-        ]);
+        $active_activity = $perform_generator->create_activity_in_container(
+            [
+                'activity_name' => 'User1 One',
+                'activity_status' => active::get_code(),
+            ]
+        );
 
         $this->assertEquals(active::get_code(), $active_activity->status);
         $state = $active_activity->get_status_state();
@@ -208,7 +237,7 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage('The following errors need to be fixed: "Name is required"');
         /** @var activity $activity */
-        $activity->update_general_info('   ', null);
+        $activity->update_general_info('   ', null, null);
     }
 
     /**
@@ -216,12 +245,13 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
      *
      * @param activity_entity $entity
      * @param string $type activity type
+     * @param int $status
      * @return activity
      * @throws coding_exception
      */
-    private function create_activity(activity_entity $entity, string $type = 'appraisal'): activity {
+    private function create_activity(activity_entity $entity, string $type = 'appraisal', int $status = 1): activity {
         $entity->type_id = activity_type::load_by_name($type)->id;
-        $entity->status = active::get_code();
+        $entity->status = $status;
 
         /** @var activity_entity $entity */
         /** @noinspection CallableParameterUseCaseInTypeContextInspection */

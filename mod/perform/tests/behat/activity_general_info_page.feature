@@ -6,16 +6,18 @@ Feature: Create and update activity general info fields
   Background:
     Given I am on a totara site
     And the following "activities" exist in "mod_perform" plugin:
-      | activity_name       | description                     | activity_type | create_track | create_section |
-      | My Test Activity #1 | My Test Activity #1 description | check-in      | true         | true           |
+      | activity_name       | description                     | activity_type | create_track | create_section | activity_status |
+      | My Test Activity #1 | My Test Activity #1 description | check-in      | true         | true           | Active          |
+      | My Test Activity #2 | My Test Activity #2 description | check-in      | true         | true           | Draft           |
+
 
   Scenario: Populate the general info fields for a new activity
     Given I log in as "admin"
     And I navigate to the manage perform activities page
     And I click on "Add activity" "button"
     And I set the following fields to these values:
-      | Activity title | My Test Activity #2             |
-      | Description    | My Test Activity #2 description |
+      | Activity title | My Test Activity #3             |
+      | Description    | My Test Activity #3 description |
       | Activity type  | Feedback                        |
 
     When I click on "Get started" "button"
@@ -23,15 +25,17 @@ Feature: Create and update activity general info fields
 
     When I click on "General" "link"
     Then the following fields match these values:
-      | Activity title | My Test Activity #2             |
-      | Description    | My Test Activity #2 description |
-    And "//span[contains(., 'Feedback')]" "xpath_element" should exist
+      | Activity title | My Test Activity #3             |
+      | Description    | My Test Activity #3 description |
+    And I should see "Feedback" in the ".tui-select" "css_element"
 
     When I navigate to the manage perform activities page
     Then I should see the tui datatable contains:
       | Name                | Type     | Status |
       | My Test Activity #1 | Check-in | Active |
-      | My Test Activity #2 | Feedback | Draft  |
+      | My Test Activity #2 | Check-in | Draft  |
+      | My Test Activity #3 | Feedback | Draft  |
+
 
   Scenario: Activity can not be saved if title only contains whitespace
     Given I log in as "admin"
@@ -45,23 +49,25 @@ Feature: Create and update activity general info fields
     Given I log in as "admin"
     And I navigate to the manage perform activities page
 
-    When I click on "My Test Activity #1" "link"
+    When I click on "My Test Activity #2" "link"
     Then the "Content" tui tab should be active
 
     When I click on "General" "link"
     Then the following fields match these values:
-      | Activity title | My Test Activity #1             |
-      | Description    | My Test Activity #1 description |
-    And "//span[contains(., 'Check-in')]" "xpath_element" should exist
+      | Activity title | My Test Activity #2             |
+      | Description    | My Test Activity #2 description |
+      | Activity type  | Check-in                        |
 
     When I set the following fields to these values:
-      | Activity title | My Test Activity #3             |
-      | Description    | My Test Activity #3 description |
+      | Activity title | My Test Activity #2             |
+      | Description    | My Test Activity #2 description |
+      | Activity type  | Feedback                        |
     And I click on "Save changes" "button"
     And I navigate to the manage perform activities page
     Then I should see the tui datatable contains:
       | Name                | Type     | Status |
-      | My Test Activity #3 | Check-in | Active |
+      | My Test Activity #1 | Check-in | Active |
+      | My Test Activity #2 | Feedback | Draft  |
 
   Scenario: Edit the general info fields can not be saved if title field only contains whitespace
     Given I log in as "admin"
@@ -77,3 +83,35 @@ Feature: Create and update activity general info fields
     When I set the field "Activity title" to "  "
     Then the "Save changes" "button" should be disabled
 
+  Scenario: Type is read only when activity status is active
+    Given I log in as "admin"
+    And I navigate to the manage perform activities page
+
+    When I click on "My Test Activity #1" "link"
+    And I click on "General" "link"
+    Then I should see "Check-in" in the ".tui-formRow__action > div > span" "css_element"
+    # the drop-down should not exist for active activity
+    And ".tui-performManageActivityGeneralInfo .tui-select" "css_element" should not exist
+
+  Scenario: Click cancel button will revert to last saved changes
+    Given I log in as "admin"
+    And I navigate to the manage perform activities page
+    And I click on "Add activity" "button"
+    And I set the following fields to these values:
+      | Activity title | My Test Activity #3             |
+      | Description    | My Test Activity #3 description |
+      | Activity type  | Feedback                        |
+
+    When I click on "Get started" "button"
+    Then the "Content" tui tab should be active
+
+    When I click on "General" "link"
+    And I set the following fields to these values:
+      | Activity title | My Test Activity |
+      | Description    | My Test Activity |
+      | Activity type  | Check-in         |
+    And I click on "Cancel" "button"
+    Then the following fields match these values:
+      | Activity title | My Test Activity #3             |
+      | Description    | My Test Activity #3 description |
+      | Activity type  | Feedback                        |

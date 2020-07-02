@@ -307,6 +307,7 @@ extend type Mutation {
     activity_id: core_id!
     name: param_text!
     description: param_text
+    type_id: core_id
   ): mod_perform_activity_result!
 
   """

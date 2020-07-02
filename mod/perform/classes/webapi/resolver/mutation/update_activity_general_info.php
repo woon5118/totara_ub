@@ -39,7 +39,7 @@ class update_activity_general_info implements mutation_resolver, has_middleware 
         // The require_activity middleware loads the activity and passes it along via the args
         $activity = $args['activity'];
 
-        $activity->update_general_info($args['name'], $args['description'] ?? null);
+        $activity->update_general_info($args['name'], $args['description'] ?? null, $args['type_id'] ?? null);
 
         return ['activity' => $activity];
     }

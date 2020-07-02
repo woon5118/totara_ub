@@ -23,6 +23,8 @@
  */
 
 use mod_perform\models\activity\activity;
+use mod_perform\models\activity\activity_type as activity_type_model;
+use mod_perform\state\activity\draft;
 use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
@@ -49,7 +51,7 @@ class mod_perform_webapi_resolver_mutation_update_activity_general_info_testcase
 
     public function test_update_success(): void {
         [$activity, $args] = $this->create_activity();
-        $expected_type = $activity->type;
+        $expected_type = activity_type_model::load_by_id($args['type_id']);
 
         ['activity' => $activity] = $this->resolve_graphql_mutation(self::MUTATION, $args);
 
@@ -57,6 +59,7 @@ class mod_perform_webapi_resolver_mutation_update_activity_general_info_testcase
         self::assertEquals($activity->id, $args['activity_id']);
         self::assertEquals($activity->name, $args['name']);
         self::assertEquals($activity->description, $args['description']);
+        self::assertEquals($activity->type->id,$args['type_id']);
 
         $actual_type = $activity->type;
         $this->assertEquals($expected_type->name, $actual_type->name, "wrong type name");
@@ -75,7 +78,8 @@ class mod_perform_webapi_resolver_mutation_update_activity_general_info_testcase
         ['activity' => $returned_activity] = $this->resolve_graphql_mutation(self::MUTATION, $args);
 
         $this->assertEquals($created_activity->id, $returned_activity->id);
-        $this->assertEquals($created_activity->name, $returned_activity->name);
+        $this->assertEquals($args['name'], $returned_activity->name);
+        $this->assertEquals($args['type_id'], $returned_activity->type->id);
 
         self::setUser($user2);
         $this->expectException(moodle_exception::class);
@@ -94,10 +98,11 @@ class mod_perform_webapi_resolver_mutation_update_activity_general_info_testcase
 
         $result = $result['activity'];
         $this->assertEquals($activity->id, $result['id']);
-        $this->assertEquals($activity->name, $result['name']);
+        $this->assertEquals($args['name'], $result['name']);
 
-        $type = $result['type'];
-        $this->assertEquals($activity->type->display_name, $type['display_name']);
+        $actual_type_display_name = $result['type']['display_name'];
+        $expected_type_display_name = activity_type_model::load_by_id($args['type_id'])->get_display_name();
+        $this->assertEquals($actual_type_display_name, $expected_type_display_name);
     }
 
     public function test_failed_ajax_query(): void {
@@ -122,12 +127,14 @@ class mod_perform_webapi_resolver_mutation_update_activity_general_info_testcase
 
         /** @var mod_perform_generator $perform_generator */
         $perform_generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
-        $activity = $perform_generator->create_activity_in_container();
+        $activity = $perform_generator->create_activity_in_container(['activity_status' => draft::get_code()]);
+        $new_type_id = 3;
 
         $args = [
             'activity_id' => $activity->id,
-            'name' => $activity->name,
-            'description' => $activity->description,
+            'name' => "Activity-1",
+            'description' => "Description of Activity 1",
+            'type_id' => $new_type_id,
         ];
 
         return [$activity, $args];

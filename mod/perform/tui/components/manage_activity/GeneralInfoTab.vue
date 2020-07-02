@@ -57,11 +57,11 @@
       <FormRow
         v-slot="{ id }"
         :label="$str('general_info_label_activity_type', 'mod_perform')"
-        required
+        :required="useModalStyling || !isActive"
       >
         <div>
           <Select
-            v-if="disableAfterSave"
+            v-if="disableAfterSave || (!useModalStyling && !isActive)"
             :id="id"
             v-model="activityTypeSelection"
             :aria-labelledby="id"
@@ -70,7 +70,10 @@
           />
           <span v-else>{{ activityTypeName }}</span>
 
-          <FormRowDetails :id="$id('aria-describedby')">
+          <FormRowDetails
+            v-show="useModalStyling"
+            :id="$id('aria-describedby')"
+          >
             {{ $str('activity_type_help_text', 'mod_perform') }}
           </FormRowDetails>
         </div>
@@ -90,6 +93,12 @@
             :disabled="isSaving || hasNoTitle || hasNoType"
             type="submit"
             @click.prevent="trySave"
+          />
+          <Button
+            v-show="!useModalStyling"
+            :disabled="isSaving"
+            :text="$str('cancel', 'moodle')"
+            @click="resetActivityChanges"
           />
         </ButtonGroup>
       </FormRow>
@@ -197,6 +206,14 @@ export default {
     hasNoType() {
       return this.activityTypeSelection === 0;
     },
+
+    /**
+     * check activity status is active
+     * @returns {boolean}
+     */
+    isActive() {
+      return this.value.state_details.name === 'ACTIVE';
+    },
   },
 
   created() {
@@ -215,12 +232,16 @@ export default {
             return { id: type.id, label: type.display_name };
           })
           .sort((a, b) => a.label.localeCompare(b.label));
-
-        options.unshift({
-          id: 0,
-          label: this.$str('general_info_select_activity_type', 'mod_perform'),
-        });
-
+        //show 'select type' only when create activity
+        if (this.useModalStyling) {
+          options.unshift({
+            id: 0,
+            label: this.$str(
+              'general_info_select_activity_type',
+              'mod_perform'
+            ),
+          });
+        }
         return options;
       },
     },
@@ -242,6 +263,11 @@ export default {
           name: this.activity.edit_name,
           description: this.activity.edit_description,
         };
+
+        // Only mutate the type id if the user has explicitly changed the type.
+        if (this.activity.type.id !== this.activityTypeSelection) {
+          variables.type_id = this.activityTypeSelection;
+        }
       } else {
         mutation = createActivityMutation;
         mutationName = 'mod_perform_create_activity';
@@ -271,7 +297,7 @@ export default {
     async trySave() {
       this.isSaving = true;
       this.activityTypeName = this.activityTypes[
-        this.activityTypeSelection
+        this.activityTypeSelection - 1
       ].label;
 
       try {
@@ -301,6 +327,15 @@ export default {
 
       this.$emit('input', this.activity);
     },
+
+    /**
+     * revert to last saved changes
+     */
+    resetActivityChanges() {
+      this.activity.edit_name = this.activity.name;
+      this.activity.edit_description = this.activity.description;
+      this.activityTypeSelection = this.activity.type.id;
+    },
   },
 };
 </script>
@@ -315,6 +350,9 @@ export default {
       "general_info_label_activity_type",
       "general_info_select_activity_type",
       "save_changes"
+    ],
+    "moodle": [
+      "cancel"
     ]
   }
 </lang-strings>

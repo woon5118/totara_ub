@@ -272,14 +272,32 @@ class activity extends model {
         return \context_module::instance($cm->id);
     }
 
-    public function update_general_info(string $name, ?string $description): self {
+    /**
+     * update activity details
+     *
+     * @param string $name
+     * @param string|null $description
+     * @param int $type_id
+     * @return $this
+     * @throws \coding_exception
+     */
+    public function update_general_info(string $name, ?string $description, ?int $type_id): self {
         $entity = $this->entity;
         $entity->name = $name;
         $entity->description = $description;
 
+        if (isset($type_id)) {
+            if (!$this->is_draft()) {
+                throw new \coding_exception("Cannot change type of activity {$this->id} since it is no longer a draft");
+            }
+            $entity->type_id = $type_id;
+        }
+
         self::validate($entity);
 
         $entity->update();
+
+        $this->entity->load_relation('type');
 
         return $this;
     }
