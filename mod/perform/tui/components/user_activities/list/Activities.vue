@@ -18,6 +18,7 @@
 
   @author Jaron Steenson <jaron.steenson@totaralearning.com>
   @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
+  @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
   @package mod_perform
 -->
 <template>
@@ -126,14 +127,19 @@
       </template>
     </Table>
 
-    <RelationshipSelector
-      v-model="isRelationshipSelectorShown"
-      :current-user-id="currentUserId"
-      :participant-sections="selectedParticipantSections"
-      :is-for-section="false"
-      :subject-user="selectedSubjectUser"
-      :view-url="viewUrl"
-    />
+    <ModalPresenter
+      :open="isRelationshipSelectorShown"
+      @request-close="hideRelationshipSelector"
+    >
+      <RelationshipSelector
+        v-model="isRelationshipSelectorShown"
+        :current-user-id="currentUserId"
+        :participant-sections="selectedParticipantSections"
+        :is-for-section="false"
+        :subject-user="selectedSubjectUser"
+        :view-url="viewUrl"
+      />
+    </ModalPresenter>
   </Loader>
 </template>
 <script>
@@ -142,6 +148,7 @@ import Cell from 'totara_core/components/datatable/Cell';
 import ExpandCell from 'totara_core/components/datatable/ExpandCell';
 import HeaderCell from 'totara_core/components/datatable/HeaderCell';
 import Loader from 'totara_core/components/loader/Loader';
+import ModalPresenter from 'totara_core/components/modal/ModalPresenter';
 import SectionsList from 'mod_perform/components/user_activities/list/Sections';
 import RelationshipSelector from 'mod_perform/components/user_activities/list/RelationshipSelector';
 import Table from 'totara_core/components/datatable/Table';
@@ -155,6 +162,7 @@ export default {
     ExpandCell,
     HeaderCell,
     Loader,
+    ModalPresenter,
     RelationshipSelector,
     SectionsList,
     Table,
@@ -270,6 +278,13 @@ export default {
         });
       });
       this.isRelationshipSelectorShown = true;
+    },
+
+    /**
+     * Close the relationship selector modal.
+     */
+    hideRelationshipSelector() {
+      this.isRelationshipSelectorShown = false;
     },
 
     /**

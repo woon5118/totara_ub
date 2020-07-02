@@ -113,14 +113,19 @@
       </Table>
     </div>
 
-    <RelationshipSelector
-      v-model="isRelationshipSelectorShown"
-      :current-user-id="currentUserId"
-      :participant-sections="selectedParticipantSections"
-      :is-for-section="true"
-      :subject-user="subjectUser"
-      :view-url="viewUrl"
-    />
+    <ModalPresenter
+      :open="isRelationshipSelectorShown"
+      @request-close="hideRelationshipSelector"
+    >
+      <RelationshipSelector
+        v-model="isRelationshipSelectorShown"
+        :current-user-id="currentUserId"
+        :participant-sections="selectedParticipantSections"
+        :is-for-section="true"
+        :subject-user="subjectUser"
+        :view-url="viewUrl"
+      />
+    </ModalPresenter>
   </div>
 </template>
 
@@ -128,6 +133,7 @@
 import Avatar from 'totara_core/components/avatar/Avatar';
 import Button from 'totara_core/components/buttons/Button';
 import Cell from 'totara_core/components/datatable/Cell';
+import ModalPresenter from 'totara_core/components/modal/ModalPresenter';
 import RelationshipSelector from 'mod_perform/components/user_activities/list/RelationshipSelector';
 import Table from 'totara_core/components/datatable/Table';
 
@@ -136,6 +142,7 @@ export default {
     Avatar,
     Button,
     Cell,
+    ModalPresenter,
     RelationshipSelector,
     Table,
   },
@@ -179,7 +186,7 @@ export default {
      *
      */
     subjectSectionsSubset() {
-      const items = this.subjectSections.map(item => {
+      return this.subjectSections.map(item => {
         const participation = item.participant_sections.map(
           participantSection => {
             return {
@@ -203,8 +210,6 @@ export default {
           section: item.section,
         };
       });
-
-      return items;
     },
   },
 
@@ -266,6 +271,13 @@ export default {
         this.selectedParticipantSections.push(participantSection);
       });
       this.isRelationshipSelectorShown = true;
+    },
+
+    /**
+     * Close the relationship selector modal.
+     */
+    hideRelationshipSelector() {
+      this.isRelationshipSelectorShown = false;
     },
 
     /**

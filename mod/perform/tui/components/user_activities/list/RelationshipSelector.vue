@@ -16,72 +16,68 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-  @author Jaron Steenson <jaron.steenson@totaralearning.com>
-  @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
+  @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
   @package mod_perform
 -->
 <template>
-  <ModalPresenter :open="value" @request-close="hideRelationshipSelector">
-    <Modal :aria-labelledby="$id('select-relationship-title')">
-      <ModalContent
-        v-if="participantSections.length > 0"
-        :title="$str('select_relationship_to_respond_as_title', 'mod_perform')"
-        :title-id="$id('select-relationship-title')"
-        :close-button="false"
+  <Modal :aria-labelledby="$id('select-relationship-title')">
+    <ModalContent
+      v-if="participantSections.length > 0"
+      :title="$str('select_relationship_to_respond_as_title', 'mod_perform')"
+      :title-id="$id('select-relationship-title')"
+      :close-button="false"
+    >
+      <p :id="$id('select-relationship-explanation')">
+        {{
+          $str(
+            'select_relationship_to_respond_as_explanation',
+            'mod_perform',
+            subjectUser.fullname
+          )
+        }}
+      </p>
+
+      <RadioGroup
+        v-model="relationshipToRespondAs"
+        required
+        :aria-labelledby="$id('select-relationship-explanation')"
       >
-        <p :id="$id('select-relationship-explanation')">
-          {{
-            $str(
-              'select_relationship_to_respond_as_explanation',
-              'mod_perform',
-              subjectUser.fullname
-            )
-          }}
-        </p>
-
-        <RadioGroup
-          v-model="relationshipToRespondAs"
-          required
-          :aria-labelledby="$id('select-relationship-explanation')"
+        <Radio
+          v-for="respondAsOption in respondAsOptions"
+          :key="respondAsOption.participant_instance.core_relationship.id"
+          :value="respondAsOption.participant_instance.core_relationship.id"
+          name="relationshipToRespondAs"
         >
-          <Radio
-            v-for="respondAsOption in respondAsOptions"
-            :key="respondAsOption.participant_instance.core_relationship.id"
-            :value="respondAsOption.participant_instance.core_relationship.id"
-            name="relationshipToRespondAs"
-          >
-            {{
-              $str('select_relationship_to_respond_as_option', 'mod_perform', {
-                relationship_name:
-                  respondAsOption.participant_instance.core_relationship.name,
-                progress_status: getStatusText(respondAsOption),
-              })
-            }}
-          </Radio>
-        </RadioGroup>
+          {{
+            $str('select_relationship_to_respond_as_option', 'mod_perform', {
+              relationship_name:
+                respondAsOption.participant_instance.core_relationship.name,
+              progress_status: getStatusText(respondAsOption),
+            })
+          }}
+        </Radio>
+      </RadioGroup>
 
-        <template v-slot:buttons>
-          <Button
-            :styleclass="{ primary: true }"
-            :text="$str('continue', 'moodle')"
-            :disabled="!relationshipToRespondAs || relationshipConfirmed"
-            @click="confirmRelationshipSelection"
-          />
-          <CancelButton
-            :disabled="relationshipConfirmed"
-            @click="hideRelationshipSelector"
-          />
-        </template>
-      </ModalContent>
-    </Modal>
-  </ModalPresenter>
+      <template v-slot:buttons>
+        <Button
+          :styleclass="{ primary: true }"
+          :text="$str('continue', 'moodle')"
+          :disabled="!relationshipToRespondAs || relationshipConfirmed"
+          @click="confirmRelationshipSelection"
+        />
+        <CancelButton
+          :disabled="relationshipConfirmed"
+          @click="$emit('input', false)"
+        />
+      </template>
+    </ModalContent>
+  </Modal>
 </template>
 <script>
 import Button from 'totara_core/components/buttons/Button';
 import CancelButton from 'totara_core/components/buttons/Cancel';
 import Modal from 'totara_core/components/modal/Modal';
 import ModalContent from 'totara_core/components/modal/ModalContent';
-import ModalPresenter from 'totara_core/components/modal/ModalPresenter';
 import Radio from 'totara_core/components/form/Radio';
 import RadioGroup from 'totara_core/components/form/RadioGroup';
 
@@ -91,7 +87,6 @@ export default {
     CancelButton,
     Modal,
     ModalContent,
-    ModalPresenter,
     Radio,
     RadioGroup,
   },
@@ -154,6 +149,14 @@ export default {
     },
   },
 
+  mounted() {
+    // Make sure the first option available is preselected
+    this.relationshipToRespondAs =
+      this.respondAsOptions.length > 0
+        ? this.respondAsOptions[0].participant_instance.core_relationship.id
+        : null;
+  },
+
   methods: {
     /**
      * Get the first section, if relationship id is supplied it will get the first section
@@ -185,16 +188,6 @@ export default {
       });
 
       return foundSection;
-    },
-
-    /**
-     * Close the relationship selector modal.
-     */
-    hideRelationshipSelector() {
-      this.relationshipToRespondAs = null;
-      this.relationshipConfirmed = false;
-
-      this.$emit('input', false);
     },
 
     /**
