@@ -3,6 +3,7 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* plugin_renderer_base::render_navigation_node - Removed tabindex="0" from non-interactive elements of breadcrumbs.
 * New methods for iteration over very large record sets were added to DML, see $DB->get_huge_recorset methods.
 * PHPUnit has been upgraded to version 8.5.x,
   see https://phpunit.de/announcements/phpunit-8.html for more information how to fix existing tests.

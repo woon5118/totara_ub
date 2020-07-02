@@ -3262,7 +3262,7 @@ EOD;
             $content = html_writer::link($item->action, $content, $attributes);
 
         } else if (is_string($item->action) || empty($item->action)) {
-            $attributes = array('tabindex'=>'0'); //add tab support to span but still maintain character stream sequence.
+            $attributes = array();
             if ($title !== '') {
                 $attributes['title'] = $title;
             }
