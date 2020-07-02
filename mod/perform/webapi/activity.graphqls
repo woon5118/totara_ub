@@ -73,7 +73,8 @@ Details about perform activity that a user is involved with (either the subject 
 type mod_perform_subject_instance {
   id: core_id!
   activity: mod_perform_activity!
-  progress_status: mod_perform_subject_instance_status!
+  progress_status: mod_perform_subject_instance_progress_status!
+  availability_status: mod_perform_subject_instance_availability_status!
   subject_user: core_user!
   participant_instances: [mod_perform_participant_instance!]!
 }
@@ -87,7 +88,8 @@ type mod_perform_participant_instance {
   is_for_current_user: Boolean!
   participant_sections: [mod_perform_participant_section!]!
   participant: core_user!
-  progress_status: mod_perform_participant_instance_status!
+  progress_status: mod_perform_participant_instance_progress_status!
+  availability_status: mod_perform_participant_instance_availability_status!
   core_relationship: totara_core_relationship!
 }
 
@@ -126,21 +128,36 @@ enum mod_perform_activity_state_enums {
 }
 
 """
-A list of possible states that a subject instance can be in
+A list of possible progress states that a subject instance can be in
 """
-enum mod_perform_subject_instance_status {
+enum mod_perform_subject_instance_progress_status {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETE
+}
+"""
+A list of possible availability states that a subject instance can be in
+"""
+enum mod_perform_subject_instance_availability_status {
+  OPEN
+  CLOSED
+}
+
+"""
+A list of possible progress states that a participant instance can be in
+"""
+enum mod_perform_participant_instance_progress_status {
   NOT_STARTED
   IN_PROGRESS
   COMPLETE
 }
 
 """
-A list of possible states that a participant instance can be in
+A list of possible availability states that a participant instance can be in
 """
-enum mod_perform_participant_instance_status {
-  NOT_STARTED
-  IN_PROGRESS
-  COMPLETE
+enum mod_perform_participant_instance_availability_status {
+  OPEN
+  CLOSED
 }
 
 """

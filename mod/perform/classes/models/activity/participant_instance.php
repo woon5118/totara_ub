@@ -72,6 +72,7 @@ class participant_instance extends model {
 
     protected $model_accessor_whitelist = [
         'progress_status',
+        'availability_status',
         'progress_state',
         'availability_state',
         'subject_instance',
@@ -138,6 +139,15 @@ class participant_instance extends model {
      */
     public function get_progress_status(): string {
         return $this->get_progress_state()->get_name();
+    }
+
+    /**
+     * Get internal name of current availability state.
+     *
+     * @return string
+     */
+    public function get_availability_status(): string {
+        return $this->get_availability_state()->get_name();
     }
 
     /**

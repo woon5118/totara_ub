@@ -302,6 +302,7 @@ $string['untitled_section'] = 'Untitled section';
 $string['user_activities_activities_about_others_title'] = 'Activities about others';
 $string['user_activities_activity_does_not_exist'] = 'The requested performance activity could not be found.';
 $string['user_activities_close_on_completion_submit_confirmation_message'] = 'You will not be able to update your responses after submission.';
+$string['user_activities_closed'] = 'Closed';
 $string['user_activities_other_response_hide'] = "Hide others' responses";
 $string['user_activities_other_response_no_participants_identified'] = 'No participants identified';
 $string['user_activities_other_response_response'] = '{$a->relationship} response';

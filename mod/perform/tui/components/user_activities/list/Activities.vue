@@ -103,6 +103,15 @@
           {{
             getYourProgressText(subjectInstance.subject.participant_instances)
           }}
+          <Lock
+            v-if="
+              allYourInstancesAreClosed(
+                subjectInstance.subject.participant_instances
+              )
+            "
+            :alt="$str('user_activities_closed', 'mod_perform')"
+            :title="$str('user_activities_closed', 'mod_perform')"
+          />
         </Cell>
         <Cell
           size="2"
@@ -112,6 +121,11 @@
           valign="center"
         >
           {{ getStatusText(subjectInstance.subject.progress_status) }}
+          <Lock
+            v-if="subjectInstance.subject.availability_status === 'CLOSED'"
+            :alt="$str('user_activities_closed', 'mod_perform')"
+            :title="$str('user_activities_closed', 'mod_perform')"
+          />
         </Cell>
       </template>
       <template v-slot:expand-content="{ row: subjectInstance }">
@@ -148,6 +162,7 @@ import Cell from 'totara_core/components/datatable/Cell';
 import ExpandCell from 'totara_core/components/datatable/ExpandCell';
 import HeaderCell from 'totara_core/components/datatable/HeaderCell';
 import Loader from 'totara_core/components/loader/Loader';
+import Lock from 'totara_core/components/icons/common/Lock';
 import ModalPresenter from 'totara_core/components/modal/ModalPresenter';
 import SectionsList from 'mod_perform/components/user_activities/list/Sections';
 import RelationshipSelector from 'mod_perform/components/user_activities/list/RelationshipSelector';
@@ -162,6 +177,7 @@ export default {
     ExpandCell,
     HeaderCell,
     Loader,
+    Lock,
     ModalPresenter,
     RelationshipSelector,
     SectionsList,
@@ -343,6 +359,22 @@ export default {
     },
 
     /**
+     * Checks if all participant instances are closed.
+     *
+     * @param {Array} participantInstances
+     * @return {Boolean}
+     */
+    allYourInstancesAreClosed(participantInstances) {
+      return !participantInstances.find(pi => {
+        return (
+          parseInt(pi.participant_id) === this.currentUserId &&
+          pi.availability_status &&
+          pi.availability_status !== 'CLOSED'
+        );
+      });
+    },
+
+    /**
      * Relationship names for the logged in user for a set of participant instances.
      *
      * @param {Object[]} participantInstances - The participant instances from the subject instance we are getting the relationship text for
@@ -383,6 +415,7 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
+      "user_activities_closed",
       "user_activities_status_complete",
       "user_activities_status_header_activity",
       "user_activities_status_header_participation",

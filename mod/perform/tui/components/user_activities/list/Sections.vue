@@ -108,6 +108,11 @@
             valign="center"
           >
             {{ getStatusText(row.progressStatus) }}
+            <Lock
+              v-if="row.availabilityStatus === 'CLOSED'"
+              :alt="$str('user_activities_closed', 'mod_perform')"
+              :title="$str('user_activities_closed', 'mod_perform')"
+            />
           </Cell>
         </template>
       </Table>
@@ -133,6 +138,7 @@
 import Avatar from 'totara_core/components/avatar/Avatar';
 import Button from 'totara_core/components/buttons/Button';
 import Cell from 'totara_core/components/datatable/Cell';
+import Lock from 'totara_core/components/icons/common/Lock';
 import ModalPresenter from 'totara_core/components/modal/ModalPresenter';
 import RelationshipSelector from 'mod_perform/components/user_activities/list/RelationshipSelector';
 import Table from 'totara_core/components/datatable/Table';
@@ -142,6 +148,7 @@ export default {
     Avatar,
     Button,
     Cell,
+    Lock,
     ModalPresenter,
     RelationshipSelector,
     Table,
@@ -195,6 +202,7 @@ export default {
                 participantSection.participant_instance.is_for_current_user,
               participant: participantSection.participant_instance.participant,
               progressStatus: participantSection.progress_status,
+              availabilityStatus: participantSection.availability_status,
               relationship:
                 participantSection.participant_instance.core_relationship.name,
               relationship_id:
@@ -296,6 +304,7 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
+      "user_activities_closed",
       "user_activities_status_complete",
       "user_activities_status_header_section_progress",
       "user_activities_status_header_relationship",
