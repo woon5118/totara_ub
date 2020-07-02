@@ -8,6 +8,9 @@ query mod_perform_my_subject_instances(
       availability_status
       activity {
         name
+        type {
+          display_name
+        }
         settings {
           multisection
         }

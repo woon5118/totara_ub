@@ -319,6 +319,7 @@ $string['user_activities_subject_header'] = 'User';
 $string['user_activities_submit_confirmation_message'] = 'Once submitted, your responses will be visible to other users who have permission to view them.';
 $string['user_activities_submit_confirmation_title'] = 'Confirm submission';
 $string['user_activities_title_header'] = 'Activity title';
+$string['user_activities_type_header'] = 'Type';
 $string['user_activities_you'] = 'You';
 $string['user_activities_your_activities_title'] = 'Your activities';
 $string['user_activities_your_relationship_to_user'] = 'Your relationship to user';

@@ -34,6 +34,9 @@
         <HeaderCell :size="isAboutOthers ? '3' : '7'">
           {{ $str('user_activities_title_header', 'mod_perform') }}
         </HeaderCell>
+        <HeaderCell size="2">
+          {{ $str('user_activities_type_header', 'mod_perform') }}
+        </HeaderCell>
         <HeaderCell v-if="isAboutOthers" size="2">
           {{ $str('user_activities_subject_header', 'mod_perform') }}
         </HeaderCell>
@@ -43,12 +46,12 @@
           }}
         </HeaderCell>
         <HeaderCell size="2">
+          {{ $str('user_activities_status_header_activity', 'mod_perform') }}
+        </HeaderCell>
+        <HeaderCell size="2">
           {{
             $str('user_activities_status_header_participation', 'mod_perform')
           }}
-        </HeaderCell>
-        <HeaderCell size="2">
-          {{ $str('user_activities_status_header_activity', 'mod_perform') }}
         </HeaderCell>
       </template>
       <template v-slot:row="{ row: subjectInstance, expand, expandState }">
@@ -74,6 +77,12 @@
           </a>
         </Cell>
         <Cell
+          size="2"
+          :column-header="$str('user_activities_type_header', 'mod_perform')"
+        >
+          {{ subjectInstance.subject.activity.type.display_name }}
+        </Cell>
+        <Cell
           v-if="isAboutOthers"
           size="2"
           :column-header="$str('user_activities_subject_header', 'mod_perform')"
@@ -96,6 +105,20 @@
         <Cell
           size="2"
           :column-header="
+            $str('user_activities_status_header_activity', 'mod_perform')
+          "
+          valign="center"
+        >
+          {{ getStatusText(subjectInstance.subject.progress_status) }}
+          <Lock
+            v-if="subjectInstance.subject.availability_status === 'CLOSED'"
+            :alt="$str('user_activities_closed', 'mod_perform')"
+            :title="$str('user_activities_closed', 'mod_perform')"
+          />
+        </Cell>
+        <Cell
+          size="2"
+          :column-header="
             $str('user_activities_status_header_participation', 'mod_perform')
           "
           valign="center"
@@ -109,20 +132,6 @@
                 subjectInstance.subject.participant_instances
               )
             "
-            :alt="$str('user_activities_closed', 'mod_perform')"
-            :title="$str('user_activities_closed', 'mod_perform')"
-          />
-        </Cell>
-        <Cell
-          size="2"
-          :column-header="
-            $str('user_activities_status_header_activity', 'mod_perform')
-          "
-          valign="center"
-        >
-          {{ getStatusText(subjectInstance.subject.progress_status) }}
-          <Lock
-            v-if="subjectInstance.subject.availability_status === 'CLOSED'"
             :alt="$str('user_activities_closed', 'mod_perform')"
             :title="$str('user_activities_closed', 'mod_perform')"
           />
@@ -423,7 +432,8 @@ export default {
       "user_activities_status_in_progress",
       "user_activities_status_not_started",
       "user_activities_subject_header",
-      "user_activities_title_header"
+      "user_activities_title_header",
+      "user_activities_type_header"
     ]
   }
 </lang-strings>
