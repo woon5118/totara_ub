@@ -6,6 +6,7 @@ query mod_perform_my_subject_instances(
       id
       progress_status
       availability_status
+      created_at
       activity {
         name
         type {

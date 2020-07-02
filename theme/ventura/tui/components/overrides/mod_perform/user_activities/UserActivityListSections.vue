@@ -22,11 +22,16 @@
 
 <style lang="scss">
 .tui-performUserActivityListSections {
-  padding: var(--tui-gap-6) var(--tui-gap-4) var(--tui-gap-4);
+  padding: var(--tui-gap-4);
 
   & > * + * {
     margin-top: var(--tui-gap-4);
   }
+}
+
+.tui-performUserActivityDateSummary {
+  padding: var(--tui-gap-6) var(--tui-gap-4) 0;
+  color: var(--tui-color-neutral-6);
 }
 
 .tui-performUserActivityListSection {

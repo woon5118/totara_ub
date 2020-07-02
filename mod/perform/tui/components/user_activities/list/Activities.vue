@@ -138,6 +138,15 @@
         </Cell>
       </template>
       <template v-slot:expand-content="{ row: subjectInstance }">
+        <p class="tui-performUserActivityDateSummary">
+          {{
+            $str(
+              'user_activities_created_at',
+              'mod_perform',
+              subjectInstance.subject.created_at
+            )
+          }}
+        </p>
         <SectionsList
           :subject-sections="subjectInstance.sections"
           :is-multi-section-active="
@@ -425,6 +434,7 @@ export default {
   {
     "mod_perform": [
       "user_activities_closed",
+      "user_activities_created_at",
       "user_activities_status_complete",
       "user_activities_status_header_activity",
       "user_activities_status_header_participation",

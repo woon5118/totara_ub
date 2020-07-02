@@ -75,6 +75,7 @@ type mod_perform_subject_instance {
   activity: mod_perform_activity!
   progress_status: mod_perform_subject_instance_progress_status!
   availability_status: mod_perform_subject_instance_availability_status!
+  created_at(format: core_date_format = DATE): core_date
   subject_user: core_user!
   participant_instances: [mod_perform_participant_instance!]!
 }

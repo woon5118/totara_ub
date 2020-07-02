@@ -62,6 +62,7 @@ class subject_instance extends model {
         'subject_user_id',
         'progress',
         'availability',
+        'created_at',
     ];
 
     protected $model_accessor_whitelist = [

@@ -24,6 +24,7 @@
 namespace mod_perform\formatter\activity;
 
 use core\orm\formatter\entity_model_formatter;
+use core\webapi\formatter\field\date_field_formatter;
 use mod_perform\models\activity\subject_instance as subject_instance_model;
 
 /**
@@ -42,6 +43,7 @@ class subject_instance extends entity_model_formatter {
         return [
             'id' => null,
             'activity' => null,
+            'created_at' => date_field_formatter::class,
             'subject_user' => null,
             'progress_status' => null,
             'availability_status' => null,
