@@ -45,6 +45,10 @@
       @include tui-font-heading-small();
       flex-grow: 1;
       overflow: hidden;
+
+      &--sronly {
+        @include sr-only();
+      }
     }
 
     &-close {

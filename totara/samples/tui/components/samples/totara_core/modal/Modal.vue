@@ -33,6 +33,7 @@
           <ModalContent
             :title="title"
             :title-id="$id('title')"
+            :title-visible="isVisible"
             :close-button="size !== 'sheet'"
           >
             <br />
@@ -61,6 +62,10 @@
           <Radio value="sheet">sheet</Radio>
         </RadioGroup>
       </FormRow>
+
+      <FormRow v-slot="{}" label="Title visible">
+        <Checkbox v-model="isVisible" />
+      </FormRow>
     </SamplesPropCtl>
 
     <SamplesCode>
@@ -80,6 +85,7 @@ import ModalPresenter from 'totara_core/components/modal/ModalPresenter';
 import OkCancelGroup from 'totara_core/components/buttons/OkCancelGroup';
 import Radio from 'totara_core/components/form/Radio';
 import RadioGroup from 'totara_core/components/form/RadioGroup';
+import Checkbox from 'totara_core/components/form/Checkbox';
 import SamplesCode from 'totara_samples/components/sample_parts/misc/SamplesCode';
 import SamplesExample from 'totara_samples/components/sample_parts/misc/SamplesExample';
 import SamplesPropCtl from 'totara_samples/components/sample_parts/misc/SamplesPropCtl';
@@ -95,6 +101,7 @@ export default {
     OkCancelGroup,
     Radio,
     RadioGroup,
+    Checkbox,
     SamplesCode,
     SamplesExample,
     SamplesPropCtl,
@@ -106,11 +113,13 @@ export default {
       name: '',
       size: 'normal',
       title: 'Enter your name',
+      isVisible: true,
       codeTemplate: `<ModalPresenter :open="modalOpen" @request-close="modalResponse">
   <Modal :size="size" :aria-labelledby="$id('title')">
     <ModalContent
       :title="title"
       :title-id="$id('title')"
+      :title-visible="isVisible"
       :close-button="true"
     >
       Some text...

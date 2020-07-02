@@ -23,7 +23,11 @@
 <template>
   <div class="tui-modalContent">
     <div class="tui-modalContent__header">
-      <div :id="titleId" class="tui-modalContent__header-title">
+      <div
+        :id="titleId"
+        class="tui-modalContent__header-title"
+        :class="{ 'tui-modalContent__header-title--sronly': !titleVisible }"
+      >
         {{ title || '' }}
         <slot name="title" />
       </div>
@@ -59,8 +63,15 @@ export default {
   },
 
   props: {
-    title: String,
+    title: {
+      type: String,
+      required: true,
+    },
     titleId: String,
+    titleVisible: {
+      type: Boolean,
+      default: true,
+    },
     closeButton: Boolean,
   },
 
