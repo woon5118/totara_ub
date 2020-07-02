@@ -21,9 +21,9 @@ Feature: Viewing and responding to perform activities
     Given I log in as "john"
     When I navigate to the outstanding perform activities list page
     Then I should see the tui datatable contains:
-      | Activity title                | Your progress   | Overall activity progress |
-      | single user manager-appraiser | Not yet started | Not yet started           |
-      | John is participating subject | Not yet started | Not yet started           |
+      | Activity title                | Type      | Overall progress | Your progress   |
+      | single user manager-appraiser | Appraisal | Not yet started  | Not yet started |
+      | John is participating subject | Appraisal | Not yet started  | Not yet started |
 
     When I click on "John is participating subject" "link"
     Then I should see "John is participating subject" in the ".tui-performUserActivity h2" "css_element"
@@ -45,17 +45,17 @@ Feature: Viewing and responding to perform activities
     And the "Your activities" tui tab should be active
     And I should see "Section submitted" in the tui "success" notification toast
     And I should see the tui datatable contains:
-      | Activity title                | Your progress   | Overall activity progress |
-      | single user manager-appraiser | Not yet started | Not yet started           |
-      | John is participating subject | Complete        | In progress               |
+      | Activity title                | Type      | Overall progress | Your progress  |
+      | single user manager-appraiser | Appraisal | Not yet started  | Not yet started|
+      | John is participating subject | Appraisal | In progress      | Complete       |
 
   Scenario: Can view and and respond to activities I'm a participant in but are not about me
     Given I log in as "john"
     When I navigate to the outstanding perform activities list page
     And I click on "Activities about others" "link"
     Then I should see the tui datatable contains:
-      | Activity title   | User      | Your progress   | Overall activity progress |
-      | David is subject | David Two | Not yet started | Not yet started           |
+      | Activity title   | Type      | User     | Overall progress | Your progress   |
+      | David is subject | Appraisal |David Two | Not yet started  | Not yet started |
 
     When I click on "David is subject" "link"
     Then I should see "David is subject" in the ".tui-participantContent__header" "css_element"
@@ -74,16 +74,16 @@ Feature: Viewing and responding to perform activities
     And I should see "Section submitted." in the tui "success" notification toast
     And the "Activities about others" tui tab should be active
     And I should see the tui datatable contains:
-      | Activity title   | User      | Your progress | Overall activity progress |
-      | David is subject | David Two | Complete      | Complete                  |
+      | Activity title   | Type      | User      | Overall progress | Your progress |
+      | David is subject | Appraisal | David Two | Complete         | Complete      |
 
   Scenario: Can view and and respond to activities I have multiple roles in
     Given I log in as "manager-appraiser"
     When I navigate to the outstanding perform activities list page
     And I click on "Activities about others" "link"
     Then I should see the tui datatable contains:
-      | Activity title                | User     | Relationship to user | Your progress   | Overall activity progress |
-      | single user manager-appraiser | John One | Manager, Appraiser   | Not yet started | Not yet started           |
+      | Activity title                | Type      | User     | Relationship to user | Overall progress | Your progress   |
+      | single user manager-appraiser | Appraisal | John One | Manager, Appraiser   | Not yet started  | Not yet started |
 
     When I click on "single user manager-appraiser" "button"
     Then I should see "Select relationship to continue" in the ".tui-modalContent" "css_element"
@@ -136,15 +136,15 @@ Feature: Viewing and responding to perform activities
     Given I log in as "john"
     When I navigate to the outstanding perform activities list page
     Then I should see the tui datatable contains:
-      | Activity title                | Your progress   | Overall activity progress |
-      | single user manager-appraiser | Not yet started | Not yet started           |
-      | John is participating subject | Not yet started | Not yet started           |
+      | Activity title                | Type      | Overall progress | Your progress   |
+      | single user manager-appraiser | Appraisal | Not yet started  | Not yet started |
+      | John is participating subject | Appraisal | Not yet started  | Not yet started |
 
     When I click on "John is participating subject" "link"
     Then I should see "John is participating subject" in the ".tui-participantContent__header" "css_element"
 
     When I navigate to the outstanding perform activities list page
     Then I should see the tui datatable contains:
-      | Activity title                | Your progress   | Overall activity progress |
-      | single user manager-appraiser | Not yet started | Not yet started           |
-      | John is participating subject | In progress     | In progress               |
+      | Activity title                | Type      | Overall progress | Your progress   |
+      | single user manager-appraiser | Appraisal | Not yet started  | Not yet started |
+      | John is participating subject | Appraisal | In progress      | In progress     |

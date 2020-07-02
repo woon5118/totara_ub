@@ -110,6 +110,11 @@
           valign="center"
         >
           {{ getStatusText(subjectInstance.subject.progress_status) }}
+          <Lozenge
+            v-if="subjectInstance.subject.is_overdue"
+            type="alert"
+            :text="$str('is_overdue', 'mod_perform')"
+          />
           <Lock
             v-if="subjectInstance.subject.availability_status === 'CLOSED'"
             :alt="$str('user_activities_closed', 'mod_perform')"
@@ -126,6 +131,15 @@
           {{
             getYourProgressText(subjectInstance.subject.participant_instances)
           }}
+          <Lozenge
+            v-if="
+              allYourInstancesAreOverdue(
+                subjectInstance.subject.participant_instances
+              )
+            "
+            type="alert"
+            :text="$str('is_overdue', 'mod_perform')"
+          />
           <Lock
             v-if="
               allYourInstancesAreClosed(
@@ -146,6 +160,15 @@
               subjectInstance.subject.created_at
             )
           }}
+          <span v-if="subjectInstance.subject.due_date">
+            {{
+              $str(
+                'user_activities_complete_before',
+                'mod_perform',
+                subjectInstance.subject.due_date
+              )
+            }}
+          </span>
         </p>
         <SectionsList
           :subject-sections="subjectInstance.sections"
@@ -181,6 +204,7 @@ import ExpandCell from 'totara_core/components/datatable/ExpandCell';
 import HeaderCell from 'totara_core/components/datatable/HeaderCell';
 import Loader from 'totara_core/components/loader/Loader';
 import Lock from 'totara_core/components/icons/common/Lock';
+import Lozenge from 'totara_core/components/lozenge/Lozenge';
 import ModalPresenter from 'totara_core/components/modal/ModalPresenter';
 import SectionsList from 'mod_perform/components/user_activities/list/Sections';
 import RelationshipSelector from 'mod_perform/components/user_activities/list/RelationshipSelector';
@@ -196,6 +220,7 @@ export default {
     HeaderCell,
     Loader,
     Lock,
+    Lozenge,
     ModalPresenter,
     RelationshipSelector,
     SectionsList,
@@ -393,6 +418,19 @@ export default {
     },
 
     /**
+     * Checks if all participant instances are overdue.
+     *
+     * @param {Array} participantInstances
+     * @return {Boolean}
+     */
+    allYourInstancesAreOverdue(participantInstances) {
+      return !participantInstances.find(
+        pi =>
+          parseInt(pi.participant_id) === this.currentUserId && !pi.is_overdue
+      );
+    },
+
+    /**
      * Relationship names for the logged in user for a set of participant instances.
      *
      * @param {Object[]} participantInstances - The participant instances from the subject instance we are getting the relationship text for
@@ -433,7 +471,9 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
+      "is_overdue",
       "user_activities_closed",
+      "user_activities_complete_before",
       "user_activities_created_at",
       "user_activities_status_complete",
       "user_activities_status_header_activity",

@@ -9,6 +9,7 @@ type mod_perform_participant_section {
   section_element_responses: [mod_perform_section_element_response!]!
   progress_status: mod_perform_participant_section_progress_status!
   availability_status: mod_perform_participant_section_availability_status!
+  is_overdue: Boolean!
   other_participant_sections: [mod_perform_participant_section!]
   responses_are_visible_to: [mod_perform_relationship!]!
 }

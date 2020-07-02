@@ -48,6 +48,7 @@ class participant_instance extends entity_model_formatter {
             'participant_id' => null,
             'participant_sections' => null,
             'availability_status' => null,
+            'is_overdue' => null,
         ];
     }
 }

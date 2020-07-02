@@ -33,6 +33,7 @@ use mod_perform\entities\activity\section_relationship;
 use mod_perform\models\activity\participant_instance;
 use mod_perform\models\activity\section;
 use mod_perform\state\participant_section\closed;
+use mod_perform\state\participant_section\complete;
 use mod_perform\state\participant_section\participant_section_availability;
 use mod_perform\state\participant_section\participant_section_progress;
 use mod_perform\state\state;
@@ -90,6 +91,7 @@ class participant_section extends model {
         'participant_instance',
         'availability_status',
         'answerable_participant_instances',
+        'is_overdue',
         'responses_are_visible_to',
     ];
 
@@ -322,6 +324,25 @@ class participant_section extends model {
      */
     public function get_availability_state(): state {
         return $this->get_state(participant_section_availability::get_type());
+    }
+
+    /**
+     * Checks if overdue
+     *
+     * @return bool
+     */
+    public function get_is_overdue(): bool {
+        return !$this->is_completed()
+            && $this->participant_instance->is_overdue;
+    }
+
+    /**
+     * Checks if subject instance is completed.
+     *
+     * @return bool
+     */
+    private function is_completed(): bool {
+        return $this->get_progress_state() instanceof complete;
     }
 
     /**

@@ -29,6 +29,7 @@ use core\entities\user;
 use core\orm\entity\model;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\models\response\participant_section;
+use mod_perform\state\participant_instance\complete;
 use mod_perform\state\participant_instance\participant_instance_availability;
 use mod_perform\state\participant_instance\participant_instance_progress;
 use mod_perform\state\state;
@@ -79,7 +80,8 @@ class participant_instance extends model {
         'participant',
         'core_relationship',
         'participant_sections',
-        'is_for_current_user'
+        'is_for_current_user',
+        'is_overdue',
     ];
 
     protected static function get_entity_class(): string {
@@ -148,6 +150,25 @@ class participant_instance extends model {
      */
     public function get_availability_status(): string {
         return $this->get_availability_state()->get_name();
+    }
+
+    /**
+     * Checks if overdue
+     *
+     * @return bool
+     */
+    public function get_is_overdue(): bool {
+        return !$this->is_completed()
+            && $this->subject_instance->is_overdue;
+    }
+
+    /**
+     * Checks if participant instance is completed.
+     *
+     * @return bool
+     */
+    private function is_completed(): bool {
+        return $this->get_progress_state() instanceof complete;
     }
 
     /**

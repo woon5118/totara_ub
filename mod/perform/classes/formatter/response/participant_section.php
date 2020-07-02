@@ -46,6 +46,7 @@ class participant_section extends entity_model_formatter {
             'section_element_responses' => null,
             'progress_status' => null,
             'availability_status' => null,
+            'is_overdue' => null,
             'participant_instance' => null,
             'answerable_participant_instances' => null,
             'responses_are_visible_to' => null,

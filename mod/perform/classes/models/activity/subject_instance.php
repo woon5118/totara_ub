@@ -31,6 +31,7 @@ use core\orm\entity\model;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 use mod_perform\state\state;
 use mod_perform\state\state_aware;
+use mod_perform\state\subject_instance\complete;
 use mod_perform\state\subject_instance\subject_instance_availability;
 use mod_perform\state\subject_instance\subject_instance_progress;
 
@@ -63,6 +64,7 @@ class subject_instance extends model {
         'progress',
         'availability',
         'created_at',
+        'due_date',
     ];
 
     protected $model_accessor_whitelist = [
@@ -72,6 +74,7 @@ class subject_instance extends model {
         'availability_status',
         'progress_state',
         'availability_state',
+        'is_overdue',
     ];
 
     /** @var subject_instance_entity */
@@ -123,6 +126,27 @@ class subject_instance extends model {
     public function get_availability_status(): string {
         return $this->get_availability_state()->get_name();
     }
+
+    /**
+     * Checks if overdue
+     *
+     * @return bool
+     */
+    public function get_is_overdue(): bool {
+        return !$this->is_completed()
+            && !empty($this->entity->due_date)
+            && time() >= (int)$this->entity->due_date;
+    }
+
+    /**
+     * Checks if subject instance is completed.
+     *
+     * @return bool
+     */
+    private function is_completed(): bool {
+        return $this->get_progress_state() instanceof complete;
+    }
+
 
     /**
      * Update progress status.

@@ -23,7 +23,9 @@
  * @package mod_perform
  */
 
+use core\date_format;
 use core\entities\user;
+use core\webapi\formatter\field\date_field_formatter;
 use mod_perform\entities\activity\filters\subject_instances_about;
 use mod_perform\entities\activity\participant_instance;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
@@ -35,9 +37,12 @@ use mod_perform\models\response\participant_section as participant_section_model
 use mod_perform\state\activity\active;
 use mod_perform\state\participant_instance\in_progress as participant_instance_in_progress;
 use mod_perform\state\participant_instance\not_started as participant_instance_not_started;
+use mod_perform\state\participant_instance\open as participant_instance_open;
 use mod_perform\state\participant_section\in_progress as section_in_progress;
 use mod_perform\state\participant_section\not_started as section_not_started;
+use mod_perform\state\participant_section\open;
 use mod_perform\state\subject_instance\in_progress as subject_instance_in_progress;
+use mod_perform\state\subject_instance\open as subject_instance_open;
 use mod_perform\task\service\subject_instance_creation;
 use totara_core\advanced_feature;
 use totara_core\relationship\resolvers\subject;
@@ -58,6 +63,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
         $activity = $perform_generator->create_full_activities()->first();
         /** @var participant_instance $participant_instance */
         $participant_instance = participant_instance::repository()->get()->first();
+        $participant_instance_model = participant_instance_model::load_by_entity($participant_instance);
         $subject_instance = subject_instance::load_by_id($participant_instance->subject_instance_id);
 
         $subject_relationship = $perform_generator->get_core_relationship(subject::class);
@@ -81,10 +87,18 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
         $expected_subject = [
             'id' => (string) $subject_instance->id,
             'progress_status' => $subject_instance->get_progress_status(),
+            'availability_status' => $subject_instance->get_availability_status(),
+            'created_at' => (new date_field_formatter(date_format::FORMAT_DATE, $subject_instance->get_context()))
+                ->format($subject_instance->created_at),
+            'due_date' => null,
+            'is_overdue' => false,
             'activity' => [
                 'name' => $activity->name,
                 'settings' => [
                     activity_setting::MULTISECTION => false
+                ],
+                'type' => [
+                    'display_name' => $activity->type->display_name
                 ]
             ],
             'subject_user' => [
@@ -99,13 +113,15 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                     ],
                     'participant_id' => $participant_id,
                     'id' => (string) $participant_instance->id,
+                    'availability_status' => participant_instance_open::get_name(),
+                    'is_overdue' => false,
                 ]
             ]
         ];
         $this->assertEquals($expected_subject, $subject['subject']);
 
         $participant = new user($participant_id);
-        $profile_image_url = (new \user_picture($participant->get_record(), 0))->get_url($GLOBALS['PAGE'])->out(false);
+        $profile_image_url = (new user_picture($participant->get_record(), 0))->get_url($GLOBALS['PAGE'])->out(false);
 
         $section = $activity->sections->first();
         $expected_section = [
@@ -131,6 +147,8 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                         'is_for_current_user' => true,
                     ],
                     'progress_status' => section_not_started::get_name(),
+                    'availability_status' => open::get_name(),
+                    'is_overdue' => false,
                 ],
             ],
             'can_participate' => true,
@@ -237,10 +255,10 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
         $participant_section1_manager = $participant_instance_for_manager->participant_sections->find('section_id', $section1->id);
 
         $subject_user = new user($user2->id);
-        $subject_user_profile_image_url = (new \user_picture($user2, 0))->get_url($GLOBALS['PAGE'])->out(false);
+        $subject_user_profile_image_url = (new user_picture($user2, 0))->get_url($GLOBALS['PAGE'])->out(false);
 
         $manager_user = new user($user1->id);
-        $manager_user_profile_image_url = (new \user_picture($user1, 0))->get_url($GLOBALS['PAGE'])->out(false);
+        $manager_user_profile_image_url = (new user_picture($user1, 0))->get_url($GLOBALS['PAGE'])->out(false);
 
 
         // Now fetch the users own instances
@@ -282,6 +300,8 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                 ],
                 'participant_id' => $participant_instance->participant_id,
                 'id' => (string) $participant_instance->id,
+                'availability_status' => participant_instance_open::get_name(),
+                'is_overdue' => false,
             ];
         }
 
@@ -291,10 +311,18 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
         $expected_subject = [
             'id' => $subject_instance->id,
             'progress_status' => subject_instance_in_progress::get_name(),
+            'availability_status' => subject_instance_open::get_name(),
+            'created_at' => (new date_field_formatter(date_format::FORMAT_DATE, $subject_instance->get_context()))
+                ->format($subject_instance->created_at),
+            'due_date' => null,
+            'is_overdue' => false,
             'activity' => [
                 'name' => $activity1->name,
                 'settings' => [
                     activity_setting::MULTISECTION => true
+                ],
+                'type' => [
+                    'display_name' => $activity1->type->display_name
                 ]
             ],
             'subject_user' => [
@@ -328,6 +356,8 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                             'is_for_current_user' => false,
                         ],
                         'progress_status' => section_not_started::get_name(),
+                        'availability_status' => open::get_name(),
+                        'is_overdue' => false,
                     ],
                 ],
                 'can_participate' => false,
@@ -355,6 +385,8 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                             'is_for_current_user' => true,
                         ],
                         'progress_status' => section_not_started::get_name(),
+                        'availability_status' => open::get_name(),
+                        'is_overdue' => false,
                     ],
                     [
                         'id' => $participant_section1_manager->id,
@@ -372,6 +404,8 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                             'is_for_current_user' => false,
                         ],
                         'progress_status' => section_not_started::get_name(),
+                        'availability_status' => open::get_name(),
+                        'is_overdue' => false,
                     ],
                 ],
                 'can_participate' => true,
@@ -399,6 +433,8 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                             'is_for_current_user' => true,
                         ],
                         'progress_status' => section_in_progress::get_name(),
+                        'availability_status' => open::get_name(),
+                        'is_overdue' => false,
                     ],
                 ],
                 'can_participate' => true,
@@ -466,6 +502,8 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                             'is_for_current_user' => true,
                         ],
                         'progress_status' => section_not_started::get_name(),
+                        'availability_status' => open::get_name(),
+                        'is_overdue' => false,
                     ],
                 ],
                 'can_participate' => true,
@@ -493,6 +531,8 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                             'is_for_current_user' => false,
                         ],
                         'progress_status' => section_not_started::get_name(),
+                        'availability_status' => open::get_name(),
+                        'is_overdue' => false,
                     ],
                     [
                         'id' => $participant_section1_manager->id,
@@ -510,6 +550,8 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                             'is_for_current_user' => true,
                         ],
                         'progress_status' => section_not_started::get_name(),
+                        'availability_status' => open::get_name(),
+                        'is_overdue' => false,
                     ],
                 ],
                 'can_participate' => true,
@@ -537,6 +579,8 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                             'is_for_current_user' => false,
                         ],
                         'progress_status' => section_in_progress::get_name(),
+                        'availability_status' => open::get_name(),
+                        'is_overdue' => false,
                     ],
                 ],
                 'can_participate' => false,

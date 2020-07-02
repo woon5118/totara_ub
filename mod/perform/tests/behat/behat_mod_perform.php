@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
@@ -30,6 +30,9 @@ use mod_perform\controllers\activity\manage_activities;
 use mod_perform\controllers\activity\user_activities;
 use mod_perform\controllers\activity\view_user_activity;
 use mod_perform\entities\activity\activity;
+use mod_perform\entities\activity\track;
+use mod_perform\entities\activity\track_user_assignment;
+use mod_perform\entities\activity\subject_instance;
 
 class behat_mod_perform extends behat_base {
 
@@ -804,6 +807,63 @@ class behat_mod_perform extends behat_base {
         $this->execute('behat_general::the_element_should_be_disabled',
             [$css_selector, 'css_element']
         );
+    }
+
+    /**
+     * @When /^I should see the subject instance was created "(?P<date>(?:[^"]|\\")*)" in the "(?P<element>(?:[^"]|\\")*)" "(?P<selector_type>(?:[^"]|\\")*)"$/
+     *
+     * @param string $date
+     * @param string $element
+     * @param string $selector_type
+     * @return void
+     */
+    public function i_should_see_the_subject_instance_was_created(string $date, string $element, string $selector_type): void {
+        $date_text = sprintf("Created %s", $date);
+        $this->execute('behat_general::assert_element_contains_text',
+            [$date_text, $element, $selector_type]
+        );
+    }
+
+    /**
+     * @When /^I should see the subject instance should be completed before "(?P<date>(?:[^"]|\\")*)" in the "(?P<element>(?:[^"]|\\")*)" "(?P<selector_type>(?:[^"]|\\")*)"$/
+     *
+     * @param string $date
+     * @param string $element
+     * @param string $selector_type
+     * @return void
+     */
+    public function i_should_see_the_subject_instance_is_due(string $date, string $element, string $selector_type): void {
+        $date_text = sprintf("Complete before %s", $date);
+        $this->execute('behat_general::assert_element_contains_text',
+            [$date_text, $element, $selector_type]
+        );
+    }
+
+    /**
+     * @When /^Subject instances for "(?P<track_description>(?:[^"]|\\")*)" track are due "(?P<due_date>(?:[^"]|\\")*)"$/
+     *
+     * @param string $track_description
+     * @param string $due_date
+     * @return void
+     */
+    public function subject_instances_for_track_are_due(string $track_description,string $due_date): void {
+        $track = track::repository()
+            ->where('description', $track_description)
+            ->select('id')
+            ->order_by('id')
+            ->first_or_fail();
+
+        $user_assignments = track_user_assignment::repository()
+            ->where('track_id', $track->id)
+            ->select('id')
+            ->get();
+        subject_instance::repository()
+            ->where_in('track_user_assignment_id', $user_assignments->pluck('id'))
+            ->update(
+                [
+                    'due_date' => $due_date
+                ]
+            );
     }
 
     /**

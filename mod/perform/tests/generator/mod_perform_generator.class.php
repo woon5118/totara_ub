@@ -29,6 +29,7 @@ use core\entities\user;
 use core_container\module\module;
 use hierarchy_organisation\entities\organisation;
 use hierarchy_position\entities\position;
+use mod_perform\dates\date_offset;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
@@ -998,7 +999,26 @@ class mod_perform_generator extends component_generator_base {
      */
     public function create_activity_track(array $data): void {
         $activity = $this->get_activity_from_name($data['activity_name']);
-        track::create($activity, $data['track_description']);
+        $track = track::create($activity, $data['track_description']);
+
+        if (isset($data['due_date_offset'])) {
+            $due_date_params = explode(',', $data['due_date_offset']);
+
+            if (count($due_date_params) > 0) {
+                $data = [
+                    'count' => trim($due_date_params[0]),
+                    'unit' => isset($due_date_params[1])
+                        ? trim($due_date_params[1])
+                        : date_offset::UNIT_DAY,
+                    'direction' => isset($due_date_params[2])
+                        ? trim($due_date_params[2])
+                        : date_offset::DIRECTION_AFTER,
+                ];
+                $due_date_offset = date_offset::create_from_json($data);
+                $track->set_due_date_relative($due_date_offset);
+                $track->update();
+            }
+        }
     }
 
     /**

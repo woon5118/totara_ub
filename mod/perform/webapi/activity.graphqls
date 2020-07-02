@@ -75,7 +75,9 @@ type mod_perform_subject_instance {
   activity: mod_perform_activity!
   progress_status: mod_perform_subject_instance_progress_status!
   availability_status: mod_perform_subject_instance_availability_status!
-  created_at(format: core_date_format = DATE): core_date
+  created_at(format: core_date_format = DATE): core_date!
+  due_date(format: core_date_format = DATETIME): core_date
+  is_overdue: Boolean!
   subject_user: core_user!
   participant_instances: [mod_perform_participant_instance!]!
 }
@@ -91,6 +93,7 @@ type mod_perform_participant_instance {
   participant: core_user!
   progress_status: mod_perform_participant_instance_progress_status!
   availability_status: mod_perform_participant_instance_availability_status!
+  is_overdue: Boolean!
   core_relationship: totara_core_relationship!
 }
 

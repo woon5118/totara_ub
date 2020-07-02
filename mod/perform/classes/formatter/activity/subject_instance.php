@@ -44,6 +44,8 @@ class subject_instance extends entity_model_formatter {
             'id' => null,
             'activity' => null,
             'created_at' => date_field_formatter::class,
+            'due_date' => date_field_formatter::class,
+            'is_overdue' => null,
             'subject_user' => null,
             'progress_status' => null,
             'availability_status' => null,
