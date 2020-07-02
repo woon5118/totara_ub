@@ -3,6 +3,7 @@ Information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* Removed tabindex="0" from non-interactive elements of message_popover
 * Removed tabindex="0" from non-interactive elements of notification_popover
 
 === 12.0 ===
