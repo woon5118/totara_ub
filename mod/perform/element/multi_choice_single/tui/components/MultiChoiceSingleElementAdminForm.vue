@@ -17,12 +17,12 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
   @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
-  @package performelement_multi_choice
+  @package performelement_multi_choice_single
 -->
 <template>
   <ElementAdminForm :type="type" :error="error" @remove="$emit('remove')">
     <template v-slot:content>
-      <div class="tui-elementEditMultiChoice">
+      <div class="tui-elementEditMultiChoiceSingle">
         <Uniform
           v-if="initialValues"
           v-slot="{ getSubmitting }"
@@ -32,7 +32,9 @@
           @submit="handleSubmit"
         >
           <FormRow
-            :label="$str('question_title', 'performelement_multi_choice')"
+            :label="
+              $str('question_title', 'performelement_multi_choice_single')
+            "
           >
             <FormText
               name="rawTitle"
@@ -41,7 +43,10 @@
           </FormRow>
           <FormRow
             :label="
-              $str('single_select_options', 'performelement_multi_choice')
+              $str(
+                'single_select_options',
+                'performelement_multi_choice_single'
+              )
             "
           >
             <FieldArray v-slot="{ items, push, remove }" path="answers">
@@ -54,14 +59,14 @@
                 @remove="(item, i) => remove(i)"
               >
                 <template v-slot="{ row, index }">
-                  <div class="tui-elementEditMultiChoice__option">
+                  <div class="tui-elementEditMultiChoiceSingle__option">
                     <FormText
                       :name="[index]"
                       :validations="v => [v.required()]"
                       :aria-label="
                         $str(
                           'answer_text',
-                          'performelement_multi_choice',
+                          'performelement_multi_choice_single',
                           index + 1
                         )
                       "
@@ -72,7 +77,7 @@
                   <ButtonIcon
                     :aria-label="$str('add', 'moodle')"
                     :styleclass="{ small: true }"
-                    class="tui-elementEditMultiChoice__add-option"
+                    class="tui-elementEditMultiChoiceSingle__add-option"
                     @click="push()"
                   >
                     <AddIcon />
@@ -88,7 +93,7 @@
           </FormRow>
           <IdentifierInput />
           <FormRow>
-            <div class="tui-elementEditMultiChoice__action-buttons">
+            <div class="tui-elementEditMultiChoiceSingle__action-buttons">
               <FormActionButtons
                 :submitting="getSubmitting()"
                 @cancel="cancel"
@@ -168,7 +173,7 @@ export default {
   },
   methods: {
     /**
-     * Handle multi choice element submit data
+     * Handle multi choice single element submit data
      * @param values
      */
     handleSubmit(values) {
@@ -196,7 +201,7 @@ export default {
 </script>
 <lang-strings>
   {
-    "performelement_multi_choice": [
+    "performelement_multi_choice_single": [
         "error_question_required",
         "question_title",
         "answer_text",

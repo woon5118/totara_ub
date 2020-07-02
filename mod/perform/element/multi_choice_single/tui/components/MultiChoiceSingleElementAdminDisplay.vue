@@ -17,7 +17,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
   @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
-  @package performelement_multi_choice
+  @package performelement_multi_choice_single
 -->
 <template>
   <ElementAdminDisplay

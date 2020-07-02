@@ -99,21 +99,21 @@ Feature: Viewing other responses
     And I click on "John is participating subject" "link"
     # Add multiple elements
     And I navigate to manage perform activity content page
-    And I click multi choice question element
+    And I click multi choice single question element
     When I set the following fields to these values:
       | rawTitle   | Question three |
       | answers[0] | Option one |
       | answers[1] | Option two |
     And I click on the "responseRequired" tui checkbox
-    And I save multi choice question element data
+    And I save multi choice single question element data
     Then I should see "Required"
-    And I click multi choice question element
+    And I click multi choice single question element
     When I set the following fields to these values:
       | rawTitle   | Question four |
       | answers[0] | Option one |
       | answers[1] | Option two |
     And I click on the "responseRequired" tui checkbox
-    And I save multi choice question element data
+    And I save multi choice single question element data
     Then I should see "Required"
     And I close the tui notification toast
     And I close the tui modal

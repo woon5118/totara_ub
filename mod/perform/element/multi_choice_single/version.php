@@ -15,25 +15,15 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
  * @package performelement_multi_choice
  */
 
-namespace performelement_multi_choice;
+defined('MOODLE_INTERNAL') || die();
 
-use mod_perform\models\response\element_validation_error;
-
-class option_required_error extends element_validation_error {
-
-    public const OPTION_REQUIRED = 'OPTION_REQUIRED';
-
-    public function __construct() {
-        $error_code = self::OPTION_REQUIRED;
-        $error_message = get_string('error_answer_required', 'performelement_multi_choice');
-
-        parent::__construct($error_code, $error_message);
-    }
-
-}
+$plugin->version  = 2020020700;       // The current module version (Date: YYYYMMDDXX).
+$plugin->requires = 2016120505;       // Requires this Moodle version.
+$plugin->component = 'performelement_multi_choice_single'; // To check on upgrade, that module sits in correct place
+$plugin->maturity  = MATURITY_STABLE;

@@ -18,26 +18,26 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <nathan.lewis@totaralearning.com>
- * @package performelement_multi_choice
+ * @package performelement_multi_choice_single
  */
 
 use core\format;
 use mod_perform\formatter\activity\element_data_field_formatter;
 use mod_perform\models\activity\element_plugin;
-use performelement_multi_choice\formatter\data_field_formatter;
-use performelement_multi_choice\multi_choice;
+use performelement_multi_choice_single\formatter\data_field_formatter;
+use performelement_multi_choice_single\multi_choice_single;
 
 /**
  * @group perform
  */
-class performelement_multi_choice_data_field_formatter_testcase extends advanced_testcase {
+class performelement_multi_choice_single_data_field_formatter_testcase extends advanced_testcase {
 
     public function test_format() {
         global $CFG;
         require_once($CFG->libdir . '/filterlib.php');
 
-        /** @var multi_choice $plugin */
-        $plugin = element_plugin::load_by_plugin('multi_choice');
+        /** @var multi_choice_single $plugin */
+        $plugin = element_plugin::load_by_plugin('multi_choice_single');
 
         // Initiate through main class
         $formatter_string = element_data_field_formatter::for_plugin($plugin);

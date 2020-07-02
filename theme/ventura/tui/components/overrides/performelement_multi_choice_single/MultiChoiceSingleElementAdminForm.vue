@@ -17,13 +17,18 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
   @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
-  @package performelement_short_text
+  @package performelement_multi_choice_single
 -->
-
 <style lang="scss">
-.tui-elementEditMultiChoiceParticipantResponse {
-  &__noResponse {
-    @include tui-font-hint();
+.tui-elementEditMultiChoiceSingle {
+  &__action-buttons {
+    display: flex;
+    align-items: end;
+    width: 100%;
+    margin-bottom: 0;
+  }
+  &__option {
+    max-width: 200px;
   }
 }
 </style>

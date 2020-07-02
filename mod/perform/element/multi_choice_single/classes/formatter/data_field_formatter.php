@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * This file is part of Totara Learn
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
@@ -18,10 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
- * @package performelement_multi_choice
+ * @package performelement_multi_choice_single
  */
 
-namespace performelement_multi_choice\formatter;
+namespace performelement_multi_choice_single\formatter;
 
 use core\webapi\formatter\field\base;
 use core\webapi\formatter\field\string_field_formatter;
@@ -29,13 +29,13 @@ use core\webapi\formatter\field\string_field_formatter;
 /**
  * This formatter runs the names of the options through the string field formatter
  *
- * @package performelement_multi_choice\formatter
+ * @package performelement_multi_choice_single\formatter
  */
 class data_field_formatter extends base {
 
     /**
      * Goes through all options and runs format on all names
-     * 
+     *
      * @param string $value the json encoded data
      * @return false|string
      */

@@ -19,7 +19,7 @@ Feature: Multiple choice element supports multi-lang filters in titles and optio
 
     # Adding a new item
     And I navigate to manage perform activity content page
-    And I click multi choice question element
+    And I click multi choice single question element
     Then "rawTitle" "field" should be visible
     When I set the following fields to these values:
       | rawTitle   | <span lang="en" class="multilang">it's an English question</span><span lang="de" class="multilang">deutsche Frage</span> |

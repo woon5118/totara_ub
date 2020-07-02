@@ -18,12 +18,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
- * @package performelement_multi_choice
+ * @package performelement_multi_choice_single
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace performelement_multi_choice_single;
 
-$plugin->version  = 2020020700;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2016120505;       // Requires this Moodle version.
-$plugin->component = 'performelement_multi_choice'; // To check on upgrade, that module sits in correct place
-$plugin->maturity  = MATURITY_STABLE;
+use mod_perform\models\activity\respondable_element_plugin;
+
+class multi_choice_single extends respondable_element_plugin {
+
+}

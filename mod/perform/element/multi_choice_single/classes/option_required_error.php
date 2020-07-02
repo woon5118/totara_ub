@@ -15,16 +15,25 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
- * @package performelement_multi_choice
+ * @package performelement_multi_choice_single
  */
 
-namespace performelement_multi_choice;
+namespace performelement_multi_choice_single;
 
-use mod_perform\models\activity\respondable_element_plugin;
+use mod_perform\models\response\element_validation_error;
 
-class multi_choice extends respondable_element_plugin {
+class option_required_error extends element_validation_error {
+
+    public const OPTION_REQUIRED = 'OPTION_REQUIRED';
+
+    public function __construct() {
+        $error_code = self::OPTION_REQUIRED;
+        $error_message = get_string('error_answer_required', 'performelement_multi_choice_single');
+
+        parent::__construct($error_code, $error_message);
+    }
 
 }

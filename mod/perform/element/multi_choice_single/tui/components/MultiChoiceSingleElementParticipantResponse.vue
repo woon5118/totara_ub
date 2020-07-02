@@ -17,21 +17,21 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
   @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
-  @package performelement_multi_choice
+  @package performelement_multi_choice_single
 -->
 <template>
-  <div class="tui-elementEditMultiChoiceParticipantResponse">
+  <div class="tui-elementEditMultiChoiceSingleParticipantResponse">
     <div
       v-if="answerOption"
-      class="tui-elementEditMultiChoiceParticipantResponse__answer"
+      class="tui-elementEditMultiChoiceSingleParticipantResponse__answer"
     >
       {{ answerOption }}
     </div>
     <div
       v-else
-      class="tui-elementEditMultiChoiceParticipantResponse__noResponse"
+      class="tui-elementEditMultiChoiceSingleParticipantResponse__noResponse"
     >
-      {{ $str('no_response_submitted', 'performelement_multi_choice') }}
+      {{ $str('no_response_submitted', 'performelement_multi_choice_single') }}
     </div>
   </div>
 </template>
@@ -68,7 +68,7 @@ export default {
 </script>
 <lang-strings>
   {
-    "performelement_multi_choice": [
+    "performelement_multi_choice_single": [
       "no_response_submitted"
     ]
   }
