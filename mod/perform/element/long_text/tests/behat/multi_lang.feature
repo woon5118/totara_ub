@@ -67,5 +67,4 @@ Feature: Long text element supports multi-lang filters in titles
     And I navigate to the outstanding perform activities list page
     And I click on "John is participating subject" "link"
     Then I should see "John is participating subject" in the ".tui-performUserActivity h2" "css_element"
-    And I should see "Part one"
     And I should see "changed & updated"

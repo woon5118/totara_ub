@@ -76,7 +76,10 @@
 
         <div class="tui-participantContent__section">
           <div class="tui-participantContent__sectionHeading">
-            <h3 class="tui-participantContent__sectionHeading-title">
+            <h3
+              v-if="activity.settings.multisection"
+              class="tui-participantContent__sectionHeading-title"
+            >
               {{ section.display_title }}
             </h3>
 

@@ -136,7 +136,7 @@ Feature: Respond to activity with multiple sections
     Given I log in as "user1"
     And I navigate to the outstanding perform activities list page
     When I click on "Open activity" "link"
-    Then I should see "section A"
+    Then I should see "Open activity" in the ".tui-participantContent__header" "css_element"
     And I answer "short text" question "test element title" with "John Answer one"
     And I click on "Submit" "button"
     Then I should see "Once submitted, your responses will be visible to other users who have permission to view them."

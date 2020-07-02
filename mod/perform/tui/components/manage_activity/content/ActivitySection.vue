@@ -168,6 +168,7 @@
       :open="deleteSectionModalOpen"
       :title="$str('modal_section_delete_title', 'mod_perform')"
       :confirm-button-text="$str('delete')"
+      :close-button="false"
       :loading="deleting"
       @confirm="deleteSection"
       @cancel="closeDeleteSectionModal"

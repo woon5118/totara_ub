@@ -64,14 +64,11 @@
 
   &__sectionHeading {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     margin-top: var(--tui-gap-6);
 
-    &-switch {
-      margin: auto 0;
-    }
-
     &-title {
+      flex: 1;
       margin: auto 0;
       @include tui-font-heading-small();
     }

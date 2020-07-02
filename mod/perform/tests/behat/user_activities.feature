@@ -27,7 +27,6 @@ Feature: Viewing and responding to perform activities
 
     When I click on "John is participating subject" "link"
     Then I should see "John is participating subject" in the ".tui-performUserActivity h2" "css_element"
-    And I should see "Part one"
     And I should see that show others responses is toggled "off"
     And I should see perform "short text" question "Question one" is unanswered
     And I should see perform "short text" question "Question two" is unanswered
@@ -59,8 +58,7 @@ Feature: Viewing and responding to perform activities
       | David is subject | David Two | Not yet started | Not yet started           |
 
     When I click on "David is subject" "link"
-    Then I should see "David is subject" in the ".tui-performUserActivity h2" "css_element"
-    And I should see "Part one"
+    Then I should see "David is subject" in the ".tui-participantContent__header" "css_element"
     And I should see that show others responses is toggled "off"
     And I should see perform "short text" question "Question one" is unanswered
     And I should see perform "short text" question "Question two" is unanswered
@@ -95,7 +93,6 @@ Feature: Viewing and responding to perform activities
     When I click on "Continue" "button"
     Then I should see "single user manager-appraiser" in the ".tui-performUserActivity h2" "css_element"
     And I should see perform activity relationship to user "Manager"
-    And I should see "Part one"
     And I should see that show others responses is toggled "off"
     And I should see perform "short text" question "Question one" is unanswered
 
@@ -114,7 +111,6 @@ Feature: Viewing and responding to perform activities
     And I click on "Continue" "button"
     Then I should see "single user manager-appraiser" in the ".tui-performUserActivity h2" "css_element"
     And I should see perform activity relationship to user "Appraiser"
-    And I should see "Part one"
     And I should see that show others responses is toggled "off"
     And I should see perform "short text" question "Question one" is unanswered
 
@@ -132,7 +128,6 @@ Feature: Viewing and responding to perform activities
     When I click on "Continue" "button"
     Then I should see "single user manager-appraiser" in the ".tui-performUserActivity h2" "css_element"
     And I should see perform activity relationship to user "Manager"
-    And I should see "Part one"
     And I should see that show others responses is toggled "on"
     And I should see "Appraiser response"
     And I should see "My first answer as appraiser"
@@ -146,7 +141,7 @@ Feature: Viewing and responding to perform activities
       | John is participating subject | Not yet started | Not yet started           |
 
     When I click on "John is participating subject" "link"
-    Then I should see "Part one"
+    Then I should see "John is participating subject" in the ".tui-participantContent__header" "css_element"
 
     When I navigate to the outstanding perform activities list page
     Then I should see the tui datatable contains:
