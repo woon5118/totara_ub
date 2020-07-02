@@ -72,8 +72,8 @@ if (!in_array($filesource, array(TCI_SOURCE_EXTERNAL, TCI_SOURCE_UPLOAD))) {
     set_config('filesource', $filesource, 'totara_completionimport');
 }
 
-$PAGE->set_heading(format_string($heading));
-$PAGE->set_title(format_string($heading));
+$PAGE->set_heading($heading);
+$PAGE->set_title($heading);
 $PAGE->set_url('/totara/completionimport/upload.php');
 admin_externalpage_setup('totara_completionimport_upload');
 

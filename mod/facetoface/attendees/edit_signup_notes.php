@@ -80,7 +80,7 @@ if ($fromform = $mform->get_data()) {
 
 $pagetitle = format_string($seminar->get_name());
 
-$PAGE->set_title(format_string($seminar->get_name(), true, array('context' => $context)));
+$PAGE->set_title($seminar->get_name());
 $PAGE->set_heading($course->fullname);
 
 echo $OUTPUT->header();

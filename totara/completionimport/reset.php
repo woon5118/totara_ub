@@ -42,8 +42,8 @@ $heading = get_string('resetimport', 'totara_completionimport');
 $thisurl = '/totara/completionimport/reset.php';
 
 $PAGE->set_context($context);
-$PAGE->set_heading(format_string($heading));
-$PAGE->set_title(format_string($heading));
+$PAGE->set_heading($heading);
+$PAGE->set_title($heading);
 $PAGE->set_url($thisurl, $pageparams);
 admin_externalpage_setup('totara_completionimport_reset');
 

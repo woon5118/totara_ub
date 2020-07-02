@@ -60,8 +60,8 @@ $rolesassigned = array_keys(totara_get_cohort_roles($cohort->id));
 
 $PAGE->set_context($contextsystem);
 $PAGE->set_url('/totara/cohort/assignroles.php', array('id' => $id));
-$PAGE->set_title(format_string($cohort->name));
-$PAGE->set_heading(format_string($cohort->name));
+$PAGE->set_title($cohort->name);
+$PAGE->set_heading($cohort->name);
 
 $strheading = get_string('assignroles', 'totara_cohort');
 totara_cohort_navlinks($cohort->id, format_string($cohort->name), $strheading);

@@ -60,7 +60,7 @@ $pagetitle = format_string(get_string('deletecompetencyevidence', 'totara_hierar
 
 $PAGE->navbar->add(get_string('deletecompetencyevidence', 'totara_hierarchy'));
 $PAGE->set_title($pagetitle);
-$PAGE->set_heading(format_string($SITE->fullname));
+$PAGE->set_heading($SITE->fullname);
 echo $OUTPUT->header($pagetitle);
 
 // prompt to delete

@@ -76,7 +76,7 @@ $actionurl->param('confirm', '1');
 $PAGE->set_url($url);
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('editinga', 'moodle', 'facetoface'));
-$PAGE->set_heading(format_string($SITE->fullname));
+$PAGE->set_heading($SITE->fullname);
 echo $OUTPUT->header();
 echo $OUTPUT->confirm($actionstr, $actionurl, $url);
 echo $OUTPUT->footer($course);

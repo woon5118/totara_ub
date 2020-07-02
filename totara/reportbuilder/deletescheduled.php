@@ -76,7 +76,7 @@ if ($confirm == 1) {
 }
 /// Display page
 $PAGE->set_title(get_string('deletescheduledreport', 'totara_reportbuilder'));
-$PAGE->set_heading(format_string($SITE->fullname));
+$PAGE->set_heading($SITE->fullname);
 echo $OUTPUT->header();
 
 echo $OUTPUT->heading(get_string('deletescheduledreport', 'totara_reportbuilder'));

@@ -98,7 +98,7 @@ if ($PAGE->user_allowed_editing()) {
 
 $PAGE->set_totara_menu_selected('\totara_core\totara\menu\myteam');
 $PAGE->set_title($strheading);
-$PAGE->set_heading(format_string($SITE->fullname));
+$PAGE->set_heading($SITE->fullname);
 $PAGE->set_button($report->edit_button().$editbutton);
 
 /** @var totara_reportbuilder_renderer $renderer */

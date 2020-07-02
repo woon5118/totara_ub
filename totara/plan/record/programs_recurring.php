@@ -127,7 +127,7 @@ $PAGE->navbar->add($strheading, new moodle_url('/totara/plan/record/index.php', 
 $PAGE->navbar->add($strsubheading);
 $PAGE->set_title($strheading);
 $PAGE->set_button($report->edit_button());
-$PAGE->set_heading(format_string($SITE->fullname));
+$PAGE->set_heading($SITE->fullname);
 
 $ownplan = $USER->id == $userid;
 

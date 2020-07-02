@@ -89,7 +89,7 @@ $PAGE->navbar->add(get_string('allevidence', 'totara_plan'), new moodle_url('/to
 $PAGE->navbar->add(get_string('evidenceview', 'totara_plan'));
 
 $PAGE->set_title($strheading);
-$PAGE->set_heading(format_string($SITE->fullname));
+$PAGE->set_heading($SITE->fullname);
 dp_display_plans_menu($userid, 0, $usertype, 'evidence/index', 'none', false);
 echo $OUTPUT->header();
 

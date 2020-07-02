@@ -42,8 +42,8 @@ $a = new stdClass();
 $a->fullname = fullname($user, true);
 $stremailupdate = get_string('emailupdate', 'auth', $a);
 
-$PAGE->set_title(format_string($SITE->fullname) . ": $stremailupdate");
-$PAGE->set_heading(format_string($SITE->fullname) . ": $stremailupdate");
+$PAGE->set_title($SITE->fullname . ": $stremailupdate");
+$PAGE->set_heading($SITE->fullname . ": $stremailupdate");
 
 if (empty($preferences['newemailattemptsleft'])) {
     redirect("$CFG->wwwroot/user/view.php?id=$user->id");

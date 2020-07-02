@@ -92,7 +92,7 @@ $pagetitle = format_string(get_string('report', 'totara_core') . ': ' . $fullnam
 $PAGE->navbar->add(get_string('view'));
 $PAGE->set_title($pagetitle);
 $PAGE->set_button($report->edit_button() . $PAGE->button);
-$PAGE->set_heading(format_string($SITE->fullname));
+$PAGE->set_heading($SITE->fullname);
 echo $OUTPUT->header();
 
 // This must be done after the header and before any other use of the report.

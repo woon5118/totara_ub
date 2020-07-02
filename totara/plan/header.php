@@ -58,7 +58,7 @@ if ($is_component) {
 }
 
 $PAGE->set_title($pagetitle);
-$PAGE->set_heading(format_string($SITE->fullname));
+$PAGE->set_heading($SITE->fullname);
 
 // Plan menu
 dp_display_plans_menu($this->userid, $this->id, $this->role);

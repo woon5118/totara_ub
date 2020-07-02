@@ -88,7 +88,7 @@ $PAGE->navbar->add($strheading);
 
 $PAGE->set_title($strheading);
 $PAGE->set_button($report->edit_button());
-$PAGE->set_heading(format_string($SITE->fullname));
+$PAGE->set_heading($SITE->fullname);
 
 /** @var totara_reportbuilder_renderer $output */
 $output = $PAGE->get_renderer('totara_reportbuilder');

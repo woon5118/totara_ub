@@ -73,8 +73,8 @@ if (!$report = reportbuilder::create_embedded($shortname, $config)) {
 }
 
 $pageheading = get_string('pluginname', 'totara_completionimport');
-$PAGE->set_heading(format_string($pageheading));
-$PAGE->set_title(format_string($pageheading));
+$PAGE->set_heading($pageheading);
+$PAGE->set_title($pageheading);
 $PAGE->set_pagelayout('noblocks');
 $PAGE->set_button($report->edit_button());
 $pageparams['format'] = $format;

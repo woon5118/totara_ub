@@ -48,8 +48,8 @@ $program->check_enabled();
 
 $PAGE->set_url(new moodle_url('/totara/program/edit_messages.php', array('id' => $id)));
 $PAGE->set_program($program);
-$PAGE->set_title(format_string($program->fullname));
-$PAGE->set_heading(format_string($program->fullname));
+$PAGE->set_title($program->fullname);
+$PAGE->set_heading($program->fullname);
 
 // Javascript include.
 local_js(array(

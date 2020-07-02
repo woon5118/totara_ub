@@ -33,7 +33,7 @@ if (!$facetofaceid) {
     $url = new moodle_url('/mod/facetoface/reports/interests.php');
     $PAGE->set_url($url);
     $PAGE->set_context(context_system::instance());
-    $PAGE->set_heading(format_string($SITE->fullname));
+    $PAGE->set_heading($SITE->fullname);
     $PAGE->set_title(get_string('declareinterestreport', 'mod_facetoface'));
     echo $OUTPUT->header();
     echo $OUTPUT->container(get_string('gettointerestreport', 'mod_facetoface', $url->out()));

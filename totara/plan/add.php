@@ -147,7 +147,7 @@ $PAGE->requires->js_call_amd('totara_plan/templates', 'init', $args);
 dp_display_plans_menu($userid);
 
 $PAGE->set_title($pagetitle);
-$PAGE->set_heading(format_string($SITE->fullname));
+$PAGE->set_heading($SITE->fullname);
 echo $OUTPUT->header();
 
 // Plan page content

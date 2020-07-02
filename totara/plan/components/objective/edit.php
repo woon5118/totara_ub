@@ -222,7 +222,7 @@ switch($action) {
 }
 
 $PAGE->set_title($pagetitle);
-$PAGE->set_heading(format_string($SITE->fullname));
+$PAGE->set_heading($SITE->fullname);
 dp_display_plans_menu($plan->userid,$plan->id,$plan->role);
 
 echo $OUTPUT->header();

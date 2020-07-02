@@ -91,7 +91,7 @@ $PAGE->set_url(new moodle_url('/totara/plan/action.php', $pageparams));
 /// Load plan
 ///
 $plan = new development_plan($id);
-$PAGE->set_heading(format_string($SITE->fullname));
+$PAGE->set_heading($SITE->fullname);
 
 ///
 /// Permissions check

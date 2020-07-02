@@ -69,8 +69,8 @@ $params['progid'] = $programid;
 
 $heading = get_string('completecourse', 'totara_program');
 $PAGE->set_context($coursecontext);
-$PAGE->set_heading(format_string($heading));
-$PAGE->set_title(format_string($heading));
+$PAGE->set_heading($heading);
+$PAGE->set_title($heading);
 $PAGE->set_url('/totara/program/content/completecourse.php', $params);
 prog_add_required_learning_base_navlinks($userid);
 if (!$progname = $DB->get_field('prog', 'fullname', array('id' => $programid))) {

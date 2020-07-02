@@ -65,7 +65,7 @@ dp_get_plan_base_navlinks($planuser);
 dp_display_plans_menu($planuser,0,$role);
 
 $PAGE->set_title($heading);
-$PAGE->set_heading(format_string($SITE->fullname));
+$PAGE->set_heading($SITE->fullname);
 echo $OUTPUT->header();
 
 if ($planuser != $USER->id) {

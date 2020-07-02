@@ -32,7 +32,7 @@ require_capability('tool/totara_sync:manage', $systemcontext);
 
 $pagetitle = get_string('syncexecute', 'tool_totara_sync');
 $PAGE->set_title($pagetitle);
-$PAGE->set_heading(format_string($SITE->fullname));
+$PAGE->set_heading($SITE->fullname);
 $execute = optional_param('execute', null, PARAM_BOOL);
 
 echo $OUTPUT->header();

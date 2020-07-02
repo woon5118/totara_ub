@@ -70,7 +70,7 @@ $pagetitle = get_string('extensions', 'totara_program');
 
 $PAGE->navbar->add($heading);
 $PAGE->set_title($pagetitle);
-$PAGE->set_heading(format_string($SITE->fullname));
+$PAGE->set_heading($SITE->fullname);
 echo $OUTPUT->header();
 
 if (!empty($userid)) {

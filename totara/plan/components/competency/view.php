@@ -168,7 +168,7 @@ if ($data = data_submitted() && $canupdate && !$plan->is_complete()) {
 $fullname = $plan->name;
 $pagetitle = format_string(get_string('learningplan', 'totara_plan').': '.$fullname);
 $PAGE->set_title($pagetitle);
-$PAGE->set_heading(format_string($SITE->fullname));
+$PAGE->set_heading($SITE->fullname);
 dp_get_plan_base_navlinks($plan->userid);
 $PAGE->navbar->add($fullname, new moodle_url('/totara/plan/view.php', array('id' => $id)));
 $PAGE->navbar->add(get_string("{$component->component}plural", 'totara_plan'), new moodle_url($component->get_url()));

@@ -55,8 +55,8 @@ if (!has_capability('totara/program:handleexceptions', $programcontext)) {
 
 $PAGE->set_url($baseurl);
 $PAGE->set_program($program);
-$PAGE->set_title(format_string($program->fullname));
-$PAGE->set_heading(format_string($program->fullname));
+$PAGE->set_title($program->fullname);
+$PAGE->set_heading($program->fullname);
 
 // This session variable will be set to true following resolution of issues.
 // This allows the page number to be reset (otherwise there is a chance that the

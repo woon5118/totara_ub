@@ -91,7 +91,7 @@ if ($category and !$category->is_uservisible()) {
 $menuitem = $viewtype == 'program' ? '\totara_coursecatalog\totara\menu\programs' : '\totara_coursecatalog\totara\menu\certifications';
 
 $PAGE->set_totara_menu_selected($menuitem);
-$PAGE->set_heading(format_string($site->fullname));
+$PAGE->set_heading($site->fullname);
 $content = $programrenderer->program_category($categoryid, $viewtype);
 
 echo $OUTPUT->header();

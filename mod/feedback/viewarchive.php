@@ -63,8 +63,8 @@ require_capability('mod/feedback:viewarchive', $context);
 
 $heading = get_string('viewarchive', 'feedback');
 $PAGE->set_context($context);
-$PAGE->set_heading(format_string($heading));
-$PAGE->set_title(format_string($heading));
+$PAGE->set_heading($heading);
+$PAGE->set_title($heading);
 $PAGE->set_url('/mod/feedback/viewarchive.php', $filters);
 
 echo $OUTPUT->header();

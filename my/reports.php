@@ -41,7 +41,7 @@ $PAGE->set_context(context_system::instance());
 $PAGE->set_pagelayout('standard');
 $PAGE->set_pagetype('my-reports');
 $PAGE->set_title($strheading);
-$PAGE->set_heading(format_string($SITE->fullname));
+$PAGE->set_heading($SITE->fullname);
 $PAGE->set_url(new moodle_url('/my/reports.php'));
 $PAGE->set_totara_menu_selected('\totara_core\totara\menu\myreports');
 $PAGE->navbar->add($strheading);

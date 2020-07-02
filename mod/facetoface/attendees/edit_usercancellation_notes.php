@@ -42,7 +42,7 @@ $context = context_module::instance($cm->id);
 $PAGE->set_url($url);
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('standard');
-$PAGE->set_title(format_string($seminar->get_name()));
+$PAGE->set_title($seminar->get_name());
 $PAGE->set_heading($course->fullname);
 
 // Check essential permissions.
@@ -79,7 +79,7 @@ if ($fromform = $mform->get_data()) {
 
 $pagetitle = format_string($seminar->get_name());
 
-$PAGE->set_title(format_string($seminar->get_name(), true, array('context' => $context)));
+$PAGE->set_title($seminar->get_name());
 $PAGE->set_heading($course->fullname);
 
 echo $OUTPUT->header();

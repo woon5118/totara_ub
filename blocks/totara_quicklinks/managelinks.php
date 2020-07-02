@@ -103,7 +103,7 @@ $strmanage = get_string('managelinks', 'block_totara_quicklinks');
 
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title($strmanage);
-$PAGE->set_heading(format_string($SITE->fullname));
+$PAGE->set_heading($SITE->fullname);
 
 $managefeeds = new moodle_url('/blocks/totara_quicklinks/managelinks.php', $urlparams);
 $PAGE->navbar->add(get_string('blocks'));
