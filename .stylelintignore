@@ -99,3 +99,5 @@ theme/roots/less/totara/totara_jquery/
 theme/roots/less/bootstrap3/
 theme/legacy/scss/
 theme/legacy/style/settings-noprocess.css
+theme/legacy/style/totara.css
+theme/legacy/style/totara-rtl.css

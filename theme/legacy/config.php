@@ -28,11 +28,8 @@ $THEME->name = 'legacy';
 $THEME->parents = ['base'];
 $THEME->enable_dock = true;
 $THEME->enable_hide = true;
-// $THEME->sheets = ['totara', 'settings-noprocess'];
+$THEME->sheets = ['totara'];
 $THEME->enable_dock = true;
-$THEME->scss = function($theme) {
-    return theme_legacy_get_main_scss_content($theme);
-};
 
 $THEME->rendererfactory = 'theme_overridden_renderer_factory';
 // $THEME->csspostprocess = 'theme_legacy_process_css';

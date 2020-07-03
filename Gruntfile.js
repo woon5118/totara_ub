@@ -182,11 +182,13 @@ module.exports = function(grunt) {
 
     // Globbing pattern for Less source files.
     var lessSrc;
+    var sassSrc = [];
     var themeStylelintIgnores;
 
     if (inTheme) {
         // Single theme less only.
         lessSrc = [cwd + '/less/*.less'];
+        sassSrc = [cwd + '/scss/*.scss'];
         themeStylelintIgnores = [cwd + '/.stylelintignore'];
         grunt.verbose.writeln('Current directory is a theme.');
     } else if (localLess) {
@@ -199,6 +201,9 @@ module.exports = function(grunt) {
         lessSrc = [
             '**/less/styles.less',
             'theme/*/less/*.less'
+        ];
+        sassSrc = [
+            'theme/*/scss/*.scss'
         ];
         themeStylelintIgnores = ['theme/*/.stylelintignore'];
     }
@@ -222,6 +227,32 @@ module.exports = function(grunt) {
         // In themes CSS files are stored in styles directory.
         if (themePath === true) {
             var filename = path.basename(srcPath, '.less') + '.css';
+            return path.join(path.dirname(path.dirname(srcPath)), 'style', filename);
+        }
+
+        // Component - styles.css file only.
+        return path.join(path.dirname(path.dirname(srcPath)), 'styles.css');
+    };
+
+    /**
+     * Generate destination paths for compiled Sass files.
+     *
+     * @param {String} destPath The current destination
+     * @param {String} srcPath The  matched src path
+     * @return {String} The rewritten destination path.
+     */
+    var sass_rename = function(destPath, srcPath) {
+        var themePath = false;
+        var upThreeDirs = path.basename(path.dirname(path.dirname(path.dirname(srcPath))));
+        var customThemeDir = path.basename(grunt.config('themedir') || '');
+
+        if (upThreeDirs === 'theme' || upThreeDirs === customThemeDir) {
+            themePath = true;
+        }
+
+        // In themes CSS files are stored in styles directory.
+        if (themePath === true) {
+            var filename = path.basename(srcPath, '.scss') + '.css';
             return path.join(path.dirname(path.dirname(srcPath)), 'style', filename);
         }
 
@@ -358,6 +389,15 @@ module.exports = function(grunt) {
         return cssFiles;
     };
 
+    var sassImporter = function(url) {
+        const result = /^theme_(\w+)\/(.*)/.exec(url);
+        if (result) {
+            const filePath = path.join(__dirname, 'theme', result[1], 'scss', result[2] + '');
+            return {file: filePath};
+        }
+        return null;
+    };
+
     // Project configuration.
     grunt.initConfig({
         eslint: {
@@ -397,6 +437,21 @@ module.exports = function(grunt) {
                     expand: true,
                     src: lessSrc,
                     rename: less_rename
+                }]
+            }
+        },
+        sass: {
+            // Totara: Dedicated Sass target.
+            totara: {
+                options: {
+                    implementation: require('sass'),
+                    importer: sassImporter,
+                    outputStyle: 'compressed'
+                },
+                files: [{
+                    expand: true,
+                    src: sassSrc,
+                    rename: sass_rename
                 }]
             }
         },
@@ -440,19 +495,6 @@ module.exports = function(grunt) {
                     expand: true,
                     src: prefixSrc,
                     filter: prefix_filter
-                }]
-            },
-            prefixlegacy: {
-                options: {
-                    processors: [
-                        require('autoprefixer')()
-                    ],
-                    parser: require('postcss-scss'),
-                    stringifier: require('postcss-scss'),
-                },
-                files: [{
-                    expand: true,
-                    src: 'theme/legacy/scss/**/*.scss'
                 }]
             },
             rtl: {
@@ -730,6 +772,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-eslint');
     grunt.loadNpmTasks('grunt-stylelint');
+    grunt.loadNpmTasks('grunt-sass');
 
     // Totara: Load PostCSS.
     grunt.loadNpmTasks('grunt-postcss');
@@ -751,13 +794,13 @@ module.exports = function(grunt) {
 
     // Register CSS taks.
     grunt.registerTask('css', [
-        // 'stylelint:scss', TOTARA: commented out as we don't have any and the library doesn't like that.
+        'stylelint:scss',
         'stylelint:less',
         'less:totara',
+        'sass:totara',
         'postcss:prefix',
         'postcss:rtl',
         'stylelint:css',
-        'postcss:prefixlegacy',
     ]);
 
     // Register the startup task.

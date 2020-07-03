@@ -2,3 +2,5 @@ less/totara/totara_jquery/
 less/bootstrap3/
 scss/
 style/settings-noprocess.css
+style/totara.css
+style/totara-rtl.css
