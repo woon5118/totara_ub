@@ -30,6 +30,7 @@ $THEME->enable_dock = true;
 $THEME->enable_hide = true;
 $THEME->sheets = ['totara'];
 $THEME->enable_dock = true;
+$THEME->minify_css = false;
 
 $THEME->rendererfactory = 'theme_overridden_renderer_factory';
 // $THEME->csspostprocess = 'theme_legacy_process_css';

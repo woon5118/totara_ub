@@ -29,6 +29,7 @@ $THEME->parents = ['legacy', 'base'];
 $THEME->enable_dock = true;
 $THEME->enable_hide = true;
 $THEME->tui = true;
+$THEME->minify_css = false;
 
 $THEME->layouts = array(
     // Most backwards compatible layout with blocks on the left - this is the layout used by default in Totara,

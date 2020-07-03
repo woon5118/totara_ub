@@ -538,6 +538,12 @@ class theme_config {
     public $image_sizes = [];
 
     /**
+     * Post-process minify CSS?
+     * @var bool
+     */
+    public $minify_css = true;
+
+    /**
      * Load the config.php file for a particular theme, and return an instance
      * of this class. (That is, this is a factory method.)
      *
@@ -618,9 +624,10 @@ class theme_config {
             'hidefromselector', 'doctype', 'yuicssmodules', 'blockrtlmanipulations',
             'lessfile', 'extralesscallback', 'lessvariablescallback', 'blockrendermethod',
             'scss', 'extrascsscallback', 'prescsscallback', 'csstreepostprocessor', 'addblockposition');
-        // Totara: Add favicon resolver and image sizes
+        // Totara: Add favicon resolver, image sizes and minify css
         $configurable[] = 'resolvefaviconcallback';
         $configurable[] = 'image_sizes';
+        $configurable[] = 'minify_css';
 
         foreach ($config as $key=>$value) {
             if (in_array($key, $configurable)) {
@@ -998,7 +1005,9 @@ class theme_config {
             }
         }
         $csscontent = $this->post_process($csscontent);
-        $csscontent = core_minify::css($csscontent);
+        if ($this->minify_css) {
+            $csscontent = core_minify::css($csscontent);
+        }
 
         return $csscontent;
     }
