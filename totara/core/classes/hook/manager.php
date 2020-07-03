@@ -99,26 +99,25 @@ abstract class manager {
             if (isset($watcher->includefile) and file_exists($watcher->includefile)) {
                 include_once($watcher->includefile);
             }
+            if (!is_callable($watcher->callback)) {
+                if (empty($CFG->upgraderunning)) {
+                    $callback = get_callable_name($watcher->callback);
+                    debugging("Invalid callable for hook watcher '$callback'", DEBUG_DEVELOPER);
+                }
+                continue;
+            }
             try {
                 $result = call_user_func($watcher->callback, $hook);
-                if ($result === false and !is_callable($watcher->callback)) {
-                    $callback = var_export($watcher->callback, true);
-                    debugging("Cannot execute hook watcher '$callback'", DEBUG_DEVELOPER);
-                }
-            } catch (\Exception $e) {
-                // Watchers are executed before installation and upgrade, this may throw errors.
-                if (empty($CFG->upgraderunning)) {
-                    // Ignore errors during upgrade, otherwise warn developers.
+                if ($result === false) {
                     $callback = get_callable_name($watcher->callback);
-                    debugging("Exception encountered in hook watcher '$callback': " .
-                        $e->getMessage(), DEBUG_DEVELOPER, $e->getTrace());
+                    debugging("Cannot execute hook watcher '$callback'", DEBUG_DEVELOPER);
                 }
             } catch (\Throwable $e) {
                 // Watchers are executed before installation and upgrade, this may throw errors.
                 if (empty($CFG->upgraderunning)) {
                     // Ignore errors during upgrade, otherwise warn developers.
                     $callback = get_callable_name($watcher->callback);
-                    debugging("Error encountered in hook watcher '$callback': " .
+                    debugging("Exception encountered in hook watcher '$callback': " .
                         $e->getMessage(), DEBUG_DEVELOPER, $e->getTrace());
                 }
             }

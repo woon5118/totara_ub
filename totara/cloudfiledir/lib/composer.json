@@ -1,0 +1,12 @@
+{
+  "name": "totara/cloudfiledir",
+  "description": "Library bundle for Cloud file content storage for Totara",
+  "license": "GPL-3.0-or-later",
+  "type": "library",
+  "homepage": "https://totaralearning.com",
+  "require": {
+    "php": ">=7.2.10 <7.5",
+    "aws/aws-sdk-php": "3.143.*",
+    "microsoft/azure-storage-blob": "1.5.*"
+  }
+}

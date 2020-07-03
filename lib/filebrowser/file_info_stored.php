@@ -234,8 +234,7 @@ class file_info_stored extends file_info {
      * @return array|false
      */
     public function get_imageinfo() {
-        $fs = get_file_storage();
-        if ($fs->content_exists($this->lf->get_contenthash())) {
+        if ($this->lf->is_content_available()) {
             return $this->lf->get_imageinfo();
         }
         return false;

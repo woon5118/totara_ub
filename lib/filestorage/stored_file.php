@@ -268,7 +268,7 @@ class stored_file {
 
         $filerecord = new stdClass;
         $contenthash = $newfile->get_contenthash();
-        if ($this->fs->content_exists($contenthash)) {
+        if ($this->fs->content_exists($contenthash) || $this->fs->try_content_recovery($contenthash)) {
             $filerecord->contenthash = $contenthash;
         } else {
             throw new file_exception('storedfileproblem', 'Invalid contenthash, content must be already in filepool', $contenthash);
@@ -384,6 +384,24 @@ class stored_file {
         // Move pool file to trash if content not needed any more.
         $this->fs->deleted_file_cleanup($this->file_record->contenthash);
         return true; // BC only
+    }
+
+    /**
+     * Verify if content file is present in local $CFG->filedir,
+     * if not attempt content recovery by default.
+     *
+     * @param bool $attemptrecovery if content missing then try recovery from trash directory or external store
+     * @return bool
+     */
+    public function is_content_available(bool $attemptrecovery = true): bool {
+        $contenthash = $this->get_contenthash();
+        if ($this->fs->content_exists($contenthash)) {
+            return true;
+        }
+        if (!$attemptrecovery) {
+            return false;
+        }
+        return $this->fs->try_content_recovery($contenthash);
     }
 
     /**

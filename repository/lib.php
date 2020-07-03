@@ -1747,7 +1747,7 @@ abstract class repository implements cacheable_object {
                                                                         'size' => $maxbytesdisplay));
             }
             $fs = get_file_storage();
-            $contentexists = $fs->content_exists($file->get_contenthash());
+            $contentexists = $file->is_content_available();
             if ($contentexists && $file->get_filesize() && $file->get_contenthash() === sha1('')) {
                 // even when 'file_storage::content_exists()' returns true this may be an empty
                 // content for the file that was not actually downloaded

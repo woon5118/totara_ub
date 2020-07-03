@@ -1530,7 +1530,7 @@ class core_plugin_manager {
                 'hierarchy', 'message', 'oauth', 'plan', 'program', 'question', 'reportbuilder',
                 'certification', 'completionimport', 'mssql', 'generator', 'connect', 'form',
                 'gap', 'job', 'completioneditor', 'userdata', 'catalog', 'workflow', 'contentmarketplace',
-                'tenant', 'webapi', 'evidence', 'mvc',
+                'tenant', 'webapi', 'evidence', 'mvc', 'cloudfiledir', 'extfiledir',
             ),
             'tabexport' => array(
                 'csv', 'csv_excel', 'excel', 'ods', 'pdflandscape', 'pdfportrait', 'wkpdflandscape', 'wkpdfportrait',

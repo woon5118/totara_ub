@@ -940,7 +940,7 @@ class file_storage {
      * @param bool $recursive include all subdirectories
      * @param bool $includedirs include files and directories
      * @param string $sort A fragment of SQL to use for sorting
-     * @return array of stored_files indexed by pathanmehash
+     * @return stored_file[] array of stored_files indexed by pathanmehash
      */
     public function get_directory_files($contextid, $component, $filearea, $itemid, $filepath, $recursive = false, $includedirs = true, $sort = "filepath, filename") {
         global $DB;
@@ -1743,6 +1743,10 @@ class file_storage {
             throw new file_reference_exception($repositoryid, $reference, null, null, $e->getMessage());
         }
 
+        if (isset($filerecord->contenthash) && !$this->content_exists($filerecord->contenthash)) {
+            $this->try_content_recovery($filerecord->contenthash);
+        }
+
         if (isset($filerecord->contenthash) && $this->content_exists($filerecord->contenthash)) {
             // there was specified the contenthash for a file already stored in moodle filepool
             if (empty($filerecord->filesize)) {
@@ -2044,6 +2048,10 @@ class file_storage {
         rename($hashfile.'.tmp', $hashfile);
         chmod($hashfile, $this->filepermissions); // Fix permissions if needed.
         @unlink($hashfile.'.tmp'); // Just in case anything fails in a weird way.
+
+        // Totara: support for cloud storage and backup plugins
+        (new \totara_core\hook\filedir_content_file_added($hashfile, $contenthash))->execute();
+
         ignore_user_abort($prev);
 
         return array($contenthash, $filesize, $newfile);
@@ -2113,6 +2121,10 @@ class file_storage {
         rename($hashfile.'.tmp', $hashfile);
         chmod($hashfile, $this->filepermissions); // Fix permissions if needed.
         @unlink($hashfile.'.tmp'); // Just in case anything fails in a weird way.
+
+        // Totara: support for cloud storage and backup plugins
+        (new \totara_core\hook\filedir_content_file_added($hashfile, $contenthash))->execute();
+
         ignore_user_abort($prev);
 
         return array($contenthash, $filesize, $newfile);
@@ -2135,15 +2147,68 @@ class file_storage {
     }
 
     /**
-     * Content exists
+     * Does the content file exist in $CFG->filedir?
+     *
+     * @internal to be used from file API only
      *
      * @param string $contenthash
+     * @param bool $clearstatcache
      * @return bool
      */
-    public function content_exists($contenthash) {
+    public function content_exists(string $contenthash, bool $clearstatcache = false): bool {
         $dir = $this->path_from_hash($contenthash);
         $filepath = $dir . '/' . $contenthash;
+        if ($clearstatcache) {
+            clearstatcache(true, $filepath);
+        }
         return file_exists($filepath);
+    }
+
+    /**
+     * Validate content file hash.
+     *
+     * @internal
+     *
+     * @param string $contenthash
+     * @param bool $deleteinvalid delete invalid content files
+     * @return bool
+     */
+    public function validate_content(string $contenthash, bool $deleteinvalid = false): bool {
+        $dir = $this->path_from_hash($contenthash);
+        $filepath = $dir . '/' . $contenthash;
+        if (!file_exists($filepath)) {
+            return false;
+        }
+        $filehash = sha1_file($filepath);
+        $valid = ($filehash === $contenthash);
+        if ($deleteinvalid && !$valid) {
+            unlink($filepath);
+        }
+        return $valid;
+    }
+
+    /**
+     * Returns length of content file.
+     *
+     * @param string $contenthash
+     * @return int|false stream resource or false on error
+     */
+    public function get_content_length(string $contenthash) {
+        $dir = $this->path_from_hash($contenthash);
+        $filepath = $dir . '/' . $contenthash;
+        return filesize($filepath);
+    }
+
+    /**
+     * Returns stream for reading of content file.
+     *
+     * @param string $contenthash
+     * @return resource|false stream resource or false on error
+     */
+    public function get_content_stream(string $contenthash) {
+        $dir = $this->path_from_hash($contenthash);
+        $filepath = $dir . '/' . $contenthash;
+        return fopen($filepath, 'r');
     }
 
     /**
@@ -2175,13 +2240,66 @@ class file_storage {
     }
 
     /**
-     * Tries to recover missing content of file from trash.
+     * Tries to recover missing content of file.
      *
-     * @param stored_file $file stored_file instance
+     * @internal to be used from file API only
+     *
+     * @param stored_file|string $file stored_file instance or content hash
      * @return bool success
      */
-    public function try_content_recovery($file) {
-        $contenthash = $file->get_contenthash();
+    public function try_content_recovery($file): bool {
+        if ($file instanceof stored_file) {
+            $contenthash = $file->get_contenthash();
+        } else if (preg_match('/^([a-f0-9]{40})$/D', $file)) {
+            $contenthash = $file;
+        } else {
+            debugging('Invalid content file parameter', DEBUG_DEVELOPER);
+            return false;
+        }
+        if ($this->content_exists($contenthash, true)) {
+            // Strange, no need to recover anything.
+            return true;
+        }
+
+        $contentdir = $this->path_from_hash($contenthash);
+        $contentfile = $contentdir . '/' . $contenthash;
+
+        $prev = ignore_user_abort(true);
+
+        $this->try_trashdir_content_recovery($contenthash);
+        if (!file_exists($contentfile)) {
+            if (!is_dir($contentdir)) {
+                if (!mkdir($contentdir, $this->dirpermissions, true)) {
+                    ignore_user_abort($prev);
+                    return false;
+                }
+            }
+            (new \totara_core\hook\filedir_content_file_restore($this, $contenthash))->execute();
+            if (!file_exists($contentfile)) {
+                ignore_user_abort($prev);
+                return false;
+            }
+        }
+
+        @chmod($contentfile, $this->filepermissions); // Fix permissions if needed.
+        (new \totara_core\hook\filedir_content_file_added($contentfile, $contenthash))->execute();
+
+        ignore_user_abort($prev);
+        return true;
+    }
+
+    /**
+     * Tries to recover missing content of file from trash.
+     *
+     * @param stored_file|string $file stored_file instance or content hash
+     * @return bool success
+     */
+    protected function try_trashdir_content_recovery($file): bool {
+        if ($file instanceof stored_file) {
+            $contenthash = $file->get_contenthash();
+        } else {
+            $contenthash = $file;
+        }
         $trashfile = $this->trash_path_from_hash($contenthash).'/'.$contenthash;
         if (!is_readable($trashfile)) {
             if (!is_readable($this->trashdir.'/'.$contenthash)) {
@@ -2190,8 +2308,8 @@ class file_storage {
             // nice, at least alternative trash file in trash root exists
             $trashfile = $this->trashdir.'/'.$contenthash;
         }
-        if (filesize($trashfile) != $file->get_filesize() or sha1_file($trashfile) != $contenthash) {
-            //weird, better fail early
+        if (sha1_file($trashfile) !== $contenthash) {
+            // Invalid trash file.
             return false;
         }
         $contentdir  = $this->path_from_hash($contenthash);
@@ -2229,29 +2347,42 @@ class file_storage {
             // file content is still used
             return;
         }
+
+        $prev = ignore_user_abort(true);
+
         //move content file to trash
         $contentfile = $this->path_from_hash($contenthash).'/'.$contenthash;
-        if (!file_exists($contentfile)) {
-            //weird, but no problem
-            return;
-        }
         $trashpath = $this->trash_path_from_hash($contenthash);
         $trashfile = $trashpath.'/'.$contenthash;
-        if (file_exists($trashfile)) {
+        if (!file_exists($contentfile)) {
+            // Already deleted locally, but it can be still in external filedir clones.
+        } else if (file_exists($trashfile)) {
             // we already have this content in trash, no need to move it there
             unlink($contentfile);
-            return;
+        } else {
+            if (!is_dir($trashpath)) {
+                mkdir($trashpath, $this->dirpermissions, true);
+            }
+            rename($contentfile, $trashfile);
         }
-        if (!is_dir($trashpath)) {
-            mkdir($trashpath, $this->dirpermissions, true);
-        }
-        rename($contentfile, $trashfile);
 
         // Fix permissions, only if needed.
-        $currentperms = octdec(substr(decoct(fileperms($trashfile)), -4));
-        if ((int)$this->filepermissions !== $currentperms) {
-            chmod($trashfile, $this->filepermissions);
+        if (file_exists($trashfile)) {
+            $currentperms = octdec(substr(decoct(fileperms($trashfile)), -4));
+            if ((int)$this->filepermissions !== $currentperms) {
+                chmod($trashfile, $this->filepermissions);
+            }
         }
+
+        // Totara: support for cloud storage and backup plugins
+        $hook = new \totara_core\hook\filedir_content_file_deleted($contenthash, $trashfile);
+        $hook->execute();
+        if ($hook->is_restorable()) {
+            // Some plugin says it can recover it if needed later, so delete the file to free disk space.
+            @unlink($trashfile);
+        }
+
+        ignore_user_abort($prev);
     }
 
     /**
@@ -2765,5 +2896,62 @@ class file_storage {
             WHERE referencefileid = :referencefileid', $params);
         $data = array('id' => $referencefileid, 'lastsync' => $lastsync);
         $DB->update_record('files_reference', (object)$data);
+    }
+
+    /**
+     * Prune unreferenced file content files from local filedir.
+     *
+     * NOTE: this may take a very very long time.
+     *
+     * @param callable $progress called after every file with contenthash and deleted parameter
+     */
+    public function prune_unreferenced_files(callable $progress): void {
+        global $DB;
+        if (!$tophandle = opendir($this->filedir)) {
+            return;
+        }
+        while (($topdir = readdir($tophandle)) !== false) {
+            if (!preg_match('/^[0-9a-f][0-9a-f]$/D', $topdir)) {
+                continue;
+            }
+            if (!$innerhandle = opendir($this->filedir . '/' . $topdir)) {
+                // Skip unreadable dirs.
+                continue;
+            }
+            while (($innerdir = readdir($innerhandle)) !== false) {
+                if (!preg_match('/^[0-9a-f][0-9a-f]$/D', $innerdir)) {
+                    continue;
+                }
+                $dir = $this->filedir . '/' . $topdir . '/' . $innerdir . '/';
+                if (!$dirhandle = opendir($dir)) {
+                    continue;
+                }
+                $usedcontenthashses = $DB->get_fieldset_sql("SELECT DISTINCT contenthash FROM {files} WHERE contenthash LIKE ? ORDER BY contenthash", [$topdir . $innerdir . '%']);
+                $usedcontenthashses = array_flip($usedcontenthashses);
+                while (($file = readdir($dirhandle)) !== false) {
+                    if (is_dir($dir . $file)) {
+                        // There should not be any dirs here!
+                        continue;
+                    }
+                    if (!preg_match('/^([0-9a-f]){40}$/D', $file)) {
+                        // Not a content file, why is it here?
+                        continue;
+                    }
+                    if (isset($usedcontenthashses[$file])) {
+                        call_user_func($progress, $file, false);
+                        continue;
+                    }
+                    $this->deleted_file_cleanup($file);
+                    if (!file_exists($dir . $file)) {
+                        call_user_func($progress, $file, true);
+                    } else {
+                        call_user_func($progress, $file, false);
+                    }
+                }
+                closedir($dirhandle);
+            }
+            closedir($innerhandle);
+        }
+        closedir($tophandle);
     }
 }

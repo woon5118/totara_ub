@@ -422,7 +422,7 @@ function file_prepare_draft_area(&$draftitemid, $contextid, $component, $fileare
                 $original->filepath  = $file->get_filepath();
                 $newsourcefield->original = file_storage::pack_reference($original);
                 // Check we can read the file before we update it.
-                if ($fs->content_exists($file->get_contenthash())) {
+                if ($file->is_content_available()) {
                     $draftfile->set_source(serialize($newsourcefield));
                 }
                 // End of file manager hack
@@ -717,7 +717,7 @@ function file_get_drafarea_files($draftitemid, $filepath = '/') {
                 // We'll use the same status types used by stored_file->get_status(), where 0 = OK. 1 = problem, as these will be
                 // used by the widget to display a warning about the problem files.
                 // The value of stored_file->get_status(), and the file record are unaffected by this. It's only superficially set.
-                $item->status = $fs->content_exists($file->get_contenthash()) ? 0 : 1;
+                $item->status = $file->is_content_available() ? 0 : 1;
                 if ($item->status == 0) {
                     if ($imageinfo = $file->get_imageinfo()) {
                         $item->realthumbnail = $itemurl->out(false, array('preview' => 'thumb',
