@@ -96,10 +96,6 @@
     text-align: left;
     z-index: 2;
 
-    .tw-editScaleValuePaths__scaleHeader-add & {
-      right: 0;
-    }
-
     &-button {
       color: var(--tui-color-state);
       background: transparent;
@@ -131,4 +127,8 @@
       }
     }
   }
+}
+
+.tw-editScaleValuePaths__addButtonList .tw-editScaleValuePaths__scaleHeader-add {
+  right: 0;
 }

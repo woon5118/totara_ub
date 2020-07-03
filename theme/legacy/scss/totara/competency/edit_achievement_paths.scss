@@ -106,11 +106,6 @@
   }
 
   &__activeDropZone {
-    .tw-editAchievementPaths__group & {
-      border: var(--tui-border-width-thin) dashed var(--tui-color-neutral-6);
-      background-color: var(--tui-color-background);
-    }
-
     > * {
       pointer-events: none;
     }
@@ -284,4 +279,9 @@
       color: var(--tui-color-prompt-warning);
     }
   }
+}
+
+.tw-editAchievementPaths__activeDropZone.tw-editAchievementPaths__group {
+    border: var(--tui-border-width-thin) dashed var(--tui-color-neutral-6);
+    background-color: var(--tui-color-background);
 }

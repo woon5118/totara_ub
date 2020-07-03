@@ -79,7 +79,7 @@
     }
 
     &-heading {
-      @include totara-style-heading-x-small;
+      @include tui-font-body-x-small();
       display: inline-block;
     }
   }
