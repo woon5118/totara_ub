@@ -50,7 +50,7 @@
 
     &::before {
       position: absolute;
-      top: 0;
+      top: calc(50% - var(--tui-form-radio-size) / 2);
       left: 0;
       display: block;
       width: var(--tui-form-radio-size);
@@ -106,7 +106,7 @@
 
   &__input ~ &__label::after {
     position: absolute;
-    top: var(--tui-radio-dot-offset);
+    top: calc(50% - var(--tui-form-radio-dot-size) / 2);
     left: var(--tui-radio-dot-offset);
     display: block;
     width: var(--tui-form-radio-dot-size);
