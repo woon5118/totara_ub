@@ -53,6 +53,17 @@ class section_participants {
      */
     public function __construct(section $section, collection $participant_sections) {
         $this->section = $section;
+
+        // Sort by relationship and then by name
+        $participant_sections->sort(function (participant_section $sect1, participant_section $sect2) {
+            $a = $sect1->participant_instance;
+            $b = $sect2->participant_instance;
+            if ($a->core_relationship->name === $b->core_relationship->name) {
+                return $a->participant->fullname <=> $b->participant->fullname;
+            }
+            return $a->core_relationship->id <=> $b->core_relationship->id;
+        });
+
         $this->participant_sections = $participant_sections;
     }
 

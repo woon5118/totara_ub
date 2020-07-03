@@ -427,6 +427,35 @@ class behat_totara_tui extends behat_base {
     }
 
     /**
+     * @Then /^I should not see "([^"]*)" under the expanded row of the tui datatable$/
+     * @Then /^I should not see "([^"]*)" under the expanded row of the tui datatable in the "([^"]*)" "([^"]*)"$/
+     * @param $expected_text string The expected text in the cell identified by the column header and row
+     * @param string $table_locator '.my-table' etc
+     * @param string|null $table_selector_type css, xpath etc
+     * @throws ExpectationException
+     */
+    public function i_should_not_see_under_the_expanded_row_of_datatable(
+        string $expected_text,
+        string $table_locator = self::DATA_TABLE_DEFAULT_LOCATOR,
+        string $table_selector_type = self::DATA_TABLE_DEFAULT_SELECTOR_TYPE
+    ): void {
+        $table = $this->find_data_table($table_selector_type, $table_locator);
+
+        $row = $table->find('css', '.tui-dataTableExpandableRow');
+        if ($row === null || !$row->isVisible()) {
+            throw new ExpectationException('Expandable row is not visible in the tui datatable', $this->getSession());
+        }
+
+        $row_text = $row->getText();
+        if (strpos($row_text, $expected_text) !== false) {
+            throw new ExpectationException(
+                "\"{$expected_text}\" text was found in the tui datatable but shouldn't be there",
+                $this->getSession()
+            );
+        }
+    }
+
+    /**
      * @Then /^I click "([^"]*)" in the "([^"]*)" tui multi select filter$/
      * @param $filter_option_text
      * @param $filter_label_text

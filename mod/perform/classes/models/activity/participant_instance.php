@@ -45,6 +45,7 @@ use totara_core\relationship\relationship as relationship_model;
  * @property-read int $participant_id
  * @property-read subject_instance $subject_instance
  * @property-read int $subject_instance_id
+ * @property-read user $participant
  * @property-read collection|participant_section[] $participant_sections
  * @property-read string $progress_status internal name of current progress state
  * @property-read participant_instance_progress|state $progress_state Current progress state

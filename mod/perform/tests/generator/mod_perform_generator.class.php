@@ -229,10 +229,9 @@ class mod_perform_generator extends component_generator_base {
      */
     public function create_section_element_from_name(array $data): void {
         $section = $this->get_section_from_title($data['section_name']);
-        $element = $this->create_element([
-            'plugin_name' => $data['element_name'],
-            'context' => $section->get_activity()->get_context()
-        ]);
+        $data['plugin_name'] = $data['element_name'];
+        $data['context'] = $section->get_activity()->get_context();
+        $element = $this->create_element($data);
         $this->create_section_element($section, $element);
     }
 
