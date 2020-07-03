@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * This file is part of Totara Learn
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
@@ -17,25 +17,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Tatsuhiro Kirihara <tatsuhiro.kirihara@totaralearning.com>
+ * @author Nathan Lewis <nathan.lewis@totaralearning.com>
  * @package mod_perform
  */
 
-namespace mod_perform\notification\brokers;
+namespace mod_perform\watcher;
 
-use mod_perform\notification\broker;
-use mod_perform\notification\dealer;
-use mod_perform\models\activity\notification as notification_model;
+use mod_perform\hook\subject_instances_created;
+use mod_perform\notification\factory;
+use mod_perform\task\service\subject_instance_dto;
 
-/**
- * overdue handler
- */
-class overdue implements broker {
-    public function get_default_triggers(): array {
-        return [];
-    }
-
-    public function execute(dealer $dealer, notification_model $notification): void {
-        // nothing to do
+class notification {
+    public static function create_subject_instances(subject_instances_created $hook): void {
+        foreach ($hook->get_dtos() as $dto) {
+            /** @var subject_instance_dto $dto */
+            $cartel = factory::create_cartel($dto);
+            $cartel->dispatch('instance_created');
+        }
     }
 }

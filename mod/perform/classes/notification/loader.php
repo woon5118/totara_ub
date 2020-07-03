@@ -24,7 +24,7 @@
 namespace mod_perform\notification;
 
 use coding_exception;
-use invalid_parameter_exception;
+use mod_perform\notification\exceptions\class_key_not_available;
 
 /**
  * The loader class.
@@ -128,14 +128,24 @@ class loader {
     }
 
     /**
+     * Throw an exception if the class key is not available.
+     *
+     * @param string $class_key
+     * @throws class_key_not_available
+     */
+    public function ensure_class_key_exists(string $class_key): void {
+        if (!isset($this->notifications[$class_key])) {
+            throw new class_key_not_available($class_key);
+        }
+    }
+
+    /**
      * @param string $class_key
      * @return array
-     * @throws invalid_parameter_exception
+     * @throws class_key_not_available
      */
     private function get_information(string $class_key): array {
-        if (!isset($this->notifications[$class_key])) {
-            throw new invalid_parameter_exception("notification {$class_key} is not registered");
-        }
+        $this->ensure_class_key_exists($class_key);
         return $this->notifications[$class_key];
     }
 }

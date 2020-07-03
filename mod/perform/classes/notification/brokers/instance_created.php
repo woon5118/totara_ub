@@ -24,6 +24,8 @@
 namespace mod_perform\notification\brokers;
 
 use mod_perform\notification\broker;
+use mod_perform\notification\dealer;
+use mod_perform\models\activity\notification as notification_model;
 
 /**
  * instance_created handler
@@ -33,7 +35,8 @@ class instance_created implements broker {
         return [];
     }
 
-    public function execute(object $x): void {
-        // nothing to do
+    public function execute(dealer $dealer, notification_model $notification): void {
+        // just post it
+        $dealer->post();
     }
 }

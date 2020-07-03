@@ -24,6 +24,11 @@
 namespace mod_perform\notification;
 
 use coding_exception;
+use mod_perform\models\activity\activity as activity_model;
+use mod_perform\models\activity\notification as notification_model;
+use mod_perform\notification\exceptions\class_key_not_available;
+use mod_perform\task\service\subject_instance_dto;
+use totara_core\relationship\relationship;
 
 /**
  * factory class
@@ -43,6 +48,45 @@ abstract class factory {
         $class = self::create_loader()->get_class_of($class_key);
         $inst = new $class();
         return $inst;
+    }
+
+    /**
+     * Create a cartel instance.
+     *
+     * @param subject_instance_dto $dto
+     * @return cartel
+     */
+    public static function create_cartel(subject_instance_dto $dto): cartel {
+        $activity = activity_model::load_by_id($dto->get_activity_id());
+        $user_id = $dto->subject_user_id;
+        $job_assignment_id = $dto->job_assignment_id;
+        return new cartel($activity, $user_id, $job_assignment_id);
+    }
+
+    /**
+     * Create a dealer instance.
+     *
+     * @param notification_model $notification
+     * @param integer $user_id
+     * @param integer|null $job_assignment_id
+     * @return dealer
+     */
+    public static function create_dealer(notification_model $notification, int $user_id, ?int $job_assignment_id): dealer {
+        $activity = $notification->get_activity();
+        $recipients = $notification->get_recipients(true);
+        $composer = self::create_composer($notification->class_key);
+        return new dealer($activity, $recipients, $composer, $user_id, $job_assignment_id);
+    }
+
+    /**
+     * Create a composer instance.
+     *
+     * @param string $class_key
+     * @return composer
+     */
+    public static function create_composer(string $class_key): composer {
+        self::create_loader()->ensure_class_key_exists($class_key);
+        return new composer($class_key);
     }
 
     /**

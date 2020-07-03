@@ -122,9 +122,8 @@ final class notification_real implements notification_interface {
     /**
      * Retrieves notifications by their parent activity.
      *
-     * @param activity $parent parent activity.
-     *
-     * @return collection retrieved notifications.
+     * @param activity $parent parent activity
+     * @return collection retrieved notifications
      */
     public static function load_by_activity(activity $parent): collection {
         if (!$parent->can_manage()) {
@@ -137,6 +136,30 @@ final class notification_real implements notification_interface {
             ->map_to(function ($item) {
                 return new self($item);
             });
+    }
+
+    /**
+     * Retrieves notifications by their parent activity.
+     *
+     * @param activity $parent parent activity
+     * @param string $class_key
+     * @param boolean $strict set true to throw an exception
+     * @return self|null
+     */
+    public static function load_by_activity_and_class_key(activity $parent, string $class_key, bool $strict = false): ?self {
+        if (!$parent->can_manage()) {
+            throw new moodle_exception('nopermissions', '', '', 'load notifications by activity');
+        }
+
+        $entity = notification_entity::repository()
+            ->where('activity_id', $parent->get_id())
+            ->where('class_key', $class_key)
+            ->one($strict);
+
+        if (!$entity) {
+            return null;
+        }
+        return new self($entity);
     }
 
     /**

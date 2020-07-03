@@ -39,6 +39,7 @@ use totara_core\relationship\relationship;
  *
  * @property integer $id
  * @property integer $relationship_id
+ * @property integer $notification_id
  * @property integer|null $recipient_id
  * @property relationship $relationship
  * @property string $name
@@ -47,6 +48,9 @@ use totara_core\relationship\relationship;
 class notification_recipient {
     /** @var integer */
     private $relationship_id;
+
+    /** @var integer */
+    private $notification_id;
 
     /** @var integer|null */
     private $recipient_id;
@@ -60,10 +64,12 @@ class notification_recipient {
     private function __construct($object) {
         if ($object instanceof notification_recipient_entity) {
             $this->relationship_id = $object->core_relationship_id;
+            $this->notification_id = $object->notification_id;
             $this->recipient_id = $object->id;
             $this->active = $object->active;
         } else {
             $this->relationship_id = $object->relationship_id;
+            $this->notification_id = $object->notification_id;
             $this->recipient_id = $object->recipient_id;
             $this->active = !empty($object->active);
         }
@@ -111,6 +117,16 @@ class notification_recipient {
         return $this->relationship_id;
     }
 
+    /**
+     * @return integer
+     */
+    public function get_notification_id(): int {
+        return $this->notification_id;
+    }
+
+    /**
+     * @return integer|null
+     */
     public function get_recipient_id(): ?int {
         return $this->recipient_id;
     }
@@ -196,7 +212,8 @@ class notification_recipient {
                 }
             })
             ->order_by('r.id')
-            ->map_to(function ($source) {
+            ->map_to(function ($source) use ($notify_id) {
+                $source->notification_id = $notify_id;
                 return new self($source);
             })
             ->get();

@@ -27,6 +27,10 @@ use mod_perform\models\activity\notification;
 use mod_perform\models\activity\notification_recipient;
 use mod_perform\models\activity\section;
 use mod_perform\models\activity\section_relationship;
+use mod_perform\notification\broker;
+use mod_perform\notification\factory;
+use mod_perform\notification\loader;
+use mod_perform\notification\dealer;
 use totara_core\relationship\relationship;
 use totara_core\relationship\resolvers\subject;
 use totara_job\relationship\resolvers\appraiser;
@@ -34,7 +38,7 @@ use totara_job\relationship\resolvers\manager;
 
 abstract class mod_perform_notification_testcase extends advanced_testcase {
     /** @var mod_perform_generator */
-    private $perfgen;
+    protected $perfgen;
 
     /** @var phpunit_message_sink */
     private $sink;
@@ -49,6 +53,28 @@ abstract class mod_perform_notification_testcase extends advanced_testcase {
     }
 
     /**
+     * Mock factory::loader.
+     *
+     * @param array $notifications
+     */
+    protected function mock_loader(array $notifications): void {
+        $loader = loader::create($notifications);
+        $rp = new ReflectionProperty(factory::class, 'loader');
+        $rp->setAccessible(true);
+        $rp->setValue(null, $loader);
+    }
+
+    /**
+     * Nullify factory::loader.
+     * This function must be called in tearDown if mock_loader is used.
+     */
+    protected function reset_loader(): void {
+        $rp = new ReflectionProperty(factory::class, 'loader');
+        $rp->setAccessible(true);
+        $rp->setValue(null, null);
+    }
+
+    /**
      * Create an activity for testing.
      *
      * @param array $data
@@ -59,7 +85,7 @@ abstract class mod_perform_notification_testcase extends advanced_testcase {
     }
 
     /**
-     * Createe a section for testing.
+     * Create a section for testing.
      *
      * @param activity $activity
      * @param array $data
@@ -69,6 +95,14 @@ abstract class mod_perform_notification_testcase extends advanced_testcase {
         return $this->perfgen->create_section($activity, $data);
     }
 
+    /**
+     * Create a notification for testing.
+     *
+     * @param activity $activity
+     * @param string $class_key
+     * @param boolean $active
+     * @return notification
+     */
     protected function create_notification(activity $activity, string $class_key, bool $active = false): notification {
         return notification::create($activity, $class_key, $active);
     }
@@ -102,20 +136,19 @@ abstract class mod_perform_notification_testcase extends advanced_testcase {
      * Activate/deactivate the recipients.
      *
      * @param notification $notification
-     * @param section $section
      * @param boolean[] $relationships array of [relationship_class => active]
      */
-    protected function toggle_recipients(notification $notification, section $section, array $relationships): void {
+    protected function toggle_recipients(notification $notification, array $relationships): void {
         $recipients = $notification->get_recipients();
         foreach ($relationships as $class => $active) {
-            $rel_id = $this->perfgen->get_core_relationship($class)->id;
-            $section_relationship = $section->section_relationships->find('core_relationship_id', $rel_id);
-            $recipient = $recipients->find('section_relationship_id', $section_relationship->id);
+            $relationship = $this->perfgen->get_core_relationship($class);
+            $rel_id = $relationship->id;
+            $recipient = $recipients->find('relationship_id', $rel_id);
             /** @var notification_recipient $recipient */
             if ($recipient->get_recipient_id()) {
                 $recipient->activate($active);
             } else {
-                notification_recipient::create($notification, $section_relationship, $active);
+                notification_recipient::create($notification, $relationship, $active);
             }
         }
     }
@@ -146,5 +179,31 @@ abstract class mod_perform_notification_testcase extends advanced_testcase {
         });
         $this->sink = null;
         return $messages;
+    }
+}
+
+class mod_perform_mock_broker implements broker {
+    /** @var integer */
+    private static $executed_count = [];
+
+    public function get_count(): int {
+        $class = get_class($this);
+        return self::$executed_count[$class] ?? 0;
+    }
+
+    public static function reset(): void {
+        self::$executed_count = [];
+    }
+
+    public function get_default_triggers(): array {
+        return [];
+    }
+
+    public function execute(dealer $dealer, notification $notification): void {
+        $class = get_class($this);
+        if (!isset(self::$executed_count[$class])) {
+            self::$executed_count[$class] = 0;
+        }
+        self::$executed_count[$class]++;
     }
 }

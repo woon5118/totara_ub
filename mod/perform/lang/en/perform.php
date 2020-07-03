@@ -137,6 +137,7 @@ $string['manage_activities_tabs_notifications'] = 'Notifications';
 $string['manage_activity_page_title'] = 'Manage performance activity';
 $string['menu_title_activity_management'] = 'Activity Management';
 $string['menu_title_my_activities'] = 'Activities';
+$string['messageprovider:activity_notification'] = 'Performance notifications';
 $string['modal_activate_title'] = 'Confirm activity activation';
 $string['modal_activate_message'] = 'Activation will make this activity live. Subjects will be assigned, and instances generated for them according to the schedule set on the activity. Once activated, changes can still be made to assignments, but content cannot be edited.';
 $string['modal_activate_message_question'] = 'Are you sure you would like to activate this activity?';
@@ -318,6 +319,28 @@ $string['sync_track_schedule_task'] = 'Synchronize assignment schedules for perf
 $string['system_activity_type:appraisal'] = 'Appraisal';
 $string['system_activity_type:check-in'] = 'Check-in';
 $string['system_activity_type:feedback'] = 'Feedback';
+$string['template_instance_created_appraiser_body'] = 'As $subject full name$’s $relationship name$, you have been selected to participate in the following activity:
+
+$Activity name$/$Activity type$
+
+This needs to be completed by $due date$.
+
+You can access the activity through this link: $Activity link$';
+$string['template_instance_created_appraiser_subject'] = '$Activity name$/$Activity type$: $subject full name$';
+$string['template_instance_created_manager_body'] = 'As $subject full name$’s $relationship name$, you have been selected to participate in the following activity:
+
+$Activity name$/$Activity type$
+
+This needs to be completed by $due date$.
+
+You can access the activity through this link: $Activity link$';
+$string['template_instance_created_manager_subject'] = '$Activity name$/$Activity type$: $subject full name$';
+$string['template_instance_created_subject_body'] = 'Your $Activity name$/$Activity type$ is ready for you to complete.
+
+This needs to be completed by $due date$.
+
+You can access the activity through this link: $Activity link$';
+$string['template_instance_created_subject_subject'] = 'Your $Activity name$/$Activity type$';
 $string['toast_error_create_activity'] = 'An error occurred while saving, and the activity could not be created.';
 $string['toast_error_generic_update'] = 'An error occurred, and your latest changes have not been saved.';
 $string['toast_error_save_response'] = 'An error occurred while saving, and the activity responses could not be updated.';

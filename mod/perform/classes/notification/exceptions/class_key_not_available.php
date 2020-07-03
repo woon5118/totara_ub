@@ -21,21 +21,24 @@
  * @package mod_perform
  */
 
-namespace mod_perform\notification\brokers;
+namespace mod_perform\notification\exceptions;
 
-use mod_perform\notification\broker;
-use mod_perform\notification\dealer;
-use mod_perform\models\activity\notification as notification_model;
+use invalid_parameter_exception;
 
 /**
- * overdue handler
+ * An exception thrown when the specified class key does not exist in the system.
  */
-class overdue implements broker {
-    public function get_default_triggers(): array {
-        return [];
-    }
+class class_key_not_available extends invalid_parameter_exception {
+    /** @var string */
+    public $class_key;
 
-    public function execute(dealer $dealer, notification_model $notification): void {
-        // nothing to do
+    /**
+     * Constructor.
+     *
+     * @param string $class_key
+     */
+    public function __construct(string $class_key) {
+        $this->class_key = $class_key;
+        parent::__construct("notification {$class_key} is not registered");
     }
 }

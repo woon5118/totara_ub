@@ -92,6 +92,20 @@ final class notification implements notification_interface {
     }
 
     /**
+     * Load an instance by the activity and the class key.
+     *
+     * @param activity $activity
+     * @param string $class_key
+     * @return self
+     */
+    public static function load_by_activity_and_class_key(activity $activity, string $class_key): self {
+        factory::create_loader()->ensure_class_key_exists($class_key);
+        $model = notification_real::load_by_activity_and_class_key($activity, $class_key, false)
+            ?? new notification_sparse($activity, $class_key);
+        return new self($model);
+    }
+
+    /**
      * Load an instance by the notification id.
      *
      * @param integer $id
@@ -99,7 +113,7 @@ final class notification implements notification_interface {
      * @throws record_not_found_exception
      */
     public static function load_by_id(int $id): self {
-        return new self(notification_real::load_by_id($id));
+        return new self(notification_real::load_by_id($id, true));
     }
 
     /**

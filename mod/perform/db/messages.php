@@ -21,21 +21,11 @@
  * @package mod_perform
  */
 
-namespace mod_perform\notification\brokers;
-
-use mod_perform\notification\broker;
-use mod_perform\notification\dealer;
-use mod_perform\models\activity\notification as notification_model;
-
-/**
- * overdue handler
- */
-class overdue implements broker {
-    public function get_default_triggers(): array {
-        return [];
-    }
-
-    public function execute(dealer $dealer, notification_model $notification): void {
-        // nothing to do
-    }
-}
+$messageproviders = [
+    'activity_notification' => [
+        'defaults' => [
+            'popup' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN + MESSAGE_DEFAULT_LOGGEDOFF,
+            'email' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN + MESSAGE_DEFAULT_LOGGEDOFF,
+        ],
+    ],
+];

@@ -400,6 +400,7 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
     }
 
     public function test_repeating_type_after_creation() {
+        $this->setAdminUser();
         $track = $this->create_single_track_with_assignments(2);
 
         // Set repeat to one day after creation.
@@ -439,6 +440,7 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
     }
 
     public function test_repeating_type_after_creation_when_complete() {
+        $this->setAdminUser();
         $track = $this->create_single_track_with_assignments(2);
 
         // Set repeat to one day after creation.
@@ -482,6 +484,7 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
     }
 
     public function test_repeating_type_after_completion() {
+        $this->setAdminUser();
         $track = $this->create_single_track_with_assignments(2);
 
         // Set repeat to one day after completion.
@@ -523,6 +526,7 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
     }
 
     public function test_repeating_limit() {
+        $this->setAdminUser();
         $track = $this->create_single_track_with_assignments(2);
 
         // Set repeat to one day after creation, limit 2.
@@ -612,6 +616,7 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
     }
 
     public function test_due_date_disabled() {
+        $this->setAdminUser();
         $track = $this->create_single_track_with_assignments(1);
         $track->set_due_date_disabled();
         $track->update();
@@ -623,6 +628,7 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
     }
 
     public function test_due_date_fixed() {
+        $this->setAdminUser();
         $track = $this->create_single_track_with_assignments(1);
         $yesterday = new date_time_setting(time() - 86400);
         $tomorrow = new date_time_setting(time() + 86400);
@@ -640,6 +646,7 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
     }
 
     public function test_due_date_relative() {
+        $this->setAdminUser();
         $track = $this->create_single_track_with_assignments(1);
         $day_after_tomorrow = (new \DateTimeImmutable('now', new DateTimeZone('utc')))
             ->modify('+ 2 day')

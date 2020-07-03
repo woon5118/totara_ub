@@ -24,6 +24,8 @@
 
 use mod_perform\models\activity\notification;
 use mod_perform\models\activity\notification_recipient;
+use totara_core\relationship\resolvers\subject;
+use totara_job\relationship\resolvers\appraiser;
 
 require_once(__DIR__ . '/notification_testcase.php');
 
@@ -40,7 +42,7 @@ class mod_perform_notification_recipient_model_testcase extends mod_perform_noti
         $this->assertFalse($notification->recipients->find('relationship_id', $relationships[2]->id)->active);
     }
 
-    public function test_load_by_notification() {
+    public function test_load_by_notification_full() {
         $activity = $this->create_activity();
         $section = $this->create_section($activity);
         $notification = notification::create($activity, 'instance_created');
@@ -50,5 +52,16 @@ class mod_perform_notification_recipient_model_testcase extends mod_perform_noti
 
         $this->assertCount(3, notification_recipient::load_by_notification($notification, false));
         $this->assertCount(1, notification_recipient::load_by_notification($notification, true));
+    }
+
+    public function test_load_by_notification_partial() {
+        $activity = $this->create_activity();
+        $section = $this->create_section($activity);
+        $notification = notification::create($activity, 'instance_created');
+        $relationships = $this->create_section_relationships($section, [subject::class, appraiser::class]);
+        notification_recipient::create($notification, $relationships[0], false);
+
+        $this->assertCount(2, notification_recipient::load_by_notification($notification, false));
+        $this->assertCount(0, notification_recipient::load_by_notification($notification, true));
     }
 }
