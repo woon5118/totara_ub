@@ -42,10 +42,11 @@ class totara_core_webapi_resolver_query_relationships_testcase extends advanced_
     public function test_resolve_relationship_type_fields() {
         self::setAdminUser();
 
-        $relationship = relationship::create([test_resolver_three::class]);
+        $relationship = relationship::create([test_resolver_three::class], 'one');
 
         $relationship_entity = new relationship_entity($relationship->id);
         $relationship_entity->created_at = 12345;
+        $relationship_entity->idnumber = 'Relationship <script>One</script>';
         $relationship_entity->save();
         $relationship = relationship::load_by_entity($relationship_entity);
 
@@ -70,6 +71,13 @@ class totara_core_webapi_resolver_query_relationships_testcase extends advanced_
         ));
         $this->assertEquals('resolver_three<script>alert(\'Bads!\')</script>', $this->resolve_graphql_type(
             self::TYPE, 'name_plural', $relationship, ['format' => format::FORMAT_RAW]
+        ));
+
+        $this->assertEquals('Relationship One', $this->resolve_graphql_type(
+            self::TYPE, 'idnumber', $relationship, ['format' => format::FORMAT_PLAIN]
+        ));
+        $this->assertEquals('Relationship <script>One</script>', $this->resolve_graphql_type(
+            self::TYPE, 'idnumber', $relationship, ['format' => format::FORMAT_RAW]
         ));
     }
 

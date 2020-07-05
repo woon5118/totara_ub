@@ -26,15 +26,17 @@ namespace totara_core\relationship;
 use coding_exception;
 use core\orm\entity\model;
 use core\orm\query\builder;
+use core_component;
+use moodle_exception;
 use totara_core\entities\relationship as relationship_entity;
 use totara_core\entities\relationship_resolver as relationship_resolver_entity;
-use totara_core\relationship\resolvers\subject;
 
 /**
  * A dynamically defined way of identifying the many users that are associated with a single user based on a given input.
  * @link https://help.totaralearning.com/display/PROD/Relationships Documentation
  *
  * @property-read int $id
+ * @property-read string $idnumber
  * @property-read int $created_at
  * @property-read string $name
  *
@@ -49,6 +51,7 @@ final class relationship extends model {
 
     protected $entity_attribute_whitelist = [
         'id',
+        'idnumber',
         'created_at',
     ];
 
@@ -62,6 +65,20 @@ final class relationship extends model {
      */
     protected static function get_entity_class(): string {
         return relationship_entity::class;
+    }
+
+    /**
+     * Gets a relationship based on the given idnumber
+     *
+     * @param string $idnumber
+     * @return static
+     */
+    public static function load_by_idnumber(string $idnumber): self {
+        $entity = static::get_entity_class()::repository()
+            ->where('idnumber', $idnumber)
+            ->one(true);
+
+        return static::load_by_entity($entity);
     }
 
     /**
@@ -124,13 +141,32 @@ final class relationship extends model {
      * Create a new relationship.
      *
      * @param string[] $resolver_class_names Array of relationship resolver class names, e.g. [subject::class, manager::class]
+     * @param string $idnumber Unique string identifier for this relationship.
+     * @param int $type Optional type identifier - defaults to standard type.
+     * @param string $component Plugin that the relationship is exclusive to. Defaults to being available for all.
      * @return relationship
      */
-    public static function create(array $resolver_class_names): self {
+    public static function create(array $resolver_class_names, string $idnumber, int $type = null, string $component = null): self {
         self::validate_resolvers($resolver_class_names);
 
-        $relationship = builder::get_db()->transaction(static function () use ($resolver_class_names) {
+        if (trim($idnumber) === '' || strlen($idnumber) > 255) {
+            throw new coding_exception('Must specify an idnumber longer than 0 characters and less than 255 characters');
+        }
+        if (totara_idnumber_exists(relationship_entity::TABLE, $idnumber)) {
+            throw new moodle_exception('idnumbertaken');
+        }
+        if ($type !== null && !in_array($type, [relationship_entity::TYPE_STANDARD, relationship_entity::TYPE_MANUAL])) {
+            throw new coding_exception('Invalid type specified: ' . $type);
+        }
+        if ($component !== null && core_component::get_component_directory($component) === null) {
+            throw new coding_exception('Specified component/plugin ' . $component . ' does not exist!');
+        }
+
+        $relationship = builder::get_db()->transaction(function () use ($resolver_class_names, $idnumber, $type, $component) {
             $relationship = new relationship_entity();
+            $relationship->idnumber = $idnumber;
+            $relationship->type = $type ?? relationship_entity::TYPE_STANDARD;
+            $relationship->component = $component;
             $relationship->save();
 
             foreach ($resolver_class_names as $resolver_class_name) {

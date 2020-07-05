@@ -33,6 +33,7 @@ use core\orm\entity\relations\has_many;
  * @property-read int $id
  * @property int $type
  * @property string $component
+ * @property string $idnumber
  * @property int $created_at
  *
  * @property-read relationship_resolver[]|collection $resolvers

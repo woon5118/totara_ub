@@ -1239,7 +1239,7 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020072700, 'totara', 'core');
     }
 
-    if ($oldversion < 2020072702) {
+    if ($oldversion < 2020072703) {
 
         // Define field type to be added to totara_core_relationship.
         $table = new xmldb_table('totara_core_relationship');
@@ -1255,8 +1255,25 @@ function xmldb_totara_core_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
+        // Define field idnumber to be added to totara_core_relationship.
+        $field = new xmldb_field('idnumber', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, 'id');
+
+        // Conditionally launch add field idnumber.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $index = new xmldb_index('idnumber', XMLDB_INDEX_UNIQUE, array('idnumber'));
+
+        // Conditionally launch add index idnumber.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        totara_core_upgrade_create_relationship('totara_core\relationship\resolvers\subject', 'subject');
+
         // Core savepoint reached.
-        upgrade_plugin_savepoint(true, 2020072702, 'totara', 'core');
+        upgrade_plugin_savepoint(true, 2020072703, 'totara', 'core');
     }
 
     return true;

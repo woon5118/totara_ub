@@ -68,6 +68,10 @@ type totara_core_relationship {
   """
   id: core_id!
   """
+  Unique human understandable way of identifying the relationship.
+  """
+  idnumber(format: core_format = PLAIN): String!
+  """
   Name of the relationship.
   """
   name(format: core_format = PLAIN): String!

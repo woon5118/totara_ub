@@ -112,16 +112,16 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020071000, 'perform');
     }
 
-    if ($oldversion < 2020072300) {
+    if ($oldversion < 2020072301) {
         require_once($CFG->dirroot . '/totara/core/db/upgradelib.php');
 
-        totara_core_upgrade_create_relationship('mod_perform\relationship\resolvers\customer', 1, 'mod_perform');
-        totara_core_upgrade_create_relationship('mod_perform\relationship\resolvers\mentor', 1, 'mod_perform');
-        totara_core_upgrade_create_relationship('mod_perform\relationship\resolvers\peer', 1, 'mod_perform');
-        totara_core_upgrade_create_relationship('mod_perform\relationship\resolvers\reviewer', 1, 'mod_perform');
+        totara_core_upgrade_create_relationship('mod_perform\relationship\resolvers\peer', 'perform_peer', 1, 'mod_perform');
+        totara_core_upgrade_create_relationship('mod_perform\relationship\resolvers\mentor', 'perform_mentor', 1, 'mod_perform');
+        totara_core_upgrade_create_relationship('mod_perform\relationship\resolvers\customer', 'perform_customer', 1, 'mod_perform');
+        totara_core_upgrade_create_relationship('mod_perform\relationship\resolvers\reviewer', 'perform_reviewer', 1, 'mod_perform');
 
         // Core savepoint reached.
-        upgrade_mod_savepoint(true, 2020072300, 'perform');
+        upgrade_mod_savepoint(true, 2020072301, 'perform');
     }
 
     return true;

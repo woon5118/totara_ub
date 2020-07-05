@@ -21,6 +21,7 @@
  * @package totara_core
  */
 
+use core\orm\query\exceptions\record_not_found_exception;
 use totara_core\entities\relationship as relationship_entity;
 use totara_core\entities\relationship_resolver;
 use totara_core\relationship\relationship;
@@ -39,33 +40,58 @@ class totara_core_relationship_testcase extends \advanced_testcase {
         relationship_entity::repository()->delete();
     }
 
+    public function test_load_by_idnumber(): void {
+        $relationship_one = relationship::create([test_resolver_one::class], 'one');
+        $relationship_two = relationship::create([test_resolver_two::class], 'two');
+
+        $this->assertEquals($relationship_one->id, relationship::load_by_idnumber('one')->id);
+        $this->assertEquals($relationship_two->id, relationship::load_by_idnumber('two')->id);
+
+        // Can not load a deleted relationship via idnumber - throws exception instead.
+        relationship_entity::repository()->where('idnumber', 'one')->delete();
+        $this->expectException(record_not_found_exception::class);
+        relationship::load_by_idnumber('one');
+    }
+
     public function test_get_name(): void {
         // For now, get_name() simply just gets the name of the first resolver that is associated with the relationship in the DB.
-        $relationship_one = relationship::create([test_resolver_one::class]);
-        $relationship_two = relationship::create([test_resolver_two::class]);
+        $relationship_one = relationship::create([test_resolver_one::class], 'one');
+        $relationship_two = relationship::create([test_resolver_two::class], 'two');
         $this->assertEquals(test_resolver_one::get_name(), $relationship_one->get_name());
         $this->assertEquals(test_resolver_two::get_name(), $relationship_two->get_name());
 
-        $subject = relationship::create([subject::class]);
+        $subject = relationship::create([subject::class], 'subject2');
         $this->assertEquals('Subject', $subject->get_name());
     }
 
     public function test_get_name_plural(): void {
         // For now, get_name() simply just gets the name of the first resolver that is associated with the relationship in the DB.
-        $relationship_one = relationship::create([test_resolver_one::class]);
-        $relationship_two = relationship::create([test_resolver_two::class]);
+        $relationship_one = relationship::create([test_resolver_one::class], 'one');
+        $relationship_two = relationship::create([test_resolver_two::class], 'two');
         $this->assertEquals(test_resolver_one::get_name_plural(), $relationship_one->get_name_plural());
         $this->assertEquals(test_resolver_two::get_name_plural(), $relationship_two->get_name_plural());
 
-        $subject = relationship::create([subject::class]);
+        $subject = relationship::create([subject::class], 'subject2');
         $this->assertEquals('Subjects', $subject->get_name_plural());
+    }
+
+    public function test_idnumber(): void {
+        $relationship_one = relationship::create([test_resolver_one::class], 'one');
+        $relationship_two = relationship::create([test_resolver_two::class], 'two');
+
+        $this->assertEquals('one', $relationship_one->idnumber);
+        $this->assertEquals('two', $relationship_two->idnumber);
+
+        $this->expectException(moodle_exception::class);
+        $this->expectExceptionMessage('This ID number is already in use');
+        relationship::create([test_resolver_one::class], 'one');
     }
 
     public function test_create(): void {
         $this->assertEquals(0, relationship_entity::repository()->count());
         $this->assertEquals(0, relationship_resolver::repository()->count());
 
-        $relationship_single = relationship::create([test_resolver_one::class]);
+        $relationship_single = relationship::create([test_resolver_one::class], 'one');
 
         $this->assertEquals(1, relationship_entity::repository()->count());
         $this->assertEquals(1, relationship_resolver::repository()->count());
@@ -83,7 +109,7 @@ class totara_core_relationship_testcase extends \advanced_testcase {
 
         $relationship_single->delete();
 
-        $relationship_multiple = relationship::create([test_resolver_one::class, test_resolver_three::class]);
+        $relationship_multiple = relationship::create([test_resolver_one::class, test_resolver_three::class], 'multi');
 
         $this->assertEquals(1, relationship_entity::repository()->count());
         $this->assertEquals(2, relationship_resolver::repository()->count());
@@ -101,7 +127,7 @@ class totara_core_relationship_testcase extends \advanced_testcase {
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage('Must specify at least one relationship resolver!');
 
-        relationship::create([]);
+        relationship::create([], '');
     }
 
     public function test_create_using_invalid_resolver_class(): void {
@@ -111,13 +137,13 @@ class totara_core_relationship_testcase extends \advanced_testcase {
         );
 
         // coding_exception is a class, but it isn't a sub class of relationship resolver
-        relationship::create([test_resolver_one::class, coding_exception::class]);
+        relationship::create([test_resolver_one::class, coding_exception::class], 'invalid');
     }
 
     public function test_create_using_incompatible_resolvers(): void {
         // Will work because they share the same accepted inputs
-        relationship::create([test_resolver_one::class, test_resolver_three::class]);
-        relationship::create([test_resolver_two::class, test_resolver_five::class]);
+        relationship::create([test_resolver_one::class, test_resolver_three::class], 'one');
+        relationship::create([test_resolver_two::class, test_resolver_five::class], 'two');
 
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage(
@@ -125,19 +151,51 @@ class totara_core_relationship_testcase extends \advanced_testcase {
         );
 
         // These two resolvers do not share the same accepted inputs
-        relationship::create([test_resolver_one::class, test_resolver_two::class]);
+        relationship::create([test_resolver_one::class, test_resolver_two::class], 'three');
+    }
+
+    public function test_create_using_duplicate_idnumber(): void {
+        relationship::create([test_resolver_one::class], 'one');
+        relationship::create([test_resolver_one::class], 'two');
+
+        $this->expectException(moodle_exception::class);
+        $this->expectExceptionMessage(get_string('idnumbertaken', 'error'));
+
+        // Has same idnumber as one
+        relationship::create([test_resolver_one::class], 'one');
+    }
+
+    public function test_create_using_invalid_type(): void {
+        relationship::create([test_resolver_one::class], 'one', relationship_entity::TYPE_MANUAL);
+        relationship::create([test_resolver_one::class], 'two', relationship_entity::TYPE_STANDARD);
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('Invalid type specified: 123456789');
+
+        // Invalid type
+        relationship::create([test_resolver_one::class], 'three', 123456789);
+    }
+
+    public function test_create_using_invalid_component(): void {
+        relationship::create([test_resolver_one::class], 'one', 0, 'totara_core');
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('Specified component/plugin nonexistent_plugin_name does not exist!');
+
+        // Component doesn't exist
+        relationship::create([test_resolver_one::class], 'two', 0, 'nonexistent_plugin_name');
     }
 
     public function test_delete(): void {
         $this->assertEquals(0, relationship_entity::repository()->count());
         $this->assertEquals(0, relationship_resolver::repository()->count());
 
-        $relationship1 = relationship::create([test_resolver_one::class, test_resolver_three::class]);
+        $relationship1 = relationship::create([test_resolver_one::class, test_resolver_three::class], 'one');
 
         $this->assertEquals(1, relationship_entity::repository()->count());
         $this->assertEquals(2, relationship_resolver::repository()->count());
 
-        $relationship2 = relationship::create([test_resolver_one::class, test_resolver_three::class]);
+        $relationship2 = relationship::create([test_resolver_one::class, test_resolver_three::class], 'two');
 
         $relationship1->delete();
 
@@ -150,19 +208,19 @@ class totara_core_relationship_testcase extends \advanced_testcase {
 
     public function test_is_acceptable_input(): void {
         // test_resolver_two & test_resolver_five only have the 'input_field_two' field in common.
-        $relationship1 = relationship::create([test_resolver_two::class]);
+        $relationship1 = relationship::create([test_resolver_two::class], 'one');
         $this->assertFalse($relationship1->is_acceptable_input(['input_field_one']));
         $this->assertTrue($relationship1->is_acceptable_input(['input_field_two']));
         $this->assertFalse($relationship1->is_acceptable_input(['input_field_three', 'input_field_one']));
 
         // test_resolver_one & test_resolver_three only have the 'input_field_one' field in common.
-        $relationship2 = relationship::create([test_resolver_one::class, test_resolver_three::class]);
+        $relationship2 = relationship::create([test_resolver_one::class, test_resolver_three::class], 'two');
         $this->assertTrue($relationship2->is_acceptable_input(['input_field_one']));
         $this->assertFalse($relationship2->is_acceptable_input(['input_field_two']));
         $this->assertTrue($relationship2->is_acceptable_input(['input_field_three', 'input_field_one']));
 
         // test_resolver_five accepts either ['input_field_one', 'input_field_three'] OR ['input_field_two']
-        $relationship3 = relationship::create([test_resolver_five::class]);
+        $relationship3 = relationship::create([test_resolver_five::class], 'three');
         $this->assertFalse($relationship3->is_acceptable_input(['input_field_one']));
         $this->assertTrue($relationship3->is_acceptable_input(['input_field_two']));
         $this->assertFalse($relationship3->is_acceptable_input(['input_field_three']));
@@ -180,7 +238,7 @@ class totara_core_relationship_testcase extends \advanced_testcase {
      * Sanity check to make sure it collects unique user ids.
      */
     public function test_get_users(): void {
-        $relationship = relationship::create([test_resolver_two::class, test_resolver_five::class]);
+        $relationship = relationship::create([test_resolver_two::class, test_resolver_five::class], 'one');
 
         $dummy_id = 5;
         $input = [

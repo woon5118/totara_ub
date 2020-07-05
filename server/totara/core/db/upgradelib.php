@@ -1242,12 +1242,13 @@ function totara_core_clear_preview_image_cache(?string $preview_mode = null): vo
  * update all corresponding relationship resolver table rows that use that class_name!
  *
  * @param string $resolver_class_name
- * @param int $type
- * @param string $component Plugin that the relationship is exclusive to.
+ * @param string $idnumber Unique identifier.
+ * @param int $type Optional type identifier - defaults to 0.
+ * @param string $component Plugin that the relationship is exclusive to. Defaults to being available for all.
  *
  * @since Totara 13.0
  */
-function totara_core_upgrade_create_relationship($resolver_class_name, $type = 0, $component = null) {
+function totara_core_upgrade_create_relationship($resolver_class_name, $idnumber = null, $type = 0, $component = null) {
     global $DB;
 
     $record = $DB->get_record(
@@ -1259,13 +1260,18 @@ function totara_core_upgrade_create_relationship($resolver_class_name, $type = 0
         return;
     }
 
-    $DB->transaction(static function () use ($DB, $resolver_class_name, $type, $component) {
-        $relationship_id = $DB->insert_record('totara_core_relationship', [
+    $DB->transaction(static function () use ($DB, $resolver_class_name, $idnumber, $type, $component) {
+        $record = [
             'created_at' => time(),
-            'type' => $type,
-            'component' => $component,
-        ]);
-
+        ];
+        if (isset($idnumber)) {
+            $record = array_merge($record, [
+                'idnumber' => $idnumber,
+                'type' => $type,
+                'component' => $component,
+            ]);
+        }
+        $relationship_id = $DB->insert_record('totara_core_relationship', $record);
 
         $DB->insert_record('totara_core_relationship_resolver', [
             'relationship_id' => $relationship_id,

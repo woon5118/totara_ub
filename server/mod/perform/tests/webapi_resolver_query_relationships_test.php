@@ -59,7 +59,7 @@ class mod_perform_webapi_resolver_query_relationships_testcase extends advanced_
         /** @var relationship[]|collection $results */
         $results = $this->resolve_graphql_query(self::QUERY, ['activity_id' => $this->activity->id]);
         $results = $results->all();
-        $this->assertCount(3, $results);
+        $this->assertCount(7, $results);
 
         $this->assertEquals(get_string('relationship_subject', 'totara_core'), $results[0]->get_name());
         $this->assertEquals(get_string('manager', 'totara_job'), $results[1]->get_name());

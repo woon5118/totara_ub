@@ -25,8 +25,8 @@ namespace totara_core\relationship;
 
 use coding_exception;
 use core\collection;
+use core\orm\entity\repository;
 use totara_core\entities\relationship as relationship_entity;
-use totara_core\entities\relationship_resolver as relationship_resolver_entity;
 
 /**
  * Data provider for relationships.
@@ -36,35 +36,88 @@ use totara_core\entities\relationship_resolver as relationship_resolver_entity;
 class relationship_provider {
 
     /**
-     * Fetch all relationships that can be used.
-     *
-     * @return relationship[]|collection
+     * @var repository
      */
-    public static function fetch_all_relationships(): collection {
-        return relationship_entity::repository()
+    private $query;
+
+    /**
+     * @var bool
+     */
+    private $fetched = false;
+
+    /**
+     * @var collection|relationship[]
+     */
+    private $items;
+
+    public function __construct() {
+        $this->query = relationship_entity::repository()
             ->with('resolvers')
-            ->order_by('id')
-            ->get()
-            ->map_to(relationship::class);
+            ->order_by('component', 'DESC') // Places the non-plugin exclusive relationships at the top
+            ->order_by('id');
+    }
+
+    /**
+     * Restrict the returned relationships to ones that are compatible with a plugin.
+     *
+     * @param string $component
+     * @return $this
+     */
+    public function filter_by_component(string $component): self {
+        if ($this->fetched) {
+            throw new coding_exception('Must call filter_by_component() before calling fetch()');
+        }
+
+        $this->query
+            ->where('component', $component)
+            ->or_where_null('component');
+
+        return $this;
     }
 
     /**
      * Fetch the relationships that are compatible with the specified fieldset.
      *
      * @param string[] $compatible_fields fieldset to check e.g. ['job_assignment_id'] or ['user_id', 'course_id']
-     * @return relationship[]|collection
+     * @return $this
      */
-    public static function fetch_compatible_relationships(array $compatible_fields): collection {
-        if (empty($compatible_fields)) {
-            throw new coding_exception(
-                'Must specify at least one field to relationship_provider::fetch_compatible_relationships()'
-            );
+    public function filter_by_compatible(array $compatible_fields): self {
+        if (!$this->fetched) {
+            throw new coding_exception('Must call fetch() before calling filter_by_compatible()');
         }
 
-        return static::fetch_all_relationships()
-            ->filter(static function (relationship $relationship) use ($compatible_fields) {
-                return $relationship->is_acceptable_input($compatible_fields);
-            });
+        if (empty($compatible_fields)) {
+            throw new coding_exception('Must specify at least one field to filter_by_compatible()');
+        }
+
+        $this->items = $this->items->filter(static function (relationship $relationship) use ($compatible_fields) {
+            return $relationship->is_acceptable_input($compatible_fields);
+        });
+
+        return $this;
+    }
+
+    /**
+     * Query the data from the database.
+     *
+     * @return $this
+     */
+    public function fetch(): self {
+        $this->items = $this->query
+            ->get()
+            ->map_to(relationship::class);
+        $this->fetched = true;
+
+        return $this;
+    }
+
+    /**
+     * Get a collection of the relationship objects that has been queried.
+     *
+     * @return collection|relationship[]
+     */
+    public function get(): collection {
+        return $this->items;
     }
 
 }
