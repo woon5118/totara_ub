@@ -46,11 +46,13 @@ export default {
       get() {
         let optionValue = [];
         if (this.data) {
-          this.element.data.options.forEach(item => {
-            if (this.data.answer_option.includes(item.name)) {
-              optionValue.push(item.value);
-            }
-          });
+          if (typeof this.element.data.options !== 'undefined') {
+            this.element.data.options.forEach(item => {
+              if (this.data.answer_option.includes(item.name)) {
+                optionValue.push(item.value);
+              }
+            });
+          }
         }
         return optionValue.join('<br/>');
       },

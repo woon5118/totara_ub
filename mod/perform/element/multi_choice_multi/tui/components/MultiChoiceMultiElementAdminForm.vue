@@ -22,13 +22,14 @@
 <template>
   <ElementAdminForm :type="type" :error="error" @remove="$emit('remove')">
     <template v-slot:content>
-      <div class="tui-elementEditMultiChoice">
+      <div class="tui-elementEditMultiChoiceMulti">
         <Uniform
           v-if="initialValues"
           v-slot="{ getSubmitting }"
           :initial-values="initialValues"
           :vertical="true"
           input-width="full"
+          :validate="validator"
           @submit="handleSubmit"
         >
           <FormRow
@@ -54,7 +55,7 @@
                 @remove="(item, i) => remove(i)"
               >
                 <template v-slot="{ row, index }">
-                  <div class="tui-elementEditMultiChoice__option">
+                  <div class="tui-elementEditMultiChoiceMulti__option">
                     <FormText
                       :name="[index]"
                       :validations="v => [v.required()]"
@@ -72,7 +73,7 @@
                   <ButtonIcon
                     :aria-label="$str('add', 'moodle')"
                     :styleclass="{ small: true }"
-                    class="tui-elementEditMultiChoice__add-option"
+                    class="tui-elementEditMultiChoiceMulti__add-option"
                     @click="push()"
                   >
                     <AddIcon />
@@ -81,6 +82,33 @@
               </Repeater>
             </FieldArray>
           </FormRow>
+
+          <FormRow
+            :label="
+              $str('response_restriction', 'performelement_multi_choice_multi')
+            "
+            class="tui-elementEditMultiChoiceMulti__restriction"
+          >
+            <div class="tui-elementEditMultiChoiceMulti__respondent">
+              <div>
+                <FormNumber name="min" />{{
+                  $str(
+                    'restriction_minimum_label',
+                    'performelement_multi_choice_multi'
+                  )
+                }}
+              </div>
+              <div>
+                <FormNumber name="max" />{{
+                  $str(
+                    'restriction_maximum_label',
+                    'performelement_multi_choice_multi'
+                  )
+                }}
+              </div>
+            </div>
+          </FormRow>
+
           <FormRow>
             <Checkbox v-model="responseRequired" name="responseRequired">
               {{ $str('section_element_response_required', 'mod_perform') }}
@@ -88,7 +116,7 @@
           </FormRow>
           <IdentifierInput />
           <FormRow>
-            <div class="tui-elementEditMultiChoice__action-buttons">
+            <div class="tui-elementEditMultiChoiceMulti__action-buttons">
               <FormActionButtons
                 :submitting="getSubmitting()"
                 @cancel="cancel"
@@ -108,6 +136,7 @@ import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
 import Checkbox from 'totara_core/components/form/Checkbox';
 import ElementAdminForm from 'mod_perform/components/element/ElementAdminForm';
 import FormActionButtons from 'mod_perform/components/element/admin_form/ActionButtons';
+import FormNumber from 'totara_core/components/uniform/FormNumber';
 import FormText from 'totara_core/components/uniform/FormText';
 import IdentifierInput from 'mod_perform/components/element/admin_form/IdentifierInput';
 import Repeater from 'totara_core/components/form/Repeater';
@@ -125,6 +154,7 @@ export default {
     FieldArray,
     FormActionButtons,
     FormRow,
+    FormNumber,
     FormText,
     IdentifierInput,
     Repeater,
@@ -143,6 +173,8 @@ export default {
     data: Object,
     rawData: Object,
     error: String,
+    min: Number,
+    max: Number,
   },
   data() {
     const initialValues = {
@@ -151,13 +183,27 @@ export default {
       identifier: this.identifier,
       responseRequired: this.isRequired,
       answers: [],
+      min: '',
+      max: '',
     };
+
     if (Object.keys(this.rawData).length == 0) {
       initialValues.answers = ['', ''];
     } else {
       this.rawData.options.forEach(item => {
         initialValues.answers.push(item.value);
       });
+      if (typeof this.rawData.settings !== 'undefined') {
+        if (Object.keys(this.rawData.settings).length > 0) {
+          this.rawData.settings.forEach(item => {
+            if (item.name == 'min') {
+              initialValues.min = item.value;
+            } else if (item.name == 'max') {
+              initialValues.max = item.value;
+            }
+          });
+        }
+      }
     }
 
     return {
@@ -173,14 +219,22 @@ export default {
      */
     handleSubmit(values) {
       const optionList = [];
+      const restrictionVal = [];
 
       values.answers.forEach((item, index) => {
         optionList.push({ name: OPTION_PREFIX + index, value: item });
       });
+
+      restrictionVal.push({ name: 'min', value: values.min });
+      restrictionVal.push({ name: 'max', value: values.max });
+
       this.$emit('update', {
         title: values.rawTitle,
         identifier: values.identifier,
-        data: { options: optionList },
+        data: {
+          options: optionList,
+          settings: restrictionVal,
+        },
         is_required: this.responseRequired,
       });
     },
@@ -191,16 +245,61 @@ export default {
     cancel() {
       this.$emit('display');
     },
+
+    validator(values) {
+      const errors = {};
+      if (values.min !== '' && Number(values.min) <= 0) {
+        errors.min = this.$str(
+          'minmaximum_zero_error',
+          'performelement_multi_choice_multi'
+        );
+      }
+      if (values.max !== '' && Number(values.max) <= 0) {
+        errors.max = this.$str(
+          'minmaximum_zero_error',
+          'performelement_multi_choice_multi'
+        );
+      }
+      if (values.min !== '' && values.answers.length < Number(values.min)) {
+        errors.min = this.$str(
+          'minmaximum_value_error',
+          'performelement_multi_choice_multi'
+        );
+      }
+      if (values.max !== '' && values.answers.length < Number(values.max)) {
+        errors.max = this.$str(
+          'minmaximum_value_error',
+          'performelement_multi_choice_multi'
+        );
+      }
+      if (
+        values.min !== '' &&
+        values.max !== '' &&
+        Number(values.min) > Number(values.max)
+      ) {
+        errors.max = this.$str(
+          'minmaximum_less_error',
+          'performelement_multi_choice_multi'
+        );
+      }
+      return errors;
+    },
   },
 };
 </script>
 <lang-strings>
   {
   "performelement_multi_choice_multi": [
+  "answer_text",
   "error_question_required",
   "question_title",
-  "answer_text",
-  "multi_select_options"
+  "minmaximum_less_error",
+  "minmaximum_value_error",
+  "minmaximum_zero_error",
+  "multi_select_options",
+  "response_restriction",
+  "restriction_minimum_label",
+  "restriction_maximum_label"
   ],
   "mod_perform": [
   "section_element_response_required"

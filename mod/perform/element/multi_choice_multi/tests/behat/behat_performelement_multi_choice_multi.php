@@ -27,9 +27,8 @@ use Behat\Mink\Exception\ExpectationException;
 class behat_performelement_multi_choice_multi extends behat_base {
 
     public const DONE_BUTTON_LOCATOR  = '.tui-elementAdminFormActionButtons__done';
-    public const EDIT_ELEMENT_LOCATOR = '.tui-elementEditMultiChoice';
-    public const ADD_OPTION_LOCATOR   = '.tui-elementEditMultiChoice__add-option';
-    public const QUESTION_DISPLAY_TITLE_LOCATOR = '.tui-performElementEditDisplay__title';
+    public const EDIT_ELEMENT_LOCATOR = '.tui-elementEditMultiChoiceMulti';
+    public const ADD_OPTION_LOCATOR   = '.tui-elementEditMultiChoiceMulti__add-option';
     public const QUESTION_DISPLAY_OPTIONS_LOCATOR = '.tui-checkbox__label';
 
     /**
@@ -90,7 +89,7 @@ class behat_performelement_multi_choice_multi extends behat_base {
      * @throws ExpectationException
      */
     public function i_delete_multiple_answers_question_option(): void {
-        $delete_button = $this->find('css', '.tui-elementEditMultiChoice .tui-iconBtn--stealth');
+        $delete_button = $this->find('css', '.tui-elementEditMultiChoiceMulti .tui-iconBtn--stealth');
         $delete_button->click();
     }
 }
