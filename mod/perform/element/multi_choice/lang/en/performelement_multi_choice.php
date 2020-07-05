@@ -21,7 +21,7 @@
  * @package performelement_multi_choice
  */
 
-$string['answer_text'] = 'Answer text';
+$string['answer_text'] = 'Answer text {$a}';
 $string['error_answer_required'] = 'Answer is required';
 $string['error_you_must_answer_this_question'] = 'You must answer this question';
 $string['error_question_required'] = 'Question is required';
