@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
@@ -17,33 +17,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
- * @package totara_core
+ * @author Jaron Steenson <jaron.steenson@totaralearning.com>
+ * @package mod_perform
  */
 
-namespace totara_core\formatter;
+namespace mod_perform\formatter\activity;
 
 use core\orm\formatter\entity_model_formatter;
-use core\webapi\formatter\field\date_field_formatter;
-use core\webapi\formatter\field\string_field_formatter;
-use totara_core\relationship\relationship;
+use mod_perform\models\activity\relationship as relationship_model;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
- * Format the relationship properties for GraphQL.
- *
- * @package totara_core\formatter
+ * Maps the date_offset class into the GraphQL mod_perform_dynamic_date_offset type.
  */
-class relationship_formatter extends entity_model_formatter {
+class relationship extends entity_model_formatter {
 
-    /** @var relationship */
+    /** @var relationship_model */
     protected $object;
 
+    /**
+     * @inheritDoc
+     */
     protected function get_map(): array {
         return [
-            'id' => null,
-            'name' => string_field_formatter::class,
-            'name_plural' => string_field_formatter::class,
-            'created_at' => date_field_formatter::class,
+            'core_relationship' => null,
+            'is_subject' => null,
         ];
     }
 

@@ -111,6 +111,7 @@ $string['jobassignmentstartdate'] = 'Start date';
 $string['jobassignmentstartdate_help'] = 'Date that the user started in this job assignment. This date can be used in dynamic audience rules. However, this date is not used to determine if the job assignment is **active** in any other part of Totara.';
 $string['jobmanagement'] = 'Job Management';
 $string['manager'] = 'Manager';
+$string['manager_plural'] = 'Managers';
 $string['managernomatchja'] = 'Make sure you are selecting a job assignment linked to your manager. If that is what you were doing, delete your manager selection and try selecting it again. Or have your manager assigned after sign-up.';
 $string['movedownxjobassignment'] = 'Move down {$a} job assignment';
 $string['moveupxjobassignment'] = 'Move up {$a} job assignment';

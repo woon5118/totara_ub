@@ -327,12 +327,12 @@ class mod_perform_generator extends component_generator_base {
         return section::load_by_entity($section);
     }
 
-    public function create_section_relationship(section $section, array $data): section_relationship_model {
+    public function create_section_relationship(section $section, array $data, $can_view = true): section_relationship_model {
         $core_relationship = $this->get_core_relationship($data['class_name']);
         return section_relationship_model::create(
             $section->get_id(),
             $core_relationship->id,
-            true
+            $can_view
         );
     }
 
@@ -595,7 +595,6 @@ class mod_perform_generator extends component_generator_base {
      *
      * @param array $data
      * @return subject_instance_entity
-     * @throws coding_exception
      */
     public function create_subject_instance(array $data): subject_instance_entity {
         $activity_id = $data['activity_id'] ?? null;
@@ -630,6 +629,17 @@ class mod_perform_generator extends component_generator_base {
             /** @var user $other_participant */
             $other_participant = user::repository()
                 ->where('username', $other_participant_username)
+                ->order_by('id')
+                ->first();
+        }
+
+        $third_participant_username = $data['third_participant_username'] ?? null;
+        $third_participant = null;
+
+        if ($other_participant_username) {
+            /** @var user $other_participant */
+            $third_participant = user::repository()
+                ->where('username', $third_participant_username)
                 ->order_by('id')
                 ->first();
         }
@@ -673,6 +683,16 @@ class mod_perform_generator extends component_generator_base {
             $other_participant_instance->save();
         }
 
+        $third_participant_instance = null;
+        if ($third_participant) {
+            $third_participant_instance = new participant_instance_entity();
+            $third_participant_instance->core_relationship_id = 0; // stubbed
+            $third_participant_instance->participant_id = $third_participant->id;
+            $third_participant_instance->subject_instance_id = $subject_instance->id;
+            $third_participant_instance->progress = instance_not_started::get_code();
+            $third_participant_instance->save();
+        }
+
         $include_questions = $data['include_questions'] ?? true;
 
         // String conversion for behat, defaulting to true.
@@ -694,7 +714,8 @@ class mod_perform_generator extends component_generator_base {
             $element2 = $this->create_element(['title' => 'Question two', 'is_required' => (bool)$required_question]);
             $this->create_section_element($section1, $element2, 2);
 
-            foreach ([$subjects_participant_instance, $other_participant_instance] as $participant_instance) {
+            $participant_instances = [$subjects_participant_instance, $other_participant_instance, $third_participant_instance];
+            foreach ($participant_instances as $participant_instance) {
                 if ($participant_instance === null) {
                     continue;
                 }
@@ -702,28 +723,46 @@ class mod_perform_generator extends component_generator_base {
                 $this->create_participant_section($activity, $participant_instance, false, $section1);
             }
 
+            $relationships_can_view = $data['relationships_can_view'] ?? 'subject, manager, appraiser';
+            $relationships_can_view = explode(', ', $relationships_can_view);
+
             if ($subject_is_participating) {
-                $subject_relationship = $this->create_section_relationship($section1, ['class_name' => subject::class]);
+                $subject_relationship = $this->create_section_relationship(
+                    $section1,
+                    ['class_name' => subject::class],
+                    in_array('subject', $relationships_can_view, true)
+                );
                 $subjects_participant_instance->core_relationship_id = $subject_relationship->core_relationship_id;
                 $subjects_participant_instance->save();
             }
 
             if ($other_participant) {
-                $manager_relationship = $this->create_section_relationship($section1, ['class_name' => manager::class]);
+                $manager_relationship = $this->create_section_relationship(
+                    $section1,
+                    ['class_name' => manager::class],
+                    in_array('manager', $relationships_can_view, true)
+                );
                 $other_participant_instance->core_relationship_id = $manager_relationship->core_relationship_id;
                 $other_participant_instance->save();
-            }
-
-            if ($subject_is_participating) {
-                $subject_relationship = $this->create_section_relationship($section1, ['class_name' => subject::class]);
-                $subjects_participant_instance->core_relationship_id = $subject_relationship->core_relationship_id;
-                $subjects_participant_instance->save();
             }
 
             if ($other_participant) {
-                $manager_relationship = $this->create_section_relationship($section1, ['class_name' => manager::class]);
+                $manager_relationship = $this->create_section_relationship(
+                    $section1, ['class_name' => manager::class],
+                    in_array('manager', $relationships_can_view, true)
+                );
                 $other_participant_instance->core_relationship_id = $manager_relationship->core_relationship_id;
                 $other_participant_instance->save();
+            }
+
+            if ($third_participant) {
+                $appraiser_relationship = $this->create_section_relationship(
+                    $section1,
+                    ['class_name' => appraiser::class],
+                    in_array('appraiser', $relationships_can_view, true)
+                );
+                $third_participant_instance->core_relationship_id = $appraiser_relationship->core_relationship_id;
+                $third_participant_instance->save();
             }
         }
 

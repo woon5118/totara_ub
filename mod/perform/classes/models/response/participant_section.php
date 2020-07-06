@@ -29,6 +29,7 @@ use core\collection;
 use core\orm\entity\model;
 use core\orm\query\builder;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
+use mod_perform\entities\activity\section_relationship;
 use mod_perform\models\activity\participant_instance;
 use mod_perform\models\activity\section;
 use mod_perform\state\participant_section\closed;
@@ -37,6 +38,8 @@ use mod_perform\state\participant_section\participant_section_progress;
 use mod_perform\state\state;
 use mod_perform\state\state_aware;
 use moodle_exception;
+use totara_core\relationship\relationship as core_relationship;
+use mod_perform\models\activity\relationship;
 
 /**
  * Class participant_section
@@ -87,6 +90,7 @@ class participant_section extends model {
         'participant_instance',
         'availability_status',
         'answerable_participant_instances',
+        'responses_are_visible_to',
     ];
 
     /**
@@ -124,6 +128,24 @@ class participant_section extends model {
      */
     public function get_answerable_participant_instances(): collection {
         return $this->entity->get_answerable_participant_instances()->map_to(participant_instance::class);
+    }
+
+    /**
+     * Get a list of all relationships that can view this participant section responses.
+     *
+     * @return collection|relationship[]
+     */
+    public function get_responses_are_visible_to(): collection {
+        return $this->entity->section->section_relationships
+            ->filter(
+                function (section_relationship $section_relationship) {
+                    return $section_relationship->can_view;
+                }
+            )->map(
+                function (section_relationship $section_relationship) {
+                    return new relationship($section_relationship->core_relationship);
+                }
+            );
     }
 
     public function get_context(): context_module {

@@ -66,5 +66,11 @@ query mod_perform_participant_section(
         }
       }
     }
+    responses_are_visible_to {
+      core_relationship {
+        name_plural
+      }
+      is_subject
+    }
   }
 }

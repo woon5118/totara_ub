@@ -22,7 +22,13 @@
  * @category test
  */
 
+use core\collection;
+use mod_perform\models\activity\activity;
 use mod_perform\models\response\participant_section;
+use mod_perform\models\activity\relationship;
+use totara_core\relationship\resolvers\subject;
+use totara_job\relationship\resolvers\appraiser;
+use totara_job\relationship\resolvers\manager;
 
 /**
  * @group perform
@@ -86,6 +92,138 @@ class mod_perform_participant_section_model_testcase extends advanced_testcase {
         foreach ($all as $answerable_participant) {
             self::assertEquals($manager_appraiser_user->id, $answerable_participant->participant_id);
         }
+    }
+
+    /**
+     * @param string[] $expected_responses_are_visible_to
+     * @dataProvider get_responses_are_visible_to_provider
+     */
+    public function test_get_responses_are_visible_to(array $expected_responses_are_visible_to): void {
+        [
+            $manager_section,
+            $appraiser_section,
+            $subject_section,
+        ] = $this->set_up_responses_are_visible($expected_responses_are_visible_to);
+
+        // All participant section should have their responses visible to the same relationships.
+        $subject_responses_are_visible_to = (new participant_section($subject_section))
+            ->get_responses_are_visible_to();
+
+        $manager_responses_are_visible_to = (new participant_section($manager_section))
+            ->get_responses_are_visible_to();
+
+        $appraiser_responses_are_visible_to = (new participant_section($appraiser_section))
+            ->get_responses_are_visible_to();
+
+        // Note we are using assertEquals because the ordering matters here.
+        self::assertEquals(
+            $expected_responses_are_visible_to,
+            $this->get_relationship_resolver_classes($subject_responses_are_visible_to)
+        );
+
+        self::assertEquals(
+            $expected_responses_are_visible_to,
+            $this->get_relationship_resolver_classes($manager_responses_are_visible_to)
+        );
+
+        self::assertEquals(
+            $expected_responses_are_visible_to,
+            $this->get_relationship_resolver_classes($appraiser_responses_are_visible_to)
+        );
+    }
+
+    public function get_responses_are_visible_to_provider(): array {
+        return [
+            'Responses are not visible to anyone' => [[]],
+            'Responses are visible to everyone' => [
+                [subject::class, manager::class, appraiser::class]
+            ],
+            'Responses are visible to just managers' => [
+                [manager::class]
+            ],
+            'Responses are visible to just appraisers' => [
+                [appraiser::class]
+            ],
+            'Responses are visible to just subjects' => [
+                [subject::class]
+            ],
+        ];
+    }
+
+    private function set_up_responses_are_visible(array $expected_responses_are_visible_to): array {
+        self::setAdminUser();
+        $data_generator = self::getDataGenerator();
+
+        $subject_user = $data_generator->create_user();
+        $manager_appraiser_user = $data_generator->create_user();
+
+        /** @var mod_perform_generator $perform_generator */
+        $perform_generator = $data_generator->get_plugin_generator('mod_perform');
+
+        $subject_instance = $perform_generator->create_subject_instance([
+            'activity_name' => 'activity 1',
+            'subject_is_participating' => false, // The subject actually is participating, but we will create the instance below.
+            'subject_user_id' => $subject_user->id,
+            'other_participant_id' => null,
+            'include_questions' => false,
+        ]);
+
+        $activity = new activity($subject_instance->activity());
+
+        $section = $perform_generator->create_section($activity, ['title' => 'Part one']);
+
+        $manager_section_relationship = $perform_generator->create_section_relationship(
+            $section,
+            ['class_name' => manager::class],
+            in_array(manager::class, $expected_responses_are_visible_to, true)
+        );
+
+        $appraiser_section_relationship = $perform_generator->create_section_relationship(
+            $section,
+            ['class_name' => appraiser::class],
+            in_array(appraiser::class, $expected_responses_are_visible_to, true)
+        );
+
+        $subject_section_relationship = $perform_generator->create_section_relationship(
+            $section,
+            ['class_name' => subject::class],
+            in_array(subject::class, $expected_responses_are_visible_to, true)
+        );
+
+        $element = $perform_generator->create_element(['title' => 'Question one']);
+        $perform_generator->create_section_element($section, $element);
+
+        $manager_section = $perform_generator->create_participant_instance_and_section(
+            $activity,
+            $manager_appraiser_user,
+            $subject_instance->id,
+            $section,
+            $manager_section_relationship->core_relationship_id
+        );
+
+        $appraiser_section = $perform_generator->create_participant_instance_and_section(
+            $activity,
+            $manager_appraiser_user,
+            $subject_instance->id,
+            $section,
+            $appraiser_section_relationship->core_relationship_id
+        );
+
+        $subject_section = $perform_generator->create_participant_instance_and_section(
+            $activity,
+            $subject_user,
+            $subject_instance->id,
+            $section,
+            $subject_section_relationship->core_relationship_id
+        );
+
+        return [$manager_section, $appraiser_section, $subject_section];
+    }
+
+    private function get_relationship_resolver_classes(collection $collection): array {
+        return $collection->map(function (relationship $relationship) {
+            return $relationship->get_core_relationship()->get_resolvers()[0];
+        })->all();
     }
 
 }

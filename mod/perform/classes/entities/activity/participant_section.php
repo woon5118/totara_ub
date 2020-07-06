@@ -90,7 +90,7 @@ class participant_section extends entity {
      * Get all participant instances (same end user, different relationship),
      * that this section can be answered by the linked participant instance.
      *
-     * @return collection|participant_instance_entity
+     * @return collection|participant_instance_entity[]
      */
     public function get_answerable_participant_instances(): collection {
         $subject_instance_id = $this->participant_instance->subject_instance_id;

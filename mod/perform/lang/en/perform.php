@@ -188,6 +188,11 @@ $string['report_activity_warning_message'] = 'This report page can only show det
 $string['report_participant_warning_message'] = 'This report page can only show details for a single subject instance at a time - to select which subject instance\'s report to view, go to <a href="{$a->url}">Manage performance activities</a>, click on the reporting icon of the activity to which the subject instance belongs. From the report\'s list of subject instances, navigate to the relevant one\'s participant instance report by clicking on its participant count.';
 $string['reporting_identifier'] = 'Reporting ID';
 $string['reporting_identifier_form_label'] = 'Reporting ID (optional)';
+$string['response_visibility_label'] = 'Your responses (once submitted) are visible to:';
+$string['response_visibility_not_visible_to_anyone'] = 'Your responses are not visible to other participants';
+$string['response_visibility_the_employee'] = 'the <strong>Employee</strong>';
+$string['response_visibility_the_employees_relationship'] = 'the employee\'s <strong>{$a}</strong>';
+$string['response_visibility_your_relationship'] = 'your <strong>{$a}</strong>';
 $string['save_changes'] = 'Save changes';
 $string['section_dropdown_menu'] = 'Section dropdown menu';
 $string['schedule_activity_instance_creation_period'] = 'Activity instance creation period';

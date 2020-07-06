@@ -56,6 +56,7 @@ class behat_mod_perform extends behat_base {
     public const TUI_TRASH_ICON_BUTTON = "button[aria-label='Delete %s']";
 
     public const EDIT_QUESTION_DISPLAY_TITLE_LOCATOR = '.tui-performElementEditDisplay__title';
+    public const RESPONSE_VISIBILITY_DESCRIPTION_LOCATOR = '.tui-participantContent__sectionHeadingOtherResponsesDescription';
 
     /**
      * Navigate to the specified page and wait for JS.
@@ -822,6 +823,16 @@ class behat_mod_perform extends behat_base {
         }
 
         $this->fail("{$participant_to_remove} participant not found");
+    }
+    /**
+     * @Given /^I should see "([^"]*)" in the perform activity response visibility description$/
+     */
+    public function i_should_see_in_the_perform_activity_response_visibility_description(string $expected_text): void {
+        $actual_text = $this->find('css', self::RESPONSE_VISIBILITY_DESCRIPTION_LOCATOR)->getText();
+
+        if (strpos($actual_text, $expected_text) === -1) {
+            $this->fail("{$expected_text} was not found in the response visibility description");
+        }
     }
 
     /**

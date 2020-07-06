@@ -28,6 +28,7 @@ use core\orm\entity\model;
 use core\orm\query\builder;
 use totara_core\entities\relationship as relationship_entity;
 use totara_core\entities\relationship_resolver as relationship_resolver_entity;
+use totara_core\relationship\resolvers\subject;
 
 /**
  * A dynamically defined way of identifying the many users that are associated with a single user based on a given input.

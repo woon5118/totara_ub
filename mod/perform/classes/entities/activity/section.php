@@ -103,6 +103,9 @@ class section extends entity {
      * @return has_many
      */
     public function section_relationships(): has_many {
-        return $this->has_many(section_relationship::class, 'section_id');
+        return $this->has_many(section_relationship::class, 'section_id')
+            ->as('sr')
+            ->join([relationship::TABLE, 'cr'], 'sr.core_relationship_id', '=', 'cr.id')
+            ->order_by('cr.id');
     }
 }

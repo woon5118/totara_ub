@@ -72,6 +72,10 @@ type totara_core_relationship {
   """
   name(format: core_format = PLAIN): String!
   """
+  The plural version of the name of the relationship.
+  """
+  name_plural(format: core_format = PLAIN): String!
+  """
   When this relationship was created.
   """
   created_at(format: core_date_format = TIMESTAMP): core_date!

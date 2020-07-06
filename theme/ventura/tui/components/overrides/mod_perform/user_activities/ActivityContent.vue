@@ -52,10 +52,13 @@
       @include tui-font-heading-x-small();
     }
   }
+
   &__navigation {
     margin-top: var(--tui-gap-4);
+
     &-buttons {
       text-align: right;
+
       :not(:first-child) {
         margin-left: var(--tui-gap-4);
       }
@@ -74,10 +77,30 @@
     }
   }
 
+  &__sectionHeadingOtherResponsesBar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding-top: var(--tui-gap-6);
+    padding-bottom: var(--tui-gap-6);
+    border-top: solid var(--tui-color-neutral-5) var(--tui-border-width-thin);
+    border-bottom: solid var(--tui-color-neutral-5) var(--tui-border-width-thin);
+  }
+
+  &__sectionHeadingOtherResponsesDescription {
+    margin: 0;
+  }
+
+  &__sectionHeading-other-response-switch {
+    margin-top: var(--tui-gap-4);
+    margin-left: 0;
+  }
+
   &__section {
     &-required-container {
       margin-top: var(--tui-gap-2);
     }
+
     &-response-required {
       @include tui-font-heading-label();
       color: var(--tui-color-prompt-alert);
@@ -86,6 +109,7 @@
 
   &__sectionItem {
     margin-top: var(--tui-gap-4);
+
     &-content {
       & > * {
         margin-top: var(--tui-gap-4);
@@ -93,18 +117,20 @@
       }
     }
   }
+
   &__readonly {
     padding-top: var(--tui-gap-1);
   }
+
   &__response-optional {
     @include tui-font-body();
     @include tui-font-hint();
   }
 }
 
-// Spit the avatar and relationship blurb on tablet an larger.
 @media (min-width: $tui-screen-xs) {
   .tui-participantContent {
+    // Spit the avatar and relationship blurb on tablet an larger.
     &__user {
       flex-direction: row;
 
@@ -121,6 +147,17 @@
         display: block;
         margin: var(--tui-gap-1) 0 0;
       }
+    }
+
+    &__sectionHeadingOtherResponsesBar {
+      flex-wrap: nowrap;
+      margin-top: var(--tui-gap-6);
+    }
+
+    &__sectionHeading-other-response-switch {
+      flex-shrink: 0;
+      margin-top: 0;
+      margin-left: var(--tui-gap-6);
     }
   }
 }

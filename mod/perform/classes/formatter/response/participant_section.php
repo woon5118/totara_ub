@@ -48,6 +48,7 @@ class participant_section extends entity_model_formatter {
             'availability_status' => null,
             'participant_instance' => null,
             'answerable_participant_instances' => null,
+            'responses_are_visible_to' => null,
         ];
     }
 }

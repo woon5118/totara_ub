@@ -84,15 +84,24 @@
             </h3>
 
             <div
-              class="tui-participantContent__sectionHeading-other-response-switch"
+              class="tui-participantContent__sectionHeadingOtherResponsesBar"
             >
-              <ToggleButton
-                v-show="hasOtherResponse"
-                v-model="showOtherResponse"
-                :text="
-                  $str('user_activities_other_response_show', 'mod_perform')
-                "
+              <ResponsesAreVisibleToDescription
+                class="tui-participantContent__sectionHeadingOtherResponsesDescription"
+                :current-user-is-subject="currentUserIsSubject"
+                :visible-to-relationships="responsesAreVisibleTo"
               />
+              <div
+                class="tui-participantContent__sectionHeading-other-response-switch"
+              >
+                <ToggleButton
+                  v-show="hasOtherResponse"
+                  v-model="showOtherResponse"
+                  :text="
+                    $str('user_activities_other_response_show', 'mod_perform')
+                  "
+                />
+              </div>
             </div>
           </div>
           <div class="tui-participantContent__section-required-container">
@@ -198,6 +207,7 @@ import GridItem from 'totara_core/components/grid/GridItem';
 import Loader from 'totara_core/components/loader/Loader';
 import OtherParticipantResponses from 'mod_perform/components/user_activities/participant/OtherParticipantResponses';
 import ParticipantUserHeader from 'mod_perform/components/user_activities/participant/ParticipantUserHeader';
+import ResponsesAreVisibleToDescription from 'mod_perform/components/user_activities/participant/ResponsesAreVisibleToDescription';
 import ToggleButton from 'totara_core/components/buttons/ToggleButton';
 import { Uniform } from 'totara_core/components/uniform';
 // graphQL
@@ -207,6 +217,7 @@ import UpdateSectionResponsesMutation from 'mod_perform/graphql/update_section_r
 export default {
   components: {
     Button,
+    ResponsesAreVisibleToDescription,
     ButtonCancel,
     ButtonGroup,
     ButtonSubmit,
@@ -288,6 +299,7 @@ export default {
       modalOpen: false,
       formValues: {},
       participantSections: [],
+      responsesAreVisibleTo: [],
     };
   },
 
@@ -307,6 +319,8 @@ export default {
         this.activeParticipantSection = data.mod_perform_participant_section;
         this.participantSections =
           data.mod_perform_participant_section.participant_instance.participant_sections;
+        this.responsesAreVisibleTo =
+          data.mod_perform_participant_section.responses_are_visible_to;
         this.formValues = {};
         this.initialValues = {
           sectionElements: {},
