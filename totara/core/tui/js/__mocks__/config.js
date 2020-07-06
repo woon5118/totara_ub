@@ -32,6 +32,7 @@ export const globalConfig = {
   admin: 'admin',
   svgicons: true,
   usertimezone: 'Pacific/Auckland',
+  servertimezone: 'Pacific/Auckland',
   contextid: 1,
   currentlanguage: 'en',
   NODE_ENV: 'production',

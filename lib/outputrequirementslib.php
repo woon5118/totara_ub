@@ -382,6 +382,7 @@ require(['core/autoinitialise'], function(ai) {
                 'admin'               => $CFG->admin,
                 'svgicons'            => $page->theme->use_svg_icons(),
                 'usertimezone'        => usertimezone(),
+                'servertimezone'      => \core_date::get_server_timezone(),
                 'contextid'           => $contextid,
                 'currentlanguage'     => $currentlanguage,
                 'NODE_ENV'            => $CFG->debugdeveloper ? 'development' : 'production',
