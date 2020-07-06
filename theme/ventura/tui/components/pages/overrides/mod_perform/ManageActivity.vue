@@ -22,8 +22,13 @@
 
 <style lang="scss">
 .tui-performManageActivity {
-  &__topBar {
-    margin-bottom: var(--tui-gap-4);
+  & > .tui-loader > * + * {
+    margin-top: var(--tui-gap-4);
+  }
+
+  &__title {
+    @include tui-font-heading-medium;
+    margin-bottom: 0;
   }
 }
 </style>

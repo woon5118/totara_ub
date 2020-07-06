@@ -115,6 +115,7 @@ import FormRowDetails from 'totara_core/components/form/FormRowDetails';
 import InputText from 'totara_core/components/form/InputText';
 import Select from 'totara_core/components/form/Select';
 import Textarea from 'totara_core/components/form/Textarea';
+import { ACTIVITY_STATUS_ACTIVE } from 'mod_perform/constants';
 
 //GraphQL
 import activityTypesQuery from 'mod_perform/graphql/activity_types';
@@ -212,7 +213,7 @@ export default {
      * @returns {boolean}
      */
     isActive() {
-      return this.value.state_details.name === 'ACTIVE';
+      return this.value.state_details.name === ACTIVITY_STATUS_ACTIVE;
     },
   },
 

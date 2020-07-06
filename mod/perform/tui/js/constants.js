@@ -25,6 +25,10 @@
 
 export const NOTIFICATION_DURATION = 10 * 1000; // 10 seconds (in milliseconds)
 
+// Corresponds to activity state classes found in \mod_perform\state\activity
+export const ACTIVITY_STATUS_ACTIVE = 'ACTIVE';
+export const ACTIVITY_STATUS_DRAFT = 'DRAFT';
+
 export const RELATIVE_DATE_DIRECTION_AFTER = 'AFTER';
 export const RELATIVE_DATE_DIRECTION_BEFORE = 'BEFORE';
 export const RELATIVE_DATE_UNIT_DAY = 'DAY';

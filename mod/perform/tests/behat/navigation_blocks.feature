@@ -14,7 +14,7 @@ Feature: Make sure the correct navigation breadcrumbs and blocks are shown.
 
     # Edit activity page
     When I click on "activity_one" "link"
-    Then I should see "Edit draft: “activity_one”"
+    Then I should see "activity_one"
     And I should not see "Performance activity administration" in the "#settingsnav" "css_element"
     And I should not see "Course administration" in the "#settingsnav" "css_element"
     And I should not see "Courses" in the ".breadcrumb-container" "css_element"

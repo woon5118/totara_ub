@@ -126,10 +126,13 @@ class mod_perform_activity_users_to_assign_count_testcase extends advanced_testc
         $this->expand_activity($activity7);
         $this->assertEquals($this->get_assigned_user_count($activity7), $activity7_actual);
 
+        // Make sure null is returned when attempting to query this on an activity that isn't ready to be activated.
+        $activity_not_ready = $this->generator()->create_activity_in_container(['activity_status' => draft::get_code()]);
+        $this->assertNull($activity_not_ready->get_users_to_assign_count());
 
-        // Make sure we get an exception when attempting to query this on a non-draft activity.
+        // Make sure we get an exception when attempting to query this on an already activated activity.
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessage("Activity {$activity1->id} can't be activated");
+        $this->expectExceptionMessage("Activity {$activity1->id} has already been activated");
         $activity1->get_users_to_assign_count();
     }
 

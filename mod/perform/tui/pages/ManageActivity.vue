@@ -33,9 +33,15 @@
         class="tui-performManageActivity__topBar"
       >
         <GridItem :units="6">
-          <h2>{{ pageHeading }}</h2>
+          <h2 class="tui-performManageActivity__title">{{ activity.name }}</h2>
         </GridItem>
       </Grid>
+
+      <ActivityStatusBanner
+        v-if="activity"
+        :activity="activity"
+        @refetch="refetch"
+      />
 
       <Tabs v-if="activity" :selected="initialTabId">
         <Tab
@@ -59,6 +65,7 @@
 </template>
 
 <script>
+import ActivityStatusBanner from 'mod_perform/components/manage_activity/ActivityStatusBanner';
 import AssignmentsTab from 'mod_perform/components/manage_activity/assignment/AssignmentsTab';
 import ActivityContentTab from 'mod_perform/components/manage_activity/content/ActivityContentTab';
 import FlexIcon from 'totara_core/components/icons/FlexIcon';
@@ -74,6 +81,7 @@ import { NOTIFICATION_DURATION } from 'mod_perform/constants';
 
 export default {
   components: {
+    ActivityStatusBanner,
     AssignmentsTab,
     ActivityContentTab,
     FlexIcon,
@@ -135,17 +143,14 @@ export default {
       },
     },
   },
-  computed: {
-    pageHeading() {
-      // TODO switching based on status
-      return this.$str(
-        'manage_edit_draft_heading',
-        'mod_perform',
-        this.activity.name
-      );
-    },
-  },
   methods: {
+    /**
+     * Re-fetch the activity from the server.
+     */
+    refetch() {
+      this.$apollo.queries.activity.refetch();
+    },
+
     /**
      * Show a generic success toast.
      */
@@ -178,7 +183,6 @@ export default {
       "manage_activities_tabs_assignment",
       "manage_activities_tabs_content",
       "manage_activities_tabs_general",
-      "manage_edit_draft_heading",
       "toast_error_generic_update",
       "toast_success_activity_update"
     ]

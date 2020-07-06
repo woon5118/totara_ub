@@ -1,12 +1,11 @@
-@totara @perform @mod_perform @javascript @vuejs
+@totara @perform @mod_perform
 Feature: Activation of activities
   As an activity administrator
   I need to be able to activate activities
   so they can be available to users.
 
   Background:
-    Given I am on a totara site
-    And the following "users" exist:
+    Given the following "users" exist:
       | username | firstname | lastname | email             |
       | user1    | user      | 1        | user1@example.com |
       | user2    | user      | 2        | user2@example.com |
@@ -33,14 +32,17 @@ Feature: Activation of activities
       | section 1    | short_text   |
     And the following "activity tracks" exist in "mod_perform" plugin:
       | activity_name           | track_description |
-      | Complete draft activity | track 1           |
+      | Empty draft activity    | track 1           |
+      | Complete draft activity | track 2           |
     And the following "track assignments" exist in "mod_perform" plugin:
       | track_description | assignment_type | assignment_name |
       | track 1           | cohort          | aud1            |
-
-  Scenario: Activating activities
+      | track 2           | cohort          | aud1            |
     When I log in as "admin"
-    And I navigate to the manage perform activities page
+
+  @javascript @vuejs
+  Scenario: Activating activities in the activities list
+    When I navigate to the manage perform activities page
     Then I should see the tui datatable contains:
       | Name                    | Type      | Status |
       | Active activity         | Check-in  | Active |
@@ -48,9 +50,14 @@ Feature: Activation of activities
       | Complete draft activity | Feedback  | Draft  |
 
     When I open the dropdown menu in the tui datatable row with "Empty draft activity" "Name"
-    Then I should see "Activate" option disabled in the dropdown menu
+    Then I should see "Activate" option in the dropdown menu
+    When I click on "Activate" option in the dropdown menu
+    Then I should see "Activity cannot be activated" in the tui modal
+    And I should see "Activation of this draft activity will only be possible once all of the following criteria are met:" in the tui modal
+    And I should see "At least one question element added" in the tui modal
 
-    When I close any visible tui dropdowns
+    When I close the tui modal
+    And I close any visible tui dropdowns
     And I open the dropdown menu in the tui datatable row with "Active activity" "Name"
     Then I should not see "Activate" option in the dropdown menu
 
@@ -59,12 +66,43 @@ Feature: Activation of activities
     Then I should see "Activate" option in the dropdown menu
 
     When I click on "Activate" option in the dropdown menu
-    Then I should see "Confirm activity activation"
-    And I should see "2 users will be assigned on activation"
+    Then I should see "Confirm activity activation" in the tui modal
+    And I should see "2 users will be assigned on activation" in the tui modal
 
     When I click on "Activate" "button"
-    Then I should see the tui datatable contains:
+    Then I should see " was successfully activated." in the tui "success" notification toast
+    And I should see the tui datatable contains:
       | Name                    | Type      | Status |
       | Active activity         | Check-in  | Active |
       | Empty draft activity    | Appraisal | Draft  |
       | Complete draft activity | Feedback  | Active |
+
+  @javascript @vuejs
+  Scenario: Activating activities on the manage activity page
+    When I navigate to the edit perform activities page for activity "Empty draft activity"
+    Then I should see "This activity is currently in a draft state" in the tui action card
+
+    When I click on the tui form help icon in the ".tui-actionCard" "css_element"
+    Then I should see "It can be activated once all of the following criteria are met:" in the tui popover
+    And I should see "At least one question element added" in the tui popover
+    When I close the tui popover
+
+    And I click on "Activate" "button" in the ".tui-actionCard" "css_element"
+    Then I should see "Activity cannot be activated" in the tui modal
+    And I should see "Activation of this draft activity will only be possible once all of the following criteria are met:" in the tui modal
+    And I should see "At least one question element added" in the tui modal
+    When I close the tui modal
+
+    When I navigate to the edit perform activities page for activity "Complete draft activity"
+    Then I should see "This activity is currently in a draft state" in the tui action card
+    When I click on "Activate" "button" in the ".tui-actionCard" "css_element"
+    Then I should see "Confirm activity activation" in the tui modal
+    And I should see "2 users will be assigned on activation" in the tui modal
+    When I close the tui modal
+    Then I should see "This activity is currently in a draft state" in the tui action card
+    When I click on "Activate" "button" in the ".tui-actionCard" "css_element"
+    And I confirm the tui confirmation modal
+    Then I should see " was successfully activated." in the tui "success" notification toast
+    And I should see "This activity is active." in the tui action card
+    And I should see "Any changes made will be applied to future subject instances only, except for title and description, which apply to all." in the tui action card
+    And I should not see "Activate" in the tui action card

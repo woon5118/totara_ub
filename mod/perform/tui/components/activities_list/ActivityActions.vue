@@ -18,7 +18,7 @@
 
   @author Matthias Bonk <matthias.bonk@totaralearning.com>
   @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
-  @package totara_perform
+  @package mod_perform
 -->
 
 <template>
@@ -44,9 +44,7 @@
       </template>
       <DropdownItem
         v-if="activity.can_potentially_activate"
-        :disabled="!activity.can_activate"
-        :title="activateOptionTitle"
-        @click="showActivateModal"
+        @click="$refs.activateActivityModal.open()"
       >
         {{ $str('activity_action_activate', 'mod_perform') }}
       </DropdownItem>
@@ -58,34 +56,12 @@
       </DropdownItem>
     </Dropdown>
 
-    <ConfirmationModal
-      :open="activateModalOpen"
-      :title="$str('modal_activate_title', 'mod_perform')"
-      :confirm-button-text="$str('activity_action_activate', 'mod_perform')"
-      :loading="activating"
-      @confirm="activateActivity"
-      @cancel="closeActivateModal"
-    >
-      <Loader :loading="$apollo.queries.activityUsersToAssignCount.loading">
-        <div>
-          <p>
-            {{ $str('modal_activate_message', 'mod_perform') }}
-          </p>
-          <p
-            v-html="
-              $str(
-                'modal_activate_message_users',
-                'mod_perform',
-                activityUsersToAssignCount
-              )
-            "
-          />
-          <p>
-            {{ $str('modal_activate_message_question', 'mod_perform') }}
-          </p>
-        </div>
-      </Loader>
-    </ConfirmationModal>
+    <ActivateActivityModal
+      v-if="activity.can_potentially_activate"
+      ref="activateActivityModal"
+      :activity="activity"
+      @refetch="$emit('refetch')"
+    />
 
     <ConfirmationModal
       :open="deleteModalOpen"
@@ -112,27 +88,28 @@
 </template>
 
 <script>
+import ActivateActivityModal from 'mod_perform/components/manage_activity/ActivateActivityModal';
 import ConfirmationModal from 'totara_core/components/modal/ConfirmationModal';
 import Dropdown from 'totara_core/components/dropdown/Dropdown';
 import DropdownItem from 'totara_core/components/dropdown/DropdownItem';
-import Loader from 'totara_core/components/loader/Loader';
 import MoreButton from 'totara_core/components/buttons/MoreIcon';
 import ParticipationReportingIcon from 'mod_perform/components/icons/ParticipationReporting';
 import { notify } from 'totara_core/notifications';
-import { NOTIFICATION_DURATION } from 'mod_perform/constants';
+import {
+  ACTIVITY_STATUS_DRAFT,
+  NOTIFICATION_DURATION,
+} from 'mod_perform/constants';
 
 // Queries
-import activateActivityMutation from 'mod_perform/graphql/activate_activity';
 import activateCloneMutation from 'mod_perform/graphql/clone_activity';
 import activateDeleteMutation from 'mod_perform/graphql/delete_activity';
-import activityUsersToAssignCountQuery from 'mod_perform/graphql/activity_users_to_assign_count';
 
 export default {
   components: {
+    ActivateActivityModal,
     ConfirmationModal,
     Dropdown,
     DropdownItem,
-    Loader,
     MoreButton,
     ParticipationReportingIcon,
   },
@@ -146,35 +123,19 @@ export default {
 
   data() {
     return {
-      activateModalOpen: false,
-      activityUsersToAssignCount: 0,
       deleteModalOpen: false,
-      activating: false,
       deleting: false,
     };
   },
 
   computed: {
     /**
-     * For certain cases, get a title text for the 'Activate" dropdown option.
-     */
-    activateOptionTitle() {
-      if (
-        this.activity.can_potentially_activate &&
-        !this.activity.can_activate
-      ) {
-        return this.$str('activity_draft_not_ready', 'mod_perform');
-      }
-      return this.$str('activity_action_activate', 'mod_perform');
-    },
-
-    /**
      * Is the activity in draft state.
      *
      * @return {boolean}
      */
     activityIsDraft() {
-      return this.activity.state_details.name === 'DRAFT';
+      return this.activity.state_details.name === ACTIVITY_STATUS_DRAFT;
     },
 
     /**
@@ -202,59 +163,7 @@ export default {
     },
   },
 
-  apollo: {
-    activityUsersToAssignCount: {
-      query: activityUsersToAssignCountQuery,
-      variables() {
-        return {
-          activity_id: this.activity.id,
-        };
-      },
-      update: data => data.mod_perform_activity_users_to_assign_count,
-      skip() {
-        return !this.activateModalOpen || this.activating;
-      },
-    },
-  },
-
   methods: {
-    /**
-     * Activate an activity
-     */
-    activateActivity() {
-      this.activating = true;
-
-      this.$apollo
-        .mutate({
-          mutation: activateActivityMutation,
-          variables: {
-            input: {
-              activity_id: this.activity.id,
-            },
-          },
-        })
-        .then(() => {
-          notify({
-            duration: NOTIFICATION_DURATION,
-            message: this.$str(
-              'toast_success_activity_activated',
-              'mod_perform',
-              this.activity.name
-            ),
-            type: 'success',
-          });
-          this.$emit('refetch');
-          this.activating = false;
-          this.closeActivateModal();
-        })
-        .catch(() => {
-          this.showErrorNotification();
-          this.$emit('refetch');
-          this.activating = false;
-          this.closeActivateModal();
-        });
-    },
-
     /**
      * Clones the activity.
      */
@@ -273,13 +182,6 @@ export default {
         this.showErrorNotification();
       }
       this.$emit('refetch');
-    },
-
-    /**
-     * Close the modal for confirming the activation of the activity.
-     */
-    closeActivateModal() {
-      this.activateModalOpen = false;
     },
 
     /**
@@ -313,13 +215,6 @@ export default {
 
       this.$emit('refetch');
       this.closeDeleteModal();
-    },
-
-    /**
-     * Display the modal for confirming the activation of the activity.
-     */
-    showActivateModal() {
-      this.activateModalOpen = true;
     },
 
     showCloneSuccessNotification() {
@@ -383,11 +278,6 @@ export default {
       "activity_action_clone",
       "activity_action_delete",
       "activity_action_options",
-      "activity_draft_not_ready",
-      "modal_activate_message",
-      "modal_activate_message_question",
-      "modal_activate_message_users",
-      "modal_activate_title",
       "modal_delete_confirmation_line",
       "modal_delete_draft_message",
       "modal_delete_draft_title",
@@ -397,7 +287,6 @@ export default {
       "participation_reporting",
       "toast_error_generic_update",
       "toast_success_activity_cloned",
-      "toast_success_activity_activated",
       "toast_success_activity_deleted",
       "toast_success_draft_activity_deleted"
     ],

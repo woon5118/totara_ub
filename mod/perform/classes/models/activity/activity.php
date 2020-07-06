@@ -456,12 +456,17 @@ class activity extends model {
     /**
      * Get the number of users that will be assigned to this activity upon activation.
      *
-     * @return int
+     * @return int|null Number of users, or null if the activity can't be activated yet.
      * @throws \coding_exception if the activity has already been activated
      */
-    public function get_users_to_assign_count(): int {
-        if (!$this->get_status_state()->can_activate()) {
-            throw new \coding_exception("Activity {$this->id} can't be activated");
+    public function get_users_to_assign_count(): ?int {
+        if (!$this->is_draft()) {
+            throw new \coding_exception("Activity {$this->id} has already been activated");
+        }
+
+        if (!$this->can_activate()) {
+            // Activity is in the draft state, but can't be activated for some other reason.
+            return null;
         }
 
         // Get all the assignments for this activity.

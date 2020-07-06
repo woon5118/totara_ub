@@ -12,6 +12,7 @@ query mod_perform_activity($activity_id: core_id!) {
     state_details {
       name
     }
+    can_potentially_activate
     sections {
       id
       title
