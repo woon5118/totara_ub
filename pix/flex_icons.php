@@ -877,7 +877,7 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-minus-circle',
+                    'classes' => 'fa-times-circle',
                 ),
         ),
     'event-course' =>
