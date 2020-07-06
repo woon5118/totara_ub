@@ -21,9 +21,6 @@
 -->
 <template>
   <div>
-    <h4 class="tui-performAssignmentSchedule__heading">
-      {{ $str('schedule_additional_settings', 'mod_perform') }}
-    </h4>
     <FormScope path="additionalSettings">
       <FormRow
         :label="$str('schedule_job_assignment_based_instances', 'mod_perform')"
@@ -111,7 +108,6 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
-      "schedule_additional_settings",
       "schedule_job_assignment_based_instances",
       "schedule_job_assignment_based_instances_disabled",
       "schedule_job_assignment_based_instances_disabled_description",

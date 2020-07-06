@@ -25,8 +25,8 @@
 use mod_perform\models\activity\track;
 use mod_perform\models\activity\track_assignment_type;
 use mod_perform\user_groups\grouping;
-use mod_perform\webapi\resolver\mutation\add_track_assignments;
 use totara_core\advanced_feature;
+use totara_job\job_assignment;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
@@ -46,7 +46,7 @@ class mod_perform_webapi_mutation_add_track_assignments_testcase extends advance
         $this->setAdminUser();
 
         $assignment_type = track_assignment_type::ADMIN;
-        [$track, $args, $context] = $this->setup_env(['type' => $assignment_type]);
+        [$track, $args, ] = $this->setup_env(['type' => $assignment_type]);
 
         $this->assertEmpty($track->assignments->all(), 'track has assignments');
 
@@ -78,6 +78,9 @@ class mod_perform_webapi_mutation_add_track_assignments_testcase extends advance
 
             $this->assertNotNull($expected_group_type, "unknown group id '$group_id'");
             $this->assertEquals($expected_group_type, $group->get_type(), 'wrong group type');
+
+            $expected_size = $expected_group_type === grouping::USER ? 1 : 5;
+            $this->assertEquals($expected_size, $group->get_size(), 'wrong group size');
         }
     }
 
@@ -114,6 +117,9 @@ class mod_perform_webapi_mutation_add_track_assignments_testcase extends advance
 
             $this->assertNotNull($expected_group_type, "unknown group id '$group_id'");
             $this->assertEquals($expected_group_type, $group['type'], 'wrong group type');
+
+            $expected_size = $expected_group_type === grouping::USER ? 1 : 5;
+            $this->assertEquals($expected_size, $group['size'], 'wrong group size');
         }
     }
 
@@ -189,12 +195,21 @@ class mod_perform_webapi_mutation_add_track_assignments_testcase extends advance
         $generator = $this->getDataGenerator();
         $hierarchies = $generator->get_plugin_generator('totara_hierarchy');
 
+        $group_users = [];
+        for ($i = 0; $i < 5; $i++) {
+            $group_users[] = $generator->create_user()->id;
+        }
+
         $grouping = null;
         switch ($type) {
             case grouping::COHORT:
                 $cohort = $generator->create_cohort([
                     'name' => 'My testing cohort'
                 ])->id;
+
+                foreach ($group_users as $user) {
+                    cohort_add_member($cohort, $user);
+                }
 
                 $grouping = grouping::cohort($cohort);
                 break;
@@ -206,6 +221,14 @@ class mod_perform_webapi_mutation_add_track_assignments_testcase extends advance
                     'fullname' => 'My really long org name'
                 ])->id;
 
+                foreach ($group_users as $user) {
+                    job_assignment::create([
+                        'userid' => $user,
+                        'idnumber' => "$user",
+                        'organisationid' => $org
+                    ]);
+                }
+
                 $grouping = grouping::org($org);
                 break;
 
@@ -215,6 +238,14 @@ class mod_perform_webapi_mutation_add_track_assignments_testcase extends advance
                     'shortname' => 'My short pos name',
                     'fullname' => 'My really long pos name'
                 ])->id;
+
+                foreach ($group_users as $user) {
+                    job_assignment::create([
+                        'userid' => $user,
+                        'idnumber' => "$user",
+                        'positionid' => $pos
+                    ]);
+                }
 
                 $grouping = grouping::pos($pos);
                 break;

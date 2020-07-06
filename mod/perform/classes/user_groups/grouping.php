@@ -63,6 +63,11 @@ final class grouping {
     private $name = null;
 
     /**
+     * @var int no of members in the grouping.
+     */
+    private $size = null;
+
+    /**
      * Get all allowed groupings.
      *
      * @return string[] the allowed groupings.
@@ -281,6 +286,24 @@ final class grouping {
     }
 
     /**
+     * Returns the number of members in this group.
+     *
+     * @return int the group size.
+     */
+    public function get_size(): int {
+        if (is_null($this->size)) {
+            if ($this->type === self::USER) {
+                $this->size = 1;
+            } else {
+                $entity = self::get_entity_class_by_user_group_type($this->type);
+                $this->size = count($entity::expand_multiple([$this->id]));
+            }
+        }
+
+        return $this->size;
+    }
+
+    /**
      * Get entity class by user group type
      *
      * @param string $type
@@ -311,5 +334,4 @@ final class grouping {
 
         return $class_name;
     }
-
 }

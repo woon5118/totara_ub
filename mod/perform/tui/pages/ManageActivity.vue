@@ -55,6 +55,7 @@
             :is="component"
             v-model="activity"
             :activity-id="activityId"
+            :activity-state="activityState"
             @mutation-error="showMutationErrorNotification"
             @mutation-success="showMutationSuccessNotification"
           />
@@ -138,9 +139,13 @@ export default {
         };
       },
       update: data => {
-        // noinspection JSUnresolvedVariable
         return data.mod_perform_activity;
       },
+    },
+  },
+  computed: {
+    activityState() {
+      return this.activity ? this.activity.state_details.name : null;
     },
   },
   methods: {

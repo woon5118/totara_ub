@@ -59,6 +59,7 @@ query mod_perform_default_track_settings($activity_id: param_integer!) {
         type
         type_label
         name
+        size
       }
     }
   }

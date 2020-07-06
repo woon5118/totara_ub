@@ -43,7 +43,8 @@ class grouping extends formatter {
             'id' => null,
             'type' => string_field_formatter::class,
             'type_label' =>  string_field_formatter::class,
-            'name' =>  string_field_formatter::class
+            'name' => string_field_formatter::class,
+            'size' => null
         ];
     }
 
@@ -63,6 +64,9 @@ class grouping extends formatter {
 
             case 'name':
                 return $this->object->get_name();
+
+            case 'size':
+                return $this->object->get_size();
         }
     }
 
@@ -74,7 +78,8 @@ class grouping extends formatter {
             'id',
             'type',
             'type_label',
-            'name'
+            'name',
+            'size'
         ];
 
         return in_array($field, $recognized);

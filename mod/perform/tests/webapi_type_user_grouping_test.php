@@ -27,8 +27,9 @@ use core\webapi\execution_context;
 
 use mod_perform\user_groups\grouping;
 
-use mod_perform\webapi\resolver\type\user_grouping;
+use totara_job\job_assignment;
 use totara_webapi\phpunit\webapi_phpunit_helper;
+
 
 /**
  * @coversDefaultClass user_grouping.
@@ -86,7 +87,8 @@ class mod_perform_webapi_type_user_grouping_testcase extends advanced_testcase {
             'type' => ['type', null, $source->get_type()],
             'type_label' => ['type_label', null, $source->get_type_label()],
             'default name' => ['name', null, $plain_name],
-            'html name' => ['name', format::FORMAT_PLAIN, $plain_name]
+            'html name' => ['name', format::FORMAT_PLAIN, $plain_name],
+            'size' => ['size', null, $source->get_size()]
         ];
 
         foreach ($testcases as $id => $testcase) {
@@ -113,12 +115,21 @@ class mod_perform_webapi_type_user_grouping_testcase extends advanced_testcase {
         $generator = $this->getDataGenerator();
         $hierarchies = $generator->get_plugin_generator('totara_hierarchy');
 
+        $group_users = [];
+        for ($i = 0; $i < 3; $i++) {
+            $group_users[] = $generator->create_user()->id;
+        }
+
         $grouping = null;
         switch ($type) {
             case grouping::COHORT:
                 $cohort = $generator->create_cohort([
                     'name' => 'My testing cohort'
                 ])->id;
+
+                foreach ($group_users as $user) {
+                    cohort_add_member($cohort, $user);
+                }
 
                 $grouping = grouping::cohort($cohort);
                 break;
@@ -130,6 +141,14 @@ class mod_perform_webapi_type_user_grouping_testcase extends advanced_testcase {
                     'fullname' => 'My really long org name'
                 ])->id;
 
+                foreach ($group_users as $user) {
+                    job_assignment::create([
+                        'userid' => $user,
+                        'idnumber' => "$user",
+                        'organisationid' => $org
+                    ]);
+                }
+
                 $grouping = grouping::org($org);
                 break;
 
@@ -139,6 +158,14 @@ class mod_perform_webapi_type_user_grouping_testcase extends advanced_testcase {
                     'shortname' => 'My short pos name',
                     'fullname' => 'My really long pos name'
                 ])->id;
+
+                foreach ($group_users as $user) {
+                    job_assignment::create([
+                        'userid' => $user,
+                        'idnumber' => "$user",
+                        'positionid' => $pos
+                    ]);
+                }
 
                 $grouping = grouping::pos($pos);
                 break;

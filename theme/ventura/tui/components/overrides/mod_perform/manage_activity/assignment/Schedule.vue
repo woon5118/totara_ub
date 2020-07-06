@@ -39,6 +39,10 @@
     border-radius: 6px;
   }
 
+  &__additional_settings {
+    margin-top: var(--tui-gap-5);
+  }
+
   &__action {
     margin-top: var(--tui-gap-5);
   }

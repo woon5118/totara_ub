@@ -7,6 +7,7 @@ type mod_perform_user_grouping {
   type: Int!
   type_label: String!
   name: String
+  size: Int!
 }
 
 input mod_perform_user_grouping_input {

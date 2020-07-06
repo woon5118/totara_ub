@@ -77,7 +77,7 @@
               $str('user_group_assignment_usercount', 'mod_perform')
             "
           >
-            <span v-if="row.group.id">TBD</span>
+            {{ row.group.size }}
           </Cell>
           <Cell size="2" valign="center" align="end">
             <ButtonIcon
@@ -108,6 +108,7 @@
         :dynamic-date-sources="dynamicDateSources"
         :default-fixed-date="defaultFixedDateSetting"
         :activity-id="activityId"
+        :activity-state="activityState"
       />
     </div>
     <AudienceAdder
@@ -119,12 +120,18 @@
 
     <ConfirmationModal
       :title="$str('user_group_assignment_confirm_remove_title', 'mod_perform')"
+      :confirm-button-text="
+        $str('user_group_assignment_confirm_modal_remove', 'mod_perform')
+      "
       :open="confirmationModalOpen"
       @confirm="removeAssignment"
       @cancel="hideRemoveConfirmationModal"
     >
-      <p>
-        {{ $str('user_group_assignment_confirm_remove', 'mod_perform') }}
+      <p v-if="isActive">
+        {{ $str('user_group_assignment_confirm_remove_active', 'mod_perform') }}
+      </p>
+      <p v-else>
+        {{ $str('user_group_assignment_confirm_remove_draft', 'mod_perform') }}
       </p>
     </ConfirmationModal>
   </div>
@@ -144,6 +151,7 @@ import GridItem from 'totara_core/components/grid/GridItem';
 import HeaderCell from 'totara_core/components/datatable/HeaderCell';
 import Table from 'totara_core/components/datatable/Table';
 import Schedule from 'mod_perform/components/manage_activity/assignment/Schedule';
+import { ACTIVITY_STATUS_ACTIVE } from 'mod_perform/constants';
 
 //GraphQL
 import TrackSettingsQuery from 'mod_perform/graphql/default_track_settings';
@@ -170,6 +178,10 @@ export default {
   props: {
     activityId: {
       type: Number,
+      required: true,
+    },
+    activityState: {
+      type: String,
       required: true,
     },
   },
@@ -203,6 +215,9 @@ export default {
      */
     dropdownPosition() {
       return screen.width > 600 ? 'bottom-right' : 'bottom-left';
+    },
+    isActive() {
+      return this.activityState == ACTIVITY_STATUS_ACTIVE;
     },
   },
 
@@ -408,7 +423,9 @@ export default {
     "mod_perform" : [
       "deleted_dynamic_source_label",
       "user_group_assignment_add_group",
-      "user_group_assignment_confirm_remove",
+      "user_group_assignment_confirm_modal_remove",
+      "user_group_assignment_confirm_remove_active",
+      "user_group_assignment_confirm_remove_draft",
       "user_group_assignment_confirm_remove_title",
       "user_group_assignment_group_cohort",
       "user_group_assignment_name",

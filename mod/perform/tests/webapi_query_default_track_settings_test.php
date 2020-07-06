@@ -25,7 +25,6 @@
 use mod_perform\models\activity\track;
 use mod_perform\models\activity\track_assignment as track_assignment_model;
 use mod_perform\models\activity\track_status;
-use mod_perform\webapi\resolver\query\default_track;
 use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
@@ -189,7 +188,8 @@ class mod_perform_webapi_query_default_track_settings_testcase extends advanced_
                 'id' => $grouping_resolve('id'),
                 'type' => $grouping_resolve('type'),
                 'type_label' => $grouping_resolve('type_label'),
-                'name' => $grouping_resolve('name')
+                'name' => $grouping_resolve('name'),
+                'size' => $grouping_resolve('size')
             ]
         ];
     }
