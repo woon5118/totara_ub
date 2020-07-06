@@ -73,6 +73,7 @@ class mod_perform_webapi_resolver_query_subject_instance_testcase extends mod_pe
                 'name' => self::$about_user_and_participating->get_activity()->name,
                 'settings' => [
                     'close_on_completion' => false,
+                    'multisection' => false,
                 ]
             ],
             'subject_user' => [
