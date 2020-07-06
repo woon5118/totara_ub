@@ -150,6 +150,45 @@ class mod_perform_participant_section_model_testcase extends advanced_testcase {
         ];
     }
 
+    /**
+     * @param string[] $responses_are_visible_to
+     * @param bool $expected_result
+     * @throws coding_exception
+     * @dataProvider can_view_others_responses_provider
+     */
+    public function test_can_view_others_responses(array $responses_are_visible_to, bool $expected_result): void {
+        [$manager_section, $appraiser_section, $subject_section] = $this->set_up_responses_are_visible($responses_are_visible_to);
+
+        $subject_can_view_others_responses = (new participant_section($subject_section))
+            ->can_view_others_responses();
+
+        self::assertEquals(
+            $expected_result,
+            $subject_can_view_others_responses
+        );
+    }
+
+    public function can_view_others_responses_provider(): array {
+        // All cases are acting as subject.
+        return [
+            'Responses are not visible to anyone' => [
+                [], false
+            ],
+            'Responses are visible to everyone' => [
+                [subject::class, manager::class, appraiser::class], true
+            ],
+            'Responses are visible to just managers' => [
+                [manager::class], false
+            ],
+            'Responses are visible to just appraisers' => [
+                [appraiser::class], false
+            ],
+            'Responses are visible to just subjects' => [
+                [subject::class], true
+            ],
+        ];
+    }
+
     private function set_up_responses_are_visible(array $expected_responses_are_visible_to): array {
         self::setAdminUser();
         $data_generator = self::getDataGenerator();

@@ -230,13 +230,15 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
      * @param int $expected_manager_count
      * @param int $expected_appraiser_count
      * @param string[] $relationship_class_names
+     * @param bool $subject_can_view_others_responses
      * @throws coding_exception
      * @dataProvider responder_group_population_provider
      */
     public function test_responder_group_population_for_subject(
         int $expected_manager_count,
         int $expected_appraiser_count,
-        array $relationship_class_names
+        array $relationship_class_names,
+        bool $subject_can_view_others_responses = true
     ): void {
         self::setAdminUser();
 
@@ -260,7 +262,11 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
         // Always create both the manager and appraiser section_relationships
         $manager_section_relationship = $generator->create_section_relationship($section, ['class_name' => manager::class]);
         $appraiser_section_relationship = $generator->create_section_relationship($section, ['class_name' => appraiser::class]);
-        $subject_section_relationship = $generator->create_section_relationship($section, ['class_name' => subject::class]);
+        $subject_section_relationship = $generator->create_section_relationship(
+            $section,
+            ['class_name' => subject::class],
+            $subject_can_view_others_responses
+        );
 
         $element = $generator->create_element(['title' => 'Question one']);
         $generator->create_section_element($section, $element);
@@ -308,20 +314,36 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
             return $group->get_relationship_name() === 'Appraiser';
         });
 
-        // There should always be two groups, the manager and appraiser group.
-        self::assertCount(2, $element_response->get_other_responder_groups());
+        if (!$subject_can_view_others_responses) {
+            self::assertCount(0, $element_response->get_other_responder_groups());
+        } else {
+            // There should always be two groups if the subject has visibility, the manager and appraiser group.
+            self::assertCount(2, $element_response->get_other_responder_groups());
 
-        // Note these are all empty responses.
-        self::assertCount($expected_manager_count, $manager_responder_group->get_responses());
-        self::assertCount($expected_appraiser_count, $appraiser_responder_group->get_responses());
+            // Note these are all empty responses.
+            self::assertCount($expected_manager_count, $manager_responder_group->get_responses());
+            self::assertCount($expected_appraiser_count, $appraiser_responder_group->get_responses());
+        }
     }
 
     public function responder_group_population_provider(): array {
         return [
-            'Two managers, one appraisers' => [2, 1, [manager::class, manager::class, appraiser::class]],
-            'Two appraisers, one managers' => [1, 2, [manager::class, appraiser::class, appraiser::class]],
+            'Two managers, one appraisers' => [
+                2, 1, [manager::class, manager::class, appraiser::class]
+            ],
+            'Two managers, one appraisers - no visibility of other responses' => [
+                0, 0, [manager::class, manager::class, appraiser::class], false
+            ],
+            'Two appraisers, one managers' => [
+                1, 2, [manager::class, appraiser::class, appraiser::class]
+            ],
+            'Two appraisers, one managers - no visibility of other responses' => [
+                0, 0, [manager::class, appraiser::class, appraiser::class], false
+            ],
             'One manager, no appraiser' => [1, 0, [manager::class]],
+            'One manager, no appraiser - no visibility of other responses' => [0, 0, [manager::class], false],
             'No manager, no appraiser' => [0, 0, []],
+            'No manager, no appraiser  - no visibility of other responses' => [0, 0, [], false],
         ];
     }
 

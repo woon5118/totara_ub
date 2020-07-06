@@ -148,6 +148,23 @@ class participant_section extends model {
             );
     }
 
+    /**
+     * Can the owner (user) of this participant section view other's responses.
+     *
+     * @return bool
+     */
+    public function can_view_others_responses(): bool {
+        $core_relationship_id = (int) $this->entity->participant_instance->core_relationship->id;
+
+        $section_is_visible_to = $this->get_responses_are_visible_to()->map(
+            function (relationship $relationship) {
+                return (int) $relationship->get_core_relationship()->id;
+            }
+        )->to_array();
+
+        return in_array($core_relationship_id, $section_is_visible_to, true);
+    }
+
     public function get_context(): context_module {
         return $this->get_participant_instance()->get_subject_instance()->get_context();
     }

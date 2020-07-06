@@ -26,6 +26,7 @@ namespace mod_perform\data_providers\response;
 use coding_exception;
 use core\collection;
 use mod_perform\entities\activity\element_response as element_response_entity;
+use mod_perform\entities\activity\participant_instance;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
 use mod_perform\entities\activity\section_element as section_element_entity;
@@ -219,9 +220,12 @@ class participant_section_with_responses {
                     );
 
                     $is_respondable =  (new element($section_element_entity->element))->get_is_respondable();
-
                     $other_responder_groups = new collection();
-                    if ($is_respondable && $include_other_responder_groups) {
+
+                    if ($is_respondable &&
+                        $include_other_responder_groups &&
+                        $this->user_can_view_others_responses()
+                    ) {
                         $other_responder_groups = $this->create_other_responder_groups($section_element_entity->id);
                     }
 
@@ -262,7 +266,7 @@ class participant_section_with_responses {
     /**
      * Create the responses by other participants (not $participant_id) for a particular section element.
      *
-     * @param collection $other_participant_instances
+     * @param collection|participant_instance_entity[] $other_participant_instances
      * @param collection $section_elements
      * @param collection $existing_responses
      * @return collection
@@ -380,6 +384,15 @@ class participant_section_with_responses {
             ->core_relationship;
 
         return (new core_relationship_model($main_participant_relationship_entity))->get_name();
+    }
+
+    /**
+     * Can the user we are fetching the section view others' responses for this section.
+     *
+     * @return bool
+     */
+    protected function user_can_view_others_responses(): bool {
+        return (new participant_section($this->participant_section_entity))->can_view_others_responses();
     }
 
 }

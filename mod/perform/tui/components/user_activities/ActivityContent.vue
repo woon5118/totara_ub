@@ -82,26 +82,23 @@
             >
               {{ section.display_title }}
             </h3>
-
+          </div>
+          <div class="tui-participantContent__sectionHeadingOtherResponsesBar">
+            <ResponsesAreVisibleToDescription
+              class="tui-participantContent__sectionHeadingOtherResponsesDescription"
+              :current-user-is-subject="currentUserIsSubject"
+              :visible-to-relationships="responsesAreVisibleTo"
+            />
             <div
-              class="tui-participantContent__sectionHeadingOtherResponsesBar"
+              class="tui-participantContent__sectionHeading-other-response-switch"
             >
-              <ResponsesAreVisibleToDescription
-                class="tui-participantContent__sectionHeadingOtherResponsesDescription"
-                :current-user-is-subject="currentUserIsSubject"
-                :visible-to-relationships="responsesAreVisibleTo"
+              <ToggleButton
+                v-if="hasOtherResponse"
+                v-model="showOtherResponse"
+                :text="
+                  $str('user_activities_other_response_show', 'mod_perform')
+                "
               />
-              <div
-                class="tui-participantContent__sectionHeading-other-response-switch"
-              >
-                <ToggleButton
-                  v-show="hasOtherResponse"
-                  v-model="showOtherResponse"
-                  :text="
-                    $str('user_activities_other_response_show', 'mod_perform')
-                  "
-                />
-              </div>
             </div>
           </div>
           <div class="tui-participantContent__section-required-container">

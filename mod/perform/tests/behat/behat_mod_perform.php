@@ -23,6 +23,7 @@
 
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\DriverException;
+use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\Mink\Exception\ExpectationException;
 use mod_perform\controllers\activity\edit_activity;
 use mod_perform\controllers\activity\manage_activities;
@@ -419,6 +420,21 @@ class behat_mod_perform extends behat_base {
             if (!$checked) {
                 throw new ExpectationException('Others responses toggle was not on', $this->getSession());
             }
+        }
+    }
+
+    /**
+     * @Then /^I should not see the show others responses toggle$/
+     */
+    public function i_should_not_see_the_show_others_responses_toggle(): void {
+        try {
+            $found = $this->find('css', self::PERFORM_SHOW_OTHERS_RESPONSES_LOCATOR, false, false, 0.1);
+
+            if ($found !== null) {
+                $this->fail('Show other responses toggle was found');
+            }
+        } catch (ElementNotFoundException $e) {
+            // Element was not found.
         }
     }
 
