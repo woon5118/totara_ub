@@ -169,17 +169,20 @@ class block_current_learning_plan_data_testcase extends block_current_learning_t
 
         // Plan approved.
         $plan->set_status(DP_PLAN_STATUS_APPROVED, DP_PLAN_REASON_CREATE);
+        \totara_program\assignment\plan::update_plan_assignments($this->user1->id, $plan->id);
 
         $learning_data = $this->get_learning_data($this->user1->id);
         $this->assertTrue($this->program_in_learning_data($this->program1, $learning_data));
 
         // Plan not approved.
         $plan->set_status(DP_PLAN_STATUS_UNAPPROVED, DP_PLAN_REASON_CREATE);
+        \totara_program\assignment\plan::update_plan_assignments($this->user1->id, $plan->id);
         $learning_data = $this->get_learning_data($this->user1->id);
         $this->assertNotTrue($this->program_in_learning_data($this->program1, $learning_data));
 
         // Plan completed.
         $plan->set_status(DP_PLAN_STATUS_COMPLETE, DP_PLAN_REASON_CREATE);
+        \totara_program\assignment\plan::update_plan_assignments($this->user1->id, $plan->id);
         $learning_data = $this->get_learning_data($this->user1->id);
         $this->assertNotTrue($this->program_in_learning_data($this->program1, $learning_data));
     }
@@ -200,14 +203,6 @@ class block_current_learning_plan_data_testcase extends block_current_learning_t
         $item = current($items);
         $this->assertInstanceOf('totara_plan\user_learning\item', $item);
 
-        // We expect one program in the correct instance.
-        $programs = $item->get_programs();
-        $this->assertCount(1, $programs);
-        $program = current($programs);
-        $this->assertInstanceOf('totara_plan\user_learning\program', $program);
-        // Should also be an instance of totara_program through inheritance
-        $this->assertInstanceOf('totara_program\user_learning\item', $program);
-
         // We expect one course in the correct instance.
         $courses = $item->get_courses();
         $this->assertCount(1, $courses);
@@ -219,7 +214,7 @@ class block_current_learning_plan_data_testcase extends block_current_learning_t
 
     public function test_object_empty_plan() {
 
-        // Create a plan with a course and a program.
+        // Create a plan with no courses.
         $plan = new development_plan($this->planrecord1->id);
         $plan->set_status(DP_PLAN_STATUS_APPROVED, DP_PLAN_REASON_CREATE);
 
@@ -234,9 +229,5 @@ class block_current_learning_plan_data_testcase extends block_current_learning_t
         // We expect an empty array.
         $courses = $item->get_courses();
         $this->assertEquals(array(), $courses);
-
-        // We expect an empty array.
-        $programs = $item->get_programs();
-        $this->assertEquals(array(), $programs);
     }
 }
