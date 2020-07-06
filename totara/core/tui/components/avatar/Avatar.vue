@@ -46,8 +46,8 @@ export default {
       type: String,
       default: 'medium',
       validator(value) {
-        return (
-          ['large', 'medium', 'small', 'xsmall', 'xxsmall'].indexOf(value) > -1
+        return ['large', 'medium', 'small', 'xsmall', 'xxsmall'].includes(
+          value
         );
       },
     },

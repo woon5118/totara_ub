@@ -21,38 +21,57 @@
 -->
 
 <style lang="scss">
+:root {
+  --tui-avatar-border-radius: 50%;
+  --tui-avatar-large-width: 185px;
+  --tui-avatar-large-height: 185px;
+  --tui-avatar-large-padding: 5px;
+  --tui-avatar-medium-width: 105px;
+  --tui-avatar-medium-height: 105px;
+  --tui-avatar-medium-padding: 3px;
+  --tui-avatar-small-width: 50px;
+  --tui-avatar-small-height: 50px;
+  --tui-avatar-small-padding: 2px;
+  --tui-avatar-xsmall-width: 38px;
+  --tui-avatar-xsmall-height: 38px;
+  --tui-avatar-xsmall-padding: 1px;
+  --tui-avatar-xxsmall-width: 24px;
+  --tui-avatar-xxsmall-height: 24px;
+  --tui-avatar-xxsmall-padding: 1px;
+}
+
 .tui-avatar {
-  border: 2px solid var(--tui-avatar-border-color);
-  border-radius: 50%;
+  border: var(--tui-border-width-normal) solid var(--tui-avatar-border-color);
+  border-radius: var(--tui-avatar-border-radius);
 
   &--large {
-    width: 185px;
-    height: 185px;
-    padding: 5px;
+    width: var(--tui-avatar-large-width);
+    height: var(--tui-avatar-large-height);
+    padding: var(--tui-avatar-large-padding);
   }
 
   &--medium {
-    width: 105px;
-    height: 105px;
-    padding: 3px;
+    width: var(--tui-avatar-medium-width);
+    height: var(--tui-avatar-medium-height);
+    padding: var(--tui-avatar-medium-padding);
   }
 
   &--small {
-    width: 50px;
-    height: 50px;
-    padding: 2px;
+    width: var(--tui-avatar-small-width);
+    height: var(--tui-avatar-small-height);
+    padding: var(--tui-avatar-small-padding);
   }
 
   &--xsmall {
-    width: 38px;
-    height: 38px;
-    padding: 1px;
+    width: var(--tui-avatar-xsmall-width);
+    height: var(--tui-avatar-xsmall-height);
+    padding: var(--tui-avatar-xsmall-padding);
   }
 
   &--xxsmall {
-    width: 24px;
-    height: 24px;
-    padding: 1px;
+    width: var(--tui-avatar-xxsmall-width);
+    height: var(--tui-avatar-xxsmall-height);
+    padding: var(--tui-avatar-xxsmall-padding);
   }
 }
 </style>
