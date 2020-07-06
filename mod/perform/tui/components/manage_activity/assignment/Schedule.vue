@@ -60,7 +60,10 @@
       />
 
       <div class="tui-performAssignmentSchedule__additional_settings">
-        <AdditionalScheduleSettings />
+        <AdditionalScheduleSettings
+          :uses-job-based-dynamic-source="isUsingJobBasedDynamicSource"
+          :dynamic-source-name="dynamicDateSourceName"
+        />
       </div>
 
       <div class="tui-performAssignmentSchedule__action">
@@ -175,6 +178,9 @@ export default {
       },
       formValuesToSave: null,
       confirmationModalOpen: false,
+      isUsingJobBasedDynamicSource:
+        !this.track.schedule_is_fixed && this.dynamicDateSourceIsJobBased(),
+      dynamicDateSourceName: this.getDynamicDateSourceName(),
     };
   },
   computed: {
@@ -200,6 +206,13 @@ export default {
 
         this.dynamicDateSettingComponent.data = JSON.parse(
           selectedDynamicSource.custom_data
+        );
+
+        this.isUsingJobBasedDynamicSource =
+          !this.scheduleIsFixed &&
+          this.dynamicDateSourceIsJobBased(selectedSource);
+        this.dynamicDateSourceName = this.getDynamicDateSourceName(
+          selectedSource
         );
       }
     },
@@ -658,6 +671,32 @@ export default {
     hideConfirmationModal() {
       this.formValuesToSave = null;
       this.confirmationModalOpen = false;
+    },
+
+    /**
+     * @returns {*|boolean}
+     */
+    dynamicDateSourceIsJobBased(dynamicSource) {
+      if (dynamicSource) {
+        return dynamicSource.is_job_based;
+      }
+      if (this.track && this.track.schedule_dynamic_source) {
+        return this.track.schedule_dynamic_source.is_job_based;
+      }
+      return false;
+    },
+
+    /**
+     * @returns {*|string}
+     */
+    getDynamicDateSourceName(dynamicSource) {
+      if (dynamicSource) {
+        return dynamicSource.display_name;
+      }
+      if (this.track && this.track.schedule_dynamic_source) {
+        return this.track.schedule_dynamic_source.display_name;
+      }
+      return null;
     },
   },
 };

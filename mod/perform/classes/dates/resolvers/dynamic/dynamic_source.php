@@ -170,7 +170,8 @@ class dynamic_source implements JsonSerializable {
             'display_name' => $this->get_display_name(),
             'is_available' => $this->is_available(),
             'custom_setting_component' => $this->resolver->get_custom_setting_component(),
-            'custom_data' => $this->resolver->get_custom_data()
+            'custom_data' => $this->resolver->get_custom_data(),
+            'is_job_based' => $this->resolver->is_job_based(),
         ];
     }
 
@@ -225,6 +226,14 @@ class dynamic_source implements JsonSerializable {
 
     public function get_resolver(): ?dynamic_date_resolver {
         return $this->resolver;
+    }
+
+    public function is_job_based(): bool {
+        if ($this->resolver === null) {
+            return false;
+        }
+
+        return $this->resolver->is_job_based();
     }
 
 }

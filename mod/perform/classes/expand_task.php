@@ -356,7 +356,14 @@ class expand_task {
     private function assign_bulk(track_assignment $assignment, array $to_create): void {
         // Bulk fetch all the start and end reference dates.
         $user_ids = array_column($to_create, 'subject_user_id');
-        $date_resolver = (new track($assignment->track))->get_date_resolver($user_ids);
+        $job_assignment_ids = array_filter(
+            array_column($to_create, 'job_assignment_id'),
+            function ($job_assignment_id) {
+                return $job_assignment_id !== null;
+            }
+        );
+
+        $date_resolver = (new track($assignment->track))->get_date_resolver($user_ids, $job_assignment_ids);
 
         if ($assignment->track->schedule_use_anniversary) {
             $date_resolver = new anniversary_of($date_resolver, time());
@@ -364,8 +371,12 @@ class expand_task {
 
         // Add the dates to the assignments.
         foreach ($to_create as $index => $row) {
-            $to_create[$index]['period_start_date'] = $date_resolver->get_start_for($row['subject_user_id']);
-            $to_create[$index]['period_end_date'] = $date_resolver->get_end_for($row['subject_user_id']);
+            $to_create[$index]['period_start_date'] = $date_resolver->get_start_for($row['subject_user_id'],
+                $row['job_assignment_id']
+            );
+            $to_create[$index]['period_end_date'] = $date_resolver->get_end_for($row['subject_user_id'],
+                $row['job_assignment_id']
+            );
         }
 
         // Insert the assignments.

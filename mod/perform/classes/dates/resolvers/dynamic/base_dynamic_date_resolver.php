@@ -41,6 +41,11 @@ abstract class base_dynamic_date_resolver implements dynamic_date_resolver {
     protected $reference_user_ids;
 
     /**
+     * @var int[]
+     */
+    protected $reference_job_assignment_ids;
+
+    /**
      * @var date_offset
      */
     protected $from;
@@ -115,15 +120,17 @@ abstract class base_dynamic_date_resolver implements dynamic_date_resolver {
     /**
      * @param date_offset $from
      * @param date_offset|null $to
-     * @param array $reference_user_ids
      * @param string $option_key
+     * @param array $reference_user_ids
+     * @param array $reference_job_assignment_ids
      * @return dynamic_date_resolver
      */
     public function set_parameters(
         date_offset $from,
         ?date_offset $to,
         string $option_key,
-        array $reference_user_ids
+        array $reference_user_ids,
+        array $reference_job_assignment_ids = []
     ): dynamic_date_resolver {
         if (!$this->option_is_available($option_key)) {
             throw new coding_exception(sprintf('Invalid option key %s', $option_key));
@@ -132,6 +139,7 @@ abstract class base_dynamic_date_resolver implements dynamic_date_resolver {
         $this->from = $from;
         $this->to = $to;
         $this->reference_user_ids = $reference_user_ids;
+        $this->reference_job_assignment_ids = $reference_job_assignment_ids;
         $this->option_key = $option_key;
 
         $this->ready_to_resolve = true;
@@ -150,7 +158,7 @@ abstract class base_dynamic_date_resolver implements dynamic_date_resolver {
     /**
      * @inheritDoc
      */
-    public function get_start_for(int $user_id): ?int {
+    public function get_start_for(int $user_id, ?int $job_assignment_id = null): ?int {
         $this->check_ready_to_resolve();
 
         if ($this->date_map === null) {
@@ -169,7 +177,7 @@ abstract class base_dynamic_date_resolver implements dynamic_date_resolver {
     /**
      * @inheritDoc
      */
-    public function get_end_for(int $user_id): ?int {
+    public function get_end_for(int $user_id, ?int $job_assignment_id = null): ?int {
         $this->check_ready_to_resolve();
 
         if ($this->date_map === null) {
@@ -234,6 +242,15 @@ abstract class base_dynamic_date_resolver implements dynamic_date_resolver {
      */
     public function is_valid_custom_data(?string $custom_data): bool {
         return is_null($custom_data);
+    }
+
+    /**
+     * Does this resolver use job assignments
+     *
+     * @return bool
+     */
+    public function is_job_based(): bool {
+        return false;
     }
 
 }

@@ -643,6 +643,7 @@ class mod_perform_track_model_testcase extends advanced_testcase {
             'is_available' => true,
             'custom_setting_component' => null,
             'custom_data' => null,
+            'is_job_based' => false,
         ], $selected_option->jsonSerialize());
     }
 
@@ -671,6 +672,7 @@ class mod_perform_track_model_testcase extends advanced_testcase {
             'is_available' => false,
             'custom_setting_component' => null,
             'custom_data' => null,
+            'is_job_based' => false,
         ], $selected_option->jsonSerialize());
     }
 

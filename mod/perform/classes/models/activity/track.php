@@ -775,9 +775,10 @@ class track extends model {
      * Get the date resolver for this track and a given set of users.
      *
      * @param array $user_ids
+     * @param array $job_assignment_ids
      * @return date_resolver|dynamic_date_resolver
      */
-    public function get_date_resolver(array $user_ids): date_resolver {
+    public function get_date_resolver(array $user_ids, array $job_assignment_ids = []): date_resolver {
         if ($this->schedule_is_fixed) {
             return new fixed_range_resolver($this->schedule_fixed_from, $this->get_schedule_fixed_to());
         }
@@ -798,7 +799,8 @@ class track extends model {
             $this->schedule_dynamic_from,
             $this->schedule_dynamic_to,
             $dynamic_source->get_option_key(),
-            $user_ids
+            $user_ids,
+            $job_assignment_ids
         );
     }
 

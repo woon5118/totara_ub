@@ -575,3 +575,29 @@ Feature: Define track schedules to perform activities
     Then the following fields match these values:
       | scheduleDynamic[dynamic_source]                  | Completion date of another activity |
       | scheduleDynamic[dynamicCustomSettings][activity] | Activity two                        |
+
+  Scenario: Job assignment start date dynamic schedule
+    Given the following "activities" exist in "mod_perform" plugin:
+      | activity_name    | description      | activity_type | create_track |
+      | Activity one     | Activity one     | feedback      | true         |
+    And I log in as "admin"
+    When I navigate to the manage perform activities page
+    And I click on "Activity one" "link"
+    And I click on "Assignments" "link"
+    When I click on "Open-ended" "button"
+    And I click on "Dynamic" "button"
+    And I set the following fields to these values:
+      | scheduleDynamic[from_count]                      | 2                          |
+      | scheduleDynamic[from_unit]                       | weeks                      |
+      | scheduleDynamic[from_direction]                  | after                      |
+      | scheduleDynamic[dynamic_source]                  | Job assignment start date  |
+    And I save the activity schedule
+    Then I should see "This setting cannot be disabled while “Job assignment start date” is in use"
+    When I click on the "Enabled" tui radio in the "subject_instance_generation" tui radio group
+    And I save the activity schedule
+    Then I should see "Activity schedule saved" in the tui "success" notification toast
+    When I reload the page
+    And I click on "Assignments" "link"
+    Then the following fields match these values:
+      | scheduleDynamic[dynamic_source]                  | Job assignment start date |
+

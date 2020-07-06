@@ -38,8 +38,9 @@ interface dynamic_date_resolver extends date_resolver {
      *
      * @param date_offset $from
      * @param date_offset|null $to
-     * @param array $reference_user_ids The user ids to resolve dates for.
      * @param string $option_key
+     * @param array $reference_user_ids The user ids to resolve dates for.
+     * @param array $reference_job_assignment_ids
      * @return static
      * @see get_start_for
      * @see get_end_for
@@ -48,7 +49,8 @@ interface dynamic_date_resolver extends date_resolver {
         date_offset $from,
         ?date_offset $to,
         string $option_key,
-        array $reference_user_ids
+        array $reference_user_ids,
+        array $reference_job_assignment_ids = []
     ): self;
 
     /**
@@ -80,11 +82,17 @@ interface dynamic_date_resolver extends date_resolver {
      */
     public function get_custom_data(): ?string ;
 
-
     /**
      * Set custom data
      *
      * @param string|null $custom_data
      */
     public function set_custom_data(?string $custom_data): void;
+
+    /**
+     * Does this resolver use job assignments
+     *
+     * @return bool
+     */
+    public function is_job_based(): bool;
 }

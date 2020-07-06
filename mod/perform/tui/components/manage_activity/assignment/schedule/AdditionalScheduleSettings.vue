@@ -25,7 +25,10 @@
       <FormRow
         :label="$str('schedule_job_assignment_based_instances', 'mod_perform')"
       >
-        <FormRadioGroup name="subject_instance_generation">
+        <FormRadioGroup
+          :validate="jobBasedCanDisableValidator"
+          name="subject_instance_generation"
+        >
           <Radio
             :value="SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT"
             :aria-describedby="$id('aria-describedby')"
@@ -97,17 +100,50 @@ export default {
     FormScope,
     Radio,
   },
+  props: {
+    usesJobBasedDynamicSource: {
+      type: Boolean,
+    },
+    dynamicSourceName: {
+      type: String,
+    },
+  },
   data() {
     return {
       SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT,
       SUBJECT_INSTANCE_GENERATION_ONE_PER_JOB,
     };
   },
+  methods: {
+    /**
+     * Validator for disabled job assigned based instance
+     * May not disable if job based dynamic source is used
+     *
+     * @param v
+     * @return {{}}
+     */
+    jobBasedCanDisableValidator(v) {
+      if (
+        this.usesJobBasedDynamicSource &&
+        v == SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT
+      ) {
+        return this.$str(
+          'schedule_job_assignment_based_disable_error',
+          'mod_perform',
+          this.dynamicSourceName
+        );
+      }
+
+      return null;
+    },
+  },
 };
 </script>
 <lang-strings>
   {
     "mod_perform": [
+      "schedule_additional_settings",
+      "schedule_job_assignment_based_disable_error",
       "schedule_job_assignment_based_instances",
       "schedule_job_assignment_based_instances_disabled",
       "schedule_job_assignment_based_instances_disabled_description",

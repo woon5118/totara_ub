@@ -28,16 +28,18 @@ interface date_resolver {
      * Get the start date for a user.
      *
      * @param int $user_id
+     * @param int|null $job_assignment_id
      * @return int
      */
-    public function get_start_for(int $user_id): ?int;
+    public function get_start_for(int $user_id, ?int $job_assignment_id = null): ?int;
 
     /**
      * Get the end date for a user.
      *
      * @param int $user_id
+     * @param int|null $job_assignment_id
      * @return int
      */
-    public function get_end_for(int $user_id): ?int;
+    public function get_end_for(int $user_id, ?int $job_assignment_id = null): ?int;
 
 }

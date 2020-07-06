@@ -66,8 +66,8 @@ class anniversary_of implements date_resolver {
     /**
      * @inheritDoc
      */
-    public function get_start_for(int $user_id): ?int {
-        $original_start = $this->original->get_start_for($user_id);
+    public function get_start_for(int $user_id, ?int $job_assignment_id = null): ?int {
+        $original_start = $this->original->get_start_for($user_id, $job_assignment_id);
 
         if ($original_start === null) {
             return null;
@@ -79,15 +79,15 @@ class anniversary_of implements date_resolver {
     /**
      * @inheritDoc
      */
-    public function get_end_for(int $user_id): ?int {
-        $original_end = $this->original->get_end_for($user_id);
+    public function get_end_for(int $user_id, ?int $job_assignment_id = null): ?int {
+        $original_end = $this->original->get_end_for($user_id, $job_assignment_id);
 
         if ($original_end === null) {
             return null;
         }
 
-        $adjusted_start = $this->get_start_for($user_id);
-        $original_start = $this->original->get_start_for($user_id);
+        $adjusted_start = $this->get_start_for($user_id, $job_assignment_id);
+        $original_start = $this->original->get_start_for($user_id, $job_assignment_id);
 
         // We only push the end to the anniversary if we did so for the start.
         // Other wise we could end up with the start being later than end if

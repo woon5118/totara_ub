@@ -46,14 +46,14 @@ class fixed_range_resolver implements date_resolver {
     /**
      * @inheritDoc
      */
-    public function get_start_for(int $user_id): ?int {
+    public function get_start_for(int $user_id, ?int $job_assignment_id = null): ?int {
         return $this->start;
     }
 
     /**
      * @inheritDoc
      */
-    public function get_end_for(int $user_id): ?int {
+    public function get_end_for(int $user_id, ?int $job_assignment_id = null): ?int {
         return $this->end;
     }
 
