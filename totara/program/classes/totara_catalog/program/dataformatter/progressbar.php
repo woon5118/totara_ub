@@ -63,6 +63,9 @@ class progressbar extends formatter {
         }
 
         $item = program::one($USER->id, $data['programid']);
+        if (!$item) {
+            return [];
+        }
         $result = $item->export_for_template();
 
         if (empty($result->progress->pbar)) {
