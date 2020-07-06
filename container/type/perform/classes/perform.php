@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
@@ -23,8 +23,8 @@
 
 namespace container_perform;
 
-use core_container\{category, container};
 use core\orm\query\builder;
+use core_container\{container, facade\category_name_provider};
 use mod_perform\models\activity\activity;
 
 /**
@@ -33,29 +33,22 @@ use mod_perform\models\activity\activity;
  * While this container was primarily designed to contain a single performance activity, it is possible
  * to extend it to allow multiple performance activities or even other types of activity.
  */
-class perform extends container {
+class perform extends container implements category_name_provider {
+
     /*
      * @const string Default category name string.
      */
     const DEFAULT_CATEGORY_NAME = 'performance-activities';
 
-
     /**
      * @param activity $activity
-     * @return static
+     * @return self
      */
     public static function from_activity(activity $activity): self {
-        /** @var static $perform_container */
+        /** @var self $perform_container */
         $perform_container = static::from_id($activity->course);
 
         return $perform_container;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public static function get_container_category(): string {
-        return category::PERFORM;
     }
 
     /**
@@ -83,56 +76,10 @@ class perform extends container {
     }
 
     /**
-     * Get the default category for performance activities.
-     * If multi tenancy is turned on and the current user is part of a tenant
-     * it will get the category of the tenant.
-     *
-     * If the category does not exist yet it will automatically create it.
-     *
-     * @return int
-     */
-    public static function get_default_category_id(): int {
-        global $CFG, $DB, $USER;
-        require_once("{$CFG->dirroot}/totara/core/lib.php");
-
-        // Default to top level as parent category
-        $parent_category_id = 0;
-        if (!empty($CFG->tenantsenabled) && !empty($USER->tenantid)) {
-            // If multi-tenancy in use and current user is in tenant find top level tenant category instead.
-            $parent_category_id = $DB->get_field('tenant', 'categoryid', ['id' => $USER->tenantid]) ?? 0;
-        }
-
-        $perform_category_id = $DB->get_field(
-            'course_categories',
-            'id',
-            ['parent' => $parent_category_id, 'name' => self::DEFAULT_CATEGORY_NAME]
-        );
-
-        // If there is a category for performance activities already, return the ID.
-        if (!empty($perform_category_id)) {
-            return $perform_category_id;
-        }
-
-        // Otherwise attempt to create one.
-        return self::create_default_categoryid($parent_category_id);
-    }
-
-    /**
-     * @param int $parent_category_id
-     * @return int
-     * @throws \moodle_exception
-     */
-    protected static function create_default_categoryid(int $parent_category_id) {
-        // No capability check as this is system behaviour to ensure category exists.
-        $new_category = \coursecat::create(['name' => self::DEFAULT_CATEGORY_NAME, 'parent' => $parent_category_id]);
-        return $new_category->id;
-    }
-
-    /**
      * @inheritDoc
      */
     public function get_view_url(): \moodle_url {
-        return null;
+        return new \moodle_url('');
     }
 
     /**
@@ -194,8 +141,27 @@ class perform extends container {
             // record is required to create the activity deleted event.
             activity::load_by_container_id($this->get_id())->delete();
 
-            delete_course($this->get_id(), false);
+            parent::delete();
         });
+    }
+
+    /**
+     * A flag to tell whether the container is belonging to the category where
+     * it is not maintain-able by the users. Which means it is only being maintained by the
+     * system only and these categories that are holding this container will not be shown
+     * to the page.
+     *
+     * @return bool
+     */
+    public static function is_using_system_category(): bool {
+        return true;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_container_category_name(): string {
+        return self::DEFAULT_CATEGORY_NAME;
     }
 
 }

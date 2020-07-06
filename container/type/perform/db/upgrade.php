@@ -17,13 +17,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
- * @package mod_perform
+ * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
+ * @package container_perform
  */
 
-defined('MOODLE_INTERNAL') || die();
+/**
+ * Local database upgrade script
+ *
+ * @param   integer $oldversion Current (pre-upgrade) local db version timestamp
+ * @return  boolean $result
+ */
+function xmldb_container_perform_upgrade($oldversion) {
+    global $CFG, $DB;
 
-$plugin->version  = 2020070601;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2016120505;       // Requires this Moodle version.
-$plugin->component = 'mod_perform'; // To check on upgrade, that module sits in correct place
-$plugin->dependencies = ['container_perform' => 2020070602];
+    $dbman = $DB->get_manager();
+
+    if ($oldversion < 2020070600) {
+        $record = $DB->get_record('course_categories', ['name' => 'performance-activities', 'idnumber' => null]);
+
+        $record->issystem = 1;
+
+        $DB->update_record('course_categories', $record);
+
+        upgrade_plugin_savepoint(true, 2020070600, 'container', 'perform');
+    }
+
+    return true;
+}

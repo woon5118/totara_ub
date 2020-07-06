@@ -44,6 +44,7 @@ use core\orm\entity\entity;
  * @property string $theme
  * @property int $programcount
  * @property int $certifcount
+ * @property int $issystem
  *
  * @package criteria_coursecompletion/entities
  */
