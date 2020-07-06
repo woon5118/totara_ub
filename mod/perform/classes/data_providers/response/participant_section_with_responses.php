@@ -26,12 +26,13 @@ namespace mod_perform\data_providers\response;
 use coding_exception;
 use core\collection;
 use mod_perform\entities\activity\element_response as element_response_entity;
+use mod_perform\entities\activity\participant_instance as participant_instance_entity;
+use mod_perform\entities\activity\participant_section as participant_section_entity;
+use mod_perform\entities\activity\section_element as section_element_entity;
+use mod_perform\models\activity\element;
 use mod_perform\models\response\participant_section;
 use mod_perform\models\response\responder_group;
 use mod_perform\models\response\section_element_response;
-use mod_perform\entities\activity\participant_section as participant_section_entity;
-use mod_perform\entities\activity\section_element as section_element_entity;
-use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use totara_core\entities\relationship as core_relationship_entity;
 use totara_core\relationship\relationship as core_relationship_model;
 
@@ -202,33 +203,37 @@ class participant_section_with_responses {
         collection $existing_responses,
         bool $include_other_responder_groups = false
     ): collection {
-        return $section_elements->map(
-            function (section_element_entity $section_element_entity) use (
-                $participant_instance_entity,
-                $existing_responses,
-                $include_other_responder_groups
-            ) {
-                // The element response model will accept missing entities in the case where a question has not yet been answered.
-                $element_response_entity = $this->find_existing_response_entity(
-                    $existing_responses,
-                    $section_element_entity->id,
-                    $participant_instance_entity->id
-                );
-
-                $other_responder_groups = null;
-                if ($include_other_responder_groups) {
-                    $other_responder_groups = $this->create_other_responder_groups($section_element_entity->id);
-                }
-
-                return new section_element_response(
+        return $section_elements
+            ->map(
+                function (section_element_entity $section_element_entity) use (
                     $participant_instance_entity,
-                    $section_element_entity,
-                    $element_response_entity,
-                    $other_responder_groups,
-                    null
-                );
-            }
-        );
+                    $existing_responses,
+                    $include_other_responder_groups
+                ) {
+                    // The element response model will accept missing entities
+                    // in the case where a question has not yet been answered.
+                    $element_response_entity = $this->find_existing_response_entity(
+                        $existing_responses,
+                        $section_element_entity->id,
+                        $participant_instance_entity->id
+                    );
+
+                    $is_respondable =  (new element($section_element_entity->element))->get_is_respondable();
+
+                    $other_responder_groups = new collection();
+                    if ($is_respondable && $include_other_responder_groups) {
+                        $other_responder_groups = $this->create_other_responder_groups($section_element_entity->id);
+                    }
+
+                    return new section_element_response(
+                        $participant_instance_entity,
+                        $section_element_entity,
+                        $element_response_entity,
+                        $other_responder_groups,
+                        null
+                    );
+                }
+            );
     }
 
     /**

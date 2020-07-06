@@ -326,14 +326,16 @@ export default {
                 responseData: null,
               },
               sort_order: item.sort_order,
+              is_respondable: item.element.is_respondable,
               response_data: item.response_data,
               other_responder_groups: item.other_responder_groups,
             };
           }
         );
 
-        data.mod_perform_participant_section.section_element_responses.forEach(
-          item => {
+        data.mod_perform_participant_section.section_element_responses
+          .filter(item => item.element.is_respondable)
+          .forEach(item => {
             this.initialValues.sectionElements[
               item.section_element_id
             ] = JSON.parse(item.response_data);
@@ -345,8 +347,7 @@ export default {
                 this.showOtherResponse = true;
               }
             });
-          }
-        );
+          });
       },
     },
   },
@@ -358,6 +359,15 @@ export default {
       }
 
       return this.answeringAs.core_relationship.name;
+    },
+
+    /**
+     * Get the elements that can be responded to.
+     */
+    respondableSectionElements() {
+      return this.sectionElements.filter(
+        sectionElement => sectionElement.is_respondable
+      );
     },
 
     /**
@@ -551,7 +561,7 @@ export default {
      * @returns {Object}
      */
     async save() {
-      const update = this.sectionElements.map(item => {
+      const update = this.respondableSectionElements.map(item => {
         return {
           section_element_id: item.id,
           response_data: JSON.stringify(item.element.responseData),

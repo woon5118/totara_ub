@@ -28,6 +28,7 @@ query mod_perform_participant_section(
         title
         data
         is_required
+        is_respondable
       }
       sort_order
       response_data

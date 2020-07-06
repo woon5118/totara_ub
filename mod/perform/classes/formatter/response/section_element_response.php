@@ -24,12 +24,13 @@
 namespace mod_perform\formatter\response;
 
 use core\orm\formatter\entity_model_formatter;
+use mod_perform\models\response\section_element_response as response_section_element_model;
 
 /**
  * Class section_element_response
  *
  * @package mod_perform\formatter\response
- * @property \mod_perform\models\response\section_element_response object
+ * @property response_section_element_model object
  */
 class section_element_response extends entity_model_formatter {
 
@@ -45,4 +46,5 @@ class section_element_response extends entity_model_formatter {
             'validation_errors' => null,
         ];
     }
+
 }

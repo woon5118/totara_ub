@@ -169,7 +169,7 @@ class section extends model {
     }
 
     /**
-     * Get any array of all section elements in this section, indexed and sorted by sort_order
+     * Get a collection of all section elements in this section, indexed and sorted by sort_order
      *
      * @return collection|section_element[]
      */
@@ -184,6 +184,17 @@ class section extends model {
         ksort($section_element_models);
 
         return new collection($section_element_models);
+    }
+
+    /**
+     * Get a collection of all section elements that can accept responses.
+     *
+     * @return collection|section_element[]
+     */
+    public function get_respondable_section_elements(): collection {
+        return $this->get_section_elements()->filter(function (section_element $section_element) {
+            return $section_element->element->get_is_respondable();
+        });
     }
 
     /**

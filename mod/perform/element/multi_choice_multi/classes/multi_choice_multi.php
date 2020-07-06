@@ -26,9 +26,9 @@ namespace performelement_multi_choice_multi;
 use core\collection;
 use coding_exception;
 use mod_perform\models\activity\element;
-use mod_perform\models\activity\element_plugin;
+use mod_perform\models\activity\respondable_element_plugin;
 
-class multi_choice_multi extends element_plugin {
+class multi_choice_multi extends respondable_element_plugin {
     /**
      * @inheritDoc
      */

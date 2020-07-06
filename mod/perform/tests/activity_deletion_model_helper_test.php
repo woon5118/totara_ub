@@ -21,6 +21,7 @@
  * @package mod_perform
  */
 
+use core\collection;
 use core\orm\entity\entity;
 use core\orm\query\builder;
 use mod_perform\entities\activity\participant_instance;
@@ -71,13 +72,17 @@ class mod_perform_activity_deletion_model_helper_testcase extends advanced_testc
         $perform_generator->create_section_element($section1, $element1);
 
         if ($include_responses) {
+            /** @var participant_instance $participant_instance_entity */
             $participant_instance_entity = participant_instance::repository()->order_by('id')->first(true);
+
+            /** @var section_element_entity $section_element_entity */
             $section_element_entity = section_element_entity::repository()->order_by('id')->first(true);
 
             $section_element_response = new section_element_response(
                 $participant_instance_entity,
                 $section_element_entity,
-                null
+                null,
+                new collection()
             );
 
             $section_element_response->set_response_data('question answer')->save();

@@ -33,6 +33,11 @@ use core\orm\formatter\entity_model_formatter;
  */
 class participant_section extends entity_model_formatter {
 
+    /**
+     * @var \mod_perform\models\response\participant_section
+     */
+    protected $object;
+
     protected function get_map(): array {
         return [
             'id' => null,

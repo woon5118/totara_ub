@@ -30,15 +30,14 @@ use mod_perform\entities\activity\section_element as section_element_entity;
 use mod_perform\entities\activity\element_response as element_response_entity;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\models\activity\element;
-use mod_perform\models\activity\element_plugin;
 use mod_perform\models\activity\participant_instance;
+use mod_perform\models\activity\element_plugin;
 use mod_perform\models\activity\section_element;
 use totara_core\relationship\relationship as core_relationship_model;
 
 /**
- * Class element
- *
- * Represents the answer to a question or other intractable element which can be displayed to users within a performance activity.
+ * Represents the response or lack of to a question or other element which
+ * can be displayed to users within a performance activity.
  *
  * @property-read int section_element_id Foreign key
  * @property-read section_element $section_element The parent section element
@@ -118,7 +117,7 @@ class section_element_response extends model {
         participant_instance_entity $participant_instance_entity,
         section_element_entity $section_element_entity,
         ?element_response_entity $element_response_entity,
-        collection $other_responder_groups = null,
+        collection $other_responder_groups,
         element_plugin $element_plugin = null
     ) {
         if ($element_response_entity === null) {
@@ -235,7 +234,7 @@ class section_element_response extends model {
      * Get the other participants responses grouped by relationship types (Manager/Appraiser).
      * @return collection
      */
-    public function get_other_responder_groups(): collection {
+    public function get_other_responder_groups(): ?collection {
         return $this->other_responder_groups;
     }
 

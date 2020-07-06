@@ -59,6 +59,7 @@ class element extends model {
     protected $model_accessor_whitelist = [
         'context',
         'element_plugin',
+        'is_respondable',
     ];
 
     /**
@@ -113,6 +114,15 @@ class element extends model {
      */
     public function get_element_plugin(): element_plugin {
         return element_plugin::load_by_plugin($this->entity->plugin_name);
+    }
+
+    /**
+     * Can the user respond to this element.
+     *
+     * @return bool
+     */
+    public function get_is_respondable(): bool {
+        return $this->get_element_plugin() instanceof respondable_element_plugin;
     }
 
     /**

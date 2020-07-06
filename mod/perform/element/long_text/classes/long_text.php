@@ -26,9 +26,9 @@ namespace performelement_long_text;
 use coding_exception;
 use core\collection;
 use mod_perform\models\activity\element;
-use mod_perform\models\activity\element_plugin;
+use mod_perform\models\activity\respondable_element_plugin;
 
-class long_text extends element_plugin {
+class long_text extends respondable_element_plugin {
 
     /**
      * @inheritDoc

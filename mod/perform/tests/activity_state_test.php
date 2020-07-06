@@ -232,6 +232,19 @@ class mod_perform_activity_state_testcase extends advanced_testcase {
         $this->assertFalse($invalid_draft_activity->can_activate());
     }
 
+
+    public function test_cant_activate_with_only_static_elements() {
+        $user1 = $this->getDataGenerator()->create_user();
+
+        $this->setUser($user1);
+
+        // A draft activity which fulfills all conditions can be activated, EXCEPT the element is static.
+        $draft_activity = $this->create_valid_activity(null, 'static_content');
+
+        $this->assertTrue($draft_activity->can_potentially_activate());
+        $this->assertFalse($draft_activity->can_activate());
+    }
+
     /**
      * Create a basic activity without any sections or questions in it
      *
@@ -251,9 +264,10 @@ class mod_perform_activity_state_testcase extends advanced_testcase {
      * Creates an activity with one section, one question and one relationship
      *
      * @param int|null $status defaults to draft
+     * @param string $element_plugin_name
      * @return activity
      */
-    protected function create_valid_activity(int $status = null): activity {
+    protected function create_valid_activity(int $status = null, $element_plugin_name = 'short_text'): activity {
         $perform_generator = $this->generator();
 
         $activity = $this->create_activity($status);
@@ -265,7 +279,7 @@ class mod_perform_activity_state_testcase extends advanced_testcase {
             ['class_name' => manager::class]
         );
 
-        $element = $perform_generator->create_element(['title' => 'Question one']);
+        $element = $perform_generator->create_element(['title' => 'Question one', 'plugin_name' => $element_plugin_name]);
         $perform_generator->create_section_element($section, $element);
 
         $perform_generator->create_single_activity_track_and_assignment($activity);

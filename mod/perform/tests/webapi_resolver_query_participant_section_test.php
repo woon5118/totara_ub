@@ -25,9 +25,7 @@ use mod_perform\models\activity\section;
 use mod_perform\models\activity\activity;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
 use mod_perform\webapi\resolver\query\participant_section;
-
 use totara_core\advanced_feature;
-
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
@@ -41,31 +39,31 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
     use webapi_phpunit_helper;
 
     public function test_get_participant_section_by_participant_instance_id(): void {
-        [$participant_sections, $section_element] = $this->create_test_data();
+        [$participant_sections, $section_element, $static_section_element] = $this->create_test_data();
 
         foreach ($participant_sections as $participant_section) {
             self::setUser($participant_section->participant_instance->participant_user->id);
 
             $args = ['participant_instance_id' => $participant_section->participant_instance->id];
 
-            $this->assert_query_success($args, $participant_section, $section_element);
+            $this->assert_query_success($args, $participant_section, $section_element, $static_section_element);
         }
     }
 
-    public function test_get_participant_section_by_participant_section_id() {
-        [$participant_sections, $section_element] = $this->create_test_data();
+    public function test_get_participant_section_by_participant_section_id(): void {
+        [$participant_sections, $section_element, $static_section_element] = $this->create_test_data();
 
         foreach ($participant_sections as $participant_section) {
             self::setUser($participant_section->participant_instance->participant_user->id);
 
             $args = ['participant_section_id' => $participant_section->id];
 
-            $this->assert_query_success($args, $participant_section, $section_element);
+            $this->assert_query_success($args, $participant_section, $section_element, $static_section_element);
         }
     }
 
-    public function test_get_participant_section_by_participant_section_id_and_participant_instance_id() {
-        [$participant_sections, $section_element] = $this->create_test_data();
+    public function test_get_participant_section_by_participant_section_id_and_participant_instance_id(): void {
+        [$participant_sections, $section_element, $static_section_element] = $this->create_test_data();
 
         foreach ($participant_sections as $participant_section) {
             self::setUser($participant_section->participant_instance->participant_user->id);
@@ -75,7 +73,7 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
                 'participant_section_id'  => $participant_section->id,
             ];
 
-            $this->assert_query_success($args, $participant_section, $section_element);
+            $this->assert_query_success($args, $participant_section, $section_element, $static_section_element);
         }
     }
 
@@ -138,11 +136,14 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
         $element = $perform_generator->create_element();
         $section_element = $perform_generator->create_section_element($section, $element);
 
+        $static_element = $perform_generator->create_element(['plugin_name' => 'static_content']);
+        $static_section_element = $perform_generator->create_section_element($section, $static_element);
+
         $participant_sections = participant_section_entity::repository()
             ->order_by('id', 'desc')
             ->get();
 
-        return [$participant_sections, $section_element];
+        return [$participant_sections, $section_element, $static_section_element];
     }
 
     private function create_section_element_response(int $section_element_id): array {
@@ -160,6 +161,32 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
                     'title' => 'test element title',
                     'data' => null,
                     'is_required' => false,
+                    'is_respondable' => true,
+                ],
+            'sort_order' => 1,
+            'response_data' => null,
+            'validation_errors' => [],
+            'other_responder_groups' => [],
+            'visible_to' => [],
+        ];
+    }
+
+    private function create_static_section_element_response(int $section_element_id): array {
+        return [
+            'section_element_id' => $section_element_id,
+            'element' =>
+                [
+                    'element_plugin' =>
+                        [
+                            'participant_form_component' =>
+                                'performelement_static_content/components/StaticContentElementParticipantForm',
+                            'participant_response_component' =>
+                                'performelement_static_content/components/StaticContentElementParticipantResponse',
+                        ],
+                    'title' => 'test element title',
+                    'data' => null,
+                    'is_required' => false,
+                    'is_respondable' => false,
                 ],
             'sort_order' => 1,
             'response_data' => null,
@@ -175,8 +202,9 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
      * @param array $args
      * @param $participant_section
      * @param $section_element
+     * @param $static_section_element
      */
-    private function assert_query_success(array $args, $participant_section, $section_element): void {
+    private function assert_query_success(array $args, $participant_section, $section_element, $static_section_element): void {
         $result = $this->parsed_graphql_operation(self::QUERY, $args);
         $this->assert_webapi_operation_successful($result);
 
@@ -192,7 +220,7 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
         $section_element_responses = $result['section_element_responses'];
 
         $this->assertCount(
-            1,
+            2,
             $section_element_responses,
             'Expected one section element'
         );
@@ -200,6 +228,11 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
         $this->assertEquals(
             $this->create_section_element_response($section_element->id),
             $section_element_responses[0]
+        );
+
+        $this->assertEquals(
+            $this->create_static_section_element_response($static_section_element->id),
+            $section_element_responses[1]
         );
     }
 }

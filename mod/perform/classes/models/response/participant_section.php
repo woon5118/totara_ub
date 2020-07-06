@@ -170,6 +170,10 @@ class participant_section extends model {
                 throw new coding_exception(sprintf('Section element not found for id %d', $section_element_id));
             }
 
+            if (!$existing_element_response->get_element()->get_is_respondable()) {
+                throw new coding_exception(sprintf('Section element with id %d can not be responded to', $section_element_id));
+            }
+
             $existing_element_response->set_response_data($updated_response_data);
         }
 

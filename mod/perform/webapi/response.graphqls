@@ -13,15 +13,19 @@ type mod_perform_participant_section {
 }
 
 """
-A section element containing responses relating to a specific participant
+A section element from the view of a participant section response,
+from the view perspective of the logged in user/participant.
+The elements are not necessarily respondable.
 """
 type mod_perform_section_element_response {
   section_element_id: core_id!
   participant_instance: mod_perform_participant_instance
   element: mod_perform_element!
-  sort_order: Int!
-  other_responder_groups: [mod_perform_responder_group!]!
   visible_to: [mod_perform_participant_instance!]!
+  sort_order: Int!
+
+  # Respondable element only fields.
+  other_responder_groups: [mod_perform_responder_group!]!
   response_data(format: core_format): String # JSON encoded answer, format is specific to the element type
   validation_errors: [mod_perform_validation_error!]!
 }

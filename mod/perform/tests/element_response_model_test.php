@@ -28,7 +28,7 @@ use mod_perform\entities\activity\element_response as element_response_entity;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\entities\activity\section_element as section_element_entity;
 use mod_perform\models\activity\element;
-use mod_perform\models\activity\element_plugin;
+use mod_perform\models\activity\respondable_element_plugin;
 use mod_perform\models\response\section_element_response;
 use mod_perform\models\response\element_validation_error;
 
@@ -57,7 +57,12 @@ class mod_perform_response_model_testcase extends advanced_testcase {
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage($expected_message);
 
-        new section_element_response($participant_instance_entity, $section_element_entity, $element_response_entity);
+        new section_element_response(
+            $participant_instance_entity,
+            $section_element_entity,
+            $element_response_entity,
+            new collection()
+        );
     }
 
     public function constructor_only_allows_responses_entities_related_to_others_provider(): array {
@@ -91,8 +96,8 @@ class mod_perform_response_model_testcase extends advanced_testcase {
         $element_response = new section_element_response($participant_instance,
             $section_element,
             null,
-            null,
-            $this->create_element_plugin_stub()
+            new collection(),
+            $this->create_question_element_plugin_stub()
         );
 
         $element_response->save();
@@ -115,8 +120,8 @@ class mod_perform_response_model_testcase extends advanced_testcase {
         $element_response = new section_element_response($participant_instance,
             $section_element,
             null,
-            null,
-            $this->create_element_plugin_stub()
+            new collection(),
+            $this->create_question_element_plugin_stub()
         );
 
         $response_data = ['answer_text' => 'Hello there.'];
@@ -136,8 +141,8 @@ class mod_perform_response_model_testcase extends advanced_testcase {
         $element_response = new section_element_response($participant_instance,
             $section_element,
             null,
-            null,
-            $this->create_element_plugin_with_validation_errors()
+            new collection(),
+            $this->create_question_element_plugin_with_validation_errors()
         );
 
         $response_data = ['answer_text' => 'Hello there.'];
@@ -151,22 +156,22 @@ class mod_perform_response_model_testcase extends advanced_testcase {
 
         self::assertNotEmpty($validation_errors, 'Expected validation errors, none were generated');
 
-        self::assertEquals($validation_errors[0]->error_message, 'There was a problem.');
-        self::assertEquals($validation_errors[0]->error_code, 1);
+        self::assertEquals('There was a problem.', $validation_errors[0]->error_message);
+        self::assertEquals(1, $validation_errors[0]->error_code);
 
-        self::assertEquals($validation_errors[1]->error_message, 'There was another problem.');
-        self::assertEquals($validation_errors[1]->error_code, 2);
+        self::assertEquals('There was another problem.', $validation_errors[1]->error_message);
+        self::assertEquals(2, $validation_errors[1]->error_code);
     }
 
-    private function create_element_plugin_stub(): element_plugin {
-        return new class extends element_plugin {
+    private function create_question_element_plugin_stub(): respondable_element_plugin {
+        return new class extends respondable_element_plugin {
             public function __construct() {
             }
         };
     }
 
-    private function create_element_plugin_with_validation_errors(): element_plugin {
-        return new class extends element_plugin {
+    private function create_question_element_plugin_with_validation_errors(): respondable_element_plugin {
+        return new class extends respondable_element_plugin {
             public function __construct() {
             }
 

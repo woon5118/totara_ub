@@ -23,8 +23,8 @@
 
 namespace performelement_multi_choice;
 
-use mod_perform\models\activity\element_plugin;
+use mod_perform\models\activity\respondable_element_plugin;
 
-class multi_choice extends element_plugin {
+class multi_choice extends respondable_element_plugin {
 
 }

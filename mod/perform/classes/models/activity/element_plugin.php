@@ -124,22 +124,6 @@ abstract class element_plugin {
     }
 
     /**
-     * Hook method to validate the response data.
-     * This method is responsible for decoding the raw response data and validating it.
-     *
-     * Should return a collection of element_validation_errors (or an empty collection when there are no errors).
-     *
-     * @param string|null                               $encoded_response_data
-     * @param element|null $element
-     *
-     * @return collection|element_validation_error[]
-     * @see element_validation_error
-     */
-    public function validate_response(?string $encoded_response_data, ?element $element): collection {
-        return new collection();
-    }
-
-    /**
      * This method return element's default component name prefix
      *
      * @return string

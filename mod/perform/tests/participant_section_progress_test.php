@@ -271,28 +271,51 @@ class mod_perform_participant_section_progress_testcase extends state_testcase {
         $participant_section->set_responses_data_from_request($request_payload);
     }
 
-    private function create_section_element_with_empty_responses(): participant_section {
+    public function test_cant_set_response_data_from_request_on_non_respondable_section_element(): void {
+        $participant_section = $this->create_section_element_with_empty_responses('static_content');
+
+        $request_payload = [
+            ['section_element_id' => 2, 'response_data' => 'answer 1'],
+        ];
+
+        static::assertCount(2, $participant_section->get_section_element_responses());
+        static::assertNull($participant_section->find_element_response(1)->response_data);
+        static::assertNull($participant_section->find_element_response(2)->response_data);
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('Section element with id 2 can not be responded to');
+
+        $participant_section->set_responses_data_from_request($request_payload);
+    }
+
+    private function create_section_element_with_empty_responses($element_plugin = 'short_text'): participant_section {
         $participant_section_entity = $this->create_participant_section();
+
+        /** @var mod_perform_generator $perform_generator */
+        $perform_generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
 
         $participant_instance_entity = $participant_section_entity->participant_instance;
 
-        $section_element1 = new section_element(['id' => 1]);
-        $section_element2 = new section_element(['id' => 2]);
+        $element1 = $perform_generator->create_element(['plugin_name' => $element_plugin]);
+        $section_element1 = new section_element(['id' => 1, 'element_id' => $element1->id]);
+
+        $element2 = $perform_generator->create_element(['plugin_name' => $element_plugin]);
+        $section_element2 = new section_element(['id' => 2, 'element_id' => $element2->id]);
 
         $response1 = new section_element_response(
             $participant_instance_entity,
             $section_element1,
             null,
-            null,
-            element_plugin::load_by_plugin('short_text')
+            new collection(),
+            element_plugin::load_by_plugin($element_plugin)
         );
 
         $response2 = new section_element_response(
             $participant_instance_entity,
             $section_element2,
             null,
-            null,
-            element_plugin::load_by_plugin('short_text')
+            new collection(),
+            element_plugin::load_by_plugin($element_plugin)
         );
 
         $responses = new collection([$response1, $response2]);

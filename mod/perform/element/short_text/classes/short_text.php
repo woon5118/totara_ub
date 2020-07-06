@@ -27,9 +27,9 @@ use coding_exception;
 use core\collection;
 use mod_perform\models\activity\element;
 use core_text;
-use mod_perform\models\activity\element_plugin;
+use mod_perform\models\activity\respondable_element_plugin;
 
-class short_text extends element_plugin {
+class short_text extends respondable_element_plugin {
 
     public const MAX_ANSWER_LENGTH = 1024;
 
