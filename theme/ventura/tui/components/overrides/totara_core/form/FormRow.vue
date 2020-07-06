@@ -72,7 +72,8 @@
     input[type='url'].tui-formInput,
     .tui-select,
     .tui-formTextarea,
-    .tui-formFieldError {
+    .tui-formFieldError,
+    .tui-range {
       width: 280px;
       max-width: 280px;
     }

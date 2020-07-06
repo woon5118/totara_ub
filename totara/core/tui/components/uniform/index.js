@@ -43,6 +43,7 @@ export { default as FormTel } from 'totara_core/components/uniform/FormTel';
 export { default as FormText } from 'totara_core/components/uniform/FormText';
 export { default as FormTextarea } from 'totara_core/components/uniform/FormTextarea';
 export { default as FormUrl } from 'totara_core/components/uniform/FormUrl';
+export { default as FormRange } from 'totara_core/components/uniform/FormRange';
 
 // util
 export { createUniformInputWrapper } from './util';

@@ -108,6 +108,20 @@
       </FormCheckboxGroup>
     </FormRow>
 
+    <FormRow label="Pizza slices" required>
+      <FormRange
+        name="pizzaSlices"
+        :value="null"
+        :default-value="6"
+        :show-labels="true"
+        :min="1"
+        :max="12"
+        low-label="BIG"
+        high-label="SMALL"
+        :validations="v => [v.required()]"
+      />
+    </FormRow>
+
     <FormRowActionButtons :submitting="getSubmitting()" @cancel="cancel" />
 
     <h3 v-if="value">Current value</h3>
@@ -131,6 +145,7 @@ import {
   FormRadioGroup,
   FormCheckbox,
   FormCheckboxGroup,
+  FormRange,
 } from 'totara_core/components/uniform';
 import InputText from 'totara_core/components/form/InputText';
 import Checkbox from 'totara_core/components/form/Checkbox';
@@ -151,6 +166,7 @@ export default {
     FormColor,
     FormNumber,
     FormRadioGroup,
+    FormRange,
     InputText,
     Radio,
     FormRowActionButtons,

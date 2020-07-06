@@ -1,0 +1,218 @@
+<!--
+  This file is part of Totara Learn
+
+  Copyright (C) 2019 onwards Totara Learning Solutions LTD
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+  @author Johannes Cilliers <johannes.cilliers@totaralearning.com>
+  @package totara_samples
+-->
+
+<template>
+  <div class="tui-testRange">
+    <div class="tui-testRange__description">
+      Stand-alone range input type
+
+      <ul>
+        Make sure the range input has an accessible name doing one of the
+        following:
+        <li>
+          setting the <span class="tui-testRange__code">label</span> prop of the
+          <span class="tui-testRange__code">FormRow</span>
+        </li>
+        <li>
+          setting
+          <span class="tui-testRange__code"
+            >ariaLabelledby="the-id-of-visible-bit-of-text-that-can-act-as-a-label-for-this"</span
+          >
+          prop of the <span class="tui-testRange__code">Range</span>
+        </li>
+        <li>
+          setting
+          <span class="tui-testRange__code"
+            >ariaLabel="The name of this range input"</span
+          >
+          prop of the <span class="tui-testRange__code">Range</span>
+        </li>
+      </ul>
+    </div>
+
+    <SamplesExample class="tui-testRange__example">
+      <FormRow>
+        <Range
+          name="rangeExample"
+          :value="selectedValue"
+          :default-value="defaultValue"
+          :show-labels="showLabels"
+          :min="minimumValue"
+          :max="maximumValue"
+          :low-label="lowLabel"
+          :high-label="highLabel"
+          @change="changed"
+        />
+      </FormRow>
+      <FormRow>
+        <div class="tui-testRange__selectedValue">
+          {{ `Selected: ${selectedValue || ''}` }}
+        </div>
+      </FormRow>
+    </SamplesExample>
+
+    <SamplesExample class="tui-testRange__example">
+      <Form>
+        <FormRow label="Form example">
+          <Range
+            name="rangeExample"
+            :value="selectedValue"
+            :default-value="defaultValue"
+            :show-labels="showLabels"
+            :min="minimumValue"
+            :max="maximumValue"
+            :low-label="lowLabel"
+            :high-label="highLabel"
+            @change="changed"
+          />
+        </FormRow>
+      </Form>
+    </SamplesExample>
+
+    <SamplesPropCtl>
+      <FormRow label="Low end value">
+        <InputNumber v-model="minimumValue" />
+      </FormRow>
+
+      <FormRow label="High end value">
+        <InputNumber v-model="maximumValue" />
+      </FormRow>
+
+      <FormRow label="Default value">
+        <InputText v-model="defaultValue" />
+      </FormRow>
+
+      <FormRow label="Low end label">
+        <InputText v-model="lowLabel" />
+      </FormRow>
+
+      <FormRow label="High end label">
+        <InputText v-model="highLabel" />
+      </FormRow>
+
+      <FormRow label="Show labels">
+        <RadioGroup v-model="showLabels" :horizontal="true">
+          <Radio name="showLabels" :value="true">True</Radio>
+          <Radio name="showLabels" :value="false">False</Radio>
+        </RadioGroup>
+      </FormRow>
+    </SamplesPropCtl>
+
+    <SamplesCode>
+      <template v-slot:template>{{ codeTemplate }}</template>
+      <template v-slot:script>{{ codeScript }}</template>
+    </SamplesCode>
+  </div>
+</template>
+
+<script>
+import Form from 'totara_core/components/form/Form';
+import FormRow from 'totara_core/components/form/FormRow';
+import InputNumber from 'totara_core/components/form/InputNumber';
+import InputText from 'totara_core/components/form/InputText';
+import Radio from 'totara_core/components/form/Radio';
+import RadioGroup from 'totara_core/components/form/RadioGroup';
+import Range from 'totara_core/components/form/Range';
+import SamplesCode from 'totara_samples/components/sample_parts/misc/SamplesCode';
+import SamplesExample from 'totara_samples/components/sample_parts/misc/SamplesExample';
+import SamplesPropCtl from 'totara_samples/components/sample_parts/misc/SamplesPropCtl';
+
+export default {
+  components: {
+    Form,
+    FormRow,
+    InputNumber,
+    InputText,
+    Radio,
+    RadioGroup,
+    Range,
+    SamplesCode,
+    SamplesExample,
+    SamplesPropCtl,
+  },
+
+  data() {
+    return {
+      selectedValue: null,
+      ariaLabelledby: '',
+      minimumValue: 0,
+      maximumValue: 10,
+      defaultValue: 5,
+      lowLabel: 'Some very long piece of text as an example for a low value',
+      highLabel:
+        'This is an even longer piece of text as an example for a high value that should wrap when too long',
+      showLabels: true,
+
+      codeTemplate: `<Range
+  value="5"
+  :show-labels="true"
+  :min="0"
+  :max="10"
+  low-label="LOW"
+  high-label="HIGH"
+  @change="changed"
+/>`,
+      codeScript: `import Range from 'totara_core/components/form/Range';
+
+export default {
+  components: {
+    Range,
+  }
+}`,
+    };
+  },
+
+  methods: {
+    changed(value) {
+      this.selectedValue = value;
+    },
+  },
+};
+</script>
+
+<style lang="scss">
+.tui-testRange {
+  &__code {
+    display: inline-block;
+    margin: 0 2px -1px;
+    padding: 0 3px;
+    text-decoration: inherit;
+    vertical-align: baseline;
+    background-color: #f4f5f7;
+    background-clip: padding-box;
+    border: 1px solid #dfe1e6;
+    border-radius: 3px;
+  }
+  &__description {
+    ul {
+      margin: 10px 0 0;
+    }
+    li {
+      margin-left: 20px;
+    }
+  }
+  &__selectedValue {
+    width: 100%;
+    text-align: center;
+  }
+}
+</style>
