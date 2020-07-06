@@ -1308,7 +1308,7 @@ class core_plugin_manager {
                 'totara_recent_learning', 'totara_report_graph', 'totara_report_manager', 'totara_stats',
                 'totara_tasks', 'totara_certifications', 'gaccess', 'totara_program_completion',
                 'totara_dashboard', 'totara_report_table', 'last_course_accessed',
-                'current_learning', 'totara_featured_links','totara_user_profile',
+                'current_learning', 'totara_featured_links', 'totara_user_profile',
                 'course_search',
                 'admin_subnav', 'admin_related_pages', 'course_navigation',
             ),
@@ -1547,14 +1547,11 @@ class core_plugin_manager {
                 'certification', 'completionimport', 'mssql', 'generator', 'connect', 'form',
                 'gap', 'job', 'completioneditor', 'userdata', 'catalog', 'workflow', 'contentmarketplace',
                 'tenant', 'webapi', 'evidence', 'mvc', 'cloudfiledir', 'extfiledir', 'samples', 'mobile',
+                'competency', 'criteria',
             ),
 
             'tabexport' => array(
                 'csv', 'csv_excel', 'excel', 'ods', 'pdflandscape', 'pdfportrait', 'wkpdflandscape', 'wkpdfportrait',
-            ),
-
-            'tassign' => array(
-                'competency'
             ),
 
             'webservice' => array(
