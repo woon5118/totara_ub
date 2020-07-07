@@ -173,6 +173,13 @@ class sqlsrv_native_moodle_database extends moodle_database {
             throw new dml_exception('dbdriverproblem', $driverstatus);
         }
 
+        if (!$this->external and strlen($prefix) > 80) {
+            // Max prefix length is 128 - 48 = 80 characters,
+            // see https://docs.microsoft.com/en-us/sql/odbc/microsoft/table-name-limitations?view=sql-server-2017
+            $a = (object)array('dbfamily' => 'mssql', 'maxlength' => 80);
+            throw new dml_exception('prefixtoolong', $a);
+        }
+
         /*
          * Log all Errors.
          */

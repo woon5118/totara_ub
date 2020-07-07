@@ -135,6 +135,13 @@ class pgsql_native_moodle_database extends moodle_database {
             throw new dml_exception('dbdriverproblem', $driverstatus);
         }
 
+        if (!$this->external and strlen($prefix) > 15) {
+            // Max prefix length is 63 - 48 = 15 characters,
+            // see https://www.postgresql.org/docs/9.6/sql-syntax-lexical.html
+            $a = (object)array('dbfamily' => 'postgres', 'maxlength' => 15);
+            throw new dml_exception('prefixtoolong', $a);
+        }
+
         $this->store_settings($dbhost, $dbuser, $dbpass, $dbname, $prefix, $dboptions);
 
         $pass = addcslashes($this->dbpass, "'\\");

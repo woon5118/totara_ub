@@ -32,8 +32,8 @@ class totara_core_no_oracle_support_testcase extends advanced_testcase {
 
         $dbman = $DB->get_manager();
 
-        $longname = 'test_long_table_name_forty_characters_xx';
-        $this->assertSame(40, strlen($longname));
+        $longname = 'test_long_table_name_forty_characters_xxyyyyzzzz';
+        $this->assertSame(48, strlen($longname));
 
         $shortname = 'test_short';
 
@@ -85,7 +85,7 @@ class totara_core_no_oracle_support_testcase extends advanced_testcase {
         } catch (moodle_exception $e) {
             $this->assertInstanceOf('coding_exception', $e);
             $max = xmldb_table::NAME_MAX_LENGTH;
-            $this->assertEquals("Coding error detected, it must be fixed by a programmer: Invalid table name {test_long_table_name_forty_characters_xxa}: name is too long. Limit is {$max} chars.", $e->getMessage());
+            $this->assertEquals("Coding error detected, it must be fixed by a programmer: Invalid table name {{$longname}a}: name is too long. Limit is {$max} chars.", $e->getMessage());
         }
 
     }

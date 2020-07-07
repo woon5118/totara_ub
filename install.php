@@ -456,10 +456,11 @@ if ($config->stage == INSTALL_DATABASE) {
     echo '</div>';
 
     echo '<div class="fitem"><div class="fitemtitle"><label for="id_prefix">'.$strprefix.'</label></div>';
-    echo '<div class="fitemelement"><input id="id_prefix" name="prefix" type="text" class="text-ltr" value="'.s($config->prefix).'" size="10" /></div>';
+    // Limit prefix to 15 characters to make it compatible with all database types.
+    echo '<div class="fitemelement"><input id="id_prefix" name="prefix" type="text" class="text-ltr" value="'.s($config->prefix).'" size="15" maxlength="15" /></div>';
     echo '</div>';
 
-    echo '<div class="fitem"><div class="fitemtitle"><label for="id_prefix">'.$strdbport.'</label></div>';
+    echo '<div class="fitem"><div class="fitemtitle"><label for="id_dbport">'.$strdbport.'</label></div>';
     echo '<div class="fitemelement"><input id="id_dbport" name="dbport" type="text" class="text-ltr" value="'.s($config->dbport).'" size="10" /></div>';
     echo '</div>';
 

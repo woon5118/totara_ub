@@ -10,13 +10,13 @@
 
   <xs:simpleType name="tableName" >
     <xs:restriction base="xs:string" >
-     <xs:pattern value='[0-9a-z_]{1,40}'/><!-- Totara will never support Oracle, limit is 40 since 2.7, YAY! -->
+     <xs:pattern value='[0-9a-z_]{1,48}'/><!-- Totara will never support Oracle, limit is 40 since 2.7 and 48 since 13.0, YAY! -->
     </xs:restriction >
   </xs:simpleType >
 
   <xs:simpleType name="fieldName" >
     <xs:restriction base="xs:string" >
-     <xs:pattern value='[0-9a-z_]{1,30}'/>
+     <xs:pattern value='[0-9a-z_]{1,63}'/>
     </xs:restriction >
   </xs:simpleType >
 

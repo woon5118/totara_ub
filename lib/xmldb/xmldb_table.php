@@ -38,13 +38,11 @@ class xmldb_table extends xmldb_object {
     protected $indexes;
 
     /**
-     * Note:
-     *  - Oracle has 30 chars limit for all names,
-     *    2 chars are reserved for prefix.
+     * NOTE: the limit is lower than database limits because space is reserved for database prefix.
      *
      * @const maximum length of field names
      */
-    const NAME_MAX_LENGTH = 40; // Totara will never support Oracle, limit is 40 since 2.7, YAY!
+    const NAME_MAX_LENGTH = 48; // Totara will never support Oracle, limit is 40 since 2.7 and 48 since 13.0, YAY!
 
     /**
      * Creates one new xmldb_table

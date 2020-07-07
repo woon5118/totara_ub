@@ -534,6 +534,13 @@ class mysqli_native_moodle_database extends moodle_database {
             throw new dml_exception('dbdriverproblem', $driverstatus);
         }
 
+        if (!$this->external and strlen($prefix) > 16) {
+            // Max prefix length is 64 - 48 = 16 characters,
+            // see https://dev.mysql.com/doc/refman/5.7/en/identifier-length.html
+            $a = (object)array('dbfamily' => 'mysql', 'maxlength' => 16);
+            throw new dml_exception('prefixtoolong', $a);
+        }
+
         $this->store_settings($dbhost, $dbuser, $dbpass, $dbname, $prefix, $dboptions);
 
         // dbsocket is used ONLY if host is NULL or 'localhost',

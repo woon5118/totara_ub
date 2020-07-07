@@ -328,7 +328,7 @@ class core_ddl_testcase extends database_driver_testcase {
         } catch (moodle_exception $e) {
             $this->assertInstanceOf('coding_exception', $e);
             $max = xmldb_table::NAME_MAX_LENGTH;
-            $this->assertEquals("Coding error detected, it must be fixed by a programmer: Invalid table name {aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa}: name is too long. Limit is {$max} chars.", $e->getMessage());
+            $this->assertEquals("Coding error detected, it must be fixed by a programmer: Invalid table name {" . $tablechars . "}: name is too long. Limit is {$max} chars.", $e->getMessage());
         }
 
         // Invalid table name.
@@ -376,7 +376,7 @@ class core_ddl_testcase extends database_driver_testcase {
         } catch (moodle_exception $e) {
             $this->assertInstanceOf('coding_exception', $e);
             $max = xmldb_field::NAME_MAX_LENGTH;
-            $this->assertEquals("Coding error detected, it must be fixed by a programmer: Invalid field name in table {test_table4}: field \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\" name is too long. Limit is {$max} chars.", $e->getMessage());
+            $this->assertEquals("Coding error detected, it must be fixed by a programmer: Invalid field name in table {test_table4}: field \"". str_repeat('a', $max + 1) . "\" name is too long. Limit is {$max} chars.", $e->getMessage());
         }
 
         // Invalid field name.
