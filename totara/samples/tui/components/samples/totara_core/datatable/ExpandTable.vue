@@ -36,7 +36,11 @@
         </template>
 
         <template v-slot:row="{ row, expand, expandState }">
-          <ExpandCell :expand-state="expandState" @click="expand()" />
+          <ExpandCell
+            :aria-label="row.title"
+            :expand-state="expandState"
+            @click="expand()"
+          />
           <Cell size="16" column-header="col 1" valign="center">
             {{ row.title }}
           </Cell>

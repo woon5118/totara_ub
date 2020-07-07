@@ -28,16 +28,12 @@
   >
     <template v-if="!header || empty">
       <ButtonIcon
-        :aria-label="
-          $str(
-            expandState ? 'a11y_collapse_row' : 'a11y_expand_row',
-            'totara_core'
-          )
-        "
+        :aria-expanded="expandState.toString()"
+        :aria-label="$str('a11y_row', 'totara_core', ariaLabel)"
         :styleclass="{
           transparent: true,
         }"
-        :text="$str('a11y_expand_row', 'totara_core')"
+        :text="$str('a11y_row', 'totara_core', ariaLabel)"
         @click="$emit('click', $event)"
       >
         <CollapseIcon v-if="expandState" size="100" />
@@ -60,6 +56,7 @@ export default {
   },
 
   props: {
+    ariaLabel: String,
     empty: Boolean,
     expandState: Boolean,
     header: Boolean,
@@ -70,8 +67,7 @@ export default {
 <lang-strings>
 {
   "totara_core": [
-    "a11y_collapse_row",
-    "a11y_expand_row"
+    "a11y_row"
   ]
 }
 </lang-strings>
