@@ -78,9 +78,15 @@ class behat_totara_competency_legacy_adder extends behat_base {
         }
     }
 
+    /**
+     * @param string $value
+     * @param string $title
+     * @return NodeElement
+     */
     private function find_list_entry(string $value, string $title): NodeElement {
+        // The legacy adder now adds a space at the end of the aria label
         $xpath = '//div[@data-region="modal-container" and @aria-hidden="false" and contains(.//h3, "' . $title . '")]' .
-            '//input[@type="checkbox" and @aria-label="Select ' . $value . '"]';
+            '//input[@type="checkbox" and @aria-label="Select ' . $value . ' "]';
         return $this->find('xpath', $xpath);
     }
 }

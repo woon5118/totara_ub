@@ -53,11 +53,11 @@ Feature: Manage Manual rating achievement paths
     And I wait for pending js
     Then I should see "Changes applied successfully"
     When I follow "Back to Competency page"
-    Then I should see "Any scale value" in the ".tui-competencySummaryAchievementConfiguration__pathgroup_scalevalue" "css_element"
-    And I should see "Manual rating" in the ".tui-competencySummaryAchievementConfiguration__pathgroup_scalevalue__path_criterion" "css_element"
-    And I should see "Manager" in the ".tui-competencySummaryAchievementConfiguration__pathgroup_scalevalue__path_criterion" "css_element"
-    And I should see "Self" in the ".tui-competencySummaryAchievementConfiguration__pathgroup_scalevalue__path_criterion" "css_element"
-    And I should see "Appraiser" in the ".tui-competencySummaryAchievementConfiguration__pathgroup_scalevalue__path_criterion" "css_element"
+    Then I should see "Any scale value" in the ".tui-competencySummaryAchievementConfiguration__scaleValue-header" "css_element"
+    And I should see "Manual rating" in the ".tui-competencySummaryAchievementCriteria__criterion-header" "css_element"
+    And I should see "Manager" in the ".tui-competencySummaryAchievementCriteria__criterion-items" "css_element"
+    And I should see "Self" in the ".tui-competencySummaryAchievementCriteria__criterion-items" "css_element"
+    And I should see "Appraiser" in the ".tui-competencySummaryAchievementCriteria__criterion-items" "css_element"
 
   Scenario: Remove Manual achievement path
     Given I log in as "admin"
