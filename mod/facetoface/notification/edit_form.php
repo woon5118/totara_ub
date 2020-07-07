@@ -181,8 +181,12 @@ class mod_facetoface_notification_form extends moodleform {
         $mform->addElement('editor', 'managerprefix_editor', get_string('managerprefix', 'facetoface'));
         $mform->setType('managerprefix_editor', PARAM_RAW);
 
-        // Enable checkbox.
-        $mform->addElement('checkbox', 'status', get_string('status'));
+        // Active/Inactive radio buttons.
+        $group = [
+            $mform->createElement('radio', 'status', null, get_string('inactive', 'mod_facetoface'), 0),
+            $mform->createElement('radio', 'status', null, get_string('active', 'mod_facetoface'), 1),
+        ];
+        $mform->addGroup($group, null, get_string('status'), '', true);
         $mform->setType('status', PARAM_INT);
 
         $this->add_action_buttons(true, get_string('save', 'admin'));

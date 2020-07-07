@@ -22,6 +22,7 @@
 
 $string['actions'] = 'Actions';
 $string['activate'] = 'Activate';
+$string['active'] = 'Active';
 $string['activitycompletiontask'] = 'Trigger delayed seminar activity completions';
 $string['activitydefaults'] = 'Activity defaults';
 $string['addattendees'] = 'Add users';
@@ -925,6 +926,7 @@ $string['icallocationstringdelimiter'] = ',';
 $string['ignoreapprovalwhenaddingattendees'] = 'Book users without requiring approval';
 $string['import'] = 'Import';
 $string['importexportattendancelegend'] = 'Import/Export attendance';
+$string['inactive'] = 'Inactive';
 $string['individuals'] = 'Individuals';
 $string['info'] = 'Info';
 $string['inprogress'] = 'In progress';

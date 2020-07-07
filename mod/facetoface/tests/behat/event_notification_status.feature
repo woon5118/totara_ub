@@ -32,7 +32,7 @@ Feature: Seminar event notification must not be available for user after it has 
     And I follow "Test seminar name"
     And I navigate to "Notifications" node in "Seminar administration"
     And I click on "Edit" "link" in the "Seminar booking confirmation: [seminarname], [starttime]-[finishtime], [sessiondate]" "table_row"
-    And I set the field "Status" to "<signup_enabled>"
+    And I click on "<signup_enabled>" "radio_exact"
     And I press "Save"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
@@ -55,8 +55,8 @@ Feature: Seminar event notification must not be available for user after it has 
     And I log out
     Examples:
       | signup_enabled | visibility     |
-      | 1              | should see     |
-      | 0              | should not see |
+      | Active         | should see     |
+      | Inactive       | should not see |
 
   # Booking cancellation notifications.
   @javascript
@@ -66,7 +66,7 @@ Feature: Seminar event notification must not be available for user after it has 
     And I follow "Test seminar name"
     And I navigate to "Notifications" node in "Seminar administration"
     And I click on "Edit" "link" in the "Seminar booking cancellation" "table_row"
-    And I set the field "Status" to "<cancellation_enabled>"
+    And I click on "<cancellation_enabled>" "radio_exact"
     And I press "Save"
     And I am on "Course 1" course homepage
     And I follow "Test seminar name"
@@ -85,5 +85,5 @@ Feature: Seminar event notification must not be available for user after it has 
     And I log out
     Examples:
       | cancellation_enabled | visibility     |
-      | 1                    | should see     |
-      | 0                    | should not see |
+      | Active               | should see     |
+      | Inactive             | should not see |

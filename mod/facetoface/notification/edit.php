@@ -108,7 +108,7 @@ if ($form->is_cancelled()) {
     $notification->courseid = $course->id;
     $notification->facetofaceid = $facetoface->id;
     $notification->ccmanager = (isset($data->ccmanager) ? 1 : 0);
-    $notification->status = (isset($data->status) ? 1 : 0);
+    $notification->status = (!empty($data->status) ? 1 : 0);
     $notification->templateid = $data->templateid;
     /** @var facetoface_notification $notification */
     $notification->save();
