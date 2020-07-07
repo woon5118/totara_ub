@@ -471,7 +471,15 @@ class activity extends model {
      * @return $this
      */
     public function activate(): self {
-        $this->get_status_state()->activate();
+        if ($this->get_status_state()->activate()) {
+            // Mark all track assignments to be expanded
+            foreach ($this->tracks as $track) {
+                foreach ($track->assignments as $assignment) {
+                    $assignment->mark_as_expand();
+                }
+            }
+        }
+
         return $this;
     }
 

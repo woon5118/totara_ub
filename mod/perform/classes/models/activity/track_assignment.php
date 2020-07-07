@@ -136,6 +136,18 @@ class track_assignment extends model {
     }
 
     /**
+     * Mark this track assignment to be expanded on the next expand task run
+     *
+     * @return $this
+     */
+    public function mark_as_expand(): self {
+        $this->entity->expand = true;
+        $this->entity->save();
+
+        return $this;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function __get($name) {

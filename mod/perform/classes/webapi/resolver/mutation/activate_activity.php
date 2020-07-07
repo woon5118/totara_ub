@@ -27,6 +27,7 @@ use core\webapi\execution_context;
 use core\webapi\mutation_resolver;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\resolver\has_middleware;
+use mod_perform\models\activity\activity;
 use mod_perform\webapi\middleware\require_activity;
 use mod_perform\webapi\middleware\require_manage_capability;
 use moodle_exception;
@@ -39,6 +40,7 @@ class activate_activity implements mutation_resolver, has_middleware {
      */
     public static function resolve(array $args, execution_context $ec) {
         // The require_activity middleware loads the activity and passes it along via the args
+        /** @var activity $activity */
         $activity = $args['activity'];
 
         // If activity is already active just return

@@ -58,13 +58,14 @@ abstract class activity_state extends state {
     /**
      * Activate this activity if possible
      *
-     * @return $this
+     * @return bool
      */
-    public function activate(): self {
+    public function activate(): bool {
         if ($this->can_activate()) {
             $this->object->switch_state(active::class);
+            return true;
         }
-        return $this;
+        return false;
     }
 
 }
