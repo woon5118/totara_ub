@@ -22,8 +22,7 @@
 
 <template>
   <div>
-    Standard tabs, usually used for admin screens. For more user facing tabs,
-    look at 'TransparentTabs'
+    Standard tabs, usually used for admin screens.
 
     <SamplesExample>
       <p>

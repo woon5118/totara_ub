@@ -246,56 +246,6 @@
       }
     }
   }
-
-  // Normal transparent tab
-  &__tab--transparent {
-    #{$mod-horizontal} & {
-      #{$block}__link {
-        position: relative;
-        background: transparent;
-        border: none;
-
-        &::after {
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          width: 1%;
-          max-width: calc(100% - var(--tui-tab-h-padding) * 2);
-          height: var(--tui-tab-highlight-height);
-          margin: 0 var(--tui-tab-h-padding);
-          transition: 0.4s;
-          content: '';
-        }
-      }
-    }
-  }
-
-  // Active transparent tab
-  &__tab--active&__tab--transparent {
-    #{$mod-horizontal} & {
-      #{$block}__link {
-        font-weight: bold;
-        background: transparent;
-        border: none;
-        box-shadow: none;
-
-        // Overwrite to position at bottom & matching text width
-        &::after {
-          top: auto;
-          width: 100%;
-        }
-      }
-    }
-  }
-
-  &__tab--disabled&__tab--transparent {
-    #{$mod-horizontal} & {
-      #{$block}__link {
-        background: transparent;
-        border-color: transparent;
-      }
-    }
-  }
 }
 
 .tui-tabContent {

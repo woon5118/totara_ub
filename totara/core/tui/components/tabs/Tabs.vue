@@ -36,7 +36,6 @@
           :class="{
             'tui-tabs__tab--active': tab.active,
             'tui-tabs__tab--disabled': tab.disabled,
-            'tui-tabs__tab--transparent': transparentTabs,
             'tui-tabs__tab--small': smallTabs,
             'tui-tabs__tab--hidden': overflowing && !measuring,
           }"
@@ -123,9 +122,6 @@ export default {
       type: String,
       default: 'horizontal',
       validator: x => ['horizontal', 'vertical'].includes(x),
-    },
-    transparentTabs: {
-      type: Boolean,
     },
     smallTabs: {
       type: Boolean,
