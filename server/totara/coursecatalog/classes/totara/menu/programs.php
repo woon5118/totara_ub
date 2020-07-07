@@ -42,7 +42,7 @@ class programs extends \totara_core\totara\menu\item {
     }
 
     public function get_default_sortorder() {
-        return 72000;
+        return 33200;
     }
 
     /**

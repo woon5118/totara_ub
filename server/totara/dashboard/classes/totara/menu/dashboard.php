@@ -69,4 +69,8 @@ class dashboard extends \totara_core\totara\menu\item {
     public function is_disabled() {
         return advanced_feature::is_disabled('totaradashboard');
     }
+
+    protected function get_default_parent() {
+        return '\totara_core\totara\menu\unused';
+    }
 }

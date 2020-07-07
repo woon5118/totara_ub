@@ -43,7 +43,7 @@ class courses extends \totara_core\totara\menu\item {
     }
 
     public function get_default_sortorder() {
-        return 71000;
+        return 33100;
     }
 
     protected function get_default_parent() {

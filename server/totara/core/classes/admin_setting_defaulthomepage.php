@@ -95,10 +95,21 @@ class totara_core_admin_setting_defaulthomepage extends admin_setting_configsele
      *
      * Parent method return $CFG->defaulthomepage as 0 once totara dashboard is disabled.
      *
+     * @param string $name
      * @return string
      */
     public function config_read($name) {
-        $value = get_config('core', 'defaulthomepage');
-        return $value === false ? 0 : $value;
+        global $CFG;
+
+        if (!empty($this->plugin)) {
+            $value = get_config('core', $name);
+            return $value === false ? 0 : $value;
+        } else {
+            if (isset($CFG->$name)) {
+                return $CFG->$name;
+            } else {
+                return NULL;
+            }
+        }
     }
 }

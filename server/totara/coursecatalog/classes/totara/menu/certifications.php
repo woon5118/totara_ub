@@ -43,7 +43,7 @@ class certifications extends \totara_core\totara\menu\item {
     }
 
     public function get_default_sortorder() {
-        return 73000;
+        return 33300;
     }
 
     protected function get_default_parent() {

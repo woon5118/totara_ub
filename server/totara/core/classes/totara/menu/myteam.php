@@ -73,4 +73,8 @@ class myteam extends item {
     public function get_incompatible_preset_rules(): array {
         return ['can_view_my_team'];
     }
+
+    protected function get_default_parent() {
+        return '\totara_core\totara\menu\unused';
+    }
 }

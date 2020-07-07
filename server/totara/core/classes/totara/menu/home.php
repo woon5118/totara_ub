@@ -23,6 +23,8 @@
  */
 namespace totara_core\totara\menu;
 
+use  totara_core\advanced_feature;
+
 class home extends item {
 
     protected function get_default_title() {
@@ -30,7 +32,19 @@ class home extends item {
     }
 
     protected function get_default_url() {
-        return '/index.php?redirect=0';
+        global $PAGE;
+
+        $homepage = get_home_page();
+
+        if (advanced_feature::is_enabled('totaradashboard') && $homepage == HOMEPAGE_TOTARA_DASHBOARD) {
+            return '/totara/dashboard/index.php';
+        } else if (get_config('core', 'catalogtype') == 'totara' &&
+            $homepage == HOMEPAGE_TOTARA_GRID_CATALOG &&
+            $PAGE->url->get_path() != '/totara/catalog/index.php') {
+            return '/totara/catalog/index.php';
+        } else {
+            return '/index.php?redirect=0';
+        }
     }
 
     protected function check_visibility() {

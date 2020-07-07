@@ -39,4 +39,8 @@ class appraisal extends \totara_core\totara\menu\container {
     public function get_incompatible_preset_rules(): array {
         return ['can_view_appraisal'];
     }
+
+    protected function get_default_parent() {
+        return '\totara_core\totara\menu\unused';
+    }
 }

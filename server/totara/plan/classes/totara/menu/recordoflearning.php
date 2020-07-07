@@ -37,7 +37,11 @@ class recordoflearning extends \totara_core\totara\menu\item {
     }
 
     public function get_default_sortorder() {
-        return 30000;
+        return 32000;
+    }
+
+    protected function get_default_parent() {
+        return '\totara_core\totara\menu\learn';
     }
 
     protected function check_visibility() {
