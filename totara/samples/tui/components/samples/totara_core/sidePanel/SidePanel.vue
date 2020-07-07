@@ -21,7 +21,7 @@
 -->
 
 <template>
-  <div class="tui-sidePanel-example">
+  <div class="tui-sidePanelExample">
     <Grid class="tui-grid--animated">
       <GridItem :units="gridUnitsLeft">
         <SidePanel
@@ -33,11 +33,9 @@
         >
           <template>
             <Grid
+              class="tui-sidePanelExample__content"
               direction="vertical"
               :use-vertical-gap="false"
-              :style="{
-                height: '100%',
-              }"
             >
               <GridItem :units="3" :grows="true">
                 <h3>Title (original left)</h3>
@@ -364,8 +362,12 @@ export default {
 </script>
 
 <style lang="scss">
-.tui-sidePanel-example {
+.tui-sidePanelExample {
   height: 100%;
+
+  & .tui-sidePanelExample__content {
+    padding: var(--tui-gap-8);
+  }
 
   .tui-grid--animated > .tui-grid-item {
     transition: flex-basis ease-in 0.3s;

@@ -139,7 +139,6 @@
     width: 100%;
     height: 100%;
     max-height: 100%;
-    padding: var(--tui-gap-8);
     background-color: var(--tui-color-neutral-3);
     border: 1px solid var(--tui-color-neutral-5);
 
