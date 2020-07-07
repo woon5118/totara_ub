@@ -290,4 +290,58 @@ class totara_program_clean_assignments_testcase extends advanced_testcase {
         $individual_user_assignments = $DB->get_records('prog_user_assignment', ['assignmentid' => $assignments1[$data->users[3]->id]]);
         $this->assertCount(0, $individual_user_assignments);
     }
+
+    public function test_missing_plan() {
+        global $DB;
+
+        $this->setAdminUser();
+
+        $generator = $this->getDataGenerator();
+        $programgenerator = $generator->get_plugin_generator('totara_program');
+        $plan_generator = $generator->get_plugin_generator('totara_plan');
+
+        $program1 = $programgenerator->create_program();
+        $program2 = $programgenerator->create_program();
+        $user1 = $generator->create_user();
+        $user2 = $generator->create_user();
+
+        // Create plan1 for user1, that contains program1 and program2
+        $planrecord = $plan_generator->create_learning_plan(array('userid' => $user1->id, 'enddate' => time() + DAYSECS));
+        $plan1 = new development_plan($planrecord->id);
+        $plan1->initialize_settings();
+        $component_program = $plan1->get_component('program');
+        $component_program->assign_new_item($program1->id);
+        $component_program->assign_new_item($program2->id);
+        $plan1->set_status(DP_PLAN_STATUS_APPROVED);
+        \totara_plan\event\approval_approved::create_from_plan($plan1)->trigger();
+
+        // Create plan2 for user2, that contains program1 and program2
+        $planrecord = $plan_generator->create_learning_plan(array('userid' => $user2->id, 'enddate' => time() + DAYSECS));
+        $plan2 = new development_plan($planrecord->id);
+        $plan2->initialize_settings();
+        $component_program = $plan2->get_component('program');
+        $component_program->assign_new_item($program1->id);
+        $component_program->assign_new_item($program2->id);
+        $plan2->set_status(DP_PLAN_STATUS_APPROVED);
+        \totara_plan\event\approval_approved::create_from_plan($plan2)->trigger();
+
+        self::assertCount(4, $DB->get_records('prog_assignment'));
+        self::assertCount(4, $DB->get_records('prog_user_assignment'));
+        self::assertCount(1, $DB->get_records('prog_completion', ['userid' => $user1->id, 'programid' => $program1->id]));
+        self::assertCount(1, $DB->get_records('prog_completion', ['userid' => $user1->id, 'programid' => $program2->id]));
+        self::assertCount(1, $DB->get_records('prog_completion', ['userid' => $user2->id, 'programid' => $program1->id]));
+        self::assertCount(1, $DB->get_records('prog_completion', ['userid' => $user2->id, 'programid' => $program2->id]));
+
+        // Delete plan1 directly.
+        $DB->delete_records('dp_plan', ['id' => $plan1->id]);
+
+        $task = new \totara_program\task\clean_program_assignments_task();
+        $task->execute();
+
+        self::assertCount(2, $DB->get_records('prog_assignment'));
+        self::assertCount(2, $DB->get_records('prog_user_assignment'));
+        self::assertCount(2, $DB->get_records('prog_user_assignment', ['userid' => $user2->id]));
+        self::assertCount(1, $DB->get_records('prog_completion', ['userid' => $user2->id, 'programid' => $program1->id]));
+        self::assertCount(1, $DB->get_records('prog_completion', ['userid' => $user2->id, 'programid' => $program2->id]));
+    }
 }

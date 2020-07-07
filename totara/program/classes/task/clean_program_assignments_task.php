@@ -93,6 +93,17 @@ class clean_program_assignments_task extends \core\task\scheduled_task {
                 $assignment = \totara_program\assignment\individual::create_from_id($assignmentid);
                 $assignment->remove();
             }
+
+            // Learning plan
+            if (advanced_feature::is_enabled('learningplans')) {
+                $sql = 'SELECT pa.id FROM {prog_assignment} pa WHERE pa.assignmenttype = :plantype AND NOT EXISTS (SELECT 1 FROM {dp_plan} p WHERE pa.assignmenttypeid = p.id)';
+                $params = ['plantype' => \totara_program\assignment\plan::ASSIGNTYPE_PLAN];
+                $manager_assignments = $DB->get_fieldset_sql($sql, $params);
+                foreach ($manager_assignments as $key => $assignmentid) {
+                    $assignment = \totara_program\assignment\plan::create_from_id($assignmentid);
+                    $assignment->remove();
+                }
+            }
         }
     }
 }
