@@ -653,13 +653,13 @@ define(['jquery', 'core/config', 'core/str', 'core/templates', 'core/notificatio
                 var actionElement = event.target.closest('[data-action]');
 
                 if (actionElement) {
+                    event.preventDefault();
                     var offset = actionElement.getAttribute('data-offset');
                     switch (actionElement.getAttribute('data-action')) {
                         case 'removedate':
                             document.querySelector('input[name="datedelete[' + offset + ']"]').value = 1;
                             actionElement.closest('tr').style.display = 'none';
                             dates_count_changed();
-                            event.preventDefault();
                             break;
                         case 'clonedate':
                             // Offset starts with 0, so no increment is needed here.
