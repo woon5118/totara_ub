@@ -27,20 +27,21 @@
     </h3>
     <Form>
       <FormRow
+        v-slot="{ label }"
         :label="$str('workflow_automatic_closure_label', 'mod_perform')"
         :helpmsg="$str('workflow_automatic_closure_label_help', 'mod_perform')"
       >
         <div>
-          <Checkbox
-            v-model="close_on_completion"
-            :disabled="formDisabled"
-            :aria-describedby="$id('aria-describedby')"
-            @change="save"
-          >
-            {{
+          <ToggleButton
+            v-model="value"
+            :disabled="isSaving"
+            :toggle-first="true"
+            :text="
               $str('workflow_automatic_closure_on_completion', 'mod_perform')
-            }}
-          </Checkbox>
+            "
+            :aria-label="label"
+            @input="valueChanged"
+          />
 
           <FormRowDetails :id="$id('aria-describedby')">
             {{
@@ -53,26 +54,51 @@
         </div>
       </FormRow>
     </Form>
+
+    <ConfirmationModal
+      :open="modalOpen"
+      :title="
+        $str('workflow_automatic_closure_confirmation_title', 'mod_perform')
+      "
+      :confirm-button-text="$str('modal_confirm', 'mod_perform')"
+      @confirm="modalConfirmed"
+      @cancel="modalCancelled"
+    >
+      {{
+        $str(
+          value
+            ? 'workflow_automatic_closure_enabled_confirmation_text'
+            : 'workflow_automatic_closure_disabled_confirmation_text',
+          'mod_perform'
+        )
+      }}
+    </ConfirmationModal>
   </div>
 </template>
 
 <script>
-import Checkbox from 'totara_core/components/form/Checkbox';
+import ConfirmationModal from 'totara_core/components/modal/ConfirmationModal';
 import Form from 'totara_core/components/form/Form';
 import FormRow from 'totara_core/components/form/FormRow';
 import FormRowDetails from 'totara_core/components/form/FormRowDetails';
+import ToggleButton from 'totara_core/components/buttons/ToggleButton';
+
 // Util
 import { notify } from 'totara_core/notifications';
-import { NOTIFICATION_DURATION } from 'mod_perform/constants';
+import {
+  ACTIVITY_STATUS_DRAFT,
+  NOTIFICATION_DURATION,
+} from 'mod_perform/constants';
 // Queries
 import toggleActivityCloseOnCompletion from 'mod_perform/graphql/toggle_activity_close_on_completion_setting';
 
 export default {
   components: {
-    Checkbox,
+    ConfirmationModal,
     Form,
     FormRow,
     FormRowDetails,
+    ToggleButton,
   },
 
   props: {
@@ -84,27 +110,56 @@ export default {
 
   data() {
     return {
-      formDisabled: false,
-      close_on_completion: this.activity.settings.close_on_completion,
+      isSaving: false,
+      value: this.activity.settings.close_on_completion,
+      modalOpen: false,
     };
   },
 
   computed: {
-    isSaving() {
-      return this.$apollo.loading;
+    isDraft() {
+      return this.activity.state_details.name === ACTIVITY_STATUS_DRAFT;
     },
   },
 
   methods: {
+    /**
+     * Opens modal when value changes.
+     */
+    valueChanged() {
+      if (this.isDraft) {
+        this.save();
+      } else {
+        this.modalOpen = true;
+      }
+    },
+
+    /**
+     * Action on modal cancel.
+     */
+    modalCancelled() {
+      this.modalOpen = false;
+      this.value = !this.value;
+    },
+
+    /**
+     * Action on modal confirmation.
+     */
+    modalConfirmed() {
+      this.modalOpen = false;
+      this.isSaving = true;
+      this.save();
+    },
+
     save() {
-      this.formDisabled = true;
+      this.isSaving = true;
       this.$apollo
         .mutate({
           mutation: toggleActivityCloseOnCompletion,
           variables: {
             input: {
               activity_id: this.activity.id,
-              setting: this.close_on_completion,
+              setting: this.value,
             },
           },
           refetchAll: false, // Prevents 4 additional queries from executing unnecessarily
@@ -115,16 +170,16 @@ export default {
             message: this.$str('toast_success_activity_update', 'mod_perform'),
             type: 'success',
           });
-          this.formDisabled = false;
+          this.isSaving = false;
         })
         .catch(() => {
-          this.close_on_completion = this.activity.settings.close_on_completion;
+          this.value = this.activity.settings.close_on_completion;
           notify({
             duration: NOTIFICATION_DURATION,
             message: this.$str('toast_error_generic_update', 'mod_perform'),
             type: 'error',
           });
-          this.formDisabled = false;
+          this.isSaving = false;
         });
     },
   },
@@ -134,6 +189,10 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
+      "modal_confirm",
+      "workflow_automatic_closure_confirmation_title",
+      "workflow_automatic_closure_disabled_confirmation_text",
+      "workflow_automatic_closure_enabled_confirmation_text",
       "workflow_automatic_closure_label",
       "workflow_automatic_closure_label_help",
       "workflow_automatic_closure_on_completion",
@@ -141,6 +200,9 @@ export default {
       "workflow_settings",
       "toast_error_generic_update",
       "toast_success_activity_update"
+    ],
+    "moodle": [
+      "help"
     ]
   }
 </lang-strings>

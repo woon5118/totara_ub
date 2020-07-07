@@ -22,18 +22,23 @@
 
 <template>
   <div class="tui-activityMultipleSectionToggle">
-    <ToggleButton
-      v-model="value"
-      :disabled="isSaving"
-      :text="$str('multiple_sections_enabled', 'mod_perform')"
-      @input="valueChanged"
-    >
-      <template v-slot:icon>
-        <InfoIconButton :aria-label="$str('help', 'moodle')">
-          {{ $str('multiple_sections_label_help', 'mod_perform') }}
-        </InfoIconButton>
-      </template>
-    </ToggleButton>
+    <Form>
+      <FormRow
+        v-slot="{ label }"
+        :label="$str('multiple_sections', 'mod_perform')"
+        :helpmsg="$str('multiple_sections_label_help', 'mod_perform')"
+      >
+        <div>
+          <ToggleButton
+            v-model="value"
+            :disabled="isSaving"
+            :aria-label="label"
+            :toggle-first="true"
+            @input="openModal"
+          />
+        </div>
+      </FormRow>
+    </Form>
 
     <ConfirmationModal
       :open="modalOpen"
@@ -55,14 +60,16 @@
 import { notify } from 'totara_core/notifications';
 import { NOTIFICATION_DURATION } from 'mod_perform/constants';
 import ConfirmationModal from 'totara_core/components/modal/ConfirmationModal';
-import InfoIconButton from 'totara_core/components/buttons/InfoIconButton';
+import Form from 'totara_core/components/form/Form';
+import FormRow from 'totara_core/components/form/FormRow';
 import ToggleActivityMultiSectionSettingMutation from 'mod_perform/graphql/toggle_activity_multisection_setting.graphql';
 import ToggleButton from 'totara_core/components/buttons/ToggleButton';
 
 export default {
   components: {
     ConfirmationModal,
-    InfoIconButton,
+    Form,
+    FormRow,
     ToggleButton,
   },
 
@@ -84,9 +91,10 @@ export default {
     /**
      * Opens modal when value changes.
      */
-    valueChanged() {
+    openModal() {
       this.modalOpen = true;
     },
+
     /**
      * Action on modal cancel.
      */
@@ -94,20 +102,23 @@ export default {
       this.modalOpen = false;
       this.value = !this.value;
     },
+
     /**
      * Action on modal confirmation.
      */
     modalConfirmed() {
       this.modalOpen = false;
-      this.isSaving = true;
       this.save();
     },
+
     /**
      * Save changes to multisection settings.
      */
-    save() {
-      this.$apollo
-        .mutate({
+    async save() {
+      this.isSaving = true;
+
+      try {
+        const { data: result } = await this.$apollo.mutate({
           mutation: ToggleActivityMultiSectionSettingMutation,
           variables: {
             input: {
@@ -116,27 +127,27 @@ export default {
             },
           },
           refetchAll: false,
-        })
-        .then(result => {
-          this.$emit(
-            'change',
-            result.data.mod_perform_toggle_activity_multisection_setting
-          );
-          notify({
-            duration: NOTIFICATION_DURATION,
-            message: this.$str('toast_success_activity_update', 'mod_perform'),
-            type: 'success',
-          });
-          this.isSaving = false;
-        })
-        .catch(() => {
-          notify({
-            duration: NOTIFICATION_DURATION,
-            message: this.$str('toast_error_generic_update', 'mod_perform'),
-            type: 'error',
-          });
-          this.isSaving = false;
         });
+
+        this.$emit(
+          'change',
+          result.mod_perform_toggle_activity_multisection_setting
+        );
+
+        notify({
+          duration: NOTIFICATION_DURATION,
+          message: this.$str('toast_success_activity_update', 'mod_perform'),
+          type: 'success',
+        });
+      } catch (e) {
+        notify({
+          duration: NOTIFICATION_DURATION,
+          message: this.$str('toast_error_generic_update', 'mod_perform'),
+          type: 'error',
+        });
+      }
+
+      this.isSaving = false;
     },
   },
 };
@@ -145,7 +156,7 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
-      "multiple_sections_enabled",
+      "multiple_sections",
       "multiple_sections_disabled_confirmation_text",
       "multiple_sections_enabled_confirmation_text",
       "multiple_sections_confirmation_title",
