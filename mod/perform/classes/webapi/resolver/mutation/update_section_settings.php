@@ -29,6 +29,7 @@ use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\mutation_resolver;
 use core\webapi\resolver\has_middleware;
+use mod_perform\models\activity\activity;
 use mod_perform\models\activity\section;
 use mod_perform\webapi\middleware\require_activity;
 use mod_perform\webapi\middleware\require_manage_capability;
@@ -40,19 +41,26 @@ class update_section_settings implements mutation_resolver, has_middleware {
      * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
-        $args = $args['input'];
+        // The require_activity middleware loads the activity and passes it along via the args
+        /** @var activity $activity */
+        $activity = $args['activity'];
+        $input = $args['input'];
 
         try {
-            $section = section::load_by_id($args['section_id']);
+            $section = section::load_by_id($input['section_id']);
         } catch (record_not_found_exception $e) {
             throw new coding_exception('Specified section id does not exist');
         }
 
-        if (isset($args['title'])) {
-            $section->update_title($args['title']);
+        if ($activity->is_active()) {
+            throw new coding_exception('Can\'t update section settings on an active activity.');
         }
 
-        return ['section' => $section->update_relationships($args['relationships'])];
+        if (isset($input['title'])) {
+            $section->update_title($input['title']);
+        }
+
+        return ['section' => $section->update_relationships($input['relationships'])];
     }
 
     /**

@@ -512,6 +512,7 @@ class mod_perform_generator extends component_generator_base {
                 'activity_name' => $name,
                 'activity_type' => $type,
                 'create_section' => false,
+                'activity_status' => $configuration->get_activity_status()
             ];
 
             $activity = $this->create_activity_in_container($data);
@@ -605,7 +606,8 @@ class mod_perform_generator extends component_generator_base {
         } else {
             $name = $data['activity_name'] ?? null;
             $type = $data['activity_type'] ?? 'appraisal';
-            $activity = $this->find_or_make_perform_activity($name, $type);
+            $status = $this->elevate_activity_status_to_code($data['activity_status'] ?? 'Active');
+            $activity = $this->find_or_make_perform_activity($name, $type, $status);
         }
 
         $subject_id = $data['subject_user_id'] ?? null;
@@ -777,26 +779,25 @@ class mod_perform_generator extends component_generator_base {
         $this->create_section_with_combined_manager_appraiser($subject_user, $manager_appraiser_user, $data['activity_name']);
     }
 
-    private function find_or_make_perform_activity($name, $type): activity {
+    private function find_or_make_perform_activity($name, $type, $status = null): activity {
+        $data = [
+            'activity_type' => $type
+        ];
+        if (isset($status)) {
+            $data['activity_status'] = $status;
+        }
+
         if (!$name) {
-            return $this->create_activity_in_container(
-                [
-                    'activity_type' => $type
-                ]
-            );
+            return $this->create_activity_in_container($data);
         }
 
         /** @var activity_entity $activity_entity */
         $activity_entity = activity_entity::repository()->where('name', $name)->order_by('id')->first();
 
         if ($activity_entity === null) {
-            return $this->create_activity_in_container(
-                [
-                    'activity_name' => $name,
-                    'activity_type' => $type,
-                    'create_section' => false
-                ]
-            );
+            $data['activity_name'] = $name;
+            $data['create_section'] = false;
+            return $this->create_activity_in_container($data);
         }
 
         return activity::load_by_entity($activity_entity);

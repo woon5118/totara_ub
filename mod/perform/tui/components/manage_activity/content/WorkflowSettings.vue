@@ -27,7 +27,6 @@
     </h3>
     <Form>
       <FormRow
-        v-slot="{ label }"
         :label="$str('workflow_automatic_closure_label', 'mod_perform')"
         :helpmsg="$str('workflow_automatic_closure_label_help', 'mod_perform')"
       >
@@ -39,7 +38,6 @@
             :text="
               $str('workflow_automatic_closure_on_completion', 'mod_perform')
             "
-            :aria-label="label"
             @input="valueChanged"
           />
 

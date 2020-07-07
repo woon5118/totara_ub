@@ -3,8 +3,8 @@ Feature: Manage performance activity static content
 
   Background:
     Given the following "activities" exist in "mod_perform" plugin:
-      | activity_name        | create_section | create_track |
-      | Add Element Activity | true           | true         |
+      | activity_name        | create_section | create_track | activity_status |
+      | Add Element Activity | true           | true         | Draft           |
 
   Scenario: Save static content elements
     Given I log in as "admin"

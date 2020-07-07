@@ -3,8 +3,8 @@ Feature: Manage performance activity short text elements
 
   Background:
     Given the following "activities" exist in "mod_perform" plugin:
-      | activity_name        | create_section | create_track |
-      | Add Element Activity | true           | true         |
+      | activity_name        | create_section | create_track | activity_status |
+      | Add Element Activity | true           | true         | Draft           |
 
   Scenario: Save required and optional short text elements
     Given I log in as "admin"

@@ -94,6 +94,10 @@ class activity_multisection_toggler {
             return $this->activity;
         }
 
+        if ($this->activity->is_active()) {
+            throw new \coding_exception('Can\'t toggle multisection on an active activity.');
+        }
+
         $DB->transaction(
             function () use ($activity_settings, $setting_key, $new_setting) {
                 if (!$new_setting) {

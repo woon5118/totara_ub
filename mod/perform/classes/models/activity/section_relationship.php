@@ -111,10 +111,8 @@ class section_relationship extends model {
      * @return void
      */
     public function update_can_view(bool $can_view): void {
-        $activity = activity::load_by_id($this->section->activity_id);
-        require_capability('mod/perform:manage_activity', $activity->get_context());
         $entity = $this->entity;
-        $entity->set_attribute('can_view', $can_view);
+        $entity->can_view = $can_view;
 
         $entity->save();
     }

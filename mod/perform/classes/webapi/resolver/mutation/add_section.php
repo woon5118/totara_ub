@@ -23,10 +23,12 @@
 
 namespace mod_perform\webapi\resolver\mutation;
 
+use coding_exception;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\mutation_resolver;
 use core\webapi\resolver\has_middleware;
+use mod_perform\models\activity\activity;
 use mod_perform\models\activity\activity_setting;
 use mod_perform\models\activity\section;
 use mod_perform\webapi\middleware\require_activity;
@@ -42,6 +44,7 @@ class add_section implements mutation_resolver, has_middleware {
      */
     public static function resolve(array $args, execution_context $ec) {
         // The require_activity middleware loads the activity and passes it along via the args
+        /** @var activity $activity */
         $activity = $args['activity'];
 
         $args = $args['input'];
@@ -49,6 +52,10 @@ class add_section implements mutation_resolver, has_middleware {
 
         if (!$activity->get_settings()->lookup(activity_setting::MULTISECTION)) {
             throw new moodle_exception('add_section_error_section_mode', 'mod_perform');
+        }
+
+        if ($activity->is_active()) {
+            throw new coding_exception('Can\'t add a new section on an active activity.');
         }
 
         $section = section::create($activity, '', $add_before_sort_order);

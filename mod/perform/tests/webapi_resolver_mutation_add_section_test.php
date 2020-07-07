@@ -24,6 +24,7 @@
 use mod_perform\models\activity\activity as activity;
 use mod_perform\models\activity\activity_setting;
 use mod_perform\models\activity\section;
+use mod_perform\state\activity\active;
 use mod_perform\state\activity\draft;
 use mod_perform\webapi\resolver\mutation\activate_activity;
 use totara_core\advanced_feature;
@@ -60,6 +61,17 @@ class mod_perform_webapi_resolver_mutation_add_section_testcase extends advanced
 
         $this->assertNotEquals($initial_section->id, $section->id);
         $this->assertEmpty($section->title);
+    }
+
+    public function test_add_section_on_active_activity_is_not_possible(): void {
+        [$activity, $args] = $this->create_activity(active::get_code());
+
+        $this->assertCount(1, $activity->get_sections());
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('Can\'t add a new section on an active activity.');
+
+        $this->resolve_graphql_mutation('mod_perform_add_section', $args);
     }
 
     public function test_activity_is_not_in_multi_section_mode() {

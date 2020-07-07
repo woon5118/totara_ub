@@ -21,6 +21,7 @@
  * @package mod_perform
  */
 
+use mod_perform\state\activity\active;
 use totara_core\relationship\resolvers\subject;
 
 /**
@@ -100,12 +101,36 @@ class mod_perform_activity_generator_configuration {
     private $create_manager_for_each_subject_user = false;
 
     /**
+     * @var int|null
+     */
+    private $activity_status;
+
+    /**
      * shortcut function to get new object
      *
      * @return static
      */
     public static function new(): self {
         return new self();
+    }
+
+    /**
+     * @param int $status_code
+     * @return $this
+     */
+    public function set_activity_status(int $status_code): self {
+        $this->activity_status = $status_code;
+
+        return $this;
+    }
+
+    /**
+     * Activity status, defaults to active if not set
+     *
+     * @return int
+     */
+    public function get_activity_status(): int {
+        return $this->activity_status ?? active::get_code();
     }
 
     /**

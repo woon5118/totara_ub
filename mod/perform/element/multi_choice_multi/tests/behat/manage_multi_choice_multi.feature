@@ -3,8 +3,8 @@ Feature: Manage performance activity multiple choice-answers elements
 
   Background:
     Given the following "activities" exist in "mod_perform" plugin:
-      | activity_name | create_section | create_track |
-      | Activity one  | true           | true         |
+      | activity_name | create_section | create_track | activity_status |
+      | Activity one  | true           | true         | Draft           |
 
   Scenario: Save multiple choice multiple answers elements to activity content
     Given I log in as "admin"

@@ -28,15 +28,14 @@
         :label="$str('multiple_sections', 'mod_perform')"
         :helpmsg="$str('multiple_sections_label_help', 'mod_perform')"
       >
-        <div>
-          <ToggleButton
-            v-model="value"
-            :disabled="isSaving"
-            :aria-label="label"
-            :toggle-first="true"
-            @input="openModal"
-          />
-        </div>
+        <ToggleButton
+          v-model="value"
+          :disabled="isSaving"
+          :aria-label="label"
+          :text="label"
+          :toggle-first="true"
+          @input="openModal"
+        />
       </FormRow>
     </Form>
 

@@ -23,6 +23,7 @@
  */
 
 use mod_perform\models\activity\activity_setting;
+use mod_perform\state\activity\draft;
 use mod_perform\webapi\resolver\mutation\toggle_activity_multisection_setting;
 use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
@@ -116,7 +117,7 @@ class mod_perform_webapi_mutation_toggle_activity_multisection_setting_testcase 
 
         /** @var mod_perform_generator $perform_generator */
         $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
-        $activity = $perform_generator->create_activity_in_container();
+        $activity = $perform_generator->create_activity_in_container(['activity_status' => draft::get_code()]);
 
         $activity_details = [
             'activity_id' => $activity->id,

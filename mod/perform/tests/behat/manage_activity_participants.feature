@@ -3,9 +3,9 @@ Feature: Adding and removing participant to a perform activity section
 
   Background:
     Given the following "activities" exist in "mod_perform" plugin:
-      | activity_name             | create_section | create_track |
-      | Participant set up test   | true           | true         |
-      | Multiple section Activity | true           | true         |
+      | activity_name             | create_section | create_track | activity_status |
+      | Participant set up test   | true           | true         | Draft           |
+      | Multiple section Activity | true           | true         | Draft           |
     And the following "activity sections" exist in "mod_perform" plugin:
       | activity_name             | section_name |
       | Multiple section Activity | Section B    |

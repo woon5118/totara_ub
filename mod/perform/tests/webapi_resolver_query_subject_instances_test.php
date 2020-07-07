@@ -26,6 +26,7 @@
 use core\date_format;
 use core\entities\user;
 use core\webapi\formatter\field\date_field_formatter;
+use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\entities\activity\filters\subject_instances_about;
 use mod_perform\entities\activity\participant_instance;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
@@ -35,6 +36,7 @@ use mod_perform\models\activity\participant_instance as participant_instance_mod
 use mod_perform\models\activity\subject_instance;
 use mod_perform\models\response\participant_section as participant_section_model;
 use mod_perform\state\activity\active;
+use mod_perform\state\activity\draft;
 use mod_perform\state\participant_instance\in_progress as participant_instance_in_progress;
 use mod_perform\state\participant_instance\not_started as participant_instance_not_started;
 use mod_perform\state\participant_instance\open as participant_instance_open;
@@ -165,12 +167,17 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
         $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
 
         $activity1 = $perform_generator->create_activity_in_container([
-            'activity_status' => active::get_code(),
+            'activity_status' => draft::get_code(),
             'create_track' => true,
             'create_section' => false
         ]);
         // Activate multisection
         $activity1->toggle_multisection_setting(true);
+
+        // Now activate this activity, directly in the database to avoid state change checks
+        $activity_entity = activity_entity::repository()->find($activity1->id);
+        $activity_entity->status = active::get_code();
+        $activity_entity->save();
 
         // Create sections, deliberately create in different order to test sort order
         $section3 = $perform_generator->create_section($activity1, ['title' => 'Section 3']);

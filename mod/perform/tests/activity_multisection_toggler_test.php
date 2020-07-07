@@ -29,6 +29,7 @@ use mod_perform\models\activity\activity_setting;
 use mod_perform\models\activity\section_element;
 use mod_perform\models\activity\helpers\activity_multisection_toggler;
 
+use mod_perform\state\activity\draft;
 use totara_core\relationship\resolvers\subject;
 
 /**
@@ -252,6 +253,22 @@ class mod_perform_activity_multisection_toggler_testcase extends advanced_testca
     }
 
     /**
+     * @covers ::set
+     */
+    public function test_toggling_active_activity_is_not_possible(): void {
+        $element_count = 3;
+        $activity = $this->setup_env(1, $element_count);
+
+        $activity->activate();
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('Can\'t toggle multisection on an active activity.');
+
+        $toggler = new activity_multisection_toggler($activity);
+        $toggler->set(true);
+    }
+
+    /**
      * @covers ::get_current_setting
      */
     public function test_get_current_setting(): void {
@@ -379,6 +396,7 @@ class mod_perform_activity_multisection_toggler_testcase extends advanced_testca
         $this->setAdminUser();
 
         $configuration = mod_perform_activity_generator_configuration::new()
+            ->set_activity_status(draft::get_code())
             ->set_number_of_activities(1)
             ->set_number_of_sections_per_activity($no_of_sections)
             ->set_number_of_elements_per_section($elements_per_section)
@@ -386,6 +404,7 @@ class mod_perform_activity_multisection_toggler_testcase extends advanced_testca
             ->disable_user_assignments()
             ->disable_subject_instances();
 
+        /** @var activity $activity */
         $activity = $this->generator()
             ->create_full_activities($configuration)
             ->first();

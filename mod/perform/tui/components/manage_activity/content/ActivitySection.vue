@@ -31,12 +31,12 @@
       :class="[editMode && !autoSave && 'tui-performActivitySection__editing']"
     >
       <Grid v-if="!autoSave && !editMode">
-        <GridItem :units="10">
+        <GridItem :units="isDraft ? 10 : 12">
           <h4 class="tui-performActivitySection__title">
             {{ savedSection.display_title }}
           </h4>
         </GridItem>
-        <GridItem :units="2">
+        <GridItem v-if="isDraft" :units="2">
           <div class="tui-performActivitySection__action-buttons">
             <EditIcon
               class="tui-performActivitySection__action-edit"
@@ -80,7 +80,7 @@
         <h4 class="tui-performActivitySection__participant-heading">
           {{ $str('activity_participants_heading', 'mod_perform') }}
         </h4>
-        <span v-if="!autoSave && !editMode">
+        <span v-if="(!autoSave && !editMode) || !isDraft">
           {{ $str('activity_participant_view_other_responses', 'mod_perform') }}
         </span>
         <div class="tui-performActivitySection__participant-items">
@@ -88,7 +88,7 @@
             v-for="participant in displayedParticipantsSorted"
             :key="participant.core_relationship.id"
             :participant="participant"
-            :editable="autoSave || editMode"
+            :editable="(autoSave || editMode) && isDraft"
             @participant-removed="removeDisplayedParticipant"
             @can-view-changed="updateParticipantData"
           />
@@ -96,7 +96,8 @@
 
         <div
           v-if="
-            displayedParticipantsSorted.length === 0 && !autoSave && !editMode
+            displayedParticipantsSorted.length === 0 &&
+              ((!autoSave && !editMode) || !isDraft)
           "
         >
           <span class="tui-performActivitySection__participant-info">
@@ -104,7 +105,7 @@
           </span>
         </div>
         <ParticipantsPopover
-          v-if="autoSave || editMode"
+          v-if="(autoSave || editMode) && isDraft"
           :relationships="relationships"
           :active-participants="displayedParticipants"
           @update-participants="updateDisplayedParticipants"
@@ -153,8 +154,11 @@
               <template v-slot:trigger="{ open }">
                 <Button
                   :styleclass="{ small: true }"
-                  :text="$str('edit_content_elements', 'mod_perform')"
-                  :aria-label="$str('edit_content_elements', 'mod_perform')"
+                  :text="
+                    isDraft
+                      ? $str('edit_content_elements', 'mod_perform')
+                      : $str('view_content_elements', 'mod_perform')
+                  "
                   @click="open"
                 />
               </template>
@@ -197,6 +201,7 @@ import InputText from 'totara_core/components/form/InputText';
 import MoreButton from 'totara_core/components/buttons/MoreIcon';
 import ParticipantsPopover from 'mod_perform/components/manage_activity/content/ParticipantsPopover';
 import UpdateSectionSettingsMutation from 'mod_perform/graphql/update_section_settings.graphql';
+import { ACTIVITY_STATUS_DRAFT } from 'mod_perform/constants';
 
 /**
  * Reflects the maximum length of the field in the database.
@@ -262,6 +267,10 @@ export default {
     },
     multipleSectionsEnabled: {
       type: Boolean,
+      required: true,
+    },
+    activityState: {
+      type: Object,
       required: true,
     },
   },
@@ -345,6 +354,13 @@ export default {
      */
     canDelete() {
       return this.sectionCount > 1;
+    },
+
+    /**
+     * @return {Boolean}
+     */
+    isDraft() {
+      return this.activityState.name === ACTIVITY_STATUS_DRAFT;
     },
   },
 
@@ -570,7 +586,8 @@ export default {
       "section_dropdown_menu",
       "section_title",
       "unsaved_changes_warning",
-      "untitled_section"
+      "untitled_section",
+      "view_content_elements"
     ],
     "moodle": [
       "cancel",

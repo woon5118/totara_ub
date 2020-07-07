@@ -24,10 +24,11 @@
 namespace mod_perform\webapi\resolver\mutation;
 
 use core\webapi\execution_context;
-use core\webapi\mutation_resolver;
 use core\webapi\middleware\require_advanced_feature;
+use core\webapi\mutation_resolver;
 use core\webapi\resolver\has_middleware;
-
+use invalid_parameter_exception;
+use mod_perform\models\activity\activity;
 use mod_perform\webapi\middleware\require_activity;
 use mod_perform\webapi\middleware\require_manage_capability;
 
@@ -41,10 +42,11 @@ class toggle_activity_multisection_setting implements mutation_resolver, has_mid
     public static function resolve(array $args, execution_context $ec) {
         $value = $args['input']['setting'] ?? null;
         if (is_null($value)) {
-            throw new \invalid_parameter_exception('multisection setting not specified');
+            throw new invalid_parameter_exception('multisection setting not specified');
         }
 
         // The require_activity middleware loads the activity and passes it along via the args
+        /** @var activity $activity */
         $activity = $args['activity'];
 
         return $activity->toggle_multisection_setting((bool)$value);

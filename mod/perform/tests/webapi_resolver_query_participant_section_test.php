@@ -225,14 +225,14 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
             'Expected one section element'
         );
 
-        $this->assertEquals(
+        $this->assertContains(
             $this->create_section_element_response($section_element->id),
-            $section_element_responses[0]
+            $section_element_responses
         );
 
-        $this->assertEquals(
+        $this->assertContains(
             $this->create_static_section_element_response($static_section_element->id),
-            $section_element_responses[1]
+            $section_element_responses
         );
     }
 }

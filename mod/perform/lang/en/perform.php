@@ -361,6 +361,7 @@ $string['user_group_assignment_unique_user_count_link'] = 'View report';
 $string['user_group_assignment_unique_user_count_title'] = 'Total unique users currently assigned as subjects';
 $string['user_group_assignment_usercount'] = 'Users';
 $string['view_actions'] = 'Actions';
+$string['view_content_elements'] = 'View content elements';
 $string['view_name'] = 'Name';
 $string['view_status'] = 'Status';
 $string['view_type'] = 'Type';

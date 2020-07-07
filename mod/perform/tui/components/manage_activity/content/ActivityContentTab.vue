@@ -31,6 +31,7 @@
     </h3>
 
     <ActivityMultipleSectionToggle
+      v-if="isDraft"
       :activity="value"
       @change="updateMultiSection($event)"
     />
@@ -49,6 +50,7 @@
         :relationships="relationships"
         :activity-name="value.name"
         :multiple-sections-enabled="value.settings.multisection"
+        :activity-state="activityState"
         @input="updateSection($event, i)"
         @toggle-edit-mode="toggleSectionStateEditMode($event, i)"
         @mutation-success="$emit('mutation-success')"
@@ -60,7 +62,7 @@
     </div>
 
     <ButtonIcon
-      v-if="value.settings.multisection"
+      v-if="value.settings.multisection && isDraft"
       :disabled="isAdding"
       :aria-label="$str('add_section', 'mod_perform')"
       :text="$str('add_section', 'mod_perform')"
@@ -79,6 +81,7 @@ import AddSectionMutation from 'mod_perform/graphql/add_section.graphql';
 import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
 import RelationshipsQuery from 'mod_perform/graphql/relationships.graphql';
 import WorkflowSettings from 'mod_perform/components/manage_activity/content/WorkflowSettings';
+import { ACTIVITY_STATUS_DRAFT } from 'mod_perform/constants';
 
 export default {
   components: {
@@ -123,6 +126,17 @@ export default {
         this.sectionStates.some(section => section.editMode) &&
         this.$refs.activitySection.some(section => section.hasChanges)
       );
+    },
+
+    activityState() {
+      return this.value.state_details;
+    },
+
+    /**
+     * @return {Boolean}
+     */
+    isDraft() {
+      return this.activityState.name === ACTIVITY_STATUS_DRAFT;
     },
   },
 

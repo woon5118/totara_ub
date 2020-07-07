@@ -8,10 +8,10 @@ Feature: Viewing other responses
       | david    | David     | Two      | david.two@example.com   |
       | harry    | Harry     | Three    | harry.three@example.com |
     And the following "subject instances" exist in "mod_perform" plugin:
-      | activity_name                 | subject_username | subject_is_participating | other_participant_username | include_required_questions |
-      | John is participating subject | john             | true                     | david                      | true                       |
-      | David is subject              | david            | false                    | admin                      | true                       |
-      | John is not participating     | harry            | true                     | david                      | false                      |
+      | activity_name                 | subject_username | subject_is_participating | other_participant_username | include_required_questions | activity_status |
+      | John is participating subject | john             | true                     | david                      | true                       | Draft           |
+      | David is subject              | david            | false                    | admin                      | true                       | Draft           |
+      | John is not participating     | harry            | true                     | david                      | false                      | Draft           |
 
   Scenario: I can respond to my activities and view other non-respond activities
     When I log in as "john"

@@ -8,8 +8,8 @@ Feature: Long text element supports multi-lang filters in titles
       | username | firstname | lastname | email                   |
       | john     | John      | One      | john.one@example.com    |
     And the following "subject instances" exist in "mod_perform" plugin:
-      | activity_name                 | subject_username | subject_is_participating |
-      | John is participating subject | john             | true                     |
+      | activity_name                 | subject_username | subject_is_participating | activity_status |
+      | John is participating subject | john             | true                     | Draft           |
     # Enabling multi-language filters for headings and content.
     And the multi-language content filter is enabled
 

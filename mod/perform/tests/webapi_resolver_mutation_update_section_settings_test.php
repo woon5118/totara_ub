@@ -23,6 +23,8 @@
 
 use mod_perform\entities\activity\section as section_entity;
 use mod_perform\models\activity\section;
+use mod_perform\state\activity\active;
+use mod_perform\state\activity\draft;
 use mod_perform\webapi\resolver\mutation\update_section_settings;
 use totara_core\advanced_feature;
 use totara_core\relationship\resolvers\subject;
@@ -46,7 +48,10 @@ class mod_perform_webapi_resolver_mutation_update_section_settings_testcase exte
     public function test_update_section_title() {
         $this->setAdminUser();
         $perform_generator = $this->perform_generator();
-        $activity = $perform_generator->create_activity_in_container(['activity_name' => 'Activity 1']);
+        $activity = $perform_generator->create_activity_in_container([
+            'activity_name' => 'Activity 1',
+            'activity_status' => draft::get_code()
+        ]);
         $context = $activity->get_context();
 
         /** @var section $section1 */
@@ -104,6 +109,31 @@ class mod_perform_webapi_resolver_mutation_update_section_settings_testcase exte
         );
     }
 
+    public function test_update_active_activity_not_possible() {
+        $this->setAdminUser();
+        $perform_generator = $this->perform_generator();
+        $activity = $perform_generator->create_activity_in_container([
+            'activity_name' => 'Activity 1',
+            'activity_status' => active::get_code()
+        ]);
+
+        /** @var section $section1 */
+        $section = $perform_generator->create_section($activity, ['title' => 'One']);
+        $this->assertEquals('One', $section->title);
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('Can\'t update section settings on an active activity.');
+
+        // Entering null means no change.
+        $this->resolve_graphql_mutation(self::MUTATION, [
+            'input' => [
+                'section_id' => $section->id,
+                'relationships' => [],
+                'title' => null,
+            ]
+        ]);
+    }
+
     public function test_update_invalid_section_id() {
         $this->setAdminUser();
         $relationship_id = $this->perform_generator()->get_core_relationship(subject::class)->id;
@@ -155,8 +185,14 @@ class mod_perform_webapi_resolver_mutation_update_section_settings_testcase exte
     public function test_update_successful() {
         self::setAdminUser();
         $perform_generator = $this->perform_generator();
-        $activity1 = $perform_generator->create_activity_in_container(['activity_name' => 'Activity 1']);
-        $activity2 = $perform_generator->create_activity_in_container(['activity_name' => 'Activity 2']);
+        $activity1 = $perform_generator->create_activity_in_container([
+            'activity_name' => 'Activity 1',
+            'activity_status' => draft::get_code()
+        ]);
+        $activity2 = $perform_generator->create_activity_in_container([
+            'activity_name' => 'Activity 2',
+            'activity_status' => draft::get_code()
+        ]);
 
         $appraiser_relationship = $perform_generator->get_core_relationship(appraiser::class);
         $manager_relationship = $perform_generator->get_core_relationship(manager::class);
@@ -206,7 +242,7 @@ class mod_perform_webapi_resolver_mutation_update_section_settings_testcase exte
      * Test the mutation through the GraphQL stack.
      */
     public function test_ajax_query_successful() {
-        $data = $this->create_test_data();
+        $data = $this->create_test_data(null, draft::get_code());
         // Section without relationships.
         $section_id = $data->activity2_section2->id;
         $appraiser_relationship = $this->perform_generator()->get_core_relationship(appraiser::class);

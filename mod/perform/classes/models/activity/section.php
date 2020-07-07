@@ -267,12 +267,7 @@ class section extends model {
                 $core_relationship_id = $relationship_update['core_relationship_id'];
 
                 /** @var section_relationship $section_relationship */
-                $section_relationship = $existing_section_relationships->find(
-                    function ($section_relationship) use ($core_relationship_id) {
-                        return $section_relationship->core_relationship_id === $core_relationship_id;
-                    }
-                );
-
+                $section_relationship = $existing_section_relationships->find('core_relationship_id', $core_relationship_id);
                 if ($section_relationship) {
                     unset($relationship_update['core_relationship_id']);
                 }
@@ -286,9 +281,12 @@ class section extends model {
             }
 
             $relationship_ids = array_column($relationship_updates, 'core_relationship_id');
-            foreach ($existing_section_relationships as $section_relationship) {
-                if (!in_array($section_relationship->core_relationship_id, $relationship_ids)) {
-                    section_relationship::delete_with_properties($this->get_id(), $section_relationship->core_relationship_id);
+            foreach ($existing_section_relationships as $existing_section_relationship) {
+                if (!in_array($existing_section_relationship->core_relationship_id, $relationship_ids)) {
+                    section_relationship::delete_with_properties(
+                        $this->get_id(),
+                        $existing_section_relationship->core_relationship_id
+                    );
                 }
             }
         });
@@ -496,9 +494,8 @@ class section extends model {
      * @throws coding_exception
      */
     public function check_deletion_requirements(): void {
-        $is_active_activity = $this->get_activity()->is_active();
         // only allow to delete section if activity status is draft
-        if ($is_active_activity) {
+        if ($this->get_activity()->is_active()) {
             throw new coding_exception('section can not be deleted for active performance activity');
         }
 

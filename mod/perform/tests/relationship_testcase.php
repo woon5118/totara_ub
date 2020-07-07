@@ -24,6 +24,7 @@
 use mod_perform\entities\activity\section_relationship;
 use mod_perform\models\activity\section_relationship as section_relationship_model;
 use mod_perform\models\activity\section;
+use mod_perform\state\activity\active;
 use totara_core\entities\relationship_resolver;
 use totara_core\relationship\resolvers\subject;
 use totara_job\relationship\resolvers\appraiser;
@@ -47,13 +48,18 @@ abstract class mod_perform_relationship_testcase extends advanced_testcase {
 
     /**
      * @param stdClass|null $as_user
+     * @param int|null $activity_status optional, defaults to active, see active::get_code()
      * @return object
      */
-    protected function create_test_data(?stdClass $as_user = null) {
+    protected function create_test_data(?stdClass $as_user = null, int $activity_status = null) {
         if ($as_user) {
             self::setUser($as_user);
         } else {
             self::setAdminUser();
+        }
+
+        if ($activity_status === null) {
+            $activity_status = active::get_code();
         }
 
         $perform_generator = $this->perform_generator();
@@ -78,9 +84,18 @@ abstract class mod_perform_relationship_testcase extends advanced_testcase {
          * activity3
          *   (no sections, no relationships)
          */
-        $data->activity1 = $perform_generator->create_activity_in_container(['activity_name' => 'Activity 1']);
-        $data->activity2 = $perform_generator->create_activity_in_container(['activity_name' => 'Activity 2']);
-        $data->activity3 = $perform_generator->create_activity_in_container(['activity_name' => 'Activity 3']);
+        $data->activity1 = $perform_generator->create_activity_in_container([
+            'activity_name' => 'Activity 1',
+            'activity_status' => $activity_status
+        ]);
+        $data->activity2 = $perform_generator->create_activity_in_container([
+            'activity_name' => 'Activity 2',
+            'activity_status' => $activity_status
+        ]);
+        $data->activity3 = $perform_generator->create_activity_in_container([
+            'activity_name' => 'Activity 3',
+            'activity_status' => $activity_status
+        ]);
 
         $data->activity1_section1 = $perform_generator->create_section($data->activity1, ['title' => 'Activity 1 section 1']);
         $data->activity1_section2 = $perform_generator->create_section($data->activity1, ['title' => 'Activity 1 section 2']);

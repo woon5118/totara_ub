@@ -106,3 +106,35 @@ Feature: Activation of activities
     And I should see "This activity is active." in the tui action card
     And I should see "Any changes made will be applied to future subject instances only, except for title and description, which apply to all." in the tui action card
     And I should not see "Activate" in the tui action card
+
+  @javascript @vuejs
+  Scenario: Editing of sections is disabled when activity is active
+    When I navigate to the edit perform activities page for activity "Complete draft activity"
+
+    Then I should see "Multiple sections"
+    Then "Edit section" "button" in the "1" activity section should exist
+    And "Section dropdown menu" "button" in the "1" activity section should exist
+    And "Edit content elements" "button" in the "1" activity section should exist
+    And "View content elements" "button" in the "1" activity section should not exist
+
+    When I click on the "On completion" tui toggle button
+    Then I should see "Activity saved" in the tui "success" notification toast
+    When I click on the "On completion" tui toggle button
+    Then I should see "Activity saved" in the tui "success" notification toast
+    When I close the tui notification toast
+
+    When I click on "Activate" "button"
+    And I confirm the tui confirmation modal
+    And I close the tui notification toast
+    Then I should not see "Multiple sections"
+    And "Edit section" "button" in the "1" activity section should not exist
+    And "Section dropdown menu" "button" in the "1" activity section should not exist
+    And "Edit content elements" "button" in the "1" activity section should not exist
+    And "View content elements" "button" in the "1" activity section should exist
+    And I should see "Subject" in the "2" activity section
+
+    # On completion setting has a confirm modal when in archived state
+    When I click on the "On completion" tui toggle button
+    Then I should see "Confirm workflow change" in the tui modal
+    When I confirm the tui confirmation modal
+    Then I should see "Activity saved" in the tui "success" notification toast

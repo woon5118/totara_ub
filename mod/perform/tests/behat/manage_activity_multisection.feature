@@ -4,8 +4,8 @@ Feature: Managing an activity with multiple sections
   Background:
     Given the following "activities" exist in "mod_perform" plugin:
       | activity_name             | create_section | create_track | activity_status |
-      | Participant set up test   | true           | true         | Active          |
-      | Multiple section Activity | true           | true         | Active          |
+      | Participant set up test   | true           | true         | Draft           |
+      | Multiple section Activity | true           | true         | Draft           |
       | Multiple section Activity2| true           | true         | Draft           |
     And the following "activity sections" exist in "mod_perform" plugin:
       | activity_name             | section_name |
@@ -22,8 +22,8 @@ Feature: Managing an activity with multiple sections
       | Subject   | 0 |
       | Manager   | 0 |
       | Appraiser | 0 |
-    And I click on the "Subject" tui checkbox in the ".tui-performManageActivityContent__items .tui-performActivitySection:nth-of-type(1) .tui-popoverFrame__content" css element
-    And I click on the "Appraiser" tui checkbox in the ".tui-performManageActivityContent__items .tui-performActivitySection:nth-of-type(1) .tui-popoverFrame__content" css element
+    And I click on the "Subject" tui checkbox in the ".tui-performManageActivityContent__items .tui-performActivitySection:nth-of-type(1) .tui-popoverFrame__content" "css_element"
+    And I click on the "Appraiser" tui checkbox in the ".tui-performManageActivityContent__items .tui-performActivitySection:nth-of-type(1) .tui-popoverFrame__content" "css_element"
     And I click on "Done" "button" in the ".tui-popoverPositioner" "css_element" of the "1" activity section
     And I click on ".tui-performActivitySectionRelationship:nth-of-type(2) .tui-checkbox__label" "css_element" in the "1" activity section
     And I click on "Done" "button" in the ".tui-formBtnGroup" "css_element" of the "1" activity section
@@ -33,8 +33,8 @@ Feature: Managing an activity with multiple sections
     # Edit relationships for second section.
     When I click on ".tui-performActivitySection__action-edit" "css_element" in the "2" activity section
     And I click the add participant button in "2" activity section
-    And I click on the "Manager" tui checkbox in the ".tui-performManageActivityContent__items .tui-performActivitySection:nth-of-type(2) .tui-popoverFrame__content" css element
-    And I click on the "Appraiser" tui checkbox in the ".tui-performManageActivityContent__items .tui-performActivitySection:nth-of-type(2) .tui-popoverFrame__content" css element
+    And I click on the "Manager" tui checkbox in the ".tui-performManageActivityContent__items .tui-performActivitySection:nth-of-type(2) .tui-popoverFrame__content" "css_element"
+    And I click on the "Appraiser" tui checkbox in the ".tui-performManageActivityContent__items .tui-performActivitySection:nth-of-type(2) .tui-popoverFrame__content" "css_element"
     And I click on "Done" "button" in the ".tui-popoverPositioner" "css_element" of the "2" activity section
     And I click on ".tui-performActivitySectionRelationship:nth-child(2) .tui-checkbox__label" "css_element" in the "2" activity section
     And I click on "Done" "button" in the ".tui-formBtnGroup" "css_element" of the "2" activity section
@@ -53,7 +53,7 @@ Feature: Managing an activity with multiple sections
 
   Scenario: Manage activity - toggle multisection states
     When I navigate to the edit perform activities page for activity "Participant set up test"
-    And I click on ".tui-toggleBtn__ui" "css_element"
+    And I click on the "Multiple sections" tui toggle button
     Then I should see "All existing content will be grouped into the first section, along with the existing participant settings" in the tui modal
     And I confirm the tui confirmation modal
     Then I should see "Activity saved" in the tui "success" notification toast
@@ -68,8 +68,8 @@ Feature: Managing an activity with multiple sections
     When I click on "button[aria-label='Edit section']" "css_element" in the "1" activity section
     And I set the title of activity section "1" to "Section #1"
     And I click the add participant button in "1" activity section
-    And I click on the "Subject" tui checkbox in the ".tui-performManageActivityContent__items .tui-performActivitySection:nth-of-type(1) .tui-popoverFrame__content" css element
-    And I click on the "Appraiser" tui checkbox in the ".tui-performManageActivityContent__items .tui-performActivitySection:nth-of-type(1) .tui-popoverFrame__content" css element
+    And I click on the "Subject" tui checkbox in the ".tui-performManageActivityContent__items .tui-performActivitySection:nth-of-type(1) .tui-popoverFrame__content" "css_element"
+    And I click on the "Appraiser" tui checkbox in the ".tui-performManageActivityContent__items .tui-performActivitySection:nth-of-type(1) .tui-popoverFrame__content" "css_element"
     And I click on "Done" "button" in the ".tui-popoverPositioner" "css_element" of the "1" activity section
     And I click on "Done" "button" in the ".tui-performActivitySection__saveButtons" "css_element"
     And I close the tui notification toast
@@ -105,7 +105,7 @@ Feature: Managing an activity with multiple sections
     And I should see "Section #2"
 
     # Multisection off => all sections merged into 1
-    When I click on ".tui-toggleBtn__ui" "css_element"
+    When I click on the "Multiple sections" tui toggle button
     Then I should see "All sections' content will be merged and section headings removed. Participant settings will be removed. This cannot be undone." in the tui modal
 
     When I confirm the tui confirmation modal
@@ -129,7 +129,7 @@ Feature: Managing an activity with multiple sections
     # for the first section to be created.
     When I close the tui modal
     And I close the tui notification toast
-    And I click on ".tui-toggleBtn__ui" "css_element"
+    And I click on the "Multiple sections" tui toggle button
     And I confirm the tui confirmation modal
     And I close the tui notification toast
     And I click on "Done" "button" in the ".tui-performActivitySection__saveButtons" "css_element"
@@ -145,7 +145,7 @@ Feature: Managing an activity with multiple sections
   Scenario: Manage activity - Add section.
     When I navigate to the edit perform activities page for activity "Participant set up test"
     Then "Add section" "button" should not be visible
-    When I click on ".tui-toggleBtn__ui" "css_element"
+    When I click on the "Multiple sections" tui toggle button
     Then I should see "All existing content will be grouped into the first section, along with the existing participant settings" in the tui modal
     When I confirm the tui confirmation modal
     And I close the tui notification toast
@@ -200,7 +200,7 @@ Feature: Managing an activity with multiple sections
   Scenario: Manage activity - Add section above and below
     When I navigate to the edit perform activities page for activity "Participant set up test"
     Then "Add section" "button" should not be visible
-    When I click on ".tui-toggleBtn__ui" "css_element"
+    When I click on the "Multiple sections" tui toggle button
     Then I should see "All existing content will be grouped into the first section, along with the existing participant settings" in the tui modal
     When I confirm the tui confirmation modal
     And I close the tui notification toast
@@ -244,7 +244,7 @@ Feature: Managing an activity with multiple sections
   Scenario: Manage activity - Edit the title for sections
     Given the multi-language content filter is enabled
     And I navigate to the edit perform activities page for activity "Participant set up test"
-    And I click on ".tui-toggleBtn__ui" "css_element"
+    And I click on the "Multiple sections" tui toggle button
     Then I should see "All existing content will be grouped into the first section, along with the existing participant settings" in the tui modal
     And I confirm the tui confirmation modal
     And I wait until the page is ready
@@ -293,7 +293,7 @@ Feature: Managing an activity with multiple sections
   Scenario: Delete a section
     When I navigate to the edit perform activities page for activity "Multiple section Activity2"
     Then "Add section" "button" should not be visible
-    When I click on ".tui-toggleBtn__ui" "css_element"
+    When I click on the "Multiple sections" tui toggle button
     Then I should see "All existing content will be grouped into the first section, along with the existing participant settings" in the tui modal
     When I confirm the tui confirmation modal
     And I close the tui notification toast
