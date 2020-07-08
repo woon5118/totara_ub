@@ -24,6 +24,17 @@
 <template>
   <div class="tui-performActivityActions__actionIcons">
     <a
+      v-if="activityIsDraft"
+      :href="participationManagementUrl"
+      :title="$str('manage_participation', 'mod_perform')"
+    >
+      <ActivityManageParticipationIcon
+        :alt="$str('manage_participation', 'mod_perform')"
+        :title="$str('manage_participation', 'mod_perform')"
+        size="200"
+      />
+    </a>
+    <a
       v-if="activity.can_view_participation_reporting"
       :href="participationReportingUrl"
       :title="$str('participation_reporting', 'mod_perform')"
@@ -89,6 +100,7 @@
 
 <script>
 import ActivateActivityModal from 'mod_perform/components/manage_activity/ActivateActivityModal';
+import ActivityManageParticipationIcon from 'mod_perform/components/icons/ActivityManageParticipation';
 import ConfirmationModal from 'totara_core/components/modal/ConfirmationModal';
 import Dropdown from 'totara_core/components/dropdown/Dropdown';
 import DropdownItem from 'totara_core/components/dropdown/DropdownItem';
@@ -107,6 +119,7 @@ import activateDeleteMutation from 'mod_perform/graphql/delete_activity';
 export default {
   components: {
     ActivateActivityModal,
+    ActivityManageParticipationIcon,
     ConfirmationModal,
     Dropdown,
     DropdownItem,
@@ -149,6 +162,20 @@ export default {
       }
 
       return this.$str('modal_delete_title', 'mod_perform');
+    },
+
+    /**
+     * Get the url to the participation management
+     *
+     * @return {string}
+     */
+    participationManagementUrl() {
+      return this.$url(
+        '/mod/perform/manage/participation/subject_instances.php',
+        {
+          activity_id: this.activity.id,
+        }
+      );
     },
 
     /**
@@ -278,6 +305,7 @@ export default {
       "activity_action_clone",
       "activity_action_delete",
       "activity_action_options",
+      "manage_participation",
       "modal_delete_confirmation_line",
       "modal_delete_draft_message",
       "modal_delete_draft_title",
