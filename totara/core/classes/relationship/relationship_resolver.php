@@ -41,6 +41,13 @@ abstract class relationship_resolver {
     abstract public static function get_name(): string;
 
     /**
+     * The plural version name of this relationship resolver to display to the user.
+     *
+     * @return string
+     */
+    abstract public static function get_name_plural(): string;
+
+    /**
      * Get a list of all fields that must be provided to {@see get_users}.
      *
      * Here we define an array of what input combinations are allowed.

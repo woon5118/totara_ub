@@ -64,6 +64,13 @@ class totara_core_webapi_resolver_query_relationships_testcase extends advanced_
         $this->assertEquals('resolver_three<script>alert(\'Bad!\')</script>', $this->resolve_graphql_type(
             self::TYPE, 'name', $relationship, ['format' => format::FORMAT_RAW]
         ));
+
+        $this->assertEquals('resolver_threealert(\'Bads!\')', $this->resolve_graphql_type(
+            self::TYPE, 'name_plural', $relationship, ['format' => format::FORMAT_PLAIN]
+        ));
+        $this->assertEquals('resolver_three<script>alert(\'Bads!\')</script>', $this->resolve_graphql_type(
+            self::TYPE, 'name_plural', $relationship, ['format' => format::FORMAT_RAW]
+        ));
     }
 
 }

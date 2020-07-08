@@ -43,6 +43,13 @@ class subject extends relationship_resolver {
     }
 
     /**
+     * @inheritDoc
+     */
+    public static function get_name_plural(): string {
+        return get_string('relationship_subject_plural', 'totara_core');
+    }
+
+    /**
      * Get a list of fields that can be provided to {@see get_users}
      *
      * @return string[][]

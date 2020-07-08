@@ -543,6 +543,7 @@ $string['registrationcode'] = 'Registration code';
 $string['registrationcode_help'] = 'Production sites require a unique registration code, it can be obtained from your Totara Partner.';
 $string['registrationcodeinvalid'] = 'Invalid registration code format';
 $string['relationship_subject'] = 'Subject';
+$string['relationship_subject_plural'] = 'Subjects';
 $string['relative_time_days'] = '{$a} days ago';
 $string['relative_time_five_minutes'] = 'Within the last five minutes';
 $string['relative_time_half_hour'] = 'Within the last half-hour';

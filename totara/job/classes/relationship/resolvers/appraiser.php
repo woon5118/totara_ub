@@ -38,6 +38,13 @@ class appraiser extends relationship_resolver {
     }
 
     /**
+     * @inheritDoc
+     */
+    public static function get_name_plural(): string {
+        return get_string('appraiser_plural', 'totara_job');
+    }
+
+    /**
      * Get a list of fields that can be provided to {@see get_users}
      *
      * @return string[][]

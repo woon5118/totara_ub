@@ -40,6 +40,17 @@ class totara_core_relationship_resolver_testcase extends \advanced_testcase {
         }
     }
 
+    public function test_get_name_plural(): void {
+        $resolvers = $this->get_all_resolvers();
+
+        // Resolver names must not be empty.
+        foreach ($resolvers as $resolver) {
+            $this->assertGreaterThan(0, strlen(trim($resolver::get_name_plural())),
+                $resolver . '::get_name() must return a non-empty string'
+            );
+        }
+    }
+
     public function test_accepted_fields(): void {
         $resolvers = $this->get_all_resolvers();
 
@@ -116,6 +127,9 @@ class test_resolver_one extends relationship_resolver {
     public static function get_name(): string {
         return 'resolver_one';
     }
+    public static function get_name_plural(): string {
+        return 'resolver_ones';
+    }
     protected static function get_data(array $data): array {
         return [$data['input_field_one']];
     }
@@ -126,6 +140,9 @@ class test_resolver_one extends relationship_resolver {
 class test_resolver_two extends relationship_resolver {
     public static function get_name(): string {
         return 'resolver_two';
+    }
+    public static function get_name_plural(): string {
+        return 'resolver_twos';
     }
     protected static function get_data(array $data): array {
         return [$data['input_field_two']];
@@ -138,10 +155,16 @@ class test_resolver_three extends test_resolver_one {
     public static function get_name(): string {
         return "resolver_three<script>alert('Bad!')</script>";
     }
+    public static function get_name_plural(): string {
+        return "resolver_three<script>alert('Bads!')</script>";
+    }
 }
 class test_resolver_four extends relationship_resolver {
     public static function get_name(): string {
         return 'resolver_four';
+    }
+    public static function get_name_plural(): string {
+        return 'resolver_fours';
     }
     protected static function get_data(array $data): array {
         return $data;
@@ -156,6 +179,9 @@ class test_resolver_four extends relationship_resolver {
 class test_resolver_five extends test_resolver_one {
     public static function get_name(): string {
         return 'resolver_five';
+    }
+    public static function get_name_plural(): string {
+        return 'resolver_fives';
     }
     protected static function get_data(array $data): array {
         return [$data['input_field_one'] ?? $data['input_field_two']];

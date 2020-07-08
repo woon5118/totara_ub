@@ -53,6 +53,7 @@ final class relationship extends model {
 
     protected $model_accessor_whitelist = [
         'name',
+        'name_plural',
     ];
 
     /**
@@ -71,6 +72,17 @@ final class relationship extends model {
         // In the future, relationships can be user (admin) specified, including their names. (Stored in the DB)
         // But until then, the name of a relationship will just be the name of their first resolver.
         return $this->get_resolvers()[0]::get_name();
+    }
+
+    /**
+     * Get this relationship's plural version of it's name.
+     *
+     * @return string
+     */
+    public function get_name_plural(): string {
+        // In the future, relationships can be user (admin) specified, including their names. (Stored in the DB)
+        // But until then, the name of a relationship will just be the name of their first resolver.
+        return $this->get_resolvers()[0]::get_name_plural();
     }
 
     /**

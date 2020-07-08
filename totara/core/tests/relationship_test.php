@@ -24,6 +24,7 @@
 use totara_core\entities\relationship as relationship_entity;
 use totara_core\entities\relationship_resolver;
 use totara_core\relationship\relationship;
+use totara_core\relationship\resolvers\subject;
 
 require_once(__DIR__ . '/relationship_resolver_test.php');
 
@@ -44,6 +45,20 @@ class totara_core_relationship_testcase extends \advanced_testcase {
         $relationship_two = relationship::create([test_resolver_two::class]);
         $this->assertEquals(test_resolver_one::get_name(), $relationship_one->get_name());
         $this->assertEquals(test_resolver_two::get_name(), $relationship_two->get_name());
+
+        $subject = relationship::create([subject::class]);
+        $this->assertEquals('Subject', $subject->get_name());
+    }
+
+    public function test_get_name_plural(): void {
+        // For now, get_name() simply just gets the name of the first resolver that is associated with the relationship in the DB.
+        $relationship_one = relationship::create([test_resolver_one::class]);
+        $relationship_two = relationship::create([test_resolver_two::class]);
+        $this->assertEquals(test_resolver_one::get_name_plural(), $relationship_one->get_name_plural());
+        $this->assertEquals(test_resolver_two::get_name_plural(), $relationship_two->get_name_plural());
+
+        $subject = relationship::create([subject::class]);
+        $this->assertEquals('Subjects', $subject->get_name_plural());
     }
 
     public function test_create(): void {

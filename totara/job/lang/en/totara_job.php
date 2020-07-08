@@ -36,6 +36,7 @@ $string['allowsignupmanagersecurityrisk'] =  'Security risk: Please be aware tha
 $string['allowsignupmanager_help'] = 'When this option is selected and **Self-registration** is enabled,
 the manager field will be available for users in the sign-up.';
 $string['appraiser'] = 'Appraiser';
+$string['appraiser_plural'] = 'Appraisers';
 $string['assignmentdates'] = 'Assignment dates';
 $string['assignmentdates_description'] = 'Job assignment dates serve multiple purposes, from reporting to dynamic audience rules to program and certification assignments and more.
 
