@@ -774,11 +774,10 @@ class track extends model {
     /**
      * Get the date resolver for this track and a given set of users.
      *
-     * @param array $user_ids
-     * @param array $job_assignment_ids
+     * @param collection|track_user_assignment[] $user_assignments
      * @return date_resolver|dynamic_date_resolver
      */
-    public function get_date_resolver(array $user_ids, array $job_assignment_ids = []): date_resolver {
+    public function get_date_resolver(collection $user_assignments): date_resolver {
         if ($this->schedule_is_fixed) {
             return new fixed_range_resolver($this->schedule_fixed_from, $this->get_schedule_fixed_to());
         }
@@ -794,6 +793,14 @@ class track extends model {
         if ($resolver === null) {
             throw new coding_exception('Dynamic date resolver not set');
         }
+
+        $user_ids = $user_assignments->pluck('subject_user_id');
+        $job_assignment_ids = $user_assignments
+            ->filter('job_assignment_id',
+                function ($job_assignment_id) {
+                    return $job_assignment_id !== null;
+                }
+            )->pluck('job_assignment_id');
 
         return $resolver->set_parameters(
             $this->schedule_dynamic_from,

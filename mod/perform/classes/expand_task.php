@@ -355,15 +355,8 @@ class expand_task {
      */
     private function assign_bulk(track_assignment $assignment, array $to_create): void {
         // Bulk fetch all the start and end reference dates.
-        $user_ids = array_column($to_create, 'subject_user_id');
-        $job_assignment_ids = array_filter(
-            array_column($to_create, 'job_assignment_id'),
-            function ($job_assignment_id) {
-                return $job_assignment_id !== null;
-            }
-        );
 
-        $date_resolver = (new track($assignment->track))->get_date_resolver($user_ids, $job_assignment_ids);
+        $date_resolver = (new track($assignment->track))->get_date_resolver(collection::new($to_create));
 
         if ($assignment->track->schedule_use_anniversary) {
             $date_resolver = new anniversary_of($date_resolver, time());
@@ -486,7 +479,7 @@ class expand_task {
         $track = new track($first_assignment->track);
 
         // Bulk fetch all the start and end reference dates.;
-        $date_resolver = $track->get_date_resolver($user_ids);
+        $date_resolver = $track->get_date_resolver($user_assignments);
 
         track_schedule_sync::sync_user_assignment_schedules($date_resolver, $user_assignments, $track->schedule_use_anniversary);
     }
@@ -498,9 +491,7 @@ class expand_task {
      * @param track $track
      */
     private function reactivate_user_assignment(track_user_assignment $user_assignment, track $track): void {
-        $user_id = $user_assignment->subject_user_id;
-
-        $date_resolver = $track->get_date_resolver([$user_id]);
+        $date_resolver = $track->get_date_resolver(collection::new([$user_assignment]));
 
         track_schedule_sync::sync_user_assignment_schedules(
             $date_resolver,

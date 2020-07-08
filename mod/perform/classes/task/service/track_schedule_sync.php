@@ -23,6 +23,7 @@
 
 namespace mod_perform\task\service;
 
+use core\orm\collection;
 use core\orm\lazy_collection;
 use core\orm\query\builder;
 use mod_perform\dates\resolvers\anniversary_of;
@@ -69,11 +70,9 @@ class track_schedule_sync {
             ->filter_by_active()
             ->get_lazy();
 
-        // Get user ids separately so we can use memory-saving lazy loading for the track_user_assignments.
-        $user_ids = $this->get_assigned_user_ids_for_track($track);
-
         // Bulk fetch all the start and end reference dates.
-        $date_resolver = (new track_model($track))->get_date_resolver($user_ids);
+        // Get user and job ids separately so we can use memory-saving lazy loading for the track_user_assignments.
+        $date_resolver = (new track_model($track))->get_date_resolver($this->get_assigned_user_and_job_ids_for_track($track));
 
         builder::get_db()->transaction(function () use ($track, $track_user_assignments, $date_resolver) {
             // Reset the flag.
@@ -85,18 +84,18 @@ class track_schedule_sync {
     }
 
     /**
-     * Get all the user ids for a track.
+     * Get all the user and job assignment ids for a track.
      *
      * @param track $track
-     * @return array
+     * @return collection
      */
-    private function get_assigned_user_ids_for_track(track $track): array {
+    private function get_assigned_user_and_job_ids_for_track(track $track): collection {
         return builder::table(track_user_assignment::TABLE)
             ->select('subject_user_id')
+            ->add_select('job_assignment_id')
             ->where('track_id', $track->id)
             ->where('deleted', false)
-            ->get(true)
-            ->pluck('subject_user_id');
+            ->get(true);
     }
 
     /**

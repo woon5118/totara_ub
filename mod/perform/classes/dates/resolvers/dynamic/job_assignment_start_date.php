@@ -78,6 +78,9 @@ class job_assignment_start_date extends base_dynamic_date_resolver {
         }
 
         $reference_date = $this->get_start_date($user_id, $job_assignment_id);
+        if ($reference_date === null) {
+            return $reference_date;
+        }
         return $this->to->apply($reference_date);
     }
 
