@@ -24,7 +24,6 @@
     <Loader :loading="$apollo.loading">
       <ConfirmationModal
         :open="modalOpen"
-        :close-button="false"
         :confirm-button-text="$str('submit', 'moodle')"
         :title="
           $str('user_activities_submit_confirmation_title', 'mod_perform')

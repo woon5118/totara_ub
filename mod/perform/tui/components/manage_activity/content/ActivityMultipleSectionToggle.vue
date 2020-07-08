@@ -37,7 +37,6 @@
 
     <ConfirmationModal
       :open="modalOpen"
-      :close-button="false"
       :title="$str('multiple_sections_confirmation_title', 'mod_perform')"
       :confirm-button-text="$str('modal_confirm', 'mod_perform')"
       @confirm="modalConfirmed"

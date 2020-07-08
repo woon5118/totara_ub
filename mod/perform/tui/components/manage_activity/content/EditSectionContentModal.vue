@@ -76,7 +76,6 @@
 
     <ConfirmationModal
       :open="deleteModalOpen"
-      :close-button="false"
       :title="$str('modal_element_delete_title', 'mod_perform')"
       :confirm-button-text="$str('delete')"
       :loading="isSaving"
@@ -88,7 +87,6 @@
 
     <ConfirmationModal
       :open="unsavedChangesModalOpen"
-      :close-button="false"
       :title="$str('modal_element_unsaved_changes_title', 'mod_perform')"
       :confirm-button-text="$str('button_close', 'mod_perform')"
       @confirm="closeThis"
