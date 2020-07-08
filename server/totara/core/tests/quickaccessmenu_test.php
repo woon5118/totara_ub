@@ -1089,6 +1089,8 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
         // Testing with competency assignment and perform activities explicitly switched off
         advanced_feature::disable('competency_assignment');
         advanced_feature::disable('performance_activities');
+        advanced_feature::enable('appraisals');
+        advanced_feature::enable('feedback360');
 
         $this->resetAfterTest();
 

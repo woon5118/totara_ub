@@ -65,7 +65,7 @@ class totara_flavour_helper_testcase extends advanced_testcase {
         $this->assertObjectNotHasAttribute('forceflavour', $CFG);
         $this->assertObjectNotHasAttribute('showflavours', $CFG);
         $this->assertObjectNotHasAttribute('currentflavour', $CFG);
-        $this->assertEquals(advanced_feature::ENABLED, get_config('moodle', 'enableappraisals'));
+        $this->assertEquals(advanced_feature::DISABLED, get_config('moodle', 'enableappraisals'));
 
         // We need some flavours for testing.
         $this->assertFileExists("$CFG->dirroot/totara/flavour/flavours/enterprise/classes/definition.php");

@@ -7,6 +7,7 @@ Feature: Perform basic appraisals administration
   @javascript
   Scenario: Create Appraisal
     Given I am on a totara site
+    And I enable the "appraisals" advanced feature
     And I log in as "admin"
     And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
     And I press "Create appraisal"

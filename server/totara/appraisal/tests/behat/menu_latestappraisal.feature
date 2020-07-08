@@ -6,6 +6,7 @@ Feature: Test Latest Appraisal menu item
 
   Scenario: Make sure Latest Appraisal is available in totara menu
     Given I am on a totara site
+    And I enable the "appraisals" advanced feature
     And I log in as "admin"
     When I navigate to "Main menu" node in "Site administration > Navigation"
     Then I should see "Latest Appraisal" in the "#totaramenutable" "css_element"
@@ -13,6 +14,7 @@ Feature: Test Latest Appraisal menu item
 
   Scenario: Make sure Latest Appraisal is available in totara menu even if other things disabled
     Given I am on a totara site
+    And I enable the "appraisals" advanced feature
     And I log in as "admin"
     When I navigate to "Advanced features" node in "Site administration > System information"
     And I set the field "Enable Goals" to "Disable"

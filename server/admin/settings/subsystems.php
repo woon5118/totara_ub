@@ -170,12 +170,12 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
     $optionalsubsystems->add(new totara_core_admin_setting_feature('enableappraisals',
         new lang_string('enableappraisals', 'totara_appraisal'),
         new lang_string('configenableappraisals', 'totara_appraisal'),
-        advanced_feature::ENABLED));
+        advanced_feature::DISABLED));
 
     $optionalsubsystems->add(new totara_core_admin_setting_feature('enablefeedback360',
         new lang_string('enablefeedback360', 'totara_feedback360'),
         new lang_string('configenablefeedback360', 'totara_feedback360'),
-        advanced_feature::ENABLED));
+        advanced_feature::DISABLED));
 
     $optionalsubsystems->add(new totara_core_admin_setting_feature('enablelearningplans',
         new lang_string('enablelearningplans', 'totara_plan'),

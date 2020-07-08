@@ -6,6 +6,7 @@ Feature: Feedback360 assigned users
 
   Background:
     Given I am on a totara site
+    And I enable the "feedback360" advanced feature
     And the following "users" exist:
       | username | firstname | lastname | email             |
       | user1    | User      | One      | user1@example.com |

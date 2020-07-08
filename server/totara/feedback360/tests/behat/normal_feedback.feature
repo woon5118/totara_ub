@@ -5,7 +5,9 @@ Feature: Normal feedback
   I am able to setup and use a normal feedback request
 
   Background:
-    Given the following "users" exist:
+    Given I am on a totara site
+    And I enable the "feedback360" advanced feature
+    And the following "users" exist:
       | username | firstname | lastname | email             |
       | user1    | User      | One      | user1@example.com |
       | user2    | User      | Two      | user2@example.com |

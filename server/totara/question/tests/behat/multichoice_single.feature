@@ -5,6 +5,8 @@ Feature: Admin interface of single answer multichoice question
 
   Background:
     Given I am on a totara site
+    And I enable the "appraisals" advanced feature
+    And I enable the "feedback360" advanced feature
     And I log in as "admin"
     And I navigate to "Manage Feedback" node in "Site administration > Appraisals"
     And I click on "Create Feedback" "button"

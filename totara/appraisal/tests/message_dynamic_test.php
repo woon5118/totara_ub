@@ -20,19 +20,23 @@
  * @author Murali Nair <murali.nair@totaralearning.com>
  * @package totara_appraisal
  */
+
+use totara_core\advanced_feature;
+
 global $CFG;
 require_once($CFG->dirroot.'/totara/appraisal/tests/message_appraisal_testcase.php');
 
 /**
  * Tests the sending of activation notifications for dynamic appraisals.
  */
-class totara_appraisal_messages_dynamic_test  extends totara_appraisal_messages_testcase {
+class totara_appraisal_message_dynamic_testcase extends totara_appraisal_messages_testcase {
     /**
      * Sets up the test environment.
      *
      * @return \stdClass parent::setup_test_env() generated test environment.
      */
     private function setup_dynamic_appraisal_test_env(): \stdClass {
+        advanced_feature::enable('appraisals');
         $test_env = $this->setup_test_env();
 
         // setup_test_env() records the current $CFG/system config settings. So

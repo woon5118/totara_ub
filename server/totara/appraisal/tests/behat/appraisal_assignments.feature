@@ -6,6 +6,7 @@ Feature: Test reported learners in appraisal assignments
 
   Background:
     Given I am on a totara site
+    And I enable the "appraisals" advanced feature
     And the following "users" exist:
       | username  | firstname | lastname | email                 |
       | learner1  | Learner   | One      | one@example.com       |

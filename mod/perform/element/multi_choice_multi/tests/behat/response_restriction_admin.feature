@@ -54,7 +54,7 @@ Feature: Manage performance activity multiple choice-answers elements with admin
     When I set the following fields to these values:
       | max | 4 |
     Then I save multiple answers question element data
-    And I click on "Submit" "button"
     And I close the tui notification toast
+    And I close the tui modal
     When I navigate to manage perform activity content page
     Then I should see perform multiple answers question "Question 1" is saved with options "Option one,Option two,Option three,Option four,Option five"

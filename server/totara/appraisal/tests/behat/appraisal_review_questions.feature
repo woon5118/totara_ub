@@ -6,6 +6,7 @@ Feature: Complete review questions in appraisals
 
   Background:
     Given I am on a totara site
+    And I enable the "appraisals" advanced feature
     And the following "users" exist:
       | username | firstname | lastname | email                |
       | learner1 | Learner   | One      | learner1@example.com |
@@ -41,7 +42,7 @@ Feature: Complete review questions in appraisals
     And I log in as "learner1"
     And I follow "Learning Plans"
     And I follow "learner1 Learning Plan"
-    And I follow "Competencies"
+    And I click on "Competencies" "link" in the "#dp-plan-content" "css_element"
     And I wait until the page is ready
     And I press "Add competencies"
     And I click on "Competency One" "link" in the "Add competencies" "totaradialogue"

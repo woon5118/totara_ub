@@ -6,6 +6,7 @@ Feature: Link appraisal with an appraisee job assignment.
 
   Background:
     Given I am on a totara site
+    And I enable the "appraisals" advanced feature
     And the following "users" exist:
       | username   | firstname  | lastname   | email                  |
       | goldfinger | Auric      | Goldfinger | goldfinger@example.com |

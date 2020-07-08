@@ -5,6 +5,8 @@ Feature: Custom Fields on goals are editable appraisals when they should be
 
   Background:
     Given I am on a totara site
+    And I enable the "appraisals" advanced feature
+    And I enable the "feedback360" advanced feature
     And I log in as "admin"
     And the following "users" exist:
       | username        | firstname      | lastname   | email             |
@@ -40,8 +42,7 @@ Feature: Custom Fields on goals are editable appraisals when they should be
     And I press "Save changes"
     And I log out
     And I log in as "learner"
-    And I follow "Performance"
-    And I follow "Goals"
+    And I click on "Goals" in the totara menu
 
     And I click on "Add personal goal" "button"
     And I set the field "Name" to "My Goal"

@@ -4,6 +4,7 @@ Feature: Test appraisal messages
   Background:
     # Set up the data we need for appraisals.
     Given I am on a totara site
+    And I enable the "appraisals" advanced feature
     And the following "users" exist:
       | username   | firstname  | lastname  | email                |
       | learner1   | learner1   | lastname  | learner1@local.com   |

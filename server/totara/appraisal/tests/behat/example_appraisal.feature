@@ -6,6 +6,7 @@ Feature: Complete the example appraisal
 
   Background:
     Given I am on a totara site
+    And I enable the "appraisals" advanced feature
     And the following "users" exist:
       | username | firstname | lastname | email                |
       | learner1 | Learner   | One      | learner1@example.com |

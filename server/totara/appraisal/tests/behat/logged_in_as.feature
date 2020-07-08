@@ -3,7 +3,7 @@ Feature: Make sure the real user is recorded in appraisals when using login-as
 
   Background:
     Given I am on a totara site
-
+    And I enable the "appraisals" advanced feature
     # Users
     And the following "users" exist:
       | username   | firstname  | lastname  | email                  |

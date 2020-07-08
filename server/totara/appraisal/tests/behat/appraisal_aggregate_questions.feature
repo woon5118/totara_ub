@@ -6,6 +6,7 @@ Feature: Perform basic actions for aggregate questions
 
   Background:
     Given I am on a totara site
+    And I enable the "appraisals" advanced feature
     And the following "users" exist:
       | username  | firstname | lastname | email                 |
       | appraiser | Sally     | Sal      | appraiser@example.com |

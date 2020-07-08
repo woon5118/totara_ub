@@ -19,20 +19,22 @@
  *
  * @author Simon Coggins <simon.coggins@totaralms.com>
  * @author Valerii Kuznetsov <valerii.kuznetsov@totaralms.com>
- * @package totara
- * @subpackage appraisal
+ * @package totara_appraisal
  *
  * Unit tests for appraisal_message class of totara/appraisal/lib.php
  *
  * To test, run this from the command line from the $CFG->dirroot
- * vendor/bin/phpunit --verbose appraisal_message_test totara/appraisal/tests/message_test.php
+ * vendor/bin/phpunit --verbose totara_appraisal_message_testcase totara/appraisal/tests/message_test.php
  */
+
+use totara_core\advanced_feature;
+
 global $CFG;
 require_once($CFG->dirroot.'/totara/appraisal/tests/appraisal_testcase.php');
 
-class appraisal_message_test extends appraisal_testcase {
+class totara_appraisal_message_testcase extends appraisal_testcase {
     public function test_create() {
-        $this->resetAfterTest();
+        advanced_feature::enable('appraisals');
         list($appraisal) = $this->prepare_appraisal_with_users();
         $map = $this->map($appraisal);
 
@@ -64,7 +66,7 @@ class appraisal_message_test extends appraisal_testcase {
     }
 
     public function test_edit() {
-        $this->resetAfterTest();
+        advanced_feature::enable('appraisals');
         // Create appraisal with messages.
         list($appraisal) = $this->prepare_appraisal_with_users();
         $map = $this->map($appraisal);
@@ -110,7 +112,7 @@ class appraisal_message_test extends appraisal_testcase {
     }
 
     public function test_delete() {
-        $this->resetAfterTest();
+        advanced_feature::enable('appraisals');
         list($appraisal) = $this->prepare_appraisal_with_users();
         $map = $this->map($appraisal);
         list($appraisal2) = $this->prepare_appraisal_with_users();
@@ -173,7 +175,7 @@ class appraisal_message_test extends appraisal_testcase {
     }
 
     public function test_is_time() {
-        $this->resetAfterTest();
+        advanced_feature::enable('appraisals');
         list($appraisal) = $this->prepare_appraisal_with_users();
         $map = $this->map($appraisal);
         $roles = array(appraisal::ROLE_LEARNER);
@@ -223,7 +225,7 @@ class appraisal_message_test extends appraisal_testcase {
     }
 
     public function test_duplicate_appraisal() {
-        $this->resetAfterTest();
+        advanced_feature::enable('appraisals');
         list($appraisal) = $this->prepare_appraisal_with_users();
         list($appraisal2) = $this->prepare_appraisal_with_users();
         $map = $this->map($appraisal);
@@ -263,7 +265,7 @@ class appraisal_message_test extends appraisal_testcase {
     }
 
     public function test_duplicate_stage() {
-        $this->resetAfterTest();
+        advanced_feature::enable('appraisals');
         list($appraisal) = $this->prepare_appraisal_with_users();
         list($appraisal2) = $this->prepare_appraisal_with_users();
         $map = $this->map($appraisal);
@@ -305,7 +307,7 @@ class appraisal_message_test extends appraisal_testcase {
     }
 
     public function test_set_message() {
-        $this->resetAfterTest();
+        advanced_feature::enable('appraisals');
         list($appraisal) = $this->prepare_appraisal_with_users();
         $map = $this->map($appraisal);
         $roles = array(appraisal::ROLE_LEARNER, appraisal::ROLE_MANAGER, appraisal::ROLE_APPRAISER, appraisal::ROLE_TEAM_LEAD);
@@ -334,7 +336,7 @@ class appraisal_message_test extends appraisal_testcase {
     }
 
     public function test_get_schedule_from() {
-        $this->resetAfterTest();
+        advanced_feature::enable('appraisals');
         list($appraisal) = $this->prepare_appraisal_with_users();
         $map = $this->map($appraisal);
 
@@ -370,8 +372,7 @@ class appraisal_message_test extends appraisal_testcase {
     public function test_process_event() {
         global $CFG, $DB;
 
-        $this->resetAfterTest();
-        $this->preventResetByRollback();
+        advanced_feature::enable('appraisals');
 
         $oldlog = ini_get('error_log');
         ini_set('error_log', "$CFG->dataroot/testlog.log"); // Prevent standard logging.
@@ -697,7 +698,7 @@ class appraisal_message_test extends appraisal_testcase {
     }
 
     public function test_activated_appraisal_new_appraisee_notification() {
-        $this->resetAfterTest();
+        advanced_feature::enable('appraisals');
         $sink = $this->redirectEmails();
         $this->assertTrue(phpunit_util::is_redirecting_phpmailer());
 
@@ -745,7 +746,7 @@ class appraisal_message_test extends appraisal_testcase {
     }
 
     public function test_appraisal_close() {
-        $this->resetAfterTest();
+        advanced_feature::enable('appraisals');
         $sink = $this->redirectEmails();
         $this->setAdminUser();
         /** @var appraisal $appraisal */

@@ -5,7 +5,9 @@ Feature: Test appraisal detailed report with numeric question
   I need to create calendar data
 
   Background:
-    Given the following "users" exist:
+    Given I am on a totara site
+    And I enable the "appraisals" advanced feature
+    And the following "users" exist:
       | username | firstname | lastname | email       | auth   | confirmed |
       | user1    | User      | One      | one@example.invalid | manual | 1         |
       | user2    | User      | Two      | two@example.invalid | manual | 1         |

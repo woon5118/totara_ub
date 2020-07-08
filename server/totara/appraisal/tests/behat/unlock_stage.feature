@@ -4,6 +4,7 @@ Feature: Test unlocking an appraisal stage for a role
   Background:
     # Set up the deta we need for appraisals.
     Given I am on a totara site
+    And I enable the "appraisals" advanced feature
     And the following "users" exist:
       | username   | firstname  | lastname  | email                |
       | learner    | learner    | lastname  | learner@example.com  |

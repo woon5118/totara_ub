@@ -7,6 +7,7 @@ Feature: Automatically link an appraisee's job assignment on appraisal activatio
   Scenario: Manager can see learner's appraisal assignment after activation without learner opening the appraisal first.
     # Set up the data we need for appraisals.
     Given I am on a totara site
+    And I enable the "appraisals" advanced feature
     And the following "users" exist:
       | username   | firstname  | lastname  | email                  |
       | learner1   | learner1   | lastname  | learner1@example.com   |

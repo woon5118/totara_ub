@@ -7,6 +7,7 @@ Feature: Admin page that lists missing roles for one appraisal
   Background:
     # Set up user data
     Given I am on a totara site
+    And I enable the "appraisals" advanced feature
     And the following "users" exist:
       | username | firstname  | lastname  | email                |
       | learner1 | Learner    | One       | learner1@example.com |

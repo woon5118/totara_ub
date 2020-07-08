@@ -3,6 +3,7 @@ Feature: Test appraisal objective selection
 
   Scenario: Test Choose objective to review when the plan has being completed comes up with proper error
     When I am on a totara site
+    And I enable the "appraisals" advanced feature
     And I log in as "admin"
     And the following "users" exist:
       | username | firstname | lastname | email |

@@ -20,13 +20,16 @@
  * @author Murali Nair <murali.nair@totaralearning.com>
  * @package totara_appraisal
  */
+
+use totara_core\advanced_feature;
+
 global $CFG;
 require_once($CFG->dirroot.'/totara/appraisal/tests/message_appraisal_testcase.php');
 
 /**
  * Tests the sending of activation notifications for static appraisals.
  */
-class totara_appraisal_messages_static_test extends totara_appraisal_messages_testcase {
+class totara_appraisal_message_static_testcase extends totara_appraisal_messages_testcase {
     /**
      * Sets up the test environment.
      *
@@ -63,6 +66,7 @@ class totara_appraisal_messages_static_test extends totara_appraisal_messages_te
      * 4) run cron tasks again
      */
     public function test_no_multijob(): void {
+        advanced_feature::enable('appraisals');
         $test_env = $this->setup_static_appraisal_test_env();
         set_config('totara_job_allowmultiplejobs', false);
 
@@ -116,6 +120,7 @@ class totara_appraisal_messages_static_test extends totara_appraisal_messages_te
      * 5) run cron tasks
      */
     public function test_multijob(): void {
+        advanced_feature::enable('appraisals');
         $test_env = $this->setup_static_appraisal_test_env();
         set_config('totara_job_allowmultiplejobs', true);
 

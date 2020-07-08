@@ -7,6 +7,7 @@ Feature: Test appraisal stage completion with missing roles
   Background:
     # Set up the deta we need for appraisals.
     Given I am on a totara site
+    And I enable the "appraisals" advanced feature
     And the following "users" exist:
       | username   | firstname  | lastname  | email                  |
       | learner1   | learner1   | lastname  | learner1@example.com   |

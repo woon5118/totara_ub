@@ -7,6 +7,7 @@ Feature: Appraisal progression halts at stage without any role assigned
   Background:
     # Set up user data.
     Given I am on a totara site
+    And I enable the "appraisals" advanced feature
     And the following "users" exist:
       | username  | firstname | lastname | email                 |
       | learner1  | Learner   | One      | learner1@example.com  |

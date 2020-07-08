@@ -6,6 +6,7 @@ Feature: Access rights to user goal questions in static appraisals
 
   Background:
     Given I am on a totara site
+    And I enable the "appraisals" advanced feature
     And the following config values are set as admin:
       | dynamicappraisals | 0 |
     And the following "users" exist:
