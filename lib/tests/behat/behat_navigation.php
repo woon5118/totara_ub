@@ -587,6 +587,39 @@ class behat_navigation extends behat_base {
     }
 
     /**
+     * Opens the requested page.
+     *
+     * @Given /^I am on "(?P<page_string>(?:[^"]|\\")*)" page/
+     * @throws coding_exception
+     * @param string $page The page name.
+     * @return void
+     */
+    public function i_am_on_page($page) {
+        \behat_hooks::set_step_readonly(false);
+        switch ($page) {
+            case 'All Appraisals':
+                $url = new moodle_url('/totara/appraisal/index.php');
+                break;
+            case 'Latest Appraisal':
+                $url = new moodle_url('/totara/appraisal/myappraisal.php', ['latest' => 1]);
+                break;
+            case '360° Feedback':
+                $url = new moodle_url('/totara/feedback360/index.php');
+                break;
+            case 'Goals':
+                $url = new moodle_url('/totara/hierarchy/prefix/goal/mygoals.php');
+                break;
+            case 'Team':
+                $url = new moodle_url('/my/teammembers.php');
+                break;
+            default:
+                throw new ExpectationException("Page " . $page . " is not defined", $this->getSession());
+        }
+        $this->getSession()->visit($this->locate_path($url->out_as_local_url(false)));
+        $this->wait_for_pending_js();
+    }
+
+    /**
      * Opens the certification homepage.
      *
      * @Given /^I am on "(?P<certificationfullname_string>(?:[^"]|\\")*)" (certification|program) homepage$/
