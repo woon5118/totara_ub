@@ -170,10 +170,7 @@ class date_offset implements JsonSerializable {
      * @return int Unix timestamp
      */
     public function apply(int $date): int {
-        $date_object = (new \DateTimeImmutable(
-            '@' . $date,
-            new DateTimeZone('utc')
-        ));
+        $date_object = (new \DateTimeImmutable('@' . $date));
 
         $modifier = $this->get_direction() === self::DIRECTION_BEFORE ? '-' : '+';
 

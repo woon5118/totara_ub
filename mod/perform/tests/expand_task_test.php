@@ -26,6 +26,7 @@ use core\entities\user;
 use core\orm\entity\repository as entity_repository;
 use core\orm\query\builder;
 use mod_perform\dates\date_offset;
+use mod_perform\dates\resolvers\dynamic\base_dynamic_date_resolver;
 use mod_perform\dates\resolvers\dynamic\dynamic_source;
 use mod_perform\dates\resolvers\dynamic\user_creation_date;
 use mod_perform\dates\resolvers\dynamic\user_custom_field;
@@ -711,7 +712,12 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
             ->one();
 
         $this->assertEquals($seven_days_before_create_date, $track_user_assignment->period_start_date);
-        $this->assertEquals($create_date, $track_user_assignment->period_end_date);
+
+        // End dates are adjusted to "end of day".
+        $this->assertEquals(
+            $create_date + DAYSECS,
+            $track_user_assignment->period_end_date
+        );
 
         // Change to open and expand for a new user.
         $track->schedule_is_open = true;
@@ -779,7 +785,9 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
             ->one();
 
         $this->assert_anniversary_date($track_user_assignment->period_start_date, 1, 1);
-        $this->assert_anniversary_date($track_user_assignment->period_end_date, 1, 1);
+
+        // End dates are adjusted to "end of day".
+        $this->assert_anniversary_date($track_user_assignment->period_end_date, 2, 1);
 
         // Change to open and expand for a new user.
         $track->schedule_is_open = true;

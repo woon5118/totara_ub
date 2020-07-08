@@ -86,5 +86,5 @@ interface dynamic_date_resolver extends date_resolver {
      *
      * @param string|null $custom_data
      */
-    public function set_custom_data(?string $custom_data);
+    public function set_custom_data(?string $custom_data): void;
 }

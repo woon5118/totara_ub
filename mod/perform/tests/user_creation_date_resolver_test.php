@@ -23,6 +23,7 @@
 
 use core\entities\user;
 use mod_perform\dates\date_offset;
+use mod_perform\dates\resolvers\dynamic\base_dynamic_date_resolver;
 use mod_perform\dates\resolvers\dynamic\dynamic_source;
 use mod_perform\dates\resolvers\dynamic\user_creation_date;
 
@@ -59,7 +60,12 @@ class mod_perform_user_creation_date_resolver_testcase extends advanced_testcase
         );
 
         self::assertEquals(691848000, $resolver->get_start_for($user->id)); // 4th of December.
-        self::assertEquals(691934400, $resolver->get_end_for($user->id)); // 5th of December.
+
+        // End dates are adjusted to "end of day".
+        self::assertEquals(
+            691934400 + DAYSECS,
+            $resolver->get_end_for($user->id)
+        ); // 5th of December.
 
         self::assertNull($resolver->get_start_for($admin->id)); // 4th of December.
         self::assertNull($resolver->get_end_for($admin->id)); // 5th of December.

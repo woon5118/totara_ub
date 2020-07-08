@@ -158,6 +158,9 @@ abstract class base_dynamic_date_resolver implements dynamic_date_resolver {
 
         $reference_date = $this->date_map[$user_id];
 
+        // End dates are adjusted to "end of day".
+        $reference_date += DAYSECS;
+
         return $this->to->apply($reference_date);
     }
 
@@ -186,9 +189,9 @@ abstract class base_dynamic_date_resolver implements dynamic_date_resolver {
     /**
      * @param string|null $custom_data
      */
-    public function set_custom_data(?string $custom_data) {
+    public function set_custom_data(?string $custom_data): void {
         if (!$this->is_valid_custom_data($custom_data)) {
-            throw new \coding_exception("Invalid custom data");
+            throw new \coding_exception('Invalid custom data');
         }
         $this->custom_data = $custom_data;
     }

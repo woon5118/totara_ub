@@ -122,7 +122,9 @@ class mod_perform_track_schedule_sync_testcase extends advanced_testcase {
         /** @var track_user_assignment $user_assignment */
         $user_assignment = track_user_assignment::repository()->one();
         $this->assert_anniversary_date($user_assignment->period_start_date, 3, 2);
-        $this->assert_anniversary_date($user_assignment->period_end_date, 4, 2);
+
+        // End dates are adjusted to "end of day".
+        $this->assert_anniversary_date($user_assignment->period_end_date, 5, 2);
 
         $track->set_schedule_open_dynamic(
             new date_offset(0, date_offset::UNIT_DAY, date_offset::DIRECTION_AFTER),
