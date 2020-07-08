@@ -20,15 +20,14 @@
 -->
 <template>
   <div class="tui-staticContentElementParticipantForm">
-    {{ data.textValue }}
+    {{ element.data.textValue }}
   </div>
 </template>
 
 <script>
 export default {
   props: {
-    name: String,
-    data: Object,
+    element: Object,
   },
 };
 </script>

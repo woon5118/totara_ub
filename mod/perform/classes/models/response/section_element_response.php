@@ -32,6 +32,7 @@ use mod_perform\entities\activity\participant_instance as participant_instance_e
 use mod_perform\models\activity\element;
 use mod_perform\models\activity\participant_instance;
 use mod_perform\models\activity\element_plugin;
+use mod_perform\models\activity\respondable_element_plugin;
 use mod_perform\models\activity\section_element;
 use totara_core\relationship\relationship as core_relationship_model;
 
@@ -189,6 +190,10 @@ class section_element_response extends model {
      * @return bool
      */
     public function validate_response(): bool {
+        if (!$this->element_plugin instanceof respondable_element_plugin) {
+            return true;
+        }
+
         $this->validation_errors = $this->element_plugin->validate_response($this->entity->response_data, $this->get_element());
 
         return $this->validation_errors->count() === 0;
