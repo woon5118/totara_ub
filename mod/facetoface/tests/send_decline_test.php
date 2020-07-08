@@ -99,6 +99,8 @@ class mod_facetoface_send_decline_testcase extends advanced_testcase {
 
 	    $seminarevent = new \mod_facetoface\seminar_event($session->id);
         $signup = \mod_facetoface\signup::create($user->id, $seminarevent);
+        // Do NOT trigger booking confirmation as its leaving the record in 'facetoface_notification_hist' table.
+        $signup->set_notificationtype(MDL_F2F_NONE);
         \mod_facetoface\signup_helper::signup($signup);
 	}
 
@@ -114,18 +116,18 @@ class mod_facetoface_send_decline_testcase extends advanced_testcase {
      * @return void
      */
 	public function test_sending_decline_email_without_attachment(): void {
-		global $USER, $DB;
+		global $CFG, $DB;
 
 		$this->setAdminUser();
-		$this->resetAfterTest(true);
 
+		$CFG->facetoface_disableicalcancel = 1; // Disable iCalendar cancellations.
         list($facetoface, $session, $user) = $this->create_facetoface_with_session_signup();
 
 		$signup = \mod_facetoface\signup::create($user->id, new \mod_facetoface\seminar_event($session->id));
 		$signup->switch_state(\mod_facetoface\signup\state\declined::class);
 
 		$this->redirectMessages();
-		\mod_facetoface\notice_sender::decline($signup);
+        \mod_facetoface\notice_sender::decline($signup);
 
 		$records = $DB->get_records("facetoface_notification_hist", ['sessionid' => $session->id, 'ical_method' => 'REQUEST']);
 

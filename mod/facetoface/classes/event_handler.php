@@ -194,8 +194,7 @@ class event_handler {
         if ($seminarevent->is_first_started() || $signup->get_attendance_processed()) {
             return;
         }
-
-        notice_sender::confirm_booking($signup, MDL_F2F_BOTH);
+        notice_sender::confirm_booking($signup, static::get_ical_notification_type($signup));
     }
 
     /**
@@ -205,7 +204,7 @@ class event_handler {
      */
     public static function send_notification_waitlisted(\mod_facetoface\event\booking_waitlisted $event) {
         $signup = $event->get_signup();
-        notice_sender::confirm_waitlist($signup, MDL_F2F_BOTH);
+        notice_sender::confirm_waitlist($signup, static::get_ical_notification_type($signup));
     }
 
     /**
@@ -293,5 +292,20 @@ class event_handler {
         $DB->execute($sql, ['jobassignmentid' => $event->objectid]);
 
         return true;
+    }
+
+    /**
+     * The ical attachment type, or MDL_F2F_TEXT to disable ical attachments
+     * @param signup $signup
+     * @return int
+     */
+    private static function get_ical_notification_type(signup $signup): int {
+        // MDL_F2F_NONE - send nothing
+        // MDL_F2F_TEXT - send email only and no ical
+        // MDL_F2F_BOTH - send email and ical
+        return (
+            $signup->get_notificationtype() == MDL_F2F_NONE ||
+            $signup->get_notificationtype() == MDL_F2F_TEXT
+        ) ? MDL_F2F_TEXT : MDL_F2F_BOTH;
     }
 }

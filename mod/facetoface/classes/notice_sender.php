@@ -59,7 +59,7 @@ class notice_sender {
                 'type'          => MDL_F2F_NOTIFICATION_AUTO,
                 'conditiontype' => MDL_F2F_CONDITION_BOOKING_REQUEST_MANAGER
             ];
-            return static::send($signup, $params);
+            return static::send($signup, $params, static::get_ical_notification_type($signup));
         }
         return 'error:nomanagersemailset';
     }
@@ -76,7 +76,7 @@ class notice_sender {
             'conditiontype' => MDL_F2F_CONDITION_BOOKING_REQUEST_ROLE
         ];
 
-        return static::send($signup, $params);
+        return static::send($signup, $params, static::get_ical_notification_type($signup));
     }
 
     /**
@@ -91,7 +91,7 @@ class notice_sender {
             'conditiontype' => MDL_F2F_CONDITION_BOOKING_REQUEST_ADMIN
         ];
 
-        return static::send($signup, $params);
+        return static::send($signup, $params, static::get_ical_notification_type($signup));
     }
 
     /**
@@ -477,7 +477,7 @@ class notice_sender {
 
         $notifyuser = true;
         $notifymanager = true;
-        if ($signup->get_skipusernotification()) {
+        if ($signup->get_skipusernotification() || $signup->get_notificationtype() == MDL_F2F_NONE) {
             $notifyuser = false;
         }
 
@@ -619,5 +619,20 @@ class notice_sender {
         $send($olds, true, $notifyuser, $notifymanager);
 
         return '';
+    }
+
+    /**
+     * The ical attachment type, or MDL_F2F_TEXT to disable ical attachments
+     * @param signup $signup
+     * @return int
+     */
+    private static function get_ical_notification_type(signup $signup): int {
+        // MDL_F2F_NONE - send nothing
+        // MDL_F2F_TEXT - send email only and no ical
+        // MDL_F2F_BOTH - send email and ical
+        return (
+            $signup->get_notificationtype() == MDL_F2F_NONE ||
+            $signup->get_notificationtype() == MDL_F2F_TEXT
+        ) ? MDL_F2F_TEXT : MDL_F2F_BOTH;
     }
 }
