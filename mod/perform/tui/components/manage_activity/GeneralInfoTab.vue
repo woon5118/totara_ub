@@ -58,6 +58,7 @@
         v-slot="{ id }"
         :label="$str('general_info_label_activity_type', 'mod_perform')"
         :required="useModalStyling || !isActive"
+        :no-input="!isActive"
       >
         <div>
           <Select
@@ -68,7 +69,9 @@
             :aria-describedby="$id('aria-describedby')"
             :options="activityTypes"
           />
-          <span v-else>{{ activityTypeName }}</span>
+          <span v-else class="tui-performManageActivityGeneralInfo">{{
+            activityTypeName
+          }}</span>
 
           <FormRowDetails
             v-show="useModalStyling"
@@ -78,6 +81,32 @@
           </FormRowDetails>
         </div>
       </FormRow>
+
+      <template v-if="!useModalStyling">
+        <h3 class="tui-performManageActivityGeneralInfo__heading">
+          {{
+            $str('activity_general_response_attribution_heading', 'mod_perform')
+          }}
+        </h3>
+
+        <FormRow
+          :label="
+            $str('activity_general_anonymous_responses_label', 'mod_perform')
+          "
+          :no-input="!isActive"
+        >
+          <ToggleButton
+            v-if="!isActive"
+            :value="activity.anonymous_responses"
+            toggle-first
+            text=""
+            @input="updateActivity({ anonymous_responses: $event })"
+          />
+          <span v-else>{{
+            activeToggleText(activity.anonymous_responses)
+          }}</span>
+        </FormRow>
+      </template>
 
       <FormRow
         :class="
@@ -115,12 +144,13 @@ import FormRowDetails from 'totara_core/components/form/FormRowDetails';
 import InputText from 'totara_core/components/form/InputText';
 import Select from 'totara_core/components/form/Select';
 import Textarea from 'totara_core/components/form/Textarea';
+import ToggleButton from 'totara_core/components/buttons/ToggleButton';
 import { ACTIVITY_STATUS_ACTIVE } from 'mod_perform/constants';
 
 //GraphQL
 import activityTypesQuery from 'mod_perform/graphql/activity_types';
 import createActivityMutation from 'mod_perform/graphql/create_activity';
-import updateGeneralInfoMutation from 'mod_perform/graphql/update_activity_general_info';
+import updateGeneralInfoMutation from 'mod_perform/graphql/update_activity';
 
 // This should correspond to mod_perform\models\activity\activity::NAME_MAX_LENGTH in the back end.
 const ACTIVITY_NAME_MAX_LENGTH = 1024;
@@ -135,6 +165,7 @@ export default {
     InputText,
     Select,
     Textarea,
+    ToggleButton,
   },
 
   props: {
@@ -257,13 +288,18 @@ export default {
 
       if (this.exists) {
         mutation = updateGeneralInfoMutation;
-        mutationName = 'mod_perform_update_activity_general_info';
+        mutationName = 'mod_perform_update_activity';
 
         variables = {
           activity_id: this.activity.id,
           name: this.activity.edit_name,
           description: this.activity.edit_description,
         };
+
+        // Add draft only updates.
+        if (!this.isActive) {
+          variables.anonymous_responses = this.activity.anonymous_responses;
+        }
 
         // Only mutate the type id if the user has explicitly changed the type.
         if (this.activity.type.id !== this.activityTypeSelection) {
@@ -287,6 +323,18 @@ export default {
       });
 
       return resultData[mutationName].activity;
+    },
+
+    /**
+     * Get a textual representation of a toggle switch for an active activity (setting is no longer available).
+     * @return {string}
+     */
+    activeToggleText(value) {
+      if (value) {
+        return this.$str('boolean_setting_text_enabled', 'mod_perform');
+      }
+
+      return this.$str('boolean_setting_text_disabled', 'mod_perform');
     },
 
     /**
@@ -345,7 +393,11 @@ export default {
   {
     "mod_perform": [
       "activity_general_tab_heading",
+      "activity_general_response_attribution_heading",
+      "activity_general_anonymous_responses_label",
       "activity_type_help_text",
+      "boolean_setting_text_enabled",
+      "boolean_setting_text_disabled",
       "general_info_label_activity_description",
       "general_info_label_activity_title",
       "general_info_label_activity_type",

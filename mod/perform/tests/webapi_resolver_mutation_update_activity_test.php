@@ -32,8 +32,8 @@ use totara_webapi\phpunit\webapi_phpunit_helper;
  * @group perform
  * Tests the mutation to create assignments for self or other
  */
-class mod_perform_webapi_resolver_mutation_update_activity_general_info_testcase extends advanced_testcase {
-    private const MUTATION = 'mod_perform_update_activity_general_info';
+class mod_perform_webapi_resolver_mutation_update_activity_testcase extends advanced_testcase {
+    private const MUTATION = 'mod_perform_update_activity';
 
     use webapi_phpunit_helper;
 
@@ -50,20 +50,13 @@ class mod_perform_webapi_resolver_mutation_update_activity_general_info_testcase
     }
 
     public function test_update_success(): void {
-        [$activity, $args] = $this->create_activity();
-        $expected_type = activity_type_model::load_by_id($args['type_id']);
+        [, $args] = $this->create_activity();
 
+        /** @var activity $activity */
         ['activity' => $activity] = $this->resolve_graphql_mutation(self::MUTATION, $args);
 
         // Return values should be updated
-        self::assertEquals($activity->id, $args['activity_id']);
-        self::assertEquals($activity->name, $args['name']);
-        self::assertEquals($activity->description, $args['description']);
-        self::assertEquals($activity->type->id,$args['type_id']);
-
-        $actual_type = $activity->type;
-        $this->assertEquals($expected_type->name, $actual_type->name, "wrong type name");
-        $this->assertEquals($expected_type->display_name, $actual_type->display_name, "wrong type display");
+        $this->assert_base_update_result($args, $activity);
     }
 
     public function test_activity_must_belong_to_user(): void {
@@ -72,14 +65,12 @@ class mod_perform_webapi_resolver_mutation_update_activity_general_info_testcase
         $user1 = $data_generator->create_user();
         $user2 = $data_generator->create_user();
 
-        [$created_activity, $args] = $this->create_activity($user1);
+        [, $args] = $this->create_activity($user1);
 
         /** @type activity $returned_activity */
         ['activity' => $returned_activity] = $this->resolve_graphql_mutation(self::MUTATION, $args);
 
-        $this->assertEquals($created_activity->id, $returned_activity->id);
-        $this->assertEquals($args['name'], $returned_activity->name);
-        $this->assertEquals($args['type_id'], $returned_activity->type->id);
+        $this->assert_base_update_result($args, $returned_activity);
 
         self::setUser($user2);
         $this->expectException(moodle_exception::class);
@@ -88,7 +79,7 @@ class mod_perform_webapi_resolver_mutation_update_activity_general_info_testcase
     }
 
     public function test_successful_ajax_call(): void {
-        [$activity, $args] = $this->create_activity();
+        [, $args] = $this->create_activity();
 
         $result = $this->parsed_graphql_operation(self::MUTATION, $args);
         $this->assert_webapi_operation_successful($result);
@@ -97,8 +88,7 @@ class mod_perform_webapi_resolver_mutation_update_activity_general_info_testcase
         $this->assertNotNull($result, 'null result');
 
         $result = $result['activity'];
-        $this->assertEquals($activity->id, $result['id']);
-        $this->assertEquals($args['name'], $result['name']);
+        $this->assert_base_update_result($args, $result);
 
         $actual_type_display_name = $result['type']['display_name'];
         $expected_type_display_name = activity_type_model::load_by_id($args['type_id'])->get_display_name();
@@ -135,8 +125,27 @@ class mod_perform_webapi_resolver_mutation_update_activity_general_info_testcase
             'name' => "Activity-1",
             'description' => "Description of Activity 1",
             'type_id' => $new_type_id,
+            'anonymous_responses' => true,
         ];
 
         return [$activity, $args];
     }
+
+    /**
+     * @param array $args
+     * @param array|object|activity $returned_activity
+     */
+    private function assert_base_update_result(array $args, $returned_activity): void {
+        if (is_array($returned_activity)) {
+            $returned_activity = (object) $returned_activity;
+            $returned_activity->type = (object) $returned_activity->type;
+        }
+
+        self::assertEquals($returned_activity->id, $args['activity_id']);
+        self::assertEquals($returned_activity->name, $args['name']);
+        self::assertEquals($returned_activity->description, $args['description']);
+        self::assertEquals($returned_activity->type->id, $args['type_id']);
+        self::assertTrue($returned_activity->anonymous_responses);
+    }
+
 }

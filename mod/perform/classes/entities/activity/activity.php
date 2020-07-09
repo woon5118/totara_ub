@@ -37,6 +37,7 @@ use core\orm\entity\relations\has_one;
  * @property int $course ID of parent course
  * @property string $description
  * @property string $name Activity name
+ * @property bool $anonymous_responses Are all responses anonymous on this activity.
  * @property int $status
  * @property int $created_at
  * @property int $updated_at
@@ -103,6 +104,25 @@ class activity extends entity {
      */
     public function settings(): has_many {
         return $this->has_many(activity_setting::class, 'activity_id');
+    }
+
+    /**
+     * Bool casting.
+     *
+     * @return bool
+     */
+    public function get_anonymous_responses_attribute(): bool {
+        return $this->get_attributes_raw()['anonymous_responses'] ?? false;
+    }
+
+    /**
+     * Bool casting.
+     *
+     * @param bool $value
+     * @return bool
+     */
+    public function set_anonymous_responses_attribute(bool $value): bool {
+        return (bool) $this->set_attribute_raw('anonymous_responses', $value);
     }
 
 }

@@ -27,19 +27,27 @@ use core\webapi\execution_context;
 use core\webapi\mutation_resolver;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\resolver\has_middleware;
+use mod_perform\models\activity\activity;
 use mod_perform\webapi\middleware\require_activity;
 use mod_perform\webapi\middleware\require_manage_capability;
 
-class update_activity_general_info implements mutation_resolver, has_middleware {
+class update_activity implements mutation_resolver, has_middleware {
 
     /**
      * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
         // The require_activity middleware loads the activity and passes it along via the args
+        /** @var activity $activity */
         $activity = $args['activity'];
 
-        $activity->update_general_info($args['name'], $args['description'] ?? null, $args['type_id'] ?? null);
+        $activity->set_general_info($args['name'], $args['description'] ?? null, $args['type_id'] ?? null);
+
+        if (!$activity->is_active()) {
+            $activity->set_attribution_settings($args['anonymous_responses']);
+        }
+
+        $activity->update();
 
         return ['activity' => $activity];
     }

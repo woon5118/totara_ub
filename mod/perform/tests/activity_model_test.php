@@ -75,7 +75,7 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
         $this->assertEquals($activity->type->name, $activity_type);
 
         $new_type_id = activity_type::load_by_name('feedback')->id;
-        $activity->update_general_info('New name for existing activity', 'New description', $new_type_id);
+        $activity->set_general_info('New name for existing activity', 'New description', $new_type_id)->update();
 
         // Assert in memory state is correct
         $this->assertEquals($activity->name, 'New name for existing activity');
@@ -101,7 +101,7 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
         $this->assertEquals($activity->description, $original_data->description);
         $this->assertEquals($activity->type->name, $activity_type);
 
-        $activity->update_general_info('New name for existing activity', null, null);
+        $activity->set_general_info('New name for existing activity', null, null)->update();
 
         // Assert in memory state is correct
         $this->assertEquals($activity->name, 'New name for existing activity');
@@ -111,6 +111,46 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
         $from_database = activity::load_by_id($activity->id);
         $this->assertEquals($from_database->name, 'New name for existing activity');
         $this->assertNull($from_database->description);
+    }
+
+    public function test_update_attribution_settings(): void {
+        $original_data = new activity_entity();
+        $original_data->name = 'Existing activity name';
+        $original_data->description = 'Existing activity description';
+
+        $activity_type = 'check-in';
+        $activity = $this->create_activity($original_data, $activity_type, draft::get_code());
+
+        $this->assertFalse($activity->anonymous_responses);
+
+        $activity->set_attribution_settings(true)->update();
+
+        // Assert in memory state is correct
+        $this->assertTrue($activity->anonymous_responses);
+
+        // Assert persisted state is correct
+        $from_database = activity::load_by_id($activity->id);
+        $this->assertTrue($from_database->anonymous_responses);
+    }
+
+    public function test_cant_update_attribution_settings_when_active(): void {
+        $original_data = new activity_entity();
+        $original_data->name = 'Existing activity name';
+        $original_data->description = 'Existing activity description';
+
+        $activity_type = 'check-in';
+        $activity = $this->create_activity($original_data, $activity_type, draft::get_code());
+
+        $original_data->refresh();
+        $original_data->status = active::get_code();
+        $original_data->save();
+
+        self::assertTrue($activity->is_active(), 'Failed precondition check, activity should be active.');
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('Attribution settings can not be updated when an activity is active');
+
+        $activity->set_attribution_settings(true);
     }
 
     /**
@@ -129,7 +169,7 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage($expected_message);
 
-        $activity->update_general_info($new_name, 'New description', null);
+        $activity->set_general_info($new_name, 'New description', null)->update();
     }
 
     public function test_update_general_should_not_update_type_for_active_activity() {
@@ -151,7 +191,7 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
 
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage("Cannot change type of activity " . $active_activity->id . " since it is no longer a draft");
-        $active_activity->update_general_info('New name for existing activity', null, 2);
+        $active_activity->set_general_info('New name for existing activity', null, 2)->update();
     }
 
     public function update_general_should_validate_new_attributes(): array {
@@ -187,7 +227,7 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
         $this->expectExceptionMessage('You can not update a entity that does not exist yet or was deleted.');
 
         $new_entity->exists_now = false;
-        $activity->update_general_info('name', 'description', null);
+        $activity->set_general_info('name', 'description', null)->update();
     }
 
     public function test_status() {
@@ -237,7 +277,7 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage('The following errors need to be fixed: "Name is required"');
         /** @var activity $activity */
-        $activity->update_general_info('   ', null, null);
+        $activity->set_general_info('   ', null, null)->update();
     }
 
     /**

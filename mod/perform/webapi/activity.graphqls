@@ -32,6 +32,7 @@ type mod_perform_activity {
   sections: [mod_perform_section!]!
   state_details: mod_perform_activity_state!
   settings: mod_perform_activity_settings!
+  anonymous_responses: Boolean! # If true all responses will be anonymized
 }
 
 """
@@ -303,11 +304,12 @@ extend type Mutation {
     type: core_id!
   ): mod_perform_activity_result!
 
-  mod_perform_update_activity_general_info(
+  mod_perform_update_activity(
     activity_id: core_id!
     name: param_text!
     description: param_text
     type_id: core_id
+    anonymous_responses: param_boolean
   ): mod_perform_activity_result!
 
   """

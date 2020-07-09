@@ -79,6 +79,11 @@ class behat_totara_tui extends behat_base {
     private const TOGGLE_BUTTON_LOCATOR = '.tui-toggleSwitch__ui';
     private const TOGGLE_BUTTON_LABEL_LOCATOR = '.tui-toggleSwitch__btn';
 
+    private const TUI_FORM_ROW_ACTION_LOCATOR = '.tui-formRow__action';
+    private const TUI_FORM_LABEL_LOCATOR = '.tui-formLabel';
+    private const TUI_FORM_ROW_CLASS = 'tui-formRow';
+    private const TUI_TOGGLE_BTN_UI_LOCATOR = '.tui-toggleBtn__ui';
+
     /**
      * @param string $locator CSS locator
      * @param string $element_name Human understandable name of the element - e.g. 'modal', 'popover', 'picker' etc
@@ -971,6 +976,50 @@ class behat_totara_tui extends behat_base {
         $this->assert_selected_option($timezone_select_node, 'timezone', $expected_value);
     }
 
+    /**
+     * @Then /^the "([^"]*)" display only tui form row should contain "([^"]*)"$/
+     * @param string $form_row_label
+     * @param string $expected_value
+     */
+    public function the_display_only_tui_form_row_should_contain(string $form_row_label, string $expected_value): void {
+        $form_row = $this->find_form_row_by_label($form_row_label);
+
+        $actual_content = $form_row->find('css', self::TUI_FORM_ROW_ACTION_LOCATOR . ' > *');
+
+        $tag = $actual_content->getTagName();
+
+        if ($tag !== 'span') {
+            $this->fail('Expected display only form row to contain a span');
+        }
+
+        if (trim($actual_content->getText()) !== $expected_value) {
+            $this->fail('Form row did not contain the expected text');
+        }
+    }
+
+    /**
+     * @Then /^the "([^"]*)" tui form row toggle switch should be "(on|off)"$/
+     * @param string $form_row_label
+     * @param string $expected_value
+     */
+    public function the_form_row_toggle_switch_should_be(string $form_row_label, string $expected_value): void {
+        $toggle_button = $this->find_form_row_toggle_button($form_row_label);
+
+        if ($toggle_button->hasClass('tui-toggleBtn__ui--aria-pressed') && $expected_value !== 'on') {
+            $this->fail('Toggle button was not ' . $expected_value);
+        }
+    }
+
+    /**
+     * @When /^I toggle the "([^"]*)" tui form row toggle switch$/
+     * @param string $form_row_label
+     */
+    public function i_toggle_form_row_toggle_switch(string $form_row_label): void {
+        $toggle_button = $this->find_form_row_toggle_button($form_row_label);
+
+        $toggle_button->click();
+    }
+
     /*
      * @param string $table_selector_type
      * @param string $table_locator
@@ -1181,6 +1230,31 @@ class behat_totara_tui extends behat_base {
         });
 
         return reset($matching_date_selectors);
+    }
+
+    private function find_form_row_by_label($form_row_label): NodeElement {
+        $labels = $this->find_all('css', self::TUI_FORM_LABEL_LOCATOR);
+
+        /** @var NodeElement[] $found_labels */
+        $found_labels = array_filter($labels, function (NodeElement $element) use ($form_row_label) {
+            return trim($element->getText()) === $form_row_label;
+        });
+
+        $found_label = reset($found_labels);
+
+        $form_row = $found_label->getParent()->getParent();
+
+        if (!$form_row->hasClass(self::TUI_FORM_ROW_CLASS)) {
+            $this->fail('Label was not inside of a form row');
+        }
+
+        return $form_row;
+    }
+
+    private function find_form_row_toggle_button(string $form_row_label): ?NodeElement {
+        $form_row = $this->find_form_row_by_label($form_row_label);
+
+        return $form_row->find('css', self::TUI_TOGGLE_BTN_UI_LOCATOR);
     }
 
     private function assert_selected_option(NodeElement $select_node, string $name, string $expected_value): void {

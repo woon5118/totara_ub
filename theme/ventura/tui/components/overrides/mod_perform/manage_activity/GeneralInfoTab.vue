@@ -24,6 +24,10 @@
 .tui-performManageActivityGeneralInfo {
   &__heading {
     @include tui-font-heading-small();
+
+    & > * + * {
+      margin-top: var(--tui-gap-12);
+    }
   }
 
   &__modalBtnRow.tui-formRow {

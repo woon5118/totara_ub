@@ -47,6 +47,7 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
                 'name',
                 'status',
                 'description',
+                'anonymous_responses',
                 'created_at',
                 'updated_at',
                 'type_id',

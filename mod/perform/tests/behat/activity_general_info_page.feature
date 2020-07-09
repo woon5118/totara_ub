@@ -10,7 +10,6 @@ Feature: Create and update activity general info fields
       | My Test Activity #1 | My Test Activity #1 description | check-in      | true         | true           | Active          |
       | My Test Activity #2 | My Test Activity #2 description | check-in      | true         | true           | Draft           |
 
-
   Scenario: Populate the general info fields for a new activity
     Given I log in as "admin"
     And I navigate to the manage perform activities page
@@ -69,6 +68,28 @@ Feature: Create and update activity general info fields
       | My Test Activity #1 | Check-in | Active |
       | My Test Activity #2 | Feedback | Draft  |
 
+  Scenario: View and edit attribution and visibility settings
+    Given I log in as "admin"
+    And I navigate to the manage perform activities page
+
+    When I click on "My Test Activity #2" "link"
+    Then the "Content" tui tab should be active
+
+    When I click on "General" "link"
+    Then the "Anonymise responses" tui form row toggle switch should be "off"
+
+    When I toggle the "Anonymise responses" tui form row toggle switch
+    And I click on "Save changes" "button"
+    And I reload the page
+    And I click on "General" "link"
+    Then the "Anonymise responses" tui form row toggle switch should be "on"
+
+    When I toggle the "Anonymise responses" tui form row toggle switch
+    And I click on "Save changes" "button"
+    And I reload the page
+    And I click on "General" "link"
+    Then the "Anonymise responses" tui form row toggle switch should be "off"
+
   Scenario: Edit the general info fields can not be saved if title field only contains whitespace
     Given I log in as "admin"
     And I navigate to the manage perform activities page
@@ -83,7 +104,7 @@ Feature: Create and update activity general info fields
     When I set the field "Activity title" to "  "
     Then the "Save changes" "button" should be disabled
 
-  Scenario: Type is read only when activity status is active
+  Scenario: Type and attribution settings are read only when activity status is active
     Given I log in as "admin"
     And I navigate to the manage perform activities page
 
@@ -92,6 +113,7 @@ Feature: Create and update activity general info fields
     Then I should see "Check-in" in the ".tui-formRow__action > div > span" "css_element"
     # the drop-down should not exist for active activity
     And ".tui-performManageActivityGeneralInfo .tui-select" "css_element" should not exist
+    And the "Anonymise responses" display only tui form row should contain "Disabled"
 
   Scenario: Click cancel button will revert to last saved changes
     Given I log in as "admin"

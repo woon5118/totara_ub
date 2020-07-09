@@ -24,6 +24,7 @@
 
 namespace mod_perform\models\activity;
 
+use coding_exception;
 use container_perform\backup\backup_helper;
 use container_perform\backup\restore_helper;
 use container_perform\perform as perform_container;
@@ -68,6 +69,7 @@ use totara_core\relationship\relationship;
  * @property-read collection|relationship[] $relationships
  * @property-read collection|track[] $tracks
  * @property-read activity_settings $settings
+ * @property-read bool anonymous_responses
  * @property bool multisection_setting
  * @property-read bool $can_clone
  *
@@ -82,6 +84,7 @@ class activity extends model {
         'course',
         'name',
         'description',
+        'anonymous_responses',
         'status',
         'created_at',
         'updated_at',
@@ -190,7 +193,7 @@ class activity extends model {
         global $DB;
 
         if ($status && $status !== draft::get_code() && $status != active::get_code()) {
-            throw new \coding_exception('Invalid activity status given');
+            throw new coding_exception('Invalid activity status given');
         }
 
         $modinfo = new \stdClass();
@@ -273,29 +276,48 @@ class activity extends model {
     }
 
     /**
-     * update activity details
+     * Set general activity details.
      *
      * @param string $name
      * @param string|null $description
      * @param int $type_id
      * @return $this
-     * @throws \coding_exception
      */
-    public function update_general_info(string $name, ?string $description, ?int $type_id): self {
+    public function set_general_info(string $name, ?string $description, ?int $type_id): self {
         $entity = $this->entity;
         $entity->name = $name;
         $entity->description = $description;
 
         if (isset($type_id)) {
             if (!$this->is_draft()) {
-                throw new \coding_exception("Cannot change type of activity {$this->id} since it is no longer a draft");
+                throw new coding_exception("Cannot change type of activity {$this->id} since it is no longer a draft");
             }
             $entity->type_id = $type_id;
         }
 
         self::validate($entity);
 
-        $entity->update();
+        return $this;
+    }
+
+    /**
+     * Set attribution settings.
+     *
+     * @param bool $anonymous_responses
+     * @return $this
+     */
+    public function set_attribution_settings(bool $anonymous_responses): self {
+        if ($this->is_active()) {
+            throw new coding_exception('Attribution settings can not be updated when an activity is active');
+        }
+
+        $this->entity->anonymous_responses = $anonymous_responses;
+
+        return $this;
+    }
+
+    public function update(): self {
+        $this->entity->update();
 
         $this->entity->load_relation('type');
 
@@ -305,7 +327,7 @@ class activity extends model {
     /**
      * @param activity_entity $entity
      * @return void
-     * @throws \coding_exception
+     * @throws coding_exception
      */
     protected static function validate(activity_entity $entity): void {
         $problems = self::get_validation_problems($entity);
@@ -316,7 +338,7 @@ class activity extends model {
 
         $formatted_problems = self::format_validation_problems($problems);
 
-        throw new \coding_exception('The following errors need to be fixed: ' . $formatted_problems);
+        throw new coding_exception('The following errors need to be fixed: ' . $formatted_problems);
     }
 
     /**
@@ -457,11 +479,11 @@ class activity extends model {
      * Get the number of users that will be assigned to this activity upon activation.
      *
      * @return int|null Number of users, or null if the activity can't be activated yet.
-     * @throws \coding_exception if the activity has already been activated
+     * @throws coding_exception if the activity has already been activated
      */
     public function get_users_to_assign_count(): ?int {
         if (!$this->is_draft()) {
-            throw new \coding_exception("Activity {$this->id} has already been activated");
+            throw new coding_exception("Activity {$this->id} has already been activated");
         }
 
         if (!$this->can_activate()) {

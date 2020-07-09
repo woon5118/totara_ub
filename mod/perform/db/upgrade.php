@@ -70,5 +70,16 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020070100, 'perform');
     }
 
+    if ($oldversion < 2020070900) {
+        $table = new xmldb_table('perform');
+        $field = new xmldb_field('anonymous_responses',  XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'status', [0, 1]);
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2020070900, 'perform');
+    }
+
     return true;
 }
