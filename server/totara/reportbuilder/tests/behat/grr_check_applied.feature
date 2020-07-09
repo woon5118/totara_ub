@@ -18,8 +18,8 @@ Feature: Check global report restrictions default settings
     And I follow "Manage embedded reports"
   # Only check embedded reports that are likely to appear on the first page (to avoid having to navigate or increase page size)
     And I should see "No" in the "Alerts (View)" "table_row"
-    And I should see "No" in the "Appraisal Detail (View)" "table_row"
-    And I should see "No" in the "Appraisal Status (View)" "table_row"
+    And I should see "No" in the "Appraisal Detail (legacy) (View)" "table_row"
+    And I should see "No" in the "Appraisal Status (legacy) (View)" "table_row"
     And I should see "No" in the "Audience Admin Screen (View)" "table_row"
     And I should see "No" in the "Audience Orphaned Users (View)" "table_row"
     And I should see "No" in the "Audience members (View)" "table_row"

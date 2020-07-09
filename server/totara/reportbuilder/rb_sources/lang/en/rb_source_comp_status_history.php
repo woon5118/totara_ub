@@ -22,9 +22,9 @@
  * @subpackage reportbuilder
  */
 
-$string['sourcelabel'] = 'Performance';
+$string['sourcelabel'] = 'Legacy Performance';
 $string['sourcesummary'] = 'Learners\' progress on their assigned competencies.';
-$string['sourcetitle'] = 'Competency Status History';
+$string['sourcetitle'] = 'Competency Status History (legacy)';
 
 // Columns.
 $string['compnamecolumn'] = 'Competency Name';

@@ -22,9 +22,9 @@
  * @subpackage reportbuilder
  */
 
-$string['sourcelabel'] = 'Performance';
+$string['sourcelabel'] = 'Legacy Performance';
 $string['sourcesummary'] = 'Performance management appraisal details including the questions and responses provided by each appraisal user.';
-$string['sourcetitle'] = 'Appraisal Detail';
+$string['sourcetitle'] = 'Appraisal Detail (legacy)';
 
 
 // Columns.

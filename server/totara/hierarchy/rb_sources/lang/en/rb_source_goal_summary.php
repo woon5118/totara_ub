@@ -22,7 +22,7 @@
  * @subpackage reportbuilder
  */
 
-$string['sourcelabel'] = 'Performance';
+$string['sourcelabel'] = 'Goals';
 $string['sourcesummary'] = 'Company goals with summary details including number of users assigned and number of users per status.';
 $string['sourcetitle'] = 'Goal Summary';
 
