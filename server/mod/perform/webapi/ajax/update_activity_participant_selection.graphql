@@ -1,0 +1,13 @@
+mutation mod_perform_update_activity_participant_selection(
+  $activity_id: core_id!
+  $relationships: [mod_perform_update_activity_participant_selection_input!]!
+) {
+  mod_perform_update_activity_participant_selection(
+    activity_id: $activity_id
+    relationships: $relationships
+  ) {
+    activity {
+      id
+    }
+  }
+}

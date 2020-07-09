@@ -1,0 +1,13 @@
+mutation mod_perform_update_manual_participants(
+  $activity_id: core_id!
+  $participants: [mod_perform_update_manual_participants_input!]!
+) {
+  mod_perform_update_manual_participants(
+    activity_id: $activity_id
+    participants: $participants
+  ) {
+    activity {
+      id
+    }
+  }
+}

@@ -1,6 +1,94 @@
+"""
+Manual relationship and it's associated calculated relationship for an activity.
+"""
+type mod_perform_manual_relationship {
+  activity: mod_perform_activity!
+  manual_relationship: mod_perform_dummy_relationship! # DUMMY RELATIONSHIP - MUST CHANGE THIS TO CORE RELATIONSHIP
+  selector_relationship: totara_core_relationship!
+}
+
+"""
+Options for manual relationships to be set at an activity level.
+"""
+type mod_perform_activity_manual_relationship_selector_options {
+  manual_relationships: [mod_perform_manual_relationship!]!
+  selector_options: [totara_core_relationship!] # Options are only given when allowed to edit i.e. when activity is draft
+}
+
+"""
+Manual relationships that can have the participants specified by the user for a particular activity.
+"""
+type mod_perform_manual_participant_activity {
+  activity: mod_perform_activity!
+  manual_relationships: [mod_perform_dummy_relationship!]! # DUMMY RELATIONSHIP - MUST CHANGE THIS TO CORE RELATIONSHIP
+}
+
 extend type Query {
   """
   Returns all relationships between users that can be used for performance activities.
   """
   mod_perform_relationships(activity_id: core_id!): [totara_core_relationship!]!
+
+  """
+  Get the options for manual relationships to be set at an activity level by an admin.
+  """
+  mod_perform_manual_relationship_selector_options(
+    activity_id: core_id!
+  ): mod_perform_activity_manual_relationship_selector_options!
+
+  """
+  Get the activities and their manual relationships that the current user can set the participants for.
+  """
+  mod_perform_manual_participant_activities: [mod_perform_manual_participant_activity]!
+}
+
+"""
+Input for selecting a relationships for a manual participant role.
+"""
+input mod_perform_update_activity_participant_selection_input {
+  manual_relationship_id: core_id!
+  selected_relationship_id: core_id!
+}
+
+"""
+Input for selecting a relationships for a manual participant role.
+"""
+input mod_perform_update_manual_participants_input {
+  manual_relationship_id: core_id!
+  user_ids: [core_id]!
+}
+
+"""
+Mutation return type
+"""
+type mod_perform_update_relationship_result {
+  activity: mod_perform_activity!
+}
+
+extend type Mutation {
+  """
+  Update the relationships for the manual participant roles for the activity.
+  """
+  mod_perform_update_activity_participant_selection(
+    activity_id: core_id!
+    relationships: [mod_perform_update_activity_participant_selection_input!]!
+  ): mod_perform_update_relationship_result!
+  """
+  Update the relationships for the manual participant roles.
+  """
+  mod_perform_update_manual_participants(
+    activity_id: core_id!
+    participants: [mod_perform_update_manual_participants_input!]!
+  ): mod_perform_update_relationship_result!
+}
+
+"""
+TODO: REMOVE IN TL-26142 / TL-26143
+DUMMY RELATIONSHIP - MUST REMOVE ONCE WE HAVE THE ACTUAL MANUAL RELATIONSHIPS IN!
+"""
+type mod_perform_dummy_relationship {
+  id: core_id!
+  name(format: core_format = PLAIN): String!
+  name_plural(format: core_format = PLAIN): String!
+  created_at(format: core_date_format = TIMESTAMP): core_date!
 }

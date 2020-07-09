@@ -1,0 +1,12 @@
+query mod_perform_manual_participant_activities {
+  mod_perform_manual_participant_activities {
+    activity {
+      id
+      name
+    }
+    manual_relationships {
+      id
+      name
+    }
+  }
+}
