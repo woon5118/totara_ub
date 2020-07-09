@@ -116,5 +116,12 @@ function xmldb_totara_appraisal_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019112600, 'totara', 'appraisal');
     }
 
+    if ($oldversion < 2020071000) {
+        if (!$DB->record_exists('appraisal_user_assignment', [])) {
+            set_config('enableappraisals', 3);
+        }
+        upgrade_plugin_savepoint(true, 2020071000, 'totara', 'appraisal');
+    }
+
     return true;
 }

@@ -110,5 +110,12 @@ function xmldb_totara_feedback360_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2017110700, 'totara', 'feedback360');
     }
 
+    if ($oldversion < 2020071000) {
+        if (!$DB->record_exists('feedback360_user_assignment', [])) {
+            set_config('enablefeedback360', 3);
+        }
+        upgrade_plugin_savepoint(true, 2020071000, 'totara', 'feedback360');
+    }
+
     return true;
 }
