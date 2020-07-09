@@ -795,12 +795,14 @@ class track extends model {
         }
 
         $user_ids = $user_assignments->pluck('subject_user_id');
-        $job_assignment_ids = $user_assignments
-            ->filter('job_assignment_id',
+        $job_assignment_ids = $user_assignments->pluck('job_assignment_id');
+        if (!empty($job_assignment_ids)) {
+            $job_assignment_ids = array_filter($job_assignment_ids,
                 function ($job_assignment_id) {
                     return $job_assignment_id !== null;
                 }
-            )->pluck('job_assignment_id');
+            );
+        }
 
         return $resolver->set_parameters(
             $this->schedule_dynamic_from,

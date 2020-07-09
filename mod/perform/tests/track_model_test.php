@@ -23,10 +23,13 @@
  */
 
 use core\collection;
+use core\orm\collection as orm_collection;
 use core\orm\entity\entity;
 use core\orm\query\builder;
 use mod_perform\dates\date_offset;
+use mod_perform\dates\resolvers\date_resolver;
 use mod_perform\dates\resolvers\dynamic\dynamic_source;
+use mod_perform\dates\resolvers\dynamic\job_assignment_start_date;
 use mod_perform\dates\resolvers\dynamic\user_creation_date;
 use mod_perform\dates\resolvers\dynamic\user_custom_field;
 use mod_perform\entities\activity\track as track_entity;
@@ -35,6 +38,7 @@ use mod_perform\models\activity\track;
 use mod_perform\models\activity\track_status;
 use PHPUnit\Framework\MockObject\MockObject;
 use totara_core\dates\date_time_setting;
+use totara_job\job_assignment;
 
 /**
  * @coversDefaultClass track.
@@ -687,4 +691,40 @@ class mod_perform_track_model_testcase extends advanced_testcase {
         self::assertNull($track->schedule_dynamic_source);
     }
 
+    public function test_get_date_resolver(): void {
+        $this->setAdminUser();
+
+        /** @var track $track */
+        $track = $this->create_activity_track('ACTIVE');
+        /** @var dynamic_source $dynamic_source */
+        $dynamic_source = (new job_assignment_start_date())->get_options()->first();
+        /** @var date_offset $offset */
+        $offset = new date_offset(1, date_offset::UNIT_DAY, date_offset::DIRECTION_AFTER);
+
+        /** @var track_entity $track_entity */
+        $track_entity = track_entity::repository()->find($track->get_id());
+
+        // Update method sets flag because our test params are different from default data.
+        $track->set_schedule_open_dynamic($offset, $dynamic_source);
+
+        // Just checking that get_date_resolver can handle collection with and without subject_user_id and job_assignment_id values
+        /** @var date_resolver $resolver */
+        $resolver = $track->get_date_resolver(orm_collection::new([['id' => 1]]));
+        $this->assertNotNull($resolver);
+
+        $resolver = $track->get_date_resolver(orm_collection::new([['id' => 1, 'subject_user_id' => 2]]));
+        $this->assertNotNull($resolver);
+
+        $resolver = $track->get_date_resolver(orm_collection::new([['id' => 1, 'subject_user_id' => 2, 'job_assignment_id' => 3]]));
+        $this->assertNotNull($resolver);
+
+        $resolver = $track->get_date_resolver(orm_collection::new(
+            [
+                ['id' => 1],
+                ['id' => 1, 'subject_user_id' => 2],
+                ['id' => 1, 'subject_user_id' => 2, 'job_assignment_id' => 3],
+            ]
+        ));
+        $this->assertNotNull($resolver);
+    }
 }
