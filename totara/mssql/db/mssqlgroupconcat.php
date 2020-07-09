@@ -330,6 +330,13 @@ DROP TABLE #tmpErrors
 
 -------------------------------------------------------------------------------------------------------------------
 GO
-EOT;
 
+-------------------------------------------------------------------------------------------------------------------
+--Turn CONCAT_NULL_YIELDS_NULL on
+
+SET CONCAT_NULL_YIELDS_NULL ON
+
+GO
+EOT;
+$mssqlgroup[] = 'SET CONCAT_NULL_YIELDS_NULL ON';
 return array('sql' => $mssqlgroup, 'text' => $sqltext);
