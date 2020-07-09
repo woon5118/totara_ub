@@ -24,6 +24,10 @@
 namespace mod_perform\dates\resolvers\dynamic;
 
 use core\collection;
+use core\orm\query\builder;
+use mod_perform\entities\activity\subject_instance;
+use mod_perform\entities\activity\track;
+use mod_perform\entities\activity\track_user_assignment;
 
 class another_activity_date extends base_dynamic_date_resolver {
 
@@ -34,7 +38,25 @@ class another_activity_date extends base_dynamic_date_resolver {
      * @inheritDoc
      */
     protected function resolve(): void {
-        $this->date_map = [];
+        $timestamp_field_name = ($this->option_key === self::ACTIVITY_COMPLETED_DAY)
+            ? 'completed_at'
+            : 'created_at';
+        $custom_data = json_decode($this->get_custom_data(), true);
+        $this->date_map = builder::create()
+            ->select(['si.subject_user_id', "max(si.{$timestamp_field_name}) as user_reference_date"])
+            ->from(subject_instance::TABLE , 'si')
+            ->join([track_user_assignment::TABLE, 'tua'], 'si.track_user_assignment_id', 'id')
+            ->join([track::TABLE, 'tr'], 'tua.track_id', 'id')
+            ->where('tr.activity_id', $custom_data['activity'])
+            ->where_not_null("si.{$timestamp_field_name}")
+            ->where_in('si.subject_user_id', $this->reference_user_ids)
+            ->group_by('si.subject_user_id')
+            ->get()
+            ->map(function ($row) {
+                // Using map (rather than pluck) to preserve keys.
+                return $row->user_reference_date;
+            })
+            ->all(true);
     }
 
     /**
