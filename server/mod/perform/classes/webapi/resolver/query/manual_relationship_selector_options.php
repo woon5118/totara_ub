@@ -29,6 +29,7 @@ use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
 use mod_perform\webapi\middleware\require_activity;
 use mod_perform\webapi\middleware\require_manage_capability;
+use totara_core\entities\relationship;
 
 /**
  * Get the options for manual relationships to be set at an activity level by an admin.
@@ -65,35 +66,31 @@ class manual_relationship_selector_options implements query_resolver, has_middle
     public static function get_dummy_data(\mod_perform\models\activity\activity $activity): array {
         $core_relationships = \totara_core\entities\relationship::repository()
             ->with('resolvers')
+            ->where('type', relationship::TYPE_STANDARD)
             ->order_by('id')
             ->limit(3)
             ->get()
             ->map_to(\totara_core\relationship\relationship::class);
         $subject_relationship = $core_relationships->first();
 
-        $dummy_manual_relationships = [
-            ['name' => 'Peer', 'id' => 4],
-            ['name' => 'Client', 'id' => 5],
-            ['name' => 'Mentor', 'id' => 6],
-            ['name' => 'Reviewer', 'id' => 7],
-        ];
+        $manual_relationships = \totara_core\entities\relationship::repository()
+            ->with('resolvers')
+            ->where('type', relationship::TYPE_MANUAL)
+            ->order_by('id')
+            ->get()
+            ->map_to(\totara_core\relationship\relationship::class);
 
-        $dummy_relationships_to_return = [];
-        foreach ($dummy_manual_relationships as $i => $dummy) {
-            $dummy_relationship = (object) array_merge($dummy, [
-                'created_at' => time(),
-                'name_plural' => $dummy['name'] . 's',
-            ]);
-
-            $dummy_relationships_to_return[] = (object) [
+        $relationships_to_return = [];
+        foreach ($manual_relationships as $i => $manual_relationship) {
+            $relationships_to_return[] = (object) [
                 'activity' => $activity,
-                'manual_relationship' => $dummy_relationship,
+                'manual_relationship' => $manual_relationship,
                 'selector_relationship' => $subject_relationship,
             ];
         }
 
         $data = [
-            'manual_relationships' => $dummy_relationships_to_return,
+            'manual_relationships' => $relationships_to_return,
         ];
 
         if ($activity->is_draft()) {

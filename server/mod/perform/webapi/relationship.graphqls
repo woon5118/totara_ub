@@ -3,7 +3,7 @@ Manual relationship and it's associated calculated relationship for an activity.
 """
 type mod_perform_manual_relationship {
   activity: mod_perform_activity!
-  manual_relationship: mod_perform_dummy_relationship! # DUMMY RELATIONSHIP - MUST CHANGE THIS TO CORE RELATIONSHIP
+  manual_relationship: totara_core_relationship!
   selector_relationship: totara_core_relationship!
 }
 
@@ -20,7 +20,7 @@ Manual relationships that can have the participants specified by the user for a 
 """
 type mod_perform_manual_participant_activity {
   activity: mod_perform_activity!
-  manual_relationships: [mod_perform_dummy_relationship!]! # DUMMY RELATIONSHIP - MUST CHANGE THIS TO CORE RELATIONSHIP
+  manual_relationships: [totara_core_relationship!]!
 }
 
 extend type Query {
@@ -80,15 +80,4 @@ extend type Mutation {
     activity_id: core_id!
     participants: [mod_perform_update_manual_participants_input!]!
   ): mod_perform_update_relationship_result!
-}
-
-"""
-TODO: REMOVE IN TL-26142 / TL-26143
-DUMMY RELATIONSHIP - MUST REMOVE ONCE WE HAVE THE ACTUAL MANUAL RELATIONSHIPS IN!
-"""
-type mod_perform_dummy_relationship {
-  id: core_id!
-  name(format: core_format = PLAIN): String!
-  name_plural(format: core_format = PLAIN): String!
-  created_at(format: core_date_format = TIMESTAMP): core_date!
 }

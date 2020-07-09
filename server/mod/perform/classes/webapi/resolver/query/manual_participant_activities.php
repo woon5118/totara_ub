@@ -29,6 +29,7 @@ use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
+use totara_core\entities\relationship;
 
 /**
  * Get the activities and their manual relationships that the current user can set the participants for.
@@ -66,25 +67,19 @@ class manual_participant_activities implements query_resolver, has_middleware {
     public static function get_dummy_data(): array {
         $activities = self::get_dummy_activities();
 
-        $dummy_manual_relationships = [
-            ['name' => 'Peer', 'id' => 4],
-            ['name' => 'Client', 'id' => 5],
-            ['name' => 'Mentor', 'id' => 6],
-            ['name' => 'Reviewer', 'id' => 7],
-        ];
+        $manual_relationships = relationship::repository()
+            ->where('type', relationship::TYPE_MANUAL)
+            ->get()
+            ->map_to(\totara_core\relationship\relationship::class)
+            ->all();
 
         $data_to_return = [];
         foreach ($activities as $activity) {
             $item = ['activity' => $activity, 'manual_relationships' => []];
 
-            foreach ($dummy_manual_relationships as $i => $dummy) {
-                $dummy_relationship = (object) array_merge($dummy, [
-                    'created_at' => time(),
-                    'name_plural' => $dummy['name'] . 's',
-                ]);
-
+            foreach ($manual_relationships as $i => $manual) {
                 if (random_int(0, 1)) {
-                    $item['manual_relationships'][] = $dummy_relationship;
+                    $item['manual_relationships'][] = $manual;
                 }
             }
 

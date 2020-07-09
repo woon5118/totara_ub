@@ -1239,5 +1239,25 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020072700, 'totara', 'core');
     }
 
+    if ($oldversion < 2020072702) {
+
+        // Define field type to be added to totara_core_relationship.
+        $table = new xmldb_table('totara_core_relationship');
+        $field = new xmldb_field('component', XMLDB_TYPE_CHAR, '100', null, null, null, null, 'type');
+        // Conditionally launch add field type.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('type', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'created_at');
+        // Conditionally launch add field component.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Core savepoint reached.
+        upgrade_plugin_savepoint(true, 2020072702, 'totara', 'core');
+    }
+
     return true;
 }

@@ -31,6 +31,8 @@ use core\orm\entity\relations\has_many;
  * Relationship entity.
  *
  * @property-read int $id
+ * @property int $type
+ * @property string $component
  * @property int $created_at
  *
  * @property-read relationship_resolver[]|collection $resolvers
@@ -42,6 +44,14 @@ class relationship extends entity {
     public const TABLE = 'totara_core_relationship';
 
     public const CREATED_TIMESTAMP = 'created_at';
+    /**
+     * type for core relationship, also called calculated relationship this is being use in core, ex: subject, manager, appraiser
+     */
+    public const TYPE_STANDARD = 0;
+    /**
+     * type for manual relationship, this is being used in perform module, ex: peer, customer, mentor, reviewer
+     */
+    public const TYPE_MANUAL = 1;
 
     /**
      * The resolvers that are part of this relationship.

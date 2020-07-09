@@ -1242,10 +1242,12 @@ function totara_core_clear_preview_image_cache(?string $preview_mode = null): vo
  * update all corresponding relationship resolver table rows that use that class_name!
  *
  * @param string $resolver_class_name
+ * @param int $type
+ * @param string $component Plugin that the relationship is exclusive to.
  *
  * @since Totara 13.0
  */
-function totara_core_upgrade_create_relationship($resolver_class_name) {
+function totara_core_upgrade_create_relationship($resolver_class_name, $type = 0, $component = null) {
     global $DB;
 
     $record = $DB->get_record(
@@ -1257,9 +1259,11 @@ function totara_core_upgrade_create_relationship($resolver_class_name) {
         return;
     }
 
-    $DB->transaction(static function () use ($DB, $resolver_class_name) {
+    $DB->transaction(static function () use ($DB, $resolver_class_name, $type, $component) {
         $relationship_id = $DB->insert_record('totara_core_relationship', [
             'created_at' => time(),
+            'type' => $type,
+            'component' => $component,
         ]);
 
 
