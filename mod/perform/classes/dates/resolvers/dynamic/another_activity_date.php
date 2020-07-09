@@ -31,7 +31,6 @@ class another_activity_date extends base_dynamic_date_resolver {
     public const ACTIVITY_INSTANCE_CREATION_DAY = 'activity_instance_creation_day';
 
     /**
-     * @todo this method will resolve the date
      * @inheritDoc
      */
     protected function resolve(): void {
@@ -39,9 +38,9 @@ class another_activity_date extends base_dynamic_date_resolver {
     }
 
     /**
-     * return avaliable source options
+     * Return available source options.
+     *
      * @return collection
-     * @throws \coding_exception
      */
     public function get_options(): collection {
         $options = [

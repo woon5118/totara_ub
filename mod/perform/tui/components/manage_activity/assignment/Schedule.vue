@@ -191,18 +191,15 @@ export default {
       this.repeatingType = values.repeatingType;
 
       if (values.scheduleDynamic.dynamic_source) {
-        let selectedSource = this.dynamicDateSources
-          .filter(
-            item =>
-              `${item.resolver_class_name}--${item.option_key}` ==
-              values.scheduleDynamic.dynamic_source
-          )
-          .shift();
+        const selectedDynamicSource = this.getSelectedDynamicDateSourceFromValues(
+          values
+        );
+
         this.dynamicDateSettingComponent.name =
-          selectedSource.custom_setting_component;
+          selectedDynamicSource.custom_setting_component;
 
         this.dynamicDateSettingComponent.data = JSON.parse(
-          selectedSource.custom_data
+          selectedDynamicSource.custom_data
         );
       }
     },
@@ -410,18 +407,17 @@ export default {
         const dynamicDateSourceParts = form.scheduleDynamic.dynamic_source.split(
           '--'
         );
-        let customData = null;
-        if (
-          this.isDynamicCustomSettingSource(form.scheduleDynamic.dynamic_source)
-        ) {
-          customData = JSON.stringify(
-            form.scheduleDynamic.dynamicCustomSettings
-          );
-        }
+
+        const customData = Object.assign(
+          {},
+          this.getDynamicCustomSettingConfig(),
+          form.scheduleDynamic.dynamicCustomSettings
+        );
+
         gql.schedule_dynamic_source = {
           resolver_class_name: dynamicDateSourceParts[0],
           option_key: dynamicDateSourceParts[1],
-          custom_data: customData,
+          custom_data: JSON.stringify(customData),
         };
 
         gql.due_date_offset = null;
@@ -584,7 +580,7 @@ export default {
     /**
      * Get dynamic custom setting data
      * @param track
-     * @returns object
+     * @returns {object}
      */
     getDynamicCustomSettingData(track) {
       let data = {};
@@ -598,7 +594,7 @@ export default {
 
     /**
      * Get dynamic custom setting component
-     * @returns string
+     * @returns {string}
      */
     getDynamicCustomSettingComponent() {
       let componentName = null;
@@ -612,11 +608,25 @@ export default {
     },
 
     /**
-     * Get dynamic custom setting general configs
-     * @returns object
+     * Get the selected dynamic date source from the uniform values.
+     * @return {object}
+     */
+    getSelectedDynamicDateSourceFromValues(values) {
+      return this.dynamicDateSources
+        .filter(
+          item =>
+            `${item.resolver_class_name}--${item.option_key}` ==
+            values.scheduleDynamic.dynamic_source
+        )
+        .shift();
+    },
+
+    /**
+     * Get dynamic custom setting general configs.
+     * @returns {object}
      */
     getDynamicCustomSettingConfig() {
-      return { activityId: this.activityId };
+      return { this_activity_id: this.activityId };
     },
 
     /**
@@ -630,7 +640,8 @@ export default {
           item => `${item.resolver_class_name}--${item.option_key}` == optionKey
         )
         .shift();
-      return !(source.custom_setting_component === null);
+
+      return source.custom_setting_component !== null;
     },
 
     /**

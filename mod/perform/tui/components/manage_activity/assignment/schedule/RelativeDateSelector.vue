@@ -133,11 +133,11 @@
           :disabled="disabled"
         />
         <div
+          v-if="showCustomDynamicSetting"
           class="tui-performAssignmentScheduleRelativeDateSelector__reference-date-customSettings"
         >
           <component
             :is="dynamicSettingComponentFor()"
-            v-if="showCustomDynamicSetting"
             :data="dynamicDateSettingComponent.data"
             :config-data="dynamicDateSettingComponent.configData"
           />

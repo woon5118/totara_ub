@@ -66,6 +66,11 @@ abstract class base_dynamic_date_resolver implements dynamic_date_resolver {
     protected $custom_data;
 
     /**
+     * @var int|null
+     */
+    protected $now;
+
+    /**
      * Get one instance of each dynamic date resolver.
      *
      * @return collection
@@ -82,6 +87,29 @@ abstract class base_dynamic_date_resolver implements dynamic_date_resolver {
         );
 
         return collection::new(array_merge($from_this_plugin, $from_other_plugins));
+    }
+
+    /**
+     * Set the "now" time, primarily for testing purposes.
+     *
+     * @param int $now
+     * @return $this
+     */
+    public function set_time(int $now): self {
+        $this->now = $now;
+
+        return $this;
+    }
+
+
+    /**
+     * Get the "now" time.
+     * This method should be proffered over a direct time call to allow testability.
+     *
+     * @return int
+     */
+    protected function get_time(): int {
+        return $this->now ?? time();
     }
 
     /**

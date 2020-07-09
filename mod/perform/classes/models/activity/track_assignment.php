@@ -26,10 +26,12 @@ namespace mod_perform\models\activity;
 use core\collection;
 use core\orm\entity\model;
 use mod_perform\entities\activity\track_assignment as track_assignment_entity;
+use mod_perform\entities\activity\track_user_assignment;
 use mod_perform\user_groups\grouping;
 
 /**
  * Represents a single performance activity track assignment.
+ * @property-read \core\orm\collection|track_user_assignment[] $user_assignments
  */
 class track_assignment extends model {
     /**
@@ -49,7 +51,11 @@ class track_assignment extends model {
         'created_by',
         'created_at',
         'updated_at',
-        'expand'
+        'expand',
+    ];
+
+    protected $model_accessor_whitelist = [
+        'user_assignments',
     ];
 
     /**

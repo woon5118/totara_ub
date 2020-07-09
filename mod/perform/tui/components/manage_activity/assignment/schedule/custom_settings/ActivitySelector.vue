@@ -19,26 +19,28 @@
   @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
   @package mod_perform
 -->
-
 <template>
   <div>
-    <FormScope path="dynamicCustomSettings">
-      <FormSelect
-        :id="$id('relative-date-reference-date')"
-        name="activity"
-        :validations="v => [v.required()]"
-        :options="activityOptions"
-      />
-    </FormScope>
+    <Loader :loading="$apollo.loading">
+      <FormScope path="dynamicCustomSettings">
+        <FormSelect
+          :id="$id('relative-date-reference-date')"
+          :options="activityOptions"
+          :validations="v => [v.required()]"
+          name="activity"
+        />
+      </FormScope>
+    </Loader>
   </div>
 </template>
+
 <script>
 import { FormSelect, FormScope } from 'totara_core/components/uniform';
-
 import performActivitiesQuery from 'mod_perform/graphql/activities';
+import Loader from 'totara_core/components/loader/Loader';
 
 export default {
-  components: { FormSelect, FormScope },
+  components: { Loader, FormSelect, FormScope },
   props: {
     data: {
       type: Object,
@@ -57,13 +59,13 @@ export default {
   computed: {
     activityOptions() {
       let defaultOption = {
-        id: null,
+        id: undefined, // This must be undefined so it will match the uniform default value.
         label: this.$str(
           'schedule_dynamic_another_activity_select',
           'mod_perform'
         ),
       };
-      let option = this.activities
+      let options = this.activities
         .filter(item => item.id != this.configData.activityId)
         .map(item => {
           return {
@@ -71,8 +73,10 @@ export default {
             label: item.name,
           };
         });
-      option.unshift(defaultOption);
-      return option;
+
+      options.unshift(defaultOption);
+
+      return options;
     },
   },
   apollo: {
@@ -86,8 +90,8 @@ export default {
 
 <lang-strings>
   {
-  "mod_perform": [
-    "schedule_dynamic_another_activity_select"
-  ]
+    "mod_perform": [
+      "schedule_dynamic_another_activity_select"
+    ]
   }
 </lang-strings>
