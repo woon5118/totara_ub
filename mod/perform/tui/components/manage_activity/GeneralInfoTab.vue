@@ -244,6 +244,9 @@ export default {
      * @returns {boolean}
      */
     isActive() {
+      if(!this.value) {
+        return false;
+      }
       return this.value.state_details.name === ACTIVITY_STATUS_ACTIVE;
     },
   },
