@@ -43,7 +43,7 @@ Feature: Test unlocking an appraisal stage for a role
 
     # Activate appraisal.
     When I log in as "admin"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     And I click on "Activate" "link" in the "Appraisal1" "table_row"
     And I press "Activate"
     And I log out
@@ -77,7 +77,7 @@ Feature: Test unlocking an appraisal stage for a role
   Scenario: Check that an appraisal stage can be unlocked for all roles
     # Admin edits stage.
     When I log in as "admin"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     And I follow "Appraisal1"
     And I switch to "Assignments" tab
     And I click on "Edit" "link" in the "learner lastname" "table_row"
@@ -120,7 +120,7 @@ Feature: Test unlocking an appraisal stage for a role
   Scenario: Check that an appraisal stage can be unlocked for a learner
     # Admin edits stage
     When I log in as "admin"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     And I follow "Appraisal1"
     And I switch to "Assignments" tab
     And I click on "Edit" "link" in the "learner lastname" "table_row"

@@ -1,4 +1,4 @@
-@totara @totara_feedback360 @totara_core_menu
+@totara @totara_feedback360 @totara_core_menu @javascript
 Feature: Test 360 Feedback Main menu item
   In order to use 360 Feedback menu item
   As an admin

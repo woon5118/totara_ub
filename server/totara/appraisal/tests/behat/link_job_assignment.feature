@@ -58,7 +58,7 @@ Feature: Link appraisal with an appraisee job assignment.
       | Job assignment test | audience | AppAud |
 
     Given I log in as "admin"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     And I click on "Activate" "link" in the "Job assignment test" "table_row"
     And I press "Activate"
     And I log out

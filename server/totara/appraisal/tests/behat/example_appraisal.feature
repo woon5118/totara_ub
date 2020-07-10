@@ -76,7 +76,7 @@ Feature: Complete the example appraisal
   @javascript
   Scenario: Complete example appraisal as learner and manager
     Given I log in as "admin"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     And I click on "Activate" "link" in the "Example appraisal" "table_row"
     And I should see "There are no assigned learners."
     And I press "Back to appraisal"

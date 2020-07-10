@@ -25,18 +25,23 @@ namespace totara_feedback360\quickaccessmenu;
 
 use \totara_core\quickaccessmenu\group;
 use \totara_core\quickaccessmenu\item;
+use \totara_core\advanced_feature;
 
 class general implements \totara_core\quickaccessmenu\provider {
 
     public static function get_items(): array {
-        return [
-            item::from_provider(
-                'managefeedback360',
-                group::get(group::PERFORM),
-                new \lang_string('feedback360:utf8', 'totara_feedback360'),
-                2000
-            ),
-        ];
+        if (advanced_feature::is_disabled('appraisals') && advanced_feature::is_enabled('feedback360')) {
+            return [
+                item::from_provider(
+                    'managefeedback360',
+                    group::get(group::PERFORM),
+                    new \lang_string('legacyfeatures', 'totara_appraisal'),
+                    6000
+                ),
+            ];
+        } else {
+            return [];
+        }
     }
 
 }

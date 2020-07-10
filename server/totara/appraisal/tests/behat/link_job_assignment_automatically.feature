@@ -56,7 +56,7 @@ Feature: Automatically link an appraisee's job assignment on appraisal activatio
       | totara_job_allowmultiplejobs | 0 |
 
     # Activate appraisal.
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     And I click on "Activate" "link" in the "Appraisal1" "table_row"
     And I press "Activate"
     And I log out
@@ -76,7 +76,7 @@ Feature: Automatically link an appraisee's job assignment on appraisal activatio
 
     # Check that adding another audience to an active appraisal also auto-links job assignments.
     When I log in as "admin"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     And I follow "Appraisal1"
     And I follow "Assignments"
     And I select "Audience" from the "groupselector" singleselect
@@ -85,7 +85,7 @@ Feature: Automatically link an appraisee's job assignment on appraisal activatio
     And I press "Update"
     And I trigger cron
     And I am on site homepage
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     And I follow "Appraisal1"
     And I follow "Assignments"
     Then I should see "Appraisals Audience 2" in the "learner3 lastname" "table_row"

@@ -141,7 +141,6 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
 
         // Needed because of capability checks.
         $this->setAdminUser();
-        $this->resetAfterTest();
 
         admin_get_root(true, false); // Force the admin tree to reload.
 
@@ -151,11 +150,11 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
             group::PLATFORM => [
                 'editusers' => 'Users',
                 'cohorts' => 'Audiences',
-                'userpolicies' => 'Permissions',
                 'positionmanage' => 'Positions',
                 'organisationmanage' => 'Organisations',
-                'managebadges' => 'Badges',
+                'userpolicies' => 'Permissions',
                 'competencymanage' => 'Competencies',
+                'managebadges' => 'Badges',
                 'manage_evidence_types' => 'Evidence',
                 'rbmanagereports' => 'Reports',
             ],
@@ -195,8 +194,6 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
             $this->markTestSkipped('Test is for standard distribution only.');
         }
 
-        $this->resetAfterTest();
-
         $roleid = $DB->get_field('role', 'id', ['shortname' => 'manager']);
         $user = $this->getDataGenerator()->create_user();
         $this->getDataGenerator()->role_assign($roleid, $user->id);
@@ -210,8 +207,8 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
                 'cohorts' => 'Audiences',
                 'positionmanage' => 'Positions',
                 'organisationmanage' => 'Organisations',
-                'managebadges' => 'Badges',
                 'competencymanage' => 'Competencies',
+                'managebadges' => 'Badges',
                 'manage_evidence_types' => 'Evidence',
                 'rbmanagereports' => 'Reports',
             ],
@@ -1088,10 +1085,6 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
         // Testing with competency assignment and perform activities explicitly switched off
         advanced_feature::disable('competency_assignment');
         advanced_feature::disable('performance_activities');
-        advanced_feature::enable('appraisals');
-        advanced_feature::enable('feedback360');
-
-        $this->resetAfterTest();
 
         $roleid = $DB->get_field('role', 'id', ['shortname' => 'manager']);
         $user = $this->getDataGenerator()->create_user();
@@ -1106,8 +1099,8 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
               'cohorts'            => 'Audiences',
               'positionmanage'     => 'Positions',
               'organisationmanage' => 'Organisations',
-              'managebadges'       => 'Badges',
               'competencymanage'   => 'Competencies',
+              'managebadges'       => 'Badges',
               'manage_evidence_types' => 'Evidence',
               'rbmanagereports'    => 'Reports',
             ],
@@ -1120,8 +1113,6 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
               'setup_content_marketplaces' => 'Content Marketplace'
             ],
             group::PERFORM => [
-                'manageappraisals'   => 'Appraisals',
-                'managefeedback360'  => '360° Feedback',
                 'goalmanage'         => 'Goals',
             ],
             group::CONFIGURATION => [
@@ -1141,8 +1132,8 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
                 'cohorts'            => 'Audiences',
                 'positionmanage'     => 'Positions',
                 'organisationmanage' => 'Organisations',
-                'managebadges'       => 'Badges',
                 'competencymanage'   => 'Competencies',
+                'managebadges'       => 'Badges',
                 'manage_evidence_types' => 'Evidence',
                 'rbmanagereports'    => 'Reports',
             ],
@@ -1155,8 +1146,6 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
                 'setup_content_marketplaces' => 'Content Marketplace'
             ],
             group::PERFORM => [
-                'manageappraisals'   => 'Appraisals',
-                'managefeedback360'  => '360° Feedback',
                 'goalmanage'         => 'Goals',
             ],
             group::CONFIGURATION => [
@@ -1184,8 +1173,8 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
                 'cohorts'            => 'Audiences',
                 'positionmanage'     => 'Positions',
                 'organisationmanage' => 'Organisations',
-                'managebadges'       => 'Badges',
                 'competencymanage'   => 'Competencies',
+                'managebadges'       => 'Badges',
                 'manage_evidence_types' => 'Evidence',
                 'rbmanagereports'    => 'Reports',
             ],
@@ -1198,8 +1187,6 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
                 'setup_content_marketplaces' => 'Content Marketplace'
             ],
             group::PERFORM => [
-                'manageappraisals'   => 'Appraisals',
-                'managefeedback360'  => '360° Feedback',
                 'goalmanage'         => 'Goals',
             ],
             group::CONFIGURATION => [
@@ -1217,8 +1204,8 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
                 'cohorts'            => 'Audiences',
                 'positionmanage'     => 'Positions',
                 'organisationmanage' => 'Organisations',
-                'managebadges'       => 'Badges',
                 'competencymanage'   => 'Competencies',
+                'managebadges'       => 'Badges',
                 'manage_evidence_types' => 'Evidence',
                 'rbmanagereports'    => 'Reports',
             ],
@@ -1230,8 +1217,6 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
                 'setup_content_marketplaces' => 'Content Marketplace'
             ],
             group::PERFORM => [
-                'manageappraisals'   => 'Appraisals',
-                'managefeedback360'  => '360° Feedback',
                 'goalmanage'         => 'Goals',
             ],
             group::CONFIGURATION => [

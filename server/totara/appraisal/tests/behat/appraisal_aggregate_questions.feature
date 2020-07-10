@@ -80,7 +80,7 @@ Feature: Perform basic actions for aggregate questions
 
   Scenario: Check available questions in the aggregate settings page.
     When I log in as "admin"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     And I click on "Aggregate Tests" "link"
     And I click on "Content" "link" in the ".tabtree" "css_element"
     And I click on "Stage1" "link" in the ".appraisal-stages" "css_element"
@@ -105,7 +105,7 @@ Feature: Perform basic actions for aggregate questions
 
   Scenario: Set aggregate question to manager view only
     When I log in as "admin"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     And I click on "Aggregate Tests" "link"
     And I click on "Content" "link" in the ".tabtree" "css_element"
     And I click on "Stage1-Aggregates" "link" in the ".appraisal-page-container" "css_element"
@@ -128,7 +128,7 @@ Feature: Perform basic actions for aggregate questions
 
   Scenario: Answer ratings questions and view aggregate question
     When I log in as "admin"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     And I click on "Aggregate Tests" "link"
     And I click on "Activate now" "link"
     And I press "Activate"
@@ -223,7 +223,7 @@ Feature: Perform basic actions for aggregate questions
 
   Scenario: Answer ratings questions and view aggregate question with zero values ignoring unanswered questions
     When I log in as "admin"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     And I click on "Zero Aggregate Tests" "link"
     And I click on "Activate now" "link"
     And I press "Activate"

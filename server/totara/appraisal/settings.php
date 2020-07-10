@@ -56,7 +56,7 @@ if ($hassiteconfig || has_any_capability($appraisalcaps, $systemcontext) || has_
 
     $ADMIN->add('appraisals',
         new admin_externalpage('managefeedback360',
-            new lang_string('managefeedback360', 'totara_feedback360'),
+            new lang_string('managefeedback360:utf8', 'totara_feedback360'),
             new moodle_url('/totara/feedback360/manage.php'),
             $feedbackcaps,
             advanced_feature::is_disabled('feedback360')

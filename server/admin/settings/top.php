@@ -47,7 +47,7 @@ $ADMIN->add('root', new admin_category('goals', get_string('goals', 'totara_hier
 $ADMIN->add('root', new admin_category('totara_plan', new lang_string('learningplans', 'totara_plan'),
     advanced_feature::is_disabled('learningplans')
 ));
-$ADMIN->add('root', new admin_category('appraisals', new lang_string('appraisals', 'totara_appraisal'),
+$ADMIN->add('root', new admin_category('appraisals', new lang_string('legacyfeatures', 'totara_appraisal'),
     (advanced_feature::is_disabled('appraisals') && advanced_feature::is_disabled('feedback360'))
 ));
 $ADMIN->add('root', new admin_category('courses', new lang_string('courses','admin')));

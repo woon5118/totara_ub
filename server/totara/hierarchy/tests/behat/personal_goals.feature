@@ -1,8 +1,10 @@
-@totara @totara_hierarchy @totara_hierarchy_goals @totara_customfield @javascript
+@totara @totara_hierarchy @totara_appraisal @totara_hierarchy_goals @totara_customfield @javascript
 Feature: Verify creation and use of personal goal types and custom fields.
 
   Background:
     Given I am on a totara site
+    And I enable the "appraisals" advanced feature
+    And I enable the "feedback360" advanced feature
     And the following "users" exist:
       | username | firstname | lastname | email             |
       | learner1 | Learner1  | Learner1 | learner1@example.com |
@@ -293,7 +295,7 @@ Feature: Verify creation and use of personal goal types and custom fields.
 
     # Add a personal goal review item to the appraisal.
     When I log in as "admin"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     And I follow "Appraisal 1"
     And I switch to "Content" tab
     And I set the field "datatype" to "Goals"
@@ -537,7 +539,7 @@ Feature: Verify creation and use of personal goal types and custom fields.
 
     # Add a personal goal review item to the appraisal.
     When I log in as "admin"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     And I follow "Appraisal 1"
     And I switch to "Content" tab
     And I set the field "datatype" to "Goals"

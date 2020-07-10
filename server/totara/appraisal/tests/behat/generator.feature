@@ -73,7 +73,7 @@ Feature: Verify appraisal data generators.
   Scenario: Verify appraisals have been created correctly.
 
     Given I log in as "admin"
-    When I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    When I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     And I follow "Appraisal 1"
     Then I should see "Appraisal 1"
 

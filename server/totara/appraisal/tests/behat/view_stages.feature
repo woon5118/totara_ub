@@ -19,7 +19,7 @@ Feature: View and navigate stages in appraisals
       | user     | fullname         | idnumber | manager  | position |
       | learner1 | Learner1 Day Job | l1ja     | manager1 | pos1     |
     And I log in as "admin"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     And I press "Create appraisal"
     And I set the following fields to these values:
       | Name        | Appraisal view test           |

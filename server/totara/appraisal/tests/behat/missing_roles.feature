@@ -50,7 +50,7 @@ Feature: Admin page that lists missing roles for one appraisal
   @javascript
   Scenario: Admin opens missing roles page for an appraisal
     When I log in as "admin"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     And I click on "Activate" "link" in the "Appraisal1" "table_row"
     And I press "Activate"
     And the following "appraisal_job_assignments" exist in "totara_appraisal" plugin:
@@ -68,7 +68,7 @@ Feature: Admin page that lists missing roles for one appraisal
   @javascript
   Scenario: Deleting managers answers are kept
     Given I log in as "admin"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     And I click on "Settings" "link" in the "Appraisal1" "table_row"
     And I switch to "Content" tab
     And I click on "Settings" "link" in the "//li[.//*[contains(text(), 'App1-Q1')]]" "xpath_element"

@@ -39,7 +39,7 @@ Feature: Make sure the real user is recorded in appraisals when using login-as
 
     # Activate appraisal.
     And I log in as "admin"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     And I click on "Activate" "link" in the "Appraisal1" "table_row"
     And I press "Activate"
 

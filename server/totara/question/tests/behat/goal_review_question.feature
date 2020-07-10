@@ -66,7 +66,7 @@ Feature: Custom Fields on goals are editable appraisals when they should be
     # the following is because I couldn't get the data generator to work with a review question
     And I log out
     And I log in as "admin"
-    And I navigate to "Appraisals > Manage appraisals" in site administration
+    And I navigate to "Legacy features > Manage Appraisals (legacy)" in site administration
     And I click on "Appraisal1" "link"
     And I switch to "Content" tab
     And I set the field "datatype" to "goals"

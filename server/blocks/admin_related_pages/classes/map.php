@@ -61,10 +61,14 @@ final class map implements \cacheable_object {
      */
     public function __construct(array $groups = [], array $items = []) {
         foreach ($groups as $group) {
-            $this->add_group($group);
+            if ($group instanceof group) {
+                $this->add_group($group);
+            }
         }
         foreach ($items as $item) {
-            $this->add_item($item);
+            if ($item instanceof item) {
+                $this->add_item($item);
+            }
         }
     }
 

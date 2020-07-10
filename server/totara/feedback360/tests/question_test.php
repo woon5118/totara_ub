@@ -24,7 +24,7 @@
 global $CFG;
 require_once($CFG->dirroot.'/totara/feedback360/tests/feedback360_testcase.php');
 
-class feedback360_question_test extends feedback360_testcase {
+class totara_feedback360_question_testcase extends feedback360_testcase {
     public function test_create() {
         $this->resetAfterTest();
         list($fdbck) = $this->prepare_feedback_with_users(1, 0);

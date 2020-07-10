@@ -46,7 +46,7 @@ Feature: Create a large appraisal
   Scenario: Create Large Appraisal
     Given I am on a totara site
     And I log in as "admin"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     And I create "50" appraisal questions on the page "Page 1"
     And I create "50" appraisal questions on the page "Page 2"
     And I create "50" appraisal questions on the page "Page 3"
@@ -82,7 +82,7 @@ Feature: Create a large appraisal
       | mysql |
     And I am on a totara site
     And I log in as "admin"
-    When I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    When I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     And I create "50" "text" appraisal questions on the page "Page 1"
     And I create "50" "text" appraisal questions on the page "Page 2"
     And I create "50" "text" appraisal questions on the page "Page 3"
@@ -112,7 +112,7 @@ Feature: Create a large appraisal
       | mysql |
     And I am on a totara site
     And I log in as "admin"
-    When I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    When I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     # 198 text questions are enough to cause a "Row size too large" error for MySQL.
     And I create "33" "text" appraisal questions on the page "Page 1"
     And I create "33" "text" appraisal questions on the page "Page 2"

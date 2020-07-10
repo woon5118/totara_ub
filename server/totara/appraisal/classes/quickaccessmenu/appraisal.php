@@ -25,18 +25,23 @@ namespace totara_appraisal\quickaccessmenu;
 
 use \totara_core\quickaccessmenu\group;
 use \totara_core\quickaccessmenu\item;
+use \totara_core\advanced_feature;
 
 class appraisal implements \totara_core\quickaccessmenu\provider {
 
     public static function get_items(): array {
-        return [
-            item::from_provider(
-                'manageappraisals',
-                group::get(group::PERFORM),
-                new \lang_string('appraisals', 'totara_appraisal'),
-                1000
-            ),
-        ];
+        if (advanced_feature::is_enabled('appraisals')) {
+            return [
+                item::from_provider(
+                    'manageappraisals',
+                    group::get(group::PERFORM),
+                    new \lang_string('legacyfeatures', 'totara_appraisal'),
+                    6000
+                ),
+            ];
+        } else {
+            return [];
+        }
     }
 
 }

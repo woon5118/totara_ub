@@ -27,7 +27,7 @@ Feature: Self evaluation feedback
 
   Scenario: Add a feedback template with optional self evaluation so that the learner can choose to self evaluate.
     Given I log in as "admin"
-    And I navigate to "Manage Feedback" node in "Site administration > Appraisals"
+    And I navigate to "Manage 360° Feedback (legacy)" node in "Site administration > Legacy features"
     And I press "Create Feedback"
     And I set the following fields to these values:
       | Name                 | Feedback 1                                     |
@@ -138,7 +138,7 @@ Feature: Self evaluation feedback
 
   Scenario: Add a feedback template with required self evaluation so that the learner can not decline self evaluate.
     Given I log in as "admin"
-    And I navigate to "Manage Feedback" node in "Site administration > Appraisals"
+    And I navigate to "Manage 360° Feedback (legacy)" node in "Site administration > Legacy features"
     And I press "Create Feedback"
     And I set the following fields to these values:
       | Name                | Feedback 1                                     |
@@ -222,7 +222,7 @@ Feature: Self evaluation feedback
 
   Scenario: Add a feedback template with disabled self evaluation so that the learner can not self evaluate.
     Given I log in as "admin"
-    And I navigate to "Manage Feedback" node in "Site administration > Appraisals"
+    And I navigate to "Manage 360° Feedback (legacy)" node in "Site administration > Legacy features"
     And I press "Create Feedback"
     And I set the following fields to these values:
       | Name                 | Feedback 1                                     |

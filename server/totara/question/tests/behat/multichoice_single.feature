@@ -1,4 +1,4 @@
-@totara @totara_question @totara_feedback360 @javascript
+@totara @totara_question @totara_appraisal @totara_feedback360 @javascript
 Feature: Admin interface of single answer multichoice question
   In order to create a multichoice question for feedback360 and appraisals
   I need to ensure correct behaviour of the admin interface
@@ -8,7 +8,7 @@ Feature: Admin interface of single answer multichoice question
     And I enable the "appraisals" advanced feature
     And I enable the "feedback360" advanced feature
     And I log in as "admin"
-    And I navigate to "Manage Feedback" node in "Site administration > Appraisals"
+    And I navigate to "Manage 360° Feedback (legacy)" node in "Site administration > Legacy features"
     And I click on "Create Feedback" "button"
     And I set the field "Name" to "test feedback"
     And I click on "Create Feedback" "button"

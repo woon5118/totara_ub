@@ -35,7 +35,7 @@ Feature: Appraisal question: Competencies from Learning Plan - test that changin
 
     # Set up appraisal.
     And I log in as "admin"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     And I press "Create appraisal"
     And I set the following fields to these values:
       | Name        | Appraisal competency test |
@@ -129,7 +129,7 @@ Feature: Appraisal question: Competencies from Learning Plan - test that changin
     # Log in as manager and go into the appraisal.
     Given I log in as "manager2"
     And I am on "Team" page
-    And I click on "Appraisals" "link" in the "firstname1 lastname1" "table_row"
+    And I click on "Appraisals (legacy)" "link" in the "firstname1 lastname1" "table_row"
     And I click on "Appraisal competency test" "link"
     And I press "Start"
     Then I should see "This is learner's answer"

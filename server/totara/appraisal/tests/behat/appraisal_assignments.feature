@@ -69,7 +69,7 @@ Feature: Test reported learners in appraisal assignments
 
   Scenario: Displayed assignments in Draft appraisals
     Given I log in as "admin"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     Then "Appraisal1" "link" should exist
     And I should see "5 (0 completed)" in the "Appraisal1" "table_row"
 
@@ -89,7 +89,7 @@ Feature: Test reported learners in appraisal assignments
       | learner5   | job1      | Job 1     | job1      | pos1     |
     And I run the scheduled task "\totara_cohort\task\cleanup_task"
     And I run the scheduled task "\totara_cohort\task\update_cohort_task"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     Then I should see "6 (0 completed)" in the "Appraisal1" "table_row"
 
     When I follow "Appraisal1"
@@ -111,7 +111,7 @@ Feature: Test reported learners in appraisal assignments
     And I run the scheduled task "\totara_cohort\task\cleanup_task"
     And I run the scheduled task "\totara_cohort\task\update_cohort_task"
     # And I run the scheduled task "\totara_appraisal\task\update_learner_assignments_task"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
 
     Then I should see "5 (0 completed)" in the "Appraisal1" "table_row"
 
@@ -126,14 +126,14 @@ Feature: Test reported learners in appraisal assignments
     And I should see "Manager Two"
 
     # Reports not available for Draft appraisal
-    When I navigate to "Reports" node in "Site administration > Appraisals"
+    When I navigate to "Reports" node in "Site administration > Legacy features"
     Then I should see "No appraisals are active."
     And I should see "No appraisals are inactive."
     And I log out
 
   Scenario: Displayed assignments in Active appraisals with none completed
     Given I log in as "admin"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     Then "Appraisal1" "link" should exist
 
     When I click on "Activate" "link" in the "Appraisal1" "table_row"
@@ -150,7 +150,7 @@ Feature: Test reported learners in appraisal assignments
     And I should see "Manager One"
     And I should see "Manager Two"
 
-    When I navigate to "Reports" node in "Site administration > Appraisals"
+    When I navigate to "Reports" node in "Site administration > Legacy features"
     Then I should see "0" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Overdue']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "5" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='On target']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "0" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Cancelled']/preceding-sibling::th)+1]" "xpath_element"
@@ -176,7 +176,7 @@ Feature: Test reported learners in appraisal assignments
 
   Scenario: Displayed assignments in Active appraisals with some completed
     Given I log in as "admin"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     Then "Appraisal1" "link" should exist
 
     When I click on "Activate" "link" in the "Appraisal1" "table_row"
@@ -194,7 +194,7 @@ Feature: Test reported learners in appraisal assignments
     And I log out
 
     When I log in as "admin"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     Then I should see "5 (1 completed)" in the "Appraisal1" "table_row"
 
     When I follow "Appraisal1"
@@ -207,7 +207,7 @@ Feature: Test reported learners in appraisal assignments
     And I should see "Manager One"
     And I should see "Manager Two"
 
-    When I navigate to "Reports" node in "Site administration > Appraisals"
+    When I navigate to "Reports" node in "Site administration > Legacy features"
     Then I should see "0" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Overdue']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "4" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='On target']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "0" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Cancelled']/preceding-sibling::th)+1]" "xpath_element"
@@ -233,7 +233,7 @@ Feature: Test reported learners in appraisal assignments
 
   Scenario: Displayed assignments in Closed appraisals with none completed
     Given I log in as "admin"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     Then "Appraisal1" "link" should exist
 
     When I click on "Activate" "link" in the "Appraisal1" "table_row"
@@ -259,7 +259,7 @@ Feature: Test reported learners in appraisal assignments
     And I should not see "Manager One"
     And I should not see "Manager Two"
 
-    When I navigate to "Reports" node in "Site administration > Appraisals"
+    When I navigate to "Reports" node in "Site administration > Legacy features"
     Then I should see "Closed" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Status']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "0" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Complete']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "5" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Incomplete']/preceding-sibling::th)+1]" "xpath_element"
@@ -284,7 +284,7 @@ Feature: Test reported learners in appraisal assignments
 
   Scenario: Displayed assignments in Closed appraisals with some completed
     Given I log in as "admin"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     Then "Appraisal1" "link" should exist
 
     When I click on "Activate" "link" in the "Appraisal1" "table_row"
@@ -302,7 +302,7 @@ Feature: Test reported learners in appraisal assignments
     And I log out
 
     When I log in as "admin"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     Then I should see "5 (1 completed)" in the "Appraisal1" "table_row"
     And "Close" "link" should exist in the "Appraisal1" "table_row"
 
@@ -324,7 +324,7 @@ Feature: Test reported learners in appraisal assignments
     And I should not see "Manager One"
     And I should not see "Manager Two"
 
-    When I navigate to "Reports" node in "Site administration > Appraisals"
+    When I navigate to "Reports" node in "Site administration > Legacy features"
     Then I should see "Closed" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Status']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "1" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Complete']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "4" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Incomplete']/preceding-sibling::th)+1]" "xpath_element"
@@ -349,7 +349,7 @@ Feature: Test reported learners in appraisal assignments
 
   Scenario: Displayed assignments in Active appraisals when members of the audience changes
     Given I log in as "admin"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     Then "Appraisal1" "link" should exist
 
     When I click on "Activate" "link" in the "Appraisal1" "table_row"
@@ -382,7 +382,7 @@ Feature: Test reported learners in appraisal assignments
     And I run the scheduled task "\totara_cohort\task\update_cohort_task"
     And I run the scheduled task "\totara_appraisal\task\update_learner_assignments_task"
     And I log in as "admin"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     Then I should see "6 (2 completed)" in the "Appraisal1" "table_row"
 
     When I follow "Appraisal1"
@@ -396,7 +396,7 @@ Feature: Test reported learners in appraisal assignments
     And I should see "Manager One"
     And I should see "Manager Two"
 
-    When I navigate to "Reports" node in "Site administration > Appraisals"
+    When I navigate to "Reports" node in "Site administration > Legacy features"
     Then I should see "0" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Overdue']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "4" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='On target']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "0" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Cancelled']/preceding-sibling::th)+1]" "xpath_element"
@@ -429,7 +429,7 @@ Feature: Test reported learners in appraisal assignments
     And I click on "Yes, delete" "button"
 
     # Before cron is run
-    When I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    When I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     Then I should see "6 (2 completed)" in the "Appraisal1" "table_row"
 
     When I follow "Appraisal1"
@@ -443,7 +443,7 @@ Feature: Test reported learners in appraisal assignments
     And I should see "Manager One"
     And I should see "Manager Two"
 
-    When I navigate to "Reports" node in "Site administration > Appraisals"
+    When I navigate to "Reports" node in "Site administration > Legacy features"
     Then I should see "0" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Overdue']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "4" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='On target']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "0" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Cancelled']/preceding-sibling::th)+1]" "xpath_element"
@@ -473,7 +473,7 @@ Feature: Test reported learners in appraisal assignments
     And I run the scheduled task "\totara_cohort\task\cleanup_task"
     And I run the scheduled task "\totara_cohort\task\update_cohort_task"
     And I run the scheduled task "\totara_appraisal\task\update_learner_assignments_task"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     Then I should see "5 (2 completed)" in the "Appraisal1" "table_row"
 
     When I follow "Appraisal1"
@@ -487,7 +487,7 @@ Feature: Test reported learners in appraisal assignments
     And I should see "Manager One"
     And I should see "Manager Two"
 
-    When I navigate to "Reports" node in "Site administration > Appraisals"
+    When I navigate to "Reports" node in "Site administration > Legacy features"
     Then I should see "0" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Overdue']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "3" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='On target']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "1" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Cancelled']/preceding-sibling::th)+1]" "xpath_element"
@@ -520,7 +520,7 @@ Feature: Test reported learners in appraisal assignments
     And I run the scheduled task "\totara_cohort\task\cleanup_task"
     And I run the scheduled task "\totara_cohort\task\update_cohort_task"
     And I run the scheduled task "\totara_appraisal\task\update_learner_assignments_task"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     Then I should see "6 (2 completed)" in the "Appraisal1" "table_row"
 
     When I follow "Appraisal1"
@@ -534,7 +534,7 @@ Feature: Test reported learners in appraisal assignments
     And I should see "Manager One"
     And I should see "Manager Two"
 
-    When I navigate to "Reports" node in "Site administration > Appraisals"
+    When I navigate to "Reports" node in "Site administration > Legacy features"
     Then I should see "0" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Overdue']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "4" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='On target']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "0" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Cancelled']/preceding-sibling::th)+1]" "xpath_element"
@@ -568,7 +568,7 @@ Feature: Test reported learners in appraisal assignments
     And I run the scheduled task "\totara_cohort\task\cleanup_task"
     And I run the scheduled task "\totara_cohort\task\update_cohort_task"
     And I run the scheduled task "\totara_appraisal\task\update_learner_assignments_task"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     Then I should see "5 (1 completed)" in the "Appraisal1" "table_row"
 
     When I follow "Appraisal1"
@@ -582,7 +582,7 @@ Feature: Test reported learners in appraisal assignments
     And I should see "Manager One"
     And I should see "Manager Two"
 
-    When I navigate to "Reports" node in "Site administration > Appraisals"
+    When I navigate to "Reports" node in "Site administration > Legacy features"
     Then I should see "0" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Overdue']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "4" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='On target']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "1" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Cancelled']/preceding-sibling::th)+1]" "xpath_element"
@@ -615,7 +615,7 @@ Feature: Test reported learners in appraisal assignments
     And I run the scheduled task "\totara_cohort\task\cleanup_task"
     And I run the scheduled task "\totara_cohort\task\update_cohort_task"
     And I run the scheduled task "\totara_appraisal\task\update_learner_assignments_task"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     Then I should see "6 (2 completed)" in the "Appraisal1" "table_row"
 
     When I follow "Appraisal1"
@@ -629,7 +629,7 @@ Feature: Test reported learners in appraisal assignments
     And I should see "Manager One"
     And I should see "Manager Two"
 
-    When I navigate to "Reports" node in "Site administration > Appraisals"
+    When I navigate to "Reports" node in "Site administration > Legacy features"
     Then I should see "0" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Overdue']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "4" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='On target']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "0" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Cancelled']/preceding-sibling::th)+1]" "xpath_element"
@@ -657,7 +657,7 @@ Feature: Test reported learners in appraisal assignments
 
   Scenario: Displayed assignments in Closed appraisals when members of the audience changes after closure
     Given I log in as "admin"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     Then "Appraisal1" "link" should exist
 
     When I click on "Activate" "link" in the "Appraisal1" "table_row"
@@ -684,7 +684,7 @@ Feature: Test reported learners in appraisal assignments
 
     # Close appraisal
     When I log in as "admin"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     Then "Close" "link" should exist in the "Appraisal1" "table_row"
     When I click on "Close" "link" in the "Appraisal1" "table_row"
     And I click on "sendalert" "checkbox"
@@ -699,7 +699,7 @@ Feature: Test reported learners in appraisal assignments
     And I run the scheduled task "\totara_cohort\task\cleanup_task"
     And I run the scheduled task "\totara_cohort\task\update_cohort_task"
     And I run the scheduled task "\totara_appraisal\task\update_learner_assignments_task"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     Then I should see "2 (2 completed)" in the "Appraisal1" "table_row"
 
     When I follow "Appraisal1"
@@ -715,7 +715,7 @@ Feature: Test reported learners in appraisal assignments
     And I should not see "Manager One"
     And I should not see "Manager Two"
 
-    When I navigate to "Reports" node in "Site administration > Appraisals"
+    When I navigate to "Reports" node in "Site administration > Legacy features"
     Then I should see "Closed" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Status']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "2" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Complete']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "3" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Incomplete']/preceding-sibling::th)+1]" "xpath_element"
@@ -748,7 +748,7 @@ Feature: Test reported learners in appraisal assignments
     And I run the scheduled task "\totara_cohort\task\cleanup_task"
     And I run the scheduled task "\totara_cohort\task\update_cohort_task"
     And I run the scheduled task "\totara_appraisal\task\update_learner_assignments_task"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     Then I should see "2 (2 completed)" in the "Appraisal1" "table_row"
 
     When I follow "Appraisal1"
@@ -763,7 +763,7 @@ Feature: Test reported learners in appraisal assignments
     And I should not see "Manager One"
     And I should not see "Manager Two"
 
-    When I navigate to "Reports" node in "Site administration > Appraisals"
+    When I navigate to "Reports" node in "Site administration > Legacy features"
     Then I should see "Closed" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Status']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "2" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Complete']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "3" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Incomplete']/preceding-sibling::th)+1]" "xpath_element"
@@ -796,7 +796,7 @@ Feature: Test reported learners in appraisal assignments
     And I run the scheduled task "\totara_cohort\task\cleanup_task"
     And I run the scheduled task "\totara_cohort\task\update_cohort_task"
     And I run the scheduled task "\totara_appraisal\task\update_learner_assignments_task"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     Then I should see "2 (2 completed)" in the "Appraisal1" "table_row"
 
     When I follow "Appraisal1"
@@ -811,7 +811,7 @@ Feature: Test reported learners in appraisal assignments
     And I should not see "Manager One"
     And I should not see "Manager Two"
 
-    When I navigate to "Reports" node in "Site administration > Appraisals"
+    When I navigate to "Reports" node in "Site administration > Legacy features"
     Then I should see "Closed" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Status']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "2" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Complete']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "3" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Incomplete']/preceding-sibling::th)+1]" "xpath_element"
@@ -838,7 +838,7 @@ Feature: Test reported learners in appraisal assignments
 
   Scenario: Displayed assignments in Closed appraisals when members of the audience changes
     Given I log in as "admin"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     Then "Appraisal1" "link" should exist
 
     When I click on "Activate" "link" in the "Appraisal1" "table_row"
@@ -873,7 +873,7 @@ Feature: Test reported learners in appraisal assignments
     And I run the scheduled task "\totara_cohort\task\cleanup_task"
     And I run the scheduled task "\totara_cohort\task\update_cohort_task"
     And I run the scheduled task "\totara_appraisal\task\update_learner_assignments_task"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     Then I should see "4 (2 completed)" in the "Appraisal1" "table_row"
 
     When I follow "Appraisal1"
@@ -886,7 +886,7 @@ Feature: Test reported learners in appraisal assignments
     And I should see "Manager One"
     And I should see "Manager Two"
 
-    When I navigate to "Reports" node in "Site administration > Appraisals"
+    When I navigate to "Reports" node in "Site administration > Legacy features"
     Then I should see "0" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Overdue']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "2" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='On target']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "1" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Cancelled']/preceding-sibling::th)+1]" "xpath_element"
@@ -918,7 +918,7 @@ Feature: Test reported learners in appraisal assignments
     And I run the scheduled task "\totara_cohort\task\cleanup_task"
     And I run the scheduled task "\totara_cohort\task\update_cohort_task"
     And I run the scheduled task "\totara_appraisal\task\update_learner_assignments_task"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     Then I should see "3 (1 completed)" in the "Appraisal1" "table_row"
 
     When I follow "Appraisal1"
@@ -931,7 +931,7 @@ Feature: Test reported learners in appraisal assignments
     And I should see "Manager One"
     And I should see "Manager Two"
 
-    When I navigate to "Reports" node in "Site administration > Appraisals"
+    When I navigate to "Reports" node in "Site administration > Legacy features"
     And I should see "0" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Overdue']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "2" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='On target']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "2" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Cancelled']/preceding-sibling::th)+1]" "xpath_element"
@@ -957,7 +957,7 @@ Feature: Test reported learners in appraisal assignments
 
     # Now Close the appraisal
     # Changes after closure should have no effect
-    When I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    When I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     Then "Close" "link" should exist in the "Appraisal1" "table_row"
     When I click on "Close" "link" in the "Appraisal1" "table_row"
     And I click on "sendalert" "checkbox"
@@ -977,7 +977,7 @@ Feature: Test reported learners in appraisal assignments
     And I should not see "Manager One"
     And I should not see "Manager Two"
 
-    When I navigate to "Reports" node in "Site administration > Appraisals"
+    When I navigate to "Reports" node in "Site administration > Legacy features"
     Then I should see "Closed" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Status']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "1" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Complete']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "3" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Incomplete']/preceding-sibling::th)+1]" "xpath_element"
@@ -1009,7 +1009,7 @@ Feature: Test reported learners in appraisal assignments
     And I run the scheduled task "\totara_cohort\task\cleanup_task"
     And I run the scheduled task "\totara_cohort\task\update_cohort_task"
     And I run the scheduled task "\totara_appraisal\task\update_learner_assignments_task"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     Then I should see "1 (1 completed)" in the "Appraisal1" "table_row"
 
     When I follow "Appraisal1"
@@ -1024,7 +1024,7 @@ Feature: Test reported learners in appraisal assignments
     And I should not see "Manager One"
     And I should not see "Manager Two"
 
-    When I navigate to "Reports" node in "Site administration > Appraisals"
+    When I navigate to "Reports" node in "Site administration > Legacy features"
     Then I should see "Closed" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Status']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "1" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Complete']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "3" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Incomplete']/preceding-sibling::th)+1]" "xpath_element"
@@ -1059,7 +1059,7 @@ Feature: Test reported learners in appraisal assignments
     And I run the scheduled task "\totara_cohort\task\update_cohort_task"
     And I run the scheduled task "\totara_appraisal\task\update_learner_assignments_task"
 
-    When I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    When I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     Then I should see "1 (1 completed)" in the "Appraisal1" "table_row"
 
     When I follow "Appraisal1"
@@ -1074,7 +1074,7 @@ Feature: Test reported learners in appraisal assignments
     And I should not see "Manager One"
     And I should not see "Manager Two"
 
-    When I navigate to "Reports" node in "Site administration > Appraisals"
+    When I navigate to "Reports" node in "Site administration > Legacy features"
     Then I should see "Closed" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Status']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "1" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Complete']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "3" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Incomplete']/preceding-sibling::th)+1]" "xpath_element"
@@ -1107,7 +1107,7 @@ Feature: Test reported learners in appraisal assignments
     And I run the scheduled task "\totara_cohort\task\cleanup_task"
     And I run the scheduled task "\totara_cohort\task\update_cohort_task"
     And I run the scheduled task "\totara_appraisal\task\update_learner_assignments_task"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     Then I should see "1 (1 completed)" in the "Appraisal1" "table_row"
 
     When I follow "Appraisal1"
@@ -1122,7 +1122,7 @@ Feature: Test reported learners in appraisal assignments
     And I should not see "Manager One"
     And I should not see "Manager Two"
 
-    When I navigate to "Reports" node in "Site administration > Appraisals"
+    When I navigate to "Reports" node in "Site administration > Legacy features"
     Then I should see "Closed" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Status']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "1" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Complete']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "3" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Incomplete']/preceding-sibling::th)+1]" "xpath_element"

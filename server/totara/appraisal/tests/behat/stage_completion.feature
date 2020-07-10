@@ -51,7 +51,7 @@ Feature: Test appraisal stage completion with missing roles
   @javascript
   Scenario: Verify stage not completed for learner with a manager
     Given I log in as "admin"
-    When I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    When I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     Then I should see "Appraisal1"
     And I should see "2 (0 completed)" in the "Appraisal1" "table_row"
     And I should see " Activate" in the "Appraisal1" "table_row"
@@ -104,7 +104,7 @@ Feature: Test appraisal stage completion with missing roles
   @javascript
   Scenario: Verify stage completed for learner without a manager after learner completed the stage
     Given I log in as "admin"
-    When I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    When I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     Then I should see "Appraisal1"
     And I should see "2 (0 completed)" in the "Appraisal1" "table_row"
     And I should see " Activate" in the "Appraisal1" "table_row"
@@ -146,7 +146,7 @@ Feature: Test appraisal stage completion with missing roles
   @javascript
   Scenario: Verify Manager is not required to complete the appraisal if he was assigned after the appraisal was completed
     Given I log in as "admin"
-    When I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    When I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     Then I should see "Appraisal1"
     And I should see "2 (0 completed)" in the "Appraisal1" "table_row"
     And I should see " Activate" in the "Appraisal1" "table_row"
@@ -218,7 +218,7 @@ Feature: Test appraisal stage completion with missing roles
   @javascript
   Scenario: Verify that the appraisal is completed if the manager is removed after the learner has completed all stages
     Given I log in as "admin"
-    When I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    When I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     Then I should see "Appraisal1"
     And I should see "2 (0 completed)" in the "Appraisal1" "table_row"
     And I should see " Activate" in the "Appraisal1" "table_row"
@@ -279,7 +279,7 @@ Feature: Test appraisal stage completion with missing roles
     Given I log in as "admin"
 
     # Add another stage
-    When I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    When I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     Then I should see "Appraisal1"
     And I follow "Appraisal1"
     And I click on "Content" "link" in the ".tabtree" "css_element"

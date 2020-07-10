@@ -29,7 +29,7 @@ Feature: Normal feedback
       | user5 | CH1    |
       | user6 | CH1    |
     And I log in as "admin"
-    And I navigate to "Manage Feedback" node in "Site administration > Appraisals"
+    And I navigate to "Manage 360° Feedback (legacy)" node in "Site administration > Legacy features"
     And I press "Create Feedback"
     And I set the following fields to these values:
       | Name               | Normal feedback                          |

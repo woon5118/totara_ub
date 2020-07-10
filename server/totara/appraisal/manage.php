@@ -74,6 +74,7 @@ switch ($action) {
 }
 
 echo $output->header();
+echo \core\notification::info(get_string('legacy_info', 'totara_appraisal'));
 switch ($action) {
     case 'delete':
         echo $output->heading(get_string('deleteappraisals', 'totara_appraisal', $appraisal->name));

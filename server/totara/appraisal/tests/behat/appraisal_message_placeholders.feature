@@ -60,7 +60,7 @@ Feature: Test appraisal messages
 
   Scenario: Test appraisal placeholders within messages
     Given I log in as "admin"
-    When I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    When I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     Then I should see "Appraisal1"
     And I should see "3 (0 completed)" in the "Appraisal1" "table_row"
     And I should see " Activate" in the "Appraisal1" "table_row"
@@ -581,7 +581,7 @@ listofstagenames: * App1_Stage1
 
   Scenario: Test appraisal placeholders default values within messages
     Given I log in as "admin"
-    When I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    When I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     Then I should see "Appraisal1"
     And I should see "3 (0 completed)" in the "Appraisal1" "table_row"
     And I should see " Activate" in the "Appraisal1" "table_row"

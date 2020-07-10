@@ -31,7 +31,7 @@ require_once($CFG->dirroot.'/totara/feedback360/tests/feedback360_testcase.php')
  *
  * Refer to TL-5226
  */
-class feedback360_email_preference_test extends feedback360_testcase {
+class totara_feedback360_email_preference_testcase extends feedback360_testcase {
     /**
      * Intercept emails and stores them locally for later verification.
      */

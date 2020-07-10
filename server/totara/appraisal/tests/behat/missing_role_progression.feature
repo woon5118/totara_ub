@@ -49,7 +49,7 @@ Feature: Appraisal progression halts at stage without any role assigned
 
     # Activate the appraisal.
     And I log in as "admin"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     And I click on "Activate" "link" in the "Appraisal1" "table_row"
     And I press "Activate"
     And I log out

@@ -71,13 +71,14 @@ switch ($action) {
 }
 
 echo $renderer->header();
+echo \core\notification::info(get_string('legacy_info', 'totara_appraisal'));
 switch ($action) {
     case 'delete':
         echo $renderer->heading(get_string('deletefeedback360s', 'totara_feedback360', $feedback360->name));
         echo $renderer->confirm_delete_feedback360($feedback360);
         break;
     default:
-        echo $renderer->heading(get_string('managefeedback360s', 'totara_feedback360'));
+        echo $renderer->heading(get_string('managefeedback360:utf8', 'totara_feedback360'));
         echo $renderer->create_feedback360_button();
         echo $renderer->feedback360_manage_table($feedback360s);
 }

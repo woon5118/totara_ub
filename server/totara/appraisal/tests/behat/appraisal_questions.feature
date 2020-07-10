@@ -39,7 +39,7 @@ Feature: Sanity checks on questions appearing in appraisals
       | Appraisal #1 | audience | AppAud |
 
     Given I log in as "admin"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     And I click on "Appraisal #1" "link"
     And I click on "Content" "link" in the ".tabtree" "css_element"
     And I click on "Stage1" "link" in the ".appraisal-stages" "css_element"

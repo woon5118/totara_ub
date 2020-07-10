@@ -26,7 +26,7 @@ Feature: Test appraisal objective selection
     And I add "learner one (l1@example.com)" user to "222" cohort members
 
     # Login as admin and create appraisal.
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     And I press "Create appraisal"
     And I set the following fields to these values:
       | Name | Appraisal review questions test |
@@ -85,7 +85,7 @@ Feature: Test appraisal objective selection
 
     # Activate the appraisal.
     And I log in as "admin"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     And I follow "Appraisal review questions test"
     And I follow "Activate now"
     And I click on "Activate" "button"

@@ -24,7 +24,7 @@ Feature: Feedback360 assigned users
       | user2 | CH1    |
       | user3 | CH1    |
     And I log in as "admin"
-    And I navigate to "Manage Feedback" node in "Site administration > Appraisals"
+    And I navigate to "Manage 360° Feedback (legacy)" node in "Site administration > Legacy features"
     And I press "Create Feedback"
     And I set the following fields to these values:
       | Name               | Test feedback                                 |
@@ -46,7 +46,7 @@ Feature: Feedback360 assigned users
 
   Scenario: Assigned users in Draft Feedback360
     Given I log in as "admin"
-    And I navigate to "Manage Feedback" node in "Site administration > Appraisals"
+    And I navigate to "Manage 360° Feedback (legacy)" node in "Site administration > Legacy features"
     Then I should see "Assigned to 3 draft user(s)" in the "Test feedback" "table_row"
 
     When I follow "Test feedback"
@@ -76,7 +76,7 @@ Feature: Feedback360 assigned users
       | Cohort 1         | CH1  | 4              | Set      |
 
     When I am on homepage
-    And I navigate to "Manage Feedback" node in "Site administration > Appraisals"
+    And I navigate to "Manage 360° Feedback (legacy)" node in "Site administration > Legacy features"
     Then I should see "Assigned to 4 draft user(s)" in the "Test feedback" "table_row"
 
     When I follow "Test feedback"
@@ -93,7 +93,7 @@ Feature: Feedback360 assigned users
 
   Scenario: Assigned users in Active Feedback360
     Given I log in as "admin"
-    And I navigate to "Manage Feedback" node in "Site administration > Appraisals"
+    And I navigate to "Manage 360° Feedback (legacy)" node in "Site administration > Legacy features"
     Then I should see "Assigned to 3 draft user(s)" in the "Test feedback" "table_row"
 
     When I follow "Activate"
@@ -127,7 +127,7 @@ Feature: Feedback360 assigned users
       | Cohort 1         | CH1  | 4              | Set      |
 
     When I am on homepage
-    And I navigate to "Manage Feedback" node in "Site administration > Appraisals"
+    And I navigate to "Manage 360° Feedback (legacy)" node in "Site administration > Legacy features"
     Then I should see "Assigned to 3 user(s)" in the "Test feedback" "table_row"
 
     When I follow "Test feedback"
@@ -141,7 +141,7 @@ Feature: Feedback360 assigned users
 
   Scenario: Assigned users in Closed Feedback360
     Given I log in as "admin"
-    And I navigate to "Manage Feedback" node in "Site administration > Appraisals"
+    And I navigate to "Manage 360° Feedback (legacy)" node in "Site administration > Legacy features"
     Then I should see "Assigned to 3 draft user(s)" in the "Test feedback" "table_row"
 
     When I follow "Activate"
@@ -178,7 +178,7 @@ Feature: Feedback360 assigned users
       | Cohort 1         | CH1  | 4              | Set      |
 
     When I am on homepage
-    And I navigate to "Manage Feedback" node in "Site administration > Appraisals"
+    And I navigate to "Manage 360° Feedback (legacy)" node in "Site administration > Legacy features"
     Then I should see "Assigned to 3 user(s)" in the "Test feedback" "table_row"
 
     When I follow "Test feedback"

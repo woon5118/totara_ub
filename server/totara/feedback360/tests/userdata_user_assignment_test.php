@@ -36,7 +36,7 @@ require_once($CFG->dirroot . '/totara/feedback360/tests/feedback360_testcase.php
  * @group totara_feedback360
  * Class userdata_user_assignment_test
  */
-class userdata_user_assignment_test extends feedback360_testcase {
+class totara_feedback360_userdata_user_assignment_testcase extends feedback360_testcase {
 
     /**
      * Create some user_assignment data for testing.

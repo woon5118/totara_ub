@@ -29,7 +29,7 @@ if (!defined('MOODLE_INTERNAL')) {
 global $CFG;
 require_once($CFG->dirroot.'/totara/feedback360/tests/feedback360_testcase.php');
 
-class feedback360_event_test extends feedback360_testcase {
+class totara_feedback360_event_testcase extends feedback360_testcase {
 
     /**
      * Test the events thrown when a feedback360 is created, updated, and deleted.

@@ -39,25 +39,25 @@ class hierarchy implements \totara_core\quickaccessmenu\provider {
                 'positionmanage',
                 group::get(group::PLATFORM),
                 new \lang_string('positions', 'totara_hierarchy'),
-                4000
+                3000
             ),
             item::from_provider(
                 'organisationmanage',
                 group::get(group::PLATFORM),
                 new \lang_string('organisations', 'totara_hierarchy'),
-                5000
+                4000
             ),
             item::from_provider(
                 'competencymanage',
                 group::get(group::PLATFORM),
                 new \lang_string('competencies', 'totara_hierarchy'),
-                6000
+                5000
             ),
             item::from_provider(
                 'goalmanage',
                 group::get(group::PERFORM),
                 new \lang_string('goals', 'totara_hierarchy'),
-                3000
+                1000
             ),
         ];
     }

@@ -28,7 +28,7 @@ require_once($CFG->dirroot.'/totara/feedback360/db/upgradelib.php');
  * To test, run this from the command line from the $CFG->dirroot.
  * vendor/bin/phpunit --verbose totara_feedback360_upgradelib_test totara/feedback360/tests/upgradelib_test.php
  */
-class totara_feedback360_upgradelib_test extends advanced_testcase {
+class totara_feedback360_upgradelib_testcase extends advanced_testcase {
 
     public function test_totara_feedback360_upgrade_fix_inconsistent_multichoice_param1() {
         $this->resetAfterTest();

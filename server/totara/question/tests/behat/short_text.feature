@@ -1,4 +1,4 @@
-@totara @totara_question @totara_appraisal @javascript
+@totara @totara_question @totara_appraisal @totara_feedback360 @javascript
 Feature: Completion of short text totara questions
   In order to include a short text field
   As admin I need to add a text field
@@ -18,7 +18,7 @@ Feature: Completion of short text totara questions
       | user  | cohort |
       | user1 | AUD1   |
     And I log in as "admin"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     And I click on "Create appraisal" "button"
     And I set the field "Name" to "Test Appraisal"
     And I click on "Create appraisal" "button"

@@ -20,7 +20,7 @@ Feature: Select feedback360 for requests
       | user1 | CH1    |
     And I log in as "admin"
 
-    When I navigate to "Manage Feedback" node in "Site administration > Appraisals"
+    When I navigate to "Manage 360° Feedback (legacy)" node in "Site administration > Legacy features"
     And I press "Create Feedback"
     And I set the following fields to these values:
       | Name               | Feedback One    |
@@ -39,7 +39,7 @@ Feature: Select feedback360 for requests
     And I follow "(Activate Now)"
     And I press "Continue"
 
-    When I navigate to "Manage Feedback" node in "Site administration > Appraisals"
+    When I navigate to "Manage 360° Feedback (legacy)" node in "Site administration > Legacy features"
     And I press "Create Feedback"
     And I set the following fields to these values:
       | Name               | Feedback Two   |

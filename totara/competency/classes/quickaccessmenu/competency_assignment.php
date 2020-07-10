@@ -39,7 +39,7 @@ class competency_assignment implements provider {
                 'competency_assignment',
                 group::get(group::PERFORM),
                 new \lang_string('title_tool_menu', 'totara_competency'),
-                4000
+                2000
             )
         ];
     }

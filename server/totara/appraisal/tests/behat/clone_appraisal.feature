@@ -43,7 +43,7 @@ Feature: Clone appraisals
       | appraisal       | type     | id     |
       |  Appraisal Test | audience | A1     |
     And I log in as "admin"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     And I click on "copy" "link" in the "Appraisal Test" "table_row"
     And I set the field "name" to "Cloned Appraisal Test"
     And I press "Save changes"

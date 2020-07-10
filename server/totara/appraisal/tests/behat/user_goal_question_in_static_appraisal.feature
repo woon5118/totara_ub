@@ -74,7 +74,7 @@ Feature: Access rights to user goal questions in static appraisals
 
     # Add a personal goal review item to the appraisal.
     Given I log in as "admin"
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     And I click on "Appraisal1" "link"
     And I switch to "Content" tab
     And I set the field "datatype" to "Goals"

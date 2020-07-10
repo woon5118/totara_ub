@@ -29,7 +29,7 @@ require_once($CFG->dirroot.'/totara/feedback360/tests/feedback360_testcase.php')
  *
  * Tests methods from the feedback360_repsonder class.
  */
-class feedback360_responder_test extends feedback360_testcase {
+class totara_feedback360_responder_testcase extends feedback360_testcase {
 
     /**
      * @var testing_data_generator

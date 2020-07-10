@@ -53,7 +53,9 @@ final class group {
      */
     public function __construct(array $items = []) {
         foreach ($items as $item) {
-            $this->add($item);
+            if ($item instanceof item) {
+                $this->add($item);
+            }
         }
     }
 

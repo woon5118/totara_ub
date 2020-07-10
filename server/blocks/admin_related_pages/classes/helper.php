@@ -23,6 +23,8 @@
 
 namespace block_admin_related_pages;
 
+use totara_core\advanced_feature;
+
 /**
  * Admin related pages block helper class.
  */
@@ -143,8 +145,8 @@ final class helper {
                 // Performance
                 new group(
                     [
-                        new item('manageappraisals', 'appraisals', 'totara_appraisal', ['appraisals']),
-                        new item('managefeedback360', 'feedback360:utf8', 'totara_feedback360', ['appraisals']),
+                        advanced_feature::is_enabled('appraisals') ? new item('manageappraisals', 'appraisals', 'totara_appraisal', ['appraisals']) : '',
+                        advanced_feature::is_enabled('feedback360') ? new item('managefeedback360', 'feedback360:utf8', 'totara_feedback360', ['appraisals']) : '',
                         new item('goalmanage', 'goals', 'totara_hierarchy', ['goals']),
                     ]
                 ),
@@ -178,9 +180,9 @@ final class helper {
                 // Link from upload completions to certifications.
                 new item('competencymanage', 'competencies', 'totara_hierarchy', ['appraisals', 'goals']),
                 // LInk from performance group back to competencies
-                new item('manageappraisals', 'appraisals', 'totara_appraisal', ['competencies']),
-                new item('managefeedback360', 'feedback360:utf8', 'totara_feedback360', ['competencies']),
-                new item('goalmanage', 'goals', 'totara_hierarchy', ['competencies']),
+                advanced_feature::is_enabled('appraisals') ? new item('manageappraisals', 'appraisals', 'totara_appraisal', ['competencies']) : '',
+                advanced_feature::is_enabled('feedback360') ? new item('managefeedback360', 'feedback360:utf8', 'totara_feedback360', ['competencies']) : '',
+                new item('goalmanage', 'goals', 'totara_hierarchy', ['competencies', 'appraisals']),
 
                 // One way link for reports to old system reports categories.
                 new item('reportlog', 'server', 'admin', ['reportsmain']),
@@ -190,7 +192,8 @@ final class helper {
                 new item('manage_evidence_types', 'evidence', 'totara_evidence', ['learningplans', 'appraisals', 'competencies']),
                 new item('managetemplates', 'learningplans', 'totara_plan', ['totara_evidence']),
                 new item('competencymanage', 'competencies', 'totara_hierarchy', ['totara_evidence']),
-                new item('manageappraisals', 'appraisals', 'totara_appraisal', ['totara_evidence']),
+                advanced_feature::is_enabled('appraisals') ? new item('manageappraisals', 'appraisals', 'totara_appraisal', ['totara_evidence']) : '',
+                advanced_feature::is_enabled('feedback360') ? new item('managefeedback360', 'feedback360:utf8', 'totara_feedback360', ['totara_evidence']) : '',
                 new item('editusers', 'users', 'admin', ['totara_evidence']),
             ]
         );
