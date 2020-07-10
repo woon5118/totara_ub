@@ -41,7 +41,12 @@
     </div>
 
     <FieldContextProvider :id="generatedId" :label-id="generatedLabelId">
-      <div class="tui-formRow__action">
+      <div
+        :class="{
+          'tui-formRow__action': true,
+          'tui-formRow__action--isStacked': isStacked,
+        }"
+      >
         <slot
           :id="generatedId"
           :labelId="generatedLabelId"
@@ -74,6 +79,7 @@ export default {
     id: String,
     label: String,
     required: Boolean,
+    isStacked: Boolean,
   },
 
   computed: {

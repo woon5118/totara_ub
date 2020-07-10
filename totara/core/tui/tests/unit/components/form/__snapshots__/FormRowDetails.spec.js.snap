@@ -2,7 +2,7 @@
 
 exports[`presentation/form/FormRowDetails.vue Checks snapshot 1`] = `
 <div
-  class="tui-formRowDetails"
+  class="tui-formRow__details"
   id="example"
 />
 `;

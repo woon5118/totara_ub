@@ -305,6 +305,7 @@ $string['enableflexiconsinfo'] = 'Enable rendering of icons using Flexible Icons
 $string['favicon'] = 'Favicon';
 $string['favicondesc'] = 'Select or upload the image file to be used as the site\'s favicon, the icon must be *.ico format';
 $string['fontdefault'] = 'Appropriate default';
+$string['formfield_defaults'] = 'Default:';
 $string['framework'] = 'Framework';
 $string['heading'] = 'Heading';
 $string['headingcolumnsdescription'] = 'The fields below define which data appear in the Report Heading Block. This block contains information about a specific user, and can appear in many locations throughout the site.';

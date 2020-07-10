@@ -33,11 +33,13 @@
       <FormText name="title" :validations="v => [v.required()]" />
     </FormRow>
 
-    <FormRow label="Colour">
+    <FormRow label="Colour" :is-stacked="true">
       <FormColor
         name="color"
         :validations="v => [v.required(), v.colorValueHex()]"
       />
+      <FormRowDefaults>{{ initialValues.color }}</FormRowDefaults>
+      <FormRowDetails>This field changes colour</FormRowDetails>
     </FormRow>
 
     <!-- or specify the input by hand -->
@@ -151,6 +153,8 @@ import InputText from 'totara_core/components/form/InputText';
 import Checkbox from 'totara_core/components/form/Checkbox';
 import Radio from 'totara_core/components/form/Radio';
 import FormRowActionButtons from 'totara_core/components/form/FormRowActionButtons';
+import FormRowDetails from 'totara_core/components/form/FormRowDetails';
+import FormRowDefaults from 'totara_core/components/form/FormRowDefaults';
 import SampleFormPart from 'totara_samples/components/sample_parts/totara_core/form/FormPart';
 import Repeater from 'totara_core/components/form/Repeater';
 import theme from 'totara_core/theme';
@@ -170,6 +174,8 @@ export default {
     InputText,
     Radio,
     FormRowActionButtons,
+    FormRowDetails,
+    FormRowDefaults,
     SampleFormPart,
     Repeater,
     FormCheckbox,

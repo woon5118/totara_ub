@@ -16,12 +16,20 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-  @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
+  @author Dave Wallace <dave.wallace@totaralearning.com>
   @package totara_core
 -->
 
 <template>
-  <div class="tui-formRow__details">
-    <slot />
+  <div class="tui-formRow__defaults">
+    {{ $str('formfield_defaults', 'totara_core') }} <slot />
   </div>
 </template>
+
+<lang-strings>
+{
+  "totara_core": [
+    "formfield_defaults"
+  ]
+}
+</lang-strings>
