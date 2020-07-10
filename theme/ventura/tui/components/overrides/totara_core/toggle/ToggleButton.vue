@@ -17,6 +17,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
   @author Steve Barnett <steve.barnett@totaralearning.com>
+  @author Dave Wallace <dave.wallace@totaralearning.com>
   @package theme_ventura
 -->
 
@@ -32,7 +33,7 @@
   --tui-form-toggle-bottom: 1.8rem;
 }
 
-.tui-toggleBtn {
+.tui-toggleSwitch {
   display: flex;
   align-items: center;
 
@@ -60,6 +61,7 @@
   &__ui {
     position: relative;
     width: var(--tui-form-toggle-container-width);
+    margin-left: var(--tui-form-toggle-text-offset);
 
     // the toggle background
     &:before {
@@ -77,6 +79,7 @@
     &:after {
       position: absolute;
       top: var(--tui-form-toggle-dot-offset);
+      left: var(--tui-form-toggle-dot-offset);
       display: block;
       width: var(--tui-form-toggle-dot-size);
       height: var(--tui-form-toggle-dot-size);
@@ -126,7 +129,7 @@
   &__btn {
     &:hover,
     &:focus {
-      ~ .tui-toggleBtn__ui {
+      ~ .tui-toggleSwitch__ui {
         &:before {
           background-color: var(--tui-form-toggle-off-bg-color-hover-focus);
         }
@@ -135,7 +138,13 @@
   }
 
   // toggled on
-  &__ui.tui-toggleBtn__ui--aria-pressed {
+  &__ui.tui-toggleSwitch__ui--aria-pressed {
+    // the dot
+    &:after {
+      right: var(--tui-form-toggle-dot-offset);
+      left: auto;
+    }
+
     // the toggle background
     &:before {
       background-color: var(--tui-form-toggle-on-bg-color);
@@ -154,7 +163,7 @@
   &__btn {
     &:hover,
     &:focus {
-      ~ .tui-toggleBtn__ui.tui-toggleBtn__ui--aria-pressed {
+      ~ .tui-toggleSwitch__ui.tui-toggleSwitch__ui--aria-pressed {
         &:before {
           background-color: var(--tui-form-toggle-on-bg-color-hover-focus);
         }
@@ -162,60 +171,20 @@
     }
   }
 
-  // toggle on the right, text on the left
-  &_right {
-    .tui-toggleBtn__ui {
-      margin-left: var(--tui-form-toggle-text-offset);
-    }
-  }
-
   // toggle on the left, text on the right
-  &_left {
-    .tui-toggleBtn__ui {
+  &--left {
+    .tui-toggleSwitch__ui {
       order: 1;
       margin-right: var(--tui-form-toggle-text-offset);
+      margin-left: 0;
     }
 
-    .tui-toggleBtn__btn {
+    .tui-toggleSwitch__btn {
       order: 2;
     }
 
-    .tui-toggleBtn__icon {
+    .tui-toggleSwitch__icon {
       order: 3;
-    }
-  }
-}
-
-// left to right languages
-.dir-ltr {
-  .tui-toggleBtn__ui {
-    // the toggle dot
-    &:after {
-      left: var(--tui-form-toggle-dot-offset);
-    }
-  }
-
-  .tui-toggleBtn__ui.tui-toggleBtn__ui--aria-pressed {
-    &:after {
-      right: var(--tui-form-toggle-dot-offset);
-      left: auto;
-    }
-  }
-}
-
-// right to left languages
-.dir-rtl {
-  .tui-toggleBtn__ui {
-    // the toggle dot
-    &:after {
-      right: var(--tui-form-toggle-dot-offset);
-    }
-  }
-
-  .tui-toggleBtn__ui.tui-toggleBtn__ui--aria-pressed {
-    &:after {
-      left: auto;
-      left: var(--tui-form-toggle-dot-offset);
     }
   }
 }

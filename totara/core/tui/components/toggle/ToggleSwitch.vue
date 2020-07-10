@@ -17,30 +17,37 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
   @author Steve Barnett <steve.barnett@totaralearning.com>
+  @author Dave Wallace <dave.wallace@totaralearning.com>
   @package totara_core
 -->
 
 <template>
-  <div :class="'tui-toggleBtn' + showToggleFirst">
+  <div
+    :class="{
+      'tui-toggleSwitch': true,
+      'tui-toggleSwitch--left': toggleFirst,
+    }"
+  >
     <button
+      :id="id"
       type="button"
-      class="tui-toggleBtn__btn"
-      :aria-pressed="ariaPressed"
+      class="tui-toggleSwitch__btn"
       :aria-label="ariaLabel"
+      :aria-pressed="value"
       :disabled="disabled"
       @click="togglePressed"
     >
       <span :class="{ 'sr-only': ariaLabel }">{{ text }}</span>
     </button>
 
-    <div class="tui-toggleBtn__icon">
+    <div class="tui-toggleSwitch__icon">
       <slot name="icon" />
     </div>
 
     <span
-      class="tui-toggleBtn__ui"
+      class="tui-toggleSwitch__ui"
       :class="{
-        'tui-toggleBtn__ui--aria-pressed': ariaPressed,
+        'tui-toggleSwitch__ui--aria-pressed': value,
       }"
       aria-hidden="true"
       @click="togglePressed"
@@ -52,17 +59,15 @@
 export default {
   props: {
     ariaLabel: String,
+    id: {
+      type: String,
+    },
     disabled: {
       type: Boolean,
       default: false,
     },
     text: {
       type: String,
-      required: true,
-    },
-    initialState: {
-      type: Boolean,
-      default: false,
     },
     toggleFirst: {
       type: Boolean,
@@ -70,40 +75,11 @@ export default {
     },
     value: {
       type: Boolean,
-      default: undefined,
-    },
-  },
-  data() {
-    return {
-      state: this.initialState,
-    };
-  },
-  computed: {
-    /**
-     * Update ariaPressed value based on value or internal state
-     *
-     * @return {Bool}
-     */
-    ariaPressed() {
-      // If no value prop provided use internal state
-      if (this.value === undefined) {
-        return this.state;
-      }
-      return this.value;
-    },
-
-    showToggleFirst() {
-      return this.toggleFirst ? ' tui-toggleBtn_left' : ' tui-toggleBtn_right';
     },
   },
   methods: {
     togglePressed() {
       if (this.disabled) return;
-      // If no value prop provided toggle internal state
-      if (this.value === undefined) {
-        this.state = !this.state;
-        return;
-      }
       // Propagate value change to parent
       this.$emit('input', !this.value);
     },

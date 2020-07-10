@@ -70,6 +70,9 @@ class behat_totara_tui extends behat_base {
 
     private const RADIO_LOCATOR = '.tui-radio__input';
 
+    private const TOGGLE_BUTTON_LOCATOR = '.tui-toggleSwitch__ui';
+    private const TOGGLE_BUTTON_LABEL_LOCATOR = '.tui-toggleSwitch__btn';
+
     /**
      * @param string $locator CSS locator
      * @param string $element_name Human understandable name of the element - e.g. 'modal', 'popover', 'picker' etc
@@ -460,18 +463,25 @@ class behat_totara_tui extends behat_base {
 
     /**
      * @Then /^I click on the "([^"]*)" tui checkbox$/
-     * @Then /^I click on the "([^"]*)" tui checkbox in the "([^"]*)" css element$/
+     * @Then /^I click on the "([^"]*)" tui checkbox in the "([^"]*)" "([^"]*)"$/
      * @param string $name
+     * @param string $parent_locator
      * @param string $parent_selector
      */
-    public function i_click_the_tui_checkbox(string $name, string $parent_selector = ''): void {
+    public function i_click_the_tui_checkbox(string $name, string $parent_locator = null, string $parent_selector = null): void {
         behat_hooks::set_step_readonly(false);
         $locator = self::CHECKBOX_LOCATOR . "[name='{$name}']";
 
-        if (!empty($parent_selector)) {
-            $locator = $parent_selector . ' ' . $locator;
+        $parent_element = $this;
+        if (isset($parent_locator, $parent_selector)) {
+            [$pre_selector, $pre_locator] = $this->transform_selector($parent_selector, $parent_locator);
+            $parent_element = $this->find($pre_selector, $pre_locator);
+            if ($parent_element === null || !$parent_element->isVisible()) {
+                throw new ExpectationException("Couldn't find the specified element or it wasn't visible", $this->getSession());
+            }
         }
-        $checkbox_input = $this->find('css', $locator);
+
+        $checkbox_input = $parent_element->find('css', $locator);
 
         if ($checkbox_input === null) {
             $this->fail("No tui check box found with name {$name}");
@@ -592,6 +602,38 @@ class behat_totara_tui extends behat_base {
         $this
             ->find_single_visible(self::POPOVER_LOCATOR, 'popover')
             ->find('css', '.tui-popoverFrame__close')
+            ->click();
+    }
+
+    /**
+     * Clicks on a toggle button with the specified aria-label or text prop.
+     *
+     * @When /^I click on the "([^"]*)" tui toggle button$/
+     *
+     * @param string $button_label
+     */
+    public function i_click_on_the_tui_toggle_button(string $button_label): void {
+        \behat_hooks::set_step_readonly(false);
+
+        /** @var NodeElement[] $toggles */
+        $toggles = $this->find_all('css', self::TOGGLE_BUTTON_LABEL_LOCATOR);
+
+        $specified_toggle = null;
+        foreach ($toggles as $toggle) {
+            if ($toggle->getText() === $button_label) {
+                $specified_toggle = $toggle;
+            }
+        }
+        if ($specified_toggle === null) {
+            $specified_toggle = $this->find_single_visible(
+                self::TOGGLE_BUTTON_LABEL_LOCATOR . "[aria-label='{$button_label}']",
+                'toggle'
+            );
+        }
+
+        $specified_toggle
+            ->getParent()
+            ->find('css', self::TOGGLE_BUTTON_LOCATOR)
             ->click();
     }
 

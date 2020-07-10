@@ -110,6 +110,11 @@
       </FormCheckboxGroup>
     </FormRow>
 
+    <FormRow label="Pineapple" :is-stacked="true">
+      <FormToggleButton name="pineapple" :toggle-first="true" />
+      <FormRowDetails id="pineapple">Belongs on pizza?</FormRowDetails>
+    </FormRow>
+
     <FormRow label="Pizza slices" required>
       <FormRange
         name="pizzaSlices"
@@ -147,6 +152,7 @@ import {
   FormRadioGroup,
   FormCheckbox,
   FormCheckboxGroup,
+  FormToggleButton,
   FormRange,
 } from 'totara_core/components/uniform';
 import InputText from 'totara_core/components/form/InputText';
@@ -172,6 +178,7 @@ export default {
     FormRadioGroup,
     FormRange,
     InputText,
+    FormToggleButton,
     Radio,
     FormRowActionButtons,
     FormRowDetails,
@@ -188,6 +195,7 @@ export default {
       initialValues: {
         answers: ['first value', '', 'third value'],
         color: theme.getVar('tui-color-primary'),
+        pineapple: true,
       },
       errors: null,
       value: null,

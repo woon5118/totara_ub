@@ -1,0 +1,91 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ToggleButton.vue Toggles aria-pressed on click Renders correctly with an empty slot 1`] = `
+<div
+  class="tui-toggleSwitch"
+>
+  <button
+    class="tui-toggleSwitch__btn"
+    id="toggle"
+    type="button"
+  >
+    <span
+      class=""
+    >
+      toggle button text
+    </span>
+  </button>
+   
+  <div
+    class="tui-toggleSwitch__icon"
+  />
+   
+  <span
+    aria-hidden="true"
+    class="tui-toggleSwitch__ui"
+  />
+</div>
+`;
+
+exports[`ToggleButton.vue Toggles aria-pressed on click Renders correctly with something in the slot 1`] = `
+<div
+  class="tui-toggleSwitch"
+>
+  <button
+    class="tui-toggleSwitch__btn"
+    id="toggle"
+    type="button"
+  >
+    <span
+      class=""
+    >
+      toggle button text
+    </span>
+  </button>
+   
+  <div
+    class="tui-toggleSwitch__icon"
+  >
+    <div>
+      icon button
+    </div>
+  </div>
+   
+  <span
+    aria-hidden="true"
+    class="tui-toggleSwitch__ui"
+  />
+</div>
+`;
+
+exports[`ToggleButton.vue Toggles aria-pressed on click Renders correctly with something in the slot and an aria-label 1`] = `
+<div
+  class="tui-toggleSwitch"
+>
+  <button
+    aria-label="Different button text"
+    class="tui-toggleSwitch__btn"
+    id="toggle"
+    type="button"
+  >
+    <span
+      class="sr-only"
+    >
+      toggle button text
+    </span>
+  </button>
+   
+  <div
+    class="tui-toggleSwitch__icon"
+  >
+    <div>
+      icon button
+    </div>
+  </div>
+   
+  <span
+    aria-hidden="true"
+    class="tui-toggleSwitch__ui"
+  />
+</div>
+`;

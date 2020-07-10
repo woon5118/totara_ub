@@ -17,15 +17,17 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
   @author Steve Barnett <steve.barnett@totaralearning.com>
+  @author Dave Wallace <dave.wallace@totaralearning.com>
   @package totara_samples
 -->
 
 <template>
   <div>
     <p>
-      This toggle button is used to immediately update parts of the UI. It's an
-      on/off switch for a state, and shouldn't be used as part of a form (used a
-      checkbox instead).
+      This toggle switch is used to immediately update parts of the UI. It's an
+      on/off switch for a state, and can be used as part of a form to reveal
+      more related form elements, or used outside of a form to reveal non-form
+      elements.
     </p>
 
     <p>
@@ -34,21 +36,32 @@
     </p>
 
     <SamplesExample>
-      <ToggleButton :text="text" :toggle-first="toggleFirst">
+      <ToggleSwitch
+        id="toggle"
+        v-model="isToggled"
+        :text="text"
+        :toggle-first="toggleFirst"
+      >
         <template v-slot:icon>
           <InfoIconButton :aria-label="'Help'">
             Some content here...
           </InfoIconButton>
         </template>
-      </ToggleButton>
+      </ToggleSwitch>
+
+      <br /><br />
+      <ToggleSwitch
+        id="toggle"
+        v-model="isToggled"
+        :text="text"
+        :toggle-first="toggleFirst"
+      />
 
       <br /><br />
 
-      <ToggleButton :text="text" :toggle-first="toggleFirst" />
-
-      <br /><br />
-
-      <ToggleButton
+      <ToggleSwitch
+        id="toggle"
+        v-model="isToggled"
         :text="text"
         :toggle-first="toggleFirst"
         :aria-label="ariaLabel"
@@ -72,25 +85,25 @@
 
 <script>
 // Components
-import ToggleButton from 'totara_core/components/buttons/ToggleButton';
-import InfoIconButton from 'totara_core/components/buttons/InfoIconButton';
 import FormRow from 'totara_core/components/form/FormRow';
+import InfoIconButton from 'totara_core/components/buttons/InfoIconButton';
+import InputText from 'totara_core/components/form/InputText';
 import Radio from 'totara_core/components/form/Radio';
 import RadioGroup from 'totara_core/components/form/RadioGroup';
-import InputText from 'totara_core/components/form/InputText';
 import SamplesExample from 'totara_samples/components/sample_parts/misc/SamplesExample';
 import SamplesPropCtl from 'totara_samples/components/sample_parts/misc/SamplesPropCtl';
+import ToggleSwitch from 'totara_core/components/toggle/ToggleSwitch';
 
 export default {
   components: {
-    ToggleButton,
-    InfoIconButton,
     FormRow,
+    InfoIconButton,
+    InputText,
     Radio,
     RadioGroup,
-    InputText,
     SamplesExample,
     SamplesPropCtl,
+    ToggleSwitch,
   },
 
   data() {
@@ -98,6 +111,7 @@ export default {
       text: 'Toggle something in the UI',
       toggleFirst: true,
       ariaLabel: 'The toggle button text',
+      isToggled: false,
     };
   },
 };
