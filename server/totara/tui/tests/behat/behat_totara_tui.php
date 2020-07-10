@@ -82,7 +82,9 @@ class behat_totara_tui extends behat_base {
     private const TUI_FORM_ROW_ACTION_LOCATOR = '.tui-formRow__action';
     private const TUI_FORM_LABEL_LOCATOR = '.tui-formLabel';
     private const TUI_FORM_ROW_CLASS = 'tui-formRow';
-    private const TUI_TOGGLE_BTN_UI_LOCATOR = '.tui-toggleBtn__ui';
+
+    private const TOGGLE_BUTTON_LOCATOR = '.tui-toggleBtn__ui';
+    private const TOGGLE_BUTTON_LABEL_LOCATOR = '.tui-toggleBtn__btn';
 
     /**
      * @param string $locator CSS locator
@@ -1254,7 +1256,7 @@ class behat_totara_tui extends behat_base {
     private function find_form_row_toggle_button(string $form_row_label): ?NodeElement {
         $form_row = $this->find_form_row_by_label($form_row_label);
 
-        return $form_row->find('css', self::TUI_TOGGLE_BTN_UI_LOCATOR);
+        return $form_row->find('css', self::TOGGLE_BUTTON_LOCATOR);
     }
 
     private function assert_selected_option(NodeElement $select_node, string $name, string $expected_value): void {
