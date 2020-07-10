@@ -220,6 +220,7 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
                 'job_assignment_id',
                 'completed_at',
                 'due_date',
+                'status',
             ]
         );
 
@@ -252,6 +253,55 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
             ]
         );
 
+        $manual_relationships = new backup_nested_element('perform_manual_relation_selections');
+        $manual_relationship = new backup_nested_element(
+            'perform_manual_relation_selection',
+            ['id'],
+            [
+                'activity_id',
+                'manual_relationship_id',
+                'selector_relationship_id',
+                'created_at'
+            ]
+        );
+
+        $manual_relationships_progresses = new backup_nested_element('manual_relationships_progresses');
+        $manual_relationships_progress = new backup_nested_element(
+            'perform_manual_relation_selection_progress',
+            ['id'],
+            [
+                'subject_instance_id',
+                'manual_relation_selection_id',
+                'status',
+                'created_at',
+                'updated_at'
+            ]
+        );
+
+        $manual_relation_selections = new backup_nested_element('manual_relation_selections');
+        $manual_relation_selected = new backup_nested_element(
+            'perform_manual_relation_selector',
+            ['id'],
+            [
+                'manual_relation_select_progress_id',
+                'user_id',
+                'created_at'
+            ]
+        );
+
+        $subject_instance_manual_participants = new backup_nested_element('subject_instance_manual_participants');
+        $subject_instance_manual_participant = new backup_nested_element(
+            'perform_subject_instance_manual_participant',
+            ['id'],
+            [
+                'subject_instance_id',
+                'core_relationship_id',
+                'user_id',
+                'created_at',
+                'created_by'
+            ]
+        );
+
         $perform->add_child($settings);
         $settings->add_child($setting);
 
@@ -271,6 +321,9 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
         $track->add_child($track_assignments);
         $track_assignments->add_child($track_assignment);
 
+        $perform->add_child($manual_relationships);
+        $manual_relationships->add_child($manual_relationship);
+
         // Define sources (in the same order as above).
         $perform->set_source_table('perform', ['id' => backup::VAR_ACTIVITYID]);
         $setting->set_source_table('perform_setting', ['activity_id' => backup::VAR_PARENTID]);
@@ -281,6 +334,8 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
         $section->set_source_table('perform_section', ['activity_id' => backup::VAR_PARENTID]);
         $section_element->set_source_table('perform_section_element', ['section_id' => backup::VAR_PARENTID]);
         $section_relationship->set_source_table('perform_section_relationship', ['section_id' => backup::VAR_PARENTID]);
+
+        $manual_relationship->set_source_table('perform_manual_relation_selection', ['activity_id' => backup::VAR_PARENTID]);
 
         $element->set_source_sql(
             "SELECT pe.*
@@ -299,6 +354,9 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
         $participant_instance->annotate_ids('totara_core_relationship', 'core_relationship_id');
         $participant_section->annotate_ids('perform_section', 'section_id');
 
+        $manual_relationship->annotate_ids('totara_core_relationship', 'manual_relationship_id');
+        $manual_relationship->annotate_ids('totara_core_relationship', 'selector_relationship_id');
+
         if ($userinfo) {
             $section_element->add_child($element_responses);
             $element_responses->add_child($element_response);
@@ -312,6 +370,14 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
             $participant_instances->add_child($participant_instance);
             $participant_instance->add_child($participant_sections);
             $participant_sections->add_child($participant_section);
+
+            $manual_relationship->add_child($manual_relationships_progresses);
+            $manual_relationships_progresses->add_child($manual_relationships_progress);
+            $manual_relationships_progress->add_child($manual_relation_selections);
+            $manual_relation_selections->add_child($manual_relation_selected);
+
+            $subject_instance->add_child($subject_instance_manual_participants);
+            $subject_instance_manual_participants->add_child($subject_instance_manual_participant);
 
             $element_response->set_source_table(
                 'perform_element_response',
@@ -337,6 +403,18 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
                 'perform_participant_section',
                 ['participant_instance_id' => backup::VAR_PARENTID]
             );
+            $manual_relationships_progress->set_source_table(
+                'perform_manual_relation_selection_progress',
+                ['manual_relation_selection_id' => backup::VAR_PARENTID]
+            );
+            $manual_relation_selected->set_source_table(
+                'perform_manual_relation_selector',
+                ['manual_relation_select_progress_id' => backup::VAR_PARENTID]
+            );
+            $subject_instance_manual_participant->set_source_table(
+                'perform_subject_instance_manual_participant',
+                ['subject_instance_id' => backup::VAR_PARENTID]
+            );
 
             $track_user_assignment->annotate_ids('user', 'subject_user_id');
             $track_user_assignment->annotate_ids('job_assignment', 'job_assignment_id');
@@ -347,6 +425,11 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
 
             $element_response->annotate_ids('perform_participant_instance', 'participant_instance_id');
             $track_user_assignment_via->annotate_ids('perform_track_assignment', 'track_assignment_id');
+
+            $manual_relationships_progress->annotate_ids('perform_subject_instance', 'subject_instance_id');
+            $manual_relation_selected->annotate_ids('user', 'user_id');
+            $subject_instance_manual_participant->annotate_ids('user', 'user_id');
+            $subject_instance_manual_participant->annotate_ids('totara_core_relationship', 'core_relationship_id');
         }
 
         return $this->prepare_activity_structure($perform);

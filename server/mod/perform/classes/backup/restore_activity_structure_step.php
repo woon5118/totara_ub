@@ -114,6 +114,26 @@ class restore_activity_structure_step extends \restore_activity_structure_step {
             '/activity/perform/tracks/track/track_user_assignments/track_user_assignment/subject_instances/subject_instance/participant_instances/participant_instance/participant_sections/participant_section'
         );
 
+        $paths[] = new restore_path_element(
+            'manual_relationship',
+            '/activity/perform/manual_relationships/manual_relationship'
+        );
+
+        $paths[] = new restore_path_element(
+            'manual_relationship_progress',
+            '/activity/perform/manual_relationships/manual_relationship/manual_relationships_progresses/manual_relationships_progress'
+        );
+
+        $paths[] = new restore_path_element(
+            'manual_relation_selected',
+            '/activity/perform/manual_relationships/manual_relationship/manual_relationships_progresses/manual_relationships_progress/manual_relation_selections/manual_relation_selected'
+        );
+
+        $paths[] = new restore_path_element(
+            'subject_instance_manual_participant',
+            '/activity/perform/tracks/track/track_user_assignments/track_user_assignment/subject_instances/subject_instance/subject_instance_manual_participants/subject_instance_manual_participant'
+        );
+
         // Return the paths wrapped into standard activity structure
         return $this->prepare_activity_structure($paths);
     }
@@ -363,5 +383,69 @@ class restore_activity_structure_step extends \restore_activity_structure_step {
 
         $new_item_id = $DB->insert_record('perform_participant_section', $data);
         $this->set_mapping('perform_participant_section', $old_id, $new_item_id);
+    }
+
+    protected function process_manual_relationship($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $old_id = $data->id;
+
+        $data->activity_id = $this->get_mappingid('perform', $data->activity_id);
+        $data->manual_relationship_id = $this->get_mappingid('totara_core_relationship', $data->manual_relationship_id);
+        $data->selector_relationship_id = $this->get_mappingid('totara_core_relationship', $data->selector_relationship_id);
+
+        $data->created_at = $this->apply_date_offset($data->created_at);
+
+        $new_item_id = $DB->insert_record('perform_manual_relation_selection', $data);
+        $this->set_mapping('perform_manual_relation_selection', $old_id, $new_item_id);
+    }
+
+    protected function process_manual_relationship_progress($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $old_id = $data->id;
+
+        $data->subject_instance_id = $this->get_mappingid('perform_subject_instance', $data->subject_instance_id);
+        $data->manual_relation_selection_id = $this->get_mappingid('perform_manual_relation_selection', $data->manual_relation_selection_id);
+
+        $data->created_at = $this->apply_date_offset($data->created_at);
+        $data->updated_at = $this->apply_date_offset($data->updated_at);
+
+        $new_item_id = $DB->insert_record('perform_manual_relation_selection_progress', $data);
+        $this->set_mapping('perform_manual_relation_selection_progress', $old_id, $new_item_id);
+    }
+
+    protected function process_manual_relation_selected($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $old_id = $data->id;
+
+        $data->manual_relation_select_progress_id = $this->get_mappingid('perform_manual_relation_selection_progress', $data->manual_relation_select_progress_id);
+        $data->user_id = $this->get_mappingid('user', $data->user_id);
+
+        $data->created_at = $this->apply_date_offset($data->created_at);
+
+        $new_item_id = $DB->insert_record('perform_manual_relation_selector', $data);
+        $this->set_mapping('perform_manual_relation_selector', $old_id, $new_item_id);
+    }
+
+    protected function process_subject_instance_manual_participant($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $old_id = $data->id;
+
+        $data->subject_instance_id = $this->get_mappingid('perform_subject_instance', $data->subject_instance_id);
+        $data->core_relationship_id = $this->get_mappingid('totara_core_relationship', $data->core_relationship_id);
+        $data->user_id = $this->get_mappingid('user', $data->user_id);
+        $data->created_by = $this->get_mappingid('user', $data->created_by);
+
+        $data->created_at = $this->apply_date_offset($data->created_at);
+
+        $new_item_id = $DB->insert_record('perform_subject_instance_manual_participant', $data);
+        $this->set_mapping('perform_subject_instance_manual_participant', $old_id, $new_item_id);
     }
 }

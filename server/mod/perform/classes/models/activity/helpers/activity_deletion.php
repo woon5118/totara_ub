@@ -27,6 +27,7 @@ use core\orm\query\builder;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\entities\activity\element as element_entity;
 use mod_perform\entities\activity\element_response as element_response_entity;
+use mod_perform\entities\activity\manual_relationship_selection;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
 use mod_perform\entities\activity\section as section_entity;
 use mod_perform\entities\activity\section_element as section_element_entity;
@@ -82,6 +83,7 @@ class activity_deletion {
             $this->delete_participant_sections($participant_section_ids);
             $this->delete_responses($response_ids); // Not linked so must be manually deleted.
             $this->delete_user_assignments($track_ids); // Must be deleted first due to foreign key constraints.
+            $this->delete_manual_relationship_selections();
 
             // Delete any elements that are directly owned by this activity (through shared context).
             $this->delete_own_elements();
@@ -256,4 +258,14 @@ class activity_deletion {
             ->where('id', $section_relationship_ids)
             ->delete();
     }
+
+    /**
+     * Delete the manual relationship selection records associated with the activity.
+     */
+    protected function delete_manual_relationship_selections(): void {
+        manual_relationship_selection::repository()
+            ->where('activity_id', $this->activity->id)
+            ->delete();
+    }
+
 }

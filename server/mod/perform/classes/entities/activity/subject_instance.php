@@ -40,6 +40,7 @@ use totara_core\entities\relationship as core_relationship;
  * @property int $availability
  * @property int|null $job_assignment_id
  * @property int|null $due_date
+ * @property int $status 0=unused, 1=default when new subject instance is active, 2=pending/waiting for manual selection"
  * @property int|null $completed_at
  * @property int $created_at
  * @property int $updated_at
@@ -111,5 +112,4 @@ class subject_instance extends entity {
             ->left_join([core_relationship::TABLE, 'cr'], 'core_relationship_id', 'cr.id')
             ->order_by('cr.id');
     }
-
 }

@@ -124,5 +124,106 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020072301, 'perform');
     }
 
+    if ($oldversion < 2020072302) {
+        $table = new xmldb_table('perform_subject_instance');
+        $field = new xmldb_field('status', XMLDB_TYPE_INTEGER, '1', null, null, null, null, 'due_date');
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define table perform_manual_relation_selection to be created.
+        $table = new xmldb_table('perform_manual_relation_selection');
+
+        // Adding fields to table perform_manual_relation_selection.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('activity_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('manual_relationship_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('selector_relationship_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('created_at', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table perform_manual_relation_selection.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('activity_id', XMLDB_KEY_FOREIGN, array('activity_id'), 'perform', array('id'));
+        $table->add_key('manual_relationship_id', XMLDB_KEY_FOREIGN, array('manual_relationship_id'), 'totara_core_relationship', array('id'));
+        $table->add_key('selector_relationship_id', XMLDB_KEY_FOREIGN, array('selector_relationship_id'), 'totara_core_relationship', array('id'));
+
+        // Adding indexes to table perform_manual_relation_selection.
+        $table->add_index('participant_role_selector', XMLDB_INDEX_UNIQUE, array('activity_id', 'manual_relationship_id', 'selector_relationship_id'));
+
+        // Conditionally launch create table for perform_manual_relation_selection.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Define table perform_manual_relation_selection_progress to be created.
+        $table = new xmldb_table('perform_manual_relation_selection_progress');
+
+        // Adding fields to table perform_manual_relation_selection_progress.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('subject_instance_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('manual_relation_selection_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('status', XMLDB_TYPE_INTEGER, '1', null, null, null, null);
+        $table->add_field('created_at', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('updated_at', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+
+        // Adding keys to table perform_manual_relation_selection_progress.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('subject_instance_id', XMLDB_KEY_FOREIGN, array('subject_instance_id'), 'perform_subject_instance', array('id'), 'cascade');
+        $table->add_key('manual_relation_selection_id', XMLDB_KEY_FOREIGN, array('manual_relation_selection_id'), 'perform_manual_relation_selection', array('id'), 'cascade');
+
+        // Adding indexes to table perform_manual_relation_selection_progress.
+        $table->add_index('subject_participant_role_selector', XMLDB_INDEX_UNIQUE, array('subject_instance_id', 'manual_relation_selection_id'));
+
+        // Conditionally launch create table for perform_manual_relation_selection_progress.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Define table perform_manual_relation_selector to be created.
+        $table = new xmldb_table('perform_manual_relation_selector');
+
+        // Adding fields to table perform_manual_relation_selector.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('manual_relation_select_progress_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('user_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('created_at', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table perform_manual_relation_selector.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('manual_relation_select_progress_id', XMLDB_KEY_FOREIGN, array('manual_relation_select_progress_id'), 'perform_manual_relation_selection_progress', array('id'), 'cascade');
+        $table->add_key('user_id', XMLDB_KEY_FOREIGN, array('user_id'), 'user', array('id'));
+
+        // Conditionally launch create table for perform_manual_relation_selector.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Define table perform_subject_instance_manual_participant to be created.
+        $table = new xmldb_table('perform_subject_instance_manual_participant');
+
+        // Adding fields to table perform_subject_instance_manual_participant.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('subject_instance_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('core_relationship_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('user_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('created_at', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('created_by', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table perform_subject_instance_manual_participant.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('subject_instance_id', XMLDB_KEY_FOREIGN, array('subject_instance_id'), 'perform_subject_instance', array('id'), 'cascade');
+        $table->add_key('core_relationship_id', XMLDB_KEY_FOREIGN, array('core_relationship_id'), 'totara_core_relationship', array('id'), 'cascade');
+        $table->add_key('user_id', XMLDB_KEY_FOREIGN, array('user_id'), 'user', array('id'));
+        $table->add_key('created_by', XMLDB_KEY_FOREIGN, array('created_by'), 'user', array('id'));
+
+        // Conditionally launch create table for perform_subject_instance_manual_participant.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        upgrade_mod_savepoint(true, 2020072302, 'perform');
+    }
+
     return true;
 }

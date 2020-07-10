@@ -24,6 +24,7 @@
 use core\collection;
 use core\orm\entity\entity;
 use core\orm\query\builder;
+use mod_perform\entities\activity\manual_relationship_selection;
 use mod_perform\entities\activity\participant_instance;
 use mod_perform\entities\activity\subject_instance;
 use mod_perform\entities\activity\track_assignment;
@@ -101,6 +102,7 @@ class mod_perform_activity_deletion_model_helper_testcase extends advanced_testc
 
         $expected_counts = [
             activity_entity::class => self::equalTo(1),
+            manual_relationship_selection::class => self::greaterThan(0),
             track_assignment::class => self::greaterThan(0),
             section_entity::class => self::greaterThan(0),
             section_element_entity::class => self::greaterThan(0),
@@ -144,6 +146,7 @@ class mod_perform_activity_deletion_model_helper_testcase extends advanced_testc
 
         $expected_counts = [
             activity_entity::class => self::equalTo(0),
+            manual_relationship_selection::class => self::equalTo(0),
             track_assignment::class => self::equalTo(0),
             section_entity::class => self::equalTo(0),
             section_element_entity::class => self::equalTo(0),

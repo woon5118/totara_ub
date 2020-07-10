@@ -242,6 +242,7 @@
         <FIELD NAME="availability" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Availability status of the subject instance. 0 - open, 10 - closed"/>
         <FIELD NAME="job_assignment_id" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Related job assignment id (copied from track user assignment)"/>
         <FIELD NAME="due_date" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="status" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" COMMENT="0=unused, 1=default when new subject instance is active, 2=pending/waiting for manual selection"/>
         <FIELD NAME="completed_at" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Recording the time when progress status went to complete."/>
         <FIELD NAME="created_at" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="updated_at" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
@@ -342,6 +343,72 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="notification_fk" TYPE="foreign" FIELDS="notification_id" REFTABLE="perform_notification" REFFIELDS="id" ONDELETE="cascade"/>
         <KEY NAME="core_relationship_fk" TYPE="foreign" FIELDS="core_relationship_id" REFTABLE="totara_core_relationship" REFFIELDS="id" ONDELETE="cascade"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="perform_manual_relation_selection" COMMENT="Indicates the roles who need to manually choose participant roles">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="activity_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="manual_relationship_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="manual participant role to be selected"/>
+        <FIELD NAME="selector_relationship_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="role that will be allowed to pick the actual particpant"/>
+        <FIELD NAME="created_at" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="activity_id" TYPE="foreign" FIELDS="activity_id" REFTABLE="perform" REFFIELDS="id"/>
+        <KEY NAME="manual_relationship_id" TYPE="foreign" FIELDS="manual_relationship_id" REFTABLE="totara_core_relationship" REFFIELDS="id"/>
+        <KEY NAME="selector_relationship_id" TYPE="foreign" FIELDS="selector_relationship_id" REFTABLE="totara_core_relationship" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="participant_role_selector" UNIQUE="true" FIELDS="activity_id, manual_relationship_id, selector_relationship_id" COMMENT="Ensure one selector per participant role"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="perform_manual_relation_selection_progress" COMMENT="Indicates how the choosing of manually participant roles has progressed">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="subject_instance_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="manual_relation_selection_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="status" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" COMMENT="Whether manual participant selection is completed for this subject/participant/selector; 0 = no, 1 = yes"/>
+        <FIELD NAME="created_at" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="updated_at" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="subject_instance_id" TYPE="foreign" FIELDS="subject_instance_id" REFTABLE="perform_subject_instance" REFFIELDS="id" ONDELETE="cascade"/>
+        <KEY NAME="manual_relation_selection_id" TYPE="foreign" FIELDS="manual_relation_selection_id" REFTABLE="perform_manual_relation_selection" REFFIELDS="id" ONDELETE="cascade"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="subject_participant_role_selector" UNIQUE="true" FIELDS="subject_instance_id, manual_relation_selection_id" COMMENT="Ensure one participant/selector per subject instance"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="perform_manual_relation_selector" COMMENT="Represents the actual users who will select the participants for this instance">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="manual_relation_select_progress_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="user_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="created_at" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="manual_relation_select_progress_id" TYPE="foreign" FIELDS="manual_relation_select_progress_id" REFTABLE="perform_manual_relation_selection_progress" REFFIELDS="id" ONDELETE="cascade"/>
+        <KEY NAME="user_id" TYPE="foreign" FIELDS="user_id" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="perform_subject_instance_manual_participant" COMMENT="Manually selected participants for each subject instance">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="subject_instance_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="core_relationship_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="user_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="created_at" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="created_by" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="subject_instance_id" TYPE="foreign" FIELDS="subject_instance_id" REFTABLE="perform_subject_instance" REFFIELDS="id" ONDELETE="cascade"/>
+        <KEY NAME="core_relationship_id" TYPE="foreign" FIELDS="core_relationship_id" REFTABLE="totara_core_relationship" REFFIELDS="id" ONDELETE="cascade"/>
+        <KEY NAME="user_id" TYPE="foreign" FIELDS="user_id" REFTABLE="user" REFFIELDS="id"/>
+        <KEY NAME="created_by" TYPE="foreign" FIELDS="created_by" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
   </TABLES>
