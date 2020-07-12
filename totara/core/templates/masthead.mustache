@@ -36,7 +36,7 @@
     * masthead_toggle: Has mobile toggle button data
     * masthead_usermenu: Has masthead usermenu data
 }}
-<nav class="totaraNav" role="navigation">
+<div class="totaraNav">
     {{#masthead_menu}}
         {{> totara_core/nav_primary }}
         {{#subnav_has_items}}{{> totara_core/nav_sub }}{{/subnav_has_items}}
@@ -46,4 +46,4 @@
             });
         {{/js}}
     {{/masthead_menu}}
-</nav>
+</div>
