@@ -3,7 +3,7 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
-
+* Added aria-label to primary nav to make the landmark distinguishable.
 * Updated totara_core/grid template, adding a new attribute to control whether an item
   is marked as active or redirects on click
 * totara_print_report_manager() function has been deprecated and should no longer be used.

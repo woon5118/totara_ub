@@ -561,6 +561,7 @@ $string['positionsarrow'] = 'Positions > ';
 $string['poweredbyx'] = 'Powered by {$a->totaralearn}';
 $string['poweredbyxhtml'] = 'Powered by <a href="{$a->url}">{$a->totaralearn}</a>';
 $string['execpathnotallowed'] = 'This setting is currently disabled. To enable, add<br />$CFG->preventexecpath = 0;<br /> to config.php';
+$string['primarynavigation'] = 'Primary navigation';
 $string['proficiency'] = 'Proficiency';
 $string['progdoesntbelongcat'] = 'The program doesn\'t belong to this category';
 $string['programicon'] = 'Program icon';
