@@ -2,11 +2,14 @@ TOTARA INSTALL PROCESS
 ======================
 
 Before installing Totara you should have a server with:
-* A supported OS - Linux (recommended CentOS, Red Hat, Ubuntu or Debian), Windows, FreeBSD and other unix variants should be compatible too
+* A compatible OS
+  * Linux (recommended) - CentOS, Red Hat, Ubuntu and Debian are fully supported
+  * Windows (note that Microsoft discontinued their support for future PHP versions in Windows)
+  * other unix based systems should be compatible too
 * System clock synchronised with internet time servers.
 * Functional outbound email
 * Supported webserver software - Apache 2.x.x (recommended), correctly configured nginx, Microsoft IIS
-* PHP (7.2.10 minimum, always use the latest release on Windows).
+* PHP - 7.2.10 minimum (8.0 and later are not compatible)
 * Required PHP modules: iconv, mbstring, curl, ctype, zip, simplexml, spl, pcre, dom, xml, json, gd, intl, zlib
 * Recommended PHP modules: openssl, tokenizer, xmlrpc, soap, opcache
 * PHP Memory limit of at least 256MB
