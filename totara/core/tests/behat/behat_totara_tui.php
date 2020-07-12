@@ -52,6 +52,8 @@ class behat_totara_tui extends behat_base {
     private const BASKET_SELECT_COUNT_LOCATOR = '.tui-basket__selectedCount';
     private const BASKET_PRIMARY_ACTION_LOCATOR = '.tui-basket__actions .tui-formBtn--prim';
 
+    private const HELP_ICON_LOCATOR = '.tui-formHelpIcon__icon';
+
     private const ACTION_CARD_LOCATOR = '.tui-actionCard';
 
     private const POPOVER_LOCATOR = '.tui-popoverFrame';
@@ -624,6 +626,30 @@ class behat_totara_tui extends behat_base {
         }
 
         throw new ExpectationException('Modal has no way to be closed.', $this->getSession());
+    }
+
+    /**
+     * @When /^I click on the tui form help icon in the "([^"]*)" "([^"]*)"$/
+     * @param string $element_locator
+     * @param string $element_selector
+     * @throws ExpectationException
+     */
+    public function i_click_on_the_help_icon(string $element_locator, string $element_selector): void {
+        \behat_hooks::set_step_readonly(false);
+
+        [$pre_selector, $pre_locator] = $this->transform_selector($element_selector, $element_locator);
+
+        $element = $this->find($pre_selector, $pre_locator);
+        if ($element === null || !$element->isVisible()) {
+            throw new ExpectationException("Couldn't find the specified element or it wasn't visible", $this->getSession());
+        }
+
+        $button = $element->find('css', self::HELP_ICON_LOCATOR);
+        if ($button === null || !$button->isVisible()) {
+            throw new ExpectationException("Couldn't find a help button inside the specified element", $this->getSession());
+        }
+
+        $button->click();
     }
 
     /**
