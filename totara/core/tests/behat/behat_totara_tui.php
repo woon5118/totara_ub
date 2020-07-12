@@ -52,6 +52,8 @@ class behat_totara_tui extends behat_base {
     private const BASKET_SELECT_COUNT_LOCATOR = '.tui-basket__selectedCount';
     private const BASKET_PRIMARY_ACTION_LOCATOR = '.tui-basket__actions .tui-formBtn--prim';
 
+    private const ACTION_CARD_LOCATOR = '.tui-actionCard';
+
     private const POPOVER_LOCATOR = '.tui-popoverFrame';
     private const POPOVER_CONTENT_LOCATOR = '.tui-popoverFrame__content';
 
@@ -622,6 +624,27 @@ class behat_totara_tui extends behat_base {
         }
 
         throw new ExpectationException('Modal has no way to be closed.', $this->getSession());
+    }
+
+    /**
+     * @Then /^I (should|should not) see "([^"]*)" in the tui action card/
+     * @param string $should_see_or_not
+     * @param string $expected_text
+     * @throws ExpectationException
+     */
+    public function i_should_see_in_the_tui_action_card(string $should_see_or_not, string $expected_text): void {
+        $should = $should_see_or_not === 'should';
+        $popover_text = $this
+            ->find_single_visible(self::ACTION_CARD_LOCATOR, 'action card')
+            ->getText();
+
+        $text_is_visible = strpos($popover_text, $expected_text) !== false;
+        if ($should && !$text_is_visible) {
+            throw new ExpectationException("\"$expected_text\" not found in the tui action card", $this->getSession());
+        }
+        if (!$should && $text_is_visible) {
+            throw new ExpectationException("\"$expected_text\" was found in the tui action card", $this->getSession());
+        }
     }
 
     /**
