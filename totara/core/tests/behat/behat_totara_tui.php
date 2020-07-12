@@ -58,6 +58,7 @@ class behat_totara_tui extends behat_base {
     private const NOTIFICATION_BANNER_LOCATOR = '.tui-notificationBanner';
     private const NOTIFICATION_TOAST_LOCATOR = '.tui-notificationBanner--toast';
 
+    private const MODAL_WRAPPER_SELECTOR = 'body > .tui-modal';
     private const MODAL_CONTENT_SELECTOR = '.tui-modalContent';
 
     private const COLLAPSIBLE_LOCATOR = '.tui-collapsible';
@@ -87,6 +88,24 @@ class behat_totara_tui extends behat_base {
             return reset($visible);
         }
         throw new Exception((empty($visible) ? 'No' : 'Multiple') . " {$element_name} elements are visible");
+    }
+
+    /**
+     * Find the element that is on top.
+     *
+     * @param string $locator CSS locator
+     * @param string $element_name Human understandable name of the element - e.g. 'modal', 'popover', 'picker' etc
+     * @return NodeElement
+     * @throws Exception
+     */
+    private function find_top_visible(string $locator, string $element_name): NodeElement {
+        $visible = array_filter($this->find_all('css', $locator), static function (NodeElement $element) {
+            return $element->isVisible();
+        });
+        if (empty($visible)) {
+            throw new Exception("No {$element_name} elements are visible");
+        }
+        return end($visible);
     }
 
     /**
@@ -539,16 +558,24 @@ class behat_totara_tui extends behat_base {
     }
 
     /**
-     * @Then /^I should see "([^"]*)" in the tui modal$/
+     * @Then /^I (should|should not) see "([^"]*)" in the tui modal$/
+     * @param string $should_see_or_not
      * @param string $expected_text
      * @throws ExpectationException
      */
-    public function i_should_see_in_the_tui_modal(string $expected_text): void {
+    public function i_should_see_in_the_tui_modal(string $should_see_or_not, string $expected_text): void {
+        $should = $should_see_or_not === 'should';
         $modal_text = $this
-            ->find_single_visible(self::MODAL_CONTENT_SELECTOR, 'modal')
+            ->find_top_visible(self::MODAL_WRAPPER_SELECTOR, 'modal')
+            ->find('css', self::MODAL_CONTENT_SELECTOR)
             ->getText();
-        if (strpos($modal_text, $expected_text) === false) {
+
+        $text_is_visible = strpos($modal_text, $expected_text) !== false;
+        if ($should && !$text_is_visible) {
             throw new ExpectationException("\"$expected_text\" not found in the tui modal", $this->getSession());
+        }
+        if (!$should && $text_is_visible) {
+            throw new ExpectationException("\"$expected_text\" was found in the tui modal", $this->getSession());
         }
     }
 
@@ -559,7 +586,8 @@ class behat_totara_tui extends behat_base {
         \behat_hooks::set_step_readonly(false);
 
         $confirm_button = $this
-            ->find_single_visible(self::MODAL_CONTENT_SELECTOR, 'modal')
+            ->find_top_visible(self::MODAL_WRAPPER_SELECTOR, 'modal')
+            ->find('css', self::MODAL_CONTENT_SELECTOR)
             ->find('css', '.tui-formBtn--prim:first-child');
         if ($confirm_button === null || !$confirm_button->isVisible()) {
             throw new Exception('The tui modal is not a confirmation modal', $this->getSession());
@@ -573,23 +601,47 @@ class behat_totara_tui extends behat_base {
     public function i_close_the_tui_modal(): void {
         \behat_hooks::set_step_readonly(false);
 
-        $this
-            ->find_single_visible(self::MODAL_CONTENT_SELECTOR, 'modal')
-            ->find('css', '.tui-modalContent__header-close')
-            ->click();
+        $modal = $this->find_top_visible(self::MODAL_WRAPPER_SELECTOR, 'modal');
+
+        // 'X' close button in top right of the modal.
+        $x_button = $modal->find('css', '.tui-modalContent__header-close')
+            ?? $modal->find('css', '.tui-modal__outsideClose');
+        if ($x_button !== null && $x_button->isVisible()) {
+            $x_button->click();
+            return;
+        }
+
+        /** @var NodeElement[] $buttons */
+        $buttons = $modal->findAll('css', '.tui-modalContent__footer-buttons button');
+        foreach ($buttons as $button) {
+            // Confirmation modals have a Cancel button.
+            if ($button->getText() === 'Cancel') {
+                $button->click();
+                return;
+            }
+        }
+
+        throw new ExpectationException('Modal has no way to be closed.', $this->getSession());
     }
 
     /**
-     * @Then /^I should see "([^"]*)" in the tui popover$/
+     * @Then /^I (should|should not) see "([^"]*)" in the tui popover$/
+     * @param string $should_see_or_not
      * @param string $expected_text
      * @throws ExpectationException
      */
-    public function i_should_see_in_the_tui_popover(string $expected_text): void {
+    public function i_should_see_in_the_tui_popover(string $should_see_or_not, string $expected_text): void {
+        $should = $should_see_or_not === 'should';
         $popover_text = $this
             ->find_single_visible(self::POPOVER_CONTENT_LOCATOR, 'popover')
             ->getText();
-        if (strpos($popover_text, $expected_text) === false) {
+
+        $text_is_visible = strpos($popover_text, $expected_text) !== false;
+        if ($should && !$text_is_visible) {
             throw new ExpectationException("\"$expected_text\" not found in the tui popover", $this->getSession());
+        }
+        if (!$should && $text_is_visible) {
+            throw new ExpectationException("\"$expected_text\" was found in the tui popover", $this->getSession());
         }
     }
 
