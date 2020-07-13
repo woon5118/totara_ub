@@ -28,7 +28,7 @@
         :label="$str('multiple_sections', 'mod_perform')"
         :helpmsg="$str('multiple_sections_label_help', 'mod_perform')"
       >
-        <ToggleButton
+        <ToggleSwitch
           v-model="value"
           :disabled="isSaving"
           :aria-label="label"
@@ -61,15 +61,15 @@ import { NOTIFICATION_DURATION } from 'mod_perform/constants';
 import ConfirmationModal from 'totara_core/components/modal/ConfirmationModal';
 import Form from 'totara_core/components/form/Form';
 import FormRow from 'totara_core/components/form/FormRow';
-import ToggleActivityMultiSectionSettingMutation from 'mod_perform/graphql/toggle_activity_multisection_setting.graphql';
-import ToggleButton from 'totara_core/components/buttons/ToggleButton';
+import ToggleActivityMultiSectionSettingMutation from 'mod_perform/graphql/toggle_activity_multisection_setting';
+import ToggleSwitch from 'totara_core/components/toggle/ToggleSwitch';
 
 export default {
   components: {
     ConfirmationModal,
     Form,
     FormRow,
-    ToggleButton,
+    ToggleSwitch,
   },
 
   props: {

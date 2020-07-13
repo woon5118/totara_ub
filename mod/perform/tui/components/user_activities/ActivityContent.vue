@@ -92,7 +92,7 @@
             <div
               class="tui-participantContent__sectionHeading-other-response-switch"
             >
-              <ToggleButton
+              <ToggleSwitch
                 v-if="hasOtherResponse"
                 v-model="showOtherResponse"
                 :text="
@@ -205,7 +205,7 @@ import Loader from 'totara_core/components/loader/Loader';
 import OtherParticipantResponses from 'mod_perform/components/user_activities/participant/OtherParticipantResponses';
 import ParticipantUserHeader from 'mod_perform/components/user_activities/participant/ParticipantUserHeader';
 import ResponsesAreVisibleToDescription from 'mod_perform/components/user_activities/participant/ResponsesAreVisibleToDescription';
-import ToggleButton from 'totara_core/components/buttons/ToggleButton';
+import ToggleSwitch from 'totara_core/components/toggle/ToggleSwitch';
 import { Uniform } from 'totara_core/components/uniform';
 // graphQL
 import SectionResponsesQuery from 'mod_perform/graphql/participant_section';
@@ -227,7 +227,7 @@ export default {
     Loader,
     OtherParticipantResponses,
     ParticipantUserHeader,
-    ToggleButton,
+    ToggleSwitch,
     Uniform,
   },
 

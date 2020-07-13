@@ -36,7 +36,7 @@
               )
             }}</Radio
           >
-          <FormRowDetails :id="$id('aria-describedby')">
+          <FormRowDetails>
             <span
               class="tui-performAssignmentScheduleAdditionalSettings__radio_description"
             >
@@ -59,7 +59,7 @@
               )
             }}</Radio
           >
-          <FormRowDetails :id="$id('aria-describedby')">
+          <FormRowDetails>
             <span
               class="tui-performAssignmentScheduleAdditionalSettings__radio_description"
             >

@@ -95,9 +95,9 @@
           "
           :no-input="!isActive"
         >
-          <ToggleButton
+          <ToggleSwitch
             v-if="!isActive"
-            :value="activity.anonymous_responses"
+            v-model="x"
             toggle-first
             text=""
             @input="updateActivity({ anonymous_responses: $event })"
@@ -144,7 +144,7 @@ import FormRowDetails from 'totara_core/components/form/FormRowDetails';
 import InputText from 'totara_core/components/form/InputText';
 import Select from 'totara_core/components/form/Select';
 import Textarea from 'totara_core/components/form/Textarea';
-import ToggleButton from 'totara_core/components/buttons/ToggleButton';
+import ToggleSwitch from 'totara_core/components/toggle/ToggleSwitch';
 import { ACTIVITY_STATUS_ACTIVE } from 'mod_perform/constants';
 
 //GraphQL
@@ -165,7 +165,7 @@ export default {
     InputText,
     Select,
     Textarea,
-    ToggleButton,
+    ToggleSwitch,
   },
 
   props: {
@@ -206,6 +206,7 @@ export default {
       activityTypeSelection: typeId,
       isSaving: false,
       mutationError: null,
+      x: true,
     };
   },
 
@@ -213,7 +214,7 @@ export default {
     /**
      * Has the activity not yet been saved to the back-end.
      *
-     * @returns {boolean}
+     * @return {boolean}
      */
     exists() {
       return Boolean(this.activity.id);
@@ -222,7 +223,7 @@ export default {
     /**
      * Is the title/name text empty.
      *
-     * @returns {boolean}
+     * @return {boolean}
      */
     hasNoTitle() {
       return (
@@ -233,7 +234,7 @@ export default {
     /**
      * Is the activity type unselected.
      *
-     * @returns {boolean}
+     * @return {boolean}
      */
     hasNoType() {
       return this.activityTypeSelection === 0;
@@ -241,13 +242,21 @@ export default {
 
     /**
      * check activity status is active
-     * @returns {boolean}
+     * @return {boolean}
      */
     isActive() {
       if (!this.value) {
         return false;
       }
       return this.value.state_details.name === ACTIVITY_STATUS_ACTIVE;
+    },
+
+    /**
+     * returns tru if the anonymous_responses setting is active
+     * @return {Boolean}
+     */
+    isAnonymousResponseActive() {
+      return this.activity.anonymous_responses;
     },
   },
 

@@ -31,7 +31,7 @@
         :helpmsg="$str('workflow_automatic_closure_label_help', 'mod_perform')"
       >
         <div>
-          <ToggleButton
+          <ToggleSwitch
             v-model="value"
             :disabled="isSaving"
             :toggle-first="true"
@@ -79,7 +79,7 @@ import ConfirmationModal from 'totara_core/components/modal/ConfirmationModal';
 import Form from 'totara_core/components/form/Form';
 import FormRow from 'totara_core/components/form/FormRow';
 import FormRowDetails from 'totara_core/components/form/FormRowDetails';
-import ToggleButton from 'totara_core/components/buttons/ToggleButton';
+import ToggleSwitch from 'totara_core/components/toggle/ToggleSwitch';
 
 // Util
 import { notify } from 'totara_core/notifications';
@@ -96,7 +96,7 @@ export default {
     Form,
     FormRow,
     FormRowDetails,
-    ToggleButton,
+    ToggleSwitch,
   },
 
   props: {
