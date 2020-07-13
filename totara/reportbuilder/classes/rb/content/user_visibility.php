@@ -145,9 +145,9 @@ final class user_visibility extends base {
         $mform->setExpanded('user_visibility_header');
 
         $enable = \reportbuilder::get_setting($reportid, self::TYPE, 'enable');
-        $mform->addElement('checkbox', 'visibility_enable', '', get_string('user_visibility_checkbox', 'totara_reportbuilder'));
-        $mform->setDefault('visibility_enable', $enable);
-        $mform->disabledIf('visibility_enable', 'contentenabled', 'eq', 0);
+        $mform->addElement('checkbox', 'user_visibility_enable', '', get_string('user_visibility_checkbox', 'totara_reportbuilder'));
+        $mform->setDefault('user_visibility_enable', $enable);
+        $mform->disabledIf('user_visibility_enable', 'contentenabled', 'eq', 0);
     }
 
     /**
@@ -158,7 +158,7 @@ final class user_visibility extends base {
      * @return bool True if form was successfully processed
      */
     public function form_process($reportid, $fromform) {
-        $visibilityenable = $fromform->visibility_enable ?? 0;
+        $visibilityenable = $fromform->user_visibility_enable ?? 0;
         return \reportbuilder::update_setting($reportid, self::TYPE, 'enable', $visibilityenable);
     }
 }
