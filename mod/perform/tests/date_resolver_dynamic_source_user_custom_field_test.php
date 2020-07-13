@@ -44,12 +44,14 @@ class mod_perform_date_resolver_dynamic_source_user_custom_field_testcase extend
     public function test_resolve() {
         $data = $this->generate_test_data();
         $custom_field_date_resolver = new user_custom_field();
-        $custom_field_date_resolver->set_parameters(
-            new date_offset(1, date_offset::UNIT_DAY, date_offset::DIRECTION_BEFORE),
-            new date_offset(1, date_offset::UNIT_DAY, date_offset::DIRECTION_BEFORE),
-            'datetime-1',
-            [$data['user1']->id]
-        );
+        $custom_field_date_resolver
+            ->set_parameters(
+                new date_offset(1, date_offset::UNIT_DAY, date_offset::DIRECTION_BEFORE),
+                new date_offset(1, date_offset::UNIT_DAY, date_offset::DIRECTION_BEFORE),
+                'datetime-1'
+            )
+            ->set_users([$data['user1']->id]);
+
         $start_date_ts = $custom_field_date_resolver->get_start_for($data['user1']->id);
         $start_date = (new DateTime())->setTimestamp($start_date_ts);
         $this->assertSame('2020-06-12', $start_date->format('Y-m-d'));

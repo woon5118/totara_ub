@@ -26,7 +26,7 @@ namespace mod_perform\dates\resolvers\dynamic;
 use core\collection;
 use core\orm\query\builder;
 
-class user_custom_field extends base_dynamic_date_resolver {
+class user_custom_field extends base_dynamic_date_resolver implements user_date_resolver {
 
     protected $time_custom_fields = null;
     /**
@@ -86,4 +86,13 @@ class user_custom_field extends base_dynamic_date_resolver {
             true
         );
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function set_users(array $reference_user_ids): dynamic_date_resolver {
+        $this->reference_user_ids = $reference_user_ids;
+        return $this;
+    }
+
 }

@@ -26,7 +26,6 @@ use core\entities\user;
 use core\orm\entity\repository as entity_repository;
 use core\orm\query\builder;
 use mod_perform\dates\date_offset;
-use mod_perform\dates\resolvers\dynamic\base_dynamic_date_resolver;
 use mod_perform\dates\resolvers\dynamic\dynamic_source;
 use mod_perform\dates\resolvers\dynamic\user_creation_date;
 use mod_perform\dates\resolvers\dynamic\user_custom_field;

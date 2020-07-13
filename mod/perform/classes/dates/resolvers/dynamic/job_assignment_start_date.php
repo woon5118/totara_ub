@@ -27,7 +27,7 @@ use core\collection;
 use core\orm\query\builder;
 use core_course\totara_catalog\course\dataholder_factory\startdate;
 
-class job_assignment_start_date extends base_dynamic_date_resolver {
+class job_assignment_start_date extends base_dynamic_date_resolver implements job_assignment_date_resolver {
 
     public const JOB_ASSIGNMENT_START_KEY = 'job-assignment-start-date';
 
@@ -46,7 +46,15 @@ class job_assignment_start_date extends base_dynamic_date_resolver {
     /**
      * @inheritDoc
      */
-    public function get_start_for(int $user_id, ?int $job_assignment_id = null): ?int {
+    public function set_job_assignments(array $reference_job_assignment_ids): dynamic_date_resolver {
+        $this->reference_job_assignment_ids = $reference_job_assignment_ids;
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function get_start_for_job_assignment(int $user_id, ?int $job_assignment_id = null): ?int {
         $this->check_ready_to_resolve();
 
         // If this is not per job_assignment, return null
@@ -65,7 +73,7 @@ class job_assignment_start_date extends base_dynamic_date_resolver {
     /**
      * @inheritDoc
      */
-    public function get_end_for(int $user_id, ?int $job_assignment_id = null): ?int {
+    public function get_end_for_job_assignment(int $user_id, ?int $job_assignment_id = null): ?int {
         $this->check_ready_to_resolve();
 
         // If this is not per job_assignment, return null

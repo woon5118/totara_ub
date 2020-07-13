@@ -15,38 +15,23 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Jaron Steenson <jaron.steenson@totaralearning.com>
+ * @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
  * @package mod_perform
  */
-namespace mod_perform\dates\resolvers;
 
-interface date_resolver {
+namespace mod_perform\dates\resolvers\dynamic;
 
-    /**
-     * Get the start date for a user.
-     *
-     * @param int $user_id
-     * @param int|null $job_assignment_id
-     * @return int
-     */
-    public function get_start_for(int $user_id): ?int;
+use mod_perform\dates\resolvers\date_resolver;
+
+interface user_date_resolver extends date_resolver {
 
     /**
-     * Get the end date for a user.
+     * Set the applicable user ids
      *
-     * @param int $user_id
-     * @param int|null $job_assignment_id
-     * @return int
+     * @param array $reference_user_ids
+     * @return dynamic_date_resolver
      */
-    public function get_end_for(int $user_id): ?int;
-
-    /**
-     * Is this a job-based resolver
-     *
-     * @return bool
-     */
-    public function is_job_based(): bool;
-
+    public function set_users(array $reference_user_ids): dynamic_date_resolver;
 }

@@ -48,9 +48,7 @@ interface dynamic_date_resolver extends date_resolver {
     public function set_parameters(
         date_offset $from,
         ?date_offset $to,
-        string $option_key,
-        array $reference_user_ids,
-        array $reference_job_assignment_ids = []
+        string $option_key
     ): self;
 
     /**

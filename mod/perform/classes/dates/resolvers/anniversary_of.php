@@ -23,6 +23,9 @@
 namespace mod_perform\dates\resolvers;
 
 use mod_perform\dates\anniversary_date_calculator;
+use mod_perform\dates\resolvers\dynamic\dynamic_date_resolver;
+use mod_perform\dates\resolvers\dynamic\user_date_resolver;
+use mod_perform\dates\resolvers\dynamic\job_assignment_date_resolver;
 
 /**
  * A decorator for any date resolver which will apply anniversary logic to the start and end dates.
@@ -30,7 +33,7 @@ use mod_perform\dates\anniversary_date_calculator;
  *
  * @package mod_perform\dates\resolvers
  */
-class anniversary_of implements date_resolver {
+class anniversary_of implements date_resolver, user_date_resolver, job_assignment_date_resolver  {
 
     /**
      * @var date_resolver
@@ -66,8 +69,8 @@ class anniversary_of implements date_resolver {
     /**
      * @inheritDoc
      */
-    public function get_start_for(int $user_id, ?int $job_assignment_id = null): ?int {
-        $original_start = $this->original->get_start_for($user_id, $job_assignment_id);
+    public function get_start_for(int $user_id): ?int {
+        $original_start = $this->original->get_start_for($user_id);
 
         if ($original_start === null) {
             return null;
@@ -79,15 +82,58 @@ class anniversary_of implements date_resolver {
     /**
      * @inheritDoc
      */
-    public function get_end_for(int $user_id, ?int $job_assignment_id = null): ?int {
-        $original_end = $this->original->get_end_for($user_id, $job_assignment_id);
+    public function get_end_for(int $user_id): ?int {
+        $original_end = $this->original->get_end_for($user_id);
 
         if ($original_end === null) {
             return null;
         }
 
-        $adjusted_start = $this->get_start_for($user_id, $job_assignment_id);
-        $original_start = $this->original->get_start_for($user_id, $job_assignment_id);
+        $adjusted_start = $this->get_start_for($user_id);
+        $original_start = $this->original->get_start_for($user_id);
+
+        // We only push the end to the anniversary if we did so for the start.
+        // Other wise we could end up with the start being later than end if
+        // the reference date is close to assignment date and the adjusted
+        // start and end fell just outside.
+        //
+        // For example:                        window start     cut off/now    window end
+        // original dates (after adjustment)   [2018-01-01]<----[2020-01-01]----->[2020-01-02]
+        //
+        // would result in the following if we just called adjust_to_anniversary on both boundaries
+        //                                      [2021-01-01]<----[2020-01-01]----->[2020-01-02]
+        if ($adjusted_start === $original_start) {
+            return $original_end;
+        }
+
+        return $this->adjust_to_anniversary($original_end);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function get_start_for_job_assignment(int $user_id, ?int $job_assignment_id): ?int {
+        $original_start = $this->original->get_start_for_job_assignment($user_id, $job_assignment_id);
+
+        if ($original_start === null) {
+            return null;
+        }
+
+        return $this->adjust_to_anniversary($original_start);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function get_end_for_job_assignment(int $user_id, ?int $job_assignment_id): ?int {
+        $original_end = $this->original->get_end_for_job_assignment($user_id, $job_assignment_id);
+
+        if ($original_end === null) {
+            return null;
+        }
+
+        $adjusted_start = $this->get_start_for_job_assignment($user_id, $job_assignment_id);
+        $original_start = $this->original->get_start_for_job_assignment($user_id, $job_assignment_id);
 
         // We only push the end to the anniversary if we did so for the start.
         // Other wise we could end up with the start being later than end if
@@ -108,6 +154,37 @@ class anniversary_of implements date_resolver {
 
     protected function adjust_to_anniversary(int $date): int {
         return $this->anniversary_date_calculator->calculate($date, $this->anniversary_cutoff_date);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function set_users(array $reference_user_ids): dynamic_date_resolver {
+        if ($this->original instanceof dynamic_date_resolver && !$this->is_job_based()) {
+            $this->original->set_users($reference_user_ids);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function set_job_assignments(
+        array $reference_job_assignment_ids): dynamic_date_resolver {
+
+        if ($this->original instanceof dynamic_date_resolver && !$this->is_job_based()) {
+            $this->original->set_job_assignments($reference_job_assignment_ids);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function is_job_based(): bool {
+        return $this->original->is_job_based();
     }
 
 }

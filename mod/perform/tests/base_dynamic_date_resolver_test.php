@@ -25,6 +25,7 @@ use core\collection;
 use mod_perform\dates\date_offset;
 use mod_perform\dates\resolvers\dynamic\base_dynamic_date_resolver;
 use mod_perform\dates\resolvers\dynamic\dynamic_date_resolver;
+use mod_perform\dates\resolvers\dynamic\user_date_resolver;
 
 class mod_perform_base_dynamic_date_resolver_testcase extends advanced_testcase {
 
@@ -53,17 +54,23 @@ class mod_perform_base_dynamic_date_resolver_testcase extends advanced_testcase 
     }
 
     private function create_zero_offset_dynamic_date_resolver(array $date_map): dynamic_date_resolver {
-        return new class($date_map) extends base_dynamic_date_resolver {
+        return new class($date_map) extends base_dynamic_date_resolver implements user_date_resolver {
 
             public function __construct(array $date_map) {
                 $this->date_map = $date_map;
 
                 $zero_off_set = new date_offset(0, date_offset::UNIT_DAY);
 
-                $this->set_parameters($zero_off_set, $zero_off_set, '', array_keys($date_map));
+                $this->set_parameters($zero_off_set, $zero_off_set, '')
+                    ->set_users(array_keys($date_map));
             }
 
             protected function resolve(): void {
+            }
+
+            public function set_users(array $reference_user_ids): dynamic_date_resolver {
+                $this->reference_user_ids = $reference_user_ids;
+                return $this;
             }
 
             public function get_options(): collection {

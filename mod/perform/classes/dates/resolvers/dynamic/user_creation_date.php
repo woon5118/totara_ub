@@ -25,7 +25,7 @@ namespace mod_perform\dates\resolvers\dynamic;
 use core\collection;
 use core\orm\query\builder;
 
-class user_creation_date extends base_dynamic_date_resolver {
+class user_creation_date extends base_dynamic_date_resolver implements user_date_resolver {
 
     public const DEFAULT_KEY = 'default';
 
@@ -80,4 +80,13 @@ class user_creation_date extends base_dynamic_date_resolver {
             $this->get_option_display_name($option_key)
         );
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function set_users(array $reference_user_ids): dynamic_date_resolver {
+        $this->reference_user_ids = $reference_user_ids;
+        return $this;
+    }
+
 }

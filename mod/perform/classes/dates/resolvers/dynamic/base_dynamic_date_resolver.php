@@ -128,9 +128,7 @@ abstract class base_dynamic_date_resolver implements dynamic_date_resolver {
     public function set_parameters(
         date_offset $from,
         ?date_offset $to,
-        string $option_key,
-        array $reference_user_ids,
-        array $reference_job_assignment_ids = []
+        string $option_key
     ): dynamic_date_resolver {
         if (!$this->option_is_available($option_key)) {
             throw new coding_exception(sprintf('Invalid option key %s', $option_key));
@@ -138,8 +136,6 @@ abstract class base_dynamic_date_resolver implements dynamic_date_resolver {
 
         $this->from = $from;
         $this->to = $to;
-        $this->reference_user_ids = $reference_user_ids;
-        $this->reference_job_assignment_ids = $reference_job_assignment_ids;
         $this->option_key = $option_key;
 
         $this->ready_to_resolve = true;
@@ -245,12 +241,11 @@ abstract class base_dynamic_date_resolver implements dynamic_date_resolver {
     }
 
     /**
-     * Does this resolver use job assignments
-     *
-     * @return bool
+     * @inheritDoc
      */
     public function is_job_based(): bool {
         return false;
     }
+
 
 }
