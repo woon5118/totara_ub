@@ -24,6 +24,19 @@
 .tui-performActivityActions {
   &__actionIcons {
     display: flex;
+    justify-content: flex-start;
+
+    &__link {
+      padding-right: var(--tui-gap-1);
+    }
+  }
+}
+
+@media screen and (min-width: $tui-screen-xs) {
+  .tui-performActivityActions {
+    &__actionIcons {
+      justify-content: flex-end;
+    }
   }
 }
 </style>

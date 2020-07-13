@@ -27,8 +27,9 @@
       v-if="activityIsDraft"
       :href="participationManagementUrl"
       :title="$str('manage_participation', 'mod_perform')"
+      class="tui-performActivityActions__actionIcons__link"
     >
-      <ActivityManageParticipationIcon
+      <Users
         :alt="$str('manage_participation', 'mod_perform')"
         :title="$str('manage_participation', 'mod_perform')"
         size="200"
@@ -38,6 +39,7 @@
       v-if="activity.can_view_participation_reporting"
       :href="participationReportingUrl"
       :title="$str('participation_reporting', 'mod_perform')"
+      class="tui-performActivityActions__actionIcons__link"
     >
       <ParticipationReportingIcon
         :alt="$str('participation_reporting', 'mod_perform')"
@@ -100,7 +102,7 @@
 
 <script>
 import ActivateActivityModal from 'mod_perform/components/manage_activity/ActivateActivityModal';
-import ActivityManageParticipationIcon from 'mod_perform/components/icons/ActivityManageParticipation';
+import Users from 'totara_core/components/icons/common/Users';
 import ConfirmationModal from 'totara_core/components/modal/ConfirmationModal';
 import Dropdown from 'totara_core/components/dropdown/Dropdown';
 import DropdownItem from 'totara_core/components/dropdown/DropdownItem';
@@ -119,7 +121,7 @@ import activateDeleteMutation from 'mod_perform/graphql/delete_activity';
 export default {
   components: {
     ActivateActivityModal,
-    ActivityManageParticipationIcon,
+    Users,
     ConfirmationModal,
     Dropdown,
     DropdownItem,

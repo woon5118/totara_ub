@@ -16,8 +16,8 @@
   You should have received a copy of the GNU General Public License
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-  @author Riana <fabian.derschatta@totaralearning.com>
-  @package mod_perform
+  @author Riana Rossouw <riana.rossouw@totaralearning.com>
+  @package core
 -->
 
 <script>
