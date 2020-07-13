@@ -27,6 +27,7 @@ use core\collection;
 use core\orm\query\builder;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\entities\activity\section;
+use mod_perform\entities\activity\subject_instance;
 use mod_perform\hook\participant_instances_created;
 use mod_perform\entities\activity\section_relationship;
 use mod_perform\state\participant_instance\not_started;
@@ -76,6 +77,8 @@ class participant_instance_creation {
      * @return void
      */
     private function aggregate_participant_instances(collection $subject_instance_dtos): void {
+        $this->filter_out_pending_instances($subject_instance_dtos);
+
         // Find all the activities that are related to the subject instances.
         $activity_ids = array_unique($subject_instance_dtos->pluck('activity_id'), SORT_NUMERIC);
         $activity_relationships = $this->get_activity_relationships($activity_ids);
@@ -263,4 +266,17 @@ class participant_instance_creation {
         (new participant_instances_created($created_participants_dtos))->execute();
         $this->participation_creation_list = [];
     }
+
+    /**
+     * Filter out all subject instances which are pending, we do not need to create
+     * participant instances for them at this point
+     *
+     * @param collection $subject_instance_dtos
+     */
+    private function filter_out_pending_instances(collection $subject_instance_dtos): void {
+        $subject_instance_dtos->filter(function (subject_instance_dto $subject_instance) {
+            return $subject_instance->get_status() !== subject_instance::STATUS_PENDING;
+        });
+    }
+
 }

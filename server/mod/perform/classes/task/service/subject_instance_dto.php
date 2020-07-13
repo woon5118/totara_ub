@@ -59,6 +59,8 @@ class subject_instance_dto {
     protected $track_id;
     /** @var int */
     protected $activity_id;
+    /** @var int */
+    protected $status;
 
     /**
      * Create a new dto from a given entity
@@ -68,14 +70,15 @@ class subject_instance_dto {
      */
     public static function create_from_entity(subject_instance $subject_instance): self {
         $instance = new self();
-        $instance->id = $subject_instance->id;
-        $instance->track_user_assignment_id = $subject_instance->track_user_assignment_id;
-        $instance->subject_user_id = $subject_instance->subject_user_id;
-        $instance->job_assignment_id = $subject_instance->job_assignment_id;
-        $instance->created_at = $subject_instance->created_at;
-        $instance->updated_at = $subject_instance->updated_at;
-        $instance->activity_id = $subject_instance->track->activity_id;
-        $instance->track_id = $subject_instance->track->id;
+        $instance->id = (int) $subject_instance->id;
+        $instance->track_user_assignment_id = (int) $subject_instance->track_user_assignment_id;
+        $instance->subject_user_id = (int) $subject_instance->subject_user_id;
+        $instance->job_assignment_id = (int) $subject_instance->job_assignment_id;
+        $instance->created_at = (int) $subject_instance->created_at;
+        $instance->updated_at = (int) $subject_instance->updated_at;
+        $instance->activity_id = (int) $subject_instance->track->activity_id;
+        $instance->track_id = (int) $subject_instance->track->id;
+        $instance->status = (int) $subject_instance->status;
 
         return $instance;
     }
@@ -134,6 +137,15 @@ class subject_instance_dto {
      */
     public function get_activity_id(): int {
         return $this->activity_id;
+    }
+
+    /**
+     * Returns the status
+     *
+     * @return int
+     */
+    public function get_status(): int {
+        return $this->status;
     }
 
     final public function __get($name) {
