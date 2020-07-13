@@ -26,7 +26,11 @@
       {{ $str('response_visibility_not_visible_to_anyone', 'mod_perform') }}
     </template>
     <template v-else>
-      {{ $str('response_visibility_label', 'mod_perform') }}
+      <span
+        v-if="anonymousResponses"
+        v-html="$str('response_visibility_label_anonymous', 'mod_perform')"
+      />
+      <span v-else v-html="$str('response_visibility_label', 'mod_perform')" />
 
       <template v-for="(description, i) in relationshipDescriptions">
         <span :key="i" v-html="description" /><template
@@ -47,6 +51,10 @@ export default {
     },
     visibleToRelationships: {
       type: Array,
+      required: true,
+    },
+    anonymousResponses: {
+      type: Boolean,
       required: true,
     },
   },
@@ -115,6 +123,7 @@ export default {
   {
     "mod_perform": [
       "response_visibility_label",
+      "response_visibility_label_anonymous",
       "response_visibility_not_visible_to_anyone",
       "response_visibility_the_employee",
       "response_visibility_the_employees_relationship",

@@ -904,6 +904,10 @@ class behat_mod_perform extends behat_base {
      * @Given /^I should see "([^"]*)" in the perform activity response visibility description$/
      */
     public function i_should_see_in_the_perform_activity_response_visibility_description(string $expected_text): void {
+        if ($expected_text === '') {
+            return;
+        }
+
         $actual_text = $this->find('css', self::RESPONSE_VISIBILITY_DESCRIPTION_LOCATOR)->getText();
 
         if (strpos($actual_text, $expected_text) === -1) {

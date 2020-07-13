@@ -202,6 +202,7 @@ $string['report_participant_warning_message'] = 'This report page can only show 
 $string['reporting_identifier'] = 'Reporting ID';
 $string['reporting_identifier_form_label'] = 'Reporting ID (optional)';
 $string['response_visibility_label'] = 'Your responses (once submitted) are visible to:';
+$string['response_visibility_label_anonymous'] = 'Your <strong>anonymised</strong> responses (once all participants have submitted) are visible to:';
 $string['response_visibility_not_visible_to_anyone'] = 'Your responses are not visible to other participants';
 $string['response_visibility_the_employee'] = 'the <strong>Employee</strong>';
 $string['response_visibility_the_employees_relationship'] = 'the employee\'s <strong>{$a}</strong>';

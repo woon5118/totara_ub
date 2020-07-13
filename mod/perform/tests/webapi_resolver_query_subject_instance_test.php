@@ -74,7 +74,8 @@ class mod_perform_webapi_resolver_query_subject_instance_testcase extends mod_pe
                 'settings' => [
                     'close_on_completion' => false,
                     'multisection' => false,
-                ]
+                ],
+                'anonymous_responses' => false,
             ],
             'subject_user' => [
                 'id' => self::$about_user_and_participating->subject_user->id,

@@ -8,103 +8,71 @@ Feature: Visibility of my responses
       | manny    | Manny     | Manager   | manny@example.com |
       | ava      | Ava       | Appraiser | ava@example.com   |
     And the following "subject instances" exist in "mod_perform" plugin:
-      | activity_name                              | subject_username | subject_is_participating | other_participant_username | third_participant_username | relationships_can_view      |
-      | No one can view responses                  | sean             | true                     | manny                      | ava                        |                             |
-      | Everyone can view responses                | sean             | true                     | manny                      | ava                        | manager, appraiser, subject |
-      | Subject only can view responses            | sean             | true                     | manny                      | ava                        | subject                     |
-      | Managers only can view responses           | sean             | true                     | manny                      | ava                        | manager                     |
-      | Appraisers only can view responses         | sean             | true                     | manny                      | ava                        | appraiser                   |
-      | Managers and Appraisers can view responses | sean             | true                     | manny                      | ava                        | manager, appraiser          |
+      | activity_name                                   | subject_username | subject_is_participating | other_participant_username | third_participant_username | relationships_can_view      | anonymous_responses |
+      | No one can view responses                       | sean             | true                     | manny                      | ava                        |                             | false               |
+      | No one can view anon responses                  | sean             | true                     | manny                      | ava                        |                             | true                |
+      | Everyone can view responses                     | sean             | true                     | manny                      | ava                        | manager, appraiser, subject | false               |
+      | Everyone can view anon responses                | sean             | true                     | manny                      | ava                        | manager, appraiser, subject | true                |
+      | Subject only can view responses                 | sean             | true                     | manny                      | ava                        | subject                     | false               |
+      | Subject only can view anon responses            | sean             | true                     | manny                      | ava                        | subject                     | true                |
+      | Managers only can view responses                | sean             | true                     | manny                      | ava                        | manager                     | false               |
+      | Managers only can view anon responses           | sean             | true                     | manny                      | ava                        | manager                     | true                |
+      | Appraisers only can view responses              | sean             | true                     | manny                      | ava                        | appraiser                   | false               |
+      | Appraisers only can view anon responses         | sean             | true                     | manny                      | ava                        | appraiser                   | true                |
+      | Managers and Appraisers can view responses      | sean             | true                     | manny                      | ava                        | manager, appraiser          | false               |
+      | Managers and Appraisers can view anon responses | sean             | true                     | manny                      | ava                        | manager, appraiser          | true                |
+      | Single subject participant section              | sean             | true                     |                            |                            | subject                     | false               |
+      | Single manager participant section              | sean             | false                    | manny                      |                            | manager                     | false               |
 
-  Scenario: Viewing responses as the subject
+  Scenario Outline: Viewing visibility of my responses
     Given I log in as "sean"
 
     When I navigate to the outstanding perform activities list page
-    And I click on "No one can view responses" "link"
-    Then I should see "No one can view responses" in the ".tui-performUserActivity h2" "css_element"
-    And I should see "Your responses are not visible to other participants"
-    And I should not see the show others responses toggle
+    And I click on "<activity>" "link"
+    Then I should see "<activity>" in the ".tui-performUserActivity h2" "css_element"
+    And I should see "<banner_label>" in the perform activity response visibility description
+    And I should see "<banner_content>" in the perform activity response visibility description
+    And <toggle_step>
 
-    When I navigate to the outstanding perform activities list page
-    And I click on "Everyone can view responses" "link"
-    Then I should see "Everyone can view responses" in the ".tui-performUserActivity h2" "css_element"
-    And I should see "Your responses (once submitted) are visible to:" in the perform activity response visibility description
-    And I should see "your Managers, your Appraisers" in the perform activity response visibility description
-    And I should see that show others responses is toggled "off"
+    Examples:
+      | activity                                        | banner_label                                                                     | banner_content                 | toggle_step                                              |
+      | No one can view responses                       | Your responses are not visible to other participants                             |                                | I should not see the show others responses toggle        |
+      | No one can view anon responses                  | Your responses are not visible to other participants                             |                                | I should not see the show others responses toggle        |
+      | Everyone can view responses                     | Your responses (once submitted) are visible to:                                  | your Managers, your Appraisers | I should see that show others responses is toggled "off" |
+      | Everyone can view anon responses                | Your anonymised responses (once all participants have submitted) are visible to: | your Managers, your Appraisers | I should see that show others responses is toggled "off" |
+      | Subject only can view responses                 | Your responses are not visible to other participants                             |                                | I should see that show others responses is toggled "off" |
+      | Subject only can view anon responses            | Your responses are not visible to other participants                             |                                | I should see that show others responses is toggled "off" |
+      | Managers only can view responses                | Your responses (once submitted) are visible to:                                  | your Managers                  | I should not see the show others responses toggle        |
+      | Managers only can view anon responses           | Your anonymised responses (once all participants have submitted) are visible to: | your Managers                  | I should not see the show others responses toggle        |
+      | Appraisers only can view responses              | Your responses (once submitted) are visible to:                                  | your Appraisers                | I should not see the show others responses toggle        |
+      | Appraisers only can view anon responses         | Your anonymised responses (once all participants have submitted) are visible to: | your Appraisers                | I should not see the show others responses toggle        |
+      | Managers and Appraisers can view responses      | Your responses (once submitted) are visible to:                                  | your Managers, your Appraisers | I should not see the show others responses toggle        |
+      | Managers and Appraisers can view anon responses | Your anonymised responses (once all participants have submitted) are visible to: | your Managers, your Appraisers | I should not see the show others responses toggle        |
+      | Single subject participant section              | Your responses are not visible to other participants                             |                                | I should not see the show others responses toggle        |
 
-    When I navigate to the outstanding perform activities list page
-    And I click on "Subject only can view responses" "link"
-    Then I should see "Subject only can view responses" in the ".tui-performUserActivity h2" "css_element"
-    And I should see "Your responses are not visible to other participants" in the perform activity response visibility description
-    And I should see that show others responses is toggled "off"
-
-    When I navigate to the outstanding perform activities list page
-    And I click on "Managers only can view responses" "link"
-    Then I should see "Managers only can view responses" in the ".tui-performUserActivity h2" "css_element"
-    And I should see "Your responses (once submitted) are visible to:" in the perform activity response visibility description
-    And I should see "your Managers" in the perform activity response visibility description
-    And I should not see the show others responses toggle
-
-    When I navigate to the outstanding perform activities list page
-    And I click on "Appraisers only can view responses" "link"
-    Then I should see "Appraisers only can view responses" in the ".tui-performUserActivity h2" "css_element"
-    And I should see "Your responses (once submitted) are visible to:" in the perform activity response visibility description
-    And I should see "your Appraisers" in the perform activity response visibility description
-    And I should not see the show others responses toggle
-
-    When I navigate to the outstanding perform activities list page
-    And I click on "Managers and Appraisers can view responses" "link"
-    Then I should see "Managers and Appraisers can view responses" in the ".tui-performUserActivity h2" "css_element"
-    And I should see "Your responses (once submitted) are visible to:" in the perform activity response visibility description
-    And I should see "your Managers, your Appraisers" in the perform activity response visibility description
-    And I should not see the show others responses toggle
-
-  Scenario: Viewing responses as a non subject participant
+  Scenario Outline: Viewing responses as a non subject participant
     Given I log in as "manny"
 
     When I navigate to the outstanding perform activities list page
     And I click on "Activities about others" "link"
-    And I click on "No one can view responses" "link"
-    Then I should see "No one can view responses" in the ".tui-performUserActivity h2" "css_element"
-    And I should see "Your responses are not visible to other participants" in the perform activity response visibility description
-    And I should not see the show others responses toggle
+    And I click on "<activity>" "link"
+    Then I should see "<activity>" in the ".tui-performUserActivity h2" "css_element"
+    And I should see "<banner_label>" in the perform activity response visibility description
+    And I should see "<banner_content>" in the perform activity response visibility description
+    And <toggle_step>
 
-    When I navigate to the outstanding perform activities list page
-    And I click on "Activities about others" "link"
-    And I click on "Everyone can view responses" "link"
-    Then I should see "Everyone can view responses" in the ".tui-performUserActivity h2" "css_element"
-    And I should see "Your responses (once submitted) are visible to:" in the perform activity response visibility description
-    And I should see "the Employee, the employee's Managers, the employee's Appraisers" in the perform activity response visibility description
-    And I should see that show others responses is toggled "off"
-
-    When I navigate to the outstanding perform activities list page
-    And I click on "Activities about others" "link"
-    And I click on "Subject only can view responses" "link"
-    Then I should see "Subject only can view responses" in the ".tui-performUserActivity h2" "css_element"
-    And I should see "Your responses (once submitted) are visible to:" in the perform activity response visibility description
-    And I should see "the Employee" in the perform activity response visibility description
-    And I should not see the show others responses toggle
-
-    When I navigate to the outstanding perform activities list page
-    And I click on "Activities about others" "link"
-    And I click on "Managers only can view responses" "link"
-    Then I should see "Managers only can view responses" in the ".tui-performUserActivity h2" "css_element"
-    And I should see "Your responses (once submitted) are visible to:" in the perform activity response visibility description
-    And I should see "the employee's Managers" in the perform activity response visibility description
-    And I should see that show others responses is toggled "off"
-
-    When I navigate to the outstanding perform activities list page
-    And I click on "Activities about others" "link"
-    And I click on "Appraisers only can view responses" "link"
-    Then I should see "Appraisers only can view responses" in the ".tui-performUserActivity h2" "css_element"
-    And I should see "Your responses (once submitted) are visible to:" in the perform activity response visibility description
-    And I should see "the employee's Appraisers" in the perform activity response visibility description
-    And I should not see the show others responses toggle
-
-    When I navigate to the outstanding perform activities list page
-    And I click on "Activities about others" "link"
-    And I click on "Managers and Appraisers can view responses" "link"
-    Then I should see "Managers and Appraisers can view responses" in the ".tui-performUserActivity h2" "css_element"
-    And I should see "Your responses (once submitted) are visible to:" in the perform activity response visibility description
-    And I should see "the employee's Managers, the employee's Appraisers" in the perform activity response visibility description
-    And I should see that show others responses is toggled "off"
+    Examples:
+      | activity                                        | banner_label                                                                     | banner_content                                     | toggle_step                                              |
+      | No one can view responses                       | Your responses are not visible to other participants                             |                                                    | I should not see the show others responses toggle        |
+      | No one can view anon responses                  | Your responses are not visible to other participants                             |                                                    | I should not see the show others responses toggle        |
+      | Everyone can view responses                     | Your responses (once submitted) are visible to:                                  | the employee's Managers, the employee's Appraisers | I should see that show others responses is toggled "off" |
+      | Everyone can view anon responses                | Your anonymised responses (once all participants have submitted) are visible to: | the employee's Managers, the employee's Appraisers | I should see that show others responses is toggled "off" |
+      | Subject only can view responses                 | Your responses are not visible to other participants                             |                                                    | I should see that show others responses is toggled "off" |
+      | Subject only can view anon responses            | Your responses are not visible to other participants                             |                                                    | I should see that show others responses is toggled "off" |
+      | Managers only can view responses                | Your responses (once submitted) are visible to:                                  | the employee's Managers                            | I should see that show others responses is toggled "off" |
+      | Managers only can view anon responses           | Your anonymised responses (once all participants have submitted) are visible to: | the employee's Managers                            | I should see that show others responses is toggled "off" |
+      | Appraisers only can view responses              | Your responses (once submitted) are visible to:                                  | the employee's Appraisers                          | I should not see the show others responses toggle        |
+      | Appraisers only can view anon responses         | Your anonymised responses (once all participants have submitted) are visible to: | the employee's Appraisers                          | I should not see the show others responses toggle        |
+      | Managers and Appraisers can view responses      | Your responses (once submitted) are visible to:                                  | the employee's Managers, the employee's Appraisers | I should see that show others responses is toggled "off" |
+      | Managers and Appraisers can view anon responses | Your anonymised responses (once all participants have submitted) are visible to: | the employee's Managers, the employee's Appraisers | I should see that show others responses is toggled "off" |
+      | Single manager participant section              | Your responses are not visible to other participants                             |                                                    | I should not see the show others responses toggle        |

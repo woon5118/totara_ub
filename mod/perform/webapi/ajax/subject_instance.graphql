@@ -8,6 +8,7 @@ query mod_perform_subject_instance($subject_instance_id: core_id!) {
         close_on_completion
         multisection
       }
+      anonymous_responses
     }
     subject_user {
       id

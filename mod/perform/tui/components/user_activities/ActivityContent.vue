@@ -87,6 +87,7 @@
               class="tui-participantContent__sectionHeadingOtherResponsesDescription"
               :current-user-is-subject="currentUserIsSubject"
               :visible-to-relationships="responsesAreVisibleTo"
+              :anonymous-responses="activity.anonymous_responses"
             />
             <div
               class="tui-participantContent__sectionHeading-other-response-switch"

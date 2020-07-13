@@ -607,7 +607,11 @@ class mod_perform_generator extends component_generator_base {
             $name = $data['activity_name'] ?? null;
             $type = $data['activity_type'] ?? 'appraisal';
             $status = $this->elevate_activity_status_to_code($data['activity_status'] ?? 'Active');
-            $activity = $this->find_or_make_perform_activity($name, $type, $status);
+
+            $anonymous_responses = $data['anonymous_responses'] ?? 'true';
+            $anonymous_responses = $anonymous_responses === 'true';
+
+            $activity = $this->find_or_make_perform_activity($name, $type, $status, $anonymous_responses);
         }
 
         $subject_id = $data['subject_user_id'] ?? null;
@@ -779,7 +783,7 @@ class mod_perform_generator extends component_generator_base {
         $this->create_section_with_combined_manager_appraiser($subject_user, $manager_appraiser_user, $data['activity_name']);
     }
 
-    private function find_or_make_perform_activity($name, $type, $status = null): activity {
+    private function find_or_make_perform_activity($name, $type, $status = null, $anonymous_responses = false): activity {
         $data = [
             'activity_type' => $type
         ];
@@ -798,6 +802,11 @@ class mod_perform_generator extends component_generator_base {
             $data['activity_name'] = $name;
             $data['create_section'] = false;
             return $this->create_activity_in_container($data);
+        }
+
+        if ($anonymous_responses) {
+            $activity_entity->anonymous_responses = true;
+            $activity_entity->save();
         }
 
         return activity::load_by_entity($activity_entity);
