@@ -189,7 +189,7 @@ class pathway_manual_webapi_resolver_mutation_create_manual_ratings_testcase ext
         );
         $this->assertNull($result->data['pathway_manual_create_manual_ratings']);
         $this->assertCount(1, $result->errors);
-        $this->assertContains('Invalid scale value', $result->errors[0]->message);
+        $this->assertStringContainsString('Invalid scale value', $result->errors[0]->message);
 
         // None of the records should exist, even though only one had bad data.
         $this->assertFalse($DB->record_exists('pathway_manual_rating', ['competency_id' => $this->competency1->id]));

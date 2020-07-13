@@ -147,9 +147,9 @@ class totara_plan_webapi_resolver_type_learning_plan_testcase extends advanced_t
         $plan1 = new development_plan($plan1->id);
 
         $description = $this->resolve($plan1, 'description');
-        $this->assertContains($file->get_component(), $description);
-        $this->assertContains($file->get_filearea(), $description);
-        $this->assertContains($file->get_itemid(), $description);
+        $this->assertStringContainsString($file->get_component(), $description);
+        $this->assertStringContainsString($file->get_filearea(), $description);
+        $this->assertStringContainsString($file->get_itemid(), $description);
     }
 
     /**
