@@ -64,4 +64,26 @@ $capabilities = [
             'performanceactivitymanager' => CAP_ALLOW,
         ]
     ],
+    // Manage participation for a specific subject user. This includes closing and re-opening subject instances,
+    // participant instances and participant sections, and creating new participant instances. Checked against
+    // a specific user.
+    // See mod/perform:manage_all_participation for a system-wide version of this capability.
+    'mod/perform:manage_subject_user_participation' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_USER,
+        'archetypes' => [
+            'staffmanager' => CAP_ALLOW,
+        ]
+    ],
+    // Manage participation for all subject instances. This includes closing and re-opening subject instances,
+    // participant instances and participant sections, and creating new participant instances. Checked against
+    // a specific user for MT support but this is a system level check.
+    // See mod/perform:manage_subject_user_participation for a more limited (per-user) version of this capability.
+    'mod/perform:manage_all_participation' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_USER,
+        'archetypes' => [
+            'manager' => CAP_ALLOW,
+        ]
+    ],
 ];

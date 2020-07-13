@@ -196,6 +196,7 @@ $string['perform:create_activity'] = 'Create performance activities';
 $string['perform:manage_activity'] = 'Manage performance activities';
 $string['perform:view_manage_activities'] = 'Access the performance activities management interface';
 $string['perform:view_participation_reporting'] = 'Access the participation reporting interface';
+$string['perform:manage_participation'] = 'Manage participation';
 $string['pluginadministration'] = 'Performance activity administration';
 $string['previous_section'] = 'Previous section';
 $string['progress'] = 'Progress';

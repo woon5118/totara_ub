@@ -165,4 +165,69 @@ class util {
         $truncated = core_text::substr($text, 0, $truncated_size);
         return "$prefix$truncated$ellipsis$suffix";
     }
+
+
+    /**
+     * Returns an array of up to 1000 userids of users who the $for_user id holds
+     * the $capability in the user's context. Useful for checking which users a
+     * user is permitted to do some action on.
+     *
+     * TODO I've just chucked this in here for now, not sure the best place for it.
+     * TODO this is prototype
+     *
+     *
+     * @param int $for_user ID of user to check for.
+     * @param string $capability Capability string to test.
+     * @param int $offset Offset to apply before returning records, null for no offset.
+     * @param int $limit Maximum number of userids to return, null for no limit.
+     * @return array Array of userids
+     * @throws \dml_exception
+     */
+    public static function get_permitted_users(int $for_user, string $capability, int $offset = 0, int $limit = 1000): array {
+        global $DB;
+        list($has_cap_sql, $has_cap_params) = access::get_has_capability_sql($capability, 'c.id', $for_user);
+        $sql = "SELECT u.id AS key, u.id FROM {user} u
+            JOIN {context} c ON c.contextlevel = " . CONTEXT_USER . " AND c.instanceid = u.id
+            WHERE u.deleted = 0 AND ({$has_cap_sql})
+            ORDER BY u.id
+        ";
+        return $DB->get_records_sql_menu($sql, $has_cap_params, $offset, $limit);
+    }
+
+    /**
+     * Return SQL and params to apply to an SQL query in order to filter to only users where the viewing
+     * user can manage those user's participation.
+     *
+     * TODO this is prototype
+     *
+     * @param int $report_for User ID of user who is viewing
+     * @param string $user_id_field String referencing database column containing user ids to filter.
+     * @return array Array containing SQL string and array of params
+     * @throws \coding_exception
+     * @throws \dml_exception
+     */
+    public static function get_manage_participation_sql(int $report_for, string $user_id_field) {
+        global $DB;
+
+        // If user can manage participation across all users don't do the per-row restriction at all.
+        $user_context = \context_user::instance($report_for);
+        if (has_capability('mod/perform:manage_all_participation', $user_context, $report_for)) {
+            return ['1=1', []];
+        }
+
+        $capability = 'mod/perform:manage_subject_user_participation';
+        $permitted_users = \mod_perform\util::get_permitted_users($report_for, $capability);
+
+        if (empty($permitted_users)) {
+            // No access at all if not permitted to see any users.
+            return ['1=0', []];
+        }
+
+        // Restrict to specific subject users.
+        list($sourcesql, $sourceparams) = $DB->get_in_or_equal($permitted_users, SQL_PARAMS_NAMED);
+        $wheresql = "$user_id_field {$sourcesql}";
+        $whereparams = $sourceparams;
+        return [$wheresql, $whereparams];
+    }
+
 }
