@@ -37,6 +37,16 @@ interface broker {
     public function get_default_triggers(): array;
 
     /**
+     * Check trigger conditions?
+     *
+     * @param notification_model $notification
+     * @param object $record some data FIXME: pass some class object instead
+     * @param clock $clock
+     * @return boolean
+     */
+    public function check_trigger_condition(notification_model $notification, object $record, clock $clock): bool;
+
+    /**
      * @param dealer $dealer
      * @param notification_model $notification
      */

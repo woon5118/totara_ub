@@ -23,15 +23,8 @@
 
 namespace mod_perform\models\activity;
 
-use coding_exception;
-use core\orm\collection;
 use core\orm\entity\model;
-use core\orm\query\builder;
-use totara_core\entities\relationship as relationship_entity;
-use totara_core\entities\relationship_resolver as relationship_resolver_entity;
-use mod_perform\entities\activity\section as section_entity;
 use mod_perform\entities\activity\notification_message as notification_message_entity;
-use mod_perform\entities\activity\section_relationship as section_relationship_entity;
 use totara_core\relationship\relationship;
 
 /**
@@ -93,24 +86,5 @@ class notification_message extends model {
         $entity->save();
         $inst = new self($entity);
         return $inst;
-    }
-
-    /**
-     * Load all notification recipients.
-     *
-     * @param notification $parent
-     * @return collection
-     */
-    public static function load_all_latest_by_notification(notification $parent): collection {
-        // select cr.id as crid, coalesce(m.sent_at, 0) as sent_at
-        // from {perform_section_relationship} sr
-        // join {totara_core_relationship} cr on cr.id=sr.core_relationship_id
-        // left join (
-        // select max(nm.sent_at) as sent_at,nm.core_relationship_id
-        // from {perform_notification_message} nm
-        // group by nm.core_relationship_id
-        // ) m on m.core_relationship_id=cr.id
-
-        throw new \Exception('not yet implemented');
     }
 }

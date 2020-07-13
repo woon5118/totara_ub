@@ -30,7 +30,6 @@ use mod_perform\notification\factory;
 use mod_perform\models\activity\details\notification_interface as notification_interface;
 use mod_perform\models\activity\details\notification_real;
 use mod_perform\models\activity\details\notification_sparse;
-use mod_perform\notification\trigger;
 
 /**
  * A proxy class that represents a single performance notification setting.
@@ -41,6 +40,7 @@ use mod_perform\notification\trigger;
  * @property boolean $active is active?
  * @property string|null $trigger_label
  * @property integer $trigger_type
+ * @property integer $last_run_at
  *
  * @property-read activity $activity
  * @property-read collection|notification_recipient[] $recipients
@@ -188,6 +188,13 @@ final class notification implements notification_interface {
     /**
      * @inheritDoc
      */
+    public function get_last_run_at(): int {
+        return $this->current->get_last_run_at();
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function exists(): bool {
         return !empty($this->get_id());
     }
@@ -262,5 +269,21 @@ final class notification implements notification_interface {
      */
     public function can_be_triggered(): bool {
         return factory::create_loader()->support_triggers($this->class_key);
+    }
+
+    /**
+     * Update the last run time.
+     *
+     * @param integer $time
+     * @return self
+     * @throws coding_exception
+     */
+    public function set_last_run_time(int $time): self {
+        if (!$this->exists()) {
+            throw new coding_exception('not available');
+        }
+        // FIXME: add set_last_run_time() to notification_interface??
+        \core\orm\query\builder::table(\mod_perform\entities\activity\notification::TABLE)->update_record(['id' => $this->get_id(), 'last_run_at' => $time]);
+        return $this->refresh();
     }
 }

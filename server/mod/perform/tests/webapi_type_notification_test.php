@@ -65,13 +65,24 @@ class mod_perform_webapi_type_notification_testcase extends advanced_testcase {
         $this->resolve_graphql_type(self::TYPE, 'id', new \stdClass());
     }
 
+    public function data_class_keys(): array {
+        return [
+            ['instance_created'],
+            ['instance_created_reminder'],
+            ['due_date_reminder'],
+            ['due_date'],
+            ['completion'],
+        ];
+    }
+
     /**
      * @covers ::resolve
+     * @dataProvider data_class_keys
      */
-    public function test_invalid_field(): void {
+    public function test_invalid_field(string $class_key): void {
         [$activity, $context] = $this->create_test_data();
 
-        $notification = notification_model::create($activity, 'instance_created');
+        $notification = notification_model::create($activity, $class_key);
         $field = 'unknown';
 
         $this->expectException(moodle_exception::class);
@@ -81,8 +92,9 @@ class mod_perform_webapi_type_notification_testcase extends advanced_testcase {
 
     /**
      * @covers ::run
+     * @dataProvider data_class_keys
      */
-    public function test_resolve(): void {
+    public function test_resolve(string $class_key): void {
         // Note: cannot use dataproviders here because PHPUnit runs these before
         // everything else. Incredibly, if a dataprovider in a random testsuite
         // creates database records or sends messages, etc, those will also be
@@ -90,12 +102,14 @@ class mod_perform_webapi_type_notification_testcase extends advanced_testcase {
         // and yet unborn tests do not start in a clean state!
         [$activity, $context] = $this->create_test_data();
 
-        $notification = notification_model::create($activity, 'instance_created');
+        $notification = notification_model::create($activity, $class_key);
 
         $testcases = [
             'id' => ['id', null, $notification->id],
             'name' => ['name', format::FORMAT_PLAIN, $notification->name],
             'active' => ['active', null, $notification->active],
+            'trigger_label' => ['trigger_label', format::FORMAT_PLAIN, $notification->trigger_label],
+            'trigger_type' => ['trigger_type', null, [null, 'BEFORE', 'AFTER'][$notification->trigger_type]],
             'triggers' => ['triggers', null, $notification->triggers],
         ];
 
@@ -104,7 +118,7 @@ class mod_perform_webapi_type_notification_testcase extends advanced_testcase {
             $args = $format ? ['format' => $format] : [];
 
             $value = $this->resolve_graphql_type(self::TYPE, $field, $notification, $args, $context);
-            $this->assertEquals($expected, $value, "[$id] wrong value");
+            $this->assertSame($expected, $value, "[$id] wrong value");
         }
     }
 }

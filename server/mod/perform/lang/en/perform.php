@@ -70,6 +70,7 @@ $string['button_close'] = 'Close';
 $string['button_continue'] = 'Continue';
 $string['boolean_setting_text_enabled'] = 'Enabled';
 $string['boolean_setting_text_disabled'] = 'Disabled';
+$string['check_notification_trigger_task'] = 'Periodically check notification trigger conditions';
 $string['condition_actor_is_participant_fail'] = 'The currently logged in user is not the participant.';
 $string['create_activity'] = 'Add activity';
 $string['create_manual_participant_progress_task'] = 'Create progress records for selecting manual participants in performance activities';
@@ -369,6 +370,28 @@ This needs to be completed by $due date$.
 
 You can access the activity through this link: $Activity link$';
 $string['template_instance_created_subject_subject'] = 'Your $Activity name$/$Activity type$';
+$string['template_instance_created_reminder_appraiser_body'] = '$days ago$ you were selected to participate in the following activity as $subject full name$’s $relationship name$:
+
+$Activity name$/$Activity type$
+
+Please ensure you complete it by $due date$.
+
+You can access the activity through this link: $Activity link$';
+$string['template_instance_created_reminder_appraiser_subject'] = 'Reminder - $Activity name$/$Activity type$: $subject full name$';
+$string['template_instance_created_reminder_manager_body'] = '$days ago$ you were selected to participate in the following activity as $subject full name$’s $relationship name$:
+
+$Activity name$/$Activity type$
+
+Please ensure you complete it by $due date$.
+
+You can access the activity through this link: $Activity link$';
+$string['template_instance_created_reminder_manager_subject'] = 'Reminder - $Activity name$/$Activity type$: $subject full name$';
+$string['template_instance_created_reminder_subject_body'] = '$days ago$ you were sent your $Activity name$/$Activity type$ to complete.
+
+Please ensure you complete it by $due date$.
+
+You can access the activity through this link: $Activity link$';
+$string['template_instance_created_reminder_subject_subject'] = 'Reminder - $Activity name$/$Activity type$';
 $string['toast_error_create_activity'] = 'An error occurred while saving, and the activity could not be created.';
 $string['toast_error_generic_update'] = 'An error occurred, and your latest changes have not been saved.';
 $string['toast_error_save_response'] = 'An error occurred while saving, and the activity responses could not be updated.';

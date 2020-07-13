@@ -23,9 +23,10 @@
 
 namespace mod_perform\notification\brokers;
 
+use mod_perform\models\activity\notification as notification_model;
 use mod_perform\notification\broker;
 use mod_perform\notification\dealer;
-use mod_perform\models\activity\notification as notification_model;
+use mod_perform\notification\clock;
 
 /**
  * overdue_reminder handler
@@ -33,6 +34,10 @@ use mod_perform\models\activity\notification as notification_model;
 class overdue_reminder implements broker {
     public function get_default_triggers(): array {
         return [DAYSECS];
+    }
+
+    public function check_trigger_condition(notification_model $notification, object $record, clock $clock): bool {
+        return false;
     }
 
     public function execute(dealer $dealer, notification_model $notification): void {

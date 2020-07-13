@@ -1441,4 +1441,67 @@ class behat_totara_tui extends behat_base {
         return reset($matches);
     }
 
+    /**
+     * @When /^I click on "(?P<element_string>(?:[^"]|\\")*)" tui "(?P<selector_string>[^"]*)" in the "(?P<container_string>(?:[^"]|\\")*)" tui "(?P<container_selector_string>[^"]*)"$/
+     * @param string $element
+     * @param string $selector
+     * @param string $container
+     * @param string $container_selector
+     */
+    public function i_click_on_the_tui_in_the_tui(string $element, string $selector, string $container, string $container_selector) {
+        behat_hooks::set_step_readonly(false);
+        $parent = $this->find_tui_element($container, $container_selector);
+        $node = $this->find_tui_element($element, $selector, $parent);
+        $node->click();
+    }
+
+    /**
+     * @param string $label
+     * @param string $tui_selector
+     * @param NodeElement|null $container
+     * @return NodeElement
+     */
+    private function find_tui_element(string $label, string $tui_selector, ?NodeElement $container = null): NodeElement {
+        if ($tui_selector === 'toggle button') {
+            $toggles = $this->find_all('css', self::TOGGLE_BUTTON_LABEL_LOCATOR, false, $container);
+
+            $specified_toggle = null;
+            foreach ($toggles as $toggle) {
+                if ($toggle->getText() === $label) {
+                    $specified_toggle = $toggle;
+                }
+            }
+            if ($specified_toggle === null && $container === null) {
+                $specified_toggle = $this->find_single_visible(
+                    self::TOGGLE_BUTTON_LABEL_LOCATOR . "[aria-label='{$label}']",
+                    'toggle'
+                );
+            }
+
+            if ($specified_toggle) {
+                return $this->find('css', self::TOGGLE_BUTTON_LOCATOR, false, $specified_toggle->getParent());
+            }
+        }
+
+        if ($tui_selector === 'collapsible') {
+            $collapsibles = $this->find_all('css', self::COLLAPSIBLE_LOCATOR, false, $container);
+
+            $matches = array_filter($collapsibles, static function (NodeElement $filter) use ($label) {
+                $legend = $filter->find('css', self::COLLAPSIBLE_HEADER_TEXT_LOCATOR);
+                return $legend !== null && $legend->getText() === $label;
+            });
+
+            $collapsible = reset($matches);
+            if ($collapsible && $collapsible->isVisible()) {
+                return $collapsible;
+            }
+        }
+
+        if ($tui_selector === 'button') {
+            [$selector, $locator] = $this->transform_selector('button', $label);
+            return $this->find($selector, $locator, false, $container);
+        }
+
+        $this->fail("Could not find the '{$label}' {$tui_selector}");
+    }
 }

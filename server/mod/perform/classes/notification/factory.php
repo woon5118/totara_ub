@@ -24,10 +24,12 @@
 namespace mod_perform\notification;
 
 use coding_exception;
+use mod_perform\entities\activity\track_user_assignment;
 use mod_perform\models\activity\activity as activity_model;
 use mod_perform\models\activity\notification as notification_model;
 use mod_perform\notification\exceptions\class_key_not_available;
 use mod_perform\task\service\subject_instance_dto;
+use stdClass;
 use totara_core\relationship\relationship;
 
 /**
@@ -36,6 +38,9 @@ use totara_core\relationship\relationship;
 abstract class factory {
     /** @var loader|null */
     protected static $loader;
+
+    /** @var clock|null */
+    protected static $clock;
 
     /**
      * Create a broker instance.
@@ -66,11 +71,22 @@ abstract class factory {
      * @param subject_instance_dto $dto
      * @return cartel
      */
-    public static function create_cartel(subject_instance_dto $dto): cartel {
+    public static function create_cartel_on_subject_instance(subject_instance_dto $dto): cartel {
         $activity = activity_model::load_by_id($dto->get_activity_id());
         $user_id = $dto->subject_user_id;
         $job_assignment_id = $dto->job_assignment_id;
         return new cartel($activity, $user_id, $job_assignment_id);
+    }
+
+    /**
+     * Create a cartel instance.
+     *
+     * @param activity_model $activity
+     * @param track_user_assignment|stdClass $user_assignment
+     * @return cartel
+     */
+    public static function create_cartel_on_user_assignment(activity_model $activity, $user_assignment): cartel {
+        return new cartel($activity, $user_assignment->subject_user_id, $user_assignment->job_assignment_id);
     }
 
     /**
@@ -110,5 +126,32 @@ abstract class factory {
             self::$loader = loader::create();
         }
         return self::$loader;
+    }
+
+    /**
+     * Return the master clock.
+     *
+     * @return clock
+     */
+    public static function create_clock(): clock {
+        if (self::$clock === null) {
+            self::$clock = new clock();
+        }
+        return self::$clock;
+    }
+
+    /**
+     * Return the master clock for testing.
+     *
+     * @param integer $bias time offset in seconds; (NOTE: bias is cumulative)
+     * @return clock
+     */
+    public static function create_clock_with_time_machine(int $bias): clock {
+        $current_bias = get_config('mod_perform', 'notification_time_travel') ?: 0;
+        $new_bias = $current_bias + $bias;
+        set_config('notification_time_travel', $new_bias, 'mod_perform');
+        // Always override the singleton instance.
+        self::$clock = new clock();
+        return self::$clock;
     }
 }

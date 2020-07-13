@@ -92,6 +92,13 @@ final class notification_real implements notification_interface {
     /**
      * @inheritDoc
      */
+    public function get_last_run_at(): int {
+        return $this->entity->last_run_at ?? 0;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function exists(): bool {
         return $this->entity->exists();
     }

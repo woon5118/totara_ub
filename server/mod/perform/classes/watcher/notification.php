@@ -38,7 +38,7 @@ class notification {
                 continue;
             }
 
-            $cartel = factory::create_cartel($dto);
+            $cartel = factory::create_cartel_on_subject_instance($dto);
             $cartel->dispatch('instance_created');
         }
     }

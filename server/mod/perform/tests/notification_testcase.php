@@ -30,6 +30,7 @@ use mod_perform\models\activity\section;
 use mod_perform\models\activity\section_relationship;
 use mod_perform\notification\broker;
 use mod_perform\notification\dealer;
+use mod_perform\notification\clock;
 use mod_perform\notification\factory;
 use mod_perform\notification\loader;
 use totara_core\relationship\relationship;
@@ -195,6 +196,10 @@ class mod_perform_mock_broker implements broker {
 
     public function get_default_triggers(): array {
         return [];
+    }
+
+    public function check_trigger_condition(notification $notification, object $record, clock $clock): bool {
+        return false;
     }
 
     public function execute(dealer $dealer, notification $notification): void {

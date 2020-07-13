@@ -21,27 +21,32 @@
  * @package mod_perform
  */
 
-namespace mod_perform\notification\brokers;
+namespace mod_perform\notification;
 
-use mod_perform\models\activity\notification as notification_model;
-use mod_perform\notification\broker;
-use mod_perform\notification\dealer;
-use mod_perform\notification\clock;
+use coding_exception;
 
 /**
- * instance_created handler
+ * Provides the master clock.
  */
-class instance_created implements broker {
-    public function get_default_triggers(): array {
-        return [];
+final class clock {
+    /** @var integer */
+    private $bias = 0;
+
+    /**
+     * Constructor.
+     */
+    public function __construct() {
+        if ((defined('PHPUNIT_TEST') && PHPUNIT_TEST) || defined('BEHAT_UTIL') || defined('BEHAT_TEST') || defined('BEHAT_SITE_RUNNING')) {
+            $this->bias = get_config('mod_perform', 'notification_time_travel') ?: 0;
+        }
     }
 
-    public function check_trigger_condition(notification_model $notification, object $record, clock $clock): bool {
-        return false;
-    }
-
-    public function execute(dealer $dealer, notification_model $notification): void {
-        // just post it
-        $dealer->post();
+    /**
+     * Get the current time stamp.
+     *
+     * @return integer
+     */
+    public function get_time(): int {
+        return time() + $this->bias;
     }
 }

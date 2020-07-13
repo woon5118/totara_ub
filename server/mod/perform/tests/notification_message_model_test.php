@@ -101,22 +101,4 @@ class mod_perform_notification_message_model_testcase extends mod_perform_notifi
         $this->assertEquals(4444, $entities[3]->sent_at);
         $this->assertEquals(5555, $entities[4]->sent_at);
     }
-
-    public function test_get_latest_records() {
-        notification_message::create($this->recipient_subject, 1111);
-        notification_message::create($this->recipient_subject, 2222);
-
-        $this->markTestIncomplete('load_all_latest_by_notification to be implemented by TL-25362 or TL-25365');
-
-        $messages = notification_message::load_all_latest_by_notification($this->notification);
-        $this->assertCount(2, $messages);
-
-        $message = $messages->find('core_relationship_id', $this->subject->core_relationship_id);
-        /** @var notification_message $message */
-        $this->assertEquals(2222, $message->sent_at);
-
-        $message = $messages->find('core_relationship_id', $this->appraiser->core_relationship_id);
-        /** @var notification_message $message */
-        $this->assertEquals(0, $message->sent_at);
-    }
 }

@@ -92,6 +92,13 @@ final class notification_sparse implements notification_interface {
     }
 
     /**
+     * @inheritDoc
+     */
+    public function get_last_run_at(): int {
+        throw new coding_exception('not available');
+    }
+
+    /**
      * {@inheritDoc}
      *
      * NOTE: the function always returns false.

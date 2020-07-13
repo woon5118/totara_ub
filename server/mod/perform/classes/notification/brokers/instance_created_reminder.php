@@ -23,9 +23,10 @@
 
 namespace mod_perform\notification\brokers;
 
+use mod_perform\models\activity\notification as notification_model;
 use mod_perform\notification\broker;
 use mod_perform\notification\dealer;
-use mod_perform\models\activity\notification as notification_model;
+use mod_perform\notification\clock;
 
 /**
  * instance_created_reminder handler
@@ -35,7 +36,27 @@ class instance_created_reminder implements broker {
         return [DAYSECS];
     }
 
+    public function check_trigger_condition(notification_model $notification, object $record, clock $clock): bool {
+        $time = $clock->get_time();
+        // Sort trigger values in case it's not.
+        $triggers = $notification->triggers;
+        sort($triggers);
+        $created_at = $record->created_at;
+        // Look up the next earliest trigger since the last run time.
+        foreach ($triggers as $trigger) {
+            $trigger_at = $created_at + $trigger * DAYSECS;
+            if ($notification->last_run_at > $trigger_at) {
+                continue;
+            }
+            if ($trigger_at <= $time && $time < $trigger_at + DAYSECS) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public function execute(dealer $dealer, notification_model $notification): void {
-        // not yet implemented
+        // just post it
+        $dealer->post();
     }
 }

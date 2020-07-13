@@ -105,6 +105,15 @@ class loader {
     }
 
     /**
+     * Get all the registered class keys.
+     *
+     * @return string[] of class_key's
+     */
+    public function get_class_keys(): array {
+        return array_keys($this->notifications);
+    }
+
+    /**
      * Get the fully-qualified class name of the broker.
      *
      * @param string $class_key

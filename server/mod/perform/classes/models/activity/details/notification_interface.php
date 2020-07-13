@@ -65,6 +65,13 @@ interface notification_interface {
     public function get_triggers(): array;
 
     /**
+     * Return the last run time.
+     *
+     * @return integer
+     */
+    public function get_last_run_at(): int;
+
+    /**
      * Return true if the underlying record exists in the database.
      *
      * @return boolean

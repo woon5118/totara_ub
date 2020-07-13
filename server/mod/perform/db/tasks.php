@@ -21,6 +21,7 @@
  * @package mod_perform
  */
 
+use mod_perform\task\check_notification_trigger_task;
 use mod_perform\task\create_manual_participant_progress_task;
 use mod_perform\task\create_subject_instance_task;
 use mod_perform\task\expand_assignments_task;
@@ -75,4 +76,13 @@ $tasks = [
         'dayofweek' => '*',
         'month' => '*'
     ],
+    [
+        'classname' => check_notification_trigger_task::class,
+        'blocking' => 0,
+        'minute' => '7,22,37,52',
+        'hour' => '*',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    ]
 ];

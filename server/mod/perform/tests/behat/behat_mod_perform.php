@@ -918,6 +918,36 @@ class behat_mod_perform extends behat_base {
     }
 
     /**
+     * @Given /^I time travel to "(\d+) (\w+) (\w+)" for perform activity notification$/
+     * @param string $time
+     * @param string $unit
+     * @param string $direction
+     */
+    public function i_time_travel_to_for_the_perform_activity_notification(string $time, string $unit, string $direction): void {
+        $bias = (int)$time;
+        if (!is_number($time) || $bias === 0) {
+            $this->fail('time must be an integer');
+        }
+        if ($unit === 'days' || $unit === 'day') {
+            $bias *= DAYSECS;
+        } else if ($unit === 'hours' || $unit === 'hour') {
+            $bias *= HOURSECS;
+        } else {
+            $this->fail('unit must be days or hours');
+        }
+        if ($direction === 'future') {
+            // do nothing
+        } else if ($direction === 'past') {
+            $bias = -$bias;
+        } else {
+            $this->fail('direction must be future or past');
+        }
+        // create_clock_with_time_machine stores $bias in the database for further tasks.
+        \mod_perform\notification\factory::create_clock_with_time_machine($bias);
+        $this->execute('behat_tool_task::i_run_the_scheduled_task', [\mod_perform\task\check_notification_trigger_task::class]);
+    }
+
+    /**
      * Convenience method to fail from an ExpectationException.
      *
      * @param string $error error message.

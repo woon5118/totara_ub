@@ -125,7 +125,7 @@ class mod_perform_generator extends component_generator_base {
                 $entity->save();
             }
 
-            if (isset($data['create_track']) && $data['create_track']) {
+            if (isset($data['create_track']) && $data['create_track'] == 'true') {
                 track::create($activity);
             }
 

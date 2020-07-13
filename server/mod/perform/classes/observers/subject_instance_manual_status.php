@@ -63,7 +63,7 @@ class subject_instance_manual_status {
      * @param subject_instance_dto $subject_instance_dto
      */
     private static function trigger_notifications(subject_instance_dto $subject_instance_dto): void {
-        $cartel = factory::create_cartel($subject_instance_dto);
+        $cartel = factory::create_cartel_on_subject_instance($subject_instance_dto);
         $cartel->dispatch('instance_created');
     }
 
