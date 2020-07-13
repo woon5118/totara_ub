@@ -617,7 +617,7 @@ class mod_perform_generator extends component_generator_base {
             $type = $data['activity_type'] ?? 'appraisal';
             $status = $this->elevate_activity_status_to_code($data['activity_status'] ?? 'Active');
 
-            $anonymous_responses = $data['anonymous_responses'] ?? 'true';
+            $anonymous_responses = $data['anonymous_responses'] ?? 'false';
             $anonymous_responses = $anonymous_responses === 'true';
 
             $activity = $this->find_or_make_perform_activity($name, $type, $status, $anonymous_responses);
@@ -794,7 +794,7 @@ class mod_perform_generator extends component_generator_base {
 
     private function find_or_make_perform_activity($name, $type, $status = null, $anonymous_responses = false): activity {
         $data = [
-            'activity_type' => $type
+            'activity_type' => $type,
         ];
         if (isset($status)) {
             $data['activity_status'] = $status;
@@ -808,9 +808,31 @@ class mod_perform_generator extends component_generator_base {
         $activity_entity = activity_entity::repository()->where('name', $name)->order_by('id')->first();
 
         if ($activity_entity === null) {
-            $data['activity_name'] = $name;
-            $data['create_section'] = false;
-            return $this->create_activity_in_container($data);
+            if (!$anonymous_responses) {
+                return $this->create_activity_in_container(
+                    [
+                        'activity_name'  => $name,
+                        'activity_type'  => $type,
+                        'create_section' => false,
+                    ]
+                );
+            }
+            else {
+                $activity = $this->create_activity_in_container(
+                    [
+                        'activity_name'   => $name,
+                        'activity_type'   => $type,
+                        'create_section'  => false,
+                        'activity_status' => 'DRAFT',
+                    ]
+                );
+                $activity->set_attribution_settings(true)->update();
+
+                if ($status !== draft::get_code()) {
+                    $activity->activate();
+                }
+                return $activity;
+            }
         }
 
         if ($anonymous_responses) {

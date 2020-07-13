@@ -29,6 +29,7 @@ use mod_perform\entities\activity\element_response as element_response_entity;
 use mod_perform\entities\activity\participant_instance;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
+use mod_perform\entities\activity as activity_entity;
 use mod_perform\entities\activity\section_element as section_element_entity;
 use mod_perform\models\activity\element;
 use mod_perform\models\response\participant_section;
@@ -113,7 +114,8 @@ class participant_section_with_responses {
             $this->participant_section_entity->participant_instance,
             $this->participant_section_entity->section_elements,
             $existing_responses,
-            true
+            true,
+            $this->is_anonymous_responses($this->participant_section_entity)
         );
 
         // Finally create the top level model and inject all the child models.
@@ -196,20 +198,23 @@ class participant_section_with_responses {
      * @param collection $section_elements
      * @param collection $existing_responses
      * @param bool $include_other_responder_groups
+     * @param bool $anonymous_responses
      * @return collection
      */
     protected function create_section_elements(
         participant_instance_entity $participant_instance_entity,
         collection $section_elements,
         collection $existing_responses,
-        bool $include_other_responder_groups = false
+        bool $include_other_responder_groups = false,
+        bool $anonymous_responses = false
     ): collection {
         return $section_elements
             ->map(
                 function (section_element_entity $section_element_entity) use (
                     $participant_instance_entity,
                     $existing_responses,
-                    $include_other_responder_groups
+                    $include_other_responder_groups,
+                    $anonymous_responses
                 ) {
                     // The element response model will accept missing entities
                     // in the case where a question has not yet been answered.
@@ -226,7 +231,7 @@ class participant_section_with_responses {
                         $include_other_responder_groups &&
                         $this->user_can_view_others_responses()
                     ) {
-                        $other_responder_groups = $this->create_other_responder_groups($section_element_entity->id);
+                        $other_responder_groups = $this->create_other_responder_groups($section_element_entity->id, $anonymous_responses);
                     }
 
                     return new section_element_response(
@@ -303,13 +308,16 @@ class participant_section_with_responses {
      * Note: this is not yet filtering based on "perform_section_relationship.can_answer".
      *
      * @param int $section_element_id
+     * @param bool $anonymous_responses
      * @return collection|responder_group[]
      */
-    protected function create_other_responder_groups(int $section_element_id): collection {
+    protected function create_other_responder_groups(int $section_element_id, bool $anonymous_responses): collection {
         // Always create a group for the other participants relationship types.
         $grouped_by_relationship = [];
-        foreach ($this->get_other_participants_relationship_type_names() as $relationship_type_name) {
-            $grouped_by_relationship[$relationship_type_name] = [];
+        if (!$anonymous_responses) {
+            foreach ($this->get_other_participants_relationship_type_names() as $relationship_type_name) {
+                $grouped_by_relationship[$relationship_type_name] = [];
+            }
         }
 
         /** @var collection|section_element_response[] $others_responses */
@@ -327,11 +335,17 @@ class participant_section_with_responses {
             // If we are fetching for one of the many manager/appraisers their relationship type name
             // will not have a group, as the relationship type name of the $participant_id
             // is excluded from the $this->other_participant_relationship_type_names array.
-            if (!array_key_exists($relationship_name, $grouped_by_relationship)) {
-                $grouped_by_relationship[$relationship_name] = [];
+
+            if (!$anonymous_responses) {
+                if (!array_key_exists($relationship_name, $grouped_by_relationship)) {
+                    $grouped_by_relationship[$relationship_name] = [];
+                }
+                $grouped_by_relationship[$relationship_name][] = $other_response;
+            }
+            else {
+                $grouped_by_relationship['anonymous'][] = $other_response;
             }
 
-            $grouped_by_relationship[$relationship_name][] = $other_response;
         }
 
         $other_responder_groups = new collection();
@@ -393,6 +407,25 @@ class participant_section_with_responses {
      */
     protected function user_can_view_others_responses(): bool {
         return (new participant_section($this->participant_section_entity))->can_view_others_responses();
+    }
+
+    /**
+     * Check is anonymous responses
+     * @param participant_section_entity|null $participant_section_entity
+     *
+     * @return bool
+     */
+    protected function is_anonymous_responses(?participant_section_entity $participant_section_entity): bool {
+        if ($participant_section_entity) {
+            /**
+             * @var activity_entity
+             */
+            $activity = $participant_section_entity->section->activity;
+
+            return $activity->anonymous_responses ?? false;
+        }
+
+        return false;
     }
 
 }

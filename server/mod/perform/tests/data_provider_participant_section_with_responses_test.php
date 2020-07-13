@@ -632,6 +632,94 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
         );
     }
 
+    public function test_responder_group_population_for_anonymous_activity(): void {
+        self::setAdminUser();
+
+        /** @var mod_perform_generator $generator */
+        $generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
+
+        $subject_user = user::logged_in();
+        $subject_user_id = $subject_user->id;
+        $manager_appraiser_user = self::getDataGenerator()->create_user();
+
+        $subject_instance = $generator->create_subject_instance(
+            [
+                'activity_name'            => 'anonymous activity',
+                'subject_is_participating' => false, // The subject actually is participating, but we will create the instance below.
+                'subject_user_id'          => $subject_user->id,
+                'other_participant_id'     => null,
+                'include_questions'        => false,
+                'anonymous_responses'      => 'true',
+            ]
+        );
+
+        $activity = new activity($subject_instance->activity());
+        $section = $generator->create_section($activity, ['title' => 'Part one']);
+
+        $manager_section_relationship = $generator->create_section_relationship($section, ['class_name' => manager::class]);
+        $appraiser_section_relationship = $generator->create_section_relationship($section, ['class_name' => appraiser::class]);
+        $subject_section_relationship = $generator->create_section_relationship($section, ['class_name' => subject::class]);
+
+        $element = $generator->create_element(['title' => 'Question one']);
+        $generator->create_section_element($section, $element);
+
+        $manager_section = $generator->create_participant_instance_and_section(
+            $activity,
+            $manager_appraiser_user,
+            $subject_instance->id,
+            $section,
+            $manager_section_relationship->core_relationship_id
+        );
+
+        $appraiser_section = $generator->create_participant_instance_and_section(
+            $activity,
+            $manager_appraiser_user,
+            $subject_instance->id,
+            $section,
+            $appraiser_section_relationship->core_relationship_id
+        );
+
+        $subject_section = $generator->create_participant_instance_and_section(
+            $activity,
+            $subject_user,
+            $subject_instance->id,
+            $section,
+            $subject_section_relationship->core_relationship_id
+        );
+
+        $data_provider = new participant_section_with_responses($subject_user_id, $subject_section->id);
+        $fetched_participant_section = $data_provider->fetch()->get();
+
+        /** @var section_element_response $element_response */
+        $element_response = $fetched_participant_section->get_section_element_responses()->first();
+
+        static::assertEquals('Subject', $element_response->get_relationship_name());
+
+        /** @var responder_group $manager_responder_group */
+        $manager_responder_group = $element_response->get_other_responder_groups()->find(function (responder_group $group) {
+            return $group->get_relationship_name() === 'Manager';
+        });
+
+        /** @var responder_group $appraiser_responder_group */
+        $appraiser_responder_group = $element_response->get_other_responder_groups()->find(function (responder_group $group) {
+            return $group->get_relationship_name() === 'Appraiser';
+        });
+
+        $anonymous_responder_group = $element_response->get_other_responder_groups()->find(function (responder_group $group) {
+            return $group->get_relationship_name() === 'anonymous';
+        });
+
+        // There should always one group
+        self::assertCount(1, $element_response->get_other_responder_groups());
+
+        // Note these are all empty responses.
+        self::assertEmpty($manager_responder_group);
+        self::assertEmpty($appraiser_responder_group);
+
+        // anonymous group contains all data
+        self::assertCount(2, $anonymous_responder_group->get_responses());
+    }
+
     protected static function assert_same_participant_section(participant_section $expected, participant_section $other): void {
         self::assertEquals(
             $expected->id,

@@ -76,11 +76,7 @@
   </div>
 </template>
 <script>
-import {
-  FormScope,
-  FormRadioGroup,
-  FormRow,
-} from 'tui/components/uniform';
+import { FormScope, FormRadioGroup, FormRow } from 'tui/components/uniform';
 import FormRowDetails from 'tui/components/form/FormRowDetails';
 import Radio from 'tui/components/form/Radio';
 import {

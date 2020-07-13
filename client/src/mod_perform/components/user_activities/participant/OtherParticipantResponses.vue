@@ -17,52 +17,79 @@
 -->
 <template>
   <div class="tui-otherParticipantResponses">
-    <FormRow
-      v-for="(group, index) in responderGroups"
-      :key="index"
-      :label="
-        $str('user_activities_other_response_response', 'mod_perform', {
-          relationship: group.relationship_name,
-        })
-      "
-    >
-      <div
-        v-if="hasResponses(group.responses)"
-        class="tui-otherParticipantResponses__response"
+    <template v-if="!anonymousResponses">
+      <FormRow
+        v-for="(group, index) in responderGroups"
+        :key="index"
+        :label="
+          $str('user_activities_other_response_response', 'mod_perform', {
+            relationship: group.relationship_name,
+          })
+        "
       >
         <div
-          v-for="(response, responseIndex) in group.responses"
-          :key="responseIndex"
-          class="tui-otherParticipantResponses__response-participant"
+          v-if="hasResponses(group.responses)"
+          class="tui-otherParticipantResponses__response"
         >
-          <ParticipantUserHeader
-            :user-name="response.participant_instance.participant.fullname"
-            :profile-picture="
-              response.participant_instance.participant.profileimageurlsmall
-            "
-            size="xsmall"
-          />
+          <div
+            v-for="(response, responseIndex) in group.responses"
+            :key="responseIndex"
+            class="tui-otherParticipantResponses__response-participant"
+          >
+            <ParticipantUserHeader
+              :user-name="response.participant_instance.participant.fullname"
+              :profile-picture="
+                response.participant_instance.participant.profileimageurlsmall
+              "
+              size="xsmall"
+            />
 
-          <ElementParticipantResponse>
-            <template v-slot:content>
-              <component
-                :is="componentFor()"
-                :data="JSON.parse(response.response_data)"
-                :element="sectionElement.element"
-              />
-            </template>
-          </ElementParticipantResponse>
+            <ElementParticipantResponse>
+              <template v-slot:content>
+                <component
+                  :is="componentFor()"
+                  :data="JSON.parse(response.response_data)"
+                  :element="sectionElement.element"
+                />
+              </template>
+            </ElementParticipantResponse>
+          </div>
         </div>
-      </div>
-      <div v-else class="tui-otherParticipantResponses__noParticipant">
-        {{
-          $str(
-            'user_activities_other_response_no_participants_identified',
-            'mod_perform'
-          )
-        }}
-      </div>
-    </FormRow>
+        <div v-else class="tui-otherParticipantResponses__noParticipant">
+          {{
+            $str(
+              'user_activities_other_response_no_participants_identified',
+              'mod_perform'
+            )
+          }}
+        </div>
+      </FormRow>
+    </template>
+    <template v-else>
+      <FormRow
+        v-for="(group, index) in responderGroups"
+        :key="index"
+        :label="$str('response_other', 'mod_perform')"
+      >
+        <div class="tui-otherParticipantResponses__anonymousResponse">
+          <div
+            v-for="(response, responseIndex) in group.responses"
+            :key="responseIndex"
+            class="tui-otherParticipantResponses__anonymousResponse-participant"
+          >
+            <ElementParticipantResponse>
+              <template v-slot:content>
+                <component
+                  :is="componentFor()"
+                  :data="JSON.parse(response.response_data)"
+                  :element="sectionElement.element"
+                />
+              </template>
+            </ElementParticipantResponse>
+          </div>
+        </div>
+      </FormRow>
+    </template>
   </div>
 </template>
 <script>
@@ -82,6 +109,10 @@ export default {
   props: {
     sectionElement: {
       type: Object,
+      required: true,
+    },
+    anonymousResponses: {
+      type: Boolean,
       required: true,
     },
   },
@@ -119,6 +150,7 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
+      "response_other",
       "user_activities_other_response_response",
       "user_activities_other_response_no_participants_identified"
     ]

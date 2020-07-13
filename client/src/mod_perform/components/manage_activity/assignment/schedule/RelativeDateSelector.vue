@@ -144,11 +144,7 @@
 
 <script>
 import Label from 'tui/components/form/Label';
-import {
-  FormSelect,
-  FormNumber,
-  FormScope,
-} from 'tui/components/uniform';
+import { FormSelect, FormNumber, FormScope } from 'tui/components/uniform';
 import {
   RELATIVE_DATE_DIRECTION_BEFORE,
   RELATIVE_DATE_DIRECTION_AFTER,

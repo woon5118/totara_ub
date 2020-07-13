@@ -138,6 +138,7 @@
               <OtherParticipantResponses
                 v-show="showOtherResponse"
                 :section-element="sectionElement"
+                :anonymous-responses="activity.anonymous_responses"
               />
             </div>
           </Collapsible>
