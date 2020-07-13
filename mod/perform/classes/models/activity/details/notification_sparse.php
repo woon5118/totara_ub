@@ -23,6 +23,7 @@
 
 namespace mod_perform\models\activity\details;
 
+use coding_exception;
 use mod_perform\notification\broker;
 use mod_perform\notification\factory;
 use mod_perform\models\activity\activity;
@@ -86,13 +87,6 @@ final class notification_sparse implements notification_interface {
     /**
      * @inheritDoc
      */
-    public function get_trigger_count(): int {
-        return count($this->get_triggers());
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function get_triggers(): array {
         return $this->broker->get_default_triggers();
     }
@@ -112,6 +106,13 @@ final class notification_sparse implements notification_interface {
     public function activate(bool $active = true): notification_interface {
         $inst = notification_real::create($this->activity, $this->class_key, $active);
         return $inst;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function set_triggers(array $values): notification_interface {
+        throw new coding_exception('not available');
     }
 
     /**

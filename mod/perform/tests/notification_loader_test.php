@@ -29,6 +29,7 @@ use mod_perform\notification\broker;
 use mod_perform\notification\brokers\instance_created;
 use mod_perform\notification\brokers\overdue;
 use mod_perform\notification\loader;
+use mod_perform\notification\trigger;
 use totara_core\relationship\relationship_provider;
 
 class mod_perform_notification_loader_testcase extends advanced_testcase {
@@ -93,12 +94,12 @@ class mod_perform_notification_loader_testcase extends advanced_testcase {
             'test_instance_created' => [
                 'class' => instance_created::class,
                 'name' => ['notification_broker_instance_created', 'mod_perform'],
-                'support_triggers' => false,
+                'trigger_type' => trigger::TYPE_UNSUPPORTED,
             ],
             'test_overdue' => [
                 'class' => overdue::class,
                 'name' => ['screenshot', 'moodle'],
-                'support_triggers' => true,
+                'trigger_type' => trigger::TYPE_AFTER,
             ],
             'kia_ora_koutou_katoa' => [
                 'class' => mod_perform_notification_loader_testcase::class,

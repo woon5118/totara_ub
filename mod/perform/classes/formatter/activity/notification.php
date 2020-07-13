@@ -25,6 +25,7 @@ namespace mod_perform\formatter\activity;
 
 use core\webapi\formatter\field\string_field_formatter;
 use core\webapi\formatter\formatter;
+use mod_perform\notification\trigger;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -32,6 +33,11 @@ defined('MOODLE_INTERNAL') || die();
  * Maps the notification model class into a GraphQL mod_perform_notification.
  */
 class notification extends formatter {
+    private const TRIGGER_TYPES = [
+        trigger::TYPE_BEFORE => 'BEFORE',
+        trigger::TYPE_AFTER => 'AFTER'
+    ];
+
     /**
      * {@inheritdoc}
      */
@@ -41,10 +47,19 @@ class notification extends formatter {
             'name' => string_field_formatter::class,
             'active' => null,
             'class_key' => null,
-            'trigger_count' => null,
+            'trigger_type' => 'format_trigger_type',
             'recipients' => null,
             'triggers' => null,
         ];
+    }
+
+    /**
+     * Return trigger_type.
+     *
+     * @return string|null the trigger type, or null if event triggers are not supported
+     */
+    protected function format_trigger_type(): ?string {
+        return self::TRIGGER_TYPES[$this->object->trigger_type] ?? null;
     }
 
     /**

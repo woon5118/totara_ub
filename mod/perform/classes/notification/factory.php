@@ -51,6 +51,16 @@ abstract class factory {
     }
 
     /**
+     * Create a trigger instance.
+     *
+     * @param notification_model $notification
+     * @return trigger
+     */
+    public static function create_trigger(notification_model $notification): trigger {
+        return new trigger($notification->get_class_key());
+    }
+
+    /**
      * Create a cartel instance.
      *
      * @param subject_instance_dto $dto

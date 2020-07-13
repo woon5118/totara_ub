@@ -96,7 +96,7 @@ class mod_perform_webapi_type_notification_testcase extends advanced_testcase {
             'id' => ['id', null, $notification->id],
             'name' => ['name', format::FORMAT_PLAIN, $notification->name],
             'active' => ['active', null, $notification->active],
-            'trigger_count' => ['trigger_count', null, $notification->trigger_count],
+            'triggers' => ['triggers', null, $notification->triggers],
         ];
 
         foreach ($testcases as $id => $testcase) {

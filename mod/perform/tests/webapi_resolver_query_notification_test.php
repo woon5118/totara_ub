@@ -62,8 +62,6 @@ class mod_perform_webapi_resolver_query_notification_testcase extends advanced_t
         $this->assertEquals($notification->id, $result['id']);
         $this->assertSame($notification->name, $result['name']);
         $this->assertSame($notification->active, $result['active']);
-        $this->assertSame($notification->trigger_count, $result['trigger_count']);
-        $this->assertEquals(count($result['triggers']), $result['trigger_count']);
     }
 
     public function test_failed_ajax_query(): void {

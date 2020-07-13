@@ -30,11 +30,31 @@ $notifications = [
     'instance_created' => [
         'name' => ['notification_broker_instance_created', 'mod_perform'],
         'class' => \mod_perform\notification\brokers\instance_created::class,
-        'support_triggers' => false,
+        'trigger_type' => \mod_perform\notification\trigger::TYPE_UNSUPPORTED,
     ],
-    'overdue' => [
-        'name' => ['notification_broker_overdue', 'mod_perform'],
-        'class' => \mod_perform\notification\brokers\overdue::class,
-        'support_triggers' => true,
+    'instance_created_reminder' => [
+        'name' => ['notification_broker_instance_created_reminder', 'mod_perform'],
+        'class' => \mod_perform\notification\brokers\instance_created_reminder::class,
+        'trigger_type' => \mod_perform\notification\trigger::TYPE_AFTER,
+    ],
+    'due_date_reminder' => [
+        'name' => ['notification_broker_due_date_reminder', 'mod_perform'],
+        'class' => \mod_perform\notification\brokers\due_date_reminder::class,
+        'trigger_type' => \mod_perform\notification\trigger::TYPE_BEFORE,
+    ],
+    'due_date' => [
+        'name' => ['notification_broker_due_date', 'mod_perform'],
+        'class' => \mod_perform\notification\brokers\due_date::class,
+        'trigger_type' => \mod_perform\notification\trigger::TYPE_UNSUPPORTED,
+    ],
+    'overdue_reminder' => [
+        'name' => ['notification_broker_overdue_reminder', 'mod_perform'],
+        'class' => \mod_perform\notification\brokers\overdue_reminder::class,
+        'trigger_type' => \mod_perform\notification\trigger::TYPE_AFTER,
+    ],
+    'completion' => [
+        'name' => ['notification_broker_completion', 'mod_perform'],
+        'class' => \mod_perform\notification\brokers\overdue_reminder::class,
+        'trigger_type' => \mod_perform\notification\trigger::TYPE_UNSUPPORTED,
     ],
 ];

@@ -36,7 +36,6 @@ use core\orm\entity\relations\has_many;
  * @property integer $activity_id parent activity record id
  * @property string $class_key array key registered in db/notifications.php
  * @property string $triggers triggers in JSON format; the internal structure varies on a broker
- * @property integer|null $last_run_at the last time the notification is processed
  * @property boolean $active is active?
  * @property integer $created_at
  * @property integer|null $updated_at

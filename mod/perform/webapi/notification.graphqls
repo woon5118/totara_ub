@@ -6,9 +6,9 @@ type mod_perform_notification {
   name(format: core_format = PLAIN): String!
   class_key: String!
   active: Boolean!
-  trigger_count: Int
+  trigger_type: mod_perform_notification_trigger_type
   recipients: [mod_perform_notification_recipient!]
-  triggers: [String!]
+  triggers: [Int!]
 }
 
 """
@@ -18,6 +18,11 @@ type mod_perform_notification_recipient {
   relationship_id: core_id
   name(format: core_format = PLAIN): String!
   active: Boolean!
+}
+
+enum mod_perform_notification_trigger_type {
+  BEFORE
+  AFTER
 }
 
 extend type Query {

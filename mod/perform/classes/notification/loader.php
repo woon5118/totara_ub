@@ -117,14 +117,24 @@ class loader {
     }
 
     /**
+     * Get the type of event triggers.
+     *
+     * @param string $class_key
+     * @return integer one of trigger constants
+     */
+    public function get_trigger_type_of(string $class_key): int {
+        $info = $this->get_information($class_key);
+        return $info['trigger_type'] ?? trigger::TYPE_UNSUPPORTED;
+    }
+
+    /**
      * Return whether a broker can provide trigger events.
      *
      * @param string $class_key
      * @return boolean
      */
     public function support_triggers(string $class_key): bool {
-        $info = $this->get_information($class_key);
-        return $info['support_triggers'] ?? false;
+        return $this->get_trigger_type_of($class_key) !== trigger::TYPE_UNSUPPORTED;
     }
 
     /**

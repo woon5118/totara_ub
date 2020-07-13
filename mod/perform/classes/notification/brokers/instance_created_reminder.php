@@ -28,14 +28,14 @@ use mod_perform\notification\dealer;
 use mod_perform\models\activity\notification as notification_model;
 
 /**
- * overdue handler
+ * instance_created_reminder handler
  */
-class overdue implements broker {
+class instance_created_reminder implements broker {
     public function get_default_triggers(): array {
         return [];
     }
 
     public function execute(dealer $dealer, notification_model $notification): void {
-        // nothing to do
+        // not yet implemented
     }
 }

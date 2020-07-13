@@ -58,16 +58,9 @@ interface notification_interface {
     public function get_active(): bool;
 
     /**
-     * Return the number of triggers set.
-     *
-     * @return integer
-     */
-    public function get_trigger_count(): int;
-
-    /**
      * Return the array of trigger values.
      *
-     * @return integer[] always empty
+     * @return integer[]
      */
     public function get_triggers(): array;
 
@@ -85,6 +78,14 @@ interface notification_interface {
      * @return notification
      */
     public function activate(bool $active = true): notification_interface;
+
+    /**
+     * Update event trigger values.
+     *
+     * @param array $values
+     * @return notification_interface
+     */
+    public function set_triggers(array $values): notification_interface;
 
     /**
      * Delete the current notification setting.

@@ -79,17 +79,6 @@ final class notification_real implements notification_interface {
     /**
      * @inheritDoc
      */
-    public function get_trigger_count(): int {
-        $triggers = json_decode($this->entity->triggers);
-        if (!is_array($triggers)) {
-            return 0;
-        }
-        return count($triggers);
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function get_triggers(): array {
         $triggers = json_decode($this->entity->triggers);
         if (!is_array($triggers)) {
@@ -203,6 +192,15 @@ final class notification_real implements notification_interface {
             throw new coding_exception('activate() is called after the entity is deleted');
         }
         $this->entity->active = $active;
+        $this->entity->save();
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function set_triggers(array $values): notification_interface {
+        $this->entity->triggers = json_encode($values, JSON_UNESCAPED_SLASHES);
         $this->entity->save();
         return $this;
     }

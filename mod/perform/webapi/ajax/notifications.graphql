@@ -4,7 +4,6 @@ query mod_perform_notifications($activity_id: core_id!) {
     name
     class_key
     active
-    trigger_count
     recipients {
       relationship_id
       name

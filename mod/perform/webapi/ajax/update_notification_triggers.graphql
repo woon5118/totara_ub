@@ -1,8 +1,17 @@
-mutation mod_perform_update_notification_trigger(
+mutation mod_perform_update_notification_triggers(
   $input: mod_perform_update_notification_triggers_input!
 ) {
   mod_perform_update_notification_triggers(input: $input) {
-    success
-    triggers
+    notification {
+      id
+      name
+      active
+      recipients {
+        relationship_id
+        name
+        active
+      }
+      triggers
+    }
   }
 }

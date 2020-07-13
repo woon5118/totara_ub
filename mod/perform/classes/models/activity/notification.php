@@ -38,11 +38,11 @@ use mod_perform\models\activity\details\notification_sparse;
  * @property string $name
  * @property string $class_key
  * @property boolean $active is active?
- * @property integer $trigger_count
- * @property integer[] $triggers
+ * @property integer $trigger_type
  *
  * @property-read activity $activity
  * @property-read collection|notification_recipient[] $recipients
+ * @property-read integer[] $triggers
  */
 final class notification implements notification_interface {
     /** @var notification_interface */
@@ -178,15 +178,9 @@ final class notification implements notification_interface {
     /**
      * @inheritDoc
      */
-    public function get_trigger_count(): int {
-        return $this->current->get_trigger_count();
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function get_triggers(): array {
-        return $this->current->get_triggers();
+        $trigger = factory::create_trigger($this);
+        return $trigger->translate_outgoing($this->current->get_triggers());
     }
 
     /**
@@ -201,6 +195,16 @@ final class notification implements notification_interface {
      */
     public function activate(bool $active = true): notification_interface {
         $this->current = $this->current->activate($active);
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function set_triggers(array $triggers): notification_interface {
+        $trigger = factory::create_trigger($this);
+        $triggers = $trigger->translate_incoming($triggers);
+        $this->current = $this->current->set_triggers($triggers);
         return $this;
     }
 
@@ -227,6 +231,16 @@ final class notification implements notification_interface {
      */
     public function get_name(): string {
         return factory::create_loader()->get_name_of($this->get_class_key());
+    }
+
+    /**
+     * Return the trigger type.
+     *
+     * @return integer one of trigger_type constants
+     */
+    public function get_trigger_type(): int {
+        $loader = factory::create_loader();
+        return $loader->get_trigger_type_of($this->current->get_class_key());
     }
 
     /**

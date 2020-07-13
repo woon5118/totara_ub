@@ -31,6 +31,7 @@ use mod_perform\models\activity\section_relationship;
 use mod_perform\notification\broker;
 use mod_perform\notification\brokers\instance_created;
 use mod_perform\notification\brokers\overdue;
+use mod_perform\notification\trigger;
 use totara_core\relationship\relationship;
 use totara_core\relationship\relationship_provider;
 use totara_core\relationship\resolvers\subject;
@@ -60,8 +61,9 @@ class mod_perform_notification_model_testcase extends mod_perform_notification_t
         $notification = notification::create($activity, $class_key);
         $this->assertEquals($activity->id, $notification->activity->get_id());
         $this->assertEquals($name_expected, $notification->name);
+        $this->assertEquals(trigger::TYPE_UNSUPPORTED, $notification->trigger_type);
         $this->assertFalse($notification->active);
-        $this->assertSame(0, $notification->trigger_count);
+        $this->assertEmpty($notification->triggers);
 
         $entity = new notification_entity($notification->get_id());
         $this->assertEquals($class_key, $entity->class_key);
@@ -107,6 +109,25 @@ class mod_perform_notification_model_testcase extends mod_perform_notification_t
         foreach ($notification->recipients as $recipient) {
             $this->assertFalse($recipient->active);
         }
+    }
+
+    public function test_triggers() {
+        $activity = $this->create_activity();
+        $notification = notification::create($activity, 'instance_created_reminder');
+        $this->assertEquals(trigger::TYPE_AFTER, $notification->trigger_type);
+        $this->assertEquals([], $notification->triggers);
+        $notification->set_triggers([3, 1, 4]);
+        $this->assertEquals([1, 3, 4], $notification->triggers);
+
+        $notification = notification::create($activity, 'instance_created');
+        $this->assertEquals(trigger::TYPE_UNSUPPORTED, $notification->trigger_type);
+        $this->assertEquals([], $notification->triggers);
+        try {
+            $notification->set_triggers([3, 1, 4]);
+            $this->fail('invalid_parameter_exception expected');
+        } catch (invalid_parameter_exception $ex) {
+        }
+        $this->assertEquals([], $notification->triggers);
     }
 
     public function test_activate() {

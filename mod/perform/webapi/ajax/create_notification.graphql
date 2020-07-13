@@ -6,7 +6,6 @@ mutation mod_perform_create_notification(
       id
       name
       active
-      trigger_count
       recipients {
         relationship_id
         name

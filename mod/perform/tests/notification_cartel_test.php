@@ -87,15 +87,3 @@ class mod_perform_notification_cartel_testcase extends mod_perform_notification_
         }
     }
 }
-
-class mod_perform_mock_broker_one extends mod_perform_mock_broker {
-    // nothing to extend
-}
-
-class mod_perform_mock_broker_two extends mod_perform_mock_broker {
-    // nothing to extend
-}
-
-class mod_perform_mock_broker_three extends mod_perform_mock_broker {
-    // nothing to extend
-}

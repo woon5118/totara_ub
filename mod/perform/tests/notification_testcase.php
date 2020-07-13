@@ -207,3 +207,15 @@ class mod_perform_mock_broker implements broker {
         self::$executed_count[$class]++;
     }
 }
+
+class mod_perform_mock_broker_one extends mod_perform_mock_broker {
+    // nothing to extend
+}
+
+class mod_perform_mock_broker_two extends mod_perform_mock_broker {
+    // nothing to extend
+}
+
+class mod_perform_mock_broker_three extends mod_perform_mock_broker {
+    // nothing to extend
+}
