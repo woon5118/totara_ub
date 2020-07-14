@@ -57,7 +57,7 @@ M.totara_coursecompetency = M.totara_coursecompetency || {
 
         // check jQuery dependency is available
         if (typeof $ === 'undefined') {
-            throw new Error('M.totara_competencyadd.init()-> jQuery dependency required for this module to function.');
+            throw new Error('M.totara_coursecompetency.init()-> jQuery dependency required for this module to function.');
         }
 
         ///

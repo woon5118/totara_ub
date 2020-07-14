@@ -91,7 +91,7 @@ define([], function() {
             });
 
             // Events from mobile toggle panel
-            this.regionPanel.addEventListener('totara_core/select_region_panel_toggle:changed', function(e) {
+            this.regionPanel.addEventListener('totara_competency/select_region_panel_toggle:changed', function(e) {
                 var target = that.regionPanel.querySelector(e.detail.target);
                 target.classList.toggle(e.detail.toggleClass);
             });

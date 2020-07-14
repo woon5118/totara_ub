@@ -56,7 +56,7 @@ M.totara_organisationitem = M.totara_organisationitem || {
 
         // check jQuery dependency is available
         if (typeof $ === 'undefined') {
-            throw new Error('M.totara_competencyitem.init()-> jQuery dependency required for this module to function.');
+            throw new Error('M.totara_organisationitem.init()-> jQuery dependency required for this module to function.');
         }
 
         //

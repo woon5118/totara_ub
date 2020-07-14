@@ -188,7 +188,5 @@ $regionpanel = \totara_core\output\select_region_panel::create(
     true
 );
 
-$PAGE->requires->js_call_amd('totara_competency/test_select_region_panel_toggle', 'init');
-echo $OUTPUT->render_from_template('totara_competency/select_region_panel_toggle', '');
 echo $OUTPUT->render($regionpanel);
 echo $OUTPUT->footer();

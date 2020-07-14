@@ -92,7 +92,7 @@ define([], function() {
          * @param {object} data
          */
         triggerEvent: function(eventName, data) {
-            var propagateEvent = new CustomEvent('totara_core/select_region_panel_toggle:' + eventName, {
+            var propagateEvent = new CustomEvent('totara_competency/select_region_panel_toggle:' + eventName, {
                 bubbles: true,
                 detail: data
             });
