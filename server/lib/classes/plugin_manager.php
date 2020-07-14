@@ -1311,6 +1311,7 @@ class core_plugin_manager {
                 'current_learning', 'totara_featured_links', 'totara_user_profile',
                 'course_search',
                 'admin_subnav', 'admin_related_pages', 'course_navigation',
+                'totara_competency',
             ),
 
             'booktool' => array(
