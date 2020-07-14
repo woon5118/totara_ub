@@ -141,6 +141,7 @@ final class trainer_helper {
             FROM {facetoface_session_roles} r
             INNER JOIN {user} u ON u.id = r.userid
             WHERE r.sessionid = ?
+            ORDER by u.id
         ";
 
         $params = [$this->seminarevent->get_id()];
