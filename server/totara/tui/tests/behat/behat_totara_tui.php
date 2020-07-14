@@ -83,9 +83,6 @@ class behat_totara_tui extends behat_base {
     private const TUI_FORM_LABEL_LOCATOR = '.tui-formLabel';
     private const TUI_FORM_ROW_CLASS = 'tui-formRow';
 
-    private const TOGGLE_BUTTON_LOCATOR = '.tui-toggleBtn__ui';
-    private const TOGGLE_BUTTON_LABEL_LOCATOR = '.tui-toggleBtn__btn';
-
     /**
      * @param string $locator CSS locator
      * @param string $element_name Human understandable name of the element - e.g. 'modal', 'popover', 'picker' etc
