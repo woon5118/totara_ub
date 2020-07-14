@@ -1511,7 +1511,7 @@ class core_plugin_manager {
             'theme' => array(
                 'base'
                 // Totara:
-                , 'roots', 'basis',
+                , 'roots', 'basis', 'legacy', 'ventura',
             ),
 
             'tool' => array(
@@ -1530,7 +1530,7 @@ class core_plugin_manager {
                 'hierarchy', 'message', 'oauth', 'plan', 'program', 'question', 'reportbuilder',
                 'certification', 'completionimport', 'mssql', 'generator', 'connect', 'form',
                 'gap', 'job', 'completioneditor', 'userdata', 'catalog', 'workflow', 'contentmarketplace',
-                'tenant', 'webapi', 'evidence', 'mvc', 'cloudfiledir', 'extfiledir',
+                'tenant', 'webapi', 'evidence', 'mvc', 'cloudfiledir', 'extfiledir', 'samples',
             ),
             'tabexport' => array(
                 'csv', 'csv_excel', 'excel', 'ods', 'pdflandscape', 'pdfportrait', 'wkpdflandscape', 'wkpdfportrait',
