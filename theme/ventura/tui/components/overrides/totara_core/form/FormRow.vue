@@ -32,7 +32,7 @@
     &--isStacked {
       flex-direction: column;
 
-      * + * {
+      & > * + * {
         margin-top: var(--tui-gap-1);
       }
     }
