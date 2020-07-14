@@ -23,6 +23,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+use mod_perform\entities\activity\subject_instance;
 use mod_perform\rb\traits\participant_subject_instance_source;
 use mod_perform\state\state_helper;
 use mod_perform\state\subject_instance\closed;
@@ -105,6 +106,19 @@ class rb_source_perform_subject_instance extends rb_base_source {
     protected function define_columnoptions() {
         $global_restriction_join_su = $this->get_global_report_restriction_join('su', 'userid');
 
+        $pending_state = subject_instance::STATUS_PENDING;
+        $participant_count_sql_fragment = "
+        CASE
+            WHEN base.status = $pending_state THEN -1
+            ELSE (
+                SELECT COUNT('x')
+                FROM {perform_participant_instance} ppi
+                {$global_restriction_join_su}
+                WHERE ppi.subject_instance_id = base.id
+            )
+        END
+        ";
+
         $columnoptions = [
             new rb_column_option(
                 'subject_instance',
@@ -120,10 +134,7 @@ class rb_source_perform_subject_instance extends rb_base_source {
                 'participant_instance',
                 'count',
                 get_string('participant_count', 'rb_source_perform_subject_instance'),
-                "(SELECT COUNT('x')
-                FROM {perform_participant_instance} ppi
-                {$global_restriction_join_su}
-                WHERE ppi.subject_instance_id = base.id)",
+                "($participant_count_sql_fragment)",
                 [
                     'dbdatatype' => 'integer',
                     'displayfunc' => 'participant_count',
@@ -166,7 +177,7 @@ class rb_source_perform_subject_instance extends rb_base_source {
                 'subject_instance',
                 'overdue',
                 get_string('overdue', 'mod_perform'),
-                "CASE 
+                "CASE
                     WHEN
                         " . time() . " >= base.due_date
                         AND NOT (
@@ -208,6 +219,11 @@ class rb_source_perform_subject_instance extends rb_base_source {
      * @return array
      */
     protected function define_filteroptions() {
+        $status_options = [
+            subject_instance::STATUS_ACTIVE => get_string('subject_instance_status_active', 'mod_perform'),
+            subject_instance::STATUS_PENDING => get_string('subject_instance_status_pending', 'mod_perform')
+        ];
+
         $filteroptions = [
             new rb_filter_option(
                 'subject_instance',
@@ -253,6 +269,17 @@ class rb_source_perform_subject_instance extends rb_base_source {
                     ),
                     'simplemode' => true,
                 ]
+            ),
+            new rb_filter_option(
+                'subject_instance',
+                'subject_status',
+                get_string('subject_instance_status', 'mod_perform'),
+                'select',
+                [
+                    'selectchoices' => $status_options,
+                    'simplemode' => true,
+                ],
+                'base.status'
             ),
             // TODO: uncomment when its available
             // new rb_filter_option(
@@ -363,6 +390,10 @@ class rb_source_perform_subject_instance extends rb_base_source {
             [
                 'type' => 'subject_instance',
                 'value' => 'subject_availability',
+            ],
+            [
+                'type' => 'subject_instance',
+                'value' => 'subject_status',
             ],
         ];
     }

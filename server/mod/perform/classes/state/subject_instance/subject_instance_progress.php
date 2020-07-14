@@ -47,6 +47,6 @@ abstract class subject_instance_progress extends state {
     }
 
     public static function get_display_name(): string {
-        return get_string('subject_instance_status_' . strtolower(static::get_name()), 'mod_perform');
+        return get_string('subject_instance_progress_' . strtolower(static::get_name()), 'mod_perform');
     }
 }

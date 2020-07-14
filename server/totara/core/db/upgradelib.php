@@ -994,8 +994,8 @@ function totara_core_core_tag_upgrade_tags() {
         }
 
         // This query looks for a tag with the decoded name and the same tagcollid: the "previous" tag.
-        $sql = "SELECT t.id FROM {tag} t 
-                 WHERE t.name = :name 
+        $sql = "SELECT t.id FROM {tag} t
+                 WHERE t.name = :name
                    AND t.tagcollid = :tagcollid";
         $previoustag = $DB->get_record_sql($sql, ['name' => $name, 'tagcollid' => $taginstance->tagcollid]);
 
@@ -1263,14 +1263,11 @@ function totara_core_upgrade_create_relationship($resolver_class_name, $idnumber
     $DB->transaction(static function () use ($DB, $resolver_class_name, $idnumber, $type, $component) {
         $record = [
             'created_at' => time(),
+            'idnumber' => $idnumber ? $idnumber : $resolver_class_name,
+            'type' => $type,
+            'component' => $component
         ];
-        if (isset($idnumber)) {
-            $record = array_merge($record, [
-                'idnumber' => $idnumber,
-                'type' => $type,
-                'component' => $component,
-            ]);
-        }
+
         $relationship_id = $DB->insert_record('totara_core_relationship', $record);
 
         $DB->insert_record('totara_core_relationship_resolver', [

@@ -28,7 +28,6 @@ use moodle_url;
 use html_writer;
 
 class participant_count extends base {
-
     /**
      * Handles the display
      *
@@ -40,6 +39,11 @@ class participant_count extends base {
      * @return string
      */
     public static function display($count, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
+        if ((int)$count < 0) {
+            // This happens for subject instances that still need manual participant assignments.
+            return get_string('subject_instance_status_pending', 'mod_perform');
+        }
+
         if ((int)$count == 1) {
             $text = get_string('instance_one', 'mod_perform');
         } else {

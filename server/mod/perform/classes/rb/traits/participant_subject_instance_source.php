@@ -108,7 +108,7 @@ trait participant_subject_instance_source {
             'perform_type.id',
             [
                 'joins' => ['perform_type', 'perform', 'track', 'track_user_assignment'],
-                'dbdatatype' => 'text',
+                'dbdatatype' => 'integer',
                 'outputformat' => 'text',
                 'displayfunc' => 'activity_type_name',
                 'extrafields' => [
