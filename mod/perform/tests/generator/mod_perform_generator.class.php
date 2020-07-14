@@ -114,6 +114,14 @@ class mod_perform_generator extends component_generator_base {
             /** @var perform_container $container */
             $activity = activity::create($container, $name, $type_model, $description, $status);
 
+            if (isset($data['anonymous_responses']) &&
+                ($data['anonymous_responses'] === true || $data['anonymous_responses'] === 'true')) {
+                /** @var activity_entity $entity */
+                $entity = activity_entity::repository()->find($activity->id);
+                $entity->anonymous_responses = true;
+                $entity->save();
+            }
+
             if (isset($data['create_track']) && $data['create_track']) {
                 track::create($activity);
             }
@@ -512,7 +520,8 @@ class mod_perform_generator extends component_generator_base {
                 'activity_name' => $name,
                 'activity_type' => $type,
                 'create_section' => false,
-                'activity_status' => $configuration->get_activity_status()
+                'activity_status' => $configuration->get_activity_status(),
+                'anonymous_responses' => $configuration->should_use_anonymous_responses(),
             ];
 
             $activity = $this->create_activity_in_container($data);

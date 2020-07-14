@@ -1,5 +1,5 @@
 @totara @perform @mod_perform @javascript @vuejs
-Feature: Manage performance activitiy page
+Feature: Manage performance activity page
   As an activity administrator
   I need to be able to manage activities
   so that I can change them according to the needs.

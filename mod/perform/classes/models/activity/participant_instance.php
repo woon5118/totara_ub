@@ -92,6 +92,18 @@ class participant_instance extends model {
         return $this->{$state_type};
     }
 
+    public function should_anonymise(): bool {
+        if ($this->get_is_for_current_user()) {
+            return false;
+        }
+
+        return $this->entity
+            ->subject_instance
+            ->track
+            ->activity
+            ->anonymous_responses;
+    }
+
     protected function update_state_code(state $state): void {
         $this->entity->{$state::get_type()} = $state::get_code();
         $this->entity->update();
@@ -113,7 +125,7 @@ class participant_instance extends model {
     /**
      * Get the participant entity, for now always an internal user.
      */
-    public function get_participant(): user {
+    public function get_participant(): ?user {
         return $this->entity->participant_user;
     }
 
@@ -176,7 +188,7 @@ class participant_instance extends model {
      *
      * @return relationship_model
      */
-    public function get_core_relationship(): relationship_model {
+    public function get_core_relationship(): ?relationship_model {
         $relationship_entity = $this->entity->core_relationship;
         return (new relationship_model($relationship_entity));
     }

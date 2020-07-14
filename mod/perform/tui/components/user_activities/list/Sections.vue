@@ -57,6 +57,7 @@
       </h3>
 
       <Table
+        v-if="!anonymousResponses || subjectSection.participation.length > 0"
         :data="subjectSection.participation"
         class="tui-performUserActivityListSection__data"
         :border-bottom-hidden="true"
@@ -121,6 +122,31 @@
           </Cell>
         </template>
       </Table>
+
+      <template v-if="anonymousResponses">
+        <hr />
+
+        <div class="tui-performUserActivityListSection__summary">
+          <p>
+            {{
+              $str(
+                'user_activities_total_respondents',
+                'mod_perform',
+                subjectSection.summary.totalRespondents
+              )
+            }}
+          </p>
+          <p>
+            {{
+              $str(
+                'user_activities_total_completed',
+                'mod_perform',
+                subjectSection.summary.totalCompleted
+              )
+            }}
+          </p>
+        </div>
+      </template>
     </div>
 
     <ModalPresenter
@@ -185,6 +211,10 @@ export default {
       required: true,
       type: Object,
     },
+    anonymousResponses: {
+      required: true,
+      type: Boolean,
+    },
   },
 
   data() {
@@ -203,25 +233,49 @@ export default {
       return this.subjectSections.map(item => {
         const participation = item.participant_sections.map(
           participantSection => {
+            let relationship,
+              relationship_id,
+              participant = {};
+
+            const isForCurrentUser =
+              participantSection.participant_instance.is_for_current_user;
+
+            // These fields are not included if answers are anonymous.
+            if (isForCurrentUser || !this.anonymousResponses) {
+              relationship =
+                participantSection.participant_instance.core_relationship.name;
+              relationship_id =
+                participantSection.participant_instance.core_relationship.id;
+              participant = participantSection.participant_instance.participant;
+            }
+
             return {
               id: participantSection.id,
-              isForCurrentUser:
-                participantSection.participant_instance.is_for_current_user,
-              participant: participantSection.participant_instance.participant,
+              isForCurrentUser,
               progressStatus: participantSection.progress_status,
               availabilityStatus: participantSection.availability_status,
               isOverdue: participantSection.is_overdue,
-              relationship:
-                participantSection.participant_instance.core_relationship.name,
-              relationship_id:
-                participantSection.participant_instance.core_relationship.id,
+              participant,
+              relationship,
+              relationship_id,
             };
+          }
+        );
+
+        const filteredParticipation = participation.filter(
+          participantSection => {
+            if (!this.anonymousResponses) {
+              return true;
+            }
+
+            return participantSection.isForCurrentUser;
           }
         );
 
         return {
           canParticipate: item.can_participate,
-          participation: participation,
+          participation: filteredParticipation,
+          summary: this.getParticipantSummary(participation),
           participant_sections: item.participant_sections,
           section: item.section,
         };
@@ -305,6 +359,18 @@ export default {
     filterToCurrentUser(participantSections) {
       return participantSections.filter(ps => ps.isForCurrentUser);
     },
+
+    getParticipantSummary(participation) {
+      const totalRespondents = participation.length;
+      const totalCompleted = participation.filter(
+        item => item.progressStatus === 'COMPLETE'
+      ).length;
+
+      return {
+        totalRespondents,
+        totalCompleted,
+      };
+    },
   },
 };
 </script>
@@ -315,11 +381,13 @@ export default {
       "is_overdue",
       "user_activities_closed",
       "user_activities_status_complete",
-      "user_activities_status_header_section_progress",
       "user_activities_status_header_relationship",
+      "user_activities_status_header_section_progress",
       "user_activities_status_in_progress",
       "user_activities_status_not_started",
       "user_activities_subject_header",
+      "user_activities_total_completed",
+      "user_activities_total_respondents",
       "user_activities_you"
     ]
   }

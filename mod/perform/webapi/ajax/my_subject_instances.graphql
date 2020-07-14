@@ -17,6 +17,7 @@ query mod_perform_my_subject_instances(
         settings {
           multisection
         }
+        anonymous_responses
       }
       subject_user {
         fullname

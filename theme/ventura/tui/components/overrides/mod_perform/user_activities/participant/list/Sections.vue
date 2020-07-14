@@ -25,7 +25,7 @@
   padding: var(--tui-gap-4);
 
   & > * + * {
-    margin-top: var(--tui-gap-4);
+    margin-top: var(--tui-gap-12);
   }
 }
 
@@ -44,6 +44,10 @@
   &__header {
     margin: 0;
     @include tui-font-body();
+  }
+
+  &__header button {
+    @include tui-font-link();
   }
 }
 </style>

@@ -129,10 +129,15 @@ class mod_perform_generator_testcase extends advanced_testcase {
 
         $activities_in_db = activity_entity::repository()->get();
         $this->assertCount(1, $activities_in_db);
+
+        /** @var activity_entity $expected_activity */
         $expected_activity = $activities->first();
+
+        /** @var activity_entity $actual_activity_entity */
         $actual_activity_entity = $activities_in_db->first();
         $this->assertEquals($expected_activity->id, $actual_activity_entity->id);
         $this->assertEquals($expected_activity->type->id, $actual_activity_entity->type_id);
+        $this->assertfalse($actual_activity_entity->anonymous_responses);
 
         // Assert that there is the expected amount of tracks in the database
         $tracks_in_db = track_entity::repository()->get();
@@ -157,6 +162,27 @@ class mod_perform_generator_testcase extends advanced_testcase {
         // Assert that there is the expected amount of section relationships in the database
         $section_relationships_in_db = section_relationship::repository()->get();
         $this->assertCount(1, $section_relationships_in_db);
+    }
+
+    public function test_create_full_activities_with_anonymous_responeses() {
+        $generator = $this->generator();
+
+        $configuration = mod_perform_activity_generator_configuration::new()->enable_anonymous_responses();
+
+        $activities = $generator->create_full_activities($configuration);
+        $this->assertCount(1, $activities);
+
+        $activities_in_db = activity_entity::repository()->get();
+        $this->assertCount(1, $activities_in_db);
+
+        /** @var activity_entity $expected_activity */
+        $expected_activity = $activities->first();
+
+        /** @var activity_entity $actual_activity_entity */
+        $actual_activity_entity = $activities_in_db->first();
+
+        $this->assertEquals($expected_activity->id, $actual_activity_entity->id);
+        $this->assertTrue($actual_activity_entity->anonymous_responses);
     }
 
     public function test_create_full_activities_with_increased_number() {

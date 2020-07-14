@@ -111,6 +111,7 @@ class subject_instance_for_participant {
                 'participant_instances' => function (repository $repository) {
                     $repository->with('participant_sections.section')
                         ->with('core_relationship.resolvers')
+                        ->with('subject_instance.track.activity')
                         ->with('participant_user');
                 }
             ])

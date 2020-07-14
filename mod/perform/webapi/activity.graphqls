@@ -89,14 +89,14 @@ Details about a participant_instance
 """
 type mod_perform_participant_instance {
   id: core_id!
-  participant_id: core_id!
+  participant_id: core_id
   is_for_current_user: Boolean!
   participant_sections: [mod_perform_participant_section!]!
-  participant: core_user!
+  participant: core_user
   progress_status: mod_perform_participant_instance_progress_status!
   availability_status: mod_perform_participant_instance_availability_status!
   is_overdue: Boolean!
-  core_relationship: totara_core_relationship!
+  core_relationship: totara_core_relationship
 }
 
 """

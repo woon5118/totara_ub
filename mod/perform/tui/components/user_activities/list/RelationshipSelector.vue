@@ -175,11 +175,18 @@ export default {
       participantSections.forEach(participantSection => {
         const instance = participantSection.participant_instance;
         const isForCurrentUser = instance.is_for_current_user;
+
+        // Early exit if not for current user.
+        // If responses are anonymous there won't even be a core_relationship
+        // on the participant instance unless it's for the current user.
+        if (!isForCurrentUser) {
+          return;
+        }
+
         const instanceRelationshipId = instance.core_relationship.id;
 
         if (
           foundSection === null &&
-          isForCurrentUser === true &&
           (relationship_id === null ||
             relationship_id === instanceRelationshipId)
         ) {
@@ -238,8 +245,16 @@ export default {
       let relationships = [];
       return participantSections.filter(ps => {
         const isForCurrentUser = ps.participant_instance.is_for_current_user;
+
+        // Early exit if not for current user.
+        // If responses are anonymous there won't even be a core_relationship
+        // on the participant instance unless it's for the current user.
+        if (!isForCurrentUser) {
+          return false;
+        }
+
         const relationship = ps.participant_instance.core_relationship.name;
-        if (isForCurrentUser && relationships.indexOf(relationship) === -1) {
+        if (relationships.indexOf(relationship) === -1) {
           relationships.push(relationship);
           return true;
         }

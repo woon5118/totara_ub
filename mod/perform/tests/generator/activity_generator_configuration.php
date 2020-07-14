@@ -106,6 +106,11 @@ class mod_perform_activity_generator_configuration {
     private $activity_status;
 
     /**
+     * @var bool
+     */
+    private $use_anonymous_responses = false;
+
+    /**
      * shortcut function to get new object
      *
      * @return static
@@ -248,6 +253,22 @@ class mod_perform_activity_generator_configuration {
      */
     public function set_number_of_users_per_user_group_type(int $number): self {
         $this->number_of_users_per_user_group_type = $number;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function should_use_anonymous_responses(): bool {
+        return $this->use_anonymous_responses;
+    }
+
+    /**
+     * @return $this
+     */
+    public function enable_anonymous_responses(): self {
+        $this->use_anonymous_responses = true;
 
         return $this;
     }

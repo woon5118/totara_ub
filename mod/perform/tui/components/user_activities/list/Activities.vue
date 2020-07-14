@@ -178,6 +178,9 @@
           :view-url="viewUrl"
           :current-user-id="currentUserId"
           :subject-user="subjectInstance.subject.subject_user"
+          :anonymous-responses="
+            subjectInstance.subject.activity.anonymous_responses
+          "
         />
       </template>
     </Table>

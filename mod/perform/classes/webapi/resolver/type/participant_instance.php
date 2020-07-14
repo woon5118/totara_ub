@@ -27,6 +27,7 @@ use core\format;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
 use mod_perform\formatter\activity\participant_instance as participant_instance_formatter;
+use mod_perform\models\activity\anonymous_participant_instance;
 use mod_perform\models\activity\participant_instance as participant_instance_model;
 
 class participant_instance implements type_resolver {
@@ -42,6 +43,11 @@ class participant_instance implements type_resolver {
     public static function resolve(string $field, $participant_instance, array $args, execution_context $ec) {
         if (!$participant_instance instanceof participant_instance_model) {
             throw new \coding_exception('Expected participant_instance model');
+        }
+
+        // Last chance guarding when participants should be anonymous.
+        if (!$participant_instance instanceof anonymous_participant_instance && $participant_instance->should_anonymise()) {
+            $participant_instance = new anonymous_participant_instance($participant_instance);
         }
 
         $format = $args['format'] ?? format::FORMAT_HTML;
