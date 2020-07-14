@@ -696,6 +696,12 @@ class reportbuilder {
                 $problems[] = get_string('reportcachingincompatiblefilter', 'totara_reportbuilder', $filter->label);
             }
         }
+
+        // Content restrictions are not compatible with caching.
+        if ($this->contentmode != REPORT_BUILDER_CONTENT_MODE_NONE) {
+            $problems[] = get_string('reportcachingincompatiblecontentrestrictions', 'totara_reportbuilder');
+        }
+
         return $problems;
     }
 

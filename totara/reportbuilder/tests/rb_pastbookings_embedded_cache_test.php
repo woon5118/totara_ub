@@ -65,12 +65,9 @@ class totara_reportbuilder_rb_pastbookings_embedded_cache_testcase extends totar
      * - Check bookings for first user (2)
      * - Check bookings for second user (1)
      * - Check bookings for fourth user (0)
-     *
-     * @param int $usecache Use cache or not (1/0)
-     * @dataProvider provider_use_cache
      */
-    public function test_bookings($usecache) {
-        parent::test_bookings($usecache);
+    public function test_bookings() {
+        parent::test_bookings();
     }
 
     public function test_is_capable() {

@@ -899,6 +899,7 @@ $string['reportbuilderuser_help'] = 'When **Show records by user** is selected t
 
 If multiple options are selected the user sees records that match any of the selected options.';
 $string['reportcachingdisabled'] = 'Report caching is disabled. <a href="{$a}">Enable report caching here</a>';
+$string['reportcachingincompatiblecontentrestrictions'] = 'Report caching is not supported when content restrictions are enabled.';
 $string['reportcachingincompatiblefilter'] = 'Filter "{$a}" is not compatible with report caching.';
 $string['reportcolumns'] = 'Report Columns';
 $string['reportconfirmdelete'] = 'Are you sure you want to delete the report "{$a}"?';

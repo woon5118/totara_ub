@@ -105,15 +105,10 @@ class totara_reportbuilder_rb_team_members_embedded_cache_testcase extends repor
      * - Report for admin user without staff 0
      * - Users0 has three members in team
      * - Users1 has two members in team
-     *
-     * @param int $usecache Use cache or not (1/0)
-     * @dataProvider provider_use_cache
      */
-    public function test_team_members($usecache) {
+    public function test_team_members() {
         $this->resetAfterTest();
-        if ($usecache) {
-            $this->enable_caching($this->report_builder_data['id']);
-        }
+        $usecache = false; // No content caching if content options present.
 
         $useridalias = reportbuilder_get_extrafield_alias('user', 'namewithlinks', 'email');
 
