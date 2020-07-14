@@ -329,7 +329,10 @@ export default {
     displayedParticipantsSorted() {
       return this.displayedParticipants
         .slice()
-        .sort((a, b) => a.core_relationship.id - b.core_relationship.id);
+        .sort(
+          (a, b) =>
+            a.core_relationship.sort_order - b.core_relationship.sort_order
+        );
     },
 
     /**

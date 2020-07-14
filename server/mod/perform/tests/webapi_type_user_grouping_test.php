@@ -24,9 +24,8 @@
 
 use core\format;
 use core\webapi\execution_context;
-
 use mod_perform\user_groups\grouping;
-
+use mod_perform\webapi\resolver\type\user_grouping;
 use totara_job\job_assignment;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
@@ -54,7 +53,7 @@ class mod_perform_webapi_type_user_grouping_testcase extends advanced_testcase {
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessageMatches("/user_grouping/");
 
-        $this->resolve_graphql_type(self::TYPE, 'id', new \stdClass());
+        $this->resolve_graphql_type(self::TYPE, 'id', new stdClass());
     }
 
     /**
@@ -186,11 +185,11 @@ class mod_perform_webapi_type_user_grouping_testcase extends advanced_testcase {
     /**
      * Creates a graphql execution context.
      *
-     * @param \context totara context to pass to the execution context.
+     * @param context totara context to pass to the execution context.
      *
      * @return execution_context the context.
      */
-    private function get_webapi_context(\context $context): execution_context {
+    private function get_webapi_context(context $context): execution_context {
         $ec = execution_context::create('dev', null);
         $ec->set_relevant_context($context);
 

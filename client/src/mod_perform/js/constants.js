@@ -24,6 +24,9 @@ export const NOTIFICATION_DURATION = 10 * 1000; // 10 seconds (in milliseconds)
 // The idnumber for the core subject relationship will ALWAYS be 'subject'
 export const RELATIONSHIP_IDNUMBER_SUBJECT = 'subject';
 
+// This should correspond to mod_perform\models\activity\activity::NAME_MAX_LENGTH in the back end.
+export const ACTIVITY_NAME_MAX_LENGTH = 1024;
+
 // Corresponds to activity state classes found in \mod_perform\state\activity
 export const ACTIVITY_STATUS_ACTIVE = 'ACTIVE';
 export const ACTIVITY_STATUS_DRAFT = 'DRAFT';

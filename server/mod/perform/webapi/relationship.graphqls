@@ -8,14 +8,6 @@ type mod_perform_manual_relationship {
 }
 
 """
-Options for manual relationships to be set at an activity level.
-"""
-type mod_perform_activity_manual_relationship_selector_options {
-  manual_relationships: [mod_perform_manual_relationship!]!
-  selector_options: [totara_core_relationship!] # Options are only given when allowed to edit i.e. when activity is draft
-}
-
-"""
 Individual subject instance that can have the participants specified by the user for a particular activity.
 """
 type mod_perform_manual_participant_selection_instance {
@@ -30,11 +22,11 @@ extend type Query {
   mod_perform_relationships(activity_id: core_id!): [totara_core_relationship!]!
 
   """
-  Get the options for manual relationships to be set at an activity level by an admin.
+  Get the relationship options for manual relationships to be set at an activity level by an admin.
   """
   mod_perform_manual_relationship_selector_options(
     activity_id: core_id!
-  ): mod_perform_activity_manual_relationship_selector_options!
+  ): [totara_core_relationship!]!
 
   """
   Get the activity instances and their manual relationships that the current user can set the participants for.
@@ -48,15 +40,15 @@ extend type Query {
 }
 
 """
-Input for selecting a relationships for a manual participant role.
+Input for selecting which relationship should nominate the participanting users.
 """
-input mod_perform_update_activity_participant_selection_input {
+input mod_perform_activity_manual_relationship_selection_input {
   manual_relationship_id: core_id!
-  selected_relationship_id: core_id!
+  selector_relationship_id: core_id!
 }
 
 """
-Input for selecting a relationships for a manual participant role.
+Input for selecting users linked to the manual relationship.
 """
 input mod_perform_update_manual_participants_input {
   manual_relationship_id: core_id!
@@ -64,7 +56,8 @@ input mod_perform_update_manual_participants_input {
 }
 
 """
-Update activity relationships return type.
+Generic return type for manual relationship mutations.
+Can be replaced in mutations.
 """
 type mod_perform_update_relationship_result {
   activity: mod_perform_activity!
@@ -78,14 +71,6 @@ type mod_perform_set_manual_participants_result {
 }
 
 extend type Mutation {
-  """
-  Update the relationships for the manual participant roles for the activity.
-  """
-  mod_perform_update_activity_participant_selection(
-    activity_id: core_id!
-    relationships: [mod_perform_update_activity_participant_selection_input!]!
-  ): mod_perform_update_relationship_result!
-
   """
   Set the participant users for the manual relationships of a subject instance.
   """

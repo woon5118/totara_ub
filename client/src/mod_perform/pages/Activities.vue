@@ -31,10 +31,7 @@
           :title-id="$id('title')"
           :close-button="true"
         >
-          <GeneralInfoForm
-            :submit-button-text="$str('get_started', 'mod_perform')"
-            :disable-after-save="true"
-            :use-modal-styling="true"
+          <CreateActivityForm
             @mutation-success="redirectToManageActivity"
             @mutation-error="creationError"
           />
@@ -86,7 +83,7 @@
 import ActivityActions from 'mod_perform/components/activities_list/ActivityActions';
 import Button from 'tui/components/buttons/Button';
 import Cell from 'tui/components/datatable/Cell';
-import GeneralInfoForm from 'mod_perform/components/manage_activity/GeneralInfoTab';
+import CreateActivityForm from 'mod_perform/components/manage_activity/CreateActivityForm';
 import HeaderCell from 'tui/components/datatable/HeaderCell';
 import Loader from 'tui/components/loader/Loader';
 import Modal from 'tui/components/modal/Modal';
@@ -102,7 +99,7 @@ export default {
     ActivityActions,
     Button,
     Cell,
-    GeneralInfoForm,
+    CreateActivityForm,
     HeaderCell,
     Loader,
     Modal,

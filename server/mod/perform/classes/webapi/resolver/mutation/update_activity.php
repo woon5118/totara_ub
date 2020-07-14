@@ -43,10 +43,13 @@ class update_activity implements mutation_resolver, has_middleware {
 
         $activity->set_general_info($args['name'], $args['description'] ?? null, $args['type_id'] ?? null);
 
-        if (!$activity->is_active()) {
+        if (isset($args['anonymous_responses'])) {
             $activity->set_attribution_settings($args['anonymous_responses']);
         }
 
+        if (isset($args['relationships'])) {
+            $activity->update_manual_relationship_selections($args['relationships']);
+        }
         $activity->update();
 
         return ['activity' => $activity];

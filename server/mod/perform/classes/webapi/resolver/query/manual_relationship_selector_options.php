@@ -30,6 +30,7 @@ use core\webapi\resolver\has_middleware;
 use mod_perform\webapi\middleware\require_activity;
 use mod_perform\webapi\middleware\require_manage_capability;
 use totara_core\entities\relationship;
+use totara_core\relationship\relationship_provider;
 
 /**
  * Get the options for manual relationships to be set at an activity level by an admin.
@@ -42,11 +43,9 @@ class manual_relationship_selector_options implements query_resolver, has_middle
      * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
-        // The require_activity middleware loads the activity and passes it along via the args
-        $activity = $args['activity'];
-
-        // TODO: Return actual data in TL-26142 / TL-26143
-        return self::get_dummy_data($activity);
+        return (new relationship_provider())
+            ->filter_by_type(relationship::TYPE_STANDARD)
+            ->get();
     }
 
     /**
@@ -59,45 +58,4 @@ class manual_relationship_selector_options implements query_resolver, has_middle
             require_manage_capability::class,
         ];
     }
-
-    /**
-     * TODO: REMOVE IN TL-26142 / TL-26143
-     */
-    public static function get_dummy_data(\mod_perform\models\activity\activity $activity): array {
-        $core_relationships = \totara_core\entities\relationship::repository()
-            ->with('resolvers')
-            ->where('type', relationship::TYPE_STANDARD)
-            ->order_by('id')
-            ->limit(3)
-            ->get()
-            ->map_to(\totara_core\relationship\relationship::class);
-        $subject_relationship = $core_relationships->first();
-
-        $manual_relationships = \totara_core\entities\relationship::repository()
-            ->with('resolvers')
-            ->where('type', relationship::TYPE_MANUAL)
-            ->order_by('id')
-            ->get()
-            ->map_to(\totara_core\relationship\relationship::class);
-
-        $relationships_to_return = [];
-        foreach ($manual_relationships as $i => $manual_relationship) {
-            $relationships_to_return[] = (object) [
-                'activity' => $activity,
-                'manual_relationship' => $manual_relationship,
-                'selector_relationship' => $subject_relationship,
-            ];
-        }
-
-        $data = [
-            'manual_relationships' => $relationships_to_return,
-        ];
-
-        if ($activity->is_draft()) {
-            $data['selector_options'] = $core_relationships;
-        }
-
-        return $data;
-    }
-
 }

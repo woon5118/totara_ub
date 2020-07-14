@@ -60,13 +60,15 @@ Feature: Adding and removing participant to a perform activity section
       | Subject   | 1 |
       | Manager   | 1 |
       | Appraiser | 0 |
+      | Peer      | 0 |
+      | Mentor    | 0 |
+      | Reviewer  | 0 |
 
     When I click on the "Appraiser" tui checkbox
     And I click on "Done" "button"
     Then I should see "Activity saved" in the tui "success" notification toast
     And I close the tui notification toast
     And I should see "Subject, Manager, Appraiser" as the perform activity participants
-    And I should see the add participant button is disabled
     When I remove "Subject" as a perform activity participant
     And I close the tui notification toast
     When I remove "Manager" as a perform activity participant
@@ -92,10 +94,13 @@ Feature: Adding and removing participant to a perform activity section
     When I click on the "Subject" tui checkbox
     When I click on the "Manager" tui checkbox
     When I click on the "Appraiser" tui checkbox
+    When I click on the "Peer" tui checkbox
+    When I click on the "Mentor" tui checkbox
+    When I click on the "Reviewer" tui checkbox
     And I click on "Done" "button"
     Then I should see "Activity saved" in the tui "success" notification toast
     And I close the tui notification toast
-    And I should see "Subject, Manager, Appraiser" as the perform activity participants
+    And I should see "Subject, Manager, Appraiser, Peer, Mentor, Reviewer" as the perform activity participants
     And I should see the add participant button is disabled
 
     # Toggle can view other responses for Subject

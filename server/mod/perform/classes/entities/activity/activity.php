@@ -135,4 +135,12 @@ class activity extends entity {
         return (bool) $this->set_attribute_raw('anonymous_responses', $value);
     }
 
+    /**
+     * Get the manual relationship configurations for the activity.
+     *
+     * @return has_many
+     */
+    public function manual_relationships(): has_many {
+        return $this->has_many(manual_relationship_selection::class, 'activity_id');
+    }
 }

@@ -26,6 +26,9 @@ use mod_perform\models\activity\activity;
 use mod_perform\models\activity\activity_type;
 use mod_perform\webapi\resolver\mutation\create_activity;
 use totara_core\advanced_feature;
+use totara_core\entities\relationship as relationship_entity;
+use totara_core\relationship\relationship;
+use totara_core\relationship\relationship_provider;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
@@ -133,6 +136,47 @@ class mod_perform_webapi_resolver_mutation_create_activity_testcase extends adva
         $this->expectExceptionMessageMatches("/type id/");
 
         $this->resolve_graphql_mutation(self::MUTATION, $args);
+    }
+
+    /**
+     * Tests selector for manual relationships are set as subject by default.
+     *
+     * @return void
+     */
+    public function test_create_activity_creates_default_manual_relationships(): void {
+        $this->setAdminUser();
+        $expected_type = activity_type::load_by_name('check-in');
+        $args = [
+            'name' => "Mid year performance review",
+            'description' => "Test Description",
+            'type' => $expected_type->id
+        ];
+        ['activity' => $activity] = $this->resolve_graphql_mutation(self::MUTATION, $args);
+
+        $subject_relationship = relationship::load_by_idnumber('subject');
+        $manual_relationships = (new relationship_provider())
+            ->filter_by_component('mod_perform')
+            ->filter_by_type(relationship_entity::TYPE_MANUAL)
+            ->get();
+        $this->assertEquals(count($manual_relationships), count($activity->manual_relationships));
+
+        $expected_default_manual_relationships = [];
+        foreach ($manual_relationships as $manual_relationship) {
+            $expected_default_manual_relationships[] = [
+                'manual_relationship_id' => $manual_relationship->id,
+                'selector_relationship_id' => $subject_relationship->id,
+            ];
+        }
+
+        $created_manual_relationships = [];
+        foreach ($activity->manual_relationships as $manual_relationship) {
+            $created_manual_relationships[] = [
+                'manual_relationship_id' => (int)$manual_relationship->manual_relationship_id,
+                'selector_relationship_id' => (int)$manual_relationship->selector_relationship_id,
+
+            ];
+        }
+        $this->assertEqualsCanonicalizing($expected_default_manual_relationships, $created_manual_relationships);
     }
 
     /**

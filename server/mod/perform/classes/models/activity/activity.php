@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
@@ -28,10 +28,15 @@ use coding_exception;
 use container_perform\backup\backup_helper;
 use container_perform\backup\restore_helper;
 use container_perform\perform as perform_container;
+use context_course;
+use context_coursecat;
+use context_module;
 use core\entities\expandable;
 use core\entities\user;
 use core\orm\collection;
 use core\orm\entity\model;
+use core\orm\query\builder;
+use core_text;
 use mod_perform\data_providers\activity\activity_settings;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\entities\activity\manual_relationship_selection;
@@ -50,8 +55,10 @@ use mod_perform\user_groups\grouping;
 use mod_perform\util;
 use mod_perform\webapi\resolver\type\activity_state;
 use moodle_exception;
+use stdClass;
 use totara_core\entities\relationship as relationship_entity;
 use totara_core\relationship\relationship;
+use totara_core\relationship\relationship_provider;
 
 /**
  * Class activity
@@ -68,7 +75,7 @@ use totara_core\relationship\relationship;
  * @property-read int $created_at
  * @property-read int $updated_at
  * @property-read collection|section[] $sections
- * @property-read collection|relationship[] $relationships
+ * @property-read collection|activity_manual_relationship_selection[] $manual_relationships
  * @property-read collection|track[] $tracks
  * @property-read activity_settings $settings
  * @property-read bool anonymous_responses
@@ -96,7 +103,7 @@ class activity extends model {
         'type',
         'sections',
         'settings',
-        'relationships',
+        'manual_relationships',
         'tracks',
         'can_activate',
         'can_potentially_activate',
@@ -134,11 +141,11 @@ class activity extends model {
      * Checks whether the logged in (or given) user has the capability to create the activity.
      *
      * @param int|null $userid
-     * @param \context_coursecat|null $context
+     * @param context_coursecat|null $context
      *
      * @return bool
      */
-    public static function can_create(int $userid = null, \context_coursecat $context = null): bool {
+    public static function can_create(int $userid = null, context_coursecat $context = null): bool {
         global $USER;
 
         if (null == $userid) {
@@ -153,7 +160,7 @@ class activity extends model {
                 return false;
             }
 
-            $context = \context_coursecat::instance($categoryid);
+            $context = context_coursecat::instance($categoryid);
         }
 
         return has_capability('mod/perform:create_activity', $context, $userid) &&
@@ -198,7 +205,7 @@ class activity extends model {
             throw new coding_exception('Invalid activity status given');
         }
 
-        $modinfo = new \stdClass();
+        $modinfo = new stdClass();
         $modinfo->modulename = 'perform';
         $modinfo->course = $container->id;
         $modinfo->name = $name;
@@ -234,20 +241,22 @@ class activity extends model {
             }
 
             $activity = self::load_by_entity($entity);
-            // TODO: Remove me when TL-26143 landed
-            $activity->create_manual_relationship_selection();
+            $activity->create_default_manual_relationships();
 
             return $activity;
         });
     }
 
     /**
-     * TODO: Remove me when TL-26143 landed
+     * Creates the default manual relationships for the activity as the subject.
+     *
+     * @return void
      */
-    private function create_manual_relationship_selection() {
-        $subject_relationship = relationship::load_by_idnumber('manager');
-        $manual_relationships = relationship_entity::repository()
-            ->where('type', relationship_entity::TYPE_MANUAL)
+    private function create_default_manual_relationships(): void {
+        $subject_relationship = relationship::load_by_idnumber('subject');
+        $manual_relationships = (new relationship_provider())
+            ->filter_by_component('mod_perform')
+            ->filter_by_type(relationship_entity::TYPE_MANUAL)
             ->get();
 
         foreach ($manual_relationships as $manual_relationship) {
@@ -286,7 +295,7 @@ class activity extends model {
     /**
      * Return the context object for this activity.
      */
-    public function get_context(): \context_module {
+    public function get_context(): context_module {
         global $USER;
 
         $mod_info = get_fast_modinfo($this->course, $USER->id);
@@ -296,7 +305,7 @@ class activity extends model {
         }
         $cm = $instances[$this->id];
 
-        return \context_module::instance($cm->id);
+        return context_module::instance($cm->id);
     }
 
     /**
@@ -378,7 +387,7 @@ class activity extends model {
             $problems[] = 'Name is required';
         }
 
-        if (\core_text::strlen($entity->name) > self::NAME_MAX_LENGTH) {
+        if (core_text::strlen($entity->name) > self::NAME_MAX_LENGTH) {
             $problems[] = 'Name cannot be more than ' . self::NAME_MAX_LENGTH . ' characters';
         }
 
@@ -612,13 +621,58 @@ class activity extends model {
     }
 
     /**
+     * Get manual relationships set for the activity.
+     *
+     * @return collection
+     */
+    public function get_manual_relationships(): collection {
+        return $this->entity->manual_relationships->map_to(activity_manual_relationship_selection::class)->sort(function($manual_selection, $manual_selection_2) {
+            return $manual_selection->manual_relationship->sort_order <=> $manual_selection_2->manual_relationship->sort_order;
+        });
+    }
+
+    /**
+     * Update the manual relationship selections.
+     *
+     * @return activity
+     */
+    public function update_manual_relationship_selections(array $selected_relationships): activity {
+        if($this->is_active()) {
+            throw new moodle_exception('error_updating_activity_manual_relationships', 'mod_perform');
+        }
+
+        builder::get_db()->transaction(function() use ($selected_relationships) {
+            $saved_relationship_selections = manual_relationship_selection::repository()
+                ->where('activity_id', $this->id)
+                ->get()->map_to(activity_manual_relationship_selection::class);
+            $core_relationships = (new relationship_provider())->filter_by_type(relationship_entity::TYPE_STANDARD)->get()->pluck('id');
+
+            $new_manual_relationship_selections = [];
+            foreach ($selected_relationships as $selected_relationship) {
+                if (!in_array($selected_relationship['selector_relationship_id'], $core_relationships, true)) {
+                    throw new moodle_exception('invalid_relationship', 'mod_perform');
+                }
+                $new_manual_relationship_selections[$selected_relationship['manual_relationship_id']] = $selected_relationship['selector_relationship_id'];
+            }
+
+            foreach ($saved_relationship_selections as $relationship_selection) {
+                if (isset($new_manual_relationship_selections[$relationship_selection->manual_relationship_id])) {
+                    $relationship_selection->update_selector_relationship($new_manual_relationship_selections[$relationship_selection->manual_relationship_id]);
+                }
+            }
+        });
+
+        return $this;
+    }
+
+    /**
      * Is the user allowed to clone this activity?
      *
      * @return bool
      */
     public function get_can_clone(): bool {
-        return has_capability(backup_helper::CAPABILITY_CONTAINER, \context_course::instance($this->entity->course))
-            && has_capability(restore_helper::CAPABILITY_CONTAINER, \context_course::instance($this->entity->course));
+        return has_capability(backup_helper::CAPABILITY_CONTAINER, context_course::instance($this->entity->course))
+            && has_capability(restore_helper::CAPABILITY_CONTAINER, context_course::instance($this->entity->course));
     }
 
     /**

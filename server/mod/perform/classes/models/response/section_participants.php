@@ -61,7 +61,7 @@ class section_participants {
             if ($a->core_relationship->name === $b->core_relationship->name) {
                 return $a->participant->fullname <=> $b->participant->fullname;
             }
-            return $a->core_relationship->id <=> $b->core_relationship->id;
+            return $a->core_relationship->sort_order <=> $b->core_relationship->sort_order;
         });
 
         $this->participant_sections = $participant_sections;

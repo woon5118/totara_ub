@@ -4,6 +4,8 @@ mutation mod_perform_update_activity(
   $description: param_text
   $type_id: core_id
   $anonymous_responses: param_boolean
+  $relationships: [mod_perform_activity_manual_relationship_selection_input!]
+  $with_relationships: Boolean!
 ) {
   mod_perform_update_activity(
     activity_id: $activity_id
@@ -11,6 +13,7 @@ mutation mod_perform_update_activity(
     description: $description
     type_id: $type_id
     anonymous_responses: $anonymous_responses
+    relationships: $relationships
   ) {
     activity {
       id
@@ -18,12 +21,23 @@ mutation mod_perform_update_activity(
       edit_name: name(format: RAW)
       description
       edit_description: description(format: RAW)
-      description
       type {
         id
         display_name
       }
       anonymous_responses
+      manual_relationships @include(if: $with_relationships) {
+        manual_relationship {
+          id
+          idnumber
+          name
+        }
+        selector_relationship {
+          id
+          idnumber
+          name
+        }
+      }
     }
   }
 }

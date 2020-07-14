@@ -18,10 +18,7 @@
 
 <template>
   <div class="tui-performManageActivityGeneralInfo">
-    <h3
-      v-if="!disableAfterSave"
-      class="tui-performManageActivityGeneralInfo__heading"
-    >
+    <h3 class="tui-performManageActivityGeneralInfo__heading">
       {{ $str('activity_general_tab_heading', 'mod_perform') }}
     </h3>
 
@@ -33,9 +30,8 @@
       >
         <InputText
           :id="id"
-          :value="activity.edit_name"
+          v-model="form.name"
           :maxlength="ACTIVITY_NAME_MAX_LENGTH"
-          @input="updateActivity({ edit_name: $event })"
         />
       </FormRow>
 
@@ -43,42 +39,29 @@
         v-slot="{ id }"
         :label="$str('general_info_label_activity_description', 'mod_perform')"
       >
-        <Textarea
-          :id="id"
-          :value="activity.edit_description"
-          @input="updateActivity({ edit_description: $event })"
-        />
+        <Textarea :id="id" v-model="form.description" />
       </FormRow>
 
       <FormRow
         v-slot="{ id }"
         :label="$str('general_info_label_activity_type', 'mod_perform')"
-        :required="useModalStyling || !isActive"
-        :no-input="!isActive"
       >
         <div>
+          <span v-if="isActive" class="tui-performManageActivityGeneralInfo">{{
+            value.type.display_name
+          }}</span>
           <Select
-            v-if="disableAfterSave || (!useModalStyling && !isActive)"
+            v-else
             :id="id"
-            v-model="activityTypeSelection"
+            v-model="form.type_id"
             :aria-labelledby="id"
             :aria-describedby="$id('aria-describedby')"
             :options="activityTypes"
           />
-          <span v-else class="tui-performManageActivityGeneralInfo">{{
-            activityTypeName
-          }}</span>
-
-          <FormRowDetails
-            v-show="useModalStyling"
-            :id="$id('aria-describedby')"
-          >
-            {{ $str('activity_type_help_text', 'mod_perform') }}
-          </FormRowDetails>
         </div>
       </FormRow>
 
-      <template v-if="!useModalStyling">
+      <template>
         <h3 class="tui-performManageActivityGeneralInfo__heading">
           {{
             $str('activity_general_response_attribution_heading', 'mod_perform')
@@ -89,41 +72,64 @@
           :label="
             $str('activity_general_anonymous_responses_label', 'mod_perform')
           "
-          :no-input="!isActive"
         >
-          <ToggleSwitch
-            v-if="!isActive"
-            v-model="activity.anonymous_responses"
-            toggle-first
-            text=""
-            @input="updateActivity({ anonymous_responses: $event })"
-          />
-          <span v-else>{{
-            activeToggleText(activity.anonymous_responses)
+          <span v-if="isActive">{{
+            activeToggleText(value.anonymous_responses)
           }}</span>
+          <ToggleSwitch v-else v-model="form.anonymousResponse" toggle-first />
         </FormRow>
       </template>
 
-      <FormRow
-        :class="
-          useModalStyling
-            ? 'tui-performManageActivityGeneralInfo__modalBtnRow'
-            : ''
-        "
-      >
+      <div class="tui-performManageActivityManualRelationships">
+        <h3 class="tui-performManageActivityManualRelationships__heading">
+          {{
+            $str('general_info_participant_selection_heading', 'mod_perform')
+          }}
+        </h3>
+        <p>
+          {{
+            $str(
+              'general_info_participant_selection_description',
+              'mod_perform'
+            )
+          }}
+        </p>
+        <FormRow
+          v-for="relationship in manualRelationships"
+          :key="relationship.id"
+          v-slot="{ id }"
+          :label="relationship.name"
+        >
+          <div>
+            <span v-if="isActive">
+              {{ relationship.selector_relationship_name }}
+            </span>
+            <Select
+              v-else
+              :id="id"
+              v-model="form.manualRelationshipSelections[relationship.id]"
+              :aria-labelledby="id"
+              :aria-label="relationship.name"
+              :aria-describedby="$id('aria-describedby')"
+              :options="manualRelationshipOptions"
+            />
+          </div>
+        </FormRow>
+      </div>
+
+      <FormRow>
         <ButtonGroup>
           <Button
             :styleclass="{ primary: true }"
-            :text="submitButtonText"
-            :disabled="isSaving || hasNoTitle || hasNoType"
+            :text="$str('save_changes', 'mod_perform')"
+            :disabled="isSaving || hasNoTitle"
             type="submit"
             @click.prevent="trySave"
           />
           <Button
-            v-show="!useModalStyling"
             :disabled="isSaving"
             :text="$str('cancel', 'moodle')"
-            @click="resetActivityChanges"
+            @click="resetChanges"
           />
         </ButtonGroup>
       </FormRow>
@@ -136,20 +142,19 @@ import Button from 'tui/components/buttons/Button';
 import ButtonGroup from 'tui/components/buttons/ButtonGroup';
 import Form from 'tui/components/form/Form';
 import FormRow from 'tui/components/form/FormRow';
-import FormRowDetails from 'tui/components/form/FormRowDetails';
 import InputText from 'tui/components/form/InputText';
 import Select from 'tui/components/form/Select';
 import Textarea from 'tui/components/form/Textarea';
 import ToggleSwitch from 'tui/components/toggle/ToggleSwitch';
-import { ACTIVITY_STATUS_ACTIVE } from 'mod_perform/constants';
+import {
+  ACTIVITY_STATUS_ACTIVE,
+  ACTIVITY_NAME_MAX_LENGTH,
+} from 'mod_perform/constants';
 
 //GraphQL
 import activityTypesQuery from 'mod_perform/graphql/activity_types';
-import createActivityMutation from 'mod_perform/graphql/create_activity';
+import manualRelationshipOptionsQuery from 'mod_perform/graphql/manual_relationship_selector_options';
 import updateGeneralInfoMutation from 'mod_perform/graphql/update_activity';
-
-// This should correspond to mod_perform\models\activity\activity::NAME_MAX_LENGTH in the back end.
-const ACTIVITY_NAME_MAX_LENGTH = 1024;
 
 export default {
   components: {
@@ -157,7 +162,6 @@ export default {
     ButtonGroup,
     Form,
     FormRow,
-    FormRowDetails,
     InputText,
     Select,
     Textarea,
@@ -165,41 +169,45 @@ export default {
   },
 
   props: {
-    disableAfterSave: {
-      type: Boolean,
-      default: false,
-    },
-    submitButtonText: {
-      type: String,
-      default() {
-        return this.$str('save_changes', 'mod_perform');
-      },
-    },
-    useModalStyling: {
-      type: Boolean,
-      default: false,
-    },
     value: {
       type: Object,
+      required: true,
+      validator(value) {
+        let keys = Object.keys(value);
+
+        return (
+          keys.includes('edit_name') &&
+          keys.includes('edit_description') &&
+          keys.includes('anonymous_responses') &&
+          keys.includes('manual_relationships')
+        );
+      },
     },
   },
 
   data() {
-    const activity = Object.assign({}, this.value);
-    const typeId = activity && activity.id ? activity.type.id : 0;
-    const typeName =
-      activity && activity.id ? activity.type.display_name : 'unknown';
-
     return {
-      activity: activity,
-      activityTypeName: typeName,
+      form: {
+        name: this.value.edit_name,
+        description: this.value.edit_description,
+        type_id: this.value.type.id,
+        manualRelationshipSelections: this.getManualRelationshipSelections(),
+        anonymousResponse: this.value && this.value.anonymous_responses,
+      },
       activityTypes: [
         {
-          id: 0,
-          label: this.$str('general_info_select_activity_type', 'mod_perform'),
+          id: this.value.type.id,
+          label: this.value.type.display_name,
         },
       ],
-      activityTypeSelection: typeId,
+      manualRelationshipOptions: this.value.manual_relationships.map(
+        relationship => {
+          return {
+            id: relationship.selector_relationship.id,
+            label: relationship.selector_relationship.name,
+          };
+        }
+      ),
       isSaving: false,
       mutationError: null,
     };
@@ -207,32 +215,12 @@ export default {
 
   computed: {
     /**
-     * Has the activity not yet been saved to the back-end.
-     *
-     * @return {boolean}
-     */
-    exists() {
-      return Boolean(this.activity.id);
-    },
-
-    /**
      * Is the title/name text empty.
      *
      * @return {boolean}
      */
     hasNoTitle() {
-      return (
-        !this.activity.edit_name || this.activity.edit_name.trim().length === 0
-      );
-    },
-
-    /**
-     * Is the activity type unselected.
-     *
-     * @return {boolean}
-     */
-    hasNoType() {
-      return this.activityTypeSelection === 0;
+      return !this.form.name || this.form.name.trim().length === 0;
     },
 
     /**
@@ -246,17 +234,28 @@ export default {
       return this.value.state_details.name === ACTIVITY_STATUS_ACTIVE;
     },
 
-    /**
-     * returns tru if the anonymous_responses setting is active
-     * @return {Boolean}
-     */
-    isAnonymousResponseActive() {
-      return this.activity.anonymous_responses;
+    manualRelationships() {
+      return this.value
+        ? this.value.manual_relationships.map(relationship => {
+            return {
+              name: relationship.manual_relationship.name,
+              id: relationship.manual_relationship.id,
+              selector_relationship_id: relationship.selector_relationship.id,
+              selector_relationship_name:
+                relationship.selector_relationship.name,
+            };
+          })
+        : [];
     },
   },
 
   created() {
     this.ACTIVITY_NAME_MAX_LENGTH = ACTIVITY_NAME_MAX_LENGTH;
+  },
+
+  mounted() {
+    // Confirm navigation away if user is currently editing.
+    window.addEventListener('beforeunload', this.unloadHandler);
   },
 
   apollo: {
@@ -266,70 +265,109 @@ export default {
         return [];
       },
       update({ mod_perform_activity_types: types }) {
-        const options = types
+        return types
           .map(type => {
             return { id: type.id, label: type.display_name };
           })
           .sort((a, b) => a.label.localeCompare(b.label));
-        //show 'select type' only when create activity
-        if (this.useModalStyling) {
-          options.unshift({
-            id: 0,
-            label: this.$str(
-              'general_info_select_activity_type',
-              'mod_perform'
-            ),
-          });
-        }
-        return options;
+      },
+    },
+    manualRelationshipOptions: {
+      query: manualRelationshipOptionsQuery,
+      variables() {
+        return { activity_id: this.value.id };
+      },
+      update: ({
+        mod_perform_manual_relationship_selector_options: relationshipOptions,
+      }) => {
+        return relationshipOptions.map(relationship => {
+          return {
+            id: relationship.id,
+            label: relationship.name,
+          };
+        });
       },
     },
   },
 
   methods: {
     /**
-     * @returns {Promise<{id, name, description}>}
+     * Gets manual relationship selections as an object map. {manual_relationship_id: selected_relationship_id}
+     *
+     * @returns {Object}
+     */
+    getManualRelationshipSelections() {
+      let relationshipSelections = {};
+      if (this.value && this.value.manual_relationships) {
+        this.value.manual_relationships.forEach(relationship => {
+          relationshipSelections[relationship.manual_relationship.id] =
+            relationship.selector_relationship.id;
+        });
+      }
+
+      return relationshipSelections;
+    },
+
+    /**
+     * Try to persist the activity to the back end.
+     * Emitting events on success/failure.
+     */
+    async trySave() {
+      this.isSaving = true;
+
+      try {
+        const savedActivity = await this.save();
+        this.updateActivity(savedActivity);
+        this.$emit('mutation-success', savedActivity);
+      } catch (e) {
+        this.$emit('mutation-error', e);
+      }
+      this.isSaving = false;
+    },
+
+    /**
+     * @returns {Object}
      */
     async save() {
-      let mutation, mutationName, variables;
+      let mutation = updateGeneralInfoMutation;
 
-      if (this.exists) {
-        mutation = updateGeneralInfoMutation;
-        mutationName = 'mod_perform_update_activity';
+      let variables = {
+        activity_id: this.value.id,
+        name: this.form.name,
+        description: this.form.description,
+        with_relationships: false,
+      };
 
-        variables = {
-          activity_id: this.activity.id,
-          name: this.activity.edit_name,
-          description: this.activity.edit_description,
-        };
-
-        // Add draft only updates.
-        if (!this.isActive) {
-          variables.anonymous_responses = this.activity.anonymous_responses;
+      // Add draft only updates.
+      if (!this.isActive) {
+        if (this.value.anonymous_responses !== this.form.anonymousResponse) {
+          variables.anonymous_responses = this.form.anonymousResponse;
         }
-
-        // Only mutate the type id if the user has explicitly changed the type.
-        if (this.activity.type.id !== this.activityTypeSelection) {
-          variables.type_id = this.activityTypeSelection;
+        if (this.value.type.id !== this.form.type_id) {
+          variables.type_id = this.form.type_id;
         }
-      } else {
-        mutation = createActivityMutation;
-        mutationName = 'mod_perform_create_activity';
-
-        variables = {
-          name: this.activity.edit_name,
-          description: this.activity.edit_description,
-          type: this.activityTypeSelection,
-        };
+        if (this.hasChangesToRelationshipSelection()) {
+          variables.with_relationships = true;
+          variables.relationships = Object.keys(
+            this.form.manualRelationshipSelections
+          ).map(manual_relationship_id => {
+            return {
+              manual_relationship_id: manual_relationship_id,
+              selector_relationship_id: this.form.manualRelationshipSelections[
+                manual_relationship_id
+              ],
+            };
+          });
+        }
       }
 
       const { data: resultData } = await this.$apollo.mutate({
         mutation,
         variables,
-        refetchAll: false, // Don't refetch all the data again
+        refetchAll: false,
       });
 
-      return resultData[mutationName].activity;
+      return resultData.mod_perform_update_activity.activity;
     },
 
     /**
@@ -337,40 +375,33 @@ export default {
      * @return {string}
      */
     activeToggleText(value) {
-      if (value) {
-        return this.$str('boolean_setting_text_enabled', 'mod_perform');
-      }
+      return value
+        ? this.$str('boolean_setting_text_enabled', 'mod_perform')
+        : this.$str('boolean_setting_text_disabled', 'mod_perform');
+    },
 
-      return this.$str('boolean_setting_text_disabled', 'mod_perform');
+    hasUnsavedChanges() {
+      return (
+        this.form.name !== this.value.edit_name ||
+        this.form.description !== this.value.edit_description ||
+        this.form.type_id !== this.value.type.id ||
+        this.form.anonymousResponse !== this.value.anonymous_responses ||
+        this.hasChangesToRelationshipSelection()
+      );
     },
 
     /**
-     * Try to persist the activity to the back end.
-     * Emitting events on success/failure.
+     * Checks if there's been a change to the manual relationship selections.
      *
-     * @returns {Promise<void>}
+     * @return {Boolean}
      */
-    async trySave() {
-      this.isSaving = true;
-      this.activityTypeName = this.activityTypes[
-        this.activityTypeSelection - 1
-      ].label;
-
-      try {
-        const savedActivity = await this.save();
-        this.updateActivity(savedActivity);
-        this.$emit('mutation-success', savedActivity);
-
-        // On create (from the modal) we keep the submit button disabled while the redirect is processing.
-        if (!this.disableAfterSave) {
-          this.isSaving = false;
-        }
-      } catch (e) {
-        this.$emit('mutation-error', e);
-
-        // If something goes wrong during create, allow the user to try again.
-        this.isSaving = false;
-      }
+    hasChangesToRelationshipSelection() {
+      return this.manualRelationships.some(relationship => {
+        return (
+          this.form.manualRelationshipSelections[relationship.id] !==
+          relationship.selector_relationship_id
+        );
+      });
     },
 
     /**
@@ -379,18 +410,57 @@ export default {
      * @param {object} update - The new values to patch into the activity object emitted.
      */
     updateActivity(update) {
-      this.activity = Object.assign({}, this.activity, update);
+      let activity = Object.assign({}, this.value, update);
+      this.$emit('input', activity);
+    },
 
-      this.$emit('input', this.activity);
+    /**
+     * Displays a warning message if the user tries to navigate away without saving.
+     * @param {Event} e
+     * @returns {String|void}
+     */
+    unloadHandler(e) {
+      if (!this.hasUnsavedChanges()) {
+        return;
+      }
+
+      // For older browsers that still show custom message.
+      const discardUnsavedChanges = this.$str(
+        'unsaved_changes_warning',
+        'mod_perform'
+      );
+      e.preventDefault();
+      e.returnValue = discardUnsavedChanges;
+      return discardUnsavedChanges;
+    },
+
+    /**
+     * Reset changes to form.
+     */
+    resetChanges() {
+      this.resetActivityChanges();
+      this.resetManualRelationshipChanges();
     },
 
     /**
      * revert to last saved changes
      */
     resetActivityChanges() {
-      this.activity.edit_name = this.activity.name;
-      this.activity.edit_description = this.activity.description;
-      this.activityTypeSelection = this.activity.type.id;
+      this.form.name = this.value.edit_name;
+      this.form.description = this.value.edit_description;
+      this.form.type_id = this.value.type.id;
+      this.form.anonymousResponse = this.value.anonymous_responses;
+    },
+
+    /**
+     * Reset changes to relationship selection.
+     */
+    resetManualRelationshipChanges() {
+      this.value.manual_relationships.map(relationship => {
+        this.form.manualRelationshipSelections[
+          relationship.manual_relationship.id
+        ] = relationship.selector_relationship.id;
+      });
     },
   },
 };
@@ -402,14 +472,15 @@ export default {
       "activity_general_tab_heading",
       "activity_general_response_attribution_heading",
       "activity_general_anonymous_responses_label",
-      "activity_type_help_text",
       "boolean_setting_text_enabled",
       "boolean_setting_text_disabled",
       "general_info_label_activity_description",
       "general_info_label_activity_title",
       "general_info_label_activity_type",
-      "general_info_select_activity_type",
-      "save_changes"
+      "general_info_participant_selection_description",
+      "general_info_participant_selection_heading",
+      "save_changes",
+      "unsaved_changes_warning"
     ],
     "moodle": [
       "cancel"

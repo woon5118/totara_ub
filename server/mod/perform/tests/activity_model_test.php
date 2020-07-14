@@ -26,6 +26,7 @@ use mod_perform\models\activity\activity_type;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\state\activity\active;
 use mod_perform\state\activity\draft;
+use totara_core\relationship\relationship;
 
 /**
  * @group perform
@@ -151,6 +152,36 @@ class mod_perform_activity_model_testcase extends advanced_testcase {
         $this->expectExceptionMessage('Attribution settings can not be updated when an activity is active');
 
         $activity->set_attribution_settings(true);
+    }
+
+    /**
+     * Test updating an active activity manual relationship fails.
+    */
+    public function test_cant_update_manual_relationship_when_active(): void {
+        $original_data = new activity_entity(
+            [
+                'name' => 'Existing activity',
+                'description' => 'Existing activity description',
+            ],
+            false,
+            false
+        );
+
+        $activity = $this->create_activity($original_data, 'check-in', active::get_code());
+        $manager_relationship = relationship::load_by_idnumber('manager');
+
+        $manual_relationships_args = [];
+        foreach ($activity->manual_relationships as $manual_relationship) {
+            $manual_relationships_args[] = [
+                'manual_relationship_id' => $manual_relationship->id,
+                'selector_relationship_id' => $manager_relationship->id,
+            ];
+        }
+
+        $this->expectException(moodle_exception::class);
+        $this->expectExceptionMessage('Can not update selecting relationships, activity is active');
+
+        $activity->update_manual_relationship_selections($manual_relationships_args);
     }
 
     /**

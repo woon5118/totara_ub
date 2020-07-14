@@ -47,10 +47,8 @@ class relationships implements query_resolver, has_middleware {
      */
     public static function resolve(array $args, execution_context $ec) {
         return (new relationship_provider())
-            ->filter_by_component('mod_perform')
-            ->fetch()
-            ->filter_by_compatible(['user_id'])
-            ->get();
+            ->filter_by_component('mod_perform', true)
+            ->get_compatible_relationships(['user_id']);
     }
 
     /**

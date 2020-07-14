@@ -40,5 +40,17 @@ query mod_perform_activity($activity_id: core_id!) {
       close_on_completion
       multisection
     }
+    manual_relationships {
+      manual_relationship {
+        id
+        idnumber
+        name
+      }
+      selector_relationship {
+        id
+        idnumber
+        name
+      }
+    }
   }
 }

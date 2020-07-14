@@ -25,9 +25,15 @@
       margin-top: var(--tui-gap-12);
     }
   }
+}
 
-  &__modalBtnRow.tui-formRow {
-    margin: var(--tui-gap-6) 0 0;
+.tui-performManageActivityManualRelationships {
+  margin-top: var(--tui-gap-6);
+  & > * + * {
+    margin-top: var(--tui-gap-6);
+  }
+  &__heading {
+    @include tui-font-heading-small();
   }
 }
 </style>

@@ -26,6 +26,7 @@ use mod_perform\models\activity\activity;
 use mod_perform\models\activity\activity_type as activity_type_model;
 use mod_perform\state\activity\draft;
 use totara_core\advanced_feature;
+use totara_core\relationship\relationship;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
@@ -78,6 +79,33 @@ class mod_perform_webapi_resolver_mutation_update_activity_testcase extends adva
         $this->resolve_graphql_mutation(self::MUTATION, $args);
     }
 
+    /**
+     * Tests updating manual relationship selector relationships for an activity.
+     *
+     * @return void
+     */
+    public function test_update_activity_manual_relationships_selectors(): void {
+        [$activity, $args] = $this->create_activity();
+        $args['with_relationships'] = true;
+        $args['relationships'] = [];
+        $manager_relationship = relationship::load_by_idnumber('manager');
+        foreach ($activity->manual_relationships as $manual_relationship) {
+            $args['relationships'][] = [
+                'manual_relationship_id' => $manual_relationship->manual_relationship_id,
+                'selector_relationship_id' => $manager_relationship->id,
+            ];
+        }
+
+        /** @var activity $updated_activity */
+        ['activity' => $updated_activity] = $this->resolve_graphql_mutation(self::MUTATION, $args);
+
+        // Return values should be updated
+        $this->assert_base_update_result($args, $updated_activity);
+        foreach ($updated_activity->manual_relationships as $manual_relationship) {
+            $this->assertEquals($manual_relationship->selector_relationship_id, $manager_relationship->id);
+        }
+    }
+
     public function test_successful_ajax_call(): void {
         [, $args] = $this->create_activity();
 
@@ -126,6 +154,7 @@ class mod_perform_webapi_resolver_mutation_update_activity_testcase extends adva
             'description' => "Description of Activity 1",
             'type_id' => $new_type_id,
             'anonymous_responses' => true,
+            'with_relationships' => false,
         ];
 
         return [$activity, $args];

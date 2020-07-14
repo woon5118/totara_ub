@@ -543,13 +543,14 @@ class behat_totara_tui extends behat_base {
             }
         }
 
-        $checkbox_input = $parent_element->find('css', $locator);
+        $checkbox_label = $parent_element->find('css', $locator);
 
-        if ($checkbox_input === null) {
+        if ($checkbox_label === null) {
             $this->fail("No tui check box found with name {$name}");
         }
 
-        $checkbox_input->getParent()->click();
+        $checkbox_input = $checkbox_label->getParent()->find('css', 'input');
+        $this->click_hidden_element($checkbox_input);
     }
 
     /**
@@ -575,9 +576,20 @@ class behat_totara_tui extends behat_base {
             );
         }
 
-        $id = $radio_input->getAttribute('id');
-        // The actual input element for the radio is hidden, and therefore cannot be interacted in a normal behat way.
-        // Instead we need this hack to manually click the hidden element via running some JS.
+        $this->click_hidden_element($radio_input);
+    }
+
+    /**
+     * Click a hidden element.
+     *
+     * In some cases with custom tui form elements the actual <input> HTML element is hidden, so behat can't interact with it.
+     * This function is a workaround for this, instead we manually click the element via running some JS in the browser.
+     * This isn't ideal, but it works. Replace if there is a better solution.
+     *
+     * @param NodeElement $input_element
+     */
+    private function click_hidden_element(NodeElement $input_element): void {
+        $id = $input_element->getAttribute('id');
         $click_script = "document.querySelector(\"#{$id}\").click();";
         $this->getSession()->getDriver()->executeScript($click_script);
         $this->wait_for_pending_js();
