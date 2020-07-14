@@ -72,11 +72,23 @@ class mod_facetoface_allocation_testcase extends advanced_testcase {
         $this->assertSame($user2->email, $message->to);
         $this->assertStringStartsWith('Seminar booking confirmation: Test seminar', $message->subject);
         $this->assertStringContainsString('BEGIN:VCALENDAR', $message->body);
+        $description = $this->extract_description_from_ical_attachment($message->body);
+        $this->assertStringContainsString('Please arrive ten minutes before the course starts', $description);
 
         // The manager.
         $message = $messages[1];
         $this->assertSame($user1->email, $message->to);
         $this->assertStringStartsWith('Seminar booking confirmation: Test seminar', $message->subject);
         $this->assertStringNotContainsString('BEGIN:VCALENDAR', $message->body);
+    }
+
+    private function extract_description_from_ical_attachment(string $body) {
+        $body = strtr($body, "\r\n", "\n");
+        if (preg_match('/BEGIN:VCALENDAR\n.*\nDESCRIPTION:(.*)\nSUMMARY:.*\nEND:VCALENDAR/sm', $body, $matches)) {
+            return strtr(implode('', array_map(function ($line) {
+                return ltrim($line);
+            }, explode("\n", quoted_printable_decode($matches[1])))), ['\\\\' => '\\', '\\;' => ';', '\\,' => ',', '\\N' => "\n", '\\n' => "\n"]);
+        }
+        $this->fail('cannot find the description property');
     }
 }

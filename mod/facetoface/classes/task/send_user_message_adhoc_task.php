@@ -165,7 +165,9 @@ class send_user_message_adhoc_task extends \core\task\adhoc_task {
         $session = $sessions[$data->sessionid];
         $icaldata = $data->icaldata;
 
-        $ical_attach = messaging::generate_ical($facetoface, $session, $icaldata['method'], $signupuser, $icaldata['dates'], $icaldata['olddates']);
+        // Extract the description text from the message data.
+        $description = isset($message->fullmessagehtml) ? $message->fullmessagehtml : '';
+        $ical_attach = messaging::generate_ical($facetoface, $session, $icaldata['method'], $signupuser, $icaldata['dates'], $icaldata['olddates'], $description);
         $message->attachment = $ical_attach->file;
     }
 
