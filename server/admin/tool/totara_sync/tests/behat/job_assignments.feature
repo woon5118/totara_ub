@@ -6,6 +6,7 @@ Feature: Use user source to import job assignments data in HR sync
   Background:
     # Site data.
     Given I log in as "admin"
+    And I enable the "appraisals" advanced feature
     And the following "organisation frameworks" exist in "totara_hierarchy" plugin:
       | fullname        | idnumber |
       | Organisation FW | OFW001   |

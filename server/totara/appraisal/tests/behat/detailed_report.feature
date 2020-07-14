@@ -99,7 +99,7 @@ Feature: Test appraisal detailed report with numeric question
     And I press "Activate"
 
     # Edit report to add "All roles"
-    When I navigate to "Reports" node in "Site administration > Legacy features"
+    When I navigate to "Reports (legacy)" node in "Site administration > Legacy features"
     And I click on "Detail report" "link" in the "Behat Test Appraisal" "table_row"
     And I press "Edit this report"
     And I click on "Columns" "link"
@@ -121,7 +121,7 @@ Feature: Test appraisal detailed report with numeric question
 
     # Load report with new column
     When I log in as "admin"
-    And I navigate to "Reports" node in "Site administration > Legacy features"
+    And I navigate to "Reports (legacy)" node in "Site administration > Legacy features"
     And I click on "Detail report" "link" in the "Behat Test Appraisal" "table_row"
     And I should see "3" in the "User One" "table_row"
     And I should not see "3" in the "User Two" "table_row"

@@ -7,6 +7,7 @@ Feature: Test the create report interface
   Background:
     Given I am on a totara site
     And I log in as "admin"
+    And I enable the "appraisals" advanced feature
     And I navigate to "Manage user reports" node in "Site administration > Reports"
     And I click on "Create" "button"
     Then I should see "Learner goal status overview"
@@ -62,7 +63,7 @@ Feature: Test the create report interface
     Then I should see "Admin site activity overview"
     And I should see "Learner goal status overview"
     And I should see "Manager goal status overview"
-    And I should see "Appraisal Detail"
+    And I should see "Appraisal Detail (legacy)"
 
   Scenario: Report sources filtering works on report creation page
     Given I disable the "competency_assignment" advanced feature

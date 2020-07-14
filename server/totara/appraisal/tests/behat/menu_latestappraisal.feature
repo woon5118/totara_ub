@@ -7,6 +7,7 @@ Feature: Test Latest Appraisal menu item
   Scenario: Make sure Latest Appraisal is available in totara menu
     Given I am on a totara site
     And I enable the "appraisals" advanced feature
+    And I enable the "feedback360" advanced feature
     And I log in as "admin"
     When I navigate to "Main menu" node in "Site administration > Navigation"
     Then I should see "Latest Appraisal" in the "#totaramenutable" "css_element"
@@ -18,7 +19,7 @@ Feature: Test Latest Appraisal menu item
     And I log in as "admin"
     When I navigate to "Advanced features" node in "Site administration > System information"
     And I set the field "Enable Goals" to "Disable"
-    And I set the field "Enable 360 Feedbacks" to "Disable"
+    And I set the field "Enable Legacy 360 Feedback" to "Disable"
     And I press "Save changes"
     When I navigate to "Main menu" node in "Site administration > Navigation"
     Then I should see "Latest Appraisal" in the "#totaramenutable" "css_element"

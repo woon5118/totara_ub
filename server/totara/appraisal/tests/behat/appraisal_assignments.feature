@@ -126,7 +126,7 @@ Feature: Test reported learners in appraisal assignments
     And I should see "Manager Two"
 
     # Reports not available for Draft appraisal
-    When I navigate to "Reports" node in "Site administration > Legacy features"
+    When I navigate to "Reports (legacy)" node in "Site administration > Legacy features"
     Then I should see "No appraisals are active."
     And I should see "No appraisals are inactive."
     And I log out
@@ -150,7 +150,7 @@ Feature: Test reported learners in appraisal assignments
     And I should see "Manager One"
     And I should see "Manager Two"
 
-    When I navigate to "Reports" node in "Site administration > Legacy features"
+    When I navigate to "Reports (legacy)" node in "Site administration > Legacy features"
     Then I should see "0" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Overdue']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "5" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='On target']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "0" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Cancelled']/preceding-sibling::th)+1]" "xpath_element"
@@ -207,7 +207,7 @@ Feature: Test reported learners in appraisal assignments
     And I should see "Manager One"
     And I should see "Manager Two"
 
-    When I navigate to "Reports" node in "Site administration > Legacy features"
+    When I navigate to "Reports (legacy)" node in "Site administration > Legacy features"
     Then I should see "0" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Overdue']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "4" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='On target']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "0" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Cancelled']/preceding-sibling::th)+1]" "xpath_element"
@@ -259,7 +259,7 @@ Feature: Test reported learners in appraisal assignments
     And I should not see "Manager One"
     And I should not see "Manager Two"
 
-    When I navigate to "Reports" node in "Site administration > Legacy features"
+    When I navigate to "Reports (legacy)" node in "Site administration > Legacy features"
     Then I should see "Closed" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Status']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "0" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Complete']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "5" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Incomplete']/preceding-sibling::th)+1]" "xpath_element"
@@ -324,7 +324,7 @@ Feature: Test reported learners in appraisal assignments
     And I should not see "Manager One"
     And I should not see "Manager Two"
 
-    When I navigate to "Reports" node in "Site administration > Legacy features"
+    When I navigate to "Reports (legacy)" node in "Site administration > Legacy features"
     Then I should see "Closed" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Status']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "1" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Complete']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "4" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Incomplete']/preceding-sibling::th)+1]" "xpath_element"
@@ -396,7 +396,7 @@ Feature: Test reported learners in appraisal assignments
     And I should see "Manager One"
     And I should see "Manager Two"
 
-    When I navigate to "Reports" node in "Site administration > Legacy features"
+    When I navigate to "Reports (legacy)" node in "Site administration > Legacy features"
     Then I should see "0" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Overdue']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "4" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='On target']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "0" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Cancelled']/preceding-sibling::th)+1]" "xpath_element"
@@ -443,7 +443,7 @@ Feature: Test reported learners in appraisal assignments
     And I should see "Manager One"
     And I should see "Manager Two"
 
-    When I navigate to "Reports" node in "Site administration > Legacy features"
+    When I navigate to "Reports (legacy)" node in "Site administration > Legacy features"
     Then I should see "0" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Overdue']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "4" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='On target']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "0" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Cancelled']/preceding-sibling::th)+1]" "xpath_element"
@@ -487,7 +487,7 @@ Feature: Test reported learners in appraisal assignments
     And I should see "Manager One"
     And I should see "Manager Two"
 
-    When I navigate to "Reports" node in "Site administration > Legacy features"
+    When I navigate to "Reports (legacy)" node in "Site administration > Legacy features"
     Then I should see "0" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Overdue']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "3" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='On target']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "1" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Cancelled']/preceding-sibling::th)+1]" "xpath_element"
@@ -534,7 +534,7 @@ Feature: Test reported learners in appraisal assignments
     And I should see "Manager One"
     And I should see "Manager Two"
 
-    When I navigate to "Reports" node in "Site administration > Legacy features"
+    When I navigate to "Reports (legacy)" node in "Site administration > Legacy features"
     Then I should see "0" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Overdue']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "4" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='On target']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "0" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Cancelled']/preceding-sibling::th)+1]" "xpath_element"
@@ -582,7 +582,7 @@ Feature: Test reported learners in appraisal assignments
     And I should see "Manager One"
     And I should see "Manager Two"
 
-    When I navigate to "Reports" node in "Site administration > Legacy features"
+    When I navigate to "Reports (legacy)" node in "Site administration > Legacy features"
     Then I should see "0" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Overdue']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "4" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='On target']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "1" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Cancelled']/preceding-sibling::th)+1]" "xpath_element"
@@ -629,7 +629,7 @@ Feature: Test reported learners in appraisal assignments
     And I should see "Manager One"
     And I should see "Manager Two"
 
-    When I navigate to "Reports" node in "Site administration > Legacy features"
+    When I navigate to "Reports (legacy)" node in "Site administration > Legacy features"
     Then I should see "0" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Overdue']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "4" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='On target']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "0" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Cancelled']/preceding-sibling::th)+1]" "xpath_element"
@@ -715,7 +715,7 @@ Feature: Test reported learners in appraisal assignments
     And I should not see "Manager One"
     And I should not see "Manager Two"
 
-    When I navigate to "Reports" node in "Site administration > Legacy features"
+    When I navigate to "Reports (legacy)" node in "Site administration > Legacy features"
     Then I should see "Closed" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Status']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "2" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Complete']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "3" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Incomplete']/preceding-sibling::th)+1]" "xpath_element"
@@ -763,7 +763,7 @@ Feature: Test reported learners in appraisal assignments
     And I should not see "Manager One"
     And I should not see "Manager Two"
 
-    When I navigate to "Reports" node in "Site administration > Legacy features"
+    When I navigate to "Reports (legacy)" node in "Site administration > Legacy features"
     Then I should see "Closed" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Status']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "2" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Complete']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "3" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Incomplete']/preceding-sibling::th)+1]" "xpath_element"
@@ -811,7 +811,7 @@ Feature: Test reported learners in appraisal assignments
     And I should not see "Manager One"
     And I should not see "Manager Two"
 
-    When I navigate to "Reports" node in "Site administration > Legacy features"
+    When I navigate to "Reports (legacy)" node in "Site administration > Legacy features"
     Then I should see "Closed" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Status']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "2" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Complete']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "3" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Incomplete']/preceding-sibling::th)+1]" "xpath_element"
@@ -886,7 +886,7 @@ Feature: Test reported learners in appraisal assignments
     And I should see "Manager One"
     And I should see "Manager Two"
 
-    When I navigate to "Reports" node in "Site administration > Legacy features"
+    When I navigate to "Reports (legacy)" node in "Site administration > Legacy features"
     Then I should see "0" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Overdue']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "2" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='On target']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "1" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Cancelled']/preceding-sibling::th)+1]" "xpath_element"
@@ -931,7 +931,7 @@ Feature: Test reported learners in appraisal assignments
     And I should see "Manager One"
     And I should see "Manager Two"
 
-    When I navigate to "Reports" node in "Site administration > Legacy features"
+    When I navigate to "Reports (legacy)" node in "Site administration > Legacy features"
     And I should see "0" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Overdue']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "2" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='On target']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "2" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Cancelled']/preceding-sibling::th)+1]" "xpath_element"
@@ -977,7 +977,7 @@ Feature: Test reported learners in appraisal assignments
     And I should not see "Manager One"
     And I should not see "Manager Two"
 
-    When I navigate to "Reports" node in "Site administration > Legacy features"
+    When I navigate to "Reports (legacy)" node in "Site administration > Legacy features"
     Then I should see "Closed" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Status']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "1" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Complete']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "3" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Incomplete']/preceding-sibling::th)+1]" "xpath_element"
@@ -1024,7 +1024,7 @@ Feature: Test reported learners in appraisal assignments
     And I should not see "Manager One"
     And I should not see "Manager Two"
 
-    When I navigate to "Reports" node in "Site administration > Legacy features"
+    When I navigate to "Reports (legacy)" node in "Site administration > Legacy features"
     Then I should see "Closed" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Status']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "1" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Complete']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "3" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Incomplete']/preceding-sibling::th)+1]" "xpath_element"
@@ -1074,7 +1074,7 @@ Feature: Test reported learners in appraisal assignments
     And I should not see "Manager One"
     And I should not see "Manager Two"
 
-    When I navigate to "Reports" node in "Site administration > Legacy features"
+    When I navigate to "Reports (legacy)" node in "Site administration > Legacy features"
     Then I should see "Closed" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Status']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "1" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Complete']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "3" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Incomplete']/preceding-sibling::th)+1]" "xpath_element"
@@ -1122,7 +1122,7 @@ Feature: Test reported learners in appraisal assignments
     And I should not see "Manager One"
     And I should not see "Manager Two"
 
-    When I navigate to "Reports" node in "Site administration > Legacy features"
+    When I navigate to "Reports (legacy)" node in "Site administration > Legacy features"
     Then I should see "Closed" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Status']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "1" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Complete']/preceding-sibling::th)+1]" "xpath_element"
     And I should see "3" in the "//table[contains(@class,'generaltable')]/tbody/tr/td[count(//table[contains(@class,'generaltable')]/thead/tr/th[.='Incomplete']/preceding-sibling::th)+1]" "xpath_element"

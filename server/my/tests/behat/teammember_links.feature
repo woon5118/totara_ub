@@ -62,7 +62,7 @@ Feature: Show only links to member information the manager has permission to see
   Scenario: Appraisals link is not available if appraisals feature is not visible
     Given I log in as "admin"
     And I navigate to "Advanced features" node in "Site administration > System information"
-    And I set the field "Enable Appraisals" to "Disable"
+    And I set the field "Enable Legacy Appraisals" to "Disable"
     And I press "Save changes"
     And I log out
     When I log in as "manager1"
@@ -87,7 +87,7 @@ Feature: Show only links to member information the manager has permission to see
   Scenario: 360 Feedback link is not available if feedback360 feature is not visible
     Given I log in as "admin"
     And I navigate to "Advanced features" node in "Site administration > System information"
-    And I set the field "Enable 360 Feedbacks" to "Disable"
+    And I set the field "Enable Legacy 360 Feedback" to "Disable"
     And I press "Save changes"
     And I log out
     When I log in as "manager1"

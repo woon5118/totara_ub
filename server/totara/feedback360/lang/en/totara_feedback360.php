@@ -61,10 +61,11 @@ $string['cancelusersemail'] = 'Cancel existing requests to these external users:
 $string['close'] = 'Close';
 $string['closed'] = 'Closed';
 $string['closenow'] = '(Close Now)';
-$string['configenablefeedback360'] = 'This option will let you: Enable/Disable 360 Feedback features from users on this site.
+$string['confighistoricfeedback360'] = 'This option will let you: Enable/Disable legacy 360 feedback features from users on this site.
 
-* If Enable is selected, all links, menus, tabs and option related to 360 feedbacks will be accessible.
-* If Disable is selected, 360 feedbacks will disappear from any menu on the site and will not be accessible.';
+* If Enable is selected, all links, menus, tabs and option related to legacy 360 feedback will be accessible.
+* If Disable is selected, legacy 360 feedback will disappear from any menu on the site and will not be accessible.';
+$string['configshowhistoricfeedback360'] = 'This setting makes historic 360 feedback available to assigned users under their Performance Activities.';
 $string['confirmactivatefeedback360'] = 'Are you sure you want to activate Feedback - {$a}?';
 $string['confirmclosefeedback360'] = 'Are you sure you want to close Feedback - {$a}?';
 $string['confirmdeletefeedback360'] = 'Are you sure you want to delete Feedback - {$a}?';
@@ -99,6 +100,7 @@ $string['emailrequeststr'] = '{$a->fullname} has requested you fill in their fee
 {$a->url}';
 $string['emailrequestsubject'] = 'Feedback request from {$a->fullname}';
 $string['emailrequesturlmask'] = 'here';
+$string['enablehistoricfeedback360'] = 'Enable Legacy 360 Feedback';
 $string['error:accessdenied'] = 'Access Denied, you do not have permission to view this page';
 $string['error:activationconfirmation'] = 'Feedback is not ready to be activated';
 $string['error:activationstatus'] = 'Cannot activate a Feedback that is neither draft or closed';
@@ -320,6 +322,7 @@ Can you please fill in the form{$a->timedue}, visit the URL below to get started
 <br /><br />
 Thank you';
 $string['settings'] = 'Settings';
+$string['showhistoricfeedback360'] = 'Show Historic 360 Feedback';
 $string['status'] = 'Status';
 $string['statusat'] = 'Status: ';
 $string['stop'] = 'stop';

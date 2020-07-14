@@ -15,8 +15,8 @@ Feature: Test Goals menu item
     Given I am on a totara site
     And I log in as "admin"
     When I navigate to "Advanced features" node in "Site administration > System information"
-    And I set the field "Enable Appraisals" to "Disable"
-    And I set the field "Enable 360 Feedbacks" to "Disable"
+    And I set the field "Enable Legacy Appraisals" to "Disable"
+    And I set the field "Enable Legacy 360 Feedback" to "Disable"
     And I press "Save changes"
     When I navigate to "Main menu" node in "Site administration > Navigation"
     Then I should see "Goals" in the "#totaramenutable" "css_element"

@@ -11,6 +11,8 @@ Feature: Totara behat step definitions work correctly
 
   Scenario: I am on page definitions
     Given I am on a totara site
+    And I enable the "appraisals" advanced feature
+    And I enable the "feedback360" advanced feature
     And I log in as "admin"
 
     When the following "appraisals" exist in "totara_appraisal" plugin:
@@ -28,7 +30,7 @@ Feature: Totara behat step definitions work correctly
     And the following "assignments" exist in "totara_appraisal" plugin:
       | appraisal        | type         | id |
       | Test Appraisal 1 | audience     | A1 |
-    And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
+    And I navigate to "Manage Appraisals (legacy)" node in "Site administration > Legacy features"
     And I click on "Activate" "link" in the "Test Appraisal 1" "table_row"
     And I press "Activate"
     And I am on "All Appraisals" page

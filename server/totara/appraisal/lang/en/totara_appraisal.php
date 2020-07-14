@@ -131,11 +131,12 @@ $string['completedbyxonbehalfofy'] = ' ({$a->completedby} on behalf of {$a->comp
 $string['completedbyx'] = ' ({$a})';
 $string['completedon'] = 'This appraisal was completed on {$a}';
 $string['completestage'] = 'Complete stage';
-$string['configenableappraisals'] = 'This option will let you: Enable/Disable Appraisal features from users on this site.
+$string['confighistoricappraisals'] = 'This option will let you: Enable/Disable legacy appraisal features from users on this site.
 
-* If Enable is selected, all links, menus, tabs and option related to appraisals will be accessible.
-* If Disable is selected, appraisals will disappear from any menu on the site and will not be accessible.
+* If Enable is selected, all links, menus, tabs and option related to legacy appraisals will be accessible.
+* If Disable is selected, legacy appraisals will disappear from any menu on the site and will not be accessible.
 ';
+$string['configshowhistoricappraisals'] = 'This setting makes historic appraisals available to assigned users under their Performance Activities.';
 $string['confirmactivateappraisal'] = 'Do you really want to activate this appraisal?';
 $string['confirmactivatewarning'] = 'You can activate the appraisal without fixing these warnings, but users may encounter some issues. Do you really want to activate this appraisal?';
 $string['confirmcloseappraisal'] = 'Do you really want to close this appraisal?';
@@ -180,6 +181,7 @@ $string['editstageheading'] = 'Edit stage';
 $string['empty'] = 'Empty';
 $string['emptyassignments'] = 'Due to be removed';
 $string['enableappraisals'] = 'Enable Appraisals';
+$string['enablehistoricappraisals'] = 'Enable Legacy Appraisals';
 $string['example:appraisalname'] = 'Example appraisal';
 $string['example:appraisaldescription'] = '<p>This is an example appraisal. You can use this as a starting point for building your own appraisal or just browse around to see how the functionality works.</p><p>If you don\'t need it, just delete it and create your own.</p>';
 $string['example:scaleyesnoname'] = 'Yes or no';
@@ -446,7 +448,7 @@ $string['pluginname'] = 'Totara Appraisals';
 $string['redisplay'] = 'Redisplay';
 $string['redisplay_help'] = 'If **Redisplay** is set then visibility and editing of the redisplayed question is controlled by the
 original question and (where applicable) stage locking settings, otherwise the question will not be redisplayed.';
-$string['reportappraisals'] = 'Reports';
+$string['reportappraisals'] = 'Reports (legacy)';
 $string['required'] = 'Required';
 $string['requirements'] = 'Requirements';
 $string['role'] = 'Role';
@@ -491,6 +493,7 @@ $string['sendscheduledmessagestask'] = 'Send scheduled appraisal messages';
 $string['settings'] = 'Settings';
 $string['appraisal_stage_completion'] = 'Stage completion';
 $string['sectioninclude'] = 'Choose which sections to include';
+$string['showhistoricappraisals'] = 'Show Historic Appraisals';
 $string['snapshotdialogtitle'] = 'Save PDF Snapshot';
 $string['snapshotdone'] = 'A snapshot of your appraisal has been saved. You can view it by going to {$a->link}';
 $string['snapshoterror'] = 'Error generating PDF snapshot';

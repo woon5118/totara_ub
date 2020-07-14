@@ -87,7 +87,7 @@ Feature: Create and use multichoice option collections
     # View the details report
     When I log out
     And I log in as "admin"
-    And I navigate to "Reports" node in "Site administration > Legacy features"
+    And I navigate to "Reports (legacy)" node in "Site administration > Legacy features"
     And I click on "Detail report" "link" in the "Behat Test Appraisal" "table_row"
     And I should see "Two" in the "Learner One" "table_row"
     And I should see "Three" in the "Learner One" "table_row"

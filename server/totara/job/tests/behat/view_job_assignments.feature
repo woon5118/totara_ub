@@ -5,6 +5,7 @@ Feature: View job assignments where I am assigned as temporary manager
 
   Background:
     Given I am on a totara site
+    And I enable the "appraisals" advanced feature
     And the following "users" exist:
       | username | firstname | lastname | email                   |
       | user1    | User      | One      | user1@example.com       |

@@ -36,6 +36,7 @@ require_capability('totara/appraisal:manageappraisals', $systemcontext);
 $output = $PAGE->get_renderer('totara_appraisal');
 
 echo $output->header();
+echo \core\notification::info(get_string('legacy_info', 'totara_appraisal'));
 
 echo $output->heading(get_string('activeappraisals', 'totara_appraisal'));
 $activeappraisals = appraisal::get_active_with_stats();

@@ -6,6 +6,7 @@ Feature: Check global report restrictions default settings
 
   Background:
     Given I am on a totara site
+    And I enable the "appraisals" advanced feature
     And I log in as "admin"
     And I set the following administration settings values:
       | Enable report restrictions | 1 |
