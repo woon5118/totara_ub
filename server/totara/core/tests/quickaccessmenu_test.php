@@ -169,9 +169,9 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
                 'setup_content_marketplaces' => 'Content Marketplace'
             ],
             group::PERFORM => [
-                'manageappraisals' => 'Appraisals',
-                'managefeedback360' => '360° Feedback',
+                'mod_perform_manage_activities' => 'Activity Management',
                 'goalmanage' => 'Goals',
+                'competency_assignment' => 'Competency assignments',
             ],
             group::CONFIGURATION => [
                 'themesettings' => 'Appearance',
@@ -224,8 +224,7 @@ class totara_core_quickaccessmenu_testcase extends advanced_testcase {
                 'setup_content_marketplaces' => 'Content Marketplace'
             ],
             group::PERFORM => [
-                'manageappraisals' => 'Appraisals',
-                'managefeedback360' => '360° Feedback',
+                'mod_perform_manage_activities' => 'Activity Management',
                 'goalmanage' => 'Goals',
             ],
             group::CONFIGURATION => [
