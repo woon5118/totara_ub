@@ -24,8 +24,9 @@ namespace mod_perform\dates\resolvers\dynamic;
 
 use core\collection;
 use core\orm\query\builder;
+use mod_perform\constants;
 
-class user_creation_date extends base_dynamic_date_resolver implements user_date_resolver {
+class user_creation_date extends base_dynamic_date_resolver {
 
     public const DEFAULT_KEY = 'default';
 
@@ -36,7 +37,7 @@ class user_creation_date extends base_dynamic_date_resolver implements user_date
         $this->date_map = builder::create()
             ->select(['id', 'timecreated'])
             ->from('user')
-            ->where('id', $this->reference_user_ids)
+            ->where('id', $this->bulk_fetch_keys)
             ->get()
             ->map(function ($row) {
                 // Admins have a 0 created date, and will be excluded.
@@ -84,9 +85,8 @@ class user_creation_date extends base_dynamic_date_resolver implements user_date
     /**
      * @inheritDoc
      */
-    public function set_users(array $reference_user_ids): dynamic_date_resolver {
-        $this->reference_user_ids = $reference_user_ids;
-        return $this;
+    public function get_resolver_base(): string {
+        return constants::DATE_RESOLVER_USER_BASED;
     }
 
 }

@@ -28,8 +28,6 @@ use core\orm\collection;
 use core\orm\entity\model;
 use mod_perform\constants;
 use mod_perform\dates\date_offset;
-use mod_perform\dates\resolvers\dynamic\job_assignment_date_resolver;
-use mod_perform\dates\resolvers\dynamic\user_date_resolver;
 use totara_core\dates\date_time_setting;
 use mod_perform\dates\resolvers\date_resolver;
 use mod_perform\dates\resolvers\dynamic\dynamic_date_resolver;
@@ -776,7 +774,7 @@ class track extends model {
     /**
      * Get the date resolver for this track and a given set of users.
      *
-     * @param collection|track_user_assignment[] $user_assignments
+     * @param collection $user_assignments - Collection of objects similar to track_user_assignments expected
      * @return date_resolver|dynamic_date_resolver
      */
     public function get_date_resolver(collection $user_assignments): date_resolver {
@@ -796,25 +794,33 @@ class track extends model {
             throw new coding_exception('Dynamic date resolver not set');
         }
 
-        if ($resolver->is_job_based()) {
-            $job_assignment_ids = $user_assignments->pluck('job_assignment_id');
-            if (!empty($job_assignment_ids)) {
-                $job_assignment_ids = array_filter($job_assignment_ids,
-                    function ($job_assignment_id) {
-                        return $job_assignment_id !== null;
-                    }
-                );
-            }
-            $resolver->set_job_assignments($job_assignment_ids);
-        } else {
-            $user_ids = $user_assignments->pluck('subject_user_id');
-            $resolver->set_users($user_ids);
+        $bulk_fetch_keys = [];
+        switch ($resolver->get_resolver_base()) {
+            case constants::DATE_RESOLVER_JOB_BASED:
+                $bulk_fetch_keys = $user_assignments->pluck('job_assignment_id');
+                if (!empty($bulk_fetch_keys)) {
+                    $bulk_fetch_keys = array_filter($bulk_fetch_keys,
+                        function ($key) {
+                            return $key !== null;
+                        }
+                    );
+                }
+                break;
+
+            case constants::DATE_RESOLVER_USER_BASED:
+                $bulk_fetch_keys = $user_assignments->pluck('subject_user_id');
+                break;
+
+            default:
+                // Fixed doesn't really need any fetch keys
+                break;
         }
 
         return $resolver->set_parameters(
             $this->schedule_dynamic_from,
             $this->schedule_dynamic_to,
-            $dynamic_source->get_option_key()
+            $dynamic_source->get_option_key(),
+            $bulk_fetch_keys
         );
     }
 

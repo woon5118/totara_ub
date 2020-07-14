@@ -595,7 +595,9 @@ Feature: Define track schedules to perform activities
     Then I should see "This setting cannot be disabled while “Job assignment start date” is in use"
     When I click on the "Enabled" tui radio in the "subject_instance_generation" tui radio group
     And I save the activity schedule
-    Then I should see "Activity schedule saved" in the tui "success" notification toast
+    And I click on "Confirm" "button"
+    And I wait until the page is ready
+    Then I should see "Changes applied and activity has been updated" in the tui "success" notification toast
     When I reload the page
     And I click on "Assignments" "link"
     Then the following fields match these values:

@@ -25,9 +25,9 @@ namespace mod_perform\dates\resolvers\dynamic;
 
 use core\collection;
 use core\orm\query\builder;
-use core_course\totara_catalog\course\dataholder_factory\startdate;
+use mod_perform\constants;
 
-class job_assignment_start_date extends base_dynamic_date_resolver implements job_assignment_date_resolver {
+class job_assignment_start_date extends base_dynamic_date_resolver {
 
     public const JOB_ASSIGNMENT_START_KEY = 'job-assignment-start-date';
 
@@ -36,62 +36,15 @@ class job_assignment_start_date extends base_dynamic_date_resolver implements jo
      */
     protected function resolve(): void {
         $this->date_map = builder::create()
-            ->select(['id', 'userid', 'startdate'])
+            ->select(['id', 'startdate'])
             ->from('job_assignment')
-            ->where('id', $this->reference_job_assignment_ids)
+            ->where('id', $this->bulk_fetch_keys)
             ->get()
-            ->all(true);
+            ->map(function ($row) {
+                // Using map (rather than pluck) to preserve keys.
+                return $row->startdate;
+            })->all(true);
     }
-
-    /**
-     * @inheritDoc
-     */
-    public function set_job_assignments(array $reference_job_assignment_ids): dynamic_date_resolver {
-        $this->reference_job_assignment_ids = $reference_job_assignment_ids;
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function get_start_for_job_assignment(int $user_id, ?int $job_assignment_id = null): ?int {
-        $this->check_ready_to_resolve();
-
-        // If this is not per job_assignment, return null
-        if ($job_assignment_id === null) {
-            return null;
-        }
-
-        $reference_date = $this->get_start_date($user_id, $job_assignment_id);
-        if ($reference_date === null) {
-            return $reference_date;
-        }
-
-        return $this->from->apply($reference_date);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function get_end_for_job_assignment(int $user_id, ?int $job_assignment_id = null): ?int {
-        $this->check_ready_to_resolve();
-
-        // If this is not per job_assignment, return null
-        if ($job_assignment_id === null) {
-            return null;
-        }
-
-        if ($this->to === null) {
-            return null;
-        }
-
-        $reference_date = $this->get_start_date($user_id, $job_assignment_id);
-        if ($reference_date === null) {
-            return $reference_date;
-        }
-        return $this->to->apply($reference_date);
-    }
-
 
     /**
      * @inheritDoc
@@ -126,33 +79,10 @@ class job_assignment_start_date extends base_dynamic_date_resolver implements jo
     }
 
     /**
-     * @param int $user_id
-     * @param int $job_assignment_id
-     * @return int|null
-     */
-    private function get_start_date(int $user_id, int $job_assignment_id): ?int {
-        if ($this->date_map === null) {
-            $this->resolve();
-        }
-
-        if (!isset($this->date_map[$job_assignment_id]) || $this->date_map[$job_assignment_id]->startdate === null) {
-            return null;
-        }
-
-        // TODO: Not sure whether this is needed
-        // Job assignment user and track_user_assignment user differs
-        if ($this->date_map[$job_assignment_id]->userid != $user_id) {
-            throw new \coding_exception('Job assignment is not for the track_user_assignment user');
-        }
-
-        return (int) $this->date_map[$job_assignment_id]->startdate;
-    }
-
-    /**
      * @inheritDoc
      */
-    public function is_job_based(): bool {
-        return true;
+    public function get_resolver_base(): string {
+        return constants::DATE_RESOLVER_JOB_BASED;
     }
 
 }

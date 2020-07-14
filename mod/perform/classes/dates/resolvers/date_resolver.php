@@ -25,28 +25,25 @@ namespace mod_perform\dates\resolvers;
 interface date_resolver {
 
     /**
-     * Get the start date for a user.
+     * Get the start date for n entry.
      *
-     * @param int $user_id
-     * @param int|null $job_assignment_id
+     * @param array $args
      * @return int
      */
-    public function get_start_for(int $user_id): ?int;
+    public function get_start(...$args): ?int;
 
     /**
-     * Get the end date for a user.
+     * Get the end date for an entry.
      *
-     * @param int $user_id
-     * @param int|null $job_assignment_id
+     * @param array $args
      * @return int
      */
-    public function get_end_for(int $user_id): ?int;
+    public function get_end(...$args): ?int;
 
     /**
-     * Is this a job-based resolver
+     * Return what the resolver is based on (user, job, etc)
      *
-     * @return bool
+     * @return string
      */
-    public function is_job_based(): bool;
-
+    public function get_resolver_base(): string;
 }

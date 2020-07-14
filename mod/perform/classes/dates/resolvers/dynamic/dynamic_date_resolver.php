@@ -32,23 +32,23 @@ interface dynamic_date_resolver extends date_resolver {
     /**
      * Set the parameters used to resolve dates for a set of users.
      *
-     * Individual users dates are retrieved by calling get_start_for and get_end_for.
-     * Generally all users from $reference_user_ids will be resolved lazily from a
-     * get_start/end_for call.
+     * Individual users dates are retrieved by calling get_start and get_end.
+     * Generally all users from $bulk_fetch_keys will be resolved lazily from a
+     * get_start/end call.
      *
      * @param date_offset $from
      * @param date_offset|null $to
      * @param string $option_key
-     * @param array $reference_user_ids The user ids to resolve dates for.
-     * @param array $reference_job_assignment_ids
+     * @param array $bulk_fetch_keys
      * @return static
-     * @see get_start_for
-     * @see get_end_for
+     * @see get_start
+     * @see get_end
  ***/
     public function set_parameters(
         date_offset $from,
         ?date_offset $to,
-        string $option_key
+        string $option_key,
+        array $bulk_fetch_keys
     ): self;
 
     /**
@@ -87,10 +87,4 @@ interface dynamic_date_resolver extends date_resolver {
      */
     public function set_custom_data(?string $custom_data): void;
 
-    /**
-     * Does this resolver use job assignments
-     *
-     * @return bool
-     */
-    public function is_job_based(): bool;
 }

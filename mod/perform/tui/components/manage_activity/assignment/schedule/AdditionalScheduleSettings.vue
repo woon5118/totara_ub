@@ -142,7 +142,6 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
-      "schedule_additional_settings",
       "schedule_job_assignment_based_disable_error",
       "schedule_job_assignment_based_instances",
       "schedule_job_assignment_based_instances_disabled",

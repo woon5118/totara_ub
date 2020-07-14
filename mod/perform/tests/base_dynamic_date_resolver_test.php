@@ -22,6 +22,7 @@
  */
 
 use core\collection;
+use mod_perform\constants;
 use mod_perform\dates\date_offset;
 use mod_perform\dates\resolvers\dynamic\base_dynamic_date_resolver;
 use mod_perform\dates\resolvers\dynamic\dynamic_date_resolver;
@@ -39,8 +40,8 @@ class mod_perform_base_dynamic_date_resolver_testcase extends advanced_testcase 
             1 => $reference_date,
         ]);
 
-        $start = $resolver->get_start_for(1);
-        $end = $resolver->get_end_for(1);
+        $start = $resolver->get_start(1);
+        $end = $resolver->get_end(1);
 
         self::assertEquals($reference_date, $start);
         self::assertEquals($expected_end_date, $end);
@@ -54,23 +55,17 @@ class mod_perform_base_dynamic_date_resolver_testcase extends advanced_testcase 
     }
 
     private function create_zero_offset_dynamic_date_resolver(array $date_map): dynamic_date_resolver {
-        return new class($date_map) extends base_dynamic_date_resolver implements user_date_resolver {
+        return new class($date_map) extends base_dynamic_date_resolver {
 
             public function __construct(array $date_map) {
                 $this->date_map = $date_map;
 
                 $zero_off_set = new date_offset(0, date_offset::UNIT_DAY);
 
-                $this->set_parameters($zero_off_set, $zero_off_set, '')
-                    ->set_users(array_keys($date_map));
+                $this->set_parameters($zero_off_set, $zero_off_set, '', array_keys($date_map));
             }
 
             protected function resolve(): void {
-            }
-
-            public function set_users(array $reference_user_ids): dynamic_date_resolver {
-                $this->reference_user_ids = $reference_user_ids;
-                return $this;
             }
 
             public function get_options(): collection {
@@ -79,6 +74,10 @@ class mod_perform_base_dynamic_date_resolver_testcase extends advanced_testcase 
 
             public function option_is_available(string $option_key): bool {
                 return true;
+            }
+
+            public function get_resolver_base(): string {
+                return constants::DATE_RESOLVER_USER_BASED;
             }
         };
     }

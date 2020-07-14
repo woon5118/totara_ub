@@ -45,56 +45,38 @@ class mod_perform_job_assignment_start_date_resolver_testcase extends advanced_t
     public function test_resolve() {
         $data = $this->generate_test_data();
         $job_assignment_start_date_resolver = new job_assignment_start_date();
-        $job_assignment_start_date_resolver
-            ->set_parameters(
-                new date_offset(1, date_offset::UNIT_DAY, date_offset::DIRECTION_AFTER),
-                new date_offset(2, date_offset::UNIT_DAY, date_offset::DIRECTION_AFTER),
-                'job-assignment-start-date'
-            )
-            ->set_job_assignments([$data['user1-job2-with-start']->id]);
+        $job_assignment_start_date_resolver->set_parameters(
+            new date_offset(1, date_offset::UNIT_DAY, date_offset::DIRECTION_AFTER),
+            new date_offset(2, date_offset::UNIT_DAY, date_offset::DIRECTION_AFTER),
+            'job-assignment-start-date',
+            [$data['user1-job2-with-start']->id]
+        );
 
-        // Job based, get_start_for should always returns null
-        $start_date_user = $job_assignment_start_date_resolver->get_start_for($data['user1']->id);
+        // Job based, get_start should always return null
+        $start_date_user = $job_assignment_start_date_resolver->get_start($data['user1']->id);
         $this->assertNull($start_date_user);
-        $start_date_user = $job_assignment_start_date_resolver->get_start_for($data['user2']->id);
+        $start_date_user = $job_assignment_start_date_resolver->get_start($data['user2']->id);
         $this->assertNull($start_date_user);
-        $end_date_user = $job_assignment_start_date_resolver->get_end_for($data['user1']->id);
+        $end_date_user = $job_assignment_start_date_resolver->get_end($data['user1']->id);
         $this->assertNull($end_date_user);
-        $end_date_user = $job_assignment_start_date_resolver->get_end_for($data['user2']->id);
+        $end_date_user = $job_assignment_start_date_resolver->get_end($data['user2']->id);
         $this->assertNull($end_date_user);
 
-        $start_date_job1 = $job_assignment_start_date_resolver->get_start_for_job_assignment($data['user1']->id,
-            $data['user1-job1']->id);
+        $start_date_job1 = $job_assignment_start_date_resolver->get_start($data['user1-job1']->id);
+        $this->assertNull($start_date_job1);
+
+        // Unknown job assignment id
+        $start_date_job1 = $job_assignment_start_date_resolver->get_start($data['user1']->id);
         $this->assertNull($start_date_job1);
 
         $expected = strtotime("+1 day", 123);
-        $start_date_job1 = $job_assignment_start_date_resolver->get_start_for_job_assignment($data['user1']->id);
-        $this->assertNull($start_date_job1);
-        $start_job2 = $job_assignment_start_date_resolver->get_start_for_job_assignment($data['user1']->id,
-            $data['user1-job2-with-start']->id);
+        $start_job2 = $job_assignment_start_date_resolver->get_start($data['user1-job2-with-start']->id);
         $this->assertSame($expected, $start_job2);
 
-        $expected = strtotime("+2 day", 123);
-        $end_job2 = $job_assignment_start_date_resolver->get_end_for_job_assignment($data['user1']->id,
-            $data['user1-job2-with-start']->id);
+        // End days are adjusted to end of day
+        $expected = strtotime("+2 day", 123) + DAYSECS;
+        $end_job2 = $job_assignment_start_date_resolver->get_end($data['user1-job2-with-start']->id);
         $this->assertSame($expected, $end_job2);
-    }
-
-    public function test_resolve_exception() {
-        $data = $this->generate_test_data();
-        $job_assignment_start_date_resolver = new job_assignment_start_date();
-        $job_assignment_start_date_resolver
-            ->set_parameters(
-                new date_offset(1, date_offset::UNIT_DAY, date_offset::DIRECTION_AFTER),
-                null,
-                'job-assignment-start-date'
-            )
-            -> set_job_assignments([$data['user2-job3']->id]);
-
-        $this->expectException(\coding_exception::class);
-        $this->expectExceptionMessage('Job assignment is not for the track_user_assignment user');
-        $start_job3 = $job_assignment_start_date_resolver->get_start_for_job_assignment($data['user1']->id,
-            $data['user2-job3']->id);
     }
 
     private function generate_test_data(): array {

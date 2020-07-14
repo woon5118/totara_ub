@@ -363,18 +363,15 @@ class expand_task {
             $date_resolver = new anniversary_of($date_resolver, time());
         }
 
+        $resolver_base = $date_resolver->get_resolver_base();
         // Add the dates to the assignments.
         foreach ($to_create as $index => $row) {
-            if ($date_resolver->is_job_based()) {
-                $to_create[$index]['period_start_date'] = $date_resolver->get_start_for_job_assignment($row['subject_user_id'],
-                    $row['job_assignment_id']
-                );
-                $to_create[$index]['period_end_date'] = $date_resolver->get_end_for_job_assignment($row['subject_user_id'],
-                    $row['job_assignment_id']
-                );
+            if ($resolver_base == constants::DATE_RESOLVER_JOB_BASED) {
+                $to_create[$index]['period_start_date'] = $date_resolver->get_start($row['job_assignment_id']);
+                $to_create[$index]['period_end_date'] = $date_resolver->get_end($row['job_assignment_id']);
             } else {
-                $to_create[$index]['period_start_date'] = $date_resolver->get_start_for($row['subject_user_id']);
-                $to_create[$index]['period_end_date'] = $date_resolver->get_end_for($row['subject_user_id']);
+                $to_create[$index]['period_start_date'] = $date_resolver->get_start($row['subject_user_id']);
+                $to_create[$index]['period_end_date'] = $date_resolver->get_end($row['subject_user_id']);
             }
         }
 
@@ -487,7 +484,11 @@ class expand_task {
         // Bulk fetch all the start and end reference dates.;
         $date_resolver = $track->get_date_resolver($user_assignments);
 
-        track_schedule_sync::sync_user_assignment_schedules($date_resolver, $user_assignments, $track->schedule_use_anniversary);
+        track_schedule_sync::sync_user_assignment_schedules(
+            $date_resolver,
+            $user_assignments,
+            $track->schedule_use_anniversary
+        );
     }
 
     /**

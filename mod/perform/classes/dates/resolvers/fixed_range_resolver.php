@@ -22,6 +22,8 @@
  */
 namespace mod_perform\dates\resolvers;
 
+use mod_perform\constants;
+
 class fixed_range_resolver implements date_resolver {
 
     /**
@@ -46,22 +48,22 @@ class fixed_range_resolver implements date_resolver {
     /**
      * @inheritDoc
      */
-    public function get_start_for(int $user_id): ?int {
+    public function get_start(...$args): ?int {
         return $this->start;
     }
 
     /**
      * @inheritDoc
      */
-    public function get_end_for(int $user_id): ?int {
+    public function get_end(...$args): ?int {
         return $this->end;
     }
 
     /**
      * @inheritDoc
      */
-    public function is_job_based(): bool {
-        return false;
+    public function get_resolver_base(): string {
+        return constants::DATE_RESOLVER_FIXED;
     }
 
 }

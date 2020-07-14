@@ -87,10 +87,10 @@ class mod_perform_date_resolver_dynamic_source_another_activity_testcase extends
             )
             ->set_custom_data(json_encode(['activity' => $data->activity1->id]));
 
-        $this->assert_time_result('2019-07-02 12:00:00', $activity_date_resolver->get_start_for($data->user1->id));
-        $this->assert_time_result('2019-07-12 12:00:00', $activity_date_resolver->get_end_for($data->user1->id));
-        $this->assert_time_result('2019-12-08 12:12:12', $activity_date_resolver->get_start_for($data->user2->id));
-        $this->assert_time_result('2019-12-18 12:12:12', $activity_date_resolver->get_end_for($data->user2->id));
+        $this->assert_time_result('2019-07-02 12:00:00', $activity_date_resolver->get_start($data->user1->id));
+        $this->assert_time_result('2019-07-12 12:00:00', $activity_date_resolver->get_end($data->user1->id));
+        $this->assert_time_result('2019-12-08 12:12:12', $activity_date_resolver->get_start($data->user2->id));
+        $this->assert_time_result('2019-12-18 12:12:12', $activity_date_resolver->get_end($data->user2->id));
 
         // Now check for activity 2.
         $activity_date_resolver = new another_activity_date();
@@ -103,10 +103,10 @@ class mod_perform_date_resolver_dynamic_source_another_activity_testcase extends
             )
             ->set_custom_data(json_encode(['activity' => $data->activity2->id]));
 
-        $this->assert_time_result('2018-07-02 12:00:00', $activity_date_resolver->get_start_for($data->user1->id));
-        $this->assert_time_result('2018-07-12 12:00:00', $activity_date_resolver->get_end_for($data->user1->id));
-        $this->assert_time_result('2018-12-08 12:12:12', $activity_date_resolver->get_start_for($data->user2->id));
-        $this->assert_time_result('2018-12-18 12:12:12', $activity_date_resolver->get_end_for($data->user2->id));
+        $this->assert_time_result('2018-07-02 12:00:00', $activity_date_resolver->get_start($data->user1->id));
+        $this->assert_time_result('2018-07-12 12:00:00', $activity_date_resolver->get_end($data->user1->id));
+        $this->assert_time_result('2018-12-08 12:12:12', $activity_date_resolver->get_start($data->user2->id));
+        $this->assert_time_result('2018-12-18 12:12:12', $activity_date_resolver->get_end($data->user2->id));
     }
 
     /**
@@ -127,10 +127,10 @@ class mod_perform_date_resolver_dynamic_source_another_activity_testcase extends
             )
             ->set_custom_data(json_encode(['activity' => $data->activity1->id]));
 
-        $this->assertNull($activity_date_resolver->get_start_for($data->user1->id));
-        $this->assertNull($activity_date_resolver->get_start_for($data->user2->id));
-        $this->assertNull($activity_date_resolver->get_end_for($data->user1->id));
-        $this->assertNull($activity_date_resolver->get_end_for($data->user2->id));
+        $this->assertNull($activity_date_resolver->get_start($data->user1->id));
+        $this->assertNull($activity_date_resolver->get_start($data->user2->id));
+        $this->assertNull($activity_date_resolver->get_end($data->user1->id));
+        $this->assertNull($activity_date_resolver->get_end($data->user2->id));
     }
 
     /**
@@ -157,10 +157,10 @@ class mod_perform_date_resolver_dynamic_source_another_activity_testcase extends
             )
             ->set_custom_data(json_encode(['activity' => $data->activity2->id]));
 
-        $this->assert_time_result('2018-07-02 12:00:00', $activity_date_resolver->get_start_for($data->user1->id));
-        $this->assert_time_result('2018-07-12 12:00:00', $activity_date_resolver->get_end_for($data->user1->id));
-        $this->assertNull($activity_date_resolver->get_start_for($data->user2->id));
-        $this->assertNull($activity_date_resolver->get_end_for($data->user2->id));
+        $this->assert_time_result('2018-07-02 12:00:00', $activity_date_resolver->get_start($data->user1->id));
+        $this->assert_time_result('2018-07-12 12:00:00', $activity_date_resolver->get_end($data->user1->id));
+        $this->assertNull($activity_date_resolver->get_start($data->user2->id));
+        $this->assertNull($activity_date_resolver->get_end($data->user2->id));
     }
 
     /**
@@ -188,10 +188,10 @@ class mod_perform_date_resolver_dynamic_source_another_activity_testcase extends
             )
             ->set_custom_data(json_encode(['activity' => $data->activity1->id]));
 
-        $this->assert_time_result('2019-07-02 12:00:00', $activity_date_resolver->get_start_for($data->user1->id));
-        $this->assertNull($activity_date_resolver->get_end_for($data->user1->id));
-        $this->assert_time_result('2019-12-08 12:12:12', $activity_date_resolver->get_start_for($data->user2->id));
-        $this->assertNull($activity_date_resolver->get_end_for($data->user2->id));
+        $this->assert_time_result('2019-07-02 12:00:00', $activity_date_resolver->get_start($data->user1->id));
+        $this->assertNull($activity_date_resolver->get_end($data->user1->id));
+        $this->assert_time_result('2019-12-08 12:12:12', $activity_date_resolver->get_start($data->user2->id));
+        $this->assertNull($activity_date_resolver->get_end($data->user2->id));
     }
 
     /**
@@ -234,10 +234,10 @@ class mod_perform_date_resolver_dynamic_source_another_activity_testcase extends
             )
             ->set_custom_data(json_encode(['activity' => $data->activity1->id]));
 
-        $this->assert_time_result('2019-09-13 15:15:15', $activity_date_resolver->get_start_for($data->user1->id));
-        $this->assert_time_result('2019-09-23 15:15:15', $activity_date_resolver->get_end_for($data->user1->id));
-        $this->assert_time_result('2019-12-08 12:12:12', $activity_date_resolver->get_start_for($data->user2->id));
-        $this->assert_time_result('2019-12-18 12:12:12', $activity_date_resolver->get_end_for($data->user2->id));
+        $this->assert_time_result('2019-09-13 15:15:15', $activity_date_resolver->get_start($data->user1->id));
+        $this->assert_time_result('2019-09-23 15:15:15', $activity_date_resolver->get_end($data->user1->id));
+        $this->assert_time_result('2019-12-08 12:12:12', $activity_date_resolver->get_start($data->user2->id));
+        $this->assert_time_result('2019-12-18 12:12:12', $activity_date_resolver->get_end($data->user2->id));
 
         // Re-adjust the date to make sure order in DB doesn't matter.
         $timestamp = (new DateTime('2019-06-09T15:15:15', new DateTimeZone('UTC')))->getTimestamp();
@@ -255,10 +255,10 @@ class mod_perform_date_resolver_dynamic_source_another_activity_testcase extends
             )
             ->set_custom_data(json_encode(['activity' => $data->activity1->id]));
 
-        $this->assert_time_result('2019-08-02 14:14:14', $activity_date_resolver->get_start_for($data->user1->id));
-        $this->assert_time_result('2019-08-12 14:14:14', $activity_date_resolver->get_end_for($data->user1->id));
-        $this->assert_time_result('2019-12-08 12:12:12', $activity_date_resolver->get_start_for($data->user2->id));
-        $this->assert_time_result('2019-12-18 12:12:12', $activity_date_resolver->get_end_for($data->user2->id));
+        $this->assert_time_result('2019-08-02 14:14:14', $activity_date_resolver->get_start($data->user1->id));
+        $this->assert_time_result('2019-08-12 14:14:14', $activity_date_resolver->get_end($data->user1->id));
+        $this->assert_time_result('2019-12-08 12:12:12', $activity_date_resolver->get_start($data->user2->id));
+        $this->assert_time_result('2019-12-18 12:12:12', $activity_date_resolver->get_end($data->user2->id));
     }
 
     public function test_resolve_with_null_date() {
@@ -283,10 +283,10 @@ class mod_perform_date_resolver_dynamic_source_another_activity_testcase extends
                 [$data->user1->id, $data->user2->id]
             )
             ->set_custom_data(json_encode(['activity' => $data->activity2->id]));
-        $this->assertNull($activity_date_resolver->get_start_for($data->user1->id));
-        $this->assertNull($activity_date_resolver->get_end_for($data->user1->id));
-        $this->assert_time_result('2018-12-08 11:11:11', $activity_date_resolver->get_start_for($data->user2->id));
-        $this->assert_time_result('2018-12-18 11:11:11', $activity_date_resolver->get_end_for($data->user2->id));
+        $this->assertNull($activity_date_resolver->get_start($data->user1->id));
+        $this->assertNull($activity_date_resolver->get_end($data->user1->id));
+        $this->assert_time_result('2018-12-08 11:11:11', $activity_date_resolver->get_start($data->user2->id));
+        $this->assert_time_result('2018-12-18 11:11:11', $activity_date_resolver->get_end($data->user2->id));
     }
 
     private function generate_test_data(): stdClass {

@@ -28,6 +28,7 @@ use core\orm\query\builder;
 use mod_perform\entities\activity\subject_instance;
 use mod_perform\entities\activity\track;
 use mod_perform\entities\activity\track_user_assignment;
+use mod_perform\constants;
 
 class another_activity_date extends base_dynamic_date_resolver {
 
@@ -49,7 +50,7 @@ class another_activity_date extends base_dynamic_date_resolver {
             ->join([track::TABLE, 'tr'], 'tua.track_id', 'id')
             ->where('tr.activity_id', $custom_data['activity'])
             ->where_not_null("si.{$timestamp_field_name}")
-            ->where_in('si.subject_user_id', $this->reference_user_ids)
+            ->where_in('si.subject_user_id', $this->bulk_fetch_keys)
             ->group_by('si.subject_user_id')
             ->get()
             ->map(function ($row) {
@@ -129,4 +130,12 @@ class another_activity_date extends base_dynamic_date_resolver {
         $data = json_decode($custom_data, true);
         return isset($data['activity']) && is_number($data['activity']);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function get_resolver_base(): string {
+        return constants::DATE_RESOLVER_USER_BASED;
+    }
+
 }

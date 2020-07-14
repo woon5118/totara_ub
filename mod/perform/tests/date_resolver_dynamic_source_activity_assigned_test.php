@@ -88,7 +88,7 @@ class mod_perform_date_resolver_dynamic_source_activity_assigned_testcase extend
             [$track_user_assignment->subject_user_id]
         );
 
-        $actual_resolver_start_date = $activity_date_resolver->get_start_for($track_user_assignment->subject_user_id);
+        $actual_resolver_start_date = $activity_date_resolver->get_start($track_user_assignment->subject_user_id);
 
         $this->assertEquals($expected_resolver_start_date, $actual_resolver_start_date);
     }
@@ -181,7 +181,7 @@ class mod_perform_date_resolver_dynamic_source_activity_assigned_testcase extend
             [$track_user_assignment->subject_user_id]
         );
 
-        $actual_resolver_start_date = $activity_date_resolver->get_start_for($track_user_assignment->subject_user_id);
+        $actual_resolver_start_date = $activity_date_resolver->get_start($track_user_assignment->subject_user_id);
 
         $this->assertEquals($expected_resolver_start_date, $actual_resolver_start_date);
 
@@ -201,7 +201,7 @@ class mod_perform_date_resolver_dynamic_source_activity_assigned_testcase extend
             [$track_user_assignment->subject_user_id]
         );
 
-        $actual_resolver_start_date = $activity_date_resolver->get_start_for($track_user_assignment->subject_user_id);
+        $actual_resolver_start_date = $activity_date_resolver->get_start($track_user_assignment->subject_user_id);
 
         $this->assertEquals($expected_resolver_start_date - 100, $actual_resolver_start_date);
 
@@ -217,7 +217,7 @@ class mod_perform_date_resolver_dynamic_source_activity_assigned_testcase extend
             [$track_user_assignment->subject_user_id]
         );
 
-        $actual_resolver_start_date = $activity_date_resolver->get_start_for($track_user_assignment->subject_user_id);
+        $actual_resolver_start_date = $activity_date_resolver->get_start($track_user_assignment->subject_user_id);
 
         $this->assertEquals($expected_resolver_start_date - 100, $actual_resolver_start_date);
     }
@@ -255,7 +255,7 @@ class mod_perform_date_resolver_dynamic_source_activity_assigned_testcase extend
             [500]
         );
 
-        $actual_resolver_start_date = $activity_date_resolver->get_start_for(500);
+        $actual_resolver_start_date = $activity_date_resolver->get_start(500);
 
         $this->assertEquals($expected_resolver_start_date, $actual_resolver_start_date);
     }

@@ -52,23 +52,23 @@ class mod_perform_user_creation_date_resolver_testcase extends advanced_testcase
         // Admin is a special case, that has a 0 create date, and will resolve to null.
         $admin = user::repository()->find(2);
 
-        $resolver = (new user_creation_date())
-            ->set_parameters(
-                new date_offset(0, date_offset::UNIT_DAY, date_offset::DIRECTION_AFTER),
-                new date_offset(1, date_offset::UNIT_DAY, date_offset::DIRECTION_AFTER),
-                user_creation_date::DEFAULT_KEY)
-            ->set_users([$user->id, $admin->id]);
+        $resolver = (new user_creation_date())->set_parameters(
+            new date_offset(0, date_offset::UNIT_DAY, date_offset::DIRECTION_AFTER),
+            new date_offset(1, date_offset::UNIT_DAY, date_offset::DIRECTION_AFTER),
+            user_creation_date::DEFAULT_KEY,
+            [$user->id, $admin->id]
+        );
 
-        self::assertEquals(691848000, $resolver->get_start_for($user->id)); // 4th of December.
+        self::assertEquals(691848000, $resolver->get_start($user->id)); // 4th of December.
 
         // End dates are adjusted to "end of day".
         self::assertEquals(
             691934400 + DAYSECS,
-            $resolver->get_end_for($user->id)
+            $resolver->get_end($user->id)
         ); // 5th of December.
 
-        self::assertNull($resolver->get_start_for($admin->id)); // 4th of December.
-        self::assertNull($resolver->get_end_for($admin->id)); // 5th of December.
+        self::assertNull($resolver->get_start($admin->id)); // 4th of December.
+        self::assertNull($resolver->get_end($admin->id)); // 5th of December.
     }
 
 }

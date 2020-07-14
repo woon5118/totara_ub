@@ -36,16 +36,6 @@ abstract class base_dynamic_date_resolver implements dynamic_date_resolver {
     protected $date_map;
 
     /**
-     * @var int[]
-     */
-    protected $reference_user_ids;
-
-    /**
-     * @var int[]
-     */
-    protected $reference_job_assignment_ids;
-
-    /**
      * @var date_offset
      */
     protected $from;
@@ -69,6 +59,11 @@ abstract class base_dynamic_date_resolver implements dynamic_date_resolver {
      * @var string|null
      */
     protected $custom_data;
+
+    /**
+     * @var array
+     */
+    protected $bulk_fetch_keys;
 
     /**
      * @var int|null
@@ -121,14 +116,14 @@ abstract class base_dynamic_date_resolver implements dynamic_date_resolver {
      * @param date_offset $from
      * @param date_offset|null $to
      * @param string $option_key
-     * @param array $reference_user_ids
-     * @param array $reference_job_assignment_ids
+     * @param array $bulk_fetch_keys
      * @return dynamic_date_resolver
      */
     public function set_parameters(
         date_offset $from,
         ?date_offset $to,
-        string $option_key
+        string $option_key,
+        array $bulk_fetch_keys
     ): dynamic_date_resolver {
         if (!$this->option_is_available($option_key)) {
             throw new coding_exception(sprintf('Invalid option key %s', $option_key));
@@ -137,6 +132,7 @@ abstract class base_dynamic_date_resolver implements dynamic_date_resolver {
         $this->from = $from;
         $this->to = $to;
         $this->option_key = $option_key;
+        $this->bulk_fetch_keys = $bulk_fetch_keys;
 
         $this->ready_to_resolve = true;
 
@@ -147,33 +143,35 @@ abstract class base_dynamic_date_resolver implements dynamic_date_resolver {
      * Should bulk fetch reference date for the supplied user ids.
      * Most likely populating $date_map with user ids as keys and reference dates as entries.
      *
-     * Is called lazily by get_start_for/get_end_for.
+     * Is called lazily by get_start/get_end.
      */
     abstract protected function resolve(): void;
 
     /**
      * @inheritDoc
      */
-    public function get_start_for(int $user_id, ?int $job_assignment_id = null): ?int {
+    public function get_start(...$args): ?int {
         $this->check_ready_to_resolve();
 
         if ($this->date_map === null) {
             $this->resolve();
         }
 
-        if (!isset($this->date_map[$user_id])) {
+        if (!isset($this->date_map[$this->get_entry_key(...$args)])) {
             return null;
         }
 
-        $reference_date = $this->date_map[$user_id];
-
+        $reference_date = $this->date_map[$this->get_entry_key(...$args)];
+        if ($reference_date === null) {
+            return null;
+        }
         return $this->from->apply($reference_date);
     }
 
     /**
      * @inheritDoc
      */
-    public function get_end_for(int $user_id, ?int $job_assignment_id = null): ?int {
+    public function get_end(...$args): ?int {
         $this->check_ready_to_resolve();
 
         if ($this->date_map === null) {
@@ -184,17 +182,25 @@ abstract class base_dynamic_date_resolver implements dynamic_date_resolver {
             return null;
         }
 
-        if (!isset($this->date_map[$user_id])) {
+        if (!isset($this->date_map[$this->get_entry_key(...$args)])) {
             return null;
         }
 
-        $reference_date = $this->date_map[$user_id];
+        $reference_date = $this->date_map[$this->get_entry_key(...$args)];
+        if ($reference_date === null) {
+            return $reference_date;
+        }
 
         // End dates are adjusted to "end of day".
         $reference_date += DAYSECS;
 
         return $this->to->apply($reference_date);
     }
+
+    /**
+     * @inheritDoc
+     */
+    abstract public function get_resolver_base(): string;
 
     protected function check_ready_to_resolve(): void {
         if (!$this->ready_to_resolve) {
@@ -237,15 +243,15 @@ abstract class base_dynamic_date_resolver implements dynamic_date_resolver {
      * @return bool
      */
     public function is_valid_custom_data(?string $custom_data): bool {
-        return is_null($custom_data);
+        return true;
     }
 
     /**
-     * @inheritDoc
+     * @param mixed ...$args
+     * @return string
      */
-    public function is_job_based(): bool {
-        return false;
+    protected function get_entry_key(...$args): string {
+        return implode('-', $args);
     }
-
 
 }

@@ -125,6 +125,7 @@ import {
   SCHEDULE_REPEATING_TYPE_AFTER_CREATION,
   SCHEDULE_REPEATING_TYPE_AFTER_CREATION_WHEN_COMPLETE,
   SCHEDULE_REPEATING_TYPE_AFTER_COMPLETION,
+  DATE_RESOLVER_JOB_BASED,
 } from 'mod_perform/constants';
 
 export default {
@@ -178,8 +179,7 @@ export default {
       },
       formValuesToSave: null,
       confirmationModalOpen: false,
-      isUsingJobBasedDynamicSource:
-        !this.track.schedule_is_fixed && this.dynamicDateSourceIsJobBased(),
+      isUsingJobBasedDynamicSource: this.dynamicDateSourceIsJobBased(),
       dynamicDateSourceName: this.getDynamicDateSourceName(),
     };
   },
@@ -210,9 +210,9 @@ export default {
 
         this.isUsingJobBasedDynamicSource =
           !this.scheduleIsFixed &&
-          this.dynamicDateSourceIsJobBased(selectedSource);
+          this.dynamicDateSourceIsJobBased(selectedDynamicSource);
         this.dynamicDateSourceName = this.getDynamicDateSourceName(
-          selectedSource
+          selectedDynamicSource
         );
       }
     },
@@ -678,10 +678,13 @@ export default {
      */
     dynamicDateSourceIsJobBased(dynamicSource) {
       if (dynamicSource) {
-        return dynamicSource.is_job_based;
+        return dynamicSource.resolver_base == DATE_RESOLVER_JOB_BASED;
       }
       if (this.track && this.track.schedule_dynamic_source) {
-        return this.track.schedule_dynamic_source.is_job_based;
+        return (
+          this.track.schedule_dynamic_source.resolver_base ==
+          DATE_RESOLVER_JOB_BASED
+        );
       }
       return false;
     },

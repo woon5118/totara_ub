@@ -48,8 +48,8 @@ class mod_perform_anniversary_of_date_resolver_testcase extends advanced_testcas
 
         $anniversary_of = new anniversary_of(new fixed_range_resolver($raw_start, $raw_end), $anniversary_cutoff_date);
 
-        $raw_actual_start = $anniversary_of->get_start_for(1);
-        $raw_actual_end = $anniversary_of->get_end_for(1);
+        $raw_actual_start = $anniversary_of->get_start(1);
+        $raw_actual_end = $anniversary_of->get_end(1);
 
         $actual_start = (new DateTimeImmutable("@{$raw_actual_start}"))->format('Y-m-d');
         $actual_end = (new DateTimeImmutable("@{$raw_actual_end}"))->format('Y-m-d');

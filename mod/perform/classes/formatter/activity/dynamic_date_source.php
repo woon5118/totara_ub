@@ -47,7 +47,7 @@ class dynamic_date_source extends formatter {
             'is_available' => null,
             'custom_setting_component' => null,
             'custom_data' => null,
-            'is_job_based' => null,
+            'resolver_base' => null,
         ];
     }
 
@@ -62,7 +62,7 @@ class dynamic_date_source extends formatter {
             case 'is_available':
             case 'custom_setting_component':
             case 'custom_data':
-            case 'is_job_based':
+            case 'resolver_base':
                 return true;
             default:
                 return false;
@@ -86,8 +86,8 @@ class dynamic_date_source extends formatter {
                 return $this->object->get_custom_setting_component();
             case 'custom_data':
                 return $this->object->get_custom_data();
-            case 'is_job_based':
-                return $this->object->is_job_based();
+            case 'resolver_base':
+                return $this->object->get_resolver_base();
             default:
                 return null;
         }

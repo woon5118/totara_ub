@@ -17,7 +17,7 @@ type mod_perform_dynamic_date_source {
   is_available: Boolean!
   custom_setting_component: String
   custom_data: String
-  is_job_based: Boolean!
+  resolver_base: String!
 }
 
 """

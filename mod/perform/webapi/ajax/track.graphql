@@ -31,7 +31,7 @@ query mod_perform_track($track_id: param_integer!) {
       is_available
       custom_setting_component
       custom_data
-      is_job_based
+      resolver_base
     }
     due_date_is_enabled
     due_date_is_fixed

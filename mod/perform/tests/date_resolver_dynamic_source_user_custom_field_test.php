@@ -44,20 +44,19 @@ class mod_perform_date_resolver_dynamic_source_user_custom_field_testcase extend
     public function test_resolve() {
         $data = $this->generate_test_data();
         $custom_field_date_resolver = new user_custom_field();
-        $custom_field_date_resolver
-            ->set_parameters(
-                new date_offset(1, date_offset::UNIT_DAY, date_offset::DIRECTION_BEFORE),
-                new date_offset(1, date_offset::UNIT_DAY, date_offset::DIRECTION_BEFORE),
-                'datetime-1'
-            )
-            ->set_users([$data['user1']->id]);
+        $custom_field_date_resolver->set_parameters(
+            new date_offset(1, date_offset::UNIT_DAY, date_offset::DIRECTION_BEFORE),
+            new date_offset(1, date_offset::UNIT_DAY, date_offset::DIRECTION_BEFORE),
+            'datetime-1',
+            [$data['user1']->id]
+        );
 
-        $start_date_ts = $custom_field_date_resolver->get_start_for($data['user1']->id);
+        $start_date_ts = $custom_field_date_resolver->get_start($data['user1']->id);
         $start_date = (new DateTime())->setTimestamp($start_date_ts);
         $this->assertSame('2020-06-12', $start_date->format('Y-m-d'));
 
         //check non saving user custom fields
-        $start_date_ts = $custom_field_date_resolver->get_start_for($data['user2']->id);
+        $start_date_ts = $custom_field_date_resolver->get_start($data['user2']->id);
         $this->assertNull($start_date_ts);
     }
 
@@ -73,7 +72,7 @@ class mod_perform_date_resolver_dynamic_source_user_custom_field_testcase extend
         $data['datetime-1']  = $DB->insert_record('user_info_field', (object)['shortname' => 'datetime-1', 'name' => 'time 1', 'categoryid' => 1, 'datatype' => 'datetime']);
         $data['datetime-2'] = $DB->insert_record('user_info_field', (object)['shortname' => 'datetime-2', 'name' => 'time 2', 'categoryid' => 1, 'datatype' => 'datetime']);
 
-        $DB->insert_record('user_info_data', (object)['userid' => $data['user1']->id , 'fieldid' => $data['datetime-1'], 'data' => 1592006400]);
+        $DB->insert_record('user_info_data', (object)['userid' => $data['user1']->id, 'fieldid' => $data['datetime-1'], 'data' => 1592006400]);
         return $data;
     }
 }

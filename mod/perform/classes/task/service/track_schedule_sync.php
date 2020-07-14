@@ -26,6 +26,7 @@ namespace mod_perform\task\service;
 use core\orm\collection;
 use core\orm\lazy_collection;
 use core\orm\query\builder;
+use mod_perform\constants;
 use mod_perform\dates\resolvers\anniversary_of;
 use mod_perform\dates\resolvers\date_resolver;
 use mod_perform\entities\activity\track;
@@ -117,8 +118,14 @@ class track_schedule_sync {
                 $date_resolver = new anniversary_of($date_resolver, $assignment->created_at);
             }
 
-            $new_start_date = $date_resolver->get_start_for($assignment->subject_user_id, $assignment->job_assignment_id);
-            $new_end_date = $date_resolver->get_end_for($assignment->subject_user_id, $assignment->job_assignment_id);
+            if ($date_resolver->get_resolver_base() === constants::DATE_RESOLVER_JOB_BASED) {
+                $new_start_date = $date_resolver->get_start($assignment->job_assignment_id);
+                $new_end_date = $date_resolver->get_end($assignment->job_assignment_id);
+            } else {
+                $new_start_date = $date_resolver->get_start($assignment->subject_user_id);
+                $new_end_date = $date_resolver->get_end($assignment->subject_user_id);
+            }
+
             if ((int)$assignment->period_start_date !== (int)$new_start_date
                 || (int)$assignment->period_end_date !== (int)$new_end_date) {
                 $assignment->period_start_date = $new_start_date;

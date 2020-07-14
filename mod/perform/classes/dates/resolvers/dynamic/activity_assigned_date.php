@@ -25,6 +25,7 @@ namespace mod_perform\dates\resolvers\dynamic;
 use core\collection;
 use core\orm\query\builder;
 use lang_string;
+use mod_perform\constants;
 use mod_perform\entities\activity\track;
 use mod_perform\entities\activity\track_user_assignment;
 
@@ -51,7 +52,7 @@ class activity_assigned_date extends base_dynamic_date_resolver {
             ->as('user_assignment')
             ->select_raw('subject_user_id, min(user_assignment.created_at) min_created_at')
             ->join([track::TABLE, 'track'], 'user_assignment.track_id', 'track.id')
-            ->where('user_assignment.subject_user_id', $this->reference_user_ids)
+            ->where('user_assignment.subject_user_id', $this->bulk_fetch_keys)
             ->where('track.activity_id', $this->activity_id)
             ->group_by('subject_user_id')
             ->get()
@@ -60,7 +61,7 @@ class activity_assigned_date extends base_dynamic_date_resolver {
                 return $row->min_created_at;
             })->all(true);
 
-        foreach ($this->reference_user_ids as $user_id) {
+        foreach ($this->bulk_fetch_keys as $user_id) {
             if (!isset($this->date_map[$user_id])) {
                 $this->date_map[$user_id] = $now;
             }
@@ -144,6 +145,13 @@ class activity_assigned_date extends base_dynamic_date_resolver {
         $data = json_decode($custom_data, true);
 
         return isset($data[self::THIS_ACTIVITY_ID]) && is_number($data[self::THIS_ACTIVITY_ID]);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function get_resolver_base(): string {
+        return constants::DATE_RESOLVER_USER_BASED;
     }
 
 }

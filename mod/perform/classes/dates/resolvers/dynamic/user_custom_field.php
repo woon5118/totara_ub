@@ -25,8 +25,9 @@ namespace mod_perform\dates\resolvers\dynamic;
 
 use core\collection;
 use core\orm\query\builder;
+use mod_perform\constants;
 
-class user_custom_field extends base_dynamic_date_resolver implements user_date_resolver {
+class user_custom_field extends base_dynamic_date_resolver {
 
     protected $time_custom_fields = null;
     /**
@@ -38,7 +39,7 @@ class user_custom_field extends base_dynamic_date_resolver implements user_date_
             ->from('user_info_data', 'uid')
             ->join(['user_info_field', 'uif'], 'fieldid', 'id')
             ->where('uif.shortname', $this->option_key)
-            ->where('uid.userid', $this->reference_user_ids)
+            ->where('uid.userid', $this->bulk_fetch_keys)
             ->get()
             ->map(function ($row) {
                 // Using map (rather than pluck) to preserve keys.
@@ -90,9 +91,8 @@ class user_custom_field extends base_dynamic_date_resolver implements user_date_
     /**
      * @inheritDoc
      */
-    public function set_users(array $reference_user_ids): dynamic_date_resolver {
-        $this->reference_user_ids = $reference_user_ids;
-        return $this;
+    public function get_resolver_base(): string {
+        return constants::DATE_RESOLVER_USER_BASED;
     }
 
 }

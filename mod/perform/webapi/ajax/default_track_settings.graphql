@@ -31,7 +31,7 @@ query mod_perform_default_track_settings($activity_id: param_integer!) {
       is_available
       custom_setting_component
       custom_data
-      is_job_based
+      resolver_base
     }
     schedule_use_anniversary
     due_date_is_enabled
@@ -71,7 +71,7 @@ query mod_perform_default_track_settings($activity_id: param_integer!) {
     is_available
     custom_setting_component
     custom_data
-    is_job_based
+    resolver_base
   }
   mod_perform_default_fixed_date_setting {
     iso

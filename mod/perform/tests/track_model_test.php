@@ -26,6 +26,7 @@ use core\collection;
 use core\orm\collection as orm_collection;
 use core\orm\entity\entity;
 use core\orm\query\builder;
+use mod_perform\constants;
 use mod_perform\dates\date_offset;
 use mod_perform\dates\resolvers\date_resolver;
 use mod_perform\dates\resolvers\dynamic\dynamic_source;
@@ -647,7 +648,7 @@ class mod_perform_track_model_testcase extends advanced_testcase {
             'is_available' => true,
             'custom_setting_component' => null,
             'custom_data' => null,
-            'is_job_based' => false,
+            'resolver_base' => constants::DATE_RESOLVER_USER_BASED,
         ], $selected_option->jsonSerialize());
     }
 
@@ -676,7 +677,7 @@ class mod_perform_track_model_testcase extends advanced_testcase {
             'is_available' => false,
             'custom_setting_component' => null,
             'custom_data' => null,
-            'is_job_based' => false,
+            'resolver_base' => constants::DATE_RESOLVER_USER_BASED,
         ], $selected_option->jsonSerialize());
     }
 
