@@ -6075,7 +6075,7 @@ function sql_table_from_select($table, $select, array $params) {
                     continue 2;
                 }
                 if (preg_match('/varchar\(([0-9]*)\)/', $field->type, $matches)) {
-                    if ($matches[1] > 255); {
+                    if ($matches[1] > 255) {
                         // Bad luck, we cannot create indexes on large mysql varchar fields.
                         continue 2;
                     }
