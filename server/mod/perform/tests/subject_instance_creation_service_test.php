@@ -24,6 +24,7 @@
 use core\orm\query\order;
 use mod_perform\dates\date_offset;
 use mod_perform\entities\activity\activity as activity_entity;
+use mod_perform\entities\activity\participant_instance;
 use mod_perform\entities\activity\subject_instance;
 use mod_perform\entities\activity\track as track_entity;
 use mod_perform\entities\activity\track_assignment;
@@ -33,6 +34,7 @@ use mod_perform\hook\subject_instances_created;
 use mod_perform\models\activity\activity as activity_model;
 use mod_perform\models\activity\track;
 use mod_perform\models\activity\track_status;
+use mod_perform\relationship\resolvers\peer;
 use mod_perform\state\activity\draft;
 use mod_perform\state\subject_instance\complete;
 use mod_perform\task\service\subject_instance_creation;
@@ -40,7 +42,9 @@ use mod_perform\task\service\subject_instance_dto;
 use mod_perform\task\service\track_schedule_sync;
 use mod_perform\user_groups\grouping;
 use totara_core\dates\date_time_setting;
+use totara_core\relationship\resolvers\subject;
 use totara_job\job_assignment;
+use totara_job\relationship\resolvers\manager;
 
 /**
  * @group perform
@@ -66,7 +70,7 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
         $this->assertCount(3, $user_assignments);
         $this->assertEquals(0, subject_instance::repository()->count());
 
-        $this->generate_instances();
+        $this->generate_instances(false);
 
         $created_instances = subject_instance::repository()->get();
         $this->assertCount(3, $created_instances);
@@ -74,6 +78,12 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
             array_column($data->users, 'id'),
             $created_instances->pluck('subject_user_id')
         );
+
+        // All subject instances created are marked as active
+        $this->assertEquals([subject_instance::STATUS_ACTIVE], array_unique($created_instances->pluck('status')));
+
+        // Participant instances were created too
+        $this->assertEquals(3, participant_instance::repository()->count());
 
         $this->assertEqualsCanonicalizing(
             $user_assignments->pluck('id'),
@@ -329,6 +339,20 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
         $sink->close();
     }
 
+    public function test_subject_instances_are_set_to_pending_on_manual_relationships() {
+        $this->create_data(false, true);
+
+        $this->generate_instances();
+
+        // All subject instances are marked as pending
+        $created_instances = subject_instance::repository()->get();
+        $this->assertCount(3, $created_instances);
+        $this->assertEquals([subject_instance::STATUS_PENDING], array_unique($created_instances->pluck('status')));
+
+        // No participant instances were created
+        $this->assertEquals(0, participant_instance::repository()->count());
+    }
+
     /**
      * This calls the creation service and returns the hooks sink if $no_hooks is set to true.
      *
@@ -348,7 +372,14 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
         return $sink;
     }
 
-    protected function create_data(bool $use_per_job_creation = false) {
+    /**
+     * @param bool $use_per_job_creation
+     * @param bool $with_manual_relatioship
+     * @return object
+     * @throws coding_exception
+     * @throws moodle_exception
+     */
+    protected function create_data(bool $use_per_job_creation = false, bool $with_manual_relatioship = false) {
         $data = new class {
             public $assignments;
             public $activity1;
@@ -362,9 +393,29 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
         /** @var mod_perform_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
 
-        $data->activity1 = $generator->create_activity_in_container(['create_track' => true]);
+        $data->activity1 = $generator->create_activity_in_container([
+            'create_track' => true,
+            'create_section' => false
+        ]);
         /** @var track $track1 */
         $data->track1 = track::load_by_activity($data->activity1)->first();
+
+        $section1 = $generator->create_section($data->activity1, ['title' => 'Section 1']);
+        $section2 = $generator->create_section($data->activity1, ['title' => 'Section 2']);
+        $section3 = $generator->create_section($data->activity1, ['title' => 'Section 3']);
+
+        $generator->create_section_relationship($section1, ['class_name' => manager::class]);
+        $generator->create_section_relationship($section1, ['class_name' => subject::class]);
+
+        $generator->create_section_relationship($section2, ['class_name' => subject::class]);
+        if ($with_manual_relatioship) {
+            $generator->create_section_relationship($section2, ['class_name' => peer::class]);
+        }
+
+        $generator->create_section_relationship($section3, ['class_name' => manager::class]);
+        if ($with_manual_relatioship) {
+            $generator->create_section_relationship($section3, ['class_name' => peer::class]);
+        }
 
         if ($use_per_job_creation) {
             set_config('totara_job_allowmultiplejobs', 1);
