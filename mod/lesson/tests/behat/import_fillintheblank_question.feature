@@ -29,7 +29,6 @@ Feature: In a lesson activity, teacher can import blackboard fill in the blank q
     Then I should see "Importing 1 questions"
     And I should see "Name an amphibian: __________"
     And I press "Continue"
-    And I should not see "__________"
     And I should not see "Your answer"
     And I set the field "id_answer" to "frog"
     And I press "Submit"
