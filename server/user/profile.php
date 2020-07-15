@@ -38,9 +38,8 @@ require_once($CFG->dirroot . '/user/profile/lib.php');
 require_once($CFG->dirroot . '/user/lib.php');
 require_once($CFG->libdir.'/filelib.php');
 
-$userid         = optional_param('id', 0, PARAM_INT);
-$edit           = optional_param('edit', null, PARAM_BOOL);    // Turn editing on and off.
-$reset          = optional_param('reset', null, PARAM_BOOL);
+$userid = optional_param('id', 0, PARAM_INT);
+$reset = optional_param('reset', null, PARAM_BOOL);
 
 $PAGE->set_url('/user/profile.php', array('id' => $userid));
 
@@ -96,29 +95,26 @@ if (!user_can_view_profile($user, null)) {
     exit;
 }
 
-// Get the profile page.  Should always return something unless the database is broken.
+// Get the profile page. Should always return something unless the database is broken.
 if (!$currentpage = my_get_page($userid, MY_PAGE_PUBLIC)) {
     print_error('mymoodlesetup');
 }
-
+$USER->editing = 0;
+// Start setting up the page.
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('mypublic');
 $PAGE->set_pagetype('user-profile');
 
 // Set up block editing capabilities.
 if (isguestuser()) {     // Guests can never edit their profile.
-    $USER->editing = $edit = 0;  // Just in case.
     $PAGE->set_blocks_editing_capability('moodle/my:configsyspages');  // unlikely :).
 } else {
     $PAGE->set_blocks_editing_capability('moodle/user:manageblocks');
 }
 
-// Start setting up the page.
-$strpublicprofile = get_string('publicprofile');
-
 $PAGE->blocks->add_region('content');
-$PAGE->set_subpage($currentpage->id);
-$PAGE->set_title(fullname($user).": $strpublicprofile");
+$PAGE->set_subpage(1);
+$PAGE->set_title(fullname($user).": " . get_string('publicprofile'));
 $PAGE->set_heading(fullname($user));
 
 if (!$currentuser) {
@@ -133,9 +129,9 @@ if ($node = $PAGE->settingsnav->get('root')) {
     $node->forceopen = false;
 }
 
-
 // Toggle the editing state and switches.
 if ($PAGE->user_allowed_editing()) {
+    // We will allow the manager to remove custom user profile blocks if they exists.
     if ($reset !== null) {
         if (!is_null($userid)) {
             if (!$currentpage = my_reset_page($userid, MY_PAGE_PUBLIC, 'user-profile')) {
@@ -143,53 +139,14 @@ if ($PAGE->user_allowed_editing()) {
             }
             redirect(new moodle_url('/user/profile.php', array('id' => $userid)));
         }
-    } else if ($edit !== null) {             // Editing state was specified.
-        $USER->editing = $edit;       // Change editing state.
-    } else {                          // Editing state is in session.
-        if ($currentpage->userid) {   // It's a page we can edit, so load from session.
-            if (!empty($USER->editing)) {
-                $edit = 1;
-            } else {
-                $edit = 0;
-            }
-        } else {
-            // For the page to display properly with the user context header the page blocks need to
-            // be copied over to the user context.
-            if (!$currentpage = my_copy_page($userid, MY_PAGE_PUBLIC, 'user-profile')) {
-                print_error('mymoodlesetup');
-            }
-            $PAGE->set_context($usercontext);
-            $PAGE->set_subpage($currentpage->id);
-            // It's a system page and they are not allowed to edit system pages.
-            $USER->editing = $edit = 0;          // Disable editing completely, just to be safe.
-        }
     }
 
-    // Add button for editing page.
-    $params = array('edit' => !$edit, 'id' => $userid);
-
-    $resetbutton = '';
-    $resetstring = get_string('resetpage', 'my');
-    $reseturl = new moodle_url("$CFG->wwwroot/user/profile.php", array('edit' => 1, 'reset' => 1, 'id' => $userid));
-
-    if (!$currentpage->userid) {
-        // Viewing a system page -- let the user customise it.
-        $editstring = get_string('updatemymoodleon');
-        $params['edit'] = 1;
-    } else if (empty($edit)) {
-        $editstring = get_string('updatemymoodleon');
+    if ($currentpage->userid !== null) {
+        $resetstring = get_string('resetpage', 'my');
+        $reseturl = new moodle_url("$CFG->wwwroot/user/profile.php", ['reset' => 1, 'id' => $userid]);
         $resetbutton = $OUTPUT->single_button($reseturl, $resetstring);
-    } else {
-        $editstring = get_string('updatemymoodleoff');
-        $resetbutton = $OUTPUT->single_button($reseturl, $resetstring);
+        $PAGE->set_button($resetbutton);
     }
-
-    $url = new moodle_url("$CFG->wwwroot/user/profile.php", $params);
-    $button = $OUTPUT->single_button($url, $editstring);
-    $PAGE->set_button($resetbutton . $button);
-
-} else {
-    $USER->editing = $edit = 0;
 }
 
 // Trigger a user profile viewed event.

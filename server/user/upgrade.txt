@@ -1,6 +1,7 @@
 This files describes API changes in /user/*.
 
 === 13.0 ===
+* my_copy_page() function has been deprecated
 * user_can_loginas() has been deprecated, please use \core_user\access_controller::can_loginas() instead
 
 === 12.0 ===

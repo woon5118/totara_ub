@@ -50,13 +50,18 @@ function my_get_page($userid, $private=MY_PAGE_PRIVATE) {
     return $DB->get_record('my_pages', array('userid' => null, 'name' => '__default', 'private' => $private));
 }
 
-
-/*
+/**
  * This copies a system default page to the current user
- *
+ * @param $userid
+ * @param int $private
+ * @param string $pagetype
+ * @return bool|mixed
+ * @deprecated since Totara 13
  */
 function my_copy_page($userid, $private=MY_PAGE_PRIVATE, $pagetype='my-index') {
     global $DB;
+
+    debugging('my_copy_page() function has been deprecated', DEBUG_DEVELOPER);
 
     if ($customised = $DB->get_record('my_pages', array('userid' => $userid, 'private' => $private))) {
         return $customised;  // We're done!

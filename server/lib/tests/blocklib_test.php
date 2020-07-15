@@ -771,7 +771,7 @@ return;
         $defaultmybm->load_blocks();
         $defaultmybm->reposition_block($sitestickyblock1->id, $regionname, 4);
         // Setup the user's dashboard.
-        $usermy = my_copy_page($user->id);
+        $usermy = my_get_page($user->id, MY_PAGE_PUBLIC);
         list($mypage, $mybm) = $this->get_a_page_and_block_manager(array($regionname), $usercontext, 'my-index', $usermy->id);
         $PAGE = $mypage;
         $mybm->add_block($blockname, $regionname, 5, false, $mypage->pagetype, $mypage->subpage);
@@ -819,18 +819,14 @@ return;
         $this->assertEquals($sitestickyblock3->id, $forcedmybr[4]->instance->id);
         $this->assertEquals('8', $forcedmybr[4]->instance->weight);
         // Check that the correct blocks are present in the standard my page.
-        $this->assertCount(6, $mybr);
-        $this->assertEquals('-2', $mybr[0]->instance->weight);
-        $this->assertEquals($sitestickyblock2->id, $mybr[1]->instance->id);
-        $this->assertEquals('-1', $mybr[1]->instance->weight);
-        $this->assertEquals('3', $mybr[2]->instance->weight);
+        $this->assertCount(4, $mybr);
+        $this->assertEquals('-1', $mybr[0]->instance->weight);
+        $this->assertEquals($sitestickyblock2->id, $mybr[0]->instance->id);
+        $this->assertEquals('0', $mybr[1]->instance->weight);
+        $this->assertEquals('5', $mybr[2]->instance->weight);
         // Test the override on the first sticky block was copied and picked up.
-        $this->assertEquals($sitestickyblock1->id, $mybr[3]->instance->id);
-        $this->assertEquals('4', $mybr[3]->instance->weight);
-        $this->assertEquals($block1->id, $mybr[4]->instance->id);
-        $this->assertEquals('5', $mybr[4]->instance->weight);
-        $this->assertEquals($sitestickyblock3->id, $mybr[5]->instance->id);
-        $this->assertEquals('8', $mybr[5]->instance->weight);
+        $this->assertEquals($sitestickyblock1->id, $mybr[1]->instance->id);
+        $this->assertEquals('8', $mybr[3]->instance->weight);
         $PAGE = $storedpage;
     }
 
