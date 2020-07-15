@@ -97,7 +97,7 @@
         >
           <ToggleSwitch
             v-if="!isActive"
-            v-model="x"
+            v-model="activity.anonymous_responses"
             toggle-first
             text=""
             @input="updateActivity({ anonymous_responses: $event })"
@@ -206,7 +206,6 @@ export default {
       activityTypeSelection: typeId,
       isSaving: false,
       mutationError: null,
-      x: true,
     };
   },
 
