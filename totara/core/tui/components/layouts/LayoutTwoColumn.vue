@@ -29,7 +29,6 @@
         { name: 'medium', boundaries: [765, 1192] },
         { name: 'large', boundaries: [1193, 1672] },
       ]"
-      @responsive-resize="resize"
     >
       <div v-if="slotProps.currentBoundaryName === 'small'">
         <Grid direction="vertical">
@@ -37,10 +36,10 @@
             <h3 class="tui-layoutTwoColumn__heading">
               <slot name="page-title" />
             </h3>
-            <slot name="right" />
+            <slot name="right" :units="12" :direction="'vertical'" />
           </GridItem>
           <GridItem>
-            <slot name="left" />
+            <slot name="left" :units="12" :direction="'vertical'" />
           </GridItem>
         </Grid>
       </div>
@@ -53,10 +52,10 @@
             </h3>
             <!-- first in DOM order for screenreaders, re-ordered visually to be
                 in the center with flexbox order -->
-            <slot name="right" :units="9" />
+            <slot name="right" :units="9" :direction="'horizontal'" />
           </GridItem>
           <GridItem :units="3" :order="1">
-            <slot name="left" :units="3" />
+            <slot name="left" :units="3" :direction="'horizontal'" />
           </GridItem>
         </Grid>
       </div>
@@ -69,10 +68,10 @@
             </h3>
             <!-- first in DOM order for screenreaders, re-ordered visually to be
                 in the center with flexbox order -->
-            <slot name="right" :units="10" />
+            <slot name="right" :units="10" :direction="'horizontal'" />
           </GridItem>
           <GridItem :units="2" :order="1">
-            <slot name="left" :units="2" />
+            <slot name="left" :units="2" :direction="'horizontal'" />
           </GridItem>
         </Grid>
       </div>
@@ -91,17 +90,6 @@ export default {
     Grid,
     GridItem,
     Responsive,
-  },
-
-  methods: {
-    resize(boundary) {
-      if (boundary === 'small') {
-        this.$emit('direction-change', 'vertical');
-        return;
-      }
-
-      this.$emit('direction-change', 'horizontal');
-    },
   },
 };
 </script>
