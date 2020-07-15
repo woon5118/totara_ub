@@ -419,6 +419,13 @@ final class util {
         return $DB->get_records_sql_menu($sql, ['userid' => $userid]);
     }
 
+    /**
+     * Adding users to multiple tenants, and removing the current tenants only if the list of
+     * tenant ids are not providing any id(s) of the current ones.
+     *
+     * @param int $userid
+     * @param int[] $tenantids
+     */
     public static function set_user_participation(int $userid, array $tenantids) {
         global $DB, $CFG;
 

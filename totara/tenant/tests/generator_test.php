@@ -188,4 +188,179 @@ class totara_tenant_generator_testcase extends advanced_testcase {
         $result = get_user_roles(context_coursecat::instance($tenant3->categoryid), $user5->id, false);
         $this->assertSame([$tenantdomainmanagerrole->id], array_values(array_map($functionroleid, $result)));
     }
+
+    public function test_set_user_participation(): void {
+        global $DB;
+
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+
+        /** @var totara_tenant_generator $tenant_generator */
+        $tenant_generator = $generator->get_plugin_generator('totara_tenant');
+        $tenant_generator->enable_tenants();
+
+        $tenant_one = $tenant_generator->create_tenant(null);
+        $tenant_two = $tenant_generator->create_tenant(null);
+
+        // Add user to two tenants.
+        $tenant_generator->set_user_participation(
+            $user_one->id,
+            [
+                $tenant_one->id,
+                $tenant_two->id
+            ]
+        );
+
+        // Make sure that this user is existing within two different cohorts from two different tenants.
+        $sql = '
+            SELECT t.id, t.name FROM "ttr_tenant" t
+            INNER JOIN "ttr_cohort" c ON t.cohortid = c.id
+            INNER JOIN "ttr_cohort_members" cm ON cm.cohortid = c.id
+            WHERE cm.userid = :user_id
+        ';
+
+        $records = $DB->get_records_sql($sql, ['user_id' => $user_one->id]);
+        $this->assertNotEmpty($records);
+        $this->assertCount(2, $records);
+
+        $this->assertArrayHasKey($tenant_one->id, $records);
+        $this->assertArrayHasKey($tenant_two->id, $records);
+
+        $first_tenant = $records[$tenant_one->id];
+        $second_tenant = $records[$tenant_two->id];
+
+        $this->assertSame($tenant_one->id, $first_tenant->id);
+        $this->assertSame($tenant_two->id, $second_tenant->id);
+
+        $this->assertSame($tenant_one->name, $first_tenant->name);
+        $this->assertSame($tenant_two->name, $second_tenant->name);
+
+        // Create new tenant and set the user to that tenant, and make sure that user will not existing within two
+        // other cohorts that are from tenant_one and tenant_two.
+        $tenant_three = $tenant_generator->create_tenant(null);
+        $tenant_generator->set_user_participation($user_one->id, [$tenant_three->id]);
+
+        $new_records = $DB->get_records_sql($sql, ['user_id' => $user_one->id]);
+        $this->assertNotEmpty($new_records);
+        $this->assertCount(1, $new_records);
+
+        $third_tenant = reset($new_records);
+        $this->assertNotEquals($tenant_one->id, $third_tenant->id);
+        $this->assertNotEquals($tenant_two->id, $third_tenant->id);
+
+        $this->assertSame($tenant_three->id, $third_tenant->id);
+
+        $user_participant_sql = '
+            SELECT t.id FROM "ttr_tenant" t
+            INNER JOIN "ttr_cohort" c ON t.cohortid = c.id
+            INNER JOIN "ttr_cohort_members" cm ON c.id = cm.cohortid
+            WHERE cm.userid = :user_id AND t.id = :tenant_id
+        ';
+
+        // Check if the user is within tenant_one.
+        $this->assertFalse(
+            $DB->record_exists_sql(
+                $user_participant_sql,
+                [
+                    'user_id' => $user_one->id,
+                    'tenant_id' => $tenant_one->id
+                ]
+            )
+        );
+
+        // Check if the user is within tenant_two
+        $this->assertFalse(
+            $DB->record_exists_sql(
+                $user_participant_sql,
+                [
+                    'user_id' => $user_one->id,
+                    'tenant_id' => $tenant_two->id
+                ]
+            )
+        );
+    }
+
+    public function test_migrate_user_to_tenant(): void {
+        global $DB;
+
+        $generator = $this->getDataGenerator();
+        $user = $generator->create_user();
+
+        /** @var totara_tenant_generator $tenant_generator */
+        $tenant_generator = $generator->get_plugin_generator('totara_tenant');
+        $tenant_generator->enable_tenants();
+
+        // Creating two tenants in order to switch between two tenants for the user.
+        $tenant_one = $tenant_generator->create_tenant();
+        $tenant_two = $tenant_generator->create_tenant();
+
+        $tenant_generator->migrate_user_to_tenant($user->id, $tenant_one->id);
+        $cohort_sql = '
+            SELECT u.id FROM "ttr_user" u
+            INNER JOIN "ttr_cohort_members" cm ON u.id = cm.userid
+            WHERE cm.cohortid = :cohort_id
+            AND u.id = :user_id
+        ';
+
+        // Check if the user is added to the tenant_one.
+        $this->assertTrue(
+            $DB->record_exists('user', ['id' => $user->id, 'tenantid' => $tenant_one->id])
+        );
+
+        $this->assertFalse(
+            $DB->record_exists('user', ['id' => $user->id, 'tenantid' => $tenant_two->id])
+        );
+
+        $this->assertTrue(
+            $DB->record_exists_sql(
+                $cohort_sql,
+                [
+                    'cohort_id' => $tenant_one->cohortid,
+                    'user_id' => $user->id
+                ]
+            )
+        );
+
+        $this->assertFalse(
+            $DB->record_exists_sql(
+                $cohort_sql,
+                [
+                    'cohort_id' => $tenant_two->cohortid,
+                    'user_id' => $user->id
+                ]
+            )
+        );
+
+        // Migrate user to tenant_two
+        $tenant_generator->migrate_user_to_tenant($user->id, $tenant_two->id);
+
+        // Check if the user is added to tenant_two and removed from tenant_one
+        $this->assertFalse(
+            $DB->record_exists('user', ['id' => $user->id, 'tenantid' => $tenant_one->id])
+        );
+
+        $this->assertTrue(
+            $DB->record_exists('user', ['id' => $user->id, 'tenantid' => $tenant_two->id])
+        );
+
+        $this->assertFalse(
+            $DB->record_exists_sql(
+                $cohort_sql,
+                [
+                    'cohort_id' => $tenant_one->cohortid,
+                    'user_id' => $user->id
+                ]
+            )
+        );
+
+        $this->assertTrue(
+            $DB->record_exists_sql(
+                $cohort_sql,
+                [
+                    'cohort_id' => $tenant_two->cohortid,
+                    'user_id' => $user->id
+                ]
+            )
+        );
+    }
 }

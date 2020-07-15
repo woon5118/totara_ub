@@ -93,4 +93,24 @@ class totara_tenant_generator extends component_generator_base {
 
         return util::create_tenant((array)$tenant);
     }
+
+    /**
+     * @param int   $userid
+     * @param int[] $tenantids
+     *
+     * @return void
+     */
+    public function set_user_participation(int $userid, array $tenantids): void {
+        util::set_user_participation($userid, $tenantids);
+    }
+
+    /**
+     * @param int $user_id
+     * @param int $tenant_id
+     *
+     * @return void
+     */
+    public function migrate_user_to_tenant(int $user_id, int $tenant_id): void {
+        util::migrate_user_to_tenant($user_id, $tenant_id);
+    }
 }
