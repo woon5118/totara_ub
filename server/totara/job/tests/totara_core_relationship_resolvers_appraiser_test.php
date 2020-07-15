@@ -21,6 +21,7 @@
  * @package totara_job
  */
 
+use totara_core\relationship\relationship;
 use totara_job\job_assignment;
 use totara_job\relationship\resolvers\appraiser;
 
@@ -41,77 +42,84 @@ class totara_job_totara_core_relationship_resolvers_appraiser_testcase extends \
         $user1ja1 = job_assignment::create_default($user1->id, ['appraiserid' => $user2->id]);
         $user1ja2 = job_assignment::create_default($user1->id, ['appraiserid' => $user3->id]);
 
-        return [$user1, $user2, $user3, $user1ja1, $user1ja2, $user2ja, $user3ja];
+        $relationship = relationship::load_by_idnumber('appraiser');
+        $appraiser_resolver = new appraiser($relationship);
+
+        return [$user1, $user2, $user3, $user1ja1, $user1ja2, $user2ja, $user3ja, $appraiser_resolver];
     }
 
     public function test_get_users_from_job_assignment_id(): void {
-        [$user1, $user2, $user3, $user1ja1, $user1ja2, $user2ja, $user3ja] = $this->create_data();
+        [$user1, $user2, $user3, $user1ja1, $user1ja2, $user2ja, $user3ja, $appraiser_resolver] = $this->create_data();
 
         // user2 is the appraiser of user1 in ja1
         $this->assertEquals(
             [$user2->id],
-            appraiser::get_users(['job_assignment_id' => $user1ja1->id])
+            $appraiser_resolver->get_users(['job_assignment_id' => $user1ja1->id])
         );
 
         // user3 is the appraiser of user1 in ja2
         $this->assertEquals(
             [$user3->id],
-            appraiser::get_users(['job_assignment_id' => $user1ja2->id])
+            $appraiser_resolver->get_users(['job_assignment_id' => $user1ja2->id])
         );
 
         // user2 is not appraised by anyone
         $this->assertEquals(
             [],
-            appraiser::get_users(['job_assignment_id' => $user2ja->id])
+            $appraiser_resolver->get_users(['job_assignment_id' => $user2ja->id])
         );
 
         // user3 is not appraised by anyone
         $this->assertEquals(
             [],
-            appraiser::get_users(['job_assignment_id' => $user3ja->id])
+            $appraiser_resolver->get_users(['job_assignment_id' => $user3ja->id])
         );
     }
 
     public function test_get_users_from_user_id(): void {
-        [$user1, $user2, $user3] = $this->create_data();
+        [$user1, $user2, $user3, $user1ja1, $user1ja2, $user2ja, $user3ja, $appraiser_resolver] = $this->create_data();
 
         // user2 and user3 are the appraisers of user1
         $this->assertEqualsCanonicalizing(
             [$user2->id, $user3->id],
-            appraiser::get_users(['user_id' => $user1->id])
+            $appraiser_resolver->get_users(['user_id' => $user1->id])
         );
 
         // user2 is not appraised by anyone
         $this->assertEquals(
             [],
-            appraiser::get_users(['user_id' => $user2->id])
+            $appraiser_resolver->get_users(['user_id' => $user2->id])
         );
 
         // user3 is not appraised by anyone
         $this->assertEquals(
             [],
-            appraiser::get_users(['user_id' => $user2->id])
+            $appraiser_resolver->get_users(['user_id' => $user2->id])
         );
     }
 
     public function test_get_users_with_incorrect_attributes(): void {
-        appraiser::get_users(['job_assignment_id' => -1]);
-        appraiser::get_users(['user_id' => -1]);
-        appraiser::get_users(['job_assignment_id' => -1, 'user_id' => -1]);
-        appraiser::get_users(['job_assignment_id' => -1, 'incorrect attribute' => -1]);
-        appraiser::get_users(['user_id' => -1, 'incorrect attribute' => -1]);
+        [$user1, $user2, $user3, $user1ja1, $user1ja2, $user2ja, $user3ja, $appraiser_resolver] = $this->create_data();
+
+        $appraiser_resolver->get_users(['job_assignment_id' => -1]);
+        $appraiser_resolver->get_users(['user_id' => -1]);
+        $appraiser_resolver->get_users(['job_assignment_id' => -1, 'user_id' => -1]);
+        $appraiser_resolver->get_users(['job_assignment_id' => -1, 'incorrect attribute' => -1]);
+        $appraiser_resolver->get_users(['user_id' => -1, 'incorrect attribute' => -1]);
 
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage('The fields inputted into the ' . appraiser::class . ' relationship resolver are invalid');
 
-        appraiser::get_users(['incorrect attribute' => -1]);
+        $appraiser_resolver->get_users(['incorrect attribute' => -1]);
     }
 
     public function test_get_users_with_no_attributes(): void {
+        [$user1, $user2, $user3, $user1ja1, $user1ja2, $user2ja, $user3ja, $appraiser_resolver] = $this->create_data();
+
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage('The fields inputted into the ' . appraiser::class . ' relationship resolver are invalid');
 
-        appraiser::get_users([]);
+        $appraiser_resolver->get_users([]);
     }
 
 }

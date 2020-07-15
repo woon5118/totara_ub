@@ -45,10 +45,12 @@ class relationship extends entity {
     public const TABLE = 'totara_core_relationship';
 
     public const CREATED_TIMESTAMP = 'created_at';
+
     /**
      * type for core relationship, also called calculated relationship this is being use in core, ex: subject, manager, appraiser
      */
     public const TYPE_STANDARD = 0;
+
     /**
      * type for manual relationship, this is being used in perform module, ex: peer, customer, mentor, reviewer
      */

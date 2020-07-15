@@ -261,7 +261,7 @@ class mod_perform_participant_section_model_testcase extends advanced_testcase {
 
     private function get_relationship_resolver_classes(collection $collection): array {
         return $collection->map(function (relationship $relationship) {
-            return $relationship->get_resolvers()[0];
+            return get_class($relationship->get_resolvers()[0]);
         })->all();
     }
 

@@ -49,6 +49,7 @@ use mod_perform\models\activity\element;
 use mod_perform\models\activity\section;
 use mod_perform\models\activity\section_element;
 use mod_perform\models\activity\section_relationship as section_relationship_model;
+use mod_perform\models\activity\subject_instance_manual_participant;
 use mod_perform\models\activity\track;
 use mod_perform\models\activity\track_assignment_type;
 use mod_perform\state\activity\active;
@@ -1190,6 +1191,26 @@ class mod_perform_generator extends component_generator_base {
                 throw new coding_exception("creating track assignment not yet implemented for {$type}");
         }
         $this->create_track_assignments_with_existing_groups(track::load_by_entity($track), $cohort_ids);
+    }
+
+    /**
+     * manual participant generator
+     *
+     * @param array $data
+     * @return collection
+     * @throws Throwable
+     * @throws dml_exception
+     */
+    public function create_subject_instance_manual_participant(array $data): collection {
+        global $DB;
+
+        $subject_instance_id = $data['subject_instance_id'];
+        $user_ids = $data['user_ids'];
+        $core_relationship_idnumber = $data['core_relationship_idnumber'];
+        $created_by = $data['created_by'];
+
+        $core_relationship_id = $DB->get_field('totara_core_relationship', 'id', ['idnumber' => $core_relationship_idnumber]);
+        return subject_instance_manual_participant::create($subject_instance_id, $core_relationship_id, $user_ids,$created_by);
     }
 
 }

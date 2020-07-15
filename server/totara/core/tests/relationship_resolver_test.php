@@ -130,7 +130,7 @@ class test_resolver_one extends relationship_resolver {
     public static function get_name_plural(): string {
         return 'resolver_ones';
     }
-    protected static function get_data(array $data): array {
+    protected function get_data(array $data): array {
         return [$data['input_field_one']];
     }
     public static function get_accepted_fields(): array {
@@ -144,7 +144,7 @@ class test_resolver_two extends relationship_resolver {
     public static function get_name_plural(): string {
         return 'resolver_twos';
     }
-    protected static function get_data(array $data): array {
+    protected function get_data(array $data): array {
         return [$data['input_field_two']];
     }
     public static function get_accepted_fields(): array {
@@ -166,7 +166,7 @@ class test_resolver_four extends relationship_resolver {
     public static function get_name_plural(): string {
         return 'resolver_fours';
     }
-    protected static function get_data(array $data): array {
+    protected function get_data(array $data): array {
         return $data;
     }
     public static function get_accepted_fields(): array {
@@ -183,7 +183,7 @@ class test_resolver_five extends test_resolver_one {
     public static function get_name_plural(): string {
         return 'resolver_fives';
     }
-    protected static function get_data(array $data): array {
+    protected function get_data(array $data): array {
         return [$data['input_field_one'] ?? $data['input_field_two']];
     }
     public static function get_accepted_fields(): array {

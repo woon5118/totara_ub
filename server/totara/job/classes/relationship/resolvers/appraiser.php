@@ -62,7 +62,7 @@ class appraiser extends relationship_resolver {
      * @param array $data containing the fields specified by {@see get_accepted_fields}
      * @return int[] of user ids
      */
-    protected static function get_data(array $data): array {
+    protected function get_data(array $data): array {
         $repository = job_assignment::repository();
 
         if (isset($data['job_assignment_id'])) {

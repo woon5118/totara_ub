@@ -21,6 +21,7 @@
  * @package totara_job
  */
 
+use totara_core\relationship\relationship;
 use totara_job\job_assignment;
 use totara_job\relationship\resolvers\manager;
 
@@ -41,77 +42,84 @@ class totara_job_totara_core_relationship_resolvers_manager_testcase extends \ad
         $user1ja1 = job_assignment::create_default($user1->id, ['managerjaid' => $user2ja->id]);
         $user1ja2 = job_assignment::create_default($user1->id, ['managerjaid' => $user3ja->id]);
 
-        return [$user1, $user2, $user3, $user1ja1, $user1ja2, $user2ja, $user3ja];
+        $relationship = relationship::load_by_idnumber('manager');
+        $manager_resolver = new manager($relationship);
+
+        return [$user1, $user2, $user3, $user1ja1, $user1ja2, $user2ja, $user3ja, $manager_resolver];
     }
 
     public function test_get_users_from_job_assignment_id(): void {
-        [$user1, $user2, $user3, $user1ja1, $user1ja2, $user2ja, $user3ja] = $this->create_data();
+        [$user1, $user2, $user3, $user1ja1, $user1ja2, $user2ja, $user3ja, $manager_resolver] = $this->create_data();
 
         // user2 is the manager of user1 in ja1
         $this->assertEquals(
             [$user2->id],
-            manager::get_users(['job_assignment_id' => $user1ja1->id])
+            $manager_resolver->get_users(['job_assignment_id' => $user1ja1->id])
         );
 
         // user3 is the manager of user1 in ja2
         $this->assertEquals(
             [$user3->id],
-            manager::get_users(['job_assignment_id' => $user1ja2->id])
+            $manager_resolver->get_users(['job_assignment_id' => $user1ja2->id])
         );
 
         // user2 is not managed by anyone
         $this->assertEquals(
             [],
-            manager::get_users(['job_assignment_id' => $user2ja->id])
+            $manager_resolver->get_users(['job_assignment_id' => $user2ja->id])
         );
 
         // user3 is not managed by anyone
         $this->assertEquals(
             [],
-            manager::get_users(['job_assignment_id' => $user3ja->id])
+            $manager_resolver->get_users(['job_assignment_id' => $user3ja->id])
         );
     }
 
     public function test_get_users_from_user_id(): void {
-        [$user1, $user2, $user3] = $this->create_data();
+        [$user1, $user2, $user3, $user1ja1, $user1ja2, $user2ja, $user3ja, $manager_resolver] = $this->create_data();
 
         // user2 and user3 are the managers of user1
         $this->assertEqualsCanonicalizing(
             [$user2->id, $user3->id],
-            manager::get_users(['user_id' => $user1->id])
+            $manager_resolver->get_users(['user_id' => $user1->id])
         );
 
         // user2 is not managed by anyone
         $this->assertEquals(
             [],
-            manager::get_users(['user_id' => $user2->id])
+            $manager_resolver->get_users(['user_id' => $user2->id])
         );
 
         // user3 is not managed by anyone
         $this->assertEquals(
             [],
-            manager::get_users(['user_id' => $user2->id])
+            $manager_resolver->get_users(['user_id' => $user2->id])
         );
     }
 
     public function test_get_users_with_incorrect_attributes(): void {
-        manager::get_users(['job_assignment_id' => -1]);
-        manager::get_users(['user_id' => -1]);
-        manager::get_users(['job_assignment_id' => -1, 'user_id' => -1]);
-        manager::get_users(['job_assignment_id' => -1, 'incorrect attribute' => -1]);
-        manager::get_users(['user_id' => -1, 'incorrect attribute' => -1]);
+        [$user1, $user2, $user3, $user1ja1, $user1ja2, $user2ja, $user3ja, $manager_resolver] = $this->create_data();
+
+        $manager_resolver->get_users(['job_assignment_id' => -1]);
+        $manager_resolver->get_users(['user_id' => -1]);
+        $manager_resolver->get_users(['job_assignment_id' => -1, 'user_id' => -1]);
+        $manager_resolver->get_users(['job_assignment_id' => -1, 'incorrect attribute' => -1]);
+        $manager_resolver->get_users(['user_id' => -1, 'incorrect attribute' => -1]);
 
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage('The fields inputted into the ' . manager::class . ' relationship resolver are invalid');
 
-        manager::get_users(['incorrect attribute' => -1]);
+        $manager_resolver->get_users(['incorrect attribute' => -1]);
     }
 
     public function test_get_users_with_no_attributes(): void {
+        [$user1, $user2, $user3, $user1ja1, $user1ja2, $user2ja, $user3ja, $manager_resolver] = $this->create_data();
+
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage('The fields inputted into the ' . manager::class . ' relationship resolver are invalid');
 
-        manager::get_users([]);
+        $manager_resolver->get_users([]);
     }
 
 }

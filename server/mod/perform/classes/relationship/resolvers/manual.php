@@ -20,39 +20,36 @@
  * @author Marco Song <marco.song@totaralearning.com>
  * @package mod_perform
  */
+
 namespace mod_perform\relationship\resolvers;
+
+use mod_perform\entities\activity\subject_instance_manual_participant;
 use totara_core\relationship\relationship_resolver;
 
-class customer extends relationship_resolver {
-
-    /**
-     * @inheritDoc
-     */
-    public static function get_name(): string {
-        return get_string('relationship_customer', 'mod_perform');
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public static function get_name_plural(): string {
-        return get_string('relationship_customer_plural', 'mod_perform');
-    }
-
+/**
+ * Abstract class manual
+ * reusable for manual relationship resolvers
+ */
+abstract class manual extends relationship_resolver {
     /**
      * @inheritDoc
      */
     public static function get_accepted_fields(): array {
         return [
             ['subject_instance_id'],
-            ['user_id'],
+            ['user_id'], // Unused, but required to be compatible with other relationships used in mod_perform.
         ];
     }
 
     /**
      * @inheritDoc
      */
-    protected static function get_data(array $data): array {
-        return [0];
+    protected function get_data(array $data): array {
+        return subject_instance_manual_participant::repository()
+            ->select('user_id')
+            ->where('subject_instance_id', $data['subject_instance_id'])
+            ->where('core_relationship_id', $this->parent_relationship->id)
+            ->get()
+            ->pluck('user_id');
     }
 }

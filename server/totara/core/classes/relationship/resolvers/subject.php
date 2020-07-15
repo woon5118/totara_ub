@@ -66,7 +66,7 @@ class subject extends relationship_resolver {
      * @param array
      * @return int[] of user ids
      */
-    protected static function get_data(array $data): array {
+    protected function get_data(array $data): array {
         return [$data['user_id']];
     }
 

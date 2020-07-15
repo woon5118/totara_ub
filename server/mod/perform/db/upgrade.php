@@ -117,7 +117,6 @@ function xmldb_perform_upgrade($oldversion) {
 
         totara_core_upgrade_create_relationship('mod_perform\relationship\resolvers\peer', 'perform_peer', 1, 'mod_perform');
         totara_core_upgrade_create_relationship('mod_perform\relationship\resolvers\mentor', 'perform_mentor', 1, 'mod_perform');
-        totara_core_upgrade_create_relationship('mod_perform\relationship\resolvers\customer', 'perform_customer', 1, 'mod_perform');
         totara_core_upgrade_create_relationship('mod_perform\relationship\resolvers\reviewer', 'perform_reviewer', 1, 'mod_perform');
 
         // Core savepoint reached.

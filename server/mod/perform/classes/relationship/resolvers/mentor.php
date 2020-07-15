@@ -20,10 +20,10 @@
  * @author Marco Song <marco.song@totaralearning.com>
  * @package mod_perform
  */
-namespace mod_perform\relationship\resolvers;
-use totara_core\relationship\relationship_resolver;
 
-class mentor extends relationship_resolver {
+namespace mod_perform\relationship\resolvers;
+
+class mentor extends manual {
 
     /**
      * @inheritDoc
@@ -37,22 +37,5 @@ class mentor extends relationship_resolver {
      */
     public static function get_name_plural(): string {
         return get_string('relationship_mentor_plural', 'mod_perform');
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public static function get_accepted_fields(): array {
-        return [
-            ['subject_instance_id'],
-            ['user_id'],
-        ];
-    }
-
-    /**
-     * @inheritDoc
-     */
-    protected static function get_data(array $data): array {
-        return [0];
     }
 }

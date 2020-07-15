@@ -115,6 +115,7 @@ class totara_core_relationship_collection_manager_testcase extends advanced_test
     private function get_relationships(): collection {
         return relationship_entity::repository()
             ->with('resolvers')
+            ->where_null('component')
             ->order_by('id')
             ->get()
             ->map_to(relationship::class);

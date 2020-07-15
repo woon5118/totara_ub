@@ -72,6 +72,7 @@ final class relationship extends model {
      *
      * @param string $idnumber
      * @return static
+     * @throws coding_exception
      */
     public static function load_by_idnumber(string $idnumber): self {
         $entity = static::get_entity_class()::repository()
@@ -122,19 +123,25 @@ final class relationship extends model {
     public function get_users(array $data): array {
         $user_ids = [];
         foreach ($this->get_resolvers() as $relationship_resolver) {
-            $user_ids[] = $relationship_resolver::get_users($data);
+            $user_ids[] = $relationship_resolver->get_users($data);
         }
         $all_user_ids = array_merge(...$user_ids);
         return array_unique($all_user_ids);
     }
 
     /**
-     * Resolver classes associated with this relationship.
+     * Resolver instances associated with this relationship.
      *
-     * @return string[]|relationship_resolver[] Relationship resolver class names.
+     * @return relationship_resolver[] Relationship resolvers.
      */
     public function get_resolvers(): array {
-        return $this->entity->resolvers->pluck('class_name');
+        $resolver_entities = $this->entity->resolvers;
+        $resolver_models = [];
+        foreach ($resolver_entities as $entity) {
+            $class_name = $entity->class_name;
+            $resolver_models[] = new $class_name($this);
+        }
+        return $resolver_models;
     }
 
     /**

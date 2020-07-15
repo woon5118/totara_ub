@@ -34,6 +34,15 @@ use coding_exception;
 abstract class relationship_resolver {
 
     /**
+     * @var relationship
+     */
+    protected $parent_relationship;
+
+    public function __construct(relationship $parent_relationship) {
+        $this->parent_relationship = $parent_relationship;
+    }
+
+    /**
      * The name of this relationship resolver to display to the user.
      *
      * @return string
@@ -122,7 +131,7 @@ abstract class relationship_resolver {
      * @param array $data containing the fields specified by {@see get_accepted_fields}
      * @return int[] of user ids
      */
-    abstract protected static function get_data(array $data): array;
+    abstract protected function get_data(array $data): array;
 
     /**
      * Validate the input and get the list of users.
@@ -130,14 +139,14 @@ abstract class relationship_resolver {
      * @param array $data containing the fields specified by {@see get_accepted_fields}
      * @return int[] of user ids
      */
-    final public static function get_users(array $data): array {
+    final public function get_users(array $data): array {
         global $CFG;
         if ($CFG->debugdeveloper) {
             // Don't validate the input on production sites for better performance.
             static::validate_input(array_keys($data));
         }
 
-        return static::get_data($data);
+        return $this->get_data($data);
     }
 
 }
