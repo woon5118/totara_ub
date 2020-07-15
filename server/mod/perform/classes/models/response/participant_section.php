@@ -39,8 +39,7 @@ use mod_perform\state\participant_section\participant_section_progress;
 use mod_perform\state\state;
 use mod_perform\state\state_aware;
 use moodle_exception;
-use totara_core\relationship\relationship as core_relationship;
-use mod_perform\models\activity\relationship;
+use totara_core\relationship\relationship;
 
 /**
  * Class participant_section
@@ -156,11 +155,11 @@ class participant_section extends model {
      * @return bool
      */
     public function can_view_others_responses(): bool {
-        $core_relationship_id = (int) $this->entity->participant_instance->core_relationship->id;
+        $core_relationship_id = (int) $this->entity->participant_instance->core_relationship_id;
 
         $section_is_visible_to = $this->get_responses_are_visible_to()->map(
             function (relationship $relationship) {
-                return (int) $relationship->get_core_relationship()->id;
+                return (int) $relationship->id;
             }
         )->to_array();
 

@@ -25,7 +25,7 @@
 use core\collection;
 use mod_perform\models\activity\activity;
 use mod_perform\models\response\participant_section;
-use mod_perform\models\activity\relationship;
+use totara_core\relationship\relationship;
 use totara_core\relationship\resolvers\subject;
 use totara_job\relationship\resolvers\appraiser;
 use totara_job\relationship\resolvers\manager;
@@ -261,7 +261,7 @@ class mod_perform_participant_section_model_testcase extends advanced_testcase {
 
     private function get_relationship_resolver_classes(collection $collection): array {
         return $collection->map(function (relationship $relationship) {
-            return $relationship->get_core_relationship()->get_resolvers()[0];
+            return $relationship->get_resolvers()[0];
         })->all();
     }
 

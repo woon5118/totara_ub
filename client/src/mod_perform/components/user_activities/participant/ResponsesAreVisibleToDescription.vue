@@ -39,6 +39,8 @@
 </template>
 
 <script>
+import { RELATIONSHIP_IDNUMBER_SUBJECT } from 'mod_perform/constants';
+
 export default {
   props: {
     currentUserIsSubject: {
@@ -76,7 +78,7 @@ export default {
         this.$str(
           'response_visibility_your_relationship',
           'mod_perform',
-          relationship.core_relationship.name_plural
+          relationship.name_plural
         )
       );
     },
@@ -93,7 +95,7 @@ export default {
         this.$str(
           'response_visibility_the_employees_relationship',
           'mod_perform',
-          relationship.core_relationship.name_plural
+          relationship.name_plural
         )
       );
 
@@ -103,12 +105,12 @@ export default {
     },
     visibleToSubject() {
       return this.visibleToRelationships.some(
-        relationship => relationship.is_subject
+        relationship => relationship.idnumber === RELATIONSHIP_IDNUMBER_SUBJECT
       );
     },
     nonSubjectRelationships() {
       return this.visibleToRelationships.filter(
-        relationship => !relationship.is_subject
+        relationship => !relationship.idnumber !== RELATIONSHIP_IDNUMBER_SUBJECT
       );
     },
   },

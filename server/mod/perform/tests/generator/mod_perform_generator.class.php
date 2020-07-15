@@ -311,7 +311,7 @@ class mod_perform_generator extends component_generator_base {
      */
     public function create_section_relationship_from_name(array $data): void {
         $relationship_name = strtolower($data['relationship']);
-        $relationships = core_relationship_provider::fetch_all_relationships();
+        $relationships = (new core_relationship_provider())->fetch()->get();
         foreach ($relationships as $relationship) {
             if (strtolower($relationship->get_name()) === $relationship_name) {
                 $this->create_section_relationship(

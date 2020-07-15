@@ -118,14 +118,6 @@ type mod_perform_section_participants {
 }
 
 """
-A thin wrapper around core relationships, which includes mod_perform specific fields such as is_subject
-"""
-type mod_perform_relationship {
-  core_relationship: totara_core_relationship!
-  is_subject: Boolean!
-}
-
-"""
 A list of possible states that a performance activity can be in
 """
 enum mod_perform_activity_state_enums {
