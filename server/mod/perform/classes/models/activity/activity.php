@@ -34,6 +34,7 @@ use core\orm\collection;
 use core\orm\entity\model;
 use mod_perform\data_providers\activity\activity_settings;
 use mod_perform\entities\activity\activity as activity_entity;
+use mod_perform\entities\activity\manual_relationship_selection;
 use mod_perform\entities\activity\track as track_entity;
 use mod_perform\entities\activity\track_assignment;
 use mod_perform\event\activity_deleted;
@@ -49,6 +50,7 @@ use mod_perform\user_groups\grouping;
 use mod_perform\util;
 use mod_perform\webapi\resolver\type\activity_state;
 use moodle_exception;
+use totara_core\entities\relationship as relationship_entity;
 use totara_core\relationship\relationship;
 
 /**
@@ -232,9 +234,31 @@ class activity extends model {
             }
 
             $activity = self::load_by_entity($entity);
+            // TODO: Remove me when TL-26143 landed
+            $activity->create_manual_relationship_selection();
 
             return $activity;
         });
+    }
+
+    /**
+     * TODO: Remove me when TL-26143 landed
+     */
+    private function create_manual_relationship_selection() {
+        $subject_relationship = relationship::load_by_idnumber('manager');
+        $manual_relationships = relationship_entity::repository()
+            ->where('type', relationship_entity::TYPE_MANUAL)
+            ->get();
+
+        foreach ($manual_relationships as $manual_relationship) {
+            (new manual_relationship_selection(
+                [
+                    'activity_id' => $this->id,
+                    'manual_relationship_id' => $manual_relationship->id,
+                    'selector_relationship_id' => $subject_relationship->id,
+                ]
+            ))->save();
+        }
     }
 
     /**

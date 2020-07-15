@@ -77,7 +77,7 @@ class participant_instance_creation {
      * @return void
      */
     private function aggregate_participant_instances(collection $subject_instance_dtos): void {
-        $this->filter_out_pending_instances($subject_instance_dtos);
+        $subject_instance_dtos = $this->filter_out_pending_instances($subject_instance_dtos);
 
         // Find all the activities that are related to the subject instances.
         $activity_ids = array_unique($subject_instance_dtos->pluck('activity_id'), SORT_NUMERIC);
@@ -273,9 +273,9 @@ class participant_instance_creation {
      *
      * @param collection $subject_instance_dtos
      */
-    private function filter_out_pending_instances(collection $subject_instance_dtos): void {
-        $subject_instance_dtos->filter(function (subject_instance_dto $subject_instance) {
-            return $subject_instance->get_status() !== subject_instance::STATUS_PENDING;
+    private function filter_out_pending_instances(collection $subject_instance_dtos): collection {
+        return $subject_instance_dtos->filter(function (subject_instance_dto $subject_instance) {
+            return $subject_instance->get_status() != subject_instance::STATUS_PENDING;
         });
     }
 

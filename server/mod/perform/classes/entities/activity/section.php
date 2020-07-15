@@ -44,6 +44,7 @@ use totara_core\entities\relationship;
  * Relationships:
  * @property-read activity $activity
  * @property-read collection|relationship[] $core_relationships
+ * @property-read collection|relationship[] $manual_relationships
  * @property-read collection|section_element[] $section_elements
  * @property-read collection|section_relationship[] $section_relationships
  * @property-read collection|participant_section[] $participant_sections
@@ -95,6 +96,16 @@ class section extends entity {
             'core_relationship_id',
             'id'
         );
+    }
+
+    /**
+     * All manual relationships linked to this section
+     *
+     * @return has_many_through
+     */
+    public function manual_relationships(): has_many_through {
+        return $this->core_relationships()
+            ->where('type', relationship::TYPE_MANUAL);
     }
 
     /**

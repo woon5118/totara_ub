@@ -29,6 +29,7 @@ use core\orm\query\builder;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\entities\activity\filters\subject_instance_id;
 use mod_perform\entities\activity\participant_instance;
+use mod_perform\entities\activity\subject_instance;
 use mod_perform\entities\activity\track as track_entity;
 use mod_perform\entities\activity\track_user_assignment as track_user_assignment_entity;
 use mod_perform\models\activity\subject_instance as subject_instance_model;
@@ -122,6 +123,7 @@ class subject_instance_for_participant {
             ->where_raw($totara_visibility_sql, $totara_visibility_params)
             // Eager loaded relationship resolvers because they are returned in the subject instance gql query
             ->where_exists($this->get_target_participant_exists())
+            ->where('status', subject_instance::STATUS_ACTIVE)
             // Newest subject instances at the top of the list
             ->order_by('si.created_at', 'desc')
             // Order by id as well is so that tests wont fail if two rows are inserted within the same second

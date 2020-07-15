@@ -49,6 +49,7 @@ use totara_core\entities\relationship as core_relationship;
  * @property-read track $track
  * @property-read user $subject_user
  * @property-read collection|participant_instance[] $participant_instances
+ * @property-read collection|manual_relationship_selection_progress[] $manual_relationship_selection_progress
  *
  * @method static subject_instance_repository repository()
  *
@@ -114,5 +115,12 @@ class subject_instance extends entity {
         return $this->has_many(participant_instance::class, 'subject_instance_id')
             ->left_join([core_relationship::TABLE, 'cr'], 'core_relationship_id', 'cr.id')
             ->order_by('cr.id');
+    }
+
+    /**
+     * @return has_many
+     */
+    public function manual_relationship_selection_progress(): has_many {
+        return $this->has_many(manual_relationship_selection_progress::class, 'subject_instance_id');
     }
 }

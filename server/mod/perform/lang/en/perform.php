@@ -72,6 +72,7 @@ $string['boolean_setting_text_enabled'] = 'Enabled';
 $string['boolean_setting_text_disabled'] = 'Disabled';
 $string['condition_actor_is_participant_fail'] = 'The currently logged in user is not the participant.';
 $string['create_activity'] = 'Add activity';
+$string['create_manual_participant_progress_task'] = 'Create progress records for selecting manual participants in performance activities';
 $string['create_subject_instance_task'] = 'Create subject instance for performance activities';
 $string['delete_element'] = 'Delete element';
 $string['delete_relationship'] = 'Delete {$a}';

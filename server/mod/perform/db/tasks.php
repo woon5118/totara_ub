@@ -21,6 +21,7 @@
  * @package mod_perform
  */
 
+use mod_perform\task\create_manual_participant_progress_task;
 use mod_perform\task\create_subject_instance_task;
 use mod_perform\task\expand_assignments_task;
 use mod_perform\task\sync_all_track_schedules_task;
@@ -58,6 +59,15 @@ $tasks = [
     ],
     [
         'classname' => create_subject_instance_task::class,
+        'blocking' => 0,
+        'minute' => '*',
+        'hour' => '*',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    ],
+    [
+        'classname' => create_manual_participant_progress_task::class,
         'blocking' => 0,
         'minute' => '*',
         'hour' => '*',

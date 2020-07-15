@@ -720,6 +720,7 @@ class mod_perform_generator extends component_generator_base {
         $subject_instance = new subject_instance_entity();
         $subject_instance->track_user_assignment_id = $user_assignment->id;
         $subject_instance->subject_user_id = $user_assignment->subject_user_id; // Purposeful denormalization
+        $subject_instance->status = $data['status'] ?? subject_instance_entity::STATUS_ACTIVE;
         $subject_instance->save();
 
         $subject_is_participating = $data['subject_is_participating'] ?? false;
@@ -728,8 +729,10 @@ class mod_perform_generator extends component_generator_base {
             $subject_is_participating = false;
         }
 
+        $is_active = $subject_instance->status === subject_instance_entity::STATUS_ACTIVE;
+
         $subjects_participant_instance = null;
-        if ($subject_is_participating) {
+        if ($subject_is_participating && $is_active) {
             $subjects_participant_instance = new participant_instance_entity();
             $subjects_participant_instance->core_relationship_id = 0; // stubbed
             $subjects_participant_instance->participant_id = $subject->id; // Answering on activity about them self
@@ -739,7 +742,7 @@ class mod_perform_generator extends component_generator_base {
         }
 
         $other_participant_instance = null;
-        if ($other_participant) {
+        if ($other_participant && $is_active) {
             $other_participant_instance = new participant_instance_entity();
             $other_participant_instance->core_relationship_id = 0; // stubbed
             $other_participant_instance->participant_id = $other_participant->id;
@@ -749,7 +752,7 @@ class mod_perform_generator extends component_generator_base {
         }
 
         $third_participant_instance = null;
-        if ($third_participant) {
+        if ($third_participant && $is_active) {
             $third_participant_instance = new participant_instance_entity();
             $third_participant_instance->core_relationship_id = 0; // stubbed
             $third_participant_instance->participant_id = $third_participant->id;

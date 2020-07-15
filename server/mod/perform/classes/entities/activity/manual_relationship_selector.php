@@ -26,6 +26,7 @@ namespace mod_perform\entities\activity;
 use core\entities\user;
 use core\orm\entity\entity;
 use core\orm\entity\relations\belongs_to;
+use core\orm\entity\relations\has_one_through;
 
 /**
  * Represents the actual user who will select the participants for a subject instance.
@@ -37,6 +38,7 @@ use core\orm\entity\relations\belongs_to;
  *
  * @property-read manual_relationship_selection_progress $progress
  * @property-read user $user
+ * @property-read subject_instance $subject_instance
  *
  * @method static manual_relationship_selector_repository repository()
  */
@@ -61,5 +63,19 @@ class manual_relationship_selector extends entity {
      */
     public function user(): belongs_to {
         return $this->belongs_to(user::class, 'user_id');
+    }
+
+    /**
+     * @return has_one_through
+     */
+    public function subject_instance(): has_one_through {
+        return $this->has_one_through(
+            manual_relationship_selection_progress::class,
+            subject_instance::class,
+            'manual_relation_select_progress_id',
+            'id',
+            'subject_instance_id',
+            'id'
+        );
     }
 }
