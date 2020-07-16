@@ -22,44 +22,69 @@
 
 <template>
   <div class="tui-performUserActivities">
-    <h2>{{ $str('user_activities_page_title', 'mod_perform') }}</h2>
+    <div class="tui-performUserActivities__header-row">
+      <h2 class="tui-performUserActivities__heading">
+        {{ $str('user_activities_page_title', 'mod_perform') }}
+      </h2>
+      <Button
+        v-if="canPotentiallyManageParticipants"
+        class="tui-performUserActivities__action-button"
+        :text="$str('manage_participation', 'mod_perform')"
+        @click="openParticipationModal = true"
+      />
+    </div>
 
-    <Tabs transparent-tabs :selected="initialTab">
-      <Tab
-        :id="$id('your-activities-tab')"
-        :name="$str('user_activities_your_activities_title', 'mod_perform')"
-      >
-        <UserActivityList
-          about="self"
-          :current-user-id="currentUserId"
-          :view-url="viewActivityUrl"
-        />
-      </Tab>
-      <Tab
-        :id="$id('activities-about-others-tab')"
-        :name="
-          $str('user_activities_activities_about_others_title', 'mod_perform')
-        "
-      >
-        <UserActivityList
-          about="others"
-          :current-user-id="currentUserId"
-          :view-url="viewActivityUrl"
-        />
-      </Tab>
-    </Tabs>
+    <div class="tui-performUserActivities__content">
+      <Tabs :selected="initialTab">
+        <Tab
+          :id="$id('your-activities-tab')"
+          :name="$str('user_activities_your_activities_title', 'mod_perform')"
+        >
+          <UserActivityList
+            about="self"
+            :current-user-id="currentUserId"
+            :view-url="viewActivityUrl"
+          />
+        </Tab>
+        <Tab
+          :id="$id('activities-about-others-tab')"
+          :name="
+            $str('user_activities_activities_about_others_title', 'mod_perform')
+          "
+        >
+          <UserActivityList
+            about="others"
+            :current-user-id="currentUserId"
+            :view-url="viewActivityUrl"
+          />
+        </Tab>
+      </Tabs>
+    </div>
+
+    <!--
+      The v-if is important here because the query performed by the SelectActivityModal can be quite expensive
+      so we only want to render/perform the component if we really need to
+    -->
+    <SelectActivityModal
+      v-if="openParticipationModal"
+      v-model="openParticipationModal"
+    />
   </div>
 </template>
 
 <script>
+import Button from 'totara_core/components/buttons/Button';
+import SelectActivityModal from 'mod_perform/components/manage_activity/participation/SelectActivityModal';
 import Tab from 'totara_core/components/tabs/Tab';
 import Tabs from 'totara_core/components/tabs/Tabs';
 import UserActivityList from 'mod_perform/components/user_activities/list/Activities';
-import { notify } from 'totara_core/notifications';
 import { NOTIFICATION_DURATION } from 'mod_perform/constants';
+import { notify } from 'totara_core/notifications';
 
 export default {
   components: {
+    Button,
+    SelectActivityModal,
     Tab,
     Tabs,
     UserActivityList,
@@ -88,6 +113,15 @@ export default {
       type: Boolean,
       default: false,
     },
+    canPotentiallyManageParticipants: {
+      required: true,
+      type: Boolean,
+    },
+  },
+  data() {
+    return {
+      openParticipationModal: false,
+    };
   },
   computed: {
     initialTab() {
@@ -128,7 +162,8 @@ export default {
       "toast_success_save_response",
       "user_activities_activities_about_others_title",
       "user_activities_page_title",
-      "user_activities_your_activities_title"
+      "user_activities_your_activities_title",
+      "manage_participation"
     ]
   }
 </lang-strings>

@@ -22,6 +22,37 @@
 
 <style lang="scss">
 .tui-performUserActivities {
+  &__header-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+
+  &__heading {
+    padding-right: var(--tui-gap-8);
+  }
+
+  &__action-button {
+    padding-top: var(--tui-gap-2);
+  }
+
+  &__content {
+    padding-top: var(--tui-gap-4);
+  }
+
   @include tui-font-body();
+}
+
+@media (min-width: $tui-screen-xs) {
+  .tui-performUserActivities {
+    &__content {
+      padding-top: 0;
+    }
+
+    &__action-button {
+      padding-top: 0;
+    }
+  }
 }
 </style>

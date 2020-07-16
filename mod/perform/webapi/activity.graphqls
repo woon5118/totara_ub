@@ -200,6 +200,11 @@ extend type Query {
   mod_perform_activities: [mod_perform_activity!]!
 
   """
+  A list of all performance activities that the current user can manage participants on
+  """
+  mod_perform_participant_manageable_activities: [mod_perform_activity!]!
+
+  """
   This query returns a single performance activity
   """
   mod_perform_activity(activity_id: core_id!): mod_perform_activity

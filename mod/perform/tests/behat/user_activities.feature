@@ -45,17 +45,17 @@ Feature: Viewing and responding to perform activities
     And the "Your activities" tui tab should be active
     And I should see "Section submitted" in the tui "success" notification toast
     And I should see the tui datatable contains:
-      | Activity title                | Type      | Overall progress | Your progress  |
-      | single user manager-appraiser | Appraisal | Not yet started  | Not yet started|
-      | John is participating subject | Appraisal | In progress      | Complete       |
+      | Activity title                | Type      | Overall progress | Your progress   |
+      | single user manager-appraiser | Appraisal | Not yet started  | Not yet started |
+      | John is participating subject | Appraisal | In progress      | Complete        |
 
   Scenario: Can view and and respond to activities I'm a participant in but are not about me
     Given I log in as "john"
     When I navigate to the outstanding perform activities list page
     And I click on "Activities about others" "link"
     Then I should see the tui datatable contains:
-      | Activity title   | Type      | User     | Overall progress | Your progress   |
-      | David is subject | Appraisal |David Two | Not yet started  | Not yet started |
+      | Activity title   | Type      | User      | Overall progress | Your progress   |
+      | David is subject | Appraisal | David Two | Not yet started  | Not yet started |
 
     When I click on "David is subject" "link"
     Then I should see "David is subject" in the ".tui-participantContent__header" "css_element"
@@ -148,3 +148,19 @@ Feature: Viewing and responding to perform activities
       | Activity title                | Type      | Overall progress | Your progress   |
       | single user manager-appraiser | Appraisal | Not yet started  | Not yet started |
       | John is participating subject | Appraisal | In progress      | In progress     |
+
+  Scenario: Managing participation
+    Given I log in as "john"
+    When I navigate to the outstanding perform activities list page
+    Then I should not see "Manage participation"
+
+    When I log out
+    And I log in as "admin"
+    And I navigate to the outstanding perform activities list page
+    And I click on "Manage participation" "link_or_button"
+    Then I should see "Select activity"
+    And the following fields match these values:
+      | manage-participation-activity-select | John is participating subject |
+
+    When I click on "Continue" "link"
+    Then I should see "Manage participation: “John is participating subject”"

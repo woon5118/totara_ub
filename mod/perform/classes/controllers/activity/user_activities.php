@@ -55,6 +55,7 @@ class user_activities extends perform_controller {
             'show-about-others-tab' => (bool) $this->get_optional_param('show_about_others_tab', false, PARAM_BOOL),
             'completion-save-success' => (bool) $this->get_optional_param('completion_save_success', false, PARAM_BOOL),
             'closed-on-completion' => (bool) $this->get_optional_param('closed_on_completion', false, PARAM_BOOL),
+            'can-potentially-manage-participants' => util::can_potentially_manage_participants(user::logged_in()->id),
         ];
 
         return self::create_tui_view('mod_perform/pages/UserActivities', $props)

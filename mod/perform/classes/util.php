@@ -24,11 +24,18 @@
 namespace mod_perform;
 
 use container_perform\perform as perform_container;
+use context_user;
+use core\collection;
+use core\entities\user;
+use core\orm\query\builder;
+use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\entities\activity\activity_type;
 
 use context;
 use context_coursecat;
 use core_text;
+use mod_perform\models\activity\activity;
+use totara_core\access;
 
 class util {
 
@@ -166,68 +173,60 @@ class util {
         return "$prefix$truncated$ellipsis$suffix";
     }
 
+    public static function can_potentially_manage_participants(int $user_id): bool {
+        if (static::has_manage_all_participants_capability($user_id)) {
+            return true;
+        }
+
+        return has_capability_in_any_context('mod/perform:manage_subject_user_participation');
+    }
+
+    public static function get_participant_manageable_activities(int $user_id) {
+        if (static::has_manage_all_participants_capability($user_id)) {
+            return activity_entity::repository()
+                ->filter_by_visible()
+                ->order_by('id')
+                ->get()
+                ->map_to(activity::class);
+        }
+
+        // Early exit if they can not even potentially manage any participants
+        if (!has_capability_in_any_context('mod/perform:manage_subject_user_participation')) {
+            return new collection();
+        }
+
+        $participation_manageable_users = self::get_permitted_users($user_id, 'mod/perform:manage_subject_user_participation');
+
+        return activity_entity::repository()->find_by_subject_user_id(...$participation_manageable_users)->map_to(activity::class);
+    }
+
+    protected static function has_manage_all_participants_capability(int $user_id): bool {
+        $user_context = context_user::instance($user_id);
+
+        return has_capability('mod/perform:manage_all_participation', $user_context, $user_id);
+    }
 
     /**
      * Returns an array of up to 1000 userids of users who the $for_user id holds
      * the $capability in the user's context. Useful for checking which users a
      * user is permitted to do some action on.
      *
-     * TODO I've just chucked this in here for now, not sure the best place for it.
-     * TODO this is prototype
-     *
-     *
      * @param int $for_user ID of user to check for.
      * @param string $capability Capability string to test.
      * @param int $offset Offset to apply before returning records, null for no offset.
      * @param int $limit Maximum number of userids to return, null for no limit.
-     * @return array Array of userids
-     * @throws \dml_exception
+     * @return int[] Array of userids
      */
     public static function get_permitted_users(int $for_user, string $capability, int $offset = 0, int $limit = 1000): array {
-        global $DB;
-        list($has_cap_sql, $has_cap_params) = access::get_has_capability_sql($capability, 'c.id', $for_user);
-        $sql = "SELECT u.id AS key, u.id FROM {user} u
-            JOIN {context} c ON c.contextlevel = " . CONTEXT_USER . " AND c.instanceid = u.id
-            WHERE u.deleted = 0 AND ({$has_cap_sql})
+        [$has_cap_sql, $has_cap_params] = access::get_has_capability_sql($capability, 'c.id', $for_user);
+
+        $sql = sprintf("SELECT u.id AS user_key, u.id FROM {user} u
+            JOIN {context} c ON c.contextlevel = %s AND c.instanceid = u.id
+            WHERE u.deleted = 0 AND (%s)
             ORDER BY u.id
-        ";
-        return $DB->get_records_sql_menu($sql, $has_cap_params, $offset, $limit);
-    }
+        ", CONTEXT_USER, $has_cap_sql);
 
-    /**
-     * Return SQL and params to apply to an SQL query in order to filter to only users where the viewing
-     * user can manage those user's participation.
-     *
-     * TODO this is prototype
-     *
-     * @param int $report_for User ID of user who is viewing
-     * @param string $user_id_field String referencing database column containing user ids to filter.
-     * @return array Array containing SQL string and array of params
-     * @throws \coding_exception
-     * @throws \dml_exception
-     */
-    public static function get_manage_participation_sql(int $report_for, string $user_id_field) {
-        global $DB;
-
-        // If user can manage participation across all users don't do the per-row restriction at all.
-        $user_context = \context_user::instance($report_for);
-        if (has_capability('mod/perform:manage_all_participation', $user_context, $report_for)) {
-            return ['1=1', []];
-        }
-
-        $capability = 'mod/perform:manage_subject_user_participation';
-        $permitted_users = \mod_perform\util::get_permitted_users($report_for, $capability);
-
-        if (empty($permitted_users)) {
-            // No access at all if not permitted to see any users.
-            return ['1=0', []];
-        }
-
-        // Restrict to specific subject users.
-        list($sourcesql, $sourceparams) = $DB->get_in_or_equal($permitted_users, SQL_PARAMS_NAMED);
-        $wheresql = "$user_id_field {$sourcesql}";
-        $whereparams = $sourceparams;
-        return [$wheresql, $whereparams];
+        return builder::get_db()->get_records_sql_menu($sql, $has_cap_params, $offset, $limit);
     }
 
 }
