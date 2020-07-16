@@ -27,6 +27,7 @@ use context;
 use context_coursecat;
 use core\entities\user;
 use mod_perform\controllers\perform_controller;
+use mod_perform\models\activity\helpers\manual_participant_helper;
 use mod_perform\util;
 use totara_mvc\tui_view;
 
@@ -49,13 +50,16 @@ class user_activities extends perform_controller {
     public function action(): tui_view {
         $this->set_url(self::get_url());
 
+        $current_user_id = user::logged_in()->id;
+
         $props = [
-            'current-user-id' => user::logged_in()->id,
+            'current-user-id' => $current_user_id,
             'view-activity-url' => (string) view_user_activity::get_url(),
             'show-about-others-tab' => (bool) $this->get_optional_param('show_about_others_tab', false, PARAM_BOOL),
             'completion-save-success' => (bool) $this->get_optional_param('completion_save_success', false, PARAM_BOOL),
             'closed-on-completion' => (bool) $this->get_optional_param('closed_on_completion', false, PARAM_BOOL),
-            'can-potentially-manage-participants' => util::can_potentially_manage_participants(user::logged_in()->id),
+            'require-manual-participants-notification' => manual_participant_helper::for_user($current_user_id)
+                ->has_pending_selections(),
         ];
 
         return self::create_tui_view('mod_perform/pages/UserActivities', $props)

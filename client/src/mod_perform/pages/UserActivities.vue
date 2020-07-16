@@ -22,6 +22,11 @@
       <h2 class="tui-performUserActivities__heading">
         {{ $str('user_activities_page_title', 'mod_perform') }}
       </h2>
+
+      <ManualParticipantsSelectionBanner
+        v-if="requireManualParticipantsNotification"
+      />
+
       <Button
         v-if="canPotentiallyManageParticipants"
         class="tui-performUserActivities__action-button"
@@ -70,6 +75,7 @@
 
 <script>
 import Button from 'tui/components/buttons/Button';
+import ManualParticipantsSelectionBanner from 'mod_perform/components/user_activities/ManualParticipantsSelectionBanner';
 import SelectActivityModal from 'mod_perform/components/manage_activity/participation/SelectActivityModal';
 import Tab from 'tui/components/tabs/Tab';
 import Tabs from 'tui/components/tabs/Tabs';
@@ -79,8 +85,7 @@ import { notify } from 'tui/notifications';
 
 export default {
   components: {
-    Button,
-    SelectActivityModal,
+    ManualParticipantsSelectionBanner,
     Tab,
     Tabs,
     UserActivityList,
@@ -106,6 +111,10 @@ export default {
       type: Boolean,
     },
     closedOnCompletion: {
+      type: Boolean,
+      default: false,
+    },
+    requireManualParticipantsNotification: {
       type: Boolean,
       default: false,
     },
