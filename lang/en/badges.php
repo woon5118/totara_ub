@@ -94,9 +94,11 @@ The only URL required for verification is [your-site-url]/badges/assertion.php s
 $string['backpackbadgessummary'] = 'You have {$a->totalbadges} badge(s) displayed from {$a->totalcollections} collection(s).';
 $string['backpackbadgessettings'] = 'Change backpack settings';
 $string['backpackcannotsendverification'] = 'Cannot send verification email';
+$string['backpackconnected'] = 'Backpack has been connected';
 $string['backpackconnection'] = 'Backpack connection';
 $string['backpackconnection_help'] = 'This page allows you to set up connection to an external backpack provider. Connecting to a backpack lets you display external badges within this site and push badges earned here to your backpack.';
 $string['backpackdetails'] = 'Backpack settings';
+$string['backpackdisconnected'] = 'Backpack has been disconnected';
 $string['backpackemail'] = 'Email address';
 $string['backpackemail_help'] = 'The email address associated with your backpack. While you are connected, any badges earned on this site will be associated with this email address.';
 $string['badgeprivacy'] = 'Show badges';
@@ -126,6 +128,7 @@ $string['backpackemailverifyemailsubject'] = '{$a}: OpenBadges Backpack email ve
 $string['backpackemailverifypending'] = 'A verification email has been sent to <strong>{$a}</strong>. Click on the verification link in the email to activate your Backpack connection.';
 $string['backpackemailverifysuccess'] = 'Thanks for verifying your email address. You are now connected to your Backpack.';
 $string['backpackemailverifytokenmismatch'] = 'The token in the link you clicked does not match the stored token. Make sure you clicked the link in most recent email you received.';
+$string['backpackexporterror'] = 'Can\'t export the badge to backpack';
 $string['backpackimport'] = 'Badge import settings';
 $string['backpackimport_help'] = 'After the backpack connection is successfully established, badges from your backpack can be displayed on your badges page and your profile page.
 
@@ -276,7 +279,6 @@ $string['description'] = 'Description';
 $string['description_help'] = 'A short description of the badge. This can only be plain text without any formatting. (This is a requirement of the Mozilla Open Badges standard.)';
 $string['disconnect'] = 'Disconnect';
 $string['donotaward'] = 'Currently, this badge is not active, so it cannot be awarded to users. If you would like to award this badge, please set its status to active.';
-$string['editsettings'] = 'Edit settings';
 $string['enablebadges'] = 'Enable badges';
 $string['endorsement'] = 'Endorsement';
 $string['error:backpackdatainvalid'] = 'The data return from the backpack was invalid.';
@@ -453,8 +455,10 @@ $string['notifyweekly'] = 'Weekly';
 $string['numawards'] = 'This badge has been issued to <a href="{$a->link}">{$a->count}</a> user(s).';
 $string['numawardstat'] = 'This badge has been issued {$a} user(s).';
 $string['overallcrit'] = 'of the selected criteria are complete.';
+$string['oauth2issuer'] = 'OAuth 2 services';
 $string['openbadgesv1'] = 'Open Badges v1.0';
 $string['openbadgesv2'] = 'Open Badges v2.0';
+$string['openbadgesv2p1'] = 'Open Badges v2.1';
 $string['potentialrecipients'] = 'Potential badge recipients';
 $string['preferences'] = 'Badge preferences';
 $string['recipients'] = 'Badge recipients';
@@ -537,3 +541,4 @@ $string['localbadges'] = 'My badges from {$a} web site';
 $string['nobackpackbadges'] = 'There are no badges in the collections you have selected. <a href="mybackpack.php">Add more collections</a>.';
 $string['nobackpackcollections'] = 'No badge collections have been selected. <a href="mybackpack.php">Add collections</a>.';
 $string['sitebackpackverify'] = 'Backpack connection';
+$string['editsettings'] = 'Edit settings';
