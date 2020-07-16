@@ -16,10 +16,10 @@ type mod_perform_activity_manual_relationship_selector_options {
 }
 
 """
-Manual relationships that can have the participants specified by the user for a particular activity.
+Individual subject instance that can have the participants specified by the user for a particular activity.
 """
-type mod_perform_manual_participant_activity {
-  activity: mod_perform_activity!
+type mod_perform_manual_participant_selection_instance {
+  subject_instance: mod_perform_subject_instance!
   manual_relationships: [totara_core_relationship!]!
 }
 
@@ -37,9 +37,14 @@ extend type Query {
   ): mod_perform_activity_manual_relationship_selector_options!
 
   """
-  Get the activities and their manual relationships that the current user can set the participants for.
+  Get the activity instances and their manual relationships that the current user can set the participants for.
   """
-  mod_perform_manual_participant_activities: [mod_perform_manual_participant_activity]!
+  mod_perform_manual_participant_selection_instances: [mod_perform_manual_participant_selection_instance]!
+
+  """
+  Get the users that are visible and selectable by the current user.
+  """
+  mod_perform_selectable_users: [core_user]!
 }
 
 """
@@ -55,14 +60,21 @@ Input for selecting a relationships for a manual participant role.
 """
 input mod_perform_update_manual_participants_input {
   manual_relationship_id: core_id!
-  user_ids: [core_id]!
+  user_ids: [core_id!]!
 }
 
 """
-Mutation return type
+Update activity relationships return type.
 """
 type mod_perform_update_relationship_result {
   activity: mod_perform_activity!
+}
+
+"""
+Set participant users return type.
+"""
+type mod_perform_set_manual_participants_result {
+  success: Boolean!
 }
 
 extend type Mutation {
@@ -73,11 +85,12 @@ extend type Mutation {
     activity_id: core_id!
     relationships: [mod_perform_update_activity_participant_selection_input!]!
   ): mod_perform_update_relationship_result!
+
   """
-  Update the relationships for the manual participant roles.
+  Set the participant users for the manual relationships of a subject instance.
   """
-  mod_perform_update_manual_participants(
-    activity_id: core_id!
+  mod_perform_set_manual_participants(
+    subject_instance_id: core_id!
     participants: [mod_perform_update_manual_participants_input!]!
-  ): mod_perform_update_relationship_result!
+  ): mod_perform_set_manual_participants_result!
 }

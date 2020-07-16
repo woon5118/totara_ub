@@ -58,6 +58,7 @@ use mod_perform\state\activity\draft;
 use mod_perform\state\participant_instance\not_started as instance_not_started;
 use mod_perform\state\participant_instance\open;
 use mod_perform\state\participant_section\not_started;
+use mod_perform\state\subject_instance\pending;
 use mod_perform\task\service\subject_instance_creation;
 use mod_perform\user_groups\grouping;
 use mod_perform\util;
@@ -345,11 +346,21 @@ class mod_perform_generator extends component_generator_base {
         return section::load_by_entity($section);
     }
 
-    public function create_section_relationship(section $section, array $data, $can_view = true): section_relationship_model {
-        $core_relationship = $this->get_core_relationship($data['class_name']);
+    /**
+     * Add relationship for a section.
+     *
+     * @param section $section
+     * @param core_relationship|array $relationship Relationship object OR data array of ['class_name' => resolver class name]
+     * @param bool $can_view
+     * @return section_relationship_model
+     */
+    public function create_section_relationship(section $section, $relationship, $can_view = true): section_relationship_model {
+        if (!$relationship instanceof core_relationship) {
+            $relationship = $this->get_core_relationship($relationship['class_name']);
+        }
         return section_relationship_model::create(
             $section->get_id(),
-            $core_relationship->id,
+            $relationship->id,
             $can_view
         );
     }
@@ -605,11 +616,13 @@ class mod_perform_generator extends component_generator_base {
     /**
      * Set the manual relationships for an activity.
      *
-     * @param int $activity_id
+     * @param activity|int $activity Activity model or ID
      * @param array[] $relationships Array of ['selector' => $selector_relationship_id, 'manual' => $manual_relationship_id]
      * @return array
      */
-    public function create_manual_relationships_for_activity(int $activity_id, array $relationships): array {
+    public function create_manual_relationships_for_activity($activity, array $relationships): array {
+        $activity_id = is_numeric($activity) ? $activity : $activity->id;
+
         return builder::get_db()->transaction(static function () use ($activity_id, $relationships) {
             // By default all the relationships are set to subject.
             // But we want to set our own values here so we delete them.
@@ -720,7 +733,7 @@ class mod_perform_generator extends component_generator_base {
         $subject_instance = new subject_instance_entity();
         $subject_instance->track_user_assignment_id = $user_assignment->id;
         $subject_instance->subject_user_id = $user_assignment->subject_user_id; // Purposeful denormalization
-        $subject_instance->status = $data['status'] ?? subject_instance_entity::STATUS_ACTIVE;
+        $subject_instance->status = $data['status'] ?? active::get_code();
         $subject_instance->save();
 
         $subject_is_participating = $data['subject_is_participating'] ?? false;
@@ -729,7 +742,7 @@ class mod_perform_generator extends component_generator_base {
             $subject_is_participating = false;
         }
 
-        $is_active = $subject_instance->status === subject_instance_entity::STATUS_ACTIVE;
+        $is_active = (int) $subject_instance->status === active::get_code();
 
         $subjects_participant_instance = null;
         if ($subject_is_participating && $is_active) {
@@ -842,13 +855,19 @@ class mod_perform_generator extends component_generator_base {
      *
      * @param activity|int $activity Activity model or ID
      * @param object|user|int $subject_user Subject user entity, record or ID
+     * @param core_relationship[] $manual_relationships Manual relationships for the section.
+     *                                                  (in order to create participant instances)
      * @param collection|manual_relationship_selection[] $selections Array/collection of selections to override.
      *                                                               Defaults to all the selections specified for the activity.
      *
      * @return subject_instance_entity
      */
-    public function create_subject_instance_with_pending_selections($activity, $subject_user,
-                                                                    array $selections = null): subject_instance_entity {
+    public function create_subject_instance_with_pending_selections(
+        $activity,
+        $subject_user,
+        array $manual_relationships,
+        array $selections = null
+    ): subject_instance_entity {
         if (!$activity instanceof activity) {
             $activity = activity::load_by_id($activity);
         }
@@ -859,6 +878,13 @@ class mod_perform_generator extends component_generator_base {
             $selections = manual_relationship_selection::repository()
                 ->where('activity_id', $activity->id)
                 ->get();
+        }
+
+        $element = $this->create_element(['title' => 'An important question!', 'is_required' => true]);
+        foreach ($manual_relationships as $i => $relationship) {
+            $section = $this->create_section($activity, ['title' => "Section {$i}"]);
+            $this->create_section_element($section, $element);
+            $this->create_section_relationship($section, $relationship);
         }
 
         $track = track::create($activity);
@@ -872,14 +898,14 @@ class mod_perform_generator extends component_generator_base {
         $subject_instance = new subject_instance_entity();
         $subject_instance->track_user_assignment_id = $user_assignment->id;
         $subject_instance->subject_user_id = $user_assignment->subject_user_id; // Purposeful denormalization
-        $subject_instance->status = subject_instance_entity::STATUS_PENDING;
+        $subject_instance->status = pending::get_code();
         $subject_instance->save();
 
         foreach ($selections as $selection) {
             $progress_entity = new manual_relationship_selection_progress();
             $progress_entity->subject_instance_id = $subject_instance->id;
             $progress_entity->manual_relation_selection_id = $selection->id;
-            $progress_entity->status = 0;
+            $progress_entity->status = manual_relationship_selection_progress::STATUS_PENDING;
             $progress_entity->save();
 
             $relationship = core_relationship::load_by_entity($selection->selector_relationship);

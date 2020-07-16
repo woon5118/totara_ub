@@ -1,0 +1,8 @@
+query mod_perform_selectable_users {
+  mod_perform_selectable_users {
+    id
+    fullname
+    profileimagealt
+    profileimageurl
+  }
+}

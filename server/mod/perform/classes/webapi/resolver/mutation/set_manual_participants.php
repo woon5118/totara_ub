@@ -17,37 +17,45 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author  Mark Metcalfe <mark.metcalfe@totaralearning.com>
+ * @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
  * @package mod_perform
  */
 
 namespace mod_perform\webapi\resolver\mutation;
 
+use core\entities\user;
 use core\webapi\execution_context;
+use core\webapi\middleware\require_login;
 use core\webapi\mutation_resolver;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\resolver\has_middleware;
-use mod_perform\webapi\middleware\require_activity;
-use mod_perform\webapi\middleware\require_manage_capability;
+use mod_perform\models\activity\subject_instance;
 
 /**
- * Update the relationships for the manual participant roles.
+ * Set the participant users for the manual relationships of a subject instance.
  *
  * @package mod_perform\webapi\resolver\mutation
  */
-class update_manual_participants implements mutation_resolver, has_middleware {
+class set_manual_participants implements mutation_resolver, has_middleware {
 
     /**
      * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
-        // The require_activity middleware loads the activity and passes it along via the args
-        $activity = $args['activity'];
+        $user_id = user::logged_in()->id;
+        $subject_instance = subject_instance::load_by_id($args['subject_instance_id']);
 
-        // TODO: Actually save the data in TL-26143
-        return [
-            'activity' => $activity,
-        ];
+        $ec->set_relevant_context($subject_instance->get_context());
+
+        // Transform participants input array into array of $relationship_id => [$user_id] for use in the subject instance model.
+        $relationships_and_participants = [];
+        foreach ($args['participants'] as $participants) {
+            $relationships_and_participants[$participants['manual_relationship_id']] = $participants['user_ids'];
+        }
+
+        $subject_instance->set_participant_users($user_id, $relationships_and_participants);
+
+        return ['success' => true];
     }
 
     /**
@@ -56,8 +64,7 @@ class update_manual_participants implements mutation_resolver, has_middleware {
     public static function get_middleware(): array {
         return [
             new require_advanced_feature('performance_activities'),
-            require_activity::by_activity_id('activity_id', true),
-            require_manage_capability::class
+            new require_login(),
         ];
     }
 

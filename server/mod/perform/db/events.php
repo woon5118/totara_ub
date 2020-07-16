@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
  * Copyright (C) 2019 onwards Totara Learning Solutions LTD
@@ -25,12 +25,14 @@ use core\event\cohort_member_added;
 use core\event\cohort_member_removed;
 use mod_perform\event\participant_instance_progress_updated;
 use mod_perform\event\participant_section_progress_updated;
+use mod_perform\event\subject_instance_activated;
 use mod_perform\event\subject_instance_progress_updated;
 use mod_perform\observers\participant_instance_availability;
 use mod_perform\observers\participant_instance_progress;
 use mod_perform\observers\participant_section_availability;
 use mod_perform\observers\participant_section_progress;
 use mod_perform\observers\subject_instance_availability;
+use mod_perform\observers\subject_instance_manual_status;
 use mod_perform\observers\track_assignment_user_groups;
 use totara_cohort\event\members_updated;
 
@@ -68,5 +70,9 @@ $observers = [
     [
         'eventname' => subject_instance_progress_updated::class,
         'callback' => subject_instance_availability::class.'::close_completed_subject_instance',
+    ],
+    [
+        'eventname' => subject_instance_activated::class,
+        'callback' => subject_instance_manual_status::class.'::generate_participant_instances',
     ],
 ];

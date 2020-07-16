@@ -23,9 +23,10 @@
 
 namespace mod_perform\rb\display;
 
-use totara_reportbuilder\rb\display\base;
-use moodle_url;
 use html_writer;
+use mod_perform\state\subject_instance\pending;
+use moodle_url;
+use totara_reportbuilder\rb\display\base;
 
 class participant_count extends base {
     /**
@@ -41,7 +42,7 @@ class participant_count extends base {
     public static function display($count, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
         if ((int)$count < 0) {
             // This happens for subject instances that still need manual participant assignments.
-            return get_string('subject_instance_status_pending', 'mod_perform');
+            return pending::get_display_name();
         }
 
         if ((int)$count == 1) {

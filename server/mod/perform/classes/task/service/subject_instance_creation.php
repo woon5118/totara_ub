@@ -35,7 +35,9 @@ use mod_perform\entities\activity\subject_instance;
 use mod_perform\entities\activity\track;
 use mod_perform\entities\activity\track_user_assignment;
 use mod_perform\hook\subject_instances_created;
+use mod_perform\state\subject_instance\active;
 use mod_perform\state\subject_instance\complete;
+use mod_perform\state\subject_instance\pending;
 use stdClass;
 use totara_core\entities\relationship;
 
@@ -62,9 +64,9 @@ class subject_instance_creation {
                 continue;
             }
 
-            $status = subject_instance::STATUS_ACTIVE;
+            $status = active::get_code();
             if ($user_assignment->manual_relationships !== null) {
-                $status = subject_instance::STATUS_PENDING;
+                $status = pending::get_code();
             }
 
             $subject_instance = new stdClass();

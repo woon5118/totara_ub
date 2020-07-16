@@ -36,7 +36,9 @@ use mod_perform\models\activity\track;
 use mod_perform\models\activity\track_status;
 use mod_perform\relationship\resolvers\peer;
 use mod_perform\state\activity\draft;
+use mod_perform\state\subject_instance\active;
 use mod_perform\state\subject_instance\complete;
+use mod_perform\state\subject_instance\pending;
 use mod_perform\task\service\subject_instance_creation;
 use mod_perform\task\service\subject_instance_dto;
 use mod_perform\task\service\track_schedule_sync;
@@ -80,7 +82,7 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
         );
 
         // All subject instances created are marked as active
-        $this->assertEquals([subject_instance::STATUS_ACTIVE], array_unique($created_instances->pluck('status')));
+        $this->assertEquals([active::get_code()], array_unique($created_instances->pluck('status')));
 
         // Participant instances were created too
         $this->assertEquals(3, participant_instance::repository()->count());
@@ -347,7 +349,7 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
         // All subject instances are marked as pending
         $created_instances = subject_instance::repository()->get();
         $this->assertCount(3, $created_instances);
-        $this->assertEquals([subject_instance::STATUS_PENDING], array_unique($created_instances->pluck('status')));
+        $this->assertEquals([pending::get_code()], array_unique($created_instances->pluck('status')));
 
         // No participant instances were created
         $this->assertEquals(0, participant_instance::repository()->count());

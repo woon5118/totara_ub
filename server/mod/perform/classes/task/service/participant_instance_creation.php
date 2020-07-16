@@ -25,12 +25,14 @@ namespace mod_perform\task\service;
 
 use core\collection;
 use core\orm\query\builder;
+use mod_perform\entities\activity\manual_relationship_selection_progress;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\entities\activity\section;
-use mod_perform\entities\activity\subject_instance;
-use mod_perform\hook\participant_instances_created;
 use mod_perform\entities\activity\section_relationship;
+use mod_perform\entities\activity\subject_instance_manual_participant;
+use mod_perform\hook\participant_instances_created;
 use mod_perform\state\participant_instance\not_started;
+use mod_perform\state\subject_instance\pending;
 use totara_core\relationship\helpers\relationship_collection_manager as core_relationship_collection_manager;
 
 /**
@@ -172,6 +174,9 @@ class participant_instance_creation {
             $args['job_assignment_id'] = $subject_instance->job_assignment_id;
         }
 
+        // Always include subject instance id in order to support manual relationships.
+        $args['subject_instance_id'] = $subject_instance->id;
+
         return $args;
     }
 
@@ -196,6 +201,8 @@ class participant_instance_creation {
                 );
             }
         }
+
+        $this->delete_manual_participant_selection_data($subject_instance->id);
     }
 
     /**
@@ -275,8 +282,26 @@ class participant_instance_creation {
      */
     private function filter_out_pending_instances(collection $subject_instance_dtos): collection {
         return $subject_instance_dtos->filter(function (subject_instance_dto $subject_instance) {
-            return $subject_instance->get_status() != subject_instance::STATUS_PENDING;
+            return $subject_instance->get_status() != pending::get_code();
         });
+    }
+
+    /**
+     * Deletes the users that were manually selected to participate.
+     * After generating participant instances based upon relationships, we no longer need to store the users.
+     *
+     * @param int $subject_instance_id
+     */
+    private function delete_manual_participant_selection_data(int $subject_instance_id): void {
+        subject_instance_manual_participant::repository()
+            ->where('subject_instance_id', $subject_instance_id)
+            ->delete();
+
+        // The perform_manual_relationship_selector table has a cascading delete foreign key on
+        // perform_manual_relationship_selector_progress, so this deletes records from both of the tables.
+        manual_relationship_selection_progress::repository()
+            ->where('subject_instance_id', $subject_instance_id)
+            ->delete();
     }
 
 }

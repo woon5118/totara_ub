@@ -61,9 +61,6 @@ class subject_instance extends entity {
     public const CREATED_TIMESTAMP = 'created_at';
     public const UPDATED_TIMESTAMP = 'updated_at';
 
-    public const STATUS_ACTIVE = 1;
-    public const STATUS_PENDING = 2;
-
     /**
      * Get the user assignment this instance belongs to
      *

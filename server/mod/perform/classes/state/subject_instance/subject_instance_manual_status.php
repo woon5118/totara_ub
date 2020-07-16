@@ -17,13 +17,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
+ * @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
  * @package mod_perform
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace mod_perform\state\subject_instance;
 
-$plugin->version  = 2020072304;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2016120505;       // Requires this Moodle version.
-$plugin->component = 'mod_perform'; // To check on upgrade, that module sits in correct place
-$plugin->dependencies = ['container_perform' => 2020070602];
+use mod_perform\state\state;
+
+/**
+ * Abstract class representing the manual participant activation status of a subject instance.
+ *
+ * @package mod_perform
+ */
+abstract class subject_instance_manual_status extends state {
+
+    /**
+     * @inheritDoc
+     */
+    public static function get_type(): string {
+        return 'status';
+    }
+
+}

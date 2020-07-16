@@ -23,12 +23,13 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-use mod_perform\entities\activity\subject_instance;
 use mod_perform\rb\traits\participant_subject_instance_source;
 use mod_perform\state\state_helper;
 use mod_perform\state\subject_instance\closed;
 use mod_perform\state\subject_instance\complete;
+use mod_perform\state\subject_instance\pending;
 use mod_perform\state\subject_instance\subject_instance_availability;
+use mod_perform\state\subject_instance\subject_instance_manual_status;
 use mod_perform\state\subject_instance\subject_instance_progress;
 use totara_core\advanced_feature;
 use totara_job\rb\source\report_trait;
@@ -106,7 +107,7 @@ class rb_source_perform_subject_instance extends rb_base_source {
     protected function define_columnoptions() {
         $global_restriction_join_su = $this->get_global_report_restriction_join('su', 'userid');
 
-        $pending_state = subject_instance::STATUS_PENDING;
+        $pending_state = pending::get_code();
         $participant_count_sql_fragment = "
         CASE
             WHEN base.status = $pending_state THEN -1
@@ -219,11 +220,6 @@ class rb_source_perform_subject_instance extends rb_base_source {
      * @return array
      */
     protected function define_filteroptions() {
-        $status_options = [
-            subject_instance::STATUS_ACTIVE => get_string('subject_instance_status_active', 'mod_perform'),
-            subject_instance::STATUS_PENDING => get_string('subject_instance_status_pending', 'mod_perform')
-        ];
-
         $filteroptions = [
             new rb_filter_option(
                 'subject_instance',
@@ -276,7 +272,9 @@ class rb_source_perform_subject_instance extends rb_base_source {
                 get_string('subject_instance_status', 'mod_perform'),
                 'select',
                 [
-                    'selectchoices' => $status_options,
+                    'selectchoices' => state_helper::get_all_display_names(
+                        'subject_instance', subject_instance_manual_status::get_type()
+                    ),
                     'simplemode' => true,
                 ],
                 'base.status'

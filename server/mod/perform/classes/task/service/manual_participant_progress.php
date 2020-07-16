@@ -31,6 +31,7 @@ use mod_perform\entities\activity\manual_relationship_selection;
 use mod_perform\entities\activity\manual_relationship_selection_progress;
 use mod_perform\entities\activity\manual_relationship_selector;
 use mod_perform\entities\activity\subject_instance;
+use mod_perform\state\subject_instance\pending;
 use stdClass;
 use totara_core\entities\relationship;
 use totara_core\relationship\helpers\relationship_collection_manager;
@@ -82,7 +83,7 @@ class manual_participant_progress {
             ->with([
                 'manual_relationship_selection_progress' => function (repository $repository) {
                     $repository->with('manual_relationship_selection')
-                        ->with('assigned_participants');
+                        ->with('manual_relationship_selectors');
                 }
             ])
             ->with([
@@ -91,7 +92,7 @@ class manual_participant_progress {
                         ->with('manual_relation_selection');
                 }
             ])
-            ->where('status', subject_instance::STATUS_PENDING)
+            ->where('status', pending::get_code())
             ->get();
     }
 
@@ -116,9 +117,9 @@ class manual_participant_progress {
                 );
             }
 
-            $relationship_ids = array_merge($relationship_ids, $manual_relation_selections->pluck('selector_relationship_id'));
+            $relationship_ids[] = $manual_relation_selections->pluck('selector_relationship_id');
         }
-        $relationship_ids = array_unique($relationship_ids);
+        $relationship_ids = array_unique(array_merge(...$relationship_ids));
         if (empty($relationship_ids)) {
             throw new coding_exception('Missing manual relationship selection records');
         }
@@ -152,7 +153,7 @@ class manual_participant_progress {
             $expected_user_ids = $expected_user_ids[$selector_relationship_id];
 
             // Get the current users
-            $current_user_ids = $progress->assigned_participants->pluck('user_id');
+            $current_user_ids = $progress->manual_relationship_selectors->pluck('user_id');
 
             // Work out who to add
             $user_ids_to_add = array_diff($expected_user_ids, $current_user_ids);

@@ -40,6 +40,7 @@ use mod_perform\entities\activity\subject_instance;
  * @property-read int|null $updated_at
  * @property-read int $track_id
  * @property-read int $activity_id
+ * @property-read int $status
  */
 class subject_instance_dto {
 

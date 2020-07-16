@@ -40,7 +40,7 @@ use core\orm\entity\relations\has_many;
  *
  * @property-read subject_instance $subject_instance
  * @property-read manual_relationship_selection $manual_relationship_selection
- * @property-read collection|manual_relationship_selector[] $assigned_participants
+ * @property-read manual_relationship_selector[]|collection $manual_relationship_selectors
  *
  * @method static manual_relationship_selection_progress_repository repository()
  */
@@ -49,6 +49,9 @@ class manual_relationship_selection_progress extends entity {
     public const TABLE = 'perform_manual_relation_selection_progress';
     public const CREATED_TIMESTAMP = 'created_at';
     public const UPDATED_TIMESTAMP = 'updated_at';
+
+    public const STATUS_PENDING = 0;
+    public const STATUS_COMPLETE = 1;
 
     /**
      * Returns the parent subject instance.
@@ -69,11 +72,11 @@ class manual_relationship_selection_progress extends entity {
     }
 
     /**
-     * Returns already selected participants for this participant role.
+     * Returns the users who select the participants for the relationship.
      *
      * @return has_many the relationship.
      */
-    public function assigned_participants(): has_many {
+    public function manual_relationship_selectors(): has_many {
         return $this->has_many(manual_relationship_selector::class, 'manual_relation_select_progress_id');
     }
 
