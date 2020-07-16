@@ -26,11 +26,15 @@ use container_perform\perform as perform_container;
 use core\collection;
 use core\entities\cohort;
 use core\entities\user;
+use core\orm\query\builder;
 use core_container\module\module;
 use hierarchy_organisation\entities\organisation;
 use hierarchy_position\entities\position;
 use mod_perform\dates\date_offset;
 use mod_perform\entities\activity\activity as activity_entity;
+use mod_perform\entities\activity\manual_relationship_selection;
+use mod_perform\entities\activity\manual_relationship_selection_progress;
+use mod_perform\entities\activity\manual_relationship_selector;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
 use mod_perform\entities\activity\section as section_entity;
@@ -130,6 +134,10 @@ class mod_perform_generator extends component_generator_base {
                 (isset($data['create_section']) && $data['create_section'] == 'true')
             ) {
                 section::create($activity);
+            }
+
+            if (isset($data['manual_relationships'])) {
+                $this->create_manual_relationships_for_activity($activity->id, $data['manual_relationships']);
             }
 
             return $activity;
@@ -594,6 +602,46 @@ class mod_perform_generator extends component_generator_base {
     }
 
     /**
+     * Set the manual relationships for an activity.
+     *
+     * @param int $activity_id
+     * @param array[] $relationships Array of ['selector' => $selector_relationship_id, 'manual' => $manual_relationship_id]
+     * @return array
+     */
+    public function create_manual_relationships_for_activity(int $activity_id, array $relationships): array {
+        return builder::get_db()->transaction(static function () use ($activity_id, $relationships) {
+            // By default all the relationships are set to subject.
+            // But we want to set our own values here so we delete them.
+            manual_relationship_selection::repository()
+                ->where('activity_id', $activity_id)
+                ->delete();
+
+            $selections = [];
+            foreach ($relationships as $relationship) {
+                $selection_entity = new manual_relationship_selection();
+                $selection_entity->activity_id = $activity_id;
+
+                if (is_numeric($relationship['selector'])) {
+                    $selection_entity->selector_relationship_id = $relationship['selector'];
+                } else {
+                    $selection_entity->selector_relationship_id = $relationship['selector']->id;
+                }
+
+                if (is_numeric($relationship['manual'])) {
+                    $selection_entity->manual_relationship_id = $relationship['manual'];
+                } else {
+                    $selection_entity->manual_relationship_id = $relationship['manual']->id;
+                }
+
+                $selection_entity->save();
+                $selections[] = $selection_entity;
+            }
+
+            return $selections;
+        });
+    }
+
+    /**
      * Creates a user activity (subject_instance) with one participant and optionally the subject participating too.
      *
      * The top level perform activity is created if a name (activity_name) or id (activity_id) is not supplied,
@@ -779,6 +827,64 @@ class mod_perform_generator extends component_generator_base {
                 );
                 $third_participant_instance->core_relationship_id = $appraiser_relationship->core_relationship_id;
                 $third_participant_instance->save();
+            }
+        }
+
+        return $subject_instance;
+    }
+
+    /**
+     * Create a subject instance that have pending participant selections.
+     *
+     * @param activity|int $activity Activity model or ID
+     * @param object|user|int $subject_user Subject user entity, record or ID
+     * @param collection|manual_relationship_selection[] $selections Array/collection of selections to override.
+     *                                                               Defaults to all the selections specified for the activity.
+     *
+     * @return subject_instance_entity
+     */
+    public function create_subject_instance_with_pending_selections($activity, $subject_user,
+                                                                    array $selections = null): subject_instance_entity {
+        if (!$activity instanceof activity) {
+            $activity = activity::load_by_id($activity);
+        }
+        if (!$subject_user instanceof user) {
+            $subject_user = new user($subject_user);
+        }
+        if ($selections === null) {
+            $selections = manual_relationship_selection::repository()
+                ->where('activity_id', $activity->id)
+                ->get();
+        }
+
+        $track = track::create($activity);
+
+        $user_assignment = new track_user_assignment();
+        $user_assignment->track_id = $track->id;
+        $user_assignment->subject_user_id = $subject_user->id;
+        $user_assignment->deleted = false;
+        $user_assignment->save();
+
+        $subject_instance = new subject_instance_entity();
+        $subject_instance->track_user_assignment_id = $user_assignment->id;
+        $subject_instance->subject_user_id = $user_assignment->subject_user_id; // Purposeful denormalization
+        $subject_instance->status = subject_instance_entity::STATUS_PENDING;
+        $subject_instance->save();
+
+        foreach ($selections as $selection) {
+            $progress_entity = new manual_relationship_selection_progress();
+            $progress_entity->subject_instance_id = $subject_instance->id;
+            $progress_entity->manual_relation_selection_id = $selection->id;
+            $progress_entity->status = 0;
+            $progress_entity->save();
+
+            $relationship = core_relationship::load_by_entity($selection->selector_relationship);
+            $users = $relationship->get_users(['user_id' => $subject_user->id]);
+            foreach ($users as $user_id) {
+                $selector = new manual_relationship_selector();
+                $selector->user_id = $user_id;
+                $selector->manual_relation_select_progress_id = $progress_entity->id;
+                $selector->save();
             }
         }
 
