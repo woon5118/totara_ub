@@ -24,7 +24,7 @@ Feature: Learner creates learning plan with objectives
 
     # Login as the learner and navigate to the learning plan.
     Given I log in as "learner1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "Learning Plans" "link"
     And I click on "learner1 Learning Plan" "link"
 
@@ -53,7 +53,7 @@ Feature: Learner creates learning plan with objectives
 
     # As the manager, access the learners plans.
     When I log in as "manager2"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "Plans" "link" in the "firstname1 lastname1" "table_row"
 
     # Access the learners plans and verify it hasn't been approved.

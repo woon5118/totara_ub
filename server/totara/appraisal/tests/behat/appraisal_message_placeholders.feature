@@ -129,7 +129,7 @@ listofstagenames: * App1_Stage1
 
     # Test Message 2, stage 1 completion.
     When I log in as "learner1"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Appraisal1" "table_row"
     And I press "Start"
     And I click on "Complete stage" "button"
@@ -137,7 +137,7 @@ listofstagenames: * App1_Stage1
     And I log out
 
     When I log in as "manager"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Appraisal1" "table_row"
     And I press "Start"
     And I click on "Complete stage" "button"
@@ -145,7 +145,7 @@ listofstagenames: * App1_Stage1
     And I log out
 
     When I log in as "appraiser"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Appraisal1" "table_row"
     And I press "Start"
     And I click on "Complete stage" "button"
@@ -153,7 +153,7 @@ listofstagenames: * App1_Stage1
     And I log out
 
     When I log in as "teamlead"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Appraisal1" "table_row"
     And I press "Start"
     And I click on "Complete stage" "button"
@@ -290,7 +290,7 @@ listofstagenames: * App1_Stage1
 
     # Test Message 3, stage 2 completion.
     When I log in as "learner1"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Appraisal1" "table_row"
     And I press "Start"
     And I click on "Complete stage" "button"
@@ -298,7 +298,7 @@ listofstagenames: * App1_Stage1
     And I log out
 
     When I log in as "manager"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Appraisal1" "table_row"
     And I press "Start"
     And I click on "Complete stage" "button"
@@ -306,7 +306,7 @@ listofstagenames: * App1_Stage1
     And I log out
 
     When I log in as "appraiser"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Appraisal1" "table_row"
     And I press "Start"
     And I click on "Complete stage" "button"
@@ -314,7 +314,7 @@ listofstagenames: * App1_Stage1
     And I log out
 
     When I log in as "teamlead"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Appraisal1" "table_row"
     And I press "Start"
     And I click on "Complete stage" "button"
@@ -451,7 +451,7 @@ listofstagenames: * App1_Stage1
 
     # Test Message 4, stage 3 completion.
     When I log in as "learner1"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Appraisal1" "table_row"
     And I press "Start"
     And I click on "Complete stage" "button"
@@ -459,7 +459,7 @@ listofstagenames: * App1_Stage1
     And I log out
 
     When I log in as "manager"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Appraisal1" "table_row"
     And I press "Start"
     And I click on "Complete stage" "button"
@@ -467,7 +467,7 @@ listofstagenames: * App1_Stage1
     And I log out
 
     When I log in as "appraiser"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Appraisal1" "table_row"
     And I press "Start"
     And I click on "Complete stage" "button"
@@ -475,7 +475,7 @@ listofstagenames: * App1_Stage1
     And I log out
 
     When I log in as "teamlead"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Appraisal1" "table_row"
     And I press "Start"
     And I click on "Complete stage" "button"

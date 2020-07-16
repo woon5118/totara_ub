@@ -79,12 +79,12 @@ Feature: Seminar Signup Role Approval
 
     And I log out
     And I log in as "manager"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then I should not see "Seminar trainer confirmation"
 
     When I log out
     And I log in as "teacher"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then I should see "Seminar trainer confirmation"
 
     When I click on "View all tasks" "link"
@@ -98,7 +98,7 @@ Feature: Seminar Signup Role Approval
 
     When I log out
     And I log in as "jimmy"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then I should see "Seminar booking confirmation"
 
     When I am on "Classroom Connect Course" course homepage

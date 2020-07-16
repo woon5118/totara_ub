@@ -23,7 +23,7 @@ Feature: Add blocks
 
   Scenario: Add blocks to all possible regions
     Given I log in as "admin"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I press "Customise this page"
     And I should not see the "Calendar" block
     When I add the "Calendar" block to the "top" region

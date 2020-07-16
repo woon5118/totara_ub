@@ -57,7 +57,7 @@ Feature: Test course visibility
   @javascript
   Scenario: Traditional course visibility works as expected
     Given I log in as "trainer1"
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     Then I should see "Biology"
     And I should see "Chemistry"
     And I should see "Physics"
@@ -70,7 +70,7 @@ Feature: Test course visibility
 
     When I log out
     And I log in as "learner1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then I should see "Biology"
     And I should see "Chemistry"
     And I should not see "Physics"
@@ -83,7 +83,7 @@ Feature: Test course visibility
 
     When I log out
     And I log in as "learner2"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then I should not see "Biology"
     And I should see "Chemistry"
     And I should not see "Physics"
@@ -96,7 +96,7 @@ Feature: Test course visibility
 
     When I log out
     And I log in as "learner3"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then I should not see "Biology"
     And I should not see "Chemistry"
     And I should not see "Physics"
@@ -150,7 +150,7 @@ Feature: Test course visibility
 
     When I log out
     And I log in as "trainer1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then I should see "Biology"
     And I should see "Chemistry"
     And I should see "Physics"

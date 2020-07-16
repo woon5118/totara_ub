@@ -21,7 +21,7 @@ Feature: See that audience based visibility doesn't effect a program showing in 
 
   Scenario: Add program to plan with no visibility restrictions.
     Given I log in as "learner1"
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I click on "Learning Plans" "link"
     And I click on "Learning Plan 1" "link"
     And I click on "Programs" "link" in the "#dp-plan-content" "css_element"

@@ -9,7 +9,7 @@ Feature: Test Current Learning block
 
   Scenario: Learner has Current Learning block on Dashboard by default
     Given I log in as "learner1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then I should see "You do not have any current learning. For previously completed learning see your Record of Learning"
 
   @javascript
@@ -33,7 +33,7 @@ Feature: Test Current Learning block
     And I log in as "admin"
 
     # Add an image to the private files block to use later in the program.
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I press "Customise this page"
     And I add the "Private files" block
     And I follow "Manage private files..."
@@ -73,7 +73,7 @@ Feature: Test Current Learning block
 
     # As the learner check the block and program is displayed correctly.
     And I log in as "learner1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I press "Customise this page"
     When I open the "Current Learning" blocks action menu
     And I follow "Delete Current Learning block"
@@ -121,7 +121,7 @@ Feature: Test Current Learning block
     And I log out
 
     And I log in as "learner1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I press "Customise this page"
     When I open the "Current Learning" blocks action menu
     And I follow "Delete Current Learning block"
@@ -159,7 +159,7 @@ Feature: Test Current Learning block
       | Learner must complete | Some courses  |
       | Minimum time required | 1             |
     And I log in as "learner1"
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     Then I should not see "Course 3"
 
     When I toggle "Test Program 1" in the current learning block
@@ -220,7 +220,7 @@ Feature: Test Current Learning block
     And I press "Save changes"
     And I log out
     And I log in as "learner1"
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     Then I should see "Course 10"
 
     When I click on ".block_current_learning .pagination [data-page=2]" "css_element"
@@ -324,7 +324,7 @@ Feature: Test Current Learning block
     # Not completing anything in course4
     # Can't complete activities in course5 - completion tracking not enabled
 
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     Then I should see "Course 1" in the "Current Learning" "block"
     And I should see "50%" in the "//div[contains(@class, 'block_current_learning-row-item') and contains(.,'Course 1')]" "xpath_element"
     # Completed courses not shown in current learning
@@ -346,7 +346,7 @@ Feature: Test Current Learning block
       | Learner must complete | All courses |
       | Minimum time required | 1           |
     And I log in as "learner1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then I should see "Test Program 1" in the "Current Learning" "block"
     And I should see "30%" in the "//li[contains(@class, 'block_current_learning-program')]/div[contains(., 'Test Program 1')]" "xpath_element"
     And I should not see "Course 1" in the "Current Learning" "block"

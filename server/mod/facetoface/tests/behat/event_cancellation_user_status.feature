@@ -137,36 +137,36 @@ Feature: Seminar event cancellation status
 
 #  Checking status as learners
     Given I log in as "learner1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then I should see "Seminar booking confirmation: Test Seminar"
     And I log out
 
     Given I log in as "learner2"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then I should see "Seminar booking decline"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I should not see "Course 1" in the "div.block_current_learning" "css_element"
     And I log out
 
     Given I log in as "learner3"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then I should see "Seminar booking confirmation: Test Seminar"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I should see "Course 1" in the "div.block_current_learning" "css_element"
     And I log out
 
     Given I log in as "learner4"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then I should see "Seminar booking confirmation: Test Seminar"
     And I should see "Course 1" in the "div.block_current_learning" "css_element"
     And I log out
 
     Given I log in as "learner5"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then I should see "Seminar booking request: Test Seminar"
     And I should not see "Seminar booking confirmation: Test Seminar"
     And I should not see "Seminar booking decline"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I should not see "Course 1" in the "div.block_current_learning" "css_element"
     And I log out
 

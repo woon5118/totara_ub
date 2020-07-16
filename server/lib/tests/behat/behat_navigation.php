@@ -598,19 +598,22 @@ class behat_navigation extends behat_base {
         \behat_hooks::set_step_readonly(false);
         switch ($page) {
             case 'All Appraisals':
-                $url = new moodle_url('/totara/appraisal/index.php');
+                $url = new \moodle_url('/totara/appraisal/index.php');
                 break;
             case 'Latest Appraisal':
-                $url = new moodle_url('/totara/appraisal/myappraisal.php', ['latest' => 1]);
+                $url = new \moodle_url('/totara/appraisal/myappraisal.php', ['latest' => 1]);
                 break;
             case '360° Feedback':
-                $url = new moodle_url('/totara/feedback360/index.php');
+                $url = new \moodle_url('/totara/feedback360/index.php');
                 break;
             case 'Goals':
-                $url = new moodle_url('/totara/hierarchy/prefix/goal/mygoals.php');
+                $url = new \moodle_url('/totara/hierarchy/prefix/goal/mygoals.php');
                 break;
             case 'Team':
-                $url = new moodle_url('/my/teammembers.php');
+                $url = new \moodle_url('/my/teammembers.php');
+                break;
+            case 'Dashboard':
+                $url = new \moodle_url('/totara/dashboard/index.php');
                 break;
             default:
                 throw new ExpectationException("Page " . $page . " is not defined", $this->getSession());

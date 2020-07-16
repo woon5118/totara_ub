@@ -70,7 +70,7 @@ Feature: User certifications and their courses appear correctly in the current l
   @javascript
   Scenario: A user can view their certification and it's courses in the current learning block
     Given I log in as "user001"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then I should see "Test Certification" in the "Current Learning" "block"
     And I toggle "Test Certification" in the current learning block
     And I should see "Certify Course 1" in "Test Certification" within the current learning block
@@ -84,7 +84,7 @@ Feature: User certifications and their courses appear correctly in the current l
     And I click on "Yes" "button"
 
     # The current learning block should now be empty.
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     Then I should not see "Test Certification" in the "Current Learning" "block"
     And I should not see "Certify Course 1" in the "Current Learning" "block"
     And I should not see "Certify Course 2" in the "Current Learning" "block"
@@ -94,7 +94,7 @@ Feature: User certifications and their courses appear correctly in the current l
     # Push user to recert and check block contents.
     When I wind back certification dates by 5 months
     And I run the "\totara_certification\task\update_certification_task" task
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then I should see "Test Certification" in the "Current Learning" "block"
     And I toggle "Test Certification" in the current learning block
     And I should not see "Certify Course 1" in "Test Certification" within the current learning block
@@ -111,7 +111,7 @@ Feature: User certifications and their courses appear correctly in the current l
 
     # Courses should now be displayed in the block as stand alone courses.
     Given I log in as "user001"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I should see "Certify Course 2" in the "Current Learning" "block"
 
     # The certification should still contain the correct content.

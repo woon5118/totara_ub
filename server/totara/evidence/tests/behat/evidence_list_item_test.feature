@@ -89,17 +89,17 @@ Feature: Evidence bank page
 
   Scenario: View another user's evidence bank as a manager via my team
     Given I log in as "evidence_user_manager"
-    When I click on "Team" in the totara menu
+    When I am on "Team" page
     Then "Totara_User One" "link" should exist in the "team_members" "table"
     And "Totara_User Two" "link" should exist in the "team_members" "table"
     And "Totara_User Three" "link" should exist in the "team_members" "table"
     And "Totara_User Four" "link" should not exist in the "team_members" "table"
     When I click on "Evidence" "link" in the "Totara_User One" "table_row"
     Then I should see "Evidence bank for Totara_User One"
-    When I click on "Team" in the totara menu
+    When I am on "Team" page
     And I click on "Evidence" "link" in the "Totara_User Two" "table_row"
     Then I should see "Evidence bank for Totara_User Two"
-    When I click on "Team" in the totara menu
+    When I am on "Team" page
     And I click on "Evidence" "link" in the "Totara_User Three" "table_row"
     Then I should see "Evidence bank for Totara_User Three"
 

@@ -21,9 +21,9 @@ Feature: Main menu behat step testing
   @javascript
   Scenario: Test I click in the totara menu with javascript
     Given I log in as "admin"
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     Then I should see "You do not have any current learning."
-    When I click on "Goals" in the totara menu
+    When I am on "Goals" page
     Then I should see "Company Goals"
 
 
@@ -50,9 +50,9 @@ Feature: Main menu behat step testing
 
   Scenario: Test I click in the totara menu without javascript
     Given I log in as "admin"
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     Then I should see "You do not have any current learning."
-    When I click on "Goals" in the totara menu
+    When I am on "Goals" page
     Then I should see "Company Goals"
 
 # NOTE: uncomment following one by one and make sure it fails:

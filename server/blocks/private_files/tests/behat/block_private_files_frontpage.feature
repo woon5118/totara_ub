@@ -25,7 +25,7 @@ Feature: The private files block allows users to store files privately in totara
   Scenario: Upload a file to the private files block from the frontpage
     Given I log in as "teacher1"
     And I am on site homepage
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I press "Customise this page"
     And I add the "Private files" block
     And "Private files" "block" should exist

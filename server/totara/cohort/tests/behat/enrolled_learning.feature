@@ -629,7 +629,7 @@ Feature: Assign enrolled learning to cohort
     And I am on site homepage
     When I log out
     And I log in as "learner1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then I should see "Course 1"
     And I should not see "Course 2"
     And I should see "Course 3"

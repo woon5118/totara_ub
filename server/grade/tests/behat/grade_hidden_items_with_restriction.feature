@@ -185,7 +185,7 @@ Feature: Grade visibility with audience restriction set
     And I log out
 
     When I log in as "staff"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "Profile" "link" in the "Stu Dent" "table_row"
     And I click on "Grades overview" "link" in the ".block_totara_user_profile_category_reports" "css_element"
     And I follow "Course 1"
@@ -193,7 +193,7 @@ Feature: Grade visibility with audience restriction set
     And I log out
 
     When I log in as "tom"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "Profile" "link" in the "Stu Dent" "table_row"
     And I follow "Grades overview"
     And I follow "Course 1"
@@ -218,7 +218,7 @@ Feature: Grade visibility with audience restriction set
       | mod/assign:view                    | Allow      | peep         | System       |           |
 
     When I log in as "staff"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "Profile" "link" in the "Stu Dent" "table_row"
     And I follow "Grades overview"
     And I follow "Course 1"
@@ -226,7 +226,7 @@ Feature: Grade visibility with audience restriction set
     And I log out
 
     When I log in as "tom"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "Profile" "link" in the "Stu Dent" "table_row"
     And I follow "Grades overview"
     And I follow "Course 1"
@@ -244,7 +244,7 @@ Feature: Grade visibility with audience restriction set
       | mod/assign:view                    | Prevent    | peep         | System       |           |
 
     When I log in as "staff"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "Profile" "link" in the "Stu Dent" "table_row"
     And I follow "Grades overview"
     And I follow "Course 1"
@@ -252,7 +252,7 @@ Feature: Grade visibility with audience restriction set
     And I log out
 
     When I log in as "tom"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "Profile" "link" in the "Stu Dent" "table_row"
     And I follow "Grades overview"
     And I follow "Course 1"
@@ -272,7 +272,7 @@ Feature: Grade visibility with audience restriction set
     And I log out
 
     When I log in as "staff"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "Profile" "link" in the "Stu Dent" "table_row"
     And I follow "Grades overview"
     And I follow "Course 1"
@@ -280,7 +280,7 @@ Feature: Grade visibility with audience restriction set
     And I log out
 
     When I log in as "tom"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "Profile" "link" in the "Stu Dent" "table_row"
     And I follow "Grades overview"
     And I follow "Course 1"

@@ -15,7 +15,7 @@ Feature: Test use of images in positions and position custom fields
     And I log in as "admin"
 
     # Add images to the private files block to use later
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I press "Customise this page"
     And I add the "Private files" block
     And I follow "Manage private files..."

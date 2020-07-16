@@ -62,7 +62,7 @@ Feature: Verify capability manageanyplan.
 
     # Login as the learner and navigate to the learning plan.
     Given I log in as "learner1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "Learning Plans" "link"
     And I click on "learner1 Learning Plan" "link"
     # Add some courses to the plan.
@@ -438,7 +438,7 @@ Feature: Verify capability manageanyplan.
     # They should not be able to create plans.
     # The plan template is set as deny for manager.
     When I log in as "manager3"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I follow "firstname1 lastname1"
     And I click on "Learning Plans" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     Then I should see "firstname1 lastname1's current and completed learning plans are shown below."
@@ -457,7 +457,7 @@ Feature: Verify capability manageanyplan.
       | capability                 | permission | role             | contextlevel | reference |
       | totara/plan:manageanyplan  | Allow      | planmanager      | System       |           |
     And I log in as "manager3"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I follow "firstname1 lastname1"
     And I click on "Learning Plans" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     Then I should see "You are viewing firstname1 lastname1's plans."

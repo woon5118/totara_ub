@@ -41,7 +41,7 @@ Feature: Verify that a manager can not see a staff members personal evidence rec
       | Staff_Created_Evidence_Bank | Staff Member |
 
   Scenario: Verify only evidence the manager created is displayed in record of learning
-    When I click on "Team" in the totara menu
+    When I am on "Team" page
     And I click on "Records" "link" in the "Staff Member" "table_row"
     Then I should see "There are no records to display"
     When the following "evidence" exist in "totara_evidence" plugin:

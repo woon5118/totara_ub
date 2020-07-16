@@ -198,7 +198,7 @@ Feature: Sanity checks on questions appearing in appraisals
     And I press "Activate"
     And I log out
     And I log in as "learner"
-    And I click on "Latest Appraisal" in the totara menu
+    And I am on "Latest Appraisal" page
     And I press "Start"
     And I set the field "Your answer" to "student long text answer"
     And I click on "ms2" "radio"
@@ -219,7 +219,7 @@ Feature: Sanity checks on questions appearing in appraisals
     Given I click on "Complete stage" "button"
     And I log out
     And I log in as "mgr"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Appraisal #1" "link" in the "Learner One" "table_row"
 
     When I press "Start"
@@ -242,7 +242,7 @@ Feature: Sanity checks on questions appearing in appraisals
     Given I click on "Complete stage" "button"
     And I log out
     And I log in as "mgr2"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Appraisal #1" "link" in the "Learner One" "table_row"
 
     When I press "Start"
@@ -264,7 +264,7 @@ Feature: Sanity checks on questions appearing in appraisals
     Given I click on "Complete stage" "button"
     And I log out
     And I log in as "appraiser"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Appraisal #1" "link" in the "Learner One" "table_row"
 
     When I press "Start"
@@ -289,7 +289,7 @@ Feature: Sanity checks on questions appearing in appraisals
     # View as learner
     And I log out
     And I log in as "learner"
-    And I click on "Latest Appraisal" in the totara menu
+    And I am on "Latest Appraisal" page
 
     When I press "View"
     Then I should not see "No response"
@@ -310,7 +310,7 @@ Feature: Sanity checks on questions appearing in appraisals
     # View as manager
     When I log out
     And I log in as "mgr"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Appraisal #1" "link" in the "Learner One" "table_row"
     And I press "View"
     Then I should not see "No response"
@@ -331,7 +331,7 @@ Feature: Sanity checks on questions appearing in appraisals
     # View as manager's manager
     When I log out
     And I log in as "mgr2"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Appraisal #1" "link" in the "Learner One" "table_row"
     And I press "View"
     Then I should not see "No response"
@@ -352,7 +352,7 @@ Feature: Sanity checks on questions appearing in appraisals
     # View as appraiser
     When I log out
     And I log in as "appraiser"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Appraisal #1" "link" in the "Learner One" "table_row"
     And I press "View"
     Then I should not see "No response"

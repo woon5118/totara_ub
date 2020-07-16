@@ -17,14 +17,14 @@ Feature: Learner creates a learning plan and adds an image to description
   @javascript
   Scenario: Learner add image to plan description.
     Given I log in as "learner1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I press "Customise this page"
     And I add the "Private files" block
     And I follow "Manage private files..."
     And I upload "totara/plan/tests/fixtures/pic1.png" file to "Files" filemanager
     And I click on "Save changes" "button"
 
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "Learning Plans" "link"
     And I press "Create new learning plan"
     And I set the field "Plan name" to "My Learning Plan"
@@ -43,14 +43,14 @@ Feature: Learner creates a learning plan and adds an image to description
   @javascript
   Scenario: Learner adds image to Objective within a plan
     Given I log in as "learner1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I press "Customise this page"
     And I add the "Private files" block
     And I follow "Manage private files..."
     And I upload "totara/plan/tests/fixtures/pic1.png" file to "Files" filemanager
     And I press "Save changes"
 
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "Learning Plans" "link"
     And I press "Create new learning plan"
     And I set the field "Plan name" to "My Learning Plan"

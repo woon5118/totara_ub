@@ -54,6 +54,6 @@ Feature: Seminar Signup Role Approval Trainer Role
 
     # Staying in same scenario to prevent re-load of data.
     When I log in as "trainer"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then I should see "View all tasks"
     And I should see "Seminar booking role request: Classroom Connect"

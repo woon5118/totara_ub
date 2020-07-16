@@ -32,7 +32,7 @@ Feature: Test Team menu item
       | user002  | POS001   | 1        | manager |
 
     When I log in as "manager"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     Then I should see "Team Members: 2 records shown"
     And I should see "fn_001 ln_001"
     And I should see "fn_002 ln_002"

@@ -39,7 +39,7 @@ Feature: Verify the columns and filters of a the Learning plans report source.
 
     # Login as the manager and approve Learning Plan 3.
     When I log in as "manager1"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "Plans" "link" in the "1" "table_row"
     And I follow "Learning Plan 3"
     And I press "Approve"

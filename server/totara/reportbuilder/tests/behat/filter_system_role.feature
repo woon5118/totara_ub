@@ -315,7 +315,7 @@ Feature: Verify the User System Role filter.
     # Login as the manager to view the Team members embedded report
     # and check the system roles are present in the filter menu.
     When I log in as "manager1"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     Then I should see "Site Manager" in the "user-roleid" "select"
     And I should see "Course creator" in the "user-roleid" "select"
     And I should see "Staff Manager" in the "user-roleid" "select"

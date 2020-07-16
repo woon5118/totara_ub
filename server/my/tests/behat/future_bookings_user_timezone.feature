@@ -79,7 +79,7 @@ Feature: My Future Bookings seminar sessions report overview
   @javascript
   Scenario: Login as a student and check My future bookings event timezones
     And I log in as "alice"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "Bookings" "link"
     And I should see "America/New_York"
     And I should see "Europe/Prague"

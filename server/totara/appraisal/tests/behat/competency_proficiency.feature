@@ -85,7 +85,7 @@ Feature: Appraisal question: Competencies from Learning Plan - test that changin
 
     # Login as the manager and navigate to the learning plan.
     Given I log in as "manager2"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "Plans" "link" in the "firstname1 lastname1" "table_row"
     And I click on "learner1 Learning Plan" "link"
 
@@ -102,7 +102,7 @@ Feature: Appraisal question: Competencies from Learning Plan - test that changin
 
     # Log in as learner and navigate to the appraisal.
     Given I log in as "learner1"
-    And I click on "Latest Appraisal" in the totara menu
+    And I am on "Latest Appraisal" page
     And I press "Start"
 
     # Set the competency in the question.
@@ -125,7 +125,7 @@ Feature: Appraisal question: Competencies from Learning Plan - test that changin
 
     # Log in as manager and go into the appraisal.
     Given I log in as "manager2"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "Appraisals" "link" in the "firstname1 lastname1" "table_row"
     And I click on "Appraisal competency test" "link"
     And I press "Start"
@@ -145,7 +145,7 @@ Feature: Appraisal question: Competencies from Learning Plan - test that changin
 
     # Make sure manager's manager can see the appraisal but can't change proficiency.
     Given I log in as "teamlead3"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Appraisal competency test" "link"
     And I press "Start"
     Then I should see "This is learner's answer"
@@ -159,7 +159,7 @@ Feature: Appraisal question: Competencies from Learning Plan - test that changin
 
     # Make sure appraiser can see the appraisal but can't change proficiency.
     Given I log in as "appraiser4"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Appraisal competency test" "link"
     And I press "Start"
     Then I should see "This is learner's answer"

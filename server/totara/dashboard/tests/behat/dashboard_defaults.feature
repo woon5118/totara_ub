@@ -16,7 +16,7 @@ Feature: Test Dashboard defaults
     And I am on site homepage
     And I turn editing mode on
     And I add the "Latest announcements" block
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I should see "Latest announcements"
     And I log out
 
@@ -31,7 +31,7 @@ Feature: Test Dashboard defaults
     And I should not see "Current Learning"
     And I should see "Make home page"
 
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     Then I should see "My Learning" in the ".breadcrumb-nav" "css_element"
     And I should not see "Make home page"
 
@@ -45,7 +45,7 @@ Feature: Test Dashboard defaults
     And I should not see "Current Learning"
     And I should not see "Make home page"
 
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I press "Make home page"
     And I should not see "Make home page"
     And I should see "Current Learning"
@@ -60,7 +60,7 @@ Feature: Test Dashboard defaults
     Then I should see "Latest announcements"
     And I should not see "Current Learning"
 
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     Then I should see "My Learning" in the ".breadcrumb-nav" "css_element"
     And I should see "Current Learning"
 
@@ -68,7 +68,7 @@ Feature: Test Dashboard defaults
     Then I should see "Latest announcements"
     And I should not see "Current Learning"
 
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I press "Make home page"
     And I should not see "Make home page"
     And I should see "Current Learning"
@@ -113,7 +113,7 @@ Feature: Test Dashboard defaults
     When I log in as "student1"
     Then I should see "Latest announcements"
     And I should not see "Current Learning"
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I press "Make home page"
     And I should not see "Make home page"
     And I should see "Current Learning"
@@ -127,7 +127,7 @@ Feature: Test Dashboard defaults
     When I log in as "admin"
     Then I should see "Latest announcements"
     And I should not see "Current Learning"
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I press "Make home page"
     And I should not see "Make home page"
     And I should see "Current Learning"

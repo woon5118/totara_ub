@@ -8,7 +8,7 @@ Feature: Manage availability conditions
   Scenario: Display list of availability conditions
     # Check the report doesn't show when not enabled.
     Given I log in as "admin"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I press "Customise this page"
     And I add the "Administration" block if not present
     And the following config values are set as admin:

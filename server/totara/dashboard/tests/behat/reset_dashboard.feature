@@ -11,7 +11,7 @@ Feature: Reset dashboard layout for all users
         | learner2 | Sam2      | Learner2 | sam2.learner2@example.com |
 
     When I log in as "learner1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then "Recent Learning" "block" should not exist
     When I press "Customise this page"
     And I add the "Recent Learning" block
@@ -20,7 +20,7 @@ Feature: Reset dashboard layout for all users
     And I log out
 
     When I log in as "learner2"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then "Recent Learning" "block" should not exist
     When I press "Customise this page"
     And I add the "Recent Learning" block
@@ -30,7 +30,7 @@ Feature: Reset dashboard layout for all users
 
   Scenario: Reset dashboard for all users
     When I log in as "admin"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I press "Manage dashboards"
     And I follow "My Learning"
     And I press "Reset dashboard for all users"
@@ -39,12 +39,12 @@ Feature: Reset dashboard layout for all users
     And I log out
 
     When I log in as "learner1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then "Recent Learning" "block" should not exist
     And I log out
 
     When I log in as "learner2"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then "Recent Learning" "block" should not exist
     And I log out
 
@@ -58,7 +58,7 @@ Feature: Reset dashboard layout for all users
     And I press "Delete"
     Then I should not see "Bob1 Learner1"
 
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I press "Manage dashboards"
     And I follow "My Learning"
     And I press "Reset dashboard for all users"
@@ -67,7 +67,7 @@ Feature: Reset dashboard layout for all users
     And I log out
 
     When I log in as "learner2"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then "Recent Learning" "block" should not exist
     And I log out
 
@@ -88,7 +88,7 @@ Feature: Reset dashboard layout for all users
     Then I should see "Bob1 Learner1"
     And "Undelete Bob1 Learner1" "link" should exist
 
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I press "Manage dashboards"
     And I follow "My Learning"
     And I press "Reset dashboard for all users"
@@ -97,7 +97,7 @@ Feature: Reset dashboard layout for all users
     And I log out
 
     When I log in as "learner2"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then "Recent Learning" "block" should not exist
     And I log out
 
@@ -109,7 +109,7 @@ Feature: Reset dashboard layout for all users
     And I log out
 
     When I log in as "learner1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then "Recent Learning" "block" should not exist
     And I log out
 

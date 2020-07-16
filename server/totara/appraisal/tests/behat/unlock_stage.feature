@@ -49,14 +49,14 @@ Feature: Test unlocking an appraisal stage for a role
 
     # Learner completes stage one.
     When I log in as "learner"
-    And I click on "Latest Appraisal" in the totara menu
+    And I am on "Latest Appraisal" page
     And I press "Start"
     And I click on "Complete stage" "button"
     And I log out
 
     # Manager completes both stages.
     When I log in as "manager"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I follow "Appraisal1"
     And I press "Start"
     And I click on "Complete stage" "button"
@@ -66,7 +66,7 @@ Feature: Test unlocking an appraisal stage for a role
 
     # Learner completes stage two.
     When I log in as "learner"
-    And I click on "Latest Appraisal" in the totara menu
+    And I am on "Latest Appraisal" page
     And I press "Start"
     And I click on "Complete stage" "button"
     Then I should see "This appraisal was completed"
@@ -87,7 +87,7 @@ Feature: Test unlocking an appraisal stage for a role
 
     # Check Manager must complete the stage.
     When I log in as "manager"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I follow "Appraisal1"
     Then I should see "learner lastname must complete this stage"
     And I should see "You must complete this stage"
@@ -99,7 +99,7 @@ Feature: Test unlocking an appraisal stage for a role
 
     # Learner can re-complete stages.
     When I log in as "learner"
-    And I click on "Latest Appraisal" in the totara menu
+    And I am on "Latest Appraisal" page
     And I press "Start"
     And I click on "Complete stage" "button"
     And I press "Start"
@@ -109,7 +109,7 @@ Feature: Test unlocking an appraisal stage for a role
 
     # Check Manager must complete the stage.
     When I log in as "manager"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I follow "Appraisal1"
     And I press "Start"
     And I click on "Complete stage" "button"
@@ -130,7 +130,7 @@ Feature: Test unlocking an appraisal stage for a role
 
     # Check Manager can edit stage
     When I log in as "manager"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I follow "Appraisal1"
     Then I should see "learner lastname must complete this stage"
     And I should see "You have completed this stage (manager lastname)"
@@ -143,7 +143,7 @@ Feature: Test unlocking an appraisal stage for a role
 
     # Learner can re-complete stages and manager is auto-completed and whole appraisal is completed
     When I log in as "learner"
-    And I click on "Latest Appraisal" in the totara menu
+    And I am on "Latest Appraisal" page
     And I press "Start"
     And I click on "Complete stage" "button"
     And I press "Start"

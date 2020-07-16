@@ -45,7 +45,7 @@ Feature: Test progress bars
     And I click on "Ok" "button" in the "Add individuals to program" "totaradialogue"
     Then I should see "'Student Two' has been added to the program"
 
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I press "Manage dashboards"
     And I follow "My Learning"
     And I press "Blocks editing on"
@@ -95,7 +95,7 @@ Feature: Test progress bars
   Scenario: Student can see progress bars
     When I log in as "student1"
     And  I am on "Course 1" course homepage
-    And  I click on "Dashboard" in the totara menu
+    And  I am on "Dashboard" page
     Then I should see "50%" in the "Last Course Accessed" "block"
     And  I should see "50%" in the ".block_current_learning-course" "css_element"
     And  I should see "50%" in the ".block-totara-featured-links-course" "css_element"
@@ -105,7 +105,7 @@ Feature: Test progress bars
 
     When I log in as "student2"
     And  I am on "Course 1" course homepage
-    And  I click on "Dashboard" in the totara menu
+    And  I am on "Dashboard" page
     Then I should see "50%" in the "Last Course Accessed" "block"
     And  I should see "50%" in the ".block_current_learning-program" "css_element"
     And  I should see "50%" in the ".block-totara-featured-links-course" "css_element"

@@ -18,7 +18,7 @@ Feature: Tenant dashboard customisation by users
       | participant1      | First     | Participant |              | ten1, ten2        |
     And I log in as "admin"
 
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I press "Manage dashboards"
     And I click on "My Learning" "link" in the "My Learning" "table_row"
     And I press "Blocks editing on"
@@ -30,7 +30,7 @@ Feature: Tenant dashboard customisation by users
     And I press "Save changes"
     And I press "Blocks editing off"
 
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I press "Manage dashboards"
     And I click on "First T Dashboard" "link" in the "First T Dashboard" "table_row"
     And I press "Blocks editing on"
@@ -42,7 +42,7 @@ Feature: Tenant dashboard customisation by users
     And I press "Save changes"
     And I press "Blocks editing off"
 
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I press "Manage dashboards"
     And I click on "Second T Dashboard" "link" in the "Second T Dashboard" "table_row"
     And I press "Blocks editing on"
@@ -59,7 +59,7 @@ Feature: Tenant dashboard customisation by users
     Given I log in as "user1"
     And I should see "First T Dashboard Default Content"
 
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I press "Customise this page"
     And I should see "First T Dashboard Default Content"
     And I configure the "(new HTML block)" block
@@ -92,7 +92,7 @@ Feature: Tenant dashboard customisation by users
     And I log in as "user1"
     And I should see "First T Dashboard Default Content"
 
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I press "Customise this page"
     And I should see "First T Dashboard Default Content"
     And I configure the "(new HTML block)" block
@@ -112,7 +112,7 @@ Feature: Tenant dashboard customisation by users
     And I should see "Second T Dashboard"
     And I should see "First T Dashboard"
 
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I press "Customise this page"
     And I should see "My Learning Default Content"
     And I configure the "(new HTML block)" block
@@ -147,7 +147,7 @@ Feature: Tenant dashboard customisation by users
     And I should see "Second T Dashboard"
     And I should see "First T Dashboard"
 
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I press "Customise this page"
     And I should see "My Learning Default Content"
     And I configure the "(new HTML block)" block

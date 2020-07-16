@@ -39,7 +39,7 @@ Feature: User courses and programs when added to a plan appear correctly in the 
 
     # Login as the learner and add a program to the plan.
     Given I log in as "learner1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "Learning Plans" "link"
     And I click on "learner1 Learning Plan" "link"
     And I click on "Programs" "link" in the "#dp-plan-content" "css_element"
@@ -52,7 +52,7 @@ Feature: User courses and programs when added to a plan appear correctly in the 
     And I should see "Program 2" in the ".dp-plan-component-items" "css_element"
 
     # The program should not appear in the block as the plan has not been activated.
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     Then I should not see "Program 1" in the "Current Learning" "block"
     And I should not see "Program 2" in the "Current Learning" "block"
 
@@ -62,7 +62,7 @@ Feature: User courses and programs when added to a plan appear correctly in the 
     And I press "Send approval request"
     And I log out
     And I log in as "manager2"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "Plans" "link" in the "firstname1 lastname1" "table_row"
     And I click on "learner1 Learning Plan" "link"
     And I set the field "reasonfordecision" to "Nice plan man!"
@@ -72,7 +72,7 @@ Feature: User courses and programs when added to a plan appear correctly in the 
 
     # The program and it's contents should now appear in the block.
     When I log in as "learner1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then I should see "Program 1" in the "Current Learning" "block"
     And I should see "Program 2" in the "Current Learning" "block"
     When I toggle "Program 1" in the current learning block
@@ -83,11 +83,11 @@ Feature: User courses and programs when added to a plan appear correctly in the 
     Then I should see "You have been enrolled in course Course 3 via required learning program Program 2."
 
     # Complete program 1, it should no longer appear in the block.
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I follow "Course 3"
     And I click on "Complete course" "link"
     And I click on "Yes" "button"
     Then I should see "You have already completed this course"
     When I run the scheduled task "\totara_program\task\completions_task"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then I should not see "Program 2" in the "Current Learning" "block"

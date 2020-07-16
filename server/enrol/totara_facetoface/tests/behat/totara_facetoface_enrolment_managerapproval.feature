@@ -116,7 +116,7 @@ Feature: Users are forced to get manager approval where required
     And I run all adhoc tasks
     And I log out
     When I log in as "manager1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "View all tasks" "link"
     And I should see "This is to advise that Student 1 has requested to be booked into the following course" in the "td.message_values_statement" "css_element"
     And I click on "Attendees" "link"

@@ -16,8 +16,7 @@ Feature: Verify a learner cannot access a course they don't have access to via t
   Scenario: Verify a learner cannot access a hidden course via the Last Course Accessed block.
 
     Given I log in as "learner1"
-
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
 
     # Visit the course.
     When I follow "Course 1"
@@ -32,6 +31,6 @@ Feature: Verify a learner cannot access a course they don't have access to via t
 
     # Login in as the learner and check the course can't be accessed.
     When I log in as "learner1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then "Last Course Accessed" "block" should not exist
 

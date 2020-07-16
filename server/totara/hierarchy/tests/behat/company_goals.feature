@@ -1,4 +1,4 @@
-@totara_hierarchy @totara_hierarchy_goal @totara @javascript
+@totara_hierarchy @totara_hierarchy_goals @totara @javascript
 Feature: Verify creation and use of company goal types and custom fields.
 
   Background:
@@ -171,7 +171,7 @@ Feature: Verify creation and use of company goal types and custom fields.
     # Login as a learner and create a company goal with the custom fields.
     When I log out
     And I log in as "learner1"
-    And I click on "Goals" in the totara menu
+    And I am on "Goals" page
     Then I should see "Company Goals"
 
     # Add a company goal to the learner goals.

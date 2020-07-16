@@ -126,13 +126,13 @@ Feature: Seminar Event Registration Closure
 
     When I log out
     And I log in as "manager"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I should see "Seminar event registration closure" in the ".block_totara_alerts" "css_element"
     And I click on "#detailtask2-dialog" "css_element" in the ".block_totara_tasks" "css_element"
     And I click on "Attendees" "link" in the "#detailtask2" "css_element"
     Then I should see "No pending approvals"
 
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I click on "#detailtask2-dialog" "css_element" in the ".block_totara_tasks" "css_element"
     And I click on "Accept" "button" in the "detailtask2" "totaradialogue"
     And I click on "#detailtask4-dialog" "css_element" in the ".block_totara_tasks" "css_element"

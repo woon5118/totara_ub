@@ -51,7 +51,7 @@ Feature: The Certification Completion report displays correctly for a learner.
 
   Scenario: A users certification red-amber-green status is correct
     Given I log in as "user001"
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     Then I should see "Test Certification" in the "Current Learning" "block"
     When I follow "Test Certification"
     Then I should see "Certify Course"
@@ -103,7 +103,7 @@ Feature: The Certification Completion report displays correctly for a learner.
     #
     When I wind back certification dates by 5 months
     And I run the "\totara_certification\task\update_certification_task" task
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then I should see "Test Certification" in the "Current Learning" "block"
     And I follow "Test Certification"
     Then I should not see "Certify Course"

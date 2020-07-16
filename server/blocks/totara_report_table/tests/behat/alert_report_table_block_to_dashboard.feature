@@ -91,7 +91,7 @@ Feature: Only Alerts Report table block on dashboard
 
   Scenario: Add only the Alerts report table block to the dashboard
     When I log in as "student1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     When I press "Customise this page"
     And I add the "Report table" block
     And I configure the "Report table" block
@@ -109,7 +109,7 @@ Feature: Only Alerts Report table block on dashboard
 
     # Check that other users don't see your messages
     When I log in as "student2"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     When I press "Customise this page"
     And I add the "Report table" block
     And I configure the "Report table" block

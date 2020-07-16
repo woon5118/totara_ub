@@ -107,7 +107,7 @@ Feature: View and navigate stages in appraisals
   Scenario: Users see View button only when they can participate in an appraisal stage
     # Learner can't see stage 1.
     When I log in as "learner1"
-    And I click on "Latest Appraisal" in the totara menu
+    And I am on "Latest Appraisal" page
     Then I should see "Job assignment linked to this appraisal"
     And I should see "Learner1 Day Job (Position One)"
     And "//div[contains(@class,'appraisal-stage-inprogress') and .//h3[contains(.,'Behat Appraisal stage 1')]]" "xpath_element" should exist
@@ -119,7 +119,7 @@ Feature: View and navigate stages in appraisals
 
     # Manager can see and complete stage 1.
     When I log in as "manager1"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Appraisal view test" "link"
     Then "//div[contains(@class,'appraisal-stage-inprogress') and .//h3[contains(.,'Behat Appraisal stage 1')]]" "xpath_element" should exist
     And "//div[contains(@class,'appraisal-stage-locked') and .//h3[contains(.,'Behat Appraisal stage 2')]]" "xpath_element" should exist
@@ -150,7 +150,7 @@ Feature: View and navigate stages in appraisals
 
     # Learner can see and complete stage 2.
     When I log in as "learner1"
-    And I click on "Latest Appraisal" in the totara menu
+    And I am on "Latest Appraisal" page
     Then "//div[contains(@class,'appraisal-stage-completed') and .//h3[contains(.,'Behat Appraisal stage 1')]]" "xpath_element" should exist
     And "//div[contains(@class,'appraisal-stage-inprogress') and .//h3[contains(.,'Behat Appraisal stage 2')]]" "xpath_element" should exist
     And "//div[contains(@class,'appraisal-stage-locked') and .//h3[contains(.,'Behat Appraisal stage 3')]]" "xpath_element" should exist
@@ -172,7 +172,7 @@ Feature: View and navigate stages in appraisals
 
     # Manager can see and complete stage 3 and see the appraisal is complete.
     When I log in as "manager1"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Appraisal view test" "link"
     Then "//div[contains(@class,'appraisal-stage-completed') and .//h3[contains(.,'Behat Appraisal stage 1')]]" "xpath_element" should exist
     And "//div[contains(@class,'appraisal-stage-completed') and .//h3[contains(.,'Behat Appraisal stage 2')]]" "xpath_element" should exist
@@ -194,7 +194,7 @@ Feature: View and navigate stages in appraisals
 
     # Learner can see the appraisal is complete.
     When I log in as "learner1"
-    And I click on "Latest Appraisal" in the totara menu
+    And I am on "Latest Appraisal" page
     Then I should see "This appraisal was completed on"
     And "//div[contains(@class,'appraisal-stage-completed') and .//h3[contains(.,'Behat Appraisal stage 1')]]" "xpath_element" should exist
     And "//div[contains(@class,'appraisal-stage-completed') and .//h3[contains(.,'Behat Appraisal stage 2')]]" "xpath_element" should exist

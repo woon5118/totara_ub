@@ -64,7 +64,7 @@ Feature: Test competencies achieved is updated
     And I click on "An Unexpected Journey" "link"
     And I choose "Join the Dwarves" from "Help to Gandalf the Grey" choice activity
     And I should see "Your selection: Join the Dwarves"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "Record of Learning" in the totara menu
     And I should see "Complete"
     And I log out
@@ -72,5 +72,5 @@ Feature: Test competencies achieved is updated
     And I run the "\totara_hierarchy\task\update_competencies_task" task
     And I log out
     And I log in as "gandalf"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I should see "1" in the "td.statistics_competenciesachieved" "css_element"

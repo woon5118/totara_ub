@@ -39,8 +39,7 @@ class home extends item {
         if (advanced_feature::is_enabled('totaradashboard') && $homepage == HOMEPAGE_TOTARA_DASHBOARD) {
             return '/totara/dashboard/index.php';
         } else if (get_config('core', 'catalogtype') == 'totara' &&
-            $homepage == HOMEPAGE_TOTARA_GRID_CATALOG &&
-            $PAGE->url->get_path() != '/totara/catalog/index.php') {
+            $homepage == HOMEPAGE_TOTARA_GRID_CATALOG) {
             return '/totara/catalog/index.php';
         } else {
             return '/index.php?redirect=0';

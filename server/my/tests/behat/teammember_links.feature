@@ -18,7 +18,7 @@ Feature: Show only links to member information the manager has permission to see
 
   Scenario: All links are shown with default permissions
     Given I log in as "manager1"
-    When I click on "Team" in the totara menu
+    When I am on "Team" page
     Then "User 1" "link" should exist in the "team_members" "table"
     And I should see the "Picture of User 1" image in the "User 1" "table_row"
     And "Plans" "link" should exist in the "User 1" "table_row"
@@ -37,7 +37,7 @@ Feature: Show only links to member information the manager has permission to see
     And I press "Save changes"
     And I log out
     When I log in as "manager1"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     Then "User 1" "link" should exist in the "team_members" "table"
     And "Plans" "link" should not exist in the "User 1" "table_row"
 
@@ -53,7 +53,7 @@ Feature: Show only links to member information the manager has permission to see
       | totara/plan:accessplan           | Prohibit   | staffmanager    | System       |           |
     And I log out
     When I log in as "manager1"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     Then "User 1" "link" should exist in the "team_members" "table"
     And "Plans" "link" should not exist in the "User 1" "table_row"
 
@@ -64,13 +64,13 @@ Feature: Show only links to member information the manager has permission to see
     And I press "Save changes"
     And I log out
     When I log in as "manager1"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     Then "User 1" "link" should exist in the "team_members" "table"
     And "Appraisals" "link" should not exist in the "User 1" "table_row"
 
   Scenario: Appraisals link is not available to temporary managers. Other links are
     Given I log in as "user2"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     Then "User 1" "link" should exist in the "team_members" "table"
     And "Appraisals" "link" should not exist in the "User 1" "table_row"
     And I should see the "Picture of User 1" image in the "User 1" "table_row"
@@ -89,7 +89,7 @@ Feature: Show only links to member information the manager has permission to see
     And I press "Save changes"
     And I log out
     When I log in as "manager1"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     Then "User 1" "link" should exist in the "team_members" "table"
     And "360° Feedback" "link" should not exist in the "User 1" "table_row"
 
@@ -101,7 +101,7 @@ Feature: Show only links to member information the manager has permission to see
       | totara/feedback360:viewstaffrequestedfeedback360  | Prohibit   | staffmanager  | User         | user1     |
     And I log out
     When I log in as "manager1"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     Then "User 1" "link" should exist in the "team_members" "table"
     And "360° Feedback" "link" should not exist in the "User 1" "table_row"
 
@@ -112,7 +112,7 @@ Feature: Show only links to member information the manager has permission to see
     And I press "Save changes"
     And I log out
     When I log in as "manager1"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     Then "User 1" "link" should exist in the "team_members" "table"
     And "Goals" "link" should not exist in the "User 1" "table_row"
 
@@ -124,7 +124,7 @@ Feature: Show only links to member information the manager has permission to see
       | totara/hierarchy:viewstaffpersonalgoal  | Prohibit   | staffmanager  | User         | user1     |
     And I log out
     When I log in as "manager1"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     Then "User 1" "link" should exist in the "team_members" "table"
     And "Goals" "link" should not exist in the "User 1" "table_row"
 
@@ -136,7 +136,7 @@ Feature: Show only links to member information the manager has permission to see
     And I press "Save changes"
     And I log out
     When I log in as "manager1"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     Then "User 1" "link" should exist in the "team_members" "table"
     And "Required" "link" should not exist in the "User 1" "table_row"
 
@@ -151,6 +151,6 @@ Feature: Show only links to member information the manager has permission to see
       | totara/program:viewprogram        | Prohibit   | staffmanager  | System       |           |
     And I log out
     When I log in as "manager1"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     Then "User 1" "link" should exist in the "team_members" "table"
     And "Required" "link" should not exist in the "User 1" "table_row"

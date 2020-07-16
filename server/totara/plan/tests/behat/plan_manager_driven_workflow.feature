@@ -42,7 +42,7 @@ Feature: Test plan manager driven workflow settings
 
   Scenario: Learner to request content added to a manager driven plan
     Given I log in as "manager2"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on the link "Plans" in row 1
     And I press "Create new learning plan"
     And I set the field "Plan template" to "template 1"
@@ -56,7 +56,7 @@ Feature: Test plan manager driven workflow settings
 
     # Check permissions for manager
     Then I log in as "manager2"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "Plans" "link"
     And I should see "You are viewing firstname1 lastname1's plans."
     And I click on "Learner1 plan" "link"
@@ -74,7 +74,7 @@ Feature: Test plan manager driven workflow settings
 
     # Check permissions for learner in each component type
     Then I log in as "learner1"
-    Then I click on "Dashboard" in the totara menu
+    Then I am on "Dashboard" page
     And I click on "Learning Plans" "link"
     And I click on "Learner1 plan" "link"
     Then I should see "Learner1 plan"

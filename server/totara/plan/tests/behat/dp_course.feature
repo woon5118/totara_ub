@@ -25,7 +25,7 @@ Feature: Check the 'Record of Learning: Courses' report displays content correct
     Given I log in as "user001"
 
     # Add course to plan 1.
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I click on "Learning Plans" "link"
     And I click on "Learning Plan 1" "link"
     And I click on "Courses" "link" in the "#dp-plan-content" "css_element"
@@ -38,7 +38,7 @@ Feature: Check the 'Record of Learning: Courses' report displays content correct
     Then I should see "Approval request sent for plan \"Learning Plan 1\""
 
     # Add same course to plan 2.
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I click on "Learning Plans" "link"
     And I click on "Learning Plan 2" "link"
     And I click on "Courses" "link" in the "#dp-plan-content" "css_element"
@@ -53,12 +53,12 @@ Feature: Check the 'Record of Learning: Courses' report displays content correct
 
     # Login as the manager and approve both plans.
     When I log in as "mana003"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "Plans" "link" in the "1" "table_row"
     And I follow "Learning Plan 1"
     And I press "Approve"
     Then I should see "Plan \"Learning Plan 1\" has been approved by fn_003 ln_003"
-    When I click on "Team" in the totara menu
+    When I am on "Team" page
     And I click on "Plans" "link" in the "1" "table_row"
     And I follow "Learning Plan 2"
     And I press "Approve"

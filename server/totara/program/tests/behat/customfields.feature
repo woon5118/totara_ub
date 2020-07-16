@@ -8,7 +8,7 @@ Feature: Program and certification customfields can be created and populated
   Scenario: I can create and fill in program custom fields
     Given I log in as "admin"
     # Add images to the private files block to use later
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I press "Customise this page"
     And I add the "Private files" block
     And I follow "Manage private files..."

@@ -62,7 +62,7 @@ Feature: Program courses can be ordered within a courseset
     And I log out
     # Ensure the courses display correctly for the learner.
     When I log in as "user001"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I should see "Test Program 1" in the "Current Learning" "block"
     And I toggle "Test Program 1" in the current learning block
     Then "Test Course 2" "text" should appear before "Test Course 1" "text"

@@ -166,7 +166,7 @@ Feature: Check attendees actions are performed by users with the right permissio
     And I log out
 
     When I log in as "manager1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "View all tasks" "link"
     And I should see "This is to advise that Sam1 Student1 has requested to be booked into the following course" in the "td.message_values_statement" "css_element"
     And I click on "Attendees" "link"

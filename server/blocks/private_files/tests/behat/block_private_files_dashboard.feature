@@ -9,7 +9,7 @@ Feature: The private files block allows users to store files privately in totara
       | username | firstname | lastname | email |
       | teacher1 | Teacher | 1 | teacher1@example.com |
     And I log in as "teacher1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I press "Customise this page"
     And I add the "Private files" block
     And "Private files" "block" should exist

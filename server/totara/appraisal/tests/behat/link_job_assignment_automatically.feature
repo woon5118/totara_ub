@@ -62,7 +62,7 @@ Feature: Automatically link an appraisee's job assignment on appraisal activatio
 
     # Verify that manager can see.
     When I log in as "manager"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I follow "As Manager"
     Then I should see "learner1 lastname"
     # No auto-linking of job assignment for learner2 because he was set up with 2 job assignments.
@@ -91,7 +91,7 @@ Feature: Automatically link an appraisee's job assignment on appraisal activatio
 
     # Verify again that manager can see the appraisal in his tab.
     And I log in as "manager"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I follow "As Manager"
     Then I should see "learner3 lastname"
     And I click on "Appraisal1" "link" in the "learner3 lastname" "table_row"

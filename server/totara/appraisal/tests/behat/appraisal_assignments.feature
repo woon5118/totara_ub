@@ -185,7 +185,7 @@ Feature: Test reported learners in appraisal assignments
     # Learner Two completes the appraisal
     When I log out
     And I log in as "learner2"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Appraisal1" "table_row"
     And I press "Start"
     And I click on "Complete stage" "button"
@@ -293,7 +293,7 @@ Feature: Test reported learners in appraisal assignments
     # Learner Two completes the appraisal
     When I log out
     And I log in as "learner2"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Appraisal1" "table_row"
     And I press "Start"
     And I click on "Complete stage" "button"
@@ -358,7 +358,7 @@ Feature: Test reported learners in appraisal assignments
     # Learner One and Two completes the appraisal
     When I log out
     And I log in as "learner1"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Appraisal1" "table_row"
     And I press "Start"
     And I click on "Complete stage" "button"
@@ -366,7 +366,7 @@ Feature: Test reported learners in appraisal assignments
     And I log out
 
     And I log in as "learner2"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Appraisal1" "table_row"
     And I press "Start"
     And I click on "Complete stage" "button"
@@ -666,7 +666,7 @@ Feature: Test reported learners in appraisal assignments
     # Learner One and Two completes the appraisal
     When I log out
     And I log in as "learner1"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Appraisal1" "table_row"
     And I press "Start"
     And I click on "Complete stage" "button"
@@ -674,7 +674,7 @@ Feature: Test reported learners in appraisal assignments
     And I log out
 
     And I log in as "learner2"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Appraisal1" "table_row"
     And I press "Start"
     And I click on "Complete stage" "button"
@@ -847,7 +847,7 @@ Feature: Test reported learners in appraisal assignments
     # Learner One and Two completes the appraisal
     When I log out
     And I log in as "learner1"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Appraisal1" "table_row"
     And I press "Start"
     And I click on "Complete stage" "button"
@@ -855,7 +855,7 @@ Feature: Test reported learners in appraisal assignments
     And I log out
 
     And I log in as "learner2"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Appraisal1" "table_row"
     And I press "Start"
     And I click on "Complete stage" "button"

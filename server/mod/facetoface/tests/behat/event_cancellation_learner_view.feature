@@ -112,7 +112,7 @@ Feature: Seminar event cancellation learner views
 
     When I log out
     And I log in as "learner1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "Bookings" "link"
     Then I should see "Course 1" in the "Test Seminar" "table_row"
     And I should see date "10 Feb next year" formatted "%d %B %Y" in the "Test Seminar" "table_row"
@@ -142,7 +142,7 @@ Feature: Seminar event cancellation learner views
     And I log out
 
     And I log in as "learner1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "Bookings" "link"
     And I click on "Past Bookings" "link"
     Then I should see "Course 1" in the "Test Seminar" "table_row"
@@ -172,7 +172,7 @@ Feature: Seminar event cancellation learner views
 
     When I log out
     And I log in as "learner1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "Bookings" "link"
 
     # --------------------------------------------------------------------------

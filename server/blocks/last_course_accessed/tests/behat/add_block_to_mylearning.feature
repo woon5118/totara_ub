@@ -11,7 +11,7 @@ Feature: User can add and remove LCA block to / from default Dashboard.
     Given I log in as "admin"
 
     # Add the block and check it's removed from the available blocks list.
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I press "Customise this page"
     And I should see "Last Course Accessed" in the "Last Course Accessed" "block"
 
@@ -30,7 +30,7 @@ Feature: User can add and remove LCA block to / from default Dashboard.
     Given I log in as "learner1"
 
     # Add the block and check it's removed from the available blocks list.
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I press "Customise this page"
     And I should see "Last Course Accessed" in the "Last Course Accessed" "block"
 

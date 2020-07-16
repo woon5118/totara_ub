@@ -60,7 +60,7 @@ Feature: Complete review questions in appraisals
 
     # As the manager, access the learners plans.
     When I log in as "manager1"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "Plans" "link" in the "Learner One" "table_row"
 
     # Access the learners plans and verify it hasn't been approved.
@@ -134,7 +134,7 @@ Feature: Complete review questions in appraisals
     Then I should see "Appraisal review questions test activated"
     When I log out
     And I log in as "learner1"
-    And I click on "Goals" in the totara menu
+    And I am on "Goals" page
     And I press "Add company goal"
     And I click on "Company Goal One" "link" in the "Assign goals" "totaradialogue"
     And I click on "Company Goal Two" "link" in the "Assign goals" "totaradialogue"
@@ -142,7 +142,7 @@ Feature: Complete review questions in appraisals
     And I wait "1" seconds
 
   Scenario: Both learner and manager can complete an appraisal review question
-    Given I click on "Latest Appraisal" in the totara menu
+    Given I am on "Latest Appraisal" page
     And I press "Start"
     And I press "Choose goals to review"
     And I click on "Company Goal One" "link" in the "Choose goals to review" "totaradialogue"
@@ -168,7 +168,7 @@ Feature: Complete review questions in appraisals
     When I log out
 
     And I log in as "manager1"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Appraisal review questions test" "link"
     And I press "Start"
 

@@ -25,7 +25,7 @@ Feature: See that competency proficiency can be updated in Record of Learning: C
 
     # Login as the learner and navigate to the learning plan.
     Given I log in as "learner1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "Learning Plans" "link"
     And I click on "learner1 Learning Plan" "link"
 

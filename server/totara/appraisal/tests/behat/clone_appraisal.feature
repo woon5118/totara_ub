@@ -53,14 +53,14 @@ Feature: Clone appraisals
   Scenario: Check learner and manager can complete the cloned appraisal without errors.
     #    Complete Stage 1
     Given I log in as "learner1"
-    And I click on "Latest Appraisal" in the totara menu
+    And I am on "Latest Appraisal" page
     And I press "Start"
     And I set the field "Your answer" to "Learner answer"
     And I press "Complete stage"
     And I log out
 
     And I log in as "manager1"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Cloned Appraisal Test" "link"
     And I press "Start"
     And I set the field "Your answer" to "Manager answer"
@@ -69,14 +69,14 @@ Feature: Clone appraisals
 
     #    Complete Stage 2
     And I log in as "learner1"
-    And I click on "Latest Appraisal" in the totara menu
+    And I am on "Latest Appraisal" page
     And I press "Start"
     And I click on "choice3" "radio"
     And I press "Complete stage"
     And I log out
 
     And I log in as "manager1"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Cloned Appraisal Test" "link"
     And I press "Start"
     And I click on "choice4" "radio"
@@ -85,14 +85,14 @@ Feature: Clone appraisals
 
      #    Complete Stage 3
     When I log in as "learner1"
-    And I click on "Latest Appraisal" in the totara menu
+    And I am on "Latest Appraisal" page
     And I press "Start"
     Then I should see "Average score"
     And I press "Complete stage"
     And I log out
 
     When I log in as "manager1"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Cloned Appraisal Test" "link"
     And I press "Start"
     Then I should see "Average score"

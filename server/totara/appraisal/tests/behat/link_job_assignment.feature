@@ -65,7 +65,7 @@ Feature: Link appraisal with an appraisee job assignment.
 
   Scenario: link job assignment when first viewing appraisal
     When I log in as "bond007"
-    And I click on "Latest Appraisal" in the totara menu
+    And I am on "Latest Appraisal" page
     Then I should see "Unnamed job assignment"
     And I should see "Learner: James Bond"
     And I should see "Manager: Role currently empty"
@@ -74,7 +74,7 @@ Feature: Link appraisal with an appraisee job assignment.
 
     When I log out
     And I log in as "moneypenny"
-    And I click on "Latest Appraisal" in the totara menu
+    And I am on "Latest Appraisal" page
     Then I should see "Comely Secretary"
     And I should see "Learner: Eve Moneypenny"
     And I should see "Manager: Judi Dench"
@@ -83,7 +83,7 @@ Feature: Link appraisal with an appraisee job assignment.
 
     When I log out
     And I log in as "oddjob"
-    And I click on "Latest Appraisal" in the totara menu
+    And I am on "Latest Appraisal" page
     Then I should see "Select a job assignment to link to this appraisal"
     And I should see "Nondescript Butler"
     And I should see "Lethal Henchman in a Bowler Hat"
@@ -104,7 +104,7 @@ Feature: Link appraisal with an appraisee job assignment.
 
   Scenario: changed job assignment details
     When I log in as "bond007"
-    And I click on "Latest Appraisal" in the totara menu
+    And I am on "Latest Appraisal" page
     Then I should see "Unnamed job assignment"
     And I should see "Learner: James Bond"
     And I should see "Manager: Role currently empty"
@@ -142,7 +142,7 @@ Feature: Link appraisal with an appraisee job assignment.
     And I log out
     And I log in as "bond007"
 
-    When I click on "Latest Appraisal" in the totara menu
+    When I am on "Latest Appraisal" page
     Then I should see "Supposed Salesman, Universal Exports"
     And I should not see "Spy, 007 Branch"
     And I should see "Learner: James Bond"
@@ -152,7 +152,7 @@ Feature: Link appraisal with an appraisee job assignment.
 
   Scenario: deleted job assignment details
     When I log in as "bond007"
-    And I click on "Latest Appraisal" in the totara menu
+    And I am on "Latest Appraisal" page
     Then I should see "Unnamed job assignment"
     And I should see "Learner: James Bond"
     And I should see "Manager: Role currently empty"
@@ -195,7 +195,7 @@ Feature: Link appraisal with an appraisee job assignment.
     And I log out
     And I log in as "bond007"
 
-    When I click on "Latest Appraisal" in the totara menu
+    When I am on "Latest Appraisal" page
     Then I should see "Select a job assignment to link to this appraisal"
     And I should see "Supposed Salesman, Universal Exports"
     And I should see "Spy, 007 Branch"
@@ -206,7 +206,7 @@ Feature: Link appraisal with an appraisee job assignment.
 
   Scenario: replaced job assignment details
     When I log in as "bond007"
-    And I click on "Latest Appraisal" in the totara menu
+    And I am on "Latest Appraisal" page
     Then I should see "Unnamed job assignment"
     And I should see "Learner: James Bond"
     And I should see "Manager: Role currently empty"
@@ -241,7 +241,7 @@ Feature: Link appraisal with an appraisee job assignment.
     And I log out
     And I log in as "bond007"
 
-    When I click on "Latest Appraisal" in the totara menu
+    When I am on "Latest Appraisal" page
     Then I should see "Supposed Salesman, Universal Exports"
     And I should not see "Unnamed job assignment (ID: 1)"
     And I should see "Learner: James Bond"

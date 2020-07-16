@@ -21,13 +21,3 @@ Feature: Test Latest Appraisal menu item
     When I navigate to "Main menu" node in "Site administration > Navigation"
     Then I should see "Latest Appraisal" in the "#totaramenutable" "css_element"
     And I should not see "Latest Appraisal" in the totara menu
-
-  Scenario: Make sure Latest Appraisal is not in totara menu if feature disabled
-    Given I am on a totara site
-    And I log in as "admin"
-    When I navigate to "Advanced features" node in "Site administration > System information"
-    And I set the field "Enable Appraisals" to "Disable"
-    And I press "Save changes"
-    And I navigate to "Main menu" node in "Site administration > Navigation"
-    Then I should see "Latest Appraisal" in the "#totaramenutable" "css_element"
-    And I should see "Feature disabled" in the "Latest Appraisal" "table_row"

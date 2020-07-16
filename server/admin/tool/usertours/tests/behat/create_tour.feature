@@ -25,7 +25,7 @@ Feature: Add a new user tour
     And I add steps to the "First tour" tour:
       | targettype                  | targetvalue_selector | Title             | Content |
       | Selector                    | .usermenu            | User menu         | This is your personal user menu. You'll find your personal preferences and your user profile here. |
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     Then I should see "Welcome to your personal learning space. We'd like to give you a quick tour to show you some of the areas you may find helpful"
     And I press "Next"
     And I should see "This area shows you what's happening in your courses"
@@ -38,7 +38,7 @@ Feature: Add a new user tour
     And I should see "This area shows you what's happening in your courses"
     And I press "End tour"
     And I should not see "This area shows you what's happening in your courses"
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I should not see "Welcome to your personal learning space. We'd like to give you a quick tour to show you some of the areas you may find helpful"
     And I should not see "This area shows you what's happening in your courses"
     And I follow "Reset user tour on this page"
@@ -59,7 +59,7 @@ Feature: Add a new user tour
     And I add steps to the "First tour" tour:
       | targettype                  | targetvalue_selector | Title             | Content |
       | Selector                    | #totaramenuitem8 | Going Home     | This is the home button. It will return you to your homepage. |
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     Then I should see "This is the home button. It will return you to your homepage."
 
   @javascript
@@ -76,7 +76,7 @@ Feature: Add a new user tour
     And I add steps to the "First tour" tour:
       | targettype                  | Title             | Content |
       | Display in middle of page   | Welcome           | Welcome to your personal learning space. We'd like to give you a quick tour to show you some of the areas you may find helpful |
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     Then I should not see "Welcome to your personal learning space. We'd like to give you a quick tour to show you some of the areas you may find helpful"
 
   @javascript
@@ -95,5 +95,5 @@ Feature: Add a new user tour
       | Display in middle of page   | Welcome           | Welcome to your personal learning space. We'd like to give you a quick tour to show you some of the areas you may find helpful |
     And I open the User tour settings page
     When I click on "Enable" "link" in the "My first tour" "table_row"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then I should see "Welcome to your personal learning space. We'd like to give you a quick tour to show you some of the areas you may find helpful"

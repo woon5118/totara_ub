@@ -1,4 +1,4 @@
-@totara @totara_hierarchy @totara_hierarchy_goal @javascript
+@totara @totara_hierarchy @totara_hierarchy_goals @javascript
 Feature: Verify own and team goals pages can be accessed
 
   # job1:
@@ -23,25 +23,25 @@ Feature: Verify own and team goals pages can be accessed
   Scenario: Verify that own goals page can be accessed for a user who has a manager and is a manager in the same job assignment
 
     Given I log in as "user1"
-    And I click on "Goals" in the totara menu
+    And I am on "Goals" page
     Then I should see "Personal Goals"
 
   Scenario: Verify that own goals page can be accessed for a user is just a manager in one job assignment
 
     Given I log in as "user3"
-    And I click on "Goals" in the totara menu
+    And I am on "Goals" page
     Then I should see "Personal Goals"
 
   Scenario: Verify that own goals page can be accessed for a user is a manager in one job assignment and team member in another
 
     Given I log in as "user2"
-    And I click on "Goals" in the totara menu
+    And I am on "Goals" page
     Then I should see "Personal Goals"
 
   Scenario: Verify that team members goals page can be accessed for a user who has a manager and is a manager in the same job assignment
 
     Given I log in as "user1"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     Then I should see "User2 User2"
     When I click on "Goals" "link" in the "User2 User2" "table_row"
     Then I should see "User2 User2's Goals"
@@ -49,7 +49,7 @@ Feature: Verify own and team goals pages can be accessed
   Scenario: Verify that team members goals page can be accessed for a user who is a manager in the one job assignment
 
     Given I log in as "user3"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     Then I should see "User1 User1"
     When I click on "Goals" "link" in the "User1 User1" "table_row"
     Then I should see "User1 User1's Goals"
@@ -57,7 +57,7 @@ Feature: Verify own and team goals pages can be accessed
   Scenario: Verify that team members goals page can be accessed for a user who is a manager in one job assignment and team member in another
 
     Given I log in as "user2"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     Then I should see "User1 User1"
     When I click on "Goals" "link" in the "User1 User1" "table_row"
     Then I should see "User1 User1's Goals"
@@ -65,7 +65,7 @@ Feature: Verify own and team goals pages can be accessed
   Scenario: Verify that team members goals page can be accessed for a user who is a temporary manager
 
     Given I log in as "user4"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     Then I should see "User2 User2"
     When I click on "Goals" "link" in the "User2 User2" "table_row"
     Then I should see "User2 User2's Goals"

@@ -41,7 +41,7 @@ Feature: Verify competency course count within learning plan
 
    # Learner adding plan
     Given I log in as "learner1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "Learning Plans" "link"
     And I click on "Create new learning plan" "button"
     And I click on "Create plan" "button"
@@ -62,7 +62,7 @@ Feature: Verify competency course count within learning plan
     Then I should see "Course 1"
     Then I should see "Course 2"
     Then I should see "Course 3"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "Learning Plans" "link"
     Then I should see "Courses (3)"
     Then I log out
@@ -77,7 +77,7 @@ Feature: Verify competency course count within learning plan
 
     # leaner check plan does not display the hidden course
     Given I log in as "learner1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "Learning Plans" "link"
     Then I should see "Courses (2)"
     And I follow "Courses (2)"
@@ -87,7 +87,7 @@ Feature: Verify competency course count within learning plan
     And I should see "2" in the "//table/tbody/tr/td[3]" "xpath_element"
 
     # leaner add a new plan and check hidden courses are not available
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "Learning Plans" "link"
     And I click on "Create new learning plan" "button"
     And I set the field "name" to "Learning Plan 2"
@@ -109,6 +109,6 @@ Feature: Verify competency course count within learning plan
     Then I should see "Course 1"
     Then I should not see "Course 2"
     Then I should see "Course 3"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "Learning Plans" "link"
     Then I should see "Courses (2)" in the "Learning Plan 2" "table_row"

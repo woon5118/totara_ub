@@ -67,7 +67,7 @@ Feature: Test appraisal objective selection
 
     # Log in as the manager approve the plan and mark the plan as complete.
     And I log in as "manager"
-    And I follow "Team"
+    And I am on "Team" page
     And I follow "Plans"
     And I click on "Create new learning plan" "button"
     And I click on "Create plan" "button"
@@ -92,8 +92,7 @@ Feature: Test appraisal objective selection
 
     # Log in as the learner and go to latest appraisal.
     And I log in as "learner"
-    And I follow "Performance"
-    And I follow "Latest Appraisal"
+    And I am on "Latest Appraisal" page
     # Click Choose objectives to review.
     And I click on "Start" "button"
     And I click on "Choose objectives to review" "button"

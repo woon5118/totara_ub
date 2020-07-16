@@ -13,7 +13,7 @@ Feature: The online users block allow you to see who is currently online on dash
 
   Scenario: View the online users block on the dashboard and see myself
     Given I log in as "teacher1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I press "Customise this page"
     And I add the "Online users" block
     Then I should see "Teacher 1" in the "Online users" "block"
@@ -24,7 +24,7 @@ Feature: The online users block allow you to see who is currently online on dash
     And I log in as "student1"
     And I log out
     When  I log in as "teacher1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I press "Customise this page"
     And I add the "Online users" block
     Then I should see "Teacher 1" in the "Online users" "block"

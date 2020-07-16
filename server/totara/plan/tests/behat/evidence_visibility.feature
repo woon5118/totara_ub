@@ -34,7 +34,7 @@ Feature: Check Evidence visibility in Record of Learning feature visibility
 
     When I am on a totara site
     And I log in as "user"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "Learning Plans" "link"
     And I click on "TestPlan" "link" in the "#dp-plans-list-unapproved-plans" "css_element"
 
@@ -73,7 +73,7 @@ Feature: Check Evidence visibility in Record of Learning feature visibility
     And I log out
 
     When I log in as "user"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "Learning Plans" "link"
     And I click on "TestPlan" "link" in the "#dp-plans-list-unapproved-plans" "css_element"
 

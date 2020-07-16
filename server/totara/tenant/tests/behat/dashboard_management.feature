@@ -13,7 +13,7 @@ Feature: Tenant dashboard management
       | First Tenant  | ten1     | First T Dashboard  |
       | Second Tenant | ten2     | Second T Dashboard |
     And I log in as "admin"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I press "Manage dashboards"
 
     When I press "Create dashboard"
@@ -31,7 +31,7 @@ Feature: Tenant dashboard management
       | First Tenant  | ten1     | First T Dashboard  |
       | Second Tenant | ten2     | Second T Dashboard |
     And I log in as "admin"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I press "Manage dashboards"
 
     When I click on "Clone dashboard" "link" in the "First T Dashboard" "table_row"

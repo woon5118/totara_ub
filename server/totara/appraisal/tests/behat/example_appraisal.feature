@@ -39,7 +39,7 @@ Feature: Complete the example appraisal
       | user     | name                      |
       | learner1 | Learner One Learning Plan |
     And I log in as "learner1"
-    And I click on "Goals" in the totara menu
+    And I am on "Goals" page
     And I press "Add company goal"
     And I click on "Company Goal One" "link" in the "Assign goals" "totaradialogue"
     And I click on "Company Goal Two" "link" in the "Assign goals" "totaradialogue"
@@ -54,7 +54,7 @@ Feature: Complete the example appraisal
     And I set the following fields to these values:
       | Name | Personal Goal Two |
     And I press "Save changes"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "Learning Plans" "link"
     And I click on "Learner One Learning Plan" "link"
     And I switch to "Competencies" tab
@@ -67,7 +67,7 @@ Feature: Complete the example appraisal
     And I press "Send approval request"
     And I log out
     And I log in as "manager1"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "Plans" "link" in the "Learner One" "table_row"
     And I click on "Approve" "link" in the "Learner One Learning Plan" "table_row"
     And I log out
@@ -90,7 +90,7 @@ Feature: Complete the example appraisal
     Then I should see "Appraisal Example appraisal activated"
     When I log out
     And I log in as "learner1"
-    And I click on "Latest Appraisal" in the totara menu
+    And I am on "Latest Appraisal" page
     Then I should see "Example appraisal"
     And I should see "Learner1 Day Job"
     When I press "Start"
@@ -163,7 +163,7 @@ Feature: Complete the example appraisal
     Then I should see "You have completed this stage"
     When I log out
     And I log in as "manager1"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     Then I should see "Active" in the "Learner One" "table_row"
     When I click on "Example appraisal" "link"
     Then I should see "You are viewing Learner One's appraisal."
@@ -233,7 +233,7 @@ Feature: Complete the example appraisal
     Then I should see "You have completed this stage"
     When I log out
     And I log in as "learner1"
-    And I click on "Latest Appraisal" in the totara menu
+    And I am on "Latest Appraisal" page
     And I press "Start"
     Then I should see "Mid-Year Review"
     And I should see "Company Goal One"
@@ -307,7 +307,7 @@ Feature: Complete the example appraisal
     And I click on "Complete stage" "button" in the "#fitem_id_submitbutton" "css_element"
     And I log out
     And I log in as "manager1"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Example appraisal" "link"
     And I press "Start"
     Then I should see "Company Goal One"
@@ -327,7 +327,7 @@ Feature: Complete the example appraisal
       | Your answer | Manager One overall comments (end-of-year) |
     And I click on "Complete stage" "button" in the "#fitem_id_submitbutton" "css_element"
     Then I should see "You have completed this stage"
-    When I click on "All Appraisals" in the totara menu
+    When I am on "All Appraisals" page
     Then I should see "Completed" in the "Learner One" "table_row"
     When I click on "Example appraisal" "link"
     Then I should see "This appraisal was completed on"

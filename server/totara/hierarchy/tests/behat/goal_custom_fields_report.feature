@@ -18,7 +18,7 @@ Feature: Verify I can see all appropriate fields in the goal custom fields repor
 
     # Add a couple of goals to the admin user.
     And I log in as "admin"
-    And I click on "Goals" in the totara menu
+    And I am on "Goals" page
 
     # Add a company goal.
     And I press "Add company goal"
@@ -72,7 +72,7 @@ Feature: Verify I can see all appropriate fields in the goal custom fields repor
       | framework | fullname       | idnumber | targetdate |
       | CGF2      | Company Goal 2 | CG2      | 05/08/2017 |
     And I log in as "learner1"
-    And I click on "Goals" in the totara menu
+    And I am on "Goals" page
     And I press "Add company goal"
     And I follow "Company Goal 1"
     And I click on "Search" "link" in the "Assign goals" "totaradialogue"

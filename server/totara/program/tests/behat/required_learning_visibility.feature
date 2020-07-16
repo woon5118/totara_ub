@@ -180,7 +180,7 @@ Feature: See that program visibility affects Required Learning content correctly
 
   Scenario: Manager can view their reports required programs
     When I log in as "user003"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     Then I should see "fn_001 ln_001"
     And I should not see "fn_002 ln_002"
     And I should see "1 record shown"

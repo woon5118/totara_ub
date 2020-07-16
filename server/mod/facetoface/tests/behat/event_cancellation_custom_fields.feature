@@ -126,7 +126,7 @@ Feature: Seminar event cancellation custom fields
     And I log in as "teacher1"
 
     # Add images to the private files block to use later
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I press "Customise this page"
     And I add the "Private files" block
     And I follow "Manage private files..."
@@ -233,7 +233,7 @@ Feature: Seminar event cancellation custom fields
   # ----------------------------------------------------------------------------
   Scenario: mod_facetoface_cancel_502: use cancellation custom fields in notification template
     And I run all adhoc tasks
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     Then I should see "Seminar event cancellation"
 
     When I click on "View all alerts" "link"

@@ -43,7 +43,7 @@ Feature: Mark course in a program complete via required learning
       | capability                              | permission | role         | contextlevel | reference |
       | totara/program:markstaffcoursecomplete  | Prohibit   | staffmanager | User         | learner1  |
     And I log in as "manager1"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "Learner One" "link"
     And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I switch to "Programs" tab
@@ -55,7 +55,7 @@ Feature: Mark course in a program complete via required learning
   Scenario: By default, Managers can mark a course complete in program page for required learning
     # Staff managers will have the markstaffcomplete permission by default.
     Given I log in as "manager1"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "Learner One" "link"
     And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I switch to "Programs" tab
@@ -82,7 +82,7 @@ Feature: Mark course in a program complete via required learning
       | capability                         | permission | role               | contextlevel | reference |
       | totara/program:markcoursecomplete  | Allow      | coursemarkcomplete | Course       | course1   |
     And I log in as "manager1"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "Learner One" "link"
     And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I switch to "Programs" tab
@@ -113,7 +113,7 @@ Feature: Mark course in a program complete via required learning
       | capability                          | permission | role             | contextlevel | reference |
       | totara/core:markusercoursecomplete  | Allow      | usermarkcomplete | User         | learner1  |
     And I log in as "manager1"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "Learner One" "link"
     And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I switch to "Programs" tab
@@ -126,7 +126,7 @@ Feature: Mark course in a program complete via required learning
     And I click on "Not completed: Course Two. Select to mark as complete." "link"
     And I press "Save changes"
     Then I should see "Course marked as manually completed"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
 
     # The capability was only allowed for Learner One. Let's check Learner Two.
     And I click on "Learner Two" "link"

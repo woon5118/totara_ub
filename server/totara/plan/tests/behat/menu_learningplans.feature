@@ -9,7 +9,7 @@ Feature: Test Learning Plans Main menu item
     And I log in as "admin"
     When I navigate to "Main menu" node in "Site administration > Navigation"
     Then I should see "Learning Plans" in the "#totaramenutable" "css_element"
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I should see "Learning Plans" in the "My Learning" "block"
 
   Scenario: Make sure Learning Plans is available in totara menu but not used

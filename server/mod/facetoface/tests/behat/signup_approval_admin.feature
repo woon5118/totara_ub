@@ -91,7 +91,7 @@ Feature: Seminar Signup Admin Approval
 
     When I log out
     And I log in as "manager"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "View all tasks" "link"
     And I should see "This is to advise that Sally Sal has requested to be booked into the following course" in the "td.message_values_statement" "css_element"
     And I click on "Attendees" "link"
@@ -103,7 +103,7 @@ Feature: Seminar Signup Admin Approval
 
     When I log out
     And I log in as "actapprover"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then I should see "Seminar booking admin request"
     And I click on "View all tasks" "link"
     And I should see "This is to advise that Sally Sal has requested to be booked into the following course" in the "td.message_values_statement" "css_element"
@@ -120,7 +120,7 @@ Feature: Seminar Signup Admin Approval
     And I log out
 
     And I log in as "manager"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then I should see "Seminar booking admin request"
     And I click on "View all tasks" "link"
     And I should see "This is to advise that Jimmy Jim has requested to be booked into the following course" in the "td.message_values_statement" "css_element"
@@ -135,7 +135,7 @@ Feature: Seminar Signup Admin Approval
 
     When I log out
     And I log in as "actapprover"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then I should see "Seminar booking admin request"
     And I click on "View all tasks" "link"
     And I should see "This is to advise that Jimmy Jim has requested to be booked into the following course" in the "td.message_values_statement" "css_element"
@@ -149,7 +149,7 @@ Feature: Seminar Signup Admin Approval
 
     When I log out
     And I log in as "jimmy"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then I should see "Seminar booking confirmation"
 
     When I am on "Classroom Connect Activity" seminar homepage
@@ -173,7 +173,7 @@ Feature: Seminar Signup Admin Approval
 
     When I log out
     And I log in as "manager"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "View all tasks" "link"
     And I should see "This is to advise that Sammy Sam has requested to be booked into the following course" in the "td.message_values_statement" "css_element"
     And I click on "Attendees" "link"
@@ -194,7 +194,7 @@ Feature: Seminar Signup Admin Approval
 
     # Check alert
     And I log in as "actapprover"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "View all" "link"
     And I should see "This is to advise that Sammy Sam has requested to be booked into the following course"
 
@@ -266,7 +266,7 @@ Feature: Seminar Signup Admin Approval
 
     # Check alert
     And I log in as "actapprover"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "View all tasks" "link"
     And I should see "This is to advise that Sammy Sam has requested to be booked into the following course"
 

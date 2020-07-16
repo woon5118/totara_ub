@@ -48,7 +48,7 @@ Feature: Seminar Signup User Approval
     And I log out
 
     And I log in as "student2"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "View all tasks" "link"
     And I should see "This is to advise that Sam1 Student1 has requested to be booked into the following course" in the "td.message_values_statement" "css_element"
     When I click on "Attendees" "link"

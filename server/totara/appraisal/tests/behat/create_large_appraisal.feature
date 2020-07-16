@@ -63,7 +63,7 @@ Feature: Create a large appraisal
 
     When I log out
     And I log in as "learner1"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I should see "Appraisal 1"
     And I click on "Appraisal 1" "link"
     # This step will take some time, and may time out when the web host is under load.
@@ -72,7 +72,7 @@ Feature: Create a large appraisal
     And I wait "9" seconds
     And I should see "A snapshot of your appraisal has been saved."
     And I click on "Cancel" "button" in the "savepdf" "totaradialogue"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I should see "Snapshot"
 
   Scenario: Show MySQL limit warning for large appraisal

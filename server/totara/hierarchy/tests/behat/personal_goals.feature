@@ -1,4 +1,4 @@
-@totara @totara_hierarchy @totara_hierarchy_goal @totara_customfield @javascript
+@totara @totara_hierarchy @totara_hierarchy_goals @totara_customfield @javascript
 Feature: Verify creation and use of personal goal types and custom fields.
 
   Background:
@@ -113,7 +113,7 @@ Feature: Verify creation and use of personal goal types and custom fields.
 
   Scenario: Verify the Show Details button show the details of the personal goal
     When I log in as "learner1"
-    And I click on "Goals" in the totara menu
+    And I am on "Goals" page
     Then I should see "Personal Goals"
 
     # Create a new personal goal
@@ -226,7 +226,7 @@ Feature: Verify creation and use of personal goal types and custom fields.
     # Login as a learner and create a personal goal with the custom fields.
     When I log out
     And I log in as "learner1"
-    And I click on "Goals" in the totara menu
+    And I am on "Goals" page
     Then I should see "Personal Goals"
 
     # Create a new personal goal
@@ -409,7 +409,7 @@ Feature: Verify creation and use of personal goal types and custom fields.
     # Login as a learner and create a personal goal with the custom fields.
     When I log out
     And I log in as "learner1"
-    And I click on "Goals" in the totara menu
+    And I am on "Goals" page
     Then I should see "Personal Goals"
 
     # Create a new personal goal
@@ -424,7 +424,7 @@ Feature: Verify creation and use of personal goal types and custom fields.
     Then I should see "Personal Goal 1" in the ".personal_table" "css_element"
 
     # Login as a learner and start the appraisal.
-    And I click on "Latest Appraisal" in the totara menu
+    And I am on "Latest Appraisal" page
     And I press "Start"
     Then I should see "Incomplete"
 
@@ -460,7 +460,7 @@ Feature: Verify creation and use of personal goal types and custom fields.
 
     # Login as the manager, access the learners appraisal and check the fields are set as they should be.
     When I log in as "manager1"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I follow "Appraisal 1"
     And I press "Start"
     Then I should see "Personal Goal 1"
@@ -590,13 +590,13 @@ Feature: Verify creation and use of personal goal types and custom fields.
     # Login as a learner and create a personal goal with the custom fields.
     When I log out
     And I log in as "learner1"
-    And I click on "Goals" in the totara menu
+    And I am on "Goals" page
     And I press "Add personal goal"
     And I set the following fields to these values:
       | Name | Personal Goal 1      |
       | Type | Personal Goal Type 1 |
     And I press "Save changes"
-    And I click on "Latest Appraisal" in the totara menu
+    And I am on "Latest Appraisal" page
     And I press "Start"
     Then I should see "Incomplete"
     And I should see "Personal Goal 1"
@@ -616,7 +616,7 @@ Feature: Verify creation and use of personal goal types and custom fields.
 
     # Login as the manager, access the learners appraisal and check the fields are set as they should be.
     When I log in as "manager1"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I follow "Appraisal 1"
     And I press "Start"
     Then I should see "Personal Goal 1"

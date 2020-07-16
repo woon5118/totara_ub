@@ -20,7 +20,7 @@ Feature: Verify the LCA block content displays the correct information.
   Scenario: Verify a Site Administrator sees the correct information but does not see progress bar when not enrolled on the course.
     Given I log in as "admin"
 
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I should not see "Last Course Accessed"
 
     # Visit the course
@@ -28,7 +28,7 @@ Feature: Verify the LCA block content displays the correct information.
     Then I should see "C1" in the ".breadcrumb-nav" "css_element"
 
     # Return to My Learning to check the content of the block.
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     Then I should see "Course 1" in the "Last Course Accessed" "block"
     # The admin should not see a progress bar as they're not enrolled on the course.
     And I should see "Not tracked" in the "Last Course Accessed" "block"
@@ -37,7 +37,7 @@ Feature: Verify the LCA block content displays the correct information.
     Then I should see "C2" in the ".breadcrumb-nav" "css_element"
 
     # Return to My Learning to check the content of the block.
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     Then I should see "Course 2" in the "Last Course Accessed" "block"
     # The admin should not see a progress bar as they're not enrolled on the course.
     And I should see "Not tracked" in the "Last Course Accessed" "block"
@@ -64,7 +64,7 @@ Feature: Verify the LCA block content displays the correct information.
 
     Given I log in as "learner1"
 
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I should not see "Last Course Accessed"
 
     # Visit the course.
@@ -72,7 +72,7 @@ Feature: Verify the LCA block content displays the correct information.
     Then I should see "C1" in the ".breadcrumb-nav" "css_element"
 
     # Return to My Learning to check the content of the block.
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     Then I should see "Course 1" in the "Last Course Accessed" "block"
     And ".progressbar_container" "css_element" should exist in the "Last Course Accessed" "block"
     And I should see "No criteria" in the "Last Course Accessed" "block"
@@ -81,7 +81,7 @@ Feature: Verify the LCA block content displays the correct information.
     Then I should see "C2" in the ".breadcrumb-nav" "css_element"
 
     # Return to My Learning to check the content of the block.
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     Then I should see "Course 2" in the "Last Course Accessed" "block"
     And ".progressbar_container" "css_element" should exist in the "Last Course Accessed" "block"
     And I should see "0%" in the "Last Course Accessed" "block"
@@ -89,7 +89,7 @@ Feature: Verify the LCA block content displays the correct information.
     When I am on "Course 2" course homepage
     Then I should see "C2" in the ".breadcrumb-nav" "css_element"
     And I follow "Test Page"
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     Then I should see "Course 2" in the "Last Course Accessed" "block"
     And ".progressbar_container" "css_element" should exist in the "Last Course Accessed" "block"
     And I should see "100%" in the "Last Course Accessed" "block"
@@ -147,7 +147,7 @@ Feature: Verify the LCA block content displays the correct information.
 
     Given I log in as "learner1"
 
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I should not see "Last Course Accessed"
 
     # Visit the course.
@@ -161,7 +161,7 @@ Feature: Verify the LCA block content displays the correct information.
     And I am on "Course 2" course homepage
     And I follow "Test Page"
 
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     Then I should see "Course 2" in the "Last Course Accessed" "block"
     And ".progressbar_container" "css_element" should exist in the "Last Course Accessed" "block"
     And I should see "33%" in the "Last Course Accessed" "block"
@@ -169,25 +169,25 @@ Feature: Verify the LCA block content displays the correct information.
   Scenario: Verify a learner sees the correct information in My Learning when having not visited a course during a login session.
 
     Given I log in as "learner1"
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I should not see "Last Course Accessed"
 
     # Visit the courses.
     When I follow "Course 2"
     Then I should see "C2" in the ".breadcrumb-nav" "css_element"
 
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I follow "Course 1"
     Then I should see "C1" in the ".breadcrumb-nav" "css_element"
 
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I follow "Course 3"
     Then I should see "C3" in the ".breadcrumb-nav" "css_element"
     And I log out
 
     # Login and check the last course accessed is Course 3.
     When I log in as "learner1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I should see "Course 3" in the "Last Course Accessed" "block"
     And I log out
 
@@ -205,7 +205,7 @@ Feature: Verify the LCA block content displays the correct information.
 
     # Login and check the last course accessed before Course 3 is Course 1.
     When I log in as "learner1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then I should see "Course 1" in the "Last Course Accessed" "block"
     And I log out
 
@@ -224,6 +224,6 @@ Feature: Verify the LCA block content displays the correct information.
     # Login and check the last course accessed is Course 1.
     # Unenrolling the learner from Course 2 should not affect the block.
     When I log in as "learner1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then I should see "Course 1" in the "Last Course Accessed" "block"
     And I log out

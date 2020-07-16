@@ -15,7 +15,7 @@ Feature: Enable the upcoming events block in a course
       | user | course | role |
       | teacher1 | C1 | editingteacher |
     When I log in as "admin"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "Go to calendar" "link"
     And I create a calendar event:
       | id_eventtype | Site |

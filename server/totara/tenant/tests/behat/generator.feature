@@ -94,7 +94,7 @@ Feature: Tenant behat generator functionality
       | Tenant participants audience name | Third T Cohort |
     And I press "Cancel"
 
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I press "Manage dashboards"
     Then "My Learning" row "Availability" column of "alldashboards" table should contain "Available to all logged in users"
     And "My Learning" row "Tenant" column of "alldashboards" table should not contain "Tenant"

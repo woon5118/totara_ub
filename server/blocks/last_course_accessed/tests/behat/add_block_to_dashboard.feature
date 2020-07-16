@@ -38,7 +38,7 @@ Feature: User can add and remove LCA block to / from dashboard.
 
   Scenario: Verify the Site Administrator can add and remove the LCA block to / from a dashboard.
     Given I log in as "admin"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     # Add the block and check it's removed from the available blocks list.
     When I press "Customise this page"
     And I add the "Last Course Accessed" block
@@ -56,7 +56,7 @@ Feature: User can add and remove LCA block to / from dashboard.
 
   Scenario: Verify a learner can add and remove the LCA block to / from a dashboard.
     Given I log in as "learner1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
 
     # Add the block and check it's removed from the available blocks list.
     When I press "Customise this page"

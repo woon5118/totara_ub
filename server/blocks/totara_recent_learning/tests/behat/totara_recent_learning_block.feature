@@ -19,7 +19,7 @@ Feature: Test Recent Learning block
 
     And I log in as "learner1"
 
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     Then I should not see "Recent Learning"
 
     When I press "Customise this page"
@@ -96,7 +96,7 @@ Feature: Test Recent Learning block
     Then I log out
 
     When I log in as "learner1"
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I press "Customise this page"
     And I add the "Recent Learning" block
     Then I should see "Course 1" in the "Recent Learning" "block"
@@ -126,7 +126,7 @@ Feature: Test Recent Learning block
     # Not completing anything in course4
     # Can't complete activities in course5 - completion tracking not enabled
 
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     Then I should see "Course 1" in the "Recent Learning" "block"
     And I should see "50%" in the "//div[contains(@class, 'recent_learning')]//li[contains (., 'Course 1')]" "xpath_element"
     And I should see "Course 2" in the "Recent Learning" "block"

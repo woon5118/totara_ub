@@ -25,7 +25,7 @@ Feature: Test use of images in competencies and competency custom fields
     And I log in as "admin"
 
     # Add images to the private files block to use later
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I press "Customise this page"
     And I add the "Private files" block
     And I follow "Manage private files..."
@@ -147,7 +147,7 @@ Feature: Test use of images in competencies and competency custom fields
     And I click on "An Unexpected Journey" "link"
     And I choose "Join the Dwarves" from "Help to Gandalf the Grey" choice activity
     And I should see "Your selection: Join the Dwarves"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "Record of Learning" in the totara menu
     Then I should see "Complete"
     And I log out

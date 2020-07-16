@@ -49,7 +49,7 @@ Feature: Automatic progress with missing roles
     And I log out
 
     When I log in as "learner1"
-    And I click on "Latest Appraisal" in the totara menu
+    And I am on "Latest Appraisal" page
     Then I should see "Job assignment linked to this appraisal"
     And I should see "Manager: Role currently empty"
     And I should see "Your Manager must complete this stage"
@@ -65,7 +65,7 @@ Feature: Automatic progress with missing roles
     And I log out
 
     When I log in as "learner1"
-    And I click on "Latest Appraisal" in the totara menu
+    And I am on "Latest Appraisal" page
     Then I should see "Job assignment linked to this appraisal"
     And I should see "Manager: Role currently empty"
     And I should not see "Your Manager must complete this stage"
@@ -81,7 +81,7 @@ Feature: Automatic progress with missing roles
     And I log out
 
     When I log in as "learner1"
-    And I click on "Latest Appraisal" in the totara menu
+    And I am on "Latest Appraisal" page
     Then I should see "Job assignment linked to this appraisal"
     And I should see "Manager: Role currently empty"
     And I should not see "Your Manager must complete this stage"

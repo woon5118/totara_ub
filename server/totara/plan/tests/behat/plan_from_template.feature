@@ -16,7 +16,7 @@ Feature: Create plan from template.
     And I press "Save changes"
 
   Scenario: Create plan from template
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "Learning Plans" "link" in the "My Learning" "block"
     And I press "Create new learning plan"
     When I set the field "Plan template" to "test template"
@@ -30,7 +30,7 @@ Feature: Create plan from template.
     Given I navigate to "Manage templates" node in "Site administration > Learning Plans"
     And I set the field "Select test template as default" to "1"
     And I click on "Update" "button"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "Learning Plans" "link" in the "My Learning" "block"
     When I press "Create new learning plan"
     Then the following fields match these values:

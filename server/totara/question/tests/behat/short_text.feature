@@ -51,7 +51,7 @@ Feature: Completion of short text totara questions
 
   Scenario: A value can be submitted for a short text question field in an appraisal
     Given I log in as "user1"
-    And I click on "Latest Appraisal" in the totara menu
+    And I am on "Latest Appraisal" page
     And I press "Start"
     Then I should see "Text field 1"
     When I set the following fields to these values:
@@ -63,7 +63,7 @@ Feature: Completion of short text totara questions
 
   Scenario: Validation prevents submission with values greater than 255 characters
     Given I log in as "user1"
-    And I click on "Latest Appraisal" in the totara menu
+    And I am on "Latest Appraisal" page
     And I press "Start"
     Then I should see "Text field 1"
     # Each block like charnum010 is 10 characters long. The total is 256 characters.

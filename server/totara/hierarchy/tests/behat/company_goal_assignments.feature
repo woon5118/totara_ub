@@ -50,14 +50,14 @@ Feature: Company goal assignments
     And I log out
 
     When I log in as "user1"
-    And I click on "Goals" in the totara menu
+    And I am on "Goals" page
     Then I should see "Goal One" in the "#company_goals_table" "css_element"
     When I follow "Goal One"
     And I should not see "Cohort 1"
 
     When I log out
     And I log in as "user3"
-    And I click on "Goals" in the totara menu
+    And I am on "Goals" page
     Then I should not see "Goal One" in the "#company_goals_table" "css_element"
     When I follow "View Goal Frameworks"
     And I follow "Goal Framework"
@@ -67,7 +67,7 @@ Feature: Company goal assignments
 
     When I log out
     And I log in as "user4"
-    And I click on "Goals" in the totara menu
+    And I am on "Goals" page
     Then I should see "Goal One" in the "#company_goals_table" "css_element"
     When I follow "Goal One"
     Then I should see "Goal Assignments" in the ".list-assigned" "css_element"

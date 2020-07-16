@@ -17,7 +17,7 @@ Feature: Test Quick Links block
 
   Scenario: Learner can add the Quick Links block to the Dashboard
     And I log in as "learner1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I press "Customise this page"
     And I add the "Quick Links" block
     And I configure the "Quick Links" block
@@ -55,7 +55,7 @@ Feature: Test Quick Links block
     And I should see "Successfully added new quicklink"
     And "//table[@id='quicklinks']/tbody/tr/td[contains(text(), 'Seminar 2')]" "xpath_element" should exist
     And "//table[@id='quicklinks']/tbody/tr/td/a[contains(text(), 'http://example.com/mod/facetoface/view.php?id=2')]" "xpath_element" should exist
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then I should see "My Links"
     And I should see "Totara" in the "My Links" "block"
     And I should see "Home" in the "My Links" "block"
@@ -73,7 +73,7 @@ Feature: Test Quick Links block
     And I click on "Yes" "button" in the "Confirmation" "dialogue"
     And I click on "Delete" "link" in the "Reports" "table_row"
     And I click on "Yes" "button" in the "Confirmation" "dialogue"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then I should see "My Links"
     And I should not see "Home" in the "My Links" "block"
     And I should not see "Reports" in the "My Links" "block"
@@ -151,7 +151,7 @@ Feature: Test Quick Links block
   Scenario: As an admin Links that contain query strings can be added
     # First, add the quick links block.
     Given I log in as "admin"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I press "Customise this page"
     And I add the "Navigation" block if not present
     And I navigate to "Calendar" node in "Site pages"

@@ -71,7 +71,7 @@ Feature: Seminar calendar publishing to course, site, and user calendars
     And I turn editing mode off
 
   Scenario: Normal visibility, seminars set to site calendar, check calendar event view
-    Given I click on "Dashboard" in the totara menu
+    Given I am on "Dashboard" page
     When I follow "Go to calendar"
     Then I should see "OTL Seminar" exactly "1" times
     And I should see "OTL Hidden Seminar"
@@ -135,7 +135,7 @@ Feature: Seminar calendar publishing to course, site, and user calendars
       | showoncalendar |   1 |
     And I click on "Save and display" "button"
 
-    Given I click on "Dashboard" in the totara menu
+    Given I am on "Dashboard" page
     When I follow "Go to calendar"
     Then I should not see "OTL Seminar"
     And I should not see "OTL Hidden Seminar"
@@ -207,7 +207,7 @@ Feature: Seminar calendar publishing to course, site, and user calendars
       | usercalentry   |   1 |
     And I click on "Save and display" "button"
 
-    Given I click on "Dashboard" in the totara menu
+    Given I am on "Dashboard" page
     When I follow "Go to calendar"
     Then I should see "OTL Seminar" exactly "1" times
     And I should see "OTL Hidden Seminar"

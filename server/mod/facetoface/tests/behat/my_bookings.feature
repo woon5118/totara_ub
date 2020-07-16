@@ -130,7 +130,7 @@ Feature: Check My bookings displays the right information for future and past ev
 
   Scenario: Check my future bookings
     Given I log in as "student1"
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     Then I should see "My Learning" in the ".breadcrumb-nav" "css_element"
     And I should see "Bookings"
 
@@ -147,7 +147,7 @@ Feature: Check My bookings displays the right information for future and past ev
     And I press "Sign-up"
 
     # Check my future bookings again.
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I click on "Bookings" "link"
     Then I should see "My Future Bookings: 2 records shown"
     And I should see "seminar1"
@@ -160,7 +160,7 @@ Feature: Check My bookings displays the right information for future and past ev
 
     # Check future bookings for student2.
     When I log in as "student2"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "Bookings" "link"
     Then I should see "My Future Bookings: 1 record shown"
     And I should see "seminar1"
@@ -168,7 +168,7 @@ Feature: Check My bookings displays the right information for future and past ev
 
   Scenario: Check my past bookings
     Given I log in as "student2"
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     Then I should see "My Learning" in the ".breadcrumb-nav" "css_element"
     And I should see "Bookings"
 
@@ -185,7 +185,7 @@ Feature: Check My bookings displays the right information for future and past ev
 
     # Check student1 does not have bookings.
     When I log in as "student1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "Bookings" "link"
     Then I should see "My Future Bookings: 0 records shown"
     And I click on "Past Bookings" "link"
@@ -206,7 +206,7 @@ Feature: Check My bookings displays the right information for future and past ev
 
     # Check again bookings for student1.
     And I log in as "student1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "Bookings" "link"
     Then I should see "My Future Bookings: 0 records shown"
     And I click on "Past Bookings" "link"

@@ -21,7 +21,7 @@ Feature: Test use of images in goals and goal custom fields
     And I log in as "admin"
 
     # Add images to the private files block to use later
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I press "Customise this page"
     And I add the "Private files" block
     And I follow "Manage private files..."
@@ -146,7 +146,7 @@ Feature: Test use of images in goals and goal custom fields
     # Create goals for the learner and add images in the text areas
     When I log in as "learner1"
     # Add images to the private files block to use later
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I press "Customise this page"
     And I add the "Private files" block
     And I follow "Manage private files..."
@@ -159,7 +159,7 @@ Feature: Test use of images in goals and goal custom fields
     And I should see "leaves-blue.png"
 
     # Company goal for learner with images
-    When I click on "Goals" in the totara menu
+    When I am on "Goals" page
     And I press "Add company goal"
     And I follow "My goal 1"
     And I press "Save"
@@ -171,7 +171,7 @@ Feature: Test use of images in goals and goal custom fields
     And I should see image with alt text "logo3 in goal description"
     And I should see image with alt text "logo4 on custom My goal 1 customfield text area"
 
-    When I click on "Goals" in the totara menu
+    When I am on "Goals" page
     And I follow "View Goal Frameworks"
     And I follow "Goal Framework"
     Then I should see the "logo3 in goal description" image in the "Description" "table_row"
@@ -180,7 +180,7 @@ Feature: Test use of images in goals and goal custom fields
     And I should see image with alt text "logo4 on custom My goal 1 customfield text area"
 
     # Personal goal with images in the description and customfield text area
-    When I click on "Goals" in the totara menu
+    When I am on "Goals" page
     And I press "Add personal goal"
     And I set the following fields to these values:
       | Name | My personal goal 1  |

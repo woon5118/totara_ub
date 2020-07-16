@@ -39,7 +39,7 @@ Feature: Scorm my learning overview
     And I click on "Save and display" "button"
     And I log out
     And I log in as "student1"
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     Then I should not see "You have SCORM packages that need attention"
 
   Scenario: Scorm my learning overview - no display attempt status
@@ -52,7 +52,7 @@ Feature: Scorm my learning overview
     And I click on "Save and display" "button"
     And I log out
     And I log in as "student1"
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     Then I should not see "You have SCORM packages that need attention"
 
   Scenario: Scorm my learning overview - activity availability specified in future
@@ -67,7 +67,7 @@ Feature: Scorm my learning overview
     And I click on "Save and display" "button"
     And I log out
     And I log in as "student1"
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     Then I should not see "You have SCORM packages that need attention"
 
   Scenario: Scorm my learning overview - activity availability specified in past
@@ -82,7 +82,7 @@ Feature: Scorm my learning overview
     And I click on "Save and display" "button"
     And I log out
     And I log in as "student1"
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     Then I should see "You have SCORM packages that need attention"
 
   Scenario: Scorm my learning overview - display attempt status
@@ -95,7 +95,7 @@ Feature: Scorm my learning overview
     And I click on "Save and display" "button"
     And I log out
     And I log in as "student1"
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     Then I should see "You have SCORM packages that need attention"
 
     Given I follow "Course 1"
@@ -111,7 +111,7 @@ Feature: Scorm my learning overview
     # Must wait here to let it save results, otherwise alert may popup.
     And I wait "2" seconds
     And I am on site homepage
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then I should see "You have SCORM packages that need attention"
 
     Given I follow "Course 1"
@@ -130,5 +130,5 @@ Feature: Scorm my learning overview
     # Must wait here to let it save results, otherwise alert may popup.
     And I wait "2" seconds
     And I am on site homepage
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then I should not see "You have SCORM packages that need attention"

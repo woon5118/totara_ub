@@ -56,7 +56,7 @@ Feature: Appraisal progression halts at stage without any role assigned
   Scenario: Subsequent stage without any role completion should not be completed automatically
     # Learner One completes stage one.
     When I log in as "learner1"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Appraisal1" "table_row"
     And I press "Start"
     And I click on "Complete stage" "button"
@@ -64,7 +64,7 @@ Feature: Appraisal progression halts at stage without any role assigned
 
     # Manager completes stage two.
     And I log in as "manager"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Appraisal1" "table_row"
     And I press "Start"
     And I click on "Complete stage" "button"

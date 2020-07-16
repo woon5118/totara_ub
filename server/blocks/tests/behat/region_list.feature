@@ -26,7 +26,7 @@ Feature: Ensure page layouts are listed correctly
     And the "Region" select box should contain "Main"
 
   Scenario: Ensure editing a block on the dashboard lists the dashboard layout options
-    Given I click on "Dashboard" in the totara menu
+    Given I am on "Dashboard" page
     And I click on "Customise this page" "button"
     And I add the "Navigation" block if not present
     And I configure the "Navigation" block
@@ -111,7 +111,7 @@ Feature: Ensure page layouts are listed correctly
     # Negative check only for one region as it takes longer.
     Then "#block-region-top.editing-region-border" "css_element" should not exist
 
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I click on "Customise this page" "button"
     Then "#block-region-main.editing-region-border" "css_element" should exist
     And "#block-region-top.editing-region-border" "css_element" should exist

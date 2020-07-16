@@ -134,7 +134,7 @@ Feature: Perform basic actions for aggregate questions
     And I log out
 
     When I log in as "jimmy"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Aggregate Tests" "link" in the "Aggregate Tests" "table_row"
     And I press "Start"
     And I click on "choice3" "radio"
@@ -146,7 +146,7 @@ Feature: Perform basic actions for aggregate questions
     When I click on "Complete stage" "button" in the "#fitem_id_submitbutton" "css_element"
     And I log out
     And I log in as "manager"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Aggregate Tests" "link" in the "Jimmy Jim" "table_row"
     And I press "Start"
     And I click on "choice1" "radio"
@@ -160,7 +160,7 @@ Feature: Perform basic actions for aggregate questions
     When I click on "Complete stage" "button" in the "#fitem_id_submitbutton" "css_element"
     And I log out
     And I log in as "appraiser"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Aggregate Tests" "link" in the "Jimmy Jim" "table_row"
     And I press "Start"
     And I click on "choice1" "radio"
@@ -174,7 +174,7 @@ Feature: Perform basic actions for aggregate questions
     When I click on "Complete stage" "button" in the "#fitem_id_submitbutton" "css_element"
     And I log out
     And I log in as "jimmy"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Aggregate Tests" "link" in the "Aggregate Tests" "table_row"
     And I press "Start"
     And I click on "choice4" "radio"
@@ -186,7 +186,7 @@ Feature: Perform basic actions for aggregate questions
     When I click on "Complete stage" "button" in the "#fitem_id_submitbutton" "css_element"
     And I log out
     And I log in as "manager"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Aggregate Tests" "link" in the "Jimmy Jim" "table_row"
     And I press "Start"
     And I click on "choice1" "radio"
@@ -202,7 +202,7 @@ Feature: Perform basic actions for aggregate questions
     When I click on "Complete stage" "button" in the "#fitem_id_submitbutton" "css_element"
     And I log out
     And I log in as "appraiser"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Aggregate Tests" "link" in the "Jimmy Jim" "table_row"
     And I press "Start"
     And I click on "choice1" "radio"
@@ -229,7 +229,7 @@ Feature: Perform basic actions for aggregate questions
     And I log out
 
     When I log in as "jimmy"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Zero Aggregate Tests" "link" in the "Zero Aggregate Tests" "table_row"
     And I press "Start"
     And I set the field with xpath "//fieldset[legend[contains(.,'S0-Rate_Num1')]]//input" to "40"
@@ -258,7 +258,7 @@ Feature: Perform basic actions for aggregate questions
     When I click on "Complete stage" "button" in the "#fitem_id_submitbutton" "css_element"
     And I log out
     And I log in as "manager"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Zero Aggregate Tests" "link" in the "Jimmy Jim" "table_row"
     And I press "Start"
     And I set the field with xpath "//fieldset[legend[contains(.,'S0-Rate_Num2')]]//input" to "60"

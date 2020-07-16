@@ -284,7 +284,7 @@ Feature: Filter seminar events in calendar by their customfields
   @javascript
   Scenario: Check that seminar customfields can be used to filter events in calendar
     When I log in as "student1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I press "Customise this page"
     And I add the "Calendar" block
     And I follow "This month"

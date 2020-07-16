@@ -64,7 +64,7 @@ Feature: Test menu correctly highlights the custom dashboard menu
     And Totara sub menu item "Dashboard 3" should not be highlighted
     And Totara sub menu item "Dashboard 4" should be highlighted
 
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     Then Totara menu item "Dashboard" should be highlighted
     Then Totara menu item "My dashboards" should not be highlighted
 # collapsed subitems are accessible too, this is not about real 'visibility'

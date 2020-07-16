@@ -49,7 +49,7 @@ Feature: Enable the course_list block on the dashboard and view its contents
 
   Scenario: Add the course list block on the dashboard and view as an admin
     Given I log in as "admin"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I press "Customise this page"
     When I add the "Courses" block
     Then I should see "Miscellaneous" in the "Course categories" "block"

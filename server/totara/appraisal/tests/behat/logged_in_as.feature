@@ -48,7 +48,7 @@ Feature: Make sure the real user is recorded in appraisals when using login-as
     # Select the job assignment
     When I log out
     And I log in as "learner1"
-    And I click on "Latest Appraisal" in the totara menu
+    And I am on "Latest Appraisal" page
 
     # Admin logs in as the manager
     And I log out
@@ -59,7 +59,7 @@ Feature: Make sure the real user is recorded in appraisals when using login-as
     Then I should see "You are logged in as manager lastname"
 
     # Mark the appraisal complete
-    When I click on "All Appraisals" in the totara menu
+    When I am on "All Appraisals" page
     And I follow "Appraisal1"
     And I press "Start"
     And I click on "Complete stage" "button"
@@ -69,6 +69,6 @@ Feature: Make sure the real user is recorded in appraisals when using login-as
     # View the appraisal as the learner
     When I log out
     And I log in as "learner1"
-    And I click on "Latest Appraisal" in the totara menu
+    And I am on "Latest Appraisal" page
     Then I should see "You must complete this stage" in the ".appraisal-stagelist" "css_element"
     And I should see "Your Manager has completed this stage (Admin User on behalf of manager lastname)" in the ".appraisal-stagelist" "css_element"

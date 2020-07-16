@@ -40,7 +40,7 @@ Feature: Check to see that programs with only a single course are displayed as e
   @javascript
   Scenario: A user can view their single course program in the current learning block
     Given I log in as "user001"
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     Then I should see "Test Single Course Program" in the "Current Learning" "block"
     And I should not be able to toggle "Test Single Course Program" row within the current learning block
     And I should not see "Course 1"

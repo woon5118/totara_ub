@@ -29,7 +29,7 @@ Feature: Test plan teamplate settings
   Scenario: Test Update plan setting on template
     Given the "mylearning" user profile block exists
     And I log in as "learner1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "Learning Plans" "link"
     And I press "Create new learning plan"
     And I set the field "Plan template" to "template 1"
@@ -62,7 +62,7 @@ Feature: Test plan teamplate settings
     And I log out
 
     Then I log in as "learner1"
-    Then I click on "Dashboard" in the totara menu
+    Then I am on "Dashboard" page
     And I click on "Learning Plans" "link"
     And I press "Create new learning plan"
     And I set the field "Plan template" to "template 2"
@@ -79,7 +79,7 @@ Feature: Test plan teamplate settings
 
     # Check permissions for manager
     Then I log in as "manager2"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "Plans" "link"
     And I should see "You are viewing firstname1 lastname1's plans."
     And I click on "template 1" "link"
@@ -119,7 +119,7 @@ Feature: Test plan teamplate settings
     And I log out
 
     Then I log in as "learner1"
-    Then I click on "Dashboard" in the totara menu
+    Then I am on "Dashboard" page
     And I click on "Learning Plans" "link"
     And I press "Create new learning plan"
     And I set the field "Plan template" to "template 1"
@@ -130,7 +130,7 @@ Feature: Test plan teamplate settings
     And I log out
 
     Then I log in as "manager2"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "Plans" "link"
     And I should see "You are viewing firstname1 lastname1's plans."
     And I click on "template 1" "link"
@@ -150,7 +150,7 @@ Feature: Test plan teamplate settings
     And I log out
 
     Then I log in as "learner1"
-    Then I click on "Dashboard" in the totara menu
+    Then I am on "Dashboard" page
     And I click on "Learning Plans" "link"
     And I press "Create new learning plan"
     And I set the field "Plan template" to "template 1"
@@ -160,7 +160,7 @@ Feature: Test plan teamplate settings
     And I log out
 
     Then I log in as "manager2"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "Plans" "link"
     And I should see "You are viewing firstname1 lastname1's plans."
     And I click on "template 1" "link"

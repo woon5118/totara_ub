@@ -45,7 +45,7 @@ Feature: See that program visibility affects Record of Learning: Programs conten
     # RoL: Progs tab should be shown and contains the program for manager.
     When I log out
     And I log in as "mana003"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "fn_001 ln_001" "link"
     And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I click on "Programs" "link" in the "#dp-plan-content" "css_element"
@@ -76,7 +76,7 @@ Feature: See that program visibility affects Record of Learning: Programs conten
     # RoL: Progs tab should be shown and contains the program for manager.
     When I log out
     And I log in as "mana003"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "fn_001 ln_001" "link"
     And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I click on "Programs" "link" in the "#dp-plan-content" "css_element"
@@ -108,7 +108,7 @@ Feature: See that program visibility affects Record of Learning: Programs conten
     # RoL: Progs tab should be visible and contains the program for manager.
     When I log out
     And I log in as "mana003"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "fn_002 ln_002" "link"
     And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I click on "Programs" "link" in the "#dp-plan-content" "css_element"
@@ -158,7 +158,7 @@ Feature: See that program visibility affects Record of Learning: Programs conten
     # RoL: Progs tab should be visible and contains the program for manager.
     When I log out
     And I log in as "mana003"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "fn_002 ln_002" "link"
     And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I click on "Programs" "link" in the "#dp-plan-content" "css_element"
@@ -186,7 +186,7 @@ Feature: See that program visibility affects Record of Learning: Programs conten
     # RoL: Progs tab should be shown and contains the program for manager.
     When I log out
     And I log in as "mana003"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "fn_001 ln_001" "link"
     And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I click on "Programs" "link" in the "#dp-plan-content" "css_element"
@@ -221,7 +221,7 @@ Feature: See that program visibility affects Record of Learning: Programs conten
     # RoL: Progs tab should be shown and contains the program for manager.
     When I log out
     And I log in as "mana003"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "fn_001 ln_001" "link"
     And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I click on "Programs" "link" in the "#dp-plan-content" "css_element"
@@ -256,7 +256,7 @@ Feature: See that program visibility affects Record of Learning: Programs conten
     # RoL: Progs tab should be shown and contains the program for manager.
     When I log out
     And I log in as "mana003"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "fn_001 ln_001" "link"
     And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I click on "Programs" "link" in the "#dp-plan-content" "css_element"
@@ -288,7 +288,7 @@ Feature: See that program visibility affects Record of Learning: Programs conten
     # RoL: Progs tab should be shown and contains the program for manager.
     When I log out
     And I log in as "mana003"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "fn_001 ln_001" "link"
     And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     Then I should not see "Programs" in the "#dp-plan-content" "css_element"
@@ -320,7 +320,7 @@ Feature: See that program visibility affects Record of Learning: Programs conten
     # RoL: Progs tab should be shown and contains the program for manager.
     When I log out
     And I log in as "mana003"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "fn_002 ln_002" "link"
     And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I click on "Programs" "link" in the "#dp-plan-content" "css_element"
@@ -363,7 +363,7 @@ Feature: See that program visibility affects Record of Learning: Programs conten
   # RoL: Progs tab should be shown and contains the program for manager.
     When I log out
     And I log in as "mana003"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "fn_002 ln_002" "link"
     And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I click on "Programs" "link" in the "#dp-plan-content" "css_element"
@@ -416,7 +416,7 @@ Feature: See that program visibility affects Record of Learning: Programs conten
     # RoL: Progs tab should be shown and contains the program for manager.
     When I log out
     And I log in as "mana003"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "fn_002 ln_002" "link"
     And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I click on "Programs" "link" in the "#dp-plan-content" "css_element"

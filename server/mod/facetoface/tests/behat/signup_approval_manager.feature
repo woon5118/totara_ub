@@ -81,7 +81,7 @@ Feature: Seminar Signup Manager Approval
     And I log out
 
     And I log in as "tammy"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "View all tasks" "link"
     And I should see "This is to advise that Sally Sal has requested to be booked into the following course" in the "td.message_values_statement" "css_element"
     And I click on "mod/facetoface/attendees" "link" in the "td.message_values_statement" "css_element"
@@ -90,7 +90,7 @@ Feature: Seminar Signup Manager Approval
     And I log out
 
     And I log in as "yummy"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "View all tasks" "link"
     And I should see "This is to advise that Sally Sal has requested to be booked into the following course" in the "td.message_values_statement" "css_element"
     And I click on "mod/facetoface/attendees" "link" in the "td.message_values_statement" "css_element"
@@ -99,7 +99,7 @@ Feature: Seminar Signup Manager Approval
     And I log out
 
     And I log in as "funny"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I should not see "View all tasks"
 
   Scenario: Student signs up with no manager assigned with manager select enabled and manager approval required
@@ -123,7 +123,7 @@ Feature: Seminar Signup Manager Approval
 
     When I log out
     And I log in as "manager"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "View all tasks" "link"
     And I should see "This is to advise that Sally Sal has requested to be booked into the following course" in the "td.message_values_statement" "css_element"
     And I click on "Attendees" "link"
@@ -146,7 +146,7 @@ Feature: Seminar Signup Manager Approval
     And I log out
 
     And I log in as "manager"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then I should see "Seminar booking request"
     And I click on "View all tasks" "link"
     And I should see "This is to advise that Jimmy Jim has requested to be booked into the following course" in the "td.message_values_statement" "css_element"
@@ -160,7 +160,7 @@ Feature: Seminar Signup Manager Approval
 
     When I log out
     And I log in as "jimmy"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then I should see "Seminar booking confirmation"
 
     When I am on "Classroom Connect" seminar homepage
@@ -191,7 +191,7 @@ Feature: Seminar Signup Manager Approval
     And I log out
 
     And I log in as "timmy"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then I should see "Seminar booking request"
     And I click on "View all tasks" "link"
     And I should see "This is to advise that Jimmy Jim has requested to be booked into the following course" in the "td.message_values_statement" "css_element"
@@ -205,7 +205,7 @@ Feature: Seminar Signup Manager Approval
 
     When I log out
     And I log in as "jimmy"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then I should see "Seminar booking confirmation"
 
     When I am on "Classroom Connect" seminar homepage

@@ -57,7 +57,7 @@ Feature: Seminar event cancellation calendar views
   Scenario: mod_facetoface_cancel_800: cancelled events removed from learner calendar.
     When I log out
     And I log in as "learner1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "Go to calendar" "link"
     Then I should see date "1 day Australia/Perth" formatted "%d %B %Y"
     Then I should see "Course 1"
@@ -78,7 +78,7 @@ Feature: Seminar event cancellation calendar views
     And "Go to event" "link" should not exist in the ".mod_facetoface__event-dashboard" "css_element"
     And "More actions" "button" should not exist in the ".mod_facetoface__event-dashboard" "css_element"
 
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I click on "Go to calendar" "link"
     Then I should not see "Course 1"
     And I should not see "10:00 AM - 4:00 PM"
@@ -90,7 +90,7 @@ Feature: Seminar event cancellation calendar views
   Scenario: mod_facetoface_cancel_801: cancelled events removed from session role calendar.
     When I log out
     And I log in as "teacher1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "Go to calendar" "link"
     Then I should see date "1 day Australia/Perth" formatted "%d %B %Y"
     Then I should see "Course 1"
@@ -111,7 +111,7 @@ Feature: Seminar event cancellation calendar views
     And "Go to event" "link" should not exist in the ".mod_facetoface__event-dashboard" "css_element"
     But "More actions" "button" should exist in the ".mod_facetoface__event-dashboard" "css_element"
 
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I click on "Go to calendar" "link"
     Then I should not see "Course 1"
     And I should not see "10:00 AM - 4:00 PM"
@@ -136,7 +136,7 @@ Feature: Seminar event cancellation calendar views
     And "Go to event" "link" should not exist in the ".mod_facetoface__event-dashboard" "css_element"
     But "More actions" "button" should exist in the ".mod_facetoface__event-dashboard" "css_element"
 
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I click on "Go to calendar" "link"
     Then I should not see "Course 1"
     And I should not see "10:00 AM - 4:00 PM"

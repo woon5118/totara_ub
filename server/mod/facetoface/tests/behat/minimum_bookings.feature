@@ -77,37 +77,37 @@ Feature: Minimum Seminar bookings
     # Confirm that the alert was sent.
     And I log out
     And I log in as "student1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I <student> see "Event under minimum bookings for: test activity"
     And I log out
     And I log in as "trainer1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I <trainer> see "Event under minimum bookings for: test activity"
     And I log out
     And I log in as "teacher1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I <teacher> see "Event under minimum bookings for: test activity"
     And I log out
     And I log in as "creator"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I <creator> see "Event under minimum bookings for: test activity"
     And I log out
     And I log in as "siteman"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I <manager> see "Event under minimum bookings for: test activity"
     And I log out
 
     # Confirm it wasn't set elsewhere - these are failing as it is sent to all people of the given role
     And I log in as "student2"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I should not see "Event under minimum bookings for: test activity"
     And I log out
     And I log in as "trainer2"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I should not see "Event under minimum bookings for: test activity"
     And I log out
     And I log in as "teacher2"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I should not see "Event under minimum bookings for: test activity"
 
     Examples:

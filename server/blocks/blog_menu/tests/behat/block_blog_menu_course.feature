@@ -33,7 +33,7 @@ Feature: Students can use block blog menu in a course
     And I press "Save changes"
     Then I should see "S1 First Blog"
     And I should see "This is my awesome blog!"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I am on "Course 1" course homepage
     And I follow "Blog entries"
     And I should see "S1 First Blog"

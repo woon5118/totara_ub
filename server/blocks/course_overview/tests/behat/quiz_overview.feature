@@ -55,7 +55,7 @@ Feature: View the quiz being due
 
   Scenario: View my quizzes that are due.
     Given I log in as "student1"
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I press "Customise this page"
     And I add the "Course overview" block
     Then I should see "You have quizzes that are due" in the "Course overview" "block"
@@ -70,7 +70,7 @@ Feature: View the quiz being due
     And I log out
     And I log in as "student2"
 
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I press "Customise this page"
     And I add the "Course overview" block
     Then I should see "You have quizzes that are due" in the "Course overview" "block"
@@ -96,7 +96,7 @@ Feature: View the quiz being due
     And I press "Attempt quiz now"
     When I am on homepage
 
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I press "Customise this page"
     And I add the "Course overview" block
     Then I should see "You have quizzes that are due" in the "Course overview" "block"

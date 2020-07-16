@@ -36,7 +36,7 @@ Feature: Learner creates learning plan with competencies.
 
     # Login as the learner and navigate to the learning plan.
     Given I log in as "learner1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I follow "Learning Plans"
     And I follow "Learning Plan 1"
 
@@ -70,7 +70,7 @@ Feature: Learner creates learning plan with competencies.
 
     # As the manager, access the learners plans.
     When I log in as "manager1"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "Plans" "link" in the "Bob1 Learner1" "table_row"
 
     # Access the learners plans and verify it hasn't been approved.
@@ -85,7 +85,7 @@ Feature: Learner creates learning plan with competencies.
     And I should see "Plan \"Learning Plan 1\" has been approved"
 
     # Make sure the ajax competency update request works
-    When I click on "Team" in the totara menu
+    When I am on "Team" page
     And I click on "Records" "link" in the "Bob1 Learner1" "table_row"
     And the field "competencyevidencestatus1" matches value "Not competent"
     And I set the field "competencyevidencestatus1" to "Competent"

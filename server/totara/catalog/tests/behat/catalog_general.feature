@@ -234,7 +234,7 @@ Feature: Test file for catalog
     When I click on "Find Learning" in the totara menu
     Then I should see "Make home page"
 
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     Then I press "Make home page"
     And I should see "Your default page was changed"
     And I should not see "Make home page"

@@ -61,7 +61,7 @@ Feature: Test appraisal stage completion with missing roles
 
     # Learner completes the stage
     When I log in as "learner1"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     Then I should see "Appraisal1"
 
     When I follow "Appraisal1"
@@ -90,7 +90,7 @@ Feature: Test appraisal stage completion with missing roles
 
     # Manager can now answer
     When I log in as "manager"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     Then I should see "Appraisal1" in the "learner1 lastname" "table_row"
 
     When I follow "Appraisal1"
@@ -113,7 +113,7 @@ Feature: Test appraisal stage completion with missing roles
     And I log out
 
     When I log in as "learner2"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     Then I should see "Appraisal1"
 
     # Learner completes the stage
@@ -155,7 +155,7 @@ Feature: Test appraisal stage completion with missing roles
     And I log out
 
     When I log in as "learner2"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     Then I should see "Appraisal1"
 
     # Learner completes the stage
@@ -191,7 +191,7 @@ Feature: Test appraisal stage completion with missing roles
     And I log out
 
     When I log in as "learner2"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     Then I should see "Completed" in the "Appraisal1" "table_row"
 
     When I follow "Appraisal1"
@@ -212,7 +212,7 @@ Feature: Test appraisal stage completion with missing roles
     And I log out
 
     When I log in as "manager"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
 
   @javascript
   Scenario: Verify that the appraisal is completed if the manager is removed after the learner has completed all stages
@@ -229,7 +229,7 @@ Feature: Test appraisal stage completion with missing roles
 
     # Learner completes the stage
     When I log in as "learner1"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     Then I should see "Appraisal1"
 
     When I follow "Appraisal1"
@@ -260,7 +260,7 @@ Feature: Test appraisal stage completion with missing roles
     And I log out
 
     When I log in as "learner1"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I follow "Appraisal1"
     Then I should see "Completed" in the ".appraisal-stagelist" "css_element"
     And "View" "button" should exist in the ".appraisal-stagelist" "css_element"
@@ -318,7 +318,7 @@ Feature: Test appraisal stage completion with missing roles
 
     # Learner completes the stage
     When I log in as "learner1"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     Then I should see "Appraisal1"
 
     When I follow "Appraisal1"
@@ -349,7 +349,7 @@ Feature: Test appraisal stage completion with missing roles
     And I log out
 
     When I log in as "learner1"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I follow "Appraisal1"
     Then "//div[contains(@class,'appraisal-stage-completed') and contains(., 'App1_Stage') and contains(., 'Completed')]" "xpath_element" should exist
     And "//div[contains(@class,'appraisal-stage-inprogress') and contains(., 'App1 Stage2') and contains(., 'Incomplete')]" "xpath_element" should exist

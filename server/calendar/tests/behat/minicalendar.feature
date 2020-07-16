@@ -17,7 +17,7 @@ Feature: Open calendar popup
     And I log in as "admin"
     And I set the following administration settings values:
       | allowdefaultpageselection | 1 |
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I press "Make home page"
 
   @javascript

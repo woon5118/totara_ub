@@ -133,7 +133,7 @@ Feature: Verify competencies are automatically added to plan according to job as
   Scenario: Create a learning plan that pulls through the competencies based on job assignments.
 
     Given I log in as "learner1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I follow "Learning Plans"
     And I press "Create new learning plan"
     And I set the field "Plan name" to "My Learning Plan"
@@ -150,7 +150,7 @@ Feature: Verify competencies are automatically added to plan according to job as
   Scenario: Create a learning plan that pulls through no competencies as there's no positions assigned.
 
     Given I log in as "learner2"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I follow "Learning Plans"
     And I press "Create new learning plan"
     And I set the field "Plan name" to "My Learning Plan"
@@ -210,7 +210,7 @@ Feature: Verify competencies are automatically added to plan according to job as
   Scenario: Create a learning plan that pulls through the competencies based on job assignments for organisations.
 
     Given I log in as "learner4"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I follow "Learning Plans"
     And I press "Create new learning plan"
     And I set the field "Plan name" to "My Learning Plan"
@@ -227,7 +227,7 @@ Feature: Verify competencies are automatically added to plan according to job as
   Scenario: Create a learning plan that pulls through no competencies as there's no organisations assigned.
 
     Given I log in as "learner2"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I follow "Learning Plans"
     And I press "Create new learning plan"
     And I set the field "Plan name" to "My Learning Plan"

@@ -36,7 +36,7 @@ Feature: See that course visibility affects Record of Learning: Courses content 
     # RoL: Courses tab should be shown and contains the course for manager.
     When I log out
     And I log in as "mana003"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "fn_001 ln_001" "link"
     And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     Then I should see "Record of Learning for fn_001 ln_001 : All Courses"
@@ -64,7 +64,7 @@ Feature: See that course visibility affects Record of Learning: Courses content 
     # RoL: Courses tab should be shown and contains the course for manager.
     When I log out
     And I log in as "mana003"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "fn_001 ln_001" "link"
     And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     Then I should see "Record of Learning for fn_001 ln_001 : All Courses"
@@ -93,7 +93,7 @@ Feature: See that course visibility affects Record of Learning: Courses content 
     # RoL: Courses tab should be visible and contains the course for manager.
     When I log out
     And I log in as "mana003"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "fn_002 ln_002" "link"
     And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     Then I should see "Record of Learning for fn_002 ln_002 : All Courses"
@@ -139,7 +139,7 @@ Feature: See that course visibility affects Record of Learning: Courses content 
     # RoL: Courses tab should be visible and contains the course for manager.
     When I log out
     And I log in as "mana003"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "fn_002 ln_002" "link"
     And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     Then I should see "Record of Learning for fn_002 ln_002 : All Courses"
@@ -165,7 +165,7 @@ Feature: See that course visibility affects Record of Learning: Courses content 
     # RoL: Courses tab should be shown and contains the course for manager.
     When I log out
     And I log in as "mana003"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "fn_001 ln_001" "link"
     And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     Then I should see "Record of Learning for fn_001 ln_001 : All Courses"
@@ -197,7 +197,7 @@ Feature: See that course visibility affects Record of Learning: Courses content 
     # RoL: Courses tab should be shown and contains the course for manager.
     When I log out
     And I log in as "mana003"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "fn_001 ln_001" "link"
     And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     Then I should see "Record of Learning for fn_001 ln_001 : All Courses"
@@ -229,7 +229,7 @@ Feature: See that course visibility affects Record of Learning: Courses content 
     # RoL: Courses tab should be shown and contains the course for manager.
     When I log out
     And I log in as "mana003"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "fn_001 ln_001" "link"
     And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     Then I should see "Record of Learning for fn_001 ln_001 : All Courses"
@@ -262,7 +262,7 @@ Feature: See that course visibility affects Record of Learning: Courses content 
     # RoL: Courses tab should be shown and contains the course for manager.
     When I log out
     And I log in as "mana003"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "fn_001 ln_001" "link"
     And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     # This one is a bit of an anomaly, but not much we can do about it without a big refactor.
@@ -295,7 +295,7 @@ Feature: See that course visibility affects Record of Learning: Courses content 
     # RoL: Courses tab should be shown and contains the course for manager.
     When I log out
     And I log in as "mana003"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
     And I click on "fn_002 ln_002" "link"
     And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     Then I should see "Record of Learning for fn_002 ln_002 : All Courses"

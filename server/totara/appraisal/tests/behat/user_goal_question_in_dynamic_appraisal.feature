@@ -97,14 +97,14 @@ Feature: Access rights to user goal questions in dynamic appraisals
 
     # Create personal goals for each learner.
     Given I log in as "learner1"
-    And I click on "Goals" in the totara menu
+    And I am on "Goals" page
     And I press "Add personal goal"
     And I set the following fields to these values:
       | Name | Personal Goal Learner One |
     And I press "Save changes"
     And I press "Add personal goal"
 
-    Given I click on "Latest Appraisal" in the totara menu
+    Given I am on "Latest Appraisal" page
     And I press "Start"
     And I set the following fields to these values:
       | Your answer | Learner One goal answer |
@@ -112,14 +112,14 @@ Feature: Access rights to user goal questions in dynamic appraisals
     And I log out
 
     Given I log in as "learner2"
-    And I click on "Goals" in the totara menu
+    And I am on "Goals" page
     And I press "Add personal goal"
     And I set the following fields to these values:
       | Name | Personal Goal Learner Two |
     And I press "Save changes"
     And I press "Add personal goal"
 
-    Given I click on "Latest Appraisal" in the totara menu
+    Given I am on "Latest Appraisal" page
     And I press "Start"
     And I set the following fields to these values:
       | Your answer | Learner Two goal answer |
@@ -127,14 +127,14 @@ Feature: Access rights to user goal questions in dynamic appraisals
     And I log out
 
     Given I log in as "learner3"
-    And I click on "Goals" in the totara menu
+    And I am on "Goals" page
     And I press "Add personal goal"
     And I set the following fields to these values:
       | Name | Personal Goal Learner Three |
     And I press "Save changes"
     And I press "Add personal goal"
 
-    Given I click on "Latest Appraisal" in the totara menu
+    Given I am on "Latest Appraisal" page
     And I press "Start"
     And I set the following fields to these values:
       | Your answer | Learner Three goal answer |
@@ -142,13 +142,13 @@ Feature: Access rights to user goal questions in dynamic appraisals
     And I log out
 
     Given I log in as "learner4"
-    And I click on "Goals" in the totara menu
+    And I am on "Goals" page
     And I press "Add personal goal"
     And I set the following fields to these values:
       | Name | Personal Goal Learner Four |
     And I press "Save changes"
     And I press "Add personal goal"
-    And I click on "Latest Appraisal" in the totara menu
+    And I am on "Latest Appraisal" page
     And I press "Start"
     And I set the following fields to these values:
       | Your answer | Learner Four goal answer |
@@ -157,14 +157,14 @@ Feature: Access rights to user goal questions in dynamic appraisals
 
     # Immediate manager does appraisals for 2 learners.
     Given I log in as "oldmgr"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Learner One" "table_row"
     And I press "Start"
     And I set the following fields to these values:
       | Your answer | Old Manager Learner One goal answer |
     And I press "Complete stage"
 
-    Given I click on "All Appraisals" in the totara menu
+    Given I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Learner Four" "table_row"
     And I press "Start"
     And I set the following fields to these values:
@@ -174,14 +174,14 @@ Feature: Access rights to user goal questions in dynamic appraisals
 
     # Team leader does appraisals for 2 learners.
     Given I log in as "oldteamlead"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Learner One" "table_row"
     And I press "Start"
     And I set the following fields to these values:
       | Your answer | Old Teamleader Learner One goal answer |
     And I press "Complete stage"
 
-    Given I click on "All Appraisals" in the totara menu
+    Given I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Learner Four" "table_row"
     And I press "Start"
     And I set the following fields to these values:
@@ -191,14 +191,14 @@ Feature: Access rights to user goal questions in dynamic appraisals
 
     # Appraiser does appraisals for 2 learners.
     Given I log in as "oldappraiser"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Learner One" "table_row"
     And I press "Start"
     And I set the following fields to these values:
       | Your answer | Old Appraiser Learner One goal answer |
     And I press "Complete stage"
 
-    Given I click on "All Appraisals" in the totara menu
+    Given I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Learner Four" "table_row"
     And I press "Start"
     And I set the following fields to these values:
@@ -216,7 +216,7 @@ Feature: Access rights to user goal questions in dynamic appraisals
     # learners.
     When I log out
     And I log in as "oldmgr"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     Then I should see "Completed" in the "Learner One" "table_row"
     And I should see "Active" in the "Learner Two" "table_row"
     And I should see "Active" in the "Learner Three" "table_row"
@@ -229,7 +229,7 @@ Feature: Access rights to user goal questions in dynamic appraisals
     And I should see "Old Appraiser Learner One goal answer"
     And I should see "Personal Goal Learner One"
 
-    When I click on "All Appraisals" in the totara menu
+    When I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Learner Two" "table_row"
     And I press "Start"
     Then I should not see "Old Manager Learner Two goal answer"
@@ -237,7 +237,7 @@ Feature: Access rights to user goal questions in dynamic appraisals
     And I should not see "Old Appraiser Learner Two goal answer"
     And I should see "Personal Goal Learner Two"
 
-    When I click on "All Appraisals" in the totara menu
+    When I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Learner Three" "table_row"
     And I press "Start"
     Then I should not see "Old Manager Learner Three goal answer"
@@ -245,7 +245,7 @@ Feature: Access rights to user goal questions in dynamic appraisals
     And I should not see "Old Appraiser Learner Three goal answer"
     And I should see "Personal Goal Learner Three"
 
-    When I click on "All Appraisals" in the totara menu
+    When I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Learner Four" "table_row"
     And I press "View"
     Then I should see "Old Manager Learner Four goal answer"
@@ -257,7 +257,7 @@ Feature: Access rights to user goal questions in dynamic appraisals
     # 4 learners.
     When I log out
     And I log in as "oldteamlead"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     Then I should see "Completed" in the "Learner One" "table_row"
     And I should see "Active" in the "Learner Two" "table_row"
     And I should see "Active" in the "Learner Three" "table_row"
@@ -270,7 +270,7 @@ Feature: Access rights to user goal questions in dynamic appraisals
     And I should see "Old Appraiser Learner One goal answer"
     And I should see "Personal Goal Learner One"
 
-    When I click on "All Appraisals" in the totara menu
+    When I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Learner Two" "table_row"
     And I press "Start"
     Then I should not see "Old Manager Learner Two goal answer"
@@ -278,7 +278,7 @@ Feature: Access rights to user goal questions in dynamic appraisals
     And I should not see "Old Appraiser Learner Two goal answer"
     And I should see "Personal Goal Learner Two"
 
-    When I click on "All Appraisals" in the totara menu
+    When I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Learner Three" "table_row"
     And I press "Start"
     Then I should not see "Old Manager Learner Three goal answer"
@@ -286,7 +286,7 @@ Feature: Access rights to user goal questions in dynamic appraisals
     And I should not see "Old Appraiser Learner Three goal answer"
     And I should see "Personal Goal Learner Three"
 
-    When I click on "All Appraisals" in the totara menu
+    When I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Learner Four" "table_row"
     And I press "View"
     Then I should see "Old Manager Learner Four goal answer"
@@ -323,7 +323,7 @@ Feature: Access rights to user goal questions in dynamic appraisals
     # Now new manager can see Learner 1 and 2's appraisals. Old manager cannot
     # see either of these appraisals.
     When I log in as "newmgr"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I should not see "Learner Three"
     And I should not see "Learner Four"
     And I should see "Completed" in the "Learner One" "table_row"
@@ -336,7 +336,7 @@ Feature: Access rights to user goal questions in dynamic appraisals
     And I should see "Old Appraiser Learner One goal answer"
     And I should see "Personal Goal Learner One"
 
-    When I click on "All Appraisals" in the totara menu
+    When I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Learner Two" "table_row"
     And I press "Start"
     Then I should not see "Old Manager Learner Two goal answer"
@@ -348,13 +348,13 @@ Feature: Access rights to user goal questions in dynamic appraisals
     # rest.
     When I log out
     And I log in as "oldmgr"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     Then I should not see "Learner One"
     Then I should not see "Learner Two"
     And I should see "Active" in the "Learner Three" "table_row"
     And I should see "Completed" in the "Learner Four" "table_row"
 
-    When I click on "All Appraisals" in the totara menu
+    When I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Learner Three" "table_row"
     And I press "Start"
     Then I should not see "Old Manager Learner Three goal answer"
@@ -362,7 +362,7 @@ Feature: Access rights to user goal questions in dynamic appraisals
     And I should not see "Old Appraiser Learner Three goal answer"
     And I should see "Personal Goal Learner Three"
 
-    When I click on "All Appraisals" in the totara menu
+    When I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Learner Four" "table_row"
     And I press "View"
     Then I should see "Old Manager Learner Four goal answer"
@@ -373,13 +373,13 @@ Feature: Access rights to user goal questions in dynamic appraisals
     # The old teamlead cannot see Learner 1 and 2's appraisal.
     When I log out
     And I log in as "oldteamlead"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     Then I should not see "Learner One"
     Then I should not see "Learner Two"
     And I should see "Active" in the "Learner Three" "table_row"
     And I should see "Completed" in the "Learner Four" "table_row"
 
-    When I click on "All Appraisals" in the totara menu
+    When I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Learner Three" "table_row"
     And I press "Start"
     Then I should not see "Old Manager Learner Three goal answer"
@@ -387,7 +387,7 @@ Feature: Access rights to user goal questions in dynamic appraisals
     And I should not see "Old Appraiser Learner Three goal answer"
     And I should see "Personal Goal Learner Three"
 
-    When I click on "All Appraisals" in the totara menu
+    When I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Learner Four" "table_row"
     And I press "View"
     Then I should see "Old Manager Learner Four goal answer"
@@ -398,7 +398,7 @@ Feature: Access rights to user goal questions in dynamic appraisals
     # The old appraiser can see all the appraisals.
     When I log out
     And I log in as "oldappraiser"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I should see "Completed" in the "Learner One" "table_row"
     And I should see "Active" in the "Learner Two" "table_row"
     And I should see "Active" in the "Learner Three" "table_row"
@@ -411,7 +411,7 @@ Feature: Access rights to user goal questions in dynamic appraisals
     And I should see "Old Appraiser Learner One goal answer"
     And I should see "Personal Goal Learner One"
 
-    When I click on "All Appraisals" in the totara menu
+    When I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Learner Two" "table_row"
     And I press "Start"
     Then I should not see "Old Manager Learner Two goal answer"
@@ -419,7 +419,7 @@ Feature: Access rights to user goal questions in dynamic appraisals
     And I should not see "Old Appraiser Learner Two goal answer"
     And I should see "Personal Goal Learner Two"
 
-    When I click on "All Appraisals" in the totara menu
+    When I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Learner Three" "table_row"
     And I press "Start"
     Then I should not see "Old Manager Learner Three goal answer"
@@ -427,7 +427,7 @@ Feature: Access rights to user goal questions in dynamic appraisals
     And I should not see "Old Appraiser Learner Three goal answer"
     And I should see "Personal Goal Learner Three"
 
-    When I click on "All Appraisals" in the totara menu
+    When I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Learner Four" "table_row"
     And I press "View"
     Then I should see "Old Manager Learner Four goal answer"
@@ -446,7 +446,7 @@ Feature: Access rights to user goal questions in dynamic appraisals
     # 4 learners.
     When I log out
     And I log in as "oldappraiser"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     Then I should see "Completed" in the "Learner One" "table_row"
     And I should see "Active" in the "Learner Two" "table_row"
     And I should see "Active" in the "Learner Three" "table_row"
@@ -459,7 +459,7 @@ Feature: Access rights to user goal questions in dynamic appraisals
     And I should see "Old Appraiser Learner One goal answer"
     And I should see "Personal Goal Learner One"
 
-    When I click on "All Appraisals" in the totara menu
+    When I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Learner Two" "table_row"
     And I press "Start"
     Then I should not see "Old Manager Learner Two goal answer"
@@ -467,7 +467,7 @@ Feature: Access rights to user goal questions in dynamic appraisals
     And I should not see "Old Appraiser Learner Two goal answer"
     And I should see "Personal Goal Learner Two"
 
-    When I click on "All Appraisals" in the totara menu
+    When I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Learner Three" "table_row"
     And I press "Start"
     Then I should not see "Old Manager Learner Three goal answer"
@@ -475,7 +475,7 @@ Feature: Access rights to user goal questions in dynamic appraisals
     And I should not see "Old Appraiser Learner Three goal answer"
     And I should see "Personal Goal Learner Three"
 
-    When I click on "All Appraisals" in the totara menu
+    When I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Learner Four" "table_row"
     And I press "View"
     Then I should see "Old Manager Learner Four goal answer"
@@ -509,7 +509,7 @@ Feature: Access rights to user goal questions in dynamic appraisals
 
     # New appraiser should only see Learner 1 and 2's appraisals.
     When I log in as "newappraiser"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     And I should not see "Learner Three"
     And I should not see "Learner Four"
     And I should see "Completed" in the "Learner One" "table_row"
@@ -522,7 +522,7 @@ Feature: Access rights to user goal questions in dynamic appraisals
     And I should see "Old Appraiser Learner One goal answer"
     And I should see "Personal Goal Learner One"
 
-    When I click on "All Appraisals" in the totara menu
+    When I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Learner Two" "table_row"
     And I press "Start"
     Then I should not see "Old Manager Learner Two goal answer"
@@ -534,13 +534,13 @@ Feature: Access rights to user goal questions in dynamic appraisals
     # the rest.
     When I log out
     And I log in as "oldappraiser"
-    And I click on "All Appraisals" in the totara menu
+    And I am on "All Appraisals" page
     Then I should not see "Learner One"
     Then I should not see "Learner Two"
     And I should see "Active" in the "Learner Three" "table_row"
     And I should see "Completed" in the "Learner Four" "table_row"
 
-    When I click on "All Appraisals" in the totara menu
+    When I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Learner Three" "table_row"
     And I press "Start"
     Then I should not see "Old Manager Learner Three goal answer"
@@ -548,7 +548,7 @@ Feature: Access rights to user goal questions in dynamic appraisals
     And I should not see "Old Appraiser Learner Three goal answer"
     And I should see "Personal Goal Learner Three"
 
-    When I click on "All Appraisals" in the totara menu
+    When I am on "All Appraisals" page
     And I click on "Appraisal1" "link" in the "Learner Four" "table_row"
     And I press "View"
     Then I should see "Old Manager Learner Four goal answer"

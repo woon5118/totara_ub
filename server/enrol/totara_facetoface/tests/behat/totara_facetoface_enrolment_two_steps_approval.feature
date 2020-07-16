@@ -70,7 +70,7 @@ Feature: Users can enrol on courses when two steps approval is on
     And I log out
 
     And I log in as "manager"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then I should see "Seminar booking admin request"
     And I click on "View all tasks" "link"
     And I should see "This is to advise that Jimmy Jim has requested to be booked into the following course" in the "td.message_values_statement" "css_element"
@@ -85,7 +85,7 @@ Feature: Users can enrol on courses when two steps approval is on
 
     When I log out
     And I log in as "actapprover"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then I should see "Seminar booking admin request"
     And I click on "View all tasks" "link"
     And I should see "This is to advise that Jimmy Jim has requested to be booked into the following course" in the "td.message_values_statement" "css_element"
@@ -99,7 +99,7 @@ Feature: Users can enrol on courses when two steps approval is on
 
     When I log out
     And I log in as "jimmy"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     Then I should see "Seminar booking confirmation"
 
     When I am on "Course1" course homepage

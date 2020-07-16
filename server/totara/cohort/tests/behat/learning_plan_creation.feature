@@ -63,12 +63,12 @@ Feature: Learning plans can be created for members of an audience.
 
     # Check the plans have been created.
     When I log in as "learner1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "Learning Plans" "link"
     Then I should see "Learning plan template 1"
     And I log out
     When I log in as "learner2"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "Learning Plans" "link"
     Then I should see "Learning plan template 1"
 
@@ -115,12 +115,12 @@ Feature: Learning plans can be created for members of an audience.
       | Learning plan template 1 | Admin User | Draft       | 2                        |
     And I log out
     When I log in as "learner1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "Learning Plans" "link"
     Then I should see "Learning plan template 1"
     And I log out
     When I log in as "learner2"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "Learning Plans" "link"
     Then I should see "Learning plan template 1"
 
@@ -169,7 +169,7 @@ Feature: Learning plans can be created for members of an audience.
       | Learning plan template 1 | Admin User | Draft       | 0                        |
     And I log out
     When I log in as "learner1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "Learning Plans" "link"
     Then I should see "Learning plan template 1"
     And I log out
@@ -191,7 +191,7 @@ Feature: Learning plans can be created for members of an audience.
       | Learning plan template 1 | Admin User | Draft       | 0                        |
     And I log out
     When I log in as "learner1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "Learning Plans" "link"
     Then I should see "Learning plan template 1"
 
@@ -258,7 +258,7 @@ Feature: Learning plans can be created for members of an audience.
 
     # Check the plan has been created with 'Draft' status.
     When I log in as "learner1"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I click on "Learning Plans" "link"
     Then I should see "Learning plan template 2" in the "#dp-plans-list-active-plans" "css_element"
     Then I should see "Learning plan template 1" in the "#dp-plans-list-unapproved-plans" "css_element"
@@ -267,7 +267,7 @@ Feature: Learning plans can be created for members of an audience.
 
     # As a user create a plan.
     Given I log in as "learner1"
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I click on "Learning Plans" "link"
     And I press "Create new learning plan"
     And I set the field "Plan name" to "My Learning Plan"
