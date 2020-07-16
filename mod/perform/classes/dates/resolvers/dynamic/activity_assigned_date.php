@@ -25,7 +25,7 @@ namespace mod_perform\dates\resolvers\dynamic;
 use core\collection;
 use core\orm\query\builder;
 use lang_string;
-use mod_perform\constants;
+use mod_perform\dates\constants;
 use mod_perform\entities\activity\track;
 use mod_perform\entities\activity\track_user_assignment;
 

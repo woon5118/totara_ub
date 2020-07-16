@@ -28,7 +28,7 @@ use core\orm\query\builder;
 use mod_perform\entities\activity\subject_instance;
 use mod_perform\entities\activity\track;
 use mod_perform\entities\activity\track_user_assignment;
-use mod_perform\constants;
+use mod_perform\dates\constants;
 
 class another_activity_date extends base_dynamic_date_resolver {
 

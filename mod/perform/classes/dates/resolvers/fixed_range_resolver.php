@@ -22,7 +22,7 @@
  */
 namespace mod_perform\dates\resolvers;
 
-use mod_perform\constants;
+use mod_perform\dates\constants;
 
 class fixed_range_resolver implements date_resolver {
 
@@ -63,7 +63,7 @@ class fixed_range_resolver implements date_resolver {
      * @inheritDoc
      */
     public function get_resolver_base(): string {
-        return constants::DATE_RESOLVER_FIXED;
+        return constants::DATE_RESOLVER_EMPTY_BASE;
     }
 
 }

@@ -26,7 +26,7 @@ use core\collection;
 use core\orm\collection as orm_collection;
 use core\orm\entity\entity;
 use core\orm\query\builder;
-use mod_perform\constants;
+use mod_perform\dates\constants;
 use mod_perform\dates\date_offset;
 use mod_perform\dates\resolvers\date_resolver;
 use mod_perform\dates\resolvers\dynamic\dynamic_source;
@@ -39,7 +39,6 @@ use mod_perform\models\activity\track;
 use mod_perform\models\activity\track_status;
 use PHPUnit\Framework\MockObject\MockObject;
 use totara_core\dates\date_time_setting;
-use totara_job\job_assignment;
 
 /**
  * @coversDefaultClass track.

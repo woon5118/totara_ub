@@ -39,6 +39,7 @@ use mod_perform\task\expand_task\assignment_parameters;
 use mod_perform\task\expand_task\assignment_parameters_collection;
 use mod_perform\task\service\track_schedule_sync;
 use mod_perform\user_groups\grouping;
+use mod_perform\dates\constants;
 
 class expand_task {
 

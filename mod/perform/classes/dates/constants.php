@@ -21,13 +21,10 @@
  * @package mod_perform
  */
 
-namespace mod_perform;
+namespace mod_perform\dates;
 
 abstract class constants {
-    public const SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT = 'ONE_PER_SUBJECT';
-    public const SUBJECT_INSTANCE_GENERATION_ONE_PER_JOB = 'ONE_PER_JOB';
-
-    public const SCHEDULE_REPEATING_AFTER_CREATION = 'AFTER_CREATION';
-    public const SCHEDULE_REPEATING_AFTER_CREATION_WHEN_COMPLETE = 'AFTER_CREATION_WHEN_COMPLETE';
-    public const SCHEDULE_REPEATING_AFTER_COMPLETION = 'AFTER_COMPLETION';
+    public const DATE_RESOLVER_EMPTY_BASE = 'EMPTY_BASE';
+    public const DATE_RESOLVER_USER_BASED = 'USER_BASED';
+    public const DATE_RESOLVER_JOB_BASED = 'JOB_BASED';
 }

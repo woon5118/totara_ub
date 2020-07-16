@@ -26,7 +26,7 @@ namespace mod_perform\task\service;
 use core\orm\collection;
 use core\orm\lazy_collection;
 use core\orm\query\builder;
-use mod_perform\constants;
+use mod_perform\dates\constants;
 use mod_perform\dates\resolvers\anniversary_of;
 use mod_perform\dates\resolvers\date_resolver;
 use mod_perform\entities\activity\track;

@@ -27,6 +27,7 @@ use coding_exception;
 use core\orm\collection;
 use core\orm\entity\model;
 use mod_perform\constants;
+use mod_perform\dates\constants as date_constants;
 use mod_perform\dates\date_offset;
 use totara_core\dates\date_time_setting;
 use mod_perform\dates\resolvers\date_resolver;
@@ -796,7 +797,7 @@ class track extends model {
 
         $bulk_fetch_keys = [];
         switch ($resolver->get_resolver_base()) {
-            case constants::DATE_RESOLVER_JOB_BASED:
+            case date_constants::DATE_RESOLVER_JOB_BASED:
                 $bulk_fetch_keys = $user_assignments->pluck('job_assignment_id');
                 if (!empty($bulk_fetch_keys)) {
                     $bulk_fetch_keys = array_filter($bulk_fetch_keys,
@@ -807,7 +808,7 @@ class track extends model {
                 }
                 break;
 
-            case constants::DATE_RESOLVER_USER_BASED:
+            case date_constants::DATE_RESOLVER_USER_BASED:
                 $bulk_fetch_keys = $user_assignments->pluck('subject_user_id');
                 break;
 

@@ -24,7 +24,7 @@ namespace mod_perform\dates\resolvers\dynamic;
 
 use core\collection;
 use core\orm\query\builder;
-use mod_perform\constants;
+use mod_perform\dates\constants;
 
 class user_creation_date extends base_dynamic_date_resolver {
 

@@ -188,7 +188,7 @@ abstract class base_dynamic_date_resolver implements dynamic_date_resolver {
 
         $reference_date = $this->date_map[$this->get_entry_key(...$args)];
         if ($reference_date === null) {
-            return $reference_date;
+            return null;
         }
 
         // End dates are adjusted to "end of day".

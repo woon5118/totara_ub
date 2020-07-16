@@ -26,7 +26,6 @@ use mod_perform\constants;
 use mod_perform\entities\activity\track as track_entity;
 use mod_perform\dates\date_offset;
 use mod_perform\entities\activity\track as track_entitty;
-use totara_core\dates\date_time_setting;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 require_once(__DIR__ . '/generator/activity_generator_configuration.php');
