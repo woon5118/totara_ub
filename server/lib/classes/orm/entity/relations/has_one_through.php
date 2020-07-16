@@ -69,30 +69,35 @@ class has_one_through extends has_many_through {
 
         $intermediate_builder = $this->get_intermediate_builder();
 
-        // Load possible values
-        $results = $this->repo
-            ->add_select($this->repo->get_table() . '.*')
-            ->add_select($intermediate_builder->get_table() . '.' . $this->get_intermediate_foreign_key() . ' as ' . $this->get_intermediate_key_name())
-            ->join($this->intermediate::TABLE, $this->get_foreign_key(), $this->get_intermediate_related_foreign_key())
-            ->where(new field($this->get_intermediate_foreign_key(), $intermediate_builder), $keys)
-            ->get(true);
+        // Chunk this to avoid too many value for IN condition
+        $keys_chunked = array_chunk($keys, builder::get_db()->get_max_in_params());
 
-        // Now iterate over original collection and append the results there
-        $collection->map(function ($item) use ($results, $name) {
-            /** @var entity $item */
-            $item->relate($name, $results->find($this->get_intermediate_key_name(), $item->{$this->get_key()}));
+        foreach ($keys_chunked as $keys) {
+            // Load possible values
+            $results = $this->repo
+                ->add_select($this->repo->get_table() . '.*')
+                ->add_select($intermediate_builder->get_table() . '.' . $this->get_intermediate_foreign_key() . ' as ' . $this->get_intermediate_key_name())
+                ->join($this->intermediate::TABLE, $this->get_foreign_key(), $this->get_intermediate_related_foreign_key())
+                ->where(new field($this->get_intermediate_foreign_key(), $intermediate_builder), $keys)
+                ->get(true);
 
-            return $item;
-        });
+            $results->key_by($this->get_intermediate_key_name());
 
-        $results->transform(function (entity $entity) {
-            // We add this key temporarily to link children to the parent,
-            // Since we do want to return entities in a valid state,
-            // We'll unset it
-            unset($entity->{$this->get_intermediate_key_name()});
+            // Now iterate over original collection and append the results there
+            $collection->map(
+                function ($item) use ($results, $name) {
+                    /** @var entity $item */
+                    $item->relate($name, $results->item($item->{$this->get_key()}));
 
-            return $entity;
-        });
+                    // We add this key temporarily to link children to the parent,
+                    // Since we do want to return entities in a valid state,
+                    // We'll unset it
+                    unset($item->{$this->get_intermediate_key_name()});
+
+                    return $item;
+                }
+            );
+        }
     }
 
     /**

@@ -26,6 +26,7 @@ namespace core\orm\entity\relations;
 use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\entity\repository;
+use core\orm\query\builder;
 
 /**
  * Class has_one defines one to one relation between entities
@@ -65,15 +66,24 @@ abstract class one_to_one extends relation {
         // Extracting keys to load related objects by.
         $keys = $collection->pluck($this->get_key());
 
-        // Load all related objects
-        $results = $this->repo->where($this->get_foreign_key(), $keys)->get();
+        // Chunk this to avoid too many value for IN condition
+        $keys_chunked = array_chunk($keys, builder::get_db()->get_max_in_params());
 
-        // Now iterate over original collection of models and inject appropriate results there.
-        $collection->map(function (entity $item) use ($results, $name) {
-            $item->relate($name, $results->filter($this->get_foreign_key(), $item->{$this->get_key()})->first());
+        foreach ($keys_chunked as $keys) {
+            // Load all related objects
+            $results = $this->repo->where($this->get_foreign_key(), $keys)->get();
 
-            return $item;
-        });
+            $results->key_by($this->get_foreign_key());
+
+            // Now iterate over original collection of models and inject appropriate results there.
+            $collection->map(
+                function (entity $item) use ($results, $name) {
+                    $item->relate($name, $results->item($item->{$this->get_key()}));
+
+                    return $item;
+                }
+            );
+        }
     }
 
 }

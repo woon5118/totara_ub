@@ -25,6 +25,7 @@ namespace core\orm\entity\relations;
 
 use core\orm\collection;
 use core\orm\entity\entity;
+use core\orm\query\builder;
 
 /**
  * Class has_many
@@ -63,16 +64,29 @@ class has_many extends relation {
         // Extracting keys to load related objects by.
         $keys = $collection->pluck($this->get_key());
 
-        // Load possible values
-        $results = $this->repo->where($this->get_foreign_key(), $keys)->get();
+        // Chunk this to avoid too many value for IN condition
+        $keys_chunked = array_chunk($keys, builder::get_db()->get_max_in_params());
+
+        // Group the result so that we can get the related results quicker
+        $grouped = [];
+        foreach ($keys_chunked as $keys) {
+            // Load possible values
+            $results = $this->repo->where($this->get_foreign_key(), $keys)->get();
+
+            foreach ($results as $result) {
+                $grouped[$result->{$this->get_foreign_key()}][$result->id] = $result;
+            }
+        }
 
         // Now iterate over original collection and append the results there
-        $collection->map(function ($item) use ($results, $name) {
-            /** @var entity $item */
-            $item->relate($name, $results->filter($this->get_foreign_key(), $item->{$this->get_key()}));
+        $collection->map(
+            function ($item) use ($grouped, $name) {
+                /** @var entity $item */
+                $item->relate($name, new collection($grouped[$item->{$this->get_key()}] ?? []));
 
-            return $item;
-        });
+                return $item;
+            }
+        );
     }
 
 }
