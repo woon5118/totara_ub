@@ -1,0 +1,198 @@
+<!--
+  This file is part of Totara Learn
+
+  Copyright (C) 2019 onwards Totara Learning Solutions LTD
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+  @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
+  @package totara_core
+-->
+
+<template>
+  <ChartJs
+    type="doughnut"
+    :data="data"
+    :options="options"
+    :header="header"
+    :canvas-attributes="canvasAttributes"
+    :aria-label="fallback"
+  />
+</template>
+
+<script>
+import ChartJs from 'totara_core/components/chartjs/ChartJs';
+import theme from 'totara_core/theme';
+
+let defaultColor = theme.getVar('tui-color-chart-background-1');
+let defaultLabelFontSize = parseInt(
+  theme.getVar('tui-font-size-chart-doughnut-label')
+);
+let defaultPercentageFontSize = parseInt(
+  theme.getVar('tui-font-size-chart-doughnut-percentage-label')
+);
+let defaultLabelColor = theme.getVar('tui-color-chart-doughnut-label');
+let defaultBackgroundColor = theme.getVar('tui-color-neutral-4');
+
+export default {
+  components: { ChartJs },
+  props: {
+    header: {
+      type: String,
+    },
+    percentage: {
+      type: Number,
+      required: true,
+    },
+    label: {
+      type: String,
+      default: '',
+    },
+    showPercentage: {
+      type: Boolean,
+      default: true,
+    },
+    color: {
+      type: String,
+    },
+    labelColor: {
+      type: String,
+    },
+    labelFontSize: {
+      type: Number,
+    },
+    labelFontWeight: {
+      type: [String, Number],
+      default: undefined,
+    },
+    percentageFontSize: {
+      type: Number,
+    },
+    backgroundColor: {
+      type: String,
+    },
+    cutout: {
+      type: Number,
+      default: 85,
+    },
+    square: {
+      type: Boolean,
+      default: false,
+    },
+  },
+
+  computed: {
+    data() {
+      let colors = [
+        this.color ? this.color : defaultColor,
+        this.backgroundColor ? this.backgroundColor : defaultBackgroundColor,
+      ];
+
+      let data = [this.percentage, 100 - this.percentage];
+
+      if (this.percentage === 100) {
+        colors = [this.color ? this.color : defaultColor];
+        data = [this.percentage];
+      }
+
+      return {
+        datasets: [
+          {
+            backgroundColor: colors,
+            hoverBackgroundColor: colors,
+            hoverBorderColor: colors,
+            borderWidth: 2,
+            borderColor: colors,
+            data: data,
+          },
+        ],
+      };
+    },
+
+    options() {
+      let labels = [];
+
+      if (this.showPercentage) {
+        labels.push({
+          text: this.percentage + '%',
+          font: {
+            size: this.percentageFontSize
+              ? this.percentageFontSize
+              : defaultPercentageFontSize,
+            weight: 'bold',
+          },
+          color: this.labelColor ? this.labelColor : defaultLabelColor,
+        });
+      }
+
+      if (this.label.trim() !== '') {
+        labels.push({
+          text: this.label,
+          font: {
+            size: this.labelFontSize
+              ? this.labelFontSize
+              : defaultLabelFontSize,
+            weight: this.labelFontWeight,
+          },
+          color: this.labelColor ? this.labelColor : defaultLabelColor,
+        });
+      }
+
+      let layout = this.square
+        ? {
+            padding: {
+              left: 0,
+              right: 0,
+              top: 0,
+              bottom: 0,
+            },
+          }
+        : {};
+
+      return {
+        cutoutPercentage: this.cutout,
+        tooltips: {
+          enabled: false,
+        },
+        plugins: {
+          doughnutlabel: {
+            labels,
+          },
+        },
+        legend: {
+          display: false,
+        },
+        layout,
+      };
+    },
+
+    canvasAttributes() {
+      return this.square
+        ? {
+            width: '100%',
+            height: '100%',
+          }
+        : {};
+    },
+
+    fallback() {
+      return (
+        (this.label.trim() !== '' ? `${this.label} ` : '') +
+        this.percentage +
+        '%'
+      );
+    },
+  },
+};
+</script>
