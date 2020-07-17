@@ -22,15 +22,12 @@
  * @category test
  */
 
-use mod_perform\entities\activity\notification as notification_entity;
-use mod_perform\models\activity\activity;
-use mod_perform\models\activity\notification;
 use mod_perform\notification\broker;
+use mod_perform\notification\brokers\due_date_reminder;
 use mod_perform\notification\brokers\instance_created;
-use mod_perform\notification\brokers\overdue;
+use mod_perform\notification\brokers\overdue_reminder;
 use mod_perform\notification\loader;
 use mod_perform\notification\trigger;
-use totara_core\relationship\relationship_provider;
 
 class mod_perform_notification_loader_testcase extends advanced_testcase {
     /**
@@ -59,11 +56,20 @@ class mod_perform_notification_loader_testcase extends advanced_testcase {
         return [
             'empty' => [[], 'notification data is empty'],
             'missing class' => [[
-                'kia_ora' => ['name' => 'kia ora']
+                'kia_ora' => ['name' => 'kia ora', 'trigger_type' => trigger::TYPE_UNSUPPORTED]
             ], 'class is missing for kia_ora'],
             'missing name' => [[
-                'kia_ora' => ['class' => 'kia\\ora']
+                'kia_ora' => ['class' => 'kia\\ora', 'trigger_type' => trigger::TYPE_UNSUPPORTED]
             ], 'name is missing for kia_ora'],
+            'missing trigger type' => [[
+                'kia_ora' => ['name' => 'kia ora', 'class' => 'kia\\ora']
+            ], 'trigger_type is missing for kia_ora'],
+            'missing trigger label 1' => [[
+                'kia_ora' => ['name' => 'kia ora', 'class' => 'kia\\ora', 'trigger_type' => trigger::TYPE_BEFORE]
+            ], 'trigger_label is missing for kia_ora'],
+            'missing trigger label 2' => [[
+                'kia_ora' => ['name' => 'kia ora', 'class' => 'kia\\ora', 'trigger_type' => trigger::TYPE_AFTER]
+            ], 'trigger_label is missing for kia_ora'],
         ];
     }
 
@@ -96,14 +102,23 @@ class mod_perform_notification_loader_testcase extends advanced_testcase {
                 'name' => ['notification_broker_instance_created', 'mod_perform'],
                 'trigger_type' => trigger::TYPE_UNSUPPORTED,
             ],
-            'test_overdue' => [
-                'class' => overdue::class,
+            'test_overdue_reminder' => [
+                'class' => overdue_reminder::class,
                 'name' => ['screenshot', 'moodle'],
                 'trigger_type' => trigger::TYPE_AFTER,
+                'trigger_label' => ['readme'],
+            ],
+            'test_due_date_reminder' => [
+                'class' => due_date_reminder::class,
+                'name' => ['downloadfile'],
+                'trigger_type' => trigger::TYPE_BEFORE,
+                'trigger_label' => ['tags', 'moodle'],
             ],
             'kia_ora_koutou_katoa' => [
                 'class' => mod_perform_notification_loader_testcase::class,
                 'name' => ['ok'],
+                'trigger_type' => trigger::TYPE_UNSUPPORTED,
+                'trigger_label' => ['ok'],
             ],
         ];
         return loader::create($notifications);
@@ -112,21 +127,24 @@ class mod_perform_notification_loader_testcase extends advanced_testcase {
     public function test_get_classes_custom() {
         $loader = $this->create_loader();
         $brokers = $loader->get_classes();
-        $this->assertCount(3, $brokers);
+        $this->assertCount(4, $brokers);
         $keys = array_keys($brokers);
         $this->assertEquals('test_instance_created', $keys[0]);
-        $this->assertEquals('test_overdue', $keys[1]);
-        $this->assertEquals('kia_ora_koutou_katoa', $keys[2]);
+        $this->assertEquals('test_overdue_reminder', $keys[1]);
+        $this->assertEquals('test_due_date_reminder', $keys[2]);
+        $this->assertEquals('kia_ora_koutou_katoa', $keys[3]);
         $values = array_values($brokers);
         $this->assertEquals(instance_created::class, $values[0]);
-        $this->assertEquals(overdue::class, $values[1]);
-        $this->assertEquals(mod_perform_notification_loader_testcase::class, $values[2]);
+        $this->assertEquals(overdue_reminder::class, $values[1]);
+        $this->assertEquals(due_date_reminder::class, $values[2]);
+        $this->assertEquals(mod_perform_notification_loader_testcase::class, $values[3]);
     }
 
     public function test_get_class_of() {
         $loader = $this->create_loader();
         $this->assertEquals(instance_created::class, $loader->get_class_of('test_instance_created'));
-        $this->assertEquals(overdue::class, $loader->get_class_of('test_overdue'));
+        $this->assertEquals(overdue_reminder::class, $loader->get_class_of('test_overdue_reminder'));
+        $this->assertEquals(due_date_reminder::class, $loader->get_class_of('test_due_date_reminder'));
         $this->assertEquals(mod_perform_notification_loader_testcase::class, $loader->get_class_of('kia_ora_koutou_katoa'));
         try {
             $loader->get_class_of('he_who_must_not_be_named');
@@ -139,7 +157,8 @@ class mod_perform_notification_loader_testcase extends advanced_testcase {
     public function test_get_name_of() {
         $loader = $this->create_loader();
         $this->assertEquals(get_string('notification_broker_instance_created', 'mod_perform'), $loader->get_name_of('test_instance_created'));
-        $this->assertEquals(get_string('screenshot', 'moodle'), $loader->get_name_of('test_overdue'));
+        $this->assertEquals(get_string('screenshot', 'moodle'), $loader->get_name_of('test_overdue_reminder'));
+        $this->assertEquals(get_string('downloadfile'), $loader->get_name_of('test_due_date_reminder'));
         $this->assertEquals(get_string('ok'), $loader->get_name_of('kia_ora_koutou_katoa'));
         try {
             $loader->get_name_of('he_who_must_not_be_named');
@@ -149,10 +168,27 @@ class mod_perform_notification_loader_testcase extends advanced_testcase {
         }
     }
 
+    public function test_get_trigger_type_of() {
+        $loader = $this->create_loader();
+        $this->assertEquals(trigger::TYPE_UNSUPPORTED, $loader->get_trigger_type_of('test_instance_created'));
+        $this->assertEquals(trigger::TYPE_AFTER, $loader->get_trigger_type_of('test_overdue_reminder'));
+        $this->assertEquals(trigger::TYPE_BEFORE, $loader->get_trigger_type_of('test_due_date_reminder'));
+        $this->assertEquals(trigger::TYPE_UNSUPPORTED, $loader->get_trigger_type_of('kia_ora_koutou_katoa'));
+    }
+
+    public function test_get_trigger_label_of() {
+        $loader = $this->create_loader();
+        $this->assertNull($loader->get_trigger_label_of('test_instance_created'));
+        $this->assertEquals(get_string('trigger_after', 'mod_perform', ['name' => get_string('readme')]), $loader->get_trigger_label_of('test_overdue_reminder'));
+        $this->assertEquals(get_string('trigger_before', 'mod_perform', ['name' => get_string('tags', 'moodle')]), $loader->get_trigger_label_of('test_due_date_reminder'));
+        $this->assertNull($loader->get_trigger_label_of('kia_ora_koutou_katoa'));
+    }
+
     public function test_support_triggers() {
         $loader = $this->create_loader();
         $this->assertFalse($loader->support_triggers('test_instance_created'));
-        $this->assertTrue($loader->support_triggers('test_overdue'));
+        $this->assertTrue($loader->support_triggers('test_overdue_reminder'));
+        $this->assertTrue($loader->support_triggers('test_due_date_reminder'));
         $this->assertFalse($loader->support_triggers('kia_ora_koutou_katoa'));
         try {
             $loader->support_triggers('he_who_must_not_be_named');

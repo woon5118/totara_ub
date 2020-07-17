@@ -24,6 +24,7 @@
 
 use mod_perform\notification\exceptions\class_key_not_available;
 use mod_perform\notification\cartel;
+use mod_perform\notification\trigger;
 
 require_once(__DIR__ . '/notification_testcase.php');
 
@@ -34,14 +35,19 @@ class mod_perform_notification_cartel_testcase extends mod_perform_notification_
             'mock_one' => [
                 'class' => mod_perform_mock_broker_one::class,
                 'name' => 'mock #1',
+                'trigger_type' => trigger::TYPE_UNSUPPORTED,
             ],
             'mock_two' => [
                 'class' => mod_perform_mock_broker_two::class,
                 'name' => 'MOCK #2',
+                'trigger_type' => trigger::TYPE_BEFORE,
+                'trigger_label' => ['clear'],
             ],
             'mock_three' => [
                 'class' => mod_perform_mock_broker_three::class,
                 'name' => 'm0c1< #3',
+                'trigger_type' => trigger::TYPE_AFTER,
+                'trigger_label' => ['learner'],
             ],
         ]);
     }

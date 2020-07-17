@@ -36,11 +36,13 @@ $notifications = [
         'name' => ['notification_broker_instance_created_reminder', 'mod_perform'],
         'class' => \mod_perform\notification\brokers\instance_created_reminder::class,
         'trigger_type' => \mod_perform\notification\trigger::TYPE_AFTER,
+        'trigger_label' => ['notification_trigger_instance_creation', 'mod_perform'],
     ],
     'due_date_reminder' => [
         'name' => ['notification_broker_due_date_reminder', 'mod_perform'],
         'class' => \mod_perform\notification\brokers\due_date_reminder::class,
         'trigger_type' => \mod_perform\notification\trigger::TYPE_BEFORE,
+        'trigger_label' => ['notification_trigger_duedate', 'mod_perform'],
     ],
     'due_date' => [
         'name' => ['notification_broker_due_date', 'mod_perform'],
@@ -51,6 +53,7 @@ $notifications = [
         'name' => ['notification_broker_overdue_reminder', 'mod_perform'],
         'class' => \mod_perform\notification\brokers\overdue_reminder::class,
         'trigger_type' => \mod_perform\notification\trigger::TYPE_AFTER,
+        'trigger_label' => ['notification_trigger_duedate', 'mod_perform'],
     ],
     'completion' => [
         'name' => ['notification_broker_completion', 'mod_perform'],

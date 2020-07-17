@@ -7,6 +7,7 @@ type mod_perform_notification {
   class_key: String!
   active: Boolean!
   trigger_type: mod_perform_notification_trigger_type
+  trigger_label(format: core_format = PLAIN): String
   recipients: [mod_perform_notification_recipient!]
   triggers: [Int!]
 }

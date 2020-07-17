@@ -32,16 +32,21 @@
       :data="notification"
       @toggleNotification="onToggleNotification"
       @toggleRecipient="onToggleRecipient"
+      @updateTriggers="onUpdateTriggers"
     />
   </div>
 </template>
 
 <script>
+import { notify } from 'tui/notifications';
+import { NOTIFICATION_DURATION } from 'mod_perform/constants';
 import NotificationSection from 'mod_perform/components/manage_activity/notification/NotificationSection';
 import notificationsQuery from 'mod_perform/graphql/notifications';
 import createNotificationMutation from 'mod_perform/graphql/create_notification';
 import toggleNotificationMutation from 'mod_perform/graphql/toggle_notification';
 import toggleNotificationRecipientMutation from 'mod_perform/graphql/toggle_notification_recipient';
+import updateNotificationTriggersMutation from 'mod_perform/graphql/update_notification_triggers';
+import { debounce } from 'tui/util';
 
 export default {
   components: {
@@ -77,6 +82,40 @@ export default {
     },
   },
 
+  beforeCreate() {
+    this.updateTriggers = debounce(
+      async (section, triggers) => {
+        const id = await this.createNotificationIfNotExists(section);
+        try {
+          await this.$apollo.mutate({
+            mutation: updateNotificationTriggersMutation,
+            variables: {
+              input: {
+                notification_id: id,
+                values: triggers,
+              },
+            },
+            refetchAll: false,
+          });
+          notify({
+            duration: NOTIFICATION_DURATION,
+            message: this.$str('toast_success_activity_update', 'mod_perform'),
+            type: 'success',
+          });
+        } catch (ex) {
+          notify({
+            duration: NOTIFICATION_DURATION,
+            message: this.$str('toast_error_generic_update', 'mod_perform'),
+            type: 'error',
+          });
+          throw ex;
+        }
+      },
+      500,
+      { leading: true, trailing: true }
+    );
+  },
+
   methods: {
     async onToggleNotification(section, active) {
       if (section.id) {
@@ -88,6 +127,7 @@ export default {
               active,
             },
           },
+          refetchAll: true,
         });
       } else {
         await this.$apollo.mutate({
@@ -99,11 +139,12 @@ export default {
               active,
             },
           },
+          refetchAll: true,
         });
       }
     },
 
-    async onToggleRecipient(section, recipient) {
+    async createNotificationIfNotExists(section) {
       let id;
       if (!section.id) {
         const mutationResult = await this.$apollo.mutate({
@@ -121,6 +162,11 @@ export default {
       } else {
         id = section.id;
       }
+      return id;
+    },
+
+    async onToggleRecipient(section, recipient) {
+      const id = await this.createNotificationIfNotExists(section);
       await this.$apollo.mutate({
         mutation: toggleNotificationRecipientMutation,
         variables: {
@@ -130,7 +176,12 @@ export default {
             active: recipient.active,
           },
         },
+        refetchAll: true,
       });
+    },
+
+    onUpdateTriggers(section, triggers) {
+      this.updateTriggers(section, triggers);
     },
   },
 };
@@ -140,7 +191,9 @@ export default {
   {
     "mod_perform": [
       "notification_active",
-      "manage_activities_tabs_notifications"
+      "manage_activities_tabs_notifications",
+      "toast_error_generic_update",
+      "toast_success_activity_update"
     ]
   }
 </lang-strings>

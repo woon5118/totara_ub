@@ -46,6 +46,17 @@
         />
         <div v-else>{{ $str('no_recipients', 'mod_perform') }}</div>
       </FormRow>
+      <FormRow
+        v-if="data.trigger_label"
+        :label="$str('trigger_events', 'mod_perform')"
+      >
+        <TriggersTable
+          :data="data.triggers"
+          :label="data.trigger_label"
+          :class-key="data.class_key"
+          @input="$emit('updateTriggers', data, $event)"
+        />
+      </FormRow>
     </Form>
   </Collapsible>
 </template>
@@ -54,6 +65,7 @@
 import Collapsible from 'tui/components/collapsible/Collapsible';
 import ToggleSwitch from 'tui/components/toggle/ToggleSwitch';
 import RecipientsTable from 'mod_perform/components/manage_activity/notification/RecipientsTable';
+import TriggersTable from 'mod_perform/components/manage_activity/notification/TriggersTable';
 import Form from 'tui/components/form/Form';
 import FormRow from 'tui/components/form/FormRow';
 
@@ -62,6 +74,7 @@ export default {
     Collapsible,
     ToggleSwitch,
     RecipientsTable,
+    TriggersTable,
     Form,
     FormRow,
   },
@@ -88,7 +101,8 @@ export default {
   "mod_perform": [
     "no_recipients",
     "recipients",
-    "toggle_notification"
+    "toggle_notification",
+    "trigger_events"
   ]
 }
 </lang-strings>

@@ -32,7 +32,7 @@ use mod_perform\models\activity\notification as notification_model;
  */
 class due_date_reminder implements broker {
     public function get_default_triggers(): array {
-        return [];
+        return [DAYSECS];
     }
 
     public function execute(dealer $dealer, notification_model $notification): void {

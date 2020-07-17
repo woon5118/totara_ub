@@ -48,6 +48,7 @@ class notification extends formatter {
             'active' => null,
             'class_key' => null,
             'trigger_type' => 'format_trigger_type',
+            'trigger_label' => string_field_formatter::class,
             'recipients' => null,
             'triggers' => null,
         ];

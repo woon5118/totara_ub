@@ -41,11 +41,13 @@ class mod_perform_notification_trigger_testcase extends mod_perform_notification
                 'class' => mod_perform_mock_broker_two::class,
                 'name' => 'MOCK #2',
                 'trigger_type' => trigger::TYPE_BEFORE,
+                'trigger_label' => ['clear'],
             ],
             'mock_three' => [
                 'class' => mod_perform_mock_broker_three::class,
                 'name' => 'm0c1< #3',
                 'trigger_type' => trigger::TYPE_AFTER,
+                'trigger_label' => ['learner'],
             ],
         ]);
     }

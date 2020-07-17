@@ -105,7 +105,7 @@ class mod_perform_notification_model_testcase extends mod_perform_notification_t
         $activity = $this->create_activity();
         $notification = notification::create($activity, 'instance_created_reminder');
         $this->assertEquals(trigger::TYPE_AFTER, $notification->trigger_type);
-        $this->assertEquals([], $notification->triggers);
+        $this->assertEquals([1], $notification->triggers);
         $notification->set_triggers([3, 1, 4]);
         $this->assertEquals([1, 3, 4], $notification->triggers);
 

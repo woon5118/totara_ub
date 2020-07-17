@@ -30,6 +30,7 @@ use mod_perform\notification\factory;
 use mod_perform\models\activity\details\notification_interface as notification_interface;
 use mod_perform\models\activity\details\notification_real;
 use mod_perform\models\activity\details\notification_sparse;
+use mod_perform\notification\trigger;
 
 /**
  * A proxy class that represents a single performance notification setting.
@@ -38,6 +39,7 @@ use mod_perform\models\activity\details\notification_sparse;
  * @property string $name
  * @property string $class_key
  * @property boolean $active is active?
+ * @property string|null $trigger_label
  * @property integer $trigger_type
  *
  * @property-read activity $activity
@@ -241,6 +243,16 @@ final class notification implements notification_interface {
     public function get_trigger_type(): int {
         $loader = factory::create_loader();
         return $loader->get_trigger_type_of($this->current->get_class_key());
+    }
+
+    /**
+     * Return the trigger label text.
+     *
+     * @return string|null localised label text or null if triggers are not supported
+     */
+    public function get_trigger_label(): ?string {
+        $loader = factory::create_loader();
+        return $loader->get_trigger_label_of($this->current->get_class_key());
     }
 
     /**

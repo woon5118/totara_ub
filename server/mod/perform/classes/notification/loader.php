@@ -33,10 +33,16 @@ class loader {
     /** @var array */
     private $notifications;
 
-    /** @var array */
+    /** @var string[] */
     private static $mandatory_fields = [
         'class',
         'name',
+        'trigger_type',
+    ];
+
+    /** @var string[] */
+    private static $mandatory_depends = [
+        'trigger_label' => ['trigger_type', trigger::TYPE_UNSUPPORTED],
     ];
 
     /**
@@ -61,6 +67,12 @@ class loader {
         foreach ($notifications as $class_key => $notif) {
             foreach (self::$mandatory_fields as $mandatory_field) {
                 if (!isset($notif[$mandatory_field])) {
+                    throw new coding_exception("{$mandatory_field} is missing for {$class_key}");
+                }
+            }
+            foreach (self::$mandatory_depends as $mandatory_field => $mandatory_dependency) {
+                $value = $notif[$mandatory_dependency[0]];
+                if ($value != $mandatory_dependency[1] && !isset($notif[$mandatory_field])) {
                     throw new coding_exception("{$mandatory_field} is missing for {$class_key}");
                 }
             }
@@ -125,6 +137,28 @@ class loader {
     public function get_trigger_type_of(string $class_key): int {
         $info = $this->get_information($class_key);
         return $info['trigger_type'] ?? trigger::TYPE_UNSUPPORTED;
+    }
+
+    /**
+     * Get the label text attached to event triggers.
+     *
+     * @param string $class_key
+     * @return string|null localised label text or null if triggers are not supported
+     */
+    public function get_trigger_label_of(string $class_key): ?string {
+        $info = $this->get_information($class_key);
+        $trigger_type = $this->get_trigger_type_of($class_key);
+        if ($trigger_type === trigger::TYPE_UNSUPPORTED) {
+            return null;
+        }
+        $label = get_string($info['trigger_label'][0], $info['trigger_label'][1] ?? '');
+        if ($trigger_type === trigger::TYPE_BEFORE) {
+            return get_string('trigger_before', 'mod_perform', ['name' => $label]);
+        }
+        if ($trigger_type === trigger::TYPE_AFTER) {
+            return get_string('trigger_after', 'mod_perform', ['name' => $label]);
+        }
+        throw new coding_exception('unsupported trigger type');
     }
 
     /**
