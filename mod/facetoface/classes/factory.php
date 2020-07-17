@@ -79,7 +79,7 @@ class factory {
         }
         // The room_list class has a different constructor.
         if ($type === 'room') {
-            return new room_list('SELECT 1 WHERE 1 != 1');
+            return new room_list('SELECT 1 FROM {facetoface_room} WHERE 1 != 1');
         } else {
             $listclass = self::$list_classes[$type];
             return new $listclass();

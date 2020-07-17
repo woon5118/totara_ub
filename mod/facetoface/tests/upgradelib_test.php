@@ -485,8 +485,14 @@ class mod_facetoface_upgradelib_testcase extends advanced_testcase {
      * @return array
      */
     public function data_upgradelib_add_new_template(): array {
+        global $DB;
         $longtext1 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean tempor sed metus quis porta. Sed volutpat arcu eget nibh ultricies ultricies. Sed ac ligula enim. Ut posuere scelerisque lacus. Aliquam cursus leo dui, sit amet viverra velit lobortis non. Sed quis ullamcorper leo.';
-        $longtext2 = "\u{1D576}\u{1D58E}\u{1D586}\u{1D57A}\u{1D597}\u{1D586}\u{1D576}\u{1D594}\u{1D59A}\u{1D599}\u{1D594}\u{1D59A}\u{1D576}\u{1D586}\u{1D599}\u{1D594}\u{1D586}\u{1D4D0}\u{1D4F8}\u{1D4FD}\u{1D4EE}\u{1D4EA}\u{1D4FB}\u{1D4F8}\u{1D4EA}\u{1D55F}\u{1D556}\u{1D568}\u{1D56B}\u{1D556}\u{1D552}\u{1D55D}\u{1D552}\u{1D55F}\u{1D555}";
+        if ($DB->get_dbfamily() === 'postgres') {
+            $longtext2 = "\u{1D576}\u{1D58E}\u{1D586}\u{1D57A}\u{1D597}\u{1D586}\u{1D576}\u{1D594}\u{1D59A}\u{1D599}\u{1D594}\u{1D59A}\u{1D576}\u{1D586}\u{1D599}\u{1D594}\u{1D586}\u{1D4D0}\u{1D4F8}\u{1D4FD}\u{1D4EE}\u{1D4EA}\u{1D4FB}\u{1D4F8}\u{1D4EA}\u{1D55F}\u{1D556}\u{1D568}\u{1D56B}\u{1D556}\u{1D552}\u{1D55D}\u{1D552}\u{1D55F}\u{1D555}";
+        } else {
+            // Play with codepoints in BMP.
+            $longtext2 = str_repeat("\u{FF2B}\u{FF49}\u{FF41}\u{FF2F}\u{FF52}\u{FF41}\u{FF2B}\u{FF4F}\u{FF55}\u{FF54}\u{FF4F}\u{FF55}\u{FF2B}\u{FF41}\u{FF54}\u{FF4F}\u{FF41}\u{FF21}\u{FF4F}\u{FF54}\u{FF45}\u{FF41}\u{FF52}\u{FF4F}\u{FF41}\u{FF2E}\u{FF45}\u{FF57}\u{FF3A}\u{FF45}\u{FF41}\u{FF4C}\u{FF41}\u{FF4E}\u{FF44}", 3);
+        }
         return [
             ['New template title', "Lorem ipsum\r\ndolor sit amet", 'New template title', "<div class=\"text_to_html\">Lorem ipsum<br />\r\ndolor sit amet</div>"],
             [$longtext1, 'Lorem ipsum', substr($longtext1, 0, 255), '<div class="text_to_html">Lorem ipsum</div>'],
