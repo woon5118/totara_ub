@@ -33,7 +33,7 @@ module.exports = {
   },
   transformIgnorePatterns: ['/node_modules/(?!babel-plugin-)'],
   resolver: path.resolve(__dirname, '../jest/resolver'),
-  setupFilesAfterEnv: ['jest-extended'],
+  setupFilesAfterEnv: ['jest-extended', 'jest-canvas-mock'],
   snapshotSerializers: ['jest-serializer-vue'],
   testMatch: [
     '**/tui/tests/unit/**/*.spec.(js|jsx|ts|tsx)',
