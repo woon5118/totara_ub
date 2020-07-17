@@ -23,6 +23,7 @@
 
 namespace mod_perform\entities\activity;
 
+use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\entity\relations\belongs_to;
 use core\orm\entity\relations\has_many;
@@ -38,7 +39,8 @@ use core\orm\entity\relations\has_many;
  * @property int $updated_at record modification time
  *
  * @property-read subject_instance $subject_instance
- * @property-read manual_relationship_select $manual_relationship_selector
+ * @property-read manual_relationship_selection $manual_relationship_selection
+ * @property-read collection|manual_relationship_selector[] $assigned_participants
  *
  * @method static manual_relationship_selection_progress_repository repository()
  */
@@ -60,7 +62,7 @@ class manual_relationship_selection_progress extends entity {
     /**
      * Returns the manual selection instance.
      *
-     * @return has_one the relationship.
+     * @return belongs_to the relationship.
      */
     public function manual_relationship_selection(): belongs_to {
         return $this->belongs_to(manual_relationship_selection::class, 'manual_relation_selection_id');

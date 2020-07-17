@@ -55,7 +55,7 @@ class manual_participant_progress {
             if ($subject_instance->manual_relationship_selection_progress
                 && count($subject_instance->manual_relationship_selection_progress) > 0
             ) {
-                // TODO: Check and sync the users - TL-26229
+                $this->sync_progress($subject_instance);
                 continue;
             }
 
@@ -79,7 +79,12 @@ class manual_participant_progress {
     private function load_pending_subject_instances(): collection {
         // Use eager loading to reduce number of queries in case we have a lot of subject instances to process
         return subject_instance::repository()
-            ->with('manual_relationship_selection_progress')
+            ->with([
+                'manual_relationship_selection_progress' => function (repository $repository) {
+                    $repository->with('manual_relationship_selection')
+                        ->with('assigned_participants');
+                }
+            ])
             ->with([
                 'track.activity' => function (repository $repository) {
                     $repository->with('sections.manual_relationships')
@@ -119,6 +124,47 @@ class manual_participant_progress {
         }
 
         return new relationship_collection_manager($relationship_ids);
+    }
+
+    /**
+     * Add missing users and delete users which are not in the respective relations any more
+     *
+     * @param subject_instance $subject_instance
+     */
+    private function sync_progress(subject_instance $subject_instance): void {
+        $relationship_args = $this->get_args_for_resolving_relationships($subject_instance);
+
+        $now = time();
+        foreach ($subject_instance->manual_relationship_selection_progress as $progress) {
+            // If this is already done leave it as is
+            if ($progress->status) {
+                continue;
+            }
+
+            $selector_relationship_id = $progress->manual_relationship_selection->selector_relationship_id;
+
+            // Get the users which should be there
+            $expected_user_ids = $this->relationship_manager->get_users_for_relationships(
+                $relationship_args,
+                [$selector_relationship_id]
+            );
+
+            $expected_user_ids = $expected_user_ids[$selector_relationship_id];
+
+            // Get the current users
+            $current_user_ids = $progress->assigned_participants->pluck('user_id');
+
+            // Work out who to add
+            $user_ids_to_add = array_diff($expected_user_ids, $current_user_ids);
+            foreach ($user_ids_to_add as $user_id) {
+                $selector = new stdClass();
+                $selector->manual_relation_select_progress_id = $progress->id;
+                $selector->user_id = $user_id;
+                $selector->created_at = $now;
+
+                $this->selectors_to_insert[] = $selector;
+            }
+        }
     }
 
     /**

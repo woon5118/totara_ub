@@ -94,10 +94,12 @@ class mod_perform_manual_participant_progress_service_testcase extends advanced_
     public function test_generate_without_multiple_jobs() {
         $data = $this->create_data();
 
+        /** @var subject_instance $subject_instance1 */
         $subject_instance1 = subject_instance::repository()
             ->where('subject_user_id', $data->user1->id)
             ->one();
 
+        /** @var subject_instance $subject_instance2 */
         $subject_instance2 = subject_instance::repository()
             ->where('subject_user_id', $data->user2->id)
             ->one();
@@ -106,8 +108,6 @@ class mod_perform_manual_participant_progress_service_testcase extends advanced_
         $progress_service->generate();
 
         $this->assertEquals(2, manual_relationship_selection_progress::repository()->count());
-        $selectors = manual_relationship_selector::repository()->get();
-        $this->assertEquals(3, $selectors->count());
 
         $expected = [
             $subject_instance1->id => [
@@ -119,18 +119,83 @@ class mod_perform_manual_participant_progress_service_testcase extends advanced_
             ],
         ];
 
-        /** @var manual_relationship_selector $selector */
-        foreach ($selectors as $selector) {
-            $subject_instance = $selector->subject_instance;
-            $this->assertContains($selector->user_id, $expected[$subject_instance->id]);
-            unset($expected[$subject_instance->id][array_search($selector->user_id, $expected[$subject_instance->id])]);
-            if (empty($expected[$subject_instance->id])) {
-                unset($expected[$subject_instance->id]);
-            }
-        }
+        $this->assert_selectors_are_present($expected);
 
-        // All expected ones should be tackled
-        $this->assertEmpty($expected);
+        // Now the manager changes, make sure the syncing works
+        $new_manager = $this->getDataGenerator()->create_user();
+        $new_manager_job = job_assignment::create(['userid' => $new_manager->id, 'idnumber' => 'nmj']);
+
+        /** @var job_assignment $job2 */
+        $job2 = $data->job2;
+        $job2->update(['managerjaid' => $new_manager_job->id]);
+
+        $progress_service = new manual_participant_progress();
+        $progress_service->generate();
+
+        // The new manager should be in the table along with the already existing ones
+        $expected = [
+            $subject_instance1->id => [
+                $data->manager1->id
+            ],
+            $subject_instance2->id => [
+                $new_manager->id,
+                $data->manager2->id,
+                $data->manager3->id,
+            ],
+        ];
+
+        $this->assert_selectors_are_present($expected);
+
+        // Now change the selector_relationship and check whether the sync picks it up.
+        // This won't happen as we do not allow changing the data on active activities
+        // but we want to be sure the logic would handle this case.
+
+        /** @var manual_relationship_selection $selector_relationship */
+        $selector_relationship = manual_relationship_selection::repository()
+            ->where('manual_relationship_id', $this->generator()->get_core_relationship(peer::class)->id)
+            ->where('activity_id', $data->activity1->id)
+            ->one();
+
+        $selector_relationship->selector_relationship_id = $this->generator()->get_core_relationship(subject::class)->id;
+        $selector_relationship->save();
+
+        $progress_service = new manual_participant_progress();
+        $progress_service->generate();
+
+        // The subjet now should also be part of the list
+        $expected = [
+            $subject_instance1->id => [
+                $subject_instance1->subject_user_id,
+                $data->manager1->id
+            ],
+            $subject_instance2->id => [
+                $subject_instance2->subject_user_id,
+                $new_manager->id,
+                $data->manager2->id,
+                $data->manager3->id,
+            ],
+        ];
+
+        $this->assert_selectors_are_present($expected);
+
+
+        // Now mark the progress as done and make sure nothing gets synced
+        manual_relationship_selection_progress::repository()
+            ->update(['status' => 1]);
+
+        // Now the manager changes, make sure the syncing works
+        $new_manager2 = $this->getDataGenerator()->create_user();
+        $new_manager_job2 = job_assignment::create(['userid' => $new_manager2->id, 'idnumber' => 'nmj']);
+
+        /** @var job_assignment $job2 */
+        $job2 = $data->job2;
+        $job2->update(['managerjaid' => $new_manager_job2->id]);
+
+        $progress_service = new manual_participant_progress();
+        $progress_service->generate();
+
+        // Nothing changes since last run
+        $this->assert_selectors_are_present($expected);
     }
 
     public function test_generate_with_multiple_jobs() {
@@ -155,8 +220,6 @@ class mod_perform_manual_participant_progress_service_testcase extends advanced_
         $progress_service->generate();
 
         $this->assertEquals(3, manual_relationship_selection_progress::repository()->count());
-        $selectors = manual_relationship_selector::repository()->get();
-        $this->assertEquals(3, $selectors->count());
 
         $expected = [
             $subject_instance1->id => [
@@ -170,18 +233,7 @@ class mod_perform_manual_participant_progress_service_testcase extends advanced_
             ],
         ];
 
-        /** @var manual_relationship_selector $selector */
-        foreach ($selectors as $selector) {
-            $subject_instance = $selector->subject_instance;
-            $this->assertContains($selector->user_id, $expected[$subject_instance->id]);
-            unset($expected[$subject_instance->id][array_search($selector->user_id, $expected[$subject_instance->id])]);
-            if (empty($expected[$subject_instance->id])) {
-                unset($expected[$subject_instance->id]);
-            }
-        }
-
-        // All expected ones should be tackled
-        $this->assertEmpty($expected);
+        $this->assert_selectors_are_present($expected);
     }
 
     /**
@@ -207,8 +259,7 @@ class mod_perform_manual_participant_progress_service_testcase extends advanced_
 
         $this->setAdminUser();
 
-        /** @var mod_perform_generator $generator */
-        $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        $generator = $this->generator();
 
         $data->activity1 = $generator->create_activity_in_container([
             'create_track' => true,
@@ -287,6 +338,34 @@ class mod_perform_manual_participant_progress_service_testcase extends advanced_
         $subject_instance_service->generate_instances();
 
         return $data;
+    }
+
+    protected function generator(): mod_perform_generator {
+        return $this->getDataGenerator()->get_plugin_generator('mod_perform');
+    }
+
+    private function assert_selectors_are_present(array $expected) {
+        $selectors = manual_relationship_selector::repository()->get();
+
+        $expected_count = 0;
+        foreach ($expected as $instance) {
+            $expected_count = $expected_count + count($instance);
+        }
+
+        $this->assertCount($expected_count, $selectors);
+
+        /** @var manual_relationship_selector $selector */
+        foreach ($selectors as $selector) {
+            $subject_instance = $selector->subject_instance;
+            $this->assertContains($selector->user_id, $expected[$subject_instance->id]);
+            unset($expected[$subject_instance->id][array_search($selector->user_id, $expected[$subject_instance->id])]);
+            if (empty($expected[$subject_instance->id])) {
+                unset($expected[$subject_instance->id]);
+            }
+        }
+
+        // All expected ones should be tackled
+        $this->assertEmpty($expected, 'Discrepancy found: Selectors found which should not be there');
     }
 
 }
