@@ -49,7 +49,7 @@ function generateProjectConfigs() {
   }, {});
 
   generateJsconfig(baseFolders);
-  generateWebpackAliases(baseFolders);
+  // generateWebpackAliases(baseFolders);
 }
 
 /**
