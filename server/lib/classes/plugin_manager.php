@@ -1249,7 +1249,7 @@ class core_plugin_manager {
         $standard_plugins = array(
 
             'aggregation' => array(
-                'first', 'highest'
+                'first', 'highest', 'latest_achieved',
             ),
 
             'antivirus' => array(
@@ -1349,7 +1349,8 @@ class core_plugin_manager {
             ),
 
             'criteria' => array(
-                'childcompetency', 'coursecompletion', 'onactivate', 'linkedcourses'
+                'childcompetency', 'coursecompletion', 'onactivate',
+                'linkedcourses', 'othercompetency',
             ),
 
             'datafield' => array(
@@ -1454,6 +1455,7 @@ class core_plugin_manager {
 
             'performelement' => array(
                 'short_text', 'multi_choice', 'long_text', 'multi_choice_multi',
+                'date_picker', 'multi_choice_single', 'static_content',
             ),
 
             'plagiarism' => array(

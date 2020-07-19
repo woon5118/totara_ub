@@ -27,8 +27,6 @@ use core\webapi\execution_context;
 use core\entities\cohort as cohort_entity;
 use core\webapi\resolver\type\cohort as cohort_type;
 
-global $CFG;
-require_once($CFG->dirroot . '/totara/cohort/lib.php');
 
 /**
  * @coversDefaultClass cohort.
@@ -36,6 +34,12 @@ require_once($CFG->dirroot . '/totara/cohort/lib.php');
  * @group core_cohort
  */
 class core_webapi_resolver_type_cohort_testcase extends advanced_testcase {
+
+    public static function setUpBeforeClass(): void {
+        global $CFG;
+        require_once($CFG->dirroot . '/totara/cohort/lib.php');
+    }
+
     /**
      * @covers ::resolve
      */
