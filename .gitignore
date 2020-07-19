@@ -38,8 +38,6 @@ composer.lock
 /jsconfig.json
 # Webpack aliases file used to help PHPStorm: npm run generate-config
 /client/tooling/generated/webpack_aliases.js
-# Client build directories
-/client/build/*/
 
 # Safety measure. Private key should never be added to repository
 totara_private.pem
