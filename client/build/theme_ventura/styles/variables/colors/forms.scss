@@ -1,0 +1,151 @@
+/* This file is part of Totara Enterprise Extensions.*/
+/**/
+/* Copyright (C) 2020 onwards Totara Learning Solutions LTD*/
+/**/
+/* Totara Enterprise Extensions is provided only to Totara*/
+/* Learning Solutions LTD’s customers and partners, pursuant to*/
+/* the terms and conditions of a separate agreement with Totara*/
+/* Learning Solutions LTD or its affiliate.*/
+/**/
+/* If you do not have an agreement with Totara Learning Solutions*/
+/* LTD, you may not access, use, modify, or distribute this software.*/
+/* Please contact [licensing@totaralearning.com] for more information.*/
+/**/
+/* @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>*/
+/* @module tuickage   theme_ventura*/
+
+/**/
+/* Form colours*/
+/**/
+
+/* Form radio colours*/
+--tui-form-radio-dot-color: var(--tui-color-state);
+--tui-form-radio-bg-color: var(--tui-color-neutral-1);
+--tui-form-radio-bg-color-disabled: var(--tui-color-neutral-3);
+--tui-form-radio-bg-color-focus: var(--tui-color-state-highlight);
+--tui-form-radio-bg-color-hover: var(--tui-color-neutral-1);
+--tui-form-radio-bg-color-active: var(--tui-color-neutral-1);
+--tui-form-radio-border-color: var(--tui-color-neutral-6);
+--tui-form-radio-border-color-disabled: var(--tui-color-state-disabled);
+--tui-form-radio-border-color-focus: var(--tui-color-state-focus);
+--tui-form-radio-border-color-active: var(--tui-color-state-focus);
+
+/* Form checkbox colours*/
+--tui-form-checkbox-check-color: var(--tui-color-neutral-1);
+--tui-form-checkbox-check-color-disabled: var(--tui-color-neutral-5);
+--tui-form-checkbox-bg-color: var(--tui-color-neutral-1);
+--tui-form-checkbox-bg-color-disabled: var(--tui-color-neutral-3);
+--tui-form-checkbox-bg-color-focus: var(--tui-color-state-highlight);
+--tui-form-checkbox-bg-color-active: var(--tui-color-state);
+--tui-form-checkbox-border-color: var(--tui-color-neutral-6);
+--tui-form-checkbox-border-color-disabled: var(--tui-color-state-disabled);
+--tui-form-checkbox-border-color-focus: var(--tui-color-state-focus);
+--tui-form-checkbox-border-color-active: var(--tui-color-state-focus);
+
+/* Text colour (labels)*/
+--tui-form-text-color: var(--tui-color-neutral-7);
+
+/* Background of form elements*/
+--tui-form-input-bg-color: var(--tui-color-neutral-1);
+--tui-form-input-bg-color-disabled: var(--tui-color-neutral-3);
+--tui-form-input-bg-color-focus: var(--tui-form-input-bg-color);
+--tui-form-input-bg-color-invalid-focus: var(--tui-color-prompt-alert-bg);
+
+/* Border of form elements*/
+--tui-form-input-border-color: var(--tui-color-neutral-6);
+--tui-form-input-border-color-disabled: var(--tui-color-neutral-4);
+--tui-form-input-border-color-focus: var(--tui-color-state);
+--tui-form-input-border-color-invalid: var(--tui-color-prompt-alert);
+/* Text colour of form elements*/
+--tui-form-input-text-color: var(--tui-color-neutral-7);
+--tui-form-input-text-color-disabled: var(--tui-color-state-disabled);
+--tui-form-input-text-placeholder-color: var(--tui-color-neutral-6);
+/* Text colour of form field defaults and details*/
+--tui-form-details-text-color: var(--tui-color-neutral-7);
+--tui-form-defaults-text-color: var(--tui-color-neutral-7);
+
+/* Standard btn background, border & text*/
+--tui-btn-bg-color: var(--tui-color-neutral-1);
+--tui-btn-bg-color-active: var(--tui-color-neutral-1);
+--tui-btn-bg-color-disabled: var(--tui-color-neutral-3);
+--tui-btn-bg-color-focus: var(--tui-color-neutral-3);
+--tui-btn-border-color: var(--tui-color-state);
+--tui-btn-border-color-active: var(--tui-color-state-active);
+--tui-btn-border-color-disabled: var(--tui-color-state-disabled);
+--tui-btn-border-color-focus: var(--tui-color-state-focus);
+--tui-btn-text-color: var(--tui-color-state);
+--tui-btn-text-color-active: var(--tui-color-state-active);
+--tui-btn-text-color-disabled: var(--tui-color-state-disabled);
+--tui-btn-text-color-focus: var(--tui-color-state-focus);
+
+/* Alert btn background, border & text*/
+--tui-btn-alert-bg-color: var(--tui-color-prompt-alert);
+--tui-btn-alert-bg-color-active: var(--tui-color-prompt-alert);
+--tui-btn-alert-bg-color-disabled: var(--tui-color-neutral-3);
+--tui-btn-alert-bg-color-focus: var(--tui-color-prompt-alert);
+--tui-btn-alert-border-color: var(--tui-color-prompt-alert);
+--tui-btn-alert-border-color-active: var(--tui-color-prompt-alert);
+--tui-btn-alert-border-color-disabled: var(--tui-color-state-disabled);
+--tui-btn-alert-border-color-focus: var(--tui-color-prompt-alert);
+--tui-btn-alert-text-color: var(--tui-color-neutral-1);
+--tui-btn-alert-text-color-active: var(--tui-color-neutral-1);
+--tui-btn-alert-text-color-disabled: var(--tui-color-state-disabled);
+--tui-btn-alert-text-color-focus: var(--tui-color-neutral-1);
+
+/* Primary btn background, text & border*/
+--tui-btn-prim-bg-color: var(--tui-color-state);
+--tui-btn-prim-bg-color-active: var(--tui-color-state-active);
+--tui-btn-prim-bg-color-disabled: var(--tui-color-state-disabled);
+--tui-btn-prim-bg-color-focus: var(--tui-color-state-focus);
+--tui-btn-prim-border-color: var(--tui-color-state);
+--tui-btn-prim-border-color-active: var(--tui-color-state-active);
+--tui-btn-prim-border-color-disabled: var(--tui-color-state-disabled);
+--tui-btn-prim-border-color-focus: var(--tui-color-state-focus);
+--tui-btn-prim-text-color: var(--tui-color-neutral-1);
+--tui-btn-prim-text-color-active: var(--tui-color-neutral-1);
+--tui-btn-prim-text-color-disabled: var(--tui-color-neutral-3);
+--tui-btn-prim-text-color-focus: var(--tui-color-neutral-1);
+
+/* toggle icon btn background, border & text*/
+--tui-btn-toggle-bg-color: var(--tui-color-neutral-1);
+--tui-btn-toggle-bg-color-active: var(--tui-color-neutral-3);
+--tui-btn-toggle-bg-color-disabled: var(--tui-color-neutral-3);
+--tui-btn-toggle-bg-color-focus: var(--tui-color-neutral-2);
+--tui-btn-toggle-bg-color-selected: var(--tui-color-neutral-4);
+--tui-btn-toggle-border-color: var(--tui-color-neutral-5);
+--tui-btn-toggle-border-color-active: var(--tui-color-neutral-5);
+--tui-btn-toggle-border-color-disabled: var(--tui-color-state-disabled);
+--tui-btn-toggle-border-color-focus: var(--tui-color-neutral-5);
+--tui-btn-toggle-border-color-selected: var(--tui-color-neutral-5);
+--tui-btn-toggle-text-color: var(--tui-color-state);
+--tui-btn-toggle-text-color-active: var(--tui-color-state);
+--tui-btn-toggle-text-color-disabled: var(--tui-color-state-disabled);
+--tui-btn-toggle-text-color-focus: var(--tui-color-state);
+--tui-btn-toggle-text-color-selected: var(--tui-color-state);
+
+/* Checkbox btn background & text*/
+--tui-btn-checkbox-bg-color-selected: var(--tui-color-neutral-3);
+--tui-btn-checkbox-bg-color-hover: var(--tui-color-state-highlight);
+--tui-btn-checkbox-text-color: var(--tui-color-state);
+--tui-btn-checkbox-text-color-active: var(--tui-color-state-active);
+--tui-btn-checkbox-text-color-focus: var(--tui-color-state-focus);
+--tui-btn-checkbox-text-color-selected: var(--tui-color-state);
+
+/* Toolbar btn background & text*/
+--tui-btn-toolbar-bg-color: transparent;
+--tui-btn-toolbar-bg-color-hover: var(--tui-color-neutral-4);
+--tui-btn-toolbar-bg-color-focus: var(--tui-color-neutral-4);
+--tui-btn-toolbar-bg-color-selected: var(--tui-color-state-active);
+--tui-btn-toolbar-text-color: var(--tui-color-state);
+--tui-btn-toolbar-text-color-selected: var(--tui-color-neutral-1);
+
+/* Toggle btn*/
+--tui-form-toggle-dot-color: var(--tui-color-neutral-1);
+--tui-form-toggle-off-bg-color: var(--tui-color-neutral-4);
+--tui-form-toggle-off-bg-color-hover-focus: var(--tui-color-neutral-5);
+--tui-form-toggle-on-bg-color: var(--tui-color-state);
+--tui-form-toggle-on-bg-color-hover-focus: var(--tui-color-state-hover);
+--tui-form-toggle-on-border-color: var(--tui-color-state);
+--tui-form-toggle-on-border-color-hover-focus: var(--tui-color-state-hover);
+--tui-form-toggle-border-color: var(--tui-color-neutral-6);
+

@@ -1,0 +1,28 @@
+/* This file is part of Totara Enterprise Extensions.*/
+/**/
+/* Copyright (C) 2020 onwards Totara Learning Solutions LTD*/
+/**/
+/* Totara Enterprise Extensions is provided only to Totara*/
+/* Learning Solutions LTD’s customers and partners, pursuant to*/
+/* the terms and conditions of a separate agreement with Totara*/
+/* Learning Solutions LTD or its affiliate.*/
+/**/
+/* If you do not have an agreement with Totara Learning Solutions*/
+/* LTD, you may not access, use, modify, or distribute this software.*/
+/* Please contact [licensing@totaralearning.com] for more information.*/
+/**/
+/* @author    Simon Chester <simon.chester@totaralearning.com>*/
+/* @module tuickage   theme_ventura*/
+
+/* #dock is 12000, modal must be above that*/
+:root {
+  --tui-zindex-modal: 100050;
+  --tui-zindex-modal-backdrop: 100040;
+  --tui-zindex-popover: 100030;
+  --tui-zindex-dropdown-menu: 10000;
+  --tui-zindex-navbar: 1000;
+  --tui-zindex-loading-page: 100060;
+  --tui-zindex-toast: 100070;
+  --tui-zindex-draggable: 100080;
+}
+

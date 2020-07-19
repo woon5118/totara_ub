@@ -1,0 +1,37 @@
+/* This file is part of Totara Enterprise Extensions.*/
+/**/
+/* Copyright (C) 2020 onwards Totara Learning Solutions LTD*/
+/**/
+/* Totara Enterprise Extensions is provided only to Totara*/
+/* Learning Solutions LTD’s customers and partners, pursuant to*/
+/* the terms and conditions of a separate agreement with Totara*/
+/* Learning Solutions LTD or its affiliate.*/
+/**/
+/* If you do not have an agreement with Totara Learning Solutions*/
+/* LTD, you may not access, use, modify, or distribute this software.*/
+/* Please contact [licensing@totaralearning.com] for more information.*/
+/**/
+/* @author    Dave Wallace <dave.wallace@totaralearning.com>*/
+/* @module tuickage   theme_ventura*/
+
+:root {
+  /**/
+  /* Theme border widths*/
+  /**/
+
+  /* Content aggregation borders*/
+  /* Often used for sections of content such as Forms, Blocks, various Panels,*/
+  /* and horizontal rules*/
+  --tui-border-width-thin: 1px;
+  --tui-border-width-normal: 2px;
+  --tui-border-width-thick: 3px;
+
+  /* Button radius*/
+  --tui-btn-radius: 6px;
+
+  /* Standard border radius*/
+  --tui-border-radius-curved: 12px;
+  --tui-border-radius-normal: 6px;
+  --tui-border-radius-small: 4px;
+}
+
