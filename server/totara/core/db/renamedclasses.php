@@ -40,6 +40,9 @@ $renamedclasses = array(
     'totara_core\formatter\field\text_field_formatter' => core\webapi\formatter\field\text_field_formatter::class,
 );
 
+// Add the old Tui component class, just while we reorganise.
+$renamedclasses['totara_core\output\tui_component'] = \totara_tui\output\component::class;
+
 // Only add these to the map if we're within PHPUnit.
 // They should never be used outside of PHPUnit.
 if (defined('PHPUNIT_TEST') && PHPUNIT_TEST) {

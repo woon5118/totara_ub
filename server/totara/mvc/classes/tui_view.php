@@ -24,8 +24,7 @@
 
 namespace totara_mvc;
 
-use stdClass;
-use totara_core\output\tui_component;
+use totara_tui\output\component;
 
 /**
  * View specific for rendering a tui component.
@@ -59,7 +58,7 @@ class tui_view extends view {
      * @inheritDoc
      */
     protected function prepare_output($output) {
-        return new tui_component($this->template, $output);
+        return new component($this->template, $output);
     }
 
     /**
