@@ -18,7 +18,7 @@
 
 <template>
   <div class="tui-formHelpIcon">
-    <Popover :position="position">
+    <Popover position="top">
       <template v-slot:trigger>
         <a href="javascript:;" class="tui-formHelpIcon__icon">
           <Info
@@ -51,10 +51,6 @@ export default {
   },
 
   props: {
-    position: {
-      type: String,
-      default: 'right',
-    },
     descId: {
       required: true,
       type: String,

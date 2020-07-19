@@ -5,7 +5,7 @@ exports[`presentation/form/HelpIcon.vue Checks snapshot 1`] = `
   class="tui-formHelpIcon"
 >
   <popover-stub
-    position="right"
+    position="top"
     triggers="click"
   >
      help text
