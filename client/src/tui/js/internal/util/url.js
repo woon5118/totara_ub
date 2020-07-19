@@ -16,7 +16,7 @@
  * @module totara_core
  */
 
-import { globalConfig as config } from './config';
+import { config } from './config';
 
 /**
  * Format a URL parameter.
@@ -115,15 +115,15 @@ export function totaraUrl(path, params) {
  * @return {string}
  */
 export function imageUrl(name, component) {
-  if (config.themerev > 0 && config.slasharguments) {
+  if (config.rev.theme > 0) {
     return totaraUrl(
-      `/theme/image.php/${config.theme}/${component}/${config.themerev}/${name}`
+      `/theme/image.php/${config.theme.name}/${component}/${config.rev.theme}/${name}`
     );
   } else {
     return totaraUrl(`/theme/image.php`, {
-      theme: config.theme,
+      theme: config.theme.name,
       component,
-      rev: config.themerev,
+      rev: config.rev.theme,
       image: name,
     });
   }

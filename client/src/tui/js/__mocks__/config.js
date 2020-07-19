@@ -16,20 +16,20 @@
  * @module totara_core
  */
 
-// original source: page_requirements_manager::get_config_for_javascript()
-export const globalConfig = {
+export const config = {
   wwwroot: 'http://foo',
   sesskey: 'sesskey',
-  loadingicon: 'http://placekitten.com/16/16',
-  themerev: 1001,
-  slasharguments: 1,
-  theme: 'basis',
-  jsrev: 1000,
-  admin: 'admin',
-  svgicons: true,
-  usertimezone: 'Pacific/Auckland',
-  servertimezone: 'Pacific/Auckland',
-  contextid: 1,
-  currentlanguage: 'en',
-  NODE_ENV: 'production',
+  rev: { js: 1000, theme: 1001 },
+  theme: {
+    name: 'ventura'
+  },
+  timezone: {
+    user: 'Pacific/Auckland',
+    server: 'Pacific/Auckland',
+  },
+  context: null,
+  locale: {
+    language: 'en',
+    country: 'NZ',
+  },
 };

@@ -19,7 +19,7 @@
 import { cacheGet, cacheSet } from './persistent_cache';
 import apollo from '../apollo_client';
 import langStringQuery from 'core/graphql/lang_strings_nosession';
-import { globalConfig as config } from '../config';
+import { config } from '../config';
 
 const loadedStrings = {};
 const loadingPromises = {};
@@ -56,7 +56,7 @@ export function hasString(key, comp) {
 function setString(key, comp, value) {
   const stringKey = `${comp}/${key}`;
   loadedStrings[stringKey] = value;
-  const lang = config.currentlanguage;
+  const lang = config.locale.language;
   const cacheKey = `core_str/${lang}/${stringKey}`;
   cacheSet(cacheKey, value);
 }
@@ -70,7 +70,7 @@ export function loadStrings(reqs) {
   const waitingFor = [];
   const needed = [];
 
-  const lang = config.currentlanguage;
+  const lang = config.locale.language;
 
   reqs.forEach(req => {
     const stringKey = `${req.component}/${req.key}`;

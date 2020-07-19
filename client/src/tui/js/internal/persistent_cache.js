@@ -16,7 +16,7 @@
  * @module tui
  */
 
-import { globalConfig as config } from '../config';
+import { config } from '../config';
 import { WebStorageStore } from './storage';
 
 const storage = new WebStorageStore('cache', window.localStorage, {
@@ -35,7 +35,7 @@ export function cacheGet(key) {
   if (cache.has(key)) {
     return cache.get(key);
   }
-  if (config.jsrev != -1) {
+  if (config.rev.js != -1) {
     const value = storage.get(key);
     cache.set(key, value);
     return value;
@@ -51,7 +51,7 @@ export function cacheGet(key) {
  */
 export function cacheSet(key, value) {
   cache.set(key, value);
-  if (config.jsrev != -1) {
+  if (config.rev.js != -1) {
     storage.set(key, value);
   }
 }
@@ -63,7 +63,7 @@ export function cacheSet(key, value) {
  */
 export function cacheDelete(key) {
   cache.delete(key);
-  if (config.jsrev != -1) {
+  if (config.rev.js != -1) {
     storage.delete(key);
   }
 }

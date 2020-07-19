@@ -409,10 +409,8 @@ require(['core/autoinitialise'], function(ai) {
                 'admin'               => $CFG->admin,
                 'svgicons'            => $page->theme->use_svg_icons(),
                 'usertimezone'        => usertimezone(),
-                'servertimezone'      => \core_date::get_server_timezone(),
                 'contextid'           => $contextid,
                 'currentlanguage'     => $currentlanguage,
-                'NODE_ENV'            => $CFG->debugdeveloper ? 'development' : 'production',
             );
             if ($CFG->debugdeveloper) {
                 $this->M_cfg['developerdebug'] = true;
@@ -1704,6 +1702,11 @@ require(['core/autoinitialise'], function(ai) {
         // Add a subset of Moodle configuration to the M namespace.
         $js .= js_writer::set_variable('M.cfg', $this->M_cfg, false);
 
+        // JS Framework config
+        $js .= js_writer::set_variable('JS_ENV', $CFG->debugdeveloper ? 'development' : 'production', false);
+        $js .= js_writer::set_variable('_pageConfig', $this->get_js_page_config($page, $renderer), false);
+        $js .= 'window.getPageConfig = function() { return window._pageConfig; };';
+
         // Set up global YUI3 loader object - this should contain all code needed by plugins.
         // Note: in JavaScript just use "YUI().use('overlay', function(Y) { .... });",
         //       this needs to be done before including any other script.
@@ -1732,6 +1735,44 @@ require(['core/autoinitialise'], function(ai) {
         $this->headdone = true;
 
         return $output;
+    }
+
+    /**
+     * Get page config object to provide to JS frameworks.
+     *
+     * @return array
+     */
+    public function get_js_page_config(moodle_page $page, renderer_base $renderer) {
+        global $CFG, $USER;
+
+        $currentlanguage = current_language();
+        if (!get_string_manager()->translation_exists($currentlanguage)) {
+            $currentlanguage = 'en';
+        }
+
+        $config = [
+            'wwwroot' => $CFG->wwwroot,
+            'sesskey' => sesskey(),
+            'rev' => [
+                'js' => (int)$this->get_jsrev(),
+                'theme' => (int)theme_get_revision(),
+            ],
+            'theme' => [
+                'name' => $page->theme->name,
+            ],
+            'timezone' => [
+                'user' => usertimezone(),
+                'server' => \core_date::get_server_timezone(),
+            ],
+            'context' => ['id' => $page->context->id],
+            'locale' => [
+                'language' => $currentlanguage,
+            ],
+        ];
+        if (defined('BEHAT_SITE_RUNNING')) {
+            $config['behatSiteRunning'] = true;
+        }
+        return $config;
     }
 
     /**

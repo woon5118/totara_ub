@@ -18,7 +18,7 @@
 
 import { memoizeLoad } from './util';
 import pending from './pending';
-import { globalConfig as config } from './config';
+import { config } from './config';
 import { cacheGet, cacheSet } from './internal/persistent_cache';
 import { totaraUrl } from './url';
 
@@ -31,7 +31,7 @@ let flexIconData;
  * @returns {Promise}
  */
 export const load = memoizeLoad(async () => {
-  const cacheKey = `core_flex_icon/${config.theme}/cache`;
+  const cacheKey = `core_flex_icon/${config.theme.name}/cache`;
   const cachedVal = cacheGet(cacheKey);
   if (cachedVal) {
     flexIconData = cachedVal;
@@ -99,7 +99,7 @@ async function loadFlexData() {
           {
             index: 0,
             methodname: 'core_output_get_flex_icons',
-            args: { themename: config.theme },
+            args: { themename: config.theme.name },
           },
         ]),
         method: 'POST',

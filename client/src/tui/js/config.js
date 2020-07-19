@@ -16,10 +16,8 @@
  * @module totara_core
  */
 
-/* global M */
+export let config = {};
 
-export let globalConfig = {};
-
-if (typeof M !== 'undefined') {
-  globalConfig = M.cfg;
+if (typeof window !== 'undefined' && window.getPageConfig) {
+  config = window.getPageConfig();
 }

@@ -97,7 +97,7 @@ import {
   getYearsSelectArray,
 } from 'tui/date';
 import { getTimeZoneKeyStrings } from 'tui/time';
-import { globalConfig } from 'tui/config';
+import { config } from 'tui/config';
 import { loadLangStrings } from 'tui/i18n';
 
 export default {
@@ -258,7 +258,7 @@ export default {
     async getTimezones() {
       let zones = getTimeZoneKeyStrings();
       let that = this;
-      const serverTimeZone = globalConfig.servertimezone;
+      const serverTimeZone = config.timezone.server;
 
       await loadLangStrings(zones.map(x => x.label));
       zones.map(function(zone) {

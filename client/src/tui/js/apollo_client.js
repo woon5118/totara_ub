@@ -23,13 +23,13 @@ import { createHttpLink } from 'apollo-link-http';
 import { BatchHttpLink } from 'apollo-link-batch-http';
 import { createTuiContextLink } from './internal/apollo/tui_context_link';
 import { createDevLink } from './internal/apollo/dev_link';
-import { globalConfig } from './config';
+import { config } from './config';
 
 const httpLinkOptions = {
-  uri: globalConfig.wwwroot + '/totara/webapi/ajax.php',
+  uri: config.wwwroot + '/totara/webapi/ajax.php',
   credentials: 'same-origin',
   headers: {
-    'X-Totara-Sesskey': globalConfig.sesskey,
+    'X-Totara-Sesskey': config.sesskey,
   },
 };
 

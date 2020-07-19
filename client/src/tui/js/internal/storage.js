@@ -16,7 +16,7 @@
  * @module tui
  */
 
-import { globalConfig as config } from '../config';
+import { config } from '../config';
 
 /* istanbul ignore next */
 class Store {
@@ -123,9 +123,9 @@ export class WebStorageStore extends Store {
    */
   _checkRev() {
     const storageRev = this.get('__jsrev');
-    if (storageRev != config.jsrev) {
+    if (storageRev != config.rev.js) {
       this.clear();
-      this.set('__jsrev', config.jsrev);
+      this.set('__jsrev', config.rev.js);
     }
   }
 }

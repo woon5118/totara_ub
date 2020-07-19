@@ -18,7 +18,7 @@
 
 import apollo from '../apollo_client';
 import bundleQuery from 'totara_tui/graphql/bundles_nosession';
-import { globalConfig } from '../config';
+import { config } from '../config';
 import pending from '../pending';
 import { pull } from '../util';
 
@@ -124,12 +124,12 @@ export default class BundleLoader {
     }
 
     // TODO: could potentially cache this in localstorage to improve performance
-    // (after taking into account globalConfig.jsrev value and theme)
+    // (after taking into account config.rev.js value and theme)
     const result = await apollo.query({
       query: bundleQuery,
       variables: {
         components: totaraComponents,
-        theme: globalConfig.theme,
+        theme: config.theme.name,
       },
       fetchPolicy: 'no-cache',
     });
