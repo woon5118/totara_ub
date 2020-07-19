@@ -20,7 +20,6 @@
 import * as flexIcons from 'tui/flex_icons';
 import FlexIconStandard from 'tui/components/icons/flex_icons/FlexIcon';
 import FlexIconPix from 'tui/components/icons/flex_icons/FlexIconPix';
-import FlexIconMustacheFallback from 'tui/components/icons/FlexIconMustacheFallback';
 import { memoize } from 'tui/util';
 
 /**
@@ -56,14 +55,31 @@ function getData(id) {
 
 const getDataCached = memoize(getData);
 
-const asyncIconComponent = memoize(id => {
-  return () => ({
-    component: tui.loadComponent(id).catch(() => FlexIconMustacheFallback),
-  });
+const asyncIconComponent = memoize((id, context) => {
+  const component = () => {
+    const promise = tui.loadComponent(id);
+    if (process.env.NODE_ENV !== 'production') {
+      promise.catch(e => {
+        if (e.code == 'MODULE_NOT_FOUND') {
+          console.warn(
+            `[FlexIcon] Could not find a Vue component equivalent for flex icon ` +
+              `template "${context.template}", either update the flex icon ` +
+              `"${context.id}" to use a different template or add a Vue ` +
+              `component at "${id}".`
+          );
+        }
+      });
+    }
+    return {
+      component: promise,
+    };
+  };
+  component.toString = () => `[FlexIcon ${id}]`;
+  return component;
 });
 
 /**
- * Get component (name string to be passed to h() or <component :is="">)
+ * Get component (to be passed to h() or <component :is="">)
  * to use to render icon.
  *
  * @private
@@ -71,7 +87,7 @@ const asyncIconComponent = memoize(id => {
  *     Template declared in flex icon config, e.g. 'core/flex_icon'.
  * @param {string} id
  *     ID of icon, e.g. 'alarm'.
- * @returns {object}
+ * @returns {*}
  */
 function getIconComponent(template, id) {
   if (!template) {
@@ -100,26 +116,14 @@ function getIconComponent(template, id) {
         console.warn(
           `[FlexIcon] Referencing an icon template "${template}" in an ` +
             `unloaded TUI bundle, loading the bundle asynchronously. To ` +
-            `improve performance add the Totara component "${totaraComp}" as ` +
-            `a "tuidependency" of the requesting component.`
+            `improve performance add "${totaraComp}" as a dependency of the ` +
+            `requesting TUI component.`
         );
       }
-      return asyncIconComponent(componentId);
+      return asyncIconComponent(componentId, { id, template });
     }
   } catch (e) {
-    if (process.env.NODE_ENV !== 'production' && e.code == 'MODULE_NOT_FOUND') {
-      console.warn(
-        `[FlexIcon] Could not find a Vue component equivalent for ` +
-          `flex icon template "${template}", falling back to ` +
-          `rendering the icon using mustache. To improve rendering ` +
-          `performance, either update the flex icon "${id}" to use ` +
-          `a different template or add a Vue component at ` +
-          `"${componentId}".`
-      );
-      return FlexIconMustacheFallback;
-    } else {
-      console.error(e);
-    }
+    console.error(e);
     return null;
   }
 }

@@ -16,12 +16,14 @@
  * @module totara_core
  */
 
-import amd from './amd';
 import { memoizeLoad } from './util';
 import pending from './pending';
+import { globalConfig as config } from './config';
+import { cacheGet, cacheSet } from './internal/persistent_cache';
+import { totaraUrl } from './url';
 
 let hasLoaded = false;
-let flexIcon;
+let flexIconData;
 
 /**
  * Load flex icon data.
@@ -29,11 +31,18 @@ let flexIcon;
  * @returns {Promise}
  */
 export const load = memoizeLoad(async () => {
-  const done = pending('flex-icon-load');
-  flexIcon = await amd('core/flex_icon');
-  await flexIcon.load();
+  const cacheKey = `core_flex_icon/${config.theme}/cache`;
+  const cachedVal = cacheGet(cacheKey);
+  if (cachedVal) {
+    flexIconData = cachedVal;
+    hasLoaded = true;
+    return;
+  }
+
+  const data = await loadFlexData();
+  flexIconData = data;
   hasLoaded = true;
-  done();
+  cacheSet(cacheKey, data);
 });
 
 /**
@@ -60,5 +69,50 @@ export function getFlexData(identifier) {
       'Requesting flex data when flex icons have not loaded yet: ' + identifier
     );
   }
-  return flexIcon.getFlexTemplateDataSync(identifier);
+  const indexes = flexIconData.icons[identifier];
+  if (!indexes) {
+    return null;
+  }
+  return {
+    data: Object.assign({}, flexIconData.datas[indexes[1]], { identifier }),
+    template: flexIconData.templates[indexes[0]],
+  };
+}
+
+/**
+ * Load flex icon data from service.
+ *
+ * @returns {Promise<object>}
+ */
+async function loadFlexData() {
+  const done = pending('flex-icon-load');
+  let result;
+  try {
+    // TODO: replace with a GraphQL query
+    const response = await fetch(
+      totaraUrl('/lib/ajax/service-nologin.php', {
+        sesskey: config.sesskey,
+        info: 'core_output_get_flex_icons',
+      }),
+      {
+        body: JSON.stringify([
+          {
+            index: 0,
+            methodname: 'core_output_get_flex_icons',
+            args: { themename: config.theme },
+          },
+        ]),
+        method: 'POST',
+        credentials: 'same-origin',
+      }
+    );
+    result = await response.json();
+    result = result[0];
+  } finally {
+    done();
+  }
+  if (!result || result.error) {
+    throw new Error('Error loading flex data');
+  }
+  return result.data;
 }
