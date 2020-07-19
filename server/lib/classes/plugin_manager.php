@@ -1527,7 +1527,7 @@ class core_plugin_manager {
             // Totara:
             'totara' => array(
                 'appraisal', 'cohort', 'core', 'coursecatalog', 'customfield', 'dashboard', 'feedback360', 'flavour',
-                'hierarchy', 'message', 'oauth', 'plan', 'program', 'question', 'reportbuilder',
+                'hierarchy', 'message', 'oauth', 'plan', 'program', 'question', 'reportbuilder', 'tui',
                 'certification', 'completionimport', 'mssql', 'generator', 'connect', 'form',
                 'gap', 'job', 'completioneditor', 'userdata', 'catalog', 'workflow', 'contentmarketplace',
                 'tenant', 'webapi', 'evidence', 'mvc', 'cloudfiledir', 'extfiledir', 'samples',
