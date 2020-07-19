@@ -129,9 +129,9 @@ class behat_config_manager {
             behat_error(BEHAT_EXITCODE_PERMISSIONS, 'File ' . $configfilepath . ' can not be created');
         }
 
-        // Totara: put the behat config into the srcroot to simplify execution.
+        // Totara: put the behat config into the test/behat directory to simplify execution.
         if (!$parallelruns) {
-            file_put_contents(__DIR__ . '/../../../../behat.yml', $contents);
+            file_put_contents(__DIR__ . '/../../../../test/behat/behat.yml', $contents);
         }
     }
 

@@ -734,4 +734,9 @@ class core_phpunit_advanced_testcase extends advanced_testcase {
         $this->assertDebuggingCalled('PHPUnits hasPerformedExpectationsOnOutput() method was removed in PHPUnit 6 and is deprecated since Totara 13; use hasExpectationOnOutput() instead.');
     }
 
+    public function test_default_environment() {
+        global $CFG;
+        $this->assertSame('https://www.example.com/moodle', $CFG->wwwroot);
+        $this->assertSame('noreply@www.example.com', $CFG->noreplyaddress);
+    }
 }

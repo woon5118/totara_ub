@@ -30,8 +30,9 @@ if (isset($_SERVER['REMOTE_ADDR'])) {
     die(); // No access from web!.
 }
 
-define('TOOL_BEHAT_DIR_SERVER', realpath(__DIR__.'/../../../..'));
-define('TOOL_BEHAT_DIR_VENDOR', realpath(__DIR__.'/../../../../../vendor'));
+define('TOOL_BEHAT_DIR_ROOT', realpath(__DIR__ . '/../../../../..'));
+define('TOOL_BEHAT_DIR_SERVER', realpath(TOOL_BEHAT_DIR_ROOT . '/server'));
+define('TOOL_BEHAT_DIR_VENDOR', realpath(TOOL_BEHAT_DIR_ROOT . '/test/behat/vendor'));
 
 // Basic functions.
 require_once(TOOL_BEHAT_DIR_SERVER . '/lib/clilib.php');

@@ -21,7 +21,7 @@
  * @package totara_job
  */
 
-require_once(__DIR__ . '/../../../config.php');
+global $CFG;
 require_once($CFG->dirroot . '/totara/core/dialogs/dialog_content.class.php');
 require_once($CFG->dirroot . '/totara/job/lib.php');
 

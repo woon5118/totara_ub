@@ -373,8 +373,13 @@ class behat_config_util {
             $this->contexts = $contexts;
         }
 
+        $autoload = $CFG->srcroot . '/test/behat/vendor/autoload.php';
+        if (!file_exists($autoload)) {
+            throw new \coding_exception('Behat composer requirements are not available.');
+        }
+
         // We require here when we are sure behat dependencies are available.
-        require_once($CFG->srcroot . '/vendor/autoload.php');
+        require_once($autoload);
 
         $config = $this->build_config();
 
@@ -466,12 +471,14 @@ class behat_config_util {
     protected function build_config($parallelruns = 0, $currentrun = 0) {
         global $CFG;
 
+        $yml_dist_file = $CFG->srcroot . '/test/behat/behat.yml.dist';
+
         // Get the defaults first.
-        $config = Symfony\Component\Yaml\Yaml::parse(file_get_contents(__DIR__ . '/../../../../behat.yml.dist'));
+        $config = Symfony\Component\Yaml\Yaml::parse(file_get_contents($yml_dist_file));
 
         // Add local Totara overrides.
-        if (file_exists(__DIR__ . '/../../../../behat_local.yml')) {
-            $localconfig = Symfony\Component\Yaml\Yaml::parse(file_get_contents(__DIR__ . '/../../../../behat_local.yml'));
+        if (file_exists($yml_dist_file)) {
+            $localconfig = Symfony\Component\Yaml\Yaml::parse(file_get_contents($yml_dist_file));
             if ($localconfig) {
                 $config = $this->merge_config($config, $localconfig);
             }
@@ -499,7 +506,7 @@ class behat_config_util {
         if (!empty($CFG->behat_wwwroot)) {
             $config['default']['extensions']['Behat\MinkExtension']['base_url'] = $CFG->behat_wwwroot;
         }
-        $config['default']['extensions']['Moodle\BehatExtension']['moodledirroot'] = $CFG->srcroot;
+        $config['default']['extensions']['Moodle\BehatExtension']['moodledirroot'] = $CFG->dirroot;
 
         $config['default']['suites'] = $this->get_behat_suites($parallelruns, $currentrun);
 

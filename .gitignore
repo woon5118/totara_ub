@@ -1,22 +1,27 @@
 # User added files
-/server/config.php
+/config.php
 /.graphqlconfig
 
 # Tooling files
-phpunit.xml
 phpcs.xml
-/behat.yml
+/test/phpunit/phpunit.xml
+/test/behat/behat.yml
 /behat_local.yml
 # Composer support - only composer.json is to be in git, the rest is installed in each checkout.
-/composer.phar
-/composer.lock
-/vendor/
+composer.phar
+composer.lock
+/test/*/vendor/
 # Node modules for the TUI componentry
 /node_modules/
 # Node modules for Totara
 /server/node_modules/
 # Codechecker tool
 /server/local/codechecker/
+# PHPUnit profiling artefacts in the srcroot directory
+/phpunit_profile_methods_*.csv
+/phpunit_profile_classes_*.csv
+# PHPUnit result cache artefact generated when it is running
+.phpunit.result.cache
 
 # Build files we don't want.
 # AMD build files

@@ -94,9 +94,13 @@ class Hint_ResultPrinter extends \PHPUnit\TextUI\ResultPrinter {
             $pathprefix .= DIRECTORY_SEPARATOR;
         }
 
-        // There is only vendor/bin/phpunit executable. There is no .cmd or .bat files.
-        $executable = $pathprefix . 'vendor' . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'phpunit';
-        $executable = testing_cli_fix_directory_separator($executable);
+        $stack = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+        $executable = end($stack)['file'];
+        unset($stack);
+
+        if (defined('TOTARA_PHPUNIT_ORIGINAL_CWD') && strpos($executable, TOTARA_PHPUNIT_ORIGINAL_CWD) === 0) {
+            $executable = substr($executable, strlen(TOTARA_PHPUNIT_ORIGINAL_CWD . DIRECTORY_SEPARATOR));
+        }
 
         // Add server arguments to the rerun if passed.
         if (isset($_SERVER['argv'][0])) {
@@ -116,7 +120,7 @@ class Hint_ResultPrinter extends \PHPUnit\TextUI\ResultPrinter {
             }
         }
 
-        $this->write("\nTo re-run:\n $executable $testName $file\n");
+        $this->write("\nTo re-run:\n $executable $file\n");
     }
 }
 

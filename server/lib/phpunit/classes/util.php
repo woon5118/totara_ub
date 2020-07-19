@@ -60,7 +60,7 @@ class phpunit_util extends testing_util {
     /**
      * @var array Files to skip when dropping dataroot folder
      */
-    protected static $datarootskipondrop = array('.', '..', 'lock', 'webrunner.xml');
+    protected static $datarootskipondrop = array('.', '..', 'lock');
 
     /** @var phpunit_cache_factory $cachefactory */
     protected static $cachefactory;
@@ -577,14 +577,47 @@ class phpunit_util extends testing_util {
      * @static
      * @return bool true means main config file created, false means only dataroot file created
      */
-    public static function build_config_file() {
+    public static function build_config_file(string $path_xml_dist = null, string $path_xml = null) {
         global $CFG;
+
+        if ($path_xml_dist === null) {
+            $path_xml_dist = $CFG->srcroot . '/test/phpunit/phpunit.xml.dist';
+        }
+        if ($path_xml === null) {
+            $path_xml = $CFG->srcroot . '/test/phpunit/phpunit.xml';
+        }
+
+        if (!file_exists($path_xml_dist) || !is_readable($path_xml_dist)) {
+            phpunit_bootstrap_error(PHPUNIT_EXITCODE_CONFIGERROR, "Can not read phpunit.xml.dist file");
+        }
 
         $template = '
         <testsuite name="@component@_testsuite">
             <directory suffix="_test.php">@dir@</directory>
         </testsuite>';
-        $data = file_get_contents("$CFG->srcroot/phpunit.xml.dist");
+        $data = file_get_contents($path_xml_dist);
+
+        $suites = '';
+        $subsystems = core_component::get_core_subsystems();
+        ksort($subsystems);
+        $subsystems = array_merge(
+            ['core' => $CFG->libdir],
+            $subsystems
+        );
+
+        foreach ($subsystems as $subsystem => $directory) {
+            if (!file_exists("$directory/tests/")) {
+                continue;
+            }
+            $dir = '../../' . substr($directory, strlen($CFG->srcroot)+1);
+            $dir .= '/tests';
+
+            $suite = str_replace('@component@', $subsystem, $template);
+            $suite = str_replace('@dir@', $dir, $suite);
+
+            $suites .= $suite;
+        }
+        $data = preg_replace('|<!--@subsystem_suites_start@-->.*<!--@subsystem_suites_end@-->|s', $suites, $data, 1);
 
         $suites = '';
 
@@ -597,7 +630,7 @@ class phpunit_util extends testing_util {
                 if (!file_exists("$fullplug/tests/")) {
                     continue;
                 }
-                $dir = substr($fullplug, strlen($CFG->srcroot)+1);
+                $dir = '../../' . substr($fullplug, strlen($CFG->srcroot)+1);
                 $dir .= '/tests';
                 $component = $type.'_'.$plug;
 
@@ -610,19 +643,18 @@ class phpunit_util extends testing_util {
 
         $data = preg_replace('|<!--@plugin_suites_start@-->.*<!--@plugin_suites_end@-->|s', $suites, $data, 1);
 
-        $result = false;
-        if (is_writable($CFG->srcroot)) {
-            if ($result = file_put_contents("$CFG->srcroot/phpunit.xml", $data)) {
-                testing_fix_file_permissions("$CFG->srcroot/phpunit.xml");
+        if (is_writable(dirname($path_xml))) {
+            $result = file_put_contents($path_xml, $data);
+            if ($result) {
+                testing_fix_file_permissions($path_xml);
+            } else {
+                phpunit_bootstrap_error(PHPUNIT_EXITCODE_CONFIGERROR, "Unable to write phpunit.xml file");
             }
+        } else {
+            phpunit_bootstrap_error(PHPUNIT_EXITCODE_CONFIGERROR, "Unable to write phpunit.xml file, srcroot directory is read only");
         }
 
-        // relink - it seems that xml:base does not work in phpunit xml files, remove this nasty hack if you find a way to set xml base for relative refs
-        $data = str_replace('lib/phpunit/', $CFG->dirroot.DIRECTORY_SEPARATOR.'lib'.DIRECTORY_SEPARATOR.'phpunit'.DIRECTORY_SEPARATOR, $data);
-        $data = preg_replace('|<directory suffix="_test.php">([^<]+)</directory>|',
-            '<directory suffix="_test.php">'.$CFG->dirroot.(DIRECTORY_SEPARATOR === '\\' ? '\\\\' : DIRECTORY_SEPARATOR).'$1</directory>',
-            $data);
-        file_put_contents("$CFG->dataroot/phpunit/webrunner.xml", $data);
+        $result = file_put_contents($CFG->dataroot . '/phpunit/webrunner.xml', $data);
         testing_fix_file_permissions("$CFG->dataroot/phpunit/webrunner.xml");
 
         return (bool)$result;

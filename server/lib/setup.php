@@ -27,419 +27,30 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use totara_core\advanced_feature;
+if (class_exists('\core\internal\config') && !defined(\core\internal\config::INITIALISED)) {
+    // This define was added in Totara 13.0 when the code was reorganised. This blocks existing config.php
+    // files from loading lib/setup.php when they are done.
+    // We want to control that now, so that we can encapsulate config.php inclusion completely.
+    if (!defined('ABORT_AFTER_CONFIG_CANCEL')) {
+        return;
+    }
+}
 
-/**
- * Holds the core settings that affect how Moodle works. Some of its fields
- * are set in config.php, and the rest are loaded from the config table.
- *
- * Some typical settings in the $CFG global:
- *  - $CFG->wwwroot  - Path to moodle index directory in url format.
- *  - $CFG->dataroot - Path to moodle data files directory on server's filesystem.
- *  - $CFG->dirroot  - Path to moodle's library folder on server's filesystem.
- *  - $CFG->libdir   - Path to moodle's library folder on server's filesystem.
- *  - $CFG->tempdir  - Path to moodle's temp file directory on server's filesystem.
- *  - $CFG->cachedir - Path to moodle's cache directory on server's filesystem (shared by cluster nodes).
- *  - $CFG->localcachedir - Path to moodle's local cache directory (not shared by cluster nodes).
- *
- * @global object $CFG
- * @name $CFG
- */
-global $CFG; // this should be done much earlier in config.php before creating new $CFG instance
+// Because old config.php files may be including this file using require_once when we include it in lib/init.php
+// we need to use require() or include() and manually ensure that this file does not get included twice.
+if (defined('TOTARA_SETUP_INCLUDED')) {
+    // This is to detect the ABORT_AFTER_CONFIG_CANCEL hack and let us through here time and time again.
+    // The calling script has to manually manage this.... good luck!
+    if (!defined('ABORT_AFTER_CONFIG_CANCEL')) {
+        return;
+    }
+} else {
+    define('TOTARA_SETUP_INCLUDED', true);
+}
 
 if (!isset($CFG)) {
-    if (defined('PHPUNIT_TEST') and PHPUNIT_TEST) {
-        echo('There is a missing "global $CFG;" at the beginning of the config.php file.'."\n");
-        exit(1);
-    } else {
-        // this should never happen, maybe somebody is accessing this file directly...
-        exit(1);
-    }
+    exit(8332);
 }
-
-// Totara: Make sure we have the very basic to load our libraries and do a full environment test,
-// at the same time this detects use of different mis-configured PHP in CLI.
-require(__DIR__ . '/../lib/environmentmincheck.php');
-
-// We can detect real dirroot path reliably since PHP 4.0.2,
-// it can not be anything else, there is no point in having this in config.php
-$CFG->dirroot = dirname(__DIR__);
-
-// TOTARA: Available since Totara 13 when we moved source code into the server directory.
-$CFG->srcroot = realpath($CFG->dirroot . '/..');
-
-// File permissions on created directories in the $CFG->dataroot
-if (!isset($CFG->directorypermissions)) {
-    $CFG->directorypermissions = 02777;      // Must be octal (that's why it's here)
-}
-if (!isset($CFG->filepermissions)) {
-    $CFG->filepermissions = ($CFG->directorypermissions & 0666); // strip execute flags
-}
-// Better also set default umask because developers often forget to include directory
-// permissions in mkdir() and chmod() after creating new files.
-if (!isset($CFG->umaskpermissions)) {
-    $CFG->umaskpermissions = (($CFG->directorypermissions & 0777) ^ 0777);
-}
-umask($CFG->umaskpermissions);
-
-if (defined('BEHAT_SITE_RUNNING')) {
-    // We already switched to behat test site previously.
-
-} else if (!empty($CFG->behat_wwwroot) or !empty($CFG->behat_dataroot) or !empty($CFG->behat_prefix)) {
-    // The behat is configured on this server, we need to find out if this is the behat test
-    // site based on the URL used for access.
-    require_once(__DIR__ . '/../lib/behat/lib.php');
-
-    // Update config variables for parallel behat runs.
-    behat_update_vars_for_process();
-
-    // If behat is being installed for parallel run, then we modify params for parallel run only.
-    if (behat_is_test_site() && !(defined('BEHAT_PARALLEL_UTIL') && empty($CFG->behatrunprocess))) {
-        clearstatcache();
-
-        // Checking the integrity of the provided $CFG->behat_* vars and the
-        // selected wwwroot to prevent conflicts with production and phpunit environments.
-        behat_check_config_vars();
-
-        // Check that the directory does not contains other things.
-        if (!file_exists("$CFG->behat_dataroot/behattestdir.txt")) {
-            if ($dh = opendir($CFG->behat_dataroot)) {
-                while (($file = readdir($dh)) !== false) {
-                    if ($file === 'behat' or $file === '.' or $file === '..' or $file === '.DS_Store' or is_numeric($file)) {
-                        continue;
-                    }
-                    behat_error(BEHAT_EXITCODE_CONFIG, "$CFG->behat_dataroot directory is not empty, ensure this is the " .
-                        "directory where you want to install behat test dataroot");
-                }
-                closedir($dh);
-                unset($dh);
-                unset($file);
-            }
-
-            if (defined('BEHAT_UTIL')) {
-                // Now we create dataroot directory structure for behat tests.
-                testing_initdataroot($CFG->behat_dataroot, 'behat');
-            } else {
-                behat_error(BEHAT_EXITCODE_INSTALL);
-            }
-        }
-
-        if (!defined('BEHAT_UTIL') and !defined('BEHAT_TEST')) {
-            // Somebody tries to access test site directly, tell them if not enabled.
-            $behatdir = preg_replace("#[/|\\\]" . BEHAT_PARALLEL_SITE_NAME . "\d{0,}$#", '', $CFG->behat_dataroot);
-            if (!file_exists($behatdir . '/test_environment_enabled.txt')) {
-                behat_error(BEHAT_EXITCODE_CONFIG, 'Behat is configured but not enabled on this test site.');
-            }
-        }
-
-        // Constant used to inform that the behat test site is being used,
-        // this includes all the processes executed by the behat CLI command like
-        // the site reset, the steps executed by the browser drivers when simulating
-        // a user session and a real session when browsing manually to $CFG->behat_wwwroot
-        // like the browser driver does automatically.
-        // Different from BEHAT_TEST as only this last one can perform CLI
-        // actions like reset the site or use data generators.
-        define('BEHAT_SITE_RUNNING', true);
-
-        // Clean extra config.php settings.
-        behat_clean_init_config();
-
-        // Now we can begin switching $CFG->X for $CFG->behat_X.
-        $CFG->wwwroot = $CFG->behat_wwwroot;
-        $CFG->prefix = $CFG->behat_prefix;
-        $CFG->dataroot = $CFG->behat_dataroot;
-        $CFG->dboptions = isset($CFG->behat_dboptions) ? $CFG->behat_dboptions : $CFG->dboptions;
-    }
-}
-
-// Normalise dataroot - we do not want any symbolic links, trailing / or any other weirdness there
-if (!isset($CFG->dataroot)) {
-    if (isset($_SERVER['REMOTE_ADDR'])) {
-        header($_SERVER['SERVER_PROTOCOL'] . ' 503 Service Unavailable');
-    }
-    echo('Fatal error: $CFG->dataroot is not specified in config.php! Exiting.'."\n");
-    exit(1);
-}
-$CFG->dataroot = realpath($CFG->dataroot);
-if ($CFG->dataroot === false) {
-    if (isset($_SERVER['REMOTE_ADDR'])) {
-        header($_SERVER['SERVER_PROTOCOL'] . ' 503 Service Unavailable');
-    }
-    echo('Fatal error: $CFG->dataroot is not configured properly, directory does not exist or is not accessible! Exiting.'."\n");
-    exit(1);
-} else if (!is_writable($CFG->dataroot)) {
-    if (isset($_SERVER['REMOTE_ADDR'])) {
-        header($_SERVER['SERVER_PROTOCOL'] . ' 503 Service Unavailable');
-    }
-    echo('Fatal error: $CFG->dataroot is not writable, admin has to fix directory permissions! Exiting.'."\n");
-    exit(1);
-}
-
-// wwwroot is mandatory
-if (!isset($CFG->wwwroot) or $CFG->wwwroot === 'http://example.com/moodle') {
-    if (isset($_SERVER['REMOTE_ADDR'])) {
-        header($_SERVER['SERVER_PROTOCOL'] . ' 503 Service Unavailable');
-    }
-    echo('Fatal error: $CFG->wwwroot is not configured! Exiting.'."\n");
-    exit(1);
-}
-
-// Make sure there is some database table prefix.
-if (!isset($CFG->prefix)) {
-    $CFG->prefix = '';
-}
-
-// Totara: custom admin directory not supported!
-$CFG->admin = 'admin';
-
-// Set up some paths.
-$CFG->libdir = $CFG->dirroot .'/lib';
-
-// Allow overriding of tempdir but be backwards compatible
-if (!isset($CFG->tempdir)) {
-    $CFG->tempdir = "$CFG->dataroot/temp";
-}
-
-// Allow overriding of cachedir but be backwards compatible
-if (!isset($CFG->cachedir)) {
-    $CFG->cachedir = "$CFG->dataroot/cache";
-}
-
-// Allow overriding of localcachedir.
-if (!isset($CFG->localcachedir)) {
-    $CFG->localcachedir = "$CFG->dataroot/localcache";
-}
-
-// Location of all languages except core English pack.
-if (!isset($CFG->langotherroot)) {
-    $CFG->langotherroot = $CFG->dataroot.'/lang';
-}
-
-// Location of local lang pack customisations (dirs with _local suffix).
-if (!isset($CFG->langlocalroot)) {
-    $CFG->langlocalroot = $CFG->dataroot.'/lang';
-}
-
-// Totara: redirect behat error logs to a special file, but do not log the errors from setup utils there.
-if (defined('BEHAT_SITE_RUNNING') or defined('BEHAT_TEST')) {
-    if (!defined('BEHAT_UTIL')) {
-        ini_set('error_log', dirname($CFG->dataroot) . '/' . basename($CFG->dataroot) . '_error.log');
-        ini_set('log_errors', 1);
-    }
-}
-
-// Totara: make sure forbidden settings are disabled, but keep them to maintain compatibility with Moodle 3.2 and later.
-$CFG->slasharguments = '1'; // Cannot be disabled any more, admin must fix web server configuration if necessary.
-$CFG->loginhttps = '0'; // This setting was removed, use https:// in $CFG->wwwroot instead.
-$CFG->pathtounoconv = ''; // Unoconv is not secure for web servers!
-$CFG->enablemobilewebservice = '0'; // Not compatible with Totara.
-$CFG->formatstringstriptags = '1'; // Enforced for security reasons, course and activity titles must not have any html tags in them!
-
-// The current directory in PHP version 4.3.0 and above isn't necessarily the
-// directory of the script when run from the command line. The require_once()
-// would fail, so we'll have to chdir()
-if (!isset($_SERVER['REMOTE_ADDR']) && isset($_SERVER['argv'][0])) {
-    // do it only once - skip the second time when continuing after prevous abort
-    if (!defined('ABORT_AFTER_CONFIG') and !defined('ABORT_AFTER_CONFIG_CANCEL')) {
-        chdir(dirname($_SERVER['argv'][0]));
-    }
-}
-
-// sometimes default PHP settings are borked on shared hosting servers, I wonder why they have to do that??
-ini_set('precision', 14); // needed for upgrades and gradebook
-ini_set('serialize_precision', 17); // Make float serialization consistent on all systems.
-ini_set('default_charset', 'UTF-8'); // Totara: always use UTF-8 as default encoding.
-ini_set('input_encoding', '');
-ini_set('output_encoding', '');
-ini_set('mbstring.language' , 'neutral');
-
-// Scripts may request no debug and error messages in output
-// please note it must be defined before including the config.php script
-// and in some cases you also need to set custom default exception handler
-if (!defined('NO_DEBUG_DISPLAY')) {
-    if (defined('AJAX_SCRIPT') and AJAX_SCRIPT) {
-        // Moodle AJAX scripts are expected to return json data, any PHP notices or errors break it badly,
-        // developers simply must learn to watch error log.
-        define('NO_DEBUG_DISPLAY', true);
-    } else {
-        define('NO_DEBUG_DISPLAY', false);
-    }
-}
-
-// Some scripts such as upgrade may want to prevent output buffering
-if (!defined('NO_OUTPUT_BUFFERING')) {
-    define('NO_OUTPUT_BUFFERING', false);
-}
-
-// PHPUnit tests need custom init
-if (!defined('PHPUNIT_TEST')) {
-    define('PHPUNIT_TEST', false);
-}
-if (PHPUNIT_TEST || (defined('BEHAT_SITE_RUNNING') && BEHAT_SITE_RUNNING)) {
-    if (!defined('TOTARA_DISTRIBUTION_TEST')) {
-        define('TOTARA_DISTRIBUTION_TEST', false);
-    }
-}
-
-// Performance tests needs to always display performance info, even in redirections.
-if (defined('MDL_PERF_TEST')) {
-    if (MDL_PERF_TEST) {
-        // We force the ones we need.
-        if (!defined('MDL_PERF')) {
-            define('MDL_PERF', true);
-        }
-        if (!defined('MDL_PERFDB')) {
-            define('MDL_PERFDB', true);
-        }
-        if (!defined('MDL_PERFTOFOOT')) {
-            define('MDL_PERFTOFOOT', true);
-        }
-    }
-} else {
-    define('MDL_PERF_TEST', false);
-}
-
-// When set to true MUC (Moodle caching) will be disabled as much as possible.
-// A special cache factory will be used to handle this situation and will use special "disabled" equivalents objects.
-// This ensure we don't attempt to read or create the config file, don't use stores, don't provide persistence or
-// storage of any kind.
-if (!defined('CACHE_DISABLE_ALL')) {
-    define('CACHE_DISABLE_ALL', false);
-}
-
-// When set to true MUC (Moodle caching) will not use any of the defined or default stores.
-// The Cache API will continue to function however this will force the use of the cachestore_dummy so all requests
-// will be interacting with a static property and will never go to the proper cache stores.
-// Useful if you need to avoid the stores for one reason or another.
-if (!defined('CACHE_DISABLE_STORES')) {
-    define('CACHE_DISABLE_STORES', false);
-}
-
-// Disable phar wrapper as this presents a security risk if user input can make it to just
-// about any PHP file function, including file_exists().
-// If the wrapper is needed, it can be enabled where required with stream_wrapper_register('phar')
-// just before it is required.
-// This line has been included after defines of constants such as PHPUNIT_TEST in case we
-// ever need to make it conditional on those. Otherwise it needs to be as early as possible.
-@stream_wrapper_unregister('phar');
-
-// Servers should define a default timezone in php.ini, but if they don't then make sure no errors are shown.
-date_default_timezone_set(@date_default_timezone_get());
-
-// Detect CLI scripts - CLI scripts are executed from command line, do not have session and we do not want HTML in output
-// In your new CLI scripts just add "define('CLI_SCRIPT', true);" before requiring config.php.
-// Please note that one script can not be accessed from both CLI and web interface.
-if (!defined('CLI_SCRIPT')) {
-    define('CLI_SCRIPT', false);
-}
-if (defined('WEB_CRON_EMULATED_CLI')) {
-    if (!isset($_SERVER['REMOTE_ADDR'])) {
-        echo('Web cron can not be executed as CLI script any more, please use admin/cli/cron.php instead'."\n");
-        exit(1);
-    }
-} else if (isset($_SERVER['REMOTE_ADDR'])) {
-    if (CLI_SCRIPT) {
-        echo('Command line scripts can not be executed from the web interface');
-        exit(1);
-    }
-} else {
-    if (!CLI_SCRIPT) {
-        echo('Command line scripts must define CLI_SCRIPT before requiring config.php'."\n");
-        exit(1);
-    }
-}
-
-// All web service requests have WS_SERVER == true.
-if (!defined('WS_SERVER')) {
-    define('WS_SERVER', false);
-}
-
-// Detect CLI maintenance mode - this is useful when you need to mess with database, such as during upgrades
-if (file_exists("$CFG->dataroot/climaintenance.html")) {
-    if (!CLI_SCRIPT) {
-        header($_SERVER['SERVER_PROTOCOL'] . ' 503 Moodle under maintenance');
-        header('Status: 503 Moodle under maintenance');
-        header('Retry-After: 300');
-        header('Content-type: text/html; charset=utf-8');
-        header('X-UA-Compatible: IE=edge');
-        /// Headers to make it not cacheable and json
-        header('Cache-Control: no-store, no-cache, must-revalidate');
-        header('Cache-Control: post-check=0, pre-check=0', false);
-        header('Pragma: no-cache');
-        header('Expires: Mon, 20 Aug 1969 09:23:00 GMT');
-        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
-        header('Accept-Ranges: none');
-        readfile("$CFG->dataroot/climaintenance.html");
-        die;
-    } else {
-        if (!defined('CLI_MAINTENANCE')) {
-            define('CLI_MAINTENANCE', true);
-        }
-    }
-} else {
-    if (!defined('CLI_MAINTENANCE')) {
-        define('CLI_MAINTENANCE', false);
-    }
-}
-
-// Sometimes people use different PHP binary for web and CLI, make 100% sure they have the supported PHP version.
-if (version_compare(PHP_VERSION, '7.2.10') < 0) {
-    $phpversion = PHP_VERSION;
-    // Do NOT localise - lang strings would not work here and we CAN NOT move it to later place.
-    echo "Totara 13 or later requires at least PHP 7.2.10 (currently using version $phpversion).\n";
-    echo "Some servers may have multiple PHP versions installed, are you using the correct executable?\n";
-    exit(1);
-}
-
-// Detect ajax scripts - they are similar to CLI because we can not redirect, output html, etc.
-if (!defined('AJAX_SCRIPT')) {
-    define('AJAX_SCRIPT', false);
-}
-
-// Exact version of currently used yui2 and 3 library.
-$CFG->yui2version = '2.9.0';
-$CFG->yui3version = '3.17.2';
-
-// Patching the upstream YUI release.
-// For important information on patching YUI modules, please see http://docs.moodle.org/dev/YUI/Patching.
-// If we need to patch a YUI modules between official YUI releases, the yuipatchlevel will need to be manually
-// incremented here. The module will also need to be listed in the yuipatchedmodules.
-// When upgrading to a subsequent version of YUI, these should be reset back to 0 and an empty array.
-$CFG->yuipatchlevel = 0;
-$CFG->yuipatchedmodules = array(
-);
-
-// Store settings from config.php in array in $CFG - we can use it later to detect problems and overrides.
-if (!isset($CFG->config_php_settings)) {
-    $CFG->config_php_settings = (array)$CFG;
-    // Forced plugin settings override values from config_plugins table.
-    unset($CFG->config_php_settings['forced_plugin_settings']);
-    if (!isset($CFG->forced_plugin_settings)) {
-        $CFG->forced_plugin_settings = array();
-    }
-}
-
-if (isset($CFG->debug)) {
-    $CFG->debug = (int)$CFG->debug;
-} else {
-    $CFG->debug = 0;
-}
-$CFG->debugdeveloper = (($CFG->debug & (E_ALL | E_STRICT)) === (E_ALL | E_STRICT)); // DEBUG_DEVELOPER is not available yet.
-
-if (!defined('MOODLE_INTERNAL')) { // Necessary because cli installer has to define it earlier.
-    /** Used by library scripts to check they are being called by Moodle. */
-    define('MOODLE_INTERNAL', true);
-}
-
-// Totara: we support migration from this particular Moodle release only.
-if (!defined('MOODLE_MIGRATION_VERSION')) {
-    define('MOODLE_MIGRATION_VERSION', '2017111309.00'); // Keep as string to simplify comparison with DB data.
-    define('MOODLE_MIGRATION_RELEASE', '3.4.9 (Build: 20190513)');
-}
-
-// core_component can be used in any scripts, it does not need anything else.
-require_once($CFG->libdir .'/classes/component.php');
-
 // special support for highly optimised scripts that do not need libraries and DB connection
 if (defined('ABORT_AFTER_CONFIG')) {
     if (!defined('ABORT_AFTER_CONFIG_CANCEL')) {
@@ -1011,7 +622,7 @@ if (!empty($CFG->debugvalidators) and !empty($CFG->guestloginbutton)) {
 
 // Apache log integration. In apache conf file one can use ${MOODULEUSER}n in
 // LogFormat to get the current logged in username in moodle.
-// Alternatvely for other web servers a header X-MOODLEUSER can be set which
+// Alternatvely for other web servers a header X-TOTARAUSER can be set which
 // can be using in the logfile and stripped out if needed.
 if ($USER && isset($USER->username)) {
     $logmethod = '';
@@ -1052,11 +663,11 @@ if ($USER && isset($USER->username)) {
                 break;
         }
         if ($logmethod == 'apache') {
-            apache_note('MOODLEUSER', $logname);
+            apache_note('TOTARAUSER', $logname);
         }
 
         if ($logmethod == 'header') {
-            header("X-MOODLEUSER: $logname");
+            header("X-TOTARAUSER: $logname");
         }
     }
 }

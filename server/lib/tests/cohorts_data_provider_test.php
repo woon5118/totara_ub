@@ -197,7 +197,7 @@ class core_cohort_data_provider_testcase extends advanced_testcase {
         // Unknown filter.
         $key = 'unknown';
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessageRegExp("/$key/");
+        $this->expectExceptionMessageMatches("/$key/");
         $cohorts
             ->set_filters([$key => '#00'])
             ->fetch_paginated();

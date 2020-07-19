@@ -25,13 +25,14 @@ if (isset($_SERVER['REMOTE_ADDR'])) {
     die; // no access from web!
 }
 
-define('TOOL_PHPUNIT_DIR_SERVER', realpath(__DIR__.'/../../../..'));
-define('TOOL_PHPUNIT_DIR_VENDOR', realpath(__DIR__.'/../../../../../vendor'));
+define('TOOL_PHPUNIT_DIR_ROOT', realpath(__DIR__ . '/../../../../..'));
+define('TOOL_PHPUNIT_DIR_SERVER', realpath(TOOL_PHPUNIT_DIR_ROOT . '/server'));
+define('TOOL_PHPUNIT_DIR_VENDOR', realpath(TOOL_PHPUNIT_DIR_ROOT . '/test/phpunit/vendor'));
 
 require_once(TOOL_PHPUNIT_DIR_SERVER . '/lib/clilib.php');
 require_once(TOOL_PHPUNIT_DIR_SERVER . '/lib/phpunit/bootstraplib.php');
 require_once(TOOL_PHPUNIT_DIR_SERVER . '/lib/testing/lib.php');
-require_once(TOOL_PHPUNIT_DIR_VENDOR . '/vendor/autoload.php');
+require_once(TOOL_PHPUNIT_DIR_VENDOR . '/autoload.php');
 
 // now get cli options
 list($options, $unrecognized) = cli_get_params(
@@ -76,7 +77,7 @@ if ($processes < 1 or $processes > 99) {
     cli_error('Processes argument must be an integer number in the range 1...99');
 }
 
-testing_update_composer_dependencies();
+testing_update_composer_dependencies('phpunit');
 echo "\nInitialising Totara PHPUnit test environment for parallel testing with $processes processes\n";
 
 chdir(__DIR__);
@@ -125,7 +126,7 @@ for ($i = 0; $i <= $processes; $i++) {
     if ($code == PHPUNIT_EXITCODE_INSTALL) {
         // NOTE: there is no point in limiting the number of concurrent init commands
         //       because phpunit processes later will be even heavier than init.
-        $process = new Symfony\Component\Process\Process("php util.php --install --instance=$i", __DIR__);
+        $process = new Symfony\Component\Process\Process(['php', 'util.php', '--install', '--instance='.$i]);
         $process->setTimeout(60*30); // Max 30 minutes for install, we do not want this to be stuck forever.
         $process->start();
         $pending[$i] = $process;
@@ -139,8 +140,11 @@ while ($pending) {
         if (!$process->isRunning()) {
             $code = $process->getExitCode();
             if ($code != 0) {
-                echo "\nInstance '$k' install failed:\n";
+                echo "\n----------\nInstance '$k' install failed:\n";
+                echo "Exit code: {$code}\n";
+                echo "Output:\n";
                 echo $process->getOutput();
+                echo "\n----------\n";
                 exit($code);
             }
             unset($pending[$k]);

@@ -1,0 +1,44 @@
+{
+  "name": "totara/totara",
+  "description": "Totara is a fully supported Open Source learning platform specifically designed for the requirements of corporate, industry and vocational training.",
+  "license": "proprietary",
+  "type": "project",
+  "homepage": "https://www.totaralearning.com",
+  "require-dev": {
+    "behat/mink": "1.8.*",
+    "behat/mink-extension": "2.3.*",
+    "behat/mink-goutte-driver": "1.2.*",
+    "behat/mink-selenium2-driver": "1.4.*",
+    "symfony/process": "^3.4",
+    "behat/behat": "3.3.*",
+    "guzzlehttp/guzzle": "^6.3"
+  },
+  "require": {
+    "php": ">=7.2.10 <7.5",
+    "ext-ctype": "*",
+    "ext-curl": "*",
+    "ext-date": "*",
+    "ext-dom": "*",
+    "ext-fileinfo": "*",
+    "ext-gd": "*",
+    "ext-hash": "*",
+    "ext-iconv": "*",
+    "ext-intl": "*",
+    "ext-json": "*",
+    "ext-libxml": "*",
+    "ext-mbstring": "*",
+    "ext-pcre": "*",
+    "ext-session": "*",
+    "ext-SimpleXML": "*",
+    "ext-SPL": "*",
+    "ext-xml": "*",
+    "ext-xmlreader": "*",
+    "ext-zip": "*",
+    "ext-zlib": "*"
+  },
+  "autoload": {
+    "psr-0": {
+      "Moodle\\BehatExtension\\": "extension/src/"
+    }
+  }
+}

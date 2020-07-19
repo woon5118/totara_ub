@@ -354,6 +354,9 @@ final class bundle {
      */
     public static function get_js_rev() {
         global $CFG;
+        if (during_initial_install()) {
+            return -1;
+        }
         if (empty(get_config('totara_tui', 'cache_js') )) {
             return -1;
         }
@@ -368,6 +371,9 @@ final class bundle {
      * @return int
      */
     public static function get_css_rev() {
+        if (during_initial_install()) {
+            return -1;
+        }
         if (empty(get_config('totara_tui', 'cache_scss'))) {
             return -1;
         }

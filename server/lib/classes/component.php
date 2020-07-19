@@ -465,6 +465,10 @@ $cache = '.var_export($cache, true).';
     protected static function fetch_subsystems() {
         global $CFG;
 
+        if (!isset($CFG->dirroot)) {
+            throw new coding_exception('$CFG has not been correctly initialised.', 'dirroot is missing');
+        }
+
         // NOTE: Any additions here must be verified to not collide with existing add-on modules and subplugins!!!
         $info = array(
             'access'      => null,

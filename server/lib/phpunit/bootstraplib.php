@@ -25,58 +25,275 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(__DIR__ . '/../testing/lib.php');
+namespace {
 
-define('PHPUNIT_EXITCODE_PHPUNITMISSING', 129);
-define('PHPUNIT_EXITCODE_PHPUNITWRONG', 130);
-define('PHPUNIT_EXITCODE_PHPUNITEXTMISSING', 131);
-define('PHPUNIT_EXITCODE_CONFIGERROR', 135);
-define('PHPUNIT_EXITCODE_CONFIGWARNING', 136);
-define('PHPUNIT_EXITCODE_INSTALL', 140);
-define('PHPUNIT_EXITCODE_REINSTALL', 141);
+    use core\internal\phpunit\bootstrap;
 
-/**
- * Print error and stop execution
- * @param int $errorcode The exit error code
- * @param string $text An error message to display
- * @return void stops code execution with error code
- */
-function phpunit_bootstrap_error($errorcode, $text = '') {
-    switch ($errorcode) {
-        case 0:
-            // this is not an error, just print information and exit
-            break;
-        case 1:
-            $text = 'Error: '.$text;
-            break;
-        case PHPUNIT_EXITCODE_PHPUNITMISSING:
-            $text = "Can not find PHPUnit library, to install use: php composer.phar install";
-            break;
-        case PHPUNIT_EXITCODE_PHPUNITWRONG:
-            $text = 'Totara requires PHPUnit 7.5.x, '.$text.' is not compatible';
-            break;
-        case PHPUNIT_EXITCODE_PHPUNITEXTMISSING:
-            $text = 'Totara can not find required PHPUnit extension '.$text;
-            break;
-        case PHPUNIT_EXITCODE_CONFIGERROR:
-            $text = "Totara PHPUnit environment configuration error:\n".$text;
-            break;
-        case PHPUNIT_EXITCODE_CONFIGWARNING:
-            $text = "Totara PHPUnit environment configuration warning:\n".$text;
-            break;
-        case PHPUNIT_EXITCODE_INSTALL:
-            $path = testing_cli_argument_path('/admin/tool/phpunit/cli/init.php');
-            $text = "Totara PHPUnit environment is not initialised, please use:\n php $path";
-            break;
-        case PHPUNIT_EXITCODE_REINSTALL:
-            $path = testing_cli_argument_path('/admin/tool/phpunit/cli/init.php');
-            $text = "Totara PHPUnit environment was initialised for different version, please use:\n php $path";
-            break;
-        default:
-            $text = empty($text) ? '' : ': '.$text;
-            $text = 'Unknown error '.$errorcode.$text;
-            break;
+    define('PHPUNIT_EXITCODE_PHPUNITMISSING', 129);
+    define('PHPUNIT_EXITCODE_PHPUNITWRONG', 130);
+    define('PHPUNIT_EXITCODE_PHPUNITEXTMISSING', 131);
+    define('PHPUNIT_EXITCODE_CONFIGERROR', 135);
+    define('PHPUNIT_EXITCODE_CONFIGWARNING', 136);
+    define('PHPUNIT_EXITCODE_INSTALL', 140);
+    define('PHPUNIT_EXITCODE_REINSTALL', 141);
+
+    /**
+     * Print error and stop execution
+     * @param int $errorcode The exit error code
+     * @param string $text An error message to display
+     * @return void stops code execution with error code
+     */
+    function phpunit_bootstrap_error($errorcode, $text = '') {
+        require_once(__DIR__ . '/../testing/lib.php');
+        switch ($errorcode) {
+            case 0:
+                // this is not an error, just print information and exit
+                break;
+            case 1:
+                $text = 'Error: ' . $text;
+                break;
+            case PHPUNIT_EXITCODE_PHPUNITMISSING:
+                $text = "Can not find PHPUnit library, to install use: php composer.phar install";
+                break;
+            case PHPUNIT_EXITCODE_PHPUNITWRONG:
+                $text = 'Totara requires PHPUnit 7.5.x, ' . $text . ' is not compatible';
+                break;
+            case PHPUNIT_EXITCODE_PHPUNITEXTMISSING:
+                $text = 'Totara can not find required PHPUnit extension ' . $text;
+                break;
+            case PHPUNIT_EXITCODE_CONFIGERROR:
+                $text = "Totara PHPUnit environment configuration error:\n" . $text;
+                break;
+            case PHPUNIT_EXITCODE_CONFIGWARNING:
+                $text = "Totara PHPUnit environment configuration warning:\n" . $text;
+                break;
+            case PHPUNIT_EXITCODE_INSTALL:
+                $path = testing_cli_argument_path('/admin/tool/phpunit/cli/init.php');
+                $text = "Totara PHPUnit environment is not initialised, please use:\n php $path";
+                break;
+            case PHPUNIT_EXITCODE_REINSTALL:
+                $path = testing_cli_argument_path('/admin/tool/phpunit/cli/init.php');
+                $text = "Totara PHPUnit environment was initialised for different version, please use:\n php $path";
+                break;
+            default:
+                $text = empty($text) ? '' : ': ' . $text;
+                $text = 'Unknown error ' . $errorcode . $text;
+                break;
+        }
+
+        testing_error($errorcode, $text);
     }
 
-    testing_error($errorcode, $text);
+    function phpunit_bootstrap_initialise_cfg(): \stdClass {
+        return \core\internal\config::initialise(
+            function ($config_file, $config_loader) {
+                $alt_config_file = realpath(__DIR__ . '../../../test/phpunit/config.php');
+                if (file_exists($alt_config_file)) {
+                    return $config_loader($alt_config_file);
+                }
+                $cfg = $config_loader($config_file);
+                bootstrap::remap_cfg($cfg);
+                bootstrap::ensure_cfg_defaults($cfg);
+                bootstrap::ensure_minimum_cfg($cfg);
+                bootstrap::modify_for_parallel_testing($cfg);
+                bootstrap::force_environment($cfg);
+
+                // Set up dataroot at this point. It will be verified by \core\internal\config::initialise() which
+                // will be using the callable provided here.
+                testing_initdataroot($cfg->dataroot, 'phpunit', $cfg->directorypermissions, $cfg->filepermissions);
+
+                return $cfg;
+            }
+        );
+    }
+
+}
+
+namespace core\internal\phpunit {
+
+    class bootstrap {
+
+        public static function remap_cfg(\stdClass $cfg) {
+            // The order of this may be important.
+            $property_map = [
+                'dirroot' => false,
+                'srcroot' => false,
+                'admin' => false,
+                'dbtype' => false,
+                'dblibrary' => false,
+                'dbhost' => false,
+                'dbname' => false,
+                'dbuser' => false,
+                'dbpass' => false,
+                'dboptions' => false,
+                'proxyhost' => false,
+                'proxyport' => false,
+                'proxytype' => false,
+                'proxyuser' => false,
+                'proxypassword' => false,
+                'proxybypass' => false,
+                'altcacheconfigpath' => false,
+                'pathtogs' => false,
+                'pathtodu' => false,
+                'aspellpath' => false,
+                'pathtodot' => false,
+                'pathtounoconv' => false,
+                'dataroot' => function (\stdClass $cfg) {
+                    if (!isset($cfg->phpunit_dataroot)) {
+                        phpunit_bootstrap_error(PHPUNIT_EXITCODE_CONFIGERROR, 'Missing $CFG->phpunit_dataroot in config.php, can not run tests!');
+                    }
+                    if (!file_exists($cfg->phpunit_dataroot)) {
+                        mkdir($cfg->phpunit_dataroot, $cfg->directorypermissions);
+                    }
+                    if (!is_dir($cfg->phpunit_dataroot)) {
+                        // Create test dir if does not exists yet.
+                        phpunit_bootstrap_error(PHPUNIT_EXITCODE_CONFIGERROR, '$CFG->phpunit_dataroot directory can not be created, can not run tests!');
+                    }
+                    // Ensure we access to phpunit_dataroot realpath always.
+                    $cfg->phpunit_dataroot = realpath($cfg->phpunit_dataroot);
+
+                    if (isset($cfg->dataroot) and $cfg->phpunit_dataroot === $cfg->dataroot) {
+                        phpunit_bootstrap_error(PHPUNIT_EXITCODE_CONFIGERROR, '$CFG->dataroot and $CFG->phpunit_dataroot must not be identical, can not run tests!');
+                    }
+
+                    if (!is_writable($cfg->phpunit_dataroot)) {
+                        // try to fix permissions if possible
+                        if (function_exists('posix_getuid')) {
+                            $chmod = fileperms($cfg->phpunit_dataroot);
+                            if (fileowner($cfg->phpunit_dataroot) == posix_getuid()) {
+                                $chmod = $chmod | 0700;
+                                chmod($cfg->phpunit_dataroot, $chmod);
+                            }
+                        }
+                        if (!is_writable($cfg->phpunit_dataroot)) {
+                            phpunit_bootstrap_error(PHPUNIT_EXITCODE_CONFIGERROR, '$CFG->phpunit_dataroot directory is not writable, can not run tests!');
+                        }
+                    }
+                    return $cfg->phpunit_dataroot;
+                },
+                'prefix' => function (\stdClass $cfg) {
+                    // verify db prefix
+                    if (!isset($cfg->phpunit_prefix)) {
+                        phpunit_bootstrap_error(PHPUNIT_EXITCODE_CONFIGERROR, 'Missing $CFG->phpunit_prefix in config.php, can not run tests!');
+                    }
+                    if ($cfg->phpunit_prefix === '') {
+                        phpunit_bootstrap_error(PHPUNIT_EXITCODE_CONFIGERROR, '$CFG->phpunit_prefix can not be empty, can not run tests!');
+                    }
+                    if (isset($cfg->prefix) and $cfg->prefix === $cfg->phpunit_prefix) {
+                        phpunit_bootstrap_error(PHPUNIT_EXITCODE_CONFIGERROR, '$CFG->prefix and $CFG->phpunit_prefix must not be identical, can not run tests!');
+                    }
+                    return $cfg->phpunit_prefix;
+                },
+                'profilingenabled' => function (\stdClass $cfg) {
+                    if (isset($cfg->phpunit_profilingenabled) && $cfg->phpunit_profilingenabled) {
+                        $cfg->profilingincluded = '*';
+                        return true;
+                    }
+                    return false;
+                }
+            ];
+            foreach ($property_map as $property => $processor) {
+                if (is_callable($processor)) {
+                    continue;
+                }
+                $phpunit_property = 'phpunit_' . $property;
+                if (isset($cfg->{$phpunit_property})) {
+                    $cfg->{$property} = $cfg->{$phpunit_property};
+                } else if ($processor === true) {
+                    phpunit_bootstrap_error(PHPUNIT_EXITCODE_CONFIGERROR, 'Missing $CFG->' . $phpunit_property . ' in config.php, can not run tests!');
+                }
+            }
+            foreach ($property_map as $property => $processor) {
+                if (!is_callable($processor)) {
+                    continue;
+                }
+                $cfg->{$property} = $processor($cfg);
+            }
+            foreach ((array)$cfg as $key => $value) {
+                if (!isset($property_map[$key])) {
+                    unset($cfg->{$key});
+                }
+            }
+        }
+
+        public static function ensure_cfg_defaults(\stdClass $cfg) {
+            $defaults = [
+                'directorypermissions' => 02777,
+                'wwwroot' => 'https://www.example.com/moodle',
+            ];
+            array_walk($defaults, function ($default, $property) use ($cfg) {
+                if (!isset($cfg->{$property})) {
+                    $cfg->{$property} = $default;
+                }
+            });
+            $cfg->filepermissions = (02777 & 0666);
+        }
+
+        public static function ensure_minimum_cfg(\stdClass $cfg) {
+            $required = [
+                'dataroot',
+                'prefix',
+                'dbtype',
+                'dblibrary',
+                'dbhost',
+                'dbname',
+                'dbuser',
+                'dbpass',
+                'dboptions',
+            ];
+            array_walk($required, function ($property) use ($cfg) {
+                if (!isset($cfg->{$property})) {
+                    $phpunit_property = 'phpunit_' . $property;
+                    phpunit_bootstrap_error(PHPUNIT_EXITCODE_CONFIGERROR, 'Missing $CFG->' . $phpunit_property . ' and/or $CFG->' . $property . ' in config.php, can not run tests!');
+                }
+            });
+        }
+
+        public static function modify_for_parallel_testing(\stdClass $cfg) {
+            // Totara: decide which instance to use.
+            if (!defined('PHPUNIT_INSTANCE')) {
+                if (getenv('TEST_TOKEN') !== false) {
+                    // Running paratest.
+                    define('PHPUNIT_PARATEST', true);
+
+                    // NOTE: test tokens are inconsistent for different runners, see https://github.com/paratestphp/paratest/issues/213
+                    $token = getenv('TEST_TOKEN');
+
+                    if (!is_numeric($token)) {
+                        echo "Invalid paratest token\n";
+                        exit(1);
+                    }
+
+                    $token = str_pad((string)$token, 2, '0', STR_PAD_LEFT);
+                    if (!file_exists($cfg->dataroot . '/' . $token)) {
+                        echo "Environemnt not initialised\n";
+                        exit(1);
+                    }
+                    define('PHPUNIT_INSTANCE', $token);
+
+                } else {
+                    // Normal run or paratest is just starting.
+                    define('PHPUNIT_INSTANCE', '00');
+                }
+            }
+
+            // Add the PHPUnit instance token to dataroot and prefix to create separation.
+            $cfg->dataroot = $cfg->dataroot . '/' . PHPUNIT_INSTANCE;
+            $cfg->prefix = $cfg->prefix . PHPUNIT_INSTANCE;
+        }
+
+        public static function force_environment(\stdClass $cfg) {
+            // force the same CFG settings in all sites
+            $cfg->debug = (E_ALL | E_STRICT); // can not use DEBUG_DEVELOPER yet
+            $cfg->debugdeveloper = true;
+            $cfg->debugdisplay = 1;
+            // some ugly hacks
+            $cfg->themerev = 1;
+            $cfg->jsrev = 1;
+            error_reporting($cfg->debug);
+            ini_set('display_errors', '1');
+            ini_set('log_errors', '1');
+            set_time_limit(0); // no time limit in CLI scripts, user may cancel execution
+        }
+    }
 }

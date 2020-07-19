@@ -254,6 +254,9 @@ abstract class testing_util {
         // OS details.
         $output .= ", OS: " . $env['os'] . "\n";
 
+        // Time to that we can see how long it has been running for. Use r so that we can easily parse it if necessary.
+        $output .= "Started " . date('r') . "\n";
+
         return $output;
     }
 

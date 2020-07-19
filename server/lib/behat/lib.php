@@ -159,9 +159,7 @@ function behat_get_shutdown_process_errors() {
  *
  * @return void
  */
-function behat_clean_init_config() {
-    global $CFG;
-
+function behat_clean_init_config(\stdClass $cfg) {
     $allowed = array_flip(array(
         'wwwroot', 'dataroot', 'dirroot', 'srcroot', 'admin', 'directorypermissions', 'filepermissions',
         'umaskpermissions', 'dbtype', 'dblibrary', 'dbhost', 'dbname', 'dbuser', 'dbpass', 'prefix',
@@ -171,14 +169,14 @@ function behat_clean_init_config() {
     ));
 
     // Add extra allowed settings.
-    if (!empty($CFG->behat_extraallowedsettings)) {
-        $allowed = array_merge($allowed, array_flip($CFG->behat_extraallowedsettings));
+    if (!empty($cfg->behat_extraallowedsettings)) {
+        $allowed = array_merge($allowed, array_flip($cfg->behat_extraallowedsettings));
     }
 
     // Also allowing behat_ prefixed attributes.
-    foreach ($CFG as $key => $value) {
+    foreach ($cfg as $key => $value) {
         if (!isset($allowed[$key]) && strpos($key, 'behat_') !== 0) {
-            unset($CFG->{$key});
+            unset($cfg->{$key});
         }
     }
 }
@@ -188,83 +186,79 @@ function behat_clean_init_config() {
  *
  * @return void Stops execution with error code if something goes wrong.
  */
-function behat_check_config_vars() {
-    global $CFG;
-
+function behat_check_config_vars(\stdClass $cfg) {
     // Verify prefix value.
-    if (empty($CFG->behat_prefix)) {
+    if (empty($cfg->behat_prefix)) {
         behat_error(BEHAT_EXITCODE_CONFIG,
-            'Define $CFG->behat_prefix in config.php');
+            'Define $cfg->behat_prefix in config.php');
     }
-    if (!empty($CFG->prefix) and $CFG->behat_prefix == $CFG->prefix) {
+    if (!empty($cfg->prefix) and $cfg->behat_prefix == $cfg->prefix) {
         behat_error(BEHAT_EXITCODE_CONFIG,
-            '$CFG->behat_prefix in config.php must be different from $CFG->prefix');
+            '$cfg->behat_prefix in config.php must be different from $cfg->prefix');
     }
-    if (!empty($CFG->phpunit_prefix) and $CFG->behat_prefix == $CFG->phpunit_prefix) {
+    if (!empty($cfg->phpunit_prefix) and $cfg->behat_prefix == $cfg->phpunit_prefix) {
         behat_error(BEHAT_EXITCODE_CONFIG,
-            '$CFG->behat_prefix in config.php must be different from $CFG->phpunit_prefix');
+            '$cfg->behat_prefix in config.php must be different from $cfg->phpunit_prefix');
     }
 
     // Verify behat wwwroot value.
-    if (empty($CFG->behat_wwwroot)) {
+    if (empty($cfg->behat_wwwroot)) {
         behat_error(BEHAT_EXITCODE_CONFIG,
-            'Define $CFG->behat_wwwroot in config.php');
+            'Define $cfg->behat_wwwroot in config.php');
     }
-    if (!empty($CFG->wwwroot) and $CFG->behat_wwwroot == $CFG->wwwroot) {
+    if (!empty($cfg->wwwroot) and $cfg->behat_wwwroot == $cfg->wwwroot) {
         behat_error(BEHAT_EXITCODE_CONFIG,
-            '$CFG->behat_wwwroot in config.php must be different from $CFG->wwwroot');
+            '$cfg->behat_wwwroot in config.php must be different from $cfg->wwwroot');
     }
 
     // Verify behat dataroot value.
-    if (empty($CFG->behat_dataroot)) {
+    if (empty($cfg->behat_dataroot)) {
         behat_error(BEHAT_EXITCODE_CONFIG,
-            'Define $CFG->behat_dataroot in config.php');
+            'Define $cfg->behat_dataroot in config.php');
     }
     clearstatcache();
-    if (!file_exists($CFG->behat_dataroot_parent)) {
-        $permissions = isset($CFG->directorypermissions) ? $CFG->directorypermissions : 02777;
+    if (!file_exists($cfg->behat_dataroot_parent)) {
+        $permissions = isset($cfg->directorypermissions) ? $cfg->directorypermissions : 02777;
         umask(0);
-        if (!mkdir($CFG->behat_dataroot_parent, $permissions, true)) {
-            behat_error(BEHAT_EXITCODE_PERMISSIONS, '$CFG->behat_dataroot directory can not be created');
+        if (!mkdir($cfg->behat_dataroot_parent, $permissions, true)) {
+            behat_error(BEHAT_EXITCODE_PERMISSIONS, '$cfg->behat_dataroot directory can not be created');
         }
     }
-    $CFG->behat_dataroot_parent = realpath($CFG->behat_dataroot_parent);
-    if (empty($CFG->behat_dataroot_parent) or !is_dir($CFG->behat_dataroot_parent) or !is_writable($CFG->behat_dataroot_parent)) {
+    $cfg->behat_dataroot_parent = realpath($cfg->behat_dataroot_parent);
+    if (empty($cfg->behat_dataroot_parent) or !is_dir($cfg->behat_dataroot_parent) or !is_writable($cfg->behat_dataroot_parent)) {
         behat_error(BEHAT_EXITCODE_CONFIG,
-            '$CFG->behat_dataroot in config.php must point to an existing writable directory');
+            '$cfg->behat_dataroot in config.php must point to an existing writable directory');
     }
-    if (!empty($CFG->dataroot) and $CFG->behat_dataroot_parent == realpath($CFG->dataroot)) {
+    if (!empty($cfg->dataroot) and $cfg->behat_dataroot_parent == realpath($cfg->dataroot)) {
         behat_error(BEHAT_EXITCODE_CONFIG,
-            '$CFG->behat_dataroot in config.php must be different from $CFG->dataroot');
+            '$cfg->behat_dataroot in config.php must be different from $cfg->dataroot');
     }
-    if (!empty($CFG->phpunit_dataroot) and $CFG->behat_dataroot_parent == realpath($CFG->phpunit_dataroot)) {
+    if (!empty($cfg->phpunit_dataroot) and $cfg->behat_dataroot_parent == realpath($cfg->phpunit_dataroot)) {
         behat_error(BEHAT_EXITCODE_CONFIG,
-            '$CFG->behat_dataroot in config.php must be different from $CFG->phpunit_dataroot');
+            '$cfg->behat_dataroot in config.php must be different from $cfg->phpunit_dataroot');
     }
 
     // This request is coming from admin/tool/behat/cli/util.php which will call util_single.php. So just return from
     // here as we don't need to create a dataroot for single run.
-    if (defined('BEHAT_PARALLEL_UTIL') && BEHAT_PARALLEL_UTIL && empty($CFG->behatrunprocess)) {
+    if (defined('BEHAT_PARALLEL_UTIL') && BEHAT_PARALLEL_UTIL && empty($cfg->behatrunprocess)) {
         return;
     }
 
-    if (!file_exists($CFG->behat_dataroot)) {
-        $permissions = isset($CFG->directorypermissions) ? $CFG->directorypermissions : 02777;
+    if (!file_exists($cfg->behat_dataroot)) {
+        $permissions = isset($cfg->directorypermissions) ? $cfg->directorypermissions : 02777;
         umask(0);
-        if (!mkdir($CFG->behat_dataroot, $permissions, true)) {
-            behat_error(BEHAT_EXITCODE_PERMISSIONS, '$CFG->behat_dataroot directory can not be created');
+        if (!mkdir($cfg->behat_dataroot, $permissions, true)) {
+            behat_error(BEHAT_EXITCODE_PERMISSIONS, '$cfg->behat_dataroot directory can not be created');
         }
     }
-    $CFG->behat_dataroot = realpath($CFG->behat_dataroot);
+    $cfg->behat_dataroot = realpath($cfg->behat_dataroot);
 }
 
 /**
  * Should we switch to the test site data?
  * @return bool
  */
-function behat_is_test_site() {
-    global $CFG;
-
+function behat_is_test_site(\stdClass $cfg) {
     if (defined('BEHAT_UTIL')) {
         // This is the admin tool that installs/drops the test site install.
         return true;
@@ -273,10 +267,10 @@ function behat_is_test_site() {
         // This is the main vendor/bin/behat script.
         return true;
     }
-    if (empty($CFG->behat_wwwroot)) {
+    if (empty($cfg->behat_wwwroot)) {
         return false;
     }
-    if (isset($_SERVER['REMOTE_ADDR']) and behat_is_requested_url($CFG->behat_wwwroot)) {
+    if (isset($_SERVER['REMOTE_ADDR']) and behat_is_requested_url($cfg->behat_wwwroot)) {
         if (!empty($_COOKIE['BEHAT'])) {
             // Totara: Something is accessing the web server with BEHAT cookie like a real browser.
             return true;
@@ -292,49 +286,46 @@ function behat_is_test_site() {
  * - behat_dataroot = behat_dataroot{behatrunprocess}
  * - behat_prefix = behat_prefix.{behatrunprocess}_ (For oracle it will be firstletter of prefix and behatrunprocess)
  **/
-function behat_update_vars_for_process() {
-    global $CFG;
-
+function behat_update_vars_for_process(\stdClass $cfg) {
     $allowedconfigoverride = array('dbtype', 'dblibrary', 'dbhost', 'dbname', 'dbuser', 'dbpass', 'behat_prefix',
         'behat_wwwroot', 'behat_dataroot');
-    $behatrunprocess = behat_get_run_process();
-    $CFG->behatrunprocess = $behatrunprocess;
+    $behatrunprocess = behat_get_run_process($cfg);
+    $cfg->behatrunprocess = $behatrunprocess;
 
     // Data directory will be a directory under parent directory.
-    $CFG->behat_dataroot_parent = $CFG->behat_dataroot;
-    $CFG->behat_dataroot .= '/'. BEHAT_PARALLEL_SITE_NAME;
-
+    $cfg->behat_dataroot_parent = $cfg->behat_dataroot;
+    $cfg->behat_dataroot .= '/'. BEHAT_PARALLEL_SITE_NAME;
     if ($behatrunprocess) {
-        if (empty($CFG->behat_parallel_run[$behatrunprocess - 1]['behat_wwwroot'])) {
+        if (empty($cfg->behat_parallel_run[$behatrunprocess - 1]['behat_wwwroot'])) {
             // Set www root for run process.
-            if (isset($CFG->behat_wwwroot) &&
-                !preg_match("#/" . BEHAT_PARALLEL_SITE_NAME . $behatrunprocess . "\$#", $CFG->behat_wwwroot)) {
-                $CFG->behat_wwwroot .= "/" . BEHAT_PARALLEL_SITE_NAME . $behatrunprocess;
+            if (isset($cfg->behat_wwwroot) &&
+                !preg_match("#/" . BEHAT_PARALLEL_SITE_NAME . $behatrunprocess . "\$#", $cfg->behat_wwwroot)) {
+                $cfg->behat_wwwroot .= "/" . BEHAT_PARALLEL_SITE_NAME . $behatrunprocess;
             }
         }
 
-        if (empty($CFG->behat_parallel_run[$behatrunprocess - 1]['behat_dataroot'])) {
+        if (empty($cfg->behat_parallel_run[$behatrunprocess - 1]['behat_dataroot'])) {
             // Set behat_dataroot.
-            if (!preg_match("#" . $behatrunprocess . "\$#", $CFG->behat_dataroot)) {
-                $CFG->behat_dataroot .= $behatrunprocess;
+            if (!preg_match("#" . $behatrunprocess . "\$#", $cfg->behat_dataroot)) {
+                $cfg->behat_dataroot .= $behatrunprocess;
             }
         }
 
         // Set behat_prefix for db, just suffix run process number, to avoid max length exceed.
         // For oracle only 2 letter prefix is possible.
         // NOTE: This will not work for parallel process > 9.
-        if ($CFG->dbtype === 'oci') {
-            $CFG->behat_prefix = substr($CFG->behat_prefix, 0, 1);
-            $CFG->behat_prefix .= "{$behatrunprocess}";
+        if ($cfg->dbtype === 'oci') {
+            $cfg->behat_prefix = substr($cfg->behat_prefix, 0, 1);
+            $cfg->behat_prefix .= "{$behatrunprocess}";
         } else {
-            $CFG->behat_prefix .= "{$behatrunprocess}_";
+            $cfg->behat_prefix .= "{$behatrunprocess}_";
         }
 
-        if (!empty($CFG->behat_parallel_run[$behatrunprocess - 1])) {
+        if (!empty($cfg->behat_parallel_run[$behatrunprocess - 1])) {
             // Override allowed config vars.
             foreach ($allowedconfigoverride as $config) {
-                if (isset($CFG->behat_parallel_run[$behatrunprocess - 1][$config])) {
-                    $CFG->$config = $CFG->behat_parallel_run[$behatrunprocess - 1][$config];
+                if (isset($cfg->behat_parallel_run[$behatrunprocess - 1][$config])) {
+                    $cfg->$config = $cfg->behat_parallel_run[$behatrunprocess - 1][$config];
                 }
             }
         }
@@ -381,8 +372,8 @@ function behat_is_requested_url($url) {
  *
  * @return bool|int false if single run, else run process number.
  */
-function behat_get_run_process() {
-    global $argv, $CFG;
+function behat_get_run_process(\stdClass $cfg) {
+    global $argv;
     $behatrunprocess = false;
 
     // Get behat run process, if set.
@@ -390,8 +381,8 @@ function behat_get_run_process() {
         $behatrunprocess = BEHAT_CURRENT_RUN;
     } else if (!empty($_SERVER['REMOTE_ADDR'])) {
         // Try get it from config if present.
-        if (!empty($CFG->behat_parallel_run)) {
-            foreach ($CFG->behat_parallel_run as $run => $behatconfig) {
+        if (!empty($cfg->behat_parallel_run)) {
+            foreach ($cfg->behat_parallel_run as $run => $behatconfig) {
                 if (isset($behatconfig['behat_wwwroot']) && behat_is_requested_url($behatconfig['behat_wwwroot'])) {
                     $behatrunprocess = $run + 1; // We start process from 1.
                     break;
@@ -400,7 +391,7 @@ function behat_get_run_process() {
         }
         // Check if parallel site prefix is used.
         if (empty($behatrunprocess) && preg_match('#/' . BEHAT_PARALLEL_SITE_NAME . '(.+?)/#', $_SERVER['REQUEST_URI'])) {
-            $dirrootrealpath = str_replace("\\", "/", realpath($CFG->dirroot));
+            $dirrootrealpath = str_replace("\\", "/", realpath($cfg->dirroot));
             $serverrealpath = str_replace("\\", "/", realpath($_SERVER['SCRIPT_FILENAME']));
             $afterpath = str_replace($dirrootrealpath.'/', '', $serverrealpath);
             // Totara: replace backslash with slash for Windows
@@ -417,8 +408,8 @@ function behat_get_run_process() {
         } else if ($k = array_search('--config', $argv)) {
             $behatconfig = str_replace("\\", "/", $argv[$k + 1]);
             // Try get it from config if present.
-            if (!empty($CFG->behat_parallel_run)) {
-                foreach ($CFG->behat_parallel_run as $run => $parallelconfig) {
+            if (!empty($cfg->behat_parallel_run)) {
+                foreach ($cfg->behat_parallel_run as $run => $parallelconfig) {
                     if (!empty($parallelconfig['behat_dataroot']) &&
                         $parallelconfig['behat_dataroot'] . '/behat/behat.yml' == $behatconfig) {
 
@@ -429,7 +420,7 @@ function behat_get_run_process() {
             }
             // Check if default behat datroot increment was done.
             if (empty($behatrunprocess)) {
-                $behatdataroot = str_replace("\\", "/", $CFG->behat_dataroot . '/' . BEHAT_PARALLEL_SITE_NAME);
+                $behatdataroot = str_replace("\\", "/", $cfg->behat_dataroot . '/' . BEHAT_PARALLEL_SITE_NAME);
                 $behatrunprocess = preg_filter("#^{$behatdataroot}" . "(.+?)[/|\\\]behat[/|\\\]behat\.yml#", '$1',
                     $behatconfig);
             }

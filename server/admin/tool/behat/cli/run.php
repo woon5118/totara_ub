@@ -31,8 +31,9 @@ define('ABORT_AFTER_CONFIG', true);
 define('CACHE_DISABLE_ALL', true);
 define('NO_OUTPUT_BUFFERING', true);
 
-define('TOOL_BEHAT_DIR_SERVER', realpath(__DIR__.'/../../../..'));
-define('TOOL_BEHAT_DIR_VENDOR', realpath(__DIR__.'/../../../../../vendor'));
+define('TOOL_BEHAT_DIR_ROOT', realpath(__DIR__ . '/../../../../..'));
+define('TOOL_BEHAT_DIR_SERVER', realpath(TOOL_BEHAT_DIR_ROOT . '/server'));
+define('TOOL_BEHAT_DIR_VENDOR', realpath(TOOL_BEHAT_DIR_ROOT . '/test/behat/vendor'));
 
 // Basic functions.
 require_once(TOOL_BEHAT_DIR_SERVER . '/lib/clilib.php');
@@ -220,7 +221,7 @@ $verbose = empty($options['verbose']) ? false : true;
 if (empty($parallelrun)) {
     $cwd = getcwd();
     chdir(__DIR__);
-    $runtestscommand = behat_command::get_behat_command(false, false, true);
+    $runtestscommand = behat_command::get_behat_command(false, false);
     $runtestscommand .= ' --config ' . behat_config_manager::get_behat_cli_config_filepath();
     $runtestscommand .= ' ' . $extraoptstr;
     $cmds['singlerun'] = $runtestscommand;
@@ -246,7 +247,7 @@ if (empty($parallelrun)) {
         // Options parameters to be added to each run.
         $myopts = !empty($options['replace']) ? str_replace($options['replace'], $i, $extraoptstr) : $extraoptstr;
 
-        $behatcommand = behat_command::get_behat_command(false, false, true);
+        $behatcommand = behat_command::get_behat_command(false, false);
         $behatconfigpath = behat_config_manager::get_behat_cli_config_filepath($i);
 
         // Command to execute behat run.
@@ -373,7 +374,7 @@ if ($verbose || $status) {
         echo "To re-run failed processes, you can use following command:" . PHP_EOL;
         $extraopts['rerun'] = '--rerun';
         $extraoptstr = implode(' ', $extraopts);
-        echo behat_command::get_behat_command(true, true, true) . " " . $extraoptstr . PHP_EOL;
+        echo behat_command::get_behat_command(true, true) . " " . $extraoptstr . PHP_EOL;
     }
     echo PHP_EOL;
 }

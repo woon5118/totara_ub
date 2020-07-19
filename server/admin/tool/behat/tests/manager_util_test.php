@@ -103,6 +103,17 @@ class tool_behat_manager_util_testcase extends advanced_testcase {
     }
 
     /**
+     * Will skip the calling test if the behat vendor directory and the autoload file do not exist.
+     */
+    private function require_behat_composer_requirements() {
+        global $CFG;
+        $autoload = $CFG->srcroot . '/test/behat/vendor/autoload.php';
+        if (!file_exists($autoload)) {
+            $this->markTestSkipped('Behat composer requirements are not available.');
+        }
+    }
+
+    /**
      * Utility function to build mock object.
      *
      * @param  behat_config_util $behatconfigutil
@@ -145,6 +156,9 @@ class tool_behat_manager_util_testcase extends advanced_testcase {
      */
     public function test_get_config_file_contents_with_single_run() {
 
+        // Composer requirements must exist as we need bo build config.
+        $this->require_behat_composer_requirements();
+
         $mockbuilder = $this->getMockBuilder('behat_config_util');
         $mockbuilder->setMethods(array('get_theme_test_directory', 'get_list_of_themes', 'get_default_theme'));
 
@@ -183,6 +197,9 @@ class tool_behat_manager_util_testcase extends advanced_testcase {
      * Behat config for single run with no theme installed.
      */
     public function test_get_config_file_contents_with_single_run_no_theme() {
+
+        // Composer requirements must exist as we need bo build config.
+        $this->require_behat_composer_requirements();
 
         $mockbuilder = $this->getMockBuilder('behat_config_util');
         $mockbuilder->setMethods(array('get_theme_test_directory', 'get_list_of_themes', 'get_default_theme'));
@@ -237,6 +254,9 @@ class tool_behat_manager_util_testcase extends advanced_testcase {
      * Behat config for parallel run.
      */
     public function test_get_config_file_contents_with_parallel_run() {
+
+        // Composer requirements must exist as we need bo build config.
+        $this->require_behat_composer_requirements();
 
         $mockbuilder = $this->getMockBuilder('behat_config_util');
         $mockbuilder->setMethods(array('get_theme_test_directory', 'get_list_of_themes', 'get_default_theme'));
@@ -340,6 +360,9 @@ class tool_behat_manager_util_testcase extends advanced_testcase {
      * Behat config for parallel run.
      */
     public function test_get_config_file_contents_with_parallel_run_optimize_tags() {
+
+        // Composer requirements must exist as we need bo build config.
+        $this->require_behat_composer_requirements();
 
         $mockbuilder = $this->getMockBuilder('behat_config_util');
         $mockbuilder->setMethods(array('get_theme_test_directory', 'get_list_of_themes', 'get_default_theme'));
@@ -485,6 +508,9 @@ class tool_behat_manager_util_testcase extends advanced_testcase {
      */
     public function test_get_config_file_contents_with_blacklisted_tags() {
 
+        // Composer requirements must exist as we need bo build config.
+        $this->require_behat_composer_requirements();
+
         $mockbuilder = $this->getMockBuilder('behat_config_util');
         $mockbuilder->setMethods(array('get_theme_test_directory', 'get_list_of_themes', 'get_blacklisted_tests_for_theme',
             'get_default_theme'));
@@ -548,6 +574,9 @@ class tool_behat_manager_util_testcase extends advanced_testcase {
      * Behat config for blacklisted features.
      */
     public function test_get_config_file_contents_with_blacklisted_features_contexts() {
+
+        // Composer requirements must exist as we need bo build config.
+        $this->require_behat_composer_requirements();
 
         $mockbuilder = $this->getMockBuilder('behat_config_util');
         $mockbuilder->setMethods(array('get_theme_test_directory', 'get_list_of_themes', 'get_blacklisted_tests_for_theme',
@@ -627,6 +656,9 @@ class tool_behat_manager_util_testcase extends advanced_testcase {
      * Behat config for blacklisted tags.
      */
     public function test_core_features_to_include_in_specified_theme() {
+
+        // Composer requirements must exist as we need bo build config.
+        $this->require_behat_composer_requirements();
 
         $mockbuilder = $this->getMockBuilder('behat_config_util');
         $mockbuilder->setMethods(array('get_theme_test_directory', 'get_list_of_themes', 'get_default_theme'));

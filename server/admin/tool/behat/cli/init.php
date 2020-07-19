@@ -36,8 +36,9 @@ if (function_exists('opcache_reset')) {
 define('CLI_SCRIPT', true);
 define('CACHE_DISABLE_ALL', true);
 
-define('TOOL_BEHAT_DIR_SERVER', realpath(__DIR__.'/../../../..'));
-define('TOOL_BEHAT_DIR_VENDOR', realpath(__DIR__.'/../../../../../vendor'));
+define('TOOL_BEHAT_DIR_ROOT', realpath(__DIR__ . '/../../../../..'));
+define('TOOL_BEHAT_DIR_SERVER', realpath(TOOL_BEHAT_DIR_ROOT . '/server'));
+define('TOOL_BEHAT_DIR_VENDOR', realpath(TOOL_BEHAT_DIR_ROOT . '/test/behat/vendor'));
 
 // Basic functions.
 require_once(TOOL_BEHAT_DIR_SERVER . '/lib/clilib.php');
@@ -119,7 +120,7 @@ $cwd = getcwd();
 $output = null;
 
 // If behat dependencies not downloaded then do it first, else symfony/process can't be used.
-testing_update_composer_dependencies();
+testing_update_composer_dependencies('behat');
 
 // Check whether the behat test environment needs to be updated.
 chdir(__DIR__);

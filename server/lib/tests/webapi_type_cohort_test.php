@@ -22,11 +22,13 @@
  * @category test
  */
 
-use cohort as cohort;
 use core\format;
 use core\webapi\execution_context;
 use core\entities\cohort as cohort_entity;
 use core\webapi\resolver\type\cohort as cohort_type;
+
+global $CFG;
+require_once($CFG->dirroot . '/totara/cohort/lib.php');
 
 /**
  * @coversDefaultClass cohort.
@@ -41,7 +43,7 @@ class core_webapi_resolver_type_cohort_testcase extends advanced_testcase {
         $webapi_context = $this->get_webapi_context();
 
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessageRegExp("/cohort_entity/");
+        $this->expectExceptionMessageMatches("/cohort_entity/");
         cohort_type::resolve('id', [], [], $webapi_context);
     }
 
@@ -54,7 +56,7 @@ class core_webapi_resolver_type_cohort_testcase extends advanced_testcase {
         $field = 'unknown';
 
         $this->expectException(moodle_exception::class);
-        $this->expectExceptionMessageRegExp("/$field/");
+        $this->expectExceptionMessageMatches("/$field/");
         cohort_type::resolve($field, $cohort_entity, [], $webapi_context);
     }
 

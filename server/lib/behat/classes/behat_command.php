@@ -104,7 +104,11 @@ class behat_command {
      * @param bool $absolutepath return command with absolute path.
      * @return string
      */
-    public final static function get_behat_command($custombyterm = false, $parallerun = false, $absolutepath = false) {
+    public final static function get_behat_command($custombyterm = false, $parallerun = false) {
+        if (!defined('TOOL_BEHAT_DIR_VENDOR')) {
+            self::output_msg('Behat commands should only be executed through scripts in server/admin/tool/behat/cli');
+            exit(BEHAT_EXITCODE_CONFIG);
+        }
 
         $separator = DIRECTORY_SEPARATOR;
         $exec = 'behat';
@@ -119,22 +123,14 @@ class behat_command {
             }
         }
 
-        // If relative path then prefix relative path.
-        if ($absolutepath) {
-            $pathprefix = testing_cli_argument_path('/');
-            if (!empty($pathprefix)) {
-                $pathprefix .= $separator;
-            }
+        if (!$parallerun) {
+            $command = TOOL_BEHAT_DIR_VENDOR . $separator . 'bin' . $separator . $exec;
         } else {
-            $pathprefix = '';
+            $command = $separator . 'admin' . $separator . 'tool' . $separator . 'behat' . $separator . 'cli' . $separator . 'run.php';
+            $command = testing_cli_argument_path($command);
+            $command = 'php ' . $command;
         }
 
-        if (!$parallerun) {
-            $command = $pathprefix . 'vendor' . $separator . 'bin' . $separator . $exec;
-        } else {
-            $command = 'php ' . $pathprefix . 'admin' . $separator . 'tool' . $separator . 'behat' . $separator . 'cli'
-                . $separator . 'run.php';
-        }
         return $command;
     }
 
@@ -147,10 +143,12 @@ class behat_command {
      * @return array            CLI command outputs [0] => string, [1] => integer
      */
     public final static function run($options = '') {
-        global $CFG;
+        if (!defined('TOOL_BEHAT_DIR_VENDOR')) {
+            self::output_msg('Behat commands should only be executed through scripts in server/admin/tool/behat/cli');
+            exit(BEHAT_EXITCODE_CONFIG);
+        }
 
         $currentcwd = getcwd();
-        chdir($CFG->srcroot);
         exec(self::get_behat_command() . ' ' . $options, $output, $code);
         chdir($currentcwd);
 
@@ -227,7 +225,11 @@ class behat_command {
      * @return bool
      */
     public static function are_behat_dependencies_installed() {
-        if (!is_dir(__DIR__ . '/../../../../vendor/behat')) {
+        if (!defined('TOOL_BEHAT_DIR_VENDOR')) {
+            self::output_msg('Behat commands should only be executed through scripts in server/admin/tool/behat/cli');
+            return false;
+        }
+        if (!is_dir(TOOL_BEHAT_DIR_VENDOR . '/behat')) {
             return false;
         }
         return true;

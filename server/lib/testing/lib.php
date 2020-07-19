@@ -41,10 +41,6 @@ define('TESTING_EXITCODE_COMPOSER', 255);
 function testing_cli_argument_path($moodlepath) {
     global $CFG;
 
-    if (isset($CFG->admin) and $CFG->admin !== 'admin') {
-        $moodlepath = preg_replace('|^/admin/|', "/$CFG->admin/", $moodlepath);
-    }
-
     if (isset($_SERVER['REMOTE_ADDR'])) {
         // Web access, this should not happen often.
         $cwd = dirname(dirname(__DIR__));
@@ -77,12 +73,16 @@ function testing_cli_argument_path($moodlepath) {
  * @param string $file
  * @return bool success
  */
-function testing_fix_file_permissions($file) {
+function testing_fix_file_permissions($file, $fileperms = null) {
     global $CFG;
 
+    if  ($fileperms === null) {
+        $fileperms = $CFG->filepermissions;
+    }
+
     $permissions = fileperms($file);
-    if ($permissions & $CFG->filepermissions != $CFG->filepermissions) {
-        $permissions = $permissions | $CFG->filepermissions;
+    if ($permissions & $fileperms != $fileperms) {
+        $permissions = $permissions | $fileperms;
         return chmod($file, $permissions);
     }
 
@@ -138,21 +138,28 @@ function testing_is_mingw() {
  * @param string $framework The test framework
  * @return void
  */
-function testing_initdataroot($dataroot, $framework) {
+function testing_initdataroot($dataroot, $framework, $directoryperms = null, $fileperms = null) {
     global $CFG;
 
     umask(0);
 
+    if  ($directoryperms === null) {
+        $directoryperms = $CFG->directorypermissions;
+    }
+    if  ($fileperms === null) {
+        $fileperms = $CFG->filepermissions;
+    }
+
     // Totara: create the dataroot dir if necessary, make sure the framework subdir is present too.
     if (!file_exists($dataroot . '/' . $framework)) {
-        mkdir($dataroot . '/' . $framework, $CFG->directorypermissions, true);
+        mkdir($dataroot . '/' . $framework, $directoryperms, true);
     }
 
     $filename = $dataroot . '/' . $framework . 'testdir.txt';
     if (!file_exists($filename)) {
         file_put_contents($filename, 'Contents of this directory are used during tests only, do not delete this file!');
     }
-    testing_fix_file_permissions($filename);
+    testing_fix_file_permissions($filename, $fileperms);
 }
 
 /**
@@ -177,11 +184,18 @@ function testing_error($errorcode, $text = '') {
  *
  * @return void exit() if something goes wrong
  */
-function testing_update_composer_dependencies() {
+function testing_update_composer_dependencies(string $framework = '') {
 
     if (getenv('TOTARA_TESTING_SKIP_COMPOSER')) {
         // Must've come from configuration. The runner has handled this themselves. Trust them or let them fail.
         return;
+    }
+
+    if ($framework === '') {
+        testing_error(TESTING_EXITCODE_COMPOSER, 'Please update your code to specify which framework is being initialised');
+    }
+    if (!preg_match('#^[a-z]+$#', $framework)) {
+        testing_error(TESTING_EXITCODE_COMPOSER, 'Framework is invalid');
     }
 
     // To restore the value after finishing.
@@ -202,12 +216,12 @@ function testing_update_composer_dependencies() {
         if ($file === false) {
             $errordetails = error_get_last();
             $error = sprintf("Unable to create composer.phar\nPHP error: %s",
-                             $errordetails['message']);
+                $errordetails['message']);
             testing_error(TESTING_EXITCODE_COMPOSER, $error);
         }
         $curl = curl_init();
 
-        curl_setopt($curl, CURLOPT_URL,  $composerurl);
+        curl_setopt($curl, CURLOPT_URL, $composerurl);
         curl_setopt($curl, CURLOPT_FILE, $file);
         $result = curl_exec($curl);
 
@@ -220,7 +234,7 @@ function testing_update_composer_dependencies() {
 
         if (!$result) {
             $error = sprintf("Unable to download composer.phar\ncURL error (%d): %s",
-                             $curlerrno, $curlerror);
+                $curlerrno, $curlerror);
             testing_error(TESTING_EXITCODE_COMPOSER, $error);
         } else if ($curlinfo['http_code'] === 404) {
             if (file_exists($composerpath)) {
@@ -228,7 +242,7 @@ function testing_update_composer_dependencies() {
                 unlink($composerpath);
             }
             $error = sprintf("Unable to download composer.phar\n" .
-                                "404 http status code fetching $composerurl");
+                "404 http status code fetching $composerurl");
             testing_error(TESTING_EXITCODE_COMPOSER, $error);
         }
     } else {
@@ -238,17 +252,24 @@ function testing_update_composer_dependencies() {
         }
     }
 
+    $workingdir = 'test/' . $framework;
+    if (!is_dir($workingdir)) {
+        testing_error(TESTING_EXITCODE_COMPOSER, 'Framework directory does not exist');
+    }
+    $workingdir = escapeshellarg($workingdir);
+    $composercmd = "php composer.phar -d{$workingdir}";
+
     // Totara: find out if we need to update (slower) or can just install to validate setup.
     $output = null;
-    exec("php composer.phar validate -q", $output, $code);
+    exec("{$composercmd} validate -q", $output, $code);
     if ($code == 2) {
         // Most likely requirements changed or dev switched branch.
-        passthru("php composer.phar update --no-suggest", $code);
+        passthru("{$composercmd} update --no-suggest", $code);
     } else {
-        passthru("php composer.phar install --no-suggest", $code);
+        passthru("{$composercmd} install --no-suggest", $code);
         if ($code == 2) {
             // Switched php version most likely.
-            passthru("php composer.phar update --no-suggest", $code);
+            passthru("{$composercmd} update --no-suggest", $code);
         }
     }
     if ($code != 0) {
@@ -256,11 +277,13 @@ function testing_update_composer_dependencies() {
     }
 
     // Totara: temporary hack for PHP 7.4 compatibility, to be removed together with TL-23348
-    $fixfile = __DIR__ . '/../../../vendor/behat/mink/src/Selector/Xpath/Escaper.php';
-    $src = file_get_contents($fixfile);
-    $fixedsrc = str_replace('implode($parts, \',\')', 'implode(\',\', $parts)', $src);
-    if ($src !== $fixedsrc) {
-        file_put_contents($fixfile, $fixedsrc);
+    if ($framework === 'behat') {
+        $fixfile = __DIR__ . '/../../../test/behat/vendor/behat/mink/src/Selector/Xpath/Escaper.php';
+        $src = file_get_contents($fixfile);
+        $fixedsrc = str_replace('implode($parts, \',\')', 'implode(\',\', $parts)', $src);
+        if ($src !== $fixedsrc) {
+            file_put_contents($fixfile, $fixedsrc);
+        }
     }
 
     // Return to our original location.

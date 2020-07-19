@@ -22,8 +22,6 @@
  * @subpackage totara_sync
  */
 
-require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/config.php');
-
 /**
  * Sets up instance moodle_database
  *

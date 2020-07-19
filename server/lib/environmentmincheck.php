@@ -33,27 +33,5 @@
  * Terminates PHP execution with status code 1 on error.
  */
 
-// Check that PHP is of a sufficient version as soon as possible
-if (version_compare(phpversion(), '7.2.10', '<')) {
-    $phpversion = phpversion();
-    echo("Totara requires at least PHP 7.2.10 (currently using version $phpversion). Please upgrade your server software.\n");
-    exit(1);
-}
-
-// Make sure iconv is available.
-if (!function_exists('iconv')) {
-    echo("Totara requires the iconv PHP extension. Please install or enable the iconv extension.\n");
-    exit(1);
-}
-
-// Make sure xml extension is available - we need it to load full environment tests.
-if (!extension_loaded('xml')) {
-    echo("Totara requires the xml PHP extension. Please install or enable the xml extension.\n");
-    exit(1);
-}
-
-// Make sure php5-json is available.
-if (!function_exists('json_encode') or !function_exists('json_decode')) {
-    echo("Totara requires the json PHP extension. Please install or enable the json extension.\n");
-    exit(1);
-}
+require_once(__DIR__ . '/init.php');
+\core\internal\config::initialise_environment();
