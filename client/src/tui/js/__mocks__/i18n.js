@@ -39,3 +39,4 @@ export const langSide = jest.fn(side => side);
 export const langString = (...args) => new LangString(...args);
 export const isLangString = str => str instanceof LangString;
 export const loadLangStrings = jest.fn(() => Promise.resolve());
+export const toVueRequirements = jest.fn(() => ({}));
