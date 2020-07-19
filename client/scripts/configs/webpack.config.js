@@ -34,7 +34,7 @@ let entryCache = null;
 const getEntry = () =>
   entryCache ? entryCache : (entryCache = scanEntry({ rootDir }));
 
-const coreBundle = 'client/build/tui/tui_bundle';
+const coreBundle = 'tui/tui_bundle';
 const isCoreBundleChunk = x =>
   x.name.replace(/\\/g, '/').startsWith(coreBundle);
 
@@ -199,7 +199,7 @@ function createConfig({
         const bundleSuffix = bundleChunk.name.slice(
           index + 'tui_bundle'.length
         );
-        return 'client/build/tui/vendors' + bundleSuffix;
+        return 'tui/vendors' + bundleSuffix;
       },
     },
   };
@@ -220,7 +220,7 @@ function createConfig({
     performance: { hints: false },
 
     output: {
-      path: rootDir,
+      path: path.join(rootDir, 'client/build'),
     },
 
     resolve: {
@@ -291,7 +291,7 @@ function scssToScssConfig({ mode, watch }) {
           return;
         }
         const out = path.join(
-          dir.replace(/^\.\/client\/src/, './client/build'),
+          dir.replace(/^\.[\/\\]client[\/\\]src/, './client/build'),
           'styles',
           x.slice('styles/'.length).replace(/\.scss$/, '')
         );

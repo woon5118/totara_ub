@@ -19,12 +19,21 @@
 const path = require('path');
 const fs = require('fs');
 const { rootDir } = require('./common');
-const componentMap = require(rootDir + 'component_map.json');
+const graphqlMap = require(path.join(rootDir + 'graphql_locations.json'));
+
+const graphqlMapEntries = Object.entries(
+  graphqlMap.locations
+).map(([componentRegex, path]) => ({
+  componentRegex: new RegExp('^' + componentRegex + '$'),
+  path,
+}));
+
+const graphqlImportRegexp = /^([a-zA-Z0-9_]+)\/graphql\/(.*)$/;
 
 const defaultFolder = 'js';
 
 // vue mapped folders
-const vueFolders = ['components', 'containers', 'presentation', 'pages'];
+const vueFolders = ['components', 'pages'];
 
 // all mapped folders
 const subfolders = [].concat(vueFolders);
@@ -33,66 +42,23 @@ const dirMaps = [{ idBaseSuffix: '', path: './' + defaultFolder }].concat(
   subfolders.map(x => ({ idBaseSuffix: '/' + x, path: './' + x }))
 );
 
-const subfolderStaticAliases = [[/^graphql\/(.*)$/, 'webapi/ajax/$1']];
-
-const cachedComponentDirs = new Map();
-const cachedClientDirs = new Map();
+const clientDirExists = new Map();
 
 /**
- * Get the directory a totara component lives in, relative to the root directory.
- *
- * e.g.
- *   - core -> lib
- *   - totara_core -> totara/core
- *   - theme_foo -> theme/foo
+ * Get the directory a Totara client component lives in, relative to `rootDir`.
  *
  * @param {string} component
- * @returns {string}
+ * @returns {?string} null if component is not a client component (probably an npm package)
  */
-function getComponentDir(component) {
-  if (cachedComponentDirs.has(component)) {
-    return cachedComponentDirs.get(component);
-  }
-  const result = getComponentDirInternal(component);
-  cachedComponentDirs.set(component, result);
-  return result;
-}
-
-/**
- * Internal implementation of getComponentDir()
- *
- * @param {string} component
- * @returns {string}
- */
-function getComponentDirInternal(component) {
-  if (component === '') {
-    // Yeah nah.
-    return null;
-  }
-  if (componentMap.components[component]) {
-    return componentMap.components[component];
-  }
-  return null;
-}
-
 function getClientDir(component) {
-  if (cachedClientDirs.has(component)) {
-    return cachedClientDirs.get(component);
-  }
-  const result = getClientDirInternal(component);
-  cachedClientDirs.set(component, result);
-  return result;
-}
-
-function getClientDirInternal(component) {
-  if (component === '') {
-    // Yeah nah.
+  if (!component) {
     return null;
   }
-  if (componentMap.components[component]) {
-    return 'client/src/' + component;
+  const dir = 'client/src/' + component;
+  if (!clientDirExists.has(component)) {
+    clientDirExists.set(component, fs.existsSync(dir));
   }
-  return null;
+  return clientDirExists.get(component) ? dir : null;
 }
 
 /**
@@ -115,7 +81,7 @@ function resolveRequest(req) {
   // Check if this is one of ours.
   const parsedReq = parseComponentRequest(req);
   if (!parsedReq) return;
-  const { serverdir, clientdir, rest, restParts } = parsedReq;
+  const { dir, rest, restParts } = parsedReq;
 
   // subfolders get mapped directly under tui/, everything else goes in tui/js/ (defaultFolder = 'js')
   const prefix = subfolders.some(x => restParts[0] == x)
@@ -133,13 +99,9 @@ function resolveRequest(req) {
       continue;
     }
     let ext = extensions[i];
-    const clientfile = path.resolve(`${clientdir}/${prefix}${rest}${ext}`);
-    const serverfile = path.resolve(`${serverdir}/tui/${prefix}${rest}${ext}`);
-    if (fs.existsSync(serverfile)) {
-      return serverfile;
-    }
-    if (fs.existsSync(clientfile)) {
-      return clientfile;
+    const file = path.resolve(`${dir}/${prefix}${rest}${ext}`);
+    if (fs.existsSync(file)) {
+      return file;
     }
   }
 
@@ -158,15 +120,31 @@ function resolveRequest(req) {
  */
 function resolveStaticAlias(req) {
   if (req[0] == '.') return;
-  const parsedReq = parseComponentRequest(req);
-  if (!parsedReq) return;
-  const { serverdir, clientdir, rest } = parsedReq;
-  for (const [pattern, replacement] of subfolderStaticAliases) {
-    if (serverdir && pattern.test(rest)) {
-      return path.join(serverdir, rest.replace(pattern, replacement));
-    }
-    if (clientdir && pattern.test(rest)) {
-      return path.join(clientdir, rest.replace(pattern, replacement));
+  return resolveGraphQLImport(req);
+}
+
+/**
+ * Resolves a GraphQL import to a file.
+ *
+ * @param {string} req
+ * @returns {?string} Path if found.
+ */
+function resolveGraphQLImport(req) {
+  const graphqlResult = graphqlImportRegexp.exec(req);
+  if (graphqlResult) {
+    const component = graphqlResult[1];
+    const subPath = graphqlResult[2];
+    for (let { componentRegex, path } of graphqlMapEntries) {
+      const componentMatch = componentRegex.exec(component);
+      if (componentMatch) {
+        const result = path.replace(/\{\$(\w+)\}/g, (match, capture) => {
+          // positional capture
+          if (capture && !isNaN(capture)) {
+            return componentMatch[capture];
+          }
+        }) + subPath + '.graphql';
+        return result;
+      }
     }
   }
 }
@@ -184,50 +162,11 @@ function parseComponentRequest(req) {
   const [component, ...restParts] = req.split('/');
   if (!restParts) return null;
   const rest = restParts.join('/');
-  const serverdir = getComponentDir(component);
-  const clientdir = getClientDir(component);
-
-  if (!serverdir && !clientdir) {
+  const dir = getClientDir(component);
+  if (!dir) {
     return null;
   }
-  return { serverdir, clientdir, rest, restParts };
-}
-
-const cachedDirComponents = new Map();
-
-/**
- * Get the Totara component the specified directory belongs to.
- *
- * Only works if one of the directory or one of its parent directories is named
- * 'tui' and contains 'tui.json'.
- *
- * @param {string} dir Directory
- * @returns {?string}
- */
-function getDirComponent(dir) {
-  if (cachedDirComponents.has(dir)) {
-    return cachedDirComponents.get(dir);
-  }
-
-  if (path.basename(dir) == 'tui') {
-    const file = path.join(dir, 'tui.json');
-    if (fs.existsSync(file)) {
-      const info = JSON.parse(fs.readFileSync(file, 'utf8'));
-      cachedDirComponents.set(dir, info.component);
-      return info.component;
-    }
-  }
-
-  const parentDir = path.dirname(dir);
-  if (parentDir == dir) {
-    // at root dir
-    cachedDirComponents.set(dir, null);
-    return null;
-  }
-
-  const parentResult = getDirComponent(parentDir);
-  cachedDirComponents.set(dir, parentResult);
-  return parentResult;
+  return { component, dir, rest, restParts };
 }
 
 module.exports = {
@@ -235,9 +174,7 @@ module.exports = {
   defaultFolder,
   dirMaps,
   vueFolders,
-  getComponentDir,
   getClientDir,
   resolveRequest,
   resolveStaticAlias,
-  getDirComponent,
 };
