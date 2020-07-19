@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import subjectInstanceQuery from 'mod_perform/graphql/subject_instance.graphql';
+import subjectInstanceQuery from 'mod_perform/graphql/subject_instance';
 import Loader from 'tui/components/loader/Loader';
 import NotificationBanner from 'tui/components/notifications/NotificationBanner';
 import ActivityContent from 'mod_perform/components/user_activities/ActivityContent';

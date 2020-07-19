@@ -156,7 +156,7 @@ import Button from 'tui/components/buttons/Button';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 import ClearIcon from 'tui/components/icons/common/Clear';
 import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
-import CreateUserAssignmentMutation from '../../webapi/ajax/create_user_assignments.graphql';
+import CreateUserAssignmentMutation from 'totara_competency/graphql/create_user_assignments';
 import FilterSidePanel from 'tui/components/filters/FilterSidePanel';
 import FlexIcon from 'tui/components/icons/FlexIcon';
 import Grid from 'tui/components/grid/Grid';

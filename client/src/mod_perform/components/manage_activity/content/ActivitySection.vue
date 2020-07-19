@@ -186,7 +186,7 @@ import Button from 'tui/components/buttons/Button';
 import ButtonGroup from 'tui/components/buttons/ButtonGroup';
 import Card from 'tui/components/card/Card';
 import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
-import DeleteSectionMutation from 'mod_perform/graphql/delete_section.graphql';
+import DeleteSectionMutation from 'mod_perform/graphql/delete_section';
 import Dropdown from 'tui/components/dropdown/Dropdown';
 import DropdownItem from 'tui/components/dropdown/DropdownItem';
 import EditIcon from 'tui/components/buttons/EditIcon';
@@ -196,7 +196,7 @@ import GridItem from 'tui/components/grid/GridItem';
 import InputText from 'tui/components/form/InputText';
 import MoreButton from 'tui/components/buttons/MoreIcon';
 import ParticipantsPopover from 'mod_perform/components/manage_activity/content/ParticipantsPopover';
-import UpdateSectionSettingsMutation from 'mod_perform/graphql/update_section_settings.graphql';
+import UpdateSectionSettingsMutation from 'mod_perform/graphql/update_section_settings';
 import { ACTIVITY_STATUS_DRAFT } from 'mod_perform/constants';
 
 /**

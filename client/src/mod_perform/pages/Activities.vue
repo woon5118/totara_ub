@@ -92,7 +92,7 @@ import Loader from 'tui/components/loader/Loader';
 import Modal from 'tui/components/modal/Modal';
 import ModalContent from 'tui/components/modal/ModalContent';
 import ModalPresenter from 'tui/components/modal/ModalPresenter';
-import performActivitiesQuery from 'mod_perform/graphql/activities.graphql';
+import performActivitiesQuery from 'mod_perform/graphql/activities';
 import Table from 'tui/components/datatable/Table';
 import { notify } from 'tui/notifications';
 import { NOTIFICATION_DURATION } from 'mod_perform/constants';

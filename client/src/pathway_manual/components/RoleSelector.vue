@@ -52,7 +52,7 @@
 
 <script>
 import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
-import RolesQuery from 'pathway_manual/graphql/roles.graphql';
+import RolesQuery from 'pathway_manual/graphql/roles';
 import Select from 'tui/components/form/Select';
 
 const UNSET_OPTION = -1;

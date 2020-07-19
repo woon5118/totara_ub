@@ -89,10 +89,10 @@
 import Button from 'tui/components/buttons/Button';
 import ButtonGroup from 'tui/components/buttons/ButtonGroup';
 import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
-import CreateManualRatingsMutation from 'pathway_manual/graphql/create_manual_ratings.graphql';
+import CreateManualRatingsMutation from 'pathway_manual/graphql/create_manual_ratings';
 import FrameworkGroup from 'pathway_manual/components/FrameworkGroup';
 import Loader from 'tui/components/loader/Loader';
-import RateableCompetenciesQuery from 'pathway_manual/graphql/user_rateable_competencies.graphql';
+import RateableCompetenciesQuery from 'pathway_manual/graphql/user_rateable_competencies';
 import UserCompetenciesFilters from 'pathway_manual/components/UserCompetenciesFilters';
 import { NONE_OPTION_VALUE, ROLE_SELF } from 'pathway_manual/constants';
 

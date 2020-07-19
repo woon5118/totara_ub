@@ -72,7 +72,7 @@ import GridItem from 'tui/components/grid/GridItem';
 import Loader from 'tui/components/loader/Loader';
 import Tab from 'tui/components/tabs/Tab';
 import Tabs from 'tui/components/tabs/Tabs';
-import activityQuery from 'mod_perform/graphql/activity.graphql';
+import activityQuery from 'mod_perform/graphql/activity';
 import { notify } from 'tui/notifications';
 import { NOTIFICATION_DURATION } from 'mod_perform/constants';
 

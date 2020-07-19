@@ -121,7 +121,7 @@ import ProgressTrackerCircle from 'tui/components/progresstracker/ProgressTracke
 import SelectFilter from 'tui/components/filters/SelectFilter';
 import { notify } from 'tui/notifications';
 // GraphQL
-import ArchiveUserAssignment from 'totara_competency/graphql/archive_user_assignment.graphql';
+import ArchiveUserAssignment from 'totara_competency/graphql/archive_user_assignment';
 import CompetencyProfileDetailsQuery from 'totara_competency/graphql/profile_competency_details';
 
 export default {
