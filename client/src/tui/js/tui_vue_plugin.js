@@ -15,8 +15,7 @@
  * @author Simon Chester <simon.chester@totaralearning.com>
  * @module totara_core
  */
-import { uniqueId } from './util';
-import { totaraUrl } from './url';
+import { uniqueId, totaraUrl } from './util';
 import { trapFocusOnTab } from './dom/focus';
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;

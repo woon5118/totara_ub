@@ -21,6 +21,7 @@ import {
   hasString,
   unloadedStrings,
   loadStrings,
+  toVueRequirements,
 } from 'tui/i18n';
 import {
   loadStrings as rawLoadStrings,
@@ -131,5 +132,12 @@ describe('loadStrings', () => {
     expect(rawLoadStrings).toHaveBeenCalledWith([
       { component: 'moodle', key: 'save' },
     ]);
+  });
+});
+
+describe('toVueRequirements', () => {
+  it('called with known string', () => {
+    const requests = [{ component: 'core', key: 'save' }];
+    expect(toVueRequirements(requests)).toStrictEqual({"core": ["save"]});
   });
 });

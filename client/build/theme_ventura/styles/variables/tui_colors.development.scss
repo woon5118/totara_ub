@@ -1,0 +1,158 @@
+/* This file is part of Totara Enterprise Extensions.*/
+/**/
+/* Copyright (C) 2020 onwards Totara Learning Solutions LTD*/
+/**/
+/* Totara Enterprise Extensions is provided only to Totara*/
+/* Learning Solutions LTD’s customers and partners, pursuant to*/
+/* the terms and conditions of a separate agreement with Totara*/
+/* Learning Solutions LTD or its affiliate.*/
+/**/
+/* If you do not have an agreement with Totara Learning Solutions*/
+/* LTD, you may not access, use, modify, or distribute this software.*/
+/* Please contact [licensing@totaralearning.com] for more information.*/
+/**/
+/* @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>*/
+/* @module tuickage   theme_ventura*/
+
+:root {
+  /**/
+  /* Theme colours*/
+  /**/
+
+  /* Primary colour*/
+  /* Often used for default image, backgrounds, line separators & visual indicators*/
+  --tui-color-primary: #dce44b;
+
+  /* Secondary colour*/
+  /* Often used for visual components such as progress bars & charts*/
+  --tui-color-secondary: #007ab8;
+
+  /* Tertiary colour*/
+  /* Often used for visual components, must have high contrast to background*/
+  --tui-color-tertiary: #1ea4a9;
+
+  /**/
+  /* Interactive state colours*/
+  /**/
+
+  /* Default state colour, shows an element is interactive*/
+  --tui-color-state: #4b7e2b;
+
+  /* Hover state colour, shown when cursor is over interactive element*/
+  --tui-color-state-hover: #3c6721;
+  /* Focus state colour, shown when element has focus (keyboard tabbing)*/
+  --tui-color-state-focus: #3c6721;
+  /* Active state colour, shown when element is active (clicked)*/
+  --tui-color-state-active: #30541a;
+  /* Highlight, visual clue for hover/focus on components such as a list row*/
+  --tui-color-state-highlight: var(--tui-color-neutral-3);
+  /* Disabled colour of interactive elements*/
+  --tui-color-state-disabled: var(--tui-color-neutral-5);
+
+  /**/
+  /* Visual prompt colours*/
+  /**/
+
+  /* Used to indicate an informational message*/
+  --tui-color-prompt-info: #007ab8;
+  --tui-color-prompt-info-bg: #daf3fe;
+  /* Used to indicate an important message (error, danger)*/
+  --tui-color-prompt-alert: #cc2428;
+  --tui-color-prompt-alert-bg: #fedada;
+  /* Used to indicate a warning message*/
+  --tui-color-prompt-warning: #b2611f;
+  --tui-color-prompt-warning-bg: #f1e2d7;
+  /* Used to indicate a success message*/
+  --tui-color-prompt-success: #4b7e2b;
+  --tui-color-prompt-success-bg: #d8eacd;
+
+  /**/
+  /* Neutral colour ranges*/
+  /**/
+
+  /* Often used for navigation bar, backgrounds & footer*/
+  --tui-color-neutral-1: #fff;
+  /* Often used for content background*/
+  --tui-color-neutral-2: #fafafa;
+  /* Often used for side panel background & disabled buttons*/
+  --tui-color-neutral-3: #f7f7f7;
+  /* Often used for progress bar background*/
+  --tui-color-neutral-4: #e6e4e4;
+  /* Often used for card component borders, line separators & disabled button*/
+  --tui-color-neutral-5: #c7c7c7;
+  /* Often used for icons and form component borders*/
+  --tui-color-neutral-6: #767676;
+  /* Often used for headers and body text*/
+  --tui-color-neutral-7: #262626;
+  /* Only used for legacy theme (Deprecated)*/
+  --tui-color-neutral-legacy-7: #3d444b;
+
+  /**/
+  /* Chart colors*/
+  /**/
+  --tui-color-chart-background-1: #007ab8;
+  --tui-color-chart-transparent-1: rgba(#007ab8, 0.38);
+  --tui-color-chart-background-2: #da7c2f;
+  --tui-color-chart-transparent-2: rgba(#da7c2f, 0.38);
+  --tui-color-chart-background-3: #bf6c78;
+  --tui-color-chart-transparent-3: rgba(#bf6c78, 0.38);
+  --tui-color-chart-background-4: #dac725;
+  --tui-color-chart-transparent-4: rgba(#dac725, 0.38);
+  --tui-color-chart-background-5: #5d5d5d;
+  --tui-color-chart-transparent-5: rgba(#5d5d5d, 0.38);
+  --tui-color-chart-background-6: #98aada;
+  --tui-color-chart-transparent-6: rgba(#98aada, 0.38);
+  --tui-color-chart-background-7: #23c1a0;
+  --tui-color-chart-transparent-7: rgba(#23c1a0, 0.38);
+
+  /**/
+  /* Content colours*/
+  /**/
+  --tui-color-background: var(--tui-color-neutral-1);
+  --tui-color-border: var(--tui-color-neutral-5);
+  --tui-color-text: var(--tui-color-neutral-7);
+  --tui-color-text-disabled: var(--tui-color-neutral-5);
+  --tui-color-text-hint: var(--tui-color-neutral-6);
+
+  /* Backdrops*/
+  --tui-color-backdrop-standard: rgba(0, 0, 0, 0.4);
+  --tui-color-backdrop-heavy: rgba(0, 0, 0, 0.8);
+  --tui-color-backdrop-contrast: var(--tui-color-neutral-1);
+
+  /* Navigation*/
+  @import 'theme_ventura/variables/colors/nav';
+  /* Catalog*/
+  @import 'theme_ventura/variables/colors/catalog';
+  /* Arrows*/
+  @import 'theme_ventura/variables/colors/arrow';
+  /* Forms*/
+  @import 'theme_ventura/variables/colors/forms';
+  /* Avatar*/
+  @import 'theme_ventura/variables/colors/avatar';
+  /* Drop down*/
+  @import 'theme_ventura/variables/colors/dropdown';
+  /* Data table*/
+  @import 'theme_ventura/variables/colors/datatable';
+  /* Tabs*/
+  @import 'theme_ventura/variables/colors/tabs';
+  /* Card*/
+  @import 'theme_ventura/variables/colors/card';
+  /* Charts*/
+  @import 'theme_ventura/variables/colors/charts';
+  /* Filters*/
+  @import 'theme_ventura/variables/colors/filters';
+  /* Tags*/
+  @import 'theme_ventura/variables/colors/tags';
+  /* Tags*/
+  @import 'theme_ventura/variables/colors/progressbar';
+  /* collapsible*/
+  @import 'theme_ventura/variables/colors/collapsible';
+  /* progress tracker*/
+  @import 'theme_ventura/variables/colors/progresstracker';
+
+  /* Side panel navigation*/
+  @import 'theme_ventura/variables/colors/side_panel_nav';
+}
+
+
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vLi9jbGllbnQvc3JjL3RoZW1lX3ZlbnR1cmEvc3R5bGVzL3ZhcmlhYmxlcy90dWlfY29sb3JzLnNjc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQSIsImZpbGUiOiJjbGllbnQvYnVpbGQvdGhlbWVfdmVudHVyYS9zdHlsZXMvdmFyaWFibGVzL3R1aV9jb2xvcnMuZGV2ZWxvcG1lbnQuc2NzcyIsInNvdXJjZXNDb250ZW50IjpbIi8qIFRoaXMgZmlsZSBpcyBwYXJ0IG9mIFRvdGFyYSBFbnRlcnByaXNlIEV4dGVuc2lvbnMuKi9cbi8qKi9cbi8qIENvcHlyaWdodCAoQykgMjAyMCBvbndhcmRzIFRvdGFyYSBMZWFybmluZyBTb2x1dGlvbnMgTFREKi9cbi8qKi9cbi8qIFRvdGFyYSBFbnRlcnByaXNlIEV4dGVuc2lvbnMgaXMgcHJvdmlkZWQgb25seSB0byBUb3RhcmEqL1xuLyogTGVhcm5pbmcgU29sdXRpb25zIExUROKAmXMgY3VzdG9tZXJzIGFuZCBwYXJ0bmVycywgcHVyc3VhbnQgdG8qL1xuLyogdGhlIHRlcm1zIGFuZCBjb25kaXRpb25zIG9mIGEgc2VwYXJhdGUgYWdyZWVtZW50IHdpdGggVG90YXJhKi9cbi8qIExlYXJuaW5nIFNvbHV0aW9ucyBMVEQgb3IgaXRzIGFmZmlsaWF0ZS4qL1xuLyoqL1xuLyogSWYgeW91IGRvIG5vdCBoYXZlIGFuIGFncmVlbWVudCB3aXRoIFRvdGFyYSBMZWFybmluZyBTb2x1dGlvbnMqL1xuLyogTFRELCB5b3UgbWF5IG5vdCBhY2Nlc3MsIHVzZSwgbW9kaWZ5LCBvciBkaXN0cmlidXRlIHRoaXMgc29mdHdhcmUuKi9cbi8qIFBsZWFzZSBjb250YWN0IFtsaWNlbnNpbmdAdG90YXJhbGVhcm5pbmcuY29tXSBmb3IgbW9yZSBpbmZvcm1hdGlvbi4qL1xuLyoqL1xuLyogQGF1dGhvciAgICBLZXZpbiBIb3R0aW5nZXIgPGtldmluLmhvdHRpbmdlckB0b3RhcmFsZWFybmluZy5jb20+Ki9cbi8qIEBtb2R1bGUgdHVpY2thZ2UgICB0aGVtZV92ZW50dXJhKi9cblxuOnJvb3Qge1xuICAvKiovXG4gIC8qIFRoZW1lIGNvbG91cnMqL1xuICAvKiovXG5cbiAgLyogUHJpbWFyeSBjb2xvdXIqL1xuICAvKiBPZnRlbiB1c2VkIGZvciBkZWZhdWx0IGltYWdlLCBiYWNrZ3JvdW5kcywgbGluZSBzZXBhcmF0b3JzICYgdmlzdWFsIGluZGljYXRvcnMqL1xuICAtLXR1aS1jb2xvci1wcmltYXJ5OiAjZGNlNDRiO1xuXG4gIC8qIFNlY29uZGFyeSBjb2xvdXIqL1xuICAvKiBPZnRlbiB1c2VkIGZvciB2aXN1YWwgY29tcG9uZW50cyBzdWNoIGFzIHByb2dyZXNzIGJhcnMgJiBjaGFydHMqL1xuICAtLXR1aS1jb2xvci1zZWNvbmRhcnk6ICMwMDdhYjg7XG5cbiAgLyogVGVydGlhcnkgY29sb3VyKi9cbiAgLyogT2Z0ZW4gdXNlZCBmb3IgdmlzdWFsIGNvbXBvbmVudHMsIG11c3QgaGF2ZSBoaWdoIGNvbnRyYXN0IHRvIGJhY2tncm91bmQqL1xuICAtLXR1aS1jb2xvci10ZXJ0aWFyeTogIzFlYTRhOTtcblxuICAvKiovXG4gIC8qIEludGVyYWN0aXZlIHN0YXRlIGNvbG91cnMqL1xuICAvKiovXG5cbiAgLyogRGVmYXVsdCBzdGF0ZSBjb2xvdXIsIHNob3dzIGFuIGVsZW1lbnQgaXMgaW50ZXJhY3RpdmUqL1xuICAtLXR1aS1jb2xvci1zdGF0ZTogIzRiN2UyYjtcblxuICAvKiBIb3ZlciBzdGF0ZSBjb2xvdXIsIHNob3duIHdoZW4gY3Vyc29yIGlzIG92ZXIgaW50ZXJhY3RpdmUgZWxlbWVudCovXG4gIC0tdHVpLWNvbG9yLXN0YXRlLWhvdmVyOiAjM2M2NzIxO1xuICAvKiBGb2N1cyBzdGF0ZSBjb2xvdXIsIHNob3duIHdoZW4gZWxlbWVudCBoYXMgZm9jdXMgKGtleWJvYXJkIHRhYmJpbmcpKi9cbiAgLS10dWktY29sb3Itc3RhdGUtZm9jdXM6ICMzYzY3MjE7XG4gIC8qIEFjdGl2ZSBzdGF0ZSBjb2xvdXIsIHNob3duIHdoZW4gZWxlbWVudCBpcyBhY3RpdmUgKGNsaWNrZWQpKi9cbiAgLS10dWktY29sb3Itc3RhdGUtYWN0aXZlOiAjMzA1NDFhO1xuICAvKiBIaWdobGlnaHQsIHZpc3VhbCBjbHVlIGZvciBob3Zlci9mb2N1cyBvbiBjb21wb25lbnRzIHN1Y2ggYXMgYSBsaXN0IHJvdyovXG4gIC0tdHVpLWNvbG9yLXN0YXRlLWhpZ2hsaWdodDogdmFyKC0tdHVpLWNvbG9yLW5ldXRyYWwtMyk7XG4gIC8qIERpc2FibGVkIGNvbG91ciBvZiBpbnRlcmFjdGl2ZSBlbGVtZW50cyovXG4gIC0tdHVpLWNvbG9yLXN0YXRlLWRpc2FibGVkOiB2YXIoLS10dWktY29sb3ItbmV1dHJhbC01KTtcblxuICAvKiovXG4gIC8qIFZpc3VhbCBwcm9tcHQgY29sb3VycyovXG4gIC8qKi9cblxuICAvKiBVc2VkIHRvIGluZGljYXRlIGFuIGluZm9ybWF0aW9uYWwgbWVzc2FnZSovXG4gIC0tdHVpLWNvbG9yLXByb21wdC1pbmZvOiAjMDA3YWI4O1xuICAtLXR1aS1jb2xvci1wcm9tcHQtaW5mby1iZzogI2RhZjNmZTtcbiAgLyogVXNlZCB0byBpbmRpY2F0ZSBhbiBpbXBvcnRhbnQgbWVzc2FnZSAoZXJyb3IsIGRhbmdlcikqL1xuICAtLXR1aS1jb2xvci1wcm9tcHQtYWxlcnQ6ICNjYzI0Mjg7XG4gIC0tdHVpLWNvbG9yLXByb21wdC1hbGVydC1iZzogI2ZlZGFkYTtcbiAgLyogVXNlZCB0byBpbmRpY2F0ZSBhIHdhcm5pbmcgbWVzc2FnZSovXG4gIC0tdHVpLWNvbG9yLXByb21wdC13YXJuaW5nOiAjYjI2MTFmO1xuICAtLXR1aS1jb2xvci1wcm9tcHQtd2FybmluZy1iZzogI2YxZTJkNztcbiAgLyogVXNlZCB0byBpbmRpY2F0ZSBhIHN1Y2Nlc3MgbWVzc2FnZSovXG4gIC0tdHVpLWNvbG9yLXByb21wdC1zdWNjZXNzOiAjNGI3ZTJiO1xuICAtLXR1aS1jb2xvci1wcm9tcHQtc3VjY2Vzcy1iZzogI2Q4ZWFjZDtcblxuICAvKiovXG4gIC8qIE5ldXRyYWwgY29sb3VyIHJhbmdlcyovXG4gIC8qKi9cblxuICAvKiBPZnRlbiB1c2VkIGZvciBuYXZpZ2F0aW9uIGJhciwgYmFja2dyb3VuZHMgJiBmb290ZXIqL1xuICAtLXR1aS1jb2xvci1uZXV0cmFsLTE6ICNmZmY7XG4gIC8qIE9mdGVuIHVzZWQgZm9yIGNvbnRlbnQgYmFja2dyb3VuZCovXG4gIC0tdHVpLWNvbG9yLW5ldXRyYWwtMjogI2ZhZmFmYTtcbiAgLyogT2Z0ZW4gdXNlZCBmb3Igc2lkZSBwYW5lbCBiYWNrZ3JvdW5kICYgZGlzYWJsZWQgYnV0dG9ucyovXG4gIC0tdHVpLWNvbG9yLW5ldXRyYWwtMzogI2Y3ZjdmNztcbiAgLyogT2Z0ZW4gdXNlZCBmb3IgcHJvZ3Jlc3MgYmFyIGJhY2tncm91bmQqL1xuICAtLXR1aS1jb2xvci1uZXV0cmFsLTQ6ICNlNmU0ZTQ7XG4gIC8qIE9mdGVuIHVzZWQgZm9yIGNhcmQgY29tcG9uZW50IGJvcmRlcnMsIGxpbmUgc2VwYXJhdG9ycyAmIGRpc2FibGVkIGJ1dHRvbiovXG4gIC0tdHVpLWNvbG9yLW5ldXRyYWwtNTogI2M3YzdjNztcbiAgLyogT2Z0ZW4gdXNlZCBmb3IgaWNvbnMgYW5kIGZvcm0gY29tcG9uZW50IGJvcmRlcnMqL1xuICAtLXR1aS1jb2xvci1uZXV0cmFsLTY6ICM3Njc2NzY7XG4gIC8qIE9mdGVuIHVzZWQgZm9yIGhlYWRlcnMgYW5kIGJvZHkgdGV4dCovXG4gIC0tdHVpLWNvbG9yLW5ldXRyYWwtNzogIzI2MjYyNjtcbiAgLyogT25seSB1c2VkIGZvciBsZWdhY3kgdGhlbWUgKERlcHJlY2F0ZWQpKi9cbiAgLS10dWktY29sb3ItbmV1dHJhbC1sZWdhY3ktNzogIzNkNDQ0YjtcblxuICAvKiovXG4gIC8qIENoYXJ0IGNvbG9ycyovXG4gIC8qKi9cbiAgLS10dWktY29sb3ItY2hhcnQtYmFja2dyb3VuZC0xOiAjMDA3YWI4O1xuICAtLXR1aS1jb2xvci1jaGFydC10cmFuc3BhcmVudC0xOiByZ2JhKCMwMDdhYjgsIDAuMzgpO1xuICAtLXR1aS1jb2xvci1jaGFydC1iYWNrZ3JvdW5kLTI6ICNkYTdjMmY7XG4gIC0tdHVpLWNvbG9yLWNoYXJ0LXRyYW5zcGFyZW50LTI6IHJnYmEoI2RhN2MyZiwgMC4zOCk7XG4gIC0tdHVpLWNvbG9yLWNoYXJ0LWJhY2tncm91bmQtMzogI2JmNmM3ODtcbiAgLS10dWktY29sb3ItY2hhcnQtdHJhbnNwYXJlbnQtMzogcmdiYSgjYmY2Yzc4LCAwLjM4KTtcbiAgLS10dWktY29sb3ItY2hhcnQtYmFja2dyb3VuZC00OiAjZGFjNzI1O1xuICAtLXR1aS1jb2xvci1jaGFydC10cmFuc3BhcmVudC00OiByZ2JhKCNkYWM3MjUsIDAuMzgpO1xuICAtLXR1aS1jb2xvci1jaGFydC1iYWNrZ3JvdW5kLTU6ICM1ZDVkNWQ7XG4gIC0tdHVpLWNvbG9yLWNoYXJ0LXRyYW5zcGFyZW50LTU6IHJnYmEoIzVkNWQ1ZCwgMC4zOCk7XG4gIC0tdHVpLWNvbG9yLWNoYXJ0LWJhY2tncm91bmQtNjogIzk4YWFkYTtcbiAgLS10dWktY29sb3ItY2hhcnQtdHJhbnNwYXJlbnQtNjogcmdiYSgjOThhYWRhLCAwLjM4KTtcbiAgLS10dWktY29sb3ItY2hhcnQtYmFja2dyb3VuZC03OiAjMjNjMWEwO1xuICAtLXR1aS1jb2xvci1jaGFydC10cmFuc3BhcmVudC03OiByZ2JhKCMyM2MxYTAsIDAuMzgpO1xuXG4gIC8qKi9cbiAgLyogQ29udGVudCBjb2xvdXJzKi9cbiAgLyoqL1xuICAtLXR1aS1jb2xvci1iYWNrZ3JvdW5kOiB2YXIoLS10dWktY29sb3ItbmV1dHJhbC0xKTtcbiAgLS10dWktY29sb3ItYm9yZGVyOiB2YXIoLS10dWktY29sb3ItbmV1dHJhbC01KTtcbiAgLS10dWktY29sb3ItdGV4dDogdmFyKC0tdHVpLWNvbG9yLW5ldXRyYWwtNyk7XG4gIC0tdHVpLWNvbG9yLXRleHQtZGlzYWJsZWQ6IHZhcigtLXR1aS1jb2xvci1uZXV0cmFsLTUpO1xuICAtLXR1aS1jb2xvci10ZXh0LWhpbnQ6IHZhcigtLXR1aS1jb2xvci1uZXV0cmFsLTYpO1xuXG4gIC8qIEJhY2tkcm9wcyovXG4gIC0tdHVpLWNvbG9yLWJhY2tkcm9wLXN0YW5kYXJkOiByZ2JhKDAsIDAsIDAsIDAuNCk7XG4gIC0tdHVpLWNvbG9yLWJhY2tkcm9wLWhlYXZ5OiByZ2JhKDAsIDAsIDAsIDAuOCk7XG4gIC0tdHVpLWNvbG9yLWJhY2tkcm9wLWNvbnRyYXN0OiB2YXIoLS10dWktY29sb3ItbmV1dHJhbC0xKTtcblxuICAvKiBOYXZpZ2F0aW9uKi9cbiAgQGltcG9ydCAndGhlbWVfdmVudHVyYS92YXJpYWJsZXMvY29sb3JzL25hdic7XG4gIC8qIENhdGFsb2cqL1xuICBAaW1wb3J0ICd0aGVtZV92ZW50dXJhL3ZhcmlhYmxlcy9jb2xvcnMvY2F0YWxvZyc7XG4gIC8qIEFycm93cyovXG4gIEBpbXBvcnQgJ3RoZW1lX3ZlbnR1cmEvdmFyaWFibGVzL2NvbG9ycy9hcnJvdyc7XG4gIC8qIEZvcm1zKi9cbiAgQGltcG9ydCAndGhlbWVfdmVudHVyYS92YXJpYWJsZXMvY29sb3JzL2Zvcm1zJztcbiAgLyogQXZhdGFyKi9cbiAgQGltcG9ydCAndGhlbWVfdmVudHVyYS92YXJpYWJsZXMvY29sb3JzL2F2YXRhcic7XG4gIC8qIERyb3AgZG93biovXG4gIEBpbXBvcnQgJ3RoZW1lX3ZlbnR1cmEvdmFyaWFibGVzL2NvbG9ycy9kcm9wZG93bic7XG4gIC8qIERhdGEgdGFibGUqL1xuICBAaW1wb3J0ICd0aGVtZV92ZW50dXJhL3ZhcmlhYmxlcy9jb2xvcnMvZGF0YXRhYmxlJztcbiAgLyogVGFicyovXG4gIEBpbXBvcnQgJ3RoZW1lX3ZlbnR1cmEvdmFyaWFibGVzL2NvbG9ycy90YWJzJztcbiAgLyogQ2FyZCovXG4gIEBpbXBvcnQgJ3RoZW1lX3ZlbnR1cmEvdmFyaWFibGVzL2NvbG9ycy9jYXJkJztcbiAgLyogQ2hhcnRzKi9cbiAgQGltcG9ydCAndGhlbWVfdmVudHVyYS92YXJpYWJsZXMvY29sb3JzL2NoYXJ0cyc7XG4gIC8qIEZpbHRlcnMqL1xuICBAaW1wb3J0ICd0aGVtZV92ZW50dXJhL3ZhcmlhYmxlcy9jb2xvcnMvZmlsdGVycyc7XG4gIC8qIFRhZ3MqL1xuICBAaW1wb3J0ICd0aGVtZV92ZW50dXJhL3ZhcmlhYmxlcy9jb2xvcnMvdGFncyc7XG4gIC8qIFRhZ3MqL1xuICBAaW1wb3J0ICd0aGVtZV92ZW50dXJhL3ZhcmlhYmxlcy9jb2xvcnMvcHJvZ3Jlc3NiYXInO1xuICAvKiBjb2xsYXBzaWJsZSovXG4gIEBpbXBvcnQgJ3RoZW1lX3ZlbnR1cmEvdmFyaWFibGVzL2NvbG9ycy9jb2xsYXBzaWJsZSc7XG4gIC8qIHByb2dyZXNzIHRyYWNrZXIqL1xuICBAaW1wb3J0ICd0aGVtZV92ZW50dXJhL3ZhcmlhYmxlcy9jb2xvcnMvcHJvZ3Jlc3N0cmFja2VyJztcblxuICAvKiBTaWRlIHBhbmVsIG5hdmlnYXRpb24qL1xuICBAaW1wb3J0ICd0aGVtZV92ZW50dXJhL3ZhcmlhYmxlcy9jb2xvcnMvc2lkZV9wYW5lbF9uYXYnO1xufVxuIl0sInNvdXJjZVJvb3QiOiIifQ==

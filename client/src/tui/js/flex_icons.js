@@ -20,7 +20,7 @@ import { memoizeLoad } from './util';
 import pending from './pending';
 import { config } from './config';
 import { cacheGet, cacheSet } from './internal/persistent_cache';
-import { totaraUrl } from './url';
+import { totaraUrl } from './util';
 
 let hasLoaded = false;
 let flexIconData;

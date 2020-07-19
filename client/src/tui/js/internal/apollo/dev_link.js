@@ -17,7 +17,7 @@
  */
 
 import { ApolloLink, Observable } from 'apollo-link';
-import { totaraUrl } from '../../url';
+import { totaraUrl } from '../../util';
 
 let executeDevQuery;
 

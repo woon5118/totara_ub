@@ -17,7 +17,7 @@
  */
 
 import { mount } from '@vue/test-utils';
-import component from 'tui/components/adder/AudienceAdder';
+import AudienceAdder from 'tui/components/adder/AudienceAdder';
 import { axe, toHaveNoViolations } from 'jest-axe';
 expect.extend(toHaveNoViolations);
 
@@ -30,7 +30,7 @@ const propsData = {
 
 describe('AudienceAdder', () => {
   beforeAll(() => {
-    wrapper = mount(component, {
+    wrapper = mount(AudienceAdder, {
       propsData,
       mocks: {
         $apollo: {

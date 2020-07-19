@@ -1,0 +1,39 @@
+/* This file is part of Totara Enterprise Extensions.*/
+/**/
+/* Copyright (C) 2020 onwards Totara Learning Solutions LTD*/
+/**/
+/* Totara Enterprise Extensions is provided only to Totara*/
+/* Learning Solutions LTD’s customers and partners, pursuant to*/
+/* the terms and conditions of a separate agreement with Totara*/
+/* Learning Solutions LTD or its affiliate.*/
+/**/
+/* If you do not have an agreement with Totara Learning Solutions*/
+/* LTD, you may not access, use, modify, or distribute this software.*/
+/* Please contact [licensing@totaralearning.com] for more information.*/
+/**/
+/* @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>*/
+/* @module tuickage   theme_ventura*/
+
+/* This contains the common variable set for form elements,*/
+/* allowing form elements to be consistent modified*/
+
+:root {
+  /* Height of single line form elements (including padding & border)*/
+  --tui-form-input-height: 3rem;
+  /* Height of large single line form elements (including padding & border)*/
+  --tui-form-input-height-large: 4rem;
+  /* Inner font size of form elements*/
+  --tui-form-input-font-size: var(--tui-font-size-15);
+  /* Inner font size of form elements*/
+  --tui-form-input-font-size-sm: var(--tui-font-size-13);
+  /* Border size of input elements*/
+  --tui-form-input-border-size: 0.1rem;
+  /* Vertical padding of single line form elements,*/
+  /* the calculation splits the remaining available space to meet the target height.*/
+  /* Must be on a single line otherwise it breaks (for some reason!) so must be ignored by prettier.*/
+  /* prettier-ignore */
+  --tui-form-input-v-padding: calc((var(--tui-form-input-height) - var(--tui-form-input-font-size) - (var(--tui-form-input-border-size) * 2)) / 2);
+}
+
+
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vLi9jbGllbnQvc3JjL3RoZW1lX3ZlbnR1cmEvc3R5bGVzL3ZhcmlhYmxlcy90dWlfZm9ybXMuc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0EiLCJmaWxlIjoiY2xpZW50L2J1aWxkL3RoZW1lX3ZlbnR1cmEvc3R5bGVzL3ZhcmlhYmxlcy90dWlfZm9ybXMuZGV2ZWxvcG1lbnQuc2NzcyIsInNvdXJjZXNDb250ZW50IjpbIi8qIFRoaXMgZmlsZSBpcyBwYXJ0IG9mIFRvdGFyYSBFbnRlcnByaXNlIEV4dGVuc2lvbnMuKi9cbi8qKi9cbi8qIENvcHlyaWdodCAoQykgMjAyMCBvbndhcmRzIFRvdGFyYSBMZWFybmluZyBTb2x1dGlvbnMgTFREKi9cbi8qKi9cbi8qIFRvdGFyYSBFbnRlcnByaXNlIEV4dGVuc2lvbnMgaXMgcHJvdmlkZWQgb25seSB0byBUb3RhcmEqL1xuLyogTGVhcm5pbmcgU29sdXRpb25zIExUROKAmXMgY3VzdG9tZXJzIGFuZCBwYXJ0bmVycywgcHVyc3VhbnQgdG8qL1xuLyogdGhlIHRlcm1zIGFuZCBjb25kaXRpb25zIG9mIGEgc2VwYXJhdGUgYWdyZWVtZW50IHdpdGggVG90YXJhKi9cbi8qIExlYXJuaW5nIFNvbHV0aW9ucyBMVEQgb3IgaXRzIGFmZmlsaWF0ZS4qL1xuLyoqL1xuLyogSWYgeW91IGRvIG5vdCBoYXZlIGFuIGFncmVlbWVudCB3aXRoIFRvdGFyYSBMZWFybmluZyBTb2x1dGlvbnMqL1xuLyogTFRELCB5b3UgbWF5IG5vdCBhY2Nlc3MsIHVzZSwgbW9kaWZ5LCBvciBkaXN0cmlidXRlIHRoaXMgc29mdHdhcmUuKi9cbi8qIFBsZWFzZSBjb250YWN0IFtsaWNlbnNpbmdAdG90YXJhbGVhcm5pbmcuY29tXSBmb3IgbW9yZSBpbmZvcm1hdGlvbi4qL1xuLyoqL1xuLyogQGF1dGhvciAgICBLZXZpbiBIb3R0aW5nZXIgPGtldmluLmhvdHRpbmdlckB0b3RhcmFsZWFybmluZy5jb20+Ki9cbi8qIEBtb2R1bGUgdHVpY2thZ2UgICB0aGVtZV92ZW50dXJhKi9cblxuLyogVGhpcyBjb250YWlucyB0aGUgY29tbW9uIHZhcmlhYmxlIHNldCBmb3IgZm9ybSBlbGVtZW50cywqL1xuLyogYWxsb3dpbmcgZm9ybSBlbGVtZW50cyB0byBiZSBjb25zaXN0ZW50IG1vZGlmaWVkKi9cblxuOnJvb3Qge1xuICAvKiBIZWlnaHQgb2Ygc2luZ2xlIGxpbmUgZm9ybSBlbGVtZW50cyAoaW5jbHVkaW5nIHBhZGRpbmcgJiBib3JkZXIpKi9cbiAgLS10dWktZm9ybS1pbnB1dC1oZWlnaHQ6IDNyZW07XG4gIC8qIEhlaWdodCBvZiBsYXJnZSBzaW5nbGUgbGluZSBmb3JtIGVsZW1lbnRzIChpbmNsdWRpbmcgcGFkZGluZyAmIGJvcmRlcikqL1xuICAtLXR1aS1mb3JtLWlucHV0LWhlaWdodC1sYXJnZTogNHJlbTtcbiAgLyogSW5uZXIgZm9udCBzaXplIG9mIGZvcm0gZWxlbWVudHMqL1xuICAtLXR1aS1mb3JtLWlucHV0LWZvbnQtc2l6ZTogdmFyKC0tdHVpLWZvbnQtc2l6ZS0xNSk7XG4gIC8qIElubmVyIGZvbnQgc2l6ZSBvZiBmb3JtIGVsZW1lbnRzKi9cbiAgLS10dWktZm9ybS1pbnB1dC1mb250LXNpemUtc206IHZhcigtLXR1aS1mb250LXNpemUtMTMpO1xuICAvKiBCb3JkZXIgc2l6ZSBvZiBpbnB1dCBlbGVtZW50cyovXG4gIC0tdHVpLWZvcm0taW5wdXQtYm9yZGVyLXNpemU6IDAuMXJlbTtcbiAgLyogVmVydGljYWwgcGFkZGluZyBvZiBzaW5nbGUgbGluZSBmb3JtIGVsZW1lbnRzLCovXG4gIC8qIHRoZSBjYWxjdWxhdGlvbiBzcGxpdHMgdGhlIHJlbWFpbmluZyBhdmFpbGFibGUgc3BhY2UgdG8gbWVldCB0aGUgdGFyZ2V0IGhlaWdodC4qL1xuICAvKiBNdXN0IGJlIG9uIGEgc2luZ2xlIGxpbmUgb3RoZXJ3aXNlIGl0IGJyZWFrcyAoZm9yIHNvbWUgcmVhc29uISkgc28gbXVzdCBiZSBpZ25vcmVkIGJ5IHByZXR0aWVyLiovXG4gIC8qIHByZXR0aWVyLWlnbm9yZSAqL1xuICAtLXR1aS1mb3JtLWlucHV0LXYtcGFkZGluZzogY2FsYygodmFyKC0tdHVpLWZvcm0taW5wdXQtaGVpZ2h0KSAtIHZhcigtLXR1aS1mb3JtLWlucHV0LWZvbnQtc2l6ZSkgLSAodmFyKC0tdHVpLWZvcm0taW5wdXQtYm9yZGVyLXNpemUpICogMikpIC8gMik7XG59XG4iXSwic291cmNlUm9vdCI6IiJ9

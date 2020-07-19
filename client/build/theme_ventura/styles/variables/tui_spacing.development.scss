@@ -1,0 +1,47 @@
+/* This file is part of Totara Enterprise Extensions.*/
+/**/
+/* Copyright (C) 2020 onwards Totara Learning Solutions LTD*/
+/**/
+/* Totara Enterprise Extensions is provided only to Totara*/
+/* Learning Solutions LTD’s customers and partners, pursuant to*/
+/* the terms and conditions of a separate agreement with Totara*/
+/* Learning Solutions LTD or its affiliate.*/
+/**/
+/* If you do not have an agreement with Totara Learning Solutions*/
+/* LTD, you may not access, use, modify, or distribute this software.*/
+/* Please contact [licensing@totaralearning.com] for more information.*/
+/**/
+/* @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>*/
+/* @module tuickage   theme_ventura*/
+
+$tui-gap: 0.4rem;
+
+:root {
+  /* Common spacing used for margin & padding*/
+  --tui-gap-1: ($tui-gap * 1);
+  --tui-gap-2: ($tui-gap * 2);
+  --tui-gap-3: ($tui-gap * 3);
+  --tui-gap-4: ($tui-gap * 4);
+  --tui-gap-5: ($tui-gap * 5);
+  --tui-gap-6: ($tui-gap * 6);
+  --tui-gap-7: ($tui-gap * 7);
+  --tui-gap-8: ($tui-gap * 8);
+  --tui-gap-9: ($tui-gap * 9);
+  --tui-gap-10: ($tui-gap * 10);
+  --tui-gap-11: ($tui-gap * 11);
+  --tui-gap-12: ($tui-gap * 12);
+
+  /**/
+  /* Grid*/
+  /**/
+
+  /* default gutter value starts with a global gutter value, changes to other*/
+  /* global gutter values at viewport/container breakpoints*/
+  --tui-grid-gutter: var(--tui-gap-5);
+  /* Global default for 'how many columns are in the grid'*/
+  /* specified for use with theme.getVar('tui-grid-maxunits') in Grid.vue*/
+  --tui-grid-maxunits: 12;
+}
+
+
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vLi9jbGllbnQvc3JjL3RoZW1lX3ZlbnR1cmEvc3R5bGVzL3ZhcmlhYmxlcy90dWlfc3BhY2luZy5zY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0EiLCJmaWxlIjoiY2xpZW50L2J1aWxkL3RoZW1lX3ZlbnR1cmEvc3R5bGVzL3ZhcmlhYmxlcy90dWlfc3BhY2luZy5kZXZlbG9wbWVudC5zY3NzIiwic291cmNlc0NvbnRlbnQiOlsiLyogVGhpcyBmaWxlIGlzIHBhcnQgb2YgVG90YXJhIEVudGVycHJpc2UgRXh0ZW5zaW9ucy4qL1xuLyoqL1xuLyogQ29weXJpZ2h0IChDKSAyMDIwIG9ud2FyZHMgVG90YXJhIExlYXJuaW5nIFNvbHV0aW9ucyBMVEQqL1xuLyoqL1xuLyogVG90YXJhIEVudGVycHJpc2UgRXh0ZW5zaW9ucyBpcyBwcm92aWRlZCBvbmx5IHRvIFRvdGFyYSovXG4vKiBMZWFybmluZyBTb2x1dGlvbnMgTFRE4oCZcyBjdXN0b21lcnMgYW5kIHBhcnRuZXJzLCBwdXJzdWFudCB0byovXG4vKiB0aGUgdGVybXMgYW5kIGNvbmRpdGlvbnMgb2YgYSBzZXBhcmF0ZSBhZ3JlZW1lbnQgd2l0aCBUb3RhcmEqL1xuLyogTGVhcm5pbmcgU29sdXRpb25zIExURCBvciBpdHMgYWZmaWxpYXRlLiovXG4vKiovXG4vKiBJZiB5b3UgZG8gbm90IGhhdmUgYW4gYWdyZWVtZW50IHdpdGggVG90YXJhIExlYXJuaW5nIFNvbHV0aW9ucyovXG4vKiBMVEQsIHlvdSBtYXkgbm90IGFjY2VzcywgdXNlLCBtb2RpZnksIG9yIGRpc3RyaWJ1dGUgdGhpcyBzb2Z0d2FyZS4qL1xuLyogUGxlYXNlIGNvbnRhY3QgW2xpY2Vuc2luZ0B0b3RhcmFsZWFybmluZy5jb21dIGZvciBtb3JlIGluZm9ybWF0aW9uLiovXG4vKiovXG4vKiBAYXV0aG9yICAgIEtldmluIEhvdHRpbmdlciA8a2V2aW4uaG90dGluZ2VyQHRvdGFyYWxlYXJuaW5nLmNvbT4qL1xuLyogQG1vZHVsZSB0dWlja2FnZSAgIHRoZW1lX3ZlbnR1cmEqL1xuXG4kdHVpLWdhcDogMC40cmVtO1xuXG46cm9vdCB7XG4gIC8qIENvbW1vbiBzcGFjaW5nIHVzZWQgZm9yIG1hcmdpbiAmIHBhZGRpbmcqL1xuICAtLXR1aS1nYXAtMTogKCR0dWktZ2FwICogMSk7XG4gIC0tdHVpLWdhcC0yOiAoJHR1aS1nYXAgKiAyKTtcbiAgLS10dWktZ2FwLTM6ICgkdHVpLWdhcCAqIDMpO1xuICAtLXR1aS1nYXAtNDogKCR0dWktZ2FwICogNCk7XG4gIC0tdHVpLWdhcC01OiAoJHR1aS1nYXAgKiA1KTtcbiAgLS10dWktZ2FwLTY6ICgkdHVpLWdhcCAqIDYpO1xuICAtLXR1aS1nYXAtNzogKCR0dWktZ2FwICogNyk7XG4gIC0tdHVpLWdhcC04OiAoJHR1aS1nYXAgKiA4KTtcbiAgLS10dWktZ2FwLTk6ICgkdHVpLWdhcCAqIDkpO1xuICAtLXR1aS1nYXAtMTA6ICgkdHVpLWdhcCAqIDEwKTtcbiAgLS10dWktZ2FwLTExOiAoJHR1aS1nYXAgKiAxMSk7XG4gIC0tdHVpLWdhcC0xMjogKCR0dWktZ2FwICogMTIpO1xuXG4gIC8qKi9cbiAgLyogR3JpZCovXG4gIC8qKi9cblxuICAvKiBkZWZhdWx0IGd1dHRlciB2YWx1ZSBzdGFydHMgd2l0aCBhIGdsb2JhbCBndXR0ZXIgdmFsdWUsIGNoYW5nZXMgdG8gb3RoZXIqL1xuICAvKiBnbG9iYWwgZ3V0dGVyIHZhbHVlcyBhdCB2aWV3cG9ydC9jb250YWluZXIgYnJlYWtwb2ludHMqL1xuICAtLXR1aS1ncmlkLWd1dHRlcjogdmFyKC0tdHVpLWdhcC01KTtcbiAgLyogR2xvYmFsIGRlZmF1bHQgZm9yICdob3cgbWFueSBjb2x1bW5zIGFyZSBpbiB0aGUgZ3JpZCcqL1xuICAvKiBzcGVjaWZpZWQgZm9yIHVzZSB3aXRoIHRoZW1lLmdldFZhcigndHVpLWdyaWQtbWF4dW5pdHMnKSBpbiBHcmlkLnZ1ZSovXG4gIC0tdHVpLWdyaWQtbWF4dW5pdHM6IDEyO1xufVxuIl0sInNvdXJjZVJvb3QiOiIifQ==

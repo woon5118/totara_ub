@@ -16,7 +16,7 @@
  * @module tui
  */
 
-import { totaraUrl } from 'tui/url';
+import { totaraUrl } from 'tui/util';
 
 describe('totaraUrl', () => {
   it('prepends base url unless absolute', () => {

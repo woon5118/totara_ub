@@ -17,7 +17,7 @@
  */
 
 import { mount } from '@vue/test-utils';
-import component from 'tui_charts/components/PercentageDoughnut.vue';
+import PercentageDoughnut from 'tui_charts/components/PercentageDoughnut';
 import ChartJs from 'tui_charts/components/ChartJs';
 import { axe, toHaveNoViolations } from 'jest-axe';
 expect.extend(toHaveNoViolations);

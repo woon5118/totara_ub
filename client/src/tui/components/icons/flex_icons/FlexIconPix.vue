@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import { imageUrl } from 'tui/url';
+import { imageUrl } from 'tui/util';
 
 // pix icon implementation
 // do not use this directly, use <FlexIcon> for pix icons too.

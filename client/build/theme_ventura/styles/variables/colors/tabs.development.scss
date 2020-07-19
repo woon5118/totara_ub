@@ -1,0 +1,37 @@
+/* This file is part of Totara Enterprise Extensions.*/
+/**/
+/* Copyright (C) 2020 onwards Totara Learning Solutions LTD*/
+/**/
+/* Totara Enterprise Extensions is provided only to Totara*/
+/* Learning Solutions LTD’s customers and partners, pursuant to*/
+/* the terms and conditions of a separate agreement with Totara*/
+/* Learning Solutions LTD or its affiliate.*/
+/**/
+/* If you do not have an agreement with Totara Learning Solutions*/
+/* LTD, you may not access, use, modify, or distribute this software.*/
+/* Please contact [licensing@totaralearning.com] for more information.*/
+/**/
+/* @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>*/
+/* @module tuickage   theme_ventura*/
+
+/**/
+/* Tabs*/
+/**/
+--tui-tabs-bg-color: var(--tui-color-neutral-3);
+--tui-tabs-bg-color-selected: var(--tui-color-neutral-1);
+--tui-tabs-bg-color-disabled: var(--tui-color-neutral-3);
+--tui-tabs-bg-color-focus: var(--tui-color-neutral-3);
+--tui-tabs-selected-bar-color: var(--tui-color-primary);
+
+--tui-tabs-text-color: var(--tui-color-state);
+--tui-tabs-text-color-active: var(--tui-color-state-active);
+--tui-tabs-text-color-disabled: var(--tui-color-state-disabled);
+--tui-tabs-text-color-focus: var(--tui-color-state-focus);
+--tui-tabs-text-color-selected: var(--tui-color-neutral-7);
+
+--tui-tabs-border-color: var(--tui-color-neutral-5);
+--tui-tabs-border-color-selected: var(--tui-color-neutral-1);
+--tui-tabs-border-color-disabled: var(--tui-color-neutral-4);
+
+
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vLi9jbGllbnQvc3JjL3RoZW1lX3ZlbnR1cmEvc3R5bGVzL3ZhcmlhYmxlcy9jb2xvcnMvdGFicy5zY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBIiwiZmlsZSI6ImNsaWVudC9idWlsZC90aGVtZV92ZW50dXJhL3N0eWxlcy92YXJpYWJsZXMvY29sb3JzL3RhYnMuZGV2ZWxvcG1lbnQuc2NzcyIsInNvdXJjZXNDb250ZW50IjpbIi8qIFRoaXMgZmlsZSBpcyBwYXJ0IG9mIFRvdGFyYSBFbnRlcnByaXNlIEV4dGVuc2lvbnMuKi9cbi8qKi9cbi8qIENvcHlyaWdodCAoQykgMjAyMCBvbndhcmRzIFRvdGFyYSBMZWFybmluZyBTb2x1dGlvbnMgTFREKi9cbi8qKi9cbi8qIFRvdGFyYSBFbnRlcnByaXNlIEV4dGVuc2lvbnMgaXMgcHJvdmlkZWQgb25seSB0byBUb3RhcmEqL1xuLyogTGVhcm5pbmcgU29sdXRpb25zIExUROKAmXMgY3VzdG9tZXJzIGFuZCBwYXJ0bmVycywgcHVyc3VhbnQgdG8qL1xuLyogdGhlIHRlcm1zIGFuZCBjb25kaXRpb25zIG9mIGEgc2VwYXJhdGUgYWdyZWVtZW50IHdpdGggVG90YXJhKi9cbi8qIExlYXJuaW5nIFNvbHV0aW9ucyBMVEQgb3IgaXRzIGFmZmlsaWF0ZS4qL1xuLyoqL1xuLyogSWYgeW91IGRvIG5vdCBoYXZlIGFuIGFncmVlbWVudCB3aXRoIFRvdGFyYSBMZWFybmluZyBTb2x1dGlvbnMqL1xuLyogTFRELCB5b3UgbWF5IG5vdCBhY2Nlc3MsIHVzZSwgbW9kaWZ5LCBvciBkaXN0cmlidXRlIHRoaXMgc29mdHdhcmUuKi9cbi8qIFBsZWFzZSBjb250YWN0IFtsaWNlbnNpbmdAdG90YXJhbGVhcm5pbmcuY29tXSBmb3IgbW9yZSBpbmZvcm1hdGlvbi4qL1xuLyoqL1xuLyogQGF1dGhvciAgICBLZXZpbiBIb3R0aW5nZXIgPGtldmluLmhvdHRpbmdlckB0b3RhcmFsZWFybmluZy5jb20+Ki9cbi8qIEBtb2R1bGUgdHVpY2thZ2UgICB0aGVtZV92ZW50dXJhKi9cblxuLyoqL1xuLyogVGFicyovXG4vKiovXG4tLXR1aS10YWJzLWJnLWNvbG9yOiB2YXIoLS10dWktY29sb3ItbmV1dHJhbC0zKTtcbi0tdHVpLXRhYnMtYmctY29sb3Itc2VsZWN0ZWQ6IHZhcigtLXR1aS1jb2xvci1uZXV0cmFsLTEpO1xuLS10dWktdGFicy1iZy1jb2xvci1kaXNhYmxlZDogdmFyKC0tdHVpLWNvbG9yLW5ldXRyYWwtMyk7XG4tLXR1aS10YWJzLWJnLWNvbG9yLWZvY3VzOiB2YXIoLS10dWktY29sb3ItbmV1dHJhbC0zKTtcbi0tdHVpLXRhYnMtc2VsZWN0ZWQtYmFyLWNvbG9yOiB2YXIoLS10dWktY29sb3ItcHJpbWFyeSk7XG5cbi0tdHVpLXRhYnMtdGV4dC1jb2xvcjogdmFyKC0tdHVpLWNvbG9yLXN0YXRlKTtcbi0tdHVpLXRhYnMtdGV4dC1jb2xvci1hY3RpdmU6IHZhcigtLXR1aS1jb2xvci1zdGF0ZS1hY3RpdmUpO1xuLS10dWktdGFicy10ZXh0LWNvbG9yLWRpc2FibGVkOiB2YXIoLS10dWktY29sb3Itc3RhdGUtZGlzYWJsZWQpO1xuLS10dWktdGFicy10ZXh0LWNvbG9yLWZvY3VzOiB2YXIoLS10dWktY29sb3Itc3RhdGUtZm9jdXMpO1xuLS10dWktdGFicy10ZXh0LWNvbG9yLXNlbGVjdGVkOiB2YXIoLS10dWktY29sb3ItbmV1dHJhbC03KTtcblxuLS10dWktdGFicy1ib3JkZXItY29sb3I6IHZhcigtLXR1aS1jb2xvci1uZXV0cmFsLTUpO1xuLS10dWktdGFicy1ib3JkZXItY29sb3Itc2VsZWN0ZWQ6IHZhcigtLXR1aS1jb2xvci1uZXV0cmFsLTEpO1xuLS10dWktdGFicy1ib3JkZXItY29sb3ItZGlzYWJsZWQ6IHZhcigtLXR1aS1jb2xvci1uZXV0cmFsLTQpO1xuIl0sInNvdXJjZVJvb3QiOiIifQ==

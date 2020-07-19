@@ -16,7 +16,7 @@
  * @module totara_core
  */
 
-import { config } from './config';
+import { config } from '../../config';
 
 /**
  * Format a URL parameter.
