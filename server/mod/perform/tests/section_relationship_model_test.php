@@ -191,4 +191,32 @@ class mod_perform_section_relationship_model_testcase extends mod_perform_relati
         $this->assert_section_relationships($section1, [constants::RELATIONSHIP_MANAGER, constants::RELATIONSHIP_SUBJECT]);
         $this->assert_section_relationships($section2, []);
     }
+
+    public function test_is_subject() {
+        $this->setAdminUser();
+        $perform_generator = $this->perform_generator();
+        $subject_id = $perform_generator->get_core_relationship('subject')->id;
+        $manager_id = $perform_generator->get_core_relationship('manager')->id;
+        $activity1 = $perform_generator->create_activity_in_container();
+        $section1 = $perform_generator->create_section($activity1);
+        $section2 = $perform_generator->create_section($activity1);
+
+        $this->assert_section_relationships($section1, []);
+        $this->assert_section_relationships($section2, []);
+
+        $subject_section_relationship = section_relationship::create(
+            $section1->get_id(),
+            $subject_id,
+            true
+        );
+
+        $manager_section_relationship = section_relationship::create(
+            $section1->get_id(),
+            $manager_id,
+            true
+        );
+
+        $this->assertTrue($subject_section_relationship->get_is_subject());
+        $this->assertFalse($manager_section_relationship->get_is_subject());
+    }
 }

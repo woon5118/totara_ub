@@ -28,6 +28,8 @@ class totara_reportbuilder_report_helper_testcase extends advanced_testcase {
     public function test_get_sources_and_create() {
         global $DB;
 
+        $this->setAdminUser();
+
         $sources = \totara_reportbuilder\report_helper::get_sources();
 
         self::assertIsArray($sources);

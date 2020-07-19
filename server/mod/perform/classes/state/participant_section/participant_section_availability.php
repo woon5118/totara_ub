@@ -42,9 +42,15 @@ abstract class participant_section_availability extends state {
     abstract public function close(): void;
 
     /**
+     * Open availability.
+     */
+    abstract public function open(): void;
+
+    /**
      * @inheritDoc
      */
     public static function get_type(): string {
         return 'availability';
     }
+
 }

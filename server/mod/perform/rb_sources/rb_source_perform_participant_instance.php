@@ -23,12 +23,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-use mod_perform\rb\traits\participant_subject_instance_source;
-use mod_perform\state\participant_instance\closed;
-use mod_perform\state\participant_instance\complete;
-use mod_perform\state\participant_instance\participant_instance_availability;
-use mod_perform\state\participant_instance\participant_instance_progress;
-use mod_perform\state\state_helper;
+use mod_perform\rb\traits\activity_trait;
+use mod_perform\rb\traits\participant_instance_trait;
+use mod_perform\rb\traits\subject_instance_trait;
 use totara_core\advanced_feature;
 use totara_job\rb\source\report_trait;
 
@@ -39,7 +36,9 @@ use totara_job\rb\source\report_trait;
  */
 class rb_source_perform_participant_instance extends rb_base_source {
     use report_trait;
-    use participant_subject_instance_source;
+    use participant_instance_trait;
+    use subject_instance_trait;
+    use activity_trait;
 
     private $resolvers = null;
     /**
@@ -68,6 +67,30 @@ class rb_source_perform_participant_instance extends rb_base_source {
         $this->joinlist = $this->define_joinlist();
         $this->columnoptions = $this->define_columnoptions();
         $this->filteroptions = $this->define_filteroptions();
+
+        $this->add_participant_instance_to_base();
+
+        $this->add_subject_instance(
+            new rb_join(
+                'subject_instance',
+                'INNER',
+                '{perform_subject_instance}',
+                'base.subject_instance_id = subject_instance.id',
+                REPORT_BUILDER_RELATION_ONE_TO_ONE
+            )
+        );
+
+        $this->add_activity(
+            new rb_join(
+                'perform',
+                'INNER',
+                '{perform}',
+                'track.activity_id = perform.id',
+                REPORT_BUILDER_RELATION_MANY_TO_ONE,
+                'track'
+            )
+        );
+
         $this->contentoptions = $this->define_contentoptions();
         $this->paramoptions = $this->define_paramoptions();
         $this->defaultcolumns = $this->define_defaultcolumns();
@@ -95,11 +118,20 @@ class rb_source_perform_participant_instance extends rb_base_source {
     protected function define_joinlist() {
         $joinlist = array(
             new rb_join(
-                'subject_instance',
+                'track_user_assignment',
                 'INNER',
-                "{perform_subject_instance}",
-                "subject_instance.id = base.subject_instance_id",
-                REPORT_BUILDER_RELATION_ONE_TO_ONE
+                '{perform_track_user_assignment}',
+                "track_user_assignment.id = subject_instance.track_user_assignment_id",
+                REPORT_BUILDER_RELATION_ONE_TO_ONE,
+                'subject_instance'
+            ),
+            new rb_join(
+                'track',
+                'INNER',
+                '{perform_track}',
+                'track.id = track_user_assignment.track_id',
+                REPORT_BUILDER_RELATION_ONE_TO_ONE,
+                'track_user_assignment'
             ),
             new rb_join(
                 'core_relationship',
@@ -118,10 +150,6 @@ class rb_source_perform_participant_instance extends rb_base_source {
             ),
         );
 
-        $this->add_to_joinlist($joinlist, 'subject_instance');
-        $this->add_core_user_tables($joinlist, 'base', 'participant_id');
-        $this->add_core_user_tables($joinlist, 'subject_instance', 'subject_user_id', 'subject_user');
-
         return $joinlist;
     }
 
@@ -131,63 +159,7 @@ class rb_source_perform_participant_instance extends rb_base_source {
      * @return array
      */
     protected function define_columnoptions() {
-        global $DB;
-        $usednamefields = totara_get_all_user_name_fields_join('subject_user', null, true);
-        $allnamefields = totara_get_all_user_name_fields_join('subject_user');
-
         $columnoptions = [
-            new rb_column_option(
-                'participant_instance',
-                'participant_progress',
-                get_string('progress', 'mod_perform'),
-                'base.progress',
-                [
-                    'dbdatatype' => 'integer',
-                    'displayfunc' => 'state_display_name',
-                    'extracontext' => [
-                        'object_type' => 'participant_instance',
-                        'state_type' => participant_instance_progress::get_type(),
-                    ],
-                ]
-            ),
-            new rb_column_option(
-                'participant_instance',
-                'participant_availability',
-                get_string('availability', 'mod_perform'),
-                'base.availability',
-                [
-                    'dbdatatype' => 'integer',
-                    'displayfunc' => 'state_display_name',
-                    'extracontext' => [
-                        'object_type' => 'participant_instance',
-                        'state_type' => participant_instance_availability::get_type(),
-                    ],
-                ]
-            ),
-            new rb_column_option(
-                'participant_instance',
-                'created_at',
-                get_string('date_created', 'rb_source_perform_participant_instance'),
-                'base.created_at',
-                [
-                    'dbdatatype' => 'timestamp',
-                    'displayfunc' => 'nice_date'
-                ]
-            ),
-            // Subject of the activity
-            new rb_column_option(
-                'subject_instance',
-                'activity_subject',
-                get_string('activity_subject', 'rb_source_perform_participant_instance'),
-                "CASE WHEN subject_user.id IS NULL THEN NULL ELSE " . $DB->sql_concat_join("' '", $usednamefields) . " END",
-                [
-                    'joins' => 'subject_user',
-                    'dbdatatype' => 'char',
-                    'outputformat' => 'text',
-                    'extrafields' => array_merge(['id' => 'subject_user.id'], $allnamefields),
-                    'displayfunc' => 'user',
-                ]
-            ),
             new rb_column_option(
                 'core_relationship',
                 'class_name',
@@ -213,32 +185,7 @@ class rb_source_perform_participant_instance extends rb_base_source {
                     'noexport' => true
                 ]
             ),
-            new rb_column_option(
-                'participant_instance',
-                'overdue',
-                get_string('overdue', 'mod_perform'),
-                "CASE 
-                    WHEN
-                        subject_instance.due_date <= " . time() . "
-                        AND NOT (
-                            base.progress = " . complete::get_code() . "
-                            OR base.availability = " . closed::get_code() . "
-                        )
-                    THEN 1
-                    ELSE 0
-                END",
-                [
-                    'joins' => 'subject_instance',
-                    'dbdatatype' => 'boolean',
-                    'displayfunc' => 'yes_or_no',
-                ]
-            ),
         ];
-
-        $this->add_fields_to_columns($columnoptions, 'subject_instance');
-        $this->add_core_user_columns($columnoptions);
-        // ATTENTION: Remove Subject of the activity rb_column_option first
-        // $this->add_core_user_columns($columnoptions, 'subject_user', 'activity_subject');
 
         return $columnoptions;
     }
@@ -249,58 +196,7 @@ class rb_source_perform_participant_instance extends rb_base_source {
      * @return array
      */
     protected function define_filteroptions() {
-        $filteroptions = [
-            // Participant name
-            new rb_filter_option(
-                'user',
-                'namelink',
-                get_string('participant_name', 'rb_source_perform_participant_instance'),
-                'text'
-            ),
-            // Date instance created
-            new rb_filter_option(
-                'participant_instance',
-                'created_at',
-                get_string('date_created', 'rb_source_perform_participant_instance'),
-                'date'
-            ),
-            // Progress of participant instance
-            new rb_filter_option(
-                'participant_instance',
-                'participant_progress',
-                get_string('progress', 'mod_perform'),
-                'select',
-                [
-                    'selectchoices' => state_helper::get_all_display_names(
-                        'participant_instance', participant_instance_progress::get_type()
-                    ),
-                ]
-            ),
-            // Availability of participant instance
-            new rb_filter_option(
-                'participant_instance',
-                'participant_availability',
-                get_string('availability', 'mod_perform'),
-                'select',
-                [
-                    'selectchoices' => state_helper::get_all_display_names(
-                        'participant_instance', participant_instance_availability::get_type()
-                    ),
-                    'simplemode' => true
-                ]
-            ),
-            // Overdue status
-            new rb_filter_option(
-                'participant_instance',
-                'overdue',
-                get_string('overdue', 'mod_perform'),
-                'multicheck',
-                [
-                    'simplemode' => true,
-                    'selectfunc' => 'yesno_list',
-                ]
-            ),
-        ];
+        $filteroptions = [];
         unset($options);
 
         // Relationship in activity
@@ -328,18 +224,6 @@ class rb_source_perform_participant_instance extends rb_base_source {
             );
         }
         unset($options);
-
-        // Subject of the activity
-        $filteroptions[] = new rb_filter_option(
-            'subject_instance',
-            'activity_subject',
-            get_string('activity_subject', 'rb_source_perform_participant_instance'),
-            'text'
-        );
-
-        $this->add_fields_to_filters($filteroptions);
-        $this->add_core_user_filters($filteroptions);
-        //$this->add_totara_job_filters($filteroptions, 'base', 'job_assignment_id');
 
         return $filteroptions;
     }
@@ -371,19 +255,19 @@ class rb_source_perform_participant_instance extends rb_base_source {
         return [
             // Participant name
             [
-                'type' => 'user',
+                'type' => 'participant_user',
                 'value' => 'namelink',
                 'heading' => get_string('participant_name', 'rb_source_perform_participant_instance'),
             ],
             // Performance activity name
             [
-                'type' => 'perform',
+                'type' => 'activity',
                 'value' => 'name',
                 'heading' => get_string('activity_name', 'mod_perform'),
             ],
             // Activity type
             [
-                'type' => 'perform',
+                'type' => 'activity',
                 'value' => 'type',
                 'heading' => get_string('activity_type', 'mod_perform'),
             ],
@@ -391,7 +275,7 @@ class rb_source_perform_participant_instance extends rb_base_source {
             [
                 'type' => 'participant_instance',
                 'value' => 'created_at',
-                'heading' => get_string('date_created', 'rb_source_perform_participant_instance'),
+                'heading' => get_string('date_created', 'mod_perform'),
             ],
             // Relationship in activity
             [
@@ -401,20 +285,20 @@ class rb_source_perform_participant_instance extends rb_base_source {
             ],
             // Subject of the activity
             [
-                'type' => 'subject_instance',
-                'value' => 'activity_subject',
-                'heading' => get_string('activity_subject', 'rb_source_perform_participant_instance'),
+                'type' => 'subject_user',
+                'value' => 'namelink',
+                'heading' => get_string('subject_name', 'rb_source_perform_subject_instance')
             ],
             // Progress of participant instance
             [
                 'type' => 'participant_instance',
-                'value' => 'participant_progress',
+                'value' => 'progress',
                 'heading' => get_string('progress', 'mod_perform'),
             ],
             // Availability of participant instance
             [
                 'type' => 'participant_instance',
-                'value' => 'participant_availability',
+                'value' => 'availability',
                 'heading' => get_string('availability', 'mod_perform'),
             ],
         ];
@@ -428,24 +312,24 @@ class rb_source_perform_participant_instance extends rb_base_source {
     public static function get_default_filters() {
         $default_filters = [
             [
-                'type' => 'user',
-                'value' => 'namelink',
+                'type' => 'participant_user',
+                'value' => 'fullname',
             ],
             [
                 'type' => 'participant_instance',
                 'value' => 'created_at',
             ],
             [
-                'type' => 'subject_instance',
-                'value' => 'activity_subject',
+                'type' => 'subject_user',
+                'value' => 'fullname',
             ],
             [
                 'type' => 'participant_instance',
-                'value' => 'participant_progress',
+                'value' => 'progress',
             ],
             [
                 'type' => 'participant_instance',
-                'value' => 'participant_availability',
+                'value' => 'availability',
             ],
         ];
         if (self::get_resolvers()) {
@@ -484,9 +368,15 @@ class rb_source_perform_participant_instance extends rb_base_source {
     protected function define_paramoptions() {
         $paramoptions = [
             new rb_param_option(
+                'activity_id',
+                'track.activity_id',
+                'track'
+            ),
+            new rb_param_option(
                 'subject_instance_id',
-                'base.subject_instance_id'
-            )
+                'base.subject_instance_id',
+                'subject_instance'
+            ),
         ];
         return $paramoptions;
     }

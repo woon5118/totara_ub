@@ -41,6 +41,7 @@ use mod_perform\entities\activity\element as element_entity;
  * @property-read bool $is_required used to check response required or optional
  * @property-read \context $context
  * @property-read element_plugin $element_plugin
+ * @property-read bool $is_respondable
  *
  * @package mod_perform\models\activity
  */

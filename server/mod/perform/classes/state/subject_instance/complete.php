@@ -23,11 +23,9 @@
 
 namespace mod_perform\state\subject_instance;
 
-use core\event\base;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
-use mod_perform\event\subject_instance_progress_updated;
-use mod_perform\models\activity\subject_instance;
-use mod_perform\state\state_event;
+use mod_perform\state\subject_instance\condition\at_least_one_participant_instance_started;
+use mod_perform\state\subject_instance\condition\no_participant_instances_complete;
 use mod_perform\state\subject_instance\condition\not_all_participant_instances_complete;
 use mod_perform\state\transition;
 
@@ -38,7 +36,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @package mod_perform
  */
-class complete extends subject_instance_progress implements state_event {
+class complete extends subject_instance_progress{
 
     public static function get_name(): string {
         return 'COMPLETE';
@@ -52,6 +50,11 @@ class complete extends subject_instance_progress implements state_event {
         return [
             transition::to(new in_progress($this->object))->with_conditions([
                 not_all_participant_instances_complete::class,
+                at_least_one_participant_instance_started::class,
+            ]),
+
+            transition::to(new not_started($this->object))->with_conditions([
+                no_participant_instances_complete::class,
             ]),
         ];
     }
@@ -62,12 +65,6 @@ class complete extends subject_instance_progress implements state_event {
         }
     }
 
-    public function get_event(): base {
-        /** @var subject_instance $subject_instance */
-        $subject_instance = $this->get_object();
-        return subject_instance_progress_updated::create_from_subject_instance($subject_instance);
-    }
-
     public function on_enter(): void {
         // Set the completed_at date.
         /** @var subject_instance_entity $subject_instance_entity */
@@ -75,4 +72,18 @@ class complete extends subject_instance_progress implements state_event {
         $subject_instance_entity->completed_at = time();
         $subject_instance_entity->update();
     }
+
+    public function manually_complete(): void {
+        // Not relevant when already complete. Do nothing.
+    }
+
+    public function manually_uncomplete(): void {
+        foreach ([in_progress::class, not_started::class] as $to_state) {
+            if ($this->can_switch($to_state)) {
+                $this->object->switch_state($to_state);
+                break;
+            }
+        }
+    }
+
 }

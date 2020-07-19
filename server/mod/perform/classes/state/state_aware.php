@@ -81,7 +81,6 @@ trait state_aware {
      * This method must be used for any state changes.
      *
      * @param string $target_state class name
-     * @param string $state_type State type
      * @return self
      */
     public function switch_state(string $target_state): self {

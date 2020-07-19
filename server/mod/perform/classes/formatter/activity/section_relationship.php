@@ -32,6 +32,7 @@ class section_relationship extends entity_model_formatter {
             'can_view' => null,
             'can_answer' => null,
             'core_relationship' => null,
+            'is_subject' => null,
         ];
     }
 }

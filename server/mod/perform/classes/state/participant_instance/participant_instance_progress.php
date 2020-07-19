@@ -23,7 +23,11 @@
 
 namespace mod_perform\state\participant_instance;
 
+use core\event\base;
+use mod_perform\event\participant_instance_progress_updated;
+use mod_perform\models\activity\participant_instance;
 use mod_perform\state\state;
+use mod_perform\state\state_event;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -32,12 +36,22 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @package mod_perform
  */
-abstract class participant_instance_progress extends state {
+abstract class participant_instance_progress extends state implements state_event {
 
     /**
      * Something has happened that may affect the instance's progress status, so check if we should switch.
      */
     abstract public function update_progress(): void;
+
+    /**
+     * Manually mark a participant instance as being complete
+     */
+    abstract public function manually_complete(): void;
+
+    /**
+     * Manually mark a participant instance as being not complete
+     */
+    abstract public function manually_uncomplete(): void;
 
     /**
      * @inheritDoc
@@ -49,4 +63,11 @@ abstract class participant_instance_progress extends state {
     public static function get_display_name(): string {
         return get_string('participant_instance_status_' . strtolower(static::get_name()), 'mod_perform');
     }
+
+    public function get_event(): base {
+        /** @var participant_instance $participant_instance */
+        $participant_instance = $this->get_object();
+        return participant_instance_progress_updated::create_from_participant_instance($participant_instance);
+    }
+
 }

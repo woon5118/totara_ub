@@ -26,6 +26,7 @@ namespace mod_perform\models\activity;
 use core\orm\entity\model;
 use mod_perform\entities\activity\section_relationship as section_relationship_entity;
 use totara_core\relationship\relationship as core_relationship_model;
+use totara_core\relationship\relationship as core_relationship;
 
 /**
  * Class section_relationship
@@ -55,6 +56,7 @@ class section_relationship extends model {
     protected $model_accessor_whitelist = [
         'section',
         'core_relationship',
+        'is_subject',
     ];
 
     /**
@@ -159,6 +161,15 @@ class section_relationship extends model {
      */
     public function get_core_relationship(): core_relationship_model {
         return core_relationship_model::load_by_entity($this->entity->core_relationship);
+    }
+
+    /**
+     * Is this relationship a "subject".
+     *
+     * @return bool
+     */
+    public function get_is_subject(): bool {
+        return $this->entity->core_relationship->idnumber == 'subject';
     }
 
 }

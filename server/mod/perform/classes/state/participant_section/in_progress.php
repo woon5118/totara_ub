@@ -23,10 +23,8 @@
 
 namespace mod_perform\state\participant_section;
 
-use core\event\base;
-use mod_perform\event\participant_section_progress_updated;
-use mod_perform\models\response\participant_section;
-use mod_perform\state\state_event;
+use mod_perform\state\participant_section\condition\all_answers_complete;
+use mod_perform\state\participant_section\condition\not_all_answers_complete;
 use mod_perform\state\transition;
 
 defined('MOODLE_INTERNAL') || die();
@@ -36,7 +34,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @package mod_perform
  */
-class in_progress extends participant_section_progress implements state_event {
+class in_progress extends participant_section_progress {
 
     public static function get_name(): string {
         return 'IN_PROGRESS';
@@ -49,22 +47,35 @@ class in_progress extends participant_section_progress implements state_event {
     public function get_transitions(): array {
         return [
             // The participant has completed a section.
-            transition::to(new complete($this->object)),
+            transition::to(new complete($this->object))->with_conditions([
+                all_answers_complete::class
+            ]),
+
+            // The participant has not completed a section, but it is "done".
+            transition::to(new not_submitted($this->object))->with_conditions([
+                not_all_answers_complete::class
+            ]),
         ];
     }
 
-    public function get_event(): base {
-        /** @var participant_section $participant_section */
-        $participant_section = $this->get_object();
-        return participant_section_progress_updated::create_from_participant_section($participant_section);
-    }
-
     public function complete(): void {
-        $this->object->switch_state(complete::class);
+        if ($this->can_switch(complete::class)) {
+            $this->object->switch_state(complete::class);
+        }
     }
 
     public function on_participant_access(): void {
         // Not relevant when already in progress. Do nothing.
-        return;
     }
+
+    public function manually_complete(): void {
+        if ($this->can_switch(not_submitted::class)) {
+            $this->object->switch_state(not_submitted::class);
+        }
+    }
+
+    public function manually_uncomplete(): void {
+        // Not relevant when incomplete. Do nothing.
+    }
+
 }

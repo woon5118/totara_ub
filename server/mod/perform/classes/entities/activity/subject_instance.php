@@ -29,7 +29,9 @@ use core\orm\entity\entity;
 use core\orm\entity\relations\belongs_to;
 use core\orm\entity\relations\has_many;
 use core\orm\entity\relations\has_one_through;
+use core\orm\query\builder;
 use totara_core\entities\relationship as core_relationship;
+use totara_job\entities\job_assignment;
 
 /**
  * Subject instance id
@@ -48,6 +50,7 @@ use totara_core\entities\relationship as core_relationship;
  * @property-read track_user_assignment $user_assignment
  * @property-read track $track
  * @property-read user $subject_user
+ * @property-read job_assignment|null $job_assignment
  * @property-read collection|participant_instance[] $participant_instances
  * @property-read collection|manual_relationship_selection_progress[] $manual_relationship_selection_progress
  *
@@ -93,6 +96,15 @@ class subject_instance extends entity {
      */
     public function subject_user(): belongs_to {
         return $this->belongs_to(user::class, 'subject_user_id');
+    }
+
+    /**
+     * Get the user this subject instance belongs to
+     *
+     * @return belongs_to
+     */
+    public function job_assignment(): belongs_to {
+        return $this->belongs_to(job_assignment::class, 'job_assignment_id');
     }
 
     /**

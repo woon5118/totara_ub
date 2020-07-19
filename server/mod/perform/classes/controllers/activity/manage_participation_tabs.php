@@ -70,4 +70,5 @@ trait manage_participation_tabs {
 
         return new tabtree($tabs);
     }
+
 }

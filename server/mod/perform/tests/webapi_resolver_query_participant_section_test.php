@@ -188,7 +188,7 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
                     'is_required' => false,
                     'is_respondable' => false,
                 ],
-            'sort_order' => 1,
+            'sort_order' => 2,
             'response_data' => null,
             'validation_errors' => [],
             'other_responder_groups' => [],

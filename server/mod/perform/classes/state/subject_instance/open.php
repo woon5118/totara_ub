@@ -23,7 +23,6 @@
 
 namespace mod_perform\state\subject_instance;
 
-use mod_perform\state\subject_instance\condition\close_on_completion_enabled;
 use mod_perform\state\transition;
 
 defined('MOODLE_INTERNAL') || die();
@@ -72,4 +71,12 @@ class open extends subject_instance_availability {
     public function close(): void {
         $this->object->switch_state(closed::class);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function open(): void {
+        // Already in the correct state.
+    }
+
 }

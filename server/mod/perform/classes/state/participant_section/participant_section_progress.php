@@ -23,7 +23,11 @@
 
 namespace mod_perform\state\participant_section;
 
+use core\event\base;
+use mod_perform\event\participant_section_progress_updated;
+use mod_perform\models\response\participant_section;
 use mod_perform\state\state;
+use mod_perform\state\state_event;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -32,7 +36,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @package mod_perform
  */
-abstract class participant_section_progress extends state {
+abstract class participant_section_progress extends state implements state_event {
 
     /**
      * Try to switch progress status to complete.
@@ -45,6 +49,16 @@ abstract class participant_section_progress extends state {
     abstract public function on_participant_access(): void;
 
     /**
+     * Manually mark a participant section as being complete
+     */
+    abstract public function manually_complete(): void;
+
+    /**
+     * Manually mark a participant section as being not complete
+     */
+    abstract public function manually_uncomplete(): void;
+
+    /**
      * @inheritDoc
      */
     public static function get_type(): string {
@@ -54,4 +68,11 @@ abstract class participant_section_progress extends state {
     public static function get_display_name(): string {
         return get_string('participant_section_status_' . strtolower(static::get_name()), 'mod_perform');
     }
+
+    public function get_event(): base {
+        /** @var participant_section $participant_section */
+        $participant_section = $this->get_object();
+        return participant_section_progress_updated::create_from_participant_section($participant_section);
+    }
+
 }

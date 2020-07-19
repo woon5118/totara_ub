@@ -29,8 +29,12 @@ use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 use mod_perform\event\subject_instance_progress_updated;
 use mod_perform\models\activity\subject_instance;
 use mod_perform\models\response\participant_section;
+use mod_perform\models\response\section_element_response;
+use mod_perform\state\invalid_state_switch_exception;
 use mod_perform\state\participant_instance\complete as complete_participant_instance;
+use mod_perform\state\participant_instance\in_progress as in_progress_participant_instance;
 use mod_perform\state\participant_instance\participant_instance_progress;
+use mod_perform\state\participant_instance\not_started as not_started_participant_instance;
 use mod_perform\state\participant_section\complete as complete_section;
 use mod_perform\state\participant_section\in_progress as in_progress_section;
 use mod_perform\state\state;
@@ -38,12 +42,13 @@ use mod_perform\state\state_helper;
 use mod_perform\state\subject_instance\complete;
 use mod_perform\state\subject_instance\condition\at_least_one_participant_instance_started;
 use mod_perform\state\subject_instance\condition\all_participant_instances_complete;
-use mod_perform\state\participant_instance\in_progress as in_progress_participant_instance;
-use mod_perform\state\participant_instance\not_started as not_started_participant_instance;
 use mod_perform\state\subject_instance\condition\not_all_participant_instances_complete;
 use mod_perform\state\subject_instance\in_progress;
 use mod_perform\state\subject_instance\not_started;
+use mod_perform\state\subject_instance\not_submitted;
 use mod_perform\state\subject_instance\subject_instance_progress;
+use totara_core\relationship\resolvers\subject;
+use totara_job\relationship\resolvers\appraiser;
 
 require_once(__DIR__ . '/generator/activity_generator_configuration.php');
 require_once(__DIR__ . '/state_testcase.php');
@@ -72,6 +77,9 @@ class mod_perform_subject_instance_progress_testcase extends state_testcase {
 
     /**
      * @dataProvider condition_all_participant_instances_data_provider
+     * @param $participant_instance1_progress
+     * @param $participant_instance2_progress
+     * @param $expected_result
      */
     public function test_condition_all_participant_instances_complete(
         $participant_instance1_progress,
@@ -82,7 +90,7 @@ class mod_perform_subject_instance_progress_testcase extends state_testcase {
         $participant_instance2 = (object)['progress' => $participant_instance2_progress];
 
         $mock = $this->getMockBuilder(subject_instance::class)
-            ->setMethods(['__get'])
+            ->onlyMethods(['__get'])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -113,6 +121,9 @@ class mod_perform_subject_instance_progress_testcase extends state_testcase {
 
     /**
      * @dataProvider at_least_one_participant_instance_started_data_provider
+     * @param $participant_instance1_progress
+     * @param $participant_instance2_progress
+     * @param $expected_result
      */
     public function test_condition_at_least_one_participant_instance_started(
         $participant_instance1_progress,
@@ -123,7 +134,7 @@ class mod_perform_subject_instance_progress_testcase extends state_testcase {
         $participant_instance2 = (object)['progress' => $participant_instance2_progress];
 
         $mock = $this->getMockBuilder(subject_instance::class)
-            ->setMethods(['__get'])
+            ->onlyMethods(['__get'])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -145,8 +156,10 @@ class mod_perform_subject_instance_progress_testcase extends state_testcase {
         $configuration = mod_perform_activity_generator_configuration::new()
             ->set_relationships_per_section([constants::RELATIONSHIP_SUBJECT, constants::RELATIONSHIP_APPRAISER])
             ->enable_appraiser_for_each_subject_user()
-            ->set_number_of_users_per_user_group_type(2);
+            ->set_number_of_users_per_user_group_type(2)
+            ->set_number_of_elements_per_section(1);
 
+        /** @var mod_perform_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
         $generator->create_full_activities($configuration);
 
@@ -221,6 +234,8 @@ class mod_perform_subject_instance_progress_testcase extends state_testcase {
 
         $configuration = mod_perform_activity_generator_configuration::new()
             ->set_number_of_users_per_user_group_type(1);
+
+        /** @var mod_perform_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
         $generator->create_full_activities($configuration);
 
@@ -249,6 +264,8 @@ class mod_perform_subject_instance_progress_testcase extends state_testcase {
 
         $configuration = mod_perform_activity_generator_configuration::new()
             ->set_number_of_users_per_user_group_type(1);
+
+        /** @var mod_perform_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
         $generator->create_full_activities($configuration);
 
@@ -270,6 +287,7 @@ class mod_perform_subject_instance_progress_testcase extends state_testcase {
 
     public function test_get_all_translated() {
         $this->assertEqualsCanonicalizing([
+            50 => 'Not submitted',
             20 => 'Complete',
             10 => 'In progress',
             0 => 'Not started',
@@ -289,23 +307,56 @@ class mod_perform_subject_instance_progress_testcase extends state_testcase {
         $participant_sections = $participant_instance->participant_sections->all();
         switch ($desired_state) {
             case in_progress_participant_instance::class:
-                $target_section_state = in_progress_section::class;
+                foreach ($participant_sections as $participant_section) {
+                    $participant_section_model = participant_section::load_by_entity($participant_section);
+                    $participant_section_model->switch_state(in_progress_section::class);
+                }
                 break;
             case complete_participant_instance::class:
-                $target_section_state = complete_section::class;
+                foreach ($participant_sections as $participant_section) {
+                    $participant_section_model = participant_section::load_by_entity($participant_section);
+                    $this->mark_answers_complete($participant_section_model);
+                    $participant_section_model->switch_state(complete_section::class);
+                }
                 break;
             default:
+                $target_section_state = null;
                 $this->fail("Can't switch participant_instance to {$desired_state}");
-        }
-
-        foreach ($participant_sections as $participant_section) {
-            $participant_section_model = participant_section::load_by_entity($participant_section);
-            $participant_section_model->switch_state($target_section_state);
         }
 
         // Make sure it worked.
         $participant_instance->refresh();
         $this->assertEquals($desired_state::get_code(), $participant_instance->progress);
+    }
+
+    private function mark_answers_complete(participant_section $participant_section): void {
+        $section_elements = $participant_section->get_section()->get_section_elements();
+
+        $responses = new collection();
+        foreach ($section_elements as $section_element) {
+            $responses->append($this->create_valid_element_response());
+        }
+
+        $participant_section->set_element_responses($responses);
+    }
+
+    private function create_valid_element_response(): section_element_response {
+        return new class extends section_element_response {
+            public $was_saved = false;
+
+            public function __construct() {
+            }
+
+            public function save(): section_element_response {
+                $this->was_saved = true;
+                return $this;
+            }
+
+            public function validate_response(): bool {
+                $this->validation_errors = new collection();
+                return true;
+            }
+        };
     }
 
     /**
@@ -317,4 +368,103 @@ class mod_perform_subject_instance_progress_testcase extends state_testcase {
             $this->assertEquals($state_code, $subject_instance->progress);
         }
     }
+
+    public function state_transitions_data_provider(): array {
+        return [
+            'Not started to not started' => [not_started::class, not_started::class, false, 'NONE_COMPLETE'],
+            'Not started to in progress' => [not_started::class, in_progress::class, true, 'SOME_COMPLETE'],
+            'Not started to complete' => [not_started::class, complete::class, true, 'ALL_COMPLETE'],
+            'Not started to not submitted' => [not_started::class, not_submitted::class, true, 'NONE_COMPLETE'],
+
+            'In progress to in progress' => [in_progress::class, in_progress::class, false, 'SOME_COMPLETE'],
+            'In progress to not started' => [in_progress::class, not_started::class, false, 'NONE_COMPLETE'],
+            'In progress to complete' => [in_progress::class, complete::class, true, 'ALL_COMPLETE'],
+            'In progress to not submitted' => [in_progress::class, not_submitted::class, true, 'SOME_COMPLETE'],
+
+            'Complete to compete' => [complete::class, complete::class, false, 'ALL_COMPLETE'],
+            'Complete to not started' => [complete::class, not_started::class, true, 'NONE_COMPLETE'],
+            'Complete to in progress' => [complete::class, in_progress::class, true, 'SOME_COMPLETE'],
+            'Complete to not submitted' => [complete::class, not_submitted::class, false, 'ALL_COMPLETE'],
+
+            'Not submitted to not submitted' => [not_submitted::class, not_submitted::class, false, 'SOME_COMPLETE'],
+            'Not submitted to not started' => [not_submitted::class, not_started::class, true, 'NONE_COMPLETE'],
+            'Not submitted to in progress' => [not_submitted::class, in_progress::class, true, 'SOME_COMPLETE'],
+            'Not submitted to complete' => [not_submitted::class, complete::class, false, 'SOME_COMPLETE'],
+        ];
+    }
+
+    /**
+     * Check switching subject instance states.
+     *
+     * @dataProvider state_transitions_data_provider
+     * @param string|subject_instance_progress $initial_state_class
+     * @param string|subject_instance_progress $target_state_class
+     * @param bool $transition_possible
+     * @param string|null $condition
+     */
+    public function test_switch_state(
+        string $initial_state_class,
+        string $target_state_class,
+        bool $transition_possible,
+        string $condition
+    ): void {
+        $this->setAdminUser();
+        $subject_user = self::getDataGenerator()->create_user();
+
+        $configuration = mod_perform_activity_generator_configuration::new()
+            ->set_relationships_per_section(['subject', 'appraiser'])
+            ->enable_appraiser_for_each_subject_user()
+            ->set_number_of_users_per_user_group_type(1)
+            ->set_number_of_elements_per_section(0);
+
+        /** @var mod_perform_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        $generator->create_full_activities($configuration)->first();
+
+        /** @var subject_instance_entity $entity */
+        $entity = subject_instance_entity::repository()->get()->first();
+        $entity->progress = $initial_state_class::get_code();
+        $entity->update();
+        $subject_instance = subject_instance::load_by_entity($entity);
+        $this->assertInstanceOf($initial_state_class, $subject_instance->get_progress_state());
+
+        switch ($condition) {
+            case 'NONE_COMPLETE':
+                // There are two participant instances by default, incomplete.
+                break;
+            case 'SOME_COMPLETE':
+                // There are two participant instances by default, incomplete. Mark one complete.
+                /** @var participant_instance $participant_instance */
+                $participant_instance = $entity->participant_instances()->first();
+                $participant_instance->progress = complete_participant_instance::get_code();
+                $participant_instance->update();
+                break;
+            case 'ALL_COMPLETE':
+                // There are two participant instances by default, incomplete. Mark them both complete.
+                /** @var participant_instance $participant_instance */
+                foreach ($entity->participant_instances()->get() as $participant_instance) {
+                    $participant_instance->progress = complete_participant_instance::get_code();
+                    $participant_instance->update();
+                }
+                break;
+            default:
+                throw new coding_exception('Unexpected condition');
+        }
+
+        $this->setUser($subject_user);
+
+        if (!$transition_possible) {
+            $this->expectException(invalid_state_switch_exception::class);
+            $this->expectExceptionMessage('Cannot switch');
+        }
+
+        $subject_instance->switch_state($target_state_class);
+
+        /** @var subject_instance_entity $subject_instance_entity */
+        $subject_instance_entity = subject_instance_entity::repository()->find($entity->id);
+        $db_progress = $subject_instance_entity->progress;
+        $this->assertEquals($target_state_class::get_code(), $db_progress);
+        $this->assertInstanceOf($target_state_class, $subject_instance->get_progress_state());
+    }
+
 }

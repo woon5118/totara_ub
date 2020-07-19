@@ -23,8 +23,6 @@
 
 namespace mod_perform\rb\display;
 
-use mod_perform\entities\activity\activity_type as activity_type_entity;
-use mod_perform\models\activity\activity_type as activity_type_model;
 use totara_reportbuilder\rb\display\base;
 
 class activity_type_name extends base {
@@ -40,12 +38,13 @@ class activity_type_name extends base {
      * @return string
      */
     public static function display($type_id, $format, \stdClass $row, \rb_column $column, \reportbuilder $report) {
-        $activity_type_record = array_merge(
-            ['id' => $type_id],
-            (array) self::get_extrafields_row($row, $column)
-        );
 
-        return activity_type_model::load_by_entity(new activity_type_entity($activity_type_record))->display_name;
+        $extra_fields = self::get_extrafields_row($row, $column);
+        if ($extra_fields->is_system) {
+            return get_string('system_activity_type:' . $extra_fields->name, 'mod_perform');
+        }
+
+        return format_string($extra_fields->name);
     }
 
     /**

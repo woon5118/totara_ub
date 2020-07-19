@@ -32,7 +32,7 @@ class participant_count extends base {
     /**
      * Handles the display
      *
-     * @param string $value
+     * @param string $count
      * @param string $format
      * @param \stdClass $row
      * @param \rb_column $column

@@ -2,6 +2,8 @@ query mod_perform_subject_instance($subject_instance_id: core_id!) {
   mod_perform_subject_instance(subject_instance_id: $subject_instance_id) {
     id
     progress_status
+    created_at
+    instance_count
     activity {
       name
       settings {
@@ -22,6 +24,9 @@ query mod_perform_subject_instance($subject_instance_id: core_id!) {
       core_relationship {
         name
       }
+    }
+    job_assignment {
+      fullname
     }
   }
 }

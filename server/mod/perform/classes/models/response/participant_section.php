@@ -32,8 +32,10 @@ use mod_perform\entities\activity\participant_section as participant_section_ent
 use mod_perform\entities\activity\section_relationship;
 use mod_perform\models\activity\participant_instance;
 use mod_perform\models\activity\section;
+use mod_perform\state\participant_instance\closed as participant_instance_closed;
 use mod_perform\state\participant_section\closed;
 use mod_perform\state\participant_section\complete;
+use mod_perform\state\participant_section\open;
 use mod_perform\state\participant_section\participant_section_availability;
 use mod_perform\state\participant_section\participant_section_progress;
 use mod_perform\state\state;
@@ -310,7 +312,7 @@ class participant_section extends model {
     /**
      * Get progress state class.
      *
-     * @return state
+     * @return participant_section_progress
      */
     public function get_progress_state(): state {
         return $this->get_state(participant_section_progress::get_type());
@@ -319,7 +321,7 @@ class participant_section extends model {
     /**
      * Get availability state class.
      *
-     * @return state
+     * @return participant_section_availability
      */
     public function get_availability_state(): state {
         return $this->get_state(participant_section_availability::get_type());
@@ -350,6 +352,54 @@ class participant_section extends model {
      */
     public function delete(): void {
         $this->entity->delete();
+    }
+
+    /**
+     * Manually close the participant section
+     *
+     * The following changes are applied, in this order:
+     * - Change availability to "Closed"
+     * - If progress is "Not yet started" or "In progress" then set progress to "Not submitted"
+     * - If progress is "Complete" then don't change progress
+     */
+    public function manually_close(): void {
+        if (!$this->get_availability_state() instanceof open) {
+            throw new coding_exception('This function can only be called if the participant section is open');
+        }
+
+        $this->get_availability_state()->close();
+        // This will trigger an event which will end up calling $this->participant_instance->update_progress_status!
+        $this->get_progress_state()->manually_complete();
+    }
+
+    /**
+     * Manually open the participant section
+     *
+     * Related participant instance and subject instance may be affected by this action.
+     *
+     * The following changes are applied, in this order:
+     * - Change availability to "Open"
+     * - Recalculate progress, either "Not yet started" or "In progress"
+     * - Change participant instance availability to "Open" and recalculate progress
+     * - Change subject instance availability to "Open" and recalculate progress
+     *
+     * @param bool $open_parent
+     */
+    public function manually_open(bool $open_parent = true): void {
+        if (!$this->get_availability_state() instanceof closed) {
+            throw new coding_exception('This function can only be called if the participant section is closed');
+        }
+
+        $this->get_availability_state()->open();
+        // This will trigger an event which will end up calling $this->participant_instance->update_progress_status!
+        $this->get_progress_state()->manually_uncomplete();
+
+        if ($open_parent) {
+            $participant_instance = $this->participant_instance;
+            if ($participant_instance->get_availability_state() instanceof participant_instance_closed) {
+                $participant_instance->manually_open(true, false);
+            }
+        }
     }
 
 }

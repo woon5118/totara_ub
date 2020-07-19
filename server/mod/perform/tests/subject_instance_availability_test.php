@@ -51,7 +51,7 @@ class mod_perform_subject_instance_availability_testcase extends state_testcase 
     public function state_transitions_data_provider(): array {
         return [
             'Open to Closed' => [open::class, closed::class, true],
-            'Closed to Open' => [closed::class, open::class, false],
+            'Closed to Open' => [closed::class, open::class, true],
             'Open to Open' => [open::class, open::class, false],
             'Closed to Closed' => [closed::class, closed::class, false],
         ];

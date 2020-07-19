@@ -23,6 +23,9 @@
 
 namespace mod_perform\state\participant_section;
 
+use mod_perform\state\participant_section\condition\all_answers_complete;
+use mod_perform\state\participant_section\condition\all_answers_incomplete;
+use mod_perform\state\participant_section\condition\not_all_answers_complete;
 use mod_perform\state\transition;
 
 defined('MOODLE_INTERNAL') || die();
@@ -44,19 +47,44 @@ class not_started extends participant_section_progress {
 
     public function get_transitions(): array {
         return [
-            // The participant has saved a draft.
-            transition::to(new in_progress($this->object)),
-
             // The participant has completed a section.
-            transition::to(new complete($this->object)),
+            transition::to(new complete($this->object))->with_conditions([
+                all_answers_complete::class,
+            ]),
+
+            // The participant has saved a draft OR an admin has manually moved progress backwards.
+            transition::to(new in_progress($this->object))->with_conditions([
+                not_all_answers_complete::class,
+                // Could replace with "viewed".
+            ]),
+
+            // The participant has not completed a section, but it is "done".
+            transition::to(new not_submitted($this->object))->with_conditions([
+                all_answers_incomplete::class,
+            ]),
         ];
     }
 
     public function complete(): void {
-        $this->object->switch_state(complete::class);
+        if ($this->can_switch(complete::class)) {
+            $this->object->switch_state(complete::class);
+        }
     }
 
     public function on_participant_access(): void {
-        $this->object->switch_state(in_progress::class);
+        if ($this->can_switch(in_progress::class)) {
+            $this->object->switch_state(in_progress::class);
+        }
     }
+
+    public function manually_complete(): void {
+        if ($this->can_switch(not_submitted::class)) {
+            $this->object->switch_state(not_submitted::class);
+        }
+    }
+
+    public function manually_uncomplete(): void {
+        // Not relevant when incomplete. Do nothing.
+    }
+
 }

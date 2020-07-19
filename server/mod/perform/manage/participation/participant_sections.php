@@ -21,6 +21,8 @@
  * @package mod_perform
  */
 
+use mod_perform\controllers\activity\manage_participation;
+
 require_once(__DIR__ . '/../../../../config.php');
 
-(new \mod_perform\controllers\activity\manage_participation())->process('sections');
+(new manage_participation())->process('sections');

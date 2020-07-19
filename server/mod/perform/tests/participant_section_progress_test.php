@@ -25,11 +25,12 @@
 
 use core\collection;
 use core\entities\user;
+use core\orm\entity\entity;
+use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\entities\activity\section_element;
 use mod_perform\models\activity\activity;
-use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\models\activity\element_plugin;
 use mod_perform\models\response\section_element_response;
 use mod_perform\models\response\element_validation_error;
@@ -38,8 +39,9 @@ use mod_perform\state\invalid_state_switch_exception;
 use mod_perform\state\participant_section\complete;
 use mod_perform\state\participant_section\in_progress;
 use mod_perform\state\participant_section\not_started;
-use mod_perform\state\state_helper;
+use mod_perform\state\participant_section\not_submitted;
 use mod_perform\state\participant_section\participant_section_progress;
+use mod_perform\state\state_helper;
 
 require_once(__DIR__ . '/relationship_testcase.php');
 require_once(__DIR__ . '/state_testcase.php');
@@ -55,26 +57,42 @@ class mod_perform_participant_section_progress_testcase extends state_testcase {
 
     public function state_transitions_data_provider(): array {
         return [
-            'Not started to in progress' => [not_started::class, in_progress::class, true],
-            'Not started to complete' => [not_started::class, complete::class, true],
-            'In progress to complete' => [in_progress::class, complete::class, true],
-            'Not started to not started' => [not_started::class, not_started::class, false],
-            'Complete to in progress' => [complete::class, in_progress::class, false],
+            'Not started to not started' => [not_started::class, not_started::class, false, 'NONE_COMPLETE'],
+            'Not started to in progress' => [not_started::class, in_progress::class, true, 'SOME_COMPLETE'],
+            'Not started to complete' => [not_started::class, complete::class, true, 'ALL_COMPLETE'],
+            'Not started to not submitted' => [not_started::class, not_submitted::class, true, 'NONE_COMPLETE'],
+
+            'In progress to in progress' => [in_progress::class, in_progress::class, false, 'SOME_COMPLETE'],
+            'In progress to not started' => [in_progress::class, not_started::class, false, 'NONE_COMPLETE'],
+            'In progress to complete' => [in_progress::class, complete::class, true, 'ALL_COMPLETE'],
+            'In progress to not submitted' => [in_progress::class, not_submitted::class, true, 'SOME_COMPLETE'],
+
+            'Complete to compete' => [complete::class, complete::class, false, 'ALL_COMPLETE'],
+            'Complete to not started' => [complete::class, not_started::class, false, 'NONE_COMPLETE'],
+            'Complete to in progress' => [complete::class, in_progress::class, true, 'SOME_COMPLETE'],
+            'Complete to not submitted' => [complete::class, not_submitted::class, false, 'ALL_COMPLETE'],
+
+            'Not submitted to not submitted' => [not_submitted::class, not_submitted::class, false, 'SOME_COMPLETE'],
+            'Not submitted to not started' => [not_submitted::class, not_started::class, true, 'NONE_COMPLETE'],
+            'Not submitted to in progress' => [not_submitted::class, in_progress::class, true, 'SOME_COMPLETE'],
+            'Not submitted to complete' => [not_submitted::class, complete::class, true, 'ALL_COMPLETE'],
         ];
     }
 
     /**
-     * Check switching section states.
+     * Check switching participant section states.
      *
      * @dataProvider state_transitions_data_provider
-     * @param string $initial_state_class
-     * @param string $target_state_class
+     * @param string|participant_section_progress $initial_state_class
+     * @param string|participant_section_progress $target_state_class
      * @param bool $transition_possible
+     * @param string|null $condition
      */
     public function test_switch_state(
         string $initial_state_class,
         string $target_state_class,
-        bool $transition_possible = true
+        bool $transition_possible,
+        string $condition
     ): void {
         $this->setAdminUser();
         $subject_user = self::getDataGenerator()->create_user();
@@ -87,6 +105,31 @@ class mod_perform_participant_section_progress_testcase extends state_testcase {
         $participant_section = participant_section::load_by_entity($entity);
         $this->assertInstanceOf($initial_state_class, $participant_section->get_progress_state());
 
+        // The generator creates two section elements, so we will provide two responses.
+        switch ($condition) {
+            case 'NONE_COMPLETE':
+                $responses = new collection([
+                    $this->create_element_response_with_validation_errors(),
+                    $this->create_element_response_with_validation_errors(),
+                ]);
+                break;
+            case 'SOME_COMPLETE':
+                $responses = new collection([
+                    $this->create_element_response_with_validation_errors(),
+                    $this->create_valid_element_response(),
+                ]);
+                break;
+            case 'ALL_COMPLETE':
+                $responses = new collection([
+                    $this->create_valid_element_response(),
+                    $this->create_valid_element_response(),
+                ]);
+                break;
+            default:
+                throw new coding_exception('Unexpected condition');
+        }
+        $participant_section->set_element_responses($responses);
+
         $this->setUser($subject_user);
         $sink = $this->redirectEvents();
 
@@ -97,16 +140,19 @@ class mod_perform_participant_section_progress_testcase extends state_testcase {
 
         $participant_section->switch_state($target_state_class);
 
-        $db_progress = participant_section_entity::repository()->find($participant_section->get_id())->progress;
+        /** @var participant_section_entity $participant_section_entity */
+        $participant_section_entity = participant_section_entity::repository()->find($participant_section->get_id());
+        $db_progress = $participant_section_entity->progress;
         $this->assertEquals($target_state_class::get_code(), $db_progress);
         $this->assertInstanceOf($target_state_class, $participant_section->get_progress_state());
 
         // Check that event has been triggered.
-        $this->assert_section_updated_event($sink, $participant_section, $subject_user->id);
+        $this->assert_participant_section_updated_event($sink, $participant_section, $subject_user->id);
     }
 
     public function test_get_all_translated() {
         $this->assertEqualsCanonicalizing([
+            50 => 'Not submitted',
             20 => 'Complete',
             10 => 'In progress',
             0 => 'Not started',
@@ -114,11 +160,13 @@ class mod_perform_participant_section_progress_testcase extends state_testcase {
     }
 
     /**
+     * Assert that the "participant section was update" event was fired
+     *
      * @param phpunit_event_sink $sink
      * @param participant_section $participant_section
      * @param int $user_id
      */
-    private function assert_section_updated_event(
+    private function assert_participant_section_updated_event(
         phpunit_event_sink $sink,
         participant_section $participant_section,
         int $user_id
@@ -143,7 +191,6 @@ class mod_perform_participant_section_progress_testcase extends state_testcase {
         $participant_section = participant_section::load_by_entity($this->create_participant_section());
 
         $responses = new collection([
-            $this->create_valid_element_response(),
             $this->create_valid_element_response(),
             $this->create_valid_element_response(),
         ]);
@@ -331,7 +378,7 @@ class mod_perform_participant_section_progress_testcase extends state_testcase {
     private function create_participant_section(
         stdClass $subject_user = null,
         stdClass $other_participant = null
-    ): participant_section_entity {
+    ): entity {
         /** @var mod_perform_generator $perform_generator */
         $perform_generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
 

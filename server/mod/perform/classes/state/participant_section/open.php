@@ -71,4 +71,12 @@ class open extends participant_section_availability {
     public function close(): void {
         $this->object->switch_state(closed::class);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function open(): void {
+        // Already in the correct state.
+    }
+
 }

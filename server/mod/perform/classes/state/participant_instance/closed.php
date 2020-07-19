@@ -27,6 +27,7 @@ use core\event\base;
 use mod_perform\event\participant_instance_availability_closed;
 use mod_perform\models\activity\participant_instance;
 use mod_perform\state\state_event;
+use mod_perform\state\transition;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -62,14 +63,23 @@ class closed extends participant_instance_availability implements state_event {
      * @inheritDoc
      */
     public function get_transitions(): array {
-        return [];
+        return [
+            transition::to(new open($this->object)),
+        ];
     }
 
     /**
      * @inheritDoc
      */
     public function close(): void {
-        return;
+        // Already in the correct state.
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function open(): void {
+        $this->object->switch_state(open::class);
     }
 
     /**

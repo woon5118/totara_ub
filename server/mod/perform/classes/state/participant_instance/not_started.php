@@ -50,9 +50,14 @@ class not_started extends participant_instance_progress {
             transition::to(new complete($this->object))->with_conditions([
                 all_sections_complete::class
             ]),
+
             transition::to(new in_progress($this->object))->with_conditions([
                 not_all_sections_complete::class,
                 at_least_one_section_started::class,
+            ]),
+
+            transition::to(new not_submitted($this->object))->with_conditions([
+                not_all_sections_complete::class,
             ]),
         ];
     }
@@ -65,4 +70,15 @@ class not_started extends participant_instance_progress {
             }
         }
     }
+
+    public function manually_complete(): void {
+        if ($this->can_switch(not_submitted::class)) {
+            $this->object->switch_state(not_submitted::class);
+        }
+    }
+
+    public function manually_uncomplete(): void {
+        // Not relevant when incomplete. Do nothing.
+    }
+
 }

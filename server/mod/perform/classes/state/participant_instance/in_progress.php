@@ -23,11 +23,8 @@
 
 namespace mod_perform\state\participant_instance;
 
-use core\event\base;
-use mod_perform\event\participant_instance_progress_updated;
-use mod_perform\models\activity\participant_instance;
 use mod_perform\state\participant_instance\condition\all_sections_complete;
-use mod_perform\state\state_event;
+use mod_perform\state\participant_instance\condition\not_all_sections_complete;
 use mod_perform\state\transition;
 
 defined('MOODLE_INTERNAL') || die();
@@ -37,7 +34,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @package mod_perform
  */
-class in_progress extends participant_instance_progress implements state_event {
+class in_progress extends participant_instance_progress {
 
     public static function get_name(): string {
         return 'IN_PROGRESS';
@@ -53,13 +50,11 @@ class in_progress extends participant_instance_progress implements state_event {
             transition::to(new complete($this->object))->with_conditions([
                 all_sections_complete::class
             ]),
-        ];
-    }
 
-    public function get_event(): base {
-        /** @var participant_instance $participant_instance */
-        $participant_instance = $this->get_object();
-        return participant_instance_progress_updated::create_from_participant_instance($participant_instance);
+            transition::to(new not_submitted($this->object))->with_conditions([
+                not_all_sections_complete::class,
+            ]),
+        ];
     }
 
     public function update_progress(): void {
@@ -67,4 +62,15 @@ class in_progress extends participant_instance_progress implements state_event {
             $this->object->switch_state(complete::class);
         }
     }
+
+    public function manually_complete(): void {
+        if ($this->can_switch(not_submitted::class)) {
+            $this->object->switch_state(not_submitted::class);
+        }
+    }
+
+    public function manually_uncomplete(): void {
+        // Not relevant when incomplete. Do nothing.
+    }
+
 }

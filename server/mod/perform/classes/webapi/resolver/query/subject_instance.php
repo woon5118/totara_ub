@@ -32,6 +32,7 @@ use core\webapi\resolver\has_middleware;
 use mod_perform\data_providers\activity\subject_instance_for_participant as subject_instance_data_provider;
 use mod_perform\models\activity\subject_instance as subject_instance_model;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
+use mod_perform\util;
 
 class subject_instance implements query_resolver, has_middleware {
     /**
@@ -53,10 +54,14 @@ class subject_instance implements query_resolver, has_middleware {
         $ec->set_relevant_context(subject_instance_model::load_by_entity($subject_instance_entity)->get_context());
 
         /** @var user $target_participant */
-        $participant_id = user::logged_in()->id;
+        $user_id = user::logged_in()->id;
+
+        if (util::can_manage_participation($user_id, $subject_instance_entity->subject_user_id)) {
+            return new subject_instance_model($subject_instance_entity);
+        }
 
         /** @var subject_instance_model $subject_instance */
-        return (new subject_instance_data_provider($participant_id))
+        return (new subject_instance_data_provider($user_id))
             ->set_subject_instance_id_filter($subject_instance_id)
             ->fetch()
             ->get()

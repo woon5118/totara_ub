@@ -19,7 +19,7 @@
 <template>
   <div class="tui-performActivityActions__actionIcons">
     <a
-      v-if="activityIsDraft"
+      v-if="!activityIsDraft"
       :href="participationManagementUrl"
       :title="$str('manage_participation', 'mod_perform')"
       class="tui-performActivityActions__actionIcons__link"

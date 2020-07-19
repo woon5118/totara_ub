@@ -26,6 +26,7 @@ use core\webapi\mutation_resolver;
 use core\webapi\query_resolver;
 use mod_perform\controllers\activity\view_user_activity;
 use mod_perform\entities\activity\activity as activity_entity;
+use mod_perform\entities\activity\subject_instance;
 use mod_perform\entities\activity\track as track_entity;
 use totara_core\advanced_feature;
 use totara_core\feature_not_available_exception;
@@ -56,7 +57,7 @@ class mod_perform_advanced_feature_disable_testcase extends advanced_testcase {
      * @dataProvider get_webapi_mutation_data_provider
      * @param string $mutation_name
      */
-    public function test_webapi_mutators_throw_error_if_feature_is_disabled(string $mutation_name) {
+    public function test_webapi_mutators_throw_error_if_feature_is_disabled(string $mutation_name): void {
         $this->expectException(feature_not_available_exception::class);
         $this->expectExceptionMessage('Feature performance_activities is not available.');
 
@@ -77,7 +78,7 @@ class mod_perform_advanced_feature_disable_testcase extends advanced_testcase {
      * @dataProvider get_webapi_query_data_provider
      * @param string $query_name
      */
-    public function test_webapi_queries_throw_error_if_feature_is_disabled(string $query_name) {
+    public function test_webapi_queries_throw_error_if_feature_is_disabled(string $query_name): void {
         $this->expectException(feature_not_available_exception::class);
         $this->expectExceptionMessage('Feature performance_activities is not available.');
 
@@ -118,19 +119,24 @@ class mod_perform_advanced_feature_disable_testcase extends advanced_testcase {
      * @param string $controller
      * @throws coding_exception
      */
-    public function test_controllers_throw_error_if_feature_is_disabled(string $controller) {
+    public function test_controllers_throw_error_if_feature_is_disabled(string $controller): void {
         if ($controller === view_user_activity::class) {
             $this->markTestSkipped('This controller needs special setup, skipping.');
         }
-        $this->setAdminUser();
+        self::setAdminUser();
 
-        $data_generator = $this->getDataGenerator();
-        /** @var mod_perform_generator $perform_generator */
-        $perform_generator = $data_generator->get_plugin_generator('mod_perform');
+        /** @var mod_perform_generator $generator */
+        $generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
 
-        $activity = $perform_generator->create_activity_in_container();
+        $config = mod_perform_activity_generator_configuration::new()
+            ->set_number_of_activities(1)
+            ->set_number_of_tracks_per_activity(1)
+            ->set_number_of_users_per_user_group_type(1);
 
-        $_GET['activity_id'] = $activity->id;
+        $generator->create_full_activities($config);
+
+        $_GET['activity_id'] = activity_entity::repository()->order_by('id')->first()->id;
+        $_GET['subject_instance_id'] = subject_instance::repository()->order_by('id')->first()->id;
 
         $this->expectException(feature_not_available_exception::class);
         $this->expectExceptionMessage('Feature performance_activities is not available.');

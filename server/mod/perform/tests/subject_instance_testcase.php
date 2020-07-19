@@ -25,6 +25,7 @@ use core\webapi\execution_context;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 use mod_perform\models\activity\subject_instance;
 use mod_perform\entities\activity\participant_section;
+use totara_job\job_assignment;
 
 /**
  * Class mod_perform_subject_instance_testcase
@@ -184,5 +185,45 @@ abstract class mod_perform_subject_instance_testcase extends advanced_testcase {
         return self::getDataGenerator()->get_plugin_generator('mod_perform');
     }
 
+    protected function strip_expected_dates(array $actual_result): array {
+        self::assertArrayHasKey(
+            'created_at',
+            $actual_result,
+            'Result is expected to contain created_at'
+        );
+
+        $month_and_year = (new DateTime())->format('F Y');
+        self::assertStringContainsString(
+            $month_and_year,
+            $actual_result['created_at'],
+            'Expected created at to at least be the current month and year'
+        );
+
+        unset($actual_result['created_at']);
+
+        return $actual_result;
+    }
+
+    /**
+     * @param $manager
+     * @param $employee
+     * @throws coding_exception
+     */
+    protected function setup_manager_employee_job_assignment($manager, $employee): void {
+        $manager_job_assignment = job_assignment::create(
+            [
+                'userid' => $manager->id,
+                'idnumber' => $manager->id,
+            ]
+        );
+
+        job_assignment::create(
+            [
+                'userid' => $employee->id,
+                'idnumber' => $employee->id,
+                'managerjaid' => $manager_job_assignment->id,
+            ]
+        );
+    }
 
 }

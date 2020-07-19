@@ -71,7 +71,7 @@ use totara_core\relationship\relationship_provider;
  * @property-read string $description
  * @property-read int $status
  * @property-read activity_state $state
- * @property-read int $type
+ * @property-read activity_type $type
  * @property-read int $created_at
  * @property-read int $updated_at
  * @property-read collection|section[] $sections
@@ -605,7 +605,7 @@ class activity extends model {
     /**
      * Get status state class.
      *
-     * @return state
+     * @return activity_status
      */
     public function get_status_state(): state {
         return $this->get_state(activity_status::get_type());

@@ -204,7 +204,7 @@ class mod_perform_track_model_testcase extends advanced_testcase {
      * @return entity | MockObject
      */
     protected function mock_existing_entity(string $class): entity {
-        $mock = $this->getMockBuilder($class)->setMethods(['exists'])->getMock();
+        $mock = $this->getMockBuilder($class)->onlyMethods(['exists'])->getMock();
         $mock->method('exists')->willReturn(true);
 
         return $mock;

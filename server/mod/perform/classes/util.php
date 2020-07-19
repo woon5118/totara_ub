@@ -35,6 +35,7 @@ use context;
 use context_coursecat;
 use core_text;
 use mod_perform\models\activity\activity;
+use required_capability_exception;
 use totara_core\access;
 
 class util {
@@ -227,6 +228,42 @@ class util {
         ", CONTEXT_USER, $has_cap_sql);
 
         return builder::get_db()->get_records_sql_menu($sql, $has_cap_params, $offset, $limit);
+    }
+
+    /**
+     * Require a manage participation check to pass.
+     *
+     * @param int $manager_id
+     * @param int $subject_user_id
+     * @return bool
+     */
+    public static function require_can_manage_participation(int $manager_id, int $subject_user_id): bool {
+        if (self::can_manage_participation($manager_id, $subject_user_id)) {
+            return true;
+        }
+
+        throw new required_capability_exception(
+            context_user::instance($subject_user_id),
+            'mod/perform:manage_activity',
+            'nopermissions',
+            ''
+        );
+    }
+
+    /**
+     * Determine if the given user can manage participation of the given subject
+     *
+     * @param int $manager_id A user id
+     * @param int $subject_user_id A user id
+     * @return bool
+     */
+    public static function can_manage_participation(int $manager_id, int $subject_user_id): bool {
+        if (static::has_manage_all_participants_capability($manager_id)) {
+            return true;
+        }
+
+        $subject_user_context = context_user::instance($subject_user_id);
+        return access::has_capability('mod/perform:manage_subject_user_participation', $subject_user_context, $manager_id);
     }
 
 }

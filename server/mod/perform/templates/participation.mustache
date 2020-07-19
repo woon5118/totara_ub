@@ -33,19 +33,27 @@
     Context variables required for this template:
     * backurl: String
     * tabs: HTML
+    * banner: HTML
     * heading: String
     * name: String (TODO: Remove once page content is implemented)
+    * toasts: HTML
 
     Example context (json):
     {
     }
 }}
 <div class="tw-perform-manage-participation">
+    {{#backurl}}
     <a href="{{backurl}}">{{#str}}back_to_all_activities, mod_perform{{/str}}</a>
+    {{/backurl}}
 
-    <h2 class="tw-perform-manage-participation__title">{{heading}}</h2>
+    <h1 class="tw-perform-manage-participation__title">{{page_heading}}</h1>
 
     {{{tabs}}}
 
-    {{name}}
+    {{{banner}}}
+
+    {{> totara_mvc/report}}
+
+    {{{toasts}}}
 </div>

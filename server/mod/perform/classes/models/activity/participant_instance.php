@@ -23,17 +23,21 @@
 
 namespace mod_perform\models\activity;
 
+use coding_exception;
 use context_module;
 use core\collection;
 use core\entities\user;
 use core\orm\entity\model;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\models\response\participant_section;
+use mod_perform\state\participant_instance\closed;
 use mod_perform\state\participant_instance\complete;
+use mod_perform\state\participant_instance\open;
 use mod_perform\state\participant_instance\participant_instance_availability;
 use mod_perform\state\participant_instance\participant_instance_progress;
 use mod_perform\state\state;
 use mod_perform\state\state_aware;
+use mod_perform\state\subject_instance\closed as subject_instance_closed;
 use totara_core\relationship\relationship as relationship_model;
 
 /**
@@ -52,6 +56,7 @@ use totara_core\relationship\relationship as relationship_model;
  * @property-read participant_instance_progress|state $progress_state Current progress state
  * @property-read participant_instance_availability|state $availability_state Current availability state
  * @property-read relationship_model $core_relationship The core relationship
+ * @property-read bool $is_overdue
  */
 class participant_instance extends model {
 
@@ -69,6 +74,7 @@ class participant_instance extends model {
         'participant_id',
         'subject_instance_id',
         'core_relationship_id',
+        'created_at',
     ];
 
     protected $model_accessor_whitelist = [
@@ -82,6 +88,7 @@ class participant_instance extends model {
         'participant_sections',
         'is_for_current_user',
         'is_overdue',
+        'subject_instance'
     ];
 
     protected static function get_entity_class(): string {
@@ -142,7 +149,6 @@ class participant_instance extends model {
      * Update progress status according to section progress.
      */
     public function update_progress_status() {
-        /** @var participant_instance_progress $state */
         $this->get_progress_state()->update_progress();
     }
 
@@ -196,7 +202,7 @@ class participant_instance extends model {
     /**
      * Get progress state class.
      *
-     * @return state
+     * @return participant_instance_progress
      */
     public function get_progress_state(): state {
         return $this->get_state(participant_instance_progress::get_type());
@@ -220,6 +226,72 @@ class participant_instance extends model {
         global $USER;
 
         return $this->participant_id == $USER->id;
+    }
+
+    /**
+     * Manually close the participant instance
+     *
+     * Related participant sections may be affected by this action.
+     *
+     * The following changes are applied, in this order:
+     * - Change availability to "Closed"
+     * - If progress is "Not yet started" or "In progress" then set progress to "Not submitted"
+     * - Change participant sections availability to "Closed"
+     * - If participant sections progress is "Not yet started" or "In progress" then set progress to "Not submitted"
+     */
+    public function manually_close(): void {
+        if (!$this->get_availability_state() instanceof open) {
+            throw new coding_exception('This function can only be called if the participant instance is open');
+        }
+
+        $this->get_availability_state()->close();
+        // This will trigger an event which will end up calling $this->subject_instance->update_progress_status!
+        $this->get_progress_state()->manually_complete();
+
+        foreach ($this->participant_sections as $participant_section) {
+            // This will trigger an event which will end up calling $this->update_progress_status!
+            $participant_section->manually_close();
+        }
+    }
+
+    /**
+     * Manually open the participant instance
+     *
+     * Related participant sections and the subject instance may be affected by this action.
+     *
+     * The following changes are applied, in this order:
+     * - Change participant sections availability to "Open"
+     * - Recalculate participant sections progress, either "Not yet started" or "In progress"
+     * - Change availability to "Open"
+     * - Recalculate progress, either "Not yet started" or "In progress"
+     * - Change subject instance availability to "Open"
+     * - Recalculate subject instance progress, either "Not yet started" or "In progress"
+     *
+     * @param bool $open_parent
+     * @param bool $open_children
+     */
+    public function manually_open(bool $open_parent = true, bool $open_children = true): void {
+        if (!$this->get_availability_state() instanceof closed) {
+            throw new coding_exception('This function can only be called if the participant instance is closed');
+        }
+
+        if ($open_children) {
+            foreach ($this->participant_sections as $participant_section) {
+                // This will trigger an event which will end up calling $this->update_progress_status!
+                $participant_section->manually_open(false);
+            }
+        }
+
+        $this->get_availability_state()->open();
+        // This will trigger an event which will end up calling $this->subject_instance->update_progress_status!
+        $this->get_progress_state()->manually_uncomplete();
+
+        if ($open_parent) {
+            $subject_instance = $this->subject_instance;
+            if ($subject_instance->get_availability_state() instanceof subject_instance_closed) {
+                $subject_instance->manually_open(false);
+            }
+        }
     }
 
 }

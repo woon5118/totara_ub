@@ -318,6 +318,18 @@ class job_assignment {
     }
 
     /**
+     * Create an instance from an orm entity.
+     *
+     * @param entities\job_assignment $job_assignment
+     * @return static
+     */
+    public static function from_entity(entities\job_assignment $job_assignment): self {
+        $record = (object) $job_assignment->to_array();
+
+        return new self($record);
+    }
+
+    /**
      * Create a new job_assignment from the given data and save it to the db.
      *
      * Processes description_editor, so you don't have to.

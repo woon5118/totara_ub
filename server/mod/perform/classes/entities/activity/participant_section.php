@@ -26,6 +26,7 @@ namespace mod_perform\entities\activity;
 use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\entity\relations\belongs_to;
+use core\orm\entity\relations\has_many;
 use core\orm\entity\relations\has_many_through;
 use mod_perform\models\activity\participant_instance as participant_instance_entity;
 
@@ -73,16 +74,29 @@ class participant_section extends entity {
     /**
      * Relationship with the section elements entities.
      *
-     * @return has_many_through
+     * @return has_many
      */
-    public function section_elements(): has_many_through {
-        return $this->has_many_through(
-            section::class,
+    public function section_elements(): has_many {
+        return $this->has_many(
             section_element::class,
             'section_id',
-            'id',
-            'id',
             'section_id'
+        );
+    }
+
+    /**
+     * Relationship with the element response entities.
+     *
+     * @return has_many_through
+     */
+    public function element_responses(): has_many_through {
+        return $this->has_many_through(
+            section_element::class,
+            element_response::class,
+            'section_id',
+            'section_id',
+            'id',
+            'section_element_id'
         );
     }
 

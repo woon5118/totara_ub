@@ -52,7 +52,7 @@ class mod_perform_participant_section_availability_testcase extends state_testca
     public function state_transitions_data_provider(): array {
         return [
             'Open to Closed' => [open::class, closed::class, true],
-            'Closed to Open' => [closed::class, open::class, false],
+            'Closed to Open' => [closed::class, open::class, true],
             'Open to Open' => [open::class, open::class, false],
             'Closed to Closed' => [closed::class, closed::class, false],
         ];
@@ -152,12 +152,6 @@ class mod_perform_participant_section_availability_testcase extends state_testca
     public function test_availability_change_on_activity_settings(bool $close_on_completion): void {
         $participant_section = participant_section::load_by_entity($this->create_participant_section());
 
-        $responses = new collection([
-            $this->create_valid_element_response(),
-            $this->create_valid_element_response(),
-            $this->create_valid_element_response(),
-        ]);
-
         self::assertEquals(
             open::get_code(),
             $participant_section->availability,
@@ -168,7 +162,7 @@ class mod_perform_participant_section_availability_testcase extends state_testca
             ->settings
             ->update([activity_setting::CLOSE_ON_COMPLETION => $close_on_completion]);
 
-        $participant_section->set_element_responses($responses);
+        $this->mark_answers_complete($participant_section);
         $completion_success = $participant_section->complete();
 
         self::assertTrue($completion_success);
@@ -181,6 +175,17 @@ class mod_perform_participant_section_availability_testcase extends state_testca
             participant_section_entity::repository()->find($participant_section->get_id())->availability,
             'Participant section has the wrong availability status'
         );
+    }
+
+    private function mark_answers_complete(participant_section $participant_section): void {
+        $section_elements = $participant_section->get_section()->get_section_elements();
+
+        $responses = new collection();
+        foreach ($section_elements as $section_element) {
+            $responses->append($this->create_valid_element_response());
+        }
+
+        $participant_section->set_element_responses($responses);
     }
 
     /**
@@ -230,4 +235,5 @@ class mod_perform_participant_section_availability_testcase extends state_testca
             }
         };
     }
+
 }

@@ -23,6 +23,7 @@
 
 namespace mod_perform\state\subject_instance;
 
+use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 use mod_perform\state\subject_instance\condition\all_participant_instances_complete;
 use mod_perform\state\subject_instance\condition\at_least_one_participant_instance_started;
 use mod_perform\state\subject_instance\condition\not_all_participant_instances_complete;
@@ -50,11 +51,27 @@ class not_started extends subject_instance_progress {
             transition::to(new complete($this->object))->with_conditions([
                 all_participant_instances_complete::class
             ]),
+
             transition::to(new in_progress($this->object))->with_conditions([
                 not_all_participant_instances_complete::class,
                 at_least_one_participant_instance_started::class,
             ]),
+
+            transition::to(new not_submitted($this->object))->with_conditions([
+                not_all_participant_instances_complete::class,
+            ]),
         ];
+    }
+
+    public function on_enter(): void {
+        // Set the completed_at date.
+        /** @var subject_instance_entity $subject_instance_entity */
+        $subject_instance_entity = subject_instance_entity::repository()->find($this->get_object()->get_id());
+        if (empty($subject_instance_entity->completed_at)) {
+            return;
+        }
+        $subject_instance_entity->completed_at = null;
+        $subject_instance_entity->update();
     }
 
     public function update_progress(): void {
@@ -65,4 +82,15 @@ class not_started extends subject_instance_progress {
             }
         }
     }
+
+    public function manually_complete(): void {
+        if ($this->can_switch(not_submitted::class)) {
+            $this->object->switch_state(not_submitted::class);
+        }
+    }
+
+    public function manually_uncomplete(): void {
+        // Not relevant when incomplete. Do nothing.
+    }
+
 }

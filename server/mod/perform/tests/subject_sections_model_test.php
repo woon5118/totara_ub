@@ -27,6 +27,7 @@ use core\collection;
 use mod_perform\constants;
 use mod_perform\expand_task;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
+use mod_perform\models\activity\section;
 use mod_perform\models\activity\section_element;
 use mod_perform\models\activity\subject_instance;
 use mod_perform\models\response\subject_sections;
@@ -135,6 +136,7 @@ class mod_perform_subject_sections_model_testcase extends advanced_testcase {
         array $relationships,
         int $no_of_sections
     ): collection {
+        /** @var mod_perform_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
         $activity = $generator->create_activity_in_container(
             [
@@ -152,9 +154,9 @@ class mod_perform_subject_sections_model_testcase extends advanced_testcase {
             $section = $generator->create_section($activity, ['title' => "section#$i"]);
             $sections->set($section, $section->id);
 
-            foreach ($relationships as $relationship) {
+            foreach ($relationships as $key => $relationship) {
                 $generator->create_section_relationship($section, ['relationship' => $relationship]);
-                section_element::create($section, $generator->create_element());
+                section_element::create($section, $generator->create_element(), $key + 1);
             }
         }
 

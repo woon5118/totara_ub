@@ -39,6 +39,7 @@ use mod_perform\entities\activity\manual_relationship_selector;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
 use mod_perform\entities\activity\section as section_entity;
+use mod_perform\entities\activity\section_element as section_element_entity;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 use mod_perform\entities\activity\track as track_entity;
 use mod_perform\entities\activity\track_user_assignment;
@@ -223,7 +224,6 @@ class mod_perform_generator extends component_generator_base {
                 $data[activity_setting::MULTISECTION] === 'yes'
             );
         }
-
     }
 
     /**
@@ -251,7 +251,10 @@ class mod_perform_generator extends component_generator_base {
         $this->create_section_element($section, $element);
     }
 
-    public function create_section_element(section $section, element $element, $sort_order = 1): section_element {
+    public function create_section_element(section $section, element $element, $sort_order = null): section_element {
+        if (is_null($sort_order)) {
+            $sort_order = section_element_entity::repository()->where('section_id', $section->id)->get()->count() + 1;
+        }
         return section_element::create($section, $element, $sort_order);
     }
 
@@ -418,6 +421,7 @@ class mod_perform_generator extends component_generator_base {
         int $user_count = 1
     ): track {
         $pos = [];
+        /** @var totara_hierarchy_generator $hierarchies */
         $hierarchies = $this->datagenerator->get_plugin_generator('totara_hierarchy');
         if ($pos_count > 0) {
             $data = ['frameworkid' => $hierarchies->create_pos_frame([])->id];
@@ -714,48 +718,57 @@ class mod_perform_generator extends component_generator_base {
         $user_assignment->deleted = false;
         $user_assignment->save();
 
-        $subject_instance = new subject_instance_entity();
-        $subject_instance->track_user_assignment_id = $user_assignment->id;
-        $subject_instance->subject_user_id = $user_assignment->subject_user_id; // Purposeful denormalization
-        $subject_instance->status = $data['status'] ?? active::get_code();
-        $subject_instance->save();
+        // Simulate repeating
+        $num_instances = $data['number_repeated_instances'] ?? 1;
+        $subject_instances = [];
+        $now = time();
+        for ($i = 1; $i <= $num_instances; $i++) {
+            // If repeating, we need the create dates to be different
+            $subject_instance = new subject_instance_entity();
+            $subject_instance->track_user_assignment_id = $user_assignment->id;
+            $subject_instance->subject_user_id = $user_assignment->subject_user_id; // Purposeful denormalization
+            $subject_instance->created_at = $now + $i;
+            $subject_instance->status = $data['status'] ?? active::get_code();
+            $subject_instance->save();
 
-        $subject_is_participating = $data['subject_is_participating'] ?? false;
-        // String conversion for behat, defaulting to false.
-        if (is_string($subject_is_participating) && $subject_is_participating !== 'true') {
-            $subject_is_participating = false;
-        }
+            $subject_is_participating = $data['subject_is_participating'] ?? false;
+            // String conversion for behat, defaulting to false.
+            if (is_string($subject_is_participating) && $subject_is_participating !== 'true') {
+                $subject_is_participating = false;
+            }
 
-        $is_active = (int) $subject_instance->status === active::get_code();
+            $is_active = (int) $subject_instance->status === active::get_code();
 
-        $subjects_participant_instance = null;
-        if ($subject_is_participating && $is_active) {
-            $subjects_participant_instance = new participant_instance_entity();
-            $subjects_participant_instance->core_relationship_id = 0; // stubbed
-            $subjects_participant_instance->participant_id = $subject->id; // Answering on activity about them self
-            $subjects_participant_instance->subject_instance_id = $subject_instance->id;
-            $subjects_participant_instance->progress = instance_not_started::get_code();
-            $subjects_participant_instance->save();
-        }
+            $subjects_participant_instance = null;
+            if ($subject_is_participating && $is_active) {
+                $subjects_participant_instance = new participant_instance_entity();
+                $subjects_participant_instance->core_relationship_id = 0; // stubbed
+                $subjects_participant_instance->participant_id = $subject->id; // Answering on activity about them self
+                $subjects_participant_instance->subject_instance_id = $subject_instance->id;
+                $subjects_participant_instance->progress = instance_not_started::get_code();
+                $subjects_participant_instance->save();
+            }
 
-        $other_participant_instance = null;
-        if ($other_participant && $is_active) {
-            $other_participant_instance = new participant_instance_entity();
-            $other_participant_instance->core_relationship_id = 0; // stubbed
-            $other_participant_instance->participant_id = $other_participant->id;
-            $other_participant_instance->subject_instance_id = $subject_instance->id;
-            $other_participant_instance->progress = instance_not_started::get_code();
-            $other_participant_instance->save();
-        }
+            $other_participant_instance = null;
+            if ($other_participant && $is_active) {
+                $other_participant_instance = new participant_instance_entity();
+                $other_participant_instance->core_relationship_id = 0; // stubbed
+                $other_participant_instance->participant_id = $other_participant->id;
+                $other_participant_instance->subject_instance_id = $subject_instance->id;
+                $other_participant_instance->progress = instance_not_started::get_code();
+                $other_participant_instance->save();
+            }
 
-        $third_participant_instance = null;
-        if ($third_participant && $is_active) {
-            $third_participant_instance = new participant_instance_entity();
-            $third_participant_instance->core_relationship_id = 0; // stubbed
-            $third_participant_instance->participant_id = $third_participant->id;
-            $third_participant_instance->subject_instance_id = $subject_instance->id;
-            $third_participant_instance->progress = instance_not_started::get_code();
-            $third_participant_instance->save();
+            $third_participant_instance = null;
+            if ($third_participant && $is_active) {
+                $third_participant_instance = new participant_instance_entity();
+                $third_participant_instance->core_relationship_id = 0; // stubbed
+                $third_participant_instance->participant_id = $third_participant->id;
+                $third_participant_instance->subject_instance_id = $subject_instance->id;
+                $third_participant_instance->progress = instance_not_started::get_code();
+                $third_participant_instance->save();
+            }
+            $subject_instances[] = $subject_instance;
         }
 
         $include_questions = $data['include_questions'] ?? true;
@@ -831,7 +844,8 @@ class mod_perform_generator extends component_generator_base {
             }
         }
 
-        return $subject_instance;
+        // Returning the last subject instance when repeating
+        return end($subject_instances);
     }
 
     /**

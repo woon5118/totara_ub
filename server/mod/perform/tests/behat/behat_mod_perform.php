@@ -25,8 +25,10 @@ use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\DriverException;
 use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\Mink\Exception\ExpectationException;
+use core\orm\entity\entity;
 use mod_perform\controllers\activity\edit_activity;
 use mod_perform\controllers\activity\manage_activities;
+use mod_perform\controllers\activity\manage_participation;
 use mod_perform\controllers\activity\user_activities;
 use mod_perform\controllers\activity\view_user_activity;
 use mod_perform\entities\activity\activity;
@@ -46,11 +48,13 @@ class behat_mod_perform extends behat_base {
     public const SHORT_TEXT_ANSWER_LOCATOR = '.tui-shortTextElementParticipantResponse__answer';
     public const MULTI_CHOICE_ANSWER_LOCATOR = '.tui-elementEditMultiChoiceSingleParticipantResponse__answer';
     public const PERFORM_ACTIVITY_YOUR_RELATIONSHIP_LOCATOR = '.tui-participantContent__user-relationshipValue';
-    public const PERFORM_SHOW_OTHERS_RESPONSES_LOCATOR      = '.tui-participantContent__sectionHeading-other-response-switch button';
+    public const PERFORM_SHOW_OTHERS_RESPONSES_LOCATOR = '.tui-participantContent__sectionHeading-other-response-switch button';
     public const MANAGE_CONTENT_PARTICIPANT_NAME_LOCATOR = '.tui-performActivitySectionRelationship__item-name';
-    public const MANAGE_CONTENT_ADD_PARTICIPANTS_BUTTON_LABEL = ".tui-performManageActivityContent__items .tui-performActivitySection:nth-of-type(%d) [aria-label='Add participants']";
-    public const MANAGE_CONTENT_ACTIVITY_SECTION = ".tui-performManageActivityContent__items .tui-performActivitySection:nth-of-type(%d)";
-    public const MANAGE_CONTENT_ACTIVITY_SECTION_CONTENT_SUMMARY = ".tui-grid-item:nth-of-type(%d) .tui-performActivitySectionElementSummary__count";
+    public const MANAGE_CONTENT_ADD_PARTICIPANTS_BUTTON_LABEL = '.tui-performManageActivityContent__items .tui-performActivitySection:nth-of-type(%d) [aria-label=\'Add participants\']';
+    public const MANAGE_CONTENT_ACTIVITY_SECTION = '.tui-performManageActivityContent__items .tui-performActivitySection:nth-of-type(%d)';
+    public const MANAGE_CONTENT_ACTIVITY_SECTION_CONTENT_SUMMARY = '.tui-grid-item:nth-of-type(%d) .tui-performActivitySectionElementSummary__count';
+    public const INSTANCE_INFO_CARD_LABEL_LOCATOR = '.tui-instanceInfoCard__info-label';
+    public const INSTANCE_INFO_CARD_VALUE_LOCATOR = '.tui-instanceInfoCard__info-value';
 
     public const TUI_USER_ANSWER_ERROR_LOCATOR = '.tui-formFieldError';
     public const USER_QUESTION_TEXT_LOCATOR = '.tui-collapsible__header-text';
@@ -103,13 +107,7 @@ class behat_mod_perform extends behat_base {
      * @param string $activity_name
      */
     public function i_navigate_to_the_edit_perform_activities_page_for(string $activity_name): void {
-        $activity = activity::repository()
-            ->where('name', $activity_name)
-            ->one();
-
-        if (!$activity) {
-            throw new DriverException('Activity with name \''.$activity_name.'\' not found.');
-        }
+        $activity = $this->get_activity_by_name($activity_name);
         $this->navigate_to_page(edit_activity::get_url(['activity_id' => $activity->id]));
     }
 
@@ -948,12 +946,80 @@ class behat_mod_perform extends behat_base {
     }
 
     /**
+     * @When /^I navigate to the perform manage participation subject instances report for activity "([^"]*)"$/
+     * @param string $activity_name
+     */
+    public function i_navigate_to_the_perform_manage_participation_subject_instances_report_for_activity(
+        string $activity_name
+    ): void {
+        $activity = $this->get_activity_by_name($activity_name);
+
+        $this->navigate_to_page(manage_participation::get_url(
+            ['activity_id' => $activity->id]
+        ));
+    }
+
+    /**
+     * @Given /^I should see "([^"]*)" in the "([^"]*)" line of the perform activities instance info card$/
+     * @param string $expected_value
+     * @param string $label_text
+     * @throws ExpectationException
+     */
+    public function i_should_see_in_the_line_of_the_perform_activities_instance_info_card(
+        string $expected_value,
+        string $label_text
+    ): void {
+        $labels = $this->find_all('css', self::INSTANCE_INFO_CARD_LABEL_LOCATOR);
+
+        $value_index = null;
+        foreach ($labels as $i => $label) {
+            if (trim($label->getText()) === $label_text) {
+                $value_index = $i;
+                break;
+            }
+        }
+
+        if ($value_index === null) {
+            $this->fail("Label not found with the text: {$label_text}");
+        }
+
+        $value = $this->find_all('css', self::INSTANCE_INFO_CARD_VALUE_LOCATOR)[$value_index];
+
+        $actual_text = trim($value->getText());
+
+        if ($actual_text !== $expected_value) {
+            $this->fail("'{$label_text}' value was not '{$expected_value}', found '{$actual_text}'");
+        }
+    }
+
+    /**
+     * @Given /^I should see today's date in the "([^"]*)" line of the perform activities instance info card$/
+     */
+    public function i_should_see_todays_date_in_the_line_of_the_perform_activities_instance_info_card(string $label_text) {
+        $today_date_formatted = (new DateTime())->format('j F Y');
+
+        $this->i_should_see_in_the_line_of_the_perform_activities_instance_info_card($today_date_formatted, $label_text);
+    }
+
+    /**
      * Convenience method to fail from an ExpectationException.
      *
      * @param string $error error message.
      */
     private function fail(string $error): void {
         throw new ExpectationException($error, $this->getSession());
+    }
+
+    private function get_activity_by_name(string $activity_name): entity {
+        $activity = activity::repository()
+            ->where('name', $activity_name)
+            ->one();
+
+        if (!$activity) {
+            throw new DriverException('Activity with name \''.$activity_name.'\' not found.');
+        }
+
+        return $activity;
     }
 
 }

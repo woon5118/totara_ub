@@ -75,7 +75,7 @@ class section_element extends model {
      *
      * @return static
      */
-    public static function create(section $section, element $element, int $sort_order = 1): self {
+    public static function create(section $section, element $element, int $sort_order): self {
         $entity = new section_element_entity();
         $entity->section_id = $section->id;
         $entity->element_id = $element->id;

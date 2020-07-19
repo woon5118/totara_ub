@@ -29,6 +29,7 @@ use context_module;
 use core\collection;
 use core\entities\user;
 use core\orm\entity\model;
+use core\orm\query\builder;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 use mod_perform\entities\activity\subject_instance_manual_participant;
 use mod_perform\event\subject_instance_manual_participants_selected;
@@ -36,11 +37,14 @@ use mod_perform\models\activity\helpers\manual_participant_helper;
 use mod_perform\state\state;
 use mod_perform\state\state_aware;
 use mod_perform\state\subject_instance\active;
+use mod_perform\state\subject_instance\closed;
 use mod_perform\state\subject_instance\complete;
+use mod_perform\state\subject_instance\open;
 use mod_perform\state\subject_instance\pending;
 use mod_perform\state\subject_instance\subject_instance_availability;
 use mod_perform\state\subject_instance\subject_instance_manual_status;
 use mod_perform\state\subject_instance\subject_instance_progress;
+use totara_job\job_assignment;
 
 /**
  * Class subject_instance
@@ -56,10 +60,14 @@ use mod_perform\state\subject_instance\subject_instance_progress;
  * @property-read int $availability The availability status code
  * @property-read activity $activity The top level perform activity this is an instance of
  * @property-read collection|participant_instance[] $participant_instances models created from participant_instance entities
+ * @property-read job_assignment|null $job_assignment The job assignment this instance is in relation to (per job activities),
+ *                                               null for per user activities
  * @property-read string $progress_status internal name of current progress state
  * @property-read subject_instance_progress|state $progress_state Current progress state
  * @property-read subject_instance_availability|state $availability_state Current availability state
  * @property-read subject_instance_manual_status|state $manual_state Current manual status state
+ * @property-read bool $is_overdue
+ * @property-read int $instance_count
  *
  * @package mod_perform\models\activity
  */
@@ -82,12 +90,14 @@ class subject_instance extends model {
     protected $model_accessor_whitelist = [
         'activity',
         'participant_instances',
+        'job_assignment',
         'progress_status',
         'availability_status',
         'progress_state',
         'availability_state',
         'manual_state',
         'is_overdue',
+        'instance_count',
     ];
 
     /** @var subject_instance_entity */
@@ -188,9 +198,20 @@ class subject_instance extends model {
     }
 
     /**
+     * @return job_assignment|null
+     */
+    public function get_job_assignment(): ?job_assignment {
+        if ($this->entity->job_assignment === null) {
+            return null;
+        }
+
+        return job_assignment::from_entity($this->entity->job_assignment);
+    }
+
+    /**
      * Get progress state class.
      *
-     * @return state
+     * @return subject_instance_progress
      */
     public function get_progress_state(): state {
         return $this->get_state(subject_instance_progress::get_type());
@@ -283,6 +304,79 @@ class subject_instance extends model {
         }
 
         $helper->set_progress_complete($this->id, $relationship_id);
+    }
+
+    /**
+     * Manually close the subject instance
+     *
+     * Related participant instances and sections may be affected by this action.
+     *
+     * The following changes are applied, in this order:
+     * - Change availability to "Closed"
+     * - If progress is "Not yet started" or "In progress" then set progress to "Not submitted"
+     * - Change participant instances availability to "Closed"
+     * - If participant instances progress is "Not yet started" or "In progress" then set progress to "Not submitted"
+     * - Change participant sections availability to "Closed"
+     * - If participant sections progress is "Not yet started" or "In progress" then set progress to "Not submitted"
+     */
+    public function manually_close(): void {
+        if (!$this->get_availability_state() instanceof open) {
+            throw new coding_exception('This function can only be called if the subject instance is open');
+        }
+
+        $this->get_availability_state()->close();
+        $this->get_progress_state()->manually_complete();
+
+        foreach ($this->participant_instances as $participant_instance) {
+            // This will trigger an event which will end up calling $this->update_progress_status!
+            $participant_instance->manually_close();
+        }
+    }
+
+    /**
+     * Manually open the subject instance
+     *
+     * Related participant instances and sections may be affected by this action.
+     *
+     * The following changes are applied, in this order:
+     * - Change participant sections availability to "Open"
+     * - Recalculate participant sections progress, either "Not yet started" or "In progress"
+     * - Change participant instances availability to "Open"
+     * - Recalculate participant instances progress, either "Not yet started" or "In progress"
+     * - Change availability to "Open"
+     * - Recalculate progress, either "Not yet started" or "In progress"
+     *
+     * @param bool $open_children
+     */
+    public function manually_open(bool $open_children = true): void {
+        if (!$this->get_availability_state() instanceof closed) {
+            throw new coding_exception('This function can only be called if the subject instance is closed');
+        }
+
+        if ($open_children) {
+            foreach ($this->participant_instances as $participant_instance) {
+                // This will trigger an event which will end up calling $this->update_progress_status!
+                $participant_instance->manually_open(false, true);
+            }
+        }
+
+        $this->get_availability_state()->open();
+        $this->get_progress_state()->manually_uncomplete();
+    }
+
+    /**
+     * Get the number of instances for this particular subject-user, track, and activity.
+     *
+     * @return int
+     */
+    public function get_instance_count(): int {
+        $row = builder::table(subject_instance_entity::TABLE)
+            ->select_raw('count(*) as count')
+            ->where('track_user_assignment_id', $this->entity->track_user_assignment_id)
+            ->where('created_at', '<=', $this->entity->created_at)
+            ->one(true);
+
+        return $row->count;
     }
 
 }

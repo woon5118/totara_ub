@@ -224,6 +224,34 @@ class behat_totara_tui extends behat_base {
     }
 
     /**
+     * @When /^I click on "([^"]*)" "([^"]*)" in the tui datatable row with "([^"]*)" "([^"]*)"$/
+     * @param string $element
+     * @param string $selector_type
+     * @param string $cell_text
+     * @param string $column_heading_text
+     * @param string|null $table_locator
+     * @param string $table_selector_type
+     */
+    public function i_click_on_in_the_tui_datatable_row(
+        string $element,
+        string $selector_type,
+        string $cell_text,
+        string $column_heading_text,
+        string $table_locator = self::DATA_TABLE_DEFAULT_LOCATOR,
+        string $table_selector_type = self::DATA_TABLE_DEFAULT_SELECTOR_TYPE
+    ): void {
+        behat_hooks::set_step_readonly(false);
+
+        $cell = $this->find_data_table_cell_by_text($column_heading_text, $cell_text, $table_locator, $table_selector_type);
+
+        list($selector, $locator) = $this->transform_selector($selector_type, $element);
+        $node = $cell->find($selector, $locator);
+        if ($node !== null) {
+            $node->click();
+        }
+    }
+
+    /**
      * If there is an opened dropdown menu, close it by pressing escape.
      *
      * @When /^I close any visible tui dropdowns$/
@@ -1058,6 +1086,34 @@ class behat_totara_tui extends behat_base {
         if (trim($actual_content->getText()) !== $expected_value) {
             $this->fail('Form row did not contain the expected text');
         }
+    }
+
+    /**
+     * @Then /^the "([^"]*)" tui form row should contain "([^"]*)"$/
+     * @param string $form_row_label
+     * @param string $expected_value
+     */
+    public function the_tui_form_row_should_contain(string $form_row_label, string $expected_value): void {
+        $form_row = $this->find_form_row_by_label($form_row_label);
+
+        $actual_content = $form_row->find('css', self::TUI_FORM_ROW_ACTION_LOCATOR . ' > *');
+
+        if (trim($actual_content->getValue()) !== $expected_value) {
+            $this->fail('Form row did not contain the expected text');
+        }
+    }
+
+    /**
+     * @Then /^I enter "([^"]*)" into "([^"]*)" the tui form row$/
+     * @param string $form_row_label
+     * @param string $value
+     */
+    public function i_enter_into_the_tui_form_row(string $value, string $form_row_label): void {
+        $form_row = $this->find_form_row_by_label($form_row_label);
+
+        $actual_content = $form_row->find('css', self::TUI_FORM_ROW_ACTION_LOCATOR . ' > *');
+
+        $actual_content->setValue($value);
     }
 
     /**

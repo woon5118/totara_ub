@@ -24,13 +24,12 @@
 use mod_perform\models\activity\participant_instance;
 use mod_perform\state\participant_instance\not_started;
 use totara_core\advanced_feature;
+use totara_job\job_assignment;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 require_once(__DIR__ . '/subject_instance_testcase.php');
 
 /**
- * @coversDefaultClass participant_section
- *
  * @group perform
  */
 class mod_perform_webapi_resolver_query_subject_instance_testcase extends mod_perform_subject_instance_testcase {
@@ -69,6 +68,8 @@ class mod_perform_webapi_resolver_query_subject_instance_testcase extends mod_pe
         $expected = [
             'id' => (string) self::$about_user_and_participating->id,
             'progress_status' => self::$about_user_and_participating->get_progress_status(),
+            'instance_count' => 1,
+            'job_assignment' => null,
             'activity' => [
                 'name' => self::$about_user_and_participating->get_activity()->name,
                 'settings' => [
@@ -101,10 +102,32 @@ class mod_perform_webapi_resolver_query_subject_instance_testcase extends mod_pe
                 ],
             ]
         ];
+
         self::assertEqualsCanonicalizing($expected['participant_instances'], $actual['participant_instances']);
-        unset($expected['participant_instances']);
-        unset($actual['participant_instances']);
-        self::assertEquals($expected, $actual);
+        unset($expected['participant_instances'], $actual['participant_instances']);
+
+        self::assertEquals($expected, $this->strip_expected_dates($actual));
+    }
+
+    public function test_get_as_participation_manager(): void {
+        $subject_instance = self::$about_user_but_not_participating;
+        $args = ['subject_instance_id' => $subject_instance->id];
+
+        $manager = self::getDataGenerator()->create_user();
+        $employee = self::$about_user_but_not_participating->subject_user;
+
+        self::setUser($manager);
+
+        $context = $this->create_webapi_context(self::QUERY);
+        $context->set_relevant_context($subject_instance->get_context());
+
+        $returned_subject_instance = $this->resolve_graphql_query(self::QUERY, $args);
+        self::assertNull($returned_subject_instance);
+
+        $this->setup_manager_employee_job_assignment($manager, $employee);
+
+        $returned_subject_instance = $this->resolve_graphql_query(self::QUERY, $args);
+        $this->assertEquals(self::$about_user_but_not_participating->id, $returned_subject_instance->id);
     }
 
     public function test_failed_ajax_query(): void {
@@ -128,4 +151,5 @@ class mod_perform_webapi_resolver_query_subject_instance_testcase extends mod_pe
         $result = $this->parsed_graphql_operation(self::QUERY, $args);
         $this->assert_webapi_operation_failed($result, 'not logged in');
     }
+
 }

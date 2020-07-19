@@ -60,11 +60,13 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
     use webapi_phpunit_helper;
 
     public function test_query_successful_with_single_section(): void {
+        /** @var mod_perform_generator $perform_generator */
         $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
         $activity = $perform_generator->create_full_activities()->first();
         /** @var participant_instance $participant_instance */
         $participant_instance = participant_instance::repository()->get()->first();
         $participant_instance_model = participant_instance_model::load_by_entity($participant_instance);
+        /** @var subject_instance $subject_instance */
         $subject_instance = subject_instance::load_by_id($participant_instance->subject_instance_id);
 
         $subject_relationship = $perform_generator->get_core_relationship(constants::RELATIONSHIP_SUBJECT);
@@ -324,6 +326,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
         $activity1->toggle_multisection_setting(true);
 
         // Now activate this activity, directly in the database to avoid state change checks
+        /** @var activity_entity $activity_entity */
         $activity_entity = activity_entity::repository()->find($activity1->id);
         $activity_entity->status = active::get_code();
         $activity_entity->save();
@@ -757,8 +760,10 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
             ],
         ];
 
-        $expected_error_message = 'Variable "$filters" got invalid value {"not_real_filter":1}; ';
-        $expected_error_message .= 'Field value.about of required type [mod_perform_subject_instance_about_filter!]! was not provided.';
+        $expected_error_message =
+            'Variable "$filters" got invalid value {"not_real_filter":1}; ';
+        $expected_error_message .=
+            'Field value.about of required type [mod_perform_subject_instance_about_filter!]! was not provided.';
         $result = $this->parsed_graphql_operation(self::QUERY, $args);
         $this->assert_webapi_operation_failed($result, $expected_error_message);
     }

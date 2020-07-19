@@ -23,14 +23,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-use mod_perform\rb\traits\participant_subject_instance_source;
-use mod_perform\state\state_helper;
-use mod_perform\state\subject_instance\closed;
-use mod_perform\state\subject_instance\complete;
 use mod_perform\state\subject_instance\pending;
-use mod_perform\state\subject_instance\subject_instance_availability;
-use mod_perform\state\subject_instance\subject_instance_manual_status;
-use mod_perform\state\subject_instance\subject_instance_progress;
+use mod_perform\rb\traits\activity_trait;
+use mod_perform\rb\traits\subject_instance_trait;
 use totara_core\advanced_feature;
 use totara_job\rb\source\report_trait;
 
@@ -41,7 +36,8 @@ use totara_job\rb\source\report_trait;
  */
 class rb_source_perform_subject_instance extends rb_base_source {
     use report_trait;
-    use participant_subject_instance_source;
+    use subject_instance_trait;
+    use activity_trait;
 
     /**
      * Constructor.
@@ -68,6 +64,20 @@ class rb_source_perform_subject_instance extends rb_base_source {
         $this->joinlist = $this->define_joinlist();
         $this->columnoptions = $this->define_columnoptions();
         $this->filteroptions = $this->define_filteroptions();
+
+        $this->add_subject_instance_to_base();
+
+        $this->add_activity(
+            new rb_join(
+                'perform',
+                'INNER',
+                '{perform}',
+                'track.activity_id = perform.id',
+                REPORT_BUILDER_RELATION_MANY_TO_ONE,
+                'track'
+            )
+        );
+
         $this->contentoptions = $this->define_contentoptions();
         $this->paramoptions = $this->define_paramoptions();
         $this->defaultcolumns = $this->define_defaultcolumns();
@@ -92,9 +102,23 @@ class rb_source_perform_subject_instance extends rb_base_source {
      * @return array
      */
     protected function define_joinlist() {
-        $joinlist = [];
-        $this->add_to_joinlist($joinlist);
-        $this->add_core_user_tables($joinlist, 'base', 'subject_user_id');
+        $joinlist = [
+            new rb_join(
+                'track_user_assignment',
+                'INNER',
+                '{perform_track_user_assignment}',
+                "track_user_assignment.id = base.track_user_assignment_id",
+                REPORT_BUILDER_RELATION_ONE_TO_ONE
+            ),
+            new rb_join(
+                'track',
+                'INNER',
+                '{perform_track}',
+                'track.id = track_user_assignment.track_id',
+                REPORT_BUILDER_RELATION_ONE_TO_ONE,
+                'track_user_assignment'
+            ),
+        ];
 
         return $joinlist;
     }
@@ -123,17 +147,7 @@ class rb_source_perform_subject_instance extends rb_base_source {
         $columnoptions = [
             new rb_column_option(
                 'subject_instance',
-                'created_at',
-                get_string('date_created', 'rb_source_perform_subject_instance'),
-                'base.created_at',
-                [
-                    'dbdatatype' => 'timestamp',
-                    'displayfunc' => 'nice_date'
-                ]
-            ),
-            new rb_column_option(
-                'participant_instance',
-                'count',
+                'participant_count',
                 get_string('participant_count', 'rb_source_perform_subject_instance'),
                 "($participant_count_sql_fragment)",
                 [
@@ -144,53 +158,6 @@ class rb_source_perform_subject_instance extends rb_base_source {
                     'extrafields' => [
                         'subject_instance_id' => "base.id"
                     ]
-                ]
-            ),
-            new rb_column_option(
-                'subject_instance',
-                'subject_progress',
-                get_string('progress', 'mod_perform'),
-                'base.progress',
-                [
-                    'dbdatatype' => 'integer',
-                    'displayfunc' => 'state_display_name',
-                    'extracontext' => [
-                        'object_type' => 'subject_instance',
-                        'state_type' => subject_instance_progress::get_type(),
-                    ],
-                ]
-            ),
-            new rb_column_option(
-                'subject_instance',
-                'subject_availability',
-                get_string('availability', 'mod_perform'),
-                'base.availability',
-                [
-                    'dbdatatype' => 'integer',
-                    'displayfunc' => 'state_display_name',
-                    'extracontext' => [
-                        'object_type' => 'subject_instance',
-                        'state_type' => subject_instance_availability::get_type(),
-                    ],
-                ]
-            ),
-            new rb_column_option(
-                'subject_instance',
-                'overdue',
-                get_string('overdue', 'mod_perform'),
-                "CASE
-                    WHEN
-                        " . time() . " >= base.due_date
-                        AND NOT (
-                            base.progress = " . complete::get_code() . "
-                            OR base.availability = " . closed::get_code() . "
-                        )
-                    THEN 1
-                    ELSE 0
-                END",
-                [
-                    'dbdatatype' => 'boolean',
-                    'displayfunc' => 'yes_or_no',
                 ]
             ),
             // TODO: uncomment when its available
@@ -208,9 +175,6 @@ class rb_source_perform_subject_instance extends rb_base_source {
             // )
         ];
 
-        $this->add_fields_to_columns($columnoptions);
-        $this->add_core_user_columns($columnoptions);
-
         return $columnoptions;
     }
 
@@ -221,64 +185,6 @@ class rb_source_perform_subject_instance extends rb_base_source {
      */
     protected function define_filteroptions() {
         $filteroptions = [
-            new rb_filter_option(
-                'subject_instance',
-                'created_at',
-                get_string('date_created', 'rb_source_perform_subject_instance'),
-                'date'
-            ),
-            new rb_filter_option(
-                'user',
-                'namelink',
-                get_string('subject_name', 'rb_source_perform_subject_instance'),
-                'text'
-            ),
-            new rb_filter_option(
-                'subject_instance',
-                'overdue',
-                get_string('overdue', 'mod_perform'),
-                'multicheck',
-                [
-                    'simplemode' => true,
-                    'selectfunc' => 'yesno_list',
-                ]
-            ),
-            new rb_filter_option(
-                'subject_instance',
-                'subject_progress',
-                get_string('progress', 'mod_perform'),
-                'select',
-                [
-                    'selectchoices' => state_helper::get_all_display_names(
-                        'subject_instance', subject_instance_progress::get_type()
-                    ),
-                ]
-            ),
-            new rb_filter_option(
-                'subject_instance',
-                'subject_availability',
-                get_string('availability', 'mod_perform'),
-                'select',
-                [
-                    'selectchoices' => state_helper::get_all_display_names(
-                        'subject_instance', subject_instance_availability::get_type()
-                    ),
-                    'simplemode' => true,
-                ]
-            ),
-            new rb_filter_option(
-                'subject_instance',
-                'subject_status',
-                get_string('subject_instance_status', 'mod_perform'),
-                'select',
-                [
-                    'selectchoices' => state_helper::get_all_display_names(
-                        'subject_instance', subject_instance_manual_status::get_type()
-                    ),
-                    'simplemode' => true,
-                ],
-                'base.status'
-            ),
             // TODO: uncomment when its available
             // new rb_filter_option(
             //     'track',
@@ -287,9 +193,6 @@ class rb_source_perform_subject_instance extends rb_base_source {
             //     'text'
             // ),
         ];
-
-        $this->add_fields_to_filters($filteroptions);
-        $this->add_core_user_filters($filteroptions);
 
         return $filteroptions;
     }
@@ -320,38 +223,38 @@ class rb_source_perform_subject_instance extends rb_base_source {
     public static function get_default_columns() {
         return [
             [
-                'type' => 'user',
+                'type' => 'subject_user',
                 'value' => 'namelink',
                 'heading' => get_string('subject_name', 'rb_source_perform_subject_instance')
             ],
             [
-                'type' => 'perform',
+                'type' => 'activity',
                 'value' => 'name',
                 'heading' => get_string('activity_name', 'mod_perform')
             ],
             [
-                'type' => 'perform',
+                'type' => 'activity',
                 'value' => 'type',
                 'heading' => get_string('activity_type', 'mod_perform')
             ],
             [
                 'type' => 'subject_instance',
                 'value' => 'created_at',
-                'heading' => get_string('date_created', 'rb_source_perform_subject_instance')
+                'heading' => get_string('date_created', 'mod_perform')
             ],
             [
                 'type' => 'subject_instance',
-                'value' => 'subject_progress',
+                'value' => 'progress',
                 'heading' => get_string('progress', 'mod_perform')
             ],
             [
                 'type' => 'subject_instance',
-                'value' => 'subject_availability',
+                'value' => 'availability',
                 'heading' => get_string('availability', 'mod_perform')
             ],
             [
-                'type' => 'participant_instance',
-                'value' => 'count',
+                'type' => 'subject_instance',
+                'value' => 'participant_count',
                 'heading' => get_string('participant_count', 'rb_source_perform_subject_instance')
             ],
         ];
@@ -365,8 +268,8 @@ class rb_source_perform_subject_instance extends rb_base_source {
     public static function get_default_filters() {
         return [
             [
-                'type' => 'user',
-                'value' => 'namelink',
+                'type' => 'subject_user',
+                'value' => 'fullname',
             ],
             // TODO: uncomment when its available
             // [
@@ -378,20 +281,20 @@ class rb_source_perform_subject_instance extends rb_base_source {
                 'value' => 'created_at',
             ],
             [
-                'type' => 'perform',
+                'type' => 'activity',
                 'value' => 'type'
             ],
             [
                 'type' => 'subject_instance',
-                'value' => 'subject_progress',
+                'value' => 'progress',
             ],
             [
                 'type' => 'subject_instance',
-                'value' => 'subject_availability',
+                'value' => 'availability',
             ],
             [
                 'type' => 'subject_instance',
-                'value' => 'subject_status',
+                'value' => 'status',
             ],
         ];
     }
@@ -421,7 +324,7 @@ class rb_source_perform_subject_instance extends rb_base_source {
                 'activity_id',
                 'track.activity_id',
                 'track'
-            )
+            ),
         ];
         return $paramoptions;
     }

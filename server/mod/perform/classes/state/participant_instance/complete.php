@@ -23,11 +23,9 @@
 
 namespace mod_perform\state\participant_instance;
 
-use core\event\base;
-use mod_perform\event\participant_instance_progress_updated;
-use mod_perform\models\activity\participant_instance;
+use mod_perform\state\participant_instance\condition\at_least_one_section_started;
+use mod_perform\state\participant_instance\condition\no_sections_complete;
 use mod_perform\state\participant_instance\condition\not_all_sections_complete;
-use mod_perform\state\state_event;
 use mod_perform\state\transition;
 
 defined('MOODLE_INTERNAL') || die();
@@ -37,7 +35,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @package mod_perform
  */
-class complete extends participant_instance_progress implements state_event {
+class complete extends participant_instance_progress {
 
     public static function get_name(): string {
         return 'COMPLETE';
@@ -51,6 +49,11 @@ class complete extends participant_instance_progress implements state_event {
         return [
             transition::to(new in_progress($this->object))->with_conditions([
                 not_all_sections_complete::class,
+                at_least_one_section_started::class,
+            ]),
+
+            transition::to(new not_started($this->object))->with_conditions([
+                no_sections_complete::class,
             ]),
         ];
     }
@@ -62,9 +65,17 @@ class complete extends participant_instance_progress implements state_event {
         }
     }
 
-    public function get_event(): base {
-        /** @var participant_instance $participant_instance */
-        $participant_instance = $this->get_object();
-        return participant_instance_progress_updated::create_from_participant_instance($participant_instance);
+    public function manually_complete(): void {
+        // Not relevant when already complete. Do nothing.
     }
+
+    public function manually_uncomplete(): void {
+        foreach ([in_progress::class, not_started::class] as $to_state) {
+            if ($this->can_switch($to_state)) {
+                $this->object->switch_state($to_state);
+                break;
+            }
+        }
+    }
+
 }

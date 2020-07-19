@@ -45,4 +45,10 @@ abstract class participant_instance_availability extends state {
      * Switch availability status.
      */
     abstract public function close(): void;
+
+    /**
+     * Switch availability status.
+     */
+    abstract public function open(): void;
+
 }

@@ -40,9 +40,15 @@ abstract class subject_instance_availability extends state {
     abstract public function close(): void;
 
     /**
+     * Open availability status.
+     */
+    abstract public function open(): void;
+
+    /**
      * @inheritDoc
      */
     public static function get_type(): string {
         return 'availability';
     }
+
 }

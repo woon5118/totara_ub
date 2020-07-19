@@ -23,10 +23,7 @@
 
 namespace mod_perform\state\participant_section;
 
-use core\event\base;
-use mod_perform\event\participant_section_progress_updated;
-use mod_perform\models\response\participant_section;
-use mod_perform\state\state_event;
+use mod_perform\state\transition;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -35,7 +32,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @package mod_perform
  */
-class complete extends participant_section_progress implements state_event {
+class complete extends participant_section_progress {
 
     public static function get_name(): string {
         return 'COMPLETE';
@@ -46,22 +43,29 @@ class complete extends participant_section_progress implements state_event {
     }
 
     public function get_transitions(): array {
-        return [];
-    }
-
-    public function get_event(): base {
-        /** @var participant_section $participant_section */
-        $participant_section = $this->get_object();
-        return participant_section_progress_updated::create_from_participant_section($participant_section);
+        return [
+            // The participant has saved a draft OR an admin has manually moved progress backwards.
+            transition::to(new in_progress($this->object)),
+        ];
     }
 
     public function complete(): void {
         // Already in complete state. Do nothing.
-        return;
     }
 
     public function on_participant_access(): void {
         // Not relevant when already complete. Do nothing.
-        return;
+    }
+
+    public function manually_complete(): void {
+        // Not relevant when already complete. Do nothing.
+    }
+
+    public function manually_uncomplete(): void {
+        // The user must have done something for it to get into the "complete" state. We move back
+        // to "in_progress" to force the user to submit the section again.
+        if ($this->can_switch(in_progress::class)) {
+            $this->object->switch_state(in_progress::class);
+        }
     }
 }

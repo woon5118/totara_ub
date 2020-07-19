@@ -5,6 +5,7 @@ type mod_perform_section_relationship {
   id: core_id!
   can_answer: Boolean!
   can_view: Boolean!
+  is_subject: Boolean!
   core_relationship: totara_core_relationship!
 }
 

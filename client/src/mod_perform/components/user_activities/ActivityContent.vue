@@ -230,6 +230,7 @@ import {
   NOTIFICATION_DURATION,
   RELATIONSHIP_SUBJECT,
 } from 'mod_perform/constants';
+import { redirectWithPost } from 'mod_perform/redirect';
 import { notify } from 'tui/notifications';
 // Components
 import Button from 'tui/components/buttons/Button';
@@ -758,7 +759,7 @@ export default {
       // Post requests require a real url (activity/index.php no activity/).
       const url = this.$url('/mod/perform/activity/index.php');
 
-      this.redirectWithPost(url, {
+      redirectWithPost(url, {
         show_about_others_tab: !this.currentUserIsSubject,
         completion_save_success: true,
         closed_on_completion: this.activity.settings.close_on_completion,
@@ -772,37 +773,10 @@ export default {
       // Post requests require a real url (activity/index.php no activity/).
       const url = this.$url('/mod/perform/activity/index.php');
 
-      this.redirectWithPost(url, {
+      redirectWithPost(url, {
         show_about_others_tab: !this.currentUserIsSubject,
         completion_save_success: false,
       });
-    },
-
-    /**
-     * There is no real way to do a post request redirect in js
-     * This just creates a hidden form and submits it.
-     *
-     * @param {String} url
-     * @param {Object} params
-     */
-    redirectWithPost(url, params) {
-      const hiddenForm = document.createElement('form');
-      hiddenForm.style.display = 'hidden';
-      hiddenForm.action = url;
-      hiddenForm.method = 'post';
-
-      // Note this only supports boolean params.
-      Object.entries(params).forEach(entry => {
-        const input = document.createElement('input');
-        input.type = 'checkbox';
-        input.name = entry[0];
-        input.checked = Boolean(entry[1]);
-        hiddenForm.appendChild(input);
-      });
-
-      document.body.appendChild(hiddenForm);
-
-      hiddenForm.submit();
     },
 
     /**

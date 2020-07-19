@@ -22,18 +22,14 @@
  */
 
 $string['sourcelabel'] = 'Performance Subject Instance (Perform)';
-$string['sourcesummary'] = 'Learners progress on their assigned competencies.';
+$string['sourcesummary'] = 'Subject progress in performance activities';
 $string['sourcetitle'] = 'Performance Subject Instance (Perform)';
 
-$string['date_completion'] = 'Date of subject instance completion';
-$string['date_created'] = 'Date subject instance created';
 $string['instance_count'] = 'Instance count';
 $string['participant_count'] = 'Participant count';
-$string['perform_type'] = 'Performance type';
-$string['subject_name'] = 'Subject\'s full name';
+$string['subject_name'] = 'Subject name';
 
-$string['type_participant_instance'] = 'Participant instance';
-$string['type_perform'] = 'Perform';
-$string['type_perform_type'] = 'Perform type';
+$string['type_activity'] = 'Perform';
 $string['type_subject_instance'] = 'Subject instance';
+$string['type_subject_user'] = 'Subject user';
 $string['type_track'] = 'Track';

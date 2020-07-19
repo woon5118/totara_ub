@@ -83,6 +83,8 @@ type mod_perform_subject_instance {
   is_overdue: Boolean!
   subject_user: core_user!
   participant_instances: [mod_perform_participant_instance!]!
+  job_assignment: totara_job_assignment
+  instance_count: Int
 }
 
 """
@@ -98,6 +100,8 @@ type mod_perform_participant_instance {
   availability_status: mod_perform_participant_instance_availability_status!
   is_overdue: Boolean!
   core_relationship: totara_core_relationship
+  subject_instance: mod_perform_subject_instance
+  created_at(format: core_date_format = DATE): core_date!
 }
 
 """
@@ -211,6 +215,13 @@ extend type Query {
   A list of all element types that can be used to create elements
   """
   mod_perform_element_plugins: [mod_perform_element_plugin!]!
+
+  """
+  A particular participant instance
+  """
+  mod_perform_participant_instance(
+    participant_instance_id: core_id!
+  ): mod_perform_participant_instance
 
   """
   A list of all performance activities the current user is participating in.

@@ -1,0 +1,43 @@
+"""
+Mutation return type
+"""
+type mod_perform_manually_change_participant_section_result {
+    participant_section: mod_perform_participant_section!
+}
+
+type mod_perform_manually_change_participant_instance_result {
+    participant_instance: mod_perform_participant_instance!
+}
+
+type mod_perform_manually_change_subject_instance_result {
+    subject_instance: mod_perform_subject_instance!
+}
+
+input mod_perform_manually_change_participant_section_input {
+    participant_section_id: core_id!
+    availability: mod_perform_participant_section_availability_status!
+}
+
+input mod_perform_manually_change_participant_instance_input {
+    participant_instance_id: core_id!
+    availability: mod_perform_participant_instance_availability_status!
+}
+
+input mod_perform_manually_change_subject_instance_input {
+    subject_instance_id: core_id!
+    availability: mod_perform_subject_instance_availability_status!
+}
+
+extend type Mutation {
+    mod_perform_manually_change_participant_section(
+        input: mod_perform_manually_change_participant_section_input!
+    ): mod_perform_manually_change_participant_section_result!
+
+    mod_perform_manually_change_participant_instance(
+        input: mod_perform_manually_change_participant_instance_input!
+    ): mod_perform_manually_change_participant_instance_result!
+
+    mod_perform_manually_change_subject_instance(
+        input: mod_perform_manually_change_subject_instance_input!
+    ): mod_perform_manually_change_subject_instance_result!
+}
