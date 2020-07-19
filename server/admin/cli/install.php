@@ -164,6 +164,7 @@ $CFG = new stdClass();
 $CFG->lang                 = 'en';
 $CFG->dirroot              = dirname(dirname(__DIR__));
 $CFG->libdir               = "$CFG->dirroot/lib";
+$CFG->libraries            = "$CFG->dirroot/../libraries";
 $CFG->wwwroot              = "http://localhost";
 $CFG->httpswwwroot         = $CFG->wwwroot;
 $CFG->docroot              = 'https://help.totaralearning.com';

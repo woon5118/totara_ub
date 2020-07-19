@@ -32,6 +32,7 @@ echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('thirdpartylibs', 'core_admin'));
 
 $files = array('core' => "$CFG->libdir/thirdpartylibs.xml");
+$files = array('core_src' => "$CFG->libraries/thirdpartylibs.xml");
 
 $plugintypes = core_component::get_plugin_types();
 foreach ($plugintypes as $type => $ignored) {
@@ -54,8 +55,8 @@ foreach ($files as $component => $xmlpath) {
     $xml = simplexml_load_file($xmlpath);
     foreach ($xml as $lib) {
         $base = realpath(dirname($xmlpath));
-        $location = substr($base, strlen($CFG->dirroot)).'/'.$lib->location;
-        if (is_dir($CFG->dirroot.$location)) {
+        $location = substr($base, strlen($CFG->srcroot)).'/'.$lib->location;
+        if (is_dir($CFG->srcroot.$location)) {
             $location .= '/';
         }
         $version = '';

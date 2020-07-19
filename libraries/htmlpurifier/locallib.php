@@ -24,6 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once( __DIR__ . '/HTMLPurifier.safe-includes.php');
 
 /**
  * Validates RTSP defined by RFC 2326

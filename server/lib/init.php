@@ -113,6 +113,8 @@ namespace core\internal {
             $cfg->srcroot = realpath($cfg->dirroot . '/..');
             // Convenience: path to lib dir.
             $cfg->libdir = $cfg->dirroot . '/lib';
+            // New libraries directory.
+            $cfg->libraries = $cfg->srcroot . '/libraries';
             // Allow overriding of tempdir but be backwards compatible
             if (!isset($cfg->tempdir)) {
                 $cfg->tempdir = "$cfg->dataroot/temp";
