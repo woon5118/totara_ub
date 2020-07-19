@@ -1,7 +1,0 @@
-[**/tui/**/*.{js,vue,css,scss}]
-indent_style = space
-indent_size = 2
-
-[scripts/**/*.js]
-indent_style = space
-indent_size = 2
