@@ -65,6 +65,9 @@ require(__DIR__ . '/../lib/environmentmincheck.php');
 // it can not be anything else, there is no point in having this in config.php
 $CFG->dirroot = dirname(__DIR__);
 
+// TOTARA: Available since Totara 13 when we moved source code into the server directory.
+$CFG->srcroot = realpath($CFG->dirroot . '/..');
+
 // File permissions on created directories in the $CFG->dataroot
 if (!isset($CFG->directorypermissions)) {
     $CFG->directorypermissions = 02777;      // Must be octal (that's why it's here)
