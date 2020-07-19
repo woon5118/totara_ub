@@ -50,6 +50,7 @@ M.core.jquerybehat = M.core.jquerybehat || {
         // This is used in behat, and potentially will be used elsewhere.
         // We want to be sure that jQuery events get monitored as well seeing as we rely on jQuery.
         if (M.util.js_pending !== 'undefined') {
+            /* global $:false */
             $(document).on("ajaxSend", function (ev, jqxhr, options) {
                 // This is a little nasty - hopefully it stays unique.
                 jqxhr.totaraxhrid = totara_generate_id();

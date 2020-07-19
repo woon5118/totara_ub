@@ -51,6 +51,8 @@ var CSS = {
 M.program = M.program || {};
 var NS = M.program.categoryexpander = M.program.categoryexpander || {};
 
+/* global YUI:false */
+
 /**
  * Set up the category expander.
  *

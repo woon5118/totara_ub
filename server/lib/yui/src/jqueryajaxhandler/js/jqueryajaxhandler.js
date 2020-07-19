@@ -31,6 +31,8 @@ M.core.jqueryajaxhandler = M.core.jqueryajaxhandler || {
             return;
         }
 
+        /* global $:false */
+
         // These need to be kept in sync with those in lib/requirejs/jquery-private.js.
         $(document).on('ajaxSuccess', function (event, response, options) {
             require(['core/jqueryajaxhandler'], function (handler) {
