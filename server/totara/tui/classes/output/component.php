@@ -1,32 +1,44 @@
 <?php
-/*
- * This file is part of Totara Learn
+/**
+ * This file is part of Totara Core
  *
- * Copyright (C) 2019 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
+ * MIT License
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  *
  * @author Simon Chester <simon.chester@totaralearning.com>
- * @package totara_core
+ * @author Sam Hemelryk <sam.hemelryk@totaralearning.com>
+ * @package totara_tui
  */
 
 namespace totara_tui\output;
 
+use coding_exception;
+use moodle_page;
+use renderable;
+
 /**
  * Renderable TUI component
  */
-final class component implements \renderable {
+final class component implements renderable {
     /**
      * @var string Component name
      */
@@ -35,12 +47,7 @@ final class component implements \renderable {
     /**
      * @var array|null Component props
      */
-    private $props = [];
-
-    /**
-     * @var bool
-     */
-    private static $registered = [];
+    private $props;
 
     /**
      * Create a new instance of component
@@ -58,7 +65,6 @@ final class component implements \renderable {
 
     /**
      * Get component name
-     *
      * @return string
      */
     public function get_name(): string {
@@ -67,14 +73,14 @@ final class component implements \renderable {
 
     /**
      * Get component props
-     *
-     * @return array Mapping of prop keys to values
+     * @return array|null Mapping of prop keys to values
      */
     public function get_props(): ?array {
         return $this->props;
     }
 
     /**
+     * Returns true if this component has props
      * @return bool
      */
     public function has_props(): bool {
@@ -82,47 +88,62 @@ final class component implements \renderable {
     }
 
     /**
-     * @throws \coding_exception if there are problems json encoding data for the component.
-     * @return string
+     * Get the props for this component
+     * @return string JSON encoded props string.
+     * @throws coding_exception if there are problems json encoding data for the component.
      */
     public function get_props_encoded(): string {
         if (!$this->has_props()) {
             // If you get here and want to remove this then you must work out and confirm what empty props look like for Vue.
             // It wasn't required during development and it's a bad idea to support something you don't need!
-            throw new \coding_exception('Encoded props requested, but there are no props.');
+            throw new coding_exception('Encoded props requested, but there are no props.');
         }
         $data = json_encode($this->props);
         if ($data === false && json_last_error() !== JSON_ERROR_NONE) {
-            throw new \coding_exception('Invalid component data encountered while attempting to encode a component of type ' . static::class, json_last_error_msg());
+            throw new coding_exception('Invalid component data encountered while attempting to encode a component of type ' . static::class, json_last_error_msg());
         }
         return $data;
     }
 
-    public function register(\moodle_page $page): \moodle_page {
+    /**
+     * Register this component against the given page instance.
+     * @param moodle_page $page
+     * @return moodle_page
+     */
+    public function register(moodle_page $page): moodle_page {
         return self::register_component($this->get_name(), $page);
     }
 
-    public static function register_component(string $name, \moodle_page $page): \moodle_page {
+    /**
+     * Register a Tui component usage by name.
+     * @chainable
+     * @param string $name
+     * @param moodle_page $page
+     * @return moodle_page The page instance passed in as an argument, to make this chainable.
+     * @throws coding_exception If it is too late to register a new component use.
+     */
+    public static function register_component(string $name, moodle_page $page): moodle_page {
         $pos = strpos($name, '/');
         if ($pos !== false) {
             $name = substr($name, 0, $pos);
         }
-        if (!isset(self::$registered[$name])) {
-            if ($page->state >= \moodle_page::STATE_IN_BODY) {
-                throw new \coding_exception('Unable to register component as the header has already been printed.');
+        $framework = self::get_framework($page);
+        if (!$framework->is_component_required($name)) {
+            if ($page->state >= moodle_page::STATE_IN_BODY) {
+                throw new coding_exception('Unable to register component as the header has already been printed.');
             }
-            self::get_framework($page)->require_vue($name);
-            self::$registered[$name] = true;
+            $framework->require_vue($name);
         }
         return $page;
     }
 
     /**
-     * @param \moodle_page $page
-     * @throws \coding_exception
+     * Returns the Tui framework instance associated with the given page instance.
+     * @param moodle_page $page
+     * @throws coding_exception
      * @return framework
      */
-    private static function get_framework(\moodle_page $page): framework {
+    private static function get_framework(moodle_page $page): framework {
         /** @var framework $framework */
         $framework = $page->requires->framework(framework::class);
         return $framework;

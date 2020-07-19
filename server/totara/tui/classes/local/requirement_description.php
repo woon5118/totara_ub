@@ -29,33 +29,34 @@
  * @package totara_tui
  */
 
-require(__DIR__ . '/../../config.php');
+namespace totara_tui\local;
 
-$tc = optional_param('tc', null, PARAM_RAW);
-$component = optional_param('component', null, PARAM_RAW);
+/**
+ * Represents a TUI bundle file for a Totara component
+ */
+final class requirement_description {
 
-$params = [];
-if ($tc !== null) {
-    $params['tc'] = $tc;
+    public $id;
+    public $type;
+    public $component;
+    public $name;
+    public $url;
+
+    public static function from_requirement(requirement $requirement, array $url_options = null) {
+        return new self(
+            $requirement->get_component() . ':' . $requirement->get_name(),
+            $requirement->get_type(),
+            $requirement->get_component(),
+            $requirement->get_name(),
+            $requirement->get_url($url_options)->out(false)
+        );
+    }
+
+    private function __construct(string $id, string $type, string $component, string $name, string $url) {
+        $this->id = $id;
+        $this->type = $type;
+        $this->component = $component;
+        $this->name = $name;
+        $this->url = $url;
+    }
 }
-if ($component !== null) {
-    $params['component'] = $component;
-}
-
-$context = context_system::instance();
-$PAGE->set_context($context);
-$PAGE->set_url('/totara/tui/index.php', $params);
-
-require_login();
-require_capability('moodle/site:config', $context);
-
-$PAGE->set_pagelayout('noblocks');
-$PAGE->set_title(get_string('samples', 'totara_tui'));
-
-// Get data for the page.
-$output = $PAGE->get_renderer('totara_tui');
-$component = \totara_tui\output\framework::vue('samples/pages/Samples');
-
-echo $output->header();
-echo $output->render($component);
-echo $output->footer();

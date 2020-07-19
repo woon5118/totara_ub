@@ -1,11 +1,57 @@
 <?php
+/**
+ * This file is part of Totara Core
+ *
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
+ *
+ * MIT License
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ * @author Simon Chester <simon.chester@totaralearning.com>
+ * @author Sam Hemelryk <sam.hemelryk@totaralearning.com>
+ * @package totara_tui
+ */
 
 namespace totara_tui\local\locator;
 
+use RegexIterator;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use RecursiveRegexIterator;
+use coding_exception;
+use core_useragent;
 use totara_tui\output\framework;
 
+/**
+ * TUI bundle helper class.
+ *
+ * This class knows where to find Tui bundles and how to read the dependencies file produced by the Tui build process.
+ *
+ * At its core a map is produced of all known bundle files, with requests to bundles being served quickly and efficiently
+ * by lookups against the map.
+ */
 final class bundle {
 
+    /**
+     * These suffixes are used at the end of Tui bundle files.
+     */
     private const SUFFIX_PRODUCTION = '';
     private const SUFFIX_PRODUCTION_LEGACY = '.legacy';
     private const SUFFIX_DEVELOPMENT = '.development';
@@ -16,14 +62,39 @@ final class bundle {
      */
     private const SOURCE_DIRECTORY = '/client/build';
 
+    /**
+     * A singleton.
+     * All interaction with bundles is via static methods.
+     * @var bundle
+     */
     private static $instance;
+
+    /** @var bool True once the map has been initialised. */
     private $map_initialised = false;
+
+    /** @var array[] A multidimensional array $map_bundle_js['bundle_name']['suffix'] = $absolute_path_to_js_file  */
     private $map_bundle_js = [];
+    /** @var array[] A multidimensional array $map_bundle_scss['bundle_name']['suffix'] = $absolute_path_to_scss_file  */
     private $map_bundle_scss = [];
+    /**
+     * Maps possible imports paths to the files that should be included to load the bundle.
+     * This is essentially a map or relative file paths (to the client/build dir) to the absolute file path.
+     * A multidimensional array $map_scss_imports['bundle_name']['suffix']['import_path'] = $absolute_path_to_scss_file
+     * @var array[]
+     */
     private $map_scss_imports = [];
-    private $map_vendors_js = null;
+    /** @var string[] An array of vendor files, the key is the suffix, and the value the absolute path for that file. */
+    private $map_vendors_js = [];
+    /**
+     * An array of bundle dependencies. The key is the bundle name, the value is an array of dependencies.
+     * @var array[]
+     */
     private $map_bundle_dependencies = [];
 
+    /**
+     * A map of file suffixes to URL parameters used for the suffix, for caching.
+     * @var string[]
+     */
     private static $map_file_to_param = [
         self::SUFFIX_PRODUCTION => 'p',
         self::SUFFIX_PRODUCTION_LEGACY => 'pl',
@@ -31,53 +102,107 @@ final class bundle {
         self::SUFFIX_DEVELOPMENT_LEGACY => 'dl',
     ];
 
+    /**
+     * Given a bundle name return the JS file that should be included.
+     * If the bundle does not exist, or the bundle has no JS then null is returned.
+     * @param string $bundle
+     * @return string|null
+     */
     public static function get_bundle_js_file(string $bundle): ?string {
         return self::instance()->resolve_bundle_js($bundle);
     }
 
+    /**
+     * Given a bundle name return the SCSS file that should be included.
+     * If the bundle does not exist, or the bundle has no SCSS then null is returned.
+     * @param string $bundle
+     * @return string|null
+     */
     public static function get_bundle_css_file(string $bundle): ?string {
         return self::instance()->resolve_bundle_scss($bundle);
     }
 
+    /**
+     * Given a bundle name return the SCSS file that can be expected to contain variables.
+     * If the bundle does not exist, or the bundle has no SCSS variables then null is returned.
+     * @param string $bundle
+     * @return string|null
+     */
     public static function get_bundle_css_variables_file(string $bundle) {
         return self::instance()->resolve_style_import($bundle, '_variables.scss');
     }
 
+    /**
+     * Returns the path to the vendors file within the Tui build directory.
+     * @return string|null
+     */
     public static function get_vendors_file(): ?string {
         return self::instance()->resolve_vendor_js();
     }
 
-    public static function get_style_scss_file($bundle, $importpath): ?string {
+    /**
+     * Returns the path to the SCSS file to import. Null if it cannot be resolved.
+     * @param string $bundle
+     * @param string $importpath
+     * @return string|null
+     */
+    public static function get_style_import(string $bundle, string $importpath): ?string {
         return self::instance()->resolve_style_import($bundle, $importpath);
     }
 
-    public static function get_bundle_dependencies($bundle): array {
+    /**
+     * Returns any dependencies the given bundle has.
+     * @param string $bundle
+     * @return string[] An array of bundle names that the given bundle is dependent upon.
+     */
+    public static function get_bundle_dependencies(string $bundle): array {
         return self::instance()->resolve_bundle_dependencies($bundle);
     }
 
+    /**
+     * Resets the singleton instance.
+     */
     public static function reset() {
         self::$instance = null;
     }
 
-    private static function instance() {
+    /**
+     * Returns a singleton of this class.
+     * @return bundle
+     */
+    private static function instance(): bundle {
         if (self::$instance === null) {
             self::$instance = new self;
         }
         return self::$instance;
     }
 
+    /**
+     * Private constructor. Use self::instance();
+     */
     private function __construct() {
         // Static methods only.
     }
 
+    /**
+     * Returns the directory that a bundle should exist in.
+     * @param string $bundle
+     * @return string
+     * @throws coding_exception If the bundle name given is not valid.
+     */
     private static function anticipated_bundle_location(string $bundle): string {
         global $CFG;
-        if ($bundle !== clean_param($bundle, PARAM_SAFEDIR)) {
-            throw new \coding_exception('Invalid bundle name provided.');
+        if ($bundle !== framework::clean_bundle_name($bundle)) {
+            throw new coding_exception('Invalid bundle name provided.');
         }
         return $CFG->srcroot . self::SOURCE_DIRECTORY . DIRECTORY_SEPARATOR . $bundle;
     }
 
+    /**
+     * Given a bundle name resolve the JS file location.
+     * @param string $bundle
+     * @return string|null
+     */
     private function resolve_bundle_js(string $bundle): ?string {
         $this->ensure_map_generated();
         foreach (self::get_js_suffix_for_file() as $suffix) {
@@ -88,6 +213,11 @@ final class bundle {
         return null;
     }
 
+    /**
+     * Given a bundle name resolve the CSS file location.
+     * @param string $bundle
+     * @return string|null
+     */
     private function resolve_bundle_scss(string $bundle): ?string {
         $this->ensure_map_generated();
         foreach (self::get_css_suffix_for_file() as $suffix) {
@@ -98,6 +228,11 @@ final class bundle {
         return null;
     }
 
+    /**
+     * Resolve the vendor JS file location.
+     * @return string|null
+     * @throws coding_exception
+     */
     private function resolve_vendor_js(): ?string {
         $this->ensure_map_generated();
         foreach (self::get_js_suffix_for_file() as $suffix) {
@@ -108,16 +243,27 @@ final class bundle {
         return null;
     }
 
-    private function resolve_style_import(string $bundle, string $import) {
+    /**
+     * Resolves the SCSS file that should be imported, given the bundle name, and the import path.
+     * @param string $bundle
+     * @param string $importpath
+     * @return string|null Absolute path to the file to import, or null if cannot be resolved.
+     */
+    private function resolve_style_import(string $bundle, string $importpath): ?string {
         $this->ensure_map_generated();
         foreach (self::get_css_suffix_for_file() as $suffix) {
-            if (isset($this->map_scss_imports[$bundle][$suffix][$import])) {
-                return $this->map_scss_imports[$bundle][$suffix][$import];
+            if (isset($this->map_scss_imports[$bundle][$suffix][$importpath])) {
+                return $this->map_scss_imports[$bundle][$suffix][$importpath];
             }
         }
         return null;
     }
 
+    /**
+     * Return the given bundles dependencies.
+     * @param string $bundle
+     * @return string[] 0..n bundle names that the given bundle is dependent upon.
+     */
     private function resolve_bundle_dependencies(string $bundle): array {
         $this->ensure_map_generated();
         if (isset($this->map_bundle_dependencies[$bundle])) {
@@ -126,16 +272,26 @@ final class bundle {
         return [];
     }
 
-    public static function get_js_suffix_for_url() {
+    /**
+     * Returns the suffix that should be used in the URL when requesting JS for a bundle.
+     * @return string
+     */
+    public static function get_js_suffix_for_url(): string {
         $suffixes = self::get_js_suffix_for_file();
         $suffix = reset($suffixes);
         return self::$map_file_to_param[$suffix];
     }
 
-    private static function get_js_suffix_for_file() {
+    /**
+     * Return the suffixes that should be checked when resolving the JS file to serve for a bundle.
+     * Multiple suffixes are supported to ensure that if the preferred suffix is not available then a suitable alternative
+     * is provided.
+     * @return string[]
+     */
+    private static function get_js_suffix_for_file(): array {
         $suffixes = [];
         $development = self::is_javascript_development();
-        $legacy = \core_useragent::is_ie();
+        $legacy = core_useragent::is_ie();
 
         if ($legacy) {
             if ($development) {
@@ -153,26 +309,33 @@ final class bundle {
         return $suffixes;
     }
 
-    public static function get_css_suffix_for_url() {
-        $suffixes = self::get_css_suffix_for_file();
-        $suffix = reset($suffixes);
-        return self::$map_file_to_param[$suffix];
+    /**
+     * Returns the suffix that should be used in the URL when requesting SCSS for a bundle.
+     * @return string
+     */
+    public static function get_css_suffix_for_url(): string {
+        if (\core_useragent::is_ie()) {
+            if (self::is_css_development()) {
+                return self::$map_file_to_param[self::SUFFIX_DEVELOPMENT_LEGACY];
+            }
+            return self::$map_file_to_param[self::SUFFIX_PRODUCTION_LEGACY];
+        }
+        if (self::is_css_development()) {
+            return self::$map_file_to_param[self::SUFFIX_DEVELOPMENT];
+        }
+        return self::$map_file_to_param[self::SUFFIX_PRODUCTION];
     }
 
-    private static function get_css_suffix_for_file($preferred_only = false) {
+    /**
+     * Return the suffixes that should be checked when resolving the SCSS file to serve for a bundle.
+     * Multiple suffixes are supported to ensure that if the preferred suffix is not available then a suitable alternative
+     * is provided.
+     * @param bool $preferred_only
+     * @return string[]
+     */
+    private static function get_css_suffix_for_file(bool $preferred_only = false): array {
         $suffixes = [];
-        $development = self::is_css_development();
-        $legacy = \core_useragent::is_ie();
-
-        if ($legacy) {
-            if ($development) {
-                $suffixes[] = self::SUFFIX_DEVELOPMENT_LEGACY;
-            }
-            $suffixes[] = self::SUFFIX_PRODUCTION_LEGACY;
-            return $suffixes;
-        }
-
-        if ($development) {
+        if (self::is_css_development()) {
             $suffixes[] = self::SUFFIX_DEVELOPMENT;
         }
         $suffixes[] = self::SUFFIX_PRODUCTION;
@@ -200,6 +363,10 @@ final class bundle {
         return 1;
     }
 
+    /**
+     * Determine the correct CSS revision to use for this load.
+     * @return int
+     */
     public static function get_css_rev() {
         if (empty(get_config('totara_tui', 'cache_scss'))) {
             return -1;
@@ -207,14 +374,31 @@ final class bundle {
         return theme_get_revision();
     }
 
-    private static function is_javascript_development() {
+     /**
+      * Returns true if Tui is in JS development mode.
+      * @return bool
+      */
+     private static function is_javascript_development(): bool {
+        if (during_initial_install()) {
+            return false;
+        }
         return (bool)get_config('totara_tui', 'development_mode');
     }
 
-    private static function is_css_development() {
+     /**
+      * Returns true if Tui is in CSS development mode.
+      * @return bool
+      */
+     private static function is_css_development(): bool {
+        if (during_initial_install()) {
+            return false;
+        }
         return (bool)get_config('totara_tui', 'development_mode');
     }
 
+    /**
+     * Checks to make sure the map has been generated, and if not triggers its generation.
+     */
     private function ensure_map_generated() {
         global $CFG;
 
@@ -235,7 +419,7 @@ final class bundle {
 
         $directory = $CFG->srcroot . self::SOURCE_DIRECTORY;
         if (!is_readable($directory) || !is_dir($directory)) {
-            throw new \coding_exception('Unable to read bundle directory');
+            throw new coding_exception('Unable to read bundle directory');
         }
         $directory_iterator = new \DirectoryIterator($directory);
         foreach ($directory_iterator as $file) {
@@ -255,6 +439,10 @@ final class bundle {
         }
     }
 
+    /**
+     * Populates the map properties for the given bundle.
+     * @param string $bundle
+     */
     private function map_bundle(string $bundle) {
         $imports = [];
         foreach (array_keys(self::$map_file_to_param) as $suffix) {
@@ -263,54 +451,98 @@ final class bundle {
 
         $directory_build = self::anticipated_bundle_location($bundle);
         if (!file_exists($directory_build) || !is_readable($directory_build)) {
-            return $imports;
+            return;
         }
-
-        $iterator = new \RegexIterator(
-            new \RecursiveIteratorIterator(
-                new \RecursiveDirectoryIterator($directory_build),
-                \RecursiveIteratorIterator::SELF_FIRST
-            ),
-            '/^.+?(?<suffix>(.legacy)?\.development)?(?<extension>\.(scss|js|json))$/',
-            \RecursiveRegexIterator::GET_MATCH
-        );
+        $iterator = $this->get_tui_build_directory_iterator($directory_build);
         $length_directory_styles = strlen($directory_build) + 1;
 
         foreach ($iterator as $fileinfo) {
             $file_absolute = $fileinfo[0];
             $file_extension = $fileinfo['extension'];
             $file_suffix = $fileinfo['suffix'];
-            $file_basename = basename($file_absolute);
             $file_relative = substr($file_absolute, $length_directory_styles, -(strlen($file_suffix . $file_extension))) . $file_extension;
 
             switch ($file_extension) {
                 case '.scss':
-                    if (strpos($file_relative, 'styles/') === 0) {
-                        $file_relative = substr($file_relative, strlen('styles/'));
-                        $this->map_scss_imports[$bundle][$file_suffix][$file_relative] = $file_absolute;
-                    } else if ($file_relative === 'tui_bundle.scss') {
-                        $this->map_bundle_scss[$bundle][$file_suffix] = $file_absolute;
-                    } else {
-                        debugging('Unable to map SCSS file ' . $file_absolute, DEBUG_DEVELOPER);
-                    }
+                    $this->add_bundle_scss_file_to_map($bundle, $file_suffix, $file_relative, $file_absolute);
                     break;
                 case '.js':
-                    if ($bundle === framework::COMPONENT && $file_relative === 'vendors.js') {
-                        $this->map_vendors_js[$file_suffix] = $file_absolute;
-                        break;
-                    }
-                    $this->map_bundle_js[$bundle][$file_suffix] = $file_absolute;
+                    $this->add_bundle_js_file_to_map($bundle, $file_suffix, $file_relative, $file_absolute);
                     break;
                 case '.json':
-                    if ($file_relative === 'dependencies.json') {
-                        $this->map_bundle_dependencies[$bundle] = [];
-                        $json = file_get_contents($file_absolute);
-                        $data = @json_decode($json);
-                        foreach ($data->dependencies as $dependency) {
-                            $this->map_bundle_dependencies[$bundle][] = $dependency->name;
-                        }
-                    }
+                    $this->add_bundle_json_file_to_map($bundle, $file_suffix, $file_relative, $file_absolute);
                     break;
+            }
+        }
+    }
+
+    /**
+     * Returns an Iterator that is designed to iterate all Tui related files within a given directory.
+     * @param string $directory
+     * @return RegexIterator
+     */
+    private function get_tui_build_directory_iterator(string $directory): RegexIterator {
+        $iterator = new RegexIterator(
+            new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($directory),
+                RecursiveIteratorIterator::SELF_FIRST
+            ),
+            '/^.+?(?<suffix>(\.legacy)?(\.development)?)?(?<extension>\.(scss|js|json))$/',
+            RecursiveRegexIterator::GET_MATCH
+        );
+        return $iterator;
+    }
+
+    /**
+     * Adds a given JS file into the map in the right place.
+     * @param string $bundle
+     * @param string $suffix
+     * @param string $path_relative
+     * @param string $path_absolute
+     */
+    private function add_bundle_js_file_to_map(string $bundle, string $suffix, string $path_relative, string $path_absolute) {
+        if ($bundle === framework::COMPONENT && $path_relative === 'vendors.js') {
+            $this->map_vendors_js[$suffix] = $path_absolute;
+        } else {
+            $this->map_bundle_js[$bundle][$suffix] = $path_absolute;
+        }
+    }
+
+    /**
+     * Adds a given SCSS file into the map in the right place.
+     * @param string $bundle
+     * @param string $suffix
+     * @param string $path_relative
+     * @param string $path_absolute
+     */
+    private function add_bundle_scss_file_to_map(string $bundle, string $suffix, string $path_relative, string $path_absolute) {
+        if (strpos($path_relative, 'styles/') === 0) {
+            $path_relative = substr($path_relative, strlen('styles/'));
+            $this->map_scss_imports[$bundle][$suffix][$path_relative] = $path_absolute;
+        } else if ($path_relative === 'tui_bundle.scss') {
+            $this->map_bundle_scss[$bundle][$suffix] = $path_absolute;
+        } else {
+            debugging('Unable to map SCSS file ' . $path_absolute, DEBUG_DEVELOPER);
+        }
+    }
+
+    /**
+     * Adds a given JSON file into the map in the right place.
+     * @param string $bundle
+     * @param string $suffix
+     * @param string $path_relative
+     * @param string $path_absolute
+     */
+    private function add_bundle_json_file_to_map(string $bundle, string $suffix, string $path_relative, string $path_absolute) {
+        if ($path_relative === 'dependencies.json') {
+            $this->map_bundle_dependencies[$bundle] = [];
+            $json = file_get_contents($path_absolute);
+            $data = @json_decode($json);
+            if (empty($data) || empty($data->dependencies)) {
+                return;
+            }
+            foreach ($data->dependencies as $dependency) {
+                $this->map_bundle_dependencies[$bundle][] = $dependency->name;
             }
         }
     }

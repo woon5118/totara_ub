@@ -169,7 +169,7 @@ class page_requirements_manager {
     protected $jquerypluginoverrides = array();
 
     /**
-     * @var \core\output\framework_manager[]
+     * @var \core\output\framework[]
      */
     private $frameworks = [];
 
@@ -343,8 +343,8 @@ require(['core/autoinitialise'], function(ai) {
 
     private function get_frameworks() {
         $instances = [];
-        foreach (\core_component::get_namespace_classes('output', \core\output\framework_manager::class) as $class) {
-            /** @var \core\output\framework_manager $class */
+        foreach (\core_component::get_namespace_classes('output', \core\output\framework::class) as $class) {
+            /** @var \core\output\framework $class */
             $instance = $class::new_instance($this);
             $instances[get_class($instance)] = $instance;
         }
@@ -1205,7 +1205,12 @@ require(['core/autoinitialise'], function(ai) {
         $this->yuicssmodules = $modules;
     }
 
-    public function framework(string $name): \core\output\framework_manager {
+    /**
+     * @param string $name
+     * @return \core\output\framework
+     * @throws coding_exception If the requested framework is not known to the page requirements manager.
+     */
+    public function framework(string $name): \core\output\framework {
         if (!isset($this->frameworks[$name])) {
             throw new \coding_exception('Unknown output framework requirements manager requested.', $name);
         }
@@ -1680,7 +1685,7 @@ require(['core/autoinitialise'], function(ai) {
         $this->init_requirements_data($page, $renderer);
 
         foreach ($this->frameworks as $manager) {
-            $manager->hook_get_head_code($page, $renderer);
+            $manager->get_head_code($page, $renderer);
         }
 
         $output = '';

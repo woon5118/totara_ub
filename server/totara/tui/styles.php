@@ -1,13 +1,43 @@
 <?php
+/**
+ * This file is part of Totara Core
+ *
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
+ *
+ * MIT License
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ * @author Simon Chester <simon.chester@totaralearning.com>
+ * @author Sam Hemelryk <sam.hemelryk@totaralearning.com>
+ * @package totara_tui
+ */
 
-//define('NO_DEBUG_DISPLAY', true);
+// Disable debug messages and any errors in output, comment out when debugging or look into error log!
+define('NO_DEBUG_DISPLAY', true);
+// We need just the values from config.php and minlib.php if we have the CSS cached already.
 define('ABORT_AFTER_CONFIG', true);
 
 require('../../config.php');
 require_once($CFG->dirroot.'/lib/csslib.php');
 
 // Defaults
-$option_svg = true;
 $option_rtl = false;
 
 $slasharguments = min_get_slash_argument();
@@ -46,7 +76,6 @@ $rev = (int)min_clean_param($rev, 'INT');
 $component = min_clean_param($component, 'SAFEDIR');
 $suffix = min_clean_param($suffix, 'SAFEDIR');
 $option_rtl = ($option_rtl === 'rtl');
-$option_svg = (bool)$option_svg;
 
 if (file_exists("{$CFG->dirroot}/theme/{$themename}/config.php")) {
     // The theme exists in standard location - ok.
@@ -57,9 +86,8 @@ if (file_exists("{$CFG->dirroot}/theme/{$themename}/config.php")) {
 }
 
 if ($rev !== -1) {
-
     $cachefile = get_cachefile($rev, $themename, $component, $suffix);
-    $etag = get_etag($rev, $themename, $component, $suffix, $option_svg, $option_rtl);
+    $etag = get_etag($rev, $themename, $component, $suffix, $option_rtl);
     if (file_exists($cachefile)) {
         if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) || !empty($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
             // We do not actually need to verify the etag value because our files
@@ -80,12 +108,14 @@ require("$CFG->dirroot/lib/setup.php");
 
 // Revision is in the URL just to facilitate caching, we don't actually trust it.
 $rev = \totara_tui\local\locator\bundle::get_css_rev();
-$suffix = \totara_tui\local\locator\bundle::get_css_suffix_for_url(true);
+$suffix = \totara_tui\local\locator\bundle::get_css_suffix_for_url();
 
-$theme = \totara_tui\local\theme::load($themename);
-$theme->force_svg_use($option_svg);
+$theme = \totara_tui\local\theme_config::load($themename);
+$theme->force_svg_use(true);
 $theme->set_rtl_mode($option_rtl);
-$theme->set_legacy_browser(strpos($suffix, 'legacy') !== false);
+if (core_useragent::is_ie()) {
+    $theme->set_legacy_browser(true);
+}
 
 if ($rev === -1) {
     // No caching flies in this content.
@@ -93,7 +123,7 @@ if ($rev === -1) {
     css_send_uncached_css($csscontent);
 }
 
-$etag = get_etag($rev, $themename, $component, $suffix, $option_svg, $option_rtl);
+$etag = get_etag($rev, $themename, $component, $suffix, $option_rtl);
 make_localcache_directory('totara_tui', false);
 
 // Make sure that only one client is generating CSS at a time.
@@ -124,18 +154,35 @@ if ($lock) {
 // Real browsers - this is the expected result!
 css_send_cached_css_content($csscontent, $etag);
 
-function get_etag($rev, $themename, $component, $suffix, $option_svg, $option_rtl) {
+/**
+ * Generate a etag for the CSS file.
+ * @param string $rev
+ * @param string $themename
+ * @param string $component
+ * @param string $suffix
+ * @param bool $option_rtl
+ * @return string
+ */
+function get_etag($rev, $themename, $component, $suffix, $option_rtl) {
     $etag = sha1(join('-', [
+        'tui',
         $rev,
         $themename,
         $component,
         $suffix,
-        ($option_svg) ? 'svg' : 'nosvg',
         ($option_rtl) ? 'rtl' : 'ltr',
     ]));
     return $etag;
 }
 
+/**
+ * Gets the name for the cache files
+ * @param string $rev
+ * @param string $themename
+ * @param string $component
+ * @param string $suffix
+ * @return string
+ */
 function get_cachefile($rev, $themename, $component, $suffix) {
     global $CFG;
     $cachefile = join('-', [
