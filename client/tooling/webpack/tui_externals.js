@@ -37,6 +37,11 @@ module.exports = function tuiExternals() {
         nativeResolve = true;
       }
 
+      // allow babel runtime through
+      if (/^@babel[/\\]/.test(request)) {
+        nativeResolve = true;
+      }
+
       if (resolveStaticAlias(request)) {
         nativeResolve = true;
       }

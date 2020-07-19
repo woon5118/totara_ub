@@ -20,11 +20,19 @@ module.exports = {
   legacy: {
     presets: ['@babel/preset-env'],
     plugins: [
-      require('../babel/disallow-syntax'),
+      // require('../babel/disallow-syntax'),
       [
-        'transform-async-to-promises',
+        '@babel/plugin-transform-runtime',
         {
-          inlineHelpers: true,
+          regenerator: true,
+        },
+      ],
+      [
+        '@babel/plugin-transform-regenerator',
+        {
+          asyncGenerators: false,
+          generators: false,
+          async: true,
         },
       ],
     ],
