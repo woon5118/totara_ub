@@ -28,6 +28,11 @@
  * This aids in security as it is outside of the webroot and should not be accessible via the web.
  */
 
+// Describe types of all globals here to help editor autocompletion.
+/** @var core_config $CFG */
+/** @var moodle_database $DB */
+/** @var moodle_page $PAGE */
+
 require_once(__DIR__ . '/lib/init.php');
 $CFG = \core\internal\config::initialise();
 require(__DIR__ . DIRECTORY_SEPARATOR . 'lib/setup.php');

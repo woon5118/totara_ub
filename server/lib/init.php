@@ -33,7 +33,9 @@ namespace core\internal {
 
         public const INITIALISED = 'TOTARA_READY_FOR_SETUP';
 
-        public static function initialise(?callable $config_resolver = null): \stdClass {
+        public static function initialise(?callable $config_resolver = null): \core_config {
+            require_once(__DIR__ . '/classes/config.php'); // Cannot use class loader yet.
+
             $loader = function (string $config_file): \stdClass {
 
                 // This is needed as config.php files used to declare $CFG as global.
@@ -46,6 +48,7 @@ namespace core\internal {
                 // There is no global here. Very intentionally.
                 // We define a new $CFG object that the config.php file will alter.
                 // But we do so without making it the global. The calling script can choose an appropriate time to make it global.
+                // Do not use the core_config class here yet, they can still annotate the $CFG in /config.php manually.
                 $CFG = new \stdClass;
                 if (!file_exists($config_file)) {
                     // Uncomment me if you need to identify the config.php that is being looked for.
@@ -70,8 +73,12 @@ namespace core\internal {
                     return $loader($config_file);
                 };
             }
-            $cfg = $config_resolver($config_file, $loader);
-            self::adjust_for_behat($cfg);
+            $rawcfg = $config_resolver($config_file, $loader);
+            self::adjust_for_behat($rawcfg);
+
+            // Create a fresh new config class and reapply all properties.
+            $cfg = new \core_config($rawcfg);
+
             self::initialise_environment();
             self::establish_defines();
             self::set_paths($cfg);
@@ -106,7 +113,7 @@ namespace core\internal {
             return $cfg;
         }
 
-        private static function set_paths(\stdClass $cfg) {
+        private static function set_paths(\core_config $cfg) {
             // Available in all releases.
             $cfg->dirroot = realpath(__DIR__ . '/../.');
             // TOTARA: Available since Totara 13 when we moved source code into the server directory.
@@ -139,9 +146,9 @@ namespace core\internal {
 
         /**
          * Make sure forbidden settings are disabled, but keep them to maintain compatibility with Moodle 3.2 and later.
-         * @param \stdClass $cfg
+         * @param \core_config $cfg
          */
-        private static function force_settings(\stdClass $cfg) {
+        private static function force_settings(\core_config $cfg) {
             $cfg->admin = 'admin'; // Custom admin directory not supported!
             $cfg->slasharguments = '1'; // Cannot be disabled any more, admin must fix web server configuration if necessary.
             $cfg->loginhttps = '0'; // This setting was removed, use https:// in $cfg->wwwroot instead.
@@ -150,7 +157,7 @@ namespace core\internal {
             $cfg->formatstringstriptags = '1'; // Enforced for security reasons, course and activity titles must not have any html tags in them!
         }
 
-        private static function defaults(\stdClass $cfg) {
+        private static function defaults(\core_config $cfg) {
 
             // File permissions on created directories in the $cfg->dataroot
             if (!isset($cfg->directorypermissions)) {
@@ -216,13 +223,11 @@ namespace core\internal {
             $cfg->yuipatchedmodules = [];
 
             // Store settings from config.php in array in $cfg - we can use it later to detect problems and overrides.
-            if (!isset($cfg->config_php_settings)) {
-                $cfg->config_php_settings = (array)$cfg;
-                // Forced plugin settings override values from config_plugins table.
-                unset($cfg->config_php_settings['forced_plugin_settings']);
-                if (!isset($cfg->forced_plugin_settings)) {
-                    $cfg->forced_plugin_settings = array();
-                }
+            $cfg->config_php_settings = (array)$cfg;
+            // Forced plugin settings override values from config_plugins table.
+            unset($cfg->config_php_settings['forced_plugin_settings']);
+            if (!isset($cfg->forced_plugin_settings)) {
+                $cfg->forced_plugin_settings = array();
             }
 
             if (isset($cfg->debug)) {
@@ -442,14 +447,14 @@ namespace core\internal {
             }
         }
 
-        private static function finalise(\stdClass $cfg) {
+        private static function finalise(\core_config $cfg) {
             umask($cfg->umaskpermissions);
 
             // core_component can be used in any scripts, it does not need anything else.
             require_once($cfg->libdir . '/classes/component.php');
         }
 
-        private static function validate_environment(\stdClass $cfg) {
+        private static function validate_environment(\core_config $cfg) {
             // Sometimes people use different PHP binary for web and CLI, make 100% sure they have the supported PHP version.
             if (version_compare(PHP_VERSION, '7.2.10') < 0) {
                 $phpversion = PHP_VERSION;
