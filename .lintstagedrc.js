@@ -17,14 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Simon Chester <simon.chester@totaralearning.com>
- * @package totara_core
  */
-
-var patterns = require('./totara/core/tui/scripts/lib/patterns');
+var patterns = require('./client/scripts/lib/patterns');
 
 var lintCommands = [
-  'node ./totara/core/tui/scripts/tasks/lint.js',
-  'node ./totara/core/tui/scripts/tasks/prettier.js --write',
+  'node ./client/scripts/tasks/lint.js',
+  'node ./client/scripts/tasks/prettier.js --write',
   'git add'
 ];
 

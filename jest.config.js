@@ -22,4 +22,4 @@
 
 /* Switch eslint config environment to 'node' to prevent 'module' definition error */
 /* eslint-env node */
-module.exports = require('./totara/core/tui/scripts/configs/jest.config');
+module.exports = require('./client/scripts/configs/jest.config');

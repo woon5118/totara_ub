@@ -1,0 +1,7 @@
+server/
+libraries/
+dev/
+test/
+client/build/
+node_modules/
+vendor/

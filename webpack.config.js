@@ -17,12 +17,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Simon Chester <simon.chester@totaralearning.com>
- * @package totara_core
  */
 
 /* Switch eslint config environment to 'node' to prevent 'module' definition error */
 /* eslint-env node */
-const config = require('./totara/core/tui/scripts/configs/webpack.config');
+const config = require('./client/scripts/configs/webpack.config');
 module.exports = function(env, argv = {}) {
     return config({
         mode: argv.mode,

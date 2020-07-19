@@ -17,13 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Simon Chester <simon.chester@totaralearning.com>
- * @package totara_core
  */
 
 /* Switch eslint config environment to 'node' to prevent 'module' definition error */
 /* eslint-env node */
 
-const babelConfigs = require('./totara/core/tui/scripts/configs/babel');
+const babelConfigs = require('./client/scripts/configs/babel');
 
 module.exports = api => {
     const isTest = api.env('test');
