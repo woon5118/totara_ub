@@ -126,7 +126,7 @@ module.exports = function(grunt) {
     var inAMD = path.basename(cwd) == 'amd';
 
     // Globbing pattern for matching all AMD JS source files.
-    var amdSrc = [inAMD ? cwd + '/src/*.js' : '**/amd/src/*.js'];
+    var amdSrc = [inAMD ? cwd + '/src/*.js' : cwd + '/**/amd/src/*.js'];
 
     // Non AMD JS which still needs to uglify through grunt
     var independentSrc = [
@@ -723,13 +723,6 @@ module.exports = function(grunt) {
         });
     };
 
-    tasks.watchAll = makeCommandTask(['npm', 'run', 'watch-all']);
-    tasks.tuiProd = makeCommandTask(['npm', 'run', 'tui-prod']);
-    tasks.tuiDev = makeCommandTask(['npm', 'run', 'tui-dev']);
-    tasks.tuiWatch = makeCommandTask(['npm', 'run', 'tui-watch']);
-    tasks.format = makeCommandTask(['node', './totara/core/tui/scripts/tasks/prettier.js', '--write']);
-    tasks.checkFormat = makeCommandTask(['node', './totara/core/tui/scripts/tasks/prettier.js', '--check']);
-
     tasks.startup = function() {
         // Are we in a YUI directory?
         if (path.basename(path.resolve(cwd, '../../')) == 'yui') {
@@ -739,7 +732,6 @@ module.exports = function(grunt) {
             grunt.task.run('amd');
         } else {
             // Run them all!.
-            grunt.task.run('check-format');
             grunt.task.run('css');
             grunt.task.run('js');
             grunt.task.run('gherkinlint');
@@ -783,14 +775,10 @@ module.exports = function(grunt) {
     grunt.registerTask('format', 'Run prettier to reformat files', tasks.format);
     grunt.registerTask('prettier', 'Alias of "format" task', tasks.format);
     grunt.registerTask('ignorefiles', 'Generate ignore files for linters', tasks.ignorefiles);
-    grunt.registerTask('watch-all', 'Watch grunt and webpack compiled files for changes', tasks.watchAll);
-    grunt.registerTask('check-format', 'Run format with check option to check for violations', tasks.checkFormat);
+    grunt.registerTask('watch-all', 'Watch grunt', tasks.watchAll);
     grunt.registerTask('yui', ['eslint:yui', 'shifter']);
     grunt.registerTask('amd', ['eslint:amd', 'uglify']);
-    grunt.registerTask('tui-prod', '', tasks.tuiProd);
-    grunt.registerTask('tui-dev', '', tasks.tuiDev);
-    grunt.registerTask('tui-watch', '', tasks.tuiWatch);
-    grunt.registerTask('js', ['amd', 'yui', 'tui-prod']);
+    grunt.registerTask('js', ['amd', 'yui']);
 
     // Register CSS taks.
     grunt.registerTask('css', [
