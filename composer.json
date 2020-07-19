@@ -1,0 +1,10 @@
+{
+  "name": "totara/totara_meta",
+  "description": "Totara is a fully supported Open Source learning platform specifically designed for the requirements of corporate, industry and vocational training.",
+  "license": "proprietary",
+  "type": "metapackage",
+  "homepage": "https://www.totaralearning.com",
+  "require": {
+    "php": ">=7.2.10 <7.5"
+  }
+}

@@ -1,8 +1,8 @@
 {
   "name": "totara/totara_phpunit",
-  "description": "Totara is a fully supported Open Source learning platform specifically designed for the requirements of corporate, industry and vocational training.",
-  "license": "proprietary",
-  "type": "project",
+  "description": "Totara PHPUnit related code",
+  "license": "GPL-3.0-or-later",
+  "type": "library",
   "homepage": "https://www.totaralearning.com",
   "require-dev": {
     "phpunit/phpunit": "8.5.*",
