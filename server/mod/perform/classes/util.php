@@ -201,7 +201,7 @@ class util {
         return activity_entity::repository()->find_by_subject_user_id(...$participation_manageable_users)->map_to(activity::class);
     }
 
-    protected static function has_manage_all_participants_capability(int $user_id): bool {
+    public static function has_manage_all_participants_capability(int $user_id): bool {
         $user_context = context_user::instance($user_id);
 
         return has_capability('mod/perform:manage_all_participation', $user_context, $user_id);

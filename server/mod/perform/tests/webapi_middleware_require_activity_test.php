@@ -27,6 +27,7 @@ use core\webapi\execution_context;
 use core\webapi\resolver\payload;
 use core\webapi\resolver\result;
 use mod_perform\activity_access_denied_exception;
+use mod_perform\entities\activity\subject_instance;
 use mod_perform\webapi\middleware\require_activity;
 use mod_perform\models\activity\notification as notification_model;
 
@@ -265,6 +266,68 @@ class mod_perform_webapi_middleware_require_activity_testcase extends advanced_t
         require_activity::by_notification_id($id_key, true)
             ->handle($composite_key_payload, $next);
     }
+
+    /**
+     * @covers ::by_subject_instance_ids
+     * @covers ::handle
+     */
+    public function test_require_by_subject_instance_ids(): void {
+        $this->setAdminUser();
+        // Create 2 activities with 2 users each.
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        $config = mod_perform_activity_generator_configuration::new()
+            ->set_number_of_activities(2)
+            ->set_number_of_users_per_user_group_type(2);
+
+        [$activity1, $activity2] = $generator->create_full_activities($config)->all();
+
+        $activity1_subject_instance_ids = subject_instance::repository()
+            ->filter_by_activity_id($activity1->id)
+            ->get()
+            ->pluck('id');
+        $activity2_subject_instance_ids = subject_instance::repository()
+            ->filter_by_activity_id($activity2->id)
+            ->get()
+            ->pluck('id');
+
+        $expected = 34324;
+        $next = function (payload $payload) use ($expected): result {
+            return new result($expected);
+        };
+        $context = execution_context::create('dev');
+
+        $id_key = 'abc';
+        $single_key_args = [$id_key => $activity1_subject_instance_ids];
+        $single_key_payload = payload::create($single_key_args, $context);
+
+        $result = require_activity::by_subject_instance_ids($id_key, false)
+            ->handle($single_key_payload, $next);
+
+        $this->assertEquals($expected, $result->get_data());
+        $this->assertFalse($context->has_relevant_context());
+
+        // Test with composite key.
+        $root_key = 'xyz';
+        $composite_key_args = [$root_key => $single_key_args];
+        $composite_key_payload = payload::create($composite_key_args, $context);
+
+        $result = require_activity::by_subject_instance_ids("$root_key.$id_key", true)
+            ->handle($composite_key_payload, $next);
+
+        $this->assertEquals($expected, $result->get_data());
+        $this->assertTrue($context->has_relevant_context());
+        $this->assertEquals($activity1->get_context()->id, $context->get_relevant_context()->id);
+
+        // Test with mixed subject_instances.
+        $id_key = 'abc';
+        $single_key_args = [$id_key => array_merge($activity1_subject_instance_ids, $activity2_subject_instance_ids)];
+        $single_key_payload = payload::create($single_key_args, $context);
+        $this->expectException(invalid_parameter_exception::class);
+        $this->expectExceptionMessage('All subject instances must belong to the same activity');
+        require_activity::by_subject_instance_ids($id_key, false)
+            ->handle($single_key_payload, $next);
+    }
+
 
     /**
      * Generates test data.

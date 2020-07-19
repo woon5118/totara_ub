@@ -24,19 +24,18 @@
 namespace mod_perform\webapi\middleware;
 
 use Closure;
-use context_course;
 use core\orm\query\exceptions\record_not_found_exception;
 use invalid_parameter_exception;
 use core\webapi\middleware;
 use core\webapi\resolver\payload;
 use core\webapi\resolver\result;
+use mod_perform\entities\activity\subject_instance;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\notification;
 use mod_perform\models\activity\helpers\access_checks;
 use mod_perform\models\activity\section;
 use mod_perform\models\activity\track;
 use moodle_exception;
-use require_login_exception;
 
 /**
  * Interceptor that uses activity related data in the incoming graphql payload
@@ -167,17 +166,45 @@ class require_activity implements middleware {
         return new require_activity($retriever, $set_relevant_context);
     }
 
+    public static function by_subject_instance_ids(
+        string $payload_keys,
+        bool $set_relevant_context = false
+    ): require_activity {
+        $retriever = function (payload $payload) use ($payload_keys): activity {
+            $subject_instance_ids = self::get_payload_value($payload_keys, $payload);
+
+            /** @var subject_instance[] $subject_instances */
+            $subject_instances = subject_instance::repository()
+                ->where('id', $subject_instance_ids)
+                ->with('track.activity')
+                ->get()
+                ->all();
+
+            $activity = $subject_instances[0]->activity();
+
+            foreach ($subject_instances as $subject_instance) {
+                if ($subject_instance->activity()->id !== $activity->id) {
+                    throw new invalid_parameter_exception('All subject instances must belong to the same activity');
+                }
+            }
+
+            return new activity($activity);
+        };
+
+        return new require_activity($retriever, $set_relevant_context);
+    }
+
     /**
-     * Returns an id extracted from the incoming payload.
+     * Returns a value extracted from the incoming payload.
      *
      * @param string $payload_keys the keys in the payload to use to extract the
-     *        id from the payload. For example if the keys are "a.b.c", then the
-     *        id is retrieved as $payload['a']['b']['c'].
+     *        value from the payload. For example if the keys are "a.b.c", then the
+     *        value is retrieved as $payload['a']['b']['c'].
      * @param payload $payload the incoming payload to parse.
      *
-     * @return id the extracted ID.
+     * @return mixed the extracted value.
      */
-    private static function get_id(string $payload_keys, payload $payload): int {
+    private static function get_payload_value(string $payload_keys, payload $payload) {
         $keys = explode('.', $payload_keys);
 
         $initial = array_shift($keys);
@@ -189,7 +216,20 @@ class require_activity implements middleware {
             }
         }
 
-        return (int)$result;
+        return $result;
+    }
+
+    /**
+     * Returns an id extracted from the incoming payload.
+     * Wraps get_payload_value() and casts result to int.
+     *
+     * @param string $payload_keys
+     * @param payload $payload
+     *
+     * @return int the extracted ID.
+     */
+    private static function get_id(string $payload_keys, payload $payload): int {
+        return (int)self::get_payload_value($payload_keys, $payload);
     }
 
     /**

@@ -28,6 +28,14 @@ Feature: Manually add participants as a manager
     Then I should see "1 participant instance created" in the tui "success" notification toast
     And I should see "Manage participation: “Subject and manager”"
 
+    # We can rely on user id 2 being the admin's account. When proper user selector is implemented,
+    # better check for a regular user.
+    When I navigate to the outstanding perform activities list page
+    And I click on "Activities about others" "link"
+    Then I should see the tui datatable contains:
+      | Activity title      | Type      | Overall progress | Your progress   |
+      | Subject and manager | Appraisal | Not yet started  | Not yet started |
+
   Scenario: No participants can be manually added when subject is the only relationship
     Given I log in as "admin"
 

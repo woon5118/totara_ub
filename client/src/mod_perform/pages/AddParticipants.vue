@@ -79,17 +79,20 @@
 </template>
 
 <script>
-import { redirectWithPost } from 'mod_perform/redirect';
-import subjectInstanceForParticipationQuery from 'mod_perform/graphql/subject_instance_for_participation';
-import Loader from 'tui/components/loader/Loader';
-import ButtonGroup from 'tui/components/buttons/ButtonGroup';
 import ActionLink from 'tui/components/links/ActionLink';
+import AddParticipantsMutation from 'mod_perform/graphql/add_participants';
 import Button from 'tui/components/buttons/Button';
+import ButtonGroup from 'tui/components/buttons/ButtonGroup';
 import Card from 'tui/components/card/Card';
+import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
 import Form from 'tui/components/form/Form';
 import FormRow from 'tui/components/form/FormRow';
 import InputText from 'tui/components/form/InputText';
-import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
+import Loader from 'tui/components/loader/Loader';
+import subjectInstanceForParticipationQuery from 'mod_perform/graphql/subject_instance_for_participation';
+import { NOTIFICATION_DURATION } from 'mod_perform/constants';
+import { notify } from 'tui/notifications';
+import { redirectWithPost } from 'mod_perform/redirect';
 
 export default {
   components: {
@@ -225,13 +228,66 @@ export default {
     closeConfirmModal() {
       this.openConfirmationModal = false;
     },
-    trySave() {
-      this.isSaving = true;
-      setTimeout(() => {
-        redirectWithPost(this.goBackLink, {
-          participant_instance_created_count: this.participantInstanceCount,
+    prepareParticipantsDataForSaving() {
+      let participantsDataPreparedForSaving = [];
+      Object.entries(this.newParticipantsByCoreRelationship).forEach(entry => {
+        const coreRelationshipId = entry[0];
+        const userIds = entry[1];
+        userIds.forEach(userId => {
+          participantsDataPreparedForSaving.push({
+            core_relationship_id: coreRelationshipId,
+            participant_id: userId,
+          });
         });
-      }, 1000);
+      });
+      return participantsDataPreparedForSaving;
+    },
+    /**
+     * Show a generic saving error toast.
+     */
+    showMutationErrorNotification() {
+      notify({
+        duration: NOTIFICATION_DURATION,
+        message: this.$str('toast_error_generic_update', 'mod_perform'),
+        type: 'error',
+      });
+    },
+    async trySave() {
+      this.isSaving = true;
+
+      try {
+        const addedParticipantInstances = await this.save();
+        redirectWithPost(this.goBackLink, {
+          participant_instance_created_count: addedParticipantInstances.length,
+        });
+      } catch (e) {
+        this.showMutationErrorNotification();
+        this.isSaving = false;
+        this.closeConfirmModal();
+      }
+    },
+
+    /**
+     * Mutation call to add participants.
+     * @return {Object}
+     */
+    async save() {
+      const {
+        data: {
+          mod_perform_add_participants: { participant_instances },
+        },
+      } = await this.$apollo.mutate({
+        mutation: AddParticipantsMutation,
+        variables: {
+          input: {
+            subject_instance_ids: [this.subjectInstanceId],
+            participants: this.prepareParticipantsDataForSaving(),
+          },
+        },
+        refetchAll: false, // Don't refetch all the data again
+      });
+
+      return participant_instances;
     },
   },
 };
@@ -248,7 +304,8 @@ export default {
       "manual_participant_add_confirmation_message_singular",
       "manual_participant_add_confirmation_title",
       "manual_participant_add_no_relationships",
-      "save"
+      "save",
+      "toast_error_generic_update"
     ]
   }
 </lang-strings>

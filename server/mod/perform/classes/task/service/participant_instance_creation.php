@@ -24,19 +24,32 @@
 namespace mod_perform\task\service;
 
 use core\collection;
+use core\entities\user;
 use core\orm\query\builder;
+use mod_perform\constants;
 use mod_perform\entities\activity\manual_relationship_selection_progress;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\entities\activity\section;
 use mod_perform\entities\activity\section_relationship;
+use mod_perform\entities\activity\subject_instance;
 use mod_perform\entities\activity\subject_instance_manual_participant;
+use mod_perform\entities\activity\track;
+use mod_perform\entities\activity\track_user_assignment;
 use mod_perform\hook\participant_instances_created;
+use mod_perform\models\activity\participant_instance as participant_instance_model;
+use mod_perform\models\activity\subject_instance as subject_instance_model;
+use mod_perform\state\activity\active;
 use mod_perform\state\participant_instance\not_started;
+use mod_perform\state\subject_instance\closed;
 use mod_perform\state\subject_instance\pending;
 use totara_core\relationship\helpers\relationship_collection_manager as core_relationship_collection_manager;
+use totara_core\relationship\relationship as core_relationship;
 
 /**
- * Class participation_service used to create participant instances for a collection of subject instances.
+ * Class participation_service
+ * Used to initially generate participant instances for a collection of new subject instances.
+ * Also used to add participant instances to existing subject instances.
+ *
  * @package mod_perform\task\service
  */
 class participant_instance_creation {
@@ -69,6 +82,242 @@ class participant_instance_creation {
                 $this->save_data();
             }
         );
+    }
+
+    /**
+     * Add a list of participants to all given subject instances.
+     *
+     * No permission checks here. Calling code must take care of that.
+     * The subject instances must belong to the same activity, otherwise an exception is thrown.
+     *
+     * @param array $subject_instance_ids
+     * @param array $participant_relationship_map array of arrays with participant_id/core_relationship_id tuples
+     * @return collection|participant_instance_model[] returns added participant instances
+     */
+    public function add_instances(array $subject_instance_ids, array $participant_relationship_map): collection {
+        $subject_instance_ids = array_map('intval', array_unique($subject_instance_ids));
+
+        $activity_id = $this->validate_add_instances($subject_instance_ids, $participant_relationship_map);
+
+        // Main transaction to add all the new participant instances.
+        $added_instances_data = builder::get_db()->transaction(
+            function () use ($activity_id, $subject_instance_ids, $participant_relationship_map) {
+                $added_instance_groups = [];
+                foreach ($subject_instance_ids as $subject_instance_id) {
+                    $added_instance_groups[] = $this->add_instances_for_subject_instance(
+                        $activity_id,
+                        $subject_instance_id,
+                        $participant_relationship_map
+                    );
+                }
+                return array_merge([], ...$added_instance_groups);
+            }
+        );
+        return $this->build_models_from_participant_instance_data($added_instances_data);
+    }
+
+    /**
+     * Build a collection of participant instance models from given tuples of
+     * [subject_instance_id, core_relationship_id, participant_id].
+     *
+     * @param array $participant_instances_data
+     * @return collection|participant_instance_model[]
+     */
+    private function build_models_from_participant_instance_data(array $participant_instances_data): collection {
+        if (count($participant_instances_data) === 0) {
+            return new collection();
+        }
+        $repository = participant_instance_entity::repository();
+        foreach ($participant_instances_data as $participant_instances_datum) {
+            $repository->or_where(function (builder $builder) use ($participant_instances_datum) {
+                $builder->where('subject_instance_id', $participant_instances_datum['subject_instance_id'])
+                    ->where('core_relationship_id', $participant_instances_datum['core_relationship_id'])
+                    ->where('participant_id', $participant_instances_datum['participant_id']);
+            });
+        }
+        return $repository->get()->map_to(participant_instance_model::class);
+    }
+
+    /**
+     * @param int $activity_id
+     * @param int $subject_instance_id
+     * @param array $participant_relationship_map
+     * @return array
+     */
+    private function add_instances_for_subject_instance(
+        int $activity_id,
+        int $subject_instance_id,
+        array $participant_relationship_map
+    ): array {
+        $added_instances_data = [];
+        $subject_instance_has_new_participant_instance = false;
+        foreach ($participant_relationship_map as $participant_relationship) {
+            // Ignore if such a participant instance already exists.
+            if ($this->participant_instance_exists(
+                $subject_instance_id,
+                $participant_relationship['core_relationship_id'],
+                $participant_relationship['participant_id']
+            )) {
+                continue;
+            }
+
+            $subject_instance_has_new_participant_instance = true;
+            $subject_instance_data = (object)[
+                'id' => $subject_instance_id,
+                'activity_id' => $activity_id,
+            ];
+            $this->create_participant_instances_for_user_list(
+                $this->build_participant_instance_data(
+                    $participant_relationship['core_relationship_id'],
+                    $subject_instance_data
+                ),
+                [$participant_relationship['participant_id']]
+            );
+            $added_instances_data[] = [
+                'subject_instance_id' => $subject_instance_id,
+                'core_relationship_id' => $participant_relationship['core_relationship_id'],
+                'participant_id' => $participant_relationship['participant_id'],
+            ];
+        }
+        if ($subject_instance_has_new_participant_instance) {
+            $subject_instance = subject_instance_model::load_by_id($subject_instance_id);
+            if ($subject_instance->get_availability_state() instanceof closed) {
+                // Re-open subject instance if it was closed. Also takes care of progress state.
+                $subject_instance->manually_open(false);
+            } else {
+                // Otherwise just make sure progress state is correct.
+                $subject_instance->update_progress_status();
+            }
+        }
+        return $added_instances_data;
+    }
+
+    /**
+     * Validate data for processing by add_instances().
+     *
+     * @param array $subject_instance_ids
+     * @param array $participant_data
+     * @return int the single activity_id that the subject_instances have in common
+     */
+    private function validate_add_instances(array $subject_instance_ids, array $participant_data): int {
+        // First get the activity id from one of the subject instances.
+        /** @var subject_instance $subject_instance */
+        $subject_instance = subject_instance::repository()
+            ->where('id', $subject_instance_ids)
+            ->with('track.activity')
+            ->order_by('id')
+            ->first();
+        if (!$subject_instance) {
+            throw new \coding_exception('Invalid subject_instance_ids detected');
+        }
+        $activity_id = $subject_instance->activity()->id;
+
+        // Activity must be active.
+        if ((int)$subject_instance->activity()->status !== active::get_code()) {
+            throw new \coding_exception('Cannot add participant instances for inactive activity.');
+        }
+
+        // Subject instances must be for the same activity.
+        $this->validate_subject_instances_for_activity($subject_instance_ids, $activity_id);
+
+        // Relationships must be involved in the activity and cannot be 'subject' relationship.
+        $relationship_ids = array_unique(array_column($participant_data, 'core_relationship_id'));
+        $this->validate_relationships_for_activity($relationship_ids, $activity_id);
+
+        // Participant ids must be valid user ids.
+        $user_ids = array_unique(array_column($participant_data, 'participant_id'));
+        $this->validate_user_ids($user_ids);
+
+        return $activity_id;
+    }
+
+    /**
+     * Validate that the given subject_instance_ids belong to the given activity id.
+     *
+     * @param array $subject_instance_ids
+     * @param int $activity_id
+     */
+    private function validate_subject_instances_for_activity(array $subject_instance_ids, int $activity_id) {
+        $subject_instance_ids_filtered = subject_instance::repository()
+            ->join([track_user_assignment::TABLE, 'tua'], 'track_user_assignment_id', 'id')
+            ->join([track::TABLE, 'tr'], 'tua.track_id', 'id')
+            ->where('tr.activity_id', $activity_id)
+            ->where_in('id', $subject_instance_ids)
+            ->get()
+            ->pluck('id');
+        $bad_subject_instance_ids = array_diff($subject_instance_ids, $subject_instance_ids_filtered);
+        if (count($bad_subject_instance_ids) > 0) {
+            $bad_subject_instance_ids = implode(',', $bad_subject_instance_ids);
+            throw new \coding_exception(
+                "Subject instances with these ids do not belong to activity {$activity_id}: {$bad_subject_instance_ids}"
+            );
+        }
+    }
+
+    /**
+     * Validate that the given relationships can be added to the given activity, meaning they must be involved in the
+     * activity but cannot be 'subject' relationship.
+     *
+     * @param array $relationship_ids_to_be_added
+     * @param int $activity_id
+     */
+    private function validate_relationships_for_activity(array $relationship_ids_to_be_added, int $activity_id) {
+
+        $subject_relationship = core_relationship::load_by_idnumber(constants::RELATIONSHIP_SUBJECT);
+        $involved_valid_relationship_ids = section_relationship::repository()
+            ->join([section::TABLE, 'sctn'], 'section_id', 'id')
+            ->where('sctn.activity_id', $activity_id)
+            ->where('core_relationship_id', '!=', $subject_relationship->id)
+            ->get(true)
+            ->pluck('core_relationship_id');
+
+        $bad_relationship_ids = array_diff($relationship_ids_to_be_added, array_unique($involved_valid_relationship_ids));
+
+        if (count($bad_relationship_ids) > 0) {
+            sort($bad_relationship_ids);
+            $bad_relationship_ids = implode(',', $bad_relationship_ids);
+            throw new \coding_exception(
+                "Relationships with these ids cannot be used in activity {$activity_id}: {$bad_relationship_ids}"
+            );
+        }
+    }
+
+    /**
+     * Validate that the given user ids exist.
+     *
+     * @param array $user_ids
+     */
+    private function validate_user_ids(array $user_ids) {
+        $user_ids_filtered_by_existing = user::repository()
+            ->where_in('id', $user_ids)
+            ->get()
+            ->pluck('id');
+
+        $bad_user_ids = array_diff($user_ids, $user_ids_filtered_by_existing);
+        if (count($bad_user_ids) > 0) {
+            $bad_user_ids = implode(',', $bad_user_ids);
+            throw new \coding_exception("Users with these ids do not exist: {$bad_user_ids}");
+        }
+    }
+
+    /**
+     * Find out whether a participant instance exists for the given data.
+     *
+     * @param int $subject_instance_id
+     * @param int $core_relationship_id
+     * @param int $participant_id
+     * @return bool
+     */
+    private function participant_instance_exists(
+        int $subject_instance_id,
+        int $core_relationship_id,
+        int $participant_id
+    ): bool {
+        return participant_instance_entity::repository()
+            ->where('subject_instance_id', $subject_instance_id)
+            ->where('core_relationship_id', $core_relationship_id)
+            ->where('participant_id', $participant_id)
+            ->exists();
     }
 
     /**

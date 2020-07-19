@@ -23,11 +23,23 @@
 
 use core\collection;
 use mod_perform\constants;
+use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\entities\activity\participant_instance;
+use mod_perform\entities\activity\participant_section;
+use mod_perform\entities\activity\section;
+use mod_perform\entities\activity\section_relationship;
 use mod_perform\entities\activity\subject_instance;
-use mod_perform\entities\activity\track_user_assignment;
 use mod_perform\entities\activity\track as track_entity;
+use mod_perform\entities\activity\track_user_assignment;
 use mod_perform\expand_task;
+use mod_perform\models\activity\participant_instance as participant_instance_model;
+use mod_perform\state\activity\draft;
+use mod_perform\state\participant_instance\closed as participant_instance_closed;
+use mod_perform\state\participant_instance\complete as participant_instance_complete;
+use mod_perform\state\subject_instance\closed;
+use mod_perform\state\subject_instance\complete;
+use mod_perform\state\subject_instance\in_progress;
+use mod_perform\state\subject_instance\open;
 use mod_perform\task\service\participant_instance_creation;
 use mod_perform\task\service\subject_instance_creation;
 use mod_perform\task\service\subject_instance_dto;
@@ -105,6 +117,567 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
             'Expand one per job mode' => [false],
         ];
     }
+
+    public function test_add_participants() {
+        /** @var mod_perform_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        $data = $this->generate_test_data_for_adding_participants([
+            constants::RELATIONSHIP_SUBJECT,
+            constants::RELATIONSHIP_APPRAISER,
+            constants::RELATIONSHIP_MANAGER
+        ]);
+        $this->assertEquals(4, participant_instance::repository()->count());
+        $this->assertEquals(4, participant_section::repository()->count());
+
+        $subject_relationship = $generator->get_core_relationship(constants::RELATIONSHIP_SUBJECT);
+        $appraiser_relationship = $generator->get_core_relationship(constants::RELATIONSHIP_APPRAISER);
+        /** @var participant_instance $participant_instance_for_subject_user1 */
+        $participant_instance_for_subject_user1 = participant_instance::repository()
+            ->where('subject_instance_id', $data->subject_instance1_id)
+            ->one(true);
+        $this->assertEquals($subject_relationship->id, $participant_instance_for_subject_user1->core_relationship_id);
+        $this->assertEquals($data->subject_user1_id, $participant_instance_for_subject_user1->participant_id);
+
+        $new_participant_user = $this->getDataGenerator()->create_user();
+        $returned_instances = (new participant_instance_creation())->add_instances(
+            [$data->subject_instance1_id],
+            [
+                [
+                    'participant_id' => $new_participant_user->id,
+                    'core_relationship_id' => $appraiser_relationship->id,
+                ]
+            ]
+        );
+
+        $this->assertEquals(5, participant_instance::repository()->count());
+        $this->assertEquals(5, participant_section::repository()->count());
+        /** @var participant_instance $new_instance */
+        $new_instance = participant_instance::repository()
+            ->where('participant_id', $new_participant_user->id)
+            ->one(true);
+        $this->assertEquals($appraiser_relationship->id, $new_instance->core_relationship_id);
+        $this->assertEquals($data->subject_instance1_id, $new_instance->subject_instance_id);
+
+        // Check return value.
+        $this->assertCount(1, $returned_instances);
+        $returned_instance = $returned_instances->first();
+        $this->assertInstanceOf(participant_instance_model::class, $returned_instance);
+        $this->assertEquals($new_instance->id, $returned_instance->id);
+    }
+
+    public function test_add_participants_multiple_subject_instances() {
+        /** @var mod_perform_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+
+        // Create an activity with 2 tracks.
+        $config = mod_perform_activity_generator_configuration::new()
+            ->set_number_of_tracks_per_activity(2)
+            ->set_number_of_users_per_user_group_type(2)
+            ->set_relationships_per_section([constants::RELATIONSHIP_SUBJECT, constants::RELATIONSHIP_APPRAISER]);
+        $activity = $generator->create_full_activities($config)->first();
+
+        $this->assertEquals(4, participant_instance::repository()->count());
+        $this->assertEquals(4, participant_section::repository()->count());
+        $subject_instance_ids = subject_instance::repository()->get()->pluck('id');
+        $this->assertCount(4, $subject_instance_ids);
+
+        $appraiser_relationship = $generator->get_core_relationship(constants::RELATIONSHIP_APPRAISER);
+        $new_participant_user = $this->getDataGenerator()->create_user();
+        $returned_instances = (new participant_instance_creation())->add_instances(
+            $subject_instance_ids,
+            [
+                [
+                    'participant_id' => $new_participant_user->id,
+                    'core_relationship_id' => $appraiser_relationship->id,
+                ]
+            ]
+        );
+
+        $this->assertEquals(8, participant_instance::repository()->count());
+        $this->assertEquals(8, participant_section::repository()->count());
+        $new_instance_ids = [];
+        foreach ($subject_instance_ids as $subject_instance_id) {
+            /** @var participant_instance $new_instance */
+            $new_instance = participant_instance::repository()
+                ->where('participant_id', $new_participant_user->id)
+                ->where('subject_instance_id', $subject_instance_id)
+                ->one(true);
+            $this->assertEquals($appraiser_relationship->id, $new_instance->core_relationship_id);
+            $new_instance_ids[] = $new_instance->id;
+        }
+
+        // Check return value.
+        $this->assertEqualsCanonicalizing($new_instance_ids, $returned_instances->pluck('id'));
+    }
+
+    public function test_add_participants_multiple_relationships() {
+        /** @var mod_perform_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        $data = $this->generate_test_data_for_adding_participants([
+            constants::RELATIONSHIP_SUBJECT,
+            constants::RELATIONSHIP_APPRAISER,
+            constants::RELATIONSHIP_MANAGER
+        ]);
+
+        $appraiser_relationship = $generator->get_core_relationship(constants::RELATIONSHIP_APPRAISER);
+        $manager_relationship = $generator->get_core_relationship(constants::RELATIONSHIP_MANAGER);
+        $new_appraiser = $this->getDataGenerator()->create_user();
+        $new_manager = $this->getDataGenerator()->create_user();
+
+        $returned_instances = (new participant_instance_creation())->add_instances(
+            [$data->subject_instance1_id],
+            [
+                [
+                    'participant_id' => $new_appraiser->id,
+                    'core_relationship_id' => $appraiser_relationship->id,
+                ],
+                [
+                    'participant_id' => $new_manager->id,
+                    'core_relationship_id' => $manager_relationship->id,
+                ],
+            ]
+        );
+
+        $this->assertEquals(6, participant_instance::repository()->count());
+        $this->assertEquals(6, participant_section::repository()->count());
+
+        /** @var participant_instance $new_appraiser_instance */
+        $new_appraiser_instance = participant_instance::repository()
+            ->where('participant_id', $new_appraiser->id)
+            ->one(true);
+        $this->assertEquals($appraiser_relationship->id, $new_appraiser_instance->core_relationship_id);
+        $this->assertEquals($data->subject_instance1_id, $new_appraiser_instance->subject_instance_id);
+
+        /** @var participant_instance $new_manager_instance */
+        $new_manager_instance = participant_instance::repository()
+            ->where('participant_id', $new_manager->id)
+            ->one(true);
+        $this->assertEquals($manager_relationship->id, $new_manager_instance->core_relationship_id);
+        $this->assertEquals($data->subject_instance1_id, $new_manager_instance->subject_instance_id);
+
+        // Check return value.
+        $this->assertEqualsCanonicalizing(
+            [$new_appraiser_instance->id, $new_manager_instance->id],
+            $returned_instances->pluck('id')
+        );
+    }
+
+    public function test_add_participants_varying_section_relationships() {
+        /** @var mod_perform_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        $data = $this->generate_test_data_for_adding_participants([
+            constants::RELATIONSHIP_SUBJECT,
+            constants::RELATIONSHIP_APPRAISER,
+            constants::RELATIONSHIP_MANAGER
+        ], 2);
+        $this->assertEquals(4, participant_instance::repository()->count());
+        $this->assertEquals(8, participant_section::repository()->count());
+
+        $appraiser_relationship = $generator->get_core_relationship(constants::RELATIONSHIP_APPRAISER);
+        $manager_relationship = $generator->get_core_relationship(constants::RELATIONSHIP_MANAGER);
+
+        // The generator builds all the sections with the same list of relationships, so let's remove
+        // the "manager" section relationship for one of the sections.
+        $sections = section::repository()
+            ->where('activity_id', $data->activity1->id)
+            ->get()
+            ->all();
+        $this->assertCount(2, $sections);
+        [$section1, $section2] = $sections;
+        section_relationship::repository()
+            ->where('section_id', $section1->id)
+            ->where('core_relationship_id', $manager_relationship->id)
+            ->delete();
+
+        $new_appraiser = $this->getDataGenerator()->create_user();
+        $new_manager = $this->getDataGenerator()->create_user();
+
+        (new participant_instance_creation())->add_instances(
+            [$data->subject_instance1_id],
+            [
+                [
+                    'participant_id' => $new_appraiser->id,
+                    'core_relationship_id' => $appraiser_relationship->id,
+                ],
+                [
+                    'participant_id' => $new_manager->id,
+                    'core_relationship_id' => $manager_relationship->id,
+                ],
+            ]
+        );
+
+        $this->assertEquals(6, participant_instance::repository()->count());
+        $new_appraiser_participant_instance = participant_instance::repository()
+            ->where('participant_id', $new_appraiser->id)
+            ->where('core_relationship_id', $appraiser_relationship->id)
+            ->where('subject_instance_id', $data->subject_instance1_id)
+            ->one(true);
+        $new_manager_participant_instance = participant_instance::repository()
+            ->where('participant_id', $new_manager->id)
+            ->where('core_relationship_id', $manager_relationship->id)
+            ->where('subject_instance_id', $data->subject_instance1_id)
+            ->one(true);
+
+        // There should be 3 new participant sections. Make sure they are as expected.
+        $this->assertEquals(11, participant_section::repository()->count());
+        foreach ([$section1, $section2] as $section) {
+            $this->assertEquals(1,
+                participant_section::repository()
+                    ->where('participant_instance_id', $new_appraiser_participant_instance->id)
+                    ->where('section_id', $section->id)
+                    ->count()
+            );
+        }
+        $this->assertEquals(1,
+            participant_section::repository()
+                ->where('participant_instance_id', $new_manager_participant_instance->id)
+                ->where('section_id', $section2->id)
+                ->count()
+        );
+    }
+
+    public function test_add_participants_invalid_participant_id() {
+        /** @var mod_perform_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        $data = $this->generate_test_data_for_adding_participants([
+            constants::RELATIONSHIP_SUBJECT,
+            constants::RELATIONSHIP_APPRAISER,
+            constants::RELATIONSHIP_MANAGER
+        ]);
+
+        $appraiser_relationship = $generator->get_core_relationship(constants::RELATIONSHIP_APPRAISER);
+        $new_appraiser = $this->getDataGenerator()->create_user();
+
+        $bad_user_id = -1;
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('Users with these ids do not exist: ' . $bad_user_id);
+
+        (new participant_instance_creation())->add_instances(
+            [$data->subject_instance1_id],
+            [
+                [
+                    'participant_id' => $new_appraiser->id,
+                    'core_relationship_id' => $appraiser_relationship->id,
+                ],
+                [
+                    'participant_id' => $bad_user_id,
+                    'core_relationship_id' => $appraiser_relationship->id,
+                ],
+            ]
+        );
+    }
+
+    public function test_add_participants_activity_must_be_active() {
+        /** @var mod_perform_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        $data = $this->generate_test_data_for_adding_participants([
+            constants::RELATIONSHIP_SUBJECT,
+            constants::RELATIONSHIP_APPRAISER
+        ]);
+
+        $appraiser_relationship = $generator->get_core_relationship(constants::RELATIONSHIP_APPRAISER);
+        $new_appraiser = $this->getDataGenerator()->create_user();
+
+        activity_entity::repository()
+            ->where('id', $data->activity1->id)
+            ->update(['status' => draft::get_code()]);
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('Cannot add participant instances for inactive activity.');
+
+        (new participant_instance_creation())->add_instances(
+            [$data->subject_instance1_id],
+            [
+                [
+                    'participant_id' => $new_appraiser->id,
+                    'core_relationship_id' => $appraiser_relationship->id,
+                ],
+            ]
+        );
+    }
+
+    public function test_add_participants_invalid_relationship() {
+        /** @var mod_perform_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        $data = $this->generate_test_data_for_adding_participants([
+            constants::RELATIONSHIP_SUBJECT,
+            constants::RELATIONSHIP_MANAGER
+        ]);
+
+        $appraiser_relationship = $generator->get_core_relationship(constants::RELATIONSHIP_APPRAISER);
+        $new_appraiser = $this->getDataGenerator()->create_user();
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage(
+            "Relationships with these ids cannot be used in activity {$data->activity1->id}: {$appraiser_relationship->id}"
+        );
+
+        (new participant_instance_creation())->add_instances(
+            [$data->subject_instance1_id],
+            [
+                [
+                    'participant_id' => $new_appraiser->id,
+                    'core_relationship_id' => $appraiser_relationship->id,
+                ],
+            ]
+        );
+    }
+
+    public function test_add_participants_cannot_add_subject_relationship() {
+        /** @var mod_perform_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        $data = $this->generate_test_data_for_adding_participants([constants::RELATIONSHIP_SUBJECT, constants::RELATIONSHIP_MANAGER]);
+
+        $subject_relationship = $generator->get_core_relationship(constants::RELATIONSHIP_SUBJECT);
+        $new_subject = $this->getDataGenerator()->create_user();
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage(
+            "Relationships with these ids cannot be used in activity {$data->activity1->id}: {$subject_relationship->id}"
+        );
+
+        (new participant_instance_creation())->add_instances(
+            [$data->subject_instance1_id],
+            [
+                [
+                    'participant_id' => $new_subject->id,
+                    'core_relationship_id' => $subject_relationship->id,
+                ],
+            ]
+        );
+    }
+
+    public function test_add_participants_with_invalid_and_valid_relationships() {
+        /** @var mod_perform_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        $data = $this->generate_test_data_for_adding_participants([constants::RELATIONSHIP_SUBJECT, constants::RELATIONSHIP_MANAGER]);
+
+        $appraiser_relationship = $generator->get_core_relationship(constants::RELATIONSHIP_APPRAISER);
+        $manager_relationship = $generator->get_core_relationship(constants::RELATIONSHIP_MANAGER);
+        $subject_relationship = $generator->get_core_relationship(constants::RELATIONSHIP_SUBJECT);
+        $new_appraiser = $this->getDataGenerator()->create_user();
+        $new_manager = $this->getDataGenerator()->create_user();
+        $new_subject = $this->getDataGenerator()->create_user();
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage(
+            "Relationships with these ids cannot be used in activity {$data->activity1->id}: "
+            . "{$subject_relationship->id},{$appraiser_relationship->id}"
+        );
+
+        (new participant_instance_creation())->add_instances(
+            [$data->subject_instance1_id],
+            [
+                [
+                    'participant_id' => $new_appraiser->id,
+                    'core_relationship_id' => $appraiser_relationship->id,
+                ],
+                [
+                    'participant_id' => $new_manager->id,
+                    'core_relationship_id' => $manager_relationship->id,
+                ],
+                [
+                    'participant_id' => $new_subject->id,
+                    'core_relationship_id' => $subject_relationship->id,
+                ],
+            ]
+        );
+    }
+
+    public function test_add_participants_invalid_subject_instance() {
+        /** @var mod_perform_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        $data = $this->generate_test_data_for_adding_participants([constants::RELATIONSHIP_SUBJECT, constants::RELATIONSHIP_APPRAISER]);
+
+        $appraiser_relationship = $generator->get_core_relationship(constants::RELATIONSHIP_APPRAISER);
+        $new_appraiser = $this->getDataGenerator()->create_user();
+
+        $activity2_subject_instance_ids = subject_instance::repository()
+            ->filter_by_activity_id($data->activity2->id)
+            ->get()
+            ->pluck('id');
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage(
+            "Subject instances with these ids do not belong to activity"
+        );
+
+        // Mix subject instances of activity1 and activity2.
+        (new participant_instance_creation())->add_instances(
+            array_merge(
+                [$data->subject_instance1_id, $data->subject_instance2_id],
+                $activity2_subject_instance_ids
+            ),
+            [
+                [
+                    'participant_id' => $new_appraiser->id,
+                    'core_relationship_id' => $appraiser_relationship->id,
+                ],
+            ]
+        );
+    }
+
+    public function bad_subject_instances_data_provider() {
+        return [
+            'empty array not allowed' => [[]],
+            'non-existing ids not allowed' => [[-1, -2]]
+        ];
+    }
+
+    /**
+     * @dataProvider bad_subject_instances_data_provider
+     * @param array $subject_instance_ids
+     */
+    public function test_add_participants_must_pass_existing_subject_instance_ids(array $subject_instance_ids) {
+        /** @var mod_perform_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        $data = $this->generate_test_data_for_adding_participants([constants::RELATIONSHIP_SUBJECT, constants::RELATIONSHIP_MANAGER]);
+
+        $subject_relationship = $generator->get_core_relationship(constants::RELATIONSHIP_SUBJECT);
+        $new_subject = $this->getDataGenerator()->create_user();
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage(
+            "Invalid subject_instance_ids detected"
+        );
+
+        (new participant_instance_creation())->add_instances(
+            $subject_instance_ids,
+            [
+                [
+                    'participant_id' => $new_subject->id,
+                    'core_relationship_id' => $subject_relationship->id,
+                ],
+            ]
+        );
+    }
+
+    public function test_add_participants_silently_ignored_if_already_existing() {
+        /** @var mod_perform_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        $data = $this->generate_test_data_for_adding_participants([constants::RELATIONSHIP_SUBJECT, constants::RELATIONSHIP_APPRAISER]);
+        $this->assertEquals(4, participant_instance::repository()->count());
+
+        $appraiser_relationship = $generator->get_core_relationship(constants::RELATIONSHIP_APPRAISER);
+        $new_appraiser = $this->getDataGenerator()->create_user();
+
+        (new participant_instance_creation())->add_instances(
+            [$data->subject_instance1_id],
+            [
+                [
+                    'participant_id' => $new_appraiser->id,
+                    'core_relationship_id' => $appraiser_relationship->id,
+                ],
+            ]
+        );
+        $this->assertEquals(5, participant_instance::repository()->count());
+
+        // Try to add the same instance again. Should be silently ignored.
+        (new participant_instance_creation())->add_instances(
+            [$data->subject_instance1_id],
+            [
+                [
+                    'participant_id' => $new_appraiser->id,
+                    'core_relationship_id' => $appraiser_relationship->id,
+                ],
+            ]
+        );
+        $this->assertEquals(5, participant_instance::repository()->count());
+    }
+
+    public function reopen_and_uncomplete_data_provider() {
+        return [
+            ['open before adding' => open::get_code()],
+            ['closed before adding' => closed::get_code()],
+        ];
+    }
+
+    /**
+     * For both closed and open subject instance we expect the same resulting states.
+     *
+     * @dataProvider reopen_and_uncomplete_data_provider
+     */
+    public function test_add_participants_reopens_and_uncompletes_subject_instance(int $state_before_adding) {
+        /** @var mod_perform_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+        $data = $this->generate_test_data_for_adding_participants([constants::RELATIONSHIP_SUBJECT, constants::RELATIONSHIP_APPRAISER]);
+
+        $appraiser_relationship = $generator->get_core_relationship(constants::RELATIONSHIP_APPRAISER);
+        $new_appraiser = $this->getDataGenerator()->create_user();
+
+        /** @var subject_instance $subject_instance */
+        $subject_instance = subject_instance::repository()->find($data->subject_instance1_id);
+        $subject_instance->availability = $state_before_adding;
+        $subject_instance->progress = complete::get_code();
+        $subject_instance->save();
+
+        // Also close existing participant_instance to make sure it stays closed.
+        /** @var participant_instance $participant_instance */
+        $participant_instance = participant_instance::repository()
+            ->where('subject_instance_id', $subject_instance->id)
+            ->one(true);
+        $participant_instance->availability = participant_instance_closed::get_code();
+        $participant_instance->progress = participant_instance_complete::get_code();
+        $participant_instance->save();
+
+        (new participant_instance_creation())->add_instances(
+            [$data->subject_instance1_id],
+            [
+                [
+                    'participant_id' => $new_appraiser->id,
+                    'core_relationship_id' => $appraiser_relationship->id,
+                ],
+            ]
+        );
+
+        // Subject instance should be re-opened/un-completed.
+        $subject_instance->refresh();
+        $this->assertEquals(open::get_code(), $subject_instance->availability);
+        $this->assertEquals(in_progress::get_code(), $subject_instance->progress);
+        // Participant instance should not be re-opened or un-completed.
+        $participant_instance->refresh();
+        $this->assertEquals(participant_instance_closed::get_code(), $participant_instance->availability);
+        $this->assertEquals(participant_instance_complete::get_code(), $participant_instance->progress);
+    }
+
+    /**
+     * Create test data for manually adding participant instances.
+     *
+     * @param array $relationships
+     * @param int $num_sections
+     * @return stdClass
+     */
+    private function generate_test_data_for_adding_participants(array $relationships, int $num_sections = 1): stdClass {
+        /** @var mod_perform_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+
+        // Create 2 activities with 2 users each.
+        $config = mod_perform_activity_generator_configuration::new()
+            ->set_number_of_activities(2)
+            ->set_number_of_users_per_user_group_type(2)
+            ->set_number_of_sections_per_activity($num_sections)
+            ->set_relationships_per_section($relationships);
+        [$activity1, $activity2] = $generator->create_full_activities($config)->all();
+
+        $activity1_subject_instances = subject_instance::repository()
+            ->filter_by_activity_id($activity1->id)
+            ->get()
+            ->all();
+        $subject_instance1_id = $activity1_subject_instances[0]->id;
+        $subject_user1_id = $activity1_subject_instances[0]->subject_user_id;
+        $subject_instance2_id = $activity1_subject_instances[1]->id;
+        $subject_user2_id = $activity1_subject_instances[1]->subject_user_id;
+
+        return (object)[
+            'activity1' => $activity1,
+            'activity2' => $activity2,
+            'subject_user1_id' => $subject_user1_id,
+            'subject_user2_id' => $subject_user2_id,
+            'subject_instance1_id' => $subject_instance1_id,
+            'subject_instance2_id' => $subject_instance2_id,
+        ];
+    }
+
 
     /**
      * Asserts participant instances created.
