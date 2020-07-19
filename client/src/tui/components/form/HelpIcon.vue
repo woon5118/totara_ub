@@ -18,7 +18,7 @@
 
 <template>
   <div class="tui-formHelpIcon">
-    <Popover position="top" :triggers="['click']">
+    <Popover position="top" :title="title" :triggers="['click']">
       <template v-slot:trigger>
         <a href="javascript:;" class="tui-formHelpIcon__icon">
           <Info
@@ -63,6 +63,9 @@ export default {
     },
     hidden: {
       type: Boolean,
+    },
+    title: {
+      type: String,
     },
   },
 };
