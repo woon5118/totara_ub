@@ -107,7 +107,7 @@ define(['jquery', 'core/webapi', 'core/localstorage', 'core/config', 'core/log']
                 cacheKey = 'core_str/' + lang + '/' + request.component + '/' + request.key;
                 var cached = storage.get(cacheKey);
                 if (cached) {
-                    M.str[request.component][request.key] = cached;
+                    M.str[request.component][request.key] = JSON.parse(cached);
                     continue;
                 }
 
@@ -153,7 +153,7 @@ define(['jquery', 'core/webapi', 'core/localstorage', 'core/config', 'core/log']
                             }
                             M.str[str.component][str.identifier] = str.string;
 
-                            storage.set('core_str/' + str.lang + '/' + str.component + '/' + str.identifier, str.string);
+                            storage.set('core_str/' + str.lang + '/' + str.component + '/' + str.identifier, JSON.stringify(str.string));
                         }
                     }
                 );

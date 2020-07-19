@@ -32,10 +32,8 @@ define(['core/config'], function(config) {
     var Wrapper = function(storage) {
         this.storage = storage;
         this.supported = this.detectSupport();
-        this.hashSource = config.wwwroot + '/' + config.jsrev;
-        this.hash = this.hashString(this.hashSource);
-        this.prefix = this.hash + '/';
-        this.jsrevPrefix = this.hashString(config.wwwroot) + '/jsrev';
+        this.prefix = 'totara:cache:' + this._rootPath() + ':';
+        this.jsrevPrefix = this.prefix + '__jsrev';
         this.validateCache();
     };
 
@@ -86,42 +84,10 @@ define(['core/config'], function(config) {
      */
     Wrapper.prototype.validateCache = function() {
         var cacheVersion = this.storage.getItem(this.jsrevPrefix);
-        if (cacheVersion === null) {
-            this.storage.setItem(this.jsrevPrefix, config.jsrev);
-            return;
-        }
-        var moodleVersion = config.jsrev;
-
-        if (moodleVersion != cacheVersion) {
-            this.storage.clear();
+        if (cacheVersion === null || config.jsrev != cacheVersion) {
+            this._clear();
             this.storage.setItem(this.jsrevPrefix, config.jsrev);
         }
-    };
-
-    /**
-     * Hash a string, used to make shorter key prefixes.
-     *
-     * @method hashString
-     * @param {String} source The string to hash
-     * @return {Number}
-     */
-    Wrapper.prototype.hashString = function(source) {
-        // From http://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript-jquery.
-        /* jshint bitwise: false */
-        /* eslint-disable no-bitwise */
-        var hash = 0;
-        var i, chr, len;
-        if (source.length === 0) {
-            return hash;
-        }
-        for (i = 0, len = source.length; i < len; i++) {
-            chr = source.charCodeAt(i);
-            hash = ((hash << 5) - hash) + chr;
-            hash |= 0; // Convert to 32bit integer
-        }
-        /* eslint-enable no-bitwise */
-        /* jshint bitwise: true */
-        return hash;
     };
 
     /**
@@ -160,6 +126,43 @@ define(['core/config'], function(config) {
             return false;
         }
         return true;
+    };
+
+    /**
+     * Get path to use to separate data for sites in the same origin.
+     *
+     * @method _rootPath
+     * @private
+     * @returns {string}
+     */
+    Wrapper.prototype._rootPath = function() {
+        // localStorage is per-origin so we can omit the domain
+        var result = /^\w+:\/\/[^/]+\/?(.*)$/.exec(config.wwwroot);
+        return result ? result[1] : config.wwwroot;
+    };
+
+    /**
+     * Clear all entries.
+     *
+     * @method _clear
+     * @private
+     */
+    Wrapper.prototype._clear = function() {
+        var self = this;
+        var keys = [];
+        for (var i = 0; i < this.storage.length; i++) {
+            var key = this.storage.key(i);
+            // match keys with our prefix, but also match the old format so
+            // we don't end up leaving old data around in localstorage
+            // (it is limited to ~5mb)
+            if (key.startsWith(this.prefix) || /^-?\d+\//.test(key)) {
+                keys.push(key);
+            }
+        }
+        // must not mutate storage while we are iterating through it
+        keys.forEach(function(key) {
+            return self.storage.removeItem(key);
+        });
     };
 
     return Wrapper;
