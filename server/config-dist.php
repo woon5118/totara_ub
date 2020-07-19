@@ -247,194 +247,12 @@ $CFG->directorypermissions = 02777;
 // any existing key.
 //      $CFG->mnetkeylifetime = 28;
 //
-// Not recommended: Set the following to true to allow the use
-// off non-Totara standard characters in usernames.
-//      $CFG->extendedusernamechars = true;
-//
-// Allow user passwords to be included in backup files. Very dangerous
-// setting as far as it publishes password hashes that can be unencrypted
-// if the backup file is publicy available. Use it only if you can guarantee
-// that all your backup files remain only privacy available and are never
-// shared out from your site/institution!
-//      $CFG->includeuserpasswordsinbackup = true;
-//
-// Completely disable user creation when restoring a course, bypassing any
-// permissions granted via roles and capabilities. Enabling this setting
-// results in the restore process stopping when a user attempts to restore a
-// course requiring users to be created.
-//     $CFG->disableusercreationonrestore = true;
-//
-// Keep the temporary directories used by backup and restore without being
-// deleted at the end of the process. Use it if you want to debug / view
-// all the information stored there after the process has ended. Note that
-// those directories may be deleted (after some ttl) both by cron and / or
-// by new backup / restore invocations.
-//     $CFG->keeptempdirectoriesonbackup = true;
-//
-// Modify the restore process in order to force the "user checks" to assume
-// that the backup originated from a different site, so detection of matching
-// users is performed with different (more "relaxed") rules. Note that this is
-// only useful if the backup file has been created using Moodle < 1.9.4 and the
-// site has been rebuilt from scratch using backup files (not the best way btw).
-// If you obtain user conflicts on restore, rather than enabling this setting
-// permanently, try restoring the backup on a different site, back it up again
-// and then restore on the target server.
-//    $CFG->forcedifferentsitecheckingusersonrestore = true;
-//
-// Force the backup system to continue to create backups in the legacy zip
-// format instead of the new tgz format. Does not affect restore, which
-// auto-detects the underlying file format.
-//    $CFG->usezipbackups = true;
-//
 // Prevent stats processing and hide the GUI
 //      $CFG->disablestatsprocessing = true;
-//
-// Setting this to true will enable admins to edit any post at any time
-//      $CFG->admineditalways = true;
-//
-// These variables define DEFAULT block variables for new courses
-// If this one is set it overrides all others and is the only one used.
-//      $CFG->defaultblocks_override = 'participants,activity_modules,search_forums,course_list:news_items,calendar_upcoming,recent_activity';
-//
-// These variables define the specific settings for defined course formats.
-// They override any settings defined in the formats own config file.
-//      $CFG->defaultblocks_site = 'site_main_menu,course_list:course_summary,calendar_month';
-//      $CFG->defaultblocks_social = 'participants,search_forums,calendar_month,calendar_upcoming,social_activities,recent_activity,course_list';
-//      $CFG->defaultblocks_topics = 'participants,activity_modules,search_forums,course_list:news_items,calendar_upcoming,recent_activity';
-//      $CFG->defaultblocks_weeks = 'participants,activity_modules,search_forums,course_list:news_items,calendar_upcoming,recent_activity';
-//
-// These blocks are used when no other default setting is found.
-//      $CFG->defaultblocks = 'participants,activity_modules,search_forums,course_list:news_items,calendar_upcoming,recent_activity';
-//
-// You can specify a different class to be created for the $PAGE global, and to
-// compute which blocks appear on each page. However, I cannot think of any good
-// reason why you would need to change that. It just felt wrong to hard-code the
-// the class name. You are strongly advised not to use these to settings unless
-// you are absolutely sure you know what you are doing.
-//      $CFG->moodlepageclass = 'moodle_page';
-//      $CFG->moodlepageclassfile = "$CFG->dirroot/local/myplugin/mypageclass.php";
-//      $CFG->blockmanagerclass = 'block_manager';
-//      $CFG->blockmanagerclassfile = "$CFG->dirroot/local/myplugin/myblockamanagerclass.php";
 //
 // Seconds for files to remain in caches. Decrease this if you are worried
 // about students being served outdated versions of uploaded files.
 //     $CFG->filelifetime = 60*60*6;
-//
-// Some web servers can offload the file serving from PHP process,
-// comment out one the following options to enable it in Totara:
-//     $CFG->xsendfile = 'X-Sendfile';           // Apache {@see https://tn123.org/mod_xsendfile/}
-//     $CFG->xsendfile = 'X-LIGHTTPD-send-file'; // Lighttpd {@see http://redmine.lighttpd.net/projects/lighttpd/wiki/X-LIGHTTPD-send-file}
-//     $CFG->xsendfile = 'X-Accel-Redirect';     // Nginx {@see http://wiki.nginx.org/XSendfile}
-// If your X-Sendfile implementation (usually Nginx) uses directory aliases specify them
-// in the following array setting:
-//     $CFG->xsendfilealiases = array(
-//         '/dataroot/' => $CFG->dataroot,
-//         '/cachedir/' => '/var/www/totara/cache',    // for custom $CFG->cachedir locations
-//         '/localcachedir/' => '/var/local/cache',    // for custom $CFG->localcachedir locations
-//         '/tempdir/'  => '/var/www/totara/temp',     // for custom $CFG->tempdir locations
-//         '/filedir'   => '/var/www/totara/filedir',  // for custom $CFG->filedir locations
-//     );
-//
-// YUI caching may be sometimes improved by slasharguments:
-//     $CFG->yuislasharguments = 1;
-// Some servers may need a special rewrite rule to work around internal path length limitations:
-// RewriteRule (^.*/theme/yui_combo\.php)(/.*) $1?file=$2
-//
-//
-// Following settings may be used to select session driver, uncomment only one of the handlers.
-//   Database session handler (not compatible with MyISAM):
-//      $CFG->session_handler_class = '\core\session\database';
-//      $CFG->session_database_acquire_lock_timeout = 120;
-//
-//   File session handler (file system locking required):
-//      $CFG->session_handler_class = '\core\session\file';
-//      $CFG->session_file_save_path = $CFG->dataroot.'/sessions';
-//
-//   Memcached session handler (requires memcached server and extension):
-//      $CFG->session_handler_class = '\core\session\memcached';
-//      $CFG->session_memcached_save_path = '127.0.0.1:11211';
-//      $CFG->session_memcached_prefix = 'memc.sess.key.';
-//      $CFG->session_memcached_acquire_lock_timeout = 120;
-//      $CFG->session_memcached_lock_expire = 7200;
-//      $CFG->session_memcached_lock_retry_sleep = 150;   // Spin-lock retry sleeptime (msec).
-//
-//   Native Redis session handler:
-//      $CFG->session_handler_class = '\core\session\redis5';
-//      $CFG->session_redis5_host = '127.0.0.1';              // Optional.
-//      $CFG->session_redis5_port = 6379;                     // Optional.
-//      $CFG->session_redis5_timeout = 5;                     // Optional (seconds).
-//      $CFG->session_redis5_database = 0;                    // Optional, database number.
-//      $CFG->session_redis5_auth = '';                       // Optional, password.
-//      $CFG->session_redis5_prefix = 'PHPREDIS_SESSION';     // Optional.
-//      $CFG->session_redis5_lock_expire = 7200;              // Optional, default is $CFG->sessiontimeout (seconds).
-//      $CFG->session_redis5_lock_wait_time = 200000;         // Optional, default is 0.2s (microseconds).
-//      $CFG->session_redis5_lock_retries = 100;              // Optional, default is 100 times.
-//      $CFG->session_redis5_serializer_use_igbinary = false; // Optional, default is PHP built-in serializer.
-//
-//      Notes: Single master setup is required; RedisArray and RedisCluster environments are not supported.
-//             Redis server must support EX and NX options of SET command.
-//             Minimum required version of PHP redis extension is 5.0.0.
-//             See https://github.com/phpredis/phpredis#php-session-handler for more information.
-//
-//   Redis session handler (requires redis server and redis extension):
-//      $CFG->session_handler_class = '\core\session\redis';
-//      $CFG->session_redis_host = '127.0.0.1';
-//      $CFG->session_redis_port = 6379;  // Optional.
-//      $CFG->session_redis_database = 0;  // Optional, default is db 0.
-//      $CFG->session_redis_auth = ''; // Optional, default is don't set one.
-//      $CFG->session_redis_prefix = ''; // Optional, default is don't set one.
-//      $CFG->session_redis_acquire_lock_timeout = 120;
-//      $CFG->session_redis_lock_expire = 7200;
-//      $CFG->session_redis_lock_retry = 100; // Optional wait between lock attempts in ms, default is 100.
-//                                            // After 5 seconds it will throttle down to once per second.
-//      Use the igbinary serializer instead of the php default one. Note that phpredis must be compiled with
-//      igbinary support to make the setting to work. Also, if you change the serializer you have to flush the database!
-//      $CFG->session_redis_serializer_use_igbinary = false; // Optional, default is PHP builtin serializer.
-//
-//   Memcache session handler (requires memcached server and memcache extension):
-//      $CFG->session_handler_class = '\core\session\memcache';
-//      $CFG->session_memcache_save_path = '127.0.0.1:11211';
-//      $CFG->session_memcache_acquire_lock_timeout = 120;
-//      ** NOTE: Memcache session handler is deprecated and will be removed in Totara 14.0,
-//               use memcached session handler instead. **
-//
-// Please be aware that when selecting either Memcached or Memcache for sessions that it is advised to use a dedicated
-// memcache server. The memcache and memcached extensions do not provide isolated environments for individual uses.
-// Using the same server for other purposes (MUC for example) can lead to sessions being prematurely removed should
-// the other uses of the server purge the cache.
-//
-// Following setting allows you to alter how frequently is timemodified updated in sessions table.
-//      $CFG->session_update_timemodified_frequency = 20; // In seconds.
-//
-// For performance reasons some scripts (such as file serving) are by default allowed to acquire
-// read-only sessions without locking. You can disable this feature by uncommenting following line:
-//      $CFG->allow_lockless_readonly_sessions = false;
-//
-// If this setting is set to true, then Totara will track the IP of the
-// current user to make sure it hasn't changed during a session.  This
-// will prevent the possibility of sessions being hijacked via XSS, but it
-// may break things for users coming using proxies that change all the time,
-// like AOL.
-//      $CFG->tracksessionip = true;
-//
-// The following lines are for handling email bounces.
-//      $CFG->handlebounces = true;
-//      $CFG->minbounces = 10;
-//      $CFG->bounceratio = .20;
-// The next lines are needed both for bounce handling and any other email to module processing.
-// mailprefix must be EXACTLY four characters.
-// Uncomment and customise this block for Postfix
-//      $CFG->mailprefix = 'mdl+'; // + is the separator for Exim and Postfix.
-//      $CFG->mailprefix = 'mdl-'; // - is the separator for qmail
-//      $CFG->maildomain = 'youremaildomain.com';
-//
-// Enable when setting up advanced reverse proxy load balancing configurations,
-// it may be also necessary to enable this when using port forwarding.
-//      $CFG->reverseproxy = true;
-//
-// Enable when using external SSL appliance for performance reasons.
-// Please note that site may be accessible via http: or https:, but not both!
-//      $CFG->sslproxy = true;
 //
 // This setting will cause the userdate() function not to fix %d in
 // date strings, and just let them show with a zero prefix.
@@ -442,12 +260,6 @@ $CFG->directorypermissions = 02777;
 //
 // This setting will make some graphs (eg user logs) use lines instead of bars
 //      $CFG->preferlinegraphs = true;
-//
-// This experimental setting allows you to specify a class to rewrite outgoing urls
-// enabling 'clean urls' in conjunction with an apache / nginx handler.
-// The handler must implement \core\output\url_rewriter.
-// This may require other hacks and it may not be compatible with some features.
-//      $CFG->urlrewriteclass = '\local_cleanurls\url_rewriter';
 //
 // Enabling this will allow custom scripts to replace existing Totara scripts.
 // For example: if $CFG->customscripts/course/view.php exists then
@@ -491,79 +303,6 @@ $CFG->directorypermissions = 02777;
 //   profilingallowme, profilingallowall, profilinglifetime
 //       $CFG->earlyprofilingenabled = true;
 //
-// Force displayed usernames
-//   A little hack to anonymise user names for all students.  If you set these
-//   then all non-teachers will always see these for every person.
-//       $CFG->forcefirstname = 'Bruce';
-//       $CFG->forcelastname  = 'Simpson';
-//
-// The following setting will turn on username logging into Apache log. For full details regarding setting
-// up of this function please refer to the install section of the document.
-//     $CFG->apacheloguser = 0; // Turn this feature off. Default value.
-//     $CFG->apacheloguser = 1; // Log user id.
-//     $CFG->apacheloguser = 2; // Log full name in cleaned format. ie, Darth Vader will be displayed as darth_vader.
-//     $CFG->apacheloguser = 3; // Log username.
-// To get the values logged in Apache's log, add to your httpd.conf
-// the following statements. In the General part put:
-//     LogFormat "%h %l %{MOODLEUSER}n %t \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\"" moodleformat
-// And in the part specific to your Totara install / virtualhost:
-//     CustomLog "/your/path/to/log" moodleformat
-//
-// Alternatively for other webservers such as nginx, you can instead have the username sent via a http header
-// 'X-MOODLEUSER' which can be saved in the logfile and then stripped out before being sent to the browser:
-//     $CFG->headerloguser = 0; // Turn this feature off. Default value.
-//     $CFG->headerloguser = 1; // Log user id.
-//     $CFG->headerloguser = 2; // Log full name in cleaned format. ie, Darth Vader will be displayed as darth_vader.
-//     $CFG->headerloguser = 3; // Log username.
-//
-// CAUTION: Use of this option will expose usernames in the Apache / nginx log,
-// If you are going to publish your log, or the output of your web stats analyzer
-// this will weaken the security of your website.
-//
-// Email database connection errors to someone.  If Totara cannot connect to the
-// database, then email this address with a notice.
-//
-//     $CFG->emailconnectionerrorsto = 'your@emailaddress.com';
-//
-// Set the priority of themes from highest to lowest. This is useful (for
-// example) in sites where the user theme should override all other theme
-// settings for accessibility reasons. You can also disable types of themes
-// (other than site)  by removing them from the array. The default setting is:
-//      $CFG->themeorder = array('course', 'category', 'session', 'user', 'site');
-// NOTE: course, category, session, user themes still require the
-// respective settings to be enabled
-//
-// It is possible to add extra themes directory stored outside of $CFG->dirroot.
-// This local directory does not have to be accessible from internet.
-//
-//     $CFG->themedir = '/location/of/extra/themes';
-//
-// It is possible to specify different cache and temp directories, use local fast filesystem
-// for normal web servers. Server clusters MUST use shared filesystem for cachedir!
-// Localcachedir is intended for server clusters, it does not have to be shared by cluster nodes.
-// The directories must not be accessible via web.
-//
-//     $CFG->tempdir = '/var/www/totara/temp';        // Directory MUST BE SHARED by all clsuter nodes.
-//     $CFG->cachedir = '/var/www/totara/cache';      // Directory MUST BE SHARED by all cluster nodes, locking required.
-//     $CFG->localcachedir = '/var/local/cache';      // Intended for local node caching.
-//
-// Some filesystems such as NFS may not support file locking operations.
-// Locking resolves race conditions and is strongly recommended for production servers.
-//     $CFG->preventfilelocking = false;
-//
-// Site default language can be set via standard administration interface. If you
-// want to have initial error messages for eventual database connection problems
-// localized too, you have to set your language code here.
-//
-//     $CFG->lang = 'yourlangcode'; // for example 'cs'
-//
-// When Totara is about to perform an intensive operation it raises PHP's memory
-// limit. The following setting should be used on large sites to set the raised
-// memory limit to something higher.
-// The value for the settings should be a valid PHP memory value. e.g. 512M, 1G
-//
-//     $CFG->extramemorylimit = '1024M';
-//
 // Totara 2.4 introduced a new cache API.
 // The cache API stores a configuration file within the Totara data directory and
 // uses that rather than the database in order to function in a stand-alone manner.
@@ -574,56 +313,6 @@ $CFG->directorypermissions = 02777;
 // webserver.
 //
 //     $CFG->altcacheconfigpath = '/var/www/shared/totara.cache.config.php
-//
-// Use the following flag to completely disable the Available update notifications
-// feature and hide it from the server administration UI.
-//
-//      $CFG->disableupdatenotifications = true;
-//
-// Use the following flag to completely disable the installation of plugins
-// (new plugins, available updates and missing dependencies) and related
-// features (such as cancelling the plugin installation or upgrade) via the
-// server administration web interface.
-//
-//      $CFG->disableupdateautodeploy = true;
-//
-// Use the following flag to disable modifications to scheduled tasks
-// whilst still showing the state of tasks.
-//
-//      $CFG->preventscheduledtaskchanges = true;
-//
-// As of version 2.4 Totara serves icons as SVG images if the users browser appears
-// to support SVG.
-// For those wanting to control the serving of SVG images the following setting can
-// be defined in your config.php.
-// If it is not defined then the default (browser detection) will occur.
-//
-// To ensure they are always used when available:
-//      $CFG->svgicons = true;
-//
-// To ensure they are never used even when available:
-//      $CFG->svgicons = false;
-//
-// As of version 12, Totara introduces a new site administration menu available in the
-// site's top navigation.
-// For those wanting to continue displaying legacy site administration menu in the
-// 'Administration' block the following setting can be defined in your config.php.
-//
-//      $CFG->legacyadminsettingsmenu = true;
-//
-// Some administration options allow setting the path to executable files. This can
-// potentially cause a security risk. Set this option to true to disable editing
-// those config settings via the web. They will need to be set explicitly in the
-// config.php file
-//      $CFG->preventexecpath = true;
-//
-// Use the following flag to set userid for noreply user. If not set then Totara will
-// create dummy user and use -ve value as user id.
-//      $CFG->noreplyuserid = -10;
-//
-// As of version 2.6 Totara supports admin to set support user. If not set, all mails
-// will be sent to supportemail.
-//      $CFG->supportuserid = -20;
 //
 // Totara 2.7 introduces a locking api for critical tasks (e.g. cron).
 // The default locking system to use is DB locking for Postgres, and file locking for
@@ -656,30 +345,6 @@ $CFG->directorypermissions = 02777;
 //
 // Locking should be tested using lib/tests/other/lockingtestpage.php page.
 //
-// Totara 2.9 allows administrators to customise the list of supported file types.
-// To add a new filetype or override the definition of an existing one, set the
-// customfiletypes variable like this:
-//
-// $CFG->customfiletypes = array(
-//     (object)array(
-//         'extension' => 'frog',
-//         'icon' => 'archive',
-//         'type' => 'application/frog',
-//         'customdescription' => 'Amphibian-related file archive'
-//     )
-// );
-//
-// The extension, icon, and type fields are required. The icon field can refer to
-// any icon inside the pix/f folder. You can also set the customdescription field
-// (shown above) and (for advanced use) the groups, string, and defaulticon fields.
-//
-// Course completion logic changed in Totara 2.9 - failed activity completion
-// now triggers course completion. If you need the previous behaviour where failed
-// activities were ignored by course completion then add the following setting
-// to your config.php BEFORE upgrading to Totara 2.9
-//
-//      $CFG->completionexcludefailures = 1;
-//
 // Upgrade key
 //
 // If the upgrade key is defined here, then the value must be provided every time
@@ -692,16 +357,6 @@ $CFG->directorypermissions = 02777;
 // password.
 //
 //      $CFG->upgradekey = 'put_some_password-like_value_here';
-//
-//
-// Disable CSRF protection on login page in Totara
-//
-// Cross site request forgery protection can be temporarily disabled on the login
-// page in case of authentication plugin incompatibility or if deprecated alternate
-// login URL is in use.
-//
-//      $CFG->allowlogincsrf = 1; // Enabling this setting is very strongly discouraged for security reasons!
-//
 //
 // Limit to courses loaded by Calendar in Totara.
 //
