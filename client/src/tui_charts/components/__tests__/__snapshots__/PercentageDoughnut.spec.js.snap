@@ -1,18 +1,18 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`presentation/chartjs/ChartJs.vue Renders correctly 1`] = `
+exports[`PercentageDoughnut renders correctly 1`] = `
 <div>
   <div
     class="tui-chartJs__header"
-    title="This is an example header"
+    title="I am a big percentage doughnut"
   >
     
-    This is an example header
+    I am a big percentage doughnut
   
   </div>
    
   <canvas
-    aria-label="This is an example header"
+    aria-label="75%"
     class="chartjs-render-monitor"
     height="0"
     role="img"
@@ -20,7 +20,7 @@ exports[`presentation/chartjs/ChartJs.vue Renders correctly 1`] = `
     width="0"
   >
     <p>
-      This is an example header
+      75%
     </p>
   </canvas>
 </div>

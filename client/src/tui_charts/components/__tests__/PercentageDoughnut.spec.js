@@ -17,8 +17,8 @@
  */
 
 import { mount } from '@vue/test-utils';
-import component from 'tui/components/chartjs/PercentageDoughnut.vue';
-import ChartJs from 'tui/components/chartjs/ChartJs';
+import component from 'tui_charts/components/PercentageDoughnut.vue';
+import ChartJs from 'tui_charts/components/ChartJs';
 import { axe, toHaveNoViolations } from 'jest-axe';
 expect.extend(toHaveNoViolations);
 
@@ -40,9 +40,9 @@ jest.mock('tui/theme', () => {
   };
 });
 
-describe('presentation/chartjs/PercentageDoughnut.vue', () => {
+describe('PercentageDoughnut', () => {
   beforeAll(() => {
-    wrapper = mount(component, {
+    wrapper = mount(PercentageDoughnut, {
       propsData: {
         percentage: 75,
         header: 'I am a big percentage doughnut',
@@ -101,7 +101,7 @@ describe('presentation/chartjs/PercentageDoughnut.vue', () => {
   });
 
   it('passes correct properties to the chart component', () => {
-    let doughnut = mount(component, {
+    let doughnut = mount(PercentageDoughnut, {
       propsData: {
         percentage: 57,
         header: 'I am a big percentage doughnut!!',
@@ -181,7 +181,7 @@ describe('presentation/chartjs/PercentageDoughnut.vue', () => {
   });
 
   it('does not include second value in the dataset if 100% passed', () => {
-    let doughnut = mount(component, {
+    let doughnut = mount(PercentageDoughnut, {
       propsData: {
         percentage: 100,
         header: 'I am a big percentage doughnut!!',

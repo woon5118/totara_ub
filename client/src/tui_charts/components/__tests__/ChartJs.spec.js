@@ -20,7 +20,7 @@
 /* eslint-disable jest/expect-expect */
 
 import { shallowMount } from '@vue/test-utils';
-import component from 'tui/components/chartjs/ChartJs.vue';
+import component from 'tui_charts/components/ChartJs.vue';
 import { axe, toHaveNoViolations } from 'jest-axe';
 expect.extend(toHaveNoViolations);
 
@@ -123,9 +123,9 @@ jest.mock('tui/theme', () => {
 
 let wrapper;
 
-describe('presentation/chartjs/ChartJs.vue', () => {
+describe('ChartJs', () => {
   beforeAll(() => {
-    wrapper = shallowMount(component, {
+    wrapper = shallowMount(ChartJs, {
       propsData: {
         type: 'bar',
         options: {},
@@ -578,7 +578,7 @@ describe('presentation/chartjs/ChartJs.vue', () => {
     it('Sets default colors for a ' + propsData.header, () => {
       // Let's create a Chart component instance
       expectation(
-        shallowMount(component, {
+        shallowMount(ChartJs, {
           propsData,
         }).vm.chart
       );
@@ -587,7 +587,7 @@ describe('presentation/chartjs/ChartJs.vue', () => {
 
   it("Default colors won't be applied if provided by user...", () => {
     // When ChartJs initializes it sets the following values...
-    let chart = shallowMount(component, {
+    let chart = shallowMount(ChartJs, {
       propsData: {
         type: 'radar',
         header: 'Radar chart',
@@ -660,7 +660,7 @@ describe('presentation/chartjs/ChartJs.vue', () => {
   });
 
   it('It passes header as an aria label if header is not set', () => {
-    let anotherWrapper = shallowMount(component, {
+    let anotherWrapper = shallowMount(ChartJs, {
       propsData: {
         type: 'bar',
         options: {},

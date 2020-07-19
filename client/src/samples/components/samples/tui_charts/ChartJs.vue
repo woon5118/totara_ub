@@ -68,7 +68,7 @@
 
 <script>
 // Components
-import ChartJs from 'tui/components/chartjs/ChartJs';
+import ChartJs from 'tui_charts/components/ChartJs';
 import SamplesCode from 'samples/components/sample_parts/misc/SamplesCode';
 import SamplesExample from 'samples/components/sample_parts/misc/SamplesExample';
 import SamplesPropCtl from 'samples/components/sample_parts/misc/SamplesPropCtl';
@@ -126,7 +126,7 @@ export default {
     },
 
     codeScript() {
-      return `import ChartJs from 'tui/components/chartjs/ChartJs';
+      return `import ChartJs from 'tui_charts/components/ChartJs';
 
 export default {
   components: {

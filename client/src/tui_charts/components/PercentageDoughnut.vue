@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
-  @module totara_core
+  @module tui_charts
 -->
 
 <template>
@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import ChartJs from 'tui/components/chartjs/ChartJs';
+import ChartJs from 'tui_charts/components/ChartJs';
 import theme from 'tui/theme';
 
 let defaultColor = theme.getVar('tui-color-chart-background-1');

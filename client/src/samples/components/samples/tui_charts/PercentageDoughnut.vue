@@ -89,7 +89,7 @@
 
 <script>
 // Components
-import PercentageDoughnut from 'tui/components/chartjs/PercentageDoughnut';
+import PercentageDoughnut from 'tui_charts/components/PercentageDoughnut';
 import SamplesCode from 'samples/components/sample_parts/misc/SamplesCode';
 import SamplesExample from 'samples/components/sample_parts/misc/SamplesExample';
 import SamplesPropCtl from 'samples/components/sample_parts/misc/SamplesPropCtl';
@@ -166,7 +166,7 @@ export default {
     },
 
     codeScript() {
-      return `import PercentageDoughnut from 'tui/components/chartjs/PercentageDoughnut';
+      return `import PercentageDoughnut from 'tui_charts/components/PercentageDoughnut';
 
 export default {
   components: {
