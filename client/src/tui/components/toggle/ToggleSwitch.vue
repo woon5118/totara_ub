@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Steve Barnett <steve.barnett@totaralearning.com>
-  @module totara_core
+  @module tui
 -->
 
 <template>

@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import Avatar from 'totara_core/components/avatar/Avatar';
+import Avatar from 'tui/components/avatar/Avatar';
 
 export default {
   components: {

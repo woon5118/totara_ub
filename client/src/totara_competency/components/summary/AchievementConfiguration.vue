@@ -86,13 +86,13 @@
 
 <script>
 // Components
-import Card from 'totara_core/components/card/Card';
+import Card from 'tui/components/card/Card';
 import Criteria from 'totara_competency/components/summary/AchievementConfigurationCriteria';
-import EditIcon from 'totara_core/components/icons/common/Edit';
-import Grid from 'totara_core/components/grid/Grid';
-import GridItem from 'totara_core/components/grid/GridItem';
-import OrBox from 'totara_core/components/decor/OrBox';
-import Separator from 'totara_core/components/decor/Separator';
+import EditIcon from 'tui/components/icons/common/Edit';
+import Grid from 'tui/components/grid/Grid';
+import GridItem from 'tui/components/grid/GridItem';
+import OrBox from 'tui/components/decor/OrBox';
+import Separator from 'tui/components/decor/Separator';
 
 // Queries
 import achievementConfigurationQuery from 'totara_competency/graphql/achievement_criteria';

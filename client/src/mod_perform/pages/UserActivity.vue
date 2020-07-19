@@ -41,8 +41,8 @@
 
 <script>
 import subjectInstanceQuery from 'mod_perform/graphql/subject_instance.graphql';
-import Loader from 'totara_core/components/loader/Loader';
-import NotificationBanner from 'totara_core/components/notifications/NotificationBanner';
+import Loader from 'tui/components/loader/Loader';
+import NotificationBanner from 'tui/components/notifications/NotificationBanner';
 import ActivityContent from 'mod_perform/components/user_activities/ActivityContent';
 
 export default {

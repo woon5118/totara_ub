@@ -69,13 +69,13 @@
 </template>
 
 <script>
-import Button from 'totara_core/components/buttons/Button';
+import Button from 'tui/components/buttons/Button';
 import SelectActivityModal from 'mod_perform/components/manage_activity/participation/SelectActivityModal';
-import Tab from 'totara_core/components/tabs/Tab';
-import Tabs from 'totara_core/components/tabs/Tabs';
+import Tab from 'tui/components/tabs/Tab';
+import Tabs from 'tui/components/tabs/Tabs';
 import UserActivityList from 'mod_perform/components/user_activities/list/Activities';
 import { NOTIFICATION_DURATION } from 'mod_perform/constants';
-import { notify } from 'totara_core/notifications';
+import { notify } from 'tui/notifications';
 
 export default {
   components: {

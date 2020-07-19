@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import SelectFilter from 'totara_core/components/filters/SelectFilter';
+import SelectFilter from 'tui/components/filters/SelectFilter';
 
 export default {
   components: {

@@ -73,12 +73,12 @@
 
 <script>
 import AdminFormMixin from 'mod_perform/components/element/admin_form/AdminFormMixin';
-import Checkbox from 'totara_core/components/form/Checkbox';
+import Checkbox from 'tui/components/form/Checkbox';
 import ElementAdminForm from 'mod_perform/components/element/ElementAdminForm';
 import FormActionButtons from 'mod_perform/components/element/admin_form/ActionButtons';
 import IdentifierInput from 'mod_perform/components/element/admin_form/IdentifierInput';
-import Textarea from 'totara_core/components/form/Textarea';
-import { Uniform, FormRow, FormText } from 'totara_core/components/uniform';
+import Textarea from 'tui/components/form/Textarea';
+import { Uniform, FormRow, FormText } from 'tui/components/uniform';
 
 export default {
   components: {

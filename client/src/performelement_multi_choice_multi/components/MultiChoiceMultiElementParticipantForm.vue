@@ -84,10 +84,10 @@
 </template>
 
 <script>
-import FormScope from 'totara_core/components/reform/FormScope';
-import FormCheckboxGroup from 'totara_core/components/uniform/FormCheckboxGroup';
-import Checkbox from 'totara_core/components/form/Checkbox';
-import { v as validation } from 'totara_core/validation';
+import FormScope from 'tui/components/reform/FormScope';
+import FormCheckboxGroup from 'tui/components/uniform/FormCheckboxGroup';
+import Checkbox from 'tui/components/form/Checkbox';
+import { v as validation } from 'tui/validation';
 
 export default {
   components: {

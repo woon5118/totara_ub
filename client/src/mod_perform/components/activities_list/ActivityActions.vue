@@ -97,13 +97,13 @@
 
 <script>
 import ActivateActivityModal from 'mod_perform/components/manage_activity/ActivateActivityModal';
-import Users from 'totara_core/components/icons/common/Users';
-import ConfirmationModal from 'totara_core/components/modal/ConfirmationModal';
-import Dropdown from 'totara_core/components/dropdown/Dropdown';
-import DropdownItem from 'totara_core/components/dropdown/DropdownItem';
-import MoreButton from 'totara_core/components/buttons/MoreIcon';
+import Users from 'tui/components/icons/common/Users';
+import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
+import Dropdown from 'tui/components/dropdown/Dropdown';
+import DropdownItem from 'tui/components/dropdown/DropdownItem';
+import MoreButton from 'tui/components/buttons/MoreIcon';
 import ParticipationReportingIcon from 'mod_perform/components/icons/ParticipationReporting';
-import { notify } from 'totara_core/notifications';
+import { notify } from 'tui/notifications';
 import {
   ACTIVITY_STATUS_DRAFT,
   NOTIFICATION_DURATION,

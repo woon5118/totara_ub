@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import ProficientIcon from 'totara_core/components/icons/common/CheckSuccess';
+import ProficientIcon from 'tui/components/icons/common/CheckSuccess';
 
 export default {
   components: {

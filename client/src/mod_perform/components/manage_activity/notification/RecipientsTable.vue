@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import ToggleSwitch from 'totara_core/components/toggle/ToggleSwitch';
+import ToggleSwitch from 'tui/components/toggle/ToggleSwitch';
 
 export default {
   components: {

@@ -63,10 +63,10 @@
 </template>
 
 <script>
-import ActionCard from 'totara_core/components/card/ActionCard';
+import ActionCard from 'tui/components/card/ActionCard';
 import ActivateActivityModal from 'mod_perform/components/manage_activity/ActivateActivityModal';
-import Button from 'totara_core/components/buttons/Button';
-import HelpIcon from 'totara_core/components/form/HelpIcon';
+import Button from 'tui/components/buttons/Button';
+import HelpIcon from 'tui/components/form/HelpIcon';
 import {
   ACTIVITY_STATUS_ACTIVE,
   ACTIVITY_STATUS_DRAFT,

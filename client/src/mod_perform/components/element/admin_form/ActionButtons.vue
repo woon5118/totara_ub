@@ -37,8 +37,8 @@
 </template>
 
 <script>
-import ButtonGroup from 'totara_core/components/buttons/ButtonGroup';
-import Button from 'totara_core/components/buttons/Button';
+import ButtonGroup from 'tui/components/buttons/ButtonGroup';
+import Button from 'tui/components/buttons/Button';
 
 export default {
   components: {

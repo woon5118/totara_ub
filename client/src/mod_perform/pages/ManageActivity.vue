@@ -64,16 +64,16 @@
 import ActivityStatusBanner from 'mod_perform/components/manage_activity/ActivityStatusBanner';
 import AssignmentsTab from 'mod_perform/components/manage_activity/assignment/AssignmentsTab';
 import ActivityContentTab from 'mod_perform/components/manage_activity/content/ActivityContentTab';
-import FlexIcon from 'totara_core/components/icons/FlexIcon';
+import FlexIcon from 'tui/components/icons/FlexIcon';
 import GeneralInfoTab from 'mod_perform/components/manage_activity/GeneralInfoTab';
 import NotificationsTab from 'mod_perform/components/manage_activity/notification/NotificationsTab';
-import Grid from 'totara_core/components/grid/Grid';
-import GridItem from 'totara_core/components/grid/GridItem';
-import Loader from 'totara_core/components/loader/Loader';
-import Tab from 'totara_core/components/tabs/Tab';
-import Tabs from 'totara_core/components/tabs/Tabs';
+import Grid from 'tui/components/grid/Grid';
+import GridItem from 'tui/components/grid/GridItem';
+import Loader from 'tui/components/loader/Loader';
+import Tab from 'tui/components/tabs/Tab';
+import Tabs from 'tui/components/tabs/Tabs';
 import activityQuery from 'mod_perform/graphql/activity.graphql';
-import { notify } from 'totara_core/notifications';
+import { notify } from 'tui/notifications';
 import { NOTIFICATION_DURATION } from 'mod_perform/constants';
 
 export default {

@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import { FormRow, FormText } from 'totara_core/components/uniform';
+import { FormRow, FormText } from 'tui/components/uniform';
 
 export default {
   components: {

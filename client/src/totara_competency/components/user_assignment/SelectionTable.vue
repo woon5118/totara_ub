@@ -95,10 +95,10 @@
 </template>
 
 <script>
-import Cell from 'totara_core/components/datatable/Cell';
-import ExpandCell from 'totara_core/components/datatable/ExpandCell';
-import HeaderCell from 'totara_core/components/datatable/HeaderCell';
-import SelectTable from 'totara_core/components/datatable/SelectTable';
+import Cell from 'tui/components/datatable/Cell';
+import ExpandCell from 'tui/components/datatable/ExpandCell';
+import HeaderCell from 'tui/components/datatable/HeaderCell';
+import SelectTable from 'tui/components/datatable/SelectTable';
 
 export default {
   components: {

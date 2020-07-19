@@ -85,9 +85,9 @@
 </template>
 
 <script>
-import Table from 'totara_core/components/datatable/Table';
-import HeaderCell from 'totara_core/components/datatable/HeaderCell';
-import Cell from 'totara_core/components/datatable/Cell';
+import Table from 'tui/components/datatable/Table';
+import HeaderCell from 'tui/components/datatable/HeaderCell';
+import Cell from 'tui/components/datatable/Cell';
 import MyRatingCell from 'totara_competency/components/profile/MyRatingCell';
 
 export default {

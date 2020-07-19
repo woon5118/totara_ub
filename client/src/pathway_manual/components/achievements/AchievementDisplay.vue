@@ -56,7 +56,7 @@
 <script>
 // Components
 import AchievementDisplayRater from 'pathway_manual/components/achievements/AchievementDisplayRater';
-import Collapsible from 'totara_core/components/collapsible/Collapsible';
+import Collapsible from 'tui/components/collapsible/Collapsible';
 
 // GraphQL
 import RoleRatingsQuery from 'pathway_manual/graphql/role_ratings';

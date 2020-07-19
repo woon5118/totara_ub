@@ -84,17 +84,17 @@
 
 <script>
 import ActivityActions from 'mod_perform/components/activities_list/ActivityActions';
-import Button from 'totara_core/components/buttons/Button';
-import Cell from 'totara_core/components/datatable/Cell';
+import Button from 'tui/components/buttons/Button';
+import Cell from 'tui/components/datatable/Cell';
 import GeneralInfoForm from 'mod_perform/components/manage_activity/GeneralInfoTab';
-import HeaderCell from 'totara_core/components/datatable/HeaderCell';
-import Loader from 'totara_core/components/loader/Loader';
-import Modal from 'totara_core/components/modal/Modal';
-import ModalContent from 'totara_core/components/modal/ModalContent';
-import ModalPresenter from 'totara_core/components/modal/ModalPresenter';
+import HeaderCell from 'tui/components/datatable/HeaderCell';
+import Loader from 'tui/components/loader/Loader';
+import Modal from 'tui/components/modal/Modal';
+import ModalContent from 'tui/components/modal/ModalContent';
+import ModalPresenter from 'tui/components/modal/ModalPresenter';
 import performActivitiesQuery from 'mod_perform/graphql/activities.graphql';
-import Table from 'totara_core/components/datatable/Table';
-import { notify } from 'totara_core/notifications';
+import Table from 'tui/components/datatable/Table';
+import { notify } from 'tui/notifications';
 import { NOTIFICATION_DURATION } from 'mod_perform/constants';
 
 export default {

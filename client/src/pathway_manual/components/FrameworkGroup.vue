@@ -78,15 +78,15 @@
 </template>
 
 <script>
-import Cell from 'totara_core/components/datatable/Cell';
-import Collapsible from 'totara_core/components/collapsible/Collapsible';
-import HeaderCell from 'totara_core/components/datatable/HeaderCell';
-import InfoIconButton from 'totara_core/components/buttons/InfoIconButton';
+import Cell from 'tui/components/datatable/Cell';
+import Collapsible from 'tui/components/collapsible/Collapsible';
+import HeaderCell from 'tui/components/datatable/HeaderCell';
+import InfoIconButton from 'tui/components/buttons/InfoIconButton';
 import LastRatingBlock from 'pathway_manual/components/LastRatingBlock';
 import LastRatingHelp from 'pathway_manual/components/LastRatingHelp';
 import RatingCell from 'pathway_manual/components/RatingCell';
 import RatingScaleOverview from 'totara_competency/components/RatingScaleOverview';
-import Table from 'totara_core/components/datatable/Table';
+import Table from 'tui/components/datatable/Table';
 import { ROLE_SELF } from 'pathway_manual/constants';
 
 export default {

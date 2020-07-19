@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Kian Nguyen <kian.nguyen@totaralearning.com>
-  @module totara_core
+  @module tui
 -->
 
 <script>

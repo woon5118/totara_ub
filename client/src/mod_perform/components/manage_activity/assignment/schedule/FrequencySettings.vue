@@ -213,8 +213,8 @@
 </template>
 
 <script>
-import { FormNumber, FormRadioGroup } from 'totara_core/components/uniform';
-import Radio from 'totara_core/components/form/Radio';
+import { FormNumber, FormRadioGroup } from 'tui/components/uniform';
+import Radio from 'tui/components/form/Radio';
 import RelativeDateSelector from 'mod_perform/components/manage_activity/assignment/schedule/RelativeDateSelector';
 import ScheduleSettingContainer from 'mod_perform/components/manage_activity/assignment/schedule/ScheduleSettingContainer';
 

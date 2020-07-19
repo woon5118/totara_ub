@@ -13,7 +13,7 @@
  * Please contact [licensing@totaralearning.com] for more information.
  *
  * @author Dave Wallace <dave.wallace@totaralearning.com>
- * @module totara_core
+ * @module tui
  */
 
 import { shallowMount } from '@vue/test-utils';

@@ -26,8 +26,8 @@
 </template>
 
 <script>
-import FormScope from 'totara_core/components/reform/FormScope';
-import FormTextarea from 'totara_core/components/uniform/FormTextarea';
+import FormScope from 'tui/components/reform/FormScope';
+import FormTextarea from 'tui/components/uniform/FormTextarea';
 
 export default {
   components: {

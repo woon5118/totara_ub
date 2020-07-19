@@ -80,9 +80,9 @@
 </template>
 
 <script>
-import Button from 'totara_core/components/buttons/Button';
-import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
-import FlexIcon from 'totara_core/components/icons/FlexIcon';
+import Button from 'tui/components/buttons/Button';
+import ButtonIcon from 'tui/components/buttons/ButtonIcon';
+import FlexIcon from 'tui/components/icons/FlexIcon';
 import RatingPopover from 'pathway_manual/components/RatingPopover';
 
 import { NONE_OPTION_VALUE } from 'pathway_manual/constants';

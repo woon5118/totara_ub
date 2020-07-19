@@ -29,8 +29,8 @@
 
 <script>
 import ChartJs from 'totara_core/components/chartjs/ChartJs';
-import theme from 'totara_core/theme';
-import { unique } from 'totara_core/util';
+import theme from 'tui/theme';
+import { unique } from 'tui/util';
 
 let rotate = (x, y, angle) => {
   return {

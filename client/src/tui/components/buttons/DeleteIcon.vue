@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Kunle Odusan <kunle.odusan@totaralearning.com>
-  @module totara_core
+  @module tui
 -->
 
 <template>
@@ -27,8 +27,8 @@
 </template>
 
 <script>
-import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
-import DeleteIcon from 'totara_core/components/icons/common/Delete';
+import ButtonIcon from 'tui/components/buttons/ButtonIcon';
+import DeleteIcon from 'tui/components/icons/common/Delete';
 
 export default {
   components: {

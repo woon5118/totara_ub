@@ -62,9 +62,9 @@
 </template>
 
 <script>
-import Label from 'totara_core/components/form/Label';
-import { isIsoAfter } from 'totara_core/date';
-import { FormScope, FormDateSelector } from 'totara_core/components/uniform';
+import Label from 'tui/components/form/Label';
+import { isIsoAfter } from 'tui/date';
+import { FormScope, FormDateSelector } from 'tui/components/uniform';
 
 export default {
   components: { FormDateSelector, FormScope, Label },

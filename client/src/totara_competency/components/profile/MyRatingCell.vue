@@ -26,8 +26,8 @@
 </template>
 
 <script>
-import Button from 'totara_core/components/buttons/Button';
-import Popover from 'totara_core/components/popover/Popover';
+import Button from 'tui/components/buttons/Button';
+import Popover from 'tui/components/popover/Popover';
 import RatingScaleOverview from 'totara_competency/components/RatingScaleOverview';
 
 export default {

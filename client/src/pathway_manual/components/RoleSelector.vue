@@ -51,9 +51,9 @@
 </template>
 
 <script>
-import ConfirmationModal from 'totara_core/components/modal/ConfirmationModal';
+import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
 import RolesQuery from 'pathway_manual/graphql/roles.graphql';
-import Select from 'totara_core/components/form/Select';
+import Select from 'tui/components/form/Select';
 
 const UNSET_OPTION = -1;
 

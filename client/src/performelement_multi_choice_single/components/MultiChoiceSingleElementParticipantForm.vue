@@ -29,9 +29,9 @@
 </template>
 
 <script>
-import FormScope from 'totara_core/components/reform/FormScope';
-import Radio from 'totara_core/components/form/Radio';
-import FormRadioGroup from 'totara_core/components/uniform/FormRadioGroup';
+import FormScope from 'tui/components/reform/FormScope';
+import Radio from 'tui/components/form/Radio';
+import FormRadioGroup from 'tui/components/uniform/FormRadioGroup';
 
 export default {
   components: {

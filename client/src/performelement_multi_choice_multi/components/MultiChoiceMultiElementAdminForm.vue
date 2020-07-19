@@ -131,17 +131,17 @@
 </template>
 
 <script>
-import AddIcon from 'totara_core/components/icons/common/Add';
+import AddIcon from 'tui/components/icons/common/Add';
 import AdminFormMixin from 'mod_perform/components/element/admin_form/AdminFormMixin';
-import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
-import Checkbox from 'totara_core/components/form/Checkbox';
+import ButtonIcon from 'tui/components/buttons/ButtonIcon';
+import Checkbox from 'tui/components/form/Checkbox';
 import ElementAdminForm from 'mod_perform/components/element/ElementAdminForm';
 import FormActionButtons from 'mod_perform/components/element/admin_form/ActionButtons';
-import FormNumber from 'totara_core/components/uniform/FormNumber';
-import FormText from 'totara_core/components/uniform/FormText';
+import FormNumber from 'tui/components/uniform/FormNumber';
+import FormText from 'tui/components/uniform/FormText';
 import IdentifierInput from 'mod_perform/components/element/admin_form/IdentifierInput';
-import Repeater from 'totara_core/components/form/Repeater';
-import { Uniform, FormRow, FieldArray } from 'totara_core/components/uniform';
+import Repeater from 'tui/components/form/Repeater';
+import { Uniform, FormRow, FieldArray } from 'tui/components/uniform';
 
 const MIN_OPTIONS = 2;
 const OPTION_PREFIX = 'option_';

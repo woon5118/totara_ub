@@ -162,14 +162,14 @@
 </template>
 
 <script>
-import Avatar from 'totara_core/components/avatar/Avatar';
-import Button from 'totara_core/components/buttons/Button';
-import Cell from 'totara_core/components/datatable/Cell';
-import Lock from 'totara_core/components/icons/common/Lock';
-import Lozenge from 'totara_core/components/lozenge/Lozenge';
-import ModalPresenter from 'totara_core/components/modal/ModalPresenter';
+import Avatar from 'tui/components/avatar/Avatar';
+import Button from 'tui/components/buttons/Button';
+import Cell from 'tui/components/datatable/Cell';
+import Lock from 'tui/components/icons/common/Lock';
+import Lozenge from 'tui/components/lozenge/Lozenge';
+import ModalPresenter from 'tui/components/modal/ModalPresenter';
 import RelationshipSelector from 'mod_perform/components/user_activities/list/RelationshipSelector';
-import Table from 'totara_core/components/datatable/Table';
+import Table from 'tui/components/datatable/Table';
 
 export default {
   components: {

@@ -89,13 +89,13 @@
   </Popover>
 </template>
 <script>
-import Button from 'totara_core/components/buttons/Button';
-import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
-import DeleteIcon from 'totara_core/components/icons/common/Delete';
-import Popover from 'totara_core/components/popover/Popover';
-import Radio from 'totara_core/components/form/Radio';
-import RadioGroup from 'totara_core/components/form/RadioGroup';
-import Textarea from 'totara_core/components/form/Textarea';
+import Button from 'tui/components/buttons/Button';
+import ButtonIcon from 'tui/components/buttons/ButtonIcon';
+import DeleteIcon from 'tui/components/icons/common/Delete';
+import Popover from 'tui/components/popover/Popover';
+import Radio from 'tui/components/form/Radio';
+import RadioGroup from 'tui/components/form/RadioGroup';
+import Textarea from 'tui/components/form/Textarea';
 
 import { NONE_OPTION_VALUE } from 'pathway_manual/constants';
 

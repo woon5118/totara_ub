@@ -57,8 +57,8 @@
 
 <script>
 // Components
-import Lozenge from 'totara_core/components/lozenge/Lozenge';
-import ProgressTracker from 'totara_core/components/progresstracker/ProgressTracker';
+import Lozenge from 'tui/components/lozenge/Lozenge';
+import ProgressTracker from 'tui/components/progresstracker/ProgressTracker';
 
 // GraphQL
 import ScaleDetailsQuery from 'totara_competency/graphql/scale';

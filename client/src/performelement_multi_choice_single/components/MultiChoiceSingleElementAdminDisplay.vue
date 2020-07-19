@@ -43,8 +43,8 @@
 
 <script>
 import ElementAdminDisplay from 'mod_perform/components/element/ElementAdminDisplay';
-import Radio from 'totara_core/components/form/Radio';
-import RadioGroup from 'totara_core/components/form/RadioGroup';
+import Radio from 'tui/components/form/Radio';
+import RadioGroup from 'tui/components/form/RadioGroup';
 
 export default {
   components: {

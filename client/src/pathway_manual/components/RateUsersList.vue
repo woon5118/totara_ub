@@ -84,15 +84,15 @@
 </template>
 
 <script>
-import Avatar from 'totara_core/components/avatar/Avatar';
-import Cell from 'totara_core/components/datatable/Cell';
-import HeaderCell from 'totara_core/components/datatable/HeaderCell';
+import Avatar from 'tui/components/avatar/Avatar';
+import Cell from 'tui/components/datatable/Cell';
+import HeaderCell from 'tui/components/datatable/HeaderCell';
 import LastRatingBlock from 'pathway_manual/components/LastRatingBlock';
 import LastRatingHelp from 'pathway_manual/components/LastRatingHelp';
-import Loader from 'totara_core/components/loader/Loader';
+import Loader from 'tui/components/loader/Loader';
 import RateableUsersQuery from 'pathway_manual/graphql/rateable_users.graphql';
-import SearchBox from 'totara_core/components/form/SearchBox';
-import Table from 'totara_core/components/datatable/Table';
+import SearchBox from 'tui/components/form/SearchBox';
+import Table from 'tui/components/datatable/Table';
 
 export default {
   components: {

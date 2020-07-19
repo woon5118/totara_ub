@@ -47,7 +47,7 @@
 <script>
 // Components
 import AchievementLayout from 'totara_competency/components/achievements/AchievementLayout';
-import AndBox from 'totara_core/components/decor/AndBox';
+import AndBox from 'tui/components/decor/AndBox';
 
 // GraphQL
 import CriteriaGroupAchievementsQuery from 'pathway_criteria_group/graphql/achievements';

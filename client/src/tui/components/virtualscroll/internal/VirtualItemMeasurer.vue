@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Arshad Anwer <arshad.anwer@totaralearning.com>
-  @module totara_core
+  @module tui
 -->
 
 <script>

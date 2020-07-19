@@ -62,11 +62,11 @@
   </Popover>
 </template>
 <script>
-import AddIcon from 'totara_core/components/icons/common/Add';
-import Button from 'totara_core/components/buttons/Button';
-import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
-import Checkbox from 'totara_core/components/form/Checkbox';
-import Popover from 'totara_core/components/popover/Popover';
+import AddIcon from 'tui/components/icons/common/Add';
+import Button from 'tui/components/buttons/Button';
+import ButtonIcon from 'tui/components/buttons/ButtonIcon';
+import Checkbox from 'tui/components/form/Checkbox';
+import Popover from 'tui/components/popover/Popover';
 
 export default {
   components: {

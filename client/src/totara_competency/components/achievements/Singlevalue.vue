@@ -72,9 +72,9 @@
 <script>
 // Components
 import AchievementLayout from 'totara_competency/components/achievements/AchievementLayout';
-import Collapsible from 'totara_core/components/collapsible/Collapsible';
-import Lozenge from 'totara_core/components/lozenge/Lozenge';
-import OrBox from 'totara_core/components/decor/OrBox';
+import Collapsible from 'tui/components/collapsible/Collapsible';
+import Lozenge from 'tui/components/lozenge/Lozenge';
+import OrBox from 'tui/components/decor/OrBox';
 
 // GraphQL
 import ScaleAchievementsQuery from 'totara_competency/graphql/scale_achievements';

@@ -64,10 +64,10 @@
 <script>
 import activateActivityMutation from 'mod_perform/graphql/activate_activity';
 import activityUsersToAssignCountQuery from 'mod_perform/graphql/activity_users_to_assign_count';
-import ConfirmationModal from 'totara_core/components/modal/ConfirmationModal';
-import InformationModal from 'totara_core/components/modal/InformationModal';
+import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
+import InformationModal from 'tui/components/modal/InformationModal';
 import { NOTIFICATION_DURATION } from 'mod_perform/constants';
-import { notify } from 'totara_core/notifications';
+import { notify } from 'tui/notifications';
 
 export default {
   components: {

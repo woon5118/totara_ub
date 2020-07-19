@@ -52,13 +52,13 @@
 </template>
 
 <script>
-import { notify } from 'totara_core/notifications';
+import { notify } from 'tui/notifications';
 import { NOTIFICATION_DURATION } from 'mod_perform/constants';
-import ConfirmationModal from 'totara_core/components/modal/ConfirmationModal';
-import Form from 'totara_core/components/form/Form';
-import FormRow from 'totara_core/components/form/FormRow';
+import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
+import Form from 'tui/components/form/Form';
+import FormRow from 'tui/components/form/FormRow';
 import ToggleActivityMultiSectionSettingMutation from 'mod_perform/graphql/toggle_activity_multisection_setting';
-import ToggleSwitch from 'totara_core/components/toggle/ToggleSwitch';
+import ToggleSwitch from 'tui/components/toggle/ToggleSwitch';
 
 export default {
   components: {

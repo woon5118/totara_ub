@@ -54,10 +54,10 @@
 </template>
 
 <script>
-import FilterBar from 'totara_core/components/filters/FilterBar';
-import SelectFilter from 'totara_core/components/filters/SelectFilter';
-import SearchFilter from 'totara_core/components/filters/SearchFilter';
-import { debounce } from 'totara_core/util';
+import FilterBar from 'tui/components/filters/FilterBar';
+import SelectFilter from 'tui/components/filters/SelectFilter';
+import SearchFilter from 'tui/components/filters/SearchFilter';
+import { debounce } from 'tui/util';
 
 export default {
   components: {

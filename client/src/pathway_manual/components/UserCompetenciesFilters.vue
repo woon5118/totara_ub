@@ -96,11 +96,11 @@
 </template>
 
 <script>
-import Button from 'totara_core/components/buttons/Button';
-import ButtonFilter from 'totara_core/components/filters/ButtonFilter';
-import ConfirmationModal from 'totara_core/components/modal/ConfirmationModal';
-import FilterBar from 'totara_core/components/filters/FilterBar';
-import SelectFilter from 'totara_core/components/filters/SelectFilter';
+import Button from 'tui/components/buttons/Button';
+import ButtonFilter from 'tui/components/filters/ButtonFilter';
+import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
+import FilterBar from 'tui/components/filters/FilterBar';
+import SelectFilter from 'tui/components/filters/SelectFilter';
 
 export default {
   components: {

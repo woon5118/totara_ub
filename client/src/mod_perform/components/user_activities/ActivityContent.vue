@@ -183,26 +183,26 @@
 
 <script>
 // Util
-import { uniqueId } from 'totara_core/util';
+import { uniqueId } from 'tui/util';
 import { NOTIFICATION_DURATION } from 'mod_perform/constants';
-import { notify } from 'totara_core/notifications';
+import { notify } from 'tui/notifications';
 // Components
-import Button from 'totara_core/components/buttons/Button';
-import ButtonCancel from 'totara_core/components/buttons/Cancel';
-import ButtonGroup from 'totara_core/components/buttons/ButtonGroup';
-import ButtonSubmit from 'totara_core/components/buttons/Submit';
-import Checkbox from 'totara_core/components/form/Checkbox';
-import Collapsible from 'totara_core/components/collapsible/Collapsible';
-import ConfirmationModal from 'totara_core/components/modal/ConfirmationModal';
+import Button from 'tui/components/buttons/Button';
+import ButtonCancel from 'tui/components/buttons/Cancel';
+import ButtonGroup from 'tui/components/buttons/ButtonGroup';
+import ButtonSubmit from 'tui/components/buttons/Submit';
+import Checkbox from 'tui/components/form/Checkbox';
+import Collapsible from 'tui/components/collapsible/Collapsible';
+import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
 import ElementParticipantForm from 'mod_perform/components/element/ElementParticipantForm';
-import Grid from 'totara_core/components/grid/Grid';
-import GridItem from 'totara_core/components/grid/GridItem';
-import Loader from 'totara_core/components/loader/Loader';
+import Grid from 'tui/components/grid/Grid';
+import GridItem from 'tui/components/grid/GridItem';
+import Loader from 'tui/components/loader/Loader';
 import OtherParticipantResponses from 'mod_perform/components/user_activities/participant/OtherParticipantResponses';
 import ParticipantUserHeader from 'mod_perform/components/user_activities/participant/ParticipantUserHeader';
 import ResponsesAreVisibleToDescription from 'mod_perform/components/user_activities/participant/ResponsesAreVisibleToDescription';
-import ToggleSwitch from 'totara_core/components/toggle/ToggleSwitch';
-import { Uniform } from 'totara_core/components/uniform';
+import ToggleSwitch from 'tui/components/toggle/ToggleSwitch';
+import { Uniform } from 'tui/components/uniform';
 // graphQL
 import SectionResponsesQuery from 'mod_perform/graphql/participant_section';
 import UpdateSectionResponsesMutation from 'mod_perform/graphql/update_section_responses';

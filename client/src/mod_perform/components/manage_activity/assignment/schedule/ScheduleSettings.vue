@@ -60,8 +60,8 @@
 import RelativeDateSelector from 'mod_perform/components/manage_activity/assignment/schedule/RelativeDateSelector';
 import ScheduleSettingContainer from 'mod_perform/components/manage_activity/assignment/schedule/ScheduleSettingContainer';
 import FixedScheduleRangeSelector from 'mod_perform/components/manage_activity/assignment/schedule/FixedScheduleRangeSelector';
-import FormCheckbox from 'totara_core/components/uniform/FormCheckbox';
-import FormScope from 'totara_core/components/reform/FormScope';
+import FormCheckbox from 'tui/components/uniform/FormCheckbox';
+import FormScope from 'tui/components/reform/FormScope';
 
 export default {
   components: {

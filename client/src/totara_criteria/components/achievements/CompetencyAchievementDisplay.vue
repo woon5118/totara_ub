@@ -178,15 +178,15 @@
 <script>
 // Components
 import AchievementLayout from 'totara_competency/components/achievements/AchievementLayout';
-import ActionLink from 'totara_core/components/links/ActionLink';
-import Button from 'totara_core/components/buttons/Button';
-import Cell from 'totara_core/components/datatable/Cell';
-import CheckIcon from 'totara_core/components/icons/common/CheckSuccess';
-import ConfirmationModal from 'totara_core/components/modal/ConfirmationModal';
-import ExpandCell from 'totara_core/components/datatable/ExpandCell';
+import ActionLink from 'tui/components/links/ActionLink';
+import Button from 'tui/components/buttons/Button';
+import Cell from 'tui/components/datatable/Cell';
+import CheckIcon from 'tui/components/icons/common/CheckSuccess';
+import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
+import ExpandCell from 'tui/components/datatable/ExpandCell';
 import ProgressCircle from 'totara_competency/components/achievements/ProgressCircle';
-import Table from 'totara_core/components/datatable/Table';
-import { notify } from 'totara_core/notifications';
+import Table from 'tui/components/datatable/Table';
+import { notify } from 'tui/notifications';
 // GraphQL
 import CreateUserAssignmentMutation from 'totara_competency/graphql/create_user_assignments';
 

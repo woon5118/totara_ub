@@ -71,10 +71,10 @@
 
 <script>
 // Components
-import AndBox from 'totara_core/components/decor/AndBox';
-import Card from 'totara_core/components/card/Card';
-import Separator from 'totara_core/components/decor/Separator';
-import WarningIcon from 'totara_core/components/icons/common/Warning';
+import AndBox from 'tui/components/decor/AndBox';
+import Card from 'tui/components/card/Card';
+import Separator from 'tui/components/decor/Separator';
+import WarningIcon from 'tui/components/icons/common/Warning';
 
 export default {
   components: {

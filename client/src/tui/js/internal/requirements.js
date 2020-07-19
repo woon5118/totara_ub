@@ -13,7 +13,7 @@
  * Please contact [licensing@totaralearning.com] for more information.
  *
  * @author Simon Chester <simon.chester@totaralearning.com>
- * @module totara_core
+ * @module tui
  */
 
 import { unloadedStrings, loadStrings } from '../i18n';

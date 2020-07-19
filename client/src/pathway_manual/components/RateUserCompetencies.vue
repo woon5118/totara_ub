@@ -86,12 +86,12 @@
 </template>
 
 <script>
-import Button from 'totara_core/components/buttons/Button';
-import ButtonGroup from 'totara_core/components/buttons/ButtonGroup';
-import ConfirmationModal from 'totara_core/components/modal/ConfirmationModal';
+import Button from 'tui/components/buttons/Button';
+import ButtonGroup from 'tui/components/buttons/ButtonGroup';
+import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
 import CreateManualRatingsMutation from 'pathway_manual/graphql/create_manual_ratings.graphql';
 import FrameworkGroup from 'pathway_manual/components/FrameworkGroup';
-import Loader from 'totara_core/components/loader/Loader';
+import Loader from 'tui/components/loader/Loader';
 import RateableCompetenciesQuery from 'pathway_manual/graphql/user_rateable_competencies.graphql';
 import UserCompetenciesFilters from 'pathway_manual/components/UserCompetenciesFilters';
 import { NONE_OPTION_VALUE, ROLE_SELF } from 'pathway_manual/constants';

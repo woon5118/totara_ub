@@ -31,9 +31,9 @@
 </template>
 
 <script>
-import { FormSelect, FormScope } from 'totara_core/components/uniform';
+import { FormSelect, FormScope } from 'tui/components/uniform';
 import performActivitiesQuery from 'mod_perform/graphql/activities';
-import Loader from 'totara_core/components/loader/Loader';
+import Loader from 'tui/components/loader/Loader';
 
 export default {
   components: { Loader, FormSelect, FormScope },

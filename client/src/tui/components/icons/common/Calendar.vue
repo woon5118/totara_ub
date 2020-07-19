@@ -13,11 +13,11 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
-  @module totara_core
+  @module tui
 -->
 
 <script>
-import FlexIcon from 'totara_core/components/icons/FlexIcon';
+import FlexIcon from 'tui/components/icons/FlexIcon';
 
 export default {
   functional: true,

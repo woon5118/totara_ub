@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
-  @module totara_core
+  @module tui
 -->
 
 <template>

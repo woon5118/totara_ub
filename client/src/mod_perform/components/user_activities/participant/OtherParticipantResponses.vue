@@ -68,8 +68,8 @@
 <script>
 import ElementParticipantResponse from '../../element/ElementParticipantResponse';
 import ParticipantUserHeader from 'mod_perform/components/user_activities/participant/ParticipantUserHeader';
-import WarningIcon from 'totara_core/components/icons/common/Warning';
-import { FormRow } from 'totara_core/components/uniform';
+import WarningIcon from 'tui/components/icons/common/Warning';
+import { FormRow } from 'tui/components/uniform';
 
 export default {
   components: {

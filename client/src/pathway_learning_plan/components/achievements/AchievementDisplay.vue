@@ -116,10 +116,10 @@
 <script>
 // Components
 import AchievementLayout from 'totara_competency/components/achievements/AchievementLayout';
-import ActionLink from 'totara_core/components/links/ActionLink';
-import Cell from 'totara_core/components/datatable/Cell';
-import ExpandCell from 'totara_core/components/datatable/ExpandCell';
-import Table from 'totara_core/components/datatable/Table';
+import ActionLink from 'tui/components/links/ActionLink';
+import Cell from 'tui/components/datatable/Cell';
+import ExpandCell from 'tui/components/datatable/ExpandCell';
+import Table from 'tui/components/datatable/Table';
 // GraphQL
 import CompetencyPlansQuery from 'pathway_learning_plan/graphql/competency_plans';
 

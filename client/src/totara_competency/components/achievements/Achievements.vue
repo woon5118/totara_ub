@@ -59,9 +59,9 @@
 
 <script>
 // Components
-import Loader from 'totara_core/components/loader/Loader';
-import Tab from 'totara_core/components/tabs/Tab';
-import Tabs from 'totara_core/components/tabs/Tabs';
+import Loader from 'tui/components/loader/Loader';
+import Tab from 'tui/components/tabs/Tab';
+import Tabs from 'tui/components/tabs/Tabs';
 // GraphQL
 import AchievementPathsQuery from 'totara_competency/graphql/achievement_paths';
 

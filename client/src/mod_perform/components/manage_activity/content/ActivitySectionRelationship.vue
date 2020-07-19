@@ -51,8 +51,8 @@
 </template>
 
 <script>
-import Checkbox from 'totara_core/components/form/Checkbox';
-import DeleteIcon from 'totara_core/components/buttons/DeleteIcon';
+import Checkbox from 'tui/components/form/Checkbox';
+import DeleteIcon from 'tui/components/buttons/DeleteIcon';
 
 export default {
   components: {

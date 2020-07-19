@@ -97,13 +97,13 @@
 </template>
 
 <script>
-import AddUserIcon from 'totara_core/components/icons/common/AddUser';
-import Cell from 'totara_core/components/datatable/Cell';
-import HeaderCell from 'totara_core/components/datatable/HeaderCell';
-import Popover from 'totara_core/components/popover/Popover';
+import AddUserIcon from 'tui/components/icons/common/AddUser';
+import Cell from 'tui/components/datatable/Cell';
+import HeaderCell from 'tui/components/datatable/HeaderCell';
+import Popover from 'tui/components/popover/Popover';
 import ProficientStatus from 'totara_competency/components/details/ProficientStatus';
-import RemoveUserIcon from 'totara_core/components/icons/common/RemoveUser';
-import Table from 'totara_core/components/datatable/Table';
+import RemoveUserIcon from 'tui/components/icons/common/RemoveUser';
+import Table from 'tui/components/datatable/Table';
 
 export default {
   components: {

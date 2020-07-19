@@ -80,9 +80,9 @@ import {
   FormScope,
   FormRadioGroup,
   FormRow,
-} from 'totara_core/components/uniform';
-import FormRowDetails from 'totara_core/components/form/FormRowDetails';
-import Radio from 'totara_core/components/form/Radio';
+} from 'tui/components/uniform';
+import FormRowDetails from 'tui/components/form/FormRowDetails';
+import Radio from 'tui/components/form/Radio';
 import {
   SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT,
   SUBJECT_INSTANCE_GENERATION_ONE_PER_JOB,

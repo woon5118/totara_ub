@@ -160,13 +160,13 @@
 <script>
 // Components
 import AchievementLayout from 'totara_competency/components/achievements/AchievementLayout';
-import ActionLink from 'totara_core/components/links/ActionLink';
-import Avatar from 'totara_core/components/avatar/Avatar';
-import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
-import Cell from 'totara_core/components/datatable/Cell';
-import CommentIcon from 'totara_core/components/icons/common/Comment';
-import Popover from 'totara_core/components/popover/Popover';
-import Table from 'totara_core/components/datatable/Table';
+import ActionLink from 'tui/components/links/ActionLink';
+import Avatar from 'tui/components/avatar/Avatar';
+import ButtonIcon from 'tui/components/buttons/ButtonIcon';
+import Cell from 'tui/components/datatable/Cell';
+import CommentIcon from 'tui/components/icons/common/Comment';
+import Popover from 'tui/components/popover/Popover';
+import Table from 'tui/components/datatable/Table';
 
 export default {
   components: {

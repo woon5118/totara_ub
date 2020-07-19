@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import InfoIconButton from 'totara_core/components/buttons/InfoIconButton';
+import InfoIconButton from 'tui/components/buttons/InfoIconButton';
 
 export default {
   components: { InfoIconButton },

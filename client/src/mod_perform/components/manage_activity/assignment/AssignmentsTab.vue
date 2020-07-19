@@ -138,18 +138,18 @@
 </template>
 
 <script>
-import AudienceAdder from 'totara_core/components/adder/AudienceAdder';
-import Button from 'totara_core/components/buttons/Button';
-import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
-import Cell from 'totara_core/components/datatable/Cell';
-import ConfirmationModal from 'totara_core/components/modal/ConfirmationModal';
-import DeleteIcon from 'totara_core/components/icons/common/Delete';
-import Dropdown from 'totara_core/components/dropdown/Dropdown';
-import DropdownItem from 'totara_core/components/dropdown/DropdownItem';
-import Grid from 'totara_core/components/grid/Grid';
-import GridItem from 'totara_core/components/grid/GridItem';
-import HeaderCell from 'totara_core/components/datatable/HeaderCell';
-import Table from 'totara_core/components/datatable/Table';
+import AudienceAdder from 'tui/components/adder/AudienceAdder';
+import Button from 'tui/components/buttons/Button';
+import ButtonIcon from 'tui/components/buttons/ButtonIcon';
+import Cell from 'tui/components/datatable/Cell';
+import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
+import DeleteIcon from 'tui/components/icons/common/Delete';
+import Dropdown from 'tui/components/dropdown/Dropdown';
+import DropdownItem from 'tui/components/dropdown/DropdownItem';
+import Grid from 'tui/components/grid/Grid';
+import GridItem from 'tui/components/grid/GridItem';
+import HeaderCell from 'tui/components/datatable/HeaderCell';
+import Table from 'tui/components/datatable/Table';
 import Schedule from 'mod_perform/components/manage_activity/assignment/Schedule';
 import { ACTIVITY_STATUS_ACTIVE } from 'mod_perform/constants';
 

@@ -43,8 +43,8 @@
 
 <script>
 import ElementAdminDisplay from 'mod_perform/components/element/ElementAdminDisplay';
-import Checkbox from 'totara_core/components/form/Checkbox';
-import CheckboxGroup from 'totara_core/components/form/CheckboxGroup';
+import Checkbox from 'tui/components/form/Checkbox';
+import CheckboxGroup from 'tui/components/form/CheckboxGroup';
 
 export default {
   components: {

@@ -32,8 +32,8 @@
 </template>
 
 <script>
-import FormScope from 'totara_core/components/reform/FormScope';
-import { FormDateSelector } from 'totara_core/components/uniform';
+import FormScope from 'tui/components/reform/FormScope';
+import { FormDateSelector } from 'tui/components/uniform';
 
 export default {
   components: {

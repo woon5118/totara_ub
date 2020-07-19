@@ -55,10 +55,10 @@
 </template>
 
 <script>
-import Button from 'totara_core/components/buttons/Button';
-import ButtonGroup from 'totara_core/components/buttons/ButtonGroup';
-import FormRow from 'totara_core/components/form/FormRow';
-import Form from 'totara_core/components/form/Form';
+import Button from 'tui/components/buttons/Button';
+import ButtonGroup from 'tui/components/buttons/ButtonGroup';
+import FormRow from 'tui/components/form/FormRow';
+import Form from 'tui/components/form/Form';
 
 export default {
   components: {

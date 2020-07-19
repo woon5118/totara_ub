@@ -71,13 +71,13 @@ import {
   Uniform,
   FormRow,
   FormDateSelector,
-} from 'totara_core/components/uniform';
-import FormText from 'totara_core/components/uniform/FormText';
+} from 'tui/components/uniform';
+import FormText from 'tui/components/uniform/FormText';
 import ElementAdminForm from 'mod_perform/components/element/ElementAdminForm';
 import FormActionButtons from 'mod_perform/components/element/admin_form/ActionButtons';
 import AdminFormMixin from 'mod_perform/components/element/admin_form/AdminFormMixin';
 import IdentifierInput from 'mod_perform/components/element/admin_form/IdentifierInput';
-import Checkbox from 'totara_core/components/form/Checkbox';
+import Checkbox from 'tui/components/form/Checkbox';
 
 export default {
   components: {

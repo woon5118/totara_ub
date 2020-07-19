@@ -13,7 +13,7 @@
  * Please contact [licensing@totaralearning.com] for more information.
  *
  * @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
- * @module totara_core
+ * @module tui
  */
 
 import { mount } from '@vue/test-utils';

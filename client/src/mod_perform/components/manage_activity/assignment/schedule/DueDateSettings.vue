@@ -97,10 +97,10 @@
 </template>
 
 <script>
-import FormDateSelector from 'totara_core/components/uniform/FormDateSelector';
-import FormRadioGroup from 'totara_core/components/uniform/FormRadioGroup';
-import Radio from 'totara_core/components/form/Radio';
-import Responsive from 'totara_core/components/responsive/Responsive';
+import FormDateSelector from 'tui/components/uniform/FormDateSelector';
+import FormRadioGroup from 'tui/components/uniform/FormRadioGroup';
+import Radio from 'tui/components/form/Radio';
+import Responsive from 'tui/components/responsive/Responsive';
 import RelativeDateSelector from 'mod_perform/components/manage_activity/assignment/schedule/RelativeDateSelector';
 import ScheduleSettingContainer from 'mod_perform/components/manage_activity/assignment/schedule/ScheduleSettingContainer';
 

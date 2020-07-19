@@ -71,14 +71,14 @@
 </template>
 
 <script>
-import ConfirmationModal from 'totara_core/components/modal/ConfirmationModal';
-import Form from 'totara_core/components/form/Form';
-import FormRow from 'totara_core/components/form/FormRow';
-import FormRowDetails from 'totara_core/components/form/FormRowDetails';
-import ToggleSwitch from 'totara_core/components/toggle/ToggleSwitch';
+import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
+import Form from 'tui/components/form/Form';
+import FormRow from 'tui/components/form/FormRow';
+import FormRowDetails from 'tui/components/form/FormRowDetails';
+import ToggleSwitch from 'tui/components/toggle/ToggleSwitch';
 
 // Util
-import { notify } from 'totara_core/notifications';
+import { notify } from 'tui/notifications';
 import {
   ACTIVITY_STATUS_DRAFT,
   NOTIFICATION_DURATION,

@@ -196,13 +196,13 @@
   </div>
 </template>
 <script>
-import CalendarIcon from 'totara_core/components/icons/common/Calendar';
+import CalendarIcon from 'tui/components/icons/common/Calendar';
 import EndDateDisabled from 'mod_perform/components/icons/EndDateDisabled';
 import EndDateEnabled from 'mod_perform/components/icons/EndDateEnabled';
 import RepeatingDisabled from 'mod_perform/components/icons/RepeatingDisabled';
 import RepeatingEnabled from 'mod_perform/components/icons/RepeatingEnabled';
-import ToggleButtonIcon from 'totara_core/components/buttons/ToggleButtonIcon';
-import ToggleSet from 'totara_core/components/buttons/ToggleSet';
+import ToggleButtonIcon from 'tui/components/buttons/ToggleButtonIcon';
+import ToggleSet from 'tui/components/buttons/ToggleSet';
 
 export default {
   components: {

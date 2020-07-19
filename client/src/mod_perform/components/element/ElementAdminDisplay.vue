@@ -81,12 +81,12 @@
 </template>
 
 <script>
-import EditIcon from 'totara_core/components/buttons/EditIcon';
-import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
-import SettingsIcon from 'totara_core/components/icons/common/Settings';
-import Popover from 'totara_core/components/popover/Popover';
+import EditIcon from 'tui/components/buttons/EditIcon';
+import ButtonIcon from 'tui/components/buttons/ButtonIcon';
+import SettingsIcon from 'tui/components/icons/common/Settings';
+import Popover from 'tui/components/popover/Popover';
 import ReportingIdentifierIcon from 'mod_perform/components/icons/ReportingIdentifier';
-import DeleteIcon from 'totara_core/components/buttons/DeleteIcon';
+import DeleteIcon from 'tui/components/buttons/DeleteIcon';
 export default {
   components: {
     ButtonIcon,

@@ -123,13 +123,13 @@
 
 <script>
 import AchievementLayout from 'totara_competency/components/achievements/AchievementLayout';
-import ActionLink from 'totara_core/components/links/ActionLink';
-import Cell from 'totara_core/components/datatable/Cell';
-import CheckIcon from 'totara_core/components/icons/common/CheckSuccess';
-import ExpandCell from 'totara_core/components/datatable/ExpandCell';
-import Progress from 'totara_core/components/progress/Progress';
+import ActionLink from 'tui/components/links/ActionLink';
+import Cell from 'tui/components/datatable/Cell';
+import CheckIcon from 'tui/components/icons/common/CheckSuccess';
+import ExpandCell from 'tui/components/datatable/ExpandCell';
+import Progress from 'tui/components/progress/Progress';
 import ProgressCircle from 'totara_competency/components/achievements/ProgressCircle';
-import Table from 'totara_core/components/datatable/Table';
+import Table from 'tui/components/datatable/Table';
 
 export default {
   components: {

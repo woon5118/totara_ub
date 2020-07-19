@@ -123,13 +123,13 @@
 </template>
 
 <script>
-import ToggleSet from 'totara_core/components/buttons/ToggleSet';
-import ToggleButtonIcon from 'totara_core/components/buttons/ToggleButtonIcon';
-import BarChartIcon from 'totara_core/components/icons/common/BarChart';
-import ListIcon from 'totara_core/components/icons/common/List';
-import Responsive from 'totara_core/components/responsive/Responsive';
-import Loader from 'totara_core/components/loader/Loader';
-import ActionLink from 'totara_core/components/links/ActionLink';
+import ToggleSet from 'tui/components/buttons/ToggleSet';
+import ToggleButtonIcon from 'tui/components/buttons/ToggleButtonIcon';
+import BarChartIcon from 'tui/components/icons/common/BarChart';
+import ListIcon from 'tui/components/icons/common/List';
+import Responsive from 'tui/components/responsive/Responsive';
+import Loader from 'tui/components/loader/Loader';
+import ActionLink from 'tui/components/links/ActionLink';
 import ProgressAssignmentFilters from 'totara_competency/components/ProgressAssignmentFilters';
 import CompetencyList from 'totara_competency/components/profile/competency_list/List';
 import CompetencyCharts from 'totara_competency/components/profile/CompetencyCharts';
@@ -137,7 +137,7 @@ import NoCompetencyAssignments from 'totara_competency/components/profile/NoComp
 import CurrentProgress from 'totara_competency/components/profile/CurrentProgress';
 import UserHeader from 'totara_competency/components/UserHeader';
 import ProgressQuery from 'totara_competency/graphql/progress_for_user';
-import { pick, groupBy } from 'totara_core/util';
+import { pick, groupBy } from 'tui/util';
 
 const ACTIVE_ASSIGNMENT = 1;
 // const ARCHIVED_ASSIGNMENT = 2;

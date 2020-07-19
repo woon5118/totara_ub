@@ -37,8 +37,8 @@
 </template>
 
 <script>
-import ActionLink from 'totara_core/components/links/ActionLink';
-import NotificationBanner from 'totara_core/components/notifications/NotificationBanner';
+import ActionLink from 'tui/components/links/ActionLink';
+import NotificationBanner from 'tui/components/notifications/NotificationBanner';
 
 export default {
   components: {

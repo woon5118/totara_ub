@@ -66,8 +66,8 @@
 </template>
 
 <script>
-import { Uniform, FormRow, FormText } from 'totara_core/components/uniform';
-import FormTextarea from 'totara_core/components/uniform/FormTextarea';
+import { Uniform, FormRow, FormText } from 'tui/components/uniform';
+import FormTextarea from 'tui/components/uniform/FormTextarea';
 import ElementAdminForm from 'mod_perform/components/element/ElementAdminForm';
 import FormActionButtons from 'mod_perform/components/element/admin_form/ActionButtons';
 import AdminFormMixin from 'mod_perform/components/element/admin_form/AdminFormMixin';

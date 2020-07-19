@@ -195,17 +195,17 @@
   </Loader>
 </template>
 <script>
-import Button from 'totara_core/components/buttons/Button';
-import Cell from 'totara_core/components/datatable/Cell';
-import ExpandCell from 'totara_core/components/datatable/ExpandCell';
-import HeaderCell from 'totara_core/components/datatable/HeaderCell';
-import Loader from 'totara_core/components/loader/Loader';
-import Lock from 'totara_core/components/icons/common/Lock';
-import Lozenge from 'totara_core/components/lozenge/Lozenge';
-import ModalPresenter from 'totara_core/components/modal/ModalPresenter';
+import Button from 'tui/components/buttons/Button';
+import Cell from 'tui/components/datatable/Cell';
+import ExpandCell from 'tui/components/datatable/ExpandCell';
+import HeaderCell from 'tui/components/datatable/HeaderCell';
+import Loader from 'tui/components/loader/Loader';
+import Lock from 'tui/components/icons/common/Lock';
+import Lozenge from 'tui/components/lozenge/Lozenge';
+import ModalPresenter from 'tui/components/modal/ModalPresenter';
 import SectionsList from 'mod_perform/components/user_activities/list/Sections';
 import RelationshipSelector from 'mod_perform/components/user_activities/list/RelationshipSelector';
-import Table from 'totara_core/components/datatable/Table';
+import Table from 'tui/components/datatable/Table';
 // Query
 import subjectInstancesQuery from 'mod_perform/graphql/my_subject_instances';
 

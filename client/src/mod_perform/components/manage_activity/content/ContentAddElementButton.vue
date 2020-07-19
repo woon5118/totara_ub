@@ -41,10 +41,10 @@
   </div>
 </template>
 <script>
-import AddIcon from 'totara_core/components/icons/common/Add';
-import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
-import Dropdown from 'totara_core/components/dropdown/Dropdown';
-import DropdownItem from 'totara_core/components/dropdown/DropdownItem';
+import AddIcon from 'tui/components/icons/common/Add';
+import ButtonIcon from 'tui/components/buttons/ButtonIcon';
+import Dropdown from 'tui/components/dropdown/Dropdown';
+import DropdownItem from 'tui/components/dropdown/DropdownItem';
 import performElementPluginsQuery from 'mod_perform/graphql/element_plugins';
 
 export default {

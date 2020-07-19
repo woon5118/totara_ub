@@ -48,13 +48,13 @@
 </template>
 
 <script>
-import Loader from 'totara_core/components/loader/Loader';
+import Loader from 'tui/components/loader/Loader';
 import CompetencyProgressQuery from 'totara_competency/graphql/competency_progress_for_user';
 import CompetencyScalesQuery from 'totara_competency/graphql/scales';
 import Filters from 'totara_competency/components/profile/competency_list/Filters';
 import ArchivedList from 'totara_competency/components/profile/competency_list/ArchivedList';
 import CurrentList from 'totara_competency/components/profile/competency_list/CurrentList';
-import { pick } from 'totara_core/util';
+import { pick } from 'tui/util';
 
 export default {
   components: {

@@ -51,11 +51,11 @@
 </template>
 
 <script>
-import Collapsible from 'totara_core/components/collapsible/Collapsible';
-import ToggleSwitch from 'totara_core/components/toggle/ToggleSwitch';
+import Collapsible from 'tui/components/collapsible/Collapsible';
+import ToggleSwitch from 'tui/components/toggle/ToggleSwitch';
 import RecipientsTable from 'mod_perform/components/manage_activity/notification/RecipientsTable';
-import Form from 'totara_core/components/form/Form';
-import FormRow from 'totara_core/components/form/FormRow';
+import Form from 'tui/components/form/Form';
+import FormRow from 'tui/components/form/FormRow';
 
 export default {
   components: {

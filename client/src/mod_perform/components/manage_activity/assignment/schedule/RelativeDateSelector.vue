@@ -143,12 +143,12 @@
 </template>
 
 <script>
-import Label from 'totara_core/components/form/Label';
+import Label from 'tui/components/form/Label';
 import {
   FormSelect,
   FormNumber,
   FormScope,
-} from 'totara_core/components/uniform';
+} from 'tui/components/uniform';
 import {
   RELATIVE_DATE_DIRECTION_BEFORE,
   RELATIVE_DATE_DIRECTION_AFTER,

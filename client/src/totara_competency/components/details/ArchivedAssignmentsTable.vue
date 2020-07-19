@@ -73,11 +73,11 @@
 </template>
 
 <script>
-import Cell from 'totara_core/components/datatable/Cell';
-import HeaderCell from 'totara_core/components/datatable/HeaderCell';
-import InfoIconButton from 'totara_core/components/buttons/InfoIconButton';
+import Cell from 'tui/components/datatable/Cell';
+import HeaderCell from 'tui/components/datatable/HeaderCell';
+import InfoIconButton from 'tui/components/buttons/InfoIconButton';
 import ProficientStatus from 'totara_competency/components/details/ProficientStatus';
-import Table from 'totara_core/components/datatable/Table';
+import Table from 'tui/components/datatable/Table';
 
 export default {
   components: {

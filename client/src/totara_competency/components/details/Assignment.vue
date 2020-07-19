@@ -112,14 +112,14 @@
 
 <script>
 // Components
-import ArchiveIcon from 'totara_core/components/icons/common/Archive';
-import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
-import ConfirmationModal from 'totara_core/components/modal/ConfirmationModal';
-import Grid from 'totara_core/components/grid/Grid';
-import GridItem from 'totara_core/components/grid/GridItem';
-import ProgressTrackerCircle from 'totara_core/components/progresstracker/ProgressTrackerCircle';
-import SelectFilter from 'totara_core/components/filters/SelectFilter';
-import { notify } from 'totara_core/notifications';
+import ArchiveIcon from 'tui/components/icons/common/Archive';
+import ButtonIcon from 'tui/components/buttons/ButtonIcon';
+import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
+import Grid from 'tui/components/grid/Grid';
+import GridItem from 'tui/components/grid/GridItem';
+import ProgressTrackerCircle from 'tui/components/progresstracker/ProgressTrackerCircle';
+import SelectFilter from 'tui/components/filters/SelectFilter';
+import { notify } from 'tui/notifications';
 // GraphQL
 import ArchiveUserAssignment from 'totara_competency/graphql/archive_user_assignment.graphql';
 import CompetencyProfileDetailsQuery from 'totara_competency/graphql/profile_competency_details';

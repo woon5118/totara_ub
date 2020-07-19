@@ -151,20 +151,20 @@
 </template>
 
 <script>
-import Basket from 'totara_core/components/basket/Basket';
-import Button from 'totara_core/components/buttons/Button';
-import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
-import ClearIcon from 'totara_core/components/icons/common/Clear';
-import ConfirmationModal from 'totara_core/components/modal/ConfirmationModal';
+import Basket from 'tui/components/basket/Basket';
+import Button from 'tui/components/buttons/Button';
+import ButtonIcon from 'tui/components/buttons/ButtonIcon';
+import ClearIcon from 'tui/components/icons/common/Clear';
+import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
 import CreateUserAssignmentMutation from '../../webapi/ajax/create_user_assignments.graphql';
-import FilterSidePanel from 'totara_core/components/filters/FilterSidePanel';
-import FlexIcon from 'totara_core/components/icons/FlexIcon';
-import Grid from 'totara_core/components/grid/Grid';
-import GridItem from 'totara_core/components/grid/GridItem';
-import Loader from 'totara_core/components/loader/Loader';
-import MultiSelectFilter from 'totara_core/components/filters/MultiSelectFilter';
-import SearchFilter from 'totara_core/components/filters/SearchFilter';
-import SelectFilter from 'totara_core/components/filters/SelectFilter';
+import FilterSidePanel from 'tui/components/filters/FilterSidePanel';
+import FlexIcon from 'tui/components/icons/FlexIcon';
+import Grid from 'tui/components/grid/Grid';
+import GridItem from 'tui/components/grid/GridItem';
+import Loader from 'tui/components/loader/Loader';
+import MultiSelectFilter from 'tui/components/filters/MultiSelectFilter';
+import SearchFilter from 'tui/components/filters/SearchFilter';
+import SelectFilter from 'tui/components/filters/SelectFilter';
 import SelectionTable from 'totara_competency/components/user_assignment/SelectionTable';
 import UserAssignableCompetenciesQuery from 'totara_competency/graphql/user_assignable_competencies';
 

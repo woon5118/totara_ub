@@ -50,13 +50,13 @@
 </template>
 
 <script>
-import ActionLink from 'totara_core/components/links/ActionLink';
-import Button from 'totara_core/components/buttons/Button';
-import Loader from 'totara_core/components/loader/Loader';
-import Modal from 'totara_core/components/modal/Modal';
-import ModalContent from 'totara_core/components/modal/ModalContent';
-import ModalPresenter from 'totara_core/components/modal/ModalPresenter';
-import Select from 'totara_core/components/form/Select';
+import ActionLink from 'tui/components/links/ActionLink';
+import Button from 'tui/components/buttons/Button';
+import Loader from 'tui/components/loader/Loader';
+import Modal from 'tui/components/modal/Modal';
+import ModalContent from 'tui/components/modal/ModalContent';
+import ModalPresenter from 'tui/components/modal/ModalPresenter';
+import Select from 'tui/components/form/Select';
 import participantManageableActivitiesQuery from 'mod_perform/graphql/participant_manageable_activities';
 
 export default {

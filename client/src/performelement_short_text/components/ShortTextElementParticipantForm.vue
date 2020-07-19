@@ -25,9 +25,9 @@
 </template>
 
 <script>
-import FormScope from 'totara_core/components/reform/FormScope';
-import { FormText } from 'totara_core/components/uniform';
-import { v as validation } from 'totara_core/validation';
+import FormScope from 'tui/components/reform/FormScope';
+import { FormText } from 'tui/components/uniform';
+import { v as validation } from 'tui/validation';
 
 export default {
   components: {

@@ -128,13 +128,13 @@ import Achievements from 'totara_competency/components/achievements/Achievements
 import ActivityLog from 'totara_competency/components/details/ActivityLog';
 import ArchivedAssignments from 'totara_competency/components/details/ArchivedAssignments';
 import Assignment from 'totara_competency/components/details/Assignment';
-import Button from 'totara_core/components/buttons/Button';
-import Grid from 'totara_core/components/grid/Grid';
-import GridItem from 'totara_core/components/grid/GridItem';
-import Loader from 'totara_core/components/loader/Loader';
-import Modal from 'totara_core/components/modal/Modal';
-import ModalPresenter from 'totara_core/components/modal/ModalPresenter';
-import NotificationBanner from 'totara_core/components/notifications/NotificationBanner';
+import Button from 'tui/components/buttons/Button';
+import Grid from 'tui/components/grid/Grid';
+import GridItem from 'tui/components/grid/GridItem';
+import Loader from 'tui/components/loader/Loader';
+import Modal from 'tui/components/modal/Modal';
+import ModalPresenter from 'tui/components/modal/ModalPresenter';
+import NotificationBanner from 'tui/components/notifications/NotificationBanner';
 import Progress from 'totara_competency/components/details/Progress';
 // GraphQL
 import CompetencyProfileDetailsQuery from 'totara_competency/graphql/profile_competency_details';

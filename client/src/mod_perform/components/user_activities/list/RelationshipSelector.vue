@@ -70,12 +70,12 @@
   </Modal>
 </template>
 <script>
-import Button from 'totara_core/components/buttons/Button';
-import CancelButton from 'totara_core/components/buttons/Cancel';
-import Modal from 'totara_core/components/modal/Modal';
-import ModalContent from 'totara_core/components/modal/ModalContent';
-import Radio from 'totara_core/components/form/Radio';
-import RadioGroup from 'totara_core/components/form/RadioGroup';
+import Button from 'tui/components/buttons/Button';
+import CancelButton from 'tui/components/buttons/Cancel';
+import Modal from 'tui/components/modal/Modal';
+import ModalContent from 'tui/components/modal/ModalContent';
+import Radio from 'tui/components/form/Radio';
+import RadioGroup from 'tui/components/form/RadioGroup';
 
 export default {
   components: {

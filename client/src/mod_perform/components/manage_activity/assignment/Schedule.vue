@@ -99,20 +99,20 @@
 <script>
 // Imports
 import AdditionalScheduleSettings from 'mod_perform/components/manage_activity/assignment/schedule/AdditionalScheduleSettings';
-import Button from 'totara_core/components/buttons/Button';
-import ButtonGroup from 'totara_core/components/buttons/ButtonGroup';
+import Button from 'tui/components/buttons/Button';
+import ButtonGroup from 'tui/components/buttons/ButtonGroup';
 import FrequencySettings from 'mod_perform/components/manage_activity/assignment/schedule/FrequencySettings';
-import ConfirmationModal from 'totara_core/components/modal/ConfirmationModal';
+import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
 import DueDateSettings from 'mod_perform/components/manage_activity/assignment/schedule/DueDateSettings';
 import ScheduleSettings from 'mod_perform/components/manage_activity/assignment/schedule/ScheduleSettings';
 import ScheduleToggles from 'mod_perform/components/manage_activity/assignment/schedule/ScheduleToggles';
 import UpdateTrackScheduleMutation from 'mod_perform/graphql/update_track_schedule';
 import { ACTIVITY_STATUS_ACTIVE } from 'mod_perform/constants';
-import { Uniform } from 'totara_core/components/uniform';
+import { Uniform } from 'tui/components/uniform';
 
 // Util
-import { notify } from 'totara_core/notifications';
-import { isIsoAfter } from 'totara_core/date';
+import { notify } from 'tui/notifications';
+import { isIsoAfter } from 'tui/date';
 import {
   NOTIFICATION_DURATION,
   RELATIVE_DATE_DIRECTION_BEFORE,
