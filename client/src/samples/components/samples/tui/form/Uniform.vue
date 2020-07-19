@@ -157,7 +157,7 @@ import Radio from 'tui/components/form/Radio';
 import FormRowActionButtons from 'tui/components/form/FormRowActionButtons';
 import FormRowDetails from 'tui/components/form/FormRowDetails';
 import FormRowDefaults from 'tui/components/form/FormRowDefaults';
-import SampleFormPart from 'samples/components/sample_parts/totara_core/form/FormPart';
+import SampleFormPart from 'samples/components/sample_parts/tui/form/FormPart';
 import Repeater from 'tui/components/form/Repeater';
 import theme from 'tui/theme';
 

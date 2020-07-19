@@ -36,7 +36,7 @@
 
 <script>
 import Button from 'tui/components/buttons/Button';
-import ExampleModal from 'samples/components/sample_parts/totara_core/modal/ExampleModal';
+import ExampleModal from 'samples/components/sample_parts/tui/modal/ExampleModal';
 import ModalPresenter from 'tui/components/modal/ModalPresenter';
 import SamplesCode from 'samples/components/sample_parts/misc/SamplesCode';
 import SamplesExample from 'samples/components/sample_parts/misc/SamplesExample';

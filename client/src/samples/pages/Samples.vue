@@ -20,7 +20,7 @@
   <div class="tui-samples">
     <Layout>
       <template v-slot:page-title>
-        {{ $str('pluginname', 'samples') }}
+        {{ $str('pluginname', 'totara_tui') }}
       </template>
       <template v-slot:left>
         <FilterSidePanel title="Filter results">
@@ -279,7 +279,7 @@ export default {
 
 <lang-strings>
 {
-  "samples": [
+  "totara_tui": [
     "pluginname"
   ]
 }
