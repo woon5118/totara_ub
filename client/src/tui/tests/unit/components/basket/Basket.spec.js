@@ -32,10 +32,6 @@ describe('Basket', () => {
           { label: 'Action', action: () => {} },
         ],
       },
-      mocks: {
-        $str: (x, y) => `[[${x}, ${y}]]`,
-        $id: x => 'id' + x,
-      },
       scopedSlots: {
         actions({ empty }) {
           return (
@@ -66,10 +62,6 @@ describe('Basket', () => {
         items: [1, 2, 3],
         bulkActions: [{ label: 'Action', action: action }],
       },
-      mocks: {
-        $str: (x, y) => `[[${x}, ${y}]]`,
-        $id: x => 'id' + x,
-      },
     });
 
     expect(action).not.toHaveBeenCalled();
@@ -90,10 +82,6 @@ describe('Basket', () => {
           { label: 'Other', action: () => {} },
         ],
       },
-      mocks: {
-        $str: (x, y) => `[[${x}, ${y}]]`,
-        $id: x => 'id' + x,
-      },
     });
 
     expect(action).not.toHaveBeenCalled();
@@ -112,10 +100,6 @@ describe('Basket', () => {
           { label: 'Action', action: () => {} },
         ],
       },
-      mocks: {
-        $str: (x, y) => `[[${x}, ${y}]]`,
-        $id: x => 'id' + x,
-      },
     });
 
     expect(wrapper.element).toMatchSnapshot();
@@ -128,10 +112,6 @@ describe('Basket', () => {
       propsData: {
         items: [1, 2, 3],
         bulkActions: [{ label: 'Action', action: action }],
-      },
-      mocks: {
-        $str: (x, y) => `[[${x}, ${y}]]`,
-        $id: x => 'id' + x,
       },
     });
 

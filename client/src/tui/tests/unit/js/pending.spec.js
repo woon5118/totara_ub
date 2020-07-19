@@ -18,6 +18,8 @@
 
 import pending from 'tui/pending';
 
+jest.unmock('tui/pending');
+
 describe('pending', () => {
   it('stores pending items in a global array', async () => {
     expect(global.testbridge.pending).toEqual([]);

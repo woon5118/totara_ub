@@ -18,8 +18,6 @@
 
 import { totaraUrl } from 'tui/url';
 
-jest.mock('tui/config');
-
 describe('totaraUrl', () => {
   it('prepends base url unless absolute', () => {
     expect(totaraUrl('/hello')).toBe('http://foo/hello');

@@ -21,8 +21,6 @@ import { mount } from '@vue/test-utils';
 import Reform from 'tui/components/reform/Reform';
 import { ReformScopeReceiver } from './util';
 
-jest.mock('tui/pending');
-jest.mock('tui/i18n');
 jest.mock('tui/dom/focus', () => ({
   getTabbableElements(el) {
     return [el];

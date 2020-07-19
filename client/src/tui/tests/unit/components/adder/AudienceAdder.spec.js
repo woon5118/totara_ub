@@ -33,18 +33,12 @@ describe('AudienceAdder', () => {
     wrapper = mount(component, {
       propsData,
       mocks: {
-        $str: function() {
-          return 'tempString';
-        },
         $apollo: {
           addSmartQuery: function() {},
           loading: false,
         },
         audiences: function() {
           return { items: [] };
-        },
-        $id: function() {
-          return 'id';
         },
       },
       stubs: ['CloseButton', 'FilterBar'],

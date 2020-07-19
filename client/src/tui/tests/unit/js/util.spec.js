@@ -29,8 +29,6 @@ import {
   isPlainObject,
 } from 'tui/util';
 
-jest.mock('tui/config');
-
 let counter = 1;
 const incr = () => counter++;
 

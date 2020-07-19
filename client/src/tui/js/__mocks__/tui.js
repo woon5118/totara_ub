@@ -16,19 +16,4 @@
  * @module tui
  */
 
-import { config } from '@vue/test-utils';
-
-jest.mock('tui/internal/storage');
-jest.mock('tui/internal/lang_string_store');
-jest.mock('tui/flex_icons');
-jest.mock('tui/config');
-jest.mock('tui/apollo_client', () => null);
-jest.mock('tui/tui');
-jest.mock('tui/pending');
-jest.mock('tui/i18n');
-
-config.mocks.$str = (key, comp, a) =>
-  a ? `[[${key}, ${comp}, ${JSON.stringify(a)}]]` : `[[${key}, ${comp}]]`;
-
-config.mocks.uid = 'id';
-config.mocks.$id = x => (x ? 'id-' + x : 'id');
+export default {};

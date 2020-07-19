@@ -8,6 +8,7 @@ exports[`presentation/datatable/SelectVisibleRowsCell.vue Checks snapshot 1`] = 
 >
   <checkbox-stub
     arialabel="5"
+    id="id"
   />
    
   <span

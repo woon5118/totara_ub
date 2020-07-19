@@ -6,6 +6,7 @@ exports[`Checkbox matches snapshot 1`] = `
 >
   <input
     class="tui-checkbox__input"
+    id="id"
     name="name"
     type="checkbox"
     value="bar"
@@ -13,6 +14,7 @@ exports[`Checkbox matches snapshot 1`] = `
    
   <label
     class="tui-checkbox__label"
+    for="id"
   >
     content
   </label>

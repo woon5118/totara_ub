@@ -23,8 +23,7 @@ import tui from 'tui/tui';
 import TotaraModuleStore from 'tui/internal/TotaraModuleStore';
 import requirements from 'tui/internal/requirements';
 
-jest.mock('tui/config');
-jest.mock('tui/apollo_client', () => null);
+jest.unmock('tui/tui');
 jest.mock('tui/internal/TotaraModuleStore');
 jest.mock('tui/internal/requirements');
 

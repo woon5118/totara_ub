@@ -8,7 +8,9 @@ exports[`MultiSelectFilter.vue matches snapshot 1`] = `
   <div
     class="tui-multiSelectFilter__item"
   >
-    <checkboxbutton-stub>
+    <checkboxbutton-stub
+      id="id"
+    >
       
         Include courses
       
@@ -17,7 +19,9 @@ exports[`MultiSelectFilter.vue matches snapshot 1`] = `
   <div
     class="tui-multiSelectFilter__item"
   >
-    <checkboxbutton-stub>
+    <checkboxbutton-stub
+      id="id"
+    >
       
         Include programs
       
@@ -26,7 +30,9 @@ exports[`MultiSelectFilter.vue matches snapshot 1`] = `
   <div
     class="tui-multiSelectFilter__item"
   >
-    <checkboxbutton-stub>
+    <checkboxbutton-stub
+      id="id"
+    >
       
         Include users
       

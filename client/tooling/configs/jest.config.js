@@ -36,9 +36,14 @@ module.exports = {
   ],
   snapshotSerializers: ['jest-serializer-vue'],
   testMatch: [
-    '**/server/**/tui/tests/unit/**/*.spec.(js|jsx|ts|tsx)',
-    '**/client/**/src/*/tests/unit/**/*.spec.(js|jsx|ts|tsx)',
-    '**/__tests__/*.(js|jsx|ts|tsx)',
+    '<rootDir>/client/**/src/*/tests/unit/**/*.spec.(js|jsx|ts|tsx)',
+    '<rootDir>/client/**/__tests__/**/*.(js|jsx|ts|tsx)',
+  ],
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/util.js',
+    '/test_util.js',
+    '/test_util/',
   ],
   watchPlugins: [
     'jest-watch-typeahead/filename',

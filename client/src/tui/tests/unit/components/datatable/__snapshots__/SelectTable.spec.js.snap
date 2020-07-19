@@ -6,7 +6,7 @@ exports[`presentation/datatable/SelectTabel.vue Checks snapshot 1`] = `
     <div role="row" class="tui-dataTableRowHeader">
       <!---->
       <div role="cell" class="tui-dataTableSelectVisibleRowsCell tui-dataTableSelectVisibleRowsCell--hidden">
-        <div class="tui-checkbox"><input type="checkbox" aria-label="lang string 1" disabled="disabled" class="tui-checkbox__input" value=""> <label class="tui-checkbox__label"></label></div> <span class="tui-dataTableCell__label">
+        <div class="tui-checkbox"><input id="id" type="checkbox" aria-label="lang string 1" disabled="disabled" class="tui-checkbox__input" value=""> <label for="id" class="tui-checkbox__label"></label></div> <span class="tui-dataTableCell__label">
     lang string 2
   </span>
       </div>
@@ -17,28 +17,28 @@ exports[`presentation/datatable/SelectTabel.vue Checks snapshot 1`] = `
       <div role="row" class="tui-dataTableRow">
         <!---->
         <div role="cell" class="tui-dataTableSelectRowCell">
-          <div class="tui-checkbox"><input type="checkbox" aria-label="lang string 3:  one" class="tui-checkbox__input" value=""> <label class="tui-checkbox__label"></label></div>
+          <div class="tui-checkbox"><input id="id" type="checkbox" aria-label="lang string 3:  one" class="tui-checkbox__input" value=""> <label for="id" class="tui-checkbox__label"></label></div>
         </div>
       </div>
       <!---->
       <div role="row" class="tui-dataTableRow">
         <!---->
         <div role="cell" class="tui-dataTableSelectRowCell">
-          <div class="tui-checkbox"><input type="checkbox" aria-label="lang string 4:  two" class="tui-checkbox__input" value=""> <label class="tui-checkbox__label"></label></div>
+          <div class="tui-checkbox"><input id="id" type="checkbox" aria-label="lang string 4:  two" class="tui-checkbox__input" value=""> <label for="id" class="tui-checkbox__label"></label></div>
         </div>
       </div>
       <!---->
       <div role="row" class="tui-dataTableRow">
         <!---->
         <div role="cell" class="tui-dataTableSelectRowCell">
-          <div class="tui-checkbox"><input type="checkbox" aria-label="lang string 5:  three" class="tui-checkbox__input" value=""> <label class="tui-checkbox__label"></label></div>
+          <div class="tui-checkbox"><input id="id" type="checkbox" aria-label="lang string 5:  three" class="tui-checkbox__input" value=""> <label for="id" class="tui-checkbox__label"></label></div>
         </div>
       </div>
       <!---->
       <div role="row" class="tui-dataTableRow">
         <!---->
         <div role="cell" class="tui-dataTableSelectRowCell">
-          <div class="tui-checkbox"><input type="checkbox" aria-label="lang string 6:  four" class="tui-checkbox__input" value=""> <label class="tui-checkbox__label"></label></div>
+          <div class="tui-checkbox"><input id="id" type="checkbox" aria-label="lang string 6:  four" class="tui-checkbox__input" value=""> <label for="id" class="tui-checkbox__label"></label></div>
         </div>
       </div>
       <!---->

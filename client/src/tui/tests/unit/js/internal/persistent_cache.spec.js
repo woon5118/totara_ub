@@ -22,10 +22,7 @@ import {
   cacheSet,
   cacheDelete,
 } from 'tui/internal/persistent_cache';
-import { globalConfig } from 'tui/config';
-
-jest.mock('tui/config');
-jest.mock('tui/internal/storage');
+import { config } from 'tui/config';
 
 const storageInstance = WebStorageStore.mock.instances.find(
   x => x.__storageKey == 'cache'
@@ -36,7 +33,7 @@ describe('persistent_cache', () => {
     storageInstance.clear();
     storageInstance.methodMockClear();
     cacheGet.__resetInternalCache();
-    globalConfig.jsrev = 1000;
+    config.rev.js = 1000;
   });
 
   it('allows storing items in the cache', () => {
@@ -64,7 +61,7 @@ describe('persistent_cache', () => {
   });
 
   it('skips writing to localstorage if caching is disabled', () => {
-    globalConfig.jsrev = -1;
+    config.rev.js = -1;
     expect(cacheGet('key')).toBe(null);
     expect(storageInstance.get).not.toHaveBeenCalled();
     const item = { name: 'bob' };

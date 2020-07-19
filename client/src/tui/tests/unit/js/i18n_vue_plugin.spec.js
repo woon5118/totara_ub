@@ -19,8 +19,6 @@
 import i18nVuePlugin, { collectStrings } from 'tui/i18n_vue_plugin';
 import { getString, hasString } from 'tui/i18n';
 
-jest.mock('tui/i18n');
-
 let Vue;
 let vm;
 

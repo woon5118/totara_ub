@@ -17,9 +17,9 @@
  */
 
 import { WebStorageStore } from 'tui/internal/storage';
-import { globalConfig } from 'tui/config';
+import { config } from 'tui/config';
 
-jest.mock('tui/config');
+jest.unmock('tui/internal/storage');
 
 let mockData = [];
 const storageMock = {
@@ -62,8 +62,8 @@ describe('WebStorageStore', () => {
   let store;
   beforeEach(() => {
     storageMock.__reset();
-    globalConfig.wwwroot = 'http://foo';
-    globalConfig.__jsrev = 1000;
+    config.wwwroot = 'http://foo';
+    config.rev.js = 1000;
     store = new WebStorageStore('store', storageMock);
   });
 
@@ -91,14 +91,14 @@ describe('WebStorageStore', () => {
     store.set('item', 1);
     expect(storageMock.getItem('totara:store::item')).toBe('1');
 
-    globalConfig.wwwroot = 'http://foo/bar';
+    config.wwwroot = 'http://foo/bar';
     store = new WebStorageStore('store', storageMock);
     store.set('item', 2);
 
     expect(storageMock.getItem('totara:store::item')).toBe('1');
     expect(storageMock.getItem('totara:store:bar:item')).toBe('2');
 
-    globalConfig.wwwroot = 'http://foo/baz';
+    config.wwwroot = 'http://foo/baz';
     store = new WebStorageStore('store', storageMock);
     store.set('item', 3);
 
@@ -108,13 +108,13 @@ describe('WebStorageStore', () => {
   });
 
   it('has option to clear relevant storage keys when jsrev changes', () => {
-    globalConfig.wwwroot = 'http://foo/bar';
+    config.wwwroot = 'http://foo/bar';
     store = new WebStorageStore('store', storageMock, { rev: true });
     expect(storageMock.getItem('totara:store:bar:__jsrev')).toBe('1000');
     store.set('item', 1);
     expect(storageMock.getItem('totara:store:bar:item')).toBe('1');
 
-    globalConfig.wwwroot = 'http://foo';
+    config.wwwroot = 'http://foo';
     store = new WebStorageStore('store', storageMock, { rev: true });
     expect(storageMock.getItem('totara:store::__jsrev')).toBe('1000');
     store.set('item', 2);
@@ -127,7 +127,7 @@ describe('WebStorageStore', () => {
     expect(storageMock.getItem('totara:store::item')).toBe('2');
 
     // now change jsrev and make sure only that store gets cleared
-    globalConfig.jsrev = 2000;
+    config.rev.js = 2000;
 
     store = new WebStorageStore('store', storageMock, { rev: true });
     expect(storageMock.getItem('totara:store::__jsrev')).toBe('2000');
@@ -136,7 +136,7 @@ describe('WebStorageStore', () => {
   });
 
   it('defaults path to full wwwroot if it cannot be parsed', () => {
-    globalConfig.wwwroot = 'nonsense';
+    config.wwwroot = 'nonsense';
     store = new WebStorageStore('store', storageMock);
     store.set('item', 1);
     expect(storageMock.getItem('totara:store:nonsense:item')).toBe('1');
