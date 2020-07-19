@@ -24,9 +24,11 @@ exports[`components/RatingPopover.vue Checks snapshot 1`] = `
      
     <radiogroup-stub
       arialabelledby="id-scale-value-heading"
+      name="id"
       value="1"
     >
       <radio-stub
+        id="id"
         label="Competent"
         name="id-scale-radio"
         value="123"
@@ -41,6 +43,7 @@ exports[`components/RatingPopover.vue Checks snapshot 1`] = `
       />
        
       <radio-stub
+        id="id"
         name="id-scale-radio"
         value="-1"
       >
