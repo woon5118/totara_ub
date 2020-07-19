@@ -17,11 +17,11 @@
 -->
 
 <script>
-import * as flexIcons from 'totara_core/flex_icons';
-import FlexIconStandard from 'totara_core/components/icons/flex_icons/FlexIcon';
-import FlexIconPix from 'totara_core/components/icons/flex_icons/FlexIconPix';
-import FlexIconMustacheFallback from 'totara_core/components/icons/FlexIconMustacheFallback';
-import { memoize } from 'totara_core/util';
+import * as flexIcons from 'tui/flex_icons';
+import FlexIconStandard from 'tui/components/icons/flex_icons/FlexIcon';
+import FlexIconPix from 'tui/components/icons/flex_icons/FlexIconPix';
+import FlexIconMustacheFallback from 'tui/components/icons/FlexIconMustacheFallback';
+import { memoize } from 'tui/util';
 
 /**
  * Get rendering data for icon identified by "id"

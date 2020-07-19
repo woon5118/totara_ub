@@ -69,10 +69,10 @@
 </template>
 
 <script>
-import Button from 'totara_core/components/buttons/Button';
-import Popover from 'totara_core/components/popover/Popover';
-import ProgressTrackerCircle from 'totara_core/components/progresstracker/ProgressTrackerCircle';
-import PopoverTrigger from 'totara_core/components/popover/PopoverTrigger';
+import Button from 'tui/components/buttons/Button';
+import Popover from 'tui/components/popover/Popover';
+import ProgressTrackerCircle from 'tui/components/progresstracker/ProgressTrackerCircle';
+import PopoverTrigger from 'tui/components/popover/PopoverTrigger';
 
 export default {
   components: {

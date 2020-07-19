@@ -107,11 +107,11 @@
 </template>
 
 <script>
-import { unique } from 'totara_core/util';
-import SelectEveryRowToggle from 'totara_core/components/datatable/SelectEveryRowToggle';
-import SelectRowCell from 'totara_core/components/datatable/SelectRowCell';
-import SelectVisibleRowsCell from 'totara_core/components/datatable/SelectVisibleRowsCell';
-import Table from 'totara_core/components/datatable/Table';
+import { unique } from 'tui/util';
+import SelectEveryRowToggle from 'tui/components/datatable/SelectEveryRowToggle';
+import SelectRowCell from 'tui/components/datatable/SelectRowCell';
+import SelectVisibleRowsCell from 'tui/components/datatable/SelectVisibleRowsCell';
+import Table from 'tui/components/datatable/Table';
 
 export default {
   components: {

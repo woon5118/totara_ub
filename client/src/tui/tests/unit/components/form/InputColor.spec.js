@@ -17,7 +17,7 @@
  */
 
 import { shallowMount } from '@vue/test-utils';
-import component from 'totara_core/components/form/InputColor.vue';
+import component from 'tui/components/form/InputColor.vue';
 
 const { axe, toHaveNoViolations } = require('jest-axe');
 expect.extend(toHaveNoViolations);

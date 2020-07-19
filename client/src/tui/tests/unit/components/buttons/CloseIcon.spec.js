@@ -17,7 +17,7 @@
  */
 
 import { shallowMount } from '@vue/test-utils';
-import CloseIcon from 'totara_core/components/buttons/CloseIcon';
+import CloseIcon from 'tui/components/buttons/CloseIcon';
 const mocks = {
   $str: (x, y) => `[[${x}, ${y}]]`,
 };

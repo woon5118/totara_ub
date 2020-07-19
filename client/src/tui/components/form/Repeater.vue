@@ -53,9 +53,9 @@
 </template>
 
 <script>
-import AddIcon from 'totara_core/components/icons/common/Add';
-import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
-import DeleteIcon from 'totara_core/components/icons/common/Delete';
+import AddIcon from 'tui/components/icons/common/Add';
+import ButtonIcon from 'tui/components/buttons/ButtonIcon';
+import DeleteIcon from 'tui/components/icons/common/Delete';
 
 export default {
   components: {

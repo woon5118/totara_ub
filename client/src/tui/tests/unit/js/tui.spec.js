@@ -19,14 +19,14 @@
 /* eslint-disable tui/no-tui-internal */
 
 import Vue from 'vue';
-import tui from 'totara_core/tui';
-import TotaraModuleStore from 'totara_core/internal/TotaraModuleStore';
-import requirements from 'totara_core/internal/requirements';
+import tui from 'tui/tui';
+import TotaraModuleStore from 'tui/internal/TotaraModuleStore';
+import requirements from 'tui/internal/requirements';
 
-jest.mock('totara_core/config');
-jest.mock('totara_core/apollo_client', () => null);
-jest.mock('totara_core/internal/TotaraModuleStore');
-jest.mock('totara_core/internal/requirements');
+jest.mock('tui/config');
+jest.mock('tui/apollo_client', () => null);
+jest.mock('tui/internal/TotaraModuleStore');
+jest.mock('tui/internal/requirements');
 
 const modules = TotaraModuleStore.mock.instances[0];
 
@@ -36,7 +36,7 @@ const mockComp = name => {
     error.code = 'MODULE_NOT_FOUND';
     throw error;
   }
-  if (name == 'totara_core/components/errors/ErrorBoundary') {
+  if (name == 'tui/components/errors/ErrorBoundary') {
     return {
       $_name: name,
       render() {
@@ -98,10 +98,10 @@ describe('mount', () => {
         let vm = this.$parent;
         while (vm) {
           if (
-            vm.$options.$_name == 'totara_core/components/errors/ErrorBoundary'
+            vm.$options.$_name == 'tui/components/errors/ErrorBoundary'
           ) {
             expect(vm.$options.$_name).toBe(
-              'totara_core/components/errors/ErrorBoundary'
+              'tui/components/errors/ErrorBoundary'
             );
           }
           vm = vm.$parent;

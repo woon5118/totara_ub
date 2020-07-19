@@ -17,7 +17,7 @@
  */
 
 import { shallowMount } from '@vue/test-utils';
-import ActionLink from 'totara_core/components/links/ActionLink';
+import ActionLink from 'tui/components/links/ActionLink';
 
 const props = {
   styleclass: { primary: true, small: true },

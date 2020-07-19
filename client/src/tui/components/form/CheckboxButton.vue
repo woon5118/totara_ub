@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import CloseIcon from 'totara_core/components/icons/common/Close';
+import CloseIcon from 'tui/components/icons/common/Close';
 
 export default {
   components: {

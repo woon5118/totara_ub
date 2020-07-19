@@ -55,9 +55,9 @@
 </template>
 
 <script>
-import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
-import Popover from 'totara_core/components/popover/Popover';
-import Button from 'totara_core/components/buttons/Button';
+import ButtonIcon from 'tui/components/buttons/ButtonIcon';
+import Popover from 'tui/components/popover/Popover';
+import Button from 'tui/components/buttons/Button';
 
 export default {
   components: {

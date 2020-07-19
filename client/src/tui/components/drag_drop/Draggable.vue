@@ -17,7 +17,7 @@
 -->
 
 <script>
-import { Point, Size } from 'totara_core/geometry';
+import { Point, Size } from 'tui/geometry';
 import {
   defaultDragDropManager,
   getSourceIdName,
@@ -29,11 +29,11 @@ import {
   INTERACTION_MOUSE,
   DragDropManager,
 } from '../../js/internal/drag_drop';
-import { waitForTransitionEnd } from 'totara_core/dom/transitions';
-import { getBox, getViewportRect } from 'totara_core/dom/position';
-import { toVueRequirements } from 'totara_core/i18n';
-import { pick } from 'totara_core/util';
-import DraggableMoveMenu from 'totara_core/components/drag_drop/DraggableMoveMenu';
+import { waitForTransitionEnd } from 'tui/dom/transitions';
+import { getBox, getViewportRect } from 'tui/dom/position';
+import { toVueRequirements } from 'tui/i18n';
+import { pick } from 'tui/util';
+import DraggableMoveMenu from 'tui/components/drag_drop/DraggableMoveMenu';
 
 /*
 

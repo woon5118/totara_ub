@@ -18,7 +18,7 @@
 
 <script>
 import { createUniformInputWrapper } from './util';
-import Textarea from 'totara_core/components/form/Textarea';
+import Textarea from 'tui/components/form/Textarea';
 
 export default createUniformInputWrapper(Textarea);
 </script>

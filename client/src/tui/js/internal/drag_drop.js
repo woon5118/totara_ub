@@ -33,11 +33,11 @@ Debugging suggestion: uncomment the console.log in _setState
 
 import Vue from 'vue';
 // eslint-disable-next-line no-unused-vars
-import { Size, Point } from 'totara_core/geometry';
-import { pull, orderBy } from 'totara_core/util';
+import { Size, Point } from 'tui/geometry';
+import { pull, orderBy } from 'tui/util';
 import DragDropAnnouncer from './drag_drop_announcer';
 import { uniqueId } from './util/misc';
-import { langString, getString } from 'totara_core/i18n';
+import { langString, getString } from 'tui/i18n';
 
 export const getSourceIdName = 'tui_dragDrop_getSourceId';
 export const getDroppableApiName = 'tui_dragDrop_getDroppableApi';

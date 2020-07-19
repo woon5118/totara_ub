@@ -17,7 +17,7 @@
  */
 
 import { shallowMount } from '@vue/test-utils';
-import component from 'totara_core/components/form/Datalist.vue';
+import component from 'tui/components/form/Datalist.vue';
 import { axe, toHaveNoViolations } from 'jest-axe';
 expect.extend(toHaveNoViolations);
 let wrapper;

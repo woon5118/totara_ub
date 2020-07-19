@@ -17,7 +17,7 @@
  */
 
 import { shallowMount } from '@vue/test-utils';
-import component from 'totara_core/components/toggle/ToggleSwitch.vue';
+import component from 'tui/components/toggle/ToggleSwitch.vue';
 import Vue from 'vue';
 import { axe, toHaveNoViolations } from 'jest-axe';
 

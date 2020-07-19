@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Simon Chester <simon.chester@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -37,10 +37,10 @@
 </template>
 
 <script>
-import InputText from 'totara_core/components/form/InputText';
-import Modal from 'totara_core/components/modal/Modal';
-import ModalContent from 'totara_core/components/modal/ModalContent';
-import OkCancelGroup from 'totara_core/components/buttons/OkCancelGroup';
+import InputText from 'tui/components/form/InputText';
+import Modal from 'tui/components/modal/Modal';
+import ModalContent from 'tui/components/modal/ModalContent';
+import OkCancelGroup from 'tui/components/buttons/OkCancelGroup';
 
 export default {
   components: {

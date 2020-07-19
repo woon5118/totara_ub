@@ -17,7 +17,7 @@
  */
 
 import { mount } from '@vue/test-utils';
-import component from 'totara_core/components/adder/AudienceAdder';
+import component from 'tui/components/adder/AudienceAdder';
 import { axe, toHaveNoViolations } from 'jest-axe';
 expect.extend(toHaveNoViolations);
 

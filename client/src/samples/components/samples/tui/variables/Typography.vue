@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -48,11 +48,11 @@
 </template>
 
 <script>
-import Cell from 'totara_core/components/datatable/Cell';
-import HeaderCell from 'totara_core/components/datatable/HeaderCell';
-import SamplesCode from 'totara_samples/components/sample_parts/misc/SamplesCode';
-import SamplesExample from 'totara_samples/components/sample_parts/misc/SamplesExample';
-import Table from 'totara_core/components/datatable/Table';
+import Cell from 'tui/components/datatable/Cell';
+import HeaderCell from 'tui/components/datatable/HeaderCell';
+import SamplesCode from 'samples/components/sample_parts/misc/SamplesCode';
+import SamplesExample from 'samples/components/sample_parts/misc/SamplesExample';
+import Table from 'tui/components/datatable/Table';
 
 export default {
   components: {

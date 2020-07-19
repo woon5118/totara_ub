@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -65,42 +65,42 @@
 </template>
 
 <script>
-import Add from 'totara_core/components/icons/common/Add';
-import AddUser from 'totara_core/components/icons/common/AddUser';
-import Archive from 'totara_core/components/icons/common/Archive';
-import BackArrow from 'totara_core/components/icons/common/BackArrow';
-import ForwardArrow from 'totara_core/components/icons/common/ForwardArrow';
-import CheckSuccess from 'totara_core/components/icons/common/CheckSuccess';
-import Close from 'totara_core/components/icons/common/Close';
-import Comment from 'totara_core/components/icons/common/Comment';
-import Delete from 'totara_core/components/icons/common/Delete';
-import Edit from 'totara_core/components/icons/common/Edit';
-import Error from 'totara_core/components/icons/common/Error';
-import Collapse from 'totara_core/components/icons/common/Collapse';
-import Expand from 'totara_core/components/icons/common/Expand';
-import More from 'totara_core/components/icons/common/More';
-import RemoveUser from 'totara_core/components/icons/common/RemoveUser';
-import Remove from 'totara_core/components/icons/common/Remove';
-import Search from 'totara_core/components/icons/common/Search';
-import Slider from 'totara_core/components/icons/common/Slider';
-import Success from 'totara_core/components/icons/common/Success';
-import Show from 'totara_core/components/icons/common/Show';
-import Hide from 'totara_core/components/icons/common/Hide';
-import List from 'totara_core/components/icons/common/List';
-import Grid from 'totara_core/components/icons/common/Grid';
-import Info from 'totara_core/components/icons/common/Info';
-import Spinner from 'totara_core/components/icons/common/Spinner';
-import Warning from 'totara_core/components/icons/common/Warning';
+import Add from 'tui/components/icons/common/Add';
+import AddUser from 'tui/components/icons/common/AddUser';
+import Archive from 'tui/components/icons/common/Archive';
+import BackArrow from 'tui/components/icons/common/BackArrow';
+import ForwardArrow from 'tui/components/icons/common/ForwardArrow';
+import CheckSuccess from 'tui/components/icons/common/CheckSuccess';
+import Close from 'tui/components/icons/common/Close';
+import Comment from 'tui/components/icons/common/Comment';
+import Delete from 'tui/components/icons/common/Delete';
+import Edit from 'tui/components/icons/common/Edit';
+import Error from 'tui/components/icons/common/Error';
+import Collapse from 'tui/components/icons/common/Collapse';
+import Expand from 'tui/components/icons/common/Expand';
+import More from 'tui/components/icons/common/More';
+import RemoveUser from 'tui/components/icons/common/RemoveUser';
+import Remove from 'tui/components/icons/common/Remove';
+import Search from 'tui/components/icons/common/Search';
+import Slider from 'tui/components/icons/common/Slider';
+import Success from 'tui/components/icons/common/Success';
+import Show from 'tui/components/icons/common/Show';
+import Hide from 'tui/components/icons/common/Hide';
+import List from 'tui/components/icons/common/List';
+import Grid from 'tui/components/icons/common/Grid';
+import Info from 'tui/components/icons/common/Info';
+import Spinner from 'tui/components/icons/common/Spinner';
+import Warning from 'tui/components/icons/common/Warning';
 
-import Cell from 'totara_core/components/datatable/Cell';
-import HeaderCell from 'totara_core/components/datatable/HeaderCell';
-import FormRow from 'totara_core/components/form/FormRow';
-import Radio from 'totara_core/components/form/Radio';
-import RadioGroup from 'totara_core/components/form/RadioGroup';
-import SamplesCode from 'totara_samples/components/sample_parts/misc/SamplesCode';
-import SamplesExample from 'totara_samples/components/sample_parts/misc/SamplesExample';
-import SamplesPropCtl from 'totara_samples/components/sample_parts/misc/SamplesPropCtl';
-import Table from 'totara_core/components/datatable/Table';
+import Cell from 'tui/components/datatable/Cell';
+import HeaderCell from 'tui/components/datatable/HeaderCell';
+import FormRow from 'tui/components/form/FormRow';
+import Radio from 'tui/components/form/Radio';
+import RadioGroup from 'tui/components/form/RadioGroup';
+import SamplesCode from 'samples/components/sample_parts/misc/SamplesCode';
+import SamplesExample from 'samples/components/sample_parts/misc/SamplesExample';
+import SamplesPropCtl from 'samples/components/sample_parts/misc/SamplesPropCtl';
+import Table from 'tui/components/datatable/Table';
 
 export default {
   components: {
@@ -252,7 +252,7 @@ export default {
       ],
       size: '200',
       codeTemplate: `<Close :size="size"/>`,
-      codeScript: `import Close from 'totara_core/components/icons/common/Close';
+      codeScript: `import Close from 'tui/components/icons/common/Close';
 
 export default {
   components: {

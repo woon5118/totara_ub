@@ -16,7 +16,7 @@
  * @module totara_core
  */
 
-import FlexIcon from 'totara_core/components/icons/flex_icons/FlexIcon';
+import FlexIcon from 'tui/components/icons/flex_icons/FlexIcon';
 
 describe('FlexIcon.vue', () => {
   it('Checks icon size validator', () => {

@@ -107,9 +107,9 @@
 </template>
 
 <script>
-import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
-import OverflowDetector from 'totara_core/components/util/OverflowDetector';
-import SliderIcon from 'totara_core/components/icons/common/Slider';
+import ButtonIcon from 'tui/components/buttons/ButtonIcon';
+import OverflowDetector from 'tui/components/util/OverflowDetector';
+import SliderIcon from 'tui/components/icons/common/Slider';
 
 export default {
   components: {

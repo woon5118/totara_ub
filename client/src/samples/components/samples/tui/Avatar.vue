@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Alvin Smith <alvin.smith@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import Avatar from 'totara_core/components/avatar/Avatar';
+import Avatar from 'tui/components/avatar/Avatar';
 
 export default {
   components: {

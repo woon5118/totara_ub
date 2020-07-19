@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Simon Chester <simon.chester@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -30,8 +30,8 @@
 </template>
 
 <script>
-import FormScope from 'totara_core/components/reform/FormScope';
-import { FormRow, FormText } from 'totara_core/components/uniform';
+import FormScope from 'tui/components/reform/FormScope';
+import { FormRow, FormText } from 'tui/components/uniform';
 
 export default {
   components: {

@@ -18,7 +18,7 @@
 
 <script>
 import { createUniformInputWrapper } from './util';
-import Select from 'totara_core/components/form/Select';
+import Select from 'tui/components/form/Select';
 
 export default createUniformInputWrapper(Select);
 </script>

@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Dave Wallace <dave.wallace@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -158,20 +158,20 @@
 
 <script>
 import Vue from 'vue';
-import Grid from 'totara_core/components/grid/Grid';
-import GridItem from 'totara_core/components/grid/GridItem';
-import SamplesExample from 'totara_samples/components/sample_parts/misc/SamplesExample';
-import SamplesPropCtl from 'totara_samples/components/sample_parts/misc/SamplesPropCtl';
-import Form from 'totara_core/components/form/Form';
-import FormRow from 'totara_core/components/form/FormRow';
-import InputNumber from 'totara_core/components/form/InputNumber';
-import Textarea from 'totara_core/components/form/Textarea';
-import Radio from 'totara_core/components/form/Radio';
-import RadioGroup from 'totara_core/components/form/RadioGroup';
-import Button from 'totara_core/components/buttons/Button';
-import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
-import EditIcon from 'totara_core/components/icons/common/Edit';
-import Popover from 'totara_core/components/popover/Popover';
+import Grid from 'tui/components/grid/Grid';
+import GridItem from 'tui/components/grid/GridItem';
+import SamplesExample from 'samples/components/sample_parts/misc/SamplesExample';
+import SamplesPropCtl from 'samples/components/sample_parts/misc/SamplesPropCtl';
+import Form from 'tui/components/form/Form';
+import FormRow from 'tui/components/form/FormRow';
+import InputNumber from 'tui/components/form/InputNumber';
+import Textarea from 'tui/components/form/Textarea';
+import Radio from 'tui/components/form/Radio';
+import RadioGroup from 'tui/components/form/RadioGroup';
+import Button from 'tui/components/buttons/Button';
+import ButtonIcon from 'tui/components/buttons/ButtonIcon';
+import EditIcon from 'tui/components/icons/common/Edit';
+import Popover from 'tui/components/popover/Popover';
 
 export default {
   components: {

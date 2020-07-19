@@ -51,7 +51,7 @@
 </template>
 
 <script>
-import Caret from 'totara_core/components/decor/Caret';
+import Caret from 'tui/components/decor/Caret';
 
 export default {
   components: {

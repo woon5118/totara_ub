@@ -77,9 +77,9 @@
 </template>
 
 <script>
-import Grid from 'totara_core/components/grid/Grid';
-import GridItem from 'totara_core/components/grid/GridItem';
-import Responsive from 'totara_core/components/responsive/Responsive';
+import Grid from 'tui/components/grid/Grid';
+import GridItem from 'tui/components/grid/GridItem';
+import Responsive from 'tui/components/responsive/Responsive';
 
 export default {
   components: {

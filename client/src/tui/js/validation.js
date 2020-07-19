@@ -18,7 +18,7 @@
 
 import { langString } from './i18n';
 import { isExists } from 'date-fns';
-import { isIsoAfter, isIsoBefore, getValuesFromIso } from 'totara_core/date';
+import { isIsoAfter, isIsoBefore, getValuesFromIso } from 'tui/date';
 
 // match browser email validation regex.
 const EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;

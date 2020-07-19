@@ -17,7 +17,7 @@
 -->
 
 <script>
-import { fieldValidator } from 'totara_core/validation';
+import { fieldValidator } from 'tui/validation';
 
 export default {
   inject: {

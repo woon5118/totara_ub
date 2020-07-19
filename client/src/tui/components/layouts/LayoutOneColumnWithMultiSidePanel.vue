@@ -137,10 +137,10 @@ This layout is capable of the following:
 </template>
 
 <script>
-import Grid from 'totara_core/components/grid/Grid';
-import GridItem from 'totara_core/components/grid/GridItem';
-import Responsive from 'totara_core/components/responsive/Responsive';
-import SidePanel from 'totara_core/components/sidepanel/SidePanel';
+import Grid from 'tui/components/grid/Grid';
+import GridItem from 'tui/components/grid/GridItem';
+import Responsive from 'tui/components/responsive/Responsive';
+import SidePanel from 'tui/components/sidepanel/SidePanel';
 
 export default {
   components: {

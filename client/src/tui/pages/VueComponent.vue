@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import Separator from 'totara_core/components/decor/Separator';
+import Separator from 'tui/components/decor/Separator';
 
 export default {
   components: {

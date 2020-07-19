@@ -17,7 +17,7 @@
  */
 
 import { shallowMount } from '@vue/test-utils';
-import component from 'totara_core/components/buttons/ButtonGroup.vue';
+import component from 'tui/components/buttons/ButtonGroup.vue';
 let wrapper;
 
 describe('presentation/form/ButtonGroup.vue', () => {

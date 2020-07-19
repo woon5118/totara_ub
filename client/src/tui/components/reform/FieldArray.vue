@@ -18,7 +18,7 @@
 
 <script>
 import Vue from 'vue';
-import FormScope from 'totara_core/components/reform/FormScope';
+import FormScope from 'tui/components/reform/FormScope';
 
 const isFn = fn => typeof fn == 'function';
 

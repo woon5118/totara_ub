@@ -32,8 +32,8 @@
 </template>
 
 <script>
-import CheckboxButton from 'totara_core/components/form/CheckboxButton';
-import Fieldset from 'totara_core/components/form/Fieldset';
+import CheckboxButton from 'tui/components/form/CheckboxButton';
+import Fieldset from 'tui/components/form/Fieldset';
 
 export default {
   components: {

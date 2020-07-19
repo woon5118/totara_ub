@@ -17,7 +17,7 @@
  */
 
 import apollo from '../apollo_client';
-import bundleQuery from 'totara_core/graphql/tui_bundles_nosession';
+import bundleQuery from 'totara_tui/graphql/bundles_nosession';
 import { globalConfig } from '../config';
 import pending from '../pending';
 import { pull } from '../util';

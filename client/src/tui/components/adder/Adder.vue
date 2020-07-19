@@ -100,15 +100,15 @@
 
 <script>
 // Components
-import Button from 'totara_core/components/buttons/Button';
-import ButtonCancel from 'totara_core/components/buttons/Cancel';
-import ButtonGroup from 'totara_core/components/buttons/ButtonGroup';
-import Loader from 'totara_core/components/loader/Loader';
-import Modal from 'totara_core/components/modal/Modal';
-import ModalContent from 'totara_core/components/modal/ModalContent';
-import ModalPresenter from 'totara_core/components/modal/ModalPresenter';
-import Tab from 'totara_core/components/tabs/Tab';
-import Tabs from 'totara_core/components/tabs/Tabs';
+import Button from 'tui/components/buttons/Button';
+import ButtonCancel from 'tui/components/buttons/Cancel';
+import ButtonGroup from 'tui/components/buttons/ButtonGroup';
+import Loader from 'tui/components/loader/Loader';
+import Modal from 'tui/components/modal/Modal';
+import ModalContent from 'tui/components/modal/ModalContent';
+import ModalPresenter from 'tui/components/modal/ModalPresenter';
+import Tab from 'tui/components/tabs/Tab';
+import Tabs from 'tui/components/tabs/Tabs';
 
 export default {
   components: {

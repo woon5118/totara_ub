@@ -17,7 +17,7 @@
  */
 
 import { mount } from '@vue/test-utils';
-import Progress from 'totara_core/components/progress/Progress';
+import Progress from 'tui/components/progress/Progress';
 
 const factory = propsData => {
   return mount(Progress, {

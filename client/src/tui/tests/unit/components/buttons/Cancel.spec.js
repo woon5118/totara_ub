@@ -17,7 +17,7 @@
  */
 
 import { mount } from '@vue/test-utils';
-import component from 'totara_core/components/buttons/Cancel';
+import component from 'tui/components/buttons/Cancel';
 let wrapper;
 import { axe, toHaveNoViolations } from 'jest-axe';
 expect.extend(toHaveNoViolations);

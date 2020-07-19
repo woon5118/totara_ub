@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -114,15 +114,15 @@
 </template>
 
 <script>
-import AddIcon from 'totara_core/components/icons/common/Add';
-import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
-import Grid from 'totara_core/components/grid/Grid';
-import GridItem from 'totara_core/components/grid/GridItem';
-import SidePanel from 'totara_core/components/sidepanel/SidePanel';
-import SidePanelNav from 'totara_core/components/sidepanel/SidePanelNav';
-import SidePanelNavButtonItem from 'totara_core/components/sidepanel/SidePanelNavButtonItem';
-import SidePanelNavGroup from 'totara_core/components/sidepanel/SidePanelNavGroup';
-import SidePanelNavLinkItem from 'totara_core/components/sidepanel/SidePanelNavLinkItem';
+import AddIcon from 'tui/components/icons/common/Add';
+import ButtonIcon from 'tui/components/buttons/ButtonIcon';
+import Grid from 'tui/components/grid/Grid';
+import GridItem from 'tui/components/grid/GridItem';
+import SidePanel from 'tui/components/sidepanel/SidePanel';
+import SidePanelNav from 'tui/components/sidepanel/SidePanelNav';
+import SidePanelNavButtonItem from 'tui/components/sidepanel/SidePanelNavButtonItem';
+import SidePanelNavGroup from 'tui/components/sidepanel/SidePanelNavGroup';
+import SidePanelNavLinkItem from 'tui/components/sidepanel/SidePanelNavLinkItem';
 
 export default {
   components: {

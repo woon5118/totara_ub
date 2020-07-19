@@ -69,12 +69,12 @@
 
 <script>
 import Vue from 'vue';
-import { waitForTransitionEnd } from 'totara_core/dom/transitions';
-import { trapFocusOnTab } from 'totara_core/dom/focus';
+import { waitForTransitionEnd } from 'tui/dom/transitions';
+import { trapFocusOnTab } from 'tui/dom/focus';
 import { bodySetModalOpen } from '../../js/internal/body_modal';
-import { presenterInterfaceName } from 'totara_core/components/modal/ModalPresenter';
-import PropsProvider from 'totara_core/components/util/PropsProvider';
-import CloseButton from 'totara_core/components/buttons/CloseIcon';
+import { presenterInterfaceName } from 'tui/components/modal/ModalPresenter';
+import PropsProvider from 'tui/components/util/PropsProvider';
+import CloseButton from 'tui/components/buttons/CloseIcon';
 
 export default {
   components: {

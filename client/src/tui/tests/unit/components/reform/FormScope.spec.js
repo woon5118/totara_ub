@@ -18,7 +18,7 @@
 
 import Vue from 'vue';
 import { mount } from '@vue/test-utils';
-import FormScope from 'totara_core/components/reform/FormScope';
+import FormScope from 'tui/components/reform/FormScope';
 import {
   ReformScopeProvider,
   ReformScopeReceiver,

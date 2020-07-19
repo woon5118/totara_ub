@@ -20,7 +20,7 @@
 /* eslint-disable jest/expect-expect */
 
 import { shallowMount } from '@vue/test-utils';
-import component from 'totara_core/components/chartjs/ChartJs.vue';
+import component from 'tui/components/chartjs/ChartJs.vue';
 import { axe, toHaveNoViolations } from 'jest-axe';
 expect.extend(toHaveNoViolations);
 
@@ -63,7 +63,7 @@ let mockDefaultColors = [
 ];
 
 // We are mocking theme to override css variables
-jest.mock('totara_core/theme', () => {
+jest.mock('tui/theme', () => {
   return {
     getVar(name) {
       let vars = {

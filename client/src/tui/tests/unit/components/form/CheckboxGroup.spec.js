@@ -17,7 +17,7 @@
  */
 
 import { shallowMount } from '@vue/test-utils';
-import CheckboxGroup from 'totara_core/components/form/CheckboxGroup';
+import CheckboxGroup from 'tui/components/form/CheckboxGroup';
 
 const PropsProviderStub = {
   props: ['provide'],

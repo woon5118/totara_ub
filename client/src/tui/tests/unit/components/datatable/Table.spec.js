@@ -17,7 +17,7 @@
  */
 
 import { shallowMount } from '@vue/test-utils';
-import component from 'totara_core/components/datatable/Table.vue';
+import component from 'tui/components/datatable/Table.vue';
 let wrapper;
 
 const stubs = {

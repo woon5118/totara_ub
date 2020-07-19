@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import MultiSelect from 'totara_core/components/filters/MultiSelectFilter';
+import MultiSelect from 'tui/components/filters/MultiSelectFilter';
 
 export default {
   components: {

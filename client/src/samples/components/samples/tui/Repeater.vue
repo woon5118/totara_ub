@@ -47,14 +47,14 @@
 </template>
 
 <script>
-import AddIcon from 'totara_core/components/icons/common/Add';
-import Button from 'totara_core/components/buttons/Button';
-import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
-import InputText from 'totara_core/components/form/InputText';
-import Radio from 'totara_core/components/form/Radio';
-import RadioGroup from 'totara_core/components/form/RadioGroup';
-import Repeater from 'totara_core/components/form/Repeater';
-import Separator from 'totara_core/components/decor/Separator';
+import AddIcon from 'tui/components/icons/common/Add';
+import Button from 'tui/components/buttons/Button';
+import ButtonIcon from 'tui/components/buttons/ButtonIcon';
+import InputText from 'tui/components/form/InputText';
+import Radio from 'tui/components/form/Radio';
+import RadioGroup from 'tui/components/form/RadioGroup';
+import Repeater from 'tui/components/form/Repeater';
+import Separator from 'tui/components/decor/Separator';
 
 export default {
   components: {

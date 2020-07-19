@@ -17,7 +17,7 @@
  */
 
 import { shallowMount } from '@vue/test-utils';
-import DropdownItem from 'totara_core/components/dropdown/DropdownItem';
+import DropdownItem from 'tui/components/dropdown/DropdownItem';
 import Vue from 'vue';
 
 let wrapper;

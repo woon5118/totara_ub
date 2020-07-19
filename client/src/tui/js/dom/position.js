@@ -16,7 +16,7 @@
  * @module totara_core
  */
 
-import { Point, Rect, Size } from 'totara_core/geometry';
+import { Point, Rect, Size } from 'tui/geometry';
 
 /**
  * Get the position of an element relative to the document.

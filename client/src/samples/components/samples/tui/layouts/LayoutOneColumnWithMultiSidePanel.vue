@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Johannes Cilliers <johannes.cilliers@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -165,7 +165,7 @@
 </template>
 
 <script>
-import LayoutOneColumnWithMultiSidePanel from 'totara_core/components/layouts/LayoutOneColumnWithMultiSidePanel';
+import LayoutOneColumnWithMultiSidePanel from 'tui/components/layouts/LayoutOneColumnWithMultiSidePanel';
 
 export default {
   components: {

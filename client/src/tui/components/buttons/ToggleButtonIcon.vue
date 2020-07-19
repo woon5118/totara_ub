@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
+import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 
 export default {
   components: {

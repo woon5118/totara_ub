@@ -19,7 +19,7 @@
 <script>
 import VirtualUtils from '../../js/lib/internal/virtual_utils';
 import VirtualItemMeasurer from './internal/VirtualItemMeasurer';
-import { getDocumentPosition } from 'totara_core/dom/position';
+import { getDocumentPosition } from 'tui/dom/position';
 
 const directionKey = 'scrollTop';
 const listKeeps = 60;

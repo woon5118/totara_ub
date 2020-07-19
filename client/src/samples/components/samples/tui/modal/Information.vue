@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -47,13 +47,13 @@
 </template>
 
 <script>
-import Button from 'totara_core/components/buttons/Button';
-import FormRow from 'totara_core/components/form/FormRow';
-import InformationModal from 'totara_core/components/modal/InformationModal';
-import InputText from 'totara_core/components/form/InputText';
-import SamplesCode from 'totara_samples/components/sample_parts/misc/SamplesCode';
-import SamplesExample from 'totara_samples/components/sample_parts/misc/SamplesExample';
-import SamplesPropCtl from 'totara_samples/components/sample_parts/misc/SamplesPropCtl';
+import Button from 'tui/components/buttons/Button';
+import FormRow from 'tui/components/form/FormRow';
+import InformationModal from 'tui/components/modal/InformationModal';
+import InputText from 'tui/components/form/InputText';
+import SamplesCode from 'samples/components/sample_parts/misc/SamplesCode';
+import SamplesExample from 'samples/components/sample_parts/misc/SamplesExample';
+import SamplesPropCtl from 'samples/components/sample_parts/misc/SamplesPropCtl';
 
 export default {
   components: {
@@ -72,7 +72,7 @@ export default {
         'You can not do this action yet. You must complete more things before you can.',
       modalOpen: false,
       title: 'This is a simple information modal.',
-      codeScript: `import InformationModal from 'totara_core/components/modal/InformationModal';
+      codeScript: `import InformationModal from 'tui/components/modal/InformationModal';
 
 export default {
   components: {

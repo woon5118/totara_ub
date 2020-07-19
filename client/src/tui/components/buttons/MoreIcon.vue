@@ -27,8 +27,8 @@
 </template>
 
 <script>
-import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
-import MoreIcon from 'totara_core/components/icons/common/More';
+import ButtonIcon from 'tui/components/buttons/ButtonIcon';
+import MoreIcon from 'tui/components/icons/common/More';
 
 export default {
   components: {

@@ -17,7 +17,7 @@
 -->
 
 <script>
-import amd from 'totara_core/amd';
+import amd from 'tui/amd';
 
 export default {
   props: {

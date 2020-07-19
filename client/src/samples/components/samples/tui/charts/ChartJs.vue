@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -68,16 +68,16 @@
 
 <script>
 // Components
-import ChartJs from 'totara_core/components/chartjs/ChartJs';
-import SamplesCode from 'totara_samples/components/sample_parts/misc/SamplesCode';
-import SamplesExample from 'totara_samples/components/sample_parts/misc/SamplesExample';
-import SamplesPropCtl from 'totara_samples/components/sample_parts/misc/SamplesPropCtl';
-import Radio from 'totara_core/components/form/Radio';
-import RadioGroup from 'totara_core/components/form/RadioGroup';
-import FormRow from 'totara_core/components/form/FormRow';
-import InputText from 'totara_core/components/form/InputText';
-import Textarea from 'totara_core/components/form/Textarea';
-import Button from 'totara_core/components/buttons/Button';
+import ChartJs from 'tui/components/chartjs/ChartJs';
+import SamplesCode from 'samples/components/sample_parts/misc/SamplesCode';
+import SamplesExample from 'samples/components/sample_parts/misc/SamplesExample';
+import SamplesPropCtl from 'samples/components/sample_parts/misc/SamplesPropCtl';
+import Radio from 'tui/components/form/Radio';
+import RadioGroup from 'tui/components/form/RadioGroup';
+import FormRow from 'tui/components/form/FormRow';
+import InputText from 'tui/components/form/InputText';
+import Textarea from 'tui/components/form/Textarea';
+import Button from 'tui/components/buttons/Button';
 
 export default {
   components: {
@@ -126,7 +126,7 @@ export default {
     },
 
     codeScript() {
-      return `import ChartJs from 'totara_core/components/chartjs/ChartJs';
+      return `import ChartJs from 'tui/components/chartjs/ChartJs';
 
 export default {
   components: {

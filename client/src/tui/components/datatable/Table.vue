@@ -141,16 +141,16 @@
 </template>
 
 <script>
-import ExpandedRow from 'totara_core/components/datatable/ExpandedRow';
-import HeaderRow from 'totara_core/components/datatable/HeaderRow';
-import PreRows from 'totara_core/components/datatable/PreRows';
-import Row from 'totara_core/components/datatable/Row';
-import RowGroup from 'totara_core/components/datatable/RowGroup';
-import Draggable from 'totara_core/components/drag_drop/Draggable';
-import PropsProvider from 'totara_core/components/util/PropsProvider';
-import Cell from 'totara_core/components/datatable/Cell';
-import HeaderCell from 'totara_core/components/datatable/HeaderCell';
-import DragHandleIcon from 'totara_core/components/icons/common/DragHandle';
+import ExpandedRow from 'tui/components/datatable/ExpandedRow';
+import HeaderRow from 'tui/components/datatable/HeaderRow';
+import PreRows from 'tui/components/datatable/PreRows';
+import Row from 'tui/components/datatable/Row';
+import RowGroup from 'tui/components/datatable/RowGroup';
+import Draggable from 'tui/components/drag_drop/Draggable';
+import PropsProvider from 'tui/components/util/PropsProvider';
+import Cell from 'tui/components/datatable/Cell';
+import HeaderCell from 'tui/components/datatable/HeaderCell';
+import DragHandleIcon from 'tui/components/icons/common/DragHandle';
 
 export default {
   components: {

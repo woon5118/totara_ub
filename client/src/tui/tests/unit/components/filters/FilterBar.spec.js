@@ -17,7 +17,7 @@
  */
 
 import { mount } from '@vue/test-utils';
-import component from 'totara_core/components/filters/FilterBar';
+import component from 'tui/components/filters/FilterBar';
 import { axe, toHaveNoViolations } from 'jest-axe';
 expect.extend(toHaveNoViolations);
 let wrapper;

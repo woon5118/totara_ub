@@ -17,7 +17,7 @@
  */
 
 import { shallowMount } from '@vue/test-utils';
-import component from 'totara_core/components/decor/Separator';
+import component from 'tui/components/decor/Separator';
 let wrapperDefault, wrapperSlottedContent;
 
 describe('Separator.vue', () => {

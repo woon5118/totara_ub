@@ -17,7 +17,7 @@
  */
 
 import { mount } from '@vue/test-utils';
-import Checkbox from 'totara_core/components/form/Checkbox';
+import Checkbox from 'tui/components/form/Checkbox';
 
 let wrapper;
 

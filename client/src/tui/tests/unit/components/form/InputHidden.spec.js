@@ -17,7 +17,7 @@
  */
 
 import { shallowMount } from '@vue/test-utils';
-import component from 'totara_core/components/form/InputHidden.vue';
+import component from 'tui/components/form/InputHidden.vue';
 let wrapper;
 
 describe('presentation/form/InputHidden.vue', () => {

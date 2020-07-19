@@ -54,7 +54,7 @@
 </template>
 
 <script>
-import PropsProvider from 'totara_core/components/util/PropsProvider';
+import PropsProvider from 'tui/components/util/PropsProvider';
 import { getTabbableElements } from '../../js/dom/focus';
 
 const DEFAULT_CLOSE_OPTIONS = ['escape', 'outside'];

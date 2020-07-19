@@ -25,9 +25,9 @@
 
 <script>
 // Components
-import ButtonCancel from 'totara_core/components/buttons/Cancel';
-import ButtonGroup from 'totara_core/components/buttons/ButtonGroup';
-import ButtonSubmit from 'totara_core/components/buttons/Submit';
+import ButtonCancel from 'tui/components/buttons/Cancel';
+import ButtonGroup from 'tui/components/buttons/ButtonGroup';
+import ButtonSubmit from 'tui/components/buttons/Submit';
 
 export default {
   components: {

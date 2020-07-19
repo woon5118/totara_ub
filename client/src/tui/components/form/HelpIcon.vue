@@ -41,8 +41,8 @@
 
 <script>
 // Components
-import Info from 'totara_core/components/icons/common/Info';
-import Popover from 'totara_core/components/popover/Popover';
+import Info from 'tui/components/icons/common/Info';
+import Popover from 'tui/components/popover/Popover';
 
 export default {
   components: {

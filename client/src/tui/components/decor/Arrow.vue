@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import { isRtl } from 'totara_core/i18n';
+import { isRtl } from 'tui/i18n';
 
 const relativeSide = {
   top: 'bottom',

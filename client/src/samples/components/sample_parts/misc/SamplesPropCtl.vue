@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -29,8 +29,8 @@
 </template>
 
 <script>
-import Collapsible from 'totara_core/components/collapsible/Collapsible';
-import Form from 'totara_core/components/form/Form';
+import Collapsible from 'tui/components/collapsible/Collapsible';
+import Form from 'tui/components/form/Form';
 
 export default {
   components: {

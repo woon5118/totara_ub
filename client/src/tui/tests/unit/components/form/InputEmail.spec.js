@@ -17,7 +17,7 @@
  */
 
 import { shallowMount } from '@vue/test-utils';
-import component from 'totara_core/components/form/InputEmail.vue';
+import component from 'tui/components/form/InputEmail.vue';
 let wrapper;
 const inputEventFunc = jest.fn();
 const submitEventFunc = jest.fn();

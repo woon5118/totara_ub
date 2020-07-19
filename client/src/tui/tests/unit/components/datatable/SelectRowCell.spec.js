@@ -17,7 +17,7 @@
  */
 
 import { shallowMount } from '@vue/test-utils';
-import component from 'totara_core/components/datatable/SelectRowCell.vue';
+import component from 'tui/components/datatable/SelectRowCell.vue';
 let wrapper;
 
 describe('presentation/datatable/SelectRowCell.vue', () => {

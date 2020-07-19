@@ -17,7 +17,7 @@
  */
 
 import { shallowMount } from '@vue/test-utils';
-import component from 'totara_core/components/datatable/Cell.vue';
+import component from 'tui/components/datatable/Cell.vue';
 let wrapper;
 
 const props = {

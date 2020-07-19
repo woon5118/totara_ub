@@ -17,7 +17,7 @@
  */
 
 import { shallowMount } from '@vue/test-utils';
-import collapsible from 'totara_core/components/collapsible/CollapsibleGroupToggle';
+import collapsible from 'tui/components/collapsible/CollapsibleGroupToggle';
 
 describe('collapsibleGroupToggle', () => {
   it('matches snapshot', () => {

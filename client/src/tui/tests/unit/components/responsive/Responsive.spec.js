@@ -17,7 +17,7 @@
  */
 
 import { shallowMount } from '@vue/test-utils';
-import Responsive from 'totara_core/components/responsive/Responsive';
+import Responsive from 'tui/components/responsive/Responsive';
 let wrapperDefault, wrapperSlotted;
 global.ResizeObserver = class {
   observe() {

@@ -16,10 +16,10 @@
  * @module totara_core
  */
 
-import amd from 'totara_core/amd';
-import pending from 'totara_core/pending';
+import amd from 'tui/amd';
+import pending from 'tui/pending';
 
-jest.mock('totara_core/pending');
+jest.mock('tui/pending');
 
 global.requirejs = jest.fn((mods, cb) => cb());
 

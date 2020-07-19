@@ -17,7 +17,7 @@
  */
 
 import { shallowMount } from '@vue/test-utils';
-import component from 'totara_core/components/form/InputTel.vue';
+import component from 'tui/components/form/InputTel.vue';
 let wrapper;
 const inputEventFunc = jest.fn();
 const submitEventFunc = jest.fn();

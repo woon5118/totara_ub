@@ -18,7 +18,7 @@
 
 <script>
 import { createUniformInputWrapper } from './util';
-import ToggleButton from 'totara_core/components/toggle/ToggleSwitch';
+import ToggleButton from 'tui/components/toggle/ToggleSwitch';
 
 export default createUniformInputWrapper(ToggleButton);
 </script>

@@ -18,7 +18,7 @@
 
 <script>
 import { createUniformInputWrapper } from './util';
-import Range from 'totara_core/components/form/Range';
+import Range from 'tui/components/form/Range';
 
 export default createUniformInputWrapper(Range);
 </script>

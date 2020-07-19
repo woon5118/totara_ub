@@ -18,7 +18,7 @@
 
 <script>
 import { createUniformInputWrapper } from './util';
-import InputPassword from 'totara_core/components/form/InputPassword';
+import InputPassword from 'tui/components/form/InputPassword';
 
 export default createUniformInputWrapper(InputPassword);
 </script>

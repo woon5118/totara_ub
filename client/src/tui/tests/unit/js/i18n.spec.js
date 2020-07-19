@@ -21,11 +21,11 @@ import {
   hasString,
   unloadedStrings,
   loadStrings,
-} from 'totara_core/i18n';
-import amd from 'totara_core/amd';
+} from 'tui/i18n';
+import amd from 'tui/amd';
 
-jest.mock('totara_core/amd');
-jest.mock('totara_core/pending');
+jest.mock('tui/amd');
+jest.mock('tui/pending');
 
 const M = (global.M = {
   util: {

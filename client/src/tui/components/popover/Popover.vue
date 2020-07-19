@@ -50,9 +50,9 @@
 </template>
 
 <script>
-import PopoverFrame from 'totara_core/components/popover/PopoverFrame';
-import PopoverTrigger from 'totara_core/components/popover/PopoverTrigger';
-import PopoverPositioner from 'totara_core/components/popover/PopoverPositioner';
+import PopoverFrame from 'tui/components/popover/PopoverFrame';
+import PopoverTrigger from 'tui/components/popover/PopoverTrigger';
+import PopoverPositioner from 'tui/components/popover/PopoverPositioner';
 
 const validTriggers = ['click', 'click-toggle', 'hover', 'focus'];
 const validPositions = ['top', 'right', 'bottom', 'left'];

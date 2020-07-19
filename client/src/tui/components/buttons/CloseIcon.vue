@@ -27,8 +27,8 @@
 </template>
 
 <script>
-import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
-import CloseIcon from 'totara_core/components/icons/common/Close';
+import ButtonIcon from 'tui/components/buttons/ButtonIcon';
+import CloseIcon from 'tui/components/icons/common/Close';
 
 export default {
   components: {

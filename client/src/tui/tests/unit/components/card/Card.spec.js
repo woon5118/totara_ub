@@ -17,7 +17,7 @@
  */
 
 import { mount } from '@vue/test-utils';
-import component from 'totara_core/components/card/Card';
+import component from 'tui/components/card/Card';
 const eventFunc = jest.fn();
 import { axe, toHaveNoViolations } from 'jest-axe';
 expect.extend(toHaveNoViolations);

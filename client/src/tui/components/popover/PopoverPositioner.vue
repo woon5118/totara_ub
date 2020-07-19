@@ -37,15 +37,15 @@
 
 <script>
 import Vue from 'vue';
-import ResizeObserver from 'totara_core/polyfills/ResizeObserver';
-import { throttle } from 'totara_core/util';
+import ResizeObserver from 'tui/polyfills/ResizeObserver';
+import { throttle } from 'tui/util';
 import {
   getDocumentPosition,
   getOffsetRect,
   getViewportRect,
 } from '../../js/dom/position';
-import { position } from 'totara_core/lib/popover';
-import { Point, Size } from 'totara_core/geometry';
+import { position } from 'tui/lib/popover';
+import { Point, Size } from 'tui/geometry';
 
 export default {
   props: {

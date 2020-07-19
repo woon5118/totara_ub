@@ -55,8 +55,8 @@
 </template>
 
 <script>
-import OverflowDetector from 'totara_core/components/util/OverflowDetector';
-import ProgressTrackerItem from 'totara_core/components/progresstracker/ProgressTrackerItem';
+import OverflowDetector from 'tui/components/util/OverflowDetector';
+import ProgressTrackerItem from 'tui/components/progresstracker/ProgressTrackerItem';
 
 export default {
   components: {

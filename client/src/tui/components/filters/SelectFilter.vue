@@ -38,8 +38,8 @@
 
 <script>
 // Components
-import Label from 'totara_core/components/form/Label';
-import Select from 'totara_core/components/form/Select';
+import Label from 'tui/components/form/Label';
+import Select from 'tui/components/form/Select';
 
 export default {
   components: {

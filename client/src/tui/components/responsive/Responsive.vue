@@ -23,8 +23,8 @@
 </template>
 
 <script>
-import ResizeObserver from 'totara_core/polyfills/ResizeObserver';
-import { throttle } from 'totara_core/util';
+import ResizeObserver from 'tui/polyfills/ResizeObserver';
+import { throttle } from 'tui/util';
 
 export default {
   props: {

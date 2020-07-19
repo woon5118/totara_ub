@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Arshad Anwer <arshad.anwer@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -177,12 +177,12 @@
 </template>
 
 <script>
-import VirtualScroll from 'totara_core/components/virtualscroll/VirtualScroll';
-import Loader from 'totara_core/components/loader/Loader';
-import Grid from 'totara_core/components/grid/Grid';
-import GridItem from 'totara_core/components/grid/GridItem';
-import Tabs from 'totara_core/components/tabs/Tabs';
-import Tab from 'totara_core/components/tabs/Tab';
+import VirtualScroll from 'tui/components/virtualscroll/VirtualScroll';
+import Loader from 'tui/components/loader/Loader';
+import Grid from 'tui/components/grid/Grid';
+import GridItem from 'tui/components/grid/GridItem';
+import Tabs from 'tui/components/tabs/Tabs';
+import Tab from 'tui/components/tabs/Tab';
 
 const uniqueIdGen = prefix => {
   return `${prefix}$${Math.random()

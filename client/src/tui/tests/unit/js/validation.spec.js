@@ -16,9 +16,9 @@
  * @module totara_core
  */
 
-import { v, fieldValidator } from 'totara_core/validation';
+import { v, fieldValidator } from 'tui/validation';
 
-jest.mock('totara_core/i18n', () => {
+jest.mock('tui/i18n', () => {
   return {
     langString(str) {
       return str;

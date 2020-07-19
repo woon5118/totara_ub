@@ -17,7 +17,7 @@
  */
 
 import { shallowMount } from '@vue/test-utils';
-import component from 'totara_core/components/datatable/SelectEveryRowToggle.vue';
+import component from 'tui/components/datatable/SelectEveryRowToggle.vue';
 let wrapper;
 
 describe('presentation/datatable/SelectEveryRowToggle.vue', () => {

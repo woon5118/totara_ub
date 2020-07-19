@@ -18,15 +18,15 @@
 
 import Vue from 'vue';
 import { mount } from '@vue/test-utils';
-import Field from 'totara_core/components/reform/Field';
+import Field from 'tui/components/reform/Field';
 import {
   ReformScopeProvider,
   ReformFieldContextProvider,
   createMockScope,
 } from './util';
-import { fieldValidator } from 'totara_core/validation';
+import { fieldValidator } from 'tui/validation';
 
-jest.mock('totara_core/validation', () => {
+jest.mock('tui/validation', () => {
   const fieldValidator = jest.fn(fn => fn);
   return { fieldValidator };
 });

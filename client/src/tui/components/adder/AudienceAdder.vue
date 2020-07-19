@@ -130,12 +130,12 @@
 
 <script>
 // Components
-import Adder from 'totara_core/components/adder/Adder';
-import Cell from 'totara_core/components/datatable/Cell';
-import FilterBar from 'totara_core/components/filters/FilterBar';
-import HeaderCell from 'totara_core/components/datatable/HeaderCell';
-import SearchFilter from 'totara_core/components/filters/SearchFilter';
-import SelectTable from 'totara_core/components/datatable/SelectTable';
+import Adder from 'tui/components/adder/Adder';
+import Cell from 'tui/components/datatable/Cell';
+import FilterBar from 'tui/components/filters/FilterBar';
+import HeaderCell from 'tui/components/datatable/HeaderCell';
+import SearchFilter from 'tui/components/filters/SearchFilter';
+import SelectTable from 'tui/components/datatable/SelectTable';
 // Queries
 import cohorts from 'core/graphql/cohorts';
 

@@ -18,7 +18,7 @@
 
 import Vue from 'vue';
 import { mount } from '@vue/test-utils';
-import ModalPresenter from 'totara_core/components/modal/ModalPresenter';
+import ModalPresenter from 'tui/components/modal/ModalPresenter';
 
 const ModalStub = {
   inject: ['modal-presenter-interface'],

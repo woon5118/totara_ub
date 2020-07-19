@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -88,7 +88,7 @@
       />
     </FormRow>
 
-    <FormRow v-slot="{ id, label }" :label="$str('number', 'totara_samples')">
+    <FormRow v-slot="{ id, label }" :label="$str('number', 'samples')">
       <InputNumber
         :id="id"
         v-model="number"
@@ -222,26 +222,26 @@
 
 <script>
 // Components
-import AddIcon from 'totara_core/components/icons/common/Add';
-import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
-import Checkbox from 'totara_core/components/form/Checkbox';
-import Datalist from 'totara_core/components/form/Datalist';
-import Form from 'totara_core/components/form/Form';
-import FormRow from 'totara_core/components/form/FormRow';
-import FormRowActionButtons from 'totara_core/components/form/FormRowActionButtons';
-import InputEmail from 'totara_core/components/form/InputEmail';
-import InputHidden from 'totara_core/components/form/InputHidden';
-import InputNumber from 'totara_core/components/form/InputNumber';
-import InputPassword from 'totara_core/components/form/InputPassword';
-import InputSearch from 'totara_core/components/form/InputSearch';
-import InputTel from 'totara_core/components/form/InputTel';
-import InputText from 'totara_core/components/form/InputText';
-import InputUrl from 'totara_core/components/form/InputUrl';
-import Radio from 'totara_core/components/form/Radio';
-import RadioGroup from 'totara_core/components/form/RadioGroup';
-import Repeater from 'totara_core/components/form/Repeater';
-import Select from 'totara_core/components/form/Select';
-import Textarea from 'totara_core/components/form/Textarea';
+import AddIcon from 'tui/components/icons/common/Add';
+import ButtonIcon from 'tui/components/buttons/ButtonIcon';
+import Checkbox from 'tui/components/form/Checkbox';
+import Datalist from 'tui/components/form/Datalist';
+import Form from 'tui/components/form/Form';
+import FormRow from 'tui/components/form/FormRow';
+import FormRowActionButtons from 'tui/components/form/FormRowActionButtons';
+import InputEmail from 'tui/components/form/InputEmail';
+import InputHidden from 'tui/components/form/InputHidden';
+import InputNumber from 'tui/components/form/InputNumber';
+import InputPassword from 'tui/components/form/InputPassword';
+import InputSearch from 'tui/components/form/InputSearch';
+import InputTel from 'tui/components/form/InputTel';
+import InputText from 'tui/components/form/InputText';
+import InputUrl from 'tui/components/form/InputUrl';
+import Radio from 'tui/components/form/Radio';
+import RadioGroup from 'tui/components/form/RadioGroup';
+import Repeater from 'tui/components/form/Repeater';
+import Select from 'tui/components/form/Select';
+import Textarea from 'tui/components/form/Textarea';
 
 export default {
   components: {
@@ -395,7 +395,7 @@ export default {
 
 <lang-strings>
 {
-  "totara_samples": [
+  "samples": [
     "number"
   ],
   "editor": [

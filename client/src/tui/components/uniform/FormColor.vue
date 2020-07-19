@@ -18,7 +18,7 @@
 
 <script>
 import { createUniformInputWrapper } from './util';
-import InputColor from 'totara_core/components/form/InputColor';
+import InputColor from 'tui/components/form/InputColor';
 
 export default createUniformInputWrapper(InputColor);
 </script>

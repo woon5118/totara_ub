@@ -18,7 +18,7 @@
 
 <script>
 import { createUniformInputWrapper } from './util';
-import Checkbox from 'totara_core/components/form/Checkbox';
+import Checkbox from 'tui/components/form/Checkbox';
 
 export default createUniformInputWrapper(Checkbox);
 </script>

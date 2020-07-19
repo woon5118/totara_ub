@@ -16,10 +16,10 @@
  * @module totara_core
  */
 
-import i18nVuePlugin, { collectStrings } from 'totara_core/i18n_vue_plugin';
-import { getString, hasString } from 'totara_core/i18n';
+import i18nVuePlugin, { collectStrings } from 'tui/i18n_vue_plugin';
+import { getString, hasString } from 'tui/i18n';
 
-jest.mock('totara_core/i18n');
+jest.mock('tui/i18n');
 
 let Vue;
 let vm;

@@ -17,10 +17,10 @@
  */
 
 import { shallowMount } from '@vue/test-utils';
-import PopoverPositioner from 'totara_core/components/popover/PopoverPositioner';
+import PopoverPositioner from 'tui/components/popover/PopoverPositioner';
 
-jest.mock('totara_core/lib/popover', () => {
-  const { Point } = require('totara_core/geometry');
+jest.mock('tui/lib/popover', () => {
+  const { Point } = require('tui/geometry');
   return {
     position() {
       return {

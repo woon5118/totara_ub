@@ -39,9 +39,9 @@
 </template>
 
 <script>
-import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
-import InfoIcon from 'totara_core/components/icons/common/Info';
-import Popover from 'totara_core/components/popover/Popover';
+import ButtonIcon from 'tui/components/buttons/ButtonIcon';
+import InfoIcon from 'tui/components/icons/common/Info';
+import Popover from 'tui/components/popover/Popover';
 
 export default {
   components: {

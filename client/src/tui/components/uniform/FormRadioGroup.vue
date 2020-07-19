@@ -18,7 +18,7 @@
 
 <script>
 import { createUniformInputWrapper } from './util';
-import RadioGroup from 'totara_core/components/form/RadioGroup';
+import RadioGroup from 'tui/components/form/RadioGroup';
 
 export default createUniformInputWrapper(RadioGroup, {
   passAriaLabelledby: true,

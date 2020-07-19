@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -61,15 +61,15 @@
 </template>
 
 <script>
-import SamplesCode from 'totara_samples/components/sample_parts/misc/SamplesCode';
-import SamplesExample from 'totara_samples/components/sample_parts/misc/SamplesExample';
-import SamplesPropCtl from 'totara_samples/components/sample_parts/misc/SamplesPropCtl';
-import FormRow from 'totara_core/components/form/FormRow';
-import Radio from 'totara_core/components/form/Radio';
-import RadioGroup from 'totara_core/components/form/RadioGroup';
+import SamplesCode from 'samples/components/sample_parts/misc/SamplesCode';
+import SamplesExample from 'samples/components/sample_parts/misc/SamplesExample';
+import SamplesPropCtl from 'samples/components/sample_parts/misc/SamplesPropCtl';
+import FormRow from 'tui/components/form/FormRow';
+import Radio from 'tui/components/form/Radio';
+import RadioGroup from 'tui/components/form/RadioGroup';
 
 // Components
-import SearchFilter from 'totara_core/components/filters/SearchFilter';
+import SearchFilter from 'tui/components/filters/SearchFilter';
 
 export default {
   components: {
@@ -97,7 +97,7 @@ export default {
   :stacked="stacked"
   @submit="searchSubmit"
 />`,
-      codeScript: `import SearchFilter from 'totara_core/components/filters/SearchFilter';
+      codeScript: `import SearchFilter from 'tui/components/filters/SearchFilter';
 
 export default {
   components: {

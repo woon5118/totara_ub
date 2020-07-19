@@ -49,8 +49,8 @@
 </template>
 
 <script>
-import ButtonGroup from 'totara_core/components/buttons/ButtonGroup';
-import CloseButton from 'totara_core/components/buttons/CloseIcon';
+import ButtonGroup from 'tui/components/buttons/ButtonGroup';
+import CloseButton from 'tui/components/buttons/CloseIcon';
 
 export default {
   components: {

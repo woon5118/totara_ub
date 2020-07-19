@@ -35,9 +35,9 @@
 </template>
 
 <script>
-import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
-import CollapseIcon from 'totara_core/components/icons/common/Collapse';
-import ExpandIcon from 'totara_core/components/icons/common/Expand';
+import ButtonIcon from 'tui/components/buttons/ButtonIcon';
+import CollapseIcon from 'tui/components/icons/common/Collapse';
+import ExpandIcon from 'tui/components/icons/common/Expand';
 
 export default {
   components: {

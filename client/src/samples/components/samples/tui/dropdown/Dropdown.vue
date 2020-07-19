@@ -104,20 +104,20 @@
 </template>
 
 <script>
-import Button from 'totara_core/components/buttons/Button';
-import Dropdown from 'totara_core/components/dropdown/Dropdown';
-import DropdownItem from 'totara_core/components/dropdown/DropdownItem';
+import Button from 'tui/components/buttons/Button';
+import Dropdown from 'tui/components/dropdown/Dropdown';
+import DropdownItem from 'tui/components/dropdown/DropdownItem';
 import {
   Uniform,
   FormRow,
   FormRadioGroup,
-} from 'totara_core/components/uniform';
-import Radio from 'totara_core/components/form/Radio';
-import AddIcon from 'totara_core/components/icons/common/Add';
-import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
-import SamplesCode from 'totara_samples/components/sample_parts/misc/SamplesCode';
-import SamplesExample from 'totara_samples/components/sample_parts/misc/SamplesExample';
-import SamplesPropCtl from 'totara_samples/components/sample_parts/misc/SamplesPropCtl';
+} from 'tui/components/uniform';
+import Radio from 'tui/components/form/Radio';
+import AddIcon from 'tui/components/icons/common/Add';
+import ButtonIcon from 'tui/components/buttons/ButtonIcon';
+import SamplesCode from 'samples/components/sample_parts/misc/SamplesCode';
+import SamplesExample from 'samples/components/sample_parts/misc/SamplesExample';
+import SamplesPropCtl from 'samples/components/sample_parts/misc/SamplesPropCtl';
 
 export default {
   components: {

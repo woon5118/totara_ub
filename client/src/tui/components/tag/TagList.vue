@@ -106,14 +106,14 @@
 </template>
 
 <script>
-import Dropdown from 'totara_core/components/dropdown/Dropdown';
-import DropdownItem from 'totara_core/components/dropdown/DropdownItem';
-import InputText from 'totara_core/components/form/InputText';
-import Expand from 'totara_core/components/icons/common/Show';
-import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
-import Close from 'totara_core/components/icons/common/Close';
-import Tag from 'totara_core/components/tag/Tag';
-import OverflowDetector from 'totara_core/components/util/OverflowDetector';
+import Dropdown from 'tui/components/dropdown/Dropdown';
+import DropdownItem from 'tui/components/dropdown/DropdownItem';
+import InputText from 'tui/components/form/InputText';
+import Expand from 'tui/components/icons/common/Show';
+import ButtonIcon from 'tui/components/buttons/ButtonIcon';
+import Close from 'tui/components/icons/common/Close';
+import Tag from 'tui/components/tag/Tag';
+import OverflowDetector from 'tui/components/util/OverflowDetector';
 
 export default {
   components: {

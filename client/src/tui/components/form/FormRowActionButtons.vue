@@ -28,8 +28,8 @@
 
 <script>
 // Components
-import SubmitCancelGroup from 'totara_core/components/buttons/SubmitCancelGroup';
-import FormRow from 'totara_core/components/form/FormRow';
+import SubmitCancelGroup from 'tui/components/buttons/SubmitCancelGroup';
+import FormRow from 'tui/components/form/FormRow';
 
 export default {
   components: {

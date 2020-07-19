@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import Spinner from 'totara_core/components/icons/common/Spinner';
+import Spinner from 'tui/components/icons/common/Spinner';
 
 export default {
   components: {

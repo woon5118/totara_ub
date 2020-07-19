@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -145,15 +145,15 @@
 
 <script>
 // Components
-import Button from 'totara_core/components/buttons/Button';
-import Form from 'totara_core/components/form/Form';
-import FormRow from 'totara_core/components/form/FormRow';
-import InputText from 'totara_core/components/form/InputText';
-import Radio from 'totara_core/components/form/Radio';
-import RadioGroup from 'totara_core/components/form/RadioGroup';
-import SamplesCode from 'totara_samples/components/sample_parts/misc/SamplesCode';
-import SamplesExample from 'totara_samples/components/sample_parts/misc/SamplesExample';
-import SamplesPropCtl from 'totara_samples/components/sample_parts/misc/SamplesPropCtl';
+import Button from 'tui/components/buttons/Button';
+import Form from 'tui/components/form/Form';
+import FormRow from 'tui/components/form/FormRow';
+import InputText from 'tui/components/form/InputText';
+import Radio from 'tui/components/form/Radio';
+import RadioGroup from 'tui/components/form/RadioGroup';
+import SamplesCode from 'samples/components/sample_parts/misc/SamplesCode';
+import SamplesExample from 'samples/components/sample_parts/misc/SamplesExample';
+import SamplesPropCtl from 'samples/components/sample_parts/misc/SamplesPropCtl';
 
 export default {
   components: {
@@ -195,7 +195,7 @@ export default {
     selected: selectedStyle,
   }"
 />`,
-      codeScript: `import Button from 'totara_core/components/buttons/Button';
+      codeScript: `import Button from 'tui/components/buttons/Button';
 
 export default {
   components: {

@@ -22,7 +22,7 @@
 
 <script>
 // Components
-import Input from 'totara_core/components/form/Input';
+import Input from 'tui/components/form/Input';
 
 export default {
   components: {

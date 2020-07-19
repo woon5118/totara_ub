@@ -16,7 +16,7 @@
  * @module totara_core
  */
 
-import pending from 'totara_core/pending';
+import pending from 'tui/pending';
 
 const STATE_IDLE = 0;
 const STATE_WAITING = 1;

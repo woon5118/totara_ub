@@ -17,10 +17,10 @@
 -->
 
 <script>
-import { throttle } from 'totara_core/util';
-import { getOffsetRect } from 'totara_core/dom/position';
-import ResizeObserver from 'totara_core/polyfills/ResizeObserver';
-import { isRtl } from 'totara_core/i18n';
+import { throttle } from 'tui/util';
+import { getOffsetRect } from 'tui/dom/position';
+import ResizeObserver from 'tui/polyfills/ResizeObserver';
+import { isRtl } from 'tui/i18n';
 
 const THROTTLE_UPDATE = 150;
 

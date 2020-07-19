@@ -43,12 +43,12 @@
 </template>
 
 <script>
-import Button from 'totara_core/components/buttons/Button';
-import ButtonCancel from 'totara_core/components/buttons/Cancel';
-import ButtonGroup from 'totara_core/components/buttons/ButtonGroup';
-import Modal from 'totara_core/components/modal/Modal';
-import ModalContent from 'totara_core/components/modal/ModalContent';
-import ModalPresenter from 'totara_core/components/modal/ModalPresenter';
+import Button from 'tui/components/buttons/Button';
+import ButtonCancel from 'tui/components/buttons/Cancel';
+import ButtonGroup from 'tui/components/buttons/ButtonGroup';
+import Modal from 'tui/components/modal/Modal';
+import ModalContent from 'tui/components/modal/ModalContent';
+import ModalPresenter from 'tui/components/modal/ModalPresenter';
 
 export default {
   components: {

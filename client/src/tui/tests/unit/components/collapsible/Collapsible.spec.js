@@ -17,7 +17,7 @@
  */
 
 import { shallowMount } from '@vue/test-utils';
-import collapsible from 'totara_core/components/collapsible/Collapsible';
+import collapsible from 'tui/components/collapsible/Collapsible';
 import { axe, toHaveNoViolations } from 'jest-axe';
 expect.extend(toHaveNoViolations);
 let wrapper;

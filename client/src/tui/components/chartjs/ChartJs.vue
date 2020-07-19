@@ -40,7 +40,7 @@
 
 <script>
 import Chart from 'chart.js';
-import theme from 'totara_core/theme';
+import theme from 'tui/theme';
 import 'chartjs-plugin-doughnutlabel';
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;

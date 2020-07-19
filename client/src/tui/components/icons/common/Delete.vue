@@ -17,7 +17,7 @@
 -->
 
 <script>
-import FlexIcon from 'totara_core/components/icons/FlexIcon';
+import FlexIcon from 'tui/components/icons/FlexIcon';
 
 export default {
   functional: true,

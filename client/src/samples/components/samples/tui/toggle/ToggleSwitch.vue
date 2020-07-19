@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Steve Barnett <steve.barnett@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -80,14 +80,14 @@
 
 <script>
 // Components
-import FormRow from 'totara_core/components/form/FormRow';
-import InfoIconButton from 'totara_core/components/buttons/InfoIconButton';
-import InputText from 'totara_core/components/form/InputText';
-import Radio from 'totara_core/components/form/Radio';
-import RadioGroup from 'totara_core/components/form/RadioGroup';
-import SamplesExample from 'totara_samples/components/sample_parts/misc/SamplesExample';
-import SamplesPropCtl from 'totara_samples/components/sample_parts/misc/SamplesPropCtl';
-import ToggleSwitch from 'totara_core/components/toggle/ToggleSwitch';
+import FormRow from 'tui/components/form/FormRow';
+import InfoIconButton from 'tui/components/buttons/InfoIconButton';
+import InputText from 'tui/components/form/InputText';
+import Radio from 'tui/components/form/Radio';
+import RadioGroup from 'tui/components/form/RadioGroup';
+import SamplesExample from 'samples/components/sample_parts/misc/SamplesExample';
+import SamplesPropCtl from 'samples/components/sample_parts/misc/SamplesPropCtl';
+import ToggleSwitch from 'tui/components/toggle/ToggleSwitch';
 
 export default {
   components: {

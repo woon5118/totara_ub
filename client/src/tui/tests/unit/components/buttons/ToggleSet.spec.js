@@ -17,7 +17,7 @@
  */
 
 import { shallowMount } from '@vue/test-utils';
-import component from 'totara_core/components/buttons/ToggleSet.vue';
+import component from 'tui/components/buttons/ToggleSet.vue';
 let wrapper;
 let value;
 

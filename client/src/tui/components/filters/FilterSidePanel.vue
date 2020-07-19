@@ -61,8 +61,8 @@
 </template>
 
 <script>
-import Button from 'totara_core/components/buttons/Button';
-import Card from 'totara_core/components/card/Card';
+import Button from 'tui/components/buttons/Button';
+import Card from 'tui/components/card/Card';
 
 export default {
   components: {

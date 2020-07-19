@@ -17,7 +17,7 @@
  */
 
 import { mount } from '@vue/test-utils';
-import component from 'totara_core/components/virtualscroll/VirtualScroll';
+import component from 'tui/components/virtualscroll/VirtualScroll';
 import { axe, toHaveNoViolations } from 'jest-axe';
 expect.extend(toHaveNoViolations);
 

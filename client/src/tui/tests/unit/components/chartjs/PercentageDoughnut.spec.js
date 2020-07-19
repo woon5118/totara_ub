@@ -17,15 +17,15 @@
  */
 
 import { mount } from '@vue/test-utils';
-import component from 'totara_core/components/chartjs/PercentageDoughnut.vue';
-import ChartJs from 'totara_core/components/chartjs/ChartJs';
+import component from 'tui/components/chartjs/PercentageDoughnut.vue';
+import ChartJs from 'tui/components/chartjs/ChartJs';
 import { axe, toHaveNoViolations } from 'jest-axe';
 expect.extend(toHaveNoViolations);
 
 let wrapper;
 
 // We are mocking theme to override css variables
-jest.mock('totara_core/theme', () => {
+jest.mock('tui/theme', () => {
   return {
     getVar(name) {
       let vars = {

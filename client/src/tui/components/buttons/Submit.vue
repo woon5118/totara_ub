@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import Button from 'totara_core/components/buttons/Button';
+import Button from 'tui/components/buttons/Button';
 
 export default {
   components: {

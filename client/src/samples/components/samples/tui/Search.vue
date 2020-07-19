@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -51,11 +51,11 @@
 
 <script>
 // Components
-import Button from 'totara_core/components/buttons/Button';
-import ButtonGroup from 'totara_core/components/buttons/ButtonGroup';
-import Form from 'totara_core/components/form/Form';
-import FormRow from 'totara_core/components/form/FormRow';
-import SearchBox from 'totara_core/components/form/SearchBox';
+import Button from 'tui/components/buttons/Button';
+import ButtonGroup from 'tui/components/buttons/ButtonGroup';
+import Form from 'tui/components/form/Form';
+import FormRow from 'tui/components/form/FormRow';
+import SearchBox from 'tui/components/form/SearchBox';
 
 export default {
   components: {

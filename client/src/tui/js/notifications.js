@@ -17,7 +17,7 @@
  */
 
 import tui from './tui';
-import Container from 'totara_core/components/notifications/ToastContainer';
+import Container from 'tui/components/notifications/ToastContainer';
 import { memoizeLoad } from './util';
 
 /**

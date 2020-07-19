@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import Card from 'totara_core/components/card/Card';
+import Card from 'tui/components/card/Card';
 
 export default {
   components: {

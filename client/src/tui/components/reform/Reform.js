@@ -25,11 +25,11 @@ import {
   structuralDeepClone,
   structuralShallowClone,
   result,
-} from 'totara_core/util';
-import { set as vueSet } from 'totara_core/vue_util';
-import { isLangString, loadLangStrings, isRtl } from 'totara_core/i18n';
-import { getDocumentPosition } from 'totara_core/dom/position';
-import { getTabbableElements } from 'totara_core/dom/focus';
+} from 'tui/util';
+import { set as vueSet } from 'tui/vue_util';
+import { isLangString, loadLangStrings, isRtl } from 'tui/i18n';
+import { getDocumentPosition } from 'tui/dom/position';
+import { getTabbableElements } from 'tui/dom/focus';
 import BatchingSerialLoadQueue from '../../js/internal/BatchingSerialLoadQueue';
 
 /**

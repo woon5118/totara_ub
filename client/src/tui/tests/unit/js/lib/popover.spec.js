@@ -16,8 +16,8 @@
  * @module totara_core
  */
 
-import { position } from 'totara_core/lib/popover';
-import { Rect, Size, Point } from 'totara_core/geometry';
+import { position } from 'tui/lib/popover';
+import { Rect, Size, Point } from 'tui/geometry';
 
 describe('position', () => {
   it('positions popover on requested side', () => {

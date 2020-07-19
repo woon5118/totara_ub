@@ -17,7 +17,7 @@
  */
 
 import { shallowMount } from '@vue/test-utils';
-import component from 'totara_core/components/form/InputText.vue';
+import component from 'tui/components/form/InputText.vue';
 let wrapper;
 const eventFunc = jest.fn();
 

@@ -17,7 +17,7 @@
  */
 
 import { mount } from '@vue/test-utils';
-import FieldContextProvider from 'totara_core/components/reform/FieldContextProvider';
+import FieldContextProvider from 'tui/components/reform/FieldContextProvider';
 
 const FieldContextReceiver = {
   inject: ['reformFieldContext'],

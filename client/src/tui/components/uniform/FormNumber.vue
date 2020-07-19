@@ -18,7 +18,7 @@
 
 <script>
 import { createUniformInputWrapper } from './util';
-import InputNumber from 'totara_core/components/form/InputNumber';
+import InputNumber from 'tui/components/form/InputNumber';
 
 export default createUniformInputWrapper(InputNumber);
 </script>

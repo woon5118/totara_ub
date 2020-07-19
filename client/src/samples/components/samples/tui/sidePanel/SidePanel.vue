@@ -317,9 +317,9 @@
 </template>
 
 <script>
-import Grid from 'totara_core/components/grid/Grid';
-import GridItem from 'totara_core/components/grid/GridItem';
-import SidePanel from 'totara_core/components/sidepanel/SidePanel';
+import Grid from 'tui/components/grid/Grid';
+import GridItem from 'tui/components/grid/GridItem';
+import SidePanel from 'tui/components/sidepanel/SidePanel';
 
 export default {
   components: {

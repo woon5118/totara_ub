@@ -16,7 +16,7 @@
  * @module totara_core
  */
 
-import pending from 'totara_core/pending';
+import pending from 'tui/pending';
 
 describe('pending', () => {
   it('calls js_pending/js_complete', async () => {

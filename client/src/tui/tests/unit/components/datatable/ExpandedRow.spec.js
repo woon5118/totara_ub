@@ -17,7 +17,7 @@
  */
 
 import { shallowMount } from '@vue/test-utils';
-import component from 'totara_core/components/datatable/ExpandedRow.vue';
+import component from 'tui/components/datatable/ExpandedRow.vue';
 let wrapper;
 
 describe('presentation/datatable/ExpandedRow.vue', () => {

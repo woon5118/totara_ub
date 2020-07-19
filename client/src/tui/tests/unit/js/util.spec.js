@@ -28,9 +28,9 @@ import {
   orderBy,
   url,
   isPlainObject,
-} from 'totara_core/util';
+} from 'tui/util';
 
-jest.mock('totara_core/config');
+jest.mock('tui/config');
 
 let counter = 1;
 const incr = () => counter++;

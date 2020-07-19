@@ -17,8 +17,8 @@
 -->
 
 <script>
-import { orderBy } from 'totara_core/util';
-import { Point } from 'totara_core/geometry';
+import { orderBy } from 'tui/util';
+import { Point } from 'tui/geometry';
 import {
   defaultDragDropManager,
   getSourceIdName,

@@ -16,7 +16,7 @@
  * @module totara_core
  */
 
-import tuiVuePlugin from 'totara_core/tui_vue_plugin';
+import tuiVuePlugin from 'tui/tui_vue_plugin';
 
 let Vue;
 let vm;

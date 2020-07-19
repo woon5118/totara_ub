@@ -16,10 +16,10 @@
  * @module totara_core
  */
 
-import amd from 'totara_core/amd';
+import amd from 'tui/amd';
 
-jest.mock('totara_core/amd');
-jest.mock('totara_core/pending');
+jest.mock('tui/amd');
+jest.mock('tui/pending');
 
 const amdFlexIcon = {
   load: jest.fn().mockResolvedValue(),
@@ -32,7 +32,7 @@ describe('load', () => {
   it('should be memoized', async () => {
     let flexIcons;
     jest.isolateModules(() => {
-      flexIcons = require('totara_core/flex_icons');
+      flexIcons = require('tui/flex_icons');
     });
     var originalLoad = flexIcons.load._fn;
     var fn = jest.fn(async () => {});
@@ -46,7 +46,7 @@ describe('load', () => {
   it("should call amd('core/flex_icon').load() and wait", async () => {
     let flexIcons;
     jest.isolateModules(() => {
-      flexIcons = require('totara_core/flex_icons');
+      flexIcons = require('tui/flex_icons');
     });
     expect(flexIcons.loaded()).toBe(false);
     await flexIcons.load();
@@ -59,7 +59,7 @@ describe('getFlexData', () => {
   it('calls getFlexTemplateDataSync() to get icon data', async () => {
     let flexIcons;
     jest.isolateModules(() => {
-      flexIcons = require('totara_core/flex_icons');
+      flexIcons = require('tui/flex_icons');
     });
     await flexIcons.load();
     expect(flexIcons.getFlexData('foo')).toEqual({ id: 'foo' });
@@ -69,7 +69,7 @@ describe('getFlexData', () => {
   it('throws an exception when data not loaded', () => {
     let flexIcons;
     jest.isolateModules(() => {
-      flexIcons = require('totara_core/flex_icons');
+      flexIcons = require('tui/flex_icons');
     });
     expect(() => flexIcons.getFlexData('foo')).toThrow('not loaded');
   });

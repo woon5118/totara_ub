@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -32,9 +32,9 @@
 </template>
 
 <script>
-import AndBox from 'totara_core/components/decor/AndBox';
-import SamplesCode from 'totara_samples/components/sample_parts/misc/SamplesCode';
-import SamplesExample from 'totara_samples/components/sample_parts/misc/SamplesExample';
+import AndBox from 'tui/components/decor/AndBox';
+import SamplesCode from 'samples/components/sample_parts/misc/SamplesCode';
+import SamplesExample from 'samples/components/sample_parts/misc/SamplesExample';
 
 export default {
   components: {
@@ -48,7 +48,7 @@ export default {
       fullpage: false,
       loading: true,
       codeTemplate: `<AndBox/>`,
-      codeScript: `import AndBox from 'totara_core/components/decor/AndBox';
+      codeScript: `import AndBox from 'tui/components/decor/AndBox';
 
 export default {
   components: {

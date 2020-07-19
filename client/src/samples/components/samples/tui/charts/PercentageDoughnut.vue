@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Aleksandr Baishev <aleksandr.baishev@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -89,16 +89,16 @@
 
 <script>
 // Components
-import PercentageDoughnut from 'totara_core/components/chartjs/PercentageDoughnut';
-import SamplesCode from 'totara_samples/components/sample_parts/misc/SamplesCode';
-import SamplesExample from 'totara_samples/components/sample_parts/misc/SamplesExample';
-import SamplesPropCtl from 'totara_samples/components/sample_parts/misc/SamplesPropCtl';
-import Radio from 'totara_core/components/form/Radio';
-import RadioGroup from 'totara_core/components/form/RadioGroup';
-import FormRow from 'totara_core/components/form/FormRow';
-import InputText from 'totara_core/components/form/InputText';
-import CheckBox from 'totara_core/components/form/Checkbox';
-import Button from 'totara_core/components/buttons/Button';
+import PercentageDoughnut from 'tui/components/chartjs/PercentageDoughnut';
+import SamplesCode from 'samples/components/sample_parts/misc/SamplesCode';
+import SamplesExample from 'samples/components/sample_parts/misc/SamplesExample';
+import SamplesPropCtl from 'samples/components/sample_parts/misc/SamplesPropCtl';
+import Radio from 'tui/components/form/Radio';
+import RadioGroup from 'tui/components/form/RadioGroup';
+import FormRow from 'tui/components/form/FormRow';
+import InputText from 'tui/components/form/InputText';
+import CheckBox from 'tui/components/form/Checkbox';
+import Button from 'tui/components/buttons/Button';
 
 export default {
   components: {
@@ -166,7 +166,7 @@ export default {
     },
 
     codeScript() {
-      return `import PercentageDoughnut from 'totara_core/components/chartjs/PercentageDoughnut';
+      return `import PercentageDoughnut from 'tui/components/chartjs/PercentageDoughnut';
 
 export default {
   components: {

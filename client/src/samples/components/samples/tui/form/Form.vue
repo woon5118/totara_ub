@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -96,20 +96,20 @@
 </template>
 
 <script>
-import Form from 'totara_core/components/form/Form';
-import FormRow from 'totara_core/components/form/FormRow';
-import SamplesCode from 'totara_samples/components/sample_parts/misc/SamplesCode';
-import SamplesExample from 'totara_samples/components/sample_parts/misc/SamplesExample';
-import SamplesPropCtl from 'totara_samples/components/sample_parts/misc/SamplesPropCtl';
+import Form from 'tui/components/form/Form';
+import FormRow from 'tui/components/form/FormRow';
+import SamplesCode from 'samples/components/sample_parts/misc/SamplesCode';
+import SamplesExample from 'samples/components/sample_parts/misc/SamplesExample';
+import SamplesPropCtl from 'samples/components/sample_parts/misc/SamplesPropCtl';
 
-import Checkbox from 'totara_core/components/form/Checkbox';
-import FormRowActionButtons from 'totara_core/components/form/FormRowActionButtons';
-import InputText from 'totara_core/components/form/InputText';
-import InputColor from 'totara_core/components/form/InputColor';
-import Radio from 'totara_core/components/form/Radio';
-import RadioGroup from 'totara_core/components/form/RadioGroup';
-import Select from 'totara_core/components/form/Select';
-import Textarea from 'totara_core/components/form/Textarea';
+import Checkbox from 'tui/components/form/Checkbox';
+import FormRowActionButtons from 'tui/components/form/FormRowActionButtons';
+import InputText from 'tui/components/form/InputText';
+import InputColor from 'tui/components/form/InputColor';
+import Radio from 'tui/components/form/Radio';
+import RadioGroup from 'tui/components/form/RadioGroup';
+import Select from 'tui/components/form/Select';
+import Textarea from 'tui/components/form/Textarea';
 
 export default {
   components: {
@@ -191,15 +191,15 @@ export default {
   <FormRowActionButtons @cancel="formCancel" @submit="formSubmit" />
 
 </Form>`,
-      codeScript: `import Checkbox from 'totara_core/components/form/Checkbox';
-import Form from 'totara_core/components/form/Form';
-import FormRow from 'totara_core/components/form/FormRow';
-import FormRowActionButtons from 'totara_core/components/form/FormRowActionButtons';
-import InputText from 'totara_core/components/form/InputText';
-import Radio from 'totara_core/components/form/Radio';
-import RadioGroup from 'totara_core/components/form/RadioGroup';
-import Select from 'totara_core/components/form/Select';
-import Textarea from 'totara_core/components/form/Textarea';
+      codeScript: `import Checkbox from 'tui/components/form/Checkbox';
+import Form from 'tui/components/form/Form';
+import FormRow from 'tui/components/form/FormRow';
+import FormRowActionButtons from 'tui/components/form/FormRowActionButtons';
+import InputText from 'tui/components/form/InputText';
+import Radio from 'tui/components/form/Radio';
+import RadioGroup from 'tui/components/form/RadioGroup';
+import Select from 'tui/components/form/Select';
+import Textarea from 'tui/components/form/Textarea';
 
 export default {
   components: {

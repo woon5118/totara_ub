@@ -80,11 +80,11 @@
 </template>
 
 <script>
-import Form from 'totara_core/components/form/Form';
-import FormRow from 'totara_core/components/form/FormRow';
-import OverflowDetector from 'totara_core/components/util/OverflowDetector';
-import PropsProvider from 'totara_core/components/util/PropsProvider';
-import Select from 'totara_core/components/form/Select';
+import Form from 'tui/components/form/Form';
+import FormRow from 'tui/components/form/FormRow';
+import OverflowDetector from 'tui/components/util/OverflowDetector';
+import PropsProvider from 'tui/components/util/PropsProvider';
+import Select from 'tui/components/form/Select';
 
 const events = {
   horizontal: {

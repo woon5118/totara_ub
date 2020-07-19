@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -68,16 +68,16 @@
 </template>
 
 <script>
-import SamplesCode from 'totara_samples/components/sample_parts/misc/SamplesCode';
-import SamplesExample from 'totara_samples/components/sample_parts/misc/SamplesExample';
-import FormRowActionButtons from 'totara_core/components/form/FormRowActionButtons';
+import SamplesCode from 'samples/components/sample_parts/misc/SamplesCode';
+import SamplesExample from 'samples/components/sample_parts/misc/SamplesExample';
+import FormRowActionButtons from 'tui/components/form/FormRowActionButtons';
 import {
   FormDateSelector,
   FormRowFieldset,
   Uniform,
-} from 'totara_core/components/uniform';
+} from 'tui/components/uniform';
 // Utils
-import { isIsoAfter } from 'totara_core/date';
+import { isIsoAfter } from 'tui/date';
 
 export default {
   components: {
@@ -131,9 +131,9 @@ export default {
   FormDateSelector,
   FormRowFieldset,
   Uniform,
-} from 'totara_core/components/uniform';
+} from 'tui/components/uniform';
 // Utils
-import { isIsoAfter } from 'totara_core/date';
+import { isIsoAfter } from 'tui/date';
 
 export default {
   components: {

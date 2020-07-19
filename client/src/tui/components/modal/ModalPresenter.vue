@@ -17,7 +17,7 @@
 -->
 
 <script>
-import PropsProvider from 'totara_core/components/util/PropsProvider';
+import PropsProvider from 'tui/components/util/PropsProvider';
 
 export const presenterInterfaceName = 'modal-presenter-interface';
 

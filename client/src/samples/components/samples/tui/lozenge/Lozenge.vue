@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -47,14 +47,14 @@
 </template>
 
 <script>
-import FormRow from 'totara_core/components/form/FormRow';
-import InputText from 'totara_core/components/form/InputText';
-import Lozenge from 'totara_core/components/lozenge/Lozenge';
-import Radio from 'totara_core/components/form/Radio';
-import RadioGroup from 'totara_core/components/form/RadioGroup';
-import SamplesCode from 'totara_samples/components/sample_parts/misc/SamplesCode';
-import SamplesExample from 'totara_samples/components/sample_parts/misc/SamplesExample';
-import SamplesPropCtl from 'totara_samples/components/sample_parts/misc/SamplesPropCtl';
+import FormRow from 'tui/components/form/FormRow';
+import InputText from 'tui/components/form/InputText';
+import Lozenge from 'tui/components/lozenge/Lozenge';
+import Radio from 'tui/components/form/Radio';
+import RadioGroup from 'tui/components/form/RadioGroup';
+import SamplesCode from 'samples/components/sample_parts/misc/SamplesCode';
+import SamplesExample from 'samples/components/sample_parts/misc/SamplesExample';
+import SamplesPropCtl from 'samples/components/sample_parts/misc/SamplesPropCtl';
 
 export default {
   components: {
@@ -73,7 +73,7 @@ export default {
       text: 'Danger',
       type: 'alert',
       codeTemplate: `<Lozenge :text="text" :type="type" />`,
-      codeScript: `import Lozenge from 'totara_core/components/lozenge/Lozenge';
+      codeScript: `import Lozenge from 'tui/components/lozenge/Lozenge';
 
 export default {
   components: {

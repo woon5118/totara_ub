@@ -20,8 +20,8 @@
      assemble GridItem contents, as we need to use some logic -->
 
 <script>
-import theme from 'totara_core/theme';
-import ResizeObserver from 'totara_core/polyfills/ResizeObserver';
+import theme from 'tui/theme';
+import ResizeObserver from 'tui/polyfills/ResizeObserver';
 import { cloneVNode } from '../../js/internal/vnode';
 
 export default {

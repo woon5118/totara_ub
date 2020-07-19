@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -114,22 +114,22 @@
 </template>
 
 <script>
-import Form from 'totara_core/components/form/Form';
-import FormRow from 'totara_core/components/form/FormRow';
-import Radio from 'totara_core/components/form/Radio';
-import RadioGroup from 'totara_core/components/form/RadioGroup';
-import SamplesCode from 'totara_samples/components/sample_parts/misc/SamplesCode';
-import SamplesExample from 'totara_samples/components/sample_parts/misc/SamplesExample';
-import SamplesPropCtl from 'totara_samples/components/sample_parts/misc/SamplesPropCtl';
+import Form from 'tui/components/form/Form';
+import FormRow from 'tui/components/form/FormRow';
+import Radio from 'tui/components/form/Radio';
+import RadioGroup from 'tui/components/form/RadioGroup';
+import SamplesCode from 'samples/components/sample_parts/misc/SamplesCode';
+import SamplesExample from 'samples/components/sample_parts/misc/SamplesExample';
+import SamplesPropCtl from 'samples/components/sample_parts/misc/SamplesPropCtl';
 
-import InputEmail from 'totara_core/components/form/InputEmail';
-import InputHidden from 'totara_core/components/form/InputHidden';
-import InputNumber from 'totara_core/components/form/InputNumber';
-import InputPassword from 'totara_core/components/form/InputPassword';
-import InputSearch from 'totara_core/components/form/InputSearch';
-import InputTel from 'totara_core/components/form/InputTel';
-import InputText from 'totara_core/components/form/InputText';
-import InputUrl from 'totara_core/components/form/InputUrl';
+import InputEmail from 'tui/components/form/InputEmail';
+import InputHidden from 'tui/components/form/InputHidden';
+import InputNumber from 'tui/components/form/InputNumber';
+import InputPassword from 'tui/components/form/InputPassword';
+import InputSearch from 'tui/components/form/InputSearch';
+import InputTel from 'tui/components/form/InputTel';
+import InputText from 'tui/components/form/InputText';
+import InputUrl from 'tui/components/form/InputUrl';
 
 export default {
   components: {
@@ -173,9 +173,9 @@ export default {
     />
   </FormRow>
 </Form>`,
-      codeScript: `import Form from 'totara_core/components/form/Form';
-import FormRow from 'totara_core/components/form/FormRow';
-import InputText from 'totara_core/components/form/InputText';
+      codeScript: `import Form from 'tui/components/form/Form';
+import FormRow from 'tui/components/form/FormRow';
+import InputText from 'tui/components/form/InputText';
 
 export default {
   components: {

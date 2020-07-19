@@ -49,11 +49,11 @@
 
 <script>
 // Components
-import CloseButton from 'totara_core/components/buttons/CloseIcon';
-import ErrorIcon from 'totara_core/components/icons/common/Error';
-import InfoIcon from 'totara_core/components/icons/common/Info';
-import SuccessIcon from 'totara_core/components/icons/common/Success';
-import WarningIcon from 'totara_core/components/icons/common/Warning';
+import CloseButton from 'tui/components/buttons/CloseIcon';
+import ErrorIcon from 'tui/components/icons/common/Error';
+import InfoIcon from 'tui/components/icons/common/Info';
+import SuccessIcon from 'tui/components/icons/common/Success';
+import WarningIcon from 'tui/components/icons/common/Warning';
 
 const icons = {
   error: ErrorIcon,

@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Simon Chester <simon.chester@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -68,15 +68,15 @@
 </template>
 
 <script>
-import Basket from 'totara_core/components/basket/Basket';
-import Button from 'totara_core/components/buttons/Button';
-import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
-import ClearIcon from 'totara_core/components/icons/common/Clear';
-import FormRow from 'totara_core/components/form/FormRow';
-import RadioGroup from 'totara_core/components/form/RadioGroup';
-import Radio from 'totara_core/components/form/Radio';
-import SamplesExample from 'totara_samples/components/sample_parts/misc/SamplesExample';
-import SamplesPropCtl from 'totara_samples/components/sample_parts/misc/SamplesPropCtl';
+import Basket from 'tui/components/basket/Basket';
+import Button from 'tui/components/buttons/Button';
+import ButtonIcon from 'tui/components/buttons/ButtonIcon';
+import ClearIcon from 'tui/components/icons/common/Clear';
+import FormRow from 'tui/components/form/FormRow';
+import RadioGroup from 'tui/components/form/RadioGroup';
+import Radio from 'tui/components/form/Radio';
+import SamplesExample from 'samples/components/sample_parts/misc/SamplesExample';
+import SamplesPropCtl from 'samples/components/sample_parts/misc/SamplesPropCtl';
 
 export default {
   components: {

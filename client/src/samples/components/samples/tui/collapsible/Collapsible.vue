@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -50,15 +50,15 @@
 </template>
 
 <script>
-import Collapsible from 'totara_core/components/collapsible/Collapsible';
-import FormRow from 'totara_core/components/form/FormRow';
-import InputText from 'totara_core/components/form/InputText';
-import Radio from 'totara_core/components/form/Radio';
-import RadioGroup from 'totara_core/components/form/RadioGroup';
-import SamplesCode from 'totara_samples/components/sample_parts/misc/SamplesCode';
-import SamplesExample from 'totara_samples/components/sample_parts/misc/SamplesExample';
-import SamplesPropCtl from 'totara_samples/components/sample_parts/misc/SamplesPropCtl';
-import Textarea from 'totara_core/components/form/Textarea';
+import Collapsible from 'tui/components/collapsible/Collapsible';
+import FormRow from 'tui/components/form/FormRow';
+import InputText from 'tui/components/form/InputText';
+import Radio from 'tui/components/form/Radio';
+import RadioGroup from 'tui/components/form/RadioGroup';
+import SamplesCode from 'samples/components/sample_parts/misc/SamplesCode';
+import SamplesExample from 'samples/components/sample_parts/misc/SamplesExample';
+import SamplesPropCtl from 'samples/components/sample_parts/misc/SamplesPropCtl';
+import Textarea from 'tui/components/form/Textarea';
 
 export default {
   components: {
@@ -82,7 +82,7 @@ export default {
       codeTemplate: `<Collapsible :label="label" :initial-state="false">
   {{ content }}
 </Collapsible>`,
-      codeScript: `import collapsible from 'totara_core/components/collapsible/Collapsible;
+      codeScript: `import collapsible from 'tui/components/collapsible/Collapsible';
 
 export default {
   components: {

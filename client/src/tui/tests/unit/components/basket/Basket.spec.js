@@ -18,7 +18,7 @@
 
 import Vue from 'vue';
 import { mount, shallowMount } from '@vue/test-utils';
-import Basket from 'totara_core/components/basket/Basket';
+import Basket from 'tui/components/basket/Basket';
 import { axe, toHaveNoViolations } from 'jest-axe';
 expect.extend(toHaveNoViolations);
 

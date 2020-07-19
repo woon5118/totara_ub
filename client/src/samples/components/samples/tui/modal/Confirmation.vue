@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -77,14 +77,14 @@
 </template>
 
 <script>
-import Button from 'totara_core/components/buttons/Button';
-import ConfirmationModal from 'totara_core/components/modal/ConfirmationModal';
-import FormRow from 'totara_core/components/form/FormRow';
-import InputText from 'totara_core/components/form/InputText';
-import SamplesCode from 'totara_samples/components/sample_parts/misc/SamplesCode';
-import SamplesExample from 'totara_samples/components/sample_parts/misc/SamplesExample';
-import SamplesPropCtl from 'totara_samples/components/sample_parts/misc/SamplesPropCtl';
-import Checkbox from 'totara_core/components/form/Checkbox';
+import Button from 'tui/components/buttons/Button';
+import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
+import FormRow from 'tui/components/form/FormRow';
+import InputText from 'tui/components/form/InputText';
+import SamplesCode from 'samples/components/sample_parts/misc/SamplesCode';
+import SamplesExample from 'samples/components/sample_parts/misc/SamplesExample';
+import SamplesPropCtl from 'samples/components/sample_parts/misc/SamplesPropCtl';
+import Checkbox from 'tui/components/form/Checkbox';
 
 export default {
   components: {
@@ -108,7 +108,7 @@ export default {
       closeButton: false,
       loading: false,
       confirmButtonText: '',
-      codeScript: `import ConfirmationModal from 'totara_core/components/modal/ConfirmationModal';
+      codeScript: `import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
 
 export default {
   components: {

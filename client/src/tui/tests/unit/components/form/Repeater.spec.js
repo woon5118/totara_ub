@@ -17,7 +17,7 @@
  */
 
 import { shallowMount } from '@vue/test-utils';
-import Repeater from 'totara_core/components/form/Repeater';
+import Repeater from 'tui/components/form/Repeater';
 
 describe('presentation/form/Repeater.vue', () => {
   let wrapper;

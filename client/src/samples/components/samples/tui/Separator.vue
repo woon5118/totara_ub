@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Dave Wallace <dave.wallace@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import Separator from 'totara_core/components/decor/Separator';
+import Separator from 'tui/components/decor/Separator';
 export default {
   components: {
     Separator,

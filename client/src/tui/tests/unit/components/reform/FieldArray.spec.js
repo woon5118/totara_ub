@@ -17,7 +17,7 @@
  */
 
 import { mount } from '@vue/test-utils';
-import FieldArray from 'totara_core/components/reform/FieldArray';
+import FieldArray from 'tui/components/reform/FieldArray';
 import { ReformScopeProvider } from './util';
 
 function create({ scope, path }) {

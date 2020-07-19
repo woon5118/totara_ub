@@ -28,8 +28,8 @@
 </template>
 
 <script>
-import ChartJs from 'totara_core/components/chartjs/ChartJs';
-import theme from 'totara_core/theme';
+import ChartJs from 'tui/components/chartjs/ChartJs';
+import theme from 'tui/theme';
 
 let defaultColor = theme.getVar('tui-color-chart-background-1');
 let defaultLabelFontSize = parseInt(

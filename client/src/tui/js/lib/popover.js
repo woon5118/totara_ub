@@ -17,8 +17,8 @@
  */
 
 // eslint-disable-next-line no-unused-vars
-import { Rect, Point, Size } from 'totara_core/geometry';
-import { langSide } from 'totara_core/i18n';
+import { Rect, Point, Size } from 'tui/geometry';
+import { langSide } from 'tui/i18n';
 
 /**
  * @typedef {Object} PositionResult

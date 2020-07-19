@@ -58,10 +58,10 @@
 </template>
 
 <script>
-import Button from 'totara_core/components/buttons/Button';
-import OverflowDetector from 'totara_core/components/util/OverflowDetector';
-import SamplesCode from 'totara_samples/components/sample_parts/misc/SamplesCode';
-import SamplesExample from 'totara_samples/components/sample_parts/misc/SamplesExample';
+import Button from 'tui/components/buttons/Button';
+import OverflowDetector from 'tui/components/util/OverflowDetector';
+import SamplesCode from 'samples/components/sample_parts/misc/SamplesCode';
+import SamplesExample from 'samples/components/sample_parts/misc/SamplesExample';
 
 export default {
   components: {
@@ -97,7 +97,7 @@ export default {
     />
   </div>
 </OverflowDetector>`,
-      codeScript: `import OverflowDetector from 'totara_core/components/util/OverflowDetector;
+      codeScript: `import OverflowDetector from 'tui/components/util/OverflowDetector';
 
 export default {
   components: {

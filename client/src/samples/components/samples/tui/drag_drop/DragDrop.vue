@@ -249,15 +249,15 @@
 </template>
 
 <script>
-import Draggable from 'totara_core/components/drag_drop/Draggable';
-import Droppable from 'totara_core/components/drag_drop/Droppable';
-import Table from 'totara_core/components/datatable/Table';
-import Cell from 'totara_core/components/datatable/Cell';
-import HeaderCell from 'totara_core/components/datatable/HeaderCell';
-import ToggleSwitch from 'totara_core/components/toggle/ToggleSwitch';
-import InputText from 'totara_core/components/form/InputText';
-import PropsProvider from 'totara_core/components/util/PropsProvider';
-import DragHandleIcon from 'totara_core/components/icons/common/DragHandle';
+import Draggable from 'tui/components/drag_drop/Draggable';
+import Droppable from 'tui/components/drag_drop/Droppable';
+import Table from 'tui/components/datatable/Table';
+import Cell from 'tui/components/datatable/Cell';
+import HeaderCell from 'tui/components/datatable/HeaderCell';
+import ToggleSwitch from 'tui/components/toggle/ToggleSwitch';
+import InputText from 'tui/components/form/InputText';
+import PropsProvider from 'tui/components/util/PropsProvider';
+import DragHandleIcon from 'tui/components/icons/common/DragHandle';
 
 export default {
   components: {

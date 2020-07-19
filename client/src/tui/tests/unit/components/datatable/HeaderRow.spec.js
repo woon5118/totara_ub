@@ -17,7 +17,7 @@
  */
 
 import { shallowMount } from '@vue/test-utils';
-import component from 'totara_core/components/datatable/HeaderRow.vue';
+import component from 'tui/components/datatable/HeaderRow.vue';
 let wrapper;
 
 describe('presentation/datatable/HeaderRow.vue', () => {

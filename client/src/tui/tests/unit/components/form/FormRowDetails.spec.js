@@ -17,7 +17,7 @@
  */
 
 import { shallowMount } from '@vue/test-utils';
-import component from 'totara_core/components/form/FormRowDetails.vue';
+import component from 'tui/components/form/FormRowDetails.vue';
 let wrapper;
 
 describe('presentation/form/FormRowDetails.vue', () => {

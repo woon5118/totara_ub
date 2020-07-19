@@ -150,16 +150,16 @@ import {
   FormCheckboxGroup,
   FormToggleButton,
   FormRange,
-} from 'totara_core/components/uniform';
-import InputText from 'totara_core/components/form/InputText';
-import Checkbox from 'totara_core/components/form/Checkbox';
-import Radio from 'totara_core/components/form/Radio';
-import FormRowActionButtons from 'totara_core/components/form/FormRowActionButtons';
-import FormRowDetails from 'totara_core/components/form/FormRowDetails';
-import FormRowDefaults from 'totara_core/components/form/FormRowDefaults';
-import SampleFormPart from 'totara_samples/components/sample_parts/totara_core/form/FormPart';
-import Repeater from 'totara_core/components/form/Repeater';
-import theme from 'totara_core/theme';
+} from 'tui/components/uniform';
+import InputText from 'tui/components/form/InputText';
+import Checkbox from 'tui/components/form/Checkbox';
+import Radio from 'tui/components/form/Radio';
+import FormRowActionButtons from 'tui/components/form/FormRowActionButtons';
+import FormRowDetails from 'tui/components/form/FormRowDetails';
+import FormRowDefaults from 'tui/components/form/FormRowDefaults';
+import SampleFormPart from 'samples/components/sample_parts/totara_core/form/FormPart';
+import Repeater from 'tui/components/form/Repeater';
+import theme from 'tui/theme';
 
 export default {
   components: {

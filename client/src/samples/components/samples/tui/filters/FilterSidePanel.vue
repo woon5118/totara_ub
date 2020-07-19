@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -63,13 +63,13 @@
 </template>
 
 <script>
-import SamplesCode from 'totara_samples/components/sample_parts/misc/SamplesCode';
-import SamplesExample from 'totara_samples/components/sample_parts/misc/SamplesExample';
+import SamplesCode from 'samples/components/sample_parts/misc/SamplesCode';
+import SamplesExample from 'samples/components/sample_parts/misc/SamplesExample';
 // Components
-import FilterSidePanel from 'totara_core/components/filters/FilterSidePanel';
-import MultiSelect from 'totara_core/components/filters/MultiSelectFilter';
-import SearchFilter from 'totara_core/components/filters/SearchFilter';
-import SelectFilter from 'totara_core/components/filters/SelectFilter';
+import FilterSidePanel from 'tui/components/filters/FilterSidePanel';
+import MultiSelect from 'tui/components/filters/MultiSelectFilter';
+import SearchFilter from 'tui/components/filters/SearchFilter';
+import SelectFilter from 'tui/components/filters/SelectFilter';
 
 export default {
   components: {
@@ -177,10 +177,10 @@ export default {
   />
 
 </FilterSidePanel>`,
-      codeScript: `import FilterSidePanel from 'totara_core/components/filters/FilterSidePanel';
-import MultiSelect from 'totara_core/components/filters/MultiSelectFilter';
-import SearchFilter from 'totara_core/components/filters/SearchFilter';
-import SelectFilter from 'totara_core/components/filters/SelectFilter';
+      codeScript: `import FilterSidePanel from 'tui/components/filters/FilterSidePanel';
+import MultiSelect from 'tui/components/filters/MultiSelectFilter';
+import SearchFilter from 'tui/components/filters/SearchFilter';
+import SelectFilter from 'tui/components/filters/SelectFilter';
 
 export default {
   components: {

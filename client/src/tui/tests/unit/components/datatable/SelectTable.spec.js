@@ -17,7 +17,7 @@
  */
 
 import { mount } from '@vue/test-utils';
-import component from 'totara_core/components/datatable/SelectTable.vue';
+import component from 'tui/components/datatable/SelectTable.vue';
 import Vue from 'vue';
 let wrapper;
 

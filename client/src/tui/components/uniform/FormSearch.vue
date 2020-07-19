@@ -18,7 +18,7 @@
 
 <script>
 import { createUniformInputWrapper } from './util';
-import InputSearch from 'totara_core/components/form/InputSearch';
+import InputSearch from 'tui/components/form/InputSearch';
 
 export default createUniformInputWrapper(InputSearch);
 </script>

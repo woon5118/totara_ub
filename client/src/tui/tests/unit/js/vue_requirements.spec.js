@@ -16,7 +16,7 @@
  * @module totara_core
  */
 
-import { makeScanner, getInheritedOption } from 'totara_core/vue_requirements';
+import { makeScanner, getInheritedOption } from 'tui/vue_requirements';
 import Vue from 'vue';
 
 describe('makeScanner', () => {

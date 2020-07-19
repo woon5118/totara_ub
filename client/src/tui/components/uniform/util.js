@@ -16,9 +16,9 @@
  * @module totara_core
  */
 
-import { pick } from 'totara_core/util';
-import { getPropDefs, getModelDef } from 'totara_core/vue_util';
-import FormField from 'totara_core/components/uniform/FormField';
+import { pick } from 'tui/util';
+import { getPropDefs, getModelDef } from 'tui/vue_util';
+import FormField from 'tui/components/uniform/FormField';
 
 /**
  * Create a wrapper component for an input.

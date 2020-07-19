@@ -40,9 +40,9 @@
 
 <script>
 // Components
-import NotificationBanner from 'totara_core/components/notifications/NotificationBanner';
+import NotificationBanner from 'tui/components/notifications/NotificationBanner';
 // Util
-import { pull, uniqueId } from 'totara_core/util';
+import { pull, uniqueId } from 'tui/util';
 
 export default {
   components: {

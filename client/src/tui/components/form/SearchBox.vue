@@ -47,10 +47,10 @@
 
 <script>
 // Components
-import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
-import InputSearch from 'totara_core/components/form/InputSearch';
-import Label from 'totara_core/components/form/Label';
-import SearchIcon from 'totara_core/components/icons/common/Search';
+import ButtonIcon from 'tui/components/buttons/ButtonIcon';
+import InputSearch from 'tui/components/form/InputSearch';
+import Label from 'tui/components/form/Label';
+import SearchIcon from 'tui/components/icons/common/Search';
 
 export default {
   components: {

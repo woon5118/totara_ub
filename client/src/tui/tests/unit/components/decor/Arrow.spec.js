@@ -17,10 +17,10 @@
  */
 
 import { shallowMount, mount } from '@vue/test-utils';
-import Arrow from 'totara_core/components/decor/Arrow';
-import { isRtl } from 'totara_core/i18n';
+import Arrow from 'tui/components/decor/Arrow';
+import { isRtl } from 'tui/i18n';
 
-jest.mock('totara_core/i18n');
+jest.mock('tui/i18n');
 
 describe('Arrow', () => {
   beforeAll(() => {

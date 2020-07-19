@@ -18,7 +18,7 @@
 
 import Vue from 'vue';
 import { shallowMount } from '@vue/test-utils';
-import PopoverTrigger from 'totara_core/components/popover/PopoverTrigger';
+import PopoverTrigger from 'tui/components/popover/PopoverTrigger';
 
 describe('PopoverTrigger', () => {
   it('triggers events', async () => {

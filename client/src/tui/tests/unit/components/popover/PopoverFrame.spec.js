@@ -17,7 +17,7 @@
  */
 
 import { shallowMount } from '@vue/test-utils';
-import PopoverFrame from 'totara_core/components/popover/PopoverFrame';
+import PopoverFrame from 'tui/components/popover/PopoverFrame';
 
 describe('PopoverFrame', () => {
   it('matches snapshot', () => {

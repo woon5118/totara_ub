@@ -57,9 +57,9 @@
 
 <script>
 // Components
-import HelpIcon from 'totara_core/components/form/HelpIcon';
-import Label from 'totara_core/components/form/Label';
-import FieldContextProvider from 'totara_core/components/reform/FieldContextProvider';
+import HelpIcon from 'tui/components/form/HelpIcon';
+import Label from 'tui/components/form/Label';
+import FieldContextProvider from 'tui/components/reform/FieldContextProvider';
 
 export default {
   components: {

@@ -37,8 +37,8 @@
 </template>
 
 <script>
-import Reform from 'totara_core/components/reform/Reform';
-import Form from 'totara_core/components/form/Form';
+import Reform from 'tui/components/reform/Reform';
+import Form from 'tui/components/form/Form';
 
 export default {
   components: {

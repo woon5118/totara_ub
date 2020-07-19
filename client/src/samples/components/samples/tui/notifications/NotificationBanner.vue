@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Simon Chester <simon.chester@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -68,14 +68,14 @@
 </template>
 
 <script>
-import NotificationBanner from 'totara_core/components/notifications/NotificationBanner';
-import SamplesExample from 'totara_samples/components/sample_parts/misc/SamplesExample';
-import SamplesPropCtl from 'totara_samples/components/sample_parts/misc/SamplesPropCtl';
-import SamplesCode from 'totara_samples/components/sample_parts/misc/SamplesCode';
-import FormRow from 'totara_core/components/form/FormRow';
-import RadioGroup from 'totara_core/components/form/RadioGroup';
-import Radio from 'totara_core/components/form/Radio';
-import InputText from 'totara_core/components/form/InputText';
+import NotificationBanner from 'tui/components/notifications/NotificationBanner';
+import SamplesExample from 'samples/components/sample_parts/misc/SamplesExample';
+import SamplesPropCtl from 'samples/components/sample_parts/misc/SamplesPropCtl';
+import SamplesCode from 'samples/components/sample_parts/misc/SamplesCode';
+import FormRow from 'tui/components/form/FormRow';
+import RadioGroup from 'tui/components/form/RadioGroup';
+import Radio from 'tui/components/form/Radio';
+import InputText from 'tui/components/form/InputText';
 
 export default {
   components: {
@@ -96,7 +96,7 @@ export default {
       dismissable: false,
       selfDismiss: false,
       codeTemplate: `<NotificationBanner type="info" message="Message."/>`,
-      codeScript: `import Loader from 'totara_core/components/notifications/NotificationBanner;
+      codeScript: `import Loader from 'tui/components/notifications/NotificationBanner';
 
 export default {
   components: {

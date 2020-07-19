@@ -33,8 +33,8 @@
 </template>
 
 <script>
-import Arrow from 'totara_core/components/decor/Arrow';
-import CloseButton from 'totara_core/components/buttons/CloseIcon';
+import Arrow from 'tui/components/decor/Arrow';
+import CloseButton from 'tui/components/buttons/CloseIcon';
 
 export default {
   components: {

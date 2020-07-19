@@ -42,8 +42,8 @@
 </template>
 
 <script>
-import Field from 'totara_core/components/reform/Field';
-import FieldError from 'totara_core/components/form/FieldError';
+import Field from 'tui/components/reform/Field';
+import FieldError from 'tui/components/form/FieldError';
 
 export default {
   components: {

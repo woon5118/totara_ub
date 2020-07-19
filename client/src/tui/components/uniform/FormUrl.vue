@@ -18,7 +18,7 @@
 
 <script>
 import { createUniformInputWrapper } from './util';
-import InputUrl from 'totara_core/components/form/InputUrl';
+import InputUrl from 'tui/components/form/InputUrl';
 
 export default createUniformInputWrapper(InputUrl);
 </script>

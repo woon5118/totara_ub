@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Simon Chester <simon.chester@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -283,11 +283,11 @@
 </template>
 
 <script>
-import Button from 'totara_core/components/buttons/Button';
-import Modal from 'totara_core/components/modal/Modal';
-import ModalContent from 'totara_core/components/modal/ModalContent';
-import ModalPresenter from 'totara_core/components/modal/ModalPresenter';
-import Popover from 'totara_core/components/popover/Popover';
+import Button from 'tui/components/buttons/Button';
+import Modal from 'tui/components/modal/Modal';
+import ModalContent from 'tui/components/modal/ModalContent';
+import ModalPresenter from 'tui/components/modal/ModalPresenter';
+import Popover from 'tui/components/popover/Popover';
 
 export default {
   components: {

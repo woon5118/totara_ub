@@ -18,12 +18,12 @@
 
 import Vue from 'vue';
 import { mount } from '@vue/test-utils';
-import Reform from 'totara_core/components/reform/Reform';
+import Reform from 'tui/components/reform/Reform';
 import { ReformScopeReceiver } from './util';
 
-jest.mock('totara_core/pending');
-jest.mock('totara_core/i18n');
-jest.mock('totara_core/dom/focus', () => ({
+jest.mock('tui/pending');
+jest.mock('tui/i18n');
+jest.mock('tui/dom/focus', () => ({
   getTabbableElements(el) {
     return [el];
   },

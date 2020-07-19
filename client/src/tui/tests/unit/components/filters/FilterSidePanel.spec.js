@@ -17,7 +17,7 @@
  */
 
 import { mount, createLocalVue } from '@vue/test-utils';
-import component from 'totara_core/components/filters/FilterSidePanel';
+import component from 'tui/components/filters/FilterSidePanel';
 import { axe, toHaveNoViolations } from 'jest-axe';
 expect.extend(toHaveNoViolations);
 const localVue = createLocalVue();

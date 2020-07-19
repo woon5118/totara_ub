@@ -18,7 +18,7 @@
 
 <script>
 import { createUniformInputWrapper } from './util';
-import InputEmail from 'totara_core/components/form/InputEmail';
+import InputEmail from 'tui/components/form/InputEmail';
 
 export default createUniformInputWrapper(InputEmail);
 </script>

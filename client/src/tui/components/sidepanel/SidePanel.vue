@@ -70,11 +70,11 @@
 </template>
 
 <script>
-import { waitForTransitionEnd } from 'totara_core/dom/transitions';
-import CollapseIcon from 'totara_core/components/icons/common/Collapse';
-import ExpandIcon from 'totara_core/components/icons/common/Expand';
-import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
-import { throttle } from 'totara_core/util';
+import { waitForTransitionEnd } from 'tui/dom/transitions';
+import CollapseIcon from 'tui/components/icons/common/Collapse';
+import ExpandIcon from 'tui/components/icons/common/Expand';
+import ButtonIcon from 'tui/components/buttons/ButtonIcon';
+import { throttle } from 'tui/util';
 
 const isIE = document.body.classList.contains('ie');
 

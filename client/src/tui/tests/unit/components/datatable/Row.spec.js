@@ -17,7 +17,7 @@
  */
 
 import { shallowMount } from '@vue/test-utils';
-import component from 'totara_core/components/datatable/Row.vue';
+import component from 'tui/components/datatable/Row.vue';
 const eventFunc = jest.fn();
 let wrapper;
 

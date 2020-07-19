@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -38,9 +38,9 @@
 
 <script>
 // Components
-import FormRowActionButtons from 'totara_core/components/form/FormRowActionButtons';
-import SamplesCode from 'totara_samples/components/sample_parts/misc/SamplesCode';
-import SamplesExample from 'totara_samples/components/sample_parts/misc/SamplesExample';
+import FormRowActionButtons from 'tui/components/form/FormRowActionButtons';
+import SamplesCode from 'samples/components/sample_parts/misc/SamplesCode';
+import SamplesExample from 'samples/components/sample_parts/misc/SamplesExample';
 
 export default {
   components: {
@@ -61,7 +61,7 @@ export default {
   @cancel="formCancel"
   @submit.prevent="formSubmit"
 />`,
-      codeScript: `import FormRowActionButtons from 'totara_core/components/form/FormRowActionButtons';
+      codeScript: `import FormRowActionButtons from 'tui/components/form/FormRowActionButtons';
 
 export default {
   components: {

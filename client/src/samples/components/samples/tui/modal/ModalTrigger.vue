@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -35,11 +35,11 @@
 </template>
 
 <script>
-import Button from 'totara_core/components/buttons/Button';
-import ExampleModal from 'totara_samples/components/sample_parts/totara_core/modal/ExampleModal';
-import ModalPresenter from 'totara_core/components/modal/ModalPresenter';
-import SamplesCode from 'totara_samples/components/sample_parts/misc/SamplesCode';
-import SamplesExample from 'totara_samples/components/sample_parts/misc/SamplesExample';
+import Button from 'tui/components/buttons/Button';
+import ExampleModal from 'samples/components/sample_parts/totara_core/modal/ExampleModal';
+import ModalPresenter from 'tui/components/modal/ModalPresenter';
+import SamplesCode from 'samples/components/sample_parts/misc/SamplesCode';
+import SamplesExample from 'samples/components/sample_parts/misc/SamplesExample';
 
 export default {
   components: {
@@ -59,7 +59,7 @@ export default {
       codeTemplate: `<ModalPresenter :open="modalOpen" @request-close="modalResponse">
   <ExampleModal/>
 </ModalPresenter>`,
-      codeScript: `import ModalPresenter from 'totara_core/components/modal/ModalPresenter';
+      codeScript: `import ModalPresenter from 'tui/components/modal/ModalPresenter';
 import CustomModal from '../CustomModal';
 
 export default {

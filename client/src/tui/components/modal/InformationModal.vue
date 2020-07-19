@@ -38,10 +38,10 @@
 </template>
 
 <script>
-import Button from 'totara_core/components/buttons/Button';
-import Modal from 'totara_core/components/modal/Modal';
-import ModalContent from 'totara_core/components/modal/ModalContent';
-import ModalPresenter from 'totara_core/components/modal/ModalPresenter';
+import Button from 'tui/components/buttons/Button';
+import Modal from 'tui/components/modal/Modal';
+import ModalContent from 'tui/components/modal/ModalContent';
+import ModalPresenter from 'tui/components/modal/ModalPresenter';
 
 export default {
   components: {

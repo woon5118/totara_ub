@@ -18,7 +18,7 @@
 
 import { mount } from '@vue/test-utils';
 import { plainWrapperArray } from '../../util';
-import PropsProvider from 'totara_core/components/util/PropsProvider';
+import PropsProvider from 'tui/components/util/PropsProvider';
 
 const SecondLevel = {
   props: ['j'],

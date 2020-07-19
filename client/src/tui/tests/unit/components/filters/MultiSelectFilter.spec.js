@@ -17,7 +17,7 @@
  */
 
 import { shallowMount } from '@vue/test-utils';
-import component from 'totara_core/components/filters/MultiSelectFilter';
+import component from 'tui/components/filters/MultiSelectFilter';
 let wrapper;
 
 describe('MultiSelectFilter.vue', () => {

@@ -16,8 +16,8 @@
  * @module totara_core
  */
 
-import { announce } from 'totara_core/accessibility';
-import { getString, langString } from 'totara_core/i18n';
+import { announce } from 'tui/accessibility';
+import { getString, langString } from 'tui/i18n';
 
 export default class DragDropAnnouncer {
   constructor(manager) {

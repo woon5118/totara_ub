@@ -61,9 +61,9 @@
 </template>
 
 <script>
-import Button from 'totara_core/components/buttons/Button';
-import Dropdown from 'totara_core/components/dropdown/Dropdown';
-import DropdownItem from 'totara_core/components/dropdown/DropdownItem';
+import Button from 'tui/components/buttons/Button';
+import Dropdown from 'tui/components/dropdown/Dropdown';
+import DropdownItem from 'tui/components/dropdown/DropdownItem';
 
 export default {
   components: {

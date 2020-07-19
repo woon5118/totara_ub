@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -57,13 +57,13 @@
 </template>
 
 <script>
-import Card from 'totara_core/components/card/Card';
-import FormRow from 'totara_core/components/form/FormRow';
-import Radio from 'totara_core/components/form/Radio';
-import RadioGroup from 'totara_core/components/form/RadioGroup';
-import SamplesCode from 'totara_samples/components/sample_parts/misc/SamplesCode';
-import SamplesExample from 'totara_samples/components/sample_parts/misc/SamplesExample';
-import SamplesPropCtl from 'totara_samples/components/sample_parts/misc/SamplesPropCtl';
+import Card from 'tui/components/card/Card';
+import FormRow from 'tui/components/form/FormRow';
+import Radio from 'tui/components/form/Radio';
+import RadioGroup from 'tui/components/form/RadioGroup';
+import SamplesCode from 'samples/components/sample_parts/misc/SamplesCode';
+import SamplesExample from 'samples/components/sample_parts/misc/SamplesExample';
+import SamplesPropCtl from 'samples/components/sample_parts/misc/SamplesPropCtl';
 
 export default {
   components: {
@@ -84,7 +84,7 @@ export default {
     Card content
   </div>
 </Card>`,
-      codeScript: `import Card from 'totara_core/components/card/Card';
+      codeScript: `import Card from 'tui/components/card/Card';
 
 export default {
   components: {

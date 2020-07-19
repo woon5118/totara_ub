@@ -17,7 +17,7 @@
  */
 
 import { shallowMount } from '@vue/test-utils';
-import RadioGroup from 'totara_core/components/form/RadioGroup';
+import RadioGroup from 'tui/components/form/RadioGroup';
 
 const PropsProviderStub = {
   props: ['provide'],

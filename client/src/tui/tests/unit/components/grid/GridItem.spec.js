@@ -17,7 +17,7 @@
  */
 
 import { shallowMount } from '@vue/test-utils';
-import component from 'totara_core/components/grid/GridItem';
+import component from 'tui/components/grid/GridItem';
 let wrapper;
 
 const props = {

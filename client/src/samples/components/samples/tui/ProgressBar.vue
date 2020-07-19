@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Alvin Smith <alvin.smith@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -82,8 +82,8 @@
 </template>
 
 <script>
-import Button from 'totara_core/components/buttons/Button';
-import Progress from 'totara_core/components/progress/Progress';
+import Button from 'tui/components/buttons/Button';
+import Progress from 'tui/components/progress/Progress';
 
 export default {
   components: {

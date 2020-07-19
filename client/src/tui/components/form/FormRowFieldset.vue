@@ -28,7 +28,7 @@
 
 <script>
 // Components
-import FormRow from 'totara_core/components/form/FormRow';
+import FormRow from 'tui/components/form/FormRow';
 
 export default {
   components: {

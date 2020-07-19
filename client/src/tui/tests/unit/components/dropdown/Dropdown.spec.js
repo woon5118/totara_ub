@@ -17,7 +17,7 @@
  */
 
 import { mount } from '@vue/test-utils';
-import Dropdown from 'totara_core/components/dropdown/Dropdown';
+import Dropdown from 'tui/components/dropdown/Dropdown';
 import { axe, toHaveNoViolations } from 'jest-axe';
 expect.extend(toHaveNoViolations);
 

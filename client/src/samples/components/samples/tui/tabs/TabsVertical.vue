@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -42,10 +42,10 @@
 </template>
 
 <script>
-import SamplesCode from 'totara_samples/components/sample_parts/misc/SamplesCode';
-import SamplesExample from 'totara_samples/components/sample_parts/misc/SamplesExample';
-import Tab from 'totara_core/components/tabs/Tab';
-import Tabs from 'totara_core/components/tabs/Tabs';
+import SamplesCode from 'samples/components/sample_parts/misc/SamplesCode';
+import SamplesExample from 'samples/components/sample_parts/misc/SamplesExample';
+import Tab from 'tui/components/tabs/Tab';
+import Tabs from 'tui/components/tabs/Tabs';
 
 export default {
   components: {
@@ -78,8 +78,8 @@ export default {
     {{ tab.content }}
   </Tab>
 </Tabs>`,
-      codeScript: `import Tab from 'totara_core/components/tabs/Tab';
-import Tabs from 'totara_core/components/tabs/Tabs';
+      codeScript: `import Tab from 'tui/components/tabs/Tab';
+import Tabs from 'tui/components/tabs/Tabs';
 
 export default {
   components: {

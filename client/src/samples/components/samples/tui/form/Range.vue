@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Johannes Cilliers <johannes.cilliers@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -121,16 +121,16 @@
 </template>
 
 <script>
-import Form from 'totara_core/components/form/Form';
-import FormRow from 'totara_core/components/form/FormRow';
-import InputNumber from 'totara_core/components/form/InputNumber';
-import InputText from 'totara_core/components/form/InputText';
-import Radio from 'totara_core/components/form/Radio';
-import RadioGroup from 'totara_core/components/form/RadioGroup';
-import Range from 'totara_core/components/form/Range';
-import SamplesCode from 'totara_samples/components/sample_parts/misc/SamplesCode';
-import SamplesExample from 'totara_samples/components/sample_parts/misc/SamplesExample';
-import SamplesPropCtl from 'totara_samples/components/sample_parts/misc/SamplesPropCtl';
+import Form from 'tui/components/form/Form';
+import FormRow from 'tui/components/form/FormRow';
+import InputNumber from 'tui/components/form/InputNumber';
+import InputText from 'tui/components/form/InputText';
+import Radio from 'tui/components/form/Radio';
+import RadioGroup from 'tui/components/form/RadioGroup';
+import Range from 'tui/components/form/Range';
+import SamplesCode from 'samples/components/sample_parts/misc/SamplesCode';
+import SamplesExample from 'samples/components/sample_parts/misc/SamplesExample';
+import SamplesPropCtl from 'samples/components/sample_parts/misc/SamplesPropCtl';
 
 export default {
   components: {
@@ -167,7 +167,7 @@ export default {
   high-label="HIGH"
   @change="changed"
 />`,
-      codeScript: `import Range from 'totara_core/components/form/Range';
+      codeScript: `import Range from 'tui/components/form/Range';
 
 export default {
   components: {

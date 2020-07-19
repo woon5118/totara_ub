@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -45,11 +45,11 @@
 </template>
 
 <script>
-import AudienceAdder from 'totara_core/components/adder/AudienceAdder';
+import AudienceAdder from 'tui/components/adder/AudienceAdder';
 
-import Button from 'totara_core/components/buttons/Button';
-import SamplesCode from 'totara_samples/components/sample_parts/misc/SamplesCode';
-import SamplesExample from 'totara_samples/components/sample_parts/misc/SamplesExample';
+import Button from 'tui/components/buttons/Button';
+import SamplesCode from 'samples/components/sample_parts/misc/SamplesCode';
+import SamplesExample from 'samples/components/sample_parts/misc/SamplesExample';
 
 // Queries
 import cohorts from 'core/graphql/cohorts';
@@ -82,7 +82,7 @@ export default {
   {{ audience }}
 </div>
 `,
-      codeScript: `import AudienceAdder from 'totara_core/components/adder/AudienceAdder';
+      codeScript: `import AudienceAdder from 'tui/components/adder/AudienceAdder';
 
 export default {
   components: {

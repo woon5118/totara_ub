@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -80,17 +80,17 @@
 </template>
 
 <script>
-import Cell from 'totara_core/components/datatable/Cell';
-import ExpandCell from 'totara_core/components/datatable/ExpandCell';
-import HeaderCell from 'totara_core/components/datatable/HeaderCell';
-import Table from 'totara_core/components/datatable/Table';
+import Cell from 'tui/components/datatable/Cell';
+import ExpandCell from 'tui/components/datatable/ExpandCell';
+import HeaderCell from 'tui/components/datatable/HeaderCell';
+import Table from 'tui/components/datatable/Table';
 
-import SamplesCode from 'totara_samples/components/sample_parts/misc/SamplesCode';
-import SamplesExample from 'totara_samples/components/sample_parts/misc/SamplesExample';
-import SamplesPropCtl from 'totara_samples/components/sample_parts/misc/SamplesPropCtl';
-import FormRow from 'totara_core/components/form/FormRow';
-import Radio from 'totara_core/components/form/Radio';
-import RadioGroup from 'totara_core/components/form/RadioGroup';
+import SamplesCode from 'samples/components/sample_parts/misc/SamplesCode';
+import SamplesExample from 'samples/components/sample_parts/misc/SamplesExample';
+import SamplesPropCtl from 'samples/components/sample_parts/misc/SamplesPropCtl';
+import FormRow from 'tui/components/form/FormRow';
+import Radio from 'tui/components/form/Radio';
+import RadioGroup from 'tui/components/form/RadioGroup';
 
 export default {
   components: {
@@ -154,10 +154,10 @@ export default {
     <h3>{{ row.title }}</h3>
   </template>
 </Table>`,
-      codeScript: `import Cell from 'totara_core/components/datatable/Cell';
-import ExpandCell from 'totara_core/components/datatable/ExpandCell';
-import HeaderCell from 'totara_core/components/datatable/HeaderCell';
-import Table from 'totara_core/components/datatable/Table';
+      codeScript: `import Cell from 'tui/components/datatable/Cell';
+import ExpandCell from 'tui/components/datatable/ExpandCell';
+import HeaderCell from 'tui/components/datatable/HeaderCell';
+import Table from 'tui/components/datatable/Table';
 
 export default {
   components: {

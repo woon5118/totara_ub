@@ -25,9 +25,9 @@
 
 <script>
 // Components
-import ButtonCancel from 'totara_core/components/buttons/Cancel';
-import ButtonGroup from 'totara_core/components/buttons/ButtonGroup';
-import ButtonOk from 'totara_core/components/buttons/Ok';
+import ButtonCancel from 'tui/components/buttons/Cancel';
+import ButtonGroup from 'tui/components/buttons/ButtonGroup';
+import ButtonOk from 'tui/components/buttons/Ok';
 
 export default {
   components: {

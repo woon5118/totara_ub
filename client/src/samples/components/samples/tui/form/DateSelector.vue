@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -150,22 +150,22 @@
 </template>
 
 <script>
-import FormRow from 'totara_core/components/form/FormRow';
-import InputNumber from 'totara_core/components/form/InputNumber';
-import InputText from 'totara_core/components/form/InputText';
-import Radio from 'totara_core/components/form/Radio';
-import RadioGroup from 'totara_core/components/form/RadioGroup';
-import SamplesCode from 'totara_samples/components/sample_parts/misc/SamplesCode';
-import SamplesExample from 'totara_samples/components/sample_parts/misc/SamplesExample';
-import SamplesPropCtl from 'totara_samples/components/sample_parts/misc/SamplesPropCtl';
+import FormRow from 'tui/components/form/FormRow';
+import InputNumber from 'tui/components/form/InputNumber';
+import InputText from 'tui/components/form/InputText';
+import Radio from 'tui/components/form/Radio';
+import RadioGroup from 'tui/components/form/RadioGroup';
+import SamplesCode from 'samples/components/sample_parts/misc/SamplesCode';
+import SamplesExample from 'samples/components/sample_parts/misc/SamplesExample';
+import SamplesPropCtl from 'samples/components/sample_parts/misc/SamplesPropCtl';
 
-import FormRowActionButtons from 'totara_core/components/form/FormRowActionButtons';
+import FormRowActionButtons from 'tui/components/form/FormRowActionButtons';
 
 import {
   FormDateSelector,
   FormRowFieldset,
   Uniform,
-} from 'totara_core/components/uniform';
+} from 'tui/components/uniform';
 
 export default {
   components: {
@@ -228,7 +228,7 @@ export default {
   FormDateSelector,
   FormRowFieldset,
   Uniform,
-} from 'totara_core/components/uniform';
+} from 'tui/components/uniform';
 
 export default {
   components: {

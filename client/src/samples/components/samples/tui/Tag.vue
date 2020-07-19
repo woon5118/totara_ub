@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Alvin Smith <alvin.smith@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -40,9 +40,9 @@
 </template>
 
 <script>
-import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
-import Close from 'totara_core/components/icons/common/Close';
-import Tag from 'totara_core/components/tag/Tag';
+import ButtonIcon from 'tui/components/buttons/ButtonIcon';
+import Close from 'tui/components/icons/common/Close';
+import Tag from 'tui/components/tag/Tag';
 
 export default {
   components: {

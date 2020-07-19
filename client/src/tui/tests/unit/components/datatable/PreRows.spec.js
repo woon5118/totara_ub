@@ -17,7 +17,7 @@
  */
 
 import { shallowMount } from '@vue/test-utils';
-import component from 'totara_core/components/datatable/PreRows.vue';
+import component from 'tui/components/datatable/PreRows.vue';
 let wrapper;
 
 describe('presentation/datatable/PreRows.vue', () => {

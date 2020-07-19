@@ -13,14 +13,14 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Simon Chester <simon.chester@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
   <div class="tui-samples">
     <Layout>
       <template v-slot:page-title>
-        {{ $str('pluginname', 'totara_samples') }}
+        {{ $str('pluginname', 'samples') }}
       </template>
       <template v-slot:left>
         <FilterSidePanel title="Filter results">
@@ -70,15 +70,15 @@
 </template>
 
 <script>
-import { memoize, unique, formatParams } from 'totara_core/util';
-import Card from 'totara_core/components/card/Card';
-import FilterSidePanel from 'totara_core/components/filters/FilterSidePanel';
-import Layout from 'totara_core/components/layouts/LayoutTwoColumn';
-import MultiSelect from 'totara_core/components/filters/MultiSelectFilter';
-import SearchFilter from 'totara_core/components/filters/SearchFilter';
-import SelectFilter from 'totara_core/components/filters/SelectFilter';
+import { memoize, unique, formatParams } from 'tui/util';
+import Card from 'tui/components/card/Card';
+import FilterSidePanel from 'tui/components/filters/FilterSidePanel';
+import Layout from 'tui/components/layouts/LayoutTwoColumn';
+import MultiSelect from 'tui/components/filters/MultiSelectFilter';
+import SearchFilter from 'tui/components/filters/SearchFilter';
+import SelectFilter from 'tui/components/filters/SelectFilter';
 
-const prefix = 'totara_samples/components/samples/';
+const prefix = 'samples/components/samples/';
 
 const underscores = str => {
   str = str.replace(/(.)([A-Z][a-z]+)/g, '$1_$2');
@@ -93,7 +93,7 @@ const wrapSampleComponent = memoize(sample => {
       ._loadTotaraComponent(sample.totaraComponent)
       .then(() => tui.loadComponent(sample.component)),
     error: tui.defaultExport(
-      tui.require('totara_core/components/errors/ErrorPageRender')
+      tui.require('tui/components/errors/ErrorPageRender')
     ),
   });
 });
@@ -177,7 +177,7 @@ export default {
   mounted() {
     this.samples = tui
       // eslint-disable-next-line tui/no-tui-internal
-      ._getLoadedComponentModules('totara_samples')
+      ._getLoadedComponentModules('samples')
       .filter(x => x.startsWith(prefix))
       .map(x => {
         const i = x.indexOf('/', prefix.length);
@@ -279,7 +279,7 @@ export default {
 
 <lang-strings>
 {
-  "totara_samples": [
+  "samples": [
     "pluginname"
   ]
 }

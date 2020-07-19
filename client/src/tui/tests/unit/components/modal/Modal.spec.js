@@ -18,7 +18,7 @@
 
 import Vue from 'vue';
 import { shallowMount, createWrapper } from '@vue/test-utils';
-import Modal from 'totara_core/components/modal/Modal';
+import Modal from 'tui/components/modal/Modal';
 import { axe, toHaveNoViolations } from 'jest-axe';
 expect.extend(toHaveNoViolations);
 

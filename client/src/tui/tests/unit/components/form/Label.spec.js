@@ -17,7 +17,7 @@
  */
 
 import { shallowMount } from '@vue/test-utils';
-import component from 'totara_core/components/form/Label.vue';
+import component from 'tui/components/form/Label.vue';
 let wrapper;
 
 describe('presentation/form/Label.vue', () => {

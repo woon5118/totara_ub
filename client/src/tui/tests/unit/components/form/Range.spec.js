@@ -17,7 +17,7 @@
  */
 
 import { mount } from '@vue/test-utils';
-import component from 'totara_core/components/form/Range.vue';
+import component from 'tui/components/form/Range.vue';
 
 let wrapper;
 const selectHandler = jest.fn();

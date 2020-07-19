@@ -17,7 +17,7 @@
  */
 
 import { shallowMount } from '@vue/test-utils';
-import component from 'totara_core/components/form/HelpIcon.vue';
+import component from 'tui/components/form/HelpIcon.vue';
 let wrapper;
 
 describe('presentation/form/HelpIcon.vue', () => {

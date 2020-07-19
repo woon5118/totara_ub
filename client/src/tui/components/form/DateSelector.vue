@@ -84,8 +84,8 @@
 
 <script>
 // Components
-import Label from 'totara_core/components/form/Label';
-import Select from 'totara_core/components/form/Select';
+import Label from 'tui/components/form/Label';
+import Select from 'tui/components/form/Select';
 
 // Utils
 import {
@@ -95,10 +95,10 @@ import {
   getMonthStringsSelectArray,
   getValuesFromIso,
   getYearsSelectArray,
-} from 'totara_core/date';
-import { getTimeZoneKeyStrings } from 'totara_core/time';
-import { globalConfig } from 'totara_core/config';
-import { loadLangStrings } from 'totara_core/i18n';
+} from 'tui/date';
+import { getTimeZoneKeyStrings } from 'tui/time';
+import { globalConfig } from 'tui/config';
+import { loadLangStrings } from 'tui/i18n';
 
 export default {
   components: {

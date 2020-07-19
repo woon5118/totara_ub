@@ -13,7 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Simon Chester <simon.chester@totaralearning.com>
-  @module totara_samples
+  @module samples
 -->
 
 <template>
@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import Modal from 'totara_core/components/modal/Modal';
+import Modal from 'tui/components/modal/Modal';
 
 export default {
   components: {

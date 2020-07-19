@@ -18,7 +18,7 @@
 
 <script>
 import { createUniformInputWrapper } from './util';
-import DateSelector from 'totara_core/components/form/DateSelector';
+import DateSelector from 'tui/components/form/DateSelector';
 
 export default createUniformInputWrapper(DateSelector);
 </script>

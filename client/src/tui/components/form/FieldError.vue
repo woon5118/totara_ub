@@ -39,9 +39,9 @@
 </template>
 
 <script>
-import ButtonIcon from 'totara_core/components/buttons/ButtonIcon';
-import CloseIcon from 'totara_core/components/icons/common/Close';
-import ErrorIcon from 'totara_core/components/icons/common/Error';
+import ButtonIcon from 'tui/components/buttons/ButtonIcon';
+import CloseIcon from 'tui/components/icons/common/Close';
+import ErrorIcon from 'tui/components/icons/common/Error';
 
 export default {
   components: {
