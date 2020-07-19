@@ -207,8 +207,12 @@ class core_calendar_lib_testcase extends advanced_testcase {
         // Create the course we will be using.
         $course = $this->getDataGenerator()->create_course();
         $group = $this->getDataGenerator()->create_group(['courseid' => $course->id]);
+        $supported = \container_course\course::get_module_types_supported();
 
         foreach (core_component::get_plugin_list('mod') as $modname => $unused) {
+            if (!isset($supported[$modname])) {
+                continue;
+            }
             try {
                 $generator = $this->getDataGenerator()->get_plugin_generator('mod_'.$modname);
             } catch (coding_exception $e) {

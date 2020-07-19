@@ -57,8 +57,12 @@ class core_course_totara_catalog_course_activity_type_filters_testcase extends \
         $available_activities = [];
         $strings = get_string_manager();
         $modules = $DB->get_records('modules', ['visible' => 1], '', "id, name");
+        $supported = \container_course\course::get_module_types_supported();
         $generator = $this->getDataGenerator();
         foreach ($modules as $module) {
+            if (!isset($supported[$module->name])) {
+                continue;
+            }
             $label = $strings->string_exists('pluginname', $module->name)
                      ? $strings->get_string('pluginname', $module->name)
                      : ucfirst($module->name);
