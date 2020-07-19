@@ -27,7 +27,7 @@
     margin: 0;
     padding: var(--tui-gap-2) var(--tui-gap-4);
     text-transform: uppercase;
-    @include tui-font-heading-x-small();
+    @include tui-font-heading-label();
   }
 }
 </style>
