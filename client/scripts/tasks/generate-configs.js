@@ -116,7 +116,7 @@ module.exports = Object.entries(paths).reduce((acc, [key, val]) => {
 }, {});
 `;
 
-  writeJs(path.join(__dirname, '../generated/webpack_aliases.js'), js);
+  writeJs(path.join(rootDir, 'webpack_aliases.js'), js);
 }
 
 generateProjectConfigs();

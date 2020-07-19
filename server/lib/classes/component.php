@@ -404,56 +404,6 @@ $cache = '.var_export($cache, true).';
     }
 
     /**
-     * Get data needed to map components to directories
-     *
-     * Returns an array containing two keys - subsystems and plugintypes.
-     * 'subsystems' is a map of subsystem names (the bit after "core_") to paths relative to dirroot.
-     * 'plugintypes' is a map of plugin types (the bit before the underscore in a frankenstyle name) to paths relative
-     * to dirroot.
-     *
-     * All returned paths start with a slash.
-     *
-     * This is intended to allow code that cannot run PHP to map frankenstyle names to directories.
-     *
-     * @return array
-     */
-    public static function get_component_path_data() {
-        if (!isset(self::$plugintypes)) {
-            self::fill_all_caches();
-        }
-
-        $data = [
-            'subsystems' => array_filter(self::$subsystems),
-            'plugintypes' => self::$plugintypes,
-        ];
-
-        foreach ($data['subsystems'] as $subsystem => $path) {
-            $data['subsystems'][$subsystem] = self::strip_dirroot($path);
-        }
-
-        foreach ($data['plugintypes'] as $subsystem => $path) {
-            $data['plugintypes'][$subsystem] = self::strip_dirroot($path);
-        }
-
-        return $data;
-    }
-
-    /**
-     * Remove leading $CFG->dirroot from a path
-     *
-     * @param string $path
-     * @return string
-     */
-    private static function strip_dirroot(string $path): string {
-        global $CFG;
-        $prefix = $CFG->dirroot . '/';
-        if (substr($path, 0, strlen($prefix)) === $prefix) {
-            $path = substr($path, strlen($prefix));
-        }
-        return $path;
-    }
-
-    /**
      * Fill all caches.
      */
     protected static function fill_all_caches() {

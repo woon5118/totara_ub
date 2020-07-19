@@ -226,7 +226,6 @@ function createConfig({
     resolve: {
       extensions: ['.mjs', '.js', '.json', '.vue', '.graphql'],
       plugins: [new TuiAliasPlugin()],
-      // only used for JetBrains IDE support at the moment
     },
 
     // used to implement importing frankenstyle paths

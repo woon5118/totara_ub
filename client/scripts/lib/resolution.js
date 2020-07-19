@@ -65,20 +65,12 @@ function getComponentDir(component) {
  * @returns {string}
  */
 function getComponentDirInternal(component) {
-  if (component == 'core') {
-    return 'server/lib';
-  }
-  const parts = component.split('_');
-  const type = parts[0];
-  const plugin = parts.slice(1).join('_');
-  if (!type || !plugin) {
+  if (component === '') {
+    // Yeah nah.
     return null;
   }
-  if (type == 'core' && componentMap.subsystems[plugin]) {
-    return componentMap.subsystems[plugin];
-  }
-  if (componentMap.plugintypes[type]) {
-    return componentMap.plugintypes[type] + '/' + plugin;
+  if (componentMap.components[component]) {
+    return componentMap.components[component];
   }
   return null;
 }
@@ -93,19 +85,11 @@ function getClientDir(component) {
 }
 
 function getClientDirInternal(component) {
-  if (component == 'core') {
-    return 'client/src/core';
-  }
-  const parts = component.split('_');
-  const type = parts[0];
-  const plugin = parts.slice(1).join('_');
-  if (!type || !plugin) {
+  if (component === '') {
+    // Yeah nah.
     return null;
   }
-  if (type == 'core' && componentMap.subsystems[plugin]) {
-    return 'client/src/' + component;
-  }
-  if (componentMap.plugintypes[type]) {
+  if (componentMap.components[component]) {
     return 'client/src/' + component;
   }
   return null;
@@ -140,7 +124,7 @@ function resolveRequest(req) {
 
   let extensions = [''];
   if (!rest.match(/\.[a-z]+$/)) {
-    extensions = ['.mjs', '.js', '.json', '.vue', '.graphql'];
+    extensions = ['.mjs', '.js', '.json', '.vue', '.graphql', ''];
   }
 
   let i = 0;

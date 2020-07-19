@@ -30,7 +30,7 @@ class TuiAliasPlugin {
         if (result) {
           return resolver.doResolve(
             target,
-            { ...data, request: result },
+            { ...data, request: path.join(rootDir, result) },
             null,
             resolveContext,
             callback
