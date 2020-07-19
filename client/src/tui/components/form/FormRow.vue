@@ -33,6 +33,7 @@
         :desc-id="ariaDescribedbyId"
         :helpmsg="helpmsg"
         :hidden="hidden"
+        :title="helpTitle"
       />
     </div>
 
@@ -71,6 +72,7 @@ export default {
   props: {
     labelLegend: Boolean,
     helpmsg: String,
+    helpTitle: String,
     hidden: Boolean,
     id: String,
     label: String,
