@@ -26,7 +26,6 @@ import {
   get,
   set,
   orderBy,
-  url,
   isPlainObject,
 } from 'tui/util';
 
@@ -193,60 +192,6 @@ describe('orderBy', () => {
     const arr = [2, 3, 2, 9, 2].map(x => ({ index: x }));
     const ordered = orderBy(arr, x => x.index);
     expect(ordered.map(x => x.index)).toEqual([2, 2, 2, 3, 9]);
-  });
-});
-
-describe('url', () => {
-  it('prepends base url unless absolute', () => {
-    expect(url('/hello')).toBe('http://foo/hello');
-    expect(url('/hello.php')).toBe('http://foo/hello.php');
-    expect(url('/hello?a=b')).toBe('http://foo/hello?a=b');
-    expect(url('//bar/hello')).toBe('//bar/hello');
-    expect(url('https://bar/hello')).toBe('https://bar/hello');
-    expect(url('foo://bar/hello')).toBe('foo://bar/hello');
-    expect(url('http://bar/hello.php')).toBe('http://bar/hello.php');
-  });
-
-  it('requires a leading /', () => {
-    expect(() => url('hello')).toThrow();
-  });
-
-  it('formats the provided params', () => {
-    expect(
-      url('/hello', { a: 'one&two three', b: 2, c: true, d: [3, 4] })
-    ).toBe('http://foo/hello?a=one%26two%20three&b=2&c=true&d[0]=3&d[1]=4');
-
-    expect(
-      url('/hello', {
-        d: [3, 4],
-        e: { f: 5, g: 6 },
-        f: [
-          [1, 2],
-          [3, 4],
-        ],
-        g: { f: { a: 5 }, g: { a: 6 } },
-      })
-    ).toBe(
-      'http://foo/hello?d[0]=3&d[1]=4&e[f]=5&e[g]=6&' +
-        'f[0][0]=1&f[0][1]=2&f[1][0]=3&f[1][1]=4&' +
-        'g[f][a]=5&g[g][a]=6'
-    );
-
-    expect(url('/xyz?a=1', { b: 2 })).toBe('http://foo/xyz?a=1&b=2');
-    expect(url('/xyz?a=1&', { b: 2 })).toBe('http://foo/xyz?a=1&b=2');
-    expect(url('/xyz?', { b: 2 })).toBe('http://foo/xyz?b=2');
-    expect(url('/xyz', {})).toBe('http://foo/xyz');
-    expect(url('/xyz.php?a=1', { b: 2 })).toBe('http://foo/xyz.php?a=1&b=2');
-    expect(url('/xyz.php', {})).toBe('http://foo/xyz.php');
-    expect(url('//xyz', { b: 2 })).toBe('//xyz?b=2');
-  });
-
-  it('passes through URL constructor if defined', () => {
-    expect(url('/hello')).toBe('http://foo/hello');
-    global.URL = jest.fn();
-    url('/oo');
-    expect(global.URL).toHaveBeenLastCalledWith('http://foo/oo');
-    delete global.URL;
   });
 });
 

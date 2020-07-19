@@ -28,4 +28,3 @@ export {
   set,
 } from './internal/util/object';
 export * from './internal/util/throttling';
-export * from './internal/util/url';

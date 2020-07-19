@@ -17,7 +17,7 @@
  */
 
 import { ApolloLink, Observable } from 'apollo-link';
-import { url } from '../../util';
+import { totaraUrl } from '../../url';
 
 let executeDevQuery;
 
@@ -57,7 +57,7 @@ if (process.env.NODE_ENV == 'development') {
     return new Observable(async observer => {
       try {
         const response = await fetch(
-          url('/totara/webapi/dev_graphql_executor.php'),
+          totaraUrl('/totara/webapi/dev_graphql_executor.php'),
           {
             credentials: 'same-origin',
             method: 'post',

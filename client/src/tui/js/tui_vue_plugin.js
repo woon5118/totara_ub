@@ -15,7 +15,8 @@
  * @author Simon Chester <simon.chester@totaralearning.com>
  * @module totara_core
  */
-import { uniqueId, url } from './util';
+import { uniqueId } from './util';
+import { totaraUrl } from './url';
 import { trapFocusOnTab } from './dom/focus';
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -58,7 +59,7 @@ export default {
       return '#' + this.$id(id);
     };
 
-    Vue.prototype.$url = url;
+    Vue.prototype.$url = totaraUrl;
 
     // expose window as $window to avoid using a global
     /* istanbul ignore else */

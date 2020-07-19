@@ -16,10 +16,10 @@
  * @module totara_core
  */
 
-import { globalConfig } from '../../config';
+import { globalConfig as config } from './config';
 
 /**
- * Format a URL parameter
+ * Format a URL parameter.
  *
  * @private
  * @param {string} key Parameter name
@@ -62,25 +62,12 @@ export function formatParams(params) {
 /**
  * Generate URL
  *
- * @param {string} url Absolute url or path beginning with /
- *   e.g. '/foo/bar.php', 'https://www.google.com/'
+ * @param {string} url Absolute or relative url.
  * @param {object=} params URL parameters.
  *   Map of keys to values.
  *   Objects and arrays are acceped as values and encoded using [].
  */
 export function url(url, params) {
-  // prepend with wwwroot if not absolute
-  if (!/^(?:[a-z]+:)?\/\//.test(url)) {
-    if (url[0] != '/') {
-      throw new Error('`url` must be an absolute URL or begin with a /');
-    }
-    url = globalConfig.wwwroot + url;
-    // if URL constructor is supported, pass it through to test that the url is valid
-    if (typeof URL == 'function') {
-      new URL(url);
-    }
-  }
-
   const formattedParams = params && formatParams(params);
   if (formattedParams) {
     if (!url.includes('?')) {
@@ -93,4 +80,51 @@ export function url(url, params) {
   }
 
   return url;
+}
+
+/**
+ * Generate URL
+ *
+ * @param {string} path Absolute url or path beginning with /
+ *   e.g. '/foo/bar.php', 'https://www.google.com/'
+ * @param {object=} params URL parameters.
+ *   Map of keys to values.
+ *   Objects and arrays are acceped as values and encoded using [].
+ */
+export function totaraUrl(path, params) {
+  // prepend with wwwroot if not absolute
+  if (!/^(?:[a-z]+:)?\/\//.test(path)) {
+    if (path[0] != '/') {
+      throw new Error('`url` must be an absolute URL or begin with a /');
+    }
+    path = config.wwwroot + path;
+    // if URL constructor is supported, pass it through to test that the url is valid
+    if (typeof URL == 'function') {
+      new URL(path);
+    }
+  }
+
+  return url(path, params);
+}
+
+/**
+ * Get URL for image.
+ *
+ * @param {string} name
+ * @param {string} component
+ * @return {string}
+ */
+export function imageUrl(name, component) {
+  if (config.themerev > 0 && config.slasharguments) {
+    return totaraUrl(
+      `/theme/image.php/${config.theme}/${component}/${config.themerev}/${name}`
+    );
+  } else {
+    return totaraUrl(`/theme/image.php`, {
+      theme: config.theme,
+      component,
+      rev: config.themerev,
+      image: name,
+    });
+  }
 }

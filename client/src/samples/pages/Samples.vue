@@ -70,7 +70,8 @@
 </template>
 
 <script>
-import { memoize, unique, formatParams } from 'tui/util';
+import { memoize, unique } from 'tui/util';
+import { formatParams } from 'tui/url';
 import Card from 'tui/components/card/Card';
 import FilterSidePanel from 'tui/components/filters/FilterSidePanel';
 import Layout from 'tui/components/layouts/LayoutTwoColumn';

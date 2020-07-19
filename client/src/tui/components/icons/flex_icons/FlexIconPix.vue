@@ -21,7 +21,7 @@
 </template>
 
 <script>
-/* global M */
+import { imageUrl } from 'tui/url';
 
 // pix icon implementation
 // do not use this directly, use <FlexIcon> for pix icons too.
@@ -46,10 +46,10 @@ export default {
       const parts = this.icon.split('|');
 
       if (parts.length === 1) {
-        return M.util.image_url(parts[0], 'core');
+        return imageUrl(parts[0], 'core');
       }
 
-      return M.util.image_url(parts[1], parts[0]);
+      return imageUrl(parts[1], parts[0]);
     },
   },
 };
