@@ -1750,6 +1750,12 @@ require(['core/autoinitialise'], function(ai) {
             $currentlanguage = 'en';
         }
 
+        if (during_initial_install()) {
+            $contextid = 1; // Does not exist yet, 1 is the likely value.
+        } else {
+            $contextid = $page->context->id;
+        }
+
         $config = [
             'wwwroot' => $CFG->wwwroot,
             'sesskey' => sesskey(),
@@ -1764,7 +1770,7 @@ require(['core/autoinitialise'], function(ai) {
                 'user' => usertimezone(),
                 'server' => \core_date::get_server_timezone(),
             ],
-            'context' => ['id' => $page->context->id],
+            'context' => ['id' => $contextid],
             'locale' => [
                 'language' => $currentlanguage,
             ],
