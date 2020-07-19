@@ -32,7 +32,7 @@ phpcs.xml
 # The jsconfig.json file used by VSCode Vue extension: npm run generate-config
 /jsconfig.json
 # Webpack aliases file used to help PHPStorm: npm run generate-config
-/client/scripts/generated/webpack_aliases.js
+/client/tooling/generated/webpack_aliases.js
 # Client build directories
 /client/build/*/
 

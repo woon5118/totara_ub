@@ -1,17 +1,17 @@
 module.exports = {
     extends: [
-        './scripts/configs/.stylelintrc_tui.js',
+        './tooling/configs/.stylelintrc_tui.js',
         "stylelint-config-prettier"
     ],
     plugins: [
         "stylelint-order",
-        "./scripts/stylelint/ascii-only"
+        "./tooling/stylelint/ascii-only"
     ],
     ignoreFiles: [
         "src/theme_legacy/**"
     ],
     rules: {
-        "order/properties-order": require('./scripts/configs/stylelint_order'),
+        "order/properties-order": require('./tooling/configs/stylelint_order'),
         "tui/ascii-only": true,
     }
 }

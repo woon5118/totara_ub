@@ -16,7 +16,7 @@
  * @module totara_core
  */
 
-// glob patterns used for linters/scripts
+// glob patterns used for linters/tooling
 const patterns = {
   eslint: [
     'client/src/**/*.{js,vue}'

@@ -18,11 +18,11 @@
  *
  * @author Simon Chester <simon.chester@totaralearning.com>
  */
-var patterns = require('./client/scripts/lib/patterns');
+var patterns = require('./client/tooling/lib/patterns');
 
 var lintCommands = [
-  'node ./client/scripts/tasks/lint.js',
-  'node ./client/scripts/tasks/prettier.js --write',
+  'node ./client/tooling/tasks/lint.js',
+  'node ./client/tooling/tasks/prettier.js --write',
   'git add'
 ];
 

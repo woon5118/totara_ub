@@ -37,7 +37,7 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['scripts/**/*', 'src/**/tests/**/*', 'src/**/__tests__/**/*'],
+      files: ['tooling/**/*', 'src/**/tests/**/*', 'src/**/__tests__/**/*'],
       rules: {
         'tui/no-object-spread': 'off',
         'tui/no-for-of': 'off',

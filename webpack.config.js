@@ -21,7 +21,7 @@
 
 /* Switch eslint config environment to 'node' to prevent 'module' definition error */
 /* eslint-env node */
-const config = require('./client/scripts/configs/webpack.config');
+const config = require('./client/tooling/configs/webpack.config');
 module.exports = function(env, argv = {}) {
     return config({
         mode: argv.mode,

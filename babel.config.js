@@ -22,7 +22,7 @@
 /* Switch eslint config environment to 'node' to prevent 'module' definition error */
 /* eslint-env node */
 
-const babelConfigs = require('./client/scripts/configs/babel');
+const babelConfigs = require('./client/tooling/configs/babel');
 
 module.exports = api => {
     const isTest = api.env('test');
