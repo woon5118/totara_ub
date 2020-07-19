@@ -79,15 +79,6 @@ function createConfig({
       filename: '[name].scss',
     }),
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': webpack.DefinePlugin.runtimeValue(
-        ({ module }) => {
-          // 'graphql' package needs NODE_ENV to be 'production' when minified
-          if (/node_modules\/graphql\//.test(module.resource)) {
-            return JSON.stringify(mode);
-          }
-          return 'M.cfg.NODE_ENV';
-        }
-      ),
       'process.env.LEGACY_BUNDLE': 'false',
       ...define,
     }),
