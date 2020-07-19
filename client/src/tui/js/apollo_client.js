@@ -55,13 +55,13 @@ const apolloClient = new ApolloClient({
   resolvers: {},
 });
 
-// monkey patch .mutate() to automatically refetch
+// monkey patch .mutate() to add automatic refetch option
 const originalMutate = apolloClient.queryManager.mutate;
 apolloClient.queryManager.mutate = function(options) {
   return originalMutate
     .apply(apolloClient.queryManager, arguments)
     .then(result => {
-      if (options.refetchAll !== false) {
+      if (options.refetchAll) {
         apolloClient.reFetchObservableQueries();
       }
       return result;
