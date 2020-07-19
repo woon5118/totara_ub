@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import ChartJs from 'totara_core/components/chartjs/ChartJs';
+import ChartJs from 'tui_charts/components/ChartJs';
 import theme from 'tui/theme';
 import { unique } from 'tui/util';
 

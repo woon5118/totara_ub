@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import PercentageDoughnut from 'totara_core/components/chartjs/PercentageDoughnut';
+import PercentageDoughnut from 'tui_charts/components/PercentageDoughnut';
 import theme from 'tui/theme';
 
 export default {
