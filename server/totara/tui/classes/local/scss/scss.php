@@ -217,6 +217,8 @@ class scss {
 
         $imports = [];
 
+        $is_theme = strpos($component, 'theme_') === 0;
+
         // SCSS vars
         $def_file_sets = array_merge([$component_files], $themes_files);
 
@@ -238,7 +240,7 @@ class scss {
         }
 
         // CSS vars and component content
-        $source_file_sets = [$component_files];
+        $source_file_sets = $is_theme ? $themes_files : [$component_files];
         foreach ($source_file_sets as $source_files) {
             foreach ($source_files['variables'] as $source_file) {
                 $imports[] = "output_only!internal_absolute:" . $source_file;
