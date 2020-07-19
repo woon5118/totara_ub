@@ -723,6 +723,17 @@ module.exports = function(grunt) {
         });
     };
 
+    tasks.format = makeCommandTask([
+        './node_modules/.bin/prettier',
+        '--write',
+        '**/webapi/**/*.{graphql,graphqls}'
+    ]);
+    tasks.checkFormat = makeCommandTask([
+        './node_modules/.bin/prettier',
+        '--check',
+        '**/webapi/**/*.{graphql,graphqls}'
+    ]);
+
     tasks.startup = function() {
         // Are we in a YUI directory?
         if (path.basename(path.resolve(cwd, '../../')) == 'yui') {
@@ -773,7 +784,7 @@ module.exports = function(grunt) {
     grunt.registerTask('shifter', 'Run Shifter against the current directory', tasks.shifter);
     grunt.registerTask('gherkinlint', 'Run gherkinlint against the current directory', tasks.gherkinlint);
     grunt.registerTask('format', 'Run prettier to reformat files', tasks.format);
-    grunt.registerTask('prettier', 'Alias of "format" task', tasks.format);
+    grunt.registerTask('check-format', 'Run format with check option to check for violations', tasks.checkFormat);
     grunt.registerTask('ignorefiles', 'Generate ignore files for linters', tasks.ignorefiles);
     grunt.registerTask('watch-all', 'Watch grunt', tasks.watchAll);
     grunt.registerTask('yui', ['eslint:yui', 'shifter']);

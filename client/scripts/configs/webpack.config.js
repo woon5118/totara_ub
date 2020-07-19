@@ -161,15 +161,6 @@ function createConfig({
       resourceQuery: /blockType=lang-strings/,
       loader: require.resolve('../webpack/tui_lang_strings_loader'),
     },
-    primary && {
-      enforce: 'pre',
-      test: /\.(js|vue)$/,
-      loader: 'eslint-loader',
-      exclude: /[/\\](?:node_modules|thirdparty)[/\\]/,
-      options: {
-        configFile: path.join(__dirname, './.eslintrc_tui.js'),
-      },
-    },
   ].filter(Boolean);
 
   // code splitting configuration

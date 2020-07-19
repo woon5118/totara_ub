@@ -29,7 +29,7 @@ async function run(opts) {
     : patterns.eslint;
 
   const cli = new CLIEngine({
-    baseConfig: require('../configs/.eslintrc_tui.js'),
+    baseConfig: require('../../.eslintrc.js'),
     fix: opts.fix,
     cwd: require('../lib/common').rootDir,
   });
