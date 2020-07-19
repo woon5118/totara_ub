@@ -16,7 +16,9 @@
  * @module totara_core
  */
 
-/* global M */
+import { pull } from './util';
+
+let pendingList = [];
 
 /**
  * Register an asynchronous task as pending.
@@ -49,11 +51,18 @@
  *   will be registered.
  */
 export default function pending(key = 'pending') {
-  M.util.js_pending(key);
+  pendingList.push(key);
   let called = false;
   return () => {
     if (called) return;
     called = true;
-    M.util.js_complete(key);
+    pull(pendingList, key);
   };
+}
+
+/* istanbul ignore else */
+if (typeof window !== 'undefined') {
+  if (!window.testbridge) window.testbridge = {};
+  if (!window.testbridge.pending) window.testbridge.pending = [];
+  pendingList = window.testbridge.pending;
 }

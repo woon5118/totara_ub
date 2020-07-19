@@ -19,12 +19,42 @@
 import pending from 'tui/pending';
 
 describe('pending', () => {
-  it('calls js_pending/js_complete', async () => {
-    global.M = { util: { js_pending: jest.fn(), js_complete: jest.fn() } };
+  it('stores pending items in a global array', async () => {
+    expect(global.testbridge.pending).toEqual([]);
     const done = pending('key1');
-    expect(global.M.util.js_pending).toHaveBeenCalledWith('key1');
-    expect(global.M.util.js_complete).not.toHaveBeenCalledWith('key1');
+    expect(global.testbridge.pending).toEqual(['key1']);
     done();
-    expect(global.M.util.js_complete).toHaveBeenCalledWith('key1');
+    expect(global.testbridge.pending).toEqual([]);
+  });
+
+  it('handles multiple pending items with the same key', () => {
+    const done1 = pending('key1');
+    const done2 = pending('key1');
+    const done3 = pending('key1');
+    expect(global.testbridge.pending).toEqual(['key1', 'key1', 'key1']);
+    done1();
+    done2();
+    expect(global.testbridge.pending).toEqual(['key1']);
+    done3();
+    expect(global.testbridge.pending).toEqual([]);
+  });
+
+  it('handles done being called multiple times', () => {
+    const done1 = pending('key1');
+    const done2 = pending('key1');
+    expect(global.testbridge.pending).toEqual(['key1', 'key1']);
+    done1();
+    done1();
+    done1();
+    done1();
+    expect(global.testbridge.pending).toEqual(['key1']);
+    done2();
+    expect(global.testbridge.pending).toEqual([]);
+  });
+
+  it('defaults to "pending" key', () => {
+    const done = pending();
+    expect(global.testbridge.pending).toEqual(['pending']);
+    done();
   });
 });

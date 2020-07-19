@@ -74,7 +74,9 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
     /**
      * The JS code to check that the page is ready.
      */
-    const PAGE_READY_JS = '(typeof M !== "undefined" && M.util && M.util.pending_js && !Boolean(M.util.pending_js.length)) && (document.readyState === "complete")';
+    const PAGE_READY_JS = '(typeof M !== "undefined" && M.util && M.util.pending_js && !Boolean(M.util.pending_js.length)) && ' .
+        '(typeof testbridge !== "undefined" && testbridge.pending && testbridge.pending.length === 0) && ' .
+        '(document.readyState === "complete")';
 
     /**
      * Locates url, based on provided path.
@@ -762,8 +764,8 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
                     }
                 } else if (' . self::PAGE_READY_JS . ') {
                     return "";
-                } else if (typeof M.util !== "undefined") {
-                    return M.util.pending_js.join(":");
+                } else if (typeof M.util !== "undefined" && typeof testbridge !== "undefined" && testbridge.pending) {
+                    return M.util.pending_js.concat(testbridge.pending).join(":");
                 } else {
                     return "incomplete";
                 }
@@ -807,7 +809,9 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
         // number of JS pending code and JS completed code will not match and we will reach this point.
 
         // Totara: Append the list of pending_js to the exception message.
-        $get_pending_js = 'return "M" in window && "util" in M && "pending_js" in M.util ? M.util.pending_js : [];';
+        $get_pending_js = 'return "M" in window && "util" in M && "pending_js" in M.util && "testbridge" in window && testbridge.pending ' .
+            '? M.util.pending_js.concat(testbridge.pending) ' .
+            ': [];';
         try {
             $pending_js = ' (pending_js: ' . json_encode($this->getSession()->getDriver()->evaluateScript($get_pending_js), JSON_UNESCAPED_SLASHES | JSON_OBJECT_AS_ARRAY) . ')';
         } catch (\Behat\Mink\Exception\DriverException $ex) {
