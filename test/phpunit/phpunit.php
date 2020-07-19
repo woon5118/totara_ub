@@ -4,12 +4,69 @@ if (php_sapi_name() !== "cli") {
     die();
 }
 
+/**
+ * Return the PATH environment value.
+ *
+ * @return string[] array of [the_name_of_path, the_value_of_path]
+ */
+function getenvpath() {
+    $env = getenv();
+    foreach ($env as $name => $value) {
+        // On Windows, PATH is case insensitive, so it could be Path or paTH.
+        if (strcasecmp($name, 'PATH') === 0) {
+            return [$name, $value];
+        }
+    }
+    // In case PATH is not exported...
+    return ['PATH', ''];
+}
+
+/**
+ * Ported the following code to PHP as escapeshellarg is not what we want on Windows.
+ * https://blogs.msdn.microsoft.com/twistylittlepassagesallalike/2011/04/23/everyone-quotes-command-line-arguments-the-wrong-way/
+ *
+ * @param string $argument
+ * @param boolean $force
+ * @return string
+ */
+function argv_quote($argument, $force = false) {
+    if ($force == false && !empty($argument) && strpbrk($argument, " \t\n\v\"") === false) {
+        return $argument;
+    }
+
+    $commandline = '"';
+    $len = strlen($argument);
+    for ($i = 0; $i < $len; $i++) {
+        $numberBackslashes = 0;
+
+        while ($i < $len && substr($argument, $i, 1) === '\\') {
+            $i++;
+            $numberBackslashes++;
+        }
+
+        if ($i === $len) {
+            $commandline .= str_repeat('\\', $numberBackslashes * 2);
+            break;
+        }
+        $ch = substr($argument, $i, 1);
+        if ($ch === '"') {
+            $commandline .= str_repeat('\\', $numberBackslashes * 2 + 1);
+            $commandline .= $ch;
+        } else {
+            $commandline .= str_repeat('\\', $numberBackslashes);
+            $commandline .= $ch;
+        }
+    }
+    $commandline .= '"';
+    return $commandline;
+}
+
 // Update the environment to ensure the same PHP binary is used to run
 // the phpunit init script. This way we can be sure that all forked processes use
 // the same binary.
-$env = getenv();
-$env['PATH'] = PHP_BINARY . ':' . $env['PATH'];
-putenv('PATH='.$env['PATH']);
+$path = getenvpath();
+$pathdelim = DIRECTORY_SEPARATOR === "\\" ? ';' : ':';
+putenv($path[0] . '=' . PHP_BINARY . $pathdelim . $path[1]);
 
 // Collect the arguments provided to this script so that we can forward them to the correct script when ready.
 $passthrough = $argv;
@@ -77,12 +134,20 @@ foreach ($passthrough as &$arg) {
             $set_config_argument = false;
         }
     }
-    $arg = escapeshellarg($arg);
+    if (DIRECTORY_SEPARATOR === "\\") {
+        $arg = argv_quote($arg);
+    } else {
+        $arg = escapeshellarg($arg);
+    }
 }
 // The hack continued...
 if ($set_config_argument) {
     $passthrough[] = '-c';
-    $passthrough[] = realpath(__DIR__ . '/phpunit.xml');
+    if (DIRECTORY_SEPARATOR === "\\") {
+        $passthrough[] = argv_quote(realpath(__DIR__ . '/phpunit.xml'));
+    } else {
+        $passthrough[] = escapeshellarg(realpath(__DIR__ . '/phpunit.xml'));
+    }
 }
 
 passthru(escapeshellcmd($command) . ' '  . join(' ', $passthrough), $code);
