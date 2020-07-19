@@ -16,10 +16,11 @@
  * @module totara_core
  */
 
-/* global M */
-
-import amd from './amd';
-import pending from './pending';
+import {
+  loadStrings as rawLoadStrings,
+  getString as rawGetString,
+  hasString as rawHasString,
+} from './internal/lang_string_store';
 
 /**
  * Normalize component name for i18n API.
@@ -47,7 +48,9 @@ const normalizeComponent = component => {
  * @return {string}
  */
 export function getString(key, component, param) {
-  return M.util.get_string(key, component, param);
+  component = normalizeComponent(component);
+  const str = rawGetString(key, component);
+  return str ? replacePlaceholders(str, param) : `[[${key}, ${component}]]`;
 }
 
 /**
@@ -59,7 +62,7 @@ export function getString(key, component, param) {
  */
 export function hasString(key, component) {
   component = normalizeComponent(component);
-  return !!(M.str[component] && M.str[component][key]);
+  return !!rawHasString(key, component);
 }
 
 /**
@@ -73,15 +76,20 @@ export function unloadedStrings(requests) {
 }
 
 /**
- * Load all of the specified strings so that they are available on M.str.
+ * Load all of the specified strings so that they are available to use.
  *
  * @param {array} requests Array of format [{ component: 'foo', key: 'bar' }]
  */
 export async function loadStrings(requests) {
-  const done = pending('i18n-load-strings');
-  const str = await amd('core/str');
-  await str.get_strings(requests);
-  done();
+  return rawLoadStrings(
+    requests.map(x => {
+      const normalized = normalizeComponent(x.component);
+      if (normalized !== x.component) {
+        return Object.assign({}, x, { component: normalized });
+      }
+      return x;
+    })
+  );
 }
 
 let isRtlValue = null;
@@ -193,4 +201,20 @@ export function toVueRequirements(strings) {
     if (!obj[cmp].includes(str.key)) obj[cmp].push(str.key);
   });
   return obj;
+}
+
+/**
+ * Replace {$a} and {$a->prop} placeholders in string.
+ *
+ * @param {string} str
+ * @param {*} a
+ * @returns {string}
+ */
+function replacePlaceholders(str, a) {
+  if (!a) return str;
+  if (typeof a == 'object') {
+    return str.replace(/\{\$a->(.*?)\}/g, (full, prop) => a[prop] || full);
+  } else {
+    return str.replace(/\{\$a\}/g, a);
+  }
 }

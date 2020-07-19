@@ -22,49 +22,71 @@ import {
   unloadedStrings,
   loadStrings,
 } from 'tui/i18n';
-import amd from 'tui/amd';
+import {
+  loadStrings as rawLoadStrings,
+  getString as rawGetString,
+  hasString as rawHasString,
+} from 'tui/internal/lang_string_store';
 
-jest.mock('tui/amd');
-jest.mock('tui/pending');
+jest.unmock('tui/i18n');
+jest.mock('tui/internal/lang_string_store');
 
-const M = (global.M = {
-  util: {
-    get_string: jest.fn((...args) => args.join(',')),
-  },
-  str: {
-    foo: {
-      bar: 'baz',
-    },
-  },
+beforeEach(() => {
+  rawLoadStrings.mockClear();
+  rawGetString.mockClear();
+  rawHasString.mockClear();
 });
 
-const coreStr = {
-  get_strings: jest.fn(x => x),
-};
-
-amd.__setMock('core/str', coreStr);
-
 describe('getString', () => {
-  it('wraps M.util.get_string', () => {
-    expect(getString('a', 'b', 'c')).toBe('a,b,c');
-    expect(M.util.get_string).toHaveBeenCalledWith('a', 'b', 'c');
-    expect(getString('d', 'e')).toBe('d,e,');
-    expect(M.util.get_string).toHaveBeenCalledWith('d', 'e', undefined);
-    expect(getString('f')).toBe('f,,');
-    expect(M.util.get_string).toHaveBeenCalledWith('f', undefined, undefined);
+  it('wraps raw', () => {
+    expect(getString('bar', 'foo', 'c')).toBe('baz');
+    expect(rawGetString).toHaveBeenCalledWith('bar', 'foo');
+    expect(getString('baz', 'foo')).toBe('qux');
+    expect(rawGetString).toHaveBeenCalledWith('baz', 'foo');
+  });
+
+  it('replaces placeholders', () => {
+    expect(getString('replace', 'foo', 'bob')).toBe('hello bob');
+    expect(rawGetString).toHaveBeenCalledWith('replace', 'foo');
+    expect(
+      getString('replace_complex', 'foo', { name: 'bob', weather: 'sunny' })
+    ).toBe('hello bob, today is sunny');
+    expect(rawGetString).toHaveBeenCalledWith('replace_complex', 'foo');
+    expect(getString('replace_complex', 'foo', { name: 'bob' })).toBe(
+      'hello bob, today is {$a->weather}'
+    );
+  });
+
+  it('normalizes component', () => {
+    expect(getString('save', 'core')).toBe('Save');
+    expect(rawGetString).toHaveBeenCalledWith('save', 'moodle');
+    expect(getString('save')).toBe('Save');
+    expect(rawGetString).toHaveBeenCalledWith('save', 'moodle');
   });
 });
 
 describe('hasString', () => {
-  it('wraps checks for presence in M.str', () => {
+  it('wraps raw', () => {
     expect(hasString('bar', 'foo')).toBe(true);
+    expect(rawHasString).toHaveBeenCalledWith('bar', 'foo');
     expect(hasString('bar', 'a')).toBe(false);
+    expect(rawHasString).toHaveBeenCalledWith('bar', 'a');
     expect(hasString('b', 'foo')).toBe(false);
+    expect(rawHasString).toHaveBeenCalledWith('b', 'foo');
+  });
+
+  it('normalizes component', () => {
+    expect(hasString('f', 'core')).toBe(false);
+    expect(rawHasString).toHaveBeenCalledWith('f', 'moodle');
+    expect(hasString('save', 'core')).toBe(true);
+    expect(rawHasString).toHaveBeenCalledWith('save', 'moodle');
+    expect(hasString('f')).toBe(false);
+    expect(rawHasString).toHaveBeenCalledWith('f', 'moodle');
   });
 });
 
 describe('unloadedStrings', () => {
-  it('filters out strings which are present in M.str', () => {
+  it('filters out strings which are already loaded', () => {
     expect(
       unloadedStrings([
         {
@@ -83,12 +105,31 @@ describe('unloadedStrings', () => {
       },
     ]);
   });
+
+  it('normalizes component', () => {
+    expect(
+      unloadedStrings([
+        {
+          component: 'core',
+          key: 'save',
+        },
+      ])
+    ).toEqual([]);
+  });
 });
 
 describe('loadStrings', () => {
-  it("calls amd('core/str').get_strings with the provided strings", async () => {
+  it('calls raw loadStrings with the provided strings', async () => {
     const requests = [{ component: 'a', key: 'b' }];
     expect(await loadStrings(requests)).toBe(undefined);
-    expect(coreStr.get_strings).toHaveBeenCalledWith(requests);
+    expect(rawLoadStrings).toHaveBeenCalledWith(requests);
+  });
+
+  it('normalizes', async () => {
+    const requests = [{ component: 'core', key: 'save' }];
+    expect(await loadStrings(requests)).toBe(undefined);
+    expect(rawLoadStrings).toHaveBeenCalledWith([
+      { component: 'moodle', key: 'save' },
+    ]);
   });
 });
