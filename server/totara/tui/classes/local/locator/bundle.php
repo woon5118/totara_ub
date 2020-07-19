@@ -60,7 +60,7 @@ final class bundle {
     /**
      * The directory containing loadable bundles, relative to $CFG->srcroot
      */
-    private const SOURCE_DIRECTORY = '/client/build';
+    private const SOURCE_DIRECTORY = DIRECTORY_SEPARATOR.'client'.DIRECTORY_SEPARATOR.'build';
 
     /**
      * A singleton.
@@ -522,8 +522,9 @@ final class bundle {
      * @param string $path_absolute
      */
     private function add_bundle_scss_file_to_map(string $bundle, string $suffix, string $path_relative, string $path_absolute) {
-        if (strpos($path_relative, 'styles/') === 0) {
-            $path_relative = substr($path_relative, strlen('styles/'));
+
+        if (strpos($path_relative, 'styles' . DIRECTORY_SEPARATOR) === 0) {
+            $path_relative = substr($path_relative, strlen('styles' . DIRECTORY_SEPARATOR));
             $this->map_scss_imports[$bundle][$suffix][$path_relative] = $path_absolute;
         } else if ($path_relative === 'tui_bundle.scss') {
             $this->map_bundle_scss[$bundle][$suffix] = $path_absolute;
