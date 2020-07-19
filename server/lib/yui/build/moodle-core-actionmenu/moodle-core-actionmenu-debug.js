@@ -534,6 +534,7 @@ ACTIONMENU.prototype = {
 
         Y.io(url, {
             method: 'POST',
+            /* global build_querystring:false */
             data: build_querystring(params),
             context: this,
             on: {

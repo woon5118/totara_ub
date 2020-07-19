@@ -189,8 +189,8 @@ Y.extend(MOODLECALENDAR, Y.Calendar, {
             // Totara: TL-14954 Use a custom headerRenderer to display the translated month names
             this.set("strings.long_months", cfg.MONTHS_LONG);
             this.set('headerRenderer', function(obj, baseDate) {
-                monthnames = this.get("strings.long_months");
-                m = obj.getMonth();
+                var monthnames = this.get("strings.long_months");
+                var m = obj.getMonth();
                 return monthnames[m];
             });
         }

@@ -26,6 +26,8 @@ YUI.add('moodle-totara_reportbuilder-graphicalreporting', function (Y, NAME) {
 M.reportbuilder = M.reportbuilder || {};
 var NS = M.reportbuilder.graphicalreport = M.reportbuilder.graphicalreport || {};
 
+/* global $:false */
+
 NS.init = function() {
     $('form').on('change', '#id_type', this.handletypechange);
     $('form').on('change', '#id_orientation', this.handleorientationchange);
