@@ -21,7 +21,6 @@
  * @package totara_tui
  *
  * @var moodle_page $PAGE
- * @var core_renderer $OUTPUT
  */
 
 require(__DIR__ . '/../../config.php');

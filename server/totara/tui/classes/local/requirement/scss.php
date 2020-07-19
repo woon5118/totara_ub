@@ -87,6 +87,6 @@ final class scss extends requirement {
     }
 
     public function required(): bool {
-        return !is_null(bundle::get_css_component_bundle($this->component));
+        return !is_null(bundle::get_bundle_css_file($this->component));
     }
 }

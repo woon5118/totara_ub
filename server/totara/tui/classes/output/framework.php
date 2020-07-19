@@ -23,6 +23,7 @@
 
 namespace totara_tui\output;
 
+use totara_tui\local\locator\bundle;
 use totara_tui\local\requirement;
 
 /**
@@ -215,11 +216,9 @@ final class framework implements \core\output\framework_manager {
         $this->final_component_state[$bundle] = false;
 
         // process every dependency
-        $deps = \core_component::get_tui_dependencies($bundle);
-        if ($deps !== null) {
-            foreach ($deps as $dependency) {
-                $this->get_final_components_visit($dependency, $bundle);
-            }
+        $dependencies = bundle::get_bundle_dependencies($bundle);
+        foreach ($dependencies as $dependency) {
+            $this->get_final_components_visit($dependency, $bundle);
         }
 
         // mark the bundle as processed

@@ -11,13 +11,18 @@ final class bundle {
     private const SUFFIX_DEVELOPMENT = '.development';
     private const SUFFIX_DEVELOPMENT_LEGACY = '.legacy.development';
 
-    const EXT_JS = '.js';
-    const EXT_SCSS = '.scss';
+    /**
+     * The directory containing loadable bundles, relative to $CFG->srcroot
+     */
+    private const SOURCE_DIRECTORY = '/client/build';
 
     private static $instance;
-    private $bundle_map = null;
-    private $styles_map = null;
-    private $import_map = null;
+    private $map_initialised = false;
+    private $map_bundle_js = [];
+    private $map_bundle_scss = [];
+    private $map_scss_imports = [];
+    private $map_vendors_js = null;
+    private $map_bundle_dependencies = [];
 
     private static $map_file_to_param = [
         self::SUFFIX_PRODUCTION => 'p',
@@ -26,73 +31,28 @@ final class bundle {
         self::SUFFIX_DEVELOPMENT_LEGACY => 'dl',
     ];
 
-    private static $extensions = [
-        self::EXT_JS,
-        self::EXT_SCSS,
-    ];
-
-    public static function get_js_component_bundle(string $component): ?string {
-        if (debugging() && $component !== clean_param($component, PARAM_COMPONENT)) {
-            throw new \coding_exception('Invalid component provided.', $component);
-        }
-        $instance = self::instance();
-        $bundle = $instance->find_component_bundle($component);
-        if ($bundle === null || !isset($bundle[self::EXT_JS])) {
-            return null;
-        }
-        return $bundle[self::EXT_JS];
+    public static function get_bundle_js_file(string $bundle): ?string {
+        return self::instance()->resolve_bundle_js($bundle);
     }
 
-    public static function get_css_component_bundle(string $component): ?string {
-        if (debugging() && $component !== clean_param($component, PARAM_SAFEDIR)) {
-            throw new \coding_exception('Invalid component provided.');
-        }
-        $instance = self::instance();
-        $bundle = $instance->find_component_bundle($component);
-        if ($bundle === null || !isset($bundle[self::EXT_SCSS])) {
-            return null;
-        }
-        return $bundle[self::EXT_SCSS];
+    public static function get_bundle_css_file(string $bundle): ?string {
+        return self::instance()->resolve_bundle_scss($bundle);
     }
 
-    public static function get_variables_for_component(string $component) {
-        if (debugging() && $component !== clean_param($component, PARAM_SAFEDIR)) {
-            throw new \coding_exception('Invalid component provided.');
-        }
-        $instance = self::instance();
-        $instance->ensure_map_generated();
-        if (!isset($instance->styles_map[$component])) {
-            return null;
-        }
-        $key = '_variables.scss';
-        foreach (self::get_css_suffix_for_file() as $suffix) {
-            if (isset($instance->styles_map[$component][$suffix][$key])) {
-                return $instance->styles_map[$component][$suffix][$key];
-            }
-        }
-        return null;
+    public static function get_bundle_css_variables_file(string $bundle) {
+        return self::instance()->resolve_style_import($bundle, '_variables.scss');
     }
 
-    public static function get_vendor_bundle(): ?string {
-        $path = self::component_build_directory_client(framework::COMPONENT) . 'vendors';
-        foreach (self::get_js_suffix_for_file() as $suffix) {
-            $file = $path . $suffix . self::EXT_JS;
-            if (file_exists($file)) {
-                return $file;
-            }
-        }
-        return null;
+    public static function get_vendors_file(): ?string {
+        return self::instance()->resolve_vendor_js();
     }
 
-    public static function get_style_file_in_component($component, $path) {
-        $instance = self::instance();
-        $instance->ensure_map_generated();
-        foreach (self::get_js_suffix_for_file() as $suffix) {
-            if (isset($instance->styles_map[$component][$suffix][$path])) {
-                return $instance->styles_map[$component][$suffix][$path];
-            }
-        }
-        return null;
+    public static function get_style_scss_file($bundle, $importpath): ?string {
+        return self::instance()->resolve_style_import($bundle, $importpath);
+    }
+
+    public static function get_bundle_dependencies($bundle): array {
+        return self::instance()->resolve_bundle_dependencies($bundle);
     }
 
     public static function reset() {
@@ -110,26 +70,60 @@ final class bundle {
         // Static methods only.
     }
 
-    private static function component_build_directory_server(string $component, string $directory_component = null) {
-        if ($directory_component === null) {
-            $directory_component = \core_component::get_component_directory($component);
-        }
-        return $directory_component . '/tui/build/';
-    }
-
-    private static function component_build_directory_client(string $component) {
+    private static function anticipated_bundle_location(string $bundle): string {
         global $CFG;
-        return $CFG->srcroot . '/client/build/' . $component . '/';
+        if ($bundle !== clean_param($bundle, PARAM_SAFEDIR)) {
+            throw new \coding_exception('Invalid bundle name provided.');
+        }
+        return $CFG->srcroot . self::SOURCE_DIRECTORY . DIRECTORY_SEPARATOR . $bundle;
     }
 
-    private function find_component_bundle(string $component): ?array {
+    private function resolve_bundle_js(string $bundle): ?string {
         $this->ensure_map_generated();
         foreach (self::get_js_suffix_for_file() as $suffix) {
-            if (isset($this->bundle_map[$component][$suffix])) {
-                return $this->bundle_map[$component][$suffix];
+            if (isset($this->map_bundle_js[$bundle][$suffix])) {
+                return $this->map_bundle_js[$bundle][$suffix];
             }
         }
         return null;
+    }
+
+    private function resolve_bundle_scss(string $bundle): ?string {
+        $this->ensure_map_generated();
+        foreach (self::get_css_suffix_for_file() as $suffix) {
+            if (isset($this->map_bundle_scss[$bundle][$suffix])) {
+                return $this->map_bundle_scss[$bundle][$suffix];
+            }
+        }
+        return null;
+    }
+
+    private function resolve_vendor_js(): ?string {
+        $this->ensure_map_generated();
+        foreach (self::get_js_suffix_for_file() as $suffix) {
+            if (isset($this->map_vendors_js[$suffix])) {
+                return $this->map_vendors_js[$suffix];
+            }
+        }
+        return null;
+    }
+
+    private function resolve_style_import(string $bundle, string $import) {
+        $this->ensure_map_generated();
+        foreach (self::get_css_suffix_for_file() as $suffix) {
+            if (isset($this->map_scss_imports[$bundle][$suffix][$import])) {
+                return $this->map_scss_imports[$bundle][$suffix][$import];
+            }
+        }
+        return null;
+    }
+
+    private function resolve_bundle_dependencies(string $bundle): array {
+        $this->ensure_map_generated();
+        if (isset($this->map_bundle_dependencies[$bundle])) {
+            return $this->map_bundle_dependencies[$bundle];
+        }
+        return [];
     }
 
     public static function get_js_suffix_for_url() {
@@ -224,90 +218,99 @@ final class bundle {
     private function ensure_map_generated() {
         global $CFG;
 
-        if ($this->bundle_map !== null) {
+        if ($this->map_initialised) {
             return;
         }
+        $this->map_initialised = true;
 
-        $this->bundle_map = [];
-        $this->import_map = [];
-        $this->styles_map = [];
+        $bundles = [];
+        $suffixes = [];
+        $suffixes_imports = [
 
-        self::load_for_component('core', "$CFG->dirroot/lib/classes");
+        ];
+        foreach (array_keys(self::$map_file_to_param) as $suffix) {
+            $suffixes[$suffix] = null;
+            $suffixes_imports[$suffix] = [];
+        }
 
-        foreach (\core_component::get_core_subsystems() as $subsystem => $fulldir) {
-            if (!$fulldir) {
+        $directory = $CFG->srcroot . self::SOURCE_DIRECTORY;
+        if (!is_readable($directory) || !is_dir($directory)) {
+            throw new \coding_exception('Unable to read bundle directory');
+        }
+        $directory_iterator = new \DirectoryIterator($directory);
+        foreach ($directory_iterator as $file) {
+            /** @var \SplFileInfo $file */
+            if ($file->isDot() || !$file->isDir()) {
                 continue;
             }
-            self::load_for_component('core_'.$subsystem, $fulldir);
+            $bundles[] = $file->getFilename();
         }
 
-        foreach (\core_component::get_plugin_types() as $plugintype => $plugintype_dir) {
-            foreach (\core_component::get_plugin_list($plugintype) as $pluginname => $fulldir) {
-                self::load_for_component($plugintype.'_'.$pluginname, $fulldir);
-            }
+        foreach ($bundles as $bundle) {
+            $this->map_bundle_js[$bundle] = $suffixes;
+            $this->map_bundle_scss[$bundle] = $suffixes;
+            $this->map_scss_imports[$bundle] = $suffixes_imports;
+            $this->map_bundle_dependencies[$bundle] = [];
+            $this->map_bundle($bundle);
         }
     }
 
-    private function load_for_component(string $component, string $directory) {
-        // Load client resources first. They will be overridden by server resources.
-        $client_build_directory = self::component_build_directory_client($component);
-        if (file_exists($client_build_directory)) {
-            $this->load_bundles_for_component($component, $client_build_directory);
-            $this->load_styles_for_component($component, $client_build_directory);
+    private function map_bundle(string $bundle) {
+        $imports = [];
+        foreach (array_keys(self::$map_file_to_param) as $suffix) {
+            $imports[$suffix] = [];
         }
-    }
 
-    private function load_bundles_for_component(string $component, string $directory_build) {
-        $expected_files = [
-            'tui_bundle',
-        ];
-        $filesuffixes = array_keys(self::$map_file_to_param);
-        foreach ($expected_files as $expected_file) {
-            foreach ($filesuffixes as $suffix) {
-                foreach (self::$extensions as $extension) {
-                    $candidate_file =  $directory_build . $expected_file . $suffix . $extension;
-                    if (file_exists($candidate_file)) {
-                        $this->bundle_map[$component][$suffix][$extension] = $candidate_file;
-                    }
-                }
-            }
+        $directory_build = self::anticipated_bundle_location($bundle);
+        if (!file_exists($directory_build) || !is_readable($directory_build)) {
+            return $imports;
         }
-    }
 
-    private function load_styles_for_component(string $component, string $directory_build) {
-        $directory_styles = $directory_build . 'styles/';
-        if (!file_exists($directory_styles)) {
-            return;
-        }
         $iterator = new \RegexIterator(
             new \RecursiveIteratorIterator(
-                new \RecursiveDirectoryIterator($directory_styles),
+                new \RecursiveDirectoryIterator($directory_build),
                 \RecursiveIteratorIterator::SELF_FIRST
             ),
-            '/^.+\.scss$/',
+            '/^.+?(?<suffix>(.legacy)?\.development)?(?<extension>\.(scss|js|json))$/',
             \RecursiveRegexIterator::GET_MATCH
         );
-        $length_directory_styles = strlen($directory_styles);
-        $filesuffixes = array_keys(self::$map_file_to_param);
+        $length_directory_styles = strlen($directory_build) + 1;
 
-        foreach ($iterator as $files_absolute) {
-            foreach ($files_absolute as $file_absolute) {
-                $file_relative = substr($file_absolute, $length_directory_styles);
-                $file = basename($file_relative);
-                $filename = substr($file, 0, -5);
+        foreach ($iterator as $fileinfo) {
+            $file_absolute = $fileinfo[0];
+            $file_extension = $fileinfo['extension'];
+            $file_suffix = $fileinfo['suffix'];
+            $file_basename = basename($file_absolute);
+            $file_relative = substr($file_absolute, $length_directory_styles, -(strlen($file_suffix . $file_extension))) . $file_extension;
 
-                $suffixpos = strpos($filename, '.');
-                if (!$suffixpos) {
-                    $suffix = '';
-                } else {
-                    $suffix = substr($filename, $suffixpos);
-                }
-                $file_relative = substr($file_relative, 0, -(strlen($suffix . '.scss'))) . '.scss';
-                if (!in_array($suffix, $filesuffixes)) {
-                    debugging('Unexpected suffix encountered in styles directory: ' .$suffix, DEBUG_DEVELOPER);
-                    continue;
-                }
-                $this->styles_map[$component][$suffix][$file_relative] = $file_absolute;
+            switch ($file_extension) {
+                case '.scss':
+                    if (strpos($file_relative, 'styles/') === 0) {
+                        $file_relative = substr($file_relative, strlen('styles/'));
+                        $this->map_scss_imports[$bundle][$file_suffix][$file_relative] = $file_absolute;
+                    } else if ($file_relative === 'tui_bundle.scss') {
+                        $this->map_bundle_scss[$bundle][$file_suffix] = $file_absolute;
+                    } else {
+                        debugging('Unable to map SCSS file ' . $file_absolute, DEBUG_DEVELOPER);
+                    }
+                    break;
+                case '.js':
+                    if ($bundle === framework::COMPONENT && $file_relative === 'vendors.js') {
+                        $this->map_vendors_js[$file_suffix] = $file_absolute;
+                        break;
+                    }
+                    $this->map_bundle_js[$bundle][$file_suffix] = $file_absolute;
+                    break;
+                case '.json':
+                    if ($file_relative === 'dependencies.json') {
+                        $this->map_bundle_dependencies[$bundle] = [];
+                        $json = file_get_contents($file_absolute);
+                        $data = @json_decode($json);
+                        foreach ($data->dependencies as $dependency) {
+                            $this->map_bundle_dependencies[$bundle][] = $dependency->name;
+                        }
+                    }
+                    break;
             }
         }
     }

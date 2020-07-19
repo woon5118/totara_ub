@@ -70,9 +70,9 @@ $candidate = $CFG->localcachedir.'/totara_tui-javascript/'.$etag;
 $cache = ($rev > 0 and $rev < (time() + 60*60));
 
 if ($component === 'vendors') {
-    $file = \totara_tui\local\locator\bundle::get_vendor_bundle();
+    $file = \totara_tui\local\locator\bundle::get_vendors_file();
 } else {
-    $file = \totara_tui\local\locator\bundle::get_js_component_bundle($component);
+    $file = \totara_tui\local\locator\bundle::get_bundle_js_file($component);
 }
 
 if ($cache) {

@@ -67,6 +67,6 @@ final class js extends requirement {
     }
 
     public function required(): bool {
-        return !is_null(bundle::get_js_component_bundle($this->component));
+        return !is_null(bundle::get_bundle_js_file($this->component));
     }
 }

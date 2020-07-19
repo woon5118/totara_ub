@@ -466,9 +466,6 @@ $cache = '.var_export($cache, true).';
         global $CFG;
 
         // NOTE: Any additions here must be verified to not collide with existing add-on modules and subplugins!!!
-
-        // Totara: please run totara/core/dev/generate_tui_data.php after updating this list to generate data for frontend
-
         $info = array(
             'access'      => null,
             'admin'       => $CFG->dirroot.'/'.$CFG->admin,
@@ -551,8 +548,6 @@ $cache = '.var_export($cache, true).';
      */
     protected static function fetch_plugintypes() {
         global $CFG;
-
-        // Totara: please run totara/core/dev/generate_tui_data.php after updating this list to generate data for frontend
 
         $types = array(
             'antivirus'     => $CFG->dirroot . '/lib/antivirus',
@@ -1322,22 +1317,6 @@ $cache = '.var_export($cache, true).';
         }
 
         return sha1(serialize($versions));
-    }
-
-    /**
-     * Get a list of all components that are a dependency of the provided
-     * component's TUI bundle.
-     *
-     * @param string $component
-     * @return string[]|null
-     */
-    public static function get_tui_dependencies(string $component) {
-        if (!$component) {
-            return null;
-        }
-        $dir = self::get_component_directory($component);
-        $plugin = core_component::load_version_file($dir.'/version.php');
-        return $plugin->tuidependencies ?? null;
     }
 
     /**

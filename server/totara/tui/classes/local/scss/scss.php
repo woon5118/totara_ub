@@ -289,16 +289,16 @@ class scss {
             return null;
         }
 
-        $bundle = false;
+        $wants_bundle = false;
         $parts = explode('/', $url, 2);
         if (count($parts) === 1) {
-            $bundle = true;
+            $wants_bundle = true;
             $parts[] = '';
         } if (count($parts) != 2) {
             return null;
         }
 
-        list($component, $path) = $parts;
+        list($bundle, $path) = $parts;
         unset($parts); // Don't be tempted to abuse me.
 
         if (substr($path, 0, 1) === '@') {
@@ -306,23 +306,29 @@ class scss {
             $path = substr($path, 1);
         }
 
-        if ($component !== clean_param($component, PARAM_COMPONENT)) {
-            throw new \coding_exception('Import does not reference a valid param', $component);
+        if ($bundle !== clean_param($bundle, PARAM_SAFEPATH)) {
+            throw new \coding_exception('Import does not reference a valid bundle', $bundle);
         }
         if ($path !== clean_param($path, PARAM_SAFEPATH)) {
             throw new \coding_exception('Import does not reference a valid path', $path);
         }
 
-        if ($bundle) {
-            return bundle::get_css_component_bundle($component);
+        if ($wants_bundle) {
+            return bundle::get_bundle_css_file($bundle);
         }
 
-        $bundle = bundle::get_style_file_in_component($component, $path . '.scss');
-        if ($bundle) {
-            return $bundle;
+        $file = bundle::get_style_scss_file($bundle, $path . '.scss');
+        if ($file) {
+            return $file;
         }
         $altpath = preg_replace('/[^\/]+$/', '_\0', $path);
-        return bundle::get_style_file_in_component($component, $altpath . '.scss');
+        $file = bundle::get_style_scss_file($bundle, $altpath . '.scss');
+
+        if (!$file) {
+            debugging('Unable to resolve import ' . $path, DEBUG_DEVELOPER);
+        }
+
+        return $file;
     }
 
     /**
@@ -347,11 +353,11 @@ class scss {
             'scss' => [],
             'variables' => [],
         ];
-        $bundle = bundle::get_css_component_bundle($component);
+        $bundle = bundle::get_bundle_css_file($component);
         if ($bundle) {
             $cssfiles['scss']['bundle'] = $bundle;
         }
-        $bundle = bundle::get_variables_for_component($component);
+        $bundle = bundle::get_bundle_css_variables_file($component);
         if ($bundle) {
             $cssfiles['variables']['_variables'] = $bundle;
         }

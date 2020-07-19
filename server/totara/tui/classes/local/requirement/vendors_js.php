@@ -62,6 +62,6 @@ final class vendors_js extends requirement {
     }
 
     public function required(): bool {
-        return !is_null(bundle::get_vendor_bundle());
+        return !is_null(bundle::get_vendors_file());
     }
 }
