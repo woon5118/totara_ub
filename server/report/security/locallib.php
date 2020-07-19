@@ -43,7 +43,6 @@ function report_security_get_issue_list() {
     $result = array(
         'report_security_check_unsecuredataroot',
         'report_security_check_displayerrors',
-        'report_security_check_vendordir',
         'report_security_check_nodemodules',
         'report_security_check_noauth',
         'report_security_check_embed',
@@ -1150,37 +1149,6 @@ function report_security_check_repositoryurl($detailed = false) {
 
     if ($detailed) {
         $result->details = get_string('check_repositoryurl_details', 'report_security');
-    }
-
-    return $result;
-}
-
-/**
- * Check the presence of the vendor directory.
- *
- * @param bool $detailed Return detailed info.
- * @return object Result data.
- */
-function report_security_check_vendordir($detailed = false) {
-    global $CFG;
-
-    $result = (object)[
-        'issue' => 'report_security_check_vendordir',
-        'name' => get_string('check_vendordir_name', 'report_security'),
-        'info' => get_string('check_vendordir_info', 'report_security'),
-        'details' => null,
-        'status' => null,
-        'link' => null,
-    ];
-
-    if (is_dir($CFG->dirroot.'/vendor')) {
-        $result->status = REPORT_SECURITY_WARNING;
-    } else {
-        $result->status = REPORT_SECURITY_OK;
-    }
-
-    if ($detailed) {
-        $result->details = get_string('check_vendordir_details', 'report_security', ['path' => $CFG->dirroot.'/vendor']);
     }
 
     return $result;
