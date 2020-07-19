@@ -25,7 +25,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 
-require_once($CFG->admin . '/tool/totara_sync/locallib.php');
+require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/totara_sync/locallib.php');
 
 /**
  * @group tool_totara_sync

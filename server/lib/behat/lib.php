@@ -163,7 +163,7 @@ function behat_clean_init_config() {
     global $CFG;
 
     $allowed = array_flip(array(
-        'wwwroot', 'dataroot', 'dirroot', 'admin', 'directorypermissions', 'filepermissions',
+        'wwwroot', 'dataroot', 'dirroot', 'srcroot', 'admin', 'directorypermissions', 'filepermissions',
         'umaskpermissions', 'dbtype', 'dblibrary', 'dbhost', 'dbname', 'dbuser', 'dbpass', 'prefix',
         'dboptions', 'proxyhost', 'proxyport', 'proxytype', 'proxyuser', 'proxypassword',
         'proxybypass', 'theme', 'pathtogs', 'pathtodu', 'aspellpath', 'pathtodot', 'skiplangupgrade',
@@ -448,7 +448,14 @@ function behat_get_run_process() {
  * @return array list of processes.
  */
 function cli_execute_parallel($cmds, $cwd = null, $delay = 0) {
-    require_once(__DIR__ . "/../../vendor/autoload.php");
+
+    if (defined('TOOL_BEHAT_DIR_VENDOR')) {
+        require_once(TOOL_BEHAT_DIR_VENDOR . "/autoload.php");
+    } else {
+        // Guessi it.
+        require_once(__DIR__ . "/../../../vendor/autoload.php");
+    }
+
 
     $processes = array();
 

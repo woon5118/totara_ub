@@ -25,10 +25,13 @@ if (isset($_SERVER['REMOTE_ADDR'])) {
     die; // no access from web!
 }
 
-require_once(__DIR__.'/../../../../lib/clilib.php');
-require_once(__DIR__.'/../../../../lib/phpunit/bootstraplib.php');
-require_once(__DIR__.'/../../../../lib/testing/lib.php');
-require_once(__DIR__.'/../../../../vendor/autoload.php');
+define('TOOL_PHPUNIT_DIR_SERVER', realpath(__DIR__.'/../../../..'));
+define('TOOL_PHPUNIT_DIR_VENDOR', realpath(__DIR__.'/../../../../../vendor'));
+
+require_once(TOOL_PHPUNIT_DIR_SERVER . '/lib/clilib.php');
+require_once(TOOL_PHPUNIT_DIR_SERVER . '/lib/phpunit/bootstraplib.php');
+require_once(TOOL_PHPUNIT_DIR_SERVER . '/lib/testing/lib.php');
+require_once(TOOL_PHPUNIT_DIR_VENDOR . '/vendor/autoload.php');
 
 // now get cli options
 list($options, $unrecognized) = cli_get_params(

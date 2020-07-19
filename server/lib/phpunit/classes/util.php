@@ -573,7 +573,7 @@ class phpunit_util extends testing_util {
     }
 
     /**
-     * Builds dirroot/phpunit.xml and dataroot/phpunit/webrunner.xml files using defaults from /phpunit.xml.dist
+     * Builds srcroot/phpunit.xml files using defaults from /phpunit.xml.dist
      * @static
      * @return bool true means main config file created, false means only dataroot file created
      */
@@ -584,7 +584,7 @@ class phpunit_util extends testing_util {
         <testsuite name="@component@_testsuite">
             <directory suffix="_test.php">@dir@</directory>
         </testsuite>';
-        $data = file_get_contents("$CFG->dirroot/phpunit.xml.dist");
+        $data = file_get_contents("$CFG->srcroot/phpunit.xml.dist");
 
         $suites = '';
 
@@ -597,7 +597,7 @@ class phpunit_util extends testing_util {
                 if (!file_exists("$fullplug/tests/")) {
                     continue;
                 }
-                $dir = substr($fullplug, strlen($CFG->dirroot)+1);
+                $dir = substr($fullplug, strlen($CFG->srcroot)+1);
                 $dir .= '/tests';
                 $component = $type.'_'.$plug;
 
@@ -611,9 +611,9 @@ class phpunit_util extends testing_util {
         $data = preg_replace('|<!--@plugin_suites_start@-->.*<!--@plugin_suites_end@-->|s', $suites, $data, 1);
 
         $result = false;
-        if (is_writable($CFG->dirroot)) {
-            if ($result = file_put_contents("$CFG->dirroot/phpunit.xml", $data)) {
-                testing_fix_file_permissions("$CFG->dirroot/phpunit.xml");
+        if (is_writable($CFG->srcroot)) {
+            if ($result = file_put_contents("$CFG->srcroot/phpunit.xml", $data)) {
+                testing_fix_file_permissions("$CFG->srcroot/phpunit.xml");
             }
         }
 
@@ -658,7 +658,7 @@ class phpunit_util extends testing_util {
         $sequencestart = 100000 + mt_rand(0, 99) * 1000;
 
         // Use the upstream file as source for the distributed configurations
-        $ftemplate = file_get_contents("$CFG->dirroot/phpunit.xml.dist");
+        $ftemplate = file_get_contents("$CFG->srcroot/phpunit.xml.dist");
         $ftemplate = preg_replace('|<!--All core suites.*</testsuites>|s', '<!--@component_suite@-->', $ftemplate);
 
         // Gets all the components with tests
@@ -678,7 +678,7 @@ class phpunit_util extends testing_util {
                 $fcontents);
 
             // fix link to schema
-            $level = substr_count(str_replace('\\', '/', $cpath), '/') - substr_count(str_replace('\\', '/', $CFG->dirroot), '/');
+            $level = substr_count(str_replace('\\', '/', $cpath), '/') - substr_count(str_replace('\\', '/', $CFG->srcroot), '/');
             $fcontents = str_replace('lib/phpunit/', str_repeat('../', $level).'lib/phpunit/', $fcontents);
 
             // Write the file

@@ -30,9 +30,12 @@ if (isset($_SERVER['REMOTE_ADDR'])) {
 
 define('IGNORE_COMPONENT_CACHE', true);
 
-require_once(__DIR__.'/../../../../lib/clilib.php');
-require_once(__DIR__.'/../../../../lib/phpunit/bootstraplib.php');
-require_once(__DIR__.'/../../../../lib/testing/lib.php');
+define('TOOL_PHPUNIT_DIR_SERVER', realpath(__DIR__.'/../../../..'));
+define('TOOL_PHPUNIT_DIR_VENDOR', realpath(__DIR__.'/../../../../../vendor'));
+
+require_once(TOOL_PHPUNIT_DIR_SERVER . '/lib/clilib.php');
+require_once(TOOL_PHPUNIT_DIR_SERVER . '/lib/phpunit/bootstraplib.php');
+require_once(TOOL_PHPUNIT_DIR_SERVER . '/lib/testing/lib.php');
 
 // now get cli options
 list($options, $unrecognized) = cli_get_params(
@@ -51,9 +54,9 @@ list($options, $unrecognized) = cli_get_params(
     )
 );
 
-if (file_exists(__DIR__.'/../../../../vendor/phpunit/phpunit/composer.json')) {
+if (file_exists(TOOL_PHPUNIT_DIR_VENDOR . '/phpunit/phpunit/composer.json')) {
     // Composer packages present.
-    require_once(__DIR__.'/../../../../vendor/autoload.php');
+    require_once(TOOL_PHPUNIT_DIR_VENDOR. '/autoload.php');
 
 } else {
     // Note: installation via PEAR is not supported any more.
@@ -84,7 +87,7 @@ if ($options['run']) {
 define('CACHE_DISABLE_ALL', true); // Totara: do not cache anything!
 define('PHPUNIT_UTIL', true);
 
-require(__DIR__ . '/../../../../lib/phpunit/bootstrap.php');
+require(TOOL_PHPUNIT_DIR_SERVER . '/lib/phpunit/bootstrap.php');
 
 // from now on this is a regular moodle CLI_SCRIPT
 
@@ -137,7 +140,7 @@ if ($diag) {
     if (phpunit_util::build_config_file()) {
         exit(0);
     } else {
-        phpunit_bootstrap_error(PHPUNIT_EXITCODE_CONFIGWARNING, 'Can not create main /phpunit.xml configuration file, verify dirroot permissions');
+        phpunit_bootstrap_error(PHPUNIT_EXITCODE_CONFIGWARNING, 'Can not create main /phpunit.xml configuration file, verify srcroot permissions');
     }
 
 } else if ($buildcomponentconfigs) {

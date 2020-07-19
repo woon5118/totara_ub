@@ -583,7 +583,7 @@ abstract class base_testcase extends \PHPUnit\Framework\TestCase {
      */
     public static function get_profiling_filepath_method() {
         global $DB;
-        return __DIR__ . '/../../../phpunit_profile_methods_' . $DB->get_dbfamily() . '.csv';
+        return __DIR__ . '/../../../../phpunit_profile_methods_' . $DB->get_dbfamily() . '.csv';
     }
 
     /**
@@ -592,7 +592,7 @@ abstract class base_testcase extends \PHPUnit\Framework\TestCase {
      */
     public static function get_profiling_filepath_class() {
         global $DB;
-        return __DIR__ . '/../../../phpunit_profile_classes_' . $DB->get_dbfamily() . '.csv';
+        return __DIR__ . '/../../../../phpunit_profile_classes_' . $DB->get_dbfamily() . '.csv';
     }
 
     public function runBare(): void {

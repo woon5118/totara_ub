@@ -645,7 +645,7 @@ class totara_program_completions_task_testcase extends advanced_testcase {
         $this->assertEquals(COMPLETION_COMPLETE, $completionstate);
 
         \completion_criteria_activity::invalidatecache();
-        require_once('completion/cron.php');
+        require_once($CFG->dirroot . '/completion/cron.php');
 
         // Confirm the course is now complete.
         $params = array('userid' => $user->id, 'course' => $course->id);

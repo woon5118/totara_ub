@@ -36,7 +36,11 @@ define('NO_OUTPUT_BUFFERING', true);
 define('IGNORE_COMPONENT_CACHE', true);
 define('ABORT_AFTER_CONFIG', true);
 
-require_once(__DIR__ . '/../../../../lib/clilib.php');
+define('TOOL_BEHAT_DIR_SERVER', realpath(__DIR__.'/../../../..'));
+define('TOOL_BEHAT_DIR_VENDOR', realpath(__DIR__.'/../../../../../vendor'));
+
+// Basic functions.
+require_once(TOOL_BEHAT_DIR_SERVER . '/lib/clilib.php');
 
 // CLI options.
 list($options, $unrecognized) = cli_get_params(
@@ -104,10 +108,10 @@ if (!empty($options['parallel'])) {
     define('BEHAT_PARALLEL_UTIL', true);
 }
 
-require_once(__DIR__ . '/../../../../config.php');
-require_once(__DIR__ . '/../../../../lib/behat/lib.php');
-require_once(__DIR__ . '/../../../../lib/behat/classes/behat_command.php');
-require_once(__DIR__ . '/../../../../lib/behat/classes/behat_config_manager.php');
+require_once(TOOL_BEHAT_DIR_SERVER . '/config.php');
+require_once(TOOL_BEHAT_DIR_SERVER . '/lib/behat/lib.php');
+require_once(TOOL_BEHAT_DIR_SERVER . '/lib/behat/classes/behat_command.php');
+require_once(TOOL_BEHAT_DIR_SERVER . '/lib/behat/classes/behat_config_manager.php');
 
 // Remove error handling overrides done in config.php. This is consistent with admin/tool/behat/cli/util_single_run.php.
 $CFG->debug = (E_ALL | E_STRICT);

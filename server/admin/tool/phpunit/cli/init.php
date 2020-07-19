@@ -33,10 +33,12 @@ if (function_exists('opcache_reset')) {
 }
 
 define('IGNORE_COMPONENT_CACHE', true);
+define('TOOL_PHPUNIT_DIR_SERVER', realpath(__DIR__.'/../../../..'));
+define('TOOL_PHPUNIT_DIR_VENDOR', realpath(__DIR__.'/../../../../../vendor'));
 
-require_once(__DIR__.'/../../../../lib/clilib.php');
-require_once(__DIR__.'/../../../../lib/phpunit/bootstraplib.php');
-require_once(__DIR__.'/../../../../lib/testing/lib.php');
+require_once(TOOL_PHPUNIT_DIR_SERVER . '/lib/clilib.php');
+require_once(TOOL_PHPUNIT_DIR_SERVER . '/lib/phpunit/bootstraplib.php');
+require_once(TOOL_PHPUNIT_DIR_SERVER . '/lib/testing/lib.php');
 
 echo "Initialising Totara PHPUnit test environment...\n";
 testing_update_composer_dependencies();

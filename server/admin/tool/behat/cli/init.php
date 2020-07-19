@@ -36,9 +36,12 @@ if (function_exists('opcache_reset')) {
 define('CLI_SCRIPT', true);
 define('CACHE_DISABLE_ALL', true);
 
+define('TOOL_BEHAT_DIR_SERVER', realpath(__DIR__.'/../../../..'));
+define('TOOL_BEHAT_DIR_VENDOR', realpath(__DIR__.'/../../../../../vendor'));
+
 // Basic functions.
-require_once(__DIR__ . '/../../../../lib/clilib.php');
-require_once(__DIR__ . '/../../../../lib/behat/lib.php');
+require_once(TOOL_BEHAT_DIR_SERVER . '/lib/clilib.php');
+require_once(TOOL_BEHAT_DIR_SERVER . '/lib/behat/lib.php');
 
 list($options, $unrecognized) = cli_get_params(
     array(

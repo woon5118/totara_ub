@@ -150,7 +150,7 @@ class behat_command {
         global $CFG;
 
         $currentcwd = getcwd();
-        chdir($CFG->dirroot);
+        chdir($CFG->srcroot);
         exec(self::get_behat_command() . ' ' . $options, $output, $code);
         chdir($currentcwd);
 
@@ -227,7 +227,7 @@ class behat_command {
      * @return bool
      */
     public static function are_behat_dependencies_installed() {
-        if (!is_dir(__DIR__ . '/../../../vendor/behat')) {
+        if (!is_dir(__DIR__ . '/../../../../vendor/behat')) {
             return false;
         }
         return true;

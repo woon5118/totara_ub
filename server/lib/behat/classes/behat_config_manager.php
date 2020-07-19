@@ -70,7 +70,7 @@ class behat_config_manager {
      * config files to avoid problems with concurrent executions.
      *
      * The steps definitions list can be filtered by component so it's
-     * behat.yml is different from the $CFG->dirroot one.
+     * behat.yml is different from the $CFG->srcroot one.
      *
      * @param  string $component Restricts the obtained steps definitions to the specified component
      * @param  string $testsrunner If the config file will be used to run tests
@@ -129,9 +129,9 @@ class behat_config_manager {
             behat_error(BEHAT_EXITCODE_PERMISSIONS, 'File ' . $configfilepath . ' can not be created');
         }
 
-        // Totara: put the behat config into the dirroot to simplify execution.
+        // Totara: put the behat config into the srcroot to simplify execution.
         if (!$parallelruns) {
-            file_put_contents(__DIR__ . '/../../../behat.yml', $contents);
+            file_put_contents(__DIR__ . '/../../../../behat.yml', $contents);
         }
     }
 
@@ -250,7 +250,7 @@ class behat_config_manager {
             if (!empty($CFG->behat_parallel_run[$i - 1]['behat_wwwroot'])) {
                 continue;
             }
-            $link = $CFG->dirroot . '/' . BEHAT_PARALLEL_SITE_NAME . $i;
+            $link = $CFG->srcroot . '/' . BEHAT_PARALLEL_SITE_NAME . $i;
             if (file_exists($link) && is_link($link)) {
                 @unlink($link);
             }
@@ -278,12 +278,12 @@ class behat_config_manager {
             if (!empty($CFG->behat_parallel_run[$i - 1]['behat_wwwroot'])) {
                 continue;
             }
-            $link = $CFG->dirroot.'/'.BEHAT_PARALLEL_SITE_NAME.$i;
+            $link = $CFG->srcroot.'/'.BEHAT_PARALLEL_SITE_NAME.$i;
             clearstatcache();
 
             // Use relative paths as this is the most portable solution
             // in case the filesystem is mounted or synced between systems
-            chdir($CFG->dirroot);
+            chdir($CFG->srcroot);
             $target = '.';
 
             if (file_exists($link)) {

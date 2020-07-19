@@ -110,7 +110,7 @@ class phpunit_autoloader implements \PHPUnit\Runner\TestSuiteLoader {
                 }
             }
             // The last option is testsuite directories in main phpunit.xml file.
-            $xmlfile = "$CFG->dirroot/phpunit.xml";
+            $xmlfile = "$CFG->srcroot/phpunit.xml";
             if (is_readable($xmlfile) and $xml = file_get_contents($xmlfile)) {
                 $dom = new DOMDocument();
                 $dom->loadXML($xml);

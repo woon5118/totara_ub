@@ -187,8 +187,8 @@ function testing_update_composer_dependencies() {
     // To restore the value after finishing.
     $cwd = getcwd();
 
-    // Set some paths.
-    $dirroot = dirname(dirname(__DIR__));
+    // Set some paths, from here back to srcroot
+    $dirroot = realpath(__DIR__ . '/../../..');
     $composerpath = $dirroot . DIRECTORY_SEPARATOR . 'composer.phar';
     $composerurl = 'https://getcomposer.org/composer.phar';
 
@@ -256,7 +256,7 @@ function testing_update_composer_dependencies() {
     }
 
     // Totara: temporary hack for PHP 7.4 compatibility, to be removed together with TL-23348
-    $fixfile = __DIR__ . '/../../vendor/behat/mink/src/Selector/Xpath/Escaper.php';
+    $fixfile = __DIR__ . '/../../../vendor/behat/mink/src/Selector/Xpath/Escaper.php';
     $src = file_get_contents($fixfile);
     $fixedsrc = str_replace('implode($parts, \',\')', 'implode(\',\', $parts)', $src);
     if ($src !== $fixedsrc) {

@@ -12,10 +12,10 @@ Documentation
 Composer installation
 ---------------------
 Composer is a dependency manager for PHP projects.
-It installs PHP libraries into /vendor/ subdirectory inside your dirroot.
+It installs PHP libraries into /vendor/ subdirectory inside your srcroot.
 
 1. install Composer - [http://getcomposer.org/doc/00-intro.md](http://getcomposer.org/doc/00-intro.md)
-2. install PHUnit and dependencies - go to your dirroot and execute `php composer.phar install`
+2. install PHUnit and dependencies - go to your srcroot and execute `php composer.phar install`
 
 
 Configure your server
@@ -37,7 +37,7 @@ this command also builds the phpunit.xml configuration files.
 
 Execute tests
 --------------
-* execute `vendor/bin/phpunit` from dirroot directory
+* execute `vendor/bin/phpunit` from srcroot directory
 * you can execute a single test case class using class name followed by path to test file `vendor/bin/phpunit core_phpunit_basic_testcase lib/tests/phpunit_test.php`
 * it is also possible to create custom configuration files in xml format and use `vendor/bin/phpunit -c mytestsuites.xml`
 

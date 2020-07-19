@@ -31,11 +31,15 @@ define('ABORT_AFTER_CONFIG', true);
 define('CACHE_DISABLE_ALL', true);
 define('NO_OUTPUT_BUFFERING', true);
 
-require_once(__DIR__ .'/../../../../config.php');
-require_once(__DIR__.'/../../../../lib/clilib.php');
-require_once(__DIR__.'/../../../../lib/behat/lib.php');
-require_once(__DIR__.'/../../../../lib/behat/classes/behat_command.php');
-require_once(__DIR__.'/../../../../lib/behat/classes/behat_config_manager.php');
+define('TOOL_BEHAT_DIR_SERVER', realpath(__DIR__.'/../../../..'));
+define('TOOL_BEHAT_DIR_VENDOR', realpath(__DIR__.'/../../../../../vendor'));
+
+// Basic functions.
+require_once(TOOL_BEHAT_DIR_SERVER . '/lib/clilib.php');
+require_once(TOOL_BEHAT_DIR_SERVER . '/lib/behat/lib.php');
+require_once(TOOL_BEHAT_DIR_SERVER . '/lib/behat/lib.php');
+require_once(TOOL_BEHAT_DIR_SERVER . '/lib/behat/classes/behat_command.php');
+require_once(TOOL_BEHAT_DIR_SERVER . '/lib/behat/classes/behat_config_manager.php');
 
 error_reporting(E_ALL | E_STRICT);
 ini_set('display_errors', '1');
@@ -280,8 +284,8 @@ if (empty($parallelrun)) {
         define('BEHAT_PARALLEL_START_DELAY', 0);
     }
 
-    // Execute all commands, relative to moodle root directory.
-    $processes = cli_execute_parallel($cmds, __DIR__ . "/../../../../", BEHAT_PARALLEL_START_DELAY);
+    // Execute all commands, relative to srcroot directory.
+    $processes = cli_execute_parallel($cmds, TOOL_BEHAT_DIR_SERVER . "/..", BEHAT_PARALLEL_START_DELAY);
     $stoponfail = empty($options['stop-on-failure']) ? false : true;
 
     // Print header.

@@ -30,9 +30,12 @@ if (isset($_SERVER['REMOTE_ADDR'])) {
     die(); // No access from web!.
 }
 
+define('TOOL_BEHAT_DIR_SERVER', realpath(__DIR__.'/../../../..'));
+define('TOOL_BEHAT_DIR_VENDOR', realpath(__DIR__.'/../../../../../vendor'));
+
 // Basic functions.
-require_once(__DIR__ . '/../../../../lib/clilib.php');
-require_once(__DIR__ . '/../../../../lib/behat/lib.php');
+require_once(TOOL_BEHAT_DIR_SERVER . '/lib/clilib.php');
+require_once(TOOL_BEHAT_DIR_SERVER . '/lib/behat/lib.php');
 
 // CLI options.
 list($options, $unrecognized) = cli_get_params(
@@ -105,7 +108,7 @@ if ($options['run']) {
 
 // Only load CFG from config.php, stop ASAP in lib/setup.php.
 define('ABORT_AFTER_CONFIG', true);
-require_once(__DIR__ . '/../../../../config.php');
+require_once(TOOL_BEHAT_DIR_SERVER . '/config.php');
 
 // Remove error handling overrides done in config.php.
 $CFG->debug = (E_ALL | E_STRICT);

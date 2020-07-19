@@ -45,7 +45,7 @@ if (!$options['fixtests']) {
     cli_error('Do not run this script if you do not know what your are doing!!!');
 }
 
-$phpunitxml = $CFG->dirroot . '/phpunit.xml';
+$phpunitxml = $CFG->srcroot . '/phpunit.xml';
 if (!file_exists($phpunitxml)) {
     cli_error('Init phpunit first!');
 }

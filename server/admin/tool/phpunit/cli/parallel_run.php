@@ -25,13 +25,16 @@ if (isset($_SERVER['REMOTE_ADDR'])) {
     die; // no access from web!
 }
 
+define('TOOL_PHPUNIT_DIR_SERVER', realpath(__DIR__.'/../../../..'));
+define('TOOL_PHPUNIT_DIR_VENDOR', realpath(__DIR__.'/../../../../../vendor'));
+
 // Add some parameters that do not make sense to change.
 $first = array_shift($_SERVER['argv']);
 array_unshift($_SERVER['argv'], '--runner=WrapperRunner');
 $_SERVER['argc']++;
 array_unshift($_SERVER['argv'], $first);
 
-require_once(__DIR__.'/../../../../vendor/autoload.php');
+require_once(TOOL_PHPUNIT_DIR_VENDOR . '/vendor/autoload.php');
 
 $app = new \ParaTest\Console\ParaTestApplication();
 $app->run();
