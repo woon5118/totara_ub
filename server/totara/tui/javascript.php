@@ -61,7 +61,7 @@ require("$CFG->dirroot/lib/setup.php");
 
 // OK, don't trust suffix, or rev
 // Suffix is in the URL only for proxies and web caches, and so that we can optimally hit our own cache.
-$suffix = \totara_tui\local\locator\bundle::get_js_designed_param_suffix();
+$suffix = \totara_tui\local\locator\bundle::get_js_suffix_for_url();
 $rev = \totara_tui\local\locator\bundle::get_js_rev();
 
 // Regenerate etag, candidate file, and cache.

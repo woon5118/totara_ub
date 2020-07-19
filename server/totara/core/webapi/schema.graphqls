@@ -68,28 +68,9 @@ type totara_core_relationship {
   created_at(format: core_date_format = TIMESTAMP): core_date!
 }
 
-"""
-TUI resource bundle
-"""
-type totara_core_tui_bundle {
-  id: String!
-  component: String!
-  type: String!
-  name: String!
-  url: String!
-}
-
 extend type Query {
   """
   Return all learning items assigned to the current user
   """
   totara_core_my_current_learning: [totara_core_learning_item]!
-
-  """
-  Query to return all of the TUI resource bundles for the provided components
-  """
-  totara_core_tui_bundles(
-    components: [String!]!
-    theme: String!
-  ): [totara_core_tui_bundle!]!
 }

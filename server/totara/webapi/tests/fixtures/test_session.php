@@ -22,7 +22,7 @@
  */
 
 use core\output\notification;
-use totara_core\output\tui_component;
+use totara_tui\output\component;
 
 require(__DIR__ . '/../../../../config.php');
 
@@ -48,6 +48,5 @@ echo $OUTPUT->notification($msg, notification::NOTIFY_SUCCESS);
 // We display a developer debug message as well to ensure that this doesn't not get shown during behat testing.
 debugging('This is a developer resource, please contact your system admin if you have arrived here by mistake.', DEBUG_DEVELOPER);
 
-echo $OUTPUT->render(new tui_component('totara_webapi/pages/TestSession'));
+echo $OUTPUT->render(new component('totara_webapi/pages/TestSession'));
 echo $OUTPUT->footer();
-

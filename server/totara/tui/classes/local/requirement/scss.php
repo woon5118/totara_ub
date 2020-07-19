@@ -67,9 +67,8 @@ final class scss extends requirement {
         global $CFG;
 
         $rev = bundle::get_css_rev();
-        $suffix = bundle::get_css_desired_suffix(true);
+        $suffix = bundle::get_css_suffix_for_url(true);
         $direction = right_to_left() ? 'rtl' : 'ltr';
-        $svg = '1';
 
         $arguments = [
             'theme' => $theme,
@@ -77,13 +76,12 @@ final class scss extends requirement {
             'type' => $component,
             'suffix' => $suffix,
             'direction' => $direction,
-            'svg' => $svg,
         ];
         if (empty($CFG->slasharguments)) {
             $url = new moodle_url('/totara/tui/styles.php', $arguments);
         } else {
             $url = new moodle_url('/totara/tui/styles.php');
-            $url->set_slashargument("/{$theme}/{$rev}/{$suffix}/{$direction}/{$svg}/{$component}", 'noparam', true);
+            $url->set_slashargument("/{$theme}/{$rev}/{$suffix}/{$direction}/{$component}", 'noparam', true);
         }
         return $url;
     }

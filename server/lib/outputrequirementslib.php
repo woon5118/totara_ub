@@ -154,16 +154,6 @@ class page_requirements_manager {
     protected $yuicssmodules = array();
 
     /**
-     * @var \core\tui\requirements $tui TUI requirements tracker
-     */
-    protected $tui;
-
-    /**
-     * @var string[] URLs to TUI SCSS, populated by init_requirements_data()
-     */
-    protected $tui_css_urls = array();
-
-    /**
      * @var array Some config vars exposed in JS, please no secret stuff there
      */
     protected $M_cfg;
@@ -179,9 +169,9 @@ class page_requirements_manager {
     protected $jquerypluginoverrides = array();
 
     /**
-     * @var bool Have headers already been sent to the client?
+     * @var \core\output\framework_manager[]
      */
-    protected $header_sent = false;
+    private $frameworks = [];
 
     /**
      * Page requirements constructor.
@@ -197,6 +187,9 @@ require(['core/autoinitialise'], function(ai) {
         M.util.js_complete('core-autoinitialise');
     });
 })";
+
+        $this->frameworks = $this->get_frameworks();
+
         $this->js_amd_inline($autoinitialisejs);
 
         // You may need to set up URL rewrite rule because oversized URLs might not be allowed by web server.
@@ -204,7 +197,6 @@ require(['core/autoinitialise'], function(ai) {
 
         $this->yui3loader = new stdClass();
         $this->YUI_config = new YUI_config();
-        $this->tui = new \core\tui\requirements();
 
         if (is_https() && !empty($CFG->useexternalyui)) {
             // On HTTPS sites all JS must be loaded from https sites,
@@ -320,8 +312,10 @@ require(['core/autoinitialise'], function(ai) {
         // Add the moodle group's module data.
         $this->YUI_config->add_moodle_metadata();
 
-        // Load the TUI core code on every page.
-        $this->tui->require_component('totara_core');
+        // Allow the output requirement managers to initialise now.
+        foreach ($this->frameworks as $manager) {
+            $manager->initialise();
+        }
 
         // Every page should include definition of following modules.
         $this->js_module($this->find_module('core_filepicker'));
@@ -345,6 +339,39 @@ require(['core/autoinitialise'], function(ai) {
                 $this->yui_module('moodle-core-jquerybehat', 'M.core.jquerybehat.init');
             }
         }
+    }
+
+    private function get_frameworks() {
+        $instances = [];
+        foreach (\core_component::get_namespace_classes('output', \core\output\framework_manager::class) as $class) {
+            /** @var \core\output\framework_manager $class */
+            $instance = $class::new_instance($this);
+            $instances[get_class($instance)] = $instance;
+        }
+        return $instances;
+    }
+
+    /**
+     * DEPRECATED: This is the old style.
+     *
+     * To fix your code:
+     *
+     *   $component = \totara_tui\output\framework::component('totara_tui/pages/blah');
+     * OR
+     *   $component = new \totara_tui\output\component('totara_tui/pages/blah');
+     *   $component->register($moodle_page_instance_probably_$PAGE);
+     *
+     * @todo Remove before release.
+     * @param $name
+     * @throws coding_exception
+     */
+    public function tui_bundle($name) {
+        debugging('Don\'t call this method any more, its deprecated and removed. Fix your code as per PHPDoc.', DEBUG_DEVELOPER);
+
+        // Don't copy this code, read the comment in the phpdoc for the method.
+        /** @var \totara_tui\output\framework $framework */
+        $framework = $this->framework(\totara_tui\output\framework::class);
+        $framework->require_vue($name);
     }
 
     /**
@@ -446,14 +473,6 @@ require(['core/autoinitialise'], function(ai) {
 
         // Include the YUI CSS Modules.
         $page->requires->set_yuicssmodules($page->theme->yuicssmodules);
-
-        // Include the CSS for loaded TUI components.
-        $tui_css_urls = array();
-        $tui_requirement_url_options = ['theme' => $page->theme->name];
-        foreach ($this->tui->get_bundles('css') as $bundle) {
-            $tui_css_urls[] = $bundle->get_url($tui_requirement_url_options);
-        }
-        $this->tui_css_urls = $tui_css_urls;
     }
 
     /**
@@ -775,7 +794,12 @@ require(['core/autoinitialise'], function(ai) {
             if (debugging()) {
                 // Check file existence only when in debug mode.
                 if (!file_exists($CFG->dirroot . strtok($url, '?'))) {
-                    throw new coding_exception('Attempt to require a JavaScript file that does not exist.', $url);
+                    $found = false;
+                    foreach ($this->frameworks as $framework) {
+
+                    }
+                    debug([$url, $CFG->dirroot . strtok($url, '?')]);
+                    //throw new coding_exception('Attempt to require a JavaScript file that does not exist.', $CFG->dirroot . strtok($url, '?'));
                 }
             }
             if (substr($url, -3) === '.js') {
@@ -1007,6 +1031,13 @@ require(['core/autoinitialise'], function(ai) {
         $this->cssthemeurls[] = $stylesheet;
     }
 
+    public function css_theme_urls(\moodle_page $page) {
+        $urls = $page->theme->css_urls($page);
+        foreach ($urls as $url) {
+            $this->css_theme($url);
+        }
+    }
+
     /**
      * Ensure that a skip link to a given target is printed at the top of the <body>.
      *
@@ -1174,34 +1205,11 @@ require(['core/autoinitialise'], function(ai) {
         $this->yuicssmodules = $modules;
     }
 
-    /**
-     * Request the TUI bundle(s) for the provided component be loaded.
-     *
-     * This must be called before $OUTPUT->header(), as by then the <head> will have
-     * already been sent, meaning we wouldn't be able to add the CSS bundle.
-     *
-     * @param string $component Totara component, e.g. 'mod_example'.
-     *     Anything following a slash will be stripped, in order to allow
-     *     passing full component names like 'mod_example/pages/Example'.
-     */
-    public function tui_bundle(string $component) {
-        // header already sent, adding another bundle to the requirements at this point will
-        // result in it only being half-loaded as the JS will be loaded but the CSS will not.
-        // however, runtime loading should work in the majority of cases, so fall back to
-        // that when not in debug mode...
-        if ($this->header_sent) {
-            if (debugging()) {
-                throw new \coding_exception(
-                    "tui_bundle: unable to require TUI bundle for \"$component\" as the header has already been sent."
-                );
-            }
-            return;
+    public function framework(string $name): \core\output\framework_manager {
+        if (!isset($this->frameworks[$name])) {
+            throw new \coding_exception('Unknown output framework requirements manager requested.', $name);
         }
-        $pos = strpos($component, '/');
-        if ($pos !== false) {
-            $component = substr($component, 0, $pos);
-        }
-        $this->tui->require_component($component);
+        return $this->frameworks[$name];
     }
 
     /**
@@ -1628,18 +1636,9 @@ require(['core/autoinitialise'], function(ai) {
         $code .= html_writer::tag('script', '/** Required in order to fix style inclusion problems in IE with YUI **/', array('id'=>'firstthemesheet', 'type'=>'text/css'));
 
         $urls = array_values($this->cssthemeurls);
-
-        // Totara: add TUI SCSS bundles.
-        // Find last tui_scss url. It should be the theme.
-        for ($theme_index = count($urls) - 1; $theme_index >= 0; $theme_index--) {
-            if (strpos($urls[$theme_index], 'tui_scss')) {
-                break;
-            }
+        foreach ($this->frameworks as $manager) {
+            $manager->inject_css_urls($urls);
         }
-        // Add the bundles before the theme CSS so theme CSS can override the CSS in them.
-        array_splice($urls, $theme_index === -1 ? count($urls) : $theme_index, 0, $this->tui_css_urls);
-
-        $urls = array_merge($urls, array_values($this->cssurls));
 
         foreach ($urls as $url) {
             $attributes['href'] = $url;
@@ -1679,6 +1678,10 @@ require(['core/autoinitialise'], function(ai) {
         // Note: the $page and $output are not stored here because it would
         // create circular references in memory which prevents garbage collection.
         $this->init_requirements_data($page, $renderer);
+
+        foreach ($this->frameworks as $manager) {
+            $manager->hook_get_head_code($page, $renderer);
+        }
 
         $output = '';
 
@@ -1795,12 +1798,16 @@ require(['core/autoinitialise'], function(ai) {
             $logconfig->level = 'trace';
         }
 
+        $scripts = [];
+        foreach ($this->frameworks as $manager) {
+            $manager->inject_js_urls($scripts, $initialiseamd);
+        }
+        foreach ($scripts as $url) {
+            $output .= html_writer::script('', $this->js_fix_url($url));
+        }
+
         // Call amd init functions.
         if ($initialiseamd) {
-            foreach ($this->tui->get_bundles('js') as $bundle) {
-                $output .= html_writer::script('', $this->js_fix_url($bundle->get_file_path()));
-            }
-
             // Totara: ajaxy form fetching does not like AMD.
             $this->js_call_amd('core/log', 'setConfig', array($logconfig));
         }
@@ -1944,15 +1951,6 @@ require(['core/autoinitialise'], function(ai) {
                     'once per page, but it seems to be being output again.');
         }
         return $this->onetimeitemsoutput[$thing] = true;
-    }
-
-    /**
-     * Mark the header as having been sent.
-     * Once this is done certain things can no longer be done, e.g. adding TUI
-     * requirements.
-     */
-    public function header_sent() {
-        $this->header_sent = true;
     }
 }
 
@@ -2301,35 +2299,4 @@ function js_reset_all_caches() {
     }
 
     set_config('jsrev', $next);
-}
-
-/**
- * If certain conditions are met, change path to point at a variant of the build file.
- *
- * Currently the conditions are:
- * * If debugdeveloper is on, file is in /tui/build/, .development variant
- *   exists, and is newer: use the .development variant.
- *
- * Returns null if the build file does not exist.
- *
- * @param string $path
- * @param string $dir Prepended to path to produce absolute path
- * @return string|null
- */
-function core_output_choose_build_file($path, $dir = '') {
-    global $CFG;
-    // try and load tui dev bundles if they are newer than the prod bundles
-    if ($CFG->debugdeveloper && preg_match('/\/tui\/build\//', $path)) {
-        $last_dot = strrpos($path, '.');
-        $dev_path = substr($path, 0, $last_dot) . '.development' . substr($path, $last_dot);
-
-        $prod_mtime = @filemtime($dir . $path);
-        $dev_mtime = @filemtime($dir . $dev_path);
-
-        // load dev file if there is no standard file or if the dev file is newer
-        if ($dev_mtime !== false && (!$prod_mtime || $dev_mtime > $prod_mtime)) {
-            $path = $dev_path;
-        }
-    }
-    return file_exists($dir . $path) ? $path : null;
 }

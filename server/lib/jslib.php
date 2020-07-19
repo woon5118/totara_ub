@@ -127,6 +127,47 @@ function js_write_cache_file_content($file, $content) {
 }
 
 /**
+ * Create cache file for JS file in a path.
+ * @param string $file full file path to cache file
+ * @param string $absolute_path JS code
+ */
+function js_write_cache_file_from_path($file, $absolute_path) {
+    global $CFG;
+
+    clearstatcache();
+    if (!file_exists(dirname($file))) {
+        @mkdir(dirname($file), $CFG->directorypermissions, true);
+    }
+
+    if (strpos($absolute_path, '..') !== false) {
+        // This should never happen, don't entertain it, just quit.
+        debugging('Safety check: path traversal is not allowed', DEBUG_DEVELOPER);
+        js_write_cache_file_content($file, 'Invalid file path provided for copying.');
+        return;
+    }
+    if (substr($absolute_path, 0, strlen($CFG->srcroot)) !== $CFG->srcroot) {
+        debugging('Safety check: attempted to cache file from outside of srcroot directory.', DEBUG_DEVELOPER);
+        js_write_cache_file_content($file, 'Invalid file path provided for copying.');
+        return;
+    }
+
+    $temp_file = $file . '-' . bin2hex(random_bytes(6)) . '.tmp';
+    // Prevent serving of incomplete file from concurrent request,
+    // Rename should be more atomic the copy if the file is large.
+    copy($absolute_path, $temp_file);
+    rename($temp_file, $file);
+
+    // Tidy things up.
+    @chmod($file, $CFG->filepermissions);
+    @unlink($file.'.tmp'); // just in case anything fails
+
+    ignore_user_abort(false);
+    if (connection_aborted()) {
+        die;
+    }
+}
+
+/**
  * Sends a 404 message about CSS not being found.
  */
 function js_send_css_not_found() {

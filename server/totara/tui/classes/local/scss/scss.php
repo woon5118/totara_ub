@@ -247,10 +247,11 @@ class scss {
             }
         }
 
-        return (object)[
-            'imports' => $imports,
-            'cssvars_legacy_imports' => $cssvars_legacy_imports
-        ];
+        $return = new \stdClass;
+        $return->imports = $imports;
+        $return->cssvars_legacy_imports = $cssvars_legacy_imports;
+
+        return $return;
     }
 
     /**

@@ -25,8 +25,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use totara_core\output\tui_component;
-
 defined('MOODLE_INTERNAL') || die();
 
 // Debug levels - always keep the values in ascending order!
@@ -2006,45 +2004,31 @@ class renderer_base {
     }
 
     /**
+     * Legacy aliasing.
+     * @deprecated since Totara 13
+     * @param \totara_tui\output\component $component
+     * @return string
+     */
+    public function render_tui_component(\totara_tui\output\component $component): string {
+        return $this->render_component($component);
+    }
+
+    /**
      * Render a TUI component.
      *
      * If this method is being called after the header has been sent, you should
-     * also call `$PAGE->requires->tui_bundle('...')` before the header is sent
-     * with the name of the component to ensure required bundles are sent with
-     * the page.
+     * also call $component->register($moodle_page_instance) before the header is sent
+     * to ensure required bundles are sent with the page.
      * If you do not call that method, the bundle may fall back to being loaded
      * at runtime by JS instead, which is a little slower.
      *
-     * @param tui_component $tui_component Component to render.
+     * @param \totara_tui\output\component $component
      * @return string HTML output.
      */
-    public function render_tui_component(tui_component $tui_component) {
-        $name = $tui_component->get_name();
-        $props = $tui_component->get_props();
-
-        // Registering TUI requirements is only possible before header is sent.
-        // Check if we've sent the header yet, otherwise `tui_bundle` will complain if we
-        // call it.
-        // If we have already sent the head, it's not fatal because the front-end code is
-        // also capable of loading bundles at runtime, it's just a little slower.
-        if (!$this->page->headerprinted) {
-            $this->page->requires->tui_bundle($name);
-        }
-
-        $json = json_encode($props);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new Exception(json_last_error_msg());
-        }
-
-        // TL-22100: use htmlspecialchars() rather than s() as s() will unencode some
-        // double encoded HTML entities, resulting in prop injection and potential XSS.
-        // This is not a standard approach, you should be using s() normally.
-        $html = '<span data-tui-component="' . htmlspecialchars($name, ENT_QUOTES, 'UTF-8') . '"';
-        if ($props !== null) {
-            $html .= ' data-tui-props="' . htmlspecialchars($json, ENT_QUOTES, 'UTF-8') . '"';
-        }
-        $html .= '></span>';
-        return $html;
+    protected function render_component(\totara_tui\output\component $component) {
+        // Delegate rendering of this to the totara_tui renderer.
+        $output = $this->page->get_renderer('totara_tui');
+        return $output->render($component);
     }
 
     /**

@@ -354,13 +354,6 @@ class core_renderer extends renderer_base {
             }
         }
 
-        // Get the theme stylesheet - this has to be always first CSS, this loads also styles.css from all plugins;
-        // any other custom CSS can not be overridden via themes and is highly discouraged
-        $urls = $this->page->theme->css_urls($this->page);
-        foreach ($urls as $url) {
-            $this->page->requires->css_theme($url);
-        }
-
         // Get the theme javascript head and footer
         if ($jsurl = $this->page->theme->javascript_url(true)) {
             $this->page->requires->js($jsurl, true);
@@ -368,6 +361,10 @@ class core_renderer extends renderer_base {
         if ($jsurl = $this->page->theme->javascript_url(false)) {
             $this->page->requires->js($jsurl);
         }
+
+        // Get the theme stylesheet - this has to be always first CSS, this loads also styles.css from all plugins;
+        // any other custom CSS can not be overridden via themes and is highly discouraged
+        $this->page->requires->css_theme_urls($this->page);
 
         // Get any HTML from the page_requirements_manager.
         $output .= $this->page->requires->get_head_code($this->page, $this);

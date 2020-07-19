@@ -16,13 +16,13 @@ if ($slasharguments) {
     $slasharguments = ltrim($slasharguments, '/');
     $slashargument_parts = explode('/', $slasharguments);
 
-    if (count($slashargument_parts) !== 6) {
+    if (count($slashargument_parts) !== 5) {
         debugging('Invalid number of arguments.', DEBUG_DEVELOPER);
         css_send_css_not_found();
     }
 
-    // Order is: theme/rev/suffix/direction/svg/component
-    list($themename, $rev, $suffix, $option_rtl, $option_svg, $component) = $slashargument_parts;
+    // Order is: theme/rev/suffix/direction/component
+    list($themename, $rev, $suffix, $option_rtl, $component) = $slashargument_parts;
     unset($slasharguments, $slashargument_parts); // Clean these up, you can't reuse them.
 
 } else {
@@ -31,7 +31,6 @@ if ($slasharguments) {
     $rev = min_optional_param('rev', null, 'INT');
     $suffix = min_optional_param('suffix', null, 'SAFEDIR');
     $option_rtl = min_optional_param('direction', 'ltr', 'SAFEDIR');
-    $option_svg = min_optional_param('svg', true, 'INT');
     $component = min_optional_param('component', null, 'SAFEDIR');
 
     // The following arguments are required. If any are null then we do not have the information required.
@@ -81,7 +80,7 @@ require("$CFG->dirroot/lib/setup.php");
 
 // Revision is in the URL just to facilitate caching, we don't actually trust it.
 $rev = \totara_tui\local\locator\bundle::get_css_rev();
-$suffix = \totara_tui\local\locator\bundle::get_css_desired_suffix(true);
+$suffix = \totara_tui\local\locator\bundle::get_css_suffix_for_url(true);
 
 $theme = \totara_tui\local\theme::load($themename);
 $theme->force_svg_use($option_svg);

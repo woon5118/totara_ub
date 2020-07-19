@@ -229,14 +229,6 @@ class theme_config {
     public $parents_exclude_javascripts = null;
 
     /**
-     * @var bool Does this theme provide or override TUI components?
-     * TUI JS and CSS bundles for the theme will only be loaded if this is set
-     * to true. TUI bundles will also be loaded for any parent themes if they
-     * have this option set to true.
-     */
-    public $tui = false;
-
-    /**
      * @var array Which file to use for each page layout.
      *
      * This is an array of arrays. The keys of the outer array are the different layouts.
@@ -548,7 +540,7 @@ class theme_config {
      * of this class. (That is, this is a factory method.)
      *
      * @param string $themename the name of the theme.
-     * @return theme_config an instance of this class.
+     * @return theme_config|static an instance of this class.
      */
     public static function load($themename) {
         global $CFG;
@@ -561,16 +553,16 @@ class theme_config {
             $settings = new stdClass();
         }
 
-        if ($config = theme_config::find_theme_config($themename, $settings)) {
-            return new theme_config($config);
+        if ($config = static::find_theme_config($themename, $settings)) {
+            return new static($config);
 
-        } else if ($themename == theme_config::DEFAULT_THEME) {
-            throw new coding_exception('Default theme '.theme_config::DEFAULT_THEME.' not available or broken!');
+        } else if ($themename == static::DEFAULT_THEME) {
+            throw new coding_exception('Default theme '.static::DEFAULT_THEME.' not available or broken!');
 
-        } else if ($config = theme_config::find_theme_config($CFG->theme, $settings)) {
+        } else if ($config = static::find_theme_config($CFG->theme, $settings)) {
             debugging('This page should be using theme ' . $themename .
                     ' which cannot be initialised. Falling back to the site theme ' . $CFG->theme, DEBUG_NORMAL);
-            return new theme_config($config);
+            return new static($config);
 
         } else {
             // bad luck, the requested theme has some problems - admin see details in theme config
@@ -578,9 +570,9 @@ class theme_config {
             if ($themename !== 'boost' && !during_initial_install() && empty($CFG->upgraderunning)) {
                 debugging('This page should be using theme ' . $themename .
                     ' which cannot be initialised. Nor can the site theme ' . $CFG->theme .
-                    '. Falling back to ' . theme_config::DEFAULT_THEME, DEBUG_NORMAL);
+                    '. Falling back to ' . static::DEFAULT_THEME, DEBUG_NORMAL);
             }
-            return new theme_config(theme_config::find_theme_config(theme_config::DEFAULT_THEME, $settings));
+            return new theme_config(static::find_theme_config(static::DEFAULT_THEME, $settings));
         }
     }
 
@@ -618,7 +610,7 @@ class theme_config {
 
         $configurable = array(
             'parents', 'sheets', 'parents_exclude_sheets', 'plugins_exclude_sheets',
-            'javascripts', 'javascripts_footer', 'parents_exclude_javascripts', 'tui',
+            'javascripts', 'javascripts_footer', 'parents_exclude_javascripts',
             'layouts', 'enable_dock','enable_hide', 'enablecourseajax', 'requiredblocks',
             'rendererfactory', 'csspostprocess', 'editor_sheets', 'rarrow', 'larrow', 'uarrow', 'darrow',
             'hidefromselector', 'doctype', 'yuicssmodules', 'blockrtlmanipulations',
@@ -691,7 +683,7 @@ class theme_config {
 
         //fix arrows if needed
         $this->check_theme_arrows();
-    
+
         // Totara: if on new theme stack, don't load YUI css
         $new_stack = $this->name == 'ventura' || $this->name == 'legacy' ||
             in_array('ventura', $this->parents) || in_array('legacy', $this->parents);
@@ -943,32 +935,22 @@ class theme_config {
             }
         }
 
-        // Totara: TUI theme SCSS
-        $requirement = new \core\tui\requirement_scss('theme', 'tui_bundle.scss');
-        $urls[] = $requirement->get_url(array('theme' => $this->name));
-
         return $urls;
     }
 
     /**
-     * Get CSS content for type and subtype. Called by styles.php.
+     * Get CSS content for type. Called by styles.php.
      *
      * @param string $type
-     * @param string $subtype
      * @return string
      */
-    public function get_css_content_by($type, $subtype) {
+    public function get_css_content_by($type) {
         if ($type === 'all' || $type === 'all-rtl') {
             $csscontent = $this->get_css_cached_content();
             if (!$csscontent) {
                 $csscontent = $this->get_css_content();
                 $this->set_css_content_cache($csscontent);
             }
-            return $csscontent;
-        } else if ($type === 'tui_scss') {
-            $csscontent = $this->get_tui_css_content(false, $subtype);
-            $csscontent = $this->post_process($csscontent);
-            $csscontent = core_minify::css($csscontent);
             return $csscontent;
         } else {
             return '';
@@ -1078,12 +1060,6 @@ class theme_config {
                 return $this->post_process($csscontent);
             }
             return '';
-        } else if ($type === 'tui_scss') {
-            $csscontent = $this->get_tui_css_content(true, $subtype);
-            if ($csscontent !== false) {
-                return $this->post_process($csscontent);
-            }
-            return '';
         }
 
         $cssfiles = array();
@@ -1133,44 +1109,6 @@ class theme_config {
             $css .= file_get_contents($file)."\n";
         }
         return $this->post_process($css);
-    }
-
-    /**
-     * Get the compiled TUI CSS content for the provided Totara component
-     *
-     * @param bool $themedesigner
-     * @param string $component
-     * @return string Compiled CSS
-     * @throws \Exception if SCSS is invalid
-     */
-    protected function get_tui_css_content($themedesigner, $component) {
-        $scss_options = new \core\tui\scss\scss_options();
-        $scss_options->set_themes($this->get_tui_theme_chain($themedesigner));
-        $scss_options->set_legacy($this->legacybrowser);
-        $scss_options->set_sourcemap_enabled($themedesigner);
-
-        $tui_scss = new \core\tui\scss\scss($scss_options);
-
-        // cache compiled result for performance in theme designer mode
-        $cache = null;
-        $cachekey = 'tui_scss_content:'.$component;
-        if ($themedesigner) {
-            $cache = cache::make('core', 'themedesigner', ['theme' => $this->name]);
-            $newest_file = $tui_scss->get_newest_tui_css_file($component);
-            if ($cached = $cache->get($cachekey)) {
-                if ($cached['newest_file'] == $newest_file) {
-                    return $cached['content'];
-                }
-            }
-        }
-
-        $result = $tui_scss->get_compiled_css($component);
-
-        if ($cache) {
-            $cache->set($cachekey, ['newest_file' => $newest_file, 'content' => $result]);
-        }
-
-        return $result;
     }
 
     /**
@@ -1324,59 +1262,6 @@ class theme_config {
     }
 
     /**
-     * Get theme chain (e.g. ['base', 'roots', 'basis']) for TUI CSS.
-     *
-     * Themes are only included if they have `$THEME->tui = true` in config.php.
-     *
-     * @param bool $themedesigner Only used to decide whether to cache or not
-     * @return string[]
-     */
-    protected function get_tui_theme_chain($themedesigner) {
-        global $CFG;
-
-        $cache = null;
-        $cachekey = 'tui_scss_theme_chain';
-        if ($themedesigner) {
-            require_once($CFG->dirroot.'/lib/csslib.php');
-            $cache = cache::make('core', 'themedesigner', ['theme' => $this->name]);
-            if ($cached_data = $cache->get($cachekey)) {
-                if ($cached_data['created'] > time() - THEME_DESIGNER_CACHE_LIFETIME) {
-                    return $cached_data['themes'];
-                }
-            }
-        }
-
-        $themes = [];
-
-        // Find out wanted parent sheets.
-        $excludes = $this->resolve_excludes('parents_exclude_sheets');
-        if ($excludes !== true) {
-            // Base first, the immediate parent last.
-            foreach (array_reverse($this->parent_configs) as $parent_config) {
-                $parent = $parent_config->name;
-                if (!empty($excludes[$parent]) and $excludes[$parent] === true) {
-                    continue;
-                }
-                if (!empty($parent_config->tui)) {
-                    $themes[] = $parent;
-                }
-            }
-        }
-
-        if (!empty($this->tui)) {
-            $themes[] = $this->name;
-        }
-
-        if ($cache) {
-            $cache->set($cachekey, [
-                'themes' => $themes,
-                'created' => time()
-            ]);
-        }
-        return $themes;
-    }
-
-    /**
      * Return the CSS content generated from LESS the file.
      *
      * @param bool $themedesigner True if theme designer is enabled.
@@ -1475,7 +1360,12 @@ class theme_config {
             // Compile!
             $compiled = $compiler->to_css();
 
-        } catch (\ScssPhp\ScssPhp\Exception $e) {
+        } catch (
+            \ScssPhp\ScssPhp\Exception\CompilerException |
+            \ScssPhp\ScssPhp\Exception\ParserException |
+            \ScssPhp\ScssPhp\Exception\ServerException |
+            \ScssPhp\ScssPhp\Exception\RangeException $e
+        ) {
             $compiled = false;
             debugging('Error while compiling SCSS: ' . $e->getMessage(), DEBUG_DEVELOPER);
         }
@@ -1668,9 +1558,6 @@ class theme_config {
         global $CFG;
 
         $rev = theme_get_revision();
-        if (!empty($CFG->tuidesignermode)) {
-            $rev = -1;
-        }
         $params = array('theme'=>$this->name,'rev'=>$rev);
         $params['type'] = $inhead ? 'head' : 'footer';
 
@@ -1703,20 +1590,12 @@ class theme_config {
             $type = 'javascripts';
         }
 
-        $tui_suffix = core_useragent::is_ie() ? '.legacy' : '';
-
         $js = array();
         // find out wanted parent javascripts
         $excludes = $this->resolve_excludes('parents_exclude_javascripts');
         if ($excludes !== true) {
             foreach (array_reverse($this->parent_configs) as $parent_config) { // base first, the immediate parent last
                 $parent = $parent_config->name;
-                if ($type == 'javascripts_footer' && !empty($parent_config->tui)) {
-                    $path = core_output_choose_build_file("{$parent_config->dir}/tui/build/tui_bundle{$tui_suffix}.js");
-                    if ($path) {
-                        $js[] = $path;
-                    }
-                }
                 if (empty($parent_config->$type)) {
                     continue;
                 }
@@ -1733,13 +1612,6 @@ class theme_config {
                         $js[] = $javascriptfile;
                     }
                 }
-            }
-        }
-
-        if ($type == 'javascripts_footer' && !empty($this->tui)) {
-            $path = core_output_choose_build_file("{$this->dir}/tui/build/tui_bundle{$tui_suffix}.js");
-            if ($path) {
-                $js[] = $path;
             }
         }
 

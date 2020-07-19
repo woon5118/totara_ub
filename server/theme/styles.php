@@ -51,26 +51,20 @@ if ($slashargument = min_get_slash_argument()) {
     $themename = min_clean_param(array_shift($slashargument_parts), 'SAFEDIR');
     $rev = min_clean_param(array_shift($slashargument_parts), 'INT');
     $type = min_clean_param(array_shift($slashargument_parts), 'SAFEDIR');
-    $subtype = $type == 'tui_scss' ? min_clean_param(array_shift($slashargument_parts), 'SAFEDIR') : null;
     $rtl = in_array('rtl', $slashargument_parts);
     $legacy = in_array('legacy', $slashargument_parts);
 } else {
     $themename = min_optional_param('theme', 'standard', 'SAFEDIR');
     $rev       = min_optional_param('rev', 0, 'INT');
     $type      = min_optional_param('type', 'all', 'SAFEDIR');
-    $subtype   = min_optional_param('subtype', null, 'SAFEDIR');
     $usesvg    = (bool)min_optional_param('svg', '1', 'INT');
     $rtl       = (bool)min_optional_param('rtl', 0, 'INT');
     $legacy    = (bool)min_optional_param('legacy', 0, 'INT');
 }
 
 // Totara: Removed chunking support as it's not used by currently supported browsers
-if (!in_array($type, ['all', 'all-rtl', 'editor', 'tui_scss'])) {
+if (!in_array($type, ['all', 'all-rtl', 'editor'])) {
     css_send_css_not_found();
-}
-
-if ($type !== 'tui_scss') {
-    $subtype = null;
 }
 
 if (file_exists("$CFG->dirroot/theme/$themename/config.php")) {
@@ -83,9 +77,8 @@ if (file_exists("$CFG->dirroot/theme/$themename/config.php")) {
 }
 
 $candidatedir = "$CFG->localcachedir/theme/$rev/$themename/css";
-$type_key = $type . ($subtype ? ".$subtype" : '');
-$etag = "$rev/$themename/$type_key";
-$candidatename = $type_key;
+$etag = "$rev/$themename/$type";
+$candidatename = $type;
 if (!$usesvg) {
     // Add to the sheet name, one day we'll be able to just drop this.
     $candidatedir .= '/nosvg';
@@ -127,7 +120,7 @@ require("$CFG->dirroot/lib/setup.php");
 
 $theme = theme_config::load($themename);
 $theme->force_svg_use($usesvg);
-$theme->set_rtl_mode($type === 'all-rtl' || ($type == 'tui_scss' && $rtl) ? true : false);
+$theme->set_rtl_mode($type === 'all-rtl' ? true : false);
 $theme->set_legacy_browser($legacy);
 
 $themerev = theme_get_revision();
@@ -138,8 +131,8 @@ if ($themerev <= 0 or $themerev != $rev) {
     $cache = false;
 
     $candidatedir = "$CFG->localcachedir/theme/$rev/$themename/css";
-    $etag = "$rev/$themename/$type_key";
-    $candidatename = $type_key;
+    $etag = "$rev/$themename/$type";
+    $candidatename = $type;
     if (!$usesvg) {
         // Add to the sheet name, one day we'll be able to just drop this.
         $candidatedir .= '/nosvg';
@@ -185,7 +178,7 @@ if ($type === 'editor') {
         }
     }
 
-    $csscontent = $theme->get_css_content_by($type, $subtype);
+    $csscontent = $theme->get_css_content_by($type);
 
     // Totara: Removed chunking support as it's not used by currently supported browsers
 

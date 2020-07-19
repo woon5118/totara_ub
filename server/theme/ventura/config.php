@@ -28,7 +28,6 @@ $THEME->name = 'ventura';
 $THEME->parents = ['legacy', 'base'];
 $THEME->enable_dock = true;
 $THEME->enable_hide = true;
-$THEME->tui = true;
 $THEME->minify_css = false;
 
 $THEME->layouts = array(

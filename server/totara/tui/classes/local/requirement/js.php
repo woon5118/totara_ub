@@ -55,7 +55,7 @@ final class js extends requirement {
         global $CFG;
 
         $jsrev = bundle::get_js_rev();
-        $suffix = bundle::get_js_designed_param_suffix();
+        $suffix = bundle::get_js_suffix_for_url();
 
         if (empty($CFG->slasharguments)) {
             return new \moodle_url('/totara/tui/javascript.php', ['rev' => $jsrev, 'component' => $this->component, 'suffix' => $suffix]);

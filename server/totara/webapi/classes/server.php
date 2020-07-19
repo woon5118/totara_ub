@@ -153,7 +153,7 @@ class server {
         ) {
             $this->add_performance_data_to_result($result);
         }
-        
+
         return $result;
     }
 

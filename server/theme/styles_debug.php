@@ -38,7 +38,6 @@ $sheet     = optional_param('sheet', '', PARAM_SAFEDIR);
 $usesvg    = optional_param('svg', 1, PARAM_BOOL);
 $rtl       = optional_param('rtl', false, PARAM_BOOL);
 $legacy    = optional_param('legacy', false, PARAM_BOOL);
-$report    = optional_param('report', null, PARAM_RAW);
 
 if (file_exists("$CFG->dirroot/theme/$themename/config.php")) {
     // The theme exists in standard location - ok.
@@ -75,30 +74,9 @@ if ($content = $cache->get($key)) {
     }
 }
 
-try {
-    $csscontent = $theme->get_css_content_debug($type, $subtype, $sheet, $rtl);
-} catch(Exception $e) {
-    if ($report === 'json') {
-        header('Content-Type: application/json; charset=utf-8');
-        header('Cache-Control: no-store, no-cache');
-        echo json_encode([
-            'status' => 'error',
-            'stack' => get_class($e) . ': ' . $e->getMessage() . "\n" . $e->getTraceAsString()
-        ]);
-        die;
-    } else {
-        throw $e;
-    }
-}
+$csscontent = $theme->get_css_content_debug($type, $subtype, $sheet);
 $cache->set($key, array('data' => $csscontent, 'created' => time()));
 
 // Totara: Removed chunking support as it's not used by currently supported browsers
-
-if ($report === 'json') {
-    header('Content-Type: application/json; charset=utf-8');
-    header('Cache-Control: no-store, no-cache');
-    echo '{"status":"ok","message": "Rendered without errors"}';
-    die;
-}
 
 css_send_uncached_css($csscontent);

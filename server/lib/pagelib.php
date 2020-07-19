@@ -958,10 +958,6 @@ class moodle_page {
             $this->starting_output();
         }
 
-        if ($state == self::STATE_IN_BODY) {
-            $this->requires->header_sent();
-        }
-
         $this->_state = $state;
     }
 

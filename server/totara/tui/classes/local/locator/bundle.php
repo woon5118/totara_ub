@@ -37,26 +37,26 @@ final class bundle {
         }
         $instance = self::instance();
         $bundle = $instance->find_component_bundle($component);
-        if ($bundle === null) {
+        if ($bundle === null || !isset($bundle[self::EXT_JS])) {
             return null;
         }
         return $bundle[self::EXT_JS];
     }
 
     public static function get_css_component_bundle(string $component): ?string {
-        if (debugging() && $component !== clean_param($component, PARAM_COMPONENT)) {
+        if (debugging() && $component !== clean_param($component, PARAM_SAFEDIR)) {
             throw new \coding_exception('Invalid component provided.');
         }
         $instance = self::instance();
         $bundle = $instance->find_component_bundle($component);
-        if ($bundle === null) {
+        if ($bundle === null || !isset($bundle[self::EXT_SCSS])) {
             return null;
         }
         return $bundle[self::EXT_SCSS];
     }
 
     public static function get_variables_for_component(string $component) {
-        if (debugging() && $component !== clean_param($component, PARAM_COMPONENT)) {
+        if (debugging() && $component !== clean_param($component, PARAM_SAFEDIR)) {
             throw new \coding_exception('Invalid component provided.');
         }
         $instance = self::instance();
@@ -65,7 +65,7 @@ final class bundle {
             return null;
         }
         $key = '_variables.scss';
-        foreach (self::get_js_desired_file_suffix() as $suffix) {
+        foreach (self::get_css_suffix_for_file() as $suffix) {
             if (isset($instance->styles_map[$component][$suffix][$key])) {
                 return $instance->styles_map[$component][$suffix][$key];
             }
@@ -75,7 +75,7 @@ final class bundle {
 
     public static function get_vendor_bundle(): ?string {
         $path = self::component_build_directory_client(framework::COMPONENT) . 'vendors';
-        foreach (self::get_js_desired_file_suffix() as $suffix) {
+        foreach (self::get_js_suffix_for_file() as $suffix) {
             $file = $path . $suffix . self::EXT_JS;
             if (file_exists($file)) {
                 return $file;
@@ -87,7 +87,7 @@ final class bundle {
     public static function get_style_file_in_component($component, $path) {
         $instance = self::instance();
         $instance->ensure_map_generated();
-        foreach (self::get_js_desired_file_suffix() as $suffix) {
+        foreach (self::get_js_suffix_for_file() as $suffix) {
             if (isset($instance->styles_map[$component][$suffix][$path])) {
                 return $instance->styles_map[$component][$suffix][$path];
             }
@@ -124,7 +124,7 @@ final class bundle {
 
     private function find_component_bundle(string $component): ?array {
         $this->ensure_map_generated();
-        foreach (self::get_js_desired_file_suffix() as $suffix) {
+        foreach (self::get_js_suffix_for_file() as $suffix) {
             if (isset($this->bundle_map[$component][$suffix])) {
                 return $this->bundle_map[$component][$suffix];
             }
@@ -132,13 +132,13 @@ final class bundle {
         return null;
     }
 
-    public static function get_js_designed_param_suffix() {
-        $suffixes = self::get_js_desired_file_suffix();
+    public static function get_js_suffix_for_url() {
+        $suffixes = self::get_js_suffix_for_file();
         $suffix = reset($suffixes);
         return self::$map_file_to_param[$suffix];
     }
 
-    private static function get_js_desired_file_suffix() {
+    private static function get_js_suffix_for_file() {
         $suffixes = [];
         $development = self::is_javascript_development();
         $legacy = \core_useragent::is_ie();
@@ -159,23 +159,29 @@ final class bundle {
         return $suffixes;
     }
 
-    public static function get_css_desired_suffix($preferred_only = false) {
+    public static function get_css_suffix_for_url() {
+        $suffixes = self::get_css_suffix_for_file();
+        $suffix = reset($suffixes);
+        return self::$map_file_to_param[$suffix];
+    }
+
+    private static function get_css_suffix_for_file($preferred_only = false) {
         $suffixes = [];
         $development = self::is_css_development();
         $legacy = \core_useragent::is_ie();
 
         if ($legacy) {
             if ($development) {
-                $suffixes[] = self::$map_file_to_param[self::SUFFIX_DEVELOPMENT_LEGACY];
+                $suffixes[] = self::SUFFIX_DEVELOPMENT_LEGACY;
             }
-            $suffixes[] = self::$map_file_to_param[self::SUFFIX_PRODUCTION_LEGACY];
+            $suffixes[] = self::SUFFIX_PRODUCTION_LEGACY;
             return $suffixes;
         }
 
         if ($development) {
-            $suffixes[] = self::$map_file_to_param[self::SUFFIX_DEVELOPMENT];
+            $suffixes[] = self::SUFFIX_DEVELOPMENT;
         }
-        $suffixes[] = self::$map_file_to_param[self::SUFFIX_PRODUCTION];
+        $suffixes[] = self::SUFFIX_PRODUCTION;
 
         if ($preferred_only) {
             return reset($suffixes);
@@ -249,12 +255,6 @@ final class bundle {
             $this->load_bundles_for_component($component, $client_build_directory);
             $this->load_styles_for_component($component, $client_build_directory);
         }
-
-        $server_build_directory = self::component_build_directory_server($component, $directory);
-        if (file_exists($server_build_directory)) {
-            $this->load_bundles_for_component($component, $server_build_directory);
-            $this->load_styles_for_component($component, $client_build_directory);
-        }
     }
 
     private function load_bundles_for_component(string $component, string $directory_build) {
@@ -302,7 +302,7 @@ final class bundle {
                 } else {
                     $suffix = substr($filename, $suffixpos);
                 }
-
+                $file_relative = substr($file_relative, 0, -(strlen($suffix . '.scss'))) . '.scss';
                 if (!in_array($suffix, $filesuffixes)) {
                     debugging('Unexpected suffix encountered in styles directory: ' .$suffix, DEBUG_DEVELOPER);
                     continue;
