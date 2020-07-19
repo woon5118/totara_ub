@@ -145,7 +145,7 @@ function getTemplateComponentId(template) {
   // original mustache templates for icons were in core, but the new
   // Vue components are in totara_core
   if (frankenstyle == 'core') {
-    frankenstyle = 'totara_core';
+    frankenstyle = 'tui';
   }
   // convert 'foo_bar_baz' to 'flex_icons/FooBarBaz'
   const componentName =
