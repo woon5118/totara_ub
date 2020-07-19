@@ -23,7 +23,7 @@ const execFileSync = require('child_process').execFileSync;
 /**
  * @var {string} rootDir Root directory of Totara installation.
  */
-const rootDir = path.join(__dirname, '../../../../../');
+const rootDir = path.join(__dirname, '../../../');
 
 /**
  * Execute a command.

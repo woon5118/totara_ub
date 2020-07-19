@@ -18,7 +18,8 @@
 
 const path = require('path');
 const fs = require('fs');
-const componentMap = require('../generated/component_map.json');
+const { rootDir } = require('./common');
+const componentMap = require(rootDir + 'component_map.json');
 
 const defaultFolder = 'js';
 
@@ -35,6 +36,7 @@ const dirMaps = [{ idBaseSuffix: '', path: './' + defaultFolder }].concat(
 const subfolderStaticAliases = [[/^graphql\/(.*)$/, 'webapi/ajax/$1']];
 
 const cachedComponentDirs = new Map();
+const cachedClientDirs = new Map();
 
 /**
  * Get the directory a totara component lives in, relative to the root directory.
@@ -64,7 +66,7 @@ function getComponentDir(component) {
  */
 function getComponentDirInternal(component) {
   if (component == 'core') {
-    return 'lib';
+    return 'server/lib';
   }
   const parts = component.split('_');
   const type = parts[0];
@@ -77,6 +79,34 @@ function getComponentDirInternal(component) {
   }
   if (componentMap.plugintypes[type]) {
     return componentMap.plugintypes[type] + '/' + plugin;
+  }
+  return null;
+}
+
+function getClientDir(component) {
+  if (cachedClientDirs.has(component)) {
+    return cachedClientDirs.get(component);
+  }
+  const result = getClientDirInternal(component);
+  cachedClientDirs.set(component, result);
+  return result;
+}
+
+function getClientDirInternal(component) {
+  if (component == 'core') {
+    return 'client/src/core';
+  }
+  const parts = component.split('_');
+  const type = parts[0];
+  const plugin = parts.slice(1).join('_');
+  if (!type || !plugin) {
+    return null;
+  }
+  if (type == 'core' && componentMap.subsystems[plugin]) {
+    return 'client/src/' + component;
+  }
+  if (componentMap.plugintypes[type]) {
+    return 'client/src/' + component;
   }
   return null;
 }
@@ -94,19 +124,42 @@ function resolveRequest(req) {
 
   if (req[0] == '.') return;
 
+  // First check if this is a static alias.
   result = resolveStaticAlias(req);
-  if (result) return result;
+  if (result) return path.resolve(result);
 
+  // Check if this is one of ours.
   const parsedReq = parseComponentRequest(req);
   if (!parsedReq) return;
-  const { dir, rest, restParts } = parsedReq;
+  const { serverdir, clientdir, rest, restParts } = parsedReq;
 
   // subfolders get mapped directly under tui/, everything else goes in tui/js/ (defaultFolder = 'js')
   const prefix = subfolders.some(x => restParts[0] == x)
     ? ''
     : defaultFolder + '/';
 
-  return `${dir}/tui/${prefix}${rest}`;
+  let extensions = [''];
+  if (!rest.match(/\.[a-z]+$/)) {
+    extensions = ['.mjs', '.js', '.json', '.vue', '.graphql'];
+  }
+
+  let i = 0;
+  for (i in extensions) {
+    if (!extensions.hasOwnProperty(i)) {
+      continue;
+    }
+    let ext = extensions[i];
+    const clientfile = path.resolve(`${clientdir}/${prefix}${rest}${ext}`);
+    const serverfile = path.resolve(`${serverdir}/tui/${prefix}${rest}${ext}`);
+    if (fs.existsSync(serverfile)) {
+      return serverfile;
+    }
+    if (fs.existsSync(clientfile)) {
+      return clientfile;
+    }
+  }
+
+  return null;
 }
 
 /**
@@ -123,10 +176,13 @@ function resolveStaticAlias(req) {
   if (req[0] == '.') return;
   const parsedReq = parseComponentRequest(req);
   if (!parsedReq) return;
-  const { dir, rest } = parsedReq;
+  const { serverdir, clientdir, rest } = parsedReq;
   for (const [pattern, replacement] of subfolderStaticAliases) {
-    if (dir && pattern.test(rest)) {
-      return path.join(dir, rest.replace(pattern, replacement));
+    if (serverdir && pattern.test(rest)) {
+      return path.join(serverdir, rest.replace(pattern, replacement));
+    }
+    if (clientdir && pattern.test(rest)) {
+      return path.join(clientdir, rest.replace(pattern, replacement));
     }
   }
 }
@@ -144,9 +200,13 @@ function parseComponentRequest(req) {
   const [component, ...restParts] = req.split('/');
   if (!restParts) return null;
   const rest = restParts.join('/');
-  const dir = getComponentDir(component);
-  if (!dir) return null;
-  return { dir, rest, restParts };
+  const serverdir = getComponentDir(component);
+  const clientdir = getClientDir(component);
+
+  if (!serverdir && !clientdir) {
+    return null;
+  }
+  return { serverdir, clientdir, rest, restParts };
 }
 
 const cachedDirComponents = new Map();
@@ -192,6 +252,7 @@ module.exports = {
   dirMaps,
   vueFolders,
   getComponentDir,
+  getClientDir,
   resolveRequest,
   resolveStaticAlias,
   getDirComponent,

@@ -32,7 +32,8 @@ module.exports = {
   setupFilesAfterEnv: ['jest-extended', 'jest-canvas-mock'],
   snapshotSerializers: ['jest-serializer-vue'],
   testMatch: [
-    '**/tui/tests/unit/**/*.spec.(js|jsx|ts|tsx)',
+    '**/server/**/tui/tests/unit/**/*.spec.(js|jsx|ts|tsx)',
+    '**/client/**/src/*/tests/unit/**/*.spec.(js|jsx|ts|tsx)',
     '**/__tests__/*.(js|jsx|ts|tsx)',
   ],
   watchPlugins: [

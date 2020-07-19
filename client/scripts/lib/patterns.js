@@ -18,12 +18,16 @@
 
 // glob patterns used for linters/scripts
 const patterns = {
-  eslint: ['**/tui/**/*.{js,vue}'],
-  stylelint: ['**/tui/**/*.{css,scss,vue}'],
+  eslint: [
+    //'**/server/**/tui/**/*.{js,vue}',
+    '**/client/src/**/*.{js,vue}'
+  ],
+  stylelint: ['**/server/**/tui/**/*.{css,scss,vue}', '**/client/src/**/*.{css,scss,vue}'],
   prettier: [
-    '**/tui/**/*.{js,css,scss,vue}',
-    '**/webapi/*.graphqls',
-    '**/webapi/**/*.graphql',
+    '**/server/**/tui/**/*.{js,css,scss,vue}',
+    '**/client/src/**/*.{js,css,scss,vue}',
+    '**/server/**/webapi/*.graphqls',
+    '**/server/**/webapi/**/*.graphql',
   ],
   // single pattern that will match all of the files in the above patterns, even
   // if some of them will get filtered out later

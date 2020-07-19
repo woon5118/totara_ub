@@ -75,7 +75,7 @@ module.exports = function(jsonSource, map) {
   }
 
   // execute pre-entry code
-  // this is used by totara_core to set up the module store etc before we add to it below
+  // this is used by tui to set up the module store etc before we add to it below
   if (config.preEntry) {
     source += 'require(' + stringifyRequest(this, config.preEntry) + ');\n';
   }
@@ -124,12 +124,12 @@ function genExposeCode(config, options) {
     return code;
   }
 
-  if (config.component != 'totara_core') {
-    if (!options.silent) {
+  if (config.component != 'tui') {
+    if (!options || !options.silent) {
       console.warn(
         `[tui.json loader] Configuration error in tui.json for ` +
           `${config.component}: exposeNodeModules is only supported in ` +
-          `totara_core.`
+          `tui.`
       );
     }
     return code;

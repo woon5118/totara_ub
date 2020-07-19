@@ -20,7 +20,7 @@ const fs = require('fs');
 const path = require('path');
 const { rootDir } = require('../lib/common');
 const { formatCodeWithPath } = require('../lib/prettier');
-const { getComponentDir } = require('../lib/resolution');
+const { getClientDir } = require('../lib/resolution');
 
 const args = require('yargs')
   .help()
@@ -37,8 +37,8 @@ const args = require('yargs')
       .default('vendor', 'totara');
   }).argv;
 
-const dir = getComponentDir(args.component);
-if (dir === null) {
+const { clientdir } = getClientDir(args.component);
+if (clientdir === null) {
   console.error(
     `Error: unknown component ${args.component}.\n` +
       `If this is a new core component or plugin type, you may need to run\n` +
@@ -46,20 +46,14 @@ if (dir === null) {
   );
   process.exit(1);
 }
-const fullDir = path.join(rootDir, dir);
+const fullDir = path.join(rootDir, clientdir);
 
-if (!fs.existsSync(fullDir)) {
-  console.error(`Error: directory ${dir} does not exist.`);
+if (fs.existsSync(fullDir)) {
+  console.error(`Error: directory ${clientdir} already exists.`);
   process.exit(1);
 }
 
-const fullTuiDir = path.join(fullDir, 'tui');
-
-// make tui dir if it does not exist
-
-if (!fs.existsSync(fullTuiDir)) {
-  fs.mkdirSync(fullTuiDir);
-}
+fs.mkdirSync(fullDir);
 
 /**
  * Write a file if it does not exist, formatting content with prettier.
@@ -68,7 +62,7 @@ if (!fs.existsSync(fullTuiDir)) {
  * @param {string} content
  */
 function write(file, content) {
-  const filePath = path.join(fullTuiDir, file);
+  const filePath = path.join(fullDir, file);
   if (fs.existsSync(filePath)) {
     console.log(`${file} already exists, skipping...`);
     return;
@@ -80,11 +74,11 @@ function write(file, content) {
   fs.writeFileSync(filePath, content, 'utf8');
 }
 
-console.log(`Initializing TUI in ${path.join(dir, 'tui')}/...`);
+console.log(`Initializing TUI in ${getClientDir}/...`);
 
 const coreTuiRelative = path.relative(
-  path.join(dir, 'tui'),
-  path.join(getComponentDir('totara_core'), 'tui')
+  clientdir,
+  getClientDir('tui')
 );
 
 /**
@@ -121,7 +115,7 @@ write(
 
 ['js', 'pages', 'components', 'tests', 'styles', 'tests/unit'].forEach(
   subdir => {
-    const fullSubdir = path.join(fullTuiDir, subdir);
+    const fullSubdir = path.join(fullDir, subdir);
     if (!fs.existsSync(fullSubdir)) {
       fs.mkdirSync(fullSubdir);
     }

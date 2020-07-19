@@ -1,8 +1,8 @@
 {
-    "component": "totara_core",
-    "vendor": "totara",
-    "preEntry": "./js/pre_entry.js",
-    "exposeNodeModules": [
-        "vue"
-    ]
+  "component": "tui",
+  "vendor": "totara",
+  "preEntry": "./js/pre_entry.js",
+  "exposeNodeModules": [
+    "vue"
+  ]
 }

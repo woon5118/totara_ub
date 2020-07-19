@@ -33,7 +33,9 @@ function writeJs(path, js) {
  * Generate project configs for editor support
  */
 function generateProjectConfigs() {
-  const tuiConfigFiles = globSync('**/tui/tui.json', { cwd: rootDir });
+  const tuiConfigFiles = globSync('server/**/tui/tui.json', { cwd: rootDir }).concat(
+    globSync('client/src/*/tui.json', { cwd: rootDir })
+  );
 
   const baseFolders = tuiConfigFiles.reduce((acc, configFile) => {
     const config = JSON.parse(

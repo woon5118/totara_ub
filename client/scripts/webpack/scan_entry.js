@@ -25,7 +25,11 @@ const globSync = require('tiny-glob/sync');
  */
 module.exports = function scanEntry({ rootDir }) {
   // scan for tui.json files
-  const tuiConfigFiles = globSync('**/tui/tui.json', { cwd: rootDir });
+  const tuiConfigFiles =
+    // Plugins introducing their own tui code.
+    globSync('server/**/tui/tui.json', { cwd: rootDir })
+      // And core, which all lives in the client.
+    .concat(globSync('client/src/*/tui.json', { cwd: rootDir }));
   let entryData = [];
 
   // parse config file and determine output location
@@ -41,9 +45,8 @@ module.exports = function scanEntry({ rootDir }) {
       );
     }
 
-    const tuiDir = path.dirname(configFile).replace(/\\/g, '/');
     const outFile = path
-      .relative(rootDir, path.resolve(tuiDir, './build/tui_bundle'))
+      .relative(rootDir, path.resolve(rootDir, 'client/build', config.component, 'tui_bundle'))
       .replace(/\\/g, '/');
 
     entryData[outFile] = './' + configFile;

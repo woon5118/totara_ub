@@ -34,7 +34,7 @@ let entryCache = null;
 const getEntry = () =>
   entryCache ? entryCache : (entryCache = scanEntry({ rootDir }));
 
-const coreBundle = 'totara/core/tui/build/tui_bundle';
+const coreBundle = 'client/build/tui/tui_bundle';
 const isCoreBundleChunk = x =>
   x.name.replace(/\\/g, '/').startsWith(coreBundle);
 
@@ -199,7 +199,7 @@ function createConfig({
         const bundleSuffix = bundleChunk.name.slice(
           index + 'tui_bundle'.length
         );
-        return 'totara/core/tui/build/vendors' + bundleSuffix;
+        return 'client/build/tui/vendors' + bundleSuffix;
       },
     },
   };
@@ -227,7 +227,6 @@ function createConfig({
       extensions: ['.mjs', '.js', '.json', '.vue', '.graphql'],
       plugins: [new TuiAliasPlugin()],
       // only used for JetBrains IDE support at the moment
-      alias: require('../generated/webpack_aliases'),
     },
 
     // used to implement importing frankenstyle paths
@@ -293,8 +292,8 @@ function scssToScssConfig({ mode, watch }) {
           return;
         }
         const out = path.join(
-          dir,
-          'build/styles',
+          dir.replace(/^\.\/client\/src/, './client/build'),
+          'styles',
           x.slice('styles/'.length).replace(/\.scss$/, '')
         );
         const modeSuffix = mode == 'production' ? '' : '.' + mode;

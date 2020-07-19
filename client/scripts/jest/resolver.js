@@ -23,7 +23,7 @@ module.exports = (request, options) => {
   if (request[0] != '.') {
     const req = resolveRequest(request);
     if (req) {
-      return options.defaultResolver(options.rootDir + '/' + req, options);
+      return options.defaultResolver(req, options);
     }
   }
   return options.defaultResolver(request, options);

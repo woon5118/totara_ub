@@ -22,7 +22,7 @@ const { escapeRegExp } = require('../lib/common');
 const { vueFolders } = require('../lib/resolution');
 
 const themeOverrideRegex = new RegExp(
-  'theme\\/[^/]+\\/tui\\/(' +
+  '(server\\/theme\\/[^/]+\\/tui|client\\/src\\/theme_[^/]+)\\/(' +
     vueFolders.map(x => escapeRegExp(x)).join('|') +
     ')\\/overrides\\/(.*).vue$'
 );
@@ -57,9 +57,9 @@ module.exports = function(source, map) {
       this.resourcePath.replace(/\\/g, '/')
     );
     // skip if we're not loading an override component or if the file is not in a subfolder
-    if (themeOverrideMatch && themeOverrideMatch[2].indexOf('/') !== -1) {
-      const folder = themeOverrideMatch[1];
-      let parentName = themeOverrideMatch[2];
+    if (themeOverrideMatch && themeOverrideMatch[3].indexOf('/') !== -1) {
+      const folder = themeOverrideMatch[2];
+      let parentName = themeOverrideMatch[3];
       const sepIndex = parentName.indexOf('/');
       parentName =
         parentName.substring(0, sepIndex) +
