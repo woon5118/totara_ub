@@ -764,8 +764,11 @@ class behat_base extends Behat\MinkExtension\Context\RawMinkContext {
                     }
                 } else if (' . self::PAGE_READY_JS . ') {
                     return "";
-                } else if (typeof M.util !== "undefined" && typeof testbridge !== "undefined" && testbridge.pending) {
-                    return M.util.pending_js.concat(testbridge.pending).join(":");
+                } else if ((typeof M.util !== "undefined" && M.util.pending_js) || (typeof testbridge !== "undefined" && testbridge.pending)) {
+                    return []
+                        .concat( (typeof M.util !== "undefined" && M.util.pending_js) ? M.util.pending_js : [] )
+                        .concat( (typeof testbridge !== "undefined" && testbridge.pending) ? testbridge.pending : [] )
+                        .join(":");
                 } else {
                     return "incomplete";
                 }

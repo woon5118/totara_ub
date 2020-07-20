@@ -34,6 +34,7 @@ define('BYTESERVING_BOUNDARY', 's1k2o3d4a5k6s7');
  */
 define('FILE_AREA_MAX_BYTES_UNLIMITED', -1);
 
+global $CFG;
 require_once("$CFG->libdir/filestorage/file_exceptions.php");
 require_once("$CFG->libdir/filestorage/file_storage.php");
 require_once("$CFG->libdir/filestorage/zip_packer.php");

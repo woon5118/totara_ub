@@ -109,7 +109,9 @@ if (!empty($options['parallel'])) {
     define('BEHAT_PARALLEL_UTIL', true);
 }
 
-require_once(TOOL_BEHAT_DIR_SERVER . '/config.php');
+require_once(__DIR__ . '/../../../../lib/init.php');
+$CFG = \core\internal\config::initialise();
+
 require_once(TOOL_BEHAT_DIR_SERVER . '/lib/behat/lib.php');
 require_once(TOOL_BEHAT_DIR_SERVER . '/lib/behat/classes/behat_command.php');
 require_once(TOOL_BEHAT_DIR_SERVER . '/lib/behat/classes/behat_config_manager.php');

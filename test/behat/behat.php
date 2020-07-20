@@ -81,8 +81,7 @@ foreach ($passthrough as &$arg) {
 }
 // The hack continued...
 if ($set_config_argument) {
-    $passthrough[] = '--config';
-    $passthrough[] = '/Users/samh/Workspace/Sitedata/distribution/14/pgsql_behat/behatrun/behat/behat.yml';
+    $passthrough[] = '--config='.escapeshellarg(__DIR__.'/behat.yml');
 }
 
 passthru(escapeshellcmd($command) . ' '  . join(' ', $passthrough), $code);

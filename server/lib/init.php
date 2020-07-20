@@ -403,8 +403,15 @@ namespace core\internal {
                         }
 
                         if (defined('BEHAT_UTIL')) {
+
+                            if (!isset($cfg->directorypermissions)) {
+                                $cfg->directorypermissions = (isset($cfg->behat_directorypermissions)) ? $cfg->behat_directorypermissions : 02777;
+                            }
+                            if (!isset($cfg->filepermissions)) {
+                                $cfg->filepermissions = (isset($cfg->behat_filepermissions)) ? $cfg->behat_filepermissions : ($cfg->directorypermissions & 0666); // strip execute flags;
+                            }
                             // Now we create dataroot directory structure for behat tests.
-                            testing_initdataroot($cfg->behat_dataroot, 'behat');
+                            testing_initdataroot($cfg->behat_dataroot, 'behat', $cfg->directorypermissions, $cfg->filepermissions);
                         } else {
                             behat_error(BEHAT_EXITCODE_INSTALL);
                         }
