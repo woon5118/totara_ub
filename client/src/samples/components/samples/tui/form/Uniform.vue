@@ -74,26 +74,28 @@
       </FormRadioGroup>
     </FormRow>
 
-    <FormRowFieldset label="Answers">
-      <FieldArray v-slot="{ items, push, remove }" path="answers">
-        <Repeater
-          :rows="items"
-          :min-rows="1"
-          :delete-icon="true"
-          :allow-deleting-first-items="true"
-          @add="push('')"
-          @remove="(item, i) => remove(i)"
-        >
-          <template v-slot="{ row, index }">
-            <FormText
-              :name="index"
-              :validations="v => [v.required()]"
-              aria-label="Answer text"
-            />
-          </template>
-        </Repeater>
-      </FieldArray>
-    </FormRowFieldset>
+    <FormRow v-slot="{ labelId }" label="Answers">
+      <FieldGroup :aria-labelledby="labelId">
+        <FieldArray v-slot="{ items, push, remove }" path="answers">
+          <Repeater
+            :rows="items"
+            :min-rows="1"
+            :delete-icon="true"
+            :allow-deleting-first-items="true"
+            @add="push('')"
+            @remove="(item, i) => remove(i)"
+          >
+            <template v-slot="{ row, index }">
+              <FormText
+                :name="index"
+                :validations="v => [v.required()]"
+                aria-label="Answer text"
+              />
+            </template>
+          </Repeater>
+        </FieldArray>
+      </FieldGroup>
+    </FormRow>
 
     <SampleFormPart path="fullName" />
 
@@ -141,7 +143,6 @@ import {
   FormField,
   FieldArray,
   FormRow,
-  FormRowFieldset,
   FormColor,
   FormText,
   FormNumber,
@@ -157,6 +158,7 @@ import Radio from 'tui/components/form/Radio';
 import FormRowActionButtons from 'tui/components/form/FormRowActionButtons';
 import FormRowDetails from 'tui/components/form/FormRowDetails';
 import FormRowDefaults from 'tui/components/form/FormRowDefaults';
+import FieldGroup from 'tui/components/form/FieldGroup';
 import SampleFormPart from 'samples/components/sample_parts/tui/form/FormPart';
 import Repeater from 'tui/components/form/Repeater';
 import theme from 'tui/theme';
@@ -167,7 +169,6 @@ export default {
     FormField,
     FieldArray,
     FormRow,
-    FormRowFieldset,
     FormText,
     FormColor,
     FormNumber,
@@ -179,6 +180,7 @@ export default {
     FormRowActionButtons,
     FormRowDetails,
     FormRowDefaults,
+    FieldGroup,
     SampleFormPart,
     Repeater,
     FormCheckbox,
