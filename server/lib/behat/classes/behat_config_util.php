@@ -373,7 +373,7 @@ class behat_config_util {
             $this->contexts = $contexts;
         }
 
-        $autoload = $CFG->srcroot . '/test/behat/vendor/autoload.php';
+        $autoload = TOOL_BEHAT_DIR_VENDOR . '/autoload.php';
         if (!file_exists($autoload)) {
             throw new \coding_exception('Behat composer requirements are not available.');
         }
@@ -472,13 +472,14 @@ class behat_config_util {
         global $CFG;
 
         $yml_dist_file = $CFG->srcroot . '/test/behat/behat.yml.dist';
+        $behat_local_file = $CFG->srcroot . '/test/behat/behat_local.yml';
 
         // Get the defaults first.
         $config = Symfony\Component\Yaml\Yaml::parse(file_get_contents($yml_dist_file));
 
         // Add local Totara overrides.
-        if (file_exists($yml_dist_file)) {
-            $localconfig = Symfony\Component\Yaml\Yaml::parse(file_get_contents($yml_dist_file));
+        if (file_exists($behat_local_file)) {
+            $localconfig = Symfony\Component\Yaml\Yaml::parse(file_get_contents($behat_local_file));
             if ($localconfig) {
                 $config = $this->merge_config($config, $localconfig);
             }

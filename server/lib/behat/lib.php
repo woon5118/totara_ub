@@ -443,7 +443,7 @@ function cli_execute_parallel($cmds, $cwd = null, $delay = 0) {
     if (defined('TOOL_BEHAT_DIR_VENDOR')) {
         require_once(TOOL_BEHAT_DIR_VENDOR . "/autoload.php");
     } else {
-        // Guessi it.
+        // Guess it.
         require_once(__DIR__ . "/../../../vendor/autoload.php");
     }
 
