@@ -4,7 +4,7 @@
   Copyright (C) 2020 onwards Totara Learning Solutions LTD
 
   Totara Enterprise Extensions is provided only to Totara
-  Learning Solutions LTD’s customers and partners, pursuant to
+  Learning Solutions LTD's customers and partners, pursuant to
   the terms and conditions of a separate agreement with Totara
   Learning Solutions LTD or its affiliate.
 
