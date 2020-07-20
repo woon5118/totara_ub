@@ -18,7 +18,7 @@
 
 <template>
   <div class="tui-popoverFrame" :class="['tui-popoverFrame--' + side]">
-    <Arrow :relative-side="side" :distance="arrowDistance" />
+    <Arrow :relative-side="arrowSide" :distance="arrowDistance" />
     <CloseButton class="tui-popoverFrame__close" @click="$emit('close')" />
     <div v-if="title" class="tui-popoverFrame__title">
       {{ title }}
@@ -35,6 +35,7 @@
 <script>
 import Arrow from 'tui/components/decor/Arrow';
 import CloseButton from 'tui/components/buttons/CloseIcon';
+import { langSide } from 'tui/i18n';
 
 export default {
   components: {
@@ -46,6 +47,12 @@ export default {
     title: String,
     side: String,
     arrowDistance: Number,
+  },
+
+  computed: {
+    arrowSide() {
+      return langSide(this.side);
+    },
   },
 };
 </script>

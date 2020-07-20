@@ -18,7 +18,7 @@
 
 // eslint-disable-next-line no-unused-vars
 import { Rect, Point, Size } from 'tui/geometry';
-import { langSide } from 'tui/i18n';
+import { langSide, isRtl } from 'tui/i18n';
 
 /**
  * @typedef {Object} PositionResult
@@ -152,18 +152,25 @@ function calculateOffset(side, secDir, ref, viewport, size, padding, force) {
   } else {
     loc[secSide] = ref[secSide] + (ref[secSize] - size[secSize]) / 2;
   }
-
-  // position the arrow
-  arrowPos = ref[secSide] + ref[secSize] / 2;
   if (loc[secSide] < viewport[secSide]) {
     loc[secSide] = viewport[secSide];
   } else if (loc[secSide] + size[secSize] > viewport[secOtherSide]) {
     loc[secSide] = viewport[secOtherSide] - size[secSize];
   }
 
+  // position the arrow
+  if (isRtl() && (secSide == 'left' || secSide == 'right')) {
+    // Top and bottom are no different between LTR & RTL langauges
+    let right = loc.left + size.width;
+    arrowPos = right - ref.right + ref.width / 2 - padding * 2;
+  } else {
+    // ltr language
+    arrowPos = ref[secSide] + ref[secSize] / 2 - loc[secSide] - padding;
+  }
+
   return {
     side,
     location: new Point(loc.left, loc.top),
-    arrowDistance: arrowPos - loc[secSide] - padding,
+    arrowDistance: arrowPos,
   };
 }

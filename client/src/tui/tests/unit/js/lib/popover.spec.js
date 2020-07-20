@@ -18,8 +18,18 @@
 
 import { position } from 'tui/lib/popover';
 import { Rect, Size, Point } from 'tui/geometry';
+import { isRtl, langSide } from 'tui/i18n';
+
+jest.mock('tui/i18n');
 
 describe('position', () => {
+  beforeEach(() => {
+    isRtl.mockReset().mockReturnValue(false);
+    langSide.mockImplementation(dir => {
+      return dir;
+    });
+  });
+
   it('positions popover on requested side', () => {
     const viewport = new Rect(0, 0, 1920, 1080);
     const ref = new Rect(500, 500, 100, 50);
@@ -59,6 +69,58 @@ describe('position', () => {
     expect(result.side).toBe('bottom');
     expect(result.location).toEqual(new Point(0, 50));
     expect(result.arrowDistance).toBe(15);
+  });
+
+  it('RTL languages are on the correct side', () => {
+    // And now Rtl
+    isRtl.mockImplementation(() => true);
+    langSide.mockImplementation(dir => {
+      switch (dir) {
+        case 'right':
+          return 'left';
+        case 'left':
+          return 'right';
+        default:
+          return dir;
+      }
+    });
+    const viewport = new Rect(0, 0, 1920, 1080);
+    const ref = new Rect(500, 500, 100, 50);
+    const size = new Size(200, 100);
+    const padding = 10;
+    const options = { viewport, ref, size, padding };
+    let result;
+
+    result = position({ ...options, position: ['top'] });
+    expect(result.side).toBe('top');
+    expect(result.location).toEqual(new Point(450, 400));
+    expect(result.arrowDistance).toBe(size.width / 2 - padding * 2);
+
+    result = position({ ...options, position: ['bottom'] });
+    expect(result.side).toBe('bottom');
+    expect(result.location).toEqual(new Point(450, 550));
+    expect(result.arrowDistance).toBe(size.width / 2 - padding * 2);
+
+    result = position({ ...options, position: ['left'] });
+    expect(result.side).toBe('right');
+    expect(result.location).toEqual(new Point(600, 475));
+    expect(result.arrowDistance).toBe(size.height / 2 - padding);
+
+    result = position({ ...options, position: ['right'] });
+    expect(result.side).toBe('left');
+    expect(result.location).toEqual(new Point(300, 475));
+    expect(result.arrowDistance).toBe(size.height / 2 - padding);
+
+    // fallback to bottom when insufficient room
+    result = position({
+      ...options,
+      viewport: new Rect(0, 0, 100, 100),
+      ref: new Rect(0, 0, 50, 50),
+      position: ['right'],
+    });
+    expect(result.side).toBe('bottom');
+    expect(result.location).toEqual(new Point(0, 50));
+    expect(result.arrowDistance).toBe(155);
   });
 
   it('allows specifying a secondary side', () => {
