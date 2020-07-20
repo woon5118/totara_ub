@@ -26,6 +26,7 @@
 
 <script>
 import FormRow from 'tui/components/form/FormRow';
+
 export default {
   components: { FormRow },
   props: {

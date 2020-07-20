@@ -23,6 +23,7 @@
 
 $string['answer_text'] = 'Answer text';
 $string['date'] = 'Date';
+$string['date_picker_placeholder'] = 'Please select DAY / MONTH / YEAR';
 $string['error_invalid_date'] = 'Invalid date. Select day, month and year';
 $string['error_you_must_answer_this_question'] = 'Required';
 $string['name'] = 'Date picker';

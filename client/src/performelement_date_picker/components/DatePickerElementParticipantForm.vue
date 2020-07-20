@@ -17,28 +17,32 @@
 -->
 <template>
   <FormScope :path="path">
-    <FormDateSelector
-      v-modal="dateValue"
-      name="date"
-      :initial-current-date="false"
-      :initial-custom-date="customDate"
-      :type="isoType"
-      :years-midrange="parseInt(midrangeYear)"
-      :years-before-midrange="parseInt(midrangeYearBefore)"
-      :years-after-midrange="parseInt(midrangeYearAfter)"
-      :validate="answerValidator"
-    />
+    <div>
+      <FormDateSelector
+        v-modal="dateValue"
+        name="date"
+        :years-midrange="midrangeYear"
+        :years-before-midrange="midrangeYearBefore"
+        :years-after-midrange="midrangeYearAfter"
+        :validate="answerValidator"
+      />
+      <FormRowDetails>{{
+        $str('date_picker_placeholder', 'performelement_date_picker')
+      }}</FormRowDetails>
+    </div>
   </FormScope>
 </template>
 
 <script>
 import FormScope from 'tui/components/reform/FormScope';
 import { FormDateSelector } from 'tui/components/uniform';
+import FormRowDetails from 'tui/components/form/FormRowDetails';
 
 export default {
   components: {
     FormScope,
     FormDateSelector,
+    FormRowDetails,
   },
 
   props: {
@@ -48,9 +52,6 @@ export default {
   },
   data() {
     return {
-      currentDate: true,
-      customDate: false,
-      isoType: 'date',
       dateValue: {},
       disabled: false,
       errors: null,
@@ -58,7 +59,6 @@ export default {
       midrangeYearBefore: 100,
       midrangeYearAfter: 50,
       selectedDate: {},
-      timezoned: true,
     };
   },
 
@@ -92,7 +92,8 @@ export default {
   {
     "performelement_date_picker": [
         "error_invalid_date",
-        "error_you_must_answer_this_question"
+        "error_you_must_answer_this_question",
+        "date_picker_placeholder"
     ]
   }
 </lang-strings>
