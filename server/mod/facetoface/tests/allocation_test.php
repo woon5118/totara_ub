@@ -82,12 +82,25 @@ class mod_facetoface_allocation_testcase extends advanced_testcase {
         $this->assertStringNotContainsString('BEGIN:VCALENDAR', $message->body);
     }
 
+    /**
+     * Get the DESCRIPTION property in the iCalendar attachment.
+     *
+     * @param string $body
+     * @return string
+     */
     private function extract_description_from_ical_attachment(string $body) {
         $body = strtr($body, "\r\n", "\n");
+        if (substr($body, -2) === "\n\n") {
+            $body = implode("\n", explode("\n\n", $body));
+        }
         if (preg_match('/BEGIN:VCALENDAR\n.*\nDESCRIPTION:(.*)\nSUMMARY:.*\nEND:VCALENDAR/sm', $body, $matches)) {
-            return strtr(implode('', array_map(function ($line) {
-                return ltrim($line);
-            }, explode("\n", quoted_printable_decode($matches[1])))), ['\\\\' => '\\', '\\;' => ';', '\\,' => ',', '\\N' => "\n", '\\n' => "\n"]);
+            $text = preg_replace('/=\\n/m', '', $matches[1]);
+            $text = implode("\n", array_map(function ($line) {
+                return quoted_printable_decode($line);
+            }, explode("\n", $text)));
+            $text = preg_replace('/\\n\\s/m', '', $text);
+            $text = strtr($text, ['\\\\' => '\\', '\\;' => ';', '\\,' => ',', '\\N' => "\n", '\\n' => "\n"]);
+            return $text;
         }
         $this->fail('cannot find the description property');
     }
