@@ -26,7 +26,7 @@ module.exports = function tuiExternals() {
 
       // Only core can use code from node_modules
       if (
-        /[/\\]client[/\\]src[/\\](?:totara_tui|tui|tui_\w+)[/\\]/.test(context) &&
+        /[/\\]client[/\\]src[/\\](?:tui|tui_\w+)(?:[/\\]|$)/.test(context) &&
         !resolveRequest(request)
       ) {
         nativeResolve = true;
