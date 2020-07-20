@@ -35,11 +35,11 @@ $string['number'] = 'Number';
 $string['pluginname'] = 'Totara TUI frontend framework';
 $string['samples'] = 'Samples';
 $string['setting_cache_scss'] = 'Cache SCSS';
-$string['setting_cache_scss_desc'] = 'When enabled Tui front end framework SCSS will not be cached on the server and will be regenerated each time it is requested.
-This will delay page load times as processing SCSS takes several seconds. It is only useful when developing styles for the product.
-It should never be enabled on production instances.';
+$string['setting_cache_scss_desc'] = 'When enabled Tui front end framework SCSS will be cached on the server and will not be regenerated each time it is requested.
+Disabling this will delay page load times as processing SCSS takes several seconds. It is only useful when developing styles for the product.
+It should never be disabled on production instances.';
 $string['setting_cache_js'] = 'Cache JS';
-$string['setting_cache_js_desc'] = 'When enabled Tui front end framework JavaScript will not be cached on the server and will be regenerated each time it is requested.';
+$string['setting_cache_js_desc'] = 'When enabled Tui front end framework JavaScript will be cached on the server and will not be regenerated each time it is requested.';
 $string['setting_development_mode'] = 'Development mode';
 $string['setting_development_mode_desc'] = 'When enabled development versions of the Tui JavaScript and SCSS will be served to pages requiring the Tui components.
 This is useful when developing components or debugging front end code at runtime.';
