@@ -24,6 +24,8 @@
   --tui-form-radio-dot-size: calc(var(--tui-form-radio-size) / 2);
   // Offset to center dot
   --tui-radio-dot-offset: calc(var(--tui-form-radio-size) / 4);
+  // Offset for radio label
+  --tui-radio-label-offset: calc(var(--tui-form-radio-size) * 1.35);
 }
 
 .tui-radio {
@@ -38,7 +40,7 @@
   &__label {
     position: relative;
     margin: 0;
-    padding-left: calc(var(--tui-form-radio-size) * 1.35);
+    padding-left: var(--tui-radio-label-offset);
     font-weight: normal;
     font-size: var(--tui-form-input-font-size);
     line-height: 1;

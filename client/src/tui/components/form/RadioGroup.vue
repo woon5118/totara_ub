@@ -19,7 +19,10 @@
 <template>
   <div
     class="tui-radioGroup"
-    :class="{ 'tui-radioGroup--horizontal': horizontal }"
+    :class="{
+      'tui-radioGroup--horizontal': horizontal,
+      'tui-radioGroup--inputSizedOptions': inputSizedOptions,
+    }"
     role="radiogroup"
     :aria-labelledby="ariaLabelledby"
   >
@@ -41,6 +44,7 @@ export default {
     ariaLabelledby: String,
     disabled: Boolean,
     horizontal: Boolean,
+    inputSizedOptions: Boolean,
     name: {
       type: String,
       default() {
@@ -55,6 +59,7 @@ export default {
     provide({ props }) {
       return {
         props: {
+          groupName: this.name,
           name: this.name,
           checked: props.value == this.value,
           disabled: this.disabled,

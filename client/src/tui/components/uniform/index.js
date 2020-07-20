@@ -32,6 +32,7 @@ export { default as FormEmail } from 'tui/components/uniform/FormEmail';
 export { default as FormNumber } from 'tui/components/uniform/FormNumber';
 export { default as FormPassword } from 'tui/components/uniform/FormPassword';
 export { default as FormRadioGroup } from 'tui/components/uniform/FormRadioGroup';
+export { default as FormRadioWithInput } from 'tui/components/uniform/FormRadioWithInput';
 export { default as FormSearch } from 'tui/components/uniform/FormSearch';
 export { default as FormSelect } from 'tui/components/uniform/FormSelect';
 export { default as FormColor } from 'tui/components/uniform/FormColor';

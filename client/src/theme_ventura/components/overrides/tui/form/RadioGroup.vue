@@ -31,6 +31,17 @@
   & > * + * {
     margin-top: var(--tui-form-radio-group-spacing-v);
   }
+
+  &--inputSizedOptions {
+    & > * + * {
+      margin-top: var(--tui-form-radio-group-spacing-v);
+    }
+
+    & > * {
+      align-items: center;
+      min-height: var(--tui-form-input-height);
+    }
+  }
 }
 
 @media screen and (min-width: $tui-screen-sm) {

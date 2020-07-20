@@ -19,6 +19,7 @@
 import { pick } from 'tui/util';
 import { getPropDefs, getModelDef } from 'tui/vue_util';
 import FormField from 'tui/components/uniform/FormField';
+import { mergeListeners } from '../../js/internal/vnode';
 
 /**
  * Create a wrapper component for an input.
@@ -31,6 +32,8 @@ import FormField from 'tui/components/uniform/FormField';
  * @returns {(object|Vue)} Vue component.
  */
 export function createUniformInputWrapper(input, options = {}) {
+  const functional =
+    options.functional !== undefined ? options.functional : true;
   const inputProps = Object.assign({}, getPropDefs(input));
   delete inputProps.name;
   delete inputProps.validate;
@@ -55,8 +58,7 @@ export function createUniformInputWrapper(input, options = {}) {
   const modelEvent = (model && model.event) || 'input';
 
   return {
-    functional: true,
-
+    functional,
     // needed for lang string loader support
     components: {
       FormField,
@@ -67,7 +69,9 @@ export function createUniformInputWrapper(input, options = {}) {
 
     props: props,
 
-    render(h, { props, children }) {
+    render(h, context) {
+      const props = functional ? context.props : this;
+      const listeners = functional ? context.listeners : this.$listeners;
       const propsForInput = pick(props, Object.keys(inputProps));
       return h(FormField, {
         props: {
@@ -103,12 +107,13 @@ export function createUniformInputWrapper(input, options = {}) {
               {
                 props: finalProps,
                 attrs,
-                on: {
+                on: mergeListeners(listeners, {
                   [modelEvent]: value => update(value),
                   blur,
-                },
+                }),
+                scopedSlots: functional ? undefined : this.$scopedSlots,
               },
-              children
+              functional ? context.children : undefined
             );
           },
         },
