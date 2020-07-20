@@ -21,7 +21,7 @@ export const config = {
   sesskey: 'sesskey',
   rev: { js: 1000, theme: 1001 },
   theme: {
-    name: 'ventura'
+    name: 'ventura',
   },
   timezone: {
     user: 'Pacific/Auckland',

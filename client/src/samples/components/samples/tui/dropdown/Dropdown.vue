@@ -107,11 +107,7 @@
 import Button from 'tui/components/buttons/Button';
 import Dropdown from 'tui/components/dropdown/Dropdown';
 import DropdownItem from 'tui/components/dropdown/DropdownItem';
-import {
-  Uniform,
-  FormRow,
-  FormRadioGroup,
-} from 'tui/components/uniform';
+import { Uniform, FormRow, FormRadioGroup } from 'tui/components/uniform';
 import Radio from 'tui/components/form/Radio';
 import AddIcon from 'tui/components/icons/common/Add';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';

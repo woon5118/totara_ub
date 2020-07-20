@@ -96,9 +96,7 @@ describe('mount', () => {
       created() {
         let vm = this.$parent;
         while (vm) {
-          if (
-            vm.$options.$_name == 'tui/components/errors/ErrorBoundary'
-          ) {
+          if (vm.$options.$_name == 'tui/components/errors/ErrorBoundary') {
             expect(vm.$options.$_name).toBe(
               'tui/components/errors/ErrorBoundary'
             );

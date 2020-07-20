@@ -27,7 +27,7 @@ const patterns = {
   ],
   // single pattern that will match all of the files in the above patterns, even
   // if some of them will get filtered out later
-  allGreedyPattern: 'client/src/*.{js,css,scss,vue,graphql,graphqls}',
+  allGreedyPattern: 'client/src/**/*.{js,css,scss,vue,graphql,graphqls}',
 };
 
 module.exports = patterns;

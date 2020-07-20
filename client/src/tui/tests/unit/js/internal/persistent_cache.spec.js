@@ -17,11 +17,7 @@
  */
 
 import { WebStorageStore } from 'tui/internal/storage';
-import {
-  cacheGet,
-  cacheSet,
-  cacheDelete,
-} from 'tui/internal/persistent_cache';
+import { cacheGet, cacheSet, cacheDelete } from 'tui/internal/persistent_cache';
 import { config } from 'tui/config';
 
 const storageInstance = WebStorageStore.mock.instances.find(
