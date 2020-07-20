@@ -211,9 +211,13 @@ export function toVueRequirements(strings) {
  * @returns {string}
  */
 function replacePlaceholders(str, a) {
-  if (!a) return str;
+  if (a == null) {
+    return str;
+  }
   if (typeof a == 'object') {
-    return str.replace(/\{\$a->(.*?)\}/g, (full, prop) => a[prop] || full);
+    return str.replace(/\{\$a->(.*?)\}/g, (full, prop) =>
+      a[prop] != null ? a[prop] : full
+    );
   } else {
     return str.replace(/\{\$a\}/g, a);
   }

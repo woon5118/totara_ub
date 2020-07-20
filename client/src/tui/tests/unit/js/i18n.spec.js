@@ -46,15 +46,26 @@ describe('getString', () => {
     expect(rawGetString).toHaveBeenCalledWith('baz', 'foo');
   });
 
-  it('replaces placeholders', () => {
+  it('replaces simple placeholders', () => {
     expect(getString('replace', 'foo', 'bob')).toBe('hello bob');
     expect(rawGetString).toHaveBeenCalledWith('replace', 'foo');
+    expect(getString('replace', 'foo', 0)).toBe('hello 0');
+    expect(getString('replace', 'foo', '')).toBe('hello ');
+    expect(getString('replace', 'foo', null)).toBe('hello {$a}');
+    expect(getString('replace', 'foo', undefined)).toBe('hello {$a}');
+    expect(getString('replace', 'foo')).toBe('hello {$a}');
+  });
+
+  it('replaces object placeholders', () => {
     expect(
       getString('replace_complex', 'foo', { name: 'bob', weather: 'sunny' })
     ).toBe('hello bob, today is sunny');
     expect(rawGetString).toHaveBeenCalledWith('replace_complex', 'foo');
     expect(getString('replace_complex', 'foo', { name: 'bob' })).toBe(
       'hello bob, today is {$a->weather}'
+    );
+    expect(getString('replace_complex', 'foo', { name: '', weather: 0 })).toBe(
+      'hello , today is 0'
     );
   });
 
@@ -138,6 +149,6 @@ describe('loadStrings', () => {
 describe('toVueRequirements', () => {
   it('called with known string', () => {
     const requests = [{ component: 'core', key: 'save' }];
-    expect(toVueRequirements(requests)).toStrictEqual({"core": ["save"]});
+    expect(toVueRequirements(requests)).toStrictEqual({ core: ['save'] });
   });
 });
