@@ -868,7 +868,7 @@ class assign_grading_table extends table_sql implements renderable {
     public function col_fullname($row) {
         if (!$this->is_downloading()) {
             $courseid = $this->assignment->get_course()->id;
-            $link= new moodle_url('/user/view.php', array('id' =>$row->id, 'course'=>$courseid));
+            $link= new moodle_url('/user/profile.php', array('id' =>$row->id, 'course'=>$courseid));
             $fullname = $this->output->action_link($link, $this->assignment->fullname($row));
         } else {
             $fullname = $this->assignment->fullname($row);

@@ -2951,7 +2951,7 @@ function tag_print_user_box($user, $return=false) {
     $profilelink = '';
 
     if ($usercontext and (has_capability('moodle/user:viewalldetails', $usercontext) || has_coursecontact_role($user->id))) {
-        $profilelink = $CFG->wwwroot .'/user/view.php?id='. $user->id;
+        $profilelink = $CFG->wwwroot .'/user/profile.php?id='. $user->id;
     }
 
     $output = $OUTPUT->box_start('user-box', 'user'. $user->id);
@@ -5397,7 +5397,7 @@ function print_log($course, $user=0, $date=0, $order="l.time ASC", $page=0, $per
         $link = new moodle_url("/iplookup/index.php?ip=$log->ip&user=$log->userid");
         $row[] = $OUTPUT->action_link($link, $log->ip, new popup_action('click', $link, 'iplookup', array('height' => 440, 'width' => 700)));
 
-        $row[] = html_writer::link(new moodle_url("/user/view.php?id={$log->userid}&course={$log->course}"), fullname($log, has_capability('moodle/site:viewfullnames', context_course::instance($course->id))));
+        $row[] = html_writer::link(new moodle_url("/user/profile.php?id={$log->userid}&course={$log->course}"), fullname($log, has_capability('moodle/site:viewfullnames', context_course::instance($course->id))));
 
         $displayaction="$log->module $log->action";
         if ($brokenurl) {
@@ -5508,7 +5508,7 @@ function print_mnet_log($hostid, $course, $user=0, $date=0, $order="l.time ASC",
         echo "</td>\n";
         $fullname = fullname($log, has_capability('moodle/site:viewfullnames', context_course::instance($course->id)));
         echo "<td class=\"r$row c3\" >\n";
-        echo "    <a href=\"$CFG->wwwroot/user/view.php?id={$log->userid}\">$fullname</a>\n";
+        echo "    <a href=\"$CFG->wwwroot/user/profile.php?id={$log->userid}\">$fullname</a>\n";
         echo "</td>\n";
         echo "<td class=\"r$row c4\">\n";
         echo $log->action .': '.$log->module;

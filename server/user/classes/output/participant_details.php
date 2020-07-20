@@ -258,7 +258,7 @@ class participant_details implements \renderable {
         }
 
         $links[] = array(
-            'url' => new \moodle_url('/user/view.php?id='. $user->id .'&course='. $course->id),
+            'url' => new \moodle_url('/user/profile.php?id='. $user->id .'&course='. $course->id),
             'text' => get_string('fullprofile') . '...'
         );
         $userdata->links = $links;

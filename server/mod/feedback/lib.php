@@ -3543,7 +3543,7 @@ function feedback_archive_display_list($archives, $params) {
                     array('historyid' => $archive->id, 'feedbackid' => $archive->feedbackid));
             $options .= html_writer::link($viewurl, format_string(get_string('view')));
 
-            $userurl = new moodle_url('/user/view.php', array('id' => $archive->userid));
+            $userurl = new moodle_url('/user/profile.php', array('id' => $archive->userid));
             $row[] = html_writer::link($userurl, format_string($archive->username));
             $row[] = html_writer::link($userurl, format_string(fullname($archive)));
 

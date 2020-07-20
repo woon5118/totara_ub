@@ -83,7 +83,7 @@ class block_totara_tasks extends block_base {
                 $msginfodata = totara_message_eventdata($msg->id, 'oninfo', $msgmeta);
 
                 // User name + link.
-                $userfrom_link = $CFG->wwwroot.'/user/view.php?id='.$msg->useridfrom;
+                $userfrom_link = $CFG->wwwroot.'/user/profile.php?id='.$msg->useridfrom;
                 $from = $DB->get_record('user', array('id' => $msg->useridfrom));
                 $fromname = fullname($from);
 

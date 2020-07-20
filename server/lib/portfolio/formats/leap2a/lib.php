@@ -96,7 +96,7 @@ class portfolio_format_leap2a_writer {
         $author = $this->dom->createElement('author');
         $author->appendChild($this->dom->createElement('name', fullname($this->user)));
         $author->appendChild($this->dom->createElement('email', $this->user->email));
-        $author->appendChild($this->dom->CreateElement('uri', $CFG->wwwroot . '/user/view.php?id=' . $this->user->id));
+        $author->appendChild($this->dom->CreateElement('uri', $CFG->wwwroot . '/user/profile.php?id=' . $this->user->id));
 
         $this->feed->appendChild($author);
         // header done, we can start appending entry elements now

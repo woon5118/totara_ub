@@ -235,7 +235,7 @@ function note_print($note, $detail = NOTES_SHOW_FULL) {
     $systemcontext = context_system::instance();
 
     $authoring = new stdClass();
-    $authoring->name = '<a href="' . $CFG->wwwroot . '/user/view.php?id=' . $author->id .
+    $authoring->name = '<a href="' . $CFG->wwwroot . '/user/profile.php?id=' . $author->id .
         '&amp;course='.$note->courseid . '">' . fullname($author) . '</a>';
     $authoring->date = userdate($note->lastmodified);
 

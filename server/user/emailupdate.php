@@ -46,7 +46,7 @@ $PAGE->set_title($SITE->fullname . ": $stremailupdate");
 $PAGE->set_heading($SITE->fullname . ": $stremailupdate");
 
 if (empty($preferences['newemailattemptsleft'])) {
-    redirect("$CFG->wwwroot/user/view.php?id=$user->id");
+    redirect("$CFG->wwwroot/user/profile.php?id=$user->id");
 
 } else if ($preferences['newemailattemptsleft'] < 1) {
     cancel_email_update($user->id);
@@ -61,7 +61,7 @@ if (empty($preferences['newemailattemptsleft'])) {
 
     // Detect duplicate before saving.
     if ($DB->record_exists_select('user', "LOWER(email) = LOWER(:email) AND id <> :userid", ['email' => $user->email, 'userid' => $user->id])) {
-        redirect(new moodle_url('/user/view.php', ['id' => $user->id]), get_string('emailnowexists', 'auth'));
+        redirect(new moodle_url('/user/profile.php', ['id' => $user->id]), get_string('emailnowexists', 'auth'));
     } else {
         // Update user email.
         $authplugin = get_auth_plugin($user->auth);
@@ -73,7 +73,7 @@ if (empty($preferences['newemailattemptsleft'])) {
         $emailbouncecounter = new core_user\email_bounce_counter($user);
         $emailbouncecounter->reset_counts();
         redirect(
-                new moodle_url('/user/view.php', ['id' => $user->id]),
+                new moodle_url('/user/profile.php', ['id' => $user->id]),
                 get_string('emailupdatesuccess', 'auth', $a),
                 null,
                 \core\output\notification::NOTIFY_SUCCESS

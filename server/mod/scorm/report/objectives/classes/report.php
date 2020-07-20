@@ -415,7 +415,7 @@ class report extends \mod_scorm\report {
                         $row[] = $OUTPUT->user_picture($user, array('courseid' => $course->id));
                     }
                     if (!$download) {
-                        $url = new \moodle_url('/user/view.php', array('id' => $scouser->userid, 'course' => $course->id));
+                        $url = new \moodle_url('/user/profile.php', array('id' => $scouser->userid, 'course' => $course->id));
                         $row[] = \html_writer::link($url, fullname($scouser));
                     } else {
                         $row[] = fullname($scouser);

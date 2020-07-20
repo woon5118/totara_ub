@@ -24,7 +24,7 @@ function glossary_show_entry_TEMPLATE($course, $cm, $glossary, $entry, $mode='',
         //Comments: Configuration not supported
         $fullname = fullname($user);
         $by = new stdClass();
-        $by->name = '<a href="'.$CFG->wwwroot.'/user/view.php?id='.$user->id.'&amp;course='.$course->id.'">'.$fullname.'</a>';
+        $by->name = '<a href="'.$CFG->wwwroot.'/user/profile.php?id='.$user->id.'&amp;course='.$course->id.'">'.$fullname.'</a>';
         $by->date = userdate($entry->timemodified);
         echo '<span class="author">'.get_string('bynameondate', 'forum', $by).'</span>' . '<br />';
 

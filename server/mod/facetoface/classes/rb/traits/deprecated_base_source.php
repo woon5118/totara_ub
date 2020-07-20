@@ -159,7 +159,7 @@ trait deprecated_base_source {
                 break;
             }
             $name = trim(core_text::substr($idname, $idendpos));
-            $result[] = ($isexport) ? $name : html_writer::link(new moodle_url('/user/view.php', array('id' => $id)), $name);
+            $result[] = ($isexport) ? $name : html_writer::link(new moodle_url('/user/profile.php', array('id' => $id)), $name);
 
             // length(length(idname)) + length(' ') + length(idname) + length(', ').
             $leftname = core_text::substr($leftname, core_text::strlen((string)$len)+1+$len+2);

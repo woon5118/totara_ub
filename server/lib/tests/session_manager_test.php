@@ -611,7 +611,7 @@ class core_session_manager_testcase extends advanced_testcase {
         $this->assertEquals($coursecontext, $event->get_context());
         $oldfullname = fullname($user, true);
         $newfullname = fullname($adminuser, true);
-        $expectedlogdata = array($course->id, "course", "loginas", "../user/view.php?id=$course->id&amp;user=$user->id", "$oldfullname -> $newfullname");
+        $expectedlogdata = array($course->id, "course", "loginas", "../user/profile.php?id=$course->id&amp;user=$user->id", "$oldfullname -> $newfullname");
         $this->assertEventLegacyLogData($expectedlogdata, $event);
     }
 

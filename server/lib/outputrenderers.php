@@ -2228,7 +2228,7 @@ class core_renderer extends renderer_base {
         if ($courseid == SITEID) {
             $url = new moodle_url('/user/profile.php', array('id' => $user->id));
         } else {
-            $url = new moodle_url('/user/view.php', array('id' => $user->id, 'course' => $courseid));
+            $url = new moodle_url('/user/profile.php', array('id' => $user->id, 'course' => $courseid));
         }
 
         $attributes = array('href'=>$url);

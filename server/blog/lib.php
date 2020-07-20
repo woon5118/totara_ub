@@ -769,7 +769,7 @@ function blog_get_headers($courseid=null, $groupid=null, $userid=null, $tagid=nu
 
         // Course module navigation is handled by build_navigation as the second param.
         $headers['cm'] = $cm;
-        $PAGE->navbar->add(fullname($user), "$CFG->wwwroot/user/view.php?id=$user->id");
+        $PAGE->navbar->add(fullname($user), "$CFG->wwwroot/user/profile.php?id=$user->id");
         $PAGE->navbar->add($strblogentries, $blogurl);
 
         $PAGE->set_title("$shortname: $cm->name: " . fullname($user) . ': ' . get_string('blogentries', 'blog'));

@@ -214,7 +214,7 @@ class job_assignment_form extends moodleform {
                         'static',
                         'appraiserselector',
                         get_string('appraiser', 'totara_job'),
-                        html_writer::tag('span', html_writer::link(new moodle_url('/user/view.php',
+                        html_writer::tag('span', html_writer::link(new moodle_url('/user/profile.php',
                             array('id' => $appraiserid)), format_string($appraisertitle)), array('id' => 'appraisertitle'))
                     )->set_allow_xss(true);
                 } else {
@@ -264,7 +264,7 @@ class job_assignment_form extends moodleform {
                     'static',
                     'managerselector',
                     get_string('manager', 'totara_job'),
-                    html_writer::tag('span', html_writer::link(new moodle_url('/user/view.php',
+                    html_writer::tag('span', html_writer::link(new moodle_url('/user/profile.php',
                         array('id' => $managerid)), format_string($managertitle)), array('id' => 'managertitle'))
                 )->set_allow_xss(true);
             } else {
@@ -351,7 +351,7 @@ class job_assignment_form extends moodleform {
                         'static',
                         'tempmanagerselector',
                         get_string('tempmanager', 'totara_job'),
-                        html_writer::tag('span', html_writer::link(new moodle_url('/user/view.php',
+                        html_writer::tag('span', html_writer::link(new moodle_url('/user/profile.php',
                                 array('id' => $tempmanagerid)), format_string($tempmanagertitle)),
                                 array('id' => 'tempmanagertitle'))
                     )->set_allow_xss(true);

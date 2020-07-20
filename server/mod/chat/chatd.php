@@ -286,7 +286,7 @@ EOD;
 
             echo '<tr><td width="35">';
 
-            $link = '/user/view.php?id='.$userinfo['user']->id.'&course='.$userinfo['courseid'];
+            $link = '/user/profile.php?id='.$userinfo['user']->id.'&course='.$userinfo['courseid'];
             $anchortagcontents = $OUTPUT->user_picture($userinfo['user'], array('courseid' => $userinfo['courseid']));
 
             $action = new popup_action('click', $link, 'user'.$userinfo['chatuser']->id);

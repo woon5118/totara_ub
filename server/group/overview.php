@@ -245,7 +245,7 @@ foreach ($members as $gpgid=>$groupdata) {
         }
         $fullnames = array();
         foreach ($users as $user) {
-            $fullnames[] = '<a href="'.$CFG->wwwroot.'/user/view.php?id='.$user->id.'&amp;course='.$course->id.'">'.fullname($user, true).'</a>';
+            $fullnames[] = '<a href="'.$CFG->wwwroot.'/user/profile.php?id='.$user->id.'&amp;course='.$course->id.'">'.fullname($user, true).'</a>';
         }
         $line[] = implode(', ', $fullnames);
         $line[] = count($users);

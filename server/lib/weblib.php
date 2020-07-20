@@ -2746,9 +2746,9 @@ function print_recent_activity_note($time, $user, $text, $link, $return=false, $
         $data['user'] = [];
         $data['user']['name'] = fullname($user, $viewfullnames);
         if ($courseid != null) {
-            $data['user']['url'] = (new moodle_url('/user/view.php', ['id' => $user->id, 'course' => $courseid]))->out();
+            $data['user']['url'] = (new moodle_url('/user/profile.php', ['id' => $user->id, 'course' => $courseid]))->out();
         } else {
-            $data['user']['url'] = (new moodle_url('/user/view.php', ['id' => $user->id]))->out();
+            $data['user']['url'] = (new moodle_url('/user/profile.php', ['id' => $user->id]))->out();
         }
     }
     if (!empty($time)) {

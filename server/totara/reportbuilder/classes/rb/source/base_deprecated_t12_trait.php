@@ -863,7 +863,7 @@ trait base_deprecated_t12_trait {
             return $fullname;
         }
 
-        $url = new moodle_url('/user/view.php', array('id' => $row->id));
+        $url = new moodle_url('/user/profile.php', array('id' => $row->id));
         if ($fullname === '') {
             return '';
         } else {
@@ -921,7 +921,7 @@ trait base_deprecated_t12_trait {
             return fullname($row);
         }
 
-        $url = new moodle_url('/user/view.php', array('id' => $row->id));
+        $url = new moodle_url('/user/profile.php', array('id' => $row->id));
         return $OUTPUT->user_picture($row, array('courseid' => 1)) . "&nbsp;" . html_writer::link($url, $user);
     }
 

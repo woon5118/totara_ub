@@ -553,7 +553,7 @@ class access_controller {
         if ($this->courseid) {
             if ($this->is_enrolled()) {
                 if ($this->can_view_profile()) {
-                    return new moodle_url('/user/view.php', ['id' => $this->userid, 'course' => $this->courseid]);
+                    return new moodle_url('/user/profile.php', ['id' => $this->userid, 'course' => $this->courseid]);
                 } else {
                     // No need to check system profile, because if they had access
                     // the course profile would be most likely accessible too.

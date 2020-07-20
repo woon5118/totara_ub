@@ -119,7 +119,7 @@ foreach ($columns as $column) {
 
 foreach ($users as $user) {
     $table->data[] = array (
-        '<a href="'.$CFG->wwwroot.'/user/view.php?id='.$user->id.'&amp;course='.SITEID.'">'.$user->fullname.'</a>',
+        '<a href="'.$CFG->wwwroot.'/user/profile.php?id='.$user->id.'&amp;course='.SITEID.'">'.$user->fullname.'</a>',
         // TOTARA - Escape potential XSS in user email.
         clean_string($user->email),
         // TOTARA - Escape potential XSS in the extra identity fields.

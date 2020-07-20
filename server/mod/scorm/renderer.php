@@ -37,7 +37,7 @@ class mod_scorm_renderer extends plugin_renderer_base {
         $output .= $this->box_start('generalbox boxaligncenter');
         $output .= html_writer::start_tag('div', array('class' => 'mdl-align'));
         $output .= $this->user_picture($user, array('courseid' => $course->id, 'link' => true));
-        $url = new moodle_url('/user/view.php', array('id' => $user->id, 'course' => $course->id));
+        $url = new moodle_url('/user/profile.php', array('id' => $user->id, 'course' => $course->id));
         $output .= html_writer::link($url, fullname($user));
         $baseurl->param('attempt', '');
         $pb = new mod_scorm_attempt_bar($attemptids, $attempt, $baseurl, 'attempt');

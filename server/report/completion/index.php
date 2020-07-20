@@ -711,7 +711,7 @@ foreach ($progress as $user) {
         if (completion_can_view_data($user->id, $course)) {
             $userurl = new moodle_url('/blocks/completionstatus/details.php', array('course' => $course->id, 'user' => $user->id));
         } else {
-            $userurl = new moodle_url('/user/view.php', array('id' => $user->id, 'course' => $course->id));
+            $userurl = new moodle_url('/user/profile.php', array('id' => $user->id, 'course' => $course->id));
         }
 
         print '<th scope="row"><a href="'.$userurl->out().'">'.fullname($user).'</a></th>';

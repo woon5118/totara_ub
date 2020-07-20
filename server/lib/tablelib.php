@@ -883,7 +883,7 @@ class flexible_table {
         if ($COURSE->id == SITEID) {
             $profileurl = new moodle_url('/user/profile.php', array('id' => $userid));
         } else {
-            $profileurl = new moodle_url('/user/view.php',
+            $profileurl = new moodle_url('/user/profile.php',
                     array('id' => $userid, 'course' => $COURSE->id));
         }
         return html_writer::link($profileurl, $name);

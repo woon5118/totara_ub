@@ -51,7 +51,7 @@ class appraisal_role_list extends \totara_reportbuilder\rb\display\base {
             if ($format == 'html') {
                 $extrakey = 'role_' . $id;
                 if ($extra->$extrakey != 0) { // Make sure the role is assigned to a user.
-                    $roleurl = new \moodle_url('/user/view.php', array('id' => $extra->$extrakey));
+                    $roleurl = new \moodle_url('/user/profile.php', array('id' => $extra->$extrakey));
                     $rolenames[] = \html_writer::link($roleurl, $rolename);
                 } else {
                     $rolenames[] = $rolename;

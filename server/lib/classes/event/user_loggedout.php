@@ -75,7 +75,7 @@ class user_loggedout extends base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/user/view.php', array('id' => $this->objectid));
+        return new \moodle_url('/user/profile.php', array('id' => $this->objectid));
     }
 
     /**

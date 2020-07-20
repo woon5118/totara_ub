@@ -78,7 +78,7 @@ class user_loggedinas extends base {
      * @return array
      */
     protected function get_legacy_logdata() {
-        return array($this->courseid, 'course', 'loginas', '../user/view.php?id=' . $this->courseid . '&amp;user=' . $this->userid,
+        return array($this->courseid, 'course', 'loginas', '../user/profile.php?id=' . $this->courseid . '&amp;user=' . $this->userid,
             $this->other['originalusername'] . ' -> ' . $this->other['loggedinasusername']);
     }
 
@@ -88,7 +88,7 @@ class user_loggedinas extends base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/user/view.php', array('id' => $this->objectid));
+        return new \moodle_url('/user/profile.php', array('id' => $this->objectid));
     }
 
     /**

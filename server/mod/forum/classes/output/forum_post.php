@@ -400,7 +400,7 @@ class forum_post implements \renderable, \templatable {
      */
     public function get_authorlink() {
         $link = new \moodle_url(
-            '/user/view.php', array(
+            '/user/profile.php', array(
                 'id' => $this->post->userid,
                 'course' => $this->course->id,
             )

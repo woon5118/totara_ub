@@ -690,7 +690,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
 
         $url = access_controller::for($user1, $course1)->get_profile_url();
         $this->assertInstanceOf(moodle_url::class, $url);
-        $this->assertSame("$CFG->wwwroot/user/view.php?id=$user1->id&course=$course1->id", $url->out(false));
+        $this->assertSame("$CFG->wwwroot/user/profile.php?id=$user1->id&course=$course1->id", $url->out(false));
 
         $url = access_controller::for($user1, $course2)->get_profile_url();
         $this->assertInstanceOf(moodle_url::class, $url);
@@ -706,7 +706,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
 
         $url = access_controller::for($user2, $course2)->get_profile_url();
         $this->assertInstanceOf(moodle_url::class, $url);
-        $this->assertSame("$CFG->wwwroot/user/view.php?id=$user2->id&course=$course2->id", $url->out(false));
+        $this->assertSame("$CFG->wwwroot/user/profile.php?id=$user2->id&course=$course2->id", $url->out(false));
 
         $this->setUser($user1);
 
@@ -722,7 +722,7 @@ class core_user_access_controller_testcase extends advanced_testcase {
 
         $url = access_controller::for($user1, $course1)->get_profile_url();
         $this->assertInstanceOf(moodle_url::class, $url);
-        $this->assertSame("$CFG->wwwroot/user/view.php?id=$user1->id&course=$course1->id", $url->out(false));
+        $this->assertSame("$CFG->wwwroot/user/profile.php?id=$user1->id&course=$course1->id", $url->out(false));
 
         $url = access_controller::for($user1, $course2)->get_profile_url();
         $this->assertInstanceOf(moodle_url::class, $url);

@@ -176,7 +176,7 @@ class core_user_editlib_testcase extends advanced_testcase {
         $this->assertSame((string)$expected, (string)$result);
 
         $result = useredit_get_return_url($user1, 'profile', $course);
-        $expected = new moodle_url('/user/view.php', array('id' => $user1->id, 'course' => $course->id));
+        $expected = new moodle_url('/user/profile.php', array('id' => $user1->id, 'course' => $course->id));
         $this->assertSame((string)$expected, (string)$result);
 
         $result = useredit_get_return_url($user1, 'preferences', $site);
@@ -303,7 +303,7 @@ class core_user_editlib_testcase extends advanced_testcase {
         $this->assertSame((string)$expected, (string)$result);
 
         $result = useredit_get_return_url($user1, 'profile', $course);
-        $expected = new moodle_url('/user/view.php', array('id' => $user1->id, 'course' => $course->id));
+        $expected = new moodle_url('/user/profile.php', array('id' => $user1->id, 'course' => $course->id));
         $this->assertSame((string)$expected, (string)$result);
 
         $result = useredit_get_return_url($user1, 'preferences', $site);

@@ -7255,7 +7255,7 @@ class context_user extends context {
         if ($COURSE->id == SITEID) {
             $url = new moodle_url('/user/profile.php', array('id'=>$this->_instanceid));
         } else {
-            $url = new moodle_url('/user/view.php', array('id'=>$this->_instanceid, 'courseid'=>$COURSE->id));
+            $url = new moodle_url('/user/profile.php', array('id'=>$this->_instanceid, 'courseid'=>$COURSE->id));
         }
         return $url;
     }

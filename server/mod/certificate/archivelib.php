@@ -267,7 +267,7 @@ function certificate_archive_display_list($archives, $params) {
 
             $row = array();
 
-            $userurl = new moodle_url('/user/view.php', array('id' => $archive->userid));
+            $userurl = new moodle_url('/user/profile.php', array('id' => $archive->userid));
             $row[] = html_writer::link($userurl, format_string($archive->username));
             $row[] = html_writer::link($userurl, format_string(fullname($archive)));
 

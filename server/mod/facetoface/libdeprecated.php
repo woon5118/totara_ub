@@ -3283,7 +3283,7 @@ function facetoface_print_session($session, $showcapacity, $calendaroutput=false
 
         if (isset($session->bookedsession->managerid) && $session->bookedsession->managerid) {
             $manager = core_user::get_user($session->bookedsession->managerid);
-            $manager_url = new moodle_url('/user/view.php', array('id' => $manager->id));
+            $manager_url = new moodle_url('/user/profile.php', array('id' => $manager->id));
             $output .= html_writer::tag('dt', get_string('managername', 'facetoface'));
             $output .= html_writer::tag('dd', html_writer::link($manager_url, fullname($manager)));
         } else {
@@ -3294,7 +3294,7 @@ function facetoface_print_session($session, $showcapacity, $calendaroutput=false
                 $managers = array();
                 foreach ($session->managerids as $managerid) {
                     $manager = core_user::get_user($managerid);
-                    $manager_url = new moodle_url('/user/view.php', array('id' => $manager->id));
+                    $manager_url = new moodle_url('/user/profile.php', array('id' => $manager->id));
                     $managers[] = html_writer::link($manager_url, fullname($manager));
                 }
                 $output .= html_writer::tag('dt', get_string('managername', 'facetoface'));
@@ -3318,7 +3318,7 @@ function facetoface_print_session($session, $showcapacity, $calendaroutput=false
         $trainer_names = array();
         $rolename = $rolename->localname;
         foreach ($session->trainers[$role] as $trainer) {
-            $trainer_url = new moodle_url('/user/view.php', array('id' => $trainer->id));
+            $trainer_url = new moodle_url('/user/profile.php', array('id' => $trainer->id));
             $trainer_names[] = html_writer::link($trainer_url, fullname($trainer));
         }
         $output .= html_writer::tag('dt', $rolename);

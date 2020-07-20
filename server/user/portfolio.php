@@ -105,7 +105,7 @@ if ($display) {
     echo html_writer::tag('p', $introstr);
 
     if (!$instances = portfolio_instances(true, false)) {
-        print_error('noinstances', 'portfolio', $CFG->wwwroot . '/user/view.php');
+        print_error('noinstances', 'portfolio', $CFG->wwwroot . '/user/profile.php');
     }
 
     $table = new html_table();

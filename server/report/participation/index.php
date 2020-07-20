@@ -349,7 +349,7 @@ if (!empty($instanceid) && !empty($roleid)) {
 
     foreach ($users as $u) {
         $data = array();
-        $data[] = html_writer::link(new moodle_url('/user/view.php', array('id' => $u->userid, 'course' => $course->id)),
+        $data[] = html_writer::link(new moodle_url('/user/profile.php', array('id' => $u->userid, 'course' => $course->id)),
             fullname($u, true));
         $data[] = !empty($u->count) ? get_string('yes').' ('.$u->count.') ' : get_string('no');
 

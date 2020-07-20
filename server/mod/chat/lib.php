@@ -695,8 +695,8 @@ function chat_format_message_manually($message, $courseid, $sender, $currentuser
     $message->picture = $OUTPUT->user_picture($sender, array('size' => false, 'courseid' => $courseid, 'link' => false));
 
     if ($courseid) {
-        $message->picture = "<a onclick=\"window.open('$CFG->wwwroot/user/view.php?id=$sender->id&amp;course=$courseid')\"".
-                            " href=\"$CFG->wwwroot/user/view.php?id=$sender->id&amp;course=$courseid\">$message->picture</a>";
+        $message->picture = "<a onclick=\"window.open('$CFG->wwwroot/user/profile.php?id=$sender->id&amp;course=$courseid')\"".
+                            " href=\"$CFG->wwwroot/user/profile.php?id=$sender->id&amp;course=$courseid\">$message->picture</a>";
     }
 
     // Calculate the row class.
@@ -888,13 +888,13 @@ function chat_format_message_theme ($message, $chatuser, $currentuser, $grouping
     $message->picture = $OUTPUT->user_picture($sender, array('courseid' => $courseid));
 
     $message->picture = "<a target='_blank'".
-                        " href=\"$CFG->wwwroot/user/view.php?id=$sender->id&amp;course=$courseid\">$message->picture</a>";
+                        " href=\"$CFG->wwwroot/user/profile.php?id=$sender->id&amp;course=$courseid\">$message->picture</a>";
 
     // Start processing the message.
     if (!empty($message->issystem)) {
         $result->type = 'system';
 
-        $senderprofile = $CFG->wwwroot.'/user/view.php?id='.$sender->id.'&amp;course='.$courseid;
+        $senderprofile = $CFG->wwwroot.'/user/profile.php?id='.$sender->id.'&amp;course='.$courseid;
         $event = get_string('message'.$message->message, 'chat', fullname($sender));
         $eventmessage = new event_message($senderprofile, fullname($sender), $message->strtime, $event, $theme);
 
@@ -990,7 +990,7 @@ function chat_format_message_theme ($message, $chatuser, $currentuser, $grouping
         $mymessageclass = 'chat-message-mymessage';
     }
 
-    $senderprofile = $CFG->wwwroot.'/user/view.php?id='.$sender->id.'&amp;course='.$courseid;
+    $senderprofile = $CFG->wwwroot.'/user/profile.php?id='.$sender->id.'&amp;course='.$courseid;
     $usermessage = new user_message($senderprofile, fullname($sender), $message->picture,
                                     $mymessageclass, $outtime, $outmain, $theme);
 
@@ -1020,7 +1020,7 @@ function chat_format_userlist($users, $course) {
     foreach ($users as $user) {
         $item = array();
         $item['name'] = fullname($user);
-        $item['url'] = $CFG->wwwroot.'/user/view.php?id='.$user->id.'&amp;course='.$course->id;
+        $item['url'] = $CFG->wwwroot.'/user/profile.php?id='.$user->id.'&amp;course='.$course->id;
         $item['picture'] = $OUTPUT->user_picture($user);
         $item['id'] = $user->id;
         $result[] = $item;
@@ -1230,7 +1230,7 @@ function chat_extend_navigation($navigation, $course, $module, $cm) {
     if (is_array($chatusers) && count($chatusers) > 0) {
         $users = $navigation->add(get_string('currentusers', 'chat'));
         foreach ($chatusers as $chatuser) {
-            $userlink = new moodle_url('/user/view.php', array('id' => $chatuser->id, 'course' => $course->id));
+            $userlink = new moodle_url('/user/profile.php', array('id' => $chatuser->id, 'course' => $course->id));
             $users->add(fullname($chatuser).' '.format_time(time() - $chatuser->lastmessageping),
                         $userlink, navigation_node::TYPE_USER, null, null, new pix_icon('i/user', ''));
         }

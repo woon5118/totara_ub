@@ -1226,7 +1226,7 @@ class core_course_renderer extends plugin_renderer_base {
             $content .= html_writer::start_tag('ul', array('class' => 'teachers'));
             foreach ($course->get_course_contacts() as $userid => $coursecontact) {
                 $name = $coursecontact['rolename'].': '.
-                        html_writer::link(new moodle_url('/user/view.php',
+                        html_writer::link(new moodle_url('/user/profile.php',
                                 array('id' => $userid, 'course' => SITEID)),
                             $coursecontact['username']);
                 $content .= html_writer::tag('li', $name);

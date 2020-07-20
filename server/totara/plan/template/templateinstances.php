@@ -85,7 +85,7 @@ foreach ($instances as $instance) {
     $tablerow = array();
     $tablerow[] = $OUTPUT->action_link(new moodle_url('/totara/plan/view.php', array('id' => $instance->id)), $instance->name);
     $user = $DB->get_record('user', array('id' => $instance->userid));
-    $tablerow[] = $OUTPUT->action_link(new moodle_url('/user/view.php', array('id' => $user->id)), $user->firstname . ' ' . $user->lastname);
+    $tablerow[] = $OUTPUT->action_link(new moodle_url('/user/profile.php', array('id' => $user->id)), $user->firstname . ' ' . $user->lastname);
     $tablerow[] = date('j M Y', $instance->startdate);
     $tablerow[] = date('j M Y', $instance->enddate);
 

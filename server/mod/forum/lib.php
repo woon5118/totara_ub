@@ -3199,7 +3199,7 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
     $postuser = username_load_fields_from_object($postuser, $post, null, $postuserfields);
     $postuser->id = $post->userid;
     $postuser->fullname    = fullname($postuser, $cm->cache->caps['moodle/site:viewfullnames']);
-    $postuser->profilelink = new moodle_url('/user/view.php', array('id'=>$post->userid, 'course'=>$course->id));
+    $postuser->profilelink = new moodle_url('/user/profile.php', array('id'=>$post->userid, 'course'=>$course->id));
 
     // Prepare the groups the posting user belongs to
     if (isset($cm->cache->usersgroups)) {
@@ -3772,7 +3772,7 @@ function forum_print_discussion_header(&$post, $forum, $group = -1, $datestring 
 
     // User name
     $fullname = fullname($postuser, $canviewfullnames);
-    echo '<a class="name" href="'.$CFG->wwwroot.'/user/view.php?id='.$post->userid.'&amp;course='.$forum->course.'">'.$fullname.'</a>';
+    echo '<a class="name" href="'.$CFG->wwwroot.'/user/profile.php?id='.$post->userid.'&amp;course='.$forum->course.'">'.$fullname.'</a>';
     echo "</td>\n";
 
     // Group picture
@@ -3836,7 +3836,7 @@ function forum_print_discussion_header(&$post, $forum, $group = -1, $datestring 
 
     // In QA forums we check that the user can view participants.
     if ($forum->type !== 'qanda' || $canviewparticipants) {
-        echo '<a href="'.$CFG->wwwroot.'/user/view.php?id='.$post->usermodified.'&amp;course='.$forum->course.'">'.
+        echo '<a href="'.$CFG->wwwroot.'/user/profile.php?id='.$post->usermodified.'&amp;course='.$forum->course.'">'.
              fullname($usermodified, $canviewfullnames).'</a><br />';
         $parenturl = (empty($post->lastpostid)) ? '' : '&amp;parent='.$post->lastpostid;
     }

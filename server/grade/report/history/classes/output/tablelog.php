@@ -266,7 +266,7 @@ class tablelog extends \table_sql implements \renderable {
         }
 
         $userid = $history->usermodified;
-        $profileurl = new \moodle_url('/user/view.php', array('id' => $userid, 'course' => $this->courseid));
+        $profileurl = new \moodle_url('/user/profile.php', array('id' => $userid, 'course' => $this->courseid));
 
         return \html_writer::link($profileurl, $name);
     }

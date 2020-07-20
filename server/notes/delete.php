@@ -65,7 +65,7 @@ if (data_submitted() && confirm_sesskey()) {
         $link = new moodle_url('/user/index.php', array('id' => $course->id));
     }
     $PAGE->navbar->add(get_string('participants'), $link);
-    $PAGE->navbar->add(fullname($user), new moodle_url('/user/view.php', array('id' => $user->id, 'course' => $course->id)));
+    $PAGE->navbar->add(fullname($user), new moodle_url('/user/profile.php', array('id' => $user->id, 'course' => $course->id)));
     $PAGE->navbar->add(get_string('notes', 'notes'),
                        new moodle_url('/notes/index.php', array('user' => $user->id, 'course' => $course->id)));
     $PAGE->navbar->add(get_string('delete'));

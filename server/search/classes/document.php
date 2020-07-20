@@ -614,7 +614,7 @@ class document implements \renderable, \templatable {
         }
 
         if ($this->is_set('userid')) {
-            $data['userurl'] = new \moodle_url('/user/view.php', array('id' => $this->get('userid'), 'course' => $this->get('courseid')));
+            $data['userurl'] = new \moodle_url('/user/profile.php', array('id' => $this->get('userid'), 'course' => $this->get('courseid')));
             $data['userfullname'] = format_string($this->get('userfullname'), true, array('context' => $this->get('contextid')));
             $data['bynameuser'] = get_string('byname', 'moodle', $data['userfullname']);
         }

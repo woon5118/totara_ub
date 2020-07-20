@@ -72,14 +72,14 @@ class log_user_full_name_including_on_behalf_of extends base {
             if (!$isexport) {
                 $a->realusername = \html_writer::link(
                     new \moodle_url(
-                        '/user/view.php',
+                        '/user/profile.php',
                         array('id' => $row->realuserid)
                     ),
                     $a->realusername
                 );
                 $a->asusername = \html_writer::link(
                     new \moodle_url(
-                        '/user/view.php',
+                        '/user/profile.php',
                         array('id' => $row->auserid)
                     ),
                     $a->asusername
@@ -91,7 +91,7 @@ class log_user_full_name_including_on_behalf_of extends base {
             if (!$isexport) {
                 $username = \html_writer::link(
                     new \moodle_url(
-                        '/user/view.php',
+                        '/user/profile.php',
                         array('id' => $row->auserid)
                     ),
                     $username

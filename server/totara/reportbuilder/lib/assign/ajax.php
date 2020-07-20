@@ -74,7 +74,7 @@ $groupinfo = $assignclass->get_group_assignedvia_details(array_keys($userdata));
 
 $aadata = array();
 foreach ($userdata as $userid => $user) {
-    $url = new moodle_url('/user/view.php', array('id' => $user->id));
+    $url = new moodle_url('/user/profile.php', array('id' => $user->id));
     $link = html_writer::link($url, fullname($user));
 
     $assignvia = array();

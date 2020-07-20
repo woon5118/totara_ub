@@ -92,7 +92,7 @@ class enrol_self_enrol_form extends moodleform {
                     $mform->addElement('static', 'keyholder', '', get_string('keyholder', 'enrol_self'));
                 }
                 if (user_can_view_profile($keyholder, $this->instance->courseid)) {
-                    $profilelink = '<a href="' . $CFG->wwwroot . '/user/view.php?id=' . $keyholder->id . '&amp;course=' .
+                    $profilelink = '<a href="' . $CFG->wwwroot . '/user/profile.php?id=' . $keyholder->id . '&amp;course=' .
                     $this->instance->courseid . '">' . fullname($keyholder) . '</a>';
                 } else {
                     $profilelink = fullname($keyholder);

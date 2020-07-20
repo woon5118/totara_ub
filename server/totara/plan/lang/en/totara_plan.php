@@ -971,8 +971,8 @@ $string['workflowsettings'] = 'Workflow settings';
 $string['xitemspending'] = '<a href="{$a->link}">{$a->number} {$a->name}</a> pending';
 $string['xitemsunapproved'] = '<a href="{$a->uri}">{$a->number} {$a->name}</a>';
 $string['xslearningplans'] = '{$a}\'s Learning Plans';
-$string['youareviewingxsplan'] = '<strong>You are viewing <a href="{$a->site}/user/view.php?id={$a->userid}">{$a->name}\'s</a> plan.</strong>';
-$string['youareviewingxsplans'] = '<strong>You are viewing <a href="{$a->site}/user/view.php?id={$a->userid}">{$a->name}\'s</a> plans.</strong>';
+$string['youareviewingxsplan'] = '<strong>You are viewing <a href="{$a->site}/user/profile.php?id={$a->userid}">{$a->name}\'s</a> plan.</strong>';
+$string['youareviewingxsplans'] = '<strong>You are viewing <a href="{$a->site}/user/profile.php?id={$a->userid}">{$a->name}\'s</a> plans.</strong>';
 
 
 /*

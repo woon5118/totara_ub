@@ -341,7 +341,7 @@ $string['managerupdateemail'] = '{$a->userfrom} has updated the due date of thei
 $string['managerupdatesubject'] = '{$a->staffname} Feedback update';
 $string['urlrequesturlmask'] = 'here';
 $string['userassignmentnotfound'] = 'User assignment not found';
-$string['userheaderfeedback'] = 'Feedback for {$a->username} <a href="{$a->site}/user/view.php?id={$a->userid}" target="_BLANK">View profile</a>';
+$string['userheaderfeedback'] = 'Feedback for {$a->username} <a href="{$a->site}/user/profile.php?id={$a->userid}" target="_BLANK">View profile</a>';
 $string['userheaderfeedbackbyemail'] = 'Feedback for {$a->username} <a href="{$a->profileurl}" target="_blank">View profile</a> from external user {$a->responder}';
 $string['userownheaderfeedback'] = 'Feedback about you';
 $string['userownheaderselfevalfeedback'] = 'Self evaluation for {$a->username}

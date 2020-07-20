@@ -415,7 +415,7 @@ class totara_program_renderer extends plugin_renderer_base {
                 $row = array();
 
                 $row[] = html_writer::checkbox("exceptionid", $rowdata->exceptionid, $rowdata->selected);
-                $url = new moodle_url('/user/view.php', array('id' => $rowdata->user->id));
+                $url = new moodle_url('/user/profile.php', array('id' => $rowdata->user->id));
                 $row[] = html_writer::link($url, fullname($rowdata->user));
                 $row[] = '#'.$rowdata->exceptionid;
 

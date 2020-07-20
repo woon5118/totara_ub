@@ -46,7 +46,7 @@ require_login();
 $coursecontext = context_course::instance($course->id);
 
 $PAGE->set_context($coursecontext);
-$PAGE->set_url('/user/view.php', array('id' => $id, 'course' => $courseid));
+$PAGE->set_url('/user/profile.php', array('id' => $id, 'course' => $courseid));
 
 if ($user->deleted or $courseid == SITEID) {   // Since Moodle 2.0 all site-level profiles are shown by profile.php.
     // Totara: this is needed because in some places suchas in user_picture class we are not checking if courseid is SITEID.

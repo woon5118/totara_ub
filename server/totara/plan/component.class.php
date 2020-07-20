@@ -1788,7 +1788,7 @@ abstract class dp_base_component {
     function current_user_link() {
         global $USER, $OUTPUT;
 
-        $userfrom_link = new moodle_url('/user/view.php', array('id' => $USER->id));
+        $userfrom_link = new moodle_url('/user/profile.php', array('id' => $USER->id));
         $fromname = fullname($USER);
         return $OUTPUT->action_link($userfrom_link, $fromname, null, array('title' => '$fromname'));
     }

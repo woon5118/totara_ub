@@ -47,7 +47,7 @@ $pluginstr = get_string('plugin', 'repository');
 require_login($course, false);
 $coursecontext = context_course::instance($course->id, MUST_EXIST);
 
-$link = new moodle_url('/user/view.php', array('id' => $user->id));
+$link = new moodle_url('/user/profile.php', array('id' => $user->id));
 $PAGE->navbar->add($fullname, $link);
 $PAGE->navbar->add($strrepos);
 $PAGE->set_title("$course->fullname: $fullname: $strrepos");
@@ -66,7 +66,7 @@ $params['context'] = $coursecontext;
 $params['currentcontext'] = $PAGE->context;
 $params['userid']   = $USER->id;
 if (!$instances = repository::get_instances($params)) {
-    print_error('noinstances', 'repository', $CFG->wwwroot . '/user/view.php');
+    print_error('noinstances', 'repository', $CFG->wwwroot . '/user/profile.php');
 }
 
 $table = new html_table();

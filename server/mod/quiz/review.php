@@ -139,7 +139,7 @@ if (!$attemptobj->get_quiz()->showuserpicture && $attemptobj->get_userid() != $U
     $userpicture->courseid = $attemptobj->get_courseid();
     $summarydata['user'] = array(
         'title'   => $userpicture,
-        'content' => new action_link(new moodle_url('/user/view.php', array(
+        'content' => new action_link(new moodle_url('/user/profile.php', array(
                                 'id' => $student->id, 'course' => $attemptobj->get_courseid())),
                           fullname($student, true)),
     );

@@ -240,7 +240,7 @@ class mod_choice_renderer extends plugin_renderer_base {
                                 array('id' => $checkboxid, 'class' => 'm-r-1'));
                         }
                         $userimage = $this->output->user_picture($user, array('courseid' => $choices->courseid, 'link' => false));
-                        $profileurl = new moodle_url('/user/view.php', array('id' => $user->id, 'course' => $choices->courseid));
+                        $profileurl = new moodle_url('/user/profile.php', array('id' => $user->id, 'course' => $choices->courseid));
                         $profilelink = html_writer::link($profileurl, $userimage . $userfullname);
                         $data .= html_writer::div($checkbox . $profilelink, 'm-b-1');
 

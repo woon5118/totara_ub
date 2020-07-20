@@ -144,7 +144,7 @@ class edit_grade_form extends moodleform {
         // fill in user name if user still exists
         $userid = $mform->getElementValue('userid');
         if ($user = $DB->get_record('user', array('id' => $userid))) {
-            $username = '<a href="'.$CFG->wwwroot.'/user/view.php?id='.$userid.'">'.fullname($user).'</a>';
+            $username = '<a href="'.$CFG->wwwroot.'/user/profile.php?id='.$userid.'">'.fullname($user).'</a>';
             $user_el =& $mform->getElement('user');
             $user_el->setValue($username);
         }

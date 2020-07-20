@@ -174,9 +174,9 @@ class report_log_table_log extends table_sql {
                 if ($event->courseid) {
                     $params['course'] = $event->courseid;
                 }
-                $a->realusername = html_writer::link(new moodle_url('/user/view.php', $params), $a->realusername);
+                $a->realusername = html_writer::link(new moodle_url('/user/profile.php', $params), $a->realusername);
                 $params['id'] = $event->userid;
-                $a->asusername = html_writer::link(new moodle_url('/user/view.php', $params), $a->asusername);
+                $a->asusername = html_writer::link(new moodle_url('/user/profile.php', $params), $a->asusername);
             }
             $username = get_string('eventloggedas', 'report_log', $a);
 
@@ -186,7 +186,7 @@ class report_log_table_log extends table_sql {
                 if ($event->courseid) {
                     $params['course'] = $event->courseid;
                 }
-                $username = html_writer::link(new moodle_url('/user/view.php', $params), $username);
+                $username = html_writer::link(new moodle_url('/user/profile.php', $params), $username);
             }
         } else {
             $username = '-';
@@ -208,7 +208,7 @@ class report_log_table_log extends table_sql {
                 if ($event->courseid) {
                     $params['course'] = $event->courseid;
                 }
-                $username = html_writer::link(new moodle_url('/user/view.php', $params), $username);
+                $username = html_writer::link(new moodle_url('/user/profile.php', $params), $username);
             }
         } else {
             $username = '-';

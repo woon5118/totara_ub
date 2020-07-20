@@ -1328,7 +1328,7 @@ class global_navigation extends navigation_node {
                         $coursenode->nodetype = self::NODETYPE_BRANCH;
                     }
                     // Very ugly hack - do not force "parents" to enrol into course their child is enrolled in,
-                    // this hack has been propagated from user/view.php to display the navigation node. (MDL-25805)
+                    // this hack has been propagated from user/profile.php to display the navigation node. (MDL-25805)
                     if (!$this->current_user_is_parent_role()) {
                         $coursenode->make_active();
                         $canviewcourseprofile = false;
@@ -2434,7 +2434,7 @@ class global_navigation extends navigation_node {
                     $count++;
                     $usercoursecontext = context_course::instance($usercourse->id);
                     $usercourseshortname = format_string($usercourse->shortname, true, array('context' => $usercoursecontext));
-                    $usercoursenode = $userscoursesnode->add($usercourseshortname, new moodle_url('/user/view.php',
+                    $usercoursenode = $userscoursesnode->add($usercourseshortname, new moodle_url('/user/profile.php',
                             array('id' => $user->id, 'course' => $usercourse->id)), self::TYPE_CONTAINER);
 
                     $gradeavailable = has_capability('moodle/grade:view', $usercoursecontext);
@@ -4755,7 +4755,7 @@ class settings_navigation extends navigation_node {
                 if ($course->id == $SITE->id) {
                     $profileurl = new moodle_url('/user/profile.php', array('id'=>$user->id));
                 } else {
-                    $profileurl = new moodle_url('/user/view.php', array('id'=>$user->id, 'course'=>$course->id));
+                    $profileurl = new moodle_url('/user/profile.php', array('id'=>$user->id, 'course'=>$course->id));
                 }
                 $usersetting->add(get_string('userdeleted'), $profileurl, self::TYPE_SETTING);
             }

@@ -205,7 +205,7 @@ class grade extends tablelike implements selectable_items, filterable_items {
         }
 
         $item->imagealt = $fullname;
-        $url = new moodle_url("/user/view.php", array('id' => $item->id, 'course' => $this->courseid));
+        $url = new moodle_url("/user/profile.php", array('id' => $item->id, 'course' => $this->courseid));
         $iconstring = get_string('filtergrades', 'gradereport_singleview', $fullname);
         $grade->label = $fullname;
 

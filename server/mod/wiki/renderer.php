@@ -84,7 +84,7 @@ class mod_wiki_renderer extends plugin_renderer_base {
         $olduser = $old->user;
         $versionlink = new moodle_url('/mod/wiki/viewversion.php', array('pageid' => $pageid, 'versionid' => $old->id));
         $restorelink = new moodle_url('/mod/wiki/restoreversion.php', array('pageid' => $pageid, 'versionid' => $old->id));
-        $userlink = new moodle_url('/user/view.php', array('id' => $olduser->id));
+        $userlink = new moodle_url('/user/profile.php', array('id' => $olduser->id));
         // view version link
         $oldversionview = ' ';
         $oldversionview .= html_writer::link($versionlink->out(false), get_string('view', 'wiki'), array('class' => 'wiki_diffview'));
@@ -95,7 +95,7 @@ class mod_wiki_renderer extends plugin_renderer_base {
         // userinfo container
         $oldheading = $this->output->container_start('wiki_diffuserleft');
         // username
-        $oldheading .= html_writer::link($CFG->wwwroot . '/user/view.php?id=' . $olduser->id, fullname($olduser)) . '&nbsp;';
+        $oldheading .= html_writer::link($CFG->wwwroot . '/user/profile.php?id=' . $olduser->id, fullname($olduser)) . '&nbsp;';
         // user picture
         $oldheading .= html_writer::link($userlink->out(false), $this->output->user_picture($olduser, array('popup' => true)), array('class' => 'notunderlined'));
         $oldheading .= $this->output->container_end();
@@ -112,7 +112,7 @@ class mod_wiki_renderer extends plugin_renderer_base {
         $newuser = $new->user;
         $versionlink = new moodle_url('/mod/wiki/viewversion.php', array('pageid' => $pageid, 'versionid' => $new->id));
         $restorelink = new moodle_url('/mod/wiki/restoreversion.php', array('pageid' => $pageid, 'versionid' => $new->id));
-        $userlink = new moodle_url('/user/view.php', array('id' => $newuser->id));
+        $userlink = new moodle_url('/user/profile.php', array('id' => $newuser->id));
 
         $newversionview = ' ';
         $newversionview .= html_writer::link($versionlink->out(false), get_string('view', 'wiki'), array('class' => 'wiki_diffview'));

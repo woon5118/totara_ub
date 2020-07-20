@@ -429,7 +429,7 @@ class enrol_self_plugin extends enrol_plugin {
 
         $a = new stdClass();
         $a->coursename = format_string($course->fullname, true, array('context'=>$context));
-        $a->profileurl = "$CFG->wwwroot/user/view.php?id=$user->id&course=$course->id";
+        $a->profileurl = "$CFG->wwwroot/user/profile.php?id=$user->id&course=$course->id";
 
         if (trim($instance->customtext1) !== '') {
             $message = $instance->customtext1;

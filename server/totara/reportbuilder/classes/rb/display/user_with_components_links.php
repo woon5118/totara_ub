@@ -103,7 +103,7 @@ class user_with_components_links extends base {
         $required_link = \html_writer::link(new \moodle_url('/totara/program/required.php',
             array('userid' => $userid)), $requiredstr);
         $plan_link = \html_writer::link("{$CFG->wwwroot}/totara/plan/index.php?userid={$userid}", $planstr);
-        $profile_link = \html_writer::link("{$CFG->wwwroot}/user/view.php?id={$userid}", $profilestr);
+        $profile_link = \html_writer::link("{$CFG->wwwroot}/user/profile.php?id={$userid}", $profilestr);
         $booking_link = \html_writer::link("{$CFG->wwwroot}/my/bookings.php?userid={$userid}", $bookingstr);
         $appraisal_link = \html_writer::link("{$CFG->wwwroot}/totara/appraisal/index.php?subjectid={$userid}", $appraisalstr);
         $feedback_link = \html_writer::link("{$CFG->wwwroot}/totara/feedback360/index.php?userid={$userid}", $feedback360str);

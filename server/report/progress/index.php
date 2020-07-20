@@ -327,7 +327,7 @@ foreach($progress as $user) {
             echo $sep . csv_quote($user->{$field});
         }
     } else {
-        print '<tr><th scope="row"><a href="'.$CFG->wwwroot.'/user/view.php?id='.
+        print '<tr><th scope="row"><a href="'.$CFG->wwwroot.'/user/profile.php?id='.
             $user->id.'&amp;course='.$course->id.'">'.fullname($user).'</a></th>';
         foreach ($extrafields as $field) {
             echo '<td>' . s($user->{$field}) . '</td>';

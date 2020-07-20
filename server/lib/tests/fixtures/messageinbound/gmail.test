@@ -72,9 +72,9 @@ Discussion
 est
 > <http://dan.moodle.local/sites/mod/forum/discuss.php?d=3D24>
 > [image: Picture of Admin User]
-> <http://dan.moodle.local/sites/user/view.php?id=3D2&course=3D3>
+> <http://dan.moodle.local/sites/user/profile.php?id=3D2&course=3D3>
 > Re: A test
-> by Admin User <http://dan.moodle.local/sites/user/view.php?id=3D2&course=
+> by Admin User <http://dan.moodle.local/sites/user/profile.php?id=3D2&course=
 =3D3>
 > - Wednesday, 8 July 2015, 11:45 am
 >
@@ -119,12 +119,12 @@ href=3D"http://dan.moodle.local/sites/mod/forum/view.php?f=3D5" target=3D"_=
 blank">Discussion forum</a> =C2=BB <a href=3D"http://dan.moodle.local/sites=
 /mod/forum/discuss.php?d=3D24" target=3D"_blank">A test</a></div><table bor=
 der=3D"0" cellpadding=3D"3" cellspacing=3D"0"><tr><td width=3D"35" valign=
-=3D"top"><a href=3D"http://dan.moodle.local/sites/user/view.php?id=3D2&amp;=
+=3D"top"><a href=3D"http://dan.moodle.local/sites/user/profile.php?id=3D2&amp;=
 course=3D3" target=3D"_blank"><img src=3D"http://dan.moodle.local/sites/the=
 me/image.php?theme=3Dmoodleorgcleaned_moodleorg&amp;component=3Dcore&amp;im=
 age=3Du%2Ff2&amp;svg=3D0" alt=3D"Picture of Admin User" title=3D"Picture of=
  Admin User" width=3D"35" height=3D"35"></a></td><td><div>Re: A test</div><=
-div>by <a href=3D"http://dan.moodle.local/sites/user/view.php?id=3D2&amp;co=
+div>by <a href=3D"http://dan.moodle.local/sites/user/profile.php?id=3D2&amp;co=
 urse=3D3" target=3D"_blank">Admin User</a> - Wednesday, 8 July 2015, 11:45 =
 am</div></td></tr><tr><td valign=3D"top">=C2=A0</td><td><p>test 123</p><div=
 ><a href=3D"http://dan.moodle.local/sites/mod/forum/discuss.php?d=3D24&amp;=

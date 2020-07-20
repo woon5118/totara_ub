@@ -89,11 +89,11 @@ On Tue, 2015-04-28 at 13:18 +0800, Admin User wrote:
     <TABLE CELLSPACING="0" CELLPADDING="3">
 <TR>
 <TD WIDTH="35" VALIGN="top">
-<A HREF="http://localhost/stable_master_forum/user/view.php?id=2&amp;course=2"><IMG SRC="http://localhost/stable_master_forum/theme/image.php?theme=clean&amp;component=core&amp;image=u%2Ff2&amp;svg=0" WIDTH="35" HEIGHT="35" ALIGN="bottom" ALT="Picture of Admin User"></A>
+<A HREF="http://localhost/stable_master_forum/user/profile.php?id=2&amp;course=2"><IMG SRC="http://localhost/stable_master_forum/theme/image.php?theme=clean&amp;component=core&amp;image=u%2Ff2&amp;svg=0" WIDTH="35" HEIGHT="35" ALIGN="bottom" ALT="Picture of Admin User"></A>
 </TD>
 <TD>
 Re: test
-by <A HREF="http://localhost/stable_master_forum/user/view.php?id=2&amp;course=2">Admin User</A> - Tuesday, 28 April 2015, 1:17 PM
+by <A HREF="http://localhost/stable_master_forum/user/profile.php?id=2&amp;course=2">Admin User</A> - Tuesday, 28 April 2015, 1:17 PM
 </TD>
 </TR>
 <TR>

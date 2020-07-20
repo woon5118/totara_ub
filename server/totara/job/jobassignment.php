@@ -46,7 +46,7 @@ if (empty($jobassignmentid)) {
     $jobassignment = \totara_job\job_assignment::get_with_id($jobassignmentid, false);
     if (!$jobassignment) {
         $userid = optional_param('userid', 0, PARAM_INT);
-        $returnurl = $userid > 1 ? new moodle_url('/user/view.php', ['id' => $userid]) : new moodle_url('/admin/user.php');
+        $returnurl = $userid > 1 ? new moodle_url('/user/profile.php', ['id' => $userid]) : new moodle_url('/admin/user.php');
         redirect(
             $returnurl,
             get_string('error:missingjobassignment', 'totara_job'),
@@ -101,7 +101,7 @@ $PAGE->set_url($currenturl);
 $PAGE->set_context($coursecontext);
 
 $PAGE->navbar->add(get_string('users'), new moodle_url('/admin/user.php'));
-$PAGE->navbar->add($fullname, new moodle_url('/user/view.php', array('id' => $user->id, 'course' => $course->id)));
+$PAGE->navbar->add($fullname, new moodle_url('/user/profile.php', array('id' => $user->id, 'course' => $course->id)));
 $PAGE->navbar->add($pagetitle, null);
 $PAGE->set_title("{$course->fullname}: {$fullname}: {$pagetitle}");
 $PAGE->set_heading("{$pagetitle}");
@@ -321,7 +321,7 @@ if ($submitted = $form->get_data()) {
 
     // Display success message
     \core\notification::success(get_string('jobassignmentsaved', 'totara_job'));
-    redirect(new moodle_url('/user/view.php', array('id' => $user->id, 'course' => $course->id)));
+    redirect(new moodle_url('/user/profile.php', array('id' => $user->id, 'course' => $course->id)));
 }
 
 // Log

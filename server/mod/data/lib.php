@@ -1425,7 +1425,7 @@ function data_print_template($template, $records, $data, $search='', $page=0, $r
         }
 
         $patterns[]='##user##';
-        $replacement[] = '<a href="'.$CFG->wwwroot.'/user/view.php?id='.$record->userid.
+        $replacement[] = '<a href="'.$CFG->wwwroot.'/user/profile.php?id='.$record->userid.
                                '&amp;course='.$data->course.'">'.fullname($record).'</a>';
 
         $patterns[] = '##userpicture##';

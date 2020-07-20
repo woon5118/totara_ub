@@ -264,7 +264,7 @@ if (strlen($result) > 0) {
         if (!empty($mailstudents)) {
             $a = new stdClass();
             $a->coursename = format_string($course->fullname, true, array('context' => $coursecontext));
-            $a->profileurl = "$CFG->wwwroot/user/view.php?id=$user->id";
+            $a->profileurl = "$CFG->wwwroot/user/profile.php?id=$user->id";
 
             $eventdata = new \core\message\message();
             $eventdata->courseid          = $course->id;

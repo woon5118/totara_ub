@@ -1086,7 +1086,7 @@ $string['viewcourse'] = 'View course';
 $string['viewdates'] = 'View dates';
 $string['viewexceptions'] = 'View exception report to resolve issue(s).';
 $string['viewinguserextrequests'] = 'Viewing extension requests for {$a}';
-$string['viewingxusersprogram'] = 'You are viewing <a href="{$a->wwwroot}/user/view.php?id={$a->id}">{$a->fullname}\'s</a> progress on this program.';
+$string['viewingxusersprogram'] = 'You are viewing <a href="{$a->wwwroot}/user/profile.php?id={$a->id}">{$a->fullname}\'s</a> progress on this program.';
 $string['viewprogram'] = 'View program';
 $string['viewprogramassignments'] = 'View program assignments';
 $string['viewprogramdetails'] = 'View program details';
@@ -1102,7 +1102,7 @@ $string['xweeks'] = '{$a} Week(s)';
 $string['xyears'] = '{$a} Year(s)';
 $string['years'] = 'Year(s)';
 $string['youareassigned'] = 'You are assigned to this program';
-$string['youareviewingxsrequiredlearning'] = 'You are viewing <a href="{$a->site}/user/view.php?id={$a->userid}">{$a->name}\'s</a> required learning.';
+$string['youareviewingxsrequiredlearning'] = 'You are viewing <a href="{$a->site}/user/profile.php?id={$a->userid}">{$a->name}\'s</a> required learning.';
 $string['youhaveadded'] = 'You have added {$a->itemnames} to this program<br />
 <br />
 <strong>This will asign {$a->affectedusers} users to the program</strong><br />

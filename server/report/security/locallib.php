@@ -887,7 +887,7 @@ function report_security_check_riskadmin($detailed=false) {
 
     if ($detailed) {
         foreach ($admins as $uid=>$user) {
-            $url = "$CFG->wwwroot/user/view.php?id=$user->id";
+            $url = "$CFG->wwwroot/user/profile.php?id=$user->id";
             // TOTARA - Escape potential XSS in user email.
             $admins[$uid] = '<li><a href="'.$url.'">'.fullname($user).' ('.clean_string($user->email).')</a></li>';
         }

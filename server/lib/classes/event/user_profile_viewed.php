@@ -80,7 +80,7 @@ class user_profile_viewed extends base {
      */
     public function get_url() {
         if ($this->contextlevel == CONTEXT_COURSE) {
-            return new \moodle_url('/user/view.php', array('id' => $this->relateduserid, 'course' => $this->courseid));
+            return new \moodle_url('/user/profile.php', array('id' => $this->relateduserid, 'course' => $this->courseid));
         }
         return new \moodle_url('/user/profile.php', array('id' => $this->relateduserid));
     }

@@ -80,7 +80,7 @@ function useredit_setup_preference_page($userid, $courseid) {
             $hostwwwroot = $DB->get_field('mnet_host', 'wwwroot', array('id' => $user->mnethostid));
             print_error('usernotfullysetup', 'mnet', '', $hostwwwroot);
         }
-        redirect($CFG->wwwroot . "/user/view.php?course={$course->id}");
+        redirect($CFG->wwwroot . "/user/profile.php?course={$course->id}");
     }
 
     $systemcontext   = context_system::instance();
@@ -524,7 +524,7 @@ function useredit_get_return_url(\stdClass $user, $returnto, \stdClass $course =
 
     } else if ($returnto === 'profile') {
         if ($course and $course->id != SITEID) {
-            $returnurl = new moodle_url('/user/view.php', array('id' => $user->id, 'course' => $course->id));
+            $returnurl = new moodle_url('/user/profile.php', array('id' => $user->id, 'course' => $course->id));
         } else {
             $returnurl = new moodle_url('/user/profile.php', array('id' => $user->id));
         }

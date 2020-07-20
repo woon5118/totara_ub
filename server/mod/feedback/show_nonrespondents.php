@@ -235,7 +235,7 @@ if (empty($students)) {
 
     foreach ($students as $student) {
         //userpicture and link to the profilepage
-        $profileurl = $CFG->wwwroot.'/user/view.php?id='.$student->id.'&amp;course='.$course->id;
+        $profileurl = $CFG->wwwroot.'/user/profile.php?id='.$student->id.'&amp;course='.$course->id;
         $profilelink = '<strong><a href="'.$profileurl.'">'.fullname($student).'</a></strong>';
         $data = array($OUTPUT->user_picture($student, array('courseid' => $course->id)), $profilelink);
 

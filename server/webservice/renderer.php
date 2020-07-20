@@ -314,7 +314,7 @@ class core_webservice_renderer extends plugin_renderer_base {
                     $reset = '';
                 }
 
-                $userprofilurl = new moodle_url('/user/view.php?id=' . $token->creatorid);
+                $userprofilurl = new moodle_url('/user/profile.php?id=' . $token->creatorid);
                 $creatoratag = html_writer::start_tag('a', array('href' => $userprofilurl));
                 $creatoratag .= $creator;
                 $creatoratag .= html_writer::end_tag('a');

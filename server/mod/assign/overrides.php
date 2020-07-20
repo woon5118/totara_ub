@@ -129,7 +129,7 @@ $table->head = array(
         get_string('action'),
 );
 
-$userurl = new moodle_url('/user/view.php', array());
+$userurl = new moodle_url('/user/profile.php', array());
 $groupurl = new moodle_url('/group/overview.php', array('id' => $cm->course));
 
 $overridedeleteurl = new moodle_url('/mod/assign/overridedelete.php');

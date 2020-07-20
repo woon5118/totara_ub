@@ -105,7 +105,7 @@ class mod_workshop_renderer extends plugin_renderer_base {
             $additionalfields = explode(',', user_picture::fields());
             $author = username_load_fields_from_object($author, $submission, 'author', $additionalfields);
             $userpic            = $this->output->user_picture($author, array('courseid' => $this->page->course->id, 'size' => 64));
-            $userurl            = new moodle_url('/user/view.php',
+            $userurl            = new moodle_url('/user/profile.php',
                                             array('id' => $author->id, 'course' => $this->page->course->id));
             $a                  = new stdclass();
             $a->name            = fullname($author);
@@ -183,7 +183,7 @@ class mod_workshop_renderer extends plugin_renderer_base {
             $additionalfields = explode(',', user_picture::fields());
             $author = username_load_fields_from_object($author, $summary, 'author', $additionalfields);
             $userpic            = $this->output->user_picture($author, array('courseid' => $this->page->course->id, 'size' => 35));
-            $userurl            = new moodle_url('/user/view.php',
+            $userurl            = new moodle_url('/user/profile.php',
                                             array('id' => $author->id, 'course' => $this->page->course->id));
             $a                  = new stdClass();
             $a->name            = fullname($author);
@@ -648,7 +648,7 @@ class mod_workshop_renderer extends plugin_renderer_base {
             $reviewer   = $assessment->reviewer;
             $userpic    = $this->output->user_picture($reviewer, array('courseid' => $this->page->course->id, 'size' => 32));
 
-            $userurl    = new moodle_url('/user/view.php',
+            $userurl    = new moodle_url('/user/profile.php',
                                        array('id' => $reviewer->id, 'course' => $this->page->course->id));
             $a          = new stdClass();
             $a->name    = fullname($reviewer);

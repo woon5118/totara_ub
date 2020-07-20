@@ -218,7 +218,7 @@ class core_tag_manage_table extends table_sql {
      */
     public function col_fullname($tag) {
         $params         = array('id' => $tag->owner);
-        $ownerlink      = new moodle_url('/user/view.php', $params);
+        $ownerlink      = new moodle_url('/user/profile.php', $params);
         $owner          = html_writer::link($ownerlink, fullname($tag));
         return $owner;
     }

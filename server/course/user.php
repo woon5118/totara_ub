@@ -153,7 +153,7 @@ switch ($mode) {
 
             // Check to see if the active node is a user name.
             if (!preg_match('/^user\d{0,}$/', $activenode->key)) { // No user name found.
-                $userurl = new moodle_url('/user/view.php', array('id' => $user->id, 'course' => $course->id));
+                $userurl = new moodle_url('/user/profile.php', array('id' => $user->id, 'course' => $course->id));
                 // Add the user name.
                 $PAGE->navbar->add(fullname($user), $userurl, navigation_node::TYPE_SETTING);
             }

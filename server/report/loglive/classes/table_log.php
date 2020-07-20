@@ -139,10 +139,10 @@ class report_loglive_table_log extends table_sql {
             if ($event->courseid) {
                 $params['course'] = $event->courseid;
             }
-            $a->realusername = html_writer::link(new moodle_url("/user/view.php", $params),
+            $a->realusername = html_writer::link(new moodle_url("/user/profile.php", $params),
                 $this->userfullnames[$logextra['realuserid']]);
             $params['id'] = $event->userid;
-            $a->asusername = html_writer::link(new moodle_url("/user/view.php", $params),
+            $a->asusername = html_writer::link(new moodle_url("/user/profile.php", $params),
                 $this->userfullnames[$event->userid]);
             $username = get_string('eventloggedas', 'report_loglive', $a);
         } else if (!empty($event->userid) && !empty($this->userfullnames[$event->userid])) {
@@ -150,7 +150,7 @@ class report_loglive_table_log extends table_sql {
             if ($event->courseid) {
                 $params['course'] = $event->courseid;
             }
-            $username = html_writer::link(new moodle_url("/user/view.php", $params), $this->userfullnames[$event->userid]);
+            $username = html_writer::link(new moodle_url("/user/profile.php", $params), $this->userfullnames[$event->userid]);
         } else {
             $username = '-';
         }
@@ -170,7 +170,7 @@ class report_loglive_table_log extends table_sql {
             if ($event->courseid) {
                 $params['course'] = $event->courseid;
             }
-            return html_writer::link(new moodle_url("/user/view.php", $params), $this->userfullnames[$event->relateduserid]);
+            return html_writer::link(new moodle_url("/user/profile.php", $params), $this->userfullnames[$event->relateduserid]);
         } else {
             return '-';
         }

@@ -150,7 +150,7 @@ class mod_assign_renderer extends plugin_renderer_base {
             $o .= $this->output->user_picture($summary->user);
             $o .= $this->output->spacer(array('width'=>30));
             $urlparams = array('id' => $summary->user->id, 'course'=>$summary->courseid);
-            $url = new moodle_url('/user/view.php', $urlparams);
+            $url = new moodle_url('/user/profile.php', $urlparams);
             $fullname = fullname($summary->user, $summary->viewfullnames);
             $extrainfo = array();
             foreach ($summary->extrauserfields as $extrafield) {
@@ -484,7 +484,7 @@ class mod_assign_renderer extends plugin_renderer_base {
                 $userslist = array();
                 foreach ($members as $member) {
                     $urlparams = array('id' => $member->id, 'course' => $status->courseid);
-                    $url = new moodle_url('/user/view.php', $urlparams);
+                    $url = new moodle_url('/user/profile.php', $urlparams);
                     if ($status->view == assign_submission_status::GRADER_VIEW && $status->blindmarking) {
                         $userslist[] = $member->alias;
                     } else {
@@ -727,7 +727,7 @@ class mod_assign_renderer extends plugin_renderer_base {
                 $userslist = array();
                 foreach ($members as $member) {
                     $urlparams = array('id' => $member->id, 'course'=>$status->courseid);
-                    $url = new moodle_url('/user/view.php', $urlparams);
+                    $url = new moodle_url('/user/profile.php', $urlparams);
                     if ($status->view == assign_submission_status::GRADER_VIEW && $status->blindmarking) {
                         $userslist[] = $member->alias;
                     } else {

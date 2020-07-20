@@ -1275,10 +1275,10 @@ class totara_core_moodlelib_testcase extends advanced_testcase {
 
         $url = user_get_profile_url($user1, $course1);
         $this->assertInstanceOf(moodle_url::class, $url);
-        $this->assertSame("$CFG->wwwroot/user/view.php?id=$user1->id&course=$course1->id", $url->out(false));
+        $this->assertSame("$CFG->wwwroot/user/profile.php?id=$user1->id&course=$course1->id", $url->out(false));
 
         $url = user_get_profile_url($user1->id, $course1->id);
         $this->assertInstanceOf(moodle_url::class, $url);
-        $this->assertSame("$CFG->wwwroot/user/view.php?id=$user1->id&course=$course1->id", $url->out(false));
+        $this->assertSame("$CFG->wwwroot/user/profile.php?id=$user1->id&course=$course1->id", $url->out(false));
     }
 }
