@@ -56,7 +56,7 @@ namespace {
                 $text = "Can not find PHPUnit library, to install use: php composer.phar install";
                 break;
             case PHPUNIT_EXITCODE_PHPUNITWRONG:
-                $text = 'Totara requires PHPUnit 7.5.x, ' . $text . ' is not compatible';
+                $text = 'Totara requires PHPUnit 8.5.x, ' . $text . ' is not compatible';
                 break;
             case PHPUNIT_EXITCODE_PHPUNITEXTMISSING:
                 $text = 'Totara can not find required PHPUnit extension ' . $text;
@@ -84,27 +84,30 @@ namespace {
         testing_error($errorcode, $text);
     }
 
-    function phpunit_bootstrap_initialise_cfg(): \stdClass {
-        return \core\internal\config::initialise(
-            function ($config_file, $config_loader) {
-                $alt_config_file = realpath(__DIR__ . '../../../test/phpunit/config.php');
-                if (file_exists($alt_config_file)) {
-                    return $config_loader($alt_config_file);
-                }
-                $cfg = $config_loader($config_file);
-                bootstrap::remap_cfg($cfg);
-                bootstrap::ensure_cfg_defaults($cfg);
-                bootstrap::ensure_minimum_cfg($cfg);
+    function phpunit_bootstrap_initialise_cfg(): \core_config {
+        $config_file = __DIR__ . '/../../../test/phpunit/config.php';
+        $main_config_file = __DIR__ . '/../../../config.php';
+        $adjuster = null;
+        if (file_exists($config_file)) {
+            $adjuster = function (\stdClass $cfg) {
+                bootstrap::ensure_minimum_cfg($cfg, false);
+                bootstrap::force_cfg_values($cfg);
                 bootstrap::modify_for_parallel_testing($cfg);
-                bootstrap::force_environment($cfg);
+            };
+        } else if (file_exists($main_config_file)) {
+            // This should be deprecated soon!
+            $config_file = $main_config_file;
+            $adjuster = function (\stdClass $cfg) {
+                bootstrap::remap_cfg($cfg);
+                bootstrap::ensure_minimum_cfg($cfg, true);
+                bootstrap::force_cfg_values($cfg);
+                bootstrap::modify_for_parallel_testing($cfg);
+            };
+        } else {
+            phpunit_bootstrap_error(PHPUNIT_EXITCODE_CONFIGERROR, 'config.php file not found');
+        }
 
-                // Set up dataroot at this point. It will be verified by \core\internal\config::initialise() which
-                // will be using the callable provided here.
-                testing_initdataroot($cfg->dataroot, 'phpunit', $cfg->directorypermissions, $cfg->filepermissions);
-
-                return $cfg;
-            }
-        );
+        return \core\internal\config::initialise($config_file, $adjuster);
     }
 
 }
@@ -216,20 +219,22 @@ namespace core\internal\phpunit {
             }
         }
 
-        public static function ensure_cfg_defaults(\stdClass $cfg) {
-            $defaults = [
-                'directorypermissions' => 02777,
-                'wwwroot' => 'https://www.example.com/moodle',
-            ];
-            array_walk($defaults, function ($default, $property) use ($cfg) {
-                if (!isset($cfg->{$property})) {
-                    $cfg->{$property} = $default;
-                }
-            });
-            $cfg->filepermissions = (02777 & 0666);
+        public static function force_cfg_values(\stdClass $cfg) {
+            if (!isset($cfg->directorypermissions)) {
+                $cfg->directorypermissions = 0770;
+            }
+            $cfg->filepermissions = ($cfg->directorypermissions & 0666);
+            $cfg->wwwroot = 'https://www.example.com/moodle';
+
+            // Do not allow overrides from config.php for these settings.
+            unset($cfg->debug);
+            unset($cfg->debugdeveloper);
+            unset($cfg->debugdisplay);
+            unset($cfg->themerev);
+            unset($cfg->jsrev);
         }
 
-        public static function ensure_minimum_cfg(\stdClass $cfg) {
+        public static function ensure_minimum_cfg(\stdClass $cfg, bool $mainconfig) {
             $required = [
                 'dataroot',
                 'prefix',
@@ -241,10 +246,14 @@ namespace core\internal\phpunit {
                 'dbpass',
                 'dboptions',
             ];
-            array_walk($required, function ($property) use ($cfg) {
+            array_walk($required, function ($property) use ($cfg, $mainconfig) {
                 if (!isset($cfg->{$property})) {
-                    $phpunit_property = 'phpunit_' . $property;
-                    phpunit_bootstrap_error(PHPUNIT_EXITCODE_CONFIGERROR, 'Missing $CFG->' . $phpunit_property . ' and/or $CFG->' . $property . ' in config.php, can not run tests!');
+                    if ($mainconfig) {
+                        $phpunit_property = 'phpunit_' . $property;
+                        phpunit_bootstrap_error(PHPUNIT_EXITCODE_CONFIGERROR, 'Missing $CFG->' . $phpunit_property . ' in /config.php, can not run tests!');
+                    } else {
+                        phpunit_bootstrap_error(PHPUNIT_EXITCODE_CONFIGERROR, 'Missing $CFG->' . $property . ' in /test/phpunit/config.php, can not run tests!');
+                    }
                 }
             });
         }
@@ -280,20 +289,9 @@ namespace core\internal\phpunit {
             // Add the PHPUnit instance token to dataroot and prefix to create separation.
             $cfg->dataroot = $cfg->dataroot . '/' . PHPUNIT_INSTANCE;
             $cfg->prefix = $cfg->prefix . PHPUNIT_INSTANCE;
-        }
 
-        public static function force_environment(\stdClass $cfg) {
-            // force the same CFG settings in all sites
-            $cfg->debug = (E_ALL | E_STRICT); // can not use DEBUG_DEVELOPER yet
-            $cfg->debugdeveloper = true;
-            $cfg->debugdisplay = 1;
-            // some ugly hacks
-            $cfg->themerev = 1;
-            $cfg->jsrev = 1;
-            error_reporting($cfg->debug);
-            ini_set('display_errors', '1');
-            ini_set('log_errors', '1');
-            set_time_limit(0); // no time limit in CLI scripts, user may cancel execution
+            // Set up dataroot at this point.
+            testing_initdataroot($cfg->dataroot, 'phpunit', $cfg->directorypermissions, $cfg->filepermissions);
         }
     }
 }

@@ -33,7 +33,14 @@ namespace core\internal {
 
         public const INITIALISED = 'TOTARA_READY_FOR_SETUP';
 
-        public static function initialise(?callable $config_resolver = null): \core_config {
+        /**
+         * Prepare global $CFG.
+         *
+         * @param string $config_file path to main config.php file
+         * @param callable|null $adjuster callback for adjusting data from config file
+         * @return \core_config future global $CFG
+         */
+        public static function initialise(string $config_file, callable $adjuster = null): \core_config {
             require_once(__DIR__ . '/classes/config.php'); // Cannot use class loader yet.
 
             $loader = function (string $config_file): \stdClass {
@@ -53,7 +60,7 @@ namespace core\internal {
                 if (!file_exists($config_file)) {
                     // Uncomment me if you need to identify the config.php that is being looked for.
                     // die('Config.php file does not exist, expected at: ' . $config_file);
-                    die('Config.php file does not exist');
+                    die('config.php file does not exist');
                 }
                 // Must be require, as we will be here multiple times.
                 require($config_file);
@@ -67,14 +74,12 @@ namespace core\internal {
 
                 return $newCFG;
             };
-            $config_file = realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'config.php');
-            if ($config_resolver === null) {
-                $config_resolver = function (string $config_file, callable $loader) {
-                    return $loader($config_file);
-                };
+
+            $rawcfg = $loader($config_file);
+            if ($adjuster) {
+                // Let behat and phpunit do its magic.
+                $adjuster($rawcfg);
             }
-            $rawcfg = $config_resolver($config_file, $loader);
-            self::adjust_for_behat($rawcfg);
 
             // Create a fresh new config class and reapply all properties.
             $cfg = new \core_config($rawcfg);
@@ -226,6 +231,7 @@ namespace core\internal {
             $cfg->config_php_settings = (array)$cfg;
             // Forced plugin settings override values from config_plugins table.
             unset($cfg->config_php_settings['forced_plugin_settings']);
+            unset($cfg->config_php_settings['config_php_settings']);
             if (!isset($cfg->forced_plugin_settings)) {
                 $cfg->forced_plugin_settings = array();
             }
@@ -233,7 +239,12 @@ namespace core\internal {
             if (isset($cfg->debug)) {
                 $cfg->debug = (int)$cfg->debug;
             } else {
-                $cfg->debug = 0;
+                if ((defined('PHPUNIT_TEST') && PHPUNIT_TEST) || (defined('PHPUNIT_UTIL') && PHPUNIT_UTIL) || (defined('BEHAT_UTIL') && BEHAT_UTIL)
+                    || (defined('BEHAT_TEST') && BEHAT_TEST) || (defined('BEHAT_SITE_RUNNING') && BEHAT_SITE_RUNNING)) {
+                    $cfg->debug = (E_ALL | E_STRICT);
+                } else {
+                    $cfg->debug = 0;
+                }
             }
             $cfg->debugdeveloper = (($cfg->debug & (E_ALL | E_STRICT)) === (E_ALL | E_STRICT)); // DEBUG_DEVELOPER is not available yet.
         }
@@ -366,12 +377,60 @@ namespace core\internal {
             }
         }
 
-        private static function adjust_for_behat(\stdClass $cfg) {
+        /**
+         * CFG initialiser for running behat site controlled by selenium.
+         * @return \core_config
+         */
+        public static function initialise_behat_site(): \core_config {
+            if (!isset($_SERVER['REMOTE_ADDR']) || empty($_COOKIE['BEHAT'])) {
+                die('Invalid behat site access');
+            }
+            $adjuster = function (\stdClass $cfg) {
+                \core\internal\config::adjust_for_behat($cfg);
+            };
+            return \core\internal\config::initialise(__DIR__ . '/../../config.php', $adjuster);
+        }
+
+        /**
+         * CFG initialiser for behat manager running the steps.
+         * @return \core_config
+         */
+        public static function initialise_behat_test(): \core_config {
+            if (!defined('BEHAT_TEST') || !BEHAT_TEST) {
+                die('Invalid behat test access');
+            }
+            $adjuster = function (\stdClass $cfg) {
+                \core\internal\config::adjust_for_behat($cfg);
+            };
+            return \core\internal\config::initialise(__DIR__ . '/../../config.php', $adjuster);
+        }
+
+        /**
+         * CFG initialiser for behat CLI utility scripts.
+         * @return \core_config
+         */
+        public static function initialise_behat_util(): \core_config {
+            if (!defined('BEHAT_UTIL') || !BEHAT_UTIL) {
+                die('Invalid behat util access');
+            }
+            $adjuster = function (\stdClass $cfg) {
+                \core\internal\config::adjust_for_behat($cfg);
+            };
+            return \core\internal\config::initialise(__DIR__ . '/../../config.php', $adjuster);
+        }
+
+        protected static function adjust_for_behat(\stdClass $cfg) {
 
             if (defined('BEHAT_SITE_RUNNING')) {
                 // We already switched to behat test site previously.
 
             } else if (!empty($cfg->behat_wwwroot) or !empty($cfg->behat_dataroot) or !empty($cfg->behat_prefix)) {
+                // Do not allow overrides from config.php for these settings.
+                unset($cfg->debug);
+                unset($cfg->debugdeveloper);
+                unset($cfg->debugdisplay);
+                unset($cfg->themerev);
+                unset($cfg->jsrev);
 
                 // The behat is configured on this server, we need to find out if this is the behat test
                 // site based on the URL used for access.
@@ -447,9 +506,11 @@ namespace core\internal {
 
             // Totara: redirect behat error logs to a special file, but do not log the errors from setup utils there.
             if (defined('BEHAT_SITE_RUNNING') or defined('BEHAT_TEST')) {
+                error_reporting(E_ALL | E_STRICT);
+                ini_set('display_errors', '1');
+                ini_set('log_errors', '1');
                 if (!defined('BEHAT_UTIL')) {
                     ini_set('error_log', dirname($cfg->dataroot) . '/' . basename($cfg->dataroot) . '_error.log');
-                    ini_set('log_errors', 1);
                 }
             }
         }

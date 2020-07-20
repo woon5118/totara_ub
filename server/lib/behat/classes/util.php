@@ -52,6 +52,8 @@ class behat_util extends testing_util {
      */
     protected static $datarootskipondrop = array('.', '..', 'lock');
 
+    protected static $globals = [];
+
     /**
      * Installs a site using $CFG->dataroot and $CFG->prefix
      * @throws coding_exception
@@ -337,6 +339,7 @@ class behat_util extends testing_util {
 
         // Check that test environment is correctly set up, stops execution.
         self::test_environment_problem();
+        return 0;
     }
 
     /**
@@ -406,6 +409,13 @@ class behat_util extends testing_util {
     }
 
     /**
+     * To be called once from \behat_hooks::before_suite() only.
+     */
+    public static function backup_globals() {
+        self::$globals['CFG'] = clone($GLOBALS['CFG']);
+    }
+
+    /**
      * Reset contents of all database tables to initial values, reset caches, etc.
      */
     public static function reset_all_data() {
@@ -414,6 +424,9 @@ class behat_util extends testing_util {
 
         // Purge dataroot directory.
         self::reset_dataroot();
+
+        // Reset $CFG to initial state.
+        $GLOBALS['CFG'] = clone(self::$globals['CFG']);
 
         // Purge all data from the caches. This is required for consistency between tests.
         // Any file caches that happened to be within the data root will have already been clearer (because we just deleted cache)
@@ -439,10 +452,6 @@ class behat_util extends testing_util {
 
         // Inform data generator.
         self::get_data_generator()->reset();
-
-        // Initialise $CFG with default values. This is needed for behat cli process, so we don't have modified
-        // $CFG values from the old run. @see set_config.
-        initialise_cfg();
 
         // Totara: make sure all browser caches are invalidated too.
         js_reset_all_caches();

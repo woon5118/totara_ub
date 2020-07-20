@@ -34,5 +34,11 @@
 /** @var moodle_page $PAGE */
 
 require_once(__DIR__ . '/lib/init.php');
-$CFG = \core\internal\config::initialise();
+
+if (isset($_SERVER['REMOTE_ADDR']) && !empty($_COOKIE['BEHAT'])) {
+    $CFG = \core\internal\config::initialise_behat_site();
+} else {
+    $CFG = \core\internal\config::initialise(__DIR__ . '/../config.php');
+}
+
 require(__DIR__ . DIRECTORY_SEPARATOR . 'lib/setup.php');

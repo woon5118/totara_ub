@@ -77,20 +77,22 @@ array_walk($define_if_not, function ($value, $define) {
 
 $phpunitversion = \PHPUnit\Runner\Version::id();
 if ($phpunitversion === '@package_version@') {
-    // library checked out from git, let's hope dev knows that 7.5.x is required
-} else if (!version_compare($phpunitversion, '7.5.0', '>=')) {
+    // library checked out from git, let's hope dev knows that 8.5.x is required
+} else if (!version_compare($phpunitversion, '8.5.0', '>=') || version_compare($phpunitversion, '9.0', '>')) {
     phpunit_bootstrap_error(PHPUNIT_EXITCODE_PHPUNITWRONG, $phpunitversion);
 }
 unset($phpunitversion);
 
 // only load CFG from config.php, stop ASAP in lib/setup.php
-$GLOBALS['CFG'] = $CFG = phpunit_bootstrap_initialise_cfg();
+$GLOBALS['CFG'] = phpunit_bootstrap_initialise_cfg();
+global $CFG;
 
-// prepare dataroot
-umask(0);
+// Some ugly hacks.
+$CFG->themerev = 1;
+$CFG->jsrev = 1;
 
 // Totara: Make sure the dataroot is ready.
-testing_initdataroot($CFG->dataroot, 'phpunit');
+umask(0);
 
 // load test case stub classes and other stuff
 require_once("$CFG->dirroot/lib/phpunit/lib.php");
@@ -98,6 +100,10 @@ require_once("$CFG->dirroot/lib/phpunit/lib.php");
 require("$CFG->dirroot/lib/setup.php");
 
 raise_memory_limit(MEMORY_HUGE);
+set_time_limit(0);
+error_reporting(E_ALL | E_STRICT);
+ini_set('display_errors', '1');
+ini_set('log_errors', '1');
 
 if (PHPUNIT_UTIL) {
     return;

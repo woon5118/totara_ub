@@ -1819,12 +1819,10 @@ class core_cache_cache_testcase extends advanced_testcase {
         $instance->set_definition_sharing('core/config', cache_definition::SHARING_SITEID + cache_definition::SHARING_VERSION);
         cache_helper::purge_all();
         $this->assertSame(null, cache_helper::$allversionshash);
-        $oldversionhash = $CFG->allversionshash;
-        unset($CFG->allversionshash);
-        $this->assertSame($oldversionhash, get_config('core', 'allversionshash'));
+        $allversionshash = $DB->get_field('config', 'value', ['name' => 'allversionshash']);
+        $this->assertSame($CFG->allversionshash, $allversionshash);
         $this->assertCount(3, $DB->get_columns('config'));
         cache_helper::$allversionshash = null;
-        $this->resetAfterTest();
     }
 
     /**

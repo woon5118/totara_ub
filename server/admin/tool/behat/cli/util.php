@@ -110,18 +110,11 @@ if (!empty($options['parallel'])) {
 }
 
 require_once(__DIR__ . '/../../../../lib/init.php');
-$CFG = \core\internal\config::initialise();
+$CFG = \core\internal\config::initialise_behat_util();
 
 require_once(TOOL_BEHAT_DIR_SERVER . '/lib/behat/lib.php');
 require_once(TOOL_BEHAT_DIR_SERVER . '/lib/behat/classes/behat_command.php');
 require_once(TOOL_BEHAT_DIR_SERVER . '/lib/behat/classes/behat_config_manager.php');
-
-// Remove error handling overrides done in config.php. This is consistent with admin/tool/behat/cli/util_single_run.php.
-$CFG->debug = (E_ALL | E_STRICT);
-$CFG->debugdisplay = 1;
-error_reporting($CFG->debug);
-ini_set('display_errors', '1');
-ini_set('log_errors', '1');
 
 // Import the necessary libraries.
 require_once($CFG->libdir . '/setuplib.php');

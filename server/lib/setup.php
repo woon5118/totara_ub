@@ -268,7 +268,9 @@ setup_validate_php_configuration();
 // Connect to the database
 setup_DB();
 
+$useconfigcache = true;
 if (PHPUNIT_TEST and !PHPUNIT_UTIL) {
+    $useconfigcache = false;
     // make sure tests do not run in parallel
     test_lock::acquire('phpunit');
     $dbhash = null;
@@ -277,21 +279,24 @@ if (PHPUNIT_TEST and !PHPUNIT_UTIL) {
             // reset DB tables
             phpunit_util::reset_database();
         }
-    } catch (Exception $e) {
+    } catch (Throwable $e) {
         if ($dbhash) {
             // we ned to reinit if reset fails
             $DB->set_field('config', 'value', 'na', array('name'=>'phpunittest'));
         }
     }
     unset($dbhash);
+} else if (defined('BEHAT_TEST') && BEHAT_TEST) {
+    $useconfigcache = false;
+    $DB->get_manager()->snapshot_rollback();
+} else if (defined('BEHAT_UTIL') && BEHAT_UTIL) {
+    $useconfigcache = false;
 }
 
+
 // Load up any configuration from the config table or MUC cache.
-if (PHPUNIT_TEST) {
-    phpunit_util::initialise_cfg();
-} else {
-    initialise_cfg();
-}
+initialise_cfg($useconfigcache);
+unset($useconfigcache);
 
 // Totara: disable the old trusttext system and object embedding completely
 //         unless the site has explicitly chosen to completely ignore security.

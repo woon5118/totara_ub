@@ -1472,6 +1472,9 @@ function set_config($name, $value, $plugin=null) {
             // So it's defined for this invocation at least.
             if (is_null($value)) {
                 unset($CFG->$name);
+            } else if ($name === 'debug') {
+                $CFG->debug = (int)$value;
+                $CFG->debugdeveloper = (($CFG->debug & DEBUG_DEVELOPER) === DEBUG_DEVELOPER);
             } else {
                 // Settings from db are always strings.
                 $CFG->$name = (string)$value;
@@ -1531,62 +1534,62 @@ function set_config($name, $value, $plugin=null) {
  *
  * NOTE: this function is called from lib/db/upgrade.php
  *
- * @static string|false $siteidentifier The site identifier is not cached. We use this static cache so
- *     that we need only fetch it once per request.
  * @param string $plugin full component name
  * @param string $name default null
  * @return mixed hash-like object or single value, return false no config found
- * @throws dml_exception
  */
 function get_config($plugin, $name = null) {
     global $CFG, $DB;
 
-    static $siteidentifier = null;
-
     if ($plugin === 'moodle' || $plugin === 'core' || empty($plugin)) {
-        $forced =& $CFG->config_php_settings;
-        $iscore = true;
-        $plugin = 'core';
-    } else {
-        if (array_key_exists($plugin, $CFG->forced_plugin_settings)) {
-            $forced =& $CFG->forced_plugin_settings[$plugin];
-        } else {
-            $forced = array();
+        if ($name) {
+            // Do not normalise $CFG values in any way,
+            // admins must enter correct values in config.php file.
+            if (property_exists($CFG, $name)) {
+                return $CFG->{$name};
+            } else {
+                return false;
+            }
         }
-        $iscore = false;
+
+        // Note: this is not a good idea,
+        //       we should add a debugging message here and fix invalid use in \core\antivirus\scanner::__construct()
+        return (object)(array)$CFG;
     }
 
-    if ($siteidentifier === null) {
-        try {
-            // This may fail during installation.
-            // If you have a look at {@link initialise_cfg()} you will see that this is how we detect the need to
-            // install the database.
-            $siteidentifier = $DB->get_field('config', 'value', array('name' => 'siteidentifier'));
-        } catch (dml_exception $ex) {
-            // Set siteidentifier to false. We don't want to trip this continually.
-            $siteidentifier = false;
-            throw $ex;
+    // Normalise values in forced settings (once only for performance reasons).
+    if (!isset($CFG->forced_plugin_settings)) {
+        $CFG->forced_plugin_settings = [];
+    } else if (isset($CFG->forced_plugin_settings[$plugin])) {
+        if (!isset($CFG->forced_plugin_settings[$plugin]['forced_plugin_settings_normalised'])) {
+            foreach ($CFG->forced_plugin_settings[$plugin] as $k => $v) {
+                if (is_array($v)) {
+                    // Array cannot be stored in database.
+                    unset($CFG->forced_plugin_settings[$plugin][$k]);
+                } else if (is_null($v)) {
+                    // Null is not a valid config settings,
+                    // it means 'delete' in set_config().
+                    unset($CFG->forced_plugin_settings[$plugin][$k]);
+                } else if (is_bool($v)) {
+                    $CFG->forced_plugin_settings[$plugin][$k] = ($v ? '1' : '0');
+                } else {
+                    $CFG->forced_plugin_settings[$plugin][$k] = (string)$v;
+                }
+            }
+            $CFG->forced_plugin_settings[$plugin]['forced_plugin_settings_normalised'] = true;
         }
     }
 
-    if (!empty($name)) {
-        if (array_key_exists($name, $forced)) {
-            return (string)$forced[$name];
-        } else if ($name === 'siteidentifier' && $plugin == 'core') {
-            return $siteidentifier;
+    if ($name) {
+        if (isset($CFG->forced_plugin_settings[$plugin][$name])) {
+            return $CFG->forced_plugin_settings[$plugin][$name];
         }
     }
 
     $cache = cache::make('core', 'config');
     $result = $cache->get($plugin);
     if ($result === false) {
-        // The user is after a recordset.
-        if (!$iscore) {
-            $result = $DB->get_records_menu('config_plugins', array('plugin' => $plugin), '', 'name,value');
-        } else {
-            // This part is not really used any more, but anyway...
-            $result = $DB->get_records_menu('config', array(), '', 'name,value');;
-        }
+        $result = $DB->get_records_menu('config_plugins', array('plugin' => $plugin), '', 'name, value');
         $cache->set($plugin, $result);
     }
 
@@ -1597,18 +1600,9 @@ function get_config($plugin, $name = null) {
         return false;
     }
 
-    if ($plugin === 'core') {
-        $result['siteidentifier'] = $siteidentifier;
-    }
-
-    foreach ($forced as $key => $value) {
-        if (is_null($value) or is_array($value) or is_object($value)) {
-            // We do not want any extra mess here, just real settings that could be saved in db.
-            unset($result[$key]);
-        } else {
-            // Convert to string as if it went through the DB.
-            $result[$key] = (string)$value;
-        }
+    if (isset($CFG->forced_plugin_settings[$plugin])) {
+        $result = array_merge($result, $CFG->forced_plugin_settings[$plugin]);
+        unset($result['forced_plugin_settings_normalised']);
     }
 
     return (object)$result;

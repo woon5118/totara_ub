@@ -818,9 +818,10 @@ function setup_validate_php_configuration() {
 
 /**
  * Initialise global $CFG variable.
+ * @pram bool $usecache
  * @private to be used only from lib/setup.php
  */
-function initialise_cfg() {
+function initialise_cfg(bool $usecache) {
     global $CFG, $DB;
 
     if (!$DB) {
@@ -828,17 +829,53 @@ function initialise_cfg() {
         return;
     }
 
-    try {
-        $localcfg = get_config('core');
-    } catch (dml_exception $e) {
-        // Most probably empty db, going to install soon.
-        return;
+    if ($usecache && defined('CACHE_DISABLE_ALL') && CACHE_DISABLE_ALL) {
+        $usecache = false;
     }
 
-    foreach ($localcfg as $name => $value) {
-        // Note that get_config() keeps forced settings
-        // and normalises values to string if possible.
-        $CFG->{$name} = $value;
+    try {
+        if ($usecache) {
+            $cache = cache::make('core', 'config');
+            $localcfg = $cache->get('core');
+            $updatecache = empty($localcfg);
+            if ($localcfg !== false || isset($localcfg['siteidentifier'])) {
+                $localcfg = (array)$localcfg;
+                // In theory fetching just one record to validate cache should be faster
+                // than fetching all config values...
+                $siteidentifier = $DB->get_field('config', 'value', ['name' => 'siteidentifier']);
+                if ($siteidentifier !== $localcfg['siteidentifier']) {
+                    $localcfg = $DB->get_records_menu('config', [], '', 'name, value');
+                }
+            } else {
+                // Fallback to DB read.
+                $localcfg = $DB->get_records_menu('config', [], '', 'name, value');
+            }
+            if ($updatecache && $localcfg) {
+                $cache->set('core', $localcfg);
+            }
+        } else {
+            $localcfg = $DB->get_records_menu('config', [], '', 'name, value');
+        }
+
+        if (!$localcfg) {
+            return;
+        }
+
+        foreach ($localcfg as $name => $value) {
+            if ($name === 'debug') {
+                // Debug is special because it is set always and it needs to update debugdeveloper too.
+                if (!isset($CFG->config_php_settings['debug'])) {
+                    $CFG->debug = (int)$value;
+                    $CFG->debugdeveloper = (($CFG->debug & DEBUG_DEVELOPER) === DEBUG_DEVELOPER);
+                }
+                continue;
+            } else if (property_exists($CFG, $name)) {
+                continue;
+            }
+            $CFG->{$name} = $value;
+        }
+    } catch (dml_exception $e) {
+        // Most probably empty db, going to install soon.
     }
 }
 

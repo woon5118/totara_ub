@@ -26,6 +26,7 @@ if (isset($_SERVER['REMOTE_ADDR'])) {
     die(); // No access from web!
 }
 
+define('BEHAT_UTIL', true);
 define('CLI_SCRIPT', true);
 define('ABORT_AFTER_CONFIG', true);
 define('CACHE_DISABLE_ALL', true);
@@ -36,7 +37,7 @@ define('TOOL_BEHAT_DIR_SERVER', realpath(TOOL_BEHAT_DIR_ROOT . '/server'));
 define('TOOL_BEHAT_DIR_VENDOR', realpath(TOOL_BEHAT_DIR_ROOT . '/test/behat/vendor'));
 
 require_once(__DIR__ . '/../../../../lib/init.php');
-$CFG = \core\internal\config::initialise();
+$CFG = \core\internal\config::initialise_behat_util();
 
 // Basic functions.
 require_once(TOOL_BEHAT_DIR_SERVER . '/lib/clilib.php');

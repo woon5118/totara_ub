@@ -97,7 +97,6 @@ class phpunit_cache_factory extends cache_factory {
         get_all_capabilities();
 
         // Cache all configs!
-        get_config('core');
         $plugins = $DB->get_records_sql("SELECT DISTINCT plugin, plugin FROM {config_plugins}");
         foreach ($plugins as $plugin) {
             get_config($plugin->plugin);

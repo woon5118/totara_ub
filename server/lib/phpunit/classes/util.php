@@ -66,30 +66,6 @@ class phpunit_util extends testing_util {
     protected static $cachefactory;
 
     /**
-     * Load global $CFG;
-     * @internal
-     * @static
-     * @return void
-     */
-    public static function initialise_cfg() {
-        global $DB;
-        $dbhash = false;
-        try {
-            $dbhash = $DB->get_field('config', 'value', array('name'=>'phpunittest'));
-        } catch (Exception $e) {
-            // not installed yet
-            initialise_cfg();
-            return;
-        }
-        if ($dbhash !== core_component::get_all_versions_hash()) {
-            // do not set CFG - the only way forward is to drop and reinstall
-            return;
-        }
-        // standard CFG init
-        initialise_cfg();
-    }
-
-    /**
      * Reset contents of all database tables to initial values, reset caches, etc.
      *
      * Note: this is relatively slow (cca 2 seconds for pg and 7 for mysql) - please use with care!
@@ -530,6 +506,10 @@ class phpunit_util extends testing_util {
 
         // Set the admin email address.
         $DB->set_field('user', 'email', 'admin@example.com', array('username' => 'admin'));
+
+        // Sets maximum debug level.
+        set_config('debug', DEBUG_DEVELOPER);
+        set_config('debugdisplay', 1);
 
         // Disable all logging for performance and sanity reasons.
         set_config('enabled_stores', '', 'tool_log');

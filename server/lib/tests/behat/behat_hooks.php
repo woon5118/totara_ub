@@ -157,27 +157,34 @@ class behat_hooks extends behat_base {
     public static function before_suite(BeforeSuiteScope $scope) {
         global $CFG;
 
+        if (!defined('CLI_SCRIPT')) {
+            define('CLI_SCRIPT', 1);
+        }
+
         // Defined only when the behat CLI command is running, the moodle init setup process will
         // read this value and switch to $CFG->behat_dataroot and $CFG->behat_prefix instead of
         // the normal site.
         if (!defined('BEHAT_TEST')) {
             define('BEHAT_TEST', 1);
-        }
+            // With BEHAT_TEST we will be using $CFG->behat_* instead of $CFG->dataroot, $CFG->prefix and $CFG->wwwroot.
+            require_once(__DIR__ . '/../../../lib/init.php');
+            try {
+                $CFG = \core\internal\config::initialise_behat_test();
+                require_once(__DIR__ . '/../../../lib/setup.php');
+            } catch (Throwable $ex) {
+                throw new behat_stop_exception('Behat test environment error: ' . $ex->getMessage());
+            }
 
-        if (!defined('CLI_SCRIPT')) {
-            define('CLI_SCRIPT', 1);
-        }
+            // Now that we are MOODLE_INTERNAL.
+            require_once(__DIR__ . '/../../behat/classes/behat_command.php');
+            require_once(__DIR__ . '/../../behat/classes/behat_selectors.php');
+            require_once(__DIR__ . '/../../behat/classes/behat_context_helper.php');
+            require_once(__DIR__ . '/../../behat/classes/util.php');
+            require_once(__DIR__ . '/../../testing/classes/test_lock.php');
+            require_once(__DIR__ . '/../../testing/classes/nasty_strings.php');
 
-        // With BEHAT_TEST we will be using $CFG->behat_* instead of $CFG->dataroot, $CFG->prefix and $CFG->wwwroot.
-        require_once(__DIR__ . '/../../../config.php');
-        $GLOBALS['CFG'] = $CFG;
-        // Now that we are MOODLE_INTERNAL.
-        require_once(__DIR__ . '/../../behat/classes/behat_command.php');
-        require_once(__DIR__ . '/../../behat/classes/behat_selectors.php');
-        require_once(__DIR__ . '/../../behat/classes/behat_context_helper.php');
-        require_once(__DIR__ . '/../../behat/classes/util.php');
-        require_once(__DIR__ . '/../../testing/classes/test_lock.php');
-        require_once(__DIR__ . '/../../testing/classes/nasty_strings.php');
+            \behat_util::backup_globals();
+        }
 
         // Avoids vendor/bin/behat to be executed directly without test environment enabled
         // to prevent undesired db & dataroot modifications, this is also checked

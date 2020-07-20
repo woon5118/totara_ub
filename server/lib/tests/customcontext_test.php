@@ -123,7 +123,6 @@ class customcontext_testcase extends advanced_testcase {
         $existingcustomcontexts = get_config(null, 'custom_context_classes');
 
         set_config('custom_context_classes', serialize($customcontexts));
-        initialise_cfg();
         context_helper::reset_levels();
         $alllevels = context_helper::get_all_levels();
         $this->assertEquals($alllevels[11], 'context_bogus1');
@@ -132,7 +131,6 @@ class customcontext_testcase extends advanced_testcase {
 
         // clean-up & restore any custom contexts
         set_config('custom_context_classes', ($existingcustomcontexts === false) ? null : $existingcustomcontexts);
-        initialise_cfg();
         context_helper::reset_levels();
     }
 }

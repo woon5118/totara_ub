@@ -2192,8 +2192,6 @@ class core_moodlelib_testcase extends advanced_testcase {
     public function test_get_config() {
         global $CFG;
 
-        $this->resetAfterTest();
-
         // Preparation.
         set_config('phpunit_test_get_config_1', 'test 1');
         set_config('phpunit_test_get_config_2', 'test 2', 'mod_forum');
@@ -2201,6 +2199,7 @@ class core_moodlelib_testcase extends advanced_testcase {
             $CFG->config_php_settings = array();
         }
         $CFG->config_php_settings['phpunit_test_get_config_3'] = 'test 3';
+        $CFG->phpunit_test_get_config_3 = 'test 3x';
 
         if (!is_array($CFG->forced_plugin_settings)) {
             $CFG->forced_plugin_settings = array();
@@ -2214,9 +2213,9 @@ class core_moodlelib_testcase extends advanced_testcase {
         // Testing.
         $this->assertSame('test 1', get_config('core', 'phpunit_test_get_config_1'));
         $this->assertSame('test 2', get_config('mod_forum', 'phpunit_test_get_config_2'));
-        $this->assertSame('test 3', get_config('core', 'phpunit_test_get_config_3'));
+        $this->assertSame('test 3x', get_config('core', 'phpunit_test_get_config_3'));
         $this->assertSame('test 4', get_config('mod_forum', 'phpunit_test_get_config_4'));
-        $this->assertFalse(get_config('core', 'phpunit_test_get_config_5'));
+        $this->assertSame('test 5', get_config('core', 'phpunit_test_get_config_5'));
         $this->assertFalse(get_config('core', 'phpunit_test_get_config_x'));
         $this->assertFalse(get_config('mod_forum', 'phpunit_test_get_config_x'));
 
@@ -2230,7 +2229,7 @@ class core_moodlelib_testcase extends advanced_testcase {
 
         // Test cache invalidation.
         $cache = cache::make('core', 'config');
-        $this->assertIsArray($cache->get('core'));
+        // Note: key 'core' is not set in PHPUnit tests.
         $this->assertIsArray($cache->get('mod_forum'));
         set_config('phpunit_test_get_config_1', 'test b');
         $this->assertFalse($cache->get('core'));

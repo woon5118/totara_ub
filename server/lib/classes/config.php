@@ -25,7 +25,15 @@
  * Main Totara configuration.
  *
  * @property int $debug PHP debugging level
+ * @property bool $debugdeveloper tru if developer mode is active
  * @property bool $debugdisplay must be disabled on production servers for security reasons
+ * @property string $extramemorylimit memory size for pages that are known to require more memory
+ * @property string $lang default site language
+ * @property bool $preventexecpath prevent admins from setting program paths web wenb interface
+ * @property bool $reverseproxy enable when reverse proxying or port forwarding
+ * @property string $session_handler_class class name of session handler
+ * @property bool $sslproxy enable when using external SSL proxy
+ * @property string $xsendfile setting for offloading of file serving to web server
  */
 final class core_config extends stdClass {
 

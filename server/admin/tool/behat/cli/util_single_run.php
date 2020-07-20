@@ -107,20 +107,9 @@ if ($options['run']) {
     define('BEHAT_CURRENT_RUN', $options['run']);
 }
 
-// Only load CFG from config.php, stop ASAP in lib/setup.php.
-define('ABORT_AFTER_CONFIG', true);
-require_once(TOOL_BEHAT_DIR_SERVER . '/config.php');
-
-// Remove error handling overrides done in config.php.
-$CFG->debug = (E_ALL | E_STRICT);
-$CFG->debugdisplay = 1;
-error_reporting($CFG->debug);
-ini_set('display_errors', '1');
-ini_set('log_errors', '1');
-
-// Finish moodle init.
-define('ABORT_AFTER_CONFIG_CANCEL', true);
-require("$CFG->dirroot/lib/setup.php");
+require_once(__DIR__ . '/../../../../lib/init.php');
+$CFG = \core\internal\config::initialise_behat_util();
+require_once(__DIR__ . '/../../../../lib/setup.php');
 
 raise_memory_limit(MEMORY_HUGE);
 
