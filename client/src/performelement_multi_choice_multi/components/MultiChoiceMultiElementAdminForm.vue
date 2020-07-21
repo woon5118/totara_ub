@@ -23,109 +23,114 @@
     @remove="$emit('remove')"
   >
     <template v-slot:content>
-      <div class="tui-elementEditMultiChoiceMulti">
-        <Uniform
-          v-if="initialValues"
-          v-slot="{ getSubmitting }"
-          :initial-values="initialValues"
-          :vertical="true"
-          input-width="full"
-          :validate="validator"
-          @submit="handleSubmit"
+      <Uniform
+        v-if="initialValues"
+        v-slot="{ getSubmitting }"
+        :initial-values="initialValues"
+        class="tui-elementEditMultiChoiceMulti"
+        input-width="full"
+        :validate="validator"
+        @submit="handleSubmit"
+      >
+        <FormRow
+          :label="$str('question_title', 'performelement_multi_choice_multi')"
+          required
         >
-          <FormRow
-            :label="$str('question_title', 'performelement_multi_choice_multi')"
-          >
-            <FormText
-              name="rawTitle"
-              :validations="v => [v.required(), v.maxLength(1024)]"
-            />
-          </FormRow>
-          <FormRow
-            :label="
-              $str('multi_select_options', 'performelement_multi_choice_multi')
-            "
-          >
-            <FieldArray v-slot="{ items, push, remove }" path="answers">
-              <Repeater
-                :rows="items"
-                :min-rows="minRows"
-                :delete-icon="true"
-                :allow-deleting-first-items="false"
-                @add="push()"
-                @remove="(item, i) => remove(i)"
-              >
-                <template v-slot="{ row, index }">
-                  <div class="tui-elementEditMultiChoiceMulti__option">
-                    <FormText
-                      :name="[index]"
-                      :validations="v => [v.required()]"
-                      :aria-label="
-                        $str(
-                          'answer_text',
-                          'performelement_multi_choice_multi',
-                          index + 1
-                        )
-                      "
-                    />
-                  </div>
-                </template>
-                <template v-slot:add>
-                  <ButtonIcon
-                    :aria-label="$str('add', 'moodle')"
-                    :styleclass="{ small: true }"
-                    class="tui-elementEditMultiChoiceMulti__add-option"
-                    @click="push()"
-                  >
-                    <AddIcon />
-                  </ButtonIcon>
-                </template>
-              </Repeater>
-            </FieldArray>
-          </FormRow>
+          <FormText
+            name="rawTitle"
+            :validations="v => [v.required(), v.maxLength(1024)]"
+          />
+        </FormRow>
+        <FormRow
+          :label="
+            $str('multi_select_options', 'performelement_multi_choice_multi')
+          "
+          required
+        >
+          <FieldArray v-slot="{ items, push, remove }" path="answers">
+            <Repeater
+              :rows="items"
+              :min-rows="minRows"
+              :delete-icon="true"
+              :allow-deleting-first-items="false"
+              @add="push()"
+              @remove="(item, i) => remove(i)"
+            >
+              <template v-slot="{ row, index }">
+                <div class="tui-elementEditMultiChoiceMulti__option">
+                  <FormText
+                    :name="[index]"
+                    :validations="v => [v.required()]"
+                    :aria-label="
+                      $str(
+                        'answer_text',
+                        'performelement_multi_choice_multi',
+                        index + 1
+                      )
+                    "
+                  />
+                </div>
+              </template>
+              <template v-slot:add>
+                <ButtonIcon
+                  :aria-label="$str('add', 'moodle')"
+                  :styleclass="{ small: true }"
+                  class="tui-elementEditMultiChoiceMulti__addOption"
+                  @click="push()"
+                >
+                  <AddIcon />
+                </ButtonIcon>
+              </template>
+            </Repeater>
+          </FieldArray>
+        </FormRow>
 
-          <FormRow
-            :label="
-              $str('response_restriction', 'performelement_multi_choice_multi')
-            "
-            class="tui-elementEditMultiChoiceMulti__restriction"
-          >
-            <div class="tui-elementEditMultiChoiceMulti__respondent">
-              <div>
-                <FormNumber name="min" />{{
-                  $str(
-                    'restriction_minimum_label',
-                    'performelement_multi_choice_multi'
-                  )
-                }}
-              </div>
-              <div>
-                <FormNumber name="max" />{{
-                  $str(
-                    'restriction_maximum_label',
-                    'performelement_multi_choice_multi'
-                  )
-                }}
-              </div>
-            </div>
-          </FormRow>
+        <FormRow
+          :label="
+            $str('response_restriction', 'performelement_multi_choice_multi')
+          "
+          :helpmsg="
+            $str(
+              'restriction_response_help_text',
+              'performelement_multi_choice_multi'
+            )
+          "
+        >
+          <FormNumber name="min" />
+          <FormRowDetails :id="$id('aria-describedby')">
+            {{
+              $str(
+                'restriction_minimum_label',
+                'performelement_multi_choice_multi'
+              )
+            }}
+          </FormRowDetails>
+        </FormRow>
 
-          <FormRow>
-            <Checkbox v-model="responseRequired" name="responseRequired">
-              {{ $str('section_element_response_required', 'mod_perform') }}
-            </Checkbox>
-          </FormRow>
-          <IdentifierInput />
-          <FormRow>
-            <div class="tui-elementEditMultiChoiceMulti__action-buttons">
-              <FormActionButtons
-                :submitting="getSubmitting()"
-                @cancel="cancel"
-              />
-            </div>
-          </FormRow>
-        </Uniform>
-      </div>
+        <FormRow>
+          <FormNumber name="max" />
+          <FormRowDetails>
+            {{
+              $str(
+                'restriction_maximum_label',
+                'performelement_multi_choice_multi'
+              )
+            }}
+          </FormRowDetails>
+        </FormRow>
+
+        <IdentifierInput />
+
+        <div class="tui-elementEditMultiChoiceMulti__required">
+          <Checkbox v-model="responseRequired" name="responseRequired">
+            {{ $str('section_element_response_required', 'mod_perform') }}
+          </Checkbox>
+        </div>
+
+        <FormRow class="tui-elementEditMultiChoiceMulti__action-buttons">
+          <FormActionButtons :submitting="getSubmitting()" @cancel="cancel" />
+        </FormRow>
+      </Uniform>
     </template>
   </ElementAdminForm>
 </template>
@@ -137,11 +142,16 @@ import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 import Checkbox from 'tui/components/form/Checkbox';
 import ElementAdminForm from 'mod_perform/components/element/ElementAdminForm';
 import FormActionButtons from 'mod_perform/components/element/admin_form/ActionButtons';
-import FormNumber from 'tui/components/uniform/FormNumber';
-import FormText from 'tui/components/uniform/FormText';
 import IdentifierInput from 'mod_perform/components/element/admin_form/IdentifierInput';
 import Repeater from 'tui/components/form/Repeater';
-import { Uniform, FormRow, FieldArray } from 'tui/components/uniform';
+import {
+  Uniform,
+  FormRow,
+  FieldArray,
+  FormNumber,
+  FormText,
+} from 'tui/components/uniform';
+import FormRowDetails from 'tui/components/form/FormRowDetails';
 
 const MIN_OPTIONS = 2;
 const OPTION_PREFIX = 'option_';
@@ -155,6 +165,7 @@ export default {
     FieldArray,
     FormActionButtons,
     FormRow,
+    FormRowDetails,
     FormNumber,
     FormText,
     IdentifierInput,
@@ -304,7 +315,9 @@ export default {
   "multi_select_options",
   "response_restriction",
   "restriction_minimum_label",
-  "restriction_maximum_label"
+  "restriction_maximum_label",
+  "restriction_response_help_text",
+  "reporting_id_help_text"
   ],
   "mod_perform": [
     "section_element_response_required"

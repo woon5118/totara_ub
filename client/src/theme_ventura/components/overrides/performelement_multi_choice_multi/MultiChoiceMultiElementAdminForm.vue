@@ -21,10 +21,8 @@
     display: flex;
     align-items: end;
     width: 100%;
+    margin-top: var(--tui-gap-4);
     margin-bottom: 0;
-  }
-  &__option {
-    max-width: 200px;
   }
 }
 </style>

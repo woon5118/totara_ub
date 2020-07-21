@@ -31,6 +31,12 @@
             <h2 class="tui-performEditSectionContentModal__title">
               {{ title }}
             </h2>
+            <p v-if="requiredText" aria-hidden="true">
+              <span class="tui-performEditSectionContentModal__required"
+                >*</span
+              >
+              {{ $str('required_fields', 'mod_perform') }}
+            </p>
           </template>
 
           <Loader :loading="isLoading">
@@ -141,6 +147,7 @@ export default {
       type: String,
       required: true,
     },
+    requiredText: Boolean,
   },
 
   data() {
@@ -554,6 +561,7 @@ export default {
     "modal_element_delete_title",
     "modal_element_unsaved_changes_message",
     "modal_element_unsaved_changes_title",
+    "required_fields",
     "toast_error_generic_update",
     "toast_success_delete_element",
     "toast_success_save_element",

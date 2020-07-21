@@ -145,6 +145,7 @@
                   : activityName
               "
               :activity-state="activityState"
+              :required-text="true"
               @update-summary="updateSection"
             >
               <template v-slot:trigger="{ open }">

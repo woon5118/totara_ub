@@ -16,7 +16,12 @@
   @module mod_perform
 -->
 <template>
-  <FormRow :label="$str('reporting_identifier_form_label', 'mod_perform')">
+  <FormRow
+    :label="$str('reporting_identifier', 'mod_perform')"
+    :helpmsg="
+      $str('reporting_id_help_text', 'performelement_multi_choice_multi')
+    "
+  >
     <div>
       <FormText name="identifier" :validations="v => [v.maxLength(1024)]" />
     </div>
@@ -36,7 +41,10 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
-      "reporting_identifier_form_label"
+      "reporting_identifier"
+    ],
+    "performelement_multi_choice_multi": [
+      "reporting_id_help_text"
     ]
   }
 </lang-strings>

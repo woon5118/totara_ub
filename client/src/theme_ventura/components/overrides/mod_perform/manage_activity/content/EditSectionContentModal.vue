@@ -23,6 +23,10 @@
     @include tui-font-heading-medium;
   }
 
+  &__required {
+    color: var(--tui-color-prompt-alert);
+  }
+
   &__form {
     & > * + * {
       margin-top: var(--tui-gap-4);

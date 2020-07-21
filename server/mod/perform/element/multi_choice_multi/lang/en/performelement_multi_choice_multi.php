@@ -40,4 +40,6 @@ $string['multi_select_options'] = 'Multi-select options';
 $string['response_restriction'] = 'Response restriction';
 $string['restriction_minimum_label'] = 'Minimum selection (empty = unlimited)';
 $string['restriction_maximum_label'] = 'Maximum selection (empty = unlimited)';
+$string['restriction_response_help_text'] = 'Use this setting to determine a minimum and maximum number of options to be selected. Leave empty if you don’t want any restrictions.';
+$string['reporting_id_help_text'] = 'Create unique element identifier for reporting purposes.';
 $string['your_response'] = 'Your response';
