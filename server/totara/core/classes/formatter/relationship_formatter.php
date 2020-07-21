@@ -45,6 +45,7 @@ class relationship_formatter extends entity_model_formatter {
             'name' => string_field_formatter::class,
             'name_plural' => string_field_formatter::class,
             'created_at' => date_field_formatter::class,
+            'type' => null,
         ];
     }
 

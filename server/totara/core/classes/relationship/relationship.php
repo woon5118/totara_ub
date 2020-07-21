@@ -52,6 +52,7 @@ final class relationship extends model {
     protected $entity_attribute_whitelist = [
         'id',
         'idnumber',
+        'type',
         'created_at',
     ];
 
