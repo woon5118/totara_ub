@@ -24,6 +24,14 @@
 
 /* Developer documentation is in /pix/flex_icons.php file. */
 
+$icons = [
+    'help' => [
+        'data' => [
+            'classes' => 'fa-info-circle ft-state-info',
+        ],
+    ],
+];
+
 /* Pix only images are not supposed to be converted to flex icons. */
 $pixonlyimages = array(
     'screenshot',

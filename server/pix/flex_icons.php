@@ -1202,7 +1202,7 @@ $icons = array(
         array(
             'data' =>
                 array(
-                    'classes' => 'fa-info-circle ft-state-info',
+                    'classes' => 'fa-info-circle',
                 ),
         ),
     /* For action links that result in hiding of something */
