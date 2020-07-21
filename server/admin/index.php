@@ -24,7 +24,7 @@
  */
 
 // Check that config.php exists, if not then call the install script
-if (!file_exists('../config.php')) {
+if (!file_exists('../../config.php')) {
     header('Location: ../install.php');
     die();
 }

@@ -23,9 +23,10 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-if (file_exists(__DIR__.'/../config.php')) {
+if (file_exists(__DIR__.'/../../config.php')) {
     // already installed
-    die;
+    error_log('install/css.php :: Installation has been completed, install styles no longer served.');
+    die('// Installation has been completed, install styles no longer served.');
 }
 
 $content = file_get_contents(__DIR__.'/../theme/ventura/style/totara.css');

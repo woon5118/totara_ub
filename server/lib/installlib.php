@@ -234,11 +234,8 @@ function install_db_validate($database, $dbhost, $dbuser, $dbpass, $dbname, $pre
  * @return string
  */
 function install_generate_configphp($database, $cfg) {
-    $configphp = '<?php  // Totara configuration file' . PHP_EOL . PHP_EOL;
-
-    $configphp .= 'unset($CFG);' . PHP_EOL;
-    $configphp .= 'global $CFG;' . PHP_EOL;
-    $configphp .= '$CFG = new stdClass();' . PHP_EOL . PHP_EOL; // prevent PHP5 strict warnings
+    $configphp  = '<?php' . PHP_EOL;
+    $configphp .= '// Totara configuration file' . PHP_EOL . PHP_EOL;
 
     $dbconfig = $database->export_dbconfig();
 
@@ -252,8 +249,6 @@ function install_generate_configphp($database, $cfg) {
 
     $configphp .= '$CFG->dataroot  = '.var_export($cfg->dataroot, true) . ';' . PHP_EOL;
 
-    $configphp .= '$CFG->admin     = '.var_export($cfg->admin, true) . ';' . PHP_EOL . PHP_EOL;
-
     if (empty($cfg->directorypermissions)) {
         $chmod = '02777';
     } else {
@@ -264,8 +259,7 @@ function install_generate_configphp($database, $cfg) {
     if (isset($cfg->upgradekey) and $cfg->upgradekey !== '') {
         $configphp .= '$CFG->upgradekey = ' . var_export($cfg->upgradekey, true) . ';' . PHP_EOL . PHP_EOL;
     }
-
-    $configphp .= 'require_once(__DIR__ . \'/lib/setup.php\');' . PHP_EOL . PHP_EOL;
+    
     $configphp .= '// There is no php closing tag in this file,' . PHP_EOL;
     $configphp .= '// it is intentional because it prevents trailing whitespace problems!' . PHP_EOL;
 

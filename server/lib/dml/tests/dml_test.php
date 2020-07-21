@@ -6735,7 +6735,7 @@ class core_dml_testcase extends database_driver_testcase {
  * protected methods of moodle_database, and unit test them.
  */
 class moodle_database_for_testing extends moodle_database {
-    protected $prefix = 'mdl_';
+    protected $prefix = 'ttr_';
 
     public function public_fix_table_names($sql) {
         return $this->fix_table_names($sql);

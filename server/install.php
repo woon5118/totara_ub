@@ -37,7 +37,7 @@ if (isset($_REQUEST['admin'])) {
 }
 
 // If config.php exists we just created config.php and need to redirect to continue installation
-$configfile = './config.php';
+$configfile = '../config.php';
 if (file_exists($configfile)) {
     header("Location: $admin/index.php?lang=$lang");
     die;
@@ -149,7 +149,7 @@ if (!empty($_POST)) {
     $config->dbuser   = empty($distro->dbuser) ? '' : $distro->dbuser; // let distros set dbuser
     $config->dbpass   = '';
     $config->dbname   = 'totaradb';
-    $config->prefix   = 'mdl_';
+    $config->prefix   = 'ttr_';
     $config->dbport   = empty($distro->dbport) ? '' : $distro->dbport;
     $config->dbsocket = empty($distro->dbsocket) ? '' : $distro->dbsocket;
 
