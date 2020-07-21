@@ -22,61 +22,128 @@
 // @author    Bas Brands
 // @author    David Scotson
 // @author    Joby Harding <joby.harding@totaralearning.com>
+// @author    Brian Barnes <brian.barnes@totaralearning.com>
 // @package   theme_legacy
 
+.path-login {
+  #page {
+    background-color: var(--legacy-color-neutral-2);
+  }
+
+  #page-footer {
+    border-top: none;
+  }
+
+  .totaraNav {
+    margin-bottom: 0;
+  }
+
+  hr {
+    border: 1px solid var(--legacy-color-primary);
+    width: 50px;
+    margin: var(--legacy-gap-2)
+        calc(100% - 50px)
+        var(--legacy-gap-4)
+        0;
+
+    display: block;
+  }
+
+  #notice {
+    @include make-sm-column(6);
+    @include make-sm-column-push(3);
+    @include make-md-column(4);
+    @include make-md-column-push(4);
+  }
+
+  .continuebutton {
+    @include make-sm-column(6);
+    @include make-sm-column-push(3);
+    @include make-md-column(4);
+    @include make-md-column-push(4);
+
+    text-align: left;
+    clear: both;
+
+    .form-submit {
+      margin-left: 0;
+    }
+  }
+}
+
 .loginbox {
-  border-radius: 3px;
-  @include bs-form-group();
 
   &.onecolumn {
     @include make-sm-column(6);
     @include make-sm-column-push(3);
     @include make-md-column(4);
     @include make-md-column-push(4);
-    @include bs-well();
   }
 
   &.twocolumns .loginpanel {
-    @include make-sm-column(4);
-    @include make-lg-column(3);
-    @include bs-well();
+    padding: 0 8.88%;
+    
+    @media screen and (max-width: calc(#{$tui-screen-sm} - 1px)) {
+      padding-bottom: var(--legacy-gap-4);
+      border-bottom: var(--legacy-border-width-thin) solid var(--legacy-color-neutral-5);
+    }
+
+    @media screen and (min-width: $tui-screen-sm) {
+      width: 50%;
+      float: left;
+      border-right: var(--legacy-border-width-thin) solid var(--legacy-color-neutral-5);
+    }
   }
 
   &.twocolumns .signuppanel {
-    @include make-sm-column(7);
-    @include make-sm-column-push(1);
-    @include make-lg-column(8);
-    @include make-lg-column-push(1);
+    @media screen and (min-width: $tui-screen-sm) {
+      width: 50%;
+      float: left;
+    }
+
+    padding: 0 8.88%;
   }
 
   .loginform {
     .form-label {
       text-align: left;
-      margin-bottom: 5px;
-      float: left;
-      display: inline-block;
+
+      label {
+        margin-bottom: var(--legacy-gap-2);
+      }
     }
+
     .form-input {
       width: 100%;
-      margin-bottom: 5px;
+      margin-bottom: var(--legacy-gap-4);
+
       input[type='text'],
       input[type='password'] {
         @extend .form-control;
         width: 100%;
         max-width: none;
-      }
-      input[type='submit'] {
-        margin: 10px 0 0;
+        border-radius: 0;
       }
     }
   }
-  input[type='submit'] {
-    margin: 10px 0 0;
+
+  input[type='checkbox'] {
+    margin-left: 0;
   }
+
+  input[type='submit'] {
+    margin: var(--legacy-gap-8) 0 0;
+  }
+
+  .loginerrors {
+    @include form-error();
+  }
+
   .desc {
     line-height: $totara-style-font-line-height-large;
     color: var(--legacy-color-text);
     clear: both;
+    margin-top: var(--legacy-gap-8);
   }
 
   .subcontent {
@@ -84,20 +151,10 @@
     margin: 0;
   }
 
-  .userforget {
-    width: 100%;
-  }
-
-  .forgetpass {
-    @include totara_style-body-x-small();
-    float: right;
-    display: inline-block;
-  }
-
   #loginbtn {
     @include bs-btn-primary();
-    width: 100%;
     font-weight: bold;
+    margin: var(--legacy-gap-8) 0 var(--legacy-gap-4);
   }
 
   .potentialidplist {
@@ -110,4 +167,42 @@
   }
 }
 
-// End of original bootstrap theme code.
+.core__forgotpassword {
+  @include make-sm-column(6);
+  @include make-sm-column-push(3);
+  @include make-md-column(4);
+  @include make-md-column-push(4);
+
+  .mform {
+    legend {
+      display: none;
+    }
+
+    fieldset + fieldset {
+      border-top: var(--legacy-border-width-thin) solid var(--legacy-color-neutral-5);
+    }
+
+    .fcontainer {
+      margin: var(--legacy-gap-4) 0;
+
+      div.fitemtile,
+      div.felement {
+        width: 100%;
+        margin-left: 0;
+
+        input[type="text"] {
+          width: 100%;
+          max-width: inherit;
+        }
+      }
+
+      .fitemtitle {
+        margin-bottom: var(--legacy-gap-2);
+      }
+    }
+
+    .fitem_actionbuttons {
+      margin-bottom: 0;
+    }
+  }
+}

@@ -47,7 +47,8 @@ body {
 #page {
   width: 100%;
   flex-grow: 1;
-  #page-login-index & {
+  #page-login-index,
+  #page-login-forgot_password, & {
     // Centre login panel vertically.
     display: flex;
     flex: 1 0 auto;

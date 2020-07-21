@@ -51,57 +51,49 @@
 
     <a class="skip-block" href="#login-skipped">{{skiplinktext}}</a>
     <div class="loginpanel">
+
         <h2>{{#str}} login {{/str}}</h2>
-        <hr />
 
         <div class="subcontent loginsub">
             {{#error}}
-                <div id="loginerrormessage" class="loginerrors" role="alert">
-                    {{error}}
+                <div class="loginerrors" role="alert">
+                    <a href="#" id="loginerrormessage" class="accesshide">{{error}}</a>
+                    {{{errorformatted}}}
                 </div>
             {{/error}}
             <form action="{{loginurl}}" method="post" id="login" data-core-autoinitialise="true" data-core-autoinitialise-amd="core/form_duplicate_prevent">
                 <div class="loginform">
-                    <div class="form-label">
-                        <label for="username">
-                            {{^canloginbyemail}}
-                                {{#str}} username {{/str}}
-                            {{/canloginbyemail}}
-                            {{#canloginbyemail}}
-                                {{#str}} usernameemail {{/str}}
-                            {{/canloginbyemail}}
-                        </label>
+                    <div class="userforget">
+                        <div class="form-label">
+                            <label for="username">
+                                {{^canloginbyemail}}
+                                    {{#str}} username {{/str}}
+                                {{/canloginbyemail}}
+                                {{#canloginbyemail}}
+                                    {{#str}} usernameemail {{/str}}
+                                {{/canloginbyemail}}
+                            </label>
+                        </div>
+                        <div class="forgetpass">
+                            <a href="{{forgotpasswordurl}}">{{#str}} forgotten {{/str}}</a>
+                        </div>
                     </div>
                     <div class="form-input">
-                        <input
-                            type="text"
-                            name="username"
-                            id="username"
-                            size="15"
-                            value="{{username}}"
-                            {{#error}}aria-describedby="loginerrormessage"{{/error}}
-                        >
+                        <input type="text" name="username" id="username" size="15" value="{{username}}">
                     </div>
                     <div class="clearer"><!-- --></div>
                     <div class="form-label">
                         <label for="password">{{#str}} password {{/str}}</label>
                     </div>
                     <div class="form-input">
-                        <input
-                            type="password"
-                            name="password"
-                            id="password"
-                            size="15"
-                            value=""
-                            {{#error}}aria-describedby="loginerrormessage"{{/error}}
-                        >
+                        <input type="password" name="password" id="password" size="15" value="">
                     </div>
                     <input type="hidden" name="logintoken" value="{{logintoken}}" />
                 </div>
 
                 <div class="clearer"><!-- --></div>
                 {{#rememberusername}}
-                    <div class="rememberusername">
+                    <div class="rememberpass">
                         <input type="checkbox" name="rememberusernamechecked" id="rememberusernamechecked" value="1" {{#rememberusernamechecked}}checked="checked"{{/rememberusernamechecked}} />
                         <label for="rememberusernamechecked">{{rememberusernamelabel}}</label>
                     </div>
@@ -111,10 +103,6 @@
                 <script>document.getElementById('anchor').value = location.hash;</script>
                 <input type="submit" id="loginbtn" value={{#quote}}{{#str}} login {{/str}}{{/quote}} />
             </form>
-
-            <div class="forgetpass">
-                <a href="{{forgotpasswordurl}}">{{#str}} forgotten {{/str}}</a>
-            </div>
 
         </div>
 
@@ -132,17 +120,12 @@
             </div>
         {{/canloginasguest}}
 
-        <div class="desc">
-            {{{cookieshelpiconformatted}}}
-            {{#str}} cookiesenabled {{/str}}
-        </div>
     </div>
     <span id="login-skipped" class="skip-block-to"></span>
 
     <div class="signuppanel">
     {{#hasinstructions}}
         <h2>{{#str}} firsttime {{/str}}</h2>
-        <hr />
         <div class="subcontent">
             {{{instructions}}}
             {{#cansignup}}
@@ -178,14 +161,24 @@
         </div>
     {{/hasidentityproviders}}
     </div>
+
+    <div class="desc">
+        {{{cookieshelpiconformatted}}}
+        {{#str}} cookiesenabled {{/str}}
+    </div>
 </div>
 
 {{#js}}
-    {{#autofocusform}}
-        if (document.getElementById('username').value !== "") {
-            document.getElementById('password').focus();
-        } else {
-            document.getElementById('username').focus();
-        }
-    {{/autofocusform}}
+    {{#error}}
+        document.getElementById('loginerrormessage').focus();
+    {{/error}}
+    {{^error}}
+        {{#autofocusform}}
+            if (document.getElementById('username').value !== "") {
+                document.getElementById('password').focus();
+            } else {
+                document.getElementById('username').focus();
+            }
+        {{/autofocusform}}
+    {{/error}}
 {{/js}}

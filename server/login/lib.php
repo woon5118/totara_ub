@@ -172,8 +172,9 @@ function core_login_process_password_reset_request() {
     // DISPLAY FORM.
 
     echo $OUTPUT->header();
-    echo $OUTPUT->box(get_string('passwordforgotteninstructions2'), 'generalbox boxwidthnormal boxaligncenter');
-    $mform->display();
+    $form = $mform->render();
+
+    echo $OUTPUT->render_from_template('core/forgot_password', ['form' => $form]);
 
     echo $OUTPUT->footer();
 }
