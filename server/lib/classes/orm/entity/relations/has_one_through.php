@@ -72,13 +72,22 @@ class has_one_through extends has_many_through {
         // Chunk this to avoid too many value for IN condition
         $keys_chunked = array_chunk($keys, builder::get_db()->get_max_in_params());
 
+        // Prepare query
+        $repository = $this->repo
+            ->add_select($this->repo->get_table() . '.*')
+            ->add_select(
+                $intermediate_builder->get_table() . '.' .
+                $this->get_intermediate_foreign_key() . ' as ' .
+                $this->get_intermediate_key_name()
+            )
+            ->join($this->intermediate::TABLE, $this->get_foreign_key(), $this->get_intermediate_related_foreign_key());
+
         foreach ($keys_chunked as $keys) {
             // Load possible values
-            $results = $this->repo
-                ->add_select($this->repo->get_table() . '.*')
-                ->add_select($intermediate_builder->get_table() . '.' . $this->get_intermediate_foreign_key() . ' as ' . $this->get_intermediate_key_name())
-                ->join($this->intermediate::TABLE, $this->get_foreign_key(), $this->get_intermediate_related_foreign_key())
-                ->where(new field($this->get_intermediate_foreign_key(), $intermediate_builder), $keys)
+            $field = new field($this->get_intermediate_foreign_key(), $intermediate_builder);
+            $results = $repository
+                ->remove_where($field)
+                ->where($field, $keys)
                 ->get(true);
 
             $results->key_by($this->get_intermediate_key_name());

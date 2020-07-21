@@ -22,7 +22,9 @@
  * @group orm
  */
 
+use core\dml\sql;
 use core\orm\query\builder;
+use core\orm\query\field;
 use core\orm\query\properties;
 use core\orm\lazy_collection;
 use core\orm\query\exceptions\record_not_found_exception;
@@ -438,4 +440,96 @@ class core_orm_builder_testcase extends orm_query_builder_base {
         $builder = builder::table($this->table_name);
         $this->assertNotSame($builder, clone $builder);
     }
+
+    public function test_it_does_remove_conditions() {
+        $builder = builder::table('foo')
+            ->where('normalfield', 'value');
+
+        $conditions = $builder->get_conditions();
+        $this->assertCount(1, $conditions);
+
+        $builder->remove_where('normalfield');
+
+        $conditions = $builder->get_conditions();
+        $this->assertCount(0, $conditions);
+
+        // Let's add a mix of conditions
+        $builder = builder::table('foo')
+            ->where('normalfield', 'value')
+            ->or_where('normalfield', 'value2')
+            ->where('otherfield', 'value3')
+            ->where('otherfield2', 'value4');
+
+        $builder->remove_where('normalfield');
+
+        $conditions = $builder->get_conditions();
+        $this->assertCount(2, $conditions);
+
+        $expected_conditions = ['otherfield', 'otherfield2'];
+
+        foreach ($conditions as $condition) {
+            $this->assertContains($condition->get_field()->get_field_column(), $expected_conditions);
+            unset($expected_conditions[array_search($condition->get_field()->get_field_column(), $expected_conditions)]);
+        }
+
+        $this->assertEmpty($expected_conditions);
+
+        // Try an alias
+        $builder = builder::table('foo')
+            ->as('bla')
+            ->where('bla.normalfield', 'value');
+
+        $builder->remove_where('normalfield');
+
+        // Nothing got removed yet
+        $conditions = $builder->get_conditions();
+        $this->assertCount(1, $conditions);
+
+        $builder->remove_where('bla.normalfield');
+
+        $conditions = $builder->get_conditions();
+        $this->assertCount(0, $conditions);
+    }
+
+    public function test_it_cannot_remove_closure_conditions() {
+        $nested_condition = function (builder $builder) {
+            $builder->where('normalfield', 'value')
+                ->or_where('normalfield', 'value2');
+        };
+
+        $builder = builder::table('foo')
+            ->where($nested_condition);
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('Removing of an nested where condition is not yet supported.');
+
+        $builder->remove_where($nested_condition);
+    }
+
+    public function test_it_cannot_remove_sql_conditions() {
+        $sql = new sql('foo = :bar', ['bar' => 'value']);
+
+        $builder = builder::table('foo')
+            ->where($sql);
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('Removing of a raw sql condition is not yet supported.');
+
+        $builder->remove_where($sql);
+    }
+
+    public function test_it_cannot_remove_raw_conditions() {
+        $sql = new sql('foo = :bar', ['bar' => 'value']);
+
+        $field = new field($sql);
+
+        $builder = builder::table('foo')
+            ->where($field, 'value');
+
+        $this->expectException(coding_exception::class);
+        $this->expectExceptionMessage('Removing of a raw condition is not yet supported.');
+
+        $builder->remove_where($field);
+    }
+
 }

@@ -327,6 +327,13 @@ final class condition implements queryable {
     }
 
     /**
+     * @return string|field|null
+     */
+    public function get_field() {
+        return $this->field;
+    }
+
+    /**
      * Set field to query
      *
      * @param string|field $field

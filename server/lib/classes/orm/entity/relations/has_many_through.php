@@ -110,22 +110,26 @@ class has_many_through extends relation {
         // Chunk this to avoid too many value for IN condition
         $keys_chunked = array_chunk($keys, builder::get_db()->get_max_in_params());
 
+        // Prepare the query
+        $repository = $this->repo
+            ->select($this->repo->get_table() . '.*')
+            ->add_select(
+                sprintf(
+                    "%s.%s as %s",
+                    $intermediate_builder->get_table(),
+                    $this->get_intermediate_foreign_key(),
+                    $this->get_intermediate_key_name()
+                )
+            )
+            ->join($this->intermediate::TABLE, $this->get_related_key(), $this->get_intermediate_related_foreign_key());
+
         // Group the result so that we can get the related results quicker
         $grouped = [];
         foreach ($keys_chunked as $keys) {
             // Load possible values
-            $results = $this->repo
-                ->select($this->repo->get_table() . '.*')
-                ->add_select(
-                    sprintf(
-                        "%s.%s as %s",
-                        $intermediate_builder->get_table(),
-                        $this->get_intermediate_foreign_key(),
-                        $this->get_intermediate_key_name()
-                    )
-                )
-                ->join($this->intermediate::TABLE, $this->get_related_key(), $this->get_intermediate_related_foreign_key())
-                ->where(new field($this->get_intermediate_foreign_key(), $intermediate_builder), $keys)
+            $field = new field($this->get_intermediate_foreign_key(), $intermediate_builder);
+            $results = $repository->remove_where($field)
+                ->where($field, $keys)
                 ->get(true);
 
             foreach ($results as $result) {

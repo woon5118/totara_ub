@@ -291,6 +291,13 @@ abstract class builder_base {
     }
 
     /**
+     * @return array|condition[]|queryable[]
+     */
+    public function get_conditions(): array {
+        return $this->properties->conditions;
+    }
+
+    /**
      * Prettifying a bits of sql query by removing extra unnecessary spaces
      *
      * @param array $bits

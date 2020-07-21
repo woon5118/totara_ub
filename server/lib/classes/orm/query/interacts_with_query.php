@@ -416,6 +416,15 @@ interface interacts_with_query {
     public function nested_where(Closure $closure, bool $or = false);
 
     /**
+     * Removes all conditions related to the given attribute from the query.
+     * This does only work with regular attributes at the moment.
+     *
+     * @param string|field $attribute Attribute to select or a closure which works as a nested builder to create aggregation
+     * @return $this
+     */
+    public function remove_where($attribute);
+
+    /**
      * Add order to the SQL query
      *
      * @param string|order|sql|null $column Order column. Pass null to reset order by

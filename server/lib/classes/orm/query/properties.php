@@ -80,7 +80,7 @@ final class properties {
     /**
      * Array of queryable conditions to generate SQL where part
      *
-     * @var queryable[]
+     * @var queryable[]|condition[]
      */
     public $conditions = [];
 

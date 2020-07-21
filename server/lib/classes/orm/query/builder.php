@@ -574,6 +574,41 @@ final class builder extends builder_base implements interacts_with_query, intera
     }
 
     /**
+     * Removes all conditions related to the given attribute from the query.
+     * This does only work with regular attributes at the moment.
+     *
+     * @param string|field $attribute Attribute to select or a closure which works as a nested builder to create aggregation
+     * @return $this
+     */
+    public function remove_where($attribute) {
+        if ($attribute instanceof Closure) {
+            throw new coding_exception('Removing of an nested where condition is not yet supported.');
+        }
+
+        if ($attribute instanceof sql) {
+            throw new coding_exception('Removing of a raw sql condition is not yet supported.');
+        }
+
+        if ($attribute instanceof field && $attribute->is_raw()) {
+            throw new coding_exception('Removing of a raw condition is not yet supported.');
+        }
+
+        $search_field = $attribute instanceof field ? (string) $attribute : (string) new field($attribute, $this);
+
+        foreach ($this->properties->conditions as $key => $condition) {
+            $field = (string) $condition->get_field();
+            if ($search_field === $field) {
+                unset($this->properties->conditions[$key]);
+            }
+        }
+
+        // Reindex the conditions array
+        $this->properties->conditions = array_values($this->properties->conditions);
+
+        return $this;
+    }
+
+    /**
      * Join another table
      *
      * @param string|table|array $table Table name to join, or table object or array in form of [table, alias]

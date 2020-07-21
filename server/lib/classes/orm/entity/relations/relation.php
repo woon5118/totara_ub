@@ -31,8 +31,10 @@ use core\orm\lazy_collection;
 use core\orm\paginator;
 use core\orm\query\builder;
 use core\orm\query\builder_base;
+use core\orm\query\condition;
 use core\orm\query\join;
 use core\orm\query\order;
+use core\orm\query\queryable;
 
 /**
  * Class relation
@@ -74,6 +76,7 @@ use core\orm\query\order;
  * @method $this where_raw(string $sql, array $params = [], bool $or = false)
  * @method $this or_where_raw(string $sql, array $params = [])
  * @method $this nested_where(\Closure $closure, bool $or = false)
+ * @method $this remove_where($attribute)
  * @method $this join($table, $source = null, $condition = null, $target = null, string $type = 'inner')
  * @method $this left_join($table, $source = null, $condition = null, $target = null)
  * @method $this right_join($table, $source = null, $condition = null, $target = null)
@@ -122,6 +125,7 @@ use core\orm\query\order;
  * @method bool is_alias_used()
  * @method string get_alias_sql()
  * @method bool has_conditions()
+ * @method array|condition[]|queryable[] get_conditions()
  * @method join|null get_join($table, ?string $alias = null)
  * @method bool has_join($table, ?string $alias = null)
  */

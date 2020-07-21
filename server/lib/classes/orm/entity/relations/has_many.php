@@ -71,7 +71,9 @@ class has_many extends relation {
         $grouped = [];
         foreach ($keys_chunked as $keys) {
             // Load possible values
-            $results = $this->repo->where($this->get_foreign_key(), $keys)->get();
+            $results = $this->repo
+                ->remove_where($this->get_foreign_key())
+                ->where($this->get_foreign_key(), $keys)->get();
 
             foreach ($results as $result) {
                 $grouped[$result->{$this->get_foreign_key()}][$result->id] = $result;

@@ -71,7 +71,9 @@ abstract class one_to_one extends relation {
 
         foreach ($keys_chunked as $keys) {
             // Load all related objects
-            $results = $this->repo->where($this->get_foreign_key(), $keys)->get();
+            $results = $this->repo
+                ->remove_where($this->get_foreign_key())
+                ->where($this->get_foreign_key(), $keys)->get();
 
             $results->key_by($this->get_foreign_key());
 
