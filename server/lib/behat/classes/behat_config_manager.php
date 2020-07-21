@@ -278,12 +278,12 @@ class behat_config_manager {
             if (!empty($CFG->behat_parallel_run[$i - 1]['behat_wwwroot'])) {
                 continue;
             }
-            $link = $CFG->srcroot.'/'.BEHAT_PARALLEL_SITE_NAME.$i;
+            $link = $CFG->dirroot.'/'.BEHAT_PARALLEL_SITE_NAME.$i;
             clearstatcache();
 
             // Use relative paths as this is the most portable solution
             // in case the filesystem is mounted or synced between systems
-            chdir($CFG->srcroot);
+            chdir($CFG->dirroot);
             $target = '.';
 
             if (file_exists($link)) {

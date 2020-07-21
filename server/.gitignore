@@ -9,3 +9,5 @@
 /lib/yuilib/*/*/*-coverage.js
 # Node modules for Totara
 /node_modules/
+# Behat parallel run symlinks
+/behatrun*
