@@ -391,7 +391,7 @@ function behat_get_run_process(\stdClass $cfg) {
         }
         // Check if parallel site prefix is used.
         if (empty($behatrunprocess) && preg_match('#/' . BEHAT_PARALLEL_SITE_NAME . '(.+?)/#', $_SERVER['REQUEST_URI'])) {
-            $dirrootrealpath = str_replace("\\", "/", realpath($cfg->dirroot));
+            $dirrootrealpath = str_replace("\\", "/", realpath(__DIR__ . '/../../'));
             $serverrealpath = str_replace("\\", "/", realpath($_SERVER['SCRIPT_FILENAME']));
             $afterpath = str_replace($dirrootrealpath.'/', '', $serverrealpath);
             // Totara: replace backslash with slash for Windows
