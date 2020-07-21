@@ -27,25 +27,29 @@
         :validate="validate"
         @submit="submit"
       >
-        <FormRowFieldset label="Start date">
-          <FormDateSelector
-            v-modal="startValue"
-            name="startDate"
-            :initial-current-date="true"
-            type="date"
-            :validations="v => [v.required()]"
-          />
-        </FormRowFieldset>
+        <FormRow v-slot="{ labelId }" label="Start date">
+          <FieldGroup :aria-labelledby="labelId">
+            <FormDateSelector
+              v-modal="startValue"
+              name="startDate"
+              :initial-current-date="true"
+              type="date"
+              :validations="v => [v.required()]"
+            />
+          </FieldGroup>
+        </FormRow>
 
-        <FormRowFieldset label="End date">
-          <FormDateSelector
-            v-modal="endValue"
-            name="endDate"
-            :initial-current-date="true"
-            type="date"
-            :validations="v => [v.required()]"
-          />
-        </FormRowFieldset>
+        <FormRow v-slot="{ labelId }" label="End date">
+          <FieldGroup :aria-labelledby="labelId">
+            <FormDateSelector
+              v-modal="endValue"
+              name="endDate"
+              :initial-current-date="true"
+              type="date"
+              :validations="v => [v.required()]"
+            />
+          </FieldGroup>
+        </FormRow>
         <FormRowActionButtons :submitting="getSubmitting()" />
       </Uniform>
 
@@ -70,20 +74,19 @@
 <script>
 import SamplesCode from 'samples/components/sample_parts/misc/SamplesCode';
 import SamplesExample from 'samples/components/sample_parts/misc/SamplesExample';
+import FormRow from 'tui/components/form/FormRow';
 import FormRowActionButtons from 'tui/components/form/FormRowActionButtons';
-import {
-  FormDateSelector,
-  FormRowFieldset,
-  Uniform,
-} from 'tui/components/uniform';
+import FieldGroup from 'tui/components/form/FieldGroup';
+import { FormDateSelector, Uniform } from 'tui/components/uniform';
 // Utils
 import { isIsoAfter } from 'tui/date';
 
 export default {
   components: {
+    FormRow,
     FormRowActionButtons,
     FormDateSelector,
-    FormRowFieldset,
+    FieldGroup,
     SamplesCode,
     SamplesExample,
     Uniform,
