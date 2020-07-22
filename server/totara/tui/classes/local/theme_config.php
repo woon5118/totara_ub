@@ -55,19 +55,52 @@ final class theme_config extends \theme_config {
     }
 
     /**
+     * Return an SHA sum for the all of the files that would be built into the SCSS bundle for the given component
+     *
+     * The SHA sum will change if any individual file that is going to be processed changes.
+     *
+     * @param string $component
+     * @return string
+     */
+    public function get_component_sha(string $component): string {
+        $tui_scss = $this->get_tui_scss_instance();
+        $shas = join(
+            "\n",
+            array_map(
+                function($file) {
+                    if (file_exists($file) && is_readable($file)) {
+                        return sha1_file($file);
+                    }
+                    return $file;
+                },
+                $tui_scss->get_loaded_files($component)
+            )
+        );
+        return sha1($shas);
+    }
+
+    /**
      * Get the compiled TUI CSS content for the provided Totara component
      *
      * @param string $component
      * @return string Compiled CSS
      */
     private function get_tui_css_content(string $component): string {
+        $tui_scss = $this->get_tui_scss_instance();
+        return $tui_scss->get_compiled_css($component);
+    }
+
+    /**
+     * Return an scss instance for this theme.
+     * @return scss
+     */
+    private function get_tui_scss_instance(): scss {
         $scss_options = new scss_options();
         $scss_options->set_themes($this->get_tui_theme_chain());
         $scss_options->set_legacy($this->legacybrowser);
         $scss_options->set_sourcemap_enabled(false);
 
-        $tui_scss = new scss($scss_options);
-        return $tui_scss->get_compiled_css($component);
+        return new scss($scss_options);
     }
 
     /**

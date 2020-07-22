@@ -170,8 +170,12 @@ function css_send_cached_css_content($csscontent, $etag) {
  * help them optimise their CSS... not that they should write lazy CSS.
  *
  * @param string $css
+ * @param string|null $etag Optional etag to set when serving this uncached CSS.
  */
-function css_send_uncached_css($css) {
+function css_send_uncached_css($css, $etag = null) {
+    if ($etag !== null) {
+        header('Etag: "'.$etag.'"');
+    }
     header('Content-Disposition: inline; filename="styles_debug.php"');
     header('Last-Modified: '. gmdate('D, d M Y H:i:s', time()) .' GMT');
     header('Expires: '. gmdate('D, d M Y H:i:s', time() + THEME_DESIGNER_CACHE_LIFETIME) .' GMT');

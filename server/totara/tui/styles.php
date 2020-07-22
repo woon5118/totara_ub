@@ -31,11 +31,14 @@
 
 // Disable debug messages and any errors in output, comment out when debugging or look into error log!
 define('NO_DEBUG_DISPLAY', true);
-// We need just the values from config.php and minlib.php if we have the CSS cached already.
-define('ABORT_AFTER_CONFIG', true);
 
-require('../../config.php');
-require_once($CFG->dirroot.'/lib/csslib.php');
+// Load config, but don't run the full setup yet!
+require('../../lib/init.php');
+$CFG = \core\internal\config::initialise(__DIR__ . '/../../../config.php');
+
+// Required libraries.
+require_once($CFG->dirroot . '/lib/configonlylib.php');
+require_once($CFG->dirroot . '/lib/csslib.php');
 
 // Defaults
 $option_rtl = false;
@@ -98,9 +101,6 @@ if ($rev !== -1) {
     }
 }
 
-// Ok, now we need to start normal moodle script, we need to load all libs and $DB.
-define('ABORT_AFTER_CONFIG_CANCEL', true);
-
 define('NO_MOODLE_COOKIES', true); // Session not used here.
 define('NO_UPGRADE_CHECK', true);  // Ignore upgrade check.
 
@@ -117,14 +117,75 @@ if (core_useragent::is_ie()) {
     $theme->set_legacy_browser(true);
 }
 
-if ($rev === -1) {
-    // No caching flies in this content.
-    $csscontent = $theme->get_css_content_by($component);
-    css_send_uncached_css($csscontent);
-}
-
 $etag = get_etag($rev, $themename, $component, $suffix, $option_rtl);
 make_localcache_directory('totara_tui', false);
+// Recalculate cachefile, even if we already have it, as rev may have changed.
+$cachefile = get_cachefile($rev, $themename, $component, $suffix);
+
+if ($rev === -1) {
+    $cache = \cache::make_from_params(cache_store::MODE_APPLICATION, 'totara_tui', 'scss_cache');
+    $last_sha = $cache->get($etag);
+    $sha = false;
+
+    $cachefile_exists = file_exists($cachefile);
+
+    if ($cachefile_exists && $last_sha === false) {
+        // We have a cachefile but we don't know the last sha that was used.
+        // This shouldn't happen but... regenerate the file to ensure we have the correct content.
+        @unlink($cachefile);
+        $cachefile_exists = false;
+    }
+    if ($cachefile_exists) {
+        // The cache file exists, compare the SHA of the theme files to the SHA we have stored in the cache and if they
+        // match then we can use the cachefile, otherwise we'll need to generate.
+        $sha = $theme->get_component_sha($component);
+        if ($sha !== $last_sha) {
+            // The sha' have changed, we need to regenerate.
+            @unlink($cachefile);
+            $cachefile_exists = false;
+        }
+    }
+
+    $csscontent = false;
+    if (!$cachefile_exists) {
+        // The cache file does not
+        if ($sha === false) {
+            $sha = $theme->get_component_sha($component);
+        }
+        $csscontent = $theme->get_css_content_by($component);
+        css_store_css($theme, $cachefile, $csscontent);
+        $cache->set($etag, $sha);
+    }
+
+    // Regenerate the etag to include the sha now that we know what is it.
+    $etag = get_etag($sha, $themename, $component, $suffix, $option_rtl);
+
+    // Next we're going to check if the browser has an old version of the css file, but that is unchanged (even though
+    // it is expired). If that is the case then the sha will match the etag and we can tell the browser to use the
+    // stale but correct file that it has.
+    if (isset($_SERVER['HTTP_IF_NONE_MATCH'])) {
+        // There can be multiple etags provided :D
+        $tags = explode(',', $_SERVER['HTTP_IF_NONE_MATCH']);
+        $tags = array_map(
+            function ($tag) {
+                return trim($tag, '"');
+            },
+            $tags
+        );
+        if (in_array($etag, $tags)) {
+            // The client has an old version that should not be cached, but it is correct and accurate to what we are about
+            // to server. This will be quicker.
+            header("HTTP/1.1 304 Not Modified");
+            exit;
+        }
+    }
+
+    if ($csscontent === false) {
+        // We need to read it from the cache file.
+        $csscontent = file_get_contents($cachefile);
+    }
+    css_send_uncached_css($csscontent, $etag);
+}
 
 // Make sure that only one client is generating CSS at a time.
 // All other clients who got to this path can wait until the first completes.
@@ -132,8 +193,6 @@ $lockfactory = \core\lock\lock_config::get_lock_factory('totara_tui_css_generati
 $lock = $lockfactory->get_lock($themename, rand(90, 120), 600);
 // We're out of the lock, check if we were waiting and the file now exists thanks to someone else.
 
-// Recalculate cachefile, even if we already have it, as rev may have changed.
-$cachefile = get_cachefile($rev, $themename, $component, $suffix);
 if (file_exists($cachefile)) {
     if ($lock) {
         $lock->release();
