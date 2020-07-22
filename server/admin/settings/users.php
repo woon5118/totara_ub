@@ -78,6 +78,14 @@ if ($hassiteconfig
     $ADMIN->add('users', $temp);
     $ADMIN->add('users', new admin_externalpage('profilefields', new lang_string('profilefields','admin'), "$CFG->wwwroot/user/profile/index.php", array('moodle/site:config', 'totara/core:manageprofilefields')));
     $ADMIN->add('users', new admin_externalpage('profilepage', new lang_string('myprofile', 'admin'), $CFG->wwwroot . '/user/profilesys.php', array('totara/core:appearance')));
+    $ADMIN->add(
+        'users',
+        new admin_externalpage(
+            'profilesummarycard',
+            new lang_string('userprofilesummarycard', 'admin'),
+            new moodle_url("/user/profile_summary_card_edit.php")
+        )
+    );
 
     // "userpolicies" settingpage
     $temp = new admin_settingpage('userpolicies', new lang_string('userpolicies', 'admin'));

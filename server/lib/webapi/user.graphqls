@@ -29,5 +29,46 @@ type core_user {
   interests: Boolean
   firstaccess(format: core_date_format = TIMESTAMP): core_date
   lastaccess(format: core_date_format = TIMESTAMP): core_date
+  card_display: core_user_card_display!
   # TODO add custom profile fields
+}
+
+"""
+Type to store the information related on how to display field of users.
+"""
+type core_user_card_display_field {
+  """
+  The value of the field that we are trying to display to the viewer.
+  """
+  value: String
+  """
+  Associate url field, if it is null then there is no associate url field with the value field.
+  If there is then the value should be displayed as a link.
+  """
+  associate_url: String
+  """
+  Label string for the field.
+  """
+  label: String
+  """
+  Whether it is a custom field or not.
+  """
+  is_custom: Boolean!
+}
+
+"""
+Metadata type for configuring the display user information component.
+"""
+type core_user_card_display {
+  """
+  Local url to point to the user's avatar, if this is null, then the viewer will definitely not able to view
+  the profile picture.
+  """
+  profile_picture_url: String
+  profile_picture_alt: String
+  """
+  Profile url can be null if the viewer cannot view the target user's profile.
+  """
+  profile_url: String
+  display_fields: [core_user_card_display_field!]!
 }

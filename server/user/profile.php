@@ -155,8 +155,8 @@ profile_view($user, $usercontext);
 // TODO WORK OUT WHERE THE NAV BAR IS!
 echo $OUTPUT->header();
 
-$headerinfo = array('heading' => fullname($user), 'user' => $user, 'usercontext' => $usercontext);
-echo $OUTPUT->context_header($headerinfo, 2);
+$widget = \core_user\output\profile_card::create($user);
+echo $OUTPUT->render($widget);
 
 echo '<div class="userprofile">';
 

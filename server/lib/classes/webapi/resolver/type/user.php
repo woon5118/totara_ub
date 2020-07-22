@@ -25,74 +25,13 @@ namespace core\webapi\resolver\type;
 
 use core\date_format;
 use core\format;
+use core_user\profile\card_display;
+use core_user\profile\user_field_resolver;
 use core\webapi\execution_context;
 use core\webapi\formatter\field\date_field_formatter;
 use core\webapi\formatter\field\text_field_formatter;
-use core_user\access_controller;
 
 class user implements \core\webapi\type_resolver {
-
-    private const FIELDS_DB = [
-        'id',                       // Type: bigint                 , default nextval (not null)
-        'auth',                     // Type: character varying(20)  , default 'manual' (not null)
-        'confirmed',                // Type: smallint               , default 0 (not null)
-        'policyagreed',             // Type: smallint               , default 0 (not null)
-        'deleted',                  // Type: smallint               , default 0 (not null)
-        'suspended',                // Type: smallint               , default 0 (not null)
-        'mnethostid',               // Type: bigint                 , default 0 (not null)
-        'username',                 // Type: character varying(100) , default '' (not null)
-        'password',                 // Type: character varying(255) , default '' (not null)
-        'idnumber',                 // Type: character varying(255) , default '' (not null)
-        'firstname',                // Type: character varying(100) , default '' (not null)
-        'lastname',                 // Type: character varying(100) , default '' (not null)
-        'email',                    // Type: character varying(100) , default '' (not null)
-        'emailstop',                // Type: smallint               , default 0 (not null)
-        'skype',                    // Type: character varying(50)  , default '' (not null)
-        'phone1',                   // Type: character varying(20)  , default '' (not null)
-        'phone2',                   // Type: character varying(20)  , default '' (not null)
-        'institution',              // Type: character varying(255) , default '' (not null)
-        'department',               // Type: character varying(255) , default '' (not null)
-        'address',                  // Type: character varying(255) , default '' (not null)
-        'city',                     // Type: character varying(120) , default '' (not null)
-        'country',                  // Type: character varying(2)   , default '' (not null)
-        'lang',                     // Type: character varying(30)  , default 'en' (not null)
-        'calendartype',             // Type: character varying(30)  , default 'gregorian' (not null)
-        'theme',                    // Type: character varying(50)  , default '' (not null)
-        'timezone',                 // Type: character varying(100) , default '99' (not null)
-        'firstaccess',              // Type: bigint                 , default 0 (not null)
-        'lastaccess',               // Type: bigint                 , default 0 (not null)
-        'lastlogin',                // Type: bigint                 , default 0 (not null)
-        'currentlogin',             // Type: bigint                 , default 0 (not null)
-        'lastip',                   // Type: character varying(45)  , default '' (not null)
-        'secret',                   // Type: character varying(15)  , default '' (not null)
-        'picture',                  // Type: bigint                 , default 0 (not null)
-        'url',                      // Type: character varying(255) , default '' (not null)
-        'description',              // Type: text                   , default  ()
-        'descriptionformat',        // Type: smallint               , default 1 (not null)
-        'mailformat',               // Type: smallint               , default 1 (not null)
-        'maildigest',               // Type: smallint               , default 0 (not null)
-        'maildisplay',              // Type: smallint               , default 2 (not null)
-        'autosubscribe',            // Type: smallint               , default 1 (not null)
-        'trackforums',              // Type: smallint               , default 0 (not null)
-        'timecreated',              // Type: bigint                 , default 0 (not null)
-        'timemodified',             // Type: bigint                 , default 0 (not null)
-        'trustbitmask',             // Type: bigint                 , default 0 (not null)
-        'imagealt',                 // Type: character varying(255) , default  ()
-        'lastnamephonetic',         // Type: character varying(255) , default  ()
-        'firstnamephonetic',        // Type: character varying(255) , default  ()
-        'middlename',               // Type: character varying(255) , default  ()
-        'alternatename',            // Type: character varying(255) , default  ()
-        'totarasync',               // Type: smallint               , default 0 (not null)
-    ];
-
-    private const FIELDS_COMPUTED = [
-        'fullname',
-        'interests',
-        'profileimagealt',
-        'profileimageurl',
-        'profileimageurlsmall',
-    ];
-
     /**
      * Resolves the user fields.
      *
@@ -104,140 +43,118 @@ class user implements \core\webapi\type_resolver {
      * @throws \coding_exception If the requested field does not exist, or the current user cannot see the given user.
      */
     public static function resolve(string $field, $user, array $args, execution_context $ec) {
-        global $PAGE, $USER;
+        global $USER;
 
         if ($field === 'password' or $field === 'secret') {
             // Extra safety - these must never ever be exposed.
             return null;
         }
 
-        if (!in_array($field, self::FIELDS_DB) && !in_array($field, self::FIELDS_COMPUTED)) {
-            throw new \coding_exception('Unknown user field', $field);
-        }
-
-        if ($user instanceof \stdClass) {
-            if (!isset($user->id) or $user->id <= 0) {
-                // Fake users not allowed!
-                throw new \coding_exception('Invalid user record provided to '.__METHOD__);
-            }
-        } else {
+        if (!($user instanceof \stdClass)) {
             throw new \coding_exception(__METHOD__ . ' must be given a user record from the database', gettype($user));
         }
 
-        $controller = self::get_user_access_controller($user, $ec);
-        if (!$controller->can_view_field($field)) {
-            $requiredfields = ['id', 'fullname'];
-            if (in_array($field, $requiredfields)) {
-                // You got here because you did not check permissions because using this type, and now you can't
-                // view this users information. The fields are required in GraphQL, but because we're kind you're
-                // getting a coding_exception rather than a cryptic GraphQL exception.
-                throw new \coding_exception('You did not check you can view a user before resolving them.', $user->id);
-            }
-            // All other fields are nullable.
-            return null;
+        // Giving us more spaces for checking the custom compute fields.
+        $custom_computed_fields = ['card_display'];
+
+        if (!user_field_resolver::is_valid_field($field) && !in_array($field, $custom_computed_fields)) {
+            throw new \coding_exception("Unknown user field");
         }
 
-        // The following fields require special handling.
+        $course_id = null;
+
+        if ($ec->has_relevant_context()) {
+            $context = $ec->get_relevant_context();
+            $context_course = $context->get_course_context(false);
+
+            if ($context_course && SITEID != $context_course->instanceid) {
+                $course_id = $context_course->instanceid;
+            }
+        }
+
+        $field_resolver = user_field_resolver::from_record($user, $course_id);
+
+        if ('card_display' === $field) {
+            $field_resolver->load_custom_fields();
+            return card_display::create($field_resolver);
+        }
+
+        $value = null;
+
+        // Handling several formatting fields.
         switch ($field) {
-            case 'profileimageurl':
-                return (new \user_picture($user, 1))->get_url($PAGE)->out(false);
-
-            case 'profileimageurlsmall':
-                return (new \user_picture($user, 0))->get_url($PAGE)->out(false);
-
-            case 'fullname':
-                return fullname($user);
-
-            case 'interests':
-                $interests = \core_tag_tag::get_item_tags_array('core', 'user', $user->id, \core_tag_tag::BOTH_STANDARD_AND_NOT, 0, false);
-                if ($interests) {
-                    return join(', ', $interests);
-                }
-                return null;
-
             case 'firstaccess':
             case 'lastaccess':
-                $timestamp = self::get_property($user, $field) ?? null;
-                if (empty($timestamp)) {
-                    return null;
+                $time_stamp = $field_resolver->get_field_value($field);
+                if (empty($time_stamp)) {
+                    break;
                 }
 
-                $format = $args['format'] ?? date_format::FORMAT_TIMESTAMP;
-                $context = \context_user::instance($user->id);
-                return (new date_field_formatter($format, $context))->format($timestamp);
+                $format = date_format::FORMAT_TIMESTAMP;
+                if (isset($args['format'])) {
+                    $format = $args['format'];
+                }
+
+                $context_user = \context_user::instance($user->id);
+                $value = (new date_field_formatter($format, $context_user))->format($time_stamp);
+                break;
 
             case 'description':
-                $value = self::get_property($user, $field) ?? null;
-                if ($value === null) {
-                    return null;
+                $description = $field_resolver->get_field_value('description');
+                if (empty($description)) {
+                    break;
                 }
 
-                $format = $args['format'] ?? format::FORMAT_HTML;
-                $context = \context_user::instance($user->id);
-                $formatter = new text_field_formatter($format, $context);
-                $formatter->set_pluginfile_url_options($context, 'user', 'profile', null);
+                $format = format::FORMAT_HTML;
+                if (isset($args['format'])) {
+                    $format = $args['format'];
+                }
+                $context_user = \context_user::instance($user->id);
+
+                $formatter = new text_field_formatter($format, $context_user);
+                $formatter->set_pluginfile_url_options($context_user, 'user', 'profile');
 
                 // Don't use the detail description and format, that has already been munged for external services :(
                 if ($format === format::FORMAT_RAW) {
                     $capabilities = ['moodle/user:update'];
                     $capabilities[] = ($USER->id == $user->id) ? 'moodle/user:editownprofile' : 'moodle/user:editprofile';
-                    if (!has_any_capability($capabilities, $context)) {
-                        return null;
+                    if (!has_any_capability($capabilities, $context_user)) {
+                        $value = null;
+                        break;
                     }
                 }
 
-                return $formatter->format($value);
+                $value = $formatter->format($description);
+                break;
 
-            case 'profileimagealt':
-                return $user->imagealt ?? null;
-        }
-
-        return self::get_property($user, $field) ?? null;
-    }
-
-    /**
-     * Returns an access controller for the given user, in the context of the execution context.
-     *
-     * @param \stdClass $user
-     * @param execution_context $ec
-     * @return access_controller
-     */
-    private static function get_user_access_controller($user, execution_context $ec) {
-        $courseid = null;
-        if ($ec->has_relevant_context()) {
-            $coursecontext = $ec->get_relevant_context()->get_course_context(false);
-            if ($coursecontext && $coursecontext->instanceid != SITEID) {
-                $courseid = $coursecontext->instanceid;
-            }
-        }
-        return access_controller::for($user, $courseid);
-    }
-
-    /**
-     * Returns a user property, loading it from the database if it is not there.
-     *
-     * @param \stdClass $user
-     * @param string $property
-     * @return mixed
-     * @throws \coding_exception If the user object does match the database or if the expected property does not exist.
-     */
-    private static function get_property(\stdClass $user, string $property) {
-        global $DB;
-        if (property_exists($user, $property)) {
-            return $user->{$property};
-        } else if (in_array($property, self::FIELDS_DB)) {
-            $record = $DB->get_record('user', ['id' => $user->id], '*', MUST_EXIST);
-            foreach ((array)$record as $field => $value) {
-                if (!isset($user->{$field})) {
-                    $user->{$field} = $value;
-                    continue;
+            default:
+                if (!user_field_resolver::is_valid_field($field)) {
+                    throw new \coding_exception('Unknown user field', $field);
                 }
-                if ($user->{$field} != $value) {
-                    throw new \coding_exception('Properties have been modified, DO NOT modify the user record.');
+
+                $value = $field_resolver->get_field_value($field);
+        }
+
+        if (null === $value && in_array($field, ['id', 'fullname'])) {
+            // You got here because you did not check permissions because using this type, and now you can't
+            // view this users information. The fields are required in GraphQL, but because we're kind you're
+            // getting a coding_exception rather than a cryptic GraphQL exception.
+            throw new \coding_exception('You did not check you can view a user before resolving them.', $user->id);
+        }
+
+        // Update the current user's data record, if the field does not existing in the record.
+        // So that in the next run of resolving, we do not have to worry about the missing properties
+        // nor have to re-fetching database to do so.
+        if (!$field_resolver->field_exist_in_user_instance($field) && user_field_resolver::is_db_field($field)) {
+            $loaded_record = $field_resolver->get_target_user_record();
+
+            foreach ($loaded_record as $missing_field => $missing_value) {
+                if (!property_exists($user, $missing_field)) {
+                    $user->{$missing_field} = $missing_value;
                 }
             }
-            return $user->{$property};
         }
-        throw new \coding_exception('The user record did not contain the expected property.', $property);
+
+        return $value;
     }
 }

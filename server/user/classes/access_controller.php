@@ -266,12 +266,12 @@ class access_controller {
         }
         if ($courseorid) {
             if (is_object($courseorid)) {
-                if ($courseorid->id and $courseorid->id != $SITE) {
+                if ($courseorid->id and $courseorid->id != $SITE->id) {
                     $this->courseid = $courseorid->id;
                     $this->cachedcourse = $courseorid;
                 }
             } else {
-                if ($courseorid != $SITE) {
+                if ($courseorid != $SITE->id ) {
                     $this->courseid = $courseorid;
                     // Do not fetch the course if it is not needed.
                 }

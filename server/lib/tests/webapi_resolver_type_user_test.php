@@ -24,12 +24,13 @@
 defined('MOODLE_INTERNAL') || die();
 
 use totara_webapi\phpunit\webapi_phpunit_helper;
+use core_user\profile\card_display;
 
 /**
  * Tests the totara job create assignment mutation
  */
 class core_webapi_resolver_type_user_testcase extends advanced_testcase {
-    
+
     use webapi_phpunit_helper;
 
     public function test_resolver_id() {
@@ -357,5 +358,16 @@ class core_webapi_resolver_type_user_testcase extends advanced_testcase {
 
         $this->setUser($this->getDataGenerator()->create_user());
         self::assertNull($this->resolve_graphql_type('core_user', 'description', $user1, []));
+    }
+
+    /**
+     * @return void
+     */
+    public function test_resolver_display_field(): void {
+        $generator = $this->getDataGenerator();
+        $user_one = $generator->create_user();
+
+        $display = $this->resolve_graphql_type('core_user', 'card_display', $user_one, []);
+        $this->assertInstanceOf(card_display::class, $display);
     }
 }
