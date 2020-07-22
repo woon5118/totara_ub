@@ -859,6 +859,9 @@ class theme_config {
 
         $svg = $this->use_svg_icons();
 
+        // Totara: Legacy CSS
+        $legacy = core_useragent::is_ie();
+
         // Totara: Removed chunking support as it's not used by currently supported browsers
 
         // Totara: RTL stylesheet.
@@ -877,6 +880,11 @@ class theme_config {
 
                 $slashargs .= '/'.$this->name.'/'.$rev.'/'.$filename;
 
+                // Totara: Legacy CSS
+                if ($legacy) {
+                    $slashargs .= '/legacy';
+                }
+
                 $url->set_slashargument($slashargs, 'noparam', true);
             } else {
                 $params = array('theme' => $this->name, 'rev' => $rev, 'type' => $filename);
@@ -888,6 +896,10 @@ class theme_config {
                 // Totara: RTL stylesheet.
                 if ($rtl) {
                     $params['rtl'] = '1';
+                }
+                // Totara: Legacy CSS
+                if ($legacy) {
+                    $params['legacy'] = '1';
                 }
                 $url->params($params);
             }
@@ -908,6 +920,10 @@ class theme_config {
             // Totara: RTL stylesheet.
             if ($rtl) {
                 $baseurl->param('rtl', '1');
+            }
+            // Totara: Legacy CSS
+            if ($legacy) {
+                $baseurl->param('legacy', '1');
             }
             // Totara: Removed special handling to support IE 9
             foreach ($css['plugins'] as $plugin => $unused) {
@@ -1028,8 +1044,10 @@ class theme_config {
     public function get_css_cache_key() {
         $nosvg = (!$this->use_svg_icons()) ? 'nosvg_' : '';
         $rtlmode = ($this->rtlmode == true) ? 'rtl' : 'ltr';
+        // Totara: Legacy CSS
+        $legacy = $this->legacybrowser ? 'legacy' : 'modern';
 
-        return $nosvg . $this->name . '_' . $rtlmode;
+        return $nosvg . $this->name . '_' . $rtlmode . '_' . $legacy;
     }
 
     /**
