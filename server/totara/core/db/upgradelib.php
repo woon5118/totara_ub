@@ -1241,38 +1241,111 @@ function totara_core_clear_preview_image_cache(?string $preview_mode = null): vo
  * Please note that if you refactor/move a relationship resolver class, you will need to
  * update all corresponding relationship resolver table rows that use that class_name!
  *
- * @param string $resolver_class_name
+ * @param string|array $resolver_classes
  * @param string $idnumber Unique identifier.
+ * @param int $sort_order
  * @param int $type Optional type identifier - defaults to 0.
  * @param string $component Plugin that the relationship is exclusive to. Defaults to being available for all.
  *
  * @since Totara 13.0
  */
-function totara_core_upgrade_create_relationship($resolver_class_name, $idnumber = null, $type = 0, $component = null) {
+function totara_core_upgrade_create_relationship($resolver_classes, $idnumber = null, $sort_order = 1, $type = 0, $component = null) {
     global $DB;
 
-    $record = $DB->get_record(
-        'totara_core_relationship_resolver',
-        ['class_name' => $resolver_class_name]
-    );
+    $resolver_classes = is_array($resolver_classes)
+        ? $resolver_classes
+        : [$resolver_classes];
 
-    if ($record) {
-        return;
+    // Checks if idnumber already exists, then updates the relationship.
+    if ($idnumber) {
+        $relationship = $DB->get_record(
+            'totara_core_relationship',
+            ['idnumber' => $idnumber]
+        );
+
+        // Update the sort order, type & component if the relationship already exists.
+        if ($relationship) {
+            // Conditionally add properties if they exist as a db column.
+            if (isset($relationship->sort_order)) {
+                $relationship->sort_order = $sort_order;
+            }
+            if (isset($relationship->type)) {
+                $relationship->type = $type;
+            }
+            if (isset($relationship->component)) {
+                $relationship->component = $component;
+            }
+            totara_core_update_relationship($relationship, $resolver_classes);
+            return;
+        }
     }
 
-    $DB->transaction(static function () use ($DB, $resolver_class_name, $idnumber, $type, $component) {
-        $record = [
-            'created_at' => time(),
-            'idnumber' => $idnumber ? $idnumber : $resolver_class_name,
-            'type' => $type,
-            'component' => $component
-        ];
+    if (!$idnumber) {
+        $idnumber = $resolver_classes[0];
+    }
+    // Creates the new relationship with the resolver classes.
+    totara_core_create_relationship($resolver_classes, $idnumber, $sort_order, $type, $component);
+}
 
-        $relationship_id = $DB->insert_record('totara_core_relationship', $record);
+/**
+ * Creates a totara relationship with the resolvers.
+ *
+ * @param array $resolver_classes
+ * @param string $idnumber
+ * @param int $sort_order
+ * @param int $type
+ * @param string|null $component
+ */
+function totara_core_create_relationship(array $resolver_classes, string $idnumber, int $sort_order = 1, int $type = 0, string $component = null): void {
+    global $DB;
+    $DB->transaction(static function() use ($DB, $resolver_classes, $idnumber, $type, $component, $sort_order) {
+        $relationship_id = $DB->insert_record(
+            'totara_core_relationship',
+            [
+                'idnumber' => $idnumber ? $idnumber : $resolver_classes[0],
+                'type' => $type,
+                'component' => $component,
+                'sort_order' => $sort_order,
+                'created_at' => time(),
+            ]
+        );
 
-        $DB->insert_record('totara_core_relationship_resolver', [
-            'relationship_id' => $relationship_id,
-            'class_name' => $resolver_class_name,
-        ]);
+        foreach ($resolver_classes as $resolver_class) {
+            $DB->insert_record('totara_core_relationship_resolver', [
+                'relationship_id' => $relationship_id,
+                'class_name' => $resolver_class,
+            ]);
+        }
     });
+}
+
+/**
+ * Updates a relationship's properties and resolvers.
+ *
+ * @param $relationship
+ * @param array $resolvers
+ */
+function totara_core_update_relationship ($relationship, array $resolvers) {
+    global $DB;
+
+    $DB->update_record( 'totara_core_relationship', $relationship);
+    $existing_resolvers = $DB->get_records(
+        'totara_core_relationship_resolver',
+        [
+            'relationship_id' => $relationship->id
+        ]
+    );
+    $resolver_classes = array_column($existing_resolvers, 'class_name');
+
+    foreach ($resolvers as $resolver) {
+        if (!in_array($resolver, $resolver_classes, true)) {
+            $DB->insert_record(
+                'totara_core_relationship_resolver',
+                [
+                    'relationship_id' => $relationship->id,
+                    'class_name' => $resolver
+                ]
+            );
+        }
+    }
 }

@@ -37,6 +37,7 @@ use totara_core\entities\relationship_resolver as relationship_resolver_entity;
  *
  * @property-read int $id
  * @property-read string $idnumber
+ * @property-read int $sort_order
  * @property-read int $created_at
  * @property-read string $name
  *
@@ -52,6 +53,8 @@ final class relationship extends model {
     protected $entity_attribute_whitelist = [
         'id',
         'idnumber',
+        'type',
+        'sort_order',
         'type',
         'created_at',
     ];
@@ -150,11 +153,12 @@ final class relationship extends model {
      *
      * @param string[] $resolver_class_names Array of relationship resolver class names, e.g. [subject::class, manager::class]
      * @param string $idnumber Unique string identifier for this relationship.
+     * @param int $sort_order
      * @param int $type Optional type identifier - defaults to standard type.
      * @param string $component Plugin that the relationship is exclusive to. Defaults to being available for all.
      * @return relationship
      */
-    public static function create(array $resolver_class_names, string $idnumber, int $type = null, string $component = null): self {
+    public static function create(array $resolver_class_names, string $idnumber, int $sort_order = 1, int $type = null, string $component = null): self {
         self::validate_resolvers($resolver_class_names);
 
         if (trim($idnumber) === '' || strlen($idnumber) > 255) {
@@ -170,11 +174,12 @@ final class relationship extends model {
             throw new coding_exception('Specified component/plugin ' . $component . ' does not exist!');
         }
 
-        $relationship = builder::get_db()->transaction(function () use ($resolver_class_names, $idnumber, $type, $component) {
+        $relationship = builder::get_db()->transaction(function () use ($resolver_class_names, $idnumber, $sort_order, $type, $component) {
             $relationship = new relationship_entity();
             $relationship->idnumber = $idnumber;
             $relationship->type = $type ?? relationship_entity::TYPE_STANDARD;
             $relationship->component = $component;
+            $relationship->sort_order = $sort_order;
             $relationship->save();
 
             foreach ($resolver_class_names as $resolver_class_name) {

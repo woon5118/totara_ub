@@ -21,14 +21,12 @@
  * @package mod_perform
  */
 
+use mod_perform\constants;
 use mod_perform\entities\activity\section_relationship;
 use mod_perform\models\activity\section_relationship as section_relationship_model;
 use mod_perform\models\activity\section;
 use mod_perform\state\activity\active;
-use totara_core\entities\relationship_resolver;
-use totara_core\relationship\resolvers\subject;
-use totara_job\relationship\resolvers\appraiser;
-use totara_job\relationship\resolvers\manager;
+use totara_core\entities\relationship;
 
 abstract class mod_perform_relationship_testcase extends advanced_testcase {
     /**
@@ -106,23 +104,23 @@ abstract class mod_perform_relationship_testcase extends advanced_testcase {
         // Two relationships for activity 1, section 1
         $data->activity1_section1_relationship1 = $perform_generator->create_section_relationship(
             $data->activity1_section1,
-            ['class_name' => appraiser::class]
+            ['relationship' => constants::RELATIONSHIP_APPRAISER]
         );
         $data->activity1_section1_relationship2 = $perform_generator->create_section_relationship(
             $data->activity1_section1,
-            ['class_name' => manager::class]
+            ['relationship' => constants::RELATIONSHIP_MANAGER]
         );
 
         // One relationship for activity 1, section 2
         $data->activity1_section2_relationship1 = $perform_generator->create_section_relationship(
             $data->activity1_section2,
-            ['class_name' => subject::class]
+            ['relationship' => constants::RELATIONSHIP_SUBJECT]
         );
 
         // One relationship for activity 2's first section.
         $data->activity2_section1_relationship1 = $perform_generator->create_section_relationship(
             $data->activity2_section1,
-            ['class_name' => subject::class]
+            ['relationship' => constants::RELATIONSHIP_SUBJECT]
         );
 
         return $data;
@@ -130,17 +128,17 @@ abstract class mod_perform_relationship_testcase extends advanced_testcase {
 
     /**
      * @param section $section
-     * @param array $expected_class_names
+     * @param array $expected_relationships
      */
-    protected function assert_section_relationships(section $section, array $expected_class_names): void {
-        $actual_class_names = relationship_resolver::repository()
-            ->select_raw('DISTINCT class_name')
-            ->join([section_relationship::TABLE, 'section_relationships'], 'relationship_id', 'core_relationship_id')
+    protected function assert_section_relationships(section $section, array $expected_relationships): void {
+        $actual_relationships = relationship::repository()
+            ->select_raw('DISTINCT idnumber')
+            ->join([section_relationship::TABLE, 'section_relationships'], 'id', 'core_relationship_id')
             ->where('section_relationships.section_id', $section->id)
             ->get()
-            ->pluck('class_name');
+            ->pluck('idnumber');
 
-        $this->assertEqualsCanonicalizing($expected_class_names, $actual_class_names);
+        $this->assertEqualsCanonicalizing($expected_relationships, $actual_relationships);
     }
 
     /**

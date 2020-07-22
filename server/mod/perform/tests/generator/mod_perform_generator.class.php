@@ -30,6 +30,7 @@ use core\orm\query\builder;
 use core_container\module\module;
 use hierarchy_organisation\entities\organisation;
 use hierarchy_position\entities\position;
+use mod_perform\constants;
 use mod_perform\dates\date_offset;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\entities\activity\manual_relationship_selection;
@@ -62,13 +63,9 @@ use mod_perform\state\subject_instance\pending;
 use mod_perform\task\service\subject_instance_creation;
 use mod_perform\user_groups\grouping;
 use mod_perform\util;
-use totara_core\entities\relationship_resolver as core_relationship_resolver;
 use totara_core\relationship\relationship as core_relationship;
 use totara_core\relationship\relationship_provider as core_relationship_provider;
-use totara_core\relationship\resolvers\subject;
 use totara_job\job_assignment;
-use totara_job\relationship\resolvers\appraiser;
-use totara_job\relationship\resolvers\manager;
 
 /**
  * Perform generator
@@ -326,7 +323,7 @@ class mod_perform_generator extends component_generator_base {
             if (strtolower($relationship->get_name()) === $relationship_name) {
                 $this->create_section_relationship(
                     $this->get_section_from_title($data['section_name']),
-                    ['class_name' => $relationship->get_resolvers()[0]]
+                    ['relationship' => $relationship->idnumber]
                 );
                 return;
             }
@@ -350,40 +347,27 @@ class mod_perform_generator extends component_generator_base {
      * Add relationship for a section.
      *
      * @param section $section
-     * @param core_relationship|array $relationship Relationship object OR data array of ['class_name' => resolver class name]
+     * @param array $data containing the relationship key as the relationship idnumber.
      * @param bool $can_view
      * @return section_relationship_model
      */
-    public function create_section_relationship(section $section, $relationship, $can_view = true): section_relationship_model {
-        if (!$relationship instanceof core_relationship) {
-            $relationship = $this->get_core_relationship($relationship['class_name']);
-        }
+    public function create_section_relationship(section $section, array $data, $can_view = true): section_relationship_model {
+        $core_relationship = $this->get_core_relationship($data['relationship']);
         return section_relationship_model::create(
             $section->get_id(),
-            $relationship->id,
+            $core_relationship->id,
             $can_view
         );
     }
 
-    public function get_core_relationship(string $class_name): core_relationship {
-        if (!isset($this->cache['core_relationships'][$class_name])) {
-            /** @var core_relationship_resolver|null $resolver */
-            $resolver = core_relationship_resolver::repository()
-                ->with('relationship')
-                ->where('class_name', $class_name)
-                ->order_by('id')
-                ->first();
-
-            if (isset($resolver)) {
-                $core_relationship = core_relationship::load_by_entity($resolver->relationship);
-            } else {
-                $core_relationship = core_relationship::create([$class_name]);
-            }
-
-            $this->cache['core_relationships'][$class_name] = $core_relationship;
-        }
-
-        return $this->cache['core_relationships'][$class_name];
+    /**
+     * Get the relationship tagged by the idnumber.
+     *
+     * @param string $idnumber
+     * @return core_relationship
+     */
+    public function get_core_relationship(string $idnumber): core_relationship {
+        return core_relationship::load_by_idnumber($idnumber);
     }
 
     /**
@@ -552,8 +536,8 @@ class mod_perform_generator extends component_generator_base {
 
             for ($k = 0; $k < $configuration->get_number_of_sections_per_activity(); $k++) {
                 $section = $this->create_section($activity, ['title' => $activity->name . ' section ' . $k]);
-                foreach ($configuration->get_relationships_per_section() as $relationship_class) {
-                    $this->create_section_relationship($section, ['class_name' => $relationship_class]);
+                foreach ($configuration->get_relationships_per_section() as $relationship_idnumber) {
+                    $this->create_section_relationship($section, ['relationship' => $relationship_idnumber]);
                 }
                 for ($j = 0; $j < $configuration->get_number_of_elements_per_section(); $j++) {
                     $title = $section->title . " element$j";
@@ -810,7 +794,7 @@ class mod_perform_generator extends component_generator_base {
             if ($subject_is_participating) {
                 $subject_relationship = $this->create_section_relationship(
                     $section1,
-                    ['class_name' => subject::class],
+                    ['relationship' => constants::RELATIONSHIP_SUBJECT],
                     in_array('subject', $relationships_can_view, true)
                 );
                 $subjects_participant_instance->core_relationship_id = $subject_relationship->core_relationship_id;
@@ -820,7 +804,7 @@ class mod_perform_generator extends component_generator_base {
             if ($other_participant) {
                 $manager_relationship = $this->create_section_relationship(
                     $section1,
-                    ['class_name' => manager::class],
+                    ['relationship' => constants::RELATIONSHIP_MANAGER],
                     in_array('manager', $relationships_can_view, true)
                 );
                 $other_participant_instance->core_relationship_id = $manager_relationship->core_relationship_id;
@@ -829,7 +813,7 @@ class mod_perform_generator extends component_generator_base {
 
             if ($other_participant) {
                 $manager_relationship = $this->create_section_relationship(
-                    $section1, ['class_name' => manager::class],
+                    $section1, ['relationship' => constants::RELATIONSHIP_MANAGER],
                     in_array('manager', $relationships_can_view, true)
                 );
                 $other_participant_instance->core_relationship_id = $manager_relationship->core_relationship_id;
@@ -839,7 +823,7 @@ class mod_perform_generator extends component_generator_base {
             if ($third_participant) {
                 $appraiser_relationship = $this->create_section_relationship(
                     $section1,
-                    ['class_name' => appraiser::class],
+                    ['relationship' => constants::RELATIONSHIP_APPRAISER],
                     in_array('appraiser', $relationships_can_view, true)
                 );
                 $third_participant_instance->core_relationship_id = $appraiser_relationship->core_relationship_id;
@@ -884,7 +868,7 @@ class mod_perform_generator extends component_generator_base {
         foreach ($manual_relationships as $i => $relationship) {
             $section = $this->create_section($activity, ['title' => "Section {$i}"]);
             $this->create_section_element($section, $element);
-            $this->create_section_relationship($section, $relationship);
+            $this->create_section_relationship($section, ['relationship' => $relationship->idnumber]);
         }
 
         $track = track::create($activity);
@@ -1135,9 +1119,9 @@ class mod_perform_generator extends component_generator_base {
 
         $section = $this->create_section($activity, ['title' => 'Part one']);
 
-        $manager_section_relationship = $this->create_section_relationship($section, ['class_name' => manager::class]);
-        $appraiser_section_relationship = $this->create_section_relationship($section, ['class_name' => appraiser::class]);
-        $subject_section_relationship = $this->create_section_relationship($section, ['class_name' => subject::class]);
+        $manager_section_relationship = $this->create_section_relationship($section, ['relationship' => constants::RELATIONSHIP_MANAGER]);
+        $appraiser_section_relationship = $this->create_section_relationship($section, ['relationship' => constants::RELATIONSHIP_APPRAISER]);
+        $subject_section_relationship = $this->create_section_relationship($section, ['relationship' => constants::RELATIONSHIP_SUBJECT]);
 
         $element = $this->create_element(['title' => 'Question one']);
         $this->create_section_element($section, $element);

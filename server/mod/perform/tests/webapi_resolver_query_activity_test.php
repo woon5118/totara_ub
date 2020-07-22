@@ -21,10 +21,8 @@
  * @package mod_perform
  */
 
+use mod_perform\constants;
 use mod_perform\webapi\resolver\query\activity;
-use totara_core\relationship\resolvers\subject;
-use totara_job\relationship\resolvers\appraiser;
-use totara_job\relationship\resolvers\manager;
 
 use totara_core\advanced_feature;
 
@@ -97,9 +95,9 @@ class mod_perform_webapi_resolver_query_activity_testcase extends mod_perform_re
      */
     public function test_ajax_query_successful() {
         $data = $this->create_test_data();
-        $appraiser_id = $this->perform_generator()->get_core_relationship(appraiser::class);
-        $manager_id = $this->perform_generator()->get_core_relationship(manager::class);
-        $subject_id = $this->perform_generator()->get_core_relationship(subject::class);
+        $appraiser_id = $this->perform_generator()->get_core_relationship(constants::RELATIONSHIP_APPRAISER);
+        $manager_id = $this->perform_generator()->get_core_relationship(constants::RELATIONSHIP_MANAGER);
+        $subject_id = $this->perform_generator()->get_core_relationship(constants::RELATIONSHIP_SUBJECT);
 
         $id = $data->activity1->id;
         $args = ['activity_id' => $id];
@@ -145,6 +143,7 @@ class mod_perform_webapi_resolver_query_activity_testcase extends mod_perform_re
                 'core_relationship' => [
                     'id' => $appraiser_id->get_id(),
                     'name' => $appraiser_id->get_name(),
+                    'sort_order' => $appraiser_id->sort_order,
                 ],
             ],
             [
@@ -154,6 +153,7 @@ class mod_perform_webapi_resolver_query_activity_testcase extends mod_perform_re
                 'core_relationship' => [
                     'id' => $manager_id->get_id(),
                     'name' => $manager_id->get_name(),
+                    'sort_order' => $manager_id->sort_order,
                 ],
             ],
         ];
@@ -169,12 +169,13 @@ class mod_perform_webapi_resolver_query_activity_testcase extends mod_perform_re
         $section2_result = reset($section2);
         $this->assertEquals('Activity 1 section 2',  $section2_result['title']);
         $section2_expected_relationships = [
-            'id' => $data->activity1_section2_relationship1->id,
+            'id' => (int)$data->activity1_section2_relationship1->id,
             'can_view' => true,
             'can_answer' => true,
             'core_relationship' => [
-                'id' => $subject_id->get_id(),
+                'id' => (int)$subject_id->get_id(),
                 'name' => $subject_id->get_name(),
+                'sort_order' => $subject_id->sort_order,
             ],
         ];
         $this->assertCount(1, $section2_result['section_relationships']);

@@ -23,18 +23,16 @@
 
 use core\collection;
 use totara_core\entities\relationship as relationship_entity;
-use totara_core\entities\relationship_resolver;
 use totara_core\relationship\relationship;
 use totara_core\relationship\relationship_provider;
-use totara_core\relationship\resolvers\subject;
 
 require_once(__DIR__ . '/relationship_resolver_test.php');
 
 /**
  * @group totara_core_relationship
- * @covers \totara_core\relationship\relationship_provider
+ * @covers relationship_provider
  */
-class totara_core_relationship_provider_testcase extends \advanced_testcase {
+class totara_core_relationship_provider_testcase extends advanced_testcase {
 
     protected function setUp(): void {
         parent::setUp();
@@ -43,58 +41,87 @@ class totara_core_relationship_provider_testcase extends \advanced_testcase {
 
     public function test_fetch_compatible_relationships(): void {
         // test_resolver_two & test_resolver_five only have the 'input_field_two' field in common.
-        $relationship1 = relationship::create([test_resolver_two::class], 'one');
+        $relationship1 = relationship::create([test_resolver_two::class], 'one', 1000);
         // test_resolver_one & test_resolver_three only have the 'input_field_one' field in common.
-        $relationship2 = relationship::create([test_resolver_one::class, test_resolver_three::class], 'two');
+        $relationship2 = relationship::create([test_resolver_one::class, test_resolver_three::class], 'two', 2000);
         // test_resolver_five accepts either ['input_field_one', 'input_field_three'] OR ['input_field_two']
-        $relationship3 = relationship::create([test_resolver_five::class], 'three');
+        $relationship3 = relationship::create([test_resolver_five::class], 'three', 3000);
 
         $this->assert_same_relationships(
             [$relationship1, $relationship3],
-            (new relationship_provider())->fetch()->filter_by_compatible(['input_field_two'])->get()
+            (new relationship_provider())->get_compatible_relationships(['input_field_two'])
         );
         $this->assert_same_relationships(
             [$relationship2],
-            (new relationship_provider())->fetch()->filter_by_compatible(['input_field_one'])->get()
+            (new relationship_provider())->get_compatible_relationships(['input_field_one'])
         );
         $this->assert_same_relationships(
             [],
-            (new relationship_provider())->fetch()->filter_by_compatible(['input_field_three'])->get()
+            (new relationship_provider())->get_compatible_relationships(['input_field_three'])
         );
         $this->assert_same_relationships(
             [$relationship2, $relationship3],
-            (new relationship_provider())->fetch()->filter_by_compatible(['input_field_three', 'input_field_one'])->get()
+            (new relationship_provider())->get_compatible_relationships(['input_field_three', 'input_field_one'])
         );
 
         // There isn't any point in specifying an empty set of fields.
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage('Must specify at least one field to filter_by_compatible()');
-        (new relationship_provider())->fetch()->filter_by_compatible([])->get();
+        (new relationship_provider())->get_compatible_relationships([]);
     }
 
     public function test_fetch_component_relationships(): void {
-        // First relationship has no component
-        $relationship1 = relationship::create([test_resolver_two::class], 'one', null, null);
+        // First relationship has no component so can be used universally
+        $relationship1 = relationship::create([test_resolver_two::class], 'one', 1000);
 
         // Second relationship has component 'totara_core'
-        $relationship2 = relationship::create([test_resolver_one::class, test_resolver_three::class], 'two', null, 'totara_core');
+        $relationship2 = relationship::create([test_resolver_one::class, test_resolver_three::class], 'two', 2000, null, 'totara_core');
 
         // Third relationship has component 'core'
-        $relationship3 = relationship::create([test_resolver_five::class], 'three', null, 'core');
+        $relationship3 = relationship::create([test_resolver_five::class], 'three', 3000, null, 'core');
 
+        // Don't include universal relationships (i.e. relationship1)
+        $this->assert_same_relationships(
+            [$relationship2],
+            (new relationship_provider())->filter_by_component('totara_core')->get()
+        );
+        $this->assert_same_relationships(
+            [$relationship3],
+            (new relationship_provider())->filter_by_component('core')->get()
+        );
+
+        // Include universal relationships (i.e. relationship1)
         $this->assert_same_relationships(
             [$relationship1, $relationship2],
-            (new relationship_provider())->filter_by_component('totara_core')->fetch()->get()
+            (new relationship_provider())->filter_by_component('totara_core', true)->get()
         );
         $this->assert_same_relationships(
             [$relationship1, $relationship3],
-            (new relationship_provider())->filter_by_component('core')->fetch()->get()
+            (new relationship_provider())->filter_by_component('core', true)->get()
+        );
+    }
+
+    public function test_fetch_universal_relationships(): void {
+        // First relationship has no component so can be used universally
+        $relationship1 = relationship::create([test_resolver_two::class], 'one', 1000);
+
+        // Second relationship has component 'totara_core'
+        $relationship2 = relationship::create([test_resolver_one::class, test_resolver_three::class], 'two', 2000, null, 'totara_core');
+
+        // Third relationship has component 'core'
+        $relationship3 = relationship::create([test_resolver_five::class], 'three', 3000, null, 'core');
+
+        // No filter applied
+        $this->assert_same_relationships(
+            [$relationship1, $relationship2, $relationship3],
+            (new relationship_provider())->get()
         );
 
-        // There isn't any point in specifying an empty set of fields.
-        $this->expectException(coding_exception::class);
-        $this->expectExceptionMessage('Must call filter_by_component() before calling fetch()');
-        (new relationship_provider())->fetch()->filter_by_component('invalid')->get();
+        // Only universally usable relationships
+        $this->assert_same_relationships(
+            [$relationship1],
+            (new relationship_provider())->filter_by_universal()->get()
+        );
     }
 
     /**

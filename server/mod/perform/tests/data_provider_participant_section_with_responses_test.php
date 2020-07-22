@@ -23,6 +23,7 @@
  */
 
 use core\entities\user;
+use mod_perform\constants;
 use mod_perform\data_providers\response\participant_section_with_responses;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
 use mod_perform\models\activity\activity;
@@ -30,9 +31,6 @@ use mod_perform\models\activity\participant_instance;
 use mod_perform\models\response\participant_section;
 use mod_perform\models\response\responder_group;
 use mod_perform\models\response\section_element_response;
-use totara_core\relationship\resolvers\subject;
-use totara_job\relationship\resolvers\appraiser;
-use totara_job\relationship\resolvers\manager;
 
 /**
  * @group perform
@@ -229,15 +227,16 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
      *
      * @param int $expected_manager_count
      * @param int $expected_appraiser_count
-     * @param string[] $relationship_class_names
+     * @param string[] $relationships
      * @param bool $subject_can_view_others_responses
+     *
      * @throws coding_exception
      * @dataProvider responder_group_population_provider
      */
     public function test_responder_group_population_for_subject(
         int $expected_manager_count,
         int $expected_appraiser_count,
-        array $relationship_class_names,
+        array $relationships,
         bool $subject_can_view_others_responses = true
     ): void {
         self::setAdminUser();
@@ -260,19 +259,19 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
         $section = $generator->create_section($activity, ['title' => 'Part one']);
 
         // Always create both the manager and appraiser section_relationships
-        $manager_section_relationship = $generator->create_section_relationship($section, ['class_name' => manager::class]);
-        $appraiser_section_relationship = $generator->create_section_relationship($section, ['class_name' => appraiser::class]);
+        $manager_section_relationship = $generator->create_section_relationship($section, ['relationship' => constants::RELATIONSHIP_MANAGER]);
+        $appraiser_section_relationship = $generator->create_section_relationship($section, ['relationship' => constants::RELATIONSHIP_APPRAISER]);
         $subject_section_relationship = $generator->create_section_relationship(
             $section,
-            ['class_name' => subject::class],
+            ['relationship' => constants::RELATIONSHIP_SUBJECT],
             $subject_can_view_others_responses
         );
 
         $element = $generator->create_element(['title' => 'Question one']);
         $generator->create_section_element($section, $element);
 
-        foreach ($relationship_class_names as $relationship_class_name) {
-            if ($relationship_class_name === manager::class) {
+        foreach ($relationships as $relationship_class_name) {
+            if ($relationship_class_name === constants::RELATIONSHIP_MANAGER) {
                 $core_relationship_id = $manager_section_relationship->core_relationship_id;
             } else {
                 $core_relationship_id = $appraiser_section_relationship->core_relationship_id;
@@ -329,19 +328,19 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
     public function responder_group_population_provider(): array {
         return [
             'Two managers, one appraisers' => [
-                2, 1, [manager::class, manager::class, appraiser::class]
+                2, 1, [constants::RELATIONSHIP_MANAGER, constants::RELATIONSHIP_MANAGER, constants::RELATIONSHIP_APPRAISER]
             ],
             'Two managers, one appraisers - no visibility of other responses' => [
-                0, 0, [manager::class, manager::class, appraiser::class], false
+                0, 0, [constants::RELATIONSHIP_MANAGER, constants::RELATIONSHIP_MANAGER, constants::RELATIONSHIP_APPRAISER], false
             ],
             'Two appraisers, one managers' => [
-                1, 2, [manager::class, appraiser::class, appraiser::class]
+                1, 2, [constants::RELATIONSHIP_MANAGER, constants::RELATIONSHIP_APPRAISER, constants::RELATIONSHIP_APPRAISER]
             ],
             'Two appraisers, one managers - no visibility of other responses' => [
-                0, 0, [manager::class, appraiser::class, appraiser::class], false
+                0, 0, [constants::RELATIONSHIP_MANAGER, constants::RELATIONSHIP_APPRAISER, constants::RELATIONSHIP_APPRAISER], false
             ],
-            'One manager, no appraiser' => [1, 0, [manager::class]],
-            'One manager, no appraiser - no visibility of other responses' => [0, 0, [manager::class], false],
+            'One manager, no appraiser' => [1, 0, [constants::RELATIONSHIP_MANAGER]],
+            'One manager, no appraiser - no visibility of other responses' => [0, 0, [constants::RELATIONSHIP_MANAGER], false],
             'No manager, no appraiser' => [0, 0, []],
             'No manager, no appraiser  - no visibility of other responses' => [0, 0, [], false],
         ];
@@ -371,9 +370,9 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
 
         $section = $generator->create_section($activity, ['title' => 'Part one']);
 
-        $manager_section_relationship = $generator->create_section_relationship($section, ['class_name' => manager::class]);
-        $appraiser_section_relationship = $generator->create_section_relationship($section, ['class_name' => appraiser::class]);
-        $subject_section_relationship = $generator->create_section_relationship($section, ['class_name' => subject::class]);
+        $manager_section_relationship = $generator->create_section_relationship($section, ['relationship' => constants::RELATIONSHIP_MANAGER]);
+        $appraiser_section_relationship = $generator->create_section_relationship($section, ['relationship' => constants::RELATIONSHIP_APPRAISER]);
+        $subject_section_relationship = $generator->create_section_relationship($section, ['relationship' => constants::RELATIONSHIP_SUBJECT]);
 
         $element = $generator->create_element(['title' => 'Question one']);
         $generator->create_section_element($section, $element);
@@ -496,8 +495,8 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
 
         $section = $generator->create_section($activity, ['title' => 'Part one']);
 
-        $manager_section_relationship = $generator->create_section_relationship($section, ['class_name' => manager::class]);
-        $subject_section_relationship = $generator->create_section_relationship($section, ['class_name' => subject::class]);
+        $manager_section_relationship = $generator->create_section_relationship($section, ['relationship' => constants::RELATIONSHIP_MANAGER]);
+        $subject_section_relationship = $generator->create_section_relationship($section, ['relationship' => constants::RELATIONSHIP_SUBJECT]);
 
         $element = $generator->create_element(['title' => 'Question one']);
         $generator->create_section_element($section, $element);
@@ -656,9 +655,18 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
         $activity = new activity($subject_instance->activity());
         $section = $generator->create_section($activity, ['title' => 'Part one']);
 
-        $manager_section_relationship = $generator->create_section_relationship($section, ['class_name' => manager::class]);
-        $appraiser_section_relationship = $generator->create_section_relationship($section, ['class_name' => appraiser::class]);
-        $subject_section_relationship = $generator->create_section_relationship($section, ['class_name' => subject::class]);
+        $manager_section_relationship = $generator->create_section_relationship(
+            $section,
+            ['relationship' => constants::RELATIONSHIP_MANAGER]
+        );
+        $appraiser_section_relationship = $generator->create_section_relationship(
+            $section,
+            ['relationship' => constants::RELATIONSHIP_APPRAISER]
+        );
+        $subject_section_relationship = $generator->create_section_relationship(
+            $section,
+            ['relationship' => constants::RELATIONSHIP_SUBJECT]
+        );
 
         $element = $generator->create_element(['title' => 'Question one']);
         $generator->create_section_element($section, $element);

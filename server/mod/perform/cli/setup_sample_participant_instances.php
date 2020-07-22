@@ -32,14 +32,13 @@ echo "This script is for functionality testing and demo.\n";
 $no_of_users = 5;
 $users_per_relationship = 5;
 
+use mod_perform\constants;
 use mod_perform\entities\activity\track_assignment;
 use mod_perform\expand_task;
 use mod_perform\models\activity\track;
 use mod_perform\task\service\subject_instance_creation;
 use mod_perform\user_groups\grouping;
 use totara_job\job_assignment;
-use totara_job\relationship\resolvers\appraiser;
-use totara_job\relationship\resolvers\manager;
 
 // Do stuff as admin user
 core\session\manager::set_user(get_admin());
@@ -115,11 +114,11 @@ class setup_data {
         $activity_tree->section_relationships = [];
         $activity_tree->section_relationships[] = $generator->create_section_relationship(
             $activity_tree->section,
-            ['class_name' => appraiser::class]
+            ['relationship' => constants::RELATIONSHIP_APPRAISER]
         );
         $activity_tree->section_relationships[] = $generator->create_section_relationship(
             $activity_tree->section,
-            ['class_name' => manager::class]
+            ['relationship' => constants::RELATIONSHIP_MANAGER]
         );
 
         /** @var track $track */

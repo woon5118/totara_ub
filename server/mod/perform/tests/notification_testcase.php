@@ -22,19 +22,17 @@
  * @category test
  */
 
+use mod_perform\constants;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\notification;
 use mod_perform\models\activity\notification_recipient;
 use mod_perform\models\activity\section;
 use mod_perform\models\activity\section_relationship;
 use mod_perform\notification\broker;
+use mod_perform\notification\dealer;
 use mod_perform\notification\factory;
 use mod_perform\notification\loader;
-use mod_perform\notification\dealer;
 use totara_core\relationship\relationship;
-use totara_core\relationship\resolvers\subject;
-use totara_job\relationship\resolvers\appraiser;
-use totara_job\relationship\resolvers\manager;
 
 abstract class mod_perform_notification_testcase extends advanced_testcase {
     /** @var mod_perform_generator */
@@ -117,13 +115,13 @@ abstract class mod_perform_notification_testcase extends advanced_testcase {
     protected function create_section_relationships(section $section, array $relationships = null): array {
         if ($relationships === null) {
             $relationships = [
-                \totara_core\relationship\resolvers\subject::class,
-                \totara_job\relationship\resolvers\appraiser::class,
-                \totara_job\relationship\resolvers\manager::class,
+                constants::RELATIONSHIP_SUBJECT,
+                constants::RELATIONSHIP_APPRAISER,
+                constants::RELATIONSHIP_MANAGER,
             ];
         }
-        return array_map(function ($class) use ($section) {
-            $rel_id = $this->perfgen->get_core_relationship($class)->id;
+        return array_map(function ($idnumber) use ($section) {
+            $rel_id = $this->perfgen->get_core_relationship($idnumber)->id;
             return section_relationship::create($section->get_id(), $rel_id, true)->core_relationship;
         }, $relationships);
     }

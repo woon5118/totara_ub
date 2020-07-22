@@ -22,13 +22,9 @@
  * @category test
  */
 
-use core\collection;
+use mod_perform\constants;
 use mod_perform\models\activity\activity;
 use mod_perform\models\response\participant_section;
-use totara_core\relationship\relationship;
-use totara_core\relationship\resolvers\subject;
-use totara_job\relationship\resolvers\appraiser;
-use totara_job\relationship\resolvers\manager;
 
 /**
  * @group perform
@@ -118,17 +114,17 @@ class mod_perform_participant_section_model_testcase extends advanced_testcase {
         // Note we are using assertEquals because the ordering matters here.
         self::assertEquals(
             $expected_responses_are_visible_to,
-            $this->get_relationship_resolver_classes($subject_responses_are_visible_to)
+            $subject_responses_are_visible_to->pluck('idnumber')
         );
 
         self::assertEquals(
             $expected_responses_are_visible_to,
-            $this->get_relationship_resolver_classes($manager_responses_are_visible_to)
+            $manager_responses_are_visible_to->pluck('idnumber')
         );
 
         self::assertEquals(
             $expected_responses_are_visible_to,
-            $this->get_relationship_resolver_classes($appraiser_responses_are_visible_to)
+            $appraiser_responses_are_visible_to->pluck('idnumber')
         );
     }
 
@@ -136,16 +132,16 @@ class mod_perform_participant_section_model_testcase extends advanced_testcase {
         return [
             'Responses are not visible to anyone' => [[]],
             'Responses are visible to everyone' => [
-                [subject::class, manager::class, appraiser::class]
+                [constants::RELATIONSHIP_SUBJECT, constants::RELATIONSHIP_MANAGER, constants::RELATIONSHIP_APPRAISER]
             ],
             'Responses are visible to just managers' => [
-                [manager::class]
+                [constants::RELATIONSHIP_MANAGER]
             ],
             'Responses are visible to just appraisers' => [
-                [appraiser::class]
+                [constants::RELATIONSHIP_APPRAISER]
             ],
             'Responses are visible to just subjects' => [
-                [subject::class]
+                [constants::RELATIONSHIP_SUBJECT]
             ],
         ];
     }
@@ -175,16 +171,16 @@ class mod_perform_participant_section_model_testcase extends advanced_testcase {
                 [], false
             ],
             'Responses are visible to everyone' => [
-                [subject::class, manager::class, appraiser::class], true
+                [constants::RELATIONSHIP_SUBJECT, constants::RELATIONSHIP_MANAGER, constants::RELATIONSHIP_APPRAISER], true
             ],
             'Responses are visible to just managers' => [
-                [manager::class], false
+                [constants::RELATIONSHIP_MANAGER], false
             ],
             'Responses are visible to just appraisers' => [
-                [appraiser::class], false
+                [constants::RELATIONSHIP_APPRAISER], false
             ],
             'Responses are visible to just subjects' => [
-                [subject::class], true
+                [constants::RELATIONSHIP_SUBJECT], true
             ],
         ];
     }
@@ -213,20 +209,20 @@ class mod_perform_participant_section_model_testcase extends advanced_testcase {
 
         $manager_section_relationship = $perform_generator->create_section_relationship(
             $section,
-            ['class_name' => manager::class],
-            in_array(manager::class, $expected_responses_are_visible_to, true)
+            ['relationship' => constants::RELATIONSHIP_MANAGER],
+            in_array(constants::RELATIONSHIP_MANAGER, $expected_responses_are_visible_to, true)
         );
 
         $appraiser_section_relationship = $perform_generator->create_section_relationship(
             $section,
-            ['class_name' => appraiser::class],
-            in_array(appraiser::class, $expected_responses_are_visible_to, true)
+            ['relationship' => constants::RELATIONSHIP_APPRAISER],
+            in_array(constants::RELATIONSHIP_APPRAISER, $expected_responses_are_visible_to, true)
         );
 
         $subject_section_relationship = $perform_generator->create_section_relationship(
             $section,
-            ['class_name' => subject::class],
-            in_array(subject::class, $expected_responses_are_visible_to, true)
+            ['relationship' => constants::RELATIONSHIP_SUBJECT],
+            in_array(constants::RELATIONSHIP_SUBJECT, $expected_responses_are_visible_to, true)
         );
 
         $element = $perform_generator->create_element(['title' => 'Question one']);
@@ -257,12 +253,6 @@ class mod_perform_participant_section_model_testcase extends advanced_testcase {
         );
 
         return [$manager_section, $appraiser_section, $subject_section];
-    }
-
-    private function get_relationship_resolver_classes(collection $collection): array {
-        return $collection->map(function (relationship $relationship) {
-            return get_class($relationship->get_resolvers()[0]);
-        })->all();
     }
 
 }

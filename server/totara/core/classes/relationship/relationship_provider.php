@@ -41,11 +41,6 @@ class relationship_provider {
     private $query;
 
     /**
-     * @var bool
-     */
-    private $fetched = false;
-
-    /**
      * @var collection|relationship[]
      */
     private $items;
@@ -53,62 +48,72 @@ class relationship_provider {
     public function __construct() {
         $this->query = relationship_entity::repository()
             ->with('resolvers')
-            ->order_by('component', 'DESC') // Places the non-plugin exclusive relationships at the top
-            ->order_by('id');
+            ->order_by('sort_order');
     }
 
     /**
      * Restrict the returned relationships to ones that are compatible with a plugin.
      *
      * @param string $component
+     * @param bool $include_universal Whether to include relationships compatible with all plugins or not.
      * @return $this
      */
-    public function filter_by_component(string $component): self {
-        if ($this->fetched) {
-            throw new coding_exception('Must call filter_by_component() before calling fetch()');
-        }
+    public function filter_by_component(string $component, bool $include_universal = false): self {
+        $this->query->where('component', $component);
 
-        $this->query
-            ->where('component', $component)
-            ->or_where_null('component');
+        if ($include_universal) {
+            $this->query->or_where_null('component');
+        }
 
         return $this;
     }
 
     /**
-     * Fetch the relationships that are compatible with the specified fieldset.
+     * Restrict the returned relationships by relationship type.
      *
-     * @param string[] $compatible_fields fieldset to check e.g. ['job_assignment_id'] or ['user_id', 'course_id']
+     * @param int $type
      * @return $this
      */
-    public function filter_by_compatible(array $compatible_fields): self {
-        if (!$this->fetched) {
-            throw new coding_exception('Must call fetch() before calling filter_by_compatible()');
+    public function filter_by_type(int $type): self {
+        $accepted_types = [relationship_entity::TYPE_MANUAL, relationship_entity::TYPE_STANDARD];
+
+        if (!in_array($type, $accepted_types, true)) {
+            throw new coding_exception('invalid relationship type');
+        }
+        $this->query->where('type', $type);
+
+        return $this;
+    }
+
+    /**
+     * Restrict the returned relationships to ones that are compatible with any and all plugins.
+     *
+     * @return $this
+     */
+    public function filter_by_universal(): self {
+        $this->query->where_null('component');
+
+        return $this;
+    }
+
+    /**
+     * Get the relationships that are compatible with the specified fieldset.
+     *
+     * @param string[] $compatible_fields fieldset to check e.g. ['job_assignment_id'] or ['user_id', 'course_id']
+     * @return collection|relationship[]
+     */
+    public function get_compatible_relationships(array $compatible_fields): collection {
+        if (!$this->items) {
+            $this->query_relationships();
         }
 
         if (empty($compatible_fields)) {
             throw new coding_exception('Must specify at least one field to filter_by_compatible()');
         }
 
-        $this->items = $this->items->filter(static function (relationship $relationship) use ($compatible_fields) {
+        return $this->items->filter(static function (relationship $relationship) use ($compatible_fields) {
             return $relationship->is_acceptable_input($compatible_fields);
         });
-
-        return $this;
-    }
-
-    /**
-     * Query the data from the database.
-     *
-     * @return $this
-     */
-    public function fetch(): self {
-        $this->items = $this->query
-            ->get()
-            ->map_to(relationship::class);
-        $this->fetched = true;
-
-        return $this;
     }
 
     /**
@@ -117,7 +122,23 @@ class relationship_provider {
      * @return collection|relationship[]
      */
     public function get(): collection {
+        if (!$this->items) {
+            $this->query_relationships();
+        }
+
         return $this->items;
     }
 
+    /**
+     * Query the data from the database.
+     *
+     * @return self
+     */
+    private function query_relationships(): self {
+        $this->items = $this->query
+            ->get()
+            ->map_to(relationship::class);
+
+        return $this;
+    }
 }

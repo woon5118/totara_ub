@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of Totara LMS
  *
  * Copyright (C) 2010 onwards Totara Learning Solutions LTD
@@ -62,8 +62,8 @@ function xmldb_totara_job_upgrade($oldversion) {
     if ($oldversion < 2020070300) {
         require_once($CFG->dirroot . '/totara/core/db/upgradelib.php');
 
-        totara_core_upgrade_create_relationship('totara_job\relationship\resolvers\manager', 'manager');
-        totara_core_upgrade_create_relationship('totara_job\relationship\resolvers\appraiser', 'appraiser');
+        totara_core_upgrade_create_relationship(['totara_job\relationship\resolvers\manager'], 'manager', 2);
+        totara_core_upgrade_create_relationship(['totara_job\relationship\resolvers\appraiser'], 'appraiser', 3);
 
         // Core savepoint reached.
         upgrade_plugin_savepoint(true, 2020070300, 'totara', 'job');

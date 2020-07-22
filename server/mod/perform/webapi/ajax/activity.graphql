@@ -26,6 +26,7 @@ query mod_perform_activity($activity_id: core_id!) {
         core_relationship {
           id
           name
+          sort_order
         }
       }
       section_elements_summary {

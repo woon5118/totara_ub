@@ -76,6 +76,10 @@ type totara_core_relationship {
   """
   type: Int!
   """
+  Order that the relationship should appear in lists.
+  """
+  sort_order: Int!
+  """
   Name of the relationship.
   """
   name(format: core_format = PLAIN): String!

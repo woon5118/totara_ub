@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
@@ -21,12 +21,13 @@
  * @package totara_job
  */
 
+
 function xmldb_totara_job_install() {
     global $CFG;
     require_once($CFG->dirroot . '/totara/core/db/upgradelib.php');
 
-    totara_core_upgrade_create_relationship('totara_job\relationship\resolvers\manager', 'manager');
-    totara_core_upgrade_create_relationship('totara_job\relationship\resolvers\appraiser', 'appraiser');
+    totara_core_upgrade_create_relationship('totara_job\relationship\resolvers\manager', 'manager', 2);
+    totara_core_upgrade_create_relationship('totara_job\relationship\resolvers\appraiser', 'appraiser', 3);
 
     return true;
 }

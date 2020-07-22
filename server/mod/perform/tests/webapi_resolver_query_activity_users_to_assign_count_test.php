@@ -21,8 +21,8 @@
  * @package mod_perform
  */
 
+use mod_perform\constants;
 use mod_perform\state\activity\draft;
-use totara_core\relationship\resolvers\subject;
 use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
@@ -101,7 +101,7 @@ class mod_perform_webapi_resolver_query_activity_users_to_assign_count_testcase 
             $section,
             $generator->create_element()
         );
-        $generator->create_section_relationship($section, ['class_name' => subject::class]);
+        $generator->create_section_relationship($section, ['relationship' => constants::RELATIONSHIP_SUBJECT]);
 
         $track = $generator->create_activity_tracks($activity)->first();
         $user = self::getDataGenerator()->create_user();

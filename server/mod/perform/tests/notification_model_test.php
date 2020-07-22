@@ -22,21 +22,11 @@
  * @category test
  */
 
+use mod_perform\constants;
 use mod_perform\entities\activity\notification as notification_entity;
-use mod_perform\models\activity\activity;
 use mod_perform\models\activity\notification;
-use mod_perform\models\activity\notification_recipient;
-use mod_perform\models\activity\section;
-use mod_perform\models\activity\section_relationship;
-use mod_perform\notification\broker;
-use mod_perform\notification\brokers\instance_created;
 use mod_perform\notification\brokers\overdue;
 use mod_perform\notification\trigger;
-use totara_core\relationship\relationship;
-use totara_core\relationship\relationship_provider;
-use totara_core\relationship\resolvers\subject;
-use totara_job\relationship\resolvers\appraiser;
-use totara_job\relationship\resolvers\manager;
 
 require_once(__DIR__ . '/notification_testcase.php');
 
@@ -94,17 +84,17 @@ class mod_perform_notification_model_testcase extends mod_perform_notification_t
         $section = $this->create_section($activity);
         $notification = notification::create($activity, 'instance_created');
         $this->assertCount(0, $notification->recipients);
-        $this->create_section_relationships($section, [appraiser::class]);
+        $this->create_section_relationships($section, [constants::RELATIONSHIP_APPRAISER]);
         $this->assertCount(1, $notification->recipients);
         foreach ($notification->recipients as $recipient) {
             $this->assertFalse($recipient->active);
         }
-        $this->create_section_relationships($section, [subject::class]);
+        $this->create_section_relationships($section, [constants::RELATIONSHIP_SUBJECT]);
         $this->assertCount(2, $notification->recipients);
         foreach ($notification->recipients as $recipient) {
             $this->assertFalse($recipient->active);
         }
-        $this->create_section_relationships($section, [manager::class]);
+        $this->create_section_relationships($section, [constants::RELATIONSHIP_MANAGER]);
         $this->assertCount(3, $notification->recipients);
         foreach ($notification->recipients as $recipient) {
             $this->assertFalse($recipient->active);
@@ -133,7 +123,7 @@ class mod_perform_notification_model_testcase extends mod_perform_notification_t
     public function test_activate() {
         $activity = $this->create_activity();
         $section = $this->create_section($activity);
-        $this->create_section_relationships($section, [appraiser::class]);
+        $this->create_section_relationships($section, [constants::RELATIONSHIP_APPRAISER]);
         $notification = notification::create($activity, 'instance_created');
         $this->assertFalse($notification->active);
         foreach ($notification->recipients as $recipient) {

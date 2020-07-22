@@ -30,4 +30,11 @@ abstract class constants {
     public const SCHEDULE_REPEATING_AFTER_CREATION = 'AFTER_CREATION';
     public const SCHEDULE_REPEATING_AFTER_CREATION_WHEN_COMPLETE = 'AFTER_CREATION_WHEN_COMPLETE';
     public const SCHEDULE_REPEATING_AFTER_COMPLETION = 'AFTER_COMPLETION';
+
+    public const RELATIONSHIP_SUBJECT = 'subject';
+    public const RELATIONSHIP_MANAGER = 'manager';
+    public const RELATIONSHIP_APPRAISER = 'appraiser';
+    public const RELATIONSHIP_PEER = 'perform_peer';
+    public const RELATIONSHIP_REVIEWER = 'perform_reviewer';
+    public const RELATIONSHIP_MENTOR = 'perform_mentor';
 }

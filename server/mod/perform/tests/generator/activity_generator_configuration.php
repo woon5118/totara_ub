@@ -21,8 +21,8 @@
  * @package mod_perform
  */
 
+use mod_perform\constants;
 use mod_perform\state\activity\active;
-use totara_core\relationship\resolvers\subject;
 
 /**
  * This class just holds the configuration needed to create full activities.
@@ -57,7 +57,7 @@ class mod_perform_activity_generator_configuration {
      *
      * @var string[]
      */
-    private $relationships_per_section = [subject::class];
+    private $relationships_per_section = [constants::RELATIONSHIP_SUBJECT];
 
     /**
      * The number of elements that should be created per section.
@@ -190,6 +190,7 @@ class mod_perform_activity_generator_configuration {
     }
 
     /**
+     * Get relationship idnumbers
      * @return array
      */
     public function get_relationships_per_section(): array {
@@ -197,11 +198,11 @@ class mod_perform_activity_generator_configuration {
     }
 
     /**
-     * @param array $relationship_classes
+     * @param array $relationship_idnumber
      * @return $this
      */
-    public function set_relationships_per_section(array $relationship_classes): self {
-        $this->relationships_per_section = $relationship_classes;
+    public function set_relationships_per_section(array $relationship_idnumber): self {
+        $this->relationships_per_section = $relationship_idnumber;
 
         return $this;
     }

@@ -52,15 +52,12 @@ class composer {
      * @return boolean
      */
     public function set_relationship(relationship $relationship): bool {
-        $resolvers = $relationship->get_resolvers();
-        if (empty($resolvers)) {
+        $resolver_idnumber = $relationship->idnumber;
+        if (empty($resolver_idnumber)) {
             $this->lang_key_prefix = null;
             return false;
         }
-        // ?? The first element ?? That's what relationship::get_name() does...
-        $resolverclass = $resolvers[0];
-        $resolvername = preg_replace('/^.*\\\\/', '', $resolverclass);
-        $this->lang_key_prefix = 'template_' .  $this->class_key . '_' . $resolvername . '_';
+        $this->lang_key_prefix = 'template_' .  $this->class_key . '_' . $resolver_idnumber . '_';
         return true;
     }
 

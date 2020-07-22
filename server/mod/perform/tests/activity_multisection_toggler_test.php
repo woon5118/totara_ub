@@ -23,14 +23,13 @@
 
 require_once(__DIR__ . '/generator/activity_generator_configuration.php');
 
+use mod_perform\constants;
 use mod_perform\entities\activity\section as section_entity;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\activity_setting;
 use mod_perform\models\activity\section_element;
 use mod_perform\models\activity\helpers\activity_multisection_toggler;
-
 use mod_perform\state\activity\draft;
-use totara_core\relationship\resolvers\subject;
 
 /**
  * @coversDefaultClass activity_multisection_toggler.
@@ -347,7 +346,7 @@ class mod_perform_activity_multisection_toggler_testcase extends advanced_testca
                 section_element::create($section, $element, $j);
             }
 
-            $generator->create_section_relationship($section, ['class_name' => subject::class]);
+            $generator->create_section_relationship($section, ['relationship' => constants::RELATIONSHIP_SUBJECT]);
         }
 
         return $activity->refresh(true);
@@ -400,7 +399,7 @@ class mod_perform_activity_multisection_toggler_testcase extends advanced_testca
             ->set_number_of_activities(1)
             ->set_number_of_sections_per_activity($no_of_sections)
             ->set_number_of_elements_per_section($elements_per_section)
-            ->set_relationships_per_section([subject::class])
+            ->set_relationships_per_section([constants::RELATIONSHIP_SUBJECT])
             ->disable_user_assignments()
             ->disable_subject_instances();
 

@@ -103,8 +103,7 @@ class manual_participant_selection_instances implements query_resolver, has_midd
         // Make sure the relationships are ordered correctly.
         foreach ($selection_instances as $selection_instance) {
             usort($selection_instance->manual_relationships, static function (relationship $a, relationship $b) {
-                // TODO: Change this to be ordered by sort_order once TL-26143 is merged.
-                return $a->id <=> $b->id;
+                return $a->sort_order <=> $b->sort_order;
             });
         }
 

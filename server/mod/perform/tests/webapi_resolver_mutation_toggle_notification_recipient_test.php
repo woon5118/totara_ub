@@ -22,6 +22,7 @@
  */
 
 use core\orm\query\exceptions\record_not_found_exception;
+use mod_perform\constants;
 use mod_perform\models\activity\activity as activity_model;
 use mod_perform\models\activity\notification as notification_model;
 use mod_perform\models\activity\section_relationship;
@@ -60,7 +61,7 @@ class mod_perform_webapi_resolver_mutation_toggle_notification_recipient_testcas
 
         $activity = $notification->get_activity();
         $section = $perform_generator->create_section($activity);
-        $rel_id = $perform_generator->get_core_relationship(subject::class)->id;
+        $rel_id = $perform_generator->get_core_relationship(constants::RELATIONSHIP_SUBJECT)->id;
         return section_relationship::create($section->get_id(), $rel_id, true)->core_relationship;
     }
 

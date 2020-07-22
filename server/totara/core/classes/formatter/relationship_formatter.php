@@ -41,9 +41,11 @@ class relationship_formatter extends entity_model_formatter {
     protected function get_map(): array {
         return [
             'id' => null,
+            'type' => null,
             'idnumber' => string_field_formatter::class,
             'name' => string_field_formatter::class,
             'name_plural' => string_field_formatter::class,
+            'sort_order' => null,
             'created_at' => date_field_formatter::class,
             'type' => null,
         ];

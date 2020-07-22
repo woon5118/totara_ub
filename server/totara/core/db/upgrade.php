@@ -1239,41 +1239,65 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020072700, 'totara', 'core');
     }
 
-    if ($oldversion < 2020072703) {
+    if ($oldversion < 2020072704) {
 
         // Define field type to be added to totara_core_relationship.
         $table = new xmldb_table('totara_core_relationship');
-        $field = new xmldb_field('component', XMLDB_TYPE_CHAR, '100', null, null, null, null, 'type');
-        // Conditionally launch add field type.
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
 
+        // Conditionally add field type.
         $field = new xmldb_field('type', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'created_at');
-        // Conditionally launch add field component.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
 
-        // Define field idnumber to be added to totara_core_relationship.
+        // Conditionally add field component.
+        $field = new xmldb_field('component', XMLDB_TYPE_CHAR, '100', null, null, null, null, 'type');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Conditionally add field sort_order.
+        $field = new xmldb_field('sort_order', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '1', 'created_at');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Conditionally add field idnumber.
         $field = new xmldb_field('idnumber', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, 'id');
-
-        // Conditionally launch add field idnumber.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
 
-        $index = new xmldb_index('idnumber', XMLDB_INDEX_UNIQUE, array('idnumber'));
+        // Update existing relationships with idnumber
+        // Only subject, appraiser & manager should exist at this point and have 1 resolver each.
+        $existing_resolvers = $DB->get_records('totara_core_relationship_resolver');
 
-        // Conditionally launch add index idnumber.
+        foreach ($existing_resolvers as $existing_resolver) {
+            $data = explode('\\', $existing_resolver->class_name);
+            $idnumber = end($data);
+            $relationship_data = [
+                'id' => $existing_resolver->relationship_id,
+                'idnumber' => $idnumber
+            ];
+            $DB->update_record('totara_core_relationship', $relationship_data);
+        }
+
+        // Conditionally add index sort_order.
+        $index = new xmldb_index('sort_order', XMLDB_INDEX_NOTUNIQUE, array('sort_order'));
         if (!$dbman->index_exists($table, $index)) {
             $dbman->add_index($table, $index);
         }
 
-        totara_core_upgrade_create_relationship('totara_core\relationship\resolvers\subject', 'subject');
+        // Conditionally add index idnumber.
+        $index = new xmldb_index('idnumber', XMLDB_INDEX_UNIQUE, array('idnumber'));
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        totara_core_upgrade_create_relationship(['totara_core\relationship\resolvers\subject'], 'subject', 1);
 
         // Core savepoint reached.
-        upgrade_plugin_savepoint(true, 2020072703, 'totara', 'core');
+        upgrade_plugin_savepoint(true, 2020072704, 'totara', 'core');
     }
 
     return true;

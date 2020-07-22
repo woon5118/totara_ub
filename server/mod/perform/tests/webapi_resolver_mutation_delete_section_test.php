@@ -21,12 +21,10 @@
  * @package mod_perform
  */
 
+use mod_perform\constants;
 use mod_perform\state\activity\active;
 use mod_perform\state\activity\draft;
 use mod_perform\webapi\resolver\mutation\delete_section;
-use totara_core\relationship\resolvers\subject;
-use totara_job\relationship\resolvers\appraiser;
-use totara_job\relationship\resolvers\manager;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
@@ -219,11 +217,11 @@ class mod_perform_webapi_resolver_mutation_delete_section_testcase extends advan
         // Two relationships for activity 1, section 1
         $data->activity1_section1_relationship1 = $perform_generator->create_section_relationship(
             $data->activity1_section1,
-            ['class_name' => appraiser::class]
+            ['relationship' => constants::RELATIONSHIP_APPRAISER]
         );
         $data->activity1_section1_relationship2 = $perform_generator->create_section_relationship(
             $data->activity1_section1,
-            ['class_name' => manager::class]
+            ['relationship' => constants::RELATIONSHIP_MANAGER]
         );
 
         // Participant section
@@ -245,13 +243,13 @@ class mod_perform_webapi_resolver_mutation_delete_section_testcase extends advan
         // One relationship for activity 1, section 2
         $data->activity1_section2_relationship1 = $perform_generator->create_section_relationship(
             $data->activity1_section2,
-            ['class_name' => subject::class]
+            ['relationship' => constants::RELATIONSHIP_SUBJECT]
         );
 
         // One relationship for activity 2's first section.
         $data->activity2_section1_relationship1 = $perform_generator->create_section_relationship(
             $data->activity2_section1,
-            ['class_name' => subject::class]
+            ['relationship' => constants::RELATIONSHIP_SUBJECT]
         );
 
         return $data;

@@ -22,6 +22,7 @@
  * @category test
  */
 
+use mod_perform\constants;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\entities\activity\section_relationship;
@@ -32,11 +33,8 @@ use mod_perform\entities\activity\track_user_assignment as track_user_assignment
 use mod_perform\models\activity\track_status;
 use mod_perform\models\activity\track_assignment_type;
 use mod_perform\user_groups\grouping;
-use totara_core\relationship\resolvers\subject;
 use totara_job\entities\job_assignment as job_assignment_entity;
 use totara_job\job_assignment;
-use totara_job\relationship\resolvers\appraiser;
-use totara_job\relationship\resolvers\manager;
 
 /**
  * @coversDefaultClass mod_perform_generator.
@@ -137,7 +135,7 @@ class mod_perform_generator_testcase extends advanced_testcase {
         $actual_activity_entity = $activities_in_db->first();
         $this->assertEquals($expected_activity->id, $actual_activity_entity->id);
         $this->assertEquals($expected_activity->type->id, $actual_activity_entity->type_id);
-        $this->assertfalse($actual_activity_entity->anonymous_responses);
+        $this->assertFalse($actual_activity_entity->anonymous_responses);
 
         // Assert that there is the expected amount of tracks in the database
         $tracks_in_db = track_entity::repository()->get();
@@ -194,7 +192,7 @@ class mod_perform_generator_testcase extends advanced_testcase {
             ->set_cohort_assignments_per_activity(4)
             ->set_number_of_users_per_user_group_type(5)
             ->enable_appraiser_for_each_subject_user()
-            ->set_relationships_per_section([subject::class, manager::class, appraiser::class]);
+            ->set_relationships_per_section([constants::RELATIONSHIP_SUBJECT, constants::RELATIONSHIP_MANAGER, constants::RELATIONSHIP_APPRAISER]);
 
         $activities = $generator->create_full_activities($configuration);
         $this->assertEquals(3, count($activities));
@@ -308,7 +306,7 @@ class mod_perform_generator_testcase extends advanced_testcase {
         $configuration = mod_perform_activity_generator_configuration::new()
             ->set_number_of_activities(2)
             ->set_number_of_users_per_user_group_type(2)
-            ->set_relationships_per_section([subject::class, manager::class, appraiser::class])
+            ->set_relationships_per_section([constants::RELATIONSHIP_SUBJECT, constants::RELATIONSHIP_MANAGER, constants::RELATIONSHIP_APPRAISER])
             ->enable_manager_for_each_subject_user()
             ->enable_appraiser_for_each_subject_user();
 

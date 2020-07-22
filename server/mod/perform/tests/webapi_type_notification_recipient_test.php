@@ -23,7 +23,7 @@
  */
 
 use core\format;
-use totara_core\relationship\resolvers\subject;
+use mod_perform\constants;
 use mod_perform\models\activity\notification as notification_model;
 use mod_perform\models\activity\notification_recipient as recipient_model;
 use mod_perform\models\activity\section_relationship;
@@ -50,7 +50,7 @@ class mod_perform_webapi_type_notification_recipient_testcase extends advanced_t
 
         $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
 
-        $subject_id = $perform_generator->get_core_relationship(subject::class)->id;
+        $subject_id = $perform_generator->get_core_relationship(constants::RELATIONSHIP_SUBJECT)->id;
 
         $activity = $perform_generator->create_activity_in_container();
         $context = $activity->get_context();

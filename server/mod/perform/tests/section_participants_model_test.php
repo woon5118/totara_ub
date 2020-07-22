@@ -23,6 +23,7 @@
  */
 
 use core\collection;
+use mod_perform\constants;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 use mod_perform\expand_task;
 use mod_perform\models\activity\section_element;
@@ -30,10 +31,7 @@ use mod_perform\models\activity\subject_instance;
 use mod_perform\models\response\participant_section;
 use mod_perform\models\response\section_participants;
 use mod_perform\task\service\subject_instance_creation;
-use totara_core\relationship\resolvers\subject;
 use totara_job\job_assignment;
-use totara_job\relationship\resolvers\appraiser;
-use totara_job\relationship\resolvers\manager;
 
 /**
  * @coversDefaultClass section_participants.
@@ -65,7 +63,7 @@ class mod_perform_section_participants_model_testcase extends advanced_testcase 
             foreach ($participant_sections as $participant_section) {
                 $this->assertInstanceOf(participant_section::class, $participant_section);
                 $user_id = $participant_section->participant_instance->participant_id;
-                $relationship = $participant_section->participant_instance->core_relationship->name;
+                $relationship = $participant_section->participant_instance->core_relationship->idnumber;
 
                 $expected = $relationships->item($user_id) ?? null;
                 $this->assertNotNull($expected, 'unknown participant in mapping');
@@ -117,9 +115,9 @@ class mod_perform_section_participants_model_testcase extends advanced_testcase 
         );
 
         $relationships = [
-            subject::class => $subject,
-            manager::class => $mgr,
-            appraiser::class => $appr
+           constants::RELATIONSHIP_SUBJECT => $subject,
+           constants::RELATIONSHIP_MANAGER => $mgr,
+           constants::RELATIONSHIP_APPRAISER => $appr
         ];
 
         $sections = collection::new([]);
@@ -127,8 +125,8 @@ class mod_perform_section_participants_model_testcase extends advanced_testcase 
             $section = $generator->create_section($activity, ['title' => "section#$i"]);
             $sections->set($section, $section->id);
 
-            foreach (array_keys($relationships) as $resolver) {
-                $generator->create_section_relationship($section, ['class_name' => $resolver]);
+            foreach (array_keys($relationships) as $relationship) {
+                $generator->create_section_relationship($section, ['relationship' => $relationship]);
                 section_element::create($section, $generator->create_element());
             }
         }
@@ -143,8 +141,8 @@ class mod_perform_section_participants_model_testcase extends advanced_testcase 
             ->first();
 
         $users_by_relationships = collection::new([]);
-        foreach ($relationships as $resolver => $user) {
-            $users_by_relationships->set($resolver::get_name(), $user->id);
+        foreach ($relationships as $relationship => $user) {
+            $users_by_relationships->set($relationship, $user->id);
         }
 
         return [$sections, $subject_instance, $users_by_relationships];

@@ -22,11 +22,9 @@
  */
 
 use core\orm\query\exceptions\record_not_found_exception;
+use mod_perform\constants;
 use mod_perform\entities\activity\section;
 use mod_perform\models\activity\section_relationship;
-use totara_core\relationship\resolvers\subject;
-use totara_job\relationship\resolvers\appraiser;
-use totara_job\relationship\resolvers\manager;
 
 require_once(__DIR__.'/relationship_testcase.php');
 
@@ -60,7 +58,7 @@ class mod_perform_section_relationship_model_testcase extends mod_perform_relati
 
         section_relationship::create(
             $non_existent_section_id,
-            $this->perform_generator()->get_core_relationship(subject::class)->id,
+            $this->perform_generator()->get_core_relationship(constants::RELATIONSHIP_SUBJECT)->id,
             true
         );
     }
@@ -68,7 +66,7 @@ class mod_perform_section_relationship_model_testcase extends mod_perform_relati
     public function test_create_missing_capability() {
         $this->setAdminUser();
         $perform_generator = $this->perform_generator();
-        $subject_id = $perform_generator->get_core_relationship(subject::class)->id;
+        $subject_id = $perform_generator->get_core_relationship(constants::RELATIONSHIP_SUBJECT)->id;
         $activity1 = $perform_generator->create_activity_in_container();
         $section1 = $perform_generator->create_section($activity1);
 
@@ -88,9 +86,9 @@ class mod_perform_section_relationship_model_testcase extends mod_perform_relati
     public function test_create_successful() {
         $this->setAdminUser();
         $perform_generator = $this->perform_generator();
-        $subject_id = $perform_generator->get_core_relationship(subject::class)->id;
-        $manager_id = $perform_generator->get_core_relationship(manager::class)->id;
-        $appraiser_id = $perform_generator->get_core_relationship(appraiser::class)->id;
+        $subject_id = $perform_generator->get_core_relationship(constants::RELATIONSHIP_SUBJECT)->id;
+        $manager_id = $perform_generator->get_core_relationship(constants::RELATIONSHIP_MANAGER)->id;
+        $appraiser_id = $perform_generator->get_core_relationship(constants::RELATIONSHIP_APPRAISER)->id;
         $activity1 = $perform_generator->create_activity_in_container();
         $activity2 = $perform_generator->create_activity_in_container();
         $section1 = $perform_generator->create_section($activity1);
@@ -106,7 +104,7 @@ class mod_perform_section_relationship_model_testcase extends mod_perform_relati
         );
         $this->assertInstanceOf(section_relationship::class, $section_relationship);
         $this->assertEquals($section1->get_id(), $section_relationship->section_id);
-        $this->assert_section_relationships($section1, [subject::class]);
+        $this->assert_section_relationships($section1, [constants::RELATIONSHIP_SUBJECT]);
         $this->assert_section_relationships($section2, []);
 
         // Try to create the same - nothing should change.
@@ -115,7 +113,7 @@ class mod_perform_section_relationship_model_testcase extends mod_perform_relati
             $subject_id,
             true
         );
-        $this->assert_section_relationships($section1, [subject::class]);
+        $this->assert_section_relationships($section1, [constants::RELATIONSHIP_SUBJECT]);
         $this->assert_section_relationships($section2, []);
 
         // Add another one to the same section.
@@ -124,7 +122,7 @@ class mod_perform_section_relationship_model_testcase extends mod_perform_relati
             $manager_id,
             true
         );
-        $this->assert_section_relationships($section1, [subject::class, manager::class]);
+        $this->assert_section_relationships($section1, [constants::RELATIONSHIP_SUBJECT, constants::RELATIONSHIP_MANAGER]);
         $this->assert_section_relationships($section2, []);
 
         // Add another one to the other section.
@@ -133,13 +131,13 @@ class mod_perform_section_relationship_model_testcase extends mod_perform_relati
             $appraiser_id,
             true
         );
-        $this->assert_section_relationships($section1, [subject::class, manager::class]);
-        $this->assert_section_relationships($section2, [appraiser::class]);
+        $this->assert_section_relationships($section1, [constants::RELATIONSHIP_SUBJECT, constants::RELATIONSHIP_MANAGER]);
+        $this->assert_section_relationships($section2, [constants::RELATIONSHIP_APPRAISER]);
     }
 
     public function test_delete_invalid_section_id() {
         $this->setAdminUser();
-        $subject_id = $this->perform_generator()->get_core_relationship(subject::class)->id;
+        $subject_id = $this->perform_generator()->get_core_relationship(constants::RELATIONSHIP_SUBJECT)->id;
         $non_existent_section_id = 1234;
         while (section::repository()->where('id', $non_existent_section_id)->exists()) {
             $non_existent_section_id ++;
@@ -152,7 +150,7 @@ class mod_perform_section_relationship_model_testcase extends mod_perform_relati
     public function test_delete_missing_capability() {
         $this->setAdminUser();
         $perform_generator = $this->perform_generator();
-        $subject = $perform_generator->get_core_relationship(subject::class)->id;
+        $subject = $perform_generator->get_core_relationship(constants::RELATIONSHIP_SUBJECT)->id;
         $activity1 = $perform_generator->create_activity_in_container();
         $section1 = $perform_generator->create_section($activity1);
 
@@ -169,7 +167,7 @@ class mod_perform_section_relationship_model_testcase extends mod_perform_relati
         $this->setAdminUser();
         /** @var mod_perform_generator $perform_generator */
         $perform_generator = $this->perform_generator();
-        $appraiser_id = $perform_generator->get_core_relationship(appraiser::class)->id;
+        $appraiser_id = $perform_generator->get_core_relationship(constants::RELATIONSHIP_APPRAISER)->id;
         $activity1 = $perform_generator->create_activity_in_container();
         $activity2 = $perform_generator->create_activity_in_container();
         $section1 = $perform_generator->create_section($activity1);
@@ -178,19 +176,19 @@ class mod_perform_section_relationship_model_testcase extends mod_perform_relati
         $this->assert_section_relationships($section1, []);
         $this->assert_section_relationships($section2, []);
 
-        $perform_generator->create_section_relationship($section1, ['class_name' => manager::class]);
-        $perform_generator->create_section_relationship($section1, ['class_name' => subject::class]);
-        $perform_generator->create_section_relationship($section1, ['class_name' => appraiser::class]);
-        $perform_generator->create_section_relationship($section2, ['class_name' => appraiser::class]);
-        $this->assert_section_relationships($section1, [manager::class, subject::class, appraiser::class]);
-        $this->assert_section_relationships($section2, [appraiser::class]);
+        $perform_generator->create_section_relationship($section1, ['relationship' => constants::RELATIONSHIP_MANAGER]);
+        $perform_generator->create_section_relationship($section1, ['relationship' => constants::RELATIONSHIP_SUBJECT]);
+        $perform_generator->create_section_relationship($section1, ['relationship' => constants::RELATIONSHIP_APPRAISER]);
+        $perform_generator->create_section_relationship($section2, ['relationship' => constants::RELATIONSHIP_APPRAISER]);
+        $this->assert_section_relationships($section1, [constants::RELATIONSHIP_MANAGER, constants::RELATIONSHIP_SUBJECT, constants::RELATIONSHIP_APPRAISER]);
+        $this->assert_section_relationships($section2, [constants::RELATIONSHIP_APPRAISER]);
 
         section_relationship::delete_with_properties($section1->get_id(), $appraiser_id);
-        $this->assert_section_relationships($section1, [manager::class, subject::class]);
-        $this->assert_section_relationships($section2, [appraiser::class]);
+        $this->assert_section_relationships($section1, [constants::RELATIONSHIP_MANAGER, constants::RELATIONSHIP_SUBJECT]);
+        $this->assert_section_relationships($section2, [constants::RELATIONSHIP_APPRAISER]);
 
         section_relationship::delete_with_properties($section2->get_id(), $appraiser_id);
-        $this->assert_section_relationships($section1, [manager::class, subject::class]);
+        $this->assert_section_relationships($section1, [constants::RELATIONSHIP_MANAGER, constants::RELATIONSHIP_SUBJECT]);
         $this->assert_section_relationships($section2, []);
     }
 }

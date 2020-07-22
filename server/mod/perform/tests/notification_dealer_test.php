@@ -22,13 +22,11 @@
  * @category test
  */
 
+use mod_perform\constants;
 use mod_perform\entities\activity\notification_message as notification_message_entity;
 use mod_perform\models\activity\notification_recipient;
 use mod_perform\notification\factory;
 use totara_job\job_assignment;
-use totara_core\relationship\resolvers\subject;
-use totara_job\relationship\resolvers\appraiser;
-use totara_job\relationship\resolvers\manager;
 
 require_once(__DIR__ . '/notification_testcase.php');
 
@@ -47,9 +45,9 @@ class mod_perform_notification_dealer_testcase extends mod_perform_notification_
         job_assignment::create_default($manager->id, ['managerjaid' => $userja->id]);
 
         $this->toggle_recipients($notification, [
-            subject::class => true,
+            constants::RELATIONSHIP_SUBJECT => true,
             // manager::class => default to false,
-            appraiser::class => true,
+            constants::RELATIONSHIP_APPRAISER => true,
         ]);
         $recipients = notification_recipient::load_by_notification($notification, true);
         $this->assertCount(2, $recipients);
@@ -80,15 +78,24 @@ class mod_perform_notification_dealer_testcase extends mod_perform_notification_
         $entities = notification_message_entity::repository()->get();
         $this->assertCount(2, $entities);
 
-        $entity = $entities->find('core_relationship_id', $this->perfgen->get_core_relationship(subject::class)->id);
+        $entity = $entities->find(
+            'core_relationship_id',
+            $this->perfgen->get_core_relationship(constants::RELATIONSHIP_SUBJECT)->id
+        );
         /** @var notification_message_entity $entity */
         $this->assertNotNull($entity);
         $this->assertEqualsWithDelta($time, $entity->sent_at, 2);
 
-        $entity = $entities->find('core_relationship_id', $this->perfgen->get_core_relationship(manager::class)->id);
+        $entity = $entities->find(
+            'core_relationship_id',
+            $this->perfgen->get_core_relationship(constants::RELATIONSHIP_MANAGER)->id
+        );
         $this->assertNull($entity);
 
-        $entity = $entities->find('core_relationship_id', $this->perfgen->get_core_relationship(appraiser::class)->id);
+        $entity = $entities->find(
+            'core_relationship_id',
+            $this->perfgen->get_core_relationship(constants::RELATIONSHIP_APPRAISER)->id
+        );
         /** @var notification_message_entity $entity */
         $this->assertNotNull($entity);
         $this->assertEqualsWithDelta($time, $entity->sent_at, 2);

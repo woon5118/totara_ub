@@ -40,7 +40,7 @@ class totara_core_relationship_upgrade_testcase extends \advanced_testcase {
         $this->assertEquals(0, relationship_entity::repository()->count());
         $this->assertEquals(0, relationship_resolver::repository()->count());
 
-        totara_core_upgrade_create_relationship(subject::class, 'subject');
+        totara_core_upgrade_create_relationship(subject::class, 'subject', 1);
 
         $this->assertEquals(1, relationship_entity::repository()->count());
         $this->assertEquals(1, relationship_resolver::repository()->count());

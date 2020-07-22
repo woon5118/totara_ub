@@ -22,6 +22,7 @@
  * @category test
  */
 
+use mod_perform\constants;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\event\participant_instance_availability_closed;
 use mod_perform\event\participant_instance_progress_updated;
@@ -36,8 +37,6 @@ use mod_perform\state\participant_instance\not_started;
 use mod_perform\state\participant_instance\open;
 use mod_perform\state\participant_instance\participant_instance_availability as participant_instance_availability_state;
 use mod_perform\state\state;
-use totara_core\relationship\resolvers\subject;
-use totara_job\relationship\resolvers\manager;
 
 require_once(__DIR__ . '/state_testcase.php');
 
@@ -180,8 +179,8 @@ class mod_perform_participant_instance_availability_testcase extends state_testc
             'subject_user_id' => $user1->id,
         ]);
 
-        $subject_relationship_id = $generator->get_core_relationship(subject::class)->id;
-        $manager_relationship_id = $generator->get_core_relationship(manager::class)->id;
+        $subject_relationship_id = $generator->get_core_relationship(constants::RELATIONSHIP_SUBJECT)->id;
+        $manager_relationship_id = $generator->get_core_relationship(constants::RELATIONSHIP_MANAGER)->id;
 
         $participant1_entity = $generator->create_participant_instance($user1, $subject_instance->id, $subject_relationship_id);
         $participant2_entity = $generator->create_participant_instance($user2, $subject_instance->id, $manager_relationship_id);

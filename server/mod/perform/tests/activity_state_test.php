@@ -21,13 +21,13 @@
  * @package mod_perform
  */
 
+use mod_perform\constants;
 use mod_perform\event\activity_activated;
 use mod_perform\models\activity\activity;
 use mod_perform\state\activity\active;
 use mod_perform\state\activity\draft;
 use mod_perform\state\activity\activity_state;
 use mod_perform\state\state_helper;
-use totara_job\relationship\resolvers\manager;
 
 /**
  * @group perform
@@ -159,7 +159,7 @@ class mod_perform_activity_state_testcase extends advanced_testcase {
         // Same with a section relationship
         $perform_generator->create_section_relationship(
             $section,
-            ['class_name' => manager::class]
+            ['relationship' => constants::RELATIONSHIP_MANAGER]
         );
 
         $invalid_draft_activity->refresh(true);
@@ -276,7 +276,7 @@ class mod_perform_activity_state_testcase extends advanced_testcase {
 
         $perform_generator->create_section_relationship(
             $section,
-            ['class_name' => manager::class]
+            ['relationship' => constants::RELATIONSHIP_MANAGER]
         );
 
         $element = $perform_generator->create_element(['title' => 'Question one', 'plugin_name' => $element_plugin_name]);

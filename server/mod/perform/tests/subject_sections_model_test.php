@@ -24,17 +24,14 @@
 
 use core\collection;
 
+use mod_perform\constants;
 use mod_perform\expand_task;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 use mod_perform\models\activity\section_element;
 use mod_perform\models\activity\subject_instance;
 use mod_perform\models\response\subject_sections;
 use mod_perform\task\service\subject_instance_creation;
-
-use totara_core\relationship\resolvers\subject;
 use totara_job\job_assignment;
-use totara_job\relationship\resolvers\appraiser;
-use totara_job\relationship\resolvers\manager;
 
 /**
  * @coversDefaultClass subject_sections.
@@ -95,18 +92,17 @@ class mod_perform_subject_sections_model_testcase extends advanced_testcase {
         );
 
         $relationships = [
-            subject::class => $subject,
-            manager::class =>  $mgr,
-            appraiser::class => $appr
+            constants::RELATIONSHIP_SUBJECT => $subject,
+            constants::RELATIONSHIP_MANAGER =>  $mgr,
+            constants::RELATIONSHIP_APPRAISER => $appr
         ];
 
         $cohort = $base_generator->create_cohort();
         cohort_add_member($cohort->id, $subject->id);
 
-        $resolvers = array_keys($relationships);
         $sections = collection::new([]);
         for ($i =  0; $i < $no_of_activities; $i++) {
-            $sections = $this->create_activity($sections, $cohort->id, $resolvers, $no_of_sections);
+            $sections = $this->create_activity($sections, $cohort->id, array_keys($relationships), $no_of_sections);
         }
 
         (new expand_task())->expand_all();
@@ -127,7 +123,7 @@ class mod_perform_subject_sections_model_testcase extends advanced_testcase {
      * @param collection|section[] $sections mapping of existing section ids to
      *        sections.
      * @param int $cohort_id identifies the cohort to assign to the activity.
-     * @param array $relationships list of relationship resolvers to use when
+     * @param array $relationships list of relationships to use when
      *        assignment participants.
      * @param int $no_of_sections no of sections to generate.
      *
@@ -157,7 +153,7 @@ class mod_perform_subject_sections_model_testcase extends advanced_testcase {
             $sections->set($section, $section->id);
 
             foreach ($relationships as $relationship) {
-                $generator->create_section_relationship($section, ['class_name' => $relationship]);
+                $generator->create_section_relationship($section, ['relationship' => $relationship]);
                 section_element::create($section, $generator->create_element());
             }
         }

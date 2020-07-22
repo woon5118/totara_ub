@@ -22,10 +22,9 @@
  * @category test
  */
 
+use mod_perform\constants;
 use mod_perform\models\activity\notification;
 use mod_perform\models\activity\notification_recipient;
-use totara_core\relationship\resolvers\subject;
-use totara_job\relationship\resolvers\appraiser;
 
 require_once(__DIR__ . '/notification_testcase.php');
 
@@ -58,7 +57,10 @@ class mod_perform_notification_recipient_model_testcase extends mod_perform_noti
         $activity = $this->create_activity();
         $section = $this->create_section($activity);
         $notification = notification::create($activity, 'instance_created');
-        $relationships = $this->create_section_relationships($section, [subject::class, appraiser::class]);
+        $relationships = $this->create_section_relationships(
+            $section,
+            [constants::RELATIONSHIP_SUBJECT, constants::RELATIONSHIP_APPRAISER]
+        );
         notification_recipient::create($notification, $relationships[0], false);
 
         $this->assertCount(2, notification_recipient::load_by_notification($notification, false));

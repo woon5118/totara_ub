@@ -22,6 +22,7 @@
  */
 
 use core\collection;
+use mod_perform\constants;
 use mod_perform\entities\activity\participant_instance;
 use mod_perform\entities\activity\subject_instance;
 use mod_perform\entities\activity\track_user_assignment;
@@ -31,8 +32,6 @@ use mod_perform\task\service\participant_instance_creation;
 use mod_perform\task\service\subject_instance_creation;
 use mod_perform\task\service\subject_instance_dto;
 use totara_job\job_assignment;
-use totara_job\relationship\resolvers\appraiser;
-use totara_job\relationship\resolvers\manager;
 
 /**
  * Class participant_instance_creation_service_test
@@ -291,8 +290,8 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
         $this->setAdminUser();
         $this->users_per_relationship = 2;
         $this->core_relationships = [
-            appraiser::class,
-            manager::class,
+            constants::RELATIONSHIP_APPRAISER,
+            constants::RELATIONSHIP_MANAGER,
         ];
     }
 
@@ -316,10 +315,10 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
             ['title' => 'Test section for activity ' . $identifier]
         );
 
-        foreach ($this->core_relationships as $relationship_class) {
+        foreach ($this->core_relationships as $relationship) {
             $generator->create_section_relationship(
                 $activity_tree->section,
-                ['class_name' => $relationship_class]
+                ['relationship' => $relationship]
             );
         }
 

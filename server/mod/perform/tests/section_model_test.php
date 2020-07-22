@@ -22,13 +22,11 @@
  * @package mod_perform
  */
 
+use mod_perform\constants;
 use mod_perform\models\activity\section_element;
 use mod_perform\models\activity\section;
 use mod_perform\state\activity\active;
 use mod_perform\state\activity\draft;
-use totara_core\relationship\resolvers\subject;
-use totara_job\relationship\resolvers\appraiser;
-use totara_job\relationship\resolvers\manager;
 
 require_once(__DIR__.'/relationship_testcase.php');
 
@@ -147,9 +145,9 @@ class mod_perform_section_model_testcase extends mod_perform_relationship_testca
         $this->assert_section_relationships($section1, []);
         $this->assert_section_relationships($section2, []);
 
-        $appraiser_relationship = $perform_generator->get_core_relationship(appraiser::class);
-        $manager_relationship = $perform_generator->get_core_relationship(manager::class);
-        $subject_relationship = $perform_generator->get_core_relationship(subject::class);
+        $appraiser_relationship = $perform_generator->get_core_relationship(constants::RELATIONSHIP_APPRAISER);
+        $manager_relationship = $perform_generator->get_core_relationship(constants::RELATIONSHIP_MANAGER);
+        $subject_relationship = $perform_generator->get_core_relationship(constants::RELATIONSHIP_SUBJECT);
 
         // Add three relationships to section1.
         $returned_section = $section1->update_relationships(
@@ -169,7 +167,7 @@ class mod_perform_section_model_testcase extends mod_perform_relationship_testca
             ]
         );
         $this->assertEquals($section1, $returned_section);
-        $this->assert_section_relationships($section1, [appraiser::class, manager::class, subject::class]);
+        $this->assert_section_relationships($section1, [constants::RELATIONSHIP_APPRAISER, constants::RELATIONSHIP_MANAGER, constants::RELATIONSHIP_SUBJECT]);
         $this->assert_section_relationships($section2, []);
 
         // Remove one relationship.
@@ -185,7 +183,7 @@ class mod_perform_section_model_testcase extends mod_perform_relationship_testca
                 ]
             ]
         );
-        $this->assert_section_relationships($section1, [appraiser::class, manager::class]);
+        $this->assert_section_relationships($section1, [constants::RELATIONSHIP_APPRAISER, constants::RELATIONSHIP_MANAGER]);
         $this->assert_section_relationships($section2, []);
 
         // Add to section2.
@@ -201,13 +199,13 @@ class mod_perform_section_model_testcase extends mod_perform_relationship_testca
                 ]
             ]
         );
-        $this->assert_section_relationships($section1, [appraiser::class, manager::class]);
-        $this->assert_section_relationships($section2, [manager::class, subject::class]);
+        $this->assert_section_relationships($section1, [constants::RELATIONSHIP_APPRAISER, constants::RELATIONSHIP_MANAGER]);
+        $this->assert_section_relationships($section2, [constants::RELATIONSHIP_MANAGER, constants::RELATIONSHIP_SUBJECT]);
 
         // Remove all from section1.
         $section1->update_relationships([]);
         $this->assert_section_relationships($section1, []);
-        $this->assert_section_relationships($section2, [manager::class, subject::class]);
+        $this->assert_section_relationships($section2, [constants::RELATIONSHIP_MANAGER, constants::RELATIONSHIP_SUBJECT]);
 
         // Remove all from section2.
         $section2->update_relationships([]);
@@ -329,7 +327,7 @@ class mod_perform_section_model_testcase extends mod_perform_relationship_testca
         );
         $data->activity1_section1_relationship1 = $perform_generator->create_section_relationship(
             $data->activity1_section1,
-            ['class_name' => appraiser::class]
+            ['relationship' => constants::RELATIONSHIP_APPRAISER]
         );
         $participant_instance = $perform_generator->create_participant_instance(
             $user1, $subject_instance->id, $data->activity1_section1_relationship1->id

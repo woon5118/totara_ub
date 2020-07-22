@@ -22,21 +22,15 @@
  * @category test
  */
 
+use mod_perform\constants;
 use mod_perform\entities\activity\notification_message as notification_message_entity;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\notification;
-use mod_perform\models\activity\notification_recipient;
 use mod_perform\models\activity\notification_message;
+use mod_perform\models\activity\notification_recipient;
 use mod_perform\models\activity\section;
-use mod_perform\models\activity\section_relationship;
-use mod_perform\notification\broker;
-use mod_perform\notification\brokers\instance_created;
 use mod_perform\notification\brokers\overdue;
 use totara_core\relationship\relationship;
-use totara_core\relationship\relationship_provider;
-use totara_core\relationship\resolvers\subject;
-use totara_job\relationship\resolvers\appraiser;
-use totara_job\relationship\resolvers\manager;
 
 require_once(__DIR__ . '/notification_testcase.php');
 
@@ -70,8 +64,14 @@ class mod_perform_notification_message_model_testcase extends mod_perform_notifi
         $this->activity = $this->create_activity();
         $this->section = $this->create_section($this->activity);
         $this->notification = $this->create_notification($this->activity, 'instance_created', true);
-        $this->relationships1 = $this->create_section_relationships($this->section, [subject::class, appraiser::class]);
-        $this->relationships2 = $this->create_section_relationships($this->section, [subject::class]);
+        $this->relationships1 = $this->create_section_relationships(
+            $this->section,
+            [constants::RELATIONSHIP_SUBJECT, constants::RELATIONSHIP_APPRAISER]
+        );
+        $this->relationships2 = $this->create_section_relationships(
+            $this->section,
+            [constants::RELATIONSHIP_SUBJECT]
+        );
         notification_recipient::create($this->notification, $this->relationships1[0], false);
 
         $recipients = $this->notification->get_recipients();
@@ -81,7 +81,8 @@ class mod_perform_notification_message_model_testcase extends mod_perform_notifi
     }
 
     public function tearDown(): void {
-        $this->activity = $this->notification = $this->section1 = $this->section2 = $this->relationships1 = $this->relationships2 = $this->recipient_subject = $this->recipient_appraiser = null;
+        $this->activity = $this->notification = $this->section1 = $this->section2 = $this->relationships1
+            = $this->relationships2 = $this->recipient_subject = $this->recipient_appraiser = null;
         parent::tearDown();
     }
 

@@ -21,6 +21,7 @@
  * @package mod_perform
  */
 
+use mod_perform\constants;
 use mod_perform\entities\activity\participant_section;
 use mod_perform\entities\activity\section;
 use mod_perform\state\participant_instance\not_started;
@@ -36,10 +37,7 @@ use mod_perform\models\activity\track;
 use mod_perform\task\service\subject_instance_creation;
 use mod_perform\task\service\subject_instance_dto;
 use totara_core\relationship\relationship as core_relationship_model;
-use totara_core\relationship\resolvers\subject;
 use totara_job\job_assignment;
-use totara_job\relationship\resolvers\appraiser;
-use totara_job\relationship\resolvers\manager;
 use mod_perform\models\activity\activity;
 
 /**
@@ -263,7 +261,7 @@ class mod_perform_participant_section_creation_service_testcase extends advanced
         );
         $activity_tree->section_relationships[] = $generator->create_section_relationship(
             $activity_tree->subject_user_section,
-            ['class_name' => subject::class]
+            ['relationship' => constants::RELATIONSHIP_SUBJECT]
         );
 
         $activity_tree->manager_appraiser_user_section = $generator->create_section(
@@ -272,11 +270,11 @@ class mod_perform_participant_section_creation_service_testcase extends advanced
         );
         $activity_tree->section_relationships[] = $generator->create_section_relationship(
             $activity_tree->manager_appraiser_user_section,
-            ['class_name' => appraiser::class]
+            ['relationship' => constants::RELATIONSHIP_APPRAISER]
         );
         $activity_tree->section_relationships[] = $generator->create_section_relationship(
             $activity_tree->manager_appraiser_user_section,
-            ['class_name' => manager::class]
+            ['relationship' => constants::RELATIONSHIP_MANAGER]
         );
 
         $this->setup_job_assignments($activity_tree, 1);
@@ -337,11 +335,11 @@ class mod_perform_participant_section_creation_service_testcase extends advanced
         $activity_tree->section_relationships = [];
         $activity_tree->section_relationships[] = $generator->create_section_relationship(
             $activity_tree->section,
-            ['class_name' => appraiser::class]
+            ['relationship' => constants::RELATIONSHIP_APPRAISER]
         );
         $activity_tree->section_relationships[] = $generator->create_section_relationship(
             $activity_tree->section,
-            ['class_name' => manager::class]
+            ['relationship' => constants::RELATIONSHIP_MANAGER]
         );
 
         return $activity_tree;

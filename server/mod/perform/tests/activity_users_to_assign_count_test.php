@@ -21,6 +21,7 @@
  * @package mod_perform
  */
 
+use mod_perform\constants;
 use mod_perform\entities\activity\track;
 use mod_perform\entities\activity\track as track_entity;
 use mod_perform\entities\activity\track_assignment;
@@ -28,7 +29,6 @@ use mod_perform\entities\activity\track_user_assignment;
 use mod_perform\expand_task;
 use mod_perform\models\activity\activity;
 use mod_perform\state\activity\draft;
-use totara_core\relationship\resolvers\subject;
 
 /**
  * @group perform
@@ -242,7 +242,7 @@ class mod_perform_activity_users_to_assign_count_testcase extends advanced_testc
             $section,
             $this->generator()->create_element()
         );
-        $this->generator()->create_section_relationship($section, ['class_name' => subject::class]);
+        $this->generator()->create_section_relationship($section, ['relationship' => constants::RELATIONSHIP_SUBJECT]);
 
         $track = $this->generator()->create_activity_tracks($activity)->first();
         $this->generator()->create_track_assignments_with_existing_groups($track, $cohorts, $orgs, $pos, $users);

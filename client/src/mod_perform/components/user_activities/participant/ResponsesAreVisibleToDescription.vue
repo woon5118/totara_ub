@@ -39,7 +39,7 @@
 </template>
 
 <script>
-import { RELATIONSHIP_IDNUMBER_SUBJECT } from 'mod_perform/constants';
+import { RELATIONSHIP_SUBJECT } from 'mod_perform/constants';
 
 export default {
   props: {
@@ -105,12 +105,12 @@ export default {
     },
     visibleToSubject() {
       return this.visibleToRelationships.some(
-        relationship => relationship.idnumber === RELATIONSHIP_IDNUMBER_SUBJECT
+        relationship => relationship.idnumber === RELATIONSHIP_SUBJECT
       );
     },
     nonSubjectRelationships() {
       return this.visibleToRelationships.filter(
-        relationship => !relationship.idnumber !== RELATIONSHIP_IDNUMBER_SUBJECT
+        relationship => relationship.idnumber !== RELATIONSHIP_SUBJECT
       );
     },
   },

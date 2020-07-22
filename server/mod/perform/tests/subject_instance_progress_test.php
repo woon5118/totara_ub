@@ -23,6 +23,7 @@
 
 use core\collection;
 use core\entities\user;
+use mod_perform\constants;
 use mod_perform\entities\activity\participant_instance;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 use mod_perform\event\subject_instance_progress_updated;
@@ -42,8 +43,6 @@ use mod_perform\state\participant_instance\not_started as not_started_participan
 use mod_perform\state\subject_instance\condition\not_all_participant_instances_complete;
 use mod_perform\state\subject_instance\in_progress;
 use mod_perform\state\subject_instance\not_started;
-use totara_core\relationship\resolvers\subject;
-use totara_job\relationship\resolvers\appraiser;
 use mod_perform\state\subject_instance\subject_instance_progress;
 
 require_once(__DIR__ . '/generator/activity_generator_configuration.php');
@@ -144,7 +143,7 @@ class mod_perform_subject_instance_progress_testcase extends state_testcase {
         $this->setAdminUser();
 
         $configuration = mod_perform_activity_generator_configuration::new()
-            ->set_relationships_per_section([subject::class, appraiser::class])
+            ->set_relationships_per_section([constants::RELATIONSHIP_SUBJECT, constants::RELATIONSHIP_APPRAISER])
             ->enable_appraiser_for_each_subject_user()
             ->set_number_of_users_per_user_group_type(2);
 

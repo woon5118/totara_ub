@@ -22,6 +22,7 @@
  */
 
 use core\orm\query\order;
+use mod_perform\constants;
 use mod_perform\dates\date_offset;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\entities\activity\participant_instance;
@@ -34,7 +35,6 @@ use mod_perform\hook\subject_instances_created;
 use mod_perform\models\activity\activity as activity_model;
 use mod_perform\models\activity\track;
 use mod_perform\models\activity\track_status;
-use mod_perform\relationship\resolvers\peer;
 use mod_perform\state\activity\draft;
 use mod_perform\state\subject_instance\active;
 use mod_perform\state\subject_instance\complete;
@@ -44,9 +44,7 @@ use mod_perform\task\service\subject_instance_dto;
 use mod_perform\task\service\track_schedule_sync;
 use mod_perform\user_groups\grouping;
 use totara_core\dates\date_time_setting;
-use totara_core\relationship\resolvers\subject;
 use totara_job\job_assignment;
-use totara_job\relationship\resolvers\manager;
 
 /**
  * @group perform
@@ -406,17 +404,17 @@ class mod_perform_subject_instance_creation_service_testcase extends advanced_te
         $section2 = $generator->create_section($data->activity1, ['title' => 'Section 2']);
         $section3 = $generator->create_section($data->activity1, ['title' => 'Section 3']);
 
-        $generator->create_section_relationship($section1, ['class_name' => manager::class]);
-        $generator->create_section_relationship($section1, ['class_name' => subject::class]);
+        $generator->create_section_relationship($section1, ['relationship' => constants::RELATIONSHIP_MANAGER]);
+        $generator->create_section_relationship($section1, ['relationship' => constants::RELATIONSHIP_SUBJECT]);
 
-        $generator->create_section_relationship($section2, ['class_name' => subject::class]);
+        $generator->create_section_relationship($section2, ['relationship' => constants::RELATIONSHIP_SUBJECT]);
         if ($with_manual_relatioship) {
-            $generator->create_section_relationship($section2, ['class_name' => peer::class]);
+            $generator->create_section_relationship($section2, ['relationship' => constants::RELATIONSHIP_PEER]);
         }
 
-        $generator->create_section_relationship($section3, ['class_name' => manager::class]);
+        $generator->create_section_relationship($section3, ['relationship' => constants::RELATIONSHIP_MANAGER]);
         if ($with_manual_relatioship) {
-            $generator->create_section_relationship($section3, ['class_name' => peer::class]);
+            $generator->create_section_relationship($section3, ['relationship' => constants::RELATIONSHIP_PEER]);
         }
 
         if ($use_per_job_creation) {

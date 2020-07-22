@@ -21,12 +21,12 @@
  * @package mod_perform
  */
 
+use mod_perform\constants;
 use mod_perform\models\activity\activity as activity;
 use mod_perform\state\activity\active;
 use mod_perform\state\activity\draft;
 use mod_perform\webapi\resolver\mutation\activate_activity;
 use totara_core\advanced_feature;
-use totara_job\relationship\resolvers\manager;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
@@ -198,7 +198,7 @@ class mod_perform_webapi_resolver_mutation_activate_activity_testcase extends ad
 
         $perform_generator->create_section_relationship(
             $section,
-            ['class_name' => manager::class]
+            ['relationship' => constants::RELATIONSHIP_MANAGER]
         );
 
         $element = $perform_generator->create_element(['title' => 'Question one']);

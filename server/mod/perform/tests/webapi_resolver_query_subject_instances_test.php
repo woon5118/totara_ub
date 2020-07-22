@@ -26,6 +26,7 @@
 use core\date_format;
 use core\entities\user;
 use core\webapi\formatter\field\date_field_formatter;
+use mod_perform\constants;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\entities\activity\filters\subject_instances_about;
 use mod_perform\entities\activity\participant_instance;
@@ -47,10 +48,6 @@ use mod_perform\state\subject_instance\in_progress as subject_instance_in_progre
 use mod_perform\state\subject_instance\open as subject_instance_open;
 use mod_perform\task\service\subject_instance_creation;
 use totara_core\advanced_feature;
-use totara_core\entities\relationship_resolver;
-use totara_core\relationship\resolvers\subject;
-use totara_job\relationship\resolvers\appraiser;
-use totara_job\relationship\resolvers\manager;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
@@ -70,7 +67,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
         $participant_instance_model = participant_instance_model::load_by_entity($participant_instance);
         $subject_instance = subject_instance::load_by_id($participant_instance->subject_instance_id);
 
-        $subject_relationship = $perform_generator->get_core_relationship(subject::class);
+        $subject_relationship = $perform_generator->get_core_relationship(constants::RELATIONSHIP_SUBJECT);
 
         $participant_id = $participant_instance->participant_id;
         self::setUser($participant_id);
@@ -174,11 +171,17 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
             ->set_number_of_users_per_user_group_type(1)
             ->enable_appraiser_for_each_subject_user()
             ->enable_anonymous_responses()
-            ->set_relationships_per_section([subject::class, manager::class, appraiser::class]);
+            ->set_relationships_per_section(
+                [
+                    constants::RELATIONSHIP_SUBJECT,
+                    constants::RELATIONSHIP_MANAGER,
+                    constants::RELATIONSHIP_APPRAISER
+                ]
+            );
 
         $activity = $perform_generator->create_full_activities($configuration)->first();
 
-        $subject_core_relationship_id = $this->get_core_relationship_id(subject::class);
+        $subject_core_relationship_id = $perform_generator->get_core_relationship(constants::RELATIONSHIP_SUBJECT)->id;
 
         /** @var participant_instance $subject_participant_instance */
         $subject_participant_instance = participant_instance::repository()
@@ -187,12 +190,12 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
 
         $subject_instance = subject_instance::load_by_id($subject_participant_instance->subject_instance_id);
 
-        $subject_relationship = $perform_generator->get_core_relationship(subject::class);
+        $subject_relationship = $perform_generator->get_core_relationship(constants::RELATIONSHIP_SUBJECT);
 
         $participant_id = $subject_participant_instance->participant_id;
         self::setUser($participant_id);
 
-        $appraiser_core_relationship_id = $this->get_core_relationship_id(appraiser::class);
+        $appraiser_core_relationship_id = $perform_generator->get_core_relationship(constants::RELATIONSHIP_APPRAISER)->id;
         $appraiser_participant_instance = participant_instance::repository()
             ->where('core_relationship_id', $appraiser_core_relationship_id)
             ->one();
@@ -330,14 +333,14 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
         $section1 = $perform_generator->create_section($activity1, ['title' => 'Section 1']);
         $section2 = $perform_generator->create_section($activity1, ['title' => 'Section 2']);
 
-        $perform_generator->create_section_relationship($section1, ['class_name' => subject::class]);
-        $perform_generator->create_section_relationship($section1, ['class_name' => manager::class]);
+        $perform_generator->create_section_relationship($section1, ['relationship' => constants::RELATIONSHIP_SUBJECT]);
+        $perform_generator->create_section_relationship($section1, ['relationship' => constants::RELATIONSHIP_MANAGER]);
 
         // This section should only be answered by the subject
-        $perform_generator->create_section_relationship($section2, ['class_name' => subject::class]);
+        $perform_generator->create_section_relationship($section2, ['relationship' => constants::RELATIONSHIP_SUBJECT]);
 
         // This section should only be answered by the manager
-        $perform_generator->create_section_relationship($section3, ['class_name' => manager::class]);
+        $perform_generator->create_section_relationship($section3, ['relationship' => constants::RELATIONSHIP_MANAGER]);
 
         $element = $perform_generator->create_element();
         $perform_generator->create_section_element($section1, $element);
@@ -385,8 +388,8 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
         $participant_instances = $subject_instance->participant_instances;
         $this->assertCount(2, $participant_instances);
 
-        $subject_relationship = $perform_generator->get_core_relationship(subject::class);
-        $manager_relationship = $perform_generator->get_core_relationship(manager::class);
+        $subject_relationship = $perform_generator->get_core_relationship(constants::RELATIONSHIP_SUBJECT);
+        $manager_relationship = $perform_generator->get_core_relationship(constants::RELATIONSHIP_MANAGER);
 
         /** @var participant_instance_model $participant_instance_for_subject */
         $participant_instance_for_subject = $subject_instance->get_participant_instances()
@@ -430,18 +433,18 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
         $actual = $this->get_webapi_operation_data($result);
         $this->assertCount(1, $actual, 'wrong subject count');
 
-        $expected_relationships = [subject::get_name(), manager::get_name()];
+        $expected_relationships = [constants::RELATIONSHIP_SUBJECT, constants::RELATIONSHIP_MANAGER];
 
         $expected_participant_instances = [];
         foreach ($participant_instances as $participant_instance) {
             // We expect to have one manager and subject, so make sure the database rows
             // match what we expect so that the later assert is correct.
             $core_relationship = $participant_instance->get_core_relationship();
-            $this->assertContains($core_relationship->name, $expected_relationships);
-            unset($expected_relationships[array_search($core_relationship->name, $expected_relationships)]);
+            $this->assertContains($core_relationship->idnumber, $expected_relationships);
+            unset($expected_relationships[array_search($core_relationship->idnumber, $expected_relationships)]);
 
             // Only the subjects participant instance got started
-            $state = $core_relationship->get_name() === manager::get_name()
+            $state = $core_relationship->idnumber === constants::RELATIONSHIP_MANAGER
                 ? participant_instance_not_started::get_name()
                 : participant_instance_in_progress::get_name();
 
@@ -778,11 +781,4 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
         $this->assert_webapi_operation_failed($result, 'not logged in');
     }
 
-    private function get_core_relationship_id(string $relationship_resolver_class) {
-        return relationship_resolver::repository()
-            ->where('class_name', $relationship_resolver_class)
-            ->order_by('id')
-            ->first()
-            ->relationship_id;
-    }
 }

@@ -21,6 +21,8 @@
  * @package mod_perform
  */
 
+use mod_perform\constants;
+use mod_perform\entities\activity\activity;
 use mod_perform\entities\activity\manual_relationship_selection;
 use mod_perform\entities\activity\manual_relationship_selection_progress;
 use mod_perform\entities\activity\manual_relationship_selector;
@@ -28,13 +30,13 @@ use mod_perform\entities\activity\subject_instance;
 use mod_perform\entities\activity\track as track_entity;
 use mod_perform\expand_task;
 use mod_perform\models\activity\track;
-use mod_perform\relationship\resolvers\peer;
+use mod_perform\state\activity\active;
+use mod_perform\state\activity\draft;
 use mod_perform\task\service\manual_participant_progress;
 use mod_perform\task\service\subject_instance_creation;
 use totara_core\entities\relationship;
-use totara_core\relationship\resolvers\subject;
+use totara_core\relationship\relationship as relationship_model;
 use totara_job\job_assignment;
-use totara_job\relationship\resolvers\manager;
 
 /**
  * @group perform
@@ -152,11 +154,11 @@ class mod_perform_manual_participant_progress_service_testcase extends advanced_
 
         /** @var manual_relationship_selection $selector_relationship */
         $selector_relationship = manual_relationship_selection::repository()
-            ->where('manual_relationship_id', $this->generator()->get_core_relationship(peer::class)->id)
+            ->where('manual_relationship_id', $this->generator()->get_core_relationship(constants::RELATIONSHIP_PEER)->id)
             ->where('activity_id', $data->activity1->id)
             ->one();
 
-        $selector_relationship->selector_relationship_id = $this->generator()->get_core_relationship(subject::class)->id;
+        $selector_relationship->selector_relationship_id = $this->generator()->get_core_relationship(constants::RELATIONSHIP_SUBJECT)->id;
         $selector_relationship->save();
 
         $progress_service = new manual_participant_progress();
@@ -263,8 +265,25 @@ class mod_perform_manual_participant_progress_service_testcase extends advanced_
 
         $data->activity1 = $generator->create_activity_in_container([
             'create_track' => true,
-            'create_section' => false
+            'create_section' => false,
+            'activity_status' => draft::get_code()
         ]);
+        $manual_relationships = $data->activity1->manual_relationships->all();
+        // Update manual relationships to manager.
+        $updated_manual_relationships = [];
+        $manager_relationship_id = relationship_model::load_by_idnumber(constants::RELATIONSHIP_MANAGER)->id;
+        foreach ($manual_relationships as $manual_relationship) {
+            $updated_manual_relationships[] = [
+                'manual_relationship_id' => $manual_relationship->manual_relationship_id,
+                'selector_relationship_id' => $manager_relationship_id,
+            ];
+        }
+        $data->activity1->update_manual_relationship_selections($updated_manual_relationships);
+
+        // Update the activity to active state.
+        activity::repository()
+            ->where('id', $data->activity1->id)
+            ->update(['status' => active::get_code()]);
 
         /** @var track $track1 */
         $data->track1 = track::load_by_activity($data->activity1)->first();
@@ -273,17 +292,17 @@ class mod_perform_manual_participant_progress_service_testcase extends advanced_
         $section2 = $generator->create_section($data->activity1, ['title' => 'Section 2']);
         $section3 = $generator->create_section($data->activity1, ['title' => 'Section 3']);
 
-        $generator->create_section_relationship($section1, ['class_name' => manager::class]);
-        $generator->create_section_relationship($section1, ['class_name' => subject::class]);
+        $generator->create_section_relationship($section1, ['relationship' => constants::RELATIONSHIP_MANAGER]);
+        $generator->create_section_relationship($section1, ['relationship' => constants::RELATIONSHIP_SUBJECT]);
 
-        $generator->create_section_relationship($section2, ['class_name' => subject::class]);
+        $generator->create_section_relationship($section2, ['relationship' => constants::RELATIONSHIP_SUBJECT]);
         if ($with_manual_relatioship) {
-            $generator->create_section_relationship($section2, ['class_name' => peer::class]);
+            $generator->create_section_relationship($section2, ['relationship' => constants::RELATIONSHIP_PEER]);
         }
 
-        $generator->create_section_relationship($section3, ['class_name' => manager::class]);
+        $generator->create_section_relationship($section3, ['relationship' => constants::RELATIONSHIP_MANAGER]);
         if ($with_manual_relatioship) {
-            $generator->create_section_relationship($section3, ['class_name' => peer::class]);
+            $generator->create_section_relationship($section3, ['relationship' => constants::RELATIONSHIP_PEER]);
         }
 
         if ($use_per_job_creation) {
