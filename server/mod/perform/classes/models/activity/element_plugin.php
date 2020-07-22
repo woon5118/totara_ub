@@ -23,8 +23,7 @@
 
 namespace mod_perform\models\activity;
 
-use core\collection;
-use mod_perform\models\response\element_validation_error;
+use mod_perform\entities\activity\element as element_entity;
 
 /**
  * Class element_plugin
@@ -48,10 +47,10 @@ abstract class element_plugin {
      *
      * @return static
      */
-    final public static function load_by_plugin(string $plugin_name) {
+    final public static function load_by_plugin(string $plugin_name): self {
         $plugin_class = "performelement_{$plugin_name}\\{$plugin_name}";
         if (!is_subclass_of($plugin_class, self::class)) {
-            throw new \coding_exception('Tried to load an unknown element plugin');
+            throw new \coding_exception('Tried to load an unknown element plugin: ' . $plugin_class);
         }
         return new $plugin_class();
     }
@@ -146,4 +145,14 @@ abstract class element_plugin {
         return $prefix;
     }
 
+    /**
+     * When an element is about to be saved in a section, validate that the configuration of the element
+     * meets any requirements of the element plugin
+     *
+     * If a problem is discovered, throw an exception.
+     *
+     * @param element_entity $element
+     */
+    public function validate_element(element_entity $element) {
+    }
 }

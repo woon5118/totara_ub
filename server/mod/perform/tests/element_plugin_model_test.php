@@ -21,7 +21,9 @@
  * @package mod_perform
  */
 
+use mod_perform\entities\activity\element as element_entity;
 use mod_perform\models\activity\element_plugin;
+use mod_perform\models\activity\respondable_element_plugin;
 
 /**
  * @group perform
@@ -33,6 +35,29 @@ class mod_perform_element_plugin_model_testcase extends advanced_testcase {
         $short_text_model = element_plugin::load_by_plugin('short_text');
 
         $this->assertEquals('short_text', $short_text_model->get_plugin_name());
+    }
+
+    /**
+     * Make sure that the respondable element plugin validation function fails if no title is provided
+     *
+     * @throws coding_exception
+     */
+    public function test_respondable_elements_require_title() {
+        $respondable_element_plugin = new class extends respondable_element_plugin {
+            public function __construct() {
+            }
+        };
+
+        $entity = new element_entity();
+        $entity->title = 'test title';
+
+        // No exception thrown.
+        $respondable_element_plugin->validate_element($entity);
+
+        $entity->title = null;
+
+        $this->expectException('coding_exception');
+        $respondable_element_plugin->validate_element($entity);
     }
 
 }

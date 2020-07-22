@@ -177,6 +177,9 @@ class element extends model {
                 "Cannot set identifier {$entity->identifier} for plugin_name {$entity->plugin_name}"
             );
         }
+
+        $element_plugin = element_plugin::load_by_plugin($entity->plugin_name);
+        $element_plugin->validate_element($entity);
     }
 
     /**

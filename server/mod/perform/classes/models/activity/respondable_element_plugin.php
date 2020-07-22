@@ -24,6 +24,7 @@
 namespace mod_perform\models\activity;
 
 use core\collection;
+use mod_perform\entities\activity\element as element_entity;
 use mod_perform\models\response\element_validation_error;
 
 /**
@@ -50,6 +51,13 @@ abstract class respondable_element_plugin extends element_plugin {
      */
     public function validate_response(?string $encoded_response_data, ?element $element): collection {
         return new collection();
+    }
+
+    public function validate_element(element_entity $element) {
+        // All respondable elements require a title.
+        if (empty(trim($element->title))) {
+            throw new \coding_exception('Respondable elements must include a title');
+        }
     }
 
 }

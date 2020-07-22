@@ -53,11 +53,11 @@ class mod_perform_element_model_testcase extends advanced_testcase {
 
     public function validation_data_provider() {
         return [
-            ['multi_choice', 'Test-ID', 'multi_choice', 'Test-ID', true],
-            ['multi_choice', 'Test-ID', 'short_text', 'Test-ID', false],
-            ['multi_choice', '', 'short_text', '', true],
-            ['multi_choice', '', 'short_text', 'Test-ID', true],
-            ['multi_choice', 'Test-ID', 'short_text', '', true],
+            ['multi_choice_single', 'Test-ID', 'multi_choice_single', 'Test-ID', true],
+            ['multi_choice_single', 'Test-ID', 'short_text', 'Test-ID', false],
+            ['multi_choice_single', '', 'short_text', '', true],
+            ['multi_choice_single', '', 'short_text', 'Test-ID', true],
+            ['multi_choice_single', 'Test-ID', 'short_text', '', true],
         ];
     }
 

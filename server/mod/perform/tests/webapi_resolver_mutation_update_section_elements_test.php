@@ -670,9 +670,9 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
 
     public function validation_create_new_data_provider() {
         return [
-            ['multi_choice', 'Test-ID', 'multi_choice', 'Test-ID', true],
-            ['multi_choice', 'Test-ID', 'short_text', 'Test-ID', false],
-            ['multi_choice', '', 'short_text', '', true],
+            ['multi_choice_single', 'Test-ID', 'multi_choice_single', 'Test-ID', true],
+            ['multi_choice_single', 'Test-ID', 'short_text', 'Test-ID', false],
+            ['multi_choice_single', '', 'short_text', '', true],
         ];
     }
 
@@ -737,7 +737,7 @@ class mod_perform_webapi_resolver_mutation_update_section_elements_testcase exte
         $activity = $perform_generator->create_activity_in_container();
         $section = $perform_generator->create_section($activity);
         $perform_generator->create_element([
-            'plugin_name' => 'multi_choice',
+            'plugin_name' => 'multi_choice_single',
             'title' => 'Test title',
             'identifier' => 'Test-ID multi_choice',
             'data' => 'aaa',
