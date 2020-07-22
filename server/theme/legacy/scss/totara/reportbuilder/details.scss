@@ -23,44 +23,44 @@
 
 .totara_reportbuilder__report_create_details {
   &_content {
-    background: var(--tui-color-neutral-1);
-    border: 1px solid var(--tui-color-neutral-5);
-    box-shadow: var(--tui-shadow-2);
+    background: var(--legacy-color-neutral-1);
+    border: 1px solid var(--legacy-color-neutral-5);
+    box-shadow: var(--legacy-shadow-2);
     display: none;
     height: 100%;
     overflow-x: hidden;
     overflow-y: scroll;
-    padding: var(--tui-gap-4);
+    padding: var(--legacy-gap-4);
     position: relative;
   }
 
   &_title {
     @include totara_style-heading_medium;
-    margin: var(--tui-gap-2) 0 var(--tui-gap-4);
+    margin: var(--legacy-gap-2) 0 var(--legacy-gap-4);
     display: inline-block;
   }
 
   &_close {
     font-size: 2rem;
-    margin-bottom: var(--tui-gap-1);
+    margin-bottom: var(--legacy-gap-1);
     // absolutely positioned for nicer SR flow
     position: absolute;
-    top: var(--tui-gap-2);
+    top: var(--legacy-gap-2);
     right: 0;
   }
 
   &_columns {
     hr {
       margin-top: 0;
-      margin-bottom: var(--tui-gap-1);
+      margin-bottom: var(--legacy-gap-1);
     }
 
     &-heading {
       @include totara_style-heading_x_small;
 
       display: inline-block;
-      margin-top: var(--tui-gap-4);
-      margin-bottom: var(--tui-gap-1);
+      margin-top: var(--legacy-gap-4);
+      margin-bottom: var(--legacy-gap-1);
     }
 
     &-default {

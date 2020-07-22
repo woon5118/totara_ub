@@ -38,7 +38,7 @@ a.criteria-action {
 
 table.issuedbadgebox {
   width: 750px;
-  background-color: var(--tui-color-neutral-1);
+  background-color: var(--legacy-color-neutral-1);
 }
 
 table.badgeissuedimage {
@@ -219,10 +219,10 @@ img#persona_signin {
 }
 
 .backpack-unsupported {
-  border: 1px solid var(--tui-color-neutral-5);
+  border: 1px solid var(--legacy-color-neutral-5);
   border-radius: 3px;
-  margin: var(--tui-gap-4) auto;
-  padding: var(--tui-gap-6);
+  margin: var(--legacy-gap-4) auto;
+  padding: var(--legacy-gap-6);
   width: 60%;
   min-width: 220px;
 }

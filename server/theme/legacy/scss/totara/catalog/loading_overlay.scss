@@ -23,7 +23,7 @@
 
 .tw-catalog__overlay {
   &::after {
-    background: var(--tui-color-neutral-1);
+    background: var(--legacy-color-neutral-1);
     content: '';
     display: block;
     height: 100%;
@@ -37,8 +37,8 @@
 }
 
 .tw-catalog__overlay_text {
-  color: var(--tui-color-neutral-7);
-  margin: var(--tui-gap-4) 0;
+  color: var(--legacy-color-neutral-7);
+  margin: var(--legacy-gap-4) 0;
   position: absolute;
   text-align: center;
   top: 0;

@@ -40,7 +40,7 @@
 }
 
 .cohortdeletedparam {
-  color: var(--tui-color-prompt-alert);
+  color: var(--legacy-color-prompt-alert);
 }
 
 #cohort_delete_detail #cohort_delete_changes {
@@ -48,15 +48,15 @@
 }
 
 #cohort_delete_footnote {
-  padding: var(--tui-gap-1);
+  padding: var(--legacy-gap-1);
 }
 
 #page-cohort-delete #modal-content {
-  padding: var(--tui-gap-4);
+  padding: var(--legacy-gap-4);
 }
 
 #page-cohort-delete #modal-footer {
-  padding-top: var(--tui-gap-4);
+  padding-top: var(--legacy-gap-4);
 
   .singlebutton div {
     margin: 0;

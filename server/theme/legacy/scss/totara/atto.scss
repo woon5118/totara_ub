@@ -23,16 +23,16 @@
 
 .editor_atto_notification {
   &.atto_warning {
-    color: var(--tui-color-prompt-warning);
+    color: var(--legacy-color-prompt-warning);
   }
 
   &.atto_info {
-    color: var(--tui-color-secondary);
+    color: var(--legacy-color-secondary);
   }
 }
 
 .editor_atto_alert {
-  z-index: var(--tui-zindex-popover);
+  z-index: var(--legacy-zindex-popover);
 }
 
 .editor_atto_alert .close {

@@ -228,7 +228,7 @@
     background-color: $state-info-bg;
   }
   .section-summary {
-    border: 1px solid var(--tui-color-neutral-5);
+    border: 1px solid var(--legacy-color-neutral-5);
     margin-top: 5px;
     list-style: none;
     .section-title {
@@ -284,7 +284,7 @@
   }
   ul {
     li.section.main {
-      border-bottom: 2px solid var(--tui-color-neutral-4);
+      border-bottom: 2px solid var(--legacy-color-neutral-4);
       margin-top: 0;
       .left,
       .right {
@@ -405,12 +405,12 @@ input.titleeditor {
   left: 50%;
   margin-left: -15.5em;
   box-shadow: 2px 2px 5px 1px rgba(0, 0, 0, 0.2);
-  z-index: var(--tui-zindex-popover);
+  z-index: var(--legacy-zindex-popover);
 }
 
 .dndupload-preview {
-  color: var(--tui-color-neutral-6);
-  border: 1px dashed var(--tui-color-neutral-6);
+  color: var(--legacy-color-neutral-6);
+  border: 1px dashed var(--legacy-color-neutral-6);
   list-style: none;
   margin-top: 0.2em;
   padding: 0.3em;
@@ -591,7 +591,7 @@ input.titleeditor {
 .course_category_tree {
   .courses {
     & > .paging.paging-morelink:hover {
-      background-color: var(--tui-color-neutral-3);
+      background-color: var(--legacy-color-neutral-3);
     }
   }
   .category {
@@ -674,7 +674,7 @@ input.titleeditor {
 #page-course-index-category {
   .generalbox.info {
     margin-bottom: 15px;
-    border: 1px dotted var(--tui-color-neutral-5);
+    border: 1px dotted var(--legacy-color-neutral-5);
     border-radius: 4px;
     padding: 5px;
   }
@@ -920,10 +920,10 @@ input.titleeditor {
         }
       }
       .without-actions {
-        color: var(--tui-color-text);
+        color: var(--legacy-color-text);
       }
       .idnumber {
-        color: var(--tui-color-text);
+        color: var(--legacy-color-text);
         margin-right: 2em;
       }
     }
@@ -969,7 +969,7 @@ input.titleeditor {
       .categoryname {
         display: inline-block;
         margin-left: 1em;
-        color: var(--tui-color-text);
+        color: var(--legacy-color-text);
       }
       .coursename {
         display: inline-block;
@@ -1013,7 +1013,7 @@ input.titleeditor {
       }
     }
     .course-count {
-      color: var(--tui-color-text);
+      color: var(--legacy-color-text);
       margin-right: 2rem;
       min-width: 3.5em;
       display: inline-block;
@@ -1064,14 +1064,14 @@ input.titleeditor {
   .listing-pagination {
     text-align: center;
     .yui3-button {
-      background-color: var(--tui-btn-bg-color);
-      color: var(--tui-btn-text-color);
+      background-color: var(--legacy-btn-bg-color);
+      color: var(--legacy-btn-text-color);
       border: 0;
       margin: 0.4rem 0.2rem 0.45rem;
       font-size: 10.4px;
       &.active-page {
-        background-color: var(--tui-btn-prim-bg-color);
-        color: var(--tui-btn-prim-text-color);
+        background-color: var(--legacy-btn-prim-bg-color);
+        color: var(--legacy-btn-prim-text-color);
       }
     }
   }
@@ -1163,8 +1163,8 @@ input.titleeditor {
     #category-listing > div,
     #course-listing > div,
     #course-detail > div {
-      border: 1px solid var(--tui-color-neutral-5);
-      background-color: var(--tui-color-neutral-1);
+      border: 1px solid var(--legacy-color-neutral-5);
+      background-color: var(--legacy-color-neutral-1);
     }
     #course-detail {
       width: 100%;
@@ -1187,8 +1187,8 @@ input.titleeditor {
     #category-listing > div,
     #course-listing > div,
     #course-detail > div {
-      border: 1px solid var(--tui-color-neutral-5);
-      background-color: var(--tui-color-neutral-1);
+      border: 1px solid var(--legacy-color-neutral-5);
+      background-color: var(--legacy-color-neutral-1);
     }
   }
 }
@@ -1260,7 +1260,7 @@ input.titleeditor {
 }
 
 #coursesearch {
-  margin-bottom: var(--tui-gap-4);
+  margin-bottom: var(--legacy-gap-4);
 }
 
 // Completely hide a text box that manages access restrictions json

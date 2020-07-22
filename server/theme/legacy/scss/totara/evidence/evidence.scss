@@ -24,9 +24,9 @@
 
 .tw-evidence {
   &__content_container {
-    background: var(--tui-color-neutral-1);
-    border: 1px solid var(--tui-color-neutral-5);
-    padding: var(--tui-gap-4);
+    background: var(--legacy-color-neutral-1);
+    border: 1px solid var(--legacy-color-neutral-5);
+    padding: var(--legacy-gap-4);
   }
 
   &__fields_view {
@@ -42,23 +42,23 @@
   &__header {
     &_backLink {
       display: inline-block;
-      padding-bottom: var(--tui-gap-2);
+      padding-bottom: var(--legacy-gap-2);
     }
 
     &_titleBtns {
-      margin-bottom: var(--tui-gap-4);
+      margin-bottom: var(--legacy-gap-4);
 
       &_title {
         margin: 0;
         &_small {
-          font-size: var(--tui-font-size-24);
+          font-size: var(--legacy-font-size-24);
           margin-bottom: auto;
           margin-top: auto;
         }
       }
 
       &_buttons {
-        margin-top: var(--tui-gap-2);
+        margin-top: var(--legacy-gap-2);
 
         &_link {
           @extend .btn;
@@ -68,7 +68,7 @@
     }
 
     .tabtree {
-      margin: var(--tui-gap-4) 0;
+      margin: var(--legacy-gap-4) 0;
     }
   }
 
@@ -78,17 +78,17 @@
 
   &__item {
     &_metadata {
-      margin-bottom: var(--tui-gap-4);
-      margin-top: var(--tui-gap-8);
+      margin-bottom: var(--legacy-gap-4);
+      margin-top: var(--legacy-gap-8);
 
       &_title {
-        margin-bottom: var(--tui-gap-4);
-        margin-top: var(--tui-gap-8);
+        margin-bottom: var(--legacy-gap-4);
+        margin-top: var(--legacy-gap-8);
       }
 
       &_row {
         &.tw-evidence__item_metadata_tf_element {
-          margin-bottom: var(--tui-gap-2);
+          margin-bottom: var(--legacy-gap-2);
         }
       }
     }
@@ -100,7 +100,7 @@
 
   &__select_type {
     &_info {
-      margin-top: var(--tui-gap-2);
+      margin-top: var(--legacy-gap-2);
 
       &_buttons > &_button {
         @extend .btn;
@@ -116,10 +116,10 @@
       }
 
       &_metadata {
-        padding-bottom: var(--tui-gap-2);
+        padding-bottom: var(--legacy-gap-2);
 
         &_description {
-          padding-bottom: var(--tui-gap-2);
+          padding-bottom: var(--legacy-gap-2);
         }
 
         &_name {
@@ -129,11 +129,11 @@
     }
 
     &_selector {
-      background: var(--tui-color-neutral-2);
-      border: 1px solid var(--tui-color-neutral-5);
-      padding-top: var(--tui-gap-4);
-      padding-bottom: var(--tui-gap-2);
-      padding-left: var(--tui-gap-4);
+      background: var(--legacy-color-neutral-2);
+      border: 1px solid var(--legacy-color-neutral-5);
+      padding-top: var(--legacy-gap-4);
+      padding-bottom: var(--legacy-gap-2);
+      padding-left: var(--legacy-gap-4);
 
       &_element {
         .form-autocomplete-selection {
@@ -167,7 +167,7 @@
 
         &_element {
           display: inline-block;
-          margin-left: var(--tui-gap-2);
+          margin-left: var(--legacy-gap-2);
         }
       }
     }

@@ -27,7 +27,7 @@ $catalog-screen_xsm_min: 500px !default;
 
 #region-main div[role='main'] h2.tw-catalog__title {
   float: left;
-  margin-top: var(--tui-gap-1);
+  margin-top: var(--legacy-gap-1);
 }
 
 .tw-catalog {
@@ -41,11 +41,11 @@ $catalog-screen_xsm_min: 500px !default;
   }
 
   &__primaryFilter {
-    border-bottom: 1px solid var(--tui-catalog-primfilter-border-color);
-    border-top: 1px solid var(--tui-catalog-primfilter-border-color);
-    font-size: var(--tui-font-size-18);
-    margin: var(--tui-gap-4) 0;
-    padding: var(--tui-gap-4) 0;
+    border-bottom: 1px solid var(--legacy-catalog-primfilter-border-color);
+    border-top: 1px solid var(--legacy-catalog-primfilter-border-color);
+    font-size: var(--legacy-font-size-18);
+    margin: var(--legacy-gap-4) 0;
+    padding: var(--legacy-gap-4) 0;
   }
 
   &__results {
@@ -58,12 +58,12 @@ $catalog-screen_xsm_min: 500px !default;
     &_overview {
       display: flex;
       flex-wrap: wrap;
-      padding: var(--tui-gap-4) 0;
+      padding: var(--legacy-gap-4) 0;
 
       &_row {
         display: flex;
         height: 100%;
-        margin-bottom: var(--tui-gap-6);
+        margin-bottom: var(--legacy-gap-6);
         width: 100%;
       }
     }
@@ -75,7 +75,7 @@ $catalog-screen_xsm_min: 500px !default;
 
   .tw-catalogResultsCount {
     height: 100%;
-    margin: auto var(--tui-gap-4) auto var(--tui-gap-1);
+    margin: auto var(--legacy-gap-4) auto var(--legacy-gap-1);
     vertical-align: top;
 
     &__text {
@@ -88,10 +88,10 @@ $catalog-screen_xsm_min: 500px !default;
     margin-top: 5rem;
 
     pre {
-      background: var(--tui-color-neutral-2);
-      border: 1px solid var(--tui-color-neutral-7);
-      font-size: var(--tui-font-size-12);
-      padding: var(--tui-gap-4);
+      background: var(--legacy-color-neutral-2);
+      border: 1px solid var(--legacy-color-neutral-7);
+      font-size: var(--legacy-font-size-12);
+      padding: var(--legacy-gap-4);
     }
 
     span {
@@ -115,7 +115,7 @@ $catalog-screen_xsm_min: 500px !default;
           &:last-of-type {
             margin: auto 0 auto auto;
             max-width: 325px;
-            padding-left: var(--tui-gap-1);
+            padding-left: var(--legacy-gap-1);
           }
 
           &_narrow {
@@ -131,17 +131,17 @@ $catalog-screen_xsm_min: 500px !default;
 @media (min-width: $tui-screen-sm) {
   .tw-catalog {
     &__primaryFilter {
-      padding: var(--tui-gap-4) var(--tui-gap-2);
+      padding: var(--legacy-gap-4) var(--legacy-gap-2);
     }
 
     &__results {
       &_overview {
-        padding: 1px var(--tui-gap-4) var(--tui-gap-2) 0;
+        padding: 1px var(--legacy-gap-4) var(--legacy-gap-2) 0;
       }
     }
 
     .tw-catalogResultsCount {
-      margin-left: var(--tui-gap-4);
+      margin-left: var(--legacy-gap-4);
     }
   }
 }

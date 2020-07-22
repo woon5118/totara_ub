@@ -32,7 +32,7 @@
 
     th,
     td {
-      padding: var(--tui-gap-1);
+      padding: var(--legacy-gap-1);
     }
 
     th:first-child {
@@ -40,7 +40,7 @@
     }
 
     tr {
-      border-bottom: 1px solid var(--tui-color-neutral-5);
+      border-bottom: 1px solid var(--legacy-color-neutral-5);
     }
 
     input[type='text'] {
@@ -49,12 +49,12 @@
 
     label {
       font-weight: normal;
-      margin: 0 0 0 var(--tui-gap-1);
+      margin: 0 0 0 var(--legacy-gap-1);
     }
   }
 
   &__addfilter {
-    margin: var(--tui-gap-1) 0 0 var(--tui-gap-1);
+    margin: var(--legacy-gap-1) 0 0 var(--legacy-gap-1);
   }
 
   tr:last-child .totara_catalog-matrix__action[data-action='move-down'],

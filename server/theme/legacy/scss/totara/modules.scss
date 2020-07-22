@@ -192,12 +192,12 @@ select {
 
 .breadcrumb-button .singlebutton {
   float: left;
-  margin-left: var(--tui-gap-1);
+  margin-left: var(--legacy-gap-1);
 }
 
 .breadcrumb-button .singleselect {
   float: left;
-  margin-left: var(--tui-gap-1);
+  margin-left: var(--legacy-gap-1);
 
   .addtomenu option:last-child {
     font-style: italic;
@@ -261,7 +261,7 @@ div#dock {
   }
 
   .mod_choice__remove-choice-link {
-    padding-left: var(--tui-gap-4);
+    padding-left: var(--legacy-gap-4);
   }
 }
 
@@ -387,7 +387,7 @@ div#dock {
 }
 
 .mod_lesson__student-response {
-  margin-bottom: var(--tui-gap-4);
+  margin-bottom: var(--legacy-gap-4);
 }
 
 // Wiki

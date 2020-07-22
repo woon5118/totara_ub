@@ -22,9 +22,9 @@
 // @package   theme_legacy
 
 .totaraNav_prim {
-  z-index: var(--tui-zindex-navbar);
-  padding: var(--tui-gap-6) 0;
-  background: var(--tui-nav-bg-color);
+  z-index: var(--legacy-zindex-navbar);
+  padding: var(--legacy-gap-6) 0;
+  background: var(--legacy-nav-bg-color);
 
   // On mobile wrap over flow items with rows
   > .container-fluid {
@@ -39,34 +39,34 @@
     height: 100vh;
     min-height: 35px;
     margin: auto 0;
-    padding: 0 var(--tui-gap-4);
+    padding: 0 var(--legacy-gap-4);
     background: inherit;
 
     // Tab colours on mobile
     &_item_link {
-      color: var(--tui-nav-tab-text-color);
-      background: var(--tui-nav-tab-bg-color);
-      border: var(--tui-border-width-thin) solid var(--tui-nav-tab-border-color);
+      color: var(--legacy-nav-tab-text-color);
+      background: var(--legacy-nav-tab-bg-color);
+      border: var(--legacy-border-width-thin) solid var(--legacy-nav-tab-border-color);
 
       &:focus,
       &:hover {
-        color: var(--tui-nav-tab-text-color-focus);
+        color: var(--legacy-nav-tab-text-color-focus);
         text-decoration: none;
-        background: var(--tui-nav-tab-bg-color-focus);
-        border-color: var(--tui-nav-tab-border-color-focus);
+        background: var(--legacy-nav-tab-bg-color-focus);
+        border-color: var(--legacy-nav-tab-border-color-focus);
       }
     }
 
     // Mobile close button
     &_close {
       display: inline-block;
-      padding: var(--tui-gap-2);
-      color: var(--tui-nav-tab-text-color);
-      font-size: var(--tui-font-size-15);
+      padding: var(--legacy-gap-2);
+      color: var(--legacy-nav-tab-text-color);
+      font-size: var(--legacy-font-size-15);
       line-height: 1;
       text-align: left;
       vertical-align: top;
-      background: var(--tui-nav-tab-bg-color);
+      background: var(--legacy-nav-tab-bg-color);
     }
 
     // List display on mobile
@@ -81,7 +81,7 @@
       width: 80%;
       overflow-y: scroll;
       background: inherit;
-      box-shadow: var(--tui-shadow-2);
+      box-shadow: var(--legacy-shadow-2);
       transition: 0.5s;
     }
   }
@@ -89,24 +89,24 @@
   &--list_item {
     &_link {
       display: flex;
-      padding: var(--tui-gap-2);
+      padding: var(--legacy-gap-2);
 
       ////
       &:focus,
       &:hover {
-        background: var(--tui-nav-tab-mobile-bg-color-focus);
+        background: var(--legacy-nav-tab-mobile-bg-color-focus);
       }
     }
 
     // Make spacing smaller on li with icons
     &_externalLink &_link,
     &_hasChildren &_link {
-      padding-right: var(--tui-gap-2);
+      padding-right: var(--legacy-gap-2);
     }
 
     &_label {
       max-width: 100%;
-      font-size: var(--tui-font-size-16);
+      font-size: var(--legacy-font-size-16);
       word-wrap: break-word;
     }
   }
@@ -114,7 +114,7 @@
   // Navigation level indentation
   .totaraNav--expand_indent {
     display: flex;
-    min-width: var(--tui-gap-6);
+    min-width: var(--legacy-gap-6);
     height: 100%;
     margin: auto 0;
 
@@ -163,7 +163,7 @@
     &--list_item {
       display: inline-block;
       vertical-align: top;
-      background: var(--tui-nav-tab-bg-color);
+      background: var(--legacy-nav-tab-bg-color);
 
       &_label {
         position: relative;
@@ -173,16 +173,16 @@
           left: 0;
           display: block;
           width: 1%;
-          border-bottom: var(--tui-border-width-normal) solid transparent;
+          border-bottom: var(--legacy-border-width-normal) solid transparent;
           transition: 0.2s;
           content: '';
         }
       }
 
       &_link {
-        padding: var(--tui-gap-2) var(--tui-gap-4);
-        color: var(--tui-nav-tab-text-color);
-        border: var(--tui-border-width-thin) solid var(--tui-nav-tab-border-color);
+        padding: var(--legacy-gap-2) var(--legacy-gap-4);
+        color: var(--legacy-nav-tab-text-color);
+        border: var(--legacy-border-width-thin) solid var(--legacy-nav-tab-border-color);
         border-right-color: transparent;
 
         // Hide by default (only shown with _hasChildren class)
@@ -192,14 +192,14 @@
 
         &:focus,
         &:hover {
-          color: var(--tui-nav-tab-text-color-focus);
-          background: var(--tui-nav-tab-bg-color-focus);
-          border: var(--tui-border-width-thin) solid var(--tui-nav-tab-border-color-focus);
+          color: var(--legacy-nav-tab-text-color-focus);
+          background: var(--legacy-nav-tab-bg-color-focus);
+          border: var(--legacy-border-width-thin) solid var(--legacy-nav-tab-border-color-focus);
 
           .totaraNav_prim--list_item_label {
             &::after {
               width: 100%;
-              border-color: var(--tui-nav-tab-border-inner-color-focus);
+              border-color: var(--legacy-nav-tab-border-inner-color-focus);
             }
           }
         }
@@ -207,7 +207,7 @@
 
       // Add border to last item unless it is selected
       &:last-child:not(.totaraNav_prim--list_item_selected) &_link {
-        border-right-color: var(--tui-nav-tab-border-color);
+        border-right-color: var(--legacy-nav-tab-border-color);
       }
 
       &_hasChildren &_link {
@@ -215,7 +215,7 @@
           display: flex;
           order: 2;
           min-width: 1.2em;
-          padding: 0 var(--tui-gap-1);
+          padding: 0 var(--legacy-gap-1);
           text-align: right;
         }
       }
@@ -232,22 +232,22 @@
         // Style of selected tab link
         .totaraNav_prim--list_item {
           &_link {
-            color: var(--tui-nav-tab-text-color-selected);
-            font-weight: var(--tui-nav-tab-text-weight-selected);
-            background: var(--tui-nav-tab-bg-color-selected);
-            border: var(--tui-border-width-thin) solid
-              var(--tui-nav-tab-border-color-selected);
+            color: var(--legacy-nav-tab-text-color-selected);
+            font-weight: var(--legacy-nav-tab-text-weight-selected);
+            background: var(--legacy-nav-tab-bg-color-selected);
+            border: var(--legacy-border-width-thin) solid
+              var(--legacy-nav-tab-border-color-selected);
 
             &:focus,
             &:hover {
-              color: var(--tui-nav-tab-text-color-selected);
-              background: var(--tui-nav-tab-bg-color-selected);
-              border: var(--tui-border-width-thin) solid
-                var(--tui-nav-tab-border-color-selected);
+              color: var(--legacy-nav-tab-text-color-selected);
+              background: var(--legacy-nav-tab-bg-color-selected);
+              border: var(--legacy-border-width-thin) solid
+                var(--legacy-nav-tab-border-color-selected);
 
               .totaraNav_prim--list_item_label {
                 &::after {
-                  border-color: var(--tui-nav-tab-border-inner-color-selected);
+                  border-color: var(--legacy-nav-tab-border-inner-color-selected);
                 }
               }
             }
@@ -258,7 +258,7 @@
             position: relative;
             &::after {
               width: 100%;
-              border-color: var(--tui-nav-tab-border-inner-color-selected);
+              border-color: var(--legacy-nav-tab-border-inner-color-selected);
             }
           }
         }

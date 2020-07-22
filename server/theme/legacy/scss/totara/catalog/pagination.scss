@@ -22,14 +22,14 @@
 // @package   theme_legacy
 
 .tw-catalogPagination {
-  margin: var(--tui-gap-2) var(--tui-gap-1);
+  margin: var(--legacy-gap-2) var(--legacy-gap-1);
 
   &__btn {
     @include bs-btn-default();
     border: 1px solid;
     border-radius: 3px;
     display: block;
-    padding: var(--tui-gap-2);
+    padding: var(--legacy-gap-2);
     text-align: center;
     transition: background-color 0.2s ease;
 
@@ -44,6 +44,6 @@
 
 @media (min-width: $tui-screen-sm) {
   .tw-catalogPagination {
-    margin: var(--tui-gap-2) var(--tui-gap-4);
+    margin: var(--legacy-gap-2) var(--legacy-gap-4);
   }
 }

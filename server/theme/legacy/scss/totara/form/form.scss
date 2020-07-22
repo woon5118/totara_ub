@@ -102,7 +102,7 @@
   .totara_form_element_filemanager object {
     height: 160px;
     width: 600px;
-    border: 1px solid var(--tui-color-border);
+    border: 1px solid var(--legacy-color-border);
   }
 
   .totara_form_element_checkboxes,
@@ -143,7 +143,7 @@
   .totara_form_group_section legend {
     a,
     a:hover {
-      color: var(--tui-color-text);
+      color: var(--legacy-color-text);
       text-decoration: none;
     }
   }
@@ -210,7 +210,7 @@
   [data-element-frozen='1'] {
     .filemanager-container,
     .filepicker-filelist {
-      background-color: var(--tui-color-neutral-2);
+      background-color: var(--legacy-color-neutral-2);
     }
     .fp-iconview .fp-thumbnail {
       border-width: 0;

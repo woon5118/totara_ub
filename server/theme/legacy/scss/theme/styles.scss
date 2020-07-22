@@ -37,6 +37,9 @@
 // Any global variables (used across multiple files) should be declared here
 @import 'theme_legacy/totara/scss_variables';
 
+// CSS variables:
+@import 'theme_legacy/totara/css_variables';
+
 // Bootstrap 3
 @import 'theme_legacy/bootstrap3/_bootstrap';
 // Bootstrap 3 class overrides

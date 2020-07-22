@@ -24,7 +24,7 @@
 .totara_catalog-multiple_select {
   legend {
     border: none;
-    font-size: var(--tui-font-size-14);
+    font-size: var(--legacy-font-size-14);
     font-weight: bold;
     margin: 0;
   }
@@ -38,8 +38,8 @@
   }
 
   li {
-    border-bottom: 1px solid var(--tui-color-neutral-5);
-    padding: var(--tui-gap-2) 0 var(--tui-gap-2) var(--tui-gap-1);
+    border-bottom: 1px solid var(--legacy-color-neutral-5);
+    padding: var(--legacy-gap-2) 0 var(--legacy-gap-2) var(--legacy-gap-1);
 
     &:first-child {
       padding-top: 0;
@@ -73,7 +73,7 @@
     &__addicon {
       clear: left;
       float: left;
-      margin: var(--tui-gap-2) 0 0 25%;
+      margin: var(--legacy-gap-2) 0 0 25%;
 
       .totara_catalog-multiple_select__noitems & {
         clear: none;

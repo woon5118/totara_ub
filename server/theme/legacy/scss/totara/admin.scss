@@ -387,16 +387,16 @@ img.iconsmall {
 
 .admin_colourpicker .colourdialogue {
   float: left;
-  border: 1px solid var(--tui-color-neutral-5);
+  border: 1px solid var(--legacy-color-neutral-5);
 }
 
 .admin_colourpicker .previewcolour {
-  border: 1px solid var(--tui-color-neutral-5);
+  border: 1px solid var(--legacy-color-neutral-5);
   margin-left: 301px;
 }
 
 .admin_colourpicker .currentcolour {
-  border: 1px solid var(--tui-color-neutral-5);
+  border: 1px solid var(--legacy-color-neutral-5);
   margin-left: 301px;
   border-top-width: 0;
 }
@@ -680,7 +680,7 @@ img.iconsmall {
 }
 
 #page-admin-mnet-peers .mform .certdetails {
-  background-color: var(--tui-color-neutral-1);
+  background-color: var(--legacy-color-neutral-1);
 }
 
 #page-admin-mnet-peers .mform .deletedhostinfo {
@@ -796,7 +796,7 @@ img.iconsmall {
 #lti_tab_heading.yui-nav,
 #tp_tab_heading.yui-nav {
   padding: 0;
-  border-bottom: 1px solid var(--tui-tabs-border-color);
+  border-bottom: 1px solid var(--legacy-tabs-border-color);
 }
 
 #lti_tab_heading.yui-nav li,
@@ -822,15 +822,15 @@ img.iconsmall {
 #tp_tab_heading.yui-nav li a em {
   background: none;
   border: none;
-  color: var(--tui-color-neutral-7);
+  color: var(--legacy-color-neutral-7);
   padding: 0;
 }
 
 #lti_tab_heading.yui-nav li.selected a,
 #tp_tab_heading.yui-nav li.selected a {
-  border-top: 1px solid var(--tui-tabs-border-color);
-  border-left: 1px solid var(--tui-tabs-border-color);
-  border-right: 1px solid var(--tui-tabs-border-color);
+  border-top: 1px solid var(--legacy-tabs-border-color);
+  border-left: 1px solid var(--legacy-tabs-border-color);
+  border-right: 1px solid var(--legacy-tabs-border-color);
   border-bottom: none;
   border-top-left-radius: $border-radius-base;
   border-top-right-radius: $border-radius-base;
@@ -844,7 +844,7 @@ img.iconsmall {
 #tp_tabs .yui-content,
 #lti_tabs .yui-content {
   border: none;
-  background-color: var(--tui-color-neutral-1);
+  background-color: var(--legacy-color-neutral-1);
 }
 
 // Tidy up Default Role Settings tables.
@@ -905,7 +905,7 @@ img.iconsmall {
 }
 
 #overriderolestable .overriddenpermission {
-  background-color: var(--tui-color-state-highlight);
+  background-color: var(--legacy-color-state-highlight);
 }
 
 // Do not rely on natural language line breaks in registration data.

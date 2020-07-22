@@ -26,7 +26,7 @@
 #page-footer {
   margin-top: $line-height-computed;
   padding: 0;
-  border-top: 1px solid var(--tui-color-neutral-5);
+  border-top: 1px solid var(--legacy-color-neutral-5);
 
   .pagelayout-legacynolayout & {
     margin-top: 0;
@@ -58,7 +58,7 @@
 .page-footer-poweredby {
   display: block;
   padding: $padding-base-vertical 0;
-  background-color: var(--tui-color-background);
+  background-color: var(--legacy-color-background);
 }
 
 .page-footer-loggedin-info {

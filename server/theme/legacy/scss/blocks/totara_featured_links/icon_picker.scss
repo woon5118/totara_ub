@@ -30,7 +30,7 @@
 
     .icon-picker-item {
       display: inline-block;
-      border: var(--tui-border-width-thin) solid var(--tui-color-state);
+      border: var(--legacy-border-width-thin) solid var(--legacy-color-state);
       border-radius: $featuredLinks-icon-selector-item-border-radius;
       cursor: pointer;
       width: $featuredLinks-icon-selector-item-width;
@@ -39,8 +39,8 @@
       text-align: center;
 
       &.selected {
-        border-color: var(--tui-color-state-active);
-        box-shadow: var(--tui-shadow-2);
+        border-color: var(--legacy-color-state-active);
+        box-shadow: var(--legacy-shadow-2);
       }
     }
   }
@@ -48,7 +48,7 @@
 
 .tf_element {
   .icon-picker-delete-icon {
-    color: var(--tui-color-prompt-alert);
+    color: var(--legacy-color-prompt-alert);
     text-decoration: underline;
     cursor: pointer;
     margin-right: 16px;
@@ -60,7 +60,7 @@
       width: $featuredLinks-icon-selector-item-size;
     }
     .icon-picker-invalid {
-      font-size: var(--tui-font-size-14);
+      font-size: var(--legacy-font-size-14);
     }
   }
 }

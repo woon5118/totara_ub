@@ -27,10 +27,10 @@ $catalog_item_narrow-image_height: 1 !default;
 $catalog_item_narrow-image_ratio: $catalog_item_narrow-image_height / $catalog_item_narrow-image_width * 100% !default;
 
 .tw-catalogItemNarrow {
-  color: var(--tui-catalog-item-text-color);
-  background: var(--tui-catalog-item-bg-color);
+  color: var(--legacy-catalog-item-text-color);
+  background: var(--legacy-catalog-item-bg-color);
   border: 1px solid;
-  border-color: var(--tui-catalog-item-border-color);
+  border-color: var(--legacy-catalog-item-border-color);
   display: block;
   position: relative;
   transition: box-shadow 0.2s ease-in-out;
@@ -38,8 +38,8 @@ $catalog_item_narrow-image_ratio: $catalog_item_narrow-image_height / $catalog_i
   &:active,
   &:focus,
   &:hover {
-    color: var(--tui-catalog-item-text-color);
-    box-shadow: var(--tui-shadow-2);
+    color: var(--legacy-catalog-item-text-color);
+    box-shadow: var(--legacy-shadow-2);
     outline: none;
     text-decoration: none;
   }
@@ -67,27 +67,27 @@ $catalog_item_narrow-image_ratio: $catalog_item_narrow-image_height / $catalog_i
 
   &__noimage {
     display: block;
-    margin-bottom: var(--tui-gap-2);
-    padding: var(--tui-gap-2);
+    margin-bottom: var(--legacy-gap-2);
+    padding: var(--legacy-gap-2);
   }
 
   &__content {
-    padding: var(--tui-gap-2);
+    padding: var(--legacy-gap-2);
   }
 
   &__hero {
-    left: calc(var(--tui-gap-1) * -1);
+    left: calc(var(--legacy-gap-1) * -1);
     max-width: 100%;
     position: absolute;
-    top: var(--tui-gap-2);
+    top: var(--legacy-gap-2);
     white-space: nowrap;
 
     &_icon {
-      background: var(--tui-catalog-item-hero-icon-bg-color);
+      background: var(--legacy-catalog-item-hero-icon-bg-color);
       border-radius: 15px;
-      box-shadow: var(--tui-shadow-2);
+      box-shadow: var(--legacy-shadow-2);
       overflow: hidden;
-      padding: var(--tui-gap-1) 0.1rem;
+      padding: var(--legacy-gap-1) 0.1rem;
 
       > .flex-icon {
         max-height: 28px;
@@ -103,13 +103,13 @@ $catalog_item_narrow-image_ratio: $catalog_item_narrow-image_height / $catalog_i
 
     &_text {
       @include totara-style-heading-label-small();
-      background: var(--tui-catalog-item-hero-bg-color);
+      background: var(--legacy-catalog-item-hero-bg-color);
       border-radius: 3px;
-      box-shadow: var(--tui-shadow-2);
-      color: var(--tui-catalog-item-hero-text-color);
+      box-shadow: var(--legacy-shadow-2);
+      color: var(--legacy-catalog-item-hero-text-color);
       max-width: 100%;
       overflow: hidden;
-      padding: 0 var(--tui-gap-2);
+      padding: 0 var(--legacy-gap-2);
       text-overflow: ellipsis;
       text-transform: inherit;
     }
@@ -121,25 +121,25 @@ $catalog_item_narrow-image_ratio: $catalog_item_narrow-image_height / $catalog_i
 
   &__noprogress {
     display: block;
-    padding: var(--tui-gap-2);
+    padding: var(--legacy-gap-2);
     height: $line-height-computed;
   }
 
   &__title {
     @include totara-style-heading-x-small();
     height: 4.5em; // Line height x3
-    margin: var(--tui-gap-2) 0;
+    margin: var(--legacy-gap-2) 0;
     overflow: hidden;
     position: relative;
 
     &_featured {
       @include totara-style-heading-label-small();
-      background: var(--tui-catalog-item-featured-bg-color);
+      background: var(--legacy-catalog-item-featured-bg-color);
       border-radius: 3px;
-      color: var(--tui-catalog-item-featured-text-color);
+      color: var(--legacy-catalog-item-featured-text-color);
       display: inline-block;
-      margin: 0 var(--tui-gap-1) 0 0;
-      padding: 0 var(--tui-gap-2);
+      margin: 0 var(--legacy-gap-1) 0 0;
+      padding: 0 var(--legacy-gap-2);
       text-transform: none;
       vertical-align: text-bottom;
     }
@@ -148,18 +148,18 @@ $catalog_item_narrow-image_ratio: $catalog_item_narrow-image_height / $catalog_i
   &__description {
     @include totara-style-body-small();
     height: 4.5em; // Line height x3
-    margin: var(--tui-gap-2) 0;
+    margin: var(--legacy-gap-2) 0;
     overflow: hidden;
   }
 
   &__textarea_group {
-    padding-top: var(--tui-gap-2);
+    padding-top: var(--legacy-gap-2);
 
     &_item {
       @include totara-style-body-x-small();
-      color: var(--tui-catalog-item-additional-text-color);
+      color: var(--legacy-catalog-item-additional-text-color);
       height: 1.63em; // line height
-      margin: var(--tui-gap-1) 0 var(--tui-gap-2);
+      margin: var(--legacy-gap-1) 0 var(--legacy-gap-2);
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -173,16 +173,16 @@ $catalog_item_narrow-image_ratio: $catalog_item_narrow-image_height / $catalog_i
   &__iconRow {
     height: 25px;
     line-height: 25px;
-    margin: var(--tui-gap-4) 0 var(--tui-gap-2);
+    margin: var(--legacy-gap-4) 0 var(--legacy-gap-2);
     overflow: hidden;
 
     > .flex-icon {
-      font-size: var(--tui-font-size-13);
+      font-size: var(--legacy-font-size-13);
     }
 
     > .flex-icon,
     &_icon {
-      margin-right: var(--tui-gap-2);
+      margin-right: var(--legacy-gap-2);
       max-height: 25px;
       width: 25px;
     }
@@ -198,7 +198,7 @@ $catalog_item_narrow-image_ratio: $catalog_item_narrow-image_height / $catalog_i
     max-height: 100%;
 
     &:after {
-      background: var(--tui-catalog-item-bg-color);
+      background: var(--legacy-catalog-item-bg-color);
       bottom: 0;
       content: '\2026';
       position: absolute;
@@ -210,12 +210,12 @@ $catalog_item_narrow-image_ratio: $catalog_item_narrow-image_height / $catalog_i
 
 .tw-grid__item_active {
   .tw-catalogItemNarrow {
-    box-shadow: var(--tui-shadow-3);
+    box-shadow: var(--legacy-shadow-3);
 
     &:active,
     &:focus,
     &:hover {
-      box-shadow: var(--tui-shadow-3);
+      box-shadow: var(--legacy-shadow-3);
       outline: none;
       text-decoration: none;
     }

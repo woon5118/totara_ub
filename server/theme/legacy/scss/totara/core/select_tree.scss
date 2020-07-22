@@ -86,7 +86,7 @@
   &__option {
     background: $selectTree-options-bg-color;
     border: 1px solid $selectTree-options-border-color;
-    box-shadow: var(--tui-shadow-2);
+    box-shadow: var(--legacy-shadow-2);
     font-size: $selectTree-options-text-size;
     max-height: 350px;
     max-width: 300px;

@@ -29,7 +29,7 @@
     clear: both;
     width: 120%;
     margin: auto 0;
-    border-top: 1px solid var(--tui-nav-quick-seperator-color);
+    border-top: 1px solid var(--legacy-nav-quick-seperator-color);
   }
 
   &_chevron {
@@ -45,8 +45,8 @@
     max-width: 100%;
     padding: $quickAccessMenu-box-padding $quickAccessMenu-box-padding 0 $quickAccessMenu-box-padding;
     overflow: hidden;
-    color: var(--tui-nav-quick-text-color);
-    background-color: var(--tui-nav-quick-bg-color);
+    color: var(--legacy-nav-quick-text-color);
+    background-color: var(--legacy-nav-quick-bg-color);
     opacity: 1;
     //Fade in timings
     transition: transform $quickAccessMenu-transition-time ease,
@@ -92,26 +92,26 @@
       }
 
       &-input {
-        border-color: var(--tui-form-input-border-color);
+        border-color: var(--legacy-form-input-border-color);
         height: 3rem;
         padding-left: 8px;
       }
     }
 
     &-header {
-      margin-bottom: var(--tui-gap-2);
+      margin-bottom: var(--legacy-gap-2);
       line-height: 2.5em;
 
       &_title {
         display: inline-block;
         margin: 0;
-        font-size: var(--tui-font-size-13);
+        font-size: var(--legacy-font-size-13);
       }
 
       &_control {
         float: right;
         color: inherit;
-        font-size: var(--tui-font-size-15);
+        font-size: var(--legacy-font-size-15);
       }
     }
   }
@@ -132,9 +132,9 @@
     &-title {
       max-width: 25ch;
       min-height: 1em; //Set this to the font-size to make sure that empty titles still have height
-      margin: var(--tui-gap-2) 0;
+      margin: var(--legacy-gap-2) 0;
       overflow: hidden;
-      font-size: var(--tui-font-size-14);
+      font-size: var(--legacy-font-size-14);
       line-height: normal;
       white-space: nowrap;
       text-overflow: ellipsis;
@@ -150,18 +150,18 @@
       margin: 0;
 
       li {
-        margin: var(--tui-gap-2) 0;
+        margin: var(--legacy-gap-2) 0;
 
         a {
-          color: var(--tui-nav-quick-item-text-color);
+          color: var(--legacy-nav-quick-item-text-color);
 
           &:focus,
           &:hover {
-            color: var(--tui-nav-quick-item-text-color-focus);
+            color: var(--legacy-nav-quick-item-text-color-focus);
           }
 
           &:active {
-            color: var(--tui-nav-quick-item-text-color-active);
+            color: var(--legacy-nav-quick-item-text-color-active);
           }
         }
       }
@@ -169,7 +169,7 @@
   }
 
   & &_footer {
-    margin-top: var(--tui-gap-2);
+    margin-top: var(--legacy-gap-2);
     line-height: 2.5em;
 
     //Horizontal rule
@@ -178,7 +178,7 @@
       left: calc(#{$quickAccessMenu-box-padding} * -1);
       display: block;
       width: 120%;
-      border-top: 1px solid var(--tui-nav-quick-seperator-color);
+      border-top: 1px solid var(--legacy-nav-quick-seperator-color);
       content: '';
     }
 
@@ -191,11 +191,11 @@
     // Menu settings link
     > a {
       float: right;
-      font-size: var(--tui-font-size-12);
+      font-size: var(--legacy-font-size-12);
     }
 
     &-last {
-      margin-right: var(--tui-gap-2);
+      margin-right: var(--legacy-gap-2);
     }
   }
 
@@ -204,7 +204,7 @@
     // Toggle icon
     &-icon {
       flex: 0 0 20%;
-      font-size: var(--tui-font-size-32);
+      font-size: var(--legacy-font-size-32);
     }
 
     &-text {
@@ -212,7 +212,7 @@
       a {
         @extend .btn;
         @include bs-btn-primary();
-        margin-top: var(--tui-gap-1);
+        margin-top: var(--legacy-gap-1);
       }
     }
   }
@@ -243,7 +243,7 @@
       flex-direction: column;
       width: 85%;
       height: 100%;
-      box-shadow: var(--tui-shadow-3);
+      box-shadow: var(--legacy-shadow-3);
       transform: translateX(0);
 
       @include prepend-current('.collapsed') {
@@ -271,7 +271,7 @@
           left: calc(#{$quickAccessMenu-box-padding} * -1);
           display: block;
           width: 120%;
-          border-top: 1px solid var(--tui-nav-quick-seperator-color);
+          border-top: 1px solid var(--legacy-nav-quick-seperator-color);
           content: '';
         }
       }
@@ -289,7 +289,7 @@
     & &_group {
       &-list {
         li {
-          padding-left: var(--tui-gap-4);
+          padding-left: var(--legacy-gap-4);
         }
       }
     }
@@ -310,9 +310,9 @@
       //Desktop sizings
       position: absolute;
       max-width: 95vw;
-      border-top: 1px solid var(--tui-nav-quick-border-top-color);
+      border-top: 1px solid var(--legacy-nav-quick-border-top-color);
       //Open/Close animation properties
-      box-shadow: var(--tui-shadow-3);
+      box-shadow: var(--legacy-shadow-3);
       transform-origin: top center;
 
       [dir='rtl'] & {

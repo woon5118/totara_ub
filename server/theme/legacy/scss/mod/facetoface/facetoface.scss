@@ -123,7 +123,7 @@ body.path-mod-facetoface div#fgroup_id_recipients input[id*='id_booked_type'] {
 .reportbuilder-table .session_bookingstatus > div > span,
 .reportbuilder-table .session_overallstatus > div > span {
   display: inline-block;
-  margin: var(--tui-gap-2);
+  margin: var(--legacy-gap-2);
 }
 
 .reportbuilder-table .session_bookingstatus .underbooked,
@@ -216,11 +216,11 @@ select.menuf2f-select {
 // styles for the seminar event page
 
 @mixin force-link-color() {
-  color: var(--tui-color-state);
+  color: var(--legacy-color-state);
 
   &:hover,
   &:focus {
-    color: var(--tui-color-state-focus);
+    color: var(--legacy-color-state-focus);
     text-decoration: underline;
   }
 }
@@ -261,7 +261,7 @@ select.menuf2f-select {
     }
 
     &:not(.btn-group) > .commandlink + .commandlink {
-      margin-left: var(--tui-gap-2);
+      margin-left: var(--legacy-gap-2);
     }
   }
 
@@ -309,19 +309,19 @@ select.menuf2f-select {
 
     border: 1px $facetoface-border-color solid;
     border-radius: $facetoface-border-radius;
-    margin: var(--tui-gap-4) 0;
-    padding: var(--tui-gap-2) var(--tui-gap-2) 0;
+    margin: var(--legacy-gap-4) 0;
+    padding: var(--legacy-gap-2) var(--legacy-gap-2) 0;
 
     &__toggle-button > .flex-icon {
       font-size: $ft-size-400;
-      margin-bottom: var(--tui-gap-2);
+      margin-bottom: var(--legacy-gap-2);
     }
 
     @mixin child() {
       display: flex;
       flex-wrap: wrap;
       flex-direction: column;
-      margin: 0 var(--tui-gap-2) var(--tui-gap-2);
+      margin: 0 var(--legacy-gap-2) var(--legacy-gap-2);
       max-width: 100%;
     }
 
@@ -343,9 +343,9 @@ select.menuf2f-select {
         margin: 0;
         // Override Moodle form
         font: inherit;
-        font-size: var(--tui-font-size-11);
-        line-height: var(--tui-font-size-16);
-        padding: 0 var(--tui-gap-1) 1px 0;
+        font-size: var(--legacy-font-size-11);
+        line-height: var(--legacy-font-size-16);
+        padding: 0 var(--legacy-gap-1) 1px 0;
       }
 
       &__select {
@@ -394,7 +394,7 @@ select.menuf2f-select {
     }
 
     &__link {
-      margin: 0 0 var(--tui-gap-2) var(--tui-gap-2);
+      margin: 0 0 var(--legacy-gap-2) var(--legacy-gap-2);
       visibility: hidden;
     }
 
@@ -407,7 +407,7 @@ select.menuf2f-select {
   &__sessions {
     &__spinner {
       display: none;
-      font-size: var(--tui-font-size-20);
+      font-size: var(--legacy-font-size-20);
     }
 
     &.loading &__spinner {
@@ -433,11 +433,11 @@ select.menuf2f-select {
   &__sessionlist {
     // Make the session list table horizontally scrollable in the content area,
     // so it wouldn't overlap the blocks on the right side.
-    margin-bottom: var(--tui-gap-6);
+    margin-bottom: var(--legacy-gap-6);
     overflow-x: auto;
 
     &--empty {
-      padding: var(--tui-gap-4);
+      padding: var(--legacy-gap-4);
     }
 
     &__show-previous--hidden {
@@ -478,7 +478,7 @@ select.menuf2f-select {
 
       // Add a border between sessions
       &__sessionrow {
-        border-top: 1px solid var(--tui-color-neutral-5);
+        border-top: 1px solid var(--legacy-color-neutral-5);
 
         // Add a thick border between events
         &.firstsession,
@@ -505,19 +505,19 @@ select.menuf2f-select {
         white-space: nowrap;
       }
       &__user {
-        font-size: var(--tui-font-size-13);
+        font-size: var(--legacy-font-size-13);
       }
     }
 
     &__timezone {
-      font-size: var(--tui-font-size-12);
+      font-size: var(--legacy-font-size-12);
       display: block;
     }
 
     // Override Bootstrap.
     &__table td.mod_facetoface__sessionlist__actions {
-      padding-bottom: var(--tui-gap-2);
-      padding-top: var(--tui-gap-2);
+      padding-bottom: var(--legacy-gap-2);
+      padding-top: var(--legacy-gap-2);
     }
 
     &__actions {
@@ -531,17 +531,17 @@ select.menuf2f-select {
         justify-content: center;
       }
       &__buttons &__dropdown.dropdown-toggle {
-        padding: var(--tui-gap-1) var(--tui-gap-2);
+        padding: var(--legacy-gap-1) var(--legacy-gap-2);
       }
       &__icons {
         display: flex;
-        font-size: var(--tui-font-size-16);
+        font-size: var(--legacy-font-size-16);
       }
       &__icons + &__links {
-        margin-top: var(--tui-gap-1);
+        margin-top: var(--legacy-gap-1);
       }
       &__dropdown {
-        margin-left: var(--tui-gap-1);
+        margin-left: var(--legacy-gap-1);
         > .flex-icon {
           font-size: 111%;
           // This hackery disables font hinting and grid fitting to get a better rendering result of the '...' button.
@@ -592,27 +592,27 @@ select.menuf2f-select {
 
     &__roomdetails {
       display: block;
-      font-size: var(--tui-font-size-12);
+      font-size: var(--legacy-font-size-12);
     }
   }
 
   &__event_details {
     dt {
-      margin-top: var(--tui-gap-2);
+      margin-top: var(--legacy-gap-2);
     }
     hr {
-      margin: var(--tui-gap-2) 0;
+      margin: var(--legacy-gap-2) 0;
     }
     &__room,
     &__asset,
     &__facilitator {
-      margin-bottom: var(--tui-gap-2);
+      margin-bottom: var(--legacy-gap-2);
     }
 
     &__sessions {
       display: flex;
       flex-direction: column;
-      margin-top: var(--tui-gap-2);
+      margin-top: var(--legacy-gap-2);
 
       @include seminar-event-state;
 
@@ -623,7 +623,7 @@ select.menuf2f-select {
       }
 
       @mixin cell() {
-        padding: var(--tui-gap-1);
+        padding: var(--legacy-gap-1);
       }
 
       &__rowheader {
@@ -689,7 +689,7 @@ select.menuf2f-select {
   }
   // Extra space below the upcoming sessions table.
   &__action-detailfooter {
-    margin-top: var(--tui-gap-4);
+    margin-top: var(--legacy-gap-4);
   }
   &__sessionlist {
     clear: right;
@@ -713,7 +713,7 @@ select.menuf2f-select {
     }
 
     &__date {
-      margin: 0 0 var(--tui-gap-2);
+      margin: 0 0 var(--legacy-gap-2);
       padding: 0;
     }
 
@@ -723,7 +723,7 @@ select.menuf2f-select {
     }
 
     &__user {
-      margin: 0 0 0 var(--tui-gap-2);
+      margin: 0 0 0 var(--legacy-gap-2);
       padding: 0;
     }
   }
@@ -734,13 +734,13 @@ select.menuf2f-select {
 
   &__action-reservation {
     border-top: 1px solid $facetoface-border-color;
-    padding-top: var(--tui-gap-2);
+    padding-top: var(--legacy-gap-2);
   }
 
   // +++ Navigation bar +++ //
   &__navigation {
-    color: var(--tui-color-neutral-1);
-    margin: var(--tui-gap-4) (0px - floor(($grid-gutter-width / 2))) var(--tui-gap-4) 0px - ceil(($grid-gutter-width / 2));
+    color: var(--legacy-color-neutral-1);
+    margin: var(--legacy-gap-4) (0px - floor(($grid-gutter-width / 2))) var(--legacy-gap-4) 0px - ceil(($grid-gutter-width / 2));
     padding-left:  ceil(($grid-gutter-width / 2));
     padding-right: floor(($grid-gutter-width / 2));
     position: relative; // IE11 does not support sticky position
@@ -753,10 +753,10 @@ select.menuf2f-select {
 
       a {
         border-right: 1px solid $facetoface-border-color;
-        font-size: var(--tui-font-size-14);
-        line-height: var(--tui-font-size-14);
-        margin: (($facetoface-navbar-height - var(--tui-font-size-14)) / 2) 0;
-        padding: 0 var(--tui-gap-2);
+        font-size: var(--legacy-font-size-14);
+        line-height: var(--legacy-font-size-14);
+        margin: (($facetoface-navbar-height - var(--legacy-font-size-14)) / 2) 0;
+        padding: 0 var(--legacy-gap-2);
 
         &:first-child {
           padding-left: 0;
@@ -786,7 +786,7 @@ select.menuf2f-select {
   @mixin sidebar-panel-open() {
     height: auto;
     min-height: 200px; // DES-89
-    padding: var(--tui-gap-6);
+    padding: var(--legacy-gap-6);
     transform: none;
     visibility: visible;
   }
@@ -794,7 +794,7 @@ select.menuf2f-select {
   // +++ Event page +++ //
   &__eventinfo {
     display: flex;
-    margin-bottom: var(--tui-gap-2);
+    margin-bottom: var(--legacy-gap-2);
 
     &__content {
       flex: 1;
@@ -805,7 +805,7 @@ select.menuf2f-select {
 
         margin-bottom: 0;
         margin-left: 0px - ceil(($grid-gutter-width / 2));
-        padding: var(--tui-gap-2) ceil(($grid-gutter-width / 2));
+        padding: var(--legacy-gap-2) ceil(($grid-gutter-width / 2));
 
         &__items {
           margin: 0;
@@ -821,8 +821,8 @@ select.menuf2f-select {
 
       @mixin section_divider() {
         @include divider;
-        margin-bottom: var(--tui-gap-2);
-        padding-bottom: var(--tui-gap-2);
+        margin-bottom: var(--legacy-gap-2);
+        padding-bottom: var(--legacy-gap-2);
       }
 
       &__intro {
@@ -896,13 +896,13 @@ select.menuf2f-select {
       max-width: 480px;
       min-width: 320px;
       order: 1;
-      padding: var(--tui-gap-6) var(--tui-gap-2) 0;
+      padding: var(--legacy-gap-6) var(--legacy-gap-2) 0;
       margin-left: ceil(($grid-gutter-width / 2));
     }
 
     &__sidebar {
-      background-color: var(--tui-color-neutral-4);
-      color: var(--tui-color-neutral-1);
+      background-color: var(--legacy-color-neutral-4);
+      color: var(--legacy-color-neutral-1);
 
       // Here comes the good-old clearfix
       @include clearfix;
@@ -924,7 +924,7 @@ select.menuf2f-select {
         // Cosmetic adjustments of Moodle form and its elements to fit in 320px
         > .mform {
           .fdescription.required {
-            margin-right: calc(var(--tui-gap-10) - var(--tui-gap-6));
+            margin-right: calc(var(--legacy-gap-10) - var(--legacy-gap-6));
           }
 
           #id_submitbutton {
@@ -940,7 +940,7 @@ select.menuf2f-select {
             }
 
             .felement {
-              padding-top: var(--tui-gap-2);
+              padding-top: var(--legacy-gap-2);
 
               label {
                 display: inline;
@@ -1005,20 +1005,20 @@ select.menuf2f-select {
       &__signup-failure {
         @include with-heading();
 
-        background: var(--tui-color-neutral-2);
-        color: var(--tui-color-neutral-1);
+        background: var(--legacy-color-neutral-2);
+        color: var(--legacy-color-neutral-1);
       }
 
       &__cancellation-cancellation {  // NOTE: this is not a typo.
         @include force-link-style();
-        color: var(--tui-color-state);
+        color: var(--legacy-color-state);
 
         &:active,
         &:focus,
         &:hover,
         &:active:focus,
         &:active:hover {
-          color: var(--tui-color-state-focus);
+          color: var(--legacy-color-state-focus);
         }
 
         &,
@@ -1027,11 +1027,11 @@ select.menuf2f-select {
         &:hover,
         &:active:focus,
         &:active:hover {
-          font-size: var(--tui-font-size-20);
+          font-size: var(--legacy-font-size-20);
           line-height: 1;
           position: absolute;
-          top: var(--tui-font-size-10);
-          right: var(--tui-gap-2);
+          top: var(--legacy-font-size-10);
+          right: var(--legacy-gap-2);
         }
       }
     }
@@ -1075,7 +1075,7 @@ select.menuf2f-select {
 
       &__toggle-button__loading {
         display: none;
-        padding: var(--tui-gap-2) 0;
+        padding: var(--legacy-gap-2) 0;
         text-align: center;
         width: 100%;
       }
@@ -1101,7 +1101,7 @@ select.menuf2f-select {
           flex: 1;
           &__hidden,
           &__shown {
-            padding: var(--tui-gap-2) 0;
+            padding: var(--legacy-gap-2) 0;
           }
           &__hidden {
             display: none;
@@ -1136,8 +1136,8 @@ select.menuf2f-select {
       &__item {
         align-items: center;
         flex-direction: row;
-        margin: 0 0 var(--tui-gap-2);
-        padding: 0 var(--tui-gap-2);
+        margin: 0 0 var(--legacy-gap-2);
+        padding: 0 var(--legacy-gap-2);
         width: 100%;
 
         &__eventtime,
@@ -1148,12 +1148,12 @@ select.menuf2f-select {
           &__select {
             max-width: initial;
             min-width: initial;
-            width: calc(100% - var(--tui-font-size-13) * 8);
+            width: calc(100% - var(--legacy-font-size-13) * 8);
           }
         }
 
         &__label {
-          width: calc(var(--tui-font-size-13) * 8);
+          width: calc(var(--legacy-font-size-13) * 8);
         }
 
         &__select {
@@ -1165,7 +1165,7 @@ select.menuf2f-select {
       &__link {
         display: none;
         margin: 0;
-        padding: var(--tui-gap-4) 0;
+        padding: var(--legacy-gap-4) 0;
         text-align: center;
         width: 100%;
       }
@@ -1223,7 +1223,7 @@ select.menuf2f-select {
 
       &__sidebars {
         margin-left: 0;
-        margin-bottom: var(--tui-gap-6);
+        margin-bottom: var(--legacy-gap-6);
         max-width: none;
         min-width: auto;
         order: 0;
@@ -1233,7 +1233,7 @@ select.menuf2f-select {
 
         > .mform {
           float: none;
-          padding-bottom: var(--tui-gap-2);
+          padding-bottom: var(--legacy-gap-2);
         }
       }
     }
@@ -1282,18 +1282,18 @@ select.menuf2f-select {
 }
 
 .f2f-takeattendance-event-summary {
-  margin: var(--tui-gap-4) 0;
+  margin: var(--legacy-gap-4) 0;
 }
 
 .f2f-takeattendance-bulk-action-box {
   margin-bottom: $form-group-margin-bottom;
-  padding: var(--tui-gap-2);
-  border: var(--tui-border-width-thin) $facetoface-border-color solid;
+  padding: var(--legacy-gap-2);
+  border: var(--legacy-border-width-thin) $facetoface-border-color solid;
   border-radius: 2px;
 
   .bulkactionstring {
     margin-top: 7px;
-    margin-right: var(--tui-gap-4);
+    margin-right: var(--legacy-gap-4);
     float: left;
 
     @media (min-width: $totara-style-screen-md-min) {
@@ -1327,11 +1327,11 @@ select.menuf2f-select {
 }
 
 div.mod-facetoface__export-options {
-  margin-top: var(--tui-gap-4);
+  margin-top: var(--legacy-gap-4);
 }
 
 a.mod_facetoface__action_goback {
-  margin: 0 0 var(--tui-gap-1) var(--tui-gap-1);
+  margin: 0 0 var(--legacy-gap-1) var(--legacy-gap-1);
 }
 
 .mod_facetoface__grade {
@@ -1358,17 +1358,17 @@ a.mod_facetoface__action_goback {
   }
   form.mform_seminarevent_cancellation {
     div.eventcancellationtext {
-      margin-bottom: var(--tui-gap-4);
+      margin-bottom: var(--legacy-gap-4);
     }
   }
 }
 
 .path-mod-facetoface {
   form.import_export {
-    padding-top: var(--tui-gap-6);
+    padding-top: var(--legacy-gap-6);
 
     legend {
-      margin-bottom: var(--tui-gap-4);
+      margin-bottom: var(--legacy-gap-4);
     }
     .fitem {
       margin-left: 0px;
@@ -1377,13 +1377,13 @@ a.mod_facetoface__action_goback {
       a.mod_facetoface__action_uploadattendance,
       a.mod_facetoface__action_csvexportupload,
       select[name='f2f-export-actions'] {
-        margin: 0 var(--tui-gap-2) var(--tui-gap-1) 0px;
+        margin: 0 var(--legacy-gap-2) var(--legacy-gap-1) 0px;
       }
     }
   }
   table.userstoupload {
     span.usernotfound {
-      margin-left: var(--tui-gap-1);
+      margin-left: var(--legacy-gap-1);
     }
   }
 }
@@ -1391,11 +1391,11 @@ a.mod_facetoface__action_goback {
 .path-mod-facetoface,
 .path-admin-mod-facetoface {
   dl > dd {
-    margin-bottom: var(--tui-gap-2);
+    margin-bottom: var(--legacy-gap-2);
   }
   .ui-dialog {
     .ui-dialog-titlebar {
-      padding: var(--tui-gap-3) var(--tui-gap-4);
+      padding: var(--legacy-gap-3) var(--legacy-gap-4);
       .ui-dialog-title {
         margin: 0;
         span.title {
@@ -1404,7 +1404,7 @@ a.mod_facetoface__action_goback {
             span#treeview_currently_selected_span_facilitator {
               display: none;
               label {
-                margin-right: var(--tui-gap-1);
+                margin-right: var(--legacy-gap-1);
               }
               span#treeview_selected_text_facilitator {
                 font-style: italic;
@@ -1451,25 +1451,25 @@ a.mod_facetoface__action_goback {
       }
       .ui-tabs-panel {
         [id^='item_'] {
-          margin-left: calc(var--tui-gap-1 / 2);
+          margin-left: calc(var(--legacy-gap-1) / 2);
         }
       }
       #search-tab .mform {
         .fitem {
-          margin-bottom: var(--tui-gap-1);
+          margin-bottom: var(--legacy-gap-1);
         }
         .fitemtitle {
           display: none;
         }
         .felement {
-          padding-right:var(--tui-gap-1) ;
+          padding-right:var(--legacy-gap-1) ;
         }
       }
       #search-tab {
         #fitem_id_query {
           margin-bottom: 0;
           .fitemtitle {
-            padding: var(--tui-gap-1) 0 0 0;
+            padding: var(--legacy-gap-1) 0 0 0;
           }
           .ftext {
             padding-right: 0;
@@ -1478,16 +1478,16 @@ a.mod_facetoface__action_goback {
         #fitem_id_dialogsearchsubmitbutton {
           margin-bottom: 0;
           .fsubmit {
-            margin-left: var(--tui-gap-1);
+            margin-left: var(--legacy-gap-1);
           }
         }
       }
       #browse-tab,
       #search-tab {
         ul.treeview li {
-          font-size: var(--tui-font-size-13);
+          font-size: var(--legacy-font-size-13);
           span {
-            margin-left: calc(var--tui-gap-1 / 2);
+            margin-left: calc(var(--legacy-gap-1) / 2);
           }
         }
       }
@@ -1495,7 +1495,7 @@ a.mod_facetoface__action_goback {
     .selected {
       .treeview-selected-item {
         display: block;
-        font-size: var(--tui-font-size-13);
+        font-size: var(--legacy-font-size-13);
       }
       // Taken from theme/basis/less
       div:hover span.deletebutton,
@@ -1526,14 +1526,14 @@ a.mod_facetoface__action_goback {
       margin-right: 0;
     }
     input[name='facilitatorselector'] {
-      margin-right: var(--tui-gap-2);
+      margin-right: var(--legacy-gap-2);
     }
   }
   table#facetoface_facilitators {
     td.facilitator_namelink,
     td.facilitator_name {
       span.userfullname {
-        margin-left: var(--tui-gap-1);
+        margin-left: var(--legacy-gap-1);
       }
     }
   }
@@ -1544,7 +1544,7 @@ a.mod_facetoface__action_goback {
       div#fgroup_id_recipients {
           fieldset.fgroup {
               div.fitem {
-                  margin-bottom: var(--tui-gap-2);
+                  margin-bottom: var(--legacy-gap-2);
                   span.recipients_status {
                       font-weight: bold;
                   }

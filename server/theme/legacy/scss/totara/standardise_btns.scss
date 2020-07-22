@@ -28,123 +28,123 @@
 
 // Standard button colours
 @mixin bs-btn-default() {
-    color: var(--tui-btn-text-color);
-    background-color: var(--tui-btn-bg-color);
-    border-color: var(--tui-btn-border-color);
+    color: var(--legacy-btn-text-color);
+    background-color: var(--legacy-btn-bg-color);
+    border-color: var(--legacy-btn-border-color);
 
     &:focus,
     &.focus {
-      color: var(--tui-btn-text-color-focus);
-      background-color: var(--tui-btn-bg-color-focus);
-      border-color: var(--tui-btn-border-color-focus);
-      box-shadow: var(--tui-btn-shadow-focus);
+      color: var(--legacy-btn-text-color-focus);
+      background-color: var(--legacy-btn-bg-color-focus);
+      border-color: var(--legacy-btn-border-color-focus);
+      box-shadow: var(--legacy-btn-shadow-focus);
     }
     &:hover {
-      color: var(--tui-btn-text-color-focus);
-      background-color: var(--tui-btn-bg-color-focus);
-      border-color: var(--tui-btn-border-color-focus);
-      box-shadow: var(--tui-btn-shadow-focus);
+      color: var(--legacy-btn-text-color-focus);
+      background-color: var(--legacy-btn-bg-color-focus);
+      border-color: var(--legacy-btn-border-color-focus);
+      box-shadow: var(--legacy-btn-shadow-focus);
     }
     &:active,
     &.active,
     .open > &.dropdown-toggle {
-      color: var(--tui-btn-text-color-active);
-      background-color: var(--tui-btn-bg-color-active);
+      color: var(--legacy-btn-text-color-active);
+      background-color: var(--legacy-btn-bg-color-active);
       background-image: none;
-      border-color: var(--tui-btn-border-color-active);
-      box-shadow: var(--tui-btn-shadow-active);
+      border-color: var(--legacy-btn-border-color-active);
+      box-shadow: var(--legacy-btn-shadow-active);
 
       &:hover,
       &:focus,
       &.focus {
-        color: var(--tui-btn-text-color-active);
-        background-color: var(--tui-btn-bg-color-active);
-        border-color: var(--tui-btn-border-color-active);
-        box-shadow: var(--tui-btn-shadow-active);
+        color: var(--legacy-btn-text-color-active);
+        background-color: var(--legacy-btn-bg-color-active);
+        border-color: var(--legacy-btn-border-color-active);
+        box-shadow: var(--legacy-btn-shadow-active);
       }
     }
     &.disabled,
     &[disabled],
     fieldset[disabled] & {
-      color: var(--tui-btn-text-color-disabled);
-      background-color: var(--tui-btn-bg-color-disabled);
-      border-color: var(--tui-btn-border-color-disabled);
+      color: var(--legacy-btn-text-color-disabled);
+      background-color: var(--legacy-btn-bg-color-disabled);
+      border-color: var(--legacy-btn-border-color-disabled);
       box-shadow: none;
       opacity: 1;
 
       &:hover,
       &:focus,
       &.focus {
-        color: var(--tui-btn-text-color-disabled);
-        background-color: var(--tui-btn-bg-color-disabled);
-        border-color: var(--tui-btn-border-color-disabled);
+        color: var(--legacy-btn-text-color-disabled);
+        background-color: var(--legacy-btn-bg-color-disabled);
+        border-color: var(--legacy-btn-border-color-disabled);
         box-shadow: none;
         opacity: 1;
       }
     }
 
     .badge {
-      color: var(--tui-btn-text-color);
-      background-color: var(--tui-btn-bg-color);
+      color: var(--legacy-btn-text-color);
+      background-color: var(--legacy-btn-bg-color);
     }
 }
 
 // Primary button colours
 @mixin bs-btn-primary() {
-    color: var(--tui-btn-prim-text-color);
-    background-color: var(--tui-btn-prim-bg-color);
-    border-color: var(--tui-btn-prim-border-color);
+    color: var(--legacy-btn-prim-text-color);
+    background-color: var(--legacy-btn-prim-bg-color);
+    border-color: var(--legacy-btn-prim-border-color);
 
     &:focus,
     &.focus {
-      color: var(--tui-btn-prim-text-color-focus);
-      background-color: var(--tui-btn-prim-bg-color-focus);
-      border-color: var(--tui-btn-prim-border-color-focus);
-      box-shadow: var(--tui-btn-shadow-focus);
+      color: var(--legacy-btn-prim-text-color-focus);
+      background-color: var(--legacy-btn-prim-bg-color-focus);
+      border-color: var(--legacy-btn-prim-border-color-focus);
+      box-shadow: var(--legacy-btn-shadow-focus);
     }
     &:hover {
-      color: var(--tui-btn-prim-text-color-focus);
-      background-color: var(--tui-btn-prim-bg-color-focus);
-      border-color: var(--tui-btn-prim-border-color-focus);
-      box-shadow: var(--tui-btn-shadow-focus);
+      color: var(--legacy-btn-prim-text-color-focus);
+      background-color: var(--legacy-btn-prim-bg-color-focus);
+      border-color: var(--legacy-btn-prim-border-color-focus);
+      box-shadow: var(--legacy-btn-shadow-focus);
     }
     &:active,
     &.active,
     .open > &.dropdown-toggle {
-      color: var(--tui-btn-prim-text-color-active);
-      background-color: var(--tui-btn-prim-bg-color-active);
+      color: var(--legacy-btn-prim-text-color-active);
+      background-color: var(--legacy-btn-prim-bg-color-active);
       background-image: none;
-      border-color: var(--tui-btn-prim-border-color-active);
-      box-shadow: var(--tui-btn-shadow-active);
+      border-color: var(--legacy-btn-prim-border-color-active);
+      box-shadow: var(--legacy-btn-shadow-active);
 
       &:hover,
       &:focus,
       &.focus {
-        color: var(--tui-btn-prim-text-color-active);
-        background-color: var(--tui-btn-prim-bg-color-active);
-        border-color: var(--tui-btn-prim-border-color-active);
-        box-shadow: var(--tui-btn-shadow-active);
+        color: var(--legacy-btn-prim-text-color-active);
+        background-color: var(--legacy-btn-prim-bg-color-active);
+        border-color: var(--legacy-btn-prim-border-color-active);
+        box-shadow: var(--legacy-btn-shadow-active);
       }
     }
     &.disabled,
     &[disabled],
     fieldset[disabled] & {
-      color: var(--tui-btn-prim-text-color-disabled);
-      background-color: var(--tui-btn-prim-bg-color-disabled);
-      border-color: var(--tui-btn-prim-border-color-disabled);
+      color: var(--legacy-btn-prim-text-color-disabled);
+      background-color: var(--legacy-btn-prim-bg-color-disabled);
+      border-color: var(--legacy-btn-prim-border-color-disabled);
 
       &:hover,
       &:focus,
       &.focus {
-        color: var(--tui-btn-prim-text-color-disabled);
-        background-color: var(--tui-btn-prim-bg-color-disabled);
-        border-color: var(--tui-btn-prim-border-color-disabled);
+        color: var(--legacy-btn-prim-text-color-disabled);
+        background-color: var(--legacy-btn-prim-bg-color-disabled);
+        border-color: var(--legacy-btn-prim-border-color-disabled);
       }
     }
 
     .badge {
-      color: var(--tui-btn-text-color);
-      background-color: var(--tui-btn-bg-color);
+      color: var(--legacy-btn-text-color);
+      background-color: var(--legacy-btn-bg-color);
     }
 }
 

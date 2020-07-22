@@ -156,27 +156,27 @@
 
 // icon colours
 .ft-state-default {
-  color: var(--tui-color-text) !important;
+  color: var(--legacy-color-text) !important;
 }
 
 .ft-state-success {
-  color: var(--tui-color-prompt-success) !important;
+  color: var(--legacy-color-prompt-success) !important;
 }
 
 .ft-state-warning {
-  color: var(--tui-color-prompt-warning) !important;
+  color: var(--legacy-color-prompt-warning) !important;
 }
 
 .ft-state-danger {
-  color: var(--tui-color-prompt-alert) !important;
+  color: var(--legacy-color-prompt-alert) !important;
 }
 
 .ft-state-info {
-  color: var(--tui-color-secondary) !important;
+  color: var(--legacy-color-secondary) !important;
 }
 
 .ft-state-disabled {
-  color: var(--tui-color-state-disabled) !important;
+  color: var(--legacy-color-state-disabled) !important;
 }
 
 // icon pixel sizes

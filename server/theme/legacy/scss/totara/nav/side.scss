@@ -26,8 +26,8 @@
   flex-shrink: 0;
   height: 100%;
   margin: auto 0 auto auto;
-  padding: 0 0 0 var(--tui-gap-2);
-  color: var(--tui-nav-side-text-color);
+  padding: 0 0 0 var(--legacy-gap-2);
+  color: var(--legacy-nav-side-text-color);
 
   &__separator {
     display: none;
@@ -37,13 +37,13 @@
     padding: 0;
 
     .select {
-      margin: 0 var(--tui-gap-2) 0 0;
+      margin: 0 var(--legacy-gap-2) 0 0;
     }
   }
 
   .popover-region {
     position: initial;
-    margin: auto var(--tui-gap-1);
+    margin: auto var(--legacy-gap-1);
 
     .ie11 & {
       //TL-20522: IE11 doesn't support the initial value, so we have to explicitly set it to the (usual) default
@@ -57,11 +57,11 @@
     .nav-link {
       position: relative;
       width: auto;
-      padding: var(--tui-gap-2);
+      padding: var(--legacy-gap-2);
       line-height: 1.5;
 
       &:hover {
-        color: var(--tui-nav-side-text-color-focus)
+        color: var(--legacy-nav-side-text-color-focus)
       }
     }
 
@@ -69,7 +69,7 @@
       top: auto;
       left: 0;
       width: 100%;
-      color: var(--tui-nav-side-popover-text-color);
+      color: var(--legacy-nav-side-popover-text-color);
     }
 
     .popover-region-toggle::before,
@@ -90,8 +90,8 @@
     .moodle-actionmenu ul {
       .toggle-display .userbutton .avatars {
         position: relative;
-        margin: auto var(--tui-gap-1);
-        padding: 0 var(--tui-gap-1);
+        margin: auto var(--legacy-gap-1);
+        padding: 0 var(--legacy-gap-1);
       }
     }
 
@@ -100,12 +100,12 @@
     }
 
     .toggle-display {
-      padding: var(--tui-gap-1);
-      color: var(--tui-nav-side-text-color);
+      padding: var(--legacy-gap-1);
+      color: var(--legacy-nav-side-text-color);
       text-decoration: none;
 
       &:hover {
-        color: var(--tui-nav-side-text-color-focus);
+        color: var(--legacy-nav-side-text-color-focus);
       }
     }
 
@@ -184,14 +184,14 @@
       position: relative;
       display: block;
       flex: 0 0 0;
-      padding: 0 0 0 var(--tui-gap-2);
+      padding: 0 0 0 var(--legacy-gap-2);
 
       &::before {
         position: absolute;
         top: 25%;
         left: 0;
         height: 50%;
-        border-left: 1px solid var(--tui-nav-side-seperator-color);
+        border-left: 1px solid var(--legacy-nav-side-seperator-color);
         content: '';
       }
     }

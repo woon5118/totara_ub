@@ -23,15 +23,15 @@
 
 .tw-toggleFilterPanel {
   display: flex;
-  margin: var(--tui-gap-2) var(--tui-gap-2) var(--tui-gap-4);
+  margin: var(--legacy-gap-2) var(--legacy-gap-2) var(--legacy-gap-4);
 
   &__trigger {
     margin: 0 auto;
-    padding: var(--tui-gap-2);
+    padding: var(--legacy-gap-2);
     text-align: center;
 
     &_fixed {
-      background: var(--tui-color-neutral-1);
+      background: var(--legacy-color-neutral-1);
       left: 0;
       position: fixed;
       top: 0;

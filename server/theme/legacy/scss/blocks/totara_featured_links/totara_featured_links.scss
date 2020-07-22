@@ -207,7 +207,7 @@ div.tf_element_input input[type='color'] {
     justify-content: center;
     align-items: center;
     border: $featuredLinks-block-border-color dashed medium;
-    background-color: var(--tui-color-neutral-2);
+    background-color: var(--legacy-color-neutral-2);
 
     a {
       position: absolute;
@@ -232,6 +232,6 @@ div.tf_element_input input[type='color'] {
   margin: 0 -2px;
   padding: 0;
   border: 0;
-  background-color: var(--tui-color-secondary);
+  background-color: var(--legacy-color-secondary);
   z-index: 10;
 }

@@ -28,8 +28,8 @@
   vertical-align: top;
 
   &--header {
-    margin: var(--tui-gap-2);
-    font-size: var(--tui-font-size-14);
+    margin: var(--legacy-gap-2);
+    font-size: var(--legacy-font-size-14);
 
     &_img {
       height: 1.5em;
@@ -44,7 +44,7 @@
     height: 100%;
 
     &--header {
-      margin: 0 var(--tui-gap-2);
+      margin: 0 var(--legacy-gap-2);
 
       &_img {
         height: 2.8rem;
@@ -56,7 +56,7 @@
 @media (min-width: $tui-screen-md) {
   .totaraNav_prim .masthead_logo {
     &--header {
-      margin: 0 var(--tui-gap-4) 0 0;
+      margin: 0 var(--legacy-gap-4) 0 0;
     }
   }
 }

@@ -31,8 +31,8 @@ $catalogResultsShare-screen_xsm_min: 500px !default;
   &__btn {
     border: 1px solid;
     @include bs-btn-default();
-    font-size: var(--tui-font-size-13);
-    padding: var(--tui-gap-2);
+    font-size: var(--legacy-font-size-13);
+    padding: var(--legacy-gap-2);
     white-space: nowrap;
 
     .flex-icon {
@@ -68,25 +68,25 @@ $catalogResultsShare-screen_xsm_min: 500px !default;
     }
 
     &::before {
-      border-top-color: var(--tui-catalog-share-border-color);
-      border-width: calc(var(--tui-gap-4) + 0.1rem);
-      margin-left: calc((var(--tui-gap-4) + 0.1rem) * -1);
+      border-top-color: var(--legacy-catalog-share-border-color);
+      border-width: calc(var(--legacy-gap-4) + 0.1rem);
+      margin-left: calc((var(--legacy-gap-4) + 0.1rem) * -1);
     }
 
     &::after {
-      border-top-color: var(--tui-catalog-share-bg-color);
-      border-width: var(--tui-gap-4);
-      margin-left: calc(var(--tui-gap-4) * -1);
+      border-top-color: var(--legacy-catalog-share-bg-color);
+      border-width: var(--legacy-gap-4);
+      margin-left: calc(var(--legacy-gap-4) * -1);
     }
   }
 
   &__expanded {
-    background: var(--tui-catalog-share-bg-color);
+    background: var(--legacy-catalog-share-bg-color);
     bottom: 4.5rem;
-    border: 1px solid var(--tui-catalog-share-border-color);
-    box-shadow: var(--tui-shadow-2);
+    border: 1px solid var(--legacy-catalog-share-border-color);
+    box-shadow: var(--legacy-shadow-2);
     display: none;
-    padding: var(--tui-gap-4);
+    padding: var(--legacy-gap-4);
     position: absolute;
     width: 300px;
     z-index: 2;
@@ -102,7 +102,7 @@ $catalogResultsShare-screen_xsm_min: 500px !default;
       @include bs-btn-primary();
       display: inline-block;
       font-weight: bold;
-      padding: var(--tui-gap-2) var(--tui-gap-4);
+      padding: var(--legacy-gap-2) var(--legacy-gap-4);
       text-align: center;
       width: 100%;
 
@@ -115,7 +115,7 @@ $catalogResultsShare-screen_xsm_min: 500px !default;
 
     &_close {
       float: right;
-      padding: var(--tui-gap-2);
+      padding: var(--legacy-gap-2);
       position: absolute;
       right: 0;
       top: 0;
@@ -126,7 +126,7 @@ $catalogResultsShare-screen_xsm_min: 500px !default;
     }
 
     &_input {
-      margin: var(--tui-gap-1) 0;
+      margin: var(--legacy-gap-1) 0;
       width: 100%;
     }
   }
@@ -140,7 +140,7 @@ $catalogResultsShare-screen_xsm_min: 500px !default;
 @media (min-width: $catalogResultsShare-screen_xsm_min) {
   .tw-catalogResultsShare {
     /*rtl:ignore*/
-    margin-right: var(--tui-gap-1);
+    margin-right: var(--legacy-gap-1);
   }
 }
 

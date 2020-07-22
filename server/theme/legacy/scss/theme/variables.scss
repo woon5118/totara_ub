@@ -99,43 +99,43 @@ $boot-color-neutral-legacy-7: #3d444b;
 
 @mixin tui-font-heading-large {
   font-weight: bold;
-  font-size: var(--tui-font-size-50);
+  font-size: var(--legacy-font-size-50);
   line-height: 1;
 }
 
 @mixin tui-font-heading-medium {
   font-weight: bold;
-  font-size: var(--tui-font-size-30);
+  font-size: var(--legacy-font-size-30);
   line-height: 1;
 }
 
 @mixin tui-font-heading-small {
   font-weight: bold;
-  font-size: var(--tui-font-size-20);
+  font-size: var(--legacy-font-size-20);
   line-height: 1.25;
 }
 
 @mixin tui-font-heading-small-regular {
   font-weight: normal;
-  font-size: var(--tui-font-size-20);
+  font-size: var(--legacy-font-size-20);
   line-height: 1.25;
 }
 
 @mixin tui-font-heading-x-small {
   font-weight: bold;
-  font-size: var(--tui-font-size-16);
+  font-size: var(--legacy-font-size-16);
   line-height: 1.25;
 }
 
 @mixin tui-font-heading-label {
   font-weight: bold;
-  font-size: var(--tui-font-size-15);
+  font-size: var(--legacy-font-size-15);
   line-height: 1.2;
 }
 
 @mixin tui-font-heading-label-small {
   font-weight: bold;
-  font-size: var(--tui-font-size-13);
+  font-size: var(--legacy-font-size-13);
   line-height: 1.15;
 }
 

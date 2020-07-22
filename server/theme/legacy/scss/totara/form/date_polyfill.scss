@@ -40,13 +40,13 @@
   color: inherit;
   border: none;
   outline: none;
-  border-bottom: solid 1px var(--tui-color-neutral-5);
+  border-bottom: solid 1px var(--legacy-color-neutral-5);
   width: 95%;
 }
 .totara_form_element_datetime.ui-timepicker-div
   .ui_tpicker_time
   .ui_tpicker_time_input:focus {
-  border-bottom-color: var(--tui-color-neutral-5);
+  border-bottom-color: var(--legacy-color-neutral-5);
 }
 
 .totara_form_element_datetime.ui-timepicker-rtl {

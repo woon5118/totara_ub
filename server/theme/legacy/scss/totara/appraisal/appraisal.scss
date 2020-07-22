@@ -88,7 +88,7 @@ div.appraisal-content .mform .fitem .felement {
   margin-left: 339px;
   border: 1px solid $appraisal-border-color;
   min-height: 200px;
-  background-color: var(--tui-color-neutral-1);
+  background-color: var(--legacy-color-neutral-1);
 }
 
 #appraisal-questions p {
@@ -120,7 +120,7 @@ div.appraisal-content .fitem.fitem_fgroup {
   margin: 0;
   padding: 0;
   margin-bottom: 0.5em;
-  background-color: var(--tui-color-neutral-1);
+  background-color: var(--legacy-color-neutral-1);
   border-top: 1px solid $appraisal-border-color;
   border-bottom: 1px solid $appraisal-border-color;
 }
@@ -161,7 +161,7 @@ ul.appraisal-quest-list a.appraisal-quest-list-name {
 table.appraisal-stages tr,
 ul.appraisal-page-list li,
 ul.appraisal-quest-list li {
-  background-color: var(--tui-color-neutral-1);
+  background-color: var(--legacy-color-neutral-1);
   -webkit-transition: background-color 250ms linear;
   -moz-transition: background-color 250ms linear;
   -ms-transition: background-color 250ms linear;
@@ -172,7 +172,7 @@ ul.appraisal-quest-list li {
 table.appraisal-stages tr:hover,
 ul.appraisal-page-list li:hover,
 ul.appraisal-quest-list li:hover {
-  background-color: var(--tui-color-neutral-2);
+  background-color: var(--legacy-color-neutral-2);
   -webkit-transition: background-color 100ms linear;
   -moz-transition: background-color 100ms linear;
   -ms-transition: background-color 100ms linear;
@@ -183,7 +183,7 @@ ul.appraisal-quest-list li:hover {
 table.appraisal-stages tr.selected,
 ul.appraisal-page-list li.selected,
 ul.appraisal-quest-list li.selected {
-  background-color: var(--tui-color-neutral-3);
+  background-color: var(--legacy-color-neutral-3);
   -webkit-transition: background-color 100ms linear;
   -moz-transition: background-color 100ms linear;
   -ms-transition: background-color 100ms linear;
@@ -242,8 +242,8 @@ li.yui3-dd-draggable {
 
 .path-admin-totara-appraisal.yui3-skin-sam .yui3-panel-content .yui3-widget-hd,
 .path-totara-appraisal.yui3-skin-sam .yui3-panel-content .yui3-widget-hd {
-  background: var(--tui-color-neutral-2);
-  color: var(--tui-color-neutral-7);
+  background: var(--legacy-color-neutral-2);
+  color: var(--legacy-color-neutral-7);
   font-weight: bold;
 }
 
@@ -281,7 +281,7 @@ li.yui3-dd-draggable {
 }
 
 .appraisal-stage {
-  background: var(--tui-color-neutral-2);
+  background: var(--legacy-color-neutral-2);
 }
 
 .appraisal-headerbuttons {
@@ -472,7 +472,7 @@ form.print-stages-form .fitem .fitemtitle {
 }
 
 .appraisal-stage-inprogress {
-  background: var(--tui-color-neutral-2);
+  background: var(--legacy-color-neutral-2);
 }
 
 @media (max-width: 768px) {

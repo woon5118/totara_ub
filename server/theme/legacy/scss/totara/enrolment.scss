@@ -98,7 +98,7 @@
   padding: 3px;
   margin: 3px;
   > *:hover {
-    border-bottom: 1px solid var(--tui-color-neutral-6);
+    border-bottom: 1px solid var(--legacy-color-neutral-6);
   }
 }
 
@@ -144,7 +144,7 @@
   .content {
     @extend .popover-content;
     margin-top: 5px;
-    background-color: var(--tui-color-neutral-2);
+    background-color: var(--legacy-color-neutral-2);
   }
 }
 

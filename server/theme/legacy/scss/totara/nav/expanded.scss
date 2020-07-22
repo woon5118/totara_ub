@@ -23,15 +23,15 @@
 
 .totaraNav--list_item_expanded {
   > .navExpand--list_item_link {
-    background: var(--tui-nav-tab-expand-bg-color-selected);
+    background: var(--legacy-nav-tab-expand-bg-color-selected);
 
     &:focus {
-      background: var(--tui-nav-tab-expand-bg-color-selected);
+      background: var(--legacy-nav-tab-expand-bg-color-selected);
     }
 
     &:focus:hover,
     &:hover {
-      background: var(--tui-nav-tab-expand-bg-color-focus);
+      background: var(--legacy-nav-tab-expand-bg-color-focus);
     }
   }
 
@@ -45,7 +45,7 @@
   display: none;
   min-width: 200px;
   margin: 0;
-  background: var(--tui-nav-tab-expand-bg-color);
+  background: var(--legacy-nav-tab-expand-bg-color);
 
   &_item_label {
     display: inline-block;
@@ -55,14 +55,14 @@
 
   &_item_link {
     display: flex;
-    padding: var(--tui-gap-2) var(--tui-gap-4) var(--tui-gap-2) var(--tui-gap-8);
-    color: var(--tui-nav-tab-expand-text-color);
+    padding: var(--legacy-gap-2) var(--legacy-gap-4) var(--legacy-gap-2) var(--legacy-gap-8);
+    color: var(--legacy-nav-tab-expand-text-color);
 
     &:focus,
     &:hover {
-      color: var(--tui-nav-tab-expand-text-color-focus);
+      color: var(--legacy-nav-tab-expand-text-color-focus);
       text-decoration: none;
-      background: var(--tui-nav-tab-expand-bg-color-focus);
+      background: var(--legacy-nav-tab-expand-bg-color-focus);
     }
   }
 }
@@ -70,21 +70,21 @@
 // Nest third layer of items on mobile
 .navExpand--listThird {
   .navExpand--list_item_link {
-    padding-left: var(--tui-gap-12);
+    padding-left: var(--legacy-gap-12);
   }
 }
 
 @media (min-width: $tui-screen-md) {
   .navExpand--listSecond {
     position: absolute;
-    border: var(--tui-border-width-thin) solid var(--tui-nav-tab-expand-border-color);
-    box-shadow: var(--tui-shadow-2);
+    border: var(--legacy-border-width-thin) solid var(--legacy-nav-tab-expand-border-color);
+    box-shadow: var(--legacy-shadow-2);
 
     .navExpand--list_item {
       // Display sub tab top borders on desktop only
       &_link {
-        padding: var(--tui-gap-2) var(--tui-gap-4);
-        border-top: var(--tui-border-width-thin) solid var(--tui-nav-tab-expand-border-color);
+        padding: var(--legacy-gap-2) var(--legacy-gap-4);
+        border-top: var(--legacy-border-width-thin) solid var(--legacy-nav-tab-expand-border-color);
       }
     }
 
@@ -99,14 +99,14 @@
   // Nest third layer of items on desktop
   .navExpand--listThird {
     .navExpand--list_item_link {
-      padding-left: var(--tui-gap-10);
+      padding-left: var(--legacy-gap-10);
     }
   }
 
   // Sub expanded navigation colours
   .totaraNav_sub {
     .navExpand--list {
-      background: var(--tui-nav-tab-expand-bg-color);
+      background: var(--legacy-nav-tab-expand-bg-color);
 
       &_item_label {
         padding-left: 0;
@@ -115,7 +115,7 @@
       &_item_link {
         &:focus,
         &:hover {
-          background: var(--tui-nav-tab-expand-bg-color-focus);
+          background: var(--legacy-nav-tab-expand-bg-color-focus);
         }
       }
     }

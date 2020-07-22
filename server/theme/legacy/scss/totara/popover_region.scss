@@ -21,16 +21,16 @@
 // @package   theme_legacy
 
 $popup-toggle-width: 25px !default;
-$popup-standard-border: 1px solid var(--tui-color-neutral-5) !default;
+$popup-standard-border: 1px solid var(--legacy-color-neutral-5) !default;
 $popup-region-container-height: 500px !default;
 $popup-region-container-width: 380px !default;
 $popup-region-container-z-index: 1 !default;
 $popup-region-header-height: 25px !default;
 $popup-region-footer-height: 30px !default;
-$popup-content-item-hover-colour-bg: var(--tui-color-state-highlight) !default;
-$popup-content-item-hover-colour-text: var(--tui-color-state-hover) !default;
-$popup-content-item-selected-colour-bg: var(--tui-color-state-active) !default;
-$popup-content-item-unread-colour: var(--tui-color-neutral-1) !default;
+$popup-content-item-hover-colour-bg: var(--legacy-color-state-highlight) !default;
+$popup-content-item-hover-colour-text: var(--legacy-color-state-hover) !default;
+$popup-content-item-selected-colour-bg: var(--legacy-color-state-active) !default;
+$popup-content-item-unread-colour: var(--legacy-color-neutral-1) !default;
 $popup-content-header-footer-height: $popup-region-header-height +
   $popup-region-footer-height !default;
 
@@ -67,7 +67,7 @@ $popup-font-size-base: 1rem !default;
     display: inline-block;
     border-left: 10px solid transparent;
     border-right: 10px solid transparent;
-    border-bottom: 10px solid var(--tui-color-neutral-5);
+    border-bottom: 10px solid var(--legacy-color-neutral-5);
     position: absolute;
     bottom: -8px;
     right: 7px;
@@ -78,7 +78,7 @@ $popup-font-size-base: 1rem !default;
     display: inline-block;
     border-left: 9px solid transparent;
     border-right: 9px solid transparent;
-    border-bottom: 9px solid var(--tui-color-neutral-1);
+    border-bottom: 9px solid var(--legacy-color-neutral-1);
     position: absolute;
     bottom: -9px;
     right: 8px;
@@ -89,7 +89,7 @@ $popup-font-size-base: 1rem !default;
 .count-container {
   padding: 2px;
   border-radius: 2px;
-  background-color: var(--tui-color-prompt-alert);
+  background-color: var(--legacy-color-prompt-alert);
   color: white;
   font-size: 10px;
   line-height: 10px;
@@ -108,9 +108,9 @@ $popup-font-size-base: 1rem !default;
   transition: height 0.25s;
   opacity: 1;
   visibility: visible;
-  background-color: var(--tui-color-neutral-1);
+  background-color: var(--legacy-color-neutral-1);
   z-index: $popup-region-container-z-index;
-  box-shadow: var(--tui-shadow-3);
+  box-shadow: var(--legacy-shadow-3);
 }
 
 .popover-region-header-container {
@@ -287,7 +287,7 @@ $popup-font-size-base: 1rem !default;
       font-size: 10px;
       line-height: 10px;
       margin: 0;
-      color: var(--tui-color-neutral-6);
+      color: var(--legacy-color-neutral-6);
       margin-left: 24px;
     }
   }
@@ -521,7 +521,7 @@ $popup-font-size-base: 1rem !default;
     left: 50%;
     top: calc(-50% - 5px);
     transform: translate(-50%, -50%);
-    background-color: var(--tui-color-neutral-1);
+    background-color: var(--legacy-color-neutral-1);
     border: 1px solid rgba(0, 0, 0, 0.2);
     border-radius: 0.3rem;
     box-sizing: border-box;
@@ -546,7 +546,7 @@ $popup-font-size-base: 1rem !default;
       display: inline-block;
       border-left: 7px solid transparent;
       border-right: 7px solid transparent;
-      border-top: 7px solid var(--tui-color-neutral-1);
+      border-top: 7px solid var(--legacy-color-neutral-1);
       position: absolute;
       bottom: -6px;
       left: calc(50% - 7px);

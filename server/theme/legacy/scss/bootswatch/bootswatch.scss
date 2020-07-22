@@ -31,7 +31,7 @@
 // Extends the Bootstrap 3 badges classes so that state
 // can be applied by class (rather than only inherited).
 .badge-primary {
-  background-color: var(--tui-color-primary);
+  background-color: var(--legacy-color-primary);
 }
 
 .badge-success {
@@ -125,17 +125,17 @@
     > a {
       margin-right: 0;
       border-radius: 0;
-      border-color: var(--tui-tabs-border-color);
+      border-color: var(--legacy-tabs-border-color);
       border-right-color: transparent;
-      background-color: var(--tui-color-neutral-3);
+      background-color: var(--legacy-color-neutral-3);
       &:hover {
-        border-color: var(--tui-tabs-border-color) transparent var(--tui-tabs-border-color)
-          var(--tui-tabs-border-color);
+        border-color: var(--legacy-tabs-border-color) transparent var(--legacy-tabs-border-color)
+          var(--legacy-tabs-border-color);
       }
     }
 
     &:last-child > a {
-      border-right-color: var(--tui-tabs-border-color);
+      border-right-color: var(--legacy-tabs-border-color);
     }
 
     &.active {
@@ -147,22 +147,22 @@
 
     // Active state, and its :hover to override normal :hover
     &.active > a {
-      background-color: var(--tui-color-neutral-1);
-      border-right-color: var(--tui-tabs-border-color);
-      border-left-color: var(--tui-tabs-border-color);
+      background-color: var(--legacy-color-neutral-1);
+      border-right-color: var(--legacy-tabs-border-color);
+      border-left-color: var(--legacy-tabs-border-color);
       &,
       &:hover,
       &:focus {
-        background-color: var(--tui-color-neutral-1);
-        border-top-color: var(--tui-color-primary);
-        box-shadow: 0 -2px var(--tui-color-primary), -3px 0 rgba(0, 0, 0, 0.03);
+        background-color: var(--legacy-color-neutral-1);
+        border-top-color: var(--legacy-color-primary);
+        box-shadow: 0 -2px var(--legacy-color-primary), -3px 0 rgba(0, 0, 0, 0.03);
       }
     }
     &.active:first-child > a {
       &,
       &:hover,
       &:focus {
-        box-shadow: 0 -2px var(--tui-color-primary), -3px 0 rgba(0, 0, 0, 0.03);
+        box-shadow: 0 -2px var(--legacy-color-primary), -3px 0 rgba(0, 0, 0, 0.03);
       }
     }
     &.disabled {
@@ -170,20 +170,20 @@
         &,
         &:hover,
         &:focus {
-          color: var(--tui-color-neutral-5);
-          background-color: var(--tui-color-neutral-1);
-          border-top-color: var(--tui-color-neutral-4);
+          color: var(--legacy-color-neutral-5);
+          background-color: var(--legacy-color-neutral-1);
+          border-top-color: var(--legacy-color-neutral-4);
         }
       }
       & + .disabled,
       &:first-child {
         > a {
-          border-left-color: var(--tui-color-neutral-4);
+          border-left-color: var(--legacy-color-neutral-4);
         }
       }
       &:last-child {
         > a {
-          border-right-color: var(--tui-color-neutral-4);
+          border-right-color: var(--legacy-color-neutral-4);
         }
       }
     }
@@ -213,7 +213,7 @@
 .alert-icon {
   vertical-align: middle;
   padding: $alert-padding ($alert-padding * 0.6);
-  color: var(--tui-color-neutral-1);
+  color: var(--legacy-color-neutral-1);
   .alert-info & {
     background: $brand-info;
   }
@@ -240,7 +240,7 @@
       floor(($padding-small-vertical * 1.5))
       ceil(($padding-small-vertical * 1.5));
     height: 1.3em;
-    color: var(--tui-color-neutral-1);
+    color: var(--legacy-color-neutral-1);
   }
 
   .alert-info & {
@@ -288,7 +288,7 @@ blockquote {
   border-left-width: 1px;
   color: $gray-light;
   cite {
-    color: var(--tui-color-text);
+    color: var(--legacy-color-text);
     &::before {
       content: '\2013\00a0\00a0';
     }
@@ -314,7 +314,7 @@ pre code {
   line-height: $line-height-base;
   word-break: break-all;
   word-wrap: break-word;
-  background-color: var(--tui-color-neutral-3);
+  background-color: var(--legacy-color-neutral-3);
   border: 1px solid $pre-border-color;
   border-radius: $border-radius-base;
 }
@@ -323,7 +323,7 @@ pre code {
 // Badges.
 //
 .badge-primary {
-  background-color: var(--tui-color-secondary);
+  background-color: var(--legacy-color-secondary);
 }
 
 abbr[title],

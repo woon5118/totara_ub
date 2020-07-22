@@ -1,0 +1,61 @@
+//
+// This file is part of Totara Learn
+//
+// Copyright (C) 2019 onwards Totara Learning Solutions LTD
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+// @copyright 2019 onwards Totara Learning Solutions LTD
+// @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+// @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
+// @package   theme_legacy
+
+:root {
+  //
+  // Form colours
+  //
+
+  --legacy-form-text-color: var(--legacy-color-neutral-7);
+  --legacy-form-input-bg-color-disabled: var(--legacy-color-neutral-3);
+  --legacy-form-input-border-color: var(--legacy-color-neutral-6);
+  --legacy-form-input-text-placeholder-color: var(--legacy-color-neutral-6);
+
+  // Standard btn background, border & text
+  --legacy-btn-bg-color: var(--legacy-color-neutral-1);
+  --legacy-btn-bg-color-active: var(--legacy-color-neutral-1);
+  --legacy-btn-bg-color-disabled: var(--legacy-color-neutral-3);
+  --legacy-btn-bg-color-focus: var(--legacy-color-neutral-3);
+  --legacy-btn-border-color: var(--legacy-color-state);
+  --legacy-btn-border-color-active: var(--legacy-color-state-active);
+  --legacy-btn-border-color-disabled: var(--legacy-color-state-disabled);
+  --legacy-btn-border-color-focus: var(--legacy-color-state-focus);
+  --legacy-btn-text-color: var(--legacy-color-state);
+  --legacy-btn-text-color-active: var(--legacy-color-state-active);
+  --legacy-btn-text-color-disabled: var(--legacy-color-state-disabled);
+  --legacy-btn-text-color-focus: var(--legacy-color-state-focus);
+
+  // Primary btn background, text & border
+  --legacy-btn-prim-bg-color: var(--legacy-color-state);
+  --legacy-btn-prim-bg-color-active: var(--legacy-color-state-active);
+  --legacy-btn-prim-bg-color-disabled: var(--legacy-color-state-disabled);
+  --legacy-btn-prim-bg-color-focus: var(--legacy-color-state-focus);
+  --legacy-btn-prim-border-color: var(--legacy-color-state);
+  --legacy-btn-prim-border-color-active: var(--legacy-color-state-active);
+  --legacy-btn-prim-border-color-disabled: var(--legacy-color-state-disabled);
+  --legacy-btn-prim-border-color-focus: var(--legacy-color-state-focus);
+  --legacy-btn-prim-text-color: var(--legacy-color-neutral-1);
+  --legacy-btn-prim-text-color-active: var(--legacy-color-neutral-1);
+  --legacy-btn-prim-text-color-disabled: var(--legacy-color-neutral-3);
+  --legacy-btn-prim-text-color-focus: var(--legacy-color-neutral-1);
+}

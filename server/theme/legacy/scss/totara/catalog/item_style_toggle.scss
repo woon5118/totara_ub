@@ -26,14 +26,14 @@ $catalogItemStyleToggle-screen_xsm_min: 500px !default;
 
 .tw-catalogItemStyleToggle {
   display: flex;
-  margin: auto var(--tui-gap-1) auto auto;
-  border-radius: var(--tui-btn-radius);
-  background-color: var(--tui-color-neutral-4);
-  border: 1px solid var(--tui-color-neutral-5);
+  margin: auto var(--legacy-gap-1) auto auto;
+  border-radius: var(--legacy-btn-radius);
+  background-color: var(--legacy-color-neutral-4);
+  border: 1px solid var(--legacy-color-neutral-5);
 
   &__btn {
-    font-size: var(--tui-font-size-13);
-    padding: var(--tui-gap-1);
+    font-size: var(--legacy-font-size-13);
+    padding: var(--legacy-gap-1);
     transition: background-color 0.2s ease;
     margin: 1px;
     border-width: 1px;
@@ -41,16 +41,16 @@ $catalogItemStyleToggle-screen_xsm_min: 500px !default;
     &:focus,
     &:hover,
     &:active {
-      color: var(--tui-color-state-hover);
+      color: var(--legacy-color-state-hover);
       outline: 0;
       text-decoration: none;
     }
 
     &_active {
-      color: var(--tui-color-neutral-7);
-      border: 1px solid var(--tui-color-neutral-5);
-      border-radius: var(--tui-btn-radius);
-      background-color: var(--tui-color-neutral-1);
+      color: var(--legacy-color-neutral-7);
+      border: 1px solid var(--legacy-color-neutral-5);
+      border-radius: var(--legacy-btn-radius);
+      background-color: var(--legacy-color-neutral-1);
       cursor: default;
 
       &:active,
@@ -64,7 +64,7 @@ $catalogItemStyleToggle-screen_xsm_min: 500px !default;
 
 @media (min-width: $catalogItemStyleToggle-screen_xsm_min) {
   .tw-catalogItemStyleToggle {
-    margin: auto var(--tui-gap-1) auto 0;
+    margin: auto var(--legacy-gap-1) auto 0;
   }
 }
 

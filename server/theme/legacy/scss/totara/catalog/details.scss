@@ -27,7 +27,7 @@
   &__arrow {
     bottom: -1.5px;
     display: none;
-    margin: var(--tui-gap-4) auto 0;
+    margin: var(--legacy-gap-4) auto 0;
     position: relative;
 
     &::before,
@@ -42,15 +42,15 @@
     }
 
     &::before {
-      border-bottom-color: var(--tui-catalog-details-border-color);
-      border-width: calc(var(--tui-gap-4) + 0.1rem);
-      margin-left: calc((var(--tui-gap-4) + 0.1rem) * -1);
+      border-bottom-color: var(--legacy-catalog-details-border-color);
+      border-width: calc(var(--legacy-gap-4) + 0.1rem);
+      margin-left: calc((var(--legacy-gap-4) + 0.1rem) * -1);
     }
 
     &::after {
-      border-bottom-color: var(--tui-catalog-details-bg-color);
-      border-width: var(--tui-gap-4);
-      margin-left: calc(var(--tui-gap-4) * -1);
+      border-bottom-color: var(--legacy-catalog-details-bg-color);
+      border-width: var(--legacy-gap-4);
+      margin-left: calc(var(--legacy-gap-4) * -1);
     }
   }
 
@@ -65,31 +65,31 @@
   }
 
   &__content {
-    background: var(--tui-catalog-details-bg-color);
-    border: 1px solid var(--tui-catalog-details-border-color);
-    box-shadow: var(--tui-shadow-3);
+    background: var(--legacy-catalog-details-bg-color);
+    border: 1px solid var(--legacy-catalog-details-border-color);
+    box-shadow: var(--legacy-shadow-3);
     display: none;
     height: 100%;
     overflow-x: hidden;
     overflow-y: scroll;
-    padding: var(--tui-gap-4);
+    padding: var(--legacy-gap-4);
     position: relative;
   }
 
   &__title {
     @include totara-style-heading-medium();
-    margin: var(--tui-gap-2) 0 var(--tui-gap-4);
+    margin: var(--legacy-gap-2) 0 var(--legacy-gap-4);
   }
 
   &__close {
     float: right;
-    font-size: var(--tui-font-size-20);
-    margin-bottom: var(--tui-gap-1);
+    font-size: var(--legacy-font-size-20);
+    margin-bottom: var(--legacy-gap-1);
   }
 
   &__manageLink {
     display: inline-block;
-    margin-bottom: var(--tui-gap-4);
+    margin-bottom: var(--legacy-gap-4);
   }
 
   &__detail {
@@ -108,15 +108,15 @@
   }
 
   &__contentBlock {
-    margin-bottom: var(--tui-gap-4);
+    margin-bottom: var(--legacy-gap-4);
   }
 
   &__textarea_group {
     &_item {
       @include totara-style-body-x-small();
-      color: var(--tui-catalog-details-additional-text-color);
+      color: var(--legacy-catalog-details-additional-text-color);
       height: 1.63em; // line height
-      margin: 0 0 var(--tui-gap-2);
+      margin: 0 0 var(--legacy-gap-2);
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -126,7 +126,7 @@
       }
 
       &:last-of-type {
-        margin: 0 0 var(--tui-gap-4);
+        margin: 0 0 var(--legacy-gap-4);
       }
     }
   }
@@ -134,16 +134,16 @@
   &__iconRow {
     height: 24px;
     line-height: 24px;
-    margin: var(--tui-gap-4) 0 var(--tui-gap-2);
+    margin: var(--legacy-gap-4) 0 var(--legacy-gap-2);
     overflow: hidden;
 
     > .flex-icon {
-      font-size: var(--tui-font-size-13);
+      font-size: var(--legacy-font-size-13);
     }
 
     > .flex-icon,
     &_icon {
-      margin-right: var(--tui-gap-2);
+      margin-right: var(--legacy-gap-2);
       max-height: 25px;
       width: 25px;
     }
@@ -158,8 +158,8 @@
   .tw-catalogDetails {
     display: block;
     height: 300px;
-    margin-bottom: var(--tui-gap-1);
-    margin-top: var(--tui-gap-5);
+    margin-bottom: var(--legacy-gap-1);
+    margin-top: var(--legacy-gap-5);
 
     &__arrow,
     &__content {
@@ -180,7 +180,7 @@
     &__placement {
       height: inherit;
       left: 0;
-      padding: 0 var(--tui-gap-4);
+      padding: 0 var(--legacy-gap-4);
       position: absolute;
       top: inherit;
       width: 100%;
@@ -213,7 +213,7 @@
   .tw-catalogDetails {
     &__detail {
       &_body {
-        padding-right: var(--tui-gap-6);
+        padding-right: var(--legacy-gap-6);
       }
     }
   }

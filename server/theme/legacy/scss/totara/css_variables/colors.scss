@@ -1,0 +1,116 @@
+//
+// This file is part of Totara Learn
+//
+// Copyright (C) 2019 onwards Totara Learning Solutions LTD
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+// @copyright 2019 onwards Totara Learning Solutions LTD
+// @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+// @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
+// @package   theme_legacy
+
+:root {
+  //
+  // Theme colours
+  //
+
+  // Primary colour
+  // Often used for default image, backgrounds, line separators & visual indicators
+  --legacy-color-primary: #dce44b;
+
+  // Secondary colour
+  // Often used for visual components such as progress bars & charts
+  --legacy-color-secondary: #007ab8;
+
+  // Tertiary colour
+  // Often used for visual components, must have high contrast to background
+  --legacy-color-tertiary: #1ea4a9;
+
+  //
+  // Interactive state colours
+  //
+
+  // Default state colour, shows an element is interactive
+  --legacy-color-state: #4b7e2b;
+
+  // Hover state colour, shown when cursor is over interactive element
+  --legacy-color-state-hover: #3c6721;
+  // Focus state colour, shown when element has focus (keyboard tabbing)
+  --legacy-color-state-focus: #3c6721;
+  // Active state colour, shown when element is active (clicked)
+  --legacy-color-state-active: #30541a;
+  // Highlight, visual clue for hover/focus on components such as a list row
+  --legacy-color-state-highlight: var(--legacy-color-neutral-3);
+  // Disabled colour of interactive elements
+  --legacy-color-state-disabled: var(--legacy-color-neutral-5);
+
+  //
+  // Visual prompt colours
+  //
+
+  // Used to indicate an informational message
+  --legacy-color-prompt-info: #007ab8;
+  --legacy-color-prompt-info-bg: #daf3fe;
+  // Used to indicate an important message (error, danger)
+  --legacy-color-prompt-alert: #cc2428;
+  --legacy-color-prompt-alert-bg: #fedada;
+  // Used to indicate a warning message
+  --legacy-color-prompt-warning: #b2611f;
+  --legacy-color-prompt-warning-bg: #f1e2d7;
+  // Used to indicate a success message
+  --legacy-color-prompt-success: #4b7e2b;
+  --legacy-color-prompt-success-bg: #d8eacd;
+
+  //
+  // Neutral colour ranges
+  //
+
+  // Often used for navigation bar, backgrounds & footer
+  --legacy-color-neutral-1: #fff;
+  // Often used for content background
+  --legacy-color-neutral-2: #fafafa;
+  // Often used for side panel background & disabled buttons
+  --legacy-color-neutral-3: #f7f7f7;
+  // Often used for progress bar background
+  --legacy-color-neutral-4: #e6e4e4;
+  // Often used for card component borders, line separators & disabled button
+  --legacy-color-neutral-5: #c7c7c7;
+  // Often used for icons and form component borders
+  --legacy-color-neutral-6: #767676;
+  // Often used for headers and body text
+  --legacy-color-neutral-7: #262626;
+
+  //
+  // Content colours
+  //
+  --legacy-color-background: var(--legacy-color-neutral-1);
+  --legacy-color-border: var(--legacy-color-neutral-5);
+  --legacy-color-text: var(--legacy-color-neutral-7);
+
+  // Backdrops
+  --legacy-color-backdrop-standard: rgba(0, 0, 0, 0.4);
+
+  //
+  // Misc
+  //
+
+  // Tabs
+  --legacy-tabs-border-color: var(--legacy-color-neutral-5);
+  --legacy-tabs-border-color-selected: var(--legacy-color-neutral-1);
+}
+
+@import 'theme_legacy/totara/css_variables/colors/nav';
+@import 'theme_legacy/totara/css_variables/colors/catalog';
+@import 'theme_legacy/totara/css_variables/colors/forms';

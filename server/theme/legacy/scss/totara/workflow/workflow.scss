@@ -51,7 +51,7 @@
   }
 
   .linked-panel {
-    color: var(--tui-color-neutral-7);
+    color: var(--legacy-color-neutral-7);
 
     /* Remove link underlines inside panel */
     &:hover {
@@ -61,14 +61,14 @@
     &:hover,
     &:focus {
       .panel {
-        background: var(--tui-color-neutral-2);
-        border-color: var(--tui-color-neutral-4);
+        background: var(--legacy-color-neutral-2);
+        border-color: var(--legacy-color-neutral-4);
       }
     }
 
     &:active {
       .panel {
-        background: var(--tui-color-neutral-3);
+        background: var(--legacy-color-neutral-3);
       }
     }
   }

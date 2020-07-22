@@ -68,7 +68,7 @@
       overflow: hidden;
       margin: 0.5em;
       padding: 1em;
-      border: 1px solid var(--tui-color-neutral-5);
+      border: 1px solid var(--legacy-color-neutral-5);
       box-sizing: content-box;
       white-space: normal;
       .action-icon {
@@ -98,7 +98,7 @@
     input {
       // Fallback for IE8: we use Bootstrap 2's button styles normally, but
       // IE8 ignores background-image: linear-gradient rules.
-      background: var(--tui-color-neutral-1) none no-repeat top left;
+      background: var(--legacy-color-neutral-1) none no-repeat top left;
     }
   }
 }
@@ -180,7 +180,7 @@
               width: 24px;
               margin: 0;
               &:hover {
-                background-color: var(--tui-color-neutral-5);
+                background-color: var(--legacy-color-neutral-5);
               }
             }
           }

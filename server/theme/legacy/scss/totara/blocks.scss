@@ -29,7 +29,7 @@
   @extend .panel;
   @extend .panel-default;
   &.invisible {
-    border-color: var(--tui-color-border);
+    border-color: var(--legacy-color-border);
     .header {
       background-color: $panel-default-heading-bg;
       h2 {

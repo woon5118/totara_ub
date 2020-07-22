@@ -22,7 +22,7 @@
 // @package   theme_legacy
 
 .policybox {
-  border: 2px solid var(--tui-color-neutral-5);
+  border: 2px solid var(--legacy-color-neutral-5);
   margin: 20px auto;
   width: 100%;
   padding: 5px;
@@ -31,7 +31,7 @@
 }
 
 .primarypolicybox {
-  background-color: var(--tui-color-neutral-3);
+  background-color: var(--legacy-color-neutral-3);
   height: 25em;
   overflow: auto;
   resize: vertical;

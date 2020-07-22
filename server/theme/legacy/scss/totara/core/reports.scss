@@ -43,14 +43,14 @@
       transition-timing-function: ease-in-out;
 
       display: block;
-      color: var(--tui-color-neutral-7);
+      color: var(--legacy-color-neutral-7);
 
       &:hover,
       &:active,
       &:focus {
-        box-shadow: var(--tui-shadow-1);
+        box-shadow: var(--legacy-shadow-1);
         text-decoration: none;
-        color: var(--tui-color-neutral-7);
+        color: var(--legacy-color-neutral-7);
         position: relative; // this lifts the shadow above the image
       }
     }
@@ -138,9 +138,9 @@
   & .totara_core__myreports__list {
     &__item {
       &:first-child {
-          border-top: 1px solid var(--tui-color-neutral-5);
+          border-top: 1px solid var(--legacy-color-neutral-5);
       }
-      border-bottom: 1px solid var(--tui-color-neutral-5);
+      border-bottom: 1px solid var(--legacy-color-neutral-5);
 
       &__content {
         display: flex;
@@ -206,7 +206,7 @@
   justify-content: space-between;
   margin-bottom: $myReports-spacing-med;
   padding-bottom: $myReports-spacing-med;
-  border-bottom: 1px solid var(--tui-color-border);
+  border-bottom: 1px solid var(--legacy-color-border);
 
   &__btn {
     @extend .btn;
@@ -229,14 +229,14 @@
 .totara_core__myreports__itemstyletoggle {
   display: flex;
   float: right;
-  margin-bottom: var(--tui-gap-1);
-  border-radius: var(--tui-btn-radius);
-  background-color: var(--tui-color-neutral-4);
-  border: 1px solid var(--tui-color-neutral-5);
+  margin-bottom: var(--legacy-gap-1);
+  border-radius: var(--legacy-btn-radius);
+  background-color: var(--legacy-color-neutral-4);
+  border: 1px solid var(--legacy-color-neutral-5);
 
   &__btn {
-    font-size: var(--tui-font-size-13);
-    padding: var(--tui-gap-1);
+    font-size: var(--legacy-font-size-13);
+    padding: var(--legacy-gap-1);
     transition: background-color 0.2s ease;
     margin: 1px;
     border-width: 1px;
@@ -244,16 +244,16 @@
     &:active,
     &:focus,
     &:hover {
-      color: var(--tui-color-state-hover);
+      color: var(--legacy-color-state-hover);
       outline: 0;
       text-decoration: none;
     }
 
     &_active {
-      color: var(--tui-color-neutral-7);
-      border: 1px solid var(--tui-color-neutral-5);
-      border-radius: var(--tui-btn-radius);
-      background-color: var(--tui-color-neutral-1);
+      color: var(--legacy-color-neutral-7);
+      border: 1px solid var(--legacy-color-neutral-5);
+      border-radius: var(--legacy-btn-radius);
+      background-color: var(--legacy-color-neutral-1);
       cursor: default;
 
       &:active,

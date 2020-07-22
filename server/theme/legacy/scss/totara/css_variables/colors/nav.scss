@@ -1,0 +1,97 @@
+//
+// This file is part of Totara Learn
+//
+// Copyright (C) 2019 onwards Totara Learning Solutions LTD
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+// @copyright 2019 onwards Totara Learning Solutions LTD
+// @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+// @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
+// @package   theme_legacy
+
+:root {
+  //
+  // Main navigation
+  //
+
+  // Primary bar
+  --legacy-nav-bg-color: var(--legacy-color-neutral-1);
+
+  // Primary tab
+  --legacy-nav-tab-bg-color: var(--legacy-color-neutral-1);
+  --legacy-nav-tab-border-color: var(--legacy-nav-tab-bg-color);
+  --legacy-nav-tab-text-color: var(--legacy-color-neutral-7);
+  // Primary tab hover/focus
+  --legacy-nav-tab-bg-color-focus: var(--legacy-color-neutral-1);
+  --legacy-nav-tab-border-color-focus: var(--legacy-nav-tab-bg-color-focus);
+  --legacy-nav-tab-border-inner-color-focus: var(--legacy-color-neutral-5);
+  --legacy-nav-tab-text-color-focus: var(--legacy-color-neutral-7);
+  --legacy-nav-tab-mobile-bg-color-focus: var(--legacy-color-state-highlight);
+  // Primary tab selected
+  --legacy-nav-tab-bg-color-selected: var(--legacy-color-neutral-1);
+  --legacy-nav-tab-border-color-selected: var(--legacy-nav-tab-bg-color-selected);
+  --legacy-nav-tab-border-inner-color-selected: var(--legacy-color-primary);
+  --legacy-nav-tab-text-color-selected: var(--legacy-color-neutral-7);
+
+  // Primary tab expanded menu
+  --legacy-nav-tab-expand-bg-color: var(--legacy-nav-tab-bg-color);
+  --legacy-nav-tab-expand-border-color: var(--legacy-color-neutral-5);
+  --legacy-nav-tab-expand-text-color: var(--legacy-nav-tab-text-color);
+  // Primary tab expanded menu hover/focus
+  --legacy-nav-tab-expand-bg-color-focus: var(--legacy-color-state-highlight);
+  --legacy-nav-tab-expand-text-color-focus: var(--legacy-color-neutral-7);
+  // Expanded menu selected expand item
+  --legacy-nav-tab-expand-bg-color-selected: var(--legacy-color-neutral-3);
+
+  // Side primary navigation
+  --legacy-nav-side-seperator-color: var(--legacy-color-neutral-5);
+  // Side primary navigation icons
+  --legacy-nav-side-text-color: var(--legacy-color-neutral-6);
+  --legacy-nav-side-text-color-focus: var(--legacy-color-neutral-7);
+  // Side primary popover (Notifications/messages)
+  --legacy-nav-side-popover-text-color: var(--legacy-color-neutral-7);
+
+  //
+  // Sub navigation
+  //
+  --legacy-nav-sub-bg-color: var(--legacy-color-neutral-1);
+  --legacy-nav-sub-border-color: var(--legacy-color-neutral-5);
+
+  // Sub tab
+  --legacy-nav-sub-tab-bg-color: var(--legacy-color-neutral-1);
+  --legacy-nav-sub-tab-border-color: var(--legacy-color-neutral-1);
+  --legacy-nav-sub-tab-text-color: var(--legacy-color-neutral-7);
+  // Sub tab hover/focus
+  --legacy-nav-sub-tab-bg-color-focus: var(--legacy-color-state-highlight);
+  --legacy-nav-sub-tab-border-color-focus: var(--legacy-color-state-highlight);
+  --legacy-nav-sub-tab-text-color-focus: var(--legacy-color-neutral-7);
+  // Sub tab selected
+  --legacy-nav-sub-tab-bg-color-selected: var(--legacy-color-neutral-1);
+  --legacy-nav-sub-tab-border-color-selected: var(--legacy-color-primary);
+  // Expanded menu selected expand item
+  --legacy-nav-sub-tab-expand-bg-color-selected: var(--legacy-color-state-highlight);
+
+  //
+  // Navigation Quick access menu
+  //
+  --legacy-nav-quick-bg-color: var(--legacy-color-neutral-1);
+  --legacy-nav-quick-border-top-color: var(--legacy-color-primary);
+  --legacy-nav-quick-seperator-color: var(--legacy-color-neutral-5);
+  --legacy-nav-quick-text-color: var(--legacy-color-neutral-7);
+  // items
+  --legacy-nav-quick-item-text-color: var(--legacy-color-state);
+  --legacy-nav-quick-item-text-color-focus: var(--legacy-color-state-focus);
+  --legacy-nav-quick-item-text-color-active: var(--legacy-color-state-active);
+}

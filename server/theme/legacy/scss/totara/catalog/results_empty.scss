@@ -23,14 +23,14 @@
 
 .tw-catalogResultsEmpty {
   &_text {
-    margin: 0 var(--tui-gap-1);
+    margin: 0 var(--legacy-gap-1);
   }
 }
 
 @media (min-width: $tui-screen-sm) {
   .tw-catalogResultsEmpty {
     &_text {
-      margin: 0 var(--tui-gap-4);
+      margin: 0 var(--legacy-gap-4);
     }
   }
 }

@@ -31,9 +31,9 @@
     @include bs-btn-default();
     cursor: pointer;
     display: inline-block;
-    font-size: var(--tui-font-size-13);
-    margin: var(--tui-gap-1);
-    padding: var(--tui-gap-2);
+    font-size: var(--legacy-font-size-13);
+    margin: var(--legacy-gap-1);
+    padding: var(--legacy-gap-2);
     vertical-align: middle;
 
     &:active,
@@ -48,15 +48,15 @@
     display: inline-block;
 
     &_options {
-      background: var(--tui-catalog-managebtn-group-bg-color);
-      border: 1px solid var(--tui-catalog-managebtn-group-border-color);
-      box-shadow: var(--tui-shadow-2);
+      background: var(--legacy-catalog-managebtn-group-bg-color);
+      border: 1px solid var(--legacy-catalog-managebtn-group-border-color);
+      box-shadow: var(--legacy-shadow-2);
       display: none;
       list-style: none;
       margin: 0;
-      padding: var(--tui-gap-1) 0;
+      padding: var(--legacy-gap-1) 0;
       position: absolute;
-      right: var(--tui-gap-1);
+      right: var(--legacy-gap-1);
       text-align: left;
       z-index: 2;
 
@@ -65,11 +65,11 @@
 
         &_link {
           display: block;
-          padding: var(--tui-gap-1) var(--tui-gap-2);
+          padding: var(--legacy-gap-1) var(--legacy-gap-2);
 
           &:focus,
           &:hover {
-            background: var(--tui-catalog-managebtn-group-bg-color-focus);
+            background: var(--legacy-catalog-managebtn-group-bg-color-focus);
             text-decoration: none;
           }
         }

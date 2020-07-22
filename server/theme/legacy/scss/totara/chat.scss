@@ -25,7 +25,7 @@
 // @package   theme_legacy
 
 .yui-skin-sam .yui-layout.path-mod-chat-gui_ajax {
-  background-color: var(--tui-color-neutral-1);
+  background-color: var(--legacy-color-neutral-1);
   .yui-layout-unit div.yui-layout-bd-nohd,
   .yui-layout-unit div.yui-layout-bd-noft,
   .yui-layout-unit div.yui-layout-bd,
@@ -60,16 +60,16 @@
   #chat-userlist {
     padding: 10px 5px;
     #users-list {
-      border-top: 1px solid var(--tui-color-neutral-5);
-      border-bottom: 1px solid var(--tui-color-neutral-1);
+      border-top: 1px solid var(--legacy-color-neutral-5);
+      border-bottom: 1px solid var(--legacy-color-neutral-1);
       li {
-        border-top: 1px solid var(--tui-color-neutral-1);
-        border-bottom: 1px solid var(--tui-color-neutral-5);
+        border-top: 1px solid var(--legacy-color-neutral-1);
+        border-bottom: 1px solid var(--legacy-color-neutral-5);
         padding: 5px 10px;
       }
       img {
         margin-right: 8px;
-        border: 1px solid var(--tui-color-neutral-5);
+        border: 1px solid var(--legacy-color-neutral-5);
         border-radius: 4px;
         max-width: none;
       }
@@ -81,22 +81,22 @@
       text-align: center;
       margin: 10px 0;
       font-size: $font-size-small;
-      color: var(--tui-color-neutral-7);
+      color: var(--legacy-color-neutral-7);
     }
     .chat-message.course-theme {
-      background-color: var(--tui-color-neutral-1);
-      border: 1px dotted var(--tui-color-neutral-5);
+      background-color: var(--legacy-color-neutral-1);
+      border: 1px dotted var(--legacy-color-neutral-5);
       border-radius: 4px;
       padding: 4px 10px;
       margin: 10px 0;
       .time {
         float: right;
         font-size: 11px;
-        color: var(--tui-color-neutral-7);
+        color: var(--legacy-color-neutral-7);
       }
     }
     .mdl-chat-my-entry .chat-message.course-theme {
-      background-color: var(--tui-color-neutral-2);
+      background-color: var(--legacy-color-neutral-2);
       .user {
         font-weight: bold;
       }

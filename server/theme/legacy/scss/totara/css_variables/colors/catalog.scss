@@ -1,0 +1,67 @@
+//
+// This file is part of Totara Learn
+//
+// Copyright (C) 2019 onwards Totara Learning Solutions LTD
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+// @copyright 2019 onwards Totara Learning Solutions LTD
+// @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+// @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
+// @package   theme_legacy
+
+:root {
+  //
+  // Catalog
+  //
+
+  --legacy-catalog-item-bg-color: var(--legacy-color-neutral-1);
+  --legacy-catalog-item-border-color: var(--legacy-color-neutral-5);
+  --legacy-catalog-item-text-color: var(--legacy-color-neutral-7);
+
+  // Catalog primary filter
+  --legacy-catalog-primfilter-border-color: var(--legacy-color-neutral-5);
+
+  // Catalog expanded details
+  --legacy-catalog-details-bg-color: var(--legacy-color-neutral-1);
+  --legacy-catalog-details-border-color: var(--legacy-color-neutral-5);
+
+  // Catalog expanded details goto link box
+  --legacy-catalog-details-goto-bg-color: var(--legacy-color-neutral-2);
+  --legacy-catalog-details-goto-border-color: var(--legacy-color-neutral-5);
+
+  // Catalog manage button group
+  --legacy-catalog-managebtn-group-bg-color: var(--legacy-color-neutral-1);
+  --legacy-catalog-managebtn-group-bg-color-focus: var(
+    --legacy-color-state-highlight
+  );
+  --legacy-catalog-managebtn-group-border-color: var(--legacy-color-neutral-5);
+
+  // Catalog share menu
+  --legacy-catalog-share-bg-color: var(--legacy-color-neutral-1);
+  --legacy-catalog-share-border-color: var(--legacy-color-neutral-5);
+
+  // Catalog grid item additional text (metadata)
+  --legacy-catalog-details-additional-text-color: var(--legacy-color-neutral-6);
+
+  // Catalog grid item hero
+  --legacy-catalog-item-hero-bg-color: var(--legacy-color-neutral-7);
+  --legacy-catalog-item-hero-icon-bg-color: var(--legacy-color-neutral-1);
+  --legacy-catalog-item-hero-text-color: var(--legacy-color-neutral-1);
+  // Catalog grid item featured
+  --legacy-catalog-item-featured-bg-color: var(--legacy-color-secondary);
+  --legacy-catalog-item-featured-text-color: var(--legacy-color-neutral-1);
+  // Catalog grid item additional text (metadata)
+  --legacy-catalog-item-additional-text-color: var(--legacy-color-neutral-6);
+}

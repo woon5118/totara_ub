@@ -65,7 +65,7 @@
         text-align: center;
 
         &:hover {
-          background-color: var(--tui-color-neutral-4);
+          background-color: var(--legacy-color-neutral-4);
           cursor: pointer;
         }
         .collapsed-icon {
@@ -111,7 +111,7 @@
       margin: 0;
 
       li {
-        border-bottom: 1px solid var(--tui-color-border);
+        border-bottom: 1px solid var(--legacy-color-border);
         padding: $current-learning-padding-vertical $current-learning-padding-horizontal;
       }
       li:nth-of-type(even) {
@@ -157,7 +157,7 @@
     font-size: 30px;
     line-height: 40px;
     height: 40px;
-    color: var(--tui-color-neutral-5);
+    color: var(--legacy-color-neutral-5);
     margin: 0;
 
     .fa-caret-down {
@@ -180,12 +180,12 @@
         padding-top: $current-learning-set-header-padding;
       }
       span {
-        color: var(--tui-color-neutral-7);
+        color: var(--legacy-color-neutral-7);
         font-size: $current-learning-text-size-small;
       }
     }
     .points {
-      color: var(--tui-color-neutral-7);
+      color: var(--legacy-color-neutral-7);
       display: inline-block;
       min-width: 10px;
       padding: 2px 7px;

@@ -24,15 +24,15 @@
 .totaraNav_prim--toggleNav {
   &_target {
     display: block;
-    padding: var(--tui-gap-1) var(--tui-gap-2);
-    color: var(--tui-nav-tab-text-color);
+    padding: var(--legacy-gap-1) var(--legacy-gap-2);
+    color: var(--legacy-nav-tab-text-color);
     font-size: 1.33em;
-    background: var(--tui-nav-tab-bg-color);
+    background: var(--legacy-nav-tab-bg-color);
 
     &:focus,
     &:hover {
-      color: var(--tui-nav-tab-text-color-focus);
-      background: var(--tui-nav-tab-bg-color-focus);
+      color: var(--legacy-nav-tab-text-color-focus);
+      background: var(--legacy-nav-tab-bg-color-focus);
     }
 
     .flex-icon {
