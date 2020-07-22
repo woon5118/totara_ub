@@ -25,7 +25,8 @@ const globSync = require('tiny-glob/sync');
  */
 module.exports = function scanEntry({ rootDir }) {
   // scan for tui.json files
-  const tuiConfigFiles = globSync('client/src/*/tui.json', { cwd: rootDir });
+  // NOTE: for some reason, double asterisk wildcard (**) is required to be able to run on Windows
+  const tuiConfigFiles = globSync('client/src/**/tui.json', { cwd: rootDir });
   let entryData = [];
 
   // parse config file and determine output location
