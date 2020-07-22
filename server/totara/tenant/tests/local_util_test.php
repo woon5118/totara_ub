@@ -547,4 +547,363 @@ class totara_tenant_local_util_testcase extends advanced_testcase {
             $this->assertSame('Coding error detected, it must be fixed by a programmer: Admins cannot be migrated to tenant members', $e->getMessage());
         }
     }
+
+    public function test_user_username_exists() {
+        $generator = $this->getDataGenerator();
+
+        $generator->create_user(['username' => 'User1', 'deleted' => 0, 'confirmed' => 1]);
+        $generator->create_user(['username' => 'user2', 'deleted' => 1, 'confirmed' => 1]);
+        $generator->create_user(['username' => 'user3', 'deleted' => 0, 'confirmed' => 0]);
+
+        $this->assertTrue(util::user_username_exists('User1'));
+        $this->assertTrue(util::user_username_exists('uSER1'));
+        $this->assertFalse(util::user_username_exists('Úser1')); // Accent insensitive MySQL will fail here, that is to be expected.
+        $this->assertFalse(util::user_username_exists('User1 '));
+
+        $this->assertFalse(util::user_username_exists('user2'));
+
+        $this->assertTrue(util::user_username_exists('user3'));
+    }
+
+    public function test_validate_user_username() {
+        $generator = $this->getDataGenerator();
+
+        $generator->create_user(['username' => 'User1', 'deleted' => 0, 'confirmed' => 1]);
+        $generator->create_user(['username' => 'user2', 'deleted' => 1, 'confirmed' => 1]);
+        $generator->create_user(['username' => 'user3', 'deleted' => 0, 'confirmed' => 0]);
+
+        $this->assertSame('Missing username', util::validate_user_username(''));
+        $this->assertSame('Missing username', util::validate_user_username(' '));
+        $this->assertSame('Missing username', util::validate_user_username('0'));
+
+        $this->assertSame('This username already exists, choose another', util::validate_user_username('User1'));
+        $this->assertSame('This username already exists, choose another', util::validate_user_username('user1'));
+
+        $this->assertSame('The username can only contain alphanumeric lowercase characters (letters and numbers), underscore (_), hyphen (-), period (.) or at symbol (@).', util::validate_user_username('user 1'));
+        $this->assertSame('Only lowercase letters allowed in username', util::validate_user_username('User'));
+
+        $this->assertSame(null, util::validate_user_username('user'));
+    }
+
+    public function test_user_email_exists() {
+        $generator = $this->getDataGenerator();
+
+        $generator->create_user(['email' => 'User1@example.com', 'deleted' => 0, 'confirmed' => 1]);
+        $generator->create_user(['email' => 'user2@example.com', 'deleted' => 1, 'confirmed' => 1]);
+        $generator->create_user(['email' => 'user3@example.com', 'deleted' => 0, 'confirmed' => 0]);
+
+        $this->assertTrue(util::user_email_exists('User1@example.com'));
+        $this->assertTrue(util::user_email_exists('uSER1@example.com'));
+        $this->assertFalse(util::user_email_exists('Úser1@example.com')); // Accent insensitive MySQL will fail here, that is to be expected.
+        $this->assertFalse(util::user_email_exists('User1@example.com '));
+
+        $this->assertFalse(util::user_email_exists('user2@example.com'));
+
+        $this->assertTrue(util::user_email_exists('user3@example.com'));
+    }
+
+    public function test_validate_user_email() {
+        $generator = $this->getDataGenerator();
+
+        $generator->create_user(['email' => 'User1@example.com', 'deleted' => 0, 'confirmed' => 1]);
+        $generator->create_user(['email' => 'user2@example.com', 'deleted' => 1, 'confirmed' => 1]);
+        $generator->create_user(['email' => 'user3@example.com', 'deleted' => 0, 'confirmed' => 0]);
+
+        $this->assertSame('Missing email address', util::validate_user_email(''));
+        $this->assertSame('Missing email address', util::validate_user_email(' '));
+        $this->assertSame('Missing email address', util::validate_user_email('0'));
+
+        $this->assertSame('This email address is already registered.', util::validate_user_email('User1@example.com'));
+        $this->assertSame('This email address is already registered.', util::validate_user_email('user1@Example.com'));
+
+        $this->assertSame('Invalid email address', util::validate_user_email('user example.com'));
+
+        $this->assertSame(null, util::validate_user_email('user@example.com'));
+    }
+
+    public function test_user_idnumber_exists() {
+        $generator = $this->getDataGenerator();
+
+        $generator->create_user(['idnumber' => 'User1', 'deleted' => 0, 'confirmed' => 1]);
+        $generator->create_user(['idnumber' => 'user2', 'deleted' => 1, 'confirmed' => 1]);
+        $generator->create_user(['idnumber' => 'user3', 'deleted' => 0, 'confirmed' => 0]);
+        $generator->create_user(['idnumber' => '', 'deleted' => 0, 'confirmed' => 1]);
+
+        $this->assertTrue(util::user_idnumber_exists('User1'));
+        $this->assertTrue(util::user_idnumber_exists('uSER1'));
+        $this->assertFalse(util::user_idnumber_exists('Úser1')); // Accent insensitive MySQL will fail here, that is to be expected.
+        $this->assertFalse(util::user_idnumber_exists('User1 '));
+
+        $this->assertFalse(util::user_idnumber_exists('user2'));
+
+        $this->assertTrue(util::user_idnumber_exists('user3'));
+
+        $this->assertFalse(util::user_idnumber_exists(''));
+    }
+
+    public function test_validate_user_idnumber() {
+        $generator = $this->getDataGenerator();
+
+        $generator->create_user(['idnumber' => 'User1', 'deleted' => 0, 'confirmed' => 1]);
+        $generator->create_user(['idnumber' => 'user2', 'deleted' => 1, 'confirmed' => 1]);
+        $generator->create_user(['idnumber' => 'user3', 'deleted' => 0, 'confirmed' => 0]);
+        $generator->create_user(['idnumber' => '', 'deleted' => 0, 'confirmed' => 1]);
+
+        $this->assertSame(null, util::validate_user_idnumber(''));
+
+        $this->assertSame('ID number is invalid', util::validate_user_idnumber(' '));
+        $this->assertSame('ID number is invalid', util::validate_user_idnumber('0'));
+        $this->assertSame('ID number is invalid', util::validate_user_idnumber('abc '));
+        $this->assertSame('ID number is invalid', util::validate_user_idnumber(' abc'));
+
+        $this->assertSame('This ID number is already in use', util::validate_user_idnumber('User1'));
+        $this->assertSame('This ID number is already in use', util::validate_user_idnumber('user1'));
+
+        $this->assertSame(null, util::validate_user_idnumber('user'));
+        $this->assertSame(null, util::validate_user_idnumber('úser'));
+    }
+
+    public function test_get_csv_required_columns() {
+        $required = util::get_csv_required_columns(true);
+        $this->assertIsArray($required);
+        $this->assertContains('username', $required);
+        $this->assertContains('email', $required);
+        $this->assertContains('firstname', $required);
+        $this->assertContains('lastname', $required);
+        $this->assertContains('password', $required);
+        $this->assertNotContains('middlename', $required);
+
+        $required = util::get_csv_required_columns(false);
+        $this->assertIsArray($required);
+        $this->assertContains('username', $required);
+        $this->assertContains('email', $required);
+        $this->assertContains('firstname', $required);
+        $this->assertContains('lastname', $required);
+        $this->assertNotContains('password', $required);
+        $this->assertNotContains('middlename', $required);
+    }
+
+    public function test_get_csv_optional_columns() {
+        $optional = util::get_csv_optional_columns(true);
+        $this->assertIsArray($optional);
+        $this->assertNotContains('username', $optional);
+        $this->assertNotContains('email', $optional);
+        $this->assertNotContains('firstname', $optional);
+        $this->assertNotContains('lastname', $optional);
+        $this->assertNotContains('password', $optional);
+        $this->assertContains('middlename', $optional);
+
+        $optional = util::get_csv_optional_columns(false);
+        $this->assertIsArray($optional);
+        $this->assertNotContains('username', $optional);
+        $this->assertNotContains('email', $optional);
+        $this->assertNotContains('firstname', $optional);
+        $this->assertNotContains('lastname', $optional);
+        $this->assertContains('password', $optional);
+        $this->assertContains('middlename', $optional);
+    }
+
+    public function test_validate_users_csv_structure() {
+        $generator = $this->getDataGenerator();
+
+        $generator->create_user(['username' => 'User1', 'email' => 'user1@example.com', 'idnumber' => 'iduser1', 'deleted' => 0, 'confirmed' => 1]);
+        $generator->create_user(['username' => 'user2', 'email' => 'user2@example.com', 'idnumber' => 'iduser2', 'deleted' => 1, 'confirmed' => 1]);
+        $generator->create_user(['username' => 'user3', 'email' => 'user3@example.com', 'idnumber' => 'iduser3', 'deleted' => 0, 'confirmed' => 0]);
+
+        $content = <<<OEF
+username,email,firstname,lastname
+use4,user4@example.com,Ctvrty,Uzivatel
+user1,user1@example.com,First User
+OEF;
+        $expected = [
+            'delimiter' => ',',
+            'delimitername' => 'comma',
+            'columns' => ['username', 'email', 'firstname', 'lastname'],
+            'error' => null,
+        ];
+        $result = util::validate_users_csv_structure($content, 'UTF-8', false);
+        $this->assertSame($expected, $result);
+
+        $expected = [
+            'delimiter' => ',',
+            'delimitername' => 'comma',
+            'columns' => ['username', 'email', 'firstname', 'lastname'],
+            'error' => 'Following columns must be included in the CSV file: password',
+        ];
+        $result = util::validate_users_csv_structure($content, 'UTF-8', true);
+        $this->assertSame($expected, $result);
+
+        $content = <<<OEF
+ username ;email; firstname;lastname ;password
+ use4 ;user4@example.com;Ctvrty;Uzivatel;Pokus123!
+user1;user1@example.com;First User;Pokus123!
+OEF;
+        $expected = [
+            'delimiter' => ';',
+            'delimitername' => 'semicolon',
+            'columns' => ['username', 'email', 'firstname', 'lastname', 'password'],
+            'error' => null,
+        ];
+        $result = util::validate_users_csv_structure($content, 'UTF-8', false);
+        $this->assertSame($expected, $result);
+
+        $content = <<<OEF
+username,email,firstname,lastname,password
+use4,user4@example.com,Ctvrty,Uzivatel,Pokus123!
+user1,user1@example.com,First User,Pokus123!
+OEF;
+        $expected = [
+            'delimiter' => ',',
+            'delimitername' => 'comma',
+            'columns' => ['username', 'email', 'firstname', 'lastname', 'password'],
+            'error' => null,
+        ];
+        $result = util::validate_users_csv_structure($content, 'UTF-8', true);
+        $this->assertSame($expected, $result);
+
+        $content = <<<OEF
+username,email,firstname,lastname,password,middlename,description
+use4,user4@example.com,Ctvrty,Uzivatel,Pokus123!,,Nothing interesting
+user1,user1@example.com,First User,Pokus123!,John,
+OEF;
+        $expected = [
+            'delimiter' => ',',
+            'delimitername' => 'comma',
+            'columns' => ['username', 'email', 'firstname', 'lastname', 'password', 'middlename', 'description'],
+            'error' => null,
+        ];
+        $result = util::validate_users_csv_structure($content, 'UTF-8', true);
+        $this->assertSame($expected, $result);
+
+        $content = <<<OEF
+username,email,firstname,lastname,password,middlename,description,xyz,def
+use4,user4@example.com,Ctvrty,Uzivatel,Pokus123!,,Nothing interesting,ff,
+user1,user1@example.com,First User,Pokus123!,John,,ii,
+OEF;
+        $expected = [
+            'delimiter' => ',',
+            'delimitername' => 'comma',
+            'columns' => ['username', 'email', 'firstname', 'lastname', 'password', 'middlename', 'description', 'xyz', 'def'],
+            'error' => 'Following unknown columns cannot be present in the CSV file: xyz, def',
+        ];
+        $result = util::validate_users_csv_structure($content, 'UTF-8', true);
+        $this->assertSame($expected, $result);
+
+        $content = <<<OEF
+abc,def,xyz
+,,
+,,
+OEF;
+        $expected = [
+            'delimiter' => ',',
+            'delimitername' => 'comma',
+            'columns' => ['abc', 'def', 'xyz'],
+            'error' => 'Following columns must be included in the CSV file: username, email, firstname, lastname, password',
+        ];
+        $result = util::validate_users_csv_structure($content, 'UTF-8', true);
+        $this->assertSame($expected, $result);
+
+        $expected = [
+            'delimiter' => ',',
+            'delimitername' => 'comma',
+            'columns' => ['abc', 'def', 'xyz'],
+            'error' => 'Following columns must be included in the CSV file: username, email, firstname, lastname',
+        ];
+        $result = util::validate_users_csv_structure($content, 'UTF-8', false);
+        $this->assertSame($expected, $result);
+
+        $content = <<<OEF
+def,xyz
+,
+,
+OEF;
+        $expected = [
+            'delimiter' => ',',
+            'delimitername' => 'comma',
+            'columns' => ['def', 'xyz'],
+            'error' => 'Following columns must be included in the CSV file: username, email, firstname, lastname, password',
+        ];
+        $result = util::validate_users_csv_structure($content, 'UTF-8', true);
+        $this->assertSame($expected, $result);
+
+        $expected = [
+            'delimiter' => ',',
+            'delimitername' => 'comma',
+            'columns' => ['def', 'xyz'],
+            'error' => 'Following columns must be included in the CSV file: username, email, firstname, lastname',
+        ];
+        $result = util::validate_users_csv_structure($content, 'UTF-8', false);
+        $this->assertSame($expected, $result);
+
+        $content = <<<OEF
+defxyz
+
+OEF;
+        $expected = [
+            'delimiter' => null,
+            'delimitername' => null,
+            'columns' => null,
+            'error' => 'There is something wrong with the format of the CSV file. Please check that it includes column names.',
+        ];
+        $result = util::validate_users_csv_structure($content, 'UTF-8', true);
+        $this->assertSame($expected, $result);
+
+        $expected = [
+            'delimiter' => null,
+            'delimitername' => null,
+            'columns' => null,
+            'error' => 'There is something wrong with the format of the CSV file. Please check that it includes column names.',
+        ];
+        $result = util::validate_users_csv_structure($content, 'UTF-8', false);
+        $this->assertSame($expected, $result);
+    }
+
+    public function test_validate_users_csv_row() {
+        $generator = $this->getDataGenerator();
+
+        $generator->create_user(['username' => 'User1', 'email' => 'user1@example.com', 'idnumber' => 'iduser1', 'deleted' => 0, 'confirmed' => 1]);
+        $generator->create_user(['username' => 'user2', 'email' => 'user2@example.com', 'idnumber' => 'iduser2', 'deleted' => 1, 'confirmed' => 1]);
+        $generator->create_user(['username' => 'user3', 'email' => 'user3@example.com', 'idnumber' => 'iduser3', 'deleted' => 0, 'confirmed' => 0]);
+
+        $row = [
+            'username' => 'user',
+            'email' => 'user@example.com',
+            'firstname' => 'Prvni',
+            'lastname' => 'Uzivatel',
+            'password' => 'Pass123443!',
+        ];
+        $expecxted = [];
+        $result = util::validate_users_csv_row($row, true);
+        $this->assertSame($expecxted, $result);
+
+        $row = [
+            'username' => 'user',
+            'email' => 'user@example.com',
+            'firstname' => 'Prvni',
+            'lastname' => 'Uzivatel',
+            'lang' => 'en',
+        ];
+        $expecxted = [];
+        $result = util::validate_users_csv_row($row, false);
+        $this->assertSame($expecxted, $result);
+
+        $row = [
+            'username' => 'user1',
+            'email' => 'user1@example.com',
+            'firstname' => '',
+            'lastname' => 'Uzivatel',
+            'idnumber' => 'iduser1',
+            'lang' => 'xx',
+        ];
+        $expecxted = [
+            'This username already exists, choose another',
+            'This email address is already registered.',
+            'This ID number is already in use',
+            'Field "firstname" is missing',
+            'Field "password" is missing',
+            'Cannot find "xx" language pack!',
+        ];
+        $result = util::validate_users_csv_row($row, true);
+        $this->assertSame($expecxted, $result);
+    }
 }

@@ -23,8 +23,8 @@
 
 namespace totara_tenant\form;
 
-use core_text;
 use core_user;
+use totara_tenant\local\util;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -100,18 +100,16 @@ final class user_create extends \moodleform {
 
     /**
      * Validate the form data.
-     * @param array $usernew
+     *
+     * NOTE: username, email and idnumber validation is a bit more strict to prevent potential problems.
+     *
+     * @param array $data
      * @param array $files
      * @return array|bool
      */
-    public function validation($usernew, $files) {
-        global $CFG, $DB;
-
-        $user = $this->_customdata['user']; // Defaults and presets.
-
-        $usernew = (object)$usernew;
-        $usernew->username = trim($usernew->username);
-        $usernew->id = $user->id;
+    public function validation($data, $files) {
+        $usernew = (object)$data;
+        $usernew->id = 0;
 
         $err = array();
 
@@ -132,35 +130,19 @@ final class user_create extends \moodleform {
             }
         }
 
-        if (empty($usernew->username)) {
-            // Might be only whitespace.
-            $err['username'] = get_string('required');
-        } else {
-            // Check new username does not exist.
-            if ($DB->record_exists('user', array('username' => $usernew->username, 'mnethostid' => $CFG->mnet_localhost_id))) {
-                $err['username'] = get_string('usernameexists');
-            }
-            // Check allowed characters.
-            if ($usernew->username !== core_text::strtolower($usernew->username)) {
-                $err['username'] = get_string('usernamelowercase');
-            } else {
-                if ($usernew->username !== core_user::clean_field($usernew->username, 'username')) {
-                    $err['username'] = get_string('invalidusername');
-                }
-            }
+        $errmsg = util::validate_user_username($usernew->username);
+        if ($errmsg !== null) {
+            $err['username'] = $errmsg;
         }
 
-        if (!validate_email($usernew->email)) {
-            $err['email'] = get_string('invalidemail');
-        } else if (empty($CFG->allowaccountssameemail)
-            and $DB->record_exists_select('user', "LOWER(email) = LOWER(:email) AND mnethostid = :mnethostid",
-                array('email' => $usernew->email, 'mnethostid' => $CFG->mnet_localhost_id))) {
-            $err['email'] = get_string('emailexists');
+        $errmsg = util::validate_user_email($usernew->email);
+        if ($errmsg !== null) {
+            $err['email'] = $errmsg;
         }
 
-        // Check idnumber uniqueness.
-        if(!empty($usernew->idnumber) && totara_idnumber_exists('user', $usernew->idnumber, 0)) {
-            $err['idnumber'] = get_string('idnumberexists', 'totara_core');
+        $errmsg = util::validate_user_idnumber($usernew->idnumber);
+        if ($errmsg !== null) {
+            $err['idnumber'] = $errmsg;
         }
 
         // Next the customisable profile fields.

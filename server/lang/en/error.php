@@ -289,6 +289,7 @@ $string['guestsarenotallowed'] = 'The guest user is not allowed to do this';
 $string['hackdetected'] = 'Hack attack detected!';
 $string['hashpoolproblem'] = 'Incorrect pool file content {$a}.';
 $string['headersent'] = 'Headers already sent';
+$string['idnumberinvalid'] = 'ID number is invalid';
 $string['idnumbertaken'] = 'This ID number is already in use';
 $string['idnumbertoolong'] = 'ID number is too long';
 $string['importformatnotimplement'] = 'Sorry, importing this format is not yet implemented!';

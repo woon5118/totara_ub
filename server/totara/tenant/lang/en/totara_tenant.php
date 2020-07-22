@@ -24,12 +24,17 @@
 $string['cannotdisable'] = 'All tenants must be deleted before multitenancy can be disabled.';
 $string['categoryname'] = 'Tenant category name';
 $string['cohortname'] = 'Tenant participants audience name';
+$string['csvfile'] = 'CSV file';
+$string['csvfilepreview'] = 'CSV file preview';
+$string['csvfiletemplate'] = 'CSV file template';
 $string['dashboardname'] = 'Tenant dashboard name';
 $string['domainmanagers'] = 'Domain managers';
 $string['erroridnumberexists'] = 'Tenant with the same identifier already exists';
 $string['erroridnumberinvalid'] = 'Invalid tenant identifier, use only lower case letters (a-z) and numbers';
 $string['errornameexists'] = 'Tenant with the same name already exists';
 $string['errornameinvalid'] = 'Invalid tenant name';
+$string['errorcsvcolumnsmissing'] = 'Following columns must be included in the CSV file: {$a}';
+$string['errorcsvcolumnsextra'] = 'Following unknown columns cannot be present in the CSV file: {$a}';
 $string['membercount'] = 'Number of members';
 $string['migrationtomemberwarning'] = 'Warning: user account will be migrated to dedicated Tenant account, participation in all other tenants will be terminated.';
 $string['migrationtononmemberwarning'] = 'Warning: dedicated tenant user account will be migrated to global user account.';
@@ -75,9 +80,20 @@ $string['tenant:usercreate_help'] = 'Allows the user to:
 * Create new users within a tenant domain
 * Import users into a tenant domain if they are permitted to import users also
 * Approve user requests for a tenant domain from the auth approved plugin if they are also permitted to approve requests';
+$string['tenant:userupload'] = 'Upload tenant users';
 $string['tenant:view'] = 'View tenant details';
 $string['tenant:view_help'] = 'Allows the user to view the list of tenants and details for each';
 $string['tenant:viewparticipants'] = 'View participants in tenant domain';
+$string['uploadusers'] = 'Upload users';
 $string['usermanagement'] = 'User management';
 $string['usermanagers'] = 'User managers';
 $string['usersreport'] = 'Tenant users report for members';
+$string['useruploadadded'] = 'Users added';
+$string['useruploaderrors'] = 'Errors';
+$string['useruploaddownloadtemplate'] = 'Download CSV template';
+$string['useruploaddownloadtemplate_help'] = 'The template file contains all the possible fields that can be included, not all of these are required.
+
+Required fields are: "username,password,firstname,lastname,email".';
+$string['useruploadexistingskipped'] = 'Existing users skipped';
+$string['useruploadresultstable'] = 'Results for tenant user upload';
+$string['useruploaduserdefaults'] = 'User defaults';

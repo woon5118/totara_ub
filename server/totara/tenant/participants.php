@@ -78,6 +78,9 @@ $buttons = [];
 if (has_capability('totara/tenant:usercreate', $tenantcontext)) {
     $buttons[] = $OUTPUT->single_button(new moodle_url('/totara/tenant/user_create.php', ['tenantid' => $tenant->id]), get_string('createuser'), 'get');
 }
+if (has_capability('totara/tenant:userupload', $tenantcontext)) {
+    $buttons[] = $OUTPUT->single_button(new moodle_url('/totara/tenant/user_upload.php', ['tenantid' => $tenant->id]), get_string('uploadusers', 'totara_tenant'), 'get');
+}
 if (has_capability('totara/tenant:manageparticipants', $systemcontext)) {
     $buttons[] = $OUTPUT->single_button(new moodle_url('/totara/tenant/participants_other.php', ['id' => $tenant->id]), get_string('participantsother', 'totara_tenant'), 'get');
 }

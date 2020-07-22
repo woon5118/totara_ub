@@ -15,6 +15,9 @@ Feature: Tenant user manager with isolation enabled
     Given the following "users" exist:
       | username          | firstname     | lastname |
       | tenantusermanager | Tenant User   | Manager  |
+    And the following "custom profile fields" exist in "totara_core" plugin:
+      | datatype | shortname | name              | param1     | defaultdata |
+      | text     | textcf    | Text Custom Field |            |             |
 # Note: the non-member managing tenant does not have any UI that leads them to the tenant category,
 #       workaround is to add totara/tenant:view capability in the system context, they can see
 #       what tenants are there just by looking at course categories anyway.

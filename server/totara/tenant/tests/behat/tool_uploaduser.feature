@@ -21,7 +21,7 @@ Feature: Tenant user CSV upload
     Given I log in as "admin"
 
     When I navigate to "Upload users" node in "Site administration > Users"
-    And I upload "totara/tenant/tests/fixtures/uplaod_users.csv" file to "File" filemanager
+    And I upload "totara/tenant/tests/fixtures/upload_users.csv" file to "File" filemanager
     And I press "Upload users"
     And I set the following fields to these values:
       | Upload type | Add new and update existing users |

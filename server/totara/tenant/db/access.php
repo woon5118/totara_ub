@@ -70,4 +70,14 @@ $capabilities = array(
             'manager' => CAP_ALLOW,
         ),
     ),
+    /* Upload users to a tenant */
+    'totara/tenant:userupload' => array(
+        'riskbitmask' => RISK_PERSONAL,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_TENANT,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+            'tenantusermanager' => CAP_ALLOW,
+        ),
+    ),
 );

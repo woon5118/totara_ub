@@ -21,6 +21,8 @@
  * @package totara_tenant
  */
 
+use totara_tenant\local\util;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -114,6 +116,12 @@ function totara_tenant_extend_navigation_category_settings($navigation, $context
         $tenantnode->add(get_string('checkpermissions', 'role'), $url, $tenantnode::TYPE_SETTING, null, 'checkpermissions', new pix_icon('i/checkpermissions', ''));
     }
 
+    // Upload users
+    if (has_capability('totara/tenant:userupload', $tenantcontext)) {
+        $url = new moodle_url("/totara/tenant/user_upload.php", ['tenantid' => $tenant->id]);
+        $tenantnode->add(get_string('uploadusers', 'totara_tenant'), $url, $tenantnode::TYPE_SETTING, null, 'uploadusers');
+    }
+
     if ($tenantnode->children) {
         $tcurl = new moodle_url('/course/index.php', ['categoryid' => $tenant->categoryid]);
         if ($PAGE->url->compare($tcurl, URL_MATCH_EXACT)) {
@@ -125,4 +133,44 @@ function totara_tenant_extend_navigation_category_settings($navigation, $context
             $navigation->add_node($tenantnode);
         }
     }
+}
+
+/**
+ * Serves CSV templates.
+ *
+ * @param stdClass $course course object
+ * @param cm_info $cm course module object
+ * @param context $context context object
+ * @param string $filearea file area
+ * @param array $args extra arguments
+ * @param bool $forcedownload whether or not force download
+ * @param array $options additional options affecting the file serving
+ * @return bool|void false if file not found, does not return if found - just send the file
+ */
+function totara_tenant_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options=array()) {
+    global $CFG, $DB;
+
+    if ($context->contextlevel != CONTEXT_TENANT) {
+        return false;
+    }
+
+    require_login(null, false, null, false);
+
+    if ($filearea !== 'csvtemplate') {
+        return false;
+    }
+
+    if (!has_capability('totara/tenant:userupload', $context)) {
+        return false;
+    }
+
+    $filename = array_shift($args);
+    if ($filename !== 'users.csv') {
+        return false;
+    }
+
+    $columns = array_merge(util::get_csv_required_columns(true), util::get_csv_optional_columns(true));
+    $content = implode(',', $columns) . "\n" . str_repeat(',', count($columns) - 1) . "\n";
+
+    send_file($content, $filename, 0, 0, true, true, 'text/csv');
 }

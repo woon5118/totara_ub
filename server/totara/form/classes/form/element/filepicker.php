@@ -304,11 +304,12 @@ class filepicker extends element {
         $options->accepted_types = file_area::accept_attribute_to_accepted_types($attributes['accept']);
         $options->return_types = FILE_INTERNAL;
         $options->disable_types = isset($attributes['disable_types']) ? $attributes['disable_types'] : array();
-        if (isset($attributes['context'])) {
-            $options->context = $attributes['context'];
+        if ((isset($attributes['context'])) && ($attributes['context'] instanceof \context)) {
+            $options->context = (object)$attributes['context']->to_array();
         } else {
-            $options->context = $this->get_model()->get_default_context();
-        }
+            $context = $this->get_model()->get_default_context();
+            $options->context = (object)$context->to_array();
+       }
 
         $options->currentfile = '';
         if ($file = $this->get_draft_file($draftitemid)) {
@@ -334,6 +335,7 @@ class filepicker extends element {
         /** @var \file_storage $fs */
         $fs = get_file_storage();
         $usercontext = \context_user::instance($USER->id);
+
         if ($files = $fs->get_directory_files($usercontext->id, 'user', 'draft', $draftitemid, '/', false, false, 'id DESC')) {
             $file = reset($files);
             return $file;

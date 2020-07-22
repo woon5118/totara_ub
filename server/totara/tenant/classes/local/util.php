@@ -642,4 +642,307 @@ final class util {
             }
         }
     }
+
+    /**
+     * Does a user with given username exist?
+     *
+     * NOTE: this is more strict than other areas to prevent problems in multi-tenant sites.
+     *
+     * @param string $username
+     * @return bool
+     */
+    public static function user_username_exists(string $username): bool {
+        global $DB;
+        $params = ['username' => $username];
+        return $DB->record_exists_select('user', "LOWER(username) = LOWER(:username) AND deleted = 0", $params);
+    }
+
+    /**
+     * Is username valid for new tenant user?
+     *
+     * NOTE: this is more strict than other areas to prevent problems in multi-tenant sites.
+     *
+     * @param string $username
+     * @return string|null null means value ok, anything else is error message
+     */
+    public static function validate_user_username(string $username): ?string {
+        if (trim($username) === '' || empty($username)) {
+            return get_string('missingusername');
+        }
+        if (self::user_username_exists($username)) {
+            return get_string('usernameexists');
+        }
+        if ($username !== \core_user::clean_field($username, 'username')) {
+            if ($username !== \core_text::strtolower($username)) {
+                return get_string('usernamelowercase');
+            } else {
+                return get_string('invalidusername');
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Does a user with given email exist?
+     *
+     * NOTE: this is more strict than other areas to prevent problems in multi-tenant sites.
+     *
+     * @param string $email
+     * @return bool
+     */
+    public static function user_email_exists(string $email): bool {
+        global $DB;
+        $params = ['email' => $email];
+        return $DB->record_exists_select('user', "LOWER(email) = LOWER(:email) AND deleted = 0", $params);
+    }
+
+    /**
+     * Is email valid for new tenant user?
+     *
+     * NOTE: this is more strict than other areas to prevent problems in multi-tenant sites.
+     *
+     * @param string $email
+     * @return string|null null means value ok, anything else is error message
+     */
+    public static function validate_user_email(string $email): ?string {
+        if (trim($email) === '' || empty($email)) {
+            return get_string('missingemail');
+        }
+        if (self::user_email_exists($email)) {
+            return get_string('emailexists');
+        }
+        if (!validate_email($email)) {
+            return get_string('invalidemail');
+        }
+        return null;
+    }
+
+    /**
+     * Does a user with given idnumber exist?
+     *
+     * NOTE: this is more strict than other areas to prevent problems in multi-tenant sites.
+     *
+     * @param string $idnumber
+     * @return bool
+     */
+    public static function user_idnumber_exists(string $idnumber): bool {
+        global $DB;
+        if ($idnumber === '') {
+            return false;
+        }
+        $params = ['idnumber' => $idnumber];
+        return $DB->record_exists_select('user', "LOWER(idnumber) = LOWER(:idnumber) AND deleted = 0", $params);
+    }
+
+    /**
+     * Is idnumber valid for new tenant user?
+     *
+     * NOTE: this is more strict than other areas to prevent problems in multi-tenant sites.
+     *
+     * @param string $idnumber
+     * @return string|null null means value ok, anything else is error message
+     */
+    public static function validate_user_idnumber(string $idnumber): ?string {
+        if ($idnumber === '') {
+            return null;
+        }
+        if (trim($idnumber) !== $idnumber || empty($idnumber)) {
+            return get_string('idnumberinvalid', 'error');
+        }
+        if (self::user_idnumber_exists($idnumber)) {
+            return get_string('idnumbertaken', 'error');
+        }
+        return null;
+    }
+
+    /**
+     * Returns list of required CSV fields.
+     *
+     * @param bool $requirepasswords
+     * @return string[]
+     */
+    public static function get_csv_required_columns(bool $requirepasswords): array {
+        $result = [
+            'username',
+            'email',
+            'firstname',
+            'lastname',
+        ];
+        if ($requirepasswords) {
+            $result[] = 'password';
+        }
+        return $result;
+    }
+
+    /**
+     * Returns list of optional CSV fields.
+     *
+     * @param bool $requirepasswords
+     * @return string[]
+     */
+    public static function get_csv_optional_columns(bool $requirepasswords): array {
+        global $DB;
+
+        // Do not use the overcomplicated fullname logic from Moodle here, just allow all possible name fields.
+        $result = [
+            'middlename', 'alternatename', 'firstnamephonetic', 'lastnamephonetic',
+            'city', 'country', 'deleted', 'suspended',
+            'idnumber', 'lang', 'timezone', 'phone1', 'phone2', 'address', 'maildisplay',
+            'mailformat', 'emaildigest', 'autosubscribe', 'description', 'webpage',
+            'institution', 'department',
+        ];
+        if (!$requirepasswords) {
+            array_unshift($result, 'password');
+        }
+
+        // Custom profile fields, ignore the required flag here, users will be asked later.
+        $fields = $DB->get_records('user_info_field', [], 'shortname ASC');
+        foreach ($fields as $field) {
+            if ($field->visible == PROFILE_VISIBLE_NONE) {
+                continue;
+            }
+            $result[] = 'profile_field_' . $field->shortname;
+        }
+        return $result;
+    }
+
+    /**
+     * Validate the structure of CSV file using the first line
+     * is compatible with tenant member upload.
+     *
+     * @param string $content
+     * @param string $encoding
+     * @param bool $requirepasswords
+     * @return array info with keys 'delimiter', 'delimitername', 'columns' and 'error'
+     */
+    public static function validate_users_csv_structure(string $content, string $encoding, bool $requirepasswords): array {
+        global $CFG;
+        require_once($CFG->dirroot . '/lib/csvlib.class.php');
+
+        $result = ['delimiter' => null, 'delimitername' => null, 'columns' => null, 'error' => null];
+
+        $content = \core_text::convert($content, $encoding, 'utf-8');
+        $content = \core_text::trim_utf8_bom($content);
+        $content = preg_replace('!\r\n?!', "\n", $content);
+
+        $content = trim($content);
+        if ($content === '') {
+            $result['error'] = get_string('csvemptyfile', 'error');
+            return $result;
+        }
+
+        $requiredcolumns = self::get_csv_required_columns($requirepasswords);
+        $optionalcolumns = self::get_csv_optional_columns($requirepasswords);
+
+        $newlinepos = strpos($content, "\n");
+        if ($newlinepos) {
+            $header = substr($content, 0, $newlinepos);
+        } else {
+            $header = $content;
+        }
+        $header = trim($header);
+
+        foreach (\csv_import_reader::get_delimiter_list() as $delimitername => $delimiter) {
+            $columns = str_getcsv($header, $delimiter, '"');
+            if (count($columns) > 1) {
+                $columns = array_map('trim', $columns);
+                $unique = array_unique($columns);
+                if (count($columns) !== count($unique)) {
+                    $result['error'] = get_string('csvcolumnduplicates', 'error');
+                    return $result;
+                }
+                $missing = [];
+                foreach ($requiredcolumns as $column) {
+                    if (!in_array($column, $columns)) {
+                        $missing[$column] = $column;
+                    }
+                }
+                if ($missing) {
+                    $result['error'] = get_string('errorcsvcolumnsmissing', 'totara_tenant', implode(', ', $missing));
+                } else {
+                    $extra = $columns;
+                    foreach ($extra as $k => $column) {
+                        if (in_array($column, $requiredcolumns)) {
+                            unset($extra[$k]);
+                        }
+                        if (in_array($column, $optionalcolumns)) {
+                            unset($extra[$k]);
+                        }
+                    }
+                    if ($extra) {
+                        $result['error'] = get_string('errorcsvcolumnsextra', 'totara_tenant', s(implode(', ', $extra)));
+                    }
+                }
+
+                $result['delimiter'] = $delimiter;
+                $result['delimitername'] = $delimitername;
+                $result['columns'] = $columns;
+                return $result;
+            }
+        }
+
+        $result['error'] = get_string('namecolumnmissing', 'cohort');
+        return $result;
+    }
+
+    /**
+     * Is the CSV row data valid for tenant member upload?
+     *
+     * @param array $row array with column names as keys
+     * @param bool $requirepasswords
+     * @return array errors, empty array means data is ok
+     */
+    public static function validate_users_csv_row(array $row, bool $requirepasswords): array {
+        global $CFG;
+
+        $errors = array();
+
+        $errmsg = self::validate_user_username($row['username']);
+        if ($errmsg !== null) {
+            $errors[] = $errmsg;
+        }
+
+        $errmsg = self::validate_user_email($row['email']);
+        if ($errmsg !== null) {
+            $errors[] = $errmsg;
+        }
+
+        if (isset($row['idnumber'])) {
+            $errmsg = self::validate_user_idnumber($row['idnumber']);
+            if ($errmsg !== null) {
+                $errors[] = $errmsg;
+            }
+        }
+        if (!isset($row['firstname']) || trim($row['firstname']) === '') {
+            $errors[] = get_string('missingfield', 'error', 'firstname');
+        }
+
+        if (!isset($row['password']) || strlen($row['password']) === 0) {
+            if ($requirepasswords) {
+                $errors[] = get_string('missingfield', 'error', 'password');
+            }
+        } else {
+            $errmsg = null;
+            if (!check_password_policy($row['password'], $errmsg)) {
+                $errors[] = $errmsg;
+            }
+        }
+
+        if (isset($row['lang']) && strlen($row['lang']) > 0) {
+            if (clean_param($row['lang'], PARAM_LANG) === '') {
+                $errors[] = get_string('cannotfindlang', 'error', s($row['lang']));
+            }
+        }
+
+        // Validate custom fields.
+        require_once($CFG->dirroot . '/admin/tool/uploaduser/locallib.php');
+        $row['status'] = [];
+        uu_check_custom_profile_data($row);
+        if ($row['status']) {
+            $errors = array_merge($errors, $row['status']);
+        }
+        unset($row['status']);
+
+        return $errors;
+    }
 }
