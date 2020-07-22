@@ -107,6 +107,13 @@ class raw_field {
     private $is_validated = false;
 
     /**
+     * An identifier which can be used for modifications
+     *
+     * @var string
+     */
+    private $identifier = null;
+
+    /**
      *
      *
      * @param string $field Raw SQL to insert into query
@@ -144,6 +151,27 @@ class raw_field {
         $this->field = $field;
         $this->builder = $builder;
         $this->is_raw = true;
+    }
+
+    /**
+     * Sets an identifier which can be used for modifying operations
+     *
+     * @param string|null $identifier
+     * @return $this
+     */
+    public function set_identifier(?string $identifier) {
+        $this->identifier = $identifier;
+
+        return $this;
+    }
+
+    /**
+     * Returns an identifier if one is set or null
+     *
+     * @return string|null
+     */
+    public function get_identifier(): ?string {
+        return $this->identifier;
     }
 
     /**

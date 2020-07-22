@@ -489,6 +489,47 @@ class core_orm_builder_testcase extends orm_query_builder_base {
 
         $conditions = $builder->get_conditions();
         $this->assertCount(0, $conditions);
+
+        // Try a field with identifier
+        $field1 = new field('myfield');
+        $field1_with_id = new field('myfield');
+        $field1_with_id->set_identifier('thisisit');
+        $field2 = new field('anotherone');
+
+        $builder = builder::table('foo')
+            ->where($field1, 'value1')
+            ->where($field1_with_id, 'value2')
+            ->where($field2, 'value3');
+
+        $builder->remove_where('normalfield');
+
+        // Nothing got removed yet
+        $conditions = $builder->get_conditions();
+        $this->assertCount(3, $conditions);
+
+        $field1_with_wrong_id = new field('myfield');
+        $field1_with_wrong_id->set_identifier('thisisnotit');
+
+        $builder->remove_where($field1_with_wrong_id);
+
+        // Nothing got removed yet
+        $conditions = $builder->get_conditions();
+        $this->assertCount(3, $conditions);
+
+        $builder->remove_where($field1_with_id);
+
+        // The one with the identifier should be gone
+        $conditions = $builder->get_conditions();
+        $this->assertCount(2, $conditions);
+
+        $expected_conditions = [$field1, $field2];
+
+        foreach ($conditions as $condition) {
+            $this->assertContains($condition->get_field(), $expected_conditions);
+            unset($expected_conditions[array_search($condition->get_field(), $expected_conditions)]);
+        }
+
+        $this->assertEmpty($expected_conditions);
     }
 
     public function test_it_cannot_remove_closure_conditions() {

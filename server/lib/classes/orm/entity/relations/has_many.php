@@ -26,6 +26,7 @@ namespace core\orm\entity\relations;
 use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\query\builder;
+use core\orm\query\field;
 
 /**
  * Class has_many
@@ -69,11 +70,16 @@ class has_many extends relation {
 
         // Group the result so that we can get the related results quicker
         $grouped = [];
+
+        $field = new field($this->get_foreign_key());
+        $field->set_identifier('has_many_foreign_key');
+
         foreach ($keys_chunked as $keys) {
             // Load possible values
             $results = $this->repo
-                ->remove_where($this->get_foreign_key())
-                ->where($this->get_foreign_key(), $keys)->get();
+                ->remove_where($field)
+                ->where($field, $keys)
+                ->get();
 
             foreach ($results as $result) {
                 $grouped[$result->{$this->get_foreign_key()}][$result->id] = $result;

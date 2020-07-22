@@ -82,9 +82,11 @@ class has_one_through extends has_many_through {
             )
             ->join($this->intermediate::TABLE, $this->get_foreign_key(), $this->get_intermediate_related_foreign_key());
 
+        $field = new field($this->get_intermediate_foreign_key(), $intermediate_builder);
+        $field->set_identifier('has_one_through_intermediate_foreign_key');
+
         foreach ($keys_chunked as $keys) {
             // Load possible values
-            $field = new field($this->get_intermediate_foreign_key(), $intermediate_builder);
             $results = $repository
                 ->remove_where($field)
                 ->where($field, $keys)

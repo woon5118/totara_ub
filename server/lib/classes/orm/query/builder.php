@@ -577,6 +577,10 @@ final class builder extends builder_base implements interacts_with_query, intera
      * Removes all conditions related to the given attribute from the query.
      * This does only work with regular attributes at the moment.
      *
+     * If the attribute is a field instance and it has an identifier this function
+     * will only remove the field with the same identifier, everything else will be ignored.
+     * This is to make it possible to safely remove certain fields without removing any unwanted ones.
+     *
      * @param string|field $attribute Attribute to select or a closure which works as a nested builder to create aggregation
      * @return $this
      */
@@ -593,11 +597,21 @@ final class builder extends builder_base implements interacts_with_query, intera
             throw new coding_exception('Removing of a raw condition is not yet supported.');
         }
 
+        $identifier = null;
+        if ($attribute instanceof field) {
+            $identifier = $attribute->get_identifier();
+        }
+
         $search_field = $attribute instanceof field ? (string) $attribute : (string) new field($attribute, $this);
 
         foreach ($this->properties->conditions as $key => $condition) {
-            $field = (string) $condition->get_field();
-            if ($search_field === $field) {
+            $field = $condition->get_field();
+            // In case the given field has an identifier this takes precedence
+            if ($identifier) {
+                if ($field instanceof field && $identifier === $field->get_identifier()) {
+                    unset($this->properties->conditions[$key]);
+                }
+            } else if ($search_field === (string) $field) {
                 unset($this->properties->conditions[$key]);
             }
         }

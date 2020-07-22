@@ -123,11 +123,13 @@ class has_many_through extends relation {
             )
             ->join($this->intermediate::TABLE, $this->get_related_key(), $this->get_intermediate_related_foreign_key());
 
+        $field = new field($this->get_intermediate_foreign_key(), $intermediate_builder);
+        $field->set_identifier('has_many_through_intermediate_foreign_key');
+
         // Group the result so that we can get the related results quicker
         $grouped = [];
         foreach ($keys_chunked as $keys) {
             // Load possible values
-            $field = new field($this->get_intermediate_foreign_key(), $intermediate_builder);
             $results = $repository->remove_where($field)
                 ->where($field, $keys)
                 ->get(true);

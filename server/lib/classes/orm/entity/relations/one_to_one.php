@@ -27,6 +27,7 @@ use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\entity\repository;
 use core\orm\query\builder;
+use core\orm\query\field;
 
 /**
  * Class has_one defines one to one relation between entities
@@ -69,11 +70,15 @@ abstract class one_to_one extends relation {
         // Chunk this to avoid too many value for IN condition
         $keys_chunked = array_chunk($keys, builder::get_db()->get_max_in_params());
 
+        $field = new field($this->get_foreign_key());
+        $field->set_identifier('one_to_one_foreign_key');
+
         foreach ($keys_chunked as $keys) {
             // Load all related objects
             $results = $this->repo
-                ->remove_where($this->get_foreign_key())
-                ->where($this->get_foreign_key(), $keys)->get();
+                ->remove_where($field)
+                ->where($field, $keys)
+                ->get();
 
             $results->key_by($this->get_foreign_key());
 
