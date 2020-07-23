@@ -15,5 +15,5 @@
 }
 
 .mediaplugin > div {
-    margin: auto;
+    margin: inherit;
 }
