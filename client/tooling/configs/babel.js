@@ -18,16 +18,7 @@
 
 module.exports = {
   legacy: {
-    presets: [
-      [
-        '@babel/preset-env',
-        {
-          targets: {
-            esmodules: true,
-          },
-        },
-      ],
-    ],
+    presets: ['@babel/preset-env'],
     plugins: [
       // require('../babel/disallow-syntax'),
       [
