@@ -69,7 +69,7 @@ export default {
   methods: {
     /**
      * Add notification to activeNotifications array
-     * Called from totara_core/notifications
+     * Called from tui/notifications
      *
      * @param {Object} options
      */

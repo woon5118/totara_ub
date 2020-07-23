@@ -56,11 +56,11 @@
 
 <script>
 import ActivityParticipants from 'mod_perform/components/user_activities/participant_selector/ActivityParticipants';
-import Loader from 'totara_core/components/loader/Loader';
+import Loader from 'tui/components/loader/Loader';
 import ManualParticipantSelectionInstancesQuery from 'mod_perform/graphql/manual_participant_selection_instances';
 import SelectableUsersQuery from 'mod_perform/graphql/selectable_users';
 import { NOTIFICATION_DURATION } from 'mod_perform/constants';
-import { notify } from 'totara_core/notifications';
+import { notify } from 'tui/notifications';
 
 export default {
   components: {

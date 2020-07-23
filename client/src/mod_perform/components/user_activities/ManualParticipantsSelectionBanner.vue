@@ -46,8 +46,8 @@
 </template>
 
 <script>
-import ActionCard from 'totara_core/components/card/ActionCard';
-import ActionLink from 'totara_core/components/links/ActionLink';
+import ActionCard from 'tui/components/card/ActionCard';
+import ActionLink from 'tui/components/links/ActionLink';
 
 export default {
   components: {

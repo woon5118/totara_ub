@@ -71,14 +71,14 @@
 </template>
 
 <script>
-import Button from 'totara_core/components/buttons/Button';
-import ButtonGroup from 'totara_core/components/buttons/ButtonGroup';
-import Form from 'totara_core/components/form/Form';
-import FormRow from 'totara_core/components/form/FormRow';
-import FormRowDetails from 'totara_core/components/form/FormRowDetails';
-import InputText from 'totara_core/components/form/InputText';
-import Select from 'totara_core/components/form/Select';
-import Textarea from 'totara_core/components/form/Textarea';
+import Button from 'tui/components/buttons/Button';
+import ButtonGroup from 'tui/components/buttons/ButtonGroup';
+import Form from 'tui/components/form/Form';
+import FormRow from 'tui/components/form/FormRow';
+import FormRowDetails from 'tui/components/form/FormRowDetails';
+import InputText from 'tui/components/form/InputText';
+import Select from 'tui/components/form/Select';
+import Textarea from 'tui/components/form/Textarea';
 import { ACTIVITY_NAME_MAX_LENGTH } from 'mod_perform/constants';
 
 //GraphQL

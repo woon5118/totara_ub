@@ -133,7 +133,7 @@ function getIconComponent(template, id) {
  * provided icon template.
  *
  * E.g.
- *   - 'core/flex_icon_stack' => 'totara_core/components/icons/flex_icons/FlexIconStack'
+ *   - 'core/flex_icon_stack' => 'tui/components/icons/flex_icons/FlexIconStack'
  *   - 'theme_foo/custom' => 'theme_foo/components/icons/flex_icons/Custom'
  *
  * @private

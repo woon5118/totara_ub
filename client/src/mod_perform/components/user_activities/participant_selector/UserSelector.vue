@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import TagList from 'totara_core/components/tag/TagList';
+import TagList from 'tui/components/tag/TagList';
 
 export default {
   components: {

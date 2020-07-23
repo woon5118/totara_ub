@@ -67,9 +67,9 @@
 </template>
 
 <script>
-import Button from 'totara_core/components/buttons/Button';
-import ButtonGroup from 'totara_core/components/buttons/ButtonGroup';
-import { FormRow, Uniform } from 'totara_core/components/uniform';
+import Button from 'tui/components/buttons/Button';
+import ButtonGroup from 'tui/components/buttons/ButtonGroup';
+import { FormRow, Uniform } from 'tui/components/uniform';
 import FormUserSelector from 'mod_perform/components/user_activities/participant_selector/FormUserSelector';
 import SetManualParticipantsMutation from 'mod_perform/graphql/set_manual_participants';
 

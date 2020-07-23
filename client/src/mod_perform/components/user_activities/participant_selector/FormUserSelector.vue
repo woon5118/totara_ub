@@ -21,7 +21,7 @@
 -->
 
 <script>
-import { createUniformInputWrapper } from 'totara_core/components/uniform/util';
+import { createUniformInputWrapper } from 'tui/components/uniform/util';
 import UserSelector from 'mod_perform/components/user_activities/participant_selector/UserSelector';
 
 export default createUniformInputWrapper(UserSelector);
