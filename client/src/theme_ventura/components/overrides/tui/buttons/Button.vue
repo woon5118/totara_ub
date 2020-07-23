@@ -335,6 +335,7 @@
   &--toolbar {
     min-width: 0;
     height: var(--tui-gap-6);
+    min-height: var(--tui-gap-6);
     padding: var(--tui-gap-1);
     color: var(--tui-btn-toolbar-text-color);
     font-size: var(--tui-font-size-14);
