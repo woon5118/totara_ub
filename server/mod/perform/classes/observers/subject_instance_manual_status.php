@@ -27,24 +27,44 @@ use core\collection;
 use core\event\base;
 use mod_perform\entities\activity\subject_instance;
 use mod_perform\event\subject_instance_activated;
+use mod_perform\notification\factory;
 use mod_perform\task\service\participant_instance_creation;
 use mod_perform\task\service\subject_instance_dto;
 
 class subject_instance_manual_status {
 
     /**
-     * When the manual status of a subject instance is updated to active,
-     * the manual participants that have been selected are used to create participant instances.
+     * React to a subject instance being activated.
      *
      * @param base|subject_instance_activated $event
      */
-    public static function generate_participant_instances(base $event): void {
+    public static function subject_instance_activated(base $event): void {
         $subject_instance = new subject_instance($event->objectid);
         $subject_instance_dto = subject_instance_dto::create_from_entity($subject_instance);
 
+        self::generate_instances($subject_instance_dto);
+        self::trigger_notifications($subject_instance_dto);
+    }
+
+    /**
+     * Create participant instances.
+     *
+     * @param subject_instance_dto $subject_instance_dto
+     */
+    private static function generate_instances(subject_instance_dto $subject_instance_dto): void {
         $subject_instance_dto_collection = new collection([$subject_instance_dto]);
         (new participant_instance_creation())
             ->generate_instances($subject_instance_dto_collection);
+    }
+
+    /**
+     * Trigger notifications to be sent to the participant users.
+     *
+     * @param subject_instance_dto $subject_instance_dto
+     */
+    private static function trigger_notifications(subject_instance_dto $subject_instance_dto): void {
+        $cartel = factory::create_cartel($subject_instance_dto);
+        $cartel->dispatch('instance_created');
     }
 
 }

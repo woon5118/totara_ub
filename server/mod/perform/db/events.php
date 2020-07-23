@@ -73,6 +73,6 @@ $observers = [
     ],
     [
         'eventname' => subject_instance_activated::class,
-        'callback' => subject_instance_manual_status::class.'::generate_participant_instances',
+        'callback' => subject_instance_manual_status::class.'::subject_instance_activated',
     ],
 ];

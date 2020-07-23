@@ -25,12 +25,19 @@ namespace mod_perform\watcher;
 
 use mod_perform\hook\subject_instances_created;
 use mod_perform\notification\factory;
+use mod_perform\state\subject_instance\pending;
 use mod_perform\task\service\subject_instance_dto;
 
 class notification {
     public static function create_subject_instances(subject_instances_created $hook): void {
         foreach ($hook->get_dtos() as $dto) {
             /** @var subject_instance_dto $dto */
+            if ($dto->status === pending::get_code()) {
+                // Don't dispatch notifications until the instance is activated. Once it is activated,
+                // notifications are dispatched in \mod_perform\observers\subject_instance_manual_status::subject_instance_activated
+                continue;
+            }
+
             $cartel = factory::create_cartel($dto);
             $cartel->dispatch('instance_created');
         }
