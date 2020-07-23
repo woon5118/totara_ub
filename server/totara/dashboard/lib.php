@@ -657,6 +657,10 @@ class totara_dashboard {
                                                                     'subpagepattern' => 'default'));
         $clonedids = array();
         foreach ($blockinstances as $instance) {
+            if (!has_capability('moodle/block:view', context_block::instance($instance->id), $userid)) {
+                continue;
+            }
+
             $originalid = $instance->id;
             unset($instance->id);
             $instance->parentcontextid = $usercontext->id;
