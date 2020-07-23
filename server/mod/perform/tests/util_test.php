@@ -32,7 +32,7 @@ use totara_job\job_assignment;
  *
  * @group perform
  */
-class mod_perform_webapi_util_testcase extends advanced_testcase {
+class mod_perform_util_testcase extends advanced_testcase {
 
     public function test_admin_can_manage_participation_of_all_activities(): void {
         self::setAdminUser();
@@ -148,4 +148,73 @@ class mod_perform_webapi_util_testcase extends advanced_testcase {
             self::setUser($user->id);
         }
     }
+
+    public function test_admin_can_potentially_report_on_subjects(): void {
+        self::setAdminUser();
+
+        $this->assertTrue(util::can_potentially_report_on_subjects(user::logged_in()->id));
+    }
+
+    public function test_user_with_subject_capability_can_potentially_report_on_subjects(): void {
+        $subject = $this->getDataGenerator()->create_user();
+        $reporter = $this->getDataGenerator()->create_user();
+
+        $reporter_role_id = create_role(
+            'Perform Reporter Role',
+            'perform_reporter_role',
+            'Can report on perform data'
+        );
+
+        $system_context = context_system::instance();
+        assign_capability(
+            'mod/perform:report_on_subject_responses',
+            CAP_ALLOW,
+            $reporter_role_id,
+            $system_context
+        );
+
+        $this->getDataGenerator()->role_assign(
+            $reporter_role_id,
+            $reporter->id,
+            context_user::instance($subject->id)
+        );
+
+        self::setUser($reporter);
+        $this->assertTrue(util::can_potentially_report_on_subjects(user::logged_in()->id));
+    }
+
+    public function test_user_with_all_subjects_capability_can_potentially_report_on_subjects(): void {
+        $reporter = $this->getDataGenerator()->create_user();
+
+        $reporter_role_id = create_role(
+            'Perform Reporter Role',
+            'perform_reporter_role',
+            'Can report on perform data'
+        );
+
+        $system_context = context_system::instance();
+        assign_capability(
+            'mod/perform:report_on_subject_responses',
+            CAP_ALLOW,
+            $reporter_role_id,
+            $system_context
+        );
+
+        $this->getDataGenerator()->role_assign(
+            $reporter_role_id,
+            $reporter->id,
+            context_user::instance($reporter->id)
+        );
+
+        self::setUser($reporter);
+        $this->assertTrue(util::can_potentially_report_on_subjects(user::logged_in()->id));
+    }
+
+    public function test_user_cannot_report_without_capability(): void {
+        $user = $this->getDataGenerator()->create_user();
+        self::setUser($user);
+
+        $this->assertFalse(util::can_potentially_report_on_subjects(user::logged_in()->id));
+    }
+
 }

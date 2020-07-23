@@ -86,4 +86,22 @@ $capabilities = [
             'manager' => CAP_ALLOW,
         ]
     ],
+    // Report on answers given for a specific subject user. Checked against a specific user.
+    // See mod/perform:report_on_all_subjects_responses for a system-wide version of this capability.
+    'mod/perform:report_on_subject_responses' => [
+        'riskbitmask'   => RISK_PERSONAL,
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_USER,
+    ],
+    // Report on answers given for all subject instances. Checked against a specific user
+    // for MT support but this is a system level check.
+    // See mod/perform:report_on_subject_responses for a more limited (per-user) version of this capability.
+    'mod/perform:report_on_all_subjects_responses' => [
+        'riskbitmask'   => RISK_PERSONAL,
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_USER,
+        'archetypes' => [
+            'manager' => CAP_ALLOW,
+        ],
+    ],
 ];

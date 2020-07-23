@@ -269,4 +269,17 @@ class util {
         return access::has_capability('mod/perform:manage_subject_user_participation', $subject_user_context, $manager_id);
     }
 
+    protected static function has_report_on_all_subjects_capability(int $user_id): bool {
+        $user_context = context_user::instance($user_id);
+
+        return has_capability('mod/perform:report_on_all_subjects_responses', $user_context, $user_id);
+    }
+
+    public static function can_potentially_report_on_subjects(int $user_id): bool {
+        if (static::has_report_on_all_subjects_capability($user_id)) {
+            return true;
+        }
+
+        return has_capability_in_any_context('mod/perform:report_on_subject_responses');
+    }
 }
