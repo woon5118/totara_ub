@@ -60,6 +60,7 @@ class user_activities extends perform_controller {
             'closed-on-completion' => (bool) $this->get_optional_param('closed_on_completion', false, PARAM_BOOL),
             'require-manual-participants-notification' => manual_participant_helper::for_user($current_user_id)
                 ->has_pending_selections(),
+            'can-potentially-manage-participants' => util::can_potentially_manage_participants($current_user_id),
         ];
 
         return self::create_tui_view('mod_perform/pages/UserActivities', $props)

@@ -85,7 +85,9 @@ import { notify } from 'tui/notifications';
 
 export default {
   components: {
+    Button,
     ManualParticipantsSelectionBanner,
+    SelectActivityModal,
     Tab,
     Tabs,
     UserActivityList,
@@ -163,12 +165,12 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
+      "manage_participation",
       "toast_success_save_close_on_completion_response",
       "toast_success_save_response",
       "user_activities_activities_about_others_title",
       "user_activities_page_title",
-      "user_activities_your_activities_title",
-      "manage_participation"
+      "user_activities_your_activities_title"
     ]
   }
 </lang-strings>

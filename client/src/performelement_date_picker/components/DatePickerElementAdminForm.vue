@@ -67,11 +67,7 @@
 </template>
 
 <script>
-import {
-  Uniform,
-  FormRow,
-  FormDateSelector,
-} from 'tui/components/uniform';
+import { Uniform, FormRow, FormDateSelector } from 'tui/components/uniform';
 import FormText from 'tui/components/uniform/FormText';
 import ElementAdminForm from 'mod_perform/components/element/ElementAdminForm';
 import FormActionButtons from 'mod_perform/components/element/admin_form/ActionButtons';

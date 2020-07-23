@@ -340,6 +340,7 @@ $string['subject_instance_availability_open'] = 'Open';
 $string['subject_instance_progress_complete'] = 'Complete';
 $string['subject_instance_progress_in_progress'] = 'In progress';
 $string['subject_instance_progress_not_started'] = 'Not started';
+$string['subject_instances'] = 'Subject instances';
 $string['sync_track_schedule_task'] = 'Synchronize assignment schedules for performance activities';
 $string['system_activity_type:appraisal'] = 'Appraisal';
 $string['system_activity_type:check-in'] = 'Check-in';
