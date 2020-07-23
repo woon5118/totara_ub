@@ -182,7 +182,7 @@ class csv_import {
 
             $column = $allcolumns[$key];
 
-            $rowobject->{$column} = $value;
+            $rowobject->{$column} = self::validate_field($rowobject, $column, $value);
         }
 
         $rowobject->timecreated = $importtime;
@@ -192,6 +192,37 @@ class csv_import {
         $rowobject->completiondateparsed = totara_date_parse_from_format($csvdateformat, $rowobject->completiondate);
 
         return $rowobject;
+    }
+
+    /**
+     * Validate field to be used prior to insert into database
+     *
+     * If field errors are detected importerror is set to the $rowobject together with importerrormsg
+     *
+     * @param \stdClass $rowobject
+     * @param string $column
+     * @param string $value
+     * @return string
+     */
+    public static function validate_field(\stdClass $rowobject, string $column, string $value) : string {
+        $maxfieldlength = [
+            'username' => 100,
+            'completiondate' => 10,
+            'grade' => 10,
+            'courseshortname' => 255,
+            'courseidnumber' => 100,
+            'certificationshortname' => 255,
+            'certificationidnumber' => 100,
+            'duedate' => 10,
+        ];
+
+        if (isset($maxfieldlength[$column]) && \core_text::strlen($value) > $maxfieldlength[$column]) {
+            $rowobject->importerror = 1;
+            $rowobject->importerrormsg .= "fieldtoolarge_{$column};";
+            $value = trim(\core_text::substr($value, 0, $maxfieldlength[$column] - 3)) . '...';
+        }
+
+        return $value;
     }
 
     /**

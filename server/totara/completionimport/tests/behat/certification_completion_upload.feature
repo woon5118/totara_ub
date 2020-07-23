@@ -68,3 +68,30 @@ Feature: Verify certification completion data can be successfully uploaded.
     And I should see "Unknown column 'badcolumn'"
     And I should see "Missing required column 'duedate'"
     And I should see "No records were imported"
+
+  Scenario: Verify long field values are handled in the certification completion upload
+    Given I log in as "admin"
+    When I navigate to "Upload Completion Records" node in "Site administration > Courses > Upload Completion Records"
+    And I upload "totara/completionimport/tests/behat/fixtures/certification_completion_long_fields.csv" file to "Certification CSV file to upload" filemanager
+    And I click on "Save" "button" in the ".totara_completionimport__uploadcertification_form" "css_element"
+    Then I should see "2 Records imported pending processing"
+    And I run all adhoc tasks
+
+    When I follow "Certification import report"
+    Then I should see "2 records shown"
+    And "1" row "Errors" column of "completionimport_certification" table should contain "Field 'username' is too long. The maximum length is 100"
+    And "1" row "Errors" column of "completionimport_certification" table should contain "Field 'certificationshortname' is too long. The maximum length is 255"
+    And "1" row "Errors" column of "completionimport_certification" table should contain "Field 'certificationidnumber' is too long. The maximum length is 100"
+    And "1" row "Errors" column of "completionimport_certification" table should contain "Field 'completiondate' is too long. The maximum length is 10"
+    And "1" row "Errors" column of "completionimport_certification" table should contain "Field 'duedate' is too long. The maximum length is 10"
+    And "1" row "Username to import" column of "completionimport_certification" table should contain "101charsintheusernamefieldsshouldfailxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx..."
+    And "1" row "Certification Shortname" column of "completionimport_certification" table should contain "256charsinthecertificationshortnamefieldsshouldfailxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx..."
+    And "1" row "Certification ID Number" column of "completionimport_certification" table should contain "101charsinthecertificationidnumberfieldsshouldfailxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx..."
+    And "1" row "Completion date" column of "completionimport_certification" table should contain "11chars..."
+    And "1" row "Due date" column of "completionimport_certification" table should contain "11chars..."
+    And "2" row "Errors" column of "completionimport_certification" table should contain ""
+    And "2" row "Username to import" column of "completionimport_certification" table should contain "learner1"
+    And "2" row "Certification Shortname" column of "completionimport_certification" table should contain "Certification 1"
+    And "2" row "Certification ID Number" column of "completionimport_certification" table should contain "Cert1"
+    And "2" row "Completion date" column of "completionimport_certification" table should contain "2020-01-01"
+    And "2" row "Due date" column of "completionimport_certification" table should contain "2020-07-01"
