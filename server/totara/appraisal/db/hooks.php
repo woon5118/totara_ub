@@ -1,8 +1,9 @@
 <?php
 /*
- * This file is part of Totara LMS
  *
- * Copyright (C) 2010 onwards Totara Learning Solutions LTD
+ * This file is part of Totara Learn
+ *
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +18,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Ciaran Irvine <ciaran.irvine@totaralms.com>
- * @author Valerii Kuznetsov <valerii.kuznetsov@totaralms.com>
- * @package totara
- * @subpackage totara_appraisal
+ * @author Oleg Demeshev <oleg.demeshev@totaralearning.com>
+ * @package totara_appraisal
  */
 
-defined('MOODLE_INTERNAL') || die();
+use totara_userdata\hook\userdata_normalise_label;
+use totara_appraisal\watcher\userdata_label;
 
-$plugin->version  = 2020081200;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2017111309;       // Requires this Moodle version.
-$plugin->component = 'totara_appraisal';   // To check on upgrade, that module sits in correct place.
+$watchers = [
+    [
+        'hookname' => userdata_normalise_label::class,
+        'callback' => [userdata_label::class, 'normalise'],
+    ],
+];
+

@@ -24,6 +24,7 @@
 namespace totara_userdata\local;
 
 use core_collator;
+use totara_userdata\hook\userdata_normalise_label;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -93,6 +94,11 @@ final class util {
                 $grouplabels[$maincomponent] = self::get_component_name($maincomponent);
             }
         }
+
+        $hook = new userdata_normalise_label($grouplabels);
+        $hook->execute();
+        $grouplabels = $hook->get_grouplabels();
+
         core_collator::asort($grouplabels);
         // We want core_user component always to be the first element.
         if (in_array('core_user', $groupeditems)) {

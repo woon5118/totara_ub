@@ -48,6 +48,7 @@ if ($data = $form->get_data()) {
     redirect(new moodle_url('/totara/userdata/export_types.php'));
 }
 
+$PAGE->set_url('/totara/userdata/export_type_edit.php', ['id' => $id, 'duplicate' => $duplicate]);
 $PAGE->requires->js_call_amd('totara_userdata/item_select', 'init', array('name' => 'itemselection_desc', 'form' => 'export'));
 
 echo $OUTPUT->header();

@@ -315,6 +315,7 @@ $string['latestappraisalsfor'] = 'Latest Appraisals for {$a}';
 $string['learners'] = 'Learners';
 $string['leavespace'] = 'Leave space on print-out to write comments';
 $string['legacy_info'] = 'This legacy Performance Management feature is surpassed by new features which were introduced in recent site upgrade.';
+$string['legacy_appraisals'] = 'Legacy Appraisals';
 $string['legacyfeatures'] = 'Legacy features';
 $string['locked'] = 'Locked';
 $string['locks'] = 'Lock stage after completion';

@@ -30,6 +30,8 @@ use mod_perform\hook\participant_instances_created;
 use core_user\hook\allow_view_profile_field;
 use mod_perform\watcher\notification;
 use mod_perform\watcher\user;
+use mod_perform\watcher\userdata_label;
+use totara_userdata\hook\userdata_normalise_label;
 
 $watchers = [
     [
@@ -51,5 +53,9 @@ $watchers = [
     [
         'hookname' => subject_instances_created::class,
         'callback' => [notification::class, 'create_subject_instances'],
+    ],
+    [
+        'hookname' => userdata_normalise_label::class,
+        'callback' => [userdata_label::class, 'normalise'],
     ],
 ];

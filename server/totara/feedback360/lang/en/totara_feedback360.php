@@ -168,6 +168,7 @@ $string['feedbacknotanonymous'] = 'Note this feedback will be submitted with you
 $string['feedbacksubmitted'] = 'Feedback submitted';
 $string['givefeedback'] = 'Give Feedback';
 $string['invalidsesskey'] = 'The given session key is not valid. Please resend data again';
+$string['legacy_feedback'] = 'Legacy 360° Feedback';
 $string['loadfeedback360failure'] = 'Failed to load the 360 Feedback';
 $string['managefeedback360'] = 'Manage Feedback (legacy)';
 $string['managefeedback360s'] = 'Manage 360&deg; Feedback (legacy)';
