@@ -47,6 +47,7 @@ use mod_perform\state\subject_instance\in_progress as subject_instance_in_progre
 use mod_perform\state\subject_instance\open as subject_instance_open;
 use mod_perform\task\service\subject_instance_creation;
 use totara_core\advanced_feature;
+use totara_core\entities\relationship_resolver;
 use totara_core\relationship\resolvers\subject;
 use totara_job\relationship\resolvers\appraiser;
 use totara_job\relationship\resolvers\manager;
@@ -177,16 +178,24 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
 
         $activity = $perform_generator->create_full_activities($configuration)->first();
 
-        /** @var participant_instance $participant_instance */
-        $participant_instance = participant_instance::repository()->get()->first();
-        $subject_instance = subject_instance::load_by_id($participant_instance->subject_instance_id);
+        $subject_core_relationship_id = $this->get_core_relationship_id(subject::class);
+
+        /** @var participant_instance $subject_participant_instance */
+        $subject_participant_instance = participant_instance::repository()
+            ->where('core_relationship_id', $subject_core_relationship_id)
+            ->one();
+
+        $subject_instance = subject_instance::load_by_id($subject_participant_instance->subject_instance_id);
 
         $subject_relationship = $perform_generator->get_core_relationship(subject::class);
 
-        $participant_id = $participant_instance->participant_id;
+        $participant_id = $subject_participant_instance->participant_id;
         self::setUser($participant_id);
 
-        $appraiser_participant_instance = participant_instance::repository()->get()->last();
+        $appraiser_core_relationship_id = $this->get_core_relationship_id(appraiser::class);
+        $appraiser_participant_instance = participant_instance::repository()
+            ->where('core_relationship_id', $appraiser_core_relationship_id)
+            ->one();
 
         $args = [
             'filters' => [
@@ -230,7 +239,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                         'name' => $subject_relationship->get_name(),
                     ],
                     'participant_id' => $participant_id,
-                    'id' => (string) $participant_instance->id,
+                    'id' => (string) $subject_participant_instance->id,
                     'availability_status' => participant_instance_open::get_name(),
                     'is_overdue' => false,
                 ],
@@ -258,7 +267,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
             ],
             'participant_sections' => [
                 [
-                    'id' => $participant_instance->participant_sections->first()->id,
+                    'id' => $subject_participant_instance->participant_sections->first()->id,
                     'participant_instance' => [
                         'progress_status' => participant_instance_not_started::get_name(),
                         'participant_id' => $participant_id,
@@ -767,5 +776,13 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
         $this->setUser();
         $result = $this->parsed_graphql_operation(self::QUERY, $args);
         $this->assert_webapi_operation_failed($result, 'not logged in');
+    }
+
+    private function get_core_relationship_id(string $relationship_resolver_class) {
+        return relationship_resolver::repository()
+            ->where('class_name', $relationship_resolver_class)
+            ->order_by('id')
+            ->first()
+            ->relationship_id;
     }
 }
