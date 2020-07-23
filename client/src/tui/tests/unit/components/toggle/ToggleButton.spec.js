@@ -17,17 +17,18 @@
  */
 
 import { mount } from '@vue/test-utils';
-import component from 'tui/components/buttons/ToggleButtonIcon.vue';
+import component from 'tui/components/toggle/ToggleButton.vue';
 import { axe, toHaveNoViolations } from 'jest-axe';
 expect.extend(toHaveNoViolations);
 let wrapper;
 
-describe('ToggleSet', () => {
+describe('ToggleButton', () => {
   beforeAll(() => {
     wrapper = mount(component, {
       propsData: {
         value: 'abc',
-        label: 'label text',
+        text: 'example text',
+        ariaLabel: 'toggle item',
       },
     });
   });

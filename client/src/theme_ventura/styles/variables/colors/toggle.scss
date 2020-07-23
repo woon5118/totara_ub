@@ -1,0 +1,48 @@
+// This file is part of Totara Enterprise Extensions.
+//
+// Copyright (C) 2020 onwards Totara Learning Solutions LTD
+//
+// Totara Enterprise Extensions is provided only to Totara
+// Learning Solutions LTD's customers and partners, pursuant to
+// the terms and conditions of a separate agreement with Totara
+// Learning Solutions LTD or its affiliate.
+//
+// If you do not have an agreement with Totara Learning Solutions
+// LTD, you may not access, use, modify, or distribute this software.
+// Please contact [licensing@totaralearning.com] for more information.
+//
+// @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
+// @module tuickage   theme_ventura
+
+//
+// Toggle colours
+//
+
+// toggle buttons
+--tui-toggle-bg-color: var(--tui-color-neutral-6);
+
+// Button background
+--tui-toggle-btn-bg-color: transparent;
+--tui-toggle-btn-bg-color-active: transparent;
+--tui-toggle-btn-bg-color-disabled: transparent;
+--tui-toggle-btn-bg-color-focus: transparent;
+--tui-toggle-btn-bg-color-selected: var(--tui-color-neutral-1);
+
+// Button text colour
+--tui-toggle-btn-text-color: var(--tui-color-neutral-1);
+--tui-toggle-btn-text-color-active: var(--tui-color-neutral-1);
+--tui-toggle-btn-text-color-disabled: var(--tui-color-neutral-1);
+--tui-toggle-btn-text-color-focus: var(--tui-color-neutral-1);
+--tui-toggle-btn-text-color-selected: var(--tui-color-neutral-7);
+
+//
+// Toggle switch
+//
+--tui-form-toggle-dot-color: var(--tui-color-neutral-1);
+--tui-form-toggle-off-bg-color: var(--tui-color-neutral-4);
+--tui-form-toggle-off-bg-color-hover-focus: var(--tui-color-neutral-5);
+--tui-form-toggle-on-bg-color: var(--tui-color-state);
+--tui-form-toggle-on-bg-color-hover-focus: var(--tui-color-state-hover);
+--tui-form-toggle-on-border-color: var(--tui-color-state);
+--tui-form-toggle-on-border-color-hover-focus: var(--tui-color-state-hover);
+--tui-form-toggle-border-color: var(--tui-color-neutral-6);

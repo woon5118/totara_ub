@@ -25,6 +25,7 @@
   --tui-btn-min-height: 3.6rem;
 }
 // Reset
+.tui-toggleBtn,
 .tui-formBtn {
   display: inline-block;
   align-items: flex-start;

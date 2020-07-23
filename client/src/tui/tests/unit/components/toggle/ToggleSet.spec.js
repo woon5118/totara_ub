@@ -16,16 +16,17 @@
  * @module tui
  */
 
-import { shallowMount } from '@vue/test-utils';
-import component from 'tui/components/buttons/ToggleSet.vue';
+import { mount } from '@vue/test-utils';
+import component from 'tui/components/toggle/ToggleSet.vue';
 let wrapper;
 let value;
 
 describe('ToggleSet', () => {
   beforeAll(() => {
-    wrapper = shallowMount(component, {
+    wrapper = mount(component, {
       propsData: {
-        vModel: value,
+        value: value,
+        ariaLabel: 'toggle set',
         disabled: false,
       },
     });

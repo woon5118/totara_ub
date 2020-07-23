@@ -106,23 +106,6 @@
 --tui-btn-prim-text-color-disabled: var(--tui-color-neutral-3);
 --tui-btn-prim-text-color-focus: var(--tui-color-neutral-1);
 
-// toggle icon btn background, border & text
---tui-btn-toggle-bg-color: var(--tui-color-neutral-1);
---tui-btn-toggle-bg-color-active: var(--tui-color-neutral-3);
---tui-btn-toggle-bg-color-disabled: var(--tui-color-neutral-3);
---tui-btn-toggle-bg-color-focus: var(--tui-color-neutral-2);
---tui-btn-toggle-bg-color-selected: var(--tui-color-neutral-4);
---tui-btn-toggle-border-color: var(--tui-color-neutral-5);
---tui-btn-toggle-border-color-active: var(--tui-color-neutral-5);
---tui-btn-toggle-border-color-disabled: var(--tui-color-state-disabled);
---tui-btn-toggle-border-color-focus: var(--tui-color-neutral-5);
---tui-btn-toggle-border-color-selected: var(--tui-color-neutral-5);
---tui-btn-toggle-text-color: var(--tui-color-state);
---tui-btn-toggle-text-color-active: var(--tui-color-state);
---tui-btn-toggle-text-color-disabled: var(--tui-color-state-disabled);
---tui-btn-toggle-text-color-focus: var(--tui-color-state);
---tui-btn-toggle-text-color-selected: var(--tui-color-state);
-
 // Checkbox btn background & text
 --tui-btn-checkbox-bg-color-selected: var(--tui-color-neutral-3);
 --tui-btn-checkbox-bg-color-hover: var(--tui-color-state-highlight);
@@ -138,13 +121,3 @@
 --tui-btn-toolbar-bg-color-selected: var(--tui-color-state-active);
 --tui-btn-toolbar-text-color: var(--tui-color-state);
 --tui-btn-toolbar-text-color-selected: var(--tui-color-neutral-1);
-
-// Toggle btn
---tui-form-toggle-dot-color: var(--tui-color-neutral-1);
---tui-form-toggle-off-bg-color: var(--tui-color-neutral-4);
---tui-form-toggle-off-bg-color-hover-focus: var(--tui-color-neutral-5);
---tui-form-toggle-on-bg-color: var(--tui-color-state);
---tui-form-toggle-on-bg-color-hover-focus: var(--tui-color-state-hover);
---tui-form-toggle-on-border-color: var(--tui-color-state);
---tui-form-toggle-on-border-color-hover-focus: var(--tui-color-state-hover);
---tui-form-toggle-border-color: var(--tui-color-neutral-6);
