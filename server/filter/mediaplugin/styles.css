@@ -17,8 +17,3 @@
 .mediaplugin > div {
     margin: auto;
 }
-
-/* Make media plugin behave properly in mod summaries and labels */
-.mod-indent-outer .mediaplugin {
-    display: table-cell;
-}
