@@ -47,6 +47,12 @@ function xmldb_totara_core_install() {
         $dbman->add_field($table, $field);
     }
 
+    $field = new xmldb_field('containertype');
+    if (!$dbman->field_exists($table, $field)) {
+        $field->set_attributes(XMLDB_TYPE_CHAR, '255', null, false, null, null);
+        $dbman->add_field($table, $field);
+    }
+
     // Create totara roles.
     $staffmanagerrole    = create_role('', 'staffmanager', '', 'staffmanager');
     // Following roles are not created any more since Totara 8.0 - assessor, regionalmanager, regionaltrainer.
@@ -523,6 +529,13 @@ function xmldb_totara_core_install() {
         $dbman->add_field($table, $field);
     }
 
+    // Define field assertion to be added to badge_external.
+    $table = new xmldb_table('badge_external');
+    $field = new xmldb_field('assertion', XMLDB_TYPE_TEXT, null, null, null, null, null, 'entityid');
+    if (!$dbman->field_exists($table, $field)) {
+        $dbman->add_field($table, $field);
+    }
+
     // Define table badge_external_identifier to be created.
     $table = new xmldb_table('badge_external_identifier');
 
@@ -563,6 +576,36 @@ function xmldb_totara_core_install() {
     // Conditionally launch drop field backpackurl.
     if ($dbman->field_exists($table, $field)) {
         $dbman->drop_field($table, $field);
+    }
+
+    // Adding table badge_backpack_oauth2.
+    $table = new xmldb_table('badge_backpack_oauth2');
+    $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+    $table->add_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+    $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+    $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+    $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+    $table->add_field('issuerid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+    $table->add_field('externalbackpackid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+    $table->add_field('token', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+    $table->add_field('refreshtoken', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+    $table->add_field('expires', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+    $table->add_field('scope', XMLDB_TYPE_TEXT, null, null, null, null, null);
+    $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+    $table->add_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+    $table->add_key('userid', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
+    $table->add_key('issuerid', XMLDB_KEY_FOREIGN, ['issuerid'], 'oauth2_issuer', ['id']);
+    $table->add_key('externalbackpackid', XMLDB_KEY_FOREIGN, ['externalbackpackid'], 'badge_external_backpack', ['id']);
+    // Conditionally launch create table for badge_backpack_oauth2.
+    if (!$dbman->table_exists($table)) {
+        $dbman->create_table($table);
+    }
+
+    // Define field type to be added to course_categories.
+    $table = new xmldb_table('course_categories');
+    $field = new xmldb_field('issystem', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'certifcount');
+    if (!$dbman->field_exists($table, $field)) {
+        $dbman->add_field($table, $field);
     }
 
     // Add default backpacks.
