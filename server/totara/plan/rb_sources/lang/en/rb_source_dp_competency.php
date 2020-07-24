@@ -27,6 +27,7 @@ $string['sourcesummary'] = 'Competency assignment and completion information.';
 $string['sourcetitle'] = 'Record of Learning: Competencies';
 // columns
 $string['duedate'] = 'Due date';
+$string['notset'] = 'Not set';
 $string['plan'] = 'Plan';
 $string['planname'] = 'Plan name';
 $string['plannamelinked'] = 'Plan name (linked to plan page)';

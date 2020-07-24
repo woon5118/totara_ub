@@ -370,7 +370,7 @@ from
                     'joins' => 'priority',
                     'dbdatatype' => 'char',
                     'outputformat' => 'text',
-                    'displayfunc' => 'format_string'
+                    'displayfunc' => 'plan_competency_priority'
                 )
         );
 
@@ -440,7 +440,7 @@ from
                     'joins' => array('dp_competency', 'scale_value', 'evidence_scale_value'),
                     'dbdatatype' => 'char',
                     'outputformat' => 'text',
-                    'displayfunc' => 'format_string'
+                    'displayfunc' => 'plan_competency_proficiency'
                 )
         );
 
