@@ -30,6 +30,10 @@ use mod_perform\notification\exceptions\class_key_not_available;
  * The loader class.
  */
 class loader {
+    public const ALL = 0;
+    public const HAS_TRIGGERS = 1;
+    public const HAS_CONDITION = 2;
+
     /** @var array */
     private $notifications;
 
@@ -42,7 +46,8 @@ class loader {
 
     /** @var string[] */
     private static $mandatory_depends = [
-        'trigger_label' => ['trigger_type', trigger::TYPE_UNSUPPORTED],
+        'trigger_label' => ['trigger_type', trigger::TYPE_ONCE],
+        'condition' => ['trigger_type', trigger::TYPE_ONCE],
     ];
 
     /**
@@ -107,10 +112,24 @@ class loader {
     /**
      * Get all the registered class keys.
      *
+     * @param integer $filter ALL, HAS_CONDITION or HAS_TRIGGERS
      * @return string[] of class_key's
      */
-    public function get_class_keys(): array {
-        return array_keys($this->notifications);
+    public function get_class_keys(int $filter = self::ALL): array {
+        if ($filter == self::ALL) {
+            $notifications = $this->notifications;
+        } else {
+            $notifications = array_filter($this->notifications, function ($notif) use ($filter) {
+                if (($filter & self::HAS_TRIGGERS) === self::HAS_TRIGGERS && $notif['trigger_type'] != trigger::TYPE_ONCE) {
+                    return true;
+                }
+                if (($filter & self::HAS_CONDITION) === self::HAS_CONDITION && !empty($notif['condition'])) {
+                    return true;
+                }
+                return false;
+            });
+        }
+        return array_keys($notifications);
     }
 
     /**
@@ -145,7 +164,7 @@ class loader {
      */
     public function get_trigger_type_of(string $class_key): int {
         $info = $this->get_information($class_key);
-        return $info['trigger_type'] ?? trigger::TYPE_UNSUPPORTED;
+        return $info['trigger_type'] ?? trigger::TYPE_ONCE;
     }
 
     /**
@@ -157,7 +176,7 @@ class loader {
     public function get_trigger_label_of(string $class_key): ?string {
         $info = $this->get_information($class_key);
         $trigger_type = $this->get_trigger_type_of($class_key);
-        if ($trigger_type === trigger::TYPE_UNSUPPORTED) {
+        if ($trigger_type === trigger::TYPE_ONCE) {
             return null;
         }
         $label = get_string($info['trigger_label'][0], $info['trigger_label'][1] ?? '');
@@ -171,13 +190,25 @@ class loader {
     }
 
     /**
+     * Get the fully-qualified class name of the condition.
+     *
+     * @param string $class_key
+     * @return string|null
+     * @throws coding_exception
+     */
+    public function get_condition_class_of(string $class_key): ?string {
+        $info = $this->get_information($class_key);
+        return $info['condition'] ?? null;
+    }
+
+    /**
      * Return whether a broker can provide trigger events.
      *
      * @param string $class_key
      * @return boolean
      */
     public function support_triggers(string $class_key): bool {
-        return $this->get_trigger_type_of($class_key) !== trigger::TYPE_UNSUPPORTED;
+        return $this->get_trigger_type_of($class_key) !== trigger::TYPE_ONCE;
     }
 
     /**

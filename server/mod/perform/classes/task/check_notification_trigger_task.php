@@ -33,6 +33,9 @@ use mod_perform\models\activity\activity as activity_model;
 use mod_perform\models\activity\notification as notification_model;
 use mod_perform\models\activity\notification_recipient as notification_recipient_model;
 use mod_perform\notification\factory;
+use mod_perform\notification\loader;
+use mod_perform\notification\trigger;
+use mod_perform\notification\triggerable;
 use mod_perform\state\activity\active;
 
 /**
@@ -44,17 +47,17 @@ class check_notification_trigger_task extends scheduled_task {
     }
 
     public function execute() {
-        // TODO: only instance_created_reminder is implemented in TL-26164.
-        $class_keys = ['instance_created_reminder'];
-        // $loader = factory::create_loader();
-        // $class_keys = array_filter($loader->get_class_keys(), function ($class_key) use ($loader) {
-        //     return $loader->support_triggers($class_key);
-        // });
+        $loader = factory::create_loader();
+        $class_keys = $loader->get_class_keys(loader::HAS_CONDITION);
 
         $clock = factory::create_clock();
         $activities = activity_entity::repository()->where('status', active::get_code())->get();
         foreach ($class_keys as $class_key) {
             $broker = factory::create_broker($class_key);
+            if (!($broker instanceof triggerable)) {
+                debugging(get_class($broker) . ' does not implement triggerable', DEBUG_DEVELOPER);
+                continue;
+            }
             foreach ($activities as $activity_entity) {
                 /** @var activity_entity $activity_entity */
                 $activity = activity_model::load_by_entity($activity_entity);
@@ -62,6 +65,7 @@ class check_notification_trigger_task extends scheduled_task {
                 if (!$notification->active) {
                     continue;
                 }
+                $condition = factory::create_condition($notification);
                 $recipients = notification_recipient_model::load_by_notification($notification, true);
                 if (!$recipients->count()) {
                     continue;
@@ -73,15 +77,16 @@ class check_notification_trigger_task extends scheduled_task {
                     ->where('t.activity_id', $activity->id)
                     ->where_null('si.completed_at')
                     ->where('tua.deleted', false)
-                    ->select(['si.id', 'tua.subject_user_id', 'tua.job_assignment_id'])
+                    ->select(['si.id', 'tua.subject_user_id', 'tua.job_assignment_id', 'si.due_date AS due_date'])
                     // how can I get an instance creation time?
-                    ->add_select('si.created_at')
+                    ->add_select('si.created_at AS instance_created_at')
                     ->get();
                 if (empty($records)) {
                     continue;
                 }
                 foreach ($records as $record) {
-                    if (!$broker->check_trigger_condition($notification, $record, $clock)) {
+                    /** @var triggerable $broker */
+                    if (!$broker->is_triggerable_now($condition, $record)) {
                         continue;
                     }
                     $cartel = factory::create_cartel_on_user_assignment($activity, $record);

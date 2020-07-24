@@ -1103,7 +1103,73 @@ class behat_mod_perform extends behat_base {
     }
 
     /**
-     * @Given /^I time travel to "(\d+) (\w+) (\w+)" for perform activity notification$/
+     * Display information about the time, the instance creation time and the due date, then pause.
+     *
+     * @Given /^(?:|I )pause to check the time for perform activity notification$/
+     */
+    public function i_pause_to_check_the_time_for_perform_activity_notification(): void {
+        global $CFG, $DB;
+        /** @var moodle_database $DB */
+        \behat_hooks::set_step_readonly(true);
+        // Pick the first record belonging to the current user.
+        // Yes this is not ideal as the user could have more than one instances, but hey it is just convenience.
+        // First, we need to extract the current user id from the profile link because $USER->id is not correctly set.
+        $el = $this->find('css', '.logininfo a[title="View profile"]');
+        if ($el && !empty($href = $el->getAttribute('href')) && preg_match('/id=(\d+)/', $href, $matches)) {
+            $userid = $matches[1];
+        } else {
+            $userid = 0; // user id is unknown
+        }
+        $record = current($DB->get_records('perform_subject_instance', ['subject_user_id' => $userid], '', '*', 0, 1)) ?: new stdClass();
+        $clock = \mod_perform\notification\factory::create_clock();
+        $due = !empty($record->due_date) ? $record->due_date : 0;
+        $creation = !empty($record->created_at) ? $record->created_at : 0;
+        $time = $clock->get_time();
+        // Windows don't support ANSI code by default, but with ANSICON.
+        $isansicon = getenv('ANSICON');
+        $ansi = !(($CFG->ostype === 'WINDOWS') && empty($isansicon));
+        $out_a_time = function ($int, $clr, $tm, $info) use ($ansi) {
+            $str = userdate($tm, '%b %d %Y %p %I:%M', 99, false, false);
+            if ($ansi) {
+                return "\033[{$int};{$clr}m{$str}\033[0m  ({$info})\n";
+            } else {
+                return "{$str}  ({$info})\n";
+            }
+        };
+        // Display the due date, the adjusted time and the instance creation time respectively.
+        $current_bias = get_config('mod_perform', 'notification_time_travel') ?: 0;
+        $info_time = sprintf('%d day %d hour in the %s', (int)($current_bias / 86400), (int)($current_bias / 3600) % 24, $current_bias > 0 ? 'future' : 'past');
+        $tz = ' in ' . \core_date::get_server_timezone();
+        $text = $ansi ? "\033[s\n" : "\n";
+        $text .= $out_a_time(1, 31, $due ?: -2682315804, $due ? ('due date' . $tz) : 'due date not set');
+        $text .= $out_a_time(1, 32, $time, $current_bias ? ($info_time . $tz) : 'time not adjusted');
+        $text .= $out_a_time(0, 33, $creation, $creation ? ('instance created' . $tz) : 'instance not created');
+        $text .= $ansi ? "\033[4A\033[0m\033[u\033[4B" : '';
+        fwrite(STDOUT, $text);
+        $this->execute('behat_general::i_pause_scenario_executon');
+    }
+
+    /**
+     * @Given /^I time travel to "midnight (past|future)" for perform activity notification$/
+     * @param string $direction
+     */
+    public function i_time_travel_to_midnight_for_the_perform_activity_notification(string $direction): void {
+        $time = \mod_perform\notification\factory::create_clock()->get_time();
+        $midnight = \mod_perform\notification\conditions\after_midnight::get_last_midnight($time);
+        if ($direction === 'future') {
+            if ($time > $midnight) {
+                $midnight += DAYSECS;
+            }
+        } else if ($direction === 'past') {
+            // do nothing
+        } else {
+            $this->fail('direction must be future or past');
+        }
+        \mod_perform\notification\factory::create_clock_with_time_offset($midnight - $time);
+    }
+
+    /**
+     * @Given /^I time travel to "(\d+) (day|days|hour|hours) (past|future)" for perform activity notification$/
      * @param string $time
      * @param string $unit
      * @param string $direction
@@ -1127,8 +1193,8 @@ class behat_mod_perform extends behat_base {
         } else {
             $this->fail('direction must be future or past');
         }
-        // create_clock_with_time_machine stores $bias in the database for further tasks.
-        \mod_perform\notification\factory::create_clock_with_time_machine($bias);
+        // create_clock_with_time_offset stores $bias in the database for further tasks.
+        \mod_perform\notification\factory::create_clock_with_time_offset($bias);
         $this->execute('behat_tool_task::i_run_the_scheduled_task', [\mod_perform\task\check_notification_trigger_task::class]);
     }
 

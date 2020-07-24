@@ -36,10 +36,6 @@ class completion implements broker {
         return [];
     }
 
-    public function check_trigger_condition(notification_model $notification, object $record, clock $clock): bool {
-        return false;
-    }
-
     public function execute(dealer $dealer, notification_model $notification): void {
         // not yet implemented
     }

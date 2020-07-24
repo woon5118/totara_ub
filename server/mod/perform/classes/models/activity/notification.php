@@ -272,6 +272,17 @@ final class notification implements notification_interface {
     }
 
     /**
+     * Get trigger values in seconds.
+     *
+     * @return array
+     */
+    public function get_triggers_in_seconds(): array {
+        return array_map(function ($trigger) {
+            return $trigger * DAYSECS;
+        }, $this->get_triggers());
+    }
+
+    /**
      * Update the last run time.
      *
      * @param integer $time

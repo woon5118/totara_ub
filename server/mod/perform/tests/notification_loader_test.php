@@ -26,6 +26,9 @@ use mod_perform\notification\broker;
 use mod_perform\notification\brokers\due_date_reminder;
 use mod_perform\notification\brokers\instance_created;
 use mod_perform\notification\brokers\overdue_reminder;
+use mod_perform\notification\conditions\after_midnight;
+use mod_perform\notification\conditions\days_after;
+use mod_perform\notification\conditions\days_before;
 use mod_perform\notification\loader;
 use mod_perform\notification\trigger;
 
@@ -61,20 +64,26 @@ class mod_perform_notification_loader_testcase extends advanced_testcase {
         return [
             'empty' => [[], 'notification data is empty'],
             'missing class' => [[
-                'kia_ora' => ['name' => 'kia ora', 'trigger_type' => trigger::TYPE_UNSUPPORTED]
+                'kia_ora' => ['name' => 'kia ora', 'trigger_type' => trigger::TYPE_ONCE]
             ], 'class is missing for kia_ora'],
             'missing name' => [[
-                'kia_ora' => ['class' => 'kia\\ora', 'trigger_type' => trigger::TYPE_UNSUPPORTED]
+                'kia_ora' => ['class' => 'kia\\ora', 'trigger_type' => trigger::TYPE_ONCE]
             ], 'name is missing for kia_ora'],
             'missing trigger type' => [[
                 'kia_ora' => ['name' => 'kia ora', 'class' => 'kia\\ora']
             ], 'trigger_type is missing for kia_ora'],
             'missing trigger label 1' => [[
-                'kia_ora' => ['name' => 'kia ora', 'class' => 'kia\\ora', 'trigger_type' => trigger::TYPE_BEFORE]
+                'kia_ora' => ['name' => 'kia ora', 'class' => 'kia\\ora', 'trigger_type' => trigger::TYPE_BEFORE, 'condition' => days_after::class]
             ], 'trigger_label is missing for kia_ora'],
             'missing trigger label 2' => [[
-                'kia_ora' => ['name' => 'kia ora', 'class' => 'kia\\ora', 'trigger_type' => trigger::TYPE_AFTER]
+                'kia_ora' => ['name' => 'kia ora', 'class' => 'kia\\ora', 'trigger_type' => trigger::TYPE_AFTER, 'condition' => days_before::class]
             ], 'trigger_label is missing for kia_ora'],
+            'missing condition 1' => [[
+                'kia_ora' => ['name' => 'kia ora', 'class' => 'kia\\ora', 'trigger_type' => trigger::TYPE_BEFORE, 'trigger_label' => ['ok']]
+            ], 'condition is missing for kia_ora'],
+            'missing condition 2' => [[
+                'kia_ora' => ['name' => 'kia ora', 'class' => 'kia\\ora', 'trigger_type' => trigger::TYPE_AFTER, 'trigger_label' => ['ok']]
+            ], 'condition is missing for kia_ora'],
         ];
     }
 
@@ -105,25 +114,28 @@ class mod_perform_notification_loader_testcase extends advanced_testcase {
             'test_instance_created' => [
                 'class' => instance_created::class,
                 'name' => ['notification_broker_instance_created', 'mod_perform'],
-                'trigger_type' => trigger::TYPE_UNSUPPORTED,
+                'trigger_type' => trigger::TYPE_ONCE,
             ],
             'test_overdue_reminder' => [
                 'class' => overdue_reminder::class,
                 'name' => ['screenshot', 'moodle'],
                 'trigger_type' => trigger::TYPE_AFTER,
                 'trigger_label' => ['readme'],
+                'condition' => days_after::class,
             ],
             'test_due_date_reminder' => [
                 'class' => due_date_reminder::class,
                 'name' => ['downloadfile'],
                 'trigger_type' => trigger::TYPE_BEFORE,
                 'trigger_label' => ['tags', 'moodle'],
+                'condition' => days_before::class,
             ],
             'kia_ora_koutou_katoa' => [
                 'class' => mod_perform_notification_loader_testcase::class,
                 'name' => ['ok'],
-                'trigger_type' => trigger::TYPE_UNSUPPORTED,
+                'trigger_type' => trigger::TYPE_ONCE,
                 'trigger_label' => ['ok'],
+                'condition' => after_midnight::class,
             ],
         ];
         return loader::create($notifications);
@@ -175,10 +187,10 @@ class mod_perform_notification_loader_testcase extends advanced_testcase {
 
     public function test_get_trigger_type_of() {
         $loader = $this->create_loader();
-        $this->assertEquals(trigger::TYPE_UNSUPPORTED, $loader->get_trigger_type_of('test_instance_created'));
+        $this->assertEquals(trigger::TYPE_ONCE, $loader->get_trigger_type_of('test_instance_created'));
         $this->assertEquals(trigger::TYPE_AFTER, $loader->get_trigger_type_of('test_overdue_reminder'));
         $this->assertEquals(trigger::TYPE_BEFORE, $loader->get_trigger_type_of('test_due_date_reminder'));
-        $this->assertEquals(trigger::TYPE_UNSUPPORTED, $loader->get_trigger_type_of('kia_ora_koutou_katoa'));
+        $this->assertEquals(trigger::TYPE_ONCE, $loader->get_trigger_type_of('kia_ora_koutou_katoa'));
     }
 
     public function test_get_trigger_label_of() {

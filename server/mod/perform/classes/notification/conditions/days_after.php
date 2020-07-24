@@ -21,28 +21,33 @@
  * @package mod_perform
  */
 
-namespace mod_perform\notification\brokers;
+namespace mod_perform\notification\conditions;
 
-use mod_perform\models\activity\notification as notification_model;
-use mod_perform\notification\broker;
-use mod_perform\notification\dealer;
 use mod_perform\notification\condition;
-use mod_perform\notification\triggerable;
 
 /**
- * instance_created_reminder handler
+ * Calculate N day after the specific time.
  */
-class instance_created_reminder implements broker, triggerable {
-    public function get_default_triggers(): array {
-        return [DAYSECS];
-    }
-
-    public function is_triggerable_now(condition $condition, object $record): bool {
-        return $condition->pass($record->instance_created_at);
-    }
-
-    public function execute(dealer $dealer, notification_model $notification): void {
-        // just post it
-        $dealer->post();
+class days_after extends condition {
+    /**
+     * {@inheritDoc}
+     *
+     * For example, if the trigger is set to 4 days and the $base_time is 8am on 1st July,
+     * the function returns true when the time is between 8.00am on 4th July and 7.59am on 5th July.
+     */
+    public function pass(int $base_time): bool {
+        $time = $this->get_time();
+        $triggers = $this->get_sorted_triggers(self::ASC);
+        // Look up the next earliest trigger since the last run time.
+        foreach ($triggers as $trigger) {
+            $trigger_at = $base_time + $trigger;
+            if ($this->is_over($trigger_at)) {
+                continue;
+            }
+            if ($trigger_at <= $time && $time < $trigger_at + DAYSECS) {
+                return true;
+            }
+        }
+        return false;
     }
 }

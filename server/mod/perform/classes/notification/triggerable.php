@@ -23,28 +23,13 @@
 
 namespace mod_perform\notification;
 
-/**
- * Provides the master clock.
- */
-class clock {
-    /** @var integer */
-    private $bias = 0;
-
+interface triggerable {
     /**
-     * Constructor.
-     */
-    public function __construct() {
-        if ((defined('PHPUNIT_TEST') && PHPUNIT_TEST) || defined('BEHAT_UTIL') || defined('BEHAT_TEST') || defined('BEHAT_SITE_RUNNING')) {
-            $this->bias = get_config('mod_perform', 'notification_time_travel') ?: 0;
-        }
-    }
-
-    /**
-     * Get the current time stamp.
+     * Return true if the notification needs to be sent right now.
      *
-     * @return integer
+     * @param condition $condition
+     * @param object $record some data FIXME: pass some class object instead
+     * @return boolean
      */
-    public function get_time(): int {
-        return time() + $this->bias;
-    }
+    public function is_triggerable_now(condition $condition, object $record): bool;
 }

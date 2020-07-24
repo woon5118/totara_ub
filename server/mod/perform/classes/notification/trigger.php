@@ -27,7 +27,7 @@ use invalid_parameter_exception;
 use mod_perform\models\activity\details\notification_interface;
 
 final class trigger {
-    const TYPE_UNSUPPORTED = 0;
+    const TYPE_ONCE = 0;
     const TYPE_BEFORE = 1;
     const TYPE_AFTER = 2;
 
@@ -64,9 +64,10 @@ final class trigger {
         if (!$this->are_triggers_available()) {
             return [];
         }
-        return array_map(function ($value) {
+        $values = array_map(function ($value) {
             return (int)floor((int)$value / DAYSECS);
         }, $values);
+        return $values;
     }
 
     /**

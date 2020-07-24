@@ -64,6 +64,18 @@ abstract class factory {
     }
 
     /**
+     * Create a condition instance.
+     *
+     * @param notification_model $notification
+     * @return condition
+     */
+    public static function create_condition(notification_model $notification): condition {
+        $class_key = $notification->get_class_key();
+        $condition_class = self::create_loader()->get_condition_class_of($class_key);
+        return new $condition_class(self::create_clock(), $notification->get_triggers_in_seconds(), $notification->last_run_at);
+    }
+
+    /**
      * Create a cartel instance.
      *
      * @param subject_instance_dto $dto
@@ -144,7 +156,7 @@ abstract class factory {
      * @param integer $bias time offset in seconds; (NOTE: bias is cumulative)
      * @return clock
      */
-    public static function create_clock_with_time_machine(int $bias): clock {
+    public static function create_clock_with_time_offset(int $bias): clock {
         $current_bias = get_config('mod_perform', 'notification_time_travel') ?: 0;
         $new_bias = $current_bias + $bias;
         set_config('notification_time_travel', $new_bias, 'mod_perform');

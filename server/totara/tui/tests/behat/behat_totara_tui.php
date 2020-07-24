@@ -997,6 +997,19 @@ class behat_totara_tui extends behat_base {
     }
 
     /**
+     * Click link in a tab tree
+     *
+     * @Given /^I switch to "(?P<nodetext_string>(?:[^"]|\\")*)" tui tab$/
+     *
+     * @throws ExpectationException
+     * @param string $nodetext tab to click.
+     */
+    public function i_switch_to_tui_tab(string $nodetext) {
+        \behat_hooks::set_step_readonly(false);
+        $this->execute('behat_general::i_click_on_in_the', [$nodetext, 'link', '.tui-tabs__tabs', 'css_element']);
+    }
+
+    /**
      * @Given /^the "([^"]*)" tui tab should be active$/
      * @param string $expected_tab_heading
      * @throws ExpectationException
@@ -1596,7 +1609,7 @@ class behat_totara_tui extends behat_base {
      * @param string $container
      * @param string $container_selector
      */
-    public function i_click_on_the_tui_in_the_tui(string $element, string $selector, string $container, string $container_selector) {
+    public function i_click_on_tui_in_the_tui(string $element, string $selector, string $container, string $container_selector) {
         behat_hooks::set_step_readonly(false);
         $parent = $this->find_tui_element($container, $container_selector);
         $node = $this->find_tui_element($element, $selector, $parent);

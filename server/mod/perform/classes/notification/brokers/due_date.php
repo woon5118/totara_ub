@@ -26,21 +26,26 @@ namespace mod_perform\notification\brokers;
 use mod_perform\models\activity\notification as notification_model;
 use mod_perform\notification\broker;
 use mod_perform\notification\dealer;
-use mod_perform\notification\clock;
+use mod_perform\notification\condition;
+use mod_perform\notification\triggerable;
 
 /**
  * due_date handler
  */
-class due_date implements broker {
+class due_date implements broker, triggerable {
     public function get_default_triggers(): array {
         return [];
     }
 
-    public function check_trigger_condition(notification_model $notification, object $record, clock $clock): bool {
-        return false;
+    public function is_triggerable_now(condition $condition, object $record): bool {
+        if (empty($record->due_date)) {
+            return false;
+        }
+        return $condition->pass($record->due_date);
     }
 
     public function execute(dealer $dealer, notification_model $notification): void {
-        // not yet implemented
+        // just post it
+        $dealer->post();
     }
 }

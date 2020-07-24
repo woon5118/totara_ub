@@ -31,8 +31,10 @@ use mod_perform\models\activity\section_relationship;
 use mod_perform\notification\broker;
 use mod_perform\notification\dealer;
 use mod_perform\notification\clock;
+use mod_perform\notification\condition;
 use mod_perform\notification\factory;
 use mod_perform\notification\loader;
+use mod_perform\notification\trigger;
 use totara_core\relationship\relationship;
 
 abstract class mod_perform_notification_testcase extends advanced_testcase {
@@ -42,6 +44,9 @@ abstract class mod_perform_notification_testcase extends advanced_testcase {
     /** @var phpunit_message_sink */
     private $sink;
 
+    /** @var boolean */
+    private $loader_mocked = false;
+
     public function setUp(): void {
         $this->setAdminUser();
         $this->perfgen = $this->getDataGenerator()->get_plugin_generator('mod_perform');
@@ -49,28 +54,55 @@ abstract class mod_perform_notification_testcase extends advanced_testcase {
 
     public function tearDown(): void {
         $this->perfgen = null;
+        if ($this->loader_mocked) {
+            $this->reset_loader();
+        }
     }
 
     /**
      * Mock factory::loader.
      *
-     * @param array $notifications
+     * @param array|null $notifications notifications definition or set null to use the default mocked definition
      */
-    protected function mock_loader(array $notifications): void {
+    protected function mock_loader(?array $notifications): void {
+        if ($notifications === null) {
+            $notifications = [
+                'mock_one' => [
+                    'class' => mod_perform_mock_broker_one::class,
+                    'name' => 'mock #1',
+                    'trigger_type' => trigger::TYPE_ONCE,
+                ],
+                'mock_two' => [
+                    'class' => mod_perform_mock_broker_two::class,
+                    'name' => 'MOCK #2',
+                    'trigger_type' => trigger::TYPE_BEFORE,
+                    'trigger_label' => ['clear'],
+                    'condition' => mod_perform_mock_condition_fail::class,
+                ],
+                'mock_three' => [
+                    'class' => mod_perform_mock_broker_three::class,
+                    'name' => 'm0c1< #3',
+                    'trigger_type' => trigger::TYPE_AFTER,
+                    'trigger_label' => ['learner'],
+                    'condition' => mod_perform_mock_condition_fail::class,
+                ],
+            ];
+        }
         $loader = loader::create($notifications);
         $rp = new ReflectionProperty(factory::class, 'loader');
         $rp->setAccessible(true);
         $rp->setValue(null, $loader);
+        $this->loader_mocked = true;
     }
 
     /**
      * Nullify factory::loader.
-     * This function must be called in tearDown if mock_loader is used.
      */
     protected function reset_loader(): void {
         $rp = new ReflectionProperty(factory::class, 'loader');
         $rp->setAccessible(true);
         $rp->setValue(null, null);
+        $this->loader_mocked = false;
     }
 
     /**
@@ -221,4 +253,42 @@ class mod_perform_mock_broker_two extends mod_perform_mock_broker {
 
 class mod_perform_mock_broker_three extends mod_perform_mock_broker {
     // nothing to extend
+}
+
+class mod_perform_mock_clock extends clock {
+    /** @var integer */
+    private $time;
+
+    public function __construct(int $time) {
+        $this->time = $time;
+    }
+
+    public function get_time(): int {
+        return $this->time;
+    }
+}
+
+class mod_perform_mock_condition extends condition {
+    /** @var boolean */
+    private $should_pass = false;
+
+    public function __construct(bool $should_pass) {
+        $this->should_pass = $should_pass;
+    }
+
+    public function pass(int $base_time): bool {
+        return $this->should_pass;
+    }
+}
+
+class mod_perform_mock_condition_fail extends mod_perform_mock_condition {
+    public function __construct() {
+        parent::__construct(false);
+    }
+}
+
+class mod_perform_mock_condition_pass extends mod_perform_mock_condition {
+    public function __construct() {
+        parent::__construct(true);
+    }
 }

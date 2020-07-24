@@ -293,8 +293,8 @@ $string['notification_active'] = 'Active';
 $string['notification_broker_completion'] = 'Completion of subject instance';
 $string['notification_broker_due_date'] = 'On due date reminder';
 $string['notification_broker_due_date_reminder'] = 'Due date approaching reminder';
-$string['notification_broker_instance_created'] = 'Participant instance created';
-$string['notification_broker_instance_created_reminder'] = 'Participant instance created reminder';
+$string['notification_broker_instance_created'] = 'Participant instance creation';
+$string['notification_broker_instance_created_reminder'] = 'Participant instance creation reminder';
 $string['notification_broker_overdue_reminder'] = 'Overdue reminder';
 $string['notification_trigger_instance_creation'] = 'instance creation';
 $string['notification_trigger_duedate'] = 'due date';
@@ -535,6 +535,57 @@ $string['system_activity_type:check-in'] = 'Check-in';
 $string['system_activity_type:feedback'] = 'Feedback';
 $string['teams_page_response_report_line'] = 'Their current and historical performance records are available for you to {$a}.';
 $string['teams_page_response_report_link'] = 'view or export';
+
+$string['template_due_date_appraiser_body'] = 'The following activity is due to be completed today :
+
+$Activity name$/$Activity type$
+
+You were selected to participate in this activity as $subject full name$’s $relationship name$. Please ensure you complete it by the end of the day.
+
+You can access the activity through this link: $Activity link$';
+$string['template_due_date_appraiser_subject'] = 'Due today - $Activity name$/$Activity type$: $subject full name$';
+
+$string['template_due_date_manager_body'] = 'The following activity is due to be completed today :
+
+$Activity name$/$Activity type$
+
+You were selected to participate in this activity as $subject full name$’s $relationship name$. Please ensure you complete it by the end of the day.
+
+You can access the activity through this link: $Activity link$';
+$string['template_due_date_manager_subject'] = 'Due today - $Activity name$/$Activity type$: $subject full name$';
+
+$string['template_due_date_subject_body'] = 'Your $Activity name$/$Activity type$ is due to be completed today.
+
+Please ensure you complete it by the end of the day.
+
+You can access the activity through this link: $Activity link$';
+$string['template_due_date_subject_subject'] = 'Due today - $Activity name$/$Activity type$';
+
+$string['template_due_date_reminder_appraiser_body'] = 'The following activity is due to be completed in $days$:
+
+$Activity name$/$Activity type$
+
+You were selected to participate in this activity as $subject full name$’s $relationship name$. Please ensure you complete it by $due date$.
+
+You can access the activity through this link: $Activity link$';
+$string['template_due_date_reminder_appraiser_subject'] = 'Reminder - $Activity name$/$Activity type$: $subject full name$';
+
+$string['template_due_date_reminder_manager_body'] = 'The following activity is due to be completed in $days$:
+
+$Activity name$/$Activity type$
+
+You were selected to participate in this activity as $subject full name$’s $relationship name$. Please ensure you complete it by $due date$.
+
+You can access the activity through this link: $Activity link$';
+$string['template_due_date_reminder_manager_subject'] = 'Reminder - $Activity name$/$Activity type$: $subject full name$';
+
+$string['template_due_date_reminder_subject_body'] = 'Your $Activity name$/$Activity type$ is due to be completed in $days$.
+
+Please ensure you complete it by $due date$.
+
+You can access the activity through this link: $Activity link$';
+$string['template_due_date_reminder_subject_subject'] = 'Reminder - $Activity name$/$Activity type$';
+
 $string['template_instance_created_appraiser_body'] = 'As $subject full name$’s $relationship name$, you have been selected to participate in the following activity:
 
 $Activity name$/$Activity type$
@@ -543,6 +594,7 @@ This needs to be completed by $due date$.
 
 You can access the activity through this link: $Activity link$';
 $string['template_instance_created_appraiser_subject'] = '$Activity name$/$Activity type$: $subject full name$';
+
 $string['template_instance_created_manager_body'] = 'As $subject full name$’s $relationship name$, you have been selected to participate in the following activity:
 
 $Activity name$/$Activity type$
@@ -567,6 +619,7 @@ This needs to be completed by $due date$.
 
 You can access the activity through this link: $Activity link$';
 $string['template_instance_created_subject_subject'] = 'Your $Activity name$/$Activity type$';
+
 $string['template_instance_created_reminder_appraiser_body'] = '$days ago$ you were selected to participate in the following activity as $subject full name$’s $relationship name$:
 
 $Activity name$/$Activity type$
@@ -575,6 +628,7 @@ Please ensure you complete it by $due date$.
 
 You can access the activity through this link: $Activity link$';
 $string['template_instance_created_reminder_appraiser_subject'] = 'Reminder - $Activity name$/$Activity type$: $subject full name$';
+
 $string['template_instance_created_reminder_manager_body'] = '$days ago$ you were selected to participate in the following activity as $subject full name$’s $relationship name$:
 
 $Activity name$/$Activity type$
@@ -599,6 +653,32 @@ Please ensure you complete it by $due date$.
 
 You can access the activity through this link: $Activity link$';
 $string['template_instance_created_reminder_subject_subject'] = 'Reminder - $Activity name$/$Activity type$';
+
+$string['template_overdue_reminder_appraiser_body'] = 'The following activity was due to be completed on $due date$ and is now overdue:
+
+$Activity name$/$Activity type$
+
+You were selected to participate in this activity as $subject full name$’s $relationship name$. Please ensure you complete it as soon as possible.
+
+You can access the activity through this link: $Activity link$';
+$string['template_overdue_reminder_appraiser_subject'] = 'Overdue - $Activity name$/$Activity type$: $subject full name$';
+
+$string['template_overdue_reminder_manager_body'] = 'The following activity was due to be completed on $due date$ and is now overdue:
+
+$Activity name$/$Activity type$
+
+You were selected to participate in this activity as $subject full name$’s $relationship name$. Please ensure you complete it as soon as possible.
+
+You can access the activity through this link: $Activity link$';
+$string['template_overdue_reminder_manager_subject'] = 'Overdue - $Activity name$/$Activity type$: $subject full name$';
+
+$string['template_overdue_reminder_subject_body'] = 'Your $Activity name$/$Activity type$ was due to be completed on $due date$ and is now overdue.
+
+Please ensure you complete it as soon as possible.
+
+You can access the activity through this link: $Activity link$';
+$string['template_overdue_reminder_subject_subject'] = 'Overdue - $Activity name$/$Activity type$';
+
 $string['toast_error_create_activity'] = 'An error occurred while saving, and the activity could not be created.';
 $string['toast_error_generic_update'] = 'An error occurred, and your latest changes have not been saved.';
 $string['toast_error_save_response'] = 'An error occurred while saving, and the activity responses could not be updated.';
