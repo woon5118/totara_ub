@@ -65,7 +65,7 @@ class appraiser extends relationship_resolver {
     protected function get_data(array $data): array {
         $repository = job_assignment::repository();
 
-        if (isset($data['job_assignment_id'])) {
+        if (!empty($data['job_assignment_id'])) {
             $repository->where('id', $data['job_assignment_id']);
         } else {
             $repository->where('userid', $data['user_id']);
