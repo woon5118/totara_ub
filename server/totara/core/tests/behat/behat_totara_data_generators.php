@@ -396,6 +396,12 @@ class behat_totara_data_generators extends behat_base {
                 'required' => array(),
             )
         ),
+        'tool_customlang' => array(
+            'language customisation' => array(
+                'datagenerator' => 'language_customisation_for_behat',
+                'required' => array('id', 'string')
+            )
+        ),
         'mod_forum' => array(
             'post' => array(
                 'age_data' => 'age_post'
