@@ -65,11 +65,6 @@ class restore_activity_structure_step extends \restore_activity_structure_step {
         );
 
         $paths[] = new restore_path_element(
-            'relationship',
-            '/activity/perform/relationships/relationship'
-        );
-
-        $paths[] = new restore_path_element(
             'section_element',
             '/activity/perform/sections/section/section_elements/section_element'
         );
@@ -116,7 +111,7 @@ class restore_activity_structure_step extends \restore_activity_structure_step {
 
         $paths[] = new restore_path_element(
             'manual_relationship',
-            '/activity/perform/manual_relationships/manual_relationship'
+            '/activity/perform/manual_relation_selections/manual_relation_selection'
         );
 
         $paths[] = new restore_path_element(
@@ -125,8 +120,8 @@ class restore_activity_structure_step extends \restore_activity_structure_step {
         );
 
         $paths[] = new restore_path_element(
-            'manual_relation_selected',
-            '/activity/perform/manual_relationships/manual_relationship/manual_relationships_progresses/manual_relationships_progress/manual_relation_selections/manual_relation_selected'
+            'manual_relation_selector',
+            '/activity/perform/manual_relationships/manual_relationship/manual_relationships_progresses/manual_relationships_progress/manual_relation_selectors/manual_relation_selector'
         );
 
         $paths[] = new restore_path_element(
@@ -155,6 +150,7 @@ class restore_activity_structure_step extends \restore_activity_structure_step {
         // Keeping or moving these times makes little sense, but it is the expected Moodle way...
         $data->created_at = $this->apply_date_offset($data->created_at);
         $data->updated_at = $this->apply_date_offset($data->updated_at);
+        // Without the types being part of the backup we cannot map the id
         //$data->type_id = $this->get_mappingid('perform_type', $data->type_id);
 
         $new_item_id = $DB->insert_record('perform', $data);
@@ -175,22 +171,6 @@ class restore_activity_structure_step extends \restore_activity_structure_step {
 
         $new_item_id = $DB->insert_record('perform_setting', $data);
         $this->set_mapping('perform_setting', $old_id, $new_item_id);
-    }
-
-    protected function process_relationship($data) {
-        global $DB;
-
-        $data = (object)$data;
-        $old_id = $data->id;
-
-        $data->activity_id = $this->get_new_parentid('perform');
-        //$data->core_relationship_id = $this->get_mappingid('totara_core_relationship', $data->core_relationship_id);
-
-        // Keeping or moving these times makes little sense, but it is the expected Moodle way...
-        $data->created_at = $this->apply_date_offset($data->created_at);
-
-        $new_item_id = $DB->insert_record('perform_relationship', $data);
-        $this->set_mapping('perform_relationship', $old_id, $new_item_id);
     }
 
     protected function process_section($data) {
@@ -340,7 +320,7 @@ class restore_activity_structure_step extends \restore_activity_structure_step {
 
         $data->track_user_assignment_id = $this->get_mappingid('perform_track_user_assignment', $data->track_user_assignment_id);
         $data->job_assignment_id = $this->get_mappingid('job_assignment', $data->job_assignment_id);
-        //$data->subject_user_id = $this->get_mappingid('user', $data->subject_user_id);
+        $data->subject_user_id = $this->get_mappingid('user', $data->subject_user_id);
 
         // Keeping or moving these times makes little sense, but it is the expected Moodle way...
         $data->created_at = $this->apply_date_offset($data->created_at);
@@ -357,7 +337,7 @@ class restore_activity_structure_step extends \restore_activity_structure_step {
         $data = (object)$data;
         $old_id = $data->id;
 
-        //$data->participant_id = $this->get_mappingid('user', $data->participant_id);
+        $data->participant_id = $this->get_mappingid('user', $data->participant_id);
         $data->subject_instance_id = $this->get_mappingid('perform_subject_instance', $data->subject_instance_id);
 
         // Keeping or moving these times makes little sense, but it is the expected Moodle way...
@@ -392,8 +372,9 @@ class restore_activity_structure_step extends \restore_activity_structure_step {
         $old_id = $data->id;
 
         $data->activity_id = $this->get_mappingid('perform', $data->activity_id);
-        $data->manual_relationship_id = $this->get_mappingid('totara_core_relationship', $data->manual_relationship_id);
-        $data->selector_relationship_id = $this->get_mappingid('totara_core_relationship', $data->selector_relationship_id);
+        // Without the core_relationship data in the backup we cannot map the ids
+        // $data->manual_relationship_id = $this->get_mappingid('totara_core_relationship', $data->manual_relationship_id);
+        // $data->selector_relationship_id = $this->get_mappingid('totara_core_relationship', $data->selector_relationship_id);
 
         $data->created_at = $this->apply_date_offset($data->created_at);
 
@@ -417,7 +398,7 @@ class restore_activity_structure_step extends \restore_activity_structure_step {
         $this->set_mapping('perform_manual_relation_selection_progress', $old_id, $new_item_id);
     }
 
-    protected function process_manual_relation_selected($data) {
+    protected function process_manual_relation_selector($data) {
         global $DB;
 
         $data = (object)$data;

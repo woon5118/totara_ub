@@ -253,9 +253,9 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
             ]
         );
 
-        $manual_relationships = new backup_nested_element('perform_manual_relation_selections');
+        $manual_relationships = new backup_nested_element('manual_relation_selections');
         $manual_relationship = new backup_nested_element(
-            'perform_manual_relation_selection',
+            'manual_relation_selection',
             ['id'],
             [
                 'activity_id',
@@ -267,7 +267,7 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
 
         $manual_relationships_progresses = new backup_nested_element('manual_relationships_progresses');
         $manual_relationships_progress = new backup_nested_element(
-            'perform_manual_relation_selection_progress',
+            'manual_relation_selection_progress',
             ['id'],
             [
                 'subject_instance_id',
@@ -278,9 +278,9 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
             ]
         );
 
-        $manual_relation_selections = new backup_nested_element('manual_relation_selections');
+        $manual_relation_selections = new backup_nested_element('manual_relation_selectors');
         $manual_relation_selected = new backup_nested_element(
-            'perform_manual_relation_selector',
+            'manual_relation_selector',
             ['id'],
             [
                 'manual_relation_select_progress_id',
@@ -291,7 +291,7 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
 
         $subject_instance_manual_participants = new backup_nested_element('subject_instance_manual_participants');
         $subject_instance_manual_participant = new backup_nested_element(
-            'perform_subject_instance_manual_participant',
+            'subject_instance_manual_participant',
             ['id'],
             [
                 'subject_instance_id',

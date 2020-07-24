@@ -23,9 +23,11 @@
 
 use container_perform\backup\backup_helper;
 use container_perform\backup\restore_helper;
+use core\orm\collection;
 use core\orm\query\builder;
 use mod_perform\backup\backup_activity_structure_step as backup_step;
 use mod_perform\entities\activity\activity as activity_entity;
+use mod_perform\entities\activity\manual_relationship_selection;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\section;
 use mod_perform\models\activity\section_element;
@@ -143,6 +145,33 @@ class mod_perform_activity_clone_model_helper_testcase extends advanced_testcase
         $old_track_assignments = $old_track->get_assignments();
         $new_track_assignments = $new_track->get_assignments();
         $this->assertSameSize($old_track_assignments, $new_track_assignments);
+
+        /** @var collection|manual_relationship_selection[] $old_selection_settings */
+        $old_selection_settings = manual_relationship_selection::repository()
+            ->where('activity_id', $activity->id)
+            ->get();
+
+        $expected_selection_settings = [];
+        foreach ($old_selection_settings as $old_selection_setting) {
+            $expected_selection_settings[] = [
+                'manual_relationship_id' => $old_selection_setting->manual_relationship_id,
+                'selector_relationship_id' => $old_selection_setting->selector_relationship,
+            ];
+        }
+
+        $new_selection_settings = manual_relationship_selection::repository()
+            ->where('activity_id', $new_activity->id)
+            ->get();
+
+        $actual_selection_settings = [];
+        foreach ($new_selection_settings as $new_selection_setting) {
+            $actual_selection_settings[] = [
+                'manual_relationship_id' => $new_selection_setting->manual_relationship_id,
+                'selector_relationship_id' => $new_selection_setting->selector_relationship,
+            ];
+        }
+
+        $this->assertEqualsCanonicalizing($expected_selection_settings, $actual_selection_settings);
     }
 
     public function test_backup_covers_all_tables_and_fields() {
