@@ -117,6 +117,6 @@ class section extends entity {
         return $this->has_many(section_relationship::class, 'section_id')
             ->as('sr')
             ->join([relationship::TABLE, 'cr'], 'sr.core_relationship_id', '=', 'cr.id')
-            ->order_by('cr.id');
+            ->order_by('cr.sort_order');
     }
 }

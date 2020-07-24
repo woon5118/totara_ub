@@ -111,7 +111,7 @@ class subject_instance extends entity {
     public function participant_instances(): has_many {
         return $this->has_many(participant_instance::class, 'subject_instance_id')
             ->left_join([core_relationship::TABLE, 'cr'], 'core_relationship_id', 'cr.id')
-            ->order_by('cr.id');
+            ->order_by('cr.sort_order');
     }
 
     /**

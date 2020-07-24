@@ -211,7 +211,7 @@ class notification_recipient {
                     $builder->where('nr.active', '<>', 0);
                 }
             })
-            ->order_by('r.id')
+            ->order_by('r.sort_order')
             ->map_to(function ($source) use ($notify_id) {
                 $source->notification_id = $notify_id;
                 return new self($source);
