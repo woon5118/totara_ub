@@ -38,6 +38,7 @@
           "
           :styleclass="{
             primary: true,
+            small: true,
           }"
         />
       </template>

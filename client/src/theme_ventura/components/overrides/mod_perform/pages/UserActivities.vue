@@ -26,6 +26,7 @@
   }
 
   &__heading {
+    margin: 0;
     padding-right: var(--tui-gap-8);
   }
 

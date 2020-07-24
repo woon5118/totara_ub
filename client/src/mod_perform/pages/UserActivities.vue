@@ -23,10 +23,6 @@
         {{ $str('user_activities_page_title', 'mod_perform') }}
       </h2>
 
-      <ManualParticipantsSelectionBanner
-        v-if="requireManualParticipantsNotification"
-      />
-
       <Button
         v-if="canPotentiallyManageParticipants"
         class="tui-performUserActivities__action-button"
@@ -34,6 +30,10 @@
         @click="openParticipationModal = true"
       />
     </div>
+
+    <ManualParticipantsSelectionBanner
+      v-if="requireManualParticipantsNotification"
+    />
 
     <div class="tui-performUserActivities__content">
       <Tabs :selected="initialTab">
