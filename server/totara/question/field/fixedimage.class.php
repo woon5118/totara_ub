@@ -113,7 +113,7 @@ class question_fixedimage extends question_base{
      * @param MoodleQuickForm $form Form to alter
      */
     public function add_field_specific_edit_elements(MoodleQuickForm $form) {
-        $this->add_field_specific_view_elements($form);
+        // This should never be called.
     }
 
     /**
@@ -124,6 +124,17 @@ class question_fixedimage extends question_base{
      * @param MoodleQuickForm $form
      */
     public function add_field_specific_view_elements(MoodleQuickForm $form) {
+        // This should never be called.
+    }
+
+    /**
+     * Add form elements related to questions to form for user answers
+     * Default implementation for first mapped field.
+     * Override for all other cases.
+     *
+     * @param MoodleQuickForm $form
+     */
+    public function add_field_specific_static_elements(MoodleQuickForm $form) {
         global $CFG, $FILEPICKER_OPTIONS;
 
         require_once($CFG->libdir . '/resourcelib.php');

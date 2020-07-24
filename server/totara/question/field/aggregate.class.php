@@ -310,6 +310,10 @@ class question_aggregate extends question_base{
     }
 
     public function add_field_specific_view_elements(MoodleQuickForm $form) {
+        // This should never be called.
+    }
+
+    public function add_field_specific_static_elements(MoodleQuickForm $form) {
         return add_field_form_elements($form);
     }
 

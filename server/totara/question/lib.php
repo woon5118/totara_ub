@@ -496,6 +496,8 @@ abstract class question_base {
             $form->addElement('html', html_writer::start_div('totara-question-nonfieldset-item'));
         }
 
+        $this->add_field_specific_static_elements($form);
+
         if ($this->cananswer) {
             if (!empty($this->viewers)) {
                 $viewersstring = get_string('visibleto', 'totara_question', implode(', ', $this->viewers));
@@ -732,6 +734,16 @@ abstract class question_base {
      */
     public function add_field_specific_view_elements(MoodleQuickForm $form) {
         $form->addElement('staticcallback', $this->get_prefix_form(), $this->label, $this);
+    }
+
+    /**
+     * Add static form elements
+     *
+     * Override in all static questions
+     *
+     * @param MoodleQuickForm $form
+     */
+    public function add_field_specific_static_elements(MoodleQuickForm $form) {
     }
 
     /**
