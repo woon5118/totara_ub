@@ -601,9 +601,24 @@ function xmldb_totara_core_install() {
         $dbman->create_table($table);
     }
 
+    $table = new xmldb_table('course_categories');
+    $field = new xmldb_field('programcount', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+    if (!$dbman->field_exists($table, $field)) {
+        // Launch add field programcount.
+        $dbman->add_field($table, $field);
+    }
+
+    // Conditionally add 'certifcount' field to 'course_categories'.
+    $table = new xmldb_table('course_categories');
+    $field = new xmldb_field('certifcount', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+    if (!$dbman->field_exists($table, $field)) {
+        // Launch add field certifcount.
+        $dbman->add_field($table, $field);
+    }
+
     // Define field type to be added to course_categories.
     $table = new xmldb_table('course_categories');
-    $field = new xmldb_field('issystem', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'certifcount');
+    $field = new xmldb_field('issystem', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
     if (!$dbman->field_exists($table, $field)) {
         $dbman->add_field($table, $field);
     }
