@@ -501,11 +501,13 @@ function xmldb_totara_core_install() {
     $table->add_field('apiversion', XMLDB_TYPE_CHAR, '12', null, XMLDB_NOTNULL, null, '1.0');
     $table->add_field('sortorder', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
     $table->add_field('password', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+    $table->add_field('oauth2_issuerid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
 
     // Adding keys to table badge_external_backpack.
     $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
     $table->add_key('backpackapiurlkey', XMLDB_KEY_UNIQUE, ['backpackapiurl']);
     $table->add_key('backpackweburlkey', XMLDB_KEY_UNIQUE, ['backpackweburl']);
+    $table->add_key('backpackoauth2key', XMLDB_KEY_FOREIGN, ['oauth2_issuerid'], 'oauth2_issuer', array('id'));
 
     // Conditionally launch create table for badge_external_backpack.
     if (!$dbman->table_exists($table)) {

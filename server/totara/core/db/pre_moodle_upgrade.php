@@ -176,7 +176,7 @@ if (!$dbman->table_exists($table)) {
 $tablebadgeexternalbackpack = new xmldb_table('badge_external_backpack');
 $fieldoauth2issuerid = new xmldb_field('oauth2_issuerid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'password');
 $keybackpackoauth2key = new xmldb_key('backpackoauth2key', XMLDB_KEY_FOREIGN, ['oauth2_issuerid'], 'oauth2_issuer', ['id']);
-if (!$dbman->field_exists($tablebadgeexternalbackpack, $fieldoauth2issuerid)) {
+if ($dbman->table_exists($tablebadgeexternalbackpack) && !$dbman->field_exists($tablebadgeexternalbackpack, $fieldoauth2issuerid)) {
     $dbman->add_field($tablebadgeexternalbackpack, $fieldoauth2issuerid);
     $dbman->add_key($tablebadgeexternalbackpack, $keybackpackoauth2key);
 }
@@ -184,6 +184,6 @@ if (!$dbman->field_exists($tablebadgeexternalbackpack, $fieldoauth2issuerid)) {
 // Define field assertion to be added to badge_external.
 $tablebadgeexternal = new xmldb_table('badge_external');
 $fieldassertion = new xmldb_field('assertion', XMLDB_TYPE_TEXT, null, null, null, null, null, 'entityid');
-if (!$dbman->field_exists($tablebadgeexternal, $fieldassertion)) {
+if ($dbman->table_exists($tablebadgeexternal) && !$dbman->field_exists($tablebadgeexternal, $fieldassertion)) {
     $dbman->add_field($tablebadgeexternal, $fieldassertion);
 }

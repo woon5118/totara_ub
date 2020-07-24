@@ -2520,26 +2520,29 @@ function check_upgrade_key($upgradekeyhash) {
 function check_unoconv_version(environment_results $result) {
     global $CFG;
 
-    if (!during_initial_install() && !empty($CFG->pathtounoconv) && file_is_executable(trim($CFG->pathtounoconv))) {
-        $currentversion = 0;
-        $supportedversion = 0.7;
-        $unoconvbin = \escapeshellarg($CFG->pathtounoconv);
-        $command = "$unoconvbin --version";
-        exec($command, $output);
+    if (!during_initial_install() && !empty($CFG->pathtounoconv)) {
+        require_once($CFG->libdir . '/filelib.php');
+        if (file_is_executable(trim($CFG->pathtounoconv))) {
+            $currentversion = 0;
+            $supportedversion = 0.7;
+            $unoconvbin = \escapeshellarg($CFG->pathtounoconv);
+            $command = "$unoconvbin --version";
+            exec($command, $output);
 
-        // If the command execution returned some output, then get the unoconv version.
-        if ($output) {
-            foreach ($output as $response) {
-                if (preg_match('/unoconv (\\d+\\.\\d+)/', $response, $matches)) {
-                    $currentversion = (float)$matches[1];
+            // If the command execution returned some output, then get the unoconv version.
+            if ($output) {
+                foreach ($output as $response) {
+                    if (preg_match('/unoconv (\\d+\\.\\d+)/', $response, $matches)) {
+                        $currentversion = (float)$matches[1];
+                    }
                 }
             }
-        }
 
-        if ($currentversion < $supportedversion) {
-            $result->setInfo(get_string('unsupportedunoconvversion', 'admin'));
-            $result->setStatus(false);
-            return $result;
+            if ($currentversion < $supportedversion) {
+                $result->setInfo(get_string('unsupportedunoconvversion', 'admin'));
+                $result->setStatus(false);
+                return $result;
+            }
         }
     }
     return null;
