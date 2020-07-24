@@ -30,6 +30,8 @@ class behat_performelement_date_picker extends behat_base {
      * @When /^I click date picker question element$/
      */
     public function i_click_date_picker_question_element(): void {
+        behat_hooks::set_step_readonly(false);
+
         $behat_general = behat_context_helper::get('behat_general');
 
         $behat_general->i_click_on("Add element","button");
@@ -40,6 +42,8 @@ class behat_performelement_date_picker extends behat_base {
      * @When /^I save date picker question element data$/
      */
     public function i_save_date_picker_question_element_data(): void {
+        behat_hooks::set_step_readonly(false);
+
         $done_button = $this->find('css', self::DONE_BUTTON_LOCATOR);
         $done_button->click();
     }

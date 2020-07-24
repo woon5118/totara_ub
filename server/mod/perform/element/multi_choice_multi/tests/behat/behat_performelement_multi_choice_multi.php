@@ -45,6 +45,8 @@ class behat_performelement_multi_choice_multi extends behat_base {
      * @When /^I save multiple answers question element data$/
      */
     public function i_save_multiple_answers_question_element_data(): void {
+        behat_hooks::set_step_readonly(false);
+
         $done_button = $this->find('css', self::DONE_BUTTON_LOCATOR);
         $done_button->click();
     }
@@ -53,6 +55,8 @@ class behat_performelement_multi_choice_multi extends behat_base {
      * @When /^I click multiple answers question add new option$/
      */
     public function i_click_multiple_answers_question_add_new_option(): void {
+        behat_hooks::set_step_readonly(false);
+
         $edit_element = $this->find('css', self::EDIT_ELEMENT_LOCATOR);
         $add_button = $edit_element->find('css', self::ADD_OPTION_LOCATOR);
         $add_button->click();
@@ -89,6 +93,8 @@ class behat_performelement_multi_choice_multi extends behat_base {
      * @throws ExpectationException
      */
     public function i_delete_multiple_answers_question_option(): void {
+        behat_hooks::set_step_readonly(false);
+
         $delete_button = $this->find('css', '.tui-elementEditMultiChoiceMulti .tui-iconBtn--stealth');
         $delete_button->click();
     }

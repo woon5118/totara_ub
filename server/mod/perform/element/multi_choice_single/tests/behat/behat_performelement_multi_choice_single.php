@@ -34,6 +34,8 @@ class behat_performelement_multi_choice_single extends behat_base {
      * @When /^I click multi choice single question element$/
      */
     public function i_click_multi_choice_single_question_element(): void {
+        behat_hooks::set_step_readonly(false);
+
         $behat_general = behat_context_helper::get('behat_general');
 
         $behat_general->i_click_on("Add element","button");
@@ -44,6 +46,8 @@ class behat_performelement_multi_choice_single extends behat_base {
      * @When /^I save multi choice single question element data$/
      */
     public function i_save_multi_choice_single_question_element_data(): void {
+        behat_hooks::set_step_readonly(false);
+
         $done_button = $this->find('css', self::DONE_BUTTON_LOCATOR);
         $done_button->click();
     }
@@ -52,6 +56,8 @@ class behat_performelement_multi_choice_single extends behat_base {
      * @When /^I click multi choice single question add new option$/
      */
     public function i_click_multi_choice_single_question_add_new_option(): void {
+        behat_hooks::set_step_readonly(false);
+
         $edit_element = $this->find('css', self::EDIT_ELEMENT_LOCATOR);
         $add_button = $edit_element->find('css', self::ADD_OPTION_LOCATOR);
         $add_button->click();
@@ -88,6 +94,8 @@ class behat_performelement_multi_choice_single extends behat_base {
      * @throws ExpectationException
      */
     public function i_delete_multi_choice_single_question_option(): void {
+        behat_hooks::set_step_readonly(false);
+
         $delete_button = $this->find('css', '.tui-elementEditMultiChoiceSingle .tui-iconBtn--stealth');
         $delete_button->click();
     }
