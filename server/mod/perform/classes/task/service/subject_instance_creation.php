@@ -203,6 +203,7 @@ class subject_instance_creation {
             ->filter_by_active_track_and_activity()
             ->filter_by_time_interval()
             ->filter_by_does_not_need_schedule_sync()
+            ->order_by('t.activity_id')
             ->get_lazy();
     }
 
