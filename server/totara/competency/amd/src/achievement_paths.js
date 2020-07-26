@@ -253,9 +253,10 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
             });
 
             this.widget.addEventListener(pwEvents + 'remove', function(e) {
-                var pwKey = e.detail.key;
+                var pwKey = e.detail.key,
+                    pendingJsKey = e.detail.pendingJsKey || '';
 
-                that.removePathway(pwKey);
+                that.removePathway(pwKey, pendingJsKey);
             });
 
             this.widget.addEventListener(pwEvents + 'singleUseCriterion', function(e) {
@@ -765,8 +766,9 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
          * to indicate that final removal will only happen when changes are applied
          *
          * @param {number} pwKey
+         * @param {string} pendingJsKey
          */
-        removePathway: function(pwKey) {
+        removePathway: function(pwKey, pendingJsKey) {
             var pwTarget = this.widget.querySelector('[data-tw-editAchievementPaths-pathway-key="' + pwKey + '"]');
 
             notification.clearNotifications();
@@ -843,6 +845,10 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
 
                     if (pwTarget) {
                         pwTarget.remove();
+                    }
+
+                    if (pendingJsKey != '') {
+                        M.util.js_complete(pendingJsKey);
                     }
                 }
             }

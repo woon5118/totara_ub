@@ -365,16 +365,28 @@ class behat_totara_tui extends behat_base {
     /**
      * @Then /^I should see "([^"]*)" under "([^"]*)" on row "([^"]*)" of the tui datatable$/
      * @Then /^I should see "([^"]*)" under "([^"]*)" on row "([^"]*)" of the tui datatable in the "([^"]*)" "([^"]*)"$/
+     * @Then /^I should see "([^"]*)" under "([^"]*)" on row "([^"]*)" of the tui datatable in the "([^"]*)" "([^"]*)" in the "([^"]*)" tui collapsible$/
      * @param $expected_text string The expected text in the cell identified by the column header and row
      * @param $column_heading_text string The text of the column header used to identify the cell
      * @param $row_number int The row number to identify the cell, the first row is 1
      * @param string $table_locator '.my-table' etc
      * @param string|null $table_selector_type css, xpath etc
+     * @param string|null $collapsible_label_text
      */
     public function i_should_see_under_on_row_of_datatable(string $expected_text, string $column_heading_text,
         int $row_number, string $table_locator = self::DATA_TABLE_DEFAULT_LOCATOR,
-        string $table_selector_type = self::DATA_TABLE_DEFAULT_SELECTOR_TYPE): void {
-        $cell = $this->find_data_table_cell($column_heading_text, $row_number, $table_locator, $table_selector_type);
+        string $table_selector_type = self::DATA_TABLE_DEFAULT_SELECTOR_TYPE,
+        string $collapsible_label_text = null
+    ): void {
+        behat_hooks::set_step_readonly(true);
+
+        /** @var NodeElement $top */
+        $root = false;
+        if ($collapsible_label_text !== null) {
+            $root = $this->find_collapsible($collapsible_label_text);
+        }
+
+        $cell = $this->find_data_table_cell($column_heading_text, $row_number, $table_locator, $table_selector_type, $root);
 
         $cell_text = $cell->getText();
 
@@ -387,18 +399,27 @@ class behat_totara_tui extends behat_base {
     /**
      * @When /^I toggle expanding row "([^"]*)" of the tui datatable$/
      * @When /^I toggle expanding row "([^"]*)" of the tui datatable in the "([^"]*)" "([^"]*)"$/
+     * @When /^I toggle expanding row "([^"]*)" of the tui datatable in the "([^"]*)" "([^"]*)" in the "([^"]*)" tui collapsible$/
      * @param int $row_number The row number to identify the cell, the first row is 1
      * @param string $table_locator '.my-table' etc
      * @param string|null $table_selector_type css, xpath etc
+     * @param string|null $collapsible_label_text
      */
     public function i_toggle_expanding_row_of_the_tui_datatable(
         int $row_number,
         string $table_locator = self::DATA_TABLE_DEFAULT_LOCATOR,
-        string $table_selector_type = self::DATA_TABLE_DEFAULT_SELECTOR_TYPE
+        string $table_selector_type = self::DATA_TABLE_DEFAULT_SELECTOR_TYPE,
+        string $collapsible_label_text = null
     ): void {
         behat_hooks::set_step_readonly(false);
 
-        $table = $this->find_data_table($table_selector_type, $table_locator);
+        /** @var NodeElement $top */
+        $top = false;
+        if ($collapsible_label_text !== null) {
+            $top = $this->find_collapsible($collapsible_label_text);
+        }
+
+        $table = $this->find_data_table($table_selector_type, $table_locator, $top);
         $row = $this->find_data_table_row($row_number, $table);
 
         $expand_button = $row->find('css', '.tui-dataTableExpandCell > button');
@@ -411,17 +432,28 @@ class behat_totara_tui extends behat_base {
     /**
      * @Then /^I should see "([^"]*)" under the expanded row of the tui datatable$/
      * @Then /^I should see "([^"]*)" under the expanded row of the tui datatable in the "([^"]*)" "([^"]*)"$/
+     * @Then /^I should see "([^"]*)" under the expanded row of the tui datatable in the "([^"]*)" "([^"]*)" in the "([^"]*)" tui collapsible$/
      * @param $expected_text string The expected text in the cell identified by the column header and row
      * @param string $table_locator '.my-table' etc
      * @param string|null $table_selector_type css, xpath etc
+     * @param string|null $collapsible_label_text
      * @throws ExpectationException
      */
     public function i_should_see_under_the_expanded_row_of_datatable(
         string $expected_text,
         string $table_locator = self::DATA_TABLE_DEFAULT_LOCATOR,
-        string $table_selector_type = self::DATA_TABLE_DEFAULT_SELECTOR_TYPE
+        string $table_selector_type = self::DATA_TABLE_DEFAULT_SELECTOR_TYPE,
+        string $collapsible_label_text = null
     ): void {
-        $table = $this->find_data_table($table_selector_type, $table_locator);
+        behat_hooks::set_step_readonly(true);
+
+        /** @var NodeElement $top */
+        $root = false;
+        if ($collapsible_label_text !== null) {
+            $root = $this->find_collapsible($collapsible_label_text);
+        }
+
+        $table = $this->find_data_table($table_selector_type, $table_locator, $root);
 
         $row = $table->find('css', '.tui-dataTableExpandableRow');
         if ($row === null || !$row->isVisible()) {
@@ -878,20 +910,35 @@ class behat_totara_tui extends behat_base {
     public function i_toggle_the_tui_collapsible(string $collapsible_label_text) {
         \behat_hooks::set_step_readonly(false);
 
-        $collapsibles = $this->find_all('css', self::COLLAPSIBLE_LOCATOR);
-
-        $matches = array_filter($collapsibles, static function (NodeElement $filter) use ($collapsible_label_text) {
-            $legend = $filter->find('css', self::COLLAPSIBLE_HEADER_TEXT_LOCATOR);
-            return $legend !== null && $legend->getText() === $collapsible_label_text;
-        });
-
         /** @var NodeElement $collapsible */
-        $collapsible = reset($matches);
+        $collapsible = $this->find_collapsible($collapsible_label_text);
         if (!$collapsible || !$collapsible->isVisible()) {
             throw new ExpectationException("Could not find the '$collapsible_label_text' collapsible", $this->getSession());
         }
 
         $collapsible->find('css', self::COLLAPSIBLE_BUTTON_LOCATOR)->click();
+    }
+
+    /**
+     * @When /^I ensure the "([^"]*)" tui collapsible is expanded$/
+     * @param string $collapsible_label_text
+     * @throws Exception
+     */
+    public function i_ensure_the_tui_collapsible_is_expanded(string $collapsible_label_text) {
+        \behat_hooks::set_step_readonly(false);
+
+        /** @var NodeElement $collapsible */
+        $collapsible = $this->find_collapsible($collapsible_label_text);
+        if (!$collapsible || !$collapsible->isVisible()) {
+            throw new ExpectationException("Could not find the '$collapsible_label_text' collapsible", $this->getSession());
+        }
+
+        /** @var NodeElement $button */
+        $button = $collapsible->find('css', self::COLLAPSIBLE_BUTTON_LOCATOR);
+        $expanded = $button->getAttribute('aria-expanded');
+        if ($expanded === 'false') {
+            $button->click();
+        }
     }
 
     /**
@@ -1129,10 +1176,11 @@ class behat_totara_tui extends behat_base {
     /**
      * @param string $table_selector_type
      * @param string $table_locator
+     * @param NodeElement|false $node
      * @return NodeElement
      * @throws ExpectationException
      */
-    private function find_data_table(string $table_selector_type, string $table_locator) {
+    private function find_data_table(string $table_selector_type, string $table_locator, $node = false) {
         if ($table_locator !== self::DATA_TABLE_DEFAULT_LOCATOR &&
             $table_selector_type === self::DATA_TABLE_DEFAULT_SELECTOR_TYPE) {
             $table_locator = $table_locator . ' ' . self::DATA_TABLE_DEFAULT_LOCATOR;
@@ -1144,7 +1192,7 @@ class behat_totara_tui extends behat_base {
             $this->getSession()
         );
 
-        return $this->find($table_selector, $table_locator);
+        return $this->find($table_selector, $table_locator, false, $node);
     }
 
     /**
@@ -1152,14 +1200,17 @@ class behat_totara_tui extends behat_base {
      * @param int $row_number
      * @param string|null $table_locator
      * @param string|null $table_selector_type
+     * @param NodeElement|false $node
      * @return NodeElement|mixed
      * @throws ExpectationException
      */
     private function find_data_table_cell(string $column_heading_text,
         int $row_number,
         string $table_locator = self::DATA_TABLE_DEFAULT_SELECTOR_TYPE,
-        string $table_selector_type = self::DATA_TABLE_DEFAULT_LOCATOR) {
-        $table = $this->find_data_table($table_selector_type, $table_locator);
+        string $table_selector_type = self::DATA_TABLE_DEFAULT_LOCATOR,
+        $node = false
+    ) {
+        $table = $this->find_data_table($table_selector_type, $table_locator, $node);
 
         $heading_index = $this->find_data_table_heading_index($column_heading_text, $table);
         $table_row = $this->find_data_table_row($row_number, $table);
@@ -1372,6 +1423,22 @@ class behat_totara_tui extends behat_base {
         if (trim($selected_option->getText()) !== $expected_value) {
             $this->fail("{$name} did not match {$expected_value}");
         }
+    }
+
+    /**
+     * @param string $collapsible_label_text
+     * @param NodeElement|bool $node
+     * @throws ExpectationException
+     */
+    private function find_collapsible(string $collapsible_label_text, $node = false) {
+        $collapsibles = $this->find_all('css', self::COLLAPSIBLE_LOCATOR, $node);
+
+        $matches = array_filter($collapsibles, static function (NodeElement $filter) use ($collapsible_label_text) {
+            $legend = $filter->find('css', self::COLLAPSIBLE_HEADER_TEXT_LOCATOR);
+            return $legend !== null && $legend->getText() === $collapsible_label_text;
+        });
+
+        return reset($matches);
     }
 
 }

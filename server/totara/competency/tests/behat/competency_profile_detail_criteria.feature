@@ -51,24 +51,22 @@ Feature: Test viewing criteria fulfilment for a user on their competency details
     # Course completion (aka flexible courses) criteria (Course 1 & 2)
     And I wait until ".tui-competencyAchievementsScale" "css_element" exists
     # Make sure we expand existing headers
-    And I click on ".tui-collapsible__header button[aria-expanded=false]" "css_element"
-    Then I should see "Complete courses" in the ".tui-competencyAchievementsScale > div:first-child .tui-criteriaCourseAchievement" "css_element"
-    And I should see "1 / 2" in the ".tui-competencyAchievementsScale > div:first-child .tui-criteriaCourseAchievement .tui-progressCircle__circle" "css_element"
-    Then I should see "Complete courses" in the ".tui-competencyAchievementsScale > div:last-child .tui-criteriaCourseAchievement" "css_element"
+    And I ensure the "Work towards level Super Competent" tui collapsible is expanded
+    Then I should see "1 / 2" "courses" completed towards achieving "Super Competent" in the competency profile
 
     # Course 1 - 100% Completed
-    Then I should see "Course 1" under "Courses" on row "1" of the tui datatable in the ".tui-criteriaCourseAchievement" "css_element"
-    And I should see "100%" under "Progress" on row "1" of the tui datatable in the ".tui-criteriaCourseAchievement" "css_element"
-    And I should see "Complete" under "Completion" on row "1" of the tui datatable in the ".tui-criteriaCourseAchievement" "css_element"
-    When I toggle expanding row "1" of the tui datatable in the ".tui-criteriaCourseAchievement" "css_element"
-    Then I should see "Course 1 Description" under the expanded row of the tui datatable in the ".tui-criteriaCourseAchievement" "css_element"
+    Then I should see "Course 1" under "Courses" on row "1" of the tui datatable in the ".tui-criteriaCourseAchievement" "css_element" in the "Work towards level Super Competent" tui collapsible
+    And I should see "100%" under "Progress" on row "1" of the tui datatable in the ".tui-criteriaCourseAchievement" "css_element" in the "Work towards level Super Competent" tui collapsible
+    And I should see "Complete" under "Completion" on row "1" of the tui datatable in the ".tui-criteriaCourseAchievement" "css_element" in the "Work towards level Super Competent" tui collapsible
+    When I toggle expanding row "1" of the tui datatable in the ".tui-criteriaCourseAchievement" "css_element" in the "Work towards level Super Competent" tui collapsible
+    Then I should see "Course 1 Description" under the expanded row of the tui datatable in the ".tui-criteriaCourseAchievement" "css_element" in the "Work towards level Super Competent" tui collapsible
 
     # Course 2 - No completion data
-    Then I should see "Course 2" under "Courses" on row "2" of the tui datatable in the ".tui-criteriaCourseAchievement" "css_element"
-    And I should see "Not available" under "Progress" on row "2" of the tui datatable in the ".tui-criteriaCourseAchievement" "css_element"
-    And I should see "Not complete" under "Completion" on row "2" of the tui datatable in the ".tui-criteriaCourseAchievement" "css_element"
-    When I toggle expanding row "2" of the tui datatable in the ".tui-criteriaCourseAchievement" "css_element"
-    Then I should see "Course 2 Description" under the expanded row of the tui datatable in the ".tui-criteriaCourseAchievement" "css_element"
+    Then I should see "Course 2" under "Courses" on row "2" of the tui datatable in the ".tui-criteriaCourseAchievement" "css_element" in the "Work towards level Super Competent" tui collapsible
+    And I should see "Not available" under "Progress" on row "2" of the tui datatable in the ".tui-criteriaCourseAchievement" "css_element" in the "Work towards level Super Competent" tui collapsible
+    And I should see "Not complete" under "Completion" on row "2" of the tui datatable in the ".tui-criteriaCourseAchievement" "css_element" in the "Work towards level Super Competent" tui collapsible
+    When I toggle expanding row "2" of the tui datatable in the ".tui-criteriaCourseAchievement" "css_element" in the "Work towards level Super Competent" tui collapsible
+    Then I should see "Course 2 Description" under the expanded row of the tui datatable in the ".tui-criteriaCourseAchievement" "css_element" in the "Work towards level Super Competent" tui collapsible
 
     # View Course 2
     When I click on "Go to course" "link" in the ".tui-criteriaCourseAchievement" "css_element"
@@ -79,16 +77,15 @@ Feature: Test viewing criteria fulfilment for a user on their competency details
 
     # Linked courses criteria (Course 3)
     And I wait until ".tui-competencyAchievementsScale" "css_element" exists
-    When I toggle the "Work towards level Just Barely Competent" tui collapsible
-    Then I should see "Complete courses" in the ".tui-competencyAchievementsScale > div:last-child .tui-criteriaCourseAchievement" "css_element"
-    And I should see "1 / 1" in the ".tui-competencyAchievementsScale > div:last-child .tui-criteriaCourseAchievement .tui-progressCircle__circle" "css_element"
+    When I ensure the "Work towards level Just Barely Competent" tui collapsible is expanded
+    Then I should see "1 / 1" "courses" completed towards achieving "Just Barely Competent" in the competency profile
 
     # Course 3 - 100% Completed
-    Then I should see "Course 3" under "Courses" on row "1" of the tui datatable in the ".tui-competencyAchievementsScale > div:last-child .tui-criteriaCourseAchievement" "css_element"
-    And I should see "100%" under "Progress" on row "1" of the tui datatable in the ".tui-competencyAchievementsScale > div:last-child .tui-criteriaCourseAchievement" "css_element"
-    And I should see "Complete" under "Completion" on row "1" of the tui datatable in the ".tui-competencyAchievementsScale > div:last-child .tui-criteriaCourseAchievement" "css_element"
-    When I toggle expanding row "1" of the tui datatable in the ".tui-competencyAchievementsScale > div:last-child .tui-criteriaCourseAchievement" "css_element"
-    Then I should see "Course 3 Description" under the expanded row of the tui datatable in the ".tui-competencyAchievementsScale > div:last-child .tui-criteriaCourseAchievement" "css_element"
+    Then I should see "Course 3" under "Courses" on row "1" of the tui datatable in the ".tui-criteriaCourseAchievement" "css_element" in the "Work towards level Just Barely Competent" tui collapsible
+    And I should see "100%" under "Progress" on row "1" of the tui datatable in the ".tui-criteriaCourseAchievement" "css_element" in the "Work towards level Just Barely Competent" tui collapsible
+    And I should see "Complete" under "Completion" on row "1" of the tui datatable in the ".tui-criteriaCourseAchievement" "css_element" in the "Work towards level Just Barely Competent" tui collapsible
+    When I toggle expanding row "1" of the tui datatable in the ".tui-criteriaCourseAchievement" "css_element" in the "Work towards level Just Barely Competent" tui collapsible
+    Then I should see "Course 3 Description" under the expanded row of the tui datatable in the ".tui-criteriaCourseAchievement" "css_element" in the "Work towards level Just Barely Competent" tui collapsible
 
     # View Course 3
     When I click on "Go to course" "link" in the ".tui-competencyAchievementsScale > div:last-child .tui-criteriaCourseAchievement" "css_element"
@@ -127,8 +124,8 @@ Feature: Test viewing criteria fulfilment for a user on their competency details
     # Other competencies
     # Make sure we expand existing headers
     And I wait until ".tui-competencyAchievementsScale" "css_element" exists
-    Then I should see "Achieve proficiency in other competencies" in the ".tui-competencyAchievementsScale > div:first-child" "css_element"
-    And I should see "0 / 2" in the ".tui-competencyAchievementsScale > div:first-child .tui-progressCircle__circle" "css_element"
+    And I ensure the "Work towards level Super Competent" tui collapsible is expanded
+    Then I should see "0 / 2" "competencies" completed towards achieving "Super Competent" in the competency profile
 
     # Other competency - Comp 4 - is not assigned and can not be self assigned.
     Then I should see "Comp4" under "Competencies" on row "2" of the tui datatable in the ".tui-competencyAchievementsScale__item:first-child" "css_element"

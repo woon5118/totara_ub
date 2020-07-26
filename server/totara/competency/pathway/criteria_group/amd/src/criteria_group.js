@@ -501,6 +501,9 @@ define(['core/str', 'core/notification', 'core/templates'], function(str, notifi
                     this.triggerEvent('update', {pathway: this.pathway});
                     this.triggerEvent('dirty', {});
                 } else {
+                    var pendingJsKey = 'pathwayRemoveLastCriterion';
+                    M.util.js_pending(pendingJsKey);
+
                     // Remove the whole criterion and AND divider
                     if (criterionTarget) {
                         criterionTarget.remove();
@@ -523,9 +526,10 @@ define(['core/str', 'core/notification', 'core/templates'], function(str, notifi
                     this.packCriteria();
 
                     if (this.pathway.criteria.length == 0) {
-                        this.triggerEvent('remove', {});
+                        this.triggerEvent('remove', {pendingJsKey: pendingJsKey});
                     } else {
                         this.triggerEvent('update', {pathway: this.pathway});
+                        M.util.js_complete(pendingJsKey);
                     }
 
                     this.triggerEvent('dirty', {});

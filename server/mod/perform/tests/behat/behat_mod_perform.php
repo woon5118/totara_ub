@@ -912,8 +912,8 @@ class behat_mod_perform extends behat_base {
 
         $actual_text = $this->find('css', self::RESPONSE_VISIBILITY_DESCRIPTION_LOCATOR)->getText();
 
-        if (strpos($actual_text, $expected_text) === -1) {
-            $this->fail("{$expected_text} was not found in the response visibility description");
+        if (strpos($actual_text, $expected_text) === false) {
+            $this->fail("{$expected_text} was not found in the response visibility description: Actual text: {$actual_text}");
         }
     }
 

@@ -1096,6 +1096,33 @@ class behat_totara_competency extends behat_base {
     }
 
     /**
+     * @Given /^I should see "(?P<search_text>(?:[^"]|\\")*)" "(courses|competencies)" completed towards achieving "(?P<scale_value>(?:[^"]|\\")*)" in the competency profile$/
+     * @param string $search_text
+     * @param string $achievement_type
+     * @param string $scale_value
+     * @throws Exception
+     */
+    public function i_should_see_in_the_profile_achievement(string $search_text, string $achievement_type, string $scale_value) {
+        \behat_hooks::set_step_readonly(true);
+
+        $goal_class = 'tui-criteria' .
+            ($achievement_type === 'courses' ? 'Course' : 'Competency') .
+            'Achievement__goal';
+        $xpath = '//div[@class="tui-competencyAchievementsScale" ' .
+            'and .//span[@class="tui-competencyAchievementsScale__title" and contains(., "' . $scale_value . '")]]' .
+            '//div[@class="' . $goal_class . '" and .//span[@class="tui-progressCircle__circle-text" and contains(., "' . $search_text . '")]]';
+
+        try {
+            $this->find('xpath', $xpath);
+        } catch (Exception $e) {
+            throw new ExpectationException(
+                "Could not find progress indicating that \"${search_text}\" {$achievement_type} were completed towards achieving \"${scale_value}\"",
+                $this->getSession()
+            );
+        }
+    }
+
+    /**
      * Find the node for the specified scalevalue
      *
      * @param string $scale_value_name
