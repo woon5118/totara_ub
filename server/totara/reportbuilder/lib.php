@@ -2461,7 +2461,14 @@ class reportbuilder {
             } else if ($param->type == 'string') {
                 $var = optional_param($name, null, PARAM_TEXT);
             } else {
-                $var = optional_param($name, null, PARAM_INT);
+                // Support for array of integers.
+                // Only way to find type seems to be to actually extract value
+                $paramval = $_POST[$param->name] ?? $_GET[$param->name] ?? null;
+                if (is_array($paramval)) {
+                    $var = optional_param_array($name, null, PARAM_INT);
+                } else {
+                    $var = optional_param($name, null, PARAM_INT);
+                }
             }
             if (isset($this->_embeddedparams[$name])) {
                 // Embedded params take priority over url params.
