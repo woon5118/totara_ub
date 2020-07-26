@@ -288,6 +288,9 @@ class activity extends model {
             if ($this->entity->relation_loaded('tracks')) {
                 $this->entity->load_relation('tracks');
             }
+            if ($this->entity->relation_loaded('settings')) {
+                $this->entity->load_relation('settings');
+            }
         }
         return $this;
     }
