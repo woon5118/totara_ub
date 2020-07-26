@@ -403,7 +403,7 @@ export default {
      * Update section.
      */
     updateSection(update) {
-      const newValue = Object.assign({}, this.section, update);
+      const newValue = Object.assign({}, this.savedSection, update);
       this.$emit('input', newValue);
     },
 
@@ -496,13 +496,11 @@ export default {
         this.updateTitle(savedSection.section.title);
         this.updateSection(savedSection);
         this.$emit('mutation-success');
-        this.isSaving = false;
-        this.disableEditing();
       } catch (e) {
         this.$emit('mutation-error', e);
-        this.isSaving = false;
-        this.disableEditing();
       }
+      this.isSaving = false;
+      this.disableEditing();
     },
 
     /**
