@@ -304,8 +304,12 @@ switch ($action) {
         }
         break;
     case 'upload':
+        // Make sure the upload is atomic, fatal errors must roll back changes in the files table
+        // to prevent cloud storage data loss. Unreferenced file in filedir is not a major problem.
+        $trans = $DB->start_delegated_transaction();
         $result = $repo->upload($saveas_filename, $maxbytes);
         ajax_check_captured_output();
+        $trans->allow_commit();
         echo json_encode($result);
         break;
 
@@ -317,8 +321,12 @@ switch ($action) {
         $newfilepath = required_param('newfilepath', PARAM_PATH);
         $newfilename = required_param('newfilename', PARAM_FILE);
 
+        // Make sure the upload is atomic, fatal errors must roll back changes in the files table
+        // to prevent cloud storage data loss. Unreferenced file in filedir is not a major problem.
+        $trans = $DB->start_delegated_transaction();
         $info = repository::overwrite_existing_draftfile($itemid, $filepath, $filename, $newfilepath, $newfilename);
         ajax_check_captured_output();
+        $trans->allow_commit();
         echo json_encode($info);
         break;
 
