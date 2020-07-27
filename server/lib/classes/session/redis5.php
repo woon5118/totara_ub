@@ -23,6 +23,8 @@
 
 namespace core\session;
 
+use core\redis\sentinel;
+
 defined('MOODLE_INTERNAL') || die();
 
 final class redis5 extends handler {
@@ -36,6 +38,12 @@ final class redis5 extends handler {
     //       problems later when the original request reverts the session data, but this should
     //       at least allow the user to save data before restarting the browser.
 
+    /** @var string Redis Sentinel hosts - comma separated list */
+    protected $sentinelhosts = '';
+    /** @var string Redis Sentinel password */
+    protected $sentinelpassword = '';
+    /** @var string name of Redis Sentinel master */
+    protected $sentinelmaster = '';
     /** @var string $host Redis server host */
     protected $host = '127.0.0.1';
     /** @var int $port port */
@@ -75,6 +83,18 @@ final class redis5 extends handler {
         }
 
         // Parse all settings, this should be ideally fully compatible with old redis handler settings.
+
+        if (isset($CFG->session_redis5_sentinel_hosts)) {
+            $this->sentinelhosts = $CFG->session_redis5_sentinel_hosts;
+        }
+
+        if (isset($CFG->session_redis5_sentinel_auth)) {
+            $this->sentinelpassword = $CFG->session_redis5_sentinel_auth;
+        }
+
+        if (isset($CFG->session_redis5_sentinel_master)) {
+            $this->sentinelmaster = $CFG->session_redis5_sentinel_master;
+        }
 
         if (isset($CFG->session_redis5_host) && $CFG->session_redis5_host !== '') {
             // NOTE: linux sockets are not supported
@@ -126,9 +146,24 @@ final class redis5 extends handler {
      * @return bool success
      */
     public function start(bool $uselocking) {
+        if (sentinel::is_supported() && $this->sentinelhosts !== '') {
+            if (trim($this->sentinelmaster) === '') {
+                throw new exception('sessionhandlerproblem', 'error', '', null, 'Missing Redis Sentinel master name');
+            }
+            $master = sentinel::resolve_master($this->sentinelhosts, $this->sentinelpassword, $this->sentinelmaster, $this->auth, true);
+            if (!$master) {
+                throw new exception('sessionhandlerproblem', 'error', '', null, 'Cannot obtain host from Redis Sentinel');
+            }
+            $host = $master['host'];
+            $port = $master['port'];
+        } else {
+            $host = $this->host;
+            $port = $this->port;
+        }
+
         // Unix socket is not supported.
         $prefix = urlencode($this->prefix);
-        $savepath = "tcp://{$this->host}:{$this->port}?timeout={$this->timeout}&prefix={$prefix}&database={$this->database}";
+        $savepath = "tcp://{$host}:{$port}?timeout={$this->timeout}&prefix={$prefix}&database={$this->database}";
         if ($this->auth !== '') {
             $savepath .= '&auth=' . urlencode($this->auth);
         }
@@ -172,21 +207,33 @@ final class redis5 extends handler {
             return $this->connection;
         }
 
-        $this->connection = new \Redis();
-
-        try {
-            if (!$this->connection->connect($this->host, $this->port, $this->timeout, null)) {
+        $redis = null;
+        if (sentinel::is_supported() && $this->sentinelhosts !== '') {
+            if (trim($this->sentinelmaster) === '') {
+                debugging('Unable to connect to host using Redis Sentinel - missing master name.', DEBUG_DEVELOPER);
+                $this->connection = false;
+                return false;
+            }
+            $redis = sentinel::resolve_master($this->sentinelhosts, $this->sentinelpassword, $this->sentinelmaster, $this->auth, false);
+            if (!$redis) {
+                debugging('Unable to connect to host using Redis Sentinel.', DEBUG_DEVELOPER);
+                $this->connection = false;
+                return false;
+            }
+        } else {
+            $redis = new \Redis();
+            if ($this->auth !== '') {
+                $redis->auth($this->auth);
+            }
+            if (!$redis->connect($this->host, $this->port, $this->timeout, null)) {
                 debugging('Unable to connect to Redis host.', DEBUG_DEVELOPER);
                 $this->connection = false;
-                return $this->connection;
+                return false;
             }
-            if ($this->auth !== '') {
-                if (!$this->connection->auth($this->auth)) {
-                    debugging('Unable to authenticate with Redis host.', DEBUG_DEVELOPER);
-                    $this->connection = false;
-                    return $this->connection;
-                }
-            }
+        }
+
+        $this->connection = $redis;
+        try {
             if (!$this->connection->setOption(\Redis::OPT_PREFIX, $this->prefix)) {
                 debugging('Unable to set prefix for Redis sessions.', DEBUG_DEVELOPER);
                 $this->connection = false;

@@ -364,6 +364,9 @@ Session handling
 // $CFG->session_redis5_lock_wait_time = 200000;         // Optional, default is 0.2s (microseconds).
 // $CFG->session_redis5_lock_retries = 100;              // Optional, default is 100 times.
 // $CFG->session_redis5_serializer_use_igbinary = false; // Optional, default is PHP built-in serializer.
+// $CFG->session_redis5_sentinel_hosts = '127.0.0.1,[::1]:26793'; // Optional, list of comma separated Sentinel hosts optionally with port number.
+// $CFG->session_redis5_sentinel_master = 'mymaster';    // Name of Redis master, required if Sentinel hosts specified.
+// $CFG->session_redis5_sentinel_auth = '';              // Optional, Sentinel password.
 //
 // Single master setup is required; RedisArray and RedisCluster environments are not currently supported.
 //

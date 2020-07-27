@@ -24,14 +24,54 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+if (core\redis\sentinel::is_supported()) {
+    $settings->add(
+        new admin_setting_configtext(
+            'cachestore_redis/test_sentinelhosts',
+            get_string('test_sentinelhosts', 'cachestore_redis'),
+            get_string('test_sentinelhosts_desc', 'cachestore_redis'),
+            '',
+            PARAM_RAW,
+            60
+        )
+    );
+    $settings->add(
+        new admin_setting_configtext(
+            'cachestore_redis/test_sentinelmaster',
+            get_string('test_sentinelmaster', 'cachestore_redis'),
+            get_string('test_sentinelmaster_desc', 'cachestore_redis'),
+            '',
+            PARAM_RAW,
+            60
+        )
+    );
+    $settings->add(
+        new admin_setting_configpasswordunmask(
+            'cachestore_redis/test_sentinelpassword',
+            get_string('test_sentinelpassword', 'cachestore_redis'),
+            get_string('test_sentinelpassword_desc', 'cachestore_redis'),
+            ''
+        )
+    );
+}
+
 $settings->add(
     new admin_setting_configtext(
         'cachestore_redis/test_server',
         get_string('test_server', 'cachestore_redis'),
         get_string('test_server_desc', 'cachestore_redis'),
         '',
-        PARAM_TEXT,
+        PARAM_RAW,
         16
+    )
+);
+$settings->add(
+    new admin_setting_configtext(
+        'cachestore_redis/test_database',
+        get_string('test_database', 'cachestore_redis'),
+        get_string('test_database_desc', 'cachestore_redis'),
+        '0',
+        PARAM_INT
     )
 );
 $settings->add(

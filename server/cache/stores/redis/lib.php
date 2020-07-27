@@ -22,6 +22,9 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use core\redis\sentinel;
+use core\redis\util;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -66,6 +69,9 @@ class cachestore_redis extends cache_store implements cache_is_key_aware, cache_
      */
     protected $definition = null;
 
+    /** @var int database number */
+    protected $database = 0;
+
     /**
      * Connection to Redis for this store.
      *
@@ -78,7 +84,7 @@ class cachestore_redis extends cache_store implements cache_is_key_aware, cache_
      *
      * @var int
      */
-    protected $serializer = Redis::SERIALIZER_PHP;
+    protected $serializer;
 
     /**
      * Determines if the requirements for this type of store are met.
@@ -127,66 +133,77 @@ class cachestore_redis extends cache_store implements cache_is_key_aware, cache_
      */
     public function __construct($name, array $configuration = array()) {
         $this->name = $name;
+        $this->isready = false;
 
-        if (!array_key_exists('server', $configuration) || empty($configuration['server'])) {
+        if (!self::are_requirements_met()) {
             return;
         }
+
         if (array_key_exists('serializer', $configuration)) {
             $this->serializer = (int)$configuration['serializer'];
-        }
-        $password = !empty($configuration['password']) ? $configuration['password'] : '';
-        $prefix = !empty($configuration['prefix']) ? $configuration['prefix'] : '';
-        $this->redis = $this->new_redis($configuration['server'], $prefix, $password);
-    }
-
-    /**
-     * Create a new Redis instance and
-     * connect to the server.
-     *
-     * @param string $server The server connection string
-     * @param string $prefix The key prefix
-     * @param string $password The server connection password
-     * @return Redis
-     */
-    protected function new_redis($server, $prefix = '', $password = '') {
-        $redis = new Redis();
-        $port = null;
-        if (strpos($server, ':')) {
-            $serverconf = explode(':', $server);
-            $server = $serverconf[0];
-            $port = $serverconf[1];
-        }
-        if ($redis->connect($server, $port)) {
-            if (!empty($password)) {
-                $redis->auth($password);
-            }
-            $redis->setOption(Redis::OPT_SERIALIZER, $this->serializer);
-            if (!empty($prefix)) {
-                $redis->setOption(Redis::OPT_PREFIX, $prefix);
-            }
-            // Database setting option...
-            $this->isready = $this->ping($redis);
         } else {
-            $this->isready = false;
+            $this->serializer = Redis::SERIALIZER_PHP;
         }
-        return $redis;
-    }
 
-    /**
-     * See if we can ping Redis server
-     *
-     * @param Redis $redis
-     * @return bool
-     */
-    protected function ping(Redis $redis) {
-        try {
-            if ($redis->ping() === false) {
-                return false;
-            }
-        } catch (Exception $e) {
-            return false;
+        if (isset($configuration['database'])) {
+            $this->database = (int)$configuration['database'];
         }
-        return true;
+
+        $sentinelhosts = isset($configuration['sentinelhosts']) ? trim($configuration['sentinelhosts']) : '';
+        $sentinelpassword = isset($configuration['sentinelpassword']) ? $configuration['sentinelpassword'] : '';
+        $sentinelmaster = isset($configuration['sentinelmaster']) ? $configuration['sentinelmaster'] : '';
+
+        if (!sentinel::is_supported()) {
+            $sentinelhosts = '';
+        }
+
+        $server = isset($configuration['server']) ? $configuration['server'] : '';
+        $password = isset($configuration['password']) ? $configuration['password'] : '';
+        $prefix = isset($configuration['prefix']) ? $configuration['prefix'] : '';
+
+        $redis = null;
+        if ($sentinelhosts !== '') {
+            if (trim($sentinelmaster) === '') {
+                return;
+            }
+            $redis = sentinel::resolve_master($sentinelhosts, $sentinelpassword, $sentinelmaster, $password);
+        } else {
+            $hosts = util::parse_redis_hosts($server, true); // Use first host for BC reasons.
+            if ($hosts) {
+                $host = reset($hosts);
+                $redis = new Redis();
+                if ($host['port']) {
+                    $success = $redis->connect($host['host'], $host['port'], 3);
+                } else {
+                    // Must be unix socket.
+                    $success = $redis->connect($host['host']);
+                }
+                if ($success) {
+                    if ($password !== '') {
+                        $success = $redis->auth($password);
+                    }
+                }
+                if (!$success) {
+                    $redis = null;
+                }
+            }
+        }
+
+        if (!$redis) {
+            return;
+        }
+
+        try {
+            $this->redis = $redis;
+            $this->redis->select($this->database);
+            $this->redis->setOption(Redis::OPT_SERIALIZER, $this->serializer);
+            if (!empty($prefix)) {
+                $this->redis->setOption(Redis::OPT_PREFIX, $prefix);
+            }
+            $this->isready = $this->redis->ping();
+        } catch (Throwable $e) {
+            error_log("Error connecting Redis store '{$this->name}'");
+        }
     }
 
     /**
@@ -442,7 +459,11 @@ class cachestore_redis extends cache_store implements cache_is_key_aware, cache_
      */
     public static function config_get_configuration_array($data) {
         return array(
+            'sentinelhosts' => $data->sentinelhosts,
+            'sentinelmaster' => $data->sentinelmaster,
+            'sentinelpassword' => $data->sentinelpassword,
             'server' => $data->server,
+            'database' => $data->database,
             'prefix' => $data->prefix,
             'password' => $data->password,
             'serializer' => $data->serializer
@@ -458,10 +479,14 @@ class cachestore_redis extends cache_store implements cache_is_key_aware, cache_
      */
     public static function config_set_edit_form_data(moodleform $editform, array $config) {
         $data = array();
+        $data['sentinelhosts'] = isset($config['sentinelhosts']) ? $config['sentinelhosts'] : '';
+        $data['sentinelmaster'] = isset($config['sentinelmaster']) ? $config['sentinelmaster'] : '';
+        $data['sentinelpassword'] = isset($config['sentinelpassword']) ? $config['sentinelpassword'] : '';
         $data['server'] = $config['server'];
-        $data['prefix'] = !empty($config['prefix']) ? $config['prefix'] : '';
-        $data['password'] = !empty($config['password']) ? $config['password'] : '';
-        if (!empty($config['serializer'])) {
+        $data['database'] = isset($config['database']) ? $config['database'] : 0;
+        $data['prefix'] = isset($config['prefix']) ? $config['prefix'] : '';
+        $data['password'] = isset($config['password']) ? $config['password'] : '';
+        if (isset($config['serializer'])) {
             $data['serializer'] = $config['serializer'];
         }
         $editform->set_data($data);
@@ -479,17 +504,25 @@ class cachestore_redis extends cache_store implements cache_is_key_aware, cache_
             return false;
         }
         $config = get_config('cachestore_redis');
-        if (empty($config->test_server)) {
+        if (!sentinel::is_supported()) {
+            $config->test_sentinelhosts = '';
+        }
+
+        if (empty($config->test_sentinelhosts) && empty($config->test_server)) {
             return false;
         }
-        $configuration = array('server' => $config->test_server);
-        if (!empty($config->test_serializer)) {
-            $configuration['serializer'] = $config->test_serializer;
+
+        $config = (array)$config;
+        foreach ($config as $k => $v) {
+            unset($config[$k]);
+            if (substr($k, 0, 5) !== 'test_') {
+                continue;
+            }
+            $k = substr($k, 5);
+            $config[$k] = $v;
         }
-        if (!empty($config->test_password)) {
-            $configuration['password'] = $config->test_password;
-        }
-        $cache = new cachestore_redis('Redis test', $configuration);
+
+        $cache = new cachestore_redis('Redis test', $config);
         $cache->initialise($definition);
 
         return $cache;

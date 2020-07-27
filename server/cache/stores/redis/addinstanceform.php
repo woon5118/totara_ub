@@ -22,6 +22,9 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use core\redis\sentinel;
+use core\redis\util;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/cache/forms.php');
@@ -41,17 +44,46 @@ class cachestore_redis_addinstance_form extends cachestore_addinstance_form {
 
         $form = $this->_form;
 
+        if (sentinel::is_supported()) {
+            $form->addElement('text', 'sentinelhosts', get_string('sentinelhosts', 'cachestore_redis'), array('size' => 100));
+            $form->setType('sentinelhosts', PARAM_RAW);
+            $form->addHelpButton('sentinelhosts', 'sentinelhosts', 'cachestore_redis');
+
+            $form->addElement('text', 'sentinelmaster', get_string('sentinelmaster', 'cachestore_redis'));
+            $form->setType('sentinelmaster', PARAM_RAW);
+            $form->addHelpButton('sentinelmaster', 'sentinelmaster', 'cachestore_redis');
+
+            $form->addElement('passwordunmask', 'sentinelpassword', get_string('sentinelpassword', 'cachestore_redis'));
+            $form->setType('sentinelpassword', PARAM_RAW);
+        } else {
+            $form->addElement('hidden', 'sentinelhosts');
+            $form->setType('sentinelhosts', PARAM_RAW);
+
+            $form->addElement('hidden', 'sentinelmaster');
+            $form->setType('sentinelmaster', PARAM_RAW);
+
+            $form->addElement('hidden', 'sentinelpassword');
+            $form->setType('sentinelpassword', PARAM_RAW);
+        }
+
         $form->addElement('text', 'server', get_string('server', 'cachestore_redis'), array('size' => 24));
-        $form->setType('server', PARAM_TEXT);
+        $form->setType('server', PARAM_RAW);
         $form->addHelpButton('server', 'server', 'cachestore_redis');
-        $form->addRule('server', get_string('required'), 'required');
+        if (!sentinel::is_supported()) {
+            $form->addRule('server', get_string('required'), 'required');
+        }
 
         $form->addElement('passwordunmask', 'password', get_string('password', 'cachestore_redis'));
         $form->setType('password', PARAM_RAW);
         $form->addHelpButton('password', 'password', 'cachestore_redis');
 
+        $form->addElement('text', 'database', get_string('database', 'cachestore_redis'));
+        $form->setType('database', PARAM_INT);
+        $form->setDefault('database', 0);
+        $form->addHelpButton('database', 'database', 'cachestore_redis');
+
         $form->addElement('text', 'prefix', get_string('prefix', 'cachestore_redis'), array('size' => 16));
-        $form->setType('prefix', PARAM_TEXT); // We set to text but we have a rule to limit to alphanumext.
+        $form->setType('prefix', PARAM_RAW); // We set to text but we have a rule to limit to alphanumext.
         $form->addHelpButton('prefix', 'prefix', 'cachestore_redis');
         $form->addRule('prefix', get_string('prefixinvalid', 'cachestore_redis'), 'regex', '#^[a-zA-Z0-9\-_]+$#');
 
@@ -62,5 +94,39 @@ class cachestore_redis_addinstance_form extends cachestore_addinstance_form {
         $form->addHelpButton('serializer', 'useserializer', 'cachestore_redis');
         $form->setDefault('serializer', Redis::SERIALIZER_PHP);
         $form->setType('serializer', PARAM_INT);
+    }
+
+    /**
+     * Validates the add instance form data
+     *
+     * @param array $data
+     * @param array $files
+     * @return array
+     */
+    public function validation($data, $files) {
+        $errors = parent::validation($data, $files);
+
+        if ($data['database'] && $data['database'] < 0) {
+            $errors['database'] = get_string('errordatabasenegative', 'cachestore_redis');
+        }
+
+        if (sentinel::is_supported()) {
+            if ($data['sentinelhosts'] !== '') {
+                $sentinels = explode(',', $data['sentinelhosts']);
+                $parsed = util::parse_sentinel_hosts($data['sentinelhosts']);
+                if (count($sentinels) !== count($parsed)) {
+                    $errors['sentinelhosts'] = get_string('error');
+                }
+                if (trim($data['sentinelmaster']) === '') {
+                    $errors['sentinelmaster'] = get_string('required');
+                }
+            }
+        } else {
+            if (trim($data['server']) === '') {
+                $errors['server'] = get_string('required');
+            }
+        }
+
+        return $errors;
     }
 }
