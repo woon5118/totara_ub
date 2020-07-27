@@ -37,6 +37,7 @@ use mod_perform\entities\activity\track;
 use mod_perform\entities\activity\track_user_assignment;
 use mod_perform\hook\participant_instances_created;
 use mod_perform\models\activity\participant_instance as participant_instance_model;
+use mod_perform\models\activity\participant_source;
 use mod_perform\models\activity\subject_instance as subject_instance_model;
 use mod_perform\state\activity\active;
 use mod_perform\state\participant_instance\not_started;
@@ -132,7 +133,8 @@ class participant_instance_creation {
             $repository->or_where(function (builder $builder) use ($participant_instances_datum) {
                 $builder->where('subject_instance_id', $participant_instances_datum['subject_instance_id'])
                     ->where('core_relationship_id', $participant_instances_datum['core_relationship_id'])
-                    ->where('participant_id', $participant_instances_datum['participant_id']);
+                    ->where('participant_id', $participant_instances_datum['participant_id'])
+                    ->where('participant_source', participant_source::INTERNAL);
             });
         }
         return $repository->get()->map_to(participant_instance_model::class);
@@ -156,7 +158,8 @@ class participant_instance_creation {
             if ($this->participant_instance_exists(
                 $subject_instance_id,
                 $participant_relationship['core_relationship_id'],
-                $participant_relationship['participant_id']
+                $participant_relationship['participant_id'],
+                participant_source::INTERNAL
             )) {
                 continue;
             }
@@ -306,17 +309,20 @@ class participant_instance_creation {
      * @param int $subject_instance_id
      * @param int $core_relationship_id
      * @param int $participant_id
+     * @param int $participant_source
      * @return bool
      */
     private function participant_instance_exists(
         int $subject_instance_id,
         int $core_relationship_id,
-        int $participant_id
+        int $participant_id,
+        int $participant_source
     ): bool {
         return participant_instance_entity::repository()
             ->where('subject_instance_id', $subject_instance_id)
             ->where('core_relationship_id', $core_relationship_id)
             ->where('participant_id', $participant_id)
+            ->where('participant_source', $participant_source)
             ->exists();
     }
 
@@ -466,6 +472,7 @@ class participant_instance_creation {
             'participant_data' => [
                 'core_relationship_id' => $core_relationship_id,
                 'subject_instance_id' => $subject_instance->id,
+                'participant_source' => participant_source::INTERNAL,
                 'status' => not_started::get_code(),
                 'created_at' => time(),
             ],

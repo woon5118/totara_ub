@@ -17,13 +17,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
+ * @author Murali Nair <murali.nair@totaralearning.com>
  * @package mod_perform
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace mod_perform\models\activity;
 
-$plugin->version  = 2020080401;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires = 2016120505;       // Requires this Moodle version.
-$plugin->component = 'mod_perform'; // To check on upgrade, that module sits in correct place
-$plugin->dependencies = ['container_perform' => 2020070602];
+/**
+ * Convenience enum to represent the participant source.
+ */
+final class participant_source {
+    public const INTERNAL = 0;
+    public const EXTERNAL = 1;
+
+    /**
+     * Get all allowed values.
+     *
+     * @return string[] the allowed values.
+     */
+    public static function get_allowed(): array {
+        return [
+            self::INTERNAL,
+            self::EXTERNAL
+        ];
+    }
+}

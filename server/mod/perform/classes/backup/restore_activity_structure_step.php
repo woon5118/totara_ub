@@ -28,6 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 
 use restore_path_element;
 use mod_perform\models\activity\activity;
+use mod_perform\models\activity\participant_source;
 use mod_perform\util;
 
 global $CFG;
@@ -42,6 +43,11 @@ class restore_activity_structure_step extends \restore_activity_structure_step {
         $paths[] = new restore_path_element(
             'perform',
             '/activity/perform'
+        );
+
+        $paths[] = new restore_path_element(
+            'external_participant',
+            '/activity/perform/external_participants/external_participant'
         );
 
         $paths[] = new restore_path_element(
@@ -181,6 +187,19 @@ class restore_activity_structure_step extends \restore_activity_structure_step {
 
         $new_item_id = $DB->insert_record('perform_setting', $data);
         $this->set_mapping('perform_setting', $old_id, $new_item_id);
+    }
+
+    protected function process_external_participant($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $old_id = $data->id;
+
+        // Keeping or moving these times makes little sense, but it is the expected Moodle way...
+        $data->created_at = $this->apply_date_offset($data->created_at);
+
+        $new_item_id = $DB->insert_record('perform_participant_external', $data);
+        $this->set_mapping('perform_external_participant', $old_id, $new_item_id);
     }
 
     protected function process_section($data) {
@@ -374,7 +393,10 @@ class restore_activity_structure_step extends \restore_activity_structure_step {
         $data = (object)$data;
         $old_id = $data->id;
 
-        $data->participant_id = $this->get_mappingid('user', $data->participant_id);
+        $data->participant_id = $data->participant_source === participant_source::INTERNAL
+            ? $this->get_mappingid('user', $data->participant_id)
+            : $this->get_mappingid('perform_external_participant', $data->participant_id);
+
         $data->subject_instance_id = $this->get_mappingid('perform_subject_instance', $data->subject_instance_id);
 
         // Keeping or moving these times makes little sense, but it is the expected Moodle way...

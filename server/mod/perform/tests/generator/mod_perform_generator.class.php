@@ -50,6 +50,7 @@ use mod_perform\models\activity\activity_type;
 use mod_perform\models\activity\element;
 use mod_perform\models\activity\notification;
 use mod_perform\models\activity\notification_recipient;
+use mod_perform\models\activity\participant_source;
 use mod_perform\models\activity\section;
 use mod_perform\models\activity\section_element;
 use mod_perform\models\activity\section_relationship as section_relationship_model;
@@ -788,6 +789,7 @@ class mod_perform_generator extends component_generator_base {
                 $subjects_participant_instance = new participant_instance_entity();
                 $subjects_participant_instance->core_relationship_id = 0; // stubbed
                 $subjects_participant_instance->participant_id = $subject->id; // Answering on activity about them self
+                $subjects_participant_instance->participant_source = participant_source::INTERNAL;
                 $subjects_participant_instance->subject_instance_id = $subject_instance->id;
                 $subjects_participant_instance->progress = instance_not_started::get_code();
                 $subjects_participant_instance->save();
@@ -798,6 +800,7 @@ class mod_perform_generator extends component_generator_base {
                 $other_participant_instance = new participant_instance_entity();
                 $other_participant_instance->core_relationship_id = 0; // stubbed
                 $other_participant_instance->participant_id = $other_participant->id;
+                $other_participant_instance->participant_source = participant_source::INTERNAL;
                 $other_participant_instance->subject_instance_id = $subject_instance->id;
                 $other_participant_instance->progress = instance_not_started::get_code();
                 $other_participant_instance->save();
@@ -808,6 +811,7 @@ class mod_perform_generator extends component_generator_base {
                 $third_participant_instance = new participant_instance_entity();
                 $third_participant_instance->core_relationship_id = 0; // stubbed
                 $third_participant_instance->participant_id = $third_participant->id;
+                $third_participant_instance->participant_source = participant_source::INTERNAL;
                 $third_participant_instance->subject_instance_id = $subject_instance->id;
                 $third_participant_instance->progress = instance_not_started::get_code();
                 $third_participant_instance->save();
@@ -1036,6 +1040,7 @@ class mod_perform_generator extends component_generator_base {
     ): participant_instance_entity {
         $participant_instance = new participant_instance_entity();
         $participant_instance->core_relationship_id = $core_relationship_id;
+        $participant_instance->participant_source = participant_source::INTERNAL;
         $participant_instance->participant_id = $participant_user->id;
         $participant_instance->subject_instance_id = $subject_instance_id;
         $participant_instance->progress = not_started::get_code();

@@ -257,5 +257,67 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020080400, 'perform');
     }
 
+    if ($oldversion < 2020080401) {
+        // Define table perform_participant_external to be created.
+        $table = new xmldb_table('perform_participant_external');
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('email', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('token', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('created_at', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+
+        $table->add_index('token', XMLDB_INDEX_UNIQUE, ['token']);
+
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Add new participant_source column to perform_participant_instance.
+        $table = new xmldb_table('perform_participant_instance');
+        $field = new xmldb_field('participant_source', XMLDB_TYPE_INTEGER, '2', null, null, null, 0, 'participant_id');
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Alter user id column in table perform_subject_instance_manual_participant.
+        $table = new xmldb_table('perform_subject_instance_manual_participant');
+
+        $user_key = new xmldb_key('user_id', XMLDB_KEY_FOREIGN, ['user_id'], 'user', ['id'], 'cascade');
+        if ($dbman->key_exists($table, $user_key)) {
+            $dbman->drop_key($table, $key);
+        }
+
+        $user_index = new xmldb_index('user_id', XMLDB_INDEX_NOTUNIQUE, ['user_id']);
+        if ($dbman->index_exists($table, $user_index)) {
+            $dbman->drop_index($table, $user_index);
+        }
+
+        $field = new xmldb_field('user_id', XMLDB_TYPE_INTEGER, '10', null, null, null, 0, 'core_relationship_id');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->change_field_notnull($table, $field);
+        } else {
+            $dbman->add_field($table, $field);
+        }
+
+        $dbman->add_key($table, $user_key);
+
+        // Add new columns to perform_subject_instance_manual_participant.
+        $table = new xmldb_table('perform_subject_instance_manual_participant');
+        $field = new xmldb_field('name', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'user_id');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('email', XMLDB_TYPE_CHAR, '100', null, null, null, null, 'name');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2020080401, 'perform');
+    }
+
     return true;
 }

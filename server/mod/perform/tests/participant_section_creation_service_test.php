@@ -34,6 +34,7 @@ use mod_perform\entities\activity\subject_instance;
 use mod_perform\entities\activity\track_user_assignment;
 use mod_perform\expand_task;
 use mod_perform\models\activity\track;
+use mod_perform\models\activity\participant_source;
 use mod_perform\task\service\subject_instance_creation;
 use mod_perform\task\service\subject_instance_dto;
 use totara_core\relationship\relationship as core_relationship_model;
@@ -212,6 +213,7 @@ class mod_perform_participant_section_creation_service_testcase extends advanced
                 foreach ($participants as $participant) {
                     $participant_instance = new participant_instance();
                     $participant_instance->subject_instance_id = $subject_instance->id;
+                    $participant_instance->participant_source = participant_source::INTERNAL;
                     $participant_instance->participant_id = $participant;
                     $participant_instance->core_relationship_id = $section_relationship->core_relationship_id;
                     $participant_instance->progress = not_started::get_code();

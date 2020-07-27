@@ -67,6 +67,18 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
             ]
         );
 
+        $external_participants = new backup_nested_element('external_participants');
+        $external_participant = new backup_nested_element(
+            'external_participant',
+            ['id'],
+            [
+                'name',
+                'email',
+                'token',
+                'created_at',
+            ]
+        );
+
         $sections = new backup_nested_element('sections');
         $section = new backup_nested_element(
             'section',
@@ -231,6 +243,7 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
             [
                 'core_relationship_id',
                 'participant_id',
+                'participant_source',
                 'subject_instance_id',
                 'progress',
                 'availability',
@@ -297,6 +310,8 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
                 'subject_instance_id',
                 'core_relationship_id',
                 'user_id',
+                'name',
+                'email',
                 'created_at',
                 'created_by'
             ]
@@ -398,6 +413,9 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
         $manual_relationship->annotate_ids('totara_core_relationship', 'selector_relationship_id');
 
         if ($userinfo) {
+            $perform->add_child($external_participants);
+            $external_participants->add_child($external_participant);
+
             $section_element->add_child($element_responses);
             $element_responses->add_child($element_response);
             $track->add_child($track_user_assignments);
@@ -419,6 +437,7 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
             $subject_instance->add_child($subject_instance_manual_participants);
             $subject_instance_manual_participants->add_child($subject_instance_manual_participant);
 
+            $external_participant->set_source_table('perform_participant_external', []);
             $element_response->set_source_table(
                 'perform_element_response',
                 ['section_element_id' => backup::VAR_PARENTID]

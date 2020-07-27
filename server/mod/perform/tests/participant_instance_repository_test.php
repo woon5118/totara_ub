@@ -22,6 +22,7 @@
  */
 
 use mod_perform\entities\activity\participant_instance;
+use mod_perform\models\activity\participant_source;
 use mod_perform\state\participant_instance\not_started;
 
 /**
@@ -76,6 +77,7 @@ class mod_perform_participant_instance_repository_testcase extends advanced_test
 
         $other_participant_instance = new participant_instance();
         $other_participant_instance->core_relationship_id = 0; // stubbed
+        $other_participant_instance->participant_source = participant_source::INTERNAL;
         $other_participant_instance->participant_id = $main_user->id;
         $other_participant_instance->subject_instance_id = $subject_instance->id;
         $other_participant_instance->progress = not_started::get_code();

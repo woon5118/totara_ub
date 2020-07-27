@@ -34,7 +34,9 @@ use totara_core\entities\relationship;
  * @property-read int $id record id
  * @property int $subject_instance_id parent subject instance
  * @property int $core_relationship_id parent core relationship
- * @property int $user_id assigned participant.
+ * @property int $user_id assigned internal participant.
+ * @property string $name assigned external participant name.
+ * @property string $email assigned external participant email.
  * @property int $created_by userid who did assignment
  * @property int $created_at record creation time
  *
