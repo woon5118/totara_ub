@@ -53,6 +53,9 @@ class import_certification_completions_task extends \core\task\adhoc_task {
             import_data_checks($importname, $importtime);
             import_data_adjustments($importname, $importtime);
 
+            // Get the users who uploaded certification completion in the given time to notify them after importing.
+            $userstonotify = get_list_of_certification_import_users($importtime);
+
             try {
                 // Put into evidence any courses / certifications not found.
                 create_evidence($importname, $importtime);
@@ -71,50 +74,44 @@ class import_certification_completions_task extends \core\task\adhoc_task {
                 \totara_program\progress\program_progress_cache::purge_progressinfo_caches();
                 \completion_info::purge_progress_caches();
 
-                // Get user who uploaded this file and notify them
-                $event = new \stdClass();
-                $event->userfrom = \core_user::get_noreply_user();
-                $event->component = 'totara_completionimport';
+                foreach ($userstonotify as $userto) {
+                    $event = new \stdClass();
+                    $event->userfrom = \core_user::get_noreply_user();
+                    $event->component = 'totara_completionimport';
+                    $event->userto = $userto;
 
-                // The userid will be the same for everyrecord in the import
-                $userid = $DB->get_field('totara_compl_import_cert', 'importuserid', ['timecreated' => $importtime], IGNORE_MULTIPLE);
-                $userto = $DB->get_record('user', ['id' => $userid]);
-                $event->userto = $userto;
+                    $a = new \stdClass();
+                    $a->uploadtime = userdate($importtime, get_string('strftimedatetime'));
+                    $reporturl = new \moodle_url('/totara/completionimport/viewreport.php',
+                        ['importname' => $importname, 'timecreated' => $importtime, 'importuserid' => $userto->id, 'clearfilters' => 1]);
+                    $a->reportlink = $OUTPUT->action_link($reporturl, get_string('report_certification', 'totara_completionimport'));
 
-                $a = new \stdClass();
-                $a->uploadtime = userdate($importtime, get_string('strftimedatetime'));
-                $reporturl = new \moodle_url('/totara/completionimport/viewreport.php',
-                    ['importname' => $importname, 'timecreated' => $importtime, 'importuserid' => $userid, 'clearfilters' => 1]);
-                $a->reportlink = $OUTPUT->action_link($reporturl, get_string('report_certification', 'totara_completionimport'));
+                    $event->subject = get_string('importsuccessfulcertsubject', 'totara_completionimport');
+                    $event->fullmessage = get_string('importsuccessfulcertfullmessage', 'totara_completionimport', $a);
 
-                $event->subject = get_string('importsuccessfulcertsubject', 'totara_completionimport');
-                $event->fullmessage = get_string('importsuccessfulcertfullmessage', 'totara_completionimport', $a);
-
-                // Send success alert
-                tm_alert_send($event);
+                    // Send success alert
+                    tm_alert_send($event);
+                }
 
             } catch (\Exception $e) {
                 debugging("Exception encountered in 'import_certification_completions_task' class: " . $e->getMessage(), DEBUG_DEVELOPER, $e->getTrace());
 
-                // Get user who uploaded this file and notify them
-                $event = new \stdClass();
-                $event->userfrom = \core_user::get_noreply_user();
-                $event->component = 'totara_completionimport';
+                foreach ($userstonotify as $userto) {
+                    $event = new \stdClass();
+                    $event->userfrom = \core_user::get_noreply_user();
+                    $event->component = 'totara_completionimport';
+                    $event->userto = $userto;
 
-                // The userid will be the same for everyrecord in the import
-                $userid = $DB->get_field('totara_compl_import_cert', 'importuserid', ['timecreated' => $importtime], IGNORE_MULTIPLE);
-                $userto = $DB->get_record('user', ['id' => $userid]);
-                $event->userto = $userto;
+                    $uploadtime = userdate($importtime, get_string('strftimedatetime'));
 
-                $uploadtime = userdate($importtime, get_string('strftimedatetime'));
+                    $event->subject = get_string('importfailedcertsubject', 'totara_completionimport');
+                    $event->fullmessage = get_string('importfailedcertfullmessage', 'totara_completionimport', $uploadtime);
 
-                $event->subject = get_string('importfailedcertsubject', 'totara_completionimport');
-                $event->fullmessage = get_string('importfailedcertfullmessage', 'totara_completionimport', $uploadtime);
+                    // Send failure alert
+                    tm_alert_send($event);
+                }
 
-                // Send failure alert
-                tm_alert_send($event);
-
-                // Update processed flag flag and add error message
+                // Update processed flag and add error message
                 $params = ['timecreated' => $importtime];
                 $updatesql = "UPDATE {totara_compl_import_cert}
                               SET

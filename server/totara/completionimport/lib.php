@@ -175,13 +175,11 @@ function get_shortnameoridnumber($relatedtable, $importtable, $shortnamefield, $
  * @return array array($sql, $params)
  */
 function get_importsqlwhere($importtime, $alias = 'i.') {
-    global $USER;
-    $sql = "WHERE {$alias}importuserid = :userid
-            AND {$alias}timecreated = :timecreated
+    $sql = "WHERE {$alias}timecreated = :timecreated
             AND {$alias}importerror = 0
             AND {$alias}timeupdated = 0
             AND {$alias}importevidence = 0 ";
-    $params = array('userid' => $USER->id, 'timecreated' => $importtime);
+    $params = array('timecreated' => $importtime);
     return array($sql, $params);
 }
 
@@ -200,6 +198,28 @@ function get_default_config($pluginname, $configname, $default) {
         set_config($configname, $configvalue, $pluginname);
     }
     return $configvalue;
+}
+
+/**
+ * Gets the list of users who imported a certification completion for the given time.
+ *
+ * @global object $DB
+ * @param int $importtime time of the import
+ * @return array
+ */
+function get_list_of_certification_import_users($importtime) {
+    global $DB;
+
+    list($sqlwhere, $sqlparams) = get_importsqlwhere($importtime, '');
+    $sql = "SELECT * 
+            FROM {user}
+            WHERE id IN (
+                SELECT DISTINCT importuserid
+                FROM {totara_compl_import_cert}
+                {$sqlwhere} AND processed = 0
+            )";
+
+    return $DB->get_records_sql($sql, $sqlparams);
 }
 
 /**
