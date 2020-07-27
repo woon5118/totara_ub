@@ -112,3 +112,14 @@ extend type Query {
   """
   totara_core_my_current_learning: [totara_core_learning_item]!
 }
+
+extend type Mutation {
+  totara_core_delete_draft_file(
+    draftid: param_integer!
+    filename: param_text!
+  ): totara_core_delete_draft_file_result!
+}
+
+type totara_core_delete_draft_file_result {
+  success: Boolean!
+}
