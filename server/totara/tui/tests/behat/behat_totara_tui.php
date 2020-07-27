@@ -83,6 +83,10 @@ class behat_totara_tui extends behat_base {
     private const TUI_FORM_LABEL_LOCATOR = '.tui-formLabel';
     private const TUI_FORM_ROW_CLASS = 'tui-formRow';
 
+    private const TAGLIST_LOCATOR = '.tui-tagList';
+    private const TAGLIST_DROPDOWN_BUTTON_LOCATOR = '.tui-tagList > button';
+    private const TAGLIST_DROPDOWN_LIST_LOCATOR = '.tui-dropdown__content';
+
     /**
      * @param string $locator CSS locator
      * @param string $element_name Human understandable name of the element - e.g. 'modal', 'popover', 'picker' etc
@@ -853,6 +857,7 @@ class behat_totara_tui extends behat_base {
                 $button = $toast->find('css', '.tui-notificationBanner__dismiss button', true);
                 if ($button && $button->isVisible()) {
                     $button->click();
+                    $this->wait_for_pending_js();
                 }
             } catch (ElementNotFoundException $e) {
                 // It can happen that the toast already vanished
@@ -1031,7 +1036,97 @@ class behat_totara_tui extends behat_base {
         $toggle_button->click();
     }
 
-    /*
+    /**
+     * @Then /^I should see the following options in the tui taglist in the "([^"]*)" "([^"]*)":$/
+     *
+     * @param string $parent_locator
+     * @param string $parent_selector
+     * @param TableNode $table
+     */
+    public function i_should_see_in_tui_taglist(string $parent_locator, string $parent_selector, TableNode $table): void {
+        behat_hooks::set_step_readonly(false);
+
+        $parent = $this->get_selected_node($parent_selector, $parent_locator);
+        if ($parent === null || !$parent->isVisible()) {
+            $this->fail("Couldn't find the specified element or it wasn't visible");
+        }
+
+        $taglist = $parent->find('css', self::TAGLIST_LOCATOR);
+        if ($taglist === null || !$taglist->isVisible()) {
+            $this->fail("Couldn't find the taglist or it wasn't visible");
+        }
+        $dropdown = $parent->find('css', self::TAGLIST_DROPDOWN_LIST_LOCATOR);
+
+        // Open the dropdown
+        $parent->find('css', self::TAGLIST_DROPDOWN_BUTTON_LOCATOR)->click();
+        $this->wait_for_pending_js();
+
+        $expected_options = array_keys($table->getRowsHash());
+        $actual_options = array_map(static function (NodeElement $element) {
+            return $element->getText();
+        }, $dropdown->findAll('css', 'a'));
+
+        if ($expected_options !== $actual_options) {
+            $this->fail('Expected and actual taglist options did not match');
+        }
+
+        // Close the dropdown
+        $parent->find('css', self::TAGLIST_DROPDOWN_BUTTON_LOCATOR)->click();
+        $this->wait_for_pending_js();
+    }
+
+    /**
+     * @When /^I select from the tui taglist in the "([^"]*)" "([^"]*)":$/
+     *
+     * @param string $parent_locator
+     * @param string $parent_selector
+     * @param TableNode $table
+     */
+    public function i_select_from_tui_taglist(string $parent_locator, string $parent_selector, TableNode $table): void {
+        behat_hooks::set_step_readonly(false);
+
+        $parent = $this->get_selected_node($parent_selector, $parent_locator);
+        if ($parent === null || !$parent->isVisible()) {
+            $this->fail("Couldn't find the specified element or it wasn't visible");
+        }
+
+        $taglist = $parent->find('css', self::TAGLIST_LOCATOR);
+        if ($taglist === null || !$taglist->isVisible()) {
+            $this->fail("Couldn't find the taglist or it wasn't visible");
+        }
+        $dropdown = $parent->find('css', self::TAGLIST_DROPDOWN_LIST_LOCATOR);
+
+        // Open the dropdown
+        $parent->find('css', self::TAGLIST_DROPDOWN_BUTTON_LOCATOR)->click();
+        $this->wait_for_pending_js();
+
+        $specified_options = array_keys($table->getRowsHash());
+
+        foreach ($specified_options as $specified_option) {
+            $clicked = false;
+            foreach ($dropdown->findAll('css', 'a') as $dropdown_option) {
+                $dropdown_option_text = $dropdown_option->getText();
+                if (strpos($dropdown_option_text, $specified_option) !== false) {
+                    $dropdown_option->click();
+                    $clicked = true;
+                    $this->wait_for_pending_js();
+                    break;
+                }
+            }
+
+            if (!$clicked) {
+                $this->fail("Specified taglist option {$specified_option} isn't available.");
+            }
+        }
+
+        // Close the dropdown if it is still open
+        if ($parent->find('css', '.tui-dropdown--open') !== null) {
+            $parent->find('css', self::TAGLIST_DROPDOWN_BUTTON_LOCATOR)->click();
+            $this->wait_for_pending_js();
+        }
+    }
+
+    /**
      * @param string $table_selector_type
      * @param string $table_locator
      * @return NodeElement
