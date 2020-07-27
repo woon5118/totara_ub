@@ -248,5 +248,14 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020080300, 'perform');
     }
 
+    if ($oldversion < 2020080400) {
+        require_once($CFG->dirroot . '/totara/core/db/upgradelib.php');
+
+        totara_core_upgrade_create_relationship(['mod_perform\relationship\resolvers\external'], 'perform_external', 7, 1, 'mod_perform');
+
+        // Core savepoint reached.
+        upgrade_mod_savepoint(true, 2020080400, 'perform');
+    }
+
     return true;
 }

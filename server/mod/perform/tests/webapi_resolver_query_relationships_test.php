@@ -59,7 +59,7 @@ class mod_perform_webapi_resolver_query_relationships_testcase extends advanced_
         /** @var relationship[]|collection $results */
         $results = $this->resolve_graphql_query(self::QUERY, ['activity_id' => $this->activity->id]);
         $results = $results->all();
-        $this->assertCount(6, $results);
+        $this->assertCount(7, $results);
 
         // make sure the order of relationships is correct
         $this->assertEquals(get_string('relationship_subject', 'totara_core'), $results[0]->get_name());
@@ -68,6 +68,7 @@ class mod_perform_webapi_resolver_query_relationships_testcase extends advanced_
         $this->assertEquals(get_string('relationship_peer', 'mod_perform'), $results[3]->get_name());
         $this->assertEquals(get_string('relationship_mentor', 'mod_perform'), $results[4]->get_name());
         $this->assertEquals(get_string('relationship_reviewer', 'mod_perform'), $results[5]->get_name());
+        $this->assertEquals(get_string('relationship_external', 'mod_perform'), $results[6]->get_name());
     }
 
     public function test_require_manage_performance_activities_capability(): void {
