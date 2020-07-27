@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Handles rules for certification status.
  */
-class cohort_rule_sqlhandler_certification_status extends cohort_rule_sqlhandler {
+final class cohort_rule_sqlhandler_certification_status extends cohort_rule_sqlhandler {
 
     // Statuses.
     const CERTIFIED         = 10;
@@ -54,6 +54,11 @@ class cohort_rule_sqlhandler_certification_status extends cohort_rule_sqlhandler
      * @var int Count of certifications included.
      */
     public $certcount = 0;
+
+    /**
+     * @var array A list of certification IDs.
+     */
+    private $certids;
 
     /**
      * Get array or certification statuses
@@ -113,11 +118,17 @@ class cohort_rule_sqlhandler_certification_status extends cohort_rule_sqlhandler
      * @throws coding_exception
      */
     public function get_sql_snippet() {
+        global $DB;
+
         // Do some checks.
         if (empty($this->listofids) || empty($this->status) || empty($this->assignmentstatus)) {
             // We should never get here.
             throw new \coding_exception('Dynamic audience certification rule has missing parameters');
         }
+
+        // Transform programs IDs into certification IDs to avoid extra joins later.
+        list($sqlin, $params) = $DB->get_in_or_equal($this->listofids, SQL_PARAMS_NAMED, 'ns_'.$this->ruleid);
+        $this->certids = $DB->get_records_select_menu('prog', "id {$sqlin}", $params, '', 'id, certifid');
 
         // Statuses array.
         $statuses = explode(',', $this->status);
@@ -236,46 +247,29 @@ class cohort_rule_sqlhandler_certification_status extends cohort_rule_sqlhandler
     /**
      * Get the certified sql snippet
      *
-     * @param bool $iscertified Used to get certified or not certified users
-     * @param string $paramprefix The param prefix
      * @return array
      */
-    public function get_sql_snippet_certified($iscertified = true, $paramprefix = 'cs') {
-        global $DB;
-
-        if ($iscertified) {
-            $sqlstart = "EXISTS (SELECT 1";
-        } else {
-            $sqlstart = "NOT EXISTS (SELECT 1";
-        }
-
+    private function get_sql_snippet_certified() {
         $timenow = time();
-
         $sqlchunks = [];
-        $params = [];
-        foreach ($this->listofids as $certifid) {
-            $sqlprefix = $DB->get_unique_param($paramprefix);
-
-            $sqlchunks[] = "$sqlstart
-                FROM {prog} p
-                LEFT JOIN {certif_completion} cc ON cc.certifid = p.certifid
-                LEFT JOIN {certif_completion_history} cch ON cch.certifid = p.certifid
-                    WHERE p.id = :{$sqlprefix}certifid
-                        AND (
-                            (cc.userid = u.id AND cc.timecompleted != 0 AND cc.timeexpires > :{$sqlprefix}timeexpires)
-                            OR
-                            (cch.userid = u.id AND cch.timecompleted != 0 AND cch.timeexpires > :{$sqlprefix}timeexpireshist)
-                            )
-                )";
-
-            $params[$sqlprefix . 'certifid'] = $certifid;
-            $params[$sqlprefix . 'timeexpires'] = $timenow;
-            $params[$sqlprefix . 'timeexpireshist'] = $timenow;
+        foreach ($this->certids as $certifid) {
+            $certifid = intval($certifid);
+            $sqlchunks[] = "(
+            EXISTS (SELECT 1
+                      FROM {certif_completion} cc
+                     WHERE cc.certifid = {$certifid} AND cc.userid = u.id
+                           AND cc.timecompleted != 0 AND cc.timeexpires > {$timenow}
+            ) OR
+            EXISTS (SELECT 1
+                      FROM {certif_completion_history} cch
+                     WHERE cch.certifid = {$certifid} AND cch.userid = u.id
+                           AND cch.timecompleted != 0 AND cch.timeexpires > {$timenow}
+            ))";
         }
 
         $sql = implode(' AND ', $sqlchunks);
 
-        return [$sql, $params];
+        return [$sql, []];
     }
 
     /**
@@ -283,49 +277,33 @@ class cohort_rule_sqlhandler_certification_status extends cohort_rule_sqlhandler
      *
      * @return array
      */
-    public function get_sql_snippet_expired() {
-        global $DB;
-
-        $sqlstart = "EXISTS (SELECT 1";
+    private function get_sql_snippet_expired() {
         $timenow = time();
-
         $sqlchunks = [];
-        $params = [];
-        foreach ($this->listofids as $certifid) {
-            $sqlprefix = $DB->get_unique_param('ex');
+        foreach ($this->certids as $certifid) {
+            $certifid = intval($certifid);
 
-            $sqlchunks[] = "$sqlstart
-                FROM {prog} p
-                LEFT JOIN {certif_completion} cc ON cc.certifid = p.certifid
-                LEFT JOIN {certif_completion_history} cch ON cch.certifid = p.certifid
-                    WHERE p.id = :{$sqlprefix}certifid
-                        AND (
-                            (
-                                cc.userid = u.id
-                                AND (cc.status = " . CERTIFSTATUS_EXPIRED . "
-                                OR (cc.status = " . CERTIFSTATUS_INPROGRESS . " AND cc.renewalstatus = " . CERTIFRENEWALSTATUS_EXPIRED . "))
-                            )
-                            OR
-                            (
-                                cch.userid = u.id
-                                AND cch.timecompleted != 0
-                                AND cch.timeexpires < :{$sqlprefix}timeexpireshist
-                            )
-                        )
-                )";
-
-            $params[$sqlprefix . 'certifid'] = $certifid;
-            $params[$sqlprefix . 'timeexpireshist'] = $timenow;
+            $sqlchunks[] = "(
+            EXISTS (SELECT 1
+                      FROM {certif_completion} cc
+                     WHERE cc.certifid = {$certifid} AND cc.userid = u.id
+                           AND (
+                                (cc.status = " . CERTIFSTATUS_COMPLETED . " AND cc.timeexpires < {$timenow})
+                                OR cc.status = " . CERTIFSTATUS_EXPIRED . "
+                                OR (cc.status = " . CERTIFSTATUS_INPROGRESS . " AND cc.renewalstatus = " . CERTIFRENEWALSTATUS_EXPIRED . ")
+                           )
+            ) OR 
+            EXISTS (SELECT 1
+                      FROM {certif_completion_history} cch
+                 LEFT JOIN {certif_completion} cc ON cc.certifid = cch.certifid AND cc.userid = cch.userid AND cc.timecompleted != 0 AND cc.timeexpires > {$timenow}
+                     WHERE cch.certifid = {$certifid} AND cch.userid = u.id AND cc.id IS NULL
+                           AND cch.timecompleted != 0 AND cch.timeexpires < {$timenow}
+            ))";
         }
 
-        $expired_sql = implode(' AND ', $sqlchunks);
+        $sql = implode(' AND ', $sqlchunks);
 
-        // Include in the sql users that are NOT currently certified.
-        list($notcertified_sql, $params2) = $this->get_sql_snippet_certified(false, 'ex2');
-        $sql = $expired_sql . " AND " . $notcertified_sql;
-        $params = array_merge($params, $params2);
-
-        return [$sql, $params];
+        return [$sql, []];
     }
 
     /**
@@ -333,24 +311,23 @@ class cohort_rule_sqlhandler_certification_status extends cohort_rule_sqlhandler
      *
      * @return array
      */
-    public function get_sql_snippet_never_certified() {
+    private function get_sql_snippet_never_certified() {
         global $DB;
 
-        list($sqlin, $params) = $DB->get_in_or_equal($this->listofids, SQL_PARAMS_NAMED, 'ns_'.$this->ruleid);
+        list($sqlin1, $params1) = $DB->get_in_or_equal($this->certids, SQL_PARAMS_NAMED, 'nsc_certifid');
+        list($sqlin2, $params2) = $DB->get_in_or_equal($this->certids, SQL_PARAMS_NAMED, 'nsh_certifid');
 
-        $sql = "NOT EXISTS (SELECT 1
-                              FROM {prog} p
-                         LEFT JOIN {certif_completion} cc ON cc.certifid = p.certifid
-                         LEFT JOIN {certif_completion_history} cch ON cch.certifid = p.certifid
-                             WHERE p.id {$sqlin}
-                               AND (
-                                    (cc.userid = u.id AND cc.timecompleted != 0)
-                                    OR
-                                    (cch.userid = u.id AND cch.timecompleted != 0)
-                                   )
-                         )";
+        $sql = "
+        NOT EXISTS (SELECT 1
+                      FROM {certif_completion} cc
+                     WHERE cc.certifid {$sqlin1} AND cc.userid = u.id AND cc.timecompleted != 0
+        ) AND
+        NOT EXISTS (SELECT 1
+                      FROM {certif_completion_history} cch
+                     WHERE cch.certifid {$sqlin2} AND cch.userid = u.id AND cch.timecompleted != 0
+        )";
 
-        return [$sql, $params];
+        return [$sql, array_merge($params1, $params2)];
     }
 
     /**
@@ -358,7 +335,7 @@ class cohort_rule_sqlhandler_certification_status extends cohort_rule_sqlhandler
      *
      * @return array
      */
-    public function get_sql_snippet_assigned() {
+    private function get_sql_snippet_assigned() {
         global $DB;
 
         $sqlchunks = [];
@@ -383,7 +360,7 @@ class cohort_rule_sqlhandler_certification_status extends cohort_rule_sqlhandler
      *
      * @return array
      */
-    public function get_sql_snippet_unassigned() {
+    private function get_sql_snippet_unassigned() {
         global $DB;
 
         list($sqlin, $params) = $DB->get_in_or_equal($this->listofids, SQL_PARAMS_NAMED, 'na_'.$this->ruleid);
