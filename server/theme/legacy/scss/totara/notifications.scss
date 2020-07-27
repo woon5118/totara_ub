@@ -23,10 +23,73 @@
 
 // Reset close styles so we can use our theme-specific
 // alert-close class and keep specificity flat.
-.alert-dismissable .close {
-  top: auto;
-  right: auto;
-  margin-bottom: 0;
-  opacity: 1;
-  text-shadow: none;
+:root {
+  --legacy-alert-internal-border-radius: calc(#{$alert-border-radius} - var(--legacy-border-width-thin));
+}
+
+.alert {
+  border-width: var(--legacy-border-width-thin)
+            var(--legacy-border-width-thin)
+            var(--legacy-border-width-thin)
+            20px;
+  display: flex;
+
+  > * {
+    vertical-align: middle;
+    display: inline;
+  }
+
+  // Extends the Bootstrap 3 alert component.
+  &.alert-with-icon {
+    padding: 0;
+    border-width: var(--legacy-border-width-thin);
+  }
+
+  .alert-message {
+    flex-grow: 1;
+    padding: $alert-padding ($alert-padding * 0.6);
+  }
+
+  .alert-close {
+    top: auto;
+    right: auto;
+    opacity: 1;
+    text-shadow: none;
+    flex-grow: 0;
+    flex-shrink: 0;
+    background-color: var(--legacy-color-neutral-1);
+    box-shadow: none;
+    padding: $padding-small-vertical $padding-small-vertical
+      floor(($padding-small-vertical * 1.5))
+      ceil(($padding-small-vertical * 1.5));
+    border-radius: 0 var(--legacy-alert-internal-border-radius) var(--legacy-alert-internal-border-radius) 0;
+
+    .flex-icon {
+      // Unfortunately there is no variable for the fixed
+      // width size of font totara fixed width icons. It
+      // is 1.3em and this needs to be square.
+      color: var(--legacy-color-neutral-6);
+    }
+  }
+}
+
+.alert-icon {
+  flex-grow: 0;
+  flex-shrink: 0;
+  padding: $alert-padding ($alert-padding * 0.6);
+  color: var(--legacy-color-neutral-1);
+  border-radius: var(--legacy-alert-internal-border-radius) 0 0 var(--legacy-alert-internal-border-radius);
+
+  .alert-info & {
+    background: $brand-info;
+  }
+  .alert-success & {
+    background: $brand-success;
+  }
+  .alert-warning & {
+    background: $brand-warning;
+  }
+  .alert-danger & {
+    background: $brand-danger;
+  }
 }

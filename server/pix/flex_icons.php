@@ -717,6 +717,34 @@ $icons = array(
                         ),
                 ),
         ),
+    'core|notification-error' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-times-circle',
+                ),
+        ),
+    'core|notification-info' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-info-circle',
+                ),
+        ),
+    'core|notification-success' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-check-circle',
+                ),
+        ),
+    'core|notification-warning' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-warning',
+                ),
+        ),
     'course' =>
         array(
             'data' =>

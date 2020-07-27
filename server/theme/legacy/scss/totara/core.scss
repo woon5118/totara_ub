@@ -1893,17 +1893,6 @@ h6 [data-flex-icon='help'] {
   }
 }
 
-.alert {
-  > *,
-  > ul,
-  > ol,
-  > p {
-    &:not(:last-child) {
-      margin-bottom: $padding-large-vertical;
-    }
-  }
-}
-
 .link-as-button {
   @extend .btn;
   @include bs-btn-default();
