@@ -23,7 +23,7 @@
         <span>
           {{ $str('appears_in', 'engage_article') }}
         </span>
-        <Spinner v-if="loading" />
+        <Loading v-if="loading" />
       </p>
 
       <ResourcePlaylistBox
@@ -39,13 +39,13 @@
 
 <script>
 import ResourcePlaylistBox from 'totara_playlist/components/box/ResourcePlaylistBox';
-import Spinner from 'tui/components/icons/common/Spinner';
+import Loading from 'tui/components/icons/common/Loading';
 import { UrlSourceType } from 'totara_engage/index';
 
 export default {
   components: {
     ResourcePlaylistBox,
-    Spinner,
+    Loading,
   },
 
   props: {

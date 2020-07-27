@@ -17,7 +17,7 @@
 -->
 <template>
   <div class="tui-likeRecordsList">
-    <Spinner v-if="$apollo.loading" size="200" />
+    <Loading v-if="$apollo.loading" size="200" />
     <template v-else>
       <p v-if="0 === like.count">
         {{ $str('nolikes', 'totara_reaction') }}
@@ -37,14 +37,14 @@
 </template>
 
 <script>
-import Spinner from 'tui/components/icons/common/Spinner';
+import Loading from 'tui/components/icons/common/Loading';
 
 // GraphQL queries
 import getLikes from 'totara_reaction/graphql/get_likes';
 
 export default {
   components: {
-    Spinner,
+    Loading,
   },
 
   props: {

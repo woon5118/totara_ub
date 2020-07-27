@@ -36,7 +36,7 @@
         @click.prevent="loadReplies"
       >
         <span>{{ $str('viewreplies', 'totara_comment') }}</span>
-        <Spinner v-if="$apollo.queries.replies.loading" />
+        <Loading v-if="$apollo.queries.replies.loading" />
       </a>
     </div>
 
@@ -104,7 +104,7 @@
 <script>
 import ReplyForm from 'totara_comment/components/form/ReplyForm';
 import { isValid, SIZE_SMALL, SIZE_LARGE } from 'totara_comment/size';
-import Spinner from 'tui/components/icons/common/Spinner';
+import Loading from 'tui/components/icons/common/Loading';
 import Reply from 'totara_comment/components/reply/Reply';
 import apolloClient from 'tui/apollo_client';
 
@@ -115,7 +115,7 @@ import createReply from 'totara_comment/graphql/create_reply';
 export default {
   components: {
     ReplyForm,
-    Spinner,
+    Loading,
     Reply,
   },
 

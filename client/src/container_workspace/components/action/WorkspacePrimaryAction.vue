@@ -65,7 +65,7 @@
       @add-members="handleAddMembers"
     />
 
-    <Spinner v-if="$apollo.loading" />
+    <Loading v-if="$apollo.loading" />
 
     <template v-else>
       <!-- Owner section -->
@@ -171,7 +171,7 @@ import Button from 'tui/components/buttons/Button';
 import ModalPresenter from 'tui/components/modal/ModalPresenter';
 import WorkspaceWarningModal from 'container_workspace/components/modal/WorkspaceWarningModal';
 import LoadingButton from 'totara_engage/components/buttons/LoadingButton';
-import Spinner from 'tui/components/icons/common/Spinner';
+import Loading from 'tui/components/icons/common/Loading';
 import { notify } from 'tui/notifications';
 import Dropdown from 'tui/components/dropdown/Dropdown';
 import DropdownItem from 'tui/components/dropdown/DropdownItem';
@@ -193,7 +193,7 @@ export default {
     ModalPresenter,
     WorkspaceWarningModal,
     LoadingButton,
-    Spinner,
+    Loading,
     DropdownItem,
     Dropdown,
     WorkspaceEditModal,

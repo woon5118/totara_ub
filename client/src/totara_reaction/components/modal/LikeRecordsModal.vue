@@ -23,7 +23,7 @@
           <span>
             {{ $str('likesx', 'totara_reaction', like.count) }}
           </span>
-          <Spinner v-if="$apollo.loading" />
+          <Loading v-if="$apollo.loading" />
         </h2>
       </template>
 
@@ -50,7 +50,7 @@
 import Modal from 'tui/components/modal/Modal';
 import ModalContent from 'tui/components/modal/ModalContent';
 import Avatar from 'tui/components/avatar/Avatar';
-import Spinner from 'tui/components/icons/common/Spinner';
+import Loading from 'tui/components/icons/common/Loading';
 
 // GraphQL
 import getLikes from 'totara_reaction/graphql/get_likes';
@@ -60,7 +60,7 @@ export default {
     Modal,
     ModalContent,
     Avatar,
-    Spinner,
+    Loading,
   },
 
   props: {

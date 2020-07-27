@@ -18,7 +18,7 @@ exports[`Loader Checks snapshot 1`] = `
       <div
         class="tui-loader__display"
       >
-        <spinner-stub
+        <loading-stub
           aria-hidden="true"
         />
         

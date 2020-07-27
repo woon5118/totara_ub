@@ -35,7 +35,7 @@
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 import LikeIcon from 'tui/components/icons/common/Like';
 import LikedIcon from 'tui/components/icons/common/LikeActive';
-import Loading from 'tui/components/icons/common/Spinner';
+import Loading from 'tui/components/icons/common/Loading';
 
 export default {
   components: {

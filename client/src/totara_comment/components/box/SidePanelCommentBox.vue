@@ -19,7 +19,7 @@
   <div class="tui-sidePanelCommentBox">
     <h4 class="tui-sidePanelCommentBox__header">
       <span>{{ $str('comments', 'totara_comment', totalComments) }}</span>
-      <Spinner v-if="submitting" />
+      <Loading v-if="submitting" />
     </h4>
 
     <CommentBox
@@ -38,12 +38,12 @@
 <script>
 import CommentBox from 'totara_comment/components/box/CommentBox';
 import { SIZE_SMALL } from 'totara_comment/size';
-import Spinner from 'tui/components/icons/common/Spinner';
+import Loading from 'tui/components/icons/common/Loading';
 
 export default {
   components: {
     CommentBox,
-    Spinner,
+    Loading,
   },
 
   props: {

@@ -83,7 +83,7 @@
               }}
             </span>
 
-            <Spinner v-if="submitting" size="300" />
+            <Loading v-if="submitting" size="300" />
           </h3>
 
           <CommentBox
@@ -116,7 +116,7 @@ import DiscussionCard from 'container_workspace/components/card/DiscussionCard';
 import BackArrow from 'tui/components/icons/common/BackArrow';
 import CommentBox from 'totara_comment/components/box/CommentBox';
 import apolloClient from 'tui/apollo_client';
-import Spinner from 'tui/components/icons/common/Spinner';
+import Loading from 'tui/components/icons/common/Loading';
 import { SIZE_LARGE } from 'totara_comment/size';
 import SidePanel from 'tui/components/sidepanel/SidePanel';
 import WorkspaceContentLayout from 'container_workspace/components/content/WorkspaceContentLayout';
@@ -131,7 +131,7 @@ export default {
     DiscussionCard,
     BackArrow,
     CommentBox,
-    Spinner,
+    Loading,
     SidePanel,
     WorkspaceContentLayout,
   },

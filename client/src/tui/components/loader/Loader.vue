@@ -26,7 +26,7 @@
     <div v-if="loading" class="tui-loader__overlay" role="alert">
       <div class="tui-loader__overlay-positioner">
         <div class="tui-loader__display">
-          <Spinner aria-hidden="true" />
+          <Loading aria-hidden="true" />
           {{ $str('loading', 'moodle') }}
         </div>
       </div>
@@ -35,11 +35,11 @@
 </template>
 
 <script>
-import Spinner from 'tui/components/icons/common/Spinner';
+import Loading from 'tui/components/icons/common/Loading';
 
 export default {
   components: {
-    Spinner,
+    Loading,
   },
 
   props: {

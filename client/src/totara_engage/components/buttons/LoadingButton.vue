@@ -26,7 +26,7 @@
     :type="type"
     @click="$emit('click', $event)"
   >
-    <Spinner />
+    <Loading />
   </ButtonIcon>
 
   <Button
@@ -42,13 +42,13 @@
 
 <script>
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
-import Spinner from 'tui/components/icons/common/Spinner';
+import Loading from 'tui/components/icons/common/Loading';
 import Button from 'tui/components/buttons/Button';
 
 export default {
   components: {
     ButtonIcon,
-    Spinner,
+    Loading,
     Button,
   },
 

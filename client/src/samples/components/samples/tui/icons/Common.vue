@@ -89,7 +89,7 @@ import Hide from 'tui/components/icons/common/Hide';
 import List from 'tui/components/icons/common/List';
 import Grid from 'tui/components/icons/common/Grid';
 import Info from 'tui/components/icons/common/Info';
-import Spinner from 'tui/components/icons/common/Spinner';
+import Loading from 'tui/components/icons/common/Loading';
 import Preview from 'tui/components/icons/common/Preview';
 import Warning from 'tui/components/icons/common/Warning';
 import Bookmark from 'tui/components/icons/common/Bookmark';
@@ -238,8 +238,8 @@ export default {
           desc: '...',
         },
         {
-          icon: Spinner,
-          name: 'Spinner',
+          icon: Loading,
+          name: 'Loading',
           desc: '...',
         },
         {

@@ -20,7 +20,7 @@
     <div class="tui-recommendedSpaces__head">
       <h2 class="tui-recommendedSpaces__head__title">
         <span>{{ $str('recommended_spaces', 'container_workspace') }}</span>
-        <Spinner v-if="$apollo.loading" />
+        <Loading v-if="$apollo.loading" />
       </h2>
 
       <a
@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import Spinner from 'tui/components/icons/common/Spinner';
+import Loading from 'tui/components/icons/common/Loading';
 import SpaceCardsGrid from 'container_workspace/components/grid/SpaceCardsGrid';
 
 // GraphQL Queries
@@ -50,7 +50,7 @@ import recommendedSpaces from 'ml_recommender/graphql/get_recommended_user_works
 
 export default {
   components: {
-    Spinner,
+    Loading,
     SpaceCardsGrid,
   },
 

@@ -22,7 +22,7 @@
       'tui-spaceImagePicker--loading': $apollo.loading,
     }"
   >
-    <Spinner v-if="$apollo.loading" />
+    <Loading v-if="$apollo.loading" />
 
     <Upload
       v-else
@@ -66,7 +66,7 @@
 <script>
 import Upload from 'tui/components/form/Upload';
 import Button from 'tui/components/buttons/Button';
-import Spinner from 'tui/components/icons/common/Spinner';
+import Loading from 'tui/components/icons/common/Loading';
 import PageLoader from 'tui/components/loader/Loader';
 
 // GraphQL queries
@@ -77,7 +77,7 @@ export default {
   components: {
     Upload,
     Button,
-    Spinner,
+    Loading,
     PageLoader,
   },
 

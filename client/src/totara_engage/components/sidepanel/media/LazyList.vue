@@ -34,7 +34,7 @@
   </div>
 </template>
 <script>
-import Loading from 'tui/components/icons/common/Spinner';
+import Loading from 'tui/components/icons/common/Loading';
 
 export default {
   components: {
