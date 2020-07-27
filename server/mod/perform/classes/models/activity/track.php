@@ -196,7 +196,13 @@ class track extends model {
      * @return collection|track_assignment[]
      */
     public function get_assignments(): collection {
-        return $this->entity->assignments->map_to(track_assignment::class);
+        // Currently, this query cannot easily be sorted by name of the user group type
+        // so sorting this by ids for now to get predictable results at least
+        return $this->entity->assignments()
+            ->order_by('user_group_type')
+            ->order_by('user_group_id')
+            ->get()
+            ->map_to(track_assignment::class);
     }
 
     /**

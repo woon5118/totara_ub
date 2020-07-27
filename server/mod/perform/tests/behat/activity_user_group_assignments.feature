@@ -16,9 +16,9 @@ Feature: Assign user groups to perform activities
       | My Test Activity | My Test Activity | feedback      | true         |
     And the following "cohorts" exist:
       | name        | idnumber    | description            | contextlevel | reference | cohorttype |
-      | Seal Team 6 | Seal Team 6 | US Seal Team 6         | System       | 0         | 1          |
-      | Delta Force | Delta Force | US Delta Force         | System       | 0         | 1          |
       | 22 SAS      | 22 SAS      | UK Special Air Service | System       | 0         | 1          |
+      | Delta Force | Delta Force | US Delta Force         | System       | 0         | 1          |
+      | Seal Team 6 | Seal Team 6 | US Seal Team 6         | System       | 0         | 1          |
     And the following "cohort members" exist:
       | user     | cohort      |
       | learner1 | Seal Team 6 |
@@ -67,7 +67,6 @@ Feature: Assign user groups to perform activities
       | Delta Force  | Delta Force |
 
     When I save my selections and close the adder
-    And I wait until the page is ready
     Then I should see the tui datatable contains:
       | Name        | Group type |
       | 22 SAS      | Audience   |
