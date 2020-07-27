@@ -401,6 +401,7 @@ export default {
   apollo: {
     trackSettings: {
       query: TrackSettingsQuery,
+      fetchPolicy: 'network-only', // Always refetch data on tab change
       variables() {
         return {
           activity_id: this.activityId,
