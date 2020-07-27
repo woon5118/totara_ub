@@ -32,8 +32,14 @@ make a full copy of local filedir when testing upgrades or staging production se
 Some operating system filesystems allow tracking of file last access times.
 If there is a full backup in the cloud, then administrator may create a script
 that deletes large files that were not accessed recently. In case the missing files
-are accessed the contents are automatically downloaded from the cloud store.  
+are accessed the contents are automatically downloaded from the cloud store.
 
+## Installation steps
+
+1. Install PHP libraries for cloud providers
+2. Add settings to config.php
+3. Upgrade or install site if necessary
+4. Push existing content files to cloud storage using ```totara/cloudfiledir/cli/store.php --push``` 
 
 ## Installation of PHP libraries
 
