@@ -226,7 +226,10 @@
 <script>
 // Util
 import { uniqueId } from 'tui/util';
-import { NOTIFICATION_DURATION } from 'mod_perform/constants';
+import {
+  NOTIFICATION_DURATION,
+  RELATIONSHIP_SUBJECT,
+} from 'mod_perform/constants';
 import { notify } from 'tui/notifications';
 // Components
 import Button from 'tui/components/buttons/Button';
@@ -436,10 +439,13 @@ export default {
     },
 
     /**
-     * Is the logged in user the subject of this activity.
+     * Is the participant answering as the subject relationship?
      */
     currentUserIsSubject() {
-      return Number(this.currentUserId) === Number(this.subjectUser.id);
+      return (
+        this.answeringAs != null &&
+        this.answeringAs.core_relationship.idnumber === RELATIONSHIP_SUBJECT
+      );
     },
 
     /**

@@ -16,6 +16,7 @@ query mod_perform_participant_section(
       id
       core_relationship {
         name
+        idnumber
       }
     }
     section_element_responses {

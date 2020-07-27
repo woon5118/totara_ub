@@ -132,8 +132,12 @@ export default {
      * @returns {Object[]}
      */
     userList() {
-      if (this.subjectInstance.subject_user.id == this.currentUserId) {
-        // We always show the subject user in the list if they are logged in.
+      if (
+        this.subjectInstance.subject_user.id == this.currentUserId &&
+        this.users.length < 2
+      ) {
+        // If the subject user is logged in and there aren't multiple users to
+        // pick from, then we include the subject user in the list of users.
         // This is to avoid the potential issue of a subject not being able to
         // select any users because they only have permission to see themselves.
         return this.users;
