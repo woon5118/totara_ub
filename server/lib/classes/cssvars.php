@@ -63,6 +63,7 @@ class cssvars {
         $values = $this->resolve_var_references($values);
         $css = $this->vars_compat($css);
         $css = $this->substitute_provided_values($css, $values);
+        $css = $this->replace_nested_calc($css);
         return $css;
     }
 
@@ -173,5 +174,91 @@ class cssvars {
                 return $match[0];
             }
         }, $css);
+    }
+
+    /**
+     * Replace nested calc() expressions with a single calc expression, as IE 11 does not support nested calc()s.
+     *
+     * @param string $css
+     * @return string
+     * @throws \coding_exception on invalid CSS
+     */
+    private function replace_nested_calc(string $css): string {
+        $index = 0;
+        $end = strlen($css);
+        $out_css = '';
+        $last_out_index = 0;
+
+        // search for and replace calc expressions
+        while ($index <= $end) {
+            // find start of calc expression
+            // calc() cannot contain whitespace between the c and the (
+            $calc_start_index = strpos($css, 'calc(', $index);
+            if ($calc_start_index !== false) {
+                // make sure we're not in a comment
+                $comment_start_index = strpos($css, '/*', $index);
+                $comment_end_index = strpos($css, '*/', $index);
+                if ($comment_end_index !== false && ($comment_start_index === false || $comment_start_index > $comment_end_index)) {
+                    $index = $comment_end_index + 2;
+                    continue;
+                }
+
+                // output CSS before calc
+                $out_css .= substr($css, $last_out_index, $calc_start_index - $last_out_index);
+                $last_out_index = $calc_start_index;
+
+                // find end of property
+                $property_end = strpos($css, ';', $calc_start_index);
+                if ($property_end === false) {
+                    $property_end = strpos($css, '}', $calc_start_index);
+                }
+
+                // count opening and closing parentheses to find the end of the calc expression
+                $calc_end_index = null;
+                $calc_index = $calc_start_index;
+                $level = 0;
+                while ($calc_index <= $property_end) {
+                    if (!preg_match('/\(|\)/', $css, $calc_matches, PREG_OFFSET_CAPTURE, $calc_index) || $calc_matches[0][1] > $property_end) {
+                        throw new \coding_exception(
+                            "Unbalanced parentheses at index $calc_start_index: " .
+                            substr($css, $calc_start_index, 40)
+                        );
+                        break;
+                    }
+                    if ($calc_matches[0][0] === '(') {
+                        $level++;
+                    } else {
+                        $level--;
+                    }
+                    $calc_index = $calc_matches[0][1] + 1;
+                    if ($level === 0) {
+                        // found the final closing paren
+                        $calc_end_index = $calc_index;
+                        break;
+                    }
+                }
+
+                // replace "calc(" with "("
+                if ($calc_end_index !== null) {
+                    $out_css .= "calc" . preg_replace(
+                        '/calc\(/',
+                        '(',
+                        substr($css, $calc_start_index, $calc_end_index - $calc_start_index)
+                    );
+                    $last_out_index = $calc_end_index;
+                    $index = $calc_end_index;
+                } else {
+                    $index = $calc_start_index + strlen('calc(');
+                }
+            } else {
+                // no more "calc(" matches left
+                break;
+            }
+        }
+
+        // output remaining CSS
+        $out_css .= substr($css, $last_out_index);
+
+        return $out_css;
     }
 }

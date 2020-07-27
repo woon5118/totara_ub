@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Simon Chester <simon.chester@totaralearning.com>
- * @package totara_core
+ * @package core
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -55,5 +55,40 @@ class core_cssvars_testcase extends basic_testcase {
         $css = ":root\n{\n--bg:\n#06c\n;\n}";
         $transformed = $cssvars->transform($css);
         $this->assertEquals(":root{--bg:\n#06c;-var--bg:\n#06c;}", $transformed);
+    }
+
+    public function test_nested_calc_replacing() {
+        $cssvars = new \core\cssvars();
+
+        // basic
+        $css = '.foo { width: calc(100px - calc(50px / 2)); }';
+        $transformed = $cssvars->transform($css);
+        $this->assertEquals('.foo { width: calc(100px - (50px / 2)); }', $transformed);
+
+        // content before and after
+        $css = '/* hello */ .foo { width: calc(100px - calc(50px / 2)); } /* goodbye */';
+        $transformed = $cssvars->transform($css);
+        $this->assertEquals('/* hello */ .foo { width: calc(100px - (50px / 2)); } /* goodbye */', $transformed);
+
+        // via vars
+        $css = ':root { --fsz: 16px; --h: calc(var(--fsz) * 1.333); } .el { height: calc(var(--h) + 2px) }';
+        $transformed = $cssvars->transform($css);
+        $this->assertStringContainsString('.el { height: calc((16px * 1.333) + 2px) }', $transformed);
+    }
+
+    public function test_nested_calc_throws_on_unbalanced_parens() {
+        $this->expectException(\coding_exception::class);
+        $this->expectExceptionMessage('Unbalanced parentheses at index 14: calc(100px - calc(50px / 2); a: exp());');
+        $cssvars = new \core\cssvars();
+        $css = '.foo { width: calc(100px - calc(50px / 2); a: exp()); }';
+        $cssvars->transform($css);
+    }
+
+    public function test_nested_calc_throws_on_unbalanced_parens_2() {
+        $this->expectException(\coding_exception::class);
+        $this->expectExceptionMessage('Unbalanced parentheses at index 14: calc(100px - calc(50px / 2); }');
+        $cssvars = new \core\cssvars();
+        $css = '.foo { width: calc(100px - calc(50px / 2); }';
+        $cssvars->transform($css);
     }
 }
