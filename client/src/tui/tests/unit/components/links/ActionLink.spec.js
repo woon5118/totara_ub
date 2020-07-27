@@ -21,6 +21,7 @@ import ActionLink from 'tui/components/links/ActionLink';
 
 const props = {
   styleclass: { primary: true, small: true },
+  ariaLabel: 'Text that overrides the link text',
   href: 'https://www.google.com/',
   text: 'Text',
 };

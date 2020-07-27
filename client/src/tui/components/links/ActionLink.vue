@@ -19,6 +19,7 @@
 <template>
   <a
     class="tui-actionLink"
+    :aria-label="ariaLabel"
     :href="disabled ? false : href"
     :class="{
       'tui-actionLink--prim': styleclass.primary,
@@ -42,6 +43,7 @@ export default {
       }),
       type: Object,
     },
+    ariaLabel: String,
     disabled: Boolean,
     href: {
       required: true,
