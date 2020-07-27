@@ -1625,6 +1625,7 @@ class behat_totara_tui extends behat_base {
      * @param string $selector
      * @param string $container
      * @param string $container_selector
+     * @throws ExpectationException
      */
     public function i_click_on_tui_in_the_tui(string $element, string $selector, string $container, string $container_selector) {
         behat_hooks::set_step_readonly(false);
@@ -1637,7 +1638,6 @@ class behat_totara_tui extends behat_base {
             $node->click();
         }
     }
-
 
     /**
      * @Then /^I should see "(?P<text_string>(?:[^"]|\\")*)" in the "(?P<element_string>(?:[^"]|\\")*)" tui "(?P<selector_string>[^"]*)"$/

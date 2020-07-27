@@ -24,9 +24,11 @@
 namespace mod_perform\notification;
 
 use coding_exception;
+use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 use mod_perform\entities\activity\track_user_assignment;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\models\activity\activity as activity_model;
+use mod_perform\models\activity\details\subject_instance_notification;
 use mod_perform\models\activity\notification as notification_model;
 use mod_perform\models\activity\participant_instance;
 use mod_perform\task\service\participant_instance_dto;
@@ -81,11 +83,13 @@ abstract class factory {
     /**
      * Create a cartel instance.
      *
-     * @param integer|subject_instance_dto $subject_instance
+     * @param integer|subject_instance_dto|subject_instance_entity $subject_instance
      * @return cartel
      */
     public static function create_cartel_on_subject_instance($subject_instance): cartel {
         if ($subject_instance instanceof subject_instance_dto) {
+            $subject_instance = $subject_instance->id;
+        } else if ($subject_instance instanceof subject_instance_entity) {
             $subject_instance = $subject_instance->id;
         }
         $participant_instances = participant_instance_entity::repository()->where('subject_instance_id', $subject_instance)->get()->all();

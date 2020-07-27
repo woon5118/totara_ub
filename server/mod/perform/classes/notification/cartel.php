@@ -52,7 +52,7 @@ class cartel {
         $subject_instance_id = false;
         $dealer = null;
 
-        $entities = participant_instance_entity::repository()->where_in('id', $this->participant_instance_ids)->get();
+        $entities = participant_instance_entity::repository()->where_in('id', $this->participant_instance_ids)->get()->all();
         /** @var participant_instance_entity[] $entities */
         foreach ($entities as $entity) {
             $instance = participant_instance_model::load_by_entity($entity);

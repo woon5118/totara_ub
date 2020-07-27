@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * This file is part of Totara Learn
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
@@ -21,31 +21,24 @@
  * @package mod_perform
  */
 
-namespace mod_perform\notification;
+namespace mod_perform\observers;
 
-/**
- * Provides the master clock.
- */
-class clock {
-    /** @var integer */
-    private $bias = 0;
+use core\event\base;
+use mod_perform\entities\activity\subject_instance as subject_instance_entity;
+use mod_perform\models\activity\subject_instance as subject_instance_model;
+use mod_perform\notification\factory;
 
+class notification {
     /**
-     * Constructor.
+     * @param base $event
+     * @return void
      */
-    public function __construct() {
-        global $CFG;
-        if (!empty($CFG->debugdeveloper) || (defined('PHPUNIT_TEST') && PHPUNIT_TEST) || defined('BEHAT_UTIL') || defined('BEHAT_TEST') || defined('BEHAT_SITE_RUNNING')) {
-            $this->bias = get_config('mod_perform', 'notification_time_travel') ?: 0;
+    public static function send_completion_notification(base $event) {
+        $entity = new subject_instance_entity($event->objectid);
+        $inst = subject_instance_model::load_by_entity($entity);
+        if ($inst->is_completed()) {
+            $cartel = factory::create_cartel_on_subject_instance($entity);
+            $cartel->dispatch('completion');
         }
-    }
-
-    /**
-     * Get the current time stamp.
-     *
-     * @return integer
-     */
-    public function get_time(): int {
-        return time() + $this->bias;
     }
 }

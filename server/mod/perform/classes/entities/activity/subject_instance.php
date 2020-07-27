@@ -35,6 +35,7 @@ use totara_job\entities\job_assignment;
 /**
  * Subject instance id
  *
+ * @property int $id
  * @property int $subject_user_id
  * @property int $track_user_assignment_id
  * @property int $progress

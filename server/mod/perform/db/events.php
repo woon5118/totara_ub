@@ -30,6 +30,7 @@ use mod_perform\event\participant_instance_progress_updated;
 use mod_perform\event\participant_section_progress_updated;
 use mod_perform\event\subject_instance_activated;
 use mod_perform\event\subject_instance_progress_updated;
+use mod_perform\observers\notification;
 use mod_perform\observers\participant_instance_availability;
 use mod_perform\observers\participant_instance_progress;
 use mod_perform\observers\participant_section_availability;
@@ -101,6 +102,10 @@ $observers = [
     [
         'eventname' => job_assignment_deleted::class,
         'callback' => track_assignment_user_groups::class.'::job_assignment_updated',
+    ],
+    [
+        'eventname' => subject_instance_progress_updated::class,
+        'callback' => notification::class . '::send_completion_notification',
     ],
     [
         'eventname' => user_tenant_membership_changed::class,

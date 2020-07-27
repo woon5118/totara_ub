@@ -22,16 +22,19 @@
  * @category test
  */
 
+use core\orm\query\builder;
+use core\orm\query\sql\query;
+use mod_perform\constants;
+use mod_perform\entities\activity\notification;
+use mod_perform\entities\activity\notification_message;
+use mod_perform\entities\activity\subject_instance;
+use mod_perform\expand_task;
 use mod_perform\notification\exceptions\class_key_not_available;
 use mod_perform\notification\cartel;
+use totara_job\job_assignment;
 
 require_once(__DIR__ . '/notification_testcase.php');
 
-/**
- * Class mod_perform_notification_cartel_testcase
- *
- * @group perform
- */
 class mod_perform_notification_cartel_testcase extends mod_perform_notification_testcase {
     public function setUp(): void {
         parent::setUp();
@@ -40,32 +43,67 @@ class mod_perform_notification_cartel_testcase extends mod_perform_notification_
 
     public function test_dispatch() {
         $this->setAdminUser();
-        $user = $this->getDataGenerator()->create_user();
+        $user1 = $this->getDataGenerator()->create_user(['username' => 'user1']);
+        $user2 = $this->getDataGenerator()->create_user(['username' => 'user2']);
+        $manager = $this->getDataGenerator()->create_user(['username' => 'manager']);
+        $appraiser = $this->getDataGenerator()->create_user(['username' => 'appraiser']);
+        $user1ja = job_assignment::create_default($user1->id, ['appraiserid' => $appraiser->id]);
+        job_assignment::create_default($manager->id, ['managerjaid' => $user1ja->id]);
+        $user2ja = job_assignment::create_default($user2->id);
+        job_assignment::create_default($manager->id, ['managerjaid' => $user2ja->id]);
+
         $activity = $this->create_activity();
         $section = $this->create_section($activity);
         $this->create_section_relationships($section);
-        $this->create_notification($activity, 'mock_one', false);
-        $this->create_notification($activity, 'mock_two', true);
+        $track = $this->create_single_activity_track_and_assignment($activity, [$user1->id, $user2->id]);
+        $element = $this->perfgen->create_element(['title' => 'Question one', 'plugin_name' => 'short_text']);
+        $this->perfgen->create_section_element($section, $element);
 
-        $cartel = new cartel($activity, $user->id, null);
+        (new expand_task())->expand_multiple($track->assignments->map(function ($ass) {
+            return $ass->id;
+        })->all());
 
-        mod_perform_mock_broker::reset();
+        $notif1 = $this->create_notification($activity, 'mock_one', false);
+        $notif2 = $this->create_notification($activity, 'mock_two', true);
+        $this->toggle_recipients($notif1, [constants::RELATIONSHIP_SUBJECT => true]);
+        $this->toggle_recipients($notif2, [constants::RELATIONSHIP_SUBJECT => true, constants::RELATIONSHIP_APPRAISER => true]);
+
+        $activity->activate();
+        $this->assertTrue($activity->is_active());
+
+        $ids = $this->create_participant_instances_on_track($track);
+        $this->assertCount(3, $ids);
+        $this->assertEquals(2, subject_instance::repository()->count());
+        $cartel = new cartel($ids);
+
+        $repo = function (string $class_key = null) {
+            return builder::table(notification_message::TABLE, 'm')
+                ->where('notification_id', 'IN',
+                    builder::table(notification::TABLE, 'n')
+                        ->select('id')
+                        ->where('class_key', 'IN',
+                            $class_key !== null
+                                ? [$class_key]
+                                : ['mock_one', 'mock_two', 'mock_three']));
+        };
+
+        $repo()->delete();
         $cartel->dispatch('mock_one');
-        $this->assertEquals(0, (new mod_perform_mock_broker_one())->get_count());
-        $this->assertEquals(0, (new mod_perform_mock_broker_two())->get_count());
-        $this->assertEquals(0, (new mod_perform_mock_broker_three())->get_count());
+        $this->assertEquals(0, $repo('mock_one')->count());
+        $this->assertEquals(0, $repo('mock_two')->count());
+        $this->assertEquals(0, $repo('mock_three')->count());
 
-        mod_perform_mock_broker::reset();
+        $repo()->delete();
         $cartel->dispatch('mock_two');
-        $this->assertEquals(0, (new mod_perform_mock_broker_one())->get_count());
-        $this->assertEquals(1, (new mod_perform_mock_broker_two())->get_count());
-        $this->assertEquals(0, (new mod_perform_mock_broker_three())->get_count());
+        $this->assertEquals(0, $repo('mock_one')->count());
+        $this->assertEquals(3, $repo('mock_two')->count());
+        $this->assertEquals(0, $repo('mock_three')->count());
 
-        mod_perform_mock_broker::reset();
+        $repo()->delete();
         $cartel->dispatch('mock_three');
-        $this->assertEquals(0, (new mod_perform_mock_broker_one())->get_count());
-        $this->assertEquals(0, (new mod_perform_mock_broker_two())->get_count());
-        $this->assertEquals(0, (new mod_perform_mock_broker_three())->get_count());
+        $this->assertEquals(0, $repo('mock_one')->count());
+        $this->assertEquals(0, $repo('mock_two')->count());
+        $this->assertEquals(0, $repo('mock_three')->count());
 
         try {
             $cartel->dispatch('mock_zero');

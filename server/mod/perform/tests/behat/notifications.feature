@@ -1,5 +1,8 @@
 @totara @perform @mod_perform @mod_perform_notification @javascript @vuejs
 Feature: Perform activity notifications
+  As an activity administrator
+  I should to be able to set that participants within an activity are notified when certain conditions are met
+
   Background:
     Given I am on a totara site
     And the following "users" exist:
@@ -47,13 +50,13 @@ Feature: Perform activity notifications
       | mod_perform | template_due_date_reminder_subject_subject           | Si avvicina la scadenza              |
       | mod_perform | template_due_date_subject_subject                    | Notificación de fecha de vencimiento |
       | mod_perform | template_overdue_reminder_subject_subject            | Försenad påminnelse                  |
-      # | mod_perform | template_completion_subject_subject                  | Ukončení činnosti                    |
+      | mod_perform | template_completion_subject_subject                  | Ukončení činnosti                    |
       | mod_perform | template_instance_created_appraiser_subject          | Nuwe aktiwiteitskennisgewing         |
       | mod_perform | template_instance_created_reminder_appraiser_subject | Herinnering aan activiteit           |
       | mod_perform | template_due_date_reminder_appraiser_subject         | A határidő közeledik                 |
       | mod_perform | template_due_date_appraiser_subject                  | Iraungitze data jakinaraztea         |
       | mod_perform | template_overdue_reminder_appraiser_subject          | Spomenuté oneskorenie                |
-      # | mod_perform | template_completion_appraiser_subject                | Faaliyetin tamamlanması              |
+      | mod_perform | template_completion_appraiser_subject                | Finalizarea activității              |
     And I log in as "admin"
     And I navigate to the manage perform activities page
     And I follow "Activity test"
@@ -510,6 +513,93 @@ Feature: Perform activity notifications
     When I log in as "user2"
     And I open the notification popover
     Then I should see "You have no notifications"
+    And I log out
+
+    # manager should not receive any notifications
+    When I log in as "manager"
+    And I open the notification popover
+    Then I should see "You have no notifications"
+
+  Scenario: mod_perform_notification_006: Completion notification
+    And I toggle the "Completion of subject instance" tui collapsible
+    And I click on the "Completion of subject instance notification" tui toggle button
+    And I click on "Subject" tui "toggle_button" in the "Completion of subject instance" tui "collapsible"
+    And I click on "Appraiser" tui "toggle_button" in the "Completion of subject instance" tui "collapsible"
+    And I click on "Activate" "button" in the ".tui-actionCard" "css_element"
+    And I confirm the tui confirmation modal
+    And I wait "1" seconds
+    And I trigger cron
+    And I press the "back" button in the browser
+    And I log out
+
+    And I log in as "user3"
+    And I navigate to the outstanding perform activities list page
+    And I click on "Activity test" "link"
+    And I set the field "Your response" to "Kia ora koutou katoa"
+    And I click on "Submit" "button"
+    And I confirm the tui confirmation modal
+    And I close the tui notification toast
+    And I log out
+
+    And I log in as "manager"
+    And I navigate to the outstanding perform activities list page
+    And I switch to "Activities about others" tui tab
+    And I click on "Activity test" "link"
+    And I set the field "Your response" to "Nau mai haere mai"
+    And I click on "Submit" "button"
+    And I confirm the tui confirmation modal
+    And I close the tui notification toast
+    And I log out
+
+    And I log in as "appraiser"
+    And I navigate to the outstanding perform activities list page
+    And I switch to "Activities about others" tui tab
+    And I click on "Activity test" "link"
+    And I set the field "Your response" to "Haere ra"
+    And I click on "Submit" "button"
+    And I confirm the tui confirmation modal
+    And I close the tui notification toast
+    And I log out
+
+    When I log in as "user1"
+    And I trigger cron
+    And I press the "back" button in the browser
+    And I reload the page
+    And I open the notification popover
+    Then I should see "You have no notifications"
+
+    When I navigate to the outstanding perform activities list page
+    And I click on "Activity test" "link"
+    And I set the field "Your response" to "Mā te wā"
+    And I click on "Submit" "button"
+    And I confirm the tui confirmation modal
+    And I close the tui notification toast
+    And I wait "1" seconds
+    And I trigger cron
+    And I press the "back" button in the browser
+    And I reload the page
+    And I open the notification popover
+    Then I should see "Ukončení činnosti" exactly "1" times
+    And I am on homepage
+    And I log out
+
+    # user3 should receive the notification
+    When I log in as "user3"
+    And I open the notification popover
+    Then I should see "Ukončení činnosti" exactly "1" times
+    And I log out
+
+    # appraiser should receive the notification
+    When I log in as "appraiser"
+    And I open the notification popover
+    Then I should see "Finalizarea activității" exactly "1" times
+    And I log out
+
+    # user2 should not receive any notifications
+    When I log in as "user2"
+    And I open the notification popover
+    Then I should see "You have no notifications"
+    And I am on homepage
     And I log out
 
     # manager should not receive any notifications

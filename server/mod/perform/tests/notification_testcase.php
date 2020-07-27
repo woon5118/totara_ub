@@ -22,12 +22,18 @@
  * @category test
  */
 
+use core\orm\query\builder;
 use mod_perform\constants;
+use mod_perform\entities\activity\participant_instance;
+use mod_perform\entities\activity\subject_instance;
+use mod_perform\entities\activity\track_user_assignment;
 use mod_perform\models\activity\activity;
+use mod_perform\models\activity\details\subject_instance_notification;
 use mod_perform\models\activity\notification;
 use mod_perform\models\activity\notification_recipient;
 use mod_perform\models\activity\section;
 use mod_perform\models\activity\section_relationship;
+use mod_perform\models\activity\track;
 use mod_perform\notification\broker;
 use mod_perform\notification\dealer;
 use mod_perform\notification\clock;
@@ -35,7 +41,10 @@ use mod_perform\notification\condition;
 use mod_perform\notification\factory;
 use mod_perform\notification\loader;
 use mod_perform\notification\trigger;
+use mod_perform\notification\triggerable;
 use totara_core\relationship\relationship;
+use mod_perform\task\service\participant_instance_creation;
+use mod_perform\task\service\subject_instance_dto;
 
 abstract class mod_perform_notification_testcase extends advanced_testcase {
     /** @var mod_perform_generator */
@@ -93,6 +102,7 @@ abstract class mod_perform_notification_testcase extends advanced_testcase {
         $rp->setAccessible(true);
         $rp->setValue(null, $loader);
         $this->loader_mocked = true;
+        $this->add_mock_lang_strings();
     }
 
     /**
@@ -103,6 +113,26 @@ abstract class mod_perform_notification_testcase extends advanced_testcase {
         $rp->setAccessible(true);
         $rp->setValue(null, null);
         $this->loader_mocked = false;
+    }
+
+    /**
+     * Add mocked lang strings to shut up debugging messages.
+     * @param string[]|null $relationships
+     */
+    protected function add_mock_lang_strings(?array $relationships = null) {
+        if (!$this->loader_mocked) {
+            return;
+        }
+
+        $relationships = $relationships ?? $this->get_default_relationships_for_testing();
+        foreach (factory::create_loader()->get_class_keys() as $class_key) {
+            foreach ($relationships as $relationship) {
+                foreach (['subject', 'body'] as $what) {
+                    $id = "template_{$class_key}_{$relationship}_{$what}";
+                    $this->overrideLangString($id, 'mod_perform', 'mock:'.$id, true);
+                }
+            }
+        }
     }
 
     /**
@@ -139,19 +169,28 @@ abstract class mod_perform_notification_testcase extends advanced_testcase {
     }
 
     /**
+     * Return subject, appraiser and manager.
+     *
+     * @return string[]
+     */
+    protected function get_default_relationships_for_testing(): array {
+        return [
+            constants::RELATIONSHIP_SUBJECT,
+            constants::RELATIONSHIP_APPRAISER,
+            constants::RELATIONSHIP_MANAGER,
+        ];
+    }
+
+    /**
      * Create section relationships for testing.
      *
      * @param section $section
-     * @param string[]|null $relationships relationship class names or null to default three relationships
+     * @param string[]|null $relationships relationship id numbers or null to use get_default_relationships_for_testing()
      * @return relationship[] as idnumber => relationship
      */
     protected function create_section_relationships(section $section, array $relationships = null): array {
         if ($relationships === null) {
-            $relationships = [
-                constants::RELATIONSHIP_SUBJECT,
-                constants::RELATIONSHIP_APPRAISER,
-                constants::RELATIONSHIP_MANAGER,
-            ];
+            $relationships = $this->get_default_relationships_for_testing();
         }
         $results = [];
         foreach ($relationships as $idnumber) {
@@ -161,20 +200,74 @@ abstract class mod_perform_notification_testcase extends advanced_testcase {
         return $results;
     }
 
-    protected function get_core_relationship(string $relationclass): relationship {
-        return $this->perfgen->get_core_relationship($relationclass);
+    /**
+     * Creates one track with one cohort assignment for the given activity.
+     *
+     * @param activity $activity parent activity.
+     * @param integer[] $userids
+     * @return track $track the generated track.
+     */
+    public function create_single_activity_track_and_assignment(activity $activity, array $userids): track {
+        $track = track::create($activity, "test track");
+        return $this->perfgen->create_track_assignments_with_existing_groups($track, [], [], [], $userids);
+    }
+
+    /**
+     * Create participant instances on the specific track.
+     * This will not trigger any notifications.
+     *
+     * @param track $track
+     * @return integer[] array of participant instance ids
+     */
+    public function create_participant_instances_on_track(track $track): array {
+        $collection = track_user_assignment::repository()
+            ->filter_by_track_id($track->id)
+            ->get()
+            ->map(function ($tua) {
+                $si = new subject_instance();
+                $si->track_user_assignment_id = $tua->id;
+                $si->subject_user_id = $tua->subject_user_id;
+                $si->job_assignment_id = $tua->job_assignment_id;
+                $si->save();
+                return subject_instance_dto::create_from_entity($si);
+            });
+
+        // Eat all hooks.
+        $sink = $this->redirectHooks();
+        (new participant_instance_creation())->generate_instances($collection);
+        $sink->close();
+
+        return builder::table(participant_instance::TABLE)
+            ->where_in('subject_instance_id', $collection->map(function (subject_instance_dto $sid) {
+                return $sid->id;
+            })->all())
+            ->get()
+            ->map(function (stdClass $rec) {
+                return $rec->id;
+            })
+            ->all();
+    }
+
+    /**
+     * Get the relationship instance by the idnumber.
+     *
+     * @param string $idnumber one of constants
+     * @return relationship
+     */
+    protected function get_core_relationship(string $idnumber): relationship {
+        return $this->perfgen->get_core_relationship($idnumber);
     }
 
     /**
      * Activate/deactivate the recipients.
      *
      * @param notification $notification
-     * @param boolean[] $relationships array of [relationship_class => active]
+     * @param boolean[] $relationships array of [idnumber => active]
      */
     protected function toggle_recipients(notification $notification, array $relationships): void {
         $recipients = $notification->get_recipients();
-        foreach ($relationships as $class => $active) {
-            $relationship = $this->perfgen->get_core_relationship($class);
+        foreach ($relationships as $idnumber => $active) {
+            $relationship = $this->perfgen->get_core_relationship($idnumber);
             $rel_id = $relationship->id;
             $recipient = $recipients->find('relationship_id', $rel_id);
             /** @var notification_recipient $recipient */
@@ -215,33 +308,22 @@ abstract class mod_perform_notification_testcase extends advanced_testcase {
     }
 }
 
-class mod_perform_mock_broker implements broker {
+class mod_perform_mock_broker implements broker, triggerable {
     /** @var integer */
-    private static $executed_count = [];
+    private static $triggerable = [];
 
-    public function get_count(): int {
+    public function set_triggerable(bool $value): void {
         $class = get_class($this);
-        return self::$executed_count[$class] ?? 0;
-    }
-
-    public static function reset(): void {
-        self::$executed_count = [];
+        self::$triggerable[$class] = $value;
     }
 
     public function get_default_triggers(): array {
         return [];
     }
 
-    public function check_trigger_condition(notification $notification, object $record, clock $clock): bool {
-        return false;
-    }
-
-    public function execute(dealer $dealer, notification $notification): void {
+    public function is_triggerable_now(condition $condition, subject_instance_notification $record): bool {
         $class = get_class($this);
-        if (!isset(self::$executed_count[$class])) {
-            self::$executed_count[$class] = 0;
-        }
-        self::$executed_count[$class]++;
+        return self::$triggerable[$class] ?? false;
     }
 }
 

@@ -537,6 +537,29 @@ $string['system_activity_type:feedback'] = 'Feedback';
 $string['teams_page_response_report_line'] = 'Their current and historical performance records are available for you to {$a}.';
 $string['teams_page_response_report_link'] = 'view or export';
 
+$string['template_completion_appraiser_body'] = 'The following activity has been completed by all participants:
+
+$Activity name$/$Activity type$: $subject full name$
+
+Thank you for your participation.
+
+You can review the completed activity through this link: $Activity link$';
+$string['template_completion_appraiser_subject'] = 'Completed activity - $Activity name$/$Activity type$: $subject full name$';
+
+$string['template_completion_manager_body'] = 'The following activity has been completed by all participants:
+
+$Activity name$/$Activity type$: $subject full name$
+
+Thank you for your participation.
+
+You can review the completed activity through this link: $Activity link$';
+$string['template_completion_manager_subject'] = 'Completed activity - $Activity name$/$Activity type$: $subject full name$';
+
+$string['template_completion_subject_body'] = 'Your $Activity name$/$Activity type$ has been completed by all participants.
+
+You can review the completed activity through this link: $Activity link$';
+$string['template_completion_subject_subject'] = 'Completed activity - $Activity name$/$Activity type$';
+
 $string['template_due_date_appraiser_body'] = 'The following activity is due to be completed today :
 
 $Activity name$/$Activity type$

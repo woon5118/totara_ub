@@ -545,8 +545,9 @@ abstract class advanced_testcase extends base_testcase {
      * @param string $string
      * @param string $component
      * @param string value
+     * @param boolean $acceptnonexistentstring
      */
-    public function overrideLangString($string, $component, $value) {
+    public function overrideLangString($string, $component, $value, $acceptnonexistentstring = false) {
         if (!$this->resetAfterTest) {
             throw new coding_exception('Enable restAfterTest to use string overriding');
         }
@@ -567,7 +568,7 @@ abstract class advanced_testcase extends base_testcase {
             $component = $plugintype . '_' . $pluginname;
         }
 
-        if (!$sm->string_exists($string, $component)) {
+        if (!$acceptnonexistentstring && !$sm->string_exists($string, $component)) {
             throw new coding_exception('Cannot override non-existent string');
         }
 

@@ -23,10 +23,7 @@
 
 namespace mod_perform\notification\brokers;
 
-use mod_perform\models\activity\notification as notification_model;
 use mod_perform\notification\broker;
-use mod_perform\notification\dealer;
-use mod_perform\notification\clock;
 
 /**
  * completion handler

@@ -168,7 +168,7 @@ class subject_instance extends model {
      *
      * @return bool
      */
-    private function is_completed(): bool {
+    public function is_completed(): bool {
         return $this->get_progress_state() instanceof complete;
     }
 

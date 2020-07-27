@@ -35,7 +35,6 @@ use mod_perform\models\activity\notification as notification_model;
 use mod_perform\models\activity\notification_recipient as notification_recipient_model;
 use mod_perform\notification\factory;
 use mod_perform\notification\loader;
-use mod_perform\notification\trigger;
 use mod_perform\notification\triggerable;
 use mod_perform\state\activity\active;
 use totara_core\entities\relationship as relationship_entity;
@@ -44,10 +43,16 @@ use totara_core\entities\relationship as relationship_entity;
  * Periodically check notification event triggers.
  */
 class check_notification_trigger_task extends scheduled_task {
+    /**
+     * @inheritDoc
+     */
     public function get_name() {
         return get_string('check_notification_trigger_task', 'mod_perform');
     }
 
+    /**
+     * @inheritDoc
+     */
     public function execute() {
         $loader = factory::create_loader();
         $class_keys = $loader->get_class_keys(loader::HAS_CONDITION);
