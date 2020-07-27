@@ -398,7 +398,7 @@ class totara_cohort_certification_status_rules_testcase extends totara_cohort_ce
             ['Currently certified, Never certified | Assigned, Unassigned | cert1&2', [1,2], ['status' => '10,30', 'assignmentstatus' => '10,20'], ['never_certified_assigned_cert1', 'never_certified_unassigned_cert1']],
 
             // Currently certified, Currently expired, Never certified | Assigned, Unassigned | cert1&2
-            ['Currently certified, Currently expired, Never certified | Assigned, Unassigned | cert1&2', [1,2], ['status' => '10,20,30', 'assignmentstatus' => '10,20'], ['certified_assigned_cert1', 'certified_unassigned_cert1', 'certified_assigned_cert1', 'certified_unassigned_cert1', 'never_certified_assigned_cert1', 'never_certified_unassigned_cert1']],
+            ['Currently certified, Currently expired, Never certified | Assigned, Unassigned | cert1&2', [1,2], ['status' => '10,20,30', 'assignmentstatus' => '10,20'], ['certified_assigned_cert1', 'certified_unassigned_cert1', 'expired_assigned_cert1', 'expired_unassigned_cert1', 'never_certified_assigned_cert1', 'never_certified_unassigned_cert1']],
 
             // Currently expired | Assigned, Unassigned | cert1&2
             ['Currently expired | Assigned, Unassigned | cert1&2', [1,2], ['status' => '20', 'assignmentstatus' => '10,20'], []],
@@ -441,19 +441,19 @@ class totara_cohort_certification_status_rules_testcase extends totara_cohort_ce
             ['Currently certified, Currently expired | Unassigned | cert3', [3], ['status' => '10,20', 'assignmentstatus' => '20'], []],
 
             // Currently certified, Never certified | Unassigned | cert3
-            ['Currently certified, Never certified | Unassigned | cert3', [3], ['status' => '10,30', 'assignmentstatus' => '20'], ['certified_assigned_cert1', 'certified_unassigned_cert1', 'certified_assigned_cert1', 'certified_unassigned_cert1', 'never_certified_assigned_cert1', 'never_certified_unassigned_cert1']],
+            ['Currently certified, Never certified | Unassigned | cert3', [3], ['status' => '10,30', 'assignmentstatus' => '20'], ['certified_assigned_cert1', 'certified_unassigned_cert1', 'expired_assigned_cert1', 'expired_unassigned_cert1', 'never_certified_assigned_cert1', 'never_certified_unassigned_cert1']],
 
             // Currently certified, Currently expired, Never certified | Unassigned | cert3
-            ['Currently certified, Currently expired, Never certified | Unassigned | cert3', [3], ['status' => '10,20,30', 'assignmentstatus' => '20'], ['certified_assigned_cert1', 'certified_unassigned_cert1', 'certified_assigned_cert1', 'certified_unassigned_cert1', 'never_certified_assigned_cert1', 'never_certified_unassigned_cert1']],
+            ['Currently certified, Currently expired, Never certified | Unassigned | cert3', [3], ['status' => '10,20,30', 'assignmentstatus' => '20'], ['certified_assigned_cert1', 'certified_unassigned_cert1', 'expired_assigned_cert1', 'expired_unassigned_cert1', 'never_certified_assigned_cert1', 'never_certified_unassigned_cert1']],
 
             // Currently expired | Unassigned | cert3
             ['Currently expired | Unassigned | cert3', [3], ['status' => '20', 'assignmentstatus' => '20'], []],
 
             // Currently expired, Never certified | Unassigned | cert3
-            ['Currently expired, Never certified | Unassigned | cert3', [3], ['status' => '20,30', 'assignmentstatus' => '20'], ['certified_assigned_cert1', 'certified_unassigned_cert1', 'certified_assigned_cert1', 'certified_unassigned_cert1', 'never_certified_assigned_cert1', 'never_certified_unassigned_cert1']],
+            ['Currently expired, Never certified | Unassigned | cert3', [3], ['status' => '20,30', 'assignmentstatus' => '20'], ['certified_assigned_cert1', 'certified_unassigned_cert1', 'expired_assigned_cert1', 'expired_unassigned_cert1', 'never_certified_assigned_cert1', 'never_certified_unassigned_cert1']],
 
             // Never certified | Unassigned | cert3
-            ['Never certified | Unassigned | cert3', [3], ['status' => '30', 'assignmentstatus' => '20'], ['certified_assigned_cert1', 'certified_unassigned_cert1', 'certified_assigned_cert1', 'certified_unassigned_cert1', 'never_certified_assigned_cert1', 'never_certified_unassigned_cert1']],
+            ['Never certified | Unassigned | cert3', [3], ['status' => '30', 'assignmentstatus' => '20'], ['certified_assigned_cert1', 'certified_unassigned_cert1', 'expired_assigned_cert1', 'expired_unassigned_cert1', 'never_certified_assigned_cert1', 'never_certified_unassigned_cert1']],
 
             // Currently certified  | Assigned, Unassigned | cert3
             ['Currently certified | Assigned, Unassigned | cert3', [3], ['status' => '10', 'assignmentstatus' => '10,20'], []],
@@ -462,19 +462,19 @@ class totara_cohort_certification_status_rules_testcase extends totara_cohort_ce
             ['Currently certified, Currently expired | Assigned, Unassigned | cert3', [3], ['status' => '10,20', 'assignmentstatus' => '10,20'], []],
 
             // Currently certified, Never certified | Assigned, Unassigned | cert3
-            ['Currently certified, Never certified | Assigned, Unassigned | cert3', [3], ['status' => '10,30', 'assignmentstatus' => '10,20'], ['certified_assigned_cert1', 'certified_unassigned_cert1', 'certified_assigned_cert1', 'certified_unassigned_cert1', 'never_certified_assigned_cert1', 'never_certified_unassigned_cert1']],
+            ['Currently certified, Never certified | Assigned, Unassigned | cert3', [3], ['status' => '10,30', 'assignmentstatus' => '10,20'], ['certified_assigned_cert1', 'certified_unassigned_cert1', 'expired_assigned_cert1', 'expired_unassigned_cert1', 'never_certified_assigned_cert1', 'never_certified_unassigned_cert1']],
 
             // Currently certified, Currently expired, Never certified | Assigned, Unassigned | cert3
-            ['Currently certified, Currently expired, Never certified | Assigned, Unassigned | cert3', [3], ['status' => '10,20,30', 'assignmentstatus' => '10,20'], ['certified_assigned_cert1', 'certified_unassigned_cert1', 'certified_assigned_cert1', 'certified_unassigned_cert1', 'never_certified_assigned_cert1', 'never_certified_unassigned_cert1']],
+            ['Currently certified, Currently expired, Never certified | Assigned, Unassigned | cert3', [3], ['status' => '10,20,30', 'assignmentstatus' => '10,20'], ['certified_assigned_cert1', 'certified_unassigned_cert1', 'expired_assigned_cert1', 'expired_unassigned_cert1', 'never_certified_assigned_cert1', 'never_certified_unassigned_cert1']],
 
             // Currently expired | Assigned, Unassigned | cert3
             ['Currently expired | Assigned, Unassigned | cert3', [3], ['status' => '20', 'assignmentstatus' => '10,20'], []],
 
             // Currently expired, Never certified | Assigned, Unassigned | cert3
-            ['Currently expired, Never certified | Assigned, Unassigned | cert3', [3], ['status' => '20,30', 'assignmentstatus' => '10,20'], ['certified_assigned_cert1', 'certified_unassigned_cert1', 'certified_assigned_cert1', 'certified_unassigned_cert1', 'never_certified_assigned_cert1', 'never_certified_unassigned_cert1']],
+            ['Currently expired, Never certified | Assigned, Unassigned | cert3', [3], ['status' => '20,30', 'assignmentstatus' => '10,20'], ['certified_assigned_cert1', 'certified_unassigned_cert1', 'expired_assigned_cert1', 'expired_unassigned_cert1', 'never_certified_assigned_cert1', 'never_certified_unassigned_cert1']],
 
             // Never certified | Assigned, Unassigned | cert3
-            ['Never certified | Assigned, Unassigned | cert3', [3], ['status' => '30', 'assignmentstatus' => '10,20'], ['certified_assigned_cert1', 'certified_unassigned_cert1', 'certified_assigned_cert1', 'certified_unassigned_cert1', 'never_certified_assigned_cert1', 'never_certified_unassigned_cert1']],
+            ['Never certified | Assigned, Unassigned | cert3', [3], ['status' => '30', 'assignmentstatus' => '10,20'], ['certified_assigned_cert1', 'certified_unassigned_cert1', 'expired_assigned_cert1', 'expired_unassigned_cert1', 'never_certified_assigned_cert1', 'never_certified_unassigned_cert1']],
 
         ];
 
@@ -486,14 +486,17 @@ class totara_cohort_certification_status_rules_testcase extends totara_cohort_ce
      */
     public function test_certification_status_rule($name, $certifications, $params, $usergroups) {
         global $DB;
-        $this->resetAfterTest(true);
         $this->setAdminUser();
 
         // Users that should be in this audience.
-        $users = [];
+        $userids = [];
         foreach ($usergroups as $usergroup) {
-            $users = array_merge($users, $this->user_groups[$usergroup]);
+            foreach ($this->user_groups[$usergroup] as $user) {
+                $userids[$user->id] = $user->id;
+            }
         }
+        $userids = array_keys($userids);
+        sort($userids);
 
         // Process listofids.
         $listofids = [];
@@ -507,10 +510,9 @@ class totara_cohort_certification_status_rules_testcase extends totara_cohort_ce
 
         // Check we have the correct members.
         $members = $DB->get_records('cohort_members', ['cohortid' => $this->cohort->id], '', 'userid');
-        $this->assertEquals(count($users), count($members), 'Failed for ' . $name);
-        foreach ($users as $user) {
-            $this->assertTrue(array_key_exists($user->id, $members), 'Failed for ' . $name);
-        }
+        $members = array_keys($members);
+        sort($members);
+        $this->assertSame($userids, $members, 'Failed for ' . $name);
     }
 
 }
