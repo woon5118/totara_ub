@@ -188,3 +188,24 @@ function totara_core_mnet_deprecated_check(environment_results $result) {
 
     return $result;
 }
+
+/**
+ * Make sure top level directory is not shared via web server.
+ *
+ * @param environment_results $result
+ * @return environment_results
+ */
+function totara_shared_src_directory(environment_results $result) {
+    global $CFG;
+
+    $result->setInfo(get_string('sharedsrcinfo', 'totara_core'));
+
+    if (substr($CFG->wwwroot, - strlen('/server')) === '/server') {
+        $result->setStatus(false);
+        $result->setFeedbackStr(['sharedsrcwarning', 'totara_core']);
+    } else {
+        $result->setStatus(true);
+    }
+
+    return $result;
+}

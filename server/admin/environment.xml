@@ -688,6 +688,7 @@
       <CUSTOM_CHECK level="optional" file="/totara/core/environmentlib.php" function="totara_core_check_for_ngram" />
       <CUSTOM_CHECK level="required" file="/totara/hierarchy/db/upgradelib.php" function="totara_hierarchy_check_comp_value_order" />
       <CUSTOM_CHECK level="optional" file="/totara/core/environmentlib.php" function="totara_core_mnet_deprecated_check" />
+      <CUSTOM_CHECK level="optional" file="/totara/core/environmentlib.php" function="totara_shared_src_directory" />
     </CUSTOM_CHECKS>
   </TOTARA>
 </COMPATIBILITY_MATRIX>
