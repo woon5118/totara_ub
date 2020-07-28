@@ -45,11 +45,12 @@ require_login();
 $context = context_system::instance();
 require_capability('moodle/site:config', $context);
 $PAGE->set_context($context);
-$PAGE->set_url('/totara/core/tests/fixtures/vue_component.php');
+$PAGE->set_url('/totara/tui/tests/fixtures/vue_component.php');
 $PAGE->set_pagelayout('noblocks');
 $PAGE->set_title($title);
 
-$PAGE->requires->tui_bundle('totara_core');
+$component = new \totara_tui\output\component('tui/pages/VueComponent');
+$component->register($PAGE);
 
 echo $OUTPUT->header();
 if ($displaydebugging) {
@@ -60,5 +61,5 @@ if ($displaydebugging) {
     debugging('This is a developer resource, please contact your system admin if you have arrived here by mistake.', DEBUG_DEVELOPER);
 }
 echo $OUTPUT->heading($title);
-echo $OUTPUT->render(new \totara_tui\output\component('totara_core/pages/VueComponent'));
+echo $OUTPUT->render($component);
 echo $OUTPUT->footer();

@@ -45,13 +45,13 @@ require_login();
 $context = context_system::instance();
 require_capability('moodle/site:config', $context);
 $PAGE->set_context($context);
-$PAGE->set_url('/totara/core/tests/fixtures/vue_apollo.php');
+$PAGE->set_url('/totara/tui/tests/fixtures/vue_apollo.php');
 $PAGE->set_pagelayout('noblocks');
 $PAGE->set_title($title);
 
 $output = $PAGE->get_renderer('totara_tui');
 
-$component = new \totara_tui\output\component('totara_core/pages/VueApollo');
+$component = new \totara_tui\output\component('tui/pages/VueApollo');
 $component->register($PAGE);
 
 echo $output->header();
