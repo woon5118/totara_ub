@@ -55,10 +55,8 @@ class subject_instance_creation {
         // Get all user assignments that potentially should have a subject instance created.
         $user_assignments = $this->get_user_assignments_potentially_needing_instances();
 
-        $now = time();
+        $dtos = new \core\collection();
 
-        $user_assignment_ids = [];
-        $inserts = [];
         foreach ($user_assignments as $user_assignment) {
             if (!$this->is_it_time_for_a_new_subject_instance($user_assignment)) {
                 continue;
@@ -69,44 +67,21 @@ class subject_instance_creation {
                 $status = pending::get_code();
             }
 
-            $subject_instance = new stdClass();
+            $now = time();
+            $subject_instance = new subject_instance();
             $subject_instance->track_user_assignment_id = $user_assignment->id;
             $subject_instance->subject_user_id = $user_assignment->subject_user_id;
             $subject_instance->job_assignment_id = $user_assignment->job_assignment_id;
             $subject_instance->status = $status;
             $subject_instance->created_at = $now;
             $subject_instance->due_date = $this->calculate_due_date($user_assignment, $now);
+            $subject_instance->save();
 
-            $inserts[] = $subject_instance;
-            $user_assignment_ids[] = $user_assignment->id;
+            $dtos->append(subject_instance_dto::create_from_entity($subject_instance));
         }
-        // Leave no reference behind for later easy unsetting
-        unset($subject_instance);
 
-        if (!empty($inserts)) {
-            $dtos = builder::get_db()->transaction(function () use ($inserts, $user_assignment_ids) {
-                // Now insert the records as batch to reduce amount of queries
-                builder::get_db()->insert_records_via_batch(subject_instance::TABLE, $inserts);
-
-                // Free up memory
-                unset($inserts);
-
-                // Now load all just created subject instance and trigger event for them
-                $created_subject_instances = subject_instance::repository()
-                    ->where('track_user_assignment_id', $user_assignment_ids)
-                    ->get_lazy();
-
-                $dtos = new collection();
-                foreach ($created_subject_instances as $created_subject_instance) {
-                    $dtos->append(subject_instance_dto::create_from_entity($created_subject_instance));
-                }
-
-                return $dtos;
-            });
-
-            $hook = new subject_instances_created($dtos);
-            $hook->execute();
-        }
+        $hook = new subject_instances_created($dtos);
+        $hook->execute();
     }
 
     /**
