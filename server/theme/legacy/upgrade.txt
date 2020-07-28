@@ -7,6 +7,7 @@ This file describes API changes for 'theme_legacy'.
 * Updated tool_usertours/tourstep template
 * Upgraded Bootstrap to 3.4.1
 * Deprecated CSS file totara-menu was dropped
+* Removed tag argument for regions so that they render as divs
 
 === BTNS ===
 === Buttons have been switched over to new mixins to help with consistency between legacy & ventura

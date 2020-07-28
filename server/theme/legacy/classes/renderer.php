@@ -70,8 +70,7 @@ class theme_legacy_renderer extends plugin_renderer_base {
             return '';
         }
         $classes = $this->grid->classes($region);
-        $tag = 'aside';
-        $html = $this->output->blocks($region, $classes, $tag);
+        $html = $this->output->blocks($region, $classes);
 
         if ($region === $this->grid::REGION_TOP) {
             $html = '<div id="region-top" class="row">' . $html . '</div>';
