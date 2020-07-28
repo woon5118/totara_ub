@@ -107,6 +107,13 @@ class mod_perform_activity_multisection_toggler_testcase extends advanced_testca
 
             $this->assertCount($expected_count, $section->section_elements, 'wrong count');
             $this->assertNotEmpty($section->get_section_relationships(), 'no relationships');
+
+            // Checking that the sort order is set correctly, should start with 1
+            $i = 1;
+            foreach ($section->section_elements as $element) {
+                $this->assertEquals($i, $element->sort_order);
+                $i++;
+            }
         }
     }
 
@@ -129,6 +136,13 @@ class mod_perform_activity_multisection_toggler_testcase extends advanced_testca
         foreach ($sections as $section) {
             $this->assertCount($element_count, $section->section_elements, 'wrong count');
             $this->assertNotEmpty($section->get_section_relationships(), 'no relationships');
+
+            // Checking that the sort order is set correctly, should start with 1
+            $i = 1;
+            foreach ($section->section_elements as $element) {
+                $this->assertEquals($i, $element->sort_order);
+                $i++;
+            }
         }
     }
 
@@ -194,6 +208,13 @@ class mod_perform_activity_multisection_toggler_testcase extends advanced_testca
             $section_elements,
             'wrong element count'
         );
+
+        // Checking that the sort order is set correctly, should start with 1
+        $i = 1;
+        foreach ($section_elements as $element) {
+            $this->assertEquals($i, $element->sort_order);
+            $i++;
+        }
 
         $actual_element_order = $section_elements
             ->sort('sort_order')
@@ -339,7 +360,7 @@ class mod_perform_activity_multisection_toggler_testcase extends advanced_testca
             $section_title = $activity->name . ' new section #$i';
             $section = $generator->create_section($activity, ['title' => $section_title]);
 
-            for ($j = 0; $j < $elements_per_section; $j++) {
+            for ($j = 1; $j <= $elements_per_section; $j++) {
                 $title = $section->title . " element: #$j";
 
                 $element = $generator->create_element(['title' => $title]);

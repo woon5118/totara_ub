@@ -539,7 +539,7 @@ class mod_perform_generator extends component_generator_base {
                 foreach ($configuration->get_relationships_per_section() as $relationship_idnumber) {
                     $this->create_section_relationship($section, ['relationship' => $relationship_idnumber]);
                 }
-                for ($j = 0; $j < $configuration->get_number_of_elements_per_section(); $j++) {
+                for ($j = 1; $j <= $configuration->get_number_of_elements_per_section(); $j++) {
                     $title = $section->title . " element$j";
                     $element = $this->create_element(['title' => $title]);
 

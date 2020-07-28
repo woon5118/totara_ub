@@ -125,9 +125,9 @@ class mod_perform_section_participants_model_testcase extends advanced_testcase 
             $section = $generator->create_section($activity, ['title' => "section#$i"]);
             $sections->set($section, $section->id);
 
-            foreach (array_keys($relationships) as $relationship) {
+            foreach (array_keys($relationships) as $key => $relationship) {
                 $generator->create_section_relationship($section, ['relationship' => $relationship]);
-                section_element::create($section, $generator->create_element());
+                section_element::create($section, $generator->create_element(), $key + 1);
             }
         }
 

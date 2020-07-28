@@ -343,6 +343,9 @@ class section extends model {
             count($this->get_section_elements()) + 1
         );
 
+        // Refresh the relation otherwise the elements are outdated
+        $this->entity->load_relation('section_elements');
+
         return $section_element;
     }
 
@@ -385,6 +388,9 @@ class section extends model {
             }
             // No need to validate sort orders because we've just resorted everything.
         });
+
+        // Refresh the relation otherwise the elements are outdated
+        $this->entity->load_relation('section_elements');
     }
 
     /**
@@ -416,6 +422,9 @@ class section extends model {
 
             $this->validate_sort_orders();
         });
+
+        // Refresh the relation otherwise the elements are outdated
+        $this->entity->load_relation('section_elements');
     }
 
     /**

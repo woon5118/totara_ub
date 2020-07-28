@@ -139,8 +139,7 @@ class activity_multisection_toggler {
 
         $merged_section = section::create($this->activity);
         foreach ($elements_to_transfer as $order => $element) {
-            $merged_section->add_element($element)
-                ->update_sort_order($order);
+            $merged_section->add_element($element);
         }
     }
 
@@ -194,8 +193,7 @@ class activity_multisection_toggler {
                 ->update_relationships($relationships_to_transfer);
 
             foreach ($elements_to_transfer as $order => $element) {
-                $rebuilt_section->add_element($element)
-                    ->update_sort_order($order);
+                $rebuilt_section->add_element($element);
             }
         }
     }
