@@ -1239,7 +1239,7 @@ function xmldb_totara_core_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020072700, 'totara', 'core');
     }
 
-    if ($oldversion < 2020072704) {
+    if ($oldversion < 2020072705) {
 
         // Define field type to be added to totara_core_relationship.
         $table = new xmldb_table('totara_core_relationship');
@@ -1297,7 +1297,7 @@ function xmldb_totara_core_upgrade($oldversion) {
         totara_core_upgrade_create_relationship(['totara_core\relationship\resolvers\subject'], 'subject', 1);
 
         // Core savepoint reached.
-        upgrade_plugin_savepoint(true, 2020072704, 'totara', 'core');
+        upgrade_plugin_savepoint(true, 2020072705, 'totara', 'core');
     }
 
     return true;
