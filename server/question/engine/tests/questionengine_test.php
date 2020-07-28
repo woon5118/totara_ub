@@ -28,6 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once(__DIR__ . '/../lib.php');
+require_once($CFG->dirroot . '/question/engine/tests/fixtures/core_question_test_renderer.php');
 
 
 /**
@@ -134,7 +135,7 @@ class question_engine_test extends advanced_testcase {
         global $PAGE;
         require_once(__DIR__.'/helpers.php');
 
-        $renderer = new testable_core_question_renderer($PAGE, 'core_question');
+        $renderer = new core_question_test_renderer($PAGE, 'core_question');
 
         // Test with number is i character.
         $this->assertEquals('<h3 class="no">Information</h3>', $renderer->number('i'));

@@ -30,8 +30,10 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once(__DIR__ . '/../lib.php');
-require_once(__DIR__ . '/helpers.php');
+require_once($CFG->dirroot . '/question/engine/lib.php');
+require_once($CFG->dirroot . '/question/engine/tests/helpers.php');
+require_once($CFG->dirroot . '/question/engine/tests/data_loading_method_test_base.php');
+require_once($CFG->dirroot . '/question/engine/tests/fixtures/core_question_test_recordset.php');
 
 
 /**
@@ -42,7 +44,7 @@ require_once(__DIR__ . '/helpers.php');
  */
 class question_attempt_db_test extends data_loading_method_test_base {
     public function test_load() {
-        $records = new question_test_recordset(array(
+        $records = new core_question_test_recordset(array(
             array('questionattemptid', 'contextid', 'questionusageid', 'slot',
                                    'behaviour', 'questionid', 'variant', 'maxmark', 'minfraction', 'maxfraction', 'flagged',
                                                                                        'questionsummary', 'rightanswer', 'responsesummary', 'timemodified',
@@ -115,7 +117,7 @@ class question_attempt_db_test extends data_loading_method_test_base {
     }
 
     public function test_load_missing_question() {
-        $records = new question_test_recordset(array(
+        $records = new core_question_test_recordset(array(
             array('questionattemptid', 'contextid', 'questionusageid', 'slot',
                                    'behaviour', 'questionid', 'variant', 'maxmark', 'minfraction', 'maxfraction', 'flagged',
                                                                                        'questionsummary', 'rightanswer', 'responsesummary', 'timemodified',
@@ -142,7 +144,7 @@ class question_attempt_db_test extends data_loading_method_test_base {
     }
 
     public function test_load_with_autosaved_data() {
-        $records = new question_test_recordset(array(
+        $records = new core_question_test_recordset(array(
             array('questionattemptid', 'contextid', 'questionusageid', 'slot',
                                    'behaviour', 'questionid', 'variant', 'maxmark', 'minfraction', 'maxfraction', 'flagged',
                                                                                        'questionsummary', 'rightanswer', 'responsesummary', 'timemodified',
@@ -201,7 +203,7 @@ class question_attempt_db_test extends data_loading_method_test_base {
         // happening concurrently, we have autosaved data in the database that
         // has already been superceded by real data, so it should be ignored.
         // There is also a second lot of redundant data to delete.
-        $records = new question_test_recordset(array(
+        $records = new core_question_test_recordset(array(
             array('questionattemptid', 'contextid', 'questionusageid', 'slot',
                                    'behaviour', 'questionid', 'variant', 'maxmark', 'minfraction', 'maxfraction', 'flagged',
                                                                                        'questionsummary', 'rightanswer', 'responsesummary', 'timemodified',

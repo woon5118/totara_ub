@@ -28,6 +28,7 @@ global $CFG;
 
 require_once($CFG->dirroot . '/question/engine/tests/helpers.php');
 require_once($CFG->dirroot . '/question/type/gapselect/tests/helper.php');
+require_once($CFG->dirroot . '/question/engine/tests/qbehaviour_walkthrough_test_base.php');
 
 
 /**

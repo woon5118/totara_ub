@@ -28,6 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once(__DIR__ . '/..//lib.php');
 require_once(__DIR__ . '/helpers.php');
+require_once($CFG->dirroot . '/question/engine/tests/qbehaviour_walkthrough_test_base.php');
 
 
 /**

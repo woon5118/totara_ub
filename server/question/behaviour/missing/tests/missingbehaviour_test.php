@@ -30,6 +30,7 @@ global $CFG;
 require_once(__DIR__ . '/../../../engine/lib.php');
 require_once(__DIR__ . '/../../../engine/tests/helpers.php');
 require_once(__DIR__ . '/../behaviour.php');
+require_once($CFG->dirroot . '/question/engine/tests/fixtures/core_question_test_recordset.php');
 
 
 /**
@@ -69,7 +70,7 @@ class qbehaviour_missing_test extends advanced_testcase {
     }
 
     public function test_render_missing() {
-        $records = new question_test_recordset(array(
+        $records = new core_question_test_recordset(array(
             array('questionattemptid', 'contextid', 'questionusageid', 'slot',
                                    'behaviour', 'questionid', 'variant', 'maxmark', 'minfraction', 'maxfraction', 'flagged',
                                             'questionsummary', 'rightanswer', 'responsesummary',

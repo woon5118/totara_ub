@@ -29,6 +29,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->libdir . '/questionlib.php');
 require_once($CFG->dirroot . '/question/engine/tests/helpers.php');
+require_once($CFG->dirroot . '/question/engine/tests/qbehaviour_walkthrough_test_base.php');
 
 
 class qtype_description_walkthrough_test extends qbehaviour_walkthrough_test_base {

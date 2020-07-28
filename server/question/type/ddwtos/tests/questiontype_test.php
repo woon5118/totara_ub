@@ -27,6 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 
 require_once($CFG->dirroot . '/question/engine/tests/helpers.php');
+require_once($CFG->dirroot . '/question/engine/tests/question_testcase.php');
 require_once($CFG->dirroot . '/question/type/ddwtos/tests/helper.php');
 
 

@@ -26,8 +26,10 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once(__DIR__ . '/../lib.php');
-require_once(__DIR__ . '/helpers.php');
+require_once($CFG->dirroot . '/question/engine/lib.php');
+require_once($CFG->dirroot . '/question/engine/tests/helpers.php');
+require_once($CFG->dirroot . '/question/engine/tests/data_loading_method_test_base.php');
+require_once($CFG->dirroot . '/question/engine/tests/fixtures/core_question_test_recordset.php');
 
 
 /**
@@ -39,7 +41,7 @@ require_once(__DIR__ . '/helpers.php');
 class question_usage_db_test extends data_loading_method_test_base {
     public function test_load() {
         $scid = context_system::instance()->id;
-        $records = new question_test_recordset(array(
+        $records = new core_question_test_recordset(array(
         array('qubaid', 'contextid', 'component', 'preferredbehaviour',
                                                'questionattemptid', 'questionusageid', 'slot',
                                                               'behaviour', 'questionid', 'variant', 'maxmark', 'minfraction', 'maxfraction', 'flagged',
@@ -97,7 +99,7 @@ class question_usage_db_test extends data_loading_method_test_base {
         // load_from_records got stuck in an infinite loop. This test is to
         // verify that no longer happens.
         $scid = context_system::instance()->id;
-        $records = new question_test_recordset(array(
+        $records = new core_question_test_recordset(array(
         array('qubaid', 'contextid', 'component', 'preferredbehaviour',
                                                    'questionattemptid', 'questionusageid', 'slot',
                                                              'behaviour', 'questionid', 'variant', 'maxmark', 'minfraction', 'maxfraction', 'flagged',
@@ -129,7 +131,7 @@ class question_usage_db_test extends data_loading_method_test_base {
         // load_from_records got stuck in an infinite loop. This test is to
         // verify that no longer happens.
         $scid = context_system::instance()->id;
-        $records = new question_test_recordset(array(
+        $records = new core_question_test_recordset(array(
         array('qubaid', 'contextid', 'component', 'preferredbehaviour',
                                                    'questionattemptid', 'questionusageid', 'slot',
                                                                         'behaviour', 'questionid', 'variant', 'maxmark', 'minfraction', 'maxfraction', 'flagged',

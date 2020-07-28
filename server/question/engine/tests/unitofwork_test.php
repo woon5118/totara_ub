@@ -27,8 +27,10 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once(__DIR__ . '/../lib.php');
-require_once(__DIR__ . '/helpers.php');
+require_once($CFG->dirroot . '/question/engine/lib.php');
+require_once($CFG->dirroot . '/question/engine/tests/helpers.php');
+require_once($CFG->dirroot . '/question/engine/tests/data_loading_method_test_base.php');
+require_once($CFG->dirroot . '/question/engine/tests/fixtures/core_question_test_recordset.php');
 
 
 /**
@@ -73,7 +75,7 @@ class question_engine_unit_of_work_test extends data_loading_method_test_base {
     }
 
     protected function setup_initial_test_state($testdata) {
-        $records = new question_test_recordset($testdata);
+        $records = new core_question_test_recordset($testdata);
 
         $this->quba = question_usage_by_activity::load_from_records($records, 1);
 
