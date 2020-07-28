@@ -279,7 +279,8 @@ class rb_source_dp_certification_history extends rb_base_source {
                 'displayfunc' => 'certif_status',
                 'dbdatatype' => 'integer',
                 'extrafields' => array(
-                    'active' => 'base.active'
+                    'active' => 'base.active',
+                    'timeexpires' => 'base.timeexpires',
                 )
             )
         );

@@ -250,6 +250,9 @@ final class cohort_rule_sqlhandler_certification_status extends cohort_rule_sqlh
      * @return array
      */
     private function get_sql_snippet_certified() {
+        // NOTE: this must match logic in totara/plan/rb_sources/rb_source_dp_certification.php
+        //       and totara/certification/classes/rb/display/certif_status.php
+
         $timenow = time();
         $sqlchunks = [];
         foreach ($this->certids as $certifid) {
@@ -258,12 +261,16 @@ final class cohort_rule_sqlhandler_certification_status extends cohort_rule_sqlh
             EXISTS (SELECT 1
                       FROM {certif_completion} cc
                      WHERE cc.certifid = {$certifid} AND cc.userid = u.id
-                           AND cc.timecompleted != 0 AND cc.timeexpires > {$timenow}
+                           AND (cc.status = " . CERTIFSTATUS_COMPLETED . " OR cc.status = " . CERTIFSTATUS_INPROGRESS . ")
+                           AND cc.timecompleted > 0 AND cc.timeexpires > {$timenow}
             ) OR
             EXISTS (SELECT 1
                       FROM {certif_completion_history} cch
+                 LEFT JOIN {certif_completion} cc ON cc.userid = cch.userid AND cc.certifid = cch.certifid
                      WHERE cch.certifid = {$certifid} AND cch.userid = u.id
-                           AND cch.timecompleted != 0 AND cch.timeexpires > {$timenow}
+                           AND (cch.status = " . CERTIFSTATUS_COMPLETED . " OR cch.status = " . CERTIFSTATUS_INPROGRESS . ")
+                           AND cch.timecompleted > 0 AND cch.timeexpires > {$timenow}
+                           AND cch.unassigned = 1 AND cc.id IS NULL
             ))";
         }
 

@@ -58,7 +58,12 @@ class certif_status extends \totara_reportbuilder\rb\display\base {
                 case CERTIFSTATUS_ASSIGNED:
                     return get_string('notcertified', 'totara_certification') . $unassigned;
                 case CERTIFSTATUS_COMPLETED:
-                    return get_string('certified', 'totara_certification') . $unassigned;
+                    // NOTE: this must match logic in totara/cohort/rules/sqlhandlers/certification_status.php
+                    if (isset($extrafields->timeexpires) && $extrafields->timeexpires < time()) {
+                        return get_string('status_expired', 'totara_certification') . $unassigned;
+                    } else {
+                        return get_string('certified', 'totara_certification') . $unassigned;
+                    }
                 default:
                     return get_string($CERTIFSTATUS[$value], 'totara_certification') . $unassigned;
             }

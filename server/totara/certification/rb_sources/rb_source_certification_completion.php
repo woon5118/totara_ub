@@ -313,6 +313,9 @@ class rb_source_certification_completion extends rb_base_source {
             array(
                 'joins' => 'certif_completion',
                 'displayfunc' => 'certif_status',
+                'extrafields' => array(
+                    'timeexpires' => 'certif_completion.timeexpires',
+                ),
             )
         );
         $columnoptions[] = new rb_column_option(

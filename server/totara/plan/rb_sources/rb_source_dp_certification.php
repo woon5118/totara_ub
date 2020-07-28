@@ -314,7 +314,8 @@ class rb_source_dp_certification extends rb_base_source {
                     'joins' => 'certif_completion',
                     'displayfunc' => 'certif_status',
                     'extrafields' => array(
-                        'unassigned' => 'certif_completion.unassigned'
+                        'unassigned' => 'certif_completion.unassigned',
+                        'timeexpires' => 'certif_completion.timeexpires',
                     )
                 )
         );
