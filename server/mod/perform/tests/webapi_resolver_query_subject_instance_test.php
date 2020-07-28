@@ -45,8 +45,8 @@ class mod_perform_webapi_resolver_query_subject_instance_testcase extends mod_pe
         $this->assert_webapi_operation_successful($result);
         $actual = $this->get_webapi_operation_data($result);
 
-        $profile_image_small_url = (new \user_picture(
-            self::$about_user_and_participating->subject_user->get_record(),
+        $profile_image_small_url = (new user_picture(
+            self::$about_user_and_participating->subject_user->get_user()->get_record(),
             0
         ))->get_url($GLOBALS['PAGE'])->out(false);
 

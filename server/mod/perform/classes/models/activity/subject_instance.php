@@ -27,7 +27,6 @@ namespace mod_perform\models\activity;
 use coding_exception;
 use context_module;
 use core\collection;
-use core\entities\user;
 use core\orm\entity\model;
 use core\orm\query\builder;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
@@ -52,7 +51,7 @@ use totara_job\job_assignment;
  * This class represents a specific activity about a specific person (subject_instance)
  *
  * @property-read int $id
- * @property-read user $subject_user The user that this activity is about
+ * @property-read participant $subject_user The user that this activity is about
  * @property-read int $subject_user_id The user id for the user this instance is about
  * @property-read int $created_at When this instance was created.
  * @property-read int $status Whether the instance is pending or not
@@ -77,7 +76,6 @@ class subject_instance extends model {
 
     protected $entity_attribute_whitelist = [
         'id',
-        'subject_user',
         'subject_user_id',
         'created_at',
         'progress',
@@ -97,6 +95,7 @@ class subject_instance extends model {
         'availability_state',
         'manual_state',
         'is_overdue',
+        'subject_user',
         'instance_count',
     ];
 
@@ -188,6 +187,15 @@ class subject_instance extends model {
     protected function update_state_code(state $state): void {
         $this->entity->{$state::get_type()} = $state::get_code();
         $this->entity->update();
+    }
+
+    /**
+     * Get the subject user.
+     *
+     * @return participant
+     */
+    public function get_subject_user(): participant {
+        return new participant($this->entity->subject_user);
     }
 
     /**

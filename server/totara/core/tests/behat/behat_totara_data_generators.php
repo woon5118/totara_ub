@@ -442,6 +442,10 @@ class behat_totara_data_generators extends behat_base {
                 'datagenerator' => 'activity_track',
                 'required' => array('activity_name', 'track_description')
             ),
+            'external participants' => array(
+                'datagenerator' => 'external_participant',
+                'required' => array('fullname', 'email')
+            ),
             'section relationships' => array(
                 'datagenerator' => 'section_relationship_from_name',
                 'required' => array('section_name', 'relationship')

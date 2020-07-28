@@ -78,7 +78,7 @@ abstract class one_to_one extends relation {
             $results = $this->repo
                 ->remove_where($field)
                 ->where($field, $keys)
-                ->get();
+                ->get(true);
 
             $results->key_by($this->get_foreign_key());
 

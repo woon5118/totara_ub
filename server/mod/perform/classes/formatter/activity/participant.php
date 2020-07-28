@@ -17,33 +17,38 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Murali Nair <murali.nair@totaralearning.com>
+ * @author Kunle Odusan <kunle.odusan@totaralearning.com>
  * @package mod_perform
  */
 
-namespace mod_perform\models\activity;
+namespace mod_perform\formatter\activity;
+
+use core\webapi\formatter\formatter;
+use mod_perform\models\activity\participant as participant_model;
 
 /**
- * Convenience enum to represent the participant source.
+ * Class participant_instance
+ *
+ * @package mod_perform\formatter\activity
  */
-final class participant_source {
-    public const INTERNAL = 0;
-    public const EXTERNAL = 1;
-
-    public const SOURCE_TEXT = [
-        self::INTERNAL => 'INTERNAL',
-        self::EXTERNAL => 'EXTERNAL',
-    ];
+class participant extends formatter {
 
     /**
-     * Get all allowed values.
-     *
-     * @return string[] the allowed values.
+     * @var participant_model
      */
-    public static function get_allowed(): array {
+    protected $object;
+
+    protected function get_map(): array {
         return [
-            self::INTERNAL,
-            self::EXTERNAL
+            'id' => null,
+            'fullname' => null,
+            'email' => null,
+            'profileimageurlsmall' => null,
+            'source' => null,
         ];
+    }
+
+    protected function has_field(string $field): bool {
+        return in_array($field, participant_model::$fields, true);
     }
 }

@@ -97,10 +97,11 @@ Feature: Adding and removing participant to a perform activity section
     When I click on the "Peer" tui checkbox
     When I click on the "Mentor" tui checkbox
     When I click on the "Reviewer" tui checkbox
+    When I click on the "External respondent" tui checkbox
     And I click on "Done" "button"
     Then I should see "Activity saved" in the tui "success" notification toast
     And I close the tui notification toast
-    And I should see "Subject, Manager, Appraiser, Peer, Mentor, Reviewer" as the perform activity participants
+    And I should see "Subject, Manager, Appraiser, Peer, Mentor, Reviewer, External respondent" as the perform activity participants
     And I should see the add participant button is disabled
 
     # Toggle can view other responses for Subject

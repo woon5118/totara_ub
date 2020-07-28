@@ -28,6 +28,7 @@ use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\entity\relations\belongs_to;
 use core\orm\entity\relations\has_many;
+use mod_perform\models\activity\participant_source;
 use totara_core\entities\relationship;
 
 /**
@@ -46,6 +47,7 @@ use totara_core\entities\relationship;
  * @property-read subject_instance $subject_instance
  * @property-read collection|participant_section[] $participant_sections
  * @property-read user $participant_user
+ * @property-read external_participant $external_participant
  *
  * @method static participant_instance_repository repository
  *
@@ -90,7 +92,19 @@ class participant_instance extends entity {
      * @return belongs_to
      */
     public function participant_user(): belongs_to {
-        return $this->belongs_to(user::class, 'participant_id');
+        return $this->belongs_to(user::class, 'participant_id', 'id')
+            ->join([self::TABLE, 'pi'], 'id', 'participant_id')
+            ->where('pi.participant_source', participant_source::INTERNAL);
     }
 
+    /**
+     * Get the external participant this participant instance belongs to.
+     *
+     * @return belongs_to
+     */
+    public function external_participant(): belongs_to {
+        return $this->belongs_to(external_participant::class, 'participant_id', 'id')
+            ->join([self::TABLE, 'pi'], 'id', 'participant_id')
+            ->where('pi.participant_source', participant_source::EXTERNAL);
+    }
 }

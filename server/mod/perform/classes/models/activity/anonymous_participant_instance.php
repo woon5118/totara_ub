@@ -100,9 +100,9 @@ class anonymous_participant_instance extends participant_instance {
     }
 
     /**
-     * Get the participant entity, for now always an internal user.
+     * @inheritDoc
      */
-    public function get_participant(): ?user {
+    public function get_participant(): ?participant {
         return null;
     }
 

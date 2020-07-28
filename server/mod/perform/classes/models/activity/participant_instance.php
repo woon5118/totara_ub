@@ -72,6 +72,7 @@ class participant_instance extends model {
         'progress',
         'availability',
         'participant_id',
+        'participant_source',
         'subject_instance_id',
         'core_relationship_id',
         'created_at',
@@ -130,10 +131,16 @@ class participant_instance extends model {
     }
 
     /**
-     * Get the participant entity, for now always an internal user.
+     * Get the participant user
+     *
+     * @return participant
      */
-    public function get_participant(): ?user {
-        return $this->entity->participant_user;
+    public function get_participant(): ?participant {
+        $participant_data = (int)$this->entity->participant_source === participant_source::INTERNAL
+            ? $this->entity->participant_user
+            : external_participant::load_by_entity($this->entity->external_participant);
+
+        return new participant($participant_data, $this->entity->participant_source);
     }
 
     /**
@@ -225,7 +232,8 @@ class participant_instance extends model {
     public function get_is_for_current_user(): bool {
         global $USER;
 
-        return $this->participant_id == $USER->id;
+        return (int)$this->entity->participant_source === participant_source::INTERNAL
+            && $this->participant_id == $USER->id;
     }
 
     /**
