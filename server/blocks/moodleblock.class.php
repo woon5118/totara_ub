@@ -794,7 +794,7 @@ EOD;
      * @return string
      */
     public function get_aria_role() {
-        return 'complementary';
+        return 'region';
     }
 
     /**
