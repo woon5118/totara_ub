@@ -56,7 +56,7 @@
     }
 }}
 <tr class="preference-row" data-region="preference-row" data-preference-key="{{preferencekey}}">
-    <td class="preference-name">{{displayname}}</td>
+    <th scope="row" class="preference-name">{{displayname}}</th>
     {{#processors}}
     <td {{^userconfigured}}class="disabled"{{/userconfigured}} data-processor-name="{{name}}">
             {{#locked}}

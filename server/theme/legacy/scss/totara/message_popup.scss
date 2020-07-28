@@ -70,7 +70,6 @@
       content: ' ';
     }
 
-
     img {
       max-width: 100%;
     }
@@ -113,7 +112,7 @@
         }
 
         &.searching {
-          background-color:var(--legacy-color-neutral-3);
+          background-color: var(--legacy-color-neutral-3);
           transition: background-color linear 0.2s;
 
           input {
@@ -745,7 +744,7 @@
           line-height: 30px;
           text-align: center;
           border-radius: 4px;
-          background-color: var(--legacy-color-prompt-error);
+          background-color: var(--legacy-color-neutral-6);
           color: var(--legacy-color-neutral-1);
           cursor: pointer;
 

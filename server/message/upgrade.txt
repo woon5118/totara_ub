@@ -3,6 +3,10 @@ information provided here is intended especially for developers.
 
 === 13.0 ===
 
+* Adding table scope attributes to improve accessibility in:
+** core_message/notification_preferences_component
+** core_message/notification_preferences_component_notification
+** core_message/notification_preferences_processor
 * message_airnotifier plugin has been fully removed
 
 === 12.0 ===
