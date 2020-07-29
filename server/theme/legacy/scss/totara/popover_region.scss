@@ -163,7 +163,7 @@ $popup-font-size-base: 1rem !default;
 }
 
 .popover-region-content-container {
-  height: calc(#{'100% - ${popup-content-header-footer-height}'});
+  height: calc(100% - #{$popup-content-header-footer-height});
   width: 100%;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
