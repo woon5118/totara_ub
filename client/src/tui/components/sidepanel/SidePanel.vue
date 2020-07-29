@@ -62,7 +62,11 @@
       ref="sidePanel__inner"
       class="tui-sidePanel__inner"
     >
-      <div ref="sidePanel__content" class="tui-sidePanel__content">
+      <div
+        ref="sidePanel__content"
+        class="tui-sidePanel__content"
+        :style="{ width: contentWidth }"
+      >
         <slot ref="removableContent" />
       </div>
     </div>
@@ -94,6 +98,15 @@ export default {
       type: String,
       default: 'ltr',
       validator: str => ['ltr', 'rtl'].includes(str),
+    },
+
+    /**
+     * Whether the SidePanel's inner content should have a fixed width when its state is expanding or collapsing
+     * When set to true, a fixed-width will be applied, preventing reflow of SidePanel contents during transitions
+     **/
+    fixContentWidth: {
+      type: Boolean,
+      default: true,
     },
 
     /**
@@ -178,6 +191,11 @@ export default {
        * completely open state to a completely closed state
        **/
       closing: false,
+
+      /**
+       * Width of the content preventing reflow of SidePanel contents during transitions
+       **/
+      contentWidth: 'auto',
 
       /**
        * Toggle value indicating the SidePanel is currently moving between a
@@ -296,6 +314,8 @@ export default {
       this.opening = true;
       this.$emit('sidepanel-expanding');
 
+      this.contentWidth = 'auto';
+
       this.$_animate().then(() => {
         this.opening = false;
         this.isOpen = true;
@@ -312,12 +332,21 @@ export default {
       this.closing = true;
       this.$emit('sidepanel-collapsing');
 
+      this.contentWidth = this.getContentWidth();
+
       this.$_animate().then(() => {
         this.closing = false;
         this.isOpen = false;
 
         this.$emit('sidepanel-collapsed');
       });
+    },
+
+    getContentWidth() {
+      if (this.fixContentWidth)
+        return (
+          this.$refs.sidePanel__content.getBoundingClientRect().width + 'px'
+        );
     },
 
     async $_animate() {
