@@ -2172,11 +2172,25 @@ class core_renderer extends renderer_base {
         if ($userpicture->alttext) {
             if (!empty($user->imagealt)) {
                 $alt = $user->imagealt;
+            } else if (!$userpicture->visibletoscreenreaders) {
+                $alt = '';    
             } else {
-                $alt = get_string('pictureof', '', fullname($user));
+                $alt = fullname($user);
             }
         } else {
             $alt = '';
+        }
+
+        if ($userpicture->alttext) {
+            if (!empty($user->imagealt)) {
+                $title = $user->imagetitle;
+            } else if (!$userpicture->visibletoscreenreaders) {
+                $title = '';   
+            } else {
+                $title = fullname($user);
+            }
+        } else {
+            $title = '';
         }
 
         if (empty($userpicture->size)) {
@@ -2195,10 +2209,7 @@ class core_renderer extends renderer_base {
 
         $src = $userpicture->get_url($this->page, $this);
 
-        $attributes = array('src'=>$src, 'alt'=>$alt, 'title'=>$alt, 'class'=>$class, 'width'=>$size, 'height'=>$size);
-        if (!$userpicture->visibletoscreenreaders) {
-            $attributes['role'] = 'presentation';
-        }
+        $attributes = array('src'=>$src, 'alt'=>$alt, 'title'=>$title, 'class'=>$class, 'width'=>$size, 'height'=>$size);
 
         // get the image html output fisrt
         $output = html_writer::empty_tag('img', $attributes);
