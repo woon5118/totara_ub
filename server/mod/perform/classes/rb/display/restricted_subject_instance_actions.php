@@ -38,6 +38,9 @@ use mod_perform\state\subject_instance\closed;
  * @package totara_reportbuilder
  */
 class restricted_subject_instance_actions extends base {
+
+    public const SUBJECT_INSTANCE_REPORT_TYPE = 'SUBJECT_INSTANCE';
+
     /**
      * @inheritDoc
      */
@@ -56,10 +59,11 @@ class restricted_subject_instance_actions extends base {
 
         return $OUTPUT->render(
             new component(
-                'mod_perform/components/report/subject_instance/Actions',
+                'mod_perform/components/report/manage_participation/Actions',
                 [
+                    'reportType'        => self::SUBJECT_INSTANCE_REPORT_TYPE,
                     'activityId'        => $extrafields->activity_id,
-                    'subjectInstanceId' => $extrafields->subject_instance_id,
+                    'id'                => $extrafields->subject_instance_id,
                     'isOpen'            => $is_open
                 ]
             )

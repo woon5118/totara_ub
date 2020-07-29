@@ -57,12 +57,7 @@
             <Button
               :styleclass="{ primary: true }"
               :text="
-                $str(
-                  isOpen
-                    ? 'button_close'
-                    : 'subject_instance_availability_reopen',
-                  'mod_perform'
-                )
+                $str(isOpen ? 'button_close' : 'button_reopen', 'mod_perform')
               "
               @click="changeAvailability()"
             />
@@ -109,6 +104,9 @@ export default {
     isOpen: {
       type: Boolean,
     },
+    reportType: {
+      type: String,
+    },
   },
   methods: {
     modalClose() {
@@ -142,10 +140,10 @@ export default {
           },
         });
         this.$emit('modal-close');
-        let params = this.isOpen
-          ? { participant_instance_closed: true }
-          : { participant_instance_opened: true };
-        redirectWithPost(window.location, params);
+        redirectWithPost(window.location, {
+          is_open: !this.isOpen,
+          report_type: this.reportType,
+        });
       } catch (e) {
         this.showErrorNotification();
       }
@@ -158,7 +156,7 @@ export default {
   "mod_perform": [
     "button_cancel",
     "button_close",
-    "subject_instance_availability_reopen",
+    "button_reopen",
     "subject_instance_closed_message_line1",
     "subject_instance_closed_message_line2",
     "subject_instance_closed_title",

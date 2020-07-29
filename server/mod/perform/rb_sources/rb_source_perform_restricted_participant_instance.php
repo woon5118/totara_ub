@@ -109,6 +109,7 @@ class rb_source_perform_restricted_participant_instance extends rb_source_perfor
                 'extrafields' => [
                     'activity_id' => 'track.activity_id',
                     'participant_instance_id' => 'base.id',
+                    'participant_availability' => 'base.availability',
                 ],
             ]
         );

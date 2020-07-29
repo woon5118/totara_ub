@@ -18,14 +18,32 @@
 
 <template>
   <div>
-    <OpenCloseActionModal
+    <SubjectOpenCloseActionModal
+      v-if="isSubjectReport"
       :modal-open="showModalOpen"
-      :subject-instance-id="subjectInstanceId"
+      :subject-instance-id="id"
       :is-open="isOpen"
+      :report-type="reportType"
       @modal-close="modalClose"
     />
-
+    <ParticipantOpenCloseActionModal
+      v-if="isParticipantReport"
+      :modal-open="showModalOpen"
+      :participant-instance-id="id"
+      :is-open="isOpen"
+      :report-type="reportType"
+      @modal-close="modalClose"
+    />
+    <SectionOpenCloseActionModal
+      v-if="isSectionReport"
+      :modal-open="showModalOpen"
+      :participant-section-id="id"
+      :is-open="isOpen"
+      :report-type="reportType"
+      @modal-close="modalClose"
+    />
     <a
+      v-if="isSubjectReport"
       :href="participationManagementUrl"
       :title="$str('activity_participants_add', 'mod_perform')"
     >
@@ -41,7 +59,7 @@
     </ButtonIcon>
     <ButtonIcon
       v-else
-      :aria-label="$str('subject_instance_availability_reopen', 'mod_perform')"
+      :aria-label="$str('button_reopen', 'mod_perform')"
       :styleclass="{ transparentNoPadding: true }"
       @click="showModal()"
     >
@@ -50,24 +68,33 @@
   </div>
 </template>
 <script>
-import ParticipantAddIcon from 'tui/components/icons/common/AddUser';
-import OpenCloseActionModal from 'mod_perform/components/report/subject_instance/OpenCloseActionModal';
-import LockIcon from 'tui/components/icons/common/Lock';
-import UnlockIcon from 'tui/components/icons/common/Unlock';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
+import LockIcon from 'tui/components/icons/common/Lock';
+import ParticipantOpenCloseActionModal from 'mod_perform/components/report/manage_participation/ParticipantOpenCloseActionModal';
+import SectionOpenCloseActionModal from 'mod_perform/components/report/manage_participation/SectionOpenCloseActionModal';
+import SubjectOpenCloseActionModal from 'mod_perform/components/report/manage_participation/SubjectInstanceOpenCloseActionModal';
+import ParticipantAddIcon from 'tui/components/icons/common/AddUser';
+import UnlockIcon from 'tui/components/icons/common/Unlock';
+
+const REPORT_TYPE_SUBJECT_INSTANCE = 'SUBJECT_INSTANCE';
+const REPORT_TYPE_PARTICIPANT_INSTANCE = 'PARTICIPANT_INSTANCE';
+const REPORT_TYPE_PARTICIPANT_SECTION = 'PARTICIPANT_SECTION';
+
 export default {
   components: {
     ButtonIcon,
-    ParticipantAddIcon,
     LockIcon,
+    ParticipantOpenCloseActionModal,
+    ParticipantAddIcon,
+    SectionOpenCloseActionModal,
+    SubjectOpenCloseActionModal,
     UnlockIcon,
-    OpenCloseActionModal,
   },
   props: {
-    activityId: {
+    reportType: {
       type: String,
     },
-    subjectInstanceId: {
+    id: {
       type: String,
     },
     isOpen: {
@@ -80,6 +107,15 @@ export default {
     };
   },
   computed: {
+    isSectionReport() {
+      return this.reportType === REPORT_TYPE_PARTICIPANT_SECTION;
+    },
+    isParticipantReport() {
+      return this.reportType === REPORT_TYPE_PARTICIPANT_INSTANCE;
+    },
+    isSubjectReport() {
+      return this.reportType === REPORT_TYPE_SUBJECT_INSTANCE;
+    },
     /**
      * Get the url to the participation management
      *
@@ -89,7 +125,7 @@ export default {
       return this.$url(
         '/mod/perform/manage/participation/add_participants.php',
         {
-          subject_instance_id: this.subjectInstanceId,
+          subject_instance_id: this.id,
         }
       );
     },
@@ -108,7 +144,7 @@ export default {
   {
   "mod_perform": [
     "activity_participants_add",
-    "subject_instance_availability_reopen",
+    "button_reopen",
     "button_close"
   ]
   }

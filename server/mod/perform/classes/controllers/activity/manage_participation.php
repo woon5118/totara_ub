@@ -30,10 +30,15 @@ use mod_perform\controllers\perform_controller;
 use mod_perform\models\activity\activity;
 use mod_perform\views\embedded_report_view;
 use mod_perform\views\override_nav_breadcrumbs;
+use mod_perform\rb\display\restricted_subject_instance_actions;
+use mod_perform\rb\display\restricted_participant_instance_actions;
+use mod_perform\rb\display\restricted_participant_section_actions;
 use moodle_url;
 use totara_mvc\view;
 use totara_mvc\has_report;
 use totara_tui\output\component;
+
+
 
 class manage_participation extends perform_controller {
     use manage_participation_tabs;
@@ -182,21 +187,34 @@ class manage_participation extends perform_controller {
         $message = null;
 
         $participants_created_count = $this->get_optional_param('participant_instance_created_count', false, PARAM_INT);
-        $participant_instance_opened = $this->get_optional_param('participant_instance_opened', false, PARAM_BOOL);
-        $participant_instance_closed = $this->get_optional_param('participant_instance_closed', false, PARAM_BOOL);
+        $is_opened = $this->get_optional_param('is_open', false, PARAM_BOOL);
+        $report_type = $this->get_optional_param('report_type', false, PARAM_TEXT);
 
-        if ($participant_instance_opened) {
-            $message = get_string('subject_instance_reopen_confirmation', 'mod_perform');
-        } else if ($participant_instance_closed) {
-            $message = get_string('subject_instance_closed_confirmation', 'mod_perform');
+        if(!$report_type && $participants_created_count < 1) {
+            return '';
+        }
+
+        if ($report_type) {
+            $lang_str = null;
+            switch ($report_type) {
+                case restricted_subject_instance_actions::SUBJECT_INSTANCE_REPORT_TYPE:
+                    $lang_str = ($is_opened) ? 'subject_instance_reopen_confirmation' : 'subject_instance_closed_confirmation';
+                    break;
+                case restricted_participant_instance_actions::PARTICIPANT_INSTANCE_REPORT_TYPE:
+                    $lang_str = ($is_opened) ? 'participant_instances_reopen_confirmation' : 'participant_instances_close_confirmation';
+                    break;
+                case restricted_participant_section_actions::PARTICIPANT_SECTION_REPORT_TYPE:
+                    $lang_str = ($is_opened) ? 'participant_section_reopen_confirmation' : 'participant_section_close_confirmation';
+                    break;
+                default:
+                    return '';
+            }
+            $message = get_string($lang_str, 'mod_perform');
+
         } else if ($participants_created_count === 1) {
             $message = get_string('participant_instances_manually_added_toast_singular', 'mod_perform');
         } else if ($participants_created_count > 1) {
             $message = get_string('participant_instances_manually_added_toast', 'mod_perform', $participants_created_count);
-        }
-
-        if ($message === null) {
-            return '';
         }
 
         return $PAGE->get_renderer('core')->render(

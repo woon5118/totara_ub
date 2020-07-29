@@ -23,12 +23,13 @@
 
 namespace mod_perform\rb\display;
 
-use core\output\flex_icon;
+use mod_perform\state\participant_section\closed;
 use rb_column;
 use rb_column_option;
 use reportbuilder;
 use stdClass;
 use totara_reportbuilder\rb\display\base;
+use totara_tui\output\component;
 
 /**
  * Class describing column display formatting.
@@ -37,13 +38,14 @@ use totara_reportbuilder\rb\display\base;
  * @package totara_reportbuilder
  */
 class restricted_participant_section_actions extends base {
+
+    public const PARTICIPANT_SECTION_REPORT_TYPE = 'PARTICIPANT_SECTION';
+
     /**
      * @inheritDoc
      */
     public static function display($value, $format, stdClass $row, rb_column $column, reportbuilder $report) {
-        global $PAGE;
-
-        $output = $PAGE->get_renderer('core');
+        global $OUTPUT;
 
         // Column uses noexport, but just to be sure...
         if ($format !== 'html') {
@@ -51,27 +53,18 @@ class restricted_participant_section_actions extends base {
         }
 
         $extrafields = self::get_extrafields_row($row, $column);
+        $is_open = ($extrafields->participant_section_availability == closed::get_code()) ? false : true;
 
-        $str_close = get_string('close', 'rb_source_perform_restricted_participant_section');
-        $str_re_open = get_string('re_open', 'rb_source_perform_restricted_participant_section');
-
-        // TODO: Add urls when available
-        // TODO: Use close/re-open depending on status
-        $close_url = '';
-        $re_open_url = '';
-
-        $close = $output->action_icon(
-            $close_url,
-            new flex_icon('lock', [
-                'alt' => $str_close,
-                'title' => $str_close,
-            ])
+        return $OUTPUT->render(
+            new component(
+                'mod_perform/components/report/manage_participation/Actions',
+                [
+                    'reportType' => self::PARTICIPANT_SECTION_REPORT_TYPE,
+                    'id'         => $extrafields->participant_section_id,
+                    'isOpen'     => $is_open,
+                ]
+            )
         );
-
-        // TODO: Use close/re-open depending on
-        $out = $close;
-
-        return $out;
     }
 
     public static function is_graphable(rb_column $column, rb_column_option $option, reportbuilder $report) {

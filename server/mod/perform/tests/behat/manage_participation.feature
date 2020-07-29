@@ -109,7 +109,7 @@ Feature: Test management of activity participation
     When I click on "Show all" "link"
     Then I should see "Participant sections: 10 records shown"
 
-  Scenario: Open/close participant subject instances
+  Scenario: open/close action on participant management reports
     Given I log in as "admin"
     And I navigate to the manage perform activities page
     And I click on "Manage participation" "link" in the tui datatable row with "3 participants" "Name"
@@ -127,6 +127,7 @@ Feature: Test management of activity participation
       | User Two            | 1               | 2            |
       | User Two            | 2               | 2            |
       | User Two            | 3               | 2            |
+    #subject instance open/close action
     When I click on "Close" "button" in the "User Three 99999997" "table_row"
     Then I should see "Close subject instance" in the tui modal
     And I confirm the tui confirmation modal
@@ -135,8 +136,27 @@ Feature: Test management of activity participation
     Then I should see "Reopen subject instance" in the tui modal
     And I confirm the tui confirmation modal
     Then I should see "Subject instance and all its participant instances reopened"
-    When I click on "Close" "button" in the "User Three 99999997" "table_row"
-    Then I should see "Close subject instance" in the tui modal
+    #participant instance open/close action
+    When I click on "Participant instances" "link"
+    And I click on "Close" "button" in the "appraiser User" "table_row"
+    Then I should see "Close participant instance" in the tui modal
+    When I confirm the tui confirmation modal
+    Then I should see "Participant instance (and any sections within) closed"
+    And I click on "Reopen" "button" in the "appraiser User" "table_row"
+    Then I should see "Reopen participant instance" in the tui modal
+    When I confirm the tui confirmation modal
+    Then I should see "Participant instance (and any sections within) reopened"
+    #participant section open/close action
+    When I click on "Participant sections" "link"
+    And I click on "Close" "button" in the "appraiser User" "table_row"
+    Then I should see "Close participant section" in the tui modal
+    When I confirm the tui confirmation modal
+    Then I should see "Participant section closed"
+    And I click on "Reopen" "button" in the "appraiser User" "table_row"
+    Then I should see "Reopen participant section" in the tui modal
+    When I confirm the tui confirmation modal
+    Then I should see "Participant section reopened"
+
 
   Scenario: Manage participants top level instance/section filtering
     Given I log in as "admin"
