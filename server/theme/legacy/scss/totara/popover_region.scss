@@ -323,12 +323,12 @@ $popup-font-size-base: 1rem !default;
 
   &.selected {
     background-color: $popup-content-item-selected-colour-bg;
-    color: $popup-content-item-hover-colour-text;
+    color: var(--legacy-color-neutral-1);
     border-color: $popup-content-item-selected-colour-bg;
 
     .content-item-footer {
       .timestamp {
-        color: $popup-content-item-hover-colour-text;
+        color: var(--legacy-color-neutral-1);
       }
     }
   }
