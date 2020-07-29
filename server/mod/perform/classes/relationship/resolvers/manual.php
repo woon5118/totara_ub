@@ -25,6 +25,7 @@ namespace mod_perform\relationship\resolvers;
 
 use mod_perform\entities\activity\subject_instance_manual_participant;
 use totara_core\relationship\relationship_resolver;
+use totara_core\relationship\relationship_resolver_dto;
 
 /**
  * Abstract class manual
@@ -46,10 +47,14 @@ abstract class manual extends relationship_resolver {
      */
     protected function get_data(array $data): array {
         return subject_instance_manual_participant::repository()
-            ->select('user_id')
+            ->select_raw('DISTINCT user_id')
             ->where('subject_instance_id', $data['subject_instance_id'])
             ->where('core_relationship_id', $this->parent_relationship->id)
             ->get()
-            ->pluck('user_id');
+            ->map(
+                function ($item) {
+                    return new relationship_resolver_dto($item->user_id);
+                }
+            )->all();
     }
 }

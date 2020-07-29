@@ -21,23 +21,11 @@
  * @package mod_perform
  */
 
-use mod_perform\relationship\resolvers\reviewer;
+use mod_perform\constants;
+use mod_perform\models\activity\subject_instance_manual_participant;
 use totara_core\relationship\relationship;
-use totara_core\relationship\relationship_resolver;
 
 abstract class perform_relationship_resolver_test extends advanced_testcase {
-    /**
-     * Get resolver for different manual relationships
-     *
-     * @param string $idnumber
-     * @return relationship_resolver
-     * @throws coding_exception
-     */
-    protected function get_resolver(string $idnumber): relationship_resolver {
-        $core_relationship_reviewer = relationship::load_by_idnumber($idnumber);
-        return new reviewer($core_relationship_reviewer);
-    }
-
     /**
      * create manual relationship resolver data
      *
@@ -66,15 +54,17 @@ abstract class perform_relationship_resolver_test extends advanced_testcase {
         );
 
         //subject_instance_manual_participants
-        $subject_instance_manual_participants = $perform_generator->create_subject_instance_manual_participant(
-            [
-                'subject_instance_id'        => $subject_instance->id,
-                'user_ids'                   => [$user1->id],
-                'core_relationship_idnumber' => $idnumber,
-                'created_by'                 => $user2->id,
-            ]
-        );
+        $relationship_id = relationship::load_by_idnumber($idnumber)->id;
+        if ($idnumber == constants::RELATIONSHIP_EXTERNAL) {
+            $subject_instance_manual_participant = subject_instance_manual_participant::create_for_external(
+                $subject_instance->id, $user2->id, $relationship_id, $user1->email, $user1->username
+            );
+        } else {
+            $subject_instance_manual_participant = subject_instance_manual_participant::create_for_internal(
+                $subject_instance->id, $user2->id, $relationship_id, $user1->id
+            );
+        }
 
-        return [$user1, $subject_instance, $subject_instance_manual_participants];
+        return [$user1, $subject_instance, $subject_instance_manual_participant];
     }
 }

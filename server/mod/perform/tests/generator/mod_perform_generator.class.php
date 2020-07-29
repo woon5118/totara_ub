@@ -957,9 +957,9 @@ class mod_perform_generator extends component_generator_base {
 
             $relationship = core_relationship::load_by_entity($selection->selector_relationship);
             $users = $relationship->get_users(['user_id' => $subject_user->id]);
-            foreach ($users as $user_id) {
+            foreach ($users as $user_dto) {
                 $selector = new manual_relationship_selector();
-                $selector->user_id = $user_id;
+                $selector->user_id = $user_dto->get_user_id();
                 $selector->manual_relation_select_progress_id = $progress_entity->id;
                 $selector->save();
             }

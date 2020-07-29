@@ -45,6 +45,7 @@ use mod_perform\state\subject_instance\closed;
 use mod_perform\state\subject_instance\pending;
 use totara_core\relationship\helpers\relationship_collection_manager as core_relationship_collection_manager;
 use totara_core\relationship\relationship as core_relationship;
+use totara_core\relationship\relationship_resolver_dto;
 
 /**
  * Class participation_service
@@ -366,7 +367,7 @@ class participant_instance_creation {
             $relationship_data = [
                 'core_relationship_ids' => $relationships_per_activity[$subject_instance->activity_id],
                 'subject_instance' => $subject_instance,
-                'participant_ids' => $participant_ids_for_relationships,
+                'participant_dtos' => $participant_ids_for_relationships,
             ];
 
             $this->create_participant_instances_for_relationships($relationship_data);
@@ -444,10 +445,10 @@ class participant_instance_creation {
     private function create_participant_instances_for_relationships(array $relationship_data): void {
         $core_relationship_ids = $relationship_data['core_relationship_ids'];
         $subject_instance = $relationship_data['subject_instance'];
-        $participant_ids = $relationship_data['participant_ids'];
+        $participant_dtos = $relationship_data['participant_dtos'];
 
         foreach ($core_relationship_ids as $core_relationship_id) {
-            $relationship_participants = $participant_ids[$core_relationship_id] ?? null;
+            $relationship_participants = $participant_dtos[$core_relationship_id] ?? null;
 
             if (!empty($relationship_participants)) {
                 $this->create_participant_instances_for_user_list(
@@ -484,15 +485,16 @@ class participant_instance_creation {
      * Create participant instances for a list of user ids.
      *
      * @param array $data
-     * @param array $participant_user_id_list
+     * @param array|relationship_resolver_dto[] $participant_dto_list
+     *
      * @return void
      */
     private function create_participant_instances_for_user_list(
         array $data,
-        array $participant_user_id_list
+        array $participant_dto_list
     ): void {
-        foreach ($participant_user_id_list as $participant_user_id) {
-            $data['participant_data']['participant_id'] = $participant_user_id;
+        foreach ($participant_dto_list as $participant_dto) {
+            $data['participant_data']['participant_id'] = $participant_dto->get_user_id();
             $this->participation_creation_list[] = $data;
 
             if (count($this->participation_creation_list) === $this->buffer_count) {

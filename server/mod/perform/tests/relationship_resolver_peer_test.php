@@ -21,6 +21,8 @@
  * @package mod_perform
  */
 
+use mod_perform\constants;
+use totara_core\relationship\relationship;
 use mod_perform\relationship\resolvers\peer;
 
 require_once(__DIR__ . '/perform_relationship_resolver_test.php');
@@ -30,26 +32,24 @@ require_once(__DIR__ . '/perform_relationship_resolver_test.php');
  * @covers peer
  */
 class relationship_resolver_peer_testcase extends perform_relationship_resolver_test {
-    /**
-     * @var string
-     */
-    const ID_NUMBER = 'perform_peer';
 
     public function test_get_users_by_subject_instance_id() {
-        [$user1, $subject_instance] = $this->create_relationship_resolver_data(self::ID_NUMBER);
+        [$user1, $subject_instance] = $this->create_relationship_resolver_data(constants::RELATIONSHIP_PEER);
 
-        $peer = $this->get_resolver(self::ID_NUMBER);
-        $user_ids = $peer->get_users(['subject_instance_id' => $subject_instance->id]);
+        $peer_resolver = relationship::load_by_idnumber(constants::RELATIONSHIP_PEER);
+        $relationship_resolver_dtos = $peer_resolver->get_users(['subject_instance_id' => $subject_instance->id]);
 
-        $this->assertEquals([$user1->id], $user_ids);
+        $this->assertEquals([$user1->id], [$relationship_resolver_dtos[0]->get_user_id()]);
     }
 
     public function test_get_users_by_subject_instance_id_and_user_id() {
-        [$user1, $subject_instance] = $this->create_relationship_resolver_data(self::ID_NUMBER);
+        [$user1, $subject_instance] = $this->create_relationship_resolver_data(constants::RELATIONSHIP_PEER);
 
-        $peer = $this->get_resolver(self::ID_NUMBER);
-        $user_ids = $peer->get_users(['subject_instance_id' => $subject_instance->id, 'user_id' => $user1->id]);
+        $peer_resolver = relationship::load_by_idnumber(constants::RELATIONSHIP_PEER);
+        $relationship_resolver_dtos = $peer_resolver->get_users(
+            ['subject_instance_id' => $subject_instance->id, 'user_id' => $user1->id]
+        );
 
-        $this->assertEquals([$user1->id], $user_ids);
+        $this->assertEquals([$user1->id], [$relationship_resolver_dtos[0]->get_user_id()]);
     }
 }

@@ -24,6 +24,7 @@
 namespace totara_core\relationship\resolvers;
 
 use totara_core\relationship\relationship_resolver;
+use totara_core\relationship\relationship_resolver_dto;
 
 /**
  * Resolves the same user as what was inputted.
@@ -64,10 +65,12 @@ class subject extends relationship_resolver {
      * Return the specified user(s).
      *
      * @param array
-     * @return int[] of user ids
+     * @return relationship_resolver_dto[]
      */
     protected function get_data(array $data): array {
-        return [$data['user_id']];
+        $dto = new relationship_resolver_dto($data['user_id']);
+
+        return [$dto];
     }
 
 }

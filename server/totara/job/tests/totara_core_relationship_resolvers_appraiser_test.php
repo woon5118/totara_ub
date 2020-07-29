@@ -22,6 +22,7 @@
  */
 
 use totara_core\relationship\relationship;
+use totara_core\relationship\relationship_resolver_dto;
 use totara_job\job_assignment;
 use totara_job\relationship\resolvers\appraiser;
 
@@ -52,15 +53,17 @@ class totara_job_totara_core_relationship_resolvers_appraiser_testcase extends \
         [$user1, $user2, $user3, $user1ja1, $user1ja2, $user2ja, $user3ja, $appraiser_resolver] = $this->create_data();
 
         // user2 is the appraiser of user1 in ja1
+        $relationship_resolver_dtos = $appraiser_resolver->get_users(['job_assignment_id' => $user1ja1->id]);
         $this->assertEquals(
             [$user2->id],
-            $appraiser_resolver->get_users(['job_assignment_id' => $user1ja1->id])
+            relationship_resolver_dto::get_user_ids($relationship_resolver_dtos)
         );
 
         // user3 is the appraiser of user1 in ja2
+        $relationship_resolver_dtos = $appraiser_resolver->get_users(['job_assignment_id' => $user1ja2->id]);
         $this->assertEquals(
             [$user3->id],
-            $appraiser_resolver->get_users(['job_assignment_id' => $user1ja2->id])
+            relationship_resolver_dto::get_user_ids($relationship_resolver_dtos)
         );
 
         // user2 is not appraised by anyone
@@ -80,9 +83,10 @@ class totara_job_totara_core_relationship_resolvers_appraiser_testcase extends \
         [$user1, $user2, $user3, $user1ja1, $user1ja2, $user2ja, $user3ja, $appraiser_resolver] = $this->create_data();
 
         // user2 and user3 are the appraisers of user1
+        $relationship_resolver_dtos = $appraiser_resolver->get_users(['user_id' => $user1->id]);
         $this->assertEqualsCanonicalizing(
             [$user2->id, $user3->id],
-            $appraiser_resolver->get_users(['user_id' => $user1->id])
+            relationship_resolver_dto::get_user_ids($relationship_resolver_dtos)
         );
 
         // user2 is not appraised by anyone

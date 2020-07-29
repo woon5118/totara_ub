@@ -21,25 +21,25 @@
  * @package mod_perform
  */
 
+use core\collection;
 use mod_perform\constants;
+use mod_perform\entities\activity\participant_instance;
 use mod_perform\entities\activity\participant_section;
 use mod_perform\entities\activity\section;
+use mod_perform\entities\activity\subject_instance;
+use mod_perform\entities\activity\track_user_assignment;
+use mod_perform\expand_task;
+use mod_perform\models\activity\activity;
+use mod_perform\models\activity\participant_source;
+use mod_perform\models\activity\track;
 use mod_perform\state\participant_instance\not_started;
 use mod_perform\task\service\participant_instance_creation;
 use mod_perform\task\service\participant_instance_dto;
 use mod_perform\task\service\participant_section_creation;
-use core\collection;
-use mod_perform\entities\activity\participant_instance;
-use mod_perform\entities\activity\subject_instance;
-use mod_perform\entities\activity\track_user_assignment;
-use mod_perform\expand_task;
-use mod_perform\models\activity\track;
-use mod_perform\models\activity\participant_source;
 use mod_perform\task\service\subject_instance_creation;
 use mod_perform\task\service\subject_instance_dto;
 use totara_core\relationship\relationship as core_relationship_model;
 use totara_job\job_assignment;
-use mod_perform\models\activity\activity;
 
 /**
  * Class participant_section_creation_service_test
@@ -214,7 +214,7 @@ class mod_perform_participant_section_creation_service_testcase extends advanced
                     $participant_instance = new participant_instance();
                     $participant_instance->subject_instance_id = $subject_instance->id;
                     $participant_instance->participant_source = participant_source::INTERNAL;
-                    $participant_instance->participant_id = $participant;
+                    $participant_instance->participant_id = $participant->get_user_id();
                     $participant_instance->core_relationship_id = $section_relationship->core_relationship_id;
                     $participant_instance->progress = not_started::get_code();
                     $participant_instance->save();

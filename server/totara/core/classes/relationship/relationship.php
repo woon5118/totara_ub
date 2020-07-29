@@ -122,15 +122,17 @@ final class relationship extends model {
      *
      * @param array $data e.g. ['job_assignment_id' => 2]
      *
-     * @return int[]
+     * @return relationship_resolver_dto[]
      */
     public function get_users(array $data): array {
-        $user_ids = [];
+        /** @var relationship_resolver_dto[] $relationship_resolver_dtos */
+        $relationship_resolver_dtos = [];
         foreach ($this->get_resolvers() as $relationship_resolver) {
-            $user_ids[] = $relationship_resolver->get_users($data);
+            $relationship_resolver_dtos[] = $relationship_resolver->get_users($data);
         }
-        $all_user_ids = array_merge(...$user_ids);
-        return array_unique($all_user_ids);
+        // NOTE: It is possible for a relationship to return duplicate user_ids if there are multiple resolvers.
+        // The resolvers themselves should always return unique user_ids, so it is not a problem for now.
+        return array_merge(...$relationship_resolver_dtos);
     }
 
     /**

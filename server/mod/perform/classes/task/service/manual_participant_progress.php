@@ -35,6 +35,7 @@ use mod_perform\state\subject_instance\pending;
 use stdClass;
 use totara_core\entities\relationship;
 use totara_core\relationship\helpers\relationship_collection_manager;
+use totara_core\relationship\relationship_resolver_dto;
 
 class manual_participant_progress {
 
@@ -145,12 +146,17 @@ class manual_participant_progress {
             $selector_relationship_id = $progress->manual_relationship_selection->selector_relationship_id;
 
             // Get the users which should be there
-            $expected_user_ids = $this->relationship_manager->get_users_for_relationships(
+            $expected_users = $this->relationship_manager->get_users_for_relationships(
                 $relationship_args,
                 [$selector_relationship_id]
             );
 
-            $expected_user_ids = $expected_user_ids[$selector_relationship_id];
+            $expected_user_ids = array_map(
+                function($user_dto) {
+                    return $user_dto->get_user_id();
+                },
+                $expected_users[$selector_relationship_id]
+            );
 
             // Get the current users
             $current_user_ids = $progress->manual_relationship_selectors->pluck('user_id');
@@ -235,15 +241,15 @@ class manual_participant_progress {
             $progress->save();
 
             // Get the users for this relationship and create one selector record for each user
-            $user_ids = $this->relationship_manager->get_users_for_relationships(
+            $user_dtos = $this->relationship_manager->get_users_for_relationships(
                 $relationship_args,
                 [$manual_relation_selection->selector_relationship_id]
             );
 
-            foreach ($user_ids[$manual_relation_selection->selector_relationship_id] as $user_id) {
+            foreach ($user_dtos[$manual_relation_selection->selector_relationship_id] as $user_dto) {
                 $selector = new stdClass();
                 $selector->manual_relation_select_progress_id = $progress->id;
-                $selector->user_id = $user_id;
+                $selector->user_id = $user_dto->get_user_id();
                 $selector->created_at = $created_at;
 
                 $this->selectors_to_insert[] = $selector;

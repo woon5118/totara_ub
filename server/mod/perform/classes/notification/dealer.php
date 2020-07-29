@@ -97,16 +97,18 @@ class dealer {
     public function post(): void {
         foreach ($this->recipients as $recipient) {
             $relationship = $recipient->relationship;
-            $users = $relationship->get_users(['user_id' => $this->user_id, 'job_assignment_id' => $this->job_assignment_id]);
-            if (empty($users)) {
+            $user_dtos = $relationship->get_users(
+                ['user_id' => $this->user_id, 'job_assignment_id' => $this->job_assignment_id]
+            );
+            if (empty($user_dtos)) {
                 continue;
             }
             if (!$this->composer->set_relationship($relationship)) {
                 continue;
             }
-            $message = $this->composer->compose($relationship);
-            foreach ($users as $user) {
-                $this->send_notification(core_user::NOREPLY_USER, $user, $message);
+            $message = $this->composer->compose();
+            foreach ($user_dtos as $user_dto) {
+                $this->send_notification(core_user::NOREPLY_USER, $user_dto->get_user_id(), $message);
             }
             $this->save_history($recipient, time());
         }

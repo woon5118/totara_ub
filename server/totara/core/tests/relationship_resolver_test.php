@@ -22,6 +22,7 @@
  */
 
 use totara_core\relationship\relationship_resolver;
+use totara_core\relationship\relationship_resolver_dto;
 
 /**
  * @group totara_core_relationship
@@ -131,7 +132,7 @@ class test_resolver_one extends relationship_resolver {
         return 'resolver_ones';
     }
     protected function get_data(array $data): array {
-        return [$data['input_field_one']];
+        return [new relationship_resolver_dto($data['input_field_one'])];
     }
     public static function get_accepted_fields(): array {
         return [['input_field_one']];
@@ -145,7 +146,7 @@ class test_resolver_two extends relationship_resolver {
         return 'resolver_twos';
     }
     protected function get_data(array $data): array {
-        return [$data['input_field_two']];
+        return [new relationship_resolver_dto($data['input_field_two'])];
     }
     public static function get_accepted_fields(): array {
         return [['input_field_two']];
@@ -167,7 +168,7 @@ class test_resolver_four extends relationship_resolver {
         return 'resolver_fours';
     }
     protected function get_data(array $data): array {
-        return $data;
+        return [new relationship_resolver_dto($data)];
     }
     public static function get_accepted_fields(): array {
         return [[]];
@@ -184,7 +185,13 @@ class test_resolver_five extends test_resolver_one {
         return 'resolver_fives';
     }
     protected function get_data(array $data): array {
-        return [$data['input_field_one'] ?? $data['input_field_two']];
+        $relationship_resolver_dto = null;
+        if (isset($data['input_field_one'])) {
+            $relationship_resolver_dto = new relationship_resolver_dto($data['input_field_one']);
+        } else {
+            $relationship_resolver_dto = new relationship_resolver_dto($data['input_field_two']);
+        }
+        return [$relationship_resolver_dto];
     }
     public static function get_accepted_fields(): array {
         return [['input_field_one', 'input_field_three'], ['input_field_two']];

@@ -27,6 +27,7 @@ use coding_exception;
 use core\collection;
 use totara_core\entities\relationship as relationship_entity;
 use totara_core\relationship\relationship;
+use totara_core\relationship\relationship_resolver_dto;
 
 /**
  * Class relationship_manager helps process a collection of relationships with the arguments.
@@ -80,7 +81,7 @@ class relationship_collection_manager {
      *
      * @param array $args Relationship input values to provide to {@see relationship::get_users}
      * @param array $relationship_ids (Optional) Resolve only a sub-selection of the specified relationships.
-     * @return array
+     * @return array|relationship_resolver_dto[]
      */
     public function get_users_for_relationships(array $args, array $relationship_ids = null): array {
         if ($relationship_ids === null) {

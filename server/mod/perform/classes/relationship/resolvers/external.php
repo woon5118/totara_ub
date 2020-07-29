@@ -23,7 +23,9 @@
 
 namespace mod_perform\relationship\resolvers;
 
+use mod_perform\entities\activity\subject_instance_manual_participant;
 use totara_core\relationship\relationship_resolver;
+use totara_core\relationship\relationship_resolver_dto;
 
 /**
  * Relationship resolver for external participants
@@ -31,6 +33,8 @@ use totara_core\relationship\relationship_resolver;
  * @package mod_perform\relationship\resolvers
  */
 class external extends relationship_resolver {
+
+    public const SOURCE = 'external';
 
     /**
      * @inheritDoc
@@ -57,10 +61,29 @@ class external extends relationship_resolver {
     }
 
     /**
-     * @inheritDoc
+     * Returns simple objects that have a name and email attribute.
+     *
+     * @param array $data
+     * @return relationship_resolver_dto[]
      */
     protected function get_data(array $data): array {
-        // TODO: Implement get_data() method.
-        return [0];
+        return subject_instance_manual_participant::repository()
+            ->select(['name', 'email'])
+            ->where('subject_instance_id', $data['subject_instance_id'])
+            ->where('core_relationship_id', $this->parent_relationship->id)
+            ->get()
+            ->map(
+                function ($external_participant) {
+                    return new relationship_resolver_dto(
+                        0,
+                        self::SOURCE,
+                        [
+                            'name'  => $external_participant->name,
+                            'email' => $external_participant->email,
+                        ]
+                    );
+                }
+            )
+            ->all();
     }
 }

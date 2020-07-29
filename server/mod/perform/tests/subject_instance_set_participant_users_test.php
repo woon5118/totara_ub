@@ -23,6 +23,7 @@
 
 use core\collection;
 use core\entities\user;
+use mod_perform\constants;
 use mod_perform\entities\activity\manual_relationship_selection_progress;
 use mod_perform\entities\activity\manual_relationship_selector;
 use mod_perform\entities\activity\participant_instance;
@@ -34,16 +35,11 @@ use mod_perform\state\subject_instance\active;
 use mod_perform\state\subject_instance\pending;
 use totara_core\relationship\relationship;
 use totara_job\job_assignment;
-use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
  * @group perform
  */
 class mod_perform_subject_instance_set_participant_users_testcase extends advanced_testcase {
-
-    private const MUTATION = 'mod_perform_set_manual_participants';
-
-    use webapi_phpunit_helper;
 
     /**
      * @var mod_perform_generator
@@ -65,23 +61,44 @@ class mod_perform_subject_instance_set_participant_users_testcase extends advanc
         $data = $this->generate_test_data();
 
         // Relationships
-        $peer_relationship = relationship::load_by_idnumber('perform_peer');
-        $mentor_relationship = relationship::load_by_idnumber('perform_mentor');
-        $reviewer_relationship = relationship::load_by_idnumber('perform_reviewer');
+        $peer_relationship = relationship::load_by_idnumber(constants::RELATIONSHIP_PEER);
+        $mentor_relationship = relationship::load_by_idnumber(constants::RELATIONSHIP_MENTOR);
+        $reviewer_relationship = relationship::load_by_idnumber(constants::RELATIONSHIP_REVIEWER);
+        $external_relationship = relationship::load_by_idnumber(constants::RELATIONSHIP_EXTERNAL);
+
+        $external_users = [
+            ['name' => 'Mark Metcalfe', 'email' => 'mark.metcalfe@totaralearning.com'],
+            ['name' => 'Some Guy', 'email' => 'some.guy@example.com'],
+        ];
 
         $this->assertEquals(pending::get_code(), $data->act1_user1_subject_instance->status);
         $this->assertCount(0, $data->act1_user1_subject_instance->participant_instances);
 
         // All selections are pending, with no users selected yet.
-        $this->assert_pending_progress_records_count(3, $data->act1_user1_subject_instance->id);
-        $this->assert_pending_selector_user_count(3, $data->act1_user1_subject_instance->id);
+        $this->assert_pending_progress_records_count(4, $data->act1_user1_subject_instance->id);
+        $this->assert_pending_selector_user_count(4, $data->act1_user1_subject_instance->id);
         $this->assert_selected_users_count(0, $data->act1_user1_subject_instance->id);
 
         // Set participants as manager user
         self::setUser($data->manager_user);
         $data->act1_user1_subject_instance->set_participant_users($data->manager_user->id, [
-            $mentor_relationship->id => [$data->manager_user->id],
-            $reviewer_relationship->id => [$data->appraiser_user->id, $data->user2->id],
+            [
+                'manual_relationship_id' => $mentor_relationship->id,
+                'users' => [
+                    ['user_id' => $data->manager_user->id]
+                ],
+            ],
+            [
+                'manual_relationship_id' => $reviewer_relationship->id,
+                'users' => [
+                    ['user_id' => $data->appraiser_user->id],
+                    ['user_id' => $data->user2->id]
+                ],
+            ],
+            [
+                'manual_relationship_id' => $external_relationship->id,
+                'users' => $external_users,
+            ],
         ]);
 
         // Not activated and no participant instances yet as the subject user still needs to set participants
@@ -91,12 +108,17 @@ class mod_perform_subject_instance_set_participant_users_testcase extends advanc
         // There should now be selection records.
         $this->assert_pending_progress_records_count(1, $data->act1_user1_subject_instance->id);
         $this->assert_pending_selector_user_count(1, $data->act1_user1_subject_instance->id);
-        $this->assert_selected_users_count(3, $data->act1_user1_subject_instance->id);
+        $this->assert_selected_users_count(5, $data->act1_user1_subject_instance->id);
 
         // Set participants as user1 (subject user)
         self::setUser($data->user1);
         $data->act1_user1_subject_instance->set_participant_users($data->user1->id, [
-            $peer_relationship->id => [$data->user2->id],
+            [
+                'manual_relationship_id' => $peer_relationship->id,
+                'users' => [
+                    ['user_id' => $data->user2->id],
+                ],
+            ],
         ]);
 
         // All relationships have had participants selected for them so should be active and participants created.
@@ -110,7 +132,8 @@ class mod_perform_subject_instance_set_participant_users_testcase extends advanc
         // 4 participant instances - 1 each for manager, appraiser, and 2 for user2
         /** @var participant_instance[]|collection $participants */
         $participants = $data->act1_user1_subject_instance->participant_instances;
-        $this->assertCount(4, $participants);
+
+        $this->assertCount(6, $participants);
 
         // Make sure user2 has 2 participant instances, 1 for the peer relationship and 1 for the reviewer relationship.
         $user2_participant_instances = $participants
@@ -130,10 +153,17 @@ class mod_perform_subject_instance_set_participant_users_testcase extends advanc
         $this->assertCount(1, $appraiser_participant_instances);
         $this->assertEquals($reviewer_relationship->id, $appraiser_participant_instances->first()->core_relationship_id);
 
+        // TODO: Assert external participant instances are properly created in TL-26388
+
         // Make sure participants can only be set once - next attempt gets an exception.
         $this->expectException(coding_exception::class);
         $data->act1_user1_subject_instance->set_participant_users($data->user1->id, [
-            $mentor_relationship->id => [$data->manager_user->id],
+            [
+                'manual_relationship_id' => $mentor_relationship->id,
+                'users' => [
+                    ['user_id' => $data->manager_user->id],
+                ],
+            ],
         ]);
     }
 
@@ -141,16 +171,34 @@ class mod_perform_subject_instance_set_participant_users_testcase extends advanc
         $data = $this->generate_test_data();
 
         // Relationships
-        $peer_relationship = relationship::load_by_idnumber('perform_peer');
-        $mentor_relationship = relationship::load_by_idnumber('perform_mentor');
-        $reviewer_relationship = relationship::load_by_idnumber('perform_reviewer');
+        $peer_relationship = relationship::load_by_idnumber(constants::RELATIONSHIP_PEER);
+        $mentor_relationship = relationship::load_by_idnumber(constants::RELATIONSHIP_MENTOR);
+        $reviewer_relationship = relationship::load_by_idnumber(constants::RELATIONSHIP_REVIEWER);
+        $external_relationship = relationship::load_by_idnumber(constants::RELATIONSHIP_EXTERNAL);
 
         // Set participants as manager user
         self::setUser($data->manager_user);
         $sink = $this->redirectEvents();
         $data->act1_user1_subject_instance->set_participant_users($data->manager_user->id, [
-            $mentor_relationship->id => [$data->manager_user->id],
-            $reviewer_relationship->id => [$data->appraiser_user->id, $data->user2->id],
+            [
+                'manual_relationship_id' => $mentor_relationship->id,
+                'users' => [
+                    ['user_id' => $data->manager_user->id],
+                ],
+            ],
+            [
+                'manual_relationship_id' => $reviewer_relationship->id,
+                'users' => [
+                    ['user_id' => $data->appraiser_user->id],
+                    ['user_id' => $data->user2->id],
+                ],
+            ],
+            [
+                'manual_relationship_id' => $external_relationship->id,
+                'users' => [
+                    ['name' => 'Mark Metcalfe', 'email' => 'mark.metcalfe@totaralearning.com'],
+                ],
+            ],
         ]);
         $events = $sink->get_events();
         $sink->close();
@@ -166,15 +214,23 @@ class mod_perform_subject_instance_set_participant_users_testcase extends advanc
         $this->assertStringContainsString("Selector user with id {$data->manager_user->id}", $event_description);
         $this->assertStringContainsString("subject instance with id {$data->act1_user1_subject_instance->id}", $event_description);
         $this->assertStringContainsString("Relationship with id {$mentor_relationship->id}", $event_description);
-        $this->assertStringContainsString("participant user with id {$data->manager_user->id}", $event_description);
-        $this->assertStringContainsString("participant user with id {$data->appraiser_user->id}", $event_description);
-        $this->assertStringContainsString("participant user with id {$data->user2->id}", $event_description);
+        $this->assertStringContainsString("user with id {$data->manager_user->id}", $event_description);
+        $this->assertStringContainsString("user with id {$data->appraiser_user->id}", $event_description);
+        $this->assertStringContainsString("user with id {$data->user2->id}", $event_description);
+        $this->assertStringContainsString(
+            "user with email mark.metcalfe@totaralearning.com and name 'Mark Metcalfe'", $event_description
+        );
 
         // Set participants as user1 (subject user)
         self::setUser($data->user1);
         $sink = $this->redirectEvents();
         $data->act1_user1_subject_instance->set_participant_users($data->user1->id, [
-            $peer_relationship->id => [$data->user2->id],
+            [
+                'manual_relationship_id' => $peer_relationship->id,
+                'users' => [
+                    ['user_id' => $data->user2->id],
+                ],
+            ],
         ]);
         $events = $sink->get_events();
         $sink->close();
@@ -183,7 +239,7 @@ class mod_perform_subject_instance_set_participant_users_testcase extends advanc
         // Make sure event was fired.
         $this->assertInstanceOf(subject_instance_manual_participants_selected::class, $event);
         $this->assertStringContainsString("Selector user with id {$data->user1->id}", $event->get_description());
-        $this->assertStringContainsString("participant user with id {$data->user2->id}", $event->get_description());
+        $this->assertStringContainsString("user with id {$data->user2->id}", $event->get_description());
     }
 
     public function test_no_users_specified(): void {
@@ -191,16 +247,18 @@ class mod_perform_subject_instance_set_participant_users_testcase extends advanc
 
         self::setUser($data->manager_user);
 
-        $valid_relationship_id = relationship::load_by_idnumber('perform_peer')->id;
+        $valid_relationship_id = relationship::load_by_idnumber(constants::RELATIONSHIP_PEER)->id;
 
         $this->expectException(coding_exception::class);
-        $this->expectExceptionMessage(
-            "No users were specified for relationship {$valid_relationship_id} while setting"
-            . " participants for subject instance {$data->act2_user1_subject_instance->id}"
-        );
+        $this->expectExceptionMessage('Must specify at least one user to create a manual participant record.');
 
         $data->act2_user1_subject_instance
-            ->set_participant_users($data->manager_user->id, [$valid_relationship_id => []]);
+            ->set_participant_users($data->manager_user->id, [
+                [
+                    'manual_relationship_id' => $valid_relationship_id,
+                    'users' => [],
+                ],
+            ]);
     }
 
     public function test_invalid_relationship_id(): void {
@@ -208,7 +266,7 @@ class mod_perform_subject_instance_set_participant_users_testcase extends advanc
 
         self::setUser($data->manager_user);
 
-        $valid_relationship_id = relationship::load_by_idnumber('perform_peer')->id;
+        $valid_relationship_id = relationship::load_by_idnumber(constants::RELATIONSHIP_PEER)->id;
 
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessage(
@@ -216,7 +274,12 @@ class mod_perform_subject_instance_set_participant_users_testcase extends advanc
         );
 
         $data->act2_user1_subject_instance
-            ->set_participant_users($data->manager_user->id, [-1 => []]);
+            ->set_participant_users($data->manager_user->id, [
+                [
+                    'manual_relationship_id' => -1,
+                    'users' => [],
+                ],
+            ]);
     }
 
     public function test_no_pending_selections(): void {
@@ -248,6 +311,74 @@ class mod_perform_subject_instance_set_participant_users_testcase extends advanc
 
         subject_instance::load_by_entity($subject_instance)
             ->set_participant_users($admin_user->id, []);
+    }
+
+    public function test_invalid_external_user_input(): void {
+        self::setAdminUser();
+        $user1 = self::getDataGenerator()->create_user();
+
+        $subject_relationship = relationship::load_by_idnumber(constants::RELATIONSHIP_SUBJECT);
+        $external_relationship = relationship::load_by_idnumber(constants::RELATIONSHIP_EXTERNAL);
+
+        $activity1 = $this->generator->create_activity_in_container(['activity_name' => 'Activity One']);
+        $this->generator->create_manual_relationships_for_activity($activity1, [
+            ['selector' => $subject_relationship->id, 'manual' => $external_relationship->id],
+        ]);
+
+        $subject_instance = $this->generator->create_subject_instance_with_pending_selections(
+            $activity1, $user1, [$external_relationship]
+        );
+        $subject_instance = subject_instance::load_by_entity($subject_instance);
+
+        // Make bad strings cant be saved.
+        try {
+            $subject_instance->set_participant_users($user1->id, [
+                [
+                    'manual_relationship_id' => $external_relationship->id,
+                    'users' => [
+                        ['name' => 'Mark <script>Bad</script>Metcalfe', 'email' => 'mark.metcalfe@totaralearning.com'],
+                    ]
+                ],
+            ]);
+            $this->fail('Expected validation coding exception');
+        } catch (coding_exception $e) {
+            $this->assertStringContainsString("Invalid user properties", $e->getMessage());
+        }
+
+        // Make sure an invalid email can not be saved.
+        $invalid_email = 'not_an_email';
+        try {
+            $subject_instance->set_participant_users($user1->id, [
+                [
+                    'manual_relationship_id' => $external_relationship->id,
+                    'users' => [
+                        ['name' => 'Mark Metcalfe', 'email' => $invalid_email],
+                    ]
+                ],
+            ]);
+            $this->fail('Expected invalid email address coding exception');
+        } catch (coding_exception $e) {
+            $this->assertStringContainsString("Invalid email address specified: '$invalid_email'", $e->getMessage());
+        }
+
+        // Make sure there can't be duplicate email addresses.
+        $duplicate_email = 'mark.metcalfe@totaralearning.com';
+        try {
+            $subject_instance->set_participant_users($user1->id, [
+                [
+                    'manual_relationship_id' => $external_relationship->id,
+                    'users' => [
+                        ['name' => 'Mark Metcalfe', 'email' => $duplicate_email],
+                        ['name' => 'Not Mark Metcalfe', 'email' => $duplicate_email],
+                    ]
+                ],
+            ]);
+            $this->fail('Expected duplicate email address coding exception');
+        } catch (coding_exception $e) {
+            $this->assertStringContainsString(
+                "Can not create multiple participant records for user with email $duplicate_email", $e->getMessage()
+            );
+        }
     }
 
     /**
@@ -372,30 +503,34 @@ class manual_participant_selector_test_data {
     }
 
     private function create_activities_and_instances(): void {
-        $subject_relationship = relationship::load_by_idnumber('subject');
-        $manager_relationship = relationship::load_by_idnumber('manager');
-        $appraiser_relationship = relationship::load_by_idnumber('appraiser');
-        $peer_relationship = relationship::load_by_idnumber('perform_peer');
-        $mentor_relationship = relationship::load_by_idnumber('perform_mentor');
-        $reviewer_relationship = relationship::load_by_idnumber('perform_reviewer');
+        $subject_relationship = relationship::load_by_idnumber(constants::RELATIONSHIP_SUBJECT);
+        $manager_relationship = relationship::load_by_idnumber(constants::RELATIONSHIP_MANAGER);
+        $appraiser_relationship = relationship::load_by_idnumber(constants::RELATIONSHIP_APPRAISER);
+        $peer_relationship = relationship::load_by_idnumber(constants::RELATIONSHIP_PEER);
+        $mentor_relationship = relationship::load_by_idnumber(constants::RELATIONSHIP_MENTOR);
+        $reviewer_relationship = relationship::load_by_idnumber(constants::RELATIONSHIP_REVIEWER);
+        $external_relationship = relationship::load_by_idnumber(constants::RELATIONSHIP_EXTERNAL);
 
         $this->activity1 = $this->perform_generator->create_activity_in_container(['activity_name' => 'Activity One']);
         $this->perform_generator->create_manual_relationships_for_activity($this->activity1, [
             ['selector' => $subject_relationship->id, 'manual' => $peer_relationship->id],
             ['selector' => $manager_relationship->id, 'manual' => $reviewer_relationship->id],
             ['selector' => $manager_relationship->id, 'manual' => $mentor_relationship->id],
+            ['selector' => $manager_relationship->id, 'manual' => $external_relationship->id],
         ]);
 
         $this->activity2 = $this->perform_generator->create_activity_in_container(['activity_name' => 'Activity Two']);
         $this->perform_generator->create_manual_relationships_for_activity($this->activity2, [
             ['selector' => $manager_relationship, 'manual' => $peer_relationship],
             ['selector' => $appraiser_relationship, 'manual' => $reviewer_relationship],
+            ['selector' => $appraiser_relationship, 'manual' => $external_relationship],
         ]);
 
         $this->activity3 = $this->perform_generator->create_activity_in_container(['activity_name' => 'Activity Three']);
         $this->perform_generator->create_manual_relationships_for_activity($this->activity3, [
             ['selector' => $subject_relationship, 'manual' => $reviewer_relationship],
             ['selector' => $appraiser_relationship, 'manual' => $peer_relationship],
+            ['selector' => $appraiser_relationship, 'manual' => $external_relationship],
         ]);
 
         $this->act1_user1_subject_instance = $this->perform_generator->create_subject_instance_with_pending_selections(
@@ -406,35 +541,35 @@ class manual_participant_selector_test_data {
         $this->act1_user1_subject_instance = subject_instance::load_by_entity($this->act1_user1_subject_instance);
 
         $this->act2_user1_subject_instance = $this->perform_generator->create_subject_instance_with_pending_selections(
-            $this->activity2, $this->user1, [$peer_relationship, $reviewer_relationship]
+            $this->activity2, $this->user1, [$peer_relationship, $reviewer_relationship, $external_relationship]
         );
         $this->act2_user1_subject_instance->created_at = strtotime('2020-02-01');
         $this->act2_user1_subject_instance->save();
         $this->act2_user1_subject_instance = subject_instance::load_by_entity($this->act2_user1_subject_instance);
 
         $this->act3_user1_subject_instance = $this->perform_generator->create_subject_instance_with_pending_selections(
-            $this->activity3, $this->user1, [$reviewer_relationship, $peer_relationship]
+            $this->activity3, $this->user1, [$reviewer_relationship, $peer_relationship, $external_relationship]
         );
         $this->act3_user1_subject_instance->created_at = strtotime('2020-03-01');
         $this->act3_user1_subject_instance->save();
         $this->act3_user1_subject_instance = subject_instance::load_by_entity($this->act3_user1_subject_instance);
 
         $this->act1_user2_subject_instance = $this->perform_generator->create_subject_instance_with_pending_selections(
-            $this->activity1, $this->user2, [$peer_relationship, $mentor_relationship]
+            $this->activity1, $this->user2, [$peer_relationship, $mentor_relationship, $external_relationship]
         );
         $this->act1_user2_subject_instance->created_at = strtotime('2020-04-01');
         $this->act1_user2_subject_instance->save();
         $this->act1_user2_subject_instance = subject_instance::load_by_entity($this->act1_user2_subject_instance);
 
         $this->act2_user2_subject_instance = $this->perform_generator->create_subject_instance_with_pending_selections(
-            $this->activity2, $this->user2, [$peer_relationship, $reviewer_relationship]
+            $this->activity2, $this->user2, [$peer_relationship, $reviewer_relationship, $external_relationship]
         );
         $this->act2_user2_subject_instance->created_at = strtotime('2020-05-01');
         $this->act2_user2_subject_instance->save();
         $this->act2_user2_subject_instance = subject_instance::load_by_entity($this->act2_user2_subject_instance);
 
         $this->act3_user2_subject_instance = $this->perform_generator->create_subject_instance_with_pending_selections(
-            $this->activity3, $this->user2, [$reviewer_relationship, $peer_relationship]
+            $this->activity3, $this->user2, [$reviewer_relationship, $peer_relationship, $external_relationship]
         );
         $this->act3_user2_subject_instance->created_at = strtotime('2020-06-01');
         $this->act3_user2_subject_instance->save();

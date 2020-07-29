@@ -24,6 +24,7 @@
 namespace totara_job\relationship\resolvers;
 
 use totara_core\relationship\relationship_resolver;
+use totara_core\relationship\relationship_resolver_dto;
 use totara_job\entities\job_assignment;
 
 class manager extends relationship_resolver {
@@ -60,7 +61,7 @@ class manager extends relationship_resolver {
      * Get the list of managers.
      *
      * @param array $data containing the fields specified by {@see get_accepted_fields}
-     * @return int[] of user ids
+     * @return relationship_resolver_dto[]
      */
     protected function get_data(array $data): array {
         $repository = job_assignment::repository();
@@ -74,8 +75,13 @@ class manager extends relationship_resolver {
         return $repository
             ->select_raw('DISTINCT manager_job.userid')
             ->join([job_assignment::TABLE, 'manager_job'], 'managerjaid', 'id')
+            ->where_not_null('manager_job.userid')
             ->get()
-            ->pluck('userid');
+            ->map(
+                function ($item) {
+                    return new relationship_resolver_dto($item->userid);
+                }
+            )->all();
     }
 
 }

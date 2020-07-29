@@ -33,6 +33,8 @@ use coding_exception;
  */
 abstract class relationship_resolver {
 
+    public const SOURCE = 'internal';
+
     /**
      * @var relationship
      */
@@ -129,7 +131,7 @@ abstract class relationship_resolver {
      * Get the list of users.
      *
      * @param array $data containing the fields specified by {@see get_accepted_fields}
-     * @return int[] of user ids
+     * @return relationship_resolver_dto[]
      */
     abstract protected function get_data(array $data): array;
 
@@ -137,7 +139,8 @@ abstract class relationship_resolver {
      * Validate the input and get the list of users.
      *
      * @param array $data containing the fields specified by {@see get_accepted_fields}
-     * @return int[] of user ids
+     * @return relationship_resolver_dto[]
+     * @throws coding_exception
      */
     final public function get_users(array $data): array {
         global $CFG;
@@ -146,7 +149,18 @@ abstract class relationship_resolver {
             static::validate_input(array_keys($data));
         }
 
-        return $this->get_data($data);
+        $relationship_resolver_dtos = $this->get_data($data);
+
+        if ($CFG->debugdeveloper) {
+            //validate get_data() returns an array consisting only of dtos
+            foreach ($relationship_resolver_dtos as $dto) {
+                if (!$dto instanceof relationship_resolver_dto) {
+                    throw new coding_exception("get_data must return relationship_resolver_dto");
+                }
+            }
+        }
+
+        return $relationship_resolver_dtos;
     }
 
 }
