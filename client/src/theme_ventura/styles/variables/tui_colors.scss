@@ -117,10 +117,6 @@
   --tui-color-backdrop-heavy: rgba(0, 0, 0, 0.8);
   --tui-color-backdrop-contrast: var(--tui-color-neutral-1);
 
-  // Navigation
-  @import 'theme_ventura/variables/colors/nav';
-  // Catalog
-  @import 'theme_ventura/variables/colors/catalog';
   // Arrows
   @import 'theme_ventura/variables/colors/arrow';
   // Forms
