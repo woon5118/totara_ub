@@ -282,4 +282,20 @@ class util {
 
         return has_capability_in_any_context('mod/perform:report_on_subject_responses');
     }
+
+    /**
+     * Determine if the given user can manage participation of the given subject
+     *
+     * @param int $user_id A user id
+     * @param int $subject_user_id A user id
+     * @return bool
+     */
+    public static function can_report_on_subjects(int $user_id, int $subject_user_id): bool {
+        if (static::has_report_on_all_subjects_capability($user_id)) {
+            return true;
+        }
+
+        $subject_user_context = context_user::instance($subject_user_id);
+        return access::has_capability('mod/perform:report_on_subject_responses', $subject_user_context, $user_id);
+    }
 }

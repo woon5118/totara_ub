@@ -311,6 +311,7 @@ $string['report_participant_warning_message'] = 'This report page can only show 
 $string['reporting_identifier'] = 'Reporting ID';
 $string['response_other']  = 'Others’ responses';
 $string['required_fields'] = 'Required fields';
+$string['response_data_report_export_link'] = 'Performance activity response data (export)';
 $string['response_visibility_label'] = 'Your responses (once submitted) are visible to:';
 $string['response_visibility_label_anonymous'] = 'Your <strong>anonymised</strong> responses (once submitted) are visible to:';
 $string['response_visibility_not_visible_to_anyone'] = 'Your responses are not visible to other participants';
