@@ -2,7 +2,7 @@
 /*
  * This file is part of Totara Learn
  *
- * Copyright (C) 2019 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,19 +18,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Brendan Cox <brendan.cox@totaralearning.com>
- * @package totara_webapi
+ * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
+ * @package core
  */
 
-// TODO: WARNING: THIS IS FROM A PR TO GO INTO INTEGRATION. IT MAY BE MERGED, IT MAY BE  CHANGED ETC.
 namespace core\webapi;
+
+use GraphQL\Type\Definition\ResolveInfo;
 
 interface union_resolver {
 
     /**
-     * Union type resolver
+     * Union type resolver. This should return a class name of a type resolver this type should resolve to.
      *
-     * @param mixed $value The data for the type we want to resolve.
-     * @return string The type name from *.graphqls that it resolves to.
+     * @param mixed $objectvalue
+     * @param mixed $context
+     * @param ResolveInfo $info
+     * @return string the class name of the type resolver for the concrete type
      */
-    public static function resolve_type($value);
+    public static function resolve_type($objectvalue, $context, ResolveInfo $info): string;
+
 }

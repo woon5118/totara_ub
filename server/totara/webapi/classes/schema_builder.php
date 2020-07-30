@@ -24,6 +24,8 @@
 
 namespace totara_webapi;
 
+use core\webapi\interface_resolver;
+use core\webapi\type_resolver;
 use core_component;
 use GraphQL\Language\Parser;
 use GraphQL\Type\Definition\InterfaceType;
@@ -61,6 +63,7 @@ class schema_builder {
         $this->add_support_for_custom_scalars($schema);
         $this->add_support_for_param_types($schema);
         $this->add_support_for_interface_types($schema);
+        $this->add_support_for_union_types($schema);
 
         return $schema;
     }
@@ -177,6 +180,37 @@ class schema_builder {
             };
 
             $type->config['resolveType'] = $fn;
+        }
+    }
+
+    /**
+     * Add support for union types, so that they can be resolved into concrete types.
+     *
+     * @param Schema $schema
+     */
+    protected function add_support_for_union_types(Schema $schema) {
+        $unions = \core_component::get_namespace_classes('webapi\resolver\union', 'core\webapi\union_resolver');
+        foreach ($unions as $classname) {
+            $parts = explode('\\', $classname);
+            $component = reset($parts);
+            $name = end($parts);
+            $unionname = $component . '_' . $name;
+            $type = $schema->getType($unionname);
+
+            $type->config['resolveType'] = function ($object_value, $context, ResolveInfo $info) use ($classname, $schema) {
+                 $typestr = call_user_func_array([$classname, 'resolve_type'], [$object_value, $context, $info]);
+
+                // Not an existing type resolver class return returned.
+                if (!class_exists($typestr) || !is_subclass_of($typestr, type_resolver::class)) {
+                    throw new \coding_exception('Invalid type resolver class returned');
+                }
+
+                $parts = explode("\\", $typestr);
+                $component = reset($parts);
+                $innertype = array_pop($parts);
+
+                return $schema->getType("{$component}_{$innertype}");
+            };
         }
     }
 
