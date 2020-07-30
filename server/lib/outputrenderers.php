@@ -642,7 +642,7 @@ class core_renderer extends renderer_base {
             }
         } else {
             // Totara: do not display login button.
-            if (!$loginpage) {
+            if (!$loginpage && empty($this->page->layout_options['nologinbutton'])) {
                 $loggedinas = get_string('loggedinnot', 'moodle');
                 if ($withlinks) {
                     $loggedinas .= html_writer::link($loginurl, get_string('login'), ['class' => 'btn btn-primary btn-xs']);
@@ -3004,7 +3004,7 @@ EOD;
         // If not logged in, show the typical not-logged-in string.
         if (!isloggedin()) {
             // Totara: do not display login button.
-            if (!$loginpage) {
+            if (!$loginpage && empty($this->page->layout_options['nologinbutton'])) {
                 $returnstr = get_string('loggedinnot', 'moodle') . html_writer::link($loginurl, get_string('login'), ['class' => 'btn btn-primary btn-xs']);
                 return html_writer::div(
                     html_writer::span(

@@ -221,6 +221,23 @@ $THEME->layouts = array(
             'nonavbar' => true,
             'nosubnav' => true,
         ),
+    ),
+    // This layout can be used for external users accessing the page.
+    // This should also be combined with setting no cookies so that
+    // the user won't be logged in and wouldn't see the user menu or other
+    // related information a normal logged in user sees
+    'external' => array(
+        'file' => 'default.php',
+        'regions' => array(),
+        'options' => array(
+            'noblocks' => true,
+            'langmenu' => true,
+            'nonavbar' => true,
+            'nosubnav' => true,
+            'nofooter' => true,
+            'nototaramenu' => true,
+            'nologinbutton' => true,
+        ),
     )
 );
 
