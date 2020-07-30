@@ -50,9 +50,18 @@ input mod_perform_activity_manual_relationship_selection_input {
 """
 Input for selecting users linked to the manual relationship.
 """
-input mod_perform_update_manual_participants_input {
+input mod_perform_set_manual_participants_input {
   manual_relationship_id: core_id!
-  user_ids: [core_id!]!
+  users: [mod_perform_manual_participant_user_input!]
+}
+
+"""
+Input for a user (either internal or external)
+"""
+input mod_perform_manual_participant_user_input {
+  user_id: core_id
+  name: String
+  email: String
 }
 
 """
@@ -76,6 +85,6 @@ extend type Mutation {
   """
   mod_perform_set_manual_participants(
     subject_instance_id: core_id!
-    participants: [mod_perform_update_manual_participants_input!]!
+    participants: [mod_perform_set_manual_participants_input!]!
   ): mod_perform_set_manual_participants_result!
 }

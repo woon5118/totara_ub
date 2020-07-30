@@ -21,6 +21,7 @@
  * @package mod_perform
  */
 
+use mod_perform\constants;
 use totara_core\advanced_feature;
 use totara_core\feature_not_available_exception;
 use totara_core\relationship\relationship;
@@ -47,20 +48,49 @@ class mod_perform_webapi_resolver_mutation_set_manual_participants_manual_testca
         $data->create_data();
 
         // Relationships
-        $mentor_relationship = relationship::load_by_idnumber('perform_mentor');
-        $reviewer_relationship = relationship::load_by_idnumber('perform_reviewer');
+        $mentor_relationship = relationship::load_by_idnumber(constants::RELATIONSHIP_MENTOR);
+        $reviewer_relationship = relationship::load_by_idnumber(constants::RELATIONSHIP_REVIEWER);
+        $external_relationship = relationship::load_by_idnumber(constants::RELATIONSHIP_EXTERNAL);
 
         self::setUser($data->manager_user);
-        $result = $this->mutate($data->act1_user1_subject_instance->id, [
-            $mentor_relationship->id => [$data->manager_user->id],
-            $reviewer_relationship->id => [$data->appraiser_user->id, $data->user2->id],
+        $result = $this->resolve_graphql_mutation(self::MUTATION, [
+            'subject_instance_id' => $data->act1_user1_subject_instance->id,
+            'participants' => [
+                [
+                    'manual_relationship_id' => $mentor_relationship->id,
+                    'users' => [
+                        ['user_id' => $data->manager_user->id],
+                    ],
+                ],
+                [
+                    'manual_relationship_id' => $reviewer_relationship->id,
+                    'users' => [
+                        ['user_id' => $data->appraiser_user->id],
+                        ['user_id' => $data->user2->id],
+                    ],
+                ],
+                [
+                    'manual_relationship_id' => $external_relationship->id,
+                    'users' => [
+                        ['name' => 'Mark Metcalfe', 'email' => 'mark.metcalfe@totaralearning.com']
+                    ],
+                ],
+            ],
         ]);
         $this->assertTrue($result['success'], 'Mutation failed');
 
         // We get an exception if we try to set the participants again since it can they can only be set once.
         $this->expectException(coding_exception::class);
-        $this->mutate($data->act1_user1_subject_instance->id, [
-            $mentor_relationship->id => [$data->manager_user->id],
+        $this->resolve_graphql_mutation(self::MUTATION, [
+            'subject_instance_id' => $data->act1_user1_subject_instance->id,
+            'participants' => [
+                [
+                    'manual_relationship_id' => $mentor_relationship->id,
+                    'users' => [
+                        ['user_id' => $data->manager_user->id],
+                    ],
+                ],
+            ],
         ]);
     }
 
@@ -68,7 +98,9 @@ class mod_perform_webapi_resolver_mutation_set_manual_participants_manual_testca
         $this->expectException(require_login_exception::class);
 
         self::setUser();
-        $result = $this->mutate(-1, []);
+        $result = $this->resolve_graphql_mutation(self::MUTATION, [
+            'subject_instance_id' => -1,
+        ]);
         $this->assert_webapi_operation_failed($result, 'not logged in');
     }
 
@@ -77,25 +109,10 @@ class mod_perform_webapi_resolver_mutation_set_manual_participants_manual_testca
 
         self::setAdminUser();
         advanced_feature::disable('performance_activities');
-        $result = $this->mutate(-1, []);
-        $this->assert_webapi_operation_failed($result, 'Feature performance_activities is not available.');
-    }
-
-    /**
-     * @param int $subject_instance_id
-     * @param int[][] $relationships_and_participants Array of $relationship_id => [$participant_user_id]
-     * @return array Mutation result.
-     */
-    private function mutate(int $subject_instance_id, array $relationships_and_participants): array {
-        return $this->resolve_graphql_mutation(self::MUTATION, [
-            'subject_instance_id' => $subject_instance_id,
-            'participants' => array_map(static function ($relationship_id) use ($relationships_and_participants) {
-                return [
-                    'manual_relationship_id' => $relationship_id,
-                    'user_ids' => $relationships_and_participants[$relationship_id],
-                ];
-            }, array_keys($relationships_and_participants)),
+        $result = $this->resolve_graphql_mutation(self::MUTATION, [
+            'subject_instance_id' => -1,
         ]);
+        $this->assert_webapi_operation_failed($result, 'Feature performance_activities is not available.');
     }
 
 }

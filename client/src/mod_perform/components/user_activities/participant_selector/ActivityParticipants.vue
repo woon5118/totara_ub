@@ -17,7 +17,10 @@
 -->
 
 <template>
-  <div class="tui-performUserActivitiesSelectParticipants__instance">
+  <Card
+    :clickable="false"
+    class="tui-performUserActivitiesSelectParticipants__instance"
+  >
     <h3 class="tui-performUserActivitiesSelectParticipants__instance-title">
       {{ instanceTitle }}
     </h3>
@@ -36,8 +39,7 @@
 
     <Uniform
       :initial-values="initialValues"
-      :validate="validate"
-      validation-mode="submit"
+      :validate="validateExternal"
       input-width="full"
       class="tui-performUserActivitiesSelectParticipants__instance-form"
       @change="updateHasChanges"
@@ -49,7 +51,19 @@
         :label="relationship.name"
         :required="true"
       >
-        <FormUserSelector :name="relationship.id" :users="userList" />
+        <ExternalUserSelector
+          v-if="isExternal(relationship)"
+          :name="relationship.id"
+        />
+
+        <FormField
+          v-else
+          v-slot="{ id, value, update }"
+          :name="relationship.id"
+          :validate="validateInternal"
+        >
+          <UserSelector v-model="value" :users="userList" @input="update" />
+        </FormField>
       </FormRow>
 
       <FormRow>
@@ -63,23 +77,29 @@
         </ButtonGroup>
       </FormRow>
     </Uniform>
-  </div>
+  </Card>
 </template>
 
 <script>
 import Button from 'tui/components/buttons/Button';
 import ButtonGroup from 'tui/components/buttons/ButtonGroup';
-import { FormRow, Uniform } from 'tui/components/uniform';
-import FormUserSelector from 'mod_perform/components/user_activities/participant_selector/FormUserSelector';
+import Card from 'tui/components/card/Card';
+import ExternalUserSelector from 'mod_perform/components/user_activities/participant_selector/ExternalUserSelector';
+import UserSelector from 'mod_perform/components/user_activities/participant_selector/UserSelector';
+import { FormField, FormRow, Uniform } from 'tui/components/uniform';
 import SetManualParticipantsMutation from 'mod_perform/graphql/set_manual_participants';
+import { RELATIONSHIP_PERFORM_EXTERNAL } from 'mod_perform/constants';
 
 export default {
   components: {
     Button,
     ButtonGroup,
+    Card,
+    ExternalUserSelector,
+    FormField,
     FormRow,
-    FormUserSelector,
     Uniform,
+    UserSelector,
   },
 
   props: {
@@ -162,17 +182,43 @@ export default {
 
   methods: {
     /**
+     * Is the specified relationship for external participants?
+     *
+     * @param {Object|Number} relationship
+     * @returns {Boolean}
+     */
+    isExternal(relationship) {
+      if (!isNaN(relationship)) {
+        // Find the relationship object from it's ID.
+        relationship = this.relationships
+          .filter(r => {
+            return r.id === relationship;
+          })
+          .shift();
+      }
+
+      return relationship.idnumber === RELATIONSHIP_PERFORM_EXTERNAL;
+    },
+
+    /**
      * Handle submission of the subject instance participants.
      *
-     * @param {Object} users The submitted form data.
+     * @param {Object} data The submitted form data.
      */
-    async submit(users) {
+    async submit(data) {
       this.isSaving = true;
 
-      const participants = Object.keys(users).map(relationship_id => {
+      const participants = Object.keys(data).map(relationshipId => {
         return {
-          manual_relationship_id: relationship_id,
-          user_ids: users[relationship_id].map(user => user.id),
+          manual_relationship_id: relationshipId,
+          users: data[relationshipId].map(user => {
+            if (this.isExternal(relationshipId)) {
+              return user;
+            }
+            return {
+              user_id: user.id,
+            };
+          }),
         };
       });
 
@@ -195,19 +241,43 @@ export default {
     },
 
     /**
-     * Get form errors if each relationship doesn't have at least one participant.
+     * Get form errors if an internal relationship doesn't have at least one participant.
      *
-     * @param {Object} users The submitted form data.
+     * @param {Object} values The submitted form data.
      * @returns {Object} validation errors
      */
-    validate(users) {
+    validateInternal(values) {
+      if (values.length === 0) {
+        return this.$str('error_no_participants_selected', 'mod_perform');
+      }
+      return false;
+    },
+
+    /**
+     * Get form errors if an external relationship has duplicate participant emails.
+     *
+     * @param {Object} values The submitted form data.
+     * @returns {Object} validation errors
+     */
+    validateExternal(values) {
       const errors = {};
-      Object.keys(users).forEach(id => {
-        if (users[id].length === 0) {
-          errors[id] = this.$str(
-            'error_no_participants_selected',
-            'mod_perform'
-          );
+      Object.keys(values).forEach(relationshipId => {
+        if (this.isExternal(relationshipId)) {
+          errors[relationshipId] = {};
+          let externalValues = values[relationshipId];
+          let emails = [];
+          Object.keys(externalValues).forEach(formId => {
+            errors[relationshipId][formId] = {};
+            let user = externalValues[formId];
+            if (emails.includes(user.email)) {
+              errors[relationshipId][formId].email = this.$str(
+                'error_external_participant_duplicate_email',
+                'mod_perform'
+              );
+            } else {
+              emails.push(user.email);
+            }
+          });
         }
       });
       return errors;
@@ -225,6 +295,14 @@ export default {
       let values = {};
       this.relationships.forEach(relationship => {
         values[relationship.id] = [];
+        if (this.isExternal(relationship)) {
+          values[relationship.id] = [
+            {
+              email: '',
+              name: '',
+            },
+          ];
+        }
       });
       return values;
     },
@@ -232,11 +310,19 @@ export default {
     /**
      * Check and store whether there have been changes.
      *
-     * @param {Object} users The form data.
+     * @param {Object} values The form data.
      * @returns {boolean}
      */
-    updateHasChanges(users) {
-      this.hasChanges = Object.keys(users).some(id => users[id].length > 0);
+    updateHasChanges(values) {
+      this.hasChanges = Object.keys(values).some(relationship => {
+        if (this.isExternal(relationship)) {
+          return values[relationship].some(user => {
+            return user.name.length > 0 || user.email.length > 0;
+          });
+        } else {
+          return values[relationship].length > 0;
+        }
+      });
     },
 
     /**
@@ -266,7 +352,12 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
+      "error_external_participant_duplicate_email",
       "error_no_participants_selected",
+      "external_user_email",
+      "external_user_email_help",
+      "external_user_name",
+      "external_user_name_help",
       "unsaved_changes_warning",
       "user_activities_created_at",
       "user_activities_select_participants_subject_instance_title"

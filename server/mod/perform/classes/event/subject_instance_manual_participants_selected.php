@@ -50,8 +50,10 @@ class subject_instance_manual_participants_selected extends base {
      * @param subject_instance $subject_instance
      * @return self|base
      */
-    public static function create_from_selected_participants(array $relationships_and_participants,
-                                                             subject_instance $subject_instance): self {
+    public static function create_from_selected_participants(
+        array $relationships_and_participants,
+        subject_instance $subject_instance
+    ): self {
         $data = [
             'objectid' => $subject_instance->get_id(),
             'relateduserid' => $subject_instance->subject_user->id,
@@ -81,11 +83,23 @@ class subject_instance_manual_participants_selected extends base {
     public function get_description(): string {
         $description =
             "Selector user with id {$this->userid} made the following participant selections" .
-            " for subject instance with id {$this->data['objectid']}:\n";
+            " for subject instance with id {$this->data['objectid']}:\n\n";
 
-        foreach ($this->data['other']['relationships_and_participants'] as $relationship_id => $user_ids) {
-            $user_ids = implode(', participant user with id ', $user_ids);
-            $description .= "\nRelationship with id {$relationship_id}: participant user with id {$user_ids}.";
+        foreach ($this->data['other']['relationships_and_participants'] as $relationship_and_participants) {
+            $relationship_id = $relationship_and_participants['manual_relationship_id'];
+            $users = $relationship_and_participants['users'];
+
+            $users = implode(', ', array_map(static function (array $user) {
+                if (isset($user['user_id'])) {
+                    // Internal User IDs.
+                    return "user with id {$user['user_id']}";
+                }
+
+                // External User emails and names.
+                return "user with email {$user['email']} and name '{$user['name']}'";
+            }, $users));
+
+            $description .= "\nRelationship with id {$relationship_id}: {$users}.";
         }
 
         return $description;

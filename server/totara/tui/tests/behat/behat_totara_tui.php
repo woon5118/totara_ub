@@ -719,7 +719,7 @@ class behat_totara_tui extends behat_base {
             ->find('css', self::MODAL_CONTENT_SELECTOR)
             ->find('css', '.tui-formBtn--prim:first-child');
         if ($confirm_button === null || !$confirm_button->isVisible()) {
-            throw new Exception('The tui modal is not a confirmation modal', $this->getSession());
+            throw new ExpectationException('The tui modal is not a confirmation modal', $this->getSession());
         }
         $confirm_button->click();
     }

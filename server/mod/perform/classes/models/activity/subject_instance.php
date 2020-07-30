@@ -29,8 +29,8 @@ use context_module;
 use core\collection;
 use core\orm\entity\model;
 use core\orm\query\builder;
+use mod_perform\constants;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
-use mod_perform\entities\activity\subject_instance_manual_participant;
 use mod_perform\event\subject_instance_manual_participants_selected;
 use mod_perform\models\activity\helpers\manual_participant_helper;
 use mod_perform\state\state;
@@ -43,6 +43,7 @@ use mod_perform\state\subject_instance\pending;
 use mod_perform\state\subject_instance\subject_instance_availability;
 use mod_perform\state\subject_instance\subject_instance_manual_status;
 use mod_perform\state\subject_instance\subject_instance_progress;
+use totara_core\relationship\relationship;
 use totara_job\job_assignment;
 
 /**
@@ -247,7 +248,7 @@ class subject_instance extends model {
      * Set the users for each relevant manual relationship to participate in this subject's activity.
      *
      * @param int $by_user User ID of who is setting the participants.
-     * @param int[][] $relationships_and_participants Array of $relationship_id => [$participant_user_id]
+     * @param array[] $relationships_and_participants Array of ['relationship_id' => int, 'users' => ['user_id'/'email' ...]]
      */
     public function set_participant_users(int $by_user, array $relationships_and_participants): void {
         global $DB;
@@ -261,11 +262,25 @@ class subject_instance extends model {
             throw new coding_exception("User id {$by_user} does not have any pending selections for subject instance {$this->id}");
         }
 
-        $manual_participant_helper->validate_participant_relationship_ids($this->id, array_keys($relationships_and_participants));
+        $relationship_ids = array_column($relationships_and_participants, 'manual_relationship_id');
+        $manual_participant_helper->validate_participant_relationship_ids($this->id, $relationship_ids);
 
-        $DB->transaction(function () use ($relationships_and_participants, $manual_participant_helper) {
-            foreach ($relationships_and_participants as $relationship_id => $user_ids) {
-                $this->set_participant_users_for_relationship($relationship_id, $user_ids, $manual_participant_helper);
+        $DB->transaction(function () use ($relationships_and_participants, $by_user, $manual_participant_helper) {
+            foreach ($relationships_and_participants as $relationship_and_participants) {
+                $relationship_id = $relationship_and_participants['manual_relationship_id'];
+                $users = $relationship_and_participants['users'];
+
+                if (relationship::load_by_id($relationship_id)->idnumber === constants::RELATIONSHIP_EXTERNAL) {
+                    subject_instance_manual_participant::create_multiple_for_external(
+                        $this->id, $by_user, $relationship_id, $users
+                    );
+                } else {
+                    subject_instance_manual_participant::create_multiple_for_internal(
+                        $this->id, $by_user, $relationship_id, $users
+                    );
+                }
+
+                $manual_participant_helper->set_progress_complete($this->id, $relationship_id);
             }
         });
 
@@ -282,36 +297,6 @@ class subject_instance extends model {
         if ($this->entity->relation_loaded('participant_instances')) {
             $this->entity->load_relation('participant_instances');
         }
-    }
-
-    /**
-     * Set the participant users for a relationships for this subject instance.
-     *
-     * @param int $relationship_id
-     * @param array $user_ids
-     * @param manual_participant_helper $helper
-     */
-    private function set_participant_users_for_relationship(
-        int $relationship_id,
-        array $user_ids,
-        manual_participant_helper $helper
-    ): void {
-        if (empty($user_ids)) {
-            throw new coding_exception("No users were specified for relationship {$relationship_id}" .
-                " while setting participants for subject instance {$this->id}."
-            );
-        }
-
-        foreach ($user_ids as $user_id) {
-            $participant = new subject_instance_manual_participant();
-            $participant->subject_instance_id = $this->id;
-            $participant->user_id = $user_id;
-            $participant->core_relationship_id = $relationship_id;
-            $participant->created_by = $helper->get_user_id();
-            $participant->save();
-        }
-
-        $helper->set_progress_complete($this->id, $relationship_id);
     }
 
     /**

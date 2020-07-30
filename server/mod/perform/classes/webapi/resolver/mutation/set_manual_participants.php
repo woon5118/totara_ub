@@ -23,6 +23,7 @@
 
 namespace mod_perform\webapi\resolver\mutation;
 
+use coding_exception;
 use core\entities\user;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_login;
@@ -47,13 +48,7 @@ class set_manual_participants implements mutation_resolver, has_middleware {
 
         $ec->set_relevant_context($subject_instance->get_context());
 
-        // Transform participants input array into array of $relationship_id => [$user_id] for use in the subject instance model.
-        $relationships_and_participants = [];
-        foreach ($args['participants'] as $participants) {
-            $relationships_and_participants[$participants['manual_relationship_id']] = $participants['user_ids'];
-        }
-
-        $subject_instance->set_participant_users($user_id, $relationships_and_participants);
+        $subject_instance->set_participant_users($user_id, $args['participants']);
 
         return ['success' => true];
     }

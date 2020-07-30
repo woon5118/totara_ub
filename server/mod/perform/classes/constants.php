@@ -37,4 +37,5 @@ abstract class constants {
     public const RELATIONSHIP_PEER = 'perform_peer';
     public const RELATIONSHIP_REVIEWER = 'perform_reviewer';
     public const RELATIONSHIP_MENTOR = 'perform_mentor';
+    public const RELATIONSHIP_EXTERNAL = 'perform_external';
 }

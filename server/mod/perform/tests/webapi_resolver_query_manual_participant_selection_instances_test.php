@@ -21,6 +21,7 @@
  * @package mod_perform
  */
 
+use mod_perform\constants;
 use mod_perform\models\activity\subject_instance;
 use totara_core\advanced_feature;
 use totara_core\relationship\relationship;
@@ -45,9 +46,10 @@ class mod_perform_webapi_resolver_query_manual_participant_selection_instances_t
         $data->create_data();
 
         // Relationships
-        $peer_relationship = relationship::load_by_idnumber('perform_peer');
-        $mentor_relationship = relationship::load_by_idnumber('perform_mentor');
-        $reviewer_relationship = relationship::load_by_idnumber('perform_reviewer');
+        $peer_relationship = relationship::load_by_idnumber(constants::RELATIONSHIP_PEER);
+        $mentor_relationship = relationship::load_by_idnumber(constants::RELATIONSHIP_MENTOR);
+        $reviewer_relationship = relationship::load_by_idnumber(constants::RELATIONSHIP_REVIEWER);
+        $external_relationship = relationship::load_by_idnumber(constants::RELATIONSHIP_EXTERNAL);
 
         // Manager user can see activity 1 and activity 2 instances for user1 (2 total)
         self::setUser($data->manager_user);
@@ -64,7 +66,7 @@ class mod_perform_webapi_resolver_query_manual_participant_selection_instances_t
 
         $this->assert_same_subject_instance($data->act1_user1_subject_instance, $managers_instance1['subject_instance']);
         $this->assert_same_relationships(
-            [$mentor_relationship, $reviewer_relationship], // Mentor should be ordered before reviewer.
+            [$mentor_relationship, $reviewer_relationship, $external_relationship], // Mentor should be ordered before reviewer.
             $managers_instance1['manual_relationships']
         );
 
@@ -84,16 +86,24 @@ class mod_perform_webapi_resolver_query_manual_participant_selection_instances_t
         $this->assertNotEquals($appraiser_instance3['subject_instance']['id'], $appraiser_instance4['subject_instance']['id']);
 
         $this->assert_same_subject_instance($data->act2_user1_subject_instance, $appraiser_instance1['subject_instance']);
-        $this->assert_same_relationships([$reviewer_relationship], $appraiser_instance1['manual_relationships']);
+        $this->assert_same_relationships(
+            [$reviewer_relationship, $external_relationship], $appraiser_instance1['manual_relationships']
+        );
 
         $this->assert_same_subject_instance($data->act3_user1_subject_instance, $appraiser_instance2['subject_instance']);
-        $this->assert_same_relationships([$peer_relationship], $appraiser_instance2['manual_relationships']);
+        $this->assert_same_relationships(
+            [$peer_relationship, $external_relationship], $appraiser_instance2['manual_relationships']
+        );
 
         $this->assert_same_subject_instance($data->act2_user2_subject_instance, $appraiser_instance3['subject_instance']);
-        $this->assert_same_relationships([$reviewer_relationship], $appraiser_instance3['manual_relationships']);
+        $this->assert_same_relationships(
+            [$reviewer_relationship, $external_relationship], $appraiser_instance3['manual_relationships']
+        );
 
         $this->assert_same_subject_instance($data->act3_user2_subject_instance, $appraiser_instance4['subject_instance']);
-        $this->assert_same_relationships([$peer_relationship], $appraiser_instance4['manual_relationships']);
+        $this->assert_same_relationships(
+            [$peer_relationship, $external_relationship], $appraiser_instance4['manual_relationships']
+        );
 
 
         // Subject user1 can see activity 1 and activity 3 instances for themselves (2 total)

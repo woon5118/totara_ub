@@ -13,16 +13,29 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
-  @package mod_perform
+  @package theme_ventura
 -->
 
-<!--
-  Required in order to use the UserSelector within Uniform.
--->
+<style lang="scss">
+.tui-performUserActivitiesExternalUserSelector {
+  & .tui-repeater__row {
+    flex-direction: column;
 
-<script>
-import { createUniformInputWrapper } from 'tui/components/uniform/util';
-import UserSelector from 'mod_perform/components/user_activities/participant_selector/UserSelector';
+    & > .tui-formField + .tui-formField {
+      margin: var(--tui-gap-2) 0 0 0;
+    }
+  }
+}
 
-export default createUniformInputWrapper(UserSelector);
-</script>
+@media (min-width: $tui-screen-xs) {
+  .tui-performUserActivitiesExternalUserSelector {
+    & .tui-repeater__row {
+      flex-direction: row;
+
+      & > .tui-formField + .tui-formField {
+        margin: 0 0 0 var(--tui-gap-2);
+      }
+    }
+  }
+}
+</style>

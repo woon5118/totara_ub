@@ -31,7 +31,6 @@
   &__instance {
     display: block;
     padding: var(--tui-gap-4);
-    border: var(--tui-border-width-thin) solid var(--tui-card-border-color);
 
     &-title {
       @include tui-font-heading-small;

@@ -35,6 +35,7 @@ Feature: Allow users to select who will participant in what roles in an activity
     And I click on the "Peer" tui checkbox
     And I click on the "Mentor" tui checkbox
     And I click on the "Reviewer" tui checkbox
+    And I click on the "External respondent" tui checkbox
     And I click on "Done" "button"
     And I close the tui notification toast
     And I click on "Edit content elements" "button"
@@ -60,21 +61,24 @@ Feature: Allow users to select who will participant in what roles in an activity
     Then I should see "Selection of participants"
     And I should see "Participants for each relationship below must be manually chosen by the selected role."
     And the following fields match these values:
-      | Peer     | Subject |
-      | Mentor   | Subject |
-      | Reviewer | Subject |
+      | Peer                 | Subject |
+      | Mentor               | Subject |
+      | Reviewer             | Subject |
+      | External respondent  | Subject |
     When I set the following fields to these values:
-      | Peer     | Subject   |
-      | Mentor   | Manager   |
-      | Reviewer | Appraiser |
+      | Peer                 | Subject   |
+      | Mentor               | Manager   |
+      | Reviewer             | Appraiser |
+      | External respondent  | Manager   |
     And I click on "Save" "button"
     Then I should see "Activity saved" in the tui "success" notification toast
     When I reload the page
     And I click on "General" "link"
     Then the following fields match these values:
-      | Peer     | Subject   |
-      | Mentor   | Manager   |
-      | Reviewer | Appraiser |
+      | Peer                 | Subject   |
+      | Mentor               | Manager   |
+      | Reviewer             | Appraiser |
+      | External respondent  | Manager   |
 
     # Activate the activity
     When I click on "Activate" "button"
@@ -113,19 +117,36 @@ Feature: Allow users to select who will participant in what roles in an activity
     And I should not see "Act1"
     And I log out
 
-    # Manager makes selection (colleague for mentor relationship)
+    # Manager makes selection (colleague for mentor relationship, and external respondent too)
     When I log in as "manager"
     And I navigate to the outstanding perform activities list page
     And I click on "Select participants" "link" in the ".tui-actionCard" "css_element"
-    Then I should see "Mentor" in the ".tui-formRow" "css_element"
-    And I should see the following options in the tui taglist in the ".tui-formRow" "css_element":
+    Then I should see "Mentor" in the ".tui-formRow:nth-child(1)" "css_element"
+    And I should see "External respondent" in the ".tui-formRow:nth-child(2)" "css_element"
+    And I should see the following options in the tui taglist in the ".tui-formRow:nth-child(1)" "css_element":
       | Appraiser User |
       | Colleague User |
       | Manager User   |
-    When I select from the tui taglist in the ".tui-formRow" "css_element":
+    When I select from the tui taglist in the ".tui-formRow:nth-child(1)" "css_element":
       | Colleague User |
     And I click on "Save" "button"
-    And I click on "Back to all performance activities" "link"
+
+    # Set external participant
+    Then I should see "Required" in the ".tui-formRow:nth-child(2)" "css_element"
+    When I click on "Add" "button"
+    And I set the following fields to these values:
+      | External respondent 1's name          | Mark Metcalfe       |
+      | External respondent 1's email address | example@example.com |
+      | External respondent 2's name          | Steve Example       |
+      | External respondent 2's email address | example@example.com |
+    And I click on "Save" "button"
+    Then I should see "Please enter a different email address" in the ".tui-formRow:nth-child(2)" "css_element"
+    When I set the following fields to these values:
+      | External respondent 1's email address | mark.metcalfe@totaralearning.com |
+    And I click on "Save" "button"
+
+    Then I should see "The participants have been successfully saved." in the tui "success" notification toast
+    When I click on "Back to all performance activities" "link"
     Then I should not see "Select participants"
     When I click on "Activities about others" "link"
     And I should see "No items to display"
