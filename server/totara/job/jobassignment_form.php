@@ -184,7 +184,7 @@ class job_assignment_form extends moodleform {
         $mform->setDefault('organisationid', 0);
         $mform->addHelpButton('organisationselector', 'chooseorganisation', 'totara_job');
 
-        if (!advanced_feature::is_disabled('appraisals')) {
+        if (advanced_feature::is_enabled('appraisals') || advanced_feature::is_enabled('performance_activities')) {
             // Show appraiser.
             // If we can edit, show button. Else show link to appraiser's profile.
             if ($canedit) {
