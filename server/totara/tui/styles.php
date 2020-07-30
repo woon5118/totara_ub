@@ -31,10 +31,10 @@
 
 // Disable debug messages and any errors in output, comment out when debugging or look into error log!
 define('NO_DEBUG_DISPLAY', true);
+// We need just the values from config.php and minlib.php if we have the CSS cached already.
+define('ABORT_AFTER_CONFIG', true);
 
-// Load config, but don't run the full setup yet!
-require('../../lib/init.php');
-$CFG = \core\internal\config::initialise(__DIR__ . '/../../../config.php');
+require('../../config.php');
 
 // Required libraries.
 require_once($CFG->dirroot . '/lib/configonlylib.php');
@@ -100,6 +100,9 @@ if ($rev !== -1) {
         css_send_cached_css($cachefile, $etag);
     }
 }
+
+// Ok, now we need to start normal moodle script, we need to load all libs and $DB.
+define('ABORT_AFTER_CONFIG_CANCEL', true);
 
 define('NO_MOODLE_COOKIES', true); // Session not used here.
 define('NO_UPGRADE_CHECK', true);  // Ignore upgrade check.
