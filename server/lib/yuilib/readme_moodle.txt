@@ -5,6 +5,7 @@ Description of import of various YUI libraries into Moodle:
 * exact version specified in lib/setup.php
 
 2/ YUI3 version 3.17.2:
+* re-apply changes from TL-26541 to inhibit the addition of id attributes to marked nodes
 * full copy of the "build" directory. Unit test code coverage files (*-coverage.js)
   are removed but no other changes are made.
 * make sure there are no @VERSION@ leftovers - replace them with current version

@@ -78,6 +78,16 @@ Y_DOM = {
     },
 
     setId: function(node, id) {
+        // Totara: YUI interferes with ProseMirror by adding ID attributes to
+        // nodes, which ProseMirror then undoes.
+        // Due to browser behavior, this somehow causes links to be clickable
+        // when they should not be, so we must patch YUI to prevent this.
+        // YUI never needs to touch ProseMirror content, so we just add a class
+        // to prevent the addition of the IDs by YUI.
+        if (node.closest('.no-yui-ids')) {
+            return;
+        }
+
         if (node.setAttribute) {
             node.setAttribute('id', id);
         } else {

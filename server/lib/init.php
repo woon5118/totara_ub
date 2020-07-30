@@ -224,8 +224,10 @@ namespace core\internal {
             // If we need to patch a YUI modules between official YUI releases, the yuipatchlevel will need to be manually
             // incremented here. The module will also need to be listed in the yuipatchedmodules.
             // When upgrading to a subsequent version of YUI, these should be reset back to 0 and an empty array.
-            $cfg->yuipatchlevel = 0;
-            $cfg->yuipatchedmodules = [];
+            $cfg->yuipatchlevel = 1;
+            $cfg->yuipatchedmodules = [
+                'dom-core',
+            ];
 
             // Store settings from config.php in array in $cfg - we can use it later to detect problems and overrides.
             $cfg->config_php_settings = (array)$cfg;
