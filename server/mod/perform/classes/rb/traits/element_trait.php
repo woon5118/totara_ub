@@ -156,6 +156,7 @@ trait element_trait {
             "{$join}.data",
             [
                 'joins' => [$join],
+                'displayfunc' => 'format_string',
             ]
         );
 

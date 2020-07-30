@@ -121,7 +121,6 @@ trait section_element_trait {
                 'joins' => [$join],
             ]
         );
-        // TODO add the rest of the section element columns here
     }
 
     /**

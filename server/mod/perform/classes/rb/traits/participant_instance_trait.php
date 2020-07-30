@@ -103,6 +103,23 @@ trait participant_instance_trait {
         /** @var participant_instance_trait|rb_base_source $this */
         $join = $this->participant_instance_join;
 
+        /*
+         * TODO we might need something like this to ensure subject_instance join is in joinlist
+         *      in cases where a source uses this trait without using the subject instance one.
+         *      BUT need to be careful this isn't similar but slightly different so it tries to
+         *      add it twice! See TODO below in columnoptions.
+        $subject_instance_join = new rb_join(
+            'subject_instance',
+            'INNER',
+            '{perform_subject_instance}',
+            "{$join}.subject_instance_id = subject_instance.id",
+            REPORT_BUILDER_RELATION_MANY_TO_ONE
+        );
+        if (!in_array($subject_instance_join, $this->joinlist, true)) {
+            $this->joinlist[] = $subject_instance_join;
+        }
+        */
+
         $this->add_core_user_tables($this->joinlist, $join, 'participant_id', 'participant_user');
     }
 
@@ -171,6 +188,7 @@ trait participant_instance_trait {
 
         // TODO Check subject_instance join is added by this trait alone
         //      Do we need to conditionally add it to joinlist?
+        //      See comment above in add_joins method.
         $this->columnoptions[] = new rb_column_option(
             'participant_instance',
             'overdue',
@@ -191,6 +209,8 @@ trait participant_instance_trait {
                 'displayfunc' => 'yes_or_no',
             ]
         );
+
+        // TODO add relationship column(s)
 
         $this->add_core_user_columns($this->columnoptions, 'participant_user', 'participant_user', true);
     }
@@ -248,6 +268,8 @@ trait participant_instance_trait {
             get_string('date_updated', 'mod_perform'),
             'date'
         );
+
+        // TODO add relationship filter(s)
 
         $this->add_core_user_filters($this->filteroptions, 'participant_user', true);
     }
