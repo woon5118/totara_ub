@@ -27,6 +27,9 @@ require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/behat/locallib.php');
 require_once($CFG->libdir . '/behat/classes/behat_config_manager.php');
 
+// TOTARA: hack alert, internally \behat_command::are_behat_dependencies_installed is dependent upon this define existing.
+define('TOOL_BEHAT_DIR_VENDOR', realpath($CFG->srcroot . '/test/behat/vendor'));
+
 // This page usually takes an exceedingly long time to load, so we need to
 // increase the time limit. At present it takes about a minute on some
 // systems, but let's allow room for expansion.
