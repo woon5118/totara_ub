@@ -25,12 +25,12 @@ namespace mod_perform\data_providers\response;
 
 use coding_exception;
 use core\collection;
+use core\orm\entity\entity;
 use mod_perform\entities\activity\activity;
 use mod_perform\entities\activity\element_response as element_response_entity;
 use mod_perform\entities\activity\participant_instance;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
-use mod_perform\entities\activity as activity_entity;
 use mod_perform\entities\activity\section_element as section_element_entity;
 use mod_perform\models\activity\element;
 use mod_perform\models\response\participant_section;
@@ -45,7 +45,7 @@ class participant_section_with_responses {
     protected $participant_section_id;
 
     /** @var int */
-    protected $user_id;
+    protected $participant_id;
 
     /** @var collection|section_element_response[] */
     protected $main_section_element_responses;
@@ -59,6 +59,9 @@ class participant_section_with_responses {
     /** @var collection|section_element_response[] */
     protected $others_section_element_responses;
 
+    /** @var int */
+    protected $participant_source;
+
     /**@var string[] */
     private $other_participant_relationship_type_names;
 
@@ -66,11 +69,13 @@ class participant_section_with_responses {
      * responses_for_participant_section constructor.
      *
      * @param int $participant_id The id of the user who wants to view or answer the section.
+     * @param int $participant_source the source of the participant, external or internal
      * @param int $participant_section_id The id of the participant section you want to fetch responses for.
      */
-    public function __construct(int $participant_id, int $participant_section_id) {
-        $this->user_id = $participant_id;
+    public function __construct(int $participant_id, int $participant_source, int $participant_section_id) {
+        $this->participant_id = $participant_id;
         $this->participant_section_id = $participant_section_id;
+        $this->participant_source = $participant_source;
     }
 
     /**
@@ -140,7 +145,7 @@ class participant_section_with_responses {
     /**
      * Fetch the top level participant section entity with required relationships eagerly loaded.
      *
-     * @return participant_section_entity|null
+     * @return entity|participant_section_entity|null
      */
     protected function fetch_participant_section(): ?participant_section_entity {
         return participant_section_entity::repository()
@@ -153,7 +158,8 @@ class participant_section_with_responses {
             // Ensure the user we are fetching responses for is a participant for the section they belong to.
             ->join([participant_instance_entity::TABLE, 'pi'], 'ps.participant_instance_id', 'pi.id')
             ->where('ps.id', $this->participant_section_id)
-            ->where('pi.participant_id', $this->user_id)
+            ->where('pi.participant_id', $this->participant_id)
+            ->where('pi.participant_source', $this->participant_source)
             ->one(false);
     }
 

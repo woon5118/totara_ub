@@ -57,7 +57,10 @@ class subject_instance_activated extends base {
             'context' => $subject_instance->get_context(),
         ];
 
-        return static::create($data);
+        $event = static::create($data);
+        $event->add_record_snapshot(subject_instance_entity::TABLE, $subject_instance->to_record());
+
+        return $event;
     }
 
     /**

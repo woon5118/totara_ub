@@ -197,7 +197,7 @@ export default {
           subject_instance_id: this.subjectInstanceId,
         };
       },
-      update: data => data['mod_perform_subject_instance'],
+      update: data => data['mod_perform_subject_instance_for_participant'],
     },
   },
   methods: {

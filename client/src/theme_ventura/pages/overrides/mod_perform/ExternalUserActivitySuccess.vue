@@ -12,38 +12,22 @@
   LTD, you may not access, use, modify, or distribute this software.
   Please contact [licensing@totaralearning.com] for more information.
 
-  @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
+  @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
   @module mod_perform
 -->
 
 <style lang="scss">
-.tui-performUserActivityListSections {
-  padding: var(--tui-gap-4);
+.tui-performUserActivitySuccess {
+  @include tui-font-body();
+
+  margin: var(--tui-gap-8) 0 0;
 
   & > * + * {
-    margin-top: var(--tui-gap-12);
-  }
-}
-
-.tui-performUserActivityDateSummary {
-  padding: var(--tui-gap-6) var(--tui-gap-4) 0;
-  color: var(--tui-color-neutral-6);
-}
-
-.tui-performUserActivityListSection {
-  max-width: 800px;
-
-  & > * + * {
-    margin-top: var(--tui-gap-2);
+    margin-top: var(--tui-gap-6);
   }
 
   &__header {
-    margin: 0;
-    @include tui-font-body();
-  }
-
-  &__header button {
-    @include tui-font-link();
+    @include tui-font-heading-medium();
   }
 }
 </style>

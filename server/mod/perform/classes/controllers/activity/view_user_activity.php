@@ -33,7 +33,8 @@ use moodle_exception;
 use totara_mvc\tui_view;
 
 /*
- * This page lists perform activities the logged in user are a participant in.
+ * This page shows a activity form for a given section or, if participant instance id is supplied,
+ * for the first section of the given instance
  */
 class view_user_activity extends perform_controller {
 

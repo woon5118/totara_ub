@@ -17,12 +17,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Jaron Steenson <jaron.steenson@totaralearning.com>
+ * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
  * @package mod_perform
  */
 
-use mod_perform\controllers\activity\view_user_activity;
+use mod_perform\controllers\activity\view_external_participant_activity;
+
+define('NO_MOODLE_COOKIES', true);
 
 require_once(__DIR__ . '/../../../config.php');
 
-(new view_user_activity())->process();
+(new view_external_participant_activity())->process();

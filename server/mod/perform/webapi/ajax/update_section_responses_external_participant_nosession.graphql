@@ -1,0 +1,48 @@
+mutation mod_perform_update_section_responses_external_participant_nosession(
+  $input: mod_perform_update_section_responses_external_participant_input!
+) {
+  mod_perform_update_section_responses_external_participant(input: $input) {
+    participant_section {
+      id
+      progress_status
+      availability_status
+      section {
+        display_title
+      }
+      section_element_responses {
+        section_element_id
+        element {
+          element_plugin {
+            participant_form_component
+          }
+          title
+          data
+          is_respondable
+        }
+        sort_order
+        response_data
+        validation_errors {
+          error_code
+          error_message
+        }
+        other_responder_groups {
+          relationship_name
+          responses {
+            participant_instance {
+              participant {
+                fullname
+                profileimageurlsmall
+              }
+            }
+            response_data
+          }
+        }
+        visible_to {
+          participant {
+            fullname
+          }
+        }
+      }
+    }
+  }
+}

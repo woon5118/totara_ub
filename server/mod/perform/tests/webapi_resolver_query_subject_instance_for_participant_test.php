@@ -21,18 +21,18 @@
  * @package mod_perform
  */
 
-use mod_perform\models\activity\participant_instance;
-use mod_perform\state\participant_instance\not_started;
 use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 require_once(__DIR__ . '/subject_instance_testcase.php');
 
 /**
+ * @coversDefaultClass \mod_perform\webapi\resolver\query\subject_instance_for_participant
+ *
  * @group perform
  */
-class mod_perform_webapi_resolver_query_subject_instance_testcase extends mod_perform_subject_instance_testcase {
-    private const QUERY = 'mod_perform_subject_instance';
+class mod_perform_webapi_resolver_query_subject_instance_for_participant_testcase extends mod_perform_subject_instance_testcase {
+    private const QUERY = 'mod_perform_subject_instance_for_participant';
 
     use webapi_phpunit_helper;
 
@@ -49,20 +49,6 @@ class mod_perform_webapi_resolver_query_subject_instance_testcase extends mod_pe
             self::$about_user_and_participating->subject_user->get_user()->get_record(),
             0
         ))->get_url($GLOBALS['PAGE'])->out(false);
-
-        /** @var participant_instance $subject_participant_instance */
-        $subject_participant_instance = self::$about_user_and_participating->participant_instances->find(
-            function (participant_instance $pi) {
-                return (int) $pi->participant_id === (int) self::$about_user_and_participating->subject_user->id;
-            }
-        );
-
-        /** @var participant_instance $manager_participant_instance */
-        $manager_participant_instance = self::$about_user_and_participating->participant_instances->find(
-            function (participant_instance $pi) {
-                return (int) $pi->participant_id !== (int) self::$about_user_and_participating->subject_user->id;
-            }
-        );
 
         $expected = [
             'id' => (string) self::$about_user_and_participating->id,
@@ -82,28 +68,7 @@ class mod_perform_webapi_resolver_query_subject_instance_testcase extends mod_pe
                 'fullname' => self::$about_user_and_participating->subject_user->fullname,
                 'profileimageurlsmall' => $profile_image_small_url,
             ],
-            'participant_instances' => [
-                [
-                    'id' => (string)$subject_participant_instance->get_id(),
-                    'progress_status' => not_started::get_name(),
-                    'core_relationship' => [
-                        'name' => 'Subject'
-                    ],
-                    'participant_id' => $subject_participant_instance->participant_id,
-                ],
-                [
-                    'id' => (string)$manager_participant_instance->get_id(),
-                    'progress_status' => not_started::get_name(),
-                    'core_relationship' => [
-                        'name' => 'Manager'
-                    ],
-                    'participant_id' => $manager_participant_instance->participant_id,
-                ],
-            ]
         ];
-
-        self::assertEqualsCanonicalizing($expected['participant_instances'], $actual['participant_instances']);
-        unset($expected['participant_instances'], $actual['participant_instances']);
 
         self::assertEquals($expected, $this->strip_expected_dates($actual));
     }

@@ -1,5 +1,9 @@
-query mod_perform_subject_instance($subject_instance_id: core_id!) {
-  mod_perform_subject_instance(subject_instance_id: $subject_instance_id) {
+query mod_perform_subject_instance_for_participant(
+  $subject_instance_id: core_id!
+) {
+  mod_perform_subject_instance_for_participant(
+    subject_instance_id: $subject_instance_id
+  ) {
     id
     progress_status
     created_at
@@ -16,14 +20,6 @@ query mod_perform_subject_instance($subject_instance_id: core_id!) {
       id
       fullname
       profileimageurlsmall
-    }
-    participant_instances {
-      id
-      participant_id
-      progress_status
-      core_relationship {
-        name
-      }
     }
     job_assignment {
       fullname

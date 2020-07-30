@@ -27,6 +27,7 @@ namespace mod_perform\models\activity;
 use core\orm\entity\model;
 use mod_perform\entities\activity\external_participant as external_participant_entity;
 use moodle_page;
+use user_picture;
 
 /**
  * Represents a single external participant.
@@ -181,6 +182,31 @@ class external_participant extends model {
      * @return string
      */
     private function get_default_image(): string {
-        return (new moodle_page())->get_renderer('core')->image_url($this->image_filename)->out(false);
+        global $PAGE;
+
+        return (new user_picture($this->get_record(), 0))
+            ->get_url($PAGE)
+            ->out(false);
     }
+
+    /**
+     * Returns a fake record
+     *
+     * @return \stdClass
+     */
+    private function get_record(): \stdClass {
+        return (object) [
+            'id' => $this->id,
+            'picture' => '',
+            'firstname' => $this->fullname,
+            'lastname' => $this->fullname,
+            'firstnamephonetic' => '',
+            'lastnamephonetic' => '',
+            'middlename' => '',
+            'alternatename' => '',
+            'imagealt' => '',
+            'email' => $this->email
+        ];
+    }
+
 }

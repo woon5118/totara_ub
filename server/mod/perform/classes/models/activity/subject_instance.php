@@ -43,6 +43,7 @@ use mod_perform\state\subject_instance\pending;
 use mod_perform\state\subject_instance\subject_instance_availability;
 use mod_perform\state\subject_instance\subject_instance_manual_status;
 use mod_perform\state\subject_instance\subject_instance_progress;
+use stdClass;
 use totara_core\relationship\relationship;
 use totara_job\job_assignment;
 
@@ -370,6 +371,15 @@ class subject_instance extends model {
             ->one(true);
 
         return $row->count;
+    }
+
+    /**
+     * Returns a record representation of the underlying entity
+     *
+     * @return stdClass
+     */
+    public function to_record(): stdClass {
+        return (object) $this->entity->get_attributes_raw();
     }
 
 }

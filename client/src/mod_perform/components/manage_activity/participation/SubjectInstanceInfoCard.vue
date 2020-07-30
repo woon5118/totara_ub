@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import subjectInstanceQuery from 'mod_perform/graphql/subject_instance';
+import subjectInstanceQuery from 'mod_perform/graphql/subject_instance_for_participant';
 import InstanceInfoCard from 'mod_perform/components/manage_activity/participation/InstanceInfoCard';
 import Loader from 'tui/components/loader/Loader';
 
@@ -99,7 +99,7 @@ export default {
           subject_instance_id: this.subjectInstanceId,
         };
       },
-      update: data => data['mod_perform_subject_instance'],
+      update: data => data['mod_perform_subject_instance_for_participant'],
     },
   },
 };

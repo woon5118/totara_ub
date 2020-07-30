@@ -36,10 +36,15 @@ class subject_instance_manual_status {
     /**
      * React to a subject instance being activated.
      *
-     * @param base|subject_instance_activated $event
+     * @param subject_instance_activated $event
      */
-    public static function subject_instance_activated(base $event): void {
-        $subject_instance = new subject_instance($event->objectid);
+    public static function subject_instance_activated(subject_instance_activated $event): void {
+        $snapshot = $event->get_record_snapshot(subject_instance::TABLE, $event->objectid);
+        if ($snapshot) {
+            $subject_instance = new subject_instance($snapshot);
+        } else {
+            $subject_instance = new subject_instance($event->objectid);
+        }
         $subject_instance_dto = subject_instance_dto::create_from_entity($subject_instance);
 
         self::generate_instances($subject_instance_dto);

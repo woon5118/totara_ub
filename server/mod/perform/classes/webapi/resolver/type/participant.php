@@ -24,30 +24,43 @@
 namespace mod_perform\webapi\resolver\type;
 
 use coding_exception;
-use core\entities\user;
 use core\format;
 use core\webapi\execution_context;
 use core\webapi\resolver\type\user as user_type;
 use core\webapi\type_resolver;
 use mod_perform\formatter\activity\participant as participant_formatter;
+use mod_perform\models\activity\helpers\external_participant_token_validator;
 use mod_perform\models\activity\participant as participant_model;
 
 class participant implements type_resolver {
 
     public static function resolve(string $field, $source, array $args, execution_context $ec) {
+        global $PAGE;
+
         if (!$source instanceof participant_model) {
             throw new coding_exception(sprintf("Invalid class %s passed to participant type resolver.", get_class($source)));
         }
 
-        if ($source->get_user() instanceof user
-            && !in_array($field, participant_model::$model_only_fields, true)
-        ) {
-            return user_type::resolve($field, $source->get_user()->get_record(), $args, $ec);
+        // If there's a valid token we will not use the core user type resolver
+        $token = $ec->get_resolve_info()->variableValues['token'] ?? null;
+        if ($token) {
+            $validator = new external_participant_token_validator($token);
+            if (!$validator->is_valid()) {
+                throw new coding_exception('Token is invalid');
+            }
         }
-        $format = $args['format'] ?? format::FORMAT_PLAIN;
-        $formatter = new participant_formatter($source, $ec->get_relevant_context());
 
-        return $formatter->format($field, $format);
+        if ($source->is_external()
+            || $token
+            || in_array($field, participant_model::$model_only_fields, true)
+        ) {
+            $format = $args['format'] ?? format::FORMAT_PLAIN;
+            $formatter = new participant_formatter($source, $ec->get_relevant_context());
+
+            return $formatter->format($field, $format);
+        }
+
+        return user_type::resolve($field, $source->get_user()->get_record(), $args, $ec);
     }
 
 }

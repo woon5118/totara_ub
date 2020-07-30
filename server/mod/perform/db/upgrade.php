@@ -287,7 +287,7 @@ function xmldb_perform_upgrade($oldversion) {
 
         $user_key = new xmldb_key('user_id', XMLDB_KEY_FOREIGN, ['user_id'], 'user', ['id'], 'cascade');
         if ($dbman->key_exists($table, $user_key)) {
-            $dbman->drop_key($table, $key);
+            $dbman->drop_key($table, $user_key);
         }
 
         $user_index = new xmldb_index('user_id', XMLDB_INDEX_NOTUNIQUE, ['user_id']);

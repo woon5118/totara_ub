@@ -111,6 +111,13 @@ class mod_perform_activity_generator_configuration {
     private $use_anonymous_responses = false;
 
     /**
+     * Whether manual relationships should be created
+     *
+     * @var bool
+     */
+    private $create_manual_participants = false;
+
+    /**
      * shortcut function to get new object
      *
      * @return static
@@ -354,5 +361,27 @@ class mod_perform_activity_generator_configuration {
     public function should_create_manager_for_each_subject_user(): bool {
         return $this->create_manager_for_each_subject_user;
     }
+
+    /**
+     * Enable creation of manual participants if there are any manual relationships involved
+     *
+     * @return $this
+     */
+    public function enable_creation_of_manual_participants(): self {
+        $this->create_manual_participants = true;
+
+        return $this;
+    }
+
+    /**
+     * Should manual participants be created for this
+     *
+     * @return bool
+     */
+    public function should_create_manual_participants(): bool {
+        return $this->create_manual_participants;
+    }
+
+
 
 }

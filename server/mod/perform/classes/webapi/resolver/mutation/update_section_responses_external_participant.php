@@ -23,37 +23,47 @@
 
 namespace mod_perform\webapi\resolver\mutation;
 
-use coding_exception;
-use core\entities\user;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
-use core\webapi\middleware\require_login;
 use core\webapi\mutation_resolver;
 use core\webapi\resolver\has_middleware;
 use mod_perform\data_providers\response\participant_section_with_responses;
+use mod_perform\models\activity\helpers\external_participant_token_validator;
 use mod_perform\models\activity\participant_source;
 
-class update_section_responses implements mutation_resolver, has_middleware {
+class update_section_responses_external_participant implements mutation_resolver, has_middleware {
     /**
      * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
         $input = $args['input'];
 
-        $participant_id = user::logged_in()->id;
         $participant_section_id = $input['participant_section_id'];
+        $token = $input['token'] ?? null;
+        if (empty($token)) {
+            return null;
+        }
+
+        $validator = new external_participant_token_validator($token);
+        if (!$validator->is_valid()) {
+            return null;
+        }
+
+        $participant_instance = $validator->get_participant_instance();
+        $participant_id = $participant_instance->participant_id;
 
         $participant_section = (new participant_section_with_responses(
             $participant_id,
-            participant_source::INTERNAL,
+            participant_source::EXTERNAL,
             $participant_section_id
         ))->fetch()->get();
 
+        // Something is not valid, we do only return null to not reveal anything through error messages
         if ($participant_section === null) {
-            throw new coding_exception(sprintf('Participant section not found for id %d', $participant_section_id));
+            return null;
         }
 
-        $ec->set_relevant_context($participant_section->get_context());
+        $ec->set_relevant_context($participant_instance->get_context());
 
         $participant_section->set_responses_data_from_request($input['update']);
         $participant_section->complete();
@@ -69,7 +79,6 @@ class update_section_responses implements mutation_resolver, has_middleware {
     public static function get_middleware(): array {
         return [
             new require_advanced_feature('performance_activities'),
-            new require_login()
         ];
     }
 }

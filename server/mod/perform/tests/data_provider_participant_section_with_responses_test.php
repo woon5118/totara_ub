@@ -28,6 +28,7 @@ use mod_perform\data_providers\response\participant_section_with_responses;
 use mod_perform\entities\activity\participant_section as participant_section_entity;
 use mod_perform\models\activity\activity;
 use mod_perform\models\activity\participant_instance;
+use mod_perform\models\activity\participant_source;
 use mod_perform\models\response\participant_section;
 use mod_perform\models\response\responder_group;
 use mod_perform\models\response\section_element_response;
@@ -60,7 +61,11 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
                 ->first()
         );
 
-        $data_provider = new participant_section_with_responses($subject->id, $participant_section->id);
+        $data_provider = new participant_section_with_responses(
+            $subject->id,
+            participant_source::INTERNAL,
+            $participant_section->id
+        );
 
         $data_provider->fetch();
 
@@ -99,7 +104,11 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
                 ->first()
         );
 
-        $data_provider = new participant_section_with_responses($subject->id, $participant_section->id);
+        $data_provider = new participant_section_with_responses(
+            $subject->id,
+            participant_source::INTERNAL,
+            $participant_section->id
+        );
 
         $responses =  $data_provider->fetch()->get()->get_section_element_responses();
         self::assertCount(2, $responses);
@@ -141,7 +150,11 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
                 ->first()
         );
 
-        $data_provider = new participant_section_with_responses($subject->id, $participant_section->id);
+        $data_provider = new participant_section_with_responses(
+            $subject->id,
+            participant_source::INTERNAL,
+            $participant_section->id
+        );
 
         $main_responses =  $data_provider->fetch()->get()->get_section_element_responses();
         self::assertCount(2, $main_responses);
@@ -214,7 +227,11 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
                 ->first()
         );
 
-        $data_provider = new participant_section_with_responses($another_user->id, $participant_section->id);
+        $data_provider = new participant_section_with_responses(
+            $another_user->id,
+            participant_source::INTERNAL,
+            $participant_section->id
+        );
 
         $fetched_participant_section = $data_provider->fetch()->get();
 
@@ -295,7 +312,11 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
             $subject_section_relationship->core_relationship_id
         );
 
-        $data_provider = new participant_section_with_responses($subject_user_id, $subject_section->id);
+        $data_provider = new participant_section_with_responses(
+            $subject_user_id,
+            participant_source::INTERNAL,
+            $subject_section->id
+        );
         $fetched_participant_section = $data_provider->fetch()->get();
 
         /** @var section_element_response $element_response */
@@ -407,7 +428,11 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
         $user_id = $fetching_as === 'Manager' ? $manager_user->id : $appraiser_user->id;
         $participant_section_id = $fetching_as === 'Manager' ? $manager_section->id : $appraiser_section->id;
 
-        $data_provider = new participant_section_with_responses($user_id, $participant_section_id);
+        $data_provider = new participant_section_with_responses(
+            $user_id,
+            participant_source::INTERNAL,
+            $participant_section_id
+        );
         $fetched_participant_section = $data_provider->fetch()->get();
 
         /** @var section_element_response $element_response */
@@ -533,7 +558,11 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
         $user_id = $manager_user->id;
         $participant_section_id = $manager_section->id;
 
-        $data_provider = new participant_section_with_responses($user_id, $participant_section_id);
+        $data_provider = new participant_section_with_responses(
+            $user_id,
+            participant_source::INTERNAL,
+            $participant_section_id
+        );
         $fetched_participant_section = $data_provider->fetch()->get();
 
         /** @var section_element_response $element_response */
@@ -589,7 +618,11 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
 
         [$subject_section] = $generator->create_section_with_combined_manager_appraiser($subject_user, $manager_appraiser_user);
 
-        $data_provider = new participant_section_with_responses($subject_user_id, $subject_section->id);
+        $data_provider = new participant_section_with_responses(
+            $subject_user_id,
+            participant_source::INTERNAL,
+            $subject_section->id
+        );
         $fetched_participant_section = $data_provider->fetch()->get();
 
         /** @var section_element_response $element_response */
@@ -695,7 +728,11 @@ class mod_perform_data_provider_participant_section_with_responses_testcase exte
             $subject_section_relationship->core_relationship_id
         );
 
-        $data_provider = new participant_section_with_responses($subject_user_id, $subject_section->id);
+        $data_provider = new participant_section_with_responses(
+            $subject_user_id,
+            participant_source::INTERNAL,
+            $subject_section->id
+        );
         $fetched_participant_section = $data_provider->fetch()->get();
 
         /** @var section_element_response $element_response */

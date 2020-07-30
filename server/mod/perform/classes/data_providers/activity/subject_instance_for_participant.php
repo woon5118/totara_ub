@@ -34,6 +34,7 @@ use mod_perform\entities\activity\subject_instance;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 use mod_perform\entities\activity\track as track_entity;
 use mod_perform\entities\activity\track_user_assignment as track_user_assignment_entity;
+use mod_perform\models\activity\participant_source;
 use mod_perform\models\activity\subject_instance as subject_instance_model;
 use mod_perform\models\response\subject_sections;
 use mod_perform\state\subject_instance\active;
@@ -51,16 +52,19 @@ class subject_instance_for_participant {
     /** @var collection */
     protected $items = null;
 
+    /** @var int */
+    protected $participant_source;
+
     /** @var array */
     private $filters = [];
 
     /**
-     * subject_instance constructor.
-     *
      * @param int $participant_id The id of the user we would like to get activities that they are participating in.
+     * @param int $participant_source see participant_source model for constants
      */
-    public function __construct(int $participant_id) {
+    public function __construct(int $participant_id, int $participant_source) {
         $this->participant_id = $participant_id;
+        $this->participant_source = $participant_source;
     }
 
     /**
@@ -122,7 +126,6 @@ class subject_instance_for_participant {
             ->join([activity_entity::TABLE, 'a'], 't.activity_id', 'id')
             ->join('course', 'a.course', 'id')
             ->where_raw($totara_visibility_sql, $totara_visibility_params)
-            // Eager loaded relationship resolvers because they are returned in the subject instance gql query
             ->where_exists($this->get_target_participant_exists())
             ->where('status', active::get_code())
             // Newest subject instances at the top of the list
@@ -157,6 +160,7 @@ class subject_instance_for_participant {
             ->as('target_participant')
             ->where_raw('target_participant.subject_instance_id = si.id')
             ->where('participant_id', $this->participant_id)
+            ->where('participant_source', $this->participant_source)
             ->get_builder();
     }
 

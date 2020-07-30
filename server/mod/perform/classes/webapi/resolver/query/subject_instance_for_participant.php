@@ -30,33 +30,42 @@ use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
 use mod_perform\data_providers\activity\subject_instance_for_participant as subject_instance_data_provider;
+use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 use mod_perform\models\activity\participant_source;
+use mod_perform\models\activity\subject_instance as subject_instance_model;
 use mod_perform\util;
 
-class my_subject_instances implements query_resolver, has_middleware {
+class subject_instance_for_participant implements query_resolver, has_middleware {
     /**
      * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
+        $subject_instance_id = $args['subject_instance_id'] ?? 0;
+        if (!$subject_instance_id) {
+            throw new \invalid_parameter_exception('invalid subject instance id');
+        }
+
+        /** @var subject_instance_entity $subject_instance_entity */
+        $subject_instance_entity = subject_instance_entity::repository()->find($subject_instance_id);
+
+        if ($subject_instance_entity === null) {
+            return null;
+        }
+
+        $ec->set_relevant_context(subject_instance_model::load_by_entity($subject_instance_entity)->get_context());
+
         $participant_id = user::logged_in()->id;
 
-        $filters = $args['filters'] ?? [];
-        $about_filter = $filters['about'] ?? [];
+        if (util::can_manage_participation($participant_id, $subject_instance_entity->subject_user_id)) {
+            return new subject_instance_model($subject_instance_entity);
+        }
 
-        $subject_sections = (new subject_instance_data_provider($participant_id, participant_source::INTERNAL))
-            ->set_about_filter($about_filter)
-            ->get_subject_sections();
-
-        // This is a workaround for making sure the correct access control checks
-        // for users are triggered. It needs a course context to determine this.
-        // If we enrol users into an activity we can remove this workaround
-        $first_section = $subject_sections->first();
-        $context = $first_section
-            ? $first_section->get_subject_instance()->get_context()
-            : util::get_default_context();
-        $ec->set_relevant_context($context);
-
-        return $subject_sections;
+        /** @var subject_instance_model $subject_instance */
+        return (new subject_instance_data_provider($participant_id, participant_source::INTERNAL))
+            ->set_subject_instance_id_filter($subject_instance_id)
+            ->fetch()
+            ->get()
+            ->first();
     }
 
     /**

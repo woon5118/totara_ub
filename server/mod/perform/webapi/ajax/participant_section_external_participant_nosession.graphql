@@ -1,0 +1,78 @@
+query mod_perform_participant_section_external_participant_nosession(
+  $token: String!
+  $participant_instance_id: core_id
+  $participant_section_id: core_id
+) {
+  mod_perform_participant_section_external_participant(
+    token: $token
+    participant_instance_id: $participant_instance_id
+    participant_section_id: $participant_section_id
+  ) {
+    id
+    progress_status
+    availability_status
+    section {
+      display_title
+    }
+    answerable_participant_instances {
+      id
+      core_relationship {
+        name
+        idnumber
+      }
+    }
+    section_element_responses {
+      section_element_id
+      element {
+        element_plugin {
+          participant_form_component
+          participant_response_component
+        }
+        title
+        data
+        is_required
+        is_respondable
+      }
+      sort_order
+      response_data
+      validation_errors {
+        error_code
+        error_message
+      }
+      other_responder_groups {
+        relationship_name
+        responses {
+          participant_instance {
+            participant {
+              fullname
+              profileimageurlsmall
+            }
+          }
+          response_data
+        }
+      }
+      visible_to {
+        participant {
+          fullname
+        }
+      }
+    }
+    participant_instance {
+      participant_sections {
+        id
+        progress_status
+        availability_status
+        section {
+          id
+          title
+          sort_order
+          display_title
+        }
+      }
+    }
+    responses_are_visible_to {
+      name_plural
+      idnumber
+    }
+  }
+}

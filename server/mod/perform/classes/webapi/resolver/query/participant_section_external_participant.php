@@ -23,21 +23,14 @@
 
 namespace mod_perform\webapi\resolver\query;
 
-use core\entities\user;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
-use core\webapi\middleware\require_login;
-use core\webapi\query_resolver;
-use core\webapi\resolver\has_middleware;
-use Exception;
-use invalid_parameter_exception;
 use mod_perform\data_providers\response\participant_section as participant_section_provider;
 use mod_perform\data_providers\response\participant_section_with_responses;
-use mod_perform\entities\activity\participant_section as participant_section_entity;
+use mod_perform\models\activity\helpers\external_participant_token_validator;
 use mod_perform\models\activity\participant_source;
-use mod_perform\models\response\participant_section as participant_section_model;
 
-class participant_section implements query_resolver, has_middleware {
+class participant_section_external_participant extends participant_section {
     /**
      * {@inheritdoc}
      */
@@ -47,9 +40,24 @@ class participant_section implements query_resolver, has_middleware {
 
         self::check_required_args($participant_instance_id, $participant_section_id);
 
-        $participant_id = user::logged_in()->id;
+        $token = $args['token'] ?? null;
+        if (empty($token)) {
+            return null;
+        }
 
-        $section_provider = new participant_section_provider($participant_id, participant_source::INTERNAL);
+        $validator = new external_participant_token_validator($token);
+        if (!$validator->is_valid()) {
+            return null;
+        }
+
+        $participant_instance = $validator->get_participant_instance();
+        if ($participant_instance_id != $participant_instance->id) {
+            return null;
+        }
+
+        $participant_id = $participant_instance->participant_id;
+
+        $section_provider = new participant_section_provider($participant_id, participant_source::EXTERNAL);
         $participant_section = $participant_section_id
             ? $section_provider->find_by_section_id($participant_section_id)
             : $section_provider->find_by_instance_id($participant_instance_id);
@@ -58,11 +66,11 @@ class participant_section implements query_resolver, has_middleware {
             return null;
         }
 
-        $ec->set_relevant_context($participant_section->get_participant_instance()->get_context());
+        $ec->set_relevant_context($participant_instance->get_context());
 
         $data_provider = new participant_section_with_responses(
             $participant_id,
-            participant_source::INTERNAL,
+            participant_source::EXTERNAL,
             $participant_section->id
         );
 
@@ -80,21 +88,7 @@ class participant_section implements query_resolver, has_middleware {
     public static function get_middleware(): array {
         return [
             new require_advanced_feature('performance_activities'),
-            new require_login()
         ];
     }
 
-    /**
-     * check if participant_instance_id and participant_section_id are both provided or on one is provided
-     * @param int $participant_instance_id
-     * @param int $participant_section_id
-     * @throws invalid_parameter_exception
-     */
-    protected static function check_required_args(int $participant_instance_id, int $participant_section_id): void {
-        if (!$participant_instance_id && !$participant_section_id) {
-            throw new invalid_parameter_exception(
-                'At least one parameter is required, either participant_instance_id or participant_section_id'
-            );
-        }
-    }
 }

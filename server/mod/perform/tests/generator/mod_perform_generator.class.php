@@ -48,14 +48,14 @@ use mod_perform\models\activity\activity;
 use mod_perform\models\activity\activity_setting;
 use mod_perform\models\activity\activity_type;
 use mod_perform\models\activity\element;
+use mod_perform\models\activity\external_participant;
 use mod_perform\models\activity\notification;
 use mod_perform\models\activity\notification_recipient;
 use mod_perform\models\activity\participant_source;
-use mod_perform\models\activity\external_participant;
 use mod_perform\models\activity\section;
 use mod_perform\models\activity\section_element;
 use mod_perform\models\activity\section_relationship as section_relationship_model;
-use mod_perform\models\activity\subject_instance_manual_participant;
+use mod_perform\models\activity\subject_instance;
 use mod_perform\models\activity\track;
 use mod_perform\models\activity\track_assignment_type;
 use mod_perform\notification\loader as notification_loader;
@@ -66,9 +66,9 @@ use mod_perform\state\participant_instance\not_started as instance_not_started;
 use mod_perform\state\participant_instance\open;
 use mod_perform\state\participant_section\not_started;
 use mod_perform\state\subject_instance\pending;
-use mod_perform\task\service\subject_instance_creation;
 use mod_perform\user_groups\grouping;
 use mod_perform\util;
+use totara_core\entities\relationship;
 use totara_core\relationship\relationship as core_relationship;
 use totara_core\relationship\relationship_provider as core_relationship_provider;
 use totara_job\job_assignment;
@@ -379,7 +379,7 @@ class mod_perform_generator extends component_generator_base {
     }
 
     public function create_notification_recipient(notification $notification, array $data, bool $active = true): notification_recipient {
-        $core_relationship = $this->get_core_relationship($data['class_name']);
+        $core_relationship = $this->get_core_relationship($data['idnumber']);
         return notification_recipient::create($notification, $core_relationship, $active);
     }
 
@@ -528,6 +528,12 @@ class mod_perform_generator extends component_generator_base {
         // For the activity generation we need to make sure the admin user is set
         advanced_testcase::setAdminUser();
 
+        $manual_relationships = relationship::repository()
+            ->where('type', relationship::TYPE_MANUAL)
+            ->get();
+        $manual_idnumbers = $manual_relationships->pluck('idnumber');
+        $has_manual_relationships = [];
+
         $activity_name_generator = new mod_perform_activity_name_generator();
 
         $activities = [];
@@ -559,15 +565,18 @@ class mod_perform_generator extends component_generator_base {
             $relationships = $configuration->get_relationships_per_section();
 
             // Add notification recipient for each relationship.
-            foreach ($relationships  as $relationship_class) {
+            foreach ($relationships as $relationship_idnumber) {
                 foreach ($notifications as $notification) {
-                    $this->create_notification_recipient($notification, ['class_name' => $relationship_class], true);
+                    $this->create_notification_recipient($notification, ['idnumber' => $relationship_idnumber], true);
                 }
             }
 
             for ($k = 0; $k < $configuration->get_number_of_sections_per_activity(); $k++) {
                 $section = $this->create_section($activity, ['title' => $activity->name . ' section ' . $k]);
                 foreach ($relationships as $relationship_idnumber) {
+                    if (in_array($relationship_idnumber, $manual_idnumbers, true)) {
+                        $has_manual_relationships[] = $relationship_idnumber;
+                    }
                     $this->create_section_relationship($section, ['relationship' => $relationship_idnumber]);
                 }
                 for ($j = 1; $j <= $configuration->get_number_of_elements_per_section(); $j++) {
@@ -623,6 +632,35 @@ class mod_perform_generator extends component_generator_base {
             $this->generate_subject_instances();
         }
 
+        if (!empty($has_manual_relationships) && $configuration->should_create_manual_participants()) {
+            foreach ($activities as $activity) {
+                $subject_instances = subject_instance_entity::repository()
+                    ->filter_by_activity_id($activity->id)
+                    ->get();
+                foreach ($subject_instances as $subject_instance) {
+                    foreach ($has_manual_relationships as $manual_relationship) {
+                        if ($manual_relationship === constants::RELATIONSHIP_EXTERNAL) {
+                            $fullname = $this->generate_fullname();
+                            $data = [
+                                'core_relationship_idnumber' => constants::RELATIONSHIP_EXTERNAL,
+                                'subject_instance_id' => $subject_instance->id,
+                                'created_by' => get_admin()->id,
+                                'externals' => [
+                                    [
+                                        'name' => $fullname,
+                                        'email' => $this->generate_email($fullname),
+                                    ]
+                                ]
+                            ];
+                            $this->create_subject_instance_manual_participant($data);
+                        }
+                    }
+                    $subject_instance_model = subject_instance::load_by_entity($subject_instance);
+                    $subject_instance_model->switch_state(\mod_perform\state\subject_instance\active::class);
+                }
+            }
+        }
+
         advanced_testcase::setUser($previous_user);
 
         return collection::new($activities);
@@ -645,6 +683,21 @@ class mod_perform_generator extends component_generator_base {
         $message_sink->close();
 
         return $message_sink;
+    }
+
+    private function generate_fullname(): string {
+        $country = rand(0, 5);
+        $firstname = rand(0, 4);
+        $lastname = rand(0, 4);
+        $female = rand(0, 1);
+        // Totara: Make sure that the random full user names are unique.
+        $firstname = ($country * 10) + $firstname + ($female * 5);
+        $lastname = ($country * 10) + $lastname + ($female * 5);
+        return $firstname.' '.$lastname;
+    }
+
+    private function generate_email(string $fullname): string {
+        return strtolower(str_replace(' ', '.', $fullname)).'@example.com';
     }
 
     /**
@@ -947,6 +1000,8 @@ class mod_perform_generator extends component_generator_base {
         $subject_instance->subject_user_id = $user_assignment->subject_user_id; // Purposeful denormalization
         $subject_instance->status = pending::get_code();
         $subject_instance->save();
+
+        $subject_instance->refresh();
 
         foreach ($selections as $selection) {
             $progress_entity = new manual_relationship_selection_progress();

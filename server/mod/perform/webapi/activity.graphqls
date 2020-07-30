@@ -254,8 +254,17 @@ extend type Query {
   """
   A specific performance activity (perform_subject_instance) a user is participating in
   """
-  mod_perform_subject_instance(
+  mod_perform_subject_instance_for_participant(
     subject_instance_id: core_id!
+  ): mod_perform_subject_instance
+
+  """
+  A specific performance activity (perform_subject_instance) a user is participating in
+  only accessible for external users with a valid token
+  """
+  mod_perform_subject_instance_for_external_participant(
+    subject_instance_id: core_id!
+    token: String
   ): mod_perform_subject_instance
 }
 

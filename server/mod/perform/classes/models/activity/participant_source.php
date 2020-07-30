@@ -30,9 +30,12 @@ final class participant_source {
     public const INTERNAL = 0;
     public const EXTERNAL = 1;
 
+    public const TEXT_INTERNAL = 'INTERNAL';
+    public const TEXT_EXTERNAL = 'EXTERNAL';
+
     public const SOURCE_TEXT = [
-        self::INTERNAL => 'INTERNAL',
-        self::EXTERNAL => 'EXTERNAL',
+        self::INTERNAL => self::TEXT_INTERNAL,
+        self::EXTERNAL => self::TEXT_EXTERNAL,
     ];
 
     /**

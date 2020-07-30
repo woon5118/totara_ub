@@ -25,6 +25,7 @@ use core\orm\query\builder;
 use mod_perform\data_providers\activity\subject_instance_for_participant;
 use mod_perform\entities\activity\filters\subject_instances_about;
 use mod_perform\entities\activity\participant_instance;
+use mod_perform\models\activity\participant_source;
 use mod_perform\models\activity\subject_instance as subject_instance_model;
 
 require_once(__DIR__ . '/subject_instance_testcase.php');
@@ -38,7 +39,7 @@ class mod_perform_data_provider_subject_instances_testcase extends mod_perform_s
      * Even unfiltered must only return activities the user is participating in.
      */
     public function test_get_unfiltered(): void {
-        $returned_subject_instances = (new subject_instance_for_participant(self::$user->id))
+        $returned_subject_instances = (new subject_instance_for_participant(self::$user->id, participant_source::INTERNAL))
             ->fetch()
             ->get();
 
@@ -65,7 +66,7 @@ class mod_perform_data_provider_subject_instances_testcase extends mod_perform_s
                 'visibleold' => 0
             ]);
 
-        $returned_subject_instances = (new subject_instance_for_participant(self::$user->id))
+        $returned_subject_instances = (new subject_instance_for_participant(self::$user->id, participant_source::INTERNAL))
             ->fetch()
             ->get();
 
@@ -85,7 +86,7 @@ class mod_perform_data_provider_subject_instances_testcase extends mod_perform_s
         /** @var subject_instance_model $query_activity */
         $query_activity = $get_query_activity();
 
-        $returned_subject_instances = (new subject_instance_for_participant(self::$user->id))
+        $returned_subject_instances = (new subject_instance_for_participant(self::$user->id, participant_source::INTERNAL))
             ->set_subject_instance_id_filter($query_activity->get_id())
             ->fetch()
             ->get();
@@ -99,7 +100,7 @@ class mod_perform_data_provider_subject_instances_testcase extends mod_perform_s
     }
 
     public function test_get_only_about_user(): void {
-        $returned_subject_instances = (new subject_instance_for_participant(self::$user->id))
+        $returned_subject_instances = (new subject_instance_for_participant(self::$user->id, participant_source::INTERNAL))
             ->set_about_filter([subject_instances_about::VALUE_ABOUT_SELF])
             ->fetch()
             ->get();
@@ -110,7 +111,7 @@ class mod_perform_data_provider_subject_instances_testcase extends mod_perform_s
     }
 
     public function test_get_subject_instances_only_about_other_users(): void {
-        $returned_subject_instances = (new subject_instance_for_participant(self::$user->id))
+        $returned_subject_instances = (new subject_instance_for_participant(self::$user->id, participant_source::INTERNAL))
             ->set_about_filter([subject_instances_about::VALUE_ABOUT_OTHERS])
             ->fetch()
             ->get();
@@ -121,7 +122,7 @@ class mod_perform_data_provider_subject_instances_testcase extends mod_perform_s
     }
 
     public function test_get_user_about_self_and_others_via_all_filter_options(): void {
-        $returned_subject_instances = (new subject_instance_for_participant(self::$user->id))
+        $returned_subject_instances = (new subject_instance_for_participant(self::$user->id, participant_source::INTERNAL))
             ->set_about_filter([subject_instances_about::VALUE_ABOUT_SELF, subject_instances_about::VALUE_ABOUT_OTHERS])
             ->fetch()
             ->get();
@@ -141,7 +142,7 @@ class mod_perform_data_provider_subject_instances_testcase extends mod_perform_s
      * Check that the result includes all participant instances not just the one for $user->id.
      */
     public function test_attaches_all_participant_instance(): void {
-        $returned_subject_instances = (new subject_instance_for_participant(self::$user->id))
+        $returned_subject_instances = (new subject_instance_for_participant(self::$user->id, participant_source::INTERNAL))
             ->set_about_filter([subject_instances_about::VALUE_ABOUT_SELF])
             ->fetch()
             ->get();

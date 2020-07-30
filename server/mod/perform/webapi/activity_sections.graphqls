@@ -74,6 +74,15 @@ extend type Query {
     participant_instance_id: core_id
     participant_section_id: core_id
   ): mod_perform_participant_section
+
+  """
+  A section of elements for an external user to respond to
+  """
+  mod_perform_participant_section_external_participant(
+    token: String!
+    participant_instance_id: core_id
+    participant_section_id: core_id
+  ): mod_perform_participant_section
 }
 
 """

@@ -13,6 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
+  @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
   @module mod_perform
 -->
 <template>
@@ -201,7 +202,10 @@
               class="tui-participantContent__buttons"
             >
               <ButtonSubmit :submitting="getSubmitting()" />
-              <ButtonCancel @click="goBackToListCancel" />
+              <ButtonCancel
+                v-if="!isExternalParticipant"
+                @click="goBackToListCancel"
+              />
             </ButtonGroup>
 
             <div class="tui-participantContent__navigation">
@@ -222,6 +226,7 @@
                       @click="loadNextParticipantSection"
                     />
                     <Button
+                      v-if="!isExternalParticipant"
                       :text="$str('button_close', 'mod_perform')"
                       @click="goBackToListCancel"
                     />
@@ -268,7 +273,9 @@ import ToggleSwitch from 'tui/components/toggle/ToggleSwitch';
 import { Uniform } from 'tui/components/uniform';
 // graphQL
 import SectionResponsesQuery from 'mod_perform/graphql/participant_section';
+import SectionResponsesQueryExternal from 'mod_perform/graphql/participant_section_external_participant_nosession';
 import UpdateSectionResponsesMutation from 'mod_perform/graphql/update_section_responses';
+import UpdateSectionResponsesMutationExternalParticipant from 'mod_perform/graphql/update_section_responses_external_participant_nosession';
 
 export default {
   components: {
@@ -307,7 +314,6 @@ export default {
      * The id of the logged in user.
      */
     currentUserId: {
-      required: true,
       type: Number,
     },
 
@@ -333,10 +339,18 @@ export default {
       required: true,
       type: Object,
       validator(value) {
-        return ['id', 'profileimageurlsmall', 'fullname'].every(
+        return ['profileimageurlsmall', 'fullname'].every(
           Object.prototype.hasOwnProperty.bind(value)
         );
       },
+    },
+
+    /**
+     * Optional token if this is an external participant
+     */
+    token: {
+      required: false,
+      type: String,
     },
   },
 
@@ -368,52 +382,63 @@ export default {
 
   apollo: {
     section: {
-      query: SectionResponsesQuery,
+      query() {
+        return this.isExternalParticipant
+          ? SectionResponsesQueryExternal
+          : SectionResponsesQuery;
+      },
       variables() {
         return {
           participant_instance_id: this.answeringAsParticipantId,
           participant_section_id: this.participantSectionId,
+          token: this.token,
         };
       },
-      update: data => data.mod_perform_participant_section.section,
+      update(data) {
+        return this.isExternalParticipant
+          ? data.mod_perform_participant_section_external_participant.section
+          : data.mod_perform_participant_section.section;
+      },
       result({ data }) {
+        let result = this.isExternalParticipant
+          ? data.mod_perform_participant_section_external_participant
+          : data.mod_perform_participant_section;
+
+        this.selectedParticipantSectionId = result.id;
         this.answerableParticipantInstances =
-          data.mod_perform_participant_section.answerable_participant_instances;
-        this.activeParticipantSection = data.mod_perform_participant_section;
+          result.answerable_participant_instances;
+        this.activeParticipantSection = result;
         this.participantSections =
-          data.mod_perform_participant_section.participant_instance.participant_sections;
-        this.responsesAreVisibleTo =
-          data.mod_perform_participant_section.responses_are_visible_to;
+          result.participant_instance.participant_sections;
+        this.responsesAreVisibleTo = result.responses_are_visible_to;
         this.formValues = {};
         this.initialValues = {
           sectionElements: {},
         };
-        this.sectionElements = data.mod_perform_participant_section.section_element_responses.map(
-          item => {
-            let component = this.activeSectionIsClosed
-              ? item.element.element_plugin.participant_response_component
-              : item.element.element_plugin.participant_form_component;
-            return {
-              id: item.section_element_id,
-              clientId: uniqueId(),
-              component: tui.asyncComponent(component),
-              element: {
-                type: item.element.element_plugin,
-                title: item.element.title,
-                identifier: item.element.identifier,
-                data: JSON.parse(item.element.data),
-                is_required: item.element.is_required,
-                responseData: null,
-              },
-              sort_order: item.sort_order,
-              is_respondable: item.element.is_respondable,
-              response_data: item.response_data,
-              other_responder_groups: item.other_responder_groups,
-            };
-          }
-        );
+        this.sectionElements = result.section_element_responses.map(item => {
+          let component = this.activeSectionIsClosed
+            ? item.element.element_plugin.participant_response_component
+            : item.element.element_plugin.participant_form_component;
+          return {
+            id: item.section_element_id,
+            clientId: uniqueId(),
+            component: tui.asyncComponent(component),
+            element: {
+              type: item.element.element_plugin,
+              title: item.element.title,
+              identifier: item.element.identifier,
+              data: JSON.parse(item.element.data),
+              is_required: item.element.is_required,
+              responseData: null,
+            },
+            sort_order: item.sort_order,
+            is_respondable: item.element.is_respondable,
+            response_data: item.response_data,
+            other_responder_groups: item.other_responder_groups,
+          };
+        });
 
-        data.mod_perform_participant_section.section_element_responses
+        result.section_element_responses
           .filter(item => item.element.is_respondable)
           .forEach(item => {
             this.initialValues.sectionElements[
@@ -435,6 +460,15 @@ export default {
   },
 
   computed: {
+    /**
+     * Returns true if the current user is an external participant,
+     * means the token is set
+     * @return {Boolean}
+     */
+    isExternalParticipant() {
+      return this.token !== null && this.token.length > 0;
+    },
+
     relationshipToUser() {
       if (this.currentUserIsSubject) {
         return this.$str('relation_to_subject_self', 'mod_perform');
@@ -457,6 +491,7 @@ export default {
      */
     currentUserIsSubject() {
       return (
+        !this.isExternalParticipant &&
         this.answeringAs != null &&
         this.answeringAs.core_relationship.idnumber === RELATIONSHIP_SUBJECT
       );
@@ -619,9 +654,10 @@ export default {
       this.isSaving = true;
       try {
         const sectionResponsesResult = await this.save();
-        const submittedParticipantSection =
-          sectionResponsesResult.mod_perform_update_section_responses
-            .participant_section;
+        const result = this.isExternalParticipant
+          ? sectionResponsesResult.mod_perform_update_section_responses_external_participant
+          : sectionResponsesResult.mod_perform_update_section_responses;
+        const submittedParticipantSection = result.participant_section;
         //assign errors to individual elements
         this.errors = submittedParticipantSection.section_element_responses
           .filter(item => item.validation_errors)
@@ -642,6 +678,7 @@ export default {
             this.showSuccessNotification();
             await this.loadParticipantSection(nextParticipantSectionId);
             this.selectedParticipantSectionId = nextParticipantSectionId;
+            this.updateUrlParam(nextParticipantSectionId);
           } else {
             // Go back to activity list
             this.goBackToListCompletionSuccess();
@@ -668,11 +705,14 @@ export default {
       });
 
       const { data: resultData } = await this.$apollo.mutate({
-        mutation: UpdateSectionResponsesMutation,
+        mutation: this.isExternalParticipant
+          ? UpdateSectionResponsesMutationExternalParticipant
+          : UpdateSectionResponsesMutation,
         variables: {
           input: {
             participant_section_id: this.activeParticipantSection.id,
             update: update,
+            token: this.token,
           },
         },
         refetchAll: false,
@@ -713,6 +753,7 @@ export default {
     async loadParticipantSection(participantSectionId) {
       await this.$apollo.queries.section.refetch({
         participant_section_id: participantSectionId,
+        token: this.token,
       });
     },
 
@@ -769,6 +810,14 @@ export default {
      * Redirects back to the list of user activities with a success message.
      */
     goBackToListCompletionSuccess() {
+      if (this.isExternalParticipant) {
+        window.location.href = this.$url('/mod/perform/activity/external.php', {
+          success: 1,
+          token: this.token,
+        });
+        return;
+      }
+
       // Post requests require a real url (activity/index.php no activity/).
       const url = this.$url('/mod/perform/activity/index.php');
 

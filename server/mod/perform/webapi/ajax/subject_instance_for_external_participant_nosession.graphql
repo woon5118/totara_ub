@@ -1,0 +1,30 @@
+query mod_perform_subject_instance_for_external_participant_nosession(
+  $subject_instance_id: core_id!
+  $token: String!
+) {
+  mod_perform_subject_instance_for_external_participant(
+    subject_instance_id: $subject_instance_id
+    token: $token
+  ) {
+    id
+    progress_status
+    created_at
+    instance_count
+    activity {
+      name
+      settings {
+        close_on_completion
+        multisection
+      }
+      anonymous_responses
+    }
+    subject_user {
+      id
+      fullname
+      profileimageurlsmall
+    }
+    job_assignment {
+      fullname
+    }
+  }
+}

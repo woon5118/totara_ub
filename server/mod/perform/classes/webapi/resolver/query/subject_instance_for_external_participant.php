@@ -23,45 +23,48 @@
 
 namespace mod_perform\webapi\resolver\query;
 
-use core\entities\user;
 use core\webapi\execution_context;
-use core\webapi\query_resolver;
 use core\webapi\middleware\require_advanced_feature;
-use core\webapi\middleware\require_login;
+use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
 use mod_perform\data_providers\activity\subject_instance_for_participant as subject_instance_data_provider;
+use mod_perform\models\activity\helpers\external_participant_token_validator;
+use mod_perform\models\activity\participant_source;
 use mod_perform\models\activity\subject_instance as subject_instance_model;
-use mod_perform\entities\activity\subject_instance as subject_instance_entity;
-use mod_perform\util;
 
-class subject_instance implements query_resolver, has_middleware {
+class subject_instance_for_external_participant implements query_resolver, has_middleware {
+
     /**
      * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
         $subject_instance_id = $args['subject_instance_id'] ?? 0;
         if (!$subject_instance_id) {
-            throw new \invalid_parameter_exception('invalid subject instance id');
-        }
-
-        /** @var subject_instance_entity $subject_instance_entity */
-        $subject_instance_entity = subject_instance_entity::repository()->find($subject_instance_id);
-
-        if ($subject_instance_entity === null) {
             return null;
         }
 
-        $ec->set_relevant_context(subject_instance_model::load_by_entity($subject_instance_entity)->get_context());
-
-        /** @var user $target_participant */
-        $user_id = user::logged_in()->id;
-
-        if (util::can_manage_participation($user_id, $subject_instance_entity->subject_user_id)) {
-            return new subject_instance_model($subject_instance_entity);
+        $token = $args['token'] ?? 0;
+        if (empty($token)) {
+            return null;
         }
 
+        $validator = new external_participant_token_validator($token);
+        if (!$validator->is_valid()) {
+            return null;
+        }
+
+        // Validate that the subject instance matches with the one for the token
+        $participant_instance = $validator->get_participant_instance();
+        if ($participant_instance->subject_instance_id != $subject_instance_id) {
+            return null;
+        }
+
+        $ec->set_relevant_context($participant_instance->get_context());
+
+        $participant_id = $participant_instance->participant_id;
+
         /** @var subject_instance_model $subject_instance */
-        return (new subject_instance_data_provider($user_id))
+        return (new subject_instance_data_provider($participant_id, participant_source::EXTERNAL))
             ->set_subject_instance_id_filter($subject_instance_id)
             ->fetch()
             ->get()
@@ -74,7 +77,6 @@ class subject_instance implements query_resolver, has_middleware {
     public static function get_middleware(): array {
         return [
             new require_advanced_feature('performance_activities'),
-            new require_login()
         ];
     }
 }

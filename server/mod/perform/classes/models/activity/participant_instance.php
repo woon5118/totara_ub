@@ -48,6 +48,7 @@ use totara_core\relationship\relationship as relationship_model;
  * @property-read int $id
  * @property-read int $progress
  * @property-read int $participant_id
+ * @property-read int $participant_source see participant_source model for constants
  * @property-read subject_instance $subject_instance
  * @property-read int $subject_instance_id
  * @property-read user $participant

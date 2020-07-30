@@ -101,15 +101,31 @@ class participant {
     }
 
     /**
+     * @return bool
+     */
+    public function is_internal(): bool {
+        return $this->source === participant_source::INTERNAL;
+    }
+
+    /**
+     * @return bool
+     */
+    public function is_external(): bool {
+        return $this->source === participant_source::EXTERNAL;
+    }
+
+    /**
      * Get the user profile image url.
      *
      * @return string
      */
     public function get_profileimageurlsmall(): string {
+        global $PAGE;
+
         return $this->source === participant_source::EXTERNAL
             ? $this->user->get_profileimageurlsmall()
             :  (new user_picture($this->user->get_record(), 0))
-                ->get_url(new moodle_page())
+                ->get_url($PAGE)
                 ->out(false);
     }
 

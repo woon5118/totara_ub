@@ -13,6 +13,7 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Jaron Steenson <jaron.steenson@totaralearning.com>
+  @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
   @module mod_perform
 -->
 
@@ -34,13 +35,15 @@
         :participant-instance-id="participantInstanceId"
         :participant-section-id="participantSectionId"
         :subject-user="subjectInstance.subject_user"
+        :token="token"
       />
     </Loader>
   </div>
 </template>
 
 <script>
-import subjectInstanceQuery from 'mod_perform/graphql/subject_instance';
+import externalSubjectInstanceQuery from 'mod_perform/graphql/subject_instance_for_external_participant_nosession';
+import subjectInstanceQuery from 'mod_perform/graphql/subject_instance_for_participant';
 import Loader from 'tui/components/loader/Loader';
 import NotificationBanner from 'tui/components/notifications/NotificationBanner';
 import ActivityContent from 'mod_perform/components/user_activities/ActivityContent';
@@ -56,8 +59,9 @@ export default {
      * The id of the logged in user.
      */
     currentUserId: {
-      required: true,
+      required: false,
       type: Number,
+      default: null,
     },
     participantInstanceId: {
       required: false,
@@ -71,6 +75,11 @@ export default {
       required: false,
       type: Number,
     },
+    token: {
+      required: false,
+      type: String,
+      default: '',
+    },
   },
 
   data() {
@@ -80,25 +89,43 @@ export default {
       subjectInstance: null,
     };
   },
+
   apollo: {
     subjectInstance: {
-      query: subjectInstanceQuery,
+      query() {
+        return this.isExternalParticipant
+          ? externalSubjectInstanceQuery
+          : subjectInstanceQuery;
+      },
       skip() {
         return !this.subjectInstanceId;
       },
       variables() {
         return {
           subject_instance_id: this.subjectInstanceId,
+          token: this.token,
         };
       },
       update(data) {
         this.hasLoaded = true;
 
-        return data['mod_perform_subject_instance'];
+        return this.isExternalParticipant
+          ? data['mod_perform_subject_instance_for_external_participant']
+          : data['mod_perform_subject_instance_for_participant'];
       },
     },
   },
+
   computed: {
+    /**
+     * Returns true if the current user is an external participant,
+     * means the token is set
+     * @return {Boolean}
+     */
+    isExternalParticipant() {
+      return this.token.length > 0;
+    },
+
     /**
      * Trying to load the activity from the server resulted in either
      * the activity not being found at all or the user not having permission
