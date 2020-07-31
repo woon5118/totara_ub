@@ -90,6 +90,7 @@ import List from 'tui/components/icons/common/List';
 import Grid from 'tui/components/icons/common/Grid';
 import Info from 'tui/components/icons/common/Info';
 import Spinner from 'tui/components/icons/common/Spinner';
+import Preview from 'tui/components/icons/common/Preview';
 import Warning from 'tui/components/icons/common/Warning';
 
 import Cell from 'tui/components/datatable/Cell';
@@ -242,6 +243,11 @@ export default {
         {
           icon: Success,
           name: 'Success',
+          desc: '...',
+        },
+        {
+          icon: Preview,
+          name: 'Preview',
           desc: '...',
         },
         {
