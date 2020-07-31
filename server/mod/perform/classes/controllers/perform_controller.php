@@ -43,6 +43,13 @@ use totara_mvc\view;
 abstract class perform_controller extends controller {
 
     /**
+     * Constant used to determine the maximum number of rows that can be used as a source
+     * of an export. This is used to prevent an excessively large query when using an
+     * embedded report result as the basis of an export.
+     */
+    const BULK_EXPORT_MAX_ROWS = 10000;
+
+    /**
      * Checks and call require_login if parameter is set, can be overridden if special set up is needed
      *
      * @return $this
