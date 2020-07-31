@@ -22,7 +22,7 @@
 */
 
 
-use mod_perform\controllers\reporting\responses\user_responses;
+use mod_perform\controllers\reporting\performance\user_responses;
 
 require_once(__DIR__ . '/../../../../config.php');
 

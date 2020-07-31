@@ -99,6 +99,8 @@ class user_with_components_links extends base {
         $feedback360str = get_string('feedback360', 'totara_feedback360');
         $goalstr = get_string('goalplural', 'totara_hierarchy');
         $evidencestr = get_string('evidence', 'totara_evidence');
+        $performance_data = get_string('user_components_performance_data_link', 'mod_perform');
+
         $rol_link = \html_writer::link("{$CFG->wwwroot}/totara/plan/record/index.php?userid={$userid}", $recordstr);
         $required_link = \html_writer::link(new \moodle_url('/totara/program/required.php',
             array('userid' => $userid)), $requiredstr);
@@ -109,6 +111,9 @@ class user_with_components_links extends base {
         $feedback_link = \html_writer::link("{$CFG->wwwroot}/totara/feedback360/index.php?userid={$userid}", $feedback360str);
         $goal_link = \html_writer::link("{$CFG->wwwroot}/totara/hierarchy/prefix/goal/mygoals.php?userid={$userid}", $goalstr);
         $evidence_link = \html_writer::link(new \moodle_url('/totara/evidence/index.php', ['user_id' => $userid]), $evidencestr);
+        $perform_response_reporting_link = \html_writer::link(
+            new \moodle_url('/mod/perform/reporting/performance/user_responses.php', ['user_id' => $userid]), $performance_data
+        );
 
         $show_plan_link = advanced_feature::is_enabled('learningplans') && dp_can_view_users_plans($userid);
 
@@ -143,6 +148,12 @@ class user_with_components_links extends base {
             class_exists('\totara_evidence\models\helpers\evidence_item_capability_helper') &&
             \totara_evidence\models\helpers\evidence_item_capability_helper::for_user($userid)->can_view_list()) {
             $links .= \html_writer::tag('li', $evidence_link);
+        }
+
+        if (advanced_feature::is_enabled('performance_activities') &&
+            class_exists(\mod_perform\util::class) &&
+            \mod_perform\util::can_report_on_subjects($USER->id, $userid)) {
+            $links .= \html_writer::tag('li', $perform_response_reporting_link);
         }
 
         $links .= \html_writer::end_tag('ul');

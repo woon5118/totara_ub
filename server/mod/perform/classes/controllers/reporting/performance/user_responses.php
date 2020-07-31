@@ -21,25 +21,24 @@
  * @package mod_perform
  */
 
-namespace mod_perform\controllers\reporting\responses;
+namespace mod_perform\controllers\reporting\performance;
 
-use context;
-use context_system;
+use context_coursecat;
 use core\entities\user;
-use core\output\notification;
 use mod_perform\controllers\perform_controller;
-use mod_perform\models\activity\activity;
-use moodle_exception;
-use moodle_url;
+use mod_perform\util;
 use totara_mvc\has_report;
-use totara_mvc\view;
 
 class user_responses extends perform_controller {
 
     use has_report;
 
-    public function setup_context(): context {
-        return context_system::instance();
+    /**
+     * @inheritDoc
+     */
+    protected function setup_context(): \context {
+        $category_id = util::get_default_category_id();
+        return context_coursecat::instance($category_id);
     }
 
     public function action() {
@@ -54,6 +53,6 @@ class user_responses extends perform_controller {
     }
 
     public static function get_base_url(): string {
-        return '/mod/perform/reporting/responses/user_responses.php';
+        return '/mod/perform/reporting/performance/user_responses.php';
     }
 }

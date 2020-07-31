@@ -548,6 +548,7 @@ $string['user_activities_select_participants_page_title'] = 'Select participants
 $string['user_activities_select_participants_subject_instance_title'] = '{$a->activity} for {$a->user}';
 $string['user_activities_status_complete'] = 'Complete';
 $string['user_activities_status_header_activity'] = 'Overall progress';
+$string['user_components_performance_data_link'] = 'Performance data';
 $string['user_activities_status_header_participation'] = 'Your progress';
 $string['user_activities_status_header_section_progress'] = 'Section progress';
 $string['user_activities_status_header_relationship'] = 'Relationship to user';

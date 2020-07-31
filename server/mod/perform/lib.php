@@ -25,7 +25,7 @@ use core\entities\user;
 use core_user\output\myprofile\node;
 use core_user\output\myprofile\tree;
 use mod_perform\controllers\activity\user_activities;
-use mod_perform\controllers\reporting\responses\user_responses;
+use mod_perform\controllers\reporting\performance\activity_response_data;
 use mod_perform\util;
 use totara_core\advanced_feature;
 
@@ -79,7 +79,7 @@ function mod_perform_myprofile_navigation(tree $tree, $user, $is_current_user) {
                 'performance_activities_response_data_report_export',
                 get_string('response_data_report_export_link', 'mod_perform'),
                 null,
-                user_responses::get_url(['user_id' => $user->id])
+                activity_response_data::get_url()
             )
         );
     }
