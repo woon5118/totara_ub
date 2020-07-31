@@ -117,6 +117,8 @@ class core_completion_webapi_resolver_mutation_activity_self_complete_testcase e
     }
 
     public function test_resolve_enrolleduser() {
+        global $PAGE;
+
         $user = $this->getDataGenerator()->create_user();
         $this->setUser($user);
 
@@ -148,6 +150,9 @@ class core_completion_webapi_resolver_mutation_activity_self_complete_testcase e
             self::fail('Unexpected exception where activity should have been marked incomplete.');
         }
 
+        // We need to reset the page first or it thinks we're double setting the context.
+        $PAGE->reset_theme_and_output();
+
         // Create another activity without completion.
         $page2 = $this->getDataGenerator()->get_plugin_generator('mod_page')->create_instance(
             array('course' => $page1->course, 'completion' => COMPLETION_TRACKING_NONE)
@@ -159,6 +164,9 @@ class core_completion_webapi_resolver_mutation_activity_self_complete_testcase e
         } catch (\moodle_exception $ex) {
             self::assertStringContainsString('Completion is not enabled', $ex->getMessage());
         }
+
+        // We need to reset the page first or it thinks we're double setting the context.
+        $PAGE->reset_theme_and_output();
 
         // Create another course with completion enabled but not self-completion
         $page3 = $this->getDataGenerator()->get_plugin_generator('mod_page')->create_instance(

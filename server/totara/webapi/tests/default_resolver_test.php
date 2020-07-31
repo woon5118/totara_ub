@@ -207,11 +207,12 @@ class totara_webapi_default_resolver_test extends advanced_testcase {
      * Explicitly not depending on the webapi_phpunit_helper to make sure even if it
      * changes these tests here still test what they should test.
      *
-     * @param string $query_name
-     * @param array $variables
+     * @param string  $query_name
+     * @param array   $variables
+     * @param context $relevantcontext - set execution relevant context to given context
      * @return mixed|null
      */
-    protected function resolve_graphql_query(string $query_name, array $variables = []) {
+    protected function resolve_graphql_query(string $query_name, array $variables = [], \context $relevantcontext = null) {
         $object_type_mock = $this->getMockBuilder(ObjectType::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -226,6 +227,9 @@ class totara_webapi_default_resolver_test extends advanced_testcase {
         $resolve_info_mock->fieldName = $query_name;
 
         $execution_context = execution_context::create(graphql::TYPE_AJAX, $query_name);
+        if (!empty($relevantcontext)) {
+            $execution_context->set_relevant_context($relevantcontext);
+        }
 
         $resolver = new default_resolver();
         return $resolver(null, $variables, $execution_context, $resolve_info_mock);
@@ -237,9 +241,10 @@ class totara_webapi_default_resolver_test extends advanced_testcase {
      *
      * @param string $mutation_name
      * @param array $variables
+     * @param context $relevantcontext - set execution relevant context to given context
      * @return mixed|null
      */
-    protected function resolve_graphql_mutation(string $mutation_name, array $variables = []) {
+    protected function resolve_graphql_mutation(string $mutation_name, array $variables = [], \context $relevantcontext = null) {
         $object_type_mock = $this->getMockBuilder(ObjectType::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -254,6 +259,9 @@ class totara_webapi_default_resolver_test extends advanced_testcase {
         $resolve_info_mock->fieldName = $mutation_name;
 
         $execution_context = execution_context::create(graphql::TYPE_AJAX, $mutation_name);
+        if (!empty($relevantcontext)) {
+            $execution_context->set_relevant_context($relevantcontext);
+        }
 
         $resolver = new default_resolver();
         return $resolver(null, $variables, $execution_context, $resolve_info_mock);
@@ -267,9 +275,10 @@ class totara_webapi_default_resolver_test extends advanced_testcase {
      * @param string $field_name
      * @param $source
      * @param array $variables
+     * @param context $relevantcontext - set execution relevant context to given context
      * @return mixed|null
      */
-    protected function resolve_graphql_type(string $type_name, string $field_name, $source, array $variables = []) {
+    protected function resolve_graphql_type(string $type_name, string $field_name, $source, array $variables = [], \context $relevantcontext = null) {
         $object_type_mock = $this->getMockBuilder(ObjectType::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -284,6 +293,9 @@ class totara_webapi_default_resolver_test extends advanced_testcase {
         $resolve_info_mock->fieldName = $field_name;
 
         $execution_context = execution_context::create(graphql::TYPE_AJAX, null);
+        if (!empty($relevantcontext)) {
+            $execution_context->set_relevant_context($relevantcontext);
+        }
 
         $resolver = new default_resolver();
         return $resolver($source, $variables, $execution_context, $resolve_info_mock);

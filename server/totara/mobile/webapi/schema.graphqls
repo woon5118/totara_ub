@@ -340,6 +340,11 @@ extend type Query {
   ): mod_scorm_current_status!
 
   """
+  Query to return additional details about a resource (file).
+  """
+  totara_mobile_resource(resourceid: core_id!): mod_resource_resource!
+
+  """
   Query to return all mobile strings for the specific language
   """
   totara_mobile_language_strings(lang: String!): String!

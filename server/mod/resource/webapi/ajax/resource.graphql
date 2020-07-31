@@ -1,0 +1,7 @@
+query mod_resource_resource($resourceid: core_id!) {
+  mod_resource_resource(resourceid: $resourceid) {
+    id
+    mimetype
+    size
+  }
+}

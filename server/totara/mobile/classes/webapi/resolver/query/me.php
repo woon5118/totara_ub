@@ -30,12 +30,11 @@ class me implements \core\webapi\query_resolver {
     public static function resolve(array $args, execution_context $ec) {
         global $DB, $USER, $CFG;
 
-        // TL-21305 will find a better, encapsulated solution for require_login calls.
-
         $requirepasswordchange = false;
         $requirepolicyagree = false;
         $requireuserconsent = false;
         try {
+            // Note: This isn't using middleware since we couldn't figure out how to replicate this try catch.
             require_login(null, false, null, false, true);
         } catch (\moodle_exception $e) {
             // Unique handling required for sitepolicy, user consent, and forcepwchange errors.

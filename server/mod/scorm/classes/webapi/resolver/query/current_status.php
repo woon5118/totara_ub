@@ -23,13 +23,21 @@
 
 namespace mod_scorm\webapi\resolver\query;
 
+use core\webapi\query_resolver;
 use core\webapi\execution_context;
+use core\webapi\resolver\has_middleware;
+use core\webapi\middleware\require_login_course_via_module_instance;
 use coding_exception;
 
-class current_status implements \core\webapi\query_resolver {
+class current_status implements query_resolver, has_middleware {
     public static function resolve(array $args, execution_context $ec) {
         global $DB, $USER, $CFG;
         require_once($CFG->dirroot . '/mod/scorm/locallib.php');
+
+        // Check that scormid has been handed through and that the middleware has provided course info.
+        if (empty($args['cm']) || empty($args['course']) || empty($args['scormid'])) {
+            throw new \coding_exception('Invalid SCORM request');
+        }
 
         // Note: the id sent through will have to be the instanceid not the cmid.
         $scorm = $DB->get_record('scorm', ['id' => $args['scormid']]);
@@ -38,15 +46,18 @@ class current_status implements \core\webapi\query_resolver {
             throw new \coding_exception('Invalid SCORM request');
         }
 
-        $cm = get_coursemodule_from_instance("scorm", $scorm->id, $scorm->course, false, MUST_EXIST);
-
-        // TL-21305 will find a better, encapsulated solution for require_login calls.
-        // Note: this is also checking course access, TL-21305 might not cover this completely.
-        require_login($scorm->course, false, $cm, false, true);
-
+        // Get course module and course (provided by middleware)
+        $cm = $args['cm'];
+        $course = $args['course'];
         $context = \context_module::instance($cm->id);
         $ec->set_relevant_context($context);
 
         return $scorm;
+    }
+
+    public static function get_middleware(): array {
+        return [
+            new require_login_course_via_module_instance('scorm', 'scormid')
+        ];
     }
 }

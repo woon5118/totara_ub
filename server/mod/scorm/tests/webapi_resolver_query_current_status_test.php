@@ -24,6 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+use totara_webapi\phpunit\webapi_phpunit_helper;
 use mod_scorm\webapi\resolver\query;
 use core\format;
 
@@ -31,6 +32,9 @@ use core\format;
  * Tests the mod scorm webapi query.
  */
 class mod_scorm_webapi_resolver_query_current_status_testcase extends advanced_testcase {
+
+    use webapi_phpunit_helper;
+
     // The regular (non-admin) user to test with.
     private $learner;
 
@@ -39,10 +43,6 @@ class mod_scorm_webapi_resolver_query_current_status_testcase extends advanced_t
 
     // An array of scorms in $course to compare results against.
     private $scorms;
-
-    private function get_execution_context(string $type = 'dev', ?string $operation = null) {
-        return \core\webapi\execution_context::create($type, $operation);
-    }
 
     public function setUp(): void {
         $this->setAdminUser();
@@ -90,14 +90,13 @@ class mod_scorm_webapi_resolver_query_current_status_testcase extends advanced_t
     public function test_resolve_no_login() {
         $this->setGuestUser();
 
-        try {
-            $scorm = array_pop($this->scorms);
-            query\current_status::resolve(['scormid' => $scorm->id], $this->get_execution_context());
-            $this->fail('Expected a moodle_exception: you are not logged in');
-        } catch (\moodle_exception $ex) {
-            // Note: generic login failure error.
-            $this->assertSame('Course or activity not accessible. (Not enrolled)', $ex->getMessage());
-        }
+        $user = $this->getDataGenerator()->create_user();
+
+        $this->expectException(require_login_exception::class);
+        $this->expectExceptionMessage('Course or activity not accessible. (Not enrolled)');
+
+        $scorm = array_pop($this->scorms);
+        $this->resolve_graphql_query('mod_scorm_current_status', ['scormid' => $scorm->id]);
     }
 
     /**
@@ -111,12 +110,10 @@ class mod_scorm_webapi_resolver_query_current_status_testcase extends advanced_t
             $invalidid += $scorm->id;
         }
 
-        try {
-            query\current_status::resolve(['scormid' => $invalidid], $this->get_execution_context());
-            $this->fail('Expected a moodle_exception: Invalid SCORM request');
-        } catch (\moodle_exception $ex) {
-            $this->assertSame('Coding error detected, it must be fixed by a programmer: Invalid SCORM request', $ex->getMessage());
-        }
+        $this->expectException(moodle_exception::class);
+        $this->expectExceptionMessage('Invalid course module ID');
+
+        $this->resolve_graphql_query('mod_scorm_current_status', ['scormid' => $invalidid]);
     }
 
     /**
@@ -126,14 +123,11 @@ class mod_scorm_webapi_resolver_query_current_status_testcase extends advanced_t
         $newuser = $this->getDataGenerator()->create_user();
         $this->setUser($newuser);
 
-        try {
-            $scorm = array_pop($this->scorms);
-            query\current_status::resolve(['scormid' => $scorm->id], $this->get_execution_context());
-            $this->fail('Expected a moodle_exception: you are not logged in');
-        } catch (\moodle_exception $ex) {
-            // Note: generic login failure error.
-            $this->assertSame('Course or activity not accessible. (Not enrolled)', $ex->getMessage());
-        }
+        $this->expectException(require_login_exception::class);
+        $this->expectExceptionMessage('Course or activity not accessible. (Not enrolled)');
+
+        $scorm = array_pop($this->scorms);
+        $this->resolve_graphql_query('mod_scorm_current_status', ['scormid' => $scorm->id]);
     }
 
     /**
@@ -142,20 +136,12 @@ class mod_scorm_webapi_resolver_query_current_status_testcase extends advanced_t
     public function test_resolver_valid_usercall() {
         $this->setUser($this->learner);
 
-        try {
-            $scorm = array_pop($this->scorms);
-            $results = query\current_status::resolve(
-                ['scormid' => $scorm->id],
-                $this->get_execution_context()
-            );
+        $scorm = array_pop($this->scorms);
+        $results = $this->resolve_graphql_query('mod_scorm_current_status', ['scormid' => $scorm->id]);
 
-            // Note: This is raw query results, so we can't check calculatedgrade or launchurl.
-            $this->assertSame($scorm->id, $results->id);
-            $this->assertSame($scorm->name, $results->name);
-            $this->assertSame($scorm->maxattempt, $results->maxattempt);
-        } catch (\moodle_exception $ex) {
-            $this->fail($ex->getMessage());
-        }
+        $this->assertSame($scorm->id, $results->id);
+        $this->assertSame($scorm->name, $results->name);
+        $this->assertSame($scorm->maxattempt, $results->maxattempt);
     }
 
     /**
@@ -168,10 +154,7 @@ class mod_scorm_webapi_resolver_query_current_status_testcase extends advanced_t
 
         // Check the initial result has 3 scorms.
         $scorm = array_pop($this->scorms);
-        $results = query\current_status::resolve(
-            ['scormid' => $scorm->id],
-            $this->get_execution_context()
-        );
+        $results = $this->resolve_graphql_query('mod_scorm_current_status', ['scormid' => $scorm->id]);
 
         $this->assertSame($scorm->id, $results->id);
         $this->assertSame($scorm->name, $results->name);
@@ -186,16 +169,9 @@ class mod_scorm_webapi_resolver_query_current_status_testcase extends advanced_t
         get_fast_modinfo(0,0,true);
         $modinfo = get_fast_modinfo($this->course);
 
-        try {
-            $results = query\current_status::resolve(
-               ['scormid' => $scorm->id],
-                $this->get_execution_context()
-            );
-
-            $this->fail('Expected a moodle_exception: Activity is hidden');
-        } catch (\moodle_exception $ex) {
-            $this->assertSame("Course or activity not accessible. (Activity is hidden)", $ex->getMessage());
-        }
+        $this->expectException(require_login_exception::class);
+        $this->expectExceptionMessage('Course or activity not accessible. (Activity is hidden)');
+        $this->resolve_graphql_query('mod_scorm_current_status', ['scormid' => $scorm->id]);
 
         // Now hide the course and check the results are 0.
         $DB->set_field('course', 'visible', '0', ['id' => $this->course->id]);
@@ -203,16 +179,9 @@ class mod_scorm_webapi_resolver_query_current_status_testcase extends advanced_t
         // Clear the course visibility cache
         cache_helper::purge_by_definition('totara_core', 'totara_course_is_viewable', ['userid' => $this->learner->id]);
 
-        try {
-            $results = query\current_status::resolve(
-                ['scormid' => $scorm->id],
-                $this->get_execution_context()
-            );
-
-            $this->fail('Expected a moodle_exception: Course is hidden');
-        } catch (\moodle_exception $ex) {
-            $this->assertSame("Course or activity not accessible. (Course is hidden)", $ex->getMessage());
-        }
+        $this->expectException(require_login_exception::class);
+        $this->expectExceptionMessage('Course or activity not accessible. (Course is hidden)');
+        $this->resolve_graphql_query('mod_scorm_current_status', ['scormid' => $scorm->id]);
 
         // Check the admin can still see everything.
         $this->setAdminUser();
@@ -220,16 +189,8 @@ class mod_scorm_webapi_resolver_query_current_status_testcase extends advanced_t
         get_fast_modinfo(0,0,true);
         $modinfo = get_fast_modinfo($this->course);
 
-        try {
-            $results = query\current_status::resolve(
-                ['scormid' => $scorm->id],
-                $this->get_execution_context()
-            );
-
-            $this->assertSame($scorm->id, $results->id);
-            $this->assertSame($scorm->name, $results->name);
-        } catch (\moodle_exception $ex) {
-            $this->fail($ex->getMessage());
-        }
+        $results = $this->resolve_graphql_query('mod_scorm_current_status', ['scormid' => $scorm->id]);
+        $this->assertSame($scorm->id, $results->id);
+        $this->assertSame($scorm->name, $results->name);
     }
 }

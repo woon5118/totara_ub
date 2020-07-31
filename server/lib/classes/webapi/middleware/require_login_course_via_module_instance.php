@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Fabian Derschatta <fabian.derschatta@totaralearning.com>
+ * @author David Curry <david.curry@totaralearning.com>
  * @package core
  */
 
@@ -29,27 +29,34 @@ use core\webapi\resolver\payload;
 use core\webapi\resolver\result;
 
 /**
- * Use this middleware if your request contains a cmid argument.
+ * Use this middleware if your request contains an instance of a module.
  * This middleware will automatically try to resolve the course and set
  * the correct parameters for require login.
  *
  * If the course id is not correctly set, means empty or not an existing course an exception will be thrown.
  */
-class require_login_course_via_coursemodule implements middleware {
+class require_login_course_via_module_instance implements middleware {
 
     /**
      * @var string
      */
-    protected $cm_id_argument_name;
+    protected $mod_type;
+
+    /**
+     * @var string
+     */
+    protected $instanceid_argument_name;
 
     protected $auto_login_guest = false;
 
     /**
+     * @param string $modtype the module type to go with the instance, e.g. quiz or assignment
      * @param string $cmid_argument_name the argument name for the course id
      * @param bool $auto_login_guest
      */
-    public function __construct(string $cmid_argument_name, bool $auto_login_guest = false) {
-        $this->cmid_argument_name = $cmid_argument_name;
+    public function __construct(string $modtype, string $instanceid_argument_name, bool $auto_login_guest = false) {
+        $this->mod_type = $modtype;
+        $this->instanceid_argument_name = $instanceid_argument_name;
         $this->auto_login_guest = $auto_login_guest;
     }
 
@@ -59,13 +66,13 @@ class require_login_course_via_coursemodule implements middleware {
     public function handle(payload $payload, Closure $next): result {
         global $DB;
 
-        $cmid = $payload->get_variable($this->cmid_argument_name);
-        if (empty($cmid)) {
+        $instanceid = $payload->get_variable($this->instanceid_argument_name);
+        if (empty($instanceid)) {
             throw new \moodle_exception('invalidcoursemodule');
         }
 
         try {
-            $cm = get_coursemodule_from_id(null, $cmid, null, true, MUST_EXIST);
+            $cm = get_coursemodule_from_instance($this->mod_type, $instanceid, null, true, MUST_EXIST);
         } catch (\Exception $exception) {
             throw new \moodle_exception('invalidcoursemodule');
         }
@@ -85,5 +92,4 @@ class require_login_course_via_coursemodule implements middleware {
 
         return $next($payload);
     }
-
 }
