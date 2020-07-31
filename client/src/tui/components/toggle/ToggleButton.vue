@@ -63,7 +63,7 @@ export default {
     },
     text: String,
     title: String,
-    value: String,
+    value: [Boolean, String],
   },
 
   methods: {

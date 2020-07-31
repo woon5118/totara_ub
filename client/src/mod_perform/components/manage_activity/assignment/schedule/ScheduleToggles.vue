@@ -18,177 +18,127 @@
 
 <template>
   <div class="tui-performAssignmentScheduleToggles">
-    <div class="tui-performAssignmentScheduleToggles__setting-group">
+    <div class="tui-performAssignmentScheduleToggles__setting">
       <h4 class="tui-performAssignmentSchedule__sectionHeading">
         {{ $str('schedule_creation_range_and_date_type', 'mod_perform') }}
       </h4>
       <div class="tui-performAssignmentScheduleToggles__toggle-group">
         <div class="tui-performAssignmentScheduleToggles__toggle-set">
           <ToggleSet
-            :value="scheduleIsOpenString"
-            @input="$emit('update:scheduleIsOpen', $event === 'true')"
+            :value="scheduleIsOpen"
+            :aria-label="$str('schedule_creation_range', 'mod_perform')"
+            :large="true"
+            @input="$emit('update:scheduleIsOpen', $event)"
           >
-            <ToggleButtonIcon
-              :label="$str('schedule_is_limited', 'mod_perform')"
-              class="tui-performAssignmentScheduleToggles__toggle-button"
+            <ToggleButton
+              :value="false"
+              :aria-label="$str('schedule_is_limited', 'mod_perform')"
               :text="$str('schedule_is_limited', 'mod_perform')"
-              value="false"
             >
-              <div
-                class="tui-performAssignmentScheduleToggles__toggle-button-content"
-              >
-                <CalendarIcon />
-                <CalendarIcon />
-                <div class="tui-performAssignmentScheduleToggles__button-label">
-                  {{ $str('schedule_is_limited', 'mod_perform') }}
-                </div>
-              </div>
-            </ToggleButtonIcon>
-            <ToggleButtonIcon
-              :label="$str('schedule_is_open', 'mod_perform')"
-              class="tui-performAssignmentScheduleToggles__toggle-button"
+              <CalendarIcon />
+            </ToggleButton>
+
+            <ToggleButton
+              :value="true"
+              :aria-label="$str('schedule_is_open', 'mod_perform')"
               :text="$str('schedule_is_open', 'mod_perform')"
-              value="true"
             >
-              <div
-                class="tui-performAssignmentScheduleToggles__toggle-button-content"
-              >
-                <CalendarIcon />
-                <CalendarIcon />
-                <CalendarIcon />
-                <div class="tui-performAssignmentScheduleToggles__button-label">
-                  {{ $str('schedule_is_open', 'mod_perform') }}
-                </div>
-              </div>
-            </ToggleButtonIcon>
+              <CalendarIcon />
+            </ToggleButton>
           </ToggleSet>
         </div>
         <div class="tui-performAssignmentScheduleToggles__toggle-set">
           <ToggleSet
-            :value="scheduleIsFixedString"
-            @input="$emit('update:scheduleIsFixed', $event === 'true')"
+            :value="scheduleIsFixed"
+            :aria-label="$str('schedule_creation_date_type', 'mod_perform')"
+            :large="true"
+            @input="$emit('update:scheduleIsFixed', $event)"
           >
-            <ToggleButtonIcon
-              :label="$str('schedule_is_fixed', 'mod_perform')"
-              class="tui-performAssignmentScheduleToggles__toggle-button"
-              value="true"
+            <ToggleButton
+              :value="true"
+              :aria-label="$str('schedule_is_fixed', 'mod_perform')"
+              :text="$str('schedule_is_fixed', 'mod_perform')"
             >
-              <div
-                class="tui-performAssignmentScheduleToggles__toggle-button-content"
-              >
-                <CalendarIcon />
-                <div class="tui-performAssignmentScheduleToggles__button-label">
-                  {{ $str('schedule_is_fixed', 'mod_perform') }}
-                </div>
-              </div>
-            </ToggleButtonIcon>
-            <ToggleButtonIcon
-              :label="$str('schedule_is_dynamic', 'mod_perform')"
-              class="tui-performAssignmentScheduleToggles__toggle-button"
-              value="false"
+              <CalendarIcon />
+            </ToggleButton>
+
+            <ToggleButton
+              :value="false"
+              :aria-label="$str('schedule_is_dynamic', 'mod_perform')"
+              :text="$str('schedule_is_dynamic', 'mod_perform')"
             >
-              <div
-                class="tui-performAssignmentScheduleToggles__toggle-button-content"
-              >
-                <CalendarIcon />
-                <CalendarIcon />
-                <div class="tui-performAssignmentScheduleToggles__button-label">
-                  {{ $str('schedule_is_dynamic', 'mod_perform') }}
-                </div>
-              </div>
-            </ToggleButtonIcon>
+              <CalendarIcon />
+            </ToggleButton>
           </ToggleSet>
         </div>
       </div>
     </div>
-    <div class="tui-performAssignmentSchedule__toggle-setting-group">
+    <div class="performAssignmentScheduleToggles__setting">
       <h4 class="tui-performAssignmentSchedule__sectionHeading">
         {{ $str('schedule_creation_frequency', 'mod_perform') }}
       </h4>
       <div class="tui-performAssignmentScheduleToggles__toggle-group">
         <div class="tui-performAssignmentScheduleToggles__toggle-set">
           <ToggleSet
-            :value="repeatingIsEnabledString"
-            @input="$emit('update:repeatingIsEnabled', $event === 'true')"
+            :value="repeatingIsEnabled"
+            :aria-label="$str('schedule_creation_frequency', 'mod_perform')"
+            :large="true"
+            @input="$emit('update:repeatingIsEnabled', $event)"
           >
-            <ToggleButtonIcon
-              :label="
+            <ToggleButton
+              :value="false"
+              :aria-label="
                 $str('schedule_creation_frequency_once_off', 'mod_perform')
               "
-              class="tui-performAssignmentScheduleToggles__toggle-button"
-              value="false"
+              :text="
+                $str('schedule_creation_frequency_once_off', 'mod_perform')
+              "
             >
-              <div
-                class="tui-performAssignmentScheduleToggles__toggle-button-content"
-              >
-                <RepeatingDisabled :size="300" />
-                <div class="tui-performAssignmentScheduleToggles__button-label">
-                  {{
-                    $str('schedule_creation_frequency_once_off', 'mod_perform')
-                  }}
-                </div>
-              </div>
-            </ToggleButtonIcon>
-            <ToggleButtonIcon
-              :label="
+              <RepeatingDisabled />
+            </ToggleButton>
+
+            <ToggleButton
+              :value="true"
+              :aria-label="
                 $str('schedule_creation_frequency_repeating', 'mod_perform')
               "
-              class="tui-performAssignmentScheduleToggles__toggle-button"
-              value="true"
+              :text="
+                $str('schedule_creation_frequency_repeating', 'mod_perform')
+              "
             >
-              <div
-                class="tui-performAssignmentScheduleToggles__toggle-button-content"
-              >
-                <RepeatingEnabled :size="300" />
-                <div class="tui-performAssignmentScheduleToggles__button-label">
-                  {{
-                    $str('schedule_creation_frequency_repeating', 'mod_perform')
-                  }}
-                </div>
-              </div>
-            </ToggleButtonIcon>
+              <RepeatingEnabled />
+            </ToggleButton>
           </ToggleSet>
         </div>
       </div>
     </div>
-    <div class="tui-performAssignmentSchedule__toggle-setting-group">
+    <div class="performAssignmentScheduleToggles__setting">
       <h4 class="tui-performAssignmentSchedule__sectionHeading">
         {{ $str('due_date', 'mod_perform') }}
       </h4>
       <div class="tui-performAssignmentScheduleToggles__toggle-group">
         <div class="tui-performAssignmentScheduleToggles__toggle-set">
           <ToggleSet
-            :value="dueDateIsEnabledString"
-            @input="$emit('update:dueDateIsEnabled', $event === 'true')"
+            :value="dueDateIsEnabled"
+            :aria-label="$str('due_date', 'mod_perform')"
+            :large="true"
+            @input="$emit('update:dueDateIsEnabled', $event)"
           >
-            <ToggleButtonIcon
-              :label="$str('due_date_is_enabled', 'mod_perform')"
-              class="tui-performAssignmentScheduleToggles__toggle-button"
-              value="true"
+            <ToggleButton
+              :value="true"
+              :aria-label="$str('due_date_is_enabled', 'mod_perform')"
+              :text="$str('due_date_is_enabled', 'mod_perform')"
             >
-              <div
-                class="tui-performAssignmentScheduleToggles__toggle-button-content"
-              >
-                <EndDateEnabled :size="300" />
-                <div class="tui-performAssignmentScheduleToggles__button-label">
-                  {{ $str('due_date_is_enabled', 'mod_perform') }}
-                </div>
-              </div>
-            </ToggleButtonIcon>
-            <ToggleButtonIcon
-              :label="$str('due_date_is_disabled', 'mod_perform')"
-              class="tui-performAssignmentScheduleToggles__toggle-button"
-              value="false"
+              <EndDateEnabled />
+            </ToggleButton>
+
+            <ToggleButton
+              :value="false"
+              :aria-label="$str('due_date_is_disabled', 'mod_perform')"
+              :text="$str('due_date_is_disabled', 'mod_perform')"
             >
-              <div
-                class="tui-performAssignmentScheduleToggles__toggle-button-content"
-              >
-                <EndDateDisabled :size="300" />
-                <div class="tui-performAssignmentScheduleToggles__button-label">
-                  {{ $str('due_date_is_disabled', 'mod_perform') }}
-                </div>
-              </div>
-            </ToggleButtonIcon>
+              <EndDateDisabled />
+            </ToggleButton>
           </ToggleSet>
         </div>
       </div>
@@ -201,17 +151,18 @@ import EndDateDisabled from 'mod_perform/components/icons/EndDateDisabled';
 import EndDateEnabled from 'mod_perform/components/icons/EndDateEnabled';
 import RepeatingDisabled from 'mod_perform/components/icons/RepeatingDisabled';
 import RepeatingEnabled from 'mod_perform/components/icons/RepeatingEnabled';
-import ToggleButtonIcon from 'tui/components/buttons/ToggleButtonIcon';
-import ToggleSet from 'tui/components/buttons/ToggleSet';
+import ToggleButton from 'tui/components/toggle/ToggleButton';
+import ToggleSet from 'tui/components/toggle/ToggleSet';
 
 export default {
+  //
   components: {
     CalendarIcon,
     EndDateDisabled,
     EndDateEnabled,
     RepeatingDisabled,
     RepeatingEnabled,
-    ToggleButtonIcon,
+    ToggleButton,
     ToggleSet,
   },
   props: {
@@ -232,20 +183,6 @@ export default {
       type: Boolean,
     },
   },
-  computed: {
-    scheduleIsOpenString() {
-      return this.scheduleIsOpen.toString();
-    },
-    scheduleIsFixedString() {
-      return this.scheduleIsFixed.toString();
-    },
-    repeatingIsEnabledString() {
-      return this.repeatingIsEnabled.toString();
-    },
-    dueDateIsEnabledString() {
-      return this.dueDateIsEnabled.toString();
-    },
-  },
 };
 </script>
 
@@ -255,6 +192,8 @@ export default {
       "due_date",
       "due_date_is_disabled",
       "due_date_is_enabled",
+      "schedule_creation_range",
+      "schedule_creation_date_type",
       "schedule_creation_range_and_date_type",
       "schedule_creation_frequency",
       "schedule_creation_frequency_once_off",

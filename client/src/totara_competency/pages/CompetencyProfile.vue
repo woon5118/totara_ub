@@ -82,19 +82,24 @@
                 v-if="currentBoundaryName != 'small'"
                 class="tui-competencyProfile__tabs"
               >
-                <ToggleSet v-model="activeTab">
-                  <ToggleButtonIcon
+                <ToggleSet
+                  v-model="activeTab"
+                  :aria-label="
+                    $str('toggle_competency_view_format', 'totara_competency')
+                  "
+                >
+                  <ToggleButton
                     value="charts"
-                    :label="$str('toggle_charts', 'totara_competency')"
+                    :aria-label="$str('toggle_charts', 'totara_competency')"
                   >
                     <BarChartIcon />
-                  </ToggleButtonIcon>
-                  <ToggleButtonIcon
+                  </ToggleButton>
+                  <ToggleButton
                     value="table"
-                    :label="$str('toggle_table', 'totara_competency')"
+                    :aria-label="$str('toggle_table', 'totara_competency')"
                   >
                     <ListIcon />
-                  </ToggleButtonIcon>
+                  </ToggleButton>
                 </ToggleSet>
               </div>
             </div>
@@ -121,10 +126,7 @@
     </Loader>
   </div>
 </template>
-
 <script>
-import ToggleSet from 'tui/components/buttons/ToggleSet';
-import ToggleButtonIcon from 'tui/components/buttons/ToggleButtonIcon';
 import BarChartIcon from 'tui/components/icons/common/BarChart';
 import ListIcon from 'tui/components/icons/common/List';
 import Responsive from 'tui/components/responsive/Responsive';
@@ -134,6 +136,8 @@ import ProgressAssignmentFilters from 'totara_competency/components/ProgressAssi
 import CompetencyList from 'totara_competency/components/profile/competency_list/List';
 import CompetencyCharts from 'totara_competency/components/profile/CompetencyCharts';
 import NoCompetencyAssignments from 'totara_competency/components/profile/NoCompetencyAssignments';
+import ToggleButton from 'tui/components/toggle/ToggleButton';
+import ToggleSet from 'tui/components/toggle/ToggleSet';
 import CurrentProgress from 'totara_competency/components/profile/CurrentProgress';
 import UserHeader from 'totara_competency/components/UserHeader';
 import ProgressQuery from 'totara_competency/graphql/progress_for_user';
@@ -145,7 +149,7 @@ const ACTIVE_ASSIGNMENT = 1;
 export default {
   components: {
     ToggleSet,
-    ToggleButtonIcon,
+    ToggleButton,
     BarChartIcon,
     ListIcon,
     Responsive,
@@ -361,6 +365,7 @@ export default {
   "totara_competency": [
     "competency_profile",
     "toggle_charts",
+    "toggle_competency_view_format",
     "toggle_table",
     "assign_competencies",
     "self_assign_competencies",

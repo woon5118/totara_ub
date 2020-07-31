@@ -21,10 +21,6 @@
   display: flex;
   flex-wrap: wrap;
 
-  &__setting-group {
-    margin-right: var(--tui-gap-2);
-  }
-
   &__toggle-group {
     display: flex;
     flex-wrap: wrap;
@@ -33,19 +29,6 @@
   &__toggle-set {
     margin-right: var(--tui-gap-4);
     margin-bottom: var(--tui-gap-2);
-  }
-
-  &__toggle-button-group {
-    margin: var(--tui-gap-4);
-  }
-
-  &__toggle-button {
-    min-height: 50px;
-  }
-
-  &__button-label {
-    margin-top: var(--tui-gap-2);
-    font-weight: bold;
   }
 }
 </style>

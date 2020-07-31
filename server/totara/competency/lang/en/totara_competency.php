@@ -366,6 +366,7 @@ $string['title_index'] = 'Manage competency assignments';
 $string['title_tool_menu'] = 'Competency assignments';
 $string['title_users'] = 'Currently assigned users';
 $string['toggle_charts'] = 'Show charts';
+$string['toggle_competency_view_format'] = 'Display formats';
 $string['toggle_table'] = 'Show tables';
 $string['type'] = 'Type';
 $string['unassigned'] = 'Unassigned';

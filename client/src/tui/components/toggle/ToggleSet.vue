@@ -66,7 +66,7 @@ export default {
     },
     disabled: Boolean,
     large: Boolean,
-    value: String,
+    value: [Boolean, String],
   },
 
   data() {
