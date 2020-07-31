@@ -18,27 +18,33 @@
 <template>
   <div class="tui-performElementReadOnlyDisplay" tabindex="0">
     <Form :vertical="true" input-width="full">
-      <FormRow :label="$str('question_title', 'mod_perform')">
+      <FormRow
+        :label="
+          $str(isStatic ? 'element_title' : 'question_title', 'mod_perform')
+        "
+      >
         {{ title }}
       </FormRow>
       <slot name="content" />
-      <FormRow
-        :label="$str('section_element_response_required', 'mod_perform')"
-      >
-        <span>
-          {{
-            $str(
-              isRequired
-                ? 'question_response_required_yes'
-                : 'question_response_required_no',
-              'mod_perform'
-            )
-          }}
-        </span>
-      </FormRow>
-      <FormRow :label="$str('reporting_identifier', 'mod_perform')">
-        {{ identifier }}
-      </FormRow>
+      <div v-if="!isStatic">
+        <FormRow
+          :label="$str('section_element_response_required', 'mod_perform')"
+        >
+          <span>
+            {{
+              $str(
+                isRequired
+                  ? 'question_response_required_yes'
+                  : 'question_response_required_no',
+                'mod_perform'
+              )
+            }}
+          </span>
+        </FormRow>
+        <FormRow :label="$str('reporting_identifier', 'mod_perform')">
+          {{ identifier }}
+        </FormRow>
+      </div>
       <FormRow>
         <div class="tui-performElementReadOnlyDisplay__action">
           <ButtonGroup>
@@ -79,6 +85,7 @@ export default {
     isRequired: {
       type: Boolean,
     },
+    isStatic: Boolean,
     identifier: String,
   },
   methods: {
@@ -91,6 +98,7 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
+      "element_title",
       "question_title",
       "question_response_required_yes",
       "question_response_required_no",

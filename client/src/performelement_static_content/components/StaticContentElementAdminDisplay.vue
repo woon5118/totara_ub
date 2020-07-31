@@ -25,7 +25,7 @@
     @remove="$emit('remove')"
     @display-read="$emit('display-read')"
   >
-    <template v-slot:content :disabled="true">
+    <template v-slot:content>
       <div class="tui-staticContentElementAdminDisplay">
         {{ data.textValue }}
       </div>

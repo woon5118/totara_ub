@@ -65,7 +65,7 @@
         <SettingsIcon size="200" />
       </ButtonIcon>
     </div>
-    <div class="tui-performElementEditDisplay__title">
+    <div v-if="title" class="tui-performElementEditDisplay__title">
       {{ title }}
 
       <span

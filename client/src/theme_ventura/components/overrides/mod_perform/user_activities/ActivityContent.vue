@@ -101,6 +101,7 @@
     }
 
     &-response-required {
+      display: inline-flex;
       @include tui-font-heading-label();
       color: var(--tui-color-prompt-alert);
     }
@@ -112,8 +113,20 @@
     &-content {
       & > * {
         margin-top: var(--tui-gap-4);
-        margin-left: var(--tui-gap-12);
       }
+    }
+    &-contentHeader {
+      display: inline-flex;
+      @include tui-font-heading-x-small();
+      margin-left: 0;
+    }
+  }
+
+  &__staticElement {
+    display: flex;
+    &__name {
+      @include tui-font-body();
+      margin-left: var(--tui-gap-3);
     }
   }
 
@@ -122,6 +135,7 @@
   }
 
   &__response-optional {
+    display: inline-flex;
     @include tui-font-body();
     @include tui-font-hint();
   }

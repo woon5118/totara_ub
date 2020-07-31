@@ -142,31 +142,37 @@
                 {{ $str('section_element_response_required', 'mod_perform') }}
               </div>
 
-              <Collapsible
+              <div
                 v-for="sectionElement in sectionElements"
                 :key="sectionElement.id"
-                :label="sectionElement.element.title"
-                :initial-state="true"
-                class="tui-participantContent__sectionItem"
               >
-                <template v-slot:label-extra>
-                  <span
-                    v-if="sectionElement.element.is_required"
-                    class="tui-participantContent__section-response-required"
-                  >
-                    *
-                  </span>
-                  <span
-                    v-if="!sectionElement.element.is_required"
-                    class="tui-participantContent__response-optional"
-                  >
-                    ({{
-                      $str('section_element_response_optional', 'mod_perform')
-                    }})
-                  </span>
-                </template>
+                <h3
+                  v-if="sectionElement.element.title"
+                  :id="$id('title')"
+                  class="tui-participantContent__sectionItem-contentHeader"
+                >
+                  {{ sectionElement.element.title }}
+                </h3>
+                <span
+                  v-if="sectionElement.element.is_required"
+                  class="tui-participantContent__section-response-required"
+                >
+                  *
+                </span>
+                <span
+                  v-if="
+                    !sectionElement.element.is_required &&
+                      sectionElement.is_respondable
+                  "
+                  class="tui-participantContent__response-optional"
+                >
+                  ({{
+                    $str('section_element_response_optional', 'mod_perform')
+                  }})
+                </span>
+
                 <div class="tui-participantContent__sectionItem-content">
-                  <ElementParticipantForm>
+                  <ElementParticipantForm v-if="sectionElement.is_respondable">
                     <template v-slot:content>
                       <component
                         :is="sectionElement.component"
@@ -174,13 +180,19 @@
                       />
                     </template>
                   </ElementParticipantForm>
+                  <div v-else class="tui-participantContent__staticElement">
+                    <component
+                      :is="sectionElement.component"
+                      v-bind="loadUserSectionElementProps(sectionElement)"
+                    />
+                  </div>
                   <OtherParticipantResponses
                     v-show="showOtherResponse"
                     :section-element="sectionElement"
                     :anonymous-responses="activity.anonymous_responses"
                   />
                 </div>
-              </Collapsible>
+              </div>
             </div>
 
             <ButtonGroup

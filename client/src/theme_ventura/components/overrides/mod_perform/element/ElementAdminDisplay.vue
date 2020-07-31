@@ -15,6 +15,8 @@
   &__title {
     display: flex;
     flex-direction: row;
+    margin-bottom: var(--tui-gap-3);
+    @include tui-font-heading-x-small;
 
     &-response-required {
       @include tui-font-heading-label();

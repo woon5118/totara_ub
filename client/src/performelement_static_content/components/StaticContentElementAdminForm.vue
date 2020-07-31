@@ -32,10 +32,7 @@
           @submit="handleSubmit"
         >
           <FormRow :label="$str('title', 'performelement_static_content')">
-            <FormText
-              name="rawTitle"
-              :validations="v => [v.required(), v.maxLength(1024)]"
-            />
+            <FormText name="rawTitle" :validations="v => [v.maxLength(1024)]" />
           </FormRow>
           <FormRow
             :label="

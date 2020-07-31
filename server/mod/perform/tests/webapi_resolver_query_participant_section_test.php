@@ -179,9 +179,9 @@ class mod_perform_webapi_resolver_query_participant_section_testcase extends adv
                     'element_plugin' =>
                         [
                             'participant_form_component' =>
-                                'performelement_static_content/components/StaticContentElementParticipantForm',
+                                'performelement_static_content/components/StaticContentElementParticipant',
                             'participant_response_component' =>
-                                'performelement_static_content/components/StaticContentElementParticipantResponse',
+                                'performelement_static_content/components/StaticContentElementParticipant',
                         ],
                     'title' => 'test element title',
                     'data' => null,

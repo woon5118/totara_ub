@@ -19,9 +19,8 @@
   <ElementAdminReadOnlyDisplay
     :type="type"
     :title="title"
-    :identifier="identifier"
-    :is-required="isRequired"
     :activity-state="activityState"
+    :is-static="true"
     @display="$emit('display')"
   >
     <template v-slot:content>

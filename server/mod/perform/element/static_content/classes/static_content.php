@@ -26,5 +26,19 @@ namespace performelement_static_content;
 use mod_perform\models\activity\element_plugin;
 
 class static_content extends element_plugin {
+    /**
+     * This method return element's user form vue component name
+     * @return string
+     */
+    public function get_participant_form_component(): string {
+        return $this->get_component_path('Participant');
+    }
 
+    /**
+     * This method return element's user form vue component name
+     * @return string
+     */
+    public function get_participant_response_component(): string {
+        return $this->get_component_path('Participant');
+    }
 }
