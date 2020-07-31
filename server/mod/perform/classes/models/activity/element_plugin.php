@@ -56,6 +56,34 @@ abstract class element_plugin {
     }
 
     /**
+     * Get all element plugins. Optionally filter to only respondable or non-respondable elements.
+     *
+     * Returns array of elements, keyed by plugin_name, value is instance of element model.
+     *
+     * @param bool $get_respondable
+     * @param bool $get_non_respondable
+     * @return array
+     * @throws \coding_exception
+     */
+    final public static function get_element_plugins(bool $get_respondable = true, bool $get_non_respondable = true): array {
+        $elements = \core_component::get_plugin_list('performelement');
+
+        $out = [];
+        foreach ($elements as $plugin_name => $plugin_path) {
+            /** @var element_plugin $element_plugin */
+            $element_plugin = self::load_by_plugin($plugin_name);
+
+            if ($get_respondable && $element_plugin->get_is_respondable()) {
+                $out[$plugin_name] = $element_plugin;
+            }
+            if ($get_non_respondable && !$element_plugin->get_is_respondable()) {
+                $out[$plugin_name] = $element_plugin;
+            }
+        }
+        return $out;
+    }
+
+    /**
      * Get plugin name, used as a key
      *
      * @return string
@@ -154,5 +182,14 @@ abstract class element_plugin {
      * @param element_entity $element
      */
     public function validate_element(element_entity $element) {
+    }
+
+    /**
+     * Can the user respond to this element.
+     *
+     * @return bool
+     */
+    public function get_is_respondable(): bool {
+        return $this instanceof respondable_element_plugin;
     }
 }
