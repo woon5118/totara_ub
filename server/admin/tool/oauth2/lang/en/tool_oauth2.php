@@ -52,7 +52,9 @@ $string['endpointdeleted'] = 'Endpoint deleted';
 $string['endpointname_help'] = 'Key used to search for this endpoint. Must end with "_endpoint".';
 $string['endpointname'] = 'Name';
 $string['endpointsforissuer'] = 'Endpoints for issuer: {$a}';
-$string['endpointurl_help'] = 'URL for this endpoint. Must use https:// protocol.';
+$string['endpointurl_help'] = 'URL for this endpoint. Must use https:// protocol.
+
+Endpoint URLs are provided by your OAuth provider and should not point to the Totara install.';
 $string['endpointurl'] = 'URL';
 $string['issuersetup'] = 'Detailed instructions on configuring the common OAuth 2 services';
 $string['issuersetuptype'] = 'Detailed instructions on setting up the {$a} OAuth 2 provider';
