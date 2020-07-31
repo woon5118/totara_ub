@@ -30,7 +30,7 @@ use core\webapi\formatter\formatter;
 
 class mobile_program_courseset_formatter extends formatter {
 
-    public function get_map(): array {
+    protected function get_map(): array {
         return [
             'id' => null,
             'label' => string_field_formatter::class,

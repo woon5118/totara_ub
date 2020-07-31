@@ -103,7 +103,7 @@ Feature: Learner creates learning plan with competencies.
     And I set the following administration settings values:
       | Enable report restrictions | 1 |
 
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I navigate to "Global report restrictions" node in "Site administration > Reports"
     And I press "New restriction"
     And I set the following fields to these values:

@@ -480,7 +480,7 @@ class totara_mobile_webapi_resolver_type_learning_item_testcase extends advanced
                 $this->assertEquals('first course', $value);
             }
             if ($format == format::FORMAT_HTML) {
-                $this->assertEquals('first course', $value);
+                $this->assertEquals('<div class="text_to_html">first course</div>', $value);
             }
             $this->assertTrue(is_string($value));
         }

@@ -36,7 +36,7 @@ class default_fixed_date_setting implements query_resolver, has_middleware {
      * {@inheritdoc}
      */
     public static function resolve(array $args, execution_context $ec) {
-        return date_time_setting::now();
+        return date_time_setting::now_server_timezone();
     }
 
     /**

@@ -40,7 +40,7 @@ Feature: Test miscellaneous bulk manual rating features.
 
   Scenario: Show last rating help for another user
     Given I log in as "user3"
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I press "Customise this page"
     And I add the "Competencies" block
     And I press "Stop customising this page"
@@ -72,7 +72,7 @@ Feature: Test miscellaneous bulk manual rating features.
 
   Scenario: Show the last rating made for a user
     When I log in as "user2"
-    And I click on "Dashboard" in the totara menu
+    And I am on "Dashboard" page
     And I press "Customise this page"
     And I add the "Competencies" block
     And I press "Stop customising this page"

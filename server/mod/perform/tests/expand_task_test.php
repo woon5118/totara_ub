@@ -488,7 +488,7 @@ class mod_perform_expand_task_testcase extends advanced_testcase {
         $track_id = $test_data->track1->id;
         $user_id = $test_data->user1->id;
 
-        $now = date_time_setting::now();
+        $now = date_time_setting::now_server_timezone();
         $test_data->track1->set_schedule_open_fixed($now);
         $test_data->track1->update();
 

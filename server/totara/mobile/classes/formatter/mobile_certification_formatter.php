@@ -30,7 +30,7 @@ use totara_certification\formatter\certification_formatter;
 
 class mobile_certification_formatter extends certification_formatter {
 
-    public function get_map(): array {
+    protected function get_map(): array {
         return [
             'id' => null,
             'certifid' => null,

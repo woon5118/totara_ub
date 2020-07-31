@@ -28,7 +28,7 @@ class behat_performelement_multi_choice_multi extends behat_base {
 
     public const DONE_BUTTON_LOCATOR  = '.tui-elementAdminFormActionButtons__done';
     public const EDIT_ELEMENT_LOCATOR = '.tui-elementEditMultiChoiceMulti';
-    public const ADD_OPTION_LOCATOR   = '.tui-elementEditMultiChoiceMulti__add-option';
+    public const ADD_OPTION_LOCATOR   = '.tui-elementEditMultiChoiceMulti__addOption';
     public const QUESTION_DISPLAY_OPTIONS_LOCATOR = '.tui-checkbox__label';
 
     /**
@@ -59,6 +59,9 @@ class behat_performelement_multi_choice_multi extends behat_base {
 
         $edit_element = $this->find('css', self::EDIT_ELEMENT_LOCATOR);
         $add_button = $edit_element->find('css', self::ADD_OPTION_LOCATOR);
+        if (!$add_button) {
+            throw new ExpectationException('Multiple answers add new option not found!', $this->getSession());
+        }
         $add_button->click();
     }
 

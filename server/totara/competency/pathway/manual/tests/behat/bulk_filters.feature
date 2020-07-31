@@ -40,7 +40,7 @@ Feature: Test filtering by users, roles, assignments etc. functions as expected.
     And I log in as "rater"
 
   Scenario: View team list and filter the users
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I press "Customise this page"
     And I add the "Competencies" block
     And I press "Stop customising this page"

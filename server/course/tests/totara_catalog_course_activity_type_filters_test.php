@@ -64,8 +64,8 @@ class core_course_totara_catalog_course_activity_type_filters_testcase extends \
                 continue;
             }
             $label = $strings->string_exists('pluginname', $module->name)
-                ? $strings->get_string('pluginname', $module->name)
-                : ucfirst($module->name);
+                     ? $strings->get_string('pluginname', $module->name)
+                     : ucfirst($module->name);
 
             if ($generator->module_exists($module->name)) {
                 $available_activities[] = [$module->id, $module->name, $label];
@@ -87,8 +87,8 @@ class core_course_totara_catalog_course_activity_type_filters_testcase extends \
                 $generator->create_module($module_name, ['course' => $course->id, ]);
 
                 $courses = array_key_exists($module_id, $activity_courses)
-                    ? $activity_courses[$module_id]
-                    : [];
+                           ? $activity_courses[$module_id]
+                           : [];
 
                 if (!in_array($course->fullname, $courses)) {
                     $courses[] = $course->fullname;

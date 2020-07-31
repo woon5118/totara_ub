@@ -479,7 +479,7 @@ class totara_core_webapi_resolver_type_learning_item_testcase extends advanced_t
                 $this->assertEquals('first course', $value);
             }
             if ($format == format::FORMAT_HTML) {
-                $this->assertEquals('first course', $value);
+                $this->assertEquals('<div class="text_to_html">first course</div>', $value);
             }
             $this->assertTrue(is_string($value));
         }

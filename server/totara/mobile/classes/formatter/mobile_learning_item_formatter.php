@@ -33,7 +33,7 @@ use core\webapi\formatter\field\date_field_formatter;
  */
 class mobile_learning_item_formatter extends learning_item_formatter {
 
-    public function get_map(): array {
+    protected function get_map(): array {
         $map = [
             'id' => null,
             'itemtype' => null,

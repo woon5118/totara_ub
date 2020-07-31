@@ -31,7 +31,7 @@ Feature: Test rating a competency for a user as different roles via the competen
 
   Scenario: As a manager, make a rating for a user via the competencies block
     Given I log in as "user2"
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I press "Customise this page"
     And I add the "Competencies" block
     And I press "Stop customising this page"
@@ -53,7 +53,7 @@ Feature: Test rating a competency for a user as different roles via the competen
 
   Scenario: As an appraiser, make a rating for a user via the competencies block
     Given I log in as "user3"
-    When I click on "Dashboard" in the totara menu
+    When I am on "Dashboard" page
     And I press "Customise this page"
     And I add the "Competencies" block
     And I press "Stop customising this page"

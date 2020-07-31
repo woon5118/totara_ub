@@ -30,7 +30,7 @@ use totara_program\formatter\program_formatter;
 
 class mobile_program_formatter extends program_formatter {
 
-    public function get_map(): array {
+    protected function get_map(): array {
         return [
             'id' => null,
             'fullname' => string_field_formatter::class,

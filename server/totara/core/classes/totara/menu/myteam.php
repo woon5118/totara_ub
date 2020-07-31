@@ -27,6 +27,7 @@ use totara_core\advanced_feature;
 use totara_job\job_assignment;
 
 class myteam extends item {
+
     protected function get_default_title() {
         return get_string('team', 'totara_core');
     }
@@ -60,6 +61,11 @@ class myteam extends item {
         return $cache;
     }
 
+    /**
+     * Is this menu item completely disabled?
+     *
+     * @return bool
+     */
     public function is_disabled() {
         return advanced_feature::is_disabled('myteam');
     }

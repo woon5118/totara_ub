@@ -38,7 +38,7 @@ use totara_program\formatter\program_formatter;
  */
 class learning_item_formatter extends formatter {
 
-    public function get_map(): array {
+    protected function get_map(): array {
         $map = [
             'id' => null,
             'itemtype' => null,
@@ -78,7 +78,7 @@ class learning_item_formatter extends formatter {
      * @param $format
      * @return
      */
-    protected function item_inherited_field_formatter($field, $value, $format) {
+    private function item_inherited_field_formatter($field, $value, $format) {
         $item = (object)[
             'id' => $this->object->id,
             $field => $value

@@ -30,7 +30,7 @@ use core\webapi\formatter\formatter;
 
 class program_formatter extends formatter {
 
-    public function get_map(): array {
+    protected function get_map(): array {
         return [
             'id' => null,
             'fullname' => string_field_formatter::class,

@@ -34,7 +34,7 @@ class totara_core_dates_date_time_setting_testcase extends \advanced_testcase {
     public function test_now_for_user(): void {
         self::setAdminUser();
         $now = time();
-        $now_for_user = date_time_setting::now();
+        $now_for_user = date_time_setting::now_server_timezone();
 
         self::assertGreaterThanOrEqual($now_for_user->get_timestamp(), $now);
         self::assertEquals(core_date::get_server_timezone(), $now_for_user->get_timezone());

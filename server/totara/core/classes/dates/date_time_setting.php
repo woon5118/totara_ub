@@ -24,20 +24,22 @@
 namespace totara_core\dates;
 
 use core_date;
+use DateTime;
 use DateTimeZone;
 
 /**
- * This class represents a date time setting which may or may not include a timezone.
- * If no timezone is supplied the user timezone is a assumed.
+ * This class represents a date time setting for a specific point in time.
+ * It can include a timezone, but if no timezone is supplied the server timezone is a assumed.
  *
  * @package totara_core\dates
  */
 class date_time_setting {
 
     public const ISO_NO_OFFSET = 'Y-m-d\TH:i:s';
+    public const ISO_DATE_ONLY = 'Y-m-d';
 
     /**
-     * @var int|null
+     * @var int
      */
     protected $timestamp;
 
@@ -47,14 +49,12 @@ class date_time_setting {
     protected $timezone;
 
     /**
-     * date_time_setting constructor.
-     *
-     * @param int|null $timestamp Unix timestamp
+     * @param int $timestamp Unix timestamp
      * @param string|null $timezone Timezone string
      */
-    public function __construct(?int $timestamp = null, ?string $timezone = null) {
+    public function __construct(int $timestamp, ?string $timezone = null) {
         $this->timestamp = $timestamp;
-        $this->timezone = $timezone ?? core_date::get_user_timezone();
+        $this->timezone = $timezone ?? core_date::get_server_timezone();
     }
 
     /**
@@ -62,41 +62,32 @@ class date_time_setting {
      *
      * @return static
      */
-    public static function now(): self {
+    public static function now_server_timezone(): self {
         return new static(time(), core_date::get_server_timezone());
     }
 
     /**
      * Factory function to create from graphql input parameter.
      *
-     * @param array|null $data
+     * @param array $data
      * @return static
      */
-    public static function create_from_array(?array $data): self {
-        if ($data === null) {
-            return new static();
-        }
-
+    public static function create_from_array(array $data): self {
         if (!isset($data['iso'])) {
             throw new \coding_exception('iso must be supplied');
         }
 
         $timezone = $data['timezone'] ?? core_date::get_server_timezone();
 
-        static::check_timezone($timezone);
-
-        $date_timezone = new DateTimeZone($timezone);
-        $date_time = (new \DateTimeImmutable($data['iso'], $date_timezone));
-
-        return new static($date_time->getTimestamp(), $timezone);
-    }
-
-    private static function check_timezone(?string $timezone): void {
         try {
-            new DateTimeZone($timezone);
+            $date_timezone = new DateTimeZone($timezone);
         } catch (\Exception $e) {
             throw new \coding_exception('Invalid timezone supplied');
         }
+
+        $date_time = (new \DateTimeImmutable($data['iso'], $date_timezone));
+
+        return new static($date_time->getTimestamp(), $timezone);
     }
 
     /**
@@ -110,7 +101,7 @@ class date_time_setting {
      * @return string An ISO 8601 formatted date string without the offset, in the supplied timezone.
      */
     public function get_iso(): string {
-        $date = new \DateTime("@{$this->timestamp}", new \DateTimeZone('UTC'));
+        $date = new DateTime("@{$this->timestamp}");
         $date->setTimezone(new \DateTimeZone($this->timezone));
 
         return $date->format(self::ISO_NO_OFFSET);
@@ -121,6 +112,23 @@ class date_time_setting {
      */
     public function get_timezone(): string {
         return $this->timezone;
+    }
+
+    /**
+     * Create a clone of this instance but adjusted to the end of the day (23:59:59).
+     *
+     * @return static
+     */
+    public function to_end_of_day(): self {
+        $date_time = new DateTime("@{$this->timestamp}");
+        $date_time->setTimezone(new DateTimeZone($this->timezone));
+
+        $end_of_day_iso = $date_time->format(self::ISO_DATE_ONLY) . 'T23:59:59';
+
+        return self::create_from_array([
+            'iso' => $end_of_day_iso,
+            'timezone' => $this->timezone,
+        ]);
     }
 
 }

@@ -318,5 +318,4 @@ final class factory {
 
         throw new \coding_exception("There is already a container class that set for type '{$type}'");
     }
-
 }
