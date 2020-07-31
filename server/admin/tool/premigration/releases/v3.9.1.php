@@ -1,16 +1,16 @@
 <?php
 
 $versions = array (
-  'tag' => 'v3.8.3',
-  'version' => 2019111803.0,
-  'release' => '3.8.3 (Build: 20200511)',
+  'tag' => 'v3.9.1',
+  'version' => 2020061501.0,
+  'release' => '3.9.1 (Build: 20200713)',
   'plugins' => 
   array (
     'antivirus_clamav' => 
     array (
       'type' => 'antivirus',
       'name' => 'clamav',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/antivirus/clamav',
@@ -19,7 +19,7 @@ $versions = array (
     array (
       'type' => 'availability',
       'name' => 'completion',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/availability/condition/completion',
@@ -28,7 +28,7 @@ $versions = array (
     array (
       'type' => 'availability',
       'name' => 'date',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/availability/condition/date',
@@ -37,7 +37,7 @@ $versions = array (
     array (
       'type' => 'availability',
       'name' => 'grade',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/availability/condition/grade',
@@ -46,7 +46,7 @@ $versions = array (
     array (
       'type' => 'availability',
       'name' => 'group',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/availability/condition/group',
@@ -55,7 +55,7 @@ $versions = array (
     array (
       'type' => 'availability',
       'name' => 'grouping',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/availability/condition/grouping',
@@ -64,7 +64,7 @@ $versions = array (
     array (
       'type' => 'availability',
       'name' => 'profile',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/availability/condition/profile',
@@ -73,7 +73,7 @@ $versions = array (
     array (
       'type' => 'qtype',
       'name' => 'calculated',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/question/type/calculated',
@@ -82,7 +82,7 @@ $versions = array (
     array (
       'type' => 'qtype',
       'name' => 'calculatedmulti',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/question/type/calculatedmulti',
@@ -91,7 +91,7 @@ $versions = array (
     array (
       'type' => 'qtype',
       'name' => 'calculatedsimple',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/question/type/calculatedsimple',
@@ -100,7 +100,7 @@ $versions = array (
     array (
       'type' => 'qtype',
       'name' => 'ddimageortext',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/question/type/ddimageortext',
@@ -109,7 +109,7 @@ $versions = array (
     array (
       'type' => 'qtype',
       'name' => 'ddmarker',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/question/type/ddmarker',
@@ -118,7 +118,7 @@ $versions = array (
     array (
       'type' => 'qtype',
       'name' => 'ddwtos',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/question/type/ddwtos',
@@ -127,7 +127,7 @@ $versions = array (
     array (
       'type' => 'qtype',
       'name' => 'description',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/question/type/description',
@@ -136,16 +136,16 @@ $versions = array (
     array (
       'type' => 'qtype',
       'name' => 'essay',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
-      'has_upgrade' => true,
+      'has_upgrade' => false,
       'relative_path' => '/question/type/essay',
     ),
     'qtype_gapselect' => 
     array (
       'type' => 'qtype',
       'name' => 'gapselect',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/question/type/gapselect',
@@ -154,7 +154,7 @@ $versions = array (
     array (
       'type' => 'qtype',
       'name' => 'match',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/question/type/match',
@@ -163,7 +163,7 @@ $versions = array (
     array (
       'type' => 'qtype',
       'name' => 'missingtype',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/question/type/missingtype',
@@ -172,7 +172,7 @@ $versions = array (
     array (
       'type' => 'qtype',
       'name' => 'multianswer',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/question/type/multianswer',
@@ -181,25 +181,25 @@ $versions = array (
     array (
       'type' => 'qtype',
       'name' => 'multichoice',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
-      'has_upgrade' => false,
+      'has_upgrade' => true,
       'relative_path' => '/question/type/multichoice',
     ),
     'qtype_numerical' => 
     array (
       'type' => 'qtype',
       'name' => 'numerical',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
-      'has_upgrade' => true,
+      'has_upgrade' => false,
       'relative_path' => '/question/type/numerical',
     ),
     'qtype_random' => 
     array (
       'type' => 'qtype',
       'name' => 'random',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/question/type/random',
@@ -208,7 +208,7 @@ $versions = array (
     array (
       'type' => 'qtype',
       'name' => 'randomsamatch',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/question/type/randomsamatch',
@@ -217,7 +217,7 @@ $versions = array (
     array (
       'type' => 'qtype',
       'name' => 'shortanswer',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/question/type/shortanswer',
@@ -226,7 +226,7 @@ $versions = array (
     array (
       'type' => 'qtype',
       'name' => 'truefalse',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/question/type/truefalse',
@@ -235,7 +235,7 @@ $versions = array (
     array (
       'type' => 'mod',
       'name' => 'assign',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/mod/assign',
@@ -244,7 +244,7 @@ $versions = array (
     array (
       'type' => 'mod',
       'name' => 'assignment',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/mod/assignment',
@@ -253,7 +253,7 @@ $versions = array (
     array (
       'type' => 'mod',
       'name' => 'book',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/mod/book',
@@ -262,7 +262,7 @@ $versions = array (
     array (
       'type' => 'mod',
       'name' => 'chat',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/mod/chat',
@@ -271,7 +271,7 @@ $versions = array (
     array (
       'type' => 'mod',
       'name' => 'choice',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/mod/choice',
@@ -280,7 +280,7 @@ $versions = array (
     array (
       'type' => 'mod',
       'name' => 'data',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/mod/data',
@@ -289,7 +289,7 @@ $versions = array (
     array (
       'type' => 'mod',
       'name' => 'feedback',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/mod/feedback',
@@ -298,7 +298,7 @@ $versions = array (
     array (
       'type' => 'mod',
       'name' => 'folder',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/mod/folder',
@@ -307,7 +307,7 @@ $versions = array (
     array (
       'type' => 'mod',
       'name' => 'forum',
-      'version' => 2019111801,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/mod/forum',
@@ -316,16 +316,25 @@ $versions = array (
     array (
       'type' => 'mod',
       'name' => 'glossary',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/mod/glossary',
+    ),
+    'mod_h5pactivity' => 
+    array (
+      'type' => 'mod',
+      'name' => 'h5pactivity',
+      'version' => 2020061500,
+      'has_install' => true,
+      'has_upgrade' => false,
+      'relative_path' => '/mod/h5pactivity',
     ),
     'mod_imscp' => 
     array (
       'type' => 'mod',
       'name' => 'imscp',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/mod/imscp',
@@ -334,7 +343,7 @@ $versions = array (
     array (
       'type' => 'mod',
       'name' => 'label',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/mod/label',
@@ -343,7 +352,7 @@ $versions = array (
     array (
       'type' => 'mod',
       'name' => 'lesson',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/mod/lesson',
@@ -352,7 +361,7 @@ $versions = array (
     array (
       'type' => 'mod',
       'name' => 'lti',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/mod/lti',
@@ -361,7 +370,7 @@ $versions = array (
     array (
       'type' => 'mod',
       'name' => 'page',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/mod/page',
@@ -370,7 +379,7 @@ $versions = array (
     array (
       'type' => 'mod',
       'name' => 'quiz',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/mod/quiz',
@@ -379,7 +388,7 @@ $versions = array (
     array (
       'type' => 'mod',
       'name' => 'resource',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/mod/resource',
@@ -388,7 +397,7 @@ $versions = array (
     array (
       'type' => 'mod',
       'name' => 'scorm',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/mod/scorm',
@@ -397,7 +406,7 @@ $versions = array (
     array (
       'type' => 'mod',
       'name' => 'survey',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/mod/survey',
@@ -406,7 +415,7 @@ $versions = array (
     array (
       'type' => 'mod',
       'name' => 'url',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/mod/url',
@@ -415,7 +424,7 @@ $versions = array (
     array (
       'type' => 'mod',
       'name' => 'wiki',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/mod/wiki',
@@ -424,7 +433,7 @@ $versions = array (
     array (
       'type' => 'mod',
       'name' => 'workshop',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/mod/workshop',
@@ -433,7 +442,7 @@ $versions = array (
     array (
       'type' => 'auth',
       'name' => 'cas',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/auth/cas',
@@ -442,7 +451,7 @@ $versions = array (
     array (
       'type' => 'auth',
       'name' => 'db',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/auth/db',
@@ -451,7 +460,7 @@ $versions = array (
     array (
       'type' => 'auth',
       'name' => 'email',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/auth/email',
@@ -460,7 +469,7 @@ $versions = array (
     array (
       'type' => 'auth',
       'name' => 'ldap',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/auth/ldap',
@@ -469,7 +478,7 @@ $versions = array (
     array (
       'type' => 'auth',
       'name' => 'lti',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/auth/lti',
@@ -478,7 +487,7 @@ $versions = array (
     array (
       'type' => 'auth',
       'name' => 'manual',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/auth/manual',
@@ -487,7 +496,7 @@ $versions = array (
     array (
       'type' => 'auth',
       'name' => 'mnet',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/auth/mnet',
@@ -496,7 +505,7 @@ $versions = array (
     array (
       'type' => 'auth',
       'name' => 'nologin',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/auth/nologin',
@@ -505,7 +514,7 @@ $versions = array (
     array (
       'type' => 'auth',
       'name' => 'none',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/auth/none',
@@ -514,7 +523,7 @@ $versions = array (
     array (
       'type' => 'auth',
       'name' => 'oauth2',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => true,
       'relative_path' => '/auth/oauth2',
@@ -523,7 +532,7 @@ $versions = array (
     array (
       'type' => 'auth',
       'name' => 'shibboleth',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/auth/shibboleth',
@@ -532,7 +541,7 @@ $versions = array (
     array (
       'type' => 'auth',
       'name' => 'webservice',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/auth/webservice',
@@ -541,7 +550,7 @@ $versions = array (
     array (
       'type' => 'calendartype',
       'name' => 'gregorian',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/calendar/type/gregorian',
@@ -550,7 +559,7 @@ $versions = array (
     array (
       'type' => 'customfield',
       'name' => 'checkbox',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/customfield/field/checkbox',
@@ -559,7 +568,7 @@ $versions = array (
     array (
       'type' => 'customfield',
       'name' => 'date',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/customfield/field/date',
@@ -568,7 +577,7 @@ $versions = array (
     array (
       'type' => 'customfield',
       'name' => 'select',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/customfield/field/select',
@@ -577,7 +586,7 @@ $versions = array (
     array (
       'type' => 'customfield',
       'name' => 'text',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/customfield/field/text',
@@ -586,7 +595,7 @@ $versions = array (
     array (
       'type' => 'customfield',
       'name' => 'textarea',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/customfield/field/textarea',
@@ -595,7 +604,7 @@ $versions = array (
     array (
       'type' => 'enrol',
       'name' => 'category',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/enrol/category',
@@ -604,7 +613,7 @@ $versions = array (
     array (
       'type' => 'enrol',
       'name' => 'cohort',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/enrol/cohort',
@@ -613,7 +622,7 @@ $versions = array (
     array (
       'type' => 'enrol',
       'name' => 'database',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/enrol/database',
@@ -622,7 +631,7 @@ $versions = array (
     array (
       'type' => 'enrol',
       'name' => 'flatfile',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/enrol/flatfile',
@@ -631,7 +640,7 @@ $versions = array (
     array (
       'type' => 'enrol',
       'name' => 'guest',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/enrol/guest',
@@ -640,7 +649,7 @@ $versions = array (
     array (
       'type' => 'enrol',
       'name' => 'imsenterprise',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/enrol/imsenterprise',
@@ -649,7 +658,7 @@ $versions = array (
     array (
       'type' => 'enrol',
       'name' => 'ldap',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/enrol/ldap',
@@ -658,7 +667,7 @@ $versions = array (
     array (
       'type' => 'enrol',
       'name' => 'lti',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/enrol/lti',
@@ -667,7 +676,7 @@ $versions = array (
     array (
       'type' => 'enrol',
       'name' => 'manual',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/enrol/manual',
@@ -676,7 +685,7 @@ $versions = array (
     array (
       'type' => 'enrol',
       'name' => 'meta',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/enrol/meta',
@@ -685,7 +694,7 @@ $versions = array (
     array (
       'type' => 'enrol',
       'name' => 'mnet',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/enrol/mnet',
@@ -694,7 +703,7 @@ $versions = array (
     array (
       'type' => 'enrol',
       'name' => 'paypal',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => true,
       'relative_path' => '/enrol/paypal',
@@ -703,7 +712,7 @@ $versions = array (
     array (
       'type' => 'enrol',
       'name' => 'self',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/enrol/self',
@@ -712,7 +721,7 @@ $versions = array (
     array (
       'type' => 'message',
       'name' => 'airnotifier',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/message/output/airnotifier',
@@ -721,7 +730,7 @@ $versions = array (
     array (
       'type' => 'message',
       'name' => 'email',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => true,
       'relative_path' => '/message/output/email',
@@ -730,7 +739,7 @@ $versions = array (
     array (
       'type' => 'message',
       'name' => 'jabber',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/message/output/jabber',
@@ -739,7 +748,7 @@ $versions = array (
     array (
       'type' => 'message',
       'name' => 'popup',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => true,
       'relative_path' => '/message/output/popup',
@@ -748,7 +757,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'activity_modules',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/blocks/activity_modules',
@@ -757,7 +766,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'activity_results',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/blocks/activity_results',
@@ -766,7 +775,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'admin_bookmarks',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/blocks/admin_bookmarks',
@@ -775,7 +784,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'badges',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/blocks/badges',
@@ -784,7 +793,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'blog_menu',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/blocks/blog_menu',
@@ -793,7 +802,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'blog_recent',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/blocks/blog_recent',
@@ -802,7 +811,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'blog_tags',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/blocks/blog_tags',
@@ -811,7 +820,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'calendar_month',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/blocks/calendar_month',
@@ -820,7 +829,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'calendar_upcoming',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/blocks/calendar_upcoming',
@@ -829,7 +838,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'comments',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/blocks/comments',
@@ -838,7 +847,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'completionstatus',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/blocks/completionstatus',
@@ -847,7 +856,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'course_list',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/blocks/course_list',
@@ -856,7 +865,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'course_summary',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/blocks/course_summary',
@@ -865,7 +874,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'feedback',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/blocks/feedback',
@@ -874,7 +883,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'globalsearch',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/blocks/globalsearch',
@@ -883,7 +892,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'glossary_random',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/blocks/glossary_random',
@@ -892,7 +901,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'html',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/blocks/html',
@@ -901,7 +910,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'login',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/blocks/login',
@@ -910,7 +919,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'lp',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/blocks/lp',
@@ -919,7 +928,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'mentees',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/blocks/mentees',
@@ -928,7 +937,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'mnet_hosts',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/blocks/mnet_hosts',
@@ -937,7 +946,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'myoverview',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/blocks/myoverview',
@@ -946,7 +955,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'myprofile',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/blocks/myprofile',
@@ -955,7 +964,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'navigation',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/blocks/navigation',
@@ -964,7 +973,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'news_items',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/blocks/news_items',
@@ -973,7 +982,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'online_users',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/blocks/online_users',
@@ -982,7 +991,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'private_files',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/blocks/private_files',
@@ -991,7 +1000,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'quiz_results',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/blocks/quiz_results',
@@ -1000,7 +1009,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'recent_activity',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/blocks/recent_activity',
@@ -1009,7 +1018,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'recentlyaccessedcourses',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/blocks/recentlyaccessedcourses',
@@ -1018,7 +1027,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'recentlyaccesseditems',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/blocks/recentlyaccesseditems',
@@ -1027,7 +1036,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'rss_client',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/blocks/rss_client',
@@ -1036,7 +1045,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'search_forums',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/blocks/search_forums',
@@ -1045,7 +1054,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'section_links',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/blocks/section_links',
@@ -1054,7 +1063,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'selfcompletion',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/blocks/selfcompletion',
@@ -1063,7 +1072,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'settings',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/blocks/settings',
@@ -1072,7 +1081,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'site_main_menu',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/blocks/site_main_menu',
@@ -1081,7 +1090,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'social_activities',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/blocks/social_activities',
@@ -1090,7 +1099,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'starredcourses',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/blocks/starredcourses',
@@ -1099,7 +1108,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'tag_flickr',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/blocks/tag_flickr',
@@ -1108,7 +1117,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'tag_youtube',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/blocks/tag_youtube',
@@ -1117,7 +1126,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'tags',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/blocks/tags',
@@ -1126,7 +1135,7 @@ $versions = array (
     array (
       'type' => 'block',
       'name' => 'timeline',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/blocks/timeline',
@@ -1135,7 +1144,7 @@ $versions = array (
     array (
       'type' => 'media',
       'name' => 'html5audio',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/media/player/html5audio',
@@ -1144,7 +1153,7 @@ $versions = array (
     array (
       'type' => 'media',
       'name' => 'html5video',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/media/player/html5video',
@@ -1153,7 +1162,7 @@ $versions = array (
     array (
       'type' => 'media',
       'name' => 'swf',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/media/player/swf',
@@ -1162,7 +1171,7 @@ $versions = array (
     array (
       'type' => 'media',
       'name' => 'videojs',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/media/player/videojs',
@@ -1171,7 +1180,7 @@ $versions = array (
     array (
       'type' => 'media',
       'name' => 'vimeo',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/media/player/vimeo',
@@ -1180,7 +1189,7 @@ $versions = array (
     array (
       'type' => 'media',
       'name' => 'youtube',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/media/player/youtube',
@@ -1189,7 +1198,7 @@ $versions = array (
     array (
       'type' => 'filter',
       'name' => 'activitynames',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/filter/activitynames',
@@ -1198,7 +1207,7 @@ $versions = array (
     array (
       'type' => 'filter',
       'name' => 'algebra',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/filter/algebra',
@@ -1207,7 +1216,7 @@ $versions = array (
     array (
       'type' => 'filter',
       'name' => 'censor',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/filter/censor',
@@ -1216,7 +1225,7 @@ $versions = array (
     array (
       'type' => 'filter',
       'name' => 'data',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/filter/data',
@@ -1225,7 +1234,7 @@ $versions = array (
     array (
       'type' => 'filter',
       'name' => 'displayh5p',
-      'version' => 2020031700,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => true,
       'relative_path' => '/filter/displayh5p',
@@ -1234,7 +1243,7 @@ $versions = array (
     array (
       'type' => 'filter',
       'name' => 'emailprotect',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/filter/emailprotect',
@@ -1243,7 +1252,7 @@ $versions = array (
     array (
       'type' => 'filter',
       'name' => 'emoticon',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/filter/emoticon',
@@ -1252,7 +1261,7 @@ $versions = array (
     array (
       'type' => 'filter',
       'name' => 'glossary',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/filter/glossary',
@@ -1261,7 +1270,7 @@ $versions = array (
     array (
       'type' => 'filter',
       'name' => 'mathjaxloader',
-      'version' => 2019111801,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => true,
       'relative_path' => '/filter/mathjaxloader',
@@ -1270,7 +1279,7 @@ $versions = array (
     array (
       'type' => 'filter',
       'name' => 'mediaplugin',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/filter/mediaplugin',
@@ -1279,7 +1288,7 @@ $versions = array (
     array (
       'type' => 'filter',
       'name' => 'multilang',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/filter/multilang',
@@ -1288,7 +1297,7 @@ $versions = array (
     array (
       'type' => 'filter',
       'name' => 'tex',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/filter/tex',
@@ -1297,7 +1306,7 @@ $versions = array (
     array (
       'type' => 'filter',
       'name' => 'tidy',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/filter/tidy',
@@ -1306,7 +1315,7 @@ $versions = array (
     array (
       'type' => 'filter',
       'name' => 'urltolink',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/filter/urltolink',
@@ -1315,7 +1324,7 @@ $versions = array (
     array (
       'type' => 'editor',
       'name' => 'atto',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => true,
       'relative_path' => '/lib/editor/atto',
@@ -1324,7 +1333,7 @@ $versions = array (
     array (
       'type' => 'editor',
       'name' => 'textarea',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/textarea',
@@ -1333,7 +1342,7 @@ $versions = array (
     array (
       'type' => 'editor',
       'name' => 'tinymce',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/tinymce',
@@ -1342,7 +1351,7 @@ $versions = array (
     array (
       'type' => 'format',
       'name' => 'singleactivity',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/course/format/singleactivity',
@@ -1351,7 +1360,7 @@ $versions = array (
     array (
       'type' => 'format',
       'name' => 'social',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/course/format/social',
@@ -1360,25 +1369,25 @@ $versions = array (
     array (
       'type' => 'format',
       'name' => 'topics',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
-      'has_upgrade' => true,
+      'has_upgrade' => false,
       'relative_path' => '/course/format/topics',
     ),
     'format_weeks' => 
     array (
       'type' => 'format',
       'name' => 'weeks',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
-      'has_upgrade' => true,
+      'has_upgrade' => false,
       'relative_path' => '/course/format/weeks',
     ),
     'dataformat_csv' => 
     array (
       'type' => 'dataformat',
       'name' => 'csv',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/dataformat/csv',
@@ -1387,7 +1396,7 @@ $versions = array (
     array (
       'type' => 'dataformat',
       'name' => 'excel',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/dataformat/excel',
@@ -1396,7 +1405,7 @@ $versions = array (
     array (
       'type' => 'dataformat',
       'name' => 'html',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/dataformat/html',
@@ -1405,7 +1414,7 @@ $versions = array (
     array (
       'type' => 'dataformat',
       'name' => 'json',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/dataformat/json',
@@ -1414,7 +1423,7 @@ $versions = array (
     array (
       'type' => 'dataformat',
       'name' => 'ods',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/dataformat/ods',
@@ -1423,7 +1432,7 @@ $versions = array (
     array (
       'type' => 'dataformat',
       'name' => 'pdf',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/dataformat/pdf',
@@ -1432,7 +1441,7 @@ $versions = array (
     array (
       'type' => 'profilefield',
       'name' => 'checkbox',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/user/profile/field/checkbox',
@@ -1441,7 +1450,7 @@ $versions = array (
     array (
       'type' => 'profilefield',
       'name' => 'datetime',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/user/profile/field/datetime',
@@ -1450,7 +1459,7 @@ $versions = array (
     array (
       'type' => 'profilefield',
       'name' => 'menu',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/user/profile/field/menu',
@@ -1459,7 +1468,7 @@ $versions = array (
     array (
       'type' => 'profilefield',
       'name' => 'text',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/user/profile/field/text',
@@ -1468,7 +1477,7 @@ $versions = array (
     array (
       'type' => 'profilefield',
       'name' => 'textarea',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/user/profile/field/textarea',
@@ -1477,7 +1486,7 @@ $versions = array (
     array (
       'type' => 'report',
       'name' => 'backups',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/report/backups',
@@ -1486,7 +1495,7 @@ $versions = array (
     array (
       'type' => 'report',
       'name' => 'competency',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/report/competency',
@@ -1495,7 +1504,7 @@ $versions = array (
     array (
       'type' => 'report',
       'name' => 'completion',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/report/completion',
@@ -1504,7 +1513,7 @@ $versions = array (
     array (
       'type' => 'report',
       'name' => 'configlog',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/report/configlog',
@@ -1513,7 +1522,7 @@ $versions = array (
     array (
       'type' => 'report',
       'name' => 'courseoverview',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/report/courseoverview',
@@ -1522,7 +1531,7 @@ $versions = array (
     array (
       'type' => 'report',
       'name' => 'eventlist',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/report/eventlist',
@@ -1531,7 +1540,7 @@ $versions = array (
     array (
       'type' => 'report',
       'name' => 'insights',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/report/insights',
@@ -1540,7 +1549,7 @@ $versions = array (
     array (
       'type' => 'report',
       'name' => 'log',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/report/log',
@@ -1549,7 +1558,7 @@ $versions = array (
     array (
       'type' => 'report',
       'name' => 'loglive',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/report/loglive',
@@ -1558,7 +1567,7 @@ $versions = array (
     array (
       'type' => 'report',
       'name' => 'outline',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/report/outline',
@@ -1567,7 +1576,7 @@ $versions = array (
     array (
       'type' => 'report',
       'name' => 'participation',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/report/participation',
@@ -1576,7 +1585,7 @@ $versions = array (
     array (
       'type' => 'report',
       'name' => 'performance',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/report/performance',
@@ -1585,7 +1594,7 @@ $versions = array (
     array (
       'type' => 'report',
       'name' => 'progress',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/report/progress',
@@ -1594,7 +1603,7 @@ $versions = array (
     array (
       'type' => 'report',
       'name' => 'questioninstances',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/report/questioninstances',
@@ -1603,7 +1612,7 @@ $versions = array (
     array (
       'type' => 'report',
       'name' => 'security',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/report/security',
@@ -1612,16 +1621,25 @@ $versions = array (
     array (
       'type' => 'report',
       'name' => 'stats',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/report/stats',
+    ),
+    'report_status' => 
+    array (
+      'type' => 'report',
+      'name' => 'status',
+      'version' => 2020061500,
+      'has_install' => false,
+      'has_upgrade' => false,
+      'relative_path' => '/report/status',
     ),
     'report_usersessions' => 
     array (
       'type' => 'report',
       'name' => 'usersessions',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/report/usersessions',
@@ -1630,7 +1648,7 @@ $versions = array (
     array (
       'type' => 'gradeexport',
       'name' => 'ods',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/grade/export/ods',
@@ -1639,7 +1657,7 @@ $versions = array (
     array (
       'type' => 'gradeexport',
       'name' => 'txt',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/grade/export/txt',
@@ -1648,7 +1666,7 @@ $versions = array (
     array (
       'type' => 'gradeexport',
       'name' => 'xls',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/grade/export/xls',
@@ -1657,7 +1675,7 @@ $versions = array (
     array (
       'type' => 'gradeexport',
       'name' => 'xml',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/grade/export/xml',
@@ -1666,7 +1684,7 @@ $versions = array (
     array (
       'type' => 'gradeimport',
       'name' => 'csv',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/grade/import/csv',
@@ -1675,7 +1693,7 @@ $versions = array (
     array (
       'type' => 'gradeimport',
       'name' => 'direct',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/grade/import/direct',
@@ -1684,7 +1702,7 @@ $versions = array (
     array (
       'type' => 'gradeimport',
       'name' => 'xml',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/grade/import/xml',
@@ -1693,7 +1711,7 @@ $versions = array (
     array (
       'type' => 'gradereport',
       'name' => 'grader',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/grade/report/grader',
@@ -1702,7 +1720,7 @@ $versions = array (
     array (
       'type' => 'gradereport',
       'name' => 'history',
-      'version' => 2019111801,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => true,
       'relative_path' => '/grade/report/history',
@@ -1711,7 +1729,7 @@ $versions = array (
     array (
       'type' => 'gradereport',
       'name' => 'outcomes',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/grade/report/outcomes',
@@ -1720,7 +1738,7 @@ $versions = array (
     array (
       'type' => 'gradereport',
       'name' => 'overview',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/grade/report/overview',
@@ -1729,7 +1747,7 @@ $versions = array (
     array (
       'type' => 'gradereport',
       'name' => 'singleview',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/grade/report/singleview',
@@ -1738,7 +1756,7 @@ $versions = array (
     array (
       'type' => 'gradereport',
       'name' => 'user',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/grade/report/user',
@@ -1747,7 +1765,7 @@ $versions = array (
     array (
       'type' => 'gradingform',
       'name' => 'guide',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/grade/grading/form/guide',
@@ -1756,7 +1774,7 @@ $versions = array (
     array (
       'type' => 'gradingform',
       'name' => 'rubric',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/grade/grading/form/rubric',
@@ -1765,7 +1783,7 @@ $versions = array (
     array (
       'type' => 'mlbackend',
       'name' => 'php',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/mlbackend/php',
@@ -1774,7 +1792,7 @@ $versions = array (
     array (
       'type' => 'mlbackend',
       'name' => 'python',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/mlbackend/python',
@@ -1783,7 +1801,7 @@ $versions = array (
     array (
       'type' => 'mnetservice',
       'name' => 'enrol',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/mnet/service/enrol',
@@ -1792,7 +1810,7 @@ $versions = array (
     array (
       'type' => 'webservice',
       'name' => 'rest',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/webservice/rest',
@@ -1801,7 +1819,7 @@ $versions = array (
     array (
       'type' => 'webservice',
       'name' => 'soap',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/webservice/soap',
@@ -1810,7 +1828,7 @@ $versions = array (
     array (
       'type' => 'webservice',
       'name' => 'xmlrpc',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/webservice/xmlrpc',
@@ -1819,7 +1837,7 @@ $versions = array (
     array (
       'type' => 'repository',
       'name' => 'areafiles',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/repository/areafiles',
@@ -1828,16 +1846,25 @@ $versions = array (
     array (
       'type' => 'repository',
       'name' => 'boxnet',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/repository/boxnet',
+    ),
+    'repository_contentbank' => 
+    array (
+      'type' => 'repository',
+      'name' => 'contentbank',
+      'version' => 2020061500,
+      'has_install' => false,
+      'has_upgrade' => false,
+      'relative_path' => '/repository/contentbank',
     ),
     'repository_coursefiles' => 
     array (
       'type' => 'repository',
       'name' => 'coursefiles',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/repository/coursefiles',
@@ -1846,7 +1873,7 @@ $versions = array (
     array (
       'type' => 'repository',
       'name' => 'dropbox',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/repository/dropbox',
@@ -1855,7 +1882,7 @@ $versions = array (
     array (
       'type' => 'repository',
       'name' => 'equella',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/repository/equella',
@@ -1864,7 +1891,7 @@ $versions = array (
     array (
       'type' => 'repository',
       'name' => 'filesystem',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/repository/filesystem',
@@ -1873,7 +1900,7 @@ $versions = array (
     array (
       'type' => 'repository',
       'name' => 'flickr',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/repository/flickr',
@@ -1882,7 +1909,7 @@ $versions = array (
     array (
       'type' => 'repository',
       'name' => 'flickr_public',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/repository/flickr_public',
@@ -1891,7 +1918,7 @@ $versions = array (
     array (
       'type' => 'repository',
       'name' => 'googledocs',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/repository/googledocs',
@@ -1900,7 +1927,7 @@ $versions = array (
     array (
       'type' => 'repository',
       'name' => 'local',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/repository/local',
@@ -1909,7 +1936,7 @@ $versions = array (
     array (
       'type' => 'repository',
       'name' => 'merlot',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/repository/merlot',
@@ -1918,7 +1945,7 @@ $versions = array (
     array (
       'type' => 'repository',
       'name' => 'nextcloud',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/repository/nextcloud',
@@ -1927,7 +1954,7 @@ $versions = array (
     array (
       'type' => 'repository',
       'name' => 'onedrive',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/repository/onedrive',
@@ -1936,7 +1963,7 @@ $versions = array (
     array (
       'type' => 'repository',
       'name' => 'picasa',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/repository/picasa',
@@ -1945,7 +1972,7 @@ $versions = array (
     array (
       'type' => 'repository',
       'name' => 'recent',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/repository/recent',
@@ -1954,7 +1981,7 @@ $versions = array (
     array (
       'type' => 'repository',
       'name' => 's3',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/repository/s3',
@@ -1963,7 +1990,7 @@ $versions = array (
     array (
       'type' => 'repository',
       'name' => 'skydrive',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/repository/skydrive',
@@ -1972,7 +1999,7 @@ $versions = array (
     array (
       'type' => 'repository',
       'name' => 'upload',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/repository/upload',
@@ -1981,7 +2008,7 @@ $versions = array (
     array (
       'type' => 'repository',
       'name' => 'url',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/repository/url',
@@ -1990,7 +2017,7 @@ $versions = array (
     array (
       'type' => 'repository',
       'name' => 'user',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/repository/user',
@@ -1999,7 +2026,7 @@ $versions = array (
     array (
       'type' => 'repository',
       'name' => 'webdav',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/repository/webdav',
@@ -2008,7 +2035,7 @@ $versions = array (
     array (
       'type' => 'repository',
       'name' => 'wikimedia',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/repository/wikimedia',
@@ -2017,7 +2044,7 @@ $versions = array (
     array (
       'type' => 'repository',
       'name' => 'youtube',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/repository/youtube',
@@ -2026,7 +2053,7 @@ $versions = array (
     array (
       'type' => 'portfolio',
       'name' => 'boxnet',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/portfolio/boxnet',
@@ -2035,7 +2062,7 @@ $versions = array (
     array (
       'type' => 'portfolio',
       'name' => 'download',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/portfolio/download',
@@ -2044,7 +2071,7 @@ $versions = array (
     array (
       'type' => 'portfolio',
       'name' => 'flickr',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/portfolio/flickr',
@@ -2053,7 +2080,7 @@ $versions = array (
     array (
       'type' => 'portfolio',
       'name' => 'googledocs',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/portfolio/googledocs',
@@ -2062,7 +2089,7 @@ $versions = array (
     array (
       'type' => 'portfolio',
       'name' => 'mahara',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/portfolio/mahara',
@@ -2071,7 +2098,7 @@ $versions = array (
     array (
       'type' => 'portfolio',
       'name' => 'picasa',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/portfolio/picasa',
@@ -2080,7 +2107,7 @@ $versions = array (
     array (
       'type' => 'search',
       'name' => 'simpledb',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/search/engine/simpledb',
@@ -2089,7 +2116,7 @@ $versions = array (
     array (
       'type' => 'search',
       'name' => 'solr',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/search/engine/solr',
@@ -2098,7 +2125,7 @@ $versions = array (
     array (
       'type' => 'qbehaviour',
       'name' => 'adaptive',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/question/behaviour/adaptive',
@@ -2107,7 +2134,7 @@ $versions = array (
     array (
       'type' => 'qbehaviour',
       'name' => 'adaptivenopenalty',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/question/behaviour/adaptivenopenalty',
@@ -2116,7 +2143,7 @@ $versions = array (
     array (
       'type' => 'qbehaviour',
       'name' => 'deferredcbm',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/question/behaviour/deferredcbm',
@@ -2125,7 +2152,7 @@ $versions = array (
     array (
       'type' => 'qbehaviour',
       'name' => 'deferredfeedback',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/question/behaviour/deferredfeedback',
@@ -2134,7 +2161,7 @@ $versions = array (
     array (
       'type' => 'qbehaviour',
       'name' => 'immediatecbm',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/question/behaviour/immediatecbm',
@@ -2143,7 +2170,7 @@ $versions = array (
     array (
       'type' => 'qbehaviour',
       'name' => 'immediatefeedback',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/question/behaviour/immediatefeedback',
@@ -2152,7 +2179,7 @@ $versions = array (
     array (
       'type' => 'qbehaviour',
       'name' => 'informationitem',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/question/behaviour/informationitem',
@@ -2161,7 +2188,7 @@ $versions = array (
     array (
       'type' => 'qbehaviour',
       'name' => 'interactive',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/question/behaviour/interactive',
@@ -2170,7 +2197,7 @@ $versions = array (
     array (
       'type' => 'qbehaviour',
       'name' => 'interactivecountback',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/question/behaviour/interactivecountback',
@@ -2179,7 +2206,7 @@ $versions = array (
     array (
       'type' => 'qbehaviour',
       'name' => 'manualgraded',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/question/behaviour/manualgraded',
@@ -2188,7 +2215,7 @@ $versions = array (
     array (
       'type' => 'qbehaviour',
       'name' => 'missing',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/question/behaviour/missing',
@@ -2197,7 +2224,7 @@ $versions = array (
     array (
       'type' => 'qformat',
       'name' => 'aiken',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/question/format/aiken',
@@ -2206,7 +2233,7 @@ $versions = array (
     array (
       'type' => 'qformat',
       'name' => 'blackboard_six',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/question/format/blackboard_six',
@@ -2215,7 +2242,7 @@ $versions = array (
     array (
       'type' => 'qformat',
       'name' => 'examview',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/question/format/examview',
@@ -2224,7 +2251,7 @@ $versions = array (
     array (
       'type' => 'qformat',
       'name' => 'gift',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/question/format/gift',
@@ -2233,7 +2260,7 @@ $versions = array (
     array (
       'type' => 'qformat',
       'name' => 'missingword',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/question/format/missingword',
@@ -2242,7 +2269,7 @@ $versions = array (
     array (
       'type' => 'qformat',
       'name' => 'multianswer',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/question/format/multianswer',
@@ -2251,7 +2278,7 @@ $versions = array (
     array (
       'type' => 'qformat',
       'name' => 'webct',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/question/format/webct',
@@ -2260,7 +2287,7 @@ $versions = array (
     array (
       'type' => 'qformat',
       'name' => 'xhtml',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/question/format/xhtml',
@@ -2269,7 +2296,7 @@ $versions = array (
     array (
       'type' => 'qformat',
       'name' => 'xml',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/question/format/xml',
@@ -2278,7 +2305,7 @@ $versions = array (
     array (
       'type' => 'tool',
       'name' => 'analytics',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/admin/tool/analytics',
@@ -2287,7 +2314,7 @@ $versions = array (
     array (
       'type' => 'tool',
       'name' => 'availabilityconditions',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/admin/tool/availabilityconditions',
@@ -2296,7 +2323,7 @@ $versions = array (
     array (
       'type' => 'tool',
       'name' => 'behat',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/admin/tool/behat',
@@ -2305,7 +2332,7 @@ $versions = array (
     array (
       'type' => 'tool',
       'name' => 'capability',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/admin/tool/capability',
@@ -2314,7 +2341,7 @@ $versions = array (
     array (
       'type' => 'tool',
       'name' => 'cohortroles',
-      'version' => 2019111801,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => true,
       'relative_path' => '/admin/tool/cohortroles',
@@ -2323,7 +2350,7 @@ $versions = array (
     array (
       'type' => 'tool',
       'name' => 'customlang',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/admin/tool/customlang',
@@ -2332,7 +2359,7 @@ $versions = array (
     array (
       'type' => 'tool',
       'name' => 'dataprivacy',
-      'version' => 2019111800,
+      'version' => 2020061501,
       'has_install' => true,
       'has_upgrade' => true,
       'relative_path' => '/admin/tool/dataprivacy',
@@ -2341,7 +2368,7 @@ $versions = array (
     array (
       'type' => 'tool',
       'name' => 'dbtransfer',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/admin/tool/dbtransfer',
@@ -2350,7 +2377,7 @@ $versions = array (
     array (
       'type' => 'tool',
       'name' => 'filetypes',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/admin/tool/filetypes',
@@ -2359,7 +2386,7 @@ $versions = array (
     array (
       'type' => 'tool',
       'name' => 'generator',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/admin/tool/generator',
@@ -2368,7 +2395,7 @@ $versions = array (
     array (
       'type' => 'tool',
       'name' => 'health',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/admin/tool/health',
@@ -2377,7 +2404,7 @@ $versions = array (
     array (
       'type' => 'tool',
       'name' => 'httpsreplace',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/admin/tool/httpsreplace',
@@ -2386,7 +2413,7 @@ $versions = array (
     array (
       'type' => 'tool',
       'name' => 'innodb',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/admin/tool/innodb',
@@ -2395,7 +2422,7 @@ $versions = array (
     array (
       'type' => 'tool',
       'name' => 'installaddon',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/admin/tool/installaddon',
@@ -2404,16 +2431,25 @@ $versions = array (
     array (
       'type' => 'tool',
       'name' => 'langimport',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/admin/tool/langimport',
+    ),
+    'tool_licensemanager' => 
+    array (
+      'type' => 'tool',
+      'name' => 'licensemanager',
+      'version' => 2020061500,
+      'has_install' => false,
+      'has_upgrade' => false,
+      'relative_path' => '/admin/tool/licensemanager',
     ),
     'tool_log' => 
     array (
       'type' => 'tool',
       'name' => 'log',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/admin/tool/log',
@@ -2422,7 +2458,7 @@ $versions = array (
     array (
       'type' => 'tool',
       'name' => 'lp',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/admin/tool/lp',
@@ -2431,7 +2467,7 @@ $versions = array (
     array (
       'type' => 'tool',
       'name' => 'lpimportcsv',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/admin/tool/lpimportcsv',
@@ -2440,7 +2476,7 @@ $versions = array (
     array (
       'type' => 'tool',
       'name' => 'lpmigrate',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/admin/tool/lpmigrate',
@@ -2449,7 +2485,7 @@ $versions = array (
     array (
       'type' => 'tool',
       'name' => 'messageinbound',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/admin/tool/messageinbound',
@@ -2458,7 +2494,7 @@ $versions = array (
     array (
       'type' => 'tool',
       'name' => 'mobile',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => true,
       'relative_path' => '/admin/tool/mobile',
@@ -2467,16 +2503,25 @@ $versions = array (
     array (
       'type' => 'tool',
       'name' => 'monitor',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/admin/tool/monitor',
+    ),
+    'tool_moodlenet' => 
+    array (
+      'type' => 'tool',
+      'name' => 'moodlenet',
+      'version' => 2020061502,
+      'has_install' => false,
+      'has_upgrade' => true,
+      'relative_path' => '/admin/tool/moodlenet',
     ),
     'tool_multilangupgrade' => 
     array (
       'type' => 'tool',
       'name' => 'multilangupgrade',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/admin/tool/multilangupgrade',
@@ -2485,7 +2530,7 @@ $versions = array (
     array (
       'type' => 'tool',
       'name' => 'oauth2',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/admin/tool/oauth2',
@@ -2494,7 +2539,7 @@ $versions = array (
     array (
       'type' => 'tool',
       'name' => 'phpunit',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/admin/tool/phpunit',
@@ -2503,7 +2548,7 @@ $versions = array (
     array (
       'type' => 'tool',
       'name' => 'policy',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => true,
       'relative_path' => '/admin/tool/policy',
@@ -2512,7 +2557,7 @@ $versions = array (
     array (
       'type' => 'tool',
       'name' => 'profiling',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/admin/tool/profiling',
@@ -2521,7 +2566,7 @@ $versions = array (
     array (
       'type' => 'tool',
       'name' => 'recyclebin',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/admin/tool/recyclebin',
@@ -2530,7 +2575,7 @@ $versions = array (
     array (
       'type' => 'tool',
       'name' => 'replace',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/admin/tool/replace',
@@ -2539,7 +2584,7 @@ $versions = array (
     array (
       'type' => 'tool',
       'name' => 'spamcleaner',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/admin/tool/spamcleaner',
@@ -2548,7 +2593,7 @@ $versions = array (
     array (
       'type' => 'tool',
       'name' => 'task',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/admin/tool/task',
@@ -2557,7 +2602,7 @@ $versions = array (
     array (
       'type' => 'tool',
       'name' => 'templatelibrary',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/admin/tool/templatelibrary',
@@ -2566,7 +2611,7 @@ $versions = array (
     array (
       'type' => 'tool',
       'name' => 'unsuproles',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/admin/tool/unsuproles',
@@ -2575,7 +2620,7 @@ $versions = array (
     array (
       'type' => 'tool',
       'name' => 'uploadcourse',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/admin/tool/uploadcourse',
@@ -2584,7 +2629,7 @@ $versions = array (
     array (
       'type' => 'tool',
       'name' => 'uploaduser',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/admin/tool/uploaduser',
@@ -2593,7 +2638,7 @@ $versions = array (
     array (
       'type' => 'tool',
       'name' => 'usertours',
-      'version' => 2019111801,
+      'version' => 2020061501,
       'has_install' => true,
       'has_upgrade' => true,
       'relative_path' => '/admin/tool/usertours',
@@ -2602,7 +2647,7 @@ $versions = array (
     array (
       'type' => 'tool',
       'name' => 'xmldb',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/admin/tool/xmldb',
@@ -2611,7 +2656,7 @@ $versions = array (
     array (
       'type' => 'cachestore',
       'name' => 'apcu',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/cache/stores/apcu',
@@ -2620,7 +2665,7 @@ $versions = array (
     array (
       'type' => 'cachestore',
       'name' => 'file',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/cache/stores/file',
@@ -2629,7 +2674,7 @@ $versions = array (
     array (
       'type' => 'cachestore',
       'name' => 'memcached',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/cache/stores/memcached',
@@ -2638,7 +2683,7 @@ $versions = array (
     array (
       'type' => 'cachestore',
       'name' => 'mongodb',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/cache/stores/mongodb',
@@ -2647,7 +2692,7 @@ $versions = array (
     array (
       'type' => 'cachestore',
       'name' => 'redis',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/cache/stores/redis',
@@ -2656,7 +2701,7 @@ $versions = array (
     array (
       'type' => 'cachestore',
       'name' => 'session',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/cache/stores/session',
@@ -2665,7 +2710,7 @@ $versions = array (
     array (
       'type' => 'cachestore',
       'name' => 'static',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/cache/stores/static',
@@ -2674,7 +2719,7 @@ $versions = array (
     array (
       'type' => 'cachelock',
       'name' => 'file',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/cache/locks/file',
@@ -2683,7 +2728,7 @@ $versions = array (
     array (
       'type' => 'fileconverter',
       'name' => 'googledrive',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/files/converter/googledrive',
@@ -2692,16 +2737,25 @@ $versions = array (
     array (
       'type' => 'fileconverter',
       'name' => 'unoconv',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/files/converter/unoconv',
+    ),
+    'contenttype_h5p' => 
+    array (
+      'type' => 'contenttype',
+      'name' => 'h5p',
+      'version' => 2020061500,
+      'has_install' => false,
+      'has_upgrade' => false,
+      'relative_path' => '/contentbank/contenttype/h5p',
     ),
     'theme_boost' => 
     array (
       'type' => 'theme',
       'name' => 'boost',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/theme/boost',
@@ -2710,16 +2764,25 @@ $versions = array (
     array (
       'type' => 'theme',
       'name' => 'classic',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/theme/classic',
+    ),
+    'h5plib_v124' => 
+    array (
+      'type' => 'h5plib',
+      'name' => 'v124',
+      'version' => 2020061500,
+      'has_install' => false,
+      'has_upgrade' => false,
+      'relative_path' => '/h5p/h5plib/v124',
     ),
     'assignsubmission_comments' => 
     array (
       'type' => 'assignsubmission',
       'name' => 'comments',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/assign/submission/comments',
@@ -2728,7 +2791,7 @@ $versions = array (
     array (
       'type' => 'assignsubmission',
       'name' => 'file',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/mod/assign/submission/file',
@@ -2737,7 +2800,7 @@ $versions = array (
     array (
       'type' => 'assignsubmission',
       'name' => 'onlinetext',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/mod/assign/submission/onlinetext',
@@ -2746,7 +2809,7 @@ $versions = array (
     array (
       'type' => 'assignfeedback',
       'name' => 'comments',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/mod/assign/feedback/comments',
@@ -2755,7 +2818,7 @@ $versions = array (
     array (
       'type' => 'assignfeedback',
       'name' => 'editpdf',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => true,
       'relative_path' => '/mod/assign/feedback/editpdf',
@@ -2764,7 +2827,7 @@ $versions = array (
     array (
       'type' => 'assignfeedback',
       'name' => 'file',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/mod/assign/feedback/file',
@@ -2773,7 +2836,7 @@ $versions = array (
     array (
       'type' => 'assignfeedback',
       'name' => 'offline',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/assign/feedback/offline',
@@ -2782,7 +2845,7 @@ $versions = array (
     array (
       'type' => 'assignment',
       'name' => 'offline',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/assignment/type/offline',
@@ -2791,7 +2854,7 @@ $versions = array (
     array (
       'type' => 'assignment',
       'name' => 'online',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/assignment/type/online',
@@ -2800,7 +2863,7 @@ $versions = array (
     array (
       'type' => 'assignment',
       'name' => 'upload',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/assignment/type/upload',
@@ -2809,7 +2872,7 @@ $versions = array (
     array (
       'type' => 'assignment',
       'name' => 'uploadsingle',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/assignment/type/uploadsingle',
@@ -2818,7 +2881,7 @@ $versions = array (
     array (
       'type' => 'booktool',
       'name' => 'exportimscp',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/book/tool/exportimscp',
@@ -2827,7 +2890,7 @@ $versions = array (
     array (
       'type' => 'booktool',
       'name' => 'importhtml',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/book/tool/importhtml',
@@ -2836,7 +2899,7 @@ $versions = array (
     array (
       'type' => 'booktool',
       'name' => 'print',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/book/tool/print',
@@ -2845,7 +2908,7 @@ $versions = array (
     array (
       'type' => 'datafield',
       'name' => 'checkbox',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/data/field/checkbox',
@@ -2854,7 +2917,7 @@ $versions = array (
     array (
       'type' => 'datafield',
       'name' => 'date',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/data/field/date',
@@ -2863,7 +2926,7 @@ $versions = array (
     array (
       'type' => 'datafield',
       'name' => 'file',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/data/field/file',
@@ -2872,7 +2935,7 @@ $versions = array (
     array (
       'type' => 'datafield',
       'name' => 'latlong',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/data/field/latlong',
@@ -2881,7 +2944,7 @@ $versions = array (
     array (
       'type' => 'datafield',
       'name' => 'menu',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/data/field/menu',
@@ -2890,7 +2953,7 @@ $versions = array (
     array (
       'type' => 'datafield',
       'name' => 'multimenu',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/data/field/multimenu',
@@ -2899,7 +2962,7 @@ $versions = array (
     array (
       'type' => 'datafield',
       'name' => 'number',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/data/field/number',
@@ -2908,7 +2971,7 @@ $versions = array (
     array (
       'type' => 'datafield',
       'name' => 'picture',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/data/field/picture',
@@ -2917,7 +2980,7 @@ $versions = array (
     array (
       'type' => 'datafield',
       'name' => 'radiobutton',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/data/field/radiobutton',
@@ -2926,7 +2989,7 @@ $versions = array (
     array (
       'type' => 'datafield',
       'name' => 'text',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/data/field/text',
@@ -2935,7 +2998,7 @@ $versions = array (
     array (
       'type' => 'datafield',
       'name' => 'textarea',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/data/field/textarea',
@@ -2944,7 +3007,7 @@ $versions = array (
     array (
       'type' => 'datafield',
       'name' => 'url',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/data/field/url',
@@ -2953,7 +3016,7 @@ $versions = array (
     array (
       'type' => 'datapreset',
       'name' => 'imagegallery',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/data/preset/imagegallery',
@@ -2962,7 +3025,7 @@ $versions = array (
     array (
       'type' => 'forumreport',
       'name' => 'summary',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/forum/report/summary',
@@ -2971,7 +3034,7 @@ $versions = array (
     array (
       'type' => 'ltiservice',
       'name' => 'basicoutcomes',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/lti/service/basicoutcomes',
@@ -2980,16 +3043,16 @@ $versions = array (
     array (
       'type' => 'ltiservice',
       'name' => 'gradebookservices',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
-      'has_upgrade' => false,
+      'has_upgrade' => true,
       'relative_path' => '/mod/lti/service/gradebookservices',
     ),
     'ltiservice_memberships' => 
     array (
       'type' => 'ltiservice',
       'name' => 'memberships',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/lti/service/memberships',
@@ -2998,7 +3061,7 @@ $versions = array (
     array (
       'type' => 'ltiservice',
       'name' => 'profile',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/lti/service/profile',
@@ -3007,7 +3070,7 @@ $versions = array (
     array (
       'type' => 'ltiservice',
       'name' => 'toolproxy',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/lti/service/toolproxy',
@@ -3016,7 +3079,7 @@ $versions = array (
     array (
       'type' => 'ltiservice',
       'name' => 'toolsettings',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/lti/service/toolsettings',
@@ -3025,7 +3088,7 @@ $versions = array (
     array (
       'type' => 'quiz',
       'name' => 'grading',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/quiz/report/grading',
@@ -3034,7 +3097,7 @@ $versions = array (
     array (
       'type' => 'quiz',
       'name' => 'overview',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => true,
       'relative_path' => '/mod/quiz/report/overview',
@@ -3043,7 +3106,7 @@ $versions = array (
     array (
       'type' => 'quiz',
       'name' => 'responses',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/quiz/report/responses',
@@ -3052,7 +3115,7 @@ $versions = array (
     array (
       'type' => 'quiz',
       'name' => 'statistics',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/mod/quiz/report/statistics',
@@ -3061,7 +3124,7 @@ $versions = array (
     array (
       'type' => 'quizaccess',
       'name' => 'delaybetweenattempts',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/quiz/accessrule/delaybetweenattempts',
@@ -3070,7 +3133,7 @@ $versions = array (
     array (
       'type' => 'quizaccess',
       'name' => 'ipaddress',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/quiz/accessrule/ipaddress',
@@ -3079,7 +3142,7 @@ $versions = array (
     array (
       'type' => 'quizaccess',
       'name' => 'numattempts',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/quiz/accessrule/numattempts',
@@ -3088,7 +3151,7 @@ $versions = array (
     array (
       'type' => 'quizaccess',
       'name' => 'offlineattempts',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/quiz/accessrule/offlineattempts',
@@ -3097,7 +3160,7 @@ $versions = array (
     array (
       'type' => 'quizaccess',
       'name' => 'openclosedate',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/quiz/accessrule/openclosedate',
@@ -3106,25 +3169,25 @@ $versions = array (
     array (
       'type' => 'quizaccess',
       'name' => 'password',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/quiz/accessrule/password',
     ),
-    'quizaccess_safebrowser' => 
+    'quizaccess_seb' => 
     array (
       'type' => 'quizaccess',
-      'name' => 'safebrowser',
-      'version' => 2019111800,
-      'has_install' => false,
+      'name' => 'seb',
+      'version' => 2020061500,
+      'has_install' => true,
       'has_upgrade' => false,
-      'relative_path' => '/mod/quiz/accessrule/safebrowser',
+      'relative_path' => '/mod/quiz/accessrule/seb',
     ),
     'quizaccess_securewindow' => 
     array (
       'type' => 'quizaccess',
       'name' => 'securewindow',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/quiz/accessrule/securewindow',
@@ -3133,7 +3196,7 @@ $versions = array (
     array (
       'type' => 'quizaccess',
       'name' => 'timelimit',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/quiz/accessrule/timelimit',
@@ -3142,7 +3205,7 @@ $versions = array (
     array (
       'type' => 'scormreport',
       'name' => 'basic',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/scorm/report/basic',
@@ -3151,7 +3214,7 @@ $versions = array (
     array (
       'type' => 'scormreport',
       'name' => 'graphs',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/scorm/report/graphs',
@@ -3160,7 +3223,7 @@ $versions = array (
     array (
       'type' => 'scormreport',
       'name' => 'interactions',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/scorm/report/interactions',
@@ -3169,7 +3232,7 @@ $versions = array (
     array (
       'type' => 'scormreport',
       'name' => 'objectives',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/scorm/report/objectives',
@@ -3178,7 +3241,7 @@ $versions = array (
     array (
       'type' => 'workshopform',
       'name' => 'accumulative',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/mod/workshop/form/accumulative',
@@ -3187,7 +3250,7 @@ $versions = array (
     array (
       'type' => 'workshopform',
       'name' => 'comments',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/mod/workshop/form/comments',
@@ -3196,7 +3259,7 @@ $versions = array (
     array (
       'type' => 'workshopform',
       'name' => 'numerrors',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/mod/workshop/form/numerrors',
@@ -3205,7 +3268,7 @@ $versions = array (
     array (
       'type' => 'workshopform',
       'name' => 'rubric',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/mod/workshop/form/rubric',
@@ -3214,7 +3277,7 @@ $versions = array (
     array (
       'type' => 'workshopallocation',
       'name' => 'manual',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/workshop/allocation/manual',
@@ -3223,7 +3286,7 @@ $versions = array (
     array (
       'type' => 'workshopallocation',
       'name' => 'random',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/mod/workshop/allocation/random',
@@ -3232,7 +3295,7 @@ $versions = array (
     array (
       'type' => 'workshopallocation',
       'name' => 'scheduled',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/mod/workshop/allocation/scheduled',
@@ -3241,7 +3304,7 @@ $versions = array (
     array (
       'type' => 'workshopeval',
       'name' => 'best',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => false,
       'relative_path' => '/mod/workshop/eval/best',
@@ -3250,7 +3313,7 @@ $versions = array (
     array (
       'type' => 'atto',
       'name' => 'accessibilitychecker',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/atto/plugins/accessibilitychecker',
@@ -3259,7 +3322,7 @@ $versions = array (
     array (
       'type' => 'atto',
       'name' => 'accessibilityhelper',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/atto/plugins/accessibilityhelper',
@@ -3268,7 +3331,7 @@ $versions = array (
     array (
       'type' => 'atto',
       'name' => 'align',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/atto/plugins/align',
@@ -3277,7 +3340,7 @@ $versions = array (
     array (
       'type' => 'atto',
       'name' => 'backcolor',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/atto/plugins/backcolor',
@@ -3286,7 +3349,7 @@ $versions = array (
     array (
       'type' => 'atto',
       'name' => 'bold',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/atto/plugins/bold',
@@ -3295,7 +3358,7 @@ $versions = array (
     array (
       'type' => 'atto',
       'name' => 'charmap',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/atto/plugins/charmap',
@@ -3304,7 +3367,7 @@ $versions = array (
     array (
       'type' => 'atto',
       'name' => 'clear',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/atto/plugins/clear',
@@ -3313,7 +3376,7 @@ $versions = array (
     array (
       'type' => 'atto',
       'name' => 'collapse',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/atto/plugins/collapse',
@@ -3322,7 +3385,7 @@ $versions = array (
     array (
       'type' => 'atto',
       'name' => 'emojipicker',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/atto/plugins/emojipicker',
@@ -3331,7 +3394,7 @@ $versions = array (
     array (
       'type' => 'atto',
       'name' => 'emoticon',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/atto/plugins/emoticon',
@@ -3340,7 +3403,7 @@ $versions = array (
     array (
       'type' => 'atto',
       'name' => 'equation',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/atto/plugins/equation',
@@ -3349,7 +3412,7 @@ $versions = array (
     array (
       'type' => 'atto',
       'name' => 'fontcolor',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/atto/plugins/fontcolor',
@@ -3358,7 +3421,7 @@ $versions = array (
     array (
       'type' => 'atto',
       'name' => 'h5p',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/atto/plugins/h5p',
@@ -3367,7 +3430,7 @@ $versions = array (
     array (
       'type' => 'atto',
       'name' => 'html',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/atto/plugins/html',
@@ -3376,7 +3439,7 @@ $versions = array (
     array (
       'type' => 'atto',
       'name' => 'image',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/atto/plugins/image',
@@ -3385,7 +3448,7 @@ $versions = array (
     array (
       'type' => 'atto',
       'name' => 'indent',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/atto/plugins/indent',
@@ -3394,7 +3457,7 @@ $versions = array (
     array (
       'type' => 'atto',
       'name' => 'italic',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/atto/plugins/italic',
@@ -3403,7 +3466,7 @@ $versions = array (
     array (
       'type' => 'atto',
       'name' => 'link',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/atto/plugins/link',
@@ -3412,7 +3475,7 @@ $versions = array (
     array (
       'type' => 'atto',
       'name' => 'managefiles',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/atto/plugins/managefiles',
@@ -3421,7 +3484,7 @@ $versions = array (
     array (
       'type' => 'atto',
       'name' => 'media',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/atto/plugins/media',
@@ -3430,7 +3493,7 @@ $versions = array (
     array (
       'type' => 'atto',
       'name' => 'noautolink',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/atto/plugins/noautolink',
@@ -3439,7 +3502,7 @@ $versions = array (
     array (
       'type' => 'atto',
       'name' => 'orderedlist',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/atto/plugins/orderedlist',
@@ -3448,7 +3511,7 @@ $versions = array (
     array (
       'type' => 'atto',
       'name' => 'recordrtc',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/atto/plugins/recordrtc',
@@ -3457,7 +3520,7 @@ $versions = array (
     array (
       'type' => 'atto',
       'name' => 'rtl',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/atto/plugins/rtl',
@@ -3466,7 +3529,7 @@ $versions = array (
     array (
       'type' => 'atto',
       'name' => 'strike',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/atto/plugins/strike',
@@ -3475,7 +3538,7 @@ $versions = array (
     array (
       'type' => 'atto',
       'name' => 'subscript',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/atto/plugins/subscript',
@@ -3484,7 +3547,7 @@ $versions = array (
     array (
       'type' => 'atto',
       'name' => 'superscript',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/atto/plugins/superscript',
@@ -3493,7 +3556,7 @@ $versions = array (
     array (
       'type' => 'atto',
       'name' => 'table',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/atto/plugins/table',
@@ -3502,7 +3565,7 @@ $versions = array (
     array (
       'type' => 'atto',
       'name' => 'title',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/atto/plugins/title',
@@ -3511,7 +3574,7 @@ $versions = array (
     array (
       'type' => 'atto',
       'name' => 'underline',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/atto/plugins/underline',
@@ -3520,7 +3583,7 @@ $versions = array (
     array (
       'type' => 'atto',
       'name' => 'undo',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/atto/plugins/undo',
@@ -3529,7 +3592,7 @@ $versions = array (
     array (
       'type' => 'atto',
       'name' => 'unorderedlist',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/atto/plugins/unorderedlist',
@@ -3538,7 +3601,7 @@ $versions = array (
     array (
       'type' => 'tinymce',
       'name' => 'ctrlhelp',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/tinymce/plugins/ctrlhelp',
@@ -3547,7 +3610,7 @@ $versions = array (
     array (
       'type' => 'tinymce',
       'name' => 'managefiles',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/tinymce/plugins/managefiles',
@@ -3556,7 +3619,7 @@ $versions = array (
     array (
       'type' => 'tinymce',
       'name' => 'moodleemoticon',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/tinymce/plugins/moodleemoticon',
@@ -3565,7 +3628,7 @@ $versions = array (
     array (
       'type' => 'tinymce',
       'name' => 'moodleimage',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/tinymce/plugins/moodleimage',
@@ -3574,7 +3637,7 @@ $versions = array (
     array (
       'type' => 'tinymce',
       'name' => 'moodlemedia',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/tinymce/plugins/moodlemedia',
@@ -3583,7 +3646,7 @@ $versions = array (
     array (
       'type' => 'tinymce',
       'name' => 'moodlenolink',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/tinymce/plugins/moodlenolink',
@@ -3592,7 +3655,7 @@ $versions = array (
     array (
       'type' => 'tinymce',
       'name' => 'pdw',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/tinymce/plugins/pdw',
@@ -3601,7 +3664,7 @@ $versions = array (
     array (
       'type' => 'tinymce',
       'name' => 'spellchecker',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/tinymce/plugins/spellchecker',
@@ -3610,7 +3673,7 @@ $versions = array (
     array (
       'type' => 'tinymce',
       'name' => 'wrap',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/lib/editor/tinymce/plugins/wrap',
@@ -3619,7 +3682,7 @@ $versions = array (
     array (
       'type' => 'logstore',
       'name' => 'database',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => true,
       'relative_path' => '/admin/tool/log/store/database',
@@ -3628,7 +3691,7 @@ $versions = array (
     array (
       'type' => 'logstore',
       'name' => 'legacy',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => false,
       'has_upgrade' => false,
       'relative_path' => '/admin/tool/log/store/legacy',
@@ -3637,7 +3700,7 @@ $versions = array (
     array (
       'type' => 'logstore',
       'name' => 'standard',
-      'version' => 2019111800,
+      'version' => 2020061500,
       'has_install' => true,
       'has_upgrade' => true,
       'relative_path' => '/admin/tool/log/store/standard',

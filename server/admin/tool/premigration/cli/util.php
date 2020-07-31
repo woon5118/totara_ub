@@ -26,6 +26,11 @@ use tool_premigration\local\util;
 define('CLI_SCRIPT', true);
 define('MOODLE_PREMIGRATION_SCRIPT', true);
 define('NO_UPGRADE_CHECK', true);
+define('CACHE_DISABLE_ALL', true);
+
+if (function_exists('opcache_reset')) {
+    opcache_reset();
+}
 
 require(__DIR__ . '/../../../../config.php');
 require_once($CFG->libdir.'/clilib.php');

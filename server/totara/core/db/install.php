@@ -518,6 +518,14 @@ function xmldb_totara_core_install() {
     // Conditionally launch create table for badge_external_backpack.
     if (!$dbman->table_exists($table)) {
         $dbman->create_table($table);
+    } else {
+        $tablebadgeexternalbackpack = new xmldb_table('badge_external_backpack');
+        $fieldoauth2issuerid = new xmldb_field('oauth2_issuerid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'password');
+        $keybackpackoauth2key = new xmldb_key('backpackoauth2key', XMLDB_KEY_FOREIGN, ['oauth2_issuerid'], 'oauth2_issuer', ['id']);
+        if (!$dbman->field_exists($tablebadgeexternalbackpack, $fieldoauth2issuerid)) {
+            $dbman->add_field($tablebadgeexternalbackpack, $fieldoauth2issuerid);
+            $dbman->add_key($tablebadgeexternalbackpack, $keybackpackoauth2key);
+        }
     }
 
     // Define field entityid to be added to badge_external.
