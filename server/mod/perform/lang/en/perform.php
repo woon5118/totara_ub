@@ -473,6 +473,8 @@ $string['sync_track_schedule_task'] = 'Synchronize assignment schedules for perf
 $string['system_activity_type:appraisal'] = 'Appraisal';
 $string['system_activity_type:check-in'] = 'Check-in';
 $string['system_activity_type:feedback'] = 'Feedback';
+$string['teams_page_response_report_line'] = 'Their current and historical performance records are available for you to {$a}.';
+$string['teams_page_response_report_link'] = 'view or export';
 $string['template_instance_created_appraiser_body'] = 'As $subject full name$’s $relationship name$, you have been selected to participate in the following activity:
 
 $Activity name$/$Activity type$

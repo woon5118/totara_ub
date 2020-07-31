@@ -40,9 +40,15 @@ Feature: Test viewing Performance activity response data
     When I click on "Performance activity response data (export)" "link"
     Then I should see "Performance activity response data"
 
-  Scenario: I can navigate to users specific report from the teams pages
+  Scenario: I can navigate to users specific report and the main page from the teams page
     Given I log in as "manager"
     And I click on "Team" in the totara menu
 
     When I click on "Performance data" "link"
     Then I should see "Performance data for John One"
+
+    When I am on "Team" page
+    Then I should see "Their current and historical performance records are available for you to view or export"
+
+    When I click on "view or export" "link"
+    Then I should see "Performance activity response data"
