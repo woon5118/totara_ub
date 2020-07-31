@@ -24,6 +24,7 @@
 
 namespace totara_webapi;
 
+use coding_exception;
 use core\webapi\interface_resolver;
 use core\webapi\type_resolver;
 use core_component;
@@ -190,26 +191,46 @@ class schema_builder {
      */
     protected function add_support_for_union_types(Schema $schema) {
         $unions = \core_component::get_namespace_classes('webapi\resolver\union', 'core\webapi\union_resolver');
-        foreach ($unions as $classname) {
-            $parts = explode('\\', $classname);
+        foreach ($unions as $class_name) {
+            $parts = explode('\\', $class_name);
             $component = reset($parts);
             $name = end($parts);
-            $unionname = $component . '_' . $name;
-            $type = $schema->getType($unionname);
+            $union_name = $component . '_' . $name;
+            $union_type = $schema->getType($union_name);
+            if (!$union_type) {
+                throw new coding_exception(
+                    "Union type '{$union_name}' is not defined in GraphQL schema",
+                    DEBUG_DEVELOPER
+                );
+            }
 
-            $type->config['resolveType'] = function ($object_value, $context, ResolveInfo $info) use ($classname, $schema) {
-                 $typestr = call_user_func_array([$classname, 'resolve_type'], [$object_value, $context, $info]);
+            $union_type->config['resolveType'] = function (
+                $object_value,
+                $context,
+                ResolveInfo $info
+            ) use ($union_name, $class_name, $schema) {
+                 $type_class_name = call_user_func_array([$class_name, 'resolve_type'], [$object_value, $context, $info]);
 
                 // Not an existing type resolver class return returned.
-                if (!class_exists($typestr) || !is_subclass_of($typestr, type_resolver::class)) {
-                    throw new \coding_exception('Invalid type resolver class returned');
+                if (!class_exists($type_class_name) || !is_subclass_of($type_class_name, type_resolver::class)) {
+                    throw new coding_exception('Invalid type resolver class returned');
                 }
 
-                $parts = explode("\\", $typestr);
+                $parts = explode("\\", $type_class_name);
                 $component = reset($parts);
                 $innertype = array_pop($parts);
 
-                return $schema->getType("{$component}_{$innertype}");
+                $type_name = "{$component}_{$innertype}";
+
+                $type = $schema->getType($type_name);
+                if (!$type) {
+                    throw new coding_exception(
+                        "Concrete type '{$type_name}' returned by GraphQL union resolver '{$type_class_name}' ".
+                        "is not defined in GraphQL schema",
+                        DEBUG_DEVELOPER
+                    );
+                }
+                return $type;
             };
         }
     }
@@ -283,7 +304,7 @@ class schema_builder {
         // The core schema file comes first
         $root_schema_file = $CFG->dirroot . '/lib/webapi/schema.graphqls';
         if (!file_exists($root_schema_file) || !is_readable($root_schema_file)) {
-            throw new \coding_exception('Core has to have at least a schema.graphqls file');
+            throw new coding_exception('Core has to have at least a schema.graphqls file');
         }
 
         $content = file_get_contents($root_schema_file);
