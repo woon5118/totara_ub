@@ -44,12 +44,14 @@ trait has_report {
      * @param string $shortname shortname of the report
      * @param array|null $extra_data Optional extra embed data
      * @param bool $trigger_report_viewed_event by default the \totara_reportbuilder\event\report_viewed event being triggered, set to false to omit this behaviour
+     * @param bool $prevent_export If true, report won't export even if 'format' param is set.
      * @return reportbuilder
      */
     protected function load_embedded_report(
         string $shortname,
         array $extra_data = [],
-        bool $trigger_report_viewed_event = true
+        bool $trigger_report_viewed_event = true,
+        bool $prevent_export = false
     ): reportbuilder {
         global $CFG, $DB;
         require_once($CFG->dirroot.'/totara/reportbuilder/lib.php');
@@ -69,7 +71,7 @@ trait has_report {
 
         // Handle exporting the report
         $format = $this->get_optional_param('format', null, PARAM_ALPHANUMEXT);
-        if ($format != '') {
+        if (!$prevent_export && $format != '') {
             $report->export_data($format);
             die();
         }
