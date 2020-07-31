@@ -5236,6 +5236,20 @@ class reportbuilder {
     }
 
     /**
+     * Return a hash representing the current active filtering on this report for currently viewing user.
+     *
+     * This can be used to tell if the search has changed from an earlier point. Note this will
+     * only work as expected when you have an active $SESSION, (so not on cron for scheduled reporting).
+     *
+     * @return string
+     */
+    public function get_search_hash(): string {
+        global $SESSION;
+        $active_filter_data = $SESSION->reportbuilder[$this->get_uniqueid()] ?? '';
+        return sha1(json_encode($active_filter_data));
+    }
+
+    /**
      * Is the current search the default saved search?
      *
      * @return bool
