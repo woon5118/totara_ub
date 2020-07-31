@@ -1,0 +1,145 @@
+<?php
+/*
+ * This file is part of Totara Perform
+ *
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author: Simon Coggins <simon.coggins@totaralearning.com>
+ * @package: mod_perform
+ */
+
+use mod_perform\util;
+
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+require_once($CFG->dirroot . '/mod/perform/rb_sources/rb_source_subject_instance_performance_reporting.php');
+
+class rb_subject_instance_performance_reporting_embedded extends rb_base_embedded {
+
+    public function __construct($data) {
+
+        if (!isset($data['subject_user_id'])) {
+            // TODO How to handle?
+        }
+        $this->url = '/mod/perform/reporting/performance/user.php';
+        $this->source = 'subject_instance_performance_reporting';
+        $this->shortname = 'subject_instance_performance_reporting';
+        $this->fullname = get_string('embedded_subject_instance_performance_reporting', 'mod_perform');
+        $this->columns = $this->define_columns();
+        $this->filters = $this->define_filters();
+        // TODO use default_sort column
+        // $this->defaultsortcolumn = '';
+
+        if (isset($data['subject_user_id'])) {
+            $this->embeddedparams['subject_user_id'] = $data['subject_user_id'];
+        }
+
+        parent::__construct();
+    }
+
+    /**
+     * Define the default columns for this report.
+     *
+     * @return array
+     */
+    protected function define_columns() {
+        return [
+            [
+                'type' => 'activity',
+                'value' => 'name',
+                'heading' => get_string('activity_name', 'mod_perform'),
+            ],
+            [
+                'type' => 'subject_instance',
+                'value' => 'created_at',
+                'heading' => get_string('created_at', 'mod_perform'),
+            ],
+            [
+                'type' => 'subject_instance',
+                'value' => 'progress',
+                'heading' => get_string('subject_progress', 'mod_perform'),
+            ],
+            [
+                'type' => 'subject_instance',
+                'value' => 'availability',
+                'heading' => get_string('subject_availability', 'mod_perform'),
+            ],
+            [
+                'type' => 'subject_instance',
+                'value' => 'actions',
+                'heading' => get_string('actions', 'mod_perform'),
+            ],
+        ];
+    }
+
+    /**
+     * Define the default filters for this report.
+     *
+     * @return array
+     */
+    protected function define_filters() {
+        return [
+            [
+                'type' => 'activity',
+                'value' => 'name',
+            ],
+            [
+                'type' => 'subject_instance',
+                'value' => 'progress',
+            ],
+            [
+                'type' => 'subject_instance',
+                'value' => 'availability',
+            ],
+            [
+                'type' => 'subject_instance',
+                'value' => 'created_at',
+            ],
+        ];
+    }
+
+    /**
+     * Clarify if current embedded report support global report restrictions.
+     * Override to true for reports that support GRR
+     *
+     * @return boolean
+     */
+    public function embedded_global_restrictions_supported() {
+        return true;
+    }
+
+    /**
+     * Can searches be saved?
+     *
+     * @return bool
+     */
+    public static function is_search_saving_allowed(): bool {
+        return false;
+    }
+
+    /**
+     * Check if the user is capable of accessing this report.
+     *
+     * @param int $reportfor userid of the user that this report is being generated for
+     * @param reportbuilder $report the report object - can use get_param_value to get params
+     * @return boolean true if the user can access this report
+     */
+    public function is_capable($reportfor, $report): bool {
+        $subject_user_id = $report->get_param_value('subject_user_id');
+        return util::can_report_on_user($subject_user_id, $reportfor);
+    }
+}

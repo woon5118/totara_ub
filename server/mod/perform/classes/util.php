@@ -298,4 +298,74 @@ class util {
         $subject_user_context = context_user::instance($subject_user_id);
         return access::has_capability('mod/perform:report_on_subject_responses', $subject_user_context, $user_id);
     }
+
+    public static function get_reportable_activities(int $user_id) {
+        if (static::has_report_on_all_subjects_capability($user_id)) {
+            return activity_entity::repository()
+                ->filter_by_visible()
+                ->order_by('id')
+                ->get()
+                ->map_to(activity::class);
+        }
+
+        // Early exit if they can not even potentially report on any subjects
+        if (!has_capability_in_any_context('mod/perform:report_on_subject_responses')) {
+            return new collection();
+        }
+
+        $reportable_users = self::get_permitted_users($user_id, 'mod/perform:report_on_subject_responses');
+
+        return activity_entity::repository()->find_by_subject_user_id(...$reportable_users)->map_to(activity::class);
+    }
+
+    /**
+     * @param int $subject_user_id
+     * @param int $viewing_user_id
+     * @return bool
+     * @throws \coding_exception
+     */
+    public static function can_report_on_user(int $subject_user_id, int $viewing_user_id) {
+        if (empty($subject_user_id) || empty($viewing_user_id)) {
+            return false;
+        }
+
+        if (static::has_report_on_all_subjects_capability($viewing_user_id)) {
+            return true;
+        }
+
+        $subject_user_context = \context_user::instance($subject_user_id);
+        return has_capability('mod/perform:report_on_subject_responses', $subject_user_context, $viewing_user_id);
+    }
+
+    /**
+     * Return SQL and params to apply to an SQL query in order to filter to only users where the viewing
+     * user can see performance data belonging to the subject user.
+     *
+     * @param int $report_for User ID of user who is viewing
+     * @param string $user_id_field String referencing database column containing user ids to filter.
+     * @return array Array containing SQL string and array of params
+     * @throws \coding_exception
+     * @throws \dml_exception
+     */
+    public static function get_report_on_subjects_sql(int $report_for, string $user_id_field) {
+        global $DB;
+
+        // If user can manage participation across all users don't do the per-row restriction at all.
+        $user_context = \context_user::instance($report_for);
+        if (has_capability('mod/perform:report_on_all_subjects_responses', $user_context, $report_for)) {
+            return ['1=1', []];
+        }
+
+        $capability = 'mod/perform:report_on_subject_responses';
+        $permitted_users = self::get_permitted_users($report_for, $capability);
+
+        if (empty($permitted_users)) {
+            // No access at all if not permitted to see any users.
+            return ['1=0', []];
+        }
+
+        // Restrict to specific subject users.
+        list($sourcesql, $sourceparams) = $DB->get_in_or_equal($permitted_users, SQL_PARAMS_NAMED);
+        return ["{$user_id_field} {$sourcesql}", $sourceparams];
+    }
 }

@@ -24,15 +24,20 @@
 namespace mod_perform\controllers\reporting\performance;
 
 use context;
+use context_coursecat;
 use context_system;
 use core\entities\user;
 use mod_perform\controllers\perform_controller;
 use mod_perform\util;
+use mod_perform\views\embedded_report_view;
+use mod_perform\views\override_nav_breadcrumbs;
 use moodle_url;
 use required_capability_exception;
+use totara_mvc\has_report;
 
 class activity_response_data extends perform_controller {
     use activity_response_data_tabs;
+    use has_report;
 
     /** @var string URL used in menu */
     public const URL =  '/mod/perform/reporting/performance/index.php';
@@ -43,7 +48,8 @@ class activity_response_data extends perform_controller {
     private $current_tab;
 
     public function setup_context(): context {
-        return context_system::instance();
+        $category_id = util::get_default_category_id();
+        return context_coursecat::instance($category_id);
     }
 
     public static function get_base_url(): string {
@@ -59,8 +65,43 @@ class activity_response_data extends perform_controller {
 
         $this->current_tab = 'by_user';
 
-        // TODO: Replace with embedded_report_view with correct template and data
-        return $this->render_dummy_page();
+        $url = static::get_base_url() . 'activity_responses_' . $this->current_tab . '.php';
+        $this->set_url(new moodle_url($url));
+
+        $data = [
+            'tabs' => self::get_activity_response_data_tabs($this->current_tab),
+            'page_heading' => get_string('performance_activity_response_data_heading', 'mod_perform'),
+        ];
+        $debug = $this->get_optional_param('debug', 0, PARAM_INT);
+
+        /** @var \reportbuilder $report */
+        $report = $this->load_embedded_report('user_performance_reporting');
+
+        $new_heading = get_string("subject_users_number_shown",
+            'mod_perform', $report->get_filtered_count()
+        );
+
+        /** @var embedded_report_view $report_view */
+        $report_view = embedded_report_view::create_from_report($report, $debug, 'mod_perform/performance_reporting')
+            ->add_override(new override_nav_breadcrumbs())
+            ->set_title($new_heading);
+        $report_view->set_additional_data($data);
+        $report_renderer = $report_view->get_page()->get_renderer('totara_reportbuilder');
+
+        // We want to replace the default report heading but want to keep any reporting amd, etc.
+        // Thus making use of the existing report_heading template
+        $rendered_heading = $report_renderer->render_from_template(
+            'totara_reportbuilder/report_heading',
+            [
+                'reportid' => $report->get_id(),
+                'heading' => $new_heading,
+                'fullname' => $report->fullname,
+            ]
+        );
+
+        $report_view->set_report_heading($rendered_heading);
+
+        return $report_view;
     }
 
     public function action_by_content() {

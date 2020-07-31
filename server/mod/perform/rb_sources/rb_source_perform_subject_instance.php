@@ -325,6 +325,10 @@ class rb_source_perform_subject_instance extends rb_base_source {
                 'track.activity_id',
                 'track'
             ),
+            new rb_param_option(
+                'subject_user_id',
+                'base.subject_user_id'
+            ),
         ];
         return $paramoptions;
     }

@@ -1,0 +1,101 @@
+<?php
+/*
+ * This file is part of Totara Perform
+ *
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author: Simon Coggins <simon.coggins@totaralearning.com>
+ * @package: mod_perform
+ */
+
+use mod_perform\util;
+
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+require_once(__DIR__ . '/rb_source_perform_subject_instance.php');
+
+/**
+ * Subject instance for performance reporting.
+ *
+ * Class rb_source_subject_instance_performance_reporting
+ */
+class rb_source_subject_instance_performance_reporting extends rb_source_perform_subject_instance {
+
+    /**
+     * Constructor.
+     *
+     * @param mixed $groupid
+     * @param rb_global_restriction_set|null $globalrestrictionset
+     * @throws coding_exception
+     */
+    public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
+        parent::__construct($groupid, $globalrestrictionset);
+
+        $this->sourcetitle = get_string('sourcetitle', 'rb_source_subject_instance_performance_reporting');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_subject_instance_performance_reporting');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_subject_instance_performance_reporting');
+
+        // This source is not available for user selection - it is used by the embedded report only.
+        $this->selectable = false;
+    }
+
+    /**
+     * Use post_config() to add restrictions based on the viewing user. Must be done here as viewing user not known until
+     * after config is finalised.
+     *
+     * @param reportbuilder $report
+     * @throws coding_exception
+     * @throws dml_exception
+     */
+    public function post_config(reportbuilder $report) {
+        $restrictions = util::get_report_on_subjects_sql($report->reportfor, "base.subject_user_id");
+        $report->set_post_config_restrictions($restrictions);
+    }
+
+    protected function define_columnoptions() {
+        $columnoptions = parent::define_columnoptions();
+
+        $columnoptions[] = new rb_column_option(
+            'activity',
+            'nameviewformlink',
+            get_string('activity_name_linked_to_view_form', 'mod_perform'),
+            "perform.name",
+            [
+                'displayfunc' => 'subject_instance_name_linked_to_view_form',
+                'extrafields' => [
+                    'subject_instance_id' => "base.id"
+                ],
+                'defaultheading' => get_string('activity_name', 'mod_perform'),
+                'nosort' => true,
+                'joins' => 'perform',
+            ]
+        );
+        $columnoptions[] = new rb_column_option(
+            'subject_instance',
+            'actions',
+            get_string('actions', 'mod_perform'),
+            "base.id",
+            [
+                'displayfunc' => 'subject_instance_reporting_actions',
+                'noexport' => true,
+                'nosort' => true,
+            ]
+        );
+
+        return $columnoptions;
+    }
+}

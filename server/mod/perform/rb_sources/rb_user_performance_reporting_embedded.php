@@ -17,37 +17,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author: Oleg Demeshev <oleg.demeshev@totaralearning.com>
+ * @author: Simon Coggins <simon.coggins@totaralearning.com>
  * @package: mod_perform
  */
 
+use mod_perform\util;
+
 defined('MOODLE_INTERNAL') || die();
 
-use mod_perform\models\activity\subject_instance;
-
 global $CFG;
-require_once($CFG->dirroot . '/mod/perform/rb_sources/rb_source_perform_participant_instance.php');
+require_once($CFG->dirroot . '/mod/perform/rb_sources/rb_source_user_performance_reporting.php');
 
-class rb_perform_participant_instance_embedded extends rb_base_embedded {
-
-    /**
-     * @var string {report_builder}.defaultsortcolumn
-     */
-    public $defaultsortcolumn = '';
+class rb_user_performance_reporting_embedded extends rb_base_embedded {
 
     public function __construct($data) {
-        $this->url = '/mod/perform/reporting/participation/participants.php';
-        $this->source = 'perform_participant_instance';
-        $this->shortname = 'perform_participant_instance';
-        $this->fullname = get_string('embedded_perform_participant_instance', 'mod_perform');
+
+        $this->url = '/mod/perform/reporting/performance/activity_responses_by_user.php';
+        $this->source = 'user_performance_reporting';
+        $this->shortname = 'user_performance_reporting';
+        $this->fullname = get_string('embedded_user_performance_reporting', 'mod_perform');
         $this->columns = $this->define_columns();
         $this->filters = $this->define_filters();
-        // TODO use default_sort column
-        $this->defaultsortcolumn = 'user_namelink';
-
-        if (isset($data['subject_instance_id']) && (int)$data['subject_instance_id'] > 0) {
-            $this->embeddedparams['subject_instance_id'] = $data['subject_instance_id'];
-        }
+        $this->defaultsortcolumn = 'user_fullname';
 
         parent::__construct();
     }
@@ -58,7 +49,33 @@ class rb_perform_participant_instance_embedded extends rb_base_embedded {
      * @return array
      */
     protected function define_columns() {
-        return \rb_source_perform_participant_instance::get_default_columns();
+        return [
+            [
+                'type' => 'user',
+                'value' => 'name_linked_to_performance_reporting',
+                'heading' => get_string('subject_user', 'mod_perform'),
+            ],
+            [
+                'type' => 'user',
+                'value' => 'email',
+                'heading' => get_string('email', 'moodle'),
+            ],
+            [
+                'type' => 'user',
+                'value' => 'username',
+                'heading' => get_string('username', 'moodle'),
+            ],
+            [
+                'type' => 'user',
+                'value' => 'idnumber',
+                'heading' => get_string('idnumber', 'moodle'),
+            ],
+            [
+                'type' => 'user',
+                'value' => 'user_performance_reporting_actions',
+                'heading' => get_string('actions', 'mod_perform'),
+            ],
+        ];
     }
 
     /**
@@ -67,7 +84,25 @@ class rb_perform_participant_instance_embedded extends rb_base_embedded {
      * @return array
      */
     protected function define_filters() {
-        return \rb_source_perform_participant_instance::get_default_filters();
+        return [
+            [
+                'type' => 'user',
+                'value' => 'fullname',
+            ],
+            // TODO add position and org
+            [
+                'type' => 'user',
+                'value' => 'email',
+            ],
+            [
+                'type' => 'user',
+                'value' => 'username',
+            ],
+            [
+                'type' => 'user',
+                'value' => 'idnumber',
+            ],
+        ];
     }
 
     /**
@@ -95,16 +130,8 @@ class rb_perform_participant_instance_embedded extends rb_base_embedded {
      * @param int $reportfor userid of the user that this report is being generated for
      * @param reportbuilder $report the report object - can use get_param_value to get params
      * @return boolean true if the user can access this report
-     * @throws moodle_exception
      */
     public function is_capable($reportfor, $report): bool {
-        $subject_instance_id = $report->get_param_value('subject_instance_id') ?? 0;
-        try {
-            $si = subject_instance::load_by_id($subject_instance_id);
-        } catch (\Exception $e) {
-            throw new moodle_exception('error_subject_instance_id_wrong', 'mod_perform', '', null, $e);
-        }
-        $context = $si->get_context();
-        return has_capability('mod/perform:view_participation_reporting', $context, $reportfor);
+        return util::can_potentially_report_on_subjects($reportfor);
     }
 }
