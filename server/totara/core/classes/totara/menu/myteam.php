@@ -60,10 +60,6 @@ class myteam extends item {
         return $cache;
     }
 
-    protected function get_default_parent() {
-        return '\totara_core\totara\menu\perform';
-    }
-
     public function is_disabled() {
         return advanced_feature::is_disabled('myteam');
     }
