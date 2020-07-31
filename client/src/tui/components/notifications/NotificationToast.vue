@@ -12,17 +12,18 @@
   LTD, you may not access, use, modify, or distribute this software.
   Please contact [licensing@totaralearning.com] for more information.
 
-  @author Simon Chester <simon.chester@totaralearning.com>
-  @module tui
+  @author Arshad Anwer <arshad.anwer@totaralearning.com>
+  @module totara_core
 -->
 
 <template>
   <div
-    v-if="!dismissed"
-    class="tui-notificationBanner"
-    :class="'tui-notificationBanner--' + type"
+    class="tui-notificationToast"
+    :class="{
+      ['tui-notificationToast--' + type]: type,
+    }"
   >
-    <div class="tui-notificationBanner__icon">
+    <div class="tui-notificationToast__icon">
       <component
         :is="iconForType"
         :alt="labelForIconType + ': '"
@@ -30,14 +31,10 @@
         :size="200"
       />
     </div>
-    <div class="tui-notificationBanner__message" v-html="message" />
-    <div
-      v-if="isDismissable"
-      class="tui-notificationBanner__dismiss"
-      aria-hidden="true"
-    >
+    <div class="tui-notificationToast__message" v-html="message" />
+    <div class="tui-notificationToast__dismiss" aria-hidden="true">
       <CloseButton
-        class="tui-notificationBanner__dismiss_button"
+        class="tui-notificationToast__dismiss_button"
         @click="dismiss"
       />
     </div>
@@ -65,32 +62,15 @@ export default {
   },
 
   props: {
-    dismissable: Boolean,
     message: String,
-    selfDismiss: Boolean,
     type: {
       type: String,
       default: 'info',
-      validator: val => ['info', 'success', 'warning', 'error'].includes(val),
+      validator: val => ['success', 'error'].includes(val),
     },
-  },
-
-  data() {
-    return {
-      dismissed: false,
-    };
   },
 
   computed: {
-    /**
-     * Check if the notification can be manualy closed
-     *
-     * @returns {boolean}
-     */
-    isDismissable() {
-      return this.dismissable || this.selfDismiss;
-    },
-
     /**
      * Return icon component for the type of notification
      *
@@ -124,12 +104,7 @@ export default {
      *
      */
     dismiss() {
-      if (this.dismissable) {
-        this.$emit('dismiss');
-      }
-      if (this.selfDismiss) {
-        this.dismissed = true;
-      }
+      this.$emit('dismiss');
     },
   },
 };

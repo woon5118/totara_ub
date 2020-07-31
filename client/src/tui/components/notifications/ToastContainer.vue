@@ -17,80 +17,73 @@
 -->
 
 <template>
-  <div
-    class="tui-toastContainer"
-    :class="[hasItems && 'tui-toastContainer--hasItems']"
-  >
+  <div class="tui-toastContainer">
     <div class="tui-toastContainer__inner" role="status" aria-live="polite">
-      <transition-group name="tui-toastContainer__list-transition" tag="div">
-        <NotificationBanner
-          v-for="notification in activeNotifications"
-          :key="notification.id"
-          class="tui-toastContainer__list-item"
-          :dismissable="true"
-          :message="notification.message"
-          :toast="true"
-          :type="notification.type"
-          @dismiss="dismiss(notification)"
+      <transition name="tui-toastContainer__item-transition" tag="div">
+        <NotificationToast
+          v-if="activeNotification"
+          :message="activeNotification.message"
+          :type="activeNotification.type"
+          @dismiss="dismiss()"
         />
-      </transition-group>
+      </transition>
     </div>
   </div>
 </template>
 
 <script>
 // Components
-import NotificationBanner from 'tui/components/notifications/NotificationBanner';
+import NotificationToast from 'tui/components/notifications/NotificationToast';
 // Util
-import { pull, uniqueId } from 'tui/util';
+import { uniqueId } from 'tui/util';
 
 export default {
   components: {
-    NotificationBanner,
+    NotificationToast,
   },
 
   data() {
     return {
-      activeNotifications: [],
+      activeNotification: null,
     };
-  },
-
-  computed: {
-    /**
-     * Check if there are active notifications
-     *
-     * @return {Boolean}
-     */
-    hasItems() {
-      return this.activeNotifications.length > 0;
-    },
   },
 
   methods: {
     /**
-     * Add notification to activeNotifications array
-     * Called from tui/notifications
+     * Add notification to activeNotification
+     * Called from totara_core/notifications
      *
      * @param {Object} options
      */
     addNotification(options) {
       options = Object.assign({}, options, { id: uniqueId() });
-      this.activeNotifications.push(options);
+      this.clearTimeout();
+      this.activeNotification = options;
+
       if (options.duration != null) {
-        setTimeout(
-          () => pull(this.activeNotifications, options),
+        this.timeout = setTimeout(
+          () => (this.activeNotification = null),
           options.duration
         );
       }
     },
 
     /**
-     * Remove notification from active array (and UI)
+     * Clear previous timer if exists
+     */
+    clearTimeout() {
+      if (this.timeout) {
+        clearTimeout(this.timeout);
+      }
+    },
+
+    /**
+     * Remove notification from active object (and UI)
      *
      * @param {Object} notification
      */
-    dismiss(notification) {
-      pull(this.activeNotifications, notification);
+    dismiss() {
+      this.activeNotification = null;
     },
   },
 };

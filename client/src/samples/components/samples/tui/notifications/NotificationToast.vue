@@ -28,18 +28,16 @@
     <SamplesPropCtl>
       <FormRow v-slot="{ labelId }" label="Type">
         <RadioGroup v-model="type" :horizontal="true">
-          <Radio value="info">Info</Radio>
           <Radio value="success">Success</Radio>
-          <Radio value="warning">Warning</Radio>
           <Radio value="error">Error</Radio>
         </RadioGroup>
       </FormRow>
 
       <FormRow v-slot="{ labelId }" label="Duration">
         <RadioGroup v-model="duration" :horizontal="true">
-          <Radio value="500">0.5 seconds</Radio>
           <Radio value="5000">5 seconds</Radio>
           <Radio value="10000">10 seconds</Radio>
+          <Radio value="50000">50 seconds</Radio>
         </RadioGroup>
       </FormRow>
 
@@ -80,8 +78,8 @@ export default {
 
   data() {
     return {
-      type: 'info',
-      duration: 5000,
+      type: 'success',
+      duration: 10000,
       message: 'bla bla bla',
       codeTemplate: `// Example Trigger
 <Button text="Trigger Notification" @click="triggerNotification" />`,

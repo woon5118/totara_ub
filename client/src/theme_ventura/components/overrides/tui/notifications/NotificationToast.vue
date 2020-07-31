@@ -12,15 +12,15 @@
   LTD, you may not access, use, modify, or distribute this software.
   Please contact [licensing@totaralearning.com] for more information.
 
-  @author Simon Chester <simon.chester@totaralearning.com>
+  @author Arshad Anwer <arshad.anwer@totaralearning.com>
   @module theme_ventura
 -->
 
 <style lang="scss">
-@mixin tui-notification-banner-color($name, $color) {
-  .tui-notificationBanner {
+@mixin tui-notification-toast-color($name, $color) {
+  .tui-notificationToast {
     &--#{$name} {
-      border-color: $color;
+      background: $color;
     }
 
     &--#{$name} &__icon {
@@ -29,19 +29,20 @@
   }
 }
 
-.tui-notificationBanner {
+.tui-notificationToast {
   @include tui-font-body-small();
 
   display: flex;
-  background-color: var(--tui-color-background);
-  border: var(--tui-border-width-thin) solid var(--tui-color-prompt-info);
+  color: var(--tui-toast-color-text);
+  background-color: var(--tui-color-prompt-success);
   border-radius: var(--tui-border-radius-small);
+  box-shadow: var(--tui-shadow-3);
 
   &__icon {
     display: flex;
-    padding: var(--tui-gap-4);
+    padding: var(--tui-gap-4) 0 var(--tui-gap-4) var(--tui-gap-4);
     color: var(--tui-color-neutral-1);
-    background: var(--tui-color-prompt-info);
+    background: var(--tui-color-prompt-success);
     // -1px to avoid isue with razor thin white line between icon container and notification border
     border-top-left-radius: calc(
       var(--tui-border-radius-small) - var(--tui-border-width-thin) - 1px
@@ -55,31 +56,28 @@
     display: flex;
     flex: 1;
     align-items: center;
-    padding: var(--tui-gap-4) var(--tui-gap-3);
+    padding: var(--tui-gap-4) var(--tui-gap-2);
   }
 
   &__dismiss {
     display: flex;
 
     &_button {
-      color: var(--tui-color-neutral-6);
+      color: var(--tui-color-neutral-4);
+
+      &:hover {
+        color: var(--tui-color-neutral-1);
+      }
     }
   }
 }
 
-@include tui-notification-banner-color(
-  'success',
-  var(--tui-color-prompt-success)
-);
-@include tui-notification-banner-color(
-  'warning',
-  var(--tui-color-prompt-warning)
-);
-@include tui-notification-banner-color('error', var(--tui-color-prompt-alert));
+@include tui-notification-toast-color('error', var(--tui-color-prompt-alert));
 
 @media screen and (min-width: $tui-screen-sm) {
-  .tui-notificationBanner {
+  .tui-notificationToast {
     @include tui-font-body();
+    color: var(--tui-toast-color-text);
 
     border-radius: var(--tui-border-radius-normal);
 

@@ -48,9 +48,9 @@ const getContainer = memoizeLoad(async () => {
 export async function notify(options) {
   options = Object.assign(
     {
-      duration: 5000,
+      duration: 10000,
       message: '...',
-      type: 'info',
+      type: 'success',
     },
     options
   );
