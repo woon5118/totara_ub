@@ -331,6 +331,46 @@ class mod_perform_generator_testcase extends advanced_testcase {
         }
     }
 
+    public function test_create_responses() {
+        $this->setAdminUser();
+        $generator = $this->generator();
+
+        $si = $generator->create_subject_instance([
+            'activity_name' => 'Weekly catchup',
+            'subject_is_participating' => true,
+            'subject_user_id' => \core\entities\user::repository()->get()->last()->id,
+            'include_questions' => true,
+        ]);
+
+        $responses = \mod_perform\entities\activity\element_response::repository()->get();
+        $this->assertCount(0, $responses);
+
+        $generator->create_responses($si);
+
+        $responses = \mod_perform\entities\activity\element_response::repository()->get();
+        $this->assertCount(2, $responses);
+    }
+
+    public function test_create_responses_with_maximum_number() {
+        $this->setAdminUser();
+        $generator = $this->generator();
+
+        $si = $generator->create_subject_instance([
+            'activity_name' => 'Weekly catchup',
+            'subject_is_participating' => true,
+            'subject_user_id' => \core\entities\user::repository()->get()->last()->id,
+            'include_questions' => true,
+        ]);
+
+        $responses = \mod_perform\entities\activity\element_response::repository()->get();
+        $this->assertCount(0, $responses);
+
+        $generator->create_responses($si, 1);
+
+        $responses = \mod_perform\entities\activity\element_response::repository()->get();
+        $this->assertCount(1, $responses);
+    }
+
     /**
      * Gets the generator instance
      *
