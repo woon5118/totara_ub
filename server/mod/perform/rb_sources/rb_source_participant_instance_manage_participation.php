@@ -193,7 +193,7 @@ class rb_source_participant_instance_manage_participation extends rb_source_perf
             [
                 'type' => 'participant_instance',
                 'value' => 'default_sort',
-                'heading' => 'default_sort',
+                'heading' => get_string('default_sort', 'mod_perform'),
                 'hidden' => true,
             ],
         ];

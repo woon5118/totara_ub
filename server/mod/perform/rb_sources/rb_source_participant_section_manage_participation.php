@@ -170,7 +170,7 @@ class rb_source_participant_section_manage_participation extends rb_source_perfo
             [
                 'type' => 'participant_section',
                 'value' => 'default_sort',
-                'heading' => 'default_sort',
+                'heading' => get_string('default_sort', 'mod_perform'),
                 'hidden' => true,
             ],
         ];

@@ -199,7 +199,7 @@ class rb_source_subject_instance_manage_participation extends rb_source_perform_
             [
                 'type' => 'subject_instance',
                 'value' => 'default_sort',
-                'heading' => 'default_sort',
+                'heading' => get_string('default_sort', 'mod_perform'),
                 'hidden' => true,
             ],
         ];
