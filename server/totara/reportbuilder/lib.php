@@ -309,7 +309,7 @@ class reportbuilder {
 
         $report = $DB->get_record('report_builder', ['id' => $id], '*', IGNORE_MISSING);
         if (!$report) {
-            print_error('reportwithidnotfound', 'totara_reportbuilder', $id);
+            print_error('reportwithidnotfound', 'totara_reportbuilder', '', $id);
         }
 
         if ($config == null) {
@@ -362,7 +362,7 @@ class reportbuilder {
         }
 
         if (!$report) {
-            print_error('reportwithnamenotfound', 'totara_reportbuilder', $name);
+            print_error('reportwithnamenotfound', 'totara_reportbuilder', '', $name);
         }
 
         self::$preventpublicconstructor = false;
@@ -4629,7 +4629,7 @@ class reportbuilder {
                 } else {
                     $message = 'error:problemobtainingreportdata';
                 }
-                print_error($message, 'totara_reportbuilder', $e->getMessage(), $e->debuginfo);
+                print_error($message, 'totara_reportbuilder', '', $e->getMessage(), $e->debuginfo);
             }
         }
         return $this->_fullcount;
