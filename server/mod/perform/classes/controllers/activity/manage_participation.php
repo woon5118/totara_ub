@@ -59,7 +59,8 @@ class manage_participation extends perform_controller {
             $this->activity = activity::load_by_id($activity_id);
             return $this->activity->get_context();
         } else {
-            return context_system::instance();
+            $category_id = util::get_default_category_id();
+            return context_coursecat::instance($category_id);
         }
     }
 
