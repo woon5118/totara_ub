@@ -206,10 +206,9 @@ class rb_source_perform_response extends rb_base_source {
                 get_string('default_sort', 'mod_perform'),
                 // This will ensure elements are grouped by activity and order within but isn't perfect, particularly for
                 // multiple identically named activities (which we don't prevent). Having an activity.sort_order would be better.
-                // TODO add relationship.idnumber between section_element.sort_order and participant_instance.participant_id
-                $DB->sql_concat_join("' '", ['perform.name', 'perform_section.sort_order', 'section_element.sort_order', 'participant_instance.participant_id']),
+                $DB->sql_concat_join("' '", ['perform.name', 'perform_section.sort_order', 'section_element.sort_order', 'totara_core_relationship.sort_order', 'participant_instance.participant_id']),
                 [
-                    'joins' => ['perform', 'perform_section', 'section_element', 'participant_instance'],
+                    'joins' => ['perform', 'perform_section', 'section_element', 'participant_instance', 'totara_core_relationship'],
                     'hidden' => true,
                     'noexport' => true,
                     'selectable' => false,

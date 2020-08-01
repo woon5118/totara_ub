@@ -30,7 +30,6 @@ $string['close'] = 'Close';
 $string['re_open'] = 'Re-open';
 
 $string['type_activity'] = 'Performance activity';
-$string['type_core_relationship'] = 'Relationship';
 $string['type_participant_instance'] = 'Participant instance';
 $string['type_participant_section'] = 'Participant section';
 $string['type_participant_user'] = 'Participant user';

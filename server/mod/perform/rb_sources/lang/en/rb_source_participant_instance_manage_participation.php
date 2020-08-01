@@ -31,7 +31,6 @@ $string['re_open'] = 'Re-open';
 $string['sections'] = 'Sections';
 
 $string['type_activity'] = 'Performance activity';
-$string['type_core_relationship'] = 'Relationship';
 $string['type_participant_instance'] = 'Participant instance';
 $string['type_participant_user'] = 'Participant user';
 $string['type_subject_instance'] = 'Subject instance';

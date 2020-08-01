@@ -25,11 +25,8 @@ $string['sourcelabel'] = 'Participant Instance (Perform)';
 $string['sourcesummary'] = 'Participant progress in performance activities';
 $string['sourcetitle'] = 'Participant Instance (Perform)';
 
-$string['core_relationship_id'] = 'Relationship ID';
 $string['participant_name'] = 'Participant name';
-$string['relationship_in_activity'] = 'Relationship in activity';
 
-$string['type_core_relationship'] = 'Core relationship';
 $string['type_participant_instance'] = 'Participant instance';
 $string['type_participant_user'] = 'Participant user';
 $string['type_activity'] = 'Performance activity';

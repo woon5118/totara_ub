@@ -33,6 +33,8 @@ use rb_base_source;
 use rb_column_option;
 use rb_filter_option;
 use rb_join;
+use totara_core\relationship\relationship;
+use totara_core\relationship\relationship_provider;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -102,6 +104,15 @@ trait participant_instance_trait {
     protected function add_participant_instance_joins() {
         /** @var participant_instance_trait|rb_base_source $this */
         $join = $this->participant_instance_join;
+
+        $this->joinlist[] = new rb_join(
+            'totara_core_relationship',
+            'INNER',
+            '{totara_core_relationship}',
+            "{$join}.core_relationship_id = totara_core_relationship.id",
+            REPORT_BUILDER_RELATION_MANY_TO_ONE,
+            [$join]
+        );
 
         /*
          * TODO we might need something like this to ensure subject_instance join is in joinlist
@@ -210,7 +221,37 @@ trait participant_instance_trait {
             ]
         );
 
-        // TODO add relationship column(s)
+        $this->columnoptions[] = new rb_column_option(
+            'participant_instance',
+            'relationship_name',
+            get_string('relationship_name', 'mod_perform'),
+            "totara_core_relationship.idnumber",
+            [
+                'joins' => [$join, 'totara_core_relationship'],
+                'displayfunc' => 'relationship_name'
+            ]
+        );
+        $this->columnoptions[] = new rb_column_option(
+            'participant_instance',
+            'relationship_id',
+            get_string('relationship_id', 'mod_perform'),
+            "totara_core_relationship.id",
+            [
+                'joins' => [$join, 'totara_core_relationship'],
+                'displayfunc' => 'integer',
+                'selectable' => false,
+            ]
+        );
+        $this->columnoptions[] = new rb_column_option(
+            'participant_instance',
+            'relationship_sort_order',
+            get_string('relationship_sort_order', 'mod_perform'),
+            "totara_core_relationship.sort_order",
+            [
+                'joins' => [$join, 'totara_core_relationship'],
+                'displayfunc' => 'integer',
+            ]
+        );
 
         $this->add_core_user_columns($this->columnoptions, 'participant_user', 'participant_user', true);
     }
@@ -269,8 +310,29 @@ trait participant_instance_trait {
             'date'
         );
 
-        // TODO add relationship filter(s)
+        $this->filteroptions[] = new rb_filter_option(
+            'participant_instance',
+            'relationship_id',
+            get_string('relationship_name', 'mod_perform'),
+            'select',
+            [
+                'selectchoices' => $this->get_relationship_type_options(),
+                'simplemode' => true,
+            ]
+        );
 
         $this->add_core_user_filters($this->filteroptions, 'participant_user', true);
+    }
+
+    private function get_relationship_type_options() {
+        $options = [];
+        $relationships = (new relationship_provider())
+            ->filter_by_component('mod_perform', true)
+            ->get_compatible_relationships(['user_id']);
+        /** @var relationship $relationship */
+        foreach ($relationships as $relationship) {
+            $options[$relationship->id] = $relationship->get_name();
+        }
+        return $options;
     }
 }

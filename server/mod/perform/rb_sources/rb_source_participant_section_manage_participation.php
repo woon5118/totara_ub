@@ -143,9 +143,9 @@ class rb_source_participant_section_manage_participation extends rb_source_perfo
                 'heading' => get_string('subject_name', 'rb_source_perform_subject_instance')
             ],
             [
-                'type' => 'core_relationship',
-                'value' => 'class_name',
-                'heading' => get_string('relationship', 'mod_perform')
+                'type' => 'participant_instance',
+                'value' => 'relationship_name',
+                'heading' => get_string('relationship_name', 'mod_perform')
             ],
             [
                 'type' => 'participant_instance',
@@ -188,8 +188,8 @@ class rb_source_participant_section_manage_participation extends rb_source_perfo
                 'value' => 'fullname',
             ],
             [
-                'type' => 'core_relationship',
-                'value' => 'core_relationship_id',
+                'type' => 'participant_instance',
+                'value' => 'relationship_id',
             ],
             [
                 'type' => 'section',

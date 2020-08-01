@@ -44,8 +44,6 @@ class rb_source_perform_participant_section extends rb_base_source {
     use section_trait;
     use subject_instance_trait;
 
-    private $resolvers = null;
-
     /**
      * Constructor.
      *
@@ -61,8 +59,6 @@ class rb_source_perform_participant_section extends rb_base_source {
 
         // Apply global user restrictions.
         $this->add_global_report_restriction_join('base', 'user_id');
-
-        $this->resolvers = self::get_resolvers();
 
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_perform_participant_section');
         $this->sourcesummary = get_string('sourcesummary', 'rb_source_perform_participant_section');
@@ -159,22 +155,6 @@ class rb_source_perform_participant_section extends rb_base_source {
                 REPORT_BUILDER_RELATION_ONE_TO_ONE,
                 'track_user_assignment'
             ),
-            new rb_join(
-                'core_relationship',
-                'LEFT',
-                "{totara_core_relationship}",
-                'core_relationship.id = participant_instance.core_relationship_id',
-                REPORT_BUILDER_RELATION_ONE_TO_ONE,
-                'participant_instance'
-            ),
-            new rb_join(
-                'core_relationship_resolver',
-                'LEFT',
-                "{totara_core_relationship_resolver}",
-                'core_relationship_resolver.relationship_id = core_relationship.id',
-                REPORT_BUILDER_RELATION_ONE_TO_ONE,
-                'core_relationship'
-            ),
         );
 
         return $joinlist;
@@ -186,34 +166,7 @@ class rb_source_perform_participant_section extends rb_base_source {
      * @return array
      */
     protected function define_columnoptions() {
-        $columnoptions = [
-            new rb_column_option(
-                'core_relationship',
-                'class_name',
-                get_string('relationship_in_activity', 'rb_source_perform_participant_instance'),
-                'core_relationship_resolver.class_name',
-                [
-                    'joins' => ['core_relationship_resolver'],
-                    'dbdatatype' => 'char',
-                    'outputformat' => 'text',
-                    'displayfunc' => 'core_relationship',
-                ]
-            ),
-            new rb_column_option(
-                'core_relationship',
-                'core_relationship_id',
-                get_string('core_relationship_id', 'rb_source_perform_participant_instance'),
-                'participant_instance.core_relationship_id',
-                [
-                    'joins' => ['participant_instance'],
-                    'dbdatatype' => 'integer',
-                    'displayfunc' => 'integer',
-                    'outputformat' => 'integer',
-                    'hidden' => 1,
-                    'noexport' => true
-                ]
-            ),
-        ];
+        $columnoptions = [];
 
         return $columnoptions;
     }
@@ -225,33 +178,6 @@ class rb_source_perform_participant_section extends rb_base_source {
      */
     protected function define_filteroptions() {
         $filteroptions = [];
-        unset($options);
-
-        // Relationship in activity
-        $options = [];
-        foreach ($this->resolvers as $resolver) {
-            $options[$resolver->relationship_id] = $resolver->class_name::get_name();
-        }
-        if ($this->resolvers) {
-            $filteroptions[] = new rb_filter_option(
-                'core_relationship',
-                'core_relationship_id',
-                get_string('relationship_in_activity', 'rb_source_perform_participant_instance'),
-                'select',
-                [
-                    'selectchoices' => $options,
-                    'simplemode' => true,
-                ]
-            );
-        } else {
-            $filteroptions[] = new rb_filter_option(
-                'core_relationship',
-                'class_name',
-                get_string('relationship_in_activity', 'rb_source_perform_participant_instance'),
-                'text'
-            );
-        }
-        unset($options);
 
         return $filteroptions;
     }
@@ -301,9 +227,9 @@ class rb_source_perform_participant_section extends rb_base_source {
             ],
             // Participant's relationship in activity
             [
-                'type' => 'core_relationship',
-                'value' => 'class_name',
-                'heading' => get_string('relationship_in_activity', 'rb_source_perform_participant_instance'),
+                'type' => 'participant_instance',
+                'value' => 'relationship_name',
+                'heading' => get_string('relationship_name', 'mod_perform'),
             ],
             // Participant instance date created
             [
@@ -357,18 +283,11 @@ class rb_source_perform_participant_section extends rb_base_source {
                 'type' => 'participant_instance',
                 'value' => 'created_at',
             ],
+            [
+                'type' => 'participant_instance',
+                'value' => 'relationship_id',
+            ],
         ];
-        if (self::get_resolvers()) {
-            $default_filters[] = [
-                'type' => 'core_relationship',
-                'value' => 'core_relationship_id',
-            ];
-        } else {
-            $default_filters[] = [
-                'type' => 'core_relationship',
-                'value' => 'class_name',
-            ];
-        }
         return $default_filters;
     }
 
@@ -414,19 +333,6 @@ class rb_source_perform_participant_section extends rb_base_source {
      */
     public static function is_source_ignored() {
         return advanced_feature::is_disabled('performance_activities');
-    }
-
-    /**
-     * Get relationship resolvers.
-     *
-     * @return array
-     * @throws dml_exception
-     */
-    private static function get_resolvers() {
-        global $DB;
-        $sql = "SELECT tcrr.class_name, tcrr.relationship_id
-                  FROM {totara_core_relationship_resolver} tcrr";
-        return $DB->get_records_sql($sql);
     }
 
     /**
