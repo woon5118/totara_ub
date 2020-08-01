@@ -21,7 +21,6 @@
  * @package mod_perform
  */
 
-use core\entities\user;
 use core_user\output\myprofile\node;
 use core_user\output\myprofile\tree;
 use mod_perform\controllers\activity\user_activities;
@@ -72,7 +71,7 @@ function mod_perform_myprofile_navigation(tree $tree, $user, $is_current_user) {
         );
     }
 
-    if (util::can_report_on_subjects(user::logged_in()->id, $user->id)) {
+    if ($is_current_user && util::can_potentially_report_on_subjects($user->id)) {
         $tree->add_node(
             new node(
                 'miscellaneous',
