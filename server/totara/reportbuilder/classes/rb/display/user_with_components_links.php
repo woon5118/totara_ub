@@ -112,7 +112,7 @@ class user_with_components_links extends base {
         $goal_link = \html_writer::link("{$CFG->wwwroot}/totara/hierarchy/prefix/goal/mygoals.php?userid={$userid}", $goalstr);
         $evidence_link = \html_writer::link(new \moodle_url('/totara/evidence/index.php', ['user_id' => $userid]), $evidencestr);
         $perform_response_reporting_link = \html_writer::link(
-            new \moodle_url('/mod/perform/reporting/performance/user_responses.php', ['user_id' => $userid]), $performance_data
+            new \moodle_url('/mod/perform/reporting/performance/user.php', ['subject_user_id' => $userid]), $performance_data
         );
 
         $show_plan_link = advanced_feature::is_enabled('learningplans') && dp_can_view_users_plans($userid);
