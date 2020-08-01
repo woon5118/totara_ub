@@ -37,6 +37,13 @@
     * heading: String
     * name: String (TODO: Remove once page content is implemented)
     * toasts: HTML
+    * debughtml: HTML, if debug is active contains debug information
+    * restrictions: HTML, restrictions part of the report
+    * description: HTML, report description
+    * savedsearch: HTML, report saved search options output
+    * search: HTML, report filter output
+    * sidebar: HTML, report sidebar filters
+    * reporthtml: HTML, report table
 
     Example context (json):
     {
@@ -53,7 +60,17 @@
 
     {{{banner}}}
 
-    {{> totara_mvc/report}}
+    <div>
+        {{{backto}}}
+        {{{heading}}}
+        {{{debughtml}}}
+        {{{restrictions}}}
+        {{{description}}}
+        {{{savedsearch}}}
+        {{{search}}}
+        {{{sidebar}}}
+        {{{reporthtml}}}
+    </div>
 
     {{{toasts}}}
 </div>
