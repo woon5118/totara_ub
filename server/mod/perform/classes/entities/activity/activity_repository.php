@@ -25,7 +25,7 @@ namespace mod_perform\entities\activity;
 
 use core\collection;
 use core\orm\entity\repository;
-
+use mod_perform\state\activity\draft;
 class activity_repository extends repository {
 
     /**
@@ -56,6 +56,7 @@ class activity_repository extends repository {
             ->join([track::TABLE, 'track'], 'activity.id', 'track.activity_id')
             ->join([track_user_assignment::TABLE, 'track_user_assignment'], 'track.id', 'track_user_assignment.track_id')
             ->where('track_user_assignment.subject_user_id', $subject_user_ids)
+            ->where_not_in('activity.status', [draft::get_code()])
             ->filter_by_visible()
             ->get();
     }

@@ -25,7 +25,6 @@ namespace mod_perform\controllers\reporting\performance;
 
 use context;
 use context_coursecat;
-use context_system;
 use core\entities\user;
 use mod_perform\controllers\perform_controller;
 use mod_perform\util;
@@ -34,6 +33,7 @@ use mod_perform\views\override_nav_breadcrumbs;
 use moodle_url;
 use required_capability_exception;
 use totara_mvc\has_report;
+
 
 class activity_response_data extends perform_controller {
     use activity_response_data_tabs;
@@ -108,9 +108,7 @@ class activity_response_data extends perform_controller {
         $this->check_access();
 
         $this->current_tab = 'by_content';
-
-        // TODO: Replace with correct template and data
-        return $this->render_dummy_page();
+        return $this->render_action_by_content();
     }
 
     private function check_access() {
@@ -121,17 +119,22 @@ class activity_response_data extends perform_controller {
         }
     }
 
-    private function render_dummy_page() {
-        $data = [
-            'tabs' => self::get_activity_response_data_tabs($this->current_tab),
-            'page_heading' => get_string('performance_activity_response_data_heading', 'mod_perform'),
-            'name' => $this->current_tab,
-        ];
+    private function render_action_by_content() {
 
         $url = static::get_base_url() . 'activity_responses_' . $this->current_tab . '.php';
         $this->set_url(new moodle_url($url));
 
-        return self::create_view('mod_perform/tabbed_dummy', $data)
+        $has_reporting_id_access = util::has_report_on_all_subjects_capability($this->currently_logged_in_user()->id);
+
+        $data = [
+            'tabs'         => self::get_activity_response_data_tabs($this->current_tab),
+            'page_heading' => get_string('performance_activity_response_data_heading', 'mod_perform'),
+            'content'      => self::create_tui_view('mod_perform/components/report/performance/ResponseByContent', [
+                'has-reporting-ids' => $has_reporting_id_access,
+            ]),
+        ];
+
+        return self::create_view('mod_perform/performance_report_by_content', $data)
             ->set_title($data['page_heading']);
     }
 }

@@ -59,6 +59,7 @@ use mod_perform\models\activity\subject_instance;
 use mod_perform\models\activity\track;
 use mod_perform\models\activity\track_assignment_type;
 use mod_perform\notification\loader as notification_loader;
+use mod_perform\models\activity\element_identifier as element_identifier_model;
 use mod_perform\state\activity\active;
 use mod_perform\state\activity\activity_state;
 use mod_perform\state\activity\draft;
@@ -1424,5 +1425,15 @@ class mod_perform_generator extends component_generator_base {
                 }
             }
         }
+    }
+
+    /**
+     * Create element identifier
+     * @param string $identifier
+     *
+     * @return element_identifier_model
+     */
+    public function create_element_identifier(string $identifier): element_identifier_model{
+        return element_identifier_model::create($identifier);
     }
 }

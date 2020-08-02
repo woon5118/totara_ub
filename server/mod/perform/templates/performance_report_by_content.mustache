@@ -16,13 +16,13 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-    @author Riana Rossouw <riana.rossouw@totaralearning.com>
+    @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
     @package mod_perform
 }}
 {{!
-    @template mod_perform/tabbed_summy
+    @template mod_perform/manage/participation/participation
 
-    Dummy template for emtpy tabs - TODO - removed template before release
+    Activity participation management template
 
     Classes required for JS:
     * none
@@ -32,17 +32,30 @@
 
     Context variables required for this template:
     * tabs: HTML
+    * banner: HTML
     * heading: String
-    * name: String
+    * debughtml: HTML, if debug is active contains debug information
+    * content: HTML, Content
+    * description: HTML, report description
+    * savedsearch: HTML, report saved search options output
+    * search: HTML, report filter output
+    * sidebar: HTML, report sidebar filters
+    * reporthtml: HTML, report table
 
     Example context (json):
     {
     }
 }}
-<div class="tw-perform-tabbed_dummy">
-    <h2 class="tw-perform-tabbed-dummy__title">{{page_heading}}</h2>
+<div class="tw-perform-performance-reporting">
+
+    <h1 class="tw-perform-performance_reporting__title">{{page_heading}}</h1>
 
     {{{tabs}}}
 
-    {{name}}
+    {{{banner}}}
+
+    <div>
+        {{{content}}}
+    </div>
+
 </div>

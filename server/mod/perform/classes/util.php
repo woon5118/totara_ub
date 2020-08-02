@@ -269,7 +269,7 @@ class util {
         return access::has_capability('mod/perform:manage_subject_user_participation', $subject_user_context, $manager_id);
     }
 
-    protected static function has_report_on_all_subjects_capability(int $user_id): bool {
+    public static function has_report_on_all_subjects_capability(int $user_id): bool {
         $user_context = context_user::instance($user_id);
 
         return has_capability('mod/perform:report_on_all_subjects_responses', $user_context, $user_id);
@@ -311,25 +311,6 @@ class util {
         }
 
         return false;
-    }
-
-    public static function get_reportable_activities(int $user_id) {
-        if (static::has_report_on_all_subjects_capability($user_id)) {
-            return activity_entity::repository()
-                ->filter_by_visible()
-                ->order_by('id')
-                ->get()
-                ->map_to(activity::class);
-        }
-
-        // Early exit if they can not even potentially report on any subjects
-        if (!has_capability_in_any_context('mod/perform:report_on_subject_responses')) {
-            return new collection();
-        }
-
-        $reportable_users = self::get_permitted_users($user_id, 'mod/perform:report_on_subject_responses');
-
-        return activity_entity::repository()->find_by_subject_user_id(...$reportable_users)->map_to(activity::class);
     }
 
     /**

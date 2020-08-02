@@ -36,6 +36,7 @@ use moodle_url;
 use totara_mvc\has_report;
 use totara_mvc\renders_components;
 use totara_mvc\view;
+use mod_perform\data_providers\activity\reportable_activities;
 
 class activity extends perform_controller {
 
@@ -71,7 +72,7 @@ class activity extends perform_controller {
             ]);
         }
 
-        $reportable_activities = util::get_reportable_activities($this->currently_logged_in_user()->id);
+        $reportable_activities = (new reportable_activities())->fetch()->get();
         if (!$reportable_activities->find('id', $activity_id)) {
             // Current user can't report on any subject users within this activity.
             throw new moodle_exception('error_activity_unavailable', 'mod_perform');

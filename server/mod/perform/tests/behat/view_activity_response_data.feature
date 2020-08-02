@@ -36,8 +36,12 @@ Feature: Test viewing Performance activity response data
     Then I should see "User1"
     And I should see "User4"
     When I switch to "Browse records by content" tab
-    # TODO Then I should see all stuff, as granted by the global cap
-    Then I should see "by_content"
+    Then the "Select activity" select box should contain "Simple optional questions activity"
+    And the "Select activity" select box should contain "Simple required questions activity"
+    And I set the following fields to these values:
+      | Select activity | Simple optional questions activity |
+    When I click on "Load records" "button" in the ".tui-performReportPerformanceResponseByContent__activity" "css_element"
+    Then I should see "Performance data for Simple optional questions activity"
 
   Scenario: A user with per-user capabilities can see the correct user performance activity response data
     Given I log in as "manager"
@@ -55,8 +59,12 @@ Feature: Test viewing Performance activity response data
     When I am on "Team" page
     And I click on "view or export" "link"
     And I switch to "Browse records by content" tab
-    # TODO Then I should see only the specific stuff granted by the individual cap
-    Then I should see "by_content"
+    Then I should not see "Select reporting IDs"
+    And the "Select activity" select box should contain "Simple optional questions activity"
+    And I set the following fields to these values:
+      | Select activity | Simple optional questions activity |
+    When I click on "Load records" "button" in the ".tui-performReportPerformanceResponseByContent__activity" "css_element"
+    Then I should see "Performance data for Simple optional questions activity"
 
   Scenario: I can navigate to the main performance activity response page from my user profile page
     Given the "miscellaneous" user profile block exists
