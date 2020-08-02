@@ -49,7 +49,7 @@ Feature: Test management of activity participation
     And I should see "for manager2 appraiser"
 
     When I click on "Manage participation" "link" in the tui datatable row with "3 participants" "Name"
-    Then the following should exist in the "perform_restricted_subject_instance" table:
+    Then the following should exist in the "subject_instance_manage_participation" table:
       | Subject name | Instance number | Participants |
       | User Four    | 3               | 3            |
       | User Four    | 2               | 3            |
@@ -66,7 +66,7 @@ Feature: Test management of activity participation
 
     When I click on "Back to all performance activities" "link"
     And I click on "Manage participation" "link" in the tui datatable row with "for manager1" "Name"
-    Then the following should exist in the "perform_restricted_subject_instance" table:
+    Then the following should exist in the "subject_instance_manage_participation" table:
       | Subject name | Instance number | Participants |
       | User Five    | 1               | 1            |
       | User Four    | 1               | 1            |
@@ -75,7 +75,7 @@ Feature: Test management of activity participation
 
     When I click on "Back to all performance activities" "link"
     And I click on "Manage participation" "link" in the tui datatable row with "for manager2 appraiser" "Name"
-    Then the following should exist in the "perform_restricted_subject_instance" table:
+    Then the following should exist in the "subject_instance_manage_participation" table:
       | Subject name | Instance number | Participants |
       | User Five    | 1               | 2            |
       | User Five    | 2               | 2            |
@@ -90,7 +90,7 @@ Feature: Test management of activity participation
 
     When I click on "2" "link" in the "User Three 99999997" "table_row"
     Then I should see "Participant instances: 2 records shown"
-    And the following should exist in the "perform_restricted_participant_instance" table:
+    And the following should exist in the "participant_instance_manage_participation" table:
       | Participant name | Subject name | Relationship |
       | appraiser User   | User Three   | Appraiser    |
       | manager Two      | User Three   | Manager      |
@@ -102,7 +102,7 @@ Feature: Test management of activity participation
     And I click on "2" "link" in the "User Three 99999997" "table_row"
     And I click on "1" "link" in the "appraiser User User Three 99999997" "table_row"
     Then I should see "Participant sections: 1 records shown"
-    And the following should exist in the "perform_restricted_participant_section" table:
+    And the following should exist in the "participant_section_manage_participation" table:
       | Participant name | Section title | Subject name | Relationship |
       | appraiser User   | Part one      | User Three   | Appraiser    |
 
@@ -113,7 +113,7 @@ Feature: Test management of activity participation
     Given I log in as "admin"
     And I navigate to the manage perform activities page
     And I click on "Manage participation" "link" in the tui datatable row with "3 participants" "Name"
-    Then the following should exist in the "perform_restricted_subject_instance" table:
+    Then the following should exist in the "subject_instance_manage_participation" table:
       | Subject's full name | Instance number | Participants |
       | User Four           | 1               | 3            |
       | User Four           | 2               | 3            |

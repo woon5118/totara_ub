@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Riana Rossouw <riana.rossouw@totaralearning.com>
+ * @author Nathan Lewis <nathan.lewis@totaralearning.com>
  * @package mod_perform
  */
 
@@ -31,7 +31,7 @@ use reportbuilder;
 use stdClass;
 use totara_reportbuilder\rb\display\base;
 
-class restricted_participant_count extends base {
+class section_count_manage_participation extends base {
 
     /**
      * Handles the display
@@ -50,8 +50,11 @@ class restricted_participant_count extends base {
 
         $extrafields = self::get_extrafields_row($row, $column);
         $url = new moodle_url(
-            '/mod/perform/manage/participation/participant_instances.php',
-            ['activity_id' => $extrafields->activity_id, 'subject_instance_id' => $extrafields->subject_instance_id]
+            '/mod/perform/manage/participation/participant_sections.php',
+            [
+                'activity_id' => $extrafields->activity_id,
+                'participant_instance_id' => $extrafields->participant_instance_id,
+            ]
         );
         return html_writer::link($url, $count);
     }

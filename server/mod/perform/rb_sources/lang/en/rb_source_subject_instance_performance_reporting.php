@@ -25,10 +25,9 @@ $string['sourcelabel'] = 'Performance Subject Instance Performance Reporting (Pe
 $string['sourcesummary'] = 'Version of subject instances report source restricted to records where the viewing user can manage performance data for the subjects.';
 $string['sourcetitle'] = 'Performance Subject Instance Performance Reporting (Perform)';
 
+$string['type_activity'] = 'Performance activity';
 $string['type_participant_instance'] = 'Participant instance';
 $string['type_participant_user'] = 'Participant user';
-$string['type_perform'] = 'Perform';
-$string['type_perform_type'] = 'Perform type';
 $string['type_subject_instance'] = 'Subject instance';
 $string['type_subject_user'] = 'Subject user';
 $string['type_track'] = 'Track';

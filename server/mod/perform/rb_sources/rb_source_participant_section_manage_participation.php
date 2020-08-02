@@ -28,11 +28,11 @@ defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__ . '/rb_source_perform_participant_section.php');
 
 /**
- * Restricted Performance participant section report.
+ * Participant section manage participation report.
  *
- * Class rb_source_perform_restricted_participant_section
+ * Class rb_source_participant_section_manage_participation
  */
-class rb_source_perform_restricted_participant_section extends rb_source_perform_participant_section {
+class rb_source_participant_section_manage_participation extends rb_source_perform_participant_section {
 
     /**
      * Constructor.
@@ -44,9 +44,9 @@ class rb_source_perform_restricted_participant_section extends rb_source_perform
     public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
         parent::__construct($groupid, $globalrestrictionset);
 
-        $this->sourcetitle = get_string('sourcetitle', 'rb_source_perform_restricted_participant_section');
-        $this->sourcesummary = get_string('sourcesummary', 'rb_source_perform_restricted_participant_section');
-        $this->sourcelabel = get_string('sourcelabel', 'rb_source_perform_restricted_participant_section');
+        $this->sourcetitle = get_string('sourcetitle', 'rb_source_participant_section_manage_participation');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_participant_section_manage_participation');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_participant_section_manage_participation');
     }
 
     /**
@@ -75,10 +75,10 @@ class rb_source_perform_restricted_participant_section extends rb_source_perform
         $columnoptions[] = new rb_column_option(
             'participant_section',
             'actions',
-            get_string('actions', 'rb_source_perform_restricted_participant_section'),
+            get_string('actions', 'rb_source_participant_section_manage_participation'),
             "base.id",
             [
-                'displayfunc' => 'restricted_participant_section_actions',
+                'displayfunc' => 'participant_section_manage_participation_actions',
                 'noexport' => true,
                 'nosort' => true,
                 'joins' => 'track',
@@ -165,7 +165,7 @@ class rb_source_perform_restricted_participant_section extends rb_source_perform
             [
                 'type' => 'participant_section',
                 'value' => 'actions',
-                'heading' => get_string('actions', 'rb_source_perform_restricted_participant_section')
+                'heading' => get_string('actions', 'rb_source_participant_section_manage_participation')
             ],
             [
                 'type' => 'participant_section',

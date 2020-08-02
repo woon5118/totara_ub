@@ -37,7 +37,7 @@ use totara_tui\output\component;
  * @author Nathan Lewis <nathan.lewis@totaralearning.com>
  * @package totara_reportbuilder
  */
-class restricted_participant_section_actions extends base {
+class participant_instance_manage_participation_actions extends base {
 
     public const PARTICIPANT_SECTION_REPORT_TYPE = 'PARTICIPANT_SECTION';
 

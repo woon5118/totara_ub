@@ -17,34 +17,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Nathan Lewis <nathan.lewis@totaralearning.com>
+ * @author Riana Rossouw <riana.rossouw@totaralearning.com>
  * @package mod_perform
  */
 
 namespace mod_perform\rb\display;
 
-use mod_perform\state\participant_instance\closed;
 use rb_column;
 use rb_column_option;
 use reportbuilder;
 use stdClass;
 use totara_reportbuilder\rb\display\base;
 use totara_tui\output\component;
+use mod_perform\state\subject_instance\closed;
 
 /**
  * Class describing column display formatting.
  *
- * @author Nathan Lewis <nathan.lewis@totaralearning.com>
+ * @author Simon Coggins <simon.coggins@totaralearning.com>
  * @package totara_reportbuilder
  */
-class restricted_participant_instance_actions extends base {
+class subject_instance_manage_participation_actions extends base {
 
-    public const PARTICIPANT_INSTANCE_REPORT_TYPE = 'PARTICIPANT_INSTANCE';
+    public const SUBJECT_INSTANCE_REPORT_TYPE = 'SUBJECT_INSTANCE';
 
     /**
      * @inheritDoc
      */
     public static function display($value, $format, stdClass $row, rb_column $column, reportbuilder $report) {
+
         global $OUTPUT;
 
         // Column uses noexport, but just to be sure...
@@ -53,19 +54,21 @@ class restricted_participant_instance_actions extends base {
         }
 
         $extrafields = self::get_extrafields_row($row, $column);
-        $is_open = ($extrafields->participant_availability == closed::get_code()) ? false : true;
+
+        $is_open = ($extrafields->subject_availability == closed::get_code()) ? false : true;
 
         return $OUTPUT->render(
             new component(
                 'mod_perform/components/report/manage_participation/Actions',
                 [
-                    'reportType' => self::PARTICIPANT_INSTANCE_REPORT_TYPE,
-                    'id'         => $extrafields->participant_instance_id,
-                    'isOpen'     => $is_open,
+                    'reportType'        => self::SUBJECT_INSTANCE_REPORT_TYPE,
+                    'activityId'        => $extrafields->activity_id,
+                    'id'                => $extrafields->subject_instance_id,
+                    'isOpen'            => $is_open
                 ]
             )
-        );
 
+        );
     }
 
     public static function is_graphable(rb_column $column, rb_column_option $option, reportbuilder $report) {

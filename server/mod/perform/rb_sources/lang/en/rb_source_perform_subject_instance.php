@@ -29,7 +29,7 @@ $string['instance_count'] = 'Instance count';
 $string['participant_count'] = 'Participant count';
 $string['subject_name'] = 'Subject name';
 
-$string['type_activity'] = 'Perform';
+$string['type_activity'] = 'Performance activity';
 $string['type_subject_instance'] = 'Subject instance';
 $string['type_subject_user'] = 'Subject user';
 $string['type_track'] = 'Track';

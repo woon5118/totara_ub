@@ -24,9 +24,9 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/mod/perform/rb_sources/rb_source_perform_restricted_participant_instance.php');
+require_once($CFG->dirroot . '/mod/perform/rb_sources/rb_source_participant_section_manage_participation.php');
 
-class rb_perform_restricted_participant_instance_embedded extends rb_base_embedded {
+class rb_participant_section_manage_participation_embedded extends rb_base_embedded {
 
     /**
      * @var string {report_builder}.defaultsortcolumn
@@ -37,21 +37,21 @@ class rb_perform_restricted_participant_instance_embedded extends rb_base_embedd
      * @param array $data
      */
     public function __construct(array $data) {
-        $this->url = '/mod/perform/manage/participation/participant_instances.php';
+        $this->url = '/mod/perform/manage/participation/participant_sections.php';
 
-        $this->source = 'perform_restricted_participant_instance';
-        $this->shortname = 'perform_restricted_participant_instance';
-        $this->fullname = get_string('embedded_perform_restricted_participant_instance', 'mod_perform');
+        $this->source = 'participant_section_manage_participation';
+        $this->shortname = 'participant_section_manage_participation';
+        $this->fullname = get_string('embedded_participant_section_manage_participation', 'mod_perform');
         $this->columns = $this->define_columns();
         $this->filters = $this->define_filters();
-        $this->defaultsortcolumn = 'participant_instance_default_sort';
+        $this->defaultsortcolumn = 'participant_section_default_sort';
 
         if (isset($data['activity_id']) && (int)$data['activity_id'] > 0) {
             $this->embeddedparams['activity_id'] = $data['activity_id'];
         }
 
-        if (isset($data['subject_instance_id']) && (int)$data['subject_instance_id'] > 0) {
-            $this->embeddedparams['subject_instance_id'] = $data['subject_instance_id'];
+        if (isset($data['participant_instance_id']) && (int)$data['participant_instance_id'] > 0) {
+            $this->embeddedparams['participant_instance_id'] = $data['participant_instance_id'];
         }
 
         parent::__construct();
@@ -63,7 +63,7 @@ class rb_perform_restricted_participant_instance_embedded extends rb_base_embedd
      * @return array
      */
     protected function define_columns() {
-        return \rb_source_perform_restricted_participant_instance::get_default_columns();
+        return rb_source_participant_section_manage_participation::get_default_columns();
     }
 
     /**
@@ -72,7 +72,7 @@ class rb_perform_restricted_participant_instance_embedded extends rb_base_embedd
      * @return array
      */
     protected function define_filters() {
-        return \rb_source_perform_restricted_participant_instance::get_default_filters();
+        return rb_source_participant_section_manage_participation::get_default_filters();
     }
 
     /**

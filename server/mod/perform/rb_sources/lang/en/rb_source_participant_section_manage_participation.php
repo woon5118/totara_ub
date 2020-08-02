@@ -21,18 +21,19 @@
  * @package: mod_perform
  */
 
-$string['sourcelabel'] = 'Performance Restricted Participant Instance (Perform)';
-$string['sourcesummary'] = 'Version of participant instance report source restricted to participants where the viewing user can manage participation';
-$string['sourcetitle'] = 'Performance Restricted Participant Instance (Perform)';
+$string['sourcelabel'] = 'Participant Section Manage Participation (Perform)';
+$string['sourcesummary'] = 'Version of participant section report source restricted to participant sections where the viewing user can manage participation';
+$string['sourcetitle'] = 'Participant Section Manage Participation (Perform)';
 
 $string['actions'] = 'Actions';
 $string['close'] = 'Close';
 $string['re_open'] = 'Re-open';
-$string['sections'] = 'Sections';
 
-$string['type_activity'] = 'Activity';
+$string['type_activity'] = 'Performance activity';
 $string['type_core_relationship'] = 'Relationship';
 $string['type_participant_instance'] = 'Participant instance';
+$string['type_participant_section'] = 'Participant section';
 $string['type_participant_user'] = 'Participant user';
+$string['type_section'] = 'Section';
 $string['type_subject_instance'] = 'Subject instance';
 $string['type_subject_user'] = 'Subject user';

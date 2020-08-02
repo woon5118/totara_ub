@@ -23,50 +23,51 @@
 
 namespace mod_perform\rb\display;
 
-use html_writer;
-use moodle_url;
+use mod_perform\state\participant_instance\closed;
 use rb_column;
 use rb_column_option;
 use reportbuilder;
 use stdClass;
 use totara_reportbuilder\rb\display\base;
+use totara_tui\output\component;
 
-class restricted_section_count extends base {
+/**
+ * Class describing column display formatting.
+ *
+ * @author Nathan Lewis <nathan.lewis@totaralearning.com>
+ * @package totara_reportbuilder
+ */
+class participant_section_manage_participation_actions extends base {
+
+    public const PARTICIPANT_INSTANCE_REPORT_TYPE = 'PARTICIPANT_INSTANCE';
 
     /**
-     * Handles the display
-     *
-     * @param string $count
-     * @param string $format
-     * @param stdClass $row
-     * @param rb_column $column
-     * @param reportbuilder $report
-     * @return string
+     * @inheritDoc
      */
-    public static function display($count, $format, stdClass $row, rb_column $column, reportbuilder $report) {
+    public static function display($value, $format, stdClass $row, rb_column $column, reportbuilder $report) {
+        global $OUTPUT;
+
+        // Column uses noexport, but just to be sure...
         if ($format !== 'html') {
-            return $count;
+            return '';
         }
 
         $extrafields = self::get_extrafields_row($row, $column);
-        $url = new moodle_url(
-            '/mod/perform/manage/participation/participant_sections.php',
-            [
-                'activity_id' => $extrafields->activity_id,
-                'participant_instance_id' => $extrafields->participant_instance_id,
-            ]
+        $is_open = ($extrafields->participant_availability == closed::get_code()) ? false : true;
+
+        return $OUTPUT->render(
+            new component(
+                'mod_perform/components/report/manage_participation/Actions',
+                [
+                    'reportType' => self::PARTICIPANT_INSTANCE_REPORT_TYPE,
+                    'id'         => $extrafields->participant_instance_id,
+                    'isOpen'     => $is_open,
+                ]
+            )
         );
-        return html_writer::link($url, $count);
+
     }
 
-    /**
-     * Is this column graphable?
-     *
-     * @param rb_column $column
-     * @param rb_column_option $option
-     * @param reportbuilder $report
-     * @return bool
-     */
     public static function is_graphable(rb_column $column, rb_column_option $option, reportbuilder $report) {
         return false;
     }

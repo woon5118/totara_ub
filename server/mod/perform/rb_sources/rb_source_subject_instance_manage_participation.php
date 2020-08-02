@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author: Nathan Lewis <nathan.lewis@totaralearning.com>
+ * @author: Simon Coggins <simon.coggins@totaralearning.com>
  * @package: mod_perform
  */
 
@@ -25,14 +25,14 @@ use mod_perform\rb\util;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(__DIR__ . '/rb_source_perform_participant_instance.php');
+require_once(__DIR__ . '/rb_source_perform_subject_instance.php');
 
 /**
- * Restricted Performance participant instance report.
+ * Subject instance manage participation report.
  *
- * Class rb_source_perform_restricted_participant_instance
+ * Class rb_source_subject_instance_manage_participation
  */
-class rb_source_perform_restricted_participant_instance extends rb_source_perform_participant_instance {
+class rb_source_subject_instance_manage_participation extends rb_source_perform_subject_instance {
 
     /**
      * Constructor.
@@ -44,9 +44,9 @@ class rb_source_perform_restricted_participant_instance extends rb_source_perfor
     public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
         parent::__construct($groupid, $globalrestrictionset);
 
-        $this->sourcetitle = get_string('sourcetitle', 'rb_source_perform_restricted_participant_instance');
-        $this->sourcesummary = get_string('sourcesummary', 'rb_source_perform_restricted_participant_instance');
-        $this->sourcelabel = get_string('sourcelabel', 'rb_source_perform_restricted_participant_instance');
+        $this->sourcetitle = get_string('sourcetitle', 'rb_source_subject_instance_manage_participation');
+        $this->sourcesummary = get_string('sourcesummary', 'rb_source_subject_instance_manage_participation');
+        $this->sourcelabel = get_string('sourcelabel', 'rb_source_subject_instance_manage_participation');
     }
 
     /**
@@ -59,7 +59,7 @@ class rb_source_perform_restricted_participant_instance extends rb_source_perfor
      */
     public function post_config(reportbuilder $report) {
         // TODO multi-tenancy support in here too?
-        $restrictions = util::get_manage_participation_sql($report->reportfor, "subject_instance.subject_user_id");
+        $restrictions = util::get_manage_participation_sql($report->reportfor, "base.subject_user_id");
         $report->set_post_config_restrictions($restrictions);
     }
 
@@ -73,70 +73,81 @@ class rb_source_perform_restricted_participant_instance extends rb_source_perfor
 
         $columnoptions = parent::define_columnoptions();
 
-        // Add Restricted Participant Count
+        // Add Participant Count
         $columnoptions[] = new rb_column_option(
-            'participant_instance',
-            'restricted_section_count',
-            get_string('sections', 'rb_source_perform_restricted_participant_instance'),
+            'subject_instance',
+            'participant_count_manage_participation',
+            get_string('participants', 'rb_source_subject_instance_manage_participation'),
             "(SELECT COUNT('x')
-            FROM {perform_participant_section} pps
-            WHERE pps.participant_instance_id = base.id)",
+            FROM {perform_participant_instance} ppi
+            WHERE ppi.subject_instance_id = base.id)",
             [
                 'dbdatatype' => 'integer',
-                'displayfunc' => 'restricted_section_count',
+                'displayfunc' => 'participant_count_manage_participation',
                 'iscompound' => true,
                 'issubquery' => true,
-                'joins' => 'track',
                 'extrafields' => [
-                    'activity_id' => 'track.activity_id',
-                    'participant_instance_id' => 'base.id',
+                    'subject_instance_id' => "base.id",
+                    'activity_id' => "perform.id"
                 ]
+            ]
+        );
+
+        // Add instance number
+        // Using <= created_at to start at 1
+        $columnoptions[] = new rb_column_option(
+            'subject_instance',
+            'instance_number',
+            get_string('instance_number', 'rb_source_subject_instance_manage_participation'),
+            "(SELECT COUNT('x')
+                FROM {perform_subject_instance} psi
+                WHERE psi.track_user_assignment_id = base.track_user_assignment_id
+                  AND psi.created_at <= base.created_at)",
+            [
+                'dbdatatype' => 'integer',
+                'displayfunc' => 'integer',
+                'iscompound' => true,
+                'issubquery' => true,
             ]
         );
 
         // Add actions
         $columnoptions[] = new rb_column_option(
-            'participant_instance',
+            'subject_instance',
             'actions',
-            get_string('actions', 'rb_source_perform_restricted_participant_instance'),
+            get_string('actions', 'rb_source_subject_instance_manage_participation'),
             "base.id",
             [
-                'displayfunc' => 'restricted_participant_instance_actions',
+                'displayfunc' => 'subject_instance_manage_participation_actions',
                 'noexport' => true,
                 'nosort' => true,
-                'joins' => 'track',
+                'joins' => 'perform',
                 'capability' => ['mod/perform:manage_subject_user_participation'],
                 'extrafields' => [
-                    'activity_id' => 'track.activity_id',
-                    'participant_instance_id' => 'base.id',
-                    'participant_availability' => 'base.availability',
+                    'activity_id' => 'perform.id',
+                    'subject_instance_id' => "base.id",
+                    'subject_availability' => "base.availability"
                 ],
             ]
         );
 
-        // Add column for default sorting on participant user, subject user and participant instance created_at DESC
+        // Add column for default sorting on subject user and instance_number (desc)
         $seq_sql = "(SELECT 99999999 - COUNT('x')
-                FROM {perform_participant_instance} ppi
-                WHERE ppi.subject_instance_id = base.subject_instance_id
-                  AND ppi.created_at <= base.created_at)";
-        $participant_usednamefields = totara_get_all_user_name_fields_join('participant_user', null, true);
-        $subject_usednamefields = totara_get_all_user_name_fields_join('subject_user', null, true);
+                FROM {perform_subject_instance} psi
+                WHERE psi.track_user_assignment_id = base.track_user_assignment_id
+                  AND psi.created_at <= base.created_at)";
+        $usednamefields = totara_get_all_user_name_fields_join('subject_user', null, true);
         $columnoptions[] = new rb_column_option(
-            'participant_instance',
+            'subject_instance',
             'default_sort',
             'default_sort',
-            $DB->sql_concat_join("' '", array_merge(
-                array_values($participant_usednamefields),
-                array_values($subject_usednamefields),
-                [$seq_sql]
-            )),
+            $DB->sql_concat_join("' '", array_merge($usednamefields, [$seq_sql])),
             [
-                'displayfunc' => 'format_string',
                 'noexport' => true,
                 'nosort' => true,
                 'hidden' => true,
-                'joins' => ['subject_user', 'participant_user'],
-                'selectable' => true,
+                'joins' => 'subject_user',
+                'selectable' => false,
             ]
         );
 
@@ -151,47 +162,42 @@ class rb_source_perform_restricted_participant_instance extends rb_source_perfor
     public static function get_default_columns() {
         return [
             [
-                'type' => 'participant_user',
-                'value' => 'namelink',
-                'heading' => get_string('participant_name', 'rb_source_perform_participant_instance')
-            ],
-            [
                 'type' => 'subject_user',
                 'value' => 'namelink',
                 'heading' => get_string('subject_name', 'rb_source_perform_subject_instance')
             ],
             [
-                'type' => 'core_relationship',
-                'value' => 'class_name',
-                'heading' => get_string('relationship', 'mod_perform')
+                'type' => 'subject_instance',
+                'value' => 'instance_number',
+                'heading' => get_string('instance_number', 'rb_source_subject_instance_manage_participation')
             ],
             [
-                'type' => 'participant_instance',
+                'type' => 'subject_instance',
                 'value' => 'created_at',
                 'heading' => get_string('date_created', 'mod_perform')
             ],
             [
-                'type' => 'participant_instance',
-                'value' => 'restricted_section_count',
-                'heading' => get_string('sections', 'rb_source_perform_restricted_participant_instance')
+                'type' => 'subject_instance',
+                'value' => 'participant_count_manage_participation',
+                'heading' => get_string('participants', 'rb_source_subject_instance_manage_participation')
             ],
             [
-                'type' => 'participant_instance',
+                'type' => 'subject_instance',
                 'value' => 'progress',
                 'heading' => get_string('progress', 'mod_perform')
             ],
             [
-                'type' => 'participant_instance',
+                'type' => 'subject_instance',
                 'value' => 'availability',
                 'heading' => get_string('availability', 'mod_perform')
             ],
             [
-                'type' => 'participant_instance',
+                'type' => 'subject_instance',
                 'value' => 'actions',
-                'heading' => get_string('actions', 'rb_source_perform_restricted_participant_instance')
+                'heading' => get_string('actions', 'rb_source_subject_instance_manage_participation')
             ],
             [
-                'type' => 'participant_instance',
+                'type' => 'subject_instance',
                 'value' => 'default_sort',
                 'heading' => 'default_sort',
                 'hidden' => true,
@@ -207,27 +213,19 @@ class rb_source_perform_restricted_participant_instance extends rb_source_perfor
     public static function get_default_filters() {
         return [
             [
-                'type' => 'participant_user',
-                'value' => 'fullname',
-            ],
-            [
-                'type' => 'core_relationship',
-                'value' => 'core_relationship_id',
-            ],
-            [
                 'type' => 'subject_user',
                 'value' => 'fullname',
             ],
             [
-                'type' => 'participant_instance',
+                'type' => 'subject_instance',
                 'value' => 'progress',
             ],
             [
-                'type' => 'participant_instance',
+                'type' => 'subject_instance',
                 'value' => 'availability',
             ],
             [
-                'type' => 'participant_instance',
+                'type' => 'subject_instance',
                 'value' => 'created_at',
             ],
         ];

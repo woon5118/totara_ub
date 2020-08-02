@@ -23,54 +23,47 @@
 
 namespace mod_perform\rb\display;
 
+use html_writer;
+use moodle_url;
 use rb_column;
 use rb_column_option;
 use reportbuilder;
 use stdClass;
 use totara_reportbuilder\rb\display\base;
-use totara_tui\output\component;
-use mod_perform\state\subject_instance\closed;
 
-/**
- * Class describing column display formatting.
- *
- * @author Simon Coggins <simon.coggins@totaralearning.com>
- * @package totara_reportbuilder
- */
-class restricted_subject_instance_actions extends base {
-
-    public const SUBJECT_INSTANCE_REPORT_TYPE = 'SUBJECT_INSTANCE';
+class participant_count_manage_participation extends base {
 
     /**
-     * @inheritDoc
+     * Handles the display
+     *
+     * @param string $count
+     * @param string $format
+     * @param stdClass $row
+     * @param rb_column $column
+     * @param reportbuilder $report
+     * @return string
      */
-    public static function display($value, $format, stdClass $row, rb_column $column, reportbuilder $report) {
-
-        global $OUTPUT;
-
-        // Column uses noexport, but just to be sure...
+    public static function display($count, $format, stdClass $row, rb_column $column, reportbuilder $report) {
         if ($format !== 'html') {
-            return '';
+            return $count;
         }
 
         $extrafields = self::get_extrafields_row($row, $column);
-
-        $is_open = ($extrafields->subject_availability == closed::get_code()) ? false : true;
-
-        return $OUTPUT->render(
-            new component(
-                'mod_perform/components/report/manage_participation/Actions',
-                [
-                    'reportType'        => self::SUBJECT_INSTANCE_REPORT_TYPE,
-                    'activityId'        => $extrafields->activity_id,
-                    'id'                => $extrafields->subject_instance_id,
-                    'isOpen'            => $is_open
-                ]
-            )
-
+        $url = new moodle_url(
+            '/mod/perform/manage/participation/participant_instances.php',
+            ['activity_id' => $extrafields->activity_id, 'subject_instance_id' => $extrafields->subject_instance_id]
         );
+        return html_writer::link($url, $count);
     }
 
+    /**
+     * Is this column graphable?
+     *
+     * @param rb_column $column
+     * @param rb_column_option $option
+     * @param reportbuilder $report
+     * @return bool
+     */
     public static function is_graphable(rb_column $column, rb_column_option $option, reportbuilder $report) {
         return false;
     }
