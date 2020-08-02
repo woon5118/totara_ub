@@ -16,7 +16,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This script creates config.php file and prepares database.
+ * This script upgrades your Totara site and should be run after updating the code.
  *
  * This script is not intended for beginners!
  * Potential problems:

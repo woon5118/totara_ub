@@ -72,15 +72,16 @@ if (version_compare(phpversion(), "7.2.10") < 0) {
 }
 
 // Nothing to do if config.php does not exist
-$configfile = __DIR__.'/../../config.php';
-if (!file_exists($configfile)) {
+$site_configfile = __DIR__.'/../../../config.php';
+if (!file_exists($site_configfile)) {
     fwrite(STDERR, 'config.php does not exist, can not continue'); // do not localize
     fwrite(STDERR, "\n");
     exit(1);
 }
 
 // Include necessary libs
-require($configfile);
+$server_configfile = __DIR__.'/../../config.php';
+require($server_configfile);
 
 require_once($CFG->libdir.'/clilib.php');
 require_once($CFG->libdir.'/installlib.php');

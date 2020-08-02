@@ -103,9 +103,10 @@ if (file_exists($distrolibfile)) {
 }
 
 // Nothing to do if config.php exists
-$configfile = __DIR__.'/../../config.php';
-if (file_exists($configfile)) {
-    require($configfile);
+$site_configfile = __DIR__.'/../../../config.php';
+$server_configfile = __DIR__.'/../../config.php';
+if (file_exists($site_configfile)) {
+    require($server_configfile);
     require_once($CFG->libdir.'/clilib.php');
     list($options, $unrecognized) = cli_get_params(array('help'=>false), array('h'=>'help'));
 
@@ -120,11 +121,6 @@ if (file_exists($configfile)) {
         cli_error(get_string('clialreadyconfigured', 'install'));
     }
 }
-
-$olddir = getcwd();
-
-// change directory so that includes below work properly
-chdir(dirname($_SERVER['argv'][0]));
 
 // Servers should define a default timezone in php.ini, but if they don't then make sure something is defined.
 if (!function_exists('date_default_timezone_set') or !function_exists('date_default_timezone_get')) {
@@ -772,21 +768,19 @@ if ($interactive) {
 // Finally we have all info needed for config.php
 $configphp = install_generate_configphp($database, $CFG);
 umask(0137);
-if (($fh = fopen($configfile, 'w')) !== false) {
+if (($fh = fopen($site_configfile, 'w')) !== false) {
     fwrite($fh, $configphp);
     fclose($fh);
 }
 
-if (!file_exists($configfile)) {
+if (!file_exists($site_configfile)) {
     cli_error('Can not create config file.');
 }
 
 // remember selected language
 $installlang = $CFG->lang;
-// return back to original dir before executing setup.php which changes the dir again
-chdir($olddir);
 // We have config.php, it is a real php script from now on :-)
-require($configfile);
+require($server_configfile);
 
 // use selected language
 $CFG->lang = $installlang;
