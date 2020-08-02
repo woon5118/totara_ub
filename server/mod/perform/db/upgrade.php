@@ -224,5 +224,29 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020072302, 'perform');
     }
 
+    if ($oldversion < 2020080300) {
+        $activities_without_manual = $DB->get_records_sql(
+            "
+                SELECT a.*
+                FROM {perform} a 
+                LEFT JOIN {perform_manual_relation_selection} mr ON a.id = mr.activity_id
+                WHERE mr.id IS NULL                 
+            "
+        );
+
+        $reflection = new ReflectionClass(\mod_perform\models\activity\activity::class);
+        $method = $reflection->getMethod('create_default_manual_relationships');
+        $method->setAccessible(true);
+
+        foreach ($activities_without_manual as $activity) {
+            $entity = new \mod_perform\entities\activity\activity($activity);
+            $model = \mod_perform\models\activity\activity::load_by_entity($entity);
+            $method->invoke($model);
+        }
+
+        // Core savepoint reached.
+        upgrade_mod_savepoint(true, 2020080300, 'perform');
+    }
+
     return true;
 }
