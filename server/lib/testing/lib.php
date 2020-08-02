@@ -276,16 +276,6 @@ function testing_update_composer_dependencies(string $framework = '') {
         exit($code);
     }
 
-    // Totara: temporary hack for PHP 7.4 compatibility, to be removed together with TL-23348
-    if ($framework === 'behat') {
-        $fixfile = __DIR__ . '/../../../test/behat/vendor/behat/mink/src/Selector/Xpath/Escaper.php';
-        $src = file_get_contents($fixfile);
-        $fixedsrc = str_replace('implode($parts, \',\')', 'implode(\',\', $parts)', $src);
-        if ($src !== $fixedsrc) {
-            file_put_contents($fixfile, $fixedsrc);
-        }
-    }
-
     // Return to our original location.
     chdir($cwd);
 }
