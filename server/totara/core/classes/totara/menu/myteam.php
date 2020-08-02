@@ -67,7 +67,10 @@ class myteam extends item {
      * @return bool
      */
     public function is_disabled() {
-        return advanced_feature::is_disabled('myteam');
+        // The team page won't show up if the team feature is disabled
+        // or perform related features are completely disabled
+        return advanced_feature::is_disabled('myteam')
+            || (advanced_feature::is_disabled('competency_assignment') && advanced_feature::is_disabled('performance_activities'));
     }
 
     public function get_incompatible_preset_rules(): array {
@@ -75,6 +78,6 @@ class myteam extends item {
     }
 
     protected function get_default_parent() {
-        return '\totara_core\totara\menu\unused';
+        return '\totara_core\totara\menu\perform';
     }
 }
