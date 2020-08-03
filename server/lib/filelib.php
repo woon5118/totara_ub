@@ -2041,13 +2041,21 @@ function readfile_accel($file, $mimetype, $accelerate) {
         }
     }
 
-    if ($accelerate and !empty($CFG->xsendfile)) {
-        if (empty($CFG->disablebyteserving) and $mimetype !== 'text/plain') {
-            header('Accept-Ranges: bytes');
-        } else {
-            header('Accept-Ranges: none');
-        }
+    if ($accelerate && empty($CFG->disablebyteserving) && $mimetype !== 'text/plain') {
+        header('Accept-Ranges: bytes');
+    } else {
+        header('Accept-Ranges: none');
+    }
 
+    if ($accelerate && is_object($file)) {
+        $xsendfilehook = new \totara_core\hook\filedir_xsendfile($file->get_contenthash());
+        $xsendfilehook->execute();
+        if ($xsendfilehook->was_file_sent()) {
+            return;
+        }
+    }
+
+    if ($accelerate and !empty($CFG->xsendfile)) {
         if (is_object($file)) {
             $fs = get_file_storage();
             if ($fs->xsendfile($file->get_contenthash())) {
