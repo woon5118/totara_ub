@@ -15,6 +15,11 @@ mutation mod_perform_update_section_settings(
           name
         }
       }
+      section_elements_summary {
+        required_question_count
+        optional_question_count
+        other_element_count
+      }
       raw_created_at: created_at(format: TIMESTAMP)
       raw_updated_at: updated_at(format: TIMESTAMP)
     }
