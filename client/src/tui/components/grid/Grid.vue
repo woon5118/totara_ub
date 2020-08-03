@@ -27,6 +27,14 @@ import { cloneVNode } from '../../js/internal/vnode';
 export default {
   props: {
     /**
+     * The tag for the Grid.
+     **/
+    gridTag: {
+      type: String,
+      validator: x => ['div', 'ul', 'ol'].includes(x),
+      default: 'div',
+    },
+    /**
      * `horizontal` and `vertical` are the two expected values, the Grid works
      * in both situations. Vertical grids will need more attention paid to their
      * individual implementations because of limitations when an explicit CSS
@@ -146,6 +154,10 @@ export default {
 
       if (this.isStacked && this.useVerticalGap) {
         classes.push('tui-grid--stacked-gap');
+      }
+
+      if (this.gridTag === 'ul' || this.gridTag === 'ol') {
+        classes.push('tui-grid--list');
       }
 
       if (additionalClasses && additionalClasses.length) {
@@ -270,7 +282,7 @@ export default {
     }
 
     return h(
-      'ul',
+      this.gridTag,
       {
         class: this.gridClasses(additionalClasses),
       },

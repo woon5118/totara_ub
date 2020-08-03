@@ -19,33 +19,50 @@
 import { shallowMount } from '@vue/test-utils';
 import component from 'tui/components/grid/GridItem';
 let wrapper;
-
-const props = {
-  units: 2,
-  order: 1,
-  grows: true,
-  shrinks: false,
-  overflows: true,
-  hyphens: false,
-  sizeData: {
-    gutterSize: '12px',
-    maxGridUnits: '16',
-    numberOfSuppliedGridItems: 8,
-  },
-};
+let props;
 
 describe('presentation/grid/GridItem.vue', () => {
-  beforeAll(() => {
-    wrapper = shallowMount(component, {
-      propsData: props,
+  props = {
+    units: 2,
+    order: 1,
+    grows: true,
+    shrinks: false,
+    overflows: true,
+    hyphens: false,
+    sizeData: {
+      gutterSize: '12px',
+      maxGridUnits: '16',
+      numberOfSuppliedGridItems: 8,
+    },
+  };
+
+  describe('with default gridItemTag', () => {
+    beforeAll(() => {
+      wrapper = shallowMount(component, {
+        propsData: props,
+      });
+    });
+
+    it('Props can be set', () => {
+      expect(wrapper.props()).toMatchObject(props);
+    });
+
+    it('Checks snapshot', () => {
+      expect(wrapper.element).toMatchSnapshot();
     });
   });
 
-  it('Props can be set', () => {
-    expect(wrapper.props()).toMatchObject(props);
-  });
+  describe('with a set gridItemTag', () => {
+    it('Checks snapshot', () => {
+      props = {
+        gridItemTag: 'li',
+        order: 1,
+      };
 
-  it('Checks snapshot', () => {
-    expect(wrapper.element).toMatchSnapshot();
+      wrapper = shallowMount(component, {
+        propsData: props,
+      });
+      expect(wrapper.element).toMatchSnapshot();
+    });
   });
 });

@@ -20,6 +20,9 @@ import { shallowMount } from '@vue/test-utils';
 import Grid from 'tui/components/grid/Grid';
 import GridItem from 'tui/components/grid/GridItem';
 let wrapper;
+let propsData;
+let scopedSlots;
+
 global.ResizeObserver = class {
   observe() {
     return;
@@ -30,64 +33,97 @@ global.ResizeObserver = class {
 };
 
 describe('presentation/grid/Grid.vue', () => {
-  beforeAll(() => {
-    wrapper = shallowMount(Grid, {
-      propsData: {
-        id: 'grid',
-        direction: 'vertical',
-        maxUnits: '16',
-        stackAt: 960,
-      },
-      scopedSlots: {
-        default: function() {
-          return this.$createElement(GridItem, {
-            props: {
-              units: 8,
-              order: 2,
-              grows: true,
-              shrinks: false,
-              overflows: true,
-              hyphens: false,
-              sizeData: {
-                gutterSize: '12px',
-                maxGridUnits: 16,
-                numberOfSuppliedGridItems: 8,
-              },
-            },
-          });
+  propsData = {
+    id: 'grid',
+    direction: 'vertical',
+    maxUnits: '16',
+    stackAt: 960,
+  };
+
+  scopedSlots = {
+    default: function() {
+      return this.$createElement(GridItem, {
+        props: {
+          units: 8,
+          order: 2,
+          grows: true,
+          shrinks: false,
+          overflows: true,
+          hyphens: false,
+          sizeData: {
+            gutterSize: '12px',
+            maxGridUnits: 16,
+            numberOfSuppliedGridItems: 8,
+          },
         },
-      },
+      });
+    },
+  };
+
+  describe('with default gridTag', () => {
+    beforeAll(() => {
+      wrapper = shallowMount(Grid, {
+        propsData,
+        scopedSlots,
+      });
+    });
+
+    it('direction can be set', () => {
+      let propValue = wrapper.find('#grid').props().direction;
+      expect(propValue).toBeTruthy();
+    });
+
+    it('maxUnits can be set', () => {
+      let propValue = wrapper.find('#grid').props().maxUnits;
+      expect(propValue).toBeTruthy();
+    });
+
+    it('stackAt can be set', () => {
+      let propValue = wrapper.find('#grid').props().stackAt;
+      expect(propValue).toBeTruthy();
+    });
+
+    it('gridClasses method returns Array of default classes', () => {
+      expect(Array.isArray(wrapper.vm.gridClasses())).toBe(true);
+    });
+
+    it('gridClasses method returns Array of default and additional classes', () => {
+      let defaultCount = wrapper.vm.gridClasses().length,
+        additionalClasses = ['customClass', 'anotherClass'];
+      expect(wrapper.vm.gridClasses(additionalClasses).length).toBe(
+        defaultCount + additionalClasses.length
+      );
+    });
+
+    it('Checks snapshot', () => {
+      expect(wrapper.element).toMatchSnapshot();
     });
   });
 
-  it('direction can be set', () => {
-    let propValue = wrapper.find('#grid').props().direction;
-    expect(propValue).toBeTruthy();
-  });
+  describe('with a set gridTag', () => {
+    beforeAll(() => {
+      propsData = { ...propsData, gridTag: 'ul' };
 
-  it('maxUnits can be set', () => {
-    let propValue = wrapper.find('#grid').props().maxUnits;
-    expect(propValue).toBeTruthy();
-  });
+      scopedSlots = {
+        default: function() {
+          return this.$createElement(GridItem, {
+            props: {
+              gridItemTag: 'li',
+              order: 1,
+            },
+          });
+        },
+      };
 
-  it('stackAt can be set', () => {
-    let propValue = wrapper.find('#grid').props().stackAt;
-    expect(propValue).toBeTruthy();
-  });
+      wrapper = shallowMount(Grid, {
+        propsData,
+        scopedSlots,
+      });
+    });
 
-  it('gridClasses method returns Array of default classes', () => {
-    expect(Array.isArray(wrapper.vm.gridClasses())).toBe(true);
-  });
-
-  it('gridClasses method returns Array of default and additional classes', () => {
-    let defaultCount = wrapper.vm.gridClasses().length,
-      additionalClasses = ['customClass', 'anotherClass'];
-    expect(wrapper.vm.gridClasses(additionalClasses).length).toBe(
-      defaultCount + additionalClasses.length
-    );
-  });
-
-  it('Checks snapshot', () => {
-    expect(wrapper.element).toMatchSnapshot();
+    it('Checks snapshot', () => {
+      wrapper.setProps({ gridTag: 'ul' });
+      expect(wrapper.element).toMatchSnapshot();
+    });
   });
 });

@@ -31,7 +31,6 @@
     border-width: 0;
     border-#{$_borderType}: #{$_gutterSize} solid transparent;
   }
-
   // the "first" item should never have a gutter, but `:first-child` may not be
   // accurate if flex re-ordering has been applied, so use generated "first"
   // className instead. this works in most cases with the exception of:
@@ -46,8 +45,6 @@
 .tui-grid {
   display: flex;
   flex-grow: 1; // in case nested inside a parent grid cell
-  margin: 0;
-  padding: 0;
 
   // main Grid modifiers applied based on supplied prop values
   &--wrapped {
@@ -59,10 +56,7 @@
     flex-grow: 0; // by default we want item size to respect unit-based calculations
     flex-shrink: 1; // by default we want to auto-adjust for gutters
     min-width: 0; // allows flex items to shrink below their minimum content size
-    margin: 0;
-    padding: 0;
     hyphens: auto; // default prevents text from causing grid mis-alignments
-    list-style-type: none;
 
     // Grid item modifiers based on supplied prop values
     &--grow {
@@ -76,6 +70,10 @@
     }
     &--overflow {
       overflow: auto;
+    }
+    &--list {
+      margin: 0;
+      padding: 0;
     }
   }
 
@@ -117,6 +115,12 @@
     &-gap {
       @include grid-item-generate-gutters(top, var(--tui-grid-gutter));
     }
+  }
+
+  &--list {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
   }
 }
 </style>

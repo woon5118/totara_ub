@@ -17,18 +17,20 @@
 -->
 
 <template>
-  <li
+  <component
+    :is="gridItemTag"
     class="tui-grid-item"
     :class="[
       grows ? 'tui-grid-item--grow' : '',
       shrinks ? '' : 'tui-grid-item--no-shrink',
       overflows ? 'tui-grid-item--overflow' : '',
       hyphens ? '' : 'tui-grid-item--no-hyphens',
+      gridItemTag === 'li' ? 'tui-grid-item--list' : '',
     ]"
     :style="{ flexBasis: getSize, order: order }"
   >
     <slot />
-  </li>
+  </component>
 </template>
 
 <script>
@@ -37,6 +39,14 @@ const isIE = document.body.classList.contains('ie');
 export default {
   name: 'GridItem',
   props: {
+    /**
+     * The gridItemTag for the GridItem. Should make semantic sense as a child of the Grid.
+     **/
+    gridItemTag: {
+      type: String,
+      validator: x => ['div', 'li', 'aside', 'section'].includes(x),
+      default: 'div',
+    },
     /**
      * The number of units a GridItem should use in the Grid
      **/
