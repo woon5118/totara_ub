@@ -4,7 +4,8 @@ Feature: Teachers can review student progress on all lessons in a course by view
   I need to view the complete report for one of my students.
 
   Background:
-    Given the following "users" exist:
+    Given the "reports" user profile block exists
+    And the following "users" exist:
       | username | firstname | lastname | email |
       | teacher1 | Teacher | 1 | teacher1@example.com |
       | student1 | Student | 1 | student1@example.com |

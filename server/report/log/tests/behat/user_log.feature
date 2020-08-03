@@ -5,7 +5,8 @@ Feature: User can view activity log.
   I need to view user today's and all report
 
   Background:
-    Given the following "courses" exist:
+    Given the "reports" user profile block exists
+    And the following "courses" exist:
       | fullname | shortname | category | groupmode |
       | Course 1 | C1 | 0 | 1 |
     And the following "users" exist:

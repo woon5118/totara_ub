@@ -6,6 +6,7 @@ Feature: View the user page for the outline report
 
   Background:
     Given the "coursedetails" user profile block exists
+    And the "reports" user profile block exists
     And the following "courses" exist:
       | fullname | shortname | format | showreports |
       | Course 1 | C1 | topics | 1 |

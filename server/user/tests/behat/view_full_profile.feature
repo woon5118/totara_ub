@@ -6,6 +6,7 @@ Feature: Access to full profiles of users
 
   Background:
     Given the "loginactivity" user profile block exists
+    And the "miscellaneous" user profile block exists
     And the following "users" exist:
       | username | firstname | lastname | email |
       | student1 | Student | 1 | student1@example.com |

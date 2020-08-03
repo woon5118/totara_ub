@@ -30,26 +30,26 @@ Feature: Access to preferences page
     And I am on "Course 1" course homepage
     And I navigate to course participants
     And I follow "Student 2"
-    And I should not see "Preferences" in the "region-main" "region"
+    And ".block_totara_user_profile_category_administration" "css_element" should not exist
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     When I navigate to course participants
     And I follow "Student 2"
-    Then I should not see "Preferences" in the "region-main" "region"
+    Then ".block_totara_user_profile_category_administration" "css_element" should not exist
 
   Scenario: Administrators and Managers can view another user's permissions page.
     Given I log in as "admin"
     And I am on "Course 1" course homepage
     And I navigate to course participants
     And I follow "Student 2"
-    And I should see "Preferences" in the "region-main" "region"
+    And I should see "Preferences" in the ".block_totara_user_profile_category_administration" "css_element"
     And I log out
     And I log in as "manager1"
     And I am on "Course 1" course homepage
     When I navigate to course participants
     And I follow "Student 2"
-    Then I should see "Preferences" in the "region-main" "region"
+    Then I should see "Preferences" in the ".block_totara_user_profile_category_administration" "css_element"
 
   @javascript
   Scenario: A user with the appropriate permissions can view another user's permissions page.

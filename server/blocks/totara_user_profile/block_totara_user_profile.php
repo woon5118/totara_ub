@@ -185,26 +185,27 @@ class block_totara_user_profile extends block_base {
             return;
         }
 
-        // Get user from page context
+        // Get user or course from page context
         $page_context =  $this->page->context;
+        $course = null;
         if ($page_context->contextlevel == CONTEXT_USER) {
             if ($page_context->instanceid == $USER->id) {
                 $user = $USER;
             } else {
                 $user = $DB->get_record('user', array('id' => $page_context->instanceid));
             }
-        }
-
-        // Get user from page navigation.
-        if (empty($user)) {
+        } else if ($page_context->contextlevel == CONTEXT_COURSE) {
+            $course = $DB->get_record('course', array('id' => $page_context->instanceid), '*', MUST_EXIST);
             $extending = $this->page->navigation->get_extending_users();
             if (count($extending) == 1) {
                 $user = end($extending);
+            } else {
+                $user = $USER;
             }
         }
 
         if (empty($user)) {
-            //Gives ability for admin maintain User Profile blocks on Default Profile Page
+            // Gives ability for admin maintain User Profile blocks on Default Profile Page.
             if (is_siteadmin()) {
                 $user = $USER;
             } else {
@@ -219,7 +220,7 @@ class block_totara_user_profile extends block_base {
          * @var core_user\output\myprofile\renderer $renderer
          */
         $renderer = $this->page->get_renderer('core_user', 'myprofile');
-        $tree = core_user\output\myprofile\manager::build_tree($user, $currentuser);
+        $tree = core_user\output\myprofile\manager::build_tree($user, $currentuser, $course);
         $newtree = $this->tree_filter($tree);
 
         $category = current($newtree->categories);

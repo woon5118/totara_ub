@@ -39,9 +39,10 @@ require_once($CFG->dirroot . '/user/lib.php');
 require_once($CFG->libdir.'/filelib.php');
 
 $userid = optional_param('id', 0, PARAM_INT);
+$courseid = optional_param('course', 0, PARAM_INT);
 $reset = optional_param('reset', null, PARAM_BOOL);
 
-$PAGE->set_url('/user/profile.php', array('id' => $userid));
+$PAGE->set_url('/user/profile.php', array('id' => $userid, 'course' => $courseid));
 
 if (!empty($CFG->forceloginforprofiles)) {
     require_login();
@@ -55,6 +56,9 @@ if (!empty($CFG->forceloginforprofiles)) {
         die;
     }
 } else if (!empty($CFG->forcelogin)) {
+    require_login();
+} else if ($courseid) {
+    // Totara: Not logged-in users are not allowed into courses!
     require_login();
 }
 
@@ -72,10 +76,20 @@ if (!$user || $user->deleted) {
     die;
 }
 
-$currentuser = ($user->id == $USER->id);
-$context = $usercontext = context_user::instance($userid, MUST_EXIST);
+if ($courseid == SITEID) {
+    redirect($CFG->wwwroot.'/user/profile.php?id='.$userid);  // Immediate redirect.
+}
 
-if (!user_can_view_profile($user, null)) {
+$currentuser = ($user->id == $USER->id);
+$usercontext = context_user::instance($userid, MUST_EXIST);
+if ($courseid) {
+    $context = $coursecontext = context_course::instance($courseid, MUST_EXIST);
+} else {
+    $context = $usercontext;
+    $coursecontext = context_system::instance();
+}
+
+if (!user_can_view_profile($user, $courseid)) {
     if (isguestuser()) {
         // Let them log in.
         redirect(get_login_url());
@@ -114,8 +128,16 @@ if (isguestuser()) {     // Guests can never edit their profile.
 
 $PAGE->blocks->add_region('content');
 $PAGE->set_subpage(1);
-$PAGE->set_title(fullname($user).": " . get_string('publicprofile'));
-$PAGE->set_heading(fullname($user));
+
+if ($courseid) {
+    $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
+    $PAGE->set_title("$course->fullname: " . get_string('personalprofile') .": " . fullname($user, has_capability('moodle/site:viewfullnames', $coursecontext)));
+    $PAGE->set_heading($course->fullname);
+    $PAGE->set_course($course);
+} else {
+    $PAGE->set_title(fullname($user) . ": " . get_string('publicprofile'));
+    $PAGE->set_heading(fullname($user));
+}
 
 if (!$currentuser) {
     $PAGE->navigation->extend_for_user($user);
@@ -126,6 +148,9 @@ if (!$currentuser) {
     $node->forceopen = true;
 }
 if ($node = $PAGE->settingsnav->get('root')) {
+    $node->forceopen = false;
+}
+if ($node = $PAGE->settingsnav->get('courseadmin')) {
     $node->forceopen = false;
 }
 
@@ -150,7 +175,7 @@ if ($PAGE->user_allowed_editing()) {
 }
 
 // Trigger a user profile viewed event.
-profile_view($user, $usercontext);
+profile_view($user, $context);
 
 // TODO WORK OUT WHERE THE NAV BAR IS!
 echo $OUTPUT->header();
