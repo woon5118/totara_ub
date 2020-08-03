@@ -73,7 +73,11 @@ class mod_perform_activity_clone_model_helper_testcase extends advanced_testcase
         /** @var section $section */
         $section = $activity->sections->first();
 
-        $element = $perform_generator->create_element();
+        $element = $perform_generator->create_element(
+            [
+                'identifier' => 'test ID'
+            ]
+        );
         $section_element = $perform_generator->create_section_element($section, $element);
 
         $entity = activity_entity::repository()->find($activity->get_id());
@@ -115,6 +119,9 @@ class mod_perform_activity_clone_model_helper_testcase extends advanced_testcase
             $old_section_elements = $old_section->get_section_elements();
             $new_section_elements = $new_section->get_section_elements();
             $this->assertSameSize($old_section_elements, $new_section_elements);
+            $old_element = $old_section_elements->first()->get_element();
+            $new_element = $new_section_elements->first()->get_element();
+            $this->assertEquals($old_element->identifier, $new_element->identifier);
 
             /** @var section_element $old_section_element */
             foreach ($old_section_elements as $section_element_key => $old_section_element) {
@@ -122,6 +129,7 @@ class mod_perform_activity_clone_model_helper_testcase extends advanced_testcase
                     $this->fail('Section element was not cloned');
                 }
                 $this->assertEquals($old_section_element->sort_order, $new_section_element->sort_order);
+
                 $old_section_elements->__unset($section_element_key);
             }
             $this->assertEmpty($old_section_elements);

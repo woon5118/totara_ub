@@ -40,7 +40,7 @@ class element extends entity_model_formatter {
             'id' => null,
             'element_plugin' => null,
             'title' => string_field_formatter::class,
-            'identifier' => null,
+            'identifier' => string_field_formatter::class,
             'data' => element_data_field_formatter::for_model($this->object),
             'is_required' => null,
             'is_respondable' => null,

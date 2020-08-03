@@ -99,10 +99,19 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
             [
                 'plugin_name',
                 'title',
-                'identifier',
+                'identifier_id',
                 'data',
                 'context_id',
                 'is_required'
+            ]
+        );
+
+        $element_identifiers = new backup_nested_element('element_identifiers');
+        $element_identifier = new backup_nested_element(
+            'element_identifier',
+            ['id'],
+            [
+                'identifier',
             ]
         );
 
@@ -349,6 +358,9 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
         $perform->add_child($elements);
         $elements->add_child($element);
 
+        $perform->add_child($element_identifiers);
+        $element_identifiers->add_child($element_identifier);
+
         $perform->add_child($sections);
         $sections->add_child($section);
         $section->add_child($section_elements);
@@ -401,10 +413,21 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
             ['activity_id' => backup::VAR_PARENTID]
         );
 
+        $element_identifier->set_source_sql(
+            "SELECT pei.*
+               FROM {perform_element_identifier} pei
+               JOIN {perform_element} pe ON pe.identifier_id = pei.id
+               JOIN {perform_section_element} pse ON pse.element_id = pe.id
+               JOIN {perform_section} ps ON pse.section_id = ps.id
+              WHERE ps.activity_id = :activity_id",
+            ['activity_id' => backup::VAR_PARENTID]
+        );
+
         $perform->annotate_ids('perform_type', 'type_id');
         $track_assignment->annotate_ids('user', 'created_by');
 
         $element->annotate_ids('context', 'context_id');
+        $element->annotate_ids('element_identifier', 'identifier_id');
 
         $participant_instance->annotate_ids('totara_core_relationship', 'core_relationship_id');
         $participant_section->annotate_ids('perform_section', 'section_id');

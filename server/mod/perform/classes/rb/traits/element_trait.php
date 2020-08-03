@@ -99,7 +99,16 @@ trait element_trait {
         /** @var element_trait|rb_base_source $this */
         $join = $this->element_join;
 
-        // None at present.
+        // Add in element_identifier table so we can add identifier columns/filters too.
+        $identifier_table_alias = "perform_element_identifier_{$join}";
+        $this->joinlist[] = new rb_join(
+            $identifier_table_alias,
+            'LEFT',
+            '{perform_element_identifier}',
+            "{$join}.identifier_id = {$identifier_table_alias}.id",
+            REPORT_BUILDER_RELATION_ONE_TO_ONE,
+            $join
+        );
     }
 
     /**
@@ -123,13 +132,14 @@ trait element_trait {
         );
 
         // Element identifier is known to end users as Reporting ID.
+        $identifier_table_alias = "perform_element_identifier_{$join}";
         $this->columnoptions[] = new rb_column_option(
             'element',
             'identifier',
             get_string('element_identifier', 'mod_perform'),
-            "{$join}.identifier",
+            "{$identifier_table_alias}.identifier",
             [
-                'joins' => [$join],
+                'joins' => [$join, $identifier_table_alias],
                 'dbdatatype' => 'text',
                 'outputformat' => 'text',
                 // TODO is this right? Not a multi-lang string but could contain chars to escape.

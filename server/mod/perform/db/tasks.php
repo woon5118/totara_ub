@@ -22,6 +22,7 @@
  */
 
 use mod_perform\task\check_notification_trigger_task;
+use mod_perform\task\cleanup_unused_element_identifiers_task;
 use mod_perform\task\create_manual_participant_progress_task;
 use mod_perform\task\create_subject_instance_task;
 use mod_perform\task\expand_assignments_task;
@@ -84,5 +85,14 @@ $tasks = [
         'day' => '*',
         'dayofweek' => '*',
         'month' => '*'
-    ]
+    ],
+    [
+        'classname' => cleanup_unused_element_identifiers_task::class,
+        'blocking' => 0,
+        'minute' => '52',
+        'hour' => '4',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    ],
 ];

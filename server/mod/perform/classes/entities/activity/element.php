@@ -24,6 +24,7 @@
 namespace mod_perform\entities\activity;
 
 use core\orm\entity\entity;
+use core\orm\entity\relations\belongs_to;
 
 /**
  * Section element entity
@@ -33,9 +34,10 @@ use core\orm\entity\entity;
  * @property int $context_id the context which owns this element, a performance activity or category/tenant
  * @property string $plugin_name name of the element plugin that controls this element
  * @property string $title a user-defined title to identify and describe this element
- * @property int $identifier used to match elements that share the same identifier
+ * @property int $identifier_id used to match elements that share the same identifier
  * @property string $data configuration data specific to this type of element
  * @property bool $is_required used to check response required or optional
+ * @property-read element_identifier $element_identifier
  *
  * @method static element_repository repository()
  *
@@ -56,5 +58,14 @@ class element extends entity {
         } else {
             return (bool) $this->get_attributes_raw()['is_required'];
         }
+    }
+
+    /**
+     * Get the element_identifier
+     *
+     * @return belongs_to
+     */
+    public function element_identifier(): belongs_to {
+        return $this->belongs_to(element_identifier::class, 'identifier_id');
     }
 }

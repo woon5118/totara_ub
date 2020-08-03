@@ -29,6 +29,9 @@
  *
  */
 
+use mod_perform\entities\activity\element;
+use mod_perform\models\activity\element_identifier;
+
 defined('MOODLE_INTERNAL') || die();
 
 function xmldb_perform_upgrade($oldversion) {
@@ -379,6 +382,93 @@ function xmldb_perform_upgrade($oldversion) {
 
         // Perform savepoint reached.
         upgrade_mod_savepoint(true, 2020081303, 'perform');
+    }
+
+    if ($oldversion < 2020081500) {
+
+        // Define table perform_element_identifier to be created.
+        $table = new xmldb_table('perform_element_identifier');
+
+        // Adding fields to table perform_element_identifier.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('identifier', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table perform_element_identifier.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+
+        // Adding indexes to table perform_element_identifier.
+        $table->add_index('identifier', XMLDB_INDEX_UNIQUE, array('identifier'));
+
+        // Conditionally launch create table for perform_element_identifier.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Define field identifier_id to be added to perform_element.
+        $table = new xmldb_table('perform_element');
+        $field = new xmldb_field('identifier_id', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'data');
+
+        // Conditionally launch add field identifier_id.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define key identifier_id (foreign) to be added to perform_element.
+        $table = new xmldb_table('perform_element');
+        $key = new xmldb_key('identifier_id', XMLDB_KEY_FOREIGN, array('identifier_id'), 'perform_element_identifier', array('id'));
+
+        // Launch add key identifier_id.
+        if (!$dbman->key_exists($table, $key)) {
+            $dbman->add_key($table, $key);
+        }
+
+        $old_table = new xmldb_table('perform_element');
+        $old_field = new xmldb_field('identifier', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'data');
+        $new_field = new xmldb_field('identifier_id', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'data');
+        $new_table = new xmldb_table('perform_element_identifier');
+
+        if ($dbman->table_exists($new_table) &&
+            $dbman->field_exists($old_table, $old_field) &&
+            $dbman->field_exists($old_table, $new_field)) {
+
+            // Create identifier records for any existing identifiers
+            $existing_identifiers = (element::repository())
+                ->select_raw('DISTINCT identifier')
+                ->where('identifier', '<>', '')
+                ->get()
+                ->pluck('identifier');
+            foreach ($existing_identifiers as $existing_identifier) {
+                element_identifier::create($existing_identifier);
+            }
+
+            // Select all elements with identifiers and the corresponding identifier ids
+            $elements_to_update = (element::repository())
+                ->left_join('perform_element_identifier', 'identifier', '=', 'identifier')
+                ->select('perform_element.id AS element_id')
+                ->add_select('perform_element_identifier.id AS identifier_id')
+                ->where_not_null('perform_element_identifier.id')
+                ->get();
+
+            // Store the identifier ids against the elements.
+            foreach ($elements_to_update as $element_to_update) {
+                /** @var element $element_entity */
+                $element_entity = element::repository()->find($element_to_update->element_id);
+                $element_entity->identifier_id = $element_to_update->identifier_id;
+                $element_entity->save();
+            }
+        }
+
+        // Define field identifier to be dropped from perform_element.
+        $table = new xmldb_table('perform_element');
+        $field = new xmldb_field('identifier');
+
+        // Conditionally launch drop field identifier.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020081500, 'perform');
     }
 
     return true;

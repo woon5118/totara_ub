@@ -91,6 +91,7 @@ $string['browse_records_by_content'] = 'Browse records by content';
 $string['browse_records_by_user'] = 'Browse records by user';
 $string['can_not_view_element'] = 'You do not have permission to view this element';
 $string['check_notification_trigger_task'] = 'Periodically check notification trigger conditions';
+$string['cleanup_unused_element_identifiers_task'] = 'Clean up unused element identifiers';
 $string['condition_actor_is_participant_fail'] = 'The currently logged in user is not the participant.';
 $string['created_at'] = 'Created at';
 $string['create_activity'] = 'Add activity';

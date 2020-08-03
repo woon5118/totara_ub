@@ -66,6 +66,11 @@ class restore_activity_structure_step extends \restore_activity_structure_step {
         );
 
         $paths[] = new restore_path_element(
+            'element_identifier',
+            '/activity/perform/element_identifiers/element_identifier'
+        );
+
+        $paths[] = new restore_path_element(
             'setting',
             '/activity/perform/settings/setting'
         );
@@ -229,6 +234,25 @@ class restore_activity_structure_step extends \restore_activity_structure_step {
 
         $new_item_id = $DB->insert_record('perform_element', $data);
         $this->set_mapping('perform_element', $old_id, $new_item_id);
+    }
+
+    protected function process_element_identifier($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $old_id = $data->id;
+
+        $activity_id = $this->get_new_parentid('perform');
+        $data->context_id = activity::load_by_id($activity_id)->get_context()->id;
+
+        // Only create new element identifiers if they don't already exist - otherwise use the existing id
+        $existing_identifier = $DB->get_record('perform_element_identifier', ['identifier' => $data->identifier]);
+        if ($existing_identifier) {
+            $new_item_id = $existing_identifier->id;
+        } else {
+            $new_item_id = $DB->insert_record('perform_element_identifier', $data);
+        }
+        $this->set_mapping('perform_element_identifier', $old_id, $new_item_id);
     }
 
     protected function process_section_element($data) {

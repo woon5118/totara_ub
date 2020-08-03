@@ -53,11 +53,11 @@ class mod_perform_element_model_testcase extends advanced_testcase {
 
     public function validation_data_provider() {
         return [
-            ['multi_choice_single', 'Test-ID', 'multi_choice_single', 'Test-ID', true],
-            ['multi_choice_single', 'Test-ID', 'short_text', 'Test-ID', false],
-            ['multi_choice_single', '', 'short_text', '', true],
-            ['multi_choice_single', '', 'short_text', 'Test-ID', true],
-            ['multi_choice_single', 'Test-ID', 'short_text', '', true],
+            ['multi_choice_single', 'Test-ID'],
+            ['short_text', 'Test-ID'],
+            ['multi_choice_single', ''],
+            ['multi_choice_single', '', 'short_text', 'Test-ID'],
+            ['short_text', ''],
         ];
     }
 
@@ -65,11 +65,9 @@ class mod_perform_element_model_testcase extends advanced_testcase {
      * @dataProvider validation_data_provider
      * @param string $plugin1
      * @param string $id1
-     * @param string $plugin2
-     * @param string $id2
      * @param bool $passes_validation
      */
-    public function test_validate(string $plugin1, string $id1, string $plugin2, string $id2, bool $passes_validation) {
+    public function test_validate(string $plugin1, string $id1) {
         $default_context = context_coursecat::instance(perform::get_default_category_id());
 
         element::create(
@@ -80,23 +78,5 @@ class mod_perform_element_model_testcase extends advanced_testcase {
             null,
             true
         );
-
-        if (!$passes_validation) {
-            $this->expectException(coding_exception::class);
-            $this->expectExceptionMessage('Cannot set identifier');
-        }
-
-        $element2 = element::create(
-            $default_context,
-            $plugin2,
-            'test title',
-            $id2,
-            null,
-            true
-        );
-
-        if ($passes_validation) {
-            $this->assertEquals($id2, $element2->identifier);
-        }
     }
 }

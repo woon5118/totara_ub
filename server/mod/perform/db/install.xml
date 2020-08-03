@@ -95,13 +95,26 @@
         <FIELD NAME="context_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The context which owns this element, either a perform activity or a category/tenant"/>
         <FIELD NAME="plugin_name" TYPE="char" LENGTH="1024" NOTNULL="true" SEQUENCE="false" COMMENT="Name of plugin that manages element of this type"/>
         <FIELD NAME="title" TYPE="char" LENGTH="1024" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="identifier" TYPE="char" LENGTH="1024" NOTNULL="false" SEQUENCE="false" COMMENT="Secondary identifier used to allow distinct questions to be aggregated together for reporting purposes."/>
+        <FIELD NAME="identifier_id" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Optional identifier used for reporting purposes"/>
         <FIELD NAME="is_required" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" COMMENT="1=required, 0=optional, null=irrelevant"/>
         <FIELD NAME="data" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="configuration data, format specific to element plugin"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="identifier_id" TYPE="foreign" FIELDS="identifier_id" REFTABLE="perform_element_identifier" REFFIELDS="id"/>
       </KEYS>
+    </TABLE>
+    <TABLE NAME="perform_element_identifier" COMMENT="Table containing identifier strings that can be used to tag elements">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="identifier" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="String name of this identifier"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="identifier" UNIQUE="true" FIELDS="identifier" COMMENT="String name of this identifier"/>
+      </INDEXES>
     </TABLE>
     <TABLE NAME="perform_section_element" COMMENT="Table to connect a specific question to a specific performance activity section">
       <FIELDS>

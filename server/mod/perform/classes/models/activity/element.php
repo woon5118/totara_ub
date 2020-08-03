@@ -36,12 +36,14 @@ use mod_perform\entities\activity\element as element_entity;
  * @property-read int $context_id
  * @property-read string $plugin_name name of the element plugin that controls this element
  * @property-read string $title a user-defined title to identify and describe this element
- * @property-read int $identifier used to match elements that share the same identifier
+ * @property-read int $identifier_id used to match elements that share the same identifier
  * @property-read string $data specific configuration data for this type of element
  * @property-read bool $is_required used to check response required or optional
  * @property-read \context $context
  * @property-read element_plugin $element_plugin
  * @property-read bool $is_respondable
+ * @property-read string element_$identifier
+ * @property-read element_identifier $element_identifier
  *
  * @package mod_perform\models\activity
  */
@@ -52,7 +54,7 @@ class element extends model {
         'context_id',
         'plugin_name',
         'title',
-        'identifier',
+        'identifier_id',
         'data',
         'is_required'
     ];
@@ -61,6 +63,8 @@ class element extends model {
         'context',
         'element_plugin',
         'is_respondable',
+        'identifier',
+        'element_identifier',
     ];
 
     /**
@@ -97,13 +101,13 @@ class element extends model {
         $entity->context_id = $context->id;
         $entity->plugin_name = $plugin_name;
         $entity->title = $title;
-        $entity->identifier = $identifier;
+        $element_identifier = element_identifier::fetch_or_create_identifier($identifier);
+        $entity->identifier_id = $element_identifier ? $element_identifier->id : null;
         $entity->data = $data;
         $entity->is_required  = $is_required;
         self::validate($entity);
         $entity->save();
 
-        /** @var self $model */
         $model = self::load_by_entity($entity);
         return $model;
     }
@@ -136,6 +140,29 @@ class element extends model {
     }
 
     /**
+     * Get the identifier string for this element, or null if none.
+     *
+     * @return string|null
+     * @throws coding_exception
+     */
+    public function get_identifier(): ?string {
+        if (is_null($this->entity->element_identifier)) {
+            return null;
+        }
+        $element_identifier = element_identifier::load_by_entity($this->entity->element_identifier);
+        return $element_identifier ? $element_identifier->identifier : null;
+    }
+
+    /**
+     * Get the identifier model for this element, or null if none.
+     *
+     * @return element_identifier
+     * @throws coding_exception
+     */
+    public function get_element_identifier(): element_identifier {
+        return element_identifier::load_by_entity($this->entity->element_identifier);
+    }
+    /**
      * Update the context for this element
      *
      * An element is "owned" by the context it belongs to. Setting a new context effectively "moves" the element.
@@ -159,7 +186,8 @@ class element extends model {
         $this->entity->title = $title;
         $this->entity->data = $data;
         $this->entity->is_required = $is_required;
-        $this->entity->identifier = $identifier;
+        $element_identifier = element_identifier::fetch_or_create_identifier($identifier);
+        $this->entity->identifier_id = $element_identifier ? $element_identifier->id : null;
         self::validate($this->entity);
         $this->entity->save();
     }
@@ -173,32 +201,7 @@ class element extends model {
      * @throws coding_exception
      */
     public static function validate(element_entity $entity): void {
-        if (!self::is_valid_identifier_for_plugin($entity->identifier, $entity->plugin_name)) {
-            throw new coding_exception(
-                "Cannot set identifier {$entity->identifier} for plugin_name {$entity->plugin_name}"
-            );
-        }
-
         $element_plugin = element_plugin::load_by_plugin($entity->plugin_name);
         $element_plugin->validate_element($entity);
-    }
-
-    /**
-     * Check if the given identifier is valid for the specified plugin_name.
-     *
-     * The rule is that the same identifier must not be used for different plugin_names.
-     *
-     * @param string $identifier
-     * @param string $plugin_name
-     * @return bool
-     */
-    public static function is_valid_identifier_for_plugin(string $identifier, string $plugin_name): bool {
-        if (empty($identifier)) {
-            return true;
-        }
-        return !element_entity::repository()
-            ->where('identifier', $identifier)
-            ->where('plugin_name', '!=', $plugin_name)
-            ->exists();
     }
 }
