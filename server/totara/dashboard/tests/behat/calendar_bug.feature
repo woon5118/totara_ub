@@ -30,7 +30,7 @@ Feature: Test that calendar works properly with calendar when dashboard set as h
       | defaulthomepage | Totara dashboard |
     And I log out
     When I log in as "student1"
-    And I click on "Home" in the totara menu
+    And I am on site homepage
     And I should see "Calendar" in the ".block_calendar_month .title" "css_element"
     And I click on "Previous month" "link" in the ".minicalendar .calendar-controls" "css_element"
     Then I should see "Calendar" in the ".block_calendar_month .title" "css_element"

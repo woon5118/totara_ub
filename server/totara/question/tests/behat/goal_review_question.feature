@@ -42,7 +42,7 @@ Feature: Custom Fields on goals are editable appraisals when they should be
     And I press "Save changes"
     And I log out
     And I log in as "learner"
-    And I click on "Goals" in the totara menu
+    And I am on "Goals" page
 
     And I click on "Add personal goal" "button"
     And I set the field "Name" to "My Goal"
@@ -92,16 +92,14 @@ Feature: Custom Fields on goals are editable appraisals when they should be
     And I log out
 
     When I log in as "learner"
-    And I follow "Performance"
-    And I follow "Latest Appraisal"
+    And I am on "Latest Appraisal" page
     And I press "Start"
 
     Then the "Text input 1" "field" should not be readonly
 
     When I log out
     And I log in as "manager"
-    And I follow "Performance"
-    And I follow "All Appraisals"
+    And I am on "All Appraisals" page
     And I click on "Appraisal1" "link"
     And I press "View"
 
@@ -109,8 +107,7 @@ Feature: Custom Fields on goals are editable appraisals when they should be
 
     When I log out
     And I log in as "managersmanager"
-    And I follow "Performance"
-    And I follow "All Appraisals"
+    And I am on "All Appraisals" page
     And I click on "Appraisal1" "link"
     And I press "View"
 
@@ -118,8 +115,7 @@ Feature: Custom Fields on goals are editable appraisals when they should be
 
     When I log out
     And I log in as "appraiser"
-    And I follow "Performance"
-    And I follow "All Appraisals"
+    And I am on "All Appraisals" page
     And I click on "Appraisal1" "link"
     And I press "View"
 
@@ -138,16 +134,15 @@ Feature: Custom Fields on goals are editable appraisals when they should be
     And I log out
 
     When I log in as "learner"
-    And I follow "Performance"
-    And I follow "Latest Appraisal"
+    And I am on "Latest Appraisal" page
     And I press "Start"
 
     Then the "Text input 1" "field" should not be readonly
 
     When I log out
     And I log in as "manager"
-    And I follow "Performance"
-    And I follow "All Appraisals"
+    And I am on "All Appraisals" page
+
     And I click on "Appraisal1" "link"
     And I press "Start"
 
@@ -155,8 +150,7 @@ Feature: Custom Fields on goals are editable appraisals when they should be
 
     When I log out
     And I log in as "managersmanager"
-    And I follow "Performance"
-    And I follow "All Appraisals"
+    And I am on "All Appraisals" page
     And I click on "Appraisal1" "link"
     And I press "Start"
 
@@ -164,8 +158,7 @@ Feature: Custom Fields on goals are editable appraisals when they should be
 
     When I log out
     And I log in as "appraiser"
-    And I follow "Performance"
-    And I follow "All Appraisals"
+    And I am on "All Appraisals" page
     And I click on "Appraisal1" "link"
     And I press "Start"
 

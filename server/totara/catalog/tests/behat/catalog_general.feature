@@ -221,20 +221,18 @@ Feature: Test file for catalog
     And I should not see "Make home page"
 
     When I click on "Home" in the totara menu
-    Then I should see "Make home page"
+    Then "Make home page" "button" should exist
 
     When I click on ".masthead_logo--header_link" "css_element"
     Then I should see "Find Learning"
-    And I should not see "Make home page"
+    And "Make home page" "button" should not exist
 
     When I click on "Home" in the totara menu
-    Then I click on "Make home page" "link"
+    Then I click on "Make home page" "button"
     And I should see "Your default page was changed"
 
     When I click on "Find Learning" in the totara menu
     Then I should see "Make home page"
 
     When I am on "Dashboard" page
-    Then I press "Make home page"
-    And I should see "Your default page was changed"
-    And I should not see "Make home page"
+    Then "Make home page" "button" should not exist

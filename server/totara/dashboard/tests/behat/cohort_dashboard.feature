@@ -61,21 +61,10 @@ Feature: Test Dashboard for cohort users
       | Content                      | Second dashboard block content |
     And I press "Save changes"
 
-      # Dasboard shows in the Totara menu
+    # Dasboard should  not show in the Totara menu.
     And I set the following administration settings values:
       | enabletotaradashboard | Enable |
     And I log out
-
-    When I log in as "student1"
-    Then I should see "Dashboard" in the totara menu
-    And I log out
-
-      # Dasboard does not show in the Totara menu
-    And I log in as "admin"
-    And I set the following administration settings values:
-      | enabletotaradashboard | Disable |
-    And I log out
-
     When I log in as "student1"
     Then I should not see "Dashboard" in the totara menu
     And I log out

@@ -30,7 +30,6 @@ Feature: Dashboard available for all logged in users
 
   Scenario: Check that user that doesn't have any cohort dashboards can access and change "available to all"
     Given I log in as "learner2"
-    And I should see "Dashboard" in the totara menu
     When I am on "Dashboard" page
     Then I press "Customise this page"
 

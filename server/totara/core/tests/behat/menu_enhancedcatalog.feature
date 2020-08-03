@@ -21,8 +21,6 @@ Feature: Test menu correctly highlights the course catalog page when enhanced ca
     When I follow "Enhanced catalog"
     Then Totara menu item "Enhanced catalog" should be highlighted
     And Totara menu item "Find Learning" should not be highlighted
-    When I follow "Find Learning"
-    And I follow "Courses"
-    Then Totara menu item "Find Learning" should be highlighted
+    When I click on "Courses" in the totara menu
+    Then Totara menu item "Learn" should be highlighted
     And Totara menu item "Enhanced catalog" should not be highlighted
-

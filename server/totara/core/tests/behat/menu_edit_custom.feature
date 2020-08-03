@@ -169,8 +169,8 @@ Feature: Main menu advanced edit custom items tests
 
     When I click on "Edit" "link" in the "Top test item" "table_row"
     And the "Parent item" select box should contain "Top"
-    And the "Parent item" select box should contain "Performance"
-    And the "Parent item" select box should contain "Find Learning (Legacy catalogues)"
+    And the "Parent item" select box should contain "Learn"
+    And the "Parent item" select box should contain "Learn / Find Learning (Legacy catalogues)"
     And the "Parent item" select box should contain "Top container"
     And the "Parent item" select box should contain "Top container / Sub container"
     And the "Parent item" select box should contain "Hidden container"
@@ -224,8 +224,8 @@ Feature: Main menu advanced edit custom items tests
 
     When I click on "Edit" "link" in the "Unused container" "table_row"
     And the "Parent item" select box should contain "Top"
-    And the "Parent item" select box should contain "Performance"
-    And the "Parent item" select box should contain "Find Learning (Legacy catalogues)"
+    And the "Parent item" select box should contain "Learn"
+    And the "Parent item" select box should contain "Learn / Find Learning (Legacy catalogues)"
     And the "Parent item" select box should contain "Top container"
     And the "Parent item" select box should contain "Top container / Sub container"
     And the "Parent item" select box should contain "Hidden container"

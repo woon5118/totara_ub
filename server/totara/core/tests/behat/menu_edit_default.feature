@@ -46,9 +46,9 @@ Feature: Main menu advanced edit default items tests
 
     When I click on "Edit" "link" in the "Dashboard" "table_row"
     And I should see the following Totara form fields having these values:
-      | Parent item       | Top                           |
+      | Parent item         | Unused                      |
       | Override menu title | 0                           |
-      | Visibility        | Show when accessible          |
+      | Visibility          | Show when accessible        |
     And I should not see Totara form label "Menu title"
     And I should not see Totara form label "Menu url address"
     And I should not see Totara form label "Open link in new window"
@@ -57,9 +57,9 @@ Feature: Main menu advanced edit default items tests
 
     When I click on "Edit" "link" in the "Performance" "table_row"
     And I should see the following Totara form fields having these values:
-      | Parent item       | Top                           |
+      | Parent item         | Unused                        |
       | Override menu title | 0                           |
-      | Visibility        | Show                          |
+      | Visibility          | Show                          |
     And I should not see Totara form label "Menu title"
     And I should not see Totara form label "Menu url address"
     And I should not see Totara form label "Open link in new window"
@@ -72,8 +72,9 @@ Feature: Main menu advanced edit default items tests
     And I should see the following Totara form fields having these values:
       | Override menu title | 0                           |
     And I set the following Totara form fields to these values:
+      | Parent item         | Learn                       |
       | Override menu title | 1                           |
-      | Menu title        | Special item                  |
+      | Menu title          | Special item                |
     And I press "Save changes"
     Then I should see "Main menu has been updated successfully"
     And I should see "Special item" in the totara menu
@@ -96,7 +97,7 @@ Feature: Main menu advanced edit default items tests
     And I press "Cancel"
     And I should see "Dashboard" in the totara menu
 
-    When I click on "Edit" "link" in the "Performance" "table_row"
+    When I click on "Edit" "link" in the "Learn" "table_row"
     And I should see the following Totara form fields having these values:
       | Override menu title | 0                           |
     And I set the following Totara form fields to these values:
@@ -113,8 +114,9 @@ Feature: Main menu advanced edit default items tests
       | Override menu title | 0                           |
     And I press "Save changes"
     Then I should see "Main menu has been updated successfully"
-    And I should see "Performance" in the totara menu
-    When I click on "Edit" "link" in the "Performance" "table_row"
+    And I should see "Learn" in the totara menu
+    And I should not see "Special container" in the totara menu
+    When I click on "Edit" "link" in the "Learn" "table_row"
     And I should see the following Totara form fields having these values:
       | Override menu title | 0                           |
     And I set the following Totara form fields to these values:
@@ -122,7 +124,8 @@ Feature: Main menu advanced edit default items tests
     And I should see the following Totara form fields having these values:
       | Menu title        | Special container             |
     And I press "Cancel"
-    And I should see "Performance" in the totara menu
+    And I should see "Learn" in the totara menu
+    And I should not see "Special container" in the totara menu
 
 # Change visibility.
 
@@ -145,31 +148,31 @@ Feature: Main menu advanced edit default items tests
     And "Dashboard" row "Visibility" column of "totaramenutable" table should contain "Show when accessible"
     And I should see "Dashboard" in the totara menu
 
-    When I click on "Edit" "link" in the "Performance" "table_row"
+    When I click on "Edit" "link" in the "Learn" "table_row"
     And I should see the following Totara form fields having these values:
       | Visibility        | Show                          |
     And I set the following Totara form fields to these values:
       | Visibility        | Hide                          |
     And I press "Save changes"
     Then I should see "Main menu has been updated successfully"
-    And "Performance" row "Visibility" column of "totaramenutable" table should contain "Hide"
-    And I should not see "Performance" in the totara menu
-    When I click on "Edit" "link" in the "Performance" "table_row"
+    And "Learn" row "Visibility" column of "totaramenutable" table should contain "Hide"
+    And I should not see "Learn" in the totara menu
+    When I click on "Edit" "link" in the "Learn" "table_row"
     And I should see the following Totara form fields having these values:
       | Visibility        | Hide                          |
     And I set the following Totara form fields to these values:
       | Visibility        | Show                          |
     And I press "Save changes"
     Then I should see "Main menu has been updated successfully"
-    And "Performance" row "Visibility" column of "totaramenutable" table should contain "Show"
-    And I should see "Performance" in the totara menu
+    And "Learn" row "Visibility" column of "totaramenutable" table should contain "Show"
+    And I should see "Learn" in the totara menu
 
 # Change parent.
 
     When I click on "Edit" "link" in the "Dashboard" "table_row"
     And the "Parent item" select box should contain "Top"
-    And the "Parent item" select box should contain "Performance"
-    And the "Parent item" select box should contain "Find Learning (Legacy catalogues)"
+    And the "Parent item" select box should contain "Learn"
+    And the "Parent item" select box should contain "Learn / Find Learning (Legacy catalogues)"
     And the "Parent item" select box should contain "Top container"
     And the "Parent item" select box should contain "Top container / Sub container"
     And the "Parent item" select box should contain "Hidden container"
@@ -177,7 +180,7 @@ Feature: Main menu advanced edit default items tests
     And the "Parent item" select box should contain "Top container / Sub container / Sub sub container"
     And the "Parent item" select box should not contain "Unused / Unused container"
     And I should see the following Totara form fields having these values:
-      | Parent item       | Top                           |
+      | Parent item       | Learn                          |
     And I set the following Totara form fields to these values:
       | Parent item       | Top container                 |
     And I press "Save changes"
@@ -221,10 +224,10 @@ Feature: Main menu advanced edit default items tests
     And "Dashboard" row "Visibility" column of "totaramenutable" table should contain "Show when accessible"
     And I should see "Dashboard" in the totara menu
 
-    When I click on "Edit" "link" in the "Performance" "table_row"
+    When I click on "Edit" "link" in the "Learn" "table_row"
     And the "Parent item" select box should contain "Top"
-    And the "Parent item" select box should contain "Performance"
-    And the "Parent item" select box should contain "Find Learning (Legacy catalogues)"
+    And the "Parent item" select box should contain "Learn"
+    And the "Parent item" select box should contain "Learn / Find Learning (Legacy catalogues)"
     And the "Parent item" select box should contain "Top container"
     And the "Parent item" select box should contain "Top container / Sub container"
     And the "Parent item" select box should contain "Hidden container"
@@ -234,31 +237,33 @@ Feature: Main menu advanced edit default items tests
     And I should see the following Totara form fields having these values:
       | Parent item       | Top                          |
     And I set the following Totara form fields to these values:
-      | Parent item       | Unused                       |
+      | Override menu title | 1                          |
+      | Menu title          | Learn Test                 |
+      | Parent item         | Unused                     |
     And I press "Save changes"
     Then I should see "Main menu has been updated successfully"
-    And "Performance" row "Visibility" column of "totaramenutable" table should contain "Unused"
-    When I click on "Edit" "link" in the "Performance" "table_row"
+    And "Learn Test" row "Visibility" column of "totaramenutable" table should contain "Unused"
+    When I click on "Edit" "link" in the "Learn Test" "table_row"
     And I should see the following Totara form fields having these values:
       | Parent item       | Unused                        |
     And I set the following Totara form fields to these values:
       | Parent item       | Top container / Sub container |
     And I press "Save changes"
     Then I should see "Main menu has been updated successfully"
-    And "Performance" row "Visibility" column of "totaramenutable" table should contain "Hidden: menu limit exceeded"
-    When I click on "Edit" "link" in the "Performance" "table_row"
+    And "Learn Test" row "Visibility" column of "totaramenutable" table should contain "Hidden: menu limit exceeded"
+    When I click on "Edit" "link" in the "Learn Test" "table_row"
     And I should see the following Totara form fields having these values:
       | Parent item       | Top container / Sub container |
     And I set the following Totara form fields to these values:
       | Parent item       | Top container / Sub container / Sub sub container |
     And I press "Save changes"
     Then I should see "Main menu has been updated successfully"
-    And "Performance" row "Visibility" column of "totaramenutable" table should contain "Hidden: menu limit exceeded"
-    When I click on "Edit" "link" in the "Performance" "table_row"
+    And "Learn Test" row "Visibility" column of "totaramenutable" table should contain "Hidden: menu limit exceeded"
+    When I click on "Edit" "link" in the "Learn Test" "table_row"
     And I should see the following Totara form fields having these values:
       | Parent item       | Top container / Sub container / Sub sub container |
     And I set the following Totara form fields to these values:
       | Parent item       | Top                           |
     And I press "Save changes"
     Then I should see "Main menu has been updated successfully"
-    And "Performance" row "Visibility" column of "totaramenutable" table should contain "Show"
+    And "Learn Test" row "Visibility" column of "totaramenutable" table should contain "Show"

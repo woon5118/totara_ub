@@ -23,37 +23,34 @@ Feature: Test Dashboard defaults
   Scenario: Dashboard is default page for all users except admin by default
     When I log in as "student1"
     Then I should see "My Learning" in the ".breadcrumb-nav" "css_element"
-    And I should not see "Make home page"
+    And "Make home page" "button" should exist
     And I should see "Current Learning"
-
-    When I click on "Home" in the totara menu
-    Then I should see "Latest announcements"
-    And I should not see "Current Learning"
-    And I should see "Make home page"
 
     When I am on "Dashboard" page
     Then I should see "My Learning" in the ".breadcrumb-nav" "css_element"
-    And I should not see "Make home page"
+    And I should see "Latest announcements"
+    And I should see "Current Learning"
+    And "Make home page" "button" should exist
 
     When I click on "Home" in the totara menu
-    And I click on "Make home page" "link"
-    And I should not see "Make home page"
-    And I should not see "Current Learning"
+    Then I should see "My Learning" in the ".breadcrumb-nav" "css_element"
+    And I should see "Latest announcements"
+    And I should see "Current Learning"
+    And "Make home page" "button" should exist
+
+    When I click on "Make home page" "button"
+    Then "Make home page" "button" should not exist
+    And I should see "Your default page was changed"
+    And I should see "Current Learning"
     And I log out
-    And I log in as "student1"
+
+    When I log in as "student1"
     Then I should see "Latest announcements"
-    And I should not see "Current Learning"
-    And I should not see "Make home page"
+    And I should see "Current Learning"
+    And "Make home page" "button" should not exist
 
     When I am on "Dashboard" page
-    And I press "Make home page"
-    And I should not see "Make home page"
-    And I should see "Current Learning"
-    And I log out
-    And I log in as "student1"
-    Then I should see "My Learning" in the ".breadcrumb-nav" "css_element"
-    And I should see "Current Learning"
-    And I should not see "Make home page"
+    Then "Make home page" "button" should not exist
 
   Scenario: Home is default page for admin by default
     When I log in as "admin"
@@ -76,17 +73,16 @@ Feature: Test Dashboard defaults
     And I log in as "admin"
     Then I should see "My Learning" in the ".breadcrumb-nav" "css_element"
     And I should see "Current Learning"
-    And I should not see "Make home page"
+    And "Make home page" "button" should not exist
 
     When I click on "Home" in the totara menu
-    And I click on "Make home page" "link"
-    And I should not see "Make home page"
-    And I should not see "Current Learning"
+    And "Make home page" "button" should not exist
+    And I should see "Current Learning"
     And I log out
     And I log in as "admin"
     Then I should see "Latest announcements"
-    And I should not see "Current Learning"
-    And I should not see "Make home page"
+    And I should see "Current Learning"
+    And "Make home page" "button" should not exist
 
   Scenario: Disable Totara Dashboard feature
     Given I log in as "admin"

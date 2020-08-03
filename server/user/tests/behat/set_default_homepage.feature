@@ -15,13 +15,15 @@ Feature: Set the site home page and dashboard as the default home page
     And I navigate to "Navigation > Navigation settings" in site administration
     And I set the field "Allow default page selection" to "1"
     And I press "Save changes"
-    And I am on site homepage
-    And I follow "Dashboard"
+    And I am on "Dashboard" page
     And I press "Make home page"
     And I should not see "Make home page"
     And I should see "Dashboard" in the ".breadcrumb-nav" "css_element"
     And "//*[@class='breadcrumb-nav']//li/span/a/span[text()='Dashboard']" "xpath_element" should exist
     And I click on "Home" in the totara menu
+    And I should not see "Make home page"
+    And I should see "Dashboard" in the ".breadcrumb-nav" "css_element"
+    And I am on site homepage
     And I follow "Make home page"
     And I should not see "Make home page"
     When I am on "Course 1" course homepage
