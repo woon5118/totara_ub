@@ -54,6 +54,8 @@ use mod_perform\models\activity\section_relationship as section_relationship_mod
 use mod_perform\models\activity\subject_instance_manual_participant;
 use mod_perform\models\activity\track;
 use mod_perform\models\activity\track_assignment_type;
+use mod_perform\models\activity\notification;
+use mod_perform\models\activity\notification_recipient;
 use mod_perform\state\activity\active;
 use mod_perform\state\activity\activity_state;
 use mod_perform\state\activity\draft;
@@ -64,6 +66,8 @@ use mod_perform\state\subject_instance\pending;
 use mod_perform\task\service\subject_instance_creation;
 use mod_perform\user_groups\grouping;
 use mod_perform\util;
+use mod_perform\notification\loader as notification_loader;
+use totara_core\entities\relationship_resolver as core_relationship_resolver;
 use totara_core\relationship\relationship as core_relationship;
 use totara_core\relationship\relationship_provider as core_relationship_provider;
 use totara_job\job_assignment;
@@ -373,6 +377,11 @@ class mod_perform_generator extends component_generator_base {
         return core_relationship::load_by_idnumber($idnumber);
     }
 
+    public function create_notification_recipient(notification $notification, array $data, bool $active = true): notification_recipient {
+        $core_relationship = $this->get_core_relationship($data['class_name']);
+        return notification_recipient::create($notification, $core_relationship, $active);
+    }
+
     /**
      * Creates a set of tracks for the given activity.
      *
@@ -500,7 +509,7 @@ class mod_perform_generator extends component_generator_base {
     }
 
     /**
-     * Create full activities including assignments, subject and participant instances
+     * Create full activities including assignments, subject, participant instances and notifications
      *
      * @param mod_perform_activity_generator_configuration $configuration
      * @return collection
@@ -534,13 +543,30 @@ class mod_perform_generator extends component_generator_base {
 
             $activity = $this->create_activity_in_container($data);
 
+            // Create all notifications.
+            $loader = notification_loader::create();
+            $key_classes = $loader->get_classes();
+            $notifications = [];
+            foreach ($key_classes as $key => $class) {
+                $notifications[] = notification::create($activity, $key, true);
+            }
+
             if ($configuration->get_number_of_sections_per_activity() > 1) {
                 $activity->get_settings()->update([activity_setting::MULTISECTION => true]);
             }
 
+            $relationships = $configuration->get_relationships_per_section();
+
+            // Add notification recipient for each relationship.
+            foreach ($relationships  as $relationship_class) {
+                foreach ($notifications as $notification) {
+                    $this->create_notification_recipient($notification, ['class_name' => $relationship_class], true);
+                }
+            }
+
             for ($k = 0; $k < $configuration->get_number_of_sections_per_activity(); $k++) {
                 $section = $this->create_section($activity, ['title' => $activity->name . ' section ' . $k]);
-                foreach ($configuration->get_relationships_per_section() as $relationship_idnumber) {
+                foreach ($relationships as $relationship_idnumber) {
                     $this->create_section_relationship($section, ['relationship' => $relationship_idnumber]);
                 }
                 for ($j = 1; $j <= $configuration->get_number_of_elements_per_section(); $j++) {

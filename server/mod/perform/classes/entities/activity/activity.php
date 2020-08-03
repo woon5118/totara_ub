@@ -117,6 +117,15 @@ class activity extends entity {
     }
 
     /**
+     * Get the notifications for this activity.
+     *
+     * @return has_many
+     */
+    public function notifications(): has_many {
+        return $this->has_many(notification::class, 'activity_id');
+    }
+
+    /**
      * Bool casting.
      *
      * @return bool

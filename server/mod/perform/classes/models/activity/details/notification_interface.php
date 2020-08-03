@@ -37,13 +37,6 @@ interface notification_interface {
     public function get_activity(): activity;
 
     /**
-     * Return the underlying notification record id or null.
-     *
-     * @return integer|null
-     */
-    public function get_id(): ?int;
-
-    /**
      * Returns the registered class key.
      *
      * @return string
@@ -82,7 +75,7 @@ interface notification_interface {
      * Activate this notification setting.
      *
      * @param boolean $active
-     * @return notification
+     * @return notification_interface
      */
     public function activate(bool $active = true): notification_interface;
 
@@ -97,14 +90,14 @@ interface notification_interface {
     /**
      * Delete the current notification setting.
      *
-     * @return notification
+     * @return notification_interface
      */
     public function delete(): notification_interface;
 
     /**
      * Reload the internal bookkeeping.
      *
-     * @return notification
+     * @return notification_interface
      */
     public function refresh(): notification_interface;
 }

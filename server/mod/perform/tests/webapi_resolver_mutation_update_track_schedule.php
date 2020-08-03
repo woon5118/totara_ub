@@ -38,7 +38,7 @@ abstract class mod_perform_webapi_resolver_mutation_update_track_schedule_base e
     protected $track1_id;
 
     public function setUp(): void {
-        global $DB;
+        global $DB, $PAGE;
 
         self::setAdminUser();
 
@@ -51,6 +51,11 @@ abstract class mod_perform_webapi_resolver_mutation_update_track_schedule_base e
         /** @var mod_perform_generator $perform_generator */
         $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
         $activities = $perform_generator->create_full_activities($configuration);
+
+        // Because notifications got emailed to the notification recipients
+        // and theme and output got initialised as a result of that we don't
+        // want the process to fail moodle_page::ensure_theme_not_set.
+        $PAGE->reset_theme_and_output();
 
         // Set all records to some known values so that we can see which records and fields are being modified.
         $control_offset = json_encode(new date_offset(

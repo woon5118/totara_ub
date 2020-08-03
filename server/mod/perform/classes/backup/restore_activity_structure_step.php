@@ -129,6 +129,16 @@ class restore_activity_structure_step extends \restore_activity_structure_step {
             '/activity/perform/tracks/track/track_user_assignments/track_user_assignment/subject_instances/subject_instance/subject_instance_manual_participants/subject_instance_manual_participant'
         );
 
+        $paths[] = new restore_path_element(
+            'notification',
+            '/activity/perform/notifications/notification'
+        );
+
+        $paths[] = new restore_path_element(
+            'notification_recipient',
+            '/activity/perform/notifications/notification/notification_recipients/notification_recipient'
+        );
+
         // Return the paths wrapped into standard activity structure
         return $this->prepare_activity_structure($paths);
     }
@@ -241,6 +251,33 @@ class restore_activity_structure_step extends \restore_activity_structure_step {
 
         $new_item_id = $DB->insert_record('perform_section_relationship', $data);
         $this->set_mapping('perform_section_relationship', $old_id, $new_item_id);
+    }
+
+    protected function process_notification($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $old_id = $data->id;
+
+        // Keeping or moving these times makes little sense, but it is the expected Moodle way...
+        $data->created_at = $this->apply_date_offset($data->created_at);
+
+        $data->activity_id = $this->get_new_parentid('perform');
+
+        $new_item_id = $DB->insert_record('perform_notification', $data);
+        $this->set_mapping('notification', $old_id, $new_item_id);
+    }
+
+    protected function process_notification_recipient($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $old_id = $data->id;
+
+        $data->notification_id = $this->get_new_parentid('notification');
+
+        $new_item_id = $DB->insert_record('perform_notification_recipient', $data);
+        $this->set_mapping('notification_recipient', $old_id, $new_item_id);
     }
 
     protected function process_track($data) {

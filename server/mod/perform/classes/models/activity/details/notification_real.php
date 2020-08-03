@@ -25,41 +25,23 @@ namespace mod_perform\models\activity\details;
 
 use coding_exception;
 use core\orm\collection;
+use core\orm\entity\model;
 use core\orm\query\exceptions\record_not_found_exception;
 use mod_perform\entities\activity\notification as notification_entity;
 use mod_perform\models\activity\activity;
-use mod_perform\models\activity\details\notification_interface;
 use mod_perform\notification\factory;
 use moodle_exception;
 
 /**
  * The internal implementation that represents an existing performance notification setting.
  */
-final class notification_real implements notification_interface {
-    /** @var notification_entity */
-    private $entity;
-
-    /**
-     * Private constructor.
-     *
-     * @param notification_entity $entity
-     */
-    private function __construct(notification_entity $entity) {
-        $this->entity = $entity;
-    }
+final class notification_real extends model implements notification_interface {
 
     /**
      * @inheritDoc
      */
     public function get_activity(): activity {
-        return new activity($this->entity->activity);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function get_id(): ?int {
-        return $this->entity->id;
+        return activity::load_by_id($this->entity->activity_id);
     }
 
     /**
@@ -109,10 +91,22 @@ final class notification_real implements notification_interface {
      */
     public function __get(string $name) {
         $methodname = 'get_'.$name;
-        if (!method_exists($this, $methodname)) {
-            throw new coding_exception('unknown property: '.$name);
+        if (method_exists($this, $methodname)) {
+            return $this->{$methodname}();
         }
-        return $this->{$methodname}();
+        return parent::__get($name);
+    }
+
+    /**
+     * @param string $name
+     * @return boolean
+     */
+    public function has_attribute(string $name): bool {
+        $methodname = 'get_'.$name;
+        if (method_exists($this, $methodname)) {
+            return true;
+        }
+        return parent::has_attribute($name);
     }
 
     /**
@@ -158,9 +152,9 @@ final class notification_real implements notification_interface {
      * @throws record_not_found_exception
      */
     public static function load_by_id(int $notification_id): self {
+        /** @var notification_entity $entity */
         $entity = notification_entity::repository()->find_or_fail($notification_id);
-        $inst = new self($entity);
-        return $inst;
+        return new self($entity);
     }
 
     /**
@@ -219,5 +213,12 @@ final class notification_real implements notification_interface {
     public function refresh(): notification_interface {
         $this->entity->refresh();
         return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected static function get_entity_class(): string {
+        return notification_entity::class;
     }
 }

@@ -27,6 +27,7 @@ use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\mutation_resolver;
 use core\webapi\resolver\has_middleware;
+use mod_perform\models\activity\activity;
 use mod_perform\webapi\middleware\require_activity;
 use moodle_exception;
 
@@ -43,6 +44,7 @@ class clone_activity implements mutation_resolver, has_middleware {
             throw new \invalid_parameter_exception('activity details not given');
         }
 
+        /** @var activity $activity */
         $activity = $args['activity'] ?? null;
         if (empty($activity) || !$activity->can_clone) {
             throw new moodle_exception('invalid_activity', 'mod_perform');

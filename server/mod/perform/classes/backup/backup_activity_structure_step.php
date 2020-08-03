@@ -302,6 +302,32 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
             ]
         );
 
+        $notifications = new backup_nested_element('notifications');
+        $notification = new backup_nested_element(
+            'notification',
+            ['id'],
+            [
+                'activity_id',
+                'class_key',
+                'active',
+                'triggers',
+                'last_run_at',
+                'created_at',
+                'updated_at',
+            ]
+        );
+
+        $notification_recipients = new backup_nested_element('notification_recipients');
+        $notification_recipient = new backup_nested_element(
+            'notification_recipient',
+            ['id'],
+            [
+                'active',
+                'notification_id',
+                'core_relationship_id',
+            ]
+        );
+
         $perform->add_child($settings);
         $settings->add_child($setting);
 
@@ -336,6 +362,20 @@ class backup_activity_structure_step extends \backup_activity_structure_step {
         $section_relationship->set_source_table('perform_section_relationship', ['section_id' => backup::VAR_PARENTID]);
 
         $manual_relationship->set_source_table('perform_manual_relation_selection', ['activity_id' => backup::VAR_PARENTID]);
+
+        // Notifications.
+        $perform->add_child($notifications);
+        $notifications->add_child($notification);
+        $notification->add_child($notification_recipients);
+        $notification_recipients->add_child($notification_recipient);
+        $notification->set_source_table(
+            'perform_notification',
+            ['activity_id' => backup::VAR_PARENTID]
+        );
+        $notification_recipient->set_source_table(
+            'perform_notification_recipient',
+            ['notification_id' => backup::VAR_PARENTID]
+        );
 
         $element->set_source_sql(
             "SELECT pe.*

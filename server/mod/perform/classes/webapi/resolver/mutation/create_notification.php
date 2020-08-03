@@ -28,6 +28,7 @@ use core\webapi\mutation_resolver;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\resolver\has_middleware;
 
+use mod_perform\models\activity\activity;
 use mod_perform\webapi\middleware\require_activity;
 use mod_perform\webapi\middleware\require_manage_capability;
 
@@ -43,6 +44,7 @@ class create_notification implements mutation_resolver, has_middleware {
      */
     public static function resolve(array $args, execution_context $ec) {
         // Activity id is verified, and activity is loaded, by middleware.
+        /** @var activity $activity */
         $activity = $args['activity'];
 
         // Get input from args

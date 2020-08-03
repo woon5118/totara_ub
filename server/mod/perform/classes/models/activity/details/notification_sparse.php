@@ -27,7 +27,6 @@ use coding_exception;
 use mod_perform\notification\broker;
 use mod_perform\notification\factory;
 use mod_perform\models\activity\activity;
-use mod_perform\models\activity\details\notification_interface;
 
 /**
  * The internal implementation that represents a non-existent performance notification setting.

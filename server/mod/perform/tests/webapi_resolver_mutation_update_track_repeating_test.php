@@ -99,7 +99,7 @@ class mod_perform_webapi_resolver_mutation_update_track_repeating_testcase
     }
 
     public function test_correct_track_is_enabled(): void {
-        global $DB;
+        global $DB, $PAGE;
 
         self::setAdminUser();
 
@@ -110,6 +110,11 @@ class mod_perform_webapi_resolver_mutation_update_track_repeating_testcase
         /** @var mod_perform_generator $perform_generator */
         $perform_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
         $activities = $perform_generator->create_full_activities($configuration);
+
+        // Because notifications got emailed to the notification recipients
+        // and theme and output got initialised as a result of that we don't
+        // want the process to fail moodle_page::ensure_theme_not_set.
+        $PAGE->reset_theme_and_output();
 
         /** @var activity $activity1 */
         $activity1 = $activities->first();

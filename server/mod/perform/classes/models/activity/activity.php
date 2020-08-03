@@ -43,6 +43,7 @@ use mod_perform\entities\activity\manual_relationship_selection;
 use mod_perform\entities\activity\track as track_entity;
 use mod_perform\entities\activity\track_assignment;
 use mod_perform\event\activity_deleted;
+use mod_perform\models\activity\details\notification_real;
 use mod_perform\models\activity\helpers\activity_clone;
 use mod_perform\models\activity\helpers\activity_deletion;
 use mod_perform\models\activity\helpers\activity_multisection_toggler;
@@ -718,4 +719,14 @@ class activity extends model {
         return (new activity_multisection_toggler($this))
             ->set($new_setting);
     }
+
+    /**
+     * Get the notifications for this activity.
+     *
+     * @return collection|notification_real[]
+     */
+    public function get_notifications(): collection {
+        return $this->entity->notifications->map_to(notification_real::class);
+    }
+
 }

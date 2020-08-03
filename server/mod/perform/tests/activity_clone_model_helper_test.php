@@ -44,9 +44,7 @@ class mod_perform_activity_clone_model_helper_testcase extends advanced_testcase
      * @var string[] table names which we do not back up
      */
     protected $ignored_tables = [
-        'perform_notification',             // TODO: work it out later in TL-25541
-        'perform_notification_recipient',   // TODO: work it out later in TL-25541
-        'perform_notification_message',     // TODO: work it out later in TL-25541
+        'perform_notification_message',
         'perform_type'
     ];
 
@@ -79,7 +77,7 @@ class mod_perform_activity_clone_model_helper_testcase extends advanced_testcase
         $section_element = $perform_generator->create_section_element($section, $element);
 
         $entity = activity_entity::repository()->find($activity->get_id());
-        $new_activity = activity::load_by_entity($entity)->clone(true);
+        $new_activity = activity::load_by_entity($entity)->clone();
 
         $suffix = get_string('activity_name_restore_suffix', 'mod_perform');
         $cloned_name = util::augment_text($activity->name, activity::NAME_MAX_LENGTH, '', $suffix);
@@ -93,8 +91,11 @@ class mod_perform_activity_clone_model_helper_testcase extends advanced_testcase
 
         $old_sections = $activity->get_sections();
         $new_sections = $new_activity->get_sections();
-
         $this->assertEquals(count($old_sections), count($new_sections));
+
+        $old_notifications = $activity->get_notifications();
+        $new_notifications = $new_activity->get_notifications();
+        $this->assertSameSize($old_notifications, $new_notifications);
 
         $old_sections = $old_sections->all(true);
         /** @var section $old_section */

@@ -48,7 +48,7 @@ use mod_perform\models\activity\details\notification_sparse;
  */
 final class notification implements notification_interface {
     /** @var notification_interface */
-    protected $current;
+    private $current;
 
     /**
      * Private constructor.
@@ -115,7 +115,7 @@ final class notification implements notification_interface {
      * @throws record_not_found_exception
      */
     public static function load_by_id(int $id): self {
-        return new self(notification_real::load_by_id($id, true));
+        return new self(notification_real::load_by_id($id));
     }
 
     /**

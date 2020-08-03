@@ -26,6 +26,7 @@ namespace mod_perform\models\activity;
 use coding_exception;
 use core\orm\collection;
 use core\orm\query\builder;
+use core\orm\query\raw_field;
 use totara_core\entities\relationship as relationship_entity;
 use totara_core\entities\relationship_resolver as relationship_resolver_entity;
 use mod_perform\entities\activity\section as section_entity;
@@ -205,12 +206,23 @@ class notification_recipient {
                 }
             })
             ->where('s.activity_id', $activity_id)
-            ->select(['r.id as relationship_id', 'nr.id as recipient_id', 'rr.class_name as resolver_class', 'nr.active as active'])
+            ->select([
+                'r.id as relationship_id',
+                'nr.id as recipient_id',
+                'rr.class_name as resolver_class',
+                'nr.active as active'
+            ])
             ->where(function (builder $builder) use ($active_only) {
                 if ($active_only) {
                     $builder->where('nr.active', '<>', 0);
                 }
             })
+            ->group_by([
+                'r.id',
+                'nr.id',
+                'rr.class_name',
+                'nr.active'
+            ])
             ->order_by('r.sort_order')
             ->map_to(function ($source) use ($notify_id) {
                 $source->notification_id = $notify_id;
