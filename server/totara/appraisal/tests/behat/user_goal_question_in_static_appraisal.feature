@@ -325,7 +325,7 @@ Feature: Access rights to user goal questions in static appraisals
     When I log in as "newmgr"
     And I am on "All Appraisals" page
     Then I should see "No appraisals have been created"
-    
+
     # The old manager still sees all appraisals.
     When I log out
     And I log in as "oldmgr"
