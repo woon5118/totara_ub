@@ -68,7 +68,7 @@ class manual_participant_progress {
         // At the end add all the selectors determined before with the least amount of queries
         if (!empty($this->selectors_to_insert)) {
             builder::get_db()->insert_records_via_batch(manual_relationship_selector::TABLE, $this->selectors_to_insert);
-            // TODO: Trigger event(s) for notification
+            // TODO: Trigger event(s) for notification TL-25366
         }
     }
 
