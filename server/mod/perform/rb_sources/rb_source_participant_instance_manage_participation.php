@@ -44,6 +44,8 @@ class rb_source_participant_instance_manage_participation extends rb_source_perf
     public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
         parent::__construct($groupid, $globalrestrictionset);
 
+        $this->selectable = false;
+
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_participant_instance_manage_participation');
         $this->sourcesummary = get_string('sourcesummary', 'rb_source_participant_instance_manage_participation');
         $this->sourcelabel = get_string('sourcelabel', 'rb_source_participant_instance_manage_participation');
@@ -54,8 +56,6 @@ class rb_source_participant_instance_manage_participation extends rb_source_perf
      * after config is finalised.
      *
      * @param reportbuilder $report
-     * @throws coding_exception
-     * @throws dml_exception
      */
     public function post_config(reportbuilder $report) {
         // TODO multi-tenancy support in here too?
@@ -124,7 +124,7 @@ class rb_source_participant_instance_manage_participation extends rb_source_perf
         $columnoptions[] = new rb_column_option(
             'participant_instance',
             'default_sort',
-            'default_sort',
+            get_string('default_sort', 'mod_perform'),
             $DB->sql_concat_join("' '", array_merge(
                 array_values($participant_usednamefields),
                 array_values($subject_usednamefields),
@@ -136,7 +136,6 @@ class rb_source_participant_instance_manage_participation extends rb_source_perf
                 'nosort' => true,
                 'hidden' => true,
                 'joins' => ['subject_user', 'participant_user'],
-                'selectable' => true,
             ]
         );
 

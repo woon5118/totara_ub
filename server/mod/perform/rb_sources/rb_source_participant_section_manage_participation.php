@@ -44,6 +44,8 @@ class rb_source_participant_section_manage_participation extends rb_source_perfo
     public function __construct($groupid, rb_global_restriction_set $globalrestrictionset = null) {
         parent::__construct($groupid, $globalrestrictionset);
 
+        $this->selectable = false;
+
         $this->sourcetitle = get_string('sourcetitle', 'rb_source_participant_section_manage_participation');
         $this->sourcesummary = get_string('sourcesummary', 'rb_source_participant_section_manage_participation');
         $this->sourcelabel = get_string('sourcelabel', 'rb_source_participant_section_manage_participation');
@@ -101,7 +103,7 @@ class rb_source_participant_section_manage_participation extends rb_source_perfo
         $columnoptions[] = new rb_column_option(
             'participant_section',
             'default_sort',
-            'default_sort',
+            get_string('default_sort', 'mod_perform'),
             $DB->sql_concat_join("' '", array_merge(
                 array_values($participant_usednamefields),
                 array_values($subject_usednamefields),
@@ -113,7 +115,6 @@ class rb_source_participant_section_manage_participation extends rb_source_perfo
                 'nosort' => true,
                 'hidden' => true,
                 'joins' => ['participant_instance', 'subject_user', 'participant_user'],
-                'selectable' => true,
             ]
         );
 

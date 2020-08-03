@@ -37,6 +37,7 @@ use mod_perform\state\participant_instance\complete;
 use mod_perform\state\participant_instance\open;
 use mod_perform\state\participant_instance\participant_instance_availability;
 use mod_perform\state\participant_instance\participant_instance_progress;
+use mod_perform\state\participant_section\open as participant_section_open;
 use mod_perform\state\state;
 use mod_perform\state\state_aware;
 use mod_perform\state\subject_instance\closed as subject_instance_closed;
@@ -277,7 +278,9 @@ class participant_instance extends model {
 
         foreach ($this->participant_sections as $participant_section) {
             // This will trigger an event which will end up calling $this->update_progress_status!
-            $participant_section->manually_close();
+            if ($participant_section->get_availability_state() instanceof participant_section_open) {
+                $participant_section->manually_close();
+            }
         }
     }
 

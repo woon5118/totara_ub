@@ -33,6 +33,7 @@ use mod_perform\constants;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 use mod_perform\event\subject_instance_manual_participants_selected;
 use mod_perform\models\activity\helpers\manual_participant_helper;
+use mod_perform\state\participant_instance\open as participant_instance_open;
 use mod_perform\state\state;
 use mod_perform\state\state_aware;
 use mod_perform\state\subject_instance\active;
@@ -323,7 +324,9 @@ class subject_instance extends model {
 
         foreach ($this->participant_instances as $participant_instance) {
             // This will trigger an event which will end up calling $this->update_progress_status!
-            $participant_instance->manually_close();
+            if ($participant_instance->get_availability_state() instanceof participant_instance_open) {
+                $participant_instance->manually_close();
+            }
         }
     }
 
