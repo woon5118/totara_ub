@@ -50,7 +50,7 @@ Feature: Suspend and re-enrol users enrolled in courses via competency programs
     And I navigate to "Manage competencies" node in "Site administration > Competencies"
     And I click on "Competency Framework" "link"
     And I click on "Competency 1" "link"
-    And I click on ".tui-competencyOverviewLinkedCourses__header_edit" "css_element"
+    And I click on ".tui-competencyOverviewLinkedCourses .tui-competencySummary__sectionHeader-edit" "css_element"
     And I click on "Add linked courses" "button"
     And I click on ".tw-list > .tw-list__row:nth-child(2) > .tw-list__cell_select" "css_element"
     And I click on "Save changes" "button" in the ".modal-container" "css_element"

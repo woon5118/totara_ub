@@ -160,7 +160,7 @@ Feature: Verify competencies are automatically added to plan according to job as
     Then I should see "Plan creation successful"
 
     # Check that no competencies have been added as there's no positions assigned to the jobs.
-    When I follow "Competencies"
+    When I click on "Competencies" "link" in the "#dp-plan-content" "css_element"
     Then I should not see "Competency 1"
     And I should not see "Competency 2"
     And I should not see "Competency 3"
@@ -220,7 +220,7 @@ Feature: Verify competencies are automatically added to plan according to job as
     Then I should see "Plan creation successful"
 
   # Check that the competencies have been added from each of the job assignments.
-    When I follow "Competencies"
+    When I click on "Competencies" "link" in the "#dp-plan-content" "css_element"
     Then I should see "Competency 2"
     And I should not see "Competency 1"
     And I should not see "Competency 3"
@@ -237,7 +237,7 @@ Feature: Verify competencies are automatically added to plan according to job as
     Then I should see "Plan creation successful"
 
     # Check that no competencies have been added as there's no organisations assigned to the jobs.
-    When I follow "Competencies"
+    When I click on "Competencies" "link" in the "#dp-plan-content" "css_element"
     Then I should not see "Competency 1"
     And I should not see "Competency 2"
     And I should not see "Competency 3"
