@@ -180,10 +180,7 @@ export default {
     "display_text",
     "edit_link",
     "insert_link",
-    "error_no_url_info",
-    "type_embedded_media",
-    "type:linkcard",
-    "type:plainlink"
+    "error_no_url_info"
   ],
   "moodle": ["ok", "cancel"]
 }
