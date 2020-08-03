@@ -1442,6 +1442,10 @@ class behat_totara_tui extends behat_base {
             return $element->getAttribute('name') === $field_name;
         });
 
+        if (empty($matching_date_selectors)) {
+            $this->fail("Couldn't find date selector with he name '{$field_name}'");
+        }
+
         return reset($matching_date_selectors);
     }
 
