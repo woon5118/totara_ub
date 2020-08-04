@@ -190,7 +190,9 @@ class access_controller {
         if (!isset(self::$instancecache[$key])) {
             if (count(self::$instancecache) >= self::INSTANCE_CACHE_MAX_SIZE) {
                 // Drop the oldest key.
-                array_shift(self::$instancecache);
+                reset(self::$instancecache);
+                $firstkey = key(self::$instancecache);
+                unset(self::$instancecache[$firstkey]);
             }
             $controller = new access_controller($user, $courseorid);
             self::$instancecache[$key] = $controller;
