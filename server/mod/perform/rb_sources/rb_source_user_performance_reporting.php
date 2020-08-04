@@ -91,8 +91,32 @@ class rb_source_user_performance_reporting extends rb_source_user {
                 'nosort' => true,
             ]
         );
+        $columnoptions[] = new \rb_column_option(
+            'user',
+            'user_performance_emailunobscured',
+            get_string('user_email_unobscured_no_cap_checks', 'mod_perform'),
+            'base.email',
+            array(
+                'displayfunc' => 'user_email_unobscured',
+                'dbdatatype' => 'char',
+                'outputformat' => 'text',
+            )
+        );
 
         return $columnoptions;
+    }
+
+    protected function define_filteroptions() {
+        $filteroptions = parent::define_filteroptions();
+
+        $filteroptions[] = new \rb_filter_option(
+            'user',
+            'user_performance_emailunobscured',
+            get_string('user_email_unobscured_no_cap_checks', 'mod_perform'),
+            'text'
+        );
+
+        return $filteroptions;
     }
 
     public function post_config(reportbuilder $report) {

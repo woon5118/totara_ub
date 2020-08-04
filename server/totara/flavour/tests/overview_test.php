@@ -50,6 +50,7 @@ class totara_flavour_overview_testcase extends advanced_testcase {
 
     protected function tearDown(): void {
         global $CFG;
+        $this->setAdminUser();
         // Make sure the $ADMIN static is not messed up by our flavours.
         unset($CFG->forceflavour);
         unset($CFG->showflavours);

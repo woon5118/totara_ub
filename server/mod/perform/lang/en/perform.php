@@ -567,6 +567,7 @@ $string['trigger_events'] = 'Trigger events';
 $string['trigger_set'] = 'Set';
 $string['unsaved_changes_warning'] = 'You have unsaved changes';
 $string['untitled_section'] = 'Untitled section';
+$string['user_email_unobscured_no_cap_checks'] = 'User\'s Email (ignoring user display setting and capability checks)';
 $string['user_activities_activities_about_others_title'] = 'Activities about others';
 $string['user_activities_activity_does_not_exist'] = 'The requested performance activity could not be found.';
 $string['user_activities_close_on_completion_submit_confirmation_message'] = 'You will not be able to update your responses after submission.';

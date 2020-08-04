@@ -55,7 +55,7 @@ class subject_instance_manage_participation_actions extends base {
 
         $extrafields = self::get_extrafields_row($row, $column);
 
-        $is_open = ($extrafields->subject_availability == closed::get_code()) ? false : true;
+        $is_open = $extrafields->subject_instance_availability != closed::get_code();
 
         return $OUTPUT->render(
             new component(

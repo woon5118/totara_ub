@@ -245,6 +245,7 @@ class core_admintree_testcase extends advanced_testcase {
     public function test_admin_setting_configexecutable() {
         global $CFG;
         $this->resetAfterTest();
+        $this->setAdminUser();
 
         $CFG->theme = 'ventura';
         $executable = new admin_setting_configexecutable('test1', 'Text 1', 'Help Path', '');

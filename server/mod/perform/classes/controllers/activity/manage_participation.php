@@ -28,17 +28,15 @@ use context_system;
 use core\output\notification;
 use mod_perform\controllers\perform_controller;
 use mod_perform\models\activity\activity;
+use mod_perform\rb\display\participant_instance_manage_participation_actions;
+use mod_perform\rb\display\participant_section_manage_participation_actions;
+use mod_perform\rb\display\subject_instance_manage_participation_actions;
 use mod_perform\views\embedded_report_view;
 use mod_perform\views\override_nav_breadcrumbs;
-use mod_perform\rb\display\restricted_subject_instance_actions;
-use mod_perform\rb\display\restricted_participant_instance_actions;
-use mod_perform\rb\display\restricted_participant_section_actions;
 use moodle_url;
 use totara_mvc\view;
 use totara_mvc\has_report;
 use totara_tui\output\component;
-
-
 
 class manage_participation extends perform_controller {
     use manage_participation_tabs;
@@ -54,7 +52,7 @@ class manage_participation extends perform_controller {
     private $current_tab;
 
     public function setup_context(): context {
-        $activity_id = $this->get_optional_param('activity_id', null,PARAM_INT);
+        $activity_id = $this->get_optional_param('activity_id', null, PARAM_INT);
         if ($activity_id !== null) {
             $this->activity = activity::load_by_id($activity_id);
             return $this->activity->get_context();
@@ -150,12 +148,12 @@ class manage_participation extends perform_controller {
     /**
      * @return view
      */
-    private function empty_activity_view():view {
+    private function empty_activity_view(): view {
         $url = new moodle_url('/mod/perform/manage/activity/index.php');
         $this->set_url(static::get_url());
         return self::create_view('mod_perform/no_report', [
             'content' => view::core_renderer()->notification(
-                get_string('report_activity_warning_message', 'mod_perform', (object)['url' => $url->out(true)]),
+                get_string('report_activity_warning_message', 'mod_perform', (object) ['url' => $url->out(true)]),
                 notification::NOTIFY_WARNING
             )
         ]);
@@ -191,27 +189,26 @@ class manage_participation extends perform_controller {
         $is_opened = $this->get_optional_param('is_open', false, PARAM_BOOL);
         $report_type = $this->get_optional_param('report_type', false, PARAM_TEXT);
 
-        if(!$report_type && $participants_created_count < 1) {
+        if (!$report_type && $participants_created_count < 1) {
             return '';
         }
 
         if ($report_type) {
             $lang_str = null;
             switch ($report_type) {
-                case restricted_subject_instance_actions::SUBJECT_INSTANCE_REPORT_TYPE:
-                    $lang_str = ($is_opened) ? 'subject_instance_reopen_confirmation' : 'subject_instance_closed_confirmation';
+                case subject_instance_manage_participation_actions::SUBJECT_INSTANCE_REPORT_TYPE:
+                    $lang_str = $is_opened ? 'subject_instance_reopen_confirmation' : 'subject_instance_closed_confirmation';
                     break;
-                case restricted_participant_instance_actions::PARTICIPANT_INSTANCE_REPORT_TYPE:
-                    $lang_str = ($is_opened) ? 'participant_instances_reopen_confirmation' : 'participant_instances_close_confirmation';
+                case participant_instance_manage_participation_actions::PARTICIPANT_INSTANCE_REPORT_TYPE:
+                    $lang_str = $is_opened ? 'participant_instances_reopen_confirmation' : 'participant_instances_close_confirmation';
                     break;
-                case restricted_participant_section_actions::PARTICIPANT_SECTION_REPORT_TYPE:
-                    $lang_str = ($is_opened) ? 'participant_section_reopen_confirmation' : 'participant_section_close_confirmation';
+                case participant_section_manage_participation_actions::PARTICIPANT_SECTION_REPORT_TYPE:
+                    $lang_str = $is_opened ? 'participant_section_reopen_confirmation' : 'participant_section_close_confirmation';
                     break;
                 default:
                     return '';
             }
             $message = get_string($lang_str, 'mod_perform');
-
         } else if ($participants_created_count === 1) {
             $message = get_string('participant_instances_manually_added_toast_singular', 'mod_perform');
         } else if ($participants_created_count > 1) {

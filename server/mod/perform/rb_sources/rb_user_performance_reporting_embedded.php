@@ -57,7 +57,7 @@ class rb_user_performance_reporting_embedded extends rb_base_embedded {
             ],
             [
                 'type' => 'user',
-                'value' => 'email',
+                'value' => 'user_performance_emailunobscured',
                 'heading' => get_string('email', 'moodle'),
             ],
             [
@@ -92,7 +92,8 @@ class rb_user_performance_reporting_embedded extends rb_base_embedded {
             // TODO add position and org
             [
                 'type' => 'user',
-                'value' => 'email',
+                'value' => 'user_performance_emailunobscured',
+                'fieldname' => get_string('email', 'moodle'),
             ],
             [
                 'type' => 'user',

@@ -44,8 +44,8 @@ class behat_mod_perform extends behat_base {
     public const PERFORM_ELEMENT_VALIDATION_ERROR_LOCATOR = '.tui-formFieldError';
     public const PERFORM_ELEMENT_LOCATOR = '.tui-participantContent__sectionItem';
     public const PERFORM_ELEMENT_QUESTION_TEXT_LOCATOR = '.tui-participantContent__sectionItem-contentHeader';
-    public const PERFORM_ELEMENT_QUESTION_OPTIONAL_LOCATOR = '.tui-participantContent__section-response-optional';
-    public const PERFORM_ELEMENT_QUESTION_REQUIRED_LOCATOR = '.tui-participantContent__section-response-required';
+    public const PERFORM_ELEMENT_QUESTION_OPTIONAL_LOCATOR = '.tui-performRequiredOptionalIndicator--optional';
+    public const PERFORM_ELEMENT_QUESTION_REQUIRED_LOCATOR = '.tui-performRequiredOptionalIndicator--required';
     public const SHORT_TEXT_RESPONSE_LOCATOR = 'input';
     public const MULTI_CHOICE_RESPONSE_LOCATOR = 'radio';
     public const PERFORM_ELEMENT_OTHER_RESPONSE_CONTAINER_LOCATOR = '.tui-otherParticipantResponses';

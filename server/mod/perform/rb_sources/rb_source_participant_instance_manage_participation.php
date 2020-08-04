@@ -109,7 +109,7 @@ class rb_source_participant_instance_manage_participation extends rb_source_perf
                 'extrafields' => [
                     'activity_id' => 'track.activity_id',
                     'participant_instance_id' => 'base.id',
-                    'participant_availability' => 'base.availability',
+                    'participant_instance_availability' => 'base.availability',
                 ],
             ]
         );

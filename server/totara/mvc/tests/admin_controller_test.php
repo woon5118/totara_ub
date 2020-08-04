@@ -42,6 +42,8 @@ class totara_mvc_admin_controller_testcase extends advanced_testcase {
     }
 
     protected function setUp(): void {
+        $this->setAdminUser();
+
         // initiate admin menu only once for performance reasons
         $this->admin_menu = admin_get_root(true, false);
         $this->admin_menu->add(
@@ -81,8 +83,6 @@ class totara_mvc_admin_controller_testcase extends advanced_testcase {
     }
 
     public function test_external_page() {
-        $this->setAdminUser();
-
         $controller = new class() extends my_admin_test_controller {
             protected $admin_external_page_name = 'test_admin_page';
 
@@ -103,8 +103,6 @@ class totara_mvc_admin_controller_testcase extends advanced_testcase {
     }
 
     public function test_with_custom_layout() {
-        $this->setAdminUser();
-
         $controller = new class() extends my_admin_test_controller {
             protected $admin_external_page_name = 'test_admin_page';
 
@@ -126,8 +124,6 @@ class totara_mvc_admin_controller_testcase extends advanced_testcase {
     }
 
     public function test_with_additional_params() {
-        $this->setAdminUser();
-
         $controller = new class() extends my_admin_test_controller {
             protected $admin_external_page_name = 'test_admin_page';
 

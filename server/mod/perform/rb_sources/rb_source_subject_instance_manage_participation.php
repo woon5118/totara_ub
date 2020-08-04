@@ -126,7 +126,7 @@ class rb_source_subject_instance_manage_participation extends rb_source_perform_
                 'extrafields' => [
                     'activity_id' => 'perform.id',
                     'subject_instance_id' => "base.id",
-                    'subject_availability' => "base.availability"
+                    'subject_instance_availability' => "base.availability"
                 ],
             ]
         );

@@ -31,7 +31,10 @@
         <Uniform v-if="element">
           <p>
             <strong>{{ element.title }}</strong>
-            <RequiredOptionalIndicator v-if="element.is_respondable" :is-required="element.is_required" />
+            <RequiredOptionalIndicator
+              v-if="element.is_respondable"
+              :is-required="element.is_required"
+            />
           </p>
           <component :is="component" path="" :element="element" />
         </Uniform>

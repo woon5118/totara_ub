@@ -87,13 +87,12 @@ Feature: Test management of activity participation
       | User Three   | 2               | 2            |
       | User Two     | 1               | 2            |
       | User Two     | 2               | 2            |
-
     When I click on "2" "link" in the "User Three 99999997" "table_row"
     Then I should see "Participant instances: 2 records shown"
     And the following should exist in the "participant_instance_manage_participation" table:
-      | Participant name | Subject name | Relationship |
-      | appraiser User   | User Three   | Appraiser    |
-      | manager Two      | User Three   | Manager      |
+      | Participant name | Subject name | Relationship name |
+      | appraiser User   | User Three   | Appraiser         |
+      | manager Two      | User Three   | Manager           |
 
     When I click on "Show all" "link"
     Then I should see "Participant instances: 20 records shown"
@@ -103,8 +102,8 @@ Feature: Test management of activity participation
     And I click on "1" "link" in the "appraiser User User Three 99999997" "table_row"
     Then I should see "Participant sections: 1 records shown"
     And the following should exist in the "participant_section_manage_participation" table:
-      | Participant name | Section title | Subject name | Relationship |
-      | appraiser User   | Part one      | User Three   | Appraiser    |
+      | Participant name | Section title | Subject name | Relationship name |
+      | appraiser User   | Part one      | User Three   | Appraiser         |
 
     When I click on "Show all" "link"
     Then I should see "Participant sections: 10 records shown"
@@ -163,7 +162,7 @@ Feature: Test management of activity participation
     And I navigate to the manage perform activities page
     And I click on "Manage participation" "link" in the tui datatable row with "3 participants" "Name"
 
-    # Click on the participants count for user one, instance 3 (99999999 - 3 = 99999996)
+    # Click on the participants count for user one, instance 3 (99999999 - 3 = 99999996), row 4
     When I click on "1" "link" in the "User One 99999996" "table_row"
     Then I should see "Showing results for 1 subject instance only"
     And I should not see "User Two"

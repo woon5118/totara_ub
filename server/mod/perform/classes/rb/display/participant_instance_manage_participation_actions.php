@@ -23,7 +23,7 @@
 
 namespace mod_perform\rb\display;
 
-use mod_perform\state\participant_section\closed;
+use mod_perform\state\participant_instance\closed;
 use rb_column;
 use rb_column_option;
 use reportbuilder;
@@ -39,7 +39,7 @@ use totara_tui\output\component;
  */
 class participant_instance_manage_participation_actions extends base {
 
-    public const PARTICIPANT_SECTION_REPORT_TYPE = 'PARTICIPANT_SECTION';
+    public const PARTICIPANT_INSTANCE_REPORT_TYPE = 'PARTICIPANT_INSTANCE';
 
     /**
      * @inheritDoc
@@ -53,18 +53,19 @@ class participant_instance_manage_participation_actions extends base {
         }
 
         $extrafields = self::get_extrafields_row($row, $column);
-        $is_open = ($extrafields->participant_section_availability == closed::get_code()) ? false : true;
+        $is_open = $extrafields->participant_instance_availability != closed::get_code();
 
         return $OUTPUT->render(
             new component(
                 'mod_perform/components/report/manage_participation/Actions',
                 [
-                    'reportType' => self::PARTICIPANT_SECTION_REPORT_TYPE,
-                    'id'         => $extrafields->participant_section_id,
+                    'reportType' => self::PARTICIPANT_INSTANCE_REPORT_TYPE,
+                    'id'         => $extrafields->participant_instance_id,
                     'isOpen'     => $is_open,
                 ]
             )
         );
+
     }
 
     public static function is_graphable(rb_column $column, rb_column_option $option, reportbuilder $report) {

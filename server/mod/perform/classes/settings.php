@@ -25,9 +25,12 @@ namespace mod_perform;
 
 use admin_externalpage;
 use context_coursecat;
+use context_user;
+use core\entities\user;
 use mod_perform\controllers\activity\manage_activities;
 use mod_perform\controllers\reporting\performance\activity_response_data;
 use moodle_url;
+use mod_perform\util;
 
 /**
  * The settings in this class are deliberately not part of the usual settings.php.
@@ -45,6 +48,35 @@ use moodle_url;
 class settings {
 
     public static function init_public_settings(\admin_root $admin_root) {
+        static::add_manage_activities_link($admin_root);
+        static::add_response_reporting_link($admin_root);
+    }
+
+    /**
+     * Users who have the 'global' response reporting capability should see the admin link
+     *
+     * Those who only have the 'individual' capability (in the context of a specific user) need to access
+     * the page either through the Team page (if they are a manager) or from their own user profile.
+     *
+     * @param \admin_root $admin_root
+     * @throws \coding_exception
+     * @throws \moodle_exception
+     */
+    private static function add_response_reporting_link(\admin_root $admin_root) {
+        $admin_root->add(
+            'performactivities',
+            new admin_externalpage(
+                'mod_perform_activity_response_data',
+                get_string('menu_title_activity_response_data', 'mod_perform'),
+                new moodle_url(activity_response_data::URL),
+                'mod/perform:report_on_all_subjects_responses',
+                false,
+                isloggedin() ? context_user::instance(user::logged_in()->id) : null
+            )
+        );
+    }
+
+    private static function add_manage_activities_link(\admin_root $admin_root) {
         $context = null;
         $system_context = \context_system::instance();
         // If the user has the capability on the system level he should be able to access the pages
@@ -77,18 +109,6 @@ class settings {
                     $context
                 )
             );
-            $admin_root->add(
-                'performactivities',
-                new admin_externalpage(
-                    'mod_perform_activity_response_data',
-                    get_string('menu_title_activity_response_data', 'mod_perform'),
-                    new moodle_url(activity_response_data::URL),
-                    'mod/perform:report_on_subject_responses',
-                    false,
-                    $context
-                )
-            );
         }
     }
-
 }

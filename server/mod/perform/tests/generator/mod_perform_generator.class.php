@@ -871,7 +871,7 @@ class mod_perform_generator extends component_generator_base {
             $subjects_participant_instance = null;
             if ($subject_is_participating && $is_active) {
                 $subjects_participant_instance = new participant_instance_entity();
-                $subjects_participant_instance->core_relationship_id = 0; // stubbed
+                $subjects_participant_instance->core_relationship_id = core_relationship::load_by_idnumber('subject')->id;
                 $subjects_participant_instance->participant_id = $subject->id; // Answering on activity about them self
                 $subjects_participant_instance->participant_source = participant_source::INTERNAL;
                 $subjects_participant_instance->subject_instance_id = $subject_instance->id;
@@ -882,7 +882,7 @@ class mod_perform_generator extends component_generator_base {
             $other_participant_instance = null;
             if ($other_participant && $is_active) {
                 $other_participant_instance = new participant_instance_entity();
-                $other_participant_instance->core_relationship_id = 0; // stubbed
+                $other_participant_instance->core_relationship_id = core_relationship::load_by_idnumber('manager')->id;
                 $other_participant_instance->participant_id = $other_participant->id;
                 $other_participant_instance->participant_source = participant_source::INTERNAL;
                 $other_participant_instance->subject_instance_id = $subject_instance->id;
@@ -893,7 +893,7 @@ class mod_perform_generator extends component_generator_base {
             $third_participant_instance = null;
             if ($third_participant && $is_active) {
                 $third_participant_instance = new participant_instance_entity();
-                $third_participant_instance->core_relationship_id = 0; // stubbed
+                $third_participant_instance->core_relationship_id = core_relationship::load_by_idnumber('manager')->id;
                 $third_participant_instance->participant_id = $third_participant->id;
                 $third_participant_instance->participant_source = participant_source::INTERNAL;
                 $third_participant_instance->subject_instance_id = $subject_instance->id;
