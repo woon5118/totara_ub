@@ -27,7 +27,7 @@ Feature: Verify certification completion data can be successfully uploaded.
     And I follow "Bob1 Learner1"
     And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I switch to "Certifications" tab
-    Then I should see "Certified" in the "Certification 1" "table_row"
+    Then I should see "Expired" in the "Certification 1" "table_row"
 
     When I follow "Other Evidence"
     And I follow "Completed certification : thisisevidence"
@@ -53,7 +53,7 @@ Feature: Verify certification completion data can be successfully uploaded.
     And I follow "Bob1 Learner1"
     And I click on "Record of Learning" "link" in the ".block_totara_user_profile_category_mylearning" "css_element"
     And I switch to "Certifications" tab
-    Then I should see "Certified" in the "Certification 1" "table_row"
+    Then I should see "Expired" in the "Certification 1" "table_row"
     And I should not see "Other Evidence"
     When I click on "Record of Learning" in the totara menu
     Then I should see "There are no records"

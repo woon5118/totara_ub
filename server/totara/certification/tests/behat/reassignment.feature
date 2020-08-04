@@ -281,13 +281,13 @@ Feature: User reassignment to a certification
     # And I check jimmy is assigned.
     And I switch to "Completion" tab
     Then I should see "Jimmy Jim"
-    And I should see "Certified" in the "Jimmy Jim" "table_row"
+    And I should see "Expired" in the "Jimmy Jim" "table_row"
 
     When I log out
     And I log in as "jimmy"
     And I click on "Record of Learning" in the totara menu
     And I switch to "Certifications" tab
-    Then I should see "Certified"
+    Then I should see "Expired"
     And I should see "Not due for renewal"
     And I should see "1 Jan 1990"
     And I should see "1 Jan 2000"
@@ -470,13 +470,13 @@ Feature: User reassignment to a certification
     # And I check they are assigned.
     And I switch to "Completion" tab
     Then I should see "Jimmy Jim"
-    And I should see "Certified" in the "Jimmy Jim" "table_row"
+    And I should see "Expired" in the "Jimmy Jim" "table_row"
 
     When I log out
     And I log in as "jimmy"
     And I click on "Record of Learning" in the totara menu
     And I switch to "Certifications" tab
-    Then I should see "Certified"
+    Then I should see "Expired"
     And I should see "Due"
     And I should see "1 Jan 2000"
     And I should see "1 Jan 2010"
