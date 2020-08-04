@@ -2,6 +2,8 @@
 Feature: Test viewing criteria fulfilment for a user on their competency details page.
 
   Background:
+    # TODO Fix randomly failing steps in TL-26571
+    Given I skip the scenario until issue "TL-26571" lands
     Given the following "users" exist:
       | username | firstname | lastname |
       | user     | Staff     | User     |

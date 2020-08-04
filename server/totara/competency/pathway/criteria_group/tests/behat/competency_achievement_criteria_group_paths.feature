@@ -4,6 +4,8 @@ Feature: Manage Criteria group achievement paths
   I need to add a Criteria based achievement paths in the competency's achievement criteria
 
   Background:
+    # TODO Fix randomly failing steps in TL-26571
+    Given I skip the scenario until issue "TL-26571" lands
     Given I am on a totara site
     And a competency scale called "ggb" exists with the following values:
       | name    | description          | idnumber       | proficient | default | sortorder |
@@ -27,8 +29,6 @@ Feature: Manage Criteria group achievement paths
       | No tracking | notrack   | 0                |
 
   Scenario: Manage Criteria group basics with coursecompletion
-    # TODO Fix randomly failing steps in TL-26571
-    Given I skip the scenario until issue "TL-26571" lands
     Given I log in as "admin"
     And I navigate to the competency achievement paths page for the "Parent" competency
     Then I should see "No achievement paths added"
@@ -105,8 +105,6 @@ Feature: Manage Criteria group achievement paths
 
 
   Scenario: Manage Criteria group basics with othercompetency
-    # TODO Fix randomly failing steps in TL-26571
-    Given I skip the scenario until issue "TL-26571" lands
     Given I log in as "admin"
     # Fist ensure user can achieve proficiency in Child1 competency
     And I navigate to the competency achievement paths page for the "Child1" competency
@@ -333,8 +331,6 @@ Feature: Manage Criteria group achievement paths
 
 
   Scenario: Criterion item aggregation in Criteria groups
-    # TODO Fix randomly failing steps in TL-26571
-    Given I skip the scenario until issue "TL-26571" lands
     Given I log in as "admin"
     And I navigate to the competency achievement paths page for the "Another" competency
     And I add a "singlevalue" pathway
