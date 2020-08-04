@@ -206,3 +206,13 @@
     }
   }
 }
+
+@media (max-width: $tui-screen-md) {
+  .path-login {
+    .boxwidthnormal,
+    #notice {
+      width: 100%;
+      padding-bottom: var(--legacy-gap-4);
+    }
+  }
+}
