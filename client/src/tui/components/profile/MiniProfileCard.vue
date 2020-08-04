@@ -30,7 +30,12 @@
     }"
   >
     <!-- Only displaying avatar picture if there are no urls -->
-    <a v-if="hasAvatar" :href="profileUrl" class="tui-miniProfileCard__avatar">
+    <a
+      v-if="hasAvatar"
+      :href="readOnly ? null : profileUrl"
+      class="tui-miniProfileCard__avatar"
+      :class="{ 'tui-miniProfileCard__avatar--readOnly': readOnly }"
+    >
       <Avatar
         v-if="hasAvatar"
         :src="avatarSrc"
@@ -58,12 +63,13 @@
           <a
             v-else
             :key="index"
-            :href="url"
+            :href="readOnly ? null : url"
             class="tui-miniProfileCard__description__link"
             :class="{
               'tui-miniProfileCard__description__link--position-zero':
                 0 === index,
               'tui-miniProfileCard__description__text--with-gap': 1 === index,
+              'tui-miniProfileCard__description__link--readOnly': readOnly,
             }"
           >
             {{ value }}
@@ -136,6 +142,7 @@ export default {
         });
       },
     },
+    readOnly: Boolean,
   },
 
   computed: {

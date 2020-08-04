@@ -49,6 +49,10 @@
 
   &__avatar {
     margin-right: var(--tui-gap-2);
+    &--readOnly:hover,
+    &--readOnly:focus {
+      text-decoration: none;
+    }
   }
 
   &__description {
@@ -86,6 +90,11 @@
 
       &--with-gap {
         margin-bottom: var(--tui-gap-1);
+      }
+
+      &--readOnly:hover,
+      &--readOnly:focus {
+        text-decoration: none;
       }
     }
   }
