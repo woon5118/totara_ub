@@ -80,7 +80,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_fixed_te
             'timezone' => 'UTC'
         ], $result_track['schedule_fixed_from']);
         self::assertEquals([
-            'iso' => '1991-12-05T00:00:00',
+            'iso' => '1991-12-05T23:59:59',
             'timezone' => 'UTC'
         ], $result_track['schedule_fixed_to']);
         self::assertNull($result_track['schedule_dynamic_from']);
@@ -92,7 +92,7 @@ class mod_perform_webapi_resolver_mutation_update_track_schedule_closed_fixed_te
         $affected_track->schedule_is_open = 0;
         $affected_track->schedule_is_fixed = 1;
         $affected_track->schedule_fixed_from = $this->get_timestamp_from_date('1991-12-04', 'UTC');
-        $affected_track->schedule_fixed_to = $this->get_timestamp_from_date('1991-12-05', 'UTC');
+        $affected_track->schedule_fixed_to = $this->get_timestamp_from_date('1991-12-05T23:59:59', 'UTC');
         $affected_track->schedule_fixed_timezone = 'UTC';
         $affected_track->schedule_dynamic_from = null;
         $affected_track->schedule_dynamic_to = null;

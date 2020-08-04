@@ -57,7 +57,7 @@ class update_track_schedule implements mutation_resolver, has_middleware {
             if ($track_schedule['schedule_is_open']) {
                 $track->set_schedule_open_fixed($from);
             } else { // Closed.
-                $to = date_time_setting::create_from_array($track_schedule['schedule_fixed_to']);
+                $to = date_time_setting::create_from_array($track_schedule['schedule_fixed_to'])->to_end_of_day();
                 $track->set_schedule_closed_fixed($from, $to);
             }
         } else { // Dynamic.
@@ -95,7 +95,7 @@ class update_track_schedule implements mutation_resolver, has_middleware {
             if (!$track_schedule['schedule_is_open'] && $track_schedule['schedule_is_fixed']) {
                 if ($track_schedule['due_date_is_fixed']) {
                     $track->set_due_date_fixed(
-                        date_time_setting::create_from_array($track_schedule['due_date_fixed'])
+                        date_time_setting::create_from_array($track_schedule['due_date_fixed'])->to_end_of_day()
                     );
                 } else { // Relative.
                     $due_date_offset = date_offset::create_from_json(

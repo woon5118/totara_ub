@@ -144,7 +144,7 @@ class mod_perform_webapi_resolver_mutation_update_track_due_date_testcase
         self::assertTrue($result_track->due_date_is_enabled);
         self::assertTrue($result_track->due_date_is_fixed);
         self::assertEquals(
-            $this->get_timestamp_from_date('2007-01-01', 'Pacific/Auckland'),
+            $this->get_timestamp_from_date('2007-01-01T23:59:59', 'Pacific/Auckland'),
             $result_track->due_date_fixed
         );
         self::assertEquals(
@@ -159,14 +159,14 @@ class mod_perform_webapi_resolver_mutation_update_track_due_date_testcase
         $affected_track->schedule_is_open = 0;
         $affected_track->schedule_is_fixed = 1;
         $affected_track->schedule_fixed_from = $this->get_timestamp_from_date('2006-12-01', 'Pacific/Auckland');
-        $affected_track->schedule_fixed_to = $this->get_timestamp_from_date('2006-12-15', 'Pacific/Auckland');
+        $affected_track->schedule_fixed_to = $this->get_timestamp_from_date('2006-12-15T23:59:59', 'Pacific/Auckland');
         $affected_track->schedule_fixed_timezone = 'Pacific/Auckland';
         $affected_track->schedule_dynamic_from = null;
         $affected_track->schedule_dynamic_to = null;
         $affected_track->schedule_needs_sync = 1;
         $affected_track->due_date_is_enabled = 1;
         $affected_track->due_date_is_fixed = 1;
-        $affected_track->due_date_fixed = $this->get_timestamp_from_date('2007-01-01', 'Pacific/Auckland');
+        $affected_track->due_date_fixed = $this->get_timestamp_from_date('2007-01-01T23:59:59', 'Pacific/Auckland');
         $affected_track->due_date_fixed_timezone = 'Pacific/Auckland';
         $affected_track->due_date_offset = null;
         $affected_track->repeating_is_enabled = 0;
@@ -230,8 +230,14 @@ class mod_perform_webapi_resolver_mutation_update_track_due_date_testcase
         $affected_track = $before_tracks[$this->track1_id];
         $affected_track->schedule_is_open = 0;
         $affected_track->schedule_is_fixed = 1;
-        $affected_track->schedule_fixed_from =  $this->get_timestamp_from_date('2020-12-04', 'Pacific/Auckland');
-        $affected_track->schedule_fixed_to =  $this->get_timestamp_from_date('2020-12-05', 'Pacific/Auckland', true);
+        $affected_track->schedule_fixed_from = $this->get_timestamp_from_date(
+            '2020-12-04',
+            'Pacific/Auckland'
+        );
+        $affected_track->schedule_fixed_to =  $this->get_timestamp_from_date(
+            '2020-12-05T23:59:59',
+            'Pacific/Auckland'
+        );
         $affected_track->schedule_fixed_timezone = 'Pacific/Auckland';
         $affected_track->schedule_dynamic_from = null;
         $affected_track->schedule_dynamic_to = null;

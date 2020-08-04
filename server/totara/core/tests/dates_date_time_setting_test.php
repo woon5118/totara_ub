@@ -129,4 +129,41 @@ class totara_core_dates_date_time_setting_testcase extends \advanced_testcase {
         ];
     }
 
+    /**
+     * @param int $original_timestamp
+     * @param string|null $timezone
+     * @param string $expected_iso
+     * @dataProvider end_of_day_provider
+     */
+    public function test_to_end_of_day(int $original_timestamp, ?string $timezone, string $expected_iso): void {
+        $setting = (new date_time_setting($original_timestamp, $timezone))->to_end_of_day();
+
+        // These fields should be unchanged.
+        $expected_timezone = $timezone ?? core_date::get_user_timezone();
+        self::assertEquals($expected_timezone, $setting->get_timezone());
+
+        // Iso should not match as all of the initial values are not at the end of the day.
+        self::assertNotEquals($original_timestamp, $setting->get_timestamp());
+
+        // This is dependant on the combination of timestamp and timezone.
+        self::assertEquals($expected_iso, $setting->get_iso());
+    }
+
+    public function end_of_day_provider(): array {
+        return [
+            'Date only and explicit timezone' => [
+                1546254000, 'Pacific/Auckland', '2019-01-01T23:59:59',
+            ],
+            'Date and time and explicit timezone' => [
+                1546254000 + 30, 'Pacific/Auckland', '2019-01-01T23:59:59',
+            ],
+            'Date only and implicit timezone' => [
+                1546272000, null, '2019-01-01T23:59:59',
+            ],
+            'Date and time and implicit timezone' => [
+                1546272000 + 30, null, '2019-01-01T23:59:59',
+            ],
+        ];
+    }
+
 }
