@@ -24,13 +24,13 @@
 
   &--hasTop {
     padding-top: var(--tui-gap-4);
-    border-top: var(--tui-border-width-normal) solid
+    border-top: var(--tui-border-width-thin) solid
       var(--tui-filter-bar-border-color);
   }
 
   &--hasBottom {
     padding-bottom: var(--tui-gap-4);
-    border-bottom: var(--tui-border-width-normal) solid
+    border-bottom: var(--tui-border-width-thin) solid
       var(--tui-filter-bar-border-color);
   }
 
