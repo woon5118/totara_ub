@@ -48,14 +48,15 @@ use mod_perform\models\activity\activity;
 use mod_perform\models\activity\activity_setting;
 use mod_perform\models\activity\activity_type;
 use mod_perform\models\activity\element;
+use mod_perform\models\activity\notification;
+use mod_perform\models\activity\notification_recipient;
 use mod_perform\models\activity\section;
 use mod_perform\models\activity\section_element;
 use mod_perform\models\activity\section_relationship as section_relationship_model;
 use mod_perform\models\activity\subject_instance_manual_participant;
 use mod_perform\models\activity\track;
 use mod_perform\models\activity\track_assignment_type;
-use mod_perform\models\activity\notification;
-use mod_perform\models\activity\notification_recipient;
+use mod_perform\notification\loader as notification_loader;
 use mod_perform\state\activity\active;
 use mod_perform\state\activity\activity_state;
 use mod_perform\state\activity\draft;
@@ -66,8 +67,6 @@ use mod_perform\state\subject_instance\pending;
 use mod_perform\task\service\subject_instance_creation;
 use mod_perform\user_groups\grouping;
 use mod_perform\util;
-use mod_perform\notification\loader as notification_loader;
-use totara_core\entities\relationship_resolver as core_relationship_resolver;
 use totara_core\relationship\relationship as core_relationship;
 use totara_core\relationship\relationship_provider as core_relationship_provider;
 use totara_job\job_assignment;
@@ -619,12 +618,31 @@ class mod_perform_generator extends component_generator_base {
         }
         if ($configuration->should_generate_subject_instances()) {
             // Create subject instances for all user assignments
-            (new subject_instance_creation())->generate_instances();
+            $this->generate_subject_instances();
         }
 
         advanced_testcase::setUser($previous_user);
 
         return collection::new($activities);
+    }
+
+    /**
+     * Generate subject instance, for unit tests make sure no messages are being sent.
+     * If you need to intercept the messages use this function directly and the message sink it returns.
+     *
+     * @return phpunit_message_sink|null
+     */
+    public function generate_subject_instances(): ?phpunit_message_sink {
+        $message_sink = null;
+        if (PHPUNIT_TEST) {
+            $message_sink = phpunit_util::start_message_redirection();
+        }
+        // Create subject instances for all user assignments
+        (new subject_instance_creation())->generate_instances();
+
+        $message_sink->close();
+
+        return $message_sink;
     }
 
     /**
