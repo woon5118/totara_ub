@@ -17,13 +17,14 @@
 -->
 
 <template>
-  <div class="tui-radioDateRangeInput">
+  <div class="tui-radioDateRangeInput" role="group">
     <div class="tui-radioDateRangeInput__number">
       <InputNumber
         :id="$id('rangeValue')"
         v-model="rangeValue"
         :aria-label="$str('number', 'totara_core')"
         :disabled="disabled"
+        :name="name + '[value]'"
         @input="update"
       />
     </div>
@@ -33,6 +34,7 @@
         v-model="rangeType"
         :aria-label="$str('date_range_type_input', 'totara_core')"
         :disabled="disabled"
+        :name="name + '[range]'"
         :options="rangeTypeOptions"
         @input="update"
       />
@@ -53,19 +55,20 @@ export default {
 
   props: {
     disabled: Boolean,
+    name: String,
     value: Object,
   },
 
   data() {
     return {
-      rangeType: 'days',
+      rangeType: 'DAY',
       rangeTypeOptions: [
         {
-          id: 'days',
+          id: 'DAY',
           label: this.$str('date_range_days', 'totara_core'),
         },
         {
-          id: 'weeks',
+          id: 'WEEK',
           label: this.$str('date_range_weeks', 'totara_core'),
         },
       ],
@@ -90,15 +93,18 @@ export default {
   },
 
   watch: {
-    value() {
-      if (this.value !== undefined) {
-        this.rangeType = this.value.range;
-        this.rangeValue = this.value.value;
-      } else {
-        this.rangeType = 'days';
-        this.rangeValue = 1;
-      }
-      this.update();
+    value: {
+      handler() {
+        if (this.value !== undefined) {
+          this.rangeType = this.value.range;
+          this.rangeValue = this.value.value;
+        } else {
+          this.rangeType = 'DAY';
+          this.rangeValue = 1;
+        }
+        this.update();
+      },
+      immediate: true,
     },
   },
 

@@ -17,20 +17,18 @@
 -->
 
 <style lang="scss">
-.tui-performAssignmentScheduleFrequencySettings {
-  &__option {
-    margin-left: 2em;
+.tui-assignmentScheduleFrequencySettings {
+  &__title {
+    margin: 0;
+    @include tui-font-heading-x-small();
   }
 
-  &__limit {
-    display: inline-flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-content: space-between;
-    align-items: baseline; // Before changing this to center or something else, check the validation errors line up ok.
-    justify-content: flex-start;
+  &__description {
+    margin-top: var(--tui-gap-4);
+  }
 
-    max-width: 5rem;
+  &__form {
+    margin-top: var(--tui-gap-8);
   }
 }
 </style>

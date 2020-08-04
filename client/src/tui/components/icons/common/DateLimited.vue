@@ -12,33 +12,34 @@
   LTD, you may not access, use, modify, or distribute this software.
   Please contact [licensing@totaralearning.com] for more information.
 
-  @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
-  @module mod_perform
+  @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
+  @module tui
 -->
 
-<template>
-  <div class="tui-performAssignmentScheduleSettingContainer">
-    <h4
-      :id="$id('settings-container-title')"
-      class="tui-performAssignmentScheduleSettingContainer__title"
-    >
-      {{ title }}
-    </h4>
-    <div
-      :aria-labelledby="$id('settings-container-title')"
-      class="tui-performAssignmentScheduleSettingContainer__container"
-    >
-      <slot />
-    </div>
-  </div>
-</template>
 <script>
+import FlexIcon from 'tui/components/icons/FlexIcon';
+
 export default {
+  functional: true,
+
+  components: {
+    FlexIcon,
+  },
+
   props: {
-    title: {
-      required: true,
-      type: String,
-    },
+    alt: String,
+    customClass: [String, Object, Array],
+    styleClass: Object,
+    size: [String, Number],
+    title: String,
+  },
+
+  render(h, { props }) {
+    return h(FlexIcon, {
+      props: Object.assign({}, props, {
+        icon: 'date-limited',
+      }),
+    });
   },
 };
 </script>

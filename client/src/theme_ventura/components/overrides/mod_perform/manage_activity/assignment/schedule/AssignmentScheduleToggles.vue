@@ -17,36 +17,49 @@
 -->
 
 <style lang="scss">
-.tui-performAssignmentSchedule {
-  & > * + * {
-    margin-top: var(--tui-gap-8);
+.tui-assignmentScheduleToggles {
+  display: flex;
+  flex-wrap: wrap;
+
+  &__group {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: var(--tui-gap-4);
+
+    &:last-child {
+      margin-right: 0;
+    }
   }
 
-  &__heading {
-    margin: var(--tui-gap-12) 0 0;
-    @include tui-font-heading-small;
-  }
+  &__item {
+    margin-right: var(--tui-gap-4);
 
-  &__form {
-    & > * + * {
+    &-header {
+      margin: var(--tui-gap-4) 0 0;
+      @include tui-font-heading-label;
+    }
+
+    &-toggle {
       margin-top: var(--tui-gap-4);
     }
-
-    &-section {
-      padding: var(--tui-gap-8);
-      background: var(--tui-color-neutral-3);
-    }
   }
+}
 
-  .tui-performAssignmentSchedule__form {
-    &-additional {
-      margin-top: var(--tui-gap-12);
-      margin-left: var(--tui-gap-8);
+@media (min-width: $tui-screen-sm) {
+  .tui-assignmentScheduleToggles {
+    &__group {
+      border-right: var(--tui-border-width-thin) solid
+        var(--tui-color-neutral-6);
+
+      &:last-child {
+        border-right: none;
+      }
     }
 
-    &-buttons {
-      margin-top: var(--tui-gap-8);
-      margin-left: var(--tui-gap-8);
+    &__item {
+      &-header {
+        margin: 0;
+      }
     }
   }
 }

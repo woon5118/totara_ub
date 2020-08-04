@@ -114,15 +114,15 @@ Feature: Define track schedules to perform activities
     And I click on "My Test Activity" "link"
     And I click on "Assignments" "link"
     And I click on "Limited" "button"
-    And I click on "Dynamic" "button"
+    And I click on "Relative" "button"
+    And I click on the "AFTER" tui radio in the "scheduleDynamic[fromDirection]" tui radio group
+    And I click on the "AFTER" tui radio in the "scheduleDynamic[toDirection]" tui radio group
     And I set the following fields to these values:
-      | scheduleDynamic[from_count]     | 1                  |
-      | scheduleDynamic[from_unit]      | weeks              |
-      | scheduleDynamic[from_direction] | after              |
-      | scheduleDynamic[to_count]       | 4                  |
-      | scheduleDynamic[to_unit]        | weeks              |
-      | scheduleDynamic[to_direction]   | after              |
-      | scheduleDynamic[dynamic_source] | User creation date |
+      | scheduleDynamic[fromOffset][after][value] | 1                  |
+      | scheduleDynamic[fromOffset][after][range] | weeks              |
+      | scheduleDynamic[toOffset][after][value]   | 4                  |
+      | scheduleDynamic[toOffset][after][range]   | weeks              |
+      | scheduleDynamic[dynamic_source]           | User creation date |
     When I save the activity schedule
     And I click on "Confirm" "button"
     And I wait until the page is ready
@@ -131,29 +131,28 @@ Feature: Define track schedules to perform activities
     When I navigate to the manage perform activities page
     And I click on "My Test Activity" "link"
     And I click on "Assignments" "link"
+    And I click on the "AFTER" tui radio in the "scheduleDynamic[fromDirection]" tui radio group
+    And I click on the "AFTER" tui radio in the "scheduleDynamic[toDirection]" tui radio group
     Then the following fields match these values:
-      | scheduleDynamic[from_count]     | 1                  |
-      | scheduleDynamic[from_unit]      | weeks              |
-      | scheduleDynamic[from_direction] | after              |
-      | scheduleDynamic[to_count]       | 4                  |
-      | scheduleDynamic[to_unit]        | weeks              |
-      | scheduleDynamic[to_direction]   | after              |
-      | scheduleDynamic[dynamic_source] | User creation date |
+      | scheduleDynamic[fromOffset][after][value]  | 1        |
+      | scheduleDynamic[fromOffset][after][range]  | weeks    |
+      | scheduleDynamic[toOffset][after][value]    | 4        |
+      | scheduleDynamic[toOffset][after][range]    | weeks    |
+      | scheduleDynamic[dynamic_source]            | User creation date |
 
   Scenario: Save and view open ended dynamic performance activity schedule
     Given I log in as "admin"
     And I navigate to the manage perform activities page
     And I click on "My Test Activity" "link"
     And I click on "Assignments" "link"
-    And I click on "Dynamic" "button"
+    And I click on "Relative" "button"
+    And I click on the "AFTER" tui radio in the "scheduleDynamic[fromDirection]" tui radio group
     And I set the following fields to these values:
-      | scheduleDynamic[from_count]     | 1                  |
-      | scheduleDynamic[from_unit]      | weeks              |
-      | scheduleDynamic[from_direction] | after              |
-      | scheduleDynamic[dynamic_source] | User creation date |
-    And I click on the "scheduleDynamic[use_anniversary]" tui checkbox
-    Then I should not see "until" in the ".tui-performAssignmentScheduleRelativeDateSelector" "css_element"
-    And "input[name='scheduleDynamic[to_count]']" "css_element" should not exist in the ".tui-performAssignmentScheduleRelativeDateSelector" "css_element"
+      | scheduleDynamic[fromOffset][after][value]   | 1                  |
+      | scheduleDynamic[fromOffset][after][range]   | weeks              |
+      | scheduleDynamic[dynamic_source]             | User creation date |
+    And I click on the "scheduleDynamic[useAnniversary]" tui checkbox
+    Then "input[name='scheduleDynamic[toDirection]']" "css_element" should not exist in the ".tui-assignmentScheduleCreationRange__form" "css_element"
 
     When I save the activity schedule
     And I click on "Confirm" "button"
@@ -163,25 +162,26 @@ Feature: Define track schedules to perform activities
     When I navigate to the manage perform activities page
     And I click on "My Test Activity" "link"
     And I click on "Assignments" "link"
+    And I click on the "AFTER" tui radio in the "scheduleDynamic[fromDirection]" tui radio group
     Then the following fields match these values:
-      | scheduleDynamic[from_count]      | 1                  |
-      | scheduleDynamic[from_unit]       | weeks              |
-      | scheduleDynamic[from_direction]  | after              |
-      | scheduleDynamic[dynamic_source]  | User creation date |
-      | scheduleDynamic[use_anniversary] | 1                  |
-    And I should not see "until" in the ".tui-performAssignmentScheduleRelativeDateSelector" "css_element"
-    And "input[name='scheduleDynamic[to_count]']" "css_element" should not exist in the ".tui-performAssignmentScheduleRelativeDateSelector" "css_element"
+      | scheduleDynamic[fromOffset][after][value]   | 1                  |
+      | scheduleDynamic[fromOffset][after][range]   | weeks              |
+      | scheduleDynamic[dynamic_source]             | User creation date |
+      | scheduleDynamic[useAnniversary]             | 1                  |
+    And "input[name='scheduleDynamic[toDirection]']" "css_element" should not exist in the ".tui-assignmentScheduleCreationRange__form" "css_element"
 
   Scenario: Check remembered toggling between dynamic options
     Given I log in as "admin"
     And I navigate to the manage perform activities page
     And I click on "My Test Activity" "link"
     And I click on "Assignments" "link"
-    And I click on "Dynamic" "button"
+    And I click on "Relative" "button"
     And I click on "Open-ended" "button"
+
+    And I click on the "BEFORE" tui radio in the "scheduleDynamic[fromDirection]" tui radio group
     And I set the following fields to these values:
-      | scheduleDynamic[from_count]     | 100                |
-      | scheduleDynamic[dynamic_source] | User creation date |
+      | scheduleDynamic[fromOffset][before][value] | 100                |
+      | scheduleDynamic[dynamic_source]            | User creation date |
     When I save the activity schedule
     And I click on "Confirm" "button"
     And I wait until the page is ready
@@ -192,8 +192,8 @@ Feature: Define track schedules to perform activities
     And I click on "Assignments" "link"
     And I click on "Limited" "button"
     Then the following fields match these values:
-      | scheduleDynamic[from_count] | 100 |
-      | scheduleDynamic[to_count]   | 0   |
+      | scheduleDynamic[fromOffset][before][value] | 100 |
+      | scheduleDynamic[toOffset][before][value]   | 1   |
 
   Scenario: Check validation messages of dynamic activity schedule
     Given I log in as "admin"
@@ -201,55 +201,54 @@ Feature: Define track schedules to perform activities
     And I click on "My Test Activity" "link"
     And I click on "Assignments" "link"
     And I click on "Limited" "button"
-    And I click on "Dynamic" "button"
+    And I click on "Relative" "button"
 
     When I set the following fields to these values:
-      | scheduleDynamic[from_count] | 0.3 |
-      | scheduleDynamic[to_count]   | 0.4 |
+      | scheduleDynamic[fromOffset][before][value] | 0.3 |
+      | scheduleDynamic[toOffset][before][value] | 0.4 |
     And I save the activity schedule
     Then I should see "Please enter a valid whole number"
 
     When I set the following fields to these values:
-      | scheduleDynamic[from_count] |  |
-      | scheduleDynamic[to_count]   |  |
-    Then I should see "Required"
+      | scheduleDynamic[fromOffset][before][value] | |
+      | scheduleDynamic[toOffset][before][value]   | |
+    Then I should see "Number must be 1 or more"
 
     When I set the following fields to these values:
-      | scheduleDynamic[from_count] | -1 |
-      | scheduleDynamic[to_count]   | -1 |
-    Then I should see "Number must be 0 or more"
+      | scheduleDynamic[fromOffset][before][value] | -1 |
+      | scheduleDynamic[toOffset][before][value]   | -1 |
+    Then I should see "Number must be 1 or more"
 
-    When I set the following fields to these values:
-      | scheduleDynamic[from_count]     | 100                |
-      | scheduleDynamic[from_direction] | after              |
-      | scheduleDynamic[to_count]       | 10                 |
-      | scheduleDynamic[to_direction]   | after              |
+    When I click on the "AFTER" tui radio in the "scheduleDynamic[fromDirection]" tui radio group
+    And I click on the "AFTER" tui radio in the "scheduleDynamic[toDirection]" tui radio group
+    And I set the following fields to these values:
+      | scheduleDynamic[fromOffset][after][value]     | 100                |
+      | scheduleDynamic[toOffset][after][value]       | 10                 |
       | scheduleDynamic[dynamic_source] | User creation date |
     And I save the activity schedule
     Then I should see "Range end date cannot be before range start date"
 
+    When I click on the "BEFORE" tui radio in the "scheduleDynamic[fromDirection]" tui radio group
+    And I click on the "BEFORE" tui radio in the "scheduleDynamic[toDirection]" tui radio group
     When I set the following fields to these values:
-      | scheduleDynamic[from_count]     | 10                 |
-      | scheduleDynamic[from_direction] | before             |
-      | scheduleDynamic[to_count]       | 100                |
-      | scheduleDynamic[to_direction]   | before             |
-      | scheduleDynamic[dynamic_source] | User creation date |
+      | scheduleDynamic[fromOffset][before][value]     | 10                 |
+      | scheduleDynamic[toOffset][before][value]       | 100                |
+      | scheduleDynamic[dynamic_source]                | User creation date |
     And I save the activity schedule
     Then I should see "Range end date cannot be before range start date"
 
     When I click on "Open-ended" "button"
     And I set the following fields to these values:
-      | scheduleDynamic[from_count] |  |
-    Then I should see "Required"
+      | scheduleDynamic[fromOffset][before][value] |  |
+    Then I should see "Number must be 1 or more"
 
     When I set the following fields to these values:
-      | scheduleDynamic[from_count] | -1 |
-    Then I should see "Number must be 0 or more"
+      | scheduleDynamic[fromOffset][before][value] | -1 |
+    Then I should see "Number must be 1 or more"
 
-    # Allow negative -0.
     When I set the following fields to these values:
-      | scheduleDynamic[from_count] | -0 |
-    Then I should not see the "Number must be 0 or more" block
+      | scheduleDynamic[fromOffset][before][value] | 1 |
+    Then I should not see the "Number must be 1 or more" block
 
     When I save the activity schedule
     And I click on "Confirm" "button"
@@ -265,32 +264,30 @@ Feature: Define track schedules to perform activities
     Then I set the "scheduleFixed[from]" tui date selector to "1 January 2020"
     And I set the "scheduleFixed[to]" tui date selector to "30 December 2030"
 
-    When I click on "Dynamic" "button"
+    When I click on "Relative" "button"
+    And I click on the "AFTER" tui radio in the "scheduleDynamic[fromDirection]" tui radio group
+    And I click on the "AFTER" tui radio in the "scheduleDynamic[toDirection]" tui radio group
     And I set the following fields to these values:
-      | scheduleDynamic[from_count]     | 1                  |
-      | scheduleDynamic[from_unit]      | weeks              |
-      | scheduleDynamic[from_direction] | after              |
-      | scheduleDynamic[to_count]       | 4                  |
-      | scheduleDynamic[to_unit]        | weeks              |
-      | scheduleDynamic[to_direction]   | after              |
-      | scheduleDynamic[dynamic_source] | User creation date |
-    And I click on the "scheduleDynamic[use_anniversary]" tui checkbox
+      | scheduleDynamic[fromOffset][after][value]    | 1                  |
+      | scheduleDynamic[fromOffset][after][range]     | weeks              |
+      | scheduleDynamic[toOffset][after][value]       | 4                  |
+      | scheduleDynamic[toOffset][after][range]       | weeks              |
+      | scheduleDynamic[dynamic_source]               | User creation date |
+    And I click on the "scheduleDynamic[useAnniversary]" tui checkbox
 
     When I click on "Fixed" "button"
 
     Then the "scheduleFixed[from]" tui date selector should be set to "1 January 2020"
     And the "scheduleFixed[to]" tui date selector should be set to "30 December 2030"
 
-    When I click on "Dynamic" "button"
+    When I click on "Relative" "button"
     Then the following fields match these values:
-      | scheduleDynamic[from_count]      | 1                  |
-      | scheduleDynamic[from_unit]       | weeks              |
-      | scheduleDynamic[from_direction]  | after              |
-      | scheduleDynamic[to_count]        | 4                  |
-      | scheduleDynamic[to_unit]         | weeks              |
-      | scheduleDynamic[to_direction]    | after              |
-      | scheduleDynamic[dynamic_source]  | User creation date |
-      | scheduleDynamic[use_anniversary] | 1                  |
+      | scheduleDynamic[fromOffset][after][value]  | 1                  |
+      | scheduleDynamic[fromOffset][after][range]  | weeks              |
+      | scheduleDynamic[toOffset][after][value]    | 4                  |
+      | scheduleDynamic[toOffset][after][range]    | weeks              |
+      | scheduleDynamic[dynamic_source]            | User creation date |
+      | scheduleDynamic[useAnniversary]            | 1                  |
 
   Scenario: Check due date is disabled by default and can be enabled
     Given I log in as "admin"
@@ -298,7 +295,7 @@ Feature: Define track schedules to perform activities
     And I click on "My Test Activity" "link"
     And I click on "Assignments" "link"
     Then I should see "Due date disabled"
-    And I should see "There is no timeframe governing participation – participants can submit their responses whenever they choose."
+    And I should see "Participants are not expected to submit their responses by a certain date."
     When I click on "Enabled" "button"
     Then I should see "Due date enabled"
     And I save the activity schedule
@@ -321,13 +318,13 @@ Feature: Define track schedules to perform activities
     And I click on "Fixed" "button"
     And I set the "scheduleFixed[from]" tui date selector to "1 January 2020"
     And I set the following fields to these values:
-      | dueDateOffset[from_count] | 0 |
+      | dueDateOffset[value] | 0 |
     And I save the activity schedule
     Then I should see "Due date must be after the creation end date"
     And the following fields match these values:
-      | dueDateOffset[from_count] | 0 |
+      | dueDateOffset[value] | 0 |
     When I set the following fields to these values:
-      | dueDateOffset[from_count] | 1 |
+      | dueDateOffset[value] | 1 |
     And I save the activity schedule
     And I click on "Confirm" "button"
     And I wait until the page is ready
@@ -335,21 +332,21 @@ Feature: Define track schedules to perform activities
     When I reload the page
     And I click on "Assignments" "link"
     Then the following fields match these values:
-      | dueDateOffset[from_count] | 1 |
+      | dueDateOffset[value] | 1 |
 
     # Open & Dynamic
     When I click on "Open-ended" "button"
-    And I click on "Dynamic" "button"
+    And I click on "Relative" "button"
+    And I click on the "AFTER" tui radio in the "scheduleDynamic[fromDirection]" tui radio group
     And I set the following fields to these values:
-      | scheduleDynamic[from_count]     | 3                  |
-      | scheduleDynamic[from_unit]      | weeks              |
-      | scheduleDynamic[from_direction] | after              |
-      | scheduleDynamic[dynamic_source] | User creation date |
-      | dueDateOffset[from_count]       | 0                  |
+      | scheduleDynamic[fromOffset][after][value]  | 3                  |
+      | scheduleDynamic[fromOffset][after][range]  | weeks              |
+      | scheduleDynamic[dynamic_source]            | User creation date |
+      | dueDateOffset[value]                       | 0                  |
     And I save the activity schedule
     Then I should see "Due date must be after the creation end date"
     When I set the following fields to these values:
-      | dueDateOffset[from_count] | 2 |
+      | dueDateOffset[value] | 2 |
     And I save the activity schedule
     And I click on "Confirm" "button"
     And I wait until the page is ready
@@ -357,24 +354,24 @@ Feature: Define track schedules to perform activities
     When I reload the page
     And I click on "Assignments" "link"
     Then the following fields match these values:
-      | dueDateOffset[from_count] | 2 |
+      | dueDateOffset[value] | 2 |
 
     # Limited & Dynamic
     When I click on "Limited" "button"
-    And I click on "Dynamic" "button"
+    And I click on "Relative" "button"
+    And I click on the "AFTER" tui radio in the "scheduleDynamic[fromDirection]" tui radio group
+    And I click on the "AFTER" tui radio in the "scheduleDynamic[toDirection]" tui radio group
     And I set the following fields to these values:
-      | scheduleDynamic[from_count]     | 1                  |
-      | scheduleDynamic[from_unit]      | weeks              |
-      | scheduleDynamic[from_direction] | after              |
-      | scheduleDynamic[to_count]       | 4                  |
-      | scheduleDynamic[to_unit]        | weeks              |
-      | scheduleDynamic[to_direction]   | after              |
-      | scheduleDynamic[dynamic_source] | User creation date |
-      | dueDateOffset[from_count]       | 0                  |
+      | scheduleDynamic[fromOffset][after][value]  | 3                  |
+      | scheduleDynamic[fromOffset][after][range]  | weeks              |
+      | scheduleDynamic[toOffset][after][value]    | 4                  |
+      | scheduleDynamic[toOffset][after][range]    | weeks              |
+      | scheduleDynamic[dynamic_source]            | User creation date |
+      | dueDateOffset[value]                  | 0                  |
     And I save the activity schedule
     Then I should see "Due date must be after the creation end date"
     When I set the following fields to these values:
-      | dueDateOffset[from_count] | 3 |
+      | dueDateOffset[value] | 3 |
     And I save the activity schedule
     And I click on "Confirm" "button"
     And I wait until the page is ready
@@ -382,18 +379,18 @@ Feature: Define track schedules to perform activities
     When I reload the page
     And I click on "Assignments" "link"
     Then the following fields match these values:
-      | dueDateOffset[from_count] | 3 |
+      | dueDateOffset[value] | 3 |
 
     # Limited & Fixed
     When I click on "Limited" "button"
     And I click on "Fixed" "button"
     When I set the "scheduleFixed[from]" tui date selector to "1 January 2020"
     And I set the "scheduleFixed[to]" tui date selector to "30 December 2030"
-    And I click on the "true" tui radio in the "dueDateIsFixed" tui radio group
-    And I set the "dueDateFixed" tui date selector to "30 December 2030"
+    And I click on the "fixed" tui radio in the "dueDateType" tui radio group
+    And I set the "fixedDueDate" tui date selector to "30 December 2030"
     And I save the activity schedule
     Then I should see "Due date must be after the creation end date"
-    When I set the "dueDateFixed" tui date selector to "31 December 2030"
+    When I set the "fixedDueDate" tui date selector to "31 December 2030"
     And I save the activity schedule
     And I click on "Confirm" "button"
     And I wait until the page is ready
@@ -403,31 +400,24 @@ Feature: Define track schedules to perform activities
 
     When I set the "scheduleFixed[from]" tui date selector to "1 January 2020"
     And I set the "scheduleFixed[to]" tui date selector to "30 December 2030"
-    # The radio group for dueDateIsFixed is special, it does not have a proper label
-    # to identify it with.
-    # TODO: Add new custom behat step for this
-    # Then the following fields match these values:
-    #      | dueDateIsFixed | true |
-    And I set the "dueDateFixed" tui date selector to "31 December 2030"
-    And I click on the "false" tui radio in the "dueDateIsFixed" tui radio group
+      | dueDateType  | fixed |
+    And I set the "fixedDueDate" tui date selector to "31 December 2030"
+    And I click on the "relative" tui radio in the "dueDateType" tui radio group
     And I set the following fields to these values:
-      | dueDateOffset[from_count] | 0 |
+      | dueDateOffset[relative][value] | 0 |
     And I save the activity schedule
     Then I should see "Due date must be after the creation end date"
     When I set the following fields to these values:
-      | dueDateOffset[from_count] | 4 |
+      | dueDateOffset[relative][value] | 4 |
     And I save the activity schedule
     And I click on "Confirm" "button"
     And I wait until the page is ready
     Then I should see "Changes applied and activity has been updated" in the tui success notification toast
     When I reload the page
     And I click on "Assignments" "link"
-    # The radio group for dueDateIsFixed is special, it does not have a proper label
-    # to identify it with.
-    # TODO: Add new custom behat step for this
     Then the following fields match these values:
-    #  | dueDateIsFixed            | false |
-      | dueDateOffset[from_count] | 4     |
+      | dueDateType                    | relative |
+      | dueDateOffset[relative][value] | 4        |
 
   Scenario: Check job assignment-based additional schedule settings
     Given I log in as "admin"
@@ -435,7 +425,7 @@ Feature: Define track schedules to perform activities
     And I click on "My Test Activity" "link"
     And I click on "Assignments" "link"
     And I should see "Job assignment-based instances"
-    When I click on the "ONE_PER_SUBJECT" tui radio in the "additionalSettings[subject_instance_generation]" tui radio group
+    When I click on the "ONE_PER_SUBJECT" tui radio in the "additionalSettings[subjectInstanceGeneration]" tui radio group
     And I save the activity schedule
     And I click on "Confirm" "button"
     And I wait until the page is ready
@@ -443,24 +433,24 @@ Feature: Define track schedules to perform activities
     When I reload the page
     And I click on "Assignments" "link"
     Then the following fields match these values:
-      | additionalSettings[subject_instance_generation] | ONE_PER_SUBJECT |
+      | additionalSettings[subjectInstanceGeneration] | ONE_PER_SUBJECT |
 
   Scenario: Check repeating is disabled by default and can be enabled
     Given I log in as "admin"
     And I navigate to the manage perform activities page
     And I click on "My Test Activity" "link"
     And I click on "Assignments" "link"
-    Then I should see "Repeating disabled"
-    And I should see "Users will receive a maximum of 1 instance each"
+    Then I should see "Frequency: Once"
+    And I should see "Users will receive a maximum of 1 instance each (or maximum of 1 per job, depending on job assignment setting)"
     When I click on "Repeating" "button"
-    Then I should see "Repeating enabled"
+    Then I should see "Frequency: Repeating"
     When I save the activity schedule
     And I click on "Confirm" "button"
     And I wait until the page is ready
     Then I should see "Changes applied and activity has been updated" in the tui success notification toast
     And I reload the page
     And I click on "Assignments" "link"
-    Then I should see "Repeating enabled"
+    Then I should see "Frequency: Repeating"
 
   Scenario: Save and view repeating performance activity schedule
     Given I log in as "admin"
@@ -469,12 +459,11 @@ Feature: Define track schedules to perform activities
     And I click on "Assignments" "link"
     And I click on "Repeating" "button"
 
-    And I click on the "AFTER_COMPLETION" tui radio in the "repeatingType" tui radio group
+    And I click on the "completeOffset" tui radio in the "repeatingValues[repeatingType]" tui radio group
     # When setting these fields in a single step, the count is not set - probably due to timing issues
     And I set the following fields to these values:
-      | repeatingOffset[AFTER_COMPLETION][from_count] | 2 |
-    And I set the following fields to these values:
-      | repeatingOffset[AFTER_COMPLETION][from_unit] | weeks |
+      | repeatingValues[repeatingOffset][completeOffset][value] | 2     |
+      | repeatingValues[repeatingOffset][completeOffset][range] | weeks |
     And I save the activity schedule
     And I click on "Confirm" "button"
     And I wait until the page is ready
@@ -487,12 +476,12 @@ Feature: Define track schedules to perform activities
     # TODO: Add new custom behat step for this
     Then the following fields match these values:
     #  | repeatingType                                 | AFTER_COMPLETION |
-      | repeatingOffset[AFTER_COMPLETION][from_count] | 2                |
-      | repeatingOffset[AFTER_COMPLETION][from_unit]  | weeks            |
+      | repeatingValues[repeatingOffset][completeOffset][value] | 2     |
+      | repeatingValues[repeatingOffset][completeOffset][range] | weeks |
 
-    And I click on the "true" tui radio in the "repeatingIsLimited" tui radio group
+    And I click on the "true" tui radio in the "repeatingValues[repeatingIsLimited]" tui radio group
     And I set the following fields to these values:
-      | repeatingLimit | 4 |
+      | repeatingValues[repeatingLimit][value] | 4 |
     And I save the activity schedule
     And I click on "Confirm" "button"
     And I wait until the page is ready
@@ -504,14 +493,14 @@ Feature: Define track schedules to perform activities
     # to identify it with.
     # TODO: Add new custom behat step for this
     Then the following fields match these values:
-    #  | repeatingIsLimited | true |
-      | repeatingLimit     | 4    |
+     # | repeatingValues[repeatingIsLimited]    | true |
+      | repeatingValues[repeatingLimit][value] | 4    |
 
     # Limited / Open-ended display text
     When I click on "Limited" "button"
-    Then I should see "until the creation period ends, with"
+    Then I should see "none (repeat until creation period ends)"
     When I click on "Open-ended" "button"
-    Then I should see "no maximum limit (repeating continues indefinitely)"
+    Then I should see "none (repeat indefinitely)"
 
   Scenario: User custom field dynamic schedule
     Given I log in as "admin"
@@ -536,11 +525,11 @@ Feature: Define track schedules to perform activities
     And I click on "My Test Activity" "link"
     And I click on "Assignments" "link"
     When I click on "Open-ended" "button"
-    And I click on "Dynamic" "button"
+    And I click on "Relative" "button"
+    And I click on the "AFTER" tui radio in the "scheduleDynamic[fromDirection]" tui radio group
     And I set the following fields to these values:
-      | scheduleDynamic[from_count]     | 3        |
-      | scheduleDynamic[from_unit]      | weeks    |
-      | scheduleDynamic[from_direction] | after    |
+      | scheduleDynamic[fromOffset][after][value]  | 3                  |
+      | scheduleDynamic[fromOffset][after][range]  | weeks              |
       | scheduleDynamic[dynamic_source] | Date one |
     And I save the activity schedule
     And I click on "Confirm" "button"
@@ -570,11 +559,11 @@ Feature: Define track schedules to perform activities
     And I click on "Activity one" "link"
     And I click on "Assignments" "link"
     When I click on "Open-ended" "button"
-    And I click on "Dynamic" "button"
+    And I click on "Relative" "button"
+    And I click on the "AFTER" tui radio in the "scheduleDynamic[fromDirection]" tui radio group
     And I set the following fields to these values:
-      | scheduleDynamic[from_count]                      | 3                                   |
-      | scheduleDynamic[from_unit]                       | weeks                               |
-      | scheduleDynamic[from_direction]                  | after                               |
+      | scheduleDynamic[fromOffset][after][value]        | 3                                   |
+      | scheduleDynamic[fromOffset][after][range]        | weeks                               |
       | scheduleDynamic[dynamic_source]                  | Completion date of another activity |
       | scheduleDynamic[dynamicCustomSettings][activity] | Activity two                        |
     And I save the activity schedule
@@ -597,15 +586,15 @@ Feature: Define track schedules to perform activities
     And I click on "Activity one" "link"
     And I click on "Assignments" "link"
     When I click on "Open-ended" "button"
-    And I click on "Dynamic" "button"
+    And I click on "Relative" "button"
+    And I click on the "AFTER" tui radio in the "scheduleDynamic[fromDirection]" tui radio group
     And I set the following fields to these values:
-      | scheduleDynamic[from_count]                      | 2                          |
-      | scheduleDynamic[from_unit]                       | weeks                      |
-      | scheduleDynamic[from_direction]                  | after                      |
-      | scheduleDynamic[dynamic_source]                  | Job assignment start date  |
+      | scheduleDynamic[fromOffset][after][value]        | 2                                   |
+      | scheduleDynamic[fromOffset][after][range]        | weeks                               |
+      | scheduleDynamic[dynamic_source]                  | Job assignment start date           |
     And I save the activity schedule
     Then I should see "This setting cannot be disabled while “Job assignment start date” is in use"
-    When I click on the "Enabled" tui radio in the "subject_instance_generation" tui radio group
+    When I click on the "Enabled" tui radio in the "subjectInstanceGeneration" tui radio group
     And I save the activity schedule
     And I click on "Confirm" "button"
     And I wait until the page is ready

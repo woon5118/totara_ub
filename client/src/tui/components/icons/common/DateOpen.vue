@@ -12,19 +12,34 @@
   LTD, you may not access, use, modify, or distribute this software.
   Please contact [licensing@totaralearning.com] for more information.
 
-  @author Jaron Steenson <jaron.steenson@totaralearning.com>
-  @module theme_ventura
+  @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
+  @module tui
 -->
 
-<style lang="scss">
-.tui-performAssignmentScheduleSettings {
-  &__use-anniversary {
-    margin-top: var(--tui-gap-2);
+<script>
+import FlexIcon from 'tui/components/icons/FlexIcon';
 
-    & .tui-checkbox {
-      // Prevent the label overflowing outside the container on mobile.
-      height: auto;
-    }
-  }
-}
-</style>
+export default {
+  functional: true,
+
+  components: {
+    FlexIcon,
+  },
+
+  props: {
+    alt: String,
+    customClass: [String, Object, Array],
+    styleClass: Object,
+    size: [String, Number],
+    title: String,
+  },
+
+  render(h, { props }) {
+    return h(FlexIcon, {
+      props: Object.assign({}, props, {
+        icon: 'date-open',
+      }),
+    });
+  },
+};
+</script>

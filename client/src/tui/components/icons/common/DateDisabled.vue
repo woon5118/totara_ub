@@ -12,14 +12,34 @@
   LTD, you may not access, use, modify, or distribute this software.
   Please contact [licensing@totaralearning.com] for more information.
 
-  @author Riana Rossouw <riana.rossouw@totaralearning.com>
-  @module theme_ventura
+  @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
+  @module tui
 -->
 
-<style lang="scss">
-.tui-performAssignmentScheduleAdditionalSettings {
-  &__radio_description {
-    @include tui-font-body-placeholder();
-  }
-}
-</style>
+<script>
+import FlexIcon from 'tui/components/icons/FlexIcon';
+
+export default {
+  functional: true,
+
+  components: {
+    FlexIcon,
+  },
+
+  props: {
+    alt: String,
+    customClass: [String, Object, Array],
+    styleClass: Object,
+    size: [String, Number],
+    title: String,
+  },
+
+  render(h, { props }) {
+    return h(FlexIcon, {
+      props: Object.assign({}, props, {
+        icon: 'date-disabled',
+      }),
+    });
+  },
+};
+</script>

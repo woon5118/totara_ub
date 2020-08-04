@@ -12,25 +12,34 @@
   LTD, you may not access, use, modify, or distribute this software.
   Please contact [licensing@totaralearning.com] for more information.
 
-  @author Mark Metcalfe <mark.metcalfe@totaralearning.com>
-  @module theme_ventura
+  @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
+  @module tui
 -->
 
-<style lang="scss">
-.tui-performAssignmentScheduleSettingContainer {
-  &__preamble {
-    margin: 0;
-  }
+<script>
+import FlexIcon from 'tui/components/icons/FlexIcon';
 
-  &__title {
-    @include tui-font-heading-label;
-    margin-top: 0;
-    margin-bottom: var(--tui-gap-1);
-  }
+export default {
+  functional: true,
 
-  &__container {
-    padding: var(--tui-gap-2);
-    background-color: var(--tui-color-neutral-3);
-  }
-}
-</style>
+  components: {
+    FlexIcon,
+  },
+
+  props: {
+    alt: String,
+    customClass: [String, Object, Array],
+    styleClass: Object,
+    size: [String, Number],
+    title: String,
+  },
+
+  render(h, { props }) {
+    return h(FlexIcon, {
+      props: Object.assign({}, props, {
+        icon: 'date-enabled',
+      }),
+    });
+  },
+};
+</script>

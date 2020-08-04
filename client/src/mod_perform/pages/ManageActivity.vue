@@ -18,20 +18,17 @@
 
 <template>
   <div class="tui-performManageActivity">
-    <a :href="goBackLink">{{
-      $str('back_to_all_activities', 'mod_perform')
-    }}</a>
+    <a :href="goBackLink">
+      {{ $str('back_to_all_activities', 'mod_perform') }}
+    </a>
 
-    <Loader :loading="$apollo.loading">
-      <Grid
-        v-if="activity"
-        :stack-at="768"
-        class="tui-performManageActivity__topBar"
-      >
-        <GridItem :units="6">
-          <h2 class="tui-performManageActivity__title">{{ activity.name }}</h2>
-        </GridItem>
-      </Grid>
+    <Loader
+      :loading="$apollo.loading"
+      class="tui-performManageActivity__content"
+    >
+      <h2 v-if="activity" class="tui-performManageActivity__title">
+        {{ activity.name }}
+      </h2>
 
       <ActivityStatusBanner
         v-if="activity"
@@ -61,36 +58,34 @@
 </template>
 
 <script>
+import ActivityContentTab from 'mod_perform/components/manage_activity/content/ActivityContentTab';
 import ActivityStatusBanner from 'mod_perform/components/manage_activity/ActivityStatusBanner';
 import AssignmentsTab from 'mod_perform/components/manage_activity/assignment/AssignmentsTab';
-import ActivityContentTab from 'mod_perform/components/manage_activity/content/ActivityContentTab';
 import FlexIcon from 'tui/components/icons/FlexIcon';
 import GeneralInfoTab from 'mod_perform/components/manage_activity/GeneralInfoTab';
 import NotificationsTab from 'mod_perform/components/manage_activity/notification/NotificationsTab';
-import Grid from 'tui/components/grid/Grid';
-import GridItem from 'tui/components/grid/GridItem';
 import Loader from 'tui/components/loader/Loader';
 import Tab from 'tui/components/tabs/Tab';
 import Tabs from 'tui/components/tabs/Tabs';
-import activityQuery from 'mod_perform/graphql/activity';
 import { notify } from 'tui/notifications';
-import { NOTIFICATION_DURATION } from 'mod_perform/constants';
 import { debounce } from 'tui/util';
+
+// graphQL
+import activityQuery from 'mod_perform/graphql/activity';
 
 export default {
   components: {
+    ActivityContentTab,
     ActivityStatusBanner,
     AssignmentsTab,
-    ActivityContentTab,
     FlexIcon,
     Tab,
     Tabs,
     Loader,
     GeneralInfoTab,
     NotificationsTab,
-    Grid,
-    GridItem,
   },
+
   props: {
     activityId: {
       required: true,
@@ -101,33 +96,29 @@ export default {
       type: String,
     },
   },
-  data() {
-    const generalInfoTabId = this.$id('genral-info-tab');
-    const contentTabId = this.$id('content-tab');
-    const assignmentTabId = this.$id('assignments-tab');
-    const notificationTabId = this.$id('notifications-tab');
 
+  data() {
     return {
       activity: null,
-      initialTabId: contentTabId,
+      initialTabId: this.$id('content-tab'),
       tabs: [
         {
-          id: generalInfoTabId,
+          id: this.$id('genral-info-tab'),
           component: 'GeneralInfoTab',
           name: this.$str('manage_activities_tabs_general', 'mod_perform'),
         },
         {
-          id: contentTabId,
+          id: this.$id('content-tab'),
           component: 'ActivityContentTab',
           name: this.$str('manage_activities_tabs_content', 'mod_perform'),
         },
         {
-          id: assignmentTabId,
+          id: this.$id('assignments-tab'),
           component: 'AssignmentsTab',
           name: this.$str('manage_activities_tabs_assignment', 'mod_perform'),
         },
         {
-          id: notificationTabId,
+          id: this.$id('notifications-tab'),
           component: 'NotificationsTab',
           name: this.$str(
             'manage_activities_tabs_notifications',
@@ -142,12 +133,14 @@ export default {
       return this.activity ? this.activity.state_details.name : null;
     },
   },
+
   created() {
     this.showMutationSuccessNotification = debounce(
       this.showMutationSuccessNotification,
       500
     );
   },
+
   apollo: {
     activity: {
       query: activityQuery,
@@ -170,24 +163,22 @@ export default {
     },
 
     /**
-     * Show a generic success toast.
-     */
-    showMutationSuccessNotification() {
-      notify({
-        duration: NOTIFICATION_DURATION,
-        message: this.$str('toast_success_activity_update', 'mod_perform'),
-        type: 'success',
-      });
-    },
-
-    /**
      * Show a generic saving error toast.
      */
     showMutationErrorNotification() {
       notify({
-        duration: NOTIFICATION_DURATION,
         message: this.$str('toast_error_generic_update', 'mod_perform'),
         type: 'error',
+      });
+    },
+
+    /**
+     * Show a generic success toast.
+     */
+    showMutationSuccessNotification() {
+      notify({
+        message: this.$str('toast_success_activity_update', 'mod_perform'),
+        type: 'success',
       });
     },
   },

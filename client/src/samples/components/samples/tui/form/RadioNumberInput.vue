@@ -26,7 +26,7 @@
         :errors="errors"
         @submit="submit"
       >
-        <FormRowFieldset label="Event date">
+        <FormRow label="Event date">
           <FormRadioGroup
             name="groupValue"
             :input-sized-options="true"
@@ -37,27 +37,30 @@
             </Radio>
 
             <FormRadioWithInput
+              v-slot="{
+                disabledRadio,
+                nameLabel,
+                setAccessibleLabel,
+                update,
+                value,
+              }"
               :disabled="disabled"
               :name="['customNumber', 'numberValue']"
               :text="relativeBeforeText"
               value="numberValue"
             >
-              <template
-                v-slot="{ disabledRadio, setAccessibleLabel, update, value }"
-              >
-                <RadioNumberInput
-                  :disabled="disabledRadio"
-                  :value="value"
-                  @input="update($event)"
-                  @accessible-change="
-                    a =>
-                      setAccessibleLabel($str('days_before', 'totara_core', a))
-                  "
-                />
-              </template>
+              <RadioNumberInput
+                :disabled="disabledRadio"
+                :name="nameLabel"
+                :value="value"
+                @input="update($event)"
+                @accessible-change="
+                  a => setAccessibleLabel($str('days_before', 'totara_core', a))
+                "
+              />
             </FormRadioWithInput>
           </FormRadioGroup>
-        </FormRowFieldset>
+        </FormRow>
         <FormRowActionButtons :submitting="getSubmitting()" @cancel="reset" />
       </Uniform>
 
@@ -104,7 +107,6 @@ import FormRowActionButtons from 'tui/components/form/FormRowActionButtons';
 import {
   FormRadioGroup,
   FormRadioWithInput,
-  FormRowFieldset,
   Uniform,
 } from 'tui/components/uniform';
 
@@ -114,7 +116,6 @@ export default {
     FormRadioWithInput,
     FormRow,
     FormRowActionButtons,
-    FormRowFieldset,
     InputText,
     Radio,
     RadioNumberInput,
@@ -133,39 +134,45 @@ export default {
       relativeBeforeText: 'Before Date:',
       selectedDate: {},
       codeTemplate: `<Uniform v-slot="{ getSubmitting }" :errors="errors" @submit="submit">
-  <FormRowFieldset label="Event date">
+  <FormRow label="Event date">
     <FormRadioGroup
       name="date"
       :input-sized-options="true"
       :validations="v => [v.required()]"
     >
       <FormRadioWithInput
+        v-slot="{
+          disabledRadio,
+          nameLabel,
+          setAccessibleLabel,
+          update,
+          value,
+        }"
         :disabled="disabled"
         :name="['customNumber', 'numberValue']"
         :text="relativeBeforeText"
         value="numberValue"
       >
-        <template v-slot="{ disabledRadio, setAccessibleLabel, update, value }">
-          <RadioNumberInput
-            :disabled="disabledRadio"
-            :value="value"
-            @input="update($event)"
-            @accessible-change="
-              a =>
-                setAccessibleLabel($str('days_before', 'totara_core', a))
-            "
-          />
-        </template>
+        <RadioNumberInput
+          :disabled="disabledRadio"
+          :name="nameLabel"
+          :value="value"
+          @input="update($event)"
+          @accessible-change="
+            a =>
+              setAccessibleLabel($str('days_before', 'totara_core', a))
+          "
+        />
       </FormRadioWithInput>
     </FormRadioGroup>
-  </FormRowFieldset>
+  </FormRow>
   <FormRowActionButtons :submitting="getSubmitting()" />
 </Uniform>`,
       codeScript: `import RadioNumberInput from 'tui/components/form/RadioNumberInput';
 import {
   FormRadioGroup,
   FormRadioWithInput,
-  FormRowFieldset,
+  FormRow,
   Uniform,
 } from 'totara_core/components/uniform';
 
@@ -173,7 +180,7 @@ export default {
   components: {
     FormRadioGroup,
     FormRadioWithInput,
-    FormRowFieldset,
+    FormRow,
     RadioNumberInput,
     Uniform,
   },

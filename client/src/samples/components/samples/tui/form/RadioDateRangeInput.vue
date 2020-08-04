@@ -26,7 +26,7 @@
         :errors="errors"
         @submit="submit"
       >
-        <FormRowFieldset label="Event date">
+        <FormRow label="Event date">
           <FormRadioGroup
             name="groupValue"
             :input-sized-options="true"
@@ -37,58 +37,66 @@
             </Radio>
 
             <FormRadioWithInput
+              v-slot="{
+                disabledRadio,
+                nameLabel,
+                setAccessibleLabel,
+                update,
+                value,
+              }"
               :name="['relativeDate', 'beforeDate']"
               :disabled="disabled"
               :text="relativeBeforeText"
               value="beforeDate"
             >
-              <template
-                v-slot="{ disabledRadio, setAccessibleLabel, update, value }"
-              >
-                <RadioDateRange
-                  :disabled="disabledRadio"
-                  :value="value"
-                  @input="update($event)"
-                  @accessible-change="
-                    a =>
-                      setAccessibleLabel(
-                        $str('date_range_before_date', 'totara_core', {
-                          range: a.range,
-                          value: a.value,
-                        })
-                      )
-                  "
-                />
-              </template>
+              <RadioDateRange
+                :disabled="disabledRadio"
+                :name="nameLabel"
+                :value="value"
+                @input="update($event)"
+                @accessible-change="
+                  a =>
+                    setAccessibleLabel(
+                      $str('date_range_before_date', 'totara_core', {
+                        range: a.range,
+                        value: a.value,
+                      })
+                    )
+                "
+              />
             </FormRadioWithInput>
 
             <FormRadioWithInput
+              v-slot="{
+                disabledRadio,
+                nameLabel,
+                setAccessibleLabel,
+                update,
+                value,
+              }"
               :name="['relativeDate', 'afterDate']"
               :disabled="disabled"
               :text="relativeAfterText"
               value="afterDate"
             >
-              <template
-                v-slot="{ disabledRadio, setAccessibleLabel, update, value }"
-              >
-                <RadioDateRange
-                  :disabled="disabledRadio"
-                  :value="value"
-                  @input="update($event)"
-                  @accessible-change="
-                    a =>
-                      setAccessibleLabel(
-                        $str('date_range_after_date', 'totara_core', {
-                          range: a.range,
-                          value: a.value,
-                        })
-                      )
-                  "
-                />
-              </template>
+              <RadioDateRange
+                :disabled="disabledRadio"
+                :name="nameLabel"
+                :value="value"
+                @input="update($event)"
+                @accessible-change="
+                  a =>
+                    setAccessibleLabel(
+                      $str('date_range_after_date', 'totara_core', {
+                        range: a.range,
+                        value: a.value,
+                      })
+                    )
+                "
+              />
             </FormRadioWithInput>
           </FormRadioGroup>
-        </FormRowFieldset>
+        </FormRow>
         <FormRowActionButtons :submitting="getSubmitting()" @cancel="reset" />
       </Uniform>
 
@@ -139,7 +147,6 @@ import FormRowActionButtons from 'tui/components/form/FormRowActionButtons';
 import {
   FormRadioGroup,
   FormRadioWithInput,
-  FormRowFieldset,
   Uniform,
 } from 'tui/components/uniform';
 
@@ -149,7 +156,6 @@ export default {
     FormRadioWithInput,
     FormRow,
     FormRowActionButtons,
-    FormRowFieldset,
     InputText,
     Radio,
     RadioDateRange,
@@ -169,68 +175,83 @@ export default {
       relativeBeforeText: 'Before Date:',
       selectedDate: {},
       codeTemplate: `<Uniform v-slot="{ getSubmitting }" :errors="errors" @submit="submit">
-  <FormRowFieldset label="Event date">
+  <FormRow label="Event date">
     <FormRadioGroup
       name="date"
       :input-sized-options="true"
       :validations="v => [v.required()]"
     >
       <FormRadioWithInput
+        v-slot="{
+          disabledRadio,
+          nameLabel,
+          setAccessibleLabel,
+          update,
+          value,
+        }"
         :name="['relativeDate', 'beforeDate']"
         :disabled="disabled"
         :text="relativeBeforeText"
         value="beforeDate"
       >
-        <template v-slot="{ disabledRadio, setAccessibleLabel, update, value }">
-          <RadioDateRange
-            :disabled="disabled"
-            :value="value"
-            @input="update($event)"
-            @accessible-change="
-              a =>
-                setAccessibleLabel(
-                  $str('date_range_before_date', 'totara_core', {
-                    range: a.range,
-                    value: a.value,
-                  })
-                )
-            "
-          />
-        </template>
+
+        <RadioDateRange
+          :disabled="disabled"
+          :name="nameLabel"
+          :value="value"
+          @input="update($event)"
+          @accessible-change="
+            a =>
+              setAccessibleLabel(
+                $str('date_range_before_date', 'totara_core', {
+                  range: a.range,
+                  value: a.value,
+                })
+              )
+          "
+        />
+
       </FormRadioWithInput>
 
       <FormRadioWithInput
+        v-slot="{
+          disabledRadio,
+          nameLabel,
+          setAccessibleLabel,
+          update,
+          value,
+        }"
         :name="['relativeDate', 'afterDate']"
         :disabled="disabled"
         :text="relativeAfterText"
         value="afterDate"
       >
-        <template v-slot="{ disabledRadio, setAccessibleLabel, update, value }">
-          <RadioDateRange
-            :disabled="disabled"
-            :value="value"
-            @input="update($event)"
-            @accessible-change="
-              a =>
-                setAccessibleLabel(
-                  $str('date_range_after_date', 'totara_core', {
-                    range: a.range,
-                    value: a.value,
-                  })
-                )
-            "
-          />
-        </template>
+
+        <RadioDateRange
+          :disabled="disabled"
+          :name="nameLabel"
+          :value="value"
+          @input="update($event)"
+          @accessible-change="
+            a =>
+              setAccessibleLabel(
+                $str('date_range_after_date', 'totara_core', {
+                  range: a.range,
+                  value: a.value,
+                })
+              )
+          "
+        />
       </FormRadioWithInput>
     </FormRadioGroup>
-  </FormRowFieldset>
+  </FormRow>
   <FormRowActionButtons :submitting="getSubmitting()" />
 </Uniform>`,
       codeScript: `import RadioDateRange from 'tui/components/form/RadioDateRange';
 import {
   FormRadioGroup,
   FormRadioWithInput,
-  FormRowFieldset,
+  FormRow,
   Uniform,
 } from 'totara_core/components/uniform';
 
@@ -238,7 +259,7 @@ export default {
   components: {
     FormRadioGroup,
     FormRadioWithInput,
-    FormRowFieldset,
+    FormRow,
     RadioDateRange,
     Uniform,
   },

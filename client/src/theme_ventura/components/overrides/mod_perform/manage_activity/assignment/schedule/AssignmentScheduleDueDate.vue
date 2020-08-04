@@ -12,34 +12,23 @@
   LTD, you may not access, use, modify, or distribute this software.
   Please contact [licensing@totaralearning.com] for more information.
 
-  @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
+  @author Jaron Steenson <jaron.steenson@totaralearning.com>
   @module mod_perform
 -->
 
-<script>
-import FlexIcon from 'tui/components/icons/FlexIcon';
+<style lang="scss">
+.tui-assignmentScheduleDueDate {
+  &__title {
+    margin: 0;
+    @include tui-font-heading-x-small();
+  }
 
-export default {
-  functional: true,
+  &__description {
+    margin-top: var(--tui-gap-4);
+  }
 
-  components: {
-    FlexIcon,
-  },
-
-  props: {
-    alt: String,
-    customClass: [String, Object, Array],
-    styleClass: Object,
-    size: [String, Number],
-    title: String,
-  },
-
-  render(h, { props }) {
-    return h(FlexIcon, {
-      props: Object.assign({}, props, {
-        icon: 'mod_perform|repeat',
-      }),
-    });
-  },
-};
-</script>
+  &__form {
+    margin-top: var(--tui-gap-8);
+  }
+}
+</style>

@@ -12,23 +12,34 @@
   LTD, you may not access, use, modify, or distribute this software.
   Please contact [licensing@totaralearning.com] for more information.
 
-  @author Jaron Steenson <jaron.steenson@totaralearning.com>
-  @module mod_perform
+  @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
+  @module tui
 -->
 
-<style lang="scss">
-.tui-performAssignmentScheduleToggles {
-  display: flex;
-  flex-wrap: wrap;
+<script>
+import FlexIcon from 'tui/components/icons/FlexIcon';
 
-  &__toggle-group {
-    display: flex;
-    flex-wrap: wrap;
-  }
+export default {
+  functional: true,
 
-  &__toggle-set {
-    margin-right: var(--tui-gap-4);
-    margin-bottom: var(--tui-gap-2);
-  }
-}
-</style>
+  components: {
+    FlexIcon,
+  },
+
+  props: {
+    alt: String,
+    customClass: [String, Object, Array],
+    styleClass: Object,
+    size: [String, Number],
+    title: String,
+  },
+
+  render(h, { props }) {
+    return h(FlexIcon, {
+      props: Object.assign({}, props, {
+        icon: 'date-relative',
+      }),
+    });
+  },
+};
+</script>

@@ -22,6 +22,11 @@
   flex-wrap: wrap;
   align-items: center;
 
+  & > * + * {
+    // Use same indentation as radio for nicer wrapping
+    margin-left: var(--tui-radio-label-offset);
+  }
+
   &__radio {
     margin: var(--tui-gap-1) 0;
   }

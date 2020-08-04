@@ -24,6 +24,7 @@
         v-model="numberValue"
         :aria-label="$str('number', 'totara_core')"
         :disabled="disabled"
+        :name="name + '[value]'"
         @input="update"
       />
     </div>
@@ -41,6 +42,7 @@ export default {
 
   props: {
     disabled: Boolean,
+    name: String,
     value: [Number, String],
   },
 
@@ -57,9 +59,12 @@ export default {
   },
 
   watch: {
-    value() {
-      this.numberValue = this.value !== undefined ? this.value : 1;
-      this.update();
+    value: {
+      handler() {
+        this.numberValue = this.value !== undefined ? this.value : 1;
+        this.update();
+      },
+      immediate: true,
     },
   },
 

@@ -19,8 +19,6 @@
 <style lang="scss">
 .tui-radioDateRangeInput {
   display: flex;
-  // Use same indentation as radio for nicer wrapping
-  margin-left: var(--tui-radio-label-offset);
 
   & > * + * {
     margin-left: var(--tui-gap-2);

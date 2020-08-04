@@ -31,6 +31,7 @@
     </Radio>
     <slot
       :disabledRadio="disabled || !checked"
+      :nameLabel="name"
       :setAccessibleLabel="setAccessibleLabel"
       :update="update"
       :value="controlValue"

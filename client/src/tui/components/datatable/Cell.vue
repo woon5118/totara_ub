@@ -28,7 +28,11 @@
     ]"
     role="cell"
   >
-    <span v-if="columnHeader" class="tui-dataTableCell__label" aria-hidden>
+    <span
+      v-if="columnHeader"
+      class="tui-dataTableCell__label"
+      aria-hidden="true"
+    >
       {{ columnHeader }}
     </span>
     <div class="tui-dataTableCell__content">

@@ -16,27 +16,34 @@
   @module mod_perform
 -->
 <template>
-  <div>
-    <Loader :loading="$apollo.loading">
-      <FormScope path="dynamicCustomSettings">
+  <FormScope path="dynamicCustomSettings" :validate="activityValidator">
+    <FormRow :label="$str('schedule_range_activity', 'mod_perform')">
+      <Loader :loading="$apollo.loading">
         <FormSelect
           :id="$id('relative-date-reference-date')"
+          char-length="25"
           :options="activityOptions"
-          :validations="v => [v.required()]"
           name="activity"
         />
-      </FormScope>
-    </Loader>
-  </div>
+      </Loader>
+    </FormRow>
+  </FormScope>
 </template>
 
 <script>
-import { FormSelect, FormScope } from 'tui/components/uniform';
-import performActivitiesQuery from 'mod_perform/graphql/activities';
 import Loader from 'tui/components/loader/Loader';
+import { FormRow, FormSelect, FormScope } from 'tui/components/uniform';
+// graphQL
+import performActivitiesQuery from 'mod_perform/graphql/activities';
 
 export default {
-  components: { Loader, FormSelect, FormScope },
+  components: {
+    FormRow,
+    FormSelect,
+    FormScope,
+    Loader,
+  },
+
   props: {
     data: {
       type: Object,
@@ -47,15 +54,18 @@ export default {
       required: true,
     },
   },
+
   data() {
     return {
       activities: [],
+      visible: true,
     };
   },
+
   computed: {
     activityOptions() {
       let defaultOption = {
-        id: undefined, // This must be undefined so it will match the uniform default value.
+        id: null,
         label: this.$str(
           'schedule_dynamic_another_activity_select',
           'mod_perform'
@@ -75,10 +85,31 @@ export default {
       return options;
     },
   },
+
   apollo: {
     activities: {
       query: performActivitiesQuery,
       update: data => data.mod_perform_activities,
+    },
+  },
+
+  beforeDestroy() {
+    this.visible = false;
+  },
+
+  methods: {
+    activityValidator(v) {
+      const activityIsRequired = this.$str(
+        'schedule_dynamic_activity_required',
+        'mod_perform'
+      );
+      const errors = {};
+
+      if (this.visible && !v.activity) {
+        errors.activity = activityIsRequired;
+      }
+
+      return errors;
     },
   },
 };
@@ -87,7 +118,9 @@ export default {
 <lang-strings>
   {
     "mod_perform": [
-      "schedule_dynamic_another_activity_select"
+      "schedule_dynamic_activity_required",
+      "schedule_dynamic_another_activity_select",
+      "schedule_range_activity"
     ]
   }
 </lang-strings>

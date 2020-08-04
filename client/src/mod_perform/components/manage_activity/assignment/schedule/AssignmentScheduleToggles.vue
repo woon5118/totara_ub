@@ -1,0 +1,239 @@
+<!--
+  This file is part of Totara Enterprise Extensions.
+
+  Copyright (C) 2020 onwards Totara Learning Solutions LTD
+
+  Totara Enterprise Extensions is provided only to Totara
+  Learning Solutions LTD's customers and partners, pursuant to
+  the terms and conditions of a separate agreement with Totara
+  Learning Solutions LTD or its affiliate.
+
+  If you do not have an agreement with Totara Learning Solutions
+  LTD, you may not access, use, modify, or distribute this software.
+  Please contact [licensing@totaralearning.com] for more information.
+
+  @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
+  @module mod_perform
+-->
+<template>
+  <div class="tui-assignmentScheduleToggles">
+    <div class="tui-assignmentScheduleToggles__group">
+      <div class="tui-assignmentScheduleToggles__item">
+        <h4 class="tui-assignmentScheduleToggles__item-header">
+          {{ $str('schedule_creation_range', 'mod_perform') }}
+        </h4>
+        <ToggleSet
+          v-model="scheduleIsOpen"
+          class="tui-assignmentScheduleToggles__item-toggle"
+          :aria-label="$str('schedule_creation_range', 'mod_perform')"
+          :large="true"
+          @input="toggleChange"
+        >
+          <ToggleButton
+            :value="false"
+            :aria-label="$str('schedule_is_limited', 'mod_perform')"
+            :text="$str('schedule_is_limited', 'mod_perform')"
+          >
+            <DateLimitedIcon />
+          </ToggleButton>
+
+          <ToggleButton
+            :value="true"
+            :aria-label="$str('schedule_is_open', 'mod_perform')"
+            :text="$str('schedule_is_open', 'mod_perform')"
+          >
+            <DateOpenIcon />
+          </ToggleButton>
+        </ToggleSet>
+      </div>
+      <div class="tui-assignmentScheduleToggles__item">
+        <h4 class="tui-assignmentScheduleToggles__item-header">
+          {{ $str('schedule_creation_date_type', 'mod_perform') }}
+        </h4>
+
+        <ToggleSet
+          v-model="scheduleIsFixed"
+          class="tui-assignmentScheduleToggles__item-toggle"
+          :aria-label="$str('schedule_creation_date_type', 'mod_perform')"
+          :large="true"
+          @input="toggleChange"
+        >
+          <ToggleButton
+            :value="true"
+            :aria-label="$str('schedule_is_fixed', 'mod_perform')"
+            :text="$str('schedule_is_fixed', 'mod_perform')"
+          >
+            <CalendarIcon />
+          </ToggleButton>
+
+          <ToggleButton
+            :value="false"
+            :aria-label="$str('schedule_is_relative', 'mod_perform')"
+            :text="$str('schedule_is_relative', 'mod_perform')"
+          >
+            <DateRelativeIcon />
+          </ToggleButton>
+        </ToggleSet>
+      </div>
+    </div>
+    <div class="tui-assignmentScheduleToggles__group">
+      <div class="tui-assignmentScheduleToggles__item">
+        <h4 class="tui-assignmentScheduleToggles__item-header">
+          {{ $str('schedule_creation_frequency', 'mod_perform') }}
+        </h4>
+
+        <ToggleSet
+          v-model="repeatingIsEnabled"
+          class="tui-assignmentScheduleToggles__item-toggle"
+          :aria-label="$str('schedule_creation_frequency', 'mod_perform')"
+          :large="true"
+          @input="toggleChange"
+        >
+          <ToggleButton
+            :value="false"
+            :aria-label="
+              $str('schedule_creation_frequency_once_off', 'mod_perform')
+            "
+            :text="$str('schedule_creation_frequency_once_off', 'mod_perform')"
+          >
+            <DateFrequencyOnceIcon />
+          </ToggleButton>
+
+          <ToggleButton
+            :value="true"
+            :aria-label="
+              $str('schedule_creation_frequency_repeating', 'mod_perform')
+            "
+            :text="$str('schedule_creation_frequency_repeating', 'mod_perform')"
+          >
+            <DateFrequencyRepeatingIcon />
+          </ToggleButton>
+        </ToggleSet>
+      </div>
+    </div>
+    <div class="tui-assignmentScheduleToggles__group">
+      <div class="tui-assignmentScheduleToggles__item">
+        <h4 class="tui-assignmentScheduleToggles__item-header">
+          {{ $str('due_date', 'mod_perform') }}
+        </h4>
+        <ToggleSet
+          v-model="dueDateIsEnabled"
+          class="tui-assignmentScheduleToggles__item-toggle"
+          :aria-label="$str('due_date', 'mod_perform')"
+          :large="true"
+          @input="toggleChange"
+        >
+          <ToggleButton
+            :value="true"
+            :aria-label="$str('due_date_is_enabled', 'mod_perform')"
+            :text="$str('due_date_is_enabled', 'mod_perform')"
+          >
+            <DateEnabledIcon />
+          </ToggleButton>
+
+          <ToggleButton
+            :value="false"
+            :aria-label="$str('due_date_is_disabled', 'mod_perform')"
+            :text="$str('due_date_is_disabled', 'mod_perform')"
+          >
+            <DateDisabledIcon />
+          </ToggleButton>
+        </ToggleSet>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+// Imports
+import ToggleButton from 'tui/components/toggle/ToggleButton';
+import ToggleSet from 'tui/components/toggle/ToggleSet';
+// Icons
+import CalendarIcon from 'tui/components/icons/common/Calendar';
+import DateDisabledIcon from 'tui/components/icons/common/DateDisabled';
+import DateEnabledIcon from 'tui/components/icons/common/DateEnabled';
+import DateFrequencyOnceIcon from 'tui/components/icons/common/DateFrequencyOnce';
+import DateFrequencyRepeatingIcon from 'tui/components/icons/common/DateFrequencyRepeating';
+import DateLimitedIcon from 'tui/components/icons/common/DateLimited';
+import DateOpenIcon from 'tui/components/icons/common/DateOpen';
+import DateRelativeIcon from 'tui/components/icons/common/DateRelative';
+
+// Util
+
+export default {
+  components: {
+    CalendarIcon,
+    DateDisabledIcon,
+    DateEnabledIcon,
+    DateFrequencyOnceIcon,
+    DateFrequencyRepeatingIcon,
+    DateLimitedIcon,
+    DateOpenIcon,
+    DateRelativeIcon,
+    ToggleButton,
+    ToggleSet,
+  },
+
+  props: {
+    value: {
+      type: Object,
+    },
+  },
+
+  data() {
+    return {
+      dueDateIsEnabled: false,
+      repeatingIsEnabled: false,
+      scheduleIsOpen: false,
+      scheduleIsFixed: false,
+    };
+  },
+
+  watch: {
+    value: {
+      handler() {
+        this.dueDateIsEnabled = this.value.dueDateIsEnabled;
+        this.repeatingIsEnabled = this.value.repeatingIsEnabled;
+        this.scheduleIsOpen = this.value.scheduleIsOpen;
+        this.scheduleIsFixed = this.value.scheduleIsFixed;
+      },
+      immediate: true,
+    },
+  },
+
+  methods: {
+    /**
+     * Inform schedule of change
+     *
+     */
+    toggleChange() {
+      this.$emit('input', {
+        dueDateIsEnabled: this.dueDateIsEnabled,
+        repeatingIsEnabled: this.repeatingIsEnabled,
+        scheduleIsOpen: this.scheduleIsOpen,
+        scheduleIsFixed: this.scheduleIsFixed,
+      });
+    },
+  },
+};
+</script>
+
+<lang-strings>
+  {
+    "mod_perform": [
+      "activity_instance_creation_heading",
+      "due_date",
+      "due_date_is_disabled",
+      "due_date_is_enabled",
+      "schedule_creation_range",
+      "schedule_creation_date_type",
+      "schedule_creation_frequency",
+      "schedule_creation_frequency_once_off",
+      "schedule_creation_frequency_repeating",
+      "schedule_is_fixed",
+      "schedule_is_limited",
+      "schedule_is_open",
+      "schedule_is_relative"
+    ]
+  }
+</lang-strings>

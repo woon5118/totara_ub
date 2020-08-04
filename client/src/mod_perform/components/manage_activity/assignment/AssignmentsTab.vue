@@ -1,124 +1,57 @@
+<!--
+  This file is part of Totara Enterprise Extensions.
+
+  Copyright (C) 2020 onwards Totara Learning Solutions LTD
+
+  Totara Enterprise Extensions is provided only to Totara
+  Learning Solutions LTD's customers and partners, pursuant to
+  the terms and conditions of a separate agreement with Totara
+  Learning Solutions LTD or its affiliate.
+
+  If you do not have an agreement with Totara Learning Solutions
+  LTD, you may not access, use, modify, or distribute this software.
+  Please contact [licensing@totaralearning.com] for more information.
+
+  @author Jaron Steenson <jaron.steenson@totaralearning.com>
+  @module mod_perform
+-->
+
 <template>
   <div class="tui-performManageActivityAssignmentsForm">
-    <Grid
-      class="tui-performManageActivityAssignmentsForm__heading"
-      :stack-at="600"
-      :use-vertical-gap="false"
-    >
-      <GridItem grows>
-        <h3 class="tui-performManageActivityAssignmentsForm__heading-title">
-          {{ $str('user_group_assignment_title', 'mod_perform') }}
-        </h3>
-      </GridItem>
-      <GridItem
-        grows
-        :units="1"
-        class="tui-performManageActivityAssignmentsForm__heading-buttons"
-      >
-        <Dropdown
-          class="tui-performManageActivityAssignmentsForm__heading-dropdown"
-          :separator="true"
-          :position="dropdownPosition"
-        >
-          <template v-slot:trigger="{ toggle, isOpen }">
-            <Button
-              :aria-expanded="isOpen ? 'true' : 'false'"
-              :text="$str('user_group_assignment_add_group', 'mod_perform')"
-              :caret="true"
-              :styleclass="{
-                primary: true,
-              }"
-              @click="toggle"
-            />
-          </template>
-          <DropdownItem @click="openAdder">
-            {{ $str('user_group_assignment_group_cohort', 'mod_perform') }}
-          </DropdownItem>
-          <DropdownItem @click="openOrgAdder">
-            {{
-              $str('user_group_assignment_group_organisation', 'mod_perform')
-            }}
-          </DropdownItem>
-          <DropdownItem @click="openPosAdder">
-            {{ $str('user_group_assignment_group_position', 'mod_perform') }}
-          </DropdownItem>
-        </Dropdown>
-      </GridItem>
-    </Grid>
+    <h3 class="tui-performManageActivityAssignmentsForm__heading">
+      {{ $str('user_group_assignment_title', 'mod_perform') }}
+    </h3>
 
-    <Table
-      class="tui-performManageActivityAssignmentsForm__table"
-      :data="assignments.length > 0 ? assignments : noAssignments"
-    >
-      <template v-slot:header-row>
-        <HeaderCell size="8" valign="center">
-          {{ $str('user_group_assignment_name', 'mod_perform') }}
-        </HeaderCell>
-        <HeaderCell size="4" valign="center">
-          {{ $str('user_group_assignment_type', 'mod_perform') }}
-        </HeaderCell>
-        <HeaderCell size="2" valign="center">
-          {{ $str('user_group_assignment_usercount', 'mod_perform') }}
-        </HeaderCell>
-        <HeaderCell size="2" valign="center" />
-      </template>
-      <template v-slot:row="{ row }">
-        <template>
-          <Cell
-            size="8"
-            valign="center"
-            :column-header="$str('user_group_assignment_name', 'mod_perform')"
-          >
-            {{ row.group.name }}
-          </Cell>
-          <Cell
-            size="4"
-            valign="center"
-            :column-header="$str('user_group_assignment_type', 'mod_perform')"
-          >
-            {{ row.group.type_label }}
-          </Cell>
-          <Cell
-            size="2"
-            valign="center"
-            :column-header="
-              $str('user_group_assignment_usercount', 'mod_perform')
-            "
-          >
-            {{ row.group.size }}
-          </Cell>
-          <Cell size="2" valign="center" align="end">
-            <ButtonIcon
-              v-if="row.group.id"
-              :aria-label="$str('delete')"
-              :styleclass="{
-                small: true,
-                transparent: true,
-              }"
-              @click="
-                showRemoveConfirmationModal(
-                  row.type,
-                  row.group.id,
-                  row.group.type
-                )
-              "
-            >
-              <DeleteIcon />
-            </ButtonIcon>
-          </Cell>
+    <!-- Drop down for adding groups -->
+    <div class="tui-performManageActivityAssignmentsForm__add">
+      <Dropdown
+        class="tui-performManageActivityAssignmentsForm__add-dropdown"
+        :separator="true"
+        :position="dropdownPosition"
+      >
+        <template v-slot:trigger="{ toggle, isOpen }">
+          <Button
+            :aria-expanded="isOpen ? 'true' : 'false'"
+            :text="$str('user_group_assignment_add_group', 'mod_perform')"
+            :caret="true"
+            :styleclass="{
+              primary: true,
+            }"
+            @click="toggle"
+          />
         </template>
-      </template>
-    </Table>
-    <div class="tui-performManageActivityAssignmentsForm__summary">
-      <Schedule
-        v-if="track"
-        :track="track"
-        :dynamic-date-sources="dynamicDateSources"
-        :default-fixed-date="defaultFixedDateSetting"
-        :activity-id="activityId"
-        :activity-state="activityState"
-      />
+        <DropdownItem @click="openAdder">
+          {{ $str('user_group_assignment_group_cohort', 'mod_perform') }}
+        </DropdownItem>
+        <DropdownItem @click="openOrgAdder">
+          {{ $str('user_group_assignment_group_organisation', 'mod_perform') }}
+        </DropdownItem>
+        <DropdownItem @click="openPosAdder">
+          {{ $str('user_group_assignment_group_position', 'mod_perform') }}
+        </DropdownItem>
+      </Dropdown>
     </div>
+
     <AudienceAdder
       :open="isAudienceAdderOpen"
       :existing-items="audienceAddedIds"
@@ -147,6 +80,84 @@
       @cancel="closePosAdder"
     />
 
+    <Table
+      class="tui-performManageActivityAssignmentsForm__table"
+      :data="assignments.length > 0 ? assignments : noAssignments"
+    >
+      <template v-slot:header-row>
+        <HeaderCell size="11" valign="center">
+          {{ $str('user_group_assignment_name', 'mod_perform') }}
+        </HeaderCell>
+        <HeaderCell size="2" valign="center">
+          {{ $str('user_group_assignment_type', 'mod_perform') }}
+        </HeaderCell>
+        <HeaderCell size="2" valign="center">
+          {{ $str('user_group_assignment_usercount', 'mod_perform') }}
+        </HeaderCell>
+        <HeaderCell size="1" valign="center" />
+      </template>
+      <template v-slot:row="{ row }">
+        <template>
+          <Cell
+            size="11"
+            valign="center"
+            :column-header="$str('user_group_assignment_name', 'mod_perform')"
+          >
+            {{ row.group.name }}
+          </Cell>
+          <Cell
+            size="2"
+            valign="center"
+            :column-header="$str('user_group_assignment_type', 'mod_perform')"
+          >
+            {{ row.group.type_label }}
+          </Cell>
+          <Cell
+            size="2"
+            valign="center"
+            :column-header="
+              $str('user_group_assignment_usercount', 'mod_perform')
+            "
+          >
+            {{ row.group.size }}
+          </Cell>
+          <Cell
+            size="1"
+            valign="center"
+            align="end"
+            :column-header="$str('view_actions', 'mod_perform')"
+          >
+            <ButtonIcon
+              v-if="row.group.id"
+              :aria-label="$str('delete')"
+              :styleclass="{
+                small: true,
+                transparent: true,
+              }"
+              @click="
+                showRemoveConfirmationModal(
+                  row.type,
+                  row.group.id,
+                  row.group.type
+                )
+              "
+            >
+              <DeleteIcon />
+            </ButtonIcon>
+          </Cell>
+        </template>
+      </template>
+    </Table>
+
+    <Schedule
+      v-if="track"
+      :track="track"
+      :dynamic-date-sources="dynamicDateSources"
+      :default-fixed-date="defaultFixedDateSetting"
+      :activity-id="activityId"
+      :activity-state="activityState"
+    />
+
     <ConfirmationModal
       :title="$str('user_group_assignment_confirm_remove_title', 'mod_perform')"
       :confirm-button-text="
@@ -168,8 +179,6 @@
 
 <script>
 import AudienceAdder from 'tui/components/adder/AudienceAdder';
-import OrganisationAdder from 'tui/components/adder/OrganisationAdder';
-import PositionAdder from 'tui/components/adder/PositionAdder';
 import Button from 'tui/components/buttons/Button';
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 import Cell from 'tui/components/datatable/Cell';
@@ -177,9 +186,9 @@ import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
 import DeleteIcon from 'tui/components/icons/common/Delete';
 import Dropdown from 'tui/components/dropdown/Dropdown';
 import DropdownItem from 'tui/components/dropdown/DropdownItem';
-import Grid from 'tui/components/grid/Grid';
-import GridItem from 'tui/components/grid/GridItem';
 import HeaderCell from 'tui/components/datatable/HeaderCell';
+import OrganisationAdder from 'tui/components/adder/OrganisationAdder';
+import PositionAdder from 'tui/components/adder/PositionAdder';
 import Table from 'tui/components/datatable/Table';
 import Schedule from 'mod_perform/components/manage_activity/assignment/Schedule';
 import { ACTIVITY_STATUS_ACTIVE } from 'mod_perform/constants';
@@ -199,8 +208,6 @@ export default {
     DeleteIcon,
     Dropdown,
     DropdownItem,
-    Grid,
-    GridItem,
     HeaderCell,
     Table,
     Schedule,
@@ -267,7 +274,6 @@ export default {
     track() {
       if (this.track) {
         this.assignments = this.track.assignments;
-
         this.audienceAddedIds = this.assignments
           .filter(assignment => assignment.group.type === this.cohortEnum)
           .map(assignment => assignment.group.id);
@@ -516,7 +522,8 @@ export default {
       "user_group_assignment_type",
       "user_group_assignment_unique_user_count_title",
       "user_group_assignment_unique_user_count_link",
-      "user_group_assignment_usercount"
+      "user_group_assignment_usercount",
+      "view_actions"
     ],
     "moodle": [
       "delete"

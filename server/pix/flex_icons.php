@@ -783,6 +783,55 @@ $icons = array(
                     'classes' => 'fa-database',
                 ),
         ),
+    'date-disabled' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-ban',
+                ),
+        ),
+    'date-enabled' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-clock-o',
+                ),
+        ),
+    'date-frequency-once' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-calendar-check-o',
+                ),
+        ),
+    'date-frequency-repeating' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-repeat',
+                ),
+        ),
+    'date-limited' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-sign-in',
+                ),
+        ),
+    'date-open' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-sign-out',
+                ),
+        ),
+    'date-relative' =>
+        array(
+            'data' =>
+                array(
+                    'classes' => 'fa-calendar-o',
+                ),
+        ),
     'deeper' =>
         array(
             'data' =>

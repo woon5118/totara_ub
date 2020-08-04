@@ -12,8 +12,8 @@
   LTD, you may not access, use, modify, or distribute this software.
   Please contact [licensing@totaralearning.com] for more information.
 
-  @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
-  @module mod_perform
+  @author Kevin Hottinger <kevin.hottinger@totaralearning.com>
+  @module tui
 -->
 
 <script>
@@ -37,7 +37,7 @@ export default {
   render(h, { props }) {
     return h(FlexIcon, {
       props: Object.assign({}, props, {
-        icon: 'mod_perform|notification-slash',
+        icon: 'date-frequency-once',
       }),
     });
   },

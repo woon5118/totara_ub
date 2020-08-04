@@ -12,31 +12,14 @@
   LTD, you may not access, use, modify, or distribute this software.
   Please contact [licensing@totaralearning.com] for more information.
 
-  @author Jaron Steenson <jaron.steenson@totaralearning.com>
-  @module mod_perform
+  @author Riana Rossouw <riana.rossouw@totaralearning.com>
+  @module theme_ventura
 -->
 
 <style lang="scss">
-.tui-performAssignmentDueDateSettings {
-  &__fixed {
-    .tui-radio__label {
-      display: inline-flex;
-      flex-wrap: wrap;
-      align-items: baseline;
-
-      @media (min-width: $tui-screen-sm) {
-        flex-wrap: nowrap;
-      }
-    }
-
-    div.tui-dateSelector__date,
-    div.tui-dateSelector__time {
-      margin: var(--tui-gap-2) var(--tui-gap-2) 0;
-
-      @media (min-width: $tui-screen-sm) {
-        margin-top: 0;
-      }
-    }
+.tui-assignmentScheduleAdditionalSettings {
+  &__description {
+    @include tui-font-body-placeholder();
   }
 }
 </style>

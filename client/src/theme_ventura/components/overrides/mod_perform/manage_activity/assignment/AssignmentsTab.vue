@@ -19,47 +19,21 @@
 <style lang="scss">
 .tui-performManageActivityAssignmentsForm {
   &__heading {
-    align-items: center;
-    margin-top: var(--tui-gap-2); // Check the content tab before changing this.
+    @include tui-font-heading-small();
+    margin: var(--tui-gap-4) 0 0;
+  }
 
-    &-title {
-      @include tui-font-heading-small();
-    }
-
-    &-buttons {
-      display: flex;
-    }
+  &__add {
+    display: flex;
+    margin-top: var(--tui-gap-2);
 
     &-dropdown {
-      margin-top: var(--tui-gap-2);
+      margin-left: auto;
     }
   }
 
   &__table {
     margin-top: var(--tui-gap-4);
-  }
-
-  &__summary {
-    display: flex;
-    margin-top: var(--tui-gap-4);
-
-    &-count {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      margin-right: var(--tui-gap-4);
-    }
-  }
-}
-
-@media (min-width: $tui-screen-xs) {
-  .tui-performManageActivityAssignmentsForm {
-    &__heading {
-      &-dropdown {
-        margin-top: 0;
-        margin-left: auto;
-      }
-    }
   }
 }
 </style>

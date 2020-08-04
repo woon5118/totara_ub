@@ -16,29 +16,26 @@
   @module mod_perform
 -->
 <template>
-  <div>
+  <div class="tui-assignmentScheduleAdditionalSettings">
     <FormScope path="additionalSettings">
       <FormRow
         :label="$str('schedule_job_assignment_based_instances', 'mod_perform')"
       >
         <FormRadioGroup
           :validate="jobBasedCanDisableValidator"
-          name="subject_instance_generation"
+          name="subjectInstanceGeneration"
+          char-length="30"
         >
-          <Radio
-            :value="SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT"
-            :aria-describedby="$id('aria-describedby')"
-            >{{
+          <Radio :value="SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT">
+            {{
               $str(
                 'schedule_job_assignment_based_instances_disabled',
                 'mod_perform'
               )
-            }}</Radio
-          >
+            }}
+          </Radio>
           <FormRowDetails>
-            <span
-              class="tui-performAssignmentScheduleAdditionalSettings__radio_description"
-            >
+            <span class="tui-assignmentScheduleAdditionalSettings__description">
               {{
                 $str(
                   'schedule_job_assignment_based_instances_disabled_description',
@@ -47,21 +44,17 @@
               }}
             </span>
           </FormRowDetails>
-          <Radio
-            :value="SUBJECT_INSTANCE_GENERATION_ONE_PER_JOB"
-            :aria-describedby="$id('aria-describedby')"
-            class="tui-performAssignmentSchedule__radio"
-            >{{
+
+          <Radio :value="SUBJECT_INSTANCE_GENERATION_ONE_PER_JOB">
+            {{
               $str(
                 'schedule_job_assignment_based_instances_enabled',
                 'mod_perform'
               )
-            }}</Radio
-          >
+            }}
+          </Radio>
           <FormRowDetails>
-            <span
-              class="tui-performAssignmentScheduleAdditionalSettings__radio_description"
-            >
+            <span class="tui-assignmentScheduleAdditionalSettings__description">
               {{
                 $str(
                   'schedule_job_assignment_based_instances_enabled_description',
@@ -75,10 +68,11 @@
     </FormScope>
   </div>
 </template>
+
 <script>
-import { FormScope, FormRadioGroup, FormRow } from 'tui/components/uniform';
 import FormRowDetails from 'tui/components/form/FormRowDetails';
 import Radio from 'tui/components/form/Radio';
+import { FormScope, FormRadioGroup, FormRow } from 'tui/components/uniform';
 import {
   SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT,
   SUBJECT_INSTANCE_GENERATION_ONE_PER_JOB,
@@ -92,6 +86,7 @@ export default {
     FormScope,
     Radio,
   },
+
   props: {
     usesJobBasedDynamicSource: {
       type: Boolean,
@@ -100,24 +95,26 @@ export default {
       type: String,
     },
   },
+
   data() {
     return {
       SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT,
       SUBJECT_INSTANCE_GENERATION_ONE_PER_JOB,
     };
   },
+
   methods: {
     /**
      * Validator for disabled job assigned based instance
      * May not disable if job based dynamic source is used
      *
-     * @param v
-     * @return {{}}
+     * @param {String} value
+     * @return {Object}
      */
-    jobBasedCanDisableValidator(v) {
+    jobBasedCanDisableValidator(value) {
       if (
         this.usesJobBasedDynamicSource &&
-        v == SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT
+        value == SUBJECT_INSTANCE_GENERATION_ONE_PER_SUBJECT
       ) {
         return this.$str(
           'schedule_job_assignment_based_disable_error',
@@ -131,6 +128,7 @@ export default {
   },
 };
 </script>
+
 <lang-strings>
   {
     "mod_perform": [

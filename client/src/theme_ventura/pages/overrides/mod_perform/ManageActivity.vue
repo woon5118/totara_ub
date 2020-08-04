@@ -18,13 +18,17 @@
 
 <style lang="scss">
 .tui-performManageActivity {
-  & > .tui-loader > * + * {
-    margin-top: var(--tui-gap-4);
+  @include tui-font-body();
+
+  &__content {
+    & > * + * {
+      margin-top: var(--tui-gap-8);
+    }
   }
 
   &__title {
     @include tui-font-heading-medium;
-    margin-bottom: 0;
+    margin: var(--tui-gap-2) 0 0;
   }
 }
 </style>
