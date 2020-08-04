@@ -24,6 +24,7 @@
 use core\collection;
 use mod_perform\constants;
 use mod_perform\entities\activity\activity as activity_entity;
+use mod_perform\entities\activity\external_participant;
 use mod_perform\entities\activity\participant_instance;
 use mod_perform\entities\activity\participant_section;
 use mod_perform\entities\activity\section;
@@ -33,6 +34,8 @@ use mod_perform\entities\activity\track as track_entity;
 use mod_perform\entities\activity\track_user_assignment;
 use mod_perform\expand_task;
 use mod_perform\models\activity\participant_instance as participant_instance_model;
+use mod_perform\models\activity\participant_source;
+use mod_perform\models\activity\subject_instance_manual_participant;
 use mod_perform\state\activity\draft;
 use mod_perform\state\participant_instance\closed as participant_instance_closed;
 use mod_perform\state\participant_instance\complete as participant_instance_complete;
@@ -43,6 +46,9 @@ use mod_perform\state\subject_instance\open;
 use mod_perform\task\service\participant_instance_creation;
 use mod_perform\task\service\subject_instance_creation;
 use mod_perform\task\service\subject_instance_dto;
+use totara_core\entities\relationship as relationship_entity;
+use totara_core\relationship\relationship;
+use totara_core\relationship\relationship_provider;
 use totara_job\job_assignment;
 
 /**
@@ -53,19 +59,36 @@ use totara_job\job_assignment;
 class mod_perform_participant_instance_creation_service_testcase extends advanced_testcase {
 
     private const JOB_ASSIGNMENTS_PER_USER = 2;
+    private const USERS_PER_RELATIONSHIP = 2;
+    private const SUBJECTS_PER_ACTIVITY = 3;
+    private const NO_OF_ACTIVITIES = 2;
+
+    private const CALCULATED_RELATIONSHIPS = [
+        constants::RELATIONSHIP_APPRAISER,
+        constants::RELATIONSHIP_MANAGER
+    ];
+
+    private const MANUAL_RELATIONSHIPS = [
+        constants::RELATIONSHIP_MENTOR,
+        constants::RELATIONSHIP_EXTERNAL
+    ];
+
+    private const EXTERNAL_USER_NAME = "John Doe";
+    private const EXTERNAL_USER_EMAIL = "jd@example.com";
 
     /**
-     * Number of users per relationship.
+     * External user tokens.
+     *
+     * @var array
+     */
+    private $tokens;
+
+    /**
+     * Manually selected internal user.
      *
      * @var int
      */
-    private $users_per_relationship;
-
-    /**
-     * Array of activity relationships.
-     * @var array
-     */
-    private $core_relationships;
+    private $internal_manual_user;
 
     /**
      * Data of Activities used.
@@ -100,15 +123,19 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
      * @return void
      */
     public function test_create_participant_instances(bool $expand_per_job_assignment): void {
-        $this->setup_assignments($expand_per_job_assignment);
+        $with_manual_relationships = true;
+        $this->setup_assignments($expand_per_job_assignment, $with_manual_relationships);
 
         $track_user_assignments = $this->get_track_user_assignments();
         $subject_instance_dto_collection = $this->create_subject_instances($track_user_assignments);
+        $this->setup_manual_participants($subject_instance_dto_collection);
 
         $participant_instance_service = new participant_instance_creation();
         $participant_instance_service->generate_instances($subject_instance_dto_collection);
 
-        $this->assert_participant_instances_created($track_user_assignments, $expand_per_job_assignment);
+        $this->assert_participant_instances_created(
+            $track_user_assignments, $expand_per_job_assignment, $with_manual_relationships
+        );
     }
 
     public function creation_mode_provider(): array {
@@ -684,20 +711,30 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
      *
      * @param collection $track_user_assignments
      * @param bool $expand_per_job_assignment
+     * @param bool $with_manual_relationships
      * @return void
      */
     private function assert_participant_instances_created(
         collection $track_user_assignments,
-        $expand_per_job_assignment = false
+        $expand_per_job_assignment = false,
+        $with_manual_relationships = false
     ): void {
         $created_participants = participant_instance::repository()->get();
-        $expected_participants_created = $track_user_assignments->count()
-            * count($this->core_relationships)
-            * $this->users_per_relationship;
+
+        $subject_count = $track_user_assignments->count();
+        $expected_calculated_participants_created = $subject_count
+            * count(self::CALCULATED_RELATIONSHIPS)
+            * self::USERS_PER_RELATIONSHIP;
 
         if ($expand_per_job_assignment) {
-            $expected_participants_created /= self::JOB_ASSIGNMENTS_PER_USER;
+            $expected_calculated_participants_created /= self::JOB_ASSIGNMENTS_PER_USER;
         }
+
+        $expected_manual_participants = $with_manual_relationships
+            ? $subject_count * count(self::MANUAL_RELATIONSHIPS)
+            : 0;
+
+        $expected_participants_created = $expected_calculated_participants_created + $expected_manual_participants;
 
         $this->assertEquals($expected_participants_created, $created_participants->count());
 
@@ -721,14 +758,42 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
         $managers_and_appraisers_list = $this->group_participant_job_assignments();
         $subject_instances_counter = [];
 
+        $relationship_provider = new relationship_provider();
+        $all_relationships = $relationship_provider
+            ->get()
+            ->key_by('id');
+
         foreach ($created_participants as $created_participant) {
+            $participant_id = $created_participant->participant_id;
+            $participant_source = (int)$created_participant->participant_source;
+
+            $relationship_id = $created_participant->core_relationship_id;
+            $relationship = $all_relationships->item($relationship_id);
+
+            if ((int)$relationship->type === relationship_entity::TYPE_MANUAL) {
+                if ($participant_source === participant_source::EXTERNAL) {
+                    $this->assert_external_participant_created_with_correct_data(
+                        $participant_id,
+                        $relationship->idnumber
+                    );
+                } else {
+                    $this->assert_manual_participant_created_with_correct_data(
+                        $participant_id,
+                        $relationship->idnumber
+                    );
+                }
+
+                continue;
+            }
+
+            // All this is for calculated relationships.
             $activity_id = $subject_instances->find('id', $created_participant->subject_instance_id)->activity()->id;
             $this->assertArrayHasKey(
-                $created_participant->participant_id,
+                $participant_id,
                 $managers_and_appraisers_list[$activity_id],
                 'Unknown participant stored.'
             );
-            $managers_and_appraisers_list[$activity_id][$created_participant->participant_id]['count']++;
+            $managers_and_appraisers_list[$activity_id][$participant_id]['count']++;
 
             $this->assertContains(
                 $created_participant->subject_instance_id,
@@ -741,7 +806,7 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
             $subject_instances_counter[$created_participant->subject_instance_id]++;
 
             $participant_relationship =
-                $managers_and_appraisers_list[$activity_id][$created_participant->participant_id]['relationship'];
+                $managers_and_appraisers_list[$activity_id][$participant_id]['relationship'];
             if (!isset($relationship_ids[$activity_id])) {
                 $relationship_ids[$activity_id] = [
                     'manager' => null,
@@ -749,27 +814,27 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
                 ];
             }
             if (is_null($relationship_ids[$activity_id][$participant_relationship])) {
-                $relationship_ids[$activity_id][$participant_relationship] = $created_participant->core_relationship_id;
+                $relationship_ids[$activity_id][$participant_relationship] = $relationship_id;
             }
             $this->assertEquals(
                 $relationship_ids[$activity_id][$participant_relationship],
-                $created_participant->core_relationship_id
+                $relationship_id
             );
         }
 
-        $expected_participant_count = count($subject_instance_ids) / $this->users_per_relationship;
+        $expected_calculated_participant_count = count($subject_instance_ids) / self::USERS_PER_RELATIONSHIP;
 
         if ($expand_per_job_assignment) {
-            $expected_participant_count /= self::JOB_ASSIGNMENTS_PER_USER;
+            $expected_calculated_participant_count /= self::JOB_ASSIGNMENTS_PER_USER;
         }
 
         foreach ($managers_and_appraisers_list as $activity_participants) {
             foreach ($activity_participants as $actual_participant) {
-                $this->assertEquals($expected_participant_count, $actual_participant['count']);
+                $this->assertEquals($expected_calculated_participant_count, $actual_participant['count']);
             }
         }
 
-        $expected_subject_instance_count = count($this->core_relationships) * $this->users_per_relationship;
+        $expected_subject_instance_count = count(self::CALCULATED_RELATIONSHIPS) * self::USERS_PER_RELATIONSHIP;
 
         if ($expand_per_job_assignment) {
             $expected_subject_instance_count /= self::JOB_ASSIGNMENTS_PER_USER;
@@ -778,6 +843,48 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
         foreach ($subject_instances_counter as $subject_instance_count) {
             $this->assertEquals($expected_subject_instance_count, $subject_instance_count);
         }
+    }
+
+    /**
+     * Asserts an external participant instance is created with the right data.
+     *
+     * @param int $participant_id
+     * @param string $relationship
+     * @return void
+     */
+    private function assert_external_participant_created_with_correct_data(
+        int $participant_id,
+        string $relationship
+    ): void {
+        $this->assertEquals(constants::RELATIONSHIP_EXTERNAL, $relationship, 'wrong relationship');
+
+        $external_participants = external_participant::repository()
+            ->where('id', $participant_id)
+            ->get();
+        $this->assertCount(1, $external_participants, ">1 external participant with id $participant_id");
+
+        $participant = $external_participants->first();
+        $this->assertEquals(self::EXTERNAL_USER_NAME, $participant->name, 'wrong name');
+        $this->assertEquals(self::EXTERNAL_USER_EMAIL, $participant->email, 'wrong email');
+
+        $token = $participant->token;
+        $this->assertNotContains($token, $this->tokens, 'duplicate external user token');
+        $this->tokens[] = $token;
+    }
+
+    /**
+     * Asserts a manual participant instance is created with the right data.
+     *
+     * @param int $participant_id
+     * @param string $relationship
+     * @return void
+     */
+    private function assert_manual_participant_created_with_correct_data(
+        int $participant_id,
+        string $relationship
+    ): void {
+        $this->assertEquals($this->internal_manual_user, $participant_id, 'wrong participant');
+        $this->assertEquals(constants::RELATIONSHIP_MENTOR, $relationship, 'wrong relationship');
     }
 
     /**
@@ -842,30 +949,31 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
      * Sets up test pre-conditions.
      *
      * @param bool $expand_per_job_assignment
+     * @param bool $add_manual_participants
      */
-    protected function setup_assignments($expand_per_job_assignment = false): void {
+    protected function setup_assignments(
+        bool $expand_per_job_assignment = false,
+        bool $add_manual_participants = false
+    ): void {
         $this->setup_config_values();
         $this->activity_trees = [];
-        $activity_count = 2;
-        for ($i = 0; $i < $activity_count; $i++) {
-            $activity_tree = $this->setup_activity($i, $expand_per_job_assignment);
+
+        for ($i = 0; $i < self::NO_OF_ACTIVITIES; $i++) {
+            $activity_tree = $this->setup_activity($i, $expand_per_job_assignment, $add_manual_participants);
             $activity_tree->identifier = $i;
             $this->activity_trees[$activity_tree->activity->id] = $this->setup_job_assignments($activity_tree);
         }
     }
 
     /**
-     * Setups configuration values which the test is based upon.
+     * Sets up configuration values which the test is based upon.
      *
      * @return void
      */
     protected function setup_config_values(): void {
         $this->setAdminUser();
-        $this->users_per_relationship = 2;
-        $this->core_relationships = [
-            constants::RELATIONSHIP_APPRAISER,
-            constants::RELATIONSHIP_MANAGER,
-        ];
+        $this->tokens = [];
+        $this->internal_manual_user = get_admin()->id;
     }
 
     /**
@@ -873,10 +981,15 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
      *
      * @param int $identifier For number of activities to create.
      * @param bool $expand_per_job_assignment
+     * @param bool $add_manual_participants
      * @return stdClass
      * @throws coding_exception
      */
-    protected function setup_activity(int $identifier, bool $expand_per_job_assignment = false): stdClass {
+    protected function setup_activity(
+        int $identifier,
+        bool $expand_per_job_assignment = false,
+        bool $add_manual_participants = false
+    ): stdClass {
         /** @var mod_perform_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
         $activity_tree = new stdClass();
@@ -888,11 +1001,20 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
             ['title' => 'Test section for activity ' . $identifier]
         );
 
-        foreach ($this->core_relationships as $relationship) {
+        foreach (self::CALCULATED_RELATIONSHIPS as $relationship) {
             $generator->create_section_relationship(
                 $activity_tree->section,
                 ['relationship' => $relationship]
             );
+        }
+
+        if ($add_manual_participants) {
+            foreach (self::MANUAL_RELATIONSHIPS as $relationship) {
+                $generator->create_section_relationship(
+                    $activity_tree->section,
+                    ['relationship' => $relationship]
+                );
+            }
         }
 
         $tracks = $generator->create_activity_tracks($activity_tree->activity);
@@ -907,7 +1029,13 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
             }
         }
 
-        $activity_tree->track = $generator->create_track_assignments($tracks->first(), 0, 0, 0, 3);
+        $activity_tree->track = $generator->create_track_assignments(
+            $tracks->first(),
+            0,
+            0,
+            0,
+            self::SUBJECTS_PER_ACTIVITY
+        );
 
         return $activity_tree;
     }
@@ -922,7 +1050,7 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
         $participant_job_assignments = [];
         $data_generator = $this->getDataGenerator();
 
-        for ($i = 0; $i < $this->users_per_relationship; $i++) {
+        for ($i = 0; $i < self::USERS_PER_RELATIONSHIP; $i++) {
             $participant_job_assignments[] = [
                 'manager' => job_assignment::create_default($data_generator->create_user()->id),
                 'appraiser' => $data_generator->create_user()->id,
@@ -950,11 +1078,43 @@ class mod_perform_participant_instance_creation_service_testcase extends advance
     }
 
     /**
+     * "Completes" manual participant selection.
+     *
+     * @param collection $subject_instances subject instances to use.
+     */
+    private function setup_manual_participants(collection $subject_instances): void {
+        $data_generator = $this->getDataGenerator()->get_plugin_generator('mod_perform');
+
+        foreach ($subject_instances as $subject) {
+            foreach (self::MANUAL_RELATIONSHIPS as $relationship) {
+                $relationship_id = relationship::load_by_idnumber($relationship)->id;
+
+                if ($relationship === constants::RELATIONSHIP_EXTERNAL) {
+                    subject_instance_manual_participant::create_for_external(
+                        $subject->id,
+                        $subject->subject_user_id,
+                        $relationship_id,
+                        self::EXTERNAL_USER_EMAIL,
+                        self::EXTERNAL_USER_NAME
+                    );
+                } else {
+                    subject_instance_manual_participant::create_for_internal(
+                        $subject->id,
+                        $subject->subject_user_id,
+                        $relationship_id,
+                        $this->internal_manual_user
+                    );
+                }
+            }
+        }
+    }
+
+    /**
      * Cleans up test post-conditions.
      */
     protected function tearDown(): void {
-        $this->users_per_relationship = null;
-        $this->core_relationships = null;
         $this->activity_trees = null;
+        $this->tokens = null;
+        $this->internal_manual_user = null;
     }
 }

@@ -36,6 +36,7 @@ use mod_perform\entities\activity\subject_instance_manual_participant;
 use mod_perform\entities\activity\track;
 use mod_perform\entities\activity\track_user_assignment;
 use mod_perform\hook\participant_instances_created;
+use mod_perform\models\activity\external_participant;
 use mod_perform\models\activity\participant_instance as participant_instance_model;
 use mod_perform\models\activity\participant_source;
 use mod_perform\models\activity\subject_instance as subject_instance_model;
@@ -473,7 +474,6 @@ class participant_instance_creation {
             'participant_data' => [
                 'core_relationship_id' => $core_relationship_id,
                 'subject_instance_id' => $subject_instance->id,
-                'participant_source' => participant_source::INTERNAL,
                 'status' => not_started::get_code(),
                 'created_at' => time(),
             ],
@@ -494,7 +494,22 @@ class participant_instance_creation {
         array $participant_dto_list
     ): void {
         foreach ($participant_dto_list as $participant_dto) {
-            $data['participant_data']['participant_id'] = $participant_dto->get_user_id();
+            $source = participant_source::INTERNAL;
+            $user_id = $participant_dto->get_user_id();
+
+            if (!$user_id) {
+                $source = participant_source::EXTERNAL;
+
+                $metadata = $participant_dto->get_meta();
+                $name = $metadata['name'];
+                $email = $metadata['email'];
+                $user_id = external_participant::create($name, $email)->id;
+            }
+
+            $data['participant_data']['participant_source'] = $source;
+            $data['participant_data']['participant_id'] = $user_id;
+
+
             $this->participation_creation_list[] = $data;
 
             if (count($this->participation_creation_list) === $this->buffer_count) {
