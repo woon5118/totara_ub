@@ -22,29 +22,31 @@
 
     <SamplesExample>
       <Uniform v-slot="{ getSubmitting }" :errors="errors" @submit="submit">
-        <FormRowFieldset label="Event date">
-          <FormDateSelector
-            v-modal="dateValue"
-            name="date"
-            :initial-timezone="'Pacific/Auckland'"
-            :initial-current-date="currentDate"
-            :initial-custom-date="customDate"
-            :disabled="disabled"
-            :has-timezone="timezoned"
-            :type="isoType"
-            :years-midrange="parseInt(midrangeYear)"
-            :years-before-midrange="parseInt(midrangeYearBefore)"
-            :years-after-midrange="parseInt(midrangeYearAfter)"
-            :validations="
-              v => [
-                v.required(),
-                v.date(),
-                v.dateMinLimit(minLimit, minLimitErrorMsg),
-                v.dateMaxLimit(maxLimit, maxLimitErrorMsg),
-              ]
-            "
-          />
-        </FormRowFieldset>
+        <FormRow v-slot="{ labelId }" label="Event date">
+          <FieldGroup :aria-labelledby="labelId">
+            <FormDateSelector
+              v-modal="dateValue"
+              name="date"
+              :initial-timezone="'Pacific/Auckland'"
+              :initial-current-date="currentDate"
+              :initial-custom-date="customDate"
+              :disabled="disabled"
+              :has-timezone="timezoned"
+              :type="isoType"
+              :years-midrange="parseInt(midrangeYear)"
+              :years-before-midrange="parseInt(midrangeYearBefore)"
+              :years-after-midrange="parseInt(midrangeYearAfter)"
+              :validations="
+                v => [
+                  v.required(),
+                  v.date(),
+                  v.dateMinLimit(minLimit, minLimitErrorMsg),
+                  v.dateMaxLimit(maxLimit, maxLimitErrorMsg),
+                ]
+              "
+            />
+          </FieldGroup>
+        </FormRow>
         <FormRowActionButtons :submitting="getSubmitting()" />
       </Uniform>
 
@@ -155,17 +157,14 @@ import InputNumber from 'tui/components/form/InputNumber';
 import InputText from 'tui/components/form/InputText';
 import Radio from 'tui/components/form/Radio';
 import RadioGroup from 'tui/components/form/RadioGroup';
+import FieldGroup from 'tui/components/form/FieldGroup';
 import SamplesCode from 'samples/components/sample_parts/misc/SamplesCode';
 import SamplesExample from 'samples/components/sample_parts/misc/SamplesExample';
 import SamplesPropCtl from 'samples/components/sample_parts/misc/SamplesPropCtl';
 
 import FormRowActionButtons from 'tui/components/form/FormRowActionButtons';
 
-import {
-  FormDateSelector,
-  FormRowFieldset,
-  Uniform,
-} from 'tui/components/uniform';
+import { FormDateSelector, Uniform } from 'tui/components/uniform';
 
 export default {
   components: {
@@ -174,9 +173,9 @@ export default {
     InputText,
     FormRowActionButtons,
     FormDateSelector,
-    FormRowFieldset,
     Radio,
     RadioGroup,
+    FieldGroup,
     SamplesCode,
     SamplesExample,
     SamplesPropCtl,
@@ -206,34 +205,33 @@ export default {
   :errors="errors"
   @submit="submit"
 >
-  <FormRowFieldset label="Event date">
-    <FormDateSelector
-      name="date"
-      :initial-current-date="true"
-      :initial-custom-date="customDate"
-      :has-timezone="true"
-      :type="date"
-      :validations="
-        v => [
-          v.required(),
-          v.date(),
-        ]
-      "
-    />
-  </FormRowFieldset>
-  
+  <FormRow label="Event date" v-slot="{ labelId }">
+    <FieldGroup :aria-labelledby="labelId">
+      <FormDateSelector
+        name="date"
+        :initial-current-date="true"
+        :initial-custom-date="customDate"
+        :has-timezone="true"
+        :type="date"
+        :validations="
+          v => [
+            v.required(),
+            v.date(),
+          ]
+        "
+      />
+    </FieldGroup>
+  </FormRow>
   ...
 </Uniform>`,
       codeScript: `import {
   FormDateSelector,
-  FormRowFieldset,
   Uniform,
 } from 'tui/components/uniform';
 
 export default {
   components: {
     FormDateSelector,
-    FormRowFieldset,
     Uniform,
   },
 }`,
