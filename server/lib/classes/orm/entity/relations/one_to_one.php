@@ -70,7 +70,7 @@ abstract class one_to_one extends relation {
         // Chunk this to avoid too many value for IN condition
         $keys_chunked = array_chunk($keys, builder::get_db()->get_max_in_params());
 
-        $field = new field($this->get_foreign_key());
+        $field = new field($this->get_foreign_key(), $this->repo->get_builder());
         $field->set_identifier('one_to_one_foreign_key');
 
         foreach ($keys_chunked as $keys) {

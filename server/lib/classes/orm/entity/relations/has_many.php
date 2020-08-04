@@ -71,7 +71,7 @@ class has_many extends relation {
         // Group the result so that we can get the related results quicker
         $grouped = [];
 
-        $field = new field($this->get_foreign_key());
+        $field = new field($this->get_foreign_key(), $this->repo->get_builder());
         $field->set_identifier('has_many_foreign_key');
 
         foreach ($keys_chunked as $keys) {
