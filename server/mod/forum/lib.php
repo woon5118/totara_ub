@@ -3339,10 +3339,9 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
     $postbyuser->post = $post->subject;
     $postbyuser->user = $postuser->fullname;
     $discussionbyuser = get_string('postbyuser', 'forum', $postbyuser);
-    $output .= html_writer::tag('a', '', array('id'=>'p'.$post->id));
     // Begin forum post.
     $output .= html_writer::start_div('forumpost clearfix' . $forumpostclass . $topicclass,
-        ['role' => 'region', 'aria-label' => $discussionbyuser]);
+        ['role' => 'region', 'aria-label' => $discussionbyuser, 'id' => 'p' . $post->id]);
     // Begin header row.
     $output .= html_writer::start_div('row header clearfix');
 
