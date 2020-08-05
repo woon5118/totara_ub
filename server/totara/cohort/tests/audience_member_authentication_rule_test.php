@@ -62,7 +62,7 @@ class totara_cohort_audience_member_authentication_rule_testcase extends advance
     private function create_cohort_and_ruleset(): stdClass {
         /** @var totara_cohort_generator $generator */
         $generator= $this->getDataGenerator()->get_plugin_generator('totara_cohort');
-        $cohort = $generator->create_cohort();
+        $cohort = $generator->create_cohort(['cohorttype' => cohort::TYPE_DYNAMIC]);
         $rulesetid = cohort_rule_create_ruleset($cohort->activecollectionid);
 
         $cohort->rulesetid = $rulesetid;

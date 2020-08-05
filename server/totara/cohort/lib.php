@@ -690,11 +690,38 @@ function totara_cohort_update_dynamic_cohort_members($cohortid, $userid=0, $dela
     global $CFG, $DB;
     require_once($CFG->dirroot . '/totara/cohort/rules/lib.php');
 
+    $cohortrecord = $DB->get_record('cohort', ['id' => $cohortid]);
+    if (!$cohortrecord) {
+        // Cohort does not exist.
+        return false;
+    }
+    if ($cohortrecord->cohorttype != cohort::TYPE_DYNAMIC) {
+        debugging('Only dynamic audiences can be updated from totara_cohort_update_dynamic_cohort_members()', DEBUG_DEVELOPER);
+        return false;
+    }
+    $cohortcontext = context::instance_by_id($cohortrecord->contextid, IGNORE_MISSING);
+    if (!$cohortcontext) {
+        debugging('Invalid cohort contextid: ' . $cohortid, DEBUG_DEVELOPER);
+        return false;
+    }
+
     /// update necessary nested cohorts first (if any)
     if ($updatenested) {
         $nestedcohorts = totara_cohort_get_nested_dynamic_cohorts($cohortid, array(), true);
         foreach ($nestedcohorts as $ncohortid) {
             totara_cohort_update_dynamic_cohort_members($ncohortid, $userid, $delaymessages, false);
+        }
+    }
+
+    $tenantjoin = '';
+    if ($CFG->tenantsenabled) {
+        if ($cohortcontext->tenantid) {
+            $tenant = \core\record\tenant::fetch($cohortcontext->tenantid, IGNORE_MISSING);
+            if (!$tenant) {
+                debugging('Invalid tenant reference in cohort context: ' . $cohortid, DEBUG_DEVELOPER);
+                return false;
+            }
+            $tenantjoin = "JOIN {cohort_members} tm ON tm.cohortid = {$tenant->cohortid} AND tm.userid = u.id";
         }
     }
 
@@ -704,6 +731,7 @@ function totara_cohort_update_dynamic_cohort_members($cohortid, $userid=0, $dela
        FROM (
            SELECT u.id as userid, 1 AS inrules, 0 AS inmembers
            FROM {user} u
+           $tenantjoin
            WHERE u.username <> 'guest'
            and u.deleted = 0
            and u.confirmed = 1";
