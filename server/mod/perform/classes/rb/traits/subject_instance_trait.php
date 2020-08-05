@@ -252,6 +252,25 @@ trait subject_instance_trait {
             ]
         );
 
+        // Add instance number
+        // Using <= created_at to start at 1
+        $this->columnoptions[] = new rb_column_option(
+            'subject_instance',
+            'instance_number',
+            get_string('instance_number', 'mod_perform'),
+            "(SELECT COUNT('x')
+                FROM {perform_subject_instance} psi
+                WHERE psi.track_user_assignment_id = {$join}.track_user_assignment_id
+                  AND psi.created_at <= {$join}.created_at)",
+            [
+                'joins' => [$join],
+                'dbdatatype' => 'integer',
+                'displayfunc' => 'integer',
+                'iscompound' => true,
+                'issubquery' => true,
+            ]
+        );
+
         $this->add_core_user_columns($this->columnoptions, 'subject_user', 'subject_user', true);
     }
 

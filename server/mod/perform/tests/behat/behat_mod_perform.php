@@ -26,6 +26,7 @@ use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\DriverException;
 use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\Mink\Exception\ExpectationException;
+use core\entities\user;
 use core\orm\entity\entity;
 use mod_perform\controllers\activity\edit_activity;
 use mod_perform\controllers\activity\manage_activities;
@@ -1177,6 +1178,18 @@ class behat_mod_perform extends behat_base {
     }
 
     /**
+     * @Given /^I navigate to the mod perform subject instance report for user "([^"]*)"$/
+     * @param string $user_name
+     */
+    public function i_navigate_to_the_mod_perform_subject_instance_report_for_user(string $user_name): void {
+        $user = $this->get_user_by_username($user_name);
+
+        $url = \mod_perform\controllers\reporting\performance\user::get_url(['subject_user_id' => $user->id]);
+
+        $this->navigate_to_page($url);
+    }
+
+    /**
      * Convenience method to fail from an ExpectationException.
      *
      * @param string $error error message.
@@ -1197,7 +1210,8 @@ class behat_mod_perform extends behat_base {
         return $activity;
     }
 
-    private function find_participant_group_container(string $group): NodeElement {
+    private function find_participant_group_container(string $group): NodeElement
+    {
         if ($group === 'responding') {
             $participant_group = 'Responding participants';
         } else {
@@ -1214,6 +1228,12 @@ class behat_mod_perform extends behat_base {
         $heading = reset($headings_for_group);
 
         return $heading->getParent();
+    }
+
+    private function get_user_by_username(string $user_name): entity {
+        return user::repository()
+            ->where('username', $user_name)
+            ->one(true);
     }
 
 }

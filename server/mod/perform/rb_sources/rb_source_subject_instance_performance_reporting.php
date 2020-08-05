@@ -80,10 +80,26 @@ class rb_source_subject_instance_performance_reporting extends rb_source_perform
                     'subject_instance_id' => "base.id"
                 ],
                 'defaultheading' => get_string('activity_name', 'mod_perform'),
-                'nosort' => true,
                 'joins' => 'perform',
             ]
         );
+
+        // Participant count
+        $columnoptions[] = new rb_column_option(
+            'subject_instance',
+            'participant_count_performance_reporting',
+            get_string('participants', 'rb_source_subject_instance_performance_reporting'),
+            "(SELECT COUNT('x')
+            FROM {perform_participant_instance} ppi
+            WHERE ppi.subject_instance_id = base.id)",
+            [
+                'dbdatatype' => 'integer',
+                'displayfunc' => 'integer',
+                'iscompound' => true,
+                'issubquery' => true,
+            ]
+        );
+
         $columnoptions[] = new rb_column_option(
             'subject_instance',
             'actions',

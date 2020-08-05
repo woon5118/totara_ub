@@ -127,8 +127,8 @@ export default {
     ModalPresenter,
   },
   props: {
-    activityId: {
-      type: Number,
+    additionalExportHrefParams: {
+      type: Object,
       required: true,
     },
     rowCount: {
@@ -164,14 +164,15 @@ export default {
         return null;
       }
 
-      return this.$url('/mod/perform/reporting/performance/export.php', {
+      let params = this.additionalExportHrefParams;
+      Object.assign(params, {
         action: 'bulk',
         export: 'Export',
         format: 'csv',
-        activity_id: this.activityId,
         filtered_report_embedded_shortname: this.embeddedShortname,
         filtered_report_filter_hash: this.filterHash,
       });
+      return this.$url('/mod/perform/reporting/performance/export.php', params);
     },
     countString() {
       if (this.rowCount === 1) {

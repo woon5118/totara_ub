@@ -28,7 +28,6 @@ $string['sourcetitle'] = 'Subject Instance Manage Participation (Perform)';
 $string['actions'] = 'Actions';
 $string['add_participants'] = 'Add participants';
 $string['close'] = 'Close';
-$string['instance_number'] = 'Instance number';
 $string['participants'] = 'Participants';
 $string['re_open'] = 'Re-open';
 

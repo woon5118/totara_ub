@@ -32,18 +32,13 @@ class rb_subject_instance_performance_reporting_embedded extends rb_base_embedde
 
     public function __construct($data) {
 
-        if (!isset($data['subject_user_id'])) {
-            // TODO How to handle?
-        }
         $this->url = '/mod/perform/reporting/performance/user.php';
         $this->source = 'subject_instance_performance_reporting';
         $this->shortname = 'subject_instance_performance_reporting';
         $this->fullname = get_string('embedded_subject_instance_performance_reporting', 'mod_perform');
         $this->columns = $this->define_columns();
         $this->filters = $this->define_filters();
-        // TODO use default_sort column
-        // $this->defaultsortcolumn = '';
-
+        $this->defaultsortcolumn = 'activity_name';
         if (isset($data['subject_user_id'])) {
             $this->embeddedparams['subject_user_id'] = $data['subject_user_id'];
         }
@@ -60,13 +55,28 @@ class rb_subject_instance_performance_reporting_embedded extends rb_base_embedde
         return [
             [
                 'type' => 'activity',
-                'value' => 'name',
-                'heading' => get_string('activity_name', 'mod_perform'),
+                'value' => 'nameviewformlink',
+                'heading' => get_string('activity_name', 'rb_source_subject_instance_performance_reporting'),
+            ],
+            [
+                'type' => 'subject_instance',
+                'value' => 'job_assignment_name',
+                'heading' => get_string('activity_job_title', 'mod_perform'),
+            ],
+            [
+                'type' => 'subject_instance',
+                'value' => 'instance_number',
+                'heading' => get_string('instance_number', 'mod_perform'),
             ],
             [
                 'type' => 'subject_instance',
                 'value' => 'created_at',
-                'heading' => get_string('created_at', 'mod_perform'),
+                'heading' => get_string('created_at', 'rb_source_subject_instance_performance_reporting'),
+            ],
+            [
+                'type' => 'subject_instance',
+                'value' => 'participant_count_performance_reporting',
+                'heading' => get_string('participant_count', 'rb_source_subject_instance_performance_reporting'),
             ],
             [
                 'type' => 'subject_instance',

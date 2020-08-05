@@ -93,24 +93,6 @@ class rb_source_subject_instance_manage_participation extends rb_source_perform_
             ]
         );
 
-        // Add instance number
-        // Using <= created_at to start at 1
-        $columnoptions[] = new rb_column_option(
-            'subject_instance',
-            'instance_number',
-            get_string('instance_number', 'rb_source_subject_instance_manage_participation'),
-            "(SELECT COUNT('x')
-                FROM {perform_subject_instance} psi
-                WHERE psi.track_user_assignment_id = base.track_user_assignment_id
-                  AND psi.created_at <= base.created_at)",
-            [
-                'dbdatatype' => 'integer',
-                'displayfunc' => 'integer',
-                'iscompound' => true,
-                'issubquery' => true,
-            ]
-        );
-
         // Add actions
         $columnoptions[] = new rb_column_option(
             'subject_instance',
@@ -169,7 +151,7 @@ class rb_source_subject_instance_manage_participation extends rb_source_perform_
             [
                 'type' => 'subject_instance',
                 'value' => 'instance_number',
-                'heading' => get_string('instance_number', 'rb_source_subject_instance_manage_participation')
+                'heading' => get_string('instance_number', 'mod_perform')
             ],
             [
                 'type' => 'subject_instance',

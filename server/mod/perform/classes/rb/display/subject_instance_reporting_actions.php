@@ -25,8 +25,11 @@ namespace mod_perform\rb\display;
 
 use mod_perform\util;
 use totara_reportbuilder\rb\display\base;
+use totara_tui\output\component;
 
 class subject_instance_reporting_actions extends base {
+
+    private static $potentially_has_permission = [];
 
     /**
      * Handles the display
@@ -48,28 +51,27 @@ class subject_instance_reporting_actions extends base {
             return '';
         }
 
-        $buttons = [];
+        $report_user_id = $report->reportfor;
 
         // Static to prevent expensive check once per row.
-        if (!isset($can_export)) {
-            static $can_export = false;
-            $can_export = util::can_potentially_report_on_subjects($report->reportfor);
+        if (!isset(self::$potentially_has_permission[$report_user_id])) {
+            self::$potentially_has_permission[$report_user_id] = util::can_potentially_report_on_subjects($report_user_id);
         }
 
-        if ($can_export) {
-            $title = get_string('export', 'mod_perform');
-            $buttons[] = \html_writer::link(
-                new \moodle_url('/mod/perform/reporting/performance/export.php', array('action' => 'item', 'subject_instance_id' => $subject_instance_id, 'export' => 'Export', 'format' => 'csv')),
-                $OUTPUT->flex_icon('export', array('alt' => $title)),
-                array('title' => $title)
-            );
-        }
-
-        if ($buttons) {
-            return implode ('', $buttons);
-        } else {
+        if (!self::$potentially_has_permission[$report_user_id]) {
             return '';
         }
+
+        $props = [
+            'subject-instance-id' => (int)$subject_instance_id,
+        ];
+
+        return $OUTPUT->render(
+            new component(
+                'mod_perform/components/report/element_response/SubjectInstanceReportingActions',
+                $props
+            )
+        );
     }
 
     /**

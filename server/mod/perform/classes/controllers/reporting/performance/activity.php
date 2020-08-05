@@ -97,7 +97,9 @@ class activity extends perform_controller {
         // Only show the action card if there are results.
         if ($filtered_count > 0) {
             $action_card_props = [
-                'activity-id' => $activity_id,
+                'additional-export-href-params' => [
+                    'activity-id' => $activity_id,
+                ],
                 'row-count' => $filtered_count,
                 'embedded-shortname' => 'element_performance_reporting',
                 'filter-hash' => $report->get_search_hash(), // Hash of current filtered state, ensures we're not using stale data.
@@ -108,7 +110,6 @@ class activity extends perform_controller {
                 'mod_perform/components/report/element_response/ExportActionCard', $action_card_props
             );
         }
-
 
         $a = (object)[
             'target' => $activity_name,

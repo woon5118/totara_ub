@@ -206,6 +206,7 @@ $string['get_started'] = 'Get started';
 $string['instance_info_card_creation_date'] = 'Creation date';
 $string['instance_info_card_show_all_button'] = 'Show all';
 $string['instance_info_card_subject_full_name'] = 'Subject full name';
+$string['instance_number'] = 'Instance number';
 $string['instance_one'] = '1 instance';
 $string['instances'] = '{$a} instances';
 $string['invalid_activity'] = 'Invalid activity';

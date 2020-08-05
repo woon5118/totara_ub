@@ -103,7 +103,7 @@ Feature: Test viewing Performance activity response data
     Then I should not see "Export performance response records"
 
     When I set the following fields to these values:
-      | totara_core_relationship-totara_core_relationship_id | Appraiser |
+      | section-involved_relationships | Appraiser |
     And I click on "submitgroupstandard[addfilter]" "button"
 
     # Action card should not be visible
@@ -115,7 +115,7 @@ Feature: Test viewing Performance activity response data
     Then I should not see "Question two"
 
     When I set the following fields to these values:
-      | totara_core_relationship-totara_core_relationship_id | Subject |
+      | section-involved_relationships | Subject |
     And I click on "submitgroupstandard[addfilter]" "button"
     Then I should see "2 records selected"
     And the following should exist in the "element_performance_reporting" table:
@@ -156,3 +156,30 @@ Feature: Test viewing Performance activity response data
     And I should see "*" in the tui modal
     And the following fields match these values:
       | [answer_text] |  |
+
+  Scenario: I can see the subject instance for subject report when I have sufficient permission
+    Given I log in as "sitemanager"
+
+    When I navigate to the mod perform subject instance report for user "user1"
+    Then I should see "Performance data for User1 Last1: 2 records shown"
+    And the following should exist in the "subject_instance_performance_reporting" table:
+      | Activity name                      | Instance number | Participants | Progress    | Availability |
+      | Simple optional questions activity | 1               | 1            | Not started | Open         |
+      | Simple required questions activity | 1               | 1            | Not started | Open         |
+
+    When I navigate to the mod perform subject instance report for user "user3"
+    Then I should see "Performance data for User3 Last3: 0 records shown"
+
+    When I log out
+    And I log in as "manager"
+    And I navigate to the mod perform subject instance report for user "user1"
+    Then I should see "Performance data for User1 Last1: 2 records shown"
+    And I should see "2 records selected"
+
+    When I navigate to the mod perform subject instance report for user "user2"
+    # Export action card should not be visible
+    Then I should not see "records selected"
+    And I should not see "Export all"
+
+    When I navigate to the mod perform subject instance report for user "user3"
+    Then I should see "You cannot report on this subject user because you do not have permission"

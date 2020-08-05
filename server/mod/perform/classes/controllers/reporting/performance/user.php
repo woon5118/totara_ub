@@ -34,11 +34,13 @@ use mod_perform\views\override_nav_breadcrumbs;
 use moodle_exception;
 use moodle_url;
 use totara_mvc\has_report;
+use totara_mvc\renders_components;
 use totara_mvc\view;
 
 class user extends perform_controller {
 
     use has_report;
+    use renders_components;
 
     public function setup_context(): context {
         $category_id = util::get_default_category_id();
@@ -62,14 +64,20 @@ class user extends perform_controller {
 
         if (!util::can_report_on_user($subject_user_id, $this->currently_logged_in_user()->id)) {
             // Current user can't report on this subject user.
-            throw new moodle_exception('error_user_unavailable', 'mod_perform');
+            $this->set_url(static::get_url());
+            return self::create_view(null, view::core_renderer()->notification(
+                get_string('error_user_unavailable', 'mod_perform'), notification::NOTIFY_ERROR
+            ));
         }
 
         $extra_data = [
             'subject_user_id' => $subject_user_id,
         ];
 
-        $report = $this->load_embedded_report('subject_instance_performance_reporting', $extra_data);
+        // Shortname of embedded report being used to generate list of items.
+        $report_shortname = 'subject_instance_performance_reporting';
+
+        $report = $this->load_embedded_report($report_shortname, $extra_data);
 
         $debug = $this->get_optional_param('debug', 0, PARAM_INT);
 
@@ -78,32 +86,23 @@ class user extends perform_controller {
         // Current filtered count
         $filtered_count = $report->get_filtered_count();
 
-        // Hash of current filtered state
-        $filter_hash = $report->get_search_hash();
-
-        // Shortname of embedded report being used to generate list of items.
-        $filtered_report_shortname = 'subject_instance_performance_reporting';
-
-        // Whether or not 'Export selected' button should be disabled or not.
-        $export_disabled = $filtered_count > self::BULK_EXPORT_MAX_ROWS;
-
-        // String showning number of results
-        $count_string_identifier = $filtered_count == 1 ? 'x_record_selected' : 'x_records_selected';
-        $count_string = get_string($count_string_identifier, 'mod_perform', $filtered_count);
-
-        // Data for template.
-        $additional_data = [
-            'filtered_report_count_string' => $count_string,
-            'filtered_report_embedded_shortname' => $filtered_report_shortname,
-            'filtered_report_filter_hash' => $filter_hash,
-            'export_disabled' => $export_disabled,
-            'extra_params' => [
-                [
-                    'name' => 'subject_user_id',
-                    'value' => $subject_user_id,
+        $action_card_component = '';
+        // Only show the action card if there are results.
+        if ($filtered_count > 0) {
+            $action_card_props = [
+                'additional-export-href-params' => [
+                    'subject_user_id' => $subject_user_id,
                 ],
-            ],
-        ];
+                'row-count' => $filtered_count,
+                'embedded-shortname' => $report_shortname,
+                'filter-hash' => $report->get_search_hash(), // Hash of current filtered state, ensures we're not using stale data.
+                'export-row-limit' => self::BULK_EXPORT_MAX_ROWS,
+            ];
+
+            $action_card_component = $this->get_rendered_component(
+                'mod_perform/components/report/element_response/ExportActionCard', $action_card_props
+            );
+        }
 
         $subject_user = \core_user::get_user($subject_user_id);
         $subject_user_name = fullname($subject_user);
@@ -118,7 +117,7 @@ class user extends perform_controller {
         $report_view = embedded_report_view::create_from_report($report, $debug, 'mod_perform/bulk_exportable_report')
             ->add_override(new override_nav_breadcrumbs())
             ->set_title(get_string('performance_data_for', 'mod_perform', $subject_user_name))
-            ->set_additional_data($additional_data);
+            ->set_additional_data(['action_card_component' => $action_card_component]);
 
         $report_renderer = $report_view->get_page()->get_renderer('totara_reportbuilder');
 
