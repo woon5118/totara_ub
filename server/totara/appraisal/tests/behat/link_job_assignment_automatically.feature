@@ -82,7 +82,8 @@ Feature: Automatically link an appraisee's job assignment on appraisal activatio
     And I follow "Appraisals Audience 2"
     And I press "Save"
     And I press "Update"
-    And I run all adhoc tasks
+    And I trigger cron
+    And I am on site homepage
     And I navigate to "Manage appraisals" node in "Site administration > Appraisals"
     And I follow "Appraisal1"
     And I follow "Assignments"
