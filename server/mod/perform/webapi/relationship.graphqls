@@ -32,11 +32,6 @@ extend type Query {
   Get the activity instances and their manual relationships that the current user can set the participants for.
   """
   mod_perform_manual_participant_selection_instances: [mod_perform_manual_participant_selection_instance]!
-
-  """
-  Get the users that are visible and selectable by the current user.
-  """
-  mod_perform_selectable_users: [core_user]!
 }
 
 """

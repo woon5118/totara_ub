@@ -24,13 +24,12 @@
 namespace mod_perform\webapi\resolver\query;
 
 use context_coursecat;
-use core\entities\user;
 use core\webapi\execution_context;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
-use core_user\access_controller;
+use mod_perform\data_providers\activity\selectable_users as selectable_users_provider;
 use mod_perform\util;
 
 /**
@@ -46,17 +45,9 @@ class selectable_users implements query_resolver, has_middleware {
     public static function resolve(array $args, execution_context $ec) {
         $ec->set_relevant_context(context_coursecat::instance(util::get_default_category_id()));
 
-        return user::repository()
-            ->filter_by_not_deleted()
-            ->filter_by_not_guest()
-            ->select_user_picture_fields()
-            ->select_full_name_fields_only()
-            ->order_by_full_name()
-            ->get()
-            ->filter(static function (user $user) {
-                return access_controller::for($user->get_record())
-                    ->can_view_field('fullname');
-            });
+        return (new selectable_users_provider())
+            ->add_filters($args['filters'] ?? [])
+            ->get();
     }
 
     /**

@@ -1,8 +1,18 @@
-query mod_perform_selectable_users {
-  mod_perform_selectable_users {
+query mod_perform_selectable_users(
+  $filters: mod_perform_selectable_users_filters
+) {
+  mod_perform_selectable_users(filters: $filters) {
     id
-    fullname
-    profileimagealt
-    profileimageurl
+    card_display {
+      profile_picture_alt
+      profile_picture_url
+      profile_url
+      display_fields {
+        associate_url
+        value
+        label
+        is_custom
+      }
+    }
   }
 }

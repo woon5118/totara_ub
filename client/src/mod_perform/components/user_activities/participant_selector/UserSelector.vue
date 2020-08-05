@@ -18,21 +18,31 @@
 
 <template>
   <TagList
-    :tags="value"
-    :items="userList"
+    :tags="usersTagList"
+    :items="usersDropdownList"
     @select="select"
     @remove="remove"
-    @filter="filter = $event"
+    @filter="updateFilter"
   >
-    <template v-slot:item="{ item }">{{ item.text }}</template>
+    <template v-slot:item="{ item }">
+      <MiniProfileCard
+        :no-border="true"
+        :read-only="true"
+        :display="item.card_display"
+      />
+    </template>
   </TagList>
 </template>
 
 <script>
+import MiniProfileCard from 'tui/components/profile/MiniProfileCard';
 import TagList from 'tui/components/tag/TagList';
+import SelectableUsersQuery from 'mod_perform/graphql/selectable_users';
+import { debounce } from 'tui/util';
 
 export default {
   components: {
+    MiniProfileCard,
     TagList,
   },
 
@@ -43,16 +53,34 @@ export default {
         return [];
       },
     },
-    users: {
-      required: true,
+    excludeUsers: {
       type: Array,
+      default() {
+        return [];
+      },
     },
   },
 
   data() {
     return {
-      filter: '',
+      fullnameFilter: '',
+      users: [],
     };
+  },
+
+  apollo: {
+    users: {
+      query: SelectableUsersQuery,
+      variables() {
+        return {
+          filters: {
+            fullname: this.fullnameFilter,
+            exclude_users: this.excludeUsers,
+          },
+        };
+      },
+      update: data => data.mod_perform_selectable_users,
+    },
   },
 
   computed: {
@@ -62,21 +90,22 @@ export default {
      *
      * @returns {[Object]}
      */
-    userList() {
-      let userList = this.users.filter(user => {
+    usersDropdownList() {
+      return this.users.filter(user => {
         return !this.value.some(selectedUser => selectedUser.id === user.id);
       });
+    },
 
-      if (this.filter) {
-        userList = userList.filter(user =>
-          user.fullname.toLowerCase().includes(this.filter.toLowerCase())
-        );
-      }
-
-      return userList.map(user => {
+    /**
+     * List of users to display as tags.
+     *
+     * @returns {[Object]}
+     */
+    usersTagList() {
+      return this.value.map(user => {
         return {
           id: user.id,
-          text: user.fullname,
+          text: user.card_display.display_fields[0].value,
         };
       });
     },
@@ -103,6 +132,13 @@ export default {
         this.value.filter(user => user.id !== selectedUser.id)
       );
     },
+
+    /**
+     * Update the full name filter (which re-triggers the query) if the user stopped typing >500 milliseconds ago.
+     */
+    updateFilter: debounce(function(input) {
+      this.fullnameFilter = input;
+    }, 500),
   },
 };
 </script>

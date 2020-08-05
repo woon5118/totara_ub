@@ -41,7 +41,6 @@
         :key="selectionInstance.subject_instance.id"
         :subject-instance="selectionInstance.subject_instance"
         :relationships="selectionInstance.manual_relationships"
-        :users="users"
         :current-user-id="currentUserId"
         @submit="submit"
         @error="error"
@@ -58,7 +57,6 @@
 import ActivityParticipants from 'mod_perform/components/user_activities/participant_selector/ActivityParticipants';
 import Loader from 'tui/components/loader/Loader';
 import ManualParticipantSelectionInstancesQuery from 'mod_perform/graphql/manual_participant_selection_instances';
-import SelectableUsersQuery from 'mod_perform/graphql/selectable_users';
 import { NOTIFICATION_DURATION } from 'mod_perform/constants';
 import { notify } from 'tui/notifications';
 
@@ -82,7 +80,6 @@ export default {
   data() {
     return {
       participantSelectionInstances: [],
-      users: [],
     };
   },
 
@@ -90,10 +87,6 @@ export default {
     participantSelectionInstances: {
       query: ManualParticipantSelectionInstancesQuery,
       update: data => data.mod_perform_manual_participant_selection_instances,
-    },
-    users: {
-      query: SelectableUsersQuery,
-      update: data => data.mod_perform_selectable_users,
     },
   },
 

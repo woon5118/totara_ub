@@ -1,0 +1,33 @@
+"""
+TODO: this should be combined with totara_competency/user_groups and put into
+totara core somewhere.
+"""
+type mod_perform_user_grouping {
+  id: core_id!
+  type: Int!
+  type_label: String!
+  name: String
+  size: Int!
+}
+
+input mod_perform_user_grouping_input {
+  id: core_id!
+  type: String!
+}
+
+"""
+Input for filtering what users can be selected.
+"""
+input mod_perform_selectable_users_filters {
+  fullname: String
+  exclude_users: [core_id]
+}
+
+extend type Query {
+  """
+  Get the users that are visible and selectable by the current user.
+  """
+  mod_perform_selectable_users(
+    filters: mod_perform_selectable_users_filters
+  ): [core_user]!
+}

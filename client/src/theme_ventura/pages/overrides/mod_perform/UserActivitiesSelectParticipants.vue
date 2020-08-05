@@ -29,8 +29,8 @@
   }
 
   &__instance {
-    display: block;
     padding: var(--tui-gap-4);
+    border: 1px solid var(--tui-card-border-color);
 
     &-title {
       @include tui-font-heading-small;

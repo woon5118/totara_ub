@@ -17,10 +17,7 @@
 -->
 
 <template>
-  <Card
-    :clickable="false"
-    class="tui-performUserActivitiesSelectParticipants__instance"
-  >
+  <div class="tui-performUserActivitiesSelectParticipants__instance">
     <h3 class="tui-performUserActivitiesSelectParticipants__instance-title">
       {{ instanceTitle }}
     </h3>
@@ -62,7 +59,11 @@
           :name="relationship.id"
           :validate="validateInternal"
         >
-          <UserSelector v-model="value" :users="userList" @input="update" />
+          <UserSelector
+            v-model="value"
+            :exclude-users="[subjectInstance.subject_user.id]"
+            @input="update"
+          />
         </FormField>
       </FormRow>
 
@@ -77,13 +78,12 @@
         </ButtonGroup>
       </FormRow>
     </Uniform>
-  </Card>
+  </div>
 </template>
 
 <script>
 import Button from 'tui/components/buttons/Button';
 import ButtonGroup from 'tui/components/buttons/ButtonGroup';
-import Card from 'tui/components/card/Card';
 import ExternalUserSelector from 'mod_perform/components/user_activities/participant_selector/ExternalUserSelector';
 import UserSelector from 'mod_perform/components/user_activities/participant_selector/UserSelector';
 import { FormField, FormRow, Uniform } from 'tui/components/uniform';
@@ -94,7 +94,6 @@ export default {
   components: {
     Button,
     ButtonGroup,
-    Card,
     ExternalUserSelector,
     FormField,
     FormRow,
@@ -108,10 +107,6 @@ export default {
       type: Object,
     },
     relationships: {
-      required: true,
-      type: Array,
-    },
-    users: {
       required: true,
       type: Array,
     },
@@ -143,29 +138,6 @@ export default {
           activity: this.subjectInstance.activity.name,
           user: this.subjectInstance.subject_user.fullname,
         }
-      );
-    },
-
-    /**
-     * Get the users that we can select for this instance.
-     *
-     * @returns {Object[]}
-     */
-    userList() {
-      if (
-        this.subjectInstance.subject_user.id == this.currentUserId &&
-        this.users.length < 2
-      ) {
-        // If the subject user is logged in and there aren't multiple users to
-        // pick from, then we include the subject user in the list of users.
-        // This is to avoid the potential issue of a subject not being able to
-        // select any users because they only have permission to see themselves.
-        return this.users;
-      }
-
-      // Otherwise we do not want to be able to select the subject instance.
-      return this.users.filter(
-        user => user.id !== this.subjectInstance.subject_user.id
       );
     },
   },
