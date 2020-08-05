@@ -31,6 +31,7 @@
       :aria-pressed="value"
       :disabled="disabled"
       @click="togglePressed"
+      @blur="$emit('blur', $event)"
     >
       <span :class="{ 'sr-only': ariaLabel }">{{ text }}</span>
     </button>
@@ -41,9 +42,6 @@
 
     <span
       class="tui-toggleSwitch__ui"
-      :class="{
-        'tui-toggleSwitch__ui--aria-pressed': value,
-      }"
       aria-hidden="true"
       @click="togglePressed"
     />
@@ -72,6 +70,11 @@ export default {
       type: Boolean,
     },
   },
+
+  mounted() {
+    console.error('[ToggleSwitch] You must pass either aria-label or text.');
+  },
+
   methods: {
     togglePressed() {
       if (this.disabled) return;

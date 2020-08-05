@@ -36,7 +36,7 @@ export { default as FormRadioWithInput } from 'tui/components/uniform/FormRadioW
 export { default as FormSearch } from 'tui/components/uniform/FormSearch';
 export { default as FormSelect } from 'tui/components/uniform/FormSelect';
 export { default as FormColor } from 'tui/components/uniform/FormColor';
-export { default as FormToggleButton } from 'tui/components/uniform/FormToggleButton';
+export { default as FormToggleSwitch } from 'tui/components/uniform/FormToggleSwitch';
 export { default as FormTel } from 'tui/components/uniform/FormTel';
 export { default as FormText } from 'tui/components/uniform/FormText';
 export { default as FormTextarea } from 'tui/components/uniform/FormTextarea';

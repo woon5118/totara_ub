@@ -109,7 +109,11 @@
     </FormRow>
 
     <FormRow label="Pineapple" :is-stacked="true">
-      <FormToggleButton name="pineapple" :toggle-first="true" />
+      <FormToggleSwitch
+        name="pineapple"
+        :toggle-first="true"
+        aria-label="Does pineapple belong on pizza?"
+      />
       <FormRowDetails id="pineapple">Belongs on pizza?</FormRowDetails>
     </FormRow>
 
@@ -149,7 +153,7 @@ import {
   FormRadioGroup,
   FormCheckbox,
   FormCheckboxGroup,
-  FormToggleButton,
+  FormToggleSwitch,
   FormRange,
 } from 'tui/components/uniform';
 import InputText from 'tui/components/form/InputText';
@@ -175,7 +179,7 @@ export default {
     FormRadioGroup,
     FormRange,
     InputText,
-    FormToggleButton,
+    FormToggleSwitch,
     Radio,
     FormRowActionButtons,
     FormRowDetails,

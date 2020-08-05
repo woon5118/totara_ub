@@ -68,6 +68,10 @@
         border-color var(--tui-transition-button-duration)
           var(--tui-transition-button-function);
       content: '';
+
+      .tui-context-invalid & {
+        box-shadow: 0 0 0 2px var(--tui-form-input-border-color-invalid);
+      }
     }
 
     // the toggle dot
@@ -133,7 +137,7 @@
   }
 
   // toggled on
-  &__ui.tui-toggleSwitch__ui--aria-pressed {
+  &__btn[aria-pressed] ~ &__ui {
     // the dot
     &:after {
       right: var(--tui-form-toggle-dot-offset);
@@ -155,10 +159,10 @@
   }
 
   // toggled on, via the button
-  &__btn {
+  &__btn[aria-pressed] {
     &:hover,
     &:focus {
-      ~ .tui-toggleSwitch__ui.tui-toggleSwitch__ui--aria-pressed {
+      ~ .tui-toggleSwitch__ui {
         &:before {
           background-color: var(--tui-form-toggle-on-bg-color-hover-focus);
         }
