@@ -223,10 +223,11 @@ class block_base {
     function is_empty() {
         global $CFG;
 
-        // Tenant hack: we need the system level settings block in tenant contexts too, so test permissions in tenant category instead.
+        // Tenant hack: we need the system level settings block, and all user-profile blocks, in tenant contexts too.
+        // Test permissions of those blocks in tenant category instead.
         $parentcontext = $this->context->get_parent_context();
         if (!empty($CFG->tenantsenabled) and $CFG->tenantsisolated and $parentcontext->contextlevel == CONTEXT_SYSTEM and !empty($this->page->context->tenantid)) {
-            if ($this->name() !== 'settings') {
+            if ($this->name() !== 'settings' && $this->page->pagetype != 'user-profile') {
                 return true;
             }
             $tenant = core\record\tenant::fetch($this->page->context->tenantid);
