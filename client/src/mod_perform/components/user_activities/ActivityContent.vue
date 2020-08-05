@@ -145,6 +145,7 @@
               <div
                 v-for="sectionElement in sectionElements"
                 :key="sectionElement.id"
+                class="tui-participantContent__sectionItem"
               >
                 <h3
                   v-if="sectionElement.element.title"
