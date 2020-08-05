@@ -20,7 +20,6 @@
  * @author Angela Kuznetsova <angela.jayasinghe@totaralearning.com>
  * @package performelement_date_picker
  */
-use Behat\Mink\Element\NodeElement;
 
 class behat_performelement_date_picker extends behat_base {
 

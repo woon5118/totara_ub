@@ -20,7 +20,7 @@
  * @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
  * @package performelement_multi_choice_single
  */
-use Behat\Mink\Element\NodeElement;
+
 use Behat\Mink\Exception\ExpectationException;
 
 class behat_performelement_multi_choice_single extends behat_base {

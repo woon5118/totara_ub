@@ -23,7 +23,6 @@
 
 namespace totara_competency\entities;
 
-use coding_exception;
 use core\orm\collection;
 use core\orm\entity\entity;
 use core\orm\entity\relations\belongs_to;

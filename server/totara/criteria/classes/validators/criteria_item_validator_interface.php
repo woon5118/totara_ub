@@ -23,8 +23,6 @@
 
 namespace totara_criteria\validators;
 
-use totara_criteria\criterion;
-
 /**
  * Interface for item validators that check the validity of a criterion's items
  */

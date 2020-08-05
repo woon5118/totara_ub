@@ -23,7 +23,6 @@
 
 namespace mod_perform\data_providers\activity;
 
-use core\entities\user;
 use core\orm\collection;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\models\activity\activity as activity_model;

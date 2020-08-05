@@ -27,7 +27,6 @@ use criteria_childcompetency\childcompetency;
 use criteria_coursecompletion\coursecompletion;
 use criteria_linkedcourses\linkedcourses;
 use criteria_onactivate\onactivate;
-use pathway_manual\manual;
 use pathway_manual\models\roles\appraiser;
 use pathway_manual\models\roles\manager;
 use pathway_manual\models\roles\self_role;

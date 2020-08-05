@@ -27,7 +27,6 @@ use hierarchy_competency\event\scale_min_proficient_value_updated;
 use totara_competency\aggregation_helper;
 use totara_competency\aggregation_users_table;
 use totara_competency\entities\configuration_change;
-use totara_core\advanced_feature;
 
 class scale {
 

@@ -27,7 +27,6 @@ use core\event\base;
 use core\orm\collection;
 use core\orm\query\builder;
 use totara_competency\assignment_create_exception;
-use totara_competency\entities;
 use totara_competency\entities\assignment;
 use totara_competency\entities\competency;
 use totara_competency\models\assignment as assignment_model;

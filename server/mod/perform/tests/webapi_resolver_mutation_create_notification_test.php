@@ -21,7 +21,6 @@
  * @package mod_perform
  */
 
-use container_perform\create_exception;
 use mod_perform\models\activity\activity as activity_model;
 use mod_perform\models\activity\notification as notification_model;
 use mod_perform\webapi\resolver\mutation\create_notification;

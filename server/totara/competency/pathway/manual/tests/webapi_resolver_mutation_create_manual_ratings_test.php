@@ -23,10 +23,8 @@
  */
 
 use core\webapi\execution_context;
-use pathway_manual\manual;
 use pathway_manual\models\roles\manager;
 use pathway_manual\webapi\resolver\mutation\create_manual_ratings;
-use totara_job\job_assignment;
 
 require_once(__DIR__ . '/pathway_manual_base_test.php');
 

@@ -27,6 +27,7 @@ use totara_core\event\course_completion_reset;
 use totara_criteria\entities\criteria_item as item_entity;
 use totara_criteria\entities\criteria_item_record as item_record_entity;
 use totara_criteria\entities\criterion as criterion_entity;
+use totara_criteria\entities\criterion_item;
 use totara_criteria\hook\criteria_achievement_changed;
 
 class criteria_linkedcourses_course_observer_testcase extends advanced_testcase {
@@ -43,7 +44,7 @@ class criteria_linkedcourses_course_observer_testcase extends advanced_testcase 
     private function setup_data(int $num_criteria = 0) {
         global $CFG;
         $data = new class() {
-            /** @var competency_entity $competency */
+            /** @var \totara_competency\entities\competency $competency */
             public $competency;
             /** @var criterion_entity[] $criterion */
             public $criteria = [];

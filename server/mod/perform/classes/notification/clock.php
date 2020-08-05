@@ -23,8 +23,6 @@
 
 namespace mod_perform\notification;
 
-use coding_exception;
-
 /**
  * Provides the master clock.
  */

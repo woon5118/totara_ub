@@ -29,7 +29,6 @@ use core\orm\entity\entity;
 use core\orm\entity\relations\belongs_to;
 use core\orm\entity\relations\has_many;
 use core\orm\entity\relations\has_one_through;
-use core\orm\query\builder;
 use totara_core\entities\relationship as core_relationship;
 use totara_job\entities\job_assignment;
 

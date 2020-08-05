@@ -31,19 +31,19 @@ class totara_competency_overall_aggregation_testcase extends advanced_testcase {
         $pathway2 = $this->getMockForAbstractClass(\totara_competency\pathway::class);
 
         /**
-         * @var PHPUnit_Framework_MockObject_MockObject|\totara_competency\overall_aggregation $aggregation1
+         * @var \PHPUnit\Framework\MockObject\MockObject|\totara_competency\overall_aggregation $aggregation1
          */
         $aggregation1 = $this->getMockForAbstractClass(overall_aggregation::class);
         $aggregation1->set_pathways([$pathway1, $pathway2]);
 
         /**
-         * @var PHPUnit_Framework_MockObject_MockObject|\totara_competency\overall_aggregation $aggregation2
+         * @var \PHPUnit\Framework\MockObject\MockObject|\totara_competency\overall_aggregation $aggregation2
          */
         $aggregation2 = $this->getMockForAbstractClass(overall_aggregation::class);
         $aggregation2->set_pathways([]);
 
         /**
-         * @var PHPUnit_Framework_MockObject_MockObject|overall_aggregation $aggregation3
+         * @var \PHPUnit\Framework\MockObject\MockObject|overall_aggregation $aggregation3
          */
         $aggregation3 = $this->getMockForAbstractClass(overall_aggregation::class);
         $aggregation3->set_pathways([$pathway1]);
@@ -54,7 +54,7 @@ class totara_competency_overall_aggregation_testcase extends advanced_testcase {
         $user2_id = 102;
 
         /**
-         * @var PHPUnit_Framework_MockObject_MockObject|overall_aggregation $aggregation1
+         * @var \PHPUnit\Framework\MockObject\MockObject|overall_aggregation $aggregation1
          */
         $aggregation1 = $this->getMockForAbstractClass(overall_aggregation::class);
         $aggregation1->set_pathways([]);

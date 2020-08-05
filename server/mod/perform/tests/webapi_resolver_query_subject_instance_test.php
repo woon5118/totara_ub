@@ -24,7 +24,6 @@
 use mod_perform\models\activity\participant_instance;
 use mod_perform\state\participant_instance\not_started;
 use totara_core\advanced_feature;
-use totara_job\job_assignment;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 require_once(__DIR__ . '/subject_instance_testcase.php');

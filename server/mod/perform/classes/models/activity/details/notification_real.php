@@ -30,7 +30,6 @@ use core\orm\query\exceptions\record_not_found_exception;
 use mod_perform\entities\activity\notification as notification_entity;
 use mod_perform\models\activity\activity;
 use mod_perform\notification\factory;
-use moodle_exception;
 
 /**
  * The internal implementation that represents an existing performance notification setting.

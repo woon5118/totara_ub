@@ -21,13 +21,9 @@
  * @package criteria_coursecompletion
  */
 
-
-use core\event\admin_settings_changed;
 use core\hook\admin_setting_changed;
 use totara_core\advanced_feature;
 use totara_criteria\entities\criterion as criterion_entity;
-use totara_criteria\hook\criteria_validity_changed;
-
 
 class criteria_coursecompletion_totara_core_watcher_testcase extends advanced_testcase {
 

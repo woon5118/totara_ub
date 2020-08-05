@@ -25,7 +25,6 @@ namespace pathway_manual\models;
 
 use core\entities\user;
 use pathway_manual\models\roles\role;
-use pathway_manual\models\roles\role_factory;
 use totara_competency\entities\assignment;
 use totara_competency\entities\competency;
 

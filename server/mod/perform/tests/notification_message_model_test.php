@@ -29,7 +29,6 @@ use mod_perform\models\activity\notification;
 use mod_perform\models\activity\notification_message;
 use mod_perform\models\activity\notification_recipient;
 use mod_perform\models\activity\section;
-use mod_perform\notification\brokers\overdue;
 use totara_core\relationship\relationship;
 
 require_once(__DIR__ . '/notification_testcase.php');

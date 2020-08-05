@@ -26,7 +26,6 @@ namespace pathway_manual\data_providers;
 use core\entities\user;
 use core\orm\collection;
 use core\orm\query\field;
-use core\webapi\scalar\id;
 use pathway_manual\entities\rating;
 use pathway_manual\models\rateable_competency;
 use pathway_manual\models\roles\role;

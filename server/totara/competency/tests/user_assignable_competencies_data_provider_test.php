@@ -22,7 +22,6 @@
  * @subpackage test
  */
 
-use core\webapi\execution_context;
 use PHPUnit\Framework\MockObject\MockObject;
 use totara_competency\entities\assignment;
 use totara_competency\entities\competency;

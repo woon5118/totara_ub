@@ -38,7 +38,6 @@ use mod_perform\state\subject_instance\closed as subject_instance_closed;
 use mod_perform\state\subject_instance\not_started as subject_instance_not_started;
 use mod_perform\state\subject_instance\not_submitted as subject_instance_not_submitted;
 use mod_perform\webapi\resolver\mutation\create_track;
-use totara_core\relationship\resolvers\subject;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 require_once(__DIR__ . '/generator/activity_generator_configuration.php');

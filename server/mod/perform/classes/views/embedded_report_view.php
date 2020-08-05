@@ -23,8 +23,6 @@
 
 namespace mod_perform\views;
 
-use moodle_url;
-use reportbuilder;
 use totara_mvc\report_view;
 
 /**

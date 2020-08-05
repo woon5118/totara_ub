@@ -25,7 +25,6 @@ namespace totara_competency\data_providers;
 
 use core\entities\user;
 use core\orm\collection;
-use core\orm\entity\entity;
 
 /**
  * This class is a base class for a model specifically for things that depend on the user!

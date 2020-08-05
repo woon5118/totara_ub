@@ -23,7 +23,6 @@
  */
 
 use core\format;
-use mod_perform\models\activity\activity;
 use mod_perform\models\activity\notification as notification_model;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 

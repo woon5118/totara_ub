@@ -24,7 +24,6 @@
 namespace pathway_criteria_group\watcher;
 
 use pathway_criteria_group\aggregation_helper;
-use pathway_criteria_group\validation_helper;
 use totara_criteria\hook\criteria_achievement_changed;
 use totara_criteria\hook\criteria_validity_changed;
 

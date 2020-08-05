@@ -42,9 +42,7 @@ use degeneration\items\position;
 use degeneration\items\user;
 use hierarchy_organisation\entities\organisation_framework;
 use hierarchy_position\entities\position_framework;
-use totara_competency\entities\competency_framework;
 use totara_competency\linked_courses;
-use totara_core\totara\menu\build;
 
 class performance_testing extends App {
 

@@ -22,7 +22,6 @@
  */
 
 use \totara_criteria\criterion;
-use \criteria_coursecompletion\coursecompletion;
 use \pathway_criteria_group\criteria_group;
 use \hierarchy_competency\event\scale_value_deleted;
 

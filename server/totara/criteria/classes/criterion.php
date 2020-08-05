@@ -362,7 +362,7 @@ abstract class criterion {
     /**
      * Add metadata to the criterion
      *
-     * @param stdClass[]|criteria_metadata[] $metadata Metadata metakey/metavalue pairs
+     * @param stdClass[]|criteria_metadata_entity[] $metadata Metadata metakey/metavalue pairs
      * @return criterion
      */
     public function add_metadata($metadata): criterion {

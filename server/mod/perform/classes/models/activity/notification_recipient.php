@@ -26,12 +26,7 @@ namespace mod_perform\models\activity;
 use coding_exception;
 use core\orm\collection;
 use core\orm\query\builder;
-use core\orm\query\raw_field;
-use totara_core\entities\relationship as relationship_entity;
-use totara_core\entities\relationship_resolver as relationship_resolver_entity;
-use mod_perform\entities\activity\section as section_entity;
 use mod_perform\entities\activity\notification_recipient as notification_recipient_entity;
-use mod_perform\entities\activity\section_relationship as section_relationship_entity;
 use stdClass;
 use totara_core\relationship\relationship;
 

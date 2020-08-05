@@ -28,14 +28,12 @@ use hierarchy_competency\event\competency_created;
 use hierarchy_competency\event\competency_deleted;
 use hierarchy_competency\event\competency_updated;
 use stdClass;
-use totara_competency\achievement_configuration;
 use totara_competency\entities\competency as competency_entity;
 use totara_competency\entities\competency_achievement;
 use totara_competency\entities\configuration_change;
 use totara_competency\entities\configuration_history;
 use totara_competency\entities\scale_aggregation;
 use totara_competency\legacy_aggregation;
-use totara_competency\pathway;
 use totara_core\advanced_feature;
 
 class competency {

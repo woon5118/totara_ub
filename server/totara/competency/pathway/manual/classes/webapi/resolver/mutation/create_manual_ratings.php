@@ -25,9 +25,7 @@ namespace pathway_manual\webapi\resolver\mutation;
 
 use core\webapi\execution_context;
 use core\webapi\mutation_resolver;
-use pathway_manual\manual;
 use pathway_manual\models\rating;
-use totara_competency\entities\competency;
 
 /**
  * Mutation to create manual ratings.

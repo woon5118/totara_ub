@@ -24,7 +24,6 @@
 namespace mod_perform\dates;
 
 use coding_exception;
-use DateTimeZone;
 use JsonSerializable;
 
 class date_offset implements JsonSerializable {

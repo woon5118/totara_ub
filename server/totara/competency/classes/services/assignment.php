@@ -294,7 +294,7 @@ class assignment extends \external_api {
     }
 
     /**
-     * @param \totara_orm\collection $assignments
+     * @param \core\orm\collection $assignments
      * @param int $expected_assignments_count
      * @param int $status
      */

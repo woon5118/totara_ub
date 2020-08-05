@@ -26,6 +26,7 @@ use mod_perform\data_providers\activity\activity;
 use mod_perform\state\activity\draft;
 use mod_perform\models\activity\activity as activity_model;
 use mod_perform\util;
+use mod_perform\webapi\resolver\mutation\clone_activity;
 use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 

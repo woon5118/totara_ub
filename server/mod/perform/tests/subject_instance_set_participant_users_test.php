@@ -23,7 +23,6 @@
 
 use core\collection;
 use core\entities\user;
-use core\event\base;
 use mod_perform\entities\activity\manual_relationship_selection_progress;
 use mod_perform\entities\activity\manual_relationship_selector;
 use mod_perform\entities\activity\participant_instance;

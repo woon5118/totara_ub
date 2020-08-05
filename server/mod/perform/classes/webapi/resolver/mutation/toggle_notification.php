@@ -31,7 +31,6 @@ use core\webapi\resolver\has_middleware;
 use mod_perform\webapi\middleware\require_activity;
 use mod_perform\webapi\middleware\require_manage_capability;
 
-use mod_perform\models\activity\activity as activity_model;
 use mod_perform\models\activity\notification as notification_model;
 
 class toggle_notification implements mutation_resolver, has_middleware {

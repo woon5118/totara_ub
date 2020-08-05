@@ -22,10 +22,7 @@
  */
 
 use core\entities\user;
-use mod_perform\entities\activity\subject_instance as subject_instance_entity;
-use mod_perform\models\activity\activity;
 use totara_core\advanced_feature;
-use totara_core\relationship\relationship;
 use totara_job\job_assignment;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 

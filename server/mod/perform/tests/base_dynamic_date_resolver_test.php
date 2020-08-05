@@ -26,7 +26,6 @@ use mod_perform\dates\constants;
 use mod_perform\dates\date_offset;
 use mod_perform\dates\resolvers\dynamic\base_dynamic_date_resolver;
 use mod_perform\dates\resolvers\dynamic\dynamic_date_resolver;
-use mod_perform\dates\resolvers\dynamic\user_date_resolver;
 
 class mod_perform_base_dynamic_date_resolver_testcase extends advanced_testcase {
 

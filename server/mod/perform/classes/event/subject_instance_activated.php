@@ -23,7 +23,6 @@
 
 namespace mod_perform\event;
 
-use core\entities\user;
 use core\event\base;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 use mod_perform\models\activity\subject_instance;

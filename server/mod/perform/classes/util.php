@@ -26,7 +26,6 @@ namespace mod_perform;
 use container_perform\perform as perform_container;
 use context_user;
 use core\collection;
-use core\entities\user;
 use core\orm\query\builder;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\entities\activity\activity_type;

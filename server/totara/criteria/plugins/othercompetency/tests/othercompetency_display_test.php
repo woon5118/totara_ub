@@ -30,7 +30,7 @@ class criteria_othercompetency_display_testcase extends advanced_testcase {
         $data = new class() {
             /** @var totara_criteria_generator criteria_generator */
             public $criteria_generator;
-            /** @var competency_entity[] other_competency_items */
+            /** @var competency[] other_competency_items */
             public $other_competency_items = [];
             /** @var int[] $other_competency_ids */
             public $other_competency_ids = [];

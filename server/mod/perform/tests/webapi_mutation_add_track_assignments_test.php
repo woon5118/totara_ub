@@ -30,7 +30,7 @@ use totara_job\job_assignment;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
- * @coversDefaultClass add_track_assignments.
+ * @coversDefaultClass \mod_perform\webapi\resolver\mutation\add_track_assignments.
  *
  * @group perform
  */

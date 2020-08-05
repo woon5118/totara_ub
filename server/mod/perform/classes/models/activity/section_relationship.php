@@ -26,7 +26,6 @@ namespace mod_perform\models\activity;
 use core\orm\entity\model;
 use mod_perform\entities\activity\section_relationship as section_relationship_entity;
 use totara_core\relationship\relationship as core_relationship_model;
-use totara_core\relationship\relationship as core_relationship;
 
 /**
  * Class section_relationship

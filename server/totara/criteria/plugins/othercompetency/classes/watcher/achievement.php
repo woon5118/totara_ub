@@ -24,10 +24,7 @@
 namespace criteria_othercompetency\watcher;
 
 use totara_criteria\competency_item_helper;
-use totara_criteria\entities\criteria_item as item_entity;
-use totara_criteria\entities\criterion as criterion_entity;
 use totara_competency\hook\competency_achievement_updated_bulk;
-use totara_criteria\hook\criteria_achievement_changed;
 
 class achievement {
 

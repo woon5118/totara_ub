@@ -22,7 +22,6 @@
  * @category test
  */
 
-use totara_competency\admin_setting_continuous_tracking;
 use totara_competency\entities\assignment;
 use totara_competency\entities\competency_assignment_user;
 use totara_competency\entities\competency_assignment_user_log;

@@ -29,7 +29,6 @@ use core\webapi\query_resolver;
 use core\webapi\middleware\require_advanced_feature;
 use core\webapi\resolver\has_middleware;
 use mod_perform\dates\resolvers\dynamic\dynamic_source;
-use mod_perform\util;
 
 class available_dynamic_date_sources implements query_resolver, has_middleware {
 

@@ -28,7 +28,6 @@ use core\orm\entity\entity;
 use core\orm\query\builder;
 use degeneration\App;
 use degeneration\Cache;
-use stdClass;
 
 /**
  * Class user

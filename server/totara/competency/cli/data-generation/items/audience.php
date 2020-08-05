@@ -24,11 +24,9 @@
 namespace degeneration\items;
 
 use core\entities\cohort;
-use core\orm\query\builder;
 use degeneration\App;
 use degeneration\Cache;
 use stdClass;
-use totara_competency\entities\course as course_entity;
 
 class audience extends item {
 

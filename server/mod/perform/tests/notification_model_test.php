@@ -25,7 +25,6 @@
 use mod_perform\constants;
 use mod_perform\entities\activity\notification as notification_entity;
 use mod_perform\models\activity\notification;
-use mod_perform\notification\brokers\overdue;
 use mod_perform\notification\trigger;
 
 require_once(__DIR__ . '/notification_testcase.php');

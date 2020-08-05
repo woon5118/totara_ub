@@ -47,8 +47,6 @@ use mod_perform\state\subject_instance\in_progress;
 use mod_perform\state\subject_instance\not_started;
 use mod_perform\state\subject_instance\not_submitted;
 use mod_perform\state\subject_instance\subject_instance_progress;
-use totara_core\relationship\resolvers\subject;
-use totara_job\relationship\resolvers\appraiser;
 
 require_once(__DIR__ . '/generator/activity_generator_configuration.php');
 require_once(__DIR__ . '/state_testcase.php');

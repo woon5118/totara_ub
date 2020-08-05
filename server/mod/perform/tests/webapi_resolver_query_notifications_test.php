@@ -22,12 +22,11 @@
  */
 
 use mod_perform\models\activity\notification as notification_model;
-use \mod_perform\webapi\resolver\query\notification;
 use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
- * @coversDefaultClass notification
+ * @coversDefaultClass \mod_perform\webapi\resolver\query\notifications
  *
  * @group perform
  */

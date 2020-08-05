@@ -23,24 +23,8 @@
 
 namespace degeneration;
 
-use degeneration\items\assignment;
-use degeneration\items\audience;
-use degeneration\items\competency;
-use degeneration\items\course;
-use degeneration\items\criteria\child_competency;
-use degeneration\items\criteria\course_completion;
-use degeneration\items\criteria\linked_courses;
-use degeneration\items\criteria\on_activate;
-use degeneration\items\item;
-use degeneration\items\organisation;
-use degeneration\items\pathways\criteria_group;
-use degeneration\items\pathways\learning_plan;
-use degeneration\items\pathways\manual_rating;
-use degeneration\items\position;
 use Faker\Factory;
 use Faker\Generator;
-use degeneration\items\user;
-use totara_competency\entities\competency_framework;
 
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'bootstrap.php';
 

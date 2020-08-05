@@ -24,7 +24,6 @@
 use core\entities\user;
 use core\orm\query\builder;
 use pathway_manual\data_providers\user_rateable_competencies;
-use pathway_manual\manual;
 use pathway_manual\models\rateable_competency;
 use pathway_manual\models\roles\self_role;
 use totara_competency\entities\assignment;

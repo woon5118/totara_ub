@@ -26,7 +26,6 @@
 namespace totara_competency;
 
 
-use totara_core\advanced_feature;
 use xmldb_table;
 
 /**

@@ -27,7 +27,6 @@ use core\task\scheduled_task;
 use totara_competency\aggregation_helper;
 use totara_competency\aggregation_task;
 use totara_competency\aggregation_users_table;
-use totara_core\advanced_feature;
 
 /**
  * Aggregates competency achievements for all users actively assigned to any competency in the system.

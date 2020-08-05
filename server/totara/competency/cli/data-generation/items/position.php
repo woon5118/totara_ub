@@ -24,7 +24,6 @@
 namespace degeneration\items;
 
 use hierarchy_position\entities\position as position_entity;
-use degeneration\App;
 
 /**
  * Class position

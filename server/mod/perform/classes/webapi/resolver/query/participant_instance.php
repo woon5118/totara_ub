@@ -30,9 +30,7 @@ use core\webapi\middleware\require_login;
 use core\webapi\query_resolver;
 use core\webapi\resolver\has_middleware;
 use mod_perform\models\activity\participant_instance as participant_instance_model;
-use mod_perform\models\activity\subject_instance as subject_instance_model;
 use mod_perform\util;
-use mod_perform\webapi\middleware\require_activity;
 
 class participant_instance implements query_resolver, has_middleware {
     /**

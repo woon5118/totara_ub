@@ -27,7 +27,6 @@ use totara_competency\event\assignment_user;
 use totara_competency\event\assignment_user_archived;
 use totara_competency\event\assignment_user_assigned;
 use totara_competency\event\assignment_user_assigned_bulk;
-use totara_competency\event\assignment_user_unassigned;
 use totara_competency\models;
 
 defined('MOODLE_INTERNAL') || die();

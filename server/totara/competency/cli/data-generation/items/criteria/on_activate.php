@@ -23,11 +23,7 @@
 
 namespace degeneration\items\criteria;
 
-use degeneration\App;
-use degeneration\Cache;
 use degeneration\items\competency;
-use degeneration\items\course;
-use totara_criteria\criterion as criterion_model;
 
 class on_activate extends criterion {
 

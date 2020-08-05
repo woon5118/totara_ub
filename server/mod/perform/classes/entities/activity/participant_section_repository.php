@@ -24,7 +24,6 @@
 namespace mod_perform\entities\activity;
 
 use coding_exception;
-use core\collection;
 use core\orm\entity\repository;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\entities\activity\participant_section as participant_section_entity;

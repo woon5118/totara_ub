@@ -26,7 +26,6 @@ namespace pathway_manual\models;
 use core\entities\user;
 use core\orm\entity\entity;
 use pathway_manual\models\roles\role;
-use pathway_manual\models\roles\role_factory;
 use pathway_manual\entities\rating;
 
 /**

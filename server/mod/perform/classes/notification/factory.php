@@ -27,10 +27,8 @@ use coding_exception;
 use mod_perform\entities\activity\track_user_assignment;
 use mod_perform\models\activity\activity as activity_model;
 use mod_perform\models\activity\notification as notification_model;
-use mod_perform\notification\exceptions\class_key_not_available;
 use mod_perform\task\service\subject_instance_dto;
 use stdClass;
-use totara_core\relationship\relationship;
 
 /**
  * factory class

@@ -24,11 +24,8 @@
 namespace mod_perform\models\activity\helpers;
 
 use coding_exception;
-use core\entities\user;
 use core\orm\entity\entity;
 use core\orm\entity\repository;
-use core\orm\query\builder;
-use core\orm\query\field;
 use mod_perform\entities\activity\manual_relationship_selection;
 use mod_perform\entities\activity\manual_relationship_selection_progress;
 use mod_perform\entities\activity\manual_relationship_selection_progress_repository;

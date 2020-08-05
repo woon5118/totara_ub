@@ -22,7 +22,6 @@
  */
 
 use core\hook\admin_setting_changed;
-use criteria_coursecompletion\watcher\totara_core;
 use totara_competency\entities\pathway as pathway_entity;
 use totara_core\advanced_feature;
 

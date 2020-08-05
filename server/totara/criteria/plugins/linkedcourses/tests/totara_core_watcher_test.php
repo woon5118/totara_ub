@@ -21,14 +21,10 @@
  * @package criteria_linkedcourses
  */
 
-
-use core\event\admin_settings_changed;
 use core\hook\admin_setting_changed;
 use totara_competency\linked_courses;
 use totara_core\advanced_feature;
 use totara_criteria\entities\criterion as criterion_entity;
-use totara_criteria\hook\criteria_validity_changed;
-
 
 class criteria_linkedcourses_totara_core_watcher_testcase extends advanced_testcase {
 

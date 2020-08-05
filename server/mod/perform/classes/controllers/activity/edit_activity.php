@@ -26,7 +26,6 @@ namespace mod_perform\controllers\activity;
 use context;
 use mod_perform\controllers\perform_controller;
 use mod_perform\controllers\requires_activity;
-use mod_perform\models\activity\activity;
 use moodle_url;
 use totara_mvc\tui_view;
 

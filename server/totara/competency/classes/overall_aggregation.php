@@ -26,7 +26,6 @@ namespace totara_competency;
 use core\orm\collection;
 use totara_competency\entities\pathway_achievement;
 use totara_competency\entities\scale_value;
-use totara_competency\userdata\achievement;
 
 abstract class overall_aggregation {
 

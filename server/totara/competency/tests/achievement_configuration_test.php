@@ -25,7 +25,6 @@ use criteria_coursecompletion\coursecompletion;
 use pathway_manual\models\roles\manager as manager_role;
 use pathway_manual\models\roles\self_role;
 use totara_competency\achievement_configuration;
-use totara_competency\achievement_criteria;
 use totara_competency\entities\competency;
 use totara_competency\entities\configuration_change;
 use totara_criteria\criterion;

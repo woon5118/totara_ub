@@ -24,7 +24,6 @@
 namespace mod_perform\task\service;
 
 use coding_exception;
-use core\collection;
 use core\orm\lazy_collection;
 use core\orm\query\builder;
 use core\orm\query\subquery;
@@ -38,7 +37,6 @@ use mod_perform\hook\subject_instances_created;
 use mod_perform\state\subject_instance\active;
 use mod_perform\state\subject_instance\complete;
 use mod_perform\state\subject_instance\pending;
-use stdClass;
 use totara_core\entities\relationship;
 
 /**

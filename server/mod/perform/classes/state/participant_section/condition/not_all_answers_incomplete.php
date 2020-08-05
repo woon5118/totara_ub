@@ -23,7 +23,6 @@
 
 namespace mod_perform\state\participant_section\condition;
 
-use mod_perform\models\response\section_element_response;
 use mod_perform\state\condition;
 
 defined('MOODLE_INTERNAL') || die();

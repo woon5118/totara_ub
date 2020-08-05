@@ -25,6 +25,7 @@ namespace mod_perform\data_providers\response;
 
 use coding_exception;
 use core\collection;
+use mod_perform\entities\activity\activity;
 use mod_perform\entities\activity\element_response as element_response_entity;
 use mod_perform\entities\activity\participant_instance;
 use mod_perform\entities\activity\participant_instance as participant_instance_entity;
@@ -418,7 +419,7 @@ class participant_section_with_responses {
     protected function is_anonymous_responses(?participant_section_entity $participant_section_entity): bool {
         if ($participant_section_entity) {
             /**
-             * @var activity_entity
+             * @var activity
              */
             $activity = $participant_section_entity->section->activity;
 

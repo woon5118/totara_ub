@@ -26,7 +26,6 @@ namespace pathway_manual\data_providers;
 use core\orm\collection;
 use core\orm\entity\repository;
 use core\orm\query\field;
-use core\orm\query\raw_field;
 use pathway_manual\entities\role;
 use pathway_manual\manual;
 use pathway_manual\models\roles\role_factory;

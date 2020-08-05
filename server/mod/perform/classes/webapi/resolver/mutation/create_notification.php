@@ -32,7 +32,6 @@ use mod_perform\models\activity\activity;
 use mod_perform\webapi\middleware\require_activity;
 use mod_perform\webapi\middleware\require_manage_capability;
 
-use mod_perform\models\activity\activity as activity_model;
 use mod_perform\models\activity\notification as notification_model;
 
 /**

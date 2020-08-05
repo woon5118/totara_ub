@@ -25,7 +25,6 @@
 
 namespace totara_criteria\webapi\resolver\query;
 
-use context_user;
 use core\entities\user;
 use core\orm\collection;
 use core\webapi\execution_context;

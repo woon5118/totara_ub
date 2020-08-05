@@ -30,7 +30,7 @@ use totara_criteria\competency_item_helper;
 class competency {
 
     /**
-     * @param pathways_created|pathways_updated|pathways_deleted $hook
+     * @param competency_configuration_changed $hook
      * @throws \coding_exception
      */
     public static function configuration_changed(competency_configuration_changed $hook) {

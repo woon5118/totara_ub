@@ -26,6 +26,7 @@ use totara_competency\hook\competency_achievement_updated_bulk;
 use totara_competency\hook\competency_configuration_changed;
 use criteria_othercompetency\watcher\competency as competency_wathcer;
 use totara_competency\entities\competency as competency_entity;
+use totara_competency\models\scale;
 use totara_criteria\entities\criterion as criterion_entity;
 use totara_criteria\entities\criterion_item as item_entity;
 use totara_criteria\hook\criteria_achievement_changed;

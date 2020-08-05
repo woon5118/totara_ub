@@ -24,11 +24,7 @@
 namespace degeneration\items\pathways;
 
 
-use degeneration\App;
-use degeneration\Cache;
-use degeneration\items\competency;
 use degeneration\items\criteria\criterion;
-use degeneration\items\item;
 
 /**
  * Class criterion

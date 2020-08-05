@@ -29,7 +29,7 @@ use totara_core\advanced_feature;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**
- * @coversDefaultClass default_track
+ * @coversDefaultClass \mod_perform\webapi\resolver\query\default_track
  *
  * @group perform
  */

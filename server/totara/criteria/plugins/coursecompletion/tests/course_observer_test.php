@@ -29,6 +29,7 @@ use totara_core\event\course_completion_reset;
 use totara_criteria\entities\criteria_item as item_entity;
 use totara_criteria\entities\criteria_item_record as item_record_entity;
 use totara_criteria\entities\criterion as criterion_entity;
+use totara_criteria\entities\criterion_item;
 use totara_criteria\hook\criteria_achievement_changed;
 use totara_criteria\hook\criteria_validity_changed;
 

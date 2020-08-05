@@ -23,7 +23,6 @@
 
 use core\orm\entity\entity;
 use pathway_manual\entities\pathway_manual;
-use pathway_manual\manual;
 use pathway_manual\models\roles\self_role;
 use totara_competency\entities\pathway;
 

@@ -24,9 +24,7 @@
 namespace pathway_manual\userdata;
 
 use core\orm\entity\repository;
-use core\orm\query\builder;
 use pathway_manual\entities\rating;
-use pathway_manual\entities\rating_purge_log;
 use totara_userdata\userdata\target_user;
 
 defined('MOODLE_INTERNAL') || die();

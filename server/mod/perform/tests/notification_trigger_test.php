@@ -22,8 +22,6 @@
  * @category test
  */
 
-use mod_perform\notification\exceptions\class_key_not_available;
-use mod_perform\notification\cartel;
 use mod_perform\notification\trigger;
 
 require_once(__DIR__ . '/notification_testcase.php');

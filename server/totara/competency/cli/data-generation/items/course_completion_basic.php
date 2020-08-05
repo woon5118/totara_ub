@@ -23,10 +23,6 @@
 
 namespace degeneration\items;
 
-use core\orm\query\builder;
-use degeneration\App;
-use totara_competency\entities\course as course_entity;
-
 class course_completion_basic extends course_completion {
 
     /**

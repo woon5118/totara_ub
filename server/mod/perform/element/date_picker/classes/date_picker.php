@@ -23,7 +23,6 @@
 
 namespace performelement_date_picker;
 
-use mod_perform\models\activity\element;
 use mod_perform\models\activity\respondable_element_plugin;
 
 class date_picker extends respondable_element_plugin {

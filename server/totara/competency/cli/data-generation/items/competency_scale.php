@@ -23,11 +23,8 @@
 
 namespace degeneration\items;
 
-use core\entities\cohort;
-use core\orm\query\builder;
 use degeneration\App;
 use degeneration\Cache;
-use totara_competency\entities\course as course_entity;
 use totara_competency\entities\scale;
 use totara_competency\entities\scale_value;
 

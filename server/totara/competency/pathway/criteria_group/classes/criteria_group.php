@@ -30,7 +30,6 @@ use core\orm\query\builder;
 use \core\orm\entity\repository;
 use pathway_criteria_group\entities\criteria_group as criteria_group_entity;
 use pathway_criteria_group\entities\criteria_group_criterion as criteria_group_criterion_entity;
-use pathway_criteria_group\validators\criteria_group_validator;
 use stdClass;
 use totara_competency\base_achievement_detail;
 use totara_competency\entities\pathway as pathway_entity;

@@ -27,7 +27,6 @@ namespace criteria_childcompetency\observer;
 use totara_competency\event\assignment_user_archived;
 use totara_competency\event\assignment_user_assigned;
 use totara_competency\event\assignment_user_unassigned;
-use totara_criteria\entities\criteria_item as item_entity;
 use totara_criteria\entities\criterion as criterion_entity;
 use totara_criteria\hook\criteria_achievement_changed;
 

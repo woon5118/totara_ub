@@ -20,13 +20,12 @@
  * @author Jaron Steenson <jaron.steenson@totaralearning.com>
  * @package mod_perform
  */
-use core\collection;
+
 use core\entities\user;
 use core\orm\query\builder;
 use mod_perform\models\activity\activity;
 use mod_perform\webapi\resolver\query\participant_manageable_activities;
 use totara_core\advanced_feature;
-use totara_job\job_assignment;
 use totara_webapi\phpunit\webapi_phpunit_helper;
 
 /**

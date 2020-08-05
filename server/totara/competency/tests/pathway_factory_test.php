@@ -22,7 +22,6 @@
  */
 
 use totara_competency\pathway_factory;
-use totara_competency\plugin_types;
 use totara_criteria\criterion;
 
 class totara_competency_pathway_factory_testcase extends \advanced_testcase {

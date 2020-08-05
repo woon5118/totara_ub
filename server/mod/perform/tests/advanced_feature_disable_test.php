@@ -27,7 +27,6 @@ use core\webapi\query_resolver;
 use mod_perform\controllers\activity\view_user_activity;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\entities\activity\subject_instance;
-use mod_perform\entities\activity\track as track_entity;
 use totara_core\advanced_feature;
 use totara_core\feature_not_available_exception;
 use totara_mvc\admin_controller;

@@ -21,7 +21,6 @@
  * @package performelement_multi_choice_multi
  */
 
-use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ExpectationException;
 
 class behat_performelement_multi_choice_multi extends behat_base {

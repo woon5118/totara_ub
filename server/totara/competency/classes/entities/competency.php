@@ -29,7 +29,6 @@ use core\orm\entity\relations\has_many;
 use core\orm\entity\relations\has_one;
 use core\orm\entity\relations\has_one_through;
 use core\orm\query\builder;
-use totara_competency\achievement_configuration;
 use totara_competency\user_groups;
 use totara_hierarchy\entities\hierarchy_item;
 

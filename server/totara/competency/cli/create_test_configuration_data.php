@@ -1,8 +1,7 @@
 <?php
 
-use criteria_linkedcourses\metadata_processor;
-use totara_competency\achievement_configuration;
 use totara_competency\linked_courses;
+
 /**
  * This file is part of Totara Learn
  *

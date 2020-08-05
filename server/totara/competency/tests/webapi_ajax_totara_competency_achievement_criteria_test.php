@@ -25,7 +25,6 @@ use pathway_manual\models\roles\manager;
 use totara_criteria\criterion;
 use \totara_webapi\graphql;
 use core\webapi\execution_context;
-use pathway_manual\manual;
 
 class totara_competency_webapi_ajax_totara_competency_achievement_criteria_testcase extends advanced_testcase {
 

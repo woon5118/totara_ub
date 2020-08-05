@@ -35,7 +35,7 @@ class test_pathway_evaluator extends pathway_evaluator {
      * Constructor.
      *
      * @param pathway $pathway
-     * @param pathway_user_source $user_source
+     * @param pathway_evaluator_user_source $user_id_source
      */
     public function __construct(pathway $pathway, pathway_evaluator_user_source $user_id_source) {
         $test_user_source = $this->get_test_user_source($user_id_source);
@@ -45,7 +45,7 @@ class test_pathway_evaluator extends pathway_evaluator {
     /**
      * Instantiate and return a test_user_source using the same user_id_source as the pathway
      * @param pathway_evaluator_user_source $user_id_source
-     * @return manual_user_source
+     * @return pathway_evaluator_user_source
      */
     private function get_test_user_source(pathway_evaluator_user_source $user_id_source): pathway_evaluator_user_source {
         return new \pathway_test_pathway\test_pathway_evaluator_user_source($user_id_source->get_source(), $user_id_source->is_full_user_set());

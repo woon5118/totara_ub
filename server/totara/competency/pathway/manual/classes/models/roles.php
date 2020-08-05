@@ -24,7 +24,6 @@
 namespace pathway_manual\models;
 
 use core\collection;
-use core\orm\query\builder;
 use core\orm\query\field;
 use pathway_manual\entities\role as role_entity;
 use pathway_manual\models\roles\role;

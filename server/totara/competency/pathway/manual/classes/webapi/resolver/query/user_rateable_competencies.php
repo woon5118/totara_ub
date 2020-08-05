@@ -23,12 +23,9 @@
 
 namespace pathway_manual\webapi\resolver\query;
 
-use context_user;
-use core\entities\user;
 use core\webapi\execution_context;
 use core\webapi\query_resolver;
 use pathway_manual\data_providers\user_rateable_competencies as user_rateable_competencies_provider;
-use pathway_manual\models\roles\role;
 use pathway_manual\models\roles\role_factory;
 use pathway_manual\models\user_competencies;
 

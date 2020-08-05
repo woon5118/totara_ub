@@ -24,7 +24,6 @@
 namespace degeneration\items;
 
 use totara_competency\entities\assignment as assignment_entity;
-use totara_competency\entities\competency as competency_entity;
 use degeneration\App;
 use totara_competency\user_groups;
 

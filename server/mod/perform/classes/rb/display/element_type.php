@@ -23,9 +23,7 @@
 
 namespace mod_perform\rb\display;
 
-use mod_perform\models\activity\activity;
 use mod_perform\models\activity\element_plugin;
-use mod_perform\util;
 use totara_reportbuilder\rb\display\base;
 
 class element_type extends base {

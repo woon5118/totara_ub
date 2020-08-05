@@ -23,7 +23,6 @@
  */
 
 use core\orm\query\builder;
-use pathway_manual\manual;
 use pathway_manual\models\roles\self_role;
 use totara_competency\entities\achievement_via;
 use totara_competency\entities\competency_achievement;
