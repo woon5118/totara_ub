@@ -165,7 +165,7 @@
                     !sectionElement.element.is_required &&
                       sectionElement.is_respondable
                   "
-                  class="tui-participantContent__response-optional"
+                  class="tui-participantContent__section-response-optional"
                 >
                   ({{
                     $str('section_element_response_optional', 'mod_perform')

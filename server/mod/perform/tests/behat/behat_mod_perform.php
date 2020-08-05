@@ -41,6 +41,8 @@ class behat_mod_perform extends behat_base {
     public const PERFORM_ELEMENT_VALIDATION_ERROR_LOCATOR = '.tui-formFieldError';
     public const PERFORM_ELEMENT_LOCATOR = '.tui-participantContent__sectionItem';
     public const PERFORM_ELEMENT_QUESTION_TEXT_LOCATOR = '.tui-participantContent__sectionItem-contentHeader';
+    public const PERFORM_ELEMENT_QUESTION_OPTIONAL_LOCATOR = '.tui-participantContent__section-response-optional';
+    public const PERFORM_ELEMENT_QUESTION_REQUIRED_LOCATOR = '.tui-participantContent__section-response-required';
     public const SHORT_TEXT_RESPONSE_LOCATOR = 'input';
     public const MULTI_CHOICE_RESPONSE_LOCATOR = 'radio';
     public const PERFORM_ELEMENT_OTHER_RESPONSE_CONTAINER_LOCATOR = '.tui-otherParticipantResponses';
@@ -706,7 +708,7 @@ class behat_mod_perform extends behat_base {
             if ($found_question === null) {
                 continue;
             }
-            $actual_title = trim(str_replace(['(optional)', '*'],['',''], $found_question->getText()));
+            $actual_title = trim(str_replace(['(optional)', '*'], ['', ''], $found_question->getText()));
             if ($actual_title === $question_text) {
                 return $question;
             }
@@ -739,11 +741,19 @@ class behat_mod_perform extends behat_base {
         foreach ($questions as $question) {
             $found_question = $question->find('css', self::PERFORM_ELEMENT_QUESTION_TEXT_LOCATOR);
 
-            if ($found_question === null) {
-                continue;
-            }
-            $actual_text = $is_required ? $question_text.' *' : $question_text.' (optional)';
-            if (trim($found_question->getText()) === $actual_text) {
+            if ($found_question !== null && trim($found_question->getText()) === $question_text) {
+                if ($is_required) {
+                    $required_found = $found_question->getParent()->find('css', self::PERFORM_ELEMENT_QUESTION_REQUIRED_LOCATOR);
+                    if ($required_found === null) {
+                        $this->fail('Found question but it is not required.');
+                    }
+                } else {
+                    $required_found = $found_question->getParent()->find('css', self::PERFORM_ELEMENT_QUESTION_OPTIONAL_LOCATOR);
+                    if ($required_found === null) {
+                        $this->fail('Found question but it is not optional.');
+                    }
+                }
+
                 return $question;
             }
         }
