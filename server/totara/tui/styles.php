@@ -89,7 +89,7 @@ if (file_exists("{$CFG->dirroot}/theme/{$themename}/config.php")) {
 }
 
 if ($rev !== -1) {
-    $cachefile = get_cachefile($rev, $themename, $component, $suffix);
+    $cachefile = get_cachefile($rev, $themename, $component, $suffix, $option_rtl);
     $etag = get_etag($rev, $themename, $component, $suffix, $option_rtl);
     if (file_exists($cachefile)) {
         if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) || !empty($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
@@ -123,7 +123,7 @@ if (core_useragent::is_ie()) {
 $etag = get_etag($rev, $themename, $component, $suffix, $option_rtl);
 make_localcache_directory('totara_tui', false);
 // Recalculate cachefile, even if we already have it, as rev may have changed.
-$cachefile = get_cachefile($rev, $themename, $component, $suffix);
+$cachefile = get_cachefile($rev, $themename, $component, $suffix, $option_rtl);
 
 if ($rev === -1) {
     $cache = \cache::make_from_params(cache_store::MODE_APPLICATION, 'totara_tui', 'scss_cache');
@@ -243,16 +243,18 @@ function get_etag($rev, $themename, $component, $suffix, $option_rtl) {
  * @param string $themename
  * @param string $component
  * @param string $suffix
+ * @param bool $option_rtl
  * @return string
  */
-function get_cachefile($rev, $themename, $component, $suffix) {
+function get_cachefile(string $rev, string $themename, string $component, string $suffix, bool $option_rtl = false) {
     global $CFG;
-    $cachefile = join('-', [
+    $cachefile = join('/', [
         $CFG->localcachedir,
         'totara_tui',
         $rev,
         $themename,
-        "{$component}{$suffix}.css"
+        ($option_rtl) ? 'rtl' : 'ltr',
+        "{$component}-{$suffix}.css"
     ]);
     return $cachefile;
 }
