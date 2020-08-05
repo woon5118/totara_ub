@@ -192,42 +192,41 @@ class notification_recipient {
      */
     public static function load_by_notification(notification $parent, bool $active_only = false): collection {
         $notify_id = $parent->id;
-        $activity_id = $parent->activity->id;
-        return builder::table(relationship_entity::TABLE, 'r')
-            ->join([relationship_resolver_entity::TABLE, 'rr'], 'r.id', '=', 'rr.relationship_id')
-            ->join([section_relationship_entity::TABLE, 'sr'], 'r.id', '=', 'sr.core_relationship_id')
-            ->join([section_entity::TABLE, 's'], 's.id', '=', 'sr.section_id')
-            ->left_join([notification_recipient_entity::TABLE, 'nr'], function (builder $joining) use ($notify_id) {
-                $joining->where_field('r.id', '=', 'nr.core_relationship_id');
-                if ($notify_id !== null) {
-                    $joining->where('nr.notification_id', $notify_id);
-                } else {
-                    $joining->where_raw('1 != 1');
-                }
-            })
-            ->where('s.activity_id', $activity_id)
-            ->select([
-                'r.id as relationship_id',
-                'nr.id as recipient_id',
-                'rr.class_name as resolver_class',
-                'nr.active as active'
-            ])
-            ->where(function (builder $builder) use ($active_only) {
-                if ($active_only) {
-                    $builder->where('nr.active', '<>', 0);
-                }
-            })
-            ->group_by([
-                'r.id',
-                'nr.id',
-                'rr.class_name',
-                'nr.active'
-            ])
-            ->order_by('r.sort_order')
+        $params = ['activity_id' => $parent->activity->id];
+        $notification_id_part = ' AND 1 != 1';
+        if ($notify_id !== null) {
+            $notification_id_part = ' AND nr.notification_id = :notification_id';
+            $params['notification_id'] = $notify_id;
+        }
+        $active_only_part = $active_only ? 'AND nr.active <> 0' : '';
+
+        $sql = "
+            SELECT 
+                r.id as relationship_id,
+                nr.id as recipient_id,
+                nr.active as active,
+                r.sort_order
+            FROM {perform_section} s 
+            JOIN {perform_section_relationship} sr ON s.id = sr.section_id
+            JOIN {totara_core_relationship} r ON sr.core_relationship_id = r.id 
+            LEFT JOIN {perform_notification_recipient} nr ON sr.core_relationship_id = nr.core_relationship_id
+                {$notification_id_part}
+            WHERE s.activity_id = :activity_id
+                {$active_only_part}
+            GROUP BY
+                r.id,
+                nr.id,
+                nr.active,
+                r.sort_order
+            ORDER BY r.sort_order
+        ";
+
+        $records = builder::get_db()->get_records_sql($sql, $params);
+
+        return collection::new($records)
             ->map_to(function ($source) use ($notify_id) {
                 $source->notification_id = $notify_id;
                 return new self($source);
-            })
-            ->get();
+            });
     }
 }
