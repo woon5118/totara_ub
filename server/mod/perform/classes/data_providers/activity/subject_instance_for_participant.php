@@ -26,15 +26,16 @@ namespace mod_perform\data_providers\activity;
 use core\collection;
 use core\orm\entity\repository;
 use core\orm\query\builder;
+use mod_perform\data_providers\provider;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\entities\activity\filters\subject_instance_id;
 use mod_perform\entities\activity\filters\subject_instances_about;
 use mod_perform\entities\activity\participant_instance;
 use mod_perform\entities\activity\subject_instance;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
+use mod_perform\entities\activity\subject_instance_repository;
 use mod_perform\entities\activity\track as track_entity;
 use mod_perform\entities\activity\track_user_assignment as track_user_assignment_entity;
-use mod_perform\models\activity\participant_source;
 use mod_perform\models\activity\subject_instance as subject_instance_model;
 use mod_perform\models\response\subject_sections;
 use mod_perform\state\subject_instance\active;
@@ -43,20 +44,18 @@ use mod_perform\state\subject_instance\active;
  * Class subject_instance
  *
  * @package mod_perform\data_providers\activity
+ *
+ * @method collection|subject_instance_model[] get
  */
-class subject_instance_for_participant {
+class subject_instance_for_participant extends provider {
 
-    /** @var int */
+    /**
+     * @var int
+     */
     protected $participant_id;
-
-    /** @var collection */
-    protected $items = null;
 
     /** @var int */
     protected $participant_source;
-
-    /** @var array */
-    private $filters = [];
 
     /**
      * @param int $participant_id The id of the user we would like to get activities that they are participating in.
@@ -68,48 +67,45 @@ class subject_instance_for_participant {
     }
 
     /**
-     * Set filter for who the activities are about (who is the subject).
-     *
-     * @param array $about
-     * @return $this
-     * @see subject_instances_about::VALUE_ABOUT_SELF
-     * @see subject_instances_about::VALUE_ABOUT_OTHERS
+     * @param subject_instance_repository|repository $repository
+     * @param string|string[] $about Subject instance about constant(s)
      */
-    public function set_about_filter(array $about): self {
-        $this->filters[] = (new subject_instances_about($this->participant_id, 'si'))->set_value($about);
+    protected function filter_query_by_about(repository $repository, $about): void {
+        if (!is_array($about)) {
+            $about = [$about];
+        }
 
-        return $this;
-    }
-
-    public function set_subject_instance_id_filter(int ...$subject_instance_ids): self {
-        $this->filters[] = (new subject_instance_id('si'))->set_value($subject_instance_ids);
-
-        return $this;
+        $repository->set_filter(
+            (new subject_instances_about($this->participant_id, 'si'))->set_value($about)
+        );
     }
 
     /**
-     * Fetch subject instances that from the database.
-     *
-     * @return $this
+     * @param subject_instance_repository|repository $repository
+     * @param int|array $subject_instance_ids Subject instance ID(s)
      */
-    public function fetch(): self {
-        $this->fetch_subject_instances();
+    protected function filter_query_by_subject_instance_id(repository $repository, $subject_instance_ids): void {
+        if (!is_array($subject_instance_ids)) {
+            $subject_instance_ids = [$subject_instance_ids];
+        }
 
-        return $this;
+        $repository->set_filter(
+            (new subject_instance_id('si'))->set_value($subject_instance_ids)
+        );
     }
 
     /**
-     * Fetch user activities that can be managed by the logged in user.
+     * Build query for user activities that can be managed by the logged in user.
      *
-     * @return $this
+     * @return subject_instance_repository
      */
-    protected function fetch_subject_instances(): self {
+    protected function build_query(): repository {
         global $CFG;
         require_once($CFG->dirroot . "/totara/coursecatalog/lib.php");
 
         [$totara_visibility_sql, $totara_visibility_params] = totara_visibility_where();
 
-        $repo = subject_instance_entity::repository()
+        return subject_instance_entity::repository()
             ->as('si')
             ->with('subject_user')
             ->with('track.activity.settings')
@@ -132,27 +128,15 @@ class subject_instance_for_participant {
             ->order_by('si.created_at', 'desc')
             // Order by id as well is so that tests wont fail if two rows are inserted within the same second
             ->order_by('si.id', 'desc');
-
-        $repo->set_filters($this->filters);
-
-        $subject_instance_entities = $repo->get();
-
-        $this->items = $subject_instance_entities->map_to(subject_instance_model::class);
-
-        return $this;
     }
 
     /**
-     * get items for the model
+     * Map the subject instance entities to their respective model class.
      *
      * @return collection|subject_instance_model[]
      */
-    public function get(): collection {
-        if (is_null($this->items)) {
-            $this->fetch();
-        }
-
-        return $this->items;
+    protected function process_fetched_items(): collection {
+        return $this->items->map_to(subject_instance_model::class);
     }
 
     private function get_target_participant_exists(): builder {
@@ -174,4 +158,18 @@ class subject_instance_for_participant {
         $subject_instances = $this->get();
         return subject_sections::create_from_subject_instances($subject_instances);
     }
+
+    /**
+     * Get a single subject instance, and only return it if the specified user is allowed to view it.
+     *
+     * @param int $subject_instance_id
+     * @return subject_instance_model
+     */
+    public function get_subject_instance(int $subject_instance_id): ?subject_instance_model {
+        return $this
+            ->add_filters(['subject_instance_id' => $subject_instance_id])
+            ->get()
+            ->first();
+    }
+
 }

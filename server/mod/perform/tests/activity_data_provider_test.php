@@ -26,7 +26,7 @@
  */
 
 use core\orm\query\builder;
-use  mod_perform\data_providers\activity\activity;
+use mod_perform\data_providers\activity\activity;
 use mod_perform\models\activity\activity as activity_model;
 
 class mod_perform_activity_data_provider_testcase extends advanced_testcase {
@@ -37,7 +37,7 @@ class mod_perform_activity_data_provider_testcase extends advanced_testcase {
         $data = $this->create_test_data();
 
         $data_provider = new activity();
-        $performs = $data_provider->fetch()->get();
+        $performs = $data_provider->fetch()->get()->all();
 
         $this->assertCount(2, $performs);
         $this->assertEqualsCanonicalizing(
@@ -67,7 +67,7 @@ class mod_perform_activity_data_provider_testcase extends advanced_testcase {
             ]);
 
         $data_provider = new activity();
-        $performs = $data_provider->fetch()->get();
+        $performs = $data_provider->fetch()->get()->all();
 
         $this->assertCount(1, $performs);
         $this->assertEqualsCanonicalizing(
@@ -92,12 +92,12 @@ class mod_perform_activity_data_provider_testcase extends advanced_testcase {
         $this->setUser($user2);
         $activity_user2_1 = $perform_generator->create_activity_in_container(['activity_name' => 'User2 One']);
 
-        $activities = $data_provider->fetch()->get();
+        $activities = $data_provider->fetch()->get()->all();
         $this->assertCount(1, $activities);
         $this->assertEquals('User2 One', $activities[0]->name);
 
         $this->setUser($user1);
-        $activities = $data_provider->fetch()->get();
+        $activities = $data_provider->fetch()->get()->all();
         $this->assertCount(2, $activities);
         $this->assertEqualsCanonicalizing(
             ['User1 One', 'User1 Two'],

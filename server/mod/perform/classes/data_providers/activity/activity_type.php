@@ -24,43 +24,33 @@
 namespace mod_perform\data_providers\activity;
 
 use core\collection;
-
+use core\orm\entity\repository;
+use mod_perform\data_providers\provider;
 use mod_perform\entities\activity\activity_type as activity_type_entity;
 use mod_perform\models\activity\activity_type as activity_type_model;
 
 /**
  * Handles sets of performance activity types.
+ *
+ * @method collection|activity_type_model[] get
  */
-class activity_type {
-    /**
-     * @var collection
-     */
-    private $items = null;
+class activity_type extends provider {
 
     /**
-     * Returns the activity types.
-     *
-     * @return collection|activity_type_model[] the list of activity types.
+     * @inheritDoc
      */
-    public function get(): collection {
-        if (is_null($this->items)) {
-            $this->fetch();
-        }
-
-        return $this->items;
+    protected function build_query(): repository {
+        return activity_type_entity::repository()
+            ->order_by('id');
     }
 
     /**
-     * Fetches activity types from the database and sorts it by id.
+     * Map the activity type entities to their respective model class.
      *
-     * @return activity_type this object.
+     * @return collection|activity_type_model[]
      */
-    public function fetch(): activity_type {
-        $this->items = activity_type_entity::repository()
-            ->order_by('id')
-            ->get()
-            ->map_to(activity_type_model::class);
-
-        return $this;
+    protected function process_fetched_items(): collection {
+        return $this->items->map_to(activity_type_model::class);
     }
+
 }

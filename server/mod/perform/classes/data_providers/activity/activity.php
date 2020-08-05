@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
  * Copyright (C) 2020 onwards Totara Learning Solutions LTD
@@ -23,55 +23,40 @@
 
 namespace mod_perform\data_providers\activity;
 
-use core\orm\collection;
+use core\collection;
+use core\orm\entity\repository;
+use mod_perform\data_providers\provider;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\models\activity\activity as activity_model;
 
-class activity {
+/**
+ * Class activity.
+ *
+ * @package mod_perform\data_providers\activity
+ *
+ * @method collection|activity_model[] get
+ */
+class activity extends provider {
 
     /**
-     * @var collection
+     * @inheritDoc
      */
-    protected $items;
-
-    /**
-     * Fetch activities from the database
-     *
-     * @return $this
-     */
-    public function fetch() {
-        $this->fetch_activities();
-
-        return $this;
-    }
-
-    /**
-     * Fetch activities that can be managed by the logged in user.
-     *
-     * @return $this
-     */
-    protected function fetch_activities() {
-        $repo = activity_entity::repository()
+    protected function build_query(): repository {
+        return activity_entity::repository()
             ->filter_by_visible()
             ->order_by('id');
-        $entities = $repo->get();
-        $this->items = [];
-
-        foreach ($entities as $entity) {
-            $item = activity_model::load_by_entity($entity);
-            if ($item->can_manage() || $item->can_view_participation_reporting()) {
-                $this->items[] = $item;
-            }
-        }
-        return $this;
     }
 
     /**
-     * get items for the model
+     * Restrict the returned activities to what the current user is allowed to view.
      *
-     * @return collection
+     * @return collection|activity_model[]
      */
-    public function get() {
-        return $this->items;
+    protected function process_fetched_items(): collection {
+        return $this->items
+            ->map_to(activity_model::class)
+            ->filter(static function (activity_model $activity) {
+                return $activity->can_manage() || $activity->can_view_participation_reporting();
+            });
     }
 }

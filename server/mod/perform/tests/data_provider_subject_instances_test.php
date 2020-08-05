@@ -87,7 +87,7 @@ class mod_perform_data_provider_subject_instances_testcase extends mod_perform_s
         $query_activity = $get_query_activity();
 
         $returned_subject_instances = (new subject_instance_for_participant(self::$user->id, participant_source::INTERNAL))
-            ->set_subject_instance_id_filter($query_activity->get_id())
+            ->add_filters(['subject_instance_id' => $query_activity->get_id()])
             ->fetch()
             ->get();
 
@@ -101,7 +101,7 @@ class mod_perform_data_provider_subject_instances_testcase extends mod_perform_s
 
     public function test_get_only_about_user(): void {
         $returned_subject_instances = (new subject_instance_for_participant(self::$user->id, participant_source::INTERNAL))
-            ->set_about_filter([subject_instances_about::VALUE_ABOUT_SELF])
+            ->add_filters(['about' => [subject_instances_about::VALUE_ABOUT_SELF]])
             ->fetch()
             ->get();
 
@@ -112,7 +112,7 @@ class mod_perform_data_provider_subject_instances_testcase extends mod_perform_s
 
     public function test_get_subject_instances_only_about_other_users(): void {
         $returned_subject_instances = (new subject_instance_for_participant(self::$user->id, participant_source::INTERNAL))
-            ->set_about_filter([subject_instances_about::VALUE_ABOUT_OTHERS])
+            ->add_filters(['about' => [subject_instances_about::VALUE_ABOUT_OTHERS]])
             ->fetch()
             ->get();
 
@@ -123,7 +123,9 @@ class mod_perform_data_provider_subject_instances_testcase extends mod_perform_s
 
     public function test_get_user_about_self_and_others_via_all_filter_options(): void {
         $returned_subject_instances = (new subject_instance_for_participant(self::$user->id, participant_source::INTERNAL))
-            ->set_about_filter([subject_instances_about::VALUE_ABOUT_SELF, subject_instances_about::VALUE_ABOUT_OTHERS])
+            ->add_filters(['about' =>
+                [subject_instances_about::VALUE_ABOUT_SELF, subject_instances_about::VALUE_ABOUT_OTHERS]
+            ])
             ->fetch()
             ->get();
 
@@ -143,7 +145,7 @@ class mod_perform_data_provider_subject_instances_testcase extends mod_perform_s
      */
     public function test_attaches_all_participant_instance(): void {
         $returned_subject_instances = (new subject_instance_for_participant(self::$user->id, participant_source::INTERNAL))
-            ->set_about_filter([subject_instances_about::VALUE_ABOUT_SELF])
+            ->add_filters(['about' => [subject_instances_about::VALUE_ABOUT_SELF]])
             ->fetch()
             ->get();
 

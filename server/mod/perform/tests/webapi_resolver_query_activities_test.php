@@ -20,6 +20,7 @@
  * @author Samantha Jayasinghe <samantha.jayasinghe@totaralearning.com>
  * @package mod_perform
  */
+
 use core\collection;
 use mod_perform\webapi\resolver\query\activities;
 use totara_core\advanced_feature;
@@ -39,9 +40,9 @@ class mod_perform_webapi_resolver_query_activities_testcase extends advanced_tes
         $names = ['Mid year performance', 'End year performance'];
         $this->create_test_data($names);
 
-        /** @var mod_perform\models\activity\activity[] $activities */
+        /** @var collection|mod_perform\models\activity\activity[] $activities */
         $result = $this->resolve_graphql_query(self::QUERY);
-        $activities = collection::new($result)->pluck('name');
+        $activities = $result->pluck('name');
 
         $this->assertCount(count($names), $activities);
         $this->assertEqualsCanonicalizing($names, $activities);

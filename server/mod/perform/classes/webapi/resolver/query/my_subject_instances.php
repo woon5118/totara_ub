@@ -40,11 +40,8 @@ class my_subject_instances implements query_resolver, has_middleware {
     public static function resolve(array $args, execution_context $ec) {
         $participant_id = user::logged_in()->id;
 
-        $filters = $args['filters'] ?? [];
-        $about_filter = $filters['about'] ?? [];
-
         $subject_sections = (new subject_instance_data_provider($participant_id, participant_source::INTERNAL))
-            ->set_about_filter($about_filter)
+            ->add_filters($args['filters'] ?? [])
             ->get_subject_sections();
 
         // This is a workaround for making sure the correct access control checks

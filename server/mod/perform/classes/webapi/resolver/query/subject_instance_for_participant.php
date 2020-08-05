@@ -60,12 +60,8 @@ class subject_instance_for_participant implements query_resolver, has_middleware
             return new subject_instance_model($subject_instance_entity);
         }
 
-        /** @var subject_instance_model $subject_instance */
         return (new subject_instance_data_provider($participant_id, participant_source::INTERNAL))
-            ->set_subject_instance_id_filter($subject_instance_id)
-            ->fetch()
-            ->get()
-            ->first();
+            ->get_subject_instance($subject_instance_id);
     }
 
     /**
