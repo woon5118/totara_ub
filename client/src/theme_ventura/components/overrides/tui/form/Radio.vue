@@ -62,6 +62,11 @@
           var(--tui-transition-form-duration);
       content: '';
       pointer-events: none;
+
+      .tui-context-invalid & {
+        border-color: var(--tui-form-input-border-color-invalid);
+        box-shadow: var(--tui-shadow-none), var(--tui-form-input-shadow-invalid);
+      }
     }
   }
 
@@ -81,7 +86,13 @@
   &__input:focus ~ &__label::before {
     border: var(--tui-form-input-border-size) solid;
     border-color: var(--tui-form-radio-border-color-focus);
-    box-shadow: var(--tui-shadow-1);
+    box-shadow: var(--tui-form-input-shadow-focus);
+
+    .tui-context-invalid & {
+      border-color: var(--tui-form-input-border-color-invalid);
+      box-shadow: var(--tui-shadow-none),
+        var(--tui-form-input-shadow-invalid-focus);
+    }
   }
 
   &__input:active:focus ~ &__label::before,
@@ -90,7 +101,13 @@
     background: var(--tui-form-radio-bg-color-active);
     border: var(--tui-form-input-border-size) solid;
     border-color: var(--tui-form-radio-border-color-active);
-    box-shadow: var(--tui-shadow-1);
+    box-shadow: var(--tui-form-input-shadow-focus);
+
+    .tui-context-invalid & {
+      border-color: var(--tui-form-input-border-color-invalid);
+      box-shadow: var(--tui-shadow-none),
+        var(--tui-form-input-shadow-invalid-focus);
+    }
   }
 
   &__input:disabled:active ~ &__label::before,

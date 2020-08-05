@@ -19,7 +19,6 @@
 <template>
   <div v-if="error" class="tui-formFieldError">
     <div class="tui-formFieldError__inner">
-      <ErrorIcon custom-class="tui-formFieldError__icon" />
       {{ error }}
 
       <ButtonIcon
@@ -41,13 +40,11 @@
 <script>
 import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 import CloseIcon from 'tui/components/icons/common/Close';
-import ErrorIcon from 'tui/components/icons/common/Error';
 
 export default {
   components: {
     ButtonIcon,
     CloseIcon,
-    ErrorIcon,
   },
 
   props: {

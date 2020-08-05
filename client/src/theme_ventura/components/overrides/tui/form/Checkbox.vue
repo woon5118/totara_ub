@@ -79,6 +79,11 @@
         width: var(--tui-form-checkbox-size-large);
         height: var(--tui-form-checkbox-size-large);
       }
+
+      .tui-context-invalid & {
+        border-color: var(--tui-form-input-border-color-invalid);
+        box-shadow: var(--tui-shadow-none), var(--tui-form-input-shadow-invalid);
+      }
     }
   }
 
@@ -87,17 +92,21 @@
   }
 
   &__input:checked:hover ~ &__label::before,
-  &__input:hover ~ &__label::before {
+  &__input:hover ~ &__label::before,
+  &__input:focus ~ &__label::before {
     border: var(--tui-form-input-border-size) solid;
     border-color: var(--tui-form-checkbox-border-color-focus);
-    box-shadow: var(--tui-shadow-1);
+    box-shadow: var(--tui-form-input-shadow-focus);
+
+    .tui-context-invalid & {
+      border-color: var(--tui-form-input-border-color-invalid);
+      box-shadow: var(--tui-shadow-none),
+        var(--tui-form-input-shadow-invalid-focus);
+    }
   }
 
   &__input:focus ~ &__label::before {
     background: var(--tui-form-checkbox-bg-color-focus);
-    border: var(--tui-form-input-border-size) solid;
-    border-color: var(--tui-form-checkbox-border-color-focus);
-    box-shadow: var(--tui-shadow-1);
   }
 
   &__input:disabled:checked ~ &__label::before,

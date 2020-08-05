@@ -19,6 +19,7 @@
   // Shadow depths
   //
 
+  --tui-shadow-none: 0 0 0 0 transparent;
   // Often used for form element focus
   --tui-shadow-1: 0 0 3px 0 var(--tui-color-state);
   --tui-shadow-1-invalid: 0 0 3px 0 var(--tui-color-prompt-alert);

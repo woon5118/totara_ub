@@ -41,6 +41,7 @@
 --tui-form-checkbox-border-color-disabled: var(--tui-color-state-disabled);
 --tui-form-checkbox-border-color-focus: var(--tui-color-state-focus);
 --tui-form-checkbox-border-color-active: var(--tui-color-state-focus);
+--tui-form-checkbox-border-color-invalid: var(--tui-color-prompt-alert);
 
 // Text colour (labels)
 --tui-form-text-color: var(--tui-color-neutral-7);
@@ -49,7 +50,7 @@
 --tui-form-input-bg-color: var(--tui-color-neutral-1);
 --tui-form-input-bg-color-disabled: var(--tui-color-neutral-3);
 --tui-form-input-bg-color-focus: var(--tui-form-input-bg-color);
---tui-form-input-bg-color-invalid-focus: var(--tui-color-prompt-alert-bg);
+--tui-form-input-bg-color-invalid-focus: var(--tui-form-input-bg-color);
 
 // Border of form elements
 --tui-form-input-border-color: var(--tui-color-neutral-6);
@@ -121,3 +122,7 @@
 --tui-btn-toolbar-bg-color-selected: var(--tui-color-state-active);
 --tui-btn-toolbar-text-color: var(--tui-color-neutral-6);
 --tui-btn-toolbar-text-color-selected: var(--tui-color-neutral-1);
+
+// Form errors
+--tui-form-error-bg-color: var(--tui-color-prompt-alert-bg);
+--tui-form-error-text-color: var(--tui-color-prompt-alert);

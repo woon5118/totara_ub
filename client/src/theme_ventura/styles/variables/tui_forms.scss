@@ -33,4 +33,11 @@
   // Must be on a single line otherwise it breaks (for some reason!) so must be ignored by prettier.
   /* prettier-ignore */
   --tui-form-input-v-padding: calc((var(--tui-form-input-height) - var(--tui-form-input-font-size) - (var(--tui-form-input-border-size) * 2)) / 2);
+
+  --tui-form-input-shadow-invalid: 0 0 0 1px
+    var(--tui-form-input-border-color-invalid);
+  --tui-form-input-shadow-focus: var(--tui-shadow-1);
+  --tui-form-input-shadow-invalid-focus: 0 0 0 1px
+      var(--tui-form-input-border-color-invalid),
+    0 0 3px 1px var(--tui-form-input-border-color-invalid);
 }

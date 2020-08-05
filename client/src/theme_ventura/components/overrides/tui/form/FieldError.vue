@@ -18,21 +18,15 @@
 
 <style lang="scss">
 .tui-formFieldError {
-  margin-top: var(--tui-gap-1);
+  margin-top: 2px;
 
   &__inner {
     @include tui-font-body-small();
     display: inline-flex;
     align-items: center;
-    padding: var(--tui-gap-1) var(--tui-gap-2);
-    color: var(--tui-color-neutral-1);
-    background: var(--tui-color-prompt-alert);
-    border-radius: var(--tui-border-radius-small);
-  }
-
-  &__icon {
-    width: auto;
-    margin-right: var(--tui-gap-1);
+    padding: 0.6rem 0.8rem;
+    color: var(--tui-form-error-text-color);
+    background: var(--tui-form-error-bg-color);
   }
 
   &__dismiss {
