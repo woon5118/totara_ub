@@ -57,16 +57,17 @@ class mod_perform_webapi_type_notification_recipient_testcase extends advanced_t
 
         $section = $perform_generator->create_section($activity);
         $section_relationship = section_relationship::create($section->get_id(), $subject_id, true);
+        $core_relationship = $section_relationship->core_relationship;
 
         $notification = notification_model::create($activity, 'instance_created');
-        return [$notification, $section_relationship, $context];
+        return [$notification, $core_relationship, $context];
     }
 
     /**
      * @covers ::resolve
      */
     public function test_invalid_input(): void {
-        [$notification, $section_relationship, $context] = $this->create_test_data();
+        [$notification, $core_relationship, $context] = $this->create_test_data();
 
         $this->expectException(coding_exception::class);
         $this->expectExceptionMessageMatches("/notification recipient/");
@@ -77,9 +78,8 @@ class mod_perform_webapi_type_notification_recipient_testcase extends advanced_t
      * @covers ::resolve
      */
     public function test_invalid_field(): void {
-        $this->markTestIncomplete("Notification recipient not yet implemented");
-        [$notification, $section_relationship, $context] = $this->create_test_data();
-        $recipient = recipient_model::create($notification, $section_relationship);
+        [$notification, $core_relationship, $context] = $this->create_test_data();
+        $recipient = recipient_model::create($notification, $core_relationship);
 
         $field = 'unknown';
 
@@ -97,10 +97,9 @@ class mod_perform_webapi_type_notification_recipient_testcase extends advanced_t
         // creates database records or sends messages, etc, those will also be
         // visible to _all_ tests. In other words, with dataproviders, current
         // and yet unborn tests do not start in a clean state!
-        $this->markTestIncomplete("Notification recipient not yet implemented");
-        [$notification, $section_relationship, $context] = $this->create_test_data();
+        [$notification, $core_relationship, $context] = $this->create_test_data();
 
-        $recipient = recipient_model::create($notification, $section_relationship);
+        $recipient = recipient_model::create($notification, $core_relationship);
 
         $testcases = [
             'name' => ['name', format::FORMAT_PLAIN, $recipient->name],

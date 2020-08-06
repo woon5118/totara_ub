@@ -17,7 +17,10 @@
 -->
 
 <template>
-  <ul class="tui-activityNotificationsRecipientsTable">
+  <ul
+    class="tui-activityNotificationsRecipientsTable"
+    :aria-label="$str('recipients', 'mod_perform')"
+  >
     <li
       v-for="e in data"
       :key="e.relationship_id"
@@ -62,3 +65,11 @@ export default {
   },
 };
 </script>
+
+<lang-strings>
+{
+  "mod_perform": [
+    "recipients"
+  ]
+}
+</lang-strings>

@@ -24,17 +24,15 @@
 namespace mod_perform\notification;
 
 use coding_exception;
-use context_user;
+use core\entities\user as user_entity;
 use core\message\message;
-use core\orm\collection;
 use core_user;
 use dml_exception;
-use mod_perform\constants;
-use mod_perform\models\activity\activity as activity_model;
+use mod_perform\models\activity\notification as notification_model;
 use mod_perform\models\activity\notification_message as notification_message_model;
 use mod_perform\models\activity\notification_recipient as notification_recipient_model;
 use stdClass;
-use totara_core\relationship\relationship;
+use totara_core\relationship\relationship as relationship_model;
 
 /**
  * The dealer class.
@@ -47,86 +45,56 @@ class dealer {
     private $composer;
 
     /** @var integer */
-    private $user_id;
-
-    /** @var integer|null */
-    private $job_assignment_id;
-
-    /** @var integer */
     private $course_id;
 
     /**
      * Constructor. *Do not instantiate this class directly. Use the factory class.*
      *
-     * @param activity_model $activity
-     * @param notification_recipient_model[]|collection $notification_recipients
-     * @param composer $composer
-     * @param integer $subject_user_id
-     * @param integer|null $job_assignment_id
+     * @param notification_model $notification
      */
-    public function __construct(
-        activity_model $activity,
-        $notification_recipients,
-        composer $composer,
-        int $subject_user_id,
-        ?int $job_assignment_id
-    ) {
-        if ($notification_recipients instanceof collection) {
-            $notification_recipients = iterator_to_array($notification_recipients);
-        }
-        foreach ($notification_recipients as $i => $recipient) {
-            if (!($recipient instanceof notification_recipient_model)) {
-                throw new coding_exception("recipients[{$i}] is not a notification_recipient model");
-            }
-        }
-        $this->recipients = $notification_recipients;
-        $this->composer = $composer;
-        $this->course_id = $activity->course;
-        $this->user_id = $subject_user_id;
-        $this->job_assignment_id = $job_assignment_id;
+    public function __construct(notification_model $notification) {
+        $this->recipients = notification_recipient_model::load_by_notification($notification, true);
+        $this->composer = factory::create_composer($notification->class_key);
+        $this->course_id = $notification->activity->course;
     }
 
     /**
-     * @return integer
+     * Return true if the notification has any recipients.
+     *
+     * @return boolean
      */
-    public function get_user_id(): int {
-        return $this->user_id;
-    }
-
-    /**
-     * @return integer|null
-     */
-    public function get_job_assignment_id(): ?int {
-        return $this->job_assignment_id;
+    public function has_recipients(): bool {
+        return count($this->recipients) > 0;
     }
 
     /**
      * Post a notification.
+     *
+     * @param user_entity|stdClass $user
+     * @param relationship_model $relationship
+     * @return boolean
      */
-    public function post(): void {
-        foreach ($this->recipients as $recipient) {
-            $relationship = $recipient->relationship;
-            // TODO Notifications for manual relationships do not work at the moment
-            //      in TL-26488 the way this works will be refactored
-            if ($recipient->relationship->type == \totara_core\entities\relationship::TYPE_MANUAL) {
-                continue;
-            }
-            $user_dtos = $relationship->get_users(
-                ['user_id' => $this->user_id, 'job_assignment_id' => $this->job_assignment_id],
-                context_user::instance($this->user_id)
-            );
-            if (empty($user_dtos)) {
-                continue;
-            }
-            if (!$this->composer->set_relationship($relationship)) {
-                continue;
-            }
-            $message = $this->composer->compose();
-            foreach ($user_dtos as $user_dto) {
-                $this->send_notification(core_user::NOREPLY_USER, $user_dto->get_user_id(), $message);
-            }
-            $this->save_history($recipient);
+    public function post($user, relationship_model $relationship): bool {
+        // FIXME: Notifications for manual relationships do not work at the moment
+        //        in TL-26488 the way this works will be refactored
+        if ($relationship->type == \totara_core\entities\relationship::TYPE_MANUAL) {
+            debugging('manual relationships do not work at the moment', DEBUG_DEVELOPER);
+            return false;
         }
+        if ($user instanceof user_entity) {
+            $user = $user->get_record();
+        }
+        $recipient = $this->resolve_recipient($relationship);
+        if (!$recipient) {
+            return false;
+        }
+        if (!$this->composer->set_relationship($relationship)) {
+            return false;
+        }
+        $message = $this->composer->compose($relationship);
+        $this->send_notification(core_user::NOREPLY_USER, $user, $message);
+        $this->save_history($recipient, time());
+        return true;
     }
 
     /**
@@ -161,6 +129,19 @@ class dealer {
         $eventdata->notification    = 1;
 
         message_send($eventdata);
+    }
+
+    /**
+     * @param relationship_model $relationship
+     * @return notification_recipient_model|null
+     */
+    private function resolve_recipient(relationship_model $relationship): ?notification_recipient_model {
+        foreach ($this->recipients as $recipient) {
+            if ($recipient->get_relationship_id() == $relationship->id) {
+                return $recipient;
+            }
+        }
+        return null;
     }
 
     /**

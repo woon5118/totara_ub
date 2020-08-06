@@ -51,8 +51,8 @@ $watchers = [
         'callback' => [user::class, 'allow_view_profile_field'],
     ],
     [
-        'hookname' => subject_instances_created::class,
-        'callback' => [notification::class, 'create_subject_instances'],
+        'hookname' => participant_instances_created::class,
+        'callback' => [notification::class, 'create_participant_instances'],
     ],
     [
         'hookname' => userdata_normalise_label::class,

@@ -141,7 +141,7 @@ class participant_instance extends model {
     /**
      * Get the participant user
      *
-     * @return participant
+     * @return participant|null
      */
     public function get_participant(): ?participant {
         $participant_data = (int)$this->entity->participant_source === participant_source::INTERNAL
@@ -200,14 +200,14 @@ class participant_instance extends model {
      *
      * @return bool
      */
-    private function is_completed(): bool {
+    public function is_completed(): bool {
         return $this->get_progress_state() instanceof complete;
     }
 
     /**
      * Get the core relationship.
      *
-     * @return relationship_model
+     * @return relationship_model|null
      */
     public function get_core_relationship(): ?relationship_model {
         $relationship_entity = $this->entity->core_relationship;

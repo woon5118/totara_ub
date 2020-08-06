@@ -39,11 +39,11 @@ class mod_perform_notification_recipient_model_testcase extends mod_perform_noti
         $section = $this->create_section($activity);
         $notification = notification::create($activity, 'instance_created');
         $relationships = $this->create_section_relationships($section);
-        notification_recipient::create($notification, $relationships[0], false);
-        notification_recipient::create($notification, $relationships[1], true);
-        $this->assertFalse($notification->recipients->find('relationship_id', $relationships[0]->id)->active);
-        $this->assertTrue($notification->recipients->find('relationship_id', $relationships[1]->id)->active);
-        $this->assertFalse($notification->recipients->find('relationship_id', $relationships[2]->id)->active);
+        notification_recipient::create($notification, $relationships[constants::RELATIONSHIP_SUBJECT], false);
+        notification_recipient::create($notification, $relationships[constants::RELATIONSHIP_APPRAISER], true);
+        $this->assertFalse($notification->recipients->find('relationship_id', $relationships[constants::RELATIONSHIP_SUBJECT]->id)->active);
+        $this->assertTrue($notification->recipients->find('relationship_id', $relationships[constants::RELATIONSHIP_APPRAISER]->id)->active);
+        $this->assertFalse($notification->recipients->find('relationship_id', $relationships[constants::RELATIONSHIP_MANAGER]->id)->active);
     }
 
     public function test_load_by_notification_full() {
@@ -51,8 +51,8 @@ class mod_perform_notification_recipient_model_testcase extends mod_perform_noti
         $section = $this->create_section($activity);
         $notification = notification::create($activity, 'instance_created');
         $relationships = $this->create_section_relationships($section);
-        notification_recipient::create($notification, $relationships[0], false);
-        notification_recipient::create($notification, $relationships[1], true);
+        notification_recipient::create($notification, $relationships[constants::RELATIONSHIP_SUBJECT], false);
+        notification_recipient::create($notification, $relationships[constants::RELATIONSHIP_APPRAISER], true);
 
         $this->assertCount(3, notification_recipient::load_by_notification($notification, false));
         $this->assertCount(1, notification_recipient::load_by_notification($notification, true));
@@ -66,7 +66,7 @@ class mod_perform_notification_recipient_model_testcase extends mod_perform_noti
             $section,
             [constants::RELATIONSHIP_SUBJECT, constants::RELATIONSHIP_APPRAISER]
         );
-        notification_recipient::create($notification, $relationships[0], false);
+        notification_recipient::create($notification, $relationships[constants::RELATIONSHIP_SUBJECT], false);
 
         $this->assertCount(2, notification_recipient::load_by_notification($notification, false));
         $this->assertCount(0, notification_recipient::load_by_notification($notification, true));

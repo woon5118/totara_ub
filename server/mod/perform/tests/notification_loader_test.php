@@ -29,6 +29,7 @@ use mod_perform\notification\brokers\overdue_reminder;
 use mod_perform\notification\conditions\after_midnight;
 use mod_perform\notification\conditions\days_after;
 use mod_perform\notification\conditions\days_before;
+use mod_perform\notification\exceptions\class_key_not_available;
 use mod_perform\notification\loader;
 use mod_perform\notification\trigger;
 
@@ -157,6 +158,13 @@ class mod_perform_notification_loader_testcase extends advanced_testcase {
         $this->assertEquals(mod_perform_notification_loader_testcase::class, $values[3]);
     }
 
+    public function test_get_class_keys() {
+        $loader = $this->create_loader();
+        $this->assertEquals(['test_instance_created', 'test_overdue_reminder', 'test_due_date_reminder', 'kia_ora_koutou_katoa'], $loader->get_class_keys());
+        $this->assertEquals(['test_overdue_reminder', 'test_due_date_reminder'], $loader->get_class_keys(loader::HAS_TRIGGERS));
+        $this->assertEquals(['test_overdue_reminder', 'test_due_date_reminder', 'kia_ora_koutou_katoa'], $loader->get_class_keys(loader::HAS_CONDITION));
+    }
+
     public function test_get_class_of() {
         $loader = $this->create_loader();
         $this->assertEquals(instance_created::class, $loader->get_class_of('test_instance_created'));
@@ -201,6 +209,14 @@ class mod_perform_notification_loader_testcase extends advanced_testcase {
         $this->assertNull($loader->get_trigger_label_of('kia_ora_koutou_katoa'));
     }
 
+    public function test_get_condition_class_of() {
+        $loader = $this->create_loader();
+        $this->assertNull($loader->get_condition_class_of('test_instance_created'));
+        $this->assertEquals(days_after::class, $loader->get_condition_class_of('test_overdue_reminder'));
+        $this->assertEquals(days_before::class, $loader->get_condition_class_of('test_due_date_reminder'));
+        $this->assertEquals(after_midnight::class, $loader->get_condition_class_of('kia_ora_koutou_katoa'));
+    }
+
     public function test_support_triggers() {
         $loader = $this->create_loader();
         $this->assertFalse($loader->support_triggers('test_instance_created'));
@@ -209,8 +225,8 @@ class mod_perform_notification_loader_testcase extends advanced_testcase {
         $this->assertFalse($loader->support_triggers('kia_ora_koutou_katoa'));
         try {
             $loader->support_triggers('he_who_must_not_be_named');
-            $this->fail('invalid_parameter_exception expected');
-        } catch (invalid_parameter_exception $ex) {
+            $this->fail('class_key_not_available expected');
+        } catch (class_key_not_available $ex) {
             $this->assertStringContainsString('notification he_who_must_not_be_named is not registered', $ex->debuginfo);
         }
     }

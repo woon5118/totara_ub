@@ -1603,6 +1603,23 @@ class behat_totara_tui extends behat_base {
     }
 
     /**
+     * @When /^I click on "(?P<element_string>(?:[^"]|\\")*)" tui "(?P<selector_string>[^"]*)"$/
+     * @param string $element
+     * @param string $selector
+     * @throws ExpectationException
+     */
+    public function i_click_on_tui(string $element, string $selector) {
+        behat_hooks::set_step_readonly(false);
+        $node = $this->find_tui_element($element, $selector);
+
+        if ($selector === 'checkbox') {
+            $this->click_hidden_element($node);
+        } else {
+            $node->click();
+        }
+    }
+
+    /**
      * @When /^I click on "(?P<element_string>(?:[^"]|\\")*)" tui "(?P<selector_string>[^"]*)" in the "(?P<container_string>(?:[^"]|\\")*)" tui "(?P<container_selector_string>[^"]*)"$/
      * @param string $element
      * @param string $selector
@@ -1613,7 +1630,123 @@ class behat_totara_tui extends behat_base {
         behat_hooks::set_step_readonly(false);
         $parent = $this->find_tui_element($container, $container_selector);
         $node = $this->find_tui_element($element, $selector, $parent);
-        $node->click();
+
+        if ($selector === 'checkbox') {
+            $this->click_hidden_element($node);
+        } else {
+            $node->click();
+        }
+    }
+
+
+    /**
+     * @Then /^I should see "(?P<text_string>(?:[^"]|\\")*)" in the "(?P<element_string>(?:[^"]|\\")*)" tui "(?P<selector_string>[^"]*)"$/
+     * @param string $text
+     * @param string $element
+     * @param string $selector
+     * @throws ExpectationException
+     */
+    public function i_should_see_in_the_tui(string $text, string $element, string $selector) {
+        behat_hooks::set_step_readonly(true);
+        $container = $this->find_tui_element($element, $selector);
+
+        // For some reason, behat_general::assert_element_contains_text fails to locate the container element by xpath.
+        // I have to copy the whole code instead of this one liner.
+        /// $this->execute('behat_general::assert_element_contains_text', [$text, $container->getXpath(), 'xpath_element']);
+
+        // Looking for all the matching nodes without any other descendant matching the
+        // same xpath (we are using contains(., ....).
+        $xpathliteral = behat_context_helper::escape($text);
+        $xpath = "/descendant-or-self::*[contains(., $xpathliteral)]" .
+            "[count(descendant::*[contains(., $xpathliteral)]) = 0]";
+
+        // Wait until it finds the text inside the container, otherwise custom exception.
+        try {
+            $nodes = $this->find_all('xpath', $xpath, false, $container);
+        } catch (ElementNotFoundException $e) {
+            throw new ExpectationException('"' . $text . '" text was not found in the "' . $element . '" element', $this->getSession());
+        }
+
+        // If we are not running javascript we have enough with the
+        // element existing as we can't check if it is visible.
+        if (!$this->running_javascript()) {
+            return;
+        }
+
+        // We also check the element visibility when running JS tests. Using microsleep as this
+        // is a repeated step and global performance is important.
+        $this->spin(
+            function($context, $args) {
+
+                foreach ($args['nodes'] as $node) {
+                    if ($node->isVisible()) {
+                        return true;
+                    }
+                }
+
+                throw new ExpectationException('"' . $args['text'] . '" text was found in the "' . $args['element'] . '" element but was not visible', $context->getSession());
+            },
+            array('nodes' => $nodes, 'text' => $text, 'element' => $element),
+            false,
+            false,
+            true
+        );
+    }
+
+    /**
+     * @Then /^I should not see "(?P<text_string>(?:[^"]|\\")*)" in the "(?P<element_string>(?:[^"]|\\")*)" tui "(?P<selector_string>[^"]*)"$/
+     * @param string $text
+     * @param string $element
+     * @param string $selector
+     * @throws ExpectationException
+     */
+    public function i_should_not_see_in_the_tui(string $text, string $element, string $selector) {
+        behat_hooks::set_step_readonly(true);
+        $container = $this->find_tui_element($element, $selector);
+
+        // For some reason, behat_general::assert_element_not_contains_text fails to locate the container element by xpath.
+        // I have to copy the whole code instead of this one liner.
+        /// $this->execute('behat_general::assert_element_not_contains_text', [$text, $container->getXpath(), 'xpath_element']);
+
+        // Looking for all the matching nodes without any other descendant matching the
+        // same xpath (we are using contains(., ....).
+        $xpathliteral = behat_context_helper::escape($text);
+        $xpath = "/descendant-or-self::*[contains(., $xpathliteral)]" .
+            "[count(descendant::*[contains(., $xpathliteral)]) = 0]";
+
+        // We should wait a while to ensure that the page is not still loading elements.
+        // Giving preference to the reliability of the results rather than to the performance.
+        try {
+            $nodes = $this->find_all('xpath', $xpath, false, $container, self::REDUCED_TIMEOUT);
+        } catch (ElementNotFoundException $e) {
+            // All ok.
+            return;
+        }
+
+        // If we are not running javascript we have enough with the
+        // element not being found as we can't check if it is visible.
+        if (!$this->running_javascript()) {
+            throw new ExpectationException('"' . $text . '" text was found in the "' . $element . '" element', $this->getSession());
+        }
+
+        // We need to ensure all the found nodes are hidden.
+        $this->spin(
+            function($context, $args) {
+
+                foreach ($args['nodes'] as $node) {
+                    if ($node->isVisible()) {
+                        throw new ExpectationException('"' . $args['text'] . '" text was found in the "' . $args['element'] . '" element and was visible', $context->getSession());
+                    }
+                }
+
+                // If all the found nodes are hidden we are happy.
+                return true;
+            },
+            array('nodes' => $nodes, 'text' => $text, 'element' => $element),
+            self::REDUCED_TIMEOUT,
+            false,
+            true
+        );
     }
 
     /**
@@ -1623,9 +1756,8 @@ class behat_totara_tui extends behat_base {
      * @return NodeElement
      */
     private function find_tui_element(string $label, string $tui_selector, ?NodeElement $container = null): NodeElement {
-        if ($tui_selector === 'toggle button') {
+        $find_toggle_switch = function () use ($label, $tui_selector, $container) {
             $toggles = $this->find_all('css', self::TOGGLE_BUTTON_LABEL_LOCATOR, false, $container);
-
             $specified_toggle = null;
             foreach ($toggles as $toggle) {
                 if ($toggle->getText() === $label) {
@@ -1638,29 +1770,56 @@ class behat_totara_tui extends behat_base {
                     'toggle'
                 );
             }
-
             if ($specified_toggle) {
                 return $this->find('css', self::TOGGLE_BUTTON_LOCATOR, false, $specified_toggle->getParent());
             }
-        }
+            return null;
+        };
 
-        if ($tui_selector === 'collapsible') {
-            $collapsibles = $this->find_all('css', self::COLLAPSIBLE_LOCATOR, false, $container);
-
-            $matches = array_filter($collapsibles, static function (NodeElement $filter) use ($label) {
-                $legend = $filter->find('css', self::COLLAPSIBLE_HEADER_TEXT_LOCATOR);
-                return $legend !== null && $legend->getText() === $label;
-            });
-
-            $collapsible = reset($matches);
-            if ($collapsible && $collapsible->isVisible()) {
-                return $collapsible;
-            }
-        }
-
-        if ($tui_selector === 'button') {
-            [$selector, $locator] = $this->transform_selector('button', $label);
+        $find_default = function () use ($label, $tui_selector, $container) {
+            [$selector, $locator] = $this->transform_selector($tui_selector, $label);
             return $this->find($selector, $locator, false, $container);
+        };
+
+        $finders = [
+            'collapsible' => function () use ($label, $tui_selector, $container) {
+                $collapsibles = $this->find_all('css', self::COLLAPSIBLE_LOCATOR, false, $container);
+                $matches = array_filter($collapsibles, static function (NodeElement $filter) use ($label) {
+                    $legend = $filter->find('css', self::COLLAPSIBLE_HEADER_TEXT_LOCATOR);
+                    return $legend !== null && $legend->getText() === $label;
+                });
+                $collapsible = reset($matches);
+                if ($collapsible && $collapsible->isVisible()) {
+                    return $collapsible;
+                }
+                return null;
+            },
+
+            'popover' => function () use ($label, $tui_selector, $container) {
+                $popovers = $this->find_all('css', self::POPOVER_LOCATOR, false, $container);
+                $matches = array_filter($popovers, static function (NodeElement $filter) use ($label) {
+                    $legend = $filter->find('css', self::POPOVER_CONTENT_LOCATOR . ' h2');
+                    return $legend !== null && $legend->getText() === $label;
+                });
+                $popover = reset($matches);
+                if ($popover && $popover->isVisible()) {
+                    return $popover;
+                }
+                return null;
+            },
+
+            'toggle_button' => $find_toggle_switch,
+            'toggle_switch' => $find_toggle_switch,
+
+            'button' => $find_default,
+            'checkbox' => $find_default,
+        ];
+
+        if (isset($finders[$tui_selector])) {
+            $node = $finders[$tui_selector]();
+            if ($node) {
+                return $node;
+            }
         }
 
         $this->fail("Could not find the '{$label}' {$tui_selector}");

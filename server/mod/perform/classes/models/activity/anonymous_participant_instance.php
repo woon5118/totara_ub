@@ -106,11 +106,6 @@ class anonymous_participant_instance extends participant_instance {
         return null;
     }
 
-    /**
-     * Get the core relationship.
-     *
-     * @return relationship_model
-     */
     public function get_core_relationship(): ?relationship_model {
         return null;
     }

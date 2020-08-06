@@ -23,13 +23,15 @@
 
 namespace mod_perform\notification;
 
+use mod_perform\models\activity\details\subject_instance_notification;
+
 interface triggerable {
     /**
      * Return true if the notification needs to be sent right now.
      *
      * @param condition $condition
-     * @param object $record some data FIXME: pass some class object instead
+     * @param subject_instance_notification $record
      * @return boolean
      */
-    public function is_triggerable_now(condition $condition, object $record): bool;
+    public function is_triggerable_now(condition $condition, subject_instance_notification $record): bool;
 }

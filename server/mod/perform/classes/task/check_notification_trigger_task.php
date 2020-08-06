@@ -30,6 +30,7 @@ use mod_perform\entities\activity\track as track_entity;
 use mod_perform\entities\activity\track_user_assignment as track_user_assignment_entity;
 use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 use mod_perform\models\activity\activity as activity_model;
+use mod_perform\models\activity\details\subject_instance_notification;
 use mod_perform\models\activity\notification as notification_model;
 use mod_perform\models\activity\notification_recipient as notification_recipient_model;
 use mod_perform\notification\factory;
@@ -37,6 +38,7 @@ use mod_perform\notification\loader;
 use mod_perform\notification\trigger;
 use mod_perform\notification\triggerable;
 use mod_perform\state\activity\active;
+use totara_core\entities\relationship as relationship_entity;
 
 /**
  * Periodically check notification event triggers.
@@ -52,14 +54,19 @@ class check_notification_trigger_task extends scheduled_task {
 
         $clock = factory::create_clock();
         $activities = activity_entity::repository()->where('status', active::get_code())->get();
-        foreach ($class_keys as $class_key) {
-            $broker = factory::create_broker($class_key);
-            if (!($broker instanceof triggerable)) {
-                debugging(get_class($broker) . ' does not implement triggerable', DEBUG_DEVELOPER);
+        foreach ($activities as $activity_entity) {
+            /** @var activity_entity $activity_entity */
+            // TODO: grab all necessities with a single giant query outside of the outer loop.
+            $records = subject_instance_notification::load_by_activity($activity_entity);
+            if (empty($records)) {
                 continue;
             }
-            foreach ($activities as $activity_entity) {
-                /** @var activity_entity $activity_entity */
+            foreach ($class_keys as $class_key) {
+                $broker = factory::create_broker($class_key);
+                if (!($broker instanceof triggerable)) {
+                    debugging(get_class($broker) . ' does not implement triggerable', DEBUG_DEVELOPER);
+                    continue;
+                }
                 $activity = activity_model::load_by_entity($activity_entity);
                 $notification = notification_model::load_by_activity_and_class_key($activity, $class_key);
                 if (!$notification->active) {
@@ -70,26 +77,12 @@ class check_notification_trigger_task extends scheduled_task {
                 if (!$recipients->count()) {
                     continue;
                 }
-                // TODO: grab all necessities with a single giant query outside of the loop.
-                $records = builder::table(subject_instance_entity::TABLE, 'si')
-                    ->join([track_user_assignment_entity::TABLE, 'tua'], 'si.track_user_assignment_id', 'tua.id')
-                    ->join([track_entity::TABLE, 't'], 'tua.track_id', 't.id')
-                    ->where('t.activity_id', $activity->id)
-                    ->where_null('si.completed_at')
-                    ->where('tua.deleted', false)
-                    ->select(['si.id', 'tua.subject_user_id', 'tua.job_assignment_id', 'si.due_date AS due_date'])
-                    // how can I get an instance creation time?
-                    ->add_select('si.created_at AS instance_created_at')
-                    ->get();
-                if (empty($records)) {
-                    continue;
-                }
                 foreach ($records as $record) {
                     /** @var triggerable $broker */
                     if (!$broker->is_triggerable_now($condition, $record)) {
                         continue;
                     }
-                    $cartel = factory::create_cartel_on_user_assignment($activity, $record);
+                    $cartel = factory::create_cartel_on_subject_instance($record->id);
                     $cartel->dispatch($class_key);
                 }
                 $notification->set_last_run_time($clock->get_time());

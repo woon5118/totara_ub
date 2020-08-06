@@ -23,9 +23,8 @@
 
 namespace mod_perform\notification\brokers;
 
-use mod_perform\models\activity\notification as notification_model;
+use mod_perform\models\activity\details\subject_instance_notification;
 use mod_perform\notification\broker;
-use mod_perform\notification\dealer;
 use mod_perform\notification\condition;
 use mod_perform\notification\triggerable;
 
@@ -37,15 +36,10 @@ class due_date implements broker, triggerable {
         return [];
     }
 
-    public function is_triggerable_now(condition $condition, object $record): bool {
+    public function is_triggerable_now(condition $condition, subject_instance_notification $record): bool {
         if (empty($record->due_date)) {
             return false;
         }
         return $condition->pass($record->due_date);
-    }
-
-    public function execute(dealer $dealer, notification_model $notification): void {
-        // just post it
-        $dealer->post();
     }
 }

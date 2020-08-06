@@ -25,8 +25,11 @@ namespace mod_perform\notification;
 
 use coding_exception;
 use mod_perform\entities\activity\track_user_assignment;
+use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\models\activity\activity as activity_model;
 use mod_perform\models\activity\notification as notification_model;
+use mod_perform\models\activity\participant_instance;
+use mod_perform\task\service\participant_instance_dto;
 use mod_perform\task\service\subject_instance_dto;
 use stdClass;
 
@@ -78,40 +81,61 @@ abstract class factory {
     /**
      * Create a cartel instance.
      *
-     * @param subject_instance_dto $dto
+     * @param integer|subject_instance_dto $subject_instance
      * @return cartel
      */
-    public static function create_cartel_on_subject_instance(subject_instance_dto $dto): cartel {
-        $activity = activity_model::load_by_id($dto->get_activity_id());
-        $user_id = $dto->subject_user_id;
-        $job_assignment_id = $dto->job_assignment_id;
-        return new cartel($activity, $user_id, $job_assignment_id);
+    public static function create_cartel_on_subject_instance($subject_instance): cartel {
+        if ($subject_instance instanceof subject_instance_dto) {
+            $subject_instance = $subject_instance->id;
+        }
+        $participant_instances = participant_instance_entity::repository()->where('subject_instance_id', $subject_instance)->get()->all();
+        return self::create_cartel_on_participant_instances($participant_instances);
     }
 
     /**
      * Create a cartel instance.
      *
-     * @param activity_model $activity
-     * @param track_user_assignment|stdClass $user_assignment
+     * @param (integer|participant_instance_dto|participant_instance|participant_instance_entity|stdClass)[] $participant_instances
      * @return cartel
      */
-    public static function create_cartel_on_user_assignment(activity_model $activity, $user_assignment): cartel {
-        return new cartel($activity, $user_assignment->subject_user_id, $user_assignment->job_assignment_id);
+    public static function create_cartel_on_participant_instances(array $participant_instances): cartel {
+        $ids = array_map(function ($e, $i) {
+            if ($e instanceof participant_instance_dto) {
+                return $e->get_id();
+            }
+            if ($e instanceof participant_instance) {
+                return $e->get_id();
+            }
+            if ($e instanceof participant_instance_entity) {
+                return $e->id;
+            }
+            if ($e instanceof stdClass) {
+                return $e->id;
+            }
+            if (is_int($e)) {
+                return $e;
+            }
+            throw new coding_exception('unknown element at ' . $i);
+        }, $participant_instances, array_keys($participant_instances));
+        /** @var integer[] $ids */
+        return new cartel($ids);
     }
 
     /**
      * Create a dealer instance.
      *
      * @param notification_model $notification
-     * @param integer $user_id
-     * @param integer|null $job_assignment_id
-     * @return dealer
+     * @return dealer|null The dealer instance or null if the notification cannot be sent
      */
-    public static function create_dealer(notification_model $notification, int $user_id, ?int $job_assignment_id): dealer {
-        $activity = $notification->get_activity();
-        $recipients = $notification->get_recipients(true);
-        $composer = self::create_composer($notification->class_key);
-        return new dealer($activity, $recipients, $composer, $user_id, $job_assignment_id);
+    public static function create_dealer_on_notification(notification_model $notification): ?dealer {
+        if ($notification->active) {
+            $dealer = new dealer($notification);
+            // Optimise out when no recipients are enabled.
+            if ($dealer->has_recipients()) {
+                return $dealer;
+            }
+        }
+        return null;
     }
 
     /**

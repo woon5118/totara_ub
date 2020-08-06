@@ -24,6 +24,8 @@
       :min-rows="1"
       :delete-icon="true"
       :allow-deleting-first-items="true"
+      :aria-label="$str('trigger_events', 'mod_perform')"
+      role="region"
       @add="onAdd"
       @remove="onRemove"
     >
@@ -154,6 +156,7 @@ export default {
 <lang-strings>
 {
   "mod_perform": [
+    "trigger_events",
     "trigger_duplicates",
     "trigger_out_of_range",
     "trigger_set"

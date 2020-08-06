@@ -23,10 +23,7 @@
 
 namespace mod_perform\notification\brokers;
 
-use mod_perform\models\activity\notification as notification_model;
 use mod_perform\notification\broker;
-use mod_perform\notification\dealer;
-use mod_perform\notification\clock;
 
 /**
  * instance_created handler
@@ -34,10 +31,5 @@ use mod_perform\notification\clock;
 class instance_created implements broker {
     public function get_default_triggers(): array {
         return [];
-    }
-
-    public function execute(dealer $dealer, notification_model $notification): void {
-        // just post it
-        $dealer->post();
     }
 }

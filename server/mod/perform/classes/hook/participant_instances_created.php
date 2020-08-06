@@ -24,7 +24,7 @@
 namespace mod_perform\hook;
 
 use core\collection;
-use stdClass;
+use mod_perform\task\service\participant_instance_dto;
 use totara_core\hook\base;
 
 /**
@@ -36,17 +36,20 @@ use totara_core\hook\base;
 class participant_instances_created extends base {
 
     /**
-     * @var collection|stdClass[]
+     * @var collection|participant_instance_dto[]
      */
     protected $participant_instance_dtos;
 
     /**
-     * @param collection|stdClass[] $participant_instance_dtos
+     * @param collection|participant_instance_dto[] $participant_instance_dtos
      */
     public function __construct(collection $participant_instance_dtos) {
         $this->participant_instance_dtos = $participant_instance_dtos;
     }
 
+    /**
+     * @return collection|participant_instance_dto[]
+     */
     public function get_dtos(): collection {
         return $this->participant_instance_dtos;
     }

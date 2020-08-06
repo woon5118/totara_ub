@@ -22,12 +22,10 @@
  * @category test
  */
 
-use mod_perform\notification\brokers\instance_created_reminder;
 use mod_perform\notification\conditions\after_midnight;
 use mod_perform\notification\conditions\days_after;
 use mod_perform\notification\conditions\days_before;
 use mod_perform\notification\factory;
-use mod_perform\notification\triggerable;
 
 require_once(__DIR__ . '/notification_testcase.php');
 
@@ -123,8 +121,26 @@ class mod_perform_notification_condition_testcase extends mod_perform_notificati
         $tz = \core_date::get_server_timezone_object();
         $time = new DateTime('now', $tz);
         $midnight = (clone $time)->modify('midnight');
-        $this->assertEquals($midnight->getTimestamp(), after_midnight::get_last_midnight($time->getTimestamp()));
-        $this->assertEquals($midnight->getTimestamp() - DAYSECS, after_midnight::get_last_midnight($time->getTimestamp() - DAYSECS));
-        $this->assertEquals($midnight->getTimestamp() + DAYSECS, after_midnight::get_last_midnight($time->getTimestamp() + DAYSECS));
+        $offsets = [-366, -365, -20, -3, -1, 0, +1, +7, +77, +365, +366];
+        foreach ($offsets as $i => $offset) {
+            $expected = $midnight->getTimestamp() + $offset * DAYSECS;
+            $this->assertEquals($expected, after_midnight::get_last_midnight($time->getTimestamp() + $offset * DAYSECS), sprintf('Failure at #%d (%d day)', $i, $offset));
+        }
+        $time = new DateTime('6am', $tz);
+        $offsets = [
+            -23 => (clone $midnight)->modify('yesterday'), // 6am - 23 hrs = 7am yesterday
+            -7 => (clone $midnight)->modify('yesterday'), // 6am - 7 hrs = 11pm yesterday
+            -6 => $midnight,
+            -3 => $midnight,
+            -1 => $midnight,
+            +1 => $midnight,
+            +5 => $midnight,
+            +17 => $midnight,
+            +18 => (clone $midnight)->modify('tomorrow'), // 6am + 18 hrs = 12am tomorrow
+            +23 => (clone $midnight)->modify('tomorrow'), // 6am + 23 hrs = 5am tomorrow
+        ];
+        foreach ($offsets as $offset => $expected) {
+            $this->assertEquals($expected->getTimestamp(), after_midnight::get_last_midnight($time->getTimestamp() + $offset * HOURSECS), sprintf('Failure at #%d (%d hour)', $i, $offset));
+        }
     }
 }

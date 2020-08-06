@@ -23,8 +23,6 @@
 
 namespace mod_perform\notification;
 
-use mod_perform\models\activity\notification as notification_model;
-
 /**
  * broker interface
  */
@@ -35,10 +33,4 @@ interface broker {
      * @return array
      */
     public function get_default_triggers(): array;
-
-    /**
-     * @param dealer $dealer
-     * @param notification_model $notification
-     */
-    public function execute(dealer $dealer, notification_model $notification): void;
 }

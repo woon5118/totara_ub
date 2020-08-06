@@ -143,7 +143,7 @@ abstract class mod_perform_notification_testcase extends advanced_testcase {
      *
      * @param section $section
      * @param string[]|null $relationships relationship class names or null to default three relationships
-     * @return relationship[]
+     * @return relationship[] as idnumber => relationship
      */
     protected function create_section_relationships(section $section, array $relationships = null): array {
         if ($relationships === null) {
@@ -153,10 +153,12 @@ abstract class mod_perform_notification_testcase extends advanced_testcase {
                 constants::RELATIONSHIP_MANAGER,
             ];
         }
-        return array_map(function ($idnumber) use ($section) {
+        $results = [];
+        foreach ($relationships as $idnumber) {
             $rel_id = $this->perfgen->get_core_relationship($idnumber)->id;
-            return section_relationship::create($section->get_id(), $rel_id, true)->core_relationship;
-        }, $relationships);
+            $results[$idnumber] = section_relationship::create($section->get_id(), $rel_id, true)->core_relationship;
+        }
+        return $results;
     }
 
     protected function get_core_relationship(string $relationclass): relationship {

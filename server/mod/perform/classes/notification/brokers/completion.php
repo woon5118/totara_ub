@@ -35,8 +35,4 @@ class completion implements broker {
     public function get_default_triggers(): array {
         return [];
     }
-
-    public function execute(dealer $dealer, notification_model $notification): void {
-        // not yet implemented
-    }
 }

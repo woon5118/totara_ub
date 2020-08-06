@@ -42,25 +42,28 @@ class mod_perform_notification_dealer_testcase extends mod_perform_notification_
         $notification = $this->create_notification($activity, 'instance_created', true);
         $relationships = $this->create_section_relationships($section);
 
-        $user = $this->getDataGenerator()->create_user();
-        $manager = $this->getDataGenerator()->create_user();
-        $appraiser = $this->getDataGenerator()->create_user();
+        $user = $this->getDataGenerator()->create_user(['username' => 'subject']);
+        $manager = $this->getDataGenerator()->create_user(['username' => 'manager']);
+        $appraiser = $this->getDataGenerator()->create_user(['username' => 'appraiser']);
 
         $userja = job_assignment::create_default($user->id, ['appraiserid' => $appraiser->id]);
         job_assignment::create_default($manager->id, ['managerjaid' => $userja->id]);
 
         $this->toggle_recipients($notification, [
             constants::RELATIONSHIP_SUBJECT => true,
-            // manager::class => default to false,
+            // constants::RELATIONSHIP_MANAGER => default to false,
             constants::RELATIONSHIP_APPRAISER => true,
         ]);
         $recipients = notification_recipient::load_by_notification($notification, true);
         $this->assertCount(2, $recipients);
 
-        $dealer = factory::create_dealer($notification, $user->id, $userja->id);
+        $dealer = factory::create_dealer_on_notification($notification);
+        $this->assertNotNull($dealer);
         $this->redirect_messages();
         $time = time();
-        $dealer->post();
+        $dealer->post($user, $relationships[constants::RELATIONSHIP_SUBJECT]);
+        $dealer->post($manager, $relationships[constants::RELATIONSHIP_MANAGER]);
+        $dealer->post($appraiser, $relationships[constants::RELATIONSHIP_APPRAISER]);
         $messages = $this->get_messages();
 
         $this->assertCount(2, $messages);

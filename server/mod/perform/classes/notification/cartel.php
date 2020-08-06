@@ -24,26 +24,24 @@
 namespace mod_perform\notification;
 
 use coding_exception;
-use mod_perform\models\activity\activity as activity_model;
+use mod_perform\entities\activity\participant_instance as participant_instance_entity;
 use mod_perform\models\activity\notification as notification_model;
+use mod_perform\models\activity\participant_instance as participant_instance_model;
 
 /**
  * The cartel class.
  */
 class cartel {
-    /** @var activity_model */
-    private $activity;
+    /** @var integer[] */
+    private $participant_instance_ids;
 
-    /** @var integer */
-    private $user_id;
-
-    /** @var integer|null */
-    private $job_assignment_id;
-
-    public function __construct(activity_model $activity, int $user_id, ?int $job_assignment_id) {
-        $this->activity = $activity;
-        $this->user_id = $user_id;
-        $this->job_assignment_id = $job_assignment_id;
+    /**
+     * Constructor. *Do not instantiate this class directly. Use the factory class.*
+     *
+     * @param integer[] $participant_instance_ids
+     */
+    public function __construct(array $participant_instance_ids) {
+        $this->participant_instance_ids = $participant_instance_ids;
     }
 
     /**
@@ -51,13 +49,25 @@ class cartel {
      * @throws coding_exception
      */
     public function dispatch(string $class_key): void {
-        $notification = notification_model::load_by_activity_and_class_key($this->activity, $class_key);
-        if (!$notification->active) {
-            return;
+        $subject_instance_id = false;
+        $dealer = null;
+
+        $entities = participant_instance_entity::repository()->where_in('id', $this->participant_instance_ids)->get();
+        /** @var participant_instance_entity[] $entities */
+        foreach ($entities as $entity) {
+            $instance = participant_instance_model::load_by_entity($entity);
+            if ($instance->subject_instance_id !== $subject_instance_id) {
+                $notification = notification_model::load_by_activity_and_class_key($instance->get_subject_instance()->get_activity(), $class_key);
+                $dealer = factory::create_dealer_on_notification($notification);
+                $subject_instance_id = $instance->subject_instance_id;
+            }
+            if (!$dealer) {
+                // The notification is not active, recipients are not set, etc.
+                continue;
+            }
+            $user = $instance->get_participant();
+            $relationship = $instance->get_core_relationship();
+            $dealer->post($user, $relationship);
         }
-        // TODO: optimise out when no recipients are active
-        $dealer = factory::create_dealer($notification, $this->user_id, $this->job_assignment_id);
-        $broker = factory::create_broker($notification->class_key);
-        $broker->execute($dealer, $notification);
     }
 }

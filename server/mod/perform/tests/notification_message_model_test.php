@@ -76,12 +76,12 @@ class mod_perform_notification_message_model_testcase extends mod_perform_notifi
             $this->section,
             [constants::RELATIONSHIP_SUBJECT]
         );
-        notification_recipient::create($this->notification, $this->relationships1[0], false);
+        notification_recipient::create($this->notification, $this->relationships1[constants::RELATIONSHIP_SUBJECT], false);
 
         $recipients = $this->notification->get_recipients();
         $this->assertCount(2, $recipients);
-        $this->recipient_subject = $recipients->find('relationship_id', $this->relationships1[0]->id);
-        $this->recipient_appraiser = $recipients->find('relationship_id', $this->relationships1[1]->id);
+        $this->recipient_subject = $recipients->find('relationship_id', $this->relationships1[constants::RELATIONSHIP_SUBJECT]->id);
+        $this->recipient_appraiser = $recipients->find('relationship_id', $this->relationships1[constants::RELATIONSHIP_APPRAISER]->id);
     }
 
     public function tearDown(): void {

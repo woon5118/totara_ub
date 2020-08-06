@@ -61,7 +61,7 @@ $notifications = [
     ],
     'completion' => [
         'name' => ['notification_broker_completion', 'mod_perform'],
-        'class' => \mod_perform\notification\brokers\overdue_reminder::class,
+        'class' => \mod_perform\notification\brokers\completion::class,
         'trigger_type' => \mod_perform\notification\trigger::TYPE_ONCE,
     ],
 ];
