@@ -23,7 +23,6 @@
       <template v-if="state === ACTIVITY_STATUS_DRAFT">
         <span v-html="$str('activity_status_banner_draft', 'mod_perform')" />
         <HelpIcon
-          position="bottom"
           :icon-label="$str('activity_status_banner_help_title', 'mod_perform')"
           :desc-id="$id('activation-help')"
         >
