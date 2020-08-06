@@ -100,6 +100,15 @@ class composer {
     }
 
     /**
+     * @return bool
+     * @throws coding_exception
+     */
+
+    public function is_reminder(): bool {
+        return factory::create_loader()->is_reminder($this->class_key);
+    }
+
+    /**
      * @param relationship $relationship
      * @return message
      * @throws coding_exception

@@ -232,4 +232,16 @@ class loader {
         $this->ensure_class_key_exists($class_key);
         return $this->notifications[$class_key];
     }
+
+    /**
+     * Check if notification is reminder.
+     *
+     * @param string $class_key
+     * @return boolean
+     * @throws class_key_not_available
+     */
+    public function is_reminder(string $class_key): bool {
+        $info = $this->get_information($class_key);
+        return !empty($info['is_reminder']);
+    }
 }

@@ -116,6 +116,7 @@ class mod_perform_notification_loader_testcase extends advanced_testcase {
                 'class' => instance_created::class,
                 'name' => ['notification_broker_instance_created', 'mod_perform'],
                 'trigger_type' => trigger::TYPE_ONCE,
+                'is_reminder' => false,
             ],
             'test_overdue_reminder' => [
                 'class' => overdue_reminder::class,
@@ -123,6 +124,7 @@ class mod_perform_notification_loader_testcase extends advanced_testcase {
                 'trigger_type' => trigger::TYPE_AFTER,
                 'trigger_label' => ['readme'],
                 'condition' => days_after::class,
+                'is_reminder' => true,
             ],
             'test_due_date_reminder' => [
                 'class' => due_date_reminder::class,
@@ -130,6 +132,7 @@ class mod_perform_notification_loader_testcase extends advanced_testcase {
                 'trigger_type' => trigger::TYPE_BEFORE,
                 'trigger_label' => ['tags', 'moodle'],
                 'condition' => days_before::class,
+                'is_reminder' => true,
             ],
             'kia_ora_koutou_katoa' => [
                 'class' => mod_perform_notification_loader_testcase::class,
@@ -137,6 +140,7 @@ class mod_perform_notification_loader_testcase extends advanced_testcase {
                 'trigger_type' => trigger::TYPE_ONCE,
                 'trigger_label' => ['ok'],
                 'condition' => after_midnight::class,
+                'is_reminder' => false,
             ],
         ];
         return loader::create($notifications);
@@ -227,6 +231,20 @@ class mod_perform_notification_loader_testcase extends advanced_testcase {
             $loader->support_triggers('he_who_must_not_be_named');
             $this->fail('class_key_not_available expected');
         } catch (class_key_not_available $ex) {
+            $this->assertStringContainsString('notification he_who_must_not_be_named is not registered', $ex->debuginfo);
+        }
+    }
+
+    public function test_is_reminder() {
+        $loader = $this->create_loader();
+        $this->assertFalse($loader->is_reminder('test_instance_created'));
+        $this->assertTrue($loader->is_reminder('test_overdue_reminder'));
+        $this->assertTrue($loader->is_reminder('test_due_date_reminder'));
+        $this->assertFalse($loader->is_reminder('kia_ora_koutou_katoa'));
+        try {
+            $loader->is_reminder('he_who_must_not_be_named');
+            $this->fail('invalid_parameter_exception expected');
+        } catch (invalid_parameter_exception $ex) {
             $this->assertStringContainsString('notification he_who_must_not_be_named is not registered', $ex->debuginfo);
         }
     }

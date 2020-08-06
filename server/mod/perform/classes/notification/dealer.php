@@ -74,6 +74,7 @@ class dealer {
      * @param relationship_model $relationship
      * @return boolean
      */
+
     public function post($user, relationship_model $relationship): bool {
         // FIXME: Notifications for manual relationships do not work at the moment
         //        in TL-26488 the way this works will be refactored
@@ -91,8 +92,9 @@ class dealer {
         if (!$this->composer->set_relationship($relationship)) {
             return false;
         }
+        $is_reminder = $this->composer->is_reminder();
         $message = $this->composer->compose($relationship);
-        $this->send_notification(core_user::NOREPLY_USER, $user, $message);
+        $this->send_notification(core_user::NOREPLY_USER, $user, $message, $is_reminder);
         $this->save_history($recipient, time());
         return true;
     }
@@ -112,9 +114,10 @@ class dealer {
      * @param stdClass|integer|string $from user object or user id or NOREPLY_USER or SUPPORT_USER
      * @param stdClass|integer|string $to user object or user id or NOREPLY_USER or SUPPORT_USER
      * @param message $message
+     * @param bool $is_reminder
      * @return void
      */
-    private function send_notification($from, $to, message $message): void {
+    private function send_notification($from, $to, message $message, bool $is_reminder): void {
         $from = self::resolve_user($from);
         $to = self::resolve_user($to);
 
@@ -124,7 +127,7 @@ class dealer {
         $eventdata->userfrom         = $from;
         $eventdata->userto           = $to;
 
-        $eventdata->name            = 'activity_notification';
+        $eventdata->name = $is_reminder ? 'activity_reminder' : 'activity_notification';
         $eventdata->component       = 'mod_perform';
         $eventdata->notification    = 1;
 
