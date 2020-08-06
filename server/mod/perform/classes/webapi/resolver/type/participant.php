@@ -35,14 +35,14 @@ use mod_perform\models\activity\participant as participant_model;
 class participant implements type_resolver {
 
     public static function resolve(string $field, $source, array $args, execution_context $ec) {
-        global $PAGE;
-
         if (!$source instanceof participant_model) {
             throw new coding_exception(sprintf("Invalid class %s passed to participant type resolver.", get_class($source)));
         }
 
         // If there's a valid token we will not use the core user type resolver
-        $token = $ec->get_resolve_info()->variableValues['token'] ?? null;
+        $token = $ec->get_resolve_info()->variableValues['token']
+            ?? $ec->get_resolve_info()->variableValues['input']['token']
+            ?? null;
         if ($token) {
             $validator = new external_participant_token_validator($token);
             if (!$validator->is_valid()) {
@@ -50,6 +50,10 @@ class participant implements type_resolver {
             }
         }
 
+        // If the user requested is an external user or
+        // the user who requests has a valid token we use the participant
+        // model to bypass the core_user checks which only work for internal users
+        // and only if you are logged in.
         if ($source->is_external()
             || $token
             || in_array($field, participant_model::$model_only_fields, true)
