@@ -257,7 +257,7 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020080400, 'perform');
     }
 
-    if ($oldversion < 2020080401) {
+    if ($oldversion < 2020080402) {
         // Define table perform_participant_external to be created.
         $table = new xmldb_table('perform_participant_external');
 
@@ -302,7 +302,9 @@ function xmldb_perform_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
-        $dbman->add_key($table, $user_key);
+        if (!$dbman->index_exists($table, $user_index)) {
+            $dbman->add_index($table, $user_index);
+        }
 
         // Add new columns to perform_subject_instance_manual_participant.
         $table = new xmldb_table('perform_subject_instance_manual_participant');
@@ -316,7 +318,7 @@ function xmldb_perform_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
-        upgrade_mod_savepoint(true, 2020080401, 'perform');
+        upgrade_mod_savepoint(true, 2020080402, 'perform');
     }
 
     return true;
