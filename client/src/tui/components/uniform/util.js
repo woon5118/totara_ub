@@ -47,6 +47,8 @@ export function createUniformInputWrapper(input, options = {}) {
   delete inputProps.ariaLabelledby;
 
   const props = Object.assign({}, inputProps, {
+    id: {},
+
     name: {
       type: [String, Number, Array],
       required: true,
@@ -87,35 +89,28 @@ export function createUniformInputWrapper(input, options = {}) {
           charLength: props.charLength,
         },
         scopedSlots: {
-          default: ({
-            id,
-            value,
-            update,
-            blur,
-            inputName,
-            errorId,
-            labelId,
-          }) => {
+          default: ({ value, update, blur, touch, labelId, attrs }) => {
             const finalProps = Object.assign({}, propsForInput);
             finalProps[modelProp] = value;
             // attrs that are actually props will automatically be moved to
             // props by Vue
-            const attrs = {
-              id,
-              name: inputName,
-              'aria-describedby': errorId || null,
-              'aria-invalid': errorId ? 'true' : null,
-            };
+            const inputAttrs = Object.assign({}, attrs);
             if (options.passAriaLabelledby) {
-              attrs['aria-labelledby'] = labelId;
+              inputAttrs['aria-labelledby'] = labelId;
+            }
+            if (props.id) {
+              inputAttrs.id = props.id;
             }
             return h(
               input,
               {
                 props: finalProps,
-                attrs,
+                attrs: inputAttrs,
                 on: mergeListeners(listeners, {
-                  [modelEvent]: value => update(value),
+                  [modelEvent]: value => {
+                    update(value);
+                    if (options.touchOnChange) touch();
+                  },
                   blur,
                 }),
                 scopedSlots: functional ? undefined : this.$scopedSlots,

@@ -75,6 +75,7 @@ export default {
         getTouched: name => !!get(this.touched, name),
         update: this.update,
         blur: this.blur,
+        touch: this.blur,
         register: this.register,
         unregister: this.unregister,
         updateRegistration: this.updateRegistration,
@@ -202,6 +203,15 @@ export default {
      * @param {(string|number|array)} path
      */
     blur(path) {
+      this.touch(path);
+    },
+
+    /**
+     * Record that input has been touched.
+     *
+     * @param {(string|number|array)} path
+     */
+    touch(path) {
       vueSet(this.touched, path, true);
       if (this.validationMode != 'submit') {
         this.$_validate(path);

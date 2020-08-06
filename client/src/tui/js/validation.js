@@ -23,16 +23,19 @@ import { isIsoAfter, isIsoBefore, getValuesFromIso } from 'tui/date';
 // match browser email validation regex.
 const EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
 
+const isEmpty = val =>
+  val === false ||
+  val === null ||
+  val === undefined ||
+  (typeof val === 'number' && isNaN(val)) ||
+  (typeof val === 'string' && val.trim().length === 0) ||
+  (Array.isArray(val) && val.length === 0);
+
 // built-in validations
 export const v = {
   required: () => ({
-    validate: val => {
-      const isEmpty =
-        !val ||
-        (typeof val === 'string' && val.trim().length === 0) ||
-        (Array.isArray(val) && val.length === 0);
-      return !isEmpty;
-    },
+    allowEmpty: false,
+    validate: val => !isEmpty(val),
     message: () => langString('required', 'moodle'),
   }),
 
@@ -87,8 +90,7 @@ export const v = {
 
   number: () => ({
     validate: val => !isNaN(Number(val)),
-    // TODO: language strings
-    message: () => `Please enter a valid number`,
+    message: () => langString('validation_invalid_number', 'totara_core'),
   }),
 
   integer: () => ({
@@ -97,33 +99,35 @@ export const v = {
       // not NaN and is an integer
       return !isNaN(num) && (num | 0) === num;
     },
-    message: () => `Please enter a valid whole number`,
+    message: () => langString('validation_invalid_integer', 'totara_core'),
   }),
 
   minLength: len => ({
     validate: val => val.length >= len,
-    message: () => `Please enter at least ${len} characters`,
+    message: () =>
+      langString('validation_invalid_min_length', 'totara_core', { len }),
   }),
 
   maxLength: len => ({
     validate: val => val.length <= len,
-    message: () => `Please enter at no more than ${len} characters`,
+    message: () =>
+      langString('validation_invalid_max_length', 'totara_core', { len }),
   }),
 
   min: min => ({
     validate: val => Number(val) >= min,
-    message: () => `Number must be ${min} or more`,
+    message: () => langString('validation_invalid_min', 'totara_core', { min }),
   }),
 
   max: max => ({
     validate: val => Number(val) <= max,
-    message: () => `Number must be ${max} or less`,
+    message: () => langString('validation_invalid_max', 'totara_core', { max }),
   }),
 
   colorValueHex: () => ({
     validate: val => /^#[0-9A-F]{6}$/i.test(val),
     message: () =>
-      'Value should begin with # followed by 6 valid hexadecimal code characters',
+      langString('validation_invalid_color_value_hex', 'totara_core'),
   }),
 
   // for testing async validation
@@ -143,7 +147,19 @@ function makeValidator(validator) {
     return validator;
   }
   return value => {
-    const result = validator.validate(value);
+    // if allowEmpty is true and it is empty skip validation
+    if (
+      (validator.allowEmpty == null || validator.allowEmpty) &&
+      isEmpty(value)
+    ) {
+      return;
+    }
+    let result = false;
+    try {
+      result = validator.validate(value);
+    } catch (e) {
+      result = false;
+    }
     if (result && result.then) {
       return result.then(() => {
         if (!result) {

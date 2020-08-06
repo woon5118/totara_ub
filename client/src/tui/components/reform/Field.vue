@@ -109,7 +109,9 @@ export default {
      * @returns {string}
      */
     inputName() {
-      return this.reformScope.getInputName(this.name);
+      return this.reformScope
+        ? this.reformScope.getInputName(this.name)
+        : this.name.toString();
     },
   },
 
@@ -169,10 +171,17 @@ export default {
     },
 
     /**
-     * Mark field as touched.
+     * Mark field as having been unfocused.
      */
     blur() {
       this.reformScope.blur(this.name);
+    },
+
+    /**
+     * Mark field as touched.
+     */
+    touch() {
+      this.reformScope.touch(this.name);
     },
 
     /**
@@ -193,6 +202,7 @@ export default {
       name: this.name,
       update: this.update,
       blur: this.blur,
+      touch: this.touch,
       error: this.error,
       inputName: this.inputName,
     });

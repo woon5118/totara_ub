@@ -60,7 +60,7 @@ export default {
 
   props: {
     path: {
-      type: [String, Array],
+      type: [String, Number, Array],
       required: true,
     },
 

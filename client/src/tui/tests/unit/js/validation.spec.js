@@ -32,8 +32,12 @@ describe('built-in validators', () => {
     expect(i.validate()).toBe(false);
     expect(i.validate('')).toBe(false);
     expect(i.validate('    ')).toBe(false);
+    expect(i.validate(NaN)).toBe(false);
+    expect(i.validate(null)).toBe(false);
+    expect(i.validate(undefined)).toBe(false);
+    expect(i.validate(false)).toBe(false);
     expect(i.validate('hi')).toBe(true);
-    expect(i.validate(0)).toBe(false);
+    expect(i.validate(0)).toBe(true);
     expect(i.validate([])).toBe(false);
     expect(i.validate({})).toBe(true);
     expect(i.validate('0')).toBe(true);
@@ -116,6 +120,6 @@ describe('fieldValidator', () => {
     const i = fieldValidator(v => [v.required(), v.min(3)]);
     expect(i('7')).toBe(undefined);
     expect(i('')).toBe('required');
-    expect(i('2')).toBe('Number must be 3 or more');
+    expect(i('2')).toBe('validation_invalid_min');
   });
 });

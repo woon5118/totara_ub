@@ -18,7 +18,7 @@
 
 <template>
   <Field
-    v-slot="slotProps"
+    v-slot="fieldSlotProps"
     :name="name"
     :validate="validate"
     :validations="validations"
@@ -31,16 +31,8 @@
         charLength && 'tui-input--customSize',
       ]"
     >
-      <slot
-        v-bind="slotProps"
-        :error-id="hasError(slotProps) ? $id('error') : false"
-      />
-      <FieldError
-        :id="$id('error')"
-        :error="computeError(slotProps)"
-        :dismissable="dismissable"
-        @dismiss="dismissError"
-      />
+      <slot v-bind="makeSlotProps(fieldSlotProps)" />
+      <FieldError :id="$id('error')" :error="computeError(fieldSlotProps)" />
     </div>
   </Field>
 </template>
@@ -61,7 +53,6 @@ export default {
       type: [String, Number, Array],
       required: true,
     },
-    dismissable: Boolean,
     error: String,
 
     validate: Function,
@@ -71,6 +62,19 @@ export default {
   },
 
   methods: {
+    makeSlotProps(slotProps) {
+      const errorId = this.hasError(slotProps) ? this.$id('error') : null;
+      return Object.assign({}, slotProps, {
+        errorId,
+        attrs: {
+          id: slotProps.id,
+          name: slotProps.inputName,
+          'aria-describedby': errorId || null,
+          'aria-invalid': errorId ? 'true' : null,
+        },
+      });
+    },
+
     hasError(slotProps) {
       return !!(this.error || slotProps.error);
     },
@@ -78,10 +82,6 @@ export default {
     computeError(slotProps) {
       const error = this.error || slotProps.error;
       return error && error.toString();
-    },
-
-    dismissError() {
-      // Todo
     },
   },
 };
