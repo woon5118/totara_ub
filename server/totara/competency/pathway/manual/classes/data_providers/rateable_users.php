@@ -118,7 +118,7 @@ class rateable_users extends provider {
      */
     protected function build_query(): repository {
         $repository = user::repository()
-            ->select_full_name_fields_only()
+            ->select_full_name_fields()
             ->select_user_picture_fields()
             ->filter_by_not_guest()
             ->filter_by_not_deleted()

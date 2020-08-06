@@ -23,6 +23,7 @@
  */
 
 use core\entities\user;
+use core_user\profile\display_setting;
 
 /**
  * Class core_orm_entity_user_repository_testcase
@@ -39,14 +40,20 @@ class core_orm_entity_user_repository_testcase extends advanced_testcase {
     protected function setUp(): void {
         parent::setUp();
         $this->user_1 = self::getDataGenerator()->create_user([
+            'username' => 'sljackson',
             'firstname' => 'Samuel',
             'middlename' => 'Leroy',
             'lastname' => 'Jackson',
+            'country' => 'US',
+            'department' => 'Makeup',
         ]);
         $this->user_2 = self::getDataGenerator()->create_user([
+            'username' => 'ewgreg',
             'firstname' => 'Ewan',
             'middlename' => 'Gordon',
             'lastname' => 'McGregor',
+            'country' => 'UK',
+            'department' => 'Lighting',
         ]);
     }
 
@@ -72,7 +79,7 @@ class core_orm_entity_user_repository_testcase extends advanced_testcase {
 
         $complex_query = user::repository()
             ->as('auser')
-            ->select_full_name_fields_only()
+            ->select_full_name_fields()
             ->add_select_raw('COUNT(prefs.id) AS preferences_count')
             ->left_join(['user_preferences', 'prefs'], 'id', 'userid')
             ->group_by('id')
@@ -81,6 +88,7 @@ class core_orm_entity_user_repository_testcase extends advanced_testcase {
         $complex_query_result = $complex_query->get()->all();
         $this->assertCount(1, $complex_query_result);
         $this->assertEquals($this->user_1->id, $complex_query_result[0]->id);
+        $this->assertEquals(0, $complex_query_result[0]->preferences_count);
     }
 
     /**
@@ -99,7 +107,7 @@ class core_orm_entity_user_repository_testcase extends advanced_testcase {
 
         $complex_query = user::repository()
             ->as('auser')
-            ->select_full_name_fields_only()
+            ->select_full_name_fields()
             ->add_select_raw('COUNT(prefs.id) AS preferences_count')
             ->left_join(['user_preferences', 'prefs'], 'id', 'userid')
             ->group_by(['id', 'firstname', 'lastname'])
@@ -111,6 +119,8 @@ class core_orm_entity_user_repository_testcase extends advanced_testcase {
         $this->assertCount(2, $complex_query_result);
         $this->assertEquals($this->user_2->id, $complex_query_result[0]->id);
         $this->assertEquals($this->user_1->id, $complex_query_result[1]->id);
+        $this->assertEquals(0, $complex_query_result[0]->preferences_count);
+        $this->assertEquals(0, $complex_query_result[1]->preferences_count);
     }
 
     /**
@@ -138,6 +148,94 @@ class core_orm_entity_user_repository_testcase extends advanced_testcase {
         $complex_query_result = $complex_query->get()->all();
         $this->assertEquals($this->user_1->id, $complex_query_result[0]->id);
         $this->assertEquals($this->user_1->picture, $complex_query_result[0]->picture);
+        $this->assertEquals(0, $complex_query_result[0]->preferences_count);
+    }
+
+    /**
+     * Test that select_profile_summary_card_fields() selects only the fields defined by an admin on the user profile summary card
+     * config page.
+     *
+     * @see /server/user/profile_summary_card_edit.php
+     */
+    public function test_select_profile_summary_card_fields(): void {
+        // By default user picture is included, and there are 2 fields for fullname and department.
+        $query1 = user::repository()
+            ->where('id', $this->user_1->id)
+            ->select_profile_summary_card_fields()
+            ->get()
+            ->all();
+        $this->assertEquals($this->user_1->id, $query1[0]->id);
+        $this->assertEquals($this->user_1->firstname, $query1[0]->firstname);
+        $this->assertEquals($this->user_1->lastname, $query1[0]->lastname);
+        $this->assertEquals($this->user_1->department, $query1[0]->department);
+        $this->assertEquals($this->user_1->picture, $query1[0]->picture);
+        $this->assertObjectNotHasAttribute('username', $query1[0]);
+        $this->assertObjectNotHasAttribute('country', $query1[0]);
+
+        // Don't include picture if it is disabled in settings.
+        display_setting::save_display_user_profile(false);
+        $query2 = user::repository()
+            ->where('id', $this->user_1->id)
+            ->select_profile_summary_card_fields()
+            ->get()
+            ->all();
+        $this->assertEquals($this->user_1->id, $query2[0]->id);
+        $this->assertEquals($this->user_1->department, $query2[0]->department);
+        $this->assertObjectNotHasAttribute('picture', $query2[0]);
+        $this->assertObjectNotHasAttribute('imagealt', $query2[0]);
+        $this->assertObjectNotHasAttribute('username', $query2[0]);
+        $this->assertObjectNotHasAttribute('country', $query2[0]);
+
+        // Don't include picture if we specify it in the method param.
+        display_setting::save_display_user_profile(true);
+        $query3 = user::repository()
+            ->where('id', $this->user_1->id)
+            ->select_profile_summary_card_fields(false)
+            ->get()
+            ->all();
+        $this->assertEquals($this->user_1->id, $query3[0]->id);
+        $this->assertEquals($this->user_1->department, $query3[0]->department);
+        $this->assertObjectNotHasAttribute('picture', $query3[0]);
+        $this->assertObjectNotHasAttribute('imagealt', $query3[0]);
+        $this->assertObjectNotHasAttribute('username', $query3[0]);
+        $this->assertObjectNotHasAttribute('country', $query3[0]);
+
+        // Change what fields will be selected
+        display_setting::save_display_fields(['username', 'country', '', '']);
+        $query4 = user::repository()
+            ->where('id', $this->user_1->id)
+            ->select_profile_summary_card_fields(false)
+            ->get()
+            ->all();
+        $this->assertEquals($this->user_1->id, $query4[0]->id);
+        $this->assertEquals($this->user_1->username, $query4[0]->username);
+        $this->assertEquals($this->user_1->country, $query4[0]->country);
+        $this->assertObjectNotHasAttribute('firstname', $query4[0]);
+        $this->assertObjectNotHasAttribute('lastname', $query4[0]);
+        $this->assertObjectNotHasAttribute('picture', $query4[0]);
+        $this->assertObjectNotHasAttribute('imagealt', $query4[0]);
+        $this->assertObjectNotHasAttribute('department', $query4[0]);
+
+        // Complex query where we select the maximum amount profile display fields.
+        display_setting::save_display_fields(['fullname', 'username', 'department', 'country']);
+        $complex_query = user::repository()
+            ->as('auser')
+            ->select_profile_summary_card_fields()
+            ->add_select_raw('COUNT(prefs.id) AS preferences_count')
+            ->left_join(['user_preferences', 'prefs'], 'id', 'userid')
+            ->group_by(['id', 'firstname', 'lastname'])
+            ->filter_by_full_name('e')
+            ->where('id', $this->user_1->id)
+            ->get()
+            ->all();
+        $this->assertEquals($this->user_1->id, $complex_query[0]->id);
+        $this->assertEquals($this->user_1->picture, $complex_query[0]->picture);
+        $this->assertEquals($this->user_1->firstname, $complex_query[0]->firstname);
+        $this->assertEquals($this->user_1->lastname, $complex_query[0]->lastname);
+        $this->assertEquals($this->user_1->department, $complex_query[0]->department);
+        $this->assertEquals($this->user_1->username, $complex_query[0]->username);
+        $this->assertEquals($this->user_1->country, $complex_query[0]->country);
+        $this->assertEquals(0, $complex_query[0]->preferences_count);
     }
 
 }

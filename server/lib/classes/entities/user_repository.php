@@ -28,6 +28,7 @@ use core\orm\entity\filter\basket;
 use core\orm\entity\filter\in;
 use core\orm\entity\filter\user_name;
 use core\orm\entity\repository;
+use core_user\profile\display_setting;
 use user_picture;
 
 class user_repository extends repository {
@@ -97,11 +98,11 @@ class user_repository extends repository {
     }
 
     /**
-     * Select only display name of the user for display purposes
+     * Select fields required for displaying name of the user.
      *
      * @return $this
      */
-    public function select_full_name_fields_only(): self {
+    public function select_full_name_fields(): self {
         $fields = $this->get_user_full_name_fields();
 
         $this
@@ -123,6 +124,41 @@ class user_repository extends repository {
         $this
             ->add_select_raw($fields)
             ->group_by_raw($fields);
+
+        return $this;
+    }
+
+    /**
+     * Selects the fields required to display a user profile summary card.
+     *
+     * @see {/server/user/profile_summary_card_edit.php} Page for setting what fields are displayed on a site-level
+     *
+     * @param bool $include_profile_image
+     * @return $this
+     */
+    public function select_profile_summary_card_fields(bool $include_profile_image = true): self {
+        if ($include_profile_image && display_setting::display_user_picture()) {
+            $this->select_user_picture_fields();
+        }
+
+        foreach (display_setting::get_display_fields() as $field_key => $field_name) {
+            if ($field_name === null) {
+                continue;
+            }
+
+            if ($field_name === 'fullname') {
+                // 'fullname' is computed so we can't directly select it.
+                $this->select_full_name_fields();
+                continue;
+            }
+
+            $this
+                ->add_select($field_name)
+                ->group_by($field_name);
+        }
+
+        // Always include the ID.
+        $this->add_select('id')->group_by('id');
 
         return $this;
     }

@@ -86,7 +86,7 @@ class user extends \external_api {
         $order = "{$name_order} {$direction}, id asc";
 
         return \core\entities\user::repository()
-            ->select_full_name_fields_only()
+            ->select_full_name_fields()
             ->filter_by_not_deleted()
             ->filter_by_not_guest()
             ->set_filters($filters)
