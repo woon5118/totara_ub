@@ -106,6 +106,22 @@ type mod_perform_subject_instance {
   instance_count: Int
 }
 
+type mod_perform_historic_activity {
+  activity_name: String,
+  activity_link: String,
+  type: String,
+  status: String
+}
+
+type mod_perform_other_historic_activity {
+  activity_name: String,
+  activity_link: String,
+  type: String,
+  subject_user: String,
+  relationship_to: String,
+  status: String
+}
+
 """
 Details about a participant_instance
 """
@@ -302,6 +318,20 @@ extend type Query {
   Get a single element
   """
   mod_perform_element(element_id: core_id): mod_perform_element
+
+  """
+  A list of all appraisal/feedback360 activities the current user is participating in.
+  This can be filtered to show only the ones the user is the subject in and
+  the ones the user is not the subject in but participating.
+  """
+  mod_perform_historic_activities: [mod_perform_historic_activity!]!
+
+  """
+  A list of all appraisal/feedback360 activities the current user is participating in.
+  This can be filtered to show only the ones the user is the subject in and
+  the ones the user is not the subject in but participating.
+  """
+  mod_perform_other_historic_activities: [mod_perform_other_historic_activity!]!
 }
 
 """

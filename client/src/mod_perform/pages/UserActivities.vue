@@ -59,6 +59,13 @@
             :view-url="viewActivityUrl"
           />
         </Tab>
+        <Tab
+          v-if="isHistoricActivitiesEnabled"
+          :id="$id('your-historic-activities-tab')"
+          :name="$str('user_activities_historic_activities', 'mod_perform')"
+        >
+          <UserHistoricActivityList :current-user-id="currentUserId" />
+        </Tab>
       </Tabs>
     </div>
 
@@ -80,6 +87,7 @@ import SelectActivityModal from 'mod_perform/components/manage_activity/particip
 import Tab from 'tui/components/tabs/Tab';
 import Tabs from 'tui/components/tabs/Tabs';
 import UserActivityList from 'mod_perform/components/user_activities/list/Activities';
+import UserHistoricActivityList from 'mod_perform/components/user_activities/list/HistoricActivities';
 import { NOTIFICATION_DURATION } from 'mod_perform/constants';
 import { notify } from 'tui/notifications';
 
@@ -91,6 +99,7 @@ export default {
     Tab,
     Tabs,
     UserActivityList,
+    UserHistoricActivityList,
   },
   props: {
     /**
@@ -121,6 +130,10 @@ export default {
       default: false,
     },
     canPotentiallyManageParticipants: {
+      required: true,
+      type: Boolean,
+    },
+    isHistoricActivitiesEnabled: {
       required: true,
       type: Boolean,
     },
@@ -169,6 +182,7 @@ export default {
       "toast_success_save_close_on_completion_response",
       "toast_success_save_response",
       "user_activities_activities_about_others_title",
+      "user_activities_historic_activities",
       "user_activities_page_title",
       "user_activities_your_activities_title"
     ]

@@ -31,11 +31,13 @@ use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\entities\activity\activity_type;
 use context;
 use context_coursecat;
+use context_system;
 use core_text;
 use mod_perform\entities\activity\element;
 use mod_perform\models\activity\activity;
 use required_capability_exception;
 use totara_core\access;
+use totara_core\advanced_feature;
 
 class util {
 
@@ -361,5 +363,14 @@ class util {
         // Restrict to specific subject users.
         list($sourcesql, $sourceparams) = $DB->get_in_or_equal($permitted_users, SQL_PARAMS_NAMED);
         return ["{$user_id_field} {$sourcesql}", $sourceparams];
+    }
+
+    public static function is_historic_activities_enabled() {
+        if (get_config(null, 'showhistoricactivities') &&
+            (advanced_feature::is_enabled('appraisals') || advanced_feature::is_enabled('feedback360'))
+        ) {
+            return true;
+        }
+        return false;
     }
 }

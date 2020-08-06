@@ -168,23 +168,18 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
         advanced_feature::ENABLED));
 
     $optionalsubsystems->add(new totara_core_admin_setting_feature('enableappraisals',
-        new lang_string('enablehistoricappraisals', 'totara_appraisal'),
-        new lang_string('confighistoricappraisals', 'totara_appraisal'),
+        new lang_string('enablelegacyappraisals', 'totara_appraisal'),
+        new lang_string('configenablelegacyappraisals', 'totara_appraisal'),
         advanced_feature::DISABLED));
-
-    $optionalsubsystems->add(new admin_setting_configcheckbox('showhistoricappraisals',
-        new lang_string('showhistoricappraisals', 'totara_appraisal'),
-        new lang_string('configshowhistoricappraisals', 'totara_appraisal'),
-        '0'));
 
     $optionalsubsystems->add(new totara_core_admin_setting_feature('enablefeedback360',
-        new lang_string('enablehistoricfeedback360', 'totara_feedback360'),
-        new lang_string('confighistoricfeedback360', 'totara_feedback360'),
+        new lang_string('enablelegacyfeedback360', 'totara_feedback360'),
+        new lang_string('configenablelegacyfeedback360', 'totara_feedback360'),
         advanced_feature::DISABLED));
 
-    $optionalsubsystems->add(new admin_setting_configcheckbox('showhistoricfeedback360',
-        new lang_string('showhistoricfeedback360', 'totara_feedback360'),
-        new lang_string('configshowhistoricfeedback360', 'totara_feedback360'),
+    $optionalsubsystems->add(new admin_setting_configcheckbox('showhistoricactivities',
+        new lang_string('showhistoricactivities', 'mod_perform'),
+        new lang_string('configshowhistoricactivities', 'mod_perform'),
         '0'));
 
     $optionalsubsystems->add(new totara_core_admin_setting_feature('enablelearningplans',

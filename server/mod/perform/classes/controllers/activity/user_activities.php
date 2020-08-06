@@ -61,6 +61,7 @@ class user_activities extends perform_controller {
             'require-manual-participants-notification' => manual_participant_helper::for_user($current_user_id)
                 ->has_pending_selections(),
             'can-potentially-manage-participants' => util::can_potentially_manage_participants($current_user_id),
+            'is-historic-activities-enabled' => util::is_historic_activities_enabled(),
         ];
 
         return self::create_tui_view('mod_perform/pages/UserActivities', $props)
