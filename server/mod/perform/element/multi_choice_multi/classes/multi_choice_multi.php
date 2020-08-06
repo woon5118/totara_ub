@@ -33,11 +33,12 @@ class multi_choice_multi extends respondable_element_plugin {
      * @inheritDoc
      */
     public function validate_response(?string $encoded_response_data, ?element $element): collection {
-        $answer_option = $this->decode_answer_option($encoded_response_data);
+        $element_data = $element->data ?? null;
+        $answer_option = $this->decode_response($encoded_response_data, $element_data);
 
         $errors = new collection();
 
-        if (empty($answer_option) && $element->is_required) {
+        if (empty($answer_option) && !is_null($element) && $element->is_required) {
             $errors->append(new answer_required_error());
         }
 
@@ -47,22 +48,53 @@ class multi_choice_multi extends respondable_element_plugin {
     }
 
     /**
-     * Pull the answer_option out of the encoded json data.
+     * Pull the answer text string out of the encoded json data.
+     *
      * @param string|null $encoded_response_data
-     * @return array|null
+     * @param string|null $encoded_element_data
+     * @return string|string[]
+     * @throws coding_exception
      */
-    protected function decode_answer_option(?string $encoded_response_data): ?array {
+    public function decode_response(?string $encoded_response_data, ?string $encoded_element_data) {
         $response_data = json_decode($encoded_response_data, true);
+        $element_data = json_decode($encoded_element_data, true);
 
         if ($response_data === null) {
             return null;
         }
 
-        if (!is_array($response_data) || !array_key_exists('answer_option', $response_data)) {
+        if (!isset($response_data['answer_option'])) {
             throw new coding_exception('Invalid response data format, expected "answer_option" field');
         }
 
-        return $response_data['answer_option'];
+        if (!is_array($response_data['answer_option'])) {
+            throw new coding_exception('Invalid response data format, expected "answer_option" to be an array');
+        }
+
+        if ($element_data === null || $element_data['options'] === null) {
+            throw new coding_exception('Invalid element data format, expected "options" field');
+        }
+
+        if (!is_array($response_data['answer_option'])) {
+            throw new coding_exception('Invalid element data format, expected "options" to be an array');
+        }
+
+        $responses = [];
+        foreach ($element_data['options'] as $i => $option) {
+            if (!isset($option['name']) || !isset($option['value'])) {
+                throw new coding_exception('Invalid element options format, expected "name" and "value" fields');
+            }
+            foreach ($response_data['answer_option'] as $answer_option) {
+                if ($option['name'] == $answer_option) {
+                    $responses[] = $option['value'];
+                }
+            }
+        }
+        return $responses;
     }
+<<<<<<< HEAD
 
 }
+=======
+}
+>>>>>>> 3aae2173a0c... fixup code

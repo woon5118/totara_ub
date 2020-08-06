@@ -24,17 +24,16 @@
 namespace mod_perform\userdata;
 
 use context;
-use mod_perform\userdata\traits\export_other_responses;
+use mod_perform\entities\activity\element_response;
+use mod_perform\models\activity\element_plugin;
+use mod_perform\models\activity\respondable_element_plugin;
+use mod_perform\userdata\traits\export_trait;
 use totara_userdata\userdata\export;
 use totara_userdata\userdata\item;
 use totara_userdata\userdata\target_user;
 
 class export_other_visible_responses extends item {
-
-    use export_other_responses;
-
-    /** @var int can view responses true */
-    private const CAN_VIEW = 1;
+    use export_trait;
 
     /**
      * Count user data for this item.
@@ -43,7 +42,12 @@ class export_other_visible_responses extends item {
      * @return int amount of data or negative integer status code (self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED)
      */
     protected static function count(target_user $user, context $context): int {
-        return self::count_other_responses($user, $context, self::CAN_VIEW);
+        return (element_response::repository())
+            ->filter_for_export()
+            ->filter_by_context($context)
+            ->filter_by_subject_for_export($user->id)
+            ->filter_by_subject_can_view($user->id)
+            ->count();
     }
 
     /**
@@ -53,6 +57,18 @@ class export_other_visible_responses extends item {
      * @return export|int result object or integer error code self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED
      */
     protected static function export(target_user $user, context $context) {
-        return self::export_other_responses_data($user, $context, self::CAN_VIEW);
+        $responses = (element_response::repository())
+            ->filter_for_export()
+            ->filter_by_context($context)
+            ->filter_by_subject_for_export($user->id)
+            ->filter_by_subject_can_view($user->id)
+            ->get(true)
+            ->map(function ($response) use ($user) {
+                return self::process_response_record($response, $user->id);
+            });
+
+        $export = new export();
+        $export->data = $responses;
+        return $export;
     }
 }

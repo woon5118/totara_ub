@@ -226,7 +226,7 @@ class section_element_response extends model {
         return (new core_relationship_model($core_relationship_entity))->get_name();
     }
 
-    public function get_element(): ?element {
+    public function get_element(): element {
         $element = null;
         if ($this->section_element_entity->element) {
             $element = new element($this->section_element_entity->element);

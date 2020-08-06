@@ -23,8 +23,40 @@
 
 namespace performelement_date_picker;
 
+use coding_exception;
 use mod_perform\models\activity\respondable_element_plugin;
 
 class date_picker extends respondable_element_plugin {
 
+    /**
+     * Pull the answer text string out of the encoded json data.
+     *
+     * @param string|null $encoded_response_data
+     * @param string|null $encoded_element_data
+     * @return string|string[]
+     * @throws coding_exception
+     */
+    public function decode_response(?string $encoded_response_data, ?string $encoded_element_data) {
+        $response_data = json_decode($encoded_response_data, true);
+
+        if ($response_data === null) {
+            return null;
+        }
+
+        if (!isset($response_data['date'])) {
+            throw new coding_exception('Invalid response data format, expected "date" field');
+        }
+
+        if (!isset($response_data['date']['iso'])) {
+            throw new coding_exception('Invalid response data format, expected "date" field to contain "iso" property');
+        }
+
+        $date_object = \DateTime::createFromFormat('Y-m-d', $response_data['date']['iso']);
+
+        if ($date_object === false) {
+            throw new coding_exception('Invalid response data format, could not parse ISO date');
+        }
+
+        return userdate($date_object->getTimestamp(), get_string('strftimedatefullshort', 'langconfig'));
+    }
 }

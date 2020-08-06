@@ -24,31 +24,15 @@
 namespace mod_perform\userdata;
 
 use context;
-use mod_perform\userdata\traits\user_responses;
-use totara_userdata\userdata\export;
+use Exception;
+use mod_perform\entities\activity\participant_instance;
+use mod_perform\models\activity\subject_instance;
+use mod_perform\userdata\traits\purge_trait;
 use totara_userdata\userdata\item;
 use totara_userdata\userdata\target_user;
 
 class purge_user_responses extends item {
-
-    use user_responses;
-
-    /**
-     * Can user data of this item data be purged from system?
-     * @param int $userstatus target_user::STATUS_ACTIVE, target_user::STATUS_DELETED or target_user::STATUS_SUSPENDED
-     * @return bool
-     */
-    public static function is_purgeable(int $userstatus): bool {
-        return true;
-    }
-
-    /**
-     * Can user data of this item be exported from the system?
-     * @return bool
-     */
-    public static function is_exportable(): bool {
-        return false;
-    }
+    use purge_trait;
 
     /**
      * Execute user data purging for this item.
@@ -59,28 +43,37 @@ class purge_user_responses extends item {
     protected static function purge(target_user $user, context $context): int {
         global $DB;
 
-        $join = self::get_activities_join($context, 'perform', 'ps.activity_id', 'p');
+        try {
+            $DB->transaction(function () use ($DB, $user, $context) {
+                participant_instance::repository()
+                    ->filter_by_context($context)
+                    ->filter_by_participant_user($user->id)->get()->map(function ($participant_instance) {
+                        $subject_instance_model = subject_instance::load_by_entity($participant_instance->subject_instance);
 
-        $sql = "SELECT per.* 
-                  FROM {perform_element_response} per
-                  JOIN {perform_participant_instance} ppi ON ppi.id = per.participant_instance_id
-                  JOIN {perform_section_element} pse ON pse.id = per.section_element_id
-                  JOIN {perform_subject_instance} psi ON psi.id = ppi.subject_instance_id
-                  JOIN {perform_element} pe ON pe.id = pse.element_id
-                  JOIN {perform_section} ps ON ps.id = pse.section_id
-                 $join
-                WHERE ppi.participant_id = :puserid";
-        $params = ['puserid' => $user->id];
-        $records = $DB->get_recordset_sql($sql, $params);
-        if ($records->valid()) {
-            foreach ($records as $record) {
-                $record->response_data = '{}';
-                $DB->update_record('perform_element_response', $record);
-            }
-            $records->close();
-        } else {
+                        // Delete cascades to include responses etc.
+                        $participant_instance->delete();
+
+                        // Ensure progress is synced following change.
+                        $subject_instance_model->update_progress_status();
+                    });
+            });
+        } catch (Exception $e) {
             return self::RESULT_STATUS_ERROR;
         }
+
         return self::RESULT_STATUS_SUCCESS;
+    }
+
+    /**
+     * Count user data for this item.
+     * @param target_user $user
+     * @param context $context restriction for counting i.e., system context for everything and course context for course data
+     * @return int amount of data or negative integer status code (self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED)
+     */
+    protected static function count(target_user $user, \context $context): int {
+        return participant_instance::repository()
+            ->filter_by_context($context)
+            ->filter_by_participant_user($user->id)
+            ->count();
     }
 }

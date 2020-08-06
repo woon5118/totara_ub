@@ -261,7 +261,11 @@ class util {
             return true;
         }
 
-        $subject_user_context = context_user::instance($subject_user_id);
+        // Allow for deleted subject user.
+        $subject_user_context = context_user::instance($subject_user_id, IGNORE_MISSING);
+        if ($subject_user_context === false) {
+            return false;
+        }
         return access::has_capability('mod/perform:manage_subject_user_participation', $subject_user_context, $manager_id);
     }
 

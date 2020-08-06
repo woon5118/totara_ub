@@ -24,50 +24,16 @@
 namespace mod_perform\userdata;
 
 use context;
-use totara_userdata\userdata\export;
+use Exception;
+use mod_perform\entities\activity\subject_instance;
+use mod_perform\entities\activity\track;
+use mod_perform\entities\activity\track_user_assignment;
+use mod_perform\userdata\traits\purge_trait;
 use totara_userdata\userdata\item;
 use totara_userdata\userdata\target_user;
 
 class purge_other_responses extends item {
-
-    /**
-     * Can user data of this item be somehow counted?
-     * How much data is there?
-     * @return bool
-     */
-    public static function is_countable(): bool {
-        return true;
-    }
-
-    /**
-     * Can user data of this item data be purged from system?
-     * @param int $userstatus target_user::STATUS_ACTIVE, target_user::STATUS_DELETED or target_user::STATUS_SUSPENDED
-     * @return bool
-     */
-    public static function is_purgeable(int $userstatus): bool {
-        return true;
-    }
-
-    /**
-     * Can user data of this item be exported from the system?
-     * @return bool
-     */
-    public static function is_exportable(): bool {
-        return false;
-    }
-
-    /**
-     * Is the given context level compatible with this item?
-     * @return array
-     */
-    public static function get_compatible_context_levels(): array {
-        return [
-            CONTEXT_SYSTEM,
-            CONTEXT_COURSECAT,
-            CONTEXT_COURSE,
-            CONTEXT_MODULE
-        ];
-    }
+    use purge_trait;
 
     /**
      * Execute user data purging for this item.
@@ -78,35 +44,26 @@ class purge_other_responses extends item {
     protected static function purge(target_user $user, context $context): int {
         global $DB;
 
-        $join = self::get_activities_join($context, 'perform', 'ps.activity_id', 'p');
+        try {
+            $DB->transaction(function () use ($DB, $user, $context) {
+                (subject_instance::repository())
+                    ->filter_by_context($context)
+                    ->filter_by_subject_user($user->id)
+                    ->get()
+                    ->map(function ($subject_instance) {
+                        $track_user_assignment_id = $subject_instance->track_user_assignment_id;
+                        $track_user_assignment = new track_user_assignment($track_user_assignment_id);
+                        $track_user_assignment->deleted = 1;
+                        $track_user_assignment->save();
 
-        $sql = "SELECT per.* 
-                  FROM {perform_element_response} per
-                  JOIN {perform_participant_instance} ppi ON ppi.id = per.participant_instance_id
-                  JOIN {perform_section_element} pse ON pse.id = per.section_element_id
-                  JOIN {perform_subject_instance} psi ON psi.id = ppi.subject_instance_id
-                  JOIN {perform_element} pe ON pe.id = pse.element_id
-                  JOIN {perform_section} ps ON ps.id = pse.section_id
-                 $join
-                 WHERE psi.subject_user_id = :suserid 
-                   AND ppi.participant_id <> :puserid 
-                   AND EXISTS (
-                        SELECT 1 
-                          FROM {perform_section_relationship} psr
-                         WHERE psr.section_id = ps.id 
-                       )
-               ";
-        $params = ['suserid' => $user->id, 'puserid' => $user->id];
-        $records = $DB->get_recordset_sql($sql, $params);
-        if ($records->valid()) {
-            foreach ($records as $record) {
-                $record->response_data = '{}';
-                $DB->update_record('perform_element_response', $record);
-            }
-            $records->close();
-        } else {
+                        // Delete cascades to include participant instances and responses etc.
+                        $subject_instance->delete();
+                    });
+            });
+        } catch (Exception $e) {
             return self::RESULT_STATUS_ERROR;
         }
+
         return self::RESULT_STATUS_SUCCESS;
     }
 
@@ -117,28 +74,9 @@ class purge_other_responses extends item {
      * @return int amount of data or negative integer status code (self::RESULT_STATUS_ERROR or self::RESULT_STATUS_SKIPPED)
      */
     protected static function count(target_user $user, \context $context): int {
-        global $DB;
-
-        $join = self::get_activities_join($context, 'perform', 'ps.activity_id', 'p');
-
-        $sql = "SELECT COUNT(per.id)
-                  FROM {perform_element_response} per
-                  JOIN {perform_participant_instance} ppi ON ppi.id = per.participant_instance_id
-                  JOIN {perform_section_element} pse ON pse.id = per.section_element_id
-                  JOIN {perform_subject_instance} psi ON psi.id = ppi.subject_instance_id
-                  JOIN {perform_element} pe ON pe.id = pse.element_id
-                  JOIN {perform_section} ps ON ps.id = pse.section_id
-                 $join
-                 WHERE psi.subject_user_id = :suserid 
-                   AND ppi.participant_id <> :puserid 
-                   AND EXISTS (
-                        SELECT 1 
-                          FROM {perform_section_relationship} psr
-                         WHERE psr.section_id = ps.id 
-                       )
-               ";
-        $params = ['suserid' => $user->id, 'puserid' => $user->id];
-
-        return $DB->count_records_sql($sql, $params);
+        return subject_instance::repository()
+            ->filter_by_context($context)
+            ->filter_by_subject_user($user->id)
+            ->count();
     }
 }

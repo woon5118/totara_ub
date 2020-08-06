@@ -321,5 +321,65 @@ function xmldb_perform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020080402, 'perform');
     }
 
+    if ($oldversion < 2020081300) {
+
+        // Define key participant_instance_id (foreign) to be dropped form perform_participant_section.
+        $table = new xmldb_table('perform_participant_section');
+        $key = new xmldb_key('participant_instance_id', XMLDB_KEY_FOREIGN, array('participant_instance_id'), 'perform_participant_instance', array('id'), 'restrict');
+
+        // Launch drop key participant_instance_id.
+        if ($dbman->key_exists($table, $key)) {
+            $dbman->drop_key($table, $key);
+        }
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020081300, 'perform');
+    }
+
+    if ($oldversion < 2020081301) {
+
+        // Define key participant_instance_id (foreign) to be added to perform_participant_section.
+        $table = new xmldb_table('perform_participant_section');
+        $key = new xmldb_key('participant_instance_id', XMLDB_KEY_FOREIGN, array('participant_instance_id'), 'perform_participant_instance', array('id'), 'cascade');
+
+        // Launch add key participant_instance_id.
+        if (!$dbman->key_exists($table, $key)) {
+            $dbman->add_key($table, $key);
+        }
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020081301, 'perform');
+    }
+
+    if ($oldversion < 2020081302) {
+
+        // Define key participant_instance_id (foreign) to be dropped form perform_element_response.
+        $table = new xmldb_table('perform_element_response');
+        $key = new xmldb_key('participant_instance_id', XMLDB_KEY_FOREIGN, array('participant_instance_id'), 'perform_participant_instance', array('id'));
+
+        // Launch drop key participant_instance_id.
+        if ($dbman->key_exists($table, $key)) {
+            $dbman->drop_key($table, $key);
+        }
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020081302, 'perform');
+    }
+
+    if ($oldversion < 2020081303) {
+
+        // Define key participant_instance_id (foreign) to be added to perform_element_response.
+        $table = new xmldb_table('perform_element_response');
+        $key = new xmldb_key('participant_instance_id', XMLDB_KEY_FOREIGN, array('participant_instance_id'), 'perform_participant_instance', array('id'), 'cascade');
+
+        // Launch add key participant_instance_id.
+        if (!$dbman->key_exists($table, $key)) {
+            $dbman->add_key($table, $key);
+        }
+
+        // Perform savepoint reached.
+        upgrade_mod_savepoint(true, 2020081303, 'perform');
+    }
+
     return true;
 }

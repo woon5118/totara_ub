@@ -23,8 +23,45 @@
 
 namespace performelement_multi_choice_single;
 
+use coding_exception;
 use mod_perform\models\activity\respondable_element_plugin;
 
 class multi_choice_single extends respondable_element_plugin {
 
+    /**
+     * Pull the answer text string out of the encoded json data.
+     *
+     * @param string|null $encoded_response_data
+     * @param string|null $encoded_element_data
+     * @return string|string[]
+     * @throws coding_exception
+     */
+    public function decode_response(?string $encoded_response_data, ?string $encoded_element_data) {
+
+        $response_data = json_decode($encoded_response_data, true);
+        $element_data = json_decode($encoded_element_data, true);
+
+        if ($response_data === null) {
+            return null;
+        }
+
+        if (!isset($response_data['answer_option'])) {
+            throw new coding_exception('Invalid response data format, expected "answer_option" field');
+        }
+
+        if ($element_data === null || !isset($element_data['options'])) {
+            throw new coding_exception('Invalid element data format, expected "options" field');
+        }
+
+        foreach ($element_data['options'] as $i => $option) {
+            if (!isset($option['name']) || !isset($option['value'])) {
+                throw new coding_exception('Invalid element options format, expected "name" and "value" fields');
+            }
+            if ($option['name'] == $response_data['answer_option']) {
+                return $option['value'];
+            }
+        }
+
+        return null;
+    }
 }

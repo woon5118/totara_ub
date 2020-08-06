@@ -34,7 +34,8 @@ class long_text extends respondable_element_plugin {
      * @inheritDoc
      */
     public function validate_response(?string $encoded_response_data, ?element $element): collection {
-        $answer_text = $this->decode_answer_text($encoded_response_data);
+        $element_data = $element->data ?? null;
+        $answer_text = $this->decode_response($encoded_response_data, $element_data);
 
         $errors = new collection();
 
@@ -47,10 +48,13 @@ class long_text extends respondable_element_plugin {
 
     /**
      * Pull the answer text string out of the encoded json data.
+     *
      * @param string|null $encoded_response_data
-     * @return string
+     * @param string|null $encoded_element_data
+     * @return string|string[]
+     * @throws coding_exception
      */
-    protected function decode_answer_text(?string $encoded_response_data): ?string {
+    public function decode_response(?string $encoded_response_data, ?string $encoded_element_data) {
         $response_data = json_decode($encoded_response_data, true);
 
         if ($response_data === null) {

@@ -34,13 +34,17 @@ class numeric_rating_scale extends respondable_element_plugin {
      * @inheritDoc
      */
     public function validate_response(?string $encoded_response_data, ?element $element): collection {
-        $answer_value = $this->decode_answer_value($encoded_response_data);
+        $element_data = $element->data ?? null;
+        $answer_value = $this->decode_response($encoded_response_data, $element_data);
 
+        if ($element === null) {
+            throw new coding_exception('Invalid element data format, expected "options" field');
+        }
         $errors = new collection();
 
         if ($answer_value !== '') {
             $this->validate_value($answer_value, $element, $errors);
-        } elseif ($element->is_required) {
+        } else if ($element->is_required) {
             $errors->append(new answer_required_error());
         }
 
@@ -50,12 +54,17 @@ class numeric_rating_scale extends respondable_element_plugin {
     /**
      * Get the answer value from encoded json data.
      * @param string|null $encoded_response_data
-     * @return string
+     * @param string|null $encoded_element_data
+     * @return string|string[]
      */
-    protected function decode_answer_value(?string $encoded_response_data): ?string {
+    public function decode_response(?string $encoded_response_data, ?string $encoded_element_data) {
         $response_data = json_decode($encoded_response_data, true);
 
-        if (empty($response_data) || !isset($response_data['answer_value'])) {
+        if ($response_data === null) {
+            return null;
+        }
+
+        if (!isset($response_data['answer_value'])) {
             throw new coding_exception('Invalid response data format, expected "answer_value" field');
         }
 
@@ -64,10 +73,10 @@ class numeric_rating_scale extends respondable_element_plugin {
 
     /**
      * @param int $answer_value
-     * @param element|null $element
+     * @param element $element
      * @param collection $errors
      */
-    protected function validate_value(int $answer_value, ?element $element, collection $errors): void {
+    protected function validate_value(int $answer_value, element $element, collection $errors): void {
         $data = json_decode($element->data, true);
 
         // If element does not have any data then we have a problem.

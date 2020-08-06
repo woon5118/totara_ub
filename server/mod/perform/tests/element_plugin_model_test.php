@@ -46,6 +46,8 @@ class mod_perform_element_plugin_model_testcase extends advanced_testcase {
         $respondable_element_plugin = new class extends respondable_element_plugin {
             public function __construct() {
             }
+            public function decode_response(?string $encoded_response_data, ?string $encoded_element_data) {
+            }
         };
 
         $entity = new element_entity();

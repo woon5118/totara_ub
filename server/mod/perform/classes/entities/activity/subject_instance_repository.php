@@ -24,6 +24,7 @@
 namespace mod_perform\entities\activity;
 
 use core\orm\entity\repository;
+use core\orm\query\builder;
 
 class subject_instance_repository extends repository {
 
@@ -44,4 +45,40 @@ class subject_instance_repository extends repository {
             ->where('"fbai_tr".activity_id', $activity_id);
     }
 
+    /**
+     * Filter by subject user id.
+     *
+     * @param int $subject_user_id
+     * @return subject_instance_repository
+     */
+    public function filter_by_subject_user(int $subject_user_id) {
+        return $this->where('subject_user_id', $subject_user_id);
+    }
+
+    /**
+     * Filter to subject instances at or below a specified context.
+     *
+     * @param \context $context
+     * @return $this
+     */
+    public function filter_by_context(\context $context): self {
+        // No need for restrictions for system context.
+        if (get_class($context) == 'context_system') {
+            return $this;
+        }
+        if (!$this->has_join('context')) {
+            $this->join('perform_track_user_assignment', 'perform_subject_instance.track_user_assignment_id', '=', 'id')
+                ->join('perform_track', 'perform_track_user_assignment.track_id', '=', 'id')
+                ->join('perform', 'perform_track.activity_id', '=', 'id')
+                ->join('course', 'perform.course', '=', 'id')
+                ->join('context', function (builder $joining) {
+                    $joining->where_field('course.id', 'context.instanceid')
+                        ->where('context.contextlevel', '=', CONTEXT_COURSE);
+                });
+        }
+        return $this->where(function (builder $builder) use ($context) {
+            $builder->where('context.id', $context->id)
+            ->or_where_like_starts_with('context.path', "{$context->path}/");
+        });
+    }
 }

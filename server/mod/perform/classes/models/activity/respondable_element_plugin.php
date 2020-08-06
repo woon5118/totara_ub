@@ -23,6 +23,7 @@
 
 namespace mod_perform\models\activity;
 
+use coding_exception;
 use core\collection;
 use mod_perform\entities\activity\element as element_entity;
 use mod_perform\models\response\element_validation_error;
@@ -56,8 +57,28 @@ abstract class respondable_element_plugin extends element_plugin {
     public function validate_element(element_entity $element) {
         // All respondable elements require a title.
         if (empty(trim($element->title))) {
-            throw new \coding_exception('Respondable elements must include a title');
+            throw new coding_exception('Respondable elements must include a title');
         }
     }
 
+    /**
+     * Method which accepts the response data and element data and outputs the decoded response.
+     * This method handles any re-formatting that is internal to the element (e.g. the element
+     * knows how to structure the response based on the element data) but does NOT do any output
+     * formatting such as format_string().
+     *
+     * @param string|null $encoded_response_data
+     * @param string|null $encoded_element_data
+     * @return string|string[]
+     * @throws coding_exception
+     */
+    abstract public function decode_response(?string $encoded_response_data, ?string $encoded_element_data);
+
+    /**
+     * Returns example response data that is in a format valid for the element. Used for generating records during testing.
+     * @return string
+     */
+    public function get_example_response_data():string {
+        return '{}';
+    }
 }
