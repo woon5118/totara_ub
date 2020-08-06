@@ -190,7 +190,7 @@ class schema_builder {
      * @param Schema $schema
      */
     protected function add_support_for_union_types(Schema $schema) {
-        $unions = \core_component::get_namespace_classes('webapi\resolver\union', 'core\webapi\union_resolver');
+        $unions = $this->load_union_classes();
         foreach ($unions as $class_name) {
             $parts = explode('\\', $class_name);
             $component = reset($parts);
@@ -225,7 +225,7 @@ class schema_builder {
                 $type = $schema->getType($type_name);
                 if (!$type) {
                     throw new coding_exception(
-                        "Concrete type '{$type_name}' returned by GraphQL union resolver '{$type_class_name}' ".
+                        "Concrete type '{$type_name}' returned by GraphQL union resolver '{$class_name}' ".
                         "is not defined in GraphQL schema",
                         DEBUG_DEVELOPER
                     );
@@ -233,6 +233,15 @@ class schema_builder {
                 return $type;
             };
         }
+    }
+
+    /**
+     * Load union classes
+     *
+     * @return array
+     */
+    protected function load_union_classes(): array {
+        return \core_component::get_namespace_classes('webapi\resolver\union', 'core\webapi\union_resolver');
     }
 
     /**

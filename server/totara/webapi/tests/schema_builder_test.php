@@ -80,9 +80,9 @@ class totara_webapi_schema_builder_test  extends \advanced_testcase {
         global $CFG;
 
         $schema_files = [
-            'test_schema_1.grahql' => file_get_contents(__DIR__.'/fixtures/webapi/test_schema_1.graphqls'),
-            'test_schema_2.grahql' => file_get_contents(__DIR__.'/fixtures/webapi/test_schema_2.graphqls'),
-            'test_schema_3.grahql' => file_get_contents(__DIR__.'/fixtures/webapi/test_schema_3.graphqls'),
+            'test_schema_1.graphqls' => file_get_contents(__DIR__.'/fixtures/webapi/test_schema_1.graphqls'),
+            'test_schema_2.graphqls' => file_get_contents(__DIR__.'/fixtures/webapi/test_schema_2.graphqls'),
+            'test_schema_3.graphqls' => file_get_contents(__DIR__.'/fixtures/webapi/test_schema_3.graphqls'),
             'format.graphqls' => file_get_contents($CFG->dirroot.'/lib/webapi/format.graphqls'),
             'status.graphqls' => file_get_contents($CFG->dirroot.'/totara/webapi/webapi/status.graphqls'),
             'course.graphqls' => file_get_contents($CFG->dirroot.'/lib/webapi/course.graphqls'),
