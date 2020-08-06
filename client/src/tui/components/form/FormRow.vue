@@ -17,42 +17,45 @@
 -->
 
 <template>
-  <div class="tui-formRow">
-    <div class="tui-formRow__desc">
-      <Label
-        v-if="label"
-        :id="generatedLabelId"
-        :for-id="generatedId"
-        :legend="labelLegend"
-        :hidden="hidden"
-        :label="label"
-        :required="required"
-      />
-      <HelpIcon
-        v-if="helpmsg"
-        :desc-id="ariaDescribedbyId"
-        :helpmsg="helpmsg"
-        :hidden="hidden"
-        :title="helpTitle"
-      />
-    </div>
-
-    <FieldContextProvider :id="generatedId" :label-id="generatedLabelId">
-      <div
-        :class="{
-          'tui-formRow__action': true,
-          'tui-formRow__action--isStacked': isStacked,
-        }"
-      >
-        <slot
-          :id="generatedId"
-          :labelId="generatedLabelId"
+  <div class="tui-formRow" :class="{ 'tui-formRow--vertical': vertical }">
+    <div class="tui-formRow__inner">
+      <div class="tui-formRow__desc">
+        <Label
+          v-if="label"
+          :id="generatedLabelId"
+          :for-id="generatedId"
+          :legend="labelLegend"
+          :hidden="hidden"
           :label="label"
-          :ariaDescribedby="ariaDescribedbyId"
-          :ariaLabel="ariaLabel"
+          :required="required"
+          :subfield="subfield"
+          :inline="true"
+        /><HelpIcon
+          v-if="helpmsg"
+          :desc-id="ariaDescribedbyId"
+          :helpmsg="helpmsg"
+          :hidden="hidden"
+          :title="helpTitle"
         />
       </div>
-    </FieldContextProvider>
+
+      <FieldContextProvider :id="generatedId" :label-id="generatedLabelId">
+        <div
+          :class="{
+            'tui-formRow__action': true,
+            'tui-formRow__action--isStacked': isStacked,
+          }"
+        >
+          <slot
+            :id="generatedId"
+            :labelId="generatedLabelId"
+            :label="label"
+            :ariaDescribedby="ariaDescribedbyId"
+            :ariaLabel="ariaLabel"
+          />
+        </div>
+      </FieldContextProvider>
+    </div>
   </div>
 </template>
 
@@ -77,7 +80,12 @@ export default {
     id: String,
     label: String,
     required: Boolean,
-    isStacked: Boolean,
+    isStacked: {
+      type: Boolean,
+      default: true,
+    },
+    subfield: Boolean,
+    vertical: Boolean,
   },
 
   computed: {

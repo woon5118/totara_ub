@@ -18,18 +18,7 @@
 
 <style lang="scss">
 // Reset
-input[type='date'].tui-formInput,
-input[type='datetime-local'].tui-formInput,
-input[type='email'].tui-formInput,
-input[type='month'].tui-formInput,
-input[type='number'].tui-formInput,
-input[type='password'].tui-formInput,
-input[type='search'].tui-formInput,
-input[type='tel'].tui-formInput,
-input[type='text'].tui-formInput,
-input[type='time'].tui-formInput,
-input[type='url'].tui-formInput,
-input[type='week'].tui-formInput {
+input[type].tui-formInput {
   display: inline-block;
   width: auto;
   max-width: none;
@@ -87,18 +76,7 @@ input[type='week'].tui-formInput {
   }
 }
 
-input[type='date'].tui-formInput,
-input[type='datetime-local'].tui-formInput,
-input[type='email'].tui-formInput,
-input[type='month'].tui-formInput,
-input[type='number'].tui-formInput,
-input[type='password'].tui-formInput,
-input[type='search'].tui-formInput,
-input[type='tel'].tui-formInput,
-input[type='text'].tui-formInput,
-input[type='time'].tui-formInput,
-input[type='url'].tui-formInput,
-input[type='week'].tui-formInput {
+input[type].tui-formInput {
   display: block;
   flex-grow: 1;
   box-sizing: border-box;
@@ -113,11 +91,13 @@ input[type='week'].tui-formInput {
   border: var(--tui-form-input-border-size) solid;
   border-color: var(--tui-form-input-border-color);
 
+  @include tui-char-length-classes();
+
   &::placeholder {
     color: var(--tui-form-input-text-placeholder-color);
   }
 
-  .tui-context-invalid & {
+  .tui-contextInvalid & {
     border-color: var(--tui-form-input-border-color-invalid);
     box-shadow: var(--tui-form-input-shadow-invalid);
   }
@@ -129,7 +109,7 @@ input[type='week'].tui-formInput {
     outline: none;
     box-shadow: var(--tui-form-input-shadow-focus);
 
-    .tui-context-invalid & {
+    .tui-contextInvalid & {
       background: var(--tui-form-input-bg-color-invalid-focus);
       border-color: var(--tui-form-input-border-color-invalid);
       box-shadow: var(--tui-form-input-shadow-invalid-focus);

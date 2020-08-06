@@ -17,12 +17,9 @@
 -->
 
 <style lang="scss">
-.tui-formRowFieldset {
-  &__inner {
-    min-width: 0;
-    margin: 0;
-    padding: 0;
-    border: 0;
-  }
+.tui-formFieldGroup {
+  flex-grow: 1;
+  width: 100%;
+  min-width: 0;
 }
 </style>

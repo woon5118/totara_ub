@@ -25,7 +25,11 @@
   >
     <div
       class="tui-formField"
-      :class="[hasError(slotProps) && 'tui-context-invalid']"
+      :class="[
+        hasError(fieldSlotProps) && 'tui-contextInvalid',
+        charLength && 'tui-formField--charLength-' + charLength,
+        charLength && 'tui-input--customSize',
+      ]"
     >
       <slot
         v-bind="slotProps"
@@ -44,6 +48,7 @@
 <script>
 import Field from 'tui/components/reform/Field';
 import FieldError from 'tui/components/form/FieldError';
+import { charLengthProp } from '../form/form_common';
 
 export default {
   components: {
@@ -61,6 +66,8 @@ export default {
 
     validate: Function,
     validations: [Function, Array],
+
+    charLength: charLengthProp,
   },
 
   methods: {

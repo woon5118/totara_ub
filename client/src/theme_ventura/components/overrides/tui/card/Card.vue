@@ -42,16 +42,16 @@
   &--clickable {
     transition: box-shadow var(--tui-transition-form-function)
       var(--tui-transition-form-duration);
+
+    &.tui-focusWithin {
+      box-shadow: var(--tui-shadow-2);
+    }
   }
 
   &--clickable:hover,
   &--clickable:focus {
     box-shadow: var(--tui-shadow-2);
     cursor: pointer;
-  }
-
-  &.tui-focusWithin {
-    box-shadow: var(--tui-shadow-2);
   }
 }
 </style>

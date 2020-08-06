@@ -19,6 +19,7 @@
 <style lang="scss">
 :root {
   --tui-form-radio-group-padding: var(--tui-gap-2);
+  // note: should not be more than twice padding
   --tui-form-radio-group-spacing-v: var(--tui-gap-4);
   --tui-form-radio-group-spacing-h: var(--tui-gap-4);
 }
@@ -28,15 +29,9 @@
   flex-direction: column;
   padding: var(--tui-form-radio-group-padding) 0;
 
-  & > * + * {
-    margin-top: var(--tui-form-radio-group-spacing-v);
-  }
+  @include tui-stack-vertical(var(--tui-form-radio-group-spacing-v));
 
   &--inputSizedOptions {
-    & > * + * {
-      margin-top: var(--tui-form-radio-group-spacing-v);
-    }
-
     & > * {
       align-items: center;
       min-height: var(--tui-form-input-height);
@@ -48,15 +43,11 @@
   .tui-radioGroup--horizontal {
     flex-direction: row;
     flex-wrap: wrap;
-    // stylelint-disable length-zero-no-unit
-    margin-top: calc(
-      0px - var(--tui-form-radio-group-spacing-v) +
-        var(--tui-form-radio-group-padding)
-    );
-    padding-top: 0;
+    // prettier-ignore
+    padding: calc(var(--tui-form-radio-group-padding) - var(--tui-form-radio-group-spacing-v) / 2) 0;
 
     & > * {
-      margin-top: var(--tui-form-radio-group-spacing-v);
+      margin: calc(var(--tui-form-radio-group-spacing-v) / 2) 0;
       margin-right: var(--tui-form-radio-group-spacing-h);
     }
   }

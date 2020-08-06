@@ -23,17 +23,28 @@
   width: 100%;
   min-width: 0;
 
-  & > * {
-    margin-bottom: var(--tui-gap-3);
+  & > * + * {
+    margin-top: var(--tui-gap-3);
+  }
+
+  &__row,
+  &__headerRow {
+    display: flex;
+    align-items: flex-start;
+  }
+
+  &__headerRow + &__row {
+    margin-top: var(--tui-gap-2);
   }
 
   &--noSpacing > * {
     margin: 0;
   }
 
-  &__row {
-    display: flex;
-    align-items: flex-start;
+  &__headerRow &__delete {
+    height: 1px;
+    min-height: 1px;
+    overflow: hidden;
   }
 }
 </style>

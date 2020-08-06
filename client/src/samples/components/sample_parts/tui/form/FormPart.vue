@@ -18,26 +18,27 @@
 
 <template>
   <FormScope :path="path" :validate="validate" :process="process">
-    <div>
+    <FormRowStack>
       <FormRow label="First name" required>
         <FormText name="first" />
       </FormRow>
       <FormRow label="Last name" required>
         <FormText name="last" />
       </FormRow>
-    </div>
+    </FormRowStack>
   </FormScope>
 </template>
 
 <script>
 import FormScope from 'tui/components/reform/FormScope';
-import { FormRow, FormText } from 'tui/components/uniform';
+import { FormRow, FormRowStack, FormText } from 'tui/components/uniform';
 
 export default {
   components: {
     FormScope,
     FormRow,
     FormText,
+    FormRowStack,
   },
 
   props: {

@@ -80,7 +80,7 @@
         height: var(--tui-form-checkbox-size-large);
       }
 
-      .tui-context-invalid & {
+      .tui-contextInvalid & {
         border-color: var(--tui-form-input-border-color-invalid);
         box-shadow: var(--tui-shadow-none), var(--tui-form-input-shadow-invalid);
       }
@@ -98,7 +98,7 @@
     border-color: var(--tui-form-checkbox-border-color-focus);
     box-shadow: var(--tui-form-input-shadow-focus);
 
-    .tui-context-invalid & {
+    .tui-contextInvalid & {
       border-color: var(--tui-form-input-border-color-invalid);
       box-shadow: var(--tui-shadow-none),
         var(--tui-form-input-shadow-invalid-focus);

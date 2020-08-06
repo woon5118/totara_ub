@@ -20,13 +20,14 @@
   <div class="tui-formHelpIcon">
     <Popover position="top" :title="title" :triggers="['click']">
       <template v-slot:trigger>
-        <a href="javascript:;" class="tui-formHelpIcon__icon">
-          <Info
-            v-if="!hidden"
-            :alt="$str('help', 'moodle')"
-            :title="iconLabel || helpmsg"
-          />
-        </a>
+        <ButtonIcon
+          class="tui-formHelpIcon__icon"
+          :aria-label="$str('help', 'moodle')"
+          :title="iconLabel || helpmsg"
+          :styleclass="{ transparent: true }"
+        >
+          <Info v-if="!hidden" />
+        </ButtonIcon>
       </template>
       <slot v-if="$slots.default" />
       <template v-else>{{ helpmsg }}</template>
@@ -43,11 +44,13 @@
 // Components
 import Info from 'tui/components/icons/common/Info';
 import Popover from 'tui/components/popover/Popover';
+import ButtonIcon from 'tui/components/buttons/ButtonIcon';
 
 export default {
   components: {
     Info,
     Popover,
+    ButtonIcon,
   },
 
   props: {

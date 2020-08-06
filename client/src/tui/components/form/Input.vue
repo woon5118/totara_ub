@@ -26,10 +26,12 @@
     :aria-labelledby="ariaLabelledby"
     :autocomplete="autocomplete"
     :autofocus="autofocus"
-    :class="{
-      'tui-formInput--preIcon': styleclass.preIcon,
-      'tui-formInput--transparent': styleclass.transparent,
-    }"
+    :class="[
+      styleclass.preIcon ? 'tui-formInput--preIcon' : null,
+      styleclass.transparent ? 'tui-formInput--transparent' : null,
+      charLength ? 'tui-formInput--charLength-' + charLength : null,
+      charLength ? 'tui-input--customSize' : null,
+    ]"
     :dir="dir"
     :disabled="disabled"
     :list="list"
@@ -55,6 +57,8 @@
 </template>
 
 <script>
+import { charLengthProp } from './form_common';
+
 export default {
   props: {
     ariaDescribedby: [String, Boolean],
@@ -69,6 +73,7 @@ export default {
     },
     disabled: Boolean,
     id: String,
+    charLength: charLengthProp,
     list: String,
     max: Number,
     maxlength: Number,

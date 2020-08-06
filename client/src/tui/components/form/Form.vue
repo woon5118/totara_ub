@@ -35,6 +35,9 @@ export default {
   props: {
     vertical: Boolean,
 
+    // default input size
+    // full - take up entire available width
+    // limited - by default, equivalent to char-length="20"
     inputWidth: {
       type: String,
       validator: x => ['full', 'limited'].includes(x),

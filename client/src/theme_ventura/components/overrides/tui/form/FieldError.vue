@@ -18,7 +18,9 @@
 
 <style lang="scss">
 .tui-formFieldError {
-  margin-top: 2px;
+  // offset the extra red shadow on invalid elements + we want the error
+  // message to be spaced 1px away
+  margin-top: calc(var(--tui-form-input-invalid-shadow-size) + 1px);
 
   &__inner {
     @include tui-font-body-small();

@@ -29,9 +29,7 @@
       display: flex;
     }
 
-    & > * + * {
-      margin-left: var(--tui-gap-2);
-    }
+    @include tui-stack-horizontal(var(--tui-gap-2));
 
     &-day {
       width: 5rem;

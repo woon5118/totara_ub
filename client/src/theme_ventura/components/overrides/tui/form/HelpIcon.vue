@@ -18,10 +18,10 @@
 
 <style lang="scss">
 .tui-formHelpIcon {
-  @include tui-font-heading-label();
   display: inline-block;
 
   &__icon {
+    padding: 0;
     color: var(--tui-color-state);
   }
 

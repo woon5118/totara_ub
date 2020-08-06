@@ -22,22 +22,29 @@
     :id="id"
     :for="forId"
     class="tui-formLabel"
-    :class="{
-      'tui-formLabel--hidden': hidden,
-    }"
+    :class="[
+      hidden && 'tui-formLabel--hidden',
+      inline && 'tui-formLabel--inline',
+      subfield && 'tui-formLabel--subfield',
+      charLength ? 'tui-inputLabel--charLength-' + charLength : null,
+      charLength ? 'tui-input--customSize' : null,
+    ]"
   >
     {{ label }}
     <span
       v-if="required"
       class="tui-formLabel__required"
-      :aria-label="$str('required', 'moodle')"
       :title="$str('required', 'moodle')"
-      v-text="'*'"
-    />
+    >
+      <span aria-hidden="true">*</span>
+      <span class="sr-only">{{ $str('required', 'moodle') }}</span>
+    </span>
   </component>
 </template>
 
 <script>
+import { charLengthProp } from './form_common';
+
 export default {
   props: {
     id: String,
@@ -49,6 +56,9 @@ export default {
       type: String,
     },
     required: Boolean,
+    subfield: Boolean,
+    inline: Boolean,
+    charLength: charLengthProp,
   },
 };
 </script>

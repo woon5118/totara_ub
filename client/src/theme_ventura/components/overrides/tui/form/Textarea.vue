@@ -35,11 +35,13 @@
     var(--tui-form-input-border-color);
   resize: none;
 
+  @include tui-char-length-classes();
+
   &::placeholder {
     color: var(--tui-form-input-text-placeholder-color);
   }
 
-  .tui-context-invalid & {
+  .tui-contextInvalid & {
     border-color: var(--tui-form-input-border-color-invalid);
     box-shadow: var(--tui-form-input-shadow-invalid);
   }
@@ -51,7 +53,7 @@
     outline: none;
     box-shadow: var(--tui-form-input-shadow-focus);
 
-    .tui-context-invalid & {
+    .tui-contextInvalid & {
       background: var(--tui-form-input-bg-color-invalid-focus);
       border-color: var(--tui-form-input-border-color-invalid);
       box-shadow: var(--tui-form-input-shadow-invalid-focus);

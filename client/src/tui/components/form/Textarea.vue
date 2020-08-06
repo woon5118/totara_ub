@@ -20,6 +20,10 @@
   <textarea
     :id="id"
     class="tui-formTextarea"
+    :class="[
+      charLength ? 'tui-formTextarea--charLength-' + charLength : null,
+      charLength ? 'tui-input--customSize' : null,
+    ]"
     :aria-describedby="ariaDescribedby"
     :aria-label="ariaLabel"
     :aria-labelledby="ariaLabelledby"
@@ -43,6 +47,8 @@
 </template>
 
 <script>
+import { charLengthProp } from './form_common';
+
 export default {
   props: {
     ariaDescribedby: [String, Boolean],
@@ -58,6 +64,7 @@ export default {
     },
     disabled: Boolean,
     id: String,
+    charLength: charLengthProp,
     maxlength: Number,
     minlength: Number,
     name: String,

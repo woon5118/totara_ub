@@ -44,3 +44,16 @@ $tui-gap: 0.4rem;
 
   --tui-paragraph-gap: var(--tui-gap-2);
 }
+
+// Outside-in spacing: Stack
+// Stacks provide spacing between their children.
+@mixin tui-stack-vertical($gap) {
+  & > * + * {
+    margin-top: $gap;
+  }
+}
+@mixin tui-stack-horizontal($gap) {
+  & > * + * {
+    margin-left: $gap;
+  }
+}

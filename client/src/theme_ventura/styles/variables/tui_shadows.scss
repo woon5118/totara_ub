@@ -20,10 +20,18 @@
   //
 
   --tui-shadow-none: 0 0 0 0 transparent;
-  // Often used for form element focus
-  --tui-shadow-1: 0 0 3px 0 var(--tui-color-state);
-  --tui-shadow-1-invalid: 0 0 3px 0 var(--tui-color-prompt-alert);
   --tui-shadow-2: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
   --tui-shadow-3: 0 6px 6px 0 rgba(0, 0, 0, 0.15);
   --tui-shadow-4: 0 10px 10px 0 rgba(0, 0, 0, 0.3);
+
+  // Input box-shadows
+  --tui-form-input-shadow-focus: 0 0 3px 0 var(--tui-color-state);
+  --tui-form-input-shadow-invalid: 0 0 0
+    var(--tui-form-input-invalid-shadow-size)
+    var(--tui-form-input-border-color-invalid);
+  --tui-form-input-shadow-invalid-focus: 0 0 0
+      var(--tui-form-input-invalid-shadow-size)
+      var(--tui-form-input-border-color-invalid),
+    0 0 3px var(--tui-form-input-invalid-shadow-size)
+      var(--tui-form-input-border-color-invalid);
 }

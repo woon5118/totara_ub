@@ -11,6 +11,7 @@ exports[`totara_engage/components/form/AccessForm.vue Checks snapshot for privat
     class="tui-accessForm__options tui-accessForm__access--withoutTagLists"
   >
     <formrow-stub
+      isstacked="true"
       label="whocansee, totara_engage"
     />
      
@@ -53,6 +54,7 @@ exports[`totara_engage/components/form/AccessForm.vue Checks snapshot for public
     class="tui-accessForm__options tui-accessForm__access--withTagLists"
   >
     <formrow-stub
+      isstacked="true"
       label="whocansee, totara_engage"
     />
      
@@ -116,6 +118,7 @@ exports[`totara_engage/components/form/AccessForm.vue Checks snapshot for restri
     class="tui-accessForm__options tui-accessForm__access--withTagLists"
   >
     <formrow-stub
+      isstacked="true"
       label="whocansee, totara_engage"
     />
      

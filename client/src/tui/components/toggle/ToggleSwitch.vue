@@ -72,7 +72,9 @@ export default {
   },
 
   mounted() {
-    console.error('[ToggleSwitch] You must pass either aria-label or text.');
+    if (!this.ariaLabel && !this.text) {
+      console.error('[ToggleSwitch] You must pass either aria-label or text.');
+    }
   },
 
   methods: {

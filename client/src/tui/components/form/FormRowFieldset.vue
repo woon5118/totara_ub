@@ -17,13 +17,15 @@
 -->
 
 <template>
-  <fieldset class="tui-formRowFieldset">
-    <FormRow label-legend v-bind="$attrs">
-      <template v-if="$scopedSlots.default" v-slot="slotProps">
-        <slot v-bind="slotProps" />
-      </template>
-    </FormRow>
-  </fieldset>
+  <div class="tui-formRowFieldset">
+    <fieldset class="tui-formRowFieldset__inner">
+      <FormRow label-legend v-bind="$attrs">
+        <template v-if="$scopedSlots.default" v-slot="slotProps">
+          <slot v-bind="slotProps" />
+        </template>
+      </FormRow>
+    </fieldset>
+  </div>
 </template>
 
 <script>

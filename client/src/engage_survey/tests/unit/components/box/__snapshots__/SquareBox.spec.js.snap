@@ -5,63 +5,69 @@ exports[`engage_survey/components/box/SquareBox.vue Checks snapshot 1`] = `
   class="tui-formRow tui-engageSurvey-squareBox"
 >
   <div
-    class="tui-formRow__desc"
-  >
-    <label
-      class="tui-formLabel tui-formLabel--hidden"
-      for="id"
-      id="id-label"
-    >
-      
-  Label for the group of checkboxes
-  
-      <!---->
-    </label>
-     
-    <!---->
-  </div>
-   
-  <div
-    class="tui-formRow__action"
+    class="tui-formRow__inner"
   >
     <div
-      aria-labelledby="id-label"
-      class="tui-checkboxGroup"
-      role="group"
+      class="tui-formRow__desc"
+    >
+      <label
+        class="tui-formLabel tui-formLabel--hidden tui-formLabel--inline"
+        for="id"
+        id="id-label"
+      >
+        
+  Label for the group of checkboxes
+  
+        <!---->
+      </label>
+      <!---->
+    </div>
+     
+    <div
+      class="tui-formRow__action tui-formRow__action--isStacked"
     >
       <div
-        class="tui-formRow"
+        aria-labelledby="id-label"
+        class="tui-checkboxGroup"
+        role="group"
       >
         <div
-          class="tui-formRow__desc"
-        >
-          <!---->
-           
-          <!---->
-        </div>
-         
-        <div
-          class="tui-formRow__action"
+          class="tui-formRow"
         >
           <div
-            class="tui-checkbox tui-engageSurvey-squareBox__checkbox"
+            class="tui-formRow__inner"
           >
-            <input
-              class="tui-checkbox__input"
-              id="id"
-              name="engagesurvey-checkbox"
-              type="checkbox"
-              value="42"
-            />
-             
-            <label
-              class="tui-checkbox__label"
-              for="id"
+            <div
+              class="tui-formRow__desc"
             >
-              
+              <!---->
+              <!---->
+            </div>
+             
+            <div
+              class="tui-formRow__action tui-formRow__action--isStacked"
+            >
+              <div
+                class="tui-checkbox tui-engageSurvey-squareBox__checkbox"
+              >
+                <input
+                  class="tui-checkbox__input"
+                  id="id"
+                  name="engagesurvey-checkbox"
+                  type="checkbox"
+                  value="42"
+                />
+                 
+                <label
+                  class="tui-checkbox__label"
+                  for="id"
+                >
+                  
         hello
       
-            </label>
+                </label>
+              </div>
+            </div>
           </div>
         </div>
       </div>

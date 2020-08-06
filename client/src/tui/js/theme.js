@@ -36,7 +36,7 @@ export default {
    */
   getVar(name) {
     if (!rootStyle) {
-      return;
+      return null;
     }
     if (varCache.has(name)) {
       return varCache.get(name);
@@ -78,7 +78,7 @@ export default {
    */
   getArrayVar(name) {
     if (!rootStyle) {
-      return;
+      return [];
     }
     if (arrayVarCache.has(name)) {
       return arrayVarCache.get(name);

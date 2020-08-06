@@ -13,16 +13,11 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Simon Chester <simon.chester@totaralearning.com>
-  @module tui
+  @module theme_ventura
 -->
 
 <style lang="scss">
-.tui-formRowFieldset {
-  &__inner {
-    min-width: 0;
-    margin: 0;
-    padding: 0;
-    border: 0;
-  }
+.tui-form {
+  @include tui-stack-vertical(var(--tui-gap-4));
 }
 </style>

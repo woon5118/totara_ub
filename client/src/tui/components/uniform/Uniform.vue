@@ -79,6 +79,7 @@ export default {
 
     vertical: Boolean,
 
+    // default input size
     inputWidth: {
       type: String,
       validator: x => ['full', 'limited'].includes(x),

@@ -20,6 +20,7 @@ import { pick } from 'tui/util';
 import { getPropDefs, getModelDef } from 'tui/vue_util';
 import FormField from 'tui/components/uniform/FormField';
 import { mergeListeners } from '../../js/internal/vnode';
+import { charLengthProp } from '../form/form_common';
 
 /**
  * Create a wrapper component for an input.
@@ -29,6 +30,8 @@ import { mergeListeners } from '../../js/internal/vnode';
  * @param {(object|Vue)} input Input component to wrap.
  * @param {object} [options]
  * @param {boolean} [options.passAriaLabelledby] Pass the label ID as aria-labelledby.
+ * @param {boolean} [options.functional] Generate a functional component.
+ * @param {boolean} [options.touchOnChange] Mark input as touched whenever it changes.
  * @returns {(object|Vue)} Vue component.
  */
 export function createUniformInputWrapper(input, options = {}) {
@@ -51,6 +54,7 @@ export function createUniformInputWrapper(input, options = {}) {
 
     validate: Function,
     validations: [Function, Array],
+    charLength: charLengthProp,
   });
 
   const model = getModelDef(input);
@@ -59,6 +63,7 @@ export function createUniformInputWrapper(input, options = {}) {
 
   return {
     functional,
+
     // needed for lang string loader support
     components: {
       FormField,
@@ -73,11 +78,13 @@ export function createUniformInputWrapper(input, options = {}) {
       const props = functional ? context.props : this;
       const listeners = functional ? context.listeners : this.$listeners;
       const propsForInput = pick(props, Object.keys(inputProps));
+      propsForInput.charLength = 'full';
       return h(FormField, {
         props: {
           name: props.name,
           validate: props.validate,
           validations: props.validations,
+          charLength: props.charLength,
         },
         scopedSlots: {
           default: ({

@@ -40,6 +40,7 @@ export default {
     'dir',
     'disabled',
     'id',
+    'charLength',
     'maxlength',
     'minlength',
     'name',

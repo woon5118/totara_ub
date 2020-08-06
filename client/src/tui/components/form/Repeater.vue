@@ -21,13 +21,31 @@
     :id="uid"
     class="tui-repeater"
     :class="[noSpacing && 'tui-repeater--noSpacing']"
+    :aria-labelledby="ariaLabelledby"
+    role="group"
     aria-live="polite"
   >
+    <div v-if="$scopedSlots.header" class="tui-repeater__headerRow">
+      <slot name="header" />
+      <ButtonIcon
+        v-if="deleteIcon"
+        class="tui-repeater__delete"
+        :style="{ visibility: 'hidden' }"
+        aria-label=""
+        aria-hidden="true"
+        :styleclass="{ small: true, stealth: true }"
+        :disabled="true"
+      >
+        <DeleteIcon />
+      </ButtonIcon>
+    </div>
     <template v-for="(row, index) in rows">
       <div :key="index" class="tui-repeater__row">
         <slot :row="row" :index="index" />
         <ButtonIcon
-          v-if="showDeleteIcon(index)"
+          v-if="deleteIcon"
+          class="tui-repeater__delete"
+          :style="{ visibility: showDeleteIcon(index) ? null : 'hidden' }"
           :aria-label="$str('delete', 'moodle')"
           :styleclass="{ small: true, stealth: true }"
           :disabled="disabled"
@@ -65,6 +83,7 @@ export default {
   },
 
   props: {
+    ariaLabelledby: String,
     rows: {
       type: Array,
       required: true,
@@ -77,22 +96,13 @@ export default {
       type: Number,
       default: Infinity,
     },
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-    deleteIcon: {
-      type: Boolean,
-      default: false,
-    },
+    disabled: Boolean,
+    deleteIcon: Boolean,
     allowDeletingFirstItems: {
       type: Boolean,
       default: true,
     },
-    noSpacing: {
-      type: Boolean,
-      default: false,
-    },
+    noSpacing: Boolean,
   },
 
   methods: {

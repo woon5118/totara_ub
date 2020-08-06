@@ -6,22 +6,25 @@ exports[`presentation/form/FormRowActionButtons.vue Checks snapshot 1`] = `
   id="example"
 >
   <div
-    class="tui-formRow__desc"
-  >
-    <!---->
-     
-    <!---->
-  </div>
-   
-  <div
-    class="tui-formRow__action"
+    class="tui-formRow__inner"
   >
     <div
-      class="tui-formBtnGroup"
+      class="tui-formRow__desc"
     >
-      <buttonsubmit-stub />
-       
-      <buttoncancel-stub />
+      <!---->
+      <!---->
+    </div>
+     
+    <div
+      class="tui-formRow__action tui-formRow__action--isStacked"
+    >
+      <div
+        class="tui-formBtnGroup"
+      >
+        <buttonsubmit-stub />
+         
+        <buttoncancel-stub />
+      </div>
     </div>
   </div>
 </div>

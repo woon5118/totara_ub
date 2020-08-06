@@ -28,9 +28,7 @@
   flex-direction: column;
   padding: var(--tui-form-checkbox-group-padding) 0;
 
-  & > * + * {
-    margin-top: var(--tui-form-checkbox-group-spacing-v);
-  }
+  @include tui-stack-vertical(var(--tui-form-checkbox-group-spacing-v));
 }
 
 @media screen and (min-width: $tui-screen-sm) {

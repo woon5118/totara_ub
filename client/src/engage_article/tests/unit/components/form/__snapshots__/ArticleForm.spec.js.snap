@@ -9,6 +9,7 @@ exports[`engage_article/components/form/ArticleForm.vue Checks snapshot 1`] = `
   <formrow-stub
     class="tui-articleForm__title"
     hidden="true"
+    isstacked="true"
     label="articletitle, engage_article"
     required="true"
   />
@@ -19,6 +20,7 @@ exports[`engage_article/components/form/ArticleForm.vue Checks snapshot 1`] = `
     <formrow-stub
       class="tui-articleForm__description__formRow"
       hidden="true"
+      isstacked="true"
       label="content, engage_article"
       required="true"
     />

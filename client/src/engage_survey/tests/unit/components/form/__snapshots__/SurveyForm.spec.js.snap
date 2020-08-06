@@ -9,7 +9,7 @@ exports[`engage_survey/components/form/SurveyForm.vue Checks snapshot 1`] = `
                   }"></formtext-stub>
     </fieldcontextprovider-stub>
   </div>
-  <formrow-stub label="formtypetitle, engage_survey">
+  <formrow-stub label="formtypetitle, engage_survey" isstacked="true">
     <formradiogroup-stub horizontal="true" name="optionType" validations="function(v) {
                   return [v.required()]
                 }">
@@ -21,7 +21,7 @@ exports[`engage_survey/components/form/SurveyForm.vue Checks snapshot 1`] = `
       </radio-stub>
     </formradiogroup-stub>
   </formrow-stub>
-  <formrow-stub label="optionstitle, engage_survey" class="tui-totaraEngage-surveyForm__answerTitle">
+  <formrow-stub label="optionstitle, engage_survey" isstacked="true" class="tui-totaraEngage-surveyForm__answerTitle">
     <fieldarray-stub path="options"></fieldarray-stub>
   </formrow-stub>
   <buttongroup-stub class="tui-totaraEngage-surveyForm__buttons tui-totaraEngage-surveyForm__buttons--right">

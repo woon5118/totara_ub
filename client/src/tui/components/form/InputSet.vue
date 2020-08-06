@@ -12,17 +12,39 @@
   LTD, you may not access, use, modify, or distribute this software.
   Please contact [licensing@totaralearning.com] for more information.
 
-  @author Steve Barnett <steve.barnett@totaralearning.com>
-  @module totara_core
+  @author Simon Chester <simon.chester@totaralearning.com>
+  @module tui
 -->
 
 <template>
-  <div class="tui-formFieldGroup" role="group" :aria-labelledby="labelId">
-    <slot />
+  <div
+    class="tui-inputSet"
+    :role="labelId ? 'group' : null"
+    :class="[
+      charLength ? 'tui-inputSet--charLength-' + charLength : null,
+      charLength ? 'tui-input--customSize' : null,
+      split ? 'tui-inputSet--split' : null,
+    ]"
+    :aria-labelledby="labelId"
+  >
+    <div
+      class="tui-inputSet__inner"
+      :class="[
+        'tui-inputSet__inner--' + direction,
+        split ? 'tui-inputSet__inner--split' : null,
+        split && stackBelow
+          ? 'tui-inputSet__inner--stackBelow-' + stackBelow
+          : null,
+      ]"
+    >
+      <slot />
+    </div>
   </div>
 </template>
 
 <script>
+import { charLengthProp, isValidCharLength } from './form_common';
+
 export default {
   inject: {
     reformFieldContext: { default: null },
@@ -36,13 +58,21 @@ export default {
   },
 
   props: {
-    ariaLabelledby: {
-      type: String,
-      required: true,
+    ariaLabelledby: String,
+    vertical: Boolean,
+    split: Boolean,
+    charLength: charLengthProp,
+    stackBelow: {
+      type: [String, Number],
+      validator: isValidCharLength,
     },
   },
 
   computed: {
+    direction() {
+      return this.vertical ? 'vertical' : 'horizontal';
+    },
+
     labelId() {
       return (
         this.ariaLabelledby ||

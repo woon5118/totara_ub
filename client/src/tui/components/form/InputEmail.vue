@@ -41,6 +41,7 @@ export default {
     'dir',
     'disabled',
     'id',
+    'charLength',
     'list',
     'maxlength',
     'minlength',

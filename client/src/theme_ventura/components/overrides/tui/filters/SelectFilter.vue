@@ -28,6 +28,7 @@
   }
 
   .tui-select {
+    width: auto;
     max-width: 250px;
   }
 

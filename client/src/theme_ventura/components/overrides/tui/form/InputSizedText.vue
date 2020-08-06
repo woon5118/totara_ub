@@ -17,12 +17,9 @@
 -->
 
 <style lang="scss">
-.tui-formRowFieldset {
-  &__inner {
-    min-width: 0;
-    margin: 0;
-    padding: 0;
-    border: 0;
-  }
+.tui-formInputSizedText {
+  // prettier-ignore
+  padding: calc((var(--tui-form-input-height) - (1em * var(--tui-font-body-line-height))) / 2) 0;
+  line-height: var(--tui-font-body-line-height);
 }
 </style>

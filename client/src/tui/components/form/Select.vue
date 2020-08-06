@@ -19,11 +19,13 @@
 <template>
   <div
     class="tui-select"
-    :class="{
-      'tui-select--disabled': disabled,
-      'tui-select--large': large,
-      'tui-select--multiple': multiple,
-    }"
+    :class="[
+      disabled && 'tui-select--disabled',
+      large && 'tui-select--large',
+      multiple && 'tui-select--multiple',
+      charLength ? 'tui-select--charLength-' + charLength : null,
+      charLength ? 'tui-input--customSize' : null,
+    ]"
   >
     <select
       :id="id"
@@ -61,6 +63,8 @@
 </template>
 
 <script>
+import { charLengthProp } from './form_common';
+
 export default {
   inheritAttrs: false,
 
@@ -73,6 +77,7 @@ export default {
     autocomplete: String,
     autofocus: Boolean,
     disabled: Boolean,
+    charLength: charLengthProp,
     large: Boolean,
     multiple: Boolean,
     name: String,

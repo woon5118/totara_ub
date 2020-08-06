@@ -16,13 +16,19 @@
   @module tui
 -->
 
-<style lang="scss">
-.tui-formRowFieldset {
-  &__inner {
-    min-width: 0;
-    margin: 0;
-    padding: 0;
-    border: 0;
-  }
-}
-</style>
+<template>
+  <div class="tui-inputSetCol" :style="{ flexGrow: units }">
+    <slot />
+  </div>
+</template>
+
+<script>
+export default {
+  props: {
+    units: {
+      type: [Number, String],
+      default: 1,
+    },
+  },
+};
+</script>

@@ -18,7 +18,10 @@
 
 <style lang="scss">
 .tui-formField {
+  flex-grow: 1;
   width: 100%;
   min-width: 0;
+
+  @include tui-char-length-classes();
 }
 </style>

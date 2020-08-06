@@ -84,8 +84,11 @@
   position: relative;
   display: flex;
   flex-grow: 1;
+  width: 100%;
   min-width: 0;
   height: var(--tui-form-input-height);
+
+  @include tui-char-length-classes();
 
   &::after {
     position: absolute;
@@ -154,7 +157,7 @@
       outline: none;
       box-shadow: var(--tui-form-input-shadow-focus);
 
-      .tui-context-invalid & {
+      .tui-contextInvalid & {
         background: var(--tui-form-input-bg-color-invalid-focus);
         border-color: var(--tui-form-input-border-color-invalid);
         box-shadow: var(--tui-form-input-shadow-invalid-focus);
@@ -182,7 +185,7 @@
       background: var(--tui-color-neutral-1);
     }
 
-    .tui-context-invalid & {
+    .tui-contextInvalid & {
       border-color: var(--tui-form-input-border-color-invalid);
       box-shadow: var(--tui-form-input-shadow-invalid);
     }

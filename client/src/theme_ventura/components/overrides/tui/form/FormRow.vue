@@ -20,70 +20,47 @@
 .tui-formRow {
   display: flex;
   flex-direction: column;
-  margin-bottom: var(--tui-gap-4);
 
-  &__action {
+  // __inner is needed as setting margin on the root element is the
+  // responsibility of the containing element (outside-in spacing).
+  // (see below for margin setting)
+  &__inner {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    flex-wrap: wrap;
+  }
+
+  &__inner > &__desc {
+    min-width: 0;
+    margin-bottom: var(--tui-gap-1);
+    padding-top: var(--tui-gap-1);
+    padding-right: var(--tui-gap-2);
+    text-align: left;
+    overflow-wrap: break-word;
+  }
+
+  &__inner > &__action {
     display: flex;
 
     &--isStacked {
       flex-direction: column;
 
-      & > * + * {
-        margin-top: var(--tui-gap-1);
-      }
+      @include tui-stack-vertical(var(--tui-gap-1));
     }
-  }
-
-  &__desc {
-    display: flex;
-    min-width: 0;
-    margin-bottom: var(--tui-gap-1);
-    text-align: left;
-    overflow-wrap: break-word;
-  }
-
-  .tui-formLabel,
-  .tui-formHelpIcon {
-    padding-top: var(--tui-gap-1);
   }
 }
 
-@media screen and (min-width: $tui-screen-sm) {
-  .tui-form--horizontal .tui-formRow {
-    flex-direction: row;
-
-    &__action {
-      flex-grow: 1;
-      min-width: 0;
-      max-width: 400px;
-    }
-
-    &__desc {
-      flex-shrink: 0;
-      width: 40%;
-      max-width: 164px;
-      margin: 0 var(--tui-gap-4) 0 0;
-    }
-  }
-
-  .tui-form--inputWidth-limited .tui-formRow {
-    input[type='email'].tui-formInput,
-    input[type='number'].tui-formInput,
-    input[type='password'].tui-formInput,
-    input[type='search'].tui-formInput,
-    input[type='tel'].tui-formInput,
-    input[type='text'].tui-formInput,
-    input[type='url'].tui-formInput,
-    .tui-select,
-    .tui-formTextarea,
-    .tui-formFieldError,
-    .tui-range {
-      width: 280px;
-      max-width: 280px;
-    }
-
-    .tui-formField {
-      width: auto;
+.tui-form--horizontal .tui-formRow:not(.tui-formRow--vertical) > {
+  .tui-formRow {
+    &__inner {
+      @include tui-layout-sidebar(
+        $side-width: 22rem,
+        $content-min-width: 60%,
+        $gutter: var(--tui-gap-1),
+        $sidebar-selector: '.tui-formRow__desc',
+        $content-selector: '.tui-formRow__action'
+      );
     }
   }
 }

@@ -16,13 +16,8 @@
   @module tui
 -->
 
-<style lang="scss">
-.tui-formRowFieldset {
-  &__inner {
-    min-width: 0;
-    margin: 0;
-    padding: 0;
-    border: 0;
-  }
-}
-</style>
+<template>
+  <div class="tui-formRowStack">
+    <slot />
+  </div>
+</template>

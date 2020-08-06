@@ -19,18 +19,28 @@
 <style lang="scss">
 .tui-formLabel {
   @include tui-font-heading-label();
-  flex-shrink: 0;
-  margin: 0 var(--tui-gap-1) 0 0;
+  min-width: 0;
+  margin: 0;
+  padding: 0 var(--tui-gap-1) 0 0;
 
   legend& {
     width: auto;
-    padding: 0;
+    margin: 0;
+    padding: 0 var(--tui-gap-1) 0 0;
     color: inherit;
     border: none;
   }
 
+  &--inline {
+    display: inline;
+  }
+
   &--hidden {
     @include sr-only();
+  }
+
+  &--subfield {
+    @include tui-font-body();
   }
 
   &__required {

@@ -69,7 +69,7 @@
           var(--tui-transition-button-function);
       content: '';
 
-      .tui-context-invalid & {
+      .tui-contextInvalid & {
         box-shadow: 0 0 0 2px var(--tui-form-input-border-color-invalid);
       }
     }

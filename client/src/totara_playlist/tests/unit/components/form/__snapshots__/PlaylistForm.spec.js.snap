@@ -9,6 +9,7 @@ exports[`totara_playlist/components/form/PlaylistForm.vue Checks snapshot 1`] = 
   <formrow-stub
     class="tui-playlistForm__title"
     hidden="true"
+    isstacked="true"
     label="playlisttitle, totara_playlist"
     required="true"
   />
@@ -19,6 +20,7 @@ exports[`totara_playlist/components/form/PlaylistForm.vue Checks snapshot 1`] = 
     <formrow-stub
       class="tui-playlistForm__description__formRow"
       hidden="true"
+      isstacked="true"
       label="playlistdescription, totara_playlist"
       required="true"
     />

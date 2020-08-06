@@ -26,7 +26,29 @@
     @submit="submit"
   >
     <FormRow label="Title" required>
-      <FormText name="title" :validations="v => [v.required()]" />
+      <FormText
+        name="title"
+        :validations="v => [v.required()]"
+        char-length="30"
+      />
+    </FormRow>
+
+    <!-- or specify the input by hand -->
+
+    <FormRow label="Length" required>
+      <FormField
+        v-slot="{ attrs, value, update, blur }"
+        name="length"
+        :validations="v => [v.required(), v.number()]"
+      >
+        <InputText v-bind="attrs" :value="value" @input="update" @blur="blur" />
+      </FormField>
+    </FormRow>
+
+    <FormRow>
+      <FormCheckbox name="isLizard" :validations="v => [v.required()]">
+        You're a lizard, Barry!
+      </FormCheckbox>
     </FormRow>
 
     <FormRow label="Colour" :is-stacked="true">
@@ -38,31 +60,8 @@
       <FormRowDetails>This field changes colour</FormRowDetails>
     </FormRow>
 
-    <!-- or specify the input by hand -->
-
-    <FormRow label="Length" required>
-      <FormField
-        v-slot="{ id, value, update, blur }"
-        name="length"
-        :validations="v => [v.required(), v.number()]"
-      >
-        <InputText
-          :id="id"
-          :value="value"
-          @input="value => update(value)"
-          @blur="blur"
-        />
-      </FormField>
-    </FormRow>
-
     <FormRow label="Age">
       <FormNumber name="age" />
-    </FormRow>
-
-    <FormRow>
-      <FormCheckbox name="isLizard" :validations="v => [v.required()]">
-        I'm a lizard, Barry!
-      </FormCheckbox>
     </FormRow>
 
     <FormRow label="Bread" required>
@@ -211,6 +210,10 @@ export default {
 
       if (values.title && values.title.toLowerCase().includes('a')) {
         errors.title = 'Please do not use the letter "a"';
+      }
+
+      if (values.pineapple) {
+        errors.pineapple = 'Incorrect';
       }
 
       return errors;

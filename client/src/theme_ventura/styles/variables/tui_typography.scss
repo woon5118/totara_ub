@@ -14,6 +14,10 @@
 // @author    Kevin Hottinger <kevin.hottinger@totaralearning.com>
 // @module tuickage   theme_ventura
 
+:root {
+  --tui-font-body-line-height: 1.33;
+}
+
 //
 // Body text
 //
@@ -22,7 +26,7 @@
   color: var(--tui-color-text);
   font-weight: normal;
   font-size: var(--tui-font-size-15);
-  line-height: 1.33;
+  line-height: var(--tui-font-body-line-height);
 }
 
 @mixin tui-font-body-small {

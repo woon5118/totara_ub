@@ -17,15 +17,21 @@
 -->
 
 <template>
-  <div class="tui-colorPicker__group">
+  <div
+    class="tui-inputColor"
+    :class="[
+      charLength ? 'tui-inputColor--charLength-' + charLength : null,
+      charLength ? 'tui-input--customSize' : null,
+    ]"
+  >
     <!-- this colour block acts as a view for the last input valid hex value as
           we're going to hide the initial colour picker control for modern
           browsers so we have full control over styling. IE11 relies on this
           to display the result of the manual text Input because it doesn't
           get a native color Input at all -->
     <div
-      class="tui-colorPicker__colorBlock"
-      :class="[disabled ? 'tui-colorPicker__colorBlock--disabled' : '']"
+      class="tui-inputColor__colorBlock"
+      :class="[disabled ? 'tui-inputColor__colorBlock--disabled' : '']"
       :style="{
         backgroundColor: lastValidHexValue,
       }"
@@ -37,19 +43,20 @@
       v-if="!isIE"
       :value="lastValidHexValue"
       type="color"
-      class="tui-colorPicker__picker"
+      class="tui-inputColor__picker"
       tabindex="-1"
       :disabled="disabled"
       :readonly="readonly"
+      aria-hidden="true"
       v-on="$listeners"
       @input="handlePickerInput"
     />
 
     <!-- all browsers will show a manual hex Input control -->
     <Input
-      :id="$id('tui-colorPicker__input')"
-      class="tui-colorPicker__input"
+      class="tui-inputColor__input"
       v-bind="$props"
+      char-length="full"
       type="text"
       :maxlength="7"
       v-on="$listeners"
@@ -81,6 +88,7 @@ export default {
     'required',
     'styleclass',
     'value',
+    'charLength',
   ],
 
   data() {

@@ -5,30 +5,33 @@ exports[`engage_survey/components/box/RadioBox.vue Checks snapshot 1`] = `
   class="tui-formRow tui-engageSurvey-radioBox"
 >
   <div
-    class="tui-formRow__desc"
-  >
-    <label
-      class="tui-formLabel tui-formLabel--hidden"
-      for="some-undefined"
-      id="some-label"
-    >
-      
-  Label for the group of radios
-  
-      <!---->
-    </label>
-     
-    <!---->
-  </div>
-   
-  <div
-    class="tui-formRow__action"
+    class="tui-formRow__inner"
   >
     <div
-      aria-labelledby="some-label"
-      class="tui-radioGroup"
-      role="radiogroup"
-    />
+      class="tui-formRow__desc"
+    >
+      <label
+        class="tui-formLabel tui-formLabel--hidden tui-formLabel--inline"
+        for="some-undefined"
+        id="some-label"
+      >
+        
+  Label for the group of radios
+  
+        <!---->
+      </label>
+      <!---->
+    </div>
+     
+    <div
+      class="tui-formRow__action tui-formRow__action--isStacked"
+    >
+      <div
+        aria-labelledby="some-label"
+        class="tui-radioGroup"
+        role="radiogroup"
+      />
+    </div>
   </div>
 </div>
 `;

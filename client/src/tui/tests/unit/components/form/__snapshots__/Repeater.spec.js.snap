@@ -6,13 +6,17 @@ exports[`presentation/form/Repeater.vue matches snapshot 1`] = `
   arialabel="Repeater btn"
   class="tui-repeater"
   id="uid-9"
+  role="group"
 >
+  <!---->
+   
   <div
     class="tui-repeater__row"
   >
      
     <buttonicon-stub
       arialabel="Add"
+      class="tui-repeater__delete"
       styleclass="[object Object]"
       type="button"
     >
@@ -25,6 +29,7 @@ exports[`presentation/form/Repeater.vue matches snapshot 1`] = `
      
     <buttonicon-stub
       arialabel="Add"
+      class="tui-repeater__delete"
       styleclass="[object Object]"
       type="button"
     >
@@ -37,6 +42,7 @@ exports[`presentation/form/Repeater.vue matches snapshot 1`] = `
      
     <buttonicon-stub
       arialabel="Add"
+      class="tui-repeater__delete"
       styleclass="[object Object]"
       type="button"
     >
