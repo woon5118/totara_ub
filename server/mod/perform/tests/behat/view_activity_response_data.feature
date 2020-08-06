@@ -16,6 +16,10 @@ Feature: Test viewing Performance activity response data
     And the following "permission overrides" exist:
       | capability                              | permission | role         | contextlevel | reference |
       | mod/perform:report_on_subject_responses | Allow      | staffmanager | System       |           |
+    And the following "subject instances" exist in "mod_perform" plugin:
+      | activity_name                      | subject_username | subject_is_participating | include_questions | include_required_questions | activity_status |
+      | Simple optional questions activity | john             | true                     | true              |                            | Active          |
+      | Simple required questions activity | john             | true                     | true              | true                       | Active          |
 
   Scenario: Test capability check and tabs
     Given I log in as "admin"
@@ -42,7 +46,7 @@ Feature: Test viewing Performance activity response data
 
   Scenario: I can navigate to users specific report and the main page from the teams page
     Given I log in as "manager"
-    And I click on "Team" in the totara menu
+    And I am on "Team" page
 
     When I click on "Performance data" "link"
     Then I should see "Performance data for John One"
@@ -52,3 +56,36 @@ Feature: Test viewing Performance activity response data
 
     When I click on "view or export" "link"
     Then I should see "Performance activity response data"
+
+  Scenario: I can preview elements
+    Given I log in as "manager"
+
+    # First check the optional questions activity.
+    When I navigate to the mod perform response data report for "Simple optional questions activity" activity
+    And I click on "Preview" "button" in the "Question one" "table_row"
+    Then I should see "Question one" in the ".tui-modalContent__content" "css_element"
+    Then I should see "(optional)" in the ".tui-modalContent__content" "css_element"
+    And the following fields match these values:
+      | [answer_text] |  |
+
+    When I click on "Close" "button"
+    And I click on "Preview" "button" in the "Question two" "table_row"
+    Then I should see "Question two" in the ".tui-modalContent__content" "css_element"
+    Then I should see "(optional)" in the ".tui-modalContent__content" "css_element"
+    And the following fields match these values:
+      | [answer_text] |  |
+
+    # Now check the required questions activity.
+    When I navigate to the mod perform response data report for "Simple required questions activity" activity
+    And I click on "Preview" "button" in the "Question one" "table_row"
+    Then I should see "Question one" in the ".tui-modalContent__content" "css_element"
+    Then I should see "*" in the ".tui-modalContent__content" "css_element"
+    And the following fields match these values:
+      | [answer_text] |  |
+
+    When I click on "Close" "button"
+    And I click on "Preview" "button" in the "Question two" "table_row"
+    Then I should see "Question two" in the ".tui-modalContent__content" "css_element"
+    Then I should see "*" in the ".tui-modalContent__content" "css_element"
+    And the following fields match these values:
+      | [answer_text] |  |

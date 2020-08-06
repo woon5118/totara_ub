@@ -1,0 +1,11 @@
+query mod_perform_element($element_id: core_id) {
+  mod_perform_element(element_id: $element_id) {
+    title
+    data
+    is_required
+    is_respondable
+    element_plugin {
+      participant_form_component
+    }
+  }
+}

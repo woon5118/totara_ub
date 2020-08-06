@@ -133,12 +133,6 @@
   &__readonly {
     padding-top: var(--tui-gap-1);
   }
-
-  &__response-optional {
-    display: inline-flex;
-    @include tui-font-body();
-    @include tui-font-hint();
-  }
 }
 
 @media (min-width: $tui-screen-xs) {

@@ -23,11 +23,15 @@
 
 namespace mod_perform\rb\display;
 
+use html_writer;
 use mod_perform\util;
+use moodle_url;
 use totara_reportbuilder\rb\display\base;
 use totara_tui\output\component;
 
 class element_actions extends base {
+
+    private static $potentially_has_permission;
 
     /**
      * Handles the display
@@ -47,32 +51,25 @@ class element_actions extends base {
             return '';
         }
 
-        $buttons = [];
-
         // Static to prevent expensive check once per row.
-        if (!isset($can_export)) {
-            static $can_export = false;
-            $can_export = util::can_potentially_report_on_subjects($report->reportfor);
+        if (self::$potentially_has_permission === null) {
+            self::$potentially_has_permission = util::can_potentially_report_on_subjects($report->reportfor);
         }
 
-        if ($can_export) {
-            $title = get_string('export', 'mod_perform');
-            $buttons[] = \html_writer::link(
-                new \moodle_url('/mod/perform/reporting/performance/export.php', array('action' => 'item', 'element_id' => $element_id, 'export' => 'Export', 'format' => 'csv')),
-                $OUTPUT->flex_icon('export', array('alt' => $title)),
-                array('title' => $title)
-            );
-        }
-
-        // TODO TL-26399 add preview element icon as a vue component.
-        //      Basic example of a Vue component render below - replace with your own component and pass in element_id as a prop:
-        $buttons[] = $OUTPUT->render(new component('tui/components/icons/common/Preview', ['size' => 100, 'element_id' => $element_id]));
-
-        if ($buttons) {
-            return implode ('', $buttons);
-        } else {
+        if (!self::$potentially_has_permission) {
             return '';
         }
+
+        $props = [
+            'element-id' => (int) $element_id,
+        ];
+
+        return $OUTPUT->render(
+            new component(
+                'mod_perform/components/report/element_response/actions',
+                $props
+            )
+        );
     }
 
     /**

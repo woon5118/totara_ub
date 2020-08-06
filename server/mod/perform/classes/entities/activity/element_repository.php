@@ -24,7 +24,26 @@
 namespace mod_perform\entities\activity;
 
 use core\orm\entity\repository;
+use core\orm\query\builder;
+use mod_perform\entities\activity\subject_instance as subject_instance_entity;
 
 class element_repository extends repository {
 
+    /**
+     * Get all the user ids of subjects using a particular element.
+     *
+     * @param int $element_id
+     * @return array
+     */
+    public function get_subject_user_ids_using_element(int $element_id): array {
+        return builder::table(section_element::TABLE, 'se')
+            ->select_raw('distinct si.subject_user_id as subject_user_id')
+            ->join([section::TABLE, 's'], 's.id', 'se.section_id')
+            ->join([participant_section::TABLE, 'ps'], 'ps.section_id', 's.id')
+            ->join([participant_instance::TABLE, 'pi'], 'pi.id', 'ps.participant_instance_id')
+            ->join([subject_instance_entity::TABLE, 'si'], 'si.id', 'pi.subject_instance_id')
+            ->where('se.element_id', $element_id)
+            ->get()
+            ->pluck('subject_user_id');
+    }
 }

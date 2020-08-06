@@ -29,10 +29,10 @@ use core\collection;
 use core\orm\query\builder;
 use mod_perform\entities\activity\activity as activity_entity;
 use mod_perform\entities\activity\activity_type;
-
 use context;
 use context_coursecat;
 use core_text;
+use mod_perform\entities\activity\element;
 use mod_perform\models\activity\activity;
 use required_capability_exception;
 use totara_core\access;
@@ -284,19 +284,33 @@ class util {
     }
 
     /**
-     * Determine if the given user can manage participation of the given subject
+     * Can a user (user_id) can see performance data for at least one subject in the activity
+     * an element (element_id) is part of.
      *
-     * @param int $user_id A user id
-     * @param int $subject_user_id A user id
+     * @param int $user_id
+     * @param int $element_id
      * @return bool
      */
-    public static function can_report_on_subjects(int $user_id, int $subject_user_id): bool {
+    public static function can_report_on_element(int $user_id, int $element_id): bool {
         if (static::has_report_on_all_subjects_capability($user_id)) {
             return true;
         }
 
-        $subject_user_context = context_user::instance($subject_user_id);
-        return access::has_capability('mod/perform:report_on_subject_responses', $subject_user_context, $user_id);
+        // Early exit if they can not even potentially manage any participants
+        if (!has_capability_in_any_context('mod/perform:report_on_subject_responses')) {
+            return false;
+        }
+
+        $subject_user_ids_with_element = element::repository()->get_subject_user_ids_using_element($element_id);
+        $permitted_user_ids = self::get_permitted_users($user_id, 'mod/perform:report_on_subject_responses');
+
+        foreach ($permitted_user_ids as $permitted_user_id) {
+            if (in_array($permitted_user_id, $subject_user_ids_with_element, true)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public static function get_reportable_activities(int $user_id) {
@@ -322,9 +336,8 @@ class util {
      * @param int $subject_user_id
      * @param int $viewing_user_id
      * @return bool
-     * @throws \coding_exception
      */
-    public static function can_report_on_user(int $subject_user_id, int $viewing_user_id) {
+    public static function can_report_on_user(int $subject_user_id, int $viewing_user_id): bool {
         if (empty($subject_user_id) || empty($viewing_user_id)) {
             return false;
         }

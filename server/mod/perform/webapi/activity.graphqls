@@ -279,6 +279,11 @@ extend type Query {
     subject_instance_id: core_id!
     token: String
   ): mod_perform_subject_instance
+
+  """
+  Get a single element
+  """
+  mod_perform_element(element_id: core_id): mod_perform_element
 }
 
 """

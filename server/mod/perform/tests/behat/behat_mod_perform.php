@@ -1165,6 +1165,18 @@ class behat_mod_perform extends behat_base {
     }
 
     /**
+     * @Given /^I navigate to the mod perform response data report for "([^"]*)" activity$/
+     * @param string $activity_name
+     */
+    public function i_navigate_to_the_mod_perform_response_data_report_for_activity(string $activity_name): void {
+        $activity = $this->get_activity_by_name($activity_name);
+
+        $url = \mod_perform\controllers\reporting\performance\activity::get_url(['activity_id' => $activity->id]);
+
+        $this->navigate_to_page($url);
+    }
+
+    /**
      * Convenience method to fail from an ExpectationException.
      *
      * @param string $error error message.

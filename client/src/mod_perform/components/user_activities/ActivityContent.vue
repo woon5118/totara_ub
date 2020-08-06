@@ -155,23 +155,11 @@
                 >
                   {{ sectionElement.element.title }}
                 </h3>
-                <span
-                  v-if="sectionElement.element.is_required"
-                  class="tui-participantContent__section-response-required"
-                >
-                  *
-                </span>
-                <span
-                  v-if="
-                    !sectionElement.element.is_required &&
-                      sectionElement.is_respondable
-                  "
-                  class="tui-participantContent__section-response-optional"
-                >
-                  ({{
-                    $str('section_element_response_optional', 'mod_perform')
-                  }})
-                </span>
+
+                <RequiredOptionalIndicator
+                  v-if="sectionElement.is_respondable"
+                  :is-required="sectionElement.element.is_required"
+                />
 
                 <div class="tui-participantContent__sectionItem-content">
                   <ElementParticipantForm v-if="sectionElement.is_respondable">
@@ -256,7 +244,6 @@ import Button from 'tui/components/buttons/Button';
 import ButtonCancel from 'tui/components/buttons/Cancel';
 import ButtonGroup from 'tui/components/buttons/ButtonGroup';
 import ButtonSubmit from 'tui/components/buttons/Submit';
-import Checkbox from 'tui/components/form/Checkbox';
 import Collapsible from 'tui/components/collapsible/Collapsible';
 import ConfirmationModal from 'tui/components/modal/ConfirmationModal';
 import ElementParticipantForm from 'mod_perform/components/element/ElementParticipantForm';
@@ -265,6 +252,7 @@ import GridItem from 'tui/components/grid/GridItem';
 import Loader from 'tui/components/loader/Loader';
 import OtherParticipantResponses from 'mod_perform/components/user_activities/participant/OtherParticipantResponses';
 import ParticipantUserHeader from 'mod_perform/components/user_activities/participant/ParticipantUserHeader';
+import RequiredOptionalIndicator from 'mod_perform/components/user_activities/RequiredOptionalIndicator';
 import ResponsesAreVisibleToDescription from 'mod_perform/components/user_activities/participant/ResponsesAreVisibleToDescription';
 import SidePanel from 'tui/components/sidepanel/SidePanel';
 import SidePanelNav from 'tui/components/sidepanel/SidePanelNav';
@@ -280,11 +268,11 @@ import UpdateSectionResponsesMutationExternalParticipant from 'mod_perform/graph
 
 export default {
   components: {
+    RequiredOptionalIndicator,
     Button,
     ButtonCancel,
     ButtonGroup,
     ButtonSubmit,
-    Checkbox,
     Collapsible,
     ConfirmationModal,
     ElementParticipantForm,

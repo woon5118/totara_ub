@@ -23,6 +23,7 @@
 
 use core\entities\user;
 use core\orm\query\builder;
+use mod_perform\entities\activity\element;
 use mod_perform\models\activity\activity;
 use mod_perform\util;
 use totara_job\job_assignment;
@@ -52,23 +53,11 @@ class mod_perform_util_testcase extends advanced_testcase {
         $manager = self::getDataGenerator()->create_user();
         $employee = self::getDataGenerator()->create_user();
 
-        $manager_job_assignment = job_assignment::create(
-            [
-                'userid' => $manager->id,
-                'idnumber' => $manager->id,
-            ]
+        $this->assign_manager_capability_over_employee(
+            'mod/perform:manage_subject_user_participation',
+            $manager,
+            $employee
         );
-
-        job_assignment::create(
-            [
-                'userid' => $employee->id,
-                'idnumber' => $employee->id,
-                'managerjaid' => $manager_job_assignment->id,
-            ]
-        );
-
-        $employee_context = context_user::instance($employee->id);
-        assign_capability('mod/perform:manage_subject_user_participation', CAP_ALLOW, $manager->id, $employee_context);
 
         self::setAdminUser();
 
@@ -156,35 +145,17 @@ class mod_perform_util_testcase extends advanced_testcase {
     }
 
     public function test_user_with_subject_capability_can_potentially_report_on_subjects(): void {
-        $subject = $this->getDataGenerator()->create_user();
-        $reporter = $this->getDataGenerator()->create_user();
+        $subject = self::getDataGenerator()->create_user();
+        $reporter = self::getDataGenerator()->create_user();
 
-        $reporter_role_id = create_role(
-            'Perform Reporter Role',
-            'perform_reporter_role',
-            'Can report on perform data'
-        );
-
-        $system_context = context_system::instance();
-        assign_capability(
-            'mod/perform:report_on_subject_responses',
-            CAP_ALLOW,
-            $reporter_role_id,
-            $system_context
-        );
-
-        $this->getDataGenerator()->role_assign(
-            $reporter_role_id,
-            $reporter->id,
-            context_user::instance($subject->id)
-        );
+        $this->assign_reporter_cap_over_subject('mod/perform:report_on_subject_responses', $reporter, $subject);
 
         self::setUser($reporter);
         $this->assertTrue(util::can_potentially_report_on_subjects(user::logged_in()->id));
     }
 
     public function test_user_with_all_subjects_capability_can_potentially_report_on_subjects(): void {
-        $reporter = $this->getDataGenerator()->create_user();
+        $reporter = self::getDataGenerator()->create_user();
 
         $reporter_role_id = create_role(
             'Perform Reporter Role',
@@ -200,7 +171,7 @@ class mod_perform_util_testcase extends advanced_testcase {
             $system_context
         );
 
-        $this->getDataGenerator()->role_assign(
+        self::getDataGenerator()->role_assign(
             $reporter_role_id,
             $reporter->id,
             context_user::instance($reporter->id)
@@ -211,10 +182,134 @@ class mod_perform_util_testcase extends advanced_testcase {
     }
 
     public function test_user_cannot_report_without_capability(): void {
-        $user = $this->getDataGenerator()->create_user();
+        $user = self::getDataGenerator()->create_user();
         self::setUser($user);
 
         $this->assertFalse(util::can_potentially_report_on_subjects(user::logged_in()->id));
+    }
+
+    public function test_user_that_can_report_on_all_subjects_responses_can_report_on_any_element(): void {
+        $reporter = self::getDataGenerator()->create_user();
+
+        $reporter_role_id = create_role(
+            'Perform Reporter Role',
+            'perform_reporter_role',
+            'Can report on perform data'
+        );
+
+        $subject = self::getDataGenerator()->create_user();
+
+        self::setAdminUser();
+
+        /** @var mod_perform_generator $perform_generator */
+        $perform_generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
+
+        $perform_generator->create_subject_instance([
+            'subject_is_participating' => true,
+            'subject_user_id' => $subject->id,
+            'other_participant_id' => null,
+            'include_questions' => true,
+        ]);
+
+        /** @var element $element */
+        $element = element::repository()->order_by('id')->first();
+
+        $system_context = context_system::instance();
+        assign_capability(
+            'mod/perform:report_on_subject_responses',
+            CAP_ALLOW,
+            $reporter_role_id,
+            $system_context
+        );
+
+        self::getDataGenerator()->role_assign(
+            $reporter_role_id,
+            $reporter->id,
+            context_user::instance($reporter->id)
+        );
+
+        self::assertTrue(util::can_report_on_element(user::logged_in()->id, $element->id));
+    }
+
+    public function test_can_report_on_element_where_user_has_permission_over_subject_using_element(): void {
+        $reporter = self::getDataGenerator()->create_user();
+        $subject = self::getDataGenerator()->create_user();
+
+        self::setAdminUser();
+
+        /** @var mod_perform_generator $perform_generator */
+        $perform_generator = self::getDataGenerator()->get_plugin_generator('mod_perform');
+
+        $perform_generator->create_subject_instance([
+            'subject_is_participating' => true,
+            'subject_user_id' => $subject->id,
+            'other_participant_id' => null,
+            'include_questions' => true,
+        ]);
+
+        /** @var element $element */
+        $element = element::repository()->order_by('id')->first();
+
+        self::assertFalse(util::can_report_on_element($reporter->id, $element->id));
+
+        $this->assign_reporter_cap_over_subject('mod/perform:report_on_subject_responses', $reporter, $subject);
+
+        self::assertTrue(util::can_report_on_element($reporter->id, $element->id));
+    }
+
+    /**
+     * @param string $capability
+     * @param stdClass $manager
+     * @param stdClass $employee
+     * @throws coding_exception
+     */
+    private function assign_manager_capability_over_employee(string $capability, stdClass $manager, stdClass $employee): void {
+        $manager_job_assignment = job_assignment::create(
+            [
+                'userid' => $manager->id,
+                'idnumber' => $manager->id,
+            ]
+        );
+
+        job_assignment::create(
+            [
+                'userid' => $employee->id,
+                'idnumber' => $employee->id,
+                'managerjaid' => $manager_job_assignment->id,
+            ]
+        );
+
+        $employee_context = context_user::instance($employee->id);
+        assign_capability($capability, CAP_ALLOW, $manager->id, $employee_context);
+    }
+
+    /**
+     * @param string $cap
+     * @param stdClass $reporter
+     * @param stdClass $subject
+     * @throws coding_exception
+     * @throws dml_exception
+     */
+    private function assign_reporter_cap_over_subject(string $cap, stdClass $reporter, stdClass $subject): void {
+        $reporter_role_id = create_role(
+            'Perform Reporter Role',
+            'perform_reporter_role',
+            'Can report on perform data'
+        );
+
+        $system_context = context_system::instance();
+        assign_capability(
+            $cap,
+            CAP_ALLOW,
+            $reporter_role_id,
+            $system_context
+        );
+
+        self::getDataGenerator()->role_assign(
+            $reporter_role_id,
+            $reporter->id,
+            context_user::instance($subject->id)
+        );
     }
 
 }

@@ -152,7 +152,7 @@ class user_with_components_links extends base {
 
         if (advanced_feature::is_enabled('performance_activities') &&
             class_exists(\mod_perform\util::class) &&
-            \mod_perform\util::can_report_on_subjects($USER->id, $userid)) {
+            \mod_perform\util::can_report_on_user($userid, $USER->id)) {
             $links .= \html_writer::tag('li', $perform_response_reporting_link);
         }
 
