@@ -25,6 +25,8 @@ use GraphQL\Server\OperationParams;
 use totara_webapi\graphql;
 use totara_webapi\persistent_operations_loader;
 
+defined('MOODLE_INTERNAL') || die();
+
 class totara_webapi_persistent_operations_loader_test extends \advanced_testcase {
 
     public function test_load_non_existing_operation() {

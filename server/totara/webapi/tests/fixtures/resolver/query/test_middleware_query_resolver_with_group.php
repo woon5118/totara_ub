@@ -30,6 +30,8 @@ use totara_webapi\webapi\resolver\middleware\test_group;
 use totara_webapi\webapi\resolver\middleware\test_request_2;
 use totara_webapi\webapi\resolver\middleware\test_result_2;
 
+defined('MOODLE_INTERNAL') || die();
+
 class test_middleware_query_resolver_with_group implements query_resolver, has_middleware {
 
     public static function resolve(array $args, execution_context $ec) {

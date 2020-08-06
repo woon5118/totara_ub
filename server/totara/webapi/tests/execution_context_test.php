@@ -23,6 +23,8 @@
 
 use core\webapi\execution_context;
 
+defined('MOODLE_INTERNAL') || die();
+
 class totara_webapi_execution_context_testcase extends advanced_testcase {
     public function test_create() {
         $ec = execution_context::create('ajax', 'core_lang_strings_nosession');

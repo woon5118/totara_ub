@@ -26,6 +26,8 @@ namespace totara_webapi\webapi\resolver\type;
 use core\webapi\execution_context;
 use core\webapi\type_resolver;
 
+defined('MOODLE_INTERNAL') || die();
+
 class test_schema_type2 implements type_resolver {
 
     /**

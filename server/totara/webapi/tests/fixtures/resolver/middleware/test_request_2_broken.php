@@ -28,6 +28,8 @@ use core\webapi\middleware;
 use core\webapi\resolver\payload;
 use core\webapi\resolver\result;
 
+defined('MOODLE_INTERNAL') || die();
+
 class test_request_2_broken implements middleware {
 
     public function handle(payload $payload, Closure $next): result {

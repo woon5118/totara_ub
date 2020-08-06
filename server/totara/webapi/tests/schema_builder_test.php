@@ -25,6 +25,8 @@ use GraphQL\Type\Schema;
 use totara_webapi\schema_builder;
 use totara_webapi\schema_file_loader;
 
+defined('MOODLE_INTERNAL') || die();
+
 class totara_webapi_schema_builder_test  extends \advanced_testcase {
 
     public function test_build_schema() {

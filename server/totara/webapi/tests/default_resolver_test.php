@@ -28,6 +28,8 @@ use GraphQL\Type\Definition\ResolveInfo;
 use totara_webapi\default_resolver;
 use totara_webapi\graphql;
 
+defined('MOODLE_INTERNAL') || die();
+
 class totara_webapi_default_resolver_test extends advanced_testcase {
 
     public function test_query_resolver() {

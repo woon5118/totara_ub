@@ -25,6 +25,8 @@
 use core\webapi\execution_context;
 use totara_webapi\graphql;
 
+defined('MOODLE_INTERNAL') || die();
+
 class totara_webapi_graphql_testcase extends advanced_testcase {
 
     /**

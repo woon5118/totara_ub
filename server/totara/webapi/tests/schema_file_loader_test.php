@@ -23,6 +23,8 @@
 
 use totara_webapi\schema_file_loader;
 
+defined('MOODLE_INTERNAL') || die();
+
 class totara_webapi_schema_file_loader_test extends \advanced_testcase {
 
     public function test_load_files() {

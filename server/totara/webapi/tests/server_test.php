@@ -28,6 +28,8 @@ use totara_webapi\graphql;
 use totara_webapi\request;
 use totara_webapi\server;
 
+defined('MOODLE_INTERNAL') || die();
+
 class totara_webapi_server_test extends advanced_testcase {
 
     public function test_handle_successful_request() {

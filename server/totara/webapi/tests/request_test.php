@@ -25,6 +25,8 @@ use totara_webapi\graphql;
 use totara_webapi\request;
 use totara_webapi\webapi_request_exception;
 
+defined('MOODLE_INTERNAL') || die();
+
 class totara_webapi_request_test extends advanced_testcase {
 
     public function test_request_empty_params() {

@@ -25,6 +25,8 @@ namespace totara_webapi\webapi\resolver\middleware;
 
 use core\webapi\middleware_group;
 
+defined('MOODLE_INTERNAL') || die();
+
 class test_group_nested implements middleware_group {
 
     /**

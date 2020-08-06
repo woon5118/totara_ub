@@ -24,8 +24,11 @@
 namespace totara_webapi\webapi\resolver\query;
 
 use core\webapi\execution_context;
+use core\webapi\query_resolver;
 
-class test_union implements \core\webapi\query_resolver {
+defined('MOODLE_INTERNAL') || die();
+
+class test_union implements query_resolver {
 
     /**
      * @inheritDoc
