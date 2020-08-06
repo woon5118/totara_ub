@@ -27,6 +27,7 @@ use core\format;
 use core\webapi\execution_context;
 use core\webapi\formatter\field\string_field_formatter;
 use core\webapi\formatter\field\text_field_formatter;
+use hierarchy_organisation\entities\organisation as organisation_entity;
 
 /**
  * Organisation hierarchy type.
@@ -49,6 +50,10 @@ class organisation implements \core\webapi\type_resolver {
         global $CFG, $DB;
 
         require_once($CFG->dirroot . '/totara/hierarchy/lib.php');
+
+        if ($organisation instanceof organisation_entity) {
+            $organisation = (object) $organisation->to_array();
+        }
 
         if (!$organisation instanceof \stdClass) {
             throw new \coding_exception('Only organisation records from the database are accepted ' . gettype($organisation));

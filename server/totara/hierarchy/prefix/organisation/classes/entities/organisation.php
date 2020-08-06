@@ -54,7 +54,7 @@ use totara_job\entities\job_assignment;
  * @property-read collection $children Immediate children
  * @property-read position_framework $framework Position framework
  *
- * @package totara_competency\entities
+ * @package hierarchy_organisation\entities
  */
 class organisation extends hierarchy_item implements expandable {
 
