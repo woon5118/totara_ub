@@ -27,6 +27,10 @@
     display: none;
   }
 
+  &__bookmark {
+    align-self: flex-start;
+  }
+
   &__loadMoreContainer {
     display: flex;
     flex-direction: column;

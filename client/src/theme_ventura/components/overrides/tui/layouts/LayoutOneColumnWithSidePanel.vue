@@ -17,14 +17,25 @@
 -->
 
 <style lang="scss">
-.tui-layoutOneColumnWithSidepanel
-  > .tui-responsive
-  > .tui-grid
-  > .tui-grid-item {
-  transition: flex-basis ease-in 0.3s;
+.tui-layoutOneColumnContentWithSidepanel {
+  &--fullSidePanel {
+    > .tui-responsive > .tui-grid > .tui-grid-item {
+      border-left: none;
+    }
+  }
 
-  &__heading {
-    @include tui-font-heading-medium();
+  // Prevents the button edges from being hidden which would prevent the user from selecting the button again
+  &--onSmallScreen {
+    > .tui-responsive > .tui-grid > .tui-grid-item {
+      .tui-sidepanel {
+        overflow: visible;
+        &--closed {
+          .tui-sidepanel__inner {
+            overflow: hidden;
+          }
+        }
+      }
+    }
   }
 }
 </style>

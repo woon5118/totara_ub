@@ -13,11 +13,19 @@
   Please contact [licensing@totaralearning.com] for more information.
 
   @author Dave Wallace <dave.wallace@totaralearning.com>
-  @module theme_ventura
+  @author Alvin Smith <alvin.smith@totaralearning.com>
+  @module totara_core
 -->
 
 <template>
-  <div class="tui-layoutOneColumnWithSidepanel">
+  <div
+    class="tui-layoutOneColumnWithSidepanel"
+    :class="{
+      'tui-layoutOneColumnWithSidepanel--fullSidePanel':
+        currentBoundaryName !== null && gridUnitsRight === 12,
+      'tui-layoutOneColumnWithSidepanel--onSmallScreen': onSmallScreen,
+    }"
+  >
     <Responsive
       :breakpoints="[
         { name: 'xsmall', boundaries: [0, 480] },
@@ -28,30 +36,19 @@
       ]"
       @responsive-resize="$_resize"
     >
-      <!--
-        Wait for the boundary name is populated so that the initial state of several components
-        within this layout will be calculated correctly when rendering.
-       -->
-      <Grid v-if="currentBoundaryName !== null" :direction="gridDirection">
-        <GridItem
-          :units="gridUnitsLeft"
-          :class="{
-            'tui-layoutOneColumnWithSidepanel__column--hidden':
-              sidePanelIsOpen && onSmallScreen,
-          }"
-        >
-          <h3 class="tui-layoutOneColumnWithSidepanel__heading">
-            <slot name="page-title" />
-          </h3>
+      <Grid v-if="currentBoundaryName !== null">
+        <GridItem v-show="gridUnitsLeft > 0" :units="gridUnitsLeft">
+          <div class="tui-layoutOneColumnWithSidepanel__heading">
+            <slot name="header" />
+          </div>
           <slot
             name="column"
             :units="gridUnitsLeft"
             :boundary-name="currentBoundaryName"
-            :direction="gridDirection"
           />
         </GridItem>
-        <GridItem :units="1" :grows="false" :shrinks="false" />
-        <GridItem :units="gridUnitsRight" :grows="false">
+
+        <GridItem :units="gridUnitsRight">
           <SidePanel
             ref="sidepanel"
             direction="rtl"
@@ -68,7 +65,6 @@
               name="sidepanel"
               :units="gridUnitsRight"
               :boundary-name="currentBoundaryName"
-              :direction="gridDirection"
             />
           </SidePanel>
         </GridItem>
@@ -92,43 +88,34 @@ export default {
   },
   data() {
     return {
-      /**
-       * Total expanded/collapsed units should equal 11, not 12, as 1 unit is
-       * reserved for a GridItem between main content and the SidePanel
-       **/
       boundaryDefaults: {
         xsmall: {
-          gridDirection: 'horizontal',
-          gridUnitsLeftExpanded: 1,
-          gridUnitsLeftCollapsed: 9,
-          gridUnitsRightExpanded: 10,
-          gridUnitsRightCollapsed: 2,
+          gridUnitsLeftExpanded: 0,
+          gridUnitsLeftCollapsed: 11,
+          gridUnitsRightExpanded: 12,
+          gridUnitsRightCollapsed: 1,
         },
         small: {
-          gridDirection: 'horizontal',
-          gridUnitsLeftExpanded: 1,
-          gridUnitsLeftCollapsed: 9,
-          gridUnitsRightExpanded: 10,
-          gridUnitsRightCollapsed: 2,
+          gridUnitsLeftExpanded: 0,
+          gridUnitsLeftCollapsed: 11,
+          gridUnitsRightExpanded: 12,
+          gridUnitsRightCollapsed: 1,
         },
         medium: {
-          gridDirection: 'horizontal',
-          gridUnitsLeftExpanded: 6,
-          gridUnitsLeftCollapsed: 10,
+          gridUnitsLeftExpanded: 7,
+          gridUnitsLeftCollapsed: 11,
           gridUnitsRightExpanded: 5,
           gridUnitsRightCollapsed: 1,
         },
         large: {
-          gridDirection: 'horizontal',
-          gridUnitsLeftExpanded: 6,
-          gridUnitsLeftCollapsed: 10,
+          gridUnitsLeftExpanded: 7,
+          gridUnitsLeftCollapsed: 11,
           gridUnitsRightExpanded: 5,
           gridUnitsRightCollapsed: 1,
         },
         xlarge: {
-          gridDirection: 'horizontal',
-          gridUnitsLeftExpanded: 6,
-          gridUnitsLeftCollapsed: 10,
+          gridUnitsLeftExpanded: 7,
+          gridUnitsLeftCollapsed: 11,
           gridUnitsRightExpanded: 5,
           gridUnitsRightCollapsed: 1,
         },
@@ -141,9 +128,6 @@ export default {
     };
   },
   computed: {
-    gridDirection() {
-      return this.boundaryDefaults[this.currentBoundaryName].gridDirection;
-    },
     gridUnitsLeft() {
       let left = this.sidePanelIsOpen
         ? 'gridUnitsLeftExpanded'

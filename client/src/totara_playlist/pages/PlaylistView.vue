@@ -18,14 +18,14 @@
 
 <template>
   <Layout class="tui-playlistView">
-    <template v-slot:column="{ direction, units, boundaryName }">
+    <template v-slot:column="{ units, boundaryName }">
       <ContributionBaseContent
         :units="units"
         :loading="!!$apollo.loading"
         :loading-more="loadingMore"
         :total-cards="contribution.cursor.total"
-        :show-heading="!$apollo.loading && direction !== 'vertical'"
-        :grid-direction="direction"
+        :show-heading="!$apollo.loading"
+        grid-direction="horizontal"
       >
         <template v-slot:buttons>
           <ResourceNavigationBar :back-button="backButton" />
@@ -45,6 +45,7 @@
             :circle="true"
             :bookmarked="bookmarked"
             size="300"
+            class="tui-playlistView__bookmark"
             @click="updateBookmark"
           />
         </template>

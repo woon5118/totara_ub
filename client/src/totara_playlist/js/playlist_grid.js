@@ -13,6 +13,7 @@
  * Please contact [licensing@totaralearning.com] for more information.
  *
  * @author Kian Nguyen <kian.nguyen@totaralearning.com>
+ * @author Alvin Smith <alvin.smith@totaralearning.com>
  * @module totara_playlist
  */
 
@@ -23,36 +24,34 @@ export default {
     gridDirection: 'horizontal',
     cardDirection: 'vertical',
     maxItemsPerRow: 1,
-    // Maximum
-    cardUnits: 9,
+    cardUnits: 11,
   },
 
   small: {
     name: 'small',
-    boundaries: [481, 794],
+    boundaries: [481, 764],
     gridDirection: 'horizontal',
     cardDirection: 'vertical',
     maxItemsPerRow: 2,
-    // Maxmium
-    cardUnits: 9,
+    cardUnits: 5,
   },
 
   medium: {
     name: 'medium',
-    boundaries: [795, 1089],
+    boundaries: [765, 1192],
     gridDirection: 'horizontal',
     cardDirection: 'horizontal',
-    maxItemsPerRow: 4,
+    maxItemsPerRow: 3,
     cardUnits: 3,
   },
 
   large: {
     name: 'large',
-    boundaries: [1090, 1396],
+    boundaries: [1193, 1396],
     gridDirection: 'horizontal',
     cardDirection: 'horizontal',
-    maxItemsPerRow: 4,
-    cardUnits: 3,
+    maxItemsPerRow: 5,
+    cardUnits: 2,
   },
 
   xlarge: {
@@ -60,7 +59,7 @@ export default {
     boundaries: [1397, 1672],
     gridDirection: 'horizontal',
     cardDirection: 'horizontal',
-    maxItemsPerRow: 4,
+    maxItemsPerRow: 5,
     cardUnits: 2,
   },
 };
