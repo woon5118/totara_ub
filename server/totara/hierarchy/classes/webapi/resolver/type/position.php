@@ -28,6 +28,7 @@ use core\webapi\execution_context;
 use core\webapi\formatter\field\string_field_formatter;
 use core\webapi\formatter\field\text_field_formatter;
 use totara_core\advanced_feature;
+use hierarchy_position\entities\position as position_entity;
 
 /**
  * Position type
@@ -50,6 +51,10 @@ class position implements \core\webapi\type_resolver {
         global $CFG, $DB;
 
         require_once($CFG->dirroot . '/totara/hierarchy/lib.php');
+
+        if ($position instanceof position_entity) {
+            $position = (object) $position->to_array();
+        }
 
         if (!$position instanceof \stdClass) {
             throw new \coding_exception('Only position records from the database are accepted ' . gettype($position));

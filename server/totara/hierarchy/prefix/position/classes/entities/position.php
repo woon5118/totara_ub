@@ -56,7 +56,7 @@ use totara_job\entities\job_assignment;
  *
  * @method static position_repository repository()
  *
- * @package totara_competency\entities
+ * @package hierarchy_position\entities
  */
 class position extends hierarchy_item implements expandable {
 
