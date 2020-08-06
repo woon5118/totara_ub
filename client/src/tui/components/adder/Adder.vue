@@ -35,6 +35,9 @@
                 </div>
 
                 <Loader :loading="loading">
+                  <div class="tui-adder__preList">
+                    <slot name="pre-list" />
+                  </div>
                   <!-- Browse List -->
                   <div class="tui-adder__list">
                     <slot

@@ -323,7 +323,7 @@ export default {
      *
      */
     selectAllVisibleRows() {
-      let selection = [];
+      let selection = [].concat(this.value);
       let allIds = this.$_allIds();
 
       // Create array of disabled items that aren't selected

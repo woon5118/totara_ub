@@ -156,6 +156,11 @@ export default {
     },
     open: Boolean,
     customQuery: Object,
+    /**
+     * custom query key needs to be passed
+     * if customQuery is passed
+     */
+    customQueryKey: String,
   },
 
   data() {
@@ -207,7 +212,9 @@ export default {
           },
         };
       },
-      update({ core_cohorts: audiences }) {
+      update({
+        [this.customQueryKey ? this.customQueryKey : 'core_cohorts']: audiences,
+      }) {
         this.nextPage = audiences.next_cursor ? audiences.next_cursor : false;
         return audiences;
       },
@@ -231,7 +238,11 @@ export default {
           },
         };
       },
-      update({ core_cohorts: selectedAudiences }) {
+      update({
+        [this.customQueryKey
+          ? this.customQueryKey
+          : 'core_cohorts']: selectedAudiences,
+      }) {
         this.audienceSelectedItems = selectedAudiences.items;
         return selectedAudiences;
       },
@@ -264,7 +275,7 @@ export default {
           const newList = oldData.items.concat(newData.items);
 
           return {
-            core_cohorts: {
+            [this.customQueryKey ? this.customQueryKey : 'core_cohorts']: {
               items: newList,
               next_cursor: newData.next_cursor,
             },
