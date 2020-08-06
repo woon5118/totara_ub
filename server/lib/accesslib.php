@@ -238,6 +238,10 @@ function accesslib_clear_all_caches($resetcontexts) {
     if ($resetcontexts) {
         context_helper::reset_caches();
     }
+
+    // Clear the access controller instance cache. The current user most likely has an instance in it and their access
+    // may have changed.
+    \core_user\access_controller::clear_instance_cache();
 }
 
 /**
@@ -284,6 +288,9 @@ function accesslib_clear_role_cache($roles) {
 
     $cache = cache::make('core', 'roledefs');
     $cache->delete_many($roles);
+
+    // Clear the access controller instance cache. Any users in there may now be stale.
+    \core_user\access_controller::clear_instance_cache();
 }
 
 /**
@@ -2017,6 +2024,9 @@ function mark_user_dirty($userid) {
     set_cache_flag('accesslib/dirtyusers', $userid, 1, time() + $CFG->sessiontimeout);
     $ACCESSLIB_PRIVATE->dirtyusers[$userid] = 1;
     unset($ACCESSLIB_PRIVATE->accessdatabyuser[$userid]);
+
+    // Clear the access controller instance cache. If this user had an entry in there it may now be stale.
+    \core_user\access_controller::clear_instance_cache();
 }
 
 /**

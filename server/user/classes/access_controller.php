@@ -180,9 +180,7 @@ class access_controller {
         }
 
         // Make sure the current $USER did not change, if it did throw aways all caches.
-        if (PHPUNIT_TEST) {
-            self::clear_instance_cache(); // No caching in PHPUnit tests.
-        } else if (self::$myuserid !== null and self::$myuserid != $USER->id) {
+        if (self::$myuserid !== null and self::$myuserid != $USER->id) {
             self::clear_instance_cache();
         }
         self::$myuserid = $USER->id;

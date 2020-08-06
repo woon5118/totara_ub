@@ -4463,6 +4463,9 @@ function delete_user(stdClass $user) {
     // Force logout - may fail if file based sessions used, sorry.
     \core\session\manager::kill_user_sessions($user->id);
 
+    // Clear the instance cache, as this user may be in there.
+    \core_user\access_controller::clear_instance_cache();
+
     // Totara: we have 3 different delete types, keep all of them for backwards compatibility.
     $updateuser = new stdClass();
     $updateuser->id           = $user->id;

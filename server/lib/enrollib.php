@@ -1875,6 +1875,9 @@ abstract class enrol_plugin {
 
         $cache = cache::make('core', 'coursecontacts');
         $cache->delete($courseid);
+
+        // Clear the access controller instances just in case this user exists in there.
+        \core_user\access_controller::clear_instance_cache();
     }
 
     /**

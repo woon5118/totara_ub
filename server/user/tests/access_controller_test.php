@@ -1439,6 +1439,8 @@ class core_user_access_controller_testcase extends advanced_testcase {
         self::assert_expected_fields($controller, $allowed, $notallowed);
 
         $CFG->profilesforenrolledusersonly = false;
+        // CFG has changed, force the static cache to clear, this isn't normal so it doesn't happen automatically.
+        \core_user\access_controller::clear_instance_cache();
 
         $allowed = [
             'id', 'suspended', 'fullname', 'interests', 'profileimagealt', 'profileimageurl', 'profileimageurlsmall', 'imagealt', 'email',
@@ -1707,6 +1709,8 @@ class core_user_access_controller_testcase extends advanced_testcase {
             'mycourses', 'description', 'descriptionformat', 'country', 'city', 'url', 'skype', 'suspended',
             'firstaccess', 'lastaccess'
         ]);
+        // CFG has changed, force the static cache to clear, this isn't normal so it doesn't happen automatically.
+        \core_user\access_controller::clear_instance_cache();
 
         $controller = access_controller::for($user2);
 
@@ -1795,6 +1799,8 @@ class core_user_access_controller_testcase extends advanced_testcase {
             'mycourses', 'description', 'descriptionformat', 'country', 'city', 'url', 'skype', 'suspended',
             'firstaccess', 'lastaccess'
         ]);
+        // CFG has changed, force the static cache to clear, this isn't normal so it doesn't happen automatically.
+        \core_user\access_controller::clear_instance_cache();
 
         $controller = access_controller::for($user2);
 
@@ -2079,6 +2085,27 @@ class core_user_access_controller_testcase extends advanced_testcase {
             $id = rand(3, 3000);
         } while ($DB->record_exists('user', ['id' => $id]));
         return $id;
+    }
+
+    public function test_instance_cache_max_size() {
+        $users = [];
+        for ($i = 0; $i < 15; $i++) {
+            $users[] = $user = $this->getDataGenerator()->create_user();
+            access_controller::for($user);
+        }
+
+
+        $property = new ReflectionProperty(access_controller::class, 'instancecache');
+        $property->setAccessible(true);
+
+        $value = $property->getValue(null);
+        self::assertCount(10, $value);
+        foreach ($value as $key => $access_controller) {
+            /** @var access_controller $access_controller */
+            $property = new ReflectionProperty(access_controller::class, 'userid');
+            $property->setAccessible(true);
+            self::assertEquals($key, $property->getValue($access_controller));
+        }
     }
 
 }

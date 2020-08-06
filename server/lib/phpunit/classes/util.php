@@ -314,6 +314,9 @@ class phpunit_util extends testing_util {
         \core_container\factory::reset();
         \core_container\factory::reset_containers_map();
 
+        // Reset the user access controller.
+        \core_user\access_controller::clear_instance_cache();
+
         if ($warnings) {
             $warnings = implode("\n", $warnings);
             trigger_error($warnings, E_USER_WARNING);
