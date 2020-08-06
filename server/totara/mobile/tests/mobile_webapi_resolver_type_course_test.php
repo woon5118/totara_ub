@@ -43,7 +43,7 @@ class totara_mobile_webapi_resolver_type_course_testcase extends advanced_testca
      * @return []
      */
     private function create_faux_courses(array $users = []) {
-        set_config('enabled', true, 'totara_mobile');
+        set_config('enable', true, 'totara_mobile');
 
         $users = [];
         $users[] = $this->getDataGenerator()->create_user();

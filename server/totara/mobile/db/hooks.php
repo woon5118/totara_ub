@@ -43,6 +43,10 @@ $watchers = [
         'callback' => '\totara_mobile\watcher\login_page_watcher::webview_login_complete'
     ],
     [
+        'hookname' => '\message_totara_airnotifier\hook\airnotifier_device_discovery',
+        'callback' => '\totara_mobile\watcher\message_totara_airnotifier_watcher::discover_mobile_devices'
+    ],
+    [
         'hookname' => '\core\hook\renderer_standard_footer_html_complete',
         'callback' => '\totara_mobile\watcher\renderer_watcher::add_mobile_banner'
     ]

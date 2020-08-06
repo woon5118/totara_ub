@@ -1,8 +1,8 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
- * Copyright (C) 2019 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,13 +17,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Petr Skoda <petr.skoda@totaralearning.com>
- * @package totara_mobile
+ * @author Chris Snyder <chris.snyder@totaralearning.com>
+ * @package message_totara_airnotifier
  */
 
-defined('MOODLE_INTERNAL') || die();
+if (!defined('MOODLE_INTERNAL')) {
+    die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
+}
 
-// Note that \totara_mobile\util::API_VERSION may also need to be changed.
-$plugin->version   = 2020072203;    // The current module version (Date: YYYYMMDDXX).
-$plugin->requires  = 2017051509;    // Requires this platform version.
-$plugin->component = 'totara_mobile'; // To check on upgrade, that module sits in correct place.
+$observers = [
+    [
+        'eventname' => '\totara_mobile\event\fcmtoken_received',
+        'callback' => ['message_totara_airnotifier\observer\fcmtoken_observer', 'on_fcmtoken_received']
+    ],
+    [
+        'eventname' => '\totara_mobile\event\fcmtoken_removed',
+        'callback' => ['message_totara_airnotifier\observer\fcmtoken_observer', 'on_fcmtoken_removed']
+    ]
+];

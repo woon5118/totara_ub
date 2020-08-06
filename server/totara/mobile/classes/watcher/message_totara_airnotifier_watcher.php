@@ -23,41 +23,41 @@
 
 namespace totara_mobile\watcher;
 
-use core\hook\renderer_standard_footer_html_complete;
+use message_totara_airnotifier\hook\airnotifier_device_discovery;
 use totara_mobile\local\util as mobile_util;
+use core\orm\query\builder;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * A hook watcher for core renderer hooks.
+ * A hook watcher for airnotifier message output plugin hooks.
  */
-final class renderer_watcher {
+final class message_totara_airnotifier_watcher {
     /**
      * A watcher to add the mobile app banner to the standard html footer.
      *
-     * @param renderer_standard_footer_html_complete $hook
+     * @param airnotifier_device_discovery $hook
      * @return void
      */
-    public static function add_mobile_banner(renderer_standard_footer_html_complete $hook): void {
-
+    public static function discover_mobile_devices(airnotifier_device_discovery $hook): void {
+        // Do nothing if the mobile app is disabled.
         if (!get_config('totara_mobile', 'enable')) {
-            // Do nothing if the mobile app is disabled.
             return;
         }
 
-        $renderer = $hook->renderer;
-        $page = $hook->page;
+        $user = $hook->get_user();
 
-        if (in_array($page->pagetype, ['site-index', 'totara-catalog-index']) || strpos($page->pagetype, 'totara-dashboard-') === 0) {
-            $url = mobile_util::app_banner_url();
-            if ($url) {
-                $data = [
-                    'appurl' => $url,
-                    'pageurl' => $page->url
-                ];
-                $newoutput = $renderer->render_from_template('totara_mobile/app_link_banner', $data);
-                $hook->output .= $newoutput;
-            }
+        // Find all of the user's FCM tokens, and add them to the hook.
+        $devices = builder::table('totara_mobile_devices')
+            ->where_not_null('fcmtoken')
+            ->where('userid', $user->id)
+            ->fetch();
+
+        $tokens = [];
+        foreach ($devices as $device) {
+            $tokens[$device->fcmtoken] = $device->fcmtoken;
         }
+
+        $hook->add_device_keys($tokens);
     }
 }

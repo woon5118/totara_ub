@@ -38,7 +38,7 @@ final class util {
      * Minimum supported App version
      * Update whenever an old version of the app becomes unsupported.
      */
-    const MIN_APP_VERSION = 0.24;
+    const MIN_APP_VERSION = '0.26';
 
     /**
      * Totara App user agent string

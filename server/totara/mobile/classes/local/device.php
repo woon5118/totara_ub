@@ -24,6 +24,9 @@
 
 namespace totara_mobile\local;
 
+use totara_mobile\event\fcmtoken_removed;
+use core\orm\query\builder;
+
 /**
  * Class with mobile device related methods.
  */
@@ -275,6 +278,18 @@ final class device {
                 $DB->delete_records('totara_mobile_webviews', ['id' => $webview->id]);
             }
             $DB->delete_records('totara_mobile_devices', ['id' => $device->id]);
+
+            // Trigger a token-deleted event
+            if (!empty($device->fcmtoken)) {
+                // Are there no more device records with the same token?
+                $token_exists = builder::table('totara_mobile_devices')
+                    ->where('fcmtoken', $device->fcmtoken)
+                    ->count();
+                if (!$token_exists) {
+                    // Trigger a token-removed event.
+                    fcmtoken_removed::create_from_device($device)->trigger();
+                }
+            }
         }
 
         return true;

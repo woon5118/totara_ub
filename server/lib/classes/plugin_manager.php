@@ -1447,7 +1447,7 @@ class core_plugin_manager {
             'message' => array(
                 'email', 'jabber', 'popup'
                 // Totara
-                , 'totara_alert', 'totara_task', 'msteams'
+                , 'totara_alert', 'totara_task', 'msteams', 'totara_airnotifier'
             ),
 
             'mnetservice' => array(

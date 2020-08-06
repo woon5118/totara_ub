@@ -1,8 +1,8 @@
 <?php
-/*
+/**
  * This file is part of Totara Learn
  *
- * Copyright (C) 2019 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,13 +17,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @author Petr Skoda <petr.skoda@totaralearning.com>
- * @package totara_mobile
+ * @author Chris Snyder <chris.snyder@totaralearning.com>
+ * @package message_totara_airnotifier
  */
 
-defined('MOODLE_INTERNAL') || die();
+// NOTE: no MOODLE_INTERNAL test here, this file may be required by behat before including /config.php.
 
-// Note that \totara_mobile\util::API_VERSION may also need to be changed.
-$plugin->version   = 2020072203;    // The current module version (Date: YYYYMMDDXX).
-$plugin->requires  = 2017051509;    // Requires this platform version.
-$plugin->component = 'totara_mobile'; // To check on upgrade, that module sits in correct place.
+require_once(__DIR__ . '/../../../../../lib/behat/behat_base.php');
+
+/**
+ * Message popup steps definitions.
+ */
+class behat_message_totara_airnotifier extends behat_base {
+    // Just an import for now.
+}

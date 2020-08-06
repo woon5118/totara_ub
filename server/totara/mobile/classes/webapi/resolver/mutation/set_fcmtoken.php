@@ -27,6 +27,7 @@ use core\webapi\execution_context;
 use core\webapi\resolver\has_middleware;
 use core\webapi\mutation_resolver;
 use core\webapi\middleware\require_login;
+use totara_mobile\event\fcmtoken_received;
 
 /**
  * Mutation to set an FCM Token for a device
@@ -57,8 +58,8 @@ class set_fcmtoken implements mutation_resolver, has_middleware {
         }
 
         // Make sure the device belongs to the logged in user... just in case.
-        $userid = $DB->get_field('totara_mobile_devices', 'userid', ['id' => $deviceid]);
-        if ($userid != $USER->id) {
+        $device = $DB->get_record('totara_mobile_devices', ['id' => $deviceid]);
+        if (empty($device->userid) || $device->userid != $USER->id) {
             return false;
         }
 
@@ -67,9 +68,14 @@ class set_fcmtoken implements mutation_resolver, has_middleware {
             return false;
         }
 
-        // Finally, update the field.
-        $token = $args['token'];
-        return $DB->set_field('totara_mobile_devices', 'fcmtoken', $token, ['id' => $deviceid]);
+        // Update the field.
+        $device->fcmtoken = $args['token'];
+        $DB->set_field('totara_mobile_devices', 'fcmtoken', $device->fcmtoken, ['id' => $deviceid]);
+
+        // Trigger a token-received event.
+        fcmtoken_received::create_from_device($device)->trigger();
+
+        return true;
     }
 
 

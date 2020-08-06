@@ -77,6 +77,7 @@ class totara_mobile_webapi_resolver_mutation_set_fcmtoken_testcase extends advan
     public function test_resolve_set_fcm_missing_and_empty() {
         global $DB;
 
+        $eventsink = $this->redirectEvents();
         $users = $this->create_faux_devices();
 
         $u1 = array_pop($users);
@@ -104,6 +105,14 @@ class totara_mobile_webapi_resolver_mutation_set_fcmtoken_testcase extends advan
         $this->assertNotEmpty($device);
         $this->assertEquals('abc123', $device->fcmtoken);
 
+        // Check that setting the token triggered an event.
+        $events = $eventsink->get_events();
+        $this->assertCount(1, $events);
+        $event = reset($events);
+        $this->assertEquals('\totara_mobile\event\fcmtoken_received', $event->eventname);
+        $this->assertEquals($u1->id, $event->userid);
+        $eventsink->clear();
+
         // Update the token with an empty string.
         $result = $this->resolve($device, ['token' => '']);
         $this->assertTrue($result);
@@ -112,6 +121,14 @@ class totara_mobile_webapi_resolver_mutation_set_fcmtoken_testcase extends advan
         $device = $DB->get_record('totara_mobile_devices', ['userid' => $u1->id]);
         $this->assertNotEmpty($device);
         $this->assertEmpty($device->fcmtoken);
+
+        // Check that setting the token triggered an event.
+        $events = $eventsink->get_events();
+        $this->assertCount(1, $events);
+        $event = reset($events);
+        $this->assertEquals('\totara_mobile\event\fcmtoken_received', $event->eventname);
+        $this->assertEquals($u1->id, $event->userid);
+        $eventsink->clear();
 
         // Make sure setting another users token to '' won't break unique indexing.
         $u2 = array_pop($users);
@@ -129,6 +146,14 @@ class totara_mobile_webapi_resolver_mutation_set_fcmtoken_testcase extends advan
         $device = $DB->get_record('totara_mobile_devices', ['userid' => $u2->id]);
         $this->assertNotEmpty($device);
         $this->assertEmpty($device->fcmtoken);
+
+        // Check that setting the token triggered an event.
+        $events = $eventsink->get_events();
+        $this->assertCount(1, $events);
+        $event = reset($events);
+        $this->assertEquals('\totara_mobile\event\fcmtoken_received', $event->eventname);
+        $this->assertEquals($u2->id, $event->userid);
+        $eventsink->clear();
     }
 
     /**
@@ -137,6 +162,7 @@ class totara_mobile_webapi_resolver_mutation_set_fcmtoken_testcase extends advan
     public function test_resolve_set_fcm_token() {
         global $DB;
 
+        $eventsink = $this->redirectEvents();
         $users = $this->create_faux_devices();
 
         $u1 = array_pop($users);
@@ -193,6 +219,7 @@ class totara_mobile_webapi_resolver_mutation_set_fcmtoken_testcase extends advan
     public function test_resolve_set_fcm_token_user_mismatch() {
         global $DB;
 
+        $eventsink = $this->redirectEvents();
         $users = $this->create_faux_devices();
 
         $u1 = array_pop($users);

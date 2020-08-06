@@ -1,8 +1,8 @@
 <?php
-/*
+/**
  * This file is part of Totara LMS
  *
- * Copyright (C) 2016 onwards Totara Learning Solutions LTD
+ * Copyright (C) 2020 onwards Totara Learning Solutions LTD
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,12 +23,15 @@
 
 namespace core\hook;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
- * Course edit form definition complete hook.
+ * Renderer standard footer HTML complete
  *
- * This hook is called at the end of the course edit form definition, prior to data being set.
+ * This hook is called when the renderer has completed rendering the standard HTML footer, allowing
+ * plugins to modify the footer markup as necessary just before output.
  *
- * @package core_course\hook
+ * @package core\hook
  */
 class renderer_standard_footer_html_complete extends \totara_core\hook\base {
 
@@ -51,7 +54,7 @@ class renderer_standard_footer_html_complete extends \totara_core\hook\base {
     public $page;
 
     /**
-     * The edit_form_definition_complete constructor.
+     * The renderer_standard_footer_html_complete constructor.
      *
      * @param string $output
      * @param \core_renderer $renderer
