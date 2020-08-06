@@ -463,4 +463,64 @@ class MoodleQuickForm_editor extends HTML_QuickForm_element implements templatab
 
         return '';
     }
+
+    /**
+     * Validate the submitted value.
+     *
+     * @param $value
+     *
+     * @return string
+     */
+    public function validateSubmitValue(?array $value): ?string {
+        // Skip empty values.
+        if (empty($value) || empty($value['text'])) {
+            if ($this->isRequired()) {
+                return get_string('err_required', 'form');
+            }
+            return null;
+        }
+
+        $format = $this->getFormat();
+        switch ($format) {
+            case FORMAT_JSON_EDITOR:
+                // Check if we have valid json.
+                if (!\core\json_editor\helper\document_helper::is_valid_json_document($value['text'])) {
+                    return get_string('err_json_editor', 'form');
+                }
+                break;
+        }
+
+        return null;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function exportValue(&$submit_values, $assoc = false) {
+        $value = $this->_findValue($submit_values);
+        if (null === $value) {
+            $value = $this->getValue();
+        }
+        $value['text'] = $this->clean_text($value['text']);
+        return $this->_prepareValue($value, $assoc);
+    }
+
+    /**
+     * @param string $text
+     * @return string
+     */
+    private function clean_text(?string $text): ?string {
+        // Skip empty values.
+        if (empty($text)) {
+            return $text;
+        }
+
+        $format = $this->getFormat();
+        switch ($format) {
+            case FORMAT_JSON_EDITOR:
+                $text = \core\json_editor\helper\document_helper::clean_json_document($text);
+                break;
+        }
+        return $text;
+    }
 }

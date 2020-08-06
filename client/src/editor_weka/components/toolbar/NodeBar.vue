@@ -26,6 +26,7 @@
           :aria-label="
             ariaLabel ? ariaLabel : $str('more_items', 'editor_weka')
           "
+          :data-weka-more="true"
           @click="toggle"
         >
           <More />

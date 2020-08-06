@@ -1480,7 +1480,7 @@ class behat_general extends behat_base {
     /**
      * Checks the provided value exists in specific row/column of table.
      *
-     * @Then /^"(?P<row_string>[^"]*)" row "(?P<column_string>[^"]*)" column of "(?P<table_string>[^"]*)" table should contain "(?P<value_string>[^"]*)"$/
+     * @Then :row row :column column of :table table should contain :value
      * @throws ElementNotFoundException
      * @param string $row row text which will be looked in.
      * @param string $column column text to search (or numeric value for the column position)

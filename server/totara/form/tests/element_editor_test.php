@@ -26,6 +26,7 @@ use totara_form\form\element\editor,
     totara_form\test\test_definition,
     totara_form\test\test_form,
     totara_form\file_area;
+use core\json_editor\node\paragraph;
 
 /**
  * Test for \totara_form\form\element\editor class.
@@ -60,7 +61,102 @@ class totara_form_element_editor_testcase extends advanced_testcase {
         $this->assertNull($files);
     }
 
-    public function test_submission() {
+    public function test_empty_json_submission() {
+        $this->setAdminUser();
+        $definition = new test_definition($this,
+            function (model $model, advanced_testcase $testcase) {
+                /** @var editor $editor1 */
+                $editor = $model->add(new editor('test_editor', 'Some test editor'));
+            });
+        test_form::phpunit_set_definition($definition);
+
+        $valid_data = $this->get_empty_json_submission();
+        $postdata = [
+            'test_editor' => $valid_data
+        ];
+        test_form::phpunit_set_post_data($postdata);
+        $currentdata = array(
+            'test_editor' => 'hehe',
+            'test_editorformat' => null
+        );
+        $form = new test_form($currentdata);
+        $data = $form->get_data();
+        $this->assertInstanceOf('stdClass', $data);
+
+        // Add the content key.
+        $text = json_decode($valid_data['text'], true);
+        $text['content'][0]['content'] = [];
+        $text = json_encode($text);
+
+        $expected = [
+            'test_editor' => $text,
+            'test_editorformat' => (string)FORMAT_JSON_EDITOR,
+        ];
+        $this->assertSame($expected, (array)$data);
+    }
+
+    public function test_valid_json_submission() {
+        $this->setAdminUser();
+        $definition = new test_definition($this,
+            function (model $model, advanced_testcase $testcase) {
+                /** @var editor $editor1 */
+                $editor = $model->add(new editor('test_editor', 'Some test editor'));
+            });
+        test_form::phpunit_set_definition($definition);
+
+        $valid_data = $this->get_valid_json_submission();
+        $postdata = [
+            'test_editor' => $valid_data
+        ];
+        test_form::phpunit_set_post_data($postdata);
+        $currentdata = array(
+            'test_editor' => 'hehe',
+            'test_editorformat' => null
+        );
+        $form = new test_form($currentdata);
+        $data = $form->get_data();
+        $this->assertInstanceOf('stdClass', $data);
+        $expected = [
+            'test_editor' => $valid_data['text'],
+            'test_editorformat' => (string)FORMAT_JSON_EDITOR,
+        ];
+        $this->assertSame($expected, (array)$data);
+    }
+
+    public function test_invalid_json_submission() {
+        global $OUTPUT;
+
+        $this->setAdminUser();
+        $definition = new test_definition($this,
+            function (model $model, advanced_testcase $testcase) {
+                /** @var editor $editor1 */
+                $editor = $model->add(new editor('test_editor', 'Some test editor'));
+            });
+        test_form::phpunit_set_definition($definition);
+
+        $invalid_data = $this->get_invalid_json_submission();
+        $postdata = [
+            'test_editor' => $invalid_data
+        ];
+        test_form::phpunit_set_post_data($postdata);
+        $currentdata = array(
+            'test_editor' => 'hehe',
+            'test_editorformat' => null
+        );
+        $form = new test_form($currentdata);
+        $data = $form->get_data();
+        $this->assertDebuggingCalled([
+            'JSON document is invalid',
+            'JSON document is invalid',
+        ]);
+        $this->assertNotEmpty($data);
+        $this->assertEquals("", $data->test_editor);
+
+        $data = $definition->model->export_for_template($OUTPUT);
+        $this->assertSame('test_editor', $data['items'][0]['name']);
+    }
+
+    public function test_html_submission() {
         $this->setAdminUser();
         $definition = new test_definition($this,
             function (model $model, advanced_testcase $testcase) {
@@ -255,5 +351,53 @@ class totara_form_element_editor_testcase extends advanced_testcase {
 
     public function test_frozen() {
         // TODO TL-9422: test frozen files.
+    }
+
+    /**
+     * @return array
+     */
+    private function get_empty_json_submission(): array {
+        return [
+            'text' => json_encode([
+                'type' => 'doc',
+                'content' => [
+                    [
+                        'type' => paragraph::get_type(),
+                        // no content key here - mimicking an enter being pressed in the editor.
+                    ],
+                ],
+            ]),
+            'format' => FORMAT_JSON_EDITOR,
+            'itemid' => null
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    private function get_valid_json_submission(): array {
+        return [
+            'text' => json_encode([
+                'type' => 'doc',
+                'content' => [paragraph::create_json_node_from_text('This is a test')],
+            ]),
+            'format' => FORMAT_JSON_EDITOR,
+            'itemid' => null
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    private function get_invalid_json_submission(): array {
+        return [
+            'text' => json_encode([
+                'type' => 'doc',
+                // Content is not an array.
+                'content' => paragraph::create_json_node_from_text('This is a test'),
+            ]),
+            'format' => FORMAT_JSON_EDITOR,
+            'itemid' => null
+        ];
     }
 }

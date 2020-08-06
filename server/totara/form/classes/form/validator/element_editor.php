@@ -73,7 +73,26 @@ class element_editor extends element_validator {
             return;
         }
 
+        // Skip empty values if they are not required.
+        if (empty($data['$name']) ) {
+            return null;
+        }
+
         // TODO TL-9418: add following checks - accepted types, return types, file size, maxfiles ...
 
+        // Confirm that we received the text format.
+        if (!isset($data["{$name}format"])) {
+            $this->element->add_error(get_string('required'));
+        }
+
+        // Validate the text according to format.
+        switch ($data["{$name}format"]) {
+            case FORMAT_JSON_EDITOR:
+                if (!\core\json_editor\helper\document_helper::is_valid_json_document($data[$name])) {
+                    $this->element->add_error(get_string('jsonvalidationerror', 'totara_form'));
+                    return;
+                }
+                break;
+        }
     }
 }

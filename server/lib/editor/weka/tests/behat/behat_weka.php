@@ -70,7 +70,7 @@ function findWekaNode(type, word) {
     });
 }
 function wekaNodeClickTarget(domNode, type) {
-    let clickTarget = 'button[aria-label=More]';
+    let clickTarget = 'button[data-weka-more]';
     if (type == 'linkBlock') {
         clickTarget = '.tui-linkBlock';
     }
@@ -78,7 +78,7 @@ function wekaNodeClickTarget(domNode, type) {
 }
 ";
 
-    /** 
+    /**
      * @var NodeElement The current Weka DOM node.
      */
     private $current_weka = null;

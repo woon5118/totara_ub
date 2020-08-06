@@ -30,6 +30,7 @@ use editor_weka\extension\emoji;
 use editor_weka\extension\hashtag;
 use editor_weka\extension\list_extension;
 use editor_weka\extension\mention;
+use core\json_editor\helper\document_helper;
 
 final class weka_texteditor extends texteditor {
     /**
@@ -222,6 +223,12 @@ final class weka_texteditor extends texteditor {
             $options = [];
         }
 
+        // Cleaning text on the way out - this is only happening for json_editor content.
+        // If your content is not a json_editor compatible - empty string will be given.
+        if (!empty($options['noclean'])) {
+            $this->text = document_helper::sanitize_json_document($this->text);
+        }
+
         // Start finding the draft_item_id within file picker options.
         if (is_array($fpoptions)) {
             $draft_item_id = null;
@@ -248,6 +255,21 @@ final class weka_texteditor extends texteditor {
         $jscode = $this->get_js_import_code($params);
 
         $PAGE->requires->js_init_code($jscode);
+    }
+
+    /**
+     * Allow editor to customise template and init itself in Totara forms.
+     *
+     * @param array $result
+     * @param array $editoroptions
+     * @param array $fpoptions
+     * @param array $fptemplates
+     *
+     * @return void
+     */
+    public function totara_form_use_editor(&$result, array $editoroptions, array $fpoptions, array $fptemplates) {
+        $this->set_text($result['text']);
+        $this->use_editor($result['id'], $editoroptions, $fpoptions);
     }
 
     /**

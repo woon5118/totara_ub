@@ -64,7 +64,7 @@ final class paragraph extends node implements block_node {
      */
     public static function validate_schema(array $raw_node): bool {
         if (
-            !array_key_exists('content', $raw_node) ||
+            array_key_exists('content', $raw_node) &&
             (null !== $raw_node['content'] && !is_array($raw_node['content']))
         ) {
             return false;
@@ -103,7 +103,7 @@ final class paragraph extends node implements block_node {
         }
 
         $input_keys = array_keys($raw_node);
-        return node_helper::check_keys_match($input_keys, ['type', 'content']);
+        return node_helper::check_keys_match($input_keys, ['type'], ['content']);
     }
 
     /**
@@ -117,11 +117,7 @@ final class paragraph extends node implements block_node {
             return null;
         }
 
-        if (!array_key_exists('content', $cleaned_raw_node)) {
-            throw new \coding_exception("Invalide node structure", static::get_type());
-        }
-
-        if (!is_array($cleaned_raw_node['content'])) {
+        if (!array_key_exists('content', $cleaned_raw_node) || !is_array($cleaned_raw_node['content'])) {
             // Make it as an array and skip the rest of the code.
             $cleaned_raw_node['content'] = [];
             return $cleaned_raw_node;

@@ -171,6 +171,10 @@ class editor extends element {
             // Malformed or missing data, use current data to prevent data loss.
             return $this->get_current_data();
         }
+
+        // Clean the text.
+        $data['text'] = $this->clean_text($name, $data);
+
         $result = array($name => $data['text']);
 
         // Add format only if it was in the current data.
@@ -192,6 +196,25 @@ class editor extends element {
         }
 
         return $result;
+    }
+
+    /**
+     * Clean the text according to format.
+     *
+     * @param string $name
+     * @param array $data
+     *
+     * @return string
+     *
+     */
+    private function clean_text(string $name, array $data): string {
+        $text = $data['text'];
+        switch ($data['format']) {
+            case FORMAT_JSON_EDITOR:
+                $text = \core\json_editor\helper\document_helper::clean_json_document($text);
+                break;
+        }
+        return $text;
     }
 
     /**
