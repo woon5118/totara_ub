@@ -181,11 +181,11 @@ function(templates, ajax, modalFactory, modalEvents, notification, str) {
             });
 
             // Listen for dragged item over drop zone event
-            this.widget.addEventListener('dragover', function(e) {
+            this.widget.addEventListener('drag', function(e) {
                 e.preventDefault();
             });
 
-            this.widget.addEventListener('drag', function(e) {
+            this.widget.addEventListener('dragover', function(e) {
                 if (!that.draggedNode) {
                     return;
                 }
