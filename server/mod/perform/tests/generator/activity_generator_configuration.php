@@ -382,6 +382,4 @@ class mod_perform_activity_generator_configuration {
         return $this->create_manual_participants;
     }
 
-
-
 }

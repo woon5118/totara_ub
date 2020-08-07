@@ -28,10 +28,12 @@ use core\message\message;
 use core\orm\collection;
 use core_user;
 use dml_exception;
+use mod_perform\constants;
 use mod_perform\models\activity\activity as activity_model;
 use mod_perform\models\activity\notification_message as notification_message_model;
 use mod_perform\models\activity\notification_recipient as notification_recipient_model;
 use stdClass;
+use totara_core\relationship\relationship;
 
 /**
  * The dealer class.
@@ -61,7 +63,13 @@ class dealer {
      * @param integer $subject_user_id
      * @param integer|null $job_assignment_id
      */
-    public function __construct(activity_model $activity, $notification_recipients, composer $composer, int $subject_user_id, ?int $job_assignment_id) {
+    public function __construct(
+        activity_model $activity,
+        $notification_recipients,
+        composer $composer,
+        int $subject_user_id,
+        ?int $job_assignment_id
+    ) {
         if ($notification_recipients instanceof collection) {
             $notification_recipients = iterator_to_array($notification_recipients);
         }
@@ -97,6 +105,11 @@ class dealer {
     public function post(): void {
         foreach ($this->recipients as $recipient) {
             $relationship = $recipient->relationship;
+            // TODO Notifications for manual relationships do not work at the moment
+            //      in TL-26488 the way this works will be refactored
+            if ($recipient->relationship->type == \totara_core\entities\relationship::TYPE_MANUAL) {
+                continue;
+            }
             $user_dtos = $relationship->get_users(
                 ['user_id' => $this->user_id, 'job_assignment_id' => $this->job_assignment_id]
             );
@@ -110,7 +123,7 @@ class dealer {
             foreach ($user_dtos as $user_dto) {
                 $this->send_notification(core_user::NOREPLY_USER, $user_dto->get_user_id(), $message);
             }
-            $this->save_history($recipient, time());
+            $this->save_history($recipient);
         }
     }
 
@@ -128,7 +141,7 @@ class dealer {
      *
      * @param stdClass|integer|string $from user object or user id or NOREPLY_USER or SUPPORT_USER
      * @param stdClass|integer|string $to user object or user id or NOREPLY_USER or SUPPORT_USER
-     * @param string $event_type
+     * @param message $message
      * @return void
      */
     private function send_notification($from, $to, message $message): void {

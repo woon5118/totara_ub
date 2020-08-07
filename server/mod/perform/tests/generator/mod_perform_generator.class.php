@@ -66,6 +66,7 @@ use mod_perform\state\participant_instance\not_started as instance_not_started;
 use mod_perform\state\participant_instance\open;
 use mod_perform\state\participant_section\not_started;
 use mod_perform\state\subject_instance\pending;
+use mod_perform\task\service\manual_participant_progress;
 use mod_perform\task\service\subject_instance_creation;
 use mod_perform\user_groups\grouping;
 use mod_perform\util;
@@ -529,11 +530,11 @@ class mod_perform_generator extends component_generator_base {
         // For the activity generation we need to make sure the admin user is set
         advanced_testcase::setAdminUser();
 
-        $manual_relationships = relationship::repository()
+        $manual_idnumbers = relationship::repository()
             ->where('type', relationship::TYPE_MANUAL)
-            ->get();
-        $manual_idnumbers = $manual_relationships->pluck('idnumber');
-        $has_manual_relationships = [];
+            ->get()
+            ->pluck('idnumber');
+        $manual_relationships = [];
 
         $activity_name_generator = new mod_perform_activity_name_generator();
 
@@ -576,7 +577,7 @@ class mod_perform_generator extends component_generator_base {
                 $section = $this->create_section($activity, ['title' => $activity->name . ' section ' . $k]);
                 foreach ($relationships as $relationship_idnumber) {
                     if (in_array($relationship_idnumber, $manual_idnumbers, true)) {
-                        $has_manual_relationships[] = $relationship_idnumber;
+                        $manual_relationships[] = $relationship_idnumber;
                     }
                     $this->create_section_relationship($section, ['relationship' => $relationship_idnumber]);
                 }
@@ -633,38 +634,52 @@ class mod_perform_generator extends component_generator_base {
             $this->generate_subject_instances();
         }
 
-        if (!empty($has_manual_relationships) && $configuration->should_create_manual_participants()) {
+        if (!empty($manual_relationships) && $configuration->should_create_manual_participants()) {
+            // Make sure the progress records are there
+            (new manual_participant_progress())->generate();
+
             foreach ($activities as $activity) {
-                $subject_instances = subject_instance_entity::repository()
-                    ->filter_by_activity_id($activity->id)
-                    ->get();
-                foreach ($subject_instances as $subject_instance) {
-                    foreach ($has_manual_relationships as $manual_relationship) {
-                        if ($manual_relationship === constants::RELATIONSHIP_EXTERNAL) {
-                            $fullname = $this->generate_fullname();
-                            $data = [
-                                'core_relationship_idnumber' => constants::RELATIONSHIP_EXTERNAL,
-                                'subject_instance_id' => $subject_instance->id,
-                                'created_by' => get_admin()->id,
-                                'externals' => [
-                                    [
-                                        'name' => $fullname,
-                                        'email' => $this->generate_email($fullname),
-                                    ]
-                                ]
-                            ];
-                            $this->create_subject_instance_manual_participant($data);
-                        }
-                    }
-                    $subject_instance_model = subject_instance::load_by_entity($subject_instance);
-                    $subject_instance_model->switch_state(\mod_perform\state\subject_instance\active::class);
-                }
+                $this->create_manual_users_for_activity($activity, $manual_relationships);
             }
         }
 
         advanced_testcase::setUser($previous_user);
 
         return collection::new($activities);
+    }
+
+    /**
+     * Create manual relationships for given activity
+     *
+     * @param activity $activity
+     * @param array $manual_relationships array of relationship idnumbers
+     */
+    public function create_manual_users_for_activity(activity $activity, array $manual_relationships) {
+        /** @var subject_instance[] $subject_instances */
+        $subject_instances = subject_instance_entity::repository()
+            ->filter_by_activity_id($activity->id)
+            ->get()
+            ->map_to(subject_instance::class);
+        foreach ($subject_instances as $subject_instance) {
+            foreach ($manual_relationships as $manual_relationship) {
+                if ($manual_relationship === constants::RELATIONSHIP_EXTERNAL) {
+                    $relationship = $this->get_core_relationship($manual_relationship);
+                    $fullname = $this->generate_fullname();
+                    $data = [
+                        [
+                            'manual_relationship_id' => $relationship->id,
+                            'users' => [
+                                [
+                                    'name' => $fullname,
+                                    'email' => $this->generate_email($fullname),
+                                ]
+                            ]
+                        ]
+                    ];
+                    $subject_instance->set_participant_users($subject_instance->subject_user_id, $data);
+                }
+            }
+        }
     }
 
     /**

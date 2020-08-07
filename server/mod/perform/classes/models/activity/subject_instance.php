@@ -249,7 +249,7 @@ class subject_instance extends model {
      * Set the users for each relevant manual relationship to participate in this subject's activity.
      *
      * @param int $by_user User ID of who is setting the participants.
-     * @param array[] $relationships_and_participants Array of ['relationship_id' => int, 'users' => ['user_id'/'email' ...]]
+     * @param array[] $relationships_and_participants Array of ['manual_relationship_id' => int, 'users' => ['user_id'/'email' ...]]
      */
     public function set_participant_users(int $by_user, array $relationships_and_participants): void {
         global $DB;

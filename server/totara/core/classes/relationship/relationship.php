@@ -37,6 +37,7 @@ use totara_core\entities\relationship_resolver as relationship_resolver_entity;
  *
  * @property-read int $id
  * @property-read string $idnumber
+ * @property-read int $type
  * @property-read int $sort_order
  * @property-read int $created_at
  * @property-read string $name
