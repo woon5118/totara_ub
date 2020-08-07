@@ -101,7 +101,13 @@ class mod_scorm_webapi_mobile_save_offline_attempts_testcase extends advanced_te
         ];
         $this->assertSame($expected, $result);
 
-        $records = $DB->get_records('scorm_scoes_track', ['scoid' => $sco->id, 'attempt' => 1, 'userid' => $user->id], 'id ASC', 'element, *');
+        $sql = "SELECT sst.element, sst.*
+                  FROM {scorm_scoes_track} sst
+                 WHERE sst.scoid = :scoid
+                   AND sst.attempt = :attempt
+                   AND sst.userid = :userid
+              ORDER BY sst.id asc";
+        $records = $DB->get_records_sql($sql, ['scoid' => $sco->id, 'attempt' => 1, 'userid' => $user->id]);
         $this->assertCount(4, $records);
         $this->assertSame('1', $records['x.offline.attempt']->value);
         $this->assertTimeCurrent($records['x.offline.attempt']->timemodified);
@@ -112,7 +118,7 @@ class mod_scorm_webapi_mobile_save_offline_attempts_testcase extends advanced_te
         $this->assertSame('25.0', $records['cmi.core.score.raw']->value);
         $this->assertEquals($timestart1 + 20, $records['cmi.core.lesson_status']->timemodified);
 
-        $records = $DB->get_records('scorm_scoes_track', ['scoid' => $sco->id, 'attempt' => 2, 'userid' => $user->id], 'id ASC', 'element, *');
+        $records = $DB->get_records_sql($sql, ['scoid' => $sco->id, 'attempt' => 2, 'userid' => $user->id]);
         $this->assertCount(4, $records);
         $this->assertSame('1', $records['x.offline.attempt']->value);
         $this->assertTimeCurrent($records['x.offline.attempt']->timemodified);
@@ -184,7 +190,7 @@ class mod_scorm_webapi_mobile_save_offline_attempts_testcase extends advanced_te
         $this->assertEquals(4, $DB->count_records('scorm_scoes_track', ['scoid' => $sco->id, 'attempt' => 1]));
         $this->assertEquals(4, $DB->count_records('scorm_scoes_track', ['scoid' => $sco->id, 'attempt' => 2]));
 
-        $records = $DB->get_records('scorm_scoes_track', ['scoid' => $sco->id, 'attempt' => 3, 'userid' => $user->id], 'id ASC', 'element, *');
+        $records = $DB->get_records_sql($sql, ['scoid' => $sco->id, 'attempt' => 3, 'userid' => $user->id]);
         $this->assertCount(3, $records);
         $this->assertSame('1', $records['x.offline.attempt']->value);
         $this->assertTimeCurrent($records['x.offline.attempt']->timemodified);
@@ -362,7 +368,7 @@ class mod_scorm_webapi_mobile_save_offline_attempts_testcase extends advanced_te
         ];
         $this->assertSame($expected, $result);
 
-        $records = $DB->get_records('scorm_scoes_track', ['scoid' => $sco->id, 'attempt' => 1, 'userid' => $user->id], 'id ASC', 'element, *');
+        $records = $DB->get_records_sql($sql, ['scoid' => $sco->id, 'attempt' => 1, 'userid' => $user->id]);
         $this->assertCount(4, $records);
         $this->assertSame('1', $records['x.offline.attempt']->value);
         $this->assertTimeCurrent($records['x.offline.attempt']->timemodified);
@@ -373,7 +379,7 @@ class mod_scorm_webapi_mobile_save_offline_attempts_testcase extends advanced_te
         $this->assertSame('25.0', $records['cmi.core.score.raw']->value);
         $this->assertEquals($timestart1 + 20, $records['cmi.core.lesson_status']->timemodified);
 
-        $records = $DB->get_records('scorm_scoes_track', ['scoid' => $sco2->id, 'attempt' => 1, 'userid' => $user->id], 'id ASC', 'element, *');
+        $records = $DB->get_records_sql($sql, ['scoid' => $sco2->id, 'attempt' => 1, 'userid' => $user->id]);
         $this->assertCount(4, $records);
         $this->assertSame('1', $records['x.offline.attempt']->value);
         $this->assertTimeCurrent($records['x.offline.attempt']->timemodified);
@@ -384,7 +390,7 @@ class mod_scorm_webapi_mobile_save_offline_attempts_testcase extends advanced_te
         $this->assertSame('66.0', $records['cmi.core.score.raw']->value);
         $this->assertEquals($timestart1 + 25, $records['cmi.core.lesson_status']->timemodified);
 
-        $records = $DB->get_records('scorm_scoes_track', ['scoid' => $sco->id, 'attempt' => 2, 'userid' => $user->id], 'id ASC', 'element, *');
+        $records = $DB->get_records_sql($sql, ['scoid' => $sco->id, 'attempt' => 2, 'userid' => $user->id]);
         $this->assertCount(4, $records);
         $this->assertSame('1', $records['x.offline.attempt']->value);
         $this->assertTimeCurrent($records['x.offline.attempt']->timemodified);
@@ -395,7 +401,7 @@ class mod_scorm_webapi_mobile_save_offline_attempts_testcase extends advanced_te
         $this->assertSame('95.0', $records['cmi.core.score.raw']->value);
         $this->assertEquals($timestart2 + 30, $records['cmi.core.lesson_status']->timemodified);
 
-        $records = $DB->get_records('scorm_scoes_track', ['scoid' => $sco2->id, 'attempt' => 2, 'userid' => $user->id], 'id ASC', 'element, *');
+        $records = $DB->get_records_sql($sql, ['scoid' => $sco2->id, 'attempt' => 2, 'userid' => $user->id]);
         $this->assertCount(4, $records);
         $this->assertSame('1', $records['x.offline.attempt']->value);
         $this->assertTimeCurrent($records['x.offline.attempt']->timemodified);
