@@ -66,6 +66,7 @@ use mod_perform\state\participant_instance\not_started as instance_not_started;
 use mod_perform\state\participant_instance\open;
 use mod_perform\state\participant_section\not_started;
 use mod_perform\state\subject_instance\pending;
+use mod_perform\task\service\subject_instance_creation;
 use mod_perform\user_groups\grouping;
 use mod_perform\util;
 use totara_core\entities\relationship;

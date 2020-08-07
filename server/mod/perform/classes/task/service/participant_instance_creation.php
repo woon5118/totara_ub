@@ -37,6 +37,7 @@ use mod_perform\entities\activity\track;
 use mod_perform\entities\activity\track_user_assignment;
 use mod_perform\hook\participant_instances_created;
 use mod_perform\models\activity\external_participant;
+use mod_perform\models\activity\participant;
 use mod_perform\models\activity\participant_instance as participant_instance_model;
 use mod_perform\models\activity\participant_source;
 use mod_perform\models\activity\subject_instance as subject_instance_model;
@@ -176,7 +177,7 @@ class participant_instance_creation {
                     $participant_relationship['core_relationship_id'],
                     $subject_instance_data
                 ),
-                [$participant_relationship['participant_id']]
+                [new relationship_resolver_dto($participant_relationship['participant_id'])]
             );
             $added_instances_data[] = [
                 'subject_instance_id' => $subject_instance_id,

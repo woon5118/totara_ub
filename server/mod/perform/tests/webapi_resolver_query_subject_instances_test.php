@@ -23,6 +23,7 @@
  * @package mod_perform
  */
 
+use core\collection;
 use core\date_format;
 use core\entities\user;
 use core\webapi\formatter\field\date_field_formatter;
@@ -439,62 +440,68 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
         $actual = $this->get_webapi_operation_data($result);
         $this->assertCount(1, $actual, 'wrong subject count');
 
-        $expected_relationships = [constants::RELATIONSHIP_SUBJECT, constants::RELATIONSHIP_MANAGER];
-
-        $expected_participant_instances = [];
-        foreach ($participant_instances as $participant_instance) {
-            // We expect to have one manager and subject, so make sure the database rows
-            // match what we expect so that the later assert is correct.
-            $core_relationship = $participant_instance->get_core_relationship();
-            $this->assertContains($core_relationship->idnumber, $expected_relationships);
-            unset($expected_relationships[array_search($core_relationship->idnumber, $expected_relationships)]);
-
-            // Only the subjects participant instance got started
-            $state = $core_relationship->idnumber === constants::RELATIONSHIP_MANAGER
-                ? participant_instance_not_started::get_name()
-                : participant_instance_in_progress::get_name();
-
-            $expected_participant_instances[] = [
-                'progress_status' => $state,
-                'core_relationship' => [
-                    'id' => $core_relationship->id,
-                    'name' => $core_relationship->name,
-                ],
-                'participant_id' => $participant_instance->participant_id,
-                'id' => (string) $participant_instance->id,
-                'availability_status' => participant_instance_open::get_name(),
-                'is_overdue' => false,
-                'is_for_current_user' => ($participant_instance->participant_id === $user2->id)
-            ];
-        }
-
-        $this->assertEmpty($expected_relationships);
-
         $subject = $actual[0];
-        $expected_subject = [
-            'id' => $subject_instance->id,
-            'progress_status' => subject_instance_in_progress::get_name(),
-            'availability_status' => subject_instance_open::get_name(),
-            'created_at' => (new date_field_formatter(date_format::FORMAT_DATE, $subject_instance->get_context()))
-                ->format($subject_instance->created_at),
-            'due_date' => null,
-            'is_overdue' => false,
-            'activity' => [
-                'name' => $activity1->name,
-                'settings' => [
-                    activity_setting::MULTISECTION => true
+
+        $expected_subject = function (subject_instance $subject_instance, collection $participant_instances, int $user_id): array {
+            $expected_relationships = [constants::RELATIONSHIP_SUBJECT, constants::RELATIONSHIP_MANAGER];
+
+            $expected_participant_instances = [];
+            foreach ($participant_instances as $participant_instance) {
+                // We expect to have one manager and subject, so make sure the database rows
+                // match what we expect so that the later assert is correct.
+                $core_relationship = $participant_instance->get_core_relationship();
+                $this->assertContains($core_relationship->idnumber, $expected_relationships);
+                unset($expected_relationships[array_search($core_relationship->idnumber, $expected_relationships)]);
+
+                // Only the subjects participant instance got started
+                $state = $core_relationship->idnumber === constants::RELATIONSHIP_MANAGER
+                    ? participant_instance_not_started::get_name()
+                    : participant_instance_in_progress::get_name();
+
+                $expected_participant_instances[] = [
+                    'progress_status' => $state,
+                    'core_relationship' => [
+                        'id' => $core_relationship->id,
+                        'name' => $core_relationship->name,
+                    ],
+                    'participant_id' => $participant_instance->participant_id,
+                    'id' => (string) $participant_instance->id,
+                    'availability_status' => participant_instance_open::get_name(),
+                    'is_overdue' => false,
+                    'is_for_current_user' => ($participant_instance->participant_id == $user_id)
+                ];
+            }
+
+            $this->assertEmpty($expected_relationships);
+
+            $expected_subject = [
+                'id' => $subject_instance->id,
+                'progress_status' => subject_instance_in_progress::get_name(),
+                'availability_status' => subject_instance_open::get_name(),
+                'created_at' => (new date_field_formatter(date_format::FORMAT_DATE, $subject_instance->get_context()))
+                    ->format($subject_instance->created_at),
+                'due_date' => null,
+                'is_overdue' => false,
+                'activity' => [
+                    'name' => $subject_instance->activity->name,
+                    'settings' => [
+                        activity_setting::MULTISECTION => true
+                    ],
+                    'type' => [
+                        'display_name' => $subject_instance->activity->type->display_name
+                    ],
+                    'anonymous_responses' => false,
                 ],
-                'type' => [
-                    'display_name' => $activity1->type->display_name
+                'subject_user' => [
+                    'fullname' => $subject_instance->subject_user->fullname
                 ],
-                'anonymous_responses' => false,
-            ],
-            'subject_user' => [
-                'fullname' => $subject_instance->subject_user->fullname
-            ],
-            'participant_instances' => $expected_participant_instances
-        ];
-        $this->assertEquals($expected_subject, $subject['subject']);
+                'participant_instances' => $expected_participant_instances
+            ];
+
+            return $expected_subject;
+        };
+
+        $this->assertEquals($expected_subject($subject_instance, $participant_instances, $user2->id), $subject['subject']);
 
         $expected_sections = [
             [
@@ -640,7 +647,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
 
         $subject = $actual[0];
         // The subject instance data should be the same as for the other user
-        $this->assertEquals($expected_subject, $subject['subject']);
+        $this->assertEquals($expected_subject($subject_instance, $participant_instances, $user1->id), $subject['subject']);
 
         $expected_sections = [
             [
