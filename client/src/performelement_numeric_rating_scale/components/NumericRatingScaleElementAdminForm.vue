@@ -55,6 +55,7 @@
 
           <!-- Scale numeric values -->
           <FormRow
+            v-slot="{ labelId }"
             :label="
               $str(
                 'scale_numeric_values',
@@ -64,7 +65,10 @@
             :helpmsg="numericValuesHelp"
             required
           >
-            <div class="tui-elementEditNumericRatingScale__values">
+            <FieldGroup
+              :aria-labelledby="labelId"
+              class="tui-elementEditNumericRatingScale__values"
+            >
               <FormNumber
                 name="lowValue"
                 :aria-label="lowValueLabel"
@@ -75,7 +79,7 @@
                 :aria-label="highValueLabel"
                 :validations="highValueValidations"
               />
-            </div>
+            </FieldGroup>
           </FormRow>
 
           <!-- Preview -->
@@ -154,6 +158,7 @@ import {
   FormCheckbox,
 } from 'tui/components/uniform';
 import ElementAdminForm from 'mod_perform/components/element/ElementAdminForm';
+import FieldGroup from 'tui/components/form/FieldGroup';
 import FormActionButtons from 'mod_perform/components/element/admin_form/ActionButtons';
 import AdminFormMixin from 'mod_perform/components/element/admin_form/AdminFormMixin';
 import IdentifierInput from 'mod_perform/components/element/admin_form/IdentifierInput';
@@ -163,6 +168,7 @@ export default {
   components: {
     ElementAdminForm,
     Uniform,
+    FieldGroup,
     FormRow,
     FormText,
     FormNumber,

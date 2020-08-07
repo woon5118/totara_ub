@@ -29,6 +29,7 @@
         :initial-values="initialValues"
         class="tui-elementEditMultiChoiceMulti"
         input-width="full"
+        validation-mode="submit"
         :validate="validator"
         @submit="handleSubmit"
       >

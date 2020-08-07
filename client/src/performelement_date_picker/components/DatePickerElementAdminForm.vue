@@ -28,11 +28,13 @@
           v-slot="{ getSubmitting }"
           :initial-values="initialValues"
           :vertical="true"
+          validation-mode="submit"
           input-width="full"
           @submit="handleSubmit"
         >
           <FormRow
             :label="$str('question_title', 'performelement_date_picker')"
+            required
           >
             <FormText
               name="rawTitle"

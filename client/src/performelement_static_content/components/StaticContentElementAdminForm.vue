@@ -28,6 +28,7 @@
           v-slot="{ getSubmitting }"
           :initial-values="initialValues"
           :vertical="true"
+          validation-mode="submit"
           input-width="full"
           @submit="handleSubmit"
         >
@@ -41,6 +42,7 @@
                 'performelement_static_content'
               )
             "
+            required
           >
             <FormTextarea
               name="rawText"

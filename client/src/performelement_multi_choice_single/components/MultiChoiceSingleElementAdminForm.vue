@@ -29,6 +29,7 @@
           v-slot="{ getSubmitting }"
           :initial-values="initialValues"
           :vertical="true"
+          validation-mode="submit"
           input-width="full"
           @submit="handleSubmit"
         >
@@ -36,6 +37,7 @@
             :label="
               $str('question_title', 'performelement_multi_choice_single')
             "
+            required
           >
             <FormText
               name="rawTitle"
@@ -49,6 +51,7 @@
                 'performelement_multi_choice_single'
               )
             "
+            required
           >
             <FieldArray v-slot="{ items, push, remove }" path="answers">
               <Repeater

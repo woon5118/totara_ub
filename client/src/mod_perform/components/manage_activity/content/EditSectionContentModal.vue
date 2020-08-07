@@ -31,13 +31,12 @@
             <h2 class="tui-performEditSectionContentModal__title">
               {{ title }}
             </h2>
-            <p v-if="requiredText" aria-hidden="true">
-              <span class="tui-performEditSectionContentModal__required"
-                >*</span
-              >
-              {{ $str('required_fields', 'mod_perform') }}
-            </p>
           </template>
+
+          <p v-if="requiredText" aria-hidden="true">
+            <span class="tui-performEditSectionContentModal__required">*</span>
+            {{ $str('required_fields', 'mod_perform') }}
+          </p>
 
           <Loader :loading="isLoading">
             <div class="tui-performEditSectionContentModal__form">

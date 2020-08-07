@@ -28,10 +28,11 @@
           v-slot="{ getSubmitting }"
           :initial-values="initialValues"
           :vertical="true"
+          validation-mode="submit"
           input-width="full"
           @submit="handleSubmit"
         >
-          <FormRow :label="$str('title', 'performelement_long_text')">
+          <FormRow :label="$str('title', 'performelement_long_text')" required>
             <FormText
               name="rawTitle"
               :validations="v => [v.required(), v.maxLength(1024)]"

@@ -24,11 +24,13 @@
           :initial-values="initialValues"
           :vertical="true"
           :activity-state="activityState"
+          validation-mode="submit"
           input-width="full"
           @submit="handleSubmit"
         >
           <FormRow
             :label="$str('short_text_title', 'performelement_short_text')"
+            required
           >
             <FormText
               name="rawTitle"

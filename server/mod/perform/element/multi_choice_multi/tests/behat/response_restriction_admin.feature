@@ -33,9 +33,11 @@ Feature: Manage performance activity multiple choice-answers elements with admin
     Then I should see "Invalid. Restriction must not exceed total number of options"
     When I set the following fields to these values:
       | min | 0 |
+    And I save multiple answers question element data
     Then I should see "Invalid. Restriction must be bigger then 0"
     When I set the following fields to these values:
       | min | -2 |
+    And I save multiple answers question element data
     Then I should see "Invalid. Restriction must be bigger then 0"
     When I set the following fields to these values:
       | min | 3 |
@@ -44,16 +46,19 @@ Feature: Manage performance activity multiple choice-answers elements with admin
     Then I should see "Invalid. Restriction must not exceed total number of options"
     When I set the following fields to these values:
       | max | 0 |
+    And I save multiple answers question element data
     Then I should see "Invalid. Maximum cannot be smaller than minimum number"
     When I set the following fields to these values:
       | max | -2 |
+    And I save multiple answers question element data
     Then I should see "Invalid. Maximum cannot be smaller than minimum number"
     When I set the following fields to these values:
       | max | 2 |
+    And I save multiple answers question element data
     Then I should see "Invalid. Maximum cannot be smaller than minimum number"
     When I set the following fields to these values:
       | max | 4 |
-    Then I save multiple answers question element data
+    And I save multiple answers question element data
     And I close the tui notification toast
     And I close the tui modal
     When I navigate to manage perform activity content page

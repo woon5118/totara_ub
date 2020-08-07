@@ -19,7 +19,7 @@
 <style lang="scss">
 .tui-performEditSectionContentModal {
   &__title {
-    margin-top: 0;
+    margin: 0;
     @include tui-font-heading-medium;
   }
 
