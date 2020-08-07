@@ -32,7 +32,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 final class totara_cloudfiledir_s3_store_testcase extends totara_cloudfiledir_store_testcase {
     protected function prepare_store_config(array $config): array {
-        if (!file_exists(__DIR__ . '/../lib/vendor/autoload.php')) {
+        if (!file_exists(__DIR__ . '/../../../../libraries/optional/autoload.php')) {
             $this->markTestSkipped('Missing cloud client libraries');
         }
 

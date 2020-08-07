@@ -1,0 +1,14 @@
+{
+  "name": "totara/totara_optional",
+  "description": "Optional libraries for use in production",
+  "type": "metapackage",
+  "homepage": "https://www.totaralearning.com",
+  "require": {
+    "php": ">=7.2.10 <7.5",
+    "aws/aws-sdk-php": "^3.148",
+    "microsoft/azure-storage-blob": "^1.5"
+  },
+  "config": {
+    "vendor-dir": "optional/"
+  }
+}

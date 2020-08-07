@@ -31,6 +31,15 @@ admin_externalpage_setup('totara_cloudfiledir_stores');
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('pluginname', 'totara_cloudfiledir'));
 
+if (!file_exists(__DIR__ . '/../../../libraries/optional/autoload.php')) {
+    // NOTE: do not translate this warning for admins,
+    //       they need to understand English basics to administer servers.
+    $optionalmissing = <<<OET
+Optional libraries are not installed in /libraries/ directory, cloud storage of content files is not available. 
+OET;
+    echo $OUTPUT->notification(markdown_to_html($optionalmissing), \core\output\notification::NOTIFY_WARNING);
+}
+
 $table = new flexible_table('totara_cloudfiledir_stores');
 
 $columns = [

@@ -44,17 +44,9 @@ final class azure extends base {
         if (empty($this->bucket)) {
             return false;
         }
-        if (class_exists('MicrosoftAzure\Storage\Common\Exceptions\ServiceException')) {
-            return true;
-        }
-        if (!defined('TOTARA_CLOUDFILEDIR_AZURE_AUTOLOAD')) {
-            define('TOTARA_CLOUDFILEDIR_AZURE_AUTOLOAD', __DIR__ . '/../../../lib/vendor/autoload.php');
-        }
-        include_once(TOTARA_CLOUDFILEDIR_AZURE_AUTOLOAD);
-
-        if (!class_exists('MicrosoftAzure\Storage\Common\Exceptions\ServiceException')) {
-            // Library not installed manually.
-            error_log('Missing Azure Blob Storage SDK, see totara/cloudfiledir/lib/composer.json');
+        include_once(__DIR__ . '/../../../../../../libraries/optional/autoload.php');
+        if (!class_exists('MicrosoftAzure\Storage\Blob\BlobRestProxy')) {
+            error_log('Missing Azure Blob Storage SDK, use composer to install optional dependencies in /libraries/ directory');
             return false;
         }
         return true;

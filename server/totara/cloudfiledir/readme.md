@@ -43,13 +43,7 @@ are accessed the contents are automatically downloaded from the cloud store.
 
 ## Installation of PHP libraries
 
-To use this plugin external libraries need to be installed via composertotara/cloudfiledir/lib/composer.json.
-Alternatively you can use other directory and specify the PHP autoload file in
-TOTARA_CLOUDFILEDIR_S3_AUTOLOAD or TOTARA_CLOUDFILEDIR_AZURE_AUTOLOAD constant
-defined in config.php file.
-
-It is strongly recommended to update composer dependencies in totara/cloudfiledir/lib/
-before each Totara upgrade.
+Before using this plugin optional libraries must be installed via composer in /libraries/ directory.
 
 ## Cloud store options
 

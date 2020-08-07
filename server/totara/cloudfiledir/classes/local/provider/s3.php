@@ -44,17 +44,9 @@ final class s3 extends base {
         if (strlen($this->bucket) === 0) {
             return false;
         }
-        if (class_exists('Aws\S3\Exception\S3Exception')) {
-            return true;
-        }
-        if (!defined('TOTARA_CLOUDFILEDIR_S3_AUTOLOAD')) {
-            define('TOTARA_CLOUDFILEDIR_S3_AUTOLOAD', __DIR__ . '/../../../lib/vendor/autoload.php');
-        }
-        include_once(TOTARA_CLOUDFILEDIR_S3_AUTOLOAD);
-
-        if (!class_exists('Aws\S3\Exception\S3Exception')) {
-            // Library not installed manually.
-            error_log('Missing Amazon S3 SDK, see totara/cloudfiledir/lib/composer.json');
+        include_once(__DIR__ . '/../../../../../../libraries/optional/autoload.php');
+        if (!class_exists('Aws\S3\S3Client')) {
+            error_log('Missing Amazon S3 SDK, use composer to install optional dependencies in /libraries/ directory');
             return false;
         }
         return true;

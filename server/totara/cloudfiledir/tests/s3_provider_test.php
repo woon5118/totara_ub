@@ -32,7 +32,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 final class totara_cloudfiledir_s3_provider_testcase extends totara_cloudfiledir_provider_testcase {
     protected function get_provider() {
-        if (!file_exists(__DIR__ . '/../lib/vendor/autoload.php')) {
+        if (!file_exists(__DIR__ . '/../../../../libraries/optional/autoload.php')) {
             $this->markTestSkipped('Missing cloud client libraries');
         }
         $options = static::get_provider_options();

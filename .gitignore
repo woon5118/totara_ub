@@ -7,7 +7,7 @@ phpcs.xml
 /behat_local.yml
 # Composer support - only composer.json is to be in git, the rest is installed in each checkout.
 composer.phar
-composer.lock
+/composer.lock
 /vendor/
 # Node modules for the TUI componentry
 /node_modules/
