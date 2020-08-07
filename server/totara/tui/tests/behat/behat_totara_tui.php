@@ -86,6 +86,7 @@ class behat_totara_tui extends behat_base {
     private const TAGLIST_LOCATOR = '.tui-tagList';
     private const TAGLIST_DROPDOWN_BUTTON_LOCATOR = '.tui-tagList > button';
     private const TAGLIST_DROPDOWN_LIST_LOCATOR = '.tui-dropdown__content';
+    private const TAGLIST_DROPDOWN_LIST_ITEM_LOCATOR = '.tui-dropdownItem';
 
     /**
      * @param string $locator CSS locator
@@ -1140,15 +1141,14 @@ class behat_totara_tui extends behat_base {
     }
 
     /**
-     * @Then /^I should see the following options in the tui taglist in the "([^"]*)" "([^"]*)":$/
+     * Find the tag list inside the specified parent element.
      *
      * @param string $parent_locator
      * @param string $parent_selector
-     * @param TableNode $table
+     * @return NodeElement[]
+     * @throws ExpectationException
      */
-    public function i_should_see_in_tui_taglist(string $parent_locator, string $parent_selector, TableNode $table): void {
-        behat_hooks::set_step_readonly(false);
-
+    private function find_taglist(string $parent_locator, string $parent_selector): array {
         $parent = $this->get_selected_node($parent_selector, $parent_locator);
         if ($parent === null || !$parent->isVisible()) {
             $this->fail("Couldn't find the specified element or it wasn't visible");
@@ -1158,7 +1158,23 @@ class behat_totara_tui extends behat_base {
         if ($taglist === null || !$taglist->isVisible()) {
             $this->fail("Couldn't find the taglist or it wasn't visible");
         }
+
         $dropdown = $parent->find('css', self::TAGLIST_DROPDOWN_LIST_LOCATOR);
+
+        return [$taglist, $parent, $dropdown];
+    }
+
+    /**
+     * @Then /^I should see the following options in the tui taglist in the "([^"]*)" "([^"]*)":$/
+     *
+     * @param string $parent_locator
+     * @param string $parent_selector
+     * @param TableNode $table
+     */
+    public function i_should_see_in_tui_taglist(string $parent_locator, string $parent_selector, TableNode $table): void {
+        behat_hooks::set_step_readonly(false);
+
+        [, $parent, $dropdown] = $this->find_taglist($parent_locator, $parent_selector);
 
         // Open the dropdown
         $parent->find('css', self::TAGLIST_DROPDOWN_BUTTON_LOCATOR)->click();
@@ -1167,10 +1183,23 @@ class behat_totara_tui extends behat_base {
         $expected_options = array_keys($table->getRowsHash());
         $actual_options = array_map(static function (NodeElement $element) {
             return $element->getText();
-        }, $dropdown->findAll('css', 'a'));
+        }, $dropdown->findAll('css', self::TAGLIST_DROPDOWN_LIST_ITEM_LOCATOR));
 
-        if ($expected_options !== $actual_options) {
-            $this->fail('Expected and actual taglist options did not match');
+        $expected_count = count($expected_options);
+        $actual_count = count($actual_options);
+        if ($expected_count !== $actual_count) {
+            $this->fail(
+                "Taglist did not contain the expected number of items " .
+                "(expected $expected_count items when there were actually $actual_count)"
+            );
+        }
+
+        foreach ($expected_options as $i => $expected_option) {
+            if (str_contains($actual_options[$i], $expected_option) === false) {
+                $this->fail(
+                    "Could not find taglist item with text '$expected_option' in position $i of the dropdown."
+                );
+            }
         }
 
         // Close the dropdown
@@ -1188,16 +1217,7 @@ class behat_totara_tui extends behat_base {
     public function i_select_from_tui_taglist(string $parent_locator, string $parent_selector, TableNode $table): void {
         behat_hooks::set_step_readonly(false);
 
-        $parent = $this->get_selected_node($parent_selector, $parent_locator);
-        if ($parent === null || !$parent->isVisible()) {
-            $this->fail("Couldn't find the specified element or it wasn't visible");
-        }
-
-        $taglist = $parent->find('css', self::TAGLIST_LOCATOR);
-        if ($taglist === null || !$taglist->isVisible()) {
-            $this->fail("Couldn't find the taglist or it wasn't visible");
-        }
-        $dropdown = $parent->find('css', self::TAGLIST_DROPDOWN_LIST_LOCATOR);
+        [, $parent, $dropdown] = $this->find_taglist($parent_locator, $parent_selector);
 
         // Open the dropdown
         $parent->find('css', self::TAGLIST_DROPDOWN_BUTTON_LOCATOR)->click();
