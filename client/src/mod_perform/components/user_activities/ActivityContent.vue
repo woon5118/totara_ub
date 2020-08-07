@@ -704,16 +704,21 @@ export default {
         };
       });
 
+      let inputVariables = {
+        participant_section_id: this.activeParticipantSection.id,
+        update: update,
+      };
+
+      if (this.token) {
+        inputVariables.token = this.token;
+      }
+
       const { data: resultData } = await this.$apollo.mutate({
         mutation: this.isExternalParticipant
           ? UpdateSectionResponsesMutationExternalParticipant
           : UpdateSectionResponsesMutation,
         variables: {
-          input: {
-            participant_section_id: this.activeParticipantSection.id,
-            update: update,
-            token: this.token,
-          },
+          input: inputVariables,
         },
         refetchAll: false,
       });

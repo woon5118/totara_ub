@@ -233,7 +233,7 @@ class participant_instance extends model {
     public function get_is_for_current_user(): bool {
         global $USER;
 
-        return (int)$this->entity->participant_source === participant_source::INTERNAL
+        return (int) $this->entity->participant_source === participant_source::INTERNAL
             && $this->participant_id == $USER->id;
     }
 

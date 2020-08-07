@@ -119,6 +119,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                     'id' => (string) $participant_instance->id,
                     'availability_status' => participant_instance_open::get_name(),
                     'is_overdue' => false,
+                    'is_for_current_user' => true
                 ]
             ]
         ];
@@ -247,6 +248,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                     'id' => (string) $subject_participant_instance->id,
                     'availability_status' => participant_instance_open::get_name(),
                     'is_overdue' => false,
+                    'is_for_current_user' => true
                 ],
                 [
                     'progress_status' => participant_instance_not_started::get_name(),
@@ -255,6 +257,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                     'id' => (string) $appraiser_participant_instance->id,
                     'availability_status' => participant_instance_open::get_name(),
                     'is_overdue' => false,
+                    'is_for_current_user' => false
                 ],
             ]
         ];
@@ -461,6 +464,7 @@ class mod_perform_webapi_resolver_query_subject_instances_testcase extends advan
                 'id' => (string) $participant_instance->id,
                 'availability_status' => participant_instance_open::get_name(),
                 'is_overdue' => false,
+                'is_for_current_user' => ($participant_instance->participant_id === $user2->id)
             ];
         }
 

@@ -458,9 +458,7 @@ export default {
      * @return {Object[]}
      */
     filterToCurrentUser(participantInstances) {
-      return participantInstances.filter(
-        pi => Number(this.currentUserId) === Number(pi.participant_id)
-      );
+      return participantInstances.filter(pi => pi.is_for_current_user);
     },
   },
 };

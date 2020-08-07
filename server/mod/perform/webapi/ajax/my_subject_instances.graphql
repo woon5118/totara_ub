@@ -28,6 +28,7 @@ query mod_perform_my_subject_instances(
         progress_status
         availability_status
         is_overdue
+        is_for_current_user
         core_relationship {
           id
           name

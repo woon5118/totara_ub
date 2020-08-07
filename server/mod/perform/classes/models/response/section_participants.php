@@ -26,6 +26,7 @@ namespace mod_perform\models\response;
 use Closure;
 use core\collection;
 use mod_perform\models\activity\participant_instance;
+use mod_perform\models\activity\participant_source;
 use mod_perform\models\activity\section;
 use mod_perform\models\activity\subject_instance;
 use stdClass;
@@ -98,7 +99,8 @@ class section_participants {
         }
 
         return $this->participant_sections->find(function (participant_section $item) use ($user_id) {
-            return (int) $item->participant_instance->participant_id === $user_id;
+            return (int) $item->participant_instance->participant_source === participant_source::INTERNAL
+                && (int) $item->participant_instance->participant_id === $user_id;
         }) !== null;
     }
 
