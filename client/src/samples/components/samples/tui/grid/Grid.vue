@@ -109,6 +109,9 @@
               <FormRow label="Order">
                 <em>Supported, but refer to implementation</em>
               </FormRow>
+              <FormRow label="HTML tag">
+                <em>Supported, but refer to implementation</em>
+              </FormRow>
             </Form>
           </Popover>
         </GridItem>
@@ -151,6 +154,9 @@
           <Radio :value="0">0 (default)</Radio>
           <Radio :value="400">400</Radio>
         </RadioGroup>
+      </FormRow>
+      <FormRow label="HTML tag for Grid container">
+        <em>Supported, but refer to implementation</em>
       </FormRow>
     </SamplesPropCtl>
   </div>
